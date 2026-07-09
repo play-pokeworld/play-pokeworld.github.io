@@ -54,8 +54,8 @@ function renderTrainingWindow(){
   if(!unlocked){
     el.innerHTML = `<div style="text-align:center;padding:14px;color:var(--dim);font-size:11px;">
       <div style="font-size:24px;margin-bottom:4px;">🔒</div>
-      <b>${lang==='en'?'Training Room Locked':'Salle d\'Entraînement verrouillée'}</b><br>
-      ${lang==='en'?'Defeat Lt. Surge in Vermilion City (3 Badges) to unlock EV Sparring Training!':'Battez le Major Bob à Carmin sur Mer (3 Badges) pour débloquer la salle d\'entraînement !'}
+      <b>${t("m.training.13")}</b><br>
+      ${t("m.training.12")}
     </div>`;
     return;
   }
@@ -79,56 +79,56 @@ function renderTrainingWindow(){
           <span style="font-size:10px;color:var(--gold);">EVs : ${totalEvs}/36 🟢 (${G.selectedTraineeLoc==='team'?'⚡ Équipe':'📦 Boîte'})</span>
         </div>
       </div>
-      <button class="hbtn" style="padding:5px 8px;font-size:11px;background:var(--blue);color:#fff;" onclick="openUnifiedSelectorModal('training')">🔄 ${lang==='en'?'Change':'Changer'}</button>
+      <button class="hbtn" style="padding:5px 8px;font-size:11px;background:var(--blue);color:#fff;" onclick="openUnifiedSelectorModal('training')">🔄 ${t("m.training.11")}</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
       <div class="pokechill-row" style="background:#18261e;border:1px solid #2e4a3c;border-radius:6px;padding:8px;cursor:pointer;text-align:left;" onclick="startTrainingBattle('move')">
-        <div style="font-weight:bold;color:#4ade80;font-size:11px;">${lang==='en'?'Move Training':'Entraînement Capacité'}</div>
-        <div style="font-size:9px;color:var(--dim);">${lang==='en'?'Difficulty: ★':'Difficulté : ★'} (Facile : -2 Nv.)</div>
+        <div style="font-weight:bold;color:#4ade80;font-size:11px;">${t("m.training.10")}</div>
+        <div style="font-size:9px;color:var(--dim);">${t("m.training.9")} (Facile : -2 Nv.)</div>
       </div>
       <div class="pokechill-row" style="background:#1f1826;border:1px solid #3c2e4a;border-radius:6px;padding:8px;cursor:pointer;text-align:left;" onclick="startTrainingBattle('ability')">
-        <div style="font-weight:bold;color:#c084fc;font-size:11px;">${lang==='en'?'Ability Training':'Entraînement Talent'}</div>
-        <div style="font-size:9px;color:var(--dim);">${lang==='en'?'Difficulty: ★':'Difficulté : ★'} (Facile : -1 Nv.)</div>
+        <div style="font-weight:bold;color:#c084fc;font-size:11px;">${t("m.training.8")}</div>
+        <div style="font-size:9px;color:var(--dim);">${t("m.training.7")} (Facile : -1 Nv.)</div>
       </div>
       <div class="pokechill-row" style="background:#26181e;border:1px solid #4a2e3c;border-radius:6px;padding:8px;cursor:pointer;text-align:left;" onclick="startTrainingBattle('ev')">
-        <div style="font-weight:bold;color:#f472b6;font-size:11px;">${lang==='en'?'EV Training I':'Entraînement EV I'}</div>
-        <div style="font-size:9px;color:var(--dim);">${lang==='en'?'Difficulty: ★':'Difficulté : ★'}★ (Moyen : +2 Nv.)</div>
+        <div style="font-weight:bold;color:#f472b6;font-size:11px;">${t("m.training.6")}</div>
+        <div style="font-size:9px;color:var(--dim);">${t("m.training.5")}★ (Moyen : +2 Nv.)</div>
       </div>
       <div class="pokechill-row" style="background:#261f18;border:1px solid #4a3c2e;border-radius:6px;padding:8px;cursor:pointer;text-align:left;" onclick="startTrainingBattle('level')">
-        <div style="font-weight:bold;color:#ffd700;font-size:11px;">${lang==='en'?'Level Training':'Entraînement Niveau'}</div>
-        <div style="font-size:9px;color:var(--dim);">${lang==='en'?'Difficulty: ★':'Difficulté : ★'}★ (Moyen : +3 Nv.)</div>
+        <div style="font-weight:bold;color:#ffd700;font-size:11px;">${t("m.training.4")}</div>
+        <div style="font-size:9px;color:var(--dim);">${t("m.training.3")}★ (Moyen : +3 Nv.)</div>
       </div>
       <div class="pokechill-row" style="grid-column:1/-1;background:#261826;border:1px solid #4a2e4a;border-radius:6px;padding:8px;cursor:pointer;text-align:left;" onclick="startTrainingBattle('hidden_ability')">
-        <div style="font-weight:bold;color:#f87171;font-size:11px;">${lang==='en'?'Hidden Ability Training ✨':'Entraînement Talent Caché ✨'}</div>
-        <div style="font-size:9px;color:var(--dim);">${lang==='en'?'Difficulty: ★':'Difficulté : ★'}★★ (Expert : +6 Nv. & Boss)</div>
+        <div style="font-weight:bold;color:#f87171;font-size:11px;">${t("m.training.2")}</div>
+        <div style="font-size:9px;color:var(--dim);">${t("m.training.1")}★★ (Expert : +6 Nv. & Boss)</div>
       </div>
     </div>
   `;
 }
 function startTrainingBattle(mode='ev'){
   if(typeof battle !== 'undefined' && battle && battle.active){
-    notify("❌ Combat en cours ! Terminez ou quittez d'abord le combat actuel.", "var(--red)");
+    notify(t("n2.combat_en_cours_terminez_ou_quittez_dabo"), "var(--red)");
     return;
   }
   const trainee = getTraineePoke();
-  if(!trainee){ setMsg("❌ Aucun Pokémon à entraîner !"); return; }
+  if(!trainee){ setMsg(t("n.aucun_pokémon_à_entraîner")); return; }
 
   if(mode === 'level' && trainee.level >= 100){
-    notify("❌ Ce Pokémon est déjà au Niveau 100 maximum !", "var(--red)");
+    notify(t("n.ce_pokémon_est_déjà_au_niveau_100_maximu"), "var(--red)");
     return;
   }
   if(mode === 'ev'){
     if(!trainee.evs) trainee.evs = {hp:0, atk:0, def:0, spa:0, spd:0, spe:0};
     const totEv = Object.values(trainee.evs).reduce((a,b)=>a+b, 0);
     if(totEv >= 36){
-      notify("❌ Ce Pokémon possède déjà 6 étoiles EV sur toutes ses statistiques (36/36) !", "var(--red)");
+      notify(t("n.ce_pokémon_possède_déjà_6_étoiles_ev_sur"), "var(--red)");
       return;
     }
   }
   if(mode === 'move'){
     const pool = learnableMoves(trainee);
     if(!pool || !pool.length){
-      notify("❌ Ce Pokémon connaît ou a déjà débloqué toutes les capacités disponibles pour son espèce !", "var(--red)");
+      notify(t("n.ce_pokémon_connaît_ou_a_déjà_débloqué_to"), "var(--red)");
       return;
     }
   }
@@ -157,4 +157,5 @@ function startTrainingBattle(mode='ev'){
   addBattleLog(`⚡ SALLE D'ENTRAÎNEMENT (${mode.toUpperCase()}) - Round 1/3 : ${bots[0].name} Nv.${bLv} !`);
   startBattle(null, true, 'training', bots);
 }
+
 

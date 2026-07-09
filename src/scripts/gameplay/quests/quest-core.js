@@ -134,7 +134,7 @@ function claimQuest(qid, cat){
   const def = (cat==='main') ? getMainQuestDef(inst.qid)
             : (cat==='side') ? SIDE_QUESTS[inst.qid]
             : inst.def;
-  if(!questDone(inst, def)){ notify('⏳ Objectif pas encore terminé !','var(--red)'); return; }
+  if(!questDone(inst, def)){ notify(t("n.objectif_pas_encore_terminé"),'var(--red)'); return; }
 
   if(def.rewardMoney) G.money += def.rewardMoney;
   if(def.rewardItems){ for(const k in def.rewardItems) addToInventory(k, def.rewardItems[k]); }
@@ -164,14 +164,14 @@ function claimQuest(qid, cat){
       if(G.team.length<6) G.team.push(legMon); else G.collection[String(legMon.id)]=legMon;
       G.pokedex[def.rewardPoke]={...(G.pokedex[def.rewardPoke]||{}),seen:true,caught:true};
       unlockTalentForSpecies(def.rewardPoke, legMon.talent);
-      notify(lang==='en'?`🎉 ${legMon.name} obtained!`:`🎉 ${legMon.name} obtenu !`,'var(--green)');
+      notify(tr("m.quest_core.2", {p0:legMon.name}),'var(--green)');
     }
   }
   updateHeader();
   try{ if(document.getElementById('story-panel')) renderStoryWindow(); }catch(_){}
   try{ if(typeof refreshMapAndLoc==='function') refreshMapAndLoc(); }catch(_){}
   saveGame();
-  notify(lang==='en'?'🎉 Quest complete! Reward received!':'🎉 Quête terminée ! Récompense reçue !','var(--green)');
+  notify(t("m.quest_core.1"),'var(--green)');
 }
 
 // ============================================================
@@ -213,3 +213,4 @@ EventBus.on(EVENTS.POKEMON_CAUGHT, ({loc})  => { advanceQuests('catch', loc, 1);
 EventBus.on(EVENTS.MINE_SELL,      ({amount}) => { advanceQuests('mine_sell', null, amount); _refreshUI(); });
 EventBus.on(EVENTS.BADGE_EARNED,   () => { advanceQuests('badge', null, 1); _refreshUI(); });
 EventBus.on(EVENTS.LEAGUE_WON,     () => { advanceQuests('league', null, 1); _refreshUI(); });
+

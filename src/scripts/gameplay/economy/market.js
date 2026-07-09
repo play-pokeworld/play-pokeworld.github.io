@@ -143,14 +143,14 @@ function renderMarket(el){
 }
 function buyPokemon(id){
   const price=getPokemonPrice(id);
-  if(G.money<price){notify('Pas assez d\'argent !','var(--red)');return;}
-  if(speciesOwned(id)){notify('Vous possédez déjà cette espèce !','var(--red)');return;}
+  if(G.money<price){notify(t("n.pas_assez_dargent"),'var(--red)');return;}
+  if(speciesOwned(id)){notify(t("n.vous_possédez_déjà_cette_espèce"),'var(--red)');return;}
   G.money-=price;
   updateHeader();
   const d=PD[id];
   const isShiny = isSpeciesShiny(id);
   const p=createPoke(id,1,isShiny);
-  if(!p){notify('Erreur lors de la création du Pokémon.','var(--red)');return;}
+  if(!p){notify(t("n.erreur_lors_de_la_création_du_pokémon"),'var(--red)');return;}
   if(G.team.length<6){
     G.team.push(p);
     notify(`🎉 ${p.name} rejoint votre équipe ! (-${price.toLocaleString()}₽)`);
@@ -164,4 +164,5 @@ function buyPokemon(id){
   renderMarket(document.getElementById('tab-content'));
   updateHeader();
 }
+
 

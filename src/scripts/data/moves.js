@@ -156,7 +156,7 @@ function getChampName(id){
     return LEAGUE_TRAINERS[battle.leagueStage].name;
   }
   if(id && String(id).startsWith('quest_')){
-    return lang === 'en' ? 'Legendary Boss' : 'Boss Légendaire';
+    return t("m.moves.14");
   }
   if(lang === 'en' && CHAMP_EN[id]) return CHAMP_EN[id].name;
   return CHAMPIONS[id]?.name || id || 'Adversaire';
@@ -181,7 +181,10 @@ function updateI18nLabels(){
     if(tabKeys[i]) el.textContent = t(tabKeys[i]);
   });
   const mapTitle = document.querySelector('#win-map .win-header-title');
-  if(mapTitle) mapTitle.textContent = '⋮⋮ ' + t('win_map');
+  if(mapTitle){
+    const rName = G.region === 'johto' ? 'Johto' : 'Kanto';
+    mapTitle.textContent = '⋮⋮ 🗺️ ' + ((typeof G!=='undefined'&&G&&G.lang==='en')?('Map: '+rName):('Carte '+rName));
+  }
   const teamTitle = document.querySelector('#win-team .win-header-title');
   if(teamTitle) teamTitle.textContent = '⋮⋮ ' + t('win_team');
   const battleTitle = document.querySelector('#win-battle .win-header-title');
@@ -189,23 +192,23 @@ function updateI18nLabels(){
   const tabsTitle = document.querySelector('#win-tabs .win-header-title');
   if(tabsTitle) tabsTitle.textContent = '⋮⋮ ' + t('win_tabs');
   const hTitle = document.getElementById('hatchery-win-title');
-  if(hTitle) hTitle.textContent = lang === 'en' ? "Daycare & Hatchery" : "Pension & Couveuse";
+  if(hTitle) hTitle.textContent = t("m.moves.13");
   const trTitle = document.getElementById('training-win-title');
-  if(trTitle) trTitle.textContent = lang === 'en' ? "Training Room" : "Salle d'Entraînement";
+  if(trTitle) trTitle.textContent = t("m.moves.12");
   const autoTitle = document.getElementById('auto-win-title');
-  if(autoTitle) autoTitle.textContent = lang === 'en' ? "Automation (PokéClicker Tools)" : "Automatisation (PokéClicker Tools)";
+  if(autoTitle) autoTitle.textContent = t("m.moves.11");
   const idleTitle = document.querySelector('#battle-idle-screen div:nth-child(2)');
   const idleDesc = document.querySelector('#battle-idle-screen div:nth-child(3)');
   if(idleTitle) idleTitle.textContent = t('idle_title');
   if(idleDesc) idleDesc.innerHTML = t('idle_desc');
   const leaveBtn = document.getElementById('leave-btn');
-  if(leaveBtn) leaveBtn.textContent = (battle && battle.isChamp) ? (lang==='en' ? '🏳️ Forfeit' : '🏳️ Abandonner') : t('leave_combat');
+  if(leaveBtn) leaveBtn.textContent = (battle && battle.isChamp) ? (t("m.moves.10")) : t('leave_combat');
   const mobBtns = document.querySelectorAll('.mob-btn');
   if(mobBtns && mobBtns.length >= 4 && mobBtns[0] && mobBtns[1] && mobBtns[2] && mobBtns[3]){
-    mobBtns[0].textContent = lang === 'en' ? '⚔️ Battle' : '⚔️ Combat';
-    mobBtns[1].textContent = lang === 'en' ? '🗺️ Map' : '🗺️ Carte';
-    mobBtns[2].textContent = lang === 'en' ? '⚡ Party' : '⚡ Équipe';
-    mobBtns[3].textContent = lang === 'en' ? '📑 Menus' : '📑 Menus';
+    mobBtns[0].textContent = t("m.moves.9");
+    mobBtns[1].textContent = t("m.moves.8");
+    mobBtns[2].textContent = t("m.moves.7");
+    mobBtns[3].textContent = t("m.moves.6");
   }
   const lootOpenBtn = document.getElementById('loot-open-btn');
   if(lootOpenBtn) lootOpenBtn.textContent = t('loot_btn');
@@ -217,13 +220,13 @@ function updateI18nLabels(){
   if(sumTitle) sumTitle.textContent = t('loot_summary_title');
   const sel = document.getElementById('map-region-select');
   if(sel){
-    sel.options[0].textContent = lang==='en' ? '🗺️ Kanto Region' : '🗺️ Région Kanto';
-    sel.options[1].textContent = lang==='en' ? '🗺️ Johto Region' : '🗺️ Région Johto';
-    sel.options[2].textContent = lang==='en' ? '🔒 Hoenn Region (Soon)' : '🔒 Région Hoenn (Bientôt)';
-    sel.options[3].textContent = lang==='en' ? '🔒 Sinnoh Region (Soon)' : '🔒 Région Sinnoh (Bientôt)';
+    sel.options[0].textContent = t("m.moves.5");
+    sel.options[1].textContent = t("m.moves.4");
+    sel.options[2].textContent = t("m.moves.3");
+    sel.options[3].textContent = t("m.moves.2");
   }
   const mapWinTitleEl = document.getElementById('map-win-title');
-  if(mapWinTitleEl) mapWinTitleEl.textContent = (lang==='en' ? 'Map: ' : 'Carte : ') + (G?.region === 'johto' ? 'Johto' : 'Kanto');
+  if(mapWinTitleEl) mapWinTitleEl.textContent = (t("m.moves.1")) + (G?.region === 'johto' ? 'Johto' : 'Kanto');
   try{ renderBattleSummary(); }catch(_){}
 }
 
@@ -744,3 +747,4 @@ const DEX_MAP = {
   250:250,
   251:251
 };
+

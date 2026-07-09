@@ -59,3 +59,4 @@ function openDexEntry(id){
   document.getElementById('poke-modal').classList.add('open');
 }
 
+

@@ -1,99 +1,63 @@
 # PokéWorld
 
-Un jeu de collection et d'élevage de Pokémon, mêlant aventure de exploration,
-farm infini et progression de ligue. Attrape les 151 espèces, constitue ton
-équipe, équipe-la d'objets, fais-la évoluer, et deviens le Maître des régions
-de Kanto puis de Johto.
+Jeu Pokémon idle/exploration (Kanto + Johto) — combat temps réel style PokéChill,
+quêtes, élevage, mine, économie, 251 Pokémon.
 
-## But du jeu
+## Structure du projet
 
-- **Explorer** la carte région par région (Kanto puis Johto), en débloquant les
-  lieux au fil de ta progression (badges, histoire).
-- **Combattre** les Pokémon sauvages pour les capturer, gagner de l'expérience et
-  faire évoluer ton équipe.
-- **Farm** : chaque rencontre rapporte des objets, des tonnes de ressources et des
-  Pokémon Shiny à débloquer — le cœur du jeu est de revenir sans cesse sur tes
-  meilleures zones pour progresser indéfiniment.
-- **Battre les Champions d'Arène**, le Conseil 4 et le Maître, puis traquer les
-  Pokémon légendaires et fabuleux cachés dans les zones avancées.
-- **Optimiser** ton équipe : talents, objets tenus, pierres d'évolution, EV/IV.
-
-## Lancer le jeu
-
-- **Le plus simple** : ouvre `pokeworld.html` (tout est intégré — CSS, JS et
-  sprites inline). Ça marche dans l'aperçu de la plateforme, en double-cliquant,
-  ou via un serveur local.
-- **Via un serveur local** (optionnel) : depuis ce dossier,
-  ```bash
-  python3 -m http.server 8000
-  ```
-  puis ouvre `http://localhost:8000/pokeworld.html`.
-
-Le jeu se sauvegarde automatiquement (localStorage).
-
-## Comment progresser (et où chercher l'info)
-
-Le jeu couvre les 151 premiers Pokémon et suit la géographie classique de Kanto et
-Johto. Pour savoir **où aller**, **quel Pokémon capturer**, **comment le faire
-évoluer** et **contre quoi il est fort/faible**, reporte-toi aux deux encyclopédies
-Pokémon de référence (mises à jour en continu par la communauté) :
-
-- **Bulbapedia** — https://bulbapedia.bulbagarden.net
-  Cartes des régions, emplacements exacts des Pokémon, tableaux des types,
-  méthodes d'évolution, objets et arènes. Idéal pour planifier un itinéraire.
-- **Pokémon Database** — https://pokemondb.net
-  Pokédex complet, tables d'efficacité des types (type chart), lieux d'apparition
-  et calculateurs. Idéal pour optimiser tes combats et tes captures.
-
-Ces deux sites sont tes meilleurs alliés pour :
-- connaître les **zones d'apparition** de chaque espèce (utile pour farm) ;
-- vérifier les **correspondances de types** avant un combat d'arène ;
-- trouver les **pierres d'évolution** et les conditions d'évolution ;
-- suivre l'ordre des **badges et des arènes** pour débloquer la suite de la carte.
-
-## Arborescence du projet
-
-```text
-pokeworld.html                     # version AUTONOME (CSS+JS+sprites inline) — à ouvrir pour jouer
-src/
-  assets/
-    css/style.css                  # toutes les feuilles de style
-    images/
-      pokemon/                     # sprites Pokémon nommés d'après leur nom anglais
-        front/      <pokemon>.png  # ex. pikachu.png, mr-mime.png, nidoran-f.png
-        back/       <pokemon>.png
-        frontShiny/ <pokemon>.png
-        backShiny/  <pokemon>.png
-      items/        <key>.png      # icônes d'objets (pokeball.png, potion.png, …)
-    sounds/                        # (réservé aux SFX)
-    fonts/                         # (polices système/emoji utilisées)
-  languages/                       # SYSTÈME DE LANGUES (fr + en)
-    translations.js                # données : I18N, POKE_NAMES_FR, MOVE_NAMES_EN, LOC_NAMES_FR/EN
-    i18n.js                        # helpers : t(), getPokeName(), getMoveName(), setLanguage()
-  scripts/
-    core/      state.js            # état initial G + sauvegarde
-    data/      moves.js            # MOVES, DEX_MAP
-               sprites.js          # SPRITE_DATA, ITEM_SPRITE_DATA (→ src/assets/images/*.png)
-               game-data.js        # ITEMS, LOCS (Kanto), LOCS_JOHTO, SHOPS, CHAMPIONS, quêtes
-    gameplay/  world.js            # régions, rencontres, boutiques, progression, quêtes
-               mine.js             # système de mine (ressources)
-               battle.js           # combat (startBattle, tour par tour, boss)
-               save.js             # sauvegarde / chargement
-    display/  sprite-helpers.js    # spriteImg(), itemIcon()
-               map.js              # rendu de la carte Kanto/Johto (nœuds, routes, badges)
-               bootstrap.js        # init() — démarrage du jeu
+```
+pokeworld/
+├── index.html              → HTML léger (378 lignes), charge tout via src/loader.js
+├── src/
+│   ├── loader.js           → charge les 106 modules dans l'ordre de dépendance
+│   ├── assets/
+│   │   ├── css/style.css   → tous les styles
+│   │   ├── images/         → sprites Pokémon + objets (1074 PNG téléchargés)
+│   │   └── sounds/
+│   ├── localization/       → TOUS les textes du jeu (zéro texte en dur dans le code)
+│   │   ├── i18n.js         → moteur (t(), tr(), getPokeName, getLocName...)
+│   │   ├── data.js         → fusionne les modules fr/ et en/ en globals
+│   │   ├── fr/             → 15 fichiers (ui, economy, combat, stats, pokedex,
+│   │   │                      items, talents, shops, champions, lore, quests,
+│   │   │                      npc, messages, pokemon-names, locations)
+│   │   └── en/             → 15 fichiers (même structure)
+│   └── scripts/
+│       ├── core/           → state, event-bus, util, pokemon-factory
+│       ├── data/           → 22 fichiers (items, talents, locations, shops,
+│       │                      champions, quests, moves, sprites, helpers...)
+│       ├── display/        → 17 fichiers (map, dashboard, team-ui, poke-modal,
+│       │                      starter, exploration, box-ui, tabs, region...)
+│       └── gameplay/
+│           ├── world/      → world, collection, team
+│           ├── quests/     → quest-core, quest-ui
+│           ├── economy/    → mine, mine-ui, inventory, inventory-actions,
+│           │               shop, market, pokedex
+│           ├── combat/     → battle-init, battle-tick, battle-attack,
+│           │               battle-status, battle-ui, battle-team-ui,
+│           │               battle-flow, battle-switch, battle-summary,
+│           │               progression, catch, training, move-learning
+│           ├── breeding/   → hatchery, hatchery-ui
+│           ├── automation/ → automation
+│           ├── boxes/      → box-selector
+│           └── save/       → save, save-extras, settings
+└── tool/
+    └── download_sprites.bat → re-télécharger les sprites (PokeAPI)
 ```
 
-## Sprites
+## Lancement
 
-604 sprites Pokémon (151 × 4 versions : face / dos / face shiny / dos shiny) + 47
-objets, séparés par version et nommés d'après le **nom anglais** du Pokémon
-(minuscules, normalisé : `♀`→`-f`, `♂`→`-m`). Aucune image n'est chargée depuis
-le réseau : tout est présent en local (et inline dans `pokeworld.html`).
+```bash
+# Nécessite un serveur local (les modules JS sont chargés en externe)
+python3 -m http.server 8000
+# Ouvrir http://localhost:8000/
+```
 
-## Système de langues
+## Localisation
 
-Le jeu supporte le **français** (`fr`, par défaut) et l'**anglais** (`en`). Les
-données de traduction sont dans `src/languages/translations.js` ; les helpers
-(`t(key)`, `getPokeName(id)`, `getMoveName(id)`, `setLanguage(lang)`) sont dans
-`src/languages/i18n.js`.
+Tous les textes passent par le système `localization/`. Aucun texte n'est codé en dur.
+- `t("clé")` → texte simple
+- `tr("clé", {param: valeur})` → texte avec interpolation `{param}`
+- `getPokeName(id)`, `getMoveName(id)`, `getLocName(id)`, `getItemName(key)`,
+  `getTalentName(tal)`, `getLore(loc)`, `getNpc(loc, idx)`, `getQuestText(cat, id)`
+
+Pour ajouter une langue : créer un dossier `localization/<lang>/` avec les mêmes fichiers.

@@ -22,15 +22,15 @@ function equipItemOn(teamIdx, key){
   const p=G.team[teamIdx];
   if(!p) return;
   const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
-  if(!ITEMS[key]||!ITEMS[key].buff){ setMsg(lang==='en' ? "This item cannot be equipped." : "Cet objet n'est pas équipable."); return; }
-  if(!(G.inventory[key]>0)){ setMsg(lang==='en' ? "You don't have this item." : "Vous n'avez pas cet objet."); return; }
+  if(!ITEMS[key]||!ITEMS[key].buff){ setMsg(t("m.team.6")); return; }
+  if(!(G.inventory[key]>0)){ setMsg(t("m.team.5")); return; }
   const other=itemEquippedOnTeam(key);
   if(other && other!==p){
-    setMsg(lang==='en' ? `❌ ${getItemName(key)} is already equipped on ${other.name}.` : `❌ ${getItemName(key)} est déjà équipé sur ${other.name}.`);
+    setMsg(tr("m.team.4", {p0:getItemName(key), p1:other.name}));
     return;
   }
   p.heldItem=key;
-  notify(lang==='en' ? `🎒 ${p.name} is now holding ${getItemName(key)}!` : `🎒 ${p.name} tient ${getItemName(key)} !`);
+  notify(tr("m.team.3", {p0:p.name, p1:getItemName(key)}));
   saveGame();
   showTab('inventory');
 }
@@ -40,7 +40,7 @@ function unequipItem(teamIdx){
   const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
   const nm=getItemName(p.heldItem)||p.heldItem;
   p.heldItem=null;
-  notify(lang==='en' ? `${p.name} is no longer holding ${nm}.` : `${p.name} ne tient plus ${nm}.`);
+  notify(tr("m.team.2", {p0:p.name, p1:nm}));
   saveGame();
   showTab('inventory');
 }
@@ -56,8 +56,9 @@ function changePokeTalent(teamIdx, boxId, newTal){
   p.talent = newTal;
   saveGame();
   const lang = G.lang || 'fr';
-  notify(lang === 'en' ? `🧬 ${p.name}'s talent changed to ${getTalentName(newTal)}!` : `🧬 Talent de ${p.name} changé pour ${getTalentName(newTal)} !`, 'var(--purple)');
+  notify(tr("m.team.1", {p0:p.name, p1:getTalentName(newTal)}), 'var(--purple)');
   if(boxId && boxId !== 'undefined' && boxId !== 'null') openBoxPokeModal(boxId);
   else openPokeModal(teamIdx);
 }
+
 

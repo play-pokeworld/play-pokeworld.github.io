@@ -36,3 +36,4 @@ function createPoke(id, level, shinyUnlocked=false){
   };
 }
 
+

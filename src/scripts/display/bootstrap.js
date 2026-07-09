@@ -1,6 +1,10 @@
 function init(){
   try{
     applySavedTheme();
+    // IMPORTANT: load the save FIRST, before any render — otherwise
+    // checkStarterNeeded() (triggered by showTab/renderMap) fires on the
+    // default G state and wrongly re-opens the starter picker on every reload.
+    loadGame();
     try{
       const savedCols = safeStorage.get('pokeworld_cols_v12');
       if(savedCols){
@@ -13,7 +17,6 @@ function init(){
     renderMap();
     updateHeader();
     showTab('info');
-    loadGame();
     updateI18nLabels();
     ensureQuestState();
     markVisited(G.location);
@@ -53,3 +56,4 @@ document.getElementById('battle-summary-modal').addEventListener('click',functio
 });
 
 init();
+

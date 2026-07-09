@@ -29,21 +29,22 @@ function toggleDebugMenu(){
 function debugGiveMoney(){
   G.money += 50000;
   updateHeader();
-  notify('🛠️ +50 000₽ ajoutés !', 'var(--gold)');
+  notify(t("n.50_000_ajoutés"), 'var(--gold)');
 }
 function debugGiveCandies(){
   addToInventory('rarecandy', 10);
-  notify('🛠️ +10 Super Bonbons ajoutés !', 'var(--purple)');
+  notify(t("n.10_super_bonbons_ajoutés"), 'var(--purple)');
   showTab('inventory');
 }
 function debugUnlockBadges(){
   G.badges = ['brock','misty','surge','erika','koga','sabrina','blaine','giovanni'];
   updateHeader();
   renderMap();
-  notify('🛠️ 8 Badges débloqués !', 'var(--blue)');
+  notify(t("n.8_badges_débloqués"), 'var(--blue)');
 }
 function debugFillMine(){
   if(G.mine) G.mine.energy = 100;
-  notify('🛠️ Énergie de mine restaurée à 100 !', 'var(--green)');
+  notify(t("n.énergie_de_mine_restaurée_à_100"), 'var(--green)');
 }
+
 

@@ -46,18 +46,19 @@ function buyItem(key){
   const loc=getLocObj(G.location);
   const shopId=loc?loc.shopId:null;
   if(shopId === 'indigo' && !G.championTitle){
-    notify(G.lang === 'en' ? '🔒 You must become Kanto League Champion to buy items here!' : '🔒 Vous devez être Maître de la Ligue pour acheter ici !', 'var(--red)');
+    notify(t("m.shop.1"), 'var(--red)');
     return;
   }
   const itm=ITEMS[key];
   if(!itm) return;
   const owned=G.inventory[key]||0;
   if(itm.buff && owned>=BAG_MAX){notify(`Sac plein pour ${getItemName(key)} (max ${BAG_MAX}).`,'var(--red)');return;}
-  if(G.money<itm.price){notify('Pas assez d\'argent !','var(--red)');return;}
+  if(G.money<itm.price){notify(t("n.pas_assez_dargent"),'var(--red)');return;}
   G.money-=itm.price;
   addToInventory(key,1);
   updateHeader();
   notify(`✅ ${getItemName(key)} acheté !`);
   renderShop(document.getElementById('tab-content'));
 }
+
 

@@ -44,3 +44,4 @@ function itemIcon(key, size=20, cls=''){
 // Un même item ne peut être équipé que sur UN Pokémon de l'équipe active.
 // ============================================================
 const BAG_MAX = 25;
+

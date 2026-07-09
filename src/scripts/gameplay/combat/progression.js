@@ -33,7 +33,7 @@ function levelUp(p){
       if(!p.moves.some(m => m.id === newMvId)){
         p.moves.push({id:newMvId, pp:MOVES[newMvId]?.pp||10, maxPP:MOVES[newMvId]?.pp||10});
         const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
-        addBattleLog(lang === 'en' ? `💡 ${p.name} learned ${getMoveName(newMvId)} at Level ${p.level}!` : `💡 ${p.name} apprend ${getMoveName(newMvId)} au Niveau ${p.level} !`);
+        addBattleLog(tr("m.progression.9", {p0:p.name, p1:getMoveName(newMvId), p2:p.level}));
       }
     }
   }
@@ -48,7 +48,7 @@ function getEvolutionMethodsHtml(id){
     const targetId = LEVEL_EVO_MAP[nid];
     const targetName = getPokeName(targetId);
     methods.push(`<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-      <span>📈 <b>${lang==='en'?'Level Up:':'Par Niveau :'}</b> ${lang==='en'?'Evolves at <b>Level '+EVO_LEVELS[nid]+'</b> into':'Évolue au <b>Niveau '+EVO_LEVELS[nid]+'</b> en'} <b>${targetName}</b></span>
+      <span>📈 <b>${t("m.progression.8")}</b> ${t("m.progression.7")} <b>${targetName}</b></span>
     </div>`);
   }
   
@@ -58,19 +58,19 @@ function getEvolutionMethodsHtml(id){
       const targetName = getPokeName(targetId);
       const stName = getItemName(stoneKey);
       methods.push(`<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-        <span>🪨 <b>${lang==='en'?'Stone / Item:':'Par Objet :'}</b> ${lang==='en'?'Use':'Avec'} ${stone ? stone.icon + ' <b>' + stName + '</b>' : stoneKey} → <b>${targetName}</b></span>
+        <span>🪨 <b>${t("m.progression.6")}</b> ${t("m.progression.5")} ${stone ? stone.icon + ' <b>' + stName + '</b>' : stoneKey} → <b>${targetName}</b></span>
       </div>`);
     }
   }
 
   if(methods.length === 0){
     return `<div style="background:var(--bg);border-radius:6px;padding:8px;margin-bottom:10px;font-size:11px;color:var(--dim);border:1px solid #333;">
-      🌱 <b>${lang==='en'?'Evolution Method:':'Méthode d\'évolution :'}</b> ${lang==='en'?'Final stage or single-stage Pokémon (does not evolve further).':'Stade ultime ou espèce sans évolution (n\'évolue pas/plus).'}
+      🌱 <b>${t("m.progression.4")}</b> ${t("m.progression.3")}
     </div>`;
   }
 
   return `<div style="background:var(--bg);border-radius:6px;padding:8px;margin-bottom:10px;font-size:11px;color:var(--text);border:1px solid #333;">
-    <div style="font-weight:bold;color:var(--gold);margin-bottom:6px;">🌱 ${lang==='en'?'Evolution Method(s):':'Méthode d\'évolution :'}</div>
+    <div style="font-weight:bold;color:var(--gold);margin-bottom:6px;">🌱 ${t("m.progression.2")}</div>
     ${methods.join('')}
   </div>`;
 }
@@ -152,8 +152,8 @@ function tryStoneEvo(teamIdx, stoneKey){
   const p=G.team[teamIdx];
   if(!p) return;
   const evo = STONE_EVO[p.id]?.[stoneKey];
-  if(!evo){ setMsg("Cet objet n'a aucun effet sur ce Pokémon."); return; }
-  if((G.inventory[stoneKey]||0)<1){ setMsg("Pierre manquante."); return; }
+  if(!evo){ setMsg(t("n2.cet_objet_na_aucun_effet_sur_ce_pokémon")); return; }
+  if((G.inventory[stoneKey]||0)<1){ setMsg(t("n.pierre_manquante")); return; }
   G.inventory[stoneKey]--;
   if(G.inventory[stoneKey]<=0) delete G.inventory[stoneKey];
   const shinyUnlock = !!(p.shinyUnlocked || p.shinyActive || p.shiny || isSpeciesShiny(evo));
@@ -164,7 +164,7 @@ function tryStoneEvo(teamIdx, stoneKey){
     G.pokedex[evo]={...(G.pokedex[evo]||{}), seen:true,caught:true};
     if(shinyUnlock) unlockShinyForSpecies(evo);
     const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
-    notify(lang==='en' ? `✨ ${p.name} evolved into ${evoMon.name} using ${getItemName(stoneKey)}!` : `✨ ${p.name} évolue en ${evoMon.name} grâce à ${getItemName(stoneKey)} !`,"var(--purple)");
+    notify(tr("m.progression.1", {p0:p.name, p1:evoMon.name, p2:getItemName(stoneKey)}),"var(--purple)");
     saveGame();
     if(document.querySelector('.tab.active')?.textContent.includes('Sac')){
       onInventoryClick(stoneKey);
@@ -173,4 +173,5 @@ function tryStoneEvo(teamIdx, stoneKey){
     }
   }
 }
+
 

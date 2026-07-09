@@ -7,7 +7,7 @@ function learnableMoves(p){
 }
 function forgetMove(idx,moveIdx){
   const p=G.team[idx];
-  if(!p||p.moves.length<=1){setMsg('Un Pokémon doit conserver au moins une capacité.');return;}
+  if(!p||p.moves.length<=1){setMsg(t("n.un_pokémon_doit_conserver_au_moins_une_c"));return;}
   const removed=p.moves.splice(moveIdx,1)[0];
   notify(`${p.name} oublie ${getMoveName(removed.id)||removed.id}.`);
   saveGame();
@@ -16,7 +16,7 @@ function forgetMove(idx,moveIdx){
 function learnMove(idx,moveId){
   const p=G.team[idx];
   if(!p) return;
-  if(p.moves.length>=4){setMsg('Capacités pleines (4). Oubliez-en une d\'abord.');return;}
+  if(p.moves.length>=4){setMsg(t("n.capacités_pleines_4_oubliezen_une_dabord"));return;}
   if(p.moves.find(m=>m.id===moveId)) return;
   p.moves.push({id:moveId,pp:MOVES[moveId]?.pp||10,maxPP:MOVES[moveId]?.pp||10});
   notify(`✅ ${p.name} apprend ${getMoveName(moveId)||moveId} !`);
@@ -28,4 +28,5 @@ function toggleMoveEditor(idx){
   openPokeModal(idx);
 }
 let moveEditorFor=null;
+
 

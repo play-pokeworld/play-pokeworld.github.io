@@ -4,10 +4,10 @@ function attemptAutoCatch(e){
   const wasShiny = !!(e.shinyActive || e.shiny);
   const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
   if(!wasShiny && !battle.legendaryCatch && !chance(10)){
-    addBattleLog(lang === 'en' ? `<span style="color:var(--dim)">💨 The wild ${e.name} escaped capture...</span>` : `<span style="color:var(--dim)">💨 Le ${e.name} sauvage s'est échappé après sa défaite...</span>`);
+    addBattleLog(tr("m.catch.7", {p0:e.name}));
     return;
   }
-  addBattleLog(lang === 'en' ? `<span style="color:var(--green)">🎊 ${e.name} was captured!</span>` : `<span style="color:var(--green)">🎊 ${e.name} a été capturé !</span>`);
+  addBattleLog(tr("m.catch.6", {p0:e.name}));
   G.pokedex[e.id]={...(G.pokedex[e.id]||{}),seen:true,caught:true};
   if(wasShiny){
     unlockShinyForSpecies(e.id);
@@ -28,21 +28,21 @@ function attemptAutoCatch(e){
     const bonus=rand(150,350);
     G.money+=bonus;
     if(wasShiny){
-      addBattleLog(lang === 'en' ? `<span class="shiny-tag">✨</span> Shiny Skin unlocked for ${e.name}!` : `<span class="shiny-tag">✨</span> Skin Shiny débloqué pour ${e.name} !`);
+      addBattleLog(tr("m.catch.5", {p0:e.name}));
     }
-    addBattleLog(lang === 'en' ? `You already own ${e.name}! Traded for ${bonus}₽.` : `Vous possédez déjà ${e.name} ! Échangé contre ${bonus}₽.`);
+    addBattleLog(tr("m.catch.4", {p0:e.name, p1:bonus}));
   } else {
     if(speciesOwned(e.id)){
       const bonus=rand(150,350);
       G.money+=bonus;
-      addBattleLog(lang === 'en' ? `Duplicate bonus: +${bonus}₽` : `Doublon détecté – ${bonus}₽`);
+      addBattleLog(tr("m.catch.3", {p0:bonus}));
     } else {
       if(G.team.length < 6){
         G.team.push(caughtMon);
-        addBattleLog(lang === 'en' ? `${e.name} Lv.1 joined your active Party!` : `${e.name} Nv.1 rejoint votre Équipe active !`);
+        addBattleLog(tr("m.catch.2", {p0:e.name}));
       } else {
         G.collection[e.id] = caughtMon;
-        addBattleLog(lang === 'en' ? `${e.name} Lv.1 added to 📦 Box!` : `${e.name} Nv.1 rejoint votre 📦 Boîte !`);
+        addBattleLog(tr("m.catch.1", {p0:e.name}));
       }
     }
   }
@@ -55,4 +55,5 @@ function attemptAutoCatch(e){
   try{ if(document.querySelector('.tab.active')?.textContent.includes('Boîte')) showTab('box'); }catch(_){}
   saveGame();
 }
+
 
