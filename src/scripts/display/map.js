@@ -23,7 +23,7 @@ function nodeDims(loc, id){
 // déverrouillent. Aucun blocage possible : on peut toujours battre des
 // Pokémon dans le lieu courant pour avancer.
 function _regLocs(){ return getCurrentRegionLocs(); }
-function _startNodes(){ return (G.region==='johto') ? ['newbark','olivine'] : ['pallet']; }
+function _startNodes(){ return (G.region==='johto') ? ['newbark'] : ['pallet']; }
 function locCleared(id){
   const loc = _regLocs()[id]; if(!loc) return false;
   return (((G.wildWinsByLoc||{})[id])||0) >= (loc.minWins||0);
@@ -67,7 +67,17 @@ function recomputeUnlocks(){
   for(const id in locs){ if(locReachable(id)) G.unlockedLocs[id]=true; }
 }
 function isLocUnlocked(id){
-  if(!G || !G.unlockedLocs || typeof G.unlockedLocs!=='object') return true; // sécurité : jamais bloquant
+  if(!G) return true;
+  // --- Blocage Starter : Route 1 (Kanto) & Route 29 (Johto) ---
+  if(id==='route1'){
+    const hasKantoStarter = !!(G.starterKanto || G.starter || (G.regionStarter && G.regionStarter.kanto));
+    if(!hasKantoStarter) return false;
+  }
+  if(id==='jroute29'){
+    const hasJohtoStarter = !!(G.starterJohto || (G.regionStarter && G.regionStarter.johto));
+    if(!hasJohtoStarter) return false;
+  }
+  if(!G.unlockedLocs || typeof G.unlockedLocs!=='object') return true; // sécurité : jamais bloquant
   if(id===G.location) return true;                 // lieu courant : toujours accessible (on peut y farmer)
   if(_startNodes().indexOf(id) >= 0) return true;  // villes de départ
   return !!G.unlockedLocs[id];
@@ -210,6 +220,24 @@ function renderMap(){
 function clickLocation(id){
   const loc=getLocObj(id);
   if(!loc) return;
+  const lang_st = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
+  // --- Blocage Starter Route 1 / Route 29 ---
+  if(id==='route1'){
+    const has = !!(G.starterKanto || G.starter || (G.regionStarter && G.regionStarter.kanto));
+    if(!has){
+      setMsg(lang_st==='en' ? '⛔ Choose your Kanto starter in Pallet Town first!' : '⛔ Choisissez d\'abord votre starter Kanto à Bourg Palette !');
+      if(typeof checkStarterNeeded==='function') checkStarterNeeded();
+      return;
+    }
+  }
+  if(id==='jroute29'){
+    const has = !!(G.starterJohto || (G.regionStarter && G.regionStarter.johto));
+    if(!has){
+      setMsg(lang_st==='en' ? '⛔ Choose your Johto starter in New Bark Town first!' : '⛔ Choisissez d\'abord votre starter Johto à Bourg Geon !');
+      if(typeof checkStarterNeeded==='function') checkStarterNeeded();
+      return;
+    }
+  }
   const badgeReq=loc.badgeReq||0;
   if(badgeReq>G.badges.length){
     const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
@@ -260,10 +288,9 @@ function travelToRegion(targetReg){
   const lang = G.lang || 'fr';
   if(targetReg === 'johto'){
     G.region = 'johto';
-    G.location = 'olivine';
-    markVisited('olivine');
+    G.location = 'newbark';
     markVisited('newbark');
-    notify(lang==='en' ? "🚢 Arrived at Olivine City harbor in Johto!" : "🚢 Arrivée au port d'Oliville dans la région de Johto !", 'var(--blue)');
+    notify(lang==='en' ? "🚢 Welcome to the Johto region — New Bark Town!" : "🚢 Bienvenue dans la région de Johto — Bourg Geon !", 'var(--blue)');
   } else {
     G.region = 'kanto';
     G.location = 'vermilion';
@@ -275,8 +302,10 @@ function travelToRegion(targetReg){
   const mapTitle = document.getElementById('map-win-title');
   if(mapTitle) mapTitle.textContent = (lang==='en' ? 'Map: ' : 'Carte : ') + (G.region === 'johto' ? 'Johto' : 'Kanto');
   renderMap();
-  showTab('info');
+  // Re-render l'onglet actif (marché inclus) pour refléter la nouvelle région.
+  showTab(_activeTab);
   saveGame();
+  setTimeout(()=>{ if(typeof checkStarterNeeded==='function') checkStarterNeeded(); }, 300);
 }
 
 function switchMapRegion(reg){
@@ -295,7 +324,8 @@ function switchMapRegion(reg){
   const mapTitle = document.getElementById('map-win-title');
   if(mapTitle) mapTitle.textContent = (lang==='en' ? 'Map: ' : 'Carte : ') + (G.region === 'johto' ? 'Johto' : 'Kanto');
   renderMap();
-  showTab('info');
+  // Re-render l'onglet actif (marché inclus) pour refléter la nouvelle région.
+  showTab(_activeTab);
   saveGame();
 }
 
@@ -543,6 +573,8 @@ function scrollToWin(winId){
 // ============================================================
 var _activeTab='info';
 function showTab(tab){
+  // Starter gate – force modal if needed
+  try{ if(typeof checkStarterNeeded==="function" && checkStarterNeeded()) return; }catch(e){}
   _activeTab=tab;
   syncShinyState();
   renderTeamWindow();
@@ -1538,40 +1570,125 @@ function openBoxPokeModal(boxId){
   modal.classList.add('open');
 }
 // ============================================================
-function chooseStarter(){
-  const isEn = (typeof G !== 'undefined' && G && G.lang === 'en');
-  const starters=[
-    {id:1, name: getPokeName(1), desc: isEn ? 'Grass/Poison - Solid defensive resilience' : 'Plante/Poison - Solide défensivement'},
-    {id:4, name: getPokeName(4), desc: isEn ? 'Fire - High offensive firepower' : 'Feu - Puissance offensive élevée'},
-    {id:7, name: getPokeName(7), desc: isEn ? 'Water - Great balanced durability' : 'Eau - Grande endurance'},
-  ];
-  const el=document.getElementById('tab-content');
-  if(!el) return;
-  el.innerHTML=`<div style="text-align:center;padding:10px">
-    <div class="loc-title">${isEn ? 'Choose your Starter!' : 'Choisissez votre Starter !'}</div>
-    <div style="color:var(--dim);font-size:12px;margin-bottom:16px">${isEn ? 'This Pokémon will accompany you throughout your adventure.' : 'Ce Pokémon vous accompagnera tout au long de votre aventure.'}</div>
-    ${starters.map(s=>`<div class="poke-card" onclick="pickStarter(${s.id})" style="cursor:pointer;text-align:left">
-      <div class="poke-card-top">
-        <div class="poke-sprite" style="background:${TYPE_COLORS[PD[s.id][1]]}22;border:2px solid ${TYPE_COLORS[PD[s.id][1]]}">${spriteImg(s.id,'',{size:44})}</div>
-        <div>
-          <div class="poke-name">${s.name}</div>
-          <div style="font-size:11px;color:var(--dim)">${s.desc}</div>
-        </div>
-      </div>
-    </div>`).join('')}
-  </div>`;
+function chooseStarter(region){
+  region = region || G.region || 'kanto';
+  // if already chosen for this region, do nothing
+  const already = region==='johto' ? (G.starterJohto || (G.regionStarter&&G.regionStarter.johto)) : (G.starterKanto || G.starter);
+  if(already){
+    const m=document.getElementById('starter-modal');
+    if(m) m.style.display='none';
+    return;
+  }
+  showStarterModal(region);
 }
 
-function pickStarter(id){
-  const p=createPoke(id,5);
-  G.team.push(p);
-  G.starter=true;
-  G.pokedex[id]={...(G.pokedex[id]||{}), seen:true,caught:true};
-  notify(`🎉 ${p.name} rejoint votre équipe !`);
-  setMsg(`${p.name} est maintenant votre partenaire !`);
-  showTab('team');
-  saveGame();
+function showStarterModal(region){
+  region = region || 'kanto';
+  const isEn = (G && G.lang === 'en');
+  const isJohto = region === 'johto';
+  const starters = isJohto ? [
+    {id:152, name:getPokeName(152), desc: isEn ? 'Grass - Calm & sturdy' : 'Plante - Calme et robuste', color:'#78c850'},
+    {id:155, name:getPokeName(155), desc: isEn ? 'Fire - Fast & explosive' : 'Feu - Rapide et explosif', color:'#f08030'},
+    {id:158, name:getPokeName(158), desc: isEn ? 'Water - Strong jaws' : 'Eau - Mâchoires puissantes', color:'#6890f0'}
+  ] : [
+    {id:1, name: getPokeName(1), desc: isEn ? 'Grass/Poison - Solid defensive resilience' : 'Plante/Poison - Solide défensivement', color:'#78c850'},
+    {id:4, name: getPokeName(4), desc: isEn ? 'Fire - High offensive firepower' : 'Feu - Puissance offensive élevée', color:'#f08030'},
+    {id:7, name: getPokeName(7), desc: isEn ? 'Water - Great balanced durability' : 'Eau - Grande endurance', color:'#6890f0'}
+  ];
+  const welcome = isJohto
+    ? (isEn ? 'Welcome to Johto! Professor Elm is waiting in New Bark Town.' : 'Bienvenue à Johto ! Le Prof. Orme vous attend à Bourg Geon.')
+    : (isEn ? 'Welcome to Kanto! Professor Oak is waiting in Pallet Town.' : 'Bienvenue à Kanto ! Le Prof. Chen vous attend à Bourg Palette.');
+  const title = isJohto
+    ? (isEn ? 'Choose your Johto Starter!' : 'Choisissez votre Starter Johto !')
+    : (isEn ? 'Choose your Starter!' : 'Choisissez votre Starter !');
+  const sub = isEn ? 'This Pokémon will accompany you throughout your adventure in this region.' : 'Ce Pokémon vous accompagnera tout au long de votre aventure dans cette région.';
+  const modal = document.getElementById('starter-modal');
+  const inner = document.getElementById('starter-modal-inner');
+  if(!modal || !inner) return;
+  inner.innerHTML = `<div style="text-align:center">
+    <div style="font-size:14px;color:var(--gold);margin-bottom:6px">${welcome}</div>
+    <div class="loc-title" style="margin-bottom:4px">${title}</div>
+    <div style="color:var(--dim);font-size:12px;margin-bottom:16px">${sub}</div>
+    <div style="display:grid;gap:10px">
+      ${starters.map(st=>`
+        <div class="poke-card starter-card" data-starter-id="${st.id}" data-starter-region="${region}" style="cursor:pointer;text-align:left;border:2px solid ${st.color}66;background:${st.color}14">
+          <div class="poke-card-top">
+            <div class="poke-sprite" style="background:${st.color}22;border:2px solid ${st.color}">${spriteImg(st.id,'',{size:52})}</div>
+            <div>
+              <div class="poke-name" style="font-size:15px">${st.name} <span style="color:var(--dim);font-size:11px">#${st.id}</span></div>
+              <div style="font-size:11px;color:var(--dim)">${st.desc}</div>
+              <div style="margin-top:6px"><span style="background:${st.color};color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:bold">${isEn ? 'Choose' : 'Choisir'}</span></div>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div style="margin-top:12px;font-size:11px;color:var(--dim)">${isEn ? 'You must choose a starter to continue. This window cannot be closed.' : 'Vous devez choisir un starter pour continuer. Cette fenêtre ne peut pas être fermée.'}</div>
+  </div>`;
+  inner.onclick = function(ev){
+    const card = ev.target && ev.target.closest ? ev.target.closest('.starter-card') : null;
+    if(!card) return;
+    ev.preventDefault(); ev.stopPropagation();
+    const sid = parseInt(card.getAttribute('data-starter-id'),10);
+    const sreg = card.getAttribute('data-starter-region') || 'kanto';
+    try { pickStarter(sid, sreg); } catch(err){ console.error('[starter] pickStarter failed', err); G._starterPickLock=false; }
+  };
+  modal.style.display='flex';
+  // prevent closing by clicking backdrop
+  modal.onclick = function(e){ if(e.target===modal){ /* block */ e.stopPropagation(); } };
 }
+
+function pickStarter(id, region){
+  if(G._starterPickLock) return;
+  G._starterPickLock=true;
+  const _releaseLock=()=>{G._starterPickLock=false;};
+  setTimeout(_releaseLock,1500);
+  try {
+  region = region || G.region || 'kanto';
+  // prevent double pick
+  if(region==='johto' && (G.starterJohto || (G.regionStarter&&G.regionStarter.johto))) { _releaseLock(); return; }
+  if(region!=='johto' && (G.starterKanto || G.starter)) { _releaseLock(); return; }
+  const p=createPoke(id,5);
+  if(!p){ console.warn('[starter] createPoke null', id); _releaseLock(); return; }
+  // ensure team has space – if full, send to box, but starter should go to team first slot if empty
+  if(G.team.length<6){
+    G.team.push(p);
+  } else {
+    G.collection[id]=p;
+  }
+  if(region==='johto'){
+    G.starterJohto=true;
+    if(!G.regionStarter) G.regionStarter={};
+    G.regionStarter.johto=true;
+  } else {
+    G.starterKanto=true;
+    G.starter=true; // legacy
+    if(!G.regionStarter) G.regionStarter={};
+    G.regionStarter.kanto=true;
+  }
+  G.pokedex[id]={...(G.pokedex[id]||{}), seen:true,caught:true};
+  const isEn = G.lang==='en';
+  notify(isEn ? `🎉 ${p.name} joined your team!` : `🎉 ${p.name} rejoint votre équipe !`, 'var(--green)');
+  setMsg(p.name + (isEn ? ' is now your partner!' : ' est maintenant votre partenaire !'));
+  const modal=document.getElementById('starter-modal');
+  if(modal) modal.style.display='none';
+  saveGame();
+  updateHeader();
+  showTab('info');
+  renderMap();
+  } finally { _releaseLock(); }
+}
+
+// Auto-show starter modal on load / region change
+function checkStarterNeeded(){
+  const reg = G.region || 'kanto';
+  const needKanto = reg==='kanto' && !(G.starterKanto || G.starter);
+  const needJohto = reg==='johto' && !G.starterJohto && !(G.regionStarter && G.regionStarter.johto);
+  if(needKanto) { showStarterModal('kanto'); return true; }
+  if(needJohto) { showStarterModal('johto'); return true; }
+  return false;
+}
+
 
 // ============================================================
 // UNDERGROUND MINE (Souterrain / Mine de Pierres d'Évolution)
@@ -1584,9 +1701,16 @@ const MINE_ITEMS = [
   {key:'thunderstone', name:'Pierre Foudre',    shape:[[0,1,0],[1,1,1],[0,1,0]]},
   {key:'leafstone',    name:'Pierre Plante',    shape:[[0,1,0],[1,1,1],[1,1,1]]},
   {key:'moonstone',    name:'Pierre Lune',      shape:[[1,1],[1,1]]},
+  {key:'sunstone',     name:'Pierre Soleil',    shape:[[1,0,1],[0,1,0],[1,0,1]]},
   {key:'nugget',       name:'Pépite',           shape:[[1,1,1],[1,1,1]]},
   {key:'stardust',     name:'Poussière Étoile', shape:[[1,1],[1,1]]},
-  {key:'fossil',       name:'Fossile',          shape:[[0,1,1,0],[1,1,1,1],[1,1,1,1],[0,1,1,0]]},
+  // Fossiles PokéClicker
+  {key:'helix_fossil', name:'Fossile Nautile',  shape:[[0,1,1,0],[1,1,1,1],[1,1,1,1],[0,1,1,0]]},
+  {key:'dome_fossil',  name:'Fossile Dôme',     shape:[[1,1,1],[1,1,1],[0,1,0]]},
+  {key:'old_amber',    name:'Vieil Ambre',      shape:[[1,1],[1,1],[1,1]]},
+  {key:'root_fossil',  name:'Fossile Racine',   shape:[[1,1,0],[1,1,1],[0,1,1]]},
+  {key:'claw_fossil',  name:'Fossile Griffe',   shape:[[1,0,1],[1,1,1],[1,0,1]]},
+  {key:'fossil',       name:'Fossile Ancien',   shape:[[0,1,1,0],[1,1,1,1],[1,1,1,1],[0,1,1,0]]},
 ];
 
 

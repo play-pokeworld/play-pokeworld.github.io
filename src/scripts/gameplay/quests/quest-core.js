@@ -94,7 +94,10 @@ function advanceQuests(type, loc, amount){
   if(mainInst){
     const def = getMainQuestDef(mainInst.qid);
     if(def && def.region===region && def.type===type && !mainInst.done){
-      const locMatch = (type!=='defeat_wild' && type!=='catch') || !def.loc || locGroup(def.loc)===locGroup(loc);
+      // 'defeat_wild' compte tous les Pokémon sauvages vaincus, peu importe le
+      // lieu (style « battre des pokemons ») : une quête comme « 3 combats » est
+      // donc toujours réalisable, même sur une ville sans sauvages (ex: newbark).
+      const locMatch = (type!=='catch') || !def.loc || locGroup(def.loc)===locGroup(loc);
       if(locMatch) mainInst.progress = (mainInst.progress||0) + amt;
       G.mainProgress[region] = mainInst.progress; // miroir pour la persistance inter-régions
     }
@@ -108,7 +111,7 @@ function advanceQuests(type, loc, amount){
       if(inst.cat==='main') continue;
       if(inst.done) continue;
       if(def.type!==type) continue;
-      if(type==='defeat_wild' || type==='catch'){
+      if(type==='catch'){
         if(def.loc!=null && locGroup(def.loc)!==locGroup(loc)) continue;
       }
       inst.progress = (inst.progress||0) + amt;

@@ -7,6 +7,7 @@ const I18N = {
   fr: {
     tab_info: "📍 Lieu",
     tab_box: "📦 Boîte",
+    tab_fossil: "🦴 Fossiles",
     tab_mine: "⛏️ Mine",
     tab_inv: "🎒 Sac",
     tab_shop: "🛒 Shop",
@@ -134,6 +135,7 @@ const I18N = {
   en: {
     tab_info: "📍 Location",
     tab_box: "📦 PC Box",
+    tab_fossil: "🦴 Fossils",
     tab_mine: "⛏️ Underground",
     tab_inv: "🎒 Bag",
     tab_shop: "🛒 Shop",

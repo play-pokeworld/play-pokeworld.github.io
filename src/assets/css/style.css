@@ -201,7 +201,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;fo
 .stat-fill{height:100%;border-radius:3px}
 .stat-val{width:30px;font-size:11px;text-align:right;color:var(--text)}
 /* MSG LOG */
-#msg-log{background:rgba(0,0,0,.6);border-top:1px solid #333;padding:4px 12px;height:32px;overflow:hidden;font-size:12px;color:var(--dim);flex-shrink:0}
+#msg-log{position:fixed;top:90px;left:20px;background:rgba(20,16,12,0.92);border:1px solid #4a3820;padding:8px 14px;border-radius:8px;font-size:12px;color:var(--text);z-index:299;max-width:320px;box-shadow:0 4px 16px rgba(0,0,0,0.5);backdrop-filter:blur(4px)}
 /* POKEDEX */
 .dex-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .dex-entry{background:var(--card);border-radius:6px;padding:6px;text-align:center;border:1px solid #333;cursor:pointer;transition:.2s}
@@ -218,7 +218,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;fo
 @keyframes pokeball-shake{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg)}75%{transform:rotate(10deg)}}
 .shaking{animation:pokeball-shake 0.4s infinite}
 /* Notification */
-#notif{position:fixed;top:50px;right:20px;background:var(--green);color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;z-index:300;display:none;max-width:260px;text-align:center}
+#notif{position:fixed;top:20px;left:20px;background:var(--green);color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;z-index:301;display:none;max-width:320px;text-align:left;box-shadow:0 4px 20px rgba(0,0,0,0.5);border-left:4px solid rgba(255,255,255,0.3)}
 /* victory screen */
 #victory-screen{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:150;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center}
 #victory-screen.open{display:flex}

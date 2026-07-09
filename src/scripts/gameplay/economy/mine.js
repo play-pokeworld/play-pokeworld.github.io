@@ -28,8 +28,15 @@ function generateMineLayer(){
   const placed = [];
   const occupied = Array.from({length: MINE_H}, () => Array(MINE_W).fill(false));
 
+  // --- Fossiles régionaux : Kanto d'abord, Johto après déblocage ---
+  const region = (G && G.region) ? G.region : 'kanto';
+  const johtoUnlocked = region==='johto' || (G.badges && G.badges.length>=8);
+  const minePool = MINE_ITEMS.filter(it=>{
+    if(!johtoUnlocked && (it.key==='root_fossil' || it.key==='claw_fossil')) return false;
+    return true;
+  });
   for(let i=0; i<numItems; i++){
-    const tmpl = MINE_ITEMS[rand(0, MINE_ITEMS.length - 1)];
+    const tmpl = minePool[rand(0, minePool.length - 1)];
     const shW = tmpl.shape[0].length;
     const shH = tmpl.shape.length;
     for(let attempt=0; attempt<30; attempt++){

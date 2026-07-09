@@ -83,14 +83,20 @@ ORDER = [
 def inline_sprites(text):
     def pkm(m):
         num, path = m.group(1), m.group(2)
-        data = open(path, "rb").read()
+        try:
+            data = open(path, "rb").read()
+        except Exception:
+            return m.group(0)
         b64 = base64.b64encode(data).decode("ascii")
         return '"%s": "data:image/png;base64,%s"' % (num, b64)
     text = re.sub(r'"(\d+)":\s*"(src/assets/images/pokemon/(?:front|back|frontShiny|backShiny)/[^"]+\.png)"',
                   pkm, text)
     def itm(m):
         key, path = m.group(1), m.group(2)
-        data = open(path, "rb").read()
+        try:
+            data = open(path, "rb").read()
+        except Exception:
+            return m.group(0)
         b64 = base64.b64encode(data).decode("ascii")
         return '"%s": "data:image/png;base64,%s"' % (key, b64)
     text = re.sub(r'"([\w]+)":\s*"(src/assets/images/items/[^"]+\.png)"',

@@ -1,41 +1,80 @@
-
 // ===== extracted from src/scripts/gameplay/mine.js =====
+const MARKET_STOCK = {
+  kanto: [
+    // Starters Kanto - base only, non-wild
+    1,4,7,
+    // Cadeaux / rares Kanto - pas d'évolutions, pas de sauvage
+    133, // Evoli
+    137, // Porygon
+    138, // Amonita (fossile - aussi trouvable en mine)
+    140, // Kabuto (fossile)
+    142, // Ptera
+    106, // Kicklee
+    107, // Tygnon
+    122  // M.Mime
+  ],
+  johto: [
+    // Starters Johto
+    152,155,158,
+    // Bébés / rares Johto - formes de base uniquement, non sauvages dans le jeu
+    175, // Togepi
+    236, // Debugant
+    179, // Wattouat
+    183, // Marill
+    187, // Granivol
+    190, // Capumain
+    194, // Axoloto
+    209, // Snubbull
+    216, // Teddiursa
+    228, // Malosse
+    231  // Phanpy
+  ]
+};
+
 function getMarketPokemon(){
-  const obtainable=new Set();
-  // Wild Pokémon
-  for(const loc of Object.values(LOCS)){
-    for(const w of (loc.wild||[])) obtainable.add(w[0]);
-  }
-  const evoMap={1:2,2:3,4:5,5:6,7:8,8:9,10:11,11:12,13:14,14:15,16:17,17:18,19:20,21:22,23:24,25:26,27:28,29:30,30:31,32:33,33:34,35:36,37:38,39:40,41:42,43:44,44:45,46:47,48:49,50:51,52:53,54:55,56:57,58:59,60:61,61:62,63:64,64:65,66:67,67:68,69:70,70:71,72:73,74:75,75:76,77:78,79:80,81:82,84:85,86:87,88:89,90:91,92:93,93:94,96:97,98:99,100:101,102:103,104:105,109:110,111:112,116:117,118:119,120:121,129:130,133:134,133:135,133:136,138:139,140:141,147:148,148:149};
-  const stoneEvo={37:[38],58:[59],133:[134,135,136],61:[62],90:[91],120:[121],25:[26],44:[45],70:[71],102:[103],30:[31],33:[34],35:[36],39:[40]};
+  if(typeof G === 'undefined' || !G) return [];
+  const region = (G.region || 'kanto');
+  // Stock curaté, drastiquement réduit, conforme aux jeux officiels.
+  // - Aucune évolution si la pré-évo est capturable / achetable
+  // - Aucun Pokémon disponible sauvagement sur une route
+  let stock = (region === 'johto') ? MARKET_STOCK.johto.slice() : MARKET_STOCK.kanto.slice();
 
-  const evolvedIds = new Set();
-  Object.values(evoMap).forEach(id => evolvedIds.add(+id));
-  Object.values(stoneEvo).forEach(arr => arr.forEach(id => evolvedIds.add(+id)));
-
-  let changed=true;
-  while(changed){
-    changed=false;
-    for(const [from,to] of Object.entries(evoMap)){
-      if(obtainable.has(+from)&&!obtainable.has(+to)){
-        obtainable.add(+to); changed=true;
-      }
+  // Sécurité : filtrer tout ce qui serait sauvage dans la région courante
+  // (au cas où la distribution sauvage évolue)
+  try {
+    const locs = (region === 'johto')
+      ? (typeof LOCS_JOHTO !== 'undefined' ? LOCS_JOHTO : LOCS)
+      : LOCS;
+    const wildSet = new Set();
+    for(const loc of Object.values(locs)){
+      for(const w of (loc.wild || [])) wildSet.add(+w[0]);
     }
-    for(const [from,tos] of Object.entries(stoneEvo)){
-      if(obtainable.has(+from)){
-        for(const to of tos){
-          if(!obtainable.has(+to)){ obtainable.add(+to); changed=true; }
-        }
-      }
+    stock = stock.filter(id => !wildSet.has(id));
+  } catch(e){}
+
+  // Sécurité : retirer les évolutions dont la base est elle-même au marché
+  // ou capturable (on garde uniquement des formes de base / mono-stade)
+  const evoTargets = new Set();
+  if(typeof LEVEL_EVO_MAP !== 'undefined'){
+    for(const t of Object.values(LEVEL_EVO_MAP)) evoTargets.add(+t);
+  }
+  if(typeof STONE_EVO !== 'undefined'){
+    for(const k in STONE_EVO){
+      for(const t of Object.values(STONE_EVO[k])) evoTargets.add(+t);
     }
   }
+  // Autoriser quelques mono-stades qui apparaissent techniquement comme cibles
+  // (ex: Porygon -> Porygon2 est géré par objet, mais Porygon reste vendable)
+  const allowList = new Set([137,133]); // Porygon, Evoli : base vendable malgré évo pierre
+  stock = stock.filter(id => !evoTargets.has(id) || allowList.has(id));
 
-  const market=[];
-  for(let i=1;i<=151;i++){
-    if([144,145,146,150,151].includes(i)) continue;
-    if(!obtainable.has(i) && !evolvedIds.has(i)) market.push(i);
-  }
-  return market;
+  // Retirer les légendaires / fabuleux
+  const banned = (region === 'johto')
+    ? [243,244,245,249,250,251]
+    : [144,145,146,150,151];
+  stock = stock.filter(id => !banned.includes(id));
+
+  return stock;
 }
 function getPokemonPrice(id){
   if(id===151) return 100000;
@@ -45,6 +84,7 @@ function getPokemonPrice(id){
   if(!d) return 999999;
   const bst=d[3]+d[4]+d[5]+d[6];
   if([1,4,7].includes(id)) return 5000;
+  if([152,155,158].includes(id)) return 5000;
   if([2,5,8].includes(id)) return 8000;
   if([3,6,9].includes(id)) return 12000;
   if([138,140].includes(id)) return 8000;
@@ -67,17 +107,17 @@ function renderMarket(el){
     el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--dim)">${t('market_empty')}</div>`;
     return;
   }
-  const cats={starter:[],legendary:[],rare:[],other:[]};
+  const cats={starter:[],fossil:[],rare:[],other:[]};
   for(const id of ids){
-    if([1,2,3,4,5,6,7,8,9].includes(id)) cats.starter.push(id);
-    else if([144,145,146,150,151].includes(id)) continue;
-    else if([138,139,140,141,142,147,148,149].includes(id)) cats.rare.push(id);
+    if([1,4,7,152,155,158].includes(id)) cats.starter.push(id);
+    else if([138,139,140,141,142].includes(id)) cats.fossil.push(id);
+    else if([133,137,106,107,122,175,236].includes(id)) cats.rare.push(id);
     else cats.other.push(id);
   }
   let html=`<div class="loc-title">${t('market_title')}</div>
   <div class="loc-sub" style="margin-bottom:10px">💰 ${isEn?'Your money':'Votre argent'} : <span style="color:var(--gold);font-weight:bold">${G.money.toLocaleString()}₽</span> · ${t('market_sub')}</div>`;
-  const catLabels={starter:t('market_cat_starter'),legendary:t('market_cat_leg'),rare:t('market_cat_rare'),other:t('market_cat_other')};
-  for(const cat of ['starter','legendary','rare','other']){
+  const catLabels={starter:t('market_cat_starter'),fossil:t('market_cat_fossil')||'🦴 Fossiles',rare:t('market_cat_rare'),other:t('market_cat_other')};
+  for(const cat of ['starter','fossil','rare','other']){
     if(!cats[cat].length) continue;
     html+=`<div class="market-category">${catLabels[cat]}</div>`;
     html+=cats[cat].map(id=>{

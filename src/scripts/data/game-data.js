@@ -21,7 +21,13 @@ const ITEMS = {
   moonstone:    {name_fr:'Pierre Lune',   name_en:'Moon Stone',    icon:'🌙', desc_fr:'Fait évoluer certains Pokémon.', desc_en:'Evolves certain Pokémon.', price:3000, type:'stone'},
   nugget:       {name_fr:'Pépite',        name_en:'Nugget',        icon:'💰', desc_fr:'Objet précieux en or pur qui vaut 5 000₽.', desc_en:'Precious gold item worth 5,000₽.', price:5000, type:'treasure', value:5000},
   stardust:     {name_fr:'Poussière Étoile',name_en:'Stardust',    icon:'✨', desc_fr:'Poussière brillante qui vaut 2 000₽.', desc_en:'Lovely red dust worth 2,000₽.', price:2000, type:'treasure', value:2000},
-  fossil:       {name_fr:'Fossile Ancien',name_en:'Old Fossil',    icon:'🦴', desc_fr:'Rare vestige qui vaut 4 000₽.', desc_en:'Prehistoric fossil worth 4,000₽.', price:4000, type:'treasure', value:4000},
+  fossil:       {name_fr:'Fossile Ancien',name_en:'Old Fossil',    icon:'🦴', desc_fr:'Rare vestige — peut être ranimé à la Pension Fossile !', desc_en:'Ancient fossil — revive it at the Fossil Lab!', price:4000, type:'fossil', value:4000, revive:138},
+  // ---- Fossiles PokéClicker ----
+  helix_fossil: {name_fr:'Fossile Nautile', name_en:'Helix Fossil', icon:'🐚', desc_fr:'Fossile d\'Amonita. Ranime-le à la Pension Fossile !', desc_en:'Omanyte Fossil. Revive at Fossil Lab!', price:5000, type:'fossil', revive:138},
+  dome_fossil:  {name_fr:'Fossile Dôme',    name_en:'Dome Fossil',  icon:'🪨', desc_fr:'Fossile de Kabuto. Ranime-le à la Pension Fossile !', desc_en:'Kabuto Fossil. Revive at Fossil Lab!', price:5000, type:'fossil', revive:140},
+  old_amber:    {name_fr:'Vieil Ambre',     name_en:'Old Amber',    icon:'🟨', desc_fr:'Ambre contenant l\'ADN de Ptéra. Ranime-le !', desc_en:'Amber containing Aerodactyl DNA. Revive it!', price:8000, type:'fossil', revive:142},
+  root_fossil:  {name_fr:'Fossile Racine',  name_en:'Root Fossil',  icon:'🌿', desc_fr:'Fossile Johto rare. Ranime un Pokémon plante préhistorique.', desc_en:'Rare Johto fossil.', price:6000, type:'fossil', revive:138},
+  claw_fossil:  {name_fr:'Fossile Griffe',  name_en:'Claw Fossil',  icon:'🦞', desc_fr:'Fossile Johto rare. Ranime un Pokémon insecte préhistorique.', desc_en:'Rare Johto fossil.', price:6000, type:'fossil', revive:140},
   muscle_band:  {name_fr:'Bandeau Muscle', name_en:'Muscle Band',  icon:'💪', desc_fr:'Attaque physique +35 % au maximum.', desc_en:'Physical Attack +35% at max stack.', price:1200, buff:{atk:0.35}},
   metal_coat:   {name_fr:'Peau Métal',     name_en:'Metal Coat',   icon:'🛡️', desc_fr:'Défense & Déf. Spé. +30 % au max.', desc_en:'Defense & Sp. Def +30% at max stack.', price:1200, buff:{def:0.30}},
   soft_sand:    {name_fr:'Sable Doux',     name_en:'Soft Sand',    icon:'🏖️', desc_fr:'PV max & Défense +30 % au max.', desc_en:'Max HP & Defense +30% at max stack.', price:1200, buff:{hpMax:0.30,def:0.30}},
@@ -29,6 +35,30 @@ const ITEMS = {
   power_gem:    {name_fr:'Joyau Pouvoir',  name_en:'Power Gem',    icon:'💎', desc_fr:'Attaque Spéciale +40 % au max.', desc_en:'Special Attack +40% at max stack.', price:1200, buff:{spa:0.40}},
   rarecandy:    {name_fr:'Super Bonbon',  name_en:'Rare Candy',    icon:'🍬', desc_fr:'Augmente instantanément le niveau d\'un Pokémon de +1 !', desc_en:'Instantly raises a Pokémon\'s level by +1!', price:10000, type:'candy'},
   chroma_charm: {name_fr:'Charme Chroma', name_en:'Shiny Charm',   icon:'✨', desc_fr:'Triple les chances de rencontrer des Pokémon Shiny (3x) !', desc_en:'Triples the chance of encountering Shiny Pokémon (3x)!', price:100000, type:'special'},
+  // ---- Objets EXCLUSIFS JOHTO (Or/Argent) : effets en combat ----
+  sunstone:     {name_fr:'Pierre Soleil', name_en:'Sun Stone', icon:'☀️', desc_fr:'Fait évoluer certains Pokémon Plante (Grainipiot→Floraëlla, Tournegrin→Héliatronc).', desc_en:'Evolves certain Grass Pokémon.', price:3000, type:'stone'},
+  kings_rock:   {name_fr:'Rocher Royal', name_en:"King's Rock", icon:'👑', desc_fr:"Objet tenu : +12% Atk & +12% Atk Spé. (évoque Koross / Chorene).", desc_en:'Held: +12% Atk & Sp.Atk (evolves Politoed/Slowking).', price:2000, buff:{atk:0.12, spa:0.12}},
+  dragon_scale: {name_fr:'Écaille Dragon', name_en:'Dragon Scale', icon:'🐉', desc_fr:'Objet tenu : +20% Atk & +20% Atk Spé. (évoque Hyporoi).', desc_en:'Held: +20% Atk & Sp.Atk (evolves Kingdra).', price:2000, buff:{atk:0.20, spa:0.20}},
+  up_grade:     {name_fr:'Upgrade', name_en:'Up-Grade', icon:'💾', desc_fr:'Objet tenu : +30% Atk Spé. (évoque Porygon2).', desc_en:'Held: +30% Sp.Atk (evolves Porygon2).', price:2000, buff:{spa:0.30}},
+  deep_sea_scale:{name_fr:'Écaille Océan', name_en:'Deep Sea Scale', icon:'🔱', desc_fr:'Objet tenu : +30% Déf. Spé. (évoque Moorelot).', desc_en:'Held: +30% Sp.Def (evolves Gorebyss).', price:1800, buff:{spd:0.30}},
+  deep_sea_tooth:{name_fr:'Dent Océan', name_en:'Deep Sea Tooth', icon:'🦷', desc_fr:'Objet tenu : +30% Attaque (évoque Hydreloc).', desc_en:'Held: +30% Atk (evolves Huntail).', price:1800, buff:{atk:0.30}},
+  twisted_spoon:{name_fr:'Cuillère Tordue', name_en:'Twisted Spoon', icon:'🥄', desc_fr:'Objet tenu : +20% Atk Spé. (renforce les capacités Psy).', desc_en:'Held: +20% Sp.Atk.', price:1500, buff:{spa:0.20}},
+  thick_club:   {name_fr:'Os Épais', name_en:'Thick Club', icon:'🦴', desc_fr:'Objet tenu (Osselet / Macrogato) : +40% Attaque !', desc_en:'Held (Cubone/Marowak): +40% Atk!', price:1500, buff:{atk:0.40}},
+  black_belt:   {name_fr:'Ceinture Noire', name_en:'Black Belt', icon:'🥋', desc_fr:'Objet tenu : +20% Attaque, dégâts Combat renforcés.', desc_en:'Held: +20% Atk, Fighting dmg up.', price:1500, buff:{atk:0.20}},
+  black_glasses:{name_fr:'Lunettes Noires', name_en:'Black Glasses', icon:'🕶️', desc_fr:'Objet tenu : +20% Attaque, dégâts Ténèbres renforcés.', desc_en:'Held: +20% Atk, Dark dmg up.', price:1500, buff:{atk:0.20}},
+  charcoal:     {name_fr:'Charbon', name_en:'Charcoal', icon:'🔥', desc_fr:'Objet tenu : +20% Attaque, dégâts Feu renforcés.', desc_en:'Held: +20% Atk, Fire dmg up.', price:1500, buff:{atk:0.20}},
+  dragon_fang:  {name_fr:'Crocdure', name_en:'Dragon Fang', icon:'🐲', desc_fr:'Objet tenu : +20% Attaque, dégâts Dragon renforcés.', desc_en:'Held: +20% Atk, Dragon dmg up.', price:1500, buff:{atk:0.20}},
+  miracle_seed: {name_fr:'Graine Miracle', name_en:'Miracle Seed', icon:'🌱', desc_fr:'Objet tenu : +20% Attaque, dégâts Plante renforcés.', desc_en:'Held: +20% Atk, Grass dmg up.', price:1500, buff:{atk:0.20}},
+  mystic_water: {name_fr:'Eau Mystique', name_en:'Mystic Water', icon:'💧', desc_fr:'Objet tenu : +20% Attaque, dégâts Eau renforcés.', desc_en:'Held: +20% Atk, Water dmg up.', price:1500, buff:{atk:0.20}},
+  never_melt_ice:{name_fr:'Glace Éternelle', name_en:'Never-Melt Ice', icon:'🧊', desc_fr:'Objet tenu : +20% Attaque, dégâts Glace renforcés.', desc_en:'Held: +20% Atk, Ice dmg up.', price:1500, buff:{atk:0.20}},
+  sharp_beak:   {name_fr:'Bec Aiguisé', name_en:'Sharp Beak', icon:'🪶', desc_fr:'Objet tenu : +20% Attaque, dégâts Vol renforcés.', desc_en:'Held: +20% Atk, Flying dmg up.', price:1500, buff:{atk:0.20}},
+  poison_barb:  {name_fr:'Piquant Poison', name_en:'Poison Barb', icon:'🟣', desc_fr:'Objet tenu : +20% Attaque, dégâts Poison renforcés.', desc_en:'Held: +20% Atk, Poison dmg up.', price:1500, buff:{atk:0.20}},
+  spell_tag:    {name_fr:'Etiquette Maléfique', name_en:'Spell Tag', icon:'🔮', desc_fr:'Objet tenu : +20% Attaque, dégâts Spectre renforcés.', desc_en:'Held: +20% Atk, Ghost dmg up.', price:1500, buff:{atk:0.20}},
+  hard_stone:   {name_fr:'Pierre Dure', name_en:'Hard Stone', icon:'🪨', desc_fr:'Objet tenu : +20% Attaque, dégâts Roche renforcés.', desc_en:'Held: +20% Atk, Rock dmg up.', price:1500, buff:{atk:0.20}},
+  magnet:       {name_fr:'Aimant', name_en:'Magnet', icon:'🧲', desc_fr:'Objet tenu : +20% Attaque, dégâts Électrik renforcés.', desc_en:'Held: +20% Atk, Electric dmg up.', price:1500, buff:{atk:0.20}},
+  silk_scarf:   {name_fr:'Foulard Soie', name_en:'Silk Scarf', icon:'🧣', desc_fr:'Objet tenu : +20% Attaque, dégâts Normal renforcés.', desc_en:'Held: +20% Atk, Normal dmg up.', price:1500, buff:{atk:0.20}},
+  silver_wing:  {name_fr:'Aile Argent', name_en:'Silver Wing', icon:'🕊️', desc_fr:'Objet clé : réveille Ho-Oh à la Tour Cendrée.', desc_en:'Key item: awakens Ho-Oh at Tin Tower.', price:1, type:'key'},
+  rainbow_wing: {name_fr:'Aile Arc-en-Ciel', name_en:'Rainbow Wing', icon:'🌈', desc_fr:'Objet clé : réveille Lugia aux Îles Whirl.', desc_en:'Key item: awakens Lugia at Whirl Islands.', price:1, type:'key'},
 };
 
 function getItemName(key){
@@ -93,7 +123,49 @@ var STORY_LORE = {
   powerplant: {speaker_fr:"Rapport Centrale", speaker_en:"Power Plant Report", text_fr:"De violentes décharges magnétiques font trembler les générateurs abandonnés. Électhor a fait de ce lieu son nid de foudre !", text_en:"Violent magnetic surges shake the abandoned generators. Zapdos has made this place its nest of lightning!"},
   victoryroad: {speaker_fr:"Inscription Rocheuse", speaker_en:"Stone Inscription", text_fr:"Seuls les Dresseurs possédant les 8 Badges de Kanto peuvent fouler cette route. Dans ses cratères incandescents règne Sulfura, l'oiseau de feu !", text_en:"Only Trainers with all 8 Kanto Badges may tread this path. In its glowing craters reigns Moltres, the bird of fire!"},
   indigo: {speaker_fr:"Maître Bleu", speaker_en:"Champion Blue", text_fr:"Salut ! Tu as enfin réussi à arriver jusqu'ici ! Mais c'est trop tard : je viens de battre le Conseil 4 ! Je suis le Dresseur le plus puissant du monde !", text_en:"Hey! You finally made it here! But you're too late: I just beat the Elite 4! I am the most powerful Trainer in the world!"},
-  ceruleancave: {speaker_fr:"Journal de Fuji", speaker_en:"Fuji's Journal", text_fr:"Nous avons cloné Mew pour créer le Pokémon ultime... Mewtwo est né de nos expériences, et sa puissance psychique surpasse l'entendement !", text_en:"We cloned Mew to create the ultimate Pokémon... Mewtwo was born of our experiments, and its psychic power is beyond comprehension!"}
+  ceruleancave: {speaker_fr:"Journal de Fuji", speaker_en:"Fuji's Journal", text_fr:"Nous avons cloné Mew pour créer le Pokémon ultime... Mewtwo est né de nos expériences, et sa puissance psychique surpasse l'entendement !", text_en:"We cloned Mew to create the ultimate Pokémon... Mewtwo was born of our experiments, and its psychic power is beyond comprehension!"},
+
+
+  newbark: {speaker_fr:"Prof. Orme", speaker_en:"Prof. Elm", text_fr:"Bourg Geonif, où tout commence. Le Prof. Orme étudie la reproduction des Pokémon.", text_en:"New Bark Town, where it all begins. Prof. Elm studies Pokémon breeding."},
+  cherrygrove: {speaker_fr:"Mme. Jo", speaker_en:"Ms. Jo", text_fr:"Ville Griotte : la première ville des dresseurs de Johto, bercée par la mer.", text_en:"Cherrygrove City: Johto's first trainers' town, by the sea."},
+  violet: {speaker_fr:"Albert (Falkner)", speaker_en:"Falkner", text_fr:"Mauville, ville des vents. Mon arène Vol teste l'agilité !", text_en:"Violet City of winds. My Flying Gym tests agility!"},
+  azalea: {speaker_fr:"Bourg Écorcia", speaker_en:"Azalea Town", text_fr:"Écorcia, nichée dans les buissons. La Team Rocket rôde près du Puits Spinarak.", text_en:"Azalea, nested in the bushes. Team Rocket lurks near Slowpoke Well."},
+  goldenrod: {speaker_fr:"Maï", speaker_en:"Whitney", text_fr:"Doublonville, la métropole animée ! Son Grand Magasin a de tout.", text_en:"Goldenrod, the bustling metropolis! Its Dept. Store has it all."},
+  ecruteak: {speaker_fr:"Moine Morten", speaker_en:"Monk Morten", text_fr:"Rosalia abrite deux tours : l'une brûlée, l'autre dorée.", text_en:"Ecruteak holds two towers: one burned, one golden."},
+  olivine: {speaker_fr:"Jasmine", speaker_en:"Jasmine", text_fr:"Oliville, port bercé par les vagues. Mon Flotajou est souffrant...", text_en:"Olivine, port town by the waves. My Ampharos is ailing..."},
+  cianwood: {speaker_fr:"Chuck", speaker_en:"Chuck", text_fr:"Irisia, île des vagues et des poings. Mon corps est un temple !", text_en:"Cianwood, isle of waves and fists. My body is a temple!"},
+  mahogany: {speaker_fr:"Frédo (Pryce)", speaker_en:"Pryce", text_fr:"Acajou, ville des neiges. Le Lac Colère bouillonne d'étrange.", text_en:"Mahogany, city of snow. Lake Rage boils with something strange."},
+  blackthorn: {speaker_fr:"Sandra (Clair)", speaker_en:"Clair", text_fr:"Ébénelle, cité des dragons. Ma famille veille sur eux.", text_en:"Blackthorn, city of dragons. My family guards them."},
+  jroute29: {speaker_fr:"Route 29", speaker_en:"Route 29", text_fr:"Douce route bordée de prés. Les jeunes Pokémon y gambadent.", text_en:"Gentle meadow road. Young Pokémon frolic here."},
+  jroute30: {speaker_fr:"Route 30", speaker_en:"Route 30", text_fr:"La Route 30 mène aux ruines. On dit qu'un prof y vécut jadis.", text_en:"Route 30 leads to ruins. A professor once lived here."},
+  jroute31: {speaker_fr:"Route 31", speaker_en:"Route 31", text_fr:"Sombre et boisée. La Tour Chétiflor se dresse au bout.", text_en:"Dark, wooded road. Sprout Tower stands at its end."},
+  jroute32: {speaker_fr:"Route 32", speaker_en:"Route 32", text_fr:"Route escarpée vers les Caves Jumelles et le Puits Spinarak.", text_en:"Steep road to Union Cave and Slowpoke Well."},
+  jroute34: {speaker_fr:"Route 34", speaker_en:"Route 34", text_fr:"Route paisible menant au Parc National et à Doublonville.", text_en:"Peaceful road to National Park and Goldenrod."},
+  jroute35: {speaker_fr:"Route 35", speaker_en:"Route 35", text_fr:"La Route 35 rejoint le Parc National, paradis des baies.", text_en:"Route 35 meets National Park, berry paradise."},
+  jroute36: {speaker_fr:"Route 36", speaker_en:"Route 36", text_fr:"Route 36 : on y soigne les Roussillets à la laiterie.", text_en:"Route 36: Miltank are tended at the dairy."},
+  jroute38: {speaker_fr:"Route 38", speaker_en:"Route 38", text_fr:"Les fermes d'Oliville. Les Roussillets paissent en paix.", text_en:"Olivine's farms. Miltank graze in peace."},
+  jroute40: {speaker_fr:"Chenal 40", speaker_en:"Sea Route 40", text_fr:"La mer lie Oliville à Irisia. Embarque, marin !", text_en:"The sea links Olivine to Cianwood. Set sail!"},
+  jroute42: {speaker_fr:"Route 42", speaker_en:"Route 42", text_fr:"Route sauvage menant au Mt. Mortar. Une brume y rôde.", text_en:"Wild road to Mt. Mortar. A mist lingers."},
+  jroute44: {speaker_fr:"Route 44 / Glace", speaker_en:"Route 44 / Ice", text_fr:"Route enneigée vers Ébénelle. Une lueur pourpre y fuit.", text_en:"Snowy road to Blackthorn. A purple gleam flees."},
+  jroute45: {speaker_fr:"Route 45", speaker_en:"Route 45", text_fr:"Route rocailleuse au Mont Argent. Les dragons y rugissent.", text_en:"Rocky road to Mt. Silver. Dragons roar."},
+  jroute28: {speaker_fr:"Route 28", speaker_en:"Route 28", text_fr:"Route 28 vers le Mont Argent, gardien des secrets anciens.", text_en:"Route 28 to Mt. Silver, keeper of ancient secrets."},
+  nationalpark: {speaker_fr:"Gardien du Parc", speaker_en:"Park Ranger", text_fr:"Le Parc National : concours de pêche et rencontres rares !", text_en:"National Park: fishing contests and rare encounters!"},
+  sprouttower: {speaker_fr:"Moine Bao", speaker_en:"Monk Bao", text_fr:"La Tour Chétiflor plie mais ne rompt jamais.", text_en:"Sprout Tower bends but never breaks."},
+  ruinsofalph: {speaker_fr:"Archéologue Solène", speaker_en:"Archaeologist Solène", text_fr:"Les Ruines d'Alpha cachent un alphabet perdu et des mystères.", text_en:"Ruins of Alph hide a lost alphabet and mysteries."},
+  burnedtower: {speaker_fr:"Esprit de la Tour", speaker_en:"Tower Spirit", text_fr:"Jadis incendiée, trois flammes y renaîtront en Bêtes Légendaires.", text_en:"Once burned, three flames shall return as Legendary Beasts."},
+  tintower: {speaker_fr:"Gardien des Ailes", speaker_en:"Wing Guardian", text_fr:"La Tour Cendrée attend le héros des Bêtes pour faire venir Ho-Oh.", text_en:"The Tin Tower awaits the Beasts' hero to summon Ho-Oh."},
+  slowpokewell: {speaker_fr:"Ancien de Écorcia", speaker_en:"Azalea Elder", text_fr:"Le Puits Spinarak fut pollué par la Team Rocket.", text_en:"Slowpoke Well was polluted by Team Rocket."},
+  unioncave: {speaker_fr:"Spécialiste Évoli", speaker_en:"Eevee Specialist", text_fr:"Les Caves Jumelles regorgent d'évolutions surprenantes.", text_en:"Union Cave teems with surprising evolutions."},
+  mtmortar: {speaker_fr:"Ermite des Chutes", speaker_en:"Waterfall Hermit", text_fr:"Le Mt. Mortar cache une grotte où Crocrodil évolue.", text_en:"Mt. Mortar hides a cave where Croconaw evolves."},
+  icepath: {speaker_fr:"Guide de Glace", speaker_en:"Ice Guide", text_fr:"Le Chemin Glace relie Acajou à Ébénelle par le froid.", text_en:"Ice Path links Mahogany and Blackthorn through cold."},
+  darkcave: {speaker_fr:"Exploratrice Noa", speaker_en:"Explorer Noa", text_fr:"La Grotte Obscure, labyrinthe sans lumière.", text_en:"Dark Cave, a maze without light."},
+  whirlislands: {speaker_fr:"Vieux Pêcheur", speaker_en:"Old Fisher", text_fr:"Aux Îles Whirl sommeille Lugia, gardien des mers.", text_en:"In the Whirl Islands sleeps Lugia, guardian of the sea."},
+  lakerage: {speaker_fr:"Pêcheur Requin", speaker_en:"Fisherman Requin", text_fr:"Le Lac Colère rougeoie : un Gyarados mutant y vit.", text_en:"Lake Rage glows red: a mutated Gyarados dwells here."},
+  victoryroad_jo: {speaker_fr:"Gardien de la Victoire", speaker_en:"Victory Guard", text_fr:"La Route Victoire sépare les champions du reste.", text_en:"Victory Road separates champions from the rest."},
+  mtsilver: {speaker_fr:"Légende du Mont", speaker_en:"Mount Legend", text_fr:"Au sommet veille Tyranocif, tyran de roc et d'ombre.", text_en:"Atop waits Tyranitar, tyrant of rock and shadow."},
+  tohjofalls: {speaker_fr:"Esprit des Chutes", speaker_en:"Falls Spirit", text_fr:"La Cascade Tohjo marque la fin du voyage Johto.", text_en:"Tohjo Falls marks the end of the Johto journey."},
+  indigo_jo: {speaker_fr:"Champion en titre", speaker_en:"Reigning Champion", text_fr:"Le Plateau Indigo couronne les maîtres de Johto.", text_en:"Indigo Plateau crowns Johto's masters."},
+  ilexforest: {speaker_fr:"Protecteur du Bois", speaker_en:"Forest Warden", text_fr:"Le Bois aux Chênes abrite Celebi, Pokémon du Temps.", text_en:"Ilex Forest shelters Celebi, the Time Pokémon."}
 };
 
 var POKE_TALENTS = {
@@ -161,6 +233,106 @@ var POKE_TALENTS = {
   144:['thickfat','multiscale','serenegrace'], 145:['static','lightningrod','speedboost'], 146:['blaze','solarpower','speedboost'],
   147:['multiscale','serenegrace','hugepower'], 148:['multiscale','serenegrace','hugepower'], 149:['multiscale','serenegrace','hugepower'],
   150:['magicguard','regenerator','adaptability'], 151:['serenegrace','adaptability','regenerator'],
+  152:['overgrow','overgrow','chlorophyll'],
+  153:['overgrow','overgrow','chlorophyll'],
+  154:['overgrow','overgrow','chlorophyll'],
+  155:['blaze','blaze','solarpower'],
+  156:['blaze','blaze','solarpower'],
+  157:['blaze','blaze','solarpower'],
+  158:['torrent','torrent','regenerator'],
+  159:['torrent','torrent','regenerator'],
+  160:['torrent','torrent','regenerator'],
+  161:['compoundeyes','guts','hugepower'],
+  162:['compoundeyes','guts','hugepower'],
+  163:['compoundeyes','serenegrace','guts'],
+  164:['compoundeyes','serenegrace','guts'],
+  165:['compoundeyes','guts','hugepower'],
+  166:['compoundeyes','guts','hugepower'],
+  167:['poisonpoint','compoundeyes','guts'],
+  168:['poisonpoint','compoundeyes','guts'],
+  169:['clearbody','serenegrace','regenerator'],
+  170:['lightningrod','compoundeyes','regenerator'],
+  171:['lightningrod','compoundeyes','regenerator'],
+  172:['static','static','lightningrod'],
+  173:['magicguard','serenegrace','regenerator'],
+  174:['magicguard','serenegrace','regenerator'],
+  175:['serenegrace','magicguard','naturalcure'],
+  176:['serenegrace','naturalcure','magicguard'],
+  177:['serenegrace','compoundeyes','naturalcure'],
+  178:['serenegrace','compoundeyes','naturalcure'],
+  179:['static','static','lightningrod'],
+  180:['static','static','lightningrod'],
+  181:['static','static','lightningrod'],
+  182:['chlorophyll','chlorophyll','solarpower'],
+  183:['thickfat','hugepower','hugepower'],
+  184:['thickfat','hugepower','hugepower'],
+  185:['sturdy','sturdy','guts'],
+  186:['sturdy','regenerator','thickfat'],
+  187:['chlorophyll','chlorophyll','solarpower'],
+  188:['chlorophyll','solarpower','guts'],
+  189:['chlorophyll','solarpower','guts'],
+  190:['compoundeyes','guts','hugepower'],
+  191:['chlorophyll','solarpower','guts'],
+  192:['chlorophyll','solarpower','guts'],
+  193:['speedboost','compoundeyes','serenegrace'],
+  194:['sturdy','regenerator','guts'],
+  195:['sturdy','regenerator','guts'],
+  196:['serenegrace','magicguard','naturalcure'],
+  197:['serenegrace','clearbody','guts'],
+  198:['compoundeyes','guts','hugepower'],
+  199:['regenerator','naturalcure','serenegrace'],
+  200:['levitate','levitate','magicguard'],
+  201:['levitate','levitate','clearbody'],
+  202:['clearbody','magicguard','regenerator'],
+  203:['clearbody','serenegrace','guts'],
+  204:['sturdy','sturdy','regenerator'],
+  205:['sturdy','clearbody','regenerator'],
+  206:['serenegrace','magicguard','guts'],
+  207:['sandveil','sturdy','guts'],
+  208:['sturdy','guts','hugepower'],
+  209:['intimidate','guts','hugepower'],
+  210:['intimidate','guts','hugepower'],
+  211:['poisonpoint','guts','hugepower'],
+  212:['technician','guts','hugepower'],
+  213:['sturdy','guts','hugepower'],
+  214:['guts','technician','hugepower'],
+  215:['clearbody','guts','hugepower'],
+  216:['guts','hugepower','sturdy'],
+  217:['guts','hugepower','sturdy'],
+  218:['sturdy','guts','hugepower'],
+  219:['sturdy','guts','hugepower'],
+  220:['sturdy','guts','hugepower'],
+  221:['sturdy','guts','hugepower'],
+  222:['naturalcure','regenerator','sturdy'],
+  223:['sniper','guts','hugepower'],
+  224:['sniper','guts','hugepower'],
+  225:['guts','hugepower','sturdy'],
+  226:['sturdy','regenerator','naturalcure'],
+  227:['sturdy','regenerator','guts'],
+  228:['guts','intimidate','hugepower'],
+  229:['guts','intimidate','hugepower'],
+  230:['sniper','guts','hugepower'],
+  231:['sturdy','guts','hugepower'],
+  232:['sturdy','guts','hugepower'],
+  233:['adaptability','regenerator','guts'],
+  234:['intimidate','guts','hugepower'],
+  235:['technician','guts','hugepower'],
+  236:['guts','sturdy','hugepower'],
+  237:['guts','sturdy','hugepower'],
+  238:['naturalcure','serenegrace','magicguard'],
+  239:['static','guts','hugepower'],
+  240:['guts','serenegrace','hugepower'],
+  241:['thickfat','guts','hugepower'],
+  242:['naturalcure','serenegrace','magicguard'],
+  243:['sturdy','intimidate','lightningrod'],
+  244:['sturdy','intimidate','guts'],
+  245:['sturdy','intimidate','regenerator'],
+  246:['guts','sturdy','hugepower'],
+  247:['guts','sturdy','hugepower'],
+  248:['guts','sturdy','hugepower'],
+  249:['sturdy','regenerator','multiscale'],
+  250:['sturdy','regenerator','solarpower'],
+  251:['naturalcure','serenegrace','magicguard'],
 };
 
 // ============================================================
@@ -338,6 +510,36 @@ var STORY_QUESTS = [
    desc_fr:"À Ébénelle, affrontez Sandra (Clair) pour le Badge Lever et devenir Maître de Johto !",
    desc_en:"In Blackthorn City, challenge Clair for the Rising Badge and become Johto Champion!",
    type:"badge", targetBadge:"clair", target:1, rewardMoney:8000, rewardItems:{choice_band:1, rarecandy:5}, rewardDesc_fr:"8 000₽ + Bandeau Choix + 5 Super Bonbons", rewardDesc_en:"8,000₽ + Choice Band + 5 Rare Candies"}
+,
+  // ===================== HISTOIRE POST-LIGUE JOHTO (légendaires) =====================
+  {id:60, region:'johto', title_fr:"La Tour Brûlante : le Mystère des Bêtes", title_en:"Burned Tower: The Beasts' Mystery",
+   desc_fr:"À Rosalia, explorez la Tour Brûlante et affrontez 8 Pokémon pour libérer les trois Bêtes Légendaires : Raikou, Entei et Suicune !",
+   desc_en:"In Ecruteak, explore Burned Tower and defeat 8 Pokémon to free the three Legendary Beasts: Raikou, Entei and Suicune!",
+   type:"defeat_wild", loc:"burnedtower", target:8, rewardMoney:3000, rewardItems:{rarecandy:5}, rewardDesc_fr:"3 000₽ + 5 Super Bonbons", rewardDesc_en:"3,000₽ + 5 Rare Candies"},
+  {id:61, region:'johto', title_fr:"Raikou, la Foudre Pourpre", title_en:"Raikou, the Purple Thunder",
+   desc_fr:"Sillonnez la Route 44 et remportez 10 combats pour faire surgir Raikou, la Bête Foudre !",
+   desc_en:"Roam Route 44 and win 10 battles to summon Raikou, the Thunder Beast!",
+   type:"defeat_wild", loc:"jroute44", target:10, rewardMoney:5000, rewardPoke:243, rewardDesc_fr:"Raikou (Légendaire ✨)", rewardDesc_en:"Raikou (Legendary ✨)"},
+  {id:62, region:'johto', title_fr:"Entei, le Volcan Vivant", title_en:"Entei, the Living Volcano",
+   desc_fr:"Parcourez la Route 28 et remportez 10 combats pour réveiller Entei, la Bête Feu !",
+   desc_en:"Travel Route 28 and win 10 battles to awaken Entei, the Fire Beast!",
+   type:"defeat_wild", loc:"jroute28", target:10, rewardMoney:5000, rewardPoke:244, rewardDesc_fr:"Entei (Légendaire ✨)", rewardDesc_en:"Entei (Legendary ✨)"},
+  {id:63, region:'johto', title_fr:"Suicune, l'Aurore Boréale", title_en:"Suicune, the Aurora",
+   desc_fr:"Parcourez la Route 42 et remportez 10 combats pour croiser Suicune, la Bête Eau !",
+   desc_en:"Cross Route 42 and win 10 battles to meet Suicune, the Water Beast!",
+   type:"defeat_wild", loc:"jroute42", target:10, rewardMoney:5000, rewardPoke:245, rewardDesc_fr:"Suicune (Légendaire ✨)", rewardDesc_en:"Suicune (Legendary ✨)"},
+  {id:64, region:'johto', title_fr:"Les Îles Whirl : Lugia, Gardien des Mers", title_en:"Whirl Islands: Lugia, Guardian of the Sea",
+   desc_fr:"Plongez aux Îles Whirl et remportez 10 combats pour éveiller Lugia, le Pokémon de la Mer !",
+   desc_en:"Dive to the Whirl Islands and win 10 battles to awaken Lugia, the Sea Pokémon!",
+   type:"defeat_wild", loc:"whirlislands", target:10, rewardMoney:8000, rewardPoke:249, rewardDesc_fr:"Lugia (Légendaire ✨)", rewardDesc_en:"Lugia (Legendary ✨)"},
+  {id:65, region:'johto', title_fr:"La Tour Cendrée : Ho-Oh, Oiseau de Feu", title_en:"Tin Tower: Ho-Oh, the Fire Bird",
+   desc_fr:"Gravissez la Tour Cendrée à Rosalia et remportez 10 combats pour faire apparaître Ho-Oh, l'Oiseau de Feu !",
+   desc_en:"Climb the Tin Tower in Ecruteak and win 10 battles to summon Ho-Oh, the Fire Bird!",
+   type:"defeat_wild", loc:"tintower", target:10, rewardMoney:8000, rewardPoke:250, rewardDesc_fr:"Ho-Oh (Légendaire ✨)", rewardDesc_en:"Ho-Oh (Legendary ✨)"},
+  {id:66, region:'johto', title_fr:"Le Bois aux Chênes : Celebi, Pokémon Fabuleux", title_en:"Ilex Forest: Celebi, the Mythical",
+   desc_fr:"Dans le Bois aux Chênes, remportez 12 combats pour rencontrer Celebi, le Pokémon du Temps !",
+   desc_en:"In Ilex Forest, win 12 battles to meet Celebi, the Time Pokémon!",
+   type:"defeat_wild", loc:"ilexforest", target:12, rewardMoney:10000, rewardPoke:251, rewardDesc_fr:"Celebi (Fabuleux ✨)", rewardDesc_en:"Celebi (Mythical ✨)"}
 ];
 
 function getSpeciesTalents(id){
@@ -484,59 +686,59 @@ var LOCS = {
 };
 
 var LOCS_JOHTO = {
-  jroute26:    {name:'Route 26',          type:'route',   x:1512,y:504,w:48,h:336, conn:['indigo_jo','jroute27'],                      wild:[], shopId:null, champ:null, badgeReq:0},
-  jroute27:    {name:'Route 27',          type:'route',   x:1384,y:696,w:304,h:48, conn:['jroute26','jroute28'],                       wild:[], shopId:null, champ:null, badgeReq:0},
-  jroute28:    {name:'Route 28',          type:'route',   x:1392,y:504,w:192,h:144, conn:['jroute27','mahogany','mtsilver'],           wild:[], shopId:null, champ:null, badgeReq:0},
-  jroute37:    {name:'Route 37',          type:'route',   x:552,y:256,w:48,h:96, conn:['jroute36','ecruteak'],                        wild:[], shopId:null, champ:null, badgeReq:0},
-  jroute39:    {name:'Route 39',          type:'route',   x:264,y:232,w:48,h:144, conn:['ecruteak','jroute38'],                        wild:[], shopId:null, champ:null, badgeReq:0},
-  jroute41:    {name:'Chenal 41 (Mer)',   type:'sea',     x:176,y:624,w:96,h:192, conn:['olivine','cianwood'],                        wild:[], shopId:null, champ:null, badgeReq:0},
-  jroute46:    {name:'Route 46',          type:'route',   x:1064,y:568,w:48,h:208, conn:['jroute45','blackthorn'],                    wild:[], shopId:null, champ:null, badgeReq:0},
-  jroute47:    {name:'Route 47',          type:'route',   x:40,y:664,w:48,h:112, conn:['jroute48'],                                    wild:[], shopId:null, champ:null, badgeReq:0},
-  jroute48:    {name:'Route 48',          type:'route',   x:40,y:504,w:48,h:208, conn:['jroute47','victoryroad_jo'],                 wild:[], shopId:null, champ:null, badgeReq:0},
+  jroute26:    {name:'Route 26',          type:'route',   x:1512,y:504,w:48,h:336, conn:['indigo_jo','jroute27'],                      wild:[], shopId:null, champ:null, badgeReq:8},
+  jroute27:    {name:'Route 27',          type:'route',   x:1384,y:696,w:304,h:48, conn:['jroute26','jroute28'],                       wild:[], shopId:null, champ:null, badgeReq:8},
+  jroute28:    {name:'Route 28',          type:'route',   x:1392,y:504,w:192,h:144, conn:['jroute27','mahogany','mtsilver'],           wild:[], shopId:null, champ:null, badgeReq:8},
+  jroute37:    {name:'Route 37',          type:'route',   x:552,y:256,w:48,h:96, conn:['jroute36','ecruteak'],                        wild:[], shopId:null, champ:null, badgeReq:3},
+  jroute39:    {name:'Route 39',          type:'route',   x:264,y:232,w:48,h:144, conn:['ecruteak','jroute38'],                        wild:[], shopId:null, champ:null, badgeReq:4},
+  jroute41:    {name:'Chenal 41 (Mer)',   type:'sea',     x:176,y:624,w:96,h:192, conn:['olivine','cianwood'],                        wild:[], shopId:null, champ:null, badgeReq:4},
+  jroute46:    {name:'Route 46',          type:'route',   x:1064,y:568,w:48,h:208, conn:['jroute45','blackthorn'],                    wild:[], shopId:null, champ:null, badgeReq:7},
+  jroute47:    {name:'Route 47',          type:'route',   x:40,y:664,w:48,h:112, conn:['jroute48'],                                    wild:[], shopId:null, champ:null, badgeReq:8},
+  jroute48:    {name:'Route 48',          type:'route',   x:40,y:504,w:48,h:208, conn:['jroute47','victoryroad_jo'],                 wild:[], shopId:null, champ:null, badgeReq:8},
   nationalpark:{name:'Parc National',     type:'town',    x:400,y:268,w:96,h:72, conn:['jroute35','jroute36'],                        wild:[], shopId:null, champ:null, badgeReq:0},
-  indigo_jo:   {name:'Plateau Indigo',    type:'town',    x:1496,y:104,w:208,h:208, conn:['jroute26','victoryroad_jo'],              wild:[], shopId:null, champ:null, badgeReq:0},
+  indigo_jo:   {name:'Plateau Indigo',    type:'town',    x:1496,y:104,w:208,h:208, conn:['jroute26','victoryroad_jo'],              wild:[], shopId:null, champ:null, badgeReq:8},
   sprouttower: {name:'Tour Chétiflor',    type:'dungeon', x:736,y:260,w:64,h:88, conn:['violet'],                                     wild:[], shopId:null, champ:null, badgeReq:0},
   ruinsofalph: {name:'Ruines d\'Alpha',    type:'dungeon', x:696,y:432,w:80,h:64, conn:['jroute32','jroute32_mid'],                                   wild:[], shopId:null, champ:null, badgeReq:0},
   burnedtower: {name:'Tour Brûlante',     type:'dungeon', x:472,y:96,w:112,h:128, conn:['ecruteak'],                                  wild:[], shopId:null, champ:null, badgeReq:0},
   tintower:    {name:'Tour Cendrée',      type:'dungeon', x:616,y:80,w:112,h:160, conn:['ecruteak'],                                  wild:[], shopId:null, champ:null, badgeReq:0},
-  mtmortar:    {name:'Mt. Mortar',        type:'dungeon', x:816,y:136,w:96,h:80, conn:['mahogany'],                                   wild:[], shopId:null, champ:null, badgeReq:0},
-  icepath:     {name:'Chemin Glace',      type:'dungeon', x:1152,y:176,w:96,h:64, conn:['mahogany','blackthorn'],                     wild:[], shopId:null, champ:null, badgeReq:0},
-  darkcave:    {name:'Grotte Obscure',    type:'dungeon', x:848,y:280,w:64,h:64, conn:['jroute42'],                                  wild:[], shopId:null, champ:null, badgeReq:0},
+  mtmortar:    {name:'Mt. Mortar',        type:'dungeon', x:816,y:136,w:96,h:80, conn:['mahogany'],                                   wild:[], shopId:null, champ:null, badgeReq:6},
+  icepath:     {name:'Chemin Glace',      type:'dungeon', x:1152,y:176,w:96,h:64, conn:['mahogany','blackthorn'],                     wild:[], shopId:null, champ:null, badgeReq:6},
+  darkcave:    {name:'Grotte Obscure',    type:'dungeon', x:848,y:280,w:64,h:64, conn:['jroute42'],                                  wild:[], shopId:null, champ:null, badgeReq:6},
   slowpokewell:{name:'Puits Spinarak',    type:'dungeon', x:576,y:856,w:64,h:48, conn:['azalea'],                                      wild:[], shopId:null, champ:null, badgeReq:0},
-  whirlislands:{name:'Îles Whirl',        type:'dungeon', x:256,y:680,w:128,h:112, conn:['cianwood'],                                  wild:[], shopId:null, champ:null, badgeReq:0},
-  victoryroad_jo:{name:'Route Victoire (Johto)',type:'dungeon',x:1512,y:272,w:112,h:128, conn:['indigo_jo','jroute28','mtsilver'],   wild:[], shopId:null, champ:null, badgeReq:0},
-  mtsilver:    {name:'Mt. Argent',        type:'dungeon', x:1264,y:448,w:160,h:288, conn:['jroute28','tohjofalls','victoryroad_jo'], wild:[], shopId:null, champ:null, badgeReq:0},
-  tohjofalls:  {name:'Cascade Tohjo',     type:'dungeon', x:1264,y:648,w:64,h:48, conn:['mtsilver'],                                  wild:[], shopId:null, champ:null, badgeReq:0},
+  whirlislands:{name:'Îles Whirl',        type:'dungeon', x:256,y:680,w:128,h:112, conn:['cianwood'],                                  wild:[], shopId:null, champ:null, badgeReq:4},
+  victoryroad_jo:{name:'Route Victoire (Johto)',type:'dungeon',x:1512,y:272,w:112,h:128, conn:['indigo_jo','jroute28','mtsilver'],   wild:[], shopId:null, champ:null, badgeReq:8},
+  mtsilver:    {name:'Mt. Argent',        type:'dungeon', x:1264,y:448,w:160,h:288, conn:['jroute28','tohjofalls','victoryroad_jo'], wild:[], shopId:null, champ:null, badgeReq:8},
+  tohjofalls:  {name:'Cascade Tohjo',     type:'dungeon', x:1264,y:648,w:64,h:48, conn:['mtsilver'],                                  wild:[], shopId:null, champ:null, badgeReq:8},
 
-  newbark:     {name:'Bourg Geon',       type:'town',    x:1192,y:684,w:80,h:72, conn:['jroute29'],                          wild:[], shopId:'pallet', champ:null, badgeReq:0},
+  newbark:     {name:'Bourg Geon',       type:'town',    x:1192,y:684,w:80,h:72, conn:['jroute29'],                          wild:[], shopId:'jnewbark', champ:null, badgeReq:0},
   jroute29:    {name:'Route 29',         type:'route',   x:1008,y:696,w:288,h:48, conn:['newbark','cherrygrove'],             wild:[[16,3,5,'common'], [19,3,5,'common'], [13,4,7,'uncommon']], shopId:null, champ:null, badgeReq:0},
-  cherrygrove: {name:'Ville Griotte',    type:'town',    x:832,y:688,w:64,h:64, conn:['jroute29','jroute30'],               wild:[], shopId:'viridian', champ:null, badgeReq:0},
+  cherrygrove: {name:'Ville Griotte',    type:'town',    x:832,y:688,w:64,h:64, conn:['jroute29','jroute30'],               wild:[], shopId:'jcherrygrove', champ:null, badgeReq:0},
   jroute30:    {name:'Route 30',         type:'route',   x:840,y:504,w:48,h:304, conn:['cherrygrove','jroute31'],            wild:[[10,4,6,'common'], [13,4,6,'common'], [16,5,7,'uncommon']], shopId:null, champ:null, badgeReq:0},
   jroute31:    {name:'Route 31',         type:'route',   x:792,y:328,w:144,h:48, conn:['jroute30','violet'],                 wild:[[69,5,8,'common'], [43,5,8,'common'], [92,6,9,'uncommon']], shopId:null, champ:null, badgeReq:0},
-  violet:      {name:'Mauville',         type:'town',    x:688,y:320,w:64,h:64, conn:['jroute31','jroute32'],               wild:[], shopId:'pewter', champ:'falkner', badgeReq:0},
-  jroute32:    {name:'Route 32',         type:'route',   x:696,y:376,w:48,h:48,  conn:['violet','ruinsofalph'],          wild:[[23,6,10,'common']],                                                  shopId:null, champ:null, badgeReq:0},
-  jroute32_mid: {name:'Route 32',        type:'route',   x:696,y:608,w:48,h:288, conn:['violet','ruinsofalph','unioncave'],       wild:[[19,6,10,'common']],                                                  shopId:null, champ:null, badgeReq:0},
-  jroute32_south:{name:'Route 32',       type:'route',   x:696,y:848,w:48,h:64,  conn:['violet','unioncave','jroute33'],         wild:[[179,7,11,'uncommon']],                                                shopId:null, champ:null, badgeReq:0},
-  unioncave:   {name:'Caves Jumelles',   type:'dungeon', x:688,y:784,w:64,h:64, conn:['jroute32_mid','jroute32_south'],               wild:[[41,8,12,'common'], [74,8,12,'common'], [95,10,14,'rare']], shopId:null, champ:null, badgeReq:0},
-  jroute33:    {name:'Route 33',         type:'route',   x:624,y:904,w:192,h:48, conn:['unioncave','azalea'],                wild:[[21,9,13,'common'], [19,9,13,'common']], shopId:null, champ:null, badgeReq:0},
-  azalea:      {name:'Écorcia',          type:'town',    x:496,y:896,w:64,h:64, conn:['jroute33','ilexforest'],             wild:[], shopId:'cerulean', champ:'bugsy', badgeReq:0},
-  ilexforest:  {name:'Bois aux Chênes',  type:'dungeon', x:408,y:888,w:112,h:112, conn:['azalea','jroute34'],                 wild:[[10,10,14,'common'], [13,10,14,'common'], [46,11,15,'uncommon']], shopId:null, champ:null, badgeReq:0},
-  jroute34:    {name:'Route 34',         type:'route',   x:408,y:744,w:48,h:176, conn:['ilexforest','goldenrod'],            wild:[[63,12,16,'common'], [19,12,16,'common'], [39,13,17,'uncommon']], shopId:null, champ:null, badgeReq:0},
-  goldenrod:   {name:'Doublonville',     type:'town',    x:416,y:560,w:128,h:192, conn:['jroute34','jroute35'],               wild:[], shopId:'celadon', champ:'whitney', badgeReq:0},
-  jroute35:    {name:'Route 35',         type:'route',   x:408,y:408,w:48,h:112, conn:['goldenrod','jroute36'],              wild:[[16,14,18,'common'], [29,14,18,'common'], [54,15,19,'uncommon']], shopId:null, champ:null, badgeReq:0},
-  jroute36:    {name:'Route 36',         type:'route',   x:520,y:328,w:272,h:48, conn:['jroute35','ecruteak'],               wild:[[37,15,20,'common'], [58,15,20,'common']], shopId:null, champ:null, badgeReq:0},
-  ecruteak:    {name:'Rosalia',          type:'town',    x:544,y:176,w:64,h:64, conn:['jroute36','jroute38','jroute42'],    wild:[], shopId:'lavender', champ:'morty', badgeReq:0},
-  jroute38:    {name:'Route 38',      type:'route',   x:400,y:184,w:224,h:48,  conn:['ecruteak','olivine'],                wild:[[19,16,21,'common'], [20,17,22,'common'], [81,18,23,'uncommon']], shopId:null, champ:null, badgeReq:0},
-  olivine:     {name:'Oliville (Port 🚢)',type:'town',   x:216,y:332,w:144,h:72, conn:['jroute38','jroute40'],               wild:[], shopId:'vermilion', champ:'jasmine', badgeReq:0},
-  jroute40:    {name:'Chenal 40 (Mer)',type:'sea',    x:200,y:448,w:48,h:160, conn:['olivine','cianwood'],                wild:[[72,18,24,'common'], [73,19,25,'uncommon']], shopId:null, champ:null, badgeReq:0},
-  cianwood:    {name:'Irisia',           type:'town',    x:96, y:688,w:64,h:64, conn:['jroute40'],                          wild:[], shopId:'fuchsia', champ:'chuck', badgeReq:0},
-  jroute42:    {name:'Route 42',         type:'route',   x:728,y:184,w:304,h:48, conn:['ecruteak','mahogany'],               wild:[[56,20,26,'common'], [41,20,26,'common']], shopId:null, champ:null, badgeReq:0},
-  jroute43:    {name:'Route 43',          type:'route',   x:920,y:96,w:48,h:120, conn:['mahogany','lakerage'],                      wild:[], shopId:null, champ:null, badgeReq:0},
-  mahogany:    {name:'Acajou',           type:'town',    x:912,y:176,w:64,h:64, conn:['jroute42','jroute43','jroute44'],    wild:[], shopId:'cinnabar', champ:'pryce', badgeReq:0},
-  lakerage:    {name:'Lac Colère (Mer)', type:'sea',     x:920,y:36,w:120,h:72, conn:['jroute43'],                          wild:[[129,22,28,'common'], [130,25,32,'rare']], shopId:null, champ:null, badgeReq:0},
-  jroute44:    {name:'Route 44 / Glace', type:'dungeon', x:1032,y:184,w:176,h:48, conn:['mahogany','blackthorn'],             wild:[[86,24,30,'common'], [87,25,32,'uncommon'], [124,26,34,'rare']], shopId:null, champ:null, badgeReq:0},
-  blackthorn:  {name:'Ébénelle',         type:'town',    x:1136,y:256,w:64,h:64, conn:['jroute44','jroute45'],               wild:[], shopId:'indigo', champ:'clair', badgeReq:0},
-  jroute45:    {name:'Route 45',      type:'route',   x:1144,y:352,w:48,h:288, conn:['blackthorn'],                        wild:[[74,25,32,'common'], [75,26,33,'common'], [147,26,35,'rare']], shopId:null, champ:null, badgeReq:0},
+  violet:      {name:'Mauville',         type:'town',    x:688,y:320,w:64,h:64, conn:['jroute31','jroute32'],               wild:[], shopId:'jviolet', champ:'falkner', badgeReq:0},
+  jroute32:    {name:'Route 32',         type:'route',   x:696,y:376,w:48,h:48,  conn:['violet','ruinsofalph'],          wild:[[23,6,10,'common']],                                                  shopId:null, champ:null, badgeReq:1},
+  jroute32_mid: {name:'Route 32',        type:'route',   x:696,y:608,w:48,h:288, conn:['violet','ruinsofalph','unioncave'],       wild:[[19,6,10,'common']],                                                  shopId:null, champ:null, badgeReq:1},
+  jroute32_south:{name:'Route 32',       type:'route',   x:696,y:848,w:48,h:64,  conn:['violet','unioncave','jroute33'],         wild:[[179,7,11,'uncommon']],                                                shopId:null, champ:null, badgeReq:1},
+  unioncave:   {name:'Caves Jumelles',   type:'dungeon', x:688,y:784,w:64,h:64, conn:['jroute32_mid','jroute32_south'],               wild:[[41,8,12,'common'], [74,8,12,'common'], [95,10,14,'rare']], shopId:null, champ:null, badgeReq:1},
+  jroute33:    {name:'Route 33',         type:'route',   x:624,y:904,w:192,h:48, conn:['unioncave','azalea'],                wild:[[21,9,13,'common'], [19,9,13,'common']], shopId:null, champ:null, badgeReq:1},
+  azalea:      {name:'Écorcia',          type:'town',    x:496,y:896,w:64,h:64, conn:['jroute33','ilexforest'],             wild:[], shopId:'jazalea', champ:'bugsy', badgeReq:0},
+  ilexforest:  {name:'Bois aux Chênes',  type:'dungeon', x:408,y:888,w:112,h:112, conn:['azalea','jroute34'],                 wild:[[10,10,14,'common'], [13,10,14,'common'], [46,11,15,'uncommon']], shopId:null, champ:null, badgeReq:1},
+  jroute34:    {name:'Route 34',         type:'route',   x:408,y:744,w:48,h:176, conn:['ilexforest','goldenrod'],            wild:[[63,12,16,'common'], [19,12,16,'common'], [39,13,17,'uncommon']], shopId:null, champ:null, badgeReq:2},
+  goldenrod:   {name:'Doublonville',     type:'town',    x:416,y:560,w:128,h:192, conn:['jroute34','jroute35'],               wild:[], shopId:'jgoldenrod', champ:'whitney', badgeReq:0},
+  jroute35:    {name:'Route 35',         type:'route',   x:408,y:408,w:48,h:112, conn:['goldenrod','jroute36'],              wild:[[16,14,18,'common'], [29,14,18,'common'], [54,15,19,'uncommon']], shopId:null, champ:null, badgeReq:2},
+  jroute36:    {name:'Route 36',         type:'route',   x:520,y:328,w:272,h:48, conn:['jroute35','ecruteak'],               wild:[[37,15,20,'common'], [58,15,20,'common']], shopId:null, champ:null, badgeReq:2},
+  ecruteak:    {name:'Rosalia',          type:'town',    x:544,y:176,w:64,h:64, conn:['jroute36','jroute38','jroute42'],    wild:[], shopId:'jecruteak', champ:'morty', badgeReq:3},
+  jroute38:    {name:'Route 38',      type:'route',   x:400,y:184,w:224,h:48,  conn:['ecruteak','olivine'],                wild:[[19,16,21,'common'], [20,17,22,'common'], [81,18,23,'uncommon']], shopId:null, champ:null, badgeReq:4},
+  olivine:     {name:'Oliville (Port 🚢)',type:'town',   x:216,y:332,w:144,h:72, conn:['jroute38','jroute40'],               wild:[], shopId:'jolivine', champ:'jasmine', badgeReq:4},
+  jroute40:    {name:'Chenal 40 (Mer)',type:'sea',    x:200,y:448,w:48,h:160, conn:['olivine','cianwood'],                wild:[[72,18,24,'common'], [73,19,25,'uncommon']], shopId:null, champ:null, badgeReq:4},
+  cianwood:    {name:'Irisia',           type:'town',    x:96, y:688,w:64,h:64, conn:['jroute40'],                          wild:[], shopId:'jcianwood', champ:'chuck', badgeReq:4},
+  jroute42:    {name:'Route 42',         type:'route',   x:728,y:184,w:304,h:48, conn:['ecruteak','mahogany'],               wild:[[56,20,26,'common'], [41,20,26,'common']], shopId:null, champ:null, badgeReq:5},
+  jroute43:    {name:'Route 43',          type:'route',   x:920,y:96,w:48,h:120, conn:['mahogany','lakerage'],                      wild:[], shopId:null, champ:null, badgeReq:6},
+  mahogany:    {name:'Acajou',           type:'town',    x:912,y:176,w:64,h:64, conn:['jroute42','jroute43','jroute44'],    wild:[], shopId:'jmahogany', champ:'pryce', badgeReq:6},
+  lakerage:    {name:'Lac Colère (Mer)', type:'sea',     x:920,y:36,w:120,h:72, conn:['jroute43'],                          wild:[[129,22,28,'common'], [130,25,32,'rare']], shopId:null, champ:null, badgeReq:6},
+  jroute44:    {name:'Route 44 / Glace', type:'dungeon', x:1032,y:184,w:176,h:48, conn:['mahogany','blackthorn'],             wild:[[86,24,30,'common'], [87,25,32,'uncommon'], [124,26,34,'rare']], shopId:null, champ:null, badgeReq:7},
+  blackthorn:  {name:'Ébénelle',         type:'town',    x:1136,y:256,w:64,h:64, conn:['jroute44','jroute45'],               wild:[], shopId:'jblackthorn', champ:'clair', badgeReq:7},
+  jroute45:    {name:'Route 45',      type:'route',   x:1144,y:352,w:48,h:288, conn:['blackthorn'],                        wild:[[74,25,32,'common'], [75,26,33,'common'], [147,26,35,'rare']], shopId:null, champ:null, badgeReq:7},
 };
 
 // ============================================================
@@ -599,6 +801,17 @@ const SHOPS = {
   fuchsia:   {name_fr:'Boutique Parmanie', name_en:'Fuchsia Mart',    items:['berry_ceriz','soft_sand','swift_charm']},
   cinnabar:  {name_fr:'Labo Cramois\'île', name_en:'Cinnabar Lab Shop',items:['muscle_band','focus_lens','power_gem','swift_charm']},
   indigo:    {name_fr:'Boutique Plateau',  name_en:'Indigo Mart',     items:['chroma_charm','rarecandy','choice_band','choice_specs','choice_scarf','life_orb','assault_vest','eviolite','leftovers','power_gem','swift_charm','muscle_band','metal_coat','soft_sand','focus_lens']},
+  // ---- Boutiques EXCLUSIVES JOHTO (objets Or/Argent) ----
+  jnewbark:   {name_fr:'Labo du Prof. Orme', name_en:"Prof. Elm's Lab", items:['berry_oran','berry_sitrus','berry_ceriz','berry_prine','rarecandy']},
+  jcherrygrove:{name_fr:'Boutique Ville Griotte', name_en:'Cherrygrove Mart', items:['berry_oran','berry_ceriz','rarecandy']},
+  jviolet:    {name_fr:'Boutique Argenta', name_en:'Violet Mart', items:['berry_sitrus','muscle_band','twisted_spoon','miracle_seed']},
+  jazalea:    {name_fr:'Boutique Écorcia', name_en:'Azalea Mart', items:['berry_prine','soft_sand','spell_tag','poison_barb']},
+  jgoldenrod: {name_fr:'Grand Magasin Doublonville', name_en:'Goldenrod Dept. Store', items:['rarecandy','sunstone','kings_rock','dragon_scale','up_grade','deep_sea_scale','deep_sea_tooth','twisted_spoon','thick_club','black_belt','black_glasses','charcoal','dragon_fang','miracle_seed','mystic_water','never_melt_ice','sharp_beak','poison_barb','spell_tag','hard_stone','magnet','silk_scarf','silver_wing','rainbow_wing','choice_band','choice_specs','life_orb','leftovers']},
+  jecruteak:  {name_fr:'Boutique Rosalia', name_en:'Ecruteak Mart', items:['berry_prine','spell_tag','never_melt_ice','mystic_water']},
+  jolivine:   {name_fr:'Boutique Oliville', name_en:'Olivine Mart', items:['berry_oran','leftovers','mystic_water','hard_stone']},
+  jcianwood:  {name_fr:'Boutique Irisia', name_en:'Cianwood Mart', items:['berry_sitrus','black_belt','charcoal','magnet']},
+  jmahogany:  {name_fr:'Boutique Acajou', name_en:'Mahogany Mart', items:['berry_prine','up_grade','deep_sea_scale','deep_sea_tooth','dragon_fang']},
+  jblackthorn:{name_fr:'Boutique Ébénelle', name_en:'Blackthorn Mart', items:['rarecandy','dragon_scale','dragon_fang','twisted_spoon','kings_rock']},
 };
 
 // ============================================================
@@ -688,6 +901,58 @@ const ROUTE_DROPS = {
   }
 })();
 
+
+// ============================================================
+// POPULATION SAUVAGE JOHTO (ajout regional - ordre officiel Or/Argent)
+// Applique APRES linkSplitRoutes pour peupler les lieux Johto.
+(function populateJohtoWild(){
+  if(typeof LOCS_JOHTO === 'undefined') return;
+  if(LOCS_JOHTO['jroute29']) LOCS_JOHTO['jroute29'].wild = [[161, 3, 6, 'common'], [16, 3, 6, 'common'], [19, 3, 6, 'common']];
+  if(LOCS_JOHTO['jroute30']) LOCS_JOHTO['jroute30'].wild = [[10, 4, 7, 'common'], [13, 4, 7, 'common'], [16, 4, 7, 'common'], [161, 4, 7, 'uncommon']];
+  if(LOCS_JOHTO['jroute31']) LOCS_JOHTO['jroute31'].wild = [[163, 5, 9, 'common'], [41, 5, 9, 'common'], [19, 5, 9, 'uncommon']];
+  if(LOCS_JOHTO['jroute32']) LOCS_JOHTO['jroute32'].wild = [[19, 6, 10, 'common'], [69, 6, 10, 'common'], [41, 6, 10, 'uncommon']];
+  if(LOCS_JOHTO['jroute32_mid']) LOCS_JOHTO['jroute32_mid'].wild = [[19, 6, 10, 'common'], [69, 6, 10, 'common'], [41, 6, 10, 'uncommon']];
+  if(LOCS_JOHTO['jroute32_south']) LOCS_JOHTO['jroute32_south'].wild = [[19, 6, 10, 'common'], [69, 6, 10, 'common'], [41, 6, 10, 'uncommon']];
+  if(LOCS_JOHTO['unioncave']) LOCS_JOHTO['unioncave'].wild = [[41, 8, 12, 'common'], [74, 8, 12, 'common'], [95, 10, 14, 'rare']];
+  if(LOCS_JOHTO['jroute33']) LOCS_JOHTO['jroute33'].wild = [[19, 9, 13, 'common'], [16, 9, 13, 'common']];
+  if(LOCS_JOHTO['ilexforest']) LOCS_JOHTO['ilexforest'].wild = [[10, 10, 14, 'common'], [13, 10, 14, 'common'], [43, 10, 14, 'common'], [69, 11, 15, 'uncommon']];
+  if(LOCS_JOHTO['jroute34']) LOCS_JOHTO['jroute34'].wild = [[16, 12, 16, 'common'], [19, 12, 16, 'common'], [63, 12, 16, 'uncommon'], [29, 12, 16, 'uncommon']];
+  if(LOCS_JOHTO['jroute35']) LOCS_JOHTO['jroute35'].wild = [[16, 14, 18, 'common'], [19, 14, 18, 'common'], [39, 14, 18, 'uncommon'], [29, 14, 18, 'uncommon']];
+  if(LOCS_JOHTO['jroute36']) LOCS_JOHTO['jroute36'].wild = [[29, 15, 20, 'common'], [39, 15, 20, 'common'], [69, 15, 20, 'uncommon']];
+  if(LOCS_JOHTO['jroute38']) LOCS_JOHTO['jroute38'].wild = [[20, 16, 21, 'common'], [88, 16, 21, 'common'], [109, 18, 23, 'uncommon']];
+  if(LOCS_JOHTO['jroute40']) LOCS_JOHTO['jroute40'].wild = [[72, 18, 24, 'common'], [129, 18, 24, 'common'], [98, 18, 24, 'uncommon']];
+  if(LOCS_JOHTO['jroute42']) LOCS_JOHTO['jroute42'].wild = [[203, 20, 26, 'common'], [20, 20, 26, 'common'], [21, 20, 26, 'uncommon']];
+  if(LOCS_JOHTO['jroute43']) LOCS_JOHTO['jroute43'].wild = [[218, 20, 26, 'common'], [219, 22, 28, 'common'], [220, 22, 28, 'uncommon']];
+  if(LOCS_JOHTO['lakerage']) LOCS_JOHTO['lakerage'].wild = [[129, 22, 28, 'common'], [130, 25, 32, 'rare']];
+  if(LOCS_JOHTO['jroute44']) LOCS_JOHTO['jroute44'].wild = [[131, 24, 30, 'common'], [220, 24, 30, 'common'], [221, 26, 34, 'rare']];
+  if(LOCS_JOHTO['jroute45']) LOCS_JOHTO['jroute45'].wild = [[169, 25, 32, 'common'], [74, 25, 32, 'common'], [111, 26, 34, 'uncommon']];
+  if(LOCS_JOHTO['jroute26']) LOCS_JOHTO['jroute26'].wild = [[16, 30, 35, 'common'], [19, 30, 35, 'common']];
+  if(LOCS_JOHTO['jroute27']) LOCS_JOHTO['jroute27'].wild = [[16, 30, 35, 'common'], [19, 30, 35, 'common'], [21, 30, 35, 'uncommon']];
+  if(LOCS_JOHTO['jroute28']) LOCS_JOHTO['jroute28'].wild = [[20, 30, 35, 'common'], [112, 32, 36, 'uncommon'], [22, 30, 35, 'uncommon']];
+  if(LOCS_JOHTO['jroute37']) LOCS_JOHTO['jroute37'].wild = [[163, 12, 18, 'common'], [43, 12, 18, 'common'], [69, 13, 19, 'uncommon']];
+  if(LOCS_JOHTO['jroute39']) LOCS_JOHTO['jroute39'].wild = [[241, 14, 20, 'common'], [128, 14, 20, 'common'], [16, 14, 20, 'common']];
+  if(LOCS_JOHTO['jroute41']) LOCS_JOHTO['jroute41'].wild = [[72, 18, 24, 'common'], [129, 18, 24, 'common'], [73, 19, 25, 'uncommon']];
+  if(LOCS_JOHTO['jroute46']) LOCS_JOHTO['jroute46'].wild = [[16, 28, 34, 'common'], [19, 28, 34, 'common'], [21, 28, 34, 'uncommon']];
+  if(LOCS_JOHTO['jroute47']) LOCS_JOHTO['jroute47'].wild = [[16, 30, 35, 'common'], [19, 30, 35, 'common']];
+  if(LOCS_JOHTO['jroute48']) LOCS_JOHTO['jroute48'].wild = [[16, 30, 35, 'common'], [19, 30, 35, 'common']];
+  if(LOCS_JOHTO['nationalpark']) LOCS_JOHTO['nationalpark'].wild = [[191, 15, 19, 'common'], [43, 15, 19, 'common'], [123, 18, 22, 'rare'], [127, 18, 22, 'rare']];
+  if(LOCS_JOHTO['sprouttower']) LOCS_JOHTO['sprouttower'].wild = [[19, 10, 14, 'common'], [92, 12, 16, 'uncommon']];
+  if(LOCS_JOHTO['ruinsofalph']) LOCS_JOHTO['ruinsofalph'].wild = [[201, 15, 20, 'common'], [41, 15, 20, 'uncommon']];
+  if(LOCS_JOHTO['burnedtower']) LOCS_JOHTO['burnedtower'].wild = [[92, 18, 24, 'common'], [109, 18, 24, 'uncommon']];
+  if(LOCS_JOHTO['tintower']) LOCS_JOHTO['tintower'].wild = [[92, 20, 26, 'common'], [109, 20, 26, 'uncommon']];
+  if(LOCS_JOHTO['mtmortar']) LOCS_JOHTO['mtmortar'].wild = [[41, 20, 26, 'common'], [74, 20, 26, 'common'], [169, 22, 28, 'uncommon']];
+  if(LOCS_JOHTO['icepath']) LOCS_JOHTO['icepath'].wild = [[124, 25, 32, 'common'], [220, 25, 32, 'common'], [221, 26, 34, 'rare']];
+  if(LOCS_JOHTO['darkcave']) LOCS_JOHTO['darkcave'].wild = [[41, 18, 24, 'common'], [169, 18, 24, 'uncommon']];
+  if(LOCS_JOHTO['slowpokewell']) LOCS_JOHTO['slowpokewell'].wild = [[79, 20, 26, 'common'], [80, 22, 28, 'uncommon']];
+  if(LOCS_JOHTO['whirlislands']) LOCS_JOHTO['whirlislands'].wild = [[72, 18, 24, 'common'], [129, 18, 24, 'common']];
+  // Trio légendaire (Raikou / Entei / Suicune) : ils ERRENT désormais (roaming),
+  // exactement comme le trio d'oiseaux de Kanto — aucune rencontre fixe sur une
+  // route. Ils apparaissent en 1% lors des combats sauvages sur une route en
+  // extérieur de Johto (rotation 12h, voir getRoamingLegendaryForRoute).
+  if(LOCS_JOHTO['victoryroad_jo']) LOCS_JOHTO['victoryroad_jo'].wild = [[95, 30, 36, 'common'], [169, 32, 38, 'common'], [111, 30, 36, 'uncommon']];
+  if(LOCS_JOHTO['mtsilver']) LOCS_JOHTO['mtsilver'].wild = [[246, 40, 46, 'common'], [247, 42, 48, 'common'], [112, 40, 46, 'uncommon']];
+  if(LOCS_JOHTO['tohjofalls']) LOCS_JOHTO['tohjofalls'].wild = [[129, 28, 34, 'common'], [130, 30, 36, 'rare']];
+})();
 
 // ============================================================================
 // PART 2: GAMEPLAY ENGINE & CORE MECHANICS

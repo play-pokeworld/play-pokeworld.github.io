@@ -103,14 +103,14 @@ function cancelDelete(){
 function doDelete(){
   safeStorage.remove('pokeworld_save');
   G={location:'pallet',region:'kanto',team:[],inventory:{},money:2000,
-    badges:[],defeatedChamps:{},pokedex:{},stepsLeft:0,starter:false,collection:{},evolvedSpecies:[],dupeCatches:{},storyIdx:0,storyProgress:0,unlockedTalents:{},activeQuests:[],repeatables:[],visitedMaps:{},completedQuests:{},mainStep:{kanto:0,johto:0},mainProgress:{kanto:0,johto:0},totalWildWins:0,maxRepeatables:3,lang:G.lang||'fr'};
+    badges:[],defeatedChamps:{},pokedex:{},stepsLeft:0,starter:false, starterKanto:false, starterJohto:false, regionStarter:{kanto:false,johto:false}, collection:{},evolvedSpecies:[],dupeCatches:{},storyIdx:0,storyProgress:0,unlockedTalents:{},activeQuests:[],repeatables:[],visitedMaps:{},completedQuests:{},mainStep:{kanto:0,johto:0},mainProgress:{kanto:0,johto:0},totalWildWins:0,maxRepeatables:3,lang:G.lang||'fr'};
   updateHeader();
   renderMap();
   showTab('info');
   cancelDelete();
   closeSettings();
   notify('🔄 Sauvegarde supprimée, nouvelle partie !','var(--blue)');
-  setTimeout(()=>{ if(!G.starter) chooseStarter(); },200);
+  setTimeout(()=>{ if(typeof checkStarterNeeded==='function') checkStarterNeeded(); else if(!G.starter) chooseStarter(); },400);
 }
 function resetGame(){ confirmDelete(); openSettings(); }
 

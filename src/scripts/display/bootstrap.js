@@ -33,7 +33,7 @@ function init(){
     }, 1000);
     // Welcome
     setTimeout(()=>{
-      if(!G.starter) chooseStarter();
+      if(typeof checkStarterNeeded==="function") checkStarterNeeded(); else if(!G.starter) chooseStarter();
     }, 200);
   }catch(e){
     console.warn('init error',e);

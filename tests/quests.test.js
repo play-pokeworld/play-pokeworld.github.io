@@ -34,7 +34,7 @@ try{
   check('G defined', !!G);
   check('NPCS defined', !!ctx.NPCS && Object.keys(ctx.NPCS).length>0);
   check('STORY_QUESTS Kanto chain >= 30', ctx.getRegionChain('kanto').length>=30);
-  check('STORY_QUESTS Johto chain == 10', ctx.getRegionChain('johto').length===10);
+  check('STORY_QUESTS Johto chain == 17', ctx.getRegionChain('johto').length===17);
   check('new game: prof Chen (id30) is the active Kanto main', G.activeQuests.some(i=>i.qid===30&&i.cat==='main'));
   check('only ONE main quest active', G.activeQuests.filter(i=>i.cat==='main').length===1);
   check('totalWildWins field exists', typeof G.totalWildWins==='number');
@@ -144,11 +144,15 @@ try{
   check('Argenta débloquée APRÈS la Forêt de Jade', ctx.locReachable('pewter')===true);
   check('route2_south partage le groupe route2', ctx.LOCS.route2_south.group==='route2');
   check('route2_south partage les Pokémon de route2', JSON.stringify(ctx.LOCS.route2_south.wild)===JSON.stringify(ctx.LOCS.route2.wild));
-  // la quête s2 (Route 2) compte les combats sur route2_south via le groupe
+  // Les quêtes de combat comptent désormais TOUS les Pokémon sauvages
+  // vaincus, peu importe le lieu (« battre des pokemons »). On réinitialise
+  // la progression pour un test déterministe, puis on vérifie qu'une victoire
+  // sur route2_south (même groupe que route2) l'incrémente bien.
   ctx.acceptSideQuest('s2');
+  const _s2=G.activeQuests.find(i=>i.qid==='s2'); if(_s2) _s2.progress=0;
   ctx.advanceQuests('defeat_wild','route2_south',5);
   const s2=G.activeQuests.find(i=>i.qid==='s2');
-  check('quête s2 progresse sur route2_south (comptage groupe)', s2 && s2.progress===5);
+  check('quête s2 progresse sur route2_south (combat global = battre des pokemons)', s2 && s2.progress===5);
   G.activeQuests=G.activeQuests.filter(i=>i.qid!=='s2');
 
   console.log('--- Johto Route 32 scindée : liens + même Pokémon ---');

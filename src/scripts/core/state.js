@@ -10,7 +10,7 @@ const safeStorage = {
 var G = {
   location:'pallet', region:'kanto', team:[], inventory:{}, money:2000,
   badges:[], defeatedChamps:{}, pokedex:{}, stepsLeft:0,
-  starter:false, collection:{}, evolvedSpecies:[], dupeCatches:{}, lang:'fr',
+  starter:false, starterKanto:false, starterJohto:false, regionStarter:{kanto:false,johto:false}, collection:{}, evolvedSpecies:[], dupeCatches:{}, lang:'fr',
   storyIdx:0, storyProgress:0, unlockedTalents:{}, activeQuests:[], repeatables:[], visitedMaps:{}, completedQuests:{}, wildWinsByLoc:{}
 };
 
