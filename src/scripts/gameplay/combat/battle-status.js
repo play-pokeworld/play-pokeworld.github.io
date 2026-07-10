@@ -9,7 +9,7 @@ function applyEndOfTurnStatus(p){
     if(mods) mods.spe = Math.min(3.0, (mods.spe || 1) * 1.15);
   }
   if(p.status==='burn'){
-    const bd=Math.max(1,Math.floor(p.maxHP/8));
+    const bd=Math.max(1,Math.floor(p.maxHP/16));
     p.currentHP=Math.max(0,p.currentHP-bd);
     addBattleLog(`${p.name} souffre de la brûlure (-${bd} PV)`);
   } else if(p.status==='poison'){
@@ -22,6 +22,14 @@ function applyEndOfTurnStatus(p){
     p.currentHP=Math.max(0,p.currentHP-bd);
     addBattleLog(`${p.name} souffre du poison virulent (-${bd} PV)`);
   }
+  // Leftovers: heal 1/16 max HP at end of turn
+  if(p.heldItem === 'leftovers' && p.currentHP > 0 && p.currentHP < p.maxHP){
+    const heal = Math.max(1, Math.floor(p.maxHP / 16));
+    p.currentHP = Math.min(p.maxHP, p.currentHP + heal);
+    addBattleLog(`${p.name} récupère ${heal} PV grâce aux Restes !`);
+  }
+  // Life Orb recoil: lose 10% max HP after attacking
+  // (applied in executeAttack after damage dealt, not here)
 }
 
 
@@ -158,3 +166,4 @@ async function onEnemyFaint(){
     endBattle();
   }
 }
+

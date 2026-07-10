@@ -62,3 +62,4 @@ function changePokeTalent(teamIdx, boxId, newTal){
 }
 
 
+

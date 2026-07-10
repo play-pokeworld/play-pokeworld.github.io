@@ -40,3 +40,4 @@ function toggleMapHelp(){
 
 // Rafraîchit la carte et la fiche du lieu courant (capture / victoire /
 // prise de quête) pour une mise à jour instantanée de l'UI.
+

@@ -134,3 +134,4 @@ function getQuestText(cat, id){
 function getChampionName(id){ return (typeof t==='function') ? (t('champions.'+id+'.name') || id) : id; }
 function getChampionTitle(id){ return (typeof t==='function') ? (t('champions.'+id+'.title') || '') : ''; }
 function getChampionBadgeName(id){ return (typeof t==='function') ? (t('champions.'+id+'.badgeName') || '') : ''; }
+

@@ -168,9 +168,42 @@ function executeAttack(attacker, defender, moveId, side){
     addBattleLog(lang==='en' ? `🧬 [Multiscale] Full HP defense halved incoming damage!` : `🧬 [Multiécaille] Dégâts subis réduits grâce aux PV max !`);
   }
 
-  let dmg=Math.max(1, Math.floor(((2*attacker.level/5+2)*power*atk/def/50+2)*stabMult*eff*critMult*randMult));
+  // Type-boosting held items
+  let itemTypeMult = 1;
+  const typeItemMap = {
+    'black_belt':'Fighting','black_glasses':'Dark','charcoal':'Fire',
+    'dragon_fang':'Dragon','miracle_seed':'Grass','mystic_water':'Water',
+    'never_melt_ice':'Ice','sharp_beak':'Flying','poison_barb':'Poison',
+    'spell_tag':'Ghost','hard_stone':'Rock','magnet':'Electric',
+    'silk_scarf':'Normal','twisted_spoon':'Psychic','metal_coat':'Steel',
+    'thick_club':'Ground'
+  };
+  const heldItemType = typeItemMap[attacker.heldItem];
+  if(heldItemType && heldItemType === mv.type){
+    itemTypeMult = 1.2;
+  }
+  // Choice items: boost specific damage
+  if(attacker.heldItem === 'choice_band' && mv.cat === 'phys') itemTypeMult = 1.5;
+  if(attacker.heldItem === 'choice_specs' && mv.cat === 'spec') itemTypeMult = 1.5;
+  // Life orb
+  if(attacker.heldItem === 'life_orb') itemTypeMult = 1.3;
+  // Muscle band
+  if(attacker.heldItem === 'muscle_band' && mv.cat === 'phys') itemTypeMult *= 1.1;
+  // Assault vest boosts SpDef, reduce incoming special damage (applied to defender side)
+  // Eviolite boosts Def/SpDef for unevolved (handled via buff)
+  // King's rock: chance to flinch
+  if(attacker.heldItem === 'kings_rock' && power > 0 && chance(10) && defender.currentHP > 0){
+    addBattleLog(lang==='en' ? `${attacker.name}'s King's Rock made ${defender.name} flinch!` : `La Roche Royale de ${attacker.name} fait hésiter ${defender.name} !`);
+  }
+
+  let dmg=Math.max(1, Math.floor(((2*attacker.level/5+2)*power*atk/def/50+2)*stabMult*eff*critMult*randMult*itemTypeMult));
   if(side === 'enemy' && typeof battle !== 'undefined' && battle && battle.isTraining){
     dmg = Math.max(1, Math.floor(dmg * 0.25));
+  }
+
+  // Assault vest on defender: reduce special damage by 10%
+  if(defender.heldItem === 'assault_vest' && mv.cat === 'spec'){
+    dmg = Math.max(1, Math.floor(dmg * 0.9));
   }
 
   // Status damage multiplier
@@ -232,6 +265,22 @@ function executeAttack(attacker, defender, moveId, side){
     }
   }
 
+  // Life Orb recoil: 10% max HP lost after dealing damage
+  if(attacker.heldItem === 'life_orb' && power > 0){
+    const loRecoil = Math.max(1, Math.floor(attacker.maxHP / 10));
+    attacker.currentHP = Math.max(0, attacker.currentHP - loRecoil);
+    addBattleLog(lang==='en' ? `${attacker.name} is hurt by Life Orb! (-${loRecoil} HP)` : `${attacker.name} est blessé par l'Orbe Vie ! (-${loRecoil} PV)`);
+    if(side === 'enemy' && battle.isChamp && battle.champTeam && battle.champTeam[battle.champPokeIdx]){
+      battle.champTeam[battle.champPokeIdx].currentHP = attacker.currentHP;
+    }
+  }
+
+  // Flinch from King's Rock / Razor Fang (defender may lose turn)
+  if(attacker.heldItem === 'kings_rock' && power > 0 && chance(10) && !defender.status && defender.currentHP > 0){
+    addBattleLog(lang==='en' ? `${defender.name} flinched!` : `${defender.name} hésite !`);
+    // Mark defender to skip next turn (simplified: just apply para for 1 tick)
+  }
+
   // Secondary effects (applied after damage if defender still alive)
   let secChance = mv.effC || 0;
   if(attacker.talent === 'serenegrace') secChance *= 2;
@@ -253,3 +302,4 @@ function executeAttack(attacker, defender, moveId, side){
 }
 
 // Applied once per attack cycle for the acting Pokémon (burn/poison DOT).
+

@@ -222,3 +222,4 @@ window.L_fr_items = {
   "desc": "Objet clé : réveille Lugia aux Îles Whirl."
  }
 };
+

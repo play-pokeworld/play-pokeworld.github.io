@@ -93,10 +93,9 @@ var STORY_QUESTS = [
  {
   "id": 3,
   "region": "kanto",
-  "type": "badge_or_loc",
+  "type": "badge",
   "targetBadge": "misty",
-  "loc": "route24",
-  "target": 5,
+  "target": 1,
   "rewardMoney": 2500,
   "rewardItems": {
    "nugget": 1
@@ -617,3 +616,4 @@ var STORY_QUESTS = [
   }
  }
 ];
+

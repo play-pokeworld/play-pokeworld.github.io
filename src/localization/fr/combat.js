@@ -10,3 +10,4 @@ window.L_fr_combat = {
   "live_loot": "🎁 Butin en direct :",
   "no_loot_yet": "Aucun butin récolté pour le moment.",
 };
+

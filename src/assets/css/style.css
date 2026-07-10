@@ -192,7 +192,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;fo
 /* POKEMON modal */
 #poke-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;display:none;align-items:center;justify-content:center}
 #poke-modal.open{display:flex}
-#poke-modal-inner{background:var(--panel);border:2px solid var(--accent);border-radius:12px;padding:20px;width:340px;max-height:80vh;overflow-y:auto}
+#poke-modal-inner{background:var(--panel);border:2px solid var(--accent);border-radius:12px;padding:20px;width:95vw;max-width:960px;max-height:90vh;overflow-y:auto;box-shadow:0 0 35px rgba(255,215,0,0.25)}
 .modal-title{font-size:18px;font-weight:bold;color:var(--gold);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
 .modal-close{cursor:pointer;color:var(--dim);font-size:20px}
 .stat-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
@@ -352,7 +352,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;fo
 #settings-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:250;display:none;align-items:center;justify-content:center}
 #settings-modal.open{display:flex}
 #settings-inner{background:var(--panel);border:2px solid var(--accent);border-radius:12px;padding:20px;width:340px;max-height:85vh;overflow-y:auto}
-#confirm-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;display:none;align-items:center;justify-content:center}
+#confirm-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:700;display:none;align-items:center;justify-content:center}
 #confirm-modal.open{display:flex}
 #confirm-inner{background:var(--panel);border:2px solid var(--red);border-radius:12px;padding:20px;width:300px;text-align:center}
 #confirm-text{font-size:13px;line-height:1.4}
@@ -417,3 +417,4 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;fo
 #quest-title{font-weight:bold;color:#fff;margin-bottom:10px;font-size:14px}
 #quest-body{font-size:12px}
 @media(max-width:600px){#quest-inner{width:92vw;padding:14px}}
+

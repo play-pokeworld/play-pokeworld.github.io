@@ -127,3 +127,4 @@ function resetGame(){ confirmDelete(); openSettings(); }
 // ============================================================
 // SETTINGS (theme, export/import, delete save)
 // ============================================================
+

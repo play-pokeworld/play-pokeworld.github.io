@@ -194,44 +194,44 @@ function getShopName(id){
 // Applique APRES linkSplitRoutes pour peupler les lieux Johto.
 (function populateJohtoWild(){
   if(typeof LOCS_JOHTO === 'undefined') return;
-  if(LOCS_JOHTO['jroute29']) LOCS_JOHTO['jroute29'].wild = [[161, 3, 6, 'common'], [16, 3, 6, 'common'], [19, 3, 6, 'common']];
-  if(LOCS_JOHTO['jroute30']) LOCS_JOHTO['jroute30'].wild = [[10, 4, 7, 'common'], [13, 4, 7, 'common'], [16, 4, 7, 'common'], [161, 4, 7, 'uncommon']];
-  if(LOCS_JOHTO['jroute31']) LOCS_JOHTO['jroute31'].wild = [[163, 5, 9, 'common'], [41, 5, 9, 'common'], [19, 5, 9, 'uncommon']];
-  if(LOCS_JOHTO['jroute32']) LOCS_JOHTO['jroute32'].wild = [[19, 6, 10, 'common'], [69, 6, 10, 'common'], [41, 6, 10, 'uncommon']];
+  if(LOCS_JOHTO['jroute29']) LOCS_JOHTO['jroute29'].wild = [[161,3,6,'common'], [16,3,6,'common'], [19,3,6,'common'], [165,3,6,'common'], [187,3,6,'common']];
+  if(LOCS_JOHTO['jroute30']) LOCS_JOHTO['jroute30'].wild = [[10,4,7,'common'], [13,4,7,'common'], [16,4,7,'common'], [161,4,7,'uncommon'], [165,4,7,'common'], [167,4,7,'common']];
+  if(LOCS_JOHTO['jroute31']) LOCS_JOHTO['jroute31'].wild = [[163,5,9,'common'], [41,5,9,'common'], [19,5,9,'uncommon'], [165,5,9,'common'], [167,5,9,'common']];
+  if(LOCS_JOHTO['jroute32']) LOCS_JOHTO['jroute32'].wild = [[19,6,10,'common'], [69,6,10,'common'], [41,6,10,'uncommon'], [211,8,14,'uncommon'], [194,7,11,'uncommon'], [179,6,10,'common']];
   if(LOCS_JOHTO['jroute32_mid']) LOCS_JOHTO['jroute32_mid'].wild = [[19, 6, 10, 'common'], [69, 6, 10, 'common'], [41, 6, 10, 'uncommon']];
   if(LOCS_JOHTO['jroute32_south']) LOCS_JOHTO['jroute32_south'].wild = [[19, 6, 10, 'common'], [69, 6, 10, 'common'], [41, 6, 10, 'uncommon']];
   if(LOCS_JOHTO['unioncave']) LOCS_JOHTO['unioncave'].wild = [[41, 8, 12, 'common'], [74, 8, 12, 'common'], [95, 10, 14, 'rare']];
   if(LOCS_JOHTO['jroute33']) LOCS_JOHTO['jroute33'].wild = [[19, 9, 13, 'common'], [16, 9, 13, 'common']];
-  if(LOCS_JOHTO['ilexforest']) LOCS_JOHTO['ilexforest'].wild = [[10, 10, 14, 'common'], [13, 10, 14, 'common'], [43, 10, 14, 'common'], [69, 11, 15, 'uncommon']];
+  if(LOCS_JOHTO['ilexforest']) LOCS_JOHTO['ilexforest'].wild = [[10,10,14,'common'], [13,10,14,'common'], [43,10,14,'common'], [69,11,15,'uncommon'], [204,10,14,'uncommon'], [214,10,14,'rare']];
   if(LOCS_JOHTO['jroute34']) LOCS_JOHTO['jroute34'].wild = [[16, 12, 16, 'common'], [19, 12, 16, 'common'], [63, 12, 16, 'uncommon'], [29, 12, 16, 'uncommon']];
-  if(LOCS_JOHTO['jroute35']) LOCS_JOHTO['jroute35'].wild = [[16, 14, 18, 'common'], [19, 14, 18, 'common'], [39, 14, 18, 'uncommon'], [29, 14, 18, 'uncommon']];
-  if(LOCS_JOHTO['jroute36']) LOCS_JOHTO['jroute36'].wild = [[29, 15, 20, 'common'], [39, 15, 20, 'common'], [69, 15, 20, 'uncommon']];
+  if(LOCS_JOHTO['jroute35']) LOCS_JOHTO['jroute35'].wild = [[16,14,18,'common'], [19,14,18,'common'], [39,14,18,'uncommon'], [29,14,18,'uncommon'], [193,14,18,'rare']];
+  if(LOCS_JOHTO['jroute36']) LOCS_JOHTO['jroute36'].wild = [[29,15,20,'common'], [39,15,20,'common'], [69,15,20,'uncommon'], [185,15,20,'rare'], [234,15,20,'common'], [187,15,20,'common']];
   if(LOCS_JOHTO['jroute38']) LOCS_JOHTO['jroute38'].wild = [[20, 16, 21, 'common'], [88, 16, 21, 'common'], [109, 18, 23, 'uncommon']];
-  if(LOCS_JOHTO['jroute40']) LOCS_JOHTO['jroute40'].wild = [[72, 18, 24, 'common'], [129, 18, 24, 'common'], [98, 18, 24, 'uncommon']];
-  if(LOCS_JOHTO['jroute42']) LOCS_JOHTO['jroute42'].wild = [[203, 20, 26, 'common'], [20, 20, 26, 'common'], [21, 20, 26, 'uncommon']];
-  if(LOCS_JOHTO['jroute43']) LOCS_JOHTO['jroute43'].wild = [[218, 20, 26, 'common'], [219, 22, 28, 'common'], [220, 22, 28, 'uncommon']];
+  if(LOCS_JOHTO['jroute40']) LOCS_JOHTO['jroute40'].wild = [[72,18,24,'common'], [129,18,24,'common'], [98,18,24,'uncommon'], [223,18,24,'uncommon']];
+  if(LOCS_JOHTO['jroute42']) LOCS_JOHTO['jroute42'].wild = [[203,20,26,'common'], [20,20,26,'common'], [21,20,26,'uncommon'], [183,20,26,'uncommon'], [179,20,26,'common']];
+  if(LOCS_JOHTO['jroute43']) LOCS_JOHTO['jroute43'].wild = [[218,20,26,'common'], [219,22,28,'common'], [220,22,28,'uncommon'], [179,20,26,'common']];
   if(LOCS_JOHTO['lakerage']) LOCS_JOHTO['lakerage'].wild = [[129, 22, 28, 'common'], [130, 25, 32, 'rare']];
   if(LOCS_JOHTO['jroute44']) LOCS_JOHTO['jroute44'].wild = [[131, 24, 30, 'common'], [220, 24, 30, 'common'], [221, 26, 34, 'rare']];
-  if(LOCS_JOHTO['jroute45']) LOCS_JOHTO['jroute45'].wild = [[169, 25, 32, 'common'], [74, 25, 32, 'common'], [111, 26, 34, 'uncommon']];
+  if(LOCS_JOHTO['jroute45']) LOCS_JOHTO['jroute45'].wild = [[169,25,32,'common'], [74,25,32,'common'], [111,26,34,'uncommon'], [207,25,32,'uncommon'], [227,25,32,'rare'], [231,25,32,'common']];
   if(LOCS_JOHTO['jroute26']) LOCS_JOHTO['jroute26'].wild = [[16, 30, 35, 'common'], [19, 30, 35, 'common']];
   if(LOCS_JOHTO['jroute27']) LOCS_JOHTO['jroute27'].wild = [[16, 30, 35, 'common'], [19, 30, 35, 'common'], [21, 30, 35, 'uncommon']];
   if(LOCS_JOHTO['jroute28']) LOCS_JOHTO['jroute28'].wild = [[20, 30, 35, 'common'], [112, 32, 36, 'uncommon'], [22, 30, 35, 'uncommon']];
-  if(LOCS_JOHTO['jroute37']) LOCS_JOHTO['jroute37'].wild = [[163, 12, 18, 'common'], [43, 12, 18, 'common'], [69, 13, 19, 'uncommon']];
-  if(LOCS_JOHTO['jroute39']) LOCS_JOHTO['jroute39'].wild = [[241, 14, 20, 'common'], [128, 14, 20, 'common'], [16, 14, 20, 'common']];
-  if(LOCS_JOHTO['jroute41']) LOCS_JOHTO['jroute41'].wild = [[72, 18, 24, 'common'], [129, 18, 24, 'common'], [73, 19, 25, 'uncommon']];
-  if(LOCS_JOHTO['jroute46']) LOCS_JOHTO['jroute46'].wild = [[16, 28, 34, 'common'], [19, 28, 34, 'common'], [21, 28, 34, 'uncommon']];
+  if(LOCS_JOHTO['jroute37']) LOCS_JOHTO['jroute37'].wild = [[163,12,18,'common'], [43,12,18,'common'], [69,12,18,'uncommon'], [167,12,18,'common'], [234,12,18,'uncommon'], [187,12,18,'common']];
+  if(LOCS_JOHTO['jroute39']) LOCS_JOHTO['jroute39'].wild = [[241,14,20,'common'], [128,14,20,'common'], [16,14,20,'common'], [209,14,20,'uncommon']];
+  if(LOCS_JOHTO['jroute41']) LOCS_JOHTO['jroute41'].wild = [[72,18,24,'common'], [129,18,24,'common'], [73,19,25,'uncommon'], [226,18,24,'uncommon']];
+  if(LOCS_JOHTO['jroute46']) LOCS_JOHTO['jroute46'].wild = [[16,28,34,'common'], [19,28,34,'common'], [21,28,34,'uncommon'], [231,28,34,'common']];
   if(LOCS_JOHTO['jroute47']) LOCS_JOHTO['jroute47'].wild = [[16, 30, 35, 'common'], [19, 30, 35, 'common']];
   if(LOCS_JOHTO['jroute48']) LOCS_JOHTO['jroute48'].wild = [[16, 30, 35, 'common'], [19, 30, 35, 'common']];
-  if(LOCS_JOHTO['nationalpark']) LOCS_JOHTO['nationalpark'].wild = [[191, 15, 19, 'common'], [43, 15, 19, 'common'], [123, 18, 22, 'rare'], [127, 18, 22, 'rare']];
+  if(LOCS_JOHTO['nationalpark']) LOCS_JOHTO['nationalpark'].wild = [[191,15,19,'common'], [43,15,19,'common'], [123,18,22,'rare'], [127,18,22,'rare'], [190,15,19,'uncommon']];
   if(LOCS_JOHTO['sprouttower']) LOCS_JOHTO['sprouttower'].wild = [[19, 10, 14, 'common'], [92, 12, 16, 'uncommon']];
-  if(LOCS_JOHTO['ruinsofalph']) LOCS_JOHTO['ruinsofalph'].wild = [[201, 15, 20, 'common'], [41, 15, 20, 'uncommon']];
-  if(LOCS_JOHTO['burnedtower']) LOCS_JOHTO['burnedtower'].wild = [[92, 18, 24, 'common'], [109, 18, 24, 'uncommon']];
+  if(LOCS_JOHTO['ruinsofalph']) LOCS_JOHTO['ruinsofalph'].wild = [[201,15,20,'common'], [41,15,20,'uncommon'], [177,15,20,'common'], [235,15,20,'rare']];
+  if(LOCS_JOHTO['burnedtower']) LOCS_JOHTO['burnedtower'].wild = [[92,18,24,'common'], [109,18,24,'uncommon'], [228,18,24,'uncommon']];
   if(LOCS_JOHTO['tintower']) LOCS_JOHTO['tintower'].wild = [[92, 20, 26, 'common'], [109, 20, 26, 'uncommon']];
   if(LOCS_JOHTO['mtmortar']) LOCS_JOHTO['mtmortar'].wild = [[41, 20, 26, 'common'], [74, 20, 26, 'common'], [169, 22, 28, 'uncommon']];
-  if(LOCS_JOHTO['icepath']) LOCS_JOHTO['icepath'].wild = [[124, 25, 32, 'common'], [220, 25, 32, 'common'], [221, 26, 34, 'rare']];
-  if(LOCS_JOHTO['darkcave']) LOCS_JOHTO['darkcave'].wild = [[41, 18, 24, 'common'], [169, 18, 24, 'uncommon']];
-  if(LOCS_JOHTO['slowpokewell']) LOCS_JOHTO['slowpokewell'].wild = [[79, 20, 26, 'common'], [80, 22, 28, 'uncommon']];
-  if(LOCS_JOHTO['whirlislands']) LOCS_JOHTO['whirlislands'].wild = [[72, 18, 24, 'common'], [129, 18, 24, 'common']];
+  if(LOCS_JOHTO['icepath']) LOCS_JOHTO['icepath'].wild = [[124,25,32,'common'], [220,25,32,'common'], [221,26,34,'rare'], [215,25,32,'uncommon'], [225,25,32,'uncommon']];
+  if(LOCS_JOHTO['darkcave']) LOCS_JOHTO['darkcave'].wild = [[41,18,24,'common'], [169,18,24,'uncommon'], [202,18,24,'uncommon'], [206,18,24,'uncommon'], [216,15,20,'rare']];
+  if(LOCS_JOHTO['slowpokewell']) LOCS_JOHTO['slowpokewell'].wild = [[79,20,26,'common'], [80,22,28,'uncommon'], [198,20,26,'uncommon']];
+  if(LOCS_JOHTO['whirlislands']) LOCS_JOHTO['whirlislands'].wild = [[72,18,24,'common'], [129,18,24,'common'], [170,18,24,'common'], [222,18,24,'uncommon'], [223,18,24,'uncommon']];
   // Trio légendaire (Raikou / Entei / Suicune) : ils ERRENT désormais (roaming),
   // exactement comme le trio d'oiseaux de Kanto — aucune rencontre fixe sur une
   // route. Ils apparaissent en 1% lors des combats sauvages sur une route en
@@ -248,3 +248,4 @@ function getShopName(id){
 // ============================================================================
 
 // GAME STATE
+

@@ -86,3 +86,4 @@ window.L_fr_champions = {
   "badgeName": "Lever Badge"
  }
 };
+

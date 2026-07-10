@@ -6,3 +6,4 @@ window.L_en_pokedex = {
   "dex_seen": "Seen:",
   "dex_shiny": "✨ Shiny:",
 };
+

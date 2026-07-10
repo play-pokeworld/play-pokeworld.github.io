@@ -79,3 +79,4 @@ let battle = {active:false, enemy:null, enemyPoke:null, playerPokeIdx:0,
   log:[], sessionCatches:[], sessionItems:{}, pendingLeave:false, pendingSwitchIdx:null};
 
 
+

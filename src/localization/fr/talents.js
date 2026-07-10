@@ -113,3 +113,4 @@ window.L_fr_talents = {
   "desc": "Toutes les attaques du lanceur et de la cible réussissent toujours."
  }
 };
+

@@ -5,6 +5,8 @@ var _invCat = 'all';
 
 function itemCat(key){
   const itm=ITEMS[key]; if(!itm) return 'all';
+  // Berries always classified as berries regardless of buff
+  if(key.startsWith('berry')) return 'berry';
   if(itm.type==='stone') return 'stone';
   if(itm.type==='treasure') return 'treasure';
   if(itm.type==='candy'||itm.type==='special') return 'special';
@@ -14,7 +16,8 @@ function itemCat(key){
 
 function setInvCat(c){
   _invCat=c;
-  const el=document.getElementById('tab-content');
+  let el=document.getElementById('fs-panel-content');
+  if(!el) el=document.getElementById('tab-content');
   if(el) renderInventory(el);
 }
 
@@ -56,10 +59,10 @@ function renderInventory(el){
     else if(itm.type === 'treasure') subTypeHtml = `<div style="font-size:11px;color:var(--gold);margin-top:2px">${t('treasure_inv_lbl')} (${itm.value?.toLocaleString()}₽/u)</div>`;
     else if(buffLines) subTypeHtml = `<div style="font-size:11px;color:var(--gold);margin-top:2px">🔮 Effet actuel : ${buffLines}</div>`;
 
-    return `<div class="inv-item" onclick="onInventoryClick('${key}')">
+    return `<div class="inv-item" onclick="onInventoryClick('${key}')" oncontextmenu="event.preventDefault();openItemInfo('${key}');return false;" title="Clic droit : info">
       <div class="inv-icon">${itemIcon(key,26)}</div>
       <div style="flex:1">
-        <div class="inv-name">${getItemName(key)} <span style="color:var(--dim);font-size:10px">(×${qty})</span></div>
+        <div class="inv-name">${getItemName(key)}</div>
         <div class="inv-desc">${getItemDesc(key)}</div>
         ${subTypeHtml}
         ${equipped?`<div style="font-size:11px;color:var(--green);margin-top:2px">${t('equipped_lbl')} ${equipped.name}</div>`:''}
@@ -70,3 +73,4 @@ function renderInventory(el){
   }
   el.innerHTML = html;
 }
+

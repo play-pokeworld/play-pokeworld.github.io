@@ -44,7 +44,7 @@ window.L_fr_quests = {
   },
   "3": {
    "title": "Le Pont Pépite d'Azuria",
-   "desc": "À Azuria, triomphez d'Ondine pour le Badge Cascade, ou remportez 5 combats sur le Pont Pépite (Route 24/25) !",
+   "desc": "À Azuria, triomphez d'Ondine (Misty) dans son arène pour obtenir le Badge Cascade !",
    "rewardDesc": "2 500₽ + 1 Pépite d'or"
   },
   "44": {
@@ -458,3 +458,4 @@ window.L_fr_quests = {
   }
  }
 };
+

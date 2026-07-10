@@ -57,3 +57,4 @@ document.getElementById('battle-summary-modal').addEventListener('click',functio
 
 init();
 
+

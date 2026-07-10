@@ -51,3 +51,4 @@ function switchMapRegion(reg){
 // ============================================================
 // DOCKING COLUMN SYSTEM (Dashboard 3 Colonnes façon PokéClicker)
 
+

@@ -115,3 +115,4 @@ function cancelBoxSwap(){ _swapFromTeamIdx=null; showTab('box'); renderTeamWindo
 // BOX TAB (Pokémon hors équipe)
 // ============================================================
 
+

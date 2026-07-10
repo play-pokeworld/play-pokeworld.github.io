@@ -113,6 +113,8 @@
     "src/scripts/display/box-modal.js",
     "src/scripts/display/starter.js",
     "src/scripts/display/map-help.js",
+    "src/scripts/display/shortcuts.js",
+    "src/scripts/display/fullscreen-panel.js",
     "src/scripts/display/bootstrap.js"
   ];
   function loadCSS(href){
@@ -134,3 +136,4 @@
   CSS.forEach(loadCSS);
   loadSequential(0);
 })();
+

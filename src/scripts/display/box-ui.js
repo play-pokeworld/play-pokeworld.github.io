@@ -175,3 +175,4 @@ function statusColor(s){
 function statusLabel(s){
   return {burn:'🔥BRÛ',poison:'☠️POI',badpoison:'☠️TXQ',para:'⚡PAR',sleep:'💤SOM',freeze:'🧊GEL',confuse:'💫CON'}[s]||s.toUpperCase();
 }
+

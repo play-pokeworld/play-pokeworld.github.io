@@ -1,6 +1,15 @@
 // ============================================================
 // INVENTORY ACTIONS — (split from inventory.js)
 // ============================================================
+// Helper: get the active content container (fullscreen panel or tab-content)
+function _getActiveContent(){
+  const fsContent = document.getElementById('fs-panel-content');
+  if(fsContent && document.getElementById('fullscreen-panel-modal')?.style.display === 'flex'){
+    return fsContent;
+  }
+  return document.getElementById('tab-content');
+}
+
 function sellTreasure(key, count){
   const itm = ITEMS[key];
   if(!itm || !G.inventory[key]) return;
@@ -22,21 +31,21 @@ function onInventoryClick(key){
 
   if(itm.type === 'treasure'){
     const qty = G.inventory[key] || 0;
-    const el = document.getElementById('tab-content');
+    const el = _getActiveContent();
     if(qty <= 0){ showTab('inventory'); return; }
     el.innerHTML = `<div class="loc-title">${t("m.inventory.5")} ${itemIcon(key, 24)} ${getItemName(key)}</div>
       <div class="loc-sub">${tr("m.treasure_sell_sub", {qty: qty, value: (itm.value?.toLocaleString()||'2 000')})}</div>
       <div style="display:flex;gap:10px;margin-top:16px;justify-content:center;flex-wrap:wrap">
         <button class="hbtn" style="background:var(--gold);color:#000;font-weight:bold;padding:8px 16px" onclick="sellTreasure('${key}', 1)">${t('sell_one')} (+${(itm.value||2000).toLocaleString()}₽)</button>
         ${qty>1?`<button class="hbtn" style="background:var(--green);color:#fff;font-weight:bold;padding:8px 16px" onclick="sellTreasure('${key}', ${qty})">${t('sell_all')} (+${((itm.value||2000)*qty).toLocaleString()}₽)</button>`:''}
-        <button class="hbtn" style="padding:8px 16px" onclick="showTab('inventory')">${t('back_bag')}</button>
+        <button class="hbtn" style="padding:8px 16px" onclick="var fsM=document.getElementById('fullscreen-panel-modal');if(fsM&&fsM.style.display==='flex'){renderInventory(document.getElementById('fs-panel-content'))}else{showTab('inventory')}" class="hbtn">${t('back_bag')}</button>
       </div>`;
     return;
   }
 
   if(itm.type === 'stone'){
     const qty = G.inventory[key] || 0;
-    const el = document.getElementById('tab-content');
+    const el = _getActiveContent();
     const candidates = [];
     G.team.forEach((p, idx) => {
       const targetId = STONE_EVO[p.id]?.[key];
@@ -67,14 +76,19 @@ function onInventoryClick(key){
           </div>`;
         }).join('') : `<div style="text-align:center;padding:24px;color:var(--dim)">${t('no_evo_stone')} ${getItemName(key)}.</div>`}
       </div>
-      <div style="text-align:center"><button class="hbtn" style="padding:8px 16px" onclick="showTab('inventory')">${t('back_bag')}</button></div>`;
+      <div style="text-align:center"><button class="hbtn" style="padding:8px 16px" onclick="var fsM=document.getElementById('fullscreen-panel-modal');if(fsM&&fsM.style.display==='flex'){renderInventory(document.getElementById('fs-panel-content'))}else{showTab('inventory')}" class="hbtn">${t('back_bag')}</button></div>`;
     return;
   }
 
   if(itm.type === 'candy' || key === 'rarecandy'){
     const qty = G.inventory[key] || 0;
-    const el = document.getElementById('tab-content');
-    if(qty <= 0){ showTab('inventory'); return; }
+    const el = _getActiveContent();
+    if(qty <= 0){ 
+      var fsM=document.getElementById('fullscreen-panel-modal');
+      if(fsM&&fsM.style.display==='flex'){renderInventory(document.getElementById('fs-panel-content'))}
+      else{showTab('inventory')}
+      return; 
+    }
     const candidates = [];
     G.team.forEach((p, idx) => {
       if(p.level < 100) candidates.push({p, loc:'team', idx});
@@ -83,27 +97,35 @@ function onInventoryClick(key){
       if(p && p.level < 100) candidates.push({p, loc:'box', idStr});
     });
 
-    el.innerHTML = `<div class="loc-title">${t("m.inventory.4")} ${itemIcon(key, 24)} ${getItemName(key)}</div>
-      <div class="loc-sub">${t("m.inventory.3")}</div>
-      <div style="margin:16px 0">
-        ${candidates.length > 0 ? candidates.map(({p, loc, idx, idStr}) => {
-          const clickFn = loc === 'team' ? `useRareCandy(${idx})` : `useBoxRareCandy('${idStr}')`;
-          const curBase = xpForLevel(p.level);
-          const inLvl = Math.max(0, (p.xp||0) - curBase);
-          const reqLvl = Math.max(1, (p.xpNext||1) - curBase);
-          return `<div class="poke-card" style="margin-bottom:8px">
-            <div class="poke-card-top" style="align-items:center">
-              <div class="poke-sprite">${spriteImg(p.id, p.emoji, {size:40, shiny:p.shinyActive})}</div>
-              <div class="poke-info" style="flex:1">
-                <div class="poke-name">${p.name} Nv.${p.level} <span style="font-size:11px;color:var(--dim)">(${loc==='team'?'⚡ Équipe':'📦 Boîte PC'})</span></div>
-                <div style="font-size:11px;color:var(--dim);margin-top:2px">XP : ${inLvl} / ${reqLvl}</div>
-              </div>
-              <button class="hbtn" style="background:var(--purple);color:#fff;padding:6px 12px;font-weight:bold" onclick="${clickFn}" ${qty<1 ? 'disabled' : ''}>${t("m.inventory.2")}</button>
-            </div>
-          </div>`;
-        }).join('') : `<div style="text-align:center;padding:24px;color:var(--dim)">${t("m.inventory.1")}</div>`}
+    el.innerHTML = `<div style="background:linear-gradient(135deg,rgba(128,0,128,0.2),rgba(0,0,0,0.3));border:2px solid var(--purple);border-radius:10px;padding:12px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="font-size:32px">${itemIcon(key, 32)}</div>
+        <div>
+          <div class="loc-title" style="margin:0">${t("m.inventory.4")} ${getItemName(key)}</div>
+          <div style="font-size:11px;color:var(--dim)">${t("m.inventory.3")}</div>
+        </div>
       </div>
-      <div style="text-align:center"><button class="hbtn" style="padding:8px 16px" onclick="showTab('inventory')">${t('back_bag')}</button></div>`;
+      <div style="background:var(--purple);color:#fff;font-weight:bold;font-size:18px;padding:6px 16px;border-radius:20px;min-width:50px;text-align:center;box-shadow:0 2px 8px rgba(128,0,128,0.4);">×${qty}</div>
+    </div>
+    <div style="margin:16px 0">
+      ${candidates.length > 0 ? candidates.map(({p, loc, idx, idStr}) => {
+        const clickFn = loc === 'team' ? `useRareCandy(${idx})` : `useBoxRareCandy('${idStr}')`;
+        const curBase = xpForLevel(p.level);
+        const inLvl = Math.max(0, (p.xp||0) - curBase);
+        const reqLvl = Math.max(1, (p.xpNext||1) - curBase);
+        return `<div class="poke-card" style="margin-bottom:8px">
+          <div class="poke-card-top" style="align-items:center">
+            <div class="poke-sprite">${spriteImg(p.id, p.emoji, {size:40, shiny:p.shinyActive})}</div>
+            <div class="poke-info" style="flex:1">
+              <div class="poke-name">${p.name} Nv.${p.level} <span style="font-size:11px;color:var(--dim)">(${loc==='team'?'⚡ Équipe':'📦 Boîte PC'})</span></div>
+              <div style="font-size:11px;color:var(--dim);margin-top:2px">XP : ${inLvl} / ${reqLvl}</div>
+            </div>
+            <button class="hbtn" style="background:var(--purple);color:#fff;padding:6px 12px;font-weight:bold" onclick="${clickFn}" ${qty<1 ? 'disabled' : ''}>${t("m.inventory.2")}</button>
+          </div>
+        </div>`;
+      }).join('') : `<div style="text-align:center;padding:24px;color:var(--dim)">${t("m.inventory.1")}</div>`}
+    </div>
+    <div style="text-align:center"><button class="hbtn" style="padding:8px 16px" onclick="var fsM=document.getElementById('fullscreen-panel-modal');if(fsM&&fsM.style.display==='flex'){renderInventory(document.getElementById('fs-panel-content'))}else{showTab('inventory')}">${t('back_bag')}</button></div>`;
     return;
   }
 
@@ -114,7 +136,7 @@ function onInventoryClick(key){
     askConfirm(`${getItemName(key)} ${t('already_eq')} ${equipped.name}. ${t('remove_q')}`, ()=>unequipItem(idx));
     return;
   }
-  const el=document.getElementById('tab-content');
+  const el=_getActiveContent();
   const capped=Math.min(BAG_MAX,G.inventory[key]||0);
   const ratio=capped/BAG_MAX;
   const buffLines=Object.entries(itm.buff).map(([s,mx])=>{
@@ -133,7 +155,7 @@ function onInventoryClick(key){
           </div>
         </div>
       </div>`).join('')}
-    <div style="text-align:center;margin-top:10px"><button class="hbtn" onclick="showTab('inventory')">${t('back_bag')}</button></div>`;
+    <div style="text-align:center;margin-top:10px"><button class="hbtn" onclick="var fsM=document.getElementById('fullscreen-panel-modal');if(fsM&&fsM.style.display==='flex'){renderInventory(document.getElementById('fs-panel-content'))}else{showTab('inventory')}" class="hbtn">${t('back_bag')}</button></div>`;
 }
 
 function useItem(key){ onInventoryClick(key); }
@@ -142,3 +164,4 @@ function consumeItem(key){
   if(G.inventory[key]>0) G.inventory[key]--;
   if(G.inventory[key]===0) delete G.inventory[key];
 }
+

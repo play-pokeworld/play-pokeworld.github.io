@@ -77,6 +77,8 @@ function recomputeUnlocks(){
 
 function isLocUnlocked(id){
   if(!G) return true;
+  // --- 8 Badges = toutes les routes débloquées ---
+  if(G.badges && G.badges.length >= 8) return true;
   // --- Blocage Starter : Route 1 (Kanto) & Route 29 (Johto) ---
   if(id==='route1'){
     const hasKantoStarter = !!(G.starterKanto || G.starter || (G.regionStarter && G.regionStarter.kanto));
@@ -108,11 +110,15 @@ function trainingUnlocked(){
 // À appeler à chaque renderMap / fin de combat pour qu'elles apparaissent
 // dès que la condition est remplie (pas seulement au (re)chargement).
 
+function mineUnlocked(){ return G.badges && G.badges.length >= 2; }
 function updateFeatureWindows(){
   const hWin = document.getElementById('win-hatchery');
   if(hWin) hWin.style.display = hatcheryUnlocked() ? 'flex' : 'none';
   const tWin = document.getElementById('win-training');
   if(tWin) tWin.style.display = trainingUnlocked() ? 'flex' : 'none';
+  const mWin = document.getElementById('win-mine');
+  if(mWin) mWin.style.display = mineUnlocked() ? 'flex' : 'none';
+  // Automation is now rendered inside the hatchery window (no standalone window)
 }
 
 // --- Code couleur de la carte (priorité : gris > vert > violet > bleu > jaune > transparent) ---
@@ -122,7 +128,7 @@ function mapNodeState(id){
   if(!loc) return {locked:false, color:'rgba(58,63,68,0.55)', kind:'locked'};
   const badgeReq=loc.badgeReq||0;
   const storyReq=loc.storyReq||0;
-  if(badgeReq>G.badges.length || storyReq>(G.storyIdx||0) || !isLocUnlocked(id)) return {locked:true, color:'rgba(58,63,68,0.55)', kind:'locked'};
+  if((G.badges.length<8 && badgeReq>G.badges.length) || storyReq>(G.storyIdx||0) || !isLocUnlocked(id)) return {locked:true, color:'rgba(58,63,68,0.55)', kind:'locked'};
   const hasQuest = (G.activeQuests||[]).some(i=>{
     const def = i.cat==='main' ? getMainQuestDef(i.qid) : (i.cat==='side' ? SIDE_QUESTS[i.qid] : null);
     return def && def.loc && locGroup(def.loc)===locGroup(id);
@@ -135,3 +141,4 @@ function mapNodeState(id){
   if(comp && comp.ids && comp.ids.some(sp=>!isSpeciesShiny(sp))) return {locked:false, color:'rgba(201,160,0,0.60)', kind:'shiny'};
   return {locked:false, color:'rgba(255,255,255,0.10)', kind:'done'};
 }
+

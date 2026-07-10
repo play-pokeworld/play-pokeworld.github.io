@@ -144,3 +144,4 @@ var REPEATABLE_QUESTS = [
   "rewardMoney": 2000
  }
 ];
+

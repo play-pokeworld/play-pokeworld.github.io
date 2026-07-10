@@ -53,3 +53,4 @@ const CHAMPIONS = {
   clair:   {badge:'rising',badgeEmoji:'🐉',
     reward:5500, badgeReq:0, team:[createPoke(147,37), createPoke(148,39), createPoke(130,40)]}
 };
+

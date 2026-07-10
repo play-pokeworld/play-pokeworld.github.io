@@ -113,3 +113,4 @@ window.L_en_talents = {
   "desc": "All moves used by or against this Pokémon never miss."
  }
 };
+

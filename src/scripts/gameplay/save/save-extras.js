@@ -13,7 +13,23 @@ function useRareCandy(teamIdx){
   notify(tr("m.save.10", {p0:p.name, p1:p.level}), 'var(--purple)');
   updateHeader();
   renderTeamWindow();
-  if(document.querySelector('.tab.active')?.textContent.includes('Sac')) onInventoryClick('rarecandy');
+  // Refresh poke modal if open
+  if(document.getElementById('poke-modal')?.classList.contains('open')){
+    openPokeModal(teamIdx);
+  }
+  // Refresh fullscreen panel (inventory) if open
+  const fsModal = document.getElementById('fullscreen-panel-modal');
+  if(fsModal && fsModal.style.display === 'flex'){
+    const fsContent = document.getElementById('fs-panel-content');
+    if(fsContent){
+      const fsTitle = document.getElementById('fs-panel-title');
+      if(fsTitle && (fsTitle.textContent.includes('Sac') || fsTitle.textContent.includes('Bag'))){
+        renderInventory(fsContent);
+      }
+    }
+  }
+  // Stay on candy page to continue using
+  onInventoryClick('rarecandy');
 }
 
 function useBoxRareCandy(boxId){
@@ -28,7 +44,19 @@ function useBoxRareCandy(boxId){
   notify(tr("m.save.9", {p0:p.name, p1:p.level}), 'var(--purple)');
   updateHeader();
   renderTeamWindow();
-  if(document.querySelector('.tab.active')?.textContent.includes('Sac')) onInventoryClick('rarecandy');
+  // Refresh fullscreen panel (inventory) if open
+  const fsModal = document.getElementById('fullscreen-panel-modal');
+  if(fsModal && fsModal.style.display === 'flex'){
+    const fsContent = document.getElementById('fs-panel-content');
+    if(fsContent){
+      const fsTitle = document.getElementById('fs-panel-title');
+      if(fsTitle && (fsTitle.textContent.includes('Sac') || fsTitle.textContent.includes('Bag'))){
+        renderInventory(fsContent);
+      }
+    }
+  }
+  // Stay on candy page to continue using
+  onInventoryClick('rarecandy');
 }
 
 
@@ -140,3 +168,4 @@ function importSave(event){
 // ============================================================
 // INIT
 // ============================================================
+

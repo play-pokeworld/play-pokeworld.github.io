@@ -31,3 +31,4 @@ var QUEST_TRIGGERS = {
 // --- Quêtes RÉPÉTABLES (menu accept/roll façon PokéClicker) ---
 
 // --- PNJ par ville (clic sur le marqueur 🗣 de la carte) ---
+

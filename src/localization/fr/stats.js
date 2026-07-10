@@ -9,3 +9,4 @@ window.L_fr_stats = {
   "stat_spd": "Déf Spéciale",
   "stat_spe": "Vitesse",
 };
+

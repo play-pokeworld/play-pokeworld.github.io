@@ -94,3 +94,4 @@ async function onPlayerPokeFaint(){
   await wait(300);
   resumeBattleActions();
 }
+

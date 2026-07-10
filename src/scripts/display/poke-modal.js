@@ -48,34 +48,41 @@ function openPokeModal(idx){
   const editing=moveEditorFor===idx;
   const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
 
+  // Current moves — clicking a move selects it for replacement (grays it)
   const moves=p.moves.map((m,mi)=>{
     const mv=MOVES[m.id];
     const mvName = getMoveName(m.id);
-    return `<div style="background:var(--bg);border-radius:6px;padding:6px 8px;margin-bottom:4px;display:flex;gap:8px;align-items:center">
+    const selected = moveReplaceSlot === mi;
+    const selStyle = selected ? 'opacity:0.4;border:1px solid var(--red);' : '';
+    return `<div style="background:var(--bg);border-radius:6px;padding:6px 8px;margin-bottom:4px;display:flex;gap:8px;align-items:center;cursor:pointer;${selStyle}" onclick="toggleMoveSelect(${idx},${mi})" oncontextmenu="event.preventDefault();openMoveInfo('${m.id}',${idx});return false;" title="${lang==='en'?'Click to select for replacement | Right-click for info':'Clic pour sélectionner (remplacement) | Clic droit pour info'}">
       <span class="type-badge" style="background:${TYPE_COLORS[mv?.type]||'#888'}">${mv?.type||'?'}</span>
       <span>${mvName}</span>
-      <span style="color:var(--dim);font-size:11px;margin-left:auto">${lang==='en'?'Pow:':'Puiss :'} ${mv?.pow||'-'} | PP: ${m.pp}/${m.maxPP}</span>
-      ${editing?`<button class="hbtn" style="padding:2px 8px;font-size:10px;border-color:var(--red)" onclick="forgetMove(${idx},${mi})">${lang==='en'?'Forget':'Oublier'}</button>`:''}
+      ${selected?'<span style="color:var(--red);font-size:10px;font-weight:bold">⬇ Remplacement</span>':''}
+      <span style="color:var(--dim);font-size:11px;margin-left:auto">${lang==='en'?'Pow:':'Puiss :'} ${mv?.pow||'-'}</span>
     </div>`;
   }).join('');
 
-  let learnHtml='';
-  if(editing){
-    const pool=learnableMoves(p);
-    const full=p.moves.length>=4;
-    learnHtml=`<div style="font-size:12px;color:var(--dim);margin:10px 0 4px">${lang==='en' ? 'Learnable moves '+(full?'<span style="color:var(--red)">(forget one first)</span>':'') + ':' : 'Capacités apprenables '+(full?'<span style="color:var(--red)">(oubliez-en une d\'abord)</span>':'') + ' :'}</div>
-    <div style="max-height:170px;overflow-y:auto">
-    ${pool.length?pool.map(id=>{
-      const mv=MOVES[id];
-      return `<div style="background:var(--card);border-radius:6px;padding:5px 8px;margin-bottom:4px;display:flex;gap:8px;align-items:center">
-        <span class="type-badge" style="background:${TYPE_COLORS[mv.type]||'#888'}">${mv.type}</span>
-        <span>${getMoveName(id)}</span>
-        <span style="color:var(--dim);font-size:11px;margin-left:auto">${lang==='en'?'Pow:':'Puiss :'} ${mv.pow||'-'}</span>
-        <button class="hbtn" style="padding:2px 8px;font-size:10px" ${full?'disabled':''} onclick="learnMove(${idx},'${id}')">${lang==='en'?'Learn':'Apprendre'}</button>
-      </div>`;
-    }).join(''):`<div style="color:var(--dim);font-size:11px">${lang==='en'?'No other moves available.':'Aucune autre capacité disponible.'}</div>`}
+  // Learnable moves — ALWAYS shown at the bottom
+  const pool=learnableMoves(p);
+  const canReplace = moveReplaceSlot !== null;
+    const full=p.moves.length>=4 && !canReplace;
+    let learnHtml=`<div style="font-size:12px;color:var(--gold);font-weight:bold;margin:12px 0 6px;padding-bottom:4px;border-bottom:1px solid #333;">
+    📖 ${lang==='en'?'Learnable Moves':'Capacités Apprenables'}
+    ${canReplace?'<span style="color:var(--red);font-size:11px;margin-left:6px">'+(lang==='en'?'← Click to replace selected':'← Clic pour remplacer')+'</span>':''}
+    ${full?'<span style="color:var(--red);font-size:11px;margin-left:6px">'+(lang==='en'?'(4/4 — select a move above first)':'(4/4 — sélectionnez une attaque ci-dessus)')+'</span>':''}
+  </div>
+  <div style="max-height:200px;overflow-y:auto">
+  ${pool.length?pool.map(id=>{
+    const mv=MOVES[id];
+    const clickAction = canReplace ? `learnMove(${idx},'${id}')` : (!full ? `learnMove(${idx},'${id}')` : '');
+    return `<div style="background:var(--card);border-radius:6px;padding:5px 8px;margin-bottom:4px;display:flex;gap:8px;align-items:center;cursor:${clickAction?'pointer':'default'};${canReplace?'border:1px solid var(--green);':''}" ${clickAction?`onclick="${clickAction}"`:''} oncontextmenu="event.preventDefault();openMoveInfo('${id}',${idx});return false;" title="${lang==='en'?'Right-click for info':'Clic droit pour info'}">
+      <span class="type-badge" style="background:${TYPE_COLORS[mv.type]||'#888'}">${mv.type}</span>
+      <span>${getMoveName(id)}</span>
+      <span style="color:var(--dim);font-size:11px;margin-left:auto">${lang==='en'?'Pow:':'Puiss :'} ${mv.pow||'-'}</span>
+      ${canReplace?'<span style="color:var(--green);font-size:10px">⬆</span>':(!full?`<span style="color:var(--green);font-size:10px">+</span>`:'')}
     </div>`;
-  }
+  }).join(''):`<div style="color:var(--dim);font-size:11px;text-align:center;padding:10px">${lang==='en'?'No other moves available.':'Aucune autre capacité disponible.'}</div>`}
+  </div>`;
 
   const stLabels = lang === 'en' ? ['Max HP','Attack','Defense','Sp. Atk','Sp. Def','Speed'] : ['PV Max','Attaque','Défense','Atk Spé','Déf Spé','Vitesse'];
   const buff=getHeldBuff(p);
@@ -155,7 +162,7 @@ function openPokeModal(idx){
   </div>
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
     <span style="font-size:12px;color:var(--dim)">${t('moves_lbl')}</span>
-    <button class="hbtn" style="padding:3px 10px;font-size:11px" onclick="toggleMoveEditor(${idx})">${editing?t('finish_btn'):t('modify_btn')}</button>
+    ${moveReplaceSlot!==null?`<button class="hbtn" style="padding:3px 10px;font-size:11px;border-color:var(--red)" onclick="moveReplaceSlot=null;openPokeModal(${idx})">${lang==='en'?'Cancel':'Annuler'}</button>`:''}
   </div>
   ${moves}
   ${learnHtml}
@@ -185,3 +192,121 @@ function openPokeModal(idx){
 
   modal.classList.add('open');
 }
+
+// ============================================================
+// POKE INFO — right-click popup showing Pokémon details (battle use)
+// ============================================================
+function openPokeInfo(pokeId){
+  const pd = PD[pokeId];
+  if(!pd) return;
+  const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
+  const isEn = lang === 'en';
+  const inner = document.getElementById('poke-modal-inner');
+  if(!inner) return;
+  
+  const [name, type1, type2, hp, atk, def, spe, moves, emoji] = pd;
+  const isShiny = isSpeciesShiny(pokeId);
+  
+  // Get official moveset if available
+  const officialMoves = (typeof POKE_MOVE_POOLS !== 'undefined' && POKE_MOVE_POOLS[pokeId]) ? POKE_MOVE_POOLS[pokeId] : [];
+  
+  inner.innerHTML = `<div class="modal-title">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="${isShiny?'is-shiny':''}" style="font-size:32px">${spriteImg(pokeId, '', {size:56, shiny:isShiny})}</div>
+      <div>
+        <div>${isShiny?'<span class="shiny-tag">✨</span>':''}${name}</div>
+        <div style="margin-top:3px">${typeSpan(type1)}${type2?typeSpan(type2):''}</div>
+        ${isShiny?`<div style="font-size:11px;color:var(--yellow);margin-top:4px;font-weight:bold">${isEn?'✨ Shiny form unlocked/owned!':'✨ Forme Shiny débloquée/possédée !'}</div>`:''}
+      </div>
+    </div>
+    <span class="modal-close" onclick="document.getElementById('poke-modal').classList.remove('open')">✕</span>
+  </div>
+  ${getEvolutionMethodsHtml(pokeId)}
+  <div style="margin:10px 0">
+    <div class="stat-row"><div class="stat-label">${isEn?'Max HP':'PV Max'}</div><div class="stat-bar"><div class="stat-fill" style="width:${Math.min(100,hp/2)}%;background:var(--green)"></div></div><div class="stat-val">${hp}</div></div>
+    <div class="stat-row"><div class="stat-label">${isEn?'Attack':'Attaque'}</div><div class="stat-bar"><div class="stat-fill" style="width:${Math.min(100,atk/2)}%;background:var(--red)"></div></div><div class="stat-val">${atk}</div></div>
+    <div class="stat-row"><div class="stat-label">${isEn?'Defense':'Défense'}</div><div class="stat-bar"><div class="stat-fill" style="width:${Math.min(100,def/2)}%;background:var(--blue)"></div></div><div class="stat-val">${def}</div></div>
+    <div class="stat-row"><div class="stat-label">${isEn?'Speed':'Vitesse'}</div><div class="stat-bar"><div class="stat-fill" style="width:${Math.min(100,spe/2)}%;background:var(--yellow)"></div></div><div class="stat-val">${spe}</div></div>
+  </div>
+  ${officialMoves.length > 0 ? `
+  <div style="font-size:12px;color:var(--dim);margin-bottom:4px">${isEn?'Level-up Moves':'Capacités par niveau'}</div>
+  <div style="display:flex;flex-wrap:wrap;gap:4px">
+    ${officialMoves.filter(m => MOVES[m]).map(m=>`<span style="background:var(--card);border-radius:4px;padding:3px 8px;font-size:11px">${getMoveName(m)}</span>`).join('')}
+  </div>` : ''}
+  <div style="text-align:center;margin-top:10px"><button class="hbtn" onclick="document.getElementById('poke-modal').classList.remove('open')">${isEn?'Close':'Fermer'}</button></div>`;
+  document.getElementById('poke-modal').classList.add('open');
+}
+
+// ============================================================
+// MOVE INFO — right-click popup showing move details & effects
+// ============================================================
+// Store context for back-navigation from move info
+var _moveInfoContext = null;
+
+function openMoveInfo(moveId, contextIdx, contextBoxId){
+  const mv = MOVES[moveId];
+  if(!mv) return;
+  const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
+  const isEn = lang === 'en';
+  const inner = document.getElementById('poke-modal-inner');
+  if(!inner) return;
+  _moveInfoContext = { idx: contextIdx !== undefined ? contextIdx : null, boxId: contextBoxId || null };
+  const name = getMoveName(moveId);
+  const type = mv.type || '?';
+  const cat = mv.cat === 'phys' ? (isEn?'Physical':'Physique') : mv.cat === 'spec' ? (isEn?'Special':'Spéciale') : (isEn?'Status':'Statut');
+  const pow = mv.pow || '—';
+  const acc = mv.acc || '—';
+
+  // Build effects description
+  const effects = [];
+  if(mv.eff === 'burn') effects.push(isEn?'May burn (10%)':'Peut brûler (10%)');
+  if(mv.eff === 'para') effects.push(isEn?'May paralyze (30%)':'Peut paralyser (30%)');
+  if(mv.eff === 'poison') effects.push(isEn?'May poison':'Peut empoisonner');
+  if(mv.eff === 'badpoison') effects.push(isEn?'May badly poison':'Peut gravement empoisonner');
+  if(mv.eff === 'sleep') effects.push(isEn?'May cause sleep':'Peut endormir');
+  if(mv.eff === 'freeze') effects.push(isEn?'May freeze':'Peut geler');
+  if(mv.eff === 'slow') effects.push(isEn?'May lower Speed':'Peut baisser la Vitesse');
+  if(mv.eff === 'confuse') effects.push(isEn?'May confuse':'Peut rendre confus');
+  if(mv.crit) effects.push(isEn?'High critical hit ratio':'Taux de critique élevé');
+  if(mv.recoil) effects.push(isEn?'Causes recoil damage':'Dégâts de recul');
+  if(mv.recharge) effects.push(isEn?'Requires recharge next turn':'Recharge nécessaire au tour suivant');
+  if(mv.trap) effects.push(isEn?'Traps opponent (2-5 turns)': 'Piège l\'adversaire (2-5 tours)');
+  if(mv.heal) effects.push(isEn?`Heals ${mv.heal*100}% HP`:`Soigne ${mv.heal*100}% PV`);
+  if(mv.prio) effects.push(isEn?`Priority +${mv.prio}`:`Priorité +${mv.prio}`);
+  if(mv.boost) {
+    const bst = Object.entries(mv.boost).map(([s,v])=>`${s.toUpperCase()}+${Math.round(v*100)}%`).join(', ');
+    effects.push(isEn?`Boosts: ${bst}`:`Boost: ${bst}`);
+  }
+
+  const effHtml = effects.length ? effects.map(e=>`<div style="font-size:11px;color:var(--gold);margin:3px 0;">✦ ${e}</div>`).join('') : `<div style="font-size:11px;color:var(--dim)">${isEn?'No special effects':'Aucun effet spécial'}</div>`;
+  const typeColor = TYPE_COLORS[type] || '#888';
+
+  inner.innerHTML = `<div class="modal-title">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="type-badge" style="background:${typeColor};font-size:13px;padding:3px 10px">${type}</span>
+      <div>${name}</div>
+      <span style="font-size:11px;color:var(--dim)">${cat}</span>
+    </div>
+    <span class="modal-close" onclick="document.getElementById('poke-modal').classList.remove('open')">✕</span>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+    <div style="background:var(--card);padding:8px;border-radius:6px;text-align:center">
+      <div style="font-size:11px;color:var(--dim)">${isEn?'Power':'Puissance'}</div>
+      <div style="font-size:20px;font-weight:bold;color:${pow>80?'var(--gold)':pow==='—'?'var(--dim)':'var(--text)'}">${pow}</div>
+    </div>
+    <div style="background:var(--card);padding:8px;border-radius:6px;text-align:center">
+      <div style="font-size:11px;color:var(--dim)">${isEn?'Accuracy':'Précision'}</div>
+      <div style="font-size:20px;font-weight:bold;color:${acc>=90?'var(--green)':'var(--text)'}">${acc}%</div>
+    </div>
+  </div>
+  <div style="background:var(--bg);border-radius:8px;padding:10px;margin-bottom:10px">
+    <div style="font-size:12px;font-weight:bold;color:var(--gold);margin-bottom:6px">${isEn?'Effects':'Effets'}</div>
+    ${effHtml}
+  </div>
+  <div style="display:flex;gap:8px;justify-content:center">
+    <button class="hbtn" style="background:var(--blue);color:#fff;font-weight:bold" onclick="if(_moveInfoContext && _moveInfoContext.boxId){openBoxPokeModal(_moveInfoContext.boxId)}else if(_moveInfoContext && _moveInfoContext.idx!==null){openPokeModal(_moveInfoContext.idx)}else{document.getElementById('poke-modal').classList.remove('open')}">← ${isEn?'Back to Pokémon':'Retour au Pokémon'}</button>
+    <button class="hbtn" onclick="_moveInfoContext=null;document.getElementById('poke-modal').classList.remove('open')">${isEn?'Close':'Fermer'}</button>
+  </div>`;
+  document.getElementById('poke-modal').classList.add('open');
+}
+

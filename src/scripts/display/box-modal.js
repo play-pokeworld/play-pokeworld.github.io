@@ -6,8 +6,6 @@ function openBoxPokeModal(boxId){
   if(!p){ moveEditorFor=null; return; }
   const modal=document.getElementById('poke-modal');
   const inner=document.getElementById('poke-modal-inner');
-  const key = 'box_'+boxId;
-  const editing = moveEditorFor===key;
   const isShiny = p.shinyUnlocked || p.shinyActive || p.shiny || isSpeciesShiny(p.id);
   const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
 
@@ -17,34 +15,41 @@ function openBoxPokeModal(boxId){
     p.shiny = p.shinyActive;
   }
 
+  // Current moves — click to select for replacement
   const moves = (p.moves||[]).map((m,mi)=>{
     const mv=MOVES[m.id];
     const mvName = getMoveName(m.id);
-    return `<div style="background:var(--bg);border-radius:6px;padding:6px 8px;margin-bottom:4px;display:flex;gap:8px;align-items:center">
+    const selected = boxMoveReplaceSlot === mi;
+    const selStyle = selected ? 'opacity:0.4;border:1px solid var(--red);' : '';
+    return `<div style="background:var(--bg);border-radius:6px;padding:6px 8px;margin-bottom:4px;display:flex;gap:8px;align-items:center;cursor:pointer;${selStyle}" onclick="toggleBoxMoveSelect('${boxId}',${mi})" oncontextmenu="event.preventDefault();openMoveInfo('${m.id}');return false;" title="${lang==='en'?'Click to select for replacement | Right-click for info':'Clic pour sélectionner (remplacement) | Clic droit pour info'}">
       <span class="type-badge" style="background:${TYPE_COLORS[mv?.type]||'#888'}">${mv?.type||'?'}</span>
       <span>${mvName}</span>
-      <span style="color:var(--dim);font-size:11px;margin-left:auto">${lang==='en'?'Pow:':'Puiss :'} ${mv?.pow||'-'} | PP: ${m.pp}/${m.maxPP}</span>
-      ${editing?`<button class="hbtn" style="padding:2px 8px;font-size:10px;border-color:var(--red)" onclick="forgetBoxMove('${boxId}',${mi})">${lang==='en'?'Forget':'Oublier'}</button>`:''}
+      ${selected?'<span style="color:var(--red);font-size:10px;font-weight:bold">⬇ Remplacement</span>':''}
+      <span style="color:var(--dim);font-size:11px;margin-left:auto">${lang==='en'?'Pow:':'Puiss :'} ${mv?.pow||'-'}</span>
     </div>`;
   }).join('');
 
-  let learnHtml='';
-  if(editing){
-    const pool=learnableMoves(p);
-    const full=(p.moves||[]).length>=4;
-    learnHtml=`<div style="font-size:12px;color:var(--dim);margin:10px 0 4px">${lang==='en' ? 'Learnable moves '+(full?'<span style="color:var(--red)">(forget one first)</span>':'') + ':' : 'Capacités apprenables '+(full?'<span style="color:var(--red)">(oubliez-en une d\'abord)</span>':'') + ' :'}</div>
-    <div style="max-height:170px;overflow-y:auto">
-    ${pool.length?pool.map(id=>{
-      const mv=MOVES[id];
-      return `<div style="background:var(--card);border-radius:6px;padding:5px 8px;margin-bottom:4px;display:flex;gap:8px;align-items:center">
-        <span class="type-badge" style="background:${TYPE_COLORS[mv.type]||'#888'}">${mv.type}</span>
-        <span>${getMoveName(id)}</span>
-        <span style="color:var(--dim);font-size:11px;margin-left:auto">${lang==='en'?'Pow:':'Puiss :'} ${mv.pow||'-'}</span>
-        <button class="hbtn" style="padding:2px 8px;font-size:10px" ${full?'disabled':''} onclick="learnBoxMove('${boxId}','${id}')">${lang==='en'?'Learn':'Apprendre'}</button>
-      </div>`;
-    }).join(''):`<div style="color:var(--dim);font-size:11px">${lang==='en'?'No other moves available.':'Aucune autre capacité disponible.'}</div>`}
+  // Learnable moves — ALWAYS shown at bottom
+  const pool=learnableMoves(p);
+  const canReplace = boxMoveReplaceSlot !== null;
+  const fullB=(p.moves||[]).length>=4 && !canReplace;
+  let learnHtml=`<div style="font-size:12px;color:var(--gold);font-weight:bold;margin:12px 0 6px;padding-bottom:4px;border-bottom:1px solid #333;">
+    📖 ${lang==='en'?'Learnable Moves':'Capacités Apprenables'}
+    ${canReplace?'<span style="color:var(--red);font-size:11px;margin-left:6px">'+(lang==='en'?'← Click to replace selected':'← Clic pour remplacer')+'</span>':''}
+    ${fullB?'<span style="color:var(--red);font-size:11px;margin-left:6px">'+(lang==='en'?'(4/4 — select a move above first)':'(4/4 — sélectionnez une attaque ci-dessus)')+'</span>':''}
+  </div>
+  <div style="max-height:200px;overflow-y:auto">
+  ${pool.length?pool.map(id=>{
+    const mv=MOVES[id];
+    const clickAction = (canReplace || !fullB) ? `learnBoxMove('${boxId}','${id}')` : '';
+    return `<div style="background:var(--card);border-radius:6px;padding:5px 8px;margin-bottom:4px;display:flex;gap:8px;align-items:center;cursor:${clickAction?'pointer':'default'};${canReplace?'border:1px solid var(--green);':''}" ${clickAction?`onclick="${clickAction}"`:''} oncontextmenu="event.preventDefault();openMoveInfo('${id}');return false;" title="${lang==='en'?'Right-click for info':'Clic droit pour info'}">
+      <span class="type-badge" style="background:${TYPE_COLORS[mv.type]||'#888'}">${mv.type}</span>
+      <span>${getMoveName(id)}</span>
+      <span style="color:var(--dim);font-size:11px;margin-left:auto">${lang==='en'?'Pow:':'Puiss :'} ${mv.pow||'-'}</span>
+      ${canReplace?'<span style="color:var(--green);font-size:10px">⬆</span>':(!fullB?`<span style="color:var(--green);font-size:10px">+</span>`:'')}
     </div>`;
-  }
+  }).join(''):`<div style="color:var(--dim);font-size:11px;text-align:center;padding:10px">${lang==='en'?'No other moves available.':'Aucune autre capacité disponible.'}</div>`}
+  </div>`;
 
   const stLabels = lang === 'en' ? ['Max HP','Attack','Defense','Sp. Atk','Sp. Def','Speed'] : ['PV Max','Attaque','Défense','Atk Spé','Déf Spé','Vitesse'];
   const stats=[
@@ -67,12 +72,12 @@ function openBoxPokeModal(boxId){
         <div style="margin-top:3px">${typeSpan(p.type1)}${p.type2?typeSpan(p.type2):''}</div>
       </div>
     </div>
-    <span class="modal-close" onclick="moveEditorFor=null;document.getElementById('poke-modal').classList.remove('open')">✕</span>
+    <span class="modal-close" onclick="boxMoveReplaceSlot=null;document.getElementById('poke-modal').classList.remove('open')">✕</span>
   </div>
   ${isShiny?`<label style="display:flex;align-items:center;gap:8px;margin-bottom:10px;background:var(--bg);padding:6px 10px;border-radius:6px;cursor:pointer">
     <input type="checkbox" ${p.shinyActive?'checked':''} onchange="toggleBoxShinySkin('${boxId}')">
     <span>✨ ${lang==='en'?'Shiny Skin':'Skin Shiny'}</span>
-    <span style="color:var(--dim);font-size:11px;margin-left:auto">${lang==='en'?'Cosmetic switch only':'Bascule d\'apparence'}</span>
+    <span style="color:var(--dim);font-size:11px;margin-left:auto">${lang==='en'?'Cosmetic switch only':'Bascule d\u2019apparence'}</span>
   </label>`:''}
   ${buildTalentSelectorHtml(p, null, boxId)}
   ${getEvolutionMethodsHtml(p.id)}
@@ -87,8 +92,8 @@ function openBoxPokeModal(boxId){
     </div>`).join('')}
   </div>
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-    <span style="font-size:12px;color:var(--dim)">Capacités :</span>
-    <button class="hbtn" style="padding:3px 10px;font-size:11px" onclick="toggleBoxMoveEditor('${boxId}')">${editing?'✓ Terminer':'✏️ Modifier'}</button>
+    <span style="font-size:12px;color:var(--dim)">${lang==='en'?'Moves':'Capacités'}</span>
+    ${boxMoveReplaceSlot!==null?`<button class="hbtn" style="padding:3px 10px;font-size:11px;border-color:var(--red)" onclick="boxMoveReplaceSlot=null;openBoxPokeModal('${boxId}')">${lang==='en'?'Cancel':'Annuler'}</button>`:''}
   </div>
   ${moves}
   ${learnHtml}
@@ -131,11 +136,25 @@ function toggleBoxShinySkin(boxId){
   openBoxPokeModal(boxId);
 }
 
+var boxMoveReplaceSlot = null;
+
+function toggleBoxMoveSelect(boxId, moveIdx){
+  const p = G.collection[boxId] || G.collection[String(boxId)];
+  if(!p) return;
+  if(boxMoveReplaceSlot === moveIdx){
+    boxMoveReplaceSlot = null;
+  } else {
+    boxMoveReplaceSlot = moveIdx;
+  }
+  openBoxPokeModal(boxId);
+}
+
 function forgetBoxMove(boxId, moveIdx){
   const p = G.collection[boxId] || G.collection[String(boxId)];
-  if(!p||(p.moves||[]).length<=1){setMsg('Un Pokémon doit conserver au moins une capacité.');return;}
+  if(!p||(p.moves||[]).length<=1){ notify(t("n.un_pokémon_doit_conserver_au_moins_une_c")); return; }
   const removed=p.moves.splice(moveIdx,1)[0];
-  notify(`${p.name} oublie ${getMoveName(removed.id)||removed.id}.`);
+  notify(tr("m.move_learning.1", {p0:p.name, p1:getMoveName(removed.id)||removed.id}));
+  boxMoveReplaceSlot = null;
   saveGame();
   openBoxPokeModal(boxId);
 }
@@ -144,10 +163,21 @@ function learnBoxMove(boxId, moveId){
   const p = G.collection[boxId] || G.collection[String(boxId)];
   if(!p) return;
   if(!p.moves) p.moves=[];
-  if(p.moves.length>=4){setMsg('Capacités pleines (4). Oubliez-en une d\'abord.');return;}
+  // Replace if slot selected
+  if(boxMoveReplaceSlot !== null && p.moves[boxMoveReplaceSlot]){
+    const oldId = p.moves[boxMoveReplaceSlot].id;
+    p.moves[boxMoveReplaceSlot] = {id:moveId};
+    notify(tr("m.move_learning.2", {p0:p.name, p1:getMoveName(moveId)||moveId, p2:getMoveName(oldId)||oldId}));
+    boxMoveReplaceSlot = null;
+    saveGame();
+    openBoxPokeModal(boxId);
+    return;
+  }
+  // Add if room
+  if(p.moves.length>=4){ notify(t("n.capacités_pleines_4_oubliezen_une_dabord")); return; }
   if(p.moves.find(m=>m.id===moveId)) return;
-  p.moves.push({id:moveId,pp:MOVES[moveId]?.pp||10,maxPP:MOVES[moveId]?.pp||10});
-  notify(`✅ ${p.name} apprend ${getMoveName(moveId)||moveId} !`);
+  p.moves.push({id:moveId});
+  notify(tr("m.move_learning.3", {p0:p.name, p1:getMoveName(moveId)||moveId}));
   saveGame();
   openBoxPokeModal(boxId);
 }
@@ -162,8 +192,8 @@ function tryBoxStoneEvo(boxId, stoneKey){
   const p = G.collection[boxId] || G.collection[String(boxId)];
   if(!p) return;
   const evo = STONE_EVO[p.id]?.[stoneKey];
-  if(!evo){ setMsg("Cet objet n'a aucun effet sur ce Pokémon."); return; }
-  if((G.inventory[stoneKey]||0)<1){ setMsg("Pierre manquante."); return; }
+  if(!evo){ notify(t("n2.cet_objet_na_aucun_effet_sur_ce_pokémon")); return; }
+  if((G.inventory[stoneKey]||0)<1){ notify(t("n.pierre_manquante")); return; }
   G.inventory[stoneKey]--;
   if(G.inventory[stoneKey]<=0) delete G.inventory[stoneKey];
   const shinyUnlock = !!(p.shinyUnlocked || p.shinyActive || p.shiny || isSpeciesShiny(evo));
@@ -182,7 +212,7 @@ function tryBoxStoneEvo(boxId, stoneKey){
       onInventoryClick(stoneKey);
     } else {
       openBoxPokeModal(evo);
-      showTab('box');
     }
   }
 }
+

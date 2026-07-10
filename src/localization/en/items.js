@@ -221,3 +221,4 @@ window.L_en_items = {
   "desc": "Key item: awakens Lugia at Whirl Islands."
  }
 };
+

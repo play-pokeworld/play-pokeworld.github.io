@@ -83,3 +83,4 @@ function triggerEntryTalents(side){
   }
   if(typeof updateBattleUI === 'function') updateBattleUI();
 }
+

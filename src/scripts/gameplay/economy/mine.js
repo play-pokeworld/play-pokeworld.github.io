@@ -54,9 +54,13 @@ function generateMineLayer(){
 
   // --- Fossiles régionaux : Kanto d'abord, Johto après déblocage ---
   const region = (G && G.region) ? G.region : 'kanto';
-  const johtoUnlocked = region==='johto' || (G.badges && G.badges.length>=8);
+  // Region gating: Johto fossils only appear once the player has travelled to Johto.
+  // Kanto fossils (helix/dome/amber) are always available.
+  const johtoVisited = (region === 'johto') || (G.regionStarter && G.regionStarter.johto) ||
+                       (G.badges && G.badges.length >= 8) ||
+                       (G.visitedMaps && (G.visitedMaps.newbark || G.visitedMaps.jroute29));
   const minePool = MINE_ITEMS.filter(it=>{
-    if(!johtoUnlocked && (it.key==='root_fossil' || it.key==='claw_fossil')) return false;
+    if(!johtoVisited && (it.key==='root_fossil' || it.key==='claw_fossil')) return false;
     return true;
   });
   for(let i=0; i<numItems; i++){
@@ -178,3 +182,4 @@ function digMineTile(tx, ty){
   const content = document.getElementById('tab-content');
   if(document.querySelector('.tab.active')?.textContent.includes('Mine')) renderMine(content);
 }
+

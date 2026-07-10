@@ -89,17 +89,23 @@ function advanceQuests(type, loc, amount){
   ensureQuestState();
   const amt = amount||1;
   const region = G.region || 'kanto';
+  // Helper : vérifie si une quête "defeat_wild"/"catch" avec un champ `loc`
+  // doit être comptée pour le lieu courant. Les routes scindées (ex: route2 /
+  // route2_south) partagent le même groupe et sont comptées ensemble.
+  function locMatches(def, type, loc){
+    if(type !== 'defeat_wild' && type !== 'catch') return true;
+    if(!def.loc) return true;                 // pas de lieu imposé → compte partout
+    return locGroup(def.loc) === locGroup(loc);
+  }
   // 1) Quête principale de la région COURANTE uniquement
   const mainInst = G.activeQuests.find(i=>i.cat==='main');
   if(mainInst){
     const def = getMainQuestDef(mainInst.qid);
     if(def && def.region===region && def.type===type && !mainInst.done){
-      // 'defeat_wild' compte tous les Pokémon sauvages vaincus, peu importe le
-      // lieu (style « battre des pokemons ») : une quête comme « 3 combats » est
-      // donc toujours réalisable, même sur une ville sans sauvages (ex: newbark).
-      const locMatch = (type!=='catch') || !def.loc || locGroup(def.loc)===locGroup(loc);
-      if(locMatch) mainInst.progress = (mainInst.progress||0) + amt;
-      G.mainProgress[region] = mainInst.progress; // miroir pour la persistance inter-régions
+      if(locMatches(def, type, loc)){
+        mainInst.progress = (mainInst.progress||0) + amt;
+        G.mainProgress[region] = mainInst.progress;
+      }
     }
   }
   // 2) Quêtes secondaires + répétables
@@ -111,9 +117,7 @@ function advanceQuests(type, loc, amount){
       if(inst.cat==='main') continue;
       if(inst.done) continue;
       if(def.type!==type) continue;
-      if(type==='catch'){
-        if(def.loc!=null && locGroup(def.loc)!==locGroup(loc)) continue;
-      }
+      if(!locMatches(def, type, loc)) continue;
       inst.progress = (inst.progress||0) + amt;
     }
   }
@@ -213,4 +217,5 @@ EventBus.on(EVENTS.POKEMON_CAUGHT, ({loc})  => { advanceQuests('catch', loc, 1);
 EventBus.on(EVENTS.MINE_SELL,      ({amount}) => { advanceQuests('mine_sell', null, amount); _refreshUI(); });
 EventBus.on(EVENTS.BADGE_EARNED,   () => { advanceQuests('badge', null, 1); _refreshUI(); });
 EventBus.on(EVENTS.LEAGUE_WON,     () => { advanceQuests('league', null, 1); _refreshUI(); });
+
 

@@ -1,6 +1,18 @@
 // ============================================================
 // MINE UI — (split from mine.js)
 // ============================================================
+
+function renderMineWindow(){
+  const el = document.getElementById('mine-window-body');
+  if(!el) return;
+  const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
+  if(!mineUnlocked()){
+    el.innerHTML = `<div style="text-align:center;padding:10px;color:var(--dim);font-size:11px;">🔒 ${lang==='en'?'Mine locked (2 Badges required)':'Mine verrouillée (2 Badges requis)'}</div>`;
+    return;
+  }
+  renderMine(el);
+}
+
 function renderMine(el){
   initMineIfNeeded();
   const {energy, maxEnergy, tool, grid, items} = G.mine;
@@ -80,7 +92,7 @@ function renderMine(el){
         ${items.map(i=>`<span style="margin-right:10px;${i.collected?'color:var(--green);font-weight:bold':''}">${i.collected?'✅':'❓'} ${getItemName(i.key)}</span>`).join('')}
       </div>
     </div>
-    <button class="hbtn" style="background:var(--blue);color:#fff" onclick="generateMineLayer(); renderMine(document.getElementById('tab-content'));">${t('mine_new_layer')}</button>
+    <button class="hbtn" style="background:var(--blue);color:#fff" onclick="generateMineLayer(); renderMineWindow();">${t('mine_new_layer')}</button>
   </div>`;
 }
 
@@ -112,3 +124,4 @@ function renderMine(el){
 
 // Cooldown (ms) before a Pokémon's next auto-attack, scaled by its effective Speed
 // (base Speed stat, adjusted by paralysis and any temporary buffs/debuffs).
+

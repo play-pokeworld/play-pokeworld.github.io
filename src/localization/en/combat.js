@@ -10,3 +10,4 @@ window.L_en_combat = {
   "live_loot": "🎁 Live Loot:",
   "no_loot_yet": "No loot collected yet.",
 };
+

@@ -56,7 +56,7 @@ function renderLocInfo(el){
     if(loc.shopId === 'indigo' && !G.championTitle){
       html+=`<div class="action-btn disabled" title="${lang==='en'?'Requires winning Kanto League':'Nécessite d\'avoir vaincu la Ligue Kanto'}"><span class="ab-icon">🔒</span><span class="ab-label">${t('tab_shop')} (${lang==='en'?'Locked: League Champion only':'Verrouillé : Maître Ligue uniquement'})</span></div>`;
     } else {
-      html+=`<div class="action-btn" onclick="showTab('shop')"><span class="ab-icon">🛒</span><span class="ab-label">${t('tab_shop')}</span></div>`;
+      html+=`<div class="action-btn" onclick="openFullscreenPanel('shop')"><span class="ab-icon">🛒</span><span class="ab-label">${t('tab_shop')}</span></div>`;
     }
   }
 
@@ -76,6 +76,36 @@ function renderLocInfo(el){
   // Pokémon Centers removed: your team auto-heals at the start of every battle.
 
   html+=`</div>`;
+
+  // --- Compteur de déblocage de la prochaine zone ---
+  // Si ce lieu verrouille des voisins (route/dungeon avec minWins > 0),
+  // afficher une barre "x / y combats avant le déblocage de la prochaine zone".
+  if(loc.type!=='town' && (loc.minWins||0) > 0 && loc.wild && loc.wild.length){
+    const curWins = ((G.wildWinsByLoc||{})[G.location]||0);
+    const need = loc.minWins;
+    // Quelles zones ce lieu débloque-t-il ? (voisins pas encore atteignables
+    // parce que CE lieu n'est pas encore "cleared")
+    const nextZones = [];
+    for(const c of (loc.conn||[])){
+      if(c === G.location) continue;
+      const cLoc = getLocObj(c);
+      if(!cLoc) continue;
+      // n'est pas encore atteignable depuis le départ
+      if(!locReachable(c)) nextZones.push(getLocName(c));
+    }
+    if(curWins < need){
+      const pct = clamp(Math.floor((curWins / need) * 100), 0, 100);
+      const zoneTxt = nextZones.length ? nextZones.slice(0,2).join(', ') : (lang==='en'?'the next zone':'la prochaine zone');
+      html += `<div style="background:rgba(255,215,0,0.08);border:1px solid var(--gold);padding:8px 10px;border-radius:8px;margin:8px 0;">
+        <div style="font-size:11px;color:var(--gold);font-weight:bold;margin-bottom:4px;">
+          ⚔️ ${curWins} / ${need} ${lang==='en'?'battles':'combats'} — ${lang==='en'?'to unlock':'avant le déblocage de'} ${zoneTxt}
+        </div>
+        <div style="height:8px;background:#221e1c;border-radius:4px;overflow:hidden;border:1px solid #111;">
+          <div style="width:${pct}%;background:var(--gold);height:100%;transition:width .3s;"></div>
+        </div>
+      </div>`;
+    }
+  }
 
   const roamingId = getRoamingLegendaryForRoute(G.location);
   if(roamingId){
@@ -164,3 +194,4 @@ function typeLabel(typ){
 // ============================================================
 // EXPLORE (wild encounter — items & captures both happen via combat)
 // ============================================================
+

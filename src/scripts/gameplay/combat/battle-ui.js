@@ -63,14 +63,25 @@ function updateBattleUI(){
   const eUnder = document.getElementById('e-under-sprite');
   if(eUnder){
     const eBadges = [];
+    // Status effect
     if(e.status) eBadges.push(`<span class="battle-status" style="background:${statusColor(e.status)};color:#fff;font-size:10px;font-weight:bold;padding:2px 6px;border-radius:3px;">${statusLabel(e.status)}</span>`);
+    // Buff/debuff arrows
+    const eAtkMod = battle.enemyMods?.atk || 1;
+    const eDefMod = battle.enemyMods?.def || 1;
+    const eSpeMod = battle.enemyMods?.spe || 1;
     const eb = getHeldBuff(e);
-    if(eb.atk || (battle.enemyMods && battle.enemyMods.atk > 1)) eBadges.push(`<span style="background:#d32f2f;color:#fff;font-size:9px;font-weight:bold;padding:2px 5px;border-radius:3px;">ATK ▲</span>`);
-    if(eb.def || (battle.enemyMods && battle.enemyMods.def > 1)) eBadges.push(`<span style="background:#1976d2;color:#fff;font-size:9px;font-weight:bold;padding:2px 5px;border-radius:3px;">DEF ▲</span>`);
-    if(eb.spe || (battle.enemyMods && battle.enemyMods.spe > 1)) eBadges.push(`<span style="background:#f57c00;color:#fff;font-size:9px;font-weight:bold;padding:2px 5px;border-radius:3px;">VIT ▲</span>`);
+    const getArrowCount = (val) => { if(val > 1.8) return '▲▲▲'; if(val > 1.3) return '▲▲'; if(val > 1.0) return '▲'; if(val < 0.5) return '▼▼▼'; if(val < 0.75) return '▼▼'; if(val < 1.0) return '▼'; return ''; };
+    const atkArrow = getArrowCount(eAtkMod);
+    const defArrow = getArrowCount(eDefMod);
+    const speArrow = getArrowCount(eSpeMod);
+    if(atkArrow) eBadges.push(`<span style="background:${atkArrow.includes('▲')?'#d32f2f':'#555'};color:#fff;font-size:9px;font-weight:bold;padding:2px 5px;border-radius:3px;">ATK ${atkArrow}</span>`);
+    if(defArrow) eBadges.push(`<span style="background:${defArrow.includes('▲')?'#1976d2':'#555'};color:#fff;font-size:9px;font-weight:bold;padding:2px 5px;border-radius:3px;">DEF ${defArrow}</span>`);
+    if(speArrow) eBadges.push(`<span style="background:${speArrow.includes('▲')?'#f57c00':'#555'};color:#fff;font-size:9px;font-weight:bold;padding:2px 5px;border-radius:3px;">VIT ${speArrow}</span>`);
     eUnder.innerHTML = eBadges.join('');
   }
 
+  // Player status & buff display — now rendered inside the active hero card by renderBattleTeamRow
+  // Just re-render the team row to show updated badges
   renderBattleTeamRow();
   try{ renderBattleSummary(); }catch(_){}
 }
@@ -91,7 +102,7 @@ function renderMoveButtons(){
     const eff=battle.enemyPoke?typeEff(mv.type,battle.enemyPoke.type1,battle.enemyPoke.type2):1;
     const effHint=eff===0?'⛔':eff>=2?'⚡':eff<=0.5?'👎':'';
     const isNext=i===nextIdx;
-    return `<div class="auto-move${isNext?' next-up':''}" data-move-id="${m.id}" data-idx="${i}">
+    return `<div class="auto-move${isNext?' next-up':''}" data-move-id="${m.id}" data-idx="${i}" oncontextmenu="event.preventDefault();openMoveInfo('${m.id}');return false;" title="Clic droit : info">
       <div class="am-top">
         <span>${i+1}. ${getMoveName(m.id)} ${effHint}</span>
         <span class="am-type" style="background:${TYPE_COLORS[mv.type]||'#888'}">${mv.type}</span>
@@ -162,3 +173,4 @@ function setBattleSpeed(n){
 
 // Ticks every 100ms; both sides' cooldowns run independently and in real time.
 // Taking damage NEVER pauses a cooldown — only KO transitions pause briefly.
+

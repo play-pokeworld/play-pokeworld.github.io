@@ -159,3 +159,4 @@ function startTrainingBattle(mode='ev'){
 }
 
 
+

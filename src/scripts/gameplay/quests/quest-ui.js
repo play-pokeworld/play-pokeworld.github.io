@@ -126,7 +126,18 @@ function closeQuestModal(){
   const m=document.getElementById('quest-modal'); if(m) m.classList.remove('open');
 }
 function rollRepeatables(){
-  const pool = REPEATABLE_QUESTS.slice();
+  ensureQuestState();
+  const johtoVisited = (G.region === 'johto') || (G.regionStarter && G.regionStarter.johto) ||
+                       (G.badges && G.badges.length >= 8) ||
+                       (G.visitedMaps && (G.visitedMaps.newbark || G.visitedMaps.jroute29));
+  // Filter the pool: only include Johto-location quests if Johto has been visited.
+  const pool = REPEATABLE_QUESTS.filter(q => {
+    if(!q.loc) return true; // global quests always available
+    // Johto locations start with 'j' or are known Johto dungeons
+    const isJohtoLoc = q.loc.startsWith('j') || ['darkcave','ilexforest','slowpokewell','unioncave','ruinsofalph','burnedtower','tintower','mtmortar','icepath','whirlislands','sprouttower','mtsilver'].includes(q.loc);
+    if(isJohtoLoc && !johtoVisited) return false;
+    return true;
+  }).slice();
   _repeatableRoll = [];
   for(let i=0;i<3 && pool.length;i++){
     const r = Math.floor(Math.random()*pool.length);
@@ -183,5 +194,6 @@ function acceptRepeatable(i){
   const lang=G.lang||'fr';
   notify(t("m.quest_ui.1"),'var(--purple)');
 }
+
 
 

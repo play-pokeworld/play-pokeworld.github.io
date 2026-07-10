@@ -77,3 +77,4 @@ window.L_location_names_fr = {
   "viridian": "Jadielle",
   "viridianforest": "Forêt Jadielle",
 };
+

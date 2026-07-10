@@ -1,33 +1,21 @@
 // ===== extracted from src/scripts/gameplay/mine.js =====
 const MARKET_STOCK = {
   kanto: [
-    // Starters Kanto - base only, non-wild
+    // Starters
     1,4,7,
-    // Cadeaux / rares Kanto - pas d'évolutions, pas de sauvage
-    133, // Evoli
-    137, // Porygon
-    138, // Amonita (fossile - aussi trouvable en mine)
-    140, // Kabuto (fossile)
-    142, // Ptera
-    106, // Kicklee
-    107, // Tygnon
-    122  // M.Mime
+    // Gifts / event-only (not wild in any game)
+    // Fossils (138,140,142) are obtainable via Mine + Hatchery — removed from market
+    133,137,106,107,122
   ],
   johto: [
-    // Starters Johto
+    // Starters
     152,155,158,
-    // Bébés / rares Johto - formes de base uniquement, non sauvages dans le jeu
-    175, // Togepi
-    236, // Debugant
-    179, // Wattouat
-    183, // Marill
-    187, // Granivol
-    190, // Capumain
-    194, // Axoloto
-    209, // Snubbull
-    216, // Teddiursa
-    228, // Malosse
-    231  // Phanpy
+    // Babies (not wild in any game)
+    172,173,174,175,236,
+    // Happiness-evo only (Espeon/Umbreon need friendship, not implemented)
+    196,197,
+    // Gift-only or bugged evo
+    199,213,238,239,240
   ]
 };
 
@@ -161,8 +149,17 @@ function buyPokemon(id){
   G.pokedex[id]={...(G.pokedex[id]||{}),seen:true,caught:true};
   if(isShiny) G.pokedex[id].shiny=true;
   saveGame();
-  renderMarket(document.getElementById('tab-content'));
+  // Refresh the market in whatever container it's currently displayed in
+  const fsContent = document.getElementById('fs-panel-content');
+  const tabContent = document.getElementById('tab-content');
+  if(fsContent && document.getElementById('fullscreen-panel-modal')?.style.display === 'flex'){
+    renderMarket(fsContent);
+  } else if(tabContent){
+    renderMarket(tabContent);
+  }
   updateHeader();
+  renderTeamWindow();
 }
+
 
 

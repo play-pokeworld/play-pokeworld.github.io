@@ -48,7 +48,7 @@ function getEvolutionMethodsHtml(id){
     const targetId = LEVEL_EVO_MAP[nid];
     const targetName = getPokeName(targetId);
     methods.push(`<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-      <span>📈 <b>${t("m.progression.8")}</b> ${t("m.progression.7")} <b>${targetName}</b></span>
+      <span>📈 <b>${t("m.progression.8")}</b> ${tr("m.progression.7", {lvl: EVO_LEVELS[nid]})} <b>${targetName}</b></span>
     </div>`);
   }
   
@@ -173,5 +173,6 @@ function tryStoneEvo(teamIdx, stoneKey){
     }
   }
 }
+
 
 

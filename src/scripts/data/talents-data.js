@@ -31,3 +31,4 @@ var TALENT_DATA = {
  "technician": {},
  "noguard": {}
 };
+

@@ -50,3 +50,4 @@ window.MOVE_NAMES_EN = (typeof L_move_names_en !== 'undefined') ? L_move_names_e
 // Location names per language.
 window.LOC_NAMES_FR = (typeof L_location_names_fr !== 'undefined') ? L_location_names_fr : {};
 window.LOC_NAMES_EN = (typeof L_location_names_en !== 'undefined') ? L_location_names_en : {};
+

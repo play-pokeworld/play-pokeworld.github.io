@@ -43,7 +43,7 @@ window.L_en_quests = {
   },
   "3": {
    "title": "Cerulean Nugget Bridge",
-   "desc": "In Cerulean City, defeat Misty for the Cascade Badge, or win 5 battles on Nugget Bridge (Road 24/25)!",
+   "desc": "In Cerulean City, defeat Misty at her Gym to earn the Cascade Badge!",
    "rewardDesc": "2,500₽ + 1 Gold Nugget"
   },
   "44": {
@@ -457,3 +457,4 @@ window.L_en_quests = {
   }
  }
 };
+

@@ -56,3 +56,4 @@ var LOCS_JOHTO = {
   blackthorn:  {name:'Ébénelle',         type:'town',    x:1136,y:256,w:64,h:64, conn:['jroute44','jroute45'],               wild:[], shopId:'jblackthorn', champ:'clair', badgeReq:7},
   jroute45:    {name:'Route 45',      type:'route',   x:1144,y:352,w:48,h:288, conn:['blackthorn'],                        wild:[[74,25,32,'common'], [75,26,33,'common'], [147,26,35,'rare']], shopId:null, champ:null, badgeReq:7},
 };
+

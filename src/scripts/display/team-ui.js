@@ -111,3 +111,4 @@ function aliveCount(){return G.team.filter(p=>p.currentHP>0).length;}
 
 function firstAlive(){return G.team.findIndex(p=>p.currentHP>0);}
 
+

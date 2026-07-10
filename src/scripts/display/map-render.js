@@ -113,6 +113,18 @@ function clickLocation(id){
   const loc=getLocObj(id);
   if(!loc) return;
   const lang_st = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
+  // --- Stop any active battle when travelling (prevents bugs) ---
+  if(typeof battle !== 'undefined' && battle && battle.active && id !== G.location){
+    if(typeof endBattle === 'function'){
+      endBattle();
+    } else if(typeof doLeaveBattle === 'function'){
+      doLeaveBattle();
+    } else {
+      battle.active = false;
+      if(battle.timerId) clearInterval(battle.timerId);
+    }
+    if(typeof openBattleSummary === 'function') openBattleSummary(false);
+  }
   // --- Blocage Starter Route 1 / Route 29 ---
   if(id==='route1'){
     const has = !!(G.starterKanto || G.starter || (G.regionStarter && G.regionStarter.kanto));
@@ -179,3 +191,4 @@ function refreshMapAndLoc(){
   try{ if(document.getElementById('map-svg')) renderMap(); }catch(e){}
   try{ if(_activeTab==='info'){ const tc=document.getElementById('tab-content'); if(tc) renderLocInfo(tc); } }catch(e){}
 }
+

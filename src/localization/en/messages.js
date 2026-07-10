@@ -147,7 +147,7 @@ window.L_en_messages = {
   "m.progression.4": "Evolution Method:",
   "m.progression.5": "Use",
   "m.progression.6": "Stone / Item:",
-  "m.progression.7": "Evolves at <b>Level '+EVO_LEVELS[nid]+'</b> into",
+  "m.progression.7": "Evolves at <b>Level {lvl}</b> into",
   "m.progression.8": "Level Up:",
   "m.progression.9": "💡 {p0} learned {p1} at Level {p2}!",
   "m.quest_core.1": "🎉 Quest complete! Reward received!",
@@ -306,4 +306,8 @@ window.L_en_messages = {
   "n2.pas_assez_dargent": "Not enough money!",
   "n2.switch_impossible_votre_pokémon_sentraîn": "🔒 Cannot switch: your Pokémon is training solo at the Dojo!",
   "n2.combat_en_cours_terminez_ou_quittez_dabo": "❌ Combat in progress! Finish or leave the current battle first.",
+  "m.move_learning.1": "{p0} forgot {p1}.",
+  "m.move_learning.2": "{p0} learned {p1}, replacing {p2}!",
+  "m.move_learning.3": "{p0} learned {p1}!",
 };
+

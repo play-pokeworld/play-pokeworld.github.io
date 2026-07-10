@@ -720,3 +720,19 @@ if errorlevel 1 (
 )
 exit /b 0
 
+
+REM ============================================================
+REM Step 3/3 : Map background images (for offline play)
+REM ============================================================
+if not exist "%ROOT%\src\assets\images\maps" mkdir "%ROOT%\src\assets\images\maps"
+
+REM Map images are game-specific art, not available on PokeAPI.
+REM They are bundled as PNG in the project under src/assets/images/maps/.
+REM If missing, the game falls back to the inline base64 data URI in map-images.js.
+
+echo.
+echo ============================================================
+echo Map images are bundled PNGs (src/assets/images/maps/).
+echo If missing, download from the project repository.
+echo ============================================================
+

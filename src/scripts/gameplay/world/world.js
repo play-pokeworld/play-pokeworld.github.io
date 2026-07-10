@@ -65,10 +65,13 @@ function updateHeader(){
   try{ renderStoryWindow(); }catch(_){}
   try{ renderHatcheryWindow(); }catch(_){}
   try{ renderTrainingWindow(); }catch(_){}
+  try{ renderMineWindow(); }catch(_){}
   try{ renderAutomationWindow(); }catch(_){}
+  try{ renderShortcutsWindow(); }catch(_){}
 }
 
 // ============================================================
 // MAP RENDER
 // ============================================================
+
 

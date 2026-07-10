@@ -137,3 +137,4 @@ function checkStarterNeeded(){
 
 // --- Bouton "?" + fenêtre d'aide au code couleur de la carte ---
 
+

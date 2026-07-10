@@ -58,7 +58,15 @@ function buyItem(key){
   addToInventory(key,1);
   updateHeader();
   notify(`✅ ${getItemName(key)} acheté !`);
-  renderShop(document.getElementById('tab-content'));
+  // Refresh in the right container
+  const fsContent = document.getElementById('fs-panel-content');
+  const tabContent = document.getElementById('tab-content');
+  if(fsContent && document.getElementById('fullscreen-panel-modal')?.style.display === 'flex'){
+    renderShop(fsContent);
+  } else if(tabContent){
+    renderShop(tabContent);
+  }
 }
+
 
 

@@ -78,9 +78,10 @@ window.L_en_ui = {
   "wild_poke": "🌿 Wild Pokémon",
   "win_battle": "⚔️ Live Battle (PokéChill)",
   "win_map": "🗺️ Kanto Map",
-  "win_tabs": "📑 Menus & Management",
+  "win_tabs": "📍 Location",
   "win_team": "⚡ Active Party",
   "xp_lbl": "XP:",
   "lang_switched_fr": "🇫🇷 Language switched to French!",
   "lang_switched_en": "🇬🇧 Language switched to English!",
 };
+

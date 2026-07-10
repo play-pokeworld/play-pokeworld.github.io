@@ -77,3 +77,4 @@ window.L_location_names_en = {
   "viridian": "Viridian City",
   "viridianforest": "Viridian Forest",
 };
+

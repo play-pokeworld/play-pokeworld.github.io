@@ -147,7 +147,7 @@ window.L_fr_messages = {
   "m.progression.4": "Méthode d'évolution :",
   "m.progression.5": "Avec",
   "m.progression.6": "Par Objet :",
-  "m.progression.7": "Évolue au <b>Niveau '+EVO_LEVELS[nid]+'</b> en",
+  "m.progression.7": "Évolue au <b>Niveau {lvl}</b> en",
   "m.progression.8": "Par Niveau :",
   "m.progression.9": "💡 {p0} apprend {p1} au Niveau {p2} !",
   "m.quest_core.1": "🎉 Quête terminée ! Récompense reçue !",
@@ -306,4 +306,8 @@ window.L_fr_messages = {
   "n2.pas_assez_dargent": "Pas assez d'argent !",
   "n2.switch_impossible_votre_pokémon_sentraîn": "🔒 Switch impossible : votre Pokémon s'entraîne en solo au Dojo !",
   "n2.combat_en_cours_terminez_ou_quittez_dabo": "❌ Combat en cours ! Terminez ou quittez d'abord le combat actuel.",
+  "m.move_learning.1": "{p0} oublie {p1}.",
+  "m.move_learning.2": "{p0} apprend {p1} à la place de {p2} !",
+  "m.move_learning.3": "{p0} apprend {p1} !",
 };
+

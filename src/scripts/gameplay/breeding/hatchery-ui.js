@@ -120,3 +120,4 @@ function renderFossilLabCompact(el){
   // reuse main fossil lab renderer – it fits in hatchery window
   if(typeof renderFossilLab === 'function') renderFossilLab(el);
 }
+

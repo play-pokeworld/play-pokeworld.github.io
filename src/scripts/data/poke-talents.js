@@ -167,3 +167,4 @@ var POKE_TALENTS = {
   250:['sturdy','regenerator','solarpower'],
   251:['naturalcure','serenegrace','magicguard'],
 };
+

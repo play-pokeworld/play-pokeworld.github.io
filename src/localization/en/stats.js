@@ -9,3 +9,4 @@ window.L_en_stats = {
   "stat_spd": "Sp. Def",
   "stat_spe": "Speed",
 };
+

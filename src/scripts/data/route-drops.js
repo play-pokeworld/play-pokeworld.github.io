@@ -10,3 +10,4 @@ const ROUTE_DROPS = {
   route19:['berry_oran','berry_ceriz'], route21:['berry_oran','berry_sitrus'],
   route23:['berry_sitrus','berry_prine','berry_ceriz'],
 };
+

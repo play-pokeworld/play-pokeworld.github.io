@@ -5,6 +5,14 @@ var _usmSort = 'id';
 var _usmSubTab = 'box';
 
 function openUnifiedSelectorModal(actionType){
+  // Close other modals first (no overlap)
+  closeFullscreenPanel();
+  if(typeof closeBattleSummary === 'function') closeBattleSummary();
+  const qm = document.getElementById('quest-modal');
+  if(qm) qm.classList.remove('open');
+  const sm = document.getElementById('settings-modal');
+  if(sm) sm.classList.remove('open');
+
   if(typeof battle !== 'undefined' && battle && battle.active && actionType === 'training'){
     notify(t("n2.combat_en_cours_terminez_dabord_votre_af"), "var(--red)");
     return;
@@ -37,28 +45,32 @@ function filterUnifiedGrid(){ renderUnifiedGrid(); }
 function renderUnifiedGrid(){
   const grid = document.getElementById('usm-grid');
   const searchInput = document.getElementById('usm-search');
+  const subtabBar = document.getElementById('usm-subtab-bar');
   if(!grid) return;
   const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
   const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
   const isEn = lang === 'en';
 
-  // Build navigation tabs for box_view and hatchery actions
+  // Build navigation tabs — render in the STICKY subtab bar (above scroll area)
   const showFossilTab = (_usmAction === 'box_view' || _usmAction === 'hatchery');
-  let tabBarHtml = '';
-  if(showFossilTab){
-    tabBarHtml = `<div style="display:flex;gap:6px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #4a3820;">
-      <button class="hbtn usm-subtab-btn" style="flex:1;padding:8px;font-size:13px;font-weight:bold;${_usmSubTab==='box'?'background:var(--blue);color:#fff;':''}" onclick="_usmSubTab='box';renderUnifiedGrid()">${isEn?'📦 Box':'📦 Boîte'}</button>
-      <button class="hbtn usm-subtab-btn" style="flex:1;padding:8px;font-size:13px;font-weight:bold;${_usmSubTab==='fossil'?'background:var(--gold);color:#000;':''}" onclick="_usmSubTab='fossil';renderUnifiedGrid()">🦴 ${isEn?'Fossils':'Fossiles'}</button>
-    </div>`;
+  if(subtabBar){
+    if(showFossilTab){
+      subtabBar.style.display = 'flex';
+      subtabBar.innerHTML = `<button class="hbtn usm-subtab-btn" style="flex:1;padding:8px;font-size:13px;font-weight:bold;${_usmSubTab==='box'?'background:var(--blue);color:#fff;':''}" onclick="_usmSubTab='box';renderUnifiedGrid()">${isEn?'📦 Box':'📦 Boîte'}</button>
+        <button class="hbtn usm-subtab-btn" style="flex:1;padding:8px;font-size:13px;font-weight:bold;${_usmSubTab==='fossil'?'background:var(--gold);color:#000;':''}" onclick="_usmSubTab='fossil';renderUnifiedGrid()">🦴 ${isEn?'Fossils':'Fossiles'}</button>`;
+    } else {
+      subtabBar.style.display = 'none';
+      subtabBar.innerHTML = '';
+    }
   }
 
   // FOSSIL TAB
   if(showFossilTab && _usmSubTab === 'fossil'){
-    grid.innerHTML = tabBarHtml + renderFossilTabContent(isEn);
+    grid.innerHTML = renderFossilTabContent(isEn);
     return;
   }
 
-  // BOX TAB (original behavior)
+  // BOX TAB
   let list = [];
   if(_usmAction !== 'hatchery'){
     G.team.forEach((p, idx) => {
@@ -88,11 +100,11 @@ function renderUnifiedGrid(){
   });
 
   if(!list.length){
-    grid.innerHTML = tabBarHtml + `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--dim)">${isEn?'No Pokémon found.':'Aucun Pokémon trouvé.'}</div>`;
+    grid.innerHTML =  `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--dim)">${isEn?'No Pokémon found.':'Aucun Pokémon trouvé.'}</div>`;
     return;
   }
 
-  grid.innerHTML = tabBarHtml + list.map(({p, loc, idStr, teamIdx}) => {
+  grid.innerHTML =  list.map(({p, loc, idStr, teamIdx}) => {
     const isShiny = p.shinyUnlocked || p.shinyActive || p.shiny || isSpeciesShiny(p.id);
     const totalIv = Object.values(p.ivs||{}).reduce((x,y)=>x+y,0);
     const totalEv = Object.values(p.evs||{}).reduce((x,y)=>x+y,0);
@@ -185,6 +197,41 @@ function sendFossilToHatchery(fossilKey){
   renderUnifiedGrid();
 }
 function selectUnifiedCard(loc, idStr){
+  // ---- TEAM SWAP MODE (from clicking a team card) ----
+  if(typeof _swapFromTeamIdx !== 'undefined' && _swapFromTeamIdx !== null){
+    let p = null;
+    if(loc === 'team'){
+      p = G.team[Number(idStr)];
+    } else {
+      p = G.collection[idStr];
+    }
+    if(!p) return;
+    if(typeof battle !== 'undefined' && battle && battle.active){
+      notify("🔒 Impossible d'échanger pendant un combat !", "var(--red)");
+      return;
+    }
+    const fromIdx = _swapFromTeamIdx;
+    _swapFromTeamIdx = null;
+    if(loc === 'team'){
+      // Swap two team members
+      const toIdx = Number(idStr);
+      if(fromIdx === toIdx) return;
+      const tmp = G.team[fromIdx];
+      G.team[fromIdx] = G.team[toIdx];
+      G.team[toIdx] = tmp;
+    } else {
+      // Replace team member with box pokemon
+      const oldPoke = G.team[fromIdx];
+      G.team[fromIdx] = p;
+      G.collection[idStr] = oldPoke;
+    }
+    closeUnifiedSelectorModal();
+    saveGame();
+    renderTeamWindow();
+    notify(`⚡ Équipe mise à jour !`, 'var(--green)');
+    return;
+  }
+
   if(_usmAction === 'box_view'){ return; }
   let p = null;
   if(loc === 'team'){
@@ -221,3 +268,4 @@ function selectUnifiedCard(loc, idStr){
     notify(`🥚 ${p.name} déposé à la pension ! Combattez pour faire éclore.`, 'var(--blue)');
   }
 }
+
