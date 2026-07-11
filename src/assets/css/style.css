@@ -302,6 +302,9 @@ body { font-size: 13px !important; }
   flex-direction: column;
 }
 
+.team-view .hp-bar-container,
+.team-view .hp-text { display: none !important; }
+
 /* ============================================================
    CARTES POKÉMON
    ============================================================ */
