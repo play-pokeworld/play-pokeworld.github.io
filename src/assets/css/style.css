@@ -70,7 +70,7 @@ body {
   overflow-x: hidden;
 }
 
-/* --- ARRIÈRE-PLAN ANIMÉ (restauré) --- */
+/* --- ARRIÈRE-PLAN ANIMÉ (body, scale infini avec repeat-x) --- */
 body::before {
   content: '';
   position: fixed;
