@@ -8,9 +8,29 @@
   <!-- Use:  python3 -m http.server 8000   then open http://localhost:8000/ -->
 </head>
 <body>
+<!-- SVG Filters for Pokédex silhouettes (no canvas CORS issues) -->
+<svg style="position:absolute;width:0;height:0;pointer-events:none;">
+  <defs>
+    <filter id="silhouette-filter">
+      <feColorMatrix type="matrix" values="
+        0 0 0 0 0.1
+        0 0 0 0 0.1
+        0 0 0 0 0.1
+        0 0 0 1 0"/>
+    </filter>
+    <filter id="silhouette-filter-light">
+      <feColorMatrix type="matrix" values="
+        0 0 0 0 0.15
+        0 0 0 0 0.15
+        0 0 0 0 0.15
+        0 0 0 1 0"/>
+    </filter>
+  </defs>
+</svg>
+
 <div id="header">
   <h1>⚡ PokéWorld</h1>
-  <div class="hinfo" style="margin-left:auto;">💰 <span id="h-money">1000</span>₽ &nbsp;|&nbsp; 🏅 <span id="h-badges">0</span>/8 badges</div>
+  <div class="hinfo" style="margin-left:auto;"> <span id="h-money">1000</span>₽ &nbsp;|&nbsp;  <span id="h-badges">0</span>/8 badges</div>
   <button class="hbtn" id="settings-btn" onclick="openSettings()">⚙️</button>
 </div>
 
@@ -50,10 +70,10 @@
       </div>
       <input type="file" id="import-file" accept=".json,application/json" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none" onchange="importSave(event)">
       <div class="settings-row" id="delete-row">
-        <button class="hbtn" onclick="confirmDelete()" style="background:var(--red);border-color:var(--red);color:#fff">🗑 Supprimer la sauvegarde</button>
+        <button class="hbtn" onclick="confirmDelete()" style="background:var(--red);border-color:var(--red);color:var(--light2)">🗑 Supprimer la sauvegarde</button>
       </div>
       <div class="settings-row" id="delete-confirm-row" style="display:none">
-        <button class="hbtn" onclick="doDelete()" style="background:var(--red);border-color:var(--red);color:#fff">✅ Confirmer la suppression</button>
+        <button class="hbtn" onclick="doDelete()" style="background:var(--red);border-color:var(--red);color:var(--light2)">✅ Confirmer la suppression</button>
         <button class="hbtn" onclick="cancelDelete()">✖️ Annuler</button>
       </div>
     </div>
@@ -71,77 +91,74 @@
   <div id="confirm-inner">
     <div id="confirm-text"></div>
     <div class="settings-row" style="margin-top:14px">
-      <button class="hbtn" id="confirm-yes" style="background:var(--red);border-color:var(--red);color:#fff">Confirmer</button>
+      <button class="hbtn" id="confirm-yes" style="background:var(--red);border-color:var(--red);color:var(--light2)">Confirmer</button>
       <button class="hbtn" onclick="closeConfirm()">Annuler</button>
     </div>
   </div>
 </div>
 
 <div class="mobile-nav-bar">
-  <button class="mob-btn" onclick="scrollToWin('win-battle')">⚔️ Combat</button>
-  <button class="mob-btn" onclick="scrollToWin('win-map')">🗺️ Carte</button>
-  <button class="mob-btn" onclick="scrollToWin('win-team')">⚡ Équipe</button>
-  <button class="mob-btn" onclick="scrollToWin('win-tabs')">📍 Lieu</button>
-
+  <button class="mob-btn" onclick="scrollToWin('win-battle')">
+    <span class="ui-icon" style="width:16px;height:16px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg>
+    </span>
+    Combat
+  </button>
+  <button class="mob-btn" onclick="scrollToWin('win-map')">
+    <span class="ui-icon" style="width:16px;height:16px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+    </span>
+    Carte
+  </button>
+  <button class="mob-btn" onclick="scrollToWin('win-team')">
+    <span class="ui-icon" style="width:16px;height:16px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    </span>
+    Équipe
+  </button>
+  <button class="mob-btn" onclick="scrollToWin('win-tabs')">
+    <span class="ui-icon" style="width:16px;height:16px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    </span>
+    Lieu
+  </button>
 </div>
 
-<div id="main-dashboard" style="display:flex;flex:1;overflow-y:auto;overflow-x:hidden;background:#181412;padding:6px;gap:8px;min-height:100%;height:auto;">
+<div id="main-dashboard" style="display:flex;flex:1;overflow-y:auto;overflow-x:hidden;background:transparent;padding:6px;gap:8px;min-height:100%;height:auto;position:relative;">
+  <!-- Fond animé -->
+  <div style="position:absolute;top:0;left:0;width:100%;height:100%;background-image:url('src/assets/images/bg/main-bg.png');background-repeat:repeat-x;background-position:0 0;opacity:0.08;animation:bg-scroll 600s linear infinite reverse;pointer-events:none;z-index:0;"></div>
   <!-- Colonne 1 (Gauche - 1fr) — Ordre: Quête, Équipe, Pension, Mine -->
   <div id="col-1" class="dash-col" data-col="1" style="flex:1;display:flex;flex-direction:column;gap:8px;height:auto;overflow:visible;min-width:240px;">
     <!-- Fenêtre 0: Histoire & Quêtes -->
-    <div id="win-story" class="dash-win" style="display:flex;flex-direction:column;background:var(--panel);border:2px solid #5c4827;border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;">
-      <div class="win-header" onmousedown="startWinDrag(event, 'win-story')" style="background:#2a2012;border-bottom:1px solid #4a3820;">
-        <span class="win-header-title" style="color:var(--gold);">⋮⋮ 📜 <span id="story-win-title">Histoire & Quêtes</span></span>
-        <span class="win-tools">
-          <button class="win-tool-btn" onclick="moveWinVert('win-story', -1)" title="Monter">⬆️</button>
-          <button class="win-tool-btn" onclick="moveWinVert('win-story', 1)" title="Descendre">⬇️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-story', 1)" title="Col. Gauche">⬅️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-story', 2)" title="Col. Centre (Large)">⏹️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-story', 3)" title="Col. Droite">➡️</button>
-        </span>
+    <div id="win-story" class="dash-win" style="display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--dark3);border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;">
+      <div class="win-header" onmousedown="startWinDrag(event, 'win-story')" style="background:var(--dark1);border-bottom:1px solid var(--dark3);">
+        <span class="win-header-title" style="color:var(--light2);">⋮⋮ 📜 <span id="story-win-title">Histoire & Quêtes</span></span>
+        
       </div>
-      <div class="win-body" id="story-panel" style="padding:10px;background:#14110e;font-size:12px;"></div>
+      <div class="win-body" id="story-panel" style="padding:10px;background:var(--dark2);font-size: 13px;"></div>
     </div>
     <!-- Fenêtre 2: Équipe Active -->
-    <div id="win-team" class="dash-win" style="display:flex;flex-direction:column;background:var(--panel);border:2px solid #3c342f;border-radius:8px;overflow:visible;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto;">
+    <div id="win-team" class="dash-win" style="display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--dark3);border-radius:8px;overflow:visible;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto;">
       <div class="win-header" onmousedown="startWinDrag(event, 'win-team')">
         <span class="win-header-title">⋮⋮ ⚡ Équipe Active</span>
-        <span class="win-tools">
-          <button class="win-tool-btn" onclick="moveWinVert('win-team', -1)" title="Monter">⬆️</button>
-          <button class="win-tool-btn" onclick="moveWinVert('win-team', 1)" title="Descendre">⬇️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-team', 1)" title="Col. Gauche">⬅️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-team', 2)" title="Col. Centre (Large)">⏹️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-team', 3)" title="Col. Droite">➡️</button>
-        </span>
+        
       </div>
       <div id="team-window-body" class="win-body" style="padding:8px;background:var(--panel);gap:6px;overflow:visible;height:auto;"></div>
     </div>
     <!-- Fenêtre 3: Pension & Couveuse (Hatchery) -->
-    <div id="win-hatchery" class="dash-win" style="display:flex;flex-direction:column;background:var(--panel);border:2px solid #3c342f;border-radius:8px;overflow:visible;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto;">
+    <div id="win-hatchery" class="dash-win" style="display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--dark3);border-radius:8px;overflow:visible;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto;">
       <div class="win-header" onmousedown="startWinDrag(event, 'win-hatchery')">
         <span class="win-header-title">⋮⋮ 🥚 <span id="hatchery-win-title">Pension & Couveuse</span></span>
-        <span class="win-tools">
-          <button class="win-tool-btn" onclick="moveWinVert('win-hatchery', -1)" title="Monter">⬆️</button>
-          <button class="win-tool-btn" onclick="moveWinVert('win-hatchery', 1)" title="Descendre">⬇️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-hatchery', 1)" title="Col. Gauche">⬅️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-hatchery', 2)" title="Col. Centre">⏹️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-hatchery', 3)" title="Col. Droite">➡️</button>
-        </span>
+        
       </div>
       <div id="hatchery-window-body" class="win-body" style="padding:8px;background:var(--panel);gap:6px;overflow:visible;height:auto;"></div>
       <div id="automation-window-body" style="padding:0;background:transparent;"></div>
     </div>
     <!-- Fenêtre Mine (Souterrain) -->
-    <div id="win-mine" class="dash-win" style="display:none;flex-direction:column;background:var(--panel);border:2px solid #5c4827;border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto;">
+    <div id="win-mine" class="dash-win" style="display:none;flex-direction:column;background:var(--panel);border:1px solid var(--dark3);border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto;">
       <div class="win-header" onmousedown="startWinDrag(event, 'win-mine')">
         <span class="win-header-title">⋮⋮ ⛏️ Mine Souterraine</span>
-        <span class="win-tools">
-          <button class="win-tool-btn" onclick="moveWinVert('win-mine', -1)" title="Monter">⬆️</button>
-          <button class="win-tool-btn" onclick="moveWinVert('win-mine', 1)" title="Descendre">⬇️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-mine', 1)" title="Col. Gauche">⬅️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-mine', 2)" title="Col. Centre">⏹️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-mine', 3)" title="Col. Droite">➡️</button>
-        </span>
+        
       </div>
       <div id="mine-window-body" class="win-body" style="padding:8px;background:var(--panel);overflow-y:auto;"></div>
     </div>
@@ -150,24 +167,18 @@
   <!-- Colonne 2 (Centre - 2fr) — Carte + Combat -->
   <div id="col-2" class="dash-col center-col" data-col="2" style="flex:2;display:flex;flex-direction:column;gap:8px;height:auto;overflow:visible;min-width:320px;">
     <!-- Fenêtre 1: Carte (moved from col-1) -->
-    <div id="win-map" class="dash-win" style="display:flex;flex-direction:column;background:var(--panel);border:2px solid #3c342f;border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;min-height:220px;">
+    <div id="win-map" class="dash-win" style="display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--dark3);border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;min-height:220px;">
       <div class="win-header" onmousedown="startWinDrag(event, 'win-map')">
         <span class="win-header-title">⋮⋮ 🗺️ <span id="map-win-title">Carte Kanto</span></span>
         <span style="margin-left:12px;">
-          <select id="map-region-select" onmousedown="event.stopPropagation()" onchange="switchMapRegion(this.value)" style="background:#0c0a09;color:#ffd700;border:1px solid #5c4827;padding:3px 8px;border-radius:4px;font-size:12px;font-weight:bold;cursor:pointer;">
+          <select id="map-region-select" onmousedown="event.stopPropagation()" onchange="switchMapRegion(this.value)" style="background:var(--dark1);color:var(--light2);border:1px solid #5c4827;padding:3px 8px;border-radius:4px;font-size: 13px;font-weight:bold;cursor:pointer;">
             <option value="kanto">🗺️ Région Kanto</option>
             <option value="johto">🗺️ Région Johto</option>
             <option value="hoenn" disabled>🔒 Région Hoenn (Bientôt)</option>
             <option value="sinnoh" disabled>🔒 Région Sinnoh (Bientôt)</option>
           </select>
         </span>
-        <span class="win-tools">
-          <button class="win-tool-btn" onclick="moveWinVert('win-map', -1)" title="Monter">⬆️</button>
-          <button class="win-tool-btn" onclick="moveWinVert('win-map', 1)" title="Descendre">⬇️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-map', 1)" title="Col. Gauche">⬅️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-map', 2)" title="Col. Centre (Large)">⏹️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-map', 3)" title="Col. Droite">➡️</button>
-        </span>
+        
       </div>
       <div class="win-body" id="map-panel" style="background:#0d1b0d;overflow:hidden;flex:1;">
         <svg id="map-svg" viewBox="0 0 720 520" preserveAspectRatio="xMidYMid meet">
@@ -178,48 +189,22 @@
       </div>
     </div>
     <!-- Fenêtre 3: Combat en direct -->
-    <div id="win-battle" class="dash-win" style="display:flex;flex-direction:column;background:#28231e;border:2px solid #3c342f;border-radius:8px;overflow:visible;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto;">
+    <div id="win-battle" class="dash-win" style="display:flex;flex-direction:column;background:var(--dark2);border:1px solid var(--dark3);border-radius:8px;overflow:visible;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto;">
       <div class="win-header" onmousedown="startWinDrag(event, 'win-battle')">
         <span class="win-header-title">⋮⋮ ⚔️ Combat en direct (PokéChill)</span>
-        <span class="win-tools">
-          <button class="win-tool-btn" onclick="moveWinVert('win-battle', -1)" title="Monter">⬆️</button>
-          <button class="win-tool-btn" onclick="moveWinVert('win-battle', 1)" title="Descendre">⬇️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-battle', 1)" title="Col. Gauche">⬅️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-battle', 2)" title="Col. Centre (Large)">⏹️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-battle', 3)" title="Col. Droite">➡️</button>
-        </span>
+        
       </div>
-      <div class="win-body" id="battle-center-panel" style="padding:10px;gap:10px;background:#28231e;height:auto;overflow:visible;">
-        <div id="battle-idle-screen" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:20px;text-align:center;color:var(--dim);gap:14px;">
-          <div style="font-size:48px;animation:pulse 2s infinite;">🌾</div>
-          <div style="font-size:16px;font-weight:bold;color:var(--text);">Exploration au repos</div>
-          <div style="font-size:12px;max-width:280px;">Déplacez-vous sur une route de la carte et cliquez sur <b>🌾 Explorer</b> ou <b>⚔️ Défier</b> pour lancer un combat en temps réel au centre de l'écran !</div>
+      <div class="win-body" id="battle-center-panel" style="padding:10px;gap:10px;background:var(--dark2);height:auto;overflow:visible;">
+        <div id="battle-idle-screen" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:20px;text-align:center;color:var(--light1);gap:14px;">
+          <div style="font-size: 15px;animation:pulse 2s infinite;">🌾</div>
+          <div style="font-size: 15px;font-weight:bold;color:var(--light2);">Exploration au repos</div>
+          <div style="font-size: 13px;max-width:280px;">Déplacez-vous sur une route de la carte et cliquez sur <b>🌾 Explorer</b> ou <b>⚔️ Défier</b> pour lancer un combat en temps réel au centre de l'écran !</div>
         </div>
 
         <div id="battle-active-scene" style="display:none;flex-direction:column;gap:10px;flex:0 0 auto;height:auto;overflow:visible;">
-          <div class="pokechill-box" style="border:2px solid #829a6b;border-radius:8px;overflow:hidden;background:#3b5030;display:flex;flex-direction:column;flex-shrink:0;box-shadow:0 4px 10px rgba(0,0,0,0.3);">
-            <div style="display:flex;background:linear-gradient(135deg, #7fb072 0%, #4c7c4c 50%, #2f5a34 100%);min-height:100px;position:relative;align-items:center;padding:8px;">
-              <div style="width:90px;height:90px;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;cursor:pointer;" oncontextmenu="event.preventDefault(); if(battle.enemyPoke){openPokeInfo(battle.enemyPoke.id);} return false;" title="Clic droit : infos Pokémon">
-                <div id="e-sprite" class="battle-poke-sprite" style="width:80px;height:80px;border:none;box-shadow:none;background:transparent;font-size:48px;">🌀</div>
-              </div>
-              <div style="flex:1;padding:4px 8px;display:flex;flex-direction:column;gap:6px;min-width:0;">
-                <div style="background:rgba(43,38,36,0.85);border-radius:6px;padding:6px 10px;border:1px solid #5a504a;">
-                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-                    <span id="e-name" style="color:#fff;font-weight:bold;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">???</span>
-                    <span id="e-hp-text" style="color:#bbb;font-size:11px;flex-shrink:0;">0/0</span>
-                  </div>
-                  <div class="battle-hp-bar" style="height:8px;background:#221e1c;border-radius:4px;overflow:hidden;border:1px solid #111;">
-                    <div id="e-hp-fill" class="battle-hp-fill" style="width:100%;background:#55a646;height:100%;"></div>
-                  </div>
-                </div>
-                <div id="e-under-sprite" style="display:flex;flex-wrap:wrap;gap:3px;margin-top:2px;"></div>
-                <div id="enemy-move-bars" class="auto-move-grid" style="display:flex;flex-direction:column;gap:4px;"></div>
-              </div>
-            </div>
-          </div>
 
-          <div class="pokechill-box" style="border:2px solid #6b6357;border-radius:8px;padding:8px;background:#463f37;display:flex;flex-direction:column;gap:6px;flex:0 0 auto;height:auto;overflow:visible;box-shadow:0 4px 10px rgba(0,0,0,0.3);" id="battle-team-row">
-          </div>
+          <!-- Team row: ennemi + équipe (tout via generatePokeCardHTML) -->
+          <div id="battle-team-row" class="team-container"></div>
 
           <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
             <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,0.25);padding:6px 10px;border-radius:6px;border:1px solid #5a504a;gap:8px;">
@@ -229,13 +214,13 @@
                   <button data-spd="1" onclick="setBattleSpeed(1)" class="hbtn active" style="padding:2px 6px;">x1</button>
                   <button data-spd="2" onclick="setBattleSpeed(2)" class="hbtn" style="padding:2px 6px;">x2</button>
                   <button data-spd="3" onclick="setBattleSpeed(3)" class="hbtn" style="padding:2px 6px;">x3</button>
-                <button data-spd="10" onclick="setBattleSpeed(10)" class="hbtn" style="padding:2px 6px;">x10</button>
+                <button data-spd="10" onclick="setBattleSpeed(10)" class="hbtn speed-x10" style="padding:2px 6px;display:none;">x10</button>
                 </div>
-                <button id="loot-open-btn" class="hbtn" onclick="openBattleSummary(false)" style="padding:4px 8px;font-size:11px;">📋 Butin</button>
+                <button id="loot-open-btn" class="hbtn" onclick="openBattleSummary(false)" style="padding:4px 8px;font-size:11px;">Butin</button>
               </div>
             </div>
-            <button id="leave-btn" onclick="doLeaveBattle()" style="width:100%;background:#d3524b;color:#fff;font-weight:bold;font-size:14px;padding:10px;border:2px solid #b33a34;border-radius:8px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,0.5);transition:0.2s;">
-              🚪 Quitter le combat
+            <button id="leave-btn" onclick="doLeaveBattle()" style="width:100%;background:#d3524b;color:var(--light2);font-weight:bold;font-size: 13px;padding:10px;border:2px solid #b33a34;border-radius:8px;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,0.5);transition:0.2s;">
+             Quitter le combat
             </button>
           </div>
         </div>
@@ -246,32 +231,20 @@
   <!-- Colonne 3 (Droite - 1fr) -->
   <div id="col-3" class="dash-col" data-col="3" style="flex:1;display:flex;flex-direction:column;gap:8px;height:auto;overflow:visible;min-width:240px;">
     <!-- Fenêtre Raccourcis (above Lieu) -->
-    <div id="win-shortcuts" class="dash-win" style="display:flex;flex-direction:column;background:var(--panel);border:2px solid var(--gold);border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto;">
+    <div id="win-shortcuts" class="dash-win" style="display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--dark3);border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto;">
       <div class="win-header" onmousedown="startWinDrag(event, 'win-shortcuts')">
         <span class="win-header-title">⋮⋮ 🔗 Raccourcis</span>
-        <span class="win-tools">
-          <button class="win-tool-btn" onclick="moveWinVert('win-shortcuts', -1)" title="Monter">⬆️</button>
-          <button class="win-tool-btn" onclick="moveWinVert('win-shortcuts', 1)" title="Descendre">⬇️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-shortcuts', 1)" title="Col. Gauche">⬅️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-shortcuts', 2)" title="Col. Centre">⏹️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-shortcuts', 3)" title="Col. Droite">➡️</button>
-        </span>
+        
       </div>
       <div id="shortcuts-window-body" class="win-body" style="padding:8px;background:var(--panel);display:flex;flex-direction:column;gap:6px;"></div>
     </div>
     <!-- Fenêtre 4: Menus & Onglets -->
     
     
-    <div id="win-tabs" class="dash-win" style="display:flex;flex-direction:column;background:var(--panel);border:2px solid #3c342f;border-radius:8px;overflow:visible;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto;min-height:280px;">
-      <div class="win-header" style="display:none;">
-        <span class="win-header-title">⋮⋮ 📑 Menus & Gestion</span>
-        <span class="win-tools">
-          <button class="win-tool-btn" onclick="moveWinVert('win-tabs', -1)" title="Monter">⬆️</button>
-          <button class="win-tool-btn" onclick="moveWinVert('win-tabs', 1)" title="Descendre">⬇️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-tabs', 1)" title="Col. Gauche">⬅️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-tabs', 2)" title="Col. Centre (Large)">⏹️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-tabs', 3)" title="Col. Droite">➡️</button>
-        </span>
+    <div id="win-tabs" class="dash-win" style="display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--dark3);border-radius:8px;overflow:visible;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto;min-height:280px;">
+      <div class="win-header" onmousedown="startWinDrag(event, 'win-tabs')">
+        <span class="win-header-title">⋮⋮ 📍 <span id="loc-win-title">Lieu</span></span>
+        
       </div>
       <div id="right-panel" style="display:flex;flex-direction:column;flex:0 0 auto;height:auto;overflow:visible;background:var(--panel);">
         <div id="tabs" style="display:flex;flex-wrap:wrap;border-bottom:2px solid var(--card);flex-shrink:0;">
@@ -281,16 +254,10 @@
       </div>
     </div>
 <!-- Fenêtre 5: Entraînement du Major Bob (Training) -->
-    <div id="win-training" class="dash-win" style="display:flex;flex-direction:column;background:var(--panel);border:2px solid #3c342f;border-radius:8px;overflow:visible;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto;">
+    <div id="win-training" class="dash-win" style="display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--dark3);border-radius:8px;overflow:visible;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto;">
       <div class="win-header" onmousedown="startWinDrag(event, 'win-training')">
         <span class="win-header-title">⋮⋮ ⚡ <span id="training-win-title">Salle d'Entraînement</span></span>
-        <span class="win-tools">
-          <button class="win-tool-btn" onclick="moveWinVert('win-training', -1)" title="Monter">⬆️</button>
-          <button class="win-tool-btn" onclick="moveWinVert('win-training', 1)" title="Descendre">⬇️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-training', 1)" title="Col. Gauche">⬅️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-training', 2)" title="Col. Centre">⏹️</button>
-          <button class="win-tool-btn" onclick="moveWinToCol('win-training', 3)" title="Col. Droite">➡️</button>
-        </span>
+        
       </div>
       <div id="training-window-body" class="win-body" style="padding:8px;background:var(--panel);gap:6px;overflow:visible;height:auto;"></div>
     </div>
@@ -301,14 +268,14 @@
 
 <!-- Unified Full-Screen Grid Modal (Hatchery / Training / Box View) -->
 <div id="unified-selector-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:270;display:none;align-items:center;justify-content:center;padding:16px;">
-  <div style="background:var(--panel);border:2px solid var(--gold);border-radius:12px;width:95vw;max-width:960px;height:90vh;display:flex;flex-direction:column;box-shadow:0 0 35px rgba(255,215,0,0.25);overflow:hidden;">
-    <div class="modal-title" style="padding:12px 18px;border-bottom:1px solid #4a3820;display:flex;align-items:center;justify-content:space-between;background:#1e1814;">
-      <div id="usm-title" style="font-size:16px;font-weight:bold;color:var(--gold);">Sélection Pokémon</div>
-      <span class="modal-close" style="cursor:pointer;font-size:20px;color:#fff;" onclick="closeUnifiedSelectorModal()">✕</span>
+  <div style="background:var(--panel);border:1px solid var(--dark3);border-radius:12px;width:95vw;max-width:960px;height:90vh;display:flex;flex-direction:column;box-shadow:0 0 35px rgba(148,136,107,0.25);overflow:hidden;">
+    <div class="modal-title" style="padding:12px 18px;border-bottom:1px solid var(--dark3);display:flex;align-items:center;justify-content:space-between;background:var(--dark1);">
+      <div id="usm-title" style="font-size: 15px;font-weight:bold;color:var(--light2);">Sélection Pokémon</div>
+      <span class="modal-close" style="cursor:pointer;font-size: 15px;color:var(--light2);" onclick="closeUnifiedSelectorModal()">✕</span>
     </div>
-    <div style="padding:10px 18px;background:#14110e;border-bottom:1px solid #332a22;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;">
+    <div style="padding:10px 18px;background:var(--dark2);border-bottom:1px solid var(--dark3);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-        <span style="font-size:12px;color:var(--dim);">Tri :</span>
+        <span style="font-size: 13px;color:var(--light1);">Tri :</span>
         <button class="hbtn usm-sort-btn active" data-sort="id" onclick="sortUnifiedGrid('id')">Pokédex #</button>
         <button class="hbtn usm-sort-btn" data-sort="level" onclick="sortUnifiedGrid('level')">Niveau</button>
         <button class="hbtn usm-sort-btn" data-sort="iv" onclick="sortUnifiedGrid('iv')">IVs ⭐</button>
@@ -316,11 +283,11 @@
         <button class="hbtn usm-sort-btn" data-sort="name" onclick="sortUnifiedGrid('name')">Nom</button>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
-        <input type="text" id="usm-search" placeholder="Rechercher par nom..." oninput="filterUnifiedGrid()" style="background:#0c0a09;color:#fff;border:1px solid #55442e;padding:5px 10px;border-radius:6px;font-size:12px;width:180px;">
+        <input type="text" id="usm-search" placeholder="Rechercher par nom..." oninput="filterUnifiedGrid()" style="background:var(--dark1);color:var(--light2);border:1px solid var(--dark3);padding:5px 10px;border-radius:6px;font-size: 13px;width:180px;">
       </div>
     </div>
-    <div id="usm-subtab-bar" style="padding:8px 16px;background:#1a1612;border-bottom:1px solid #332a22;flex-shrink:0;"></div>
-    <div id="usm-grid" style="flex:1;overflow-y:auto;padding:16px;display:grid;grid-template-columns:repeat(auto-fill, minmax(210px, 1fr));gap:10px;align-content:start;background:#0f0d0b;"></div>
+    <div id="usm-subtab-bar" style="padding:8px 16px;background:var(--dark2);border-bottom:1px solid var(--dark3);flex-shrink:0;"></div>
+    <div id="usm-grid" style="flex:1;overflow-y:auto;padding:16px;display:grid;grid-template-columns:repeat(auto-fill, minmax(210px, 1fr));gap:10px;align-content:start;background:var(--dark1);"></div>
   </div>
 </div>
 
@@ -328,12 +295,12 @@
 <div id="battle-summary-modal">
   <div id="battle-summary-inner">
     <div class="modal-title">
-      <div id="battle-summary-title">📋 Butin de la session</div>
+      <div id="battle-summary-title">Butin de la session</div>
       <span class="modal-close" onclick="closeBattleSummary()">✕</span>
     </div>
     <div id="battle-summary-content"></div>
     <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">
-      <button id="loot-restart-btn" class="hbtn" style="width:100%;padding:10px;background:var(--green);color:#fff;font-weight:bold;font-size:13px;" onclick="restartLastBattle()">🔄 Relancer le combat immédiatement</button>
+      <button id="loot-restart-btn" class="hbtn" style="width:100%;padding:10px;background:var(--green);color:var(--light2);font-weight:bold;font-size:13px;" onclick="restartLastBattle()">🔄 Relancer le combat immédiatement</button>
       <button id="loot-continue-btn" class="hbtn" style="width:100%;padding:8px" onclick="closeBattleSummary()">Continuer sur la route</button>
     </div>
   </div>
@@ -341,23 +308,23 @@
 
 <!-- Debug menu (Bottom right fixed widget) -->
 <div id="debug-widget" style="position:fixed;bottom:14px;right:14px;z-index:9990;display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
-  <div id="debug-drawer" style="display:none;background:#181210;border:2px solid #ff5252;padding:12px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,0.85);width:260px;flex-direction:column;gap:8px;">
-    <div style="font-size:12px;font-weight:bold;color:#ff8a80;border-bottom:1px solid #443;padding-bottom:4px;display:flex;justify-content:space-between;align-items:center;">
+  <div id="debug-drawer" style="display:none;background:var(--dark1);border:2px solid var(--red);padding:12px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,0.85);width:260px;flex-direction:column;gap:8px;">
+    <div style="font-size: 13px;font-weight:bold;color:var(--red);border-bottom:1px solid #443;padding-bottom:4px;display:flex;justify-content:space-between;align-items:center;">
       <span>🛠️ Menu Debug / triche</span>
       <span style="cursor:pointer;" onclick="toggleDebugMenu()">✕</span>
     </div>
-    <button class="hbtn" style="background:#2e442e;color:#fff;font-size:11px;padding:6px;width:100%;font-weight:bold;" onclick="debugGiveMoney()">💰 +50 000₽</button>
-    <button class="hbtn" style="background:#552e4f;color:#fff;font-size:11px;padding:6px;width:100%;font-weight:bold;" onclick="debugGiveCandies()">🍬 +10 Super Bonbons (Rare Candy)</button>
-    <button class="hbtn" style="background:#2e3c55;color:#fff;font-size:11px;padding:6px;width:100%;font-weight:bold;" onclick="debugUnlockBadges()">🏅 Débloquer 8 Badges Kanto</button>
-    <button class="hbtn" style="background:#4e3d1e;color:#fff;font-size:11px;padding:6px;width:100%;font-weight:bold;" onclick="debugFillMine()">⚡ Recharge Énergie Mine (100)</button>
-  <button class="hbtn" style="background:#ff6600;color:#fff;font-size:11px;padding:6px;width:100%;font-weight:bold;" onclick="if(typeof battle!=='undefined'&&battle){setBattleSpeed(10);notify('⚡ Vitesse x10!','var(--orange)');}">⚡ Vitesse x10</button>
+    <button class="hbtn" style="background:var(--green);color:var(--light2);font-size:11px;padding:6px;width:100%;font-weight:bold;" onclick="debugGiveMoney()">💰 +50 000₽</button>
+    <button class="hbtn" style="background:var(--purple);color:var(--light2);font-size:11px;padding:6px;width:100%;font-weight:bold;" onclick="debugGiveCandies()">🍬 +10 Super Bonbons (Rare Candy)</button>
+    <button class="hbtn" style="background:var(--blue);color:var(--light2);font-size:11px;padding:6px;width:100%;font-weight:bold;" onclick="debugUnlockBadges()">🏅 Débloquer 8 Badges Kanto</button>
+    <button class="hbtn" style="background:var(--accent);color:var(--light2);font-size:11px;padding:6px;width:100%;font-weight:bold;" onclick="debugFillMine()">⚡ Recharge Énergie Mine (100)</button>
+  <button id="debug-x10-toggle" class="hbtn" style="background:var(--dark3);color:var(--light2);font-size:11px;padding:6px;width:100%;font-weight:bold;" onclick="toggleBattleSpeedX10()">Vitesse x10 : <span id="debug-x10-state">OFF</span></button>
   </div>
-  <button id="debug-toggle-btn" onclick="toggleDebugMenu()" style="background:#882222;color:#fff;border:2px solid #ff5252;padding:8px 14px;border-radius:20px;font-weight:bold;box-shadow:0 4px 15px rgba(0,0,0,0.6);cursor:pointer;font-size:12px;">🛠️ Debug</button>
+  <button id="debug-toggle-btn" onclick="toggleDebugMenu()" style="background:var(--red);color:var(--light2);border:2px solid var(--red);padding:8px 14px;border-radius:20px;font-weight:bold;box-shadow:0 4px 15px rgba(0,0,0,0.6);cursor:pointer;font-size: 13px;">🛠️ Debug</button>
 </div>
 
 <!-- Starter Modal (persistent) -->
 <div id="starter-modal" style="position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:900;display:none;align-items:center;justify-content:center;">
-  <div id="starter-modal-inner" style="background:var(--panel);border:2px solid var(--gold);border-radius:14px;padding:22px;max-width:520px;width:92vw;max-height:90vh;overflow-y:auto;box-shadow:0 0 40px rgba(255,215,0,0.25);">
+  <div id="starter-modal-inner" style="background:var(--panel);border:1px solid var(--dark3);border-radius:14px;padding:22px;max-width:520px;width:92vw;max-height:90vh;overflow-y:auto;box-shadow:0 0 40px rgba(148,136,107,0.25);">
   </div>
 </div>
 
@@ -371,15 +338,15 @@
 
 <!-- Victory Screen -->
 <div id="victory-screen">
-  <div style="font-size:60px">🏆</div>
+  <div style="font-size: 15px">🏆</div>
   <h2>CHAMPION !</h2>
   <p id="victory-msg">Vous avez vaincu tous les Dresseurs!</p>
-  <button class="hbtn" onclick="document.getElementById('victory-screen').classList.remove('open')" style="font-size:14px;padding:8px 20px">Continuer</button>
+  <button class="hbtn" onclick="document.getElementById('victory-screen').classList.remove('open')" style="font-size: 13px;padding:8px 20px">Continuer</button>
 </div>
 
 <!-- Quest Capture Screen -->
 <div id="quest-capture-screen" style="position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:160;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:20px;">
-  <div id="qcap-content" style="background:var(--panel);border:2px solid var(--gold);padding:24px;border-radius:12px;max-width:340px;width:100%;box-shadow:0 0 30px rgba(255,215,0,0.3);">
+  <div id="qcap-content" style="background:var(--panel);border:1px solid var(--dark3);padding:24px;border-radius:12px;max-width:340px;width:100%;box-shadow:0 0 30px rgba(148,136,107,0.3);">
   </div>
 </div>
   <script src="src/loader.js"></script>

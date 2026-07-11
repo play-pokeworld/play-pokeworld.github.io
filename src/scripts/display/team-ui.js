@@ -1,58 +1,54 @@
 // ============================================================
-// TEAM UI — (split from map.js)
+// TEAM UI — Utilise le template poke-card.css
 // ============================================================
 function renderTeamWindow(){
   const el = document.getElementById('team-window-body');
+  // Add team-view class for CSS to hide HP bars
+  if(el) el.classList.add('team-view');
   if(!el) return;
-  if(G.team.length===0){
-    el.innerHTML=`<div style="text-align:center;padding:20px;color:var(--dim);font-size:12px;">
+
+  if(G.team.length === 0){
+    el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--light1);font-size: 13px;">
       ${t('team_empty')}<br><br>
-      ${!G.starter?`<button class="hbtn" onclick="chooseStarter()">${t('choose_starter')}</button>`:t('explore_routes')}
+      ${!G.starter ? `<button class="hbtn" onclick="chooseStarter()">${t('choose_starter')}</button>` : t('explore_routes')}
     </div>`;
     return;
   }
-  const battleLockBanner = battle.active ? `<div style="background:rgba(244,67,54,0.15);border:1px solid var(--red);padding:6px 8px;border-radius:4px;margin-bottom:6px;color:#ff8a80;font-size:11px;display:flex;align-items:center;gap:6px;">
-    <span>🔒</span><span>${t('battle_lock_team')}</span>
-  </div>` : '';
-  
-  const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
+
+  const battleLockBanner = battle.active
+    ? `<div style="background:rgba(211,66,95,0.15);border:1px solid var(--red);padding:8px;border-radius:6px;margin-bottom:8px;color:#ff8a80;font-size:13px;display:flex;align-items:center;gap:8px;">
+        <span>🔒</span><span>${t('battle_lock_team')}</span>
+       </div>`
+    : '';
+
   el.innerHTML = renderTeamPresetsToolbar() + battleLockBanner + G.team.map((p, i) => {
-    if((p.xp||0) < xpForLevel(p.level)) p.xp = xpForLevel(p.level) + (p.xp || 0);
+    if((p.xp || 0) < xpForLevel(p.level)) p.xp = xpForLevel(p.level) + (p.xp || 0);
     if(!p.xpNext || p.xpNext <= xpForLevel(p.level)) p.xpNext = xpForLevel(p.level + 1);
-    const isShiny = p.shinyUnlocked || p.shinyActive || p.shiny || isSpeciesShiny(p.id);
-    const itm = p.heldItem ? ITEMS[p.heldItem] : null;
-    const curLevelBase = xpForLevel(p.level);
-    const xpInLevel = Math.max(0, p.xp - curLevelBase);
-    const xpReqLevel = Math.max(1, (p.xpNext || 1) - curLevelBase);
-    const xpPct = clamp(Math.floor((xpInLevel / xpReqLevel) * 100), 0, 100);
-    return `<div class="poke-card" draggable="true"
-        style="padding:6px;margin-bottom:6px;cursor:pointer;${isShiny?'border:1px solid var(--yellow);background:rgba(255,215,0,0.06);':''}"
-        ondragstart="onTeamDragStart(event,${i})"
-        ondragover="onTeamDragOver(event)"
-        ondragleave="onTeamDragLeave(event)"
-        ondrop="onTeamDrop(event,${i})"
-        onclick="onTeamCardClick(event,${i})"
-        oncontextmenu="event.preventDefault(); openPokeModal(${i}); return false;"
-        title="Clic: échanger avec boîte | Clic Droit: fiche">
-      <div class="poke-card-top" style="gap:6px;">
-        <div class="poke-sprite${isShiny?' is-shiny':''}" style="width:34px;height:34px;font-size:15px;background:${TYPE_COLORS[p.type1]||'#333'}22;border:2px solid ${isShiny?'var(--yellow)':TYPE_COLORS[p.type1]}">${spriteImg(p.id,p.emoji,{shiny:isShiny,size:30})}</div>
-        <div class="poke-info" style="min-width:0;flex:1;">
-          <div class="poke-name" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${isShiny?'✨ ':''}${p.name} <span style="font-size:10px;color:var(--dim)">${lang==='en'?'Lv.':'Nv.'}${p.level}</span></div>
-          <div style="font-size:10px;color:${itm?'var(--gold)':'var(--dim)'};margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">🎒 ${itm ? itm.icon + ' ' + getItemName(p.heldItem) : (lang==='en'?'No item':'Aucun objet')}</div>
-          <div style="height:3px;width:100%;background:#1a1412;border-radius:1.5px;overflow:hidden;margin-top:4px;" title="XP: ${xpInLevel}/${xpReqLevel}">
-            <div style="width:${xpPct}%;background:var(--purple);height:100%;"></div>
-          </div>
-          <div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:4px;">
-            ${(p.moves||[]).map(m=>{
-              const mv = MOVES[m.id];
-              return `<span style="background:${TYPE_COLORS[mv?.type]||'#444'};color:#fff;font-size:9px;padding:1px 4px;border-radius:3px;">${getMoveName(m.id)}</span>`;
-            }).join('')}
-          </div>
-        </div>
-        <button class="hbtn" style="padding:2px 6px;font-size:10px;" onclick="event.stopPropagation();openPokeModal(${i})" title="Fiche">📋</button>
-      </div>
-    </div>`;
-  }).join('');
+
+    const itemClickHandler = `openItemSelector(${i})`;
+
+    return generatePokeCardHTML(p, i, {
+      isActive: false,
+      isFainted: false,
+      showMoves: true,
+      showXP: true,
+      showStatus: false,
+      movesAsBars: false,
+      onRightClickSprite: `openPokeModal(${i})`,
+      onLeftClickSprite: `onTeamCardClick(event, ${i})`,
+      onLeftClickItem: itemClickHandler,
+    });
+  }).join('') + (G.team.length < 6 ? `
+    <div style="background:var(--dark3);border:2px dashed var(--light1);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;" 
+         onmouseover="this.style.background='var(--light1)';this.style.borderColor='var(--light2)';" 
+         onmouseout="this.style.background='var(--dark3)';this.style.borderColor='var(--light1)';"
+         onclick="openUnifiedSelectorModal('team')">
+      <div style="font-size: 32px;color:var(--light2);margin-bottom:8px;">+</div>
+      <div style="font-size: 13px;color:var(--light2);font-weight:bold;">Ajouter un Pokémon</div>
+      <div style="font-size: 13px;color:var(--light1);margin-top:4px;">${G.team.length}/6 dans l'équipe</div>
+    </div>
+  ` : '');
+  addLongPressToItemBadges();
 }
 
 // ============================================================
@@ -61,54 +57,136 @@ function renderTeamWindow(){
 
 function renderTeamPresetsToolbar(){
   const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
-  if(!G.teamPresets) G.teamPresets = { preset1:{name:"Équipe Aventure",uids:[]}, preset2:{name:"Équipe Boss",uids:[]}, preset3:{name:"Équipe Entraînement",uids:[]} };
-  return `<div style="display:flex;align-items:center;gap:4px;background:rgba(0,0,0,0.3);padding:6px;border-radius:6px;margin-bottom:8px;border:1px solid #3a322c;flex-wrap:wrap;">
-    <span style="font-size:10px;color:var(--gold);font-weight:bold;">📑 ${lang==='en'?'Presets:':'Presets :'}</span>
-    ${['preset1','preset2','preset3'].map((pk, idx) => {
+  if(!G.teamPresets) G.teamPresets = {
+    preset1: {name: "Équipe Aventure", uids: []},
+    preset2: {name: "Équipe Boss", uids: []},
+    preset3: {name: "Équipe Entraînement", uids: []}
+  };
+
+  return `<div style="display:flex;align-items:center;gap:6px;background:var(--dark3);padding:8px;border-radius:6px;margin-bottom:8px;border:1px solid var(--light1);flex-wrap:wrap;">
+    <span style="font-size:13px;color:var(--light2);font-weight:bold;"> ${lang === 'en' ? 'Presets:' : 'Presets :'}</span>
+    ${['preset1', 'preset2', 'preset3'].map((pk, idx) => {
       const active = G.activePresetId === pk;
       const count = (G.teamPresets[pk]?.uids || []).length;
-      return `<div style="display:flex;align-items:center;gap:2px;"><button class="hbtn" style="padding:3px 6px;font-size:10px;${active?'background:var(--accent);border-color:#ff8a80;':''}" onclick="loadTeamFromPreset('${pk}')" title="Charger ${G.teamPresets[pk]?.name}">#${idx+1} (${count})</button>
-      <button class="hbtn" style="padding:2px 5px;font-size:9px;color:var(--dim);" onclick="saveCurrentTeamToPreset('${pk}')" title="Sauvegarder l'équipe actuelle">💾</button></div>`;
+      return `<div style="display:flex;align-items:center;gap:3px;">
+        <button class="hbtn" style="padding:4px 8px;font-size:13px;${active ? 'background:var(--light1);border-color:var(--light1);color:var(--dark1);' : ''}" onclick="loadTeamFromPreset('${pk}')" title="Charger ${G.teamPresets[pk]?.name}">#${idx + 1} (${count})</button>
+        <button class="hbtn" style="padding:3px 6px;font-size: 13px;color:var(--light1);" onclick="saveCurrentTeamToPreset('${pk}')" title="Sauvegarder l'équipe actuelle">💾</button>
+      </div>`;
     }).join('')}
   </div>`;
 }
 
 function renderPokeCard(p, i){
-  if((p.xp||0) < xpForLevel(p.level)) p.xp = xpForLevel(p.level) + (p.xp || 0);
+  if((p.xp || 0) < xpForLevel(p.level)) p.xp = xpForLevel(p.level) + (p.xp || 0);
   if(!p.xpNext || p.xpNext <= xpForLevel(p.level)) p.xpNext = xpForLevel(p.level + 1);
-  const curLevelBase = xpForLevel(p.level);
-  const xpInLevel = Math.max(0, p.xp - curLevelBase);
-  const xpReqLevel = Math.max(1, (p.xpNext || 1) - curLevelBase);
-  const itmKey=p.heldItem;
-  const itm=(itmKey && ITEMS[itmKey]) ? {...ITEMS[itmKey], name:getItemName(itmKey), desc:getItemDesc(itmKey)} : null;
-  const heldHtml=itm
-    ? `<div style="font-size:10px;color:var(--gold);margin-top:2px">🎒 ${itm.icon} ${itm.name}</div>`
-    : `<div style="font-size:10px;color:var(--dim);margin-top:2px">🎒 Aucun objet</div>`;
-  const isShiny = p.shinyUnlocked || p.shinyActive || p.shiny || isSpeciesShiny(p.id);
-  return `<div class="poke-card" draggable="true"
-      style="${isShiny?'border:1px solid var(--yellow);background:rgba(255,215,0,0.06);box-shadow:0 0 8px rgba(255,215,0,0.3);':''}"
-      ondragstart="onTeamDragStart(event,${i})"
-      ondragover="onTeamDragOver(event)"
-      ondragleave="onTeamDragLeave(event)"
-      ondrop="onTeamDrop(event,${i})"
-      onclick="onTeamCardClick(event,${i})"
-      oncontextmenu="event.preventDefault(); openPokeModal(${i}); return false;"
-      title="Clic: échanger avec boîte | Clic Droit: voir la fiche">
-    <div class="poke-card-top">
-      <div class="poke-sprite${isShiny?' is-shiny':''}" style="background:${TYPE_COLORS[p.type1]||'#333'}22;border:2px solid ${isShiny?'var(--yellow)':TYPE_COLORS[p.type1]}">${spriteImg(p.id,p.emoji,{shiny:isShiny,size:40})}</div>
-      <div class="poke-info">
-        <div class="poke-name">${isShiny?'<span class="shiny-tag" title="Forme Shiny">✨</span>':''}${p.name} <span style="color:var(--dim);font-size:10px">Nv.${p.level}</span></div>
-        <div style="margin-top:2px">${typeSpan(p.type1)}${p.type2?typeSpan(p.type2):''}</div>
-        ${heldHtml}
-      </div>
-      <button class="hbtn" style="padding:3px 8px;font-size:11px" onclick="event.stopPropagation();openPokeModal(${i})" title="Sheet">${t("fiche_btn")}</button>
-    </div>
-    <div style="font-size:10px;color:var(--dim);margin-top:4px">XP: ${xpInLevel}/${xpReqLevel} · <span style="color:var(--dim)">Glisser réordonner · Clic échanger · Clic Droit Fiche</span></div>
-  </div>`;
+
+  return generatePokeCardHTML(p, i, {
+    isActive: false,
+    isFainted: p.currentHP <= 0,
+    showMoves: true,
+    showXP: true,
+    movesAsBars: false,
+    onRightClickSprite: `openPokeModal(${i})`,
+    onLeftClickSprite: `onTeamCardClick(event, ${i})`,
+  });
 }
 
-function aliveCount(){return G.team.filter(p=>p.currentHP>0).length;}
+// Open item selector for team Pokemon
+function openItemSelector(teamIdx){
+  openFullscreenPanel('inventory');
+  setTimeout(() => showItemSelectorForPokemon(teamIdx), 200);
+}
 
-function firstAlive(){return G.team.findIndex(p=>p.currentHP>0);}
+// Show inventory with Cancel/Remove buttons
+function showItemSelectorForPokemon(teamIdx){
+  const p = G.team[teamIdx];
+  if(!p) return;
+  const fsContent = document.getElementById('fs-panel-content');
+  if(!fsContent) return;
+  
+  const currentKey = p.heldItem;
+  const entries = Object.entries(G.inventory).filter(([k,v]) => v > 0 && ITEMS[k] && ITEMS[k].buff);
+  
+  let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+    <div>
+      <div style="font-size: 15px;font-weight:bold;color:var(--light1);">${p.name} Nv.${p.level}</div>
+      <div style="font-size: 13px;color:var(--light1);">Objet équipé: ${currentKey ? getItemName(currentKey) : 'Aucun'}</div>
+    </div>
+  </div>`;
+  
+  if(entries.length === 0){
+    html += `<div style="text-align:center;padding:20px;color:var(--light1);">Aucun objet équippable</div>`;
+  } else {
+    html += entries.map(([key, qty]) => {
+      const itm = ITEMS[key];
+      const capped = Math.min(BAG_MAX, qty);
+      const ratio = capped / BAG_MAX;
+      const buffLines = Object.entries(itm.buff).map(([s, mx]) => {
+        const label = {atk:'Atk',def:'Déf',spe:'Vit',hpMax:'PV Max',spa:'Atk Spé',spd:'Déf Spé'}[s] || s;
+        return `${label} +${Math.round(mx*ratio*100)}%`;
+      }).join(' · ');
+      const equipped = itemEquippedOnTeam(key);
+      return `<div class="inv-item" onclick="equipItemDirect(${teamIdx}, '${key}')">
+        <div class="inv-icon">${itemSpriteHtml(key, 40)}</div>
+        <div style="flex:1">
+          <div class="inv-name">${getItemName(key)}</div>
+          <div class="inv-desc">${buffLines}</div>
+          ${equipped && equipped !== p ? `<div style="font-size: 13px;color:var(--light1);">Sur ${equipped.name}</div>` : ''}
+        </div>
+        <div class="inv-qty">×${qty}</div>
+      </div>`;
+    }).join('');
+  }
+  
+  html += `<div style="display:flex;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--light1);">
+    <button class="hbtn" style="flex:1;padding:10px;background:var(--dark3);" onclick="closeFullscreenPanel()">${lang==='en'?'Cancel':'Annuler'}</button>
+    ${currentKey ? `<button class="hbtn" style="flex:1;padding:10px;background:var(--red);" onclick="removeItemFromPokemon(${teamIdx})">${lang==='en'?'Remove':'Retirer'}</button>` : ''}
+  </div>`;
+  
+  fsContent.innerHTML = html;
+}
 
+function equipItemDirect(teamIdx, key){
+  const p = G.team[teamIdx];
+  if(!p) return;
+  if(!ITEMS[key] || !ITEMS[key].buff) return;
+  if(!(G.inventory[key] > 0)) return;
+  p.heldItem = key;
+  saveGame();
+  renderTeamWindow();
+  closeFullscreenPanel();
+  notify(`${p.name} tient ${getItemName(key)} !`, 'var(--green)');
+}
 
+function removeItemFromPokemon(teamIdx){
+  const p = G.team[teamIdx];
+  if(!p || !p.heldItem) return;
+  p.heldItem = null;
+  saveGame();
+  renderTeamWindow();
+  closeFullscreenPanel();
+  notify(`${p.name} ne tient plus rien.`, 'var(--light1)');
+}
+
+// Add long-press support to item badges for mobile
+function addLongPressToItemBadges(){
+  setTimeout(() => {
+    document.querySelectorAll('.poke-item-badge').forEach(badge => {
+      if(badge.dataset.longPressAdded) return;
+      badge.dataset.longPressAdded = 'true';
+      let timer;
+      badge.addEventListener('touchstart', function(e) {
+        timer = setTimeout(() => {
+          e.preventDefault();
+          const key = this.dataset.itemKey;
+          if(key) openItemInfo(key);
+        }, 500);
+      });
+      badge.addEventListener('touchend', () => clearTimeout(timer));
+      badge.addEventListener('touchmove', () => clearTimeout(timer));
+    });
+  }, 100);
+}
+
+function aliveCount(){ return G.team.filter(p => p.currentHP > 0).length; }
+function firstAlive(){ return G.team.findIndex(p => p.currentHP > 0); }

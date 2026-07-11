@@ -2,251 +2,251 @@
 // NPC DATA — (split from quest-data.js)
 // ============================================================
 var NPCS = {
- "pallet": [
-  {
-   "mainTalk": 30
-  },
-  {
-   "quest": "s1"
-  }
+"pallet": [
+ {
+"mainTalk": 30
+ },
+ {
+"quest":"s1"
+ }
  ],
- "viridian": [
-  {
-   "quest": "s2"
-  },
-  {
-   "quest": "s11"
-  }
+"viridian": [
+ {
+"quest":"s2"
+ },
+ {
+"quest":"s11"
+ }
  ],
- "pewter": [
-  {
-   "quest": "s3"
-  }
+"pewter": [
+ {
+"quest":"s3"
+ }
  ],
- "cerulean": [
-  {
-   "board": true
-  },
-  {
-   "quest": "s12"
-  }
+"cerulean": [
+ {
+"board": true
+ },
+ {
+"quest":"s12"
+ }
  ],
- "vermilion": [
-  {
-   "quest": "s4"
-  },
-  {
-   "quest": "s14"
-  }
+"vermilion": [
+ {
+"quest":"s4"
+ },
+ {
+"quest":"s14"
+ }
  ],
- "lavender": [
-  {
-   "quest": "s5"
-  },
-  {
-   "quest": "s15"
-  }
+"lavender": [
+ {
+"quest":"s5"
+ },
+ {
+"quest":"s15"
+ }
  ],
- "celadon": [
-  {
-   "quest": "s6"
-  },
-  {
-   "quest": "s13"
-  }
+"celadon": [
+ {
+"quest":"s6"
+ },
+ {
+"quest":"s13"
+ }
  ],
- "fuchsia": [
-  {
-   "quest": "s7"
-  }
+"fuchsia": [
+ {
+"quest":"s7"
+ }
  ],
- "saffron": [
-  {
-   "board": true
-  }
+"saffron": [
+ {
+"board": true
+ }
  ],
- "cinnabar": [
-  {
-   "quest": "s8"
-  }
+"cinnabar": [
+ {
+"quest":"s8"
+ }
  ],
- "newbark": [
-  {
-   "mainTalk": 31
-  }
+"newbark": [
+ {
+"mainTalk": 31
+ }
  ],
- "olivine": [
-  {
-   "quest": "s9"
-  },
-  {
-   "board": true
-  }
+"olivine": [
+ {
+"quest":"s9"
+ },
+ {
+"board": true
+ }
  ],
- "blackthorn": [
-  {
-   "quest": "s10"
-  }
+"blackthorn": [
+ {
+"quest":"s10"
+ }
  ],
- "ecruteak": [
-  {
-   "board": true
-  }
+"ecruteak": [
+ {
+"board": true
+ }
  ],
- "cherrygrove": [
-  {}
+"cherrygrove": [
+ {}
  ],
- "violet": [
-  {
-   "board": true
-  }
+"violet": [
+ {
+"board": true
+ }
  ],
- "azalea": [
-  {
-   "quest": "s35"
-  }
+"azalea": [
+ {
+"quest":"s35"
+ }
  ],
- "goldenrod": [
-  {
-   "quest": "s32"
-  },
-  {
-   "quest": "s36"
-  }
+"goldenrod": [
+ {
+"quest":"s32"
+ },
+ {
+"quest":"s36"
+ }
  ],
- "cianwood": [
-  {
-   "board": true
-  }
+"cianwood": [
+ {
+"board": true
+ }
  ],
- "mahogany": [
-  {
-   "quest": "s30"
-  }
+"mahogany": [
+ {
+"quest":"s30"
+ }
  ],
- "lakerage": [
-  {
-   "quest": "s31"
-  }
+"lakerage": [
+ {
+"quest":"s31"
+ }
  ],
- "jroute29": [
-  {
-   "board": true
-  }
+"jroute29": [
+ {
+"board": true
+ }
  ],
- "jroute30": [
-  {
-   "quest": "s34"
-  }
+"jroute30": [
+ {
+"quest":"s34"
+ }
  ],
- "jroute35": [
-  {
-   "quest": "s37"
-  }
+"jroute35": [
+ {
+"quest":"s37"
+ }
  ],
- "jroute38": [
-  {
-   "board": true
-  }
+"jroute38": [
+ {
+"board": true
+ }
  ],
- "jroute40": [
-  {
-   "board": true
-  }
+"jroute40": [
+ {
+"board": true
+ }
  ],
- "jroute42": [
-  {
-   "board": true
-  }
+"jroute42": [
+ {
+"board": true
+ }
  ],
- "jroute44": [
-  {
-   "board": true
-  }
+"jroute44": [
+ {
+"board": true
+ }
  ],
- "jroute45": [
-  {
-   "board": true
-  }
+"jroute45": [
+ {
+"board": true
+ }
  ],
- "jroute28": [
-  {
-   "board": true
-  }
+"jroute28": [
+ {
+"board": true
+ }
  ],
- "nationalpark": [
-  {
-   "board": true
-  }
+"nationalpark": [
+ {
+"board": true
+ }
  ],
- "sprouttower": [
-  {
-   "quest": "s39"
-  }
+"sprouttower": [
+ {
+"quest":"s39"
+ }
  ],
- "ruinsofalph": [
-  {
-   "quest": "s40"
-  }
+"ruinsofalph": [
+ {
+"quest":"s40"
+ }
  ],
- "burnedtower": [
-  {}
+"burnedtower": [
+ {}
  ],
- "tintower": [
-  {}
+"tintower": [
+ {}
  ],
- "slowpokewell": [
-  {
-   "board": true
-  }
+"slowpokewell": [
+ {
+"board": true
+ }
  ],
- "unioncave": [
-  {
-   "quest": "s33"
-  }
+"unioncave": [
+ {
+"quest":"s33"
+ }
  ],
- "mtmortar": [
-  {
-   "board": true
-  }
+"mtmortar": [
+ {
+"board": true
+ }
  ],
- "icepath": [
-  {
-   "board": true
-  }
+"icepath": [
+ {
+"board": true
+ }
  ],
- "darkcave": [
-  {
-   "board": true
-  }
+"darkcave": [
+ {
+"board": true
+ }
  ],
- "whirlislands": [
-  {}
+"whirlislands": [
+ {}
  ],
- "victoryroad_jo": [
-  {
-   "board": true
-  }
+"victoryroad_jo": [
+ {
+"board": true
+ }
  ],
- "mtsilver": [
-  {
-   "board": true
-  }
+"mtsilver": [
+ {
+"board": true
+ }
  ],
- "tohjofalls": [
-  {
-   "board": true
-  }
+"tohjofalls": [
+ {
+"board": true
+ }
  ],
- "ilexforest": [
-  {
-   "board": true
-  }
+"ilexforest": [
+ {
+"board": true
+ }
  ],
- "indigo_jo": [
-  {
-   "board": true
-  }
+"indigo_jo": [
+ {
+"board": true
+ }
  ]
 };
 

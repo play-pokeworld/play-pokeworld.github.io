@@ -690,10 +690,25 @@ call :getitem claw_fossil claw-fossil
 
 
 echo.
+echo.
 echo ============================================================
-echo Done. Sprites written under:
+echo Step 3/3 : Downloading fonts
+echo ============================================================
+
+if not exist "%ROOT%\src\assets\font" mkdir "%ROOT%\src\assets\font"
+
+echo   [font] WinkySans-Regular.ttf
+curl -sSL --fail -o "%ROOT%\src\assets\font\WinkySans-Regular.ttf" "https://github.com/googlefonts/winkysans/raw/main/fonts/ttf/WinkySans-Regular.ttf" || echo     ! failed WinkySans
+
+echo   [font] Megrim-Regular.ttf
+curl -sSL --fail -o "%ROOT%\src\assets\font\Megrim-Regular.ttf" "https://github.com/google/fonts/raw/main/ofl/megrim/Megrim-Regular.ttf" || echo     ! failed Megrim
+
+echo.
+echo ============================================================
+echo Done. Files written under:
 echo   %POKEDIR%
 echo   %ITEMDIR%
+echo   %ROOT%\src\assets\font\
 echo ============================================================
 popd
 pause
@@ -722,17 +737,35 @@ exit /b 0
 
 
 REM ============================================================
-REM Step 3/3 : Map background images (for offline play)
+REM Step 3/3 : Fonts (WinkySans from PokeChill)
 REM ============================================================
-if not exist "%ROOT%\src\assets\images\maps" mkdir "%ROOT%\src\assets\images\maps"
+if not exist "%ROOT%\src\assets\font" mkdir "%ROOT%\src\assets\font"
 
-REM Map images are game-specific art, not available on PokeAPI.
-REM They are bundled as PNG in the project under src/assets/images/maps/.
-REM If missing, the game falls back to the inline base64 data URI in map-images.js.
+echo.
+echo   [font] WinkySans.ttf (PokeChill font)
+curl -sSL --fail -o "%ROOT%\src\assets\font\WinkySans.ttf" "https://raw.githubusercontent.com/play-pokechill/play-pokechill.github.io/main/font/WinkySans.ttf" || echo     ! failed WinkySans
+
+REM ============================================================
+REM Step 4/4 : Background sprites (PokeChill)
+REM ============================================================
+if not exist "%ROOT%\src\assets\images\bg" mkdir "%ROOT%\src\assets\images\bg"
+
+echo.
+echo   [bg] main-bg.png (animated background pattern)
+curl -sSL --fail -o "%ROOT%\src\assets\images\bg\main-bg.png" "https://raw.githubusercontent.com/play-pokechill/play-pokechill.github.io/main/img/bg/main-bg.png" || echo     ! failed main-bg
+
+echo   [bg] empty.jpg (main content background)
+curl -sSL --fail -o "%ROOT%\src\assets\images\bg\empty.jpg" "https://raw.githubusercontent.com/play-pokechill/play-pokechill.github.io/main/img/bg/empty.jpg" || echo     ! failed empty
+
+echo   [bg] forest.png (exploration header)
+curl -sSL --fail -o "%ROOT%\src\assets\images\bg\forest.png" "https://raw.githubusercontent.com/play-pokechill/play-pokechill.github.io/main/img/bg/forest.png" || echo     ! failed forest
 
 echo.
 echo ============================================================
-echo Map images are bundled PNGs (src/assets/images/maps/).
-echo If missing, download from the project repository.
+echo Done. Files written under:
+echo   %POKEDIR%
+echo   %ITEMDIR%
+echo   %ROOT%\src\assets\font\
+echo   %ROOT%\src\assets\images\bg\
 echo ============================================================
 

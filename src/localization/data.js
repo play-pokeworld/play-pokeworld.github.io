@@ -20,27 +20,27 @@ var LANG_NESTED_DOMAINS = ['items','quests','lore','npc','talents','champions','
 var LANGS = ['fr','en'];
 
 function _mergeLang(lang){
-  var flat = {};
-  for(var i=0;i<LANG_FLAT_DOMAINS.length;i++){
-    var d = LANG_FLAT_DOMAINS[i];
-    var frag = window['L_'+lang+'_'+d];
-    if(frag) for(var k in frag) if(Object.prototype.hasOwnProperty.call(frag,k)) flat[k]=frag[k];
-  }
-  var nested = {};
-  for(var j=0;j<LANG_NESTED_DOMAINS.length;j++){
-    var nd = LANG_NESTED_DOMAINS[j];
-    var nfrag = window['L_'+lang+'_'+nd];
-    if(nfrag) nested[nd]=nfrag;
-  }
-  // Combine: nested namespaces sit alongside flat keys.
-  var out = flat;
-  for(var nk in nested) out[nk]=nested[nk];
-  return out;
+ var flat = {};
+ for(var i=0;i<LANG_FLAT_DOMAINS.length;i++){
+ var d = LANG_FLAT_DOMAINS[i];
+ var frag = window['L_'+lang+'_'+d];
+ if(frag) for(var k in frag) if(Object.prototype.hasOwnProperty.call(frag,k)) flat[k]=frag[k];
+}
+ var nested = {};
+ for(var j=0;j<LANG_NESTED_DOMAINS.length;j++){
+ var nd = LANG_NESTED_DOMAINS[j];
+ var nfrag = window['L_'+lang+'_'+nd];
+ if(nfrag) nested[nd]=nfrag;
+}
+ // Combine: nested namespaces sit alongside flat keys.
+ var out = flat;
+ for(var nk in nested) out[nk]=nested[nk];
+ return out;
 }
 
 window.I18N = {
-  fr: _mergeLang('fr'),
-  en: _mergeLang('en')
+ fr: _mergeLang('fr'),
+ en: _mergeLang('en')
 };
 
 // Pokémon French names (array indexed by species id).

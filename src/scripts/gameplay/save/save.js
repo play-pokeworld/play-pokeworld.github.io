@@ -1,130 +1,223 @@
 // ============================================================
-// SAVE — (split from save.js)
+// SAVE SYSTEM — Inspiré de PokéChill (simple et robuste)
 // ============================================================
-function saveGame(manual){
-  try{
-    safeStorage.set('pokeworld_save',JSON.stringify({
-      G:G, version:2
-    }));
-    if(manual) notify(t("n.partie_sauvegardée"));
-  } catch(e){ if(manual) setMsg(t("n.erreur_de_sauvegarde"));}
-}
 
+const SAVE_KEY = 'pokeworld_save';
+const SAVE_VERSION = 2;
 
-function loadGame(manual){
-  try{
-    const raw=safeStorage.get('pokeworld_save');
-    if(!raw){ if(manual) setMsg(t("n.aucune_sauvegarde_trouvée")); return;}
-    const save=JSON.parse(raw);
-    if(save.version>=2){
-      G=save.G;
-      if(!G.collection) G.collection={};
-      if(!G.evolvedSpecies) G.evolvedSpecies=[];
-      if(!G.dupeCatches) G.dupeCatches={};
-      if(!G.teamPresets) G.teamPresets = { preset1:{name:"Équipe Aventure",uids:[]}, preset2:{name:"Équipe Boss",uids:[]}, preset3:{name:"Équipe Entraînement",uids:[]} };
-      if(!G.activePresetId) G.activePresetId = 'preset1';
-      if(!G.automation) G.automation = { autoHatch: false, autoSeedHatchery: false, autoExplore: false };
-      if(!G.mainStep || typeof G.mainStep!=='object') G.mainStep={kanto:0,johto:0};
-      if(G.mainStep.kanto==null) G.mainStep.kanto=0;
-      if(G.mainStep.johto==null) G.mainStep.johto=0;
-      if(!G.mainProgress || typeof G.mainProgress!=='object') G.mainProgress={kanto:0,johto:0};
-      if(G.mainProgress.kanto==null) G.mainProgress.kanto=0;
-      if(G.mainProgress.johto==null) G.mainProgress.johto=0;
-      if(typeof G.totalWildWins!=='number') G.totalWildWins=0;
-      if(typeof G.maxRepeatables!=='number') G.maxRepeatables=3;
-      // Migration boîte : {normal, shiny} → instance unique
-      for(const [idStr,slot] of Object.entries(G.collection)){
-        if(slot && typeof slot==='object' && ('normal' in slot || 'shiny' in slot)){
-          const inst=slot.normal||slot.shiny||null;
-          if(inst){
-            inst.shinyUnlocked=!!slot.shiny||!!inst.shiny;
-            inst.shinyActive=!!inst.shiny;
-            inst.heldItem=inst.heldItem||null;
-            G.collection[idStr]=inst;
-          } else delete G.collection[idStr];
-        }
-      }
-      // Nettoyage inventaire : supprime les anciens objets non équipables
-      for(const k of Object.keys(G.inventory||{})){
-        if(!ITEMS[k]) delete G.inventory[k];
-        else if(ITEMS[k].buff) G.inventory[k]=Math.min(BAG_MAX,G.inventory[k]);
-      }
-      // Migration Pokémon d'équipe
-      for(const p of G.team){
-        if(!p) continue;
-        if(!p.uid) p.uid='p_'+Math.random().toString(36).substr(2,9)+'_'+Math.random().toString(36).substr(2,5);
-        if(!p.moves) p.moves=[];
-        for(const m of p.moves){
-          if(m.maxPP===undefined) m.maxPP=MOVES[m.id]?.pp||10;
-          if(m.pp===undefined) m.pp=m.maxPP;
-        }
-        if(!p.battleMods) p.battleMods={atk:1,def:1,spe:1};
-        if(p.heldItem===undefined) p.heldItem=null;
-        if(p.shinyUnlocked===undefined) p.shinyUnlocked=!!p.shiny;
-        if(p.shinyActive===undefined) p.shinyActive=!!p.shiny;
-        p.shiny=p.shinyActive;
-        if((p.xp||0) < xpForLevel(p.level)) p.xp = xpForLevel(p.level) + (p.xp || 0);
-        if(!p.xpNext || p.xpNext <= xpForLevel(p.level)) p.xpNext = xpForLevel(p.level + 1);
-      }
-      for(const p of Object.values(G.collection||{})){
-        if(!p) continue;
-        if(!p.uid) p.uid='p_'+Math.random().toString(36).substr(2,9)+'_'+Math.random().toString(36).substr(2,5);
-        if((p.xp||0) < xpForLevel(p.level)) p.xp = xpForLevel(p.level) + (p.xp || 0);
-        if(!p.xpNext || p.xpNext <= xpForLevel(p.level)) p.xpNext = xpForLevel(p.level + 1);
-      }
+// Sauvegarde complète de l'état du jeu
+function saveGame(manual = false) {
+  try {
+    // Créer un objet sérialisable avec TOUT l'état
+    const saveData = {
+      version: SAVE_VERSION,
+      timestamp: Date.now(),
+      G: JSON.parse(JSON.stringify(G)) // Deep clone pour éviter les références
+    };
+    
+    const json = JSON.stringify(saveData);
+    
+    // Vérifier que la sauvegarde n'est pas trop volumineuse
+    if (json.length > 5 * 1024 * 1024) { // 5MB
+      console.error('[SAVE] Save too large:', json.length, 'bytes');
+      if (manual) notify("Erreur: sauvegarde trop volumineuse", "var(--red)");
+      return false;
     }
-    syncShinyState();
-    syncAllNames();
-    updateHeader();
-    renderDashboardColumns();
-    renderMap();
-    showTab('info');
-    ensureQuestState();
-    if(manual) notify(t("n.partie_chargée"));
-  } catch(e){ if(manual) setMsg(t("n.erreur_de_chargement"));}
+    
+    // Sauvegarder dans localStorage
+    localStorage.setItem(SAVE_KEY, json);
+    
+    if (manual) {
+      const collectionCount = Object.keys(G.collection || {}).length;
+      const teamCount = G.team ? G.team.length : 0;
+      console.log(`[SAVE] ✅ Saved successfully: ${teamCount} team, ${collectionCount} box`);
+      notify(t("n.partie_sauvegardée") || "Partie sauvegardée !");
+    }
+    
+    return true;
+  } catch (e) {
+    console.error('[SAVE ERROR]', e);
+    if (manual) {
+      notify("Erreur lors de la sauvegarde: " + e.message, "var(--red)");
+    }
+    return false;
+  }
 }
 
-
-function askConfirm(message, onYes){
-  document.getElementById('confirm-text').textContent=message;
-  const btn=document.getElementById('confirm-yes');
-  const fresh=btn.cloneNode(true); // strip old listeners
-  btn.parentNode.replaceChild(fresh,btn);
-  fresh.addEventListener('click',()=>{ closeConfirm(); onYes(); });
-  document.getElementById('confirm-modal').classList.add('open');
+// Chargement de la sauvegarde
+function loadGame(manual = false) {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    
+    if (!raw) {
+      if (manual) notify("Aucune sauvegarde trouvée", "var(--light1)");
+      return false;
+    }
+    
+    console.log('[LOAD] Raw save size:', raw.length, 'bytes');
+    
+    const saveData = JSON.parse(raw);
+    
+    // Vérifier la version
+    if (saveData.version < SAVE_VERSION) {
+      console.warn('[LOAD] Old save version:', saveData.version, '-> migrating to', SAVE_VERSION);
+      // Migration si nécessaire
+    }
+    
+    // Restaurer l'état complet
+    G = saveData.G;
+    
+    // Vérifier que G est bien restauré
+    if (!G) {
+      console.error('[LOAD] G is null after load!');
+      return false;
+    }
+    
+    // Initialiser les structures manquantes (pour compatibilité)
+    if (!G.collection) G.collection = {};
+    if (!G.team) G.team = [];
+    if (!G.inventory) G.inventory = {};
+    if (!G.pokedex) G.pokedex = {};
+    if (!G.unlockedTalents) G.unlockedTalents = {};
+    if (!G.mainStep) G.mainStep = { kanto: 0, johto: 0 };
+    if (!G.automation) G.automation = { autoHatch: false, autoSeedHatchery: false, autoExplore: false };
+    
+    // Logs de debug
+    const collectionCount = Object.keys(G.collection).length;
+    const teamCount = G.team.length;
+    console.log(`[LOAD] ✅ Loaded successfully: ${teamCount} team, ${collectionCount} box`);
+    console.log('[LOAD] Collection keys:', Object.keys(G.collection).slice(0, 5));
+    
+    // Sauvegarder immédiatement pour consolider
+    saveGame(false);
+    
+    if (manual) {
+      notify("Partie chargée !", "var(--green)");
+    }
+    
+    return true;
+  } catch (e) {
+    console.error('[LOAD ERROR]', e);
+    if (manual) {
+      notify("Erreur lors du chargement: " + e.message, "var(--red)");
+    }
+    return false;
+  }
 }
 
-function closeConfirm(){
-  document.getElementById('confirm-modal').classList.remove('open');
+// Autosave silencieux
+function autoSave() {
+  try {
+    saveGame(false);
+  } catch (e) {
+    console.error('[AUTOSAVE ERROR]', e);
+  }
 }
 
-
-function confirmDelete(){
-  document.getElementById('delete-row').style.display='none';
-  document.getElementById('delete-confirm-row').style.display='flex';
+// Export de sauvegarde (pour backup)
+function exportSave() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) {
+      notify("Aucune sauvegarde à exporter", "var(--red)");
+      return;
+    }
+    
+    const blob = new Blob([raw], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `pokeworld_save_${new Date().toISOString().slice(0, 19)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    notify("Sauvegarde exportée !", "var(--green)");
+  } catch (e) {
+    console.error('[EXPORT ERROR]', e);
+    notify("Erreur lors de l'export", "var(--red)");
+  }
 }
 
-function cancelDelete(){
-  document.getElementById('delete-row').style.display='flex';
-  document.getElementById('delete-confirm-row').style.display='none';
+// Import de sauvegarde (depuis fichier)
+function importSave(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const json = e.target.result;
+      const saveData = JSON.parse(json);
+      
+      // Vérifier que c'est une sauvegarde valide
+      if (!saveData.G || !saveData.version) {
+        notify("Fichier de sauvegarde invalide", "var(--red)");
+        return;
+      }
+      
+      // Sauvegarder l'actuelle au cas où
+      const currentSave = localStorage.getItem(SAVE_KEY);
+      
+      // Charger la nouvelle sauvegarde
+      localStorage.setItem(SAVE_KEY, json);
+      
+      // Recharger le jeu
+      if (loadGame(false)) {
+        notify("Sauvegarde importée ! Rechargement...", "var(--green)");
+        setTimeout(() => location.reload(), 1000);
+      } else {
+        // Restaurer l'ancienne si échec
+        if (currentSave) {
+          localStorage.setItem(SAVE_KEY, currentSave);
+        }
+        notify("Erreur lors de l'import", "var(--red)");
+      }
+    } catch (err) {
+      console.error('[IMPORT ERROR]', err);
+      notify("Erreur lors de l'import: " + err.message, "var(--red)");
+    }
+  };
+  reader.readAsText(file);
 }
 
-function doDelete(){
-  safeStorage.remove('pokeworld_save');
-  G={location:'pallet',region:'kanto',team:[],inventory:{},money:2000,
-    badges:[],defeatedChamps:{},pokedex:{},stepsLeft:0,starter:false, starterKanto:false, starterJohto:false, regionStarter:{kanto:false,johto:false}, collection:{},evolvedSpecies:[],dupeCatches:{},storyIdx:0,storyProgress:0,unlockedTalents:{},activeQuests:[],repeatables:[],visitedMaps:{},completedQuests:{},mainStep:{kanto:0,johto:0},mainProgress:{kanto:0,johto:0},totalWildWins:0,maxRepeatables:3,lang:G.lang||'fr'};
-  updateHeader();
-  renderMap();
-  showTab('info');
-  cancelDelete();
-  closeSettings();
-  notify(t("n.sauvegarde_supprimée_nouvelle_partie"),'var(--blue)');
-  setTimeout(()=>{ if(typeof checkStarterNeeded==='function') checkStarterNeeded(); else if(!G.starter) chooseStarter(); },400);
+// Suppression de sauvegarde
+function deleteSave() {
+  try {
+    localStorage.removeItem(SAVE_KEY);
+    notify("Sauvegarde supprimée", "var(--green)");
+    setTimeout(() => location.reload(), 1000);
+  } catch (e) {
+    console.error('[DELETE ERROR]', e);
+    notify("Erreur lors de la suppression", "var(--red)");
+  }
 }
 
-function resetGame(){ confirmDelete(); openSettings(); }
+// Autosave périodique (toutes les 30 secondes)
+setInterval(() => {
+  autoSave();
+}, 30000);
 
 // ============================================================
-// SETTINGS (theme, export/import, delete save)
+// FONCTIONS DE GESTION DE SAUVEGARDE (pour les boutons UI)
 // ============================================================
 
+function confirmDelete() {
+  // Cache le bouton supprimer, affiche les boutons confirmer/annuler
+  const deleteRow = document.getElementById('delete-row');
+  const confirmRow = document.getElementById('delete-confirm-row');
+  if (deleteRow) deleteRow.style.display = 'none';
+  if (confirmRow) confirmRow.style.display = 'flex';
+}
+
+function cancelDelete() {
+  // Cache les boutons confirmer/annuler, réaffiche le bouton supprimer
+  const deleteRow = document.getElementById('delete-row');
+  const confirmRow = document.getElementById('delete-confirm-row');
+  if (deleteRow) deleteRow.style.display = 'flex';
+  if (confirmRow) confirmRow.style.display = 'none';
+}
+
+function doDelete() {
+  deleteSave();
+}
+
+function resetGame() {
+  confirmDelete();
+}

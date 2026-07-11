@@ -10,15 +10,14 @@ function renderShortcutsWindow(){
   const buttons = [
     {icon:'📦', label: isEn?'PC Box':'Boîte PC', action: "openUnifiedSelectorModal('box_view')", color:'var(--blue)'},
     {icon:'🎒', label: isEn?'Bag':'Sac', action: "openFullscreenPanel('inventory')", color:'var(--green)'},
-    {icon:'🏪', label: isEn?'Poké Market':'Marché', action: "openFullscreenPanel('market')", color:'var(--purple)'},
-    {icon:'📖', label:'Pokédex', action: "openFullscreenPanel('pokedex')", color:'var(--gold)'},
+    {icon:'🏪', label: isEn?'Poké Market':'Marché', action: "openFullscreenPanel('market')", color:'var(--accent)'},
+    {icon:'', label:'Pokédex', action: "openFullscreenPanel('pokedex')", color:'var(--light2)'},
   ];
 
   el.innerHTML = buttons.map(b => 
-    `<button onclick="${b.action}" style="width:100%;padding:10px 12px;background:var(--card);border:2px solid ${b.color};border-radius:8px;cursor:pointer;font-size:13px;font-weight:bold;color:#fff;display:flex;align-items:center;gap:10px;transition:0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
-      <span style="font-size:20px">${b.icon}</span>
+    `<button onclick="${b.action}" style="width:100%;padding:10px 12px;background:var(--dark3);border:2px solid ${b.color};border-radius:8px;cursor:pointer;font-size:13px;font-weight:bold;color:var(--light2);display:flex;align-items:center;gap:10px;transition:0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+      <span style="font-size: 15px">${b.icon}</span>
       <span>${b.label}</span>
     </button>`
   ).join('');
 }
-
