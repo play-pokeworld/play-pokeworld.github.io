@@ -20,6 +20,7 @@
 }
 
 /* --- COULEURS --- */
+/* Thème SOMBRE (défaut) */
 :root {
   --dark1: #36342F;
   --dark2: #444138;
@@ -57,6 +58,71 @@
   --orange: #FBA64C;
   --purple: #B763CF;
   --yellow: #F2D94E;
+}
+
+/* Thème CLAIR */
+[data-theme="light"] {
+  --dark1: #E8E0D0;
+  --dark2: #F5F0E0;
+  --dark3: #D8CDB5;
+  --light1: #8B7355;
+  --light2: #4A3B2A;
+  --accent: #8B7355;
+  --panel: #F5F0E0;
+  --panel-bg: #4A3B2A;
+  --panel-text: #E8E0D0;
+  --panel-border: #8B7355;
+  --dim: #8B7355;
+  --red: #C0392B;
+  --green: #27AE60;
+  --blue: #2980B9;
+  --orange: #E67E22;
+  --purple: #8E44AD;
+  --yellow: #F39C12;
+}
+
+/* Thème GAMEBOY */
+[data-theme="gameboy"] {
+  --dark1: #0F380F;
+  --dark2: #306230;
+  --dark3: #8BAC0F;
+  --light1: #4A8A4A;
+  --light2: #9BBC0F;
+  --accent: #4A8A4A;
+  --panel: #306230;
+  --panel-bg: #9BBC0F;
+  --panel-text: #0F380F;
+  --panel-border: #8BAC0F;
+  --dim: #4A8A4A;
+  --shiny: #FFD700;
+  --red: #C0392B;
+  --green: #27AE60;
+  --blue: #2980B9;
+  --orange: #E67E22;
+  --purple: #8E44AD;
+  --yellow: #F39C12;
+}
+
+/* Thème FEU */
+[data-theme="fire"] {
+  --dark1: #2C1810;
+  --dark2: #4A2520;
+  --dark3: #6B3A30;
+  --light1: #E67E22;
+  --light2: #FFDAB9;
+  --accent: #E67E22;
+  --panel: #4A2520;
+  --panel-bg: #FFDAB9;
+  --panel-text: #2C1810;
+  --panel-border: #E67E22;
+  --dim: #E67E22;
+  --shiny: #FF4500;
+  --red: #FF4500;
+  --green: #FF6347;
+  --blue: #FF8C00;
+  --orange: #FF6347;
+  --purple: #FF1493;
+  --yellow: #FFD700;
 }
 
 /* --- BODY --- */
