@@ -1,7 +1,6 @@
 // ============================================================
 // TEAM MANAGE — (split from map.js)
 // ============================================================
-let _teamDragIdx=null;
 let _swapFromTeamIdx=null;
 
 function saveCurrentTeamToPreset(key){
@@ -68,35 +67,6 @@ function renderTeam(el){
  <span><b>Combat en direct en cours :</b> L'équipe active est verrouillée. Vous ne pouvez ni échanger, ni réordonner, ni modifier le stuff pendant le combat.</span>
  </div>` : '';
  el.innerHTML= renderTeamPresetsToolbar() + battleLockBanner + G.team.map((p,i)=>renderPokeCard(p,i)).join('');
-}
-
-function onTeamDragStart(ev, i){
- if(battle.active){
- notify("Action impossible : l'équipe est bloquée pendant un combat actif.","var(--red)");
- ev.preventDefault(); return;
- }
- _teamDragIdx=i;
- ev.dataTransfer.effectAllowed='move';
- try{ ev.dataTransfer.setData('text/plain', String(i)); }catch(e){}
-}
-
-function onTeamDragOver(ev){
- ev.preventDefault();
- ev.dataTransfer.dropEffect='move';
- ev.currentTarget.style.borderColor='var(--light1)';
-}
-
-function onTeamDragLeave(ev){ ev.currentTarget.style.borderColor=''; }
-
-function onTeamDrop(ev, j){
- ev.preventDefault();
- ev.currentTarget.style.borderColor='';
- if(battle.active) return;
- const i=_teamDragIdx; _teamDragIdx=null;
- if(i==null||i===j||!G.team[i]||!G.team[j]) return;
- const tmp=G.team[i]; G.team[i]=G.team[j]; G.team[j]=tmp;
- saveGame();
- renderTeamWindow();
 }
 
 function onTeamCardClick(ev, i){

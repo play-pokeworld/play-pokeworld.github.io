@@ -21,7 +21,7 @@ function renderTeamWindow(){
        </div>`
     : '';
 
-  el.innerHTML = renderTeamPresetsToolbar() + battleLockBanner + G.team.map((p, i) => {
+  const teamCardsHtml = G.team.map((p, i) => {
     if((p.xp || 0) < xpForLevel(p.level)) p.xp = xpForLevel(p.level) + (p.xp || 0);
     if(!p.xpNext || p.xpNext <= xpForLevel(p.level)) p.xpNext = xpForLevel(p.level + 1);
 
@@ -38,7 +38,12 @@ function renderTeamWindow(){
       onLeftClickSprite: `onTeamCardClick(event, ${i})`,
       onLeftClickItem: itemClickHandler,
     });
-  }).join('') + (G.team.length < 6 ? `
+  }).join('');
+
+  el.innerHTML = renderTeamPresetsToolbar() + battleLockBanner + teamCardsHtml;
+  
+  // Add drag and drop events after render
+  addTeamDragAndDrop(); + (G.team.length < 6 ? `
     <div style="background:var(--dark3);border:2px dashed var(--light1);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;" 
          onmouseover="this.style.background='var(--light1)';this.style.borderColor='var(--light2)';" 
          onmouseout="this.style.background='var(--dark3)';this.style.borderColor='var(--light1)';"
@@ -231,3 +236,101 @@ function addLongPressToItemBadges(){
 
 function aliveCount(){ return G.team.filter(p => p.currentHP > 0).length; }
 function firstAlive(){ return G.team.findIndex(p => p.currentHP > 0); }
+
+
+
+function addTeamDragAndDrop() {
+  const teamEl = document.getElementById('team-window-body');
+  if (!teamEl) return;
+  const cards = teamEl.querySelectorAll('.poke-card');
+  cards.forEach((card, idx) => {
+    card.setAttribute('data-team-idx', idx);
+    card.addEventListener('mousedown', (ev) => teamMouseDown(ev, idx));
+    card.addEventListener('mouseup', (ev) => teamMouseUp(ev));
+    card.addEventListener('dragstart', (ev) => teamDragStart(ev, idx));
+    card.addEventListener('dragover', (ev) => teamDragOver(ev));
+    card.addEventListener('dragleave', (ev) => teamDragLeave(ev));
+    card.addEventListener('drop', (ev) => teamDrop(ev, idx));
+  });
+}
+
+// ============================================================
+// TEAM DRAG AND DROP (long-press to drag)
+// ============================================================
+let _teamDragIdx = null;
+let _teamLongPressTimer = null;
+let _teamLongPressReady = false;
+const TEAM_DRAG_DELAY = 400; // ms before drag is enabled
+
+function teamMouseDown(ev, idx) {
+  // Only on left click
+  if (ev.button !== 0) return;
+  _teamLongPressReady = false;
+  _teamDragIdx = idx;
+  _teamLongPressTimer = setTimeout(() => {
+    _teamLongPressReady = true;
+    // Add draggable attribute only after long-press
+    if (ev.currentTarget) {
+      ev.currentTarget.setAttribute('draggable', 'true');
+      ev.currentTarget.style.opacity = '0.6';
+      ev.currentTarget.style.cursor = 'grabbing';
+    }
+  }, TEAM_DRAG_DELAY);
+}
+
+function teamMouseUp(ev) {
+  clearTimeout(_teamLongPressTimer);
+  _teamLongPressTimer = null;
+  if (ev.currentTarget) {
+    // Remove draggable attribute if long-press wasn't completed
+    if (!_teamLongPressReady) {
+      ev.currentTarget.removeAttribute('draggable');
+    }
+    ev.currentTarget.style.opacity = '';
+    ev.currentTarget.style.cursor = '';
+  }
+}
+
+function teamDragStart(ev, idx) {
+  clearTimeout(_teamLongPressTimer);
+  ev.dataTransfer.effectAllowed = 'move';
+  ev.dataTransfer.setData('text/plain', String(idx));
+  // Fix the ghost image
+  try {
+    const rect = ev.currentTarget.getBoundingClientRect();
+    ev.dataTransfer.setDragImage(ev.currentTarget, rect.width / 2, rect.height / 2);
+  } catch(e) {}
+}
+
+function teamDragOver(ev) {
+  ev.preventDefault();
+  ev.dataTransfer.dropEffect = 'move';
+  ev.currentTarget.style.borderColor = 'var(--light2)';
+  ev.currentTarget.style.boxShadow = '0 0 15px rgba(236,222,183,0.6)';
+}
+
+function teamDragLeave(ev) {
+  ev.currentTarget.style.borderColor = '';
+  ev.currentTarget.style.boxShadow = '';
+}
+
+function teamDrop(ev, targetIdx) {
+  ev.preventDefault();
+  ev.currentTarget.style.borderColor = '';
+  ev.currentTarget.style.boxShadow = '';
+  ev.currentTarget.style.opacity = '';
+  ev.currentTarget.style.cursor = '';
+  
+  if (_teamDragIdx === null || _teamDragIdx === targetIdx) return;
+  
+  // Swap the two Pokémon in the team array
+  const sourceIdx = _teamDragIdx;
+  const temp = G.team[sourceIdx];
+  G.team[sourceIdx] = G.team[targetIdx];
+  G.team[targetIdx] = temp;
+  
+  _teamDragIdx = null;
+  _teamLongPressReady = false;
+  saveGame();
+  renderTeamWindow();
+}
