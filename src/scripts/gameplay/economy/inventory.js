@@ -106,7 +106,7 @@ function handleInventoryClick(key){
   const itm = ITEMS[key];
   if(!itm) return;
   if(itm.buff){
-    openItemInfo(key);
+    // Items équipables : clic gauche ne fait rien dans le sac
     return;
   }
   onInventoryClick(key);

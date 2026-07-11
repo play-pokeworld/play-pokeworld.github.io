@@ -138,8 +138,8 @@ function openBoxPokeModal(boxId){
  })()}
  <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
  ${swap
- ? `<button class="hbtn"style="background:var(--blue);color:#fff"onclick="swapBoxWithTeam('${boxId}'); document.getElementById('poke-modal').classList.remove('open');">🔁 Échanger avec ${G.team[_swapFromTeamIdx]?.name||"l'équipe"}</button>
-    <button class="hbtn"style="background:var(--red);color:#fff"onclick="removeFromTeam(${_swapFromTeamIdx}); document.getElementById('poke-modal').classList.remove('open');">❌ Retirer de l'équipe</button>
+ ? `<button class="hbtn"style="background:var(--blue);color:#fff"onclick="swapBoxWithTeam('${boxId}'); document.getElementById('poke-modal').classList.remove('open');"> Échanger avec ${G.team[_swapFromTeamIdx]?.name||"l'équipe"}</button>
+    <button class="hbtn"style="background:var(--red);color:#fff"onclick="removeFromTeam(${_swapFromTeamIdx}); document.getElementById('poke-modal').classList.remove('open');"> Retirer de l'équipe</button>
     <button class="hbtn"style="background:var(--dark3);color:var(--light2)"onclick="cancelSwap(); document.getElementById('poke-modal').classList.remove('open');">✖ Annuler</button>`
  : `<button class="hbtn"style="background:var(--green);color:#fff"onclick="addBoxedToTeam('${boxId}'); document.getElementById('poke-modal').classList.remove('open');"${G.team.length>=6?'disabled title="Équipe pleine (6/6)"':''}>➕ Ajouter à l'équipe</button>`}
  </div>`;

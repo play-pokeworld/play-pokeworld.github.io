@@ -99,6 +99,7 @@ function openItemSelector(teamIdx){
 
 // Show inventory with Cancel/Remove buttons
 function showItemSelectorForPokemon(teamIdx){
+  const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
   const p = G.team[teamIdx];
   if(!p) return;
   const fsContent = document.getElementById('fs-panel-content');
@@ -166,6 +167,46 @@ function removeItemFromPokemon(teamIdx){
   renderTeamWindow();
   closeFullscreenPanel();
   notify(`${p.name} ne tient plus rien.`, 'var(--light1)');
+}
+
+// Retire l'objet d'un Pokémon de l'équipe et ferme le panneau
+function unequipItemFromPokemon(idx){
+  const p = G.team[idx];
+  if(!p || !p.heldItem) return;
+  const itemName = getItemName(p.heldItem);
+  p.heldItem = null;
+  saveGame();
+  renderTeamWindow();
+  document.getElementById('poke-modal').classList.remove('open');
+  notify(`${itemName} retiré de ${p.name}.`, 'var(--light1)');
+}
+
+// Retire l'objet d'un Pokémon de la boîte et ferme le panneau
+function unequipItemFromBox(boxId){
+  const p = G.collection[boxId] || G.collection[String(boxId)];
+  if(!p || !p.heldItem) return;
+  const itemName = getItemName(p.heldItem);
+  p.heldItem = null;
+  saveGame();
+  document.getElementById('poke-modal').classList.remove('open');
+  notify(`${itemName} retiré de ${p.name}.`, 'var(--light1)');
+}
+
+// Retire un item spécifique de tous les Pokémon de l'équipe (par key)
+function removeItemFromTeamByName(key){
+  let removed = false;
+  G.team.forEach(p => {
+    if(p && p.heldItem === key){
+      p.heldItem = null;
+      removed = true;
+    }
+  });
+  if(removed){
+    saveGame();
+    renderTeamWindow();
+    closeFullscreenPanel();
+    notify(`${getItemName(key)} retiré de l'équipe.`, 'var(--light1)');
+  }
 }
 
 // Add long-press support to item badges for mobile

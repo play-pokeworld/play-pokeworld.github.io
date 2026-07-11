@@ -129,10 +129,10 @@ function onInventoryClick(key){
  return;
  }
 
- if(!itm.buff) return;
- // From bag: just show info popup, no equip flow (equip only from team window)
- openItemInfo(key);
- return;
+  if(!itm.buff) return;
+  // From bag: just show info popup, no equip flow (equip only from team window)
+  openItemInfo(key);
+  return;
 }
 
 function useItem(key){ onInventoryClick(key); }
