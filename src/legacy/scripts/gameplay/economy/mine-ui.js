@@ -19,6 +19,10 @@ function renderMine(el){
  1: '#b5836d',
  0: 'var(--dark2)'
  };
+ const itemColors = {
+ firestone:'#ff3b1f', waterstone:'#00a6ff', thunderstone:'#ffe600', leafstone:'#39ff64', moonstone:'#d28cff', sunstone:'#ffb000',
+ nugget:'#ffd84a', stardust:'#7ff7ff', helix_fossil:'#ff7bd5', dome_fossil:'#ff8a3d', old_amber:'#ffbf2f', fossil:'#ff5f9e', root_fossil:'#70ff3d', claw_fossil:'#ff5252'
+ };
 
  let gridHtml = `<div data-style="display:grid;grid-template-columns:repeat(${MINE_W}, 1fr);gap:3px;background:#221814;padding:8px;border-radius:10px;border:2px solid #6d4c3d;margin:12px 0">`;
 
@@ -40,17 +44,18 @@ function renderMine(el){
  }
 
  let contentHtml = '';
+ const revealedItem = !!(depth === 0 && cellItem);
+ const revealedColor = revealedItem ? (itemColors[cellItem.key] || '#ff4fd8') : null;
  if(depth === 0){
  if(cellItem){
- contentHtml = `<div data-style="width:100%;height:100%;background:${cellItem.collected?'rgba(76,175,80,0.25)':'rgba(148,136,107,0.25)'};display:flex;align-items:center;justify-content:center;border-radius:3px">${isItemCenter ? itemIcon(cellItem.key, 24) : ''}</div>`;
+ contentHtml = `<div class="mine-revealed-item ${cellItem.collected?'is-collected':''}" data-style="width:100%;height:100%;background:${cellItem.collected?'rgba(76,175,80,0.35)':revealedColor};display:flex;align-items:center;justify-content:center;border-radius:3px;box-shadow:inset 0 0 12px rgba(255,255,255,0.45),0 0 12px ${revealedColor};border:2px solid rgba(255,255,255,0.75)">${isItemCenter ? itemIcon(cellItem.key, 24) : ''}</div>`;
  }
  } else {
- const hint = (depth === 1 && cellItem) ? `<div class="extracted-template-style-223"></div>` : '';
- contentHtml = `<div class="extracted-template-style-224">${hint||depth}</div>`;
+ contentHtml = `<div class="extracted-template-style-224">${depth}</div>`;
  }
 
  const canClick = depth > 0 || tool === 'hammer';
- gridHtml += `<div class="${canClick?'mine-tile-clickable':''}" ${canClick ? `data-action="legacy-call" data-call="digMineTile" data-call-args="${x},${y}"` : ''} data-style="aspect-ratio:1;background:${rockColors[depth]};border-radius:4px;cursor:${canClick ? 'pointer' : 'default'};display:flex;align-items:center;justify-content:center;user-select:none;transition:filter 0.1s;position:relative">
+ gridHtml += `<div class="mine-tile ${canClick?'mine-tile-clickable':''} ${revealedItem?'mine-tile-revealed-item':''}" ${canClick ? `data-action="legacy-call" data-call="digMineTile" data-call-args="${x},${y}"` : ''} data-style="aspect-ratio:1;background:${rockColors[depth]};border-radius:4px;cursor:${canClick ? 'pointer' : 'default'};display:flex;align-items:center;justify-content:center;user-select:none;transition:filter 0.1s;position:relative">
  ${contentHtml}
  </div>`;
  }

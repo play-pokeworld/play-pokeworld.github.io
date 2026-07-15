@@ -1,9 +1,15 @@
+function normalizeItemKey(key){
+ const aliases = {ancient_fossil:'fossil', old_fossil:'fossil', fossil_ancien:'fossil'};
+ return aliases[key] || key;
+}
 function getItemName(key){
- const v = (typeof t==='function') ? t('items.'+key+'.name') : key;
- return v || key;
+ const displayKey = normalizeItemKey(key);
+ const v = (typeof t==='function') ? t('items.'+displayKey+'.name') : displayKey;
+ return v || displayKey;
 }
 function getItemDesc(key){
- return (typeof t==='function') ? (t('items.'+key+'.desc') || '') : '';
+ const displayKey = normalizeItemKey(key);
+ return (typeof t==='function') ? (t('items.'+displayKey+'.desc') || '') : '';
 }
 
 
@@ -71,8 +77,9 @@ function openItemInfo(key){
 
 
 function getItemSpriteUrl(key) {
-  if (!key || !ITEMS[key]) return null;
-  return 'src/assets/images/items/' + key + '.png';
+  const displayKey = normalizeItemKey(key);
+  if (!displayKey || !ITEMS[displayKey]) return null;
+  return 'src/assets/images/items/' + displayKey + '.png';
 }
 
 function itemSpriteHtml(key, size) {

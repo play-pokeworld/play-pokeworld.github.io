@@ -129,6 +129,20 @@ const ITEMS = {
 "value": 4000,
 "revive": 138
  },
+"ancient_fossil": {
+"icon":"",
+"price": 4000,
+"type":"fossil",
+"value": 4000,
+"revive": 138
+ },
+"old_fossil": {
+"icon":"",
+"price": 4000,
+"type":"fossil",
+"value": 4000,
+"revive": 138
+ },
 "helix_fossil": {
 "icon":"",
 "price": 5000,

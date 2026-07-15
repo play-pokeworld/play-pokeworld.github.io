@@ -129,6 +129,16 @@ function claimQuest(qid, cat){
  : (cat==='side') ? SIDE_QUESTS[inst.qid]
  : inst.def;
  if(!questDone(inst, def)){ notify(t("legacy_message_n_objectif_pas_encore_termin"),'var(--red)'); return; }
+ if(def.rewardPoke && cat==='main'){
+   if(typeof battle !== 'undefined' && battle && battle.active){
+     notify('Un combat est déjà en cours : terminez-le avant de défier ce légendaire.', 'var(--red)');
+     return;
+   }
+   if(!G.team || !G.team.length){
+     notify(t('no_pokemon_in_team'), 'var(--red)');
+     return;
+   }
+ }
 
  if(def.rewardMoney) G.money += def.rewardMoney;
  if(def.rewardItems){ for(const k in def.rewardItems) addToInventory(k, def.rewardItems[k]); }

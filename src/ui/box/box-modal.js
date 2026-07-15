@@ -317,7 +317,7 @@ export function tryBoxStoneEvo(boxId, stoneKey) {
   if((G.inventory[stoneKey]||0)<1){ if (typeof globalThis.notify==='function') globalThis.notify(t("n.pierre_manquante")); return; }
   G.inventory[stoneKey]--;
   if(G.inventory[stoneKey]<=0) delete G.inventory[stoneKey];
-  const shinyUnlock = !!(p.shinyUnlocked || p.shinyActive || p.shiny || (globalThis.isSpeciesShiny?globalThis.isSpeciesShiny(evo):false));
+  const shinyUnlock = !!(p.shinyUnlocked || p.shinyActive || p.shiny || (globalThis.isSpeciesShiny?globalThis.isSpeciesShiny(evo):false) || (globalThis.rollShiny?globalThis.rollShiny():false));
   const evoMon = (globalThis.createPoke?globalThis.createPoke(evo, 1, shinyUnlock):null);
   if(evoMon){
     evoMon.shinyActive = shinyUnlock; evoMon.shiny = shinyUnlock;
@@ -328,10 +328,12 @@ export function tryBoxStoneEvo(boxId, stoneKey) {
     if(shinyUnlock && typeof globalThis.unlockShinyForSpecies==='function') globalThis.unlockShinyForSpecies(evo);
     if (typeof globalThis.notify==='function') globalThis.notify(tr('evolution_stone_notify', {from:p.name, to:evoMon.name, item:(globalThis.getItemName?globalThis.getItemName(stoneKey):stoneKey)}),"var(--accent)");
     if (typeof globalThis.saveGame==='function') globalThis.saveGame();
-    if(document.querySelector('.tab.active')?.textContent.includes('Sac')){
+    if(document.querySelector('.tab.active')?.textContent.includes('Sac') || (document.getElementById('fullscreen-panel-modal')?.style.display==='flex')){
       if (typeof globalThis.onInventoryClick==='function') globalThis.onInventoryClick(stoneKey);
     } else {
-      openBoxPokeModal(evo);
+      const modal = document.getElementById('poke-modal');
+      if (modal) modal.classList.remove('open');
+      if (typeof globalThis.renderTeamWindow==='function') globalThis.renderTeamWindow();
     }
   }
 }

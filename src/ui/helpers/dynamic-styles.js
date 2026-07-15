@@ -24,6 +24,16 @@ export function applyDynamicStyles(root = document) {
     }
   });
 
+
+
+  // Generic background bridge used by mine tiles and revealed item cells
+  root.querySelectorAll && root.querySelectorAll('[data-bg]').forEach(el => {
+    if (!el.dataset.pct) {
+      el.style.setProperty('--bg', el.dataset.bg);
+      el.style.background = el.dataset.bg;
+    }
+  });
+
   // Background color for mine tiles
   root.querySelectorAll && root.querySelectorAll('[data-bg-color]').forEach(el => {
     el.style.background = el.dataset.bgColor;

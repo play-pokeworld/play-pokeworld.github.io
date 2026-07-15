@@ -1,5 +1,15 @@
 function itemEquippedOnTeam(key){
- return G.team.find(p=>p.heldItem===key)||null;
+ const teamHolder = (G.team||[]).find(p=>p&&p.heldItem===key);
+ if(teamHolder) return teamHolder;
+ for(const boxKey in (G.collection||{})){
+ const boxed = G.collection[boxKey];
+ if(boxed && boxed.heldItem === key) return boxed;
+ }
+ for(const slot of (G.hatchery||[])){
+ const hp = slot && slot.poke;
+ if(hp && hp.heldItem === key) return hp;
+ }
+ return null;
 }
 function getHeldBuff(p){
  const out={atk:0,def:0,spe:0,hpMax:0};

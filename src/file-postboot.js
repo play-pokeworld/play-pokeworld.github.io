@@ -289,7 +289,7 @@ function installCriticalClickFallback(root) {
     root.querySelectorAll('[data-bg]').forEach(function(el){
       if (!el.dataset.pct) { // avoid double handling
         // Only set if not already handled
-        if (el.classList.contains('mine-tile') || el.classList.contains('starter-card--custom') || el.classList.contains('poke-sprite--custom') || el.classList.contains('starter-choose-btn')) {
+        if (el.classList.contains('mine-tile') || el.classList.contains('mine-revealed-item') || el.classList.contains('starter-card--custom') || el.classList.contains('poke-sprite--custom') || el.classList.contains('starter-choose-btn')) {
           el.style.background = el.dataset.bg;
         }
       }

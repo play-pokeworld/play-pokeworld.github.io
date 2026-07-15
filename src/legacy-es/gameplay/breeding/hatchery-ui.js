@@ -27,7 +27,8 @@ function renderHatcheryWindow(){
  const displayId = isFossil ? slot.reviveId : p.id;
  const displayEmoji = isFossil ? '' : (p.emoji || '');
  const displayShiny = isFossil ? false : p.shinyActive;
- const displayName = isFossil ? getItemName(slot.fossilKey) : getPokeName(p.id);
+ const fossilDisplayKey = isFossil && typeof getFossilDisplayKey === 'function' ? getFossilDisplayKey(slot.fossilKey) : slot.fossilKey;
+ const displayName = isFossil ? getItemName(fossilDisplayKey) : getPokeName(p.id);
  const iconEmoji = isFossil ? '' : '';
  const steps = slot.steps || 0;
  const req = slot.stepsReq || 10;
@@ -35,7 +36,7 @@ function renderHatcheryWindow(){
  const pct = clamp(Math.floor((steps / req) * 100), 0, 100);
  html += `<div>
  <div class="extracted-template-style-143" data-action="legacy-call" data-call="openUnifiedSelectorModal" data-call-args="'box_view'">
- ${isFossil ? itemIcon(slot.fossilKey,40) : spriteImg(displayId, displayEmoji, {size:60, shiny:displayShiny})}
+ ${isFossil ? itemIcon(fossilDisplayKey,40) : spriteImg(displayId, displayEmoji, {size:60, shiny:displayShiny})}
  </div>
  <div class="extracted-template-style-144">
  <div class="extracted-template-style-145">${iconEmoji} ${displayName} <span class="extracted-template-style-007">Slot #${i+1}</span></div>
@@ -75,16 +76,17 @@ function renderFossilLab(el){
 
  html += `<div class="extracted-template-style-149">`;
  fossils.forEach(f => {
- const item = ITEMS[f.key] || {};
+ const displayKey = f.displayKey || (typeof getFossilDisplayKey === 'function' ? getFossilDisplayKey(f.key) : f.key);
+ const item = ITEMS[displayKey] || ITEMS[f.key] || {};
  const pokeId = f.reviveId;
  const pokeName = getPokeName(pokeId);
  const seen = G.pokedex[pokeId]?.seen;
  const owned = speciesOwned(pokeId);
  html += `<div class="extracted-template-style-150">
  <div class="extracted-template-style-006">
- <div class="extracted-template-style-024">${itemIcon(f.key,36)}</div>
+ <div class="extracted-template-style-024">${itemIcon(displayKey,36)}</div>
  <div class="extracted-template-style-088">
- <div class="extracted-template-style-089">${getItemName(f.key)}</div>
+ <div class="extracted-template-style-089">${getItemName(displayKey)}</div>
  <div class="extracted-template-style-090">${t('quantity_abbrev')}: <b class="extracted-template-style-002">${f.qty}</b></div>
  </div>
  </div>

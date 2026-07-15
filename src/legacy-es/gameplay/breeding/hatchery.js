@@ -1,11 +1,25 @@
 const FOSSIL_REVIVE_MAP = {
  fossil: 138,
+ ancient_fossil: 138,
+ old_fossil: 138,
+ fossil_ancien: 138,
  helix_fossil: 138,
  dome_fossil: 140,
  old_amber: 142,
  root_fossil: 138,
  claw_fossil: 140
 };
+const FOSSIL_DISPLAY_KEY = {
+ ancient_fossil: 'fossil',
+ old_fossil: 'fossil',
+ fossil_ancien: 'fossil'
+};
+function getFossilDisplayKey(key){
+ return FOSSIL_DISPLAY_KEY[key] || key;
+}
+function getFossilReviveId(key){
+ return FOSSIL_REVIVE_MAP[key] || (ITEMS[key] && ITEMS[key].type === 'fossil' ? ITEMS[key].revive : null);
+}
 
 function upgradeHatcherySlots(cost){
  if(G.money < cost){
@@ -92,11 +106,17 @@ function hatchEgg(slotIdx=0){
 function getFossilInventory(){
  const inv = G.inventory || {};
  const list = [];
- for(const key in FOSSIL_REVIVE_MAP){
- const qty = inv[key] || 0;
- if(qty > 0){
- list.push({key, qty, reviveId: FOSSIL_REVIVE_MAP[key]});
- }
+ const seenKeys = new Set();
+ const addFossil = (key, qty) => {
+   if(seenKeys.has(key) || !(qty > 0)) return;
+   const reviveId = getFossilReviveId(key);
+   if(!reviveId) return;
+   seenKeys.add(key);
+   list.push({key, displayKey:getFossilDisplayKey(key), qty, reviveId});
+ };
+ for(const key in FOSSIL_REVIVE_MAP) addFossil(key, inv[key] || 0);
+ for(const key in inv){
+   if(ITEMS[key] && ITEMS[key].type === 'fossil') addFossil(key, inv[key] || 0);
  }
  return list;
 }
@@ -107,7 +127,7 @@ function reviveFossil(fossilKey){
  notify(t('no_fossil_left'),'var(--red)');
  return;
  }
- const pokeId = FOSSIL_REVIVE_MAP[fossilKey];
+ const pokeId = getFossilReviveId(fossilKey);
  if(!pokeId){
  notify(t('unknown_fossil'),'var(--red)');
  return;
@@ -146,6 +166,8 @@ function reviveFossil(fossilKey){
 if (typeof upgradeHatcherySlots !== 'undefined' && typeof window !== 'undefined') window.upgradeHatcherySlots = upgradeHatcherySlots;
 if (typeof hatchEgg !== 'undefined' && typeof window !== 'undefined') window.hatchEgg = hatchEgg;
 if (typeof getFossilInventory !== 'undefined' && typeof window !== 'undefined') window.getFossilInventory = getFossilInventory;
+if (typeof getFossilDisplayKey !== 'undefined' && typeof window !== 'undefined') window.getFossilDisplayKey = getFossilDisplayKey;
+if (typeof getFossilReviveId !== 'undefined' && typeof window !== 'undefined') window.getFossilReviveId = getFossilReviveId;
 if (typeof reviveFossil !== 'undefined' && typeof window !== 'undefined') window.reviveFossil = reviveFossil;
 
 export {};

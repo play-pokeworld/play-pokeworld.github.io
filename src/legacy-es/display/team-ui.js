@@ -122,12 +122,13 @@ function showItemSelectorForPokemon(teamIdx){
         return `${label} +${Math.round(mx*ratio*100)}%`;
       }).join(' · ');
       const equipped = itemEquippedOnTeam(key);
-      return `<div class="inv-item" data-action="legacy-call" data-call="equipItemDirect" data-call-args="${teamIdx}, '${key}'">
+      const lockedByOther = equipped && equipped !== p;
+      return `<div class="inv-item ${lockedByOther?'is-disabled':''}" ${lockedByOther?'':`data-action="legacy-call" data-call="equipItemDirect" data-call-args="${teamIdx}, '${key}'"`} title="${lockedByOther?`Déjà équipé par ${equipped.name}`:''}">
         <div class="inv-icon">${itemSpriteHtml(key, 40)}</div>
         <div class="extracted-template-style-088">
           <div class="inv-name">${getItemName(key)}</div>
           <div class="inv-desc">${buffLines}</div>
-          ${equipped && equipped !== p ? `<div class="extracted-template-style-007">Sur ${equipped.name}</div>` : ''}
+          ${lockedByOther ? `<div class="extracted-template-style-007">🔒 Déjà sur ${equipped.name}</div>` : ''}
         </div>
         <div class="inv-qty">&times;${qty}</div>
       </div>`;
@@ -147,6 +148,12 @@ function equipItemDirect(teamIdx, key){
   if(!p) return;
   if(!ITEMS[key] || !ITEMS[key].buff) return;
   if(!(G.inventory[key] > 0)) return;
+  const alreadyEquipped = itemEquippedOnTeam(key);
+  if(alreadyEquipped && alreadyEquipped !== p){
+    notify(`🔒 ${getItemName(key)} est déjà équipé par ${alreadyEquipped.name}.`, 'var(--red)');
+    showItemSelectorForPokemon(teamIdx);
+    return;
+  }
   p.heldItem = key;
   saveGame();
   renderTeamWindow();

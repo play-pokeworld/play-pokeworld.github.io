@@ -29,7 +29,7 @@ function initMineIfNeeded(){
  completedCount: 0
  };
  }
- if(!G.mine.grid || !G.mine.items){
+ if(!G.mine.grid || !G.mine.items || !G.mine.items.length || G.mine.items.every(it => it.collected)){
  generateMineLayer();
  }
 }
@@ -175,6 +175,10 @@ function digMineTile(tx, ty){
  }
  }
 
+ if(G.mine.items && (!G.mine.items.length || G.mine.items.every(it => it.collected))){
+ notify('⛏️ Couche épuisée : nouvelle mine générée automatiquement !', 'var(--blue)');
+ generateMineLayer();
+ }
  saveGame();
  try{ autoSave(); }catch(e){}
  renderMineWindow();

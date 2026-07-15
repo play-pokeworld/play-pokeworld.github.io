@@ -273,7 +273,7 @@ function tryBoxStoneEvo(boxId, stoneKey){
  if((G.inventory[stoneKey]||0)<1){ notify(t("n.pierre_manquante")); return; }
  G.inventory[stoneKey]--;
  if(G.inventory[stoneKey]<=0) delete G.inventory[stoneKey];
- const shinyUnlock = !!(p.shinyUnlocked || p.shinyActive || p.shiny || isSpeciesShiny(evo));
+ const shinyUnlock = !!(p.shinyUnlocked || p.shinyActive || p.shiny || isSpeciesShiny(evo) || rollShiny());
  const evoMon = createPoke(evo, 1, shinyUnlock);
  if(evoMon){
  evoMon.shinyActive = shinyUnlock; evoMon.shiny = shinyUnlock;
@@ -284,10 +284,11 @@ function tryBoxStoneEvo(boxId, stoneKey){
  if(shinyUnlock) unlockShinyForSpecies(evo);
  notify(tr('evolution_stone_notify', {from:p.name, to:evoMon.name, item:getItemName(stoneKey)}),"var(--accent)");
  saveGame();
- if(document.querySelector('.tab.active')?.textContent.includes('Sac')){
+ if(document.querySelector('.tab.active')?.textContent.includes('Sac') || (document.getElementById('fullscreen-panel-modal')?.style.display==='flex')){
  onInventoryClick(stoneKey);
  } else {
- openBoxPokeModal(evo);
+ const m=document.getElementById('poke-modal'); if(m) m.classList.remove('open');
+ renderTeamWindow();
  }
  }
 }

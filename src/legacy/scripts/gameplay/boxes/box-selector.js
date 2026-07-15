@@ -64,6 +64,8 @@ function renderUnifiedGrid(){
   const subtabBar = document.getElementById('usm-subtab-bar');
   if(!grid) return;
   const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+  grid.classList.remove('usm-modern-grid');
+  grid.classList.remove('usm-fossil-view');
 
   
   const showFossilTab = (_usmAction === 'box_view' || _usmAction === 'hatchery');
@@ -81,7 +83,9 @@ function renderUnifiedGrid(){
 
   
   if(showFossilTab && _usmSubTab === 'fossil'){
-    grid.innerHTML = renderFossilTabContent(isEn);
+    grid.classList.remove('usm-modern-grid');
+    grid.classList.add('usm-fossil-view');
+    grid.innerHTML = renderFossilTabContent();
     return;
   }
 
@@ -141,16 +145,13 @@ function renderUnifiedGrid(){
     return;
   }
 
-  
+  grid.classList.remove('usm-modern-grid');
   let html = list.map(({p, loc, idStr, teamIdx}) => {
     const isShiny = p.shinyUnlocked || p.shinyActive || p.shiny || isSpeciesShiny(p.id);
-    const clickFn = `selectUnifiedCard('${loc}', '${idStr}')`;
-    const rightClickFn = loc === 'team' ? `openPokeModal(${teamIdx})` : `openBoxPokeModal('${idStr}')`;
-
     return `
       <div class="box-card" data-action="legacy-call" data-call="selectUnifiedCard" data-call-args="'${loc}','${idStr}'" data-context-call="${loc === 'team' ? 'openPokeModal' : 'openBoxPokeModal'}" data-context-args="${loc === 'team' ? teamIdx : `'${idStr}'`}" title="${t('select_or_details_hint')}">
         <div class="box-level">Lv.${p.level}</div>
-        <div class="box-shiny" data-style="display:${isShiny?'block':'none'}">★</div>
+        <div class="box-shiny ${isShiny?'is-visible':'is-hidden'}">★</div>
         <div class="poke-sprite">${spriteImg(p.id, p.emoji, {size: 72, shiny: isShiny})}</div>
       </div>`;
   }).join('');
@@ -179,51 +180,50 @@ function cancelTeamSwap() {
 }
 
 
-function renderFossilTabContent(isEn){
+function renderFossilTabContent(){
   const fossils = (typeof getFossilInventory === 'function') ? getFossilInventory() : [];
   if(!fossils.length){
-    return `<div class="extracted-template-style-128">
-      <div class="extracted-template-style-134">⛏️</div>
+    return `<div class="fossil-empty-state">
+      <div class="fossil-empty-icon">⛏️</div>
       <b>${t('no_fossils_yet')}</b><br>
-      <span class="extracted-template-style-033">${t('dig_mine_fossils')}</span>
-      <div class="extracted-template-style-135"><button class="hbtn extracted-template-style-136" data-action="close-selector-show-tab" data-tab="mine">️ ${t('go_to_mine')}</button></div>
+      <span>${t('dig_mine_fossils')}</span>
+      <div><button class="hbtn" data-action="close-selector-show-tab" data-tab="mine">⛏ ${t('go_to_mine')}</button></div>
     </div>`;
   }
-  let html = `<div class="extracted-template-style-137">
-    ${t('fossil_selector_hint')}
-  </div>`;
+  let html = `<div class="fossil-selector-intro">${t('fossil_selector_hint')}</div><div class="fossil-selector-grid">`;
   html += fossils.map(f => {
-    const item = ITEMS[f.key] || {};
+    const displayKey = f.displayKey || (typeof getFossilDisplayKey === 'function' ? getFossilDisplayKey(f.key) : f.key);
     const pokeId = f.reviveId;
     const pokeName = getPokeName(pokeId);
     const seen = G.pokedex[pokeId]?.seen;
     const owned = speciesOwned(pokeId);
     const stepsReq = 15;
-    return `<div class="extracted-template-style-138">
-      <div class="extracted-template-style-006">
-        <div class="extracted-template-style-024">${itemIcon(f.key,36)}</div>
-        <div class="extracted-template-style-088">
-          <div class="extracted-template-style-042">${getItemName(f.key)}</div>
-          <div class="extracted-template-style-007">${t('quantity_abbrev')}: <b>&times;${f.qty}</b></div>
+    return `<div class="fossil-card ${owned?'is-owned':'is-missing'}">
+      <div class="fossil-card-head">
+        <div class="fossil-item-icon">${itemIcon(displayKey,40)}</div>
+        <div class="fossil-card-title">
+          <div class="fossil-name">${getItemName(displayKey)}</div>
+          <div class="fossil-qty">${t('quantity_abbrev')} &times;${f.qty}</div>
         </div>
+        <div class="fossil-owned-badge ${owned?'':'is-missing'}" title="${owned?t('owned'):'Non possédé'}">${owned?'✓':'!'}</div>
       </div>
-      <div class="extracted-template-style-139">
-        <div>${spriteImg(pokeId,'🦖',{size:40})}</div>
-        <div>
-          <div class="extracted-template-style-067">${seen?pokeName:'???'} <span class="extracted-template-style-025">#${pokeId}</span></div>
-          <div class="extracted-template-style-090">${t('revives_into')} · ${owned?'✅':''}</div>
-        </div>
+      <div class="fossil-card-body">
+        <div class="fossil-arrow">↓</div>
+        <div class="fossil-target-orb">${spriteImg(pokeId,'🦖',{size:68})}</div>
+        <div class="fossil-target-name">${seen?pokeName:'???'} <span>#${pokeId}</span></div>
+        <div class="fossil-target-sub">${t('revives_into')}</div>
       </div>
-      <button class="hbtn extracted-template-style-140" data-action="legacy-call" data-call="sendFossilToHatchery" data-call-args="'${f.key}'"> ${t('incubate')} (${stepsReq} ${t('ko_unit')})</button>
+      <button class="hbtn fossil-incubate-btn" data-action="legacy-call" data-call="sendFossilToHatchery" data-call-args="'${f.key}'">${t('incubate')} · ${stepsReq} ${t('ko_unit')}</button>
     </div>`;
   }).join('');
+  html += `</div>`;
   return html;
 }
 
 function sendFossilToHatchery(fossilKey){
   const invQty = (G.inventory && G.inventory[fossilKey]) || 0;
   if(invQty < 1){ notify(t('no_fossil_left'),'var(--red)'); return; }
-  const pokeId = FOSSIL_REVIVE_MAP[fossilKey];
+  const pokeId = (typeof getFossilReviveId === 'function') ? getFossilReviveId(fossilKey) : FOSSIL_REVIVE_MAP[fossilKey];
   if(!pokeId){ notify(t('unknown_fossil'),'var(--red)'); return; }
   if(!G.hatchery) G.hatchery = [null];
   const emptyIdx = G.hatchery.findIndex(s => s === null);
@@ -236,7 +236,7 @@ function sendFossilToHatchery(fossilKey){
   G.hatchery[emptyIdx] = { poke: null, isFossil: true, fossilKey: fossilKey, reviveId: pokeId, steps: 0, stepsReq: 15 };
   saveGame();
   renderHatcheryWindow();
-  notify(tr('fossil_sent_hatchery', {item:getItemName(fossilKey)}),'var(--green)');
+  notify(tr('fossil_sent_hatchery', {item:getItemName(typeof getFossilDisplayKey === 'function' ? getFossilDisplayKey(fossilKey) : fossilKey)}),'var(--green)');
   renderUnifiedGrid();
 }
 

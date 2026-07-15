@@ -42,6 +42,12 @@ function onInventoryClick(key){
  if(itm.type === 'stone'){
  const qty = G.inventory[key] || 0;
  const el = _getActiveContent();
+ if(qty <= 0){
+   var fsM=document.getElementById('fullscreen-panel-modal');
+   if(fsM&&fsM.style.display==='flex'){renderInventory(document.getElementById('fs-panel-content'))}
+   else{showTab('inventory')}
+   return;
+ }
  const candidates = [];
  G.team.forEach((p, idx) => {
  const targetId = STONE_EVO[p.id]?.[key];
@@ -53,26 +59,38 @@ function onInventoryClick(key){
  if(targetId) candidates.push({p, loc:'box', idStr, targetId});
  });
 
- el.innerHTML = `<div class="loc-title">${t('use_stone')} ${itemSpriteHtml(key, 24)} ${getItemName(key)}</div>
- <div class="loc-sub">${t('stone_sub')}</div>
- <div class="extracted-template-style-195">
- ${candidates.length > 0 ? candidates.map(({p, loc, idx, idStr, targetId}) => {
- const target = PD[targetId];
- const owned = speciesOwned(targetId);
- const clickFn = loc === 'team' ? `tryStoneEvo(${idx}, '${key}')` : `tryBoxStoneEvo('${idStr}', '${key}')`;
- return `<div class="poke-card" data-style="margin-bottom:8px;${owned?'border:1px solid var(--green)':''}">
- <div class="poke-card-top extracted-bridge-style-043">
- <div class="poke-sprite">${spriteImg(p.id, p.emoji, {size:40, shiny:p.shinyActive})}</div>
- <div class="poke-info extracted-bridge-style-044">
- <div class="poke-name">${p.name} Nv.${p.level} <span class="extracted-template-style-090">(${loc==='team'?t('team_location'):t('box_pc_location')})</span></div>
- <div class="extracted-template-style-196">${t('evolves_into')} <b>${target?getPokeName(targetId):'#'+targetId}</b> ${owned?`(${t('already_owned_sp')})`:''}</div>
+ let headerHtml = `<div class="extracted-template-style-198">
+ <div class="extracted-template-style-006">
+ <div class="extracted-template-style-185">${itemSpriteHtml(key, 40)}</div>
+ <div>
+ <div class="extracted-template-style-199">${t('use_stone')} ${getItemName(key)}</div>
+ <div class="extracted-template-style-090">${t('stone_sub')}</div>
  </div>
- <button class="hbtn extracted-bridge-style-045" data-action="legacy-call" data-call="${loc === 'team' ? 'tryStoneEvo' : 'tryBoxStoneEvo'}" data-call-args="${loc === 'team' ? `${idx},'${key}'` : `'${idStr}','${key}'`}"${qty<1 ? 'disabled' : ''}>${t('evolve_btn')}</button>
+ </div>
+ <div class="extracted-template-style-200">&times;${qty}</div>
+ </div>`;
+
+ let candidatesHtml = '';
+ if(candidates.length > 0){
+ candidatesHtml = '<div class="extracted-template-style-201">' + candidates.map(({p, loc, idx, idStr, targetId}) => {
+ const owned = speciesOwned(targetId);
+ const targetName = getPokeName(targetId);
+ const callName = loc === 'team' ? 'tryStoneEvo' : 'tryBoxStoneEvo';
+ const callArgs = loc === 'team' ? `${idx},'${key}'` : `'${idStr}','${key}'`;
+ return `<div class="extracted-template-style-202" data-action="legacy-call" data-call="${callName}" data-call-args="${callArgs}" title="${p.name} → ${targetName} (${owned?t('already_owned_sp'):'Non possédé'})">
+ <div class="extracted-template-style-203">
+ ${p.shinyActive?'<div class="evo-shiny-badge">★</div>':''}<div class="extracted-template-style-204">Nv.${p.level}</div>
+ <div class="evo-owned-badge ${owned?'':'is-missing'}" title="${owned?'Évolution déjà possédée':'Évolution non possédée'}">${owned?'✓':'!'}</div>
+ ${spriteImg(p.id, p.emoji, {size:72, shiny:p.shinyActive})}
+ <div class="evo-target-label">→ ${targetName}</div>
  </div>
  </div>`;
- }).join('') : `<div class="extracted-template-style-197">${t('no_evo_stone')} ${getItemName(key)}.</div>`}
- </div>
- <div class="extracted-template-style-013"><button class="hbtn extracted-bridge-style-042" data-action="return-inventory" class="hbtn">${t('back_bag')}</button></div>`;
+ }).join('') + '</div>';
+ } else {
+ candidatesHtml = `<div class="extracted-template-style-039">${t('no_evo_stone')} ${getItemName(key)}.</div>`;
+ }
+
+ el.innerHTML = headerHtml + candidatesHtml + `<div class="extracted-template-style-013"><button class="hbtn extracted-bridge-style-042" data-action="return-inventory" class="hbtn">${t('back_bag')}</button></div>`;
  return;
  }
 
