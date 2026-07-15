@@ -1,0 +1,72 @@
+button,
+.hbtn,
+.mob-btn,
+.tab-btn,
+.action-btn,
+.theme-swatch,
+.modal-close,
+.inv-item,
+.box-card,
+.poke-slot,
+.team-slot {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+[oncontextmenu],
+[data-context-action],
+.auto-move,
+.move-row,
+.inv-item,
+.box-card,
+.poke-sprite {
+  touch-action: manipulation;
+}
+
+@media (max-width: 1024px) {
+  body { overscroll-behavior: contain; }
+  .dash-win { max-width: 100%; }
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+  .window-drag-disabled .win-header { cursor: default; }
+  .window-drag-disabled .win-header::after {
+    content: "";
+  }
+  .dash-win { scroll-margin-top: 74px; }
+}
+
+@media (max-width: 600px) {
+  .settings-row,
+  .theme-grid { gap: 10px; }
+  .modal-title { min-height: 44px; }
+}
+
+@media (max-width: 420px) {
+  .hinfo { font-size: 12px; }
+  .mob-btn { padding: 8px 6px; }
+}
+
+.shortcut-action-btn {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--dark3);
+  border: 2px solid var(--shortcut-color, var(--light2));
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--light2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: opacity 0.2s;
+}
+.shortcut-action-btn:hover { opacity: 0.8; }
+.shortcut-action-icon { font-size: 15px; }
+.mine-tile-clickable:hover { filter: brightness(1.25); }
+
+.modal-close:empty::before { content: '✕'; }
+.modal-close { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; }
+
+.pw-type-info { font-size: 13px; padding: 3px 10px; }

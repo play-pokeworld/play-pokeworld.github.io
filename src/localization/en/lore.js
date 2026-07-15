@@ -221,4 +221,3 @@ window.L_en_lore = {
 "text":"Ilex Forest shelters Celebi, the Time Pokémon."
 }
 };
-

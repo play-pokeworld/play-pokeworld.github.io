@@ -1,0 +1,139 @@
+function _getActiveContent(){
+ const fsContent = document.getElementById('fs-panel-content');
+ if(fsContent && document.getElementById('fullscreen-panel-modal')?.style.display === 'flex'){
+ return fsContent;
+ }
+ return document.getElementById('tab-content');
+}
+
+function sellTreasure(key, count){
+ const itm = ITEMS[key];
+ if(!itm || !G.inventory[key]) return;
+ const actual = Math.min(count, G.inventory[key]);
+ G.inventory[key] -= actual;
+ if(G.inventory[key] <= 0) delete G.inventory[key];
+ const gain = actual * (itm.value || 2000);
+ G.money += gain;
+ EventBus.emit(EVENTS.MINE_SELL, { key, amount: actual });
+ updateHeader();
+ notify(` Vendu ${actual}x ${getItemName(key)} pour +${gain.toLocaleString()}₽ !`, 'var(--green)');
+ saveGame();
+ onInventoryClick(key);
+}
+
+function onInventoryClick(key){
+ const itm=ITEMS[key]; if(!itm) return;
+ const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
+
+ if(itm.type === 'treasure'){
+ const qty = G.inventory[key] || 0;
+ const el = _getActiveContent();
+ if(qty <= 0){ showTab('inventory'); return; }
+ el.innerHTML = `<div class="loc-title">${t("m.inventory.5")} ${itemSpriteHtml(key, 24)} ${getItemName(key)}</div>
+ <div class="loc-sub">${tr("m.treasure_sell_sub", {qty: qty, value: (itm.value?.toLocaleString()||'2 000')})}</div>
+ <div class="extracted-template-style-194">
+ <button class="hbtn extracted-bridge-style-040" data-action="legacy-call" data-call="sellTreasure" data-call-args="'${key}', 1">${t('sell_one')} (+${(itm.value||2000).toLocaleString()}₽)</button>
+ ${qty>1?`<button class="hbtn extracted-bridge-style-041" data-action="legacy-call" data-call="sellTreasure" data-call-args="'${key}', ${qty}">${t('sell_all')} (+${((itm.value||2000)*qty).toLocaleString()}₽)</button>`:''}
+ <button class="hbtn extracted-bridge-style-042" data-action="return-inventory" class="hbtn">${t('back_bag')}</button>
+ </div>`;
+ return;
+ }
+
+ if(itm.type === 'stone'){
+ const qty = G.inventory[key] || 0;
+ const el = _getActiveContent();
+ const candidates = [];
+ G.team.forEach((p, idx) => {
+ const targetId = STONE_EVO[p.id]?.[key];
+ if(targetId) candidates.push({p, loc:'team', idx, targetId});
+ });
+ Object.entries(G.collection).forEach(([idStr, p]) => {
+ if(!p) return;
+ const targetId = STONE_EVO[p.id]?.[key];
+ if(targetId) candidates.push({p, loc:'box', idStr, targetId});
+ });
+
+ el.innerHTML = `<div class="loc-title">${t('use_stone')} ${itemSpriteHtml(key, 24)} ${getItemName(key)}</div>
+ <div class="loc-sub">${t('stone_sub')}</div>
+ <div class="extracted-template-style-195">
+ ${candidates.length > 0 ? candidates.map(({p, loc, idx, idStr, targetId}) => {
+ const target = PD[targetId];
+ const owned = speciesOwned(targetId);
+ const clickFn = loc === 'team' ? `tryStoneEvo(${idx}, '${key}')` : `tryBoxStoneEvo('${idStr}', '${key}')`;
+ return `<div class="poke-card" data-style="margin-bottom:8px;${owned?'border:1px solid var(--green)':''}">
+ <div class="poke-card-top extracted-bridge-style-043">
+ <div class="poke-sprite">${spriteImg(p.id, p.emoji, {size:40, shiny:p.shinyActive})}</div>
+ <div class="poke-info extracted-bridge-style-044">
+ <div class="poke-name">${p.name} Nv.${p.level} <span class="extracted-template-style-090">(${loc==='team'?t('team_location'):t('box_pc_location')})</span></div>
+ <div class="extracted-template-style-196">${t('evolves_into')} <b>${target?getPokeName(targetId):'#'+targetId}</b> ${owned?`(${t('already_owned_sp')})`:''}</div>
+ </div>
+ <button class="hbtn extracted-bridge-style-045" data-action="legacy-call" data-call="${loc === 'team' ? 'tryStoneEvo' : 'tryBoxStoneEvo'}" data-call-args="${loc === 'team' ? `${idx},'${key}'` : `'${idStr}','${key}'`}"${qty<1 ? 'disabled' : ''}>${t('evolve_btn')}</button>
+ </div>
+ </div>`;
+ }).join('') : `<div class="extracted-template-style-197">${t('no_evo_stone')} ${getItemName(key)}.</div>`}
+ </div>
+ <div class="extracted-template-style-013"><button class="hbtn extracted-bridge-style-042" data-action="return-inventory" class="hbtn">${t('back_bag')}</button></div>`;
+ return;
+ }
+
+ if(itm.type === 'candy' || key === 'rarecandy'){
+ const qty = G.inventory[key] || 0;
+ const el = _getActiveContent();
+ if(qty <= 0){ 
+ var fsM=document.getElementById('fullscreen-panel-modal');
+ if(fsM&&fsM.style.display==='flex'){renderInventory(document.getElementById('fs-panel-content'))}
+ else{showTab('inventory')}
+ return; 
+ }
+ const candidates = [];
+ G.team.forEach((p, idx) => {
+ if(p.level < 100) candidates.push({p, loc:'team', idx});
+ });
+ Object.entries(G.collection).forEach(([idStr, p]) => {
+ if(p && p.level < 100) candidates.push({p, loc:'box', idStr});
+ });
+
+ 
+ let headerHtml = `<div class="extracted-template-style-198">
+ <div class="extracted-template-style-006">
+ <div class="extracted-template-style-185">${itemSpriteHtml(key, 40)}</div>
+ <div>
+ <div class="extracted-template-style-199">${t("m.inventory.4")} ${getItemName(key)}</div>
+ <div class="extracted-template-style-090">${t("m.inventory.3")}</div>
+ </div>
+ </div>
+ <div class="extracted-template-style-200">&times;${qty}</div>
+</div>`;
+
+ 
+ let candidatesHtml = '';
+ if(candidates.length > 0) {
+ candidatesHtml = '<div class="extracted-template-style-201">' + candidates.map(({p, loc, idx, idStr}) => {
+ const clickFn = loc === 'team' ? `useRareCandy(${idx})` : `useBoxRareCandy('${idStr}')`;
+ return `<div class="extracted-template-style-202" data-action="legacy-call" data-call="${loc === 'team' ? 'useRareCandy' : 'useBoxRareCandy'}" data-call-args="${loc === 'team' ? idx : `'${idStr}'`}">
+ <div class="extracted-template-style-203">
+ <div class="extracted-template-style-204">Lv.${p.level}</div>
+ ${spriteImg(p.id, p.emoji, {size: 72, shiny: p.shinyActive})}
+ </div>
+ </div>`;
+ }).join('') + '</div>';
+ } else {
+ candidatesHtml = `<div class="extracted-template-style-039">${t("m.inventory.1")}</div>`;
+ }
+
+ el.innerHTML = headerHtml + candidatesHtml;
+ return;
+ }
+
+  if(!itm.buff) return;
+  
+  openItemInfo(key);
+  return;
+}
+
+function useItem(key){ onInventoryClick(key); }
+
+function consumeItem(key){
+ if(G.inventory[key]>0) G.inventory[key]--;
+ if(G.inventory[key]===0) delete G.inventory[key];
+}

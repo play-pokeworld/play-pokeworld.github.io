@@ -61,4 +61,3 @@ window.L_en_shops = {
 "name":"Blackthorn Mart"
 }
 };
-

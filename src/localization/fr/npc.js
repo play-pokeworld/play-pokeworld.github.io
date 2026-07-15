@@ -476,4 +476,3 @@ window.L_fr_npc = {
 }
  ]
 };
-

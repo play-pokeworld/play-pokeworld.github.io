@@ -34,4 +34,3 @@ window.L_en_economy = {
 "use_stone":"Use",
 "will_replace":"(will replace current item)",
 };
-

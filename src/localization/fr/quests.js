@@ -458,4 +458,3 @@ window.L_fr_quests = {
 }
 }
 };
-

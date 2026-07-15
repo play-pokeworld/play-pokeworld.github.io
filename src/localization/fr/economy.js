@@ -34,4 +34,3 @@ window.L_fr_economy = {
 "use_stone":"Utiliser",
 "will_replace":"(remplacera l'objet actuel)",
 };
-
