@@ -172,8 +172,19 @@ var STORY_QUESTS = [
 "target": 5,
 "rewardMoney": 4500,
 "rewardItems": {
-"rarecandy": 3
+"rarecandy": 3,
+"pokeflute": 1
  }
+ },
+ {
+"id": 52,
+"region":"kanto",
+"type":"item",
+"requiredItem":"pokeflute",
+"target": 1,
+"rewardPoke": 143,
+"rewardLevel": 30,
+"rewardMoney": 3000
  },
  {
 "id": 48,

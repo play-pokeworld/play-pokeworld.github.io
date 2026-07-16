@@ -7,6 +7,7 @@ window.L_fr_ui = {
 "box_pc_note":"Ce Pokémon est dans votre boîte PC. Placez-le dans votre équipe pour l'entraîner ou lui équiper des objets !",
 "box_swap_header":"Échange : choisissez un Pokémon de la boîte pour remplacer",
 "buy_btn":"Acheter",
+"quest_challenge_btn":"Défier !",
 "challenge_btn":"Défier",
 "choose_starter":"Choisir votre Starter",
 "cols3":"3 Colonnes",

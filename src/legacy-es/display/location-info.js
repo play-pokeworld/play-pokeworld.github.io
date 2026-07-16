@@ -7,12 +7,12 @@ function renderLocInfo(el){
 
  
  const locTitleEl = document.getElementById('loc-win-title');
- if(locTitleEl) locTitleEl.textContent = loc.name || 'Lieu';
+ if(locTitleEl) locTitleEl.textContent = getLocName(G.location) || 'Lieu';
 
  let html='';
 
  
- html += `<div class="extracted-template-style-049">${loc.name}</div>`;
+ html += `<div class="extracted-template-style-049">${getLocName(G.location)}</div>`;
 
  
  const lore = getLore(G.location);
@@ -78,14 +78,9 @@ function renderLocInfo(el){
  if(loc.type!=='town' && (loc.minWins||0) > 0 && loc.wild && loc.wild.length){
  const curWins = ((G.wildWinsByLoc||{})[G.location]||0);
  const need = loc.minWins;
- const nextZones = [];
- for(const c of (loc.conn||[])){
- if(c === G.location) continue;
- const cLoc = getLocObj(c);
- if(!cLoc) continue;
- if(!locReachable(c)) nextZones.push(getLocName(c));
- }
- if(curWins < need){
+ const nextZoneIds = (typeof zonesUnlockedByClearing === 'function') ? zonesUnlockedByClearing(G.location) : [];
+ const nextZones = nextZoneIds.map(id => getLocName(id));
+ if(curWins < need && nextZones.length){
  const pct = clamp(Math.floor((curWins / need) * 100), 0, 100);
  const zone_txt = nextZones.length ? nextZones.slice(0,2).join(', ') : t('next_zone');
  html += `<div class="extracted-template-style-059">

@@ -26,7 +26,7 @@ function renderStoryWindow(){
  const tgt = def.target||1;
  const done = questDone(inst, def);
  const pct = clamp(Math.floor((prog/tgt)*100),0,100);
- const btnText = (cat==='main' && def.rewardPoke) ? 'Défier !' : t("m.quest_ui.26");
+ const btnText = (cat==='main' && def.rewardPoke) ? t('quest_challenge_btn') : t("m.quest_ui.26");
  const qt = getQuestText(cat, def.id);
  const ttl = (numLabel?numLabel+' ':'') + qt.title;
  const dsc = qt.desc;

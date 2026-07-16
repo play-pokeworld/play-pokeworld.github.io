@@ -74,6 +74,7 @@ function questDone(inst, def){
  return (inst.progress||0) >= (def.target||1);
  }
  if(def.type==='talk') return (inst.progress||0) >= (def.target||1);
+ if(def.type==='item') return !!(def.requiredItem && G.inventory && G.inventory[def.requiredItem] > 0);
  return (inst.progress||0) >= (def.target||1);
 }
 
@@ -161,7 +162,7 @@ function claimQuest(qid, cat){
  const lang = G.lang||'fr';
  if(def.rewardPoke && cat==='main'){
  
- startLegendaryEncounter(def.rewardPoke);
+ startLegendaryEncounter(def.rewardPoke, def.rewardLevel || 65);
  } else if(def.rewardPoke && cat==='side'){
  const legMon = createPoke(def.rewardPoke, 50, true);
  if(legMon){

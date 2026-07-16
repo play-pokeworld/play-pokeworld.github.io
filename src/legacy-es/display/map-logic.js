@@ -20,6 +20,51 @@ function _regLocs(){ return getCurrentRegionLocs(); }
 
 function _startNodes(){ return (G.region==='johto') ? ['newbark'] : ['pallet']; }
 
+function regionOfLoc(id){
+ if(LOCS_JOHTO && LOCS_JOHTO[id]) return 'johto';
+ return 'kanto';
+}
+const KANTO_BADGES = ['brock','misty','surge','erika','koga','sabrina','blaine','giovanni'];
+const JOHTO_BADGES = ['falkner','bugsy','whitney','morty','chuck','jasmine','pryce','clair'];
+function regionBadgeCount(region){
+ const ids = region === 'johto' ? JOHTO_BADGES : KANTO_BADGES;
+ return ids.filter(b => G.badges && G.badges.includes(b)).length;
+}
+function locBadgeCount(id){ return regionBadgeCount(regionOfLoc(id)); }
+function hasQuestDone(id){ return !!(G.completedQuests && G.completedQuests[id]); }
+function hasRequiredItem(key){ return !!(key && G.inventory && G.inventory[key] > 0); }
+const EXTRA_LOC_GATES = {
+ route12: {quest:52, item:'pokeflute', label:'Poké Flûte / Ronflex'},
+ route16: {quest:52, item:'pokeflute', label:'Poké Flûte / Ronflex'},
+ ceruleancave: {champion:true, label:'Ligue Pokémon'},
+ mtsilver: {champion:true, label:'Ligue Pokémon'},
+ tohjofalls: {champion:true, label:'Ligue Pokémon'}
+};
+function locGateStatus(id){
+ const loc = _regLocs()[id] || getLocObj(id);
+ if(!loc) return {ok:false, reason:'missing'};
+ const need = loc.badgeReq || 0;
+ const have = locBadgeCount(id);
+ if(need > have) return {ok:false, reason:'badge', need, have};
+ const gate = EXTRA_LOC_GATES[id];
+ if(gate){
+   if(gate.item && !hasRequiredItem(gate.item)) return {ok:false, reason:'item', item:gate.item, label:gate.label};
+   if(gate.quest && !hasQuestDone(gate.quest)) return {ok:false, reason:'quest', quest:gate.quest, label:gate.label};
+   if(gate.champion && !G.championTitle) return {ok:false, reason:'champion', label:gate.label};
+ }
+ return {ok:true};
+}
+function locGateSatisfied(id){ return locGateStatus(id).ok; }
+function locGateMessage(id){
+ const st = locGateStatus(id);
+ if(st.ok) return '';
+ if(st.reason === 'badge') return tr('requires_badges', {need:st.need, have:st.have});
+ if(st.reason === 'item') return 'Objet requis : ' + getItemName(st.item);
+ if(st.reason === 'quest') return 'Quête requise : ' + (st.label || 'progression');
+ if(st.reason === 'champion') return 'Requiert la victoire à la Ligue Pokémon';
+ return tr('location_not_reachable', {location:getLocName(id)});
+}
+
 function locCleared(id){
  const loc = _regLocs()[id]; if(!loc) return false;
  return (((G.wildWinsByLoc||{})[id])||0) >= (loc.minWins||0);
@@ -27,24 +72,44 @@ function locCleared(id){
 
 function locReachable(id, _seen){
  const loc = _regLocs()[id]; if(!loc) return false;
- 
- 
  if(id === G.location) return true;
  if(_startNodes().indexOf(id) >= 0) return true;
+ if(!locGateSatisfied(id)) return false;
  _seen = _seen || new Set();
  if(_seen.has(id)) return false;
  _seen.add(id);
  const conn = loc.conn || [];
  for(let i=0;i<conn.length;i++){
  const n = conn[i];
- if(locReachable(n, _seen) && locCleared(n)) return true;
+ if(locReachable(n, new Set(_seen)) && locCleared(n)) return true;
  }
  return false;
 }
 
+function canUnlockDirectlyFrom(fromId, targetId){
+ if(!fromId || !targetId || fromId === targetId) return false;
+ const locs = _regLocs();
+ const target = locs[targetId];
+ if(!locs[fromId] || !target) return false;
+ return zonesUnlockedByClearing(fromId).indexOf(targetId) >= 0;
+}
+function zonesUnlockedByClearing(id){
+ const locs = _regLocs();
+ const loc = locs[id];
+ if(!loc || (loc.minWins||0) <= 0 || locCleared(id) || !locReachable(id)) return [];
+ const before = new Set(Object.keys(locs).filter(locId => locReachable(locId)));
+ if(!G.wildWinsByLoc) G.wildWinsByLoc = {};
+ const oldWins = G.wildWinsByLoc[id] || 0;
+ G.wildWinsByLoc[id] = Math.max(oldWins, loc.minWins || 0);
+ const after = Object.keys(locs).filter(locId => locReachable(locId));
+ if(oldWins > 0) G.wildWinsByLoc[id] = oldWins;
+ else delete G.wildWinsByLoc[id];
+ return after.filter(locId => locId !== id && !before.has(locId));
+}
 
 function blockingNeighbor(id){
  const loc = _regLocs()[id]; if(!loc) return null;
+ if(!locGateSatisfied(id)) return null;
  const conn = loc.conn || [];
  for(let i=0;i<conn.length;i++){
  const n = conn[i];
@@ -52,7 +117,6 @@ function blockingNeighbor(id){
  }
  return null;
 }
-
 
 function recomputeUnlocks(){
  if(!G) return;
@@ -63,9 +127,7 @@ function recomputeUnlocks(){
 
 function isLocUnlocked(id){
  if(!G) return true;
- 
- if(G.badges && G.badges.length >= 8) return true;
- 
+ if(!locGateSatisfied(id)) return false;
  if(id==='route1'){
  const hasKantoStarter = !!(G.starterKanto || G.starter || (G.regionStarter && G.regionStarter.kanto));
  if(!hasKantoStarter) return false;
@@ -74,10 +136,9 @@ function isLocUnlocked(id){
  const hasJohtoStarter = !!(G.starterJohto || (G.regionStarter && G.regionStarter.johto));
  if(!hasJohtoStarter) return false;
  }
- if(!G.unlockedLocs || typeof G.unlockedLocs!=='object') return true; 
- if(id===G.location) return true; 
- if(_startNodes().indexOf(id) >= 0) return true; 
- return !!G.unlockedLocs[id];
+ if(id===G.location) return true;
+ if(_startNodes().indexOf(id) >= 0) return true;
+ return locReachable(id);
 }
 
 
@@ -108,7 +169,7 @@ function mapNodeState(id){
  if(!loc) return {locked:false, color:'rgba(58,63,68,0.55)', kind:'locked'};
  const badgeReq=loc.badgeReq||0;
  const storyReq=loc.storyReq||0;
- if((G.badges.length<8 && badgeReq>G.badges.length) || storyReq>(G.storyIdx||0) || !isLocUnlocked(id)) return {locked:true, color:'rgba(58,63,68,0.55)', kind:'locked'};
+ if(storyReq>(G.storyIdx||0) || !isLocUnlocked(id)) return {locked:true, color:'rgba(58,63,68,0.55)', kind:'locked'};
  const hasQuest = (G.activeQuests||[]).some(i=>{
  const def = i.cat==='main' ? getMainQuestDef(i.qid) : (i.cat==='side' ? SIDE_QUESTS[i.qid] : null);
  return def && def.loc && locGroup(def.loc)===locGroup(id);
@@ -157,6 +218,10 @@ function showMapLegend(){
 if (typeof nodeDims !== 'undefined' && typeof window !== 'undefined') window.nodeDims = nodeDims;
 if (typeof _regLocs !== 'undefined' && typeof window !== 'undefined') window._regLocs = _regLocs;
 if (typeof _startNodes !== 'undefined' && typeof window !== 'undefined') window._startNodes = _startNodes;
+if (typeof regionBadgeCount !== 'undefined' && typeof window !== 'undefined') window.regionBadgeCount = regionBadgeCount;
+if (typeof locGateStatus !== 'undefined' && typeof window !== 'undefined') window.locGateStatus = locGateStatus;
+if (typeof locGateMessage !== 'undefined' && typeof window !== 'undefined') window.locGateMessage = locGateMessage;
+if (typeof zonesUnlockedByClearing !== 'undefined' && typeof window !== 'undefined') window.zonesUnlockedByClearing = zonesUnlockedByClearing;
 if (typeof locCleared !== 'undefined' && typeof window !== 'undefined') window.locCleared = locCleared;
 if (typeof locReachable !== 'undefined' && typeof window !== 'undefined') window.locReachable = locReachable;
 if (typeof blockingNeighbor !== 'undefined' && typeof window !== 'undefined') window.blockingNeighbor = blockingNeighbor;

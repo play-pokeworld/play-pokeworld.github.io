@@ -9,10 +9,10 @@ function startWildBattle(){
 }
 
 
-function startLegendaryEncounter(pokeId){
+function startLegendaryEncounter(pokeId, level=65){
  if(!G.team.length){ setMsg(t('no_pokemon_in_team')); return; }
  const isShiny = isSpeciesShiny(pokeId) || rollShiny();
- const legPoke = createPoke(pokeId, 65, isShiny);
+ const legPoke = createPoke(pokeId, level || 65, isShiny);
  if(!legPoke) return;
  legPoke.maxHP = Math.floor(legPoke.maxHP * 2.2);
  legPoke.currentHP = legPoke.maxHP;

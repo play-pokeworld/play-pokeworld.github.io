@@ -26,7 +26,7 @@ function renderStoryWindow(){
  const tgt = def.target||1;
  const done = questDone(inst, def);
  const pct = clamp(Math.floor((prog/tgt)*100),0,100);
- const btnText = (cat==='main' && def.rewardPoke) ? 'Défier !' : t("m.quest_ui.26");
+ const btnText = (cat==='main' && def.rewardPoke) ? t('quest_challenge_btn') : t("m.quest_ui.26");
  const qt = getQuestText(cat, def.id);
  const ttl = (numLabel?numLabel+' ':'') + qt.title;
  const dsc = qt.desc;
@@ -36,6 +36,8 @@ function renderStoryWindow(){
  body = `<div>${done?(t("m.quest_ui.25")):(t("m.quest_ui.24"))}</div>`;
  } else if(def.type==='talk'){
  body = `<div>${done?(t("m.quest_ui.23")):(t("m.quest_ui.22"))}</div>`;
+ } else if(def.type==='item'){
+ body = `<div>${done?'Poké Flûte obtenue !':'Obtenez la Poké Flûte.'}</div>`;
  } else {
  body = `<div class="extracted-template-style-243"><span>${t("m.quest_ui.21")}</span><span>${done?'':prog+' / '+tgt}</span></div>\n <div class="extracted-template-style-244"><div></div></div>`;
  }

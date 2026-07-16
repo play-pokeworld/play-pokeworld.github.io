@@ -7,6 +7,7 @@ window.L_en_ui = {
 "box_pc_note":"This Pokémon is in your PC box. Place it in your active party to train or equip items!",
 "box_swap_header":"Swap: choose a box Pokémon to replace",
 "buy_btn":"Buy",
+"quest_challenge_btn":"Challenge!",
 "challenge_btn":"Challenge",
 "choose_starter":"Choose your Starter",
 "cols3":"3 Columns",

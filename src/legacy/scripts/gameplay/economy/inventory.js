@@ -5,8 +5,8 @@ function itemCat(key){
  const itm=ITEMS[key]; if(!itm) return 'all';
  if(key.startsWith('berry')) return 'berry';
  if(itm.type==='stone') return 'stone';
- if(itm.type==='treasure') return 'treasure';
- if(itm.type==='candy'||itm.type==='special') return 'special';
+ if(itm.type==='treasure'||itm.type==='fossil') return 'treasure';
+ if(itm.type==='candy'||itm.type==='special'||itm.type==='key') return 'special';
  if(itm.buff) return 'object';
  return 'berry';
 }

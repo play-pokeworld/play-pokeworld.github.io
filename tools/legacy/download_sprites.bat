@@ -544,6 +544,7 @@ echo Step 2/2 : Downloading items
 echo ============================================================
 
 
+call :getitem pokeflute poke-flute
 call :getitem greatball great-ball
 
 call :getitem ultraball ultra-ball

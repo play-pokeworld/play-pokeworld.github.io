@@ -68,6 +68,10 @@ window.L_en_items = {
 "name":"Moon Stone",
 "desc":"Evolves certain Pokémon."
 },
+"pokeflute": {
+"name":"Poké Flute",
+"desc":"A flute with a soothing melody. It can wake Snorlax."
+},
 "nugget": {
 "name":"Nugget",
 "desc":"Precious gold item worth 5,000₽."

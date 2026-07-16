@@ -8,7 +8,7 @@ window.L_en_quests = {
 },
 "0": {
 "title":"A New Adventure Begins",
-"desc":"Welcome to PokéWorld! Travel to Road 1 and win 3 battles against wild Pokémon to prove your skills.",
+"desc":"Welcome to PokéWorld! Travel to Route 1 and win 3 battles against wild Pokémon to prove your skills.",
 "rewardDesc":"500₽ + 5 Oran Berries"
 },
 "40": {
@@ -28,12 +28,12 @@ window.L_en_quests = {
 },
 "42": {
 "title":"Mt. Moon Enigma",
-"desc":"Cross Road 3 and win 6 wild battles to advance toward Mt. Moon.",
+"desc":"Cross Route 3 and win 6 wild battles to advance toward Mt. Moon.",
 "rewardDesc":"1,500₽ + 1 Moon Stone"
 },
 "43": {
-"title":"Crossing Road 4",
-"desc":"Road 4 leads to Cerulean. Win 6 wild battles to forge your team.",
+"title":"Crossing Route 4",
+"desc":"Route 4 leads to Cerulean. Win 6 wild battles to forge your team.",
 "rewardDesc":"1,200₽ + 5 Prine Berries"
 },
 "2": {
@@ -47,13 +47,13 @@ window.L_en_quests = {
 "rewardDesc":"2,500₽ + 1 Gold Nugget"
 },
 "44": {
-"title":"Waters of Road 5",
-"desc":"Road 5 links Cerulean to Saffron. Win 6 wild battles to train up.",
+"title":"Waters of Route 5",
+"desc":"Route 5 links Cerulean to Saffron. Win 6 wild battles to train up.",
 "rewardDesc":"1,500₽ + 5 Sitrus Berries"
 },
 "45": {
-"title":"Road 6 — To Vermilion",
-"desc":"Take Road 6 toward Vermilion City and win 6 wild battles.",
+"title":"Route 6 — To Vermilion",
+"desc":"Take Route 6 toward Vermilion City and win 6 wild battles.",
 "rewardDesc":"1,500₽ + 5 Oran Berries"
 },
 "5": {
@@ -63,7 +63,7 @@ window.L_en_quests = {
 },
 "4": {
 "title":"Diglett's Cave Secrets",
-"desc":"Cross Road 11 and explore the mysterious Diglett's Cave. Win 5 wild battles to train your team.",
+"desc":"Cross Route 11 and explore the mysterious Diglett's Cave. Win 5 wild battles to train your team.",
 "rewardDesc":"3,000₽ + 5 Sitrus Berries"
 },
 "46": {
@@ -79,11 +79,17 @@ window.L_en_quests = {
 "7": {
 "title":"Pokémon Tower Ghosts",
 "desc":"Travel to Lavender Town and brave the spirits of Pokémon Tower. Win 5 battles to obtain 3 Rare Candies.",
-"rewardDesc":"4,500₽ + 3 Rare Candies"
+"rewardDesc":"4,500₽ + 3 Rare Candies + Poké Flute"
+},
+
+"52": {
+"title":"The Poké Flute and Snorlax",
+"desc":"With the Poké Flute obtained in Lavender Town, wake the Snorlax blocking the roads and challenge it!",
+"rewardDesc":"Snorlax + 3,000₽"
 },
 "48": {
-"title":"Road 7 — Celadon",
-"desc":"Road 7 links Saffron to Celadon. Win 6 wild battles to prepare for the gym.",
+"title":"Route 7 — Celadon",
+"desc":"Route 7 links Saffron to Celadon. Win 6 wild battles to prepare for the gym.",
 "rewardDesc":"2,500₽ + 1 Leaf Stone"
 },
 "8": {
@@ -107,7 +113,7 @@ window.L_en_quests = {
 "rewardDesc":"4,000₽ + 2 Stardust"
 },
 "50": {
-"title":"Seafoam Isles — Roads 19 & 20",
+"title":"Seafoam Islands — Roads 19 & 20",
 "desc":"Head to Sea Roads 19 & 20 south of Fuchsia. Win 8 wild sea battles.",
 "rewardDesc":"4,000₽ + 10 Oran Berries"
 },
@@ -122,8 +128,8 @@ window.L_en_quests = {
 "rewardDesc":"10,000₽ + Choice Scarf + 5 Rare Candies"
 },
 "51": {
-"title":"Road 23 — The Vanguard",
-"desc":"Road 23 guards the path to Victory Road. Win 10 wild battles to toughen up.",
+"title":"Route 23 — The Vanguard",
+"desc":"Route 23 guards the path to Victory Road. Win 10 wild battles to toughen up.",
 "rewardDesc":"5,000₽ + Choice Scarf"
 },
 "13": {
@@ -133,12 +139,12 @@ window.L_en_quests = {
 },
 "14": {
 "title":"The Ice Bird of Seafoam",
-"desc":"Explore the frozen depths of Seafoam Islands (Sea Road 20) and win 10 battles to awaken the legendary Articuno!",
+"desc":"Explore the frozen depths of Seafoam Islands (Sea Route 20) and win 10 battles to awaken the legendary Articuno!",
 "rewardDesc":"Articuno (Legendary )"
 },
 "15": {
 "title":"The Thunder Bird of Power Plant",
-"desc":"Enter the abandoned Power Plant (Road 10) and defeat 10 wild Pokémon to summon Zapdos!",
+"desc":"Enter the abandoned Power Plant (Route 10) and defeat 10 wild Pokémon to summon Zapdos!",
 "rewardDesc":"Zapdos (Legendary )"
 },
 "16": {
@@ -237,8 +243,8 @@ window.L_en_quests = {
 "rewardDesc":"Lugia (Legendary )"
 },
 "65": {
-"title":"Tin Tower: Ho-Oh, the Fire Bird",
-"desc":"Climb the Tin Tower in Ecruteak and win 10 battles to summon Ho-Oh, the Fire Bird!",
+"title":"Bell Tower: Ho-Oh, the Fire Bird",
+"desc":"Climb the Bell Tower in Ecruteak and win 10 battles to summon Ho-Oh, the Fire Bird!",
 "rewardDesc":"Ho-Oh (Legendary )"
 },
 "66": {
@@ -250,12 +256,12 @@ window.L_en_quests = {
 "side": {
 "s1": {
 "title":"The Berry Collector",
-"desc":"Young Régis wants to see your skill: defeat 10 wild Pokémon on Road 1.",
+"desc":"Young Régis wants to see your skill: defeat 10 wild Pokémon on Route 1.",
 "rewardDesc":"800₽ + 5 Sitrus Berries"
 },
 "s2": {
 "title":"Apprentice Trainer",
-"desc":"Trainer Red challenges you: win 15 battles on Road 2.",
+"desc":"Trainer Red challenges you: win 15 battles on Route 2.",
 "rewardDesc":"1,200₽ + 5 Prine Berries"
 },
 "s3": {
@@ -280,7 +286,7 @@ window.L_en_quests = {
 },
 "s7": {
 "title":"Fuchsia Trainer",
-"desc":"Trainer Nina challenges you on Road 19: 12 wins!",
+"desc":"Trainer Nina challenges you on Route 19: 12 wins!",
 "rewardDesc":"2,000₽ + Leftovers"
 },
 "s8": {
@@ -290,22 +296,22 @@ window.L_en_quests = {
 },
 "s9": {
 "title":"Olivine Guard",
-"desc":"Guard Olaf watches Road 38/39: 10 wins!",
+"desc":"Guard Olaf watches Route 38/39: 10 wins!",
 "rewardDesc":"2,000₽ + 10 Oran Berries"
 },
 "s10": {
 "title":"Blackthorn's Dragon Master",
-"desc":"Dragon Master tests you on Road 45: 10 wins!",
+"desc":"Dragon Master tests you on Route 45: 10 wins!",
 "rewardDesc":"2,500₽ + 2 Rare Candies"
 },
 "s11": {
 "title":"Viridian Guardian",
-"desc":"Guard Jo challenges newcomers: win 12 wild battles on Road 22!",
+"desc":"Guard Jo challenges newcomers: win 12 wild battles on Route 22!",
 "rewardDesc":"1,800₽ + 5 Cheri Berries"
 },
 "s12": {
 "title":"Cerulean Researcher",
-"desc":"Researcher Lys tracks rare Pokémon: win 12 battles on Road 9!",
+"desc":"Researcher Lys tracks rare Pokémon: win 12 battles on Route 9!",
 "rewardDesc":"2,200₽ + 5 Sitrus Berries"
 },
 "s13": {
@@ -315,12 +321,12 @@ window.L_en_quests = {
 },
 "s14": {
 "title":"Vermilion Fighter",
-"desc":"Fighter Ken watches Road 11: 12 wild wins!",
+"desc":"Fighter Ken watches Route 11: 12 wild wins!",
 "rewardDesc":"2,400₽ + 1 Thunder Stone"
 },
 "s15": {
 "title":"Lavender Watcher",
-"desc":"Watcher Tom patrols Road 12: win 12 wild battles!",
+"desc":"Watcher Tom patrols Route 12: win 12 wild battles!",
 "rewardDesc":"2,400₽ + 4 Rare Candies"
 },
 "s30": {

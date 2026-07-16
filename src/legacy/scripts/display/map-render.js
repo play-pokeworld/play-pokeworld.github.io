@@ -35,7 +35,8 @@ function renderMap(){
  const isCurrent=id===G.location;
  const badgeReq=loc.badgeReq||0;
  const storyReq=loc.storyReq||0;
- const isLocked=badgeReq>G.badges.length || storyReq>(G.storyIdx||0) || !isLocUnlocked(id);
+ const gateStatus = (typeof locGateStatus === 'function') ? locGateStatus(id) : {ok:true};
+ const isLocked=storyReq>(G.storyIdx||0) || !isLocUnlocked(id);
  const isReachable=!isLocked&&!isCurrent;
  const dims=nodeDims(loc, id);
  const w=dims.w, h=dims.h;
@@ -50,8 +51,8 @@ function renderMap(){
  const labelColor = isCurrent?'#94886B':isReachable?'#ececec':'#9a9a9a';
  const x0=loc.x - w/2, y0=loc.y - h/2;
  const blk = blockingNeighbor(id);
- const reqStr = (badgeReq>G.badges.length)
- ? tr('requires_badges', {need:badgeReq, have:G.badges.length})
+ const reqStr = (!gateStatus.ok && typeof locGateMessage === 'function')
+ ? locGateMessage(id)
  : (blk)
  ? tr('win_wild_battles_req', {need:getLocObj(blk).minWins||0, location:getLocName(blk), have:((G.wildWinsByLoc||{})[blk]||0)})
  : tr('locked_by_story', {current:G.storyIdx||0, required:storyReq});
@@ -133,9 +134,9 @@ function clickLocation(id){
  return;
  }
  }
- const badgeReq=loc.badgeReq||0;
- if(badgeReq>G.badges.length){
- setMsg(tr('need_badges_access', {need:badgeReq, location:getLocName(id), have:G.badges.length}));
+ const gateStatus = (typeof locGateStatus === 'function') ? locGateStatus(id) : {ok:true};
+ if(!gateStatus.ok){
+ setMsg(typeof locGateMessage === 'function' ? locGateMessage(id) : tr('location_not_reachable', {location:getLocName(id)}));
  return;
  }
  const storyReq=loc.storyReq||0;

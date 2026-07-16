@@ -69,6 +69,10 @@ window.L_fr_items = {
 "name":"Pierre Lune",
 "desc":"Fait évoluer certains Pokémon."
 },
+"pokeflute": {
+"name":"Poké Flûte",
+"desc":"Une flûte à la mélodie apaisante. Elle permet de réveiller Ronflex."
+},
 "nugget": {
 "name":"Pépite",
 "desc":"Objet précieux en or pur qui vaut 5 000₽."

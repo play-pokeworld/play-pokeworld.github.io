@@ -14,7 +14,7 @@ window.L_fr_quests = {
 },
 "40": {
 "title":"La Forêt de Jadielle",
-"desc":"Explorez la Forêt Jadielle et remportez 5 combats sauvages pour aiguiser votre equipe.",
+"desc":"Explorez la Forêt de Jade et remportez 5 combats sauvages pour aiguiser votre equipe.",
 "rewardDesc":"600₽ + 5 Baies Sitrus"
 },
 "41": {
@@ -80,7 +80,13 @@ window.L_fr_quests = {
 "7": {
 "title":"Les Fantômes de la Tour de Lavanville",
 "desc":"Rejoignez Lavanville et bravez les esprits de la Tour Pokémon. Remportez 5 combats pour obtenir 3 Super Bonbons.",
-"rewardDesc":"4 500₽ + 3 Super Bonbons"
+"rewardDesc":"4 500₽ + 3 Super Bonbons + Poké Flûte"
+},
+
+"52": {
+"title":"La Poké Flûte et Ronflex",
+"desc":"Grâce à la Poké Flûte obtenue à Lavanville, réveillez le Ronflex qui bloque les routes et défiez-le !",
+"rewardDesc":"Ronflex + 3 000₽"
 },
 "48": {
 "title":"La Route 7 — Céladopole",
@@ -164,12 +170,12 @@ window.L_fr_quests = {
 },
 "31": {
 "title":"Le Salut du Prof. Orme",
-"desc":"À Bourg Geonif, parlez au Prof. Orme pour debutere officiellement votre aventure Johto.",
+"desc":"À Bourg Geon, parlez au Prof. Orme pour debutere officiellement votre aventure Johto.",
 "rewardDesc":"300₽ + 5 Baies Oran"
 },
 "20": {
-"title":"21. L'Appel de Johto — Bourg Geonif",
-"desc":"Bienvenue en Johto ! Parlez au Prof. Orme à Bourg Geonif puis remportez 3 combats sauvages pour débuter.",
+"title":"21. L'Appel de Johto — Bourg Geon",
+"desc":"Bienvenue en Johto ! Parlez au Prof. Orme à Bourg Geon puis remportez 3 combats sauvages pour débuter.",
 "rewardDesc":"500₽ + 5 Baies Oran"
 },
 "21": {
@@ -188,7 +194,7 @@ window.L_fr_quests = {
 "rewardDesc":"2 000₽ + Sable Doux"
 },
 "24": {
-"title":"25. La Brume d'Ébénelle",
+"title":"25. La Brume de Rosalia",
 "desc":"À Rosalia, vainquez Mortimer (Morty) pour le Badge Brume !",
 "rewardDesc":"2 500₽ + Mouchoir Choix"
 },
@@ -213,8 +219,8 @@ window.L_fr_quests = {
 "rewardDesc":"8 000₽ + Bandeau Choix + 5 Super Bonbons"
 },
 "60": {
-"title":"La Tour Brûlante : le Mystère des Bêtes",
-"desc":"À Rosalia, explorez la Tour Brûlante et affrontez 8 Pokémon pour libérer les trois Bêtes Légendaires : Raikou, Entei et Suicune !",
+"title":"La Tour Cendrée : le Mystère des Bêtes",
+"desc":"À Rosalia, explorez la Tour Cendrée et affrontez 8 Pokémon pour libérer les trois Bêtes Légendaires : Raikou, Entei et Suicune !",
 "rewardDesc":"3 000₽ + 5 Super Bonbons"
 },
 "61": {
@@ -233,13 +239,13 @@ window.L_fr_quests = {
 "rewardDesc":"Suicune (Légendaire )"
 },
 "64": {
-"title":"Les Îles Whirl : Lugia, Gardien des Mers",
-"desc":"Plongez aux Îles Whirl et remportez 10 combats pour éveiller Lugia, le Pokémon de la Mer !",
+"title":"Les Tourb'Îles : Lugia, Gardien des Mers",
+"desc":"Plongez aux Tourb'Îles et remportez 10 combats pour éveiller Lugia, le Pokémon de la Mer !",
 "rewardDesc":"Lugia (Légendaire )"
 },
 "65": {
-"title":"La Tour Cendrée : Ho-Oh, Oiseau de Feu",
-"desc":"Gravissez la Tour Cendrée à Rosalia et remportez 10 combats pour faire apparaître Ho-Oh, l'Oiseau de Feu !",
+"title":"La Tour Carillon : Ho-Oh, Oiseau de Feu",
+"desc":"Gravissez la Tour Carillon à Rosalia et remportez 10 combats pour faire apparaître Ho-Oh, l'Oiseau de Feu !",
 "rewardDesc":"Ho-Oh (Légendaire )"
 },
 "66": {
@@ -432,8 +438,8 @@ window.L_fr_quests = {
 "rewardDesc":"1 500₽"
 },
 "r34": {
-"title":"Grotte Obscure",
-"desc":"Remportez 12 combats dans la Grotte Obscure.",
+"title":"Antre Noir",
+"desc":"Remportez 12 combats dans la Antre Noir.",
 "rewardDesc":"1 Rocher Royal"
 },
 "r35": {

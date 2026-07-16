@@ -110,6 +110,12 @@ const ITEMS = {
 "price": 3000,
 "type":"stone"
  },
+"pokeflute": {
+"icon":"🎵",
+"price": 0,
+"type":"key",
+"value": 0
+ },
 "nugget": {
 "icon":"",
 "price": 5000,
