@@ -17,7 +17,7 @@ function renderStoryWindow(){
  const repsActive = G.repeatables || [];
 
  if(!mainDef && !sideActive.length && !repsActive.length){
- panel.innerHTML = `<div class="extracted-template-style-242">\n 📜 ${t("m.quest_ui.27")}</div>`;
+ panel.innerHTML = (typeof renderTutorialQuestBlock === 'function' ? renderTutorialQuestBlock() : '') + `<div class="extracted-template-style-242">\n 📜 ${t("m.quest_ui.27")}</div>`;
  return;
  }
 
@@ -42,7 +42,7 @@ function renderStoryWindow(){
  return `<div class="extracted-template-style-245">\n <div class="extracted-template-style-246">${ttl}</div>\n <div class="extracted-template-style-247">${dsc}</div>\n ${body}\n <div class="extracted-template-style-248"> ${rew}</div>\n <button class="hbtn" data-style="width:100%;padding:6px;font-size:13px;font-weight:bold;background:${done?(def.rewardPoke?'var(--accent)':'var(--green)'):'#332a22'};color:#fff;cursor:${done?'pointer':'not-allowed'};border:1px solid ${done?'#388e3c':'#44382e'};opacity:${done?1:0.6};"\n ${done?`data-action="legacy-call" data-call="claimQuest" data-call-args="'${inst.qid}','${cat}'"`:'disabled'}>${done?btnText:(t("m.quest_ui.20"))}</button>\n </div>`;
  };
 
- let html='';
+ let html=(typeof renderTutorialQuestBlock === 'function' ? renderTutorialQuestBlock() : '');
  if(mainDef){
  const step = (G.mainStep[region]||0)+1;
  html += `<div class="extracted-template-style-249">📖 ${t("m.quest_ui.19")} (${regionName} — ${step}/${total})</div>`;

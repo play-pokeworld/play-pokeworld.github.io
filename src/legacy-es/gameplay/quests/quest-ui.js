@@ -17,7 +17,7 @@ function renderStoryWindow(){
  const repsActive = G.repeatables || [];
 
  if(!mainDef && !sideActive.length && !repsActive.length){
- panel.innerHTML = `<div class="extracted-template-style-242">\n 📜 ${t("m.quest_ui.27")}</div>`;
+ panel.innerHTML = (typeof renderTutorialQuestBlock === 'function' ? renderTutorialQuestBlock() : '') + `<div class="extracted-template-style-242">\n 📜 ${t("m.quest_ui.27")}</div>`;
  return;
  }
 
@@ -44,7 +44,7 @@ function renderStoryWindow(){
  return `<div class="extracted-template-style-245">\n <div class="extracted-template-style-246">${ttl}</div>\n <div class="extracted-template-style-247">${dsc}</div>\n ${body}\n <div class="extracted-template-style-248"> ${rew}</div>\n <button class="hbtn"\n ${done?`data-action="legacy-call" data-call="claimQuest" data-call-args="'${inst.qid}','${cat}'"`:'disabled'}>${done?btnText:(t("m.quest_ui.20"))}</button>\n </div>`;
  };
 
- let html='';
+ let html=(typeof renderTutorialQuestBlock === 'function' ? renderTutorialQuestBlock() : '');
  if(mainDef){
  const step = (G.mainStep[region]||0)+1;
  html += `<div class="extracted-template-style-249">📖 ${t("m.quest_ui.19")} (${regionName} — ${step}/${total})</div>`;

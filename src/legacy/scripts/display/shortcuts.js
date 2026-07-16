@@ -7,6 +7,7 @@ function renderShortcutsWindow(){
     {icon:'🏪', label: t('shortcut_market'), action:'open-fullscreen-panel', value:'market', color:'var(--accent)'},
     {icon:'', label:t('panel_pokedex_title'), action:'open-fullscreen-panel', value:'pokedex', color:'var(--light2)'},
     {icon:'📚', label:t('dictionary_title'), action:'open-fullscreen-panel', value:'dictionary', color:'var(--purple)'},
+    {icon:'❔', label:t('guide_title'), action:'open-fullscreen-panel', value:'guide', color:'var(--orange)'},
   ];
 
   el.innerHTML = buttons.map(b => 

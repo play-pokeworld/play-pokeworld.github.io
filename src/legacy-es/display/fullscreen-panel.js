@@ -116,7 +116,8 @@ function openFullscreenPanel(panelType){
  shop: t('panel_shop_title'),
  market: t('panel_market_title'),
  pokedex: t('panel_pokedex_title'),
- dictionary: t('dictionary_title')
+ dictionary: t('dictionary_title'),
+ guide: t('guide_title')
  };
 
  
@@ -150,6 +151,7 @@ function openFullscreenPanel(panelType){
  else if(panelType === 'market') renderMarket(content);
  else if(panelType === 'pokedex') renderPokedex(content);
  else if(panelType === 'dictionary') renderDictionary(content);
+ else if(panelType === 'guide' && typeof renderGuidePanel === 'function'){ if(typeof window !== 'undefined' && typeof window.setGuideSection === 'function') window.setGuideSection(null); else renderGuidePanel(content); }
 
  modal.style.display = 'flex';
 }

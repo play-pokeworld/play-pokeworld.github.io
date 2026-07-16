@@ -109,6 +109,7 @@
   "src/legacy/scripts/display/map-help.js",
   "src/legacy/scripts/display/shortcuts.js",
   "src/legacy/scripts/display/fullscreen-panel.js",
+  "src/legacy/scripts/display/tutorial.js",
   "src/legacy/scripts/display/bootstrap.js"
 ];
   function loadScript(index) {

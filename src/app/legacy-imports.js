@@ -82,6 +82,7 @@ import "../legacy-es/display/poke-modal.js";
 import "../legacy-es/display/starter.js";
 import "../legacy-es/display/map-help.js";
 import "../legacy-es/display/fullscreen-panel.js";
+import "../legacy-es/display/tutorial.js";
 import "../legacy-es/display/bootstrap.js";
 
 export {};

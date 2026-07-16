@@ -827,3 +827,131 @@
   background: rgba(211,66,95,.10);
 }
 .training-upgrade-line input { transform: scale(1.25); }
+.starter-card .poke-name { color: var(--light2); text-shadow: 0 1px 2px rgba(0,0,0,.55); }
+.tutorial-tip {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 1200;
+  width: min(360px, calc(100vw - 36px));
+  background: linear-gradient(180deg, rgba(68,65,56,.98), rgba(54,52,47,.98));
+  border: 2px solid var(--light1);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 14px 40px rgba(0,0,0,.55);
+}
+.tutorial-tip-title { color: var(--light2); font-weight: 900; margin-bottom: 6px; }
+.tutorial-tip-body { color: var(--light1); font-size: 13px; line-height: 1.35; }
+.tutorial-tip-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
+.tutorial-quest-card {
+  background: rgba(236,222,183,.08);
+  border: 1px solid var(--light1);
+  border-left: 4px solid var(--accent);
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.tutorial-quest-card.done { border-left-color: var(--green); }
+.tutorial-quest-head { display:flex; gap:8px; align-items:center; color:var(--light2); }
+.tutorial-quest-card p { color: var(--light1); font-size: 13px; line-height:1.35; margin:6px 0; }
+.tutorial-quest-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.guide-header { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:12px; }
+.guide-header h2 { margin:0; color:var(--light2); }
+.guide-header p { margin:4px 0 0; color:var(--light1); }
+.guide-progress { min-width:86px; height:86px; border-radius:50%; background:var(--dark1); border:2px solid var(--light2); display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.guide-progress b { font-size:22px; color:var(--light2); }
+.guide-progress span { font-size:11px; color:var(--light1); }
+.guide-actions { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+.tutorial-step-list { display:grid; gap:8px; margin-bottom:14px; }
+.tutorial-step { display:flex; gap:10px; background:rgba(0,0,0,.20); border:1px solid var(--dark3); border-radius:10px; padding:9px; }
+.tutorial-step.done { border-color:rgba(96,190,88,.65); }
+.tutorial-step b { color:var(--light2); }
+.tutorial-step p { color:var(--light1); font-size:12px; margin:3px 0 0; }
+.guide-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
+.guide-card { background:rgba(0,0,0,.22); border:1px solid var(--dark3); border-radius:12px; padding:12px; }
+.guide-card h3 { margin:0 0 6px; color:var(--light2); font-size:14px; }
+.guide-card p { margin:0; color:var(--light1); line-height:1.38; font-size:13px; }
+.tutorial-quest-card.active {
+  border-width: 2px;
+  border-color: var(--light2);
+  background: linear-gradient(180deg, rgba(236,222,183,.12), rgba(0,0,0,.18));
+  box-shadow: 0 8px 22px rgba(0,0,0,.28), inset 0 0 0 1px rgba(255,255,255,.06);
+}
+.tutorial-quest-title {
+  color: var(--light2);
+  font-size: 14px;
+  font-weight: 900;
+  margin-top: 8px;
+}
+.tutorial-how {
+  background: rgba(0,0,0,.24);
+  border: 1px solid var(--dark3);
+  border-radius: 8px;
+  padding: 8px;
+  color: var(--light1);
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 8px 0;
+}
+.tutorial-how b { color: var(--light2); }
+.tutorial-progress-bar {
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--dark1);
+  border: 1px solid rgba(255,255,255,.08);
+  margin: 8px 0 10px;
+}
+.tutorial-progress-bar div { height: 100%; width: var(--pct, 0%); background: var(--green); }
+.tutorial-primary { background: var(--light2); color: var(--dark1); font-weight: 900; }
+.guide-card-button {
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  width: 100%;
+  transition: transform .15s, border-color .15s, filter .15s;
+}
+.guide-card-button:hover { transform: translateY(-2px); border-color: var(--light2); filter: brightness(1.08); }
+.guide-page-list { display: grid; gap: 12px; }
+.guide-page {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 12px;
+  background: rgba(0,0,0,.22);
+  border: 1px solid var(--dark3);
+  border-radius: 12px;
+  padding: 12px;
+}
+.guide-page-num {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--light2);
+  color: var(--dark1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+}
+.guide-page h3 { margin: 0 0 5px; color: var(--light2); font-size: 14px; }
+.guide-page p { margin: 0; color: var(--light1); line-height: 1.42; font-size: 13px; }
+.guide-info-card {
+  background: rgba(0,0,0,.22);
+  border: 1px solid var(--dark3);
+  border-left: 4px solid var(--accent);
+  border-radius: 12px;
+  padding: 13px 14px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.18);
+}
+.guide-info-card h3 {
+  color: var(--light2);
+  margin: 0 0 7px;
+  font-size: 15px;
+  font-weight: 900;
+}
+.guide-info-card p {
+  color: var(--light1);
+  margin: 0;
+  line-height: 1.48;
+  font-size: 13px;
+}

@@ -119,5 +119,6 @@ const LEGACY_SCRIPT_ORDER = [
   "src/legacy/scripts/display/map-help.js" + V,
   "src/legacy/scripts/display/shortcuts.js" + V,
   "src/legacy/scripts/display/fullscreen-panel.js" + V,
+  "src/legacy/scripts/display/tutorial.js" + V,
   "src/legacy/scripts/display/bootstrap.js" + V
 ];

@@ -9,6 +9,7 @@ export function renderShortcutsWindow() {
     {icon:'🏪', label: (typeof t==='function'?t('shortcut_market'):'Market'), action:'open-fullscreen-panel', value:'market', color:'var(--accent)'},
     {icon:'', label:(typeof t==='function'?t('panel_pokedex_title'):'Pokedex'), action:'open-fullscreen-panel', value:'pokedex', color:'var(--light2)'},
     {icon:'📚', label:(typeof t==='function'?t('dictionary_title'):'Dictionnaire'), action:'open-fullscreen-panel', value:'dictionary', color:'var(--purple)'},
+    {icon:'❔', label:(typeof t==='function'?t('guide_title'):'Guide'), action:'open-fullscreen-panel', value:'guide', color:'var(--orange)'},
   ];
 
   const btnElements = buttons.map(b => {
