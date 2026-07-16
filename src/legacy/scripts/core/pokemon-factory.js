@@ -55,7 +55,7 @@ function createPoke(id, level, shinyUnlocked=false){
  shinyUnlocked:isShiny, shinyActive:isShiny, shiny:isShiny,
  talent:talent,
  heldItem:null,
- moves: getMovesForLevel(moveset, level),
+ moves: (typeof getMovesForSpeciesLevel === 'function' ? getMovesForSpeciesLevel(id, moveset, level) : getMovesForLevel(moveset, level)),
  ivs, evs, status:null, statusTurns:0, xp: xpForLevel(level), xpNext: xpForLevel(level+1),
  battleMods:{atk:1,def:1,spa:1,spd:1,spe:1},
  };

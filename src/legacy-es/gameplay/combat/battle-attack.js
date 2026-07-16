@@ -60,11 +60,20 @@ function executeAttack(attacker, defender, moveId, side){
  addBattleLog(tr('combat_attack_auto_2', {p0:defender.name}));
  return;
  }
+ const absorbMap = {waterabsorb:'Water', stormdrain:'Water', voltabsorb:'Electric', flashfire:'Fire', sapsipper:'Grass'};
+ if(absorbMap[defender.talent] === mv.type){
+ const heal = Math.max(1, Math.floor(defender.maxHP * 0.25));
+ defender.currentHP = Math.min(defender.maxHP, defender.currentHP + heal);
+ addBattleLog(`${defender.name} absorbe ${getMoveName(moveId)} grâce à ${getTalentName(defender.talent)} ! (+${heal} PV)`);
+ updateBattleUI();
+ return;
+ }
 
  
  let acc = mv.acc || 100;
+ if(attacker.talent === 'noguard' || defender.talent === 'noguard') acc = 1000;
  if(attacker.talent === 'compoundeyes') acc += 30;
- if(defender.talent === 'sandveil') acc -= 20;
+ if(defender.talent === 'sandveil' || defender.talent === 'snowcloak') acc -= 20;
  if(mv.pow!==null && mv.pow!==undefined && !chance(acc)){
  addBattleLog(tr('combat_attack_auto_3', {p0:attacker.name}));
  return;
@@ -166,7 +175,8 @@ function executeAttack(attacker, defender, moveId, side){
  if(!power) return;
 
  const stabMult=(attacker.type1===mv.type||attacker.type2===mv.type)?(attacker.talent==='adaptability'?2.0:1.5):1;
- const critMult=(mv.crit&&chance(15))?(attacker.talent==='sniper'?2.25:1.5):1;
+ const critBlocked = defender.talent === 'shellarmor' || defender.talent === 'battlearmor';
+ const critMult=(mv.crit&&!critBlocked&&chance(15))?(attacker.talent==='sniper'?2.25:1.5):1;
  const randMult=(rand(85,100)/100);
 
  const isSpec = mv.cat === 'spec';
@@ -178,7 +188,7 @@ function executeAttack(attacker, defender, moveId, side){
  let atk = (isSpec ? (attacker.spa || attacker.atk) : attacker.atk) * atkBuff * atkModVal;
  let def = (isSpec ? (defender.spd || defender.def) : defender.def) * defBuff * defModVal;
 
- if(attacker.talent === 'hugepower' && !isSpec){
+ if((attacker.talent === 'hugepower' || attacker.talent === 'purepower') && !isSpec){
  atk *= 1.6;
  if(chance(35)) addBattleLog(t('combat_attack_auto_25'));
  }
@@ -204,6 +214,10 @@ function executeAttack(attacker, defender, moveId, side){
  power = Math.floor(power * 1.35);
  addBattleLog(t('combat_attack_auto_29'));
  }
+ if(attacker.talent === 'swarm' && mv.type === 'Bug' && attacker.currentHP < attacker.maxHP * 0.35){
+ power = Math.floor(power * 1.35);
+ }
+ if(attacker.talent === 'steelyspirit' && mv.type === 'Steel') power = Math.floor(power * 1.25);
 
  if(defender.talent === 'thickfat' && (mv.type === 'Fire' || mv.type === 'Ice')){
  def *= 2;
@@ -212,6 +226,12 @@ function executeAttack(attacker, defender, moveId, side){
  if(defender.talent === 'multiscale' && defender.currentHP >= defender.maxHP){
  def *= 2;
  addBattleLog(t('combat_attack_auto_31'));
+ }
+ if((defender.talent === 'filter' || defender.talent === 'solidrock') && eff > 1){
+ def *= 1.33;
+ }
+ if(defender.talent === 'marvelscale' && defender.status && !isSpec){
+ def *= 1.5;
  }
 
  

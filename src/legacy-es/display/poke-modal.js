@@ -307,6 +307,7 @@ function openMoveInfo(moveId, contextIdx, contextBoxId){
 
  const effHtml = effects.length ? effects.map(e=>`<div class="extracted-template-style-096">✦ ${e}</div>`).join('') : `<div class="extracted-template-style-090">${t('no_special_effects')}</div>`;
  const typeColor = TYPE_COLORS[type] || '#888';
+ const moveDesc = (typeof MOVE_DESCRIPTIONS !== 'undefined' && MOVE_DESCRIPTIONS[moveId]) ? MOVE_DESCRIPTIONS[moveId] : '';
 
  inner.innerHTML = `<div class="modal-title">
  <div class="extracted-template-style-006">
@@ -326,6 +327,7 @@ function openMoveInfo(moveId, contextIdx, contextBoxId){
  <div>${acc}%</div>
  </div>
  </div>
+ ${moveDesc?`<div class="extracted-template-style-008"><div class="extracted-template-style-005">Description</div><div class="extracted-template-style-090">${moveDesc}</div></div>`:''}
  <div class="extracted-template-style-008">
  <div class="extracted-template-style-005">${t('effects')}</div>
  ${effHtml}

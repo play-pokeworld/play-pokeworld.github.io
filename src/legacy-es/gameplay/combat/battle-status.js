@@ -22,7 +22,7 @@ function applyEndOfTurnStatus(p){
  if(!p||p.currentHP<=0) return;
  
  
- if(p.talent === 'speedboost'){
+ if(p.talent === 'speedboost' || p.talent === 'quickfeet' || p.talent === 'swiftswim' || p.talent === 'chlorophyll'){
  const isPlayerSide = (p === getActivePlayerPoke() || p === G.team[battle.playerPokeIdx]);
  const mods = isPlayerSide ? battle.playerMods : battle.enemyMods;
  if(mods) mods.spe = Math.min(3.0, (mods.spe || 1) * 1.15);

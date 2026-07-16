@@ -43,6 +43,7 @@
   "src/legacy/scripts/data/pokemon-talents.js",
   "src/legacy/scripts/data/poke-talents.js",
   "src/legacy/scripts/data/pokedex-flavor.js",
+  "src/legacy/scripts/data/official-pokemon-data.js",
   "src/legacy/scripts/data/story-quests.js",
   "src/legacy/scripts/data/locations-data.js",
   "src/legacy/scripts/data/locations-johto.js",

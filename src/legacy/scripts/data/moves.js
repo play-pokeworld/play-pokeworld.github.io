@@ -974,3 +974,5 @@ const DEX_MAP = {
  250:250,
  251:251
 };
+
+if (typeof window !== 'undefined') { window.MOVES = MOVES; window.PD = PD; window.DEX_MAP = DEX_MAP; window.POKE_MOVE_POOLS = POKE_MOVE_POOLS; }

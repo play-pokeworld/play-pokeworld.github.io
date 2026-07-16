@@ -53,6 +53,7 @@ function openAbilityInfo(key){
  document.getElementById('poke-modal').classList.add('open');
 }
 function renderDictionary(el){
+ el.classList.add('dictionary-panel-content');
  const tab = _dictionaryTab || 'items';
  const q = _dictionarySearch || '';
  const tabs = [{id:'items',label:t('dict_items')||'Objets'},{id:'moves',label:t('dict_moves')||'Attaques'},{id:'abilities',label:t('dict_abilities')||'Talents'}];
@@ -142,6 +143,7 @@ function openFullscreenPanel(panelType){
  document.getElementById('fs-panel-filters').innerHTML = '';
  document.getElementById('fs-panel-title').textContent = titles[panelType] || panelType;
  const content = document.getElementById('fs-panel-content');
+ content.classList.remove('dictionary-panel-content');
 
  if(panelType === 'inventory') renderInventory(content);
  else if(panelType === 'shop') renderShop(content);

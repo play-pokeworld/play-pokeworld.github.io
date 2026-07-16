@@ -134,3 +134,5 @@ function getRarityLabel(rarity) {
   if (rarity === 3) return 'Rare';
   return 'Inconnu';
 }
+
+if (typeof window !== 'undefined') window.TALENTS_FULL = TALENTS_FULL;

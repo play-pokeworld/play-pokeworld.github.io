@@ -86,6 +86,8 @@ function loadGame(manual = false) {
     
     
     G = saveData.G;
+    if (typeof window !== 'undefined') window.G = G;
+    if (typeof globalThis !== 'undefined') globalThis.G = G;
     
     
     if (!G) {
@@ -101,6 +103,7 @@ function loadGame(manual = false) {
     if (!G.unlockedTalents) G.unlockedTalents = {};
     if (!G.mainStep) G.mainStep = { kanto: 0, johto: 0 };
     if (!G.automation) G.automation = { autoHatch: false, autoSeedHatchery: false, autoExplore: false };
+    if (typeof applyOfficialPokemonDataToSave === 'function') applyOfficialPokemonDataToSave();
     
     
     const collectionCount = Object.keys(G.collection).length;

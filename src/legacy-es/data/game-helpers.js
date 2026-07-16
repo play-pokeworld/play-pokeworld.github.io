@@ -1,11 +1,10 @@
 function getSpeciesTalents(id){
  const nid = Number(id);
- 
- if(typeof POKEMON_TALENTS !== 'undefined' && POKEMON_TALENTS[nid]) {
-   return POKEMON_TALENTS[nid];
- }
- 
- return POKE_TALENTS[nid] || ['sturdy', 'intimidate', 'hugepower'];
+ const official = (typeof globalThis !== 'undefined' && (globalThis.OFFICIAL_POKE_TALENTS || globalThis.POKE_TALENTS || globalThis.POKEMON_TALENTS)) ? (globalThis.OFFICIAL_POKE_TALENTS || globalThis.POKE_TALENTS || globalThis.POKEMON_TALENTS) : null;
+ if(official && (official[nid] || official[String(nid)])) return official[nid] || official[String(nid)];
+ if(typeof POKEMON_TALENTS !== 'undefined' && POKEMON_TALENTS[nid]) return POKEMON_TALENTS[nid];
+ if(typeof POKE_TALENTS !== 'undefined' && POKE_TALENTS[nid]) return POKE_TALENTS[nid];
+ return ['sturdy', 'intimidate', 'hugepower'];
 }
 
 
@@ -27,12 +26,18 @@ function getRarityLabel(rarity) {
 
 function getTalentName(tal){
  if(!tal) return 'Normal';
- return (typeof t==='function') ? (t('talents.'+tal+'.name') || tal) : tal;
+ const loc = (typeof t==='function') ? t('talents.'+tal+'.name') : '';
+ if(loc && loc !== 'talents.'+tal+'.name') return loc;
+ if(typeof TALENTS_FULL !== 'undefined' && TALENTS_FULL[tal] && TALENTS_FULL[tal].name) return TALENTS_FULL[tal].name;
+ return tal;
 }
 
 
 function getTalentDesc(tal){
- return (typeof t==='function') ? (t('talents.'+tal+'.desc') || '') : '';
+ const loc = (typeof t==='function') ? t('talents.'+tal+'.desc') : '';
+ if(loc && loc !== 'talents.'+tal+'.desc') return loc;
+ if(typeof TALENTS_FULL !== 'undefined' && TALENTS_FULL[tal] && TALENTS_FULL[tal].info) return TALENTS_FULL[tal].info;
+ return '';
 }
 
 
@@ -62,11 +67,30 @@ function unlockTalentForSpecies(id, tal){
 }
 
 
+function getLearnReqFallbackFromPool(pool, moveId){
+ const idx = (pool||[]).indexOf(moveId);
+ if(idx < 0) return 999;
+ if(idx < 4) return 1;
+ return Math.min(100, 1 + Math.floor((idx - 3) * 2));
+}
 function getMovesForLevel(moveset, level){
- if(!moveset || !moveset.length) return [{id:'tackle', pp:35, maxPP:35}];
+ const moveData = (typeof globalThis !== 'undefined' && globalThis.MOVES) ? globalThis.MOVES : MOVES;
+ if(!moveset || !moveset.length) return [{id:'tackle', pp:moveData.tackle?.pp||35, maxPP:moveData.tackle?.pp||35}];
  const count = level >= 24 ? 4 : level >= 16 ? 3 : level >= 8 ? 2 : 1;
- const available = moveset.slice(0, Math.min(count, moveset.length));
- return available.map(m => ({id:m, pp:MOVES[m]?.pp||10, maxPP:MOVES[m]?.pp||10}));
+ const available = moveset.filter(m => moveData[m]).filter(m => getLearnReqFallbackFromPool(moveset, m) <= level);
+ const picked = (available.length ? available : moveset.filter(m => moveData[m])).slice(-Math.min(count, 4));
+ return picked.map(m => ({id:m, pp:moveData[m]?.pp||10, maxPP:moveData[m]?.pp||10}));
+}
+function getMovesForSpeciesLevel(speciesId, moveset, level){
+ const pools = (typeof globalThis !== 'undefined' && (globalThis.OFFICIAL_POKE_MOVE_POOLS || globalThis.POKE_MOVE_POOLS)) ? (globalThis.OFFICIAL_POKE_MOVE_POOLS || globalThis.POKE_MOVE_POOLS) : null;
+ const levels = (typeof globalThis !== 'undefined' && globalThis.POKE_MOVE_LEVELS) ? globalThis.POKE_MOVE_LEVELS : null;
+ const moveData = (typeof globalThis !== 'undefined' && globalThis.MOVES) ? globalThis.MOVES : MOVES;
+ const pool = (pools && (pools[speciesId] || pools[String(speciesId)])) || moveset || [];
+ const lmap = (levels && (levels[speciesId] || levels[String(speciesId)])) || {};
+ const count = level >= 24 ? 4 : level >= 16 ? 3 : level >= 8 ? 2 : 1;
+ const available = pool.filter(m => moveData[m] && ((lmap[m] != null ? lmap[m] : getLearnReqFallbackFromPool(pool,m)) <= level));
+ const picked = (available.length ? available : pool.filter(m => moveData[m])).slice(-Math.min(count, 4));
+ return picked.map(m => ({id:m, pp:moveData[m]?.pp||10, maxPP:moveData[m]?.pp||10}));
 }
 
 
@@ -217,6 +241,7 @@ if (typeof getTalentName !== 'undefined' && typeof window !== 'undefined') windo
 if (typeof getTalentDesc !== 'undefined' && typeof window !== 'undefined') window.getTalentDesc = getTalentDesc;
 if (typeof isTalentHidden !== 'undefined' && typeof window !== 'undefined') window.isTalentHidden = isTalentHidden;
 if (typeof unlockTalentForSpecies !== 'undefined' && typeof window !== 'undefined') window.unlockTalentForSpecies = unlockTalentForSpecies;
+if (typeof getMovesForSpeciesLevel !== 'undefined' && typeof window !== 'undefined') window.getMovesForSpeciesLevel = getMovesForSpeciesLevel;
 if (typeof getMovesForLevel !== 'undefined' && typeof window !== 'undefined') window.getMovesForLevel = getMovesForLevel;
 if (typeof calcStat !== 'undefined' && typeof window !== 'undefined') window.calcStat = calcStat;
 if (typeof recalcPokeStats !== 'undefined' && typeof window !== 'undefined') window.recalcPokeStats = recalcPokeStats;

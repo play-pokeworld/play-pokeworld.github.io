@@ -1,31 +1,35 @@
 function getLearnLevelForMove(pokeId, moveId){
  
- if(typeof POKE_MOVE_POOLS === 'undefined' || !POKE_MOVE_POOLS[pokeId]) return 1;
- const pool = POKE_MOVE_POOLS[pokeId];
+ const pools = (globalThis.OFFICIAL_POKE_MOVE_POOLS || globalThis.POKE_MOVE_POOLS) || (typeof POKE_MOVE_POOLS !== 'undefined' ? POKE_MOVE_POOLS : null);
+ if(!pools || !pools[pokeId]) return 1;
+ const pool = pools[pokeId];
+ const levels = globalThis.POKE_MOVE_LEVELS || null;
+ const lmap = levels ? (levels[pokeId] || levels[String(pokeId)] || {}) : {};
+ if(lmap[moveId] != null) return lmap[moveId];
  const idx = pool.indexOf(moveId);
  if(idx === -1) return 999; 
- 
  if(idx < 4) return 1;
- 
- return 1 + Math.floor((idx - 3) * 5);
+ return Math.min(100, 1 + Math.floor((idx - 3) * 2));
 }
 
 function learnableMoves(p){
- const known=new Set(p.moves.map(m=>m.id));
+ const moveData = (typeof globalThis !== 'undefined' && globalThis.MOVES) ? globalThis.MOVES : MOVES;
+ const known=new Set((p.moves||[]).map(m=>typeof m==='string'?m:m.id).filter(Boolean));
  
- if(typeof POKE_MOVE_POOLS !== 'undefined' && POKE_MOVE_POOLS[p.id]){
- const pool = POKE_MOVE_POOLS[p.id];
+ const pools = (globalThis.OFFICIAL_POKE_MOVE_POOLS || globalThis.POKE_MOVE_POOLS) || (typeof POKE_MOVE_POOLS !== 'undefined' ? POKE_MOVE_POOLS : null);
+ if(pools && pools[p.id]){
+ const pool = pools[p.id];
  
  return pool.filter(id => {
  if(known.has(id)) return false;
- if(!MOVES[id]) return false;
+ if(!moveData[id]) return false;
  const reqLvl = getLearnLevelForMove(p.id, id);
  return p.level >= reqLvl;
  });
  }
  
  const types=new Set([p.type1,p.type2].filter(Boolean));
- return Object.keys(MOVES).filter(id=>!known.has(id)&&types.has(MOVES[id].type));
+ return Object.keys(moveData).filter(id=>!known.has(id)&&types.has(moveData[id].type));
 }
 
 
