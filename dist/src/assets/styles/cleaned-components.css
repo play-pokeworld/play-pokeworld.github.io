@@ -778,3 +778,52 @@
   padding: 10px 16px;
   border-top: 0;
 }
+.training-header-card {
+  background: rgba(0,0,0,0.22);
+  border: 1px solid var(--dark3);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.training-header-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.training-mode-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(190px,1fr)); gap:10px; margin-top:10px; }
+.training-mode-row { min-height:76px; border:1px solid var(--dark3); border-radius:10px; padding:10px; background:rgba(0,0,0,0.2); }
+.training-mode-row.is-disabled { opacity:.45; cursor:not-allowed; filter:grayscale(.4); }
+.training-mode-title { font-weight:900; color:var(--light2); font-size:13px; margin-bottom:4px; }
+.training-upgrade-line { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:8px 0; border-bottom:1px solid rgba(148,136,107,.25); }
+.hatchery-upgrade-row { display:flex; justify-content:flex-end; margin-bottom:10px; }
+.training-mode-row {
+  cursor: pointer;
+  border-width: 2px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.25), inset 0 0 0 1px rgba(255,255,255,.06);
+  transition: transform .15s, filter .15s, box-shadow .15s;
+}
+.training-mode-row:hover { transform: translateY(-2px); filter: brightness(1.12); }
+.training-mode-grid .training-mode-row:nth-child(1) { border-color:#5cc8ff; background:linear-gradient(135deg, rgba(92,200,255,.20), rgba(0,0,0,.20)); }
+.training-mode-grid .training-mode-row:nth-child(2) { border-color:#d68cff; background:linear-gradient(135deg, rgba(214,140,255,.20), rgba(0,0,0,.20)); }
+.training-mode-grid .training-mode-row:nth-child(3) { border-color:#60be58; background:linear-gradient(135deg, rgba(96,190,88,.22), rgba(0,0,0,.20)); }
+.training-mode-grid .training-mode-row:nth-child(4) { border-color:#f2d94e; background:linear-gradient(135deg, rgba(242,217,78,.22), rgba(0,0,0,.20)); }
+.training-mode-row.is-disabled { pointer-events:none; box-shadow:none; }
+.hatchery-upgrade-row { justify-content: stretch; }
+.hatchery-upgrade-row .hbtn { width: 100%; padding: 10px; font-weight: 900; }
+.training-upgrade-line {
+  border: 2px solid var(--dark3);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 8px 0;
+  background: rgba(0,0,0,.22);
+}
+.training-upgrade-line.is-on {
+  border-color: var(--green);
+  background: rgba(96,190,88,.16);
+  box-shadow: 0 0 12px rgba(96,190,88,.18);
+}
+.training-upgrade-line.is-off {
+  border-color: var(--red);
+  background: rgba(211,66,95,.10);
+}
+.training-upgrade-line input { transform: scale(1.25); }

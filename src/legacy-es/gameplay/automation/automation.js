@@ -1,30 +1,6 @@
 function renderAutomationWindow(){
  const el = document.getElementById('automation-window-body');
- if(!el) return;
- const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
- if(!G.automation) G.automation = { autoHatch: false, autoSeedHatchery: false, autoExplore: false };
- 
- el.innerHTML = `
- <div class="extracted-template-style-086">
- ${t("m.automation.7")}
- </div>
- <div class="extracted-template-style-125">
- <label class="extracted-template-style-126">
- <div>
- <b class="extracted-template-style-127"> ${t("m.automation.6")}</b>
- <div class="extracted-template-style-007">${t("m.automation.5")}</div>
- </div>
- <input type="checkbox"${G.automation.autoHatch ? 'checked' : ''} data-change-call="toggleAutomation" data-change-args="'autoHatch', this.checked" class="extracted-bridge-style-028">
- </label>
- <label class="extracted-template-style-126">
- <div>
- <b class="extracted-template-style-127"> ${t("m.automation.4")}</b>
- <div class="extracted-template-style-007">${t("m.automation.3")}</div>
- </div>
- <input type="checkbox"${G.automation.autoSeedHatchery ? 'checked' : ''} data-change-call="toggleAutomation" data-change-args="'autoSeedHatchery', this.checked" class="extracted-bridge-style-028">
- </label>
- </div>
- `;
+ if(el) el.innerHTML = '';
 }
 function toggleAutomation(key, val){
  if(!G.automation) G.automation = {};

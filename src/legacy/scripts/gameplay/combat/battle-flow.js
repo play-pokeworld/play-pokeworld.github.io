@@ -1,4 +1,5 @@
 function endBattle(){
+ if(typeof restoreAllTransformedPokemon === 'function') restoreAllTransformedPokemon();
  clearInterval(battle.timerId);
  const hadLoot=!battle.isChamp&&(((battle.sessionCatches||[]).length)||Object.keys(battle.sessionItems||{}).length);
  battle.active=false;

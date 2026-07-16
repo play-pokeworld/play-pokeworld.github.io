@@ -1,3 +1,60 @@
+
+function transformPokemon(attacker, defender, side){
+ if(!attacker || !defender) return false;
+ if(attacker._transformed){
+   addBattleLog(`${attacker.name} est déjà transformé !`);
+   return true;
+ }
+ const hpRatio = attacker.maxHP ? attacker.currentHP / attacker.maxHP : 1;
+ attacker._transformBackup = {
+   id: attacker.id, name: attacker.name, emoji: attacker.emoji,
+   type1: attacker.type1, type2: attacker.type2,
+   maxHP: attacker.maxHP, atk: attacker.atk, def: attacker.def, spa: attacker.spa, spd: attacker.spd, spe: attacker.spe,
+   talent: attacker.talent, moves: (attacker.moves||[]).map(m=>({...m})), shinyActive: attacker.shinyActive, shiny: attacker.shiny
+ };
+ attacker._transformed = true;
+ attacker._transformedFrom = defender.id;
+ attacker.id = defender.id;
+ attacker.name = (attacker._transformBackup.name || 'Métamorph') + ' → ' + defender.name;
+ attacker.emoji = defender.emoji;
+ attacker.type1 = defender.type1;
+ attacker.type2 = defender.type2;
+ attacker.maxHP = defender.maxHP;
+ attacker.currentHP = Math.max(1, Math.min(attacker.maxHP, Math.floor(attacker.maxHP * hpRatio)));
+ attacker.atk = defender.atk;
+ attacker.def = defender.def;
+ attacker.spa = defender.spa || defender.atk;
+ attacker.spd = defender.spd || defender.def;
+ attacker.spe = defender.spe;
+ attacker.talent = defender.talent;
+ attacker.moves = (defender.moves||[]).map(m=>({id:m.id, pp:(MOVES[m.id]?.pp||m.pp||10), maxPP:(MOVES[m.id]?.pp||m.maxPP||10)}));
+ attacker.shinyActive = defender.shinyActive || defender.shiny;
+ attacker.shiny = attacker.shinyActive;
+ addBattleLog(`🧬 ${attacker._transformBackup.name} prend l'apparence de ${defender.name} !`);
+ try{ renderMoveButtons(); }catch(_){}
+ try{ renderBattleTeamRow(); }catch(_){}
+ updateBattleUI();
+ return true;
+}
+function restoreTransformedPokemon(p){
+ if(!p || !p._transformed || !p._transformBackup) return;
+ const b = p._transformBackup;
+ const hpRatio = p.maxHP ? p.currentHP / p.maxHP : 1;
+ p.id=b.id; p.name=b.name; p.emoji=b.emoji; p.type1=b.type1; p.type2=b.type2;
+ p.maxHP=b.maxHP; p.currentHP=Math.max(0, Math.min(p.maxHP, Math.floor(p.maxHP*hpRatio)));
+ p.atk=b.atk; p.def=b.def; p.spa=b.spa; p.spd=b.spd; p.spe=b.spe;
+ p.talent=b.talent; p.moves=(b.moves||[]).map(m=>({...m}));
+ p.shinyActive=b.shinyActive; p.shiny=b.shiny;
+ delete p._transformed; delete p._transformedFrom; delete p._transformBackup;
+}
+function restoreAllTransformedPokemon(){
+ try{ (G.team||[]).forEach(restoreTransformedPokemon); }catch(_){}
+ try{ Object.values(G.collection||{}).forEach(restoreTransformedPokemon); }catch(_){}
+ try{ (G.hatchery||[]).forEach(s=>s&&s.poke&&restoreTransformedPokemon(s.poke)); }catch(_){}
+ try{ if(battle&&battle.enemyPoke) restoreTransformedPokemon(battle.enemyPoke); }catch(_){}
+ try{ if(battle&&battle.champTeam) battle.champTeam.forEach(restoreTransformedPokemon); }catch(_){}
+}
+
 function handleStatusBeforeMove(poke, side){
  const s=poke.status;
  if(!s) return true;
@@ -51,6 +108,11 @@ function executeAttack(attacker, defender, moveId, side){
 
  addBattleLog(tr('uses_move_log', {name:attacker.name, move:getMoveName(moveId)}));
  playAttackAnim(side);
+
+ if(moveId === 'transform'){
+ transformPokemon(attacker, defender, side);
+ return;
+ }
 
  if(defender.talent === 'levitate' && mv.type === 'Ground'){
  addBattleLog(tr('combat_attack_auto_1', {p0:defender.name}));

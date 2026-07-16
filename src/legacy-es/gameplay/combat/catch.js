@@ -1,106 +1,100 @@
+
+function rollWeightedTalentForSpecies(speciesId){
+ const tals = (typeof getSpeciesTalents === 'function') ? getSpeciesTalents(speciesId) : [];
+ const available = tals.filter(tal => typeof TALENTS_FULL !== 'undefined' && TALENTS_FULL[tal]);
+ if(!available.length) return null;
+ const weighted = [];
+ available.forEach(tal => {
+   const rarity = TALENTS_FULL[tal].rarity || 1;
+   const weight = rarity === 1 ? 60 : rarity === 2 ? 30 : 12;
+   for(let i=0;i<weight;i++) weighted.push(tal);
+ });
+ return weighted[rand(0, weighted.length-1)] || available[0];
+}
+function unlockCapturedTalent(speciesId, talent){
+ if(!talent || typeof TALENTS_FULL === 'undefined' || !TALENTS_FULL[talent]) return false;
+ if(!G.unlockedTalents) G.unlockedTalents = {};
+ if(!G.unlockedTalents[speciesId]) G.unlockedTalents[speciesId] = [];
+ const already = G.unlockedTalents[speciesId].includes(talent);
+ const rarity = TALENTS_FULL[talent].rarity || 1;
+ const chancePct = rarity === 1 ? 100 : rarity === 2 ? 55 : 30;
+ if(!already && chance(chancePct)){
+   G.unlockedTalents[speciesId].push(talent);
+   return true;
+ }
+ if(!already && G.unlockedTalents[speciesId].length === 0){
+   G.unlockedTalents[speciesId].push(talent);
+   return true;
+ }
+ return false;
+}
+function rollCaptureIv(caughtMon){
+ if(!caughtMon) return null;
+ if(!caughtMon.ivs) caughtMon.ivs = {hp:0, atk:0, def:0, spa:0, spd:0, spe:0};
+ if(!chance(10)) return null;
+ const keys = ['hp','atk','def','spa','spd','spe'];
+ const avail = keys.filter(k => (caughtMon.ivs[k]||0) < 6);
+ if(!avail.length) return null;
+ const picked = avail[rand(0, avail.length-1)];
+ caughtMon.ivs[picked] = (caughtMon.ivs[picked]||0) + 1;
+ try{ recalcPokeStats(caughtMon); }catch(_){}
+ return picked;
+}
+
 function attemptAutoCatch(e){
  const wasShiny = !!(e.shinyActive || e.shiny);
- const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
  if(!wasShiny && !battle.legendaryCatch && !chance(10)){
  addBattleLog(tr("m.catch.7", {p0:e.name}));
  return;
  }
  addBattleLog(tr("m.catch.6", {p0:e.name}));
  G.pokedex[e.id]={...(G.pokedex[e.id]||{}),seen:true,caught:true};
- if(wasShiny){
- unlockShinyForSpecies(e.id);
- }
+ if(wasShiny) unlockShinyForSpecies(e.id);
  const alreadyOwned=speciesOwned(e.id);
  const caughtMon = createPoke(e.id, 1, wasShiny || isSpeciesShiny(e.id));
- 
- 
- if(caughtMon && typeof TALENTS_FULL !== 'undefined') {
-   const speciesTalents = getSpeciesTalents(e.id);
-   if(speciesTalents && speciesTalents.length > 0) {
-     
-     const available = speciesTalents.filter(t => TALENTS_FULL[t]);
-     if(available.length > 0) {
-       
-       const roll = rand(0, 99);
-       let chosenTalent = null;
-       
-       if(roll < 50) {
-         
-         const commons = available.filter(t => TALENTS_FULL[t].rarity === 1);
-         if(commons.length > 0) chosenTalent = commons[rand(0, commons.length-1)];
-       } else if(roll < 80) {
-         
-         const uncommons = available.filter(t => TALENTS_FULL[t].rarity === 2);
-         if(uncommons.length > 0) chosenTalent = uncommons[rand(0, uncommons.length-1)];
-       } else {
-         
-         const rares = available.filter(t => TALENTS_FULL[t].rarity === 3);
-         if(rares.length > 0) chosenTalent = rares[rand(0, rares.length-1)];
-       }
-       
-       
-       if(!chosenTalent) chosenTalent = available[rand(0, available.length-1)];
-       
-       
-       if(!G.unlockedTalents) G.unlockedTalents = {};
-       if(!G.unlockedTalents[e.id]) G.unlockedTalents[e.id] = [];
-       if(!G.unlockedTalents[e.id].includes(chosenTalent)) {
-         G.unlockedTalents[e.id].push(chosenTalent);
-         if(!caughtMon.unlockedTalents) caughtMon.unlockedTalents = [];
-         if(!caughtMon.unlockedTalents.includes(chosenTalent)) {
-           caughtMon.unlockedTalents.push(chosenTalent);
-         }
-         const talentInfo = getTalentByKey(chosenTalent);
-         if(talentInfo && typeof notify === 'function') {
-           notify(tr("m.talent_unlocked", {
-             name: getPokeName(e.id),
-             talent: talentInfo.name,
-             rarity: getRarityLabel(talentInfo.rarity)
-           }), 'var(--accent)');
-         }
-       }
-     }
-   }
- }
- 
  if(caughtMon){
- caughtMon.shinyActive = wasShiny || isSpeciesShiny(e.id);
- caughtMon.shiny = caughtMon.shinyActive;
- caughtMon.shinyUnlocked = caughtMon.shinyActive || caughtMon.shinyUnlocked;
- caughtMon.heldItem = null;
+   const rolledTalent = rollWeightedTalentForSpecies(e.id);
+   if(rolledTalent) caughtMon.talent = rolledTalent;
+   const talentUnlocked = unlockCapturedTalent(e.id, caughtMon.talent);
+   const ivKey = rollCaptureIv(caughtMon);
+   caughtMon.shinyActive = wasShiny || isSpeciesShiny(e.id);
+   caughtMon.shiny = caughtMon.shinyActive;
+   caughtMon.shinyUnlocked = caughtMon.shinyActive || caughtMon.shinyUnlocked;
+   caughtMon.heldItem = null;
+   if(talentUnlocked){
+     const talentInfo = getTalentByKey(caughtMon.talent);
+     if(talentInfo && typeof notify === 'function') notify(tr("m.talent_unlocked", {name:getPokeName(e.id), talent:talentInfo.name, rarity:getRarityLabel(talentInfo.rarity)}), 'var(--accent)');
+     addBattleLog(`🧬 Talent découvert : ${getTalentName(caughtMon.talent)} !`);
+   }
+   if(ivKey) addBattleLog(`⭐ IV gagné sur ${caughtMon.name} : ${ivKey.toUpperCase()} +1 !`);
  }
  if(!battle.sessionCatches) battle.sessionCatches=[];
- battle.sessionCatches.push({id:e.id, name:e.name, emoji:e.emoji||PD[e.id]?.[8]||'❓', shiny:wasShiny, dupe:alreadyOwned});
+ battle.sessionCatches.push({id:e.id, name:e.name, emoji:e.emoji||PD[e.id]?.[12]||'❓', shiny:wasShiny, dupe:alreadyOwned});
  try{ if (typeof renderBattleLoot === 'function') renderBattleLoot(); }catch(_){}
  try{ if (typeof renderBattleSummary === 'function') { const m=document.getElementById('battle-summary-modal'); if(m&&m.classList.contains('open')) renderBattleSummary(); } }catch(_){}
  if(alreadyOwned){
- if(!G.dupeCatches) G.dupeCatches={};
- G.dupeCatches[e.id]=(G.dupeCatches[e.id]||0)+1;
- const bonus=rand(150,350);
- G.money+=bonus;
- if(wasShiny){
- addBattleLog(tr("m.catch.5", {p0:e.name}));
- }
- addBattleLog(tr("m.catch.4", {p0:e.name, p1:bonus}));
+   if(!G.dupeCatches) G.dupeCatches={};
+   G.dupeCatches[e.id]=(G.dupeCatches[e.id]||0)+1;
+   const bonus=rand(150,350);
+   G.money+=bonus;
+   if(wasShiny) addBattleLog(tr("m.catch.5", {p0:e.name}));
+   addBattleLog(tr("m.catch.4", {p0:e.name, p1:bonus}));
  } else {
- if(speciesOwned(e.id)){
- const bonus=rand(150,350);
- G.money+=bonus;
- addBattleLog(tr("m.catch.3", {p0:bonus}));
- } else {
- if(G.team.length < 6){
- G.team.push(caughtMon);
- addBattleLog(tr("m.catch.2", {p0:e.name}));
- } else {
- 
- let boxId = 'box_' + e.id + '_' + Date.now();
- while(G.collection[boxId]) {
- boxId = 'box_' + e.id + '_' + Date.now() + Math.floor(Math.random()*1000);
- }
- G.collection[boxId] = caughtMon;
- addBattleLog(tr("m.catch.1", {p0:e.name}));
- }
- }
+   if(speciesOwned(e.id)){
+     const bonus=rand(150,350);
+     G.money+=bonus;
+     addBattleLog(tr("m.catch.3", {p0:bonus}));
+   } else if(caughtMon){
+     if(G.team.length < 6){
+       G.team.push(caughtMon);
+       addBattleLog(tr("m.catch.2", {p0:e.name}));
+     } else {
+       let boxId = 'box_' + e.id + '_' + Date.now();
+       while(G.collection[boxId]) boxId = 'box_' + e.id + '_' + Date.now() + Math.floor(Math.random()*1000);
+       G.collection[boxId] = caughtMon;
+       addBattleLog(tr("m.catch.1", {p0:e.name}));
+     }
+   }
  }
  if(G.mine) G.mine.energy = Math.min(G.mine.maxEnergy||100, (G.mine.energy||0) + 15);
  EventBus.emit(EVENTS.POKEMON_CAUGHT, { loc: G.location });
@@ -114,6 +108,9 @@ function attemptAutoCatch(e){
 
 
 // --- Migrated to ES module, globals exposed ---
+if (typeof rollWeightedTalentForSpecies !== 'undefined' && typeof window !== 'undefined') window.rollWeightedTalentForSpecies = rollWeightedTalentForSpecies;
+if (typeof unlockCapturedTalent !== 'undefined' && typeof window !== 'undefined') window.unlockCapturedTalent = unlockCapturedTalent;
+if (typeof rollCaptureIv !== 'undefined' && typeof window !== 'undefined') window.rollCaptureIv = rollCaptureIv;
 if (typeof attemptAutoCatch !== 'undefined' && typeof window !== 'undefined') window.attemptAutoCatch = attemptAutoCatch;
 
 export {};

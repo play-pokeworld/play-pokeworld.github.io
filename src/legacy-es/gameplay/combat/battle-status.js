@@ -102,56 +102,12 @@ async function onEnemyFaint(){
  battle.eMoveIdx=0;
  if(battle.isTraining && battle.trainee){
  battle.trainingStage = battle.champPokeIdx;
- if(!battle.trainee.evs) battle.trainee.evs = {hp:0, atk:0, def:0, spa:0, spd:0, spe:0};
- const keys = ['hp','atk','def','spa','spd','spe'];
- const avail = keys.filter(k => (battle.trainee.evs[k]||0) < 6);
- if(avail.length > 0){
- const pk = avail[rand(0, avail.length - 1)];
- battle.trainee.evs[pk]++;
- addBattleLog(`<span class="extracted-template-style-156">${tr('training_round_ev', {stat:pk.toUpperCase(), value:battle.trainee.evs[pk]})}</span>`);
- }
- 
- 
- if(battle.trainingMode === 'talent' && typeof TALENTS_FULL !== 'undefined' && battle.champPokeIdx === 2){
- const nid = battle.trainee.id;
- const speciesTalents = getSpeciesTalents(nid);
- if(speciesTalents && speciesTalents.length > 0){
- if(!G.unlockedTalents) G.unlockedTalents = {};
- if(!G.unlockedTalents[nid]) G.unlockedTalents[nid] = [battle.trainee.talent];
- const available = speciesTalents.filter(t => TALENTS_FULL[t]);
- 
- const roll = rand(0, 99);
- const chosenTalent = available[rand(0, available.length-1)];
- const talentInfo = getTalentByKey(chosenTalent);
- let unlockChance = 40; 
- if(talentInfo){
- if(talentInfo.rarity === 1) unlockChance = 60;
- else if(talentInfo.rarity === 2) unlockChance = 40;
- else if(talentInfo.rarity === 3) unlockChance = 20;
- 
- if(roll < unlockChance){
- const wasNew = !G.unlockedTalents[nid].includes(chosenTalent);
- if(wasNew){
- G.unlockedTalents[nid].push(chosenTalent);
- addBattleLog(`<span class="extracted-template-style-157">${tr('new_talent_unlocked', {talent:talentInfo.name, rarity:getRarityLabel(talentInfo.rarity)})}</span>`);
- } else {
- addBattleLog(`<span class="extracted-template-style-156">${tr('talent_reconfirmed', {talent:talentInfo.name, rarity:getRarityLabel(talentInfo.rarity)})}</span>`);
- }
- 
- battle.trainee.talent = chosenTalent;
- } else {
- addBattleLog(`<span class="extracted-template-style-158">${t('no_new_talent')}</span>`);
- }
- }
- }
- }
- 
  battle.trainee.currentHP = battle.trainee.maxHP;
  if(battle.trainee.moves) for(const m of battle.trainee.moves) m.pp = m.maxPP;
  addBattleLog(tr('training_room_round', {round:battle.champPokeIdx+1, pokemon:next.name}));
- } else {
+} else {
  addBattleLog(tr('champion_sends', {champion:getChampName(battle.champId), pokemon:next.name}));
- }
+}
  G.pokedex[next.id]={...(G.pokedex[next.id]||{}),seen:true};
  resetEnemyCd();
  updateBattleUI();

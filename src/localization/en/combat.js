@@ -72,7 +72,7 @@ window.L_en_combat = {
 "new_talent_unlocked":"🎉 New ability unlocked: {talent} ({rarity})!",
 "talent_reconfirmed":"✨ Ability {talent} ({rarity}) re-confirmed!",
 "no_new_talent":"No new ability this time...",
-"training_room_round":" TRAINING ROOM - Round {round}/3: {pokemon}!",
+"training_room_round":" TRAINING ROOM - Round {round}/6: {pokemon}!",
 "champion_sends":"{champion} sends out {pokemon}!",
 "league_stage_victory":" Victory against {trainer}! Your team was fully healed (100% HP)!",
 "league_stage_success":" Stage {stage}/5 cleared! Team healed! Next battle: {trainer}...",

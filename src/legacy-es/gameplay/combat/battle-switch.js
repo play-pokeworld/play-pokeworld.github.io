@@ -73,39 +73,41 @@ async function champVictory(){
  const mode = battle.trainingMode || 'ev';
  let rewardMsg = '';
  if(trainee){
- if(!trainee.evs) trainee.evs = {hp:0, atk:0, def:0, spa:0, spd:0, spe:0};
- const keys = ['hp','atk','def','spa','spd','spe'];
- const avail = keys.filter(k => (trainee.evs[k]||0) < 6);
- if(avail.length > 0){
- const pk = avail[rand(0, avail.length - 1)];
- trainee.evs[pk]++;
- }
- if(mode === 'level'){
- levelUp(trainee);
- rewardMsg = ` (+1 Niveau -> Nv.${trainee.level})`;
- } else if(mode === 'hidden_ability'){
- trainee.hiddenTalentUnlocked = true;
- const tals = getSpeciesTalents(trainee.id);
- if(tals && tals[2]) trainee.talent = tals[2];
- rewardMsg = t('hidden_talent_unlocked_reward');
- } else if(mode === 'ability'){
- const tals = getSpeciesTalents(trainee.id);
- if(tals && tals[0] && tals[1]){
- trainee.talent = (trainee.talent === tals[0]) ? tals[1] : tals[0];
- rewardMsg = ` (Nouveau talent : ${getTalentName(trainee.talent)})`;
- }
- } else {
- trainee.xp += (trainee.level || 20) * 60;
- while(trainee.xp >= trainee.xpNext && trainee.level < 100) levelUp(trainee);
- }
- recalcPokeStats(trainee);
+   if(mode === 'ev'){
+     if(!trainee.evs) trainee.evs = {hp:0, atk:0, def:0, spa:0, spd:0, spe:0};
+     const keys = ['hp','atk','def','spa','spd','spe'];
+     const avail = keys.filter(k => (trainee.evs[k]||0) < 6);
+     if(avail.length){
+       const pk = avail[rand(0, avail.length - 1)];
+       trainee.evs[pk]++;
+       rewardMsg = ` (+1 EV ${pk.toUpperCase()} → ${trainee.evs[pk]}/6)`;
+     } else rewardMsg = ' (EV au maximum)';
+   } else if(mode === 'level'){
+     const gain = Math.min(rand(2,5), Math.max(0, 100 - (trainee.level||1)));
+     for(let i=0;i<gain;i++) levelUp(trainee);
+     rewardMsg = ` (+${gain} niveaux → Nv.${trainee.level})`;
+   } else if(mode === 'talent'){
+     const chosen = (typeof rollTrainingTalent === 'function') ? rollTrainingTalent(trainee) : null;
+     if(chosen){
+       if(!G.unlockedTalents) G.unlockedTalents = {};
+       if(!G.unlockedTalents[trainee.id]) G.unlockedTalents[trainee.id] = [];
+       const wasNew = !G.unlockedTalents[trainee.id].includes(chosen);
+       if(wasNew) G.unlockedTalents[trainee.id].push(chosen);
+       trainee.talent = chosen;
+       rewardMsg = ` (${wasNew?'Nouveau talent':'Talent confirmé'} : ${getTalentName(chosen)})`;
+     } else rewardMsg = ' (aucun talent disponible)';
+   } else if(mode === 'move'){
+     const unlocked = (typeof unlockTrainingMove === 'function') ? unlockTrainingMove(trainee) : null;
+     rewardMsg = unlocked ? ` (Capacité débloquée : ${getMoveName(unlocked)})` : ' (toutes les capacités sont déjà débloquées)';
+   }
+   recalcPokeStats(trainee);
  }
  battle.isTraining = false;
  notify(tr('training_complete', {reward:rewardMsg}), 'var(--green)');
  updateHeader(); renderTeamWindow(); renderTrainingWindow();
  await wait(1200); endBattle(); renderMap(); showTab('info');
  return;
- }
+}
  if(battle.champId && String(battle.champId).startsWith('quest_')){
  const qId = Number(battle.champId.split('_')[1]);
  const q = STORY_QUESTS.find(x => x.id === qId);

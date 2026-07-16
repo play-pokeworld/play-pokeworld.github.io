@@ -134,7 +134,7 @@ function pokemonDetailMoveRows(p, opts){
  const replaceSlot = boxId ? globalThis.boxMoveReplaceSlot : (typeof moveReplaceSlot !== 'undefined' ? moveReplaceSlot : null);
  const canReplace = !readonly && !locked && replaceSlot !== null;
  const full = (p.moves||[]).length >= 4 && !canReplace;
- const known = (p.moves||[]).map((m, mi)=>{
+ const known = (p.moves||[]).map((m, mi)=>({m: typeof m === 'string' ? {id:m} : m, mi})).filter(entry => entry.m && MOVES[entry.m.id]).map(({m, mi})=>{
    const mv = MOVES[m.id];
    const selected = !readonly && !locked && replaceSlot === mi;
    const action = readonly || locked ? '' : (boxId ? ` data-action="legacy-call" data-call="toggleBoxMoveSelect" data-call-args="'${boxId}',${mi}"` : ` data-action="legacy-call" data-call="toggleMoveSelect" data-call-args="${idx},${mi}"`);

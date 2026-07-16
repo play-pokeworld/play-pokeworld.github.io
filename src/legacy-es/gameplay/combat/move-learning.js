@@ -23,6 +23,7 @@ function learnableMoves(p){
  return pool.filter(id => {
  if(known.has(id)) return false;
  if(!moveData[id]) return false;
+ if(typeof isMoveTrainingLocked === 'function' && isMoveTrainingLocked(p, id)) return false;
  const reqLvl = getLearnLevelForMove(p.id, id);
  return p.level >= reqLvl;
  });

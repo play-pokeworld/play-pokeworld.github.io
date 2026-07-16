@@ -30,6 +30,7 @@ function upgradeHatcherySlots(cost){
  G.hatcheryMaxSlots = (G.hatcheryMaxSlots || 1) + 1;
  updateHeader();
  renderHatcheryWindow();
+ if(typeof openHatcheryUpgradeMenu === 'function') openHatcheryUpgradeMenu();
  notify(tr('hatchery_upgraded', {slots:G.hatcheryMaxSlots}),"var(--green)");
 }
 
