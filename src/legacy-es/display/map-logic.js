@@ -34,11 +34,11 @@ function locBadgeCount(id){ return regionBadgeCount(regionOfLoc(id)); }
 function hasQuestDone(id){ return !!(G.completedQuests && G.completedQuests[id]); }
 function hasRequiredItem(key){ return !!(key && G.inventory && G.inventory[key] > 0); }
 const EXTRA_LOC_GATES = {
- route12: {quest:52, item:'pokeflute', label:'Poké Flûte / Ronflex'},
- route16: {quest:52, item:'pokeflute', label:'Poké Flûte / Ronflex'},
- ceruleancave: {champion:true, label:'Ligue Pokémon'},
- mtsilver: {champion:true, label:'Ligue Pokémon'},
- tohjofalls: {champion:true, label:'Ligue Pokémon'}
+ route12: {quest:52, item:'pokeflute', label:t('snorlax_flute_gate')},
+ route16: {quest:52, item:'pokeflute', label:t('snorlax_flute_gate')},
+ ceruleancave: {champion:true, label:t('league_gate')},
+ mtsilver: {champion:true, label:t('league_gate')},
+ tohjofalls: {champion:true, label:t('league_gate')}
 };
 function locGateStatus(id){
  const loc = _regLocs()[id] || getLocObj(id);
@@ -60,8 +60,8 @@ function locGateMessage(id){
  if(st.ok) return '';
  if(st.reason === 'badge') return tr('requires_badges', {need:st.need, have:st.have});
  if(st.reason === 'item') return 'Objet requis : ' + getItemName(st.item);
- if(st.reason === 'quest') return 'Quête requise : ' + (st.label || 'progression');
- if(st.reason === 'champion') return 'Requiert la victoire à la Ligue Pokémon';
+ if(st.reason === 'quest') return tr('quest_required_gate',{label:(st.label||'progression')});
+ if(st.reason === 'champion') return t('league_required_gate');
  return tr('location_not_reachable', {location:getLocName(id)});
 }
 

@@ -1,2 +1,0 @@
-Tous les sprites Pokémon (front/back/shiny) et les sprites d'items requis sont inclus dans src/assets/images/.
-Les anciennes URL de secours pour certaines polices TTF ne sont plus nécessaires : la police WinkySans.woff2 est déjà incluse.

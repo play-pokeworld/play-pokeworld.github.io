@@ -64,9 +64,9 @@ function attemptAutoCatch(e){
    if(talentUnlocked){
      const talentInfo = getTalentByKey(caughtMon.talent);
      if(talentInfo && typeof notify === 'function') notify(tr("m.talent_unlocked", {name:getPokeName(e.id), talent:talentInfo.name, rarity:getRarityLabel(talentInfo.rarity)}), 'var(--accent)');
-     addBattleLog(`🧬 Talent découvert : ${getTalentName(caughtMon.talent)} !`);
+     addBattleLog(tr('capture_talent_log',{talent:getTalentName(caughtMon.talent)}));
    }
-   if(ivKey) addBattleLog(`⭐ IV gagné sur ${caughtMon.name} : ${ivKey.toUpperCase()} +1 !`);
+   if(ivKey) addBattleLog(tr('capture_iv_log',{name:caughtMon.name,stat:ivKey.toUpperCase()}));
  }
  if(!battle.sessionCatches) battle.sessionCatches=[];
  battle.sessionCatches.push({id:e.id, name:e.name, emoji:e.emoji||PD[e.id]?.[12]||'❓', shiny:wasShiny, dupe:alreadyOwned});

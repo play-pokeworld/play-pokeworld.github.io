@@ -6,13 +6,13 @@ function openHatcheryUpgradeMenu(){
  const maxSlots = clamp(G.hatcheryMaxSlots || 1, 1, 4);
  const upgradeCost = maxSlots * 15000;
  if(!G.automation) G.automation = {autoHatch:false, autoSeedHatchery:false, autoExplore:false};
- inner.innerHTML = `<div class="modal-title"><div>⚙️ Pension & améliorations</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
- <div class="dict-info-block"><b>Automatisations</b><br>
- <label class="training-upgrade-line ${G.automation.autoHatch?'is-on':'is-off'}"><span>🥚 Éclosion automatique</span><input type="checkbox"${G.automation.autoHatch?'checked':''} data-change-call="toggleAutomation" data-change-args="'autoHatch', this.checked"></label>
- <label class="training-upgrade-line ${G.automation.autoSeedHatchery?'is-on':'is-off'}"><span>📦 Remplir les slots depuis la boîte</span><input type="checkbox"${G.automation.autoSeedHatchery?'checked':''} data-change-call="toggleAutomation" data-change-args="'autoSeedHatchery', this.checked"></label>
+ inner.innerHTML = `<div class="modal-title"><div>${t('hatchery_upgrade_title')}</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
+ <div class="dict-info-block"><b>${t('hatchery_automation')}</b><br>
+ <label class="training-upgrade-line ${G.automation.autoHatch?'is-on':'is-off'}"><span>${t('hatchery_auto_hatch')}</span><input type="checkbox"${G.automation.autoHatch?'checked':''} data-change-call="toggleAutomation" data-change-args="'autoHatch', this.checked"></label>
+ <label class="training-upgrade-line ${G.automation.autoSeedHatchery?'is-on':'is-off'}"><span>${t('hatchery_auto_seed')}</span><input type="checkbox"${G.automation.autoSeedHatchery?'checked':''} data-change-call="toggleAutomation" data-change-args="'autoSeedHatchery', this.checked"></label>
  </div>
- <div class="dict-info-block"><b>Slots de Pension</b><br>${maxSlots<4?`<button class="hbtn" data-action="legacy-call" data-call="upgradeHatcherySlots" data-call-args="${upgradeCost}">⬆ Ajouter un slot (${upgradeCost.toLocaleString()}₽)</button>`:'Tous les slots sont débloqués.'}</div>
- <div class="dict-info-block"><b>À venir :</b><br>• soigneurs/personnel de pension<br>• bonus d’éclosion et d’IV<br>• automatisations avancées</div>`;
+ <div class="dict-info-block"><b>${t('hatchery_slots_title')}</b><br>${maxSlots<4?`<button class="hbtn" data-action="legacy-call" data-call="upgradeHatcherySlots" data-call-args="${upgradeCost}">${t('hatchery_add_slot')} (${upgradeCost.toLocaleString()}₽)</button>`:t('hatchery_all_slots')}</div>
+ <div class="dict-info-block"><b>${t('training_upgrade_title')}</b><br>${t('hatchery_future')}</div>`;
  modal.classList.add('open');
 }
 
@@ -29,7 +29,7 @@ function renderHatcheryWindow(){
  return;
  }
  
- let headerHtml = `<div class="hatchery-upgrade-row"><button class="hbtn" data-action="legacy-call" data-call="openHatcheryUpgradeMenu" data-call-args="">⚙️ Améliorations Pension</button></div>`;
+ let headerHtml = `<div class="hatchery-upgrade-row"><button class="hbtn" data-action="legacy-call" data-call="openHatcheryUpgradeMenu" data-call-args="">${t('hatchery_upgrade_button')}</button></div>`;
  
  const maxSlots = clamp(G.hatcheryMaxSlots || 1, 1, 4);
  if(!G.hatchery) G.hatchery = [null];

@@ -7,8 +7,8 @@ function findPokemonSources(id){
  for(const base in (LEVEL_EVO_MAP||{})) if(Number(LEVEL_EVO_MAP[base])===Number(id)) add('evo', `${getPokeName(Number(base))} (${t('level_word')} ${EVO_LEVELS[base]||'?'})`);
  for(const base in (STONE_EVO||{})) for(const stone in STONE_EVO[base]) if(Number(STONE_EVO[base][stone])===Number(id)) add('evo', `${getPokeName(Number(base))} + ${getItemName(stone)}`);
  if(typeof FOSSIL_REVIVE_MAP !== 'undefined') for(const fk in FOSSIL_REVIVE_MAP) if(Number(FOSSIL_REVIVE_MAP[fk])===Number(id)) add('fossil', getItemName(typeof getFossilDisplayKey==='function'?getFossilDisplayKey(fk):fk));
- if((STORY_QUESTS||[]).some(q=>Number(q.rewardPoke)===Number(id))) add('quest', 'Quête principale');
- if(!out.length) add('unknown', 'Non renseigné');
+ if((STORY_QUESTS||[]).some(q=>Number(q.rewardPoke)===Number(id))) add('quest', t('dex_quest_source'));
+ if(!out.length) add('unknown', t('dict_unknown_source'));
  return out;
 }
 function getDexFlavor(id){
@@ -86,10 +86,10 @@ function openDexEntry(id){
    <div class="dex-detail-main">
      <p class="dex-flavor">${desc || 'Description indisponible pour le moment.'}</p>
      ${getEvolutionMethodsHtml(id)}
-     <div class="dex-detail-section"><h3>Où le trouver</h3><div class="dict-chip-list">${sources.map(s=>`<span class="dict-chip">${s.label}</span>`).join('')}</div></div>
-     <div class="dex-detail-section"><h3>${t('pokedex_moves')}</h3><div class="dict-chip-list">${moves.length?moves.map(m=>`<span class="dict-chip" data-action="legacy-call" data-call="openMoveInfo" data-call-args="'${m}'">${getMoveName(m)||m}</span>`).join(''):'<span class="dict-muted">Aucune attaque renseignée.</span>'}</div></div>
-     <div class="dex-detail-section"><h3>${t('pokemon_talents')}</h3><div class="dict-chip-list">${tals.length?tals.map(tal=>`<span class="dict-chip" data-action="legacy-call" data-call="openAbilityInfo" data-call-args="'${tal}'">${TALENTS_FULL[tal]?.name||tal}</span>`).join(''):'<span class="dict-muted">Aucun talent renseigné</span>'}</div></div>
-     <div class="dex-detail-section"><h3>Stats de base</h3><div class="dex-stat-mini"><span>PV ${bhp}</span><span>ATK ${batk}</span><span>DEF ${bdef}</span><span>ASP ${bspa}</span><span>DSP ${bspd}</span><span>VIT ${bspe}</span></div></div>
+     <div class="dex-detail-section"><h3>${t('dex_where')}</h3><div class="dict-chip-list">${sources.map(s=>`<span class="dict-chip">${s.label}</span>`).join('')}</div></div>
+     <div class="dex-detail-section"><h3>${t('pokedex_moves')}</h3><div class="dict-chip-list">${moves.length?moves.map(m=>`<span class="dict-chip" data-action="legacy-call" data-call="openMoveInfo" data-call-args="'${m}'">${getMoveName(m)||m}</span>`).join(''):`<span class="dict-muted">${t('dex_no_moves')}</span>`}</div></div>
+     <div class="dex-detail-section"><h3>${t('pokemon_talents')}</h3><div class="dict-chip-list">${tals.length?tals.map(tal=>`<span class="dict-chip" data-action="legacy-call" data-call="openAbilityInfo" data-call-args="'${tal}'">${TALENTS_FULL[tal]?.name||tal}</span>`).join(''):`<span class="dict-muted">${t('dex_no_talents')}</span>`}</div></div>
+     <div class="dex-detail-section"><h3>${t('dex_base_stats')}</h3><div class="dex-stat-mini"><span>PV ${bhp}</span><span>ATK ${batk}</span><span>DEF ${bdef}</span><span>ASP ${bspa}</span><span>DSP ${bspd}</span><span>VIT ${bspe}</span></div></div>
    </div>
  </div>`;
  document.getElementById('poke-modal').classList.add('open');
