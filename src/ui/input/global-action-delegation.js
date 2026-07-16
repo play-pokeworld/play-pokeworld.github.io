@@ -119,6 +119,7 @@ export function installGlobalActionDelegation(root = document) {
     const actionTarget = event.target.closest('[data-action]');
     if (!actionTarget) return;
     if (actionTarget.dataset.action === 'filter-unified-grid') callGlobal('filterUnifiedGrid');
+    if (actionTarget.dataset.action === 'filter-dictionary') callGlobal('setDictionarySearch', actionTarget.value);
   });
 
   root.addEventListener('mouseover', (event) => {

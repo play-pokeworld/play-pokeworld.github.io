@@ -40,6 +40,11 @@ function openBoxPokeModal(boxId){
  p.shiny = p.shinyActive;
  }
 
+ if(typeof renderPokemonDetailModal === 'function'){
+ renderPokemonDetailModal(p, {boxId:boxId, locationLabel:t('pc_box')});
+ return;
+ }
+
  
  const buff={atk:0,def:0,spe:0,spa:0,spd:0,hpMax:0};
  const buffedAtk=Math.floor(p.atk*(1+(buff.atk||0)));

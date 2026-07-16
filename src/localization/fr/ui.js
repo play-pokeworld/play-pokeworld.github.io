@@ -2,6 +2,10 @@
 // Auto-extracted & grouped by domain. Edit text here, never hardcode in logic.
 
 window.L_fr_ui = {
+"dict_abilities":"Talents",
+"dict_moves":"Attaques",
+"dict_items":"Objets",
+"dictionary_title":"Dictionnaire",
 "add_to_team_btn":"Ajouter à l'équipe",
 "box_header":"Pokémon en boîte",
 "box_pc_note":"Ce Pokémon est dans votre boîte PC. Placez-le dans votre équipe pour l'entraîner ou lui équiper des objets !",

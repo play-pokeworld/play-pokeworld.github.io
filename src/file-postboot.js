@@ -139,6 +139,7 @@ function installCriticalClickFallback(root) {
     const target = event.target.closest('[data-action]');
     if (!target) return;
     if (target.dataset.action === 'filter-unified-grid') callGlobal('filterUnifiedGrid');
+    if (target.dataset.action === 'filter-dictionary') callGlobal('setDictionarySearch', target.value);
   });
 
   document.addEventListener('mouseover', function (event) {

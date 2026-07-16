@@ -186,6 +186,7 @@ function digMineTile(tx, ty){
 
 
 // --- Migrated to ES module, globals exposed ---
+if (typeof MINE_ITEMS !== 'undefined' && typeof window !== 'undefined') window.MINE_ITEMS = MINE_ITEMS;
 if (typeof initMineIfNeeded !== 'undefined' && typeof window !== 'undefined') window.initMineIfNeeded = initMineIfNeeded;
 if (typeof generateMineLayer !== 'undefined' && typeof window !== 'undefined') window.generateMineLayer = generateMineLayer;
 if (typeof setMineTool !== 'undefined' && typeof window !== 'undefined') window.setMineTool = setMineTool;

@@ -51,23 +51,23 @@ window.L_fr_items = {
 },
 "firestone": {
 "name":"Pierre Feu",
-"desc":"Fait évoluer certains Pokémon Feu."
+"desc":"Permet à un Pokémon compatible d'évoluer."
 },
 "waterstone": {
 "name":"Pierre Eau",
-"desc":"Fait évoluer certains Pokémon Eau."
+"desc":"Permet à un Pokémon compatible d'évoluer."
 },
 "thunderstone": {
 "name":"Pierre Foudre",
-"desc":"Fait évoluer certains Pokémon Électrik."
+"desc":"Permet à un Pokémon compatible d'évoluer."
 },
 "leafstone": {
 "name":"Pierre Plante",
-"desc":"Fait évoluer certains Pokémon Plante."
+"desc":"Permet à un Pokémon compatible d'évoluer."
 },
 "moonstone": {
 "name":"Pierre Lune",
-"desc":"Fait évoluer certains Pokémon."
+"desc":"Permet à un Pokémon compatible d'évoluer."
 },
 "pokeflute": {
 "name":"Poké Flûte",
@@ -135,27 +135,27 @@ window.L_fr_items = {
 },
 "sunstone": {
 "name":"Pierre Soleil",
-"desc":"Fait évoluer certains Pokémon Plante (Grainipiot→Floraëlla, Tournegrin→Héliatronc)."
+"desc":"Permet à un Pokémon compatible d'évoluer."
 },
 "kings_rock": {
 "name":"Rocher Royal",
-"desc":"Objet tenu : +12% Atk & +12% Atk Spé. (évoque Koross / Chorene)."
+"desc":"Objet tenu : +12% Atk & +12% Atk Spé. Peut aussi permettre à un Pokémon compatible d'évoluer."
 },
 "dragon_scale": {
 "name":"Écaille Dragon",
-"desc":"Objet tenu : +20% Atk & +20% Atk Spé. (évoque Hyporoi)."
+"desc":"Objet tenu : +20% Atk & +20% Atk Spé. Peut aussi permettre à un Pokémon compatible d'évoluer."
 },
 "up_grade": {
 "name":"Upgrade",
-"desc":"Objet tenu : +30% Atk Spé. (évoque Porygon2)."
+"desc":"Objet tenu : +30% Atk Spé. Peut aussi permettre à un Pokémon compatible d'évoluer."
 },
 "deep_sea_scale": {
 "name":"Écaille Océan",
-"desc":"Objet tenu : +30% Déf. Spé. (évoque Moorelot)."
+"desc":"Objet tenu : +30% Déf. Spé. Peut aussi permettre à un Pokémon compatible d'évoluer."
 },
 "deep_sea_tooth": {
 "name":"Dent Océan",
-"desc":"Objet tenu : +30% Attaque (évoque Hydreloc)."
+"desc":"Objet tenu : +30% Attaque. Peut aussi permettre à un Pokémon compatible d'évoluer."
 },
 "twisted_spoon": {
 "name":"Cuillère Tordue",

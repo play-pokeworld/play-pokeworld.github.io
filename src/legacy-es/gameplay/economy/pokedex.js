@@ -1,3 +1,22 @@
+
+function findPokemonSources(id){
+ const out=[];
+ const add=(kind, label)=>{ if(label && !out.some(x=>x.kind===kind&&x.label===label)) out.push({kind,label}); };
+ for(const [locId,loc] of Object.entries(LOCS||{})) if((loc.wild||[]).some(w=>Number(w[0])===Number(id))) add('zone', getLocName(locId));
+ for(const [locId,loc] of Object.entries(LOCS_JOHTO||{})) if((loc.wild||[]).some(w=>Number(w[0])===Number(id))) add('zone', getLocName(locId));
+ for(const base in (LEVEL_EVO_MAP||{})) if(Number(LEVEL_EVO_MAP[base])===Number(id)) add('evo', `${getPokeName(Number(base))} (${t('level_word')} ${EVO_LEVELS[base]||'?'})`);
+ for(const base in (STONE_EVO||{})) for(const stone in STONE_EVO[base]) if(Number(STONE_EVO[base][stone])===Number(id)) add('evo', `${getPokeName(Number(base))} + ${getItemName(stone)}`);
+ if(typeof FOSSIL_REVIVE_MAP !== 'undefined') for(const fk in FOSSIL_REVIVE_MAP) if(Number(FOSSIL_REVIVE_MAP[fk])===Number(id)) add('fossil', getItemName(typeof getFossilDisplayKey==='function'?getFossilDisplayKey(fk):fk));
+ if((STORY_QUESTS||[]).some(q=>Number(q.rewardPoke)===Number(id))) add('quest', 'Quête principale');
+ if(!out.length) add('unknown', 'Non renseigné');
+ return out;
+}
+function getDexFlavor(id){
+ const lang = (G && G.lang) || 'fr';
+ const data = (typeof POKEDEX_FLAVOR !== 'undefined') ? POKEDEX_FLAVOR : null;
+ return (data && data[lang] && data[lang][id]) || (data && data.en && data.en[id]) || '';
+}
+
 function renderPokedex(el){
  const total = PD.filter(Boolean).length;
  const caught = Object.values(G.pokedex).filter(e=>e.caught).length;
@@ -43,36 +62,42 @@ function renderPokedex(el){
 function openDexEntry(id){
  const pd = PD[id];
  if(!pd) return;
- const [name,t1,t2,bhp,batk,bdef,bspe,moves,emoji] = pd;
+ const name = getPokeName(id);
+ const t1 = pd[1], t2 = pd[2];
+ const bhp = pd[3] || 0, batk = pd[4] || 0, bdef = pd[5] || 0, bspa = pd[6] || batk, bspd = pd[7] || bdef, bspe = pd[8] || 0;
+ const moves = Array.isArray(pd[9]) ? pd[9] : [];
+ const emoji = pd[12] || '';
  const isShiny = isSpeciesShiny(id);
  const inner = document.getElementById('poke-modal-inner');
- 
- inner.innerHTML = `<div class="modal-title">
- <div class="extracted-template-style-006">
- <div class="extracted-template-style-233">${spriteImg(id,emoji,{size:72, shiny:isShiny})}</div>
- <div>
+ if(!inner) return;
+ const desc = getDexFlavor(id);
+ const sources = findPokemonSources(id);
+ const tals = (typeof getSpeciesTalents === 'function') ? getSpeciesTalents(id) : [];
+ inner.classList.add('poke-detail-inner');
+ inner.innerHTML = `<div class="modal-title poke-detail-title">
  <div>#${id} ${isShiny?'<span class="shiny-tag">★</span>':''}${name}</div>
- <div class="extracted-template-style-026">${typeSpan(t1)}${t2?typeSpan(t2):''}</div>
- </div>
- </div>
  <span class="modal-close" data-action="close-poke-modal">✕</span>
  </div>
- ${getEvolutionMethodsHtml(id)}
- <div class="extracted-template-style-093">
- <div class="stat-row"><div class="stat-label">${t('stat_hp')}</div><div class="stat-bar"><div class="stat-fill"></div></div><div class="stat-val">${bhp}</div></div>
- <div class="stat-row"><div class="stat-label">${t('stat_atk')}</div><div class="stat-bar"><div class="stat-fill"></div></div><div class="stat-val">${batk}</div></div>
- <div class="stat-row"><div class="stat-label">${t('stat_def')}</div><div class="stat-bar"><div class="stat-fill"></div></div><div class="stat-val">${bdef}</div></div>
- <div class="stat-row"><div class="stat-label">${t('stat_spe')}</div><div class="stat-bar"><div class="stat-fill"></div></div><div class="stat-val">${bspe}</div></div>
- </div>
- <div class="extracted-template-style-234">${t('pokedex_moves')} :</div>
- <div class="extracted-template-style-094">
- ${(moves||[]).map(m=>`<span class="extracted-template-style-235">${getMoveName(m)||m}</span>`).join('')}
+ <div class="dex-detail-layout">
+   <div class="dex-detail-hero">
+     <div class="dex-detail-orb">${spriteImg(id,emoji,{size:120, shiny:isShiny})}</div>
+     <div class="dex-detail-types">${typeSpan(t1)}${t2?typeSpan(t2):''}</div>
+   </div>
+   <div class="dex-detail-main">
+     <p class="dex-flavor">${desc || 'Description indisponible pour le moment.'}</p>
+     ${getEvolutionMethodsHtml(id)}
+     <div class="dex-detail-section"><h3>Où le trouver</h3><div class="dict-chip-list">${sources.map(s=>`<span class="dict-chip">${s.label}</span>`).join('')}</div></div>
+     <div class="dex-detail-section"><h3>${t('pokedex_moves')}</h3><div class="dict-chip-list">${moves.length?moves.map(m=>`<span class="dict-chip" data-action="legacy-call" data-call="openMoveInfo" data-call-args="'${m}'">${getMoveName(m)||m}</span>`).join(''):'<span class="dict-muted">Aucune attaque renseignée.</span>'}</div></div>
+     <div class="dex-detail-section"><h3>${t('pokemon_talents')}</h3><div class="dict-chip-list">${tals.length?tals.map(tal=>`<span class="dict-chip" data-action="legacy-call" data-call="openAbilityInfo" data-call-args="'${tal}'">${TALENTS_FULL[tal]?.name||tal}</span>`).join(''):'<span class="dict-muted">Aucun talent renseigné</span>'}</div></div>
+     <div class="dex-detail-section"><h3>Stats de base</h3><div class="dex-stat-mini"><span>PV ${bhp}</span><span>ATK ${batk}</span><span>DEF ${bdef}</span><span>ASP ${bspa}</span><span>DSP ${bspd}</span><span>VIT ${bspe}</span></div></div>
+   </div>
  </div>`;
  document.getElementById('poke-modal').classList.add('open');
 }
 
 
 // --- Migrated to ES module, globals exposed ---
+if (typeof findPokemonSources !== 'undefined' && typeof window !== 'undefined') window.findPokemonSources = findPokemonSources;
 if (typeof renderPokedex !== 'undefined' && typeof window !== 'undefined') window.renderPokedex = renderPokedex;
 if (typeof openDexEntry !== 'undefined' && typeof window !== 'undefined') window.openDexEntry = openDexEntry;
 

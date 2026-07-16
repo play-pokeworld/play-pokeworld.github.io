@@ -50,23 +50,23 @@ window.L_en_items = {
 },
 "firestone": {
 "name":"Fire Stone",
-"desc":"Evolves certain Fire-type Pokémon."
+"desc":"Allows a compatible Pokémon to evolve."
 },
 "waterstone": {
 "name":"Water Stone",
-"desc":"Evolves certain Water-type Pokémon."
+"desc":"Allows a compatible Pokémon to evolve."
 },
 "thunderstone": {
 "name":"Thunder Stone",
-"desc":"Evolves certain Electric-type Pokémon."
+"desc":"Allows a compatible Pokémon to evolve."
 },
 "leafstone": {
 "name":"Leaf Stone",
-"desc":"Evolves certain Grass-type Pokémon."
+"desc":"Allows a compatible Pokémon to evolve."
 },
 "moonstone": {
 "name":"Moon Stone",
-"desc":"Evolves certain Pokémon."
+"desc":"Allows a compatible Pokémon to evolve."
 },
 "pokeflute": {
 "name":"Poké Flute",
@@ -134,27 +134,27 @@ window.L_en_items = {
 },
 "sunstone": {
 "name":"Sun Stone",
-"desc":"Evolves certain Grass Pokémon."
+"desc":"Allows a compatible Pokémon to evolve."
 },
 "kings_rock": {
 "name":"King's Rock",
-"desc":"Held: +12% Atk & Sp.Atk (evolves Politoed/Slowking)."
+"desc":"Held: +12% Atk & Sp.Atk. Can also evolve a compatible Pokémon."
 },
 "dragon_scale": {
 "name":"Dragon Scale",
-"desc":"Held: +20% Atk & Sp.Atk (evolves Kingdra)."
+"desc":"Held: +20% Atk & Sp.Atk. Can also evolve a compatible Pokémon."
 },
 "up_grade": {
 "name":"Up-Grade",
-"desc":"Held: +30% Sp.Atk (evolves Porygon2)."
+"desc":"Held: +30% Sp.Atk. Can also evolve a compatible Pokémon."
 },
 "deep_sea_scale": {
 "name":"Deep Sea Scale",
-"desc":"Held: +30% Sp.Def (evolves Gorebyss)."
+"desc":"Held: +30% Sp.Def. Can also evolve a compatible Pokémon."
 },
 "deep_sea_tooth": {
 "name":"Deep Sea Tooth",
-"desc":"Held: +30% Atk (evolves Huntail)."
+"desc":"Held: +30% Atk. Can also evolve a compatible Pokémon."
 },
 "twisted_spoon": {
 "name":"Twisted Spoon",

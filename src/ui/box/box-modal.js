@@ -74,6 +74,11 @@ export function openBoxPokeModal(boxId) {
     p.shiny = p.shinyActive;
   }
 
+  if (typeof globalThis.renderPokemonDetailModal === 'function') {
+    globalThis.renderPokemonDetailModal(p, { boxId, locationLabel: t('pc_box') });
+    return;
+  }
+
   const buff = { atk:0, def:0, spe:0, spa:0, spd:0, hpMax:0 };
   const buffedAtk = Math.floor(p.atk*(1+(buff.atk||0)));
   const buffedDef = Math.floor(p.def*(1+(buff.def||0)));

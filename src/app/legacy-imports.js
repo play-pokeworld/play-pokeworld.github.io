@@ -19,6 +19,7 @@ import "../legacy-es/data/talents-data.js";
 import "../legacy-es/data/talents-full.js";
 import "../legacy-es/data/pokemon-talents.js";
 import "../legacy-es/data/poke-talents.js";
+import "../legacy-es/data/pokedex-flavor.js";
 import "../legacy-es/data/story-quests.js";
 import "../legacy-es/data/locations-data.js";
 import "../legacy-es/data/locations-johto.js";

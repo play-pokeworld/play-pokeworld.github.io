@@ -52,6 +52,7 @@ const LEGACY_SCRIPT_ORDER = [
   "src/legacy/scripts/data/talents-full.js" + V,
   "src/legacy/scripts/data/pokemon-talents.js" + V,
   "src/legacy/scripts/data/poke-talents.js" + V,
+  "src/legacy/scripts/data/pokedex-flavor.js" + V,
   "src/legacy/scripts/data/story-quests.js" + V,
   "src/legacy/scripts/data/locations-data.js" + V,
   "src/legacy/scripts/data/locations-johto.js" + V,

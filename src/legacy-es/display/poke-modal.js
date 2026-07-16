@@ -99,236 +99,149 @@ function changePokeTalent(idx, boxId, newTalent){
 
 
 
+
+function switchPokemonStatTab(tab){
+ const root = document.getElementById('poke-modal-inner');
+ if(!root) return;
+ root.querySelectorAll('.poke-detail-stat-tab').forEach(btn=>btn.classList.toggle('active', btn.dataset.statTab === tab));
+ root.querySelectorAll('.poke-detail-stat-panel').forEach(panel=>panel.classList.toggle('active', panel.dataset.statPanel === tab));
+}
+
+function pokemonDetailStatRows(p){
+ const labels = [t('stat_hp'), t('stat_atk'), t('stat_def'), t('stat_spa'), t('stat_spd'), t('stat_spe')];
+ const keys = ['hp','atk','def','spa','spd','spe'];
+ const baseVals = [p.maxHP||p.hp||0, p.atk||0, p.def||0, p.spa||p.atk||0, p.spd||p.def||0, p.spe||0];
+ const maxVals = [500,220,220,220,220,220];
+ const colors = ['#60BE58','#D3425F','#539DDF','#EF90E6','#B763CF','#FBA64C'];
+ const statRow = (label, value, pct, color, extra='') => `<div class="poke-detail-stat-row">
+   <span class="poke-detail-stat-name">${label}</span>
+   <div class="poke-detail-stat-bar"><div class="poke-detail-stat-fill" data-pct="${pct}" data-bg="${color}"></div></div>
+   <span class="poke-detail-stat-value">${value}${extra}</span>
+ </div>`;
+ return {
+   base: labels.map((label,i)=>statRow(label, baseVals[i], Math.min(100, Math.round(baseVals[i]/maxVals[i]*100)), colors[i])).join(''),
+   iv: labels.map((label,i)=>{ const val=(p.ivs||{})[keys[i]]||0; return statRow(label, renderStars(val,false), Math.round(val/6*100), colors[i], `<small>${val}/6</small>`); }).join(''),
+   ev: labels.map((label,i)=>{ const val=(p.evs||{})[keys[i]]||0; return statRow(label, renderStars(val,true), Math.round(val/6*100), colors[i], `<small>${val}/6</small>`); }).join('')
+ };
+}
+
+function pokemonDetailMoveRows(p, opts){
+ opts = opts || {};
+ const idx = opts.idx;
+ const boxId = opts.boxId;
+ const readonly = !!opts.readonly;
+ const locked = !!opts.locked;
+ const replaceSlot = boxId ? globalThis.boxMoveReplaceSlot : (typeof moveReplaceSlot !== 'undefined' ? moveReplaceSlot : null);
+ const canReplace = !readonly && !locked && replaceSlot !== null;
+ const full = (p.moves||[]).length >= 4 && !canReplace;
+ const known = (p.moves||[]).map((m, mi)=>{
+   const mv = MOVES[m.id];
+   const selected = !readonly && !locked && replaceSlot === mi;
+   const action = readonly || locked ? '' : (boxId ? ` data-action="legacy-call" data-call="toggleBoxMoveSelect" data-call-args="'${boxId}',${mi}"` : ` data-action="legacy-call" data-call="toggleMoveSelect" data-call-args="${idx},${mi}"`);
+   return `<div class="poke-detail-move-row ${selected?'selected':''}" data-type-color="${TYPE_COLORS[mv?.type||'']||'#555'}"${action} data-context-call="openMoveInfo" data-context-args="'${m.id}'" title="${locked?battleEditLockMessage():t('click_replace_context_info')}">
+     <span class="type-badge ${typeClass(mv?.type||'?')}">${mv?.type||'?'}</span>
+     <span class="poke-detail-move-name">${getMoveName(m.id)}</span>
+     <span class="poke-detail-move-meta">${mv?.pow||0} ${t('power_abbrev')} · ${mv?.cat||''}</span>
+     ${selected?`<span class="poke-detail-pill danger">${t('replacement_badge')}</span>`:''}
+   </div>`;
+ }).join('');
+ const pool = readonly ? [] : learnableMoves(p);
+ const learn = pool.length ? pool.map(id=>{
+   const mv = MOVES[id];
+   const active = !locked && (canReplace || !full);
+   const attrs = active ? (boxId ? ` data-action="legacy-call" data-call="learnBoxMove" data-call-args="'${boxId}','${id}'"` : ` data-action="legacy-call" data-call="learnMove" data-call-args="${idx},'${id}'"`) : '';
+   return `<div class="poke-detail-move-row learnable ${active?'clickable':''}" data-type-color="${TYPE_COLORS[mv?.type||'']||'#555'}"${attrs} data-context-call="openMoveInfo" data-context-args="'${id}'" title="${locked?battleEditLockMessage():t('context_info_touch')}">
+     <span class="type-badge ${typeClass(mv?.type||'?')}">${mv?.type||'?'}</span>
+     <span class="poke-detail-move-name">${getMoveName(id)}</span>
+     <span class="poke-detail-move-meta">${mv?.pow||0} ${t('power_abbrev')} · ${mv?.cat||''}</span>
+     ${active?'<span class="poke-detail-pill">+</span>':''}
+   </div>`;
+ }).join('') : `<div class="poke-detail-empty">${t('no_other_moves')}</div>`;
+ return { known, learn, canReplace, full };
+}
+
+function pokemonDetailHeldItemHtml(p, opts){
+ opts = opts || {};
+ if(!p.heldItem) return `<div class="poke-detail-subtle">${t('no_item_equipped_bag')}</div>`;
+ const key = p.heldItem;
+ const itm = ITEMS[key];
+ const qty = Math.min(BAG_MAX, (G.inventory||{})[key]||0);
+ const removeCall = opts.boxId ? `unequipItemFromBox` : `unequipItem`;
+ const removeArgs = opts.boxId ? `'${opts.boxId}'` : `${opts.idx}`;
+ return `<div class="poke-detail-held">
+   <div class="poke-detail-held-icon">${itemSpriteHtml(key,34)}</div>
+   <div class="poke-detail-held-text"><b>${getItemName(key)}</b><span>${itm?.buff?`${t('item_power')} ${qty}/${BAG_MAX}`:(getItemDesc(key)||'')}</span></div>
+   ${opts.readonly?'':`<button class="hbtn poke-detail-mini-btn" data-action="legacy-call" data-call="${removeCall}" data-call-args="${removeArgs}">${t('remove')}</button>`}
+ </div>`;
+}
+
+function renderPokemonDetailModal(p, opts){
+ opts = opts || {};
+ if(!p) return;
+ const modal = document.getElementById('poke-modal');
+ const inner = document.getElementById('poke-modal-inner');
+ if(!modal || !inner) return;
+ inner.classList.add('poke-detail-inner');
+ const idx = opts.idx;
+ const boxId = opts.boxId;
+ const readonly = !!opts.readonly;
+ const locLabel = opts.locationLabel || (boxId ? t('pc_box') : (idx!=null ? t('team_location_clean') : ''));
+ const locked = readonly ? false : isPokemonLockedForBattleEdits(p, idx, boxId);
+ const isShiny = !!(p.shinyActive || p.shiny || p.shinyUnlocked || isSpeciesShiny(p.id));
+ const statRows = pokemonDetailStatRows(p);
+ const moveRows = pokemonDetailMoveRows(p, {idx, boxId, readonly, locked});
+ const talentHtml = readonly ? (()=>{
+   const info = p.talent && TALENTS_FULL[p.talent] ? TALENTS_FULL[p.talent] : null;
+   return info ? `<div class="poke-detail-ability-chip"><span>${info.name}</span><small>${getRarityLabel(info.rarity)}</small></div><div class="poke-detail-subtle">${info.info||''}</div>` : `<div class="poke-detail-subtle">${t('no_talent_species')}</div>`;
+ })() : buildTalentSelectorHtml(p, idx!=null?idx:null, boxId||null);
+ const shinyToggle = (!readonly && (p.shinyUnlocked || p.shiny || isSpeciesShiny(p.id))) ? `<label class="poke-detail-toggle"><input type="checkbox"${p.shinyActive?'checked':''} data-change-call="${boxId?'toggleBoxShinySkin':'toggleShinySkin'}" data-change-args="${boxId?`'${boxId}'`:idx}"> <span>${t('shiny_skin')}</span></label>` : '';
+ const evos = getEvolutionMethodsHtml(p.id);
+ inner.innerHTML = `<div class="modal-title poke-detail-title">
+   <div>${isShiny?'<span class="shiny-tag">★</span>':''}${p.name} <span class="poke-detail-id">#${p.id}</span></div>
+   <span class="modal-close" data-action="close-poke-modal" data-reset-move-editor="true" data-reset-box-move="true">✕</span>
+ </div>
+ <div class="poke-detail-shell">
+   <section class="poke-detail-hero">
+     <div class="poke-detail-name-row"><div><b>${p.name}</b><span>${t('level_word')} ${p.level||1}${locLabel?` · ${locLabel}`:''}</span></div></div>
+     <div class="poke-detail-sprite-card ${isShiny?'is-shiny':''}">${spriteImg(p.id,p.emoji,{shiny:isShiny,size:132})}</div>
+     <div class="poke-detail-types">${typeSpan(p.type1)}${p.type2?typeSpan(p.type2):''}</div>
+     ${shinyToggle}
+   </section>
+   <aside class="poke-detail-side">
+     <div class="poke-detail-stat-tabs">
+       <button class="poke-detail-stat-tab active" data-stat-tab="base" data-action="legacy-call" data-call="switchPokemonStatTab" data-call-args="'base'">Base Stats</button>
+       <button class="poke-detail-stat-tab" data-stat-tab="iv" data-action="legacy-call" data-call="switchPokemonStatTab" data-call-args="'iv'">IV</button>
+       <button class="poke-detail-stat-tab" data-stat-tab="ev" data-action="legacy-call" data-call="switchPokemonStatTab" data-call-args="'ev'">EV</button>
+     </div>
+     <div class="poke-detail-stat-panel active" data-stat-panel="base">${statRows.base}</div>
+     <div class="poke-detail-stat-panel" data-stat-panel="iv">${statRows.iv}</div>
+     <div class="poke-detail-stat-panel" data-stat-panel="ev">${statRows.ev}</div>
+   </aside>
+ </div>
+ <div class="poke-detail-section-grid">
+   <section class="poke-detail-panel"><h3>${t('pokemon_talents')}</h3>${talentHtml}</section>
+   <section class="poke-detail-panel"><h3>${t('equipped_item_label')}</h3>${pokemonDetailHeldItemHtml(p,{idx,boxId,readonly})}</section>
+   ${evos?`<section class="poke-detail-panel poke-detail-panel-wide"><h3>Évolutions</h3>${evos}</section>`:''}
+ </div>
+ <section class="poke-detail-moves-block">
+   <div class="poke-detail-moves-title"><span>${t('moves_lbl')}</span>${moveRows.canReplace?`<button class="hbtn poke-detail-mini-btn" data-action="${boxId?'cancel-box-move-replace':'cancel-move-replace'}" ${boxId?`data-box-id="${boxId}"`:`data-team-index="${idx}"`}>${t('cancel')}</button>`:''}</div>
+   <div class="poke-detail-moves-list current">${moveRows.known || `<div class="poke-detail-empty">${t('no_other_moves')}</div>`}</div>
+   ${readonly?'':`<div class="poke-detail-learn-title">${t('learnable_moves_title')} ${locked?`<span>${battleEditLockMessage()}</span>`:moveRows.full?`<span>${t('select_move_first')}</span>`:''}</div><div class="poke-detail-moves-list learn">${moveRows.learn}</div>`}
+ </section>`;
+ modal.classList.add('open');
+ if(typeof applyDynamicStyles === 'function') applyDynamicStyles(inner);
+ else if(typeof window !== 'undefined' && window.applyDynamicStyles) window.applyDynamicStyles(inner);
+}
+
 function openPokeModal(idx){
  const p=G.team[idx];
  if(!p){ moveEditorFor=null; return; }
- const modal=document.getElementById('poke-modal');
- const inner=document.getElementById('poke-modal-inner');
- const editing=moveEditorFor===idx;
- const battleEditLocked = isPokemonLockedForBattleEdits(p, idx, null);
- if(battleEditLocked && moveReplaceSlot !== null) moveReplaceSlot = null;
-
- 
- const moves=p.moves.map((m,mi)=>{
- const mv=MOVES[m.id];
- const mvName = getMoveName(m.id);
- const selected = !battleEditLocked && moveReplaceSlot === mi;
- const moveActionAttrs = battleEditLocked ? '' : ` data-action="legacy-call" data-call="toggleMoveSelect" data-call-args="${idx},${mi}"`;
- return `<div class="box-move-card ${selected?'is-selected':''}" data-type-color="${TYPE_COLORS[mv?.type||'']||'#555'}"${moveActionAttrs} data-context-call="openMoveInfo" data-context-args="'${m.id}',${idx}" title="${battleEditLocked?battleEditLockMessage():t('click_replace_context_info')}">
- <span class="type-badge ${typeClass(mv?.type||'?')}">${mv?.type||'?'}</span>
- <span>${mvName}</span>
- ${selected?'<span class="extracted-template-style-018">'+t('replacement_badge')+'</span>':''}
- <span class="extracted-template-style-019">${t('power_abbrev')} ${mv?.pow||'-'}</span>
- </div>`;
- }).join('');
-
- 
- const pool=learnableMoves(p);
- const canReplace = !battleEditLocked && moveReplaceSlot !== null;
- const full=p.moves.length>=4 && !canReplace;
- let learnHtml=`<div class="extracted-template-style-020">
-  ${t('learnable_moves_title')}
- ${battleEditLocked?'<span class="extracted-template-style-021">'+battleEditLockMessage()+'</span>':''}
- ${!battleEditLocked&&canReplace?'<span class="extracted-template-style-021">'+t('click_to_replace_selected')+'</span>':''}
- ${!battleEditLocked&&full?'<span class="extracted-template-style-021">'+t('select_move_first')+'</span>':''}
- </div>
- <div class="extracted-template-style-022">
- ${pool.length?pool.map(id=>{
- const mv=MOVES[id];
- const clickAction = !battleEditLocked && (canReplace || !full) ? `learnMove(${idx},'${id}')` : '';
- const learnActionAttrs = clickAction ? ` data-action="legacy-call" data-call="learnMove" data-call-args="${idx},\'${id}\'"` : '';
- return `<div class="box-move-card box-move-card--learnable ${clickAction?'is-clickable':''} ${canReplace?'is-selectable':''}" data-type-color="${TYPE_COLORS[mv.type]||'#555'}"${learnActionAttrs} data-context-call="openMoveInfo" data-context-args="'${id}',${idx}" title="${battleEditLocked?battleEditLockMessage():t('context_info_touch')}">
- <span class="type-badge ${typeClass(mv.type)}">${mv.type}</span>
- <span>${getMoveName(id)}</span>
- <span class="extracted-template-style-019">${t('power_abbrev')} ${mv.pow||'-'}</span>
- ${!battleEditLocked&&canReplace?'<span class="extracted-template-style-017">⬆</span>':(!battleEditLocked&&!full?`<span class="extracted-template-style-017">+</span>`:'')}
- </div>`;
- }).join(''):`<div class="extracted-template-style-023">${t('no_other_moves')}</div>`}
- </div>`;
-
- const stLabels = [t('stat_hp'), t('stat_atk'), t('stat_def'), t('stat_spa'), t('stat_spd'), t('stat_spe')];
- const buff=getHeldBuff(p);
- const buffedAtk=Math.floor(p.atk*(1+(buff.atk||0)));
- const buffedDef=Math.floor(p.def*(1+(buff.def||0)));
- const buffedSpe=Math.floor(p.spe*(1+(buff.spe||0)));
- const buffedHP =Math.floor(p.maxHP*(1+(buff.hpMax||0)));
- const showDelta=(base,cur)=> cur>base ? `<span class="extracted-template-style-017"> +${cur-base}</span>` : '';
- const buffedSpa=Math.floor((p.spa||p.atk)*(1+(buff.spa||0)));
- const buffedSpd=Math.floor((p.spd||p.def)*(1+(buff.spd||0)));
- const stats=[
- [stLabels[0], buffedHP, 500, '#4caf50', p.maxHP],
- [stLabels[1], buffedAtk,200, '#f44336', p.atk],
- [stLabels[2], buffedDef,200, '#2196f3', p.def],
- [stLabels[3], buffedSpa,200, '#e91e63', p.spa||p.atk],
- [stLabels[4], buffedSpd,200, '#9c27b0', p.spd||p.def],
- [stLabels[5], buffedSpe,200, '#ff9800', p.spe],
- ];
-
- 
- const itmKey=p.heldItem;
- const itm=(itmKey && ITEMS[itmKey]) ? {...ITEMS[itmKey], name:getItemName(itmKey), desc:getItemDesc(itmKey)} : null;
- const count=itmKey?Math.min(BAG_MAX,G.inventory[itmKey]||0):0;
- const heldBlock=itm
- ? `<div class="extracted-template-style-085">
- <div class="extracted-template-style-086">${t('equipped_item_label')}</div>
- <div class="extracted-template-style-087">
- <div class="extracted-template-style-024">${itm.icon}</div>
- <div class="extracted-template-style-088">
- <div class="extracted-template-style-089">${getItemName(itmKey)}</div>
- <div class="extracted-template-style-090">${t('item_power')} ${count}/${BAG_MAX} — buff ${Math.round(count/BAG_MAX*100)}%</div>
- </div>
- <button class="hbtn extracted-bridge-style-025" data-action="legacy-call" data-call="unequipItem" data-call-args="${idx}">${t('remove')}</button>
- </div>
- </div>`
- : `<div class="extracted-template-style-091">
- ${t('no_item_equipped_bag')}
- </div>`;
-
- inner.innerHTML=`<div class="modal-title">
- <div class="extracted-template-style-006">
- <div class="extracted-template-style-024" class="${p.shinyActive?'shiny-spark':''}">${spriteImg(p.id,p.emoji,{shiny:p.shinyActive,size:72})}</div>
- <div>
- <div>${p.shinyActive?'<span class="shiny-tag"></span>':''}${p.name}</div>
- <div class="extracted-template-style-007">${t('level_word')} ${p.level}</div>
- <div class="extracted-template-style-026">${typeSpan(p.type1)}${p.type2?typeSpan(p.type2):''}</div>
- </div>
- </div>
- <span class="modal-close" data-action="close-poke-modal" data-reset-move-editor="true"></span>
- </div>
- ${p.shinyUnlocked?`<label class="extracted-template-style-027">
- <input type="checkbox"${p.shinyActive?'checked':''} data-change-call="toggleShinySkin" data-change-args="${idx}">
- <span> ${t('shiny_skin')}</span>
- <span class="extracted-template-style-019">${t('cosmetic_switch_only_team')}</span>
- </label>`:''}
- ${heldBlock}
- ${buildTalentSelectorHtml(p, idx, null)}
- ${getEvolutionMethodsHtml(p.id)}
- <div class="extracted-template-style-028">
- ${stats.map(([l,v,m,c,base], sIdx)=>{
- const keys = ['hp','atk','def','spa','spd','spe'];
- const k = keys[sIdx] || 'hp';
- const ivVal = (p.ivs||{})[k] || 0;
- const evVal = (p.evs||{})[k] || 0;
- return `<div class="stat-row extracted-bridge-style-001">
- <div class="extracted-template-style-029">
- <span class="stat-label extracted-bridge-style-002">${l}</span>
- <span class="stat-val extracted-bridge-style-003">${v}${showDelta(base,v)}</span>
- </div>
- <div class="stat-bar extracted-bridge-style-004"><div class="stat-fill"></div></div>
- <div class="extracted-template-style-030">
- <span><b>IV:</b> ${renderStars(ivVal, false)} (${ivVal}/6)</span>
- <span><b>EV:</b> ${renderStars(evVal, true)} (${evVal}/6)</span>
- </div>
- </div>`;
- }).join('')}
- </div>
- <div class="extracted-template-style-031">
- <span class="extracted-template-style-007">${t('moves_lbl')}</span>
- ${!battleEditLocked&&moveReplaceSlot!==null?`<button class="hbtn extracted-bridge-style-005" data-action="cancel-move-replace" data-team-index="${idx}">${t('cancel')}</button>`:''}
- </div>
- ${moves}
- ${learnHtml}
- ${(() => {
- const curLevelBase = xpForLevel(p.level);
- const xpInLevel = Math.max(0, (p.xp||0) - curLevelBase);
- const xpReqLevel = Math.max(1, (p.xpNext || 1) - curLevelBase);
- return `<div class="extracted-template-style-032">XP : ${xpInLevel} / ${xpReqLevel} <span class="extracted-template-style-033">(${p.xp||0} total)</span></div>`;
- })()}
- ${(() => {
- const evos = STONE_EVO[p.id];
- if(!evos) return '';
- let html = `<div class="extracted-template-style-034"><div class="extracted-template-style-035">${t('stone_evo_title')}</div><div class="extracted-template-style-036">`;
- for(const [stoneKey, targetId] of Object.entries(evos)){
- const stone = ITEMS[stoneKey];
- const owned = G.inventory[stoneKey]||0;
- const target = PD[targetId];
- const already = speciesOwned(targetId);
- html += `<button class="hbtn" data-action="legacy-call" data-call="tryStoneEvo" data-call-args="${idx},'${stoneKey}'"${owned<1||already?'disabled':''} title="${stone?.desc||''}">${stone?.icon||''} ${target?target[0]:'#'+targetId} ${owned>0?`(${owned})`:''}${already?' ':''}</button>`;
- }
- html += '</div></div>';
- return html;
- })()}
- `;
-
- modal.classList.add('open');
+ renderPokemonDetailModal(p,{idx, locationLabel:t('team_location_clean')});
 }
 
 
 function openReadonlyPokeModal(p, contextLabel){
- if(!p) return;
- const modal=document.getElementById('poke-modal');
- const inner=document.getElementById('poke-modal-inner');
- if(!modal || !inner) return;
- const buff=(typeof getHeldBuff === 'function') ? getHeldBuff(p) : {atk:0,def:0,spe:0,spa:0,spd:0,hpMax:0};
- const buffedAtk=Math.floor((p.atk||0)*(1+(buff.atk||0)));
- const buffedDef=Math.floor((p.def||0)*(1+(buff.def||0)));
- const buffedSpe=Math.floor((p.spe||0)*(1+(buff.spe||0)));
- const buffedHP =Math.floor((p.maxHP||p.hp||0)*(1+(buff.hpMax||0)));
- const buffedSpa=Math.floor((p.spa||p.atk||0)*(1+(buff.spa||0)));
- const buffedSpd=Math.floor((p.spd||p.def||0)*(1+(buff.spd||0)));
- const stLabels = [t('stat_hp'), t('stat_atk'), t('stat_def'), t('stat_spa'), t('stat_spd'), t('stat_spe')];
- const stats=[
- [stLabels[0], buffedHP, 500, '#4caf50', p.maxHP||p.hp||0],
- [stLabels[1], buffedAtk,200, '#f44336', p.atk||0],
- [stLabels[2], buffedDef,200, '#2196f3', p.def||0],
- [stLabels[3], buffedSpa,200, '#e91e63', p.spa||p.atk||0],
- [stLabels[4], buffedSpd,200, '#9c27b0', p.spd||p.def||0],
- [stLabels[5], buffedSpe,200, '#ff9800', p.spe||0],
- ];
- const showDelta=(base,cur)=> cur>base ? `<span class="extracted-template-style-017"> +${cur-base}</span>` : '';
- const talentInfo = p.talent && typeof TALENTS_FULL !== 'undefined' && TALENTS_FULL[p.talent] ? TALENTS_FULL[p.talent] : null;
- const talentHtml = talentInfo ? `<div class="extracted-template-style-083">
- <div class="extracted-template-style-060">🧬 ${t('pokemon_talents')}</div>
- <div class="box-move-card" data-type-color="#94886B">
- <span>${talentInfo.name}</span>
- <span class="extracted-template-style-019">${getRarityLabel(talentInfo.rarity)}</span>
- </div>
- <div class="extracted-template-style-084">${talentInfo.info || ''}</div>
- </div>` : '';
- const moves=(p.moves||[]).map((m)=>{
- const mv=MOVES[m.id];
- return `<div class="box-move-card" data-type-color="${TYPE_COLORS[mv?.type||'']||'#555'}" data-context-call="openMoveInfo" data-context-args="'${m.id}'" title="${t('context_info_touch')}">
- <span class="type-badge ${typeClass(mv?.type||'?')}">${mv?.type||'?'}</span>
- <span>${getMoveName(m.id)}</span>
- <span class="extracted-template-style-019">${t('power_abbrev')} ${mv?.pow||'-'}</span>
- </div>`;
- }).join('');
- inner.innerHTML=`<div class="modal-title">
- <div class="extracted-template-style-006">
- <div class="extracted-template-style-024 ${p.shinyActive?'shiny-spark is-shiny':''}">${spriteImg(p.id,p.emoji,{shiny:p.shinyActive,size:72})}</div>
- <div>
- <div>${p.shinyActive?'<span class="shiny-tag"></span>':''}${p.name} <span class="extracted-template-style-025">#${p.id}</span></div>
- <div class="extracted-template-style-007">${contextLabel ? contextLabel + ' — ' : ''}${t('level_word')} ${p.level || 1}</div>
- <div class="extracted-template-style-026">${typeSpan(p.type1)}${p.type2?typeSpan(p.type2):''}</div>
- </div>
- </div>
- <span class="modal-close" data-action="close-poke-modal"></span>
- </div>
- ${talentHtml}
- ${getEvolutionMethodsHtml(p.id)}
- <div class="extracted-template-style-028">
- ${stats.map(([l,v,m,c,base], sIdx)=>{
- const keys = ['hp','atk','def','spa','spd','spe'];
- const k = keys[sIdx] || 'hp';
- const ivVal = (p.ivs||{})[k] || 0;
- const evVal = (p.evs||{})[k] || 0;
- return `<div class="stat-row extracted-bridge-style-001">
- <div class="extracted-template-style-029">
- <span class="stat-label extracted-bridge-style-002">${l}</span>
- <span class="stat-val extracted-bridge-style-003">${v}${showDelta(base,v)}</span>
- </div>
- <div class="stat-bar extracted-bridge-style-004"><div class="stat-fill"></div></div>
- <div class="extracted-template-style-030">
- <span><b>IV:</b> ${renderStars(ivVal, false)} (${ivVal}/6)</span>
- <span><b>EV:</b> ${renderStars(evVal, true)} (${evVal}/6)</span>
- </div>
- </div>`;
- }).join('')}
- </div>
- <div class="extracted-template-style-031"><span class="extracted-template-style-007">${t('moves_lbl')}</span></div>
- ${moves || `<div class="extracted-template-style-023">${t('no_other_moves')}</div>`}`;
- modal.classList.add('open');
- if(typeof applyDynamicStyles === 'function') applyDynamicStyles(inner);
+ renderPokemonDetailModal(p,{readonly:true, locationLabel:contextLabel||''});
 }
 
 function openBattleEnemyPokeModal(){
@@ -426,6 +339,8 @@ function openMoveInfo(moveId, contextIdx, contextBoxId){
 
 
 // --- Migrated to ES module, globals exposed ---
+if (typeof switchPokemonStatTab !== 'undefined' && typeof window !== 'undefined') window.switchPokemonStatTab = switchPokemonStatTab;
+if (typeof renderPokemonDetailModal !== 'undefined' && typeof window !== 'undefined') window.renderPokemonDetailModal = renderPokemonDetailModal;
 if (typeof isPokemonLockedForBattleEdits !== 'undefined' && typeof window !== 'undefined') window.isPokemonLockedForBattleEdits = isPokemonLockedForBattleEdits;
 if (typeof notifyBattleEditLocked !== 'undefined' && typeof window !== 'undefined') window.notifyBattleEditLocked = notifyBattleEditLocked;
 if (typeof buildTalentSelectorHtml !== 'undefined' && typeof window !== 'undefined') window.buildTalentSelectorHtml = buildTalentSelectorHtml;

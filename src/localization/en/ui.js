@@ -2,6 +2,10 @@
 // Auto-extracted & grouped by domain. Edit text here, never hardcode in logic.
 
 window.L_en_ui = {
+"dict_abilities":"Abilities",
+"dict_moves":"Moves",
+"dict_items":"Items",
+"dictionary_title":"Dictionary",
 "add_to_team_btn":"Add to Party",
 "box_header":"Pokémon in PC Box",
 "box_pc_note":"This Pokémon is in your PC box. Place it in your active party to train or equip items!",
