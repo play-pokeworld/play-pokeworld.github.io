@@ -1,176 +1,50 @@
 var _guideSection = null;
-
+function tutIsEn(){ const c=(typeof currentLang==='function'?currentLang():((G&&G.lang)||'fr')); return String(c).charAt(0)==='e'; }
+function tt(fr,en){ return tutIsEn()?en:fr; }
 function ensureTutorialState(){
- if(!G.tutorial || typeof G.tutorial !== 'object') G.tutorial = {};
- if(G.tutorial.enabled === undefined) G.tutorial.enabled = true;
- if(!G.tutorial.completed) G.tutorial.completed = {};
- if(!G.tutorial.dismissedTips) G.tutorial.dismissedTips = {};
- if(!G.tutorial.rewards) G.tutorial.rewards = {};
+ if(!G.tutorial||typeof G.tutorial!=='object') G.tutorial={};
+ if(G.tutorial.enabled===undefined) G.tutorial.enabled=true;
+ if(!G.tutorial.completed) G.tutorial.completed={};
+ if(!G.tutorial.dismissedTips) G.tutorial.dismissedTips={};
+ if(!G.tutorial.rewards) G.tutorial.rewards={};
  return G.tutorial;
 }
-function tutorialIsEnabled(){ return !!(ensureTutorialState().enabled); }
-function tutorialDisable(){ const st=ensureTutorialState(); st.enabled=false; closeTutorialTip(); saveGame(); try{ renderStoryWindow(); }catch(_){} notify(t('tutorial_disabled')||'Tutoriel désactivé','var(--light1)'); }
-function tutorialEnable(){ const st=ensureTutorialState(); st.enabled=true; saveGame(); try{ renderStoryWindow(); }catch(_){} notify(t('tutorial_enabled')||'Tutoriels activés','var(--green)'); }
-function tutorialDismissTip(id){ const st=ensureTutorialState(); if(id) st.dismissedTips[id]=true; closeTutorialTip(); saveGame(); }
+function tutorialIsEnabled(){ return !!ensureTutorialState().enabled; }
+function tutorialDisable(){ const st=ensureTutorialState(); st.enabled=false; saveGame(); try{renderStoryWindow();}catch(_){} notify(tt('Tutoriel désactivé','Tutorial disabled'),'var(--light1)'); }
+function tutorialEnable(){ const st=ensureTutorialState(); st.enabled=true; saveGame(); try{renderStoryWindow();}catch(_){} notify(tt('Tutoriel activé','Tutorial enabled'),'var(--green)'); }
+function tutorialDismissTip(id){ if(id) ensureTutorialState().dismissedTips[id]=true; saveGame(); }
 function closeTutorialTip(){ const el=document.getElementById('tutorial-tip'); if(el) el.remove(); }
-function tutorialMark(id){ const st=ensureTutorialState(); if(!id) return; if(!st.completed[id]){ st.completed[id]=true; updateTutorialProgress(); saveGame(); try{ renderStoryWindow(); }catch(_){} } }
+function tutorialMark(id){ const st=ensureTutorialState(); if(id&&!st.completed[id]){ st.completed[id]=true; updateTutorialProgress(); saveGame(); try{renderStoryWindow();}catch(_){} } }
 function tutorialDeviceHint(kind){
- const touch = (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0) || ('ontouchstart' in window);
- if(kind === 'sheet') return touch ? 'Mobile : appuie longtemps sur un Pokémon de ton équipe, ou touche sa carte si elle est visible.' : 'PC : clique ou clic droit sur un Pokémon dans la fenêtre Équipe Active.';
- if(kind === 'map') return touch ? 'Mobile : utilise la barre du bas pour revenir à la Carte ou au Lieu.' : 'PC : clique directement sur la Carte puis sur les boutons du panneau Lieu.';
- return touch ? 'Mobile : utilise la barre du bas et les gros boutons.' : 'PC : utilise les raccourcis et le clic droit pour les infos.';
+ const touch=(typeof navigator!=='undefined'&&navigator.maxTouchPoints>0)||('ontouchstart' in window);
+ if(kind==='sheet') return touch?tt('Mobile : appuie longtemps sur un Pokémon de ton équipe ou touche sa carte.','Mobile: long-press a team Pokémon or tap its card.'):tt('PC : clique ou clic droit sur un Pokémon dans Équipe Active.','PC: click or right-click a Pokémon in Active Team.');
+ if(kind==='map') return touch?tt('Mobile : utilise la barre du bas pour revenir à Carte ou Lieu.','Mobile: use the bottom bar to return to Map or Location.'):tt('PC : clique sur la Carte puis utilise la fenêtre Lieu.','PC: click the Map, then use the Location window.');
+ return touch?tt('Mobile : utilise les gros boutons.','Mobile: use the large buttons.'):tt('PC : utilise les raccourcis et le clic droit.','PC: use shortcuts and right-click.');
 }
-function tutorialGiveReward(step){
- const st=ensureTutorialState();
- if(!step || st.rewards[step.id]) return;
- if(step.money){ G.money=(G.money||0)+step.money; try{ updateHeader(); }catch(_){} }
- if(step.items){ for(const k in step.items) addToInventory(k, step.items[k]); }
- st.rewards[step.id]=true;
- if(step.rewardText) notify(step.rewardText, 'var(--green)');
-}
-function tutorialSteps(){
- return [
-  {id:'route1_battles', title:t('tutorial_step_route1_title')||'Premiers combats', desc:t('tutorial_step_route1_desc')||'Gagne 3 combats sauvages sur la Route 1.', how:()=>`Où aller : fenêtre Carte → Route 1. Ensuite, dans la fenêtre Lieu, clique sur 🌾 Explorer. ${tutorialDeviceHint('map')}`, actionLabel:'Aller à Route 1', actionCall:'clickLocation', actionArgs:"'route1'", done:()=>((G.wildWinsByLoc||{}).route1||0)>=3, money:300, items:{berry_oran:3}, rewardText:'+300₽ + 3 Baies Oran'},
-  {id:'open_poke_sheet', title:t('tutorial_step_sheet_title')||'Lire une fiche Pokémon', desc:t('tutorial_step_sheet_desc')||'Ouvre une fiche Pokémon pour lire ses stats, IV, EV, talents et attaques.', how:()=>`${tutorialDeviceHint('sheet')} La fiche contient les onglets Base Stats / IV / EV et la liste des attaques.`, actionLabel:'Voir mon équipe', actionCall:'showTab', actionArgs:"'team'", done:()=>!!ensureTutorialState().completed.open_poke_sheet, money:200, rewardText:'+200₽'},
-  {id:'open_bag', title:t('tutorial_step_bag_title')||'Ouvrir le sac', desc:t('tutorial_step_bag_desc')||'Ouvre le Sac depuis les Raccourcis pour voir tes objets.', how:()=>`Dans la fenêtre Raccourcis, clique 🎒 Sac. Tu y trouveras baies, objets tenus, pierres, trésors et objets spéciaux.`, actionLabel:'Ouvrir le Sac', actionCall:'openFullscreenPanel', actionArgs:"'inventory'", items:{potion:2}, done:()=>!!ensureTutorialState().completed.open_bag, rewardText:'+2 Potions'},
-  {id:'open_pokedex', title:t('tutorial_step_dex_title')||'Consulter le Pokédex', desc:t('tutorial_step_dex_desc')||'Ouvre le Pokédex et clique sur un Pokémon déjà vu.', how:()=>`Dans Raccourcis, ouvre le Pokédex. Clique sur un Pokémon non grisé pour voir où le trouver, ses talents et sa description.`, actionLabel:'Ouvrir le Pokédex', actionCall:'openFullscreenPanel', actionArgs:"'pokedex'", done:()=>!!ensureTutorialState().completed.open_pokedex, money:500, rewardText:'+500₽'},
-  {id:'first_badge', title:t('tutorial_step_badge_title')||'Premier badge', desc:t('tutorial_step_badge_desc')||'Progresse jusqu’à Argenta et bats Pierre.', how:()=>`Nettoie les routes jusqu’à Argenta. Une fois à Argenta, dans la fenêtre Lieu, clique sur ⚔️ Défier Pierre. Les badges débloquent de nouvelles zones.`, actionLabel:'Voir la Carte', actionCall:'showTab', actionArgs:"'info'", done:()=>G.badges&&G.badges.includes('brock'), items:{rarecandy:1}, rewardText:'+1 Super Bonbon'},
- ];
-}
-function updateTutorialProgress(){
- const st=ensureTutorialState();
- for(const step of tutorialSteps()){
-  if(!st.completed[step.id] && step.done()) st.completed[step.id]=true;
-  if(st.completed[step.id]) tutorialGiveReward(step);
- }
- const allDone = tutorialSteps().every(step => st.completed[step.id]);
- if(allDone && st.enabled){
-  st.enabled = false;
-  try{ saveGame(); }catch(_){}
- }
-}
-function currentTutorialStep(){ updateTutorialProgress(); const st=ensureTutorialState(); return tutorialSteps().find(step=>!st.completed[step.id]) || null; }
-function renderTutorialQuestBlock(){
- const st=ensureTutorialState();
- if(!st.enabled) return '';
- const steps=tutorialSteps();
- const doneCount=steps.filter(s=>st.completed[s.id]).length;
- const step=currentTutorialStep();
- if(!step){ st.enabled=false; try{ saveGame(); }catch(_){} return ''; }
- const idx=steps.findIndex(s=>s.id===step.id)+1;
- return `<div class="tutorial-quest-card active">
-  <div class="tutorial-quest-head"><span>💡</span><b>Tutoriel guidé — Étape ${idx}/${steps.length}</b></div>
-  <div class="tutorial-quest-title">${step.title}</div>
-  <p>${step.desc}</p>
-  <div class="tutorial-how"><b>Comment faire :</b><br>${step.how()}</div>
-  <div class="tutorial-progress-bar"><div data-pct="${Math.round(doneCount/steps.length*100)}"></div></div>
-  <div class="tutorial-quest-actions">
-   ${step.actionCall?`<button class="hbtn tutorial-primary" data-action="legacy-call" data-call="${step.actionCall}" data-call-args="${step.actionArgs||''}">${step.actionLabel||'Faire'}</button>`:''}
-   <button class="hbtn" data-action="legacy-call" data-call="openFullscreenPanel" data-call-args="'guide'">${t('guide_title')||'Guide'}</button>
-   <button class="hbtn" data-action="legacy-call" data-call="tutorialDisable" data-call-args="">${t('tutorial_disable_all')||'Désactiver'}</button>
-  </div>
- </div>`;
-}
-function showTutorialTip(id, title, body){ return; }
-
-function guideSections(){
- return {
-  map:{icon:'🗺️', title:t('guide_map_title')||'Carte & progression', pages:[
-   ['Lire la carte','Les lieux colorés sont disponibles, les lieux gris sont verrouillés. La couleur indique aussi s’il reste des Pokémon à capturer, des quêtes ou des shiny à trouver. Le bouton ? de la carte explique la légende.'],
-   ['Se déplacer','Clique sur un lieu débloqué pour t’y rendre. Sur mobile, utilise la barre du bas pour revenir à Carte ou Lieu rapidement.'],
-   ['Dans un lieu','La fenêtre Lieu peut afficher plusieurs actions : 🌾 Explorer pour les combats sauvages, ⚔️ Défier une arène ou un boss, 🏪 Boutique, 🗣 PNJ/Quêtes, accès région/bateau, fossiles ou infos de zone.'],
-   ['Débloquer la suite','Certaines routes demandent des combats sauvages pour ouvrir le chemin suivant. D’autres zones demandent un badge, une quête ou un objet spécial comme la Poké Flûte.'],
-   ['PNJ et quêtes','Les PNJ marqués sur la carte ou dans le lieu peuvent donner des quêtes. Les quêtes principales font avancer l’histoire ; les secondaires donnent des récompenses utiles.']
-  ]},
-  combat:{icon:'⚔️', title:t('guide_combat_title')||'Combat', pages:[
-   ['Déroulement automatique','Le combat avance en temps réel. Chaque Pokémon utilise ses attaques automatiquement quand sa barre est chargée. La vitesse x1/x2/x3 change le rythme.'],
-   ['Attaques et barres','Les attaques affichées ont un type, une puissance et parfois un effet. L’attaque prête ou en cours se met en évidence. Les PP ne sont pas gérés comme dans les jeux classiques : le système repose surtout sur les cooldowns.'],
-   ['Changer de Pokémon','Clique sur un Pokémon de ton équipe dans la fenêtre de combat pour le rendre actif. Sur mobile, touche la carte du Pokémon. Certains changements attendent la fin d’une animation.'],
-   ['Statuts','Brûlure réduit les dégâts physiques et inflige des dégâts. Poison inflige des dégâts sur la durée. Paralysie peut empêcher d’agir. Sommeil et gel peuvent faire passer des tours. Confusion/peur sont converties en effets simples selon le moteur.'],
-   ['Capture et butin','Après un K.O. sauvage, le jeu tente une capture automatiquement. Le butin en bas de la fenêtre montre les Pokémon capturés et les objets trouvés pendant la session.'],
-   ['Talents et objets','Les talents et objets tenus peuvent changer les dégâts, la vitesse, les immunités ou les statuts. Consulte la fiche Pokémon ou le Dictionnaire pour les détails.']
-  ]},
-  pokemon:{icon:'🧬', title:t('guide_pokemon_title')||'Pokémon', pages:[
-   ['Ouvrir la fiche',`${tutorialDeviceHint('sheet')} La fiche donne tout : niveau, types, stats, IV, EV, talents, objet tenu, évolutions et attaques.`],
-   ['Base Stats','Les Base Stats sont les stats naturelles de l’espèce. Plus elles sont hautes, plus le Pokémon est naturellement fort dans ce domaine.'],
-   ['IV','Les IV sont des bonus rares et permanents. Chaque étoile donne un petit bonus à une stat. On peut en gagner à la capture, à la pension ou via de futures améliorations.'],
-   ['EV','Les EV sont l’entraînement spécialisé. Chaque point renforce une stat. L’entraînement EV donne exactement +1 EV aléatoire jusqu’à un maximum.'],
-   ['Changer les attaques','Dans la fiche, clique une attaque connue pour choisir un slot à remplacer, puis clique une attaque apprenable. Si 4 attaques sont déjà équipées, tu dois sélectionner un slot avant d’apprendre.'],
-   ['Attaques verrouillées','Certaines attaques avancées sont verrouillées derrière l’entraînement Capacité. Une fois débloquées, elles apparaissent dans les attaques apprenables.'],
-   ['Talents','Chaque Pokémon a plusieurs talents possibles. La capture et l’entraînement Talent peuvent en débloquer. Les talents rares sont plus difficiles à obtenir.'],
-   ['Objet tenu','Un Pokémon peut tenir un objet. Un même objet tenu ne peut être porté que par un seul Pokémon à la fois. Les bonus dépendent souvent du nombre possédé dans le sac.']
-  ]},
-  bag:{icon:'🎒', title:t('guide_bag_title')||'Sac', pages:[
-   ['Catégories','Le sac sépare les Baies, objets tenus, pierres/évolutions, trésors, fossiles et objets spéciaux. Utilise les filtres pour t’y retrouver.'],
-   ['Objets tenus','Clique l’objet tenu sur un Pokémon ou utilise le sac pour l’équiper. Un objet déjà porté par un autre Pokémon est bloqué.'],
-   ['Pierres et évolutions','Les objets d’évolution affichent les Pokémon compatibles. L’indicateur ✓/! montre si l’évolution est déjà possédée.'],
-   ['Trésors et fossiles','Les trésors se vendent. Les fossiles se raniment via la pension/labo fossile. Les fossiles sont aussi listés dans le Dictionnaire.'],
-   ['Objets spéciaux','Les objets spéciaux comme la Poké Flûte servent à débloquer des quêtes ou des passages.']
-  ]},
-  mine:{icon:'⛏️', title:t('guide_mine_title')||'Mine', pages:[
-   ['But','La mine cache pierres, trésors et fossiles. Creuse les cases pour révéler entièrement les objets.'],
-   ['Outils','Le burin coûte peu et creuse précisément. Le marteau coûte plus mais touche une zone plus large.'],
-   ['Indices visuels','Les cases non creusées ne révèlent pas les objets. Une case totalement creusée avec un objet devient beaucoup plus visible.'],
-   ['Énergie et reset','Creuser consomme de l’énergie. Quand tous les objets de la couche sont récupérés, la mine se renouvelle automatiquement.']
-  ]},
-  hatchery:{icon:'🥚', title:t('guide_hatchery_title')||'Pension', pages:[
-   ['Déposer un Pokémon','Dépose un Pokémon depuis l’équipe ou la boîte dans un slot. La pension peut améliorer certains aspects selon les systèmes débloqués.'],
-   ['Fossiles','Les fossiles trouvés à la mine peuvent être envoyés à la pension pour être ranimés en Pokémon.'],
-   ['Améliorations','Le bouton Améliorations Pension contient les slots supplémentaires et les automatisations. Plus tard, les bonus de personnel seront ajoutés ici.'],
-   ['Automatisation','Éclosion automatique et remplissage automatique existent déjà, mais restent optionnels pour ne pas gêner les joueurs qui veulent gérer manuellement.']
-  ]},
-  training:{icon:'🏋️', title:t('guide_training_title')||'Entraînement', pages:[
-   ['Choisir le Pokémon','Sélectionne un Pokémon à entraîner. Plus tard plusieurs Pokémon pourront être entraînés en parallèle.'],
-   ['Capacité','Débloque une attaque avancée verrouillée. Si le Pokémon a moins de 4 attaques, elle peut être ajoutée directement.'],
-   ['Talent','Tire un talent parmi la liste du Pokémon. Il peut être nouveau ou déjà connu, selon la rareté et la chance.'],
-   ['EV','Donne exactement +1 EV aléatoire si le Pokémon n’est pas déjà au maximum.'],
-   ['Niveau','Donne entre +2 et +5 niveaux sans dépasser le niveau 100.'],
-   ['Boutons grisés','Un entraînement qui ne sert plus à rien devient grisé : niveau 100, EV au max, plus de talent, plus de capacité à débloquer.'],
-   ['Équipes de coachs','Les combats d’entraînement utilisent 6 Pokémon et choisissent une équipe selon le type principal du Pokémon entraîné.']
-  ]},
-  dictionary:{icon:'📚', title:t('guide_dictionary_title')||'Dictionnaire', pages:[
-   ['Objets','Cherche un objet pour savoir si tu le possèdes, où le trouver et à quoi il sert.'],
-   ['Attaques','Cherche une attaque pour voir son type, sa puissance, ses effets et si un de tes Pokémon la connaît.'],
-   ['Talents','Cherche un talent pour voir sa rareté, son effet, et quels Pokémon peuvent l’avoir.'],
-   ['Recherche','La barre de recherche filtre immédiatement la page active. Elle est utile quand les listes deviennent longues.']
-  ]}
- };
-}
-function setGuideSection(section){ _guideSection = section || null; const el=document.getElementById('fs-panel-content'); if(el) renderGuidePanel(el); }
-function renderGuidePanel(el){
- const sections=guideSections();
- if(_guideSection && sections[_guideSection]){
-  const sec=sections[_guideSection];
-  el.innerHTML=`<div class="guide-header"><div><h2>${sec.icon} ${sec.title}</h2><p>Guide détaillé</p></div><button class="hbtn" data-action="legacy-call" data-call="setGuideSection" data-call-args="null">← Retour</button></div>
-  <div class="guide-page-list">${sec.pages.map(([title,txt])=>`<article class="guide-info-card"><h3>${title}</h3><p>${txt}</p></article>`).join('')}</div>`;
-  return;
- }
- el.innerHTML=`<div class="guide-header"><div><h2>${t('guide_title')||'Guide'}</h2><p>${t('guide_intro')||'Choisis une rubrique pour tout savoir.'}</p></div></div>
- <div class="guide-actions"><button class="hbtn" data-action="legacy-call" data-call="tutorialEnable" data-call-args="">${t('tutorial_enable')||'Activer tutos'}</button><button class="hbtn" data-action="legacy-call" data-call="tutorialDisable" data-call-args="">${t('tutorial_disable_all')||'Désactiver tutos'}</button></div>
- <div class="guide-grid">${Object.entries(sections).map(([id,sec])=>`<button class="guide-card guide-card-button" data-action="legacy-call" data-call="setGuideSection" data-call-args="'${id}'"><h3>${sec.icon} ${sec.title}</h3><p>${sec.pages.length} pages d'informations</p></button>`).join('')}</div>`;
-}
-function installTutorialHooks(){
- const wrap=(name, cb)=>{ const fn=window[name]; if(typeof fn!=='function' || fn.__tutorialWrapped) return false; const nw=function(...args){ const res=fn.apply(this,args); try{ cb(args,res); }catch(e){} return res; }; nw.__tutorialWrapped=true; window[name]=nw; return true; };
- wrap('pickStarter', ()=>{ try{ renderStoryWindow(); }catch(_){} });
- wrap('openFullscreenPanel', ([panel])=>{ if(panel==='inventory') tutorialMark('open_bag'); if(panel==='pokedex') tutorialMark('open_pokedex'); });
- wrap('openPokeModal', ()=>{ tutorialMark('open_poke_sheet'); });
- wrap('openBoxPokeModal', ()=>{ tutorialMark('open_poke_sheet'); });
- wrap('exploreArea', ()=>{ updateTutorialProgress(); });
- wrap('renderMap', ()=>{ updateTutorialProgress(); });
-}
-setTimeout(installTutorialHooks, 500);
-
-if(typeof window !== 'undefined'){
- window.ensureTutorialState=ensureTutorialState;
- window.tutorialDisable=tutorialDisable;
- window.tutorialEnable=tutorialEnable;
- window.tutorialDismissTip=tutorialDismissTip;
- window.closeTutorialTip=closeTutorialTip;
- window.tutorialMark=tutorialMark;
- window.renderTutorialQuestBlock=renderTutorialQuestBlock;
- window.renderGuidePanel=renderGuidePanel;
- window.setGuideSection=setGuideSection;
- window.showTutorialTip=showTutorialTip;
- window.installTutorialHooks=installTutorialHooks;
-}
-
+function tutorialSteps(){ return [
+ {id:'route1_battles',title:()=>tt('Premiers combats','First battles'),desc:()=>tt('Gagne 3 combats sauvages sur la Route 1.','Win 3 wild battles on Route 1.'),how:()=>tt(`Carte → Route 1, puis dans Lieu clique 🌾 Explorer. ${tutorialDeviceHint('map')}`,`Map → Route 1, then in Location click 🌾 Explore. ${tutorialDeviceHint('map')}`),actionLabel:()=>tt('Aller à Route 1','Go to Route 1'),actionCall:'clickLocation',actionArgs:"'route1'",done:()=>((G.wildWinsByLoc||{}).route1||0)>=3,money:300,items:{berry_oran:3},rewardText:()=>tt('+300₽ + 3 Baies Oran','+300₽ + 3 Oran Berries')},
+ {id:'open_poke_sheet',title:()=>tt('Lire une fiche Pokémon','Read a Pokémon sheet'),desc:()=>tt('Ouvre une fiche Pokémon.','Open a Pokémon sheet.'),how:()=>`${tutorialDeviceHint('sheet')} ${tt('Regarde les onglets Base Stats / IV / EV.','Check the Base Stats / IV / EV tabs.')}`,actionLabel:()=>tt('Voir mon équipe','View my team'),actionCall:'showTab',actionArgs:"'team'",done:()=>!!ensureTutorialState().completed.open_poke_sheet,money:200,rewardText:()=>'+200₽'},
+ {id:'open_bag',title:()=>tt('Ouvrir le sac','Open the bag'),desc:()=>tt('Ouvre le Sac depuis les Raccourcis.','Open the Bag from Shortcuts.'),how:()=>tt('Dans Raccourcis, clique 🎒 Sac.','In Shortcuts, click 🎒 Bag.'),actionLabel:()=>tt('Ouvrir le Sac','Open Bag'),actionCall:'openFullscreenPanel',actionArgs:"'inventory'",items:{potion:2},done:()=>!!ensureTutorialState().completed.open_bag,rewardText:()=>tt('+2 Potions','+2 Potions')},
+ {id:'open_pokedex',title:()=>tt('Consulter le Pokédex','Check the Pokédex'),desc:()=>tt('Ouvre le Pokédex et clique un Pokémon vu.','Open the Pokédex and click a seen Pokémon.'),how:()=>tt('Dans Raccourcis, ouvre le Pokédex puis clique un Pokémon non grisé.','From Shortcuts, open the Pokédex and click a non-grayed Pokémon.'),actionLabel:()=>tt('Ouvrir le Pokédex','Open Pokédex'),actionCall:'openFullscreenPanel',actionArgs:"'pokedex'",done:()=>!!ensureTutorialState().completed.open_pokedex,money:500,rewardText:()=>'+500₽'},
+ {id:'first_badge',title:()=>tt('Premier badge','First badge'),desc:()=>tt('Progresse jusqu’à Argenta et bats Pierre.','Progress to Pewter City and defeat Brock.'),how:()=>tt('Nettoie les routes jusqu’à Argenta puis clique ⚔️ Défier Pierre dans Lieu.','Clear routes to Pewter City, then click ⚔️ Challenge Brock in Location.'),actionLabel:()=>tt('Voir le lieu','View location'),actionCall:'showTab',actionArgs:"'info'",done:()=>G.badges&&G.badges.includes('brock'),items:{rarecandy:1},rewardText:()=>tt('+1 Super Bonbon','+1 Rare Candy')}
+]; }
+function tutorialGiveReward(step){ const st=ensureTutorialState(); if(!step||st.rewards[step.id]) return; if(step.money){G.money=(G.money||0)+step.money; try{updateHeader();}catch(_){}} if(step.items){for(const k in step.items)addToInventory(k,step.items[k]);} st.rewards[step.id]=true; if(step.rewardText) notify(step.rewardText(),'var(--green)'); }
+function updateTutorialProgress(){ const st=ensureTutorialState(); for(const step of tutorialSteps()){ if(!st.completed[step.id]&&step.done()) st.completed[step.id]=true; if(st.completed[step.id]) tutorialGiveReward(step);} if(tutorialSteps().every(s=>st.completed[s.id])&&st.enabled){st.enabled=false; try{saveGame();}catch(_){}} }
+function currentTutorialStep(){ updateTutorialProgress(); const st=ensureTutorialState(); return tutorialSteps().find(s=>!st.completed[s.id])||null; }
+function renderTutorialQuestBlock(){ const st=ensureTutorialState(); if(!st.enabled) return ''; const steps=tutorialSteps(); const step=currentTutorialStep(); if(!step){st.enabled=false; try{saveGame();}catch(_){} return '';} const done=steps.filter(s=>st.completed[s.id]).length; const idx=steps.findIndex(s=>s.id===step.id)+1; return `<div class="tutorial-quest-card active"><div class="tutorial-quest-head"><span>💡</span><b>${tt('Tutoriel guidé','Guided tutorial')} — ${tt('Étape','Step')} ${idx}/${steps.length}</b></div><div class="tutorial-quest-title">${step.title()}</div><p>${step.desc()}</p><div class="tutorial-how"><b>${tt('Comment faire','How to do it')} :</b><br>${step.how()}</div><div class="tutorial-progress-bar"><div data-pct="${Math.round(done/steps.length*100)}"></div></div><div class="tutorial-quest-actions">${step.actionCall?`<button class="hbtn tutorial-primary" data-action="legacy-call" data-call="${step.actionCall}" data-call-args="${step.actionArgs||''}">${step.actionLabel()}</button>`:''}<button class="hbtn" data-action="legacy-call" data-call="openFullscreenPanel" data-call-args="'guide'">${tt('Guide','Guide')}</button><button class="hbtn" data-action="legacy-call" data-call="tutorialDisable" data-call-args="">${tt('Désactiver','Disable')}</button></div></div>`; }
+function showTutorialTip(id,title,body){ return; }
+function guideSections(){ return {
+ map:{icon:'🗺️',title:tt('Carte & progression','Map & progression'),pages:[[tt('Lire la carte','Reading the map'),tt('Les lieux colorés sont disponibles, les lieux gris sont verrouillés. Le bouton ? explique la légende.','Colored areas are available; gray areas are locked. The ? button explains the legend.')],[tt('Dans un lieu','Inside a location'),tt('La fenêtre Lieu peut afficher : Explorer, arène/boss, boutique, PNJ/quêtes, accès région/bateau et infos.','The Location window can show: Explore, gym/boss, shop, NPC/quests, region/boat access and info.')],[tt('Débloquer','Unlocking'),tt('Certaines routes demandent des combats. D’autres zones demandent badges, quêtes ou objets spéciaux.','Some routes require battles. Other areas require badges, quests or special items.')]]},
+ combat:{icon:'⚔️',title:tt('Combat','Combat'),pages:[[tt('Automatique','Automatic'),tt('Les Pokémon attaquent quand leur barre est chargée. La vitesse x1/x2/x3 change le rythme.','Pokémon attack when their bar is charged. x1/x2/x3 changes the pace.')],[tt('Changer de Pokémon','Switching Pokémon'),tt('Clique un Pokémon de ton équipe en combat pour le rendre actif.','Click a team Pokémon in battle to make it active.')],[tt('Statuts','Status effects'),tt('Brûlure, poison, paralysie, sommeil et gel modifient le combat.','Burn, poison, paralysis, sleep and freeze affect combat.')]]},
+ pokemon:{icon:'🧬',title:tt('Pokémon','Pokémon'),pages:[[tt('Fiche','Sheet'),`${tutorialDeviceHint('sheet')} ${tt('La fiche montre niveau, types, stats, IV, EV, talents et attaques.','The sheet shows level, types, stats, IV, EV, abilities and moves.')}`],[tt('IV et EV','IV and EV'),tt('Les IV sont rares et permanents. Les EV viennent de l’entraînement et renforcent une stat.','IVs are rare permanent bonuses. EVs come from training and boost a stat.')],[tt('Attaques','Moves'),tt('Clique une attaque connue puis une attaque apprenable pour remplacer.','Click a known move, then a learnable move to replace it.')]]},
+ bag:{icon:'🎒',title:tt('Sac','Bag'),pages:[[tt('Catégories','Categories'),tt('Baies, objets tenus, pierres, trésors, fossiles et objets spéciaux sont séparés.','Berries, held items, stones, treasures, fossils and special items are separated.')]]},
+ mine:{icon:'⛏️',title:tt('Mine','Mine'),pages:[[tt('Creuser','Digging'),tt('Le burin est précis, le marteau creuse large.','The chisel is precise; the hammer digs wide.')]]},
+ hatchery:{icon:'🥚',title:tt('Pension','Hatchery'),pages:[[tt('Slots','Slots'),tt('Dépose des Pokémon ou fossiles. Les améliorations sont dans le menu dédié.','Deposit Pokémon or fossils. Upgrades are in the dedicated menu.')]]},
+ training:{icon:'🏋️',title:tt('Entraînement','Training'),pages:[[tt('Modes','Modes'),tt('Capacité, Talent, EV et Niveau ont chacun un rôle.','Move, Ability, EV and Level each have a role.')]]},
+ dictionary:{icon:'📚',title:tt('Dictionnaire','Dictionary'),pages:[[tt('Recherche','Search'),tt('Cherche objets, attaques et talents pour voir leurs effets et sources.','Search items, moves and abilities to see effects and sources.')]]}
+}; }
+function setGuideSection(section){ _guideSection=section||null; const el=document.getElementById('fs-panel-content'); if(el) renderGuidePanel(el); }
+function renderGuidePanel(el){ const sections=guideSections(); if(_guideSection&&sections[_guideSection]){ const sec=sections[_guideSection]; el.innerHTML=`<div class="guide-header"><div><h2>${sec.icon} ${sec.title}</h2><p>${tt('Guide détaillé','Detailed guide')}</p></div><button class="hbtn" data-action="legacy-call" data-call="setGuideSection" data-call-args="null">← ${tt('Retour','Back')}</button></div><div class="guide-page-list">${sec.pages.map(([title,txt])=>`<article class="guide-info-card"><h3>${title}</h3><p>${txt}</p></article>`).join('')}</div>`; return;} el.innerHTML=`<div class="guide-header"><div><h2>${tt('Guide','Guide')}</h2><p>${tt('Choisis une rubrique pour tout savoir.','Choose a topic to learn everything.')}</p></div></div><div class="guide-actions"><button class="hbtn" data-action="legacy-call" data-call="tutorialEnable" data-call-args="">${tt('Activer les tutos','Enable tutorials')}</button><button class="hbtn" data-action="legacy-call" data-call="tutorialDisable" data-call-args="">${tt('Désactiver tutos','Disable tutorials')}</button></div><div class="guide-grid">${Object.entries(sections).map(([id,sec])=>`<button class="guide-card guide-card-button" data-action="legacy-call" data-call="setGuideSection" data-call-args="'${id}'"><h3>${sec.icon} ${sec.title}</h3><p>${sec.pages.length} ${tt('pages d’informations','information pages')}</p></button>`).join('')}</div>`; }
+function installTutorialHooks(){ const wrap=(name,cb)=>{ const fn=window[name]; if(typeof fn!=='function'||fn.__tutorialWrapped) return; const nw=function(...args){ const res=fn.apply(this,args); try{cb(args,res);}catch(_){} return res;}; nw.__tutorialWrapped=true; window[name]=nw;}; wrap('pickStarter',()=>{try{renderStoryWindow();}catch(_){}}); wrap('openFullscreenPanel',([panel])=>{if(panel==='inventory')tutorialMark('open_bag'); if(panel==='pokedex')tutorialMark('open_pokedex');}); wrap('openPokeModal',()=>tutorialMark('open_poke_sheet')); wrap('openBoxPokeModal',()=>tutorialMark('open_poke_sheet')); wrap('exploreArea',()=>updateTutorialProgress()); wrap('renderMap',()=>updateTutorialProgress()); }
+setTimeout(installTutorialHooks,500);
+if(typeof window!=='undefined'){ window.ensureTutorialState=ensureTutorialState; window.tutorialDisable=tutorialDisable; window.tutorialEnable=tutorialEnable; window.tutorialDismissTip=tutorialDismissTip; window.closeTutorialTip=closeTutorialTip; window.tutorialMark=tutorialMark; window.renderTutorialQuestBlock=renderTutorialQuestBlock; window.renderGuidePanel=renderGuidePanel; window.setGuideSection=setGuideSection; window.showTutorialTip=showTutorialTip; window.installTutorialHooks=installTutorialHooks; }
