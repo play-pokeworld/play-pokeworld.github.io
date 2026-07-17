@@ -162,8 +162,8 @@ function pokemonDetailMoveRows(p, opts){
 
 function pokemonDetailHeldItemHtml(p, opts){
  opts = opts || {};
- if(!p.heldItem) return `<div class="poke-detail-subtle">${t('no_item_equipped_bag')}</div>`;
- const key = p.heldItem;
+ const key = (opts.idx != null && typeof getTeamSlotItem === 'function') ? getTeamSlotItem(opts.idx) : (p && p.heldItem);
+ if(!key) return `<div class="poke-detail-subtle">${t('no_item_equipped_bag')}</div>`;
  const itm = ITEMS[key];
  const qty = Math.min(BAG_MAX, (G.inventory||{})[key]||0);
  const removeCall = opts.boxId ? `unequipItemFromBox` : `unequipItem`;

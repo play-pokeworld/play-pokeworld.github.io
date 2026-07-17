@@ -65,6 +65,11 @@ function debugFillMine(){
  notify(t("legacy_message_n_nergie_de_mine_restaur_e_100"), 'var(--green)');
 }
 
+function debugTimeSkipAfk10Minutes(){
+ if(typeof debugTimeSkip10Minutes === 'function') debugTimeSkip10Minutes();
+ else notify(t('debug_timeskip_unavailable'), 'var(--red)');
+}
+
 
 // --- Migrated to ES module, globals exposed ---
 if (typeof openSettings !== 'undefined' && typeof window !== 'undefined') window.openSettings = openSettings;
@@ -77,5 +82,6 @@ if (typeof debugGiveCandies !== 'undefined' && typeof window !== 'undefined') wi
 if (typeof debugUnlockBadges !== 'undefined' && typeof window !== 'undefined') window.debugUnlockBadges = debugUnlockBadges;
 if (typeof toggleBattleSpeedX10 !== 'undefined' && typeof window !== 'undefined') window.toggleBattleSpeedX10 = toggleBattleSpeedX10;
 if (typeof debugFillMine !== 'undefined' && typeof window !== 'undefined') window.debugFillMine = debugFillMine;
+if (typeof debugTimeSkipAfk10Minutes !== 'undefined' && typeof window !== 'undefined') window.debugTimeSkipAfk10Minutes = debugTimeSkipAfk10Minutes;
 
 export {};

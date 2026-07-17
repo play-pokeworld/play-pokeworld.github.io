@@ -65,7 +65,7 @@ function applyEndOfTurnStatus(p){
  }
  
  
- if(p.heldItem === 'leftovers' && p.currentHP > 0 && p.currentHP < p.maxHP){
+ if((typeof getHeldItemForPokemon === 'function' ? getHeldItemForPokemon(p) : p.heldItem) === 'leftovers' && p.currentHP > 0 && p.currentHP < p.maxHP){
  const heal = Math.max(1, Math.floor(p.maxHP / 16));
  p.currentHP = Math.min(p.maxHP, p.currentHP + heal);
  addBattleLog(tr('leftovers_heal', {name:p.name, heal:heal}));

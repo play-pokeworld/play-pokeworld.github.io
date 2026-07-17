@@ -53,6 +53,7 @@ const ACTIONS = {
   'debug-give-candies': () => callGlobal('debugGiveCandies'),
   'debug-unlock-badges': () => callGlobal('debugUnlockBadges'),
   'debug-fill-mine': () => callGlobal('debugFillMine'),
+  'debug-timeskip-10m': () => callGlobal('debugTimeSkipAfk10Minutes'),
   'toggle-battle-speed-x10': () => callGlobal('toggleBattleSpeedX10'),
   'close-victory-screen': () => document.getElementById('victory-screen')?.classList.remove('open'),
   'toggle-map-help': () => callGlobal('toggleMapHelp'),

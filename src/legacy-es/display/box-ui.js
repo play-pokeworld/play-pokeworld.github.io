@@ -53,13 +53,12 @@ function addBoxedToTeam(id){
  setMsg(t('species_already_in_team'));
  return;
  }
- 
- poke.heldItem = null;
- 
+ if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(poke); else poke.heldItem = null;
  delete G.collection[id];
  delete G.collection[String(id)];
  for(const k of Object.keys(G.collection)){ if(G.collection[k]===poke) delete G.collection[k]; }
  G.team.push(poke);
+ if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
  notify(tr('joined_team', {name:poke.name}));
  showTab('box');
  renderTeamWindow();
@@ -77,48 +76,27 @@ function swapBoxWithTeam(id){
  const boxed=G.collection[id] || G.collection[String(id)];
  if(!boxed) return;
  const teamP=G.team[idx];
- const slotItem = teamP.heldItem || null;
- 
- teamP.heldItem = null;
- 
- if(boxed.heldItem && boxed.heldItem !== slotItem){
- 
- try{ addToInventory(boxed.heldItem,1); }catch(_){}
- }
- boxed.heldItem = slotItem;
- 
  const incomingSpecies = Number(boxed.id);
  const duplicateInTeam = G.team.some((tp,ti)=>ti!==idx && Number(tp.id)===incomingSpecies);
  if(duplicateInTeam){
  setMsg(t('species_already_in_team_present'));
- teamP.heldItem = slotItem;
- boxed.heldItem = null;
  return;
  }
- 
- 
+ const outId = Number(teamP.id);
+ if(G.collection[outId] || G.collection[String(outId)]){
+ setMsg(t('box_conflict'));
+ return;
+ }
  delete G.collection[id];
  delete G.collection[String(id)];
- 
  for(const k of Object.keys(G.collection)){
  if(G.collection[k] === boxed) delete G.collection[k];
  }
- 
- const outId = Number(teamP.id);
- if(G.collection[outId] || G.collection[String(outId)]){
- 
- setMsg(t('box_conflict'));
- teamP.heldItem = slotItem;
- boxed.heldItem = null;
- 
- G.collection[incomingSpecies] = boxed;
- return;
- }
+ if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(teamP); else teamP.heldItem = null;
+ if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(boxed); else boxed.heldItem = null;
  G.collection[outId] = teamP;
- 
- teamP.heldItem = null;
- 
  G.team[idx] = boxed;
+ if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
  _swapFromTeamIdx=null;
  notify(`🔁 ${teamP.name} ↔ ${boxed.name}`);
  showTab('box');
@@ -136,13 +114,10 @@ function sendTeamToBox(idx){
  setMsg(t('species_already_in_box'));
  return;
  }
- 
- if(p.heldItem){
- try{ addToInventory(p.heldItem,1); }catch(_){}
- p.heldItem = null;
- }
+ if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(p); else p.heldItem = null;
  G.collection[pid]=p;
  G.team.splice(idx,1);
+ if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
  document.getElementById('poke-modal').classList.remove('open');
  notify(tr('sent_to_box', {name:p.name}));
  showTab('box');

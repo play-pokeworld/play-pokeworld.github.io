@@ -19,6 +19,7 @@ function doSwitchBattlePoke(idx){
  }
  const p=G.team[idx];
  if(!p||p.currentHP<=0) return;
+if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
  battle.playerPokeIdx=idx;
  battle.playerMods={atk:1,def:1,spe:1};
  battle.pMoveIdx=0;

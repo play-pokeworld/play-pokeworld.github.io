@@ -1,4 +1,5 @@
 function startBattle(enemyPoke, isChamp, champId=null, champPokeList=null){
+ if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
  if(!G.team.length){setMsg(t('no_pokemon_in_team'));return;}
  if(isChamp && (!champPokeList || !champPokeList.length)){
  setMsg(t('empty_enemy_team_error'));

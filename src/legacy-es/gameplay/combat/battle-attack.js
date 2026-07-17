@@ -103,6 +103,8 @@ function playHitAnim(side){
 function executeAttack(attacker, defender, moveId, side){
  const mv=MOVES[moveId];
  if(!mv) return;
+ const attackerHeldItem = (typeof getHeldItemForPokemon === 'function') ? getHeldItemForPokemon(attacker) : attacker.heldItem;
+ const defenderHeldItem = (typeof getHeldItemForPokemon === 'function') ? getHeldItemForPokemon(defender) : defender.heldItem;
  const atkMod=(side==='player'?battle.playerMods:battle.enemyMods).atk;
  const defMod=(side==='player'?battle.enemyMods:battle.playerMods).def;
 
@@ -306,21 +308,21 @@ function executeAttack(attacker, defender, moveId, side){
  'silk_scarf':'Normal','twisted_spoon':'Psychic','metal_coat':'Steel',
  'thick_club':'Ground'
  };
- const heldItemType = typeItemMap[attacker.heldItem];
+ const heldItemType = typeItemMap[attackerHeldItem];
  if(heldItemType && heldItemType === mv.type){
  itemTypeMult = 1.2;
  }
  
- if(attacker.heldItem === 'choice_band' && mv.cat === 'phys') itemTypeMult = 1.5;
- if(attacker.heldItem === 'choice_specs' && mv.cat === 'spec') itemTypeMult = 1.5;
+ if(attackerHeldItem === 'choice_band' && mv.cat === 'phys') itemTypeMult = 1.5;
+ if(attackerHeldItem === 'choice_specs' && mv.cat === 'spec') itemTypeMult = 1.5;
  
- if(attacker.heldItem === 'life_orb') itemTypeMult = 1.3;
+ if(attackerHeldItem === 'life_orb') itemTypeMult = 1.3;
  
- if(attacker.heldItem === 'muscle_band' && mv.cat === 'phys') itemTypeMult *= 1.1;
+ if(attackerHeldItem === 'muscle_band' && mv.cat === 'phys') itemTypeMult *= 1.1;
  
  
  
- if(attacker.heldItem === 'kings_rock' && power > 0 && chance(10) && defender.currentHP > 0){
+ if(attackerHeldItem === 'kings_rock' && power > 0 && chance(10) && defender.currentHP > 0){
  addBattleLog(tr('combat_attack_auto_32', {p0:attacker.name, p1:defender.name}));
  }
 
@@ -330,7 +332,7 @@ function executeAttack(attacker, defender, moveId, side){
  }
 
  
- if(defender.heldItem === 'assault_vest' && mv.cat === 'spec'){
+ if(defenderHeldItem === 'assault_vest' && mv.cat === 'spec'){
  dmg = Math.max(1, Math.floor(dmg * 0.9));
  }
 
@@ -391,7 +393,7 @@ function executeAttack(attacker, defender, moveId, side){
  }
 
  
- if(attacker.heldItem === 'life_orb' && power > 0){
+ if(attackerHeldItem === 'life_orb' && power > 0){
  const loRecoil = Math.max(1, Math.floor(attacker.maxHP / 10));
  attacker.currentHP = Math.max(0, attacker.currentHP - loRecoil);
  addBattleLog(tr('combat_attack_auto_38', {p0:attacker.name, p1:loRecoil}));
@@ -401,7 +403,7 @@ function executeAttack(attacker, defender, moveId, side){
  }
 
  
- if(attacker.heldItem === 'kings_rock' && power > 0 && chance(10) && !defender.status && defender.currentHP > 0){
+ if(attackerHeldItem === 'kings_rock' && power > 0 && chance(10) && !defender.status && defender.currentHP > 0){
  addBattleLog(tr('combat_attack_auto_39', {p0:defender.name}));
  
  }

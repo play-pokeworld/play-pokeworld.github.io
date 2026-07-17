@@ -97,7 +97,7 @@
 
 
   function createInitialGameState() {
-    return { location:'pallet', region:'kanto', team:[], inventory:{}, money:2000, badges:[], defeatedChamps:{}, pokedex:{}, stepsLeft:0, starter:false, starterKanto:false, starterJohto:false, regionStarter:{kanto:false,johto:false}, collection:{}, evolvedSpecies:[], dupeCatches:{}, lang:'fr', storyIdx:0, storyProgress:0, unlockedTalents:{}, activeQuests:[], repeatables:[], visitedMaps:{}, completedQuests:{}, wildWinsByLoc:{}, playTimeMs:0, saveMeta:{} };
+    return { location:'pallet', region:'kanto', team:[], inventory:{}, money:2000, badges:[], defeatedChamps:{}, pokedex:{}, stepsLeft:0, starter:false, starterKanto:false, starterJohto:false, regionStarter:{kanto:false,johto:false}, collection:{}, teamSlotItems:[], evolvedSpecies:[], dupeCatches:{}, lang:'fr', storyIdx:0, storyProgress:0, unlockedTalents:{}, activeQuests:[], repeatables:[], visitedMaps:{}, completedQuests:{}, wildWinsByLoc:{}, playTimeMs:0, saveMeta:{} };
   }
   function createInitialBattleState() {
     return { active:false, enemy:null, enemyPoke:null, playerPokeIdx:0, isChamp:false, champId:null, champPokeIdx:0, turnLocked:false, escaped:false, chill:false, playerMods:{atk:1,def:1,spe:1}, enemyMods:{atk:1,def:1,spe:1}, log:[], sessionCatches:[], sessionItems:{}, pendingLeave:false, pendingSwitchIdx:null };
@@ -202,7 +202,7 @@
       'close-confirm': ['closeConfirm'], 'scroll-to-window': ['scrollToWin', element.dataset.targetWindow], 'set-battle-speed': ['setBattleSpeed', Number(element.dataset.speed)],
       'open-battle-summary': ['openBattleSummary', false], 'leave-battle': ['doLeaveBattle'], 'show-tab': ['showTab', element.dataset.tab], 'close-unified-selector': ['closeUnifiedSelectorModal'],
       'sort-unified-grid': ['sortUnifiedGrid', element.dataset.sort], 'close-battle-summary': ['closeBattleSummary'], 'restart-last-battle': ['restartLastBattle'],
-      'debug-give-money': ['debugGiveMoney'], 'debug-give-candies': ['debugGiveCandies'], 'debug-unlock-badges': ['debugUnlockBadges'], 'debug-fill-mine': ['debugFillMine'],
+      'debug-give-money': ['debugGiveMoney'], 'debug-give-candies': ['debugGiveCandies'], 'debug-unlock-badges': ['debugUnlockBadges'], 'debug-fill-mine': ['debugFillMine'], 'debug-timeskip-10m': ['debugTimeSkipAfk10Minutes'],
       'toggle-battle-speed-x10': ['toggleBattleSpeedX10'], 'toggle-map-help': ['toggleMapHelp'], 'open-fullscreen-panel': ['openFullscreenPanel', element.dataset.panel], 'open-unified-selector': ['openUnifiedSelectorModal', element.dataset.panel],
       'close-fullscreen-panel': ['closeFullscreenPanel'], 'copy-export-text': ['copyExportText']
     };

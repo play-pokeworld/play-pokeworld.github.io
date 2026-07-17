@@ -271,9 +271,12 @@ function selectUnifiedCard(loc, idStr){
         newBoxId = 'box_' + teamPoke.id + '_' + Date.now() + Math.floor(Math.random()*1000);
       }
       
+      if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(teamPoke); else teamPoke.heldItem = null;
+      if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(p); else p.heldItem = null;
       G.collection[newBoxId] = teamPoke;
       delete G.collection[idStr];
       G.team[_swapFromTeamIdx] = p;
+      if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
       _swapFromTeamIdx = null;
       closeUnifiedSelectorModal();
       updateHeader();
@@ -286,7 +289,9 @@ function selectUnifiedCard(loc, idStr){
         notify(t('team_full_select_replace'), 'var(--red)');
         return;
       }
+      if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(p); else p.heldItem = null;
       G.team.push(p);
+      if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
       delete G.collection[idStr];
       closeUnifiedSelectorModal();
       updateHeader();
@@ -315,8 +320,8 @@ function selectUnifiedCard(loc, idStr){
       notify(t('hatchery_full'), 'var(--red)');
       return;
     }
-    if(loc === 'team') G.team.splice(Number(idStr), 1);
-    else delete G.collection[idStr];
+    if(loc === 'team') { if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(p); else p.heldItem = null; G.team.splice(Number(idStr), 1); if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems(); }
+    else { if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(p); else p.heldItem = null; delete G.collection[idStr]; }
     G.hatchery[emptyIdx] = { poke: p, steps: 0, stepsReq: 10 };
     closeUnifiedSelectorModal();
     updateHeader();

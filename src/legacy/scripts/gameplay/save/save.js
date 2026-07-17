@@ -67,6 +67,7 @@ function normalizeLoadedState(){
  if(!G.unlockedTalents) G.unlockedTalents = {};
  if(!G.mainStep) G.mainStep = { kanto: 0, johto: 0 };
  if(!G.automation) G.automation = { autoHatch: false, autoSeedHatchery: false, autoExplore: false };
+ if(!Array.isArray(G.teamSlotItems)) G.teamSlotItems = [];
  if(!G.evolvedSpecies) G.evolvedSpecies = [];
  if(!G.dupeCatches) G.dupeCatches = {};
  if(!G.teamPresets) G.teamPresets = { preset1:{name:t('preset_adventure'),uids:[]}, preset2:{name:t('preset_boss'),uids:[]}, preset3:{name:t('preset_training'),uids:[]} };
@@ -77,6 +78,7 @@ function normalizeLoadedState(){
  ensureDefaultSaveIcon();
  for(const p of (G.team || [])){ if(!p.moves) p.moves = []; for(const m of p.moves){ if(m.maxPP === undefined) m.maxPP = MOVES[m.id]?.pp || 10; if(m.pp === undefined) m.pp = m.maxPP; } }
  if (typeof applyOfficialPokemonDataToSave === 'function') applyOfficialPokemonDataToSave();
+ if(typeof ensureTeamSlotItems === 'function') ensureTeamSlotItems();
 }
 function migrateLegacySingleSave(){
  let changed = false; const normalized = [];
@@ -223,10 +225,10 @@ function createNewSaveFromMenu(){
  state.saveMeta = { id, name: defaultSaveName(index.length + 1), background: SAVE_CARD_BACKGROUNDS[index.length % SAVE_CARD_BACKGROUNDS.length], createdAt: saveNow(), updatedAt: saveNow(), playTimeMs: 0, iconPokeId: 0, pendingStarter: true };
  state.playTimeMs = 0; currentSaveId = id; assignGlobalState(state); normalizeLoadedState(); activateCurrentSave(false); notify(t('save_choose_starter_first'), 'var(--accent)');
 }
-function activateCurrentSave(manual){ if(!currentSaveId && G && G.saveMeta && G.saveMeta.id) currentSaveId = G.saveMeta.id; if(currentSaveId && hasStarterInState(G)) storageSet(ACTIVE_SAVE_ID_KEY, currentSaveId); window.currentSaveId = currentSaveId; resetRuntimeBattleState(); saveSessionStartedAt = saveNow(); hideSaveMenu(); if(typeof initializeGameInterface === 'function') initializeGameInterface(); else if(typeof renderMap === 'function') { renderMap(); updateHeader(); showTab('info'); } if(manual) notify(t('game_loaded'), 'var(--green)'); }
+function activateCurrentSave(manual){ if(!currentSaveId && G && G.saveMeta && G.saveMeta.id) currentSaveId = G.saveMeta.id; if(currentSaveId && hasStarterInState(G)) storageSet(ACTIVE_SAVE_ID_KEY, currentSaveId); window.currentSaveId = currentSaveId; resetRuntimeBattleState(); saveSessionStartedAt = saveNow(); hideSaveMenu(); if(typeof initializeGameInterface === 'function') initializeGameInterface(); else if(typeof renderMap === 'function') { renderMap(); updateHeader(); showTab('info'); } if(typeof scheduleAfkCatchup === 'function') scheduleAfkCatchup('load'); if(manual) notify(t('game_loaded'), 'var(--green)'); }
 function startSaveById(id){ const data = readSlot(id); if(!data || !isCompatibleSaveData(data) || !hasStarterInState(data.G)){ notify(t('save_incompatible_deleted') || t('no_save_found'), 'var(--red)'); storageRemove(slotKey(id)); removeSaveFromIndex(id); renderSaveMenu(); return false; } currentSaveId = id; storageSet(ACTIVE_SAVE_ID_KEY, id); return loadGame(true); }
 function updatePlayTimeBeforeSave(){ if(!G) return; if(!G.saveMeta || typeof G.saveMeta !== 'object') G.saveMeta = {}; const now = saveNow(); if(saveSessionStartedAt && window.PokeWorldGameStarted){ const delta = Math.max(0, now - saveSessionStartedAt); if(delta < 24 * 60 * 60 * 1000) G.playTimeMs = Math.max(0, Number(G.playTimeMs || 0)) + delta; saveSessionStartedAt = now; } if(G.playTimeMs == null) G.playTimeMs = 0; G.saveMeta.playTimeMs = Math.max(0, Number(G.playTimeMs || 0)); G.saveMeta.updatedAt = now; }
-function saveGame(manual = false) { try { if(!currentSaveId && G && G.saveMeta && G.saveMeta.id) currentSaveId = G.saveMeta.id; if(!currentSaveId){ if(manual) notify(t('no_save_found'), 'var(--light1)'); return false; } if(!hasStarterInState(G)){ if(manual) notify(t('save_need_starter'), 'var(--red)'); return false; } ensureDefaultSaveIcon(); updatePlayTimeBeforeSave(); G.saveMeta.pendingStarter = false; const saveData = { version:SAVE_VERSION, timestamp:saveNow(), saveId:currentSaveId, G:JSON.parse(JSON.stringify(G)) }; ensureSaveMeta(saveData, currentSaveId); const json = JSON.stringify(saveData); if (json.length > 5 * 1024 * 1024) { console.error('[SAVE] Save too large:', json.length, 'bytes'); if (manual) notify(t('save_error_too_large'), 'var(--red)'); return false; } writeSlot(currentSaveId, saveData, true); storageSet(ACTIVE_SAVE_ID_KEY, currentSaveId); upsertSaveIndex(saveData); if (manual) notify(t('legacy_message_n_partie_sauvegard_e')); const settingsModal = document.getElementById('settings-modal'); const editingProfile = document.activeElement && document.activeElement.closest ? document.activeElement.closest('#save-profile-section') : null; if(settingsModal && settingsModal.classList.contains('open') && !editingProfile) updateSaveProfileControls(); return true; } catch (e) { console.error('[SAVE ERROR]', e); if (manual) notify(tr('save_error_message', {message:e.message}), 'var(--red)'); return false; } }
+function saveGame(manual = false) { try { if(!currentSaveId && G && G.saveMeta && G.saveMeta.id) currentSaveId = G.saveMeta.id; if(!currentSaveId){ if(manual) notify(t('no_save_found'), 'var(--light1)'); return false; } if(!hasStarterInState(G)){ if(manual) notify(t('save_need_starter'), 'var(--red)'); return false; } if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems(); ensureDefaultSaveIcon(); if(!afkApplying && typeof markAfkSeen === 'function') markAfkSeen(false); updatePlayTimeBeforeSave(); G.saveMeta.pendingStarter = false; const saveData = { version:SAVE_VERSION, timestamp:saveNow(), saveId:currentSaveId, G:JSON.parse(JSON.stringify(G)) }; ensureSaveMeta(saveData, currentSaveId); const json = JSON.stringify(saveData); if (json.length > 5 * 1024 * 1024) { console.error('[SAVE] Save too large:', json.length, 'bytes'); if (manual) notify(t('save_error_too_large'), 'var(--red)'); return false; } writeSlot(currentSaveId, saveData, true); storageSet(ACTIVE_SAVE_ID_KEY, currentSaveId); upsertSaveIndex(saveData); if (manual) notify(t('legacy_message_n_partie_sauvegard_e')); const settingsModal = document.getElementById('settings-modal'); const editingProfile = document.activeElement && document.activeElement.closest ? document.activeElement.closest('#save-profile-section') : null; if(settingsModal && settingsModal.classList.contains('open') && !editingProfile) updateSaveProfileControls(); return true; } catch (e) { console.error('[SAVE ERROR]', e); if (manual) notify(tr('save_error_message', {message:e.message}), 'var(--red)'); return false; } }
 function loadGame(manual = false) { try { const id = currentSaveId || storageGet(ACTIVE_SAVE_ID_KEY); let saveData = id ? readSlot(id) : null; if(!saveData){ const raw = storageGet(SAVE_KEY); saveData = raw ? JSON.parse(raw) : null; } if (!saveData) { if (manual) notify(t('no_save_found'), 'var(--light1)'); return false; } if (!isCompatibleSaveData(saveData) || !hasStarterInState(saveData.G)) { deleteIncompatibleSave('version=' + (saveData && saveData.version)); if (manual) notify(t('save_incompatible_deleted'), 'var(--red)'); return false; } const loadedId = id || saveData.saveId || saveData.G?.saveMeta?.id || uniqueSaveId(); currentSaveId = loadedId; ensureSaveMeta(saveData, loadedId); assignGlobalState(saveData.G); normalizeLoadedState(); const freshData = {version:SAVE_VERSION, timestamp:saveNow(), saveId:currentSaveId, G:JSON.parse(JSON.stringify(G))}; writeSlot(currentSaveId, freshData, true); upsertSaveIndex(freshData); activateCurrentSave(manual); return true; } catch (e) { console.error('[LOAD ERROR]', e); if (manual) notify(tr('load_error_message', {message:e.message}), 'var(--red)'); return false; } }
 function deleteIncompatibleSave(reason) { try { if(currentSaveId){ storageRemove(slotKey(currentSaveId)); removeSaveFromIndex(currentSaveId); } storageRemove(SAVE_KEY); console.warn('[SAVE] Incompatible browser save removed automatically:', reason || 'unknown reason'); return true; } catch (e) { console.error('[SAVE] Unable to remove incompatible save:', e); return false; } }
 function autoSave() { try { if(currentSaveId && window.PokeWorldGameStarted) saveGame(false); } catch (e) { console.error('[AUTOSAVE ERROR]', e); } }
@@ -235,6 +237,396 @@ function exportSave(){ exportActiveMultiSave(); }
 function normalizeImportedSave(parsed){ if(!parsed || !parsed.G) return null; const saveData = {version: parsed.version || SAVE_VERSION, timestamp: saveNow(), saveId: parsed.saveId || parsed.G?.saveMeta?.id, G: parsed.G}; if(!isCompatibleSaveData(saveData) || !hasStarterInState(saveData.G)) return null; const id = uniqueSaveId(saveData.saveId || saveData.G?.saveMeta?.id); ensureSaveMeta(saveData, id); saveData.G.saveMeta.id = id; saveData.saveId = id; if(!saveData.G.saveMeta.name) saveData.G.saveMeta.name = importedSaveName(); saveData.G.saveMeta.updatedAt = saveNow(); saveData.G.saveMeta.createdAt = saveData.G.saveMeta.createdAt || saveNow(); return saveData; }
 function importMultiSave(eventOrFile){ const file = eventOrFile && eventOrFile.target ? eventOrFile.target.files && eventOrFile.target.files[0] : eventOrFile; if(!file) return; const reader = new FileReader(); reader.onload = (e) => { try { const imported = normalizeImportedSave(JSON.parse(e.target.result)); if(!imported){ notify(t('save_incompatible_deleted'), 'var(--red)'); return; } writeSlot(imported.saveId, imported, false); upsertSaveIndex(imported); const menuOpen = document.body.classList.contains('save-menu-active') || !window.PokeWorldGameStarted; if(menuOpen){ renderSaveMenu(); notify(t('save_imported_library'), 'var(--green)'); } else { currentSaveId = imported.saveId; storageSet(ACTIVE_SAVE_ID_KEY, currentSaveId); loadGame(true); if(typeof closeSettings === 'function') closeSettings(); notify(t('save_imported_library'), 'var(--green)'); } } catch (err) { console.error('[IMPORT ERROR]', err); notify(tr('save_import_error', {message:err.message}), 'var(--red)'); } finally { if(eventOrFile && eventOrFile.target) eventOrFile.target.value = ''; } }; reader.readAsText(file); }
 function importSave(event){ importMultiSave(event); }
+
+const AFK_MIN_MS = 5000;
+const AFK_MAX_MS = 8 * 60 * 60 * 1000;
+const AFK_MAX_WINS = 720;
+let afkHandlersInstalled = false;
+let afkApplying = false;
+let afkCatchupTimer = null;
+let afkPendingSince = null;
+let afkLastHeartbeat = saveNow();
+function afkStorageKey(){ return currentSaveId ? ('pokeworld_afk_last_' + currentSaveId) : 'pokeworld_afk_last'; }
+function countAfkTeamKo(){ return (G && Array.isArray(G.team)) ? G.team.filter(p => p && p.currentHP <= 0).length : 0; }
+function getAfkInfo(){
+ let fromStorage = null;
+ try{ const raw = storageGet(afkStorageKey()); if(raw) fromStorage = JSON.parse(raw); }catch(_){ }
+ const node = G && G.afk ? G.afk : {};
+ return { ts: Number(fromStorage?.ts || node.lastSeenAt || saveNow()), wasWildBattle: !!(fromStorage?.wasWildBattle || node.wasWildBattle), battleSpeed: Number(fromStorage?.battleSpeed || node.battleSpeed || (battle && battle.speed) || 1), teamKoAtStart: Number((fromStorage && fromStorage.teamKoAtStart != null ? fromStorage.teamKoAtStart : node.teamKoAtStart) || 0) };
+}
+function markAfkSeen(force){
+ if(!G || !currentSaveId) return;
+ if(!force && afkPendingSince) return;
+ if(!force && typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+ if(!G.afk || typeof G.afk !== 'object') G.afk = {};
+ const wildBattle = !!(battle && battle.active && !battle.isChamp && !battle.isTraining);
+ const now = saveNow();
+ G.afk.lastSeenAt = now;
+ G.afk.wasWildBattle = wildBattle;
+ G.afk.battleSpeed = wildBattle ? (battle.speed || 1) : (G.afk.battleSpeed || 1);
+ afkLastHeartbeat = now;
+ if(force) afkPendingSince = null;
+ G.afk.teamKoAtStart = countAfkTeamKo();
+ try{ storageSet(afkStorageKey(), JSON.stringify({ts:G.afk.lastSeenAt, wasWildBattle:G.afk.wasWildBattle, battleSpeed:G.afk.battleSpeed, teamKoAtStart:G.afk.teamKoAtStart})); }catch(_){ }
+}
+function beginAfkSleep(){
+ if(!window.PokeWorldGameStarted || !G || !hasStarterInState(G)) return;
+ if(!currentSaveId && G.saveMeta && G.saveMeta.id) currentSaveId = G.saveMeta.id;
+ const now = saveNow();
+ afkPendingSince = now;
+ if(!G.afk || typeof G.afk !== 'object') G.afk = {};
+ const wildBattle = !!(battle && battle.active && !battle.isChamp && !battle.isTraining);
+ G.afk.lastSeenAt = now;
+ G.afk.wasWildBattle = wildBattle || !!(G.afk.wasWildBattle);
+ G.afk.battleSpeed = wildBattle ? (battle.speed || 1) : (G.afk.battleSpeed || 1);
+ G.afk.teamKoAtStart = countAfkTeamKo();
+ try{ storageSet(afkStorageKey(), JSON.stringify({ts:now, wasWildBattle:G.afk.wasWildBattle, battleSpeed:G.afk.battleSpeed, teamKoAtStart:G.afk.teamKoAtStart})); }catch(_){ }
+ if(battle && battle.active && !battle.isChamp && !battle.isTraining) battle.paused = true;
+ try{ if(hasStarterInState(G)) saveGame(false); }catch(_){ }
+}
+function scheduleAfkCatchup(reason){
+ clearTimeout(afkCatchupTimer);
+ afkCatchupTimer = setTimeout(() => applyAfkReturn(reason || 'return'), 120);
+}
+function resumeAfkBattleIfNeeded(){
+ if(battle && battle.active && !battle.isChamp && !battle.isTraining && battle.paused){
+  battle.paused = false;
+  try{ updateBattleUI(); renderMoveButtons(); renderEnemyMoveBars(); renderBattleTeamRow(); }catch(_){}
+ }
+}
+function pollAfkHeartbeat(){
+ const now = saveNow();
+ if(!window.PokeWorldGameStarted || afkApplying){ afkLastHeartbeat = now; return; }
+ if(!G || !hasStarterInState(G)){ afkLastHeartbeat = now; return; }
+ if(!currentSaveId && G.saveMeta && G.saveMeta.id) currentSaveId = G.saveMeta.id;
+ const hidden = typeof document !== 'undefined' && document.visibilityState === 'hidden';
+ if(hidden){
+  if(!afkPendingSince) beginAfkSleep();
+  return;
+ }
+ const start = afkPendingSince || afkLastHeartbeat;
+ const elapsed = now - start;
+ if(elapsed >= AFK_MIN_MS){
+  const info = afkPendingSince ? getAfkInfo() : {ts:start, wasWildBattle:!!(battle && battle.active && !battle.isChamp && !battle.isTraining), battleSpeed:(battle && battle.speed) || 1, teamKoAtStart:countAfkTeamKo()};
+  applyAfkProgress(elapsed, afkPendingSince ? 'heartbeat-return' : 'heartbeat-gap', info);
+  return;
+ }
+ markAfkSeen(false);
+}
+function installAfkHandlers(){
+ if(afkHandlersInstalled || typeof window === 'undefined') return;
+ afkHandlersInstalled = true;
+ document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'hidden') beginAfkSleep();
+  else scheduleAfkCatchup('visible');
+ });
+ window.addEventListener('blur', () => beginAfkSleep());
+ window.addEventListener('focus', () => scheduleAfkCatchup('focus'));
+ window.addEventListener('pageshow', () => scheduleAfkCatchup('pageshow'));
+ window.addEventListener('pagehide', () => beginAfkSleep());
+ setInterval(pollAfkHeartbeat, 2000);
+}
+function applyAfkReturn(reason){
+ if(afkApplying) return;
+ if(!window.PokeWorldGameStarted || !G || !hasStarterInState(G)){ resumeAfkBattleIfNeeded(); return; }
+ if(!currentSaveId && G.saveMeta && G.saveMeta.id) currentSaveId = G.saveMeta.id;
+ const info = getAfkInfo();
+ const start = afkPendingSince || info.ts;
+ const elapsed = saveNow() - start;
+ if(!(elapsed >= AFK_MIN_MS)){ resumeAfkBattleIfNeeded(); markAfkSeen(true); return; }
+ applyAfkProgress(elapsed, reason, {...info, ts:start});
+}
+function canAfkBattle(info){
+ const loc = (typeof getLocObj === 'function') ? getLocObj(G.location) : null;
+ if(!loc || !loc.wild || !loc.wild.length || !G.team || !G.team.length) return false;
+ if(battle && battle.active && (battle.isChamp || battle.isTraining)) return false;
+ return true;
+}
+function getAfkEncounterSeconds(loc, info){
+ const wild = loc?.wild || [];
+ let enemyLv = 10;
+ if(wild.length){ enemyLv = wild.reduce((sum,w)=>sum+(((w[1]||1)+(w[2]||w[1]||1))/2),0)/wild.length; }
+ const alive = (G.team||[]).filter(p=>p && p.currentHP > 0);
+ const team = alive.length ? alive : (G.team||[]).filter(Boolean);
+ const teamLv = team.length ? team.reduce((sum,p)=>sum+(p.level||1),0)/team.length : 1;
+ const diff = enemyLv - teamLv;
+ let base = 18 + Math.max(0, diff) * 1.6 - Math.max(0, -diff) * 0.25;
+ const spd = Math.max(1, Math.min(10, Number(info.battleSpeed || battle?.speed || 1)));
+ return Math.max(7, base / Math.sqrt(spd));
+}
+function advanceAfkHatchery(wins){
+ if(!wins || !G.hatchery || !Array.isArray(G.hatchery)) return 0;
+ let changed = 0;
+ for(let i=0;i<G.hatchery.length;i++){
+  const slot = G.hatchery[i];
+  if(!slot) continue;
+  slot.steps = (slot.steps || 0) + wins;
+  changed++;
+  if(G.automation && G.automation.autoHatch && slot.steps >= (slot.stepsReq || 10)){
+   try{ hatchEgg(i); }catch(_){ }
+  }
+ }
+ return changed;
+}
+function getAfkActivePokemon(){
+ return (G.team||[]).find(p => p && p.currentHP > 0) || null;
+}
+function getAfkAttackStat(attacker, move){
+ const isSpec = move && move.cat === 'spec';
+ const base = isSpec ? (attacker.spa || attacker.atk || 1) : (attacker.atk || 1);
+ try{
+  const buff = getHeldBuff(attacker) || {};
+  return Math.max(1, base * (1 + (buff[isSpec ? 'spa' : 'atk'] || 0)));
+ }catch(_){ return Math.max(1, base); }
+}
+function getAfkDefenseStat(defender, move){
+ const isSpec = move && move.cat === 'spec';
+ const base = isSpec ? (defender.spd || defender.def || 1) : (defender.def || 1);
+ try{
+  const buff = getHeldBuff(defender) || {};
+  return Math.max(1, base * (1 + (buff[isSpec ? 'spd' : 'def'] || 0)));
+ }catch(_){ return Math.max(1, base); }
+}
+function estimateAfkMoveDamage(attacker, defender, moveId){
+ const mv = MOVES && MOVES[moveId];
+ if(!mv) return 0;
+ if(mv.fixed !== undefined && mv.fixed !== null) return Math.max(1, typeof mv.fixed === 'number' ? mv.fixed : (attacker.level || 1));
+ if(!mv.pow || mv.pow <= 0) return 0;
+ const eff = typeof typeEff === 'function' ? typeEff(mv.type, defender.type1, defender.type2) : 1;
+ if(eff <= 0 && !mv.fixed) return 0;
+ const level = Math.max(1, attacker.level || 1);
+ let atk = getAfkAttackStat(attacker, mv);
+ let def = getAfkDefenseStat(defender, mv);
+ if((attacker.talent === 'hugepower' || attacker.talent === 'purepower') && mv.cat !== 'spec') atk *= 1.6;
+ if(attacker.talent === 'guts' && attacker.status && mv.cat !== 'spec') atk *= 1.35;
+ const stab = (attacker.type1 === mv.type || attacker.type2 === mv.type) ? (attacker.talent === 'adaptability' ? 2 : 1.5) : 1;
+ const avgAccuracy = Math.max(0.35, Math.min(1, (mv.acc || 100) / 100));
+ const raw = (((2 * level / 5 + 2) * mv.pow * atk / Math.max(1, def)) / 50 + 2) * stab * eff * 0.925 * avgAccuracy;
+ return Math.max(1, Math.floor(raw));
+}
+function estimateAfkBestDamage(attacker, defender){
+ const moves = (attacker && attacker.moves) || [];
+ let best = 0;
+ for(const m of moves){ best = Math.max(best, estimateAfkMoveDamage(attacker, defender, m.id)); }
+ if(best <= 0) best = Math.max(1, Math.floor((attacker.level || 1) / 2));
+ return best;
+}
+function afkCdFor(poke){
+ if(typeof calcAttackCd === 'function') return Math.max(350, calcAttackCd(poke?.spe || 50));
+ const spe = Math.max(1, poke?.spe || 50);
+ return Math.max(500, Math.round(1900 * (100 / (100 + Math.min(spe, 180)))));
+}
+function simulateAfkFight(enemy){
+ if(!enemy) return {won:false, lost:false, damage:0, fainted:0};
+ let enemyHp = Math.max(1, enemy.currentHP || enemy.maxHP || 1);
+ let totalDamage = 0;
+ let fainted = 0;
+ let p = getAfkActivePokemon();
+ if(!p) return {won:false, lost:true, damage:0, fainted:0};
+ let pCd = afkCdFor(p);
+ let eCd = afkCdFor(enemy);
+ let guard = 0;
+ while(enemyHp > 0 && guard < 250){
+  guard++;
+  p = getAfkActivePokemon();
+  if(!p) return {won:false, lost:true, damage:totalDamage, fainted};
+  const pDmg = estimateAfkBestDamage(p, enemy);
+  const eDmg = estimateAfkBestDamage(enemy, p);
+  if(pCd <= eCd){
+   enemyHp -= pDmg;
+   eCd -= pCd;
+   pCd = afkCdFor(p);
+   if(enemyHp <= 0) return {won:true, lost:false, damage:totalDamage, fainted};
+  } else {
+   p.currentHP = Math.max(0, (p.currentHP || p.maxHP || 1) - eDmg);
+   totalDamage += eDmg;
+   pCd -= eCd;
+   eCd = afkCdFor(enemy);
+   if(p.currentHP <= 0){
+    p.status = null;
+    p.statusTurns = 0;
+    fainted++;
+    const next = getAfkActivePokemon();
+    if(!next) return {won:false, lost:true, damage:totalDamage, fainted};
+    pCd = afkCdFor(next);
+   }
+  }
+ }
+ const lost = enemyHp > 0;
+ return {won:!lost, lost, damage:totalDamage, fainted};
+}
+function simulateAfkWildWin(loc){
+ const roamingId = typeof getRoamingLegendaryForRoute === 'function' ? getRoamingLegendaryForRoute(G.location) : null;
+ const e = typeof pickWildEncounter === 'function' ? pickWildEncounter(loc, roamingId) : null;
+ if(!e) return null;
+ if(!battle.sessionCatches) battle.sessionCatches = [];
+ if(!battle.sessionItems) battle.sessionItems = {};
+ battle.legendaryCatch = false;
+ G.pokedex[e.id] = {...(G.pokedex[e.id]||{}), seen:true};
+ const fight = simulateAfkFight(e);
+ if(!fight.won){
+  return {won:false, money:0, damage:fight.damage, fainted:fight.fainted, lost:true};
+ }
+ const xp = typeof gainXP === 'function' ? gainXP(e) : 0;
+ G.totalWildWins = (G.totalWildWins||0) + 1;
+ if(!G.wildWinsByLoc) G.wildWinsByLoc = {};
+ G.wildWinsByLoc[G.location] = (G.wildWinsByLoc[G.location]||0) + 1;
+ try{ attemptAutoCatch(e); }catch(_){ }
+ try{ EventBus.emit(EVENTS.WILD_DEFEATED, {loc:G.location}); }catch(_){ }
+ const drops = ROUTE_DROPS[G.location];
+ if(drops && drops.length && chance(4)){
+  const drop = drops[rand(0,drops.length-1)];
+  addToInventory(drop,1);
+  battle.sessionItems[drop] = (battle.sessionItems[drop]||0)+1;
+ }
+ const mon = rand(e.level*5, e.level*10);
+ G.money += mon;
+ return {won:true, money:mon, damage:fight.damage, fainted:fight.fainted, lost:false};
+}
+function ensureAfkActiveBattlePokemon(){
+ if(!battle || !battle.active || !G || !Array.isArray(G.team)) return false;
+ const current = G.team[battle.playerPokeIdx || 0];
+ if(current && current.currentHP > 0) return true;
+ let idx = -1;
+ try{ if(typeof firstAlive === 'function') idx = firstAlive(); }catch(_){}
+ if(idx == null || idx < 0) idx = G.team.findIndex(p => p && p.currentHP > 0);
+ if(idx >= 0){
+  battle.playerPokeIdx = idx;
+  battle.pMoveIdx = 0;
+  battle.playerMods = {atk:1,def:1,spe:1};
+  try{ resetPlayerCd(); }catch(_){}
+  return true;
+ }
+ return false;
+}
+function finishAfkBattleState(shouldContinue, loc){
+ if(!shouldContinue || !loc || !loc.wild || !loc.wild.length) return;
+ const next = typeof pickWildEncounter === 'function' ? pickWildEncounter(loc, getRoamingLegendaryForRoute(G.location)) : null;
+ if(!next) return;
+ if(battle && battle.active){
+  const hasAlive = ensureAfkActiveBattlePokemon();
+  if(!hasAlive){ endBattle(); return; }
+  battle.enemyPoke = next;
+  battle.enemyMods = {atk:1,def:1,spe:1};
+  battle.playerMods = {atk:1,def:1,spe:1};
+  battle.eMoveIdx = 0;
+  battle.escaped = false;
+  battle.paused = false;
+  try{ resetEnemyCd(); resetPlayerCd(); triggerEntryTalents('both'); updateBattleUI(); renderMoveButtons(); renderEnemyMoveBars(); renderBattleTeamRow(); }catch(_){ }
+ }
+}
+function snapshotInventory(){ return {...(G.inventory || {})}; }
+function diffInventory(before, after){
+ const keys = new Set([...Object.keys(before||{}), ...Object.keys(after||{})]);
+ const out = [];
+ for(const key of keys){
+  const delta = Number((after&&after[key]) || 0) - Number((before&&before[key]) || 0);
+  if(delta > 0) out.push({key, qty:delta});
+ }
+ return out;
+}
+function ensureAfkResultPanel(){
+ let modal = document.getElementById('afk-result-modal');
+ if(!modal){
+  modal = document.createElement('div');
+  modal.id = 'afk-result-modal';
+  modal.className = 'afk-result-modal';
+  document.body.appendChild(modal);
+ }
+ return modal;
+}
+function closeAfkResultPanel(){ const modal = document.getElementById('afk-result-modal'); if(modal) modal.classList.remove('open'); }
+function renderAfkItemList(items){
+ if(!items || !items.length) return `<span class="afk-muted">${escHtml(t('afk_none'))}</span>`;
+ return items.map(it => `<span class="afk-chip">${itemIcon(it.key,18)} ${escHtml(getItemName(it.key))} ×${it.qty}</span>`).join('');
+}
+function showAfkResultPanel(result){
+ const modal = ensureAfkResultPanel();
+ const itemsHtml = renderAfkItemList(result.items || []);
+ const titleKey = result.debug ? 'afk_panel_title_debug' : 'afk_panel_title_return';
+ const statusKey = result.error ? 'afk_panel_status_error' : result.lost ? 'afk_panel_status_lost' : result.wins > 0 ? 'afk_panel_status_ok' : 'afk_panel_status_empty';
+ modal.innerHTML = `<div class="afk-result-card"><div class="modal-title"><div>⏱ ${escHtml(t(titleKey))}</div><span class="afk-modal-close" data-action="legacy-call" data-call="closeAfkResultPanel" data-call-args="">✕</span></div><div class="afk-result-status ${result.error?'danger':result.lost?'danger':result.wins>0?'success':''}">${escHtml(t(statusKey))}</div><div class="afk-result-grid"><div><b>${escHtml(formatPlayTime(result.timeMs || 0))}</b><span>${escHtml(t('afk_panel_duration'))}</span></div><div><b>${result.wins || 0}</b><span>${escHtml(t('afk_panel_battles'))}</span></div><div><b>+${Number(result.money || 0).toLocaleString()}₽</b><span>${escHtml(t('afk_panel_money'))}</span></div><div><b>${result.fainted || 0}</b><span>${escHtml(t('afk_panel_team_ko'))}</span></div><div><b>${result.captures || 0}</b><span>${escHtml(t('afk_panel_captures'))}</span></div><div><b>+${result.energy || 0}</b><span>${escHtml(t('afk_panel_energy'))}</span></div></div><div class="afk-result-section"><b>${escHtml(t('afk_panel_items'))}</b><div class="afk-chip-row">${itemsHtml}</div></div>${result.message?`<div class="afk-result-note">${escHtml(result.message)}</div>`:''}<div class="afk-result-actions"><button class="hbtn" data-action="legacy-call" data-call="closeAfkResultPanel" data-call-args="">${escHtml(t('close'))}</button></div></div>`;
+ modal.classList.add('open');
+}
+function applyAfkProgress(elapsedMs, reason, info){
+ afkApplying = true;
+ try{
+  const capped = Math.min(elapsedMs, AFK_MAX_MS);
+  const seconds = Math.floor(capped / 1000);
+  const startMoney = Number(G.money || 0);
+  const startEnergy = G.mine ? Number(G.mine.energy || 0) : 0;
+  const invBefore = snapshotInventory();
+  const catchBefore = (battle && battle.sessionCatches) ? battle.sessionCatches.length : 0;
+  const teamKoBefore = Number(info && info.teamKoAtStart != null ? info.teamKoAtStart : countAfkTeamKo());
+  let wins = 0;
+  let money = 0;
+  let damage = 0;
+  let fainted = 0;
+  let lost = false;
+  if(G.mine){
+   G.mine.energy = Math.min(G.mine.maxEnergy || 100, (G.mine.energy || 0) + seconds * 2);
+  }
+  const loc = (typeof getLocObj === 'function') ? getLocObj(G.location) : null;
+  const shouldFight = canAfkBattle(info);
+  const shouldContinue = shouldFight;
+  const wasActive = !!(battle && battle.active && !battle.isChamp && !battle.isTraining);
+  if(wasActive) battle.paused = true;
+  if(shouldFight && loc){
+   const perFight = getAfkEncounterSeconds(loc, info);
+   const plannedWins = Math.max(0, Math.min(AFK_MAX_WINS, Math.floor(seconds / perFight)));
+   let completed = 0;
+   for(let i=0;i<plannedWins;i++){
+    const result = simulateAfkWildWin(loc);
+    if(!result) break;
+    money += Number(result.money || 0);
+    damage += Number(result.damage || 0);
+    fainted += Number(result.fainted || 0);
+    if(result.lost){ lost = true; break; }
+    if(result.won) completed++;
+   }
+   wins = completed;
+   advanceAfkHatchery(wins);
+   if(lost){
+    try{ addBattleLog(t('afk_party_ko_log')); }catch(_){}
+    if(battle && battle.active) endBattle();
+   } else {
+    finishAfkBattleState(shouldContinue, loc);
+   }
+  }
+  if(!shouldFight) resumeAfkBattleIfNeeded();
+  if(G.afk){ G.afk.wasWildBattle = !!(battle && battle.active && !battle.isChamp && !battle.isTraining); }
+  markAfkSeen(true);
+  try{ updateHeader(); renderBattleLoot(); renderBattleSummary(); }catch(_){ }
+  saveGame(false);
+  const teamKoAfter = countAfkTeamKo();
+  const displayedFainted = Math.max(fainted, Math.max(0, teamKoAfter - teamKoBefore));
+  const result = {debug: reason === 'debug', timeMs:capped, wins, money:Math.max(0, Number(G.money || 0) - startMoney), damage, fainted:displayedFainted, lost, energy:G.mine ? Math.max(0, Number(G.mine.energy || 0) - startEnergy) : 0, captures:Math.max(0, ((battle && battle.sessionCatches) ? battle.sessionCatches.length : 0) - catchBefore), items:diffInventory(invBefore, G.inventory || {})};
+  showAfkResultPanel(result);
+  if(wins > 0 || lost){
+   const params = {time:formatPlayTime(capped), wins:wins, money:Number(result.money || 0).toLocaleString(), fainted:result.fainted};
+   notify(tr(lost ? 'afk_progress_lost_summary' : 'afk_progress_summary', params), lost ? 'var(--red)' : 'var(--green)');
+   try{ addBattleLog(tr(lost ? 'afk_battle_log_lost_summary' : 'afk_battle_log_summary', params)); }catch(_){ }
+  } else if(seconds >= 30 && G.mine){
+   notify(tr('afk_energy_summary', {time:formatPlayTime(capped)}), 'var(--blue)');
+  } else if(seconds >= 5){
+   notify(tr('afk_no_progress_summary', {time:formatPlayTime(capped)}), 'var(--light1)');
+  }
+ } catch(e) {
+  console.error('[AFK ERROR]', e);
+  resumeAfkBattleIfNeeded();
+  try{ markAfkSeen(true); }catch(_){}
+  try{ showAfkResultPanel({error:true, timeMs:elapsedMs || 0, wins:0, money:0, damage:0, fainted:0, captures:0, energy:0, items:[], message:t('afk_error_resume')}); notify(t('afk_error_resume'), 'var(--red)'); }catch(_){}
+ } finally {
+  afkApplying = false;
+ }
+}
+function debugTimeSkip10Minutes(){
+ if(!window.PokeWorldGameStarted || !G || !hasStarterInState(G)){ showAfkResultPanel({debug:true, timeMs:10*60*1000, wins:0, money:0, damage:0, fainted:0, captures:0, energy:0, items:[], message:t('save_need_starter')}); notify(t('save_need_starter'), 'var(--red)'); return; }
+ if(!currentSaveId && G.saveMeta && G.saveMeta.id) currentSaveId = G.saveMeta.id;
+ applyAfkProgress(10 * 60 * 1000, 'debug', {ts:saveNow() - 10 * 60 * 1000, wasWildBattle:true, battleSpeed:(battle && battle.speed) || 1, forceBattle:true});
+}
+installAfkHandlers();
+
 function deleteSave() { try { const id = currentSaveId; if(id){ storageRemove(slotKey(id)); removeSaveFromIndex(id); } storageRemove(SAVE_KEY); storageRemove(ACTIVE_SAVE_ID_KEY); currentSaveId = null; window.currentSaveId = null; window.PokeWorldGameStarted = false; notify(t('save_deleted'), 'var(--green)'); setTimeout(() => { if(typeof closeSettings === 'function') closeSettings(); renderSaveMenu(); }, 400); } catch (e) { console.error('[DELETE ERROR]', e); notify(t('save_delete_error'), 'var(--red)'); } }
 setInterval(() => { autoSave(); }, 30000);
 if(typeof window !== 'undefined' && !window._pokeWorldSaveBeforeUnload){ window._pokeWorldSaveBeforeUnload = true; window.addEventListener('beforeunload', () => { autoSave(); }); }
@@ -337,3 +729,5 @@ if (typeof selectSaveProfileIcon !== 'undefined' && typeof window !== 'undefined
 if (typeof openSaveIconBoxSelector !== 'undefined' && typeof window !== 'undefined') window.openSaveIconBoxSelector = openSaveIconBoxSelector;
 if (typeof getCurrentSaveId !== 'undefined' && typeof window !== 'undefined') window.getCurrentSaveId = getCurrentSaveId;
 if (typeof formatPlayTime !== 'undefined' && typeof window !== 'undefined') window.formatPlayTime = formatPlayTime;
+if (typeof debugTimeSkip10Minutes !== 'undefined' && typeof window !== 'undefined') window.debugTimeSkip10Minutes = debugTimeSkip10Minutes;
+if (typeof closeAfkResultPanel !== 'undefined' && typeof window !== 'undefined') window.closeAfkResultPanel = closeAfkResultPanel;

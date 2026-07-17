@@ -1352,3 +1352,108 @@ body.save-menu-active { overflow: hidden; }
 .save-context-item.danger:hover {
   background: rgba(211,66,95,0.24);
 }
+
+.afk-result-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 26000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+  background: rgba(0,0,0,0.46);
+  backdrop-filter: blur(4px);
+}
+.afk-result-modal.open {
+  display: flex;
+}
+.afk-result-card {
+  width: min(620px, 96vw);
+  max-height: 92vh;
+  overflow-y: auto;
+  border: 1px solid rgba(236,222,183,0.42);
+  border-radius: 18px;
+  background: rgba(54,52,47,0.96);
+  box-shadow: 0 22px 54px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.06);
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+.afk-result-status {
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: rgba(236,222,183,0.12);
+  border: 1px solid rgba(236,222,183,0.22);
+  color: var(--light2);
+  font-weight: 900;
+}
+.afk-result-status.success {
+  background: rgba(96,190,88,0.16);
+  border-color: rgba(96,190,88,0.44);
+}
+.afk-result-status.danger {
+  background: rgba(211,66,95,0.16);
+  border-color: rgba(211,66,95,0.48);
+}
+.afk-result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+}
+.afk-result-grid div {
+  border: 1px solid rgba(236,222,183,0.18);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.22);
+  padding: 10px;
+  display: grid;
+  gap: 4px;
+}
+.afk-result-grid b {
+  color: var(--light2);
+  font-size: 17px;
+}
+.afk-result-grid span,
+.afk-muted,
+.afk-result-note {
+  color: var(--light1);
+}
+.afk-result-section {
+  display: grid;
+  gap: 8px;
+}
+.afk-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.afk-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid rgba(236,222,183,0.22);
+  border-radius: 999px;
+  background: rgba(0,0,0,0.22);
+  padding: 5px 8px;
+  color: var(--light2);
+}
+.afk-result-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.afk-modal-close {
+  cursor: pointer;
+  color: var(--light1);
+  font-size: 24px;
+  font-weight: 900;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+}
+.afk-modal-close:hover {
+  background: rgba(236,222,183,0.14);
+  color: var(--light2);
+}

@@ -35,7 +35,9 @@ function generatePokeCardHTML(p, i, options = {}) {
   const cdPct = isEnemy
     ? ((battle.eCdMax) ? Math.max(0, 100 - (battle.eCd / battle.eCdMax * 100)) : 0)
     : ((battle.pCdMax) ? Math.max(0, 100 - (battle.pCd / battle.pCdMax * 100)) : 0);
-  const itm = p.heldItem ? ITEMS[p.heldItem] : null;
+  const heldKey = (typeof getHeldItemForPokemon === 'function') ? getHeldItemForPokemon(p) : (p.heldItem || null);
+  if(!isEnemy && heldKey) p.heldItem = heldKey;
+  const itm = heldKey ? ITEMS[heldKey] : null;
   const b = getHeldBuff(p);
 
   
@@ -72,7 +74,7 @@ function generatePokeCardHTML(p, i, options = {}) {
 
   
   const itemBadgeHtml = itm
-    ? '<div class="poke-item-badge" data-item-key="' + p.heldItem + '" ' + legacyClickAttributes(onLeftClickItem) + ' data-context-call="openItemInfo" data-context-args="\'' + p.heldItem + '\'" title="' + t('change_or_info_title') + '">' + itemSpriteHtml(p.heldItem, 20) + '</div>'
+    ? '<div class="poke-item-badge" data-item-key="' + heldKey + '" ' + legacyClickAttributes(onLeftClickItem) + ' data-context-call="openItemInfo" data-context-args="\'' + heldKey + '\'" title="' + t('change_or_info_title') + '">' + itemSpriteHtml(heldKey, 20) + '</div>'
     : '<div class="poke-item-badge empty" ' + legacyClickAttributes(onLeftClickItem) + ' title="'+t('equip_click_title')+'">+</div>';
 
   
@@ -159,6 +161,7 @@ function generatePokeCardHTML(p, i, options = {}) {
 
 
 function renderBattleTeamRow() {
+  if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
   const row = document.getElementById('battle-team-row');
   if (!row) return;
 

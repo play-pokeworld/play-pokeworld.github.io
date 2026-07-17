@@ -80,6 +80,7 @@ function installCriticalClickFallback(root) {
     'debug-give-candies': function () { callGlobal('debugGiveCandies'); },
     'debug-unlock-badges': function () { callGlobal('debugUnlockBadges'); },
     'debug-fill-mine': function () { callGlobal('debugFillMine'); },
+    'debug-timeskip-10m': function () { callGlobal('debugTimeSkipAfk10Minutes'); },
     'toggle-battle-speed-x10': function () { callGlobal('toggleBattleSpeedX10'); },
     'close-victory-screen': function () { var el = document.getElementById('victory-screen'); if (el) el.classList.remove('open'); },
     'toggle-map-help': function () { callGlobal('toggleMapHelp'); },

@@ -3,6 +3,7 @@ function renderTeamWindow(){
   
   if(el) el.classList.add('team-view');
   if(!el) return;
+  if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
 
   if(G.team.length === 0){
     el.innerHTML = `<div class="extracted-template-style-108">
@@ -37,17 +38,18 @@ function renderTeamWindow(){
     });
   }).join('');
 
-  el.innerHTML = renderTeamPresetsToolbar() + battleLockBanner + teamCardsHtml;
-  
-  
-  addTeamDragAndDrop(); + (G.team.length < 6 ? `
+  const addCardHtml = G.team.length < 6 ? `
     <div class="extracted-template-style-110"
          data-action="legacy-call" data-call="openUnifiedSelectorModal" data-call-args="'team'">
       <div class="extracted-template-style-111">+</div>
       <div class="extracted-template-style-112">${t('add_pokemon')}</div>
       <div class="extracted-template-style-113">${tr('team_count', {count:G.team.length})}</div>
     </div>
-  ` : '');
+  ` : '';
+  el.innerHTML = renderTeamPresetsToolbar() + battleLockBanner + teamCardsHtml + addCardHtml;
+  
+  
+  addTeamDragAndDrop();
   addLongPressToItemBadges();
 }
 
@@ -73,6 +75,7 @@ function renderTeamPresetsToolbar(){
 }
 
 function renderPokeCard(p, i){
+  if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
   if((p.xp || 0) < xpForLevel(p.level)) p.xp = xpForLevel(p.level) + (p.xp || 0);
   if(!p.xpNext || p.xpNext <= xpForLevel(p.level)) p.xpNext = xpForLevel(p.level + 1);
 
@@ -100,7 +103,7 @@ function showItemSelectorForPokemon(teamIdx){
   const fsContent = document.getElementById('fs-panel-content');
   if(!fsContent) return;
   
-  const currentKey = p.heldItem;
+  const currentKey = (typeof getTeamSlotItem === 'function') ? getTeamSlotItem(teamIdx) : p.heldItem;
   const entries = Object.entries(G.inventory).filter(([k,v]) => v > 0 && ITEMS[k] && ITEMS[k].buff);
   
   let html = `<div class="extracted-template-style-118">
@@ -154,7 +157,8 @@ function equipItemDirect(teamIdx, key){
     showItemSelectorForPokemon(teamIdx);
     return;
   }
-  p.heldItem = key;
+  if(typeof setTeamSlotItem === 'function') setTeamSlotItem(teamIdx, key);
+  else p.heldItem = key;
   saveGame();
   renderTeamWindow();
   closeFullscreenPanel();
@@ -163,8 +167,10 @@ function equipItemDirect(teamIdx, key){
 
 function removeItemFromPokemon(teamIdx){
   const p = G.team[teamIdx];
-  if(!p || !p.heldItem) return;
-  p.heldItem = null;
+  const currentKey = (typeof getTeamSlotItem === 'function') ? getTeamSlotItem(teamIdx) : (p && p.heldItem);
+  if(!p || !currentKey) return;
+  if(typeof clearTeamSlotItem === 'function') clearTeamSlotItem(teamIdx);
+  else p.heldItem = null;
   saveGame();
   renderTeamWindow();
   closeFullscreenPanel();
@@ -174,9 +180,11 @@ function removeItemFromPokemon(teamIdx){
 
 function unequipItemFromPokemon(idx){
   const p = G.team[idx];
-  if(!p || !p.heldItem) return;
-  const itemName = getItemName(p.heldItem);
-  p.heldItem = null;
+  const currentKey = (typeof getTeamSlotItem === 'function') ? getTeamSlotItem(idx) : (p && p.heldItem);
+  if(!p || !currentKey) return;
+  const itemName = getItemName(currentKey);
+  if(typeof clearTeamSlotItem === 'function') clearTeamSlotItem(idx);
+  else p.heldItem = null;
   saveGame();
   renderTeamWindow();
   document.getElementById('poke-modal').classList.remove('open');
@@ -197,6 +205,13 @@ function unequipItemFromBox(boxId){
 
 function removeItemFromTeamByName(key){
   let removed = false;
+  if(typeof ensureTeamSlotItems === 'function') ensureTeamSlotItems();
+  if(Array.isArray(G.teamSlotItems)){
+    for(let i=0;i<G.teamSlotItems.length;i++){
+      if(G.teamSlotItems[i] === key){ G.teamSlotItems[i] = null; removed = true; }
+    }
+    if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
+  }
   G.team.forEach(p => {
     if(p && p.heldItem === key){
       p.heldItem = null;
@@ -322,6 +337,7 @@ function teamDrop(ev, targetIdx) {
   const temp = G.team[sourceIdx];
   G.team[sourceIdx] = G.team[targetIdx];
   G.team[targetIdx] = temp;
+  if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
   
   _teamDragIdx = null;
   _teamLongPressReady = false;

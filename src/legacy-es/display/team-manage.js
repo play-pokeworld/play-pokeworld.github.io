@@ -39,10 +39,12 @@ function loadTeamFromPreset(key){
  }
  for(const oldP of G.team){
  if(!newTeam.includes(oldP)){
+ if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(oldP); else oldP.heldItem = null;
  G.collection[String(oldP.id)] = oldP;
  }
  }
  G.team = newTeam;
+ if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
  G.activePresetId = key;
  notify(tr('preset_loaded', {name:preset.name, count:newTeam.length}), 'var(--green)');
  renderTeamWindow();
@@ -52,6 +54,7 @@ function loadTeamFromPreset(key){
 }
 
 function renderTeam(el){
+ if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
  if(G.team.length===0){
  el.innerHTML=`<div class="extracted-template-style-039">
  ${t('no_pokemon_yet')}<br><br>
@@ -63,7 +66,8 @@ function renderTeam(el){
  <span class="extracted-template-style-024"></span>
  <span><b>${t('live_battle_lock_team')}</b> ${t('team_locked_battle_long')}</span>
  </div>` : '';
- el.innerHTML= renderTeamPresetsToolbar() + battleLockBanner + G.team.map((p,i)=>renderPokeCard(p,i)).join('');
+ const addCardHtml = G.team.length < 6 ? `<div class="extracted-template-style-110" data-action="legacy-call" data-call="openUnifiedSelectorModal" data-call-args="'team'"><div class="extracted-template-style-111">+</div><div class="extracted-template-style-112">${t('add_pokemon')}</div><div class="extracted-template-style-113">${tr('team_count', {count:G.team.length})}</div></div>` : '';
+ el.innerHTML= renderTeamPresetsToolbar() + battleLockBanner + G.team.map((p,i)=>renderPokeCard(p,i)).join('') + addCardHtml;
 }
 
 function onTeamCardClick(ev, i){
@@ -95,8 +99,10 @@ function removeFromTeam(idx){
  while(G.collection[boxId]) {
  boxId = boxId + '_dup' + Math.floor(Math.random()*1000);
  }
+ if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(p); else p.heldItem = null;
  G.collection[boxId] = p;
  G.team.splice(idx, 1);
+ if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
  _swapFromTeamIdx = null;
  saveGame();
  updateHeader();
@@ -122,10 +128,12 @@ function swapBoxWithTeam(boxId){
  newBoxId = newBoxId + '_dup' + Math.floor(Math.random()*1000);
  }
  
+ if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(teamPoke); else teamPoke.heldItem = null;
  G.collection[newBoxId] = teamPoke;
  delete G.collection[boxId];
  delete G.collection[String(boxId)];
  G.team[teamIdx] = boxPoke;
+ if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
  _swapFromTeamIdx = null;
  saveGame();
  updateHeader();
@@ -140,7 +148,9 @@ function addBoxedToTeam(boxId){
  }
  const p = G.collection[boxId] || G.collection[String(boxId)];
  if(!p){ notify(t('pokemon_not_found'), 'var(--red)'); return; }
+ if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(p); else p.heldItem = null;
  G.team.push(p);
+ if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
  delete G.collection[boxId];
  delete G.collection[String(boxId)];
  saveGame();
