@@ -9,7 +9,7 @@ function openUnifiedSelectorModal(actionType){
   const qm = document.getElementById('quest-modal');
   if(qm) qm.classList.remove('open');
   const sm = document.getElementById('settings-modal');
-  if(sm) sm.classList.remove('open');
+  if(sm && actionType !== 'save_icon') sm.classList.remove('open');
 
   if(typeof battle !== 'undefined' && battle && battle.active && actionType === 'training'){
     notify("Combat en cours !", "var(--red)");
@@ -24,6 +24,7 @@ function openUnifiedSelectorModal(actionType){
   if(actionType === 'hatchery') titleEl.textContent = t('selector_title_hatchery');
   else if(actionType === 'training') titleEl.textContent = t('selector_title_training');
   else if(actionType === 'team') titleEl.textContent = t('selector_title_team');
+  else if(actionType === 'save_icon') titleEl.textContent = t('save_profile_icon');
   else titleEl.textContent = t('selector_title_box');
   
   modal.style.display = 'flex';
@@ -101,7 +102,7 @@ function renderUnifiedGrid(){
   });
 
   
-  if(_usmAction === 'team'){
+  if(_usmAction === 'team' || _usmAction === 'save_icon'){
     list = list.filter(({loc}) => loc === 'box');
   }
 
@@ -149,7 +150,7 @@ function renderUnifiedGrid(){
   let html = list.map(({p, loc, idStr, teamIdx}) => {
     const isShiny = p.shinyUnlocked || p.shinyActive || p.shiny || isSpeciesShiny(p.id);
     return `
-      <div class="box-card" data-action="legacy-call" data-call="selectUnifiedCard" data-call-args="'${loc}','${idStr}'" data-context-call="${loc === 'team' ? 'openPokeModal' : 'openBoxPokeModal'}" data-context-args="${loc === 'team' ? teamIdx : `'${idStr}'`}" title="${t('select_or_details_hint')}">
+      <div class="box-card ${_usmAction === 'save_icon' && G.saveMeta && Number(G.saveMeta.iconPokeId) === Number(p.id) ? 'save-icon-selector-card active' : (_usmAction === 'save_icon' ? 'save-icon-selector-card' : '')}" data-action="legacy-call" data-call="selectUnifiedCard" data-call-args="'${loc}','${idStr}'" data-context-call="${loc === 'team' ? 'openPokeModal' : 'openBoxPokeModal'}" data-context-args="${loc === 'team' ? teamIdx : `'${idStr}'`}" title="${t('select_or_details_hint')}">
         <div class="box-level">Lv.${p.level}</div>
         <div class="box-shiny ${isShiny?'is-visible':'is-hidden'}">★</div>
         <div class="poke-sprite">${spriteImg(p.id, p.emoji, {size: 72, shiny: isShiny})}</div>
@@ -249,6 +250,12 @@ function selectUnifiedCard(loc, idStr){
     p = G.collection[idStr];
   }
   if(!p) return;
+
+  if(_usmAction === 'save_icon'){
+    if(typeof window.selectSaveProfileIcon === 'function') window.selectSaveProfileIcon(idStr, p.id);
+    closeUnifiedSelectorModal();
+    return;
+  }
 
   if(_usmAction === 'team'){
     

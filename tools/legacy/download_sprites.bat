@@ -9,7 +9,7 @@ REM   Placement: put this file in <project>/tool/download_sprites.bat
 REM   Run: double-click the .bat OR from a cmd prompt in this folder.
 REM ==============================================================
 setlocal enabledelayedexpansion
-pushd "%~dp0.."
+pushd "%~dp0..\.."
 set "ROOT=%CD%"
 set "POKEDIR=%ROOT%\src\assets\images\pokemon"
 set "ITEMDIR=%ROOT%\src\assets\images\items"
@@ -703,6 +703,7 @@ curl -sSL --fail -o "%ROOT%\src\assets\font\WinkySans-Regular.ttf" "https://gith
 
 echo   [font] Megrim-Regular.ttf
 curl -sSL --fail -o "%ROOT%\src\assets\font\Megrim-Regular.ttf" "https://github.com/google/fonts/raw/main/ofl/megrim/Megrim-Regular.ttf" || echo     ! failed Megrim
+
 
 echo.
 echo ============================================================

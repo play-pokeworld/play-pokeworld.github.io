@@ -7,6 +7,7 @@ export function createInitialGameState() {
     collection: {}, evolvedSpecies: [], dupeCatches: {}, lang: 'fr',
     storyIdx: 0, storyProgress: 0, unlockedTalents: {}, activeQuests: [],
     repeatables: [], visitedMaps: {}, completedQuests: {}, wildWinsByLoc: {},
+    playTimeMs: 0, saveMeta: {},
   };
 }
 export const gameState = createInitialGameState();

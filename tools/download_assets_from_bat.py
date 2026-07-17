@@ -21,9 +21,6 @@ for key, paname in re.findall(r'call\s+:getitem\s+([^\s\r\n]+)\s+([^\s\r\n]+)', 
 for out_raw, url in re.findall(r'curl\s+-sSL\s+--fail\s+-o\s+"%ROOT%\\([^"]+)"\s+"(https?://[^"]+)"', bat, flags=re.I):
     out = out_raw.replace('\\','/')
     tasks.append((root/out, url, None))
-# Winky PokeChill direct late section
-for out_raw, url in re.findall(r'curl\s+-sSL\s+--fail\s+-o\s+"%ROOT%\\([^"]+)"\s+"(https?://[^"]+)"', bat, flags=re.I):
-    pass
 
 # De-duplicate by destination, keeping first successful URL/fallback pair.
 seen={}

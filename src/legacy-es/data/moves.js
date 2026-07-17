@@ -198,24 +198,6 @@ function updateI18nLabels(){
  if(lootContBtn) lootContBtn.textContent = t('loot_continue_btn');
  const sumTitle = document.getElementById('battle-summary-title');
  if(sumTitle) sumTitle.textContent = t('loot_summary_title');
-
- const debugTitle = document.querySelector('#debug-drawer .pw-static-068 span:first-child');
- if(debugTitle) debugTitle.textContent = t('debug_menu_title');
- const dbgMoney = document.querySelector('[data-action="debug-give-money"]');
- if(dbgMoney) dbgMoney.textContent = t('debug_give_money');
- const dbgCandies = document.querySelector('[data-action="debug-give-candies"]');
- if(dbgCandies) dbgCandies.textContent = t('debug_give_candies');
- const dbgBadges = document.querySelector('[data-action="debug-unlock-badges"]');
- if(dbgBadges) dbgBadges.textContent = t('debug_unlock_badges');
- const dbgMine = document.querySelector('[data-action="debug-fill-mine"]');
- if(dbgMine) dbgMine.textContent = t('debug_fill_mine');
- const dbgX10 = document.getElementById('debug-x10-toggle');
- if(dbgX10){ const state = document.getElementById('debug-x10-state')?.textContent || 'OFF'; dbgX10.innerHTML = t('debug_x10_toggle') + ' <span id="debug-x10-state">' + state + '</span>'; }
- const dbgToggle = document.getElementById('debug-toggle-btn');
- if(dbgToggle) dbgToggle.textContent = t('debug_toggle_btn');
- const mapHelp = document.getElementById('map-help-modal');
- if(mapHelp) mapHelp.remove();
-
  const sel = document.getElementById('map-region-select');
  if(sel){
  sel.options[0].textContent = t("m.moves.5");
@@ -225,6 +207,8 @@ function updateI18nLabels(){
  }
  const mapWinTitleEl = document.getElementById('map-win-title');
  if(mapWinTitleEl) mapWinTitleEl.textContent = (t("m.moves.1")) + (G?.region === 'johto' ? 'Johto' : 'Kanto');
+ try{ updateSaveProfileControls(); }catch(_){}
+ if(document.body.classList.contains('save-menu-active')){ try{ renderSaveMenu(); }catch(_){} }
  try{ renderBattleSummary(); }catch(_){}
 }
 

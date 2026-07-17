@@ -2,8 +2,6 @@
 
 var _dictionaryTab = 'items';
 var _dictionarySearch = '';
-function dictIsEn(){ const c=(typeof currentLang==='function'?currentLang():((G&&G.lang)||'fr')); return String(c).charAt(0)==='e'; }
-function dt(fr,en){ return dictIsEn()?en:fr; }
 function setDictionaryTab(tab){
  _dictionaryTab = tab || 'items';
  _dictionarySearch = '';
@@ -30,11 +28,11 @@ function findItemSources(key){
    if(Array.isArray(items) && items.some(it => (Array.isArray(it) ? it[0] : (it.key || it.id || it)) === key)) add(getShopName(shopId));
  }
  if(typeof MINE_ITEMS !== 'undefined' && MINE_ITEMS.some(it=>it.key===key)) add(t('mine_title')||'Mine');
- for(const q of (STORY_QUESTS||[])) if(q.rewardItems && q.rewardItems[key]) add(t('dict_main_quest'));
- if(typeof SIDE_QUESTS !== 'undefined') for(const q of Object.values(SIDE_QUESTS||{})) if(q.rewardItems && q.rewardItems[key]) add(t('dict_side_quest'));
- for(const r of (G.repeatables||[])) if(r.def && r.def.rewardItems && r.def.rewardItems[key]) add(t('dict_repeatable_quest'));
- if(ITEMS[key] && ITEMS[key].type === 'fossil') add(t('fossil_lab')||t('dict_fossil_lab'));
- if(!sources.length) add(t('dict_unknown_source'));
+ for(const q of (STORY_QUESTS||[])) if(q.rewardItems && q.rewardItems[key]) add('Quête principale');
+ if(typeof SIDE_QUESTS !== 'undefined') for(const q of Object.values(SIDE_QUESTS||{})) if(q.rewardItems && q.rewardItems[key]) add('Quête secondaire');
+ for(const r of (G.repeatables||[])) if(r.def && r.def.rewardItems && r.def.rewardItems[key]) add('Quête répétable');
+ if(ITEMS[key] && ITEMS[key].type === 'fossil') add(t('fossil_lab')||'Laboratoire Fossile');
+ if(!sources.length) add('Obtention non renseignée');
  return sources;
 }
 function openAbilityInfo(key){
@@ -49,8 +47,8 @@ function openAbilityInfo(key){
    }
  }
  inner.innerHTML = `<div class="modal-title"><div>🧬 ${info.name}</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
- <div class="dict-info-block"><div><b>${t('dict_rarity')}</b> : ${getRarityLabel(info.rarity)}</div><p>${info.info||''}</p></div>
- <div class="dict-info-title">${t('dict_related_pokemon')}</div>
+ <div class="dict-info-block"><div><b>Rareté</b> : ${getRarityLabel(info.rarity)}</div><p>${info.info||''}</p></div>
+ <div class="dict-info-title">Pokémon concernés</div>
  <div class="dict-chip-list">${species.length?species.map(id=>`<span class="dict-chip">#${id} ${getPokeName(id)}</span>`).join(''):'<span class="dict-muted">Aucun Pokémon listé.</span>'}</div>`;
  document.getElementById('poke-modal').classList.add('open');
 }
@@ -59,7 +57,7 @@ function renderDictionary(el){
  const tab = _dictionaryTab || 'items';
  const q = _dictionarySearch || '';
  const tabs = [{id:'items',label:t('dict_items')||'Objets'},{id:'moves',label:t('dict_moves')||'Attaques'},{id:'abilities',label:t('dict_abilities')||'Talents'}];
- let html = `<div class="dict-toolbar"><div class="dict-tabs">${tabs.map(tb=>`<button class="hbtn dict-tab ${tab===tb.id?'active':''}" data-action="legacy-call" data-call="setDictionaryTab" data-call-args="'${tb.id}'">${tb.label}</button>`).join('')}</div><input class="dict-search" data-action="filter-dictionary" value="${q.replace(/"/g,'&quot;')}" placeholder="${t('dict_search_placeholder')}"></div>`;
+ let html = `<div class="dict-toolbar"><div class="dict-tabs">${tabs.map(tb=>`<button class="hbtn dict-tab ${tab===tb.id?'active':''}" data-action="legacy-call" data-call="setDictionaryTab" data-call-args="'${tb.id}'">${tb.label}</button>`).join('')}</div><input class="dict-search" data-action="filter-dictionary" value="${q.replace(/"/g,'&quot;')}" placeholder="Rechercher..."></div>`;
  if(tab === 'items'){
    let keys = Object.keys(ITEMS||{}).sort((a,b)=>getItemName(a).localeCompare(getItemName(b)));
    if(q) keys = keys.filter(k => (getItemName(k)+' '+k+' '+getItemDesc(k)).toLowerCase().includes(q));
@@ -67,9 +65,9 @@ function renderDictionary(el){
      const owned = (G.inventory&&G.inventory[k]>0);
      const sources = findItemSources(k);
      return `<div class="dict-entry ${owned?'owned':''}" data-action="legacy-call" data-call="openItemInfo" data-call-args="'${k}'">
-       <div class="dict-entry-icon">${itemSpriteHtml(k,32)}</div><div><b>${getItemName(k)}</b><span>${owned?`${t('dict_owned')} ×${G.inventory[k]}`:t('dict_not_owned')}</span><small>${sources.slice(0,3).join(' · ')}${sources.length>3?'…':''}</small></div>
+       <div class="dict-entry-icon">${itemSpriteHtml(k,32)}</div><div><b>${getItemName(k)}</b><span>${owned?`Possédé ×${G.inventory[k]}`:'Non possédé'}</span><small>${sources.slice(0,3).join(' · ')}${sources.length>3?'…':''}</small></div>
      </div>`;
-   }).join('') || `<div class="dict-muted">${t('dict_no_results')}</div>`}</div>`;
+   }).join('') || `<div class="dict-muted">Aucun résultat.</div>`}</div>`;
  } else if(tab === 'moves'){
    const mons = _dictPokemonList();
    let keys = Object.keys(MOVES||{}).sort((a,b)=>getMoveName(a).localeCompare(getMoveName(b)));
@@ -78,9 +76,9 @@ function renderDictionary(el){
      const mv = MOVES[k];
      const users = mons.filter(o=>(o.p.moves||[]).some(m=>m.id===k));
      return `<div class="dict-entry ${users.length?'owned':''}" data-type-color="${TYPE_COLORS[mv?.type||'']||'#555'}" data-action="legacy-call" data-call="openMoveInfo" data-call-args="'${k}'">
-       <div class="dict-entry-icon type-badge ${typeClass(mv?.type||'?')}">${mv?.type||'?'}</div><div><b>${getMoveName(k)}</b><span>${users.length?`${users.length} ${t('dict_move_users')}`:t('dict_no_move_users')}</span><small>${users.slice(0,4).map(u=>u.p.name).join(' · ')}${users.length>4?'…':''}</small></div>
+       <div class="dict-entry-icon type-badge ${typeClass(mv?.type||'?')}">${mv?.type||'?'}</div><div><b>${getMoveName(k)}</b><span>${users.length?`${users.length} Pokémon avec cette attaque`:'Aucun Pokémon ne la connaît'}</span><small>${users.slice(0,4).map(u=>u.p.name).join(' · ')}${users.length>4?'…':''}</small></div>
      </div>`;
-   }).join('') || `<div class="dict-muted">${t('dict_no_results')}</div>`}</div>`;
+   }).join('') || `<div class="dict-muted">Aucun résultat.</div>`}</div>`;
  } else {
    const mons = _dictPokemonList();
    const unlocked = new Set();
@@ -91,9 +89,9 @@ function renderDictionary(el){
    html += `<div class="dict-grid">${keys.map(k=>{
      const info=TALENTS_FULL[k]; const users=mons.filter(o=>o.p.talent===k);
      return `<div class="dict-entry ${unlocked.has(k)?'owned':''}" data-action="legacy-call" data-call="openAbilityInfo" data-call-args="'${k}'">
-       <div class="dict-entry-icon">🧬</div><div><b>${info.name}</b><span>${unlocked.has(k)?`${t('dict_unlocked')} · ${users.length} ${t('dict_holders')}`:t('dict_locked')} · ${getRarityLabel(info.rarity)}</span><small>${users.slice(0,4).map(u=>u.p.name).join(' · ')}${users.length>4?'…':''}</small></div>
+       <div class="dict-entry-icon">🧬</div><div><b>${info.name}</b><span>${unlocked.has(k)?`Débloqué · ${users.length} porteur(s)`:'Non débloqué'} · ${getRarityLabel(info.rarity)}</span><small>${users.slice(0,4).map(u=>u.p.name).join(' · ')}${users.length>4?'…':''}</small></div>
      </div>`;
-   }).join('') || `<div class="dict-muted">${t('dict_no_results')}</div>`}</div>`;
+   }).join('') || `<div class="dict-muted">Aucun résultat.</div>`}</div>`;
  }
  el.innerHTML = html;
  const input = el.querySelector('.dict-search');

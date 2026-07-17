@@ -61,9 +61,9 @@ function openTrainingUpgradeMenu(){
  const inner=document.getElementById('poke-modal-inner');
  const modal=document.getElementById('poke-modal');
  if(!inner||!modal) return;
- inner.innerHTML = `<div class="modal-title"><div>${t('training_upgrade_title')}</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
- <div class="dict-info-block"><b>${t('training_upgrade_title')}</b><br>${t('training_upgrade_coming')}</div>
- <div class="dict-info-block">${t('training_upgrade_note')}</div>`;
+ inner.innerHTML = `<div class="modal-title"><div>⚙️ Centre d'entraînement</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
+ <div class="dict-info-block"><b>À venir :</b><br>• plusieurs Pokémon entraînables en parallèle<br>• plusieurs équipes de coachs<br>• bonus de gain d'EV / talents / niveaux<br>• automatisations d'entraînement</div>
+ <div class="dict-info-block">Les améliorations seront ajoutées dans ce menu pour éviter d'encombrer la fenêtre principale.</div>`;
  modal.classList.add('open');
 }
 function pickTrainingBots(trainee, mode, level){
@@ -148,14 +148,14 @@ function renderTrainingWindow(){
  el.innerHTML = `<div class="training-header-card">
  <div class="extracted-template-style-087"><div class="extracted-template-style-185">${spriteImg(trainee.id, trainee.emoji, {size:60, shiny:trainee.shinyActive})}</div>
  <div><b class="extracted-template-style-186">${trainee.name}</b> <span class="extracted-template-style-187">Nv.${trainee.level}</span><br>
- <span class="extracted-template-style-188">${t('training_summary_evs')} : ${totalEvs}/36 🟢 · ${t('training_summary_talents')} ${getUnlockedTalentListForSpecies(trainee.id).length}/${getSpeciesTalents(trainee.id).length} · ${t('training_summary_moves')} ${getTrainableLockedMoves(trainee).length}</span></div></div>
- <div class="training-header-actions"><button class="hbtn" data-action="legacy-call" data-call="openUnifiedSelectorModal" data-call-args="'training'">${t("m.training.11")}</button><button class="hbtn" data-action="legacy-call" data-call="openTrainingUpgradeMenu" data-call-args="">${t('training_upgrade_button')}</button></div>
+ <span class="extracted-template-style-188">EVs : ${totalEvs}/36 🟢 · Talents ${getUnlockedTalentListForSpecies(trainee.id).length}/${getSpeciesTalents(trainee.id).length} · Moves entraînement ${getTrainableLockedMoves(trainee).length}</span></div></div>
+ <div class="training-header-actions"><button class="hbtn" data-action="legacy-call" data-call="openUnifiedSelectorModal" data-call-args="'training'">${t("m.training.11")}</button><button class="hbtn" data-action="legacy-call" data-call="openTrainingUpgradeMenu" data-call-args="">⚙️ Améliorations</button></div>
  </div>
  <div class="training-mode-grid">
- ${trainingButtonHtml('move',t('training_move_title'), canMove?t('training_move_desc'):t('training_move_done'), canMove)}
- ${trainingButtonHtml('talent',t('training_talent_title'), canTalent?t('training_talent_desc'):t('training_talent_done'), canTalent)}
- ${trainingButtonHtml('ev',t('training_ev_title'), canEv?t('training_ev_desc'):t('training_ev_done'), canEv)}
- ${trainingButtonHtml('level',t('training_level_title'), canLevel?t('training_level_desc'):t('training_level_done'), canLevel)}
+ ${trainingButtonHtml('move','📖 Discipline Capacités', canMove?'Débloque une attaque verrouillée par entraînement.':'Toutes les attaques d’entraînement sont déjà débloquées.', canMove)}
+ ${trainingButtonHtml('talent','🧬 Atelier Talents', canTalent?'Tente d’obtenir un talent de la liste du Pokémon.':'Tous les talents disponibles sont déjà débloqués.', canTalent)}
+ ${trainingButtonHtml('ev','🟢 Stage EV ciblé', canEv?'Gagne exactement 1 EV aléatoire.':'EV au maximum.', canEv)}
+ ${trainingButtonHtml('level','⭐ Stage Niveau', canLevel?'Gagne entre 2 et 5 niveaux.':'Niveau 100 atteint.', canLevel)}
  </div>`;
 }
 function startTrainingBattle(mode='ev'){
@@ -168,7 +168,7 @@ function startTrainingBattle(mode='ev'){
    const totEv = Object.values(trainee.evs).reduce((a,b)=>a+b,0);
    if(totEv >= 36){ notify(t("legacy_message_n_ce_pok_mon_poss_de_d_j_6_toiles_ev_sur"),"var(--red)"); return; }
  }
- if(mode === 'move' && !getTrainableLockedMoves(trainee).length){ notify(t('training_move_notify_done'), 'var(--red)'); return; }
+ if(mode === 'move' && !getTrainableLockedMoves(trainee).length){ notify('Toutes les capacités d’entraînement sont déjà débloquées.', 'var(--red)'); return; }
  if(mode === 'talent' && !getTrainableTalents(trainee).length){ notify(t('all_talents_unlocked'), 'var(--red)'); return; }
  battle.isTraining = true;
  battle.trainingStage = 0;

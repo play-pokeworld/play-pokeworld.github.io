@@ -15,6 +15,28 @@
 </head>
 <body>
 
+<div id="save-menu-screen" class="save-menu-screen is-open">
+  <div class="save-menu-bg-layer"></div>
+  <section class="save-menu-panel" aria-labelledby="save-menu-title">
+    <div class="save-menu-title-block">
+      <div class="save-menu-kicker">PokéWorld</div>
+      <h1 id="save-menu-title">PokéWorld</h1>
+      <p id="save-menu-subtitle"></p>
+    </div>
+    <div class="save-menu-list-shell">
+      <button id="save-menu-prev" class="hbtn save-menu-scroll-btn" data-action="legacy-call" data-call="scrollSaveList" data-call-args="-1">‹</button>
+      <div id="save-menu-list" class="save-menu-list"></div>
+      <button id="save-menu-next" class="hbtn save-menu-scroll-btn" data-action="legacy-call" data-call="scrollSaveList" data-call-args="1">›</button>
+    </div>
+    <div class="save-menu-actions">
+      <button id="save-menu-new-btn" class="hbtn save-menu-action-primary" data-action="legacy-call" data-call="createNewSaveFromMenu" data-call-args=""></button>
+      <label id="save-menu-import-label" class="hbtn save-menu-action-secondary" for="save-menu-import-file"></label>
+      <input type="file" id="save-menu-import-file" accept=".json,application/json" class="pw-static-010" data-action="import-save-file">
+    </div>
+  </section>
+</div>
+
+
 <svg class="pw-static-001">
   <defs>
     <filter id="silhouette-filter">
@@ -61,6 +83,28 @@
         <div class="theme-swatch pw-static-006" data-theme-btn="light" data-action="set-theme" data-theme-value="light">Clair</div>
         <div class="theme-swatch pw-static-007" data-theme-btn="gameboy" data-action="set-theme" data-theme-value="gameboy">Game Boy</div>
         <div class="theme-swatch pw-static-008" data-theme-btn="fire" data-action="set-theme" data-theme-value="fire">Feu</div>
+      </div>
+    </div>
+
+
+    <div class="settings-section" id="save-profile-section">
+      <h3 id="save-profile-heading"></h3>
+      <div id="save-profile-preview" class="save-profile-preview"></div>
+      <label class="save-profile-field" for="save-profile-name">
+        <span id="save-profile-name-label"></span>
+        <input type="text" id="save-profile-name" maxlength="32" autocomplete="off">
+      </label>
+      <label class="save-profile-field" for="save-profile-background">
+        <span id="save-profile-background-label"></span>
+        <select id="save-profile-background"></select>
+      </label>
+      <div class="save-profile-field">
+        <span id="save-profile-icon-label"></span>
+        <div id="save-profile-icon-current" class="save-profile-icon-current"></div>
+        <button id="save-profile-icon-btn" class="hbtn" data-action="legacy-call" data-call="openSaveIconBoxSelector" data-call-args=""></button>
+      </div>
+      <div class="settings-row">
+        <button id="save-profile-apply-btn" class="hbtn" data-action="legacy-call" data-call="applySaveProfileSettings" data-call-args=""></button>
       </div>
     </div>
 

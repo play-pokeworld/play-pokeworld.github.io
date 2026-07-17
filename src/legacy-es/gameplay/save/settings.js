@@ -5,6 +5,7 @@ function openSettings(){
  document.querySelectorAll('.theme-swatch').forEach(s=>{
  s.classList.toggle('active', s.dataset.themeBtn===(safeStorage.get('pokeworld_theme')||'dark'));
  });
+ if(typeof updateSaveProfileControls === 'function') updateSaveProfileControls();
 }
 function closeSettings(){
  document.getElementById('settings-modal').classList.remove('open');

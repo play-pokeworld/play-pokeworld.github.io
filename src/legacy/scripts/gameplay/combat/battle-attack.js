@@ -2,7 +2,7 @@
 function transformPokemon(attacker, defender, side){
  if(!attacker || !defender) return false;
  if(attacker._transformed){
-   addBattleLog(`${attacker.name} ${t('transform_already')}`);
+   addBattleLog(`${attacker.name} est déjà transformé !`);
    return true;
  }
  const hpRatio = attacker.maxHP ? attacker.currentHP / attacker.maxHP : 1;
@@ -30,7 +30,7 @@ function transformPokemon(attacker, defender, side){
  attacker.moves = (defender.moves||[]).map(m=>({id:m.id, pp:(MOVES[m.id]?.pp||m.pp||10), maxPP:(MOVES[m.id]?.pp||m.maxPP||10)}));
  attacker.shinyActive = defender.shinyActive || defender.shiny;
  attacker.shiny = attacker.shinyActive;
- addBattleLog(`🧬 ${attacker._transformBackup.name} ${t('transform_log')} ${defender.name} !`);
+ addBattleLog(`🧬 ${attacker._transformBackup.name} prend l'apparence de ${defender.name} !`);
  try{ renderMoveButtons(); }catch(_){}
  try{ renderBattleTeamRow(); }catch(_){}
  updateBattleUI();
@@ -126,7 +126,7 @@ function executeAttack(attacker, defender, moveId, side){
  if(absorbMap[defender.talent] === mv.type){
  const heal = Math.max(1, Math.floor(defender.maxHP * 0.25));
  defender.currentHP = Math.min(defender.maxHP, defender.currentHP + heal);
- addBattleLog(tr('ability_absorb_log',{move:getMoveName(moveId),talent:getTalentName(defender.talent),heal:heal}));
+ addBattleLog(`${defender.name} absorbe ${getMoveName(moveId)} grâce à ${getTalentName(defender.talent)} ! (+${heal} PV)`);
  updateBattleUI();
  return;
  }
