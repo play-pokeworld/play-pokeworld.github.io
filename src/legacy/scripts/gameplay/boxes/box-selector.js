@@ -11,10 +11,6 @@ function openUnifiedSelectorModal(actionType){
   const sm = document.getElementById('settings-modal');
   if(sm && actionType !== 'save_icon') sm.classList.remove('open');
 
-  if(typeof battle !== 'undefined' && battle && battle.active && actionType === 'training'){
-    notify("Combat en cours !", "var(--red)");
-    return;
-  }
   _usmAction = actionType;
   _usmSubTab = 'box';
   const modal = document.getElementById('unified-selector-modal');
@@ -101,8 +97,8 @@ function renderUnifiedGrid(){
     if(showFossilTab){
       subtabBar.style.display = 'flex';
       subtabBar.innerHTML = `
-        <button class="hbtn usm-subtab-btn" class="hbtn usm-subtab-btn" data-style="flex:1;padding:8px;font-size:13px;font-weight:bold;${_usmSubTab==='box'?'background:var(--light2);color:var(--dark1);':''}" data-action="set-usm-subtab" data-subtab="box">📦 ${t('box_label')}</button>
-        <button class="hbtn usm-subtab-btn" class="hbtn usm-subtab-btn" data-style="flex:1;padding:8px;font-size:13px;font-weight:bold;${_usmSubTab==='fossil'?'background:var(--light2);color:var(--dark1);':''}" data-action="set-usm-subtab" data-subtab="fossil"> ${t('fossils')}</button>`;
+        <button class="hbtn usm-subtab-btn" class="hbtn usm-subtab-btn" data-action="set-usm-subtab" data-subtab="box">📦 ${t('box_label')}</button>
+        <button class="hbtn usm-subtab-btn" class="hbtn usm-subtab-btn" data-action="set-usm-subtab" data-subtab="fossil"> ${t('fossils')}</button>`;
     } else {
       subtabBar.style.display = 'none';
       subtabBar.innerHTML = '';
@@ -323,12 +319,18 @@ function selectUnifiedCard(loc, idStr){
     }
   } else if(_usmAction === 'training'){
     if(!p.uid) p.uid = 'p_' + Math.random().toString(36).substr(2, 9);
-    G.selectedTraineeUid = p.uid;
-    G.selectedTraineeLoc = loc;
-    G.selectedTraineeId = idStr;
+    const slotIndex = (typeof G.pendingTrainingSlotIndex === 'number') ? G.pendingTrainingSlotIndex : 0;
+    if(typeof setTrainingSlotPokemon === 'function'){
+      setTrainingSlotPokemon(slotIndex, loc, idStr, p);
+    } else {
+      G.selectedTraineeUid = p.uid;
+      G.selectedTraineeLoc = loc;
+      G.selectedTraineeId = idStr;
+    }
+    G.pendingTrainingSlotIndex = null;
     closeUnifiedSelectorModal();
     renderTrainingWindow();
-    notify(tr('selected_for_training', {name:p.name}), 'var(--green)');
+    notify(tr('selected_for_training_slot', {name:p.name, slot:slotIndex+1}), 'var(--green)');
   } else if(_usmAction === 'hatchery'){
     if(loc === 'team' && G.team.length <= 1){
       notify(t('cannot_deposit_only_pokemon'), 'var(--red)');
@@ -350,3 +352,20 @@ function selectUnifiedCard(loc, idStr){
     notify(tr('deposited_hatchery', {name:p.name}), 'var(--green)');
   }
 }
+
+
+// --- Migrated to ES module, globals exposed ---
+if (typeof openUnifiedSelectorModal !== 'undefined' && typeof window !== 'undefined') window.openUnifiedSelectorModal = openUnifiedSelectorModal;
+if (typeof closeUnifiedSelectorModal !== 'undefined' && typeof window !== 'undefined') window.closeUnifiedSelectorModal = closeUnifiedSelectorModal;
+if (typeof sortUnifiedGrid !== 'undefined' && typeof window !== 'undefined') window.sortUnifiedGrid = sortUnifiedGrid;
+if (typeof filterUnifiedGrid !== 'undefined' && typeof window !== 'undefined') window.filterUnifiedGrid = filterUnifiedGrid;
+if (typeof setFilterType !== 'undefined' && typeof window !== 'undefined') window.setFilterType = setFilterType;
+if (typeof setFilterShiny !== 'undefined' && typeof window !== 'undefined') window.setFilterShiny = setFilterShiny;
+if (typeof setFilterTeam !== 'undefined' && typeof window !== 'undefined') window.setFilterTeam = setFilterTeam;
+if (typeof renderUnifiedGrid !== 'undefined' && typeof window !== 'undefined') window.renderUnifiedGrid = renderUnifiedGrid;
+if (typeof renderUnifiedSwapFooter !== 'undefined' && typeof window !== 'undefined') window.renderUnifiedSwapFooter = renderUnifiedSwapFooter;
+if (typeof cancelTeamSwap !== 'undefined' && typeof window !== 'undefined') window.cancelTeamSwap = cancelTeamSwap;
+if (typeof renderFossilTabContent !== 'undefined' && typeof window !== 'undefined') window.renderFossilTabContent = renderFossilTabContent;
+if (typeof sendFossilToHatchery !== 'undefined' && typeof window !== 'undefined') window.sendFossilToHatchery = sendFossilToHatchery;
+if (typeof selectUnifiedCard !== 'undefined' && typeof window !== 'undefined') window.selectUnifiedCard = selectUnifiedCard;
+

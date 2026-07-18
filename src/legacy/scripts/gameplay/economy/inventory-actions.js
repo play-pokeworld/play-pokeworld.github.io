@@ -9,6 +9,7 @@ function _getActiveContent(){
 function sellTreasure(key, count){
  const itm = ITEMS[key];
  if(!itm || !G.inventory[key]) return;
+ if(itm.type === 'fossil'){ notify(t('fossil_not_sellable'), 'var(--red)'); return; }
  const actual = Math.min(count, G.inventory[key]);
  G.inventory[key] -= actual;
  if(G.inventory[key] <= 0) delete G.inventory[key];

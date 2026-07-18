@@ -11,10 +11,6 @@ function openUnifiedSelectorModal(actionType){
   const sm = document.getElementById('settings-modal');
   if(sm && actionType !== 'save_icon') sm.classList.remove('open');
 
-  if(typeof battle !== 'undefined' && battle && battle.active && actionType === 'training'){
-    notify("Combat en cours !", "var(--red)");
-    return;
-  }
   _usmAction = actionType;
   _usmSubTab = 'box';
   const modal = document.getElementById('unified-selector-modal');
@@ -323,12 +319,18 @@ function selectUnifiedCard(loc, idStr){
     }
   } else if(_usmAction === 'training'){
     if(!p.uid) p.uid = 'p_' + Math.random().toString(36).substr(2, 9);
-    G.selectedTraineeUid = p.uid;
-    G.selectedTraineeLoc = loc;
-    G.selectedTraineeId = idStr;
+    const slotIndex = (typeof G.pendingTrainingSlotIndex === 'number') ? G.pendingTrainingSlotIndex : 0;
+    if(typeof setTrainingSlotPokemon === 'function'){
+      setTrainingSlotPokemon(slotIndex, loc, idStr, p);
+    } else {
+      G.selectedTraineeUid = p.uid;
+      G.selectedTraineeLoc = loc;
+      G.selectedTraineeId = idStr;
+    }
+    G.pendingTrainingSlotIndex = null;
     closeUnifiedSelectorModal();
     renderTrainingWindow();
-    notify(tr('selected_for_training', {name:p.name}), 'var(--green)');
+    notify(tr('selected_for_training_slot', {name:p.name, slot:slotIndex+1}), 'var(--green)');
   } else if(_usmAction === 'hatchery'){
     if(loc === 'team' && G.team.length <= 1){
       notify(t('cannot_deposit_only_pokemon'), 'var(--red)');

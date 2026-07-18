@@ -161,34 +161,48 @@ async function onEnemyFaint(){
 
  
  const questLoc = battle.questDefeatLoc || G.location;
+ const isQuestRewardBattle = battle.questRewardQuestId != null;
  const xp=gainXP(e);
  addBattleLog(tr('team_gains_xp', {xp:xp}));
 
  
+ if(!isQuestRewardBattle){
  G.totalWildWins = (G.totalWildWins||0) + 1;
  if(!G.wildWinsByLoc) G.wildWinsByLoc = {};
  G.wildWinsByLoc[questLoc] = (G.wildWinsByLoc[questLoc]||0) + 1;
+ }
 
  
  if(!battle.noAutoCatch) attemptAutoCatch(e);
- EventBus.emit(EVENTS.WILD_DEFEATED, { loc: questLoc });
- try{ if(document.getElementById('map-svg')) renderMap(); }catch(_){}
-
- 
- const drops=ROUTE_DROPS[questLoc];
- if(drops&&drops.length&&chance(4)){
- const drop=drops[rand(0,drops.length-1)];
- addToInventory(drop,1);
- if(!battle.sessionItems) battle.sessionItems={};
- battle.sessionItems[drop]=(battle.sessionItems[drop]||0)+1;
- try{ if (typeof renderBattleLoot === 'function') renderBattleLoot(); }catch(_){}
- addBattleLog(tr('item_found_log', {icon:itemIcon(drop,16), item:getItemName(drop)}));
+ if(isQuestRewardBattle && typeof completeQuestRewardBattle === 'function'){
+  const completedQuestId = battle.questRewardQuestId;
+  battle.questRewardQuestId = null;
+  battle.questRewardCat = null;
+  battle.questRewardRegion = null;
+  battle.questRewardDefId = null;
+  completeQuestRewardBattle(completedQuestId);
+ }
+ if(!isQuestRewardBattle){
+  EventBus.emit(EVENTS.WILD_DEFEATED, { loc: questLoc });
+  try{ if(document.getElementById('map-svg')) renderMap(); }catch(_){}
  }
 
- const mon=rand(e.level*5, e.level*10);
- G.money+=mon;
+ 
+ const drops=isQuestRewardBattle ? null : ROUTE_DROPS[questLoc];
+ if(drops&&drops.length&&chance(4)){
+ const drop=drops[rand(0,drops.length-1)];
+ const reward = (typeof grantRewardItem === 'function') ? grantRewardItem(drop,1) : (addToInventory(drop,1), {added:1,money:0});
+ if(reward.added){
+ if(!battle.sessionItems) battle.sessionItems={};
+ battle.sessionItems[drop]=(battle.sessionItems[drop]||0)+reward.added;
+ try{ if (typeof renderBattleLoot === 'function') renderBattleLoot(); }catch(_){}
+ addBattleLog(tr('item_found_log', {icon:itemIcon(drop,16), item:getItemName(drop)}));
+ } else if(reward.money){
+ addBattleLog(tr('duplicate_item_money_log', {item:getItemName(drop), money:reward.money.toLocaleString()}));
+ }
+ }
+
  updateHeader();
- addBattleLog(tr('money_won_log', {money:mon}));
 
  await wait(700);
 

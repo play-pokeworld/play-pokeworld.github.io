@@ -10,6 +10,10 @@ function endBattle(){
  battle.noAutoCatch=false;
  battle.questDefeatLoc=null;
  battle.isQuestDefeatBattle=false;
+ battle.questRewardQuestId=null;
+ battle.questRewardCat=null;
+ battle.questRewardRegion=null;
+ battle.questRewardDefId=null;
  battle.enemyPoke=null;
  battle.champTeam=null;
  const idleScreen = document.getElementById('battle-idle-screen');
@@ -78,3 +82,12 @@ function resumeBattleActions(){
 
 
 function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+
+
+// --- Migrated to ES module, globals exposed ---
+if (typeof endBattle !== 'undefined' && typeof window !== 'undefined') window.endBattle = endBattle;
+if (typeof restartLastBattle !== 'undefined' && typeof window !== 'undefined') window.restartLastBattle = restartLastBattle;
+if (typeof leaveBattle !== 'undefined' && typeof window !== 'undefined') window.leaveBattle = leaveBattle;
+if (typeof resumeBattleActions !== 'undefined' && typeof window !== 'undefined') window.resumeBattleActions = resumeBattleActions;
+if (typeof wait !== 'undefined' && typeof window !== 'undefined') window.wait = wait;
+

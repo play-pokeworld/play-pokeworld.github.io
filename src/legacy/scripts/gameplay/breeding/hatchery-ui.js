@@ -4,14 +4,14 @@ function openHatcheryUpgradeMenu(){
  const modal=document.getElementById('poke-modal');
  if(!inner||!modal) return;
  const maxSlots = clamp(G.hatcheryMaxSlots || 1, 1, 4);
- const upgradeCost = maxSlots * 15000;
+ const upgradeCost = (typeof getHatcherySlotUpgradeCost === 'function') ? getHatcherySlotUpgradeCost() : (maxSlots * 15000);
  if(!G.automation) G.automation = {autoHatch:false, autoSeedHatchery:false, autoExplore:false};
  inner.innerHTML = `<div class="modal-title"><div>⚙️ Pension & améliorations</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
  <div class="dict-info-block"><b>Automatisations</b><br>
- <label class="training-upgrade-line ${G.automation.autoHatch?'is-on':'is-off'}"><span>🥚 Éclosion automatique</span><input type="checkbox"${G.automation.autoHatch?'checked':''} data-change-call="toggleAutomation" data-change-args="'autoHatch', this.checked"></label>
- <label class="training-upgrade-line ${G.automation.autoSeedHatchery?'is-on':'is-off'}"><span>📦 Remplir les slots depuis la boîte</span><input type="checkbox"${G.automation.autoSeedHatchery?'checked':''} data-change-call="toggleAutomation" data-change-args="'autoSeedHatchery', this.checked"></label>
+ <label class="training-upgrade-line ${G.automation.autoHatch?'is-on':'is-off'}"><span>🥚 Éclosion automatique ${typeof getAutomationUpgradeLabelSuffix==='function'?getAutomationUpgradeLabelSuffix('autoHatch'):''}</span><input type="checkbox"${G.automation.autoHatch?'checked':''} data-change-call="toggleAutomation" data-change-args="'autoHatch', this.checked"></label>
+ <label class="training-upgrade-line ${G.automation.autoSeedHatchery?'is-on':'is-off'}"><span>📦 Remplir les slots depuis la boîte ${typeof getAutomationUpgradeLabelSuffix==='function'?getAutomationUpgradeLabelSuffix('autoSeedHatchery'):''}</span><input type="checkbox"${G.automation.autoSeedHatchery?'checked':''} data-change-call="toggleAutomation" data-change-args="'autoSeedHatchery', this.checked"></label>
  </div>
- <div class="dict-info-block"><b>Slots de Pension</b><br>${maxSlots<4?`<button class="hbtn" data-action="legacy-call" data-call="upgradeHatcherySlots" data-call-args="${upgradeCost}">⬆ Ajouter un slot (${upgradeCost.toLocaleString()}₽)</button>`:'Tous les slots sont débloqués.'}</div>
+ <div class="dict-info-block"><b>Slots de Pension</b><br>${maxSlots<4&&upgradeCost?`<button class="hbtn" data-action="legacy-call" data-call="upgradeHatcherySlots" data-call-args="${upgradeCost}">⬆ Ajouter un slot (${upgradeCost.toLocaleString()}₽)</button>`:t('hatchery_slots_max')}</div>
  <div class="dict-info-block"><b>À venir :</b><br>• soigneurs/personnel de pension<br>• bonus d’éclosion et d’IV<br>• automatisations avancées</div>`;
  modal.classList.add('open');
 }
@@ -52,7 +52,7 @@ function renderHatcheryWindow(){
  const req = slot.stepsReq || 10;
  const done = steps >= req;
  const pct = clamp(Math.floor((steps / req) * 100), 0, 100);
- html += `<div data-style="display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.25);padding:8px;border-radius:8px;border:1px solid ${done?'var(--green)':(isFossil?'#6b5b3e':'#5a504a')};">
+ html += `<div>
  <div class="extracted-template-style-143" data-action="legacy-call" data-call="openUnifiedSelectorModal" data-call-args="'box_view'">
  ${isFossil ? itemIcon(fossilDisplayKey,40) : spriteImg(displayId, displayEmoji, {size:60, shiny:displayShiny})}
  </div>
@@ -60,7 +60,7 @@ function renderHatcheryWindow(){
  <div class="extracted-template-style-145">${iconEmoji} ${displayName} <span class="extracted-template-style-007">Slot #${i+1}</span></div>
  <div class="extracted-template-style-146">${done ? t('ready') : tr('incubating', {steps:steps, required:req})}</div>
  <div class="extracted-template-style-147">
- <div data-style="width:${pct}%;background:${done?'var(--green)':(isFossil?'var(--light2)':'var(--blue)')};height:100%;transition:0.3s;"></div>
+ <div></div>
  </div>
  </div>
  ${done ? `<button class="hbtn extracted-bridge-style-030" data-action="legacy-call" data-call="hatchEgg" data-call-args="${i}"> ${t('hatch')}</button>` : ''}
@@ -127,3 +127,11 @@ function renderFossilLabCompact(el){
  
  if(typeof renderFossilLab === 'function') renderFossilLab(el);
 }
+
+
+// --- Migrated to ES module, globals exposed ---
+if (typeof openHatcheryUpgradeMenu !== 'undefined' && typeof window !== 'undefined') window.openHatcheryUpgradeMenu = openHatcheryUpgradeMenu;
+if (typeof renderHatcheryWindow !== 'undefined' && typeof window !== 'undefined') window.renderHatcheryWindow = renderHatcheryWindow;
+if (typeof renderFossilLab !== 'undefined' && typeof window !== 'undefined') window.renderFossilLab = renderFossilLab;
+if (typeof renderFossilLabCompact !== 'undefined' && typeof window !== 'undefined') window.renderFossilLabCompact = renderFossilLabCompact;
+

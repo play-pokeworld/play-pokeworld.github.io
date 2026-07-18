@@ -81,7 +81,6 @@ const SHOPS = {
  },
 "indigo": {
 "items": [
-"chroma_charm",
 "rarecandy",
 "choice_band",
 "choice_specs",
@@ -156,9 +155,6 @@ const SHOPS = {
 "silk_scarf",
 "silver_wing",
 "rainbow_wing",
-"choice_band",
-"choice_specs",
-"life_orb",
 "leftovers"
  ]
  },

@@ -13,6 +13,7 @@ function getRoamingLegendaryForRoute(locId){
  [kantoOutdoor[(kIdx) % kantoOutdoor.length]]: 144,
  [kantoOutdoor[(kIdx+7) % kantoOutdoor.length]]: 145,
  [kantoOutdoor[(kIdx+13) % kantoOutdoor.length]]: 146,
+ [kantoOutdoor[(kIdx+19) % kantoOutdoor.length]]: 151,
  [johtoOutdoor[(jIdx) % johtoOutdoor.length]]: 243,
  [johtoOutdoor[(jIdx+7) % johtoOutdoor.length]]: 244,
  [johtoOutdoor[(jIdx+13) % johtoOutdoor.length]]: 245

@@ -1740,3 +1740,121 @@ body.save-menu-active { overflow: hidden; }
   font-size: 15px;
   text-shadow: 0 0 8px rgba(255,255,255,0.48);
 }
+
+.repeatable-upgrade-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(236,222,183,0.22);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.18);
+  color: var(--light2);
+  margin-bottom: 10px;
+}
+.repeatable-upgrade-head span {
+  color: var(--light1);
+  font-size: 12px;
+}
+.training-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.training-slot-card,
+.training-locked-slot {
+  border: 1px solid var(--dark3);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.22);
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+.training-slot-card.is-active {
+  border-color: var(--green);
+  box-shadow: 0 0 16px rgba(96,190,88,0.18), inset 0 0 0 1px rgba(96,190,88,0.18);
+}
+.training-slot-card.is-empty,
+.training-locked-slot {
+  border-style: dashed;
+  align-content: center;
+  min-height: 190px;
+  text-align: center;
+}
+.training-slot-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  color: var(--light2);
+}
+.training-slot-head span {
+  color: var(--light1);
+  font-size: 12px;
+  font-weight: 800;
+}
+.training-slot-pokemon {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+.training-slot-sprite {
+  width: 62px;
+  height: 62px;
+  border-radius: 12px;
+  background: radial-gradient(circle at 35% 25%, rgba(236,222,183,0.26), rgba(0,0,0,0.18));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.training-slot-pokemon small,
+.training-slot-empty,
+.training-slot-result,
+.training-slot-timer,
+.training-locked-slot {
+  color: var(--light1);
+  font-size: 12px;
+  line-height: 1.35;
+}
+.training-slot-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.training-slot-progress {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--dark1);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.training-slot-progress div {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--green);
+  transition: width 0.3s;
+}
+.training-slot-progress .pct-0 { width: 0%; }
+.training-slot-progress .pct-5 { width: 5%; }
+.training-slot-progress .pct-10 { width: 10%; }
+.training-slot-progress .pct-15 { width: 15%; }
+.training-slot-progress .pct-20 { width: 20%; }
+.training-slot-progress .pct-25 { width: 25%; }
+.training-slot-progress .pct-30 { width: 30%; }
+.training-slot-progress .pct-35 { width: 35%; }
+.training-slot-progress .pct-40 { width: 40%; }
+.training-slot-progress .pct-45 { width: 45%; }
+.training-slot-progress .pct-50 { width: 50%; }
+.training-slot-progress .pct-55 { width: 55%; }
+.training-slot-progress .pct-60 { width: 60%; }
+.training-slot-progress .pct-65 { width: 65%; }
+.training-slot-progress .pct-70 { width: 70%; }
+.training-slot-progress .pct-75 { width: 75%; }
+.training-slot-progress .pct-80 { width: 80%; }
+.training-slot-progress .pct-85 { width: 85%; }
+.training-slot-progress .pct-90 { width: 90%; }
+.training-slot-progress .pct-95 { width: 95%; }
+.training-slot-progress .pct-100 { width: 100%; }

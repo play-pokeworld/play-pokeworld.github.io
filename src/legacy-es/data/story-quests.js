@@ -5,9 +5,9 @@ var STORY_QUESTS = [
   "type": "talk",
   "loc": "pallet",
   "target": 1,
-  "rewardMoney": 300,
+  "rewardMoney": 800,
   "rewardItems": {
-   "berry_oran": 5
+   "berry_oran": 1
   }
  },
  {
@@ -15,10 +15,10 @@ var STORY_QUESTS = [
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "route1",
-  "target": 3,
-  "rewardMoney": 500,
+  "target": 10,
+  "rewardMoney": 1000,
   "rewardItems": {
-   "berry_oran": 5
+   "berry_oran": 2
   }
  },
  {
@@ -26,10 +26,10 @@ var STORY_QUESTS = [
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "viridianforest",
-  "target": 5,
-  "rewardMoney": 600,
+  "target": 15,
+  "rewardMoney": 1500,
   "rewardItems": {
-   "berry_sitrus": 5
+   "berry_sitrus": 1
   }
  },
  {
@@ -37,10 +37,10 @@ var STORY_QUESTS = [
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "route22",
-  "target": 6,
-  "rewardMoney": 700,
+  "target": 20,
+  "rewardMoney": 2000,
   "rewardItems": {
-   "berry_ceriz": 5
+   "berry_ceriz": 1
   }
  },
  {
@@ -49,7 +49,7 @@ var STORY_QUESTS = [
   "type": "badge",
   "targetBadge": "brock",
   "target": 1,
-  "rewardMoney": 1000,
+  "rewardMoney": 2500,
   "rewardItems": {
    "fossil": 1
   }
@@ -59,8 +59,8 @@ var STORY_QUESTS = [
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "route3",
-  "target": 6,
-  "rewardMoney": 1500,
+  "target": 25,
+  "rewardMoney": 2500,
   "rewardItems": {
    "moonstone": 1
   }
@@ -70,10 +70,10 @@ var STORY_QUESTS = [
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "route4",
-  "target": 6,
-  "rewardMoney": 1200,
+  "target": 20,
+  "rewardMoney": 2200,
   "rewardItems": {
-   "berry_prine": 5
+   "berry_prine": 1
   }
  },
  {
@@ -81,8 +81,8 @@ var STORY_QUESTS = [
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "mtmoon",
-  "target": 6,
-  "rewardMoney": 1500,
+  "target": 30,
+  "rewardMoney": 4000,
   "rewardItems": {
    "moonstone": 1
   }
@@ -93,7 +93,7 @@ var STORY_QUESTS = [
   "type": "badge",
   "targetBadge": "misty",
   "target": 1,
-  "rewardMoney": 2500,
+  "rewardMoney": 4500,
   "rewardItems": {
    "nugget": 1
   }
@@ -103,10 +103,10 @@ var STORY_QUESTS = [
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "route5",
-  "target": 6,
-  "rewardMoney": 1500,
+  "target": 25,
+  "rewardMoney": 3000,
   "rewardItems": {
-   "berry_sitrus": 5
+   "berry_sitrus": 1
   }
  },
  {
@@ -114,10 +114,10 @@ var STORY_QUESTS = [
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "route6",
-  "target": 6,
-  "rewardMoney": 1500,
+  "target": 25,
+  "rewardMoney": 3000,
   "rewardItems": {
-   "berry_oran": 5
+   "berry_oran": 1
   }
  },
  {
@@ -126,7 +126,7 @@ var STORY_QUESTS = [
   "type": "badge",
   "targetBadge": "surge",
   "target": 1,
-  "rewardMoney": 3500,
+  "rewardMoney": 6500,
   "rewardItems": {
    "thunderstone": 1
   }
@@ -136,10 +136,10 @@ var STORY_QUESTS = [
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "diglettscave",
-  "target": 5,
-  "rewardMoney": 3000,
+  "target": 35,
+  "rewardMoney": 6000,
   "rewardItems": {
-   "berry_sitrus": 5
+   "soft_sand": 1
   }
  },
  {
@@ -147,10 +147,10 @@ var STORY_QUESTS = [
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "route10",
-  "target": 6,
-  "rewardMoney": 2000,
+  "target": 40,
+  "rewardMoney": 6000,
   "rewardItems": {
-   "berry_prine": 5
+   "berry_prine": 1
   }
  },
  {
@@ -158,10 +158,10 @@ var STORY_QUESTS = [
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "rocktunnel",
-  "target": 6,
-  "rewardMoney": 2000,
+  "target": 50,
+  "rewardMoney": 7500,
   "rewardItems": {
-   "berry_ceriz": 5
+   "hard_stone": 1
   }
  },
  {
@@ -169,10 +169,10 @@ var STORY_QUESTS = [
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "pokemontower",
-  "target": 5,
-  "rewardMoney": 4500,
+  "target": 45,
+  "rewardMoney": 8500,
   "rewardItems": {
-   "rarecandy": 3,
+   "rarecandy": 1,
    "pokeflute": 1
   }
  },
@@ -184,15 +184,15 @@ var STORY_QUESTS = [
   "target": 1,
   "rewardPoke": 143,
   "rewardLevel": 30,
-  "rewardMoney": 3000
+  "rewardMoney": 5000
  },
  {
   "id": 48,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "route7",
-  "target": 6,
-  "rewardMoney": 2500,
+  "target": 35,
+  "rewardMoney": 5500,
   "rewardItems": {
    "leafstone": 1
   }
@@ -203,10 +203,9 @@ var STORY_QUESTS = [
   "type": "badge",
   "targetBadge": "erika",
   "target": 1,
-  "rewardMoney": 5000,
+  "rewardMoney": 9000,
   "rewardItems": {
-   "leafstone": 1,
-   "life_orb": 1
+   "leafstone": 1
   }
  },
  {
@@ -215,9 +214,9 @@ var STORY_QUESTS = [
   "type": "badge",
   "targetBadge": "koga",
   "target": 1,
-  "rewardMoney": 6000,
+  "rewardMoney": 11000,
   "rewardItems": {
-   "leftovers": 1
+   "poison_barb": 1
   }
  },
  {
@@ -226,19 +225,19 @@ var STORY_QUESTS = [
   "type": "badge",
   "targetBadge": "sabrina",
   "target": 1,
-  "rewardMoney": 7000,
+  "rewardMoney": 13000,
   "rewardItems": {
-   "assault_vest": 1
+   "twisted_spoon": 1
   }
  },
  {
   "id": 49,
   "region": "kanto",
   "type": "mine_sell",
-  "target": 3,
-  "rewardMoney": 4000,
+  "target": 5,
+  "rewardMoney": 7000,
   "rewardItems": {
-   "stardust": 2
+   "stardust": 1
   }
  },
  {
@@ -246,10 +245,10 @@ var STORY_QUESTS = [
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "route20",
-  "target": 8,
-  "rewardMoney": 4000,
+  "target": 60,
+  "rewardMoney": 9000,
   "rewardItems": {
-   "berry_oran": 10
+   "berry_oran": 1
   }
  },
  {
@@ -258,7 +257,7 @@ var STORY_QUESTS = [
   "type": "badge",
   "targetBadge": "blaine",
   "target": 1,
-  "rewardMoney": 8000,
+  "rewardMoney": 16000,
   "rewardItems": {
    "firestone": 1,
    "waterstone": 1
@@ -270,10 +269,9 @@ var STORY_QUESTS = [
   "type": "badge",
   "targetBadge": "giovanni",
   "target": 1,
-  "rewardMoney": 10000,
+  "rewardMoney": 22000,
   "rewardItems": {
-   "choice_scarf": 1,
-   "rarecandy": 5
+   "rarecandy": 1
   }
  },
  {
@@ -281,10 +279,10 @@ var STORY_QUESTS = [
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "route23",
-  "target": 10,
-  "rewardMoney": 5000,
+  "target": 80,
+  "rewardMoney": 14000,
   "rewardItems": {
-   "choice_scarf": 1
+   "rarecandy": 1
   }
  },
  {
@@ -293,10 +291,9 @@ var STORY_QUESTS = [
   "type": "badge",
   "targetBadge": "elite4",
   "target": 1,
-  "rewardMoney": 25000,
+  "rewardMoney": 40000,
   "rewardItems": {
-   "choice_band": 1,
-   "choice_specs": 1
+   "rarecandy": 1
   }
  },
  {
@@ -304,35 +301,40 @@ var STORY_QUESTS = [
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "seafoamislands",
-  "target": 10,
-  "rewardPoke": 144
+  "target": 150,
+  "rewardPoke": 144,
+  "rewardLevel": 50,
+  "rewardMoney": 15000
  },
  {
   "id": 15,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "powerplant",
-  "target": 10,
-  "rewardPoke": 145
+  "target": 150,
+  "rewardPoke": 145,
+  "rewardLevel": 50,
+  "rewardMoney": 15000
  },
  {
   "id": 16,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "victoryroad",
-  "target": 10,
-  "rewardPoke": 146
+  "target": 150,
+  "rewardPoke": 146,
+  "rewardLevel": 50,
+  "rewardMoney": 15000
  },
  {
   "id": 17,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "pokemonmansion",
-  "target": 10,
-  "rewardMoney": 15000,
+  "target": 90,
+  "rewardMoney": 20000,
   "rewardItems": {
-   "swift_charm": 1,
-   "rarecandy": 10
+   "rarecandy": 1
   }
  },
  {
@@ -340,17 +342,19 @@ var STORY_QUESTS = [
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "ceruleancave",
-  "target": 15,
+  "target": 150,
   "rewardPoke": 150,
-  "rewardMoney": 25000
+  "rewardLevel": 70,
+  "rewardMoney": 30000
  },
  {
   "id": 19,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "safarizone",
-  "target": 15,
+  "target": 150,
   "rewardPoke": 151,
+  "rewardLevel": 50,
   "rewardMoney": 50000,
   "rewardItems": {
    "chroma_charm": 1
@@ -362,9 +366,9 @@ var STORY_QUESTS = [
   "type": "talk",
   "loc": "newbark",
   "target": 1,
-  "rewardMoney": 300,
+  "rewardMoney": 800,
   "rewardItems": {
-   "berry_oran": 5
+   "berry_oran": 1
   }
  },
  {
@@ -372,10 +376,10 @@ var STORY_QUESTS = [
   "region": "johto",
   "type": "defeat_wild",
   "loc": "jroute29",
-  "target": 5,
-  "rewardMoney": 500,
+  "target": 10,
+  "rewardMoney": 1000,
   "rewardItems": {
-   "berry_oran": 5
+   "berry_oran": 2
   }
  },
  {
@@ -384,9 +388,9 @@ var STORY_QUESTS = [
   "type": "badge",
   "targetBadge": "falkner",
   "target": 1,
-  "rewardMoney": 1000,
+  "rewardMoney": 3000,
   "rewardItems": {
-   "berry_sitrus": 5
+   "berry_sitrus": 1
   }
  },
  {
@@ -395,7 +399,7 @@ var STORY_QUESTS = [
   "type": "badge",
   "targetBadge": "bugsy",
   "target": 1,
-  "rewardMoney": 1500,
+  "rewardMoney": 5000,
   "rewardItems": {
    "muscle_band": 1
   }
@@ -406,7 +410,7 @@ var STORY_QUESTS = [
   "type": "badge",
   "targetBadge": "whitney",
   "target": 1,
-  "rewardMoney": 2000,
+  "rewardMoney": 7000,
   "rewardItems": {
    "soft_sand": 1
   }
@@ -417,9 +421,9 @@ var STORY_QUESTS = [
   "type": "badge",
   "targetBadge": "morty",
   "target": 1,
-  "rewardMoney": 2500,
+  "rewardMoney": 9000,
   "rewardItems": {
-   "choice_scarf": 1
+   "spell_tag": 1
   }
  },
  {
@@ -428,7 +432,7 @@ var STORY_QUESTS = [
   "type": "badge",
   "targetBadge": "chuck",
   "target": 1,
-  "rewardMoney": 3000,
+  "rewardMoney": 11000,
   "rewardItems": {
    "power_gem": 1
   }
@@ -439,9 +443,9 @@ var STORY_QUESTS = [
   "type": "badge",
   "targetBadge": "jasmine",
   "target": 1,
-  "rewardMoney": 3500,
+  "rewardMoney": 13000,
   "rewardItems": {
-   "leftovers": 1
+   "metal_coat": 1
   }
  },
  {
@@ -450,9 +454,9 @@ var STORY_QUESTS = [
   "type": "badge",
   "targetBadge": "pryce",
   "target": 1,
-  "rewardMoney": 4000,
+  "rewardMoney": 15000,
   "rewardItems": {
-   "choice_specs": 1
+   "never_melt_ice": 1
   }
  },
  {
@@ -461,10 +465,10 @@ var STORY_QUESTS = [
   "type": "badge",
   "targetBadge": "clair",
   "target": 1,
-  "rewardMoney": 8000,
+  "rewardMoney": 20000,
   "rewardItems": {
-   "choice_band": 1,
-   "rarecandy": 5
+   "dragon_fang": 1,
+   "rarecandy": 1
   }
  },
  {
@@ -473,11 +477,9 @@ var STORY_QUESTS = [
   "type": "badge",
   "targetBadge": "johto_elite4",
   "target": 1,
-  "rewardMoney": 18000,
+  "rewardMoney": 35000,
   "rewardItems": {
-   "rarecandy": 10,
-   "choice_band": 1,
-   "choice_specs": 1
+   "rarecandy": 1
   }
  },
  {
@@ -485,10 +487,10 @@ var STORY_QUESTS = [
   "region": "johto",
   "type": "defeat_wild",
   "loc": "burnedtower",
-  "target": 8,
-  "rewardMoney": 3000,
+  "target": 60,
+  "rewardMoney": 12000,
   "rewardItems": {
-   "rarecandy": 5
+   "rarecandy": 1
   }
  },
  {
@@ -496,54 +498,60 @@ var STORY_QUESTS = [
   "region": "johto",
   "type": "defeat_wild",
   "loc": "jroute44",
-  "target": 10,
-  "rewardMoney": 5000,
-  "rewardPoke": 243
+  "target": 150,
+  "rewardMoney": 25000,
+  "rewardPoke": 243,
+  "rewardLevel": 50
  },
  {
   "id": 62,
   "region": "johto",
   "type": "defeat_wild",
   "loc": "jroute28",
-  "target": 10,
-  "rewardMoney": 5000,
-  "rewardPoke": 244
+  "target": 150,
+  "rewardMoney": 25000,
+  "rewardPoke": 244,
+  "rewardLevel": 50
  },
  {
   "id": 63,
   "region": "johto",
   "type": "defeat_wild",
   "loc": "jroute42",
-  "target": 10,
-  "rewardMoney": 5000,
-  "rewardPoke": 245
+  "target": 150,
+  "rewardMoney": 25000,
+  "rewardPoke": 245,
+  "rewardLevel": 50
  },
  {
   "id": 64,
   "region": "johto",
   "type": "defeat_wild",
   "loc": "whirlislands",
-  "target": 10,
-  "rewardMoney": 8000,
-  "rewardPoke": 249
+  "target": 150,
+  "rewardMoney": 30000,
+  "rewardPoke": 249,
+  "rewardLevel": 70
  },
  {
   "id": 65,
   "region": "johto",
   "type": "defeat_wild",
   "loc": "tintower",
-  "target": 10,
-  "rewardMoney": 8000,
-  "rewardPoke": 250
+  "target": 150,
+  "rewardMoney": 30000,
+  "rewardPoke": 250,
+  "rewardLevel": 70
  },
  {
   "id": 66,
   "region": "johto",
   "type": "defeat_wild",
   "loc": "ilexforest",
-  "target": 12,
-  "rewardMoney": 10000,
-  "rewardPoke": 251
+  "target": 150,
+  "rewardMoney": 35000,
+  "rewardPoke": 251,
+  "rewardLevel": 50
  }
 ];
 

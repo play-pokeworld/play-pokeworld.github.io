@@ -368,6 +368,38 @@ function getLeagueRegionForChampion(champId){
 }
 function isLeagueChampionId(champId){ return REGION_ORDER.some(region => getLeagueChampionIdForRegion(region) === champId); }
 
+function getDuplicateItemPayout(key, qty){
+ const itm = ITEMS[key] || ITEMS[normalizeItemKey ? normalizeItemKey(key) : key];
+ const unit = Math.max(0, Math.floor(((itm && (itm.price || itm.value)) || 0) * 0.25));
+ return unit * Math.max(1, qty || 1);
+}
+function grantRewardItem(key, qty){
+ qty = Math.max(1, Number(qty || 1));
+ if(!ITEMS[key]) return {added:0, money:0};
+ const itm = ITEMS[key];
+ if(itm.type === 'treasure' || itm.type === 'fossil'){
+  addToInventory(key, qty);
+  return {added:qty, money:0};
+ }
+ if((G.inventory && G.inventory[key] > 0)){
+  const money = getDuplicateItemPayout(key, qty);
+  if(money > 0) G.money = (G.money || 0) + money;
+  return {added:0, money};
+ }
+ addToInventory(key, qty);
+ return {added:qty, money:0};
+}
+function grantRewardItems(items){
+ const result = {added:{}, money:0};
+ if(!items) return result;
+ for(const key in items){
+  const r = grantRewardItem(key, items[key]);
+  if(r.added) result.added[key] = (result.added[key] || 0) + r.added;
+  result.money += r.money || 0;
+ }
+ return result;
+}
+
 
 const BOX_FILTER_DEFAULTS = {region:'all', type:'all', shiny:'all', evo:'all'};
 const FILTER_LEVEL_EVO_MAP = {1:2,2:3,4:5,5:6,7:8,8:9,10:11,11:12,13:14,14:15,16:17,17:18,19:20,21:22,23:24,27:28,29:30,32:33,41:42,43:44,46:47,48:49,50:51,52:53,54:55,56:57,60:61,63:64,64:65,66:67,67:68,69:70,72:73,74:75,75:76,77:78,79:80,81:82,84:85,86:87,88:89,92:93,93:94,96:97,98:99,100:101,104:105,109:110,111:112,116:117,118:119,129:130,138:139,140:141,147:148,148:149,113:242,152:153,153:154,155:156,156:157,158:159,159:160,161:162,163:164,165:166,167:168,170:171,172:25,173:35,174:39,175:176,177:178,179:180,180:181,183:184,187:188,188:189,194:195,204:205,209:210,216:217,218:219,220:221,223:224,228:229,231:232,236:237,238:124,239:125,240:126,246:247,247:248};

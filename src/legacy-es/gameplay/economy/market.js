@@ -1,3 +1,4 @@
+const MARKET_PRICE_OVERRIDES = {1:100000,4:100000,7:100000,133:180000,137:250000,106:140000,107:140000,122:140000,124:160000,131:220000,152:150000,155:150000,158:150000,172:120000,173:120000,174:120000,175:160000,236:180000,196:250000,197:250000,199:220000,213:180000,238:160000,239:160000,240:160000};
 const MARKET_STOCK = {
  kanto: [1,4,7,133,137,106,107,122,124,131],
  johto: [152,155,158,172,173,174,175,236,196,197,199,213,238,239,240]
@@ -32,27 +33,17 @@ function getMarketPokemon(){
 }
 
 function getPokemonPrice(id){
- if(id===151) return 100000;
- if(id===150) return 75000;
- if([144,145,146].includes(id)) return 50000;
+ id = Number(id);
+ if(MARKET_PRICE_OVERRIDES[id]) return MARKET_PRICE_OVERRIDES[id];
  const d=PD[id];
  if(!d) return 999999;
- const bst=d[3]+d[4]+d[5]+d[6];
- if([1,4,7,152,155,158].includes(id)) return 5000;
- if([2,5,8].includes(id)) return 8000;
- if([3,6,9].includes(id)) return 12000;
- if([138,140].includes(id)) return 8000;
- if([139,141].includes(id)) return 12000;
- if([142].includes(id)) return 15000;
- if([147].includes(id)) return 10000;
- if([148].includes(id)) return 15000;
- if([149].includes(id)) return 25000;
- let mult=12;
- if(bst>=350) mult=22;
- else if(bst>=300) mult=18;
- else if(bst>=250) mult=15;
- else if(bst>=200) mult=13;
- return Math.max(1500, Math.floor(bst*mult));
+ const bst=d[3]+d[4]+d[5]+d[6]+(d[7]||0)+(d[8]||0);
+ let mult=240;
+ if(bst>=520) mult=520;
+ else if(bst>=450) mult=420;
+ else if(bst>=380) mult=330;
+ else if(bst>=300) mult=280;
+ return Math.max(80000, Math.floor(bst*mult));
 }
 
 function renderMarket(el){
@@ -105,19 +96,24 @@ function renderMarket(el){
 }
 
 function buyPokemon(id){
+ id = Number(id);
  const price=getPokemonPrice(id);
  if(G.money<price){notify(t("n.pas_assez_dargent"),'var(--red)');return;}
- if(speciesOwned(id)){notify(t("legacy_message_n_vous_poss_dez_d_j_cette_esp_ce"),'var(--red)');return;}
  G.money-=price;
  updateHeader();
- const isShiny = isSpeciesShiny(id);
+ const isShiny = (typeof rollShiny === 'function') ? rollShiny() : false;
  const p=createPoke(id,1,isShiny);
  if(!p){notify(t("legacy_message_n_erreur_lors_de_la_cr_ation_du_pok_mon"),'var(--red)');return;}
- if(G.team.length<6){
+ if(isShiny){ p.shinyUnlocked=true; p.shinyActive=true; p.shiny=true; if(typeof unlockShinyForSpecies==='function') unlockShinyForSpecies(id); }
+ if(typeof unlockTalentForSpecies === 'function' && p.talent) unlockTalentForSpecies(id, p.talent);
+ if(G.team.length<6 && !speciesOwned(id)){
  G.team.push(p);
+ if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
  notify(tr('joined_team_price', {name:p.name, price:price.toLocaleString()}),'var(--green)');
  } else {
- G.collection[String(id)]=p;
+ let boxId = 'market_' + id + '_' + Date.now();
+ while(G.collection[boxId]) boxId = 'market_' + id + '_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+ G.collection[boxId]=p;
  notify(tr('sent_to_box_price', {name:p.name, price:price.toLocaleString()}),'var(--green)');
  }
  G.pokedex[id]={...(G.pokedex[id]||{}),seen:true,caught:true};

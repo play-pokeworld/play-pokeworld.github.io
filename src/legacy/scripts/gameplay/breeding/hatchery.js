@@ -21,7 +21,15 @@ function getFossilReviveId(key){
  return FOSSIL_REVIVE_MAP[key] || (ITEMS[key] && ITEMS[key].type === 'fossil' ? ITEMS[key].revive : null);
 }
 
+const HATCHERY_SLOT_UPGRADE_COSTS = [100000, 300000, 750000];
+function getHatcherySlotUpgradeCost(){
+ const maxSlots = clamp(G.hatcheryMaxSlots || 1, 1, 4);
+ return HATCHERY_SLOT_UPGRADE_COSTS[maxSlots - 1] || null;
+}
 function upgradeHatcherySlots(cost){
+ const expected = getHatcherySlotUpgradeCost();
+ if(!expected){ notify(t('hatchery_slots_max'), 'var(--green)'); return; }
+ cost = expected;
  if(G.money < cost){
  notify(t("n.pas_assez_dargent"),"var(--red)");
  return;

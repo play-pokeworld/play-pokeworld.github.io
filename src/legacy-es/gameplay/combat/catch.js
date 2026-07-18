@@ -75,15 +75,11 @@ function attemptAutoCatch(e){
  if(alreadyOwned){
    if(!G.dupeCatches) G.dupeCatches={};
    G.dupeCatches[e.id]=(G.dupeCatches[e.id]||0)+1;
-   const bonus=rand(150,350);
-   G.money+=bonus;
    if(wasShiny) addBattleLog(tr("m.catch.5", {p0:e.name}));
-   addBattleLog(tr("m.catch.4", {p0:e.name, p1:bonus}));
+   addBattleLog(tr('capture_duplicate_no_money', {name:e.name}));
  } else {
    if(speciesOwned(e.id)){
-     const bonus=rand(150,350);
-     G.money+=bonus;
-     addBattleLog(tr("m.catch.3", {p0:bonus}));
+     addBattleLog(tr('capture_duplicate_no_money', {name:e.name}));
    } else if(caughtMon){
      if(G.team.length < 6){
        G.team.push(caughtMon);

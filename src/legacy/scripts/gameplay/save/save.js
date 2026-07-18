@@ -494,12 +494,10 @@ function simulateAfkWildWin(loc){
  const drops = ROUTE_DROPS[G.location];
  if(drops && drops.length && chance(4)){
   const drop = drops[rand(0,drops.length-1)];
-  addToInventory(drop,1);
-  battle.sessionItems[drop] = (battle.sessionItems[drop]||0)+1;
+  const reward = (typeof grantRewardItem === 'function') ? grantRewardItem(drop,1) : (addToInventory(drop,1), {added:1,money:0});
+  if(reward.added) battle.sessionItems[drop] = (battle.sessionItems[drop]||0)+reward.added;
  }
- const mon = rand(e.level*5, e.level*10);
- G.money += mon;
- return {won:true, money:mon, damage:fight.damage, fainted:fight.fainted, lost:false};
+ return {won:true, money:0, damage:fight.damage, fainted:fight.fainted, lost:false};
 }
 function ensureAfkActiveBattlePokemon(){
  if(!battle || !battle.active || !G || !Array.isArray(G.team)) return false;

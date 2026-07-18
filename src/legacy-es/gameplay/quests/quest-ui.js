@@ -41,7 +41,8 @@ function renderStoryWindow(){
  } else {
  body = `<div class="extracted-template-style-243"><span>${t("m.quest_ui.21")}</span><span>${done?'':prog+' / '+tgt}</span></div>\n <div class="extracted-template-style-244"><div></div></div>`;
  }
- return `<div class="extracted-template-style-245">\n <div class="extracted-template-style-246">${ttl}</div>\n <div class="extracted-template-style-247">${dsc}</div>\n ${body}\n <div class="extracted-template-style-248"> ${rew}</div>\n <button class="hbtn"\n ${done?`data-action="legacy-call" data-call="claimQuest" data-call-args="'${inst.qid}','${cat}'"`:'disabled'}>${done?btnText:(t("m.quest_ui.20"))}</button>\n </div>`;
+ const claimCls = `hbtn quest-claim-btn ${done?'is-done':''}`;
+ return `<div class="extracted-template-style-245">\n <div class="extracted-template-style-246">${ttl}</div>\n <div class="extracted-template-style-247">${dsc}</div>\n ${body}\n <div class="extracted-template-style-248"> ${rew}</div>\n <button class="${claimCls}"\n ${done?`data-action="legacy-call" data-call="claimQuest" data-call-args="'${inst.qid}','${cat}'"`:'disabled'}>${done?btnText:(t("m.quest_ui.20"))}</button>\n </div>`;
  };
 
  let html=(typeof renderTutorialQuestBlock === 'function' ? renderTutorialQuestBlock() : '');
@@ -125,74 +126,163 @@ function acceptSideQuest(sid){
 function closeQuestModal(){
  const m=document.getElementById('quest-modal'); if(m) m.classList.remove('open');
 }
-function rollRepeatables(){
+const REPEATABLE_REROLL_MS = 10 * 60 * 1000;
+const REPEATABLE_SLOT_UPGRADE_COSTS = [75000, 200000, 500000, 1200000];
+function getRepeatableChoices(){
  ensureQuestState();
- const johtoVisited = (G.region === 'johto') || (G.regionStarter && G.regionStarter.johto) ||
- (G.badges && G.badges.length >= 8) ||
- (G.visitedMaps && (G.visitedMaps.newbark || G.visitedMaps.jroute29));
- 
- const pool = REPEATABLE_QUESTS.filter(q => {
- if(!q.loc) return true; 
- 
- const isJohtoLoc = q.loc.startsWith('j') || ['darkcave','ilexforest','slowpokewell','unioncave','ruinsofalph','burnedtower','tintower','mtmortar','icepath','whirlislands','sprouttower','mtsilver'].includes(q.loc);
- if(isJohtoLoc && !johtoVisited) return false;
- return true;
- }).slice();
- _repeatableRoll = [];
- for(let i=0;i<3 && pool.length;i++){
- const r = Math.floor(Math.random()*pool.length);
- _repeatableRoll.push(pool.splice(r,1)[0]);
+ if(!Array.isArray(G.repeatableChoices)) G.repeatableChoices=[];
+ _repeatableRoll = G.repeatableChoices.map(id => REPEATABLE_QUESTS.find(q => q.id === id)).filter(Boolean);
+ return _repeatableRoll;
+}
+function isRepeatableAvailable(q){
+ if(!q || !q.loc) return true;
+ const qRegion = (typeof regionOfLoc === 'function') ? regionOfLoc(q.loc) : (q.region || 'kanto');
+ return qRegion === (G.region || 'kanto');
+}
+function repeatablePool(){
+ ensureQuestState();
+ const activeIds = new Set((G.repeatables||[]).map(r=>r.tplId));
+ const choiceIds = new Set((G.repeatableChoices||[]));
+ return REPEATABLE_QUESTS.filter(q => isRepeatableAvailable(q) && !activeIds.has(q.id) && !choiceIds.has(q.id));
+}
+function pickRepeatableChoice(extraExcluded){
+ const excluded = new Set(extraExcluded || []);
+ const activeIds = new Set((G.repeatables||[]).map(r=>r.tplId));
+ const currentIds = new Set((G.repeatableChoices||[]));
+ let pool = REPEATABLE_QUESTS.filter(q => isRepeatableAvailable(q) && !activeIds.has(q.id) && !currentIds.has(q.id) && !excluded.has(q.id));
+ if(!pool.length) pool = REPEATABLE_QUESTS.filter(q => isRepeatableAvailable(q) && !activeIds.has(q.id) && !excluded.has(q.id));
+ if(!pool.length) return null;
+ return pool[rand(0, pool.length-1)];
+}
+function fillRepeatableChoices(){
+ ensureQuestState();
+ const choices = (G.repeatableChoices||[]).filter(id => { const q = REPEATABLE_QUESTS.find(x => x.id === id); return q && isRepeatableAvailable(q); });
+ G.repeatableChoices = choices.slice(0,3);
+ while(G.repeatableChoices.length < 3){
+  const q = pickRepeatableChoice(G.repeatableChoices);
+  if(!q) break;
+  G.repeatableChoices.push(q.id);
  }
+ _repeatableRoll = getRepeatableChoices();
+}
+function repeatableCooldownLeft(){
+ ensureQuestState();
+ return Math.max(0, (G.repeatableLastRollAt || 0) + REPEATABLE_REROLL_MS - Date.now());
+}
+function formatRepeatableCooldown(ms){
+ const s = Math.ceil(ms/1000);
+ const m = Math.floor(s/60);
+ const r = s%60;
+ return `${m}:${String(r).padStart(2,'0')}`;
+}
+function rollRepeatables(force){
+ ensureQuestState();
+ const left = repeatableCooldownLeft();
+ if(!force && left > 0 && (G.repeatableChoices||[]).length){
+  notify(tr('repeatable_reroll_wait', {time:formatRepeatableCooldown(left)}), 'var(--light1)');
+  renderRepeatableBoard();
+  return;
+ }
+ G.repeatableChoices = [];
+ for(let i=0;i<3;i++){
+  const q = pickRepeatableChoice(G.repeatableChoices);
+  if(q) G.repeatableChoices.push(q.id);
+ }
+ G.repeatableLastRollAt = Date.now();
+ _repeatableRoll = getRepeatableChoices();
  renderRepeatableBoard();
+ saveGame();
 }
 function openRepeatableMenu(){
  ensureQuestState();
- if(!_repeatableRoll || !_repeatableRoll.length) rollRepeatables();
+ if(!G.repeatableChoices || !G.repeatableChoices.length) rollRepeatables(true);
  else renderRepeatableBoard();
  const tEl=document.getElementById('quest-title');
  if(tEl) tEl.textContent = (t("m.quest_ui.8"));
  const mEl=document.getElementById('quest-modal'); if(mEl) mEl.classList.add('open');
 }
 function renderRepeatableBoard(){
+ ensureQuestState();
+ fillRepeatableChoices();
  const lang=G.lang||'fr';
- let html = `<div class="extracted-template-style-263">${t("m.quest_ui.7")}</div>`;
+ const activeCount = (G.repeatables||[]).length;
+ const max = G.maxRepeatables || 1;
+ const left = repeatableCooldownLeft();
+ let html = `<div class="repeatable-upgrade-head"><div><b>${t('repeatable_slots')}</b> ${activeCount}/${max}<br><span>${tr('repeatable_reroll_timer', {time:left>0?formatRepeatableCooldown(left):t('ready')})}</span></div><button class="hbtn" data-action="legacy-call" data-call="openRepeatableUpgradeMenu" data-call-args="">⚙️ ${t('repeatable_upgrades')}</button></div>`;
+ html += `<div class="extracted-template-style-263">${t("m.quest_ui.7")}</div>`;
  html += _repeatableRoll.map((tpl,i)=>{
  const active = G.repeatables.some(r=>r.tplId===tpl.id);
  const rt = getQuestText('repeatable', tpl.id);
  const ttl = rt.title;
  const dsc = rt.desc;
  const rew = rt.rewardDesc;
+ const canAccept = activeCount < max && !active;
  return `<div class="extracted-template-style-264">
  <div class="extracted-template-style-265">${tpl.icon||'🔁'} ${ttl}</div>
  <div class="extracted-template-style-260">${dsc}</div>
  <div class="extracted-template-style-261"> ${rew}</div>
- ${active?`<div class="extracted-template-style-266"> ${t("m.quest_ui.6")}</div>`:`<button class="hbtn extracted-bridge-style-051" data-action="legacy-call" data-call="acceptRepeatable" data-call-args="${i}"> ${t("m.quest_ui.5")}</button>`}
+ ${active?`<div class="extracted-template-style-266"> ${t("m.quest_ui.6")}</div>`:`<button class="hbtn extracted-bridge-style-051" ${canAccept?`data-action="legacy-call" data-call="acceptRepeatable" data-call-args="${i}"`:'disabled'}> ${canAccept?t("m.quest_ui.5"):t('repeatable_slots_full')}</button>`}
  </div>`;
  }).join('');
  html += `<div class="extracted-template-style-131">
- <button class="hbtn extracted-bridge-style-052" data-action="legacy-call" data-call="rollRepeatables" data-call-args="">🎲 ${t("m.quest_ui.4")}</button>
+ <button class="hbtn extracted-bridge-style-052" ${left<=0?`data-action="legacy-call" data-call="rollRepeatables" data-call-args="false"`:'disabled'}>🎲 ${left>0?tr('repeatable_reroll_wait', {time:formatRepeatableCooldown(left)}):t("m.quest_ui.4")}</button>
  <button class="hbtn extracted-bridge-style-044" data-action="legacy-call" data-call="closeQuestModal" data-call-args=""> ${t("m.quest_ui.3")}</button>
  </div>`;
  const bEl=document.getElementById('quest-body'); if(bEl) bEl.innerHTML=html;
 }
+function openRepeatableUpgradeMenu(){
+ ensureQuestState();
+ const inner=document.getElementById('poke-modal-inner');
+ const modal=document.getElementById('poke-modal');
+ if(!inner||!modal) return;
+ const lvl = G.repeatableSlotUpgrades || 0;
+ const max = 1 + lvl;
+ const nextCost = REPEATABLE_SLOT_UPGRADE_COSTS[lvl];
+ inner.innerHTML = `<div class="modal-title"><div>⚙️ ${t('repeatable_upgrades')}</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
+ <div class="dict-info-block"><b>${t('repeatable_slots')}</b><br>${tr('repeatable_slots_current', {count:max, max:5})}</div>
+ <div class="dict-info-block">${nextCost ? `<button class="hbtn" data-action="legacy-call" data-call="upgradeRepeatableSlots" data-call-args="${nextCost}">⬆ ${tr('repeatable_slot_upgrade_buy', {next:max+1, price:nextCost.toLocaleString()})}</button>` : t('repeatable_slots_max')}</div>
+ <div class="dict-info-block">${t('repeatable_reroll_free_desc')}</div>`;
+ modal.classList.add('open');
+}
+function upgradeRepeatableSlots(cost){
+ ensureQuestState();
+ const lvl = G.repeatableSlotUpgrades || 0;
+ const expected = REPEATABLE_SLOT_UPGRADE_COSTS[lvl];
+ if(!expected){ notify(t('repeatable_slots_max'), 'var(--green)'); return; }
+ if(Number(cost) !== expected) cost = expected;
+ if(G.money < cost){ notify(t('n.pas_assez_dargent'), 'var(--red)'); return; }
+ G.money -= cost;
+ G.repeatableSlotUpgrades = Math.min(4, lvl + 1);
+ G.maxRepeatables = 1 + G.repeatableSlotUpgrades;
+ updateHeader();
+ saveGame();
+ notify(tr('repeatable_slot_upgraded', {count:G.maxRepeatables}), 'var(--green)');
+ openRepeatableUpgradeMenu();
+ try{ renderRepeatableBoard(); }catch(_){}
+}
 function acceptRepeatable(i){
  ensureQuestState();
+ fillRepeatableChoices();
  const tpl = _repeatableRoll[i];
  if(!tpl) return;
- if((G.repeatables||[]).length >= (G.maxRepeatables||3)){
- const lang = G.lang||'fr';
- notify(tr("m.quest_ui.2", {p0:G.maxRepeatables||3}),'var(--accent)');
+ if(G.repeatables.length >= (G.maxRepeatables||1)){
+ notify(tr('repeatable_limit_reached', {n:G.maxRepeatables||1}),'var(--accent)');
+ renderRepeatableBoard();
  return;
  }
  if(G.repeatables.some(r=>r.tplId===tpl.id)){ notify(t("legacy_message_n_qu_te_r_p_table_d_j_active"),'var(--green)'); return; }
  G.repeatables.push({qid:'r_'+tpl.id, tplId:tpl.id, cat:'repeatable', def:tpl, progress:0, done:false});
- closeQuestModal();
+ if(!Array.isArray(G.repeatableChoices)) G.repeatableChoices=[];
+ const replacement = pickRepeatableChoice([tpl.id]);
+ if(replacement) G.repeatableChoices[i] = replacement.id;
+ else G.repeatableChoices.splice(i,1);
+ _repeatableRoll = getRepeatableChoices();
  updateHeader();
  try{ if(typeof refreshMapAndLoc==='function') refreshMapAndLoc(); }catch(_){}
  try{ if(document.getElementById('story-panel')) renderStoryWindow(); }catch(_){}
  saveGame();
- const lang=G.lang||'fr';
  notify(t("m.quest_ui.1"),'var(--accent)');
+ renderRepeatableBoard();
 }
 
 
@@ -205,5 +295,7 @@ if (typeof rollRepeatables !== 'undefined' && typeof window !== 'undefined') win
 if (typeof openRepeatableMenu !== 'undefined' && typeof window !== 'undefined') window.openRepeatableMenu = openRepeatableMenu;
 if (typeof renderRepeatableBoard !== 'undefined' && typeof window !== 'undefined') window.renderRepeatableBoard = renderRepeatableBoard;
 if (typeof acceptRepeatable !== 'undefined' && typeof window !== 'undefined') window.acceptRepeatable = acceptRepeatable;
+if (typeof openRepeatableUpgradeMenu !== 'undefined' && typeof window !== 'undefined') window.openRepeatableUpgradeMenu = openRepeatableUpgradeMenu;
+if (typeof upgradeRepeatableSlots !== 'undefined' && typeof window !== 'undefined') window.upgradeRepeatableSlots = upgradeRepeatableSlots;
 
 export {};

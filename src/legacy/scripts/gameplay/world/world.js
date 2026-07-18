@@ -13,6 +13,7 @@ function getRoamingLegendaryForRoute(locId){
  [kantoOutdoor[(kIdx) % kantoOutdoor.length]]: 144,
  [kantoOutdoor[(kIdx+7) % kantoOutdoor.length]]: 145,
  [kantoOutdoor[(kIdx+13) % kantoOutdoor.length]]: 146,
+ [kantoOutdoor[(kIdx+19) % kantoOutdoor.length]]: 151,
  [johtoOutdoor[(jIdx) % johtoOutdoor.length]]: 243,
  [johtoOutdoor[(jIdx+7) % johtoOutdoor.length]]: 244,
  [johtoOutdoor[(jIdx+13) % johtoOutdoor.length]]: 245
@@ -41,3 +42,10 @@ function updateHeader(){
  try{ renderAutomationWindow(); }catch(_){}
  try{ renderShortcutsWindow(); }catch(_){}
 }
+
+
+// --- Migrated to ES module, globals exposed ---
+if (typeof getRoamingLegendaryForRoute !== 'undefined' && typeof window !== 'undefined') window.getRoamingLegendaryForRoute = getRoamingLegendaryForRoute;
+if (typeof getBadgeDisplayTotal !== 'undefined' && typeof window !== 'undefined') window.getBadgeDisplayTotal = getBadgeDisplayTotal;
+if (typeof updateHeader !== 'undefined' && typeof window !== 'undefined') window.updateHeader = updateHeader;
+

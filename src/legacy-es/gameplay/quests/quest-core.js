@@ -35,7 +35,11 @@ function ensureQuestState(){
  if(!Array.isArray(G.activeQuests)) G.activeQuests=[];
  if(!Array.isArray(G.repeatables)) G.repeatables=[];
  if(typeof G.totalWildWins!=='number') G.totalWildWins=0;
- if(typeof G.maxRepeatables!=='number') G.maxRepeatables=3;
+ if(typeof G.repeatableSlotUpgrades!=='number') G.repeatableSlotUpgrades=0;
+ G.repeatableSlotUpgrades = clamp(G.repeatableSlotUpgrades||0, 0, 4);
+ G.maxRepeatables = 1 + G.repeatableSlotUpgrades;
+ if(!Array.isArray(G.repeatableChoices)) G.repeatableChoices=[];
+ if(typeof G.repeatableLastRollAt!=='number') G.repeatableLastRollAt=0;
  if(!G.wildWinsByLoc || typeof G.wildWinsByLoc!=='object') G.wildWinsByLoc={};
  if(!G.unlockedLocs || typeof G.unlockedLocs!=='object') G.unlockedLocs={};
  if(typeof G.storyIdx==='undefined') G.storyIdx=0;
@@ -172,17 +176,27 @@ function claimQuest(qid, cat){
  if(!questDone(inst, def)){ notify(t("legacy_message_n_objectif_pas_encore_termin"),'var(--red)'); return; }
  if(def.rewardPoke && cat==='main'){
    if(typeof battle !== 'undefined' && battle && battle.active){
-     notify('Un combat est déjà en cours : terminez-le avant de défier ce légendaire.', 'var(--red)');
+     notify(t('quest_reward_battle_active'), 'var(--red)');
      return;
    }
    if(!G.team || !G.team.length){
      notify(t('no_pokemon_in_team'), 'var(--red)');
      return;
    }
+   const started = (typeof startLegendaryEncounter === 'function') ? startLegendaryEncounter(def.rewardPoke, def.rewardLevel || 65) : false;
+   if(started && typeof battle !== 'undefined' && battle && battle.active){
+    battle.questRewardQuestId = inst.qid;
+    battle.questRewardCat = cat;
+    battle.questRewardRegion = def.region || (G.region || 'kanto');
+    battle.questRewardDefId = def.id;
+    notify(tr('quest_reward_battle_started', {pokemon:getPokeName(def.rewardPoke)}), 'var(--green)');
+    saveGame();
+   }
+   return;
  }
 
  if(def.rewardMoney) G.money += def.rewardMoney;
- if(def.rewardItems){ for(const k in def.rewardItems) addToInventory(k, def.rewardItems[k]); }
+ if(def.rewardItems){ if(typeof grantRewardItems === 'function') grantRewardItems(def.rewardItems); else for(const k in def.rewardItems) addToInventory(k, def.rewardItems[k]); }
 
  if(cat==='main'){
  G.completedQuests[inst.qid]=true;
@@ -201,10 +215,7 @@ function claimQuest(qid, cat){
  list.splice(idx,1); 
 
  const lang = G.lang||'fr';
- if(def.rewardPoke && cat==='main'){
- 
- startLegendaryEncounter(def.rewardPoke, def.rewardLevel || 65);
- } else if(def.rewardPoke && cat==='side'){
+ if(def.rewardPoke && cat==='side'){
  const legMon = createPoke(def.rewardPoke, 50, true);
  if(legMon){
  if(G.team.length<6) G.team.push(legMon); else G.collection[String(legMon.id)]=legMon;
@@ -219,6 +230,34 @@ function claimQuest(qid, cat){
  saveGame();
  try{ autoSave(); }catch(e){}
  notify(t("m.quest_core.1"),'var(--green)');
+}
+
+function completeQuestRewardBattle(qid){
+ ensureQuestState();
+ const inst = (G.activeQuests || []).find(i=>String(i.qid)===String(qid) && i.cat==='main');
+ const def = inst ? getMainQuestDef(inst.qid) : getMainQuestDef(qid);
+ if(!inst || !def) return false;
+ if(def.rewardMoney) G.money += def.rewardMoney;
+ if(def.rewardItems){
+  if(typeof grantRewardItems === 'function') grantRewardItems(def.rewardItems);
+  else for(const k in def.rewardItems) addToInventory(k, def.rewardItems[k]);
+ }
+ G.completedQuests[inst.qid]=true;
+ const region = def.region || (G.region || 'kanto');
+ const chain = getRegionChain(region);
+ const chainIdx = chain.findIndex(q=>String(q.id)===String(inst.qid));
+ if(chainIdx>=0) G.mainStep[region] = chainIdx+1;
+ G.mainProgress[region] = 0;
+ if(G.questBaselines && G.questBaselines[region]) delete G.questBaselines[region][String(inst.qid)];
+ G.activeQuests = G.activeQuests.filter(i=>!(String(i.qid)===String(inst.qid) && i.cat==='main'));
+ syncActiveMain();
+ updateHeader();
+ try{ if(document.getElementById('story-panel')) renderStoryWindow(); }catch(_){}
+ try{ if(typeof refreshMapAndLoc==='function') refreshMapAndLoc(); }catch(_){}
+ saveGame();
+ try{ autoSave(); }catch(e){}
+ notify(t("m.quest_core.1"),'var(--green)');
+ return true;
 }
 
 
@@ -338,6 +377,7 @@ if (typeof questDone !== 'undefined' && typeof window !== 'undefined') window.qu
 if (typeof advanceQuests !== 'undefined' && typeof window !== 'undefined') window.advanceQuests = advanceQuests;
 if (typeof locMatches !== 'undefined' && typeof window !== 'undefined') window.locMatches = locMatches;
 if (typeof claimQuest !== 'undefined' && typeof window !== 'undefined') window.claimQuest = claimQuest;
+if (typeof completeQuestRewardBattle !== 'undefined' && typeof window !== 'undefined') window.completeQuestRewardBattle = completeQuestRewardBattle;
 if (typeof talkNpcMainQuest !== 'undefined' && typeof window !== 'undefined') window.talkNpcMainQuest = talkNpcMainQuest;
 if (typeof getQuestDefinitionForInstance !== 'undefined' && typeof window !== 'undefined') window.getQuestDefinitionForInstance = getQuestDefinitionForInstance;
 if (typeof getActiveLocalDefeatQuestForLocation !== 'undefined' && typeof window !== 'undefined') window.getActiveLocalDefeatQuestForLocation = getActiveLocalDefeatQuestForLocation;

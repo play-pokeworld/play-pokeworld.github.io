@@ -7,7 +7,7 @@ var SIDE_QUESTS = {
 "target": 10,
 "rewardMoney": 800,
 "rewardItems": {
-"berry_sitrus": 5
+"berry_sitrus": 2
  }
  },
 "s2": {
@@ -18,7 +18,7 @@ var SIDE_QUESTS = {
 "target": 15,
 "rewardMoney": 1200,
 "rewardItems": {
-"berry_prine": 5
+"berry_prine": 2
  }
  },
 "s3": {
@@ -50,7 +50,7 @@ var SIDE_QUESTS = {
 "target": 12,
 "rewardMoney": 2000,
 "rewardItems": {
-"rarecandy": 3
+"rarecandy": 1
  }
  },
 "s6": {
@@ -93,7 +93,7 @@ var SIDE_QUESTS = {
 "target": 10,
 "rewardMoney": 2000,
 "rewardItems": {
-"berry_oran": 10
+"berry_oran": 2
  }
  },
 "s10": {
@@ -104,7 +104,7 @@ var SIDE_QUESTS = {
 "target": 10,
 "rewardMoney": 2500,
 "rewardItems": {
-"rarecandy": 2
+"rarecandy": 1
  }
  },
 "s11": {
@@ -115,7 +115,7 @@ var SIDE_QUESTS = {
 "target": 12,
 "rewardMoney": 1800,
 "rewardItems": {
-"berry_ceriz": 5
+"berry_ceriz": 2
  }
  },
 "s12": {
@@ -126,7 +126,7 @@ var SIDE_QUESTS = {
 "target": 12,
 "rewardMoney": 2200,
 "rewardItems": {
-"berry_sitrus": 5
+"berry_sitrus": 2
  }
  },
 "s13": {
@@ -159,7 +159,7 @@ var SIDE_QUESTS = {
 "target": 12,
 "rewardMoney": 2400,
 "rewardItems": {
-"rarecandy": 4
+"rarecandy": 1
  }
  },
 "s30": {
@@ -192,7 +192,7 @@ var SIDE_QUESTS = {
 "target": 10,
 "rewardMoney": 2200,
 "rewardItems": {
-"rarecandy": 2
+"rarecandy": 1
  }
  },
 "s33": {
@@ -214,7 +214,7 @@ var SIDE_QUESTS = {
 "target": 12,
 "rewardMoney": 1800,
 "rewardItems": {
-"berry_sitrus": 5
+"berry_sitrus": 2
  }
  },
 "s35": {
@@ -279,7 +279,7 @@ var SIDE_QUESTS = {
 "target": 8,
 "rewardMoney": 1800,
 "rewardItems": {
-"rarecandy": 3
+"rarecandy": 1
  }
  }
 };

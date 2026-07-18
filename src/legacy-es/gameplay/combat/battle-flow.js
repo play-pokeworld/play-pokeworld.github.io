@@ -10,6 +10,10 @@ function endBattle(){
  battle.noAutoCatch=false;
  battle.questDefeatLoc=null;
  battle.isQuestDefeatBattle=false;
+ battle.questRewardQuestId=null;
+ battle.questRewardCat=null;
+ battle.questRewardRegion=null;
+ battle.questRewardDefId=null;
  battle.enemyPoke=null;
  battle.champTeam=null;
  const idleScreen = document.getElementById('battle-idle-screen');

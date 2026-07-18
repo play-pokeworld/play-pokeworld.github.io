@@ -10,16 +10,22 @@ function startWildBattle(){
 
 
 function startLegendaryEncounter(pokeId, level=65){
- if(!G.team.length){ setMsg(t('no_pokemon_in_team')); return; }
+ if(!G.team.length){ setMsg(t('no_pokemon_in_team')); return false; }
+ if(typeof battle !== 'undefined' && battle && battle.active){ notify(t('battle_in_progress'), 'var(--red)'); return false; }
  const isShiny = isSpeciesShiny(pokeId) || rollShiny();
  const legPoke = createPoke(pokeId, level || 65, isShiny);
- if(!legPoke) return;
+ if(!legPoke) return false;
  legPoke.maxHP = Math.floor(legPoke.maxHP * 2.2);
  legPoke.currentHP = legPoke.maxHP;
- battle.legendaryCatch = true; 
- addBattleLog(tr('wild_legendary_appeared', {name:legPoke.name}));
  startBattle(legPoke, false);
- battle.chill = false; 
+ if(battle && battle.active){
+  battle.legendaryCatch = true;
+  battle.chill = false;
+  battle.noAutoCatch = false;
+  addBattleLog(tr('wild_legendary_appeared', {name:legPoke.name}));
+  return true;
+ }
+ return false;
 }
 
 
@@ -90,3 +96,10 @@ async function onPlayerPokeFaint(){
  await wait(300);
  resumeBattleActions();
 }
+
+
+// --- Migrated to ES module, globals exposed ---
+if (typeof startWildBattle !== 'undefined' && typeof window !== 'undefined') window.startWildBattle = startWildBattle;
+if (typeof startLegendaryEncounter !== 'undefined' && typeof window !== 'undefined') window.startLegendaryEncounter = startLegendaryEncounter;
+if (typeof spawnNextWild !== 'undefined' && typeof window !== 'undefined') window.spawnNextWild = spawnNextWild;
+
