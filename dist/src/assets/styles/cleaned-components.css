@@ -1707,3 +1707,36 @@ body.save-menu-active { overflow: hidden; }
     grid-template-columns: 1fr 1fr;
   }
 }
+
+.poke-detail-shiny-toggle {
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 156px;
+  margin-top: 8px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  font-weight: 900;
+  transition: transform 0.16s, filter 0.16s, box-shadow 0.16s, background 0.16s;
+}
+.poke-detail-shiny-toggle.is-on {
+  background: linear-gradient(135deg, #f2d94e, #ef90e6);
+  color: #2c1810;
+  border-color: #f2d94e;
+  box-shadow: 0 0 16px rgba(242,217,78,0.32), inset 0 0 0 1px rgba(255,255,255,0.38);
+}
+.poke-detail-shiny-toggle.is-off {
+  background: rgba(236,222,183,0.12);
+  color: var(--light2);
+  border-color: rgba(236,222,183,0.28);
+}
+.poke-detail-shiny-toggle:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+.poke-detail-shiny-star {
+  font-size: 15px;
+  text-shadow: 0 0 8px rgba(255,255,255,0.48);
+}

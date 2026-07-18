@@ -59,16 +59,16 @@ function syncShinyState(){
  for(const p of G.team){
  if(p && shinySpecies.has(Number(p.id))){
  p.shinyUnlocked = true;
- p.shinyActive = true;
- p.shiny = true;
+ if(p.shinyActive === undefined) p.shinyActive = true;
+ p.shiny = !!p.shinyActive;
  }
  }
  for(const k in G.collection){
  const p = G.collection[k];
  if(p && shinySpecies.has(Number(p.id))){
  p.shinyUnlocked = true;
- p.shinyActive = true;
- p.shiny = true;
+ if(p.shinyActive === undefined) p.shinyActive = true;
+ p.shiny = !!p.shinyActive;
  }
  }
 }

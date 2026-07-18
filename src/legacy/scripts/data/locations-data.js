@@ -51,12 +51,12 @@ var LOCS = {
 
 var LOCS_JOHTO = {
  jroute26: {name:'Route 26', type:'route', x:1512,y:504,w:48,h:336, conn:['indigo_jo','jroute27'], wild:[], shopId:null, champ:null, badgeReq:8},
- jroute27: {name:'Route 27', type:'route', x:1384,y:696,w:304,h:48, conn:['jroute26','jroute28'], wild:[], shopId:null, champ:null, badgeReq:8},
+ jroute27: {name:'Route 27', type:'route', x:1384,y:696,w:304,h:48, conn:['newbark','jroute26','jroute28','tohjofalls'], wild:[], shopId:null, champ:null, badgeReq:8},
  jroute28: {name:'Route 28', type:'route', x:1392,y:504,w:192,h:144, conn:['jroute27','mtsilver'], wild:[], shopId:null, champ:null, badgeReq:8},
  jroute37: {name:'Route 37', type:'route', x:552,y:256,w:48,h:96, conn:['jroute36','ecruteak'], wild:[], shopId:null, champ:null, badgeReq:3},
  jroute39: {name:'Route 39', type:'route', x:264,y:232,w:48,h:144, conn:['ecruteak','jroute38'], wild:[], shopId:null, champ:null, badgeReq:4},
  jroute41: {name:'Route 41', type:'sea', x:176,y:624,w:96,h:192, conn:['olivine','cianwood'], wild:[], shopId:null, champ:null, badgeReq:4},
- jroute46: {name:'Route 46', type:'route', x:1064,y:568,w:48,h:208, conn:['jroute45','blackthorn'], wild:[], shopId:null, champ:null, badgeReq:7},
+ jroute46: {name:'Route 46', type:'route', x:1064,y:568,w:48,h:208, conn:['jroute45','jroute29'], wild:[], shopId:null, champ:null, badgeReq:7},
  jroute47: {name:'Route 47', type:'route', x:40,y:664,w:48,h:112, conn:['jroute48'], wild:[], shopId:null, champ:null, badgeReq:8},
  jroute48: {name:'Route 48', type:'route', x:40,y:504,w:48,h:208, conn:['jroute47','victoryroad_jo'], wild:[], shopId:null, champ:null, badgeReq:8},
  nationalpark:{name:'Parc Naturel', type:'town', x:400,y:268,w:96,h:72, conn:['jroute35','jroute36'], wild:[], shopId:null, champ:null, badgeReq:0},
@@ -74,7 +74,7 @@ var LOCS_JOHTO = {
  mtsilver: {name:'Mont Argenté', type:'dungeon', x:1264,y:448,w:160,h:288, conn:['jroute28','tohjofalls'], wild:[], shopId:null, champ:null, badgeReq:8},
  tohjofalls: {name:'Chutes Tohjo', type:'dungeon', x:1264,y:648,w:64,h:48, conn:['jroute27','mtsilver'], wild:[], shopId:null, champ:null, badgeReq:8},
 
- newbark: {name:'Bourg Geon', type:'town', x:1192,y:684,w:80,h:72, conn:['jroute29'], wild:[], shopId:'jnewbark', champ:null, badgeReq:0},
+ newbark: {name:'Bourg Geon', type:'town', x:1192,y:684,w:80,h:72, conn:['jroute29','jroute27'], wild:[], shopId:'jnewbark', champ:null, badgeReq:0},
  jroute29: {name:'Route 29', type:'route', x:1008,y:696,w:288,h:48, conn:['newbark','cherrygrove'], wild:[[16,3,5,'common'], [19,3,5,'common'], [13,4,7,'uncommon']], shopId:null, champ:null, badgeReq:0},
  cherrygrove: {name:'Ville Griotte', type:'town', x:832,y:688,w:64,h:64, conn:['jroute29','jroute30'], wild:[], shopId:'jcherrygrove', champ:null, badgeReq:0},
  jroute30: {name:'Route 30', type:'route', x:840,y:504,w:48,h:304, conn:['cherrygrove','jroute31'], wild:[[10,4,6,'common'], [13,4,6,'common'], [16,5,7,'uncommon']], shopId:null, champ:null, badgeReq:0},
@@ -102,5 +102,5 @@ var LOCS_JOHTO = {
  lakerage: {name:'Lac Colère', type:'sea', x:920,y:36,w:120,h:72, conn:['jroute43'], wild:[[129,22,28,'common'], [130,25,32,'rare']], shopId:null, champ:null, badgeReq:6},
  jroute44: {name:'Route 44', type:'dungeon', x:1032,y:184,w:176,h:48, conn:['mahogany','blackthorn'], wild:[[86,24,30,'common'], [87,25,32,'uncommon'], [124,26,34,'rare']], shopId:null, champ:null, badgeReq:7},
  blackthorn: {name:'Ébénelle', type:'town', x:1136,y:256,w:64,h:64, conn:['jroute44','jroute45'], wild:[], shopId:'jblackthorn', champ:'clair', badgeReq:7},
- jroute45: {name:'Route 45', type:'route', x:1144,y:352,w:48,h:288, conn:['blackthorn'], wild:[[74,25,32,'common'], [75,26,33,'common'], [147,26,35,'rare']], shopId:null, champ:null, badgeReq:7},
+ jroute45: {name:'Route 45', type:'route', x:1144,y:392,w:48,h:208, conn:['blackthorn','jroute46'], wild:[[74,25,32,'common'], [75,26,33,'common'], [147,26,35,'rare']], shopId:null, champ:null, badgeReq:7},
 };

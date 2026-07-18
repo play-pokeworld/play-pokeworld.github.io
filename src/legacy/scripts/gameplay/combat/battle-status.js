@@ -160,21 +160,22 @@ async function onEnemyFaint(){
  }
 
  
+ const questLoc = battle.questDefeatLoc || G.location;
  const xp=gainXP(e);
  addBattleLog(tr('team_gains_xp', {xp:xp}));
 
  
  G.totalWildWins = (G.totalWildWins||0) + 1;
  if(!G.wildWinsByLoc) G.wildWinsByLoc = {};
- G.wildWinsByLoc[G.location] = (G.wildWinsByLoc[G.location]||0) + 1;
+ G.wildWinsByLoc[questLoc] = (G.wildWinsByLoc[questLoc]||0) + 1;
 
  
- attemptAutoCatch(e);
- EventBus.emit(EVENTS.WILD_DEFEATED, { loc: G.location });
+ if(!battle.noAutoCatch) attemptAutoCatch(e);
+ EventBus.emit(EVENTS.WILD_DEFEATED, { loc: questLoc });
  try{ if(document.getElementById('map-svg')) renderMap(); }catch(_){}
 
  
- const drops=ROUTE_DROPS[G.location];
+ const drops=ROUTE_DROPS[questLoc];
  if(drops&&drops.length&&chance(4)){
  const drop=drops[rand(0,drops.length-1)];
  addToInventory(drop,1);

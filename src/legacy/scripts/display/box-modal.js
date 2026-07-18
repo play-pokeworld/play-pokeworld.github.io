@@ -119,11 +119,7 @@ function openBoxPokeModal(boxId){
  </div>
  <span class="modal-close" data-action="close-poke-modal" data-reset-box-move="true"></span>
  </div>
- ${isShiny?`<label class="extracted-template-style-027">
- <input type="checkbox"${p.shinyActive?'checked':''} data-change-call="toggleBoxShinySkin" data-change-args="'${boxId}'">
- <span> ${t('shiny_skin')}</span>
- <span class="extracted-template-style-019">${t('cosmetic_switch_only')}</span>
- </label>`:''}
+ ${isShiny?`<button class="hbtn poke-detail-shiny-toggle ${p.shinyActive?'is-on':'is-off'}" data-action="legacy-call" data-call="toggleBoxShinySkin" data-call-args="'${boxId}'"><span class="poke-detail-shiny-star">★</span><span>${p.shinyActive?t('shiny_skin_on'):t('shiny_skin_off')}</span></button>`:''}
  ${buildTalentSelectorHtml(p, null, boxId)}
  ${getEvolutionMethodsHtml(p.id)}
  <div class="extracted-template-style-028">
@@ -185,10 +181,12 @@ function openBoxPokeModal(boxId){
 
 function toggleBoxShinySkin(boxId){
  const p = G.collection[boxId] || G.collection[String(boxId)];
- if(!p) return;
+ if(!p || !(p.shinyUnlocked || p.shiny || isSpeciesShiny(p.id))) return;
+ if(p.shinyActive === undefined) p.shinyActive = true;
  p.shinyActive = !p.shinyActive;
- p.shiny = p.shinyActive;
+ p.shiny = !!p.shinyActive;
  saveGame();
+ if(typeof refreshAfterShinyToggle === 'function') refreshAfterShinyToggle();
  openBoxPokeModal(boxId);
 }
 

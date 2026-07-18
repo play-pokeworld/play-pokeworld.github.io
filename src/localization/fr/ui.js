@@ -573,4 +573,10 @@ window.L_fr_ui = {
 "box_filter_evo_missing":"Évolution possible non obtenue",
 "box_filter_reset":"Réinitialiser",
 "filters_title":"Filtres",
+"quest_battle_btn":"Combattre",
+"quest_battle_started":"Combat de quête : {quest}",
+"quest_battle_none":"Aucune quête de combat active ici.",
+"quest_battle_title":"Quête locale",
+"shiny_skin_on":"Sprite shiny activé",
+"shiny_skin_off":"Sprite normal activé",
 };

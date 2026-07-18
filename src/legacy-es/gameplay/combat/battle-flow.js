@@ -7,6 +7,9 @@ function endBattle(){
  battle.legendaryCatch=false;
  battle.isTraining=false;
  battle.trainee=null;
+ battle.noAutoCatch=false;
+ battle.questDefeatLoc=null;
+ battle.isQuestDefeatBattle=false;
  battle.enemyPoke=null;
  battle.champTeam=null;
  const idleScreen = document.getElementById('battle-idle-screen');

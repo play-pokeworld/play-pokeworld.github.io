@@ -573,4 +573,10 @@ window.L_en_ui = {
 "box_filter_evo_missing":"Possible evolution not owned",
 "box_filter_reset":"Reset",
 "filters_title":"Filters",
+"quest_battle_btn":"Battle",
+"quest_battle_started":"Quest battle: {quest}",
+"quest_battle_none":"No active battle quest here.",
+"quest_battle_title":"Local quest",
+"shiny_skin_on":"Shiny sprite enabled",
+"shiny_skin_off":"Normal sprite enabled",
 };

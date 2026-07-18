@@ -130,13 +130,31 @@ function sendTeamToBox(idx){
  saveGame();
 }
 
+function refreshAfterShinyToggle(){
+ try{ if(typeof updateHeader === 'function') updateHeader(); }catch(_){}
+ try{ if(typeof renderTeamWindow === 'function') renderTeamWindow(); }catch(_){}
+ try{ if(typeof renderBattleTeamRow === 'function') renderBattleTeamRow(); }catch(_){}
+ try{ if(typeof updateBattleUI === 'function' && battle && battle.active) updateBattleUI(); }catch(_){}
+ try{ if(typeof renderUnifiedGrid === 'function') renderUnifiedGrid(); }catch(_){}
+ try{
+  const tabEl = document.getElementById('tab-content');
+  if(tabEl && typeof _activeTab !== 'undefined'){
+    if(_activeTab === 'box' && typeof renderBox === 'function') renderBox(tabEl);
+    if(_activeTab === 'pokedex' && typeof renderPokedex === 'function') renderPokedex(tabEl);
+  }
+ }catch(_){}
+ try{ if(typeof refreshMapAndLoc === 'function') refreshMapAndLoc(); }catch(_){}
+}
+
 
 function toggleShinySkin(idx){
  const p=G.team[idx];
- if(!p||!p.shinyUnlocked) return;
+ if(!p || !(p.shinyUnlocked || p.shiny || isSpeciesShiny(p.id))) return;
+ if(p.shinyActive === undefined) p.shinyActive = true;
  p.shinyActive=!p.shinyActive;
- p.shiny=p.shinyActive;
+ p.shiny=!!p.shinyActive;
  saveGame();
+ refreshAfterShinyToggle();
  openPokeModal(idx);
 }
 

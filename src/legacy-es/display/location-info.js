@@ -49,6 +49,12 @@ function renderLocInfo(el){
  if(loc.type!=='town'){
  allButtons += `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="exploreArea" data-call-args=""><span class="ab-icon extracted-template-style-056">🌾</span><span class="ab-label extracted-template-style-057">${t('explore_btn')}</span></div>`;
  }
+ const localDefeatQuest = (typeof getActiveLocalDefeatQuestForLocation === 'function') ? getActiveLocalDefeatQuestForLocation(G.location) : null;
+ const hasRegularWildBattle = !!(loc.wild && loc.wild.length);
+ if(localDefeatQuest && !hasRegularWildBattle){
+ const qtxt = getQuestText(localDefeatQuest.inst.cat || 'main', localDefeatQuest.def.id);
+ allButtons += `<div class="action-btn loc-action-btn quest-battle-btn" data-action="legacy-call" data-call="startQuestDefeatBattle" data-call-args="'${G.location}'"><span class="ab-icon extracted-template-style-056">⚔️</span><span class="ab-label extracted-template-style-057">${t('quest_battle_btn')} ${qtxt.title ? '— '+qtxt.title : ''}</span></div>`;
+ }
 
  
  if(loc.shopId&&SHOPS[loc.shopId]){

@@ -237,6 +237,79 @@ function talkNpcMainQuest(npc){
  return true;
 }
 
+function getQuestDefinitionForInstance(inst){
+ if(!inst) return null;
+ if(inst.cat === 'main') return getMainQuestDef(inst.qid);
+ if(inst.cat === 'side') return SIDE_QUESTS[inst.qid];
+ if(inst.cat === 'repeatable') return inst.def;
+ return inst.def || null;
+}
+function getActiveLocalDefeatQuestForLocation(locId){
+ ensureQuestState();
+ const group = locGroup(locId);
+ const candidates = [];
+ for(const inst of (G.activeQuests || [])) candidates.push(inst);
+ for(const inst of (G.repeatables || [])) candidates.push(inst);
+ for(const inst of candidates){
+  const def = getQuestDefinitionForInstance(inst);
+  if(!def || def.type !== 'defeat_wild' || !def.loc || inst.done) continue;
+  if(locGroup(def.loc) !== group) continue;
+  if(questDone(inst, def)) continue;
+  return {inst, def};
+ }
+ return null;
+}
+const QUEST_TOWN_BATTLE_POOLS = {
+ azalea: [[41,16],[23,16],[109,18],[19,17]],
+ goldenrod: [[19,20],[20,22],[41,20],[109,22],[88,22]],
+ mahogany: [[20,27],[41,26],[88,28],[109,29],[110,30]],
+ olivine: [[72,24],[98,24],[66,26],[73,26]],
+ cherrygrove: [[19,6],[16,6],[161,6]],
+ newbark: [[161,4],[16,4],[19,4]],
+ violet: [[16,10],[21,10],[163,10]],
+ ecruteak: [[92,22],[93,24],[109,23]],
+ blackthorn: [[147,32],[74,32],[169,34]]
+};
+function getQuestBattlePool(locId){
+ const loc = getLocObj(locId);
+ if(loc && loc.wild && loc.wild.length){
+  return loc.wild.map(w => [Number(w[0]), Math.max(1, Number(w[1]||1)), Math.max(1, Number(w[2]||w[1]||1))]);
+ }
+ if(QUEST_TOWN_BATTLE_POOLS[locId]) return QUEST_TOWN_BATTLE_POOLS[locId];
+ const linked = (typeof getLinkedRouteIds === 'function') ? getLinkedRouteIds(locId) : [locId];
+ for(const lid of linked){
+  const l = getLocObj(lid);
+  if(l && l.wild && l.wild.length) return l.wild.map(w => [Number(w[0]), Math.max(1, Number(w[1]||1)), Math.max(1, Number(w[2]||w[1]||1))]);
+ }
+ const conn = (loc && loc.conn) || [];
+ for(const cid of conn){
+  const l = getLocObj(cid);
+  if(l && l.wild && l.wild.length) return l.wild.map(w => [Number(w[0]), Math.max(1, Number(w[1]||1)), Math.max(1, Number(w[2]||w[1]||1))]);
+ }
+ return [[19,10],[41,10],[23,10]];
+}
+function startQuestDefeatBattle(locId){
+ const active = getActiveLocalDefeatQuestForLocation(locId || G.location);
+ if(!active){ notify(t('quest_battle_none'), 'var(--light1)'); return; }
+ if(!G.team || !G.team.length){ notify(t('no_pokemon_in_team'), 'var(--red)'); return; }
+ if(typeof canUseCurrentTeamForRegion === 'function' && !canUseCurrentTeamForRegion(G.region || 'kanto')){ notify(regionTeamRestrictionMessage(G.region || 'kanto'), 'var(--red)'); return; }
+ if(battle && battle.active){ notify(t('battle_in_progress'), 'var(--red)'); return; }
+ const pool = getQuestBattlePool(locId || G.location);
+ const picked = pool[rand(0, pool.length-1)];
+ const minLv = Number(picked[1] || picked[0] || 10);
+ const maxLv = Number(picked[2] || minLv);
+ const enemy = createPoke(Number(picked[0]), rand(minLv, maxLv), false);
+ if(!enemy){ notify(t('enemy_not_found_error'), 'var(--red)'); return; }
+ startBattle(enemy, false);
+ if(battle && battle.active){
+  battle.chill = false;
+  battle.noAutoCatch = true;
+  battle.questDefeatLoc = active.def.loc || locId || G.location;
+  battle.isQuestDefeatBattle = true;
+  addBattleLog(tr('quest_battle_started', {quest:getQuestText(active.inst.cat || 'main', active.def.id).title || t('quest_battle_title')}));
+ }
+}
+
 
 var _repeatableRoll = [];
 
@@ -266,6 +339,10 @@ if (typeof advanceQuests !== 'undefined' && typeof window !== 'undefined') windo
 if (typeof locMatches !== 'undefined' && typeof window !== 'undefined') window.locMatches = locMatches;
 if (typeof claimQuest !== 'undefined' && typeof window !== 'undefined') window.claimQuest = claimQuest;
 if (typeof talkNpcMainQuest !== 'undefined' && typeof window !== 'undefined') window.talkNpcMainQuest = talkNpcMainQuest;
+if (typeof getQuestDefinitionForInstance !== 'undefined' && typeof window !== 'undefined') window.getQuestDefinitionForInstance = getQuestDefinitionForInstance;
+if (typeof getActiveLocalDefeatQuestForLocation !== 'undefined' && typeof window !== 'undefined') window.getActiveLocalDefeatQuestForLocation = getActiveLocalDefeatQuestForLocation;
+if (typeof getQuestBattlePool !== 'undefined' && typeof window !== 'undefined') window.getQuestBattlePool = getQuestBattlePool;
+if (typeof startQuestDefeatBattle !== 'undefined' && typeof window !== 'undefined') window.startQuestDefeatBattle = startQuestDefeatBattle;
 if (typeof _refreshUI !== 'undefined' && typeof window !== 'undefined') window._refreshUI = _refreshUI;
 
 export {};

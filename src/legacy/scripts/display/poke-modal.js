@@ -187,14 +187,16 @@ function renderPokemonDetailModal(p, opts){
  const readonly = !!opts.readonly;
  const locLabel = opts.locationLabel || (boxId ? t('pc_box') : (idx!=null ? t('team_location_clean') : ''));
  const locked = readonly ? false : isPokemonLockedForBattleEdits(p, idx, boxId);
- const isShiny = !!(p.shinyActive || p.shiny || p.shinyUnlocked || isSpeciesShiny(p.id));
+ const shinyUnlocked = !!(p.shinyUnlocked || p.shiny || isSpeciesShiny(p.id));
+ if(shinyUnlocked && p.shinyActive === undefined){ p.shinyActive = true; p.shiny = true; }
+ const isShiny = !!p.shinyActive;
  const statRows = pokemonDetailStatRows(p);
  const moveRows = pokemonDetailMoveRows(p, {idx, boxId, readonly, locked});
  const talentHtml = readonly ? (()=>{
    const info = p.talent && TALENTS_FULL[p.talent] ? TALENTS_FULL[p.talent] : null;
    return info ? `<div class="poke-detail-ability-chip"><span>${info.name}</span><small>${getRarityLabel(info.rarity)}</small></div><div class="poke-detail-subtle">${info.info||''}</div>` : `<div class="poke-detail-subtle">${t('no_talent_species')}</div>`;
  })() : buildTalentSelectorHtml(p, idx!=null?idx:null, boxId||null);
- const shinyToggle = (!readonly && (p.shinyUnlocked || p.shiny || isSpeciesShiny(p.id))) ? `<label class="poke-detail-toggle"><input type="checkbox"${p.shinyActive?'checked':''} data-change-call="${boxId?'toggleBoxShinySkin':'toggleShinySkin'}" data-change-args="${boxId?`'${boxId}'`:idx}"> <span>${t('shiny_skin')}</span></label>` : '';
+ const shinyToggle = (!readonly && shinyUnlocked) ? `<button class="hbtn poke-detail-shiny-toggle ${isShiny?'is-on':'is-off'}" data-action="legacy-call" data-call="${boxId?'toggleBoxShinySkin':'toggleShinySkin'}" data-call-args="${boxId?`'${boxId}'`:idx}"><span class="poke-detail-shiny-star">★</span><span>${isShiny?t('shiny_skin_on'):t('shiny_skin_off')}</span></button>` : '';
  const evos = getEvolutionMethodsHtml(p.id);
  inner.innerHTML = `<div class="modal-title poke-detail-title">
    <div>${isShiny?'<span class="shiny-tag">★</span>':''}${p.name} <span class="poke-detail-id">#${p.id}</span></div>
