@@ -614,7 +614,9 @@ function applyAfkProgress(elapsedMs, reason, info){
   let lost = false;
   if(G.mine){
    G.mine.energy = Math.min(G.mine.maxEnergy || 100, (G.mine.energy || 0) + seconds * 2);
+   try{ if(typeof simulateAfkMineAutomation === 'function') simulateAfkMineAutomation(seconds); }catch(_){}
   }
+  try{ if(typeof simulateAfkTrainingProgress === 'function') simulateAfkTrainingProgress(seconds); }catch(_){}
   const loc = (typeof getLocObj === 'function') ? getLocObj(G.location) : null;
   const shouldFight = canAfkBattle(info);
   const shouldContinue = shouldFight;

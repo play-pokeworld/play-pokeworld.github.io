@@ -54,6 +54,7 @@ function unlockTrainingMove(p){
 
 const TRAINING_MULTI_SLOT_COST = 750000;
 var _trainingSlotTicker = null;
+var _lastTrainingPanelRenderAt = 0;
 
 function hasActiveTrainingBattle(){
  return !!(G && Array.isArray(G.trainingSlots) && G.trainingSlots.some(slot => slot && slot.active && slot.battle));
@@ -233,6 +234,27 @@ function trainingCdPctClass(cur, max){
  const pct = max ? clamp(Math.floor(100 - ((cur || 0) / max) * 100), 0, 100) : 0;
  return 'pct-' + Math.max(0, Math.min(100, Math.round(pct / 5) * 5));
 }
+function trainingCdPctValue(cur, max){ return max ? clamp(Math.floor(100 - ((cur || 0) / max) * 100), 0, 100) : 0; }
+function setTrainingPct(el, pct){ if(el){ el.dataset.pct = String(pct); el.style.width = pct + '%'; } }
+function updateTrainingLiveProgress(){
+ if(!G || !Array.isArray(G.trainingSlots)) return;
+ for(let i=0;i<G.trainingSlots.length;i++){
+  const slot = G.trainingSlots[i];
+  if(!slot || !slot.active || !slot.battle) continue;
+  const card = document.querySelector(`[data-training-slot-card="${i}"]`);
+  if(!card) continue;
+  const trainee = findPokemonByTrainingSlot(slot);
+  const tb = slot.battle;
+  const enemy = tb.enemy || (tb.enemies ? tb.enemies[tb.enemyIndex||0] : null);
+  if(!trainee || !enemy) continue;
+  setTrainingPct(card.querySelector('[data-training-fill="player-hp"]'), trainingBattleHpPct(trainee));
+  setTrainingPct(card.querySelector('[data-training-fill="enemy-hp"]'), trainingBattleHpPct(enemy));
+  setTrainingPct(card.querySelector('[data-training-fill="player-cd"]'), trainingCdPctValue(tb.pCd, tb.pCdMax));
+  setTrainingPct(card.querySelector('[data-training-fill="enemy-cd"]'), trainingCdPctValue(tb.eCd, tb.eCdMax));
+  const pText = card.querySelector('[data-training-text="player-hp"]'); if(pText) pText.textContent = `${trainee.currentHP}/${trainee.maxHP} PV`;
+  const eText = card.querySelector('[data-training-text="enemy-hp"]'); if(eText) eText.textContent = `${enemy.currentHP}/${enemy.maxHP} PV`;
+ }
+}
 function trainingBattleLog(slot, msg){
  if(!slot) return;
  if(!slot.battle) slot.battle = {};
@@ -297,7 +319,7 @@ function trainingStartNextOpponent(slotIndex){
  trainingBattleLog(slot, tr('training_live_next_round', {round:tb.enemyIndex+1, total:tb.enemies.length, enemy:enemy.name}));
  return true;
 }
-function trainingMoveDamage(attacker, defender, moveId){
+function trainingMoveDamage(attacker, defender, moveId, side='player'){
  const mv = MOVES[moveId];
  if(!attacker || !defender || !mv) return {damage:0, text:''};
  if(mv.cat === 'stat' || mv.pow === null || mv.pow === undefined || !mv.pow){
@@ -318,6 +340,9 @@ function trainingMoveDamage(attacker, defender, moveId){
  const crit = (mv.crit && chance(15)) ? 1.5 : 1;
  const randMult = rand(85,100) / 100;
  let dmg = Math.max(1, Math.floor(((2*(attacker.level||1)/5+2)*power*atk/def/50+2)*stab*eff*crit*randMult));
+ const staffEase = (typeof getStaffBonus === 'function') ? getStaffBonus('training','training_ease') : 0;
+ if(side === 'player' && staffEase) dmg = Math.max(1, Math.floor(dmg * (1 + staffEase)));
+ if(side === 'enemy' && staffEase) dmg = Math.max(1, Math.floor(dmg * (1 - staffEase)));
  if(attacker.status === 'burn' && mv.cat === 'phys') dmg = Math.max(1, Math.floor(dmg/2));
  return {damage:dmg, text:tr('training_live_hit', {name:attacker.name, move:getMoveName(moveId), target:defender.name, damage:dmg})};
 }
@@ -337,7 +362,7 @@ function trainingDoAttack(slotIndex, side){
  const idxKey = side === 'player' ? 'pMoveIdx' : 'eMoveIdx';
  const mv = moves[(tb[idxKey] || 0) % moves.length];
  tb[idxKey] = ((tb[idxKey] || 0) + 1) % moves.length;
- const res = trainingMoveDamage(attacker, defender, mv.id);
+ const res = trainingMoveDamage(attacker, defender, mv.id, side);
  if(res.text) trainingBattleLog(slot, res.text);
  if(res.damage > 0){
   defender.currentHP = Math.max(0, defender.currentHP - res.damage);
@@ -405,10 +430,23 @@ function completeTrainingSlot(slotIndex, success=true){
   slot.lastResult = tr('training_slot_last_failed', {mode:getTrainingModeLabel(mode)});
   notify(tr('training_slot_failed', {name:trainee.name}), 'var(--red)');
  }
+ if(typeof addStaffXp === 'function') addStaffXp('training', success ? 1 : 0.5);
  updateHeader();
  renderTeamWindow();
  renderTrainingBattlePanel();
  saveGame();
+ const autoCfg = (G.trainingAutomation && G.trainingAutomation.slots) ? G.trainingAutomation.slots[idx] : null;
+ if(autoCfg && autoCfg.enabled && success){
+  if(trainingAutomationEligible(trainee, mode)){
+   try{ startTrainingBattle(resolveTrainingAutoMode(trainee, autoCfg), idx); }catch(_){}
+  } else {
+   if(G.trainingSlots && G.trainingSlots[idx]) G.trainingSlots[idx] = {uid:null, loc:null, idStr:null, active:false};
+   try{ processTrainingAutomationQueues(); }catch(_){}
+  }
+ } else {
+  if(success && !hasAnyTrainingAvailable(trainee) && G.trainingSlots && G.trainingSlots[idx]) G.trainingSlots[idx] = {uid:null, loc:null, idStr:null, active:false};
+  try{ processTrainingAutomationQueues(); }catch(_){}
+ }
  return true;
 }
 function updateTrainingSlots(){
@@ -454,9 +492,33 @@ function startTrainingSlotTicker(){
  _trainingSlotTicker = setInterval(()=>{
   updateTrainingSlots();
   if(Array.isArray(G.trainingSlots) && G.trainingSlots.some(s=>s && s.active)){
-   try{ renderTrainingBattlePanel(); }catch(_){}
+   try{ updateTrainingLiveProgress(); }catch(_){}
+  } else {
+   try{ processTrainingAutomationQueues(); }catch(_){}
   }
  }, 100);
+}
+function simulateAfkTrainingProgress(seconds){
+ ensureTrainingSlots();
+ let ticks = Math.min(120, Math.floor(Math.max(0, seconds||0) / 25));
+ let completed = 0;
+ while(ticks-- > 0){
+  for(let i=0;i<getTrainingSlotCount();i++){
+   const slot = G.trainingSlots[i];
+   if(!slot || !slot.active || !slot.battle) continue;
+   const tb = slot.battle;
+   const enemy = tb.enemy;
+   if(enemy) enemy.currentHP = 0;
+   if(enemy) trainingBattleLog(slot, tr('training_live_enemy_down', {enemy:enemy.name}));
+   if(!trainingStartNextOpponent(i)){
+    completeTrainingSlot(i, true);
+    completed++;
+   }
+  }
+  try{ processTrainingAutomationQueues(); }catch(_){}
+ }
+ if(completed){ try{ renderTrainingWindow(); renderTrainingBattlePanel(); }catch(_){} }
+ return completed;
 }
 function cancelTrainingSlot(slotIndex){
  ensureTrainingSlots();
@@ -472,6 +534,8 @@ function cancelTrainingSlot(slotIndex){
  slot.mode = null;
  slot.battle = null;
  slot.lastResult = t('training_slot_cancelled');
+ const a = ensureTrainingAutomation();
+ if(a.slots[idx]) a.slots[idx].enabled = false;
  notify(t('training_slot_cancelled'), 'var(--light1)');
  saveGame();
  renderTrainingBattlePanel();
@@ -527,25 +591,25 @@ function renderTrainingBattlePanel(){
   const eHpClass = trainingBattleHpPct(enemy) > 50 ? 'high' : trainingBattleHpPct(enemy) > 20 ? 'medium' : 'low';
   const pMove = (trainee.moves||[])[(tb.pMoveIdx||0) % Math.max(1,(trainee.moves||[]).length)];
   const eMove = (enemy.moves||[])[(tb.eMoveIdx||0) % Math.max(1,(enemy.moves||[]).length)];
-  return `<div class="training-live-card">
+  return `<div class="training-live-card" data-training-slot-card="${i}">
    <div class="training-live-head"><b>${tr('training_slot_title', {slot:i+1})}</b><span>${getTrainingModeLabel(tb.mode)} · ${tr('training_round_label', {round:(tb.enemyIndex||0)+1, total:(tb.enemies||[]).length||1})}</span></div>
    <div class="training-live-duel">
     <div class="training-live-poke">
-     <div class="training-live-sprite">${spriteImg(trainee.id, trainee.emoji, {size:70, shiny:trainee.shinyActive})}</div>
+     <div class="training-live-sprite" data-context-call="openTrainingSlotPokeModal" data-context-args="${i}">${spriteImg(trainee.id, trainee.emoji, {size:70, shiny:trainee.shinyActive})}</div>
      <b>${trainee.name}</b><span>Nv.${trainee.level}</span>
-     <div class="hp-bar"><div class="hp-fill ${pHpClass}" data-pct="${trainingBattleHpPct(trainee)}"></div></div>
-     <small>${trainee.currentHP}/${trainee.maxHP} PV</small>
+     <div class="hp-bar"><div class="hp-fill ${pHpClass}" data-training-fill="player-hp" data-pct="${trainingBattleHpPct(trainee)}"></div></div>
+     <small data-training-text="player-hp">${trainee.currentHP}/${trainee.maxHP} PV</small>
      <div class="training-live-move">${pMove ? getMoveName(pMove.id) : '-'}</div>
-     <div class="training-live-cd"><div class="${trainingCdPctClass(tb.pCd, tb.pCdMax)}"></div></div>
+     <div class="training-live-cd"><div class="training-cd-fill" data-training-fill="player-cd" data-pct="${trainingCdPctValue(tb.pCd, tb.pCdMax)}"></div></div>
     </div>
     <div class="training-live-vs">VS</div>
     <div class="training-live-poke enemy">
      <div class="training-live-sprite">${spriteImg(enemy.id, enemy.emoji, {size:70, shiny:enemy.shinyActive})}</div>
      <b>${enemy.name}</b><span>Nv.${enemy.level}</span>
-     <div class="hp-bar"><div class="hp-fill ${eHpClass}" data-pct="${trainingBattleHpPct(enemy)}"></div></div>
-     <small>${enemy.currentHP}/${enemy.maxHP} PV</small>
+     <div class="hp-bar"><div class="hp-fill ${eHpClass}" data-training-fill="enemy-hp" data-pct="${trainingBattleHpPct(enemy)}"></div></div>
+     <small data-training-text="enemy-hp">${enemy.currentHP}/${enemy.maxHP} PV</small>
      <div class="training-live-move">${eMove ? getMoveName(eMove.id) : '-'}</div>
-     <div class="training-live-cd"><div class="${trainingCdPctClass(tb.eCd, tb.eCdMax)}"></div></div>
+     <div class="training-live-cd"><div class="training-cd-fill" data-training-fill="enemy-cd" data-pct="${trainingCdPctValue(tb.eCd, tb.eCdMax)}"></div></div>
     </div>
    </div>
    <button class="hbtn" data-action="legacy-call" data-call="cancelTrainingSlot" data-call-args="${i}">✖ ${t('training_slot_cancel')}</button>
@@ -564,37 +628,371 @@ function upgradeTrainingMultiSlot(){
  notify(t('training_multi_slot_bought'), 'var(--green)');
  openTrainingUpgradeMenu();
 }
+const TRAINING_AUTOMATION_SLOT_COST = 1000000;
+const TRAINING_QUEUE_UPGRADE_COSTS = [250000, 750000, 1500000, 3000000];
+function getTrainingQueueLimit(){
+ const a = ensureTrainingAutomation();
+ return 3 + clamp(a.queueUpgradeLevel || 0, 0, TRAINING_QUEUE_UPGRADE_COSTS.length) * 3;
+}
+function getTrainingQueueUpgradeCost(){
+ const a = ensureTrainingAutomation();
+ return TRAINING_QUEUE_UPGRADE_COSTS[a.queueUpgradeLevel || 0] || null;
+}
+function upgradeTrainingQueueSize(){
+ const cost = getTrainingQueueUpgradeCost();
+ if(!cost){ notify(t('queue_size_maxed'), 'var(--green)'); return; }
+ if(G.money < cost){ notify(t('n.pas_assez_dargent'), 'var(--red)'); return; }
+ G.money -= cost;
+ const a = ensureTrainingAutomation();
+ a.queueUpgradeLevel = (a.queueUpgradeLevel || 0) + 1;
+ updateHeader(); saveGame();
+ notify(tr('queue_size_upgraded', {count:getTrainingQueueLimit()}), 'var(--green)');
+ try{ openTrainingManagementMenu('automation'); }catch(_){}
+}
+function ensureTrainingAutomation(){
+ if(!G.trainingAutomation || typeof G.trainingAutomation !== 'object') G.trainingAutomation = {};
+ if(!G.trainingAutomation.purchasedSlots || typeof G.trainingAutomation.purchasedSlots !== 'object') G.trainingAutomation.purchasedSlots = {};
+ if(!Array.isArray(G.trainingAutomation.slots)) G.trainingAutomation.slots = [];
+ for(let i=0;i<2;i++){
+  if(!G.trainingAutomation.slots[i]) G.trainingAutomation.slots[i] = {enabled:false, mode:'ev', filterShiny:'all', filterEv:'all', sort:'ev_asc', queue:[]};
+  const cfg = G.trainingAutomation.slots[i];
+  if(!cfg.mode) cfg.mode = 'ev';
+  if(!cfg.filterShiny) cfg.filterShiny = 'all';
+  if(!cfg.filterEv) cfg.filterEv = cfg.filterIv || 'all';
+  if(!cfg.sort || cfg.sort === 'iv_desc' || cfg.sort === 'iv_asc') cfg.sort = 'ev_asc';
+  if(!Array.isArray(cfg.queue)) cfg.queue = [];
+ }
+ return G.trainingAutomation;
+}
+function isTrainingAutomationPurchased(slotIndex){
+ const a = ensureTrainingAutomation();
+ return !!a.purchasedSlots[String(slotIndex)];
+}
+function buyTrainingAutomationSlot(slotIndex){
+ const idx = clamp(Number(slotIndex)||0, 0, 1);
+ if(isTrainingAutomationPurchased(idx)){ notify(t('automation_already_bought'), 'var(--green)'); return; }
+ if(G.money < TRAINING_AUTOMATION_SLOT_COST){ notify(tr('automation_upgrade_need_money', {price:TRAINING_AUTOMATION_SLOT_COST.toLocaleString()}), 'var(--red)'); return; }
+ G.money -= TRAINING_AUTOMATION_SLOT_COST;
+ const a = ensureTrainingAutomation();
+ a.purchasedSlots[String(idx)] = true;
+ updateHeader();
+ saveGame();
+ notify(tr('automation_upgrade_bought', {name:tr('training_slot_title',{slot:idx+1}), price:TRAINING_AUTOMATION_SLOT_COST.toLocaleString()}), 'var(--green)');
+ openTrainingManagementMenu('automation');
+}
+function setTrainingAutomationOption(slotIndex, key, value){
+ const idx = clamp(Number(slotIndex)||0, 0, 1);
+ const a = ensureTrainingAutomation();
+ a.slots[idx][key] = value;
+ saveGame();
+ openTrainingManagementMenu('automation');
+}
+function toggleTrainingAutomationSlot(slotIndex, openMenu=true){
+ const idx = clamp(Number(slotIndex)||0, 0, 1);
+ if(!isTrainingAutomationPurchased(idx)){ buyTrainingAutomationSlot(idx); return; }
+ const a = ensureTrainingAutomation();
+ const willEnable = !a.slots[idx].enabled;
+ if(willEnable && typeof battle !== 'undefined' && battle && battle.active){
+  notify(t('battle_in_progress_no_training'), 'var(--red)');
+  return;
+ }
+ a.slots[idx].enabled = willEnable;
+ saveGame();
+ if(willEnable) processTrainingAutomationQueues();
+ renderTrainingWindow();
+ try{ renderTrainingBattlePanel(); }catch(_){}
+ if(openMenu) openTrainingManagementMenu('automation');
+}
+function trainingAutomationEligible(p, mode){
+ if(!p || p.locked) return false;
+ if(mode === 'all') return hasAnyTrainingAvailable(p);
+ if(mode === 'ev') return Object.values(p.evs||{}).reduce((a,b)=>a+(Number(b)||0),0) < 36;
+ if(mode === 'talent') return getTrainableTalents(p).length > 0;
+ if(mode === 'move') return getTrainableLockedMoves(p).length > 0;
+ if(mode === 'level') return (p.level||1) < 100;
+ return hasAnyTrainingAvailable(p);
+}
+function resolveTrainingAutoMode(p, cfg){
+ const wanted = (cfg && cfg.mode) || 'ev';
+ if(wanted !== 'all') return wanted;
+ if(getTrainableTalents(p).length > 0) return 'talent';
+ if(getTrainableLockedMoves(p).length > 0) return 'move';
+ if(Object.values(p.evs||{}).reduce((a,b)=>a+(Number(b)||0),0) < 36) return 'ev';
+ if((p.level||1) < 100) return 'level';
+ return 'ev';
+}
+function trainingAutomationCandidates(slotIndex){
+ const a = ensureTrainingAutomation();
+ const cfg = a.slots[slotIndex];
+ const mode = cfg.mode || 'ev';
+ let list=[];
+ for(const k in (G.collection||{})){
+  const p = G.collection[k];
+  if(!p) continue;
+  if(typeof ensurePokemonUid === 'function') ensurePokemonUid(p); else if(!p.uid) p.uid = 'p_' + Math.random().toString(36).substr(2,9);
+  if((G.team||[]).some(tp=>tp && tp.uid === p.uid)) continue;
+  if(!trainingAutomationEligible(p, mode)) continue;
+  const shiny = !!(p.shinyUnlocked || p.shinyActive || p.shiny || isSpeciesShiny(p.id));
+  if(cfg.filterShiny === 'non_shiny' && shiny) continue;
+  if(cfg.filterShiny === 'shiny' && !shiny) continue;
+  const ivTotal = (typeof pokemonIvTotal==='function'?pokemonIvTotal(p):0);
+  const evTotal = (typeof pokemonEvTotal==='function'?pokemonEvTotal(p):0);
+  if(cfg.filterEv === 'complete' && evTotal < 36) continue;
+  if(cfg.filterEv === 'incomplete' && evTotal >= 36) continue;
+  list.push({key:k, uid:p.uid, p, iv:ivTotal, ev:evTotal, talents:getTrainableTalents(p).length, moves:getTrainableLockedMoves(p).length, levelMissing:(p.level||1)<100?1:0});
+ }
+ const sort = cfg.sort || 'ev_asc';
+ list.sort((a,b)=>{
+  if(sort === 'ev_desc') return b.ev - a.ev || a.p.id - b.p.id;
+  if(sort === 'level_desc') return (b.p.level||1) - (a.p.level||1) || a.ev - b.ev;
+  if(sort === 'level_asc') return (a.p.level||1) - (b.p.level||1) || a.ev - b.ev;
+  if(sort === 'talent_missing') return b.talents - a.talents || a.ev - b.ev;
+  if(sort === 'move_missing') return b.moves - a.moves || a.ev - b.ev;
+  if(sort === 'level_missing') return b.levelMissing - a.levelMissing || (a.p.level||1) - (b.p.level||1);
+  if(sort === 'dex') return (a.p.id||0) - (b.p.id||0);
+  return a.ev - b.ev || (a.p.level||1) - (b.p.level||1);
+ });
+ return list;
+}
+function rebuildTrainingQueue(slotIndex){
+ const idx = clamp(Number(slotIndex)||0, 0, 1);
+ cleanTrainingQueue(idx);
+ saveGame();
+ openTrainingManagementMenu('automation');
+ notify(t('queue_refreshed'), 'var(--green)');
+}
+function findPokemonByUidAnywhere(uid){
+ for(const p of (G.team||[])) if(p && p.uid === uid) return {p, loc:'team', idStr:String(G.team.indexOf(p))};
+ for(const k in (G.collection||{})) if(G.collection[k] && G.collection[k].uid === uid) return {p:G.collection[k], loc:'box', idStr:k};
+ return null;
+}
+function cleanTrainingQueue(slotIndex){
+ const a = ensureTrainingAutomation();
+ const cfg = a.slots[slotIndex];
+ const seen = new Set();
+ cfg.queue = (cfg.queue||[]).filter(uid=>{
+  if(!uid || seen.has(uid)) return false;
+  seen.add(uid);
+  const found = findPokemonByUidAnywhere(uid);
+  if(!found || found.loc !== 'box') return false;
+  return trainingAutomationEligible(found.p, cfg.mode || 'ev');
+ });
+ return cfg.queue;
+}
+function refillTrainingQueueFromRules(slotIndex){
+ const a = ensureTrainingAutomation();
+ const cfg = a.slots[slotIndex];
+ cleanTrainingQueue(slotIndex);
+ const cap = getTrainingQueueLimit();
+ let added = 0;
+ const queued = new Set(cfg.queue || []);
+ const busy = new Set((G.trainingSlots||[]).filter(Boolean).map(slot => slot.uid).filter(Boolean));
+ if(G.hatcheryQueue) for(const uid of G.hatcheryQueue) busy.add(uid);
+ for(const entry of trainingAutomationCandidates(slotIndex)){
+  if((cfg.queue||[]).length >= cap) break;
+  if(queued.has(entry.uid) || busy.has(entry.uid)) continue;
+  cfg.queue.push(entry.uid);
+  queued.add(entry.uid);
+  added++;
+ }
+ return added;
+}
+function processTrainingAutomationQueues(){
+ const a = ensureTrainingAutomation();
+ if(typeof battle !== 'undefined' && battle && battle.active) return false;
+ ensureTrainingSlots();
+ let changed = false;
+ for(let i=0;i<getTrainingSlotCount();i++){
+  const slot = G.trainingSlots && G.trainingSlots[i];
+  const cfg = a.slots[i];
+  if(!cfg || !cfg.enabled || !isTrainingAutomationPurchased(i)) continue;
+  cleanTrainingQueue(i);
+  const added = refillTrainingQueueFromRules(i);
+  if(added) changed = true;
+  if(slot && slot.active) continue;
+  if(slot && slot.uid){
+   const current = findPokemonByTrainingSlot(slot);
+   if(current && trainingAutomationEligible(current, cfg.mode || 'ev')){
+    startTrainingBattle(resolveTrainingAutoMode(current, cfg), i);
+    changed = true;
+    continue;
+   }
+   if(current && !hasAnyTrainingAvailable(current)){
+    G.trainingSlots[i] = {uid:null, loc:null, idStr:null, active:false};
+   } else if(current) {
+    continue;
+   }
+  }
+  while(cfg.queue.length){
+   const uid = cfg.queue.shift();
+   const found = findPokemonByUidAnywhere(uid);
+   if(!found || found.loc !== 'box') continue;
+   if(!trainingAutomationEligible(found.p, cfg.mode || 'ev')) continue;
+   setTrainingSlotPokemon(i, found.loc, found.idStr, found.p);
+   startTrainingBattle(resolveTrainingAutoMode(found.p, cfg), i);
+   changed = true;
+   break;
+  }
+ }
+ if(changed) saveGame();
+ return changed;
+}
+function isUidInAnyAutomationQueue(uid){
+ if(G.hatcheryQueue && G.hatcheryQueue.includes(uid)) return true;
+ const a = ensureTrainingAutomation();
+ return a.slots.some(s => s && Array.isArray(s.queue) && s.queue.includes(uid));
+}
+function isUidTrainingActive(uid){ return !!((G.trainingSlots||[]).find(slot => slot && slot.uid === uid && slot.active)); }
+function hasAnyTrainingAvailable(p){
+ if(!p) return false;
+ const st = trainingModeAvailability(p);
+ return !!(st.move || st.talent || st.ev || st.level);
+}
+function addPokemonToTrainingQueue(slotIndex, boxId, silent=false){
+ const idx = clamp(Number(slotIndex)||0, 0, 1);
+ const a = ensureTrainingAutomation();
+ const cfg = a.slots[idx];
+ cleanTrainingQueue(idx);
+ const p = G.collection[boxId] || G.collection[String(boxId)];
+ if(!p){ notify(t('pokemon_not_found'), 'var(--red)'); return false; }
+ if(typeof ensurePokemonUid === 'function') ensurePokemonUid(p); else if(!p.uid) p.uid='p_'+Math.random().toString(36).substr(2,9);
+ if(p.locked){ notify(t('queue_locked_rejected'), 'var(--red)'); return false; }
+ if((G.team||[]).some(tp=>tp && tp.uid === p.uid)){ notify(t('queue_team_rejected'), 'var(--red)'); return false; }
+ if(!hasAnyTrainingAvailable(p)){ notify(t('training_no_available'), 'var(--red)'); return false; }
+ if(!trainingAutomationEligible(p, cfg.mode || 'ev')){ notify(t('training_no_available_for_mode'), 'var(--red)'); return false; }
+ if(isUidTrainingActive(p.uid)){ notify(t('queue_already_busy'), 'var(--red)'); return false; }
+ if(G.hatcheryQueue && G.hatcheryQueue.includes(p.uid)){ notify(t('queue_already_other'), 'var(--red)'); return false; }
+ if(cfg.queue.includes(p.uid)){ notify(t('queue_already_added'), 'var(--light1)'); return false; }
+ ensureTrainingSlots();
+ const slot = G.trainingSlots[idx];
+ if(slot && !slot.active && !slot.uid){
+  setTrainingSlotPokemon(idx, 'box', boxId, p);
+  if(cfg.enabled && isTrainingAutomationPurchased(idx) && !(typeof battle !== 'undefined' && battle && battle.active)){
+   startTrainingBattle(resolveTrainingAutoMode(p, cfg), idx);
+  }
+  if(!silent) notify(tr('selected_for_training_slot', {name:p.name, slot:idx+1}), 'var(--green)');
+  return 'slot';
+ }
+ if(cfg.queue.length >= getTrainingQueueLimit()){ notify(tr('queue_full', {count:getTrainingQueueLimit()}), 'var(--red)'); return false; }
+ cfg.queue.push(p.uid);
+ saveGame();
+ if(!silent) notify(tr('queue_added_training', {name:p.name, slot:idx+1}), 'var(--green)');
+ if(!silent){ try{ openBoxPokeModal(boxId); }catch(_){} }
+ return 'queue';
+}
+function removePokemonFromTrainingQueue(slotIndex, uid){
+ const idx = clamp(Number(slotIndex)||0, 0, 1);
+ const a = ensureTrainingAutomation();
+ a.slots[idx].queue = (a.slots[idx].queue||[]).filter(x=>x!==uid);
+ saveGame();
+ try{ openTrainingManagementMenu('automation'); }catch(_){}
+}
+function clearTrainingQueue(slotIndex){
+ const idx = clamp(Number(slotIndex)||0, 0, 1);
+ const a = ensureTrainingAutomation();
+ a.slots[idx].queue = [];
+ saveGame();
+ try{ openTrainingManagementMenu('automation'); }catch(_){}
+}
+function isPokemonQueuedTraining(p){
+ if(!p || !p.uid) return false;
+ const a = ensureTrainingAutomation();
+ return a.slots.some(s => s && Array.isArray(s.queue) && s.queue.includes(p.uid));
+}
+function renderTrainingQueuePreview(slotIndex, limit=24){
+ const a = ensureTrainingAutomation();
+ const cfg = a.slots[slotIndex];
+ cleanTrainingQueue(slotIndex);
+ const cap = getTrainingQueueLimit();
+ const html = (cfg.queue||[]).slice(0,limit).map(uid=>{
+  const found = findPokemonByUidAnywhere(uid);
+  const p = found && found.p;
+  if(!p) return '';
+  return `<div class="queue-chip">${spriteImg(p.id,p.emoji,{size:28,shiny:p.shinyActive})}<span>${p.name} · Nv.${p.level} · IV ${typeof pokemonIvTotal==='function'?pokemonIvTotal(p):0}</span><button class="queue-remove-btn" data-action="legacy-call" data-call="removePokemonFromTrainingQueue" data-call-args="${slotIndex}, '${uid}'">✕</button></div>`;
+ }).join('');
+ return `<div class="queue-cap">${tr('queue_capacity', {count:(cfg.queue||[]).length, max:cap})}</div>` + (html || `<div class="dict-muted">${t('queue_empty')}</div>`);
+}
+function trainingAutomationRulesHtml(i, cfg){
+ return `<div class="automation-rules-grid">
+  <label class="automation-field"><span>${t('training_auto_mode')}</span><select data-change-call="setTrainingAutomationOption" data-change-args="${i}, 'mode', this.value">
+   <option value="all" ${cfg.mode==='all'?'selected':''}>${t('training_auto_mode_all')}</option>
+   <option value="ev" ${cfg.mode==='ev'?'selected':''}>${getTrainingModeLabel('ev')}</option>
+   <option value="talent" ${cfg.mode==='talent'?'selected':''}>${getTrainingModeLabel('talent')}</option>
+   <option value="move" ${cfg.mode==='move'?'selected':''}>${getTrainingModeLabel('move')}</option>
+   <option value="level" ${cfg.mode==='level'?'selected':''}>${getTrainingModeLabel('level')}</option>
+  </select></label>
+  <label class="automation-field"><span>${t('auto_filter_shiny')}</span><select data-change-call="setTrainingAutomationOption" data-change-args="${i}, 'filterShiny', this.value">
+   <option value="all" ${cfg.filterShiny==='all'?'selected':''}>${t('box_filter_all_shiny')}</option>
+   <option value="non_shiny" ${cfg.filterShiny==='non_shiny'?'selected':''}>${t('box_filter_non_shiny_only')}</option>
+   <option value="shiny" ${cfg.filterShiny==='shiny'?'selected':''}>${t('box_filter_shiny_only')}</option>
+  </select></label>
+  <label class="automation-field"><span>${t('box_filter_ev')}</span><select data-change-call="setTrainingAutomationOption" data-change-args="${i}, 'filterEv', this.value">
+   <option value="all" ${cfg.filterEv==='all'?'selected':''}>${t('box_filter_all_ev')}</option>
+   <option value="complete" ${cfg.filterEv==='complete'?'selected':''}>${t('box_filter_ev_complete')}</option>
+   <option value="incomplete" ${cfg.filterEv==='incomplete'?'selected':''}>${t('box_filter_ev_incomplete')}</option>
+  </select></label>
+  <label class="automation-field"><span>${t('sort_label')}</span><select data-change-call="setTrainingAutomationOption" data-change-args="${i}, 'sort', this.value">
+   <option value="ev_asc" ${cfg.sort==='ev_asc'?'selected':''}>${t('auto_sort_ev_asc')}</option>
+   <option value="ev_desc" ${cfg.sort==='ev_desc'?'selected':''}>${t('auto_sort_ev_desc')}</option>
+   <option value="level_desc" ${cfg.sort==='level_desc'?'selected':''}>${t('auto_sort_level_desc')}</option>
+   <option value="level_asc" ${cfg.sort==='level_asc'?'selected':''}>${t('auto_sort_level_asc')}</option>
+   <option value="talent_missing" ${cfg.sort==='talent_missing'?'selected':''}>${t('auto_sort_talent_missing')}</option>
+   <option value="move_missing" ${cfg.sort==='move_missing'?'selected':''}>${t('auto_sort_move_missing')}</option>
+   <option value="level_missing" ${cfg.sort==='level_missing'?'selected':''}>${t('auto_sort_level_missing')}</option>
+   <option value="dex" ${cfg.sort==='dex'?'selected':''}>${t('auto_sort_dex')}</option>
+  </select></label>
+ </div>`;
+}
+function renderTrainingAutomationSlotCard(i){
+ const a = ensureTrainingAutomation();
+ const cfg = a.slots[i];
+ const purchased = isTrainingAutomationPurchased(i);
+ const unlocked = i < getTrainingSlotCount();
+ if(!unlocked) return `<div class="automation-card training-auto-slot-card"><div class="automation-card-head"><span>${tr('training_slot_title',{slot:i+1})}</span></div><div class="automation-card-desc">${t('training_slot_locked')}</div></div>`;
+ if(!purchased){
+  return `<div class="automation-card training-auto-slot-card"><div class="automation-card-head"><span>${tr('training_slot_title',{slot:i+1})}</span><b>${t('automation_locked_upgrade')}</b></div></div>`;
+ }
+ return `<div class="automation-card training-auto-slot-card ${cfg.enabled?'is-owned':''}">
+  <button class="hbtn automation-toggle-btn ${cfg.enabled?'is-on':'is-off'}" data-action="legacy-call" data-call="toggleTrainingAutomationSlot" data-call-args="${i}"><span>${tr('training_slot_title',{slot:i+1})}</span><b>${cfg.enabled?t('automation_enabled'):t('automation_disabled')}</b></button>
+  ${trainingAutomationRulesHtml(i, cfg)}
+  <div class="queue-panel"><div class="queue-panel-head"><b>${t('queue_waiting_list')}</b><span>${tr('queue_capacity', {count:(cfg.queue||[]).length, max:getTrainingQueueLimit()})}</span></div><div class="queue-list">${renderTrainingQueuePreview(i)}</div><div class="queue-actions"><button class="hbtn queue-build-btn" data-action="legacy-call" data-call="openUnifiedSelectorModal" data-call-args="'training_queue_${i}'">➕ ${t('queue_add_from_box')}</button><button class="hbtn" data-action="legacy-call" data-call="clearTrainingQueue" data-call-args="${i}">${t('queue_clear')}</button></div></div>
+ </div>`;
+}
+function trainingAutomationUnlockCard(i){
+ const purchased = isTrainingAutomationPurchased(i);
+ return `<div class="upgrade-card ${purchased?'is-owned':''}"><div><b>${tr('training_slot_title',{slot:i+1})} · ${t('management_automation')}</b><span>${purchased?t('automation_owned'):tr('automation_buy_button', {price:TRAINING_AUTOMATION_SLOT_COST.toLocaleString()})}</span></div>${purchased?'':`<button class="hbtn purchase-btn" data-action="legacy-call" data-call="buyTrainingAutomationSlot" data-call-args="${i}">${t('buy_btn')}</button>`}</div>`;
+}
 function renderTrainingManagementTabs(active){
  return `<div class="management-tabs">
   <button class="hbtn ${active==='upgrades'?'active':''}" data-action="legacy-call" data-call="openTrainingManagementMenu" data-call-args="'upgrades'">⬆ ${t('management_upgrades')}</button>
   <button class="hbtn ${active==='automation'?'active':''}" data-action="legacy-call" data-call="openTrainingManagementMenu" data-call-args="'automation'">🤖 ${t('management_automation')}</button>
-  <button class="hbtn ${active==='trainers'?'active':''}" data-action="legacy-call" data-call="openTrainingManagementMenu" data-call-args="'trainers'">🧑‍🏫 ${t('management_trainers')}</button>
+  <button class="hbtn ${active==='trainers'?'active':''}" data-action="legacy-call" data-call="openTrainingManagementMenu" data-call-args="'trainers'">🧑‍🏫 ${t('training_trainers_title')}</button>
  </div>`;
 }
 function openTrainingManagementMenu(page='upgrades'){
  const inner=document.getElementById('poke-modal-inner');
  const modal=document.getElementById('poke-modal');
  if(!inner||!modal) return;
+ modal.classList.remove('poke-detail-front');
+ inner.classList.remove('poke-detail-inner');
+ inner.classList.add('management-inner');
  ensureTrainingSlots();
+ const queueCost = getTrainingQueueUpgradeCost();
  const body = page === 'trainers'
-  ? `<div class="dict-info-block"><b>🧑‍🏫 ${t('management_trainers')}</b><br>${t('training_trainers_soon')}</div>`
+  ? `${typeof renderStaffList==='function'?renderStaffList('training'):''}`
   : page === 'automation'
-  ? `<div class="dict-info-block"><b>${t('training_automation_title')}</b><br>${t('training_automation_desc')}</div>
-     <div class="training-auto-slot-list">${[0,1].map(i=>{
-       const slot = G.trainingSlots[i];
-       const p = slot ? findPokemonByTrainingSlot(slot) : null;
-       const unlocked = i < getTrainingSlotCount();
-       return `<div class="training-auto-slot-card ${unlocked?'':'is-locked'}">
-        <b>${tr('training_slot_title', {slot:i+1})}</b>
-        <span>${unlocked ? (p ? `${p.name} · Nv.${p.level}${slot.active?' · '+t('training_slot_active'):''}` : t('training_slot_empty')) : t('training_slot_locked')}</span>
-       </div>`;
-     }).join('')}</div>`
-  : `<div class="dict-info-block"><b>${t('training_slots')}</b><br>${tr('training_slots_current', {count:getTrainingSlotCount(), max:2})}</div>
-     <div class="dict-info-block">${G.trainingMultiSlot ? t('training_multi_slot_max') : `<button class="hbtn purchase-btn" data-action="legacy-call" data-call="upgradeTrainingMultiSlot" data-call-args="">⬆ ${tr('training_multi_slot_buy', {price:TRAINING_MULTI_SLOT_COST.toLocaleString()})}</button>`}</div>
-     <div class="dict-info-block"><b>${t('note')} :</b><br>${t('training_multi_slot_note')}</div>`;
- inner.innerHTML = `<div class="modal-title"><div>⚙️ ${t('training_management_title')}</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
- ${renderTrainingManagementTabs(page)}
- ${body}`;
+  ? `<div class="training-auto-slot-list vertical">${[0,1].map(i=>renderTrainingAutomationSlotCard(i)).join('')}</div>`
+  : `<div class="upgrade-grid">
+      <div class="upgrade-card ${G.trainingMultiSlot?'is-owned':''}"><div><b>${t('training_slots')}</b><span>${getTrainingSlotCount()}/2</span></div>${G.trainingMultiSlot ? `<b>${t('automation_owned')}</b>` : `<button class="hbtn purchase-btn" data-action="legacy-call" data-call="upgradeTrainingMultiSlot" data-call-args="">${TRAINING_MULTI_SLOT_COST.toLocaleString()}₽</button>`}</div>
+      <div class="upgrade-card"><div><b>${t('queue_size_title')}</b><span>${tr('queue_capacity', {count:0, max:getTrainingQueueLimit()})}</span></div>${queueCost?`<button class="hbtn purchase-btn" data-action="legacy-call" data-call="upgradeTrainingQueueSize" data-call-args="">${queueCost.toLocaleString()}₽</button>`:`<b>${t('queue_size_maxed')}</b>`}</div>
+      ${trainingAutomationUnlockCard(0)}
+      ${trainingAutomationUnlockCard(1)}
+     </div>`;
+ inner.innerHTML = `<div class="modal-title management-title"><div>⚙️ ${t('training_management_title')}</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
+ <div class="management-shell management-training">
+  ${renderTrainingManagementTabs(page)}
+  <div class="management-content">${body}</div>
+ </div>`;
  modal.classList.add('open');
 }
 function openTrainingUpgradeMenu(){ openTrainingManagementMenu('upgrades'); }
@@ -632,17 +1030,20 @@ function renderTrainingSlot(slotIndex){
  const last = slot && slot.lastResult ? `<div class="training-slot-result">${slot.lastResult}</div>` : '';
  const actions = active
   ? `<button class="hbtn" data-action="legacy-call" data-call="cancelTrainingSlot" data-call-args="${slotIndex}">✖ ${t('training_slot_cancel')}</button>`
-  : `<button class="hbtn" data-action="legacy-call" data-call="openTrainingSlotSelector" data-call-args="${slotIndex}">${t('training_slot_change')}</button>`;
+  : `<button class="hbtn" data-action="legacy-call" data-call="openTrainingSlotSelector" data-call-args="${slotIndex}">${t('training_slot_change')}</button>${slot&&slot.uid?`<button class="hbtn" data-action="legacy-call" data-call="clearTrainingSlot" data-call-args="${slotIndex}">${t('remove')}</button>`:''}`;
+ const autoState = (G.trainingAutomation && G.trainingAutomation.slots && G.trainingAutomation.slots[slotIndex]) ? G.trainingAutomation.slots[slotIndex] : {enabled:false};
+ const autoPurchased = typeof isTrainingAutomationPurchased === 'function' && isTrainingAutomationPurchased(slotIndex);
+ const autoBtn = `<button class="hbtn training-slot-auto-btn ${autoState.enabled?'is-on':'is-off'}" data-action="legacy-call" data-call="toggleTrainingAutomationSlot" data-call-args="${slotIndex}, false">🤖 ${autoPurchased ? (autoState.enabled?t('automation_enabled'):t('automation_disabled')) : tr('automation_buy_button', {price:TRAINING_AUTOMATION_SLOT_COST.toLocaleString()})}</button>`;
  return `<div class="training-slot-card ${active?'is-active':''}">
   <div class="training-slot-head"><b>${slotTitle}</b><span>${active?t('training_slot_active'):t('ready')}</span></div>
   <div class="training-slot-pokemon">
-   <div class="training-slot-sprite">${spriteImg(trainee.id, trainee.emoji, {size:58, shiny:trainee.shinyActive})}</div>
+   <div class="training-slot-sprite" data-context-call="openTrainingSlotPokeModal" data-context-args="${slotIndex}">${spriteImg(trainee.id, trainee.emoji, {size:58, shiny:trainee.shinyActive})}</div>
    <div><b>${trainee.name}</b> <span>Nv.${trainee.level}</span><br>
    <small>EVs ${state.totalEvs}/36 · Talents ${getUnlockedTalentListForSpecies(trainee.id).length}/${getSpeciesTalents(trainee.id).length} · Moves ${getTrainableLockedMoves(trainee).length}</small></div>
   </div>
   ${active?`<div class="training-slot-result">${t('training_live_visible_hint')}</div>`:''}
   ${last}
-  <div class="training-slot-actions">${actions}</div>
+  <div class="training-slot-actions">${actions}${autoBtn}</div>
   <div class="training-mode-grid">
    ${trainingButtonHtml('move', state.move && !active, slotIndex)}
    ${trainingButtonHtml('talent', state.talent && !active, slotIndex)}
@@ -650,6 +1051,16 @@ function renderTrainingSlot(slotIndex){
    ${trainingButtonHtml('level', state.level && !active, slotIndex)}
   </div>
  </div>`;
+}
+function openTrainingSlotPokeModal(slotIndex){
+ ensureTrainingSlots();
+ const idx = clamp(Number(slotIndex)||0, 0, getTrainingSlotCount()-1);
+ const slot = G.trainingSlots[idx];
+ const p = findPokemonByTrainingSlot(slot);
+ if(!p) return;
+ if(slot && slot.loc === 'team') openPokeModal(Number(slot.idStr||0));
+ else if(slot && slot.loc === 'box' && typeof openBoxPokeModal === 'function') openBoxPokeModal(slot.idStr);
+ else if(typeof renderPokemonDetailModal === 'function') renderPokemonDetailModal(p,{readonly:true, locationLabel:t('selector_title_training')});
 }
 function renderTrainingWindow(){
  const el = document.getElementById('training-window-body');
@@ -665,10 +1076,7 @@ function renderTrainingWindow(){
  const slotHtml = [];
  for(let i=0;i<count;i++) slotHtml.push(renderTrainingSlot(i));
  const lockedHint = !G.trainingMultiSlot ? `<div class="training-locked-slot"><b>${t('training_slot_locked')}</b><button class="hbtn" data-action="legacy-call" data-call="openTrainingUpgradeMenu" data-call-args="">⚙️ ${tr('training_multi_slot_buy', {price:TRAINING_MULTI_SLOT_COST.toLocaleString()})}</button></div>` : '';
- el.innerHTML = `<div class="training-header-card">
-  <div><b class="extracted-template-style-186">${t('training_center_title')}</b><br><span class="extracted-template-style-188">${t('training_slots')} ${count}/2 · ${t('training_parallel_hint')}</span></div>
-  <div class="training-header-actions"><button class="hbtn" data-action="legacy-call" data-call="openTrainingManagementMenu" data-call-args="'upgrades'">⚙️ ${t('training_management_button')}</button></div>
- </div>
+ el.innerHTML = `<div class="hatchery-upgrade-row"><button class="hbtn" data-action="legacy-call" data-call="openTrainingManagementMenu" data-call-args="'upgrades'">⚙️ ${t('training_management_button')}</button></div>
  <div class="training-slot-grid">${slotHtml.join('')}${lockedHint}</div>`;
 }
 function startTrainingBattle(mode='ev', slotIndex=0){
@@ -688,6 +1096,7 @@ function startTrainingBattle(mode='ev', slotIndex=0){
  }
  if(mode === 'move' && !getTrainableLockedMoves(trainee).length){ notify(t('training_mode_move_done'), 'var(--red)'); return; }
  if(mode === 'talent' && !getTrainableTalents(trainee).length){ notify(t('all_talents_unlocked'), 'var(--red)'); return; }
+ if(typeof battle !== 'undefined' && battle){ battle.sessionCatches=[]; battle.sessionItems={}; try{ renderBattleLoot(); }catch(_){} }
  const enemies = trainingCreateEnemyTeam(trainee, mode);
  if(!enemies.length){ notify(t('enemy_not_found_error'), 'var(--red)'); return; }
  const enemy = enemies[0];
@@ -733,6 +1142,20 @@ if (typeof completeTrainingSlot !== 'undefined' && typeof window !== 'undefined'
 if (typeof cancelTrainingSlot !== 'undefined' && typeof window !== 'undefined') window.cancelTrainingSlot = cancelTrainingSlot;
 if (typeof updateTrainingSlots !== 'undefined' && typeof window !== 'undefined') window.updateTrainingSlots = updateTrainingSlots;
 if (typeof renderTrainingBattlePanel !== 'undefined' && typeof window !== 'undefined') window.renderTrainingBattlePanel = renderTrainingBattlePanel;
+if (typeof updateTrainingLiveProgress !== 'undefined' && typeof window !== 'undefined') window.updateTrainingLiveProgress = updateTrainingLiveProgress;
+if (typeof openTrainingSlotPokeModal !== 'undefined' && typeof window !== 'undefined') window.openTrainingSlotPokeModal = openTrainingSlotPokeModal;
+if (typeof buyTrainingAutomationSlot !== 'undefined' && typeof window !== 'undefined') window.buyTrainingAutomationSlot = buyTrainingAutomationSlot;
+if (typeof toggleTrainingAutomationSlot !== 'undefined' && typeof window !== 'undefined') window.toggleTrainingAutomationSlot = toggleTrainingAutomationSlot;
+if (typeof setTrainingAutomationOption !== 'undefined' && typeof window !== 'undefined') window.setTrainingAutomationOption = setTrainingAutomationOption;
+if (typeof rebuildTrainingQueue !== 'undefined' && typeof window !== 'undefined') window.rebuildTrainingQueue = rebuildTrainingQueue;
+if (typeof processTrainingAutomationQueues !== 'undefined' && typeof window !== 'undefined') window.processTrainingAutomationQueues = processTrainingAutomationQueues;
+if (typeof trainingAutomationEligible !== 'undefined' && typeof window !== 'undefined') window.trainingAutomationEligible = trainingAutomationEligible;
+if (typeof simulateAfkTrainingProgress !== 'undefined' && typeof window !== 'undefined') window.simulateAfkTrainingProgress = simulateAfkTrainingProgress;
+if (typeof upgradeTrainingQueueSize !== 'undefined' && typeof window !== 'undefined') window.upgradeTrainingQueueSize = upgradeTrainingQueueSize;
+if (typeof addPokemonToTrainingQueue !== 'undefined' && typeof window !== 'undefined') window.addPokemonToTrainingQueue = addPokemonToTrainingQueue;
+if (typeof removePokemonFromTrainingQueue !== 'undefined' && typeof window !== 'undefined') window.removePokemonFromTrainingQueue = removePokemonFromTrainingQueue;
+if (typeof clearTrainingQueue !== 'undefined' && typeof window !== 'undefined') window.clearTrainingQueue = clearTrainingQueue;
+if (typeof isPokemonQueuedTraining !== 'undefined' && typeof window !== 'undefined') window.isPokemonQueuedTraining = isPokemonQueuedTraining;
 if (typeof upgradeTrainingMultiSlot !== 'undefined' && typeof window !== 'undefined') window.upgradeTrainingMultiSlot = upgradeTrainingMultiSlot;
 if (typeof openTrainingManagementMenu !== 'undefined' && typeof window !== 'undefined') window.openTrainingManagementMenu = openTrainingManagementMenu;
 if (typeof openTrainingUpgradeMenu !== 'undefined' && typeof window !== 'undefined') window.openTrainingUpgradeMenu = openTrainingUpgradeMenu;

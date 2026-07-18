@@ -36,6 +36,46 @@ function notifyBattleEditLocked(){
  if(typeof notify === 'function') notify(battleEditLockMessage(), 'var(--red)');
 }
 
+function togglePokemonFavorite(idx, boxId){
+ const p = boxId ? (G.collection[boxId] || G.collection[String(boxId)]) : G.team[Number(idx)];
+ if(!p) return;
+ p.favorite = !p.favorite;
+ saveGame();
+ if(boxId) openBoxPokeModal(boxId); else openPokeModal(Number(idx));
+ try{ renderTeamWindow(); }catch(_){}
+ try{ renderUnifiedGrid(); }catch(_){}
+}
+function togglePokemonLock(idx, boxId){
+ const p = boxId ? (G.collection[boxId] || G.collection[String(boxId)]) : G.team[Number(idx)];
+ if(!p) return;
+ p.locked = !p.locked;
+ saveGame();
+ if(boxId) openBoxPokeModal(boxId); else openPokeModal(Number(idx));
+ try{ renderTeamWindow(); }catch(_){}
+ try{ renderUnifiedGrid(); }catch(_){}
+}
+function pokemonProtectionControlsHtml(p, idx, boxId, readonly){
+ if(readonly || !p) return '';
+ const favArgs = boxId ? `null, '${boxId}'` : `${idx}, ''`;
+ const lockArgs = favArgs;
+ return `<div class="poke-protection-actions">
+  <button class="hbtn poke-protect-btn ${p.favorite?'is-on':'is-off'}" data-action="legacy-call" data-call="togglePokemonFavorite" data-call-args="${favArgs}">⭐ ${p.favorite?t('pokemon_favorite_on'):t('pokemon_favorite_off')}</button>
+  <button class="hbtn poke-protect-btn ${p.locked?'is-locked':'is-off'}" data-action="legacy-call" data-call="togglePokemonLock" data-call-args="${lockArgs}">🔒 ${p.locked?t('pokemon_locked_on'):t('pokemon_locked_off')}</button>
+ </div>`;
+}
+
+function pokemonQueueControlsHtml(p, boxId, readonly){
+ if(readonly || !p || !boxId) return '';
+ const inHatchery = typeof isPokemonQueuedHatchery === 'function' && isPokemonQueuedHatchery(p);
+ const inTraining = typeof isPokemonQueuedTraining === 'function' && isPokemonQueuedTraining(p);
+ return `<div class="poke-queue-actions">
+  <div class="poke-detail-subtle">${t('queue_add_from_box')}</div>
+  <button class="hbtn queue-action-btn ${inHatchery?'is-on':''}" data-action="legacy-call" data-call="addPokemonToHatcheryQueue" data-call-args="'${boxId}'">🥚 ${inHatchery?t('queue_already_added_short'):t('queue_add_hatchery')}</button>
+  <button class="hbtn queue-action-btn ${inTraining?'is-on':''}" data-action="legacy-call" data-call="addPokemonToTrainingQueue" data-call-args="0, '${boxId}'">🏋️ ${t('queue_add_training_slot1')}</button>
+  <button class="hbtn queue-action-btn ${inTraining?'is-on':''}" data-action="legacy-call" data-call="addPokemonToTrainingQueue" data-call-args="1, '${boxId}'">🏋️ ${t('queue_add_training_slot2')}</button>
+ </div>`;
+}
+
 function buildTalentSelectorHtml(p, idx, boxId){
  const nid = Number(p.id);
  const tals = getSpeciesTalents(nid);
@@ -181,6 +221,7 @@ function renderPokemonDetailModal(p, opts){
  const modal = document.getElementById('poke-modal');
  const inner = document.getElementById('poke-modal-inner');
  if(!modal || !inner) return;
+ inner.classList.remove('management-inner');
  inner.classList.add('poke-detail-inner');
  const idx = opts.idx;
  const boxId = opts.boxId;
@@ -208,6 +249,8 @@ function renderPokemonDetailModal(p, opts){
      <div class="poke-detail-sprite-card ${isShiny?'is-shiny':''}">${spriteImg(p.id,p.emoji,{shiny:isShiny,size:132})}</div>
      <div class="poke-detail-types">${typeSpan(p.type1)}${p.type2?typeSpan(p.type2):''}</div>
      ${shinyToggle}
+     ${pokemonProtectionControlsHtml(p, idx, boxId, readonly)}
+     ${pokemonQueueControlsHtml(p, boxId, readonly)}
    </section>
    <aside class="poke-detail-side">
      <div class="poke-detail-stat-tabs">
@@ -230,6 +273,7 @@ function renderPokemonDetailModal(p, opts){
    <div class="poke-detail-moves-list current">${moveRows.known || `<div class="poke-detail-empty">${t('no_other_moves')}</div>`}</div>
    ${readonly?'':`<div class="poke-detail-learn-title">${t('learnable_moves_title')} ${locked?`<span>${battleEditLockMessage()}</span>`:moveRows.full?`<span>${t('select_move_first')}</span>`:''}</div><div class="poke-detail-moves-list learn">${moveRows.learn}</div>`}
  </section>`;
+ modal.classList.add('poke-detail-front');
  modal.classList.add('open');
  if(typeof applyDynamicStyles === 'function') applyDynamicStyles(inner);
  else if(typeof window !== 'undefined' && window.applyDynamicStyles) window.applyDynamicStyles(inner);
@@ -347,6 +391,8 @@ if (typeof switchPokemonStatTab !== 'undefined' && typeof window !== 'undefined'
 if (typeof renderPokemonDetailModal !== 'undefined' && typeof window !== 'undefined') window.renderPokemonDetailModal = renderPokemonDetailModal;
 if (typeof isPokemonLockedForBattleEdits !== 'undefined' && typeof window !== 'undefined') window.isPokemonLockedForBattleEdits = isPokemonLockedForBattleEdits;
 if (typeof notifyBattleEditLocked !== 'undefined' && typeof window !== 'undefined') window.notifyBattleEditLocked = notifyBattleEditLocked;
+if (typeof togglePokemonFavorite !== 'undefined' && typeof window !== 'undefined') window.togglePokemonFavorite = togglePokemonFavorite;
+if (typeof togglePokemonLock !== 'undefined' && typeof window !== 'undefined') window.togglePokemonLock = togglePokemonLock;
 if (typeof buildTalentSelectorHtml !== 'undefined' && typeof window !== 'undefined') window.buildTalentSelectorHtml = buildTalentSelectorHtml;
 if (typeof changePokeTalent !== 'undefined' && typeof window !== 'undefined') window.changePokeTalent = changePokeTalent;
 if (typeof openReadonlyPokeModal !== 'undefined' && typeof window !== 'undefined') window.openReadonlyPokeModal = openReadonlyPokeModal;

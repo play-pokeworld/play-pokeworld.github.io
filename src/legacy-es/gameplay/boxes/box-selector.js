@@ -18,6 +18,9 @@ function openUnifiedSelectorModal(actionType){
   if(!modal || !titleEl) return;
   const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
   if(actionType === 'hatchery') titleEl.textContent = t('selector_title_hatchery');
+  else if(actionType === 'hatchery_queue') titleEl.textContent = t('selector_title_hatchery_queue');
+  else if(String(actionType).startsWith('training_queue_')) titleEl.textContent = tr('selector_title_training_queue', {slot:Number(String(actionType).split('_').pop())+1});
+  else if(actionType === 'item_rarecandy') titleEl.textContent = t('selector_title_item_use');
   else if(actionType === 'training') titleEl.textContent = t('selector_title_training');
   else if(actionType === 'team') titleEl.textContent = t('selector_title_team');
   else if(actionType === 'save_icon') titleEl.textContent = t('save_profile_icon');
@@ -84,7 +87,7 @@ function renderUnifiedGrid(){
   const footer = document.getElementById('usm-footer');
   if(!grid) return;
   const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
-  const showBoxFilters = (_usmAction === 'box_view' || _usmAction === 'team' || _usmAction === 'save_icon') && _usmSubTab === 'box';
+  const showBoxFilters = (_usmAction === 'box_view' || _usmAction === 'team' || _usmAction === 'save_icon' || _usmAction === 'hatchery_queue' || _usmAction === 'item_rarecandy' || String(_usmAction).startsWith('training_queue_')) && _usmSubTab === 'box';
   const filtersHtml = showBoxFilters && typeof renderBoxFiltersHtml === 'function' ? renderBoxFiltersHtml() : '';
   if(filterPanel){ filterPanel.innerHTML = filtersHtml; filterPanel.style.display = filtersHtml ? 'block' : 'none'; }
   renderUnifiedSwapFooter();
@@ -127,9 +130,10 @@ function renderUnifiedGrid(){
   });
 
   
-  if(_usmAction === 'team' || _usmAction === 'save_icon'){
+  if(_usmAction === 'team' || _usmAction === 'save_icon' || _usmAction === 'hatchery_queue' || String(_usmAction).startsWith('training_queue_')){
     list = list.filter(({loc}) => loc === 'box');
   }
+  if(_usmAction === 'item_rarecandy') list = list.filter(({p}) => (p.level||1) < 100);
 
   
   if(q) list = list.filter(({p}) => p.name.toLowerCase().includes(q));
@@ -138,6 +142,11 @@ function renderUnifiedGrid(){
   if(_usmFilter.inTeam === 'yes') list = list.filter(({loc}) => loc === 'team');
   if(_usmFilter.inTeam === 'no') list = list.filter(({loc}) => loc === 'box');
   if(showBoxFilters && typeof applyPokemonBoxFilters === 'function') list = applyPokemonBoxFilters(list);
+  if(String(_usmAction).startsWith('training_queue_') && typeof globalThis.trainingAutomationEligible === 'function'){
+    const slotIndex = Number(String(_usmAction).split('_').pop()) || 0;
+    const cfg = (G.trainingAutomation && G.trainingAutomation.slots && G.trainingAutomation.slots[slotIndex]) || {mode:'ev'};
+    list = list.filter(({p}) => globalThis.trainingAutomationEligible(p, cfg.mode || 'ev'));
+  }
 
   
   list.sort((a, b) => {
@@ -176,9 +185,13 @@ function renderUnifiedGrid(){
   grid.classList.remove('usm-modern-grid');
   let html = list.map(({p, loc, idStr, teamIdx}) => {
     const isShiny = p.shinyUnlocked || p.shinyActive || p.shiny || isSpeciesShiny(p.id);
+    const queuedH = typeof isPokemonQueuedHatchery === 'function' && isPokemonQueuedHatchery(p);
+    const queuedT = typeof isPokemonQueuedTraining === 'function' && isPokemonQueuedTraining(p);
+    const badges = `${p.favorite?'<span class="box-status-badge favorite">⭐</span>':''}${p.locked?'<span class="box-status-badge locked">🔒</span>':''}${queuedH?'<span class="box-status-badge queued">🥚</span>':''}${queuedT?'<span class="box-status-badge queued">🏋️</span>':''}`;
     return `
       <div class="box-card ${_usmAction === 'save_icon' && G.saveMeta && Number(G.saveMeta.iconPokeId) === Number(p.id) ? 'save-icon-selector-card active' : (_usmAction === 'save_icon' ? 'save-icon-selector-card' : '')}" data-action="legacy-call" data-call="selectUnifiedCard" data-call-args="'${loc}','${idStr}'" data-context-call="${loc === 'team' ? 'openPokeModal' : 'openBoxPokeModal'}" data-context-args="${loc === 'team' ? teamIdx : `'${idStr}'`}" title="${t('select_or_details_hint')}">
         <div class="box-level">Lv.${p.level}</div>
+        <div class="box-status-badges">${badges}</div>
         <div class="box-shiny ${isShiny?'is-visible':'is-hidden'}">★</div>
         <div class="poke-sprite">${spriteImg(p.id, p.emoji, {size: 72, shiny: isShiny})}</div>
       </div>`;
@@ -250,7 +263,7 @@ function sendFossilToHatchery(fossilKey){
   }
   G.inventory[fossilKey]--;
   if(G.inventory[fossilKey] <= 0) delete G.inventory[fossilKey];
-  G.hatchery[emptyIdx] = { poke: null, isFossil: true, fossilKey: fossilKey, reviveId: pokeId, steps: 0, stepsReq: 15 };
+  G.hatchery[emptyIdx] = { poke: null, isFossil: true, fossilKey: fossilKey, reviveId: pokeId, steps: 0, stepsReq: (typeof hatcheryStepsForPokemon === 'function' ? hatcheryStepsForPokemon(pokeId) : 50) };
   saveGame();
   renderHatcheryWindow();
   notify(tr('fossil_sent_hatchery', {item:getItemName(typeof getFossilDisplayKey === 'function' ? getFossilDisplayKey(fossilKey) : fossilKey)}),'var(--green)');
@@ -317,6 +330,14 @@ function selectUnifiedCard(loc, idStr){
     } else {
       notify(t('already_in_team'), 'var(--light1)');
     }
+  } else if(_usmAction === 'item_rarecandy'){
+    if((G.inventory && (G.inventory.rarecandy||0) > 0) && (p.level||1) < 100){
+      if(loc === 'team') useRareCandy(Number(idStr));
+      else useBoxRareCandy(idStr);
+      try{ renderUnifiedGrid(); }catch(_){}
+    } else {
+      notify(t('legacy_message_n_ce_pok_mon_est_d_j_au_niveau_100_maximu'), 'var(--red)');
+    }
   } else if(_usmAction === 'training'){
     if(!p.uid) p.uid = 'p_' + Math.random().toString(36).substr(2, 9);
     const slotIndex = (typeof G.pendingTrainingSlotIndex === 'number') ? G.pendingTrainingSlotIndex : 0;
@@ -331,6 +352,21 @@ function selectUnifiedCard(loc, idStr){
     closeUnifiedSelectorModal();
     renderTrainingWindow();
     notify(tr('selected_for_training_slot', {name:p.name, slot:slotIndex+1}), 'var(--green)');
+  } else if(_usmAction === 'hatchery_queue'){
+    if(loc !== 'box') return;
+    const ok = (typeof addPokemonToHatcheryQueue === 'function') ? addPokemonToHatcheryQueue(idStr, true) : false;
+    renderUnifiedGrid();
+    if(ok === 'slot') notify(tr('deposited_hatchery', {name:p.name}), 'var(--green)'); else if(ok) notify(tr('queue_added_hatchery', {name:p.name}), 'var(--green)');
+    try{ if(typeof openHatcheryManagementMenu === 'function') openHatcheryManagementMenu('automation'); }catch(_){}
+    try{ if(typeof renderHatcheryWindow === 'function') renderHatcheryWindow(); }catch(_){}
+  } else if(String(_usmAction).startsWith('training_queue_')){
+    if(loc !== 'box') return;
+    const slotIndex = Number(String(_usmAction).split('_').pop()) || 0;
+    const ok = (typeof addPokemonToTrainingQueue === 'function') ? addPokemonToTrainingQueue(slotIndex, idStr, true) : false;
+    renderUnifiedGrid();
+    if(ok === 'slot') notify(tr('selected_for_training_slot', {name:p.name, slot:slotIndex+1}), 'var(--green)'); else if(ok) notify(tr('queue_added_training', {name:p.name, slot:slotIndex+1}), 'var(--green)');
+    try{ if(typeof openTrainingManagementMenu === 'function') openTrainingManagementMenu('automation'); }catch(_){}
+    try{ if(typeof renderTrainingWindow === 'function') renderTrainingWindow(); }catch(_){}
   } else if(_usmAction === 'hatchery'){
     if(loc === 'team' && G.team.length <= 1){
       notify(t('cannot_deposit_only_pokemon'), 'var(--red)');
@@ -344,7 +380,7 @@ function selectUnifiedCard(loc, idStr){
     }
     if(loc === 'team') { if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(p); else p.heldItem = null; G.team.splice(Number(idStr), 1); if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems(); }
     else { if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(p); else p.heldItem = null; delete G.collection[idStr]; }
-    G.hatchery[emptyIdx] = { poke: p, steps: 0, stepsReq: 10 };
+    G.hatchery[emptyIdx] = { poke: p, steps: 0, stepsReq: (typeof hatcheryStepsForPokemon === 'function' ? hatcheryStepsForPokemon(p) : 25) };
     closeUnifiedSelectorModal();
     updateHeader();
     renderTeamWindow();

@@ -2223,3 +2223,568 @@ body.save-menu-active { overflow: hidden; }
   background: var(--red);
   color: var(--light2);
 }
+.poke-protection-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.poke-protect-btn {
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 12px;
+}
+.poke-protect-btn.is-on {
+  background: linear-gradient(135deg, #f2d94e, #ffef9a);
+  color: var(--dark1);
+  border-color: #f2d94e;
+}
+.poke-protect-btn.is-locked {
+  background: linear-gradient(135deg, var(--red), #ff8ba0);
+  color: #fff;
+  border-color: var(--red);
+}
+.poke-protect-btn.is-off {
+  background: rgba(0,0,0,0.22);
+  color: var(--light2);
+}
+.automation-field {
+  display: grid;
+  gap: 5px;
+  margin: 8px 0;
+  color: var(--light1);
+  font-size: 12px;
+  font-weight: 900;
+}
+.automation-field select {
+  width: 100%;
+  border: 1px solid var(--dark3);
+  border-radius: 8px;
+  background: var(--dark1);
+  color: var(--light2);
+  padding: 8px 10px;
+}
+.queue-build-btn {
+  width: 100%;
+  margin-top: 8px;
+  font-weight: 900;
+}
+.queue-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+.queue-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--dark3);
+  border-radius: 999px;
+  background: rgba(0,0,0,0.2);
+  padding: 5px 8px;
+  color: var(--light2);
+  font-size: 12px;
+  font-weight: 800;
+}
+.queue-chip img {
+  width: 28px;
+  height: 28px;
+}
+.staff-summary {
+  color: var(--light2);
+  font-weight: 900;
+  margin: 8px 0;
+}
+.staff-list {
+  display: grid;
+  gap: 10px;
+}
+.staff-card {
+  border: 1px solid var(--dark3);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.22);
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+}
+.staff-card.is-active {
+  border-color: var(--green);
+  box-shadow: 0 0 14px rgba(96,190,88,0.14);
+}
+.staff-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--light2);
+}
+.staff-card-head span,
+.staff-card-desc,
+.staff-level {
+  color: var(--light1);
+  font-size: 12px;
+  line-height: 1.35;
+}
+.staff-card-desc {
+  color: var(--light2);
+}
+.poke-queue-actions {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+.queue-action-btn {
+  width: 100%;
+  justify-content: center;
+  font-weight: 900;
+}
+.queue-action-btn.is-on {
+  background: var(--green);
+  color: var(--dark1);
+}
+.box-status-badges {
+  position: absolute;
+  left: 5px;
+  top: 28px;
+  display: grid;
+  gap: 2px;
+  z-index: 3;
+}
+.box-status-badge {
+  min-width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  background: rgba(0,0,0,0.56);
+  border: 1px solid rgba(255,255,255,0.18);
+}
+.box-status-badge.favorite { color: var(--shiny); }
+.box-status-badge.locked { color: #ffb8c5; }
+.box-status-badge.queued { color: var(--green); }
+.queue-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+.queue-remove-btn {
+  border: 0;
+  border-radius: 999px;
+  background: rgba(211,66,95,0.85);
+  color: white;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  font-weight: 900;
+}
+.queue-cap {
+  color: var(--light1);
+  font-size: 12px;
+  font-weight: 900;
+  margin-bottom: 6px;
+}
+.mine-tool-shop {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+.extracted-template-style-229 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.mine-tool-btn.active {
+  background: var(--light2);
+  color: var(--dark1);
+  font-weight: 900;
+}
+#unified-selector-modal .box-filter-panel label span {
+  display: block;
+  color: var(--light2);
+  font-size: 11px;
+  font-weight: 900;
+  margin: 0 0 4px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+#unified-selector-modal .box-filter-panel {
+  align-items: end;
+}
+.mine-grid {
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  width: min(100%, 520px);
+  margin-left: auto;
+  margin-right: auto;
+}
+.mine-tile {
+  min-width: 0;
+  min-height: 0;
+}
+.staff-list {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.staff-card {
+  min-height: 190px;
+  align-content: start;
+}
+.staff-bonus {
+  color: var(--light2);
+  font-size: 12px;
+  line-height: 1.35;
+  border: 1px solid rgba(236,222,183,0.16);
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: rgba(0,0,0,0.14);
+}
+
+#unified-selector-modal { z-index: 30000; }
+#poke-modal-inner.management-inner {
+  width: min(96vw, 920px);
+  min-height: min(70vh, 620px);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+#mine-window-body .mine-grid {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  grid-auto-rows: auto;
+  width: min(100%, 520px);
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+#mine-window-body .mine-tile {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+.automation-toggle-btn.is-on,
+.purchase-btn,
+.automation-buy-btn,
+.hatchery-hatch-btn {
+  background: linear-gradient(135deg, #477a45, #6f9f63);
+  color: #f6f1dc;
+  border-color: #6f9f63;
+}
+.automation-toggle-btn.is-on span,
+.automation-toggle-btn.is-on b {
+  color: #f6f1dc;
+}
+.mine-tool-upgrade-card {
+  border: 1px solid var(--dark3);
+  border-radius: 10px;
+  background: rgba(0,0,0,0.18);
+  padding: 9px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--light2);
+  min-height: 0;
+}
+.mine-tool-upgrade-card span {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 900;
+}
+.training-slot-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+.training-slot-auto-btn.is-off {
+  background: rgba(0,0,0,0.22);
+  color: var(--light2);
+  border-color: var(--dark3);
+}
+.training-slot-auto-btn.is-on {
+  background: linear-gradient(135deg, #477a45, #6f9f63);
+  color: #f6f1dc;
+  border-color: #6f9f63;
+}
+#poke-modal-inner.management-inner {
+  width: min(96vw, 980px);
+  height: min(84vh, 760px);
+  min-height: min(84vh, 760px);
+  max-height: min(84vh, 760px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(180deg, rgba(68,65,56,0.98), rgba(42,41,38,0.98));
+}
+#poke-modal-inner.management-inner .management-title {
+  flex: 0 0 auto;
+  border-bottom: 1px solid rgba(236,222,183,0.22);
+  padding-bottom: 10px;
+}
+.management-shell {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+}
+.management-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid rgba(236,222,183,0.22);
+  border-radius: 14px;
+  background: rgba(0,0,0,0.22);
+}
+.management-tabs .hbtn {
+  min-height: 40px;
+  border-radius: 10px;
+  font-weight: 900;
+}
+.management-content {
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding-right: 4px;
+}
+.management-content > .dict-info-block,
+.management-content > .automation-card,
+.management-content > .staff-summary {
+  margin: 0;
+}
+#poke-modal-inner.management-inner .dict-info-block {
+  border-radius: 14px;
+  border-color: rgba(236,222,183,0.22);
+  background: rgba(0,0,0,0.22);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+}
+#poke-modal-inner.management-inner .automation-card,
+#poke-modal-inner.management-inner .staff-card {
+  border-radius: 14px;
+  border-color: rgba(236,222,183,0.22);
+}
+.training-auto-slot-list,
+.staff-list,
+.mine-tool-shop {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.queue-actions {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.upgrade-grid,
+.automation-dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+.upgrade-card,
+.automation-locked-card {
+  min-height: 76px;
+  border: 1px solid rgba(236,222,183,0.22);
+  border-radius: 14px;
+  background: rgba(0,0,0,0.22);
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.upgrade-card > div,
+.automation-locked-card > span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.upgrade-card b,
+.automation-locked-card span {
+  color: var(--light2);
+  font-weight: 900;
+}
+.upgrade-card span,
+.automation-locked-card b {
+  color: var(--light1);
+  font-size: 12px;
+}
+.upgrade-card.is-owned,
+.automation-card.is-owned {
+  border-color: rgba(96,190,88,0.62);
+}
+.automation-toggle-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+.automation-rules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+  border: 1px solid rgba(236,222,183,0.18);
+  border-radius: 14px;
+  background: rgba(0,0,0,0.18);
+  padding: 10px;
+}
+.queue-panel {
+  border: 1px solid rgba(236,222,183,0.22);
+  border-radius: 14px;
+  background: rgba(0,0,0,0.20);
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+.queue-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--light2);
+}
+.queue-panel-head span {
+  color: var(--light1);
+  font-size: 12px;
+  font-weight: 900;
+}
+.training-auto-slot-list.vertical {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.training-auto-slot-card {
+  display: grid;
+  gap: 10px;
+}
+.staff-card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+.staff-card.is-owned {
+  cursor: pointer;
+}
+.staff-card.is-owned:hover {
+  border-color: var(--light2);
+  filter: brightness(1.06);
+}
+.staff-card-sprite {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.22);
+  border: 1px solid rgba(236,222,183,0.18);
+  font-size: 24px;
+}
+.staff-level-pill {
+  justify-self: start;
+  border-radius: 999px;
+  background: rgba(236,222,183,0.12);
+  border: 1px solid rgba(236,222,183,0.22);
+  color: var(--light2);
+  padding: 3px 8px;
+  font-size: 12px;
+  font-weight: 900;
+}
+.staff-xp {
+  display: grid;
+  gap: 4px;
+}
+.staff-xp-label {
+  color: var(--light1);
+  font-size: 11px;
+  font-weight: 900;
+}
+.staff-xp-bar {
+  height: 7px;
+  border-radius: 999px;
+  background: var(--dark1);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.staff-xp-bar div {
+  height: 100%;
+  width: var(--pct, 0%);
+  background: #6f9f63;
+  border-radius: 999px;
+}
+
+#poke-modal.poke-detail-front { z-index: 31000; }
+.upgrade-card .hbtn,
+.automation-buy-btn,
+.purchase-btn {
+  white-space: normal;
+  line-height: 1.15;
+  min-width: 96px;
+  max-width: 180px;
+  text-align: center;
+}
+.training-slot-actions .hbtn {
+  min-height: 36px;
+}
+#poke-modal-inner.poke-detail-inner .poke-detail-title,
+#settings-inner > .modal-title {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: linear-gradient(180deg, rgba(68,65,56,0.98), rgba(54,52,47,0.98));
+  border-bottom: 1px solid rgba(236,222,183,0.24);
+  padding-top: 6px;
+  padding-bottom: 10px;
+}
+#settings-inner {
+  overflow-y: auto;
+}
+.training-cd-fill {
+  height: 100%;
+  width: var(--pct, 0%);
+  background: var(--light2);
+  border-radius: 999px;
+  transition: width 0.12s linear;
+}
+.training-slot-sprite,
+.training-live-sprite {
+  cursor: context-menu;
+}
+.hatchery-auto-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.hatchery-auto-layout .automation-toggle-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.automation-two-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+.automation-panel {
+  border: 1px solid rgba(236,222,183,0.22);
+  border-radius: 14px;
+  background: rgba(0,0,0,0.20);
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+@media (max-width: 760px) {
+  .hatchery-auto-layout .automation-toggle-row,
+  .automation-two-cols { grid-template-columns: 1fr; }
+}
+#poke-modal-inner.poke-detail-inner .poke-detail-title {
+  top: -16px;
+  margin: -16px -16px 12px;
+  padding: 14px 16px 10px;
+  width: calc(100% + 32px);
+  border-radius: 12px 12px 0 0;
+}
+#settings-inner > .modal-title {
+  top: -18px;
+  margin: -18px -18px 12px;
+  padding: 14px 18px 10px;
+  width: calc(100% + 36px);
+  border-radius: 12px 12px 0 0;
+}

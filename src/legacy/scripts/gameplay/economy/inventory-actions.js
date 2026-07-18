@@ -97,52 +97,21 @@ function onInventoryClick(key){
 
  if(itm.type === 'candy' || key === 'rarecandy'){
  const qty = G.inventory[key] || 0;
- const el = _getActiveContent();
- if(qty <= 0){ 
- var fsM=document.getElementById('fullscreen-panel-modal');
- if(fsM&&fsM.style.display==='flex'){renderInventory(document.getElementById('fs-panel-content'))}
- else{showTab('inventory')}
- return; 
+ if(qty <= 0){
+  var fsM=document.getElementById('fullscreen-panel-modal');
+  if(fsM&&fsM.style.display==='flex'){renderInventory(document.getElementById('fs-panel-content'))}
+  else{showTab('inventory')}
+  return;
  }
- const candidates = [];
- G.team.forEach((p, idx) => {
- if(p.level < 100) candidates.push({p, loc:'team', idx});
- });
- Object.entries(G.collection).forEach(([idStr, p]) => {
- if(p && p.level < 100) candidates.push({p, loc:'box', idStr});
- });
-
- 
- let headerHtml = `<div class="extracted-template-style-198">
- <div class="extracted-template-style-006">
- <div class="extracted-template-style-185">${itemSpriteHtml(key, 40)}</div>
- <div>
- <div class="extracted-template-style-199">${t("m.inventory.4")} ${getItemName(key)}</div>
- <div class="extracted-template-style-090">${t("m.inventory.3")}</div>
- </div>
- </div>
- <div class="extracted-template-style-200">&times;${qty}</div>
-</div>`;
-
- 
- let candidatesHtml = '';
- if(candidates.length > 0) {
- candidatesHtml = '<div class="extracted-template-style-201">' + candidates.map(({p, loc, idx, idStr}) => {
- const clickFn = loc === 'team' ? `useRareCandy(${idx})` : `useBoxRareCandy('${idStr}')`;
- return `<div class="extracted-template-style-202" data-action="legacy-call" data-call="${loc === 'team' ? 'useRareCandy' : 'useBoxRareCandy'}" data-call-args="${loc === 'team' ? idx : `'${idStr}'`}">
- <div class="extracted-template-style-203">
- <div class="extracted-template-style-204">Lv.${p.level}</div>
- ${spriteImg(p.id, p.emoji, {size: 72, shiny: p.shinyActive})}
- </div>
- </div>`;
- }).join('') + '</div>';
- } else {
- candidatesHtml = `<div class="extracted-template-style-039">${t("m.inventory.1")}</div>`;
+ G.pendingItemUseKey = key;
+ if(typeof openUnifiedSelectorModal === 'function'){
+  openUnifiedSelectorModal('item_rarecandy');
+  const titleEl = document.getElementById('usm-title');
+  if(titleEl) titleEl.textContent = `${t("m.inventory.4")} ${getItemName(key)} ×${qty}`;
  }
-
- el.innerHTML = headerHtml + candidatesHtml;
  return;
  }
+
 
   if(!itm.buff) return;
   
@@ -156,3 +125,12 @@ function consumeItem(key){
  if(G.inventory[key]>0) G.inventory[key]--;
  if(G.inventory[key]===0) delete G.inventory[key];
 }
+
+
+// --- Migrated to ES module, globals exposed ---
+if (typeof _getActiveContent !== 'undefined' && typeof window !== 'undefined') window._getActiveContent = _getActiveContent;
+if (typeof sellTreasure !== 'undefined' && typeof window !== 'undefined') window.sellTreasure = sellTreasure;
+if (typeof onInventoryClick !== 'undefined' && typeof window !== 'undefined') window.onInventoryClick = onInventoryClick;
+if (typeof useItem !== 'undefined' && typeof window !== 'undefined') window.useItem = useItem;
+if (typeof consumeItem !== 'undefined' && typeof window !== 'undefined') window.consumeItem = consumeItem;
+

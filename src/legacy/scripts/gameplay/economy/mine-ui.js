@@ -1,3 +1,54 @@
+function renderMineManagementTabs(active){
+ return `<div class="management-tabs">
+  <button class="hbtn ${active==='upgrades'?'active':''}" data-action="legacy-call" data-call="openMineManagementMenu" data-call-args="'upgrades'">⬆ ${t('management_upgrades')}</button>
+  <button class="hbtn ${active==='automation'?'active':''}" data-action="legacy-call" data-call="openMineManagementMenu" data-call-args="'automation'">🤖 ${t('management_automation')}</button>
+  <button class="hbtn ${active==='miners'?'active':''}" data-action="legacy-call" data-call="openMineManagementMenu" data-call-args="'miners'">⛏️ ${t('management_miners')}</button>
+ </div>`;
+}
+function mineAutoUnlockCard(){
+ const auto = G.mine.automation || {purchased:false};
+ return `<div class="upgrade-card ${auto.purchased?'is-owned':''}"><div><b>${t('mine_auto_title')}</b><span>${auto.purchased?t('automation_owned'):tr('automation_buy_button', {price:'1 000 000'})}</span></div>${auto.purchased?'':`<button class="hbtn purchase-btn" data-action="legacy-call" data-call="buyMineAutomation" data-call-args="">${t('buy_btn')}</button>`}</div>`;
+}
+function mineToolUpgradeCard(tool){
+ const unlocked = typeof isMineToolUnlocked==='function' && isMineToolUnlocked(tool);
+ const def = typeof MINE_TOOL_DEFS !== 'undefined' ? MINE_TOOL_DEFS[tool] : null;
+ return `<div class="upgrade-card mine-tool-upgrade-card ${unlocked?'is-owned':''}"><div><b>${t('mine_tool_'+tool)}</b><span>${unlocked?t('owned'):(def&&def.cost?def.cost.toLocaleString()+'₽':'')}</span></div>${unlocked?'':`<button class="hbtn purchase-btn" data-action="legacy-call" data-call="buyMineTool" data-call-args="'${tool}'">${t('buy_btn')}</button>`}</div>`;
+}
+function openMineManagementMenu(page='upgrades'){
+ const inner=document.getElementById('poke-modal-inner');
+ const modal=document.getElementById('poke-modal');
+ if(!inner||!modal) return;
+ modal.classList.remove('poke-detail-front');
+ inner.classList.remove('poke-detail-inner');
+ inner.classList.add('management-inner');
+ if(typeof ensureMineAutomation === 'function') ensureMineAutomation();
+ const auto = G.mine.automation || {purchased:false, enabled:false};
+ const energyCost = typeof getMineEnergyUpgradeCost === 'function' ? getMineEnergyUpgradeCost() : null;
+ const body = page === 'miners'
+  ? `${typeof renderStaffList==='function'?renderStaffList('mine'):''}`
+  : page === 'automation'
+  ? `<div class="automation-dashboard">${auto.purchased
+       ? `<button class="hbtn automation-toggle-btn ${auto.enabled?'is-on':'is-off'}" data-action="legacy-call" data-call="toggleMineAutomation" data-call-args=""><span>⛏️ ${t('mine_auto_title')}</span><b>${auto.enabled?t('automation_enabled'):t('automation_disabled')}</b></button>`
+       : `<div class="automation-locked-card"><span>⛏️ ${t('mine_auto_title')}</span><b>${t('automation_locked_upgrade')}</b></div>`}</div>`
+  : `<div class="upgrade-grid">
+      <div class="upgrade-card ${energyCost?'':'is-owned'}"><div><b>${t('mine_energy_upgrade_title')}</b><span>${G.mine.maxEnergy||100}</span></div>${energyCost?`<button class="hbtn purchase-btn" data-action="legacy-call" data-call="upgradeMineEnergy" data-call-args="">${energyCost.toLocaleString()}₽</button>`:`<b>${t('automation_owned')}</b>`}</div>
+      ${mineAutoUnlockCard()}
+      ${['pickaxe','drill','dynamite'].map(tool=>mineToolUpgradeCard(tool)).join('')}
+     </div>`;
+ inner.innerHTML = `<div class="modal-title management-title"><div>⚙️ ${t('mine_management_title')}</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
+ <div class="management-shell management-mine">
+  ${renderMineManagementTabs(page)}
+  <div class="management-content">${body}</div>
+ </div>`;
+ modal.classList.add('open');
+}
+
+function renderMineToolButton(tool){
+ const unlocked = typeof isMineToolUnlocked === 'function' ? isMineToolUnlocked(tool) : (tool==='chisel'||tool==='hammer');
+ const selected = G.mine && G.mine.tool === tool;
+ const cost = typeof mineToolEnergyCost === 'function' ? mineToolEnergyCost(tool) : 5;
+ return `<button class="hbtn mine-tool-btn ${selected?'active':''}" ${unlocked?`data-action="legacy-call" data-call="setMineTool" data-call-args="'${tool}'"`:'disabled'}>${t('mine_tool_'+tool)} · ${cost}⚡</button>`;
+}
 function renderMineWindow(){
  const el = document.getElementById('mine-window-body');
  if(!el) return;
@@ -24,7 +75,7 @@ function renderMine(el){
  nugget:'#ffd84a', stardust:'#7ff7ff', helix_fossil:'#ff7bd5', dome_fossil:'#ff8a3d', old_amber:'#ffbf2f', fossil:'#ff5f9e', root_fossil:'#70ff3d', claw_fossil:'#ff5252'
  };
 
- let gridHtml = `<div data-style="display:grid;grid-template-columns:repeat(${MINE_W}, 1fr);gap:3px;background:#221814;padding:8px;border-radius:10px;border:2px solid #6d4c3d;margin:12px 0">`;
+ let gridHtml = `<div class="mine-grid" data-grid-cols="${MINE_W}">`;
 
  for(let y=0; y<MINE_H; y++){
  for(let x=0; x<MINE_W; x++){
@@ -48,14 +99,14 @@ function renderMine(el){
  const revealedColor = revealedItem ? (itemColors[cellItem.key] || '#ff4fd8') : null;
  if(depth === 0){
  if(cellItem){
- contentHtml = `<div class="mine-revealed-item ${cellItem.collected?'is-collected':''}" data-style="width:100%;height:100%;background:${cellItem.collected?'rgba(76,175,80,0.35)':revealedColor};display:flex;align-items:center;justify-content:center;border-radius:3px;box-shadow:inset 0 0 12px rgba(255,255,255,0.45),0 0 12px ${revealedColor};border:2px solid rgba(255,255,255,0.75)">${isItemCenter ? itemIcon(cellItem.key, 24) : ''}</div>`;
+ contentHtml = `<div class="mine-revealed-item ${cellItem.collected?'is-collected':''}" data-bg="${revealedColor}">${isItemCenter ? itemIcon(cellItem.key, 24) : ''}</div>`;
  }
  } else {
  contentHtml = `<div class="extracted-template-style-224">${depth}</div>`;
  }
 
  const canClick = depth > 0 || tool === 'hammer';
- gridHtml += `<div class="mine-tile ${canClick?'mine-tile-clickable':''} ${revealedItem?'mine-tile-revealed-item':''}" ${canClick ? `data-action="legacy-call" data-call="digMineTile" data-call-args="${x},${y}"` : ''} data-style="aspect-ratio:1;background:${rockColors[depth]};border-radius:4px;cursor:${canClick ? 'pointer' : 'default'};display:flex;align-items:center;justify-content:center;user-select:none;transition:filter 0.1s;position:relative">
+ gridHtml += `<div class="mine-tile ${canClick?'mine-tile-clickable':''} ${revealedItem?'mine-tile-revealed-item':''}" data-bg="${rockColors[depth]}" ${revealedItem?`data-bg="${revealedColor}"`:''} ${canClick ? `data-action="legacy-call" data-call="digMineTile" data-call-args="${x},${y}"` : ''}>
  ${contentHtml}
  </div>`;
  }
@@ -64,7 +115,8 @@ function renderMine(el){
 
  const foundCount = items.filter(i=>i.collected).length;
 
- el.innerHTML = `<div class="loc-title">${t('mine_title')}</div>
+ el.innerHTML = `<div class="hatchery-upgrade-row"><button class="hbtn" data-action="legacy-call" data-call="openMineManagementMenu" data-call-args="'upgrades'">⚙️ ${t('mine_management_button')}</button></div>
+ <div class="loc-title">${t('mine_title')}</div>
  <div class="loc-sub">${t('mine_sub')}</div>
 
  <div class="extracted-template-style-225">
@@ -73,13 +125,12 @@ function renderMine(el){
  <span>${t('mine_energy')}</span>
  <span id="mine-energy-val" class="extracted-bridge-style-046">${energy||0} / ${maxEnergy||100}</span>
  </div>
- <div class="stat-bar extracted-bridge-style-047"><div id="mine-energy-bar" class="stat-fill" data-style="width:${((energy||0)/(maxEnergy||100))*100}%;background:var(--light2)"></div></div>
+ <div class="stat-bar extracted-bridge-style-047"><div id="mine-energy-bar" class="stat-fill"></div></div>
  <div class="extracted-template-style-228">${t('mine_energy_hint')}</div>
  </div>
 
  <div class="extracted-template-style-229">
- <button class="hbtn" data-style="${tool==='chisel'?'background:var(--light2);color:#000;font-weight:bold':''}" data-action="legacy-call" data-call="setMineTool" data-call-args="'chisel'">${t('mine_chisel')}</button>
- <button class="hbtn" data-style="${tool==='hammer'?'background:var(--light2);color:#000;font-weight:bold':''}" data-action="legacy-call" data-call="setMineTool" data-call-args="'hammer'">${t('mine_hammer')}</button>
+ ${['chisel','hammer','pickaxe','drill','dynamite'].filter(tool=>typeof isMineToolUnlocked !== 'function' || isMineToolUnlocked(tool)).map(tool=>renderMineToolButton(tool)).join('')}
  </div>
  </div>
 
@@ -89,9 +140,16 @@ function renderMine(el){
  <div>
  <span class="extracted-template-style-089">${t('mine_treasures')} <span class="extracted-template-style-002">${foundCount} / ${items.length}</span></span>
  <div class="extracted-template-style-231">
- ${items.map(i=>`<span data-style="margin-right:10px;${i.collected?'color:var(--green);font-weight:bold':''}">${i.collected?'':'❓'} ${getItemName(i.key)}</span>`).join('')}
+ ${items.map(i=>`<span>${i.collected?'':'❓'} ${getItemName(i.key)}</span>`).join('')}
  </div>
  </div>
  <button class="hbtn extracted-bridge-style-006" data-action="generate-mine-layer">${t('mine_new_layer')}</button>
  </div>`;
 }
+
+
+// --- Migrated to ES module, globals exposed ---
+if (typeof openMineManagementMenu !== 'undefined' && typeof window !== 'undefined') window.openMineManagementMenu = openMineManagementMenu;
+if (typeof renderMineWindow !== 'undefined' && typeof window !== 'undefined') window.renderMineWindow = renderMineWindow;
+if (typeof renderMine !== 'undefined' && typeof window !== 'undefined') window.renderMine = renderMine;
+

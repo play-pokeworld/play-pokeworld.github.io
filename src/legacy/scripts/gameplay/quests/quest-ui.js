@@ -17,7 +17,7 @@ function renderStoryWindow(){
  const repsActive = G.repeatables || [];
 
  if(!mainDef && !sideActive.length && !repsActive.length){
- panel.innerHTML = (typeof renderTutorialQuestBlock === 'function' ? renderTutorialQuestBlock() : '') + `<div class="extracted-template-style-242">\n 📜 ${t("m.quest_ui.27")}</div>`;
+ panel.innerHTML = (typeof renderTutorialQuestBlock === 'function' ? renderTutorialQuestBlock() : '') + `<div class="extracted-template-style-242">\n 📜 ${t("m.quest_ui.27")}</div><div class="extracted-template-style-252">\n <button class="hbtn extracted-bridge-style-048" data-action="legacy-call" data-call="openRepeatableMenu" data-call-args="">🔁 ${t("m.quest_ui.16")}</button>\n </div>`;
  return;
  }
 

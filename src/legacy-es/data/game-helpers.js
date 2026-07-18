@@ -402,7 +402,7 @@ function grantRewardItems(items){
 }
 
 
-const BOX_FILTER_DEFAULTS = {region:'all', type:'all', shiny:'all', evo:'all'};
+const BOX_FILTER_DEFAULTS = {region:'all', type:'all', shiny:'all', evo:'all', favorite:'all', locked:'all', iv:'all', ev:'all'};
 const FILTER_LEVEL_EVO_MAP = {1:2,2:3,4:5,5:6,7:8,8:9,10:11,11:12,13:14,14:15,16:17,17:18,19:20,21:22,23:24,27:28,29:30,32:33,41:42,43:44,46:47,48:49,50:51,52:53,54:55,56:57,60:61,63:64,64:65,66:67,67:68,69:70,72:73,74:75,75:76,77:78,79:80,81:82,84:85,86:87,88:89,92:93,93:94,96:97,98:99,100:101,104:105,109:110,111:112,116:117,118:119,129:130,138:139,140:141,147:148,148:149,113:242,152:153,153:154,155:156,156:157,158:159,159:160,161:162,163:164,165:166,167:168,170:171,172:25,173:35,174:39,175:176,177:178,179:180,180:181,183:184,187:188,188:189,194:195,204:205,209:210,216:217,218:219,220:221,223:224,228:229,231:232,236:237,238:124,239:125,240:126,246:247,247:248};
 const FILTER_STONE_EVO = {37:{firestone:38},58:{firestone:59},133:{firestone:136,waterstone:134,thunderstone:135},61:{waterstone:62,kings_rock:186},90:{waterstone:91},120:{waterstone:121},25:{thunderstone:26},44:{leafstone:45,sunstone:182},70:{leafstone:71},102:{leafstone:103},30:{moonstone:31},33:{moonstone:34},35:{moonstone:36},39:{moonstone:40},79:{kings_rock:200},95:{metal_coat:208},117:{dragon_scale:230},123:{metal_coat:212},137:{up_grade:233},191:{sunstone:192}};
 
@@ -481,6 +481,16 @@ function pokemonMatchesBoxFilters(p){
  if(filters.shiny === 'shiny' && !shiny) return false;
  if(filters.shiny === 'normal' && shiny) return false;
  if(filters.evo === 'missing' && !canPokemonEvolveToUnowned(p)) return false;
+ if(filters.favorite === 'favorite' && !p.favorite) return false;
+ if(filters.favorite === 'not_favorite' && p.favorite) return false;
+ if(filters.locked === 'locked' && !p.locked) return false;
+ if(filters.locked === 'unlocked' && p.locked) return false;
+ const ivTotal = Object.values(p.ivs||{}).reduce((a,b)=>a+(Number(b)||0),0);
+ if(filters.iv === 'complete' && ivTotal < 36) return false;
+ if(filters.iv === 'incomplete' && ivTotal >= 36) return false;
+ const evTotal = Object.values(p.evs||{}).reduce((a,b)=>a+(Number(b)||0),0);
+ if(filters.ev === 'complete' && evTotal < 36) return false;
+ if(filters.ev === 'incomplete' && evTotal >= 36) return false;
  return true;
 }
 function applyPokemonBoxFilters(entries){
@@ -503,11 +513,35 @@ function renderBoxFiltersHtml(){
   ['all', t('box_filter_all_evo')],
   ['missing', t('box_filter_evo_missing')]
  ].map(o => boxFilterOptionHtml(o[0], o[1], filters.evo)).join('');
+ const favoriteOptions = [
+  ['all', t('box_filter_all_favorites')],
+  ['favorite', t('box_filter_favorite_only')],
+  ['not_favorite', t('box_filter_not_favorite')]
+ ].map(o => boxFilterOptionHtml(o[0], o[1], filters.favorite)).join('');
+ const lockedOptions = [
+  ['all', t('box_filter_all_locked')],
+  ['locked', t('box_filter_locked_only')],
+  ['unlocked', t('box_filter_unlocked_only')]
+ ].map(o => boxFilterOptionHtml(o[0], o[1], filters.locked)).join('');
+ const ivOptions = [
+  ['all', t('box_filter_all_iv')],
+  ['complete', t('box_filter_iv_complete')],
+  ['incomplete', t('box_filter_iv_incomplete')]
+ ].map(o => boxFilterOptionHtml(o[0], o[1], filters.iv)).join('');
+ const evOptions = [
+  ['all', t('box_filter_all_ev')],
+  ['complete', t('box_filter_ev_complete')],
+  ['incomplete', t('box_filter_ev_incomplete')]
+ ].map(o => boxFilterOptionHtml(o[0], o[1], filters.ev)).join('');
  return `<div class="box-filter-panel"><div class="box-filter-title">${t('filters_title')}</div>
   <label><span>${t('box_filter_region')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'region', this.value">${regionOptions}</select></label>
   <label><span>${t('box_filter_type')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'type', this.value">${typeOptions}</select></label>
   <label><span>${t('box_filter_shiny')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'shiny', this.value">${shinyOptions}</select></label>
   <label><span>${t('box_filter_evolution')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'evo', this.value">${evoOptions}</select></label>
+  <label><span>${t('box_filter_favorite')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'favorite', this.value">${favoriteOptions}</select></label>
+  <label><span>${t('box_filter_locked')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'locked', this.value">${lockedOptions}</select></label>
+  <label><span>${t('box_filter_iv')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'iv', this.value">${ivOptions}</select></label>
+  <label><span>${t('box_filter_ev')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'ev', this.value">${evOptions}</select></label>
   <button class="hbtn" data-action="legacy-call" data-call="resetBoxFilters" data-call-args="">${t('box_filter_reset')}</button>
  </div>`;
 }

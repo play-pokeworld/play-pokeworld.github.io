@@ -3,38 +3,79 @@ function renderHatcheryManagementTabs(active){
  return `<div class="management-tabs">
   <button class="hbtn ${active==='upgrades'?'active':''}" data-action="legacy-call" data-call="openHatcheryManagementMenu" data-call-args="'upgrades'">⬆ ${t('management_upgrades')}</button>
   <button class="hbtn ${active==='automation'?'active':''}" data-action="legacy-call" data-call="openHatcheryManagementMenu" data-call-args="'automation'">🤖 ${t('management_automation')}</button>
-  <button class="hbtn ${active==='trainers'?'active':''}" data-action="legacy-call" data-call="openHatcheryManagementMenu" data-call-args="'trainers'">🧑‍🏫 ${t('management_trainers')}</button>
+  <button class="hbtn ${active==='trainers'?'active':''}" data-action="legacy-call" data-call="openHatcheryManagementMenu" data-call-args="'trainers'">🧑‍💼 ${t('hatchery_managers_title')}</button>
  </div>`;
 }
 function hatcheryAutomationCard(key, icon, descKey){
  if(!G.automation) G.automation = {autoHatch:false, autoSeedHatchery:false, autoExplore:false};
  const purchased = typeof isAutomationPurchased === 'function' ? isAutomationPurchased(key) : true;
- const cost = (typeof AUTOMATION_UPGRADE_COSTS !== 'undefined' && AUTOMATION_UPGRADE_COSTS[key]) ? AUTOMATION_UPGRADE_COSTS[key] : (key==='autoHatch'?250000:500000);
  if(!purchased){
-  return `<button class="hbtn automation-buy-btn" data-action="legacy-call" data-call="buyAutomationUpgrade" data-call-args="'${key}'">${icon} ${t('automation_'+key)} · ${tr('automation_buy_button', {price:cost.toLocaleString()})}</button>`;
+  return `<div class="automation-locked-card"><span>${icon} ${t('automation_'+key)}</span><b>${t('automation_locked_upgrade')}</b></div>`;
  }
  const enabled = !!G.automation[key];
  return `<button class="hbtn automation-toggle-btn ${enabled?'is-on':'is-off'}" data-action="legacy-call" data-call="toggleAutomationButton" data-call-args="'${key}'">
   <span>${icon} ${t('automation_'+key)}</span><b>${enabled?t('automation_enabled'):t('automation_disabled')}</b>
  </button>`;
 }
+function hatcheryAutomationUnlockCard(key, icon){
+ const purchased = typeof isAutomationPurchased === 'function' ? isAutomationPurchased(key) : true;
+ const cost = (typeof AUTOMATION_UPGRADE_COSTS !== 'undefined' && AUTOMATION_UPGRADE_COSTS[key]) ? AUTOMATION_UPGRADE_COSTS[key] : 1000000;
+ return `<div class="upgrade-card ${purchased?'is-owned':''}"><div><b>${icon} ${t('automation_'+key)}</b><span>${purchased?t('automation_owned'):tr('automation_buy_button', {price:cost.toLocaleString()})}</span></div>${purchased?'':`<button class="hbtn purchase-btn" data-action="legacy-call" data-call="buyAutomationUpgrade" data-call-args="'${key}'">${t('buy_btn')}</button>`}</div>`;
+}
+function hatcheryAutomationRulesHtml(){
+ const cfg = typeof ensureHatcheryAutomation === 'function' ? ensureHatcheryAutomation() : {filterShiny:'all', filterIv:'all', sort:'iv_desc'};
+ return `<div class="automation-rules-grid">
+  <label class="automation-field"><span>${t('auto_filter_shiny')}</span><select data-change-call="setHatcheryAutomationOption" data-change-args="'filterShiny', this.value">
+   <option value="all" ${cfg.filterShiny==='all'?'selected':''}>${t('box_filter_all_shiny')}</option>
+   <option value="non_shiny" ${cfg.filterShiny==='non_shiny'?'selected':''}>${t('box_filter_non_shiny_only')}</option>
+   <option value="shiny" ${cfg.filterShiny==='shiny'?'selected':''}>${t('box_filter_shiny_only')}</option>
+  </select></label>
+  <label class="automation-field"><span>${t('box_filter_iv')}</span><select data-change-call="setHatcheryAutomationOption" data-change-args="'filterIv', this.value">
+   <option value="all" ${cfg.filterIv==='all'?'selected':''}>${t('box_filter_all_iv')}</option>
+   <option value="complete" ${cfg.filterIv==='complete'?'selected':''}>${t('box_filter_iv_complete')}</option>
+   <option value="incomplete" ${cfg.filterIv==='incomplete'?'selected':''}>${t('box_filter_iv_incomplete')}</option>
+  </select></label>
+  <label class="automation-field"><span>${t('sort_label')}</span><select data-change-call="setHatcheryAutomationOption" data-change-args="'sort', this.value">
+   <option value="iv_desc" ${cfg.sort==='iv_desc'?'selected':''}>${t('auto_sort_iv_desc')}</option>
+   <option value="iv_asc" ${cfg.sort==='iv_asc'?'selected':''}>${t('auto_sort_iv_asc')}</option>
+   <option value="level_desc" ${cfg.sort==='level_desc'?'selected':''}>${t('auto_sort_level_desc')}</option>
+   <option value="level_asc" ${cfg.sort==='level_asc'?'selected':''}>${t('auto_sort_level_asc')}</option>
+   <option value="dex" ${cfg.sort==='dex'?'selected':''}>${t('auto_sort_dex')}</option>
+  </select></label>
+ </div>`;
+}
 function openHatcheryManagementMenu(page='upgrades'){
  const inner=document.getElementById('poke-modal-inner');
  const modal=document.getElementById('poke-modal');
  if(!inner||!modal) return;
+ modal.classList.remove('poke-detail-front');
+ inner.classList.remove('poke-detail-inner');
+ inner.classList.add('management-inner');
  const maxSlots = clamp(G.hatcheryMaxSlots || 1, 1, 4);
- const upgradeCost = (typeof getHatcherySlotUpgradeCost === 'function') ? getHatcherySlotUpgradeCost() : (maxSlots * 15000);
+ const upgradeCost = (typeof getHatcherySlotUpgradeCost === 'function') ? getHatcherySlotUpgradeCost() : null;
+ const queueCost = (typeof getHatcheryQueueUpgradeCost === 'function') ? getHatcheryQueueUpgradeCost() : null;
+ const slotsBought = maxSlots >= 4;
  const body = page === 'trainers'
-  ? `<div class="dict-info-block"><b>🧑‍🏫 ${t('management_trainers')}</b><br>${t('hatchery_trainers_soon')}</div>`
+  ? `${typeof renderStaffList==='function'?renderStaffList('hatchery'):''}`
   : page === 'automation'
-  ? `<div class="dict-info-block"><b>${t('hatchery_automation_title')}</b></div>
-     ${hatcheryAutomationCard('autoHatch', '🥚', 'automation_autoHatch_desc')}
-     ${hatcheryAutomationCard('autoSeedHatchery', '📦', 'automation_autoSeedHatchery_desc')}`
-  : `<div class="dict-info-block"><b>${t('hatchery_slots_title')}</b><br>${tr('hatchery_slots_current', {count:maxSlots, max:4})}</div>
-     <div class="dict-info-block">${maxSlots<4&&upgradeCost?`<button class="hbtn purchase-btn" data-action="legacy-call" data-call="upgradeHatcherySlots" data-call-args="${upgradeCost}">⬆ ${tr('hatchery_upgrade_slot', {cost:upgradeCost.toLocaleString()})}</button>`:t('hatchery_slots_max')}</div>`;
- inner.innerHTML = `<div class="modal-title"><div>⚙️ ${t('hatchery_management_title')}</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
- ${renderHatcheryManagementTabs(page)}
- ${body}`;
+  ? `<div class="automation-dashboard hatchery-auto-layout">
+      <div class="automation-toggle-row">${hatcheryAutomationCard('autoHatch', '🥚', 'automation_autoHatch_desc')}${hatcheryAutomationCard('autoSeedHatchery', '📦', 'automation_autoSeedHatchery_desc')}</div>
+      <div class="automation-two-cols">
+       <div class="automation-panel"><div class="queue-panel-head"><b>${t('filters_title')}</b><span>${t('sort_label')}</span></div>${hatcheryAutomationRulesHtml()}</div>
+       <div class="queue-panel"><div class="queue-panel-head"><b>${t('queue_waiting_list')}</b><span>${typeof getHatcheryQueueLimit==='function'?tr('queue_capacity', {count:(G.hatcheryQueue||[]).length, max:getHatcheryQueueLimit()}):''}</span></div><div class="queue-list">${typeof renderHatcheryQueuePreview==='function'?renderHatcheryQueuePreview():''}</div><div class="queue-actions"><button class="hbtn queue-build-btn" data-action="legacy-call" data-call="openUnifiedSelectorModal" data-call-args="'hatchery_queue'">➕ ${t('queue_add_from_box')}</button><button class="hbtn" data-action="legacy-call" data-call="clearHatcheryQueue" data-call-args="">${t('queue_clear')}</button></div></div>
+      </div>
+     </div>`
+  : `<div class="upgrade-grid">
+      <div class="upgrade-card ${slotsBought?'is-owned':''}"><div><b>${t('hatchery_slots_title')}</b><span>${maxSlots}/4</span></div>${slotsBought?`<b>${t('automation_owned')}</b>`:`<button class="hbtn purchase-btn" data-action="legacy-call" data-call="upgradeHatcherySlots" data-call-args="${upgradeCost}">${upgradeCost.toLocaleString()}₽</button>`}</div>
+      <div class="upgrade-card ${queueCost?'':'is-owned'}"><div><b>${t('queue_size_title')}</b><span>${tr('queue_capacity', {count:(G.hatcheryQueue||[]).length, max:getHatcheryQueueLimit()})}</span></div>${queueCost?`<button class="hbtn purchase-btn" data-action="legacy-call" data-call="upgradeHatcheryQueueSize" data-call-args="">${queueCost.toLocaleString()}₽</button>`:`<b>${t('automation_owned')}</b>`}</div>
+      ${hatcheryAutomationUnlockCard('autoHatch','🥚')}
+      ${hatcheryAutomationUnlockCard('autoSeedHatchery','📦')}
+     </div>`;
+ inner.innerHTML = `<div class="modal-title management-title"><div>⚙️ ${t('hatchery_management_title')}</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
+ <div class="management-shell management-hatchery">
+  ${renderHatcheryManagementTabs(page)}
+  <div class="management-content">${body}</div>
+ </div>`;
  modal.classList.add('open');
 }
 function openHatcheryUpgradeMenu(){ openHatcheryManagementMenu('upgrades'); }
