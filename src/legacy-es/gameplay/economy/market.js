@@ -1,5 +1,5 @@
 const MARKET_STOCK = {
- kanto: [1,4,7,133,137,106,107,122],
+ kanto: [1,4,7,133,137,106,107,122,124,131],
  johto: [152,155,158,172,173,174,175,236,196,197,199,213,238,239,240]
 };
 
@@ -24,7 +24,7 @@ function getMarketPokemon(){
  for(const t of Object.values(STONE_EVO[k])) evoTargets.add(+t);
  }
  }
- const allowList = new Set([137,133]);
+ const allowList = new Set([137,133,124]);
  stock = stock.filter(id => !evoTargets.has(id) || allowList.has(id));
  const banned = (region === 'johto') ? [243,244,245,249,250,251] : [144,145,146,150,151];
  stock = stock.filter(id => !banned.includes(id));
@@ -74,7 +74,7 @@ function renderMarket(el){
  for(const id of ids){
  if([1,4,7,152,155,158].includes(id)) cats.starter.push(id);
  else if([138,139,140,141,142].includes(id)) cats.fossil.push(id);
- else if([133,137,106,107,122,175,236].includes(id)) cats.rare.push(id);
+ else if([133,137,106,107,122,124,131,175,236].includes(id)) cats.rare.push(id);
  else cats.other.push(id);
  }
  let html='';

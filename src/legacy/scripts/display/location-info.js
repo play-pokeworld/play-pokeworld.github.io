@@ -37,7 +37,10 @@ function renderLocInfo(el){
 
  
  if(G.location === 'vermilion'){
- allButtons += `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="travelToRegion" data-call-args="'johto'"><span class="ab-icon extracted-template-style-056">🚢</span><span class="ab-label extracted-template-style-057">${t('sail_to_johto')}</span></div>`;
+ const canSailJohto = (typeof canAccessRegion !== 'function') || canAccessRegion('johto');
+ allButtons += canSailJohto
+ ? `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="travelToRegion" data-call-args="'johto'"><span class="ab-icon extracted-template-style-056">🚢</span><span class="ab-label extracted-template-style-057">${t('sail_to_johto')}</span></div>`
+ : `<div class="action-btn loc-action-btn disabled"><span class="ab-icon extracted-template-style-056">🚢</span><span class="ab-label extracted-template-style-057">${t('sail_to_johto')} (${regionAccessMessage('johto')})</span></div>`;
  } else if(G.location === 'olivine'){
  allButtons += `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="travelToRegion" data-call-args="'kanto'"><span class="ab-icon extracted-template-style-056">🚢</span><span class="ab-label extracted-template-style-057">${t('sail_to_kanto')}</span></div>`;
  }
@@ -59,7 +62,8 @@ function renderLocInfo(el){
  
  if(champId){
  const champBadgeReq=champ?(champ.badgeReq||0):0;
- const champLocked=champBadgeReq>G.badges.length;
+ const haveRegionBadges = (typeof regionBadgeCount === 'function') ? regionBadgeCount(regionOfLoc(G.location)) : (G.badges||[]).length;
+ const champLocked=champBadgeReq>haveRegionBadges;
  if(champLocked){
  allButtons += `<div class="action-btn loc-action-btn disabled"><span class="ab-icon extracted-template-style-056">⚔️</span><span class="ab-label extracted-template-style-057">${getChampName(champId)} (${champBadgeReq} ${t('req_lbl')})</span></div>`;
  } else if(champDefeated){

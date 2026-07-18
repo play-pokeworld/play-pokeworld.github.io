@@ -118,16 +118,18 @@ async function onEnemyFaint(){
  resumeBattleActions();
  return;
  } else {
- if(battle.isLeague && typeof battle.leagueStage === 'number' && battle.leagueStage < 4){
+ if(battle.isLeague && typeof battle.leagueStage === 'number'){
+ const leagueTrainers = (typeof getLeagueTrainersForRegion === 'function') ? getLeagueTrainersForRegion(battle.leagueRegion || 'kanto') : LEAGUE_TRAINERS;
+ if(battle.leagueStage < leagueTrainers.length - 1){
  battle.leagueStage++;
- const trainer = LEAGUE_TRAINERS[battle.leagueStage];
+ const trainer = leagueTrainers[battle.leagueStage];
  for(const p of G.team){
  p.currentHP = p.maxHP;
  p.status = null;
  p.statusTurns = 0;
  if(p.moves) for(const m of p.moves) m.pp = m.maxPP;
  }
- addBattleLog(`<span class="extracted-template-style-156">${tr('league_stage_victory', {trainer:LEAGUE_TRAINERS[battle.leagueStage - 1].name})}</span>`);
+ addBattleLog(`<span class="extracted-template-style-156">${tr('league_stage_victory', {trainer:leagueTrainers[battle.leagueStage - 1].name})}</span>`);
  notify(tr('league_stage_success', {stage:battle.leagueStage, trainer:trainer.name}), 'var(--green)');
  updateBattleUI();
  renderBattleTeamRow();
@@ -139,7 +141,7 @@ async function onEnemyFaint(){
  const nextPoke = battle.champTeam[0];
  battle.enemyPoke = nextPoke;
  battle.eMoveIdx = 0;
- addBattleLog(tr('league_next_battle', {stage:battle.leagueStage + 1, trainer:trainer.name, pokemon:nextPoke.name}));
+ addBattleLog(tr('league_next_battle_region', {region:getRegionDisplayName(battle.leagueRegion || 'kanto'), stage:battle.leagueStage + 1, trainer:trainer.name, pokemon:nextPoke.name}));
  G.pokedex[nextPoke.id] = {...(G.pokedex[nextPoke.id]||{}), seen:true};
  resetPlayerCd();
  resetEnemyCd();
@@ -153,6 +155,7 @@ async function onEnemyFaint(){
  }
  await champVictory();
  return;
+ }
  }
  }
 

@@ -1,23 +1,29 @@
 function renderBox(el){
- const entries=boxedEntries();
+ const allEntries=boxedEntries();
+ const entries=(typeof applyPokemonBoxFilters === 'function') ? applyPokemonBoxFilters(allEntries) : allEntries;
+ const filtersHtml = (typeof renderBoxFiltersHtml === 'function') ? renderBoxFiltersHtml() : '';
  const swap=(_swapFromTeamIdx!=null && G.team[_swapFromTeamIdx]);
  const battleLockBanner = battle.active ? `<div class="extracted-template-style-038">
  <span class="extracted-template-style-024"></span>
  <span>${t('battle_lock_box')}</span>
  </div>` : '';
- if(!entries.length){
- el.innerHTML= battleLockBanner + `<div class="extracted-template-style-039">
+ if(!allEntries.length){
+ el.innerHTML= battleLockBanner + filtersHtml + `<div class="extracted-template-style-039">
  ${t('box_empty')}
  </div>${swap?`<div class="extracted-template-style-040"><button class="hbtn" data-action="legacy-call" data-call="cancelBoxSwap" data-call-args="">${t('finish_btn')}</button></div>`:''}`;
+ return;
+ }
+ if(!entries.length){
+ el.innerHTML= battleLockBanner + filtersHtml + `<div class="extracted-template-style-039">${t('no_pokemon_found')}</div>`;
  return;
  }
  const header=swap
  ? `<div class="loc-sub extracted-bridge-style-010">${t('box_swap_header')} <b>${G.team[_swapFromTeamIdx]?.name}</b>. <button class="hbtn extracted-bridge-style-011" data-action="legacy-call" data-call="cancelBoxSwap" data-call-args=""></button></div>`
  : `<div class="extracted-template-style-041">
- <span class="loc-sub"> ${entries.length} ${t('box_header')}</span>
+ <span class="loc-sub"> ${entries.length} / ${allEntries.length} ${t('box_header')}</span>
  <button class="hbtn extracted-bridge-style-012" data-action="legacy-call" data-call="openUnifiedSelectorModal" data-call-args="'box_view'">🔍 ${t('fullscreen_pc_box')}</button>
  </div>`;
- el.innerHTML= battleLockBanner + `${header}
+ el.innerHTML= battleLockBanner + filtersHtml + `${header}
  <div class="box-grid">
  ${entries.map(({id, cleanId, poke})=>{
  const isShiny = poke.shinyUnlocked || poke.shinyActive || poke.shiny || isSpeciesShiny(poke.id);

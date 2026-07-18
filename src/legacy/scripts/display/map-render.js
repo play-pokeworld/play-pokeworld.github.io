@@ -1,10 +1,21 @@
+function updateRegionSelectorLocks(){
+ const sel = document.getElementById('map-region-select');
+ if(!sel) return;
+ Array.from(sel.options || []).forEach(opt => {
+  if(!opt.value) return;
+  const ok = (typeof canAccessRegion !== 'function') || canAccessRegion(opt.value);
+  opt.disabled = !ok || opt.dataset.forceDisabled === 'true';
+  if(!ok && typeof regionAccessMessage === 'function') opt.title = regionAccessMessage(opt.value);
+ });
+}
+
 function renderMap(){
  recomputeUnlocks();
  updateFeatureWindows();
  
  
  const regSel = document.getElementById('map-region-select');
- if(regSel && G && G.region){ regSel.value = G.region; }
+ if(regSel && G && G.region){ regSel.value = G.region; if(typeof updateRegionSelectorLocks === 'function') updateRegionSelectorLocks(); }
  
  
  const mapWT = document.querySelector('#win-map .win-header-title');

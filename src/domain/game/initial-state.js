@@ -6,7 +6,7 @@ export function createInitialGameState() {
     regionStarter: { kanto: false, johto: false },
     collection: {}, teamSlotItems: [], evolvedSpecies: [], dupeCatches: {}, lang: 'fr',
     storyIdx: 0, storyProgress: 0, unlockedTalents: {}, activeQuests: [],
-    repeatables: [], visitedMaps: {}, completedQuests: {}, wildWinsByLoc: {},
+    repeatables: [], visitedMaps: {}, completedQuests: {}, wildWinsByLoc: {}, regionLeagueWon: {},
     playTimeMs: 0, saveMeta: {},
   };
 }

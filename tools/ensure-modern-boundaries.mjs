@@ -14,7 +14,7 @@ write('src/domain/game/initial-state.js', `export function createInitialGameStat
     regionStarter: { kanto: false, johto: false },
     collection: {}, teamSlotItems: [], evolvedSpecies: [], dupeCatches: {}, lang: 'fr',
     storyIdx: 0, storyProgress: 0, unlockedTalents: {}, activeQuests: [],
-    repeatables: [], visitedMaps: {}, completedQuests: {}, wildWinsByLoc: {},
+    repeatables: [], visitedMaps: {}, completedQuests: {}, wildWinsByLoc: {}, regionLeagueWon: {},
     playTimeMs: 0, saveMeta: {},
   };
 }
@@ -281,7 +281,7 @@ export function installLegacyGlobals(target = globalThis) {
 `);
 
 write('src/domain/economy/market.js', `export const MARKET_STOCK = Object.freeze({
-  kanto: Object.freeze([1, 4, 7, 133, 137, 106, 107, 122]),
+  kanto: Object.freeze([1, 4, 7, 133, 137, 106, 107, 122, 124, 131]),
   johto: Object.freeze([152, 155, 158, 172, 173, 174, 175, 236, 196, 197, 199, 213, 238, 239, 240]),
 });
 

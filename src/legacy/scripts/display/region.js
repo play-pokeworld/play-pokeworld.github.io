@@ -1,6 +1,12 @@
 function travelToRegion(targetReg){
  if(typeof G === 'undefined' || !G) return;
  if(targetReg === G.region) return;
+ if(typeof canAccessRegion === 'function' && !canAccessRegion(targetReg)){
+ const msg = regionAccessMessage(targetReg);
+ setMsg(msg); notify(msg, 'var(--red)');
+ const sel = document.getElementById('map-region-select'); if(sel) sel.value = G.region || 'kanto';
+ return;
+ }
  if(targetReg === 'johto'){
  G.region = 'johto';
  G.location = 'newbark';
@@ -24,6 +30,12 @@ function travelToRegion(targetReg){
 }
 
 function switchMapRegion(reg){
+ if(typeof canAccessRegion === 'function' && !canAccessRegion(reg)){
+ const msg = regionAccessMessage(reg);
+ setMsg(msg); notify(msg, 'var(--red)');
+ const sel = document.getElementById('map-region-select'); if(sel) sel.value = G.region || 'kanto';
+ return;
+ }
  if(G.region !== reg){
  if(reg === 'johto'){
  if(!LOCS_JOHTO[G.location]) G.location = 'newbark';

@@ -97,7 +97,7 @@
 
 
   function createInitialGameState() {
-    return { location:'pallet', region:'kanto', team:[], inventory:{}, money:2000, badges:[], defeatedChamps:{}, pokedex:{}, stepsLeft:0, starter:false, starterKanto:false, starterJohto:false, regionStarter:{kanto:false,johto:false}, collection:{}, teamSlotItems:[], evolvedSpecies:[], dupeCatches:{}, lang:'fr', storyIdx:0, storyProgress:0, unlockedTalents:{}, activeQuests:[], repeatables:[], visitedMaps:{}, completedQuests:{}, wildWinsByLoc:{}, playTimeMs:0, saveMeta:{} };
+    return { location:'pallet', region:'kanto', team:[], inventory:{}, money:2000, badges:[], defeatedChamps:{}, pokedex:{}, stepsLeft:0, starter:false, starterKanto:false, starterJohto:false, regionStarter:{kanto:false,johto:false}, collection:{}, teamSlotItems:[], evolvedSpecies:[], dupeCatches:{}, lang:'fr', storyIdx:0, storyProgress:0, unlockedTalents:{}, activeQuests:[], repeatables:[], visitedMaps:{}, completedQuests:{}, wildWinsByLoc:{}, regionLeagueWon:{}, playTimeMs:0, saveMeta:{} };
   }
   function createInitialBattleState() {
     return { active:false, enemy:null, enemyPoke:null, playerPokeIdx:0, isChamp:false, champId:null, champPokeIdx:0, turnLocked:false, escaped:false, chill:false, playerMods:{atk:1,def:1,spe:1}, enemyMods:{atk:1,def:1,spe:1}, log:[], sessionCatches:[], sessionItems:{}, pendingLeave:false, pendingSwitchIdx:null };

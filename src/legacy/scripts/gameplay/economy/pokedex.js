@@ -18,10 +18,11 @@ function getDexFlavor(id){
 }
 
 function renderPokedex(el){
- const total = PD.filter(Boolean).length;
- const caught = Object.values(G.pokedex).filter(e=>e.caught).length;
- const seen = Object.values(G.pokedex).filter(e=>e.seen||e.caught).length;
- const shinyCount = PD.slice(1).filter((pd,i)=>pd && isSpeciesShiny(i+1)).length;
+ const visibleIds = (typeof getUnlockedDexIds === 'function') ? getUnlockedDexIds() : PD.slice(1).map((_,i)=>i+1).filter(id=>PD[id]);
+ const total = visibleIds.length;
+ const caught = visibleIds.filter(id=>G.pokedex && G.pokedex[id] && G.pokedex[id].caught).length;
+ const seen = visibleIds.filter(id=>G.pokedex && G.pokedex[id] && (G.pokedex[id].seen || G.pokedex[id].caught)).length;
+ const shinyCount = visibleIds.filter(id=>isSpeciesShiny(id)).length;
 
  
  const filterBar = document.getElementById('fs-panel-filters');
@@ -33,14 +34,15 @@ function renderPokedex(el){
  <span class="extracted-template-style-212">${t('pokedex_seen')}: <b class="extracted-template-style-232">${seen}</b></span>
  <span class="extracted-template-style-212">${t('pokedex_caught')}: <b class="extracted-template-style-232">${caught}</b> / ${total}</span>
  <span class="extracted-template-style-212">${t('pokedex_shiny')}: <b class="extracted-template-style-232">${shinyCount}</b> / ${total}</span>
+ <span class="extracted-template-style-212">${t('pokedex_regions')}: <b class="extracted-template-style-232">${(typeof getUnlockedRegionsForPokedex==='function'?getUnlockedRegionsForPokedex():['kanto']).map(r=>getRegionDisplayName(r)).join(', ')}</b></span>
  `;
  }
 
  el.innerHTML = `
  <div class="dex-grid">
- ${PD.slice(1).map((pd,i)=>{
+ ${visibleIds.map((id)=>{
+ const pd = PD[id];
  if(!pd) return '';
- const id = i+1;
  const entry = G.pokedex[id];
  const isCaught = entry?.caught;
  const isSeen = entry?.seen || isCaught;

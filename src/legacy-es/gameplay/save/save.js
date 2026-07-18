@@ -66,6 +66,8 @@ function normalizeLoadedState(){
  if(!G.pokedex) G.pokedex = {};
  if(!G.unlockedTalents) G.unlockedTalents = {};
  if(!G.mainStep) G.mainStep = { kanto: 0, johto: 0 };
+ if(!G.regionLeagueWon || typeof G.regionLeagueWon !== 'object') G.regionLeagueWon = {};
+ if(typeof ensureRegionProgress === 'function') ensureRegionProgress();
  if(!G.automation) G.automation = { autoHatch: false, autoSeedHatchery: false, autoExplore: false };
  if(!Array.isArray(G.teamSlotItems)) G.teamSlotItems = [];
  if(!G.evolvedSpecies) G.evolvedSpecies = [];
@@ -78,6 +80,7 @@ function normalizeLoadedState(){
  ensureDefaultSaveIcon();
  for(const p of (G.team || [])){ if(!p.moves) p.moves = []; for(const m of p.moves){ if(m.maxPP === undefined) m.maxPP = MOVES[m.id]?.pp || 10; if(m.pp === undefined) m.pp = m.maxPP; } }
  if (typeof applyOfficialPokemonDataToSave === 'function') applyOfficialPokemonDataToSave();
+ if(typeof canAccessRegion === 'function' && G.region && !canAccessRegion(G.region)){ G.region = 'kanto'; G.location = 'vermilion'; }
  if(typeof ensureTeamSlotItems === 'function') ensureTeamSlotItems();
 }
 function migrateLegacySingleSave(){
@@ -195,13 +198,24 @@ function deleteSaveById(id){
  if(!window.confirm(t('save_delete_confirm'))) return;
  storageRemove(slotKey(id));
  removeSaveFromIndex(id);
- if(currentSaveId === id){
+ let rawActive = null;
+ try{ rawActive = storageGet(SAVE_KEY); }catch(_){ }
+ if(rawActive){
+  try{
+   const activeData = JSON.parse(rawActive);
+   const activeId = activeData.saveId || (activeData.G && activeData.G.saveMeta && activeData.G.saveMeta.id);
+   if(activeId === id) storageRemove(SAVE_KEY);
+  }catch(_){ storageRemove(SAVE_KEY); }
+ }
+ const activeKey = storageGet(ACTIVE_SAVE_ID_KEY);
+ if(currentSaveId === id || activeKey === id || readSaveIndex().length === 0){
   currentSaveId = null;
   window.currentSaveId = null;
   storageRemove(ACTIVE_SAVE_ID_KEY);
   storageRemove(SAVE_KEY);
   window.PokeWorldGameStarted = false;
  }
+ writeSaveIndex(readSaveIndex().filter(entry => entry && readSlot(entry.id)));
  renderSaveMenu();
  notify(t('save_deleted'), 'var(--green)');
 }
@@ -217,7 +231,7 @@ function renderSaveMenu(){
  setTimeout(updateSaveMenuScrollButtons, 0);
 }
 function hideSaveMenu(){ const screen = document.getElementById('save-menu-screen'); if(screen) screen.classList.remove('is-open'); document.body.classList.remove('save-menu-active'); document.body.classList.add('game-started'); }
-function createFreshGameState(){ let state = null; try{ if(window.PokeWorldState && window.PokeWorldState.createInitialGameState) state = window.PokeWorldState.createInitialGameState(); }catch(_){ } if(!state) state = { location:'pallet', region:'kanto', team:[], inventory:{}, money:2000, badges:[], defeatedChamps:{}, pokedex:{}, stepsLeft:0, starter:false, starterKanto:false, starterJohto:false, regionStarter:{kanto:false,johto:false}, collection:{}, evolvedSpecies:[], dupeCatches:{}, lang:'fr', storyIdx:0, storyProgress:0, unlockedTalents:{}, activeQuests:[], repeatables:[], visitedMaps:{}, completedQuests:{}, wildWinsByLoc:{}, playTimeMs:0, saveMeta:{} }; const storedLang = storageGet('pokeworld_lang'); if(storedLang) state.lang = storedLang; if(state.playTimeMs == null) state.playTimeMs = 0; return state; }
+function createFreshGameState(){ let state = null; try{ if(window.PokeWorldState && window.PokeWorldState.createInitialGameState) state = window.PokeWorldState.createInitialGameState(); }catch(_){ } if(!state) state = { location:'pallet', region:'kanto', team:[], inventory:{}, money:2000, badges:[], defeatedChamps:{}, pokedex:{}, stepsLeft:0, starter:false, starterKanto:false, starterJohto:false, regionStarter:{kanto:false,johto:false}, collection:{}, teamSlotItems:[], evolvedSpecies:[], dupeCatches:{}, lang:'fr', storyIdx:0, storyProgress:0, unlockedTalents:{}, activeQuests:[], repeatables:[], visitedMaps:{}, completedQuests:{}, wildWinsByLoc:{}, regionLeagueWon:{}, playTimeMs:0, saveMeta:{} }; const storedLang = storageGet('pokeworld_lang'); if(storedLang) state.lang = storedLang; if(state.playTimeMs == null) state.playTimeMs = 0; return state; }
 function assignGlobalState(state){ const target = (typeof G !== 'undefined' && G && typeof G === 'object') ? G : {}; for(const key of Object.keys(target)) delete target[key]; Object.assign(target, state || {}); G = target; if(typeof window !== 'undefined'){ window.G = target; if(window.PokeWorldState) window.PokeWorldState.gameState = target; } if(typeof globalThis !== 'undefined') globalThis.G = target; }
 function resetRuntimeBattleState(){ try{ const fresh = window.PokeWorldBattleState && window.PokeWorldBattleState.createInitialBattleState ? window.PokeWorldBattleState.createInitialBattleState() : null; if(fresh && typeof battle !== 'undefined' && battle){ for(const key of Object.keys(battle)) delete battle[key]; Object.assign(battle, fresh); window.battle = battle; } }catch(_){ } }
 function createNewSaveFromMenu(){
@@ -252,7 +266,7 @@ function getAfkInfo(){
  let fromStorage = null;
  try{ const raw = storageGet(afkStorageKey()); if(raw) fromStorage = JSON.parse(raw); }catch(_){ }
  const node = G && G.afk ? G.afk : {};
- return { ts: Number(fromStorage?.ts || node.lastSeenAt || saveNow()), wasWildBattle: !!(fromStorage?.wasWildBattle || node.wasWildBattle), battleSpeed: Number(fromStorage?.battleSpeed || node.battleSpeed || (battle && battle.speed) || 1), teamKoAtStart: Number((fromStorage && fromStorage.teamKoAtStart != null ? fromStorage.teamKoAtStart : node.teamKoAtStart) || 0) };
+ return { ts: Number(fromStorage?.ts || node.lastSeenAt || saveNow()), pending: !!(fromStorage?.pending || node.pendingAfk), wasWildBattle: !!(fromStorage?.wasWildBattle || node.wasWildBattle), battleSpeed: Number(fromStorage?.battleSpeed || node.battleSpeed || (battle && battle.speed) || 1), teamKoAtStart: Number((fromStorage && fromStorage.teamKoAtStart != null ? fromStorage.teamKoAtStart : node.teamKoAtStart) || 0) };
 }
 function markAfkSeen(force){
  if(!G || !currentSaveId) return;
@@ -266,8 +280,9 @@ function markAfkSeen(force){
  G.afk.battleSpeed = wildBattle ? (battle.speed || 1) : (G.afk.battleSpeed || 1);
  afkLastHeartbeat = now;
  if(force) afkPendingSince = null;
+ G.afk.pendingAfk = false;
  G.afk.teamKoAtStart = countAfkTeamKo();
- try{ storageSet(afkStorageKey(), JSON.stringify({ts:G.afk.lastSeenAt, wasWildBattle:G.afk.wasWildBattle, battleSpeed:G.afk.battleSpeed, teamKoAtStart:G.afk.teamKoAtStart})); }catch(_){ }
+ try{ storageSet(afkStorageKey(), JSON.stringify({ts:G.afk.lastSeenAt, pending:false, wasWildBattle:G.afk.wasWildBattle, battleSpeed:G.afk.battleSpeed, teamKoAtStart:G.afk.teamKoAtStart})); }catch(_){ }
 }
 function beginAfkSleep(){
  if(!window.PokeWorldGameStarted || !G || !hasStarterInState(G)) return;
@@ -279,8 +294,9 @@ function beginAfkSleep(){
  G.afk.lastSeenAt = now;
  G.afk.wasWildBattle = wildBattle || !!(G.afk.wasWildBattle);
  G.afk.battleSpeed = wildBattle ? (battle.speed || 1) : (G.afk.battleSpeed || 1);
+ G.afk.pendingAfk = true;
  G.afk.teamKoAtStart = countAfkTeamKo();
- try{ storageSet(afkStorageKey(), JSON.stringify({ts:now, wasWildBattle:G.afk.wasWildBattle, battleSpeed:G.afk.battleSpeed, teamKoAtStart:G.afk.teamKoAtStart})); }catch(_){ }
+ try{ storageSet(afkStorageKey(), JSON.stringify({ts:now, pending:true, wasWildBattle:G.afk.wasWildBattle, battleSpeed:G.afk.battleSpeed, teamKoAtStart:G.afk.teamKoAtStart})); }catch(_){ }
  if(battle && battle.active && !battle.isChamp && !battle.isTraining) battle.paused = true;
  try{ if(hasStarterInState(G)) saveGame(false); }catch(_){ }
 }
@@ -304,11 +320,12 @@ function pollAfkHeartbeat(){
   if(!afkPendingSince) beginAfkSleep();
   return;
  }
- const start = afkPendingSince || afkLastHeartbeat;
- const elapsed = now - start;
- if(elapsed >= AFK_MIN_MS){
-  const info = afkPendingSince ? getAfkInfo() : {ts:start, wasWildBattle:!!(battle && battle.active && !battle.isChamp && !battle.isTraining), battleSpeed:(battle && battle.speed) || 1, teamKoAtStart:countAfkTeamKo()};
-  applyAfkProgress(elapsed, afkPendingSince ? 'heartbeat-return' : 'heartbeat-gap', info);
+ if(afkPendingSince){
+  const start = afkPendingSince;
+  const elapsed = now - start;
+  if(elapsed >= AFK_MIN_MS){ applyAfkProgress(elapsed, 'heartbeat-return', getAfkInfo()); return; }
+  resumeAfkBattleIfNeeded();
+  markAfkSeen(true);
   return;
  }
  markAfkSeen(false);
@@ -320,7 +337,6 @@ function installAfkHandlers(){
   if(document.visibilityState === 'hidden') beginAfkSleep();
   else scheduleAfkCatchup('visible');
  });
- window.addEventListener('blur', () => beginAfkSleep());
  window.addEventListener('focus', () => scheduleAfkCatchup('focus'));
  window.addEventListener('pageshow', () => scheduleAfkCatchup('pageshow'));
  window.addEventListener('pagehide', () => beginAfkSleep());
@@ -331,6 +347,7 @@ function applyAfkReturn(reason){
  if(!window.PokeWorldGameStarted || !G || !hasStarterInState(G)){ resumeAfkBattleIfNeeded(); return; }
  if(!currentSaveId && G.saveMeta && G.saveMeta.id) currentSaveId = G.saveMeta.id;
  const info = getAfkInfo();
+ if(!afkPendingSince && !info.pending){ resumeAfkBattleIfNeeded(); markAfkSeen(true); return; }
  const start = afkPendingSince || info.ts;
  const elapsed = saveNow() - start;
  if(!(elapsed >= AFK_MIN_MS)){ resumeAfkBattleIfNeeded(); markAfkSeen(true); return; }
@@ -340,6 +357,7 @@ function canAfkBattle(info){
  const loc = (typeof getLocObj === 'function') ? getLocObj(G.location) : null;
  if(!loc || !loc.wild || !loc.wild.length || !G.team || !G.team.length) return false;
  if(battle && battle.active && (battle.isChamp || battle.isTraining)) return false;
+ if(typeof canUseCurrentTeamForRegion === 'function' && !canUseCurrentTeamForRegion(G.region || 'kanto')) return false;
  return true;
 }
 function getAfkEncounterSeconds(loc, info){

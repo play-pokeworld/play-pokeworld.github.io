@@ -119,6 +119,7 @@ const CHAMP_EN = {
  blaine:{name:'Blaine', title:'Cinnabar Gym Leader', bname:'Volcano Badge'},
  giovanni:{name:'Giovanni', title:'Viridian Gym Leader', bname:'Earth Badge'},
  elite4: {name:'Kanto League (Blue)', title:'Champion', bname:'Champion Title'},
+ johto_elite4: {name:'Johto League (Lance)', title:'Champion', bname:'Johto Champion Title'},
  falkner: {name:'Falkner', title:'Violet Gym Leader', bname:'Zephyr Badge'},
  bugsy: {name:'Bugsy', title:'Azalea Gym Leader', bname:'Hive Badge'},
  whitney: {name:'Whitney', title:'Goldenrod Gym Leader', bname:'Plain Badge'},
@@ -131,8 +132,9 @@ const CHAMP_EN = {
 
 function getChampName(id){
  const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
- if(typeof battle !== 'undefined' && battle && (battle.isLeague || id === 'elite4' || battle.champId === 'elite4') && typeof battle.leagueStage === 'number' && typeof LEAGUE_TRAINERS !== 'undefined' && LEAGUE_TRAINERS[battle.leagueStage]){
- return LEAGUE_TRAINERS[battle.leagueStage].name;
+ if(typeof battle !== 'undefined' && battle && (battle.isLeague || id === 'elite4' || id === 'johto_elite4' || battle.champId === 'elite4' || battle.champId === 'johto_elite4') && typeof battle.leagueStage === 'number'){
+ const trainers = (typeof getLeagueTrainersForRegion === 'function') ? getLeagueTrainersForRegion(battle.leagueRegion || (typeof getLeagueRegionForChampion === 'function' ? getLeagueRegionForChampion(id || battle.champId) : 'kanto')) : LEAGUE_TRAINERS;
+ if(trainers && trainers[battle.leagueStage]) return trainers[battle.leagueStage].name;
  }
  if(id && String(id).startsWith('quest_')){
  return t("m.moves.14");

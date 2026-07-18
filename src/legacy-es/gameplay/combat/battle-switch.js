@@ -19,6 +19,10 @@ function doSwitchBattlePoke(idx){
  }
  const p=G.team[idx];
  if(!p||p.currentHP<=0) return;
+ if(typeof regionRequiresNativeTeam === 'function' && regionRequiresNativeTeam(G.region || 'kanto') && !isPokemonNativeToRegion(p.id, G.region || 'kanto')){
+ notify(regionTeamRestrictionMessage(G.region || 'kanto'), 'var(--red)');
+ return;
+ }
 if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
  battle.playerPokeIdx=idx;
  battle.playerMods={atk:1,def:1,spe:1};
@@ -143,17 +147,19 @@ async function champVictory(){
  }
 
  const champ = CHAMPIONS[battle.champId] || { name: getChampName(battle.champId), reward: 5000, badgeName: 'Badge', badgeEmoji: '', team: battle.champTeam || [] };
- const isLeague = (battle.champId === 'elite4' || battle.isLeague);
+ const isLeague = ((typeof isLeagueChampionId === 'function' && isLeagueChampionId(battle.champId)) || battle.champId === 'elite4' || battle.isLeague);
+ const leagueRegion = battle.leagueRegion || (typeof getLeagueRegionForChampion === 'function' ? getLeagueRegionForChampion(battle.champId) : 'kanto');
  const isFirstWin = !isLeague && !G.badges.includes(battle.champId);
  G.defeatedChamps[battle.champId] = true;
 
  if(isLeague){
- G.championTitle = true;
- EventBus.emit(EVENTS.LEAGUE_WON, {});
+ if(typeof markRegionLeagueWon === 'function') markRegionLeagueWon(leagueRegion);
+ else if(leagueRegion === 'kanto') G.championTitle = true;
+ EventBus.emit(EVENTS.LEAGUE_WON, {region:leagueRegion});
  G.money += (champ.reward || 15000);
  updateHeader();
- addBattleLog(`<span class="extracted-template-style-002">${t('league_master_victory_log')}</span>`);
- notify(tr('league_master_title_reward', {money:(champ.reward||15000).toLocaleString()}), 'var(--light2)');
+ addBattleLog(`<span class="extracted-template-style-002">${tr('league_master_victory_log_region', {region:getRegionDisplayName(leagueRegion)})}</span>`);
+ notify(tr('league_master_title_reward_region', {region:getRegionDisplayName(leagueRegion), money:(champ.reward||15000).toLocaleString()}), 'var(--light2)');
  } else {
  if(isFirstWin) G.badges.push(battle.champId);
  EventBus.emit(EVENTS.BADGE_EARNED, { champId: battle.champId });
@@ -182,7 +188,7 @@ async function champVictory(){
  showTab('info');
 
  if(isLeague){
- document.getElementById('victory-msg').textContent=t('league_victory_message');
+ document.getElementById('victory-msg').textContent=tr('league_victory_message_region', {region:getRegionDisplayName(leagueRegion)});
  document.getElementById('victory-screen').classList.add('open');
  } else {
  notify(` ${champ.badgeName} obtenu ! ${champ.badgeEmoji}`,'var(--accent)');

@@ -1,6 +1,12 @@
 function startBattle(enemyPoke, isChamp, champId=null, champPokeList=null){
  if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
  if(!G.team.length){setMsg(t('no_pokemon_in_team'));return;}
+ if(typeof canUseCurrentTeamForRegion === 'function' && !canUseCurrentTeamForRegion(G.region || 'kanto')){
+ battle.isLeague = false; battle.leagueRegion = null;
+ setMsg(regionTeamRestrictionMessage(G.region || 'kanto'));
+ notify(regionTeamRestrictionMessage(G.region || 'kanto'), 'var(--red)');
+ return;
+ }
  if(isChamp && (!champPokeList || !champPokeList.length)){
  setMsg(t('empty_enemy_team_error'));
  return;
@@ -95,19 +101,30 @@ function getChampTeam(champId){
 function startChampBattle(champId){
  const champ=CHAMPIONS[champId];
  if(!champ){return;}
- if((champ.badgeReq||0)>G.badges.length){
+ const champRegion = champ.region || ((typeof JOHTO_BADGES !== 'undefined' && JOHTO_BADGES.includes(champId)) || champId === 'johto_elite4' ? 'johto' : 'kanto');
+ const haveRegionBadges = (typeof regionBadgeCount === 'function') ? regionBadgeCount(champRegion) : (G.badges||[]).length;
+ if((champ.badgeReq||0)>haveRegionBadges){
  setMsg(tr('need_badges_challenge', {need:champ.badgeReq, champion:getChampName(champId || battle.champId)}));
  return;
  }
  if(!G.team.length){setMsg(t('no_pokemon_in_team'));return;}
+ if(typeof canUseCurrentTeamForRegion === 'function' && !canUseCurrentTeamForRegion(G.region || 'kanto')){
+ battle.isLeague = false; battle.leagueRegion = null;
+ setMsg(regionTeamRestrictionMessage(G.region || 'kanto'));
+ notify(regionTeamRestrictionMessage(G.region || 'kanto'), 'var(--red)');
+ return;
+ }
 
- if(champId === 'elite4'){
+ if(typeof isLeagueChampionId === 'function' ? isLeagueChampionId(champId) : champId === 'elite4'){
+ const leagueRegion = (typeof getLeagueRegionForChampion === 'function') ? getLeagueRegionForChampion(champId) : 'kanto';
+ const trainers = (typeof getLeagueTrainersForRegion === 'function') ? getLeagueTrainersForRegion(leagueRegion) : LEAGUE_TRAINERS;
  battle.isLeague = true;
+ battle.leagueRegion = leagueRegion;
  battle.leagueStage = 0;
- const firstTrainer = LEAGUE_TRAINERS[0];
+ const firstTrainer = trainers[0];
  const team = firstTrainer.team.map(([id, lv]) => createPoke(id, lv, false));
- addBattleLog(tr('league_battle_challenge', {trainer:firstTrainer.name}));
- startBattle(null, true, 'elite4', team);
+ addBattleLog(tr('league_battle_challenge_region', {region:getRegionDisplayName(leagueRegion), trainer:firstTrainer.name}));
+ startBattle(null, true, champId, team);
  addBattleLog(tr('league_intro_quote', {trainer:firstTrainer.name}));
  return;
  }

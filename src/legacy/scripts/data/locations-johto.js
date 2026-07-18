@@ -9,7 +9,7 @@ var LOCS_JOHTO = {
  jroute47: {name:'Route 47', type:'route', x:40,y:664,w:48,h:112, conn:['jroute48'], wild:[], shopId:null, champ:null, badgeReq:8},
  jroute48: {name:'Route 48', type:'route', x:40,y:504,w:48,h:208, conn:['jroute47','victoryroad_jo'], wild:[], shopId:null, champ:null, badgeReq:8},
  nationalpark:{name:'Parc Naturel', type:'town', x:400,y:268,w:96,h:72, conn:['jroute35','jroute36'], wild:[], shopId:null, champ:null, badgeReq:0},
- indigo_jo: {name:'Plateau Indigo', type:'town', x:1496,y:104,w:208,h:208, conn:['jroute26','victoryroad_jo'], wild:[], shopId:null, champ:null, badgeReq:8},
+ indigo_jo: {name:'Plateau Indigo', type:'town', x:1496,y:104,w:208,h:208, conn:['jroute26','victoryroad_jo'], wild:[], shopId:null, champ:'johto_elite4', badgeReq:8},
  sprouttower: {name:'Tour Chétiflor', type:'dungeon', x:736,y:260,w:64,h:88, conn:['violet'], wild:[], shopId:null, champ:null, badgeReq:0},
  ruinsofalph: {name:'Ruines d\'Alpha', type:'dungeon', x:696,y:432,w:80,h:64, conn:['jroute32','jroute32_mid'], wild:[], shopId:null, champ:null, badgeReq:0},
  burnedtower: {name:'Tour Carillon', type:'dungeon', x:472,y:96,w:112,h:128, conn:['ecruteak'], wild:[], shopId:null, champ:null, badgeReq:0},

@@ -233,7 +233,248 @@ function getShopName(id){
 })();
 
 
+const REGION_ORDER = ['kanto','johto','hoenn','sinnoh','unova','kalos','alola','galar','paldea'];
+const REGION_POKE_RANGES = {
+  kanto: {start:1, end:151, previous:null, league:'elite4'},
+  johto: {start:152, end:251, previous:'kanto', league:'johto_elite4'},
+  hoenn: {start:252, end:386, previous:'johto', league:'hoenn_elite4'},
+  sinnoh: {start:387, end:493, previous:'hoenn', league:'sinnoh_elite4'},
+  unova: {start:494, end:649, previous:'sinnoh', league:'unova_elite4'},
+  kalos: {start:650, end:721, previous:'unova', league:'kalos_elite4'},
+  alola: {start:722, end:809, previous:'kalos', league:'alola_elite4'},
+  galar: {start:810, end:905, previous:'alola', league:'galar_league'},
+  paldea: {start:906, end:1025, previous:'galar', league:'paldea_league'}
+};
+function getRegionMeta(region){ return REGION_POKE_RANGES[region || 'kanto'] || REGION_POKE_RANGES.kanto; }
+function getRegionDisplayName(region){
+ const key = 'region_'+(region||'kanto');
+ const val = (typeof t === 'function') ? t(key) : '';
+ if(val && val !== key) return val;
+ return String(region||'kanto').charAt(0).toUpperCase()+String(region||'kanto').slice(1);
+}
+function getPreviousRegion(region){ return getRegionMeta(region).previous || null; }
+function isPokemonNativeToRegion(id, region){
+ const meta = getRegionMeta(region);
+ const nid = Number(id);
+ return nid >= meta.start && nid <= meta.end;
+}
+function getRegionPokedexTotal(region){
+ const meta = getRegionMeta(region);
+ return Math.max(0, (meta.end || 0) - (meta.start || 0) + 1);
+}
+function countCaughtInRegion(region){
+ const meta = getRegionMeta(region);
+ let count = 0;
+ for(let id=meta.start; id<=meta.end; id++){
+  if(G && G.pokedex && G.pokedex[id] && G.pokedex[id].caught) count++;
+ }
+ return count;
+}
+function isRegionDexComplete(region){ return countCaughtInRegion(region) >= getRegionPokedexTotal(region); }
+function ensureRegionProgress(){
+ if(!G) return;
+ if(!G.regionLeagueWon || typeof G.regionLeagueWon !== 'object') G.regionLeagueWon = {};
+ if(G.championTitle || (G.defeatedChamps && G.defeatedChamps.elite4)) G.regionLeagueWon.kanto = true;
+ if(G.defeatedChamps && G.defeatedChamps.johto_elite4) G.regionLeagueWon.johto = true;
+}
+function isRegionLeagueWon(region){
+ ensureRegionProgress();
+ region = region || 'kanto';
+ if(region === 'kanto') return !!(G && (G.championTitle || (G.regionLeagueWon && G.regionLeagueWon.kanto) || (G.defeatedChamps && G.defeatedChamps.elite4)));
+ return !!(G && G.regionLeagueWon && G.regionLeagueWon[region]);
+}
+function markRegionLeagueWon(region){
+ if(!G) return;
+ if(!G.regionLeagueWon || typeof G.regionLeagueWon !== 'object') G.regionLeagueWon = {};
+ G.regionLeagueWon[region || 'kanto'] = true;
+ if(region === 'kanto') G.championTitle = true;
+ if(region === 'johto') G.johtoChampionTitle = true;
+}
+function getRegionAccessStatus(targetRegion){
+ targetRegion = targetRegion || 'kanto';
+ if(targetRegion === 'kanto') return {ok:true};
+ const prev = getPreviousRegion(targetRegion);
+ if(!prev) return {ok:true};
+ if(!isRegionLeagueWon(prev)) return {ok:false, reason:'league', previous:prev, target:targetRegion};
+ const caught = countCaughtInRegion(prev);
+ const total = getRegionPokedexTotal(prev);
+ if(caught < total) return {ok:false, reason:'dex', previous:prev, target:targetRegion, caught, total};
+ return {ok:true};
+}
+function canAccessRegion(targetRegion){ return getRegionAccessStatus(targetRegion).ok; }
+function regionAccessMessage(targetRegion){
+ const st = getRegionAccessStatus(targetRegion);
+ if(st.ok) return '';
+ if(st.reason === 'league') return tr('region_locked_league', {region:getRegionDisplayName(st.previous), target:getRegionDisplayName(st.target)});
+ if(st.reason === 'dex') return tr('region_locked_dex', {region:getRegionDisplayName(st.previous), target:getRegionDisplayName(st.target), caught:st.caught, total:st.total});
+ return tr('region_locked_generic', {target:getRegionDisplayName(targetRegion)});
+}
+function regionRequiresNativeTeam(region){ return !!(region && region !== 'kanto' && !isRegionLeagueWon(region)); }
+function getInvalidTeamPokemonForRegion(region){
+ if(!regionRequiresNativeTeam(region)) return [];
+ return (G.team || []).filter(p => p && !isPokemonNativeToRegion(p.id, region));
+}
+function canUseCurrentTeamForRegion(region){ return getInvalidTeamPokemonForRegion(region || (G && G.region) || 'kanto').length === 0; }
+function regionTeamRestrictionMessage(region){
+ region = region || (G && G.region) || 'kanto';
+ const bad = getInvalidTeamPokemonForRegion(region);
+ if(!bad.length) return '';
+ return tr('region_team_restricted', {region:getRegionDisplayName(region), pokemon:bad.slice(0,3).map(p=>p.name || getPokeName(p.id)).join(', ')});
+}
+function getLeagueChampionIdForRegion(region){ return getRegionMeta(region).league || 'elite4'; }
+function getLeagueRegionForChampion(champId){
+ for(const region of REGION_ORDER){ if(getLeagueChampionIdForRegion(region) === champId) return region; }
+ return champId === 'elite4' ? 'kanto' : ((G && G.region) || 'kanto');
+}
+function isLeagueChampionId(champId){ return REGION_ORDER.some(region => getLeagueChampionIdForRegion(region) === champId); }
+
+
+const BOX_FILTER_DEFAULTS = {region:'all', type:'all', shiny:'all', evo:'all'};
+function ensureBoxFilters(){
+ if(!G.boxFilters || typeof G.boxFilters !== 'object') G.boxFilters = {...BOX_FILTER_DEFAULTS};
+ for(const key in BOX_FILTER_DEFAULTS){ if(G.boxFilters[key] == null) G.boxFilters[key] = BOX_FILTER_DEFAULTS[key]; }
+ return G.boxFilters;
+}
+function getPokemonRegion(id){
+ const nid = Number(id);
+ for(const region of REGION_ORDER){
+  const meta = getRegionMeta(region);
+  if(nid >= meta.start && nid <= meta.end) return region;
+ }
+ return 'unknown';
+}
+function getUnlockedRegionsForPokedex(){
+ return REGION_ORDER.filter(region => region === 'kanto' || (typeof canAccessRegion === 'function' && canAccessRegion(region)));
+}
+function getUnlockedDexIds(){
+ const out = [];
+ for(const region of getUnlockedRegionsForPokedex()){
+  const meta = getRegionMeta(region);
+  for(let id=meta.start; id<=meta.end && id<=(PD ? PD.length-1 : meta.end); id++) if(PD[id]) out.push(id);
+ }
+ return out;
+}
+function getBoxFilterRegions(){
+ const regions = new Set(['all']);
+ for(const p of Object.values(G.collection || {})) if(p) regions.add(getPokemonRegion(p.id));
+ for(const p of (G.team || [])) if(p) regions.add(getPokemonRegion(p.id));
+ return Array.from(regions).filter(r => r === 'all' || r !== 'unknown');
+}
+function getBoxFilterTypes(){
+ const types = new Set(['all']);
+ for(const p of Object.values(G.collection || {})){
+  if(!p) continue;
+  if(p.type1) types.add(p.type1);
+  if(p.type2) types.add(p.type2);
+ }
+ for(const p of (G.team || [])){
+  if(!p) continue;
+  if(p.type1) types.add(p.type1);
+  if(p.type2) types.add(p.type2);
+ }
+ return Array.from(types);
+}
+function canPokemonEvolveToUnowned(p){
+ if(!p) return false;
+ const id = Number(p.id);
+ const levelMap = (typeof LEVEL_EVO_MAP !== 'undefined') ? LEVEL_EVO_MAP : (globalThis.LEVEL_EVO_MAP || {});
+ const stoneMap = (typeof STONE_EVO !== 'undefined') ? STONE_EVO : (globalThis.STONE_EVO || {});
+ const lvlTarget = levelMap[id] || levelMap[String(id)] || null;
+ if(lvlTarget && !speciesOwned(lvlTarget)) return true;
+ const stones = stoneMap[id] || stoneMap[String(id)] || null;
+ if(stones){
+  for(const stoneKey in stones){
+   const target = stones[stoneKey];
+   if(!speciesOwned(target)) return true;
+  }
+ }
+ return false;
+}
+function pokemonMatchesBoxFilters(p){
+ const filters = ensureBoxFilters();
+ if(!p) return false;
+ if(filters.region && filters.region !== 'all' && getPokemonRegion(p.id) !== filters.region) return false;
+ if(filters.type && filters.type !== 'all' && p.type1 !== filters.type && p.type2 !== filters.type) return false;
+ const shiny = !!(p.shinyUnlocked || p.shinyActive || p.shiny || isSpeciesShiny(p.id));
+ if(filters.shiny === 'shiny' && !shiny) return false;
+ if(filters.shiny === 'normal' && shiny) return false;
+ if(filters.evo === 'missing' && !canPokemonEvolveToUnowned(p)) return false;
+ return true;
+}
+function applyPokemonBoxFilters(entries){
+ ensureBoxFilters();
+ return (entries || []).filter(entry => pokemonMatchesBoxFilters(entry.p || entry.poke));
+}
+function boxFilterOptionHtml(value, label, current){ return `<option value="${value}"${String(current)===String(value)?' selected':''}>${label}</option>`; }
+function renderBoxFiltersHtml(){
+ const filters = ensureBoxFilters();
+ const regions = getBoxFilterRegions();
+ const types = getBoxFilterTypes();
+ const regionOptions = regions.map(r => boxFilterOptionHtml(r, r==='all'?t('box_filter_all_regions'):getRegionDisplayName(r), filters.region)).join('');
+ const typeOptions = types.map(tp => boxFilterOptionHtml(tp, tp==='all'?t('box_filter_all_types'):tp, filters.type)).join('');
+ const shinyOptions = [
+  ['all', t('box_filter_all_shiny')],
+  ['shiny', t('box_filter_shiny_only')],
+  ['normal', t('box_filter_non_shiny_only')]
+ ].map(o => boxFilterOptionHtml(o[0], o[1], filters.shiny)).join('');
+ const evoOptions = [
+  ['all', t('box_filter_all_evo')],
+  ['missing', t('box_filter_evo_missing')]
+ ].map(o => boxFilterOptionHtml(o[0], o[1], filters.evo)).join('');
+ return `<div class="box-filter-panel"><div class="box-filter-title">${t('filters_title')}</div>
+  <label><span>${t('box_filter_region')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'region', this.value">${regionOptions}</select></label>
+  <label><span>${t('box_filter_type')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'type', this.value">${typeOptions}</select></label>
+  <label><span>${t('box_filter_shiny')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'shiny', this.value">${shinyOptions}</select></label>
+  <label><span>${t('box_filter_evolution')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'evo', this.value">${evoOptions}</select></label>
+  <button class="hbtn" data-action="legacy-call" data-call="resetBoxFilters" data-call-args="">${t('box_filter_reset')}</button>
+ </div>`;
+}
+function setBoxFilter(key, value){
+ const filters = ensureBoxFilters();
+ if(!(key in BOX_FILTER_DEFAULTS)) return;
+ filters[key] = value || BOX_FILTER_DEFAULTS[key];
+ try{ if(typeof renderUnifiedGrid === 'function') renderUnifiedGrid(); }catch(_){}
+ try{ const tab = document.getElementById('tab-content'); if(tab && typeof _activeTab !== 'undefined' && _activeTab === 'box') renderBox(tab); }catch(_){}
+ try{ saveGame(false); }catch(_){}
+}
+function resetBoxFilters(){
+ G.boxFilters = {...BOX_FILTER_DEFAULTS};
+ try{ if(typeof renderUnifiedGrid === 'function') renderUnifiedGrid(); }catch(_){}
+ try{ const tab = document.getElementById('tab-content'); if(tab && typeof _activeTab !== 'undefined' && _activeTab === 'box') renderBox(tab); }catch(_){}
+ try{ saveGame(false); }catch(_){}
+}
+
+
 // --- Migrated to ES module, globals exposed ---
+if (typeof ensureBoxFilters !== 'undefined' && typeof window !== 'undefined') window.ensureBoxFilters = ensureBoxFilters;
+if (typeof getPokemonRegion !== 'undefined' && typeof window !== 'undefined') window.getPokemonRegion = getPokemonRegion;
+if (typeof getUnlockedRegionsForPokedex !== 'undefined' && typeof window !== 'undefined') window.getUnlockedRegionsForPokedex = getUnlockedRegionsForPokedex;
+if (typeof getUnlockedDexIds !== 'undefined' && typeof window !== 'undefined') window.getUnlockedDexIds = getUnlockedDexIds;
+if (typeof canPokemonEvolveToUnowned !== 'undefined' && typeof window !== 'undefined') window.canPokemonEvolveToUnowned = canPokemonEvolveToUnowned;
+if (typeof pokemonMatchesBoxFilters !== 'undefined' && typeof window !== 'undefined') window.pokemonMatchesBoxFilters = pokemonMatchesBoxFilters;
+if (typeof applyPokemonBoxFilters !== 'undefined' && typeof window !== 'undefined') window.applyPokemonBoxFilters = applyPokemonBoxFilters;
+if (typeof renderBoxFiltersHtml !== 'undefined' && typeof window !== 'undefined') window.renderBoxFiltersHtml = renderBoxFiltersHtml;
+if (typeof setBoxFilter !== 'undefined' && typeof window !== 'undefined') window.setBoxFilter = setBoxFilter;
+if (typeof resetBoxFilters !== 'undefined' && typeof window !== 'undefined') window.resetBoxFilters = resetBoxFilters;
+if (typeof getRegionMeta !== 'undefined' && typeof window !== 'undefined') window.getRegionMeta = getRegionMeta;
+if (typeof getRegionDisplayName !== 'undefined' && typeof window !== 'undefined') window.getRegionDisplayName = getRegionDisplayName;
+if (typeof isPokemonNativeToRegion !== 'undefined' && typeof window !== 'undefined') window.isPokemonNativeToRegion = isPokemonNativeToRegion;
+if (typeof countCaughtInRegion !== 'undefined' && typeof window !== 'undefined') window.countCaughtInRegion = countCaughtInRegion;
+if (typeof getRegionPokedexTotal !== 'undefined' && typeof window !== 'undefined') window.getRegionPokedexTotal = getRegionPokedexTotal;
+if (typeof isRegionDexComplete !== 'undefined' && typeof window !== 'undefined') window.isRegionDexComplete = isRegionDexComplete;
+if (typeof ensureRegionProgress !== 'undefined' && typeof window !== 'undefined') window.ensureRegionProgress = ensureRegionProgress;
+if (typeof isRegionLeagueWon !== 'undefined' && typeof window !== 'undefined') window.isRegionLeagueWon = isRegionLeagueWon;
+if (typeof markRegionLeagueWon !== 'undefined' && typeof window !== 'undefined') window.markRegionLeagueWon = markRegionLeagueWon;
+if (typeof getRegionAccessStatus !== 'undefined' && typeof window !== 'undefined') window.getRegionAccessStatus = getRegionAccessStatus;
+if (typeof canAccessRegion !== 'undefined' && typeof window !== 'undefined') window.canAccessRegion = canAccessRegion;
+if (typeof regionAccessMessage !== 'undefined' && typeof window !== 'undefined') window.regionAccessMessage = regionAccessMessage;
+if (typeof regionRequiresNativeTeam !== 'undefined' && typeof window !== 'undefined') window.regionRequiresNativeTeam = regionRequiresNativeTeam;
+if (typeof getInvalidTeamPokemonForRegion !== 'undefined' && typeof window !== 'undefined') window.getInvalidTeamPokemonForRegion = getInvalidTeamPokemonForRegion;
+if (typeof canUseCurrentTeamForRegion !== 'undefined' && typeof window !== 'undefined') window.canUseCurrentTeamForRegion = canUseCurrentTeamForRegion;
+if (typeof regionTeamRestrictionMessage !== 'undefined' && typeof window !== 'undefined') window.regionTeamRestrictionMessage = regionTeamRestrictionMessage;
+if (typeof getLeagueChampionIdForRegion !== 'undefined' && typeof window !== 'undefined') window.getLeagueChampionIdForRegion = getLeagueChampionIdForRegion;
+if (typeof getLeagueRegionForChampion !== 'undefined' && typeof window !== 'undefined') window.getLeagueRegionForChampion = getLeagueRegionForChampion;
+if (typeof isLeagueChampionId !== 'undefined' && typeof window !== 'undefined') window.isLeagueChampionId = isLeagueChampionId;
 if (typeof getSpeciesTalents !== 'undefined' && typeof window !== 'undefined') window.getSpeciesTalents = getSpeciesTalents;
 if (typeof getTalentByKey !== 'undefined' && typeof window !== 'undefined') window.getTalentByKey = getTalentByKey;
 if (typeof getRarityLabel !== 'undefined' && typeof window !== 'undefined') window.getRarityLabel = getRarityLabel;

@@ -59,12 +59,39 @@ function setFilterTeam(filter){
   renderUnifiedGrid();
 }
 
+
+function renderUnifiedSwapFooter(){
+  const footer = document.getElementById('usm-footer');
+  if(!footer) return;
+  footer.innerHTML = '';
+  footer.style.display = 'none';
+  if(_usmAction === 'team' && _swapFromTeamIdx != null){
+    const teamPoke = G.team[_swapFromTeamIdx];
+    if(teamPoke){
+      footer.innerHTML = `<div class="usm-swap-footer">
+        <div class="usm-swap-footer-label">${tr('selected_pokemon', {name:teamPoke.name, level:teamPoke.level})}</div>
+        <div class="usm-swap-footer-actions">
+          <button class="hbtn usm-cancel-btn" data-action="legacy-call" data-call="cancelTeamSwap" data-call-args="">✖ ${t('cancel')}</button>
+          <button class="hbtn usm-remove-btn" data-action="call-close-selector" data-call="removeFromTeam" data-call-args="${_swapFromTeamIdx}">❌ ${t('remove')}</button>
+        </div>
+      </div>`;
+      footer.style.display = 'block';
+    }
+  }
+}
+
 function renderUnifiedGrid(){
   const grid = document.getElementById('usm-grid');
   const searchInput = document.getElementById('usm-search');
   const subtabBar = document.getElementById('usm-subtab-bar');
+  const filterPanel = document.getElementById('usm-filter-panel');
+  const footer = document.getElementById('usm-footer');
   if(!grid) return;
   const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+  const showBoxFilters = (_usmAction === 'box_view' || _usmAction === 'team' || _usmAction === 'save_icon') && _usmSubTab === 'box';
+  const filtersHtml = showBoxFilters && typeof renderBoxFiltersHtml === 'function' ? renderBoxFiltersHtml() : '';
+  if(filterPanel){ filterPanel.innerHTML = filtersHtml; filterPanel.style.display = filtersHtml ? 'block' : 'none'; }
+  renderUnifiedSwapFooter();
   grid.classList.remove('usm-modern-grid');
   grid.classList.remove('usm-fossil-view');
 
@@ -86,6 +113,8 @@ function renderUnifiedGrid(){
   if(showFossilTab && _usmSubTab === 'fossil'){
     grid.classList.remove('usm-modern-grid');
     grid.classList.add('usm-fossil-view');
+    if(filterPanel){ filterPanel.innerHTML = ''; filterPanel.style.display = 'none'; }
+    if(footer){ footer.innerHTML = ''; footer.style.display = 'none'; }
     grid.innerHTML = renderFossilTabContent();
     return;
   }
@@ -112,6 +141,7 @@ function renderUnifiedGrid(){
   if(_usmFilter.shiny) list = list.filter(({p}) => p.shinyUnlocked || p.shinyActive || p.shiny);
   if(_usmFilter.inTeam === 'yes') list = list.filter(({loc}) => loc === 'team');
   if(_usmFilter.inTeam === 'no') list = list.filter(({loc}) => loc === 'box');
+  if(showBoxFilters && typeof applyPokemonBoxFilters === 'function') list = applyPokemonBoxFilters(list);
 
   
   list.sort((a, b) => {
@@ -142,7 +172,8 @@ function renderUnifiedGrid(){
   });
 
   if(!list.length){
-    grid.innerHTML = `<div class="extracted-template-style-128">${t('no_pokemon_found')}</div>`;
+    renderUnifiedSwapFooter();
+    grid.innerHTML = `<div class="extracted-template-style-128 box-filter-empty">${t('no_pokemon_found')}</div>`;
     return;
   }
 
@@ -158,18 +189,7 @@ function renderUnifiedGrid(){
   }).join('');
   
   
-  if (_usmAction === 'team' && _swapFromTeamIdx != null) {
-    const teamPoke = G.team[_swapFromTeamIdx];
-    if (teamPoke) {
-      html += `<div class="extracted-template-style-129">
-        <div class="extracted-template-style-130">${tr('selected_pokemon', {name:teamPoke.name, level:teamPoke.level})}</div>
-        <div class="extracted-template-style-131">
-          <button class="hbtn extracted-template-style-132" data-action="legacy-call" data-call="cancelTeamSwap" data-call-args="">✖ ${t('cancel')}</button>
-          <button class="hbtn extracted-template-style-133" data-action="call-close-selector" data-call="removeFromTeam" data-call-args="${_swapFromTeamIdx}">❌ ${t('remove')}</button>
-        </div>
-      </div>`;
-    }
-  }
+  renderUnifiedSwapFooter();
   
   grid.innerHTML = html;
 }
@@ -341,6 +361,7 @@ if (typeof setFilterType !== 'undefined' && typeof window !== 'undefined') windo
 if (typeof setFilterShiny !== 'undefined' && typeof window !== 'undefined') window.setFilterShiny = setFilterShiny;
 if (typeof setFilterTeam !== 'undefined' && typeof window !== 'undefined') window.setFilterTeam = setFilterTeam;
 if (typeof renderUnifiedGrid !== 'undefined' && typeof window !== 'undefined') window.renderUnifiedGrid = renderUnifiedGrid;
+if (typeof renderUnifiedSwapFooter !== 'undefined' && typeof window !== 'undefined') window.renderUnifiedSwapFooter = renderUnifiedSwapFooter;
 if (typeof cancelTeamSwap !== 'undefined' && typeof window !== 'undefined') window.cancelTeamSwap = cancelTeamSwap;
 if (typeof renderFossilTabContent !== 'undefined' && typeof window !== 'undefined') window.renderFossilTabContent = renderFossilTabContent;
 if (typeof sendFossilToHatchery !== 'undefined' && typeof window !== 'undefined') window.sendFossilToHatchery = sendFossilToHatchery;

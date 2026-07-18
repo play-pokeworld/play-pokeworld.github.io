@@ -1,10 +1,21 @@
+function updateRegionSelectorLocks(){
+ const sel = document.getElementById('map-region-select');
+ if(!sel) return;
+ Array.from(sel.options || []).forEach(opt => {
+  if(!opt.value) return;
+  const ok = (typeof canAccessRegion !== 'function') || canAccessRegion(opt.value);
+  opt.disabled = !ok || opt.dataset.forceDisabled === 'true';
+  if(!ok && typeof regionAccessMessage === 'function') opt.title = regionAccessMessage(opt.value);
+ });
+}
+
 function renderMap(){
  recomputeUnlocks();
  updateFeatureWindows();
  
  
  const regSel = document.getElementById('map-region-select');
- if(regSel && G && G.region){ regSel.value = G.region; }
+ if(regSel && G && G.region){ regSel.value = G.region; if(typeof updateRegionSelectorLocks === 'function') updateRegionSelectorLocks(); }
  
  
  const mapWT = document.querySelector('#win-map .win-header-title');
@@ -172,6 +183,7 @@ function refreshMapAndLoc(){
 
 
 // --- Migrated to ES module, globals exposed ---
+if (typeof updateRegionSelectorLocks !== 'undefined' && typeof window !== 'undefined') window.updateRegionSelectorLocks = updateRegionSelectorLocks;
 if (typeof renderMap !== 'undefined' && typeof window !== 'undefined') window.renderMap = renderMap;
 if (typeof clickLocation !== 'undefined' && typeof window !== 'undefined') window.clickLocation = clickLocation;
 if (typeof refreshMapAndLoc !== 'undefined' && typeof window !== 'undefined') window.refreshMapAndLoc = refreshMapAndLoc;

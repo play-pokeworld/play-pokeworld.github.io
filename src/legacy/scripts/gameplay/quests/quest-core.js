@@ -66,6 +66,7 @@ function markVisited(mapId){
 function questDone(inst, def){
  if(!def) return false;
  if(def.type==='badge'){
+ if(typeof isLeagueChampionId === 'function' && isLeagueChampionId(def.targetBadge)) return isRegionLeagueWon(getLeagueRegionForChampion(def.targetBadge));
  if(def.targetBadge==='elite4') return !!(G.championTitle || G.badges.includes('elite4'));
  return G.badges.includes(def.targetBadge);
  }

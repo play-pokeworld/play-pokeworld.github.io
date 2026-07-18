@@ -222,8 +222,8 @@
           <select id="map-region-select" data-stop-drag="true" data-action="switch-map-region" class="pw-static-029">
             <option value="kanto">🗺️ Région Kanto</option>
             <option value="johto">🗺️ Région Johto</option>
-            <option value="hoenn" disabled>🔒 Région Hoenn (Bientôt)</option>
-            <option value="sinnoh" disabled>🔒 Région Sinnoh (Bientôt)</option>
+            <option value="hoenn" disabled data-force-disabled="true">🔒 Région Hoenn (Bientôt)</option>
+            <option value="sinnoh" disabled data-force-disabled="true">🔒 Région Sinnoh (Bientôt)</option>
           </select>
         </span>
         
@@ -329,12 +329,14 @@
         <button class="hbtn usm-sort-btn" data-sort="ev" data-action="sort-unified-grid">EVs 🟢</button>
         <button class="hbtn usm-sort-btn" data-sort="name" data-action="sort-unified-grid">Nom</button>
       </div>
+      <div id="usm-filter-panel" class="usm-filter-panel"></div>
       <div class="pw-static-059">
         <input type="text" id="usm-search" placeholder="Rechercher par nom..." data-action="filter-unified-grid" class="pw-static-060">
       </div>
     </div>
     <div id="usm-subtab-bar" class="pw-static-061"></div>
     <div id="usm-grid" class="pw-static-062"></div>
+    <div id="usm-footer" class="usm-footer"></div>
   </div>
 </div>
 
