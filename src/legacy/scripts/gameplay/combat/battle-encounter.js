@@ -1,4 +1,5 @@
 function startWildBattle(){
+ if(typeof hasActiveTrainingBattle === 'function' && hasActiveTrainingBattle()){ notify(t('training_in_progress_no_battle'), 'var(--red)'); return; }
  const loc=LOCS[G.location];
  const wild=loc.wild;
  if(!wild||!wild.length||!G.team.length) return;
@@ -10,6 +11,7 @@ function startWildBattle(){
 
 
 function startLegendaryEncounter(pokeId, level=65){
+ if(typeof hasActiveTrainingBattle === 'function' && hasActiveTrainingBattle()){ notify(t('training_in_progress_no_battle'), 'var(--red)'); return false; }
  if(!G.team.length){ setMsg(t('no_pokemon_in_team')); return false; }
  if(typeof battle !== 'undefined' && battle && battle.active){ notify(t('battle_in_progress'), 'var(--red)'); return false; }
  const isShiny = isSpeciesShiny(pokeId) || rollShiny();

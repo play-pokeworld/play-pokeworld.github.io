@@ -497,7 +497,7 @@ var STORY_QUESTS = [
   "id": 61,
   "region": "johto",
   "type": "defeat_wild",
-  "loc": "jroute44",
+  "loc": "burnedtower",
   "target": 150,
   "rewardMoney": 25000,
   "rewardPoke": 243,
@@ -507,7 +507,7 @@ var STORY_QUESTS = [
   "id": 62,
   "region": "johto",
   "type": "defeat_wild",
-  "loc": "jroute28",
+  "loc": "burnedtower",
   "target": 150,
   "rewardMoney": 25000,
   "rewardPoke": 244,
@@ -517,7 +517,7 @@ var STORY_QUESTS = [
   "id": 63,
   "region": "johto",
   "type": "defeat_wild",
-  "loc": "jroute42",
+  "loc": "burnedtower",
   "target": 150,
   "rewardMoney": 25000,
   "rewardPoke": 245,
@@ -558,3 +558,4 @@ var STORY_QUESTS = [
 
 // --- Migrated to ES module, globals exposed ---
 if (typeof STORY_QUESTS !== 'undefined' && typeof window !== 'undefined') window.STORY_QUESTS = STORY_QUESTS;
+

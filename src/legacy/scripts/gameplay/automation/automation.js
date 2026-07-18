@@ -24,6 +24,22 @@ function purchaseAutomationIfNeeded(key){
  notify(tr('automation_upgrade_bought', {name:t('automation_'+key), price:cost.toLocaleString()}), 'var(--green)');
  return true;
 }
+function buyAutomationUpgrade(key){
+ if(isAutomationPurchased(key)){ notify(t('automation_already_bought'), 'var(--green)'); return; }
+ if(purchaseAutomationIfNeeded(key)){
+  saveGame();
+  try{ openHatcheryManagementMenu('automation'); }catch(_){}
+ }
+}
+function toggleAutomationButton(key){
+ if(!G.automation) G.automation = {};
+ if(!isAutomationPurchased(key)){
+  buyAutomationUpgrade(key);
+  return;
+ }
+ toggleAutomation(key, !G.automation[key]);
+ try{ openHatcheryManagementMenu('automation'); }catch(_){}
+}
 function toggleAutomation(key, val){
  if(!G.automation) G.automation = {};
  if(val && !purchaseAutomationIfNeeded(key)){
@@ -63,6 +79,8 @@ function toggleAutomation(key, val){
 // --- Migrated to ES module, globals exposed ---
 if (typeof renderAutomationWindow !== 'undefined' && typeof window !== 'undefined') window.renderAutomationWindow = renderAutomationWindow;
 if (typeof isAutomationPurchased !== 'undefined' && typeof window !== 'undefined') window.isAutomationPurchased = isAutomationPurchased;
+if (typeof buyAutomationUpgrade !== 'undefined' && typeof window !== 'undefined') window.buyAutomationUpgrade = buyAutomationUpgrade;
+if (typeof toggleAutomationButton !== 'undefined' && typeof window !== 'undefined') window.toggleAutomationButton = toggleAutomationButton;
 if (typeof getAutomationUpgradeLabelSuffix !== 'undefined' && typeof window !== 'undefined') window.getAutomationUpgradeLabelSuffix = getAutomationUpgradeLabelSuffix;
 if (typeof toggleAutomation !== 'undefined' && typeof window !== 'undefined') window.toggleAutomation = toggleAutomation;
 

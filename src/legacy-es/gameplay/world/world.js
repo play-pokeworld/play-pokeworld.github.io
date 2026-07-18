@@ -16,7 +16,8 @@ function getRoamingLegendaryForRoute(locId){
  [kantoOutdoor[(kIdx+19) % kantoOutdoor.length]]: 151,
  [johtoOutdoor[(jIdx) % johtoOutdoor.length]]: 243,
  [johtoOutdoor[(jIdx+7) % johtoOutdoor.length]]: 244,
- [johtoOutdoor[(jIdx+13) % johtoOutdoor.length]]: 245
+ [johtoOutdoor[(jIdx+13) % johtoOutdoor.length]]: 245,
+ [johtoOutdoor[(jIdx+19) % johtoOutdoor.length]]: 251
  };
  }
  return G.roamingPool[locId] || null;

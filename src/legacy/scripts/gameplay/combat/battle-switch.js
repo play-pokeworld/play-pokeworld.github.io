@@ -55,7 +55,7 @@ function showQuestCapturePanel(legMon, wasShiny){
  </div>
  ${shinyTag}
  <div class="extracted-template-style-170">
- <div class="poke-sprite${wasShiny?' is-shiny':''}" data-style="width:96px;height:96px;border:3px solid ${wasShiny?'var(--light2)':TYPE_COLORS[legMon.type1]||'#888'};background:${TYPE_COLORS[legMon.type1]||'#333'}22;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+ <div class="poke-sprite${wasShiny?' is-shiny':''}">
  ${spriteImg(legMon.id, legMon.emoji, {shiny:wasShiny, size:72})}
  </div>
  </div>
@@ -147,6 +147,8 @@ async function champVictory(){
  }
 
  const champ = CHAMPIONS[battle.champId] || { name: getChampName(battle.champId), reward: 5000, badgeName: 'Badge', badgeEmoji: '', team: battle.champTeam || [] };
+ const champBadgeName = (typeof getChampBadgeName === 'function' ? getChampBadgeName(battle.champId) : (champ.badgeName || 'Badge')) || champ.badgeName || 'Badge';
+ const champBadgeEmoji = champ.badgeEmoji || '';
  const isLeague = ((typeof isLeagueChampionId === 'function' && isLeagueChampionId(battle.champId)) || battle.champId === 'elite4' || battle.isLeague);
  const leagueRegion = battle.leagueRegion || (typeof getLeagueRegionForChampion === 'function' ? getLeagueRegionForChampion(battle.champId) : 'kanto');
  const leagueFirstWin = isLeague ? !(typeof isRegionLeagueWon === 'function' && isRegionLeagueWon(leagueRegion)) : false;
@@ -169,8 +171,8 @@ async function champVictory(){
  updateHeader();
  addBattleLog(`<span class="extracted-template-style-002"> Vous avez vaincu ${getChampName(battle.champId)} !</span>`);
  if(isFirstWin){
- addBattleLog(`Vous recevez le <b>${champ.badgeName}</b> ${champ.badgeEmoji} !`);
- notify(` ${champ.badgeName} obtenu ! ${champ.badgeEmoji}`,'var(--accent)');
+ addBattleLog(`Vous recevez le <b>${champBadgeName}</b> ${champBadgeEmoji} !`);
+ notify(` ${champBadgeName} obtenu ! ${champBadgeEmoji}`,'var(--accent)');
  } else {
  addBattleLog(`Victoire de revanche contre ${getChampName(battle.champId)} !`);
  notify(t('rematch_no_money'),'var(--light1)');
@@ -193,8 +195,16 @@ async function champVictory(){
  document.getElementById('victory-msg').textContent=tr('league_victory_message_region', {region:getRegionDisplayName(leagueRegion)});
  document.getElementById('victory-screen').classList.add('open');
  } else {
- notify(` ${champ.badgeName} obtenu ! ${champ.badgeEmoji}`,'var(--accent)');
+ notify(` ${champBadgeName} obtenu ! ${champBadgeEmoji}`,'var(--accent)');
  }
 
  saveGame();
 }
+
+
+// --- Migrated to ES module, globals exposed ---
+if (typeof switchBattlePoke !== 'undefined' && typeof window !== 'undefined') window.switchBattlePoke = switchBattlePoke;
+if (typeof doSwitchBattlePoke !== 'undefined' && typeof window !== 'undefined') window.doSwitchBattlePoke = doSwitchBattlePoke;
+if (typeof healTeamHalf !== 'undefined' && typeof window !== 'undefined') window.healTeamHalf = healTeamHalf;
+if (typeof showQuestCapturePanel !== 'undefined' && typeof window !== 'undefined') window.showQuestCapturePanel = showQuestCapturePanel;
+

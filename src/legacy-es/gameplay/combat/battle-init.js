@@ -1,4 +1,8 @@
 function startBattle(enemyPoke, isChamp, champId=null, champPokeList=null){
+ if(typeof hasActiveTrainingBattle === 'function' && hasActiveTrainingBattle()){
+  notify(t('training_in_progress_no_battle'), 'var(--red)');
+  return false;
+ }
  if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
  if(!G.team.length){setMsg(t('no_pokemon_in_team'));return;}
  if(typeof canUseCurrentTeamForRegion === 'function' && !canUseCurrentTeamForRegion(G.region || 'kanto')){
@@ -88,6 +92,7 @@ function startBattle(enemyPoke, isChamp, champId=null, champPokeList=null){
  renderEnemyMoveBars();
  renderBattleTeamRow();
  battle.timerId=setInterval(battleTick,100);
+ return true;
 }
 
 
@@ -99,6 +104,10 @@ function getChampTeam(champId){
 
 
 function startChampBattle(champId){
+ if(typeof hasActiveTrainingBattle === 'function' && hasActiveTrainingBattle()){
+  notify(t('training_in_progress_no_battle'), 'var(--red)');
+  return;
+ }
  const champ=CHAMPIONS[champId];
  if(!champ){return;}
  const champRegion = champ.region || ((typeof JOHTO_BADGES !== 'undefined' && JOHTO_BADGES.includes(champId)) || champId === 'johto_elite4' ? 'johto' : 'kanto');

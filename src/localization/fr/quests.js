@@ -230,17 +230,17 @@ window.L_fr_quests = {
 },
 "61": {
 "title":"Raikou, la Foudre Pourpre",
-"desc":"Traquez Raikou en Johto : mettez K.O. 150 Pokémon sauvages sur la Route 44 pour le défier. Il reste aussi roaming.",
+"desc":"À la Tour Cendrée de Rosalia, mettez K.O. 150 Pokémon sauvages pour attirer Raikou et le défier.",
 "rewardDesc":"Raikou + 25 000₽"
 },
 "62": {
 "title":"Entei, le Volcan Vivant",
-"desc":"Traquez Entei en Johto : mettez K.O. 150 Pokémon sauvages sur la Route 28 pour le défier. Il reste aussi roaming.",
+"desc":"À la Tour Cendrée de Rosalia, mettez K.O. 150 Pokémon sauvages pour attirer Entei et le défier.",
 "rewardDesc":"Entei + 25 000₽"
 },
 "63": {
 "title":"Suicune, l’Aurore Boréale",
-"desc":"Traquez Suicune en Johto : mettez K.O. 150 Pokémon sauvages sur la Route 42 pour le défier. Il reste aussi roaming.",
+"desc":"À la Tour Cendrée de Rosalia, mettez K.O. 150 Pokémon sauvages pour attirer Suicune et le défier.",
 "rewardDesc":"Suicune + 25 000₽"
 },
 "64": {

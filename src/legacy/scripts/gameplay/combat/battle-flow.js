@@ -23,6 +23,7 @@ function endBattle(){
  renderTeamWindow();
  try{ renderMap(); }catch(_){}
  if(hadLoot) openBattleSummary(true);
+ try{ if(typeof renderTrainingBattlePanel === 'function') renderTrainingBattlePanel(); }catch(_){}
 }
 
 

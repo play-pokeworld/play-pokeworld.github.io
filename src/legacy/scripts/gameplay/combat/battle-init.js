@@ -1,4 +1,8 @@
 function startBattle(enemyPoke, isChamp, champId=null, champPokeList=null){
+ if(typeof hasActiveTrainingBattle === 'function' && hasActiveTrainingBattle()){
+  notify(t('training_in_progress_no_battle'), 'var(--red)');
+  return false;
+ }
  if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
  if(!G.team.length){setMsg(t('no_pokemon_in_team'));return;}
  if(typeof canUseCurrentTeamForRegion === 'function' && !canUseCurrentTeamForRegion(G.region || 'kanto')){
@@ -44,6 +48,7 @@ function startBattle(enemyPoke, isChamp, champId=null, champPokeList=null){
  battle.sessionCatches=[];
  battle.sessionItems={};
  try{ if (typeof renderBattleLoot === 'function') renderBattleLoot(); }catch(_){}
+ try{ if (typeof renderBattleSummary === 'function') renderBattleSummary(); }catch(_){}
  }
 
  if(isChamp&&champPokeList&&champPokeList.length){
@@ -87,6 +92,7 @@ function startBattle(enemyPoke, isChamp, champId=null, champPokeList=null){
  renderEnemyMoveBars();
  renderBattleTeamRow();
  battle.timerId=setInterval(battleTick,100);
+ return true;
 }
 
 
@@ -98,6 +104,10 @@ function getChampTeam(champId){
 
 
 function startChampBattle(champId){
+ if(typeof hasActiveTrainingBattle === 'function' && hasActiveTrainingBattle()){
+  notify(t('training_in_progress_no_battle'), 'var(--red)');
+  return;
+ }
  const champ=CHAMPIONS[champId];
  if(!champ){return;}
  const champRegion = champ.region || ((typeof JOHTO_BADGES !== 'undefined' && JOHTO_BADGES.includes(champId)) || champId === 'johto_elite4' ? 'johto' : 'kanto');
@@ -171,3 +181,14 @@ function resetEnemyCd(){
  battle.eCd=calcAttackCd(effectiveSpeed(e,battle.enemyMods));
  battle.eCdMax=battle.eCd;
 }
+
+
+// --- Migrated to ES module, globals exposed ---
+if (typeof startBattle !== 'undefined' && typeof window !== 'undefined') window.startBattle = startBattle;
+if (typeof getChampTeam !== 'undefined' && typeof window !== 'undefined') window.getChampTeam = getChampTeam;
+if (typeof startChampBattle !== 'undefined' && typeof window !== 'undefined') window.startChampBattle = startChampBattle;
+if (typeof calcAttackCd !== 'undefined' && typeof window !== 'undefined') window.calcAttackCd = calcAttackCd;
+if (typeof effectiveSpeed !== 'undefined' && typeof window !== 'undefined') window.effectiveSpeed = effectiveSpeed;
+if (typeof resetPlayerCd !== 'undefined' && typeof window !== 'undefined') window.resetPlayerCd = resetPlayerCd;
+if (typeof resetEnemyCd !== 'undefined' && typeof window !== 'undefined') window.resetEnemyCd = resetEnemyCd;
+

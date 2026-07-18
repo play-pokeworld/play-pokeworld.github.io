@@ -147,6 +147,8 @@ async function champVictory(){
  }
 
  const champ = CHAMPIONS[battle.champId] || { name: getChampName(battle.champId), reward: 5000, badgeName: 'Badge', badgeEmoji: '', team: battle.champTeam || [] };
+ const champBadgeName = (typeof getChampBadgeName === 'function' ? getChampBadgeName(battle.champId) : (champ.badgeName || 'Badge')) || champ.badgeName || 'Badge';
+ const champBadgeEmoji = champ.badgeEmoji || '';
  const isLeague = ((typeof isLeagueChampionId === 'function' && isLeagueChampionId(battle.champId)) || battle.champId === 'elite4' || battle.isLeague);
  const leagueRegion = battle.leagueRegion || (typeof getLeagueRegionForChampion === 'function' ? getLeagueRegionForChampion(battle.champId) : 'kanto');
  const leagueFirstWin = isLeague ? !(typeof isRegionLeagueWon === 'function' && isRegionLeagueWon(leagueRegion)) : false;
@@ -169,8 +171,8 @@ async function champVictory(){
  updateHeader();
  addBattleLog(`<span class="extracted-template-style-002"> Vous avez vaincu ${getChampName(battle.champId)} !</span>`);
  if(isFirstWin){
- addBattleLog(`Vous recevez le <b>${champ.badgeName}</b> ${champ.badgeEmoji} !`);
- notify(` ${champ.badgeName} obtenu ! ${champ.badgeEmoji}`,'var(--accent)');
+ addBattleLog(`Vous recevez le <b>${champBadgeName}</b> ${champBadgeEmoji} !`);
+ notify(` ${champBadgeName} obtenu ! ${champBadgeEmoji}`,'var(--accent)');
  } else {
  addBattleLog(`Victoire de revanche contre ${getChampName(battle.champId)} !`);
  notify(t('rematch_no_money'),'var(--light1)');
@@ -193,7 +195,7 @@ async function champVictory(){
  document.getElementById('victory-msg').textContent=tr('league_victory_message_region', {region:getRegionDisplayName(leagueRegion)});
  document.getElementById('victory-screen').classList.add('open');
  } else {
- notify(` ${champ.badgeName} obtenu ! ${champ.badgeEmoji}`,'var(--accent)');
+ notify(` ${champBadgeName} obtenu ! ${champBadgeEmoji}`,'var(--accent)');
  }
 
  saveGame();

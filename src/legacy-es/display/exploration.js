@@ -21,6 +21,7 @@ function pickWildEncounter(loc, roamingId){
 
 
 function exploreArea(){
+ if(typeof hasActiveTrainingBattle === 'function' && hasActiveTrainingBattle()){ notify(t('training_in_progress_no_battle'), 'var(--red)'); return; }
  if(G.team.length===0){setMsg(t('no_pokemon_in_team')); return;}
  const loc=getLocObj(G.location);
  if(!loc || !loc.wild || !loc.wild.length){setMsg(t('no_wild_pokemon_here')); return;}

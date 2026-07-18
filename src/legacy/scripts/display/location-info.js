@@ -70,12 +70,17 @@ function renderLocInfo(el){
  const champBadgeReq=champ?(champ.badgeReq||0):0;
  const haveRegionBadges = (typeof regionBadgeCount === 'function') ? regionBadgeCount(regionOfLoc(G.location)) : (G.badges||[]).length;
  const champLocked=champBadgeReq>haveRegionBadges;
+ const isLeague = (typeof isLeagueChampionId === 'function' && isLeagueChampionId(champId)) || champId === 'elite4' || champId === 'johto_elite4';
+ const champName = getChampName(champId);
+ const lockedLabel = isLeague ? tr('league_locked_label', {champion:champName, badges:champBadgeReq}) : tr('arena_locked_label', {champion:champName, badges:champBadgeReq});
+ const challengeLabel = isLeague ? tr('league_challenge_label', {champion:champName}) : tr('arena_challenge_label', {champion:champName});
+ const rematchLabel = isLeague ? tr('league_rematch_label', {champion:champName}) : tr('arena_rematch_label', {champion:champName});
  if(champLocked){
- allButtons += `<div class="action-btn loc-action-btn disabled"><span class="ab-icon extracted-template-style-056">⚔️</span><span class="ab-label extracted-template-style-057">${getChampName(champId)} (${champBadgeReq} ${t('req_lbl')})</span></div>`;
+ allButtons += `<div class="action-btn loc-action-btn disabled"><span class="ab-icon extracted-template-style-056">⚔️</span><span class="ab-label extracted-template-style-057">${lockedLabel}</span></div>`;
  } else if(champDefeated){
- allButtons += `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="startChampBattle" data-call-args="'${champId}'"><span class="ab-icon extracted-template-style-056">🔄</span><span class="ab-label extracted-template-style-057">${t('rematch_btn')} ${getChampName(champId)}</span></div>`;
+ allButtons += `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="startChampBattle" data-call-args="'${champId}'"><span class="ab-icon extracted-template-style-056">🔄</span><span class="ab-label extracted-template-style-057">${rematchLabel}</span></div>`;
  } else {
- allButtons += `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="startChampBattle" data-call-args="'${champId}'"><span class="ab-icon extracted-template-style-056">⚔️</span><span class="ab-label extracted-template-style-057">${t('challenge_btn')} ${getChampName(champId)}</span></div>`;
+ allButtons += `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="startChampBattle" data-call-args="'${champId}'"><span class="ab-icon extracted-template-style-056">⚔️</span><span class="ab-label extracted-template-style-057">${challengeLabel}</span></div>`;
  }
  }
 
@@ -99,7 +104,7 @@ function renderLocInfo(el){
  ${curWins} / ${need} ${t('battles')} — ${t('to_unlock')} ${zone_txt}
  </div>
  <div class="extracted-template-style-061">
- <div data-style="width:${pct}%;background:var(--light2);height:100%;transition:width .3s;"></div>
+ <div></div>
  </div>
  </div>`;
  }
@@ -120,7 +125,7 @@ function renderLocInfo(el){
  const shinyCount=comp?comp.ids.filter(id=>isSpeciesShiny(id)).length:0;
  html+=`<div class="extracted-template-style-063">
  <span>${t('wild_poke')}</span>
- <span data-style="color:${complete?'var(--green)':'var(--light2)'};font-weight:bold">${comp?`${comp.caught}/${comp.total}`:''}</span>
+ <span>${comp?`${comp.caught}/${comp.total}`:''}</span>
  ${shinyCount>0?`<span class="extracted-template-style-064"> Shiny : ${shinyCount}/${comp.total}</span>`:''}
  </div>`;
  html+=`<div class="extracted-template-style-065">`;
@@ -132,10 +137,12 @@ function renderLocInfo(el){
  const seen=G.pokedex[id];
  const owned=speciesOwned(id);
  const shinyOwned=isSpeciesShiny(id);
- html+=`<div data-style="background:var(--dark3);border-radius:6px;padding:6px 8px;font-size:13px;text-align:center;position:relative;${owned?`border:1px solid ${shinyOwned?'var(--light2)':'var(--green)'}`:''}">
+ const entryCls = `location-entry loc-wild-poke ${owned?'is-owned':'is-missing'} ${shinyOwned?'is-shiny-owned':''} ${seen?'is-seen':'is-unseen'}`;
+ html+=`<div class="${entryCls}">
+ <div class="loc-caught-badge ${owned?'is-owned':'is-missing'}">${owned?'✓':'?'}</div>
  <div class="extracted-template-style-066">${spriteImg(id,'',{size:60, shiny:shinyOwned})}</div>
  <div class="extracted-template-style-067">${getPokeName(id)}${shinyOwned?'<span class="shiny-tag extracted-template-style-068">★</span>':''}</div>
- <div class="extracted-template-style-025">Nv.${lo}-${hi}</div><div data-style="font-size:13px;margin-top:2px;color:${r==='rare'?'var(--light2)':r==='uncommon'?'var(--blue)':'var(--light1)'}">${r==='rare'?t('rarity_rare'):r==='uncommon'?t('rarity_uncom'):t('rarity_com')}</div>
+ <div class="extracted-template-style-025">Nv.${lo}-${hi}</div><div>${r==='rare'?t('rarity_rare'):r==='uncommon'?t('rarity_uncom'):t('rarity_com')}</div>
  </div>`;
  }
  if(roamingId){
@@ -143,7 +150,9 @@ function renderLocInfo(el){
  const seen = G.pokedex[roamingId];
  const owned = speciesOwned(roamingId);
  const shinyOwned = isSpeciesShiny(roamingId);
- html += `<div class="extracted-template-style-069">
+ const roamCls = `extracted-template-style-069 location-entry loc-wild-poke is-roaming ${owned?'is-owned':'is-missing'} ${shinyOwned?'is-shiny-owned':''} ${seen?'is-seen':'is-unseen'}`;
+ html += `<div class="${roamCls}">
+ <div class="loc-caught-badge ${owned?'is-owned':'is-missing'}">${owned?'✓':'?'}</div>
  <div class="extracted-template-style-066">${spriteImg(roamingId,'',{size:60, shiny:shinyOwned})}</div>
  <div class="extracted-template-style-070">${getPokeName(roamingId)}${shinyOwned?'<span class="shiny-tag extracted-template-style-071">★</span>':''}</div>
  <div class="extracted-template-style-025">Nv.45</div>
@@ -173,3 +182,9 @@ function renderLocInfo(el){
 function typeLabel(typ){
  return t('typ_' + typ) || typ;
 }
+
+
+// --- Migrated to ES module, globals exposed ---
+if (typeof renderLocInfo !== 'undefined' && typeof window !== 'undefined') window.renderLocInfo = renderLocInfo;
+if (typeof typeLabel !== 'undefined' && typeof window !== 'undefined') window.typeLabel = typeLabel;
+

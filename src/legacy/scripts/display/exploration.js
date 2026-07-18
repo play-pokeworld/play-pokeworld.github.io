@@ -21,6 +21,7 @@ function pickWildEncounter(loc, roamingId){
 
 
 function exploreArea(){
+ if(typeof hasActiveTrainingBattle === 'function' && hasActiveTrainingBattle()){ notify(t('training_in_progress_no_battle'), 'var(--red)'); return; }
  if(G.team.length===0){setMsg(t('no_pokemon_in_team')); return;}
  const loc=getLocObj(G.location);
  if(!loc || !loc.wild || !loc.wild.length){setMsg(t('no_wild_pokemon_here')); return;}
@@ -54,3 +55,11 @@ function addToInventory(key, qty){
  const maxLimit = ITEMS[key].buff ? BAG_MAX : 999999;
  G.inventory[key]=Math.min(maxLimit, cur+qty);
 }
+
+
+// --- Migrated to ES module, globals exposed ---
+if (typeof pickWildEncounter !== 'undefined' && typeof window !== 'undefined') window.pickWildEncounter = pickWildEncounter;
+if (typeof exploreArea !== 'undefined' && typeof window !== 'undefined') window.exploreArea = exploreArea;
+if (typeof healTeam !== 'undefined' && typeof window !== 'undefined') window.healTeam = healTeam;
+if (typeof addToInventory !== 'undefined' && typeof window !== 'undefined') window.addToInventory = addToInventory;
+

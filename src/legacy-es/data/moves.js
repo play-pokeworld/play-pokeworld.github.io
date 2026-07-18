@@ -141,16 +141,19 @@ function getChampName(id){
  if(id && String(id).startsWith('quest_')){
  return t("m.moves.14");
  }
+ if(typeof getChampionName === 'function') return getChampionName(id) || id || 'Adversaire';
  if(lang === 'en' && CHAMP_EN[id]) return CHAMP_EN[id].name;
  return CHAMPIONS[id]?.name || id || 'Adversaire';
 }
 function getChampTitle(id){
  const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
+ if(typeof getChampionTitle === 'function') return getChampionTitle(id) || id;
  if(lang === 'en' && CHAMP_EN[id]) return CHAMP_EN[id].title;
  return CHAMPIONS[id]?.title || id;
 }
 function getChampBadgeName(id){
  const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
+ if(typeof getChampionBadgeName === 'function') return getChampionBadgeName(id) || id;
  if(lang === 'en' && CHAMP_EN[id]) return CHAMP_EN[id].bname;
  return CHAMPIONS[id]?.badgeName || id;
 }

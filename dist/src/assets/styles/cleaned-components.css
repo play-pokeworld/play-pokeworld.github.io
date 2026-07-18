@@ -1858,3 +1858,368 @@ body.save-menu-active { overflow: hidden; }
 .training-slot-progress .pct-90 { width: 90%; }
 .training-slot-progress .pct-95 { width: 95%; }
 .training-slot-progress .pct-100 { width: 100%; }
+.training-slot-card .training-mode-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+#training-battle-live-panel {
+  display: none;
+  width: 100%;
+  margin-top: 10px;
+}
+#training-battle-live-panel.open {
+  display: grid;
+  gap: 10px;
+}
+.training-live-title {
+  color: var(--light2);
+  font-weight: 900;
+  text-align: center;
+  padding: 8px;
+  border: 1px solid var(--dark3);
+  border-radius: 10px;
+  background: rgba(0,0,0,0.2);
+}
+.training-live-card {
+  border: 1px solid rgba(96,190,88,0.55);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.22);
+  padding: 10px;
+  display: grid;
+  gap: 9px;
+}
+.training-live-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--light2);
+}
+.training-live-head span {
+  color: var(--green);
+  font-weight: 900;
+}
+.training-live-duel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: stretch;
+}
+.training-live-poke {
+  border: 1px solid var(--dark3);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  padding: 8px;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  text-align: center;
+}
+.training-live-poke.enemy {
+  border-color: rgba(211,66,95,0.48);
+}
+.training-live-sprite {
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 25%, rgba(236,222,183,0.28), rgba(0,0,0,0.18));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.training-live-poke b {
+  color: var(--light2);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.training-live-poke span,
+.training-live-poke small,
+.training-live-log {
+  color: var(--light1);
+  font-size: 12px;
+}
+.training-live-poke .hp-bar {
+  width: 100%;
+  height: 8px;
+}
+.training-live-move {
+  color: var(--light2);
+  font-size: 11px;
+  font-weight: 900;
+  min-height: 16px;
+}
+.training-live-cd {
+  width: 100%;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--dark1);
+  overflow: hidden;
+}
+.training-live-cd div {
+  height: 100%;
+  background: var(--light2);
+  border-radius: 999px;
+}
+.training-live-vs {
+  align-self: center;
+  color: var(--light2);
+  font-weight: 900;
+  padding: 0 2px;
+}
+.training-live-log {
+  min-height: 62px;
+  max-height: 82px;
+  overflow: hidden;
+  border: 1px solid var(--dark3);
+  border-radius: 8px;
+  background: rgba(0,0,0,0.18);
+  padding: 6px 8px;
+  display: grid;
+  align-content: end;
+  gap: 2px;
+}
+.management-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 10px 0;
+}
+.management-tabs .hbtn.active {
+  background: var(--light2);
+  color: var(--dark1);
+  font-weight: 900;
+}
+.purchase-btn,
+.automation-buy-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--green), #8bd77d);
+  color: var(--dark1);
+  font-weight: 900;
+}
+.training-auto-slot-list {
+  display: grid;
+  gap: 8px;
+}
+.training-auto-slot-card {
+  border: 1px solid var(--dark3);
+  border-radius: 10px;
+  background: rgba(0,0,0,0.2);
+  padding: 10px;
+  display: grid;
+  gap: 4px;
+}
+.training-auto-slot-card b { color: var(--light2); }
+.training-auto-slot-card span { color: var(--light1); font-size: 12px; }
+.training-auto-slot-card.is-locked { opacity: 0.55; }
+.automation-card {
+  border: 1px solid var(--dark3);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.22);
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+  margin: 8px 0;
+}
+.automation-card.is-owned {
+  border-color: rgba(96,190,88,0.65);
+}
+.automation-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--light2);
+  font-weight: 900;
+}
+.automation-card-desc {
+  color: var(--light1);
+  font-size: 12px;
+  line-height: 1.35;
+}
+.automation-owned-badge {
+  color: var(--green);
+  font-size: 12px;
+}
+@media (max-width: 680px) {
+  .training-live-duel { grid-template-columns: 1fr; }
+  .training-live-vs { text-align: center; }
+  .training-slot-card .training-mode-grid { grid-template-columns: 1fr; }
+}
+
+.training-live-cd .pct-0 { width: 0%; }
+.training-live-cd .pct-5 { width: 5%; }
+.training-live-cd .pct-10 { width: 10%; }
+.training-live-cd .pct-15 { width: 15%; }
+.training-live-cd .pct-20 { width: 20%; }
+.training-live-cd .pct-25 { width: 25%; }
+.training-live-cd .pct-30 { width: 30%; }
+.training-live-cd .pct-35 { width: 35%; }
+.training-live-cd .pct-40 { width: 40%; }
+.training-live-cd .pct-45 { width: 45%; }
+.training-live-cd .pct-50 { width: 50%; }
+.training-live-cd .pct-55 { width: 55%; }
+.training-live-cd .pct-60 { width: 60%; }
+.training-live-cd .pct-65 { width: 65%; }
+.training-live-cd .pct-70 { width: 70%; }
+.training-live-cd .pct-75 { width: 75%; }
+.training-live-cd .pct-80 { width: 80%; }
+.training-live-cd .pct-85 { width: 85%; }
+.training-live-cd .pct-90 { width: 90%; }
+.training-live-cd .pct-95 { width: 95%; }
+.training-live-cd .pct-100 { width: 100%; }
+#poke-modal-inner .management-tabs .hbtn.active {
+  background: var(--light2);
+  color: var(--dark1);
+  border-color: var(--light2);
+  text-shadow: none;
+}
+#poke-modal-inner .management-tabs .hbtn.active span,
+#poke-modal-inner .management-tabs .hbtn.active b {
+  color: var(--dark1);
+}
+#poke-modal-inner .management-tabs .hbtn:not(.active) {
+  background: rgba(0,0,0,0.22);
+  color: var(--light2);
+  border-color: var(--dark3);
+}
+.hatchery-slot-card {
+  border: 1px solid var(--dark3);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.22);
+  padding: 10px;
+  display: grid;
+  gap: 10px;
+}
+.hatchery-slot-card.is-done {
+  border-color: rgba(96,190,88,0.72);
+  box-shadow: 0 0 14px rgba(96,190,88,0.14);
+}
+.hatchery-slot-card.is-fossil {
+  border-color: rgba(236,222,183,0.44);
+}
+.hatchery-slot-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+.hatchery-slot-media {
+  width: 68px;
+  height: 68px;
+  flex: 0 0 68px;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(236,222,183,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hatchery-slot-info {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+.hatchery-slot-name {
+  color: var(--light2);
+  font-weight: 900;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hatchery-slot-name span,
+.hatchery-slot-status {
+  color: var(--light1);
+  font-size: 12px;
+  font-weight: 700;
+}
+.hatchery-slot-progress {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--dark1);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.hatchery-hatch-btn {
+  width: 100%;
+  padding: 10px;
+  font-weight: 900;
+  background: var(--green);
+  color: var(--dark1);
+}
+.management-tabs {
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+.automation-toggle-btn,
+.automation-buy-btn {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-weight: 900;
+}
+.automation-toggle-btn.is-off {
+  background: rgba(0,0,0,0.26);
+  color: var(--light2);
+  border-color: var(--dark3);
+}
+.automation-toggle-btn.is-on {
+  background: linear-gradient(135deg, var(--green), #8bd77d);
+  color: var(--dark1);
+  border-color: var(--green);
+}
+.automation-toggle-btn.is-on span,
+.automation-toggle-btn.is-on b {
+  color: var(--dark1);
+}
+.automation-toggle-btn b {
+  font-size: 12px;
+}
+.loc-wild-poke.location-entry {
+  min-width: 92px;
+  border: 2px solid rgba(236,222,183,0.25);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.26), 0 3px 10px rgba(0,0,0,0.18);
+}
+.loc-wild-poke.location-entry.is-missing {
+  border-color: rgba(211,66,95,0.72);
+  background: linear-gradient(180deg, rgba(211,66,95,0.12), rgba(0,0,0,0.18));
+}
+.loc-wild-poke.location-entry.is-owned {
+  border-color: rgba(96,190,88,0.86);
+  background: linear-gradient(180deg, rgba(96,190,88,0.14), rgba(0,0,0,0.18));
+}
+.loc-wild-poke.location-entry.is-shiny-owned {
+  border-color: var(--shiny);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.26), 0 0 14px rgba(242,217,78,0.32);
+}
+.loc-wild-poke.location-entry.is-roaming {
+  border-color: var(--accent);
+  background: linear-gradient(180deg, rgba(156,39,176,0.18), rgba(0,0,0,0.18));
+}
+.loc-caught-badge {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: 999px;
+  border: 2px solid var(--dark1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+  z-index: 2;
+}
+.loc-caught-badge.is-owned {
+  background: var(--green);
+  color: var(--dark1);
+}
+.loc-caught-badge.is-missing {
+  background: var(--red);
+  color: var(--light2);
+}

@@ -229,17 +229,17 @@ window.L_en_quests = {
 },
 "61": {
 "title":"Raikou, the Purple Thunder",
-"desc":"Track Raikou in Johto: knock out 150 wild Pokémon on Route 44 to challenge it. It can still roam.",
+"desc":"At Ecruteak’s Burned Tower, knock out 150 wild Pokémon to draw out Raikou and challenge it.",
 "rewardDesc":"Raikou + 25,000₽"
 },
 "62": {
 "title":"Entei, the Living Volcano",
-"desc":"Track Entei in Johto: knock out 150 wild Pokémon on Route 28 to challenge it. It can still roam.",
+"desc":"At Ecruteak’s Burned Tower, knock out 150 wild Pokémon to draw out Entei and challenge it.",
 "rewardDesc":"Entei + 25,000₽"
 },
 "63": {
 "title":"Suicune, the Northern Wind",
-"desc":"Track Suicune in Johto: knock out 150 wild Pokémon on Route 42 to challenge it. It can still roam.",
+"desc":"At Ecruteak’s Burned Tower, knock out 150 wild Pokémon to draw out Suicune and challenge it.",
 "rewardDesc":"Suicune + 25,000₽"
 },
 "64": {

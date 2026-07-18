@@ -331,6 +331,7 @@ function startQuestDefeatBattle(locId){
  const active = getActiveLocalDefeatQuestForLocation(locId || G.location);
  if(!active){ notify(t('quest_battle_none'), 'var(--light1)'); return; }
  if(!G.team || !G.team.length){ notify(t('no_pokemon_in_team'), 'var(--red)'); return; }
+ if(typeof hasActiveTrainingBattle === 'function' && hasActiveTrainingBattle()){ notify(t('training_in_progress_no_battle'), 'var(--red)'); return; }
  if(typeof canUseCurrentTeamForRegion === 'function' && !canUseCurrentTeamForRegion(G.region || 'kanto')){ notify(regionTeamRestrictionMessage(G.region || 'kanto'), 'var(--red)'); return; }
  if(battle && battle.active){ notify(t('battle_in_progress'), 'var(--red)'); return; }
  const pool = getQuestBattlePool(locId || G.location);

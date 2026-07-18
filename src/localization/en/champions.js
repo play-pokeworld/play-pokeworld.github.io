@@ -1,89 +1,21 @@
 // ===== EN — Gym Leader / Champion names & titles =====
-// (FR source mirrored; English overrides welcome)
 window.L_en_champions = {
-"brock": {
-"name":"Pierre (Brock)",
-"title":"Champion Arène Argenta",
-"badgeName":"Pierre Badge"
-},
-"misty": {
-"name":"Ondine (Misty)",
-"title":"Championne Arène Azuria",
-"badgeName":"Cascade Badge"
-},
-"surge": {
-"name":"Surge (Lt. Surge)",
-"title":"Champion Arène Carmin",
-"badgeName":"Foudre Badge"
-},
-"erika": {
-"name":"Erika",
-"title":"Championne Arène Céladopole",
-"badgeName":"Arc-en-Ciel Badge"
-},
-"koga": {
-"name":"Koga",
-"title":"Champion Arène Parmanie",
-"badgeName":"Âme Badge"
-},
-"sabrina": {
-"name":"Morgane (Sabrina)",
-"title":"Championne Arène Safrania",
-"badgeName":"Marais Badge"
-},
-"blaine": {
-"name":"Pyro (Blaine)",
-"title":"Champion Arène Cramois'île",
-"badgeName":"Volcan Badge"
-},
-"giovanni": {
-"name":"Giovanni",
-"title":"Champion Arène Jadielle",
-"badgeName":"Terre Badge"
-},
-"elite4": {
-"name":"Élite 4 + Champion Bleu",
-"title":"Ligue Kanto",
-"badgeName":"Titre Champion"
-},
-"falkner": {
-"name":"Albert (Falkner)",
-"title":"Champion Arène Mauville",
-"badgeName":"Zéphyr Badge"
-},
-"bugsy": {
-"name":"Hector (Bugsy)",
-"title":"Champion Arène Écorcia",
-"badgeName":"Essaim Badge"
-},
-"whitney": {
-"name":"Blanche (Whitney)",
-"title":"Championne Arène Doublonville",
-"badgeName":"Plaine Badge"
-},
-"morty": {
-"name":"Mortimer (Morty)",
-"title":"Champion Arène Rosalia",
-"badgeName":"Brume Badge"
-},
-"chuck": {
-"name":"Chuck",
-"title":"Champion Arène Irisia",
-"badgeName":"Choc Badge"
-},
-"jasmine": {
-"name":"Jasmine",
-"title":"Championne Arène Oliville",
-"badgeName":"Minéral Badge"
-},
-"pryce": {
-"name":"Frédo (Pryce)",
-"title":"Champion Arène Acajou",
-"badgeName":"Glacier Badge"
-},
-"clair": {
-"name":"Sandra (Clair)",
-"title":"Championne Arène Ébénelle",
-"badgeName":"Lever Badge"
-}
+"brock": {"name":"Brock","title":"Pewter Gym Leader","badgeName":"Boulder Badge"},
+"misty": {"name":"Misty","title":"Cerulean Gym Leader","badgeName":"Cascade Badge"},
+"surge": {"name":"Lt. Surge","title":"Vermilion Gym Leader","badgeName":"Thunder Badge"},
+"erika": {"name":"Erika","title":"Celadon Gym Leader","badgeName":"Rainbow Badge"},
+"koga": {"name":"Koga","title":"Fuchsia Gym Leader","badgeName":"Soul Badge"},
+"sabrina": {"name":"Sabrina","title":"Saffron Gym Leader","badgeName":"Marsh Badge"},
+"blaine": {"name":"Blaine","title":"Cinnabar Gym Leader","badgeName":"Volcano Badge"},
+"giovanni": {"name":"Giovanni","title":"Viridian Gym Leader","badgeName":"Earth Badge"},
+"elite4": {"name":"Kanto League","title":"Kanto League","badgeName":"Kanto Champion Title"},
+"johto_elite4": {"name":"Johto League","title":"Johto League","badgeName":"Johto Champion Title"},
+"falkner": {"name":"Falkner","title":"Violet Gym Leader","badgeName":"Zephyr Badge"},
+"bugsy": {"name":"Bugsy","title":"Azalea Gym Leader","badgeName":"Hive Badge"},
+"whitney": {"name":"Whitney","title":"Goldenrod Gym Leader","badgeName":"Plain Badge"},
+"morty": {"name":"Morty","title":"Ecruteak Gym Leader","badgeName":"Fog Badge"},
+"chuck": {"name":"Chuck","title":"Cianwood Gym Leader","badgeName":"Storm Badge"},
+"jasmine": {"name":"Jasmine","title":"Olivine Gym Leader","badgeName":"Mineral Badge"},
+"pryce": {"name":"Pryce","title":"Mahogany Gym Leader","badgeName":"Glacier Badge"},
+"clair": {"name":"Clair","title":"Blackthorn Gym Leader","badgeName":"Rising Badge"}
 };

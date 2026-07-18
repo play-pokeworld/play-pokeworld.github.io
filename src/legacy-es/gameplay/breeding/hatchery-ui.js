@@ -1,20 +1,43 @@
 
-function openHatcheryUpgradeMenu(){
+function renderHatcheryManagementTabs(active){
+ return `<div class="management-tabs">
+  <button class="hbtn ${active==='upgrades'?'active':''}" data-action="legacy-call" data-call="openHatcheryManagementMenu" data-call-args="'upgrades'">⬆ ${t('management_upgrades')}</button>
+  <button class="hbtn ${active==='automation'?'active':''}" data-action="legacy-call" data-call="openHatcheryManagementMenu" data-call-args="'automation'">🤖 ${t('management_automation')}</button>
+  <button class="hbtn ${active==='trainers'?'active':''}" data-action="legacy-call" data-call="openHatcheryManagementMenu" data-call-args="'trainers'">🧑‍🏫 ${t('management_trainers')}</button>
+ </div>`;
+}
+function hatcheryAutomationCard(key, icon, descKey){
+ if(!G.automation) G.automation = {autoHatch:false, autoSeedHatchery:false, autoExplore:false};
+ const purchased = typeof isAutomationPurchased === 'function' ? isAutomationPurchased(key) : true;
+ const cost = (typeof AUTOMATION_UPGRADE_COSTS !== 'undefined' && AUTOMATION_UPGRADE_COSTS[key]) ? AUTOMATION_UPGRADE_COSTS[key] : (key==='autoHatch'?250000:500000);
+ if(!purchased){
+  return `<button class="hbtn automation-buy-btn" data-action="legacy-call" data-call="buyAutomationUpgrade" data-call-args="'${key}'">${icon} ${t('automation_'+key)} · ${tr('automation_buy_button', {price:cost.toLocaleString()})}</button>`;
+ }
+ const enabled = !!G.automation[key];
+ return `<button class="hbtn automation-toggle-btn ${enabled?'is-on':'is-off'}" data-action="legacy-call" data-call="toggleAutomationButton" data-call-args="'${key}'">
+  <span>${icon} ${t('automation_'+key)}</span><b>${enabled?t('automation_enabled'):t('automation_disabled')}</b>
+ </button>`;
+}
+function openHatcheryManagementMenu(page='upgrades'){
  const inner=document.getElementById('poke-modal-inner');
  const modal=document.getElementById('poke-modal');
  if(!inner||!modal) return;
  const maxSlots = clamp(G.hatcheryMaxSlots || 1, 1, 4);
  const upgradeCost = (typeof getHatcherySlotUpgradeCost === 'function') ? getHatcherySlotUpgradeCost() : (maxSlots * 15000);
- if(!G.automation) G.automation = {autoHatch:false, autoSeedHatchery:false, autoExplore:false};
- inner.innerHTML = `<div class="modal-title"><div>⚙️ Pension & améliorations</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
- <div class="dict-info-block"><b>Automatisations</b><br>
- <label class="training-upgrade-line ${G.automation.autoHatch?'is-on':'is-off'}"><span>🥚 Éclosion automatique ${typeof getAutomationUpgradeLabelSuffix==='function'?getAutomationUpgradeLabelSuffix('autoHatch'):''}</span><input type="checkbox"${G.automation.autoHatch?'checked':''} data-change-call="toggleAutomation" data-change-args="'autoHatch', this.checked"></label>
- <label class="training-upgrade-line ${G.automation.autoSeedHatchery?'is-on':'is-off'}"><span>📦 Remplir les slots depuis la boîte ${typeof getAutomationUpgradeLabelSuffix==='function'?getAutomationUpgradeLabelSuffix('autoSeedHatchery'):''}</span><input type="checkbox"${G.automation.autoSeedHatchery?'checked':''} data-change-call="toggleAutomation" data-change-args="'autoSeedHatchery', this.checked"></label>
- </div>
- <div class="dict-info-block"><b>Slots de Pension</b><br>${maxSlots<4&&upgradeCost?`<button class="hbtn" data-action="legacy-call" data-call="upgradeHatcherySlots" data-call-args="${upgradeCost}">⬆ Ajouter un slot (${upgradeCost.toLocaleString()}₽)</button>`:t('hatchery_slots_max')}</div>
- <div class="dict-info-block"><b>À venir :</b><br>• soigneurs/personnel de pension<br>• bonus d’éclosion et d’IV<br>• automatisations avancées</div>`;
+ const body = page === 'trainers'
+  ? `<div class="dict-info-block"><b>🧑‍🏫 ${t('management_trainers')}</b><br>${t('hatchery_trainers_soon')}</div>`
+  : page === 'automation'
+  ? `<div class="dict-info-block"><b>${t('hatchery_automation_title')}</b></div>
+     ${hatcheryAutomationCard('autoHatch', '🥚', 'automation_autoHatch_desc')}
+     ${hatcheryAutomationCard('autoSeedHatchery', '📦', 'automation_autoSeedHatchery_desc')}`
+  : `<div class="dict-info-block"><b>${t('hatchery_slots_title')}</b><br>${tr('hatchery_slots_current', {count:maxSlots, max:4})}</div>
+     <div class="dict-info-block">${maxSlots<4&&upgradeCost?`<button class="hbtn purchase-btn" data-action="legacy-call" data-call="upgradeHatcherySlots" data-call-args="${upgradeCost}">⬆ ${tr('hatchery_upgrade_slot', {cost:upgradeCost.toLocaleString()})}</button>`:t('hatchery_slots_max')}</div>`;
+ inner.innerHTML = `<div class="modal-title"><div>⚙️ ${t('hatchery_management_title')}</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
+ ${renderHatcheryManagementTabs(page)}
+ ${body}`;
  modal.classList.add('open');
 }
+function openHatcheryUpgradeMenu(){ openHatcheryManagementMenu('upgrades'); }
 
 function renderHatcheryWindow(){
  const el = document.getElementById('hatchery-window-body');
@@ -29,7 +52,7 @@ function renderHatcheryWindow(){
  return;
  }
  
- let headerHtml = `<div class="hatchery-upgrade-row"><button class="hbtn" data-action="legacy-call" data-call="openHatcheryUpgradeMenu" data-call-args="">⚙️ Améliorations Pension</button></div>`;
+ let headerHtml = `<div class="hatchery-upgrade-row"><button class="hbtn" data-action="legacy-call" data-call="openHatcheryUpgradeMenu" data-call-args="">⚙️ ${t('hatchery_management_button')}</button></div>`;
  
  const maxSlots = clamp(G.hatcheryMaxSlots || 1, 1, 4);
  if(!G.hatchery) G.hatchery = [null];
@@ -52,18 +75,18 @@ function renderHatcheryWindow(){
  const req = slot.stepsReq || 10;
  const done = steps >= req;
  const pct = clamp(Math.floor((steps / req) * 100), 0, 100);
- html += `<div>
- <div class="extracted-template-style-143" data-action="legacy-call" data-call="openUnifiedSelectorModal" data-call-args="'box_view'">
- ${isFossil ? itemIcon(fossilDisplayKey,40) : spriteImg(displayId, displayEmoji, {size:60, shiny:displayShiny})}
+ html += `<div class="hatchery-slot-card ${done?'is-done':''} ${isFossil?'is-fossil':''}">
+ <div class="hatchery-slot-main" data-action="legacy-call" data-call="openUnifiedSelectorModal" data-call-args="'box_view'">
+  <div class="hatchery-slot-media">
+   ${isFossil ? itemIcon(fossilDisplayKey,44) : spriteImg(displayId, displayEmoji, {size:64, shiny:displayShiny})}
+  </div>
+  <div class="hatchery-slot-info">
+   <div class="hatchery-slot-name">${iconEmoji} ${displayName} <span>Slot #${i+1}</span></div>
+   <div class="hatchery-slot-status">${done ? t('ready') : tr('incubating', {steps:steps, required:req})}</div>
+   <div class="hatchery-slot-progress"><div class="hatchery-progress ${done?'is-done':isFossil?'is-fossil':'is-normal'}" data-pct="${pct}"></div></div>
+  </div>
  </div>
- <div class="extracted-template-style-144">
- <div class="extracted-template-style-145">${iconEmoji} ${displayName} <span class="extracted-template-style-007">Slot #${i+1}</span></div>
- <div class="extracted-template-style-146">${done ? t('ready') : tr('incubating', {steps:steps, required:req})}</div>
- <div class="extracted-template-style-147">
- <div></div>
- </div>
- </div>
- ${done ? `<button class="hbtn extracted-bridge-style-030" data-action="legacy-call" data-call="hatchEgg" data-call-args="${i}"> ${t('hatch')}</button>` : ''}
+ ${done ? `<button class="hbtn hatchery-hatch-btn" data-action="legacy-call" data-call="hatchEgg" data-call-args="${i}"> ${t('hatch')}</button>` : ''}
  </div>`;
  }
  }
@@ -130,6 +153,7 @@ function renderFossilLabCompact(el){
 
 
 // --- Migrated to ES module, globals exposed ---
+if (typeof openHatcheryManagementMenu !== 'undefined' && typeof window !== 'undefined') window.openHatcheryManagementMenu = openHatcheryManagementMenu;
 if (typeof openHatcheryUpgradeMenu !== 'undefined' && typeof window !== 'undefined') window.openHatcheryUpgradeMenu = openHatcheryUpgradeMenu;
 if (typeof renderHatcheryWindow !== 'undefined' && typeof window !== 'undefined') window.renderHatcheryWindow = renderHatcheryWindow;
 if (typeof renderFossilLab !== 'undefined' && typeof window !== 'undefined') window.renderFossilLab = renderFossilLab;
