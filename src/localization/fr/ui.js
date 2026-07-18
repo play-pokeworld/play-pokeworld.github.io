@@ -543,4 +543,7 @@ window.L_fr_ui = {
 "afk_none":"Aucun",
 "afk_panel_team_ko":"Pokémon K.O.",
 "team_slot_name":"Slot équipe {slot}",
+"afk_captures_normal":"Normaux",
+"afk_captures_shiny":"Shiny",
+"duplicate_short":"doublon(s)",
 };

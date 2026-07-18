@@ -1457,3 +1457,77 @@ body.save-menu-active { overflow: hidden; }
   background: rgba(236,222,183,0.14);
   color: var(--light2);
 }
+
+.afk-loot-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.afk-loot-subtitle {
+  color: var(--light1);
+  font-weight: 900;
+  margin: 2px 0 6px;
+}
+.afk-loot-subtitle.shiny {
+  color: var(--yellow);
+}
+.afk-loot-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: stretch;
+}
+.afk-loot-card {
+  position: relative;
+  min-width: 86px;
+  max-width: 126px;
+  min-height: 86px;
+  border: 1px solid rgba(236,222,183,0.22);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.22);
+  padding: 8px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 4px;
+  color: var(--light2);
+  text-align: center;
+}
+.afk-loot-card.is-shiny {
+  border-color: rgba(242,217,78,0.72);
+  box-shadow: 0 0 14px rgba(242,217,78,0.18), inset 0 0 0 1px rgba(242,217,78,0.2);
+}
+.afk-loot-card.item {
+  min-height: 78px;
+}
+.afk-loot-card span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 900;
+}
+.afk-loot-card b {
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  border-radius: 999px;
+  padding: 1px 6px;
+  background: rgba(0,0,0,0.48);
+  color: var(--light2);
+  font-size: 11px;
+}
+.afk-loot-card em {
+  position: absolute;
+  top: 5px;
+  left: 7px;
+  color: var(--yellow);
+  font-style: normal;
+  text-shadow: 0 0 8px rgba(242,217,78,0.55);
+}
+@media (max-width: 640px) {
+  .afk-loot-split {
+    grid-template-columns: 1fr;
+  }
+}

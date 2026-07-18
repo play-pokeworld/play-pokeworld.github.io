@@ -516,7 +516,17 @@ function finishAfkBattleState(shouldContinue, loc){
  }
 }
 function snapshotInventory(){ return {...(G.inventory || {})}; }
+function snapshotSessionItems(){ return {...((battle && battle.sessionItems) || {})}; }
 function diffInventory(before, after){
+ const keys = new Set([...Object.keys(before||{}), ...Object.keys(after||{})]);
+ const out = [];
+ for(const key of keys){
+  const delta = Number((after&&after[key]) || 0) - Number((before&&before[key]) || 0);
+  if(delta > 0) out.push({key, qty:delta});
+ }
+ return out;
+}
+function diffSessionItems(before, after){
  const keys = new Set([...Object.keys(before||{}), ...Object.keys(after||{})]);
  const out = [];
  for(const key of keys){
@@ -536,16 +546,38 @@ function ensureAfkResultPanel(){
  return modal;
 }
 function closeAfkResultPanel(){ const modal = document.getElementById('afk-result-modal'); if(modal) modal.classList.remove('open'); }
+function groupAfkCaptures(captures){
+ const grouped = {};
+ for(const c of captures || []){
+  const id = Number(c.id || 0);
+  if(!id) continue;
+  const key = id + ':' + (!!c.shiny);
+  if(!grouped[key]) grouped[key] = {id, name:c.name || getPokeName(id), emoji:c.emoji || '', shiny:!!c.shiny, count:0, dupes:0};
+  grouped[key].count++;
+  if(c.dupe) grouped[key].dupes++;
+ }
+ return Object.values(grouped).sort((a,b) => (b.shiny-a.shiny) || a.id-b.id);
+}
+function renderAfkCaptureCards(list){
+ if(!list || !list.length) return `<span class="afk-muted">${escHtml(t('afk_none'))}</span>`;
+ return list.map(c => `<div class="afk-loot-card ${c.shiny?'is-shiny':''}" title="${escHtml(c.name)}${c.dupes?` · ${c.dupes} ${escHtml(t('duplicate_short'))}`:''}">${spriteImg(c.id, c.emoji, {shiny:c.shiny, size:44})}<span>${escHtml(c.name)}</span>${c.count>1?`<b>×${c.count}</b>`:''}${c.shiny?'<em>★</em>':''}</div>`).join('');
+}
+function renderAfkCaptureList(captures){
+ const grouped = groupAfkCaptures(captures || []);
+ if(!grouped.length) return `<span class="afk-muted">${escHtml(t('afk_none'))}</span>`;
+ return `<div class="afk-loot-row">${renderAfkCaptureCards(grouped)}</div>`;
+}
 function renderAfkItemList(items){
  if(!items || !items.length) return `<span class="afk-muted">${escHtml(t('afk_none'))}</span>`;
- return items.map(it => `<span class="afk-chip">${itemIcon(it.key,18)} ${escHtml(getItemName(it.key))} ×${it.qty}</span>`).join('');
+ return items.map(it => `<div class="afk-loot-card item" title="${escHtml(getItemName(it.key))}">${itemSpriteHtml(it.key,34)}<span>${escHtml(getItemName(it.key))}</span><b>×${it.qty}</b></div>`).join('');
 }
 function showAfkResultPanel(result){
  const modal = ensureAfkResultPanel();
+ const capturesHtml = renderAfkCaptureList(result.captureList || []);
  const itemsHtml = renderAfkItemList(result.items || []);
  const titleKey = result.debug ? 'afk_panel_title_debug' : 'afk_panel_title_return';
  const statusKey = result.error ? 'afk_panel_status_error' : result.lost ? 'afk_panel_status_lost' : result.wins > 0 ? 'afk_panel_status_ok' : 'afk_panel_status_empty';
- modal.innerHTML = `<div class="afk-result-card"><div class="modal-title"><div>⏱ ${escHtml(t(titleKey))}</div><span class="afk-modal-close" data-action="legacy-call" data-call="closeAfkResultPanel" data-call-args="">✕</span></div><div class="afk-result-status ${result.error?'danger':result.lost?'danger':result.wins>0?'success':''}">${escHtml(t(statusKey))}</div><div class="afk-result-grid"><div><b>${escHtml(formatPlayTime(result.timeMs || 0))}</b><span>${escHtml(t('afk_panel_duration'))}</span></div><div><b>${result.wins || 0}</b><span>${escHtml(t('afk_panel_battles'))}</span></div><div><b>+${Number(result.money || 0).toLocaleString()}₽</b><span>${escHtml(t('afk_panel_money'))}</span></div><div><b>${result.fainted || 0}</b><span>${escHtml(t('afk_panel_team_ko'))}</span></div><div><b>${result.captures || 0}</b><span>${escHtml(t('afk_panel_captures'))}</span></div><div><b>+${result.energy || 0}</b><span>${escHtml(t('afk_panel_energy'))}</span></div></div><div class="afk-result-section"><b>${escHtml(t('afk_panel_items'))}</b><div class="afk-chip-row">${itemsHtml}</div></div>${result.message?`<div class="afk-result-note">${escHtml(result.message)}</div>`:''}<div class="afk-result-actions"><button class="hbtn" data-action="legacy-call" data-call="closeAfkResultPanel" data-call-args="">${escHtml(t('close'))}</button></div></div>`;
+ modal.innerHTML = `<div class="afk-result-card"><div class="modal-title"><div>⏱ ${escHtml(t(titleKey))}</div><span class="afk-modal-close" data-action="legacy-call" data-call="closeAfkResultPanel" data-call-args="">✕</span></div><div class="afk-result-status ${result.error?'danger':result.lost?'danger':result.wins>0?'success':''}">${escHtml(t(statusKey))}</div><div class="afk-result-grid"><div><b>${escHtml(formatPlayTime(result.timeMs || 0))}</b><span>${escHtml(t('afk_panel_duration'))}</span></div><div><b>${result.wins || 0}</b><span>${escHtml(t('afk_panel_battles'))}</span></div><div><b>+${Number(result.money || 0).toLocaleString()}₽</b><span>${escHtml(t('afk_panel_money'))}</span></div><div><b>${result.fainted || 0}</b><span>${escHtml(t('afk_panel_team_ko'))}</span></div><div><b>${result.captures || 0}</b><span>${escHtml(t('afk_panel_captures'))}</span></div><div><b>+${result.energy || 0}</b><span>${escHtml(t('afk_panel_energy'))}</span></div></div><div class="afk-result-section"><b>${escHtml(t('captured_pokemon_title'))}</b>${capturesHtml}</div><div class="afk-result-section"><b>${escHtml(t('found_items_title'))}</b><div class="afk-loot-row">${itemsHtml}</div></div>${result.message?`<div class="afk-result-note">${escHtml(result.message)}</div>`:''}<div class="afk-result-actions"><button class="hbtn" data-action="legacy-call" data-call="closeAfkResultPanel" data-call-args="">${escHtml(t('close'))}</button></div></div>`;
  modal.classList.add('open');
 }
 function applyAfkProgress(elapsedMs, reason, info){
@@ -556,6 +588,7 @@ function applyAfkProgress(elapsedMs, reason, info){
   const startMoney = Number(G.money || 0);
   const startEnergy = G.mine ? Number(G.mine.energy || 0) : 0;
   const invBefore = snapshotInventory();
+  const sessionItemsBefore = snapshotSessionItems();
   const catchBefore = (battle && battle.sessionCatches) ? battle.sessionCatches.length : 0;
   const teamKoBefore = Number(info && info.teamKoAtStart != null ? info.teamKoAtStart : countAfkTeamKo());
   let wins = 0;
@@ -600,7 +633,10 @@ function applyAfkProgress(elapsedMs, reason, info){
   saveGame(false);
   const teamKoAfter = countAfkTeamKo();
   const displayedFainted = Math.max(fainted, Math.max(0, teamKoAfter - teamKoBefore));
-  const result = {debug: reason === 'debug', timeMs:capped, wins, money:Math.max(0, Number(G.money || 0) - startMoney), damage, fainted:displayedFainted, lost, energy:G.mine ? Math.max(0, Number(G.mine.energy || 0) - startEnergy) : 0, captures:Math.max(0, ((battle && battle.sessionCatches) ? battle.sessionCatches.length : 0) - catchBefore), items:diffInventory(invBefore, G.inventory || {})};
+  const captureList = ((battle && battle.sessionCatches) ? battle.sessionCatches.slice(catchBefore) : []);
+  let itemList = diffSessionItems(sessionItemsBefore, (battle && battle.sessionItems) || {});
+  if(!itemList.length) itemList = diffInventory(invBefore, G.inventory || {});
+  const result = {debug: reason === 'debug', timeMs:capped, wins, money:Math.max(0, Number(G.money || 0) - startMoney), damage, fainted:displayedFainted, lost, energy:G.mine ? Math.max(0, Number(G.mine.energy || 0) - startEnergy) : 0, captures:captureList.length, captureList, items:itemList};
   showAfkResultPanel(result);
   if(wins > 0 || lost){
    const params = {time:formatPlayTime(capped), wins:wins, money:Number(result.money || 0).toLocaleString(), fainted:result.fainted};

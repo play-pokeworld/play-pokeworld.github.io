@@ -543,4 +543,7 @@ window.L_en_ui = {
 "afk_none":"None",
 "afk_panel_team_ko":"Pokémon fainted",
 "team_slot_name":"Team slot {slot}",
+"afk_captures_normal":"Normal",
+"afk_captures_shiny":"Shiny",
+"duplicate_short":"duplicate(s)",
 };
