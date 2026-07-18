@@ -22,9 +22,17 @@ function getRoamingLegendaryForRoute(locId){
 }
 
 
+function getBadgeDisplayTotal(){
+ const supportedRegions = ['kanto','johto'];
+ let regions = 1;
+ try{ regions = supportedRegions.filter(r => (typeof canAccessRegion === 'function') ? canAccessRegion(r) : r === 'kanto').length || 1; }catch(_){ regions = 1; }
+ return regions * 8;
+}
 function updateHeader(){
  document.getElementById('h-money').textContent=G.money.toLocaleString();
  document.getElementById('h-badges').textContent=G.badges.length;
+ const totalEl = document.getElementById('h-badges-total');
+ if(totalEl) totalEl.textContent = getBadgeDisplayTotal();
  try{ renderTeamWindow(); }catch(_){}
  try{ renderStoryWindow(); }catch(_){}
  try{ renderHatcheryWindow(); }catch(_){}
@@ -37,6 +45,7 @@ function updateHeader(){
 
 // --- Migrated to ES module, globals exposed ---
 if (typeof getRoamingLegendaryForRoute !== 'undefined' && typeof window !== 'undefined') window.getRoamingLegendaryForRoute = getRoamingLegendaryForRoute;
+if (typeof getBadgeDisplayTotal !== 'undefined' && typeof window !== 'undefined') window.getBadgeDisplayTotal = getBadgeDisplayTotal;
 if (typeof updateHeader !== 'undefined' && typeof window !== 'undefined') window.updateHeader = updateHeader;
 
 export {};

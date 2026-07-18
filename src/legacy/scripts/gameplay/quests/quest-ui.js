@@ -22,7 +22,7 @@ function renderStoryWindow(){
  }
 
  const qCard = (inst, cat, def, numLabel)=>{
- const prog = (inst.progress||0);
+ const prog = (typeof questProgressValue === 'function') ? questProgressValue(inst, def) : (inst.progress||0);
  const tgt = def.target||1;
  const done = questDone(inst, def);
  const pct = clamp(Math.floor((prog/tgt)*100),0,100);

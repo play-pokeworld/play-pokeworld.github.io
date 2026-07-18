@@ -8,17 +8,17 @@ window.L_en_quests = {
 },
 "0": {
 "title":"A New Adventure Begins",
-"desc":"Welcome to PokéWorld! Travel to Route 1 and win 3 battles against wild Pokémon to prove your skills.",
+"desc":"Welcome to PokéWorld! Travel to Route 1 and knock out 3 wild Pokémon against wild Pokémon to prove your skills.",
 "rewardDesc":"500₽ + 5 Oran Berries"
 },
 "40": {
 "title":"Viridian Forest Awakens",
-"desc":"Explore Viridian Forest and win 5 wild battles to sharpen your team.",
+"desc":"Explore Viridian Forest and knock out 5 wild Pokémon to sharpen your team.",
 "rewardDesc":"600₽ + 5 Sitrus Berries"
 },
 "41": {
 "title":"Wild Route 22",
-"desc":"Route 22 is full of Pokémon. Win 6 wild battles to grow stronger!",
+"desc":"Route 22 is full of Pokémon. Knock out 6 wild Pokémon to grow stronger!",
 "rewardDesc":"700₽ + 5 Cheri Berries"
 },
 "1": {
@@ -28,12 +28,12 @@ window.L_en_quests = {
 },
 "42": {
 "title":"Mt. Moon Enigma",
-"desc":"Cross Route 3 and win 6 wild battles to advance toward Mt. Moon.",
+"desc":"Cross Route 3 and knock out 6 wild Pokémon to advance toward Mt. Moon.",
 "rewardDesc":"1,500₽ + 1 Moon Stone"
 },
 "43": {
 "title":"Crossing Route 4",
-"desc":"Route 4 leads to Cerulean. Win 6 wild battles to forge your team.",
+"desc":"Route 4 leads to Cerulean. Knock out 6 wild Pokémon to forge your team.",
 "rewardDesc":"1,200₽ + 5 Prine Berries"
 },
 "2": {
@@ -48,12 +48,12 @@ window.L_en_quests = {
 },
 "44": {
 "title":"Waters of Route 5",
-"desc":"Route 5 links Cerulean to Saffron. Win 6 wild battles to train up.",
+"desc":"Route 5 links Cerulean to Saffron. Knock out 6 wild Pokémon to train up.",
 "rewardDesc":"1,500₽ + 5 Sitrus Berries"
 },
 "45": {
 "title":"Route 6 — To Vermilion",
-"desc":"Take Route 6 toward Vermilion City and win 6 wild battles.",
+"desc":"Take Route 6 toward Vermilion City and knock out 6 wild Pokémon.",
 "rewardDesc":"1,500₽ + 5 Oran Berries"
 },
 "5": {
@@ -63,22 +63,22 @@ window.L_en_quests = {
 },
 "4": {
 "title":"Diglett's Cave Secrets",
-"desc":"Cross Route 11 and explore the mysterious Diglett's Cave. Win 5 wild battles to train your team.",
+"desc":"Cross Route 11 and explore the mysterious Diglett's Cave. Knock out 5 wild Pokémon to train your team.",
 "rewardDesc":"3,000₽ + 5 Sitrus Berries"
 },
 "46": {
 "title":"Roads 9 & 10 Gateway",
-"desc":"Roads 9 & 10 lead north. Win 6 wild battles to advance.",
+"desc":"Roads 9 & 10 lead north. Knock out 6 wild Pokémon to advance.",
 "rewardDesc":"2,000₽ + 5 Prine Berries"
 },
 "47": {
 "title":"The Rocky Tunnel",
-"desc":"Cross the Rocky Tunnel toward Lavender Town. Win 6 wild battles in the dark.",
+"desc":"Cross the Rocky Tunnel toward Lavender Town. Knock out 6 wild Pokémon in the dark.",
 "rewardDesc":"2,000₽ + 5 Cheri Berries"
 },
 "7": {
 "title":"Pokémon Tower Ghosts",
-"desc":"Travel to Lavender Town and brave the spirits of Pokémon Tower. Win 5 battles to obtain 3 Rare Candies.",
+"desc":"Travel to Lavender Town and brave the spirits of Pokémon Tower. Knock out 5 wild Pokémon to obtain 3 Rare Candies.",
 "rewardDesc":"4,500₽ + 3 Rare Candies + Poké Flute"
 },
 
@@ -89,7 +89,7 @@ window.L_en_quests = {
 },
 "48": {
 "title":"Route 7 — Celadon",
-"desc":"Route 7 links Saffron to Celadon. Win 6 wild battles to prepare for the gym.",
+"desc":"Route 7 links Saffron to Celadon. Knock out 6 wild Pokémon to prepare for the gym.",
 "rewardDesc":"2,500₽ + 1 Leaf Stone"
 },
 "8": {
@@ -129,7 +129,7 @@ window.L_en_quests = {
 },
 "51": {
 "title":"Route 23 — The Vanguard",
-"desc":"Route 23 guards the path to Victory Road. Win 10 wild battles to toughen up.",
+"desc":"Route 23 guards the path to Victory Road. Knock out 10 wild Pokémon to toughen up.",
 "rewardDesc":"5,000₽ + Choice Scarf"
 },
 "13": {
@@ -139,7 +139,7 @@ window.L_en_quests = {
 },
 "14": {
 "title":"The Ice Bird of Seafoam",
-"desc":"Explore the frozen depths of Seafoam Islands (Sea Route 20) and win 10 battles to awaken the legendary Articuno!",
+"desc":"Explore the frozen depths of Seafoam Islands (Sea Route 20) and knock out 10 wild Pokémon to awaken the legendary Articuno!",
 "rewardDesc":"Articuno (Legendary )"
 },
 "15": {
@@ -149,12 +149,12 @@ window.L_en_quests = {
 },
 "16": {
 "title":"The Fire Bird of Victory Road",
-"desc":"Brave the trials of Victory Road (Cave) and win 10 battles to encounter Moltres!",
+"desc":"Brave the trials of Victory Road (Cave) and knock out 10 wild Pokémon to encounter Moltres!",
 "rewardDesc":"Moltres (Legendary )"
 },
 "17": {
 "title":"Pokémon Mansion Archives",
-"desc":"Explore the ruined Pokémon Mansion on Cinnabar Island. Win 10 wild battles to uncover secrets.",
+"desc":"Explore the ruined Pokémon Mansion on Cinnabar Island. Knock out 10 wild Pokémon to uncover secrets.",
 "rewardDesc":"15,000₽ + Swift Charm + 10 Rare Candies"
 },
 "18": {
@@ -173,84 +173,89 @@ window.L_en_quests = {
 "rewardDesc":"300₽ + 5 Oran Berries"
 },
 "20": {
-"title":"21. Johto's Call — New Bark",
-"desc":"Welcome to Johto! Visit Prof. Elm in New Bark, then win 3 wild battles to begin.",
+"title":"Route 29: First Johto KOs",
+"desc":"Leave New Bark Town for Route 29 and knock out 5 wild Pokémon to reach Cherrygrove City.",
 "rewardDesc":"500₽ + 5 Oran Berries"
 },
 "21": {
-"title":"22. Violet's Flying Trial",
-"desc":"Travel to Violet City and challenge Falkner at his Flying Gym for the Zephyr Badge!",
+"title":"Violet City: Zephyr Badge",
+"desc":"Go to Violet City and defeat Falkner in his Flying-type Gym to obtain the Zephyr Badge.",
 "rewardDesc":"1,000₽ + 5 Sitrus Berries"
 },
 "22": {
-"title":"23. Azalea's Bug Trial",
-"desc":"In Azalea Town, defeat Bugsy to claim the Hive Badge!",
-"rewardDesc":"1,500₽ + Muscle Band"
+"title":"Azalea Town: Hive Badge",
+"desc":"Cross Union Cave, reach Azalea Town, and defeat Bugsy in his Bug-type Gym.",
+"rewardDesc":"1,500₽ + 1 Muscle Band"
 },
 "23": {
-"title":"24. Goldenrod's Plain Trial",
-"desc":"In Goldenrod City, defeat Whitney for the Plain Badge!",
-"rewardDesc":"2,000₽ + Soft Sand"
+"title":"Goldenrod City: Plain Badge",
+"desc":"Cross Ilex Forest and Route 34, then defeat Whitney in Goldenrod City.",
+"rewardDesc":"2,000₽ + 1 Soft Sand"
 },
 "24": {
-"title":"25. Ecruteak's Fog Trial",
-"desc":"In Ecruteak City, defeat Morty for the Fog Badge!",
-"rewardDesc":"2,500₽ + Choice Scarf"
+"title":"Ecruteak City: Fog Badge",
+"desc":"Travel through Route 36, reach Ecruteak City, and defeat Morty in his Ghost-type Gym.",
+"rewardDesc":"2,500₽ + 1 Choice Scarf"
 },
 "25": {
-"title":"26. Cianwood's Storm Trial",
-"desc":"On Cianwood Island, defeat Chuck for the Storm Badge!",
-"rewardDesc":"3,000₽ + Power Gem"
+"title":"Cianwood City: Storm Badge",
+"desc":"From Olivine, cross Routes 40 and 41 to Cianwood City, then defeat Chuck.",
+"rewardDesc":"3,000₽ + 1 Power Gem"
 },
 "26": {
-"title":"27. Olivine's Mineral Trial",
-"desc":"In Olivine City, defeat Jasmine for the Mineral Badge!",
-"rewardDesc":"3,500₽ + Leftovers"
+"title":"Olivine City: Mineral Badge",
+"desc":"Return to Olivine City and defeat Jasmine in her Steel-type Gym.",
+"rewardDesc":"3,500₽ + 1 Leftovers"
 },
 "27": {
-"title":"28. Mahogany's Glacier Trial",
-"desc":"In Mahogany Town, defeat Pryce for the Glacier Badge!",
-"rewardDesc":"4,000₽ + Choice Specs"
+"title":"Mahogany Town: Glacier Badge",
+"desc":"Reach Mahogany Town after Ecruteak and Mt. Mortar, then defeat Pryce.",
+"rewardDesc":"4,000₽ + 1 Choice Specs"
 },
 "28": {
-"title":"29. Blackthorn's Rising Trial",
-"desc":"In Blackthorn City, challenge Clair for the Rising Badge and become Johto Champion!",
+"title":"Blackthorn City: Rising Badge",
+"desc":"Cross the Ice Path to Blackthorn City and defeat Clair to obtain the Rising Badge.",
 "rewardDesc":"8,000₽ + Choice Band + 5 Rare Candies"
 },
+"29": {
+"title":"Indigo Plateau: Johto League",
+"desc":"After the 8 Johto badges, cross Routes 26 and 27 and Victory Road to conquer the Johto League.",
+"rewardDesc":"18,000₽ + 10 Rare Candies + Choice items"
+},
 "60": {
-"title":"Burned Tower: The Beasts' Mystery",
-"desc":"In Ecruteak, explore Burned Tower and defeat 8 Pokémon to free the three Legendary Beasts: Raikou, Entei and Suicune!",
+"title":"Ecruteak City: Burned Tower",
+"desc":"In Ecruteak City, explore the Burned Tower and knock out 8 wild Pokémon to reveal the Legendary Beasts mystery.",
 "rewardDesc":"3,000₽ + 5 Rare Candies"
 },
 "61": {
 "title":"Raikou, the Purple Thunder",
-"desc":"Roam Route 44 and win 10 battles to summon Raikou, the Thunder Beast!",
-"rewardDesc":"Raikou (Legendary )"
+"desc":"On Route 44, knock out 10 wild Pokémon to make Raikou appear.",
+"rewardDesc":"Raikou + 5,000₽"
 },
 "62": {
 "title":"Entei, the Living Volcano",
-"desc":"Travel Route 28 and win 10 battles to awaken Entei, the Fire Beast!",
-"rewardDesc":"Entei (Legendary )"
+"desc":"On Route 28, knock out 10 wild Pokémon to awaken Entei.",
+"rewardDesc":"Entei + 5,000₽"
 },
 "63": {
-"title":"Suicune, the Aurora",
-"desc":"Cross Route 42 and win 10 battles to meet Suicune, the Water Beast!",
-"rewardDesc":"Suicune (Legendary )"
+"title":"Suicune, the Northern Wind",
+"desc":"On Route 42, knock out 10 wild Pokémon to encounter Suicune.",
+"rewardDesc":"Suicune + 5,000₽"
 },
 "64": {
-"title":"Whirl Islands: Lugia, Guardian of the Sea",
-"desc":"Dive to the Whirl Islands and win 10 battles to awaken Lugia, the Sea Pokémon!",
-"rewardDesc":"Lugia (Legendary )"
+"title":"Whirl Islands: Lugia",
+"desc":"At the Whirl Islands, knock out 10 wild Pokémon to awaken Lugia, guardian of the seas.",
+"rewardDesc":"Lugia + 8,000₽"
 },
 "65": {
-"title":"Bell Tower: Ho-Oh, the Fire Bird",
-"desc":"Climb the Bell Tower in Ecruteak and win 10 battles to summon Ho-Oh, the Fire Bird!",
-"rewardDesc":"Ho-Oh (Legendary )"
+"title":"Bell Tower: Ho-Oh",
+"desc":"At Ecruteak’s Bell Tower, knock out 10 wild Pokémon to make Ho-Oh appear.",
+"rewardDesc":"Ho-Oh + 8,000₽"
 },
 "66": {
-"title":"Ilex Forest: Celebi, the Mythical",
-"desc":"In Ilex Forest, win 12 battles to meet Celebi, the Time Pokémon!",
-"rewardDesc":"Celebi (Mythical )"
+"title":"Ilex Forest: Celebi",
+"desc":"In Ilex Forest, knock out 12 wild Pokémon to meet Celebi.",
+"rewardDesc":"Celebi + 10,000₽"
 }
 },
 "side": {
@@ -261,7 +266,7 @@ window.L_en_quests = {
 },
 "s2": {
 "title":"Apprentice Trainer",
-"desc":"Trainer Red challenges you: win 15 battles on Route 2.",
+"desc":"Trainer Red challenges you: knock out 15 wild Pokémon on Route 2.",
 "rewardDesc":"1,200₽ + 5 Prine Berries"
 },
 "s3": {
@@ -306,12 +311,12 @@ window.L_en_quests = {
 },
 "s11": {
 "title":"Viridian Guardian",
-"desc":"Guard Jo challenges newcomers: win 12 wild battles on Route 22!",
+"desc":"Guard Jo challenges newcomers: knock out 12 wild Pokémon on Route 22!",
 "rewardDesc":"1,800₽ + 5 Cheri Berries"
 },
 "s12": {
 "title":"Cerulean Researcher",
-"desc":"Researcher Lys tracks rare Pokémon: win 12 battles on Route 9!",
+"desc":"Researcher Lys tracks rare Pokémon: knock out 12 wild Pokémon on Route 9!",
 "rewardDesc":"2,200₽ + 5 Sitrus Berries"
 },
 "s13": {
@@ -326,12 +331,12 @@ window.L_en_quests = {
 },
 "s15": {
 "title":"Lavender Watcher",
-"desc":"Watcher Tom patrols Route 12: win 12 wild battles!",
+"desc":"Watcher Tom patrols Route 12: knock out 12 wild Pokémon!",
 "rewardDesc":"2,400₽ + 4 Rare Candies"
 },
 "s30": {
 "title":"Team Rocket at Mahogany",
-"desc":"Scientist Pierre-Jean hunts Team Rocket: win 10 battles at Mahogany!",
+"desc":"Scientist Pierre-Jean hunts Team Rocket: knock out 10 wild Pokémon at Mahogany!",
 "rewardDesc":"2,500₽ + Up-Grade"
 },
 "s31": {
@@ -393,7 +398,7 @@ window.L_en_quests = {
 },
 "r2": {
 "title":"Wandering Trainer",
-"desc":"Win 25 wild battles (anywhere).",
+"desc":"Knock out 25 wild Pokémon (anywhere).",
 "rewardDesc":"5 Prine Berries"
 },
 "r3": {
@@ -408,7 +413,7 @@ window.L_en_quests = {
 },
 "r5": {
 "title":"Seasoned Explorer",
-"desc":"Win 50 wild battles (anywhere).",
+"desc":"Knock out 50 wild Pokémon (anywhere).",
 "rewardDesc":"1 Choice Scarf"
 },
 "r6": {
@@ -418,17 +423,17 @@ window.L_en_quests = {
 },
 "r30": {
 "title":"Route 29 Patrol",
-"desc":"Win 15 wild battles on Route 29.",
+"desc":"Knock out 15 wild Pokémon on Route 29.",
 "rewardDesc":"5 Oran Berries"
 },
 "r31": {
 "title":"Route 34 Patrol",
-"desc":"Win 20 wild battles on Route 34.",
+"desc":"Knock out 20 wild Pokémon on Route 34.",
 "rewardDesc":"1 Mystic Water"
 },
 "r32": {
 "title":"Route 45 Patrol",
-"desc":"Win 20 wild battles on Route 45.",
+"desc":"Knock out 20 wild Pokémon on Route 45.",
 "rewardDesc":"1 Dragon Fang"
 },
 "r33": {
@@ -438,17 +443,17 @@ window.L_en_quests = {
 },
 "r34": {
 "title":"Dark Cave Patrol",
-"desc":"Win 12 battles in Dark Cave.",
+"desc":"Knock out 12 wild Pokémon in Dark Cave.",
 "rewardDesc":"1 King's Rock"
 },
 "r35": {
 "title":"Ilex Forest Patrol",
-"desc":"Win 15 battles in Ilex Forest.",
+"desc":"Knock out 15 wild Pokémon in Ilex Forest.",
 "rewardDesc":"1 Miracle Seed"
 },
 "r36": {
 "title":"Route 40 Angler",
-"desc":"Win 15 battles on Sea Route 40.",
+"desc":"Knock out 15 wild Pokémon on Sea Route 40.",
 "rewardDesc":"1 Mystic Water"
 },
 "r37": {

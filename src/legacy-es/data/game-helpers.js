@@ -145,22 +145,74 @@ const MIN_WINS_DEFAULT = 10;
 })();
 
 
-(function linkSplitRoutes(){
- for(const obj of [LOCS, LOCS_JOHTO]){
+function getAutoRouteLinkGroups(obj){
  const byName = {};
- for(const id in obj){ const loc=obj[id]; if(!loc||!loc.name) continue; (byName[loc.name]=byName[loc.name]||[]).push(id); }
- for(const name in byName){
- const ids = byName[name];
- if(ids.length < 2) continue;
- const primary = ids[0];
- const baseWild = obj[primary].wild || [];
+ for(const id in obj){
+  const loc = obj[id];
+  if(!loc || !loc.name) continue;
+  const isRouteLike = loc.type === 'route' || loc.type === 'sea';
+  const routeName = /^(Route|Chenal|Piste Cyclable)\b/.test(loc.name);
+  if(isRouteLike && routeName) (byName[loc.name] = byName[loc.name] || []).push(id);
+ }
+ return Object.values(byName).filter(ids => ids.length > 1);
+}
+function _wildKey(entry){ return [Number(entry[0]), Number(entry[1]||0), Number(entry[2]||entry[1]||0), entry[3]||'common'].join(':'); }
+function _mergeWildLists(ids, obj){
+ const seen = new Set();
+ const out = [];
  for(const id of ids){
- obj[id].group = primary; 
- if(id !== primary) obj[id].wild = baseWild.slice(); 
+  const loc = obj[id];
+  for(const entry of ((loc && loc.wild) || [])){
+   const key = _wildKey(entry);
+   if(!seen.has(key)){ seen.add(key); out.push(entry.slice ? entry.slice() : entry); }
+  }
  }
+ return out;
+}
+function _mergeDropLists(ids){
+ if(typeof ROUTE_DROPS === 'undefined') return [];
+ const seen = new Set();
+ const out = [];
+ for(const id of ids){
+  for(const key of (ROUTE_DROPS[id] || [])){
+   if(!seen.has(key)){ seen.add(key); out.push(key); }
+  }
  }
+ return out;
+}
+function applyRouteLinkGroups(){
+ const objects = [LOCS, LOCS_JOHTO].filter(Boolean);
+ for(const obj of objects){
+  const groups = getAutoRouteLinkGroups(obj);
+  for(const ids of groups){
+   const primary = ids[0];
+   const wild = _mergeWildLists(ids, obj);
+   const drops = _mergeDropLists(ids);
+   for(const id of ids){
+    if(!obj[id]) continue;
+    obj[id].group = primary;
+    obj[id].wild = wild.map(w => w.slice ? w.slice() : w);
+    if(drops.length && typeof ROUTE_DROPS !== 'undefined') ROUTE_DROPS[id] = drops.slice();
+   }
+  }
  }
-})();
+}
+function getLinkedRouteIds(id){
+ const out = new Set([id]);
+ const baseLoc = getLocObj(id);
+ const group = (baseLoc && baseLoc.group) || id;
+ for(const obj of [LOCS, LOCS_JOHTO]){
+  if(!obj) continue;
+  for(const locId in obj){
+   const loc = obj[locId];
+   if(!loc) continue;
+   if(((loc.group || locId) === group)) out.add(locId);
+  }
+ }
+ return Array.from(out);
+}
+
+applyRouteLinkGroups();
 
 
 function getShopName(id){
@@ -168,19 +220,7 @@ function getShopName(id){
 }
 
 
-(function linkSplitRouteDrops(){
- for(const obj of [LOCS, LOCS_JOHTO]){
- const byName = {};
- for(const id in obj){ const loc=obj[id]; if(!loc||!loc.name) continue; (byName[loc.name]=byName[loc.name]||[]).push(id); }
- for(const name in byName){
- const ids = byName[name];
- if(ids.length < 2) continue;
- const primary = ids[0];
- const base = (ROUTE_DROPS[primary] || []).slice();
- for(const id of ids){ if(id !== primary) ROUTE_DROPS[id] = base; }
- }
- }
-})();
+applyRouteLinkGroups();
 
 
 (function populateJohtoWild(){
@@ -188,9 +228,9 @@ function getShopName(id){
  if(LOCS_JOHTO['jroute29']) LOCS_JOHTO['jroute29'].wild = [[161,3,6,'common'], [16,3,6,'common'], [19,3,6,'common'], [165,3,6,'common'], [187,3,6,'common']];
  if(LOCS_JOHTO['jroute30']) LOCS_JOHTO['jroute30'].wild = [[10,4,7,'common'], [13,4,7,'common'], [16,4,7,'common'], [161,4,7,'uncommon'], [165,4,7,'common'], [167,4,7,'common']];
  if(LOCS_JOHTO['jroute31']) LOCS_JOHTO['jroute31'].wild = [[163,5,9,'common'], [41,5,9,'common'], [19,5,9,'uncommon'], [165,5,9,'common'], [167,5,9,'common']];
- if(LOCS_JOHTO['jroute32']) LOCS_JOHTO['jroute32'].wild = [[19,6,10,'common'], [69,6,10,'common'], [41,6,10,'uncommon'], [211,8,14,'uncommon'], [194,7,11,'uncommon'], [179,6,10,'common']];
- if(LOCS_JOHTO['jroute32_mid']) LOCS_JOHTO['jroute32_mid'].wild = [[19, 6, 10, 'common'], [69, 6, 10, 'common'], [41, 6, 10, 'uncommon']];
- if(LOCS_JOHTO['jroute32_south']) LOCS_JOHTO['jroute32_south'].wild = [[19, 6, 10, 'common'], [69, 6, 10, 'common'], [41, 6, 10, 'uncommon']];
+ if(LOCS_JOHTO['jroute32']) LOCS_JOHTO['jroute32'].wild = [[19,6,10,'common'],[69,6,10,'common'],[41,6,10,'uncommon'],[211,8,14,'uncommon'],[194,7,11,'uncommon'],[179,6,10,'common']];
+ if(LOCS_JOHTO['jroute32_mid']) LOCS_JOHTO['jroute32_mid'].wild = [[19,6,10,'common'],[69,6,10,'common'],[41,6,10,'uncommon'],[211,8,14,'uncommon'],[194,7,11,'uncommon'],[179,6,10,'common']];
+ if(LOCS_JOHTO['jroute32_south']) LOCS_JOHTO['jroute32_south'].wild = [[19,6,10,'common'],[69,6,10,'common'],[41,6,10,'uncommon'],[211,8,14,'uncommon'],[194,7,11,'uncommon'],[179,6,10,'common']];
  if(LOCS_JOHTO['unioncave']) LOCS_JOHTO['unioncave'].wild = [[41, 8, 12, 'common'], [74, 8, 12, 'common'], [95, 10, 14, 'rare']];
  if(LOCS_JOHTO['jroute33']) LOCS_JOHTO['jroute33'].wild = [[19, 9, 13, 'common'], [16, 9, 13, 'common']];
  if(LOCS_JOHTO['ilexforest']) LOCS_JOHTO['ilexforest'].wild = [[10,10,14,'common'], [13,10,14,'common'], [43,10,14,'common'], [69,11,15,'uncommon'], [204,10,14,'uncommon'], [214,10,14,'rare']];
@@ -231,6 +271,7 @@ function getShopName(id){
  if(LOCS_JOHTO['mtsilver']) LOCS_JOHTO['mtsilver'].wild = [[246, 40, 46, 'common'], [247, 42, 48, 'common'], [112, 40, 46, 'uncommon']];
  if(LOCS_JOHTO['tohjofalls']) LOCS_JOHTO['tohjofalls'].wild = [[129, 28, 34, 'common'], [130, 30, 36, 'rare']];
 })();
+applyRouteLinkGroups();
 
 
 const REGION_ORDER = ['kanto','johto','hoenn','sinnoh','unova','kalos','alola','galar','paldea'];
@@ -330,6 +371,9 @@ function isLeagueChampionId(champId){ return REGION_ORDER.some(region => getLeag
 
 
 const BOX_FILTER_DEFAULTS = {region:'all', type:'all', shiny:'all', evo:'all'};
+const FILTER_LEVEL_EVO_MAP = {1:2,2:3,4:5,5:6,7:8,8:9,10:11,11:12,13:14,14:15,16:17,17:18,19:20,21:22,23:24,27:28,29:30,32:33,41:42,43:44,46:47,48:49,50:51,52:53,54:55,56:57,60:61,63:64,64:65,66:67,67:68,69:70,72:73,74:75,75:76,77:78,79:80,81:82,84:85,86:87,88:89,92:93,93:94,96:97,98:99,100:101,104:105,109:110,111:112,116:117,118:119,129:130,138:139,140:141,147:148,148:149,113:242,152:153,153:154,155:156,156:157,158:159,159:160,161:162,163:164,165:166,167:168,170:171,172:25,173:35,174:39,175:176,177:178,179:180,180:181,183:184,187:188,188:189,194:195,204:205,209:210,216:217,218:219,220:221,223:224,228:229,231:232,236:237,238:124,239:125,240:126,246:247,247:248};
+const FILTER_STONE_EVO = {37:{firestone:38},58:{firestone:59},133:{firestone:136,waterstone:134,thunderstone:135},61:{waterstone:62,kings_rock:186},90:{waterstone:91},120:{waterstone:121},25:{thunderstone:26},44:{leafstone:45,sunstone:182},70:{leafstone:71},102:{leafstone:103},30:{moonstone:31},33:{moonstone:34},35:{moonstone:36},39:{moonstone:40},79:{kings_rock:200},95:{metal_coat:208},117:{dragon_scale:230},123:{metal_coat:212},137:{up_grade:233},191:{sunstone:192}};
+
 function ensureBoxFilters(){
  if(!G.boxFilters || typeof G.boxFilters !== 'object') G.boxFilters = {...BOX_FILTER_DEFAULTS};
  for(const key in BOX_FILTER_DEFAULTS){ if(G.boxFilters[key] == null) G.boxFilters[key] = BOX_FILTER_DEFAULTS[key]; }
@@ -374,18 +418,24 @@ function getBoxFilterTypes(){
  }
  return Array.from(types);
 }
+function isEvolutionTargetObtained(targetId){
+ const nid = Number(targetId);
+ return !!(speciesOwned(nid) || (G && G.pokedex && G.pokedex[nid] && G.pokedex[nid].caught));
+}
 function canPokemonEvolveToUnowned(p){
  if(!p) return false;
  const id = Number(p.id);
- const levelMap = (typeof LEVEL_EVO_MAP !== 'undefined') ? LEVEL_EVO_MAP : (globalThis.LEVEL_EVO_MAP || {});
- const stoneMap = (typeof STONE_EVO !== 'undefined') ? STONE_EVO : (globalThis.STONE_EVO || {});
+ const globalLevelMap = (typeof LEVEL_EVO_MAP !== 'undefined') ? LEVEL_EVO_MAP : (globalThis.LEVEL_EVO_MAP || {});
+ const globalStoneMap = (typeof STONE_EVO !== 'undefined') ? STONE_EVO : (globalThis.STONE_EVO || {});
+ const levelMap = Object.keys(globalLevelMap || {}).length ? globalLevelMap : FILTER_LEVEL_EVO_MAP;
+ const stoneMap = Object.keys(globalStoneMap || {}).length ? globalStoneMap : FILTER_STONE_EVO;
  const lvlTarget = levelMap[id] || levelMap[String(id)] || null;
- if(lvlTarget && !speciesOwned(lvlTarget)) return true;
+ if(lvlTarget && !isEvolutionTargetObtained(lvlTarget)) return true;
  const stones = stoneMap[id] || stoneMap[String(id)] || null;
  if(stones){
   for(const stoneKey in stones){
    const target = stones[stoneKey];
-   if(!speciesOwned(target)) return true;
+   if(!isEvolutionTargetObtained(target)) return true;
   }
  }
  return false;
@@ -450,6 +500,7 @@ if (typeof ensureBoxFilters !== 'undefined' && typeof window !== 'undefined') wi
 if (typeof getPokemonRegion !== 'undefined' && typeof window !== 'undefined') window.getPokemonRegion = getPokemonRegion;
 if (typeof getUnlockedRegionsForPokedex !== 'undefined' && typeof window !== 'undefined') window.getUnlockedRegionsForPokedex = getUnlockedRegionsForPokedex;
 if (typeof getUnlockedDexIds !== 'undefined' && typeof window !== 'undefined') window.getUnlockedDexIds = getUnlockedDexIds;
+if (typeof isEvolutionTargetObtained !== 'undefined' && typeof window !== 'undefined') window.isEvolutionTargetObtained = isEvolutionTargetObtained;
 if (typeof canPokemonEvolveToUnowned !== 'undefined' && typeof window !== 'undefined') window.canPokemonEvolveToUnowned = canPokemonEvolveToUnowned;
 if (typeof pokemonMatchesBoxFilters !== 'undefined' && typeof window !== 'undefined') window.pokemonMatchesBoxFilters = pokemonMatchesBoxFilters;
 if (typeof applyPokemonBoxFilters !== 'undefined' && typeof window !== 'undefined') window.applyPokemonBoxFilters = applyPokemonBoxFilters;
@@ -489,6 +540,8 @@ if (typeof recalcPokeStats !== 'undefined' && typeof window !== 'undefined') win
 if (typeof renderStars !== 'undefined' && typeof window !== 'undefined') window.renderStars = renderStars;
 if (typeof isShinyDisplay !== 'undefined' && typeof window !== 'undefined') window.isShinyDisplay = isShinyDisplay;
 if (typeof xpForLevel !== 'undefined' && typeof window !== 'undefined') window.xpForLevel = xpForLevel;
+if (typeof applyRouteLinkGroups !== 'undefined' && typeof window !== 'undefined') window.applyRouteLinkGroups = applyRouteLinkGroups;
+if (typeof getLinkedRouteIds !== 'undefined' && typeof window !== 'undefined') window.getLinkedRouteIds = getLinkedRouteIds;
 if (typeof getShopName !== 'undefined' && typeof window !== 'undefined') window.getShopName = getShopName;
 
 export {};

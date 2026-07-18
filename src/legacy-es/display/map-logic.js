@@ -67,9 +67,13 @@ function locGateMessage(id){
 
 function locCleared(id){
  const loc = _regLocs()[id]; if(!loc) return false;
- return (((G.wildWinsByLoc||{})[id])||0) >= (loc.minWins||0);
+ const need = loc.minWins || 0;
+ if(need <= 0) return true;
+ const idsToCheck = (typeof getLinkedRouteIds === 'function') ? getLinkedRouteIds(id) : [id];
+ let wins = 0;
+ for(const locId of idsToCheck){ wins += ((G.wildWinsByLoc||{})[locId])||0; }
+ return wins >= need;
 }
-
 function locReachable(id, _seen){
  const loc = _regLocs()[id]; if(!loc) return false;
  if(id === G.location) return true;

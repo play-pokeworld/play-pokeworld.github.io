@@ -106,7 +106,9 @@ function getCurrentRegionLocs(){
  return reg === 'johto' ? LOCS_JOHTO : LOCS;
 }
 function getLocObj(id){
- return LOCS[id] || LOCS_JOHTO[id] || null;
+ const reg = (typeof G !== 'undefined' && G && G.region) ? G.region : 'kanto';
+ if(reg === 'johto' && LOCS_JOHTO && LOCS_JOHTO[id]) return LOCS_JOHTO[id];
+ return LOCS[id] || (LOCS_JOHTO ? LOCS_JOHTO[id] : null) || null;
 }
 
 const CHAMP_EN = {

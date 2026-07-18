@@ -153,9 +153,9 @@ async function onEnemyFaint(){
  resumeBattleActions();
  return;
  }
+ }
  await champVictory();
  return;
- }
  }
  }
 

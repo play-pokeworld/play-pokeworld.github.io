@@ -9,17 +9,17 @@ window.L_fr_quests = {
 },
 "0": {
 "title":"Le Début d'une Aventure",
-"desc":"Bienvenue dans PokéWorld ! Rendez-vous sur la Route 1 et remportez 3 combats sauvages pour prouver votre talent.",
+"desc":"Bienvenue dans PokéWorld ! Rendez-vous sur la Route 1 et mettez K.O. 3 Pokémon sauvages pour prouver votre talent.",
 "rewardDesc":"500₽ + 5 Baies Oran"
 },
 "40": {
 "title":"La Forêt de Jadielle",
-"desc":"Explorez la Forêt de Jade et remportez 5 combats sauvages pour aiguiser votre equipe.",
+"desc":"Explorez la Forêt de Jade et mettez K.O. 5 Pokémon sauvages pour aiguiser votre equipe.",
 "rewardDesc":"600₽ + 5 Baies Sitrus"
 },
 "41": {
 "title":"La Route 22 Sauvage",
-"desc":"La Route 22 regorge de Pokémon. Remportez 6 combats sauvages pour devenir plus fort !",
+"desc":"La Route 22 regorge de Pokémon. Mettez K.O. 6 Pokémon sauvages pour devenir plus fort !",
 "rewardDesc":"700₽ + 5 Baies Ceriz"
 },
 "1": {
@@ -29,12 +29,12 @@ window.L_fr_quests = {
 },
 "42": {
 "title":"L'Énigme du Mont Sélénite",
-"desc":"Traversez la Route 3 et remportez 6 combats sauvages pour progresser vers le Mont Sélénite.",
+"desc":"Traversez la Route 3 et mettez K.O. 6 Pokémon sauvages pour progresser vers le Mont Sélénite.",
 "rewardDesc":"1 500₽ + 1 Pierre Lune"
 },
 "43": {
 "title":"La Traversée de la Route 4",
-"desc":"La Route 4 mene a Azuria. Remportez 6 combats sauvages pour forger votre equipe.",
+"desc":"La Route 4 mene a Azuria. Mettez K.O. 6 Pokémon sauvages pour forger votre equipe.",
 "rewardDesc":"1 200₽ + 5 Baies Prine"
 },
 "2": {
@@ -49,12 +49,12 @@ window.L_fr_quests = {
 },
 "44": {
 "title":"Les Eaux de la Route 5",
-"desc":"La Route 5 relie Azuria a Safrania. Remportez 6 combats sauvages pour vous entrainer.",
+"desc":"La Route 5 relie Azuria a Safrania. Mettez K.O. 6 Pokémon sauvages pour vous entrainer.",
 "rewardDesc":"1 500₽ + 5 Baies Sitrus"
 },
 "45": {
 "title":"La Route 6 — Vers Carmin",
-"desc":"Empruntez la Route 6 vers Carmin sur Mer et remportez 6 combats sauvages.",
+"desc":"Empruntez la Route 6 vers Carmin sur Mer et mettez K.O. 6 Pokémon sauvages.",
 "rewardDesc":"1 500₽ + 5 Baies Oran"
 },
 "5": {
@@ -64,22 +64,22 @@ window.L_fr_quests = {
 },
 "4": {
 "title":"Les Secrets de la Cave Taupiqueur",
-"desc":"Traversez la Route 11 et explorez la mystérieuse Cave Taupiqueur. Remportez 5 combats sauvages pour renforcer votre equipe.",
+"desc":"Traversez la Route 11 et explorez la mystérieuse Cave Taupiqueur. Mettez K.O. 5 Pokémon sauvages pour renforcer votre equipe.",
 "rewardDesc":"3 000₽ + 5 Baies Sitrus"
 },
 "46": {
 "title":"L'Écluse de la Route 9 et 10",
-"desc":"Les Routes 9 et 10 menent au nord. Remportez 6 combats sauvages pour progresser.",
+"desc":"Les Routes 9 et 10 menent au nord. Mettez K.O. 6 Pokémon sauvages pour progresser.",
 "rewardDesc":"2 000₽ + 5 Baies Prine"
 },
 "47": {
 "title":"Le Tunnel Rocheux",
-"desc":"Francchissez le Tunnel Rocheux vers Lavanville. Remportez 6 combats sauvages dans l'obscurite.",
+"desc":"Francchissez le Tunnel Rocheux vers Lavanville. Mettez K.O. 6 Pokémon sauvages dans l'obscurite.",
 "rewardDesc":"2 000₽ + 5 Baies Ceriz"
 },
 "7": {
 "title":"Les Fantômes de la Tour de Lavanville",
-"desc":"Rejoignez Lavanville et bravez les esprits de la Tour Pokémon. Remportez 5 combats pour obtenir 3 Super Bonbons.",
+"desc":"Rejoignez Lavanville et bravez les esprits de la Tour Pokémon. Mettez K.O. 5 Pokémon sauvages pour obtenir 3 Super Bonbons.",
 "rewardDesc":"4 500₽ + 3 Super Bonbons + Poké Flûte"
 },
 
@@ -90,7 +90,7 @@ window.L_fr_quests = {
 },
 "48": {
 "title":"La Route 7 — Céladopole",
-"desc":"La Route 7 relie Safrania a Céladopole. Remportez 6 combats sauvages pour vous preparer a l'arene.",
+"desc":"La Route 7 relie Safrania a Céladopole. Mettez K.O. 6 Pokémon sauvages pour vous preparer a l'arene.",
 "rewardDesc":"2 500₽ + 1 Pierre Plante"
 },
 "8": {
@@ -115,7 +115,7 @@ window.L_fr_quests = {
 },
 "50": {
 "title":"Les Îles Écume — Route 19 et 20",
-"desc":"Partez vers les Chenaux 19 et 20 au sud de Parmanie. Remportez 8 combats sauvages en mer.",
+"desc":"Partez vers les Chenaux 19 et 20 au sud de Parmanie. Mettez K.O. 8 Pokémon sauvages en mer.",
 "rewardDesc":"4 000₽ + 10 Baies Oran"
 },
 "11": {
@@ -130,7 +130,7 @@ window.L_fr_quests = {
 },
 "51": {
 "title":"La Route 23 — L'Avant-Garde",
-"desc":"La Route 23 garde l'acces a la Route Victoire. Remportez 10 combats sauvages pour vous aguerri.",
+"desc":"La Route 23 garde l'acces a la Route Victoire. Mettez K.O. 10 Pokémon sauvages pour vous aguerri.",
 "rewardDesc":"5 000₽ + Mouchoir Choix"
 },
 "13": {
@@ -150,7 +150,7 @@ window.L_fr_quests = {
 },
 "16": {
 "title":"L'Oiseau de Feu de la Route Victoire",
-"desc":"Traversez les epreuves de la Route Victoire (Grotte) et remportez 10 combats pour defier Sulfura !",
+"desc":"Traversez les epreuves de la Route Victoire (Grotte) et mettez K.O. 10 Pokémon sauvages pour defier Sulfura !",
 "rewardDesc":"Sulfura (Légendaire )"
 },
 "17": {
@@ -174,84 +174,89 @@ window.L_fr_quests = {
 "rewardDesc":"300₽ + 5 Baies Oran"
 },
 "20": {
-"title":"21. L'Appel de Johto — Bourg Geon",
-"desc":"Bienvenue en Johto ! Parlez au Prof. Orme à Bourg Geon puis remportez 3 combats sauvages pour débuter.",
+"title":"Route 29 : premiers K.O. à Johto",
+"desc":"Quittez Bourg Geon vers la Route 29 et mettez K.O. 5 Pokémon sauvages pour atteindre Ville Griotte.",
 "rewardDesc":"500₽ + 5 Baies Oran"
 },
 "21": {
-"title":"22. L'Épreuve d'Argenta (Johto)",
-"desc":"Rendez-vous à Argenta et défiez Albert (Falkner) dans son arène Vol pour le Badge Zéphyr !",
+"title":"Mauville : le Badge Zéphyr",
+"desc":"Rendez-vous à Mauville et défiez Albert dans son Arène Vol pour obtenir le Badge Zéphyr.",
 "rewardDesc":"1 000₽ + 5 Baies Sitrus"
 },
 "22": {
-"title":"23. La Forêt d'Écorcia",
-"desc":"À Écorcia, triomphez d'Hector (Bugsy) pour le Badge Essaim !",
-"rewardDesc":"1 500₽ + Bandeau Muscle"
+"title":"Écorcia : le Badge Essaim",
+"desc":"Traversez les Caves Jumelles, rejoignez Écorcia et battez Hector dans son Arène Insecte.",
+"rewardDesc":"1 500₽ + 1 Bandeau Muscle"
 },
 "23": {
-"title":"24. La Plaine de Doublonville",
-"desc":"À Doublonville, battez Blanche (Whitney) pour le Badge Plaine !",
-"rewardDesc":"2 000₽ + Sable Doux"
+"title":"Doublonville : le Badge Plaine",
+"desc":"Traversez le Bois aux Chênes et la Route 34, puis battez Blanche à Doublonville pour obtenir le Badge Plaine.",
+"rewardDesc":"2 000₽ + 1 Sable Doux"
 },
 "24": {
-"title":"25. La Brume de Rosalia",
-"desc":"À Rosalia, vainquez Mortimer (Morty) pour le Badge Brume !",
-"rewardDesc":"2 500₽ + Mouchoir Choix"
+"title":"Rosalia : le Badge Brume",
+"desc":"Passez par la Route 36, rejoignez Rosalia et vainquez Mortimer dans son Arène Spectre.",
+"rewardDesc":"2 500₽ + 1 Mouchoir Choix"
 },
 "25": {
-"title":"26. Le Choc d'Irisia",
-"desc":"Sur l'Île d'Irisia, battez Chuck pour le Badge Choc !",
-"rewardDesc":"3 000₽ + Joyau Pouvoir"
+"title":"Irisia : le Badge Choc",
+"desc":"Depuis Oliville, traversez les Chenaux 40 et 41 jusqu’à Irisia, puis battez Chuck.",
+"rewardDesc":"3 000₽ + 1 Joyau Pouvoir"
 },
 "26": {
-"title":"27. Le Minéral d'Oliville",
-"desc":"À Oliville, triomphez de Jasmine pour le Badge Minéral !",
-"rewardDesc":"3 500₽ + Restes"
+"title":"Oliville : le Badge Minéral",
+"desc":"Retournez à Oliville et triomphez de Jasmine dans son Arène Acier pour obtenir le Badge Minéral.",
+"rewardDesc":"3 500₽ + 1 Restes"
 },
 "27": {
-"title":"28. Le Glacier d'Acajou",
-"desc":"À Acajou, vainquez Frédo (Pryce) pour le Badge Glacier !",
-"rewardDesc":"4 000₽ + Lunettes Choix"
+"title":"Acajou : le Badge Glacier",
+"desc":"Rejoignez Acajou après Rosalia et le Mont Creuset, puis vainquez Frédo pour obtenir le Badge Glacier.",
+"rewardDesc":"4 000₽ + 1 Lunettes Choix"
 },
 "28": {
-"title":"29. Le Lever d'Ébénelle",
-"desc":"À Ébénelle, affrontez Sandra (Clair) pour le Badge Lever et devenir Maître de Johto !",
+"title":"Ébénelle : le Badge Lever",
+"desc":"Traversez la Route de Glace jusqu’à Ébénelle et affrontez Sandra pour obtenir le Badge Lever.",
 "rewardDesc":"8 000₽ + Bandeau Choix + 5 Super Bonbons"
 },
+"29": {
+"title":"Plateau Indigo : Ligue Johto",
+"desc":"Après les 8 badges de Johto, traversez les Routes 26 et 27 puis la Route Victoire pour triompher de la Ligue Johto.",
+"rewardDesc":"18 000₽ + 10 Super Bonbons + objets Choix"
+},
 "60": {
-"title":"La Tour Cendrée : le Mystère des Bêtes",
-"desc":"À Rosalia, explorez la Tour Cendrée et affrontez 8 Pokémon pour libérer les trois Bêtes Légendaires : Raikou, Entei et Suicune !",
+"title":"Rosalia : la Tour Cendrée",
+"desc":"À Rosalia, explorez la Tour Cendrée et mettez K.O. 8 Pokémon sauvages pour lever le mystère des Bêtes légendaires.",
 "rewardDesc":"3 000₽ + 5 Super Bonbons"
 },
 "61": {
 "title":"Raikou, la Foudre Pourpre",
-"desc":"Sillonnez la Route 44 et remportez 10 combats pour faire surgir Raikou, la Bête Foudre !",
-"rewardDesc":"Raikou (Légendaire )"
+"desc":"Sur la Route 44, mettez K.O. 10 Pokémon sauvages pour faire surgir Raikou.",
+"rewardDesc":"Raikou + 5 000₽"
 },
 "62": {
 "title":"Entei, le Volcan Vivant",
-"desc":"Parcourez la Route 28 et remportez 10 combats pour réveiller Entei, la Bête Feu !",
-"rewardDesc":"Entei (Légendaire )"
+"desc":"Sur la Route 28, mettez K.O. 10 Pokémon sauvages pour réveiller Entei.",
+"rewardDesc":"Entei + 5 000₽"
 },
 "63": {
-"title":"Suicune, l'Aurore Boréale",
-"desc":"Parcourez la Route 42 et remportez 10 combats pour croiser Suicune, la Bête Eau !",
-"rewardDesc":"Suicune (Légendaire )"
+"title":"Suicune, l’Aurore Boréale",
+"desc":"Sur la Route 42, mettez K.O. 10 Pokémon sauvages pour croiser Suicune.",
+"rewardDesc":"Suicune + 5 000₽"
 },
 "64": {
-"title":"Les Tourb'Îles : Lugia, Gardien des Mers",
-"desc":"Plongez aux Tourb'Îles et remportez 10 combats pour éveiller Lugia, le Pokémon de la Mer !",
-"rewardDesc":"Lugia (Légendaire )"
+"title":"Tourb’Îles : Lugia",
+"desc":"Aux Tourb’Îles, mettez K.O. 10 Pokémon sauvages pour éveiller Lugia, gardien des mers.",
+"rewardDesc":"Lugia + 8 000₽"
 },
 "65": {
-"title":"La Tour Carillon : Ho-Oh, Oiseau de Feu",
-"desc":"Gravissez la Tour Carillon à Rosalia et remportez 10 combats pour faire apparaître Ho-Oh, l'Oiseau de Feu !",
-"rewardDesc":"Ho-Oh (Légendaire )"
+"title":"Tour Carillon : Ho-Oh",
+"desc":"À la Tour Carillon de Rosalia, mettez K.O. 10 Pokémon sauvages pour faire apparaître Ho-Oh.",
+"rewardDesc":"Ho-Oh + 8 000₽"
 },
 "66": {
-"title":"Le Bois aux Chênes : Celebi, Pokémon Fabuleux",
-"desc":"Dans le Bois aux Chênes, remportez 12 combats pour rencontrer Celebi, le Pokémon du Temps !",
-"rewardDesc":"Celebi (Fabuleux )"
+"title":"Bois aux Chênes : Celebi",
+"desc":"Dans le Bois aux Chênes, mettez K.O. 12 Pokémon sauvages pour rencontrer Celebi.",
+"rewardDesc":"Celebi + 10 000₽"
 }
 },
 "side": {
@@ -262,7 +267,7 @@ window.L_fr_quests = {
 },
 "s2": {
 "title":"Apprenti Dresseur",
-"desc":"Le Dresseur Red vous met au défi : remportez 15 combats sur la Route 2.",
+"desc":"Le Dresseur Red vous met au défi : mettez K.O. 15 Pokémon sauvages sur la Route 2.",
 "rewardDesc":"1 200₽ + 5 Baies Prine"
 },
 "s3": {
@@ -307,12 +312,12 @@ window.L_fr_quests = {
 },
 "s11": {
 "title":"Gardien de Jadielle",
-"desc":"Le Gardien Jo défie les newcomers : remportez 12 combats sauvages sur la Route 22 !",
+"desc":"Le Gardien Jo défie les newcomers : mettez K.O. 12 Pokémon sauvages sur la Route 22 !",
 "rewardDesc":"1 800₽ + 5 Baies Ceriz"
 },
 "s12": {
 "title":"Chercheuse d'Azuria",
-"desc":"La Chercheuse Lys traque les Pokémon rares : remportez 12 combats sur la Route 9 !",
+"desc":"La Chercheuse Lys traque les Pokémon rares : mettez K.O. 12 Pokémon sauvages sur la Route 9 !",
 "rewardDesc":"2 200₽ + 5 Baies Sitrus"
 },
 "s13": {
@@ -327,12 +332,12 @@ window.L_fr_quests = {
 },
 "s15": {
 "title":"Gardien de Lavanville",
-"desc":"Le Gardien Tom arpente la Route 12 : remportez 12 combats sauvages !",
+"desc":"Le Gardien Tom arpente la Route 12 : mettez K.O. 12 Pokémon sauvages !",
 "rewardDesc":"2 400₽ + 4 Super Bonbons"
 },
 "s30": {
 "title":"La Team Rocket à Acajou",
-"desc":"Le Scientifique Pierre-Jean traque la Team Rocket : remportez 10 combats à Acajou !",
+"desc":"Le Scientifique Pierre-Jean traque la Team Rocket : mettez K.O. 10 Pokémon sauvages à Acajou !",
 "rewardDesc":"2 500₽ + Upgrade"
 },
 "s31": {
@@ -394,7 +399,7 @@ window.L_fr_quests = {
 },
 "r2": {
 "title":"Dresseur Itinérant",
-"desc":"Remportez 25 combats sauvages (n'importe où).",
+"desc":"Mettez K.O. 25 Pokémon sauvages (n'importe où).",
 "rewardDesc":"5 Baies Prine"
 },
 "r3": {
@@ -409,7 +414,7 @@ window.L_fr_quests = {
 },
 "r5": {
 "title":"Explorateur Aguerri",
-"desc":"Remportez 50 combats sauvages (n'importe où).",
+"desc":"Mettez K.O. 50 Pokémon sauvages (n'importe où).",
 "rewardDesc":"1 Mouchoir Choix"
 },
 "r6": {
@@ -419,17 +424,17 @@ window.L_fr_quests = {
 },
 "r30": {
 "title":"Patrouille Route 29",
-"desc":"Remportez 15 combats sauvages sur la Route 29.",
+"desc":"Mettez K.O. 15 Pokémon sauvages sur la Route 29.",
 "rewardDesc":"5 Baies Oran"
 },
 "r31": {
 "title":"Patrouille Route 34",
-"desc":"Remportez 20 combats sauvages sur la Route 34.",
+"desc":"Mettez K.O. 20 Pokémon sauvages sur la Route 34.",
 "rewardDesc":"1 Eau Mystique"
 },
 "r32": {
 "title":"Patrouille Route 45",
-"desc":"Remportez 20 combats sauvages sur la Route 45.",
+"desc":"Mettez K.O. 20 Pokémon sauvages sur la Route 45.",
 "rewardDesc":"1 Crocdure"
 },
 "r33": {
@@ -439,17 +444,17 @@ window.L_fr_quests = {
 },
 "r34": {
 "title":"Antre Noir",
-"desc":"Remportez 12 combats dans la Antre Noir.",
+"desc":"Mettez K.O. 12 Pokémon sauvages dans la Antre Noir.",
 "rewardDesc":"1 Rocher Royal"
 },
 "r35": {
 "title":"Bois aux Chênes",
-"desc":"Remportez 15 combats dans le Bois aux Chênes.",
+"desc":"Mettez K.O. 15 Pokémon sauvages dans le Bois aux Chênes.",
 "rewardDesc":"1 Graine Miracle"
 },
 "r36": {
 "title":"Pêcheur du Chenal 40",
-"desc":"Remportez 15 combats sur le Chenal 40.",
+"desc":"Mettez K.O. 15 Pokémon sauvages sur le Chenal 40.",
 "rewardDesc":"1 Eau Mystique"
 },
 "r37": {

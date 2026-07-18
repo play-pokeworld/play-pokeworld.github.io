@@ -99,9 +99,15 @@ function unlockShinyForSpecies(id){
  }
 }
 function locCompletion(locId){
- const loc=getLocObj(locId);
- if(!loc||!loc.wild||!loc.wild.length) return null;
- const ids=[...new Set(loc.wild.map(w=>w[0]))];
+ const idsToCheck = (typeof getLinkedRouteIds === 'function') ? getLinkedRouteIds(locId) : [locId];
+ const species = new Set();
+ for(const id of idsToCheck){
+  const loc = getLocObj(id);
+  if(!loc || !loc.wild || !loc.wild.length) continue;
+  for(const w of loc.wild) species.add(Number(w[0]));
+ }
+ if(!species.size) return null;
+ const ids = Array.from(species).filter(Boolean);
  const caught=ids.filter(id=>speciesOwned(id)).length;
  return {caught, total:ids.length, ids};
 }

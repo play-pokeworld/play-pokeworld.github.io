@@ -80,7 +80,8 @@ function renderLocInfo(el){
 
  
  if(loc.type!=='town' && (loc.minWins||0) > 0 && loc.wild && loc.wild.length){
- const curWins = ((G.wildWinsByLoc||{})[G.location]||0);
+ const linkedIds = (typeof getLinkedRouteIds === 'function') ? getLinkedRouteIds(G.location) : [G.location];
+ const curWins = linkedIds.reduce((sum,id)=>sum+(((G.wildWinsByLoc||{})[id])||0),0);
  const need = loc.minWins;
  const nextZoneIds = (typeof zonesUnlockedByClearing === 'function') ? zonesUnlockedByClearing(G.location) : [];
  const nextZones = nextZoneIds.map(id => getLocName(id));

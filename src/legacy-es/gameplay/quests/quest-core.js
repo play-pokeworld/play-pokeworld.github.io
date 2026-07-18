@@ -12,7 +12,12 @@ function syncActiveMain(){
  G.activeQuests = G.activeQuests.filter(i=>i.cat!=='main');
  const def = getCurrentMain(region);
  if(def){
- const prog = (G.mainProgress && G.mainProgress[region]!=null) ? G.mainProgress[region] : 0;
+ let prog = (G.mainProgress && G.mainProgress[region]!=null) ? G.mainProgress[region] : 0;
+ if(def.type === 'defeat_wild'){
+  const beforeBaseline = G.questBaselines && G.questBaselines[region] && G.questBaselines[region][String(def.id)] != null;
+  ensureQuestBaseline(region, def);
+  if(!beforeBaseline) prog = 0;
+ }
  G.activeQuests.push({qid:def.id, cat:'main', progress:prog, done:false});
  }
 }
@@ -62,6 +67,40 @@ function markVisited(mapId){
  try{ if(document.getElementById('map-svg')) renderMap(); }catch(_){}
 }
 
+function getQuestWildWinCount(def){
+ if(!def || def.type !== 'defeat_wild' || !def.loc) return 0;
+ const group = (typeof locGroup === 'function') ? locGroup(def.loc) : def.loc;
+ let total = 0;
+ for(const locId in (G.wildWinsByLoc || {})){
+  const locGroupId = (typeof locGroup === 'function') ? locGroup(locId) : locId;
+  if(locGroupId === group) total += (G.wildWinsByLoc[locId] || 0);
+ }
+ return total;
+}
+function ensureQuestBaseline(region, def){
+ if(!def || def.type !== 'defeat_wild') return null;
+ if(!G.questBaselines || typeof G.questBaselines !== 'object') G.questBaselines = {};
+ if(!G.questBaselines[region]) G.questBaselines[region] = {};
+ const key = String(def.id);
+ if(G.questBaselines[region][key] == null){
+  G.questBaselines[region][key] = getQuestWildWinCount(def);
+  if(!G._questBaselineMigration) G._questBaselineMigration = {};
+  G._questBaselineMigration[region+'_'+key] = true;
+  if(G.mainProgress && G.mainProgress[region] != null) G.mainProgress[region] = 0;
+ }
+ return G.questBaselines[region][key] || 0;
+}
+function questProgressValue(inst, def){
+ if(!def || !inst) return 0;
+ if(def.type === 'defeat_wild'){
+  const region = def.region || (G && G.region) || 'kanto';
+  const baseline = ensureQuestBaseline(region, def) || 0;
+  const afterStart = Math.max(0, getQuestWildWinCount(def) - baseline);
+  return Math.max(inst.progress || 0, afterStart);
+ }
+ return inst.progress || 0;
+}
+
 
 function questDone(inst, def){
  if(!def) return false;
@@ -72,11 +111,11 @@ function questDone(inst, def){
  }
  if(def.type==='badge_or_loc'){
  if(def.targetBadge && G.badges.includes(def.targetBadge)) return true;
- return (inst.progress||0) >= (def.target||1);
+ return questProgressValue(inst, def) >= (def.target||1);
  }
- if(def.type==='talk') return (inst.progress||0) >= (def.target||1);
+ if(def.type==='talk') return questProgressValue(inst, def) >= (def.target||1);
  if(def.type==='item') return !!(def.requiredItem && G.inventory && G.inventory[def.requiredItem] > 0);
- return (inst.progress||0) >= (def.target||1);
+ return questProgressValue(inst, def) >= (def.target||1);
 }
 
 function advanceQuests(type, loc, amount){
@@ -98,7 +137,7 @@ function advanceQuests(type, loc, amount){
  if(def && def.region===region && def.type===type && !mainInst.done){
  if(locMatches(def, type, loc)){
  mainInst.progress = (mainInst.progress||0) + amt;
- G.mainProgress[region] = mainInst.progress;
+ G.mainProgress[region] = questProgressValue(mainInst, def);
  }
  }
  }
@@ -152,6 +191,7 @@ function claimQuest(qid, cat){
  const idx = chain.findIndex(q=>q.id===inst.qid);
  if(idx>=0) G.mainStep[region] = idx+1;
  G.mainProgress[region] = 0;
+ if(G.questBaselines && G.questBaselines[region]) delete G.questBaselines[region][String(inst.qid)];
  
  G.activeQuests = G.activeQuests.filter(i=>!(i.cat==='main'));
  syncActiveMain();
@@ -218,6 +258,9 @@ if (typeof getMainQuestDef !== 'undefined' && typeof window !== 'undefined') win
 if (typeof getSideQuestDef !== 'undefined' && typeof window !== 'undefined') window.getSideQuestDef = getSideQuestDef;
 if (typeof locGroup !== 'undefined' && typeof window !== 'undefined') window.locGroup = locGroup;
 if (typeof markVisited !== 'undefined' && typeof window !== 'undefined') window.markVisited = markVisited;
+if (typeof getQuestWildWinCount !== 'undefined' && typeof window !== 'undefined') window.getQuestWildWinCount = getQuestWildWinCount;
+if (typeof ensureQuestBaseline !== 'undefined' && typeof window !== 'undefined') window.ensureQuestBaseline = ensureQuestBaseline;
+if (typeof questProgressValue !== 'undefined' && typeof window !== 'undefined') window.questProgressValue = questProgressValue;
 if (typeof questDone !== 'undefined' && typeof window !== 'undefined') window.questDone = questDone;
 if (typeof advanceQuests !== 'undefined' && typeof window !== 'undefined') window.advanceQuests = advanceQuests;
 if (typeof locMatches !== 'undefined' && typeof window !== 'undefined') window.locMatches = locMatches;
