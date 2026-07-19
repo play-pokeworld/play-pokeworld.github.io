@@ -27,3 +27,4 @@ if (typeof TYPE_COLORS !== 'undefined' && typeof window !== 'undefined') window.
 if (typeof CHART !== 'undefined' && typeof window !== 'undefined') window.CHART = CHART;
 
 export {};
+

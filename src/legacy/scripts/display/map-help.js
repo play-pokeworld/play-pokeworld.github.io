@@ -34,3 +34,4 @@ function toggleMapHelp(){
  }
  m.classList.toggle('open');
 }
+

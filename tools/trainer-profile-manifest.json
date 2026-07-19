@@ -1,0 +1,659 @@
+{
+  "note": "Pokeclicker trainer profile sprites used for staff/profile visuals.",
+  "sourceBase": "https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/",
+  "outputDir": "src/assets/images/trainers/profil",
+  "sprites": [
+    {
+      "file": "trainer-0.png",
+      "sourcePath": "src/assets/images/profile/trainer-0.png"
+    },
+    {
+      "file": "trainer-1.png",
+      "sourcePath": "src/assets/images/profile/trainer-1.png"
+    },
+    {
+      "file": "trainer-10.png",
+      "sourcePath": "src/assets/images/profile/trainer-10.png"
+    },
+    {
+      "file": "trainer-100.png",
+      "sourcePath": "src/assets/images/profile/trainer-100.png"
+    },
+    {
+      "file": "trainer-101.png",
+      "sourcePath": "src/assets/images/profile/trainer-101.png"
+    },
+    {
+      "file": "trainer-102.png",
+      "sourcePath": "src/assets/images/profile/trainer-102.png"
+    },
+    {
+      "file": "trainer-103.png",
+      "sourcePath": "src/assets/images/profile/trainer-103.png"
+    },
+    {
+      "file": "trainer-104.png",
+      "sourcePath": "src/assets/images/profile/trainer-104.png"
+    },
+    {
+      "file": "trainer-105.png",
+      "sourcePath": "src/assets/images/profile/trainer-105.png"
+    },
+    {
+      "file": "trainer-106.png",
+      "sourcePath": "src/assets/images/profile/trainer-106.png"
+    },
+    {
+      "file": "trainer-107.png",
+      "sourcePath": "src/assets/images/profile/trainer-107.png"
+    },
+    {
+      "file": "trainer-108.png",
+      "sourcePath": "src/assets/images/profile/trainer-108.png"
+    },
+    {
+      "file": "trainer-109.png",
+      "sourcePath": "src/assets/images/profile/trainer-109.png"
+    },
+    {
+      "file": "trainer-11.png",
+      "sourcePath": "src/assets/images/profile/trainer-11.png"
+    },
+    {
+      "file": "trainer-110.png",
+      "sourcePath": "src/assets/images/profile/trainer-110.png"
+    },
+    {
+      "file": "trainer-111.png",
+      "sourcePath": "src/assets/images/profile/trainer-111.png"
+    },
+    {
+      "file": "trainer-112.png",
+      "sourcePath": "src/assets/images/profile/trainer-112.png"
+    },
+    {
+      "file": "trainer-113.png",
+      "sourcePath": "src/assets/images/profile/trainer-113.png"
+    },
+    {
+      "file": "trainer-114.png",
+      "sourcePath": "src/assets/images/profile/trainer-114.png"
+    },
+    {
+      "file": "trainer-115.png",
+      "sourcePath": "src/assets/images/profile/trainer-115.png"
+    },
+    {
+      "file": "trainer-116.png",
+      "sourcePath": "src/assets/images/profile/trainer-116.png"
+    },
+    {
+      "file": "trainer-117.png",
+      "sourcePath": "src/assets/images/profile/trainer-117.png"
+    },
+    {
+      "file": "trainer-118.png",
+      "sourcePath": "src/assets/images/profile/trainer-118.png"
+    },
+    {
+      "file": "trainer-119.png",
+      "sourcePath": "src/assets/images/profile/trainer-119.png"
+    },
+    {
+      "file": "trainer-12.png",
+      "sourcePath": "src/assets/images/profile/trainer-12.png"
+    },
+    {
+      "file": "trainer-120.png",
+      "sourcePath": "src/assets/images/profile/trainer-120.png"
+    },
+    {
+      "file": "trainer-121.png",
+      "sourcePath": "src/assets/images/profile/trainer-121.png"
+    },
+    {
+      "file": "trainer-122.png",
+      "sourcePath": "src/assets/images/profile/trainer-122.png"
+    },
+    {
+      "file": "trainer-123.png",
+      "sourcePath": "src/assets/images/profile/trainer-123.png"
+    },
+    {
+      "file": "trainer-124.png",
+      "sourcePath": "src/assets/images/profile/trainer-124.png"
+    },
+    {
+      "file": "trainer-125.png",
+      "sourcePath": "src/assets/images/profile/trainer-125.png"
+    },
+    {
+      "file": "trainer-126.png",
+      "sourcePath": "src/assets/images/profile/trainer-126.png"
+    },
+    {
+      "file": "trainer-127.png",
+      "sourcePath": "src/assets/images/profile/trainer-127.png"
+    },
+    {
+      "file": "trainer-128.png",
+      "sourcePath": "src/assets/images/profile/trainer-128.png"
+    },
+    {
+      "file": "trainer-129.png",
+      "sourcePath": "src/assets/images/profile/trainer-129.png"
+    },
+    {
+      "file": "trainer-13.png",
+      "sourcePath": "src/assets/images/profile/trainer-13.png"
+    },
+    {
+      "file": "trainer-130.png",
+      "sourcePath": "src/assets/images/profile/trainer-130.png"
+    },
+    {
+      "file": "trainer-131.png",
+      "sourcePath": "src/assets/images/profile/trainer-131.png"
+    },
+    {
+      "file": "trainer-132.png",
+      "sourcePath": "src/assets/images/profile/trainer-132.png"
+    },
+    {
+      "file": "trainer-133.png",
+      "sourcePath": "src/assets/images/profile/trainer-133.png"
+    },
+    {
+      "file": "trainer-134.png",
+      "sourcePath": "src/assets/images/profile/trainer-134.png"
+    },
+    {
+      "file": "trainer-135.png",
+      "sourcePath": "src/assets/images/profile/trainer-135.png"
+    },
+    {
+      "file": "trainer-136.png",
+      "sourcePath": "src/assets/images/profile/trainer-136.png"
+    },
+    {
+      "file": "trainer-137.png",
+      "sourcePath": "src/assets/images/profile/trainer-137.png"
+    },
+    {
+      "file": "trainer-138.png",
+      "sourcePath": "src/assets/images/profile/trainer-138.png"
+    },
+    {
+      "file": "trainer-139.png",
+      "sourcePath": "src/assets/images/profile/trainer-139.png"
+    },
+    {
+      "file": "trainer-14.png",
+      "sourcePath": "src/assets/images/profile/trainer-14.png"
+    },
+    {
+      "file": "trainer-140.png",
+      "sourcePath": "src/assets/images/profile/trainer-140.png"
+    },
+    {
+      "file": "trainer-141.png",
+      "sourcePath": "src/assets/images/profile/trainer-141.png"
+    },
+    {
+      "file": "trainer-142.png",
+      "sourcePath": "src/assets/images/profile/trainer-142.png"
+    },
+    {
+      "file": "trainer-143.png",
+      "sourcePath": "src/assets/images/profile/trainer-143.png"
+    },
+    {
+      "file": "trainer-144.png",
+      "sourcePath": "src/assets/images/profile/trainer-144.png"
+    },
+    {
+      "file": "trainer-145.png",
+      "sourcePath": "src/assets/images/profile/trainer-145.png"
+    },
+    {
+      "file": "trainer-146.png",
+      "sourcePath": "src/assets/images/profile/trainer-146.png"
+    },
+    {
+      "file": "trainer-147.png",
+      "sourcePath": "src/assets/images/profile/trainer-147.png"
+    },
+    {
+      "file": "trainer-148.png",
+      "sourcePath": "src/assets/images/profile/trainer-148.png"
+    },
+    {
+      "file": "trainer-149.png",
+      "sourcePath": "src/assets/images/profile/trainer-149.png"
+    },
+    {
+      "file": "trainer-15.png",
+      "sourcePath": "src/assets/images/profile/trainer-15.png"
+    },
+    {
+      "file": "trainer-150.png",
+      "sourcePath": "src/assets/images/profile/trainer-150.png"
+    },
+    {
+      "file": "trainer-151.png",
+      "sourcePath": "src/assets/images/profile/trainer-151.png"
+    },
+    {
+      "file": "trainer-152.png",
+      "sourcePath": "src/assets/images/profile/trainer-152.png"
+    },
+    {
+      "file": "trainer-153.png",
+      "sourcePath": "src/assets/images/profile/trainer-153.png"
+    },
+    {
+      "file": "trainer-154.png",
+      "sourcePath": "src/assets/images/profile/trainer-154.png"
+    },
+    {
+      "file": "trainer-155.png",
+      "sourcePath": "src/assets/images/profile/trainer-155.png"
+    },
+    {
+      "file": "trainer-156.png",
+      "sourcePath": "src/assets/images/profile/trainer-156.png"
+    },
+    {
+      "file": "trainer-157.png",
+      "sourcePath": "src/assets/images/profile/trainer-157.png"
+    },
+    {
+      "file": "trainer-158.png",
+      "sourcePath": "src/assets/images/profile/trainer-158.png"
+    },
+    {
+      "file": "trainer-159.png",
+      "sourcePath": "src/assets/images/profile/trainer-159.png"
+    },
+    {
+      "file": "trainer-16.png",
+      "sourcePath": "src/assets/images/profile/trainer-16.png"
+    },
+    {
+      "file": "trainer-160.png",
+      "sourcePath": "src/assets/images/profile/trainer-160.png"
+    },
+    {
+      "file": "trainer-161.png",
+      "sourcePath": "src/assets/images/profile/trainer-161.png"
+    },
+    {
+      "file": "trainer-162.png",
+      "sourcePath": "src/assets/images/profile/trainer-162.png"
+    },
+    {
+      "file": "trainer-17.png",
+      "sourcePath": "src/assets/images/profile/trainer-17.png"
+    },
+    {
+      "file": "trainer-18.png",
+      "sourcePath": "src/assets/images/profile/trainer-18.png"
+    },
+    {
+      "file": "trainer-19.png",
+      "sourcePath": "src/assets/images/profile/trainer-19.png"
+    },
+    {
+      "file": "trainer-2.png",
+      "sourcePath": "src/assets/images/profile/trainer-2.png"
+    },
+    {
+      "file": "trainer-20.png",
+      "sourcePath": "src/assets/images/profile/trainer-20.png"
+    },
+    {
+      "file": "trainer-21.png",
+      "sourcePath": "src/assets/images/profile/trainer-21.png"
+    },
+    {
+      "file": "trainer-22.png",
+      "sourcePath": "src/assets/images/profile/trainer-22.png"
+    },
+    {
+      "file": "trainer-23.png",
+      "sourcePath": "src/assets/images/profile/trainer-23.png"
+    },
+    {
+      "file": "trainer-24.png",
+      "sourcePath": "src/assets/images/profile/trainer-24.png"
+    },
+    {
+      "file": "trainer-25.png",
+      "sourcePath": "src/assets/images/profile/trainer-25.png"
+    },
+    {
+      "file": "trainer-26.png",
+      "sourcePath": "src/assets/images/profile/trainer-26.png"
+    },
+    {
+      "file": "trainer-27.png",
+      "sourcePath": "src/assets/images/profile/trainer-27.png"
+    },
+    {
+      "file": "trainer-28.png",
+      "sourcePath": "src/assets/images/profile/trainer-28.png"
+    },
+    {
+      "file": "trainer-29.png",
+      "sourcePath": "src/assets/images/profile/trainer-29.png"
+    },
+    {
+      "file": "trainer-3.png",
+      "sourcePath": "src/assets/images/profile/trainer-3.png"
+    },
+    {
+      "file": "trainer-30.png",
+      "sourcePath": "src/assets/images/profile/trainer-30.png"
+    },
+    {
+      "file": "trainer-31.png",
+      "sourcePath": "src/assets/images/profile/trainer-31.png"
+    },
+    {
+      "file": "trainer-32.png",
+      "sourcePath": "src/assets/images/profile/trainer-32.png"
+    },
+    {
+      "file": "trainer-33.png",
+      "sourcePath": "src/assets/images/profile/trainer-33.png"
+    },
+    {
+      "file": "trainer-34.png",
+      "sourcePath": "src/assets/images/profile/trainer-34.png"
+    },
+    {
+      "file": "trainer-35.png",
+      "sourcePath": "src/assets/images/profile/trainer-35.png"
+    },
+    {
+      "file": "trainer-36.png",
+      "sourcePath": "src/assets/images/profile/trainer-36.png"
+    },
+    {
+      "file": "trainer-37.png",
+      "sourcePath": "src/assets/images/profile/trainer-37.png"
+    },
+    {
+      "file": "trainer-38.png",
+      "sourcePath": "src/assets/images/profile/trainer-38.png"
+    },
+    {
+      "file": "trainer-39.png",
+      "sourcePath": "src/assets/images/profile/trainer-39.png"
+    },
+    {
+      "file": "trainer-4.png",
+      "sourcePath": "src/assets/images/profile/trainer-4.png"
+    },
+    {
+      "file": "trainer-40.png",
+      "sourcePath": "src/assets/images/profile/trainer-40.png"
+    },
+    {
+      "file": "trainer-41.png",
+      "sourcePath": "src/assets/images/profile/trainer-41.png"
+    },
+    {
+      "file": "trainer-42.png",
+      "sourcePath": "src/assets/images/profile/trainer-42.png"
+    },
+    {
+      "file": "trainer-43.png",
+      "sourcePath": "src/assets/images/profile/trainer-43.png"
+    },
+    {
+      "file": "trainer-44.png",
+      "sourcePath": "src/assets/images/profile/trainer-44.png"
+    },
+    {
+      "file": "trainer-45.png",
+      "sourcePath": "src/assets/images/profile/trainer-45.png"
+    },
+    {
+      "file": "trainer-46.png",
+      "sourcePath": "src/assets/images/profile/trainer-46.png"
+    },
+    {
+      "file": "trainer-47.png",
+      "sourcePath": "src/assets/images/profile/trainer-47.png"
+    },
+    {
+      "file": "trainer-48.png",
+      "sourcePath": "src/assets/images/profile/trainer-48.png"
+    },
+    {
+      "file": "trainer-49.png",
+      "sourcePath": "src/assets/images/profile/trainer-49.png"
+    },
+    {
+      "file": "trainer-5.png",
+      "sourcePath": "src/assets/images/profile/trainer-5.png"
+    },
+    {
+      "file": "trainer-50.png",
+      "sourcePath": "src/assets/images/profile/trainer-50.png"
+    },
+    {
+      "file": "trainer-51.png",
+      "sourcePath": "src/assets/images/profile/trainer-51.png"
+    },
+    {
+      "file": "trainer-52.png",
+      "sourcePath": "src/assets/images/profile/trainer-52.png"
+    },
+    {
+      "file": "trainer-53.png",
+      "sourcePath": "src/assets/images/profile/trainer-53.png"
+    },
+    {
+      "file": "trainer-54.png",
+      "sourcePath": "src/assets/images/profile/trainer-54.png"
+    },
+    {
+      "file": "trainer-55.png",
+      "sourcePath": "src/assets/images/profile/trainer-55.png"
+    },
+    {
+      "file": "trainer-56.png",
+      "sourcePath": "src/assets/images/profile/trainer-56.png"
+    },
+    {
+      "file": "trainer-57.png",
+      "sourcePath": "src/assets/images/profile/trainer-57.png"
+    },
+    {
+      "file": "trainer-58.png",
+      "sourcePath": "src/assets/images/profile/trainer-58.png"
+    },
+    {
+      "file": "trainer-59.png",
+      "sourcePath": "src/assets/images/profile/trainer-59.png"
+    },
+    {
+      "file": "trainer-6.png",
+      "sourcePath": "src/assets/images/profile/trainer-6.png"
+    },
+    {
+      "file": "trainer-60.png",
+      "sourcePath": "src/assets/images/profile/trainer-60.png"
+    },
+    {
+      "file": "trainer-61.png",
+      "sourcePath": "src/assets/images/profile/trainer-61.png"
+    },
+    {
+      "file": "trainer-62.png",
+      "sourcePath": "src/assets/images/profile/trainer-62.png"
+    },
+    {
+      "file": "trainer-63.png",
+      "sourcePath": "src/assets/images/profile/trainer-63.png"
+    },
+    {
+      "file": "trainer-64.png",
+      "sourcePath": "src/assets/images/profile/trainer-64.png"
+    },
+    {
+      "file": "trainer-65.png",
+      "sourcePath": "src/assets/images/profile/trainer-65.png"
+    },
+    {
+      "file": "trainer-66.png",
+      "sourcePath": "src/assets/images/profile/trainer-66.png"
+    },
+    {
+      "file": "trainer-67.png",
+      "sourcePath": "src/assets/images/profile/trainer-67.png"
+    },
+    {
+      "file": "trainer-68.png",
+      "sourcePath": "src/assets/images/profile/trainer-68.png"
+    },
+    {
+      "file": "trainer-69.png",
+      "sourcePath": "src/assets/images/profile/trainer-69.png"
+    },
+    {
+      "file": "trainer-7.png",
+      "sourcePath": "src/assets/images/profile/trainer-7.png"
+    },
+    {
+      "file": "trainer-70.png",
+      "sourcePath": "src/assets/images/profile/trainer-70.png"
+    },
+    {
+      "file": "trainer-71.png",
+      "sourcePath": "src/assets/images/profile/trainer-71.png"
+    },
+    {
+      "file": "trainer-72.png",
+      "sourcePath": "src/assets/images/profile/trainer-72.png"
+    },
+    {
+      "file": "trainer-73.png",
+      "sourcePath": "src/assets/images/profile/trainer-73.png"
+    },
+    {
+      "file": "trainer-74.png",
+      "sourcePath": "src/assets/images/profile/trainer-74.png"
+    },
+    {
+      "file": "trainer-75.png",
+      "sourcePath": "src/assets/images/profile/trainer-75.png"
+    },
+    {
+      "file": "trainer-76.png",
+      "sourcePath": "src/assets/images/profile/trainer-76.png"
+    },
+    {
+      "file": "trainer-77.png",
+      "sourcePath": "src/assets/images/profile/trainer-77.png"
+    },
+    {
+      "file": "trainer-78.png",
+      "sourcePath": "src/assets/images/profile/trainer-78.png"
+    },
+    {
+      "file": "trainer-79.png",
+      "sourcePath": "src/assets/images/profile/trainer-79.png"
+    },
+    {
+      "file": "trainer-8.png",
+      "sourcePath": "src/assets/images/profile/trainer-8.png"
+    },
+    {
+      "file": "trainer-80.png",
+      "sourcePath": "src/assets/images/profile/trainer-80.png"
+    },
+    {
+      "file": "trainer-81.png",
+      "sourcePath": "src/assets/images/profile/trainer-81.png"
+    },
+    {
+      "file": "trainer-82.png",
+      "sourcePath": "src/assets/images/profile/trainer-82.png"
+    },
+    {
+      "file": "trainer-83.png",
+      "sourcePath": "src/assets/images/profile/trainer-83.png"
+    },
+    {
+      "file": "trainer-84.png",
+      "sourcePath": "src/assets/images/profile/trainer-84.png"
+    },
+    {
+      "file": "trainer-85.png",
+      "sourcePath": "src/assets/images/profile/trainer-85.png"
+    },
+    {
+      "file": "trainer-86.png",
+      "sourcePath": "src/assets/images/profile/trainer-86.png"
+    },
+    {
+      "file": "trainer-87.png",
+      "sourcePath": "src/assets/images/profile/trainer-87.png"
+    },
+    {
+      "file": "trainer-88.png",
+      "sourcePath": "src/assets/images/profile/trainer-88.png"
+    },
+    {
+      "file": "trainer-89.png",
+      "sourcePath": "src/assets/images/profile/trainer-89.png"
+    },
+    {
+      "file": "trainer-9.png",
+      "sourcePath": "src/assets/images/profile/trainer-9.png"
+    },
+    {
+      "file": "trainer-90.png",
+      "sourcePath": "src/assets/images/profile/trainer-90.png"
+    },
+    {
+      "file": "trainer-91.png",
+      "sourcePath": "src/assets/images/profile/trainer-91.png"
+    },
+    {
+      "file": "trainer-92.png",
+      "sourcePath": "src/assets/images/profile/trainer-92.png"
+    },
+    {
+      "file": "trainer-93.png",
+      "sourcePath": "src/assets/images/profile/trainer-93.png"
+    },
+    {
+      "file": "trainer-94.png",
+      "sourcePath": "src/assets/images/profile/trainer-94.png"
+    },
+    {
+      "file": "trainer-95.png",
+      "sourcePath": "src/assets/images/profile/trainer-95.png"
+    },
+    {
+      "file": "trainer-96.png",
+      "sourcePath": "src/assets/images/profile/trainer-96.png"
+    },
+    {
+      "file": "trainer-97.png",
+      "sourcePath": "src/assets/images/profile/trainer-97.png"
+    },
+    {
+      "file": "trainer-98.png",
+      "sourcePath": "src/assets/images/profile/trainer-98.png"
+    },
+    {
+      "file": "trainer-99.png",
+      "sourcePath": "src/assets/images/profile/trainer-99.png"
+    }
+  ]
+}

@@ -86,12 +86,12 @@ function openDexEntry(id){
      <div class="dex-detail-types">${typeSpan(t1)}${t2?typeSpan(t2):''}</div>
    </div>
    <div class="dex-detail-main">
-     <p class="dex-flavor">${desc || 'Description indisponible pour le moment.'}</p>
+     <p class="dex-flavor">${desc || (t('dict_description_unavailable') || 'Description unavailable for now.')}</p>
      ${getEvolutionMethodsHtml(id)}
-     <div class="dex-detail-section"><h3>Où le trouver</h3><div class="dict-chip-list">${sources.map(s=>`<span class="dict-chip">${s.label}</span>`).join('')}</div></div>
-     <div class="dex-detail-section"><h3>${t('pokedex_moves')}</h3><div class="dict-chip-list">${moves.length?moves.map(m=>`<span class="dict-chip" data-action="legacy-call" data-call="openMoveInfo" data-call-args="'${m}'">${getMoveName(m)||m}</span>`).join(''):'<span class="dict-muted">Aucune attaque renseignée.</span>'}</div></div>
-     <div class="dex-detail-section"><h3>${t('pokemon_talents')}</h3><div class="dict-chip-list">${tals.length?tals.map(tal=>`<span class="dict-chip" data-action="legacy-call" data-call="openAbilityInfo" data-call-args="'${tal}'">${TALENTS_FULL[tal]?.name||tal}</span>`).join(''):'<span class="dict-muted">Aucun talent renseigné</span>'}</div></div>
-     <div class="dex-detail-section"><h3>Stats de base</h3><div class="dex-stat-mini"><span>PV ${bhp}</span><span>ATK ${batk}</span><span>DEF ${bdef}</span><span>ASP ${bspa}</span><span>DSP ${bspd}</span><span>VIT ${bspe}</span></div></div>
+     <div class="dex-detail-section"><h3>${t('dict_where_find') || 'Where to find it'}</h3><div class="dict-chip-list">${sources.map(s=>`<span class="dict-chip">${s.label}</span>`).join('')}</div></div>
+     <div class="dex-detail-section"><h3>${t('pokedex_moves')}</h3><div class="dict-chip-list">${moves.length?moves.map(m=>`<span class="dict-chip" data-action="legacy-call" data-call="openMoveInfo" data-call-args="'${m}'">${getMoveName(m)||m}</span>`).join(''):`<span class="dict-muted">${t('dict_no_moves_listed') || 'No moves listed.'}</span>`}</div></div>
+     <div class="dex-detail-section"><h3>${t('pokemon_talents')}</h3><div class="dict-chip-list">${tals.length?tals.map(tal=>`<span class="dict-chip" data-action="legacy-call" data-call="openAbilityInfo" data-call-args="'${tal}'">${TALENTS_FULL[tal]?.name||tal}</span>`).join(''):`<span class="dict-muted">${t('dict_no_abilities_listed') || 'No abilities listed.'}</span>`}</div></div>
+     <div class="dex-detail-section"><h3>${t('dict_base_stats') || 'Base stats'}</h3><div class="dex-stat-mini"><span>PV ${bhp}</span><span>ATK ${batk}</span><span>DEF ${bdef}</span><span>ASP ${bspa}</span><span>DSP ${bspd}</span><span>VIT ${bspe}</span></div></div>
    </div>
  </div>`;
  document.getElementById('poke-modal').classList.add('open');
@@ -104,3 +104,4 @@ if (typeof renderPokedex !== 'undefined' && typeof window !== 'undefined') windo
 if (typeof openDexEntry !== 'undefined' && typeof window !== 'undefined') window.openDexEntry = openDexEntry;
 
 export {};
+

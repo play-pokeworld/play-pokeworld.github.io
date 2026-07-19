@@ -164,7 +164,7 @@ function statusColor(s){
 }
 
 function statusLabel(s){
- return {burn:'BRN',poison:'☠POI',badpoison:'☠TXQ',para:'PAR',sleep:'SOM',freeze:'🧊GEL',confuse:'💫CON'}[s]||s.toUpperCase();
+ return {burn:'bru',poison:'poi',badpoison:'tox',para:'par',sleep:'som',freeze:'gel',confuse:'con'}[s]||String(s||'').slice(0,3).toLowerCase();
 }
 
 
@@ -179,3 +179,4 @@ if (typeof statusColor !== 'undefined' && typeof window !== 'undefined') window.
 if (typeof statusLabel !== 'undefined' && typeof window !== 'undefined') window.statusLabel = statusLabel;
 
 export {};
+

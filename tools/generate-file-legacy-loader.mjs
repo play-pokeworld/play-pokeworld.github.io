@@ -28,3 +28,4 @@ const content = `(function () {
 `;
 fs.writeFileSync(path.join(root, 'src/legacy-loader.js'), content, 'utf8');
 console.log(`Generated src/legacy-loader.js from ${scriptPaths.length} scripts.`);
+

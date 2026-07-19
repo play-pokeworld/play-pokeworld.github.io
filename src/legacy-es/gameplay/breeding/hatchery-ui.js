@@ -1,9 +1,9 @@
 
 function renderHatcheryManagementTabs(active){
- return `<div class="management-tabs">
-  <button class="hbtn ${active==='upgrades'?'active':''}" data-action="legacy-call" data-call="openHatcheryManagementMenu" data-call-args="'upgrades'">⬆ ${t('management_upgrades')}</button>
-  <button class="hbtn ${active==='automation'?'active':''}" data-action="legacy-call" data-call="openHatcheryManagementMenu" data-call-args="'automation'">🤖 ${t('management_automation')}</button>
-  <button class="hbtn ${active==='trainers'?'active':''}" data-action="legacy-call" data-call="openHatcheryManagementMenu" data-call-args="'trainers'">🧑‍💼 ${t('hatchery_managers_title')}</button>
+ return `<div class="management-tabs ui-management-tabs">
+  ${typeof uiTabButtonHtml==='function' ? uiTabButtonHtml({label:t('management_upgrades'), icon:(typeof getIcon==='function'?getIcon('save',14):''), call:'openHatcheryManagementMenu', args:`'upgrades'`, active:active==='upgrades'}) : `<button class="hbtn ${active==='upgrades'?'active':''}" data-action="legacy-call" data-call="openHatcheryManagementMenu" data-call-args="'upgrades'">${t('management_upgrades')}</button>`}
+  ${typeof uiTabButtonHtml==='function' ? uiTabButtonHtml({label:t('management_automation'), icon:(typeof getIcon==='function'?getIcon('settings',14):''), call:'openHatcheryManagementMenu', args:`'automation'`, active:active==='automation'}) : `<button class="hbtn ${active==='automation'?'active':''}" data-action="legacy-call" data-call="openHatcheryManagementMenu" data-call-args="'automation'">${t('management_automation')}</button>`}
+  ${typeof uiTabButtonHtml==='function' ? uiTabButtonHtml({label:t('hatchery_managers_title'), icon:(typeof getIcon==='function'?getIcon('team',14):''), call:'openHatcheryManagementMenu', args:`'trainers'`, active:active==='trainers'}) : `<button class="hbtn ${active==='trainers'?'active':''}" data-action="legacy-call" data-call="openHatcheryManagementMenu" data-call-args="'trainers'">${t('hatchery_managers_title')}</button>`}
  </div>`;
 }
 function hatcheryAutomationCard(key, icon, descKey){
@@ -59,19 +59,19 @@ function openHatcheryManagementMenu(page='upgrades'){
   ? `${typeof renderStaffList==='function'?renderStaffList('hatchery'):''}`
   : page === 'automation'
   ? `<div class="automation-dashboard hatchery-auto-layout">
-      <div class="automation-toggle-row">${hatcheryAutomationCard('autoHatch', '🥚', 'automation_autoHatch_desc')}${hatcheryAutomationCard('autoSeedHatchery', '📦', 'automation_autoSeedHatchery_desc')}</div>
+      <div class="automation-toggle-row">${hatcheryAutomationCard('autoHatch', getIcon('hatchery',14), 'automation_autoHatch_desc')}${hatcheryAutomationCard('autoSeedHatchery', getIcon('box',14), 'automation_autoSeedHatchery_desc')}</div>
       <div class="automation-two-cols">
        <div class="automation-panel"><div class="queue-panel-head"><b>${t('filters_title')}</b><span>${t('sort_label')}</span></div>${hatcheryAutomationRulesHtml()}</div>
-       <div class="queue-panel"><div class="queue-panel-head"><b>${t('queue_waiting_list')}</b><span>${typeof getHatcheryQueueLimit==='function'?tr('queue_capacity', {count:(G.hatcheryQueue||[]).length, max:getHatcheryQueueLimit()}):''}</span></div><div class="queue-list">${typeof renderHatcheryQueuePreview==='function'?renderHatcheryQueuePreview():''}</div><div class="queue-actions"><button class="hbtn queue-build-btn" data-action="legacy-call" data-call="openUnifiedSelectorModal" data-call-args="'hatchery_queue'">➕ ${t('queue_add_from_box')}</button><button class="hbtn" data-action="legacy-call" data-call="clearHatcheryQueue" data-call-args="">${t('queue_clear')}</button></div></div>
+       <div class="queue-panel"><div class="queue-panel-head"><b>${t('queue_waiting_list')}</b><span>${typeof getHatcheryQueueLimit==='function'?tr('queue_capacity', {count:(G.hatcheryQueue||[]).length, max:getHatcheryQueueLimit()}):''}</span></div><div class="queue-list">${typeof renderHatcheryQueuePreview==='function'?renderHatcheryQueuePreview():''}</div><div class="queue-actions"><button class="hbtn queue-build-btn" data-action="legacy-call" data-call="openUnifiedSelectorModal" data-call-args="'hatchery_queue'">${typeof getIcon==='function'?getIcon('box',14):''} ${t('queue_add_from_box')}</button><button class="hbtn" data-action="legacy-call" data-call="clearHatcheryQueue" data-call-args="">${t('queue_clear')}</button></div></div>
       </div>
      </div>`
   : `<div class="upgrade-grid">
       <div class="upgrade-card ${slotsBought?'is-owned':''}"><div><b>${t('hatchery_slots_title')}</b><span>${maxSlots}/4</span></div>${slotsBought?`<b>${t('automation_owned')}</b>`:`<button class="hbtn purchase-btn" data-action="legacy-call" data-call="upgradeHatcherySlots" data-call-args="${upgradeCost}">${upgradeCost.toLocaleString()}₽</button>`}</div>
       <div class="upgrade-card ${queueCost?'':'is-owned'}"><div><b>${t('queue_size_title')}</b><span>${tr('queue_capacity', {count:(G.hatcheryQueue||[]).length, max:getHatcheryQueueLimit()})}</span></div>${queueCost?`<button class="hbtn purchase-btn" data-action="legacy-call" data-call="upgradeHatcheryQueueSize" data-call-args="">${queueCost.toLocaleString()}₽</button>`:`<b>${t('automation_owned')}</b>`}</div>
-      ${hatcheryAutomationUnlockCard('autoHatch','🥚')}
-      ${hatcheryAutomationUnlockCard('autoSeedHatchery','📦')}
+      ${hatcheryAutomationUnlockCard('autoHatch', getIcon('hatchery',14))}
+      ${hatcheryAutomationUnlockCard('autoSeedHatchery', getIcon('box',14))}
      </div>`;
- inner.innerHTML = `<div class="modal-title management-title"><div>⚙️ ${t('hatchery_management_title')}</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
+ inner.innerHTML = `<div class="modal-title management-title"><div>${typeof getIcon==='function'?getIcon('settings',14):''} ${t('hatchery_management_title')}</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
  <div class="management-shell management-hatchery">
   ${renderHatcheryManagementTabs(page)}
   <div class="management-content">${body}</div>
@@ -93,7 +93,7 @@ function renderHatcheryWindow(){
  return;
  }
  
- let headerHtml = `<div class="hatchery-upgrade-row"><button class="hbtn" data-action="legacy-call" data-call="openHatcheryUpgradeMenu" data-call-args="">⚙️ ${t('hatchery_management_button')}</button></div>`;
+ let headerHtml = `<div class="hatchery-upgrade-row"><button class="hbtn" data-action="legacy-call" data-call="openHatcheryUpgradeMenu" data-call-args="">${typeof getIcon==='function'?getIcon('settings',14):''} ${t('hatchery_management_button')}</button></div>`;
  
  const maxSlots = clamp(G.hatcheryMaxSlots || 1, 1, 4);
  if(!G.hatchery) G.hatchery = [null];
@@ -102,7 +102,7 @@ function renderHatcheryWindow(){
  for(let i=0; i<maxSlots; i++){
  const slot = G.hatchery[i];
  if(!slot){
- html += `<button class="hbtn extracted-bridge-style-029" data-action="legacy-call" data-call="openUnifiedSelectorModal" data-call-args="'hatchery'">➕ ${tr('hatchery_place_slot', {slot:i+1})}</button>`;
+ html += `<button class="hbtn extracted-bridge-style-029" data-action="legacy-call" data-call="openUnifiedSelectorModal" data-call-args="'hatchery'">${tr('hatchery_place_slot', {slot:i+1})}</button>`;
  } else {
  const p = slot.poke;
  const isFossil = !!slot.isFossil;
@@ -143,10 +143,10 @@ function renderFossilLab(el){
 
  if(!fossils.length){
  html += `<div class="extracted-template-style-148">
- <div class="extracted-template-style-134">⛏</div>
+ <div class="extracted-template-style-134">${typeof getIcon==='function'?getIcon('mine',20):''}</div>
  <b>${t('no_fossils_yet')}</b><br>
  <span class="extracted-template-style-033">${t('fossil_mine_hint')}</span>
- <div class="extracted-template-style-135"><button class="hbtn extracted-bridge-style-006" data-action="legacy-call" data-call="showTab" data-call-args="'mine'">⛏ ${t('go_to_mine')}</button></div>
+ <div class="extracted-template-style-135"><button class="hbtn extracted-bridge-style-006" data-action="legacy-call" data-call="showTab" data-call-args="'mine'">${typeof getIcon==='function'?getIcon('mine',14):''} ${t('go_to_mine')}</button></div>
  </div>`;
  el.innerHTML = html;
  return;
@@ -169,19 +169,19 @@ function renderFossilLab(el){
  </div>
  </div>
  <div class="extracted-template-style-151">
- <div>${spriteImg(pokeId,'🦖',{size: 60})}</div>
+ <div>${spriteImg(pokeId,'',{size: 60})}</div>
  <div>
  <div class="extracted-template-style-067">${seen ? pokeName : '???'} <span class="extracted-template-style-025">#${pokeId}</span></div>
  <div class="extracted-template-style-090">${t('revives_into')}</div>
  ${owned ? `<div class="extracted-template-style-152"> ${t('owned')}</div>` : ''}
  </div>
  </div>
- <button class="hbtn extracted-bridge-style-033" data-action="legacy-call" data-call="reviveFossil" data-call-args="'${f.key}'">🧬 ${t('revive')}${f.qty>1 ? ` (${f.qty})` : ''}</button>
+ <button class="hbtn extracted-bridge-style-033" data-action="legacy-call" data-call="reviveFossil" data-call-args="'${f.key}'">${t('revive')}${f.qty>1 ? ` (${f.qty})` : ''}</button>
  </div>`;
  });
  html += `</div>`;
  html += `<div class="extracted-template-style-153">
- 💡 ${t('fossil_lab_tip')}
+ ${t('fossil_lab_tip')}
  </div>`;
  el.innerHTML = html;
 }
@@ -201,3 +201,4 @@ if (typeof renderFossilLab !== 'undefined' && typeof window !== 'undefined') win
 if (typeof renderFossilLabCompact !== 'undefined' && typeof window !== 'undefined') window.renderFossilLabCompact = renderFossilLabCompact;
 
 export {};
+

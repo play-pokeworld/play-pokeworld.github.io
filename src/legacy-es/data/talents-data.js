@@ -33,3 +33,4 @@ var TALENT_DATA = {
 // --- Migrated to ES module, globals exposed ---
 
 export {};
+

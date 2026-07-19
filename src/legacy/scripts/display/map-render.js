@@ -18,10 +18,10 @@ function renderMap(){
  if(regSel && G && G.region){ regSel.value = G.region; if(typeof updateRegionSelectorLocks === 'function') updateRegionSelectorLocks(); }
  
  
- const mapWT = document.querySelector('#win-map .win-header-title');
+ const mapWT = document.getElementById('map-win-title');
  if(mapWT){
  const rName = G.region==='johto'?'Johto':'Kanto';
- mapWT.textContent = '⋮⋮ 🗺 ' + tr('map_title_name', {region:rName});
+ mapWT.textContent = tr('map_title_name', {region:rName});
  }
  const svg=document.getElementById('map-svg');
  if(svg) svg.setAttribute('viewBox','0 0 1600 960');
@@ -69,7 +69,7 @@ function renderMap(){
  : tr('locked_by_story', {current:G.storyIdx||0, required:storyReq});
  const title = isLocked?`${getLocName(id)} \u2014 ${reqStr}`:getLocName(id);
  rectsHTML+=`
- <g class="loc-node${isCurrent?' current':''}${isReachable?' adjacent':''}${isLocked?' locked':''}" data-action="legacy-call" data-call="clickLocation" data-call-args="'${id}'" data-style="cursor:${isLocked?'not-allowed':'pointer'}">
+ <g class="loc-node${isCurrent?' current':''}${isReachable?' adjacent':''}${isLocked?' locked':''}" data-action="legacy-call" data-call="clickLocation" data-call-args="'${id}'">
  <title>${title}</title>
  <rect x="${x0-2}"y="${y0-2}"width="${w+4}"height="${h+4}"rx="11"fill="#000"opacity="${isLocked?0.35:0.4}"/>
  <rect x="${x0}"y="${y0}"width="${w}"height="${h}"rx="9"fill="${color}"stroke="${stroke}"stroke-width="${sw}"/>
@@ -103,7 +103,7 @@ function renderMap(){
  const nx=loc.x + labelW/2 + 10, ny=loc.y - 13;
  rectsHTML+=`<g class="npc-node extracted-bridge-style-023" data-action="legacy-call-stop" data-call="openNpc" data-call-args="'${id}',${pni}"><title>${npcName}</title>`
  +`<circle cx="${nx}"cy="${ny}"r="11"fill="#7b3fa0"stroke="#fff"stroke-width="2"/>`
- +`<text x="${nx}"y="${ny+1}"text-anchor="middle"dominant-baseline="middle"font-size="13">🗣</text></g>`;
+ +`<text x="${nx}"y="${ny+1}"text-anchor="middle"dominant-baseline="middle"font-size="13">…</text></g>`;
  }
  }
  }
@@ -180,3 +180,4 @@ function refreshMapAndLoc(){
  try{ if(document.getElementById('map-svg')) renderMap(); }catch(e){}
  try{ if(_activeTab==='info'){ const tc=document.getElementById('tab-content'); if(tc) renderLocInfo(tc); } }catch(e){}
 }
+

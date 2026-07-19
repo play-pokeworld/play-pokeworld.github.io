@@ -47,7 +47,7 @@ function unlockTrainingMove(p){
  if(!p.trainingUnlockedMoves.includes(moveId)) p.trainingUnlockedMoves.push(moveId);
  if((p.moves||[]).length < 4){
    const mv = MOVES[moveId];
-   p.moves.push({id:moveId, pp:mv?.pp||10, maxPP:mv?.pp||10});
+   p.moves.push({id:moveId});
  }
  return moveId;
 }
@@ -281,7 +281,6 @@ function trainingCreateEnemyTeam(trainee, mode){
   enemy.currentHP = enemy.maxHP;
   enemy.status = null;
   enemy.statusTurns = 0;
-  if(enemy.moves) for(const m of enemy.moves) m.pp = m.maxPP || (MOVES[m.id]?.pp || 10);
  });
  return team.filter(Boolean);
 }
@@ -290,7 +289,6 @@ function trainingHealBetweenRounds(trainee){
  trainee.currentHP = trainee.maxHP;
  trainee.status = null;
  trainee.statusTurns = 0;
- if(trainee.moves) for(const m of trainee.moves) m.pp = m.maxPP || (MOVES[m.id]?.pp || 10);
 }
 function trainingStartNextOpponent(slotIndex){
  const slot = G.trainingSlots[slotIndex];
@@ -308,7 +306,6 @@ function trainingStartNextOpponent(slotIndex){
  enemy.currentHP = enemy.maxHP;
  enemy.status = null;
  enemy.statusTurns = 0;
- if(enemy.moves) for(const m of enemy.moves) m.pp = m.maxPP || (MOVES[m.id]?.pp || 10);
  tb.enemy = enemy;
  tb.pMoveIdx = 0;
  tb.eMoveIdx = 0;
@@ -421,12 +418,10 @@ function completeTrainingSlot(slotIndex, success=true){
  if(success){
   const rewardMsg = applyTrainingReward(trainee, mode);
   trainee.currentHP = trainee.maxHP;
-  if(trainee.moves) for(const m of trainee.moves) m.pp = m.maxPP || (MOVES[m.id]?.pp || 10);
   slot.lastResult = tr('training_slot_last_success', {mode:getTrainingModeLabel(mode), reward:rewardMsg || ''});
   notify(tr('training_complete', {reward:rewardMsg}), 'var(--green)');
  } else {
   trainee.currentHP = trainee.maxHP;
-  if(trainee.moves) for(const m of trainee.moves) m.pp = m.maxPP || (MOVES[m.id]?.pp || 10);
   slot.lastResult = tr('training_slot_last_failed', {mode:getTrainingModeLabel(mode)});
   notify(tr('training_slot_failed', {name:trainee.name}), 'var(--red)');
  }
@@ -528,7 +523,6 @@ function cancelTrainingSlot(slotIndex){
  const trainee = findPokemonByTrainingSlot(slot);
  if(trainee){
   trainee.currentHP = trainee.maxHP;
-  if(trainee.moves) for(const m of trainee.moves) m.pp = m.maxPP || (MOVES[m.id]?.pp || 10);
  }
  slot.active = false;
  slot.mode = null;
@@ -581,7 +575,7 @@ function renderTrainingBattlePanel(){
   if(row) row.innerHTML = '';
  }
  panel.classList.add('open');
- panel.innerHTML = `<div class="training-live-title">⚔️ ${t('training_live_title')}</div>` + activeSlots.map(({slot, i})=>{
+ panel.innerHTML = `<div class="training-live-title">${typeof getIcon==='function'?getIcon('battle',16):''} ${t('training_live_title')}</div>` + activeSlots.map(({slot, i})=>{
   const trainee = findPokemonByTrainingSlot(slot);
   const tb = slot.battle;
   if(!Array.isArray(tb.enemies) && tb.enemy) tb.enemies = [tb.enemy];
@@ -612,7 +606,7 @@ function renderTrainingBattlePanel(){
      <div class="training-live-cd"><div class="training-cd-fill" data-training-fill="enemy-cd" data-pct="${trainingCdPctValue(tb.eCd, tb.eCdMax)}"></div></div>
     </div>
    </div>
-   <button class="hbtn" data-action="legacy-call" data-call="cancelTrainingSlot" data-call-args="${i}">✖ ${t('training_slot_cancel')}</button>
+   <button class="hbtn" data-action="legacy-call" data-call="cancelTrainingSlot" data-call-args="${i}">${typeof getIcon==='function'?getIcon('close',14):''} ${t('training_slot_cancel')}</button>
   </div>`;
  }).join('');
  try{ if(typeof applyDynamicStyles === 'function') applyDynamicStyles(panel); }catch(_){}
@@ -955,7 +949,7 @@ function renderTrainingAutomationSlotCard(i){
  return `<div class="automation-card training-auto-slot-card ${cfg.enabled?'is-owned':''}">
   <button class="hbtn automation-toggle-btn ${cfg.enabled?'is-on':'is-off'}" data-action="legacy-call" data-call="toggleTrainingAutomationSlot" data-call-args="${i}"><span>${tr('training_slot_title',{slot:i+1})}</span><b>${cfg.enabled?t('automation_enabled'):t('automation_disabled')}</b></button>
   ${trainingAutomationRulesHtml(i, cfg)}
-  <div class="queue-panel"><div class="queue-panel-head"><b>${t('queue_waiting_list')}</b><span>${tr('queue_capacity', {count:(cfg.queue||[]).length, max:getTrainingQueueLimit()})}</span></div><div class="queue-list">${renderTrainingQueuePreview(i)}</div><div class="queue-actions"><button class="hbtn queue-build-btn" data-action="legacy-call" data-call="openUnifiedSelectorModal" data-call-args="'training_queue_${i}'">➕ ${t('queue_add_from_box')}</button><button class="hbtn" data-action="legacy-call" data-call="clearTrainingQueue" data-call-args="${i}">${t('queue_clear')}</button></div></div>
+  <div class="queue-panel"><div class="queue-panel-head"><b>${t('queue_waiting_list')}</b><span>${tr('queue_capacity', {count:(cfg.queue||[]).length, max:getTrainingQueueLimit()})}</span></div><div class="queue-list">${renderTrainingQueuePreview(i)}</div><div class="queue-actions"><button class="hbtn queue-build-btn" data-action="legacy-call" data-call="openUnifiedSelectorModal" data-call-args="'training_queue_${i}'">${typeof getIcon==='function'?getIcon('box',14):''} ${t('queue_add_from_box')}</button><button class="hbtn" data-action="legacy-call" data-call="clearTrainingQueue" data-call-args="${i}">${t('queue_clear')}</button></div></div>
  </div>`;
 }
 function trainingAutomationUnlockCard(i){
@@ -963,10 +957,10 @@ function trainingAutomationUnlockCard(i){
  return `<div class="upgrade-card ${purchased?'is-owned':''}"><div><b>${tr('training_slot_title',{slot:i+1})} · ${t('management_automation')}</b><span>${purchased?t('automation_owned'):tr('automation_buy_button', {price:TRAINING_AUTOMATION_SLOT_COST.toLocaleString()})}</span></div>${purchased?'':`<button class="hbtn purchase-btn" data-action="legacy-call" data-call="buyTrainingAutomationSlot" data-call-args="${i}">${t('buy_btn')}</button>`}</div>`;
 }
 function renderTrainingManagementTabs(active){
- return `<div class="management-tabs">
-  <button class="hbtn ${active==='upgrades'?'active':''}" data-action="legacy-call" data-call="openTrainingManagementMenu" data-call-args="'upgrades'">⬆ ${t('management_upgrades')}</button>
-  <button class="hbtn ${active==='automation'?'active':''}" data-action="legacy-call" data-call="openTrainingManagementMenu" data-call-args="'automation'">🤖 ${t('management_automation')}</button>
-  <button class="hbtn ${active==='trainers'?'active':''}" data-action="legacy-call" data-call="openTrainingManagementMenu" data-call-args="'trainers'">🧑‍🏫 ${t('training_trainers_title')}</button>
+ return `<div class="management-tabs ui-management-tabs">
+  ${typeof uiTabButtonHtml==='function' ? uiTabButtonHtml({label:t('management_upgrades'), icon:(typeof getIcon==='function'?getIcon('save',14):''), call:'openTrainingManagementMenu', args:`'upgrades'`, active:active==='upgrades'}) : `<button class="hbtn ${active==='upgrades'?'active':''}" data-action="legacy-call" data-call="openTrainingManagementMenu" data-call-args="'upgrades'">${t('management_upgrades')}</button>`}
+  ${typeof uiTabButtonHtml==='function' ? uiTabButtonHtml({label:t('management_automation'), icon:(typeof getIcon==='function'?getIcon('settings',14):''), call:'openTrainingManagementMenu', args:`'automation'`, active:active==='automation'}) : `<button class="hbtn ${active==='automation'?'active':''}" data-action="legacy-call" data-call="openTrainingManagementMenu" data-call-args="'automation'">${t('management_automation')}</button>`}
+  ${typeof uiTabButtonHtml==='function' ? uiTabButtonHtml({label:t('training_trainers_title'), icon:(typeof getIcon==='function'?getIcon('team',14):''), call:'openTrainingManagementMenu', args:`'trainers'`, active:active==='trainers'}) : `<button class="hbtn ${active==='trainers'?'active':''}" data-action="legacy-call" data-call="openTrainingManagementMenu" data-call-args="'trainers'">${t('training_trainers_title')}</button>`}
  </div>`;
 }
 function openTrainingManagementMenu(page='upgrades'){
@@ -988,7 +982,7 @@ function openTrainingManagementMenu(page='upgrades'){
       ${trainingAutomationUnlockCard(0)}
       ${trainingAutomationUnlockCard(1)}
      </div>`;
- inner.innerHTML = `<div class="modal-title management-title"><div>⚙️ ${t('training_management_title')}</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
+ inner.innerHTML = `<div class="modal-title management-title"><div>${typeof getIcon==='function'?getIcon('settings',14):''} ${t('training_management_title')}</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
  <div class="management-shell management-training">
   ${renderTrainingManagementTabs(page)}
   <div class="management-content">${body}</div>
@@ -1021,7 +1015,7 @@ function renderTrainingSlot(slotIndex){
   return `<div class="training-slot-card is-empty">
    <div class="training-slot-head"><b>${slotTitle}</b></div>
    <div class="training-slot-empty">${t('training_slot_empty')}</div>
-   <button class="hbtn" data-action="legacy-call" data-call="openTrainingSlotSelector" data-call-args="${slotIndex}">➕ ${t('training_slot_choose')}</button>
+   <button class="hbtn" data-action="legacy-call" data-call="openTrainingSlotSelector" data-call-args="${slotIndex}">${typeof getIcon==='function'?getIcon('box',14):''} ${t('training_slot_choose')}</button>
   </div>`;
  }
  if(!trainee.evs) trainee.evs = {hp:0, atk:0, def:0, spa:0, spd:0, spe:0};
@@ -1029,11 +1023,11 @@ function renderTrainingSlot(slotIndex){
  const active = slot && slot.active;
  const last = slot && slot.lastResult ? `<div class="training-slot-result">${slot.lastResult}</div>` : '';
  const actions = active
-  ? `<button class="hbtn" data-action="legacy-call" data-call="cancelTrainingSlot" data-call-args="${slotIndex}">✖ ${t('training_slot_cancel')}</button>`
+  ? `<button class="hbtn" data-action="legacy-call" data-call="cancelTrainingSlot" data-call-args="${slotIndex}">${typeof getIcon==='function'?getIcon('close',14):''} ${t('training_slot_cancel')}</button>`
   : `<button class="hbtn" data-action="legacy-call" data-call="openTrainingSlotSelector" data-call-args="${slotIndex}">${t('training_slot_change')}</button>${slot&&slot.uid?`<button class="hbtn" data-action="legacy-call" data-call="clearTrainingSlot" data-call-args="${slotIndex}">${t('remove')}</button>`:''}`;
  const autoState = (G.trainingAutomation && G.trainingAutomation.slots && G.trainingAutomation.slots[slotIndex]) ? G.trainingAutomation.slots[slotIndex] : {enabled:false};
  const autoPurchased = typeof isTrainingAutomationPurchased === 'function' && isTrainingAutomationPurchased(slotIndex);
- const autoBtn = `<button class="hbtn training-slot-auto-btn ${autoState.enabled?'is-on':'is-off'}" data-action="legacy-call" data-call="toggleTrainingAutomationSlot" data-call-args="${slotIndex}, false">🤖 ${autoPurchased ? (autoState.enabled?t('automation_enabled'):t('automation_disabled')) : tr('automation_buy_button', {price:TRAINING_AUTOMATION_SLOT_COST.toLocaleString()})}</button>`;
+ const autoBtn = `<button class="hbtn training-slot-auto-btn ${autoState.enabled?'is-on':'is-off'}" data-action="legacy-call" data-call="toggleTrainingAutomationSlot" data-call-args="${slotIndex}, false">${typeof getIcon==='function'?getIcon('settings',14):''} ${autoPurchased ? (autoState.enabled?t('automation_enabled'):t('automation_disabled')) : tr('automation_buy_button', {price:TRAINING_AUTOMATION_SLOT_COST.toLocaleString()})}</button>`;
  return `<div class="training-slot-card ${active?'is-active':''}">
   <div class="training-slot-head"><b>${slotTitle}</b><span>${active?t('training_slot_active'):t('ready')}</span></div>
   <div class="training-slot-pokemon">
@@ -1075,8 +1069,8 @@ function renderTrainingWindow(){
  const count = getTrainingSlotCount();
  const slotHtml = [];
  for(let i=0;i<count;i++) slotHtml.push(renderTrainingSlot(i));
- const lockedHint = !G.trainingMultiSlot ? `<div class="training-locked-slot"><b>${t('training_slot_locked')}</b><button class="hbtn" data-action="legacy-call" data-call="openTrainingUpgradeMenu" data-call-args="">⚙️ ${tr('training_multi_slot_buy', {price:TRAINING_MULTI_SLOT_COST.toLocaleString()})}</button></div>` : '';
- el.innerHTML = `<div class="hatchery-upgrade-row"><button class="hbtn" data-action="legacy-call" data-call="openTrainingManagementMenu" data-call-args="'upgrades'">⚙️ ${t('training_management_button')}</button></div>
+ const lockedHint = !G.trainingMultiSlot ? `<div class="training-locked-slot"><b>${t('training_slot_locked')}</b><button class="hbtn" data-action="legacy-call" data-call="openTrainingUpgradeMenu" data-call-args="">${typeof getIcon==='function'?getIcon('settings',14):''} ${tr('training_multi_slot_buy', {price:TRAINING_MULTI_SLOT_COST.toLocaleString()})}</button></div>` : '';
+ el.innerHTML = `<div class="hatchery-upgrade-row"><button class="hbtn" data-action="legacy-call" data-call="openTrainingManagementMenu" data-call-args="'upgrades'">${typeof getIcon==='function'?getIcon('settings',14):''} ${t('training_management_button')}</button></div>
  <div class="training-slot-grid">${slotHtml.join('')}${lockedHint}</div>`;
 }
 function startTrainingBattle(mode='ev', slotIndex=0){
@@ -1163,4 +1157,5 @@ if (typeof pickTrainingBots !== 'undefined' && typeof window !== 'undefined') wi
 if (typeof getTraineePoke !== 'undefined' && typeof window !== 'undefined') window.getTraineePoke = getTraineePoke;
 if (typeof renderTrainingWindow !== 'undefined' && typeof window !== 'undefined') window.renderTrainingWindow = renderTrainingWindow;
 if (typeof startTrainingBattle !== 'undefined' && typeof window !== 'undefined') window.startTrainingBattle = startTrainingBattle;
+
 

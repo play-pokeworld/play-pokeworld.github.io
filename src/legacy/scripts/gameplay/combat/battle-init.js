@@ -25,7 +25,6 @@ function startBattle(enemyPoke, isChamp, champId=null, champPokeList=null){
  mp.currentHP=mp.maxHP;
  mp.status=null;
  mp.statusTurns=0;
- if(mp.moves) for(const m of mp.moves) m.pp=m.maxPP;
  }
  battle.active=true;
  battle.isChamp=isChamp;
@@ -43,6 +42,12 @@ function startBattle(enemyPoke, isChamp, champId=null, champPokeList=null){
  battle.eMoveIdx=0;
  battle.pendingLeave=false;
  battle.pendingSwitchIdx=null;
+ battle.resolvingKO=false;
+ battle.trainerVisual=null;
+ battle.sessionWins=0;
+ battle.sessionPlayerKOs=0;
+ battle.sessionStartedAt=Date.now();
+ battle.sessionDamageByPokemon={};
  if(!isChamp){
  
  battle.sessionCatches=[];
@@ -191,4 +196,5 @@ if (typeof calcAttackCd !== 'undefined' && typeof window !== 'undefined') window
 if (typeof effectiveSpeed !== 'undefined' && typeof window !== 'undefined') window.effectiveSpeed = effectiveSpeed;
 if (typeof resetPlayerCd !== 'undefined' && typeof window !== 'undefined') window.resetPlayerCd = resetPlayerCd;
 if (typeof resetEnemyCd !== 'undefined' && typeof window !== 'undefined') window.resetEnemyCd = resetEnemyCd;
+
 

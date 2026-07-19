@@ -45,3 +45,4 @@ if (typeof typeSpan !== 'undefined' && typeof window !== 'undefined') window.typ
 if (typeof hpColor !== 'undefined' && typeof window !== 'undefined') window.hpColor = hpColor;
 
 export {};
+

@@ -92,14 +92,14 @@ function generatePokeCardHTML(p, i, options = {}) {
             ' data-context-call="openMoveInfo" data-context-args="\'' + m.id + '\'"' +
             ' title="' + t('context_info_touch') + '">' +
             '<span class="move-name">' + getMoveName(m.id) + '</span>' +
-            '<span class="move-type type-' + mv.type.toLowerCase() + '">' + mv.type + '</span>' +
+            '<span class="move-type type-' + mv.type.toLowerCase() + '">' + mv.type + '</span>' + battleMoveEffBadgeHtml(mv.type, isEnemy) +
             '</div>';
         } else {
           movesHtml += '<div class="poke-move"' +
             ' data-context-call="openMoveInfo" data-context-args="\'' + m.id + '\'"' +
             ' title="' + t('context_info_touch') + '">' +
             '<span class="move-name">' + getMoveName(m.id) + '</span>' +
-            '<span class="move-type type-' + mv.type.toLowerCase() + '">' + mv.type + '</span>' +
+            '<span class="move-type type-' + mv.type.toLowerCase() + '">' + mv.type + '</span>' + battleMoveEffBadgeHtml(mv.type, isEnemy) +
             '</div>';
         }
       } else {
@@ -160,6 +160,58 @@ function generatePokeCardHTML(p, i, options = {}) {
 }
 
 
+function battleMoveEffBadgeHtml(moveType, isEnemy){
+ try{
+  const target = isEnemy ? (typeof getActivePlayerPoke === 'function' ? getActivePlayerPoke() : null) : (battle && battle.enemyPoke);
+  if(!target || !moveType || typeof typeEff !== 'function') return '';
+  const eff = typeEff(moveType, target.type1, target.type2);
+  let label = '';
+  if(eff === 0) label = '×0';
+  else if(eff >= 4) label = '×4';
+  else if(eff >= 2) label = '×2';
+  else if(eff <= 0.25) label = '×¼';
+  else if(eff <= 0.5) label = '×½';
+  else label = '×1';
+  const cls = eff === 0 ? 'immune' : eff >= 2 ? 'super' : eff < 1 ? 'resist' : 'neutral';
+  return `<span class="move-eff-badge ${cls}">${label}</span>`;
+ }catch(_){ return ''; }
+}
+
+function trainerRoleLabel(role){
+ const key = 'trainer_role_' + String(role || 'trainer').toLowerCase();
+ const val = typeof t === 'function' ? t(key) : '';
+ return val && val !== key ? val : (role || 'trainer');
+}
+function trainerStyleLabel(style){
+ const key = 'trainer_style_' + String(style || '').toLowerCase().replace(/[^a-z0-9]+/g,'_');
+ const val = typeof t === 'function' ? t(key) : '';
+ return val && val !== key ? val : style;
+}
+function trainerVisualHtml(){
+ if(!battle || !battle.isChamp) return '';
+ let name = '';
+ let role = '';
+ let style = [];
+ let spriteKey = '';
+ if(battle.trainerVisual){
+  const visual = battle.trainerVisual;
+  const bid = battle.questTrainerBattleId || visual.id || visual.battleId || '';
+  name = bid && typeof getTrainerBattleName === 'function' ? getTrainerBattleName(bid) : (visual.name || '');
+  role = visual.role || '';
+  style = visual.style || [];
+  spriteKey = visual.sprite || (bid && typeof getTrainerSpriteKey === 'function' ? getTrainerSpriteKey(bid) : role);
+ } else if(battle.champId){
+  name = getChampName(battle.champId);
+  role = battle.champId === 'atoll' ? 'atoll' : ((typeof isLeagueChampionId === 'function' && isLeagueChampionId(battle.champId)) ? 'league' : 'gym');
+  const champ = CHAMPIONS[battle.champId];
+  style = (champ && champ.strategy) || [];
+  spriteKey = typeof getTrainerSpriteKey === 'function' ? getTrainerSpriteKey(battle.champId) : role;
+ }
+ if(!name && !role) return '';
+ const sprite = typeof trainerSpriteImg === 'function' ? trainerSpriteImg(spriteKey || role || 'trainer', 58) : `<span>${String(name||role||'?').slice(0,2).toUpperCase()}</span>`;
+ return `<div class="trainer-visual-card role-${String(role||'trainer').toLowerCase()}"><div class="trainer-sprite-placeholder">${sprite}</div><div><b>${name}</b><span>${trainerRoleLabel(role)}</span><div class="trainer-style-row">${(style||[]).slice(0,4).map(x=>`<em>${trainerStyleLabel(x)}</em>`).join('')}</div></div></div>`;
+}
+
 function renderBattleTeamRow() {
   if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
   const row = document.getElementById('battle-team-row');
@@ -168,7 +220,7 @@ function renderBattleTeamRow() {
   const e = battle.enemyPoke;
   const p = getActivePlayerPoke();
 
-  let html = '';
+  let html = trainerVisualHtml();
 
   
   if (e) {
@@ -236,7 +288,7 @@ function renderBattleLoot() {
   const itemEntries = Object.entries(battle.sessionItems || {}).filter(([, qty]) => Number(qty) > 0);
 
   if (!catches.length && !itemEntries.length) {
-    container.innerHTML = '<div class="extracted-template-style-103">Aucun butin pour le moment</div>';
+    container.innerHTML = '<div class="extracted-template-style-103">' + (t('no_loot_yet') || 'Aucun butin récolté pour le moment.') + '</div>';
     return;
   }
 
@@ -265,3 +317,14 @@ function renderBattleLoot() {
 
   container.innerHTML = parts.join('');
 }
+
+
+// --- Migrated to ES module, globals exposed ---
+if (typeof legacyClickAttributes !== 'undefined' && typeof window !== 'undefined') window.legacyClickAttributes = legacyClickAttributes;
+if (typeof legacyContextAttributes !== 'undefined' && typeof window !== 'undefined') window.legacyContextAttributes = legacyContextAttributes;
+if (typeof generatePokeCardHTML !== 'undefined' && typeof window !== 'undefined') window.generatePokeCardHTML = generatePokeCardHTML;
+if (typeof renderBattleTeamRow !== 'undefined' && typeof window !== 'undefined') window.renderBattleTeamRow = renderBattleTeamRow;
+if (typeof renderEnemyMoveBars !== 'undefined' && typeof window !== 'undefined') window.renderEnemyMoveBars = renderEnemyMoveBars;
+if (typeof renderBattleLoot !== 'undefined' && typeof window !== 'undefined') window.renderBattleLoot = renderBattleLoot;
+
+

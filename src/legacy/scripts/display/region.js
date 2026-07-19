@@ -54,3 +54,4 @@ function switchMapRegion(reg){
  showTab(_activeTab);
  saveGame();
 }
+

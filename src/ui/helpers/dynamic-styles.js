@@ -14,7 +14,7 @@ export function applyDynamicStyles(root = document) {
       // Use CSS variable --pct and also direct width for fallback
       el.style.setProperty('--pct', pct + '%');
       // For elements that expect width percentage
-      if (el.classList.contains('stat-fill') || el.classList.contains('location-progress-bar') || el.classList.contains('hatchery-progress') || el.classList.contains('mine-energy-fill') || el.classList.contains('quest-progress-bar') || el.classList.contains('xp-fill') || el.classList.contains('hp-fill') || el.classList.contains('training-cd-fill')) {
+      if (el.classList.contains('stat-fill') || el.classList.contains('location-progress-bar') || el.classList.contains('hatchery-progress') || el.classList.contains('mine-energy-fill') || el.classList.contains('quest-progress-bar') || el.classList.contains('xp-fill') || el.classList.contains('hp-fill') || el.classList.contains('training-cd-fill') || el.classList.contains('battle-damage-fill')) {
         el.style.width = pct + '%';
       }
     }
@@ -64,6 +64,7 @@ export function applyDynamicStyles(root = document) {
   // Color vars
   root.querySelectorAll && root.querySelectorAll('[data-color]').forEach(el => {
     el.style.setProperty('--starter-color', el.dataset.color);
+    el.style.setProperty('--shortcut-color', el.dataset.color);
   });
 }
 
@@ -86,3 +87,4 @@ if (typeof window !== 'undefined') {
     observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-pct', 'data-bg', 'data-bg-color', 'data-type-color', 'data-grid-cols'] });
   } catch (_) {}
 }
+

@@ -18,10 +18,10 @@ function renderMap(){
  if(regSel && G && G.region){ regSel.value = G.region; if(typeof updateRegionSelectorLocks === 'function') updateRegionSelectorLocks(); }
  
  
- const mapWT = document.querySelector('#win-map .win-header-title');
+ const mapWT = document.getElementById('map-win-title');
  if(mapWT){
  const rName = G.region==='johto'?'Johto':'Kanto';
- mapWT.textContent = '⋮⋮ 🗺 ' + tr('map_title_name', {region:rName});
+ mapWT.textContent = tr('map_title_name', {region:rName});
  }
  const svg=document.getElementById('map-svg');
  if(svg) svg.setAttribute('viewBox','0 0 1600 960');
@@ -103,7 +103,7 @@ function renderMap(){
  const nx=loc.x + labelW/2 + 10, ny=loc.y - 13;
  rectsHTML+=`<g class="npc-node extracted-bridge-style-023" data-action="legacy-call-stop" data-call="openNpc" data-call-args="'${id}',${pni}"><title>${npcName}</title>`
  +`<circle cx="${nx}"cy="${ny}"r="11"fill="#7b3fa0"stroke="#fff"stroke-width="2"/>`
- +`<text x="${nx}"y="${ny+1}"text-anchor="middle"dominant-baseline="middle"font-size="13">🗣</text></g>`;
+ +`<text x="${nx}"y="${ny+1}"text-anchor="middle"dominant-baseline="middle"font-size="13">…</text></g>`;
  }
  }
  }
@@ -189,3 +189,4 @@ if (typeof clickLocation !== 'undefined' && typeof window !== 'undefined') windo
 if (typeof refreshMapAndLoc !== 'undefined' && typeof window !== 'undefined') window.refreshMapAndLoc = refreshMapAndLoc;
 
 export {};
+

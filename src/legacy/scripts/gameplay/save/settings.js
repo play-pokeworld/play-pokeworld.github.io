@@ -64,3 +64,4 @@ function debugFillMine(){
  if(G.mine) G.mine.energy = 100;
  notify(t("legacy_message_n_nergie_de_mine_restaur_e_100"), 'var(--green)');
 }
+

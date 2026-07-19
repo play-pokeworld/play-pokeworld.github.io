@@ -24,3 +24,4 @@ export function safeHtml(strings, ...values) {
 export function joinHtml(items, renderer) {
   return (items || []).map(renderer).join('');
 }
+

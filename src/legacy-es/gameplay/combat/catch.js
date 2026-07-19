@@ -64,7 +64,7 @@ function attemptAutoCatch(e){
    if(talentUnlocked){
      const talentInfo = getTalentByKey(caughtMon.talent);
      if(talentInfo && typeof notify === 'function') notify(tr("m.talent_unlocked", {name:getPokeName(e.id), talent:talentInfo.name, rarity:getRarityLabel(talentInfo.rarity)}), 'var(--accent)');
-     addBattleLog(`🧬 Talent découvert : ${getTalentName(caughtMon.talent)} !`);
+     addBattleLog(tr('battle_talent_discovered_log', {talent:getTalentName(caughtMon.talent)}));
    }
    if(ivKey) addBattleLog(`⭐ IV gagné sur ${caughtMon.name} : ${ivKey.toUpperCase()} +1 !`);
  }
@@ -110,3 +110,4 @@ if (typeof rollCaptureIv !== 'undefined' && typeof window !== 'undefined') windo
 if (typeof attemptAutoCatch !== 'undefined' && typeof window !== 'undefined') window.attemptAutoCatch = attemptAutoCatch;
 
 export {};
+

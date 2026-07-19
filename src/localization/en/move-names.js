@@ -61,3 +61,4 @@ window.L_move_names_en = {
 "watergun":"Water Gun",
 "wingattack":"Wing Attack",
 };
+

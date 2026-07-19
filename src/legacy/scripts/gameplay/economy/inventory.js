@@ -28,17 +28,17 @@ function setInvSort(s){
 function renderInventory(el){
  const entries=Object.entries(G.inventory).filter(([k,v])=>v>0 && ITEMS[k]);
  const cats=[
- {id:'all', label: t("m.inventory.12"), icon:'🎒'},
- {id:'berry', label: t("m.inventory.11"), icon:'🍓'},
- {id:'object', label: t("m.inventory.10"), icon:''},
- {id:'stone', label: t("m.inventory.9"), icon:''},
- {id:'treasure', label: t("m.inventory.8"), icon:'💰'},
- {id:'special', label: t("m.inventory.7"), icon:'✨'}
+ {id:'all', label: t("m.inventory.12"), icon:getIcon('bag',14)},
+ {id:'berry', label: t("m.inventory.11"), icon:getIcon('pokeball',14)},
+ {id:'object', label: t("m.inventory.10"), icon:getIcon('team',14)},
+ {id:'stone', label: t("m.inventory.9"), icon:getIcon('badge',14)},
+ {id:'treasure', label: t("m.inventory.8"), icon:getIcon('money',14)},
+ {id:'special', label: t("m.inventory.7"), icon:getIcon('guide',14)}
  ];
  const sorts=[
- {id:'name', label: t('sort_name'), icon:''},
- {id:'qty', label: t('sort_quantity'), icon:'🔢'},
- {id:'category', label: t('sort_category'), icon:'📂'}
+ {id:'name', label: t('sort_name'), icon:getIcon('dictionary',14)},
+ {id:'qty', label: t('sort_quantity'), icon:getIcon('info',14)},
+ {id:'category', label: t('sort_category'), icon:getIcon('box',14)}
  ];
 
  
@@ -49,17 +49,21 @@ function renderInventory(el){
  filterBar.style.gap = '6px';
  filterBar.style.alignItems = 'center';
 
- let filtersHtml = `<span class="extracted-template-style-205">${t('filter_label')}</span>`;
+ let filtersHtml = `<div class="ui-control-toolbar ui-control-toolbar--filters"><span class="ui-toolbar-label">${t('filter_label')}</span>`;
  filtersHtml += cats.map(c=>{
    const isActive = _invCat===c.id;
-   return `<button class="hbtn" data-action="legacy-call" data-call="setInvCat" data-call-args="'${c.id}'" data-style="padding:6px 12px;font-size:13px;background:${isActive?'var(--light2)':'var(--light1)'};color:${isActive?'var(--dark1)':'var(--light2)'};border:2px solid ${isActive?'var(--light2)':'var(--dark3)'};font-weight:${isActive?'bold':'normal'}">${c.icon} ${c.label}</button>`;
+   return typeof uiButtonHtml==='function'
+    ? uiButtonHtml({label:c.label, icon:c.icon, call:'setInvCat', args:`'${c.id}'`, variant:'tool', active:isActive})
+    : `<button class="hbtn" data-action="legacy-call" data-call="setInvCat" data-call-args="'${c.id}'">${c.icon} ${c.label}</button>`;
  }).join('');
- filtersHtml += `<span class="extracted-template-style-206">|</span>`;
- filtersHtml += `<span class="extracted-template-style-205">${t('sort_label')}</span>`;
+ filtersHtml += `<span class="ui-toolbar-sep"></span><span class="ui-toolbar-label">${t('sort_label')}</span>`;
  filtersHtml += sorts.map(s=>{
    const isActive = _invSort===s.id;
-   return `<button class="hbtn" data-action="legacy-call" data-call="setInvSort" data-call-args="'${s.id}'" data-style="padding:6px 12px;font-size:13px;background:${isActive?'var(--light2)':'var(--light1)'};color:${isActive?'var(--dark1)':'var(--light2)'};border:2px solid ${isActive?'var(--light2)':'var(--dark3)'};font-weight:${isActive?'bold':'normal'}">${s.icon} ${s.label}</button>`;
+   return typeof uiButtonHtml==='function'
+    ? uiButtonHtml({label:s.label, icon:s.icon, call:'setInvSort', args:`'${s.id}'`, variant:'tool', active:isActive})
+    : `<button class="hbtn" data-action="legacy-call" data-call="setInvSort" data-call-args="'${s.id}'">${s.icon} ${s.label}</button>`;
  }).join('');
+ filtersHtml += `</div>`;
  filterBar.innerHTML = filtersHtml;
  }
 
@@ -107,3 +111,4 @@ function handleInventoryClick(key){
   }
   onInventoryClick(key);
 }
+

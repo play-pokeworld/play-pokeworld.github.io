@@ -36,6 +36,7 @@
   "src/legacy/scripts/data/ui-icons.js",
   "src/legacy/scripts/data/moves.js",
   "src/legacy/scripts/data/sprites.js",
+  "src/legacy/scripts/data/trainer-sprites-data.js",
   "src/legacy/scripts/data/items-data.js",
   "src/legacy/scripts/data/items-helpers.js",
   "src/legacy/scripts/data/talents-data.js",

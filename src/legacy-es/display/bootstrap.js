@@ -65,3 +65,4 @@ init();
 if (typeof init !== 'undefined' && typeof window !== 'undefined') window.init = init;
 if (typeof initializeGameInterface !== 'undefined' && typeof window !== 'undefined') window.initializeGameInterface = initializeGameInterface;
 export {};
+

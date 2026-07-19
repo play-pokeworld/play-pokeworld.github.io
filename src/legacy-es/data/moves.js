@@ -138,6 +138,12 @@ function getChampName(id){
  const trainers = (typeof getLeagueTrainersForRegion === 'function') ? getLeagueTrainersForRegion(battle.leagueRegion || (typeof getLeagueRegionForChampion === 'function' ? getLeagueRegionForChampion(id || battle.champId) : 'kanto')) : LEAGUE_TRAINERS;
  if(trainers && trainers[battle.leagueStage]) return trainers[battle.leagueStage].name;
  }
+ if(id && String(id).startsWith('quest_trainer_')){
+ const bid = String(id).replace('quest_trainer_','');
+ const tb = (typeof getTrainerBattleDef === 'function') ? getTrainerBattleDef(bid) : null;
+ return (typeof getTrainerBattleName === 'function') ? getTrainerBattleName(bid) : (tb ? tb.name : t("trainer_battle"));
+ }
+ if(id === 'atoll') return t('battle_atoll_title');
  if(id && String(id).startsWith('quest_')){
  return t("m.moves.14");
  }
@@ -166,15 +172,15 @@ function updateI18nLabels(){
  tabEls.forEach((el, i) => {
  if(tabKeys[i]) el.textContent = t(tabKeys[i]);
  });
- const mapTitle = document.querySelector('#win-map .win-header-title');
+ const mapTitle = document.getElementById('map-win-title');
  if(mapTitle){
  const rName = G.region === 'johto' ? 'Johto' : 'Kanto';
- mapTitle.textContent = '⋮⋮ 🗺 ' + tr('map_title_name', {region:rName});
+ mapTitle.textContent = tr('map_title_name', {region:rName});
  }
- const teamTitle = document.querySelector('#win-team .win-header-title');
- if(teamTitle) teamTitle.textContent = '⋮⋮ ' + t('win_team');
- const battleTitle = document.querySelector('#win-battle .win-header-title');
- if(battleTitle) battleTitle.textContent = '⋮⋮ ' + t('win_battle');
+ const teamTitle = document.getElementById('team-win-title');
+ if(teamTitle) teamTitle.textContent = t('win_team');
+ const battleTitle = document.getElementById('battle-win-title');
+ if(battleTitle) battleTitle.textContent = t('win_battle');
  const tabsTitle = document.querySelector('#win-tabs .win-header-title');
  
  
@@ -204,7 +210,7 @@ function updateI18nLabels(){
  const lootContBtn = document.getElementById('loot-continue-btn');
  if(lootContBtn) lootContBtn.textContent = t('loot_continue_btn');
  const sumTitle = document.getElementById('battle-summary-title');
- if(sumTitle) sumTitle.textContent = t('loot_summary_title');
+ if(sumTitle) sumTitle.textContent = t('battle_session_summary_title') || t('loot_summary_title');
  const sel = document.getElementById('map-region-select');
  if(sel){
  sel.options[0].textContent = t("m.moves.5");
@@ -999,3 +1005,4 @@ if (typeof PD !== 'undefined' && typeof window !== 'undefined') window.PD = PD;
 if (typeof DEX_MAP !== 'undefined' && typeof window !== 'undefined') window.DEX_MAP = DEX_MAP;
 
 export {};
+

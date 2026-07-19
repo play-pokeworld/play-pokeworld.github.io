@@ -57,27 +57,27 @@
 </svg>
 
 <div id="header">
-  <h1>⚡ PokéWorld</h1>
+  <h1><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><circle cx="12" cy="12" r="3"/></svg></span><span>PokéWorld</span></h1>
   <div class="hinfo pw-static-002"> <span id="h-money">1000</span>₽ &nbsp;|&nbsp;  <span id="h-badges">0</span>/<span id="h-badges-total">8</span> badges</div>
-  <button class="hbtn" id="settings-btn" data-action="open-settings">⚙️</button>
+  <button class="hbtn icon-btn" id="settings-btn" data-action="open-settings" aria-label="Réglages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
 </div>
 
 <div id="settings-modal">
   <div id="settings-inner">
     <div class="modal-title">
-      <div>⚙️ Réglages</div>
+      <div>Réglages</div>
       <span class="modal-close" data-action="close-settings">✕</span>
     </div>
 
     <div class="settings-section">
-      <h3>🌐 Langue / Language</h3>
+      <h3>Langue / Language</h3>
       <div class="pw-static-003">
-        <button class="hbtn lang-btn pw-static-004" data-lang="fr" data-action="set-language">🇫🇷 Français</button>
-        <button class="hbtn lang-btn pw-static-004" data-lang="en" data-action="set-language">🇬🇧 English</button>
+        <button class="hbtn lang-btn pw-static-004" data-lang="fr" data-action="set-language">Français</button>
+        <button class="hbtn lang-btn pw-static-004" data-lang="en" data-action="set-language">English</button>
       </div>
     </div>
     <div class="settings-section">
-      <h3>🎨 Thème</h3>
+      <h3>Thème</h3>
       <div class="theme-grid">
         <div class="theme-swatch pw-static-005" data-theme-btn="dark" data-action="set-theme" data-theme-value="dark">Sombre</div>
         <div class="theme-swatch pw-static-006" data-theme-btn="light" data-action="set-theme" data-theme-value="light">Clair</div>
@@ -109,22 +109,22 @@
     </div>
 
     <div class="settings-section">
-      <h3>💾 Sauvegarde</h3>
+      <h3>Sauvegarde</h3>
       <div class="settings-row">
-        <button class="hbtn" data-action="save-game">💾 Sauvegarder</button>
-        <button class="hbtn" data-action="load-game">📂 Charger</button>
+        <button class="hbtn" data-action="save-game">Sauvegarder</button>
+        <button class="hbtn" data-action="load-game">Charger</button>
       </div>
       <div class="settings-row">
-        <button class="hbtn" data-action="export-save">⬇️ Exporter</button>
-        <label class="hbtn pw-static-009" for="import-file">⬆️ Importer</label>
+        <button class="hbtn" data-action="export-save">Exporter</button>
+        <label class="hbtn pw-static-009" for="import-file">Importer</label>
       </div>
       <input type="file" id="import-file" accept=".json,application/json" class="pw-static-010" data-action="import-save-file">
       <div class="settings-row" id="delete-row">
-        <button class="hbtn pw-static-011" data-action="confirm-delete">🗑 Supprimer la sauvegarde</button>
+        <button class="hbtn pw-static-011" data-action="confirm-delete">Supprimer la sauvegarde</button>
       </div>
       <div class="settings-row pw-static-012" id="delete-confirm-row">
-        <button class="hbtn pw-static-011" data-action="do-delete">✅ Confirmer la suppression</button>
-        <button class="hbtn" data-action="cancel-delete">✖️ Annuler</button>
+        <button class="hbtn pw-static-011" data-action="do-delete">Confirmer la suppression</button>
+        <button class="hbtn" data-action="cancel-delete">Annuler</button>
       </div>
     </div>
   </div>
@@ -148,47 +148,34 @@
 </div>
 
 <div class="mobile-nav-bar">
-  <button class="mob-btn" data-action="scroll-to-window" data-target-window="win-battle">
-    <span class="ui-icon pw-static-014">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg>
-    </span>
-    Combat
-  </button>
-  <button class="mob-btn" data-action="scroll-to-window" data-target-window="win-map">
-    <span class="ui-icon pw-static-014">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-    </span>
-    Carte
-  </button>
-  <button class="mob-btn" data-action="scroll-to-window" data-target-window="win-team">
-    <span class="ui-icon pw-static-014">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-    </span>
-    Équipe
-  </button>
-  <button class="mob-btn" data-action="scroll-to-window" data-target-window="win-tabs">
-    <span class="ui-icon pw-static-014">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-    </span>
-    Lieu
-  </button>
+  <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="adventure">Aventure</button>
+  <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="combat">Combat</button>
+  <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="team">Équipe</button>
+  <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="quests">Quêtes</button>
+  <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="manage">Gestion</button>
+</div>
+<div class="mobile-subnav-bar">
+  <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="hatchery">Pension</button>
+  <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="training">Entraînement</button>
+  <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="mine">Mine</button>
+  <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="shortcuts">Raccourcis</button>
 </div>
 
 <div id="main-dashboard" class="pw-static-015">
   
   <div id="col-1" class="dash-col pw-static-016" data-col="1">
     
-    <div id="win-story" class="dash-win pw-static-017">
-      <div class="win-header pw-static-018" data-drag-window="win-story">
-        <span class="win-header-title pw-static-019">⋮⋮ 📜 <span id="story-win-title">Histoire & Quêtes</span></span>
+    <div id="win-story" class="dash-win pw-static-021">
+      <div class="win-header" data-drag-window="win-story">
+        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span><span id="story-win-title">Histoire & Quêtes</span></span>
         
       </div>
-      <div class="win-body pw-static-020" id="story-panel"></div>
+      <div class="win-body pw-static-022" id="story-panel"></div>
     </div>
     
     <div id="win-team" class="dash-win pw-static-021">
       <div class="win-header" data-drag-window="win-team">
-        <span class="win-header-title">⋮⋮ ⚡ Équipe Active</span>
+        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span><span id="team-win-title">Équipe Active</span></span>
         
       </div>
       <div id="team-window-body" class="win-body pw-static-022"></div>
@@ -196,7 +183,7 @@
     
     <div id="win-hatchery" class="dash-win pw-static-021">
       <div class="win-header" data-drag-window="win-hatchery">
-        <span class="win-header-title">⋮⋮ 🥚 <span id="hatchery-win-title">Pension & Couveuse</span></span>
+        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3c-3.5 0-6 4.2-6 9 0 4.5 2.2 8 6 8s6-3.5 6-8c0-4.8-2.5-9-6-9z"/></svg></span><span id="hatchery-win-title">Pension & Couveuse</span></span>
         
       </div>
       <div id="hatchery-window-body" class="win-body pw-static-022"></div>
@@ -205,7 +192,7 @@
     
     <div id="win-mine" class="dash-win pw-static-024">
       <div class="win-header" data-drag-window="win-mine">
-        <span class="win-header-title">⋮⋮ ⛏️ Mine Souterraine</span>
+        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3l7 7"/><path d="M4 20l7-7"/><path d="M14 3l-4 4 7 7 4-4"/><path d="M2 22l8-8"/></svg></span>Mine souterraine</span>
         
       </div>
       <div id="mine-window-body" class="win-body pw-static-025"></div>
@@ -217,13 +204,13 @@
     
     <div id="win-map" class="dash-win pw-static-027">
       <div class="win-header" data-drag-window="win-map">
-        <span class="win-header-title">⋮⋮ 🗺️ <span id="map-win-title">Carte Kanto</span></span>
+        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span><span id="map-win-title">Carte Kanto</span></span>
         <span class="pw-static-028">
           <select id="map-region-select" data-stop-drag="true" data-action="switch-map-region" class="pw-static-029">
-            <option value="kanto">🗺️ Région Kanto</option>
-            <option value="johto">🗺️ Région Johto</option>
-            <option value="hoenn" disabled data-force-disabled="true">🔒 Région Hoenn (Bientôt)</option>
-            <option value="sinnoh" disabled data-force-disabled="true">🔒 Région Sinnoh (Bientôt)</option>
+            <option value="kanto">Région Kanto</option>
+            <option value="johto">Région Johto</option>
+            <option value="hoenn" disabled data-force-disabled="true">Région Hoenn (Bientôt)</option>
+            <option value="sinnoh" disabled data-force-disabled="true">Région Sinnoh (Bientôt)</option>
           </select>
         </span>
         
@@ -239,14 +226,14 @@
     
     <div id="win-battle" class="dash-win pw-static-031">
       <div class="win-header" data-drag-window="win-battle">
-        <span class="win-header-title">⋮⋮ ⚔️ Combat en direct (PokéChill)</span>
+        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg></span><span id="battle-win-title">Combat en direct</span></span>
         
       </div>
       <div class="win-body pw-static-032" id="battle-center-panel">
         <div id="battle-idle-screen" class="pw-static-033">
-          <div class="pw-static-034">🌾</div>
+          <div class="pw-static-034"><span class="idle-scene-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/></svg></span></div>
           <div class="pw-static-035">Exploration au repos</div>
-          <div class="pw-static-036">Déplacez-vous sur une route de la carte et cliquez sur <b>🌾 Explorer</b> ou <b>⚔️ Défier</b> pour lancer un combat en temps réel au centre de l'écran !</div>
+          <div class="pw-static-036">Déplacez-vous sur une route de la carte et cliquez sur <b>Explorer</b> ou <b>Défier</b> pour lancer un combat en temps réel au centre de l'écran !</div>
         </div>
 
         <div id="battle-active-scene" class="pw-static-037">
@@ -264,7 +251,7 @@
                   <button data-spd="3" data-action="set-battle-speed" data-speed="3" class="hbtn pw-static-042">x3</button>
                 <button data-spd="10" data-action="set-battle-speed" data-speed="10" class="hbtn speed-x10 pw-static-043">x10</button>
                 </div>
-                <button id="loot-open-btn" class="hbtn pw-static-044" data-action="open-battle-summary">Butin</button>
+                <button id="loot-open-btn" class="hbtn pw-static-044" data-action="open-battle-summary">Résumé</button>
               </div>
             </div>
             <button id="leave-btn" data-action="leave-battle" class="pw-static-045">
@@ -281,7 +268,7 @@
     
     <div id="win-shortcuts" class="dash-win pw-static-046">
       <div class="win-header" data-drag-window="win-shortcuts">
-        <span class="win-header-title">⋮⋮ 🔗 Raccourcis</span>
+        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></span>Raccourcis</span>
         
       </div>
       <div id="shortcuts-window-body" class="win-body pw-static-047"></div>
@@ -291,12 +278,12 @@
     
     <div id="win-tabs" class="dash-win pw-static-048">
       <div class="win-header" data-drag-window="win-tabs">
-        <span class="win-header-title">⋮⋮ 📍 <span id="loc-win-title">Lieu</span></span>
+        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span id="loc-win-title">Lieu</span></span>
         
       </div>
       <div id="right-panel" class="pw-static-049">
         <div id="tabs" class="pw-static-050">
-          <div class="tab active" data-action="show-tab" data-tab="info">📍 Lieu</div>
+          <div class="tab active" data-action="show-tab" data-tab="info">Lieu</div>
           </div>
         <div id="tab-content" class="win-body pw-static-051"></div>
       </div>
@@ -304,7 +291,7 @@
 
     <div id="win-training" class="dash-win pw-static-021">
       <div class="win-header" data-drag-window="win-training">
-        <span class="win-header-title">⋮⋮ ⚡ <span id="training-win-title">Salle d'Entraînement</span></span>
+        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6v12"/><path d="M18 6v12"/><path d="M3 9h6"/><path d="M15 9h6"/><path d="M3 15h6"/><path d="M15 15h6"/><path d="M9 12h6"/></svg></span><span id="training-win-title">Salle d'Entraînement</span></span>
         
       </div>
       <div id="training-window-body" class="win-body pw-static-022"></div>
@@ -317,7 +304,7 @@
 <div id="unified-selector-modal" class="pw-static-052">
   <div class="pw-static-053">
     <div class="modal-title pw-static-054">
-      <div id="usm-title" class="pw-static-035">Sélection Pokémon</div>
+      <div id="usm-title" class="pw-static-035">Sélection</div>
       <span class="modal-close pw-static-055" data-action="close-unified-selector">✕</span>
     </div>
     <div class="pw-static-056">
@@ -325,8 +312,9 @@
         <span class="pw-static-058">Tri :</span>
         <button class="hbtn usm-sort-btn active" data-sort="id" data-action="sort-unified-grid">Pokédex #</button>
         <button class="hbtn usm-sort-btn" data-sort="level" data-action="sort-unified-grid">Niveau</button>
-        <button class="hbtn usm-sort-btn" data-sort="iv" data-action="sort-unified-grid">IVs ⭐</button>
-        <button class="hbtn usm-sort-btn" data-sort="ev" data-action="sort-unified-grid">EVs 🟢</button>
+        <button class="hbtn usm-sort-btn" data-sort="iv" data-action="sort-unified-grid">IVs</button>
+        <button class="hbtn usm-sort-btn" data-sort="ev" data-action="sort-unified-grid">EVs</button>
+        <button class="hbtn usm-sort-btn" data-sort="rank" data-action="sort-unified-grid">Rang</button>
         <button class="hbtn usm-sort-btn" data-sort="name" data-action="sort-unified-grid">Nom</button>
       </div>
       <div id="usm-filter-panel" class="usm-filter-panel"></div>
@@ -344,12 +332,12 @@
 <div id="battle-summary-modal">
   <div id="battle-summary-inner">
     <div class="modal-title">
-      <div id="battle-summary-title">Butin de la session</div>
+      <div id="battle-summary-title">Butin & résumé de session</div>
       <span class="modal-close" data-action="close-battle-summary">✕</span>
     </div>
     <div id="battle-summary-content"></div>
     <div class="pw-static-063">
-      <button id="loot-restart-btn" class="hbtn pw-static-064" data-action="restart-last-battle">🔄 Relancer le combat immédiatement</button>
+      <button id="loot-restart-btn" class="hbtn pw-static-064" data-action="restart-last-battle">Relancer le combat immédiatement</button>
       <button id="loot-continue-btn" class="hbtn pw-static-065" data-action="close-battle-summary">Continuer sur la route</button>
     </div>
   </div>
@@ -359,17 +347,17 @@
 <div id="debug-widget" class="pw-static-066">
   <div id="debug-drawer" class="pw-static-067">
     <div class="pw-static-068">
-      <span>🛠️ Menu Debug / triche</span>
+      <span>Menu debug</span>
       <span class="pw-static-069" data-action="toggle-debug-menu">✕</span>
     </div>
-    <button class="hbtn pw-static-070" data-action="debug-give-money">💰 +50 000₽</button>
-    <button class="hbtn pw-static-071" data-action="debug-give-candies">🍬 +10 Super Bonbons (Rare Candy)</button>
-    <button class="hbtn pw-static-072" data-action="debug-unlock-badges">🏅 Débloquer 8 Badges Kanto</button>
-    <button class="hbtn pw-static-073" data-action="debug-fill-mine">⚡ Recharge Énergie Mine (100)</button>
-    <button class="hbtn pw-static-073" data-action="legacy-call" data-call="debugTimeSkip10Minutes" data-call-args="">⏱ Timeskip AFK +10 min</button>
+    <button class="hbtn pw-static-070" data-action="debug-give-money">Monnaie +50 000₽</button>
+    <button class="hbtn pw-static-071" data-action="debug-give-candies">Super Bonbons +10</button>
+    <button class="hbtn pw-static-072" data-action="debug-unlock-badges">Débloquer 8 badges Kanto</button>
+    <button class="hbtn pw-static-073" data-action="debug-fill-mine">Énergie mine +100</button>
+    <button class="hbtn pw-static-073" data-action="legacy-call" data-call="debugTimeSkip10Minutes" data-call-args="">AFK +10 min</button>
   <button id="debug-x10-toggle" class="hbtn pw-static-074" data-action="toggle-battle-speed-x10">Vitesse x10 : <span id="debug-x10-state">OFF</span></button>
   </div>
-  <button id="debug-toggle-btn" data-action="toggle-debug-menu" class="pw-static-075">🛠️ Debug</button>
+  <button id="debug-toggle-btn" data-action="toggle-debug-menu" class="pw-static-075">Debug</button>
 </div>
 
 
@@ -388,7 +376,7 @@
 
 
 <div id="victory-screen">
-  <div class="pw-static-078">🏆</div>
+  <div class="pw-static-078"><span class="victory-icon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M6 2h12v6a6 6 0 01-12 0V2zm-2 1H2v2a4 4 0 004 4V3zm18 0h-2v6a4 4 0 004-4V3zM9 20h6v2H9z"/></svg></span></div>
   <h2>CHAMPION !</h2>
   <p id="victory-msg">Vous avez vaincu tous les Dresseurs!</p>
   <button class="hbtn pw-static-079" data-action="close-victory-screen">Continuer</button>
@@ -404,3 +392,4 @@
   <script src="src/file-postboot.js"></script>
 </body>
 </html>
+

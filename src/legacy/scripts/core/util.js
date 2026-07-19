@@ -30,3 +30,4 @@ function hpColor(pct){
  if(pct>0.25) return 'var(--light2)';
  return 'var(--red)';
 }
+

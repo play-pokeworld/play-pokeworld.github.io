@@ -1,3 +1,54 @@
+const TRAINER_BATTLES = {
+ kanto_rival_route22:{name:'Blue', role:'rival', style:['balanced','speed'], team:[[16,9],[19,9],[133,10]], rewardMoney:1200},
+ kanto_rocket_mtmoon:{name:'Team Rocket Grunt', role:'rocket', style:['poison','early'], team:[[19,14],[41,14],[23,15]], rewardMoney:1800},
+ kanto_super_nerd_fossil:{name:'Super Nerd Miguel', role:'trainer', style:['science','electric'], team:[[81,16],[100,16],[109,17]], rewardMoney:2200},
+ kanto_rival_cerulean:{name:'Blue', role:'rival', style:['balanced'], team:[[17,18],[63,17],[19,16],[133,18]], rewardMoney:3000},
+ kanto_rival_ssanne:{name:'Blue', role:'rival', style:['balanced','special'], team:[[17,23],[20,22],[64,22],[133,24]], rewardMoney:4500},
+ kanto_rocket_hideout:{name:'Team Rocket Admin', role:'rocket', style:['poison','dark'], team:[[20,28],[42,29],[24,30],[110,31]], rewardMoney:7000},
+ kanto_giovanni_hideout:{name:'Giovanni', role:'boss', style:['ground','boss'], team:[[95,30],[111,31],[115,33]], rewardMoney:9000},
+ kanto_rival_silph:{name:'Blue', role:'rival', style:['balanced','fast'], team:[[18,37],[65,35],[112,36],[59,38],[133,38]], rewardMoney:12000},
+ kanto_giovanni_silph:{name:'Giovanni', role:'boss', style:['ground','rocket'], team:[[31,37],[34,38],[115,39],[112,41]], rewardMoney:15000},
+ kanto_rival_victory:{name:'Blue', role:'rival', style:['balanced','champion-prep'], team:[[18,47],[65,47],[112,47],[59,48],[103,48],[130,50]], rewardMoney:20000},
+ johto_rival_cherrygrove:{name:'Silver', role:'rival', style:['starter','aggressive'], team:[[152,8],[155,8],[158,8]], rewardMoney:1200},
+ johto_sprout_elder:{name:'Sage Li', role:'sage', style:['grass','tower'], team:[[69,12],[163,12],[69,14]], rewardMoney:2200},
+ johto_rocket_slowpoke:{name:'Team Rocket Grunt', role:'rocket', style:['poison'], team:[[19,15],[41,15],[109,16]], rewardMoney:2500},
+ johto_rival_ilex:{name:'Silver', role:'rival', style:['aggressive'], team:[[92,18],[41,18],[153,19],[156,19],[159,19]], rewardMoney:4000},
+ johto_rival_burned:{name:'Silver', role:'rival', style:['ghost','aggressive'], team:[[92,22],[42,22],[198,23],[153,24],[156,24],[159,24]], rewardMoney:6000},
+ johto_rocket_lake:{name:'Rocket Executive', role:'rocket', style:['poison','rage'], team:[[42,30],[109,30],[198,31],[110,32]], rewardMoney:9000},
+ johto_rocket_radio:{name:'Team Rocket Executive', role:'rocket', style:['rocket','boss'], team:[[24,34],[42,35],[110,36],[229,38]], rewardMoney:14000},
+ johto_rival_victory:{name:'Silver', role:'rival', style:['balanced'], team:[[215,38],[169,38],[94,39],[208,40],[153,41],[156,41],[159,41]], rewardMoney:16000}
+};
+function getTrainerBattleDef(id){ return TRAINER_BATTLES[id] || null; }
+function getTrainerBattleName(id){ const key='trainer_battle_name_'+id; const val=(typeof t==='function')?t(key):''; return (val && val!==key) ? val : ((getTrainerBattleDef(id)||{}).name || id); }
+function questTrainerMoves(id){
+ const map = {
+  63:['confusion','psybeam','shadowball'],64:['confusion','psybeam','psychic','shadowball'],65:['psychic','shadowball','psybeam','thunderbolt'],
+  133:['quickattack','bite','shadowball','bodyslam'],17:['gust','wingattack','quickattack'],18:['gust','wingattack','quickattack','skyattack'],
+  19:['bite','quickattack','tackle'],20:['bite','quickattack','hyperbeam'],23:['poisonsting','bite','sludgebomb'],24:['poisonsting','bite','sludgebomb','earthquake'],
+  41:['bite','wingattack','poisonsting'],42:['bite','wingattack','sludgebomb'],109:['sludgebomb','toxic','flamethrower'],110:['sludgebomb','toxic','flamethrower','shadowball'],
+  95:['rockthrow','dig','earthquake'],111:['earthquake','rockthrow','bodyslam'],112:['earthquake','stoneedge','bodyslam'],115:['bodyslam','earthquake','rockslide'],
+  31:['earthquake','sludgebomb','bodyslam'],34:['earthquake','sludgebomb','thunderbolt'],59:['flamethrower','fireblast','bite'],103:['psychic','solarbeam','earthquake'],130:['surf','bite','dragonbreath','icebeam'],
+  152:['razorleaf','bodyslam','poisonsting'],155:['ember','quickattack','bodyslam'],158:['watergun','bite','surf'],153:['razorleaf','bodyslam','poisonsting'],156:['flamethrower','quickattack','earthquake'],159:['surf','bite','icebeam'],
+  92:['lick','shadowball','nightshade'],94:['shadowball','nightshade','psychic'],198:['bite','wingattack','shadowball'],215:['bite','icebeam','quickattack'],208:['irontail','earthquake','rockthrow'],229:['crunch','flamethrower','fireblast']
+ };
+ return map[Number(id)] || null;
+}
+function createTrainerBattleTeam(battleId){
+ const def = getTrainerBattleDef(battleId);
+ if(!def) return [];
+ return (def.team||[]).map(entry => {
+  const id = Array.isArray(entry) ? entry[0] : entry.id;
+  const lv = Array.isArray(entry) ? entry[1] : entry.level;
+  const p = createPoke(id, lv, false);
+  if(!p) return null;
+  const moves = (entry.moves || questTrainerMoves(id) || []).filter(m => MOVES && MOVES[m]).slice(0,4);
+  if(moves.length) p.moves = moves.map(m=>({id:m}));
+  if(entry.talent) p.talent = entry.talent;
+  try{ recalcPokeStats(p); p.currentHP = p.maxHP; }catch(_){}
+  return p;
+ }).filter(Boolean);
+}
+
 function getRegionChain(region){ return STORY_QUESTS.filter(q=>q.region===region); }
 function getCurrentMain(region){
  const chain = getRegionChain(region);
@@ -42,6 +93,7 @@ function ensureQuestState(){
  if(typeof G.repeatableLastRollAt!=='number') G.repeatableLastRollAt=0;
  if(!G.wildWinsByLoc || typeof G.wildWinsByLoc!=='object') G.wildWinsByLoc={};
  if(!G.unlockedLocs || typeof G.unlockedLocs!=='object') G.unlockedLocs={};
+ if(!G.questTrainerWins || typeof G.questTrainerWins!=='object') G.questTrainerWins={};
  if(typeof G.storyIdx==='undefined') G.storyIdx=0;
  if(typeof G.storyProgress==='undefined') G.storyProgress=0;
  
@@ -119,6 +171,7 @@ function questDone(inst, def){
  }
  if(def.type==='talk') return questProgressValue(inst, def) >= (def.target||1);
  if(def.type==='item') return !!(def.requiredItem && G.inventory && G.inventory[def.requiredItem] > 0);
+ if(def.type==='trainer_battle') return !!(G.questTrainerWins && G.questTrainerWins[def.battleId]);
  return questProgressValue(inst, def) >= (def.target||1);
 }
 
@@ -176,7 +229,9 @@ function claimQuest(qid, cat){
  if(!questDone(inst, def)){ notify(t("legacy_message_n_objectif_pas_encore_termin"),'var(--red)'); return; }
  if(def.rewardPoke && cat==='main'){
    if(typeof battle !== 'undefined' && battle && battle.active){
-     notify(t('quest_reward_battle_active'), 'var(--red)');
+     notify(t('quest_battle_stop_current'), 'var(--blue)');
+     try{ endBattle(); }catch(_){}
+     setTimeout(()=>{ try{ claimQuest(qid, cat); }catch(e){ console.error(e); } }, 350);
      return;
    }
    if(!G.team || !G.team.length){
@@ -351,6 +406,46 @@ function startQuestDefeatBattle(locId){
 }
 
 
+function startQuestTrainerBattle(qid, cat='main'){
+ ensureQuestState();
+ const inst = (G.activeQuests || []).find(i=>String(i.qid)===String(qid) && i.cat===cat);
+ const def = inst ? getQuestDefinitionForInstance(inst) : (cat==='main' ? getMainQuestDef(qid) : null);
+ if(!def || def.type !== 'trainer_battle') return;
+ if(questDone(inst || {progress:0}, def)){ claimQuest(qid, cat); return; }
+ if(typeof battle !== 'undefined' && battle && battle.active){
+  notify(t('quest_battle_stop_current'), 'var(--blue)');
+  try{ endBattle(); }catch(_){}
+  setTimeout(()=>{ try{ startQuestTrainerBattle(qid, cat); }catch(e){ console.error(e); } }, 350);
+  return;
+ }
+ if(typeof hasActiveTrainingBattle === 'function' && hasActiveTrainingBattle()){ notify(t('training_in_progress_no_battle'), 'var(--red)'); return; }
+ if(!G.team || !G.team.length){ notify(t('no_pokemon_in_team'), 'var(--red)'); return; }
+ const trainer = getTrainerBattleDef(def.battleId);
+ const team = createTrainerBattleTeam(def.battleId);
+ if(!trainer || !team.length){ notify(t('enemy_not_found_error'), 'var(--red)'); return; }
+ const ok = startBattle(null, true, 'quest_trainer_'+def.battleId, team);
+ if(ok !== false && battle && battle.active){
+  battle.isQuestTrainerBattle = true;
+  battle.questTrainerBattleId = def.battleId;
+  battle.questTrainerQuestId = def.id;
+  battle.questTrainerCat = cat;
+  battle.trainerVisual = trainer;
+  try{ renderBattleTeamRow(); }catch(_){}
+  addBattleTimeline(getTrainerBattleName(def.battleId), 'trainer');
+ }
+}
+function completeQuestTrainerBattle(battleId){
+ if(!G.questTrainerWins || typeof G.questTrainerWins !== 'object') G.questTrainerWins = {};
+ G.questTrainerWins[battleId] = true;
+ const trainer = getTrainerBattleDef(battleId);
+ if(trainer && trainer.rewardMoney) G.money = (G.money||0) + trainer.rewardMoney;
+ updateHeader();
+ try{ if(document.getElementById('story-panel')) renderStoryWindow(); }catch(_){}
+ saveGame();
+ notify(tr('trainer_battle_won', {trainer:getTrainerBattleName(battleId)}), 'var(--green)');
+}
+
+
 var _repeatableRoll = [];
 
 
@@ -384,5 +479,10 @@ if (typeof getQuestDefinitionForInstance !== 'undefined' && typeof window !== 'u
 if (typeof getActiveLocalDefeatQuestForLocation !== 'undefined' && typeof window !== 'undefined') window.getActiveLocalDefeatQuestForLocation = getActiveLocalDefeatQuestForLocation;
 if (typeof getQuestBattlePool !== 'undefined' && typeof window !== 'undefined') window.getQuestBattlePool = getQuestBattlePool;
 if (typeof startQuestDefeatBattle !== 'undefined' && typeof window !== 'undefined') window.startQuestDefeatBattle = startQuestDefeatBattle;
+if (typeof getTrainerBattleDef !== 'undefined' && typeof window !== 'undefined') window.getTrainerBattleDef = getTrainerBattleDef;
+if (typeof getTrainerBattleName !== 'undefined' && typeof window !== 'undefined') window.getTrainerBattleName = getTrainerBattleName;
+if (typeof startQuestTrainerBattle !== 'undefined' && typeof window !== 'undefined') window.startQuestTrainerBattle = startQuestTrainerBattle;
+if (typeof completeQuestTrainerBattle !== 'undefined' && typeof window !== 'undefined') window.completeQuestTrainerBattle = completeQuestTrainerBattle;
 if (typeof _refreshUI !== 'undefined' && typeof window !== 'undefined') window._refreshUI = _refreshUI;
+
 

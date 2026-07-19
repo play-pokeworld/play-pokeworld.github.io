@@ -194,7 +194,7 @@ function renderStaffList(type){
   const unlocked = canAccessStaffLocation(def);
   const activeAttrs = owned ? `data-action="legacy-call" data-call="toggleStaff" data-call-args="'${def.id}'"` : '';
   return `<div class="staff-card ${owned?'is-owned':'is-unowned'} ${isActive?'is-active':''}" ${activeAttrs}>
-   <div class="staff-card-sprite"><span>👤</span></div>
+   <div class="staff-card-sprite">${typeof staffSpriteImg === 'function' ? staffSpriteImg(def.id, 48) : '<span>👤</span>'}</div>
    <div class="staff-card-head"><b>${getStaffName(def.id)}</b><span>${getLocName(def.loc)}</span></div>
    <div class="staff-card-desc">${getStaffDesc(def.id)}</div>
    ${owned?`${staffBonusHtml(def)}<div class="staff-xp"><div class="staff-xp-label">${tr('staff_xp_bar', {xp:xp, need:need})}</div><div class="staff-xp-bar"><div data-pct="${pct}"></div></div></div><div class="staff-level-pill">${tr('staff_level_short', {level:lvl})}</div>`:''}
@@ -224,3 +224,4 @@ if (typeof getAutomationUpgradeLabelSuffix !== 'undefined' && typeof window !== 
 if (typeof toggleAutomation !== 'undefined' && typeof window !== 'undefined') window.toggleAutomation = toggleAutomation;
 
 export {};
+

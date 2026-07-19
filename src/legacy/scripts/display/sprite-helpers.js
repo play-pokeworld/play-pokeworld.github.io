@@ -27,11 +27,11 @@ function spriteSilhouette(id, emoji, {size=40, cls=''}={}){
  
  
  const canvasId = 'sil-canvas-' + id;
- return `<div data-style="width:${size}px;height:${size}px;position:relative;overflow:hidden;">
-   <img src="${src}" data-style="width:${size}px;height:${size}px;object-fit:contain;" 
+ return `<div class="sprite-silhouette-wrapper">
+   <img src="${src}" class="sprite-silhouette-img" width="${size}" height="${size}" 
         onload="silhouetteCanvas(this, '${canvasId}', ${size})"
         onerror="this.style.display='none'">
-   <canvas id="${canvasId}" width="${size}" height="${size}" data-style="width:${size}px;height:${size}px;position:absolute;top:0;left:0;"></canvas>
+   <canvas id="${canvasId}" class="sprite-silhouette-canvas" width="${size}" height="${size}"></canvas>
  </div>`;
 }
 
@@ -84,10 +84,11 @@ function itemIcon(key, size=20, cls=''){
  else if(key === 'assault_vest' || key === 'eviolite') src = ITEM_SPRITE_DATA[key] || ITEM_SPRITE_DATA['muscle_band'];
  else src = ITEM_SPRITE_DATA['potion'];
  }
- const emoji = ITEMS[key]?.icon || '❔';
+ const emoji = ITEMS[key]?.icon || '?';
  if(!src) return `<span class="sprite-fallback-emoji">${emoji}</span>`;
  return `<img src="${src}"alt="${emoji}" class="sprite-img ${cls} sprite-middle" width="${size}" height="${size}" onerror="spriteFallback(this,'${emoji}',${size})">`;
 }
 
 
 const BAG_MAX = 25;
+

@@ -17,50 +17,47 @@ const JOHTO_LEAGUE_TRAINERS = [
 
 function getLeagueTrainersForRegion(region){ return region === 'johto' ? JOHTO_LEAGUE_TRAINERS : LEAGUE_TRAINERS; }
 
+function trainerPoke(id, level, opts={}){
+ const p = createPoke(id, level, !!opts.shiny);
+ if(!p) return p;
+ if(opts.moves) p.moves = opts.moves.filter(m => MOVES && MOVES[m]).slice(0,4).map(m => ({id:m}));
+ if(opts.talent) p.talent = opts.talent;
+ if(opts.item) p.heldItem = opts.item;
+ if(opts.evs) p.evs = Object.assign({hp:0,atk:0,def:0,spa:0,spd:0,spe:0}, opts.evs);
+ if(opts.ivs) p.ivs = Object.assign({hp:0,atk:0,def:0,spa:0,spd:0,spe:0}, opts.ivs);
+ try{ recalcPokeStats(p); p.currentHP = p.maxHP; }catch(_){}
+ return p;
+}
+
 const CHAMPIONS = {
- brock: {badge:'boulder',badgeEmoji:'',
- reward:1500, badgeReq:0, team:[createPoke(74,12), createPoke(95,14)]},
- misty: {badge:'cascade',badgeEmoji:'',
- reward:2000, badgeReq:1, team:[createPoke(120,18), createPoke(121,21)]},
- surge: {badge:'thunder',badgeEmoji:'',
- reward:2500, badgeReq:2, team:[createPoke(100,21), createPoke(25,18), createPoke(26,24)]},
- erika: {badge:'rainbow',badgeEmoji:'🌈',
- reward:3000, badgeReq:3, team:[createPoke(71,29), createPoke(114,24), createPoke(45,29)]},
- koga: {badge:'soul',badgeEmoji:'💜',
- reward:3500, badgeReq:4, team:[createPoke(109,37), createPoke(89,39), createPoke(109,37), createPoke(110,43)]},
- sabrina: {badge:'marsh',badgeEmoji:'',
- reward:3800, badgeReq:5, team:[createPoke(64,38), createPoke(122,37), createPoke(49,38), createPoke(65,43)]},
- blaine:{badge:'volcano',badgeEmoji:'🌋',
- reward:4000, badgeReq:6, team:[createPoke(58,42), createPoke(77,40), createPoke(78,42), createPoke(59,47)]},
- giovanni:{badge:'earth',badgeEmoji:'🌍',
- reward:5000, badgeReq:7, team:[createPoke(111,45), createPoke(51,42), createPoke(31,44), createPoke(34,45), createPoke(112,50)]},
- elite4: {name:'Ligue Kanto', badge:'champion',badgeEmoji:'',
- reward:15000, badgeReq:8, team:[
- createPoke(87,54), createPoke(131,56),
- createPoke(95,55), createPoke(68,58),
- createPoke(94,56), createPoke(24,58),
- createPoke(148,58), createPoke(149,62),
- createPoke(65,63), createPoke(103,63), createPoke(59,63), createPoke(130,63), createPoke(6,65)
+ brock: {badge:'boulder',badgeEmoji:'', strategy:['rock','defense'],
+ reward:1500, badgeReq:0, team:[trainerPoke(74,12,{talent:'sturdy',moves:['rockthrow','tackle','defensecurl']}), trainerPoke(95,14,{talent:'sturdy',moves:['rockthrow','dig','tackle']})]},
+ misty: {badge:'cascade',badgeEmoji:'', strategy:['water','speed','special'],
+ reward:2000, badgeReq:1, team:[trainerPoke(120,18,{talent:'naturalcure',moves:['watergun','quickattack','confusion']}), trainerPoke(121,21,{talent:'analytic',moves:['watergun','psybeam','bubble','recover']})]},
+ surge: {badge:'thunder',badgeEmoji:'', strategy:['electric','speed','paralysis'],
+ reward:2500, badgeReq:2, team:[trainerPoke(100,21,{talent:'static',moves:['thundershock','thunderwave','quickattack']}), trainerPoke(25,20,{talent:'static',moves:['thundershock','quickattack','irontail']}), trainerPoke(26,24,{talent:'lightningrod',moves:['thunderbolt','quickattack','irontail','thunderwave']})]},
+ erika: {badge:'rainbow',badgeEmoji:'🌈', strategy:['grass','poison','drain'],
+ reward:3000, badgeReq:3, team:[trainerPoke(71,29,{talent:'chlorophyll',moves:['razorleaf','sludgebomb','poisonsting']}), trainerPoke(114,26,{talent:'regenerator',moves:['vinewhip','absorb','sludgebomb']}), trainerPoke(45,30,{talent:'effectspore',moves:['razorleaf','sludgebomb','poisonsting']})]},
+ koga: {badge:'soul',badgeEmoji:'💜', strategy:['poison','status','tank'],
+ reward:3500, badgeReq:4, team:[trainerPoke(109,37,{talent:'levitate',moves:['sludgebomb','toxic','smokescreen']}), trainerPoke(89,39,{talent:'poisontouch',moves:['sludgebomb','bodyslam','toxic']}), trainerPoke(109,37,{talent:'levitate',moves:['sludgebomb','toxic','flamethrower']}), trainerPoke(110,43,{talent:'levitate',moves:['sludgebomb','toxic','flamethrower','shadowball']})]},
+ sabrina: {badge:'marsh',badgeEmoji:'', strategy:['psychic','speed','special'],
+ reward:3800, badgeReq:5, team:[trainerPoke(64,38,{talent:'synchronize',moves:['psybeam','shadowball','confusion']}), trainerPoke(122,37,{talent:'filter',moves:['psychic','dazzlinggleam','confusion']}), trainerPoke(49,38,{talent:'tintedlens',moves:['psybeam','sludgebomb','bugbite']}), trainerPoke(65,43,{talent:'magicguard',moves:['psychic','shadowball','psybeam','recover']})]},
+ blaine:{badge:'volcano',badgeEmoji:'🌋', strategy:['fire','burn','offense'],
+ reward:4000, badgeReq:6, team:[trainerPoke(58,42,{talent:'intimidate',moves:['flamethrower','bite','quickattack']}), trainerPoke(77,40,{talent:'flashfire',moves:['flamethrower','quickattack','bodyslam']}), trainerPoke(78,42,{talent:'flashfire',moves:['fireblast','megapunch','quickattack']}), trainerPoke(59,47,{talent:'intimidate',moves:['fireblast','flamethrower','bodyslam','bite']})]},
+ giovanni:{badge:'earth',badgeEmoji:'🌍', strategy:['ground','bulk','coverage'],
+ reward:5000, badgeReq:7, team:[trainerPoke(111,45,{talent:'rockhead',moves:['earthquake','rockthrow','bodyslam']}), trainerPoke(51,42,{talent:'arenatrap',moves:['earthquake','slash','rockslide']}), trainerPoke(31,44,{talent:'poisonpoint',moves:['earthquake','sludgebomb','bodyslam']}), trainerPoke(34,45,{talent:'sheerforce',moves:['earthquake','sludgebomb','thunderbolt']}), trainerPoke(112,50,{talent:'lightningrod',moves:['earthquake','stoneedge','bodyslam','hornattack']})]},
+ elite4: {name:'Ligue Kanto', badge:'champion',badgeEmoji:'', reward:15000, badgeReq:8, team:[
+ createPoke(87,54), createPoke(131,56), createPoke(95,55), createPoke(68,58), createPoke(94,56), createPoke(24,58), createPoke(148,58), createPoke(149,62), createPoke(65,63), createPoke(103,63), createPoke(59,63), createPoke(130,63), createPoke(6,65)
  ]},
- johto_elite4: {name:'Ligue Johto', badge:'johto_champion',badgeEmoji:'', region:'johto', reward:18000, badgeReq:8, team:[
- createPoke(178,42), createPoke(205,43), createPoke(237,43), createPoke(229,47), createPoke(149,50)
- ]},
- falkner: {region:'johto', badge:'zephyr',badgeEmoji:'🪽',
- reward:1800, badgeReq:0, team:[createPoke(16,13), createPoke(18,15)]},
- bugsy: {region:'johto', badge:'hive',badgeEmoji:'🐞',
- reward:2200, badgeReq:1, team:[createPoke(11,15), createPoke(14,15), createPoke(123,17)]},
- whitney: {region:'johto', badge:'plain',badgeEmoji:'🐮',
- reward:2600, badgeReq:2, team:[createPoke(35,18), createPoke(36,20)]},
- morty: {region:'johto', badge:'fog',badgeEmoji:'',
- reward:3200, badgeReq:3, team:[createPoke(92,21), createPoke(93,23), createPoke(94,25)]},
- chuck: {region:'johto', badge:'storm',badgeEmoji:'🥊',
- reward:3800, badgeReq:4, team:[createPoke(56,27), createPoke(62,30)]},
- jasmine: {region:'johto', badge:'mineral',badgeEmoji:'',
- reward:4200, badgeReq:5, team:[createPoke(81,30), createPoke(82,35)]},
- pryce: {region:'johto', badge:'glacier',badgeEmoji:'❄',
- reward:4800, badgeReq:6, team:[createPoke(86,32), createPoke(87,34), createPoke(131,36)]},
- clair: {region:'johto', badge:'rising',badgeEmoji:'',
- reward:5500, badgeReq:7, team:[createPoke(147,37), createPoke(148,39), createPoke(130,40)]}
+ johto_elite4: {name:'Ligue Johto', badge:'johto_champion',badgeEmoji:'', region:'johto', reward:18000, badgeReq:8, team:[ createPoke(178,42), createPoke(205,43), createPoke(237,43), createPoke(229,47), createPoke(149,50) ]},
+ falkner: {region:'johto', badge:'zephyr',badgeEmoji:'🪽', strategy:['flying','speed'], reward:1800, badgeReq:0, team:[trainerPoke(16,13,{talent:'keeneye',moves:['gust','quickattack']}), trainerPoke(18,15,{talent:'tangledfeet',moves:['gust','quickattack','wingattack']})]},
+ bugsy: {region:'johto', badge:'hive',badgeEmoji:'🐞', strategy:['bug','tempo'], reward:2200, badgeReq:1, team:[trainerPoke(11,15,{talent:'shedskin',moves:['stringshot','bugbite']}), trainerPoke(14,15,{talent:'shedskin',moves:['poisonsting','bugbite']}), trainerPoke(123,17,{talent:'technician',moves:['bugbite','wingattack','quickattack']})]},
+ whitney: {region:'johto', badge:'plain',badgeEmoji:'🐮', strategy:['normal','bulk'], reward:2600, badgeReq:2, team:[trainerPoke(35,18,{talent:'cutecharm',moves:['bodyslam','dazzlinggleam']}), trainerPoke(36,20,{talent:'magicguard',moves:['bodyslam','moonblast','icebeam']})]},
+ morty: {region:'johto', badge:'fog',badgeEmoji:'', strategy:['ghost','status'], reward:3200, badgeReq:3, team:[trainerPoke(92,21,{talent:'levitate',moves:['lick','shadowball']}), trainerPoke(93,23,{talent:'levitate',moves:['shadowball','nightshade']}), trainerPoke(94,25,{talent:'cursedbody',moves:['shadowball','nightshade','psychic']})]},
+ chuck: {region:'johto', badge:'storm',badgeEmoji:'🥊', strategy:['fighting','physical'], reward:3800, badgeReq:4, team:[trainerPoke(56,27,{talent:'vitalspirit',moves:['karatechop','rockslide']}), trainerPoke(62,30,{talent:'waterabsorb',moves:['surf','karatechop','icebeam']})]},
+ jasmine: {region:'johto', badge:'mineral',badgeEmoji:'', strategy:['steel','defense'], reward:4200, badgeReq:5, team:[trainerPoke(81,30,{talent:'sturdy',moves:['thunderbolt','metalclaw']}), trainerPoke(82,35,{talent:'magnetpull',moves:['thunderbolt','irontail']}), trainerPoke(208,35,{talent:'sturdy',moves:['irontail','earthquake','rockthrow']})]},
+ pryce: {region:'johto', badge:'glacier',badgeEmoji:'❄', strategy:['ice','water'], reward:4800, badgeReq:6, team:[trainerPoke(86,32,{talent:'thickfat',moves:['icebeam','watergun']}), trainerPoke(87,34,{talent:'thickfat',moves:['icebeam','surf']}), trainerPoke(131,36,{talent:'waterabsorb',moves:['icebeam','surf','bodyslam']})]},
+ clair: {region:'johto', badge:'rising',badgeEmoji:'', strategy:['dragon','boss'], reward:5500, badgeReq:7, team:[trainerPoke(147,37,{talent:'shedskin',moves:['dragonbreath','surf']}), trainerPoke(148,39,{talent:'shedskin',moves:['dragonbreath','thunderbolt']}), trainerPoke(130,40,{talent:'intimidate',moves:['surf','bite','dragonbreath']}), trainerPoke(230,42,{talent:'sniper',moves:['surf','dragonbreath','icebeam']})]}
 };
 
 
@@ -70,3 +67,4 @@ if (typeof JOHTO_LEAGUE_TRAINERS !== 'undefined' && typeof window !== 'undefined
 if (typeof getLeagueTrainersForRegion !== 'undefined' && typeof window !== 'undefined') window.getLeagueTrainersForRegion = getLeagueTrainersForRegion;
 
 export {};
+

@@ -113,6 +113,36 @@ async function champVictory(){
  await wait(1200); endBattle(); renderMap(); showTab('info');
  return;
 }
+ if(battle.isQuestTrainerBattle){
+ const battleId = battle.questTrainerBattleId;
+ if(typeof completeQuestTrainerBattle === 'function') completeQuestTrainerBattle(battleId);
+ battle.isQuestTrainerBattle = false;
+ battle.questTrainerBattleId = null;
+ battle.questTrainerQuestId = null;
+ battle.questTrainerCat = null;
+ updateHeader();
+ renderStoryWindow();
+ saveGame();
+ await wait(1200);
+ endBattle();
+ renderMap();
+ showTab('info');
+ return;
+}
+ if(battle.isAtollBattle){
+ const reward = battle.atollReward || 0;
+ if(typeof completeAtollBattle === 'function') completeAtollBattle(reward, battle.atollMode || battle.atollRank);
+ battle.isAtollBattle = false;
+ battle.atollReward = 0;
+ battle.atollRank = null;
+ battle.atollMode = null;
+ updateHeader();
+ saveGame();
+ await wait(1200);
+ endBattle();
+ openFullscreenPanel('atoll');
+ return;
+}
  if(battle.champId && String(battle.champId).startsWith('quest_')){
  const qId = Number(battle.champId.split('_')[1]);
  const q = STORY_QUESTS.find(x => x.id === qId);
@@ -207,4 +237,5 @@ if (typeof switchBattlePoke !== 'undefined' && typeof window !== 'undefined') wi
 if (typeof doSwitchBattlePoke !== 'undefined' && typeof window !== 'undefined') window.doSwitchBattlePoke = doSwitchBattlePoke;
 if (typeof healTeamHalf !== 'undefined' && typeof window !== 'undefined') window.healTeamHalf = healTeamHalf;
 if (typeof showQuestCapturePanel !== 'undefined' && typeof window !== 'undefined') window.showQuestCapturePanel = showQuestCapturePanel;
+
 

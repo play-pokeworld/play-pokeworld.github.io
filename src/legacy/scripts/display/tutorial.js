@@ -30,11 +30,11 @@ function tutorialGiveReward(step){
 }
 function tutorialSteps(){
  return [
-  {id:'route1_battles', title:t('tutorial_step_route1_title')||'Premiers combats', desc:t('tutorial_step_route1_desc')||'Gagne 3 combats sauvages sur la Route 1.', how:()=>`Où aller : fenêtre Carte → Route 1. Ensuite, dans la fenêtre Lieu, clique sur 🌾 Explorer. ${tutorialDeviceHint('map')}`, actionLabel:'Aller à Route 1', actionCall:'clickLocation', actionArgs:"'route1'", done:()=>((G.wildWinsByLoc||{}).route1||0)>=3, money:300, items:{berry_oran:3}, rewardText:'+300₽ + 3 Baies Oran'},
+  {id:'route1_battles', title:t('tutorial_step_route1_title')||'Premiers combats', desc:t('tutorial_step_route1_desc')||'Gagne 3 combats sauvages sur la Route 1.', how:()=>`Où aller : fenêtre Carte → Route 1. Ensuite, dans la fenêtre Lieu, clique sur Explorer. ${tutorialDeviceHint('map')}`, actionLabel:'Aller à Route 1', actionCall:'clickLocation', actionArgs:"'route1'", done:()=>((G.wildWinsByLoc||{}).route1||0)>=3, money:300, items:{berry_oran:3}, rewardText:'+300₽ + 3 Baies Oran'},
   {id:'open_poke_sheet', title:t('tutorial_step_sheet_title')||'Lire une fiche Pokémon', desc:t('tutorial_step_sheet_desc')||'Ouvre une fiche Pokémon pour lire ses stats, IV, EV, talents et attaques.', how:()=>`${tutorialDeviceHint('sheet')} La fiche contient les onglets Base Stats / IV / EV et la liste des attaques.`, actionLabel:'Voir mon équipe', actionCall:'showTab', actionArgs:"'team'", done:()=>!!ensureTutorialState().completed.open_poke_sheet, money:200, rewardText:'+200₽'},
-  {id:'open_bag', title:t('tutorial_step_bag_title')||'Ouvrir le sac', desc:t('tutorial_step_bag_desc')||'Ouvre le Sac depuis les Raccourcis pour voir tes objets.', how:()=>`Dans la fenêtre Raccourcis, clique 🎒 Sac. Tu y trouveras baies, objets tenus, pierres, trésors et objets spéciaux.`, actionLabel:'Ouvrir le Sac', actionCall:'openFullscreenPanel', actionArgs:"'inventory'", items:{potion:2}, done:()=>!!ensureTutorialState().completed.open_bag, rewardText:'+2 Potions'},
+  {id:'open_bag', title:t('tutorial_step_bag_title')||'Ouvrir le sac', desc:t('tutorial_step_bag_desc')||'Ouvre le Sac depuis les Raccourcis pour voir tes objets.', how:()=>`Dans la fenêtre Raccourcis, clique sur Sac. Tu y trouveras baies, objets tenus, pierres, trésors et objets spéciaux.`, actionLabel:'Ouvrir le Sac', actionCall:'openFullscreenPanel', actionArgs:"'inventory'", items:{potion:2}, done:()=>!!ensureTutorialState().completed.open_bag, rewardText:'+2 Potions'},
   {id:'open_pokedex', title:t('tutorial_step_dex_title')||'Consulter le Pokédex', desc:t('tutorial_step_dex_desc')||'Ouvre le Pokédex et clique sur un Pokémon déjà vu.', how:()=>`Dans Raccourcis, ouvre le Pokédex. Clique sur un Pokémon non grisé pour voir où le trouver, ses talents et sa description.`, actionLabel:'Ouvrir le Pokédex', actionCall:'openFullscreenPanel', actionArgs:"'pokedex'", done:()=>!!ensureTutorialState().completed.open_pokedex, money:500, rewardText:'+500₽'},
-  {id:'first_badge', title:t('tutorial_step_badge_title')||'Premier badge', desc:t('tutorial_step_badge_desc')||'Progresse jusqu’à Argenta et bats Pierre.', how:()=>`Nettoie les routes jusqu’à Argenta. Une fois à Argenta, dans la fenêtre Lieu, clique sur ⚔️ Défier Pierre. Les badges débloquent de nouvelles zones.`, actionLabel:'Voir la Carte', actionCall:'showTab', actionArgs:"'info'", done:()=>G.badges&&G.badges.includes('brock'), items:{rarecandy:1}, rewardText:'+1 Super Bonbon'},
+  {id:'first_badge', title:t('tutorial_step_badge_title')||'Premier badge', desc:t('tutorial_step_badge_desc')||'Progresse jusqu’à Argenta et bats Pierre.', how:()=>`Nettoie les routes jusqu’à Argenta. Une fois à Argenta, dans la fenêtre Lieu, clique sur Défier Pierre. Les badges débloquent de nouvelles zones.`, actionLabel:'Voir la Carte', actionCall:'showTab', actionArgs:"'info'", done:()=>G.badges&&G.badges.includes('brock'), items:{rarecandy:1}, rewardText:'+1 Super Bonbon'},
  ];
 }
 function updateTutorialProgress(){
@@ -75,64 +75,96 @@ function showTutorialTip(id, title, body){ return; }
 
 function guideSections(){
  return {
-  map:{icon:'🗺️', title:t('guide_map_title')||'Carte & progression', pages:[
-   ['Lire la carte','Les lieux colorés sont disponibles, les lieux gris sont verrouillés. La couleur indique aussi s’il reste des Pokémon à capturer, des quêtes ou des shiny à trouver. Le bouton ? de la carte explique la légende.'],
-   ['Se déplacer','Clique sur un lieu débloqué pour t’y rendre. Sur mobile, utilise la barre du bas pour revenir à Carte ou Lieu rapidement.'],
-   ['Dans un lieu','La fenêtre Lieu peut afficher plusieurs actions : 🌾 Explorer pour les combats sauvages, ⚔️ Défier une arène ou un boss, 🏪 Boutique, 🗣 PNJ/Quêtes, accès région/bateau, fossiles ou infos de zone.'],
-   ['Débloquer la suite','Certaines routes demandent des combats sauvages pour ouvrir le chemin suivant. D’autres zones demandent un badge, une quête ou un objet spécial comme la Poké Flûte.'],
-   ['PNJ et quêtes','Les PNJ marqués sur la carte ou dans le lieu peuvent donner des quêtes. Les quêtes principales font avancer l’histoire ; les secondaires donnent des récompenses utiles.']
+  map:{icon:(typeof getIcon==='function'?getIcon('map',14):''), title:t('guide_map_title')||'Carte & progression', pages:[
+   ['Lire la carte','Les couleurs montrent l’état des lieux : disponibles, verrouillés, zones avec captures manquantes, quêtes actives ou shiny encore absents. Le bouton d’aide de la carte résume ce code couleur.'],
+   ['Déplacements','Clique sur un lieu débloqué pour t’y rendre. Une fois sur place, la fenêtre Lieu affiche les actions disponibles : explorer, défier, boutique, PNJ, bateau, labo fossile ou accès spéciaux.'],
+   ['Verrous de progression','La progression peut dépendre d’un nombre de combats sauvages gagnés, d’un badge, d’une quête principale ou d’un objet spécial. Les messages de blocage indiquent toujours la condition manquante.'],
+   ['Régions','Kanto puis Johto se débloquent avec la progression. Certaines règles d’accès imposent aussi de terminer une Ligue ou un Pokédex régional avant d’aller plus loin.'],
+   ['PNJ et quêtes','Les PNJ servent à faire avancer l’histoire, lancer des quêtes secondaires ou déclencher des combats scénarisés. Pense à revisiter les villes après les gros objectifs.']
   ]},
-  combat:{icon:'⚔️', title:t('guide_combat_title')||'Combat', pages:[
-   ['Déroulement automatique','Le combat avance en temps réel. Chaque Pokémon utilise ses attaques automatiquement quand sa barre est chargée. La vitesse x1/x2/x3 change le rythme.'],
-   ['Attaques et barres','Les attaques affichées ont un type, une puissance et parfois un effet. L’attaque prête ou en cours se met en évidence. Les PP ne sont pas gérés comme dans les jeux classiques : le système repose surtout sur les cooldowns.'],
-   ['Changer de Pokémon','Clique sur un Pokémon de ton équipe dans la fenêtre de combat pour le rendre actif. Sur mobile, touche la carte du Pokémon. Certains changements attendent la fin d’une animation.'],
-   ['Statuts','Brûlure réduit les dégâts physiques et inflige des dégâts. Poison inflige des dégâts sur la durée. Paralysie peut empêcher d’agir. Sommeil et gel peuvent faire passer des tours. Confusion/peur sont converties en effets simples selon le moteur.'],
-   ['Capture et butin','Après un K.O. sauvage, le jeu tente une capture automatiquement. Le butin en bas de la fenêtre montre les Pokémon capturés et les objets trouvés pendant la session.'],
-   ['Talents et objets','Les talents et objets tenus peuvent changer les dégâts, la vitesse, les immunités ou les statuts. Consulte la fiche Pokémon ou le Dictionnaire pour les détails.']
+  combat:{icon:(typeof getIcon==='function'?getIcon('battle',14):''), title:t('guide_combat_title')||'Combat', pages:[
+   ['Principe général','Les combats sont automatiques et en temps réel. Tu ne choisis pas l’attaque pendant le combat : la stratégie se prépare avant, via l’équipe, les objets, les talents et l’ordre de tes Pokémon.'],
+   ['Barres d’attaque','Chaque Pokémon charge automatiquement son attaque suivante. La vitesse, les statuts et certains talents modifient le rythme des attaques.'],
+   ['Efficacité','Les indicateurs ×2, ×4, ×½, ×¼ et ×0 montrent l’efficacité d’un type contre la cible actuelle. Ils sont visibles directement sur les attaques pour lire rapidement un matchup.'],
+   ['Changement de Pokémon','Tu peux changer de Pokémon actif pendant un combat normal si un autre membre vivant est disponible. Les combats d’entraînement solo n’autorisent pas ce changement.'],
+   ['Statuts','Brûlure, poison, poison grave, sommeil, gel et paralysie ont des effets récurrents ou des pertes de tour. Ils sont affichés en badges courts sur les cartes.'],
+   ['Talents et objets','Les talents et objets tenus peuvent réduire des dégâts, soigner, booster des stats ou modifier des types d’attaque. Observe les petites capsules visuelles quand ils s’activent.'],
+   ['Butin et captures','Après les combats sauvages, le jeu gère automatiquement les captures et le butin. Le résumé de session regroupe captures, objets, victoires, K.O. et dégâts de l’équipe.'],
+   ['Combats spéciaux','Arènes, Ligue, rival, Team Rocket, boss de quête et Atoll demandent surtout de la préparation : bonne équipe, bons talents, EV et objets tenus.']
   ]},
-  pokemon:{icon:'🧬', title:t('guide_pokemon_title')||'Pokémon', pages:[
-   ['Ouvrir la fiche',`${tutorialDeviceHint('sheet')} La fiche donne tout : niveau, types, stats, IV, EV, talents, objet tenu, évolutions et attaques.`],
-   ['Base Stats','Les Base Stats sont les stats naturelles de l’espèce. Plus elles sont hautes, plus le Pokémon est naturellement fort dans ce domaine.'],
-   ['IV','Les IV sont des bonus rares et permanents. Chaque étoile donne un petit bonus à une stat. On peut en gagner à la capture, à la pension ou via de futures améliorations.'],
-   ['EV','Les EV sont l’entraînement spécialisé. Chaque point renforce une stat. L’entraînement EV donne exactement +1 EV aléatoire jusqu’à un maximum.'],
-   ['Changer les attaques','Dans la fiche, clique une attaque connue pour choisir un slot à remplacer, puis clique une attaque apprenable. Si 4 attaques sont déjà équipées, tu dois sélectionner un slot avant d’apprendre.'],
-   ['Attaques verrouillées','Certaines attaques avancées sont verrouillées derrière l’entraînement Capacité. Une fois débloquées, elles apparaissent dans les attaques apprenables.'],
-   ['Talents','Chaque Pokémon a plusieurs talents possibles. La capture et l’entraînement Talent peuvent en débloquer. Les talents rares sont plus difficiles à obtenir.'],
-   ['Objet tenu','Un Pokémon peut tenir un objet. Un même objet tenu ne peut être porté que par un seul Pokémon à la fois. Les bonus dépendent souvent du nombre possédé dans le sac.']
+  pokemon:{icon:(typeof getIcon==='function'?getIcon('pokeball',14):''), title:t('guide_pokemon_title')||'Pokémon', pages:[
+   ['Fiche Pokémon',`${tutorialDeviceHint('sheet')} La fiche montre types, niveau, rang, Base Stats, IV, EV, talents, objet tenu, évolutions, attaques connues et attaques apprenables.`],
+   ['Base Stats','Les Base Stats représentent le potentiel naturel de l’espèce. Deux Pokémon d’une même espèce partagent cette base, puis les IV/EV/personnalisation font la différence.'],
+   ['IV','Les IV sont des bonus durables sur chaque statistique. Plus ils sont hauts, meilleur est le Pokémon sur le long terme.'],
+   ['EV','Les EV représentent l’entraînement spécialisé. Ils montent surtout via l’entraînement EV et améliorent progressivement une statistique précise.'],
+   ['Talents','Chaque espèce peut disposer de plusieurs talents. La capture, l’entraînement Talent et certains progrès débloquent ces options au fil du temps.'],
+   ['Attaques','Clique une attaque connue pour sélectionner un slot à remplacer, puis une attaque apprenable. Les descriptions de capacités indiquent type, puissance, précision et effets.'],
+   ['Objet tenu','Un objet tenu peut transformer un Pokémon médiocre en bon support, ou renforcer un sweeper déjà fort. Un même objet ne peut être équipé que sur un seul Pokémon à la fois.'],
+   ['Favori / verrouillage','Favori sert à repérer un Pokémon important. Verrouillé empêche plusieurs automatismes de le recycler par erreur.']
   ]},
-  bag:{icon:'🎒', title:t('guide_bag_title')||'Sac', pages:[
-   ['Catégories','Le sac sépare les Baies, objets tenus, pierres/évolutions, trésors, fossiles et objets spéciaux. Utilise les filtres pour t’y retrouver.'],
-   ['Objets tenus','Clique l’objet tenu sur un Pokémon ou utilise le sac pour l’équiper. Un objet déjà porté par un autre Pokémon est bloqué.'],
-   ['Pierres et évolutions','Les objets d’évolution affichent les Pokémon compatibles. L’indicateur ✓/! montre si l’évolution est déjà possédée.'],
-   ['Trésors et fossiles','Les trésors se vendent. Les fossiles se raniment via la pension/labo fossile. Les fossiles sont aussi listés dans le Dictionnaire.'],
-   ['Objets spéciaux','Les objets spéciaux comme la Poké Flûte servent à débloquer des quêtes ou des passages.']
+  bag:{icon:(typeof getIcon==='function'?getIcon('bag',14):''), title:t('guide_bag_title')||'Sac', pages:[
+   ['Organisation','Le sac est trié par catégories : consommables, objets tenus, pierres, trésors, fossiles et objets spéciaux. Utilise les filtres et le tri pour gagner du temps.'],
+   ['Consommables','Les soins, bonbons et objets d’usage immédiat s’emploient depuis le sac ou via certaines interfaces dédiées.'],
+   ['Objets tenus','Les objets tenus sont pensés pour la préparation d’équipe. Le bonus réel dépend parfois du stock possédé dans le sac.'],
+   ['Pierres d’évolution','Les pierres affichent les Pokémon compatibles. Le jeu t’indique aussi si l’évolution cible est déjà obtenue.'],
+   ['Trésors et fossiles','Les trésors servent surtout à l’économie. Les fossiles servent à la pension / résurrection plutôt qu’à la vente.']
   ]},
-  mine:{icon:'⛏️', title:t('guide_mine_title')||'Mine', pages:[
-   ['But','La mine cache pierres, trésors et fossiles. Creuse les cases pour révéler entièrement les objets.'],
-   ['Outils','Le burin coûte peu et creuse précisément. Le marteau coûte plus mais touche une zone plus large.'],
-   ['Indices visuels','Les cases non creusées ne révèlent pas les objets. Une case totalement creusée avec un objet devient beaucoup plus visible.'],
-   ['Énergie et reset','Creuser consomme de l’énergie. Quand tous les objets de la couche sont récupérés, la mine se renouvelle automatiquement.']
+  mine:{icon:(typeof getIcon==='function'?getIcon('mine',14):''), title:t('guide_mine_title')||'Mine', pages:[
+   ['Objectif','La mine cache pierres, trésors et fossiles. Il faut révéler complètement les objets pour les récupérer.'],
+   ['Outils','Le burin est précis. Le marteau couvre une petite zone. Les améliorations débloquent des outils plus efficaces comme la pioche renforcée, la foreuse et la dynamite.'],
+   ['Énergie','Chaque coup consomme de l’énergie. L’énergie se régénère avec le temps et certains systèmes de progression.'],
+   ['Renouvellement','Une fois tous les objets d’une couche récupérés, la mine se renouvelle. Les futurs mineurs améliorent l’efficacité et l’endurance des sessions.']
   ]},
-  hatchery:{icon:'🥚', title:t('guide_hatchery_title')||'Pension', pages:[
-   ['Déposer un Pokémon','Dépose un Pokémon depuis l’équipe ou la boîte dans un slot. La pension peut améliorer certains aspects selon les systèmes débloqués.'],
-   ['Fossiles','Les fossiles trouvés à la mine peuvent être envoyés à la pension pour être ranimés en Pokémon.'],
-   ['Améliorations','Le bouton Améliorations Pension contient les slots supplémentaires et les automatisations. Plus tard, les bonus de personnel seront ajoutés ici.'],
-   ['Automatisation','Éclosion automatique et remplissage automatique existent déjà, mais restent optionnels pour ne pas gêner les joueurs qui veulent gérer manuellement.']
+  hatchery:{icon:(typeof getIcon==='function'?getIcon('hatchery',14):''), title:t('guide_hatchery_title')||'Pension', pages:[
+   ['Déposer un Pokémon','Dépose un Pokémon depuis l’équipe ou depuis la boîte si un slot est libre. Plusieurs slots se débloquent via les améliorations.'],
+   ['Progression des œufs','Les œufs et fossiles avancent avec les K.O. de combat. Quand le compteur requis est atteint, ils sont prêts à éclore.'],
+   ['Fossiles','Les fossiles trouvés à la mine peuvent être envoyés en pension pour être ranimés sous forme de Pokémon.'],
+   ['Automatisation','La pension possède une file d’attente manuelle, un remplissage automatique, une éclosion automatique, des filtres de tri et du personnel.'],
+   ['Gérants','Les gérants améliorent progressivement l’efficacité de la pension. Ils se recrutent par lieu et gagnent de l’XP en travaillant.']
   ]},
-  training:{icon:'🏋️', title:t('guide_training_title')||'Entraînement', pages:[
-   ['Choisir le Pokémon','Sélectionne un Pokémon à entraîner. Plus tard plusieurs Pokémon pourront être entraînés en parallèle.'],
-   ['Capacité','Débloque une attaque avancée verrouillée. Si le Pokémon a moins de 4 attaques, elle peut être ajoutée directement.'],
-   ['Talent','Tire un talent parmi la liste du Pokémon. Il peut être nouveau ou déjà connu, selon la rareté et la chance.'],
-   ['EV','Donne exactement +1 EV aléatoire si le Pokémon n’est pas déjà au maximum.'],
-   ['Niveau','Donne entre +2 et +5 niveaux sans dépasser le niveau 100.'],
-   ['Boutons grisés','Un entraînement qui ne sert plus à rien devient grisé : niveau 100, EV au max, plus de talent, plus de capacité à débloquer.'],
-   ['Équipes de coachs','Les combats d’entraînement utilisent 6 Pokémon et choisissent une équipe selon le type principal du Pokémon entraîné.']
+  training:{icon:(typeof getIcon==='function'?getIcon('training',14):''), title:t('guide_training_title')||'Entraînement', pages:[
+   ['Modes','Les modes principaux sont Niveau, EV, Talent et Capacité. Chaque mode vise une amélioration précise.'],
+   ['Niveau','Le stage Niveau donne plusieurs niveaux d’un coup, dans la limite du niveau 100.'],
+   ['EV','Le stage EV donne exactement +1 EV aléatoire tant que le Pokémon n’est pas déjà au maximum.'],
+   ['Talent','Le stage Talent tente de débloquer ou reconfirmer un talent possible de l’espèce. Les talents rares prennent naturellement plus de temps.'],
+   ['Capacité','Le stage Capacité débloque des attaques avancées réservées à l’entraînement. Elles deviennent ensuite apprenables dans la fiche du Pokémon.'],
+   ['Slots et automatisation','Chaque slot peut avoir sa propre file d’attente et son propre mode auto. Le personnel d’entraînement améliore aussi la régularité du système.']
   ]},
-  dictionary:{icon:'📚', title:t('guide_dictionary_title')||'Dictionnaire', pages:[
+  quests:{icon:(typeof getIcon==='function'?getIcon('quests',14):''), title:'Quêtes', pages:[
+   ['Quêtes principales','Elles débloquent l’histoire, des villes, des objets-clés et les passages majeurs comme la Poké Flûte ou l’accès à d’autres régions.'],
+   ['Quêtes secondaires','Elles donnent surtout de l’argent, des objets ou des combats spéciaux. Elles apparaissent souvent via les PNJ de ville.'],
+   ['Quêtes répétables','Les répétables servent d’économie long terme. Elles demandent de vaincre, capturer ou vendre selon l’objectif proposé.'],
+   ['Combats de quête','Certaines quêtes lancent un combat unique. Le défi est souvent plus important qu’un simple combat sauvage et peut donner un Pokémon ou un gros reward.']
+  ]},
+  economy:{icon:(typeof getIcon==='function'?getIcon('shop',14):''), title:'Économie & marché', pages:[
+   ['Boutiques','Les boutiques vendent soins, objets spéciaux, pierres, objets tenus et autres ressources selon ta progression.'],
+   ['PokéMarket','Le marché sert à acheter certaines espèces introuvables facilement dans la nature. Il complète la collection plus qu’il ne remplace l’exploration.'],
+   ['Trésors et ventes','La mine alimente une grande partie de l’économie via les trésors. Les doublons d’objets spéciaux peuvent aussi être convertis en argent.'],
+   ['Récompenses','Argent et objets viennent des quêtes, combats, mine, captures, répétables et modes spéciaux comme l’Atoll.']
+  ]},
+  automation:{icon:(typeof getIcon==='function'?getIcon('settings',14):''), title:'Automatisation & personnel', pages:[
+   ['Principe','L’automatisation n’agit pas seule au début : il faut acheter les modules, configurer les règles et parfois remplir la file d’attente manuellement.'],
+   ['Files d’attente','La pension et l’entraînement possèdent leurs propres files, avec capacité maximale, filtres et tri.'],
+   ['Personnel','Le personnel se recrute selon la progression. Chaque employé donne un bonus spécialisé et gagne des niveaux avec l’usage.'],
+   ['Protections','Les Pokémon verrouillés et certaines situations évitent que l’automatisation touche à des Pokémon que tu veux garder manuellement.']
+  ]},
+  save:{icon:(typeof getIcon==='function'?getIcon('save',14):''), title:'Sauvegardes & AFK', pages:[
+   ['Multi-saves','Le jeu gère plusieurs sauvegardes avec nom, fond et icône personnalisables.'],
+   ['Import / export','Exporte régulièrement tes saves pour éviter toute perte pendant les phases alpha. L’import permet aussi d’écraser proprement une partie existante.'],
+   ['AFK','Une partie de la progression peut être simulée hors ligne. Le résumé AFK indique combats gagnés, captures, énergie, argent et K.O. éventuels.'],
+   ['Sécurité alpha','Comme le projet est encore en alpha, garde toujours une exportation récente avant de tester un nouveau zip.']
+  ]},
+  atoll:{icon:(typeof getIcon==='function'?getIcon('atoll',14):''), title:t('battle_atoll_title')||'Atoll de Combat', pages:[
+   ['Rôle','L’Atoll de Combat est le contenu de fin d’alpha. Il sert à tester des équipes optimisées dans plusieurs formats.'],
+   ['Formats','Tour, Usine, Arène et Dôme appliquent chacun des contraintes différentes : rang maximum, location, objets interdits ou équipe prêtée.'],
+   ['Préparation','Les objets tenus, les talents, les EV et l’ordre d’équipe comptent beaucoup plus ici que dans les combats sauvages classiques.'],
+   ['Récompenses','Les victoires donnent des jetons Atoll utilisables dans la boutique dédiée. Les séries augmentent l’intérêt du farm.']
+  ]},
+  dictionary:{icon:(typeof getIcon==='function'?getIcon('dictionary',14):''), title:t('guide_dictionary_title')||'Dictionnaire', pages:[
    ['Objets','Cherche un objet pour savoir si tu le possèdes, où le trouver et à quoi il sert.'],
-   ['Attaques','Cherche une attaque pour voir son type, sa puissance, ses effets et si un de tes Pokémon la connaît.'],
-   ['Talents','Cherche un talent pour voir sa rareté, son effet, et quels Pokémon peuvent l’avoir.'],
-   ['Recherche','La barre de recherche filtre immédiatement la page active. Elle est utile quand les listes deviennent longues.']
+   ['Attaques','Cherche une attaque pour voir son type, sa puissance, ses effets et quels Pokémon la connaissent déjà.'],
+   ['Talents','Cherche un talent pour voir son effet, sa rareté et les Pokémon concernés.'],
+   ['Usage','Le dictionnaire devient très utile quand le nombre d’objets, de talents et d’attaques commence à devenir difficile à suivre de tête.']
   ]}
  };
 }
@@ -173,4 +205,5 @@ if(typeof window !== 'undefined'){
  window.showTutorialTip=showTutorialTip;
  window.installTutorialHooks=installTutorialHooks;
 }
+
 

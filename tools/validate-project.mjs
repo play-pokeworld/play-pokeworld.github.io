@@ -67,6 +67,10 @@ assertEqual('Pokemon back sprites', countFiles('src/assets/images/pokemon/back')
 assertEqual('Pokemon front shiny sprites', countFiles('src/assets/images/pokemon/frontShiny'), 251);
 assertEqual('Pokemon back shiny sprites', countFiles('src/assets/images/pokemon/backShiny'), 251);
 assertAtLeast('item icons', countFiles('src/assets/images/items'), 72);
+assertEqual('region maps', countFiles('src/assets/images/maps'), 2);
+assertAtLeast('background images', countFiles('src/assets/images/bg'), 3);
+assertAtLeast('trainer npc sprites', countFiles('src/assets/images/trainers/npcs'), 500);
+assertAtLeast('trainer profile sprites', countFiles('src/assets/images/trainers/profil'), 163);
 
 assertEqual('modern EventBus module', exists('src/core/event-bus.js') ? 1 : 0, 1);
 assertEqual('core storage module', exists('src/core/storage.js') ? 1 : 0, 1);
@@ -98,3 +102,4 @@ if (fail.length) {
   process.exit(1);
 }
 console.log('Validation passed.');
+

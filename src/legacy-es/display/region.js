@@ -61,3 +61,4 @@ if (typeof travelToRegion !== 'undefined' && typeof window !== 'undefined') wind
 if (typeof switchMapRegion !== 'undefined' && typeof window !== 'undefined') window.switchMapRegion = switchMapRegion;
 
 export {};
+

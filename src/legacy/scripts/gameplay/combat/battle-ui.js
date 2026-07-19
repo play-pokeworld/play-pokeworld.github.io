@@ -93,9 +93,9 @@ function renderMoveButtons(){
  const mv=MOVES[m.id];
  if(!mv) return '';
  const eff=battle.enemyPoke?typeEff(mv.type,battle.enemyPoke.type1,battle.enemyPoke.type2):1;
- const effHint=eff===0?'⛔':eff>=2?'':eff<=0.5?'':''; 
+ const effHint=eff===0?'×0':eff>=4?'×4':eff>=2?'×2':eff<=0.25?'×¼':eff<=0.5?'×½':''; 
  const isNext=i===nextIdx;
- return '<div class="auto-move'+(isNext?' next-up':'')+' type-' + (mv.type||'').toLowerCase() + '" data-move-id="'+m.id+'" data-idx="'+i+'" data-context-call="openMoveInfo" data-context-args="\''+m.id+'\'" title="Clic droit : info">'+
+ return '<div class="auto-move'+(isNext?' next-up':'')+' type-' + (mv.type||'').toLowerCase() + '" data-move-id="'+m.id+'" data-idx="'+i+'" data-context-call="openMoveInfo" data-context-args="\''+m.id+'\'" title="'+t('context_info_touch')+'">'+
  '<div class="am-top">'+
  '<span>'+(i+1)+'. '+getMoveName(m.id)+' '+effHint+'</span>'+
  '<span class="am-type type-' + (mv.type||'').toLowerCase() + '">'+mv.type+'</span>'+
@@ -183,3 +183,4 @@ function toggleDebugX10(show){
   if(show) body.classList.add('debug-active');
   else body.classList.remove('debug-active');
 }
+

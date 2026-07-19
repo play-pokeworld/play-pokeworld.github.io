@@ -255,7 +255,97 @@ window.L_en_quests = {
 "66": {
 "title":"Ilex Forest: Celebi",
 "desc":"In Ilex Forest, knock out 150 wild Pokémon to meet Celebi.",
-"rewardDesc":"Celebi + 35,000₽"
+"rewardDesc":"Celebi + 35,000₽",
+"1001": {
+"title": "Route 22: Rival Challenge",
+"desc": "On Route 22, battle your rival Blue to prove your team is ready for Pewter.",
+"rewardDesc": "Battle reward + progression"
+},
+"1002": {
+"title": "Mt. Moon: Rocket Ambush",
+"desc": "Inside Mt. Moon, push back a Team Rocket Grunt searching for fossils.",
+"rewardDesc": "Battle reward"
+},
+"1003": {
+"title": "Mt. Moon: Fossil Clash",
+"desc": "Battle Super Nerd Miguel to secure a rare fossil.",
+"rewardDesc": "1 Fossil + battle reward"
+},
+"1004": {
+"title": "Cerulean City: Rival Rematch",
+"desc": "In Cerulean City, Blue blocks your path before Misty's Gym.",
+"rewardDesc": "Battle reward"
+},
+"1005": {
+"title": "S.S. Anne: Deck Duel",
+"desc": "In Vermilion City, battle Blue before challenging Lt. Surge.",
+"rewardDesc": "Battle reward"
+},
+"1006": {
+"title": "Celadon City: Rocket Hideout",
+"desc": "Clear out the Rocket Hideout hidden beneath Celadon City.",
+"rewardDesc": "Battle reward"
+},
+"1007": {
+"title": "Celadon City: Giovanni Appears",
+"desc": "Battle Giovanni and stop Team Rocket's Celadon operation.",
+"rewardDesc": "Battle reward"
+},
+"1008": {
+"title": "Silph Co.: Rival Encounter",
+"desc": "In Saffron City, Blue challenges you during the Silph Co. crisis.",
+"rewardDesc": "Battle reward"
+},
+"1009": {
+"title": "Silph Co.: Giovanni",
+"desc": "Defeat Giovanni and free Saffron City from Team Rocket.",
+"rewardDesc": "Battle reward"
+},
+"1010": {
+"title": "Victory Road: Final Rival Duel",
+"desc": "Before the Pokémon League, Blue gives you one last strategic test.",
+"rewardDesc": "Battle reward"
+},
+"1101": {
+"title": "Cherrygrove City: Stolen Starter",
+"desc": "Battle Silver after the stolen Pokémon incident.",
+"rewardDesc": "Battle reward"
+},
+"1102": {
+"title": "Sprout Tower: Elder Li",
+"desc": "Climb Sprout Tower and battle Elder Li.",
+"rewardDesc": "Battle reward"
+},
+"1103": {
+"title": "Slowpoke Well: Team Rocket",
+"desc": "In Azalea Town, drive Team Rocket out of Slowpoke Well.",
+"rewardDesc": "Battle reward"
+},
+"1104": {
+"title": "Ilex Forest: Rival",
+"desc": "Silver waits in Ilex Forest after Azalea Town.",
+"rewardDesc": "Battle reward"
+},
+"1105": {
+"title": "Burned Tower: Rival",
+"desc": "In Ecruteak City, battle Silver among the mysteries of Burned Tower.",
+"rewardDesc": "Battle reward"
+},
+"1106": {
+"title": "Lake of Rage: Rocket Executive",
+"desc": "After the Lake of Rage incident, battle a Rocket Executive.",
+"rewardDesc": "Battle reward"
+},
+"1107": {
+"title": "Radio Tower: Rocket Takeover",
+"desc": "In Goldenrod City, stop Team Rocket's occupation of the Radio Tower.",
+"rewardDesc": "Battle reward"
+},
+"1108": {
+"title": "Johto Victory Road: Rival",
+"desc": "Before the Johto League, Silver challenges you one last time.",
+"rewardDesc": "Battle reward"
+}
 }
 },
 "side": {
@@ -468,3 +558,4 @@ window.L_en_quests = {
 }
 }
 };
+

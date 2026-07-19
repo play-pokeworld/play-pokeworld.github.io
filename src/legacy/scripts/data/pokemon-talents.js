@@ -501,3 +501,4 @@ const POKEMON_TALENTS = {
   500: ['hydratation', 'psychicGuard', 'leafGuard', 'livingShield', 'overgrow', 'mistify', 'synchronize', 'solarPower', 'rainDish', 'strangeCharm', 'effectSpore', 'magicGuard', 'psychicAbsorb', 'growthAbsorb', 'chlorophyll', 'grassyPelt', 'pixiePelt', 'strategist', 'libero', 'flashPsycha', 'flashHerba'],
   501: ['plainGuard', 'average', 'scrappy', 'pickPocket', 'unburden', 'thickFat', 'guts', 'skillLink'],
 };
+

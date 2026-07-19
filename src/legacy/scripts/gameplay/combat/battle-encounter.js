@@ -61,6 +61,7 @@ function spawnNextWild(){
 async function onPlayerPokeFaint(){
  battle.paused=true;
  const p=getActivePlayerPoke();
+ if(!battle.isChamp && !battle.isTraining) battle.sessionPlayerKOs = (battle.sessionPlayerKOs||0) + 1;
  addBattleLog(tr('player_pokemon_ko', {name:p.name}));
  updateBattleUI();
  await wait(500);
@@ -104,4 +105,5 @@ async function onPlayerPokeFaint(){
 if (typeof startWildBattle !== 'undefined' && typeof window !== 'undefined') window.startWildBattle = startWildBattle;
 if (typeof startLegendaryEncounter !== 'undefined' && typeof window !== 'undefined') window.startLegendaryEncounter = startLegendaryEncounter;
 if (typeof spawnNextWild !== 'undefined' && typeof window !== 'undefined') window.spawnNextWild = spawnNextWild;
+
 

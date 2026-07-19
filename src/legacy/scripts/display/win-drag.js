@@ -12,7 +12,7 @@ function startWinDrag(e, winId){
  dragGhostEl = document.createElement('div');
  const titleText = win.querySelector('.win-header-title')?.textContent || winId;
  dragGhostEl.innerHTML = `<div class="extracted-template-style-124">
- <span>📌 Glisser pour Ancrer : ${titleText}</span>
+ <span>Glisser pour ancrer : ${titleText}</span>
  </div>`;
  dragGhostEl.style.position = 'fixed';
  dragGhostEl.style.pointerEvents = 'none';
@@ -134,3 +134,4 @@ window.addEventListener('mouseup', (e) => {
  activeDragWinId = null;
  dragGhostEl = null;
 });
+

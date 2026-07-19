@@ -1,19 +1,27 @@
 function endBattle(){
  if(typeof restoreAllTransformedPokemon === 'function') restoreAllTransformedPokemon();
  clearInterval(battle.timerId);
- const hadLoot=!battle.isChamp&&(((battle.sessionCatches||[]).length)||Object.keys(battle.sessionItems||{}).length);
+ const hadLoot=!battle.isChamp&&((((battle.sessionCatches||[]).length)||Object.keys(battle.sessionItems||{}).length||(battle.sessionWins||0)||(battle.sessionPlayerKOs||0)));
+ const wasAtollLoss = !!battle.isAtollBattle;
  battle.active=false;
  battle.paused=false;
+ battle.resolvingKO=false;
  battle.legendaryCatch=false;
  battle.isTraining=false;
  battle.trainee=null;
  battle.noAutoCatch=false;
  battle.questDefeatLoc=null;
  battle.isQuestDefeatBattle=false;
+ if(wasAtollLoss && G && G.atoll){ G.atoll.streak = 0; try{ if(typeof restoreAtollTeam === 'function') restoreAtollTeam(); notify(t('atoll_streak_lost'), 'var(--red)'); }catch(_){} }
+ battle.isAtollBattle=false;
+ battle.atollReward=0;
+ battle.atollRank=null;
+ battle.atollMode=null;
  battle.questRewardQuestId=null;
  battle.questRewardCat=null;
  battle.questRewardRegion=null;
  battle.questRewardDefId=null;
+ battle.trainerVisual=null;
  battle.enemyPoke=null;
  battle.champTeam=null;
  const idleScreen = document.getElementById('battle-idle-screen');
@@ -91,4 +99,5 @@ if (typeof restartLastBattle !== 'undefined' && typeof window !== 'undefined') w
 if (typeof leaveBattle !== 'undefined' && typeof window !== 'undefined') window.leaveBattle = leaveBattle;
 if (typeof resumeBattleActions !== 'undefined' && typeof window !== 'undefined') window.resumeBattleActions = resumeBattleActions;
 if (typeof wait !== 'undefined' && typeof window !== 'undefined') window.wait = wait;
+
 

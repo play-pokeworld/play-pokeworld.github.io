@@ -130,3 +130,4 @@ function changePokeTalent(teamIdx, boxId, newTal){
  if(boxId && boxId !== 'undefined' && boxId !== 'null') openBoxPokeModal(boxId);
  else openPokeModal(teamIdx);
 }
+

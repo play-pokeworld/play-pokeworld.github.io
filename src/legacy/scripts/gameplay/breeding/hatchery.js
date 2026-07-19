@@ -346,8 +346,7 @@ function hatchEgg(slotIdx=0){
  updateHeader();
  renderTeamWindow();
  renderHatcheryWindow();
- const prefix = slot.isFossil ? '🧬' : '';
- if((slot.isFossil && (p.shinyUnlocked||p.shinyActive||p.shiny)) || (!slot.isFossil && rollShiny())){
+  if((slot.isFossil && (p.shinyUnlocked||p.shinyActive||p.shiny)) || (!slot.isFossil && rollShiny())){
  notify(tr("m.hatchery.2", {p0:p.name}),"var(--light2)");
  } else {
  notify(tr("m.hatchery.1", {p0:p.name, p1:ivMsg}),"var(--green)");
@@ -438,4 +437,5 @@ if (typeof addPokemonToHatcheryQueue !== 'undefined' && typeof window !== 'undef
 if (typeof removePokemonFromHatcheryQueue !== 'undefined' && typeof window !== 'undefined') window.removePokemonFromHatcheryQueue = removePokemonFromHatcheryQueue;
 if (typeof clearHatcheryQueue !== 'undefined' && typeof window !== 'undefined') window.clearHatcheryQueue = clearHatcheryQueue;
 if (typeof isPokemonQueuedHatchery !== 'undefined' && typeof window !== 'undefined') window.isPokemonQueuedHatchery = isPokemonQueuedHatchery;
+
 

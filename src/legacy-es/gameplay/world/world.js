@@ -51,3 +51,4 @@ if (typeof getBadgeDisplayTotal !== 'undefined' && typeof window !== 'undefined'
 if (typeof updateHeader !== 'undefined' && typeof window !== 'undefined') window.updateHeader = updateHeader;
 
 export {};
+

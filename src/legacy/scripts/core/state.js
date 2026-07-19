@@ -15,3 +15,4 @@ function effText(mult){
 
 
 var battle = window.PokeWorldBattleState.battleState;
+

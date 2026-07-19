@@ -221,3 +221,4 @@ window.L_fr_lore = {
 "text":"Le Bois aux Chênes abrite Celebi, Pokémon du Temps."
 }
 };
+

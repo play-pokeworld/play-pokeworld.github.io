@@ -19,6 +19,7 @@ export function getBattleViewSnapshot() {
       enemy: enemy ? [enemy.uid || enemy.id, enemy.id, enemy.level, enemy.shinyActive, enemy.status, enemy.talent, (enemy.moves || []).map(m => m.id).join(',')] : null,
       active: battle ? battle.playerPokeIdx : 0,
       training: !!(battle && battle.isTraining),
+      trainer: battle ? [battle.champId || '', battle.isQuestTrainerBattle || false, battle.questTrainerBattleId || '', battle.isAtollBattle || false, battle.atollMode || '', battle.trainerVisual ? (battle.trainerVisual.name || '') + ':' + (battle.trainerVisual.role || '') + ':' + ((battle.trainerVisual.style || []).join(',')) : ''] : null,
       team: team.map(p => p ? [p.uid || p.id, p.id, p.level, p.shinyActive, p.status, p.heldItem || '', (p.moves || []).map(m => m.id).join(','), p.currentHP <= 0] : null)
     });
   } catch (_) {
@@ -110,7 +111,7 @@ export function renderMoveButtons() {
     const mv = (globalThis.MOVES || {})[m.id];
     if (!mv) return '';
     const eff = battle.enemyPoke ? typeEff(mv.type, battle.enemyPoke.type1, battle.enemyPoke.type2) : 1;
-    const effHint = eff === 0 ? '⛔' : eff >= 2 ? '' : eff <= 0.5 ? '' : '';
+    const effHint = eff === 0 ? ' ×0' : eff >= 4 ? ' ×4' : eff >= 2 ? ' ×2' : eff <= 0.25 ? ' ×¼' : eff <= 0.5 ? ' ×½' : ' ×1';
     const isNext = i === nextIdx;
     return '<div class="auto-move' + (isNext ? ' next-up' : '') + ' type-' + (mv.type||'').toLowerCase() + '" data-move-id="' + m.id + '" data-idx="' + i + '" data-context-call="openMoveInfo" data-context-args="\'' + m.id + '\'" title="' + (t('context_info_touch') || '') + '">' +
       '<div class="am-top">' +
@@ -221,3 +222,4 @@ if (typeof window !== 'undefined') {
   window.setBattleSpeed = setBattleSpeed;
   window.toggleDebugX10 = toggleDebugX10;
 }
+

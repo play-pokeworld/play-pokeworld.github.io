@@ -66,3 +66,4 @@ function createPoke(id, level, shinyUnlocked=false){
 if (typeof createPoke !== 'undefined' && typeof window !== 'undefined') window.createPoke = createPoke;
 
 export {};
+

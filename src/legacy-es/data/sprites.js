@@ -1020,3 +1020,4 @@ if (typeof SPRITE_DATA !== 'undefined' && typeof window !== 'undefined') window.
 if (typeof ITEM_SPRITE_DATA !== 'undefined' && typeof window !== 'undefined') window.ITEM_SPRITE_DATA = ITEM_SPRITE_DATA;
 
 export {};
+

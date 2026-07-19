@@ -15,3 +15,4 @@ console.log('Copied runtime assets to dist/src/assets for legacy path compatibil
 // Remove the temporary Vite input from the source tree after build.
 // The source-root index.html is the file:// fallback; dist/index.html is production.
 fs.rmSync(path.join(root, 'index.vite.html'), { force: true });
+

@@ -507,3 +507,4 @@ const POKEMON_TALENTS = {
 if (typeof POKEMON_TALENTS !== 'undefined' && typeof window !== 'undefined') window.POKEMON_TALENTS = POKEMON_TALENTS;
 
 export {};
+

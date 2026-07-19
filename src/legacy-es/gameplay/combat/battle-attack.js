@@ -1,4 +1,109 @@
 
+function getBattleSideCard(side){
+ const row = document.getElementById('battle-team-row');
+ if(!row) return null;
+ if(side === 'enemy') return row.querySelector('.poke-card:first-child');
+ return row.querySelector('.poke-card.active') || row.querySelector('.poke-card:nth-child(2)');
+}
+function battleTypeColor(type){ return (typeof TYPE_COLORS !== 'undefined' && TYPE_COLORS[type]) ? TYPE_COLORS[type] : 'var(--light2)'; }
+function battleEffShort(mult){
+ if(mult === 0) return '×0';
+ if(mult >= 4) return '×4';
+ if(mult >= 2) return '×2';
+ if(mult <= 0.25) return '×¼';
+ if(mult <= 0.5) return '×½';
+ return '';
+}
+function battleEffKind(mult){
+ if(mult === 0) return 'immune';
+ if(mult >= 2) return 'super';
+ if(mult < 1) return 'resist';
+ return 'normal';
+}
+function spawnBattleFloat(side, text, kind='normal', sub=''){
+ const card = getBattleSideCard(side);
+ if(!card) return;
+ const el = document.createElement('div');
+ el.className = `battle-float ${kind}`;
+ el.innerHTML = `<b>${text}</b>${sub?`<span>${sub}</span>`:''}`;
+ card.appendChild(el);
+ setTimeout(()=>el.remove(), 1100);
+}
+function spawnBattleChip(side, text, kind='move', type=''){
+ const card = getBattleSideCard(side);
+ if(!card || !text) return;
+ const el = document.createElement('div');
+ el.className = `battle-chip ${kind}`;
+ if(type) el.style.setProperty('--chip-color', battleTypeColor(type));
+ el.textContent = text;
+ card.appendChild(el);
+ setTimeout(()=>el.remove(), 1300);
+ addBattleTimeline(text, kind, type);
+}
+function ensureBattleTimeline(){
+ const scene = document.getElementById('battle-active-scene');
+ if(!scene) return null;
+ let tl = document.getElementById('battle-visual-timeline');
+ if(!tl){
+  tl = document.createElement('div');
+  tl.id = 'battle-visual-timeline';
+  scene.insertBefore(tl, scene.firstChild);
+ }
+ return tl;
+}
+function addBattleTimeline(text, kind='normal', type=''){
+ const tl = ensureBattleTimeline();
+ if(!tl || !text) return;
+ const chip = document.createElement('span');
+ chip.className = `battle-timeline-chip ${kind}`;
+ if(type) chip.style.setProperty('--chip-color', battleTypeColor(type));
+ chip.textContent = text;
+ tl.appendChild(chip);
+ while(tl.children.length > 8) tl.firstChild.remove();
+}
+function visualMoveUsed(side, moveId, mv){
+ const name = typeof getMoveName === 'function' ? getMoveName(moveId) : moveId;
+ spawnBattleChip(side, name, 'move', mv && mv.type);
+ const card = getBattleSideCard(side);
+ if(card){
+  card.querySelectorAll('.poke-move').forEach(el=>{
+   if((el.textContent||'').includes(name)){
+    el.classList.add('visual-firing');
+    setTimeout(()=>el.classList.remove('visual-firing'), 450);
+   }
+  });
+ }
+}
+function visualDamage(attackerSide, damage, eff, crit){
+ const targetSide = attackerSide === 'player' ? 'enemy' : 'player';
+ const sub = [battleEffShort(eff), crit ? 'CRIT' : ''].filter(Boolean).join(' ');
+ const kind = crit ? 'crit' : battleEffKind(eff);
+ spawnBattleFloat(targetSide, '-' + damage, kind, sub);
+ if(eff !== 1 || crit) addBattleTimeline(`${damage}${sub?` ${sub}`:''}`, kind);
+}
+function visualHeal(side, amount, label=''){
+ spawnBattleFloat(side, '+' + amount, 'heal', label);
+ addBattleTimeline(`+${amount}${label?` ${label}`:''}`, 'heal');
+}
+function visualStatus(side, status){
+ if(!status || typeof statusLabel !== 'function') return;
+ spawnBattleFloat(side, statusLabel(status), 'status ' + status, '');
+ addBattleTimeline(statusLabel(status), 'status ' + status);
+}
+function visualTalent(side, talent, detail=''){
+ const name = typeof getTalentName === 'function' ? getTalentName(talent) : talent;
+ spawnBattleChip(side, detail ? `${name} ${detail}` : name, 'talent');
+}
+function visualItem(side, item, detail=''){
+ const name = typeof getItemName === 'function' ? getItemName(item) : item;
+ spawnBattleChip(side, detail ? `${name} ${detail}` : name, 'item');
+}
+function visualStatusChanges(attackerSide, prevAttackerStatus, prevDefenderStatus, attacker, defender){
+ const defenderSide = attackerSide === 'player' ? 'enemy' : 'player';
+ if(attacker && attacker.status && attacker.status !== prevAttackerStatus) visualStatus(attackerSide, attacker.status);
+ if(defender && defender.status && defender.status !== prevDefenderStatus) visualStatus(defenderSide, defender.status);
+}
+
 function transformPokemon(attacker, defender, side){
  if(!attacker || !defender) return false;
  if(attacker._transformed){
@@ -27,10 +132,10 @@ function transformPokemon(attacker, defender, side){
  attacker.spd = defender.spd || defender.def;
  attacker.spe = defender.spe;
  attacker.talent = defender.talent;
- attacker.moves = (defender.moves||[]).map(m=>({id:m.id, pp:(MOVES[m.id]?.pp||m.pp||10), maxPP:(MOVES[m.id]?.pp||m.maxPP||10)}));
+ attacker.moves = (defender.moves||[]).map(m=>({id:m.id}));
  attacker.shinyActive = defender.shinyActive || defender.shiny;
  attacker.shiny = attacker.shinyActive;
- addBattleLog(`🧬 ${attacker._transformBackup.name} prend l'apparence de ${defender.name} !`);
+ addBattleLog(tr('battle_transform_log', {source:attacker._transformBackup.name, target:defender.name}));
  try{ renderMoveButtons(); }catch(_){}
  try{ renderBattleTeamRow(); }catch(_){}
  updateBattleUI();
@@ -103,6 +208,9 @@ function playHitAnim(side){
 function executeAttack(attacker, defender, moveId, side){
  const mv=MOVES[moveId];
  if(!mv) return;
+ const prevAttackerStatus = attacker ? attacker.status : null;
+ const prevDefenderStatus = defender ? defender.status : null;
+ visualMoveUsed(side, moveId, mv);
  const attackerHeldItem = (typeof getHeldItemForPokemon === 'function') ? getHeldItemForPokemon(attacker) : attacker.heldItem;
  const defenderHeldItem = (typeof getHeldItemForPokemon === 'function') ? getHeldItemForPokemon(defender) : defender.heldItem;
  const atkMod=(side==='player'?battle.playerMods:battle.enemyMods).atk;
@@ -117,10 +225,14 @@ function executeAttack(attacker, defender, moveId, side){
  }
 
  if(defender.talent === 'levitate' && mv.type === 'Ground'){
+ visualTalent(side === 'player' ? 'enemy' : 'player', defender.talent, '×0');
+ spawnBattleFloat(side === 'player' ? 'enemy' : 'player', '×0', 'immune');
  addBattleLog(tr('combat_attack_auto_1', {p0:defender.name}));
  return;
  }
  if(defender.talent === 'lightningrod' && mv.type === 'Electric'){
+ visualTalent(side === 'player' ? 'enemy' : 'player', defender.talent, '×0');
+ spawnBattleFloat(side === 'player' ? 'enemy' : 'player', '×0', 'immune');
  addBattleLog(tr('combat_attack_auto_2', {p0:defender.name}));
  return;
  }
@@ -128,6 +240,8 @@ function executeAttack(attacker, defender, moveId, side){
  if(absorbMap[defender.talent] === mv.type){
  const heal = Math.max(1, Math.floor(defender.maxHP * 0.25));
  defender.currentHP = Math.min(defender.maxHP, defender.currentHP + heal);
+ visualTalent(side === 'player' ? 'enemy' : 'player', defender.talent, '+PV');
+ visualHeal(side === 'player' ? 'enemy' : 'player', heal);
  addBattleLog(`${defender.name} absorbe ${getMoveName(moveId)} grâce à ${getTalentName(defender.talent)} ! (+${heal} PV)`);
  updateBattleUI();
  return;
@@ -139,6 +253,7 @@ function executeAttack(attacker, defender, moveId, side){
  if(attacker.talent === 'compoundeyes') acc += 30;
  if(defender.talent === 'sandveil' || defender.talent === 'snowcloak') acc -= 20;
  if(mv.pow!==null && mv.pow!==undefined && !chance(acc)){
+ spawnBattleFloat(side === 'player' ? 'enemy' : 'player', 'MISS', 'miss');
  addBattleLog(tr('combat_attack_auto_3', {p0:attacker.name}));
  return;
  }
@@ -146,6 +261,7 @@ function executeAttack(attacker, defender, moveId, side){
  
  const eff = typeEff(mv.type, defender.type1, defender.type2);
  if(eff === 0 && !mv.fixed){
+ spawnBattleFloat(side === 'player' ? 'enemy' : 'player', '×0', 'immune');
  addBattleLog(tr('combat_attack_auto_4', {p0:defender.name}));
  return;
  }
@@ -223,6 +339,7 @@ function executeAttack(attacker, defender, moveId, side){
  addBattleLog(tr('combat_attack_auto_24', {p0:defender.name}));
  }
  }
+ visualStatusChanges(side, prevAttackerStatus, prevDefenderStatus, attacker, defender);
  updateBattleUI();
  return;
  }
@@ -233,7 +350,9 @@ function executeAttack(attacker, defender, moveId, side){
  const dmg=typeof mv.fixed==='number'?mv.fixed:attacker.level;
  defender.currentHP=Math.max(0,defender.currentHP-dmg);
  playHitAnim(side);
+ visualDamage(side, dmg, 1, false);
  addBattleLog(`${defender.name} perd ${dmg} PV !`);
+ visualStatusChanges(side, prevAttackerStatus, prevDefenderStatus, attacker, defender);
  updateBattleUI();return;
  }
  if(!power) return;
@@ -342,6 +461,7 @@ function executeAttack(attacker, defender, moveId, side){
  if(mv.drain){
  const drained=Math.floor(dmg/2);
  attacker.currentHP=Math.min(attacker.maxHP,attacker.currentHP+drained);
+ visualHeal(side, drained, 'drain');
  addBattleLog(`${attacker.name} absorbe ${drained} PV !`);
  if(side === 'enemy' && battle.isChamp && battle.champTeam && battle.champTeam[battle.champPokeIdx]){
  battle.champTeam[battle.champPokeIdx].currentHP = attacker.currentHP;
@@ -350,14 +470,23 @@ function executeAttack(attacker, defender, moveId, side){
 
  if(defender.talent === 'sturdy' && dmg >= defender.currentHP && defender.currentHP >= defender.maxHP){
  dmg = defender.currentHP - 1;
+ visualTalent(side === 'player' ? 'enemy' : 'player', defender.talent, '1 PV');
  addBattleLog(tr('combat_attack_auto_33', {p0:defender.name}));
  }
 
  defender.currentHP=Math.max(0,defender.currentHP-dmg);
+ if(side === 'player'){
+  if(!battle.sessionDamageByPokemon) battle.sessionDamageByPokemon = {};
+  const key = attacker.uid || String(attacker.id || attacker.name || 'poke');
+  if(!battle.sessionDamageByPokemon[key]) battle.sessionDamageByPokemon[key] = {id:attacker.id, name:attacker.name, emoji:attacker.emoji||'', shiny:!!(attacker.shinyActive||attacker.shiny), damage:0, kos:0};
+  battle.sessionDamageByPokemon[key].damage += dmg;
+  if(defender.currentHP <= 0) battle.sessionDamageByPokemon[key].kos += 1;
+ }
  if(battle.isChamp && battle.champTeam && battle.champTeam[battle.champPokeIdx]){
  if(side === 'player') battle.champTeam[battle.champPokeIdx].currentHP = defender.currentHP;
  }
  playHitAnim(side);
+ visualDamage(side, dmg, eff, critMult>1);
 
  if(defender.talent === 'roughskin' && mv.cat === 'phys'){
  const refl = Math.max(1, Math.floor(attacker.maxHP * 0.12));
@@ -386,6 +515,7 @@ function executeAttack(attacker, defender, moveId, side){
  if(mv.recoil){
  const recoil=Math.max(1,Math.floor(dmg/4));
  attacker.currentHP=Math.max(0,attacker.currentHP-recoil);
+ spawnBattleFloat(side, '-' + recoil, 'recoil', 'recul');
  addBattleLog(tr('combat_attack_auto_37', {p0:attacker.name, p1:recoil}));
  if(side === 'enemy' && battle.isChamp && battle.champTeam && battle.champTeam[battle.champPokeIdx]){
  battle.champTeam[battle.champPokeIdx].currentHP = attacker.currentHP;
@@ -396,6 +526,8 @@ function executeAttack(attacker, defender, moveId, side){
  if(attackerHeldItem === 'life_orb' && power > 0){
  const loRecoil = Math.max(1, Math.floor(attacker.maxHP / 10));
  attacker.currentHP = Math.max(0, attacker.currentHP - loRecoil);
+ visualItem(side, attackerHeldItem, '-PV');
+ spawnBattleFloat(side, '-' + loRecoil, 'recoil', '');
  addBattleLog(tr('combat_attack_auto_38', {p0:attacker.name, p1:loRecoil}));
  if(side === 'enemy' && battle.isChamp && battle.champTeam && battle.champTeam[battle.champPokeIdx]){
  battle.champTeam[battle.champPokeIdx].currentHP = attacker.currentHP;
@@ -432,6 +564,7 @@ function executeAttack(attacker, defender, moveId, side){
  }
  }
 
+ visualStatusChanges(side, prevAttackerStatus, prevDefenderStatus, attacker, defender);
  updateBattleUI();
 }
 
@@ -443,5 +576,13 @@ if (typeof handleStatusBeforeMove !== 'undefined' && typeof window !== 'undefine
 if (typeof playAttackAnim !== 'undefined' && typeof window !== 'undefined') window.playAttackAnim = playAttackAnim;
 if (typeof playHitAnim !== 'undefined' && typeof window !== 'undefined') window.playHitAnim = playHitAnim;
 if (typeof executeAttack !== 'undefined' && typeof window !== 'undefined') window.executeAttack = executeAttack;
+if (typeof spawnBattleFloat !== 'undefined' && typeof window !== 'undefined') window.spawnBattleFloat = spawnBattleFloat;
+if (typeof spawnBattleChip !== 'undefined' && typeof window !== 'undefined') window.spawnBattleChip = spawnBattleChip;
+if (typeof addBattleTimeline !== 'undefined' && typeof window !== 'undefined') window.addBattleTimeline = addBattleTimeline;
+if (typeof visualHeal !== 'undefined' && typeof window !== 'undefined') window.visualHeal = visualHeal;
+if (typeof visualItem !== 'undefined' && typeof window !== 'undefined') window.visualItem = visualItem;
+if (typeof visualTalent !== 'undefined' && typeof window !== 'undefined') window.visualTalent = visualTalent;
+if (typeof visualStatus !== 'undefined' && typeof window !== 'undefined') window.visualStatus = visualStatus;
 
 export {};
+

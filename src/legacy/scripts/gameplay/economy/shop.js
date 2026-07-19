@@ -62,3 +62,4 @@ function buyItem(key){
  renderShop(fsContent);
  }
 }
+

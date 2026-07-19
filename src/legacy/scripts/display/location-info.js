@@ -10,9 +10,14 @@ function renderLocInfo(el){
  if(locTitleEl) locTitleEl.textContent = getLocName(G.location) || 'Lieu';
 
  let html='';
+ const uiIcon = (name, fallback='') => (typeof getIcon === 'function' ? getIcon(name, 18) : fallback);
+ const regionKey = (typeof regionOfLoc === 'function') ? regionOfLoc(G.location) : (G.region || 'kanto');
+ const hasShop = !!(loc.shopId && SHOPS[loc.shopId]);
+ const wildCount = (loc.wild || []).length;
+ const npcCount = ((typeof NPCS!=='undefined') ? (NPCS[G.location]||[]) : []).length;
 
  
- html += `<div class="extracted-template-style-049">${getLocName(G.location)}</div>`;
+ html += `<div class="loc-overview-card"><div class="loc-overview-title">${getLocName(G.location)}</div><div class="loc-overview-meta"><span>${typeof getRegionDisplayName === 'function' ? getRegionDisplayName(regionKey) : regionKey}</span><span>${loc.type||''}</span><span>${wildCount ? wildCount + ' ' + (t('wild_poke') || 'rencontres') : (t('no_wild_pokemon_here') || 'aucune rencontre')}</span><span>${npcCount} NPC</span>${hasShop ? `<span>${t('tab_shop') || 'Boutique'}</span>` : ''}</div></div>`;
 
  
  const lore = getLore(G.location);
@@ -32,36 +37,36 @@ function renderLocInfo(el){
  const locNpcs = (typeof NPCS!=='undefined') ? (NPCS[G.location]||[]) : [];
  locNpcs.forEach((npc, ni)=>{
  const npcName = getNpc(G.location, ni).name || ('NPC '+(ni+1));
- allButtons += `<div class="action-btn loc-npc-btn extracted-template-style-053" data-action="legacy-call" data-call="openNpc" data-call-args="'${G.location}',${ni}"><span class="ab-icon extracted-template-style-054">🗣</span><span class="ab-label extracted-template-style-055">${npcName}</span></div>`;
+ allButtons += `<div class="action-btn loc-npc-btn extracted-template-style-053" data-action="legacy-call" data-call="openNpc" data-call-args="'${G.location}',${ni}"><span class="ab-icon extracted-template-style-054">${uiIcon('npc','•')}</span><span class="ab-label extracted-template-style-055">${npcName}</span></div>`;
  });
 
  
  if(G.location === 'vermilion'){
  const canSailJohto = (typeof canAccessRegion !== 'function') || canAccessRegion('johto');
  allButtons += canSailJohto
- ? `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="travelToRegion" data-call-args="'johto'"><span class="ab-icon extracted-template-style-056">🚢</span><span class="ab-label extracted-template-style-057">${t('sail_to_johto')}</span></div>`
- : `<div class="action-btn loc-action-btn disabled"><span class="ab-icon extracted-template-style-056">🚢</span><span class="ab-label extracted-template-style-057">${t('sail_to_johto')} (${regionAccessMessage('johto')})</span></div>`;
+ ? `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="travelToRegion" data-call-args="'johto'"><span class="ab-icon extracted-template-style-056">${uiIcon('ship','•')}</span><span class="ab-label extracted-template-style-057">${t('sail_to_johto')}</span></div>`
+ : `<div class="action-btn loc-action-btn disabled"><span class="ab-icon extracted-template-style-056">${uiIcon('ship','•')}</span><span class="ab-label extracted-template-style-057">${t('sail_to_johto')} (${regionAccessMessage('johto')})</span></div>`;
  } else if(G.location === 'olivine'){
- allButtons += `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="travelToRegion" data-call-args="'kanto'"><span class="ab-icon extracted-template-style-056">🚢</span><span class="ab-label extracted-template-style-057">${t('sail_to_kanto')}</span></div>`;
+ allButtons += `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="travelToRegion" data-call-args="'kanto'"><span class="ab-icon extracted-template-style-056">${uiIcon('ship','•')}</span><span class="ab-label extracted-template-style-057">${t('sail_to_kanto')}</span></div>`;
  }
 
  
  if(loc.type!=='town'){
- allButtons += `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="exploreArea" data-call-args=""><span class="ab-icon extracted-template-style-056">🌾</span><span class="ab-label extracted-template-style-057">${t('explore_btn')}</span></div>`;
+ allButtons += `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="exploreArea" data-call-args=""><span class="ab-icon extracted-template-style-056">${uiIcon('explore','•')}</span><span class="ab-label extracted-template-style-057">${t('explore_btn')}</span></div>`;
  }
  const localDefeatQuest = (typeof getActiveLocalDefeatQuestForLocation === 'function') ? getActiveLocalDefeatQuestForLocation(G.location) : null;
  const hasRegularWildBattle = !!(loc.wild && loc.wild.length);
  if(localDefeatQuest && !hasRegularWildBattle){
  const qtxt = getQuestText(localDefeatQuest.inst.cat || 'main', localDefeatQuest.def.id);
- allButtons += `<div class="action-btn loc-action-btn quest-battle-btn" data-action="legacy-call" data-call="startQuestDefeatBattle" data-call-args="'${G.location}'"><span class="ab-icon extracted-template-style-056">⚔️</span><span class="ab-label extracted-template-style-057">${t('quest_battle_btn')} ${qtxt.title ? '— '+qtxt.title : ''}</span></div>`;
+ allButtons += `<div class="action-btn loc-action-btn quest-battle-btn" data-action="legacy-call" data-call="startQuestDefeatBattle" data-call-args="'${G.location}'"><span class="ab-icon extracted-template-style-056">${uiIcon('battle','•')}</span><span class="ab-label extracted-template-style-057">${t('quest_battle_btn')} ${qtxt.title ? '— '+qtxt.title : ''}</span></div>`;
  }
 
  
  if(loc.shopId&&SHOPS[loc.shopId]){
  if(loc.shopId === 'indigo' && !G.championTitle){
- allButtons += `<div class="action-btn loc-action-btn disabled"><span class="ab-icon extracted-template-style-056">🏪</span><span class="ab-label extracted-template-style-057">${t('tab_shop')} (${t('locked')})</span></div>`;
+ allButtons += `<div class="action-btn loc-action-btn disabled"><span class="ab-icon extracted-template-style-056">${uiIcon('shop','•')}</span><span class="ab-label extracted-template-style-057">${t('tab_shop')} (${t('locked')})</span></div>`;
  } else {
- allButtons += `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="openFullscreenPanel" data-call-args="'shop'"><span class="ab-icon extracted-template-style-056">🏪</span><span class="ab-label extracted-template-style-057">${t('tab_shop')}</span></div>`;
+ allButtons += `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="openFullscreenPanel" data-call-args="'shop'"><span class="ab-icon extracted-template-style-056">${uiIcon('shop','•')}</span><span class="ab-label extracted-template-style-057">${t('tab_shop')}</span></div>`;
  }
  }
 
@@ -76,11 +81,11 @@ function renderLocInfo(el){
  const challengeLabel = isLeague ? tr('league_challenge_label', {champion:champName}) : tr('arena_challenge_label', {champion:champName});
  const rematchLabel = isLeague ? tr('league_rematch_label', {champion:champName}) : tr('arena_rematch_label', {champion:champName});
  if(champLocked){
- allButtons += `<div class="action-btn loc-action-btn disabled"><span class="ab-icon extracted-template-style-056">⚔️</span><span class="ab-label extracted-template-style-057">${lockedLabel}</span></div>`;
+ allButtons += `<div class="action-btn loc-action-btn disabled"><span class="ab-icon extracted-template-style-056">${uiIcon('battle','•')}</span><span class="ab-label extracted-template-style-057">${lockedLabel}</span></div>`;
  } else if(champDefeated){
- allButtons += `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="startChampBattle" data-call-args="'${champId}'"><span class="ab-icon extracted-template-style-056">🔄</span><span class="ab-label extracted-template-style-057">${rematchLabel}</span></div>`;
+ allButtons += `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="startChampBattle" data-call-args="'${champId}'"><span class="ab-icon extracted-template-style-056">${uiIcon('rematch','•')}</span><span class="ab-label extracted-template-style-057">${rematchLabel}</span></div>`;
  } else {
- allButtons += `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="startChampBattle" data-call-args="'${champId}'"><span class="ab-icon extracted-template-style-056">⚔️</span><span class="ab-label extracted-template-style-057">${challengeLabel}</span></div>`;
+ allButtons += `<div class="action-btn loc-action-btn" data-action="legacy-call" data-call="startChampBattle" data-call-args="'${champId}'"><span class="ab-icon extracted-template-style-056">${uiIcon('battle','•')}</span><span class="ab-label extracted-template-style-057">${challengeLabel}</span></div>`;
  }
  }
 
@@ -116,6 +121,9 @@ function renderLocInfo(el){
  html += `<div class="extracted-template-style-062">
  <span><b>${t('roaming_legendary_rotation')}</b> ${getPokeName(roamingId)} ${t('can_appear_here')}</span>
  </div>`;
+ }
+ if(loc.type !== 'town'){
+ html += `<div class="route-events-placeholder"><b>${t('route_events_placeholder_title') || 'Événements de route'}</b><span>${t('route_events_placeholder_desc') || ''}</span></div>`;
  }
 
  
@@ -187,4 +195,5 @@ function typeLabel(typ){
 // --- Migrated to ES module, globals exposed ---
 if (typeof renderLocInfo !== 'undefined' && typeof window !== 'undefined') window.renderLocInfo = renderLocInfo;
 if (typeof typeLabel !== 'undefined' && typeof window !== 'undefined') window.typeLabel = typeLabel;
+
 

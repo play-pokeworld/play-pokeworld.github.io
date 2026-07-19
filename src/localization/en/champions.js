@@ -19,3 +19,4 @@ window.L_en_champions = {
 "pryce": {"name":"Pryce","title":"Mahogany Gym Leader","badgeName":"Glacier Badge"},
 "clair": {"name":"Clair","title":"Blackthorn Gym Leader","badgeName":"Rising Badge"}
 };
+

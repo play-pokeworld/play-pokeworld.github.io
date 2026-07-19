@@ -15,7 +15,7 @@ write('src/domain/game/initial-state.js', `export function createInitialGameStat
     collection: {}, teamSlotItems: [], evolvedSpecies: [], dupeCatches: {}, lang: 'fr',
     storyIdx: 0, storyProgress: 0, unlockedTalents: {}, activeQuests: [],
     repeatables: [], visitedMaps: {}, completedQuests: {}, wildWinsByLoc: {}, regionLeagueWon: {},
-    playTimeMs: 0, saveMeta: {},
+    playTimeMs: 0, saveMeta: {}, routeEvents: { seen: {}, active: null, history: [], cooldowns: {} },
   };
 }
 export const gameState = createInitialGameState();
@@ -28,7 +28,7 @@ write('src/domain/battle/battle-state.js', `export function createInitialBattleS
     turnLocked: false, escaped: false, chill: false,
     playerMods: { atk: 1, def: 1, spe: 1 },
     enemyMods: { atk: 1, def: 1, spe: 1 },
-    log: [], sessionCatches: [], sessionItems: {},
+    log: [], sessionCatches: [], sessionItems: {}, sessionWins: 0, sessionPlayerKOs: 0, sessionStartedAt: 0, sessionDamageByPokemon: {},
     pendingLeave: false, pendingSwitchIdx: null,
   };
 }
@@ -82,11 +82,11 @@ console.log('Modern boundaries ensured.');
 
 if (fs.existsSync('src/assets/css/style.css')) {
   let css = fs.readFileSync('src/assets/css/style.css', 'utf8');
-  css = css.replace("src: url('../font/WinkySans.ttf') format('truetype');", "src: url('../font/WinkySans.woff2') format('woff2');");
-  css = css.replace("src: url('../font/WinkySans-Regular.ttf') format('truetype');", "src: url('../font/WinkySans.woff2') format('woff2');");
+  css = css.replace("src: url('../font/WinkySans-Regular.ttf') format('truetype');", "src: url('../font/WinkySans.ttf') format('truetype');");
+  css = css.replace("src: url('../font/WinkySans.woff2') format('woff2');", "src: url('../font/WinkySans.ttf') format('truetype');");
   fs.writeFileSync('src/assets/css/style.css', css, 'utf8');
 }
-for (const font of ['src/assets/font/WinkySans.ttf', 'src/assets/font/WinkySans-Regular.ttf', 'src/assets/font/Megrim-Regular.ttf']) {
+for (const font of ['src/assets/font/WinkySans-Regular.ttf']) {
   if (fs.existsSync(font)) fs.rmSync(font, { force: true });
 }
 
@@ -211,11 +211,11 @@ if (fs.existsSync('src/file-preflight.js')) {
 }
 
 async function ensureWinkySansFont() {
-  const fontPath = 'src/assets/font/WinkySans.woff2';
+  const fontPath = 'src/assets/font/WinkySans.ttf';
   fs.mkdirSync(path.dirname(fontPath), { recursive: true });
   if (!fs.existsSync(fontPath)) {
     const https = await import('node:https');
-    const url = 'https://fonts.gstatic.com/s/winkysans/v3/ll85K2SDUiG1Hpf2p06bN60okw.woff2';
+    const url = 'https://raw.githubusercontent.com/play-pokechill/play-pokechill.github.io/main/font/WinkySans.ttf';
     await new Promise((resolve, reject) => {
       const file = fs.createWriteStream(fontPath);
       https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (response) => {
@@ -228,7 +228,7 @@ async function ensureWinkySansFont() {
       }).on('error', reject);
     });
   }
-  for (const font of ['src/assets/font/WinkySans.ttf', 'src/assets/font/WinkySans-Regular.ttf', 'src/assets/font/Megrim-Regular.ttf']) {
+  for (const font of ['src/assets/font/WinkySans-Regular.ttf']) {
     if (fs.existsSync(font)) fs.rmSync(font, { force: true });
   }
 }
@@ -357,7 +357,7 @@ for (const file of ['src/ui/input/inline-handler-sanitizer.js', 'src/file-postbo
 }
 if (fs.existsSync('src/assets/css/style.css')) {
   let css = fs.readFileSync('src/assets/css/style.css', 'utf8');
-  css = css.replace("src: url('../font/WinkySans.ttf') format('truetype');", "src: url('../font/WinkySans.woff2') format('woff2');");
+  css = css.replace("src: url('../font/WinkySans.woff2') format('woff2');", "src: url('../font/WinkySans.ttf') format('truetype');");
   fs.writeFileSync('src/assets/css/style.css', css, 'utf8');
 }
 
@@ -408,3 +408,4 @@ if (fs.existsSync('src/assets/styles/mobile-accessibility.css')) {
   if (!source.includes('.pw-type-info')) source += '\n.pw-type-info { font-size: 13px; padding: 3px 10px; }\n';
   fs.writeFileSync('src/assets/styles/mobile-accessibility.css', source, 'utf8');
 }
+

@@ -7,7 +7,7 @@ export function createInitialGameState() {
     collection: {}, teamSlotItems: [], evolvedSpecies: [], dupeCatches: {}, lang: 'fr',
     storyIdx: 0, storyProgress: 0, unlockedTalents: {}, activeQuests: [],
     repeatables: [], visitedMaps: {}, completedQuests: {}, wildWinsByLoc: {}, regionLeagueWon: {},
-    playTimeMs: 0, saveMeta: {},
+    playTimeMs: 0, saveMeta: {}, routeEvents: { seen: {}, active: null, history: [], cooldowns: {} },
   };
 }
 export const gameState = createInitialGameState();

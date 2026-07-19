@@ -256,7 +256,97 @@ window.L_fr_quests = {
 "66": {
 "title":"Bois aux Chênes : Celebi",
 "desc":"Dans le Bois aux Chênes, mettez K.O. 150 Pokémon sauvages pour rencontrer Celebi.",
-"rewardDesc":"Celebi + 35 000₽"
+"rewardDesc":"Celebi + 35 000₽",
+"1001": {
+"title": "Route 22 : le défi du Rival",
+"desc": "Sur la Route 22, affrontez votre rival Blue pour prouver que votre équipe est prête pour Argenta.",
+"rewardDesc": "Récompense de combat + progression"
+},
+"1002": {
+"title": "Mont Sélénite : embuscade Rocket",
+"desc": "Dans le Mont Sélénite, repoussez un Sbire Rocket attiré par les fossiles.",
+"rewardDesc": "Récompense de combat"
+},
+"1003": {
+"title": "Mont Sélénite : le choix du fossile",
+"desc": "Affrontez le Super Nerd Miguel pour sécuriser un fossile rare.",
+"rewardDesc": "1 Fossile + récompense de combat"
+},
+"1004": {
+"title": "Azuria : revanche du Rival",
+"desc": "À Azuria, Blue vous barre la route avant l'Arène d'Ondine.",
+"rewardDesc": "Récompense de combat"
+},
+"1005": {
+"title": "L'Océane : duel sur le pont",
+"desc": "À Carmin sur Mer, affrontez Blue avant de défier le Major Bob.",
+"rewardDesc": "Récompense de combat"
+},
+"1006": {
+"title": "Céladopole : repaire Rocket",
+"desc": "Nettoyez le Repaire Rocket caché sous Céladopole.",
+"rewardDesc": "Récompense de combat"
+},
+"1007": {
+"title": "Céladopole : Giovanni sort de l'ombre",
+"desc": "Affrontez Giovanni pour mettre fin aux opérations Rocket de Céladopole.",
+"rewardDesc": "Récompense de combat"
+},
+"1008": {
+"title": "Sylphe SARL : le Rival vous attend",
+"desc": "À Safrania, Blue vous défie au cœur de la crise de la Sylphe SARL.",
+"rewardDesc": "Récompense de combat"
+},
+"1009": {
+"title": "Sylphe SARL : Giovanni",
+"desc": "Affrontez Giovanni et libérez Safrania de la Team Rocket.",
+"rewardDesc": "Récompense de combat"
+},
+"1010": {
+"title": "Route Victoire : dernier duel Rival",
+"desc": "Avant la Ligue, Blue vous impose un dernier test stratégique.",
+"rewardDesc": "Récompense de combat"
+},
+"1101": {
+"title": "Ville Griotte : le voleur de starter",
+"desc": "Affrontez Silver après l'incident du Pokémon volé.",
+"rewardDesc": "Récompense de combat"
+},
+"1102": {
+"title": "Tour Chétiflor : le Sage Li",
+"desc": "Gravissez la Tour Chétiflor et affrontez le Sage Li.",
+"rewardDesc": "Récompense de combat"
+},
+"1103": {
+"title": "Puits Ramoloss : Team Rocket",
+"desc": "À Écorcia, chassez la Team Rocket du Puits Ramoloss.",
+"rewardDesc": "Récompense de combat"
+},
+"1104": {
+"title": "Bois aux Chênes : Rival",
+"desc": "Silver vous attend dans le Bois aux Chênes après Écorcia.",
+"rewardDesc": "Récompense de combat"
+},
+"1105": {
+"title": "Tour Cendrée : Rival",
+"desc": "À Rosalia, affrontez Silver au milieu des mystères de la Tour Cendrée.",
+"rewardDesc": "Récompense de combat"
+},
+"1106": {
+"title": "Lac Colère : exécutif Rocket",
+"desc": "Après le tumulte du Lac Colère, affrontez un exécutif Rocket.",
+"rewardDesc": "Récompense de combat"
+},
+"1107": {
+"title": "Tour Radio : reprise Rocket",
+"desc": "À Doublonville, mettez fin à l'occupation Rocket de la Tour Radio.",
+"rewardDesc": "Récompense de combat"
+},
+"1108": {
+"title": "Route Victoire Johto : Rival",
+"desc": "Avant la Ligue Johto, Silver vous provoque une dernière fois.",
+"rewardDesc": "Récompense de combat"
+}
 }
 },
 "side": {
@@ -469,3 +559,4 @@ window.L_fr_quests = {
 }
 }
 };
+

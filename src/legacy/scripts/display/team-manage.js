@@ -158,3 +158,4 @@ function addBoxedToTeam(boxId){
  renderTeamWindow();
  notify(tr('added_to_team', {name:p.name}), 'var(--green)');
 }
+

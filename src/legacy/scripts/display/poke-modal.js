@@ -59,8 +59,8 @@ function pokemonProtectionControlsHtml(p, idx, boxId, readonly){
  const favArgs = boxId ? `null, '${boxId}'` : `${idx}, ''`;
  const lockArgs = favArgs;
  return `<div class="poke-protection-actions">
-  <button class="hbtn poke-protect-btn ${p.favorite?'is-on':'is-off'}" data-action="legacy-call" data-call="togglePokemonFavorite" data-call-args="${favArgs}">⭐ ${p.favorite?t('pokemon_favorite_on'):t('pokemon_favorite_off')}</button>
-  <button class="hbtn poke-protect-btn ${p.locked?'is-locked':'is-off'}" data-action="legacy-call" data-call="togglePokemonLock" data-call-args="${lockArgs}">🔒 ${p.locked?t('pokemon_locked_on'):t('pokemon_locked_off')}</button>
+  <button class="hbtn poke-protect-btn ${p.favorite?'is-on':'is-off'}" data-action="legacy-call" data-call="togglePokemonFavorite" data-call-args="${favArgs}"><span class="poke-protect-label">${p.favorite?t('pokemon_favorite_on'):t('pokemon_favorite_off')}</span></button>
+  <button class="hbtn poke-protect-btn ${p.locked?'is-locked':'is-off'}" data-action="legacy-call" data-call="togglePokemonLock" data-call-args="${lockArgs}"><span class="poke-protect-icon">${typeof getIcon==='function'?getIcon('close',12):'×'}</span><span class="poke-protect-label">${p.locked?t('pokemon_locked_on'):t('pokemon_locked_off')}</span></button>
  </div>`;
 }
 
@@ -70,9 +70,9 @@ function pokemonQueueControlsHtml(p, boxId, readonly){
  const inTraining = typeof isPokemonQueuedTraining === 'function' && isPokemonQueuedTraining(p);
  return `<div class="poke-queue-actions">
   <div class="poke-detail-subtle">${t('queue_add_from_box')}</div>
-  <button class="hbtn queue-action-btn ${inHatchery?'is-on':''}" data-action="legacy-call" data-call="addPokemonToHatcheryQueue" data-call-args="'${boxId}'">🥚 ${inHatchery?t('queue_already_added_short'):t('queue_add_hatchery')}</button>
-  <button class="hbtn queue-action-btn ${inTraining?'is-on':''}" data-action="legacy-call" data-call="addPokemonToTrainingQueue" data-call-args="0, '${boxId}'">🏋️ ${t('queue_add_training_slot1')}</button>
-  <button class="hbtn queue-action-btn ${inTraining?'is-on':''}" data-action="legacy-call" data-call="addPokemonToTrainingQueue" data-call-args="1, '${boxId}'">🏋️ ${t('queue_add_training_slot2')}</button>
+  <button class="hbtn queue-action-btn ${inHatchery?'is-on':''}" data-action="legacy-call" data-call="addPokemonToHatcheryQueue" data-call-args="'${boxId}'">${typeof getIcon==='function'?getIcon('hatchery',14):''} ${inHatchery?t('queue_already_added_short'):t('queue_add_hatchery')}</button>
+  <button class="hbtn queue-action-btn ${inTraining?'is-on':''}" data-action="legacy-call" data-call="addPokemonToTrainingQueue" data-call-args="0, '${boxId}'">${typeof getIcon==='function'?getIcon('training',14):''} ${t('queue_add_training_slot1')}</button>
+  <button class="hbtn queue-action-btn ${inTraining?'is-on':''}" data-action="legacy-call" data-call="addPokemonToTrainingQueue" data-call-args="1, '${boxId}'">${typeof getIcon==='function'?getIcon('training',14):''} ${t('queue_add_training_slot2')}</button>
  </div>`;
 }
 
@@ -97,7 +97,7 @@ function buildTalentSelectorHtml(p, idx, boxId){
  });
 
  return `<div class="extracted-template-style-083">
- <div class="extracted-template-style-060">🧬 ${t('pokemon_talents')}</div>
+ <div class="extracted-template-style-060">${typeof getIcon==='function'?getIcon('training',14):''} ${t('pokemon_talents')}</div>
  ${locked?`<div class="extracted-template-style-090">${battleEditLockMessage()}</div>`:''}
  <select data-action="stop-propagation" ${talentChangeAttrs} class="extracted-bridge-style-024">
  ${uniqueTals.map(tal => {
@@ -153,16 +153,21 @@ function pokemonDetailStatRows(p){
  const baseVals = [p.maxHP||p.hp||0, p.atk||0, p.def||0, p.spa||p.atk||0, p.spd||p.def||0, p.spe||0];
  const maxVals = [500,220,220,220,220,220];
  const colors = ['#60BE58','#D3425F','#539DDF','#EF90E6','#B763CF','#FBA64C'];
- const statRow = (label, value, pct, color, extra='') => `<div class="poke-detail-stat-row">
+ const statRow = (label, pct, color, text) => `<div class="poke-detail-stat-row">
    <span class="poke-detail-stat-name">${label}</span>
    <div class="poke-detail-stat-bar"><div class="poke-detail-stat-fill" data-pct="${pct}" data-bg="${color}"></div></div>
-   <span class="poke-detail-stat-value">${value}${extra}</span>
+   <span class="poke-detail-stat-value">${text}</span>
  </div>`;
  return {
-   base: labels.map((label,i)=>statRow(label, baseVals[i], Math.min(100, Math.round(baseVals[i]/maxVals[i]*100)), colors[i])).join(''),
-   iv: labels.map((label,i)=>{ const val=(p.ivs||{})[keys[i]]||0; return statRow(label, renderStars(val,false), Math.round(val/6*100), colors[i], `<small>${val}/6</small>`); }).join(''),
-   ev: labels.map((label,i)=>{ const val=(p.evs||{})[keys[i]]||0; return statRow(label, renderStars(val,true), Math.round(val/6*100), colors[i], `<small>${val}/6</small>`); }).join('')
+   base: labels.map((label,i)=>statRow(label, Math.min(100, Math.round(baseVals[i]/maxVals[i]*100)), colors[i], baseVals[i])).join(''),
+   iv: labels.map((label,i)=>{ const val=(p.ivs||{})[keys[i]]||0; return statRow(label, Math.round(val/6*100), colors[i], `${val}/6`); }).join(''),
+   ev: labels.map((label,i)=>{ const val=(p.evs||{})[keys[i]]||0; return statRow(label, Math.round(val/6*100), colors[i], `${val}/6`); }).join('')
  };
+}
+function pokemonDetailRankPanelHtml(p){
+ const rank = typeof getPokemonRank === 'function' ? getPokemonRank(p.id) : '?';
+ const bst = typeof getPokemonBaseStatTotal === 'function' ? getPokemonBaseStatTotal(p.id) : '';
+ return `<div class="poke-rank-panel rank-${String(rank).toLowerCase()}"><div class="poke-rank-letter">${rank}</div><div><b>${t('pokemon_rank')}</b><span>${bst?`BST ${bst}`:''}</span></div></div>`;
 }
 
 function pokemonDetailMoveRows(p, opts){
@@ -250,7 +255,6 @@ function renderPokemonDetailModal(p, opts){
      <div class="poke-detail-types">${typeSpan(p.type1)}${p.type2?typeSpan(p.type2):''}</div>
      ${shinyToggle}
      ${pokemonProtectionControlsHtml(p, idx, boxId, readonly)}
-     ${pokemonQueueControlsHtml(p, boxId, readonly)}
    </section>
    <aside class="poke-detail-side">
      <div class="poke-detail-stat-tabs">
@@ -265,8 +269,8 @@ function renderPokemonDetailModal(p, opts){
  </div>
  <div class="poke-detail-section-grid">
    <section class="poke-detail-panel"><h3>${t('pokemon_talents')}</h3>${talentHtml}</section>
-   <section class="poke-detail-panel"><h3>${t('equipped_item_label')}</h3>${pokemonDetailHeldItemHtml(p,{idx,boxId,readonly})}</section>
-   ${evos?`<section class="poke-detail-panel poke-detail-panel-wide"><h3>Évolutions</h3>${evos}</section>`:''}
+   <section class="poke-detail-panel"><h3>${t('pokemon_rank')}</h3>${pokemonDetailRankPanelHtml(p)}</section>
+   ${evos?`<section class="poke-detail-panel poke-detail-panel-wide"><h3>${t('evolutions_title') || 'Evolutions'}</h3>${evos}</section>`:''}
  </div>
  <section class="poke-detail-moves-block">
    <div class="poke-detail-moves-title"><span>${t('moves_lbl')}</span>${moveRows.canReplace?`<button class="hbtn poke-detail-mini-btn" data-action="${boxId?'cancel-box-move-replace':'cancel-move-replace'}" ${boxId?`data-box-id="${boxId}"`:`data-team-index="${idx}"`}>${t('cancel')}</button>`:''}</div>
@@ -373,7 +377,7 @@ function openMoveInfo(moveId, contextIdx, contextBoxId){
  <div>${acc}%</div>
  </div>
  </div>
- ${moveDesc?`<div class="extracted-template-style-008"><div class="extracted-template-style-005">Description</div><div class="extracted-template-style-090">${moveDesc}</div></div>`:''}
+ ${moveDesc?`<div class="extracted-template-style-008"><div class="extracted-template-style-005">${t('description')}</div><div class="extracted-template-style-090">${moveDesc}</div></div>`:''}
  <div class="extracted-template-style-008">
  <div class="extracted-template-style-005">${t('effects')}</div>
  ${effHtml}
@@ -400,4 +404,5 @@ if (typeof openBattleEnemyPokeModal !== 'undefined' && typeof window !== 'undefi
 if (typeof openPokeModal !== 'undefined' && typeof window !== 'undefined') window.openPokeModal = openPokeModal;
 if (typeof openPokeInfo !== 'undefined' && typeof window !== 'undefined') window.openPokeInfo = openPokeInfo;
 if (typeof openMoveInfo !== 'undefined' && typeof window !== 'undefined') window.openMoveInfo = openMoveInfo;
+
 

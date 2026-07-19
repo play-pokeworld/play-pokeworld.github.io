@@ -50,3 +50,4 @@ if (typeof getRoamingLegendaryForRoute !== 'undefined' && typeof window !== 'und
 if (typeof getBadgeDisplayTotal !== 'undefined' && typeof window !== 'undefined') window.getBadgeDisplayTotal = getBadgeDisplayTotal;
 if (typeof updateHeader !== 'undefined' && typeof window !== 'undefined') window.updateHeader = updateHeader;
 
+

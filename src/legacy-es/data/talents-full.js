@@ -142,3 +142,4 @@ if (typeof getRarityLabel !== 'undefined' && typeof window !== 'undefined') wind
 if (typeof TALENTS_FULL !== 'undefined' && typeof window !== 'undefined') window.TALENTS_FULL = TALENTS_FULL;
 
 export {};
+

@@ -34,3 +34,4 @@ export function installTouchContextMenuBridge(root = document) {
   root.addEventListener('pointerup', clear, { passive: true });
   root.addEventListener('pointercancel', clear, { passive: true });
 }
+

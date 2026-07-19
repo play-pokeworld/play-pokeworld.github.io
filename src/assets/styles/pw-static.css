@@ -14,10 +14,6 @@
 .pw-static-014{width:16px;height:16px}
 .pw-static-015{display:flex;flex:1;overflow-y:auto;overflow-x:hidden;background:transparent;padding:6px;gap:8px;min-height:100%;height:auto;position:relative}
 .pw-static-016{flex:1;display:flex;flex-direction:column;gap:8px;height:auto;overflow:visible;min-width:240px}
-.pw-static-017{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--dark3);border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto}
-.pw-static-018{background:var(--dark1);border-bottom:1px solid var(--dark3)}
-.pw-static-019{color:var(--light2)}
-.pw-static-020{padding:10px;background:var(--dark2);font-size: 13px}
 .pw-static-021{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--dark3);border-radius:8px;overflow:visible;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto}
 .pw-static-022{padding:8px;background:var(--panel);gap:6px;overflow:visible;height:auto}
 .pw-static-023{padding:0;background:transparent}
@@ -193,3 +189,4 @@
 .pw-static-197{text-align:center;padding:24px;color:var(--light1)}
 .pw-static-198{position:sticky;top:0;background:var(--dark1);padding:12px;border-bottom:2px solid var(--dark3);z-index:10;min-height:60px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .pw-static-199{font-size: 15px;font-weight:bold;color:var(--light2)}
+

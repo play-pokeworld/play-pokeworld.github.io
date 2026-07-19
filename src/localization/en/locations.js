@@ -100,3 +100,4 @@ window.L_location_names_en = {
 "mtsilver":"Mt. Silver",
 "tohjofalls":"Tohjo Falls"
 };
+

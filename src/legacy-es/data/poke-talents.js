@@ -170,3 +170,4 @@ var POKE_TALENTS = {
 if (typeof POKE_TALENTS !== 'undefined' && typeof window !== 'undefined') window.POKE_TALENTS = POKE_TALENTS;
 
 export {};
+

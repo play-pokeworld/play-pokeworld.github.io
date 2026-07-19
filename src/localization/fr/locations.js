@@ -100,3 +100,4 @@ window.L_location_names_fr = {
 "mtsilver":"Mont Argenté",
 "tohjofalls":"Chutes Tohjo"
 };
+

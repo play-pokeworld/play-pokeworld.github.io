@@ -17,7 +17,7 @@ function renderStoryWindow(){
  const repsActive = G.repeatables || [];
 
  if(!mainDef && !sideActive.length && !repsActive.length){
- panel.innerHTML = (typeof renderTutorialQuestBlock === 'function' ? renderTutorialQuestBlock() : '') + `<div class="extracted-template-style-242">\n 📜 ${t("m.quest_ui.27")}</div><div class="extracted-template-style-252">\n <button class="hbtn extracted-bridge-style-048" data-action="legacy-call" data-call="openRepeatableMenu" data-call-args="">🔁 ${t("m.quest_ui.16")}</button>\n </div>`;
+ panel.innerHTML = (typeof renderTutorialQuestBlock === 'function' ? renderTutorialQuestBlock() : '') + `<div class="extracted-template-style-242">${(typeof getIcon==='function'?getIcon('story',16):'')} ${t("m.quest_ui.27")}</div><div class="extracted-template-style-252">\n <button class="hbtn extracted-bridge-style-048" data-action="legacy-call" data-call="openRepeatableMenu" data-call-args="">${typeof getIcon==='function'?getIcon('rematch',14):''} ${t("m.quest_ui.16")}</button>\n </div>`;
  return;
  }
 
@@ -26,7 +26,11 @@ function renderStoryWindow(){
  const tgt = def.target||1;
  const done = questDone(inst, def);
  const pct = clamp(Math.floor((prog/tgt)*100),0,100);
- const btnText = (cat==='main' && def.rewardPoke) ? t('quest_challenge_btn') : t("m.quest_ui.26");
+ const btnText = (cat==='main' && def.rewardPoke) ? t('quest_challenge_btn') : (def.type==='trainer_battle' && !done ? t('quest_challenge_btn') : t("m.quest_ui.26"));
+ const actionAttrs = (def.type==='trainer_battle' && !done)
+   ? `data-action="legacy-call" data-call="startQuestTrainerBattle" data-call-args="'${inst.qid}','${cat}'"`
+   : (done ? `data-action="legacy-call" data-call="claimQuest" data-call-args="'${inst.qid}','${cat}'"` : 'disabled');
+ const canPress = done || def.type==='trainer_battle';
  const qt = getQuestText(cat, def.id);
  const ttl = (numLabel?numLabel+' ':'') + qt.title;
  const dsc = qt.desc;
@@ -38,28 +42,31 @@ function renderStoryWindow(){
  body = `<div>${done?(t("m.quest_ui.23")):(t("m.quest_ui.22"))}</div>`;
  } else if(def.type==='item'){
  body = `<div>${done?'Poké Flûte obtenue !':'Obtenez la Poké Flûte.'}</div>`;
+ } else if(def.type==='trainer_battle'){
+ const trainer = typeof getTrainerBattleDef === 'function' ? getTrainerBattleDef(def.battleId) : null;
+ body = `<div class="quest-trainer-target"><b>${done?t('trainer_battle_done'):tr('trainer_battle_target', {trainer:typeof getTrainerBattleName==='function'?getTrainerBattleName(def.battleId):(trainer?trainer.name:def.battleId)})}</b><small>${done?'':t('trainer_battle_hint')}</small></div>`;
  } else {
- body = `<div class="extracted-template-style-243"><span>${t("m.quest_ui.21")}</span><span>${done?'':prog+' / '+tgt}</span></div>\n <div class="extracted-template-style-244"><div></div></div>`;
+ body = `<div class="extracted-template-style-243"><span>${t("m.quest_ui.21")}</span><span>${done?`${t('ready')}`:prog+' / '+tgt}</span></div>\n <div class="extracted-template-style-244 quest-progress-container"><div class="quest-progress-bar ${done?'is-done':''}" data-pct="${pct}"></div></div>`;
  }
- const claimCls = `hbtn quest-claim-btn ${done?'is-done':''}`;
- return `<div class="extracted-template-style-245">\n <div class="extracted-template-style-246">${ttl}</div>\n <div class="extracted-template-style-247">${dsc}</div>\n ${body}\n <div class="extracted-template-style-248"> ${rew}</div>\n <button class="${claimCls}"\n ${done?`data-action="legacy-call" data-call="claimQuest" data-call-args="'${inst.qid}','${cat}'"`:'disabled'}>${done?btnText:(t("m.quest_ui.20"))}</button>\n </div>`;
+ const claimCls = `hbtn quest-claim-btn ${done?'is-done':''} ${((def.type==='trainer_battle'&&!done)||(cat==='main'&&def.rewardPoke&&done))?'is-challenge':''}`;
+ return `<div class="extracted-template-style-245">\n <div class="extracted-template-style-246">${ttl}</div>\n <div class="extracted-template-style-247">${dsc}</div>\n ${body}\n <div class="extracted-template-style-248"> ${rew}</div>\n <button class="${claimCls}" ${actionAttrs}>${canPress?btnText:(t("m.quest_ui.20"))}</button>\n </div>`;
  };
 
  let html=(typeof renderTutorialQuestBlock === 'function' ? renderTutorialQuestBlock() : '');
  if(mainDef){
  const step = (G.mainStep[region]||0)+1;
- html += `<div class="extracted-template-style-249">📖 ${t("m.quest_ui.19")} (${regionName} — ${step}/${total})</div>`;
+ html += `<div class="extracted-template-style-249">${(typeof getIcon==='function'?getIcon('story',16):'')} ${t("m.quest_ui.19")} (${regionName} — ${step}/${total})</div>`;
  html += qCard(mainInst, 'main', mainDef, step+'.');
  }
  if(sideActive.length){
- html += `<div class="extracted-template-style-250">🗣 ${t("m.quest_ui.18")} (${regionName})</div>`;
+ html += `<div class="extracted-template-style-250">${(typeof getIcon==='function'?getIcon('npc',16):'')} ${t("m.quest_ui.18")} (${regionName})</div>`;
  for(const inst of sideActive){ const def=SIDE_QUESTS[inst.qid]; if(def) html+=qCard(inst,'side',def,''); }
  }
  if(repsActive.length){
- html += `<div class="extracted-template-style-251">🔁 ${t("m.quest_ui.17")} (${tr("m.repeatable_limit", {n: (G.maxRepeatables||3)})})</div>`;
+ html += `<div class="extracted-template-style-251">${(typeof getIcon==='function'?getIcon('rematch',16):'')} ${t("m.quest_ui.17")} (${tr("m.repeatable_limit", {n: (G.maxRepeatables||3)})})</div>`;
  for(const inst of repsActive){ const def=inst.def; if(def) html+=qCard(inst,'repeatable',def,''); }
  }
- html += `<div class="extracted-template-style-252">\n <button class="hbtn extracted-bridge-style-048" data-action="legacy-call" data-call="openRepeatableMenu" data-call-args="">🔁 ${t("m.quest_ui.16")}</button>\n </div>`;
+ html += `<div class="extracted-template-style-252">\n <button class="hbtn extracted-bridge-style-048" data-action="legacy-call" data-call="openRepeatableMenu" data-call-args="">${typeof getIcon==='function'?getIcon('rematch',14):''} ${t("m.quest_ui.16")}</button>\n </div>`;
  panel.innerHTML = html;
 }
 function openNpc(locId, idx){
@@ -73,7 +80,7 @@ function openNpc(locId, idx){
  const npcName = npcText.name;
  const lines = npcText.lines;
  let html = `<div class="extracted-template-style-253">
- <div class="extracted-template-style-254">🗣 ${npcName}</div>
+ <div class="extracted-template-style-254">${(typeof getIcon==='function'?getIcon('npc',16):'')} ${npcName}</div>
  ${lines.map(l=>`<div class="extracted-template-style-255">« ${l} »</div>`).join('')}
  </div>`;
 
@@ -86,7 +93,7 @@ function openNpc(locId, idx){
  const dsc = sqt.desc;
  const rew = sqt.rewardDesc;
  if(active){
- html += `<div class="extracted-template-style-256">📌 ${t("m.quest_ui.15")} ${ttl}</div>`;
+ html += `<div class="extracted-template-style-256">${(typeof getIcon==='function'?getIcon('quests',16):'')} ${t("m.quest_ui.15")} ${ttl}</div>`;
  } else if(done){
  html += `<div class="extracted-template-style-257"> ${t("m.quest_ui.14")} ${ttl}</div>`;
  } else {
@@ -99,13 +106,13 @@ function openNpc(locId, idx){
  }
  }
  if(npc.board){
- html += `<button class="hbtn extracted-bridge-style-050" data-action="legacy-call" data-call="openRepeatableMenu" data-call-args="">🔁 ${t("m.quest_ui.12")}</button>`;
+ html += `<button class="hbtn extracted-bridge-style-050" data-action="legacy-call" data-call="openRepeatableMenu" data-call-args="">${typeof getIcon==='function'?getIcon('rematch',14):''} ${t("m.quest_ui.12")}</button>`;
  }
  html += `<div class="extracted-template-style-262"><button class="hbtn" data-action="legacy-call" data-call="closeQuestModal" data-call-args=""> ${t("m.quest_ui.11")}</button></div>`;
  if(talkedMain){
- html += `<div class="extracted-template-style-256">📖 ${t("m.quest_ui.10")}</div>`;
+ html += `<div class="extracted-template-style-256">${(typeof getIcon==='function'?getIcon('story',16):'')} ${t("m.quest_ui.10")}</div>`;
  }
- const tEl=document.getElementById('quest-title'); if(tEl) tEl.textContent = '🗣 ' + npcName;
+ const tEl=document.getElementById('quest-title'); if(tEl) tEl.innerHTML = (typeof getIcon==='function'?getIcon('npc',16):'') + ' ' + npcName;
  const bEl=document.getElementById('quest-body'); if(bEl) bEl.innerHTML = html;
  const mEl=document.getElementById('quest-modal'); if(mEl) mEl.classList.add('open');
 }
@@ -208,7 +215,7 @@ function renderRepeatableBoard(){
  const activeCount = (G.repeatables||[]).length;
  const max = G.maxRepeatables || 1;
  const left = repeatableCooldownLeft();
- let html = `<div class="repeatable-upgrade-head"><div><b>${t('repeatable_slots')}</b> ${activeCount}/${max}<br><span>${tr('repeatable_reroll_timer', {time:left>0?formatRepeatableCooldown(left):t('ready')})}</span></div><button class="hbtn" data-action="legacy-call" data-call="openRepeatableUpgradeMenu" data-call-args="">⚙️ ${t('repeatable_upgrades')}</button></div>`;
+ let html = `<div class="repeatable-upgrade-head"><div><b>${t('repeatable_slots')}</b> ${activeCount}/${max}<br><span>${tr('repeatable_reroll_timer', {time:left>0?formatRepeatableCooldown(left):t('ready')})}</span></div><button class="hbtn" data-action="legacy-call" data-call="openRepeatableUpgradeMenu" data-call-args="">${typeof getIcon==='function'?getIcon('settings',14):''} ${t('repeatable_upgrades')}</button></div>`;
  html += `<div class="extracted-template-style-263">${t("m.quest_ui.7")}</div>`;
  html += _repeatableRoll.map((tpl,i)=>{
  const active = G.repeatables.some(r=>r.tplId===tpl.id);
@@ -218,14 +225,14 @@ function renderRepeatableBoard(){
  const rew = rt.rewardDesc;
  const canAccept = activeCount < max && !active;
  return `<div class="extracted-template-style-264">
- <div class="extracted-template-style-265">${tpl.icon||'🔁'} ${ttl}</div>
+ <div class="extracted-template-style-265">${(tpl.iconHtml || (typeof getIcon==='function'?getIcon('rematch',14):''))} ${ttl}</div>
  <div class="extracted-template-style-260">${dsc}</div>
  <div class="extracted-template-style-261"> ${rew}</div>
  ${active?`<div class="extracted-template-style-266"> ${t("m.quest_ui.6")}</div>`:`<button class="hbtn extracted-bridge-style-051" ${canAccept?`data-action="legacy-call" data-call="acceptRepeatable" data-call-args="${i}"`:'disabled'}> ${canAccept?t("m.quest_ui.5"):t('repeatable_slots_full')}</button>`}
  </div>`;
  }).join('');
  html += `<div class="extracted-template-style-131">
- <button class="hbtn extracted-bridge-style-052" ${left<=0?`data-action="legacy-call" data-call="rollRepeatables" data-call-args="false"`:'disabled'}>🎲 ${left>0?tr('repeatable_reroll_wait', {time:formatRepeatableCooldown(left)}):t("m.quest_ui.4")}</button>
+ <button class="hbtn extracted-bridge-style-052" ${left<=0?`data-action="legacy-call" data-call="rollRepeatables" data-call-args="false"`:'disabled'}>${typeof getIcon==='function'?getIcon('rematch',14):''} ${left>0?tr('repeatable_reroll_wait', {time:formatRepeatableCooldown(left)}):t("m.quest_ui.4")}</button>
  <button class="hbtn extracted-bridge-style-044" data-action="legacy-call" data-call="closeQuestModal" data-call-args=""> ${t("m.quest_ui.3")}</button>
  </div>`;
  const bEl=document.getElementById('quest-body'); if(bEl) bEl.innerHTML=html;
@@ -238,9 +245,9 @@ function openRepeatableUpgradeMenu(){
  const lvl = G.repeatableSlotUpgrades || 0;
  const max = 1 + lvl;
  const nextCost = REPEATABLE_SLOT_UPGRADE_COSTS[lvl];
- inner.innerHTML = `<div class="modal-title"><div>⚙️ ${t('repeatable_upgrades')}</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
+ inner.innerHTML = `<div class="modal-title"><div>${typeof getIcon==='function'?getIcon('settings',14):''} ${t('repeatable_upgrades')}</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
  <div class="dict-info-block"><b>${t('repeatable_slots')}</b><br>${tr('repeatable_slots_current', {count:max, max:5})}</div>
- <div class="dict-info-block">${nextCost ? `<button class="hbtn" data-action="legacy-call" data-call="upgradeRepeatableSlots" data-call-args="${nextCost}">⬆ ${tr('repeatable_slot_upgrade_buy', {next:max+1, price:nextCost.toLocaleString()})}</button>` : t('repeatable_slots_max')}</div>
+ <div class="dict-info-block">${nextCost ? `<button class="hbtn" data-action="legacy-call" data-call="upgradeRepeatableSlots" data-call-args="${nextCost}">${typeof getIcon==='function'?getIcon('save',14):''} ${tr('repeatable_slot_upgrade_buy', {next:max+1, price:nextCost.toLocaleString()})}</button>` : t('repeatable_slots_max')}</div>
  <div class="dict-info-block">${t('repeatable_reroll_free_desc')}</div>`;
  modal.classList.add('open');
 }
@@ -299,3 +306,4 @@ if (typeof openRepeatableUpgradeMenu !== 'undefined' && typeof window !== 'undef
 if (typeof upgradeRepeatableSlots !== 'undefined' && typeof window !== 'undefined') window.upgradeRepeatableSlots = upgradeRepeatableSlots;
 
 export {};
+

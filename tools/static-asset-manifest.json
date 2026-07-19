@@ -1,0 +1,50 @@
+{
+  "note": "Static visual/runtime assets required by PokéWorld outside of the Pokémon batch downloader.",
+  "assets": [
+    {
+      "id": "map-kanto",
+      "output": "src/assets/images/maps/kanto.png",
+      "sourceUrl": "https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/src/assets/images/kanto-kanto.png"
+    },
+    {
+      "id": "map-johto",
+      "output": "src/assets/images/maps/johto.png",
+      "sourceUrl": "https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/src/assets/images/johto.png"
+    },
+    {
+      "id": "bg-main",
+      "output": "src/assets/images/bg/main-bg.png",
+      "sourceUrl": "https://raw.githubusercontent.com/play-pokechill/play-pokechill.github.io/main/img/bg/main-bg.png"
+    },
+    {
+      "id": "bg-empty",
+      "output": "src/assets/images/bg/empty.jpg",
+      "sourceUrl": "https://raw.githubusercontent.com/play-pokechill/play-pokechill.github.io/main/img/bg/empty.jpg"
+    },
+    {
+      "id": "bg-forest",
+      "output": "src/assets/images/bg/forest.png",
+      "sourceUrl": "https://raw.githubusercontent.com/play-pokechill/play-pokechill.github.io/main/img/bg/forest.png"
+    },
+    {
+      "id": "font-winky-ttf",
+      "output": "src/assets/font/WinkySans.ttf",
+      "sourceUrl": "https://raw.githubusercontent.com/play-pokechill/play-pokechill.github.io/main/font/WinkySans.ttf"
+    },
+    {
+      "id": "font-megrim-ttf",
+      "output": "src/assets/font/Megrim-Regular.ttf",
+      "sourceUrl": "https://raw.githubusercontent.com/google/fonts/main/ofl/megrim/Megrim.ttf"
+    },
+    {
+      "id": "item-deep-sea-scale",
+      "output": "src/assets/images/items/deep_sea_scale.png",
+      "sourceUrl": "https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/src/assets/images/items/evolution/Deepsea_scale.png"
+    },
+    {
+      "id": "item-deep-sea-tooth",
+      "output": "src/assets/images/items/deep_sea_tooth.png",
+      "sourceUrl": "https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/src/assets/images/items/evolution/Deepsea_tooth.png"
+    }
+  ]
+}

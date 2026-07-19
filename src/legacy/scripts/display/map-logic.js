@@ -216,3 +216,4 @@ function showMapLegend(){
   modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
   document.body.appendChild(modal);
 }
+

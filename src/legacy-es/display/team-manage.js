@@ -171,3 +171,4 @@ if (typeof swapBoxWithTeam !== 'undefined' && typeof window !== 'undefined') win
 if (typeof addBoxedToTeam !== 'undefined' && typeof window !== 'undefined') window.addBoxedToTeam = addBoxedToTeam;
 
 export {};
+

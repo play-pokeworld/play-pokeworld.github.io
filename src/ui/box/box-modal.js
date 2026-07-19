@@ -119,7 +119,7 @@ export function openBoxPokeModal(boxId) {
   const canReplace = !battleEditLocked && boxMoveReplaceSlot !== null;
   const fullB = (p.moves||[]).length >= 4 && !canReplace;
   let learnHtml = `<div class="pw-learnable-title">
-    📖 ${t('learnable_moves_title')}
+    ${t('learnable_moves_title')}
     ${battleEditLocked?'<span class="pw-hint">'+boxBattleEditLockMessage()+'</span>':''}
     ${!battleEditLocked&&canReplace?'<span class="pw-hint">'+t('click_to_replace_selected')+'</span>':''}
     ${!battleEditLocked&&fullB?'<span class="pw-hint">'+t('select_move_first')+'</span>':''}
@@ -351,3 +351,4 @@ if (typeof window !== 'undefined') {
   window.toggleBoxMoveEditor = toggleBoxMoveEditor;
   window.tryBoxStoneEvo = tryBoxStoneEvo;
 }
+

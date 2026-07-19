@@ -4,6 +4,7 @@ import "../domain/battle/tick.js";
 import "../ui/battle/battle-ui.js";
 import "../ui/box/box-modal.js";
 import "../ui/shortcuts/shortcuts-ui.js";
+import "../ui/system/legacy-ui-kit.js";
 import "../ui/helpers/dynamic-styles.js";
 import "../domain/inventory/inventory-logic.js";
 import "../legacy-es/core/state.js";
@@ -13,6 +14,7 @@ import "../legacy-es/core/pokemon-factory.js";
 import "../legacy-es/data/ui-icons.js";
 import "../legacy-es/data/moves.js";
 import "../legacy-es/data/sprites.js";
+import "../legacy-es/data/trainer-sprites-data.js";
 import "../legacy-es/data/items-data.js";
 import "../legacy-es/data/items-helpers.js";
 import "../legacy-es/data/talents-data.js";
@@ -86,3 +88,4 @@ import "../legacy-es/display/tutorial.js";
 import "../legacy-es/display/bootstrap.js";
 
 export {};
+

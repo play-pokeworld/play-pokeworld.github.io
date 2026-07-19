@@ -69,3 +69,4 @@ if (typeof renderShop !== 'undefined' && typeof window !== 'undefined') window.r
 if (typeof buyItem !== 'undefined' && typeof window !== 'undefined') window.buyItem = buyItem;
 
 export {};
+

@@ -37,7 +37,6 @@ function healTeam(){
  if(p.currentHP<p.maxHP||p.status){
  p.currentHP=p.maxHP;
  p.status=null;
- for(const m of p.moves) m.pp=m.maxPP;
  healed=true;
  }
  }
@@ -62,4 +61,5 @@ if (typeof pickWildEncounter !== 'undefined' && typeof window !== 'undefined') w
 if (typeof exploreArea !== 'undefined' && typeof window !== 'undefined') window.exploreArea = exploreArea;
 if (typeof healTeam !== 'undefined' && typeof window !== 'undefined') window.healTeam = healTeam;
 if (typeof addToInventory !== 'undefined' && typeof window !== 'undefined') window.addToInventory = addToInventory;
+
 

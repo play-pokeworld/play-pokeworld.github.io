@@ -284,7 +284,7 @@ function digMineTile(tx, ty, silent=false){
   }
  }
  if(G.mine.items && (!G.mine.items.length || G.mine.items.every(it => it.collected))){
-  if(!silent) notify('⛏️ Couche épuisée : nouvelle mine générée automatiquement !', 'var(--blue)');
+  if(!silent) notify('Couche épuisée : nouvelle mine générée automatiquement !', 'var(--blue)');
   generateMineLayer();
  }
  saveGame();
@@ -313,3 +313,4 @@ if (typeof startMineAutomationTicker !== 'undefined' && typeof window !== 'undef
 if (typeof simulateAfkMineAutomation !== 'undefined' && typeof window !== 'undefined') window.simulateAfkMineAutomation = simulateAfkMineAutomation;
 
 export {};
+

@@ -44,6 +44,14 @@ var STORY_QUESTS = [
   }
  },
  {
+  "id": 1001,
+  "region": "kanto",
+  "type": "trainer_battle",
+  "loc": "route22",
+  "battleId": "kanto_rival_route22",
+  "target": 1
+ },
+ {
   "id": 1,
   "region": "kanto",
   "type": "badge",
@@ -66,6 +74,36 @@ var STORY_QUESTS = [
   }
  },
  {
+  "id": 2,
+  "region": "kanto",
+  "type": "defeat_wild",
+  "loc": "mtmoon",
+  "target": 30,
+  "rewardMoney": 4000,
+  "rewardItems": {
+   "moonstone": 1
+  }
+ },
+ {
+  "id": 1002,
+  "region": "kanto",
+  "type": "trainer_battle",
+  "loc": "mtmoon",
+  "battleId": "kanto_rocket_mtmoon",
+  "target": 1
+ },
+ {
+  "id": 1003,
+  "region": "kanto",
+  "type": "trainer_battle",
+  "loc": "mtmoon",
+  "battleId": "kanto_super_nerd_fossil",
+  "target": 1,
+  "rewardItems": {
+   "fossil": 1
+  }
+ },
+ {
   "id": 43,
   "region": "kanto",
   "type": "defeat_wild",
@@ -77,15 +115,12 @@ var STORY_QUESTS = [
   }
  },
  {
-  "id": 2,
+  "id": 1004,
   "region": "kanto",
-  "type": "defeat_wild",
-  "loc": "mtmoon",
-  "target": 30,
-  "rewardMoney": 4000,
-  "rewardItems": {
-   "moonstone": 1
-  }
+  "type": "trainer_battle",
+  "loc": "cerulean",
+  "battleId": "kanto_rival_cerulean",
+  "target": 1
  },
  {
   "id": 3,
@@ -119,6 +154,14 @@ var STORY_QUESTS = [
   "rewardItems": {
    "berry_oran": 1
   }
+ },
+ {
+  "id": 1005,
+  "region": "kanto",
+  "type": "trainer_battle",
+  "loc": "vermilion",
+  "battleId": "kanto_rival_ssanne",
+  "target": 1
  },
  {
   "id": 5,
@@ -198,6 +241,22 @@ var STORY_QUESTS = [
   }
  },
  {
+  "id": 1006,
+  "region": "kanto",
+  "type": "trainer_battle",
+  "loc": "celadon",
+  "battleId": "kanto_rocket_hideout",
+  "target": 1
+ },
+ {
+  "id": 1007,
+  "region": "kanto",
+  "type": "trainer_battle",
+  "loc": "celadon",
+  "battleId": "kanto_giovanni_hideout",
+  "target": 1
+ },
+ {
   "id": 8,
   "region": "kanto",
   "type": "badge",
@@ -218,6 +277,22 @@ var STORY_QUESTS = [
   "rewardItems": {
    "poison_barb": 1
   }
+ },
+ {
+  "id": 1008,
+  "region": "kanto",
+  "type": "trainer_battle",
+  "loc": "saffron",
+  "battleId": "kanto_rival_silph",
+  "target": 1
+ },
+ {
+  "id": 1009,
+  "region": "kanto",
+  "type": "trainer_battle",
+  "loc": "saffron",
+  "battleId": "kanto_giovanni_silph",
+  "target": 1
  },
  {
   "id": 10,
@@ -284,6 +359,14 @@ var STORY_QUESTS = [
   "rewardItems": {
    "rarecandy": 1
   }
+ },
+ {
+  "id": 1010,
+  "region": "kanto",
+  "type": "trainer_battle",
+  "loc": "victoryroad",
+  "battleId": "kanto_rival_victory",
+  "target": 1
  },
  {
   "id": 13,
@@ -383,6 +466,22 @@ var STORY_QUESTS = [
   }
  },
  {
+  "id": 1101,
+  "region": "johto",
+  "type": "trainer_battle",
+  "loc": "cherrygrove",
+  "battleId": "johto_rival_cherrygrove",
+  "target": 1
+ },
+ {
+  "id": 1102,
+  "region": "johto",
+  "type": "trainer_battle",
+  "loc": "sprouttower",
+  "battleId": "johto_sprout_elder",
+  "target": 1
+ },
+ {
   "id": 21,
   "region": "johto",
   "type": "badge",
@@ -392,6 +491,14 @@ var STORY_QUESTS = [
   "rewardItems": {
    "berry_sitrus": 1
   }
+ },
+ {
+  "id": 1103,
+  "region": "johto",
+  "type": "trainer_battle",
+  "loc": "slowpokewell",
+  "battleId": "johto_rocket_slowpoke",
+  "target": 1
  },
  {
   "id": 22,
@@ -405,6 +512,14 @@ var STORY_QUESTS = [
   }
  },
  {
+  "id": 1104,
+  "region": "johto",
+  "type": "trainer_battle",
+  "loc": "ilexforest",
+  "battleId": "johto_rival_ilex",
+  "target": 1
+ },
+ {
   "id": 23,
   "region": "johto",
   "type": "badge",
@@ -414,6 +529,14 @@ var STORY_QUESTS = [
   "rewardItems": {
    "soft_sand": 1
   }
+ },
+ {
+  "id": 1105,
+  "region": "johto",
+  "type": "trainer_battle",
+  "loc": "burnedtower",
+  "battleId": "johto_rival_burned",
+  "target": 1
  },
  {
   "id": 24,
@@ -449,6 +572,14 @@ var STORY_QUESTS = [
   }
  },
  {
+  "id": 1106,
+  "region": "johto",
+  "type": "trainer_battle",
+  "loc": "lakerage",
+  "battleId": "johto_rocket_lake",
+  "target": 1
+ },
+ {
   "id": 27,
   "region": "johto",
   "type": "badge",
@@ -458,6 +589,14 @@ var STORY_QUESTS = [
   "rewardItems": {
    "never_melt_ice": 1
   }
+ },
+ {
+  "id": 1107,
+  "region": "johto",
+  "type": "trainer_battle",
+  "loc": "goldenrod",
+  "battleId": "johto_rocket_radio",
+  "target": 1
  },
  {
   "id": 28,
@@ -470,6 +609,14 @@ var STORY_QUESTS = [
    "dragon_fang": 1,
    "rarecandy": 1
   }
+ },
+ {
+  "id": 1108,
+  "region": "johto",
+  "type": "trainer_battle",
+  "loc": "victoryroad_jo",
+  "battleId": "johto_rival_victory",
+  "target": 1
  },
  {
   "id": 29,
@@ -558,4 +705,5 @@ var STORY_QUESTS = [
 
 // --- Migrated to ES module, globals exposed ---
 if (typeof STORY_QUESTS !== 'undefined' && typeof window !== 'undefined') window.STORY_QUESTS = STORY_QUESTS;
+
 

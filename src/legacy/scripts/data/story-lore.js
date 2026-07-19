@@ -55,3 +55,4 @@ var STORY_LORE = {
 "indigo_jo": {},
 "ilexforest": {}
 };
+

@@ -5,7 +5,7 @@ export function createInitialBattleState() {
     turnLocked: false, escaped: false, chill: false,
     playerMods: { atk: 1, def: 1, spe: 1 },
     enemyMods: { atk: 1, def: 1, spe: 1 },
-    log: [], sessionCatches: [], sessionItems: {},
+    log: [], sessionCatches: [], sessionItems: {}, sessionWins: 0, sessionPlayerKOs: 0, sessionStartedAt: 0, sessionDamageByPokemon: {},
     pendingLeave: false, pendingSwitchIdx: null,
   };
 }

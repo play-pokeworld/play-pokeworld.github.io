@@ -78,7 +78,7 @@ function itemIcon(key, size=20, cls=''){
  else if(key === 'assault_vest' || key === 'eviolite') src = ITEM_SPRITE_DATA[key] || ITEM_SPRITE_DATA['muscle_band'];
  else src = ITEM_SPRITE_DATA['potion'];
  }
- const emoji = ITEMS[key]?.icon || '❔';
+ const emoji = ITEMS[key]?.icon || '?';
  if(!src) return `<span class="sprite-fallback-emoji">${emoji}</span>`;
  return `<img src="${src}"alt="${emoji}" class="sprite-img ${cls} sprite-middle" width="${size}" height="${size}" onerror="spriteFallback(this,'${emoji}',${size})">`;
 }
@@ -95,3 +95,4 @@ if (typeof silhouetteCanvas !== 'undefined' && typeof window !== 'undefined') wi
 if (typeof itemIcon !== 'undefined' && typeof window !== 'undefined') window.itemIcon = itemIcon;
 
 export {};
+

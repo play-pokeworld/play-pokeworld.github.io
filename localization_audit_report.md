@@ -1,0 +1,259 @@
+# Localization audit
+
+## Missing keys between FR and EN
+
+- No missing keys detected between FR and EN sections.
+## Hardcoded candidate strings outside localization
+
+Total candidates: 8963
+
+- `src/app/install-legacy-globals.js` → var(--green)
+- `src/app/install-legacy-globals.js` → ) && typeof target.renderBattleSummary ===
+- `src/app/install-legacy-globals.js` → var(--light2)
+- `src/app/install-legacy-globals.js` → var(--red)
+- `src/core/event-bus.js` → [EventBus]
+- `src/core/save-compatibility.js` → [PokeWorld] Incompatible browser save removed automatically.
+- `src/core/save-compatibility.js` → [PokeWorld] Corrupted browser save removed automatically.
+- `src/file-postboot.js` → [PokeWorld] Missing global action handler:
+- `src/file-postboot.js` → return [
+- `src/file-postboot.js` → [PokeWorld] Could not parse legacy call args:
+- `src/file-postboot.js` → #debug-toggle-btn
+- `src/file-postboot.js` → .modal-close
+- `src/file-postboot.js` → #settings-modal
+- `src/file-postboot.js` → #unified-selector-modal
+- `src/file-postboot.js` → #battle-summary-modal
+- `src/file-postboot.js` → #poke-modal
+- `src/file-postboot.js` → #confirm-modal
+- `src/file-postboot.js` → #team-window-body .poke-card
+- `src/file-postboot.js` → button, .poke-item-badge, .poke-move, [data-context-call]
+- `src/file-postboot.js` → .poke-card
+- `src/file-postboot.js` → ).call(el, event); } catch (error) { console.error(
+- `src/file-postboot.js` → , event, el))); var m = document.getElementById(
+- `src/file-postboot.js` → ); if (m) m.classList.remove(
+- `src/file-postboot.js` → , event, el))); callGlobal(
+- `src/file-postboot.js` → ) callGlobal(
+- `src/file-postboot.js` → , document.getElementById(
+- `src/file-postboot.js` → )); else callGlobal(
+- `src/file-postboot.js` → [data-action]
+- `src/file-postboot.js` → [data-context-call], [data-context-code]
+- `src/file-postboot.js` → ).call(target, event); } catch (error) { console.error(
+- `src/file-postboot.js` → [data-change-call]
+- `src/file-postboot.js` → [data-hover-in]
+- `src/file-postboot.js` → [data-hover-out]
+- `src/file-postboot.js` → [data-stop-drag]
+- `src/file-postboot.js` → [data-drag-window]
+- `src/file-postboot.js` → (pointer: coarse), (max-width: 850px)
+- `src/file-postboot.js` → [oncontextmenu], [data-context-action], .auto-move, .move-row, .inv-item, .box-card, .poke-sprite
+- `src/file-postboot.js` → /* Runtime-extracted legacy inline styles. */\n
+- `src/file-postboot.js` → ).replace(/\s*:\s*/g,
+- `src/file-postboot.js` → + className +
+- `src/file-postboot.js` → + normalized +
+- `src/file-postboot.js` → [PokeWorld] Inline
+- `src/file-postboot.js` → bridge failed
+- `src/file-postboot.js` → [data-style]
+- `src/file-postboot.js` → [data-inline-css]
+- `src/file-postboot.js` → + eventName +
+- `src/file-postboot.js` → ); arr.push(
+- `src/file-postboot.js` → ); return arr; }, [])).join(
+- `src/file-postboot.js` → + eventName); arr.push(
+- `src/file-postboot.js` → [data-pct]
+- `src/file-postboot.js` → [data-grid-cols]
+- `src/file-postboot.js` → [data-bg]
+- `src/file-postboot.js` → ) && drawer.style.display !==
+- `src/file-preflight.js` → [PokeWorld] Incompatible browser save removed automatically.
+- `src/file-preflight.js` → [PokeWorld] Corrupted browser save removed automatically.
+- `src/file-preflight.js` → (pointer: fine) and (min-width: 851px)
+- `src/file-preflight.js` → [EventBus]
+- `src/file-preflight.js` → var(--green)
+- `src/file-preflight.js` → ) && typeof window.renderBattleSummary ===
+- `src/file-preflight.js` → + window.typeClass(type) +
+- `src/file-preflight.js` → + type +
+- `src/file-preflight.js` → var(--light2)
+- `src/file-preflight.js` → var(--red)
+- `src/file-preflight.js` → + dataAction +
+- `src/file-preflight.js` → + call +
+- `src/file-preflight.js` → ) attrs.push(
+- `src/file-preflight.js` → + args +
+- `src/file-preflight.js` → + classes.join(
+- `src/file-preflight.js` → + attrs.join(
+- `src/file-preflight.js` → + (icon ?
+- `src/file-preflight.js` → + icon +
+- `src/file-preflight.js` → + label +
+- `src/file-preflight.js` → + value +
+- `src/file-preflight.js` → (max-width: 850px), (pointer: coarse)
+- `src/file-preflight.js` → #main-dashboard .dash-win
+- `src/file-preflight.js` → .mobile-subnav-bar
+- `src/file-preflight.js` → ) visible = [
+- `src/file-preflight.js` → .mobile-nav-bar [data-mobile-view]
+- `src/file-preflight.js` → .mobile-subnav-bar [data-mobile-manage-view]
+- `src/file-preflight.js` → return [
+- `src/file-preflight.js` → #settings-modal
+- `src/file-preflight.js` → #unified-selector-modal
+- `src/file-preflight.js` → #battle-summary-modal
+- `src/file-preflight.js` → #confirm-modal
+- `src/file-preflight.js` → #fullscreen-panel-modal
+- `src/file-preflight.js` → #poke-modal
+- `src/file-preflight.js` → #map-help-modal
+- `src/file-preflight.js` → , event, element))); var pm = document.getElementById(
+- `src/file-preflight.js` → ); if (pm) pm.classList.remove(
+- `src/file-preflight.js` → , event, element))); callGlobal(
+- `src/file-preflight.js` → ) callGlobal(
+- `src/file-preflight.js` → , document.getElementById(
+- `src/file-preflight.js` → )); else callGlobal(
+- `src/file-preflight.js` → .modal-close
+- `src/file-preflight.js` → #debug-toggle-btn
+- `src/file-preflight.js` → [data-action]
+- `src/file-preflight.js` → #team-window-body .poke-card
+- `src/file-preflight.js` → button, .poke-item-badge, .poke-move
+- `src/file-preflight.js` → [data-context-call]
+- `src/file-preflight.js` → [data-change-call]
+- `src/legacy/scripts/core/pokemon-factory.js` → + Math.random().toString(36).substr(2, 9) +
+- `src/legacy/scripts/core/util.js` → var(--green)
+- `src/legacy/scripts/core/util.js` → var(--light2)
+- `src/legacy/scripts/core/util.js` → var(--red)
+- `src/legacy/scripts/data/champions-data.js` → Olga (Conseil 4 Glace)
+- `src/legacy/scripts/data/champions-data.js` → Conseil 4 Glace/Eau
+- `src/legacy/scripts/data/champions-data.js` → Aldo (Conseil 4 Combat)
+- `src/legacy/scripts/data/champions-data.js` → Conseil 4 Combat/Roche
+- `src/legacy/scripts/data/champions-data.js` → Agatha (Conseil 4 Spectre)
+- `src/legacy/scripts/data/champions-data.js` → Conseil 4 Spectre/Poison
+- `src/legacy/scripts/data/champions-data.js` → Peter (Conseil 4 Dragon)
+- `src/legacy/scripts/data/champions-data.js` → Conseil 4 Dragon
+- `src/legacy/scripts/data/champions-data.js` → , title:
+- `src/legacy/scripts/data/champions-data.js` → Koga (Conseil 4 Poison)
+- `src/legacy/scripts/data/champions-data.js` → Conseil 4 Poison
+- `src/legacy/scripts/data/champions-data.js` → Conseil 4 Combat
+- `src/legacy/scripts/data/champions-data.js` → Marion (Conseil 4 Ténèbres)
+- `src/legacy/scripts/data/champions-data.js` → Conseil 4 Ténèbres
+- `src/legacy/scripts/data/champions-data.js` → Peter (Maître Johto)
+- `src/legacy/scripts/data/champions-data.js` → Maître de la Ligue Johto
+- `src/legacy/scripts/data/champions-data.js` → , strategy:[
+- `src/legacy/scripts/data/champions-data.js` → ,badgeEmoji:
+- `src/legacy/scripts/data/champions-data.js` → Ligue Kanto
+- `src/legacy/scripts/data/champions-data.js` → Ligue Johto
+- `src/legacy/scripts/data/champions-data.js` → , region:
+- `src/legacy/scripts/data/champions-data.js` → ], reward:2600, badgeReq:2, team:[trainerPoke(35,18,{talent:
+- `src/legacy/scripts/data/champions-data.js` → ,moves:[
+- `src/legacy/scripts/data/champions-data.js` → ]}), trainerPoke(131,36,{talent:
+- `src/legacy/scripts/data/champions-data.js` → ], reward:5500, badgeReq:7, team:[trainerPoke(147,37,{talent:
+- `src/legacy/scripts/data/champions-data.js` → ]}), trainerPoke(148,39,{talent:
+- `src/legacy/scripts/data/game-helpers.js` → Peu commun
+- `src/legacy/scripts/data/game-helpers.js` → talents.
+- `src/legacy/scripts/data/game-helpers.js` → m.talent_unlocked
+- `src/legacy/scripts/data/game-helpers.js` → m.talent_hidden
+- `src/legacy/scripts/data/game-helpers.js` → var(--accent)
+- `src/legacy/scripts/data/game-helpers.js` → ) return tr(
+- `src/legacy/scripts/data/game-helpers.js` → , shiny:
+- `src/legacy/scripts/data/game-helpers.js` → , favorite:
+- `src/legacy/scripts/data/game-helpers.js` → , locked:
+- `src/legacy/scripts/data/game-helpers.js` → || r !==
+- `src/legacy/scripts/data/game-helpers.js` → && typeof getPokemonRank ===
+- `src/legacy/scripts/data/game-helpers.js` → ].map(r => boxFilterOptionHtml(r, r===
+- `src/legacy/scripts/data/game-helpers.js` → box-filter-panel ui-control-toolbar ui-control-toolbar--box
+- `src/legacy/scripts/data/game-helpers.js` → data-action=
+- `src/legacy/scripts/data/game-helpers.js` → data-call=
+- `src/legacy/scripts/data/game-helpers.js` → data-call-args=
+- `src/legacy/scripts/data/items-helpers.js` → ) typeLabel = t(
+- `src/legacy/scripts/data/items-helpers.js` → data-action=
+- `src/legacy/scripts/data/items-helpers.js` → src/assets/images/items/
+- `src/legacy/scripts/data/items-helpers.js` → onerror=
+- `src/legacy/scripts/data/items-helpers.js` → inline-flex\
+- `src/legacy/scripts/data/items-helpers.js` → ><span class=
+- `src/legacy/scripts/data/items-helpers.js` → + icon +
+- `src/legacy/scripts/data/locations-data.js` → Bourg Palette
+- `src/legacy/scripts/data/locations-data.js` → , x:392,y:620,w:80,h:72, conn:[
+- `src/legacy/scripts/data/locations-data.js` → , x:400,y:432,w:64,h:64, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Route 22
+- `src/legacy/scripts/data/locations-data.js` → Forêt de Jade
+- `src/legacy/scripts/data/locations-data.js` → , x:416,y:184,w:128,h:80, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Mont Sélénite
+- `src/legacy/scripts/data/locations-data.js` → , x:1064,y:176,w:144,h:64, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Caverne Azurée
+- `src/legacy/scripts/data/locations-data.js` → Pont Pépite (24)
+- `src/legacy/scripts/data/locations-data.js` → Route 25
+- `src/legacy/scripts/data/locations-data.js` → , x:1048,y:352,w:176,h:128, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Carmin sur Mer
+- `src/legacy/scripts/data/locations-data.js` → , x:1056,y:528,w:160,h:64, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Route 11
+- `src/legacy/scripts/data/locations-data.js` → Cave Taupiqueur
+- `src/legacy/scripts/data/locations-data.js` → Route 10
+- `src/legacy/scripts/data/locations-data.js` → Grotte Rocheuse
+- `src/legacy/scripts/data/locations-data.js` → Centrale Électrique
+- `src/legacy/scripts/data/locations-data.js` → , x:1392,y:344,w:64,h:80, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Tour Pokémon
+- `src/legacy/scripts/data/locations-data.js` → Céladopole
+- `src/legacy/scripts/data/locations-data.js` → , x:712,y:320,w:144,h:192, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Route 16
+- `src/legacy/scripts/data/locations-data.js` → Piste Cyclable (17)
+- `src/legacy/scripts/data/locations-data.js` → Route 18
+- `src/legacy/scripts/data/locations-data.js` → , x:768,y:744,w:128,h:80, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Parc Safari
+- `src/legacy/scripts/data/locations-data.js` → Route 15
+- `src/legacy/scripts/data/locations-data.js` → Route 14
+- `src/legacy/scripts/data/locations-data.js` → Route 13
+- `src/legacy/scripts/data/locations-data.js` → Route 12
+- `src/legacy/scripts/data/locations-data.js` → Chenal 19
+- `src/legacy/scripts/data/locations-data.js` → , x:736,y:888,w:160,h:48, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Chenal 20
+- `src/legacy/scripts/data/locations-data.js` → , x:496,y:888,w:128,h:48, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Îles Écume
+- `src/legacy/scripts/data/locations-data.js` → Cramois\
+- `src/legacy/scripts/data/locations-data.js` → , x:392,y:888,w:80,h:80, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Manoir Pokémon
+- `src/legacy/scripts/data/locations-data.js` → Chenal 21
+- `src/legacy/scripts/data/locations-data.js` → , x:392,y:752,w:48,h:192, conn:[
+- `src/legacy/scripts/data/locations-data.js` → ], wild:[[116,20,35,
+- `src/legacy/scripts/data/locations-data.js` → Route 23
+- `src/legacy/scripts/data/locations-data.js` → Route Victoire
+- `src/legacy/scripts/data/locations-data.js` → Plateau Indigo
+- `src/legacy/scripts/data/locations-data.js` → , x:136, y:96, w:176, h:192, conn:[
+- `src/legacy/scripts/data/locations-data.js` → ], wild:[], shopId:
+- `src/legacy/scripts/data/locations-data.js` → , champ:
+- `src/legacy/scripts/data/locations-data.js` → Route 26
+- `src/legacy/scripts/data/locations-data.js` → Route 27
+- `src/legacy/scripts/data/locations-data.js` → Route 28
+- `src/legacy/scripts/data/locations-data.js` → Route 37
+- `src/legacy/scripts/data/locations-data.js` → Route 39
+- `src/legacy/scripts/data/locations-data.js` → Route 41
+- `src/legacy/scripts/data/locations-data.js` → , x:176,y:624,w:96,h:192, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Route 46
+- `src/legacy/scripts/data/locations-data.js` → Route 47
+- `src/legacy/scripts/data/locations-data.js` → Route 48
+- `src/legacy/scripts/data/locations-data.js` → Parc Naturel
+- `src/legacy/scripts/data/locations-data.js` → , x:400,y:268,w:96,h:72, conn:[
+- `src/legacy/scripts/data/locations-data.js` → , x:1496,y:104,w:208,h:208, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Tour Chétiflor
+- `src/legacy/scripts/data/locations-data.js` → Ruines d\
+- `src/legacy/scripts/data/locations-data.js` → , x:696,y:432,w:80,h:64, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Tour Cendrée
+- `src/legacy/scripts/data/locations-data.js` → Tour Carillon
+- `src/legacy/scripts/data/locations-data.js` → Mont Creuset
+- `src/legacy/scripts/data/locations-data.js` → Route de Glace
+- `src/legacy/scripts/data/locations-data.js` → Antre Noir
+- `src/legacy/scripts/data/locations-data.js` → Puits Ramoloss
+- `src/legacy/scripts/data/locations-data.js` → , x:256,y:680,w:128,h:112, conn:[
+- `src/legacy/scripts/data/locations-data.js` → ], wild:[[41,22,28,
+- `src/legacy/scripts/data/locations-data.js` → Route Victoire (Johto)
+- `src/legacy/scripts/data/locations-data.js` → Mont Argenté
+- `src/legacy/scripts/data/locations-data.js` → Chutes Tohjo
+- `src/legacy/scripts/data/locations-data.js` → Bourg Geon
+- `src/legacy/scripts/data/locations-data.js` → , x:1192,y:684,w:80,h:72, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Route 29
+- `src/legacy/scripts/data/locations-data.js` → Ville Griotte
+- `src/legacy/scripts/data/locations-data.js` → , x:832,y:688,w:64,h:64, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Route 30
+- `src/legacy/scripts/data/locations-data.js` → Route 31
+- `src/legacy/scripts/data/locations-data.js` → , x:688,y:320,w:64,h:64, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Route 32
+- `src/legacy/scripts/data/locations-data.js` → Caves Jumelles
+- `src/legacy/scripts/data/locations-data.js` → Route 33
+- `src/legacy/scripts/data/locations-data.js` → , x:496,y:896,w:64,h:64, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Bois aux Chênes
+- `src/legacy/scripts/data/locations-data.js` → Route 34
+- `src/legacy/scripts/data/locations-data.js` → , x:416,y:560,w:128,h:192, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Route 35
+- `src/legacy/scripts/data/locations-data.js` → Route 36
+- `src/legacy/scripts/data/locations-data.js` → , x:544,y:176,w:64,h:64, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Route 38
+- `src/legacy/scripts/data/locations-data.js` → , x:216,y:332,w:144,h:72, conn:[
+- `src/legacy/scripts/data/locations-data.js` → Route 40

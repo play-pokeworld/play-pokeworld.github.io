@@ -1,0 +1,2183 @@
+{
+  "note": "Comprehensive Pokeclicker NPC/trainer sprites mirrored into project assets.",
+  "sourceBase": "https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/",
+  "outputDir": "src/assets/images/trainers/npcs",
+  "sprites": [
+    {
+      "file": "Aaron.png",
+      "sourcePath": "src/assets/images/npcs/Aaron.png"
+    },
+    {
+      "file": "Ace Duo.png",
+      "sourcePath": "src/assets/images/npcs/Ace Duo.png"
+    },
+    {
+      "file": "Ace Trainer (female).png",
+      "sourcePath": "src/assets/images/npcs/Ace Trainer (female).png"
+    },
+    {
+      "file": "Ace Trainer (male).png",
+      "sourcePath": "src/assets/images/npcs/Ace Trainer (male).png"
+    },
+    {
+      "file": "Acerola.png",
+      "sourcePath": "src/assets/images/npcs/Acerola.png"
+    },
+    {
+      "file": "Actor.png",
+      "sourcePath": "src/assets/images/npcs/Actor.png"
+    },
+    {
+      "file": "Adaman.png",
+      "sourcePath": "src/assets/images/npcs/Adaman.png"
+    },
+    {
+      "file": "Aether Branch Chief (faba).png",
+      "sourcePath": "src/assets/images/npcs/Aether Branch Chief (faba).png"
+    },
+    {
+      "file": "Aether Foundation Employee (female).png",
+      "sourcePath": "src/assets/images/npcs/Aether Foundation Employee (female).png"
+    },
+    {
+      "file": "Aether Foundation Employee (male).png",
+      "sourcePath": "src/assets/images/npcs/Aether Foundation Employee (male).png"
+    },
+    {
+      "file": "Aether Foundation Employee (masked).png",
+      "sourcePath": "src/assets/images/npcs/Aether Foundation Employee (masked).png"
+    },
+    {
+      "file": "Aether Foundation Employees (both).png",
+      "sourcePath": "src/assets/images/npcs/Aether Foundation Employees (both).png"
+    },
+    {
+      "file": "Aether Foundation Employees (male).png",
+      "sourcePath": "src/assets/images/npcs/Aether Foundation Employees (male).png"
+    },
+    {
+      "file": "Aether President (lusamine).png",
+      "sourcePath": "src/assets/images/npcs/Aether President (lusamine).png"
+    },
+    {
+      "file": "Agatha.png",
+      "sourcePath": "src/assets/images/npcs/Agatha.png"
+    },
+    {
+      "file": "AI Sada.png",
+      "sourcePath": "src/assets/images/npcs/AI Sada.png"
+    },
+    {
+      "file": "AI Turo.png",
+      "sourcePath": "src/assets/images/npcs/AI Turo.png"
+    },
+    {
+      "file": "Akari.png",
+      "sourcePath": "src/assets/images/npcs/Akari.png"
+    },
+    {
+      "file": "Allister.png",
+      "sourcePath": "src/assets/images/npcs/Allister.png"
+    },
+    {
+      "file": "Amateur Archaeologists.png",
+      "sourcePath": "src/assets/images/npcs/Amateur Archaeologists.png"
+    },
+    {
+      "file": "Anabel.png",
+      "sourcePath": "src/assets/images/npcs/Anabel.png"
+    },
+    {
+      "file": "Anomaly Mewtwo X.png",
+      "sourcePath": "src/assets/images/npcs/Anomaly Mewtwo X.png"
+    },
+    {
+      "file": "Anomaly Mewtwo Y.png",
+      "sourcePath": "src/assets/images/npcs/Anomaly Mewtwo Y.png"
+    },
+    {
+      "file": "Aqua Admin (matt).png",
+      "sourcePath": "src/assets/images/npcs/Aqua Admin (matt).png"
+    },
+    {
+      "file": "Aqua Admin (shelly).png",
+      "sourcePath": "src/assets/images/npcs/Aqua Admin (shelly).png"
+    },
+    {
+      "file": "Aqua Leader.png",
+      "sourcePath": "src/assets/images/npcs/Aqua Leader.png"
+    },
+    {
+      "file": "Arezu.png",
+      "sourcePath": "src/assets/images/npcs/Arezu.png"
+    },
+    {
+      "file": "Armored Mewtwo.png",
+      "sourcePath": "src/assets/images/npcs/Armored Mewtwo.png"
+    },
+    {
+      "file": "Aroma Lady.png",
+      "sourcePath": "src/assets/images/npcs/Aroma Lady.png"
+    },
+    {
+      "file": "Artist (Gen 8).png",
+      "sourcePath": "src/assets/images/npcs/Artist (Gen 8).png"
+    },
+    {
+      "file": "Artist (male).png",
+      "sourcePath": "src/assets/images/npcs/Artist (male).png"
+    },
+    {
+      "file": "Arven.png",
+      "sourcePath": "src/assets/images/npcs/Arven.png"
+    },
+    {
+      "file": "Ash Ketchum.png",
+      "sourcePath": "src/assets/images/npcs/Ash Ketchum.png"
+    },
+    {
+      "file": "Assistant Branch Chief Wicke.png",
+      "sourcePath": "src/assets/images/npcs/Assistant Branch Chief Wicke.png"
+    },
+    {
+      "file": "Athlete (female).png",
+      "sourcePath": "src/assets/images/npcs/Athlete (female).png"
+    },
+    {
+      "file": "Athlete (male).png",
+      "sourcePath": "src/assets/images/npcs/Athlete (male).png"
+    },
+    {
+      "file": "Atticus.png",
+      "sourcePath": "src/assets/images/npcs/Atticus.png"
+    },
+    {
+      "file": "Avery.png",
+      "sourcePath": "src/assets/images/npcs/Avery.png"
+    },
+    {
+      "file": "AZ.png",
+      "sourcePath": "src/assets/images/npcs/AZ.png"
+    },
+    {
+      "file": "Backpacker (female).png",
+      "sourcePath": "src/assets/images/npcs/Backpacker (female).png"
+    },
+    {
+      "file": "Backpacker (male).png",
+      "sourcePath": "src/assets/images/npcs/Backpacker (male).png"
+    },
+    {
+      "file": "Bandana Guy.png",
+      "sourcePath": "src/assets/images/npcs/Bandana Guy.png"
+    },
+    {
+      "file": "Barry.png",
+      "sourcePath": "src/assets/images/npcs/Barry.png"
+    },
+    {
+      "file": "Battle Girl.png",
+      "sourcePath": "src/assets/images/npcs/Battle Girl.png"
+    },
+    {
+      "file": "BattleCafeMaster.png",
+      "sourcePath": "src/assets/images/npcs/BattleCafeMaster.png"
+    },
+    {
+      "file": "Bea.png",
+      "sourcePath": "src/assets/images/npcs/Bea.png"
+    },
+    {
+      "file": "Beauty.png",
+      "sourcePath": "src/assets/images/npcs/Beauty.png"
+    },
+    {
+      "file": "Bede.png",
+      "sourcePath": "src/assets/images/npcs/Bede.png"
+    },
+    {
+      "file": "Bellhop.png",
+      "sourcePath": "src/assets/images/npcs/Bellhop.png"
+    },
+    {
+      "file": "Beni (Ninja).png",
+      "sourcePath": "src/assets/images/npcs/Beni (Ninja).png"
+    },
+    {
+      "file": "Beni.png",
+      "sourcePath": "src/assets/images/npcs/Beni.png"
+    },
+    {
+      "file": "Bertha.png",
+      "sourcePath": "src/assets/images/npcs/Bertha.png"
+    },
+    {
+      "file": "Biker Goon.png",
+      "sourcePath": "src/assets/images/npcs/Biker Goon.png"
+    },
+    {
+      "file": "Bill's Grandpa with Eevee.png",
+      "sourcePath": "src/assets/images/npcs/Bill's Grandpa with Eevee.png"
+    },
+    {
+      "file": "Bill's Grandpa without Eevee.png",
+      "sourcePath": "src/assets/images/npcs/Bill's Grandpa without Eevee.png"
+    },
+    {
+      "file": "Bill.png",
+      "sourcePath": "src/assets/images/npcs/Bill.png"
+    },
+    {
+      "file": "Bird Keeper.png",
+      "sourcePath": "src/assets/images/npcs/Bird Keeper.png"
+    },
+    {
+      "file": "Black Belt.png",
+      "sourcePath": "src/assets/images/npcs/Black Belt.png"
+    },
+    {
+      "file": "Blaine.png",
+      "sourcePath": "src/assets/images/npcs/Blaine.png"
+    },
+    {
+      "file": "Blue-lgpe.png",
+      "sourcePath": "src/assets/images/npcs/Blue-lgpe.png"
+    },
+    {
+      "file": "Blue-masters.png",
+      "sourcePath": "src/assets/images/npcs/Blue-masters.png"
+    },
+    {
+      "file": "Blue.png",
+      "sourcePath": "src/assets/images/npcs/Blue.png"
+    },
+    {
+      "file": "Blue1.png",
+      "sourcePath": "src/assets/images/npcs/Blue1.png"
+    },
+    {
+      "file": "Blue2.png",
+      "sourcePath": "src/assets/images/npcs/Blue2.png"
+    },
+    {
+      "file": "Bodybuilder (female).png",
+      "sourcePath": "src/assets/images/npcs/Bodybuilder (female).png"
+    },
+    {
+      "file": "Bodybuilder (male).png",
+      "sourcePath": "src/assets/images/npcs/Bodybuilder (male).png"
+    },
+    {
+      "file": "Bookworms.png",
+      "sourcePath": "src/assets/images/npcs/Bookworms.png"
+    },
+    {
+      "file": "Brains & Brawn.png",
+      "sourcePath": "src/assets/images/npcs/Brains & Brawn.png"
+    },
+    {
+      "file": "Brassius.png",
+      "sourcePath": "src/assets/images/npcs/Brassius.png"
+    },
+    {
+      "file": "Brawly.png",
+      "sourcePath": "src/assets/images/npcs/Brawly.png"
+    },
+    {
+      "file": "Brock.png",
+      "sourcePath": "src/assets/images/npcs/Brock.png"
+    },
+    {
+      "file": "Bruno.png",
+      "sourcePath": "src/assets/images/npcs/Bruno.png"
+    },
+    {
+      "file": "Bruno2.png",
+      "sourcePath": "src/assets/images/npcs/Bruno2.png"
+    },
+    {
+      "file": "Bug Buds.png",
+      "sourcePath": "src/assets/images/npcs/Bug Buds.png"
+    },
+    {
+      "file": "Bug Catcher.png",
+      "sourcePath": "src/assets/images/npcs/Bug Catcher.png"
+    },
+    {
+      "file": "Bugsy.png",
+      "sourcePath": "src/assets/images/npcs/Bugsy.png"
+    },
+    {
+      "file": "Burgh.png",
+      "sourcePath": "src/assets/images/npcs/Burgh.png"
+    },
+    {
+      "file": "Burglar.png",
+      "sourcePath": "src/assets/images/npcs/Burglar.png"
+    },
+    {
+      "file": "Butler.png",
+      "sourcePath": "src/assets/images/npcs/Butler.png"
+    },
+    {
+      "file": "Byron.png",
+      "sourcePath": "src/assets/images/npcs/Byron.png"
+    },
+    {
+      "file": "Caitlin.png",
+      "sourcePath": "src/assets/images/npcs/Caitlin.png"
+    },
+    {
+      "file": "Calaba.png",
+      "sourcePath": "src/assets/images/npcs/Calaba.png"
+    },
+    {
+      "file": "Calem.png",
+      "sourcePath": "src/assets/images/npcs/Calem.png"
+    },
+    {
+      "file": "Camper.png",
+      "sourcePath": "src/assets/images/npcs/Camper.png"
+    },
+    {
+      "file": "Candice.png",
+      "sourcePath": "src/assets/images/npcs/Candice.png"
+    },
+    {
+      "file": "Celio.png",
+      "sourcePath": "src/assets/images/npcs/Celio.png"
+    },
+    {
+      "file": "Channeler.png",
+      "sourcePath": "src/assets/images/npcs/Channeler.png"
+    },
+    {
+      "file": "Charm.png",
+      "sourcePath": "src/assets/images/npcs/Charm.png"
+    },
+    {
+      "file": "Chaser (female).png",
+      "sourcePath": "src/assets/images/npcs/Chaser (female).png"
+    },
+    {
+      "file": "Chaser (male).png",
+      "sourcePath": "src/assets/images/npcs/Chaser (male).png"
+    },
+    {
+      "file": "Cheren.png",
+      "sourcePath": "src/assets/images/npcs/Cheren.png"
+    },
+    {
+      "file": "Chobin.png",
+      "sourcePath": "src/assets/images/npcs/Chobin.png"
+    },
+    {
+      "file": "Chuck.png",
+      "sourcePath": "src/assets/images/npcs/Chuck.png"
+    },
+    {
+      "file": "Cipher (commander).png",
+      "sourcePath": "src/assets/images/npcs/Cipher (commander).png"
+    },
+    {
+      "file": "Cipher Admin (nascour).png",
+      "sourcePath": "src/assets/images/npcs/Cipher Admin (nascour).png"
+    },
+    {
+      "file": "Cipher Admin Ardos.png",
+      "sourcePath": "src/assets/images/npcs/Cipher Admin Ardos.png"
+    },
+    {
+      "file": "Cipher Admin Dakim.png",
+      "sourcePath": "src/assets/images/npcs/Cipher Admin Dakim.png"
+    },
+    {
+      "file": "Cipher Admin Ein.png",
+      "sourcePath": "src/assets/images/npcs/Cipher Admin Ein.png"
+    },
+    {
+      "file": "Cipher Admin Eldes.png",
+      "sourcePath": "src/assets/images/npcs/Cipher Admin Eldes.png"
+    },
+    {
+      "file": "Cipher Admin Gorigan.png",
+      "sourcePath": "src/assets/images/npcs/Cipher Admin Gorigan.png"
+    },
+    {
+      "file": "Cipher Admin Lovrina.png",
+      "sourcePath": "src/assets/images/npcs/Cipher Admin Lovrina.png"
+    },
+    {
+      "file": "Cipher Admin Miror B.png",
+      "sourcePath": "src/assets/images/npcs/Cipher Admin Miror B.png"
+    },
+    {
+      "file": "Cipher Admin Snattle.png",
+      "sourcePath": "src/assets/images/npcs/Cipher Admin Snattle.png"
+    },
+    {
+      "file": "Cipher Admin Venus.png",
+      "sourcePath": "src/assets/images/npcs/Cipher Admin Venus.png"
+    },
+    {
+      "file": "Cipher Head (evice).png",
+      "sourcePath": "src/assets/images/npcs/Cipher Head (evice).png"
+    },
+    {
+      "file": "Cipher Peon (female).png",
+      "sourcePath": "src/assets/images/npcs/Cipher Peon (female).png"
+    },
+    {
+      "file": "Cipher Peon (male).png",
+      "sourcePath": "src/assets/images/npcs/Cipher Peon (male).png"
+    },
+    {
+      "file": "Cipher Peon (yellow).png",
+      "sourcePath": "src/assets/images/npcs/Cipher Peon (yellow).png"
+    },
+    {
+      "file": "Cipher Peon Blusix.png",
+      "sourcePath": "src/assets/images/npcs/Cipher Peon Blusix.png"
+    },
+    {
+      "file": "Cipher Peon Browsix.png",
+      "sourcePath": "src/assets/images/npcs/Cipher Peon Browsix.png"
+    },
+    {
+      "file": "Cipher Peon Greesix.png",
+      "sourcePath": "src/assets/images/npcs/Cipher Peon Greesix.png"
+    },
+    {
+      "file": "Cipher Peon Purpsix.png",
+      "sourcePath": "src/assets/images/npcs/Cipher Peon Purpsix.png"
+    },
+    {
+      "file": "Cipher Peon Resix.png",
+      "sourcePath": "src/assets/images/npcs/Cipher Peon Resix.png"
+    },
+    {
+      "file": "Cipher Peon XD (female).png",
+      "sourcePath": "src/assets/images/npcs/Cipher Peon XD (female).png"
+    },
+    {
+      "file": "Cipher Peon XD (male).png",
+      "sourcePath": "src/assets/images/npcs/Cipher Peon XD (male).png"
+    },
+    {
+      "file": "Cipher Peon Yellosix.png",
+      "sourcePath": "src/assets/images/npcs/Cipher Peon Yellosix.png"
+    },
+    {
+      "file": "Cissy.png",
+      "sourcePath": "src/assets/images/npcs/Cissy.png"
+    },
+    {
+      "file": "Clair.png",
+      "sourcePath": "src/assets/images/npcs/Clair.png"
+    },
+    {
+      "file": "Clavell.png",
+      "sourcePath": "src/assets/images/npcs/Clavell.png"
+    },
+    {
+      "file": "Clay.png",
+      "sourcePath": "src/assets/images/npcs/Clay.png"
+    },
+    {
+      "file": "Clemont.png",
+      "sourcePath": "src/assets/images/npcs/Clemont.png"
+    },
+    {
+      "file": "Clover.png",
+      "sourcePath": "src/assets/images/npcs/Clover.png"
+    },
+    {
+      "file": "Clown Jessie & James.png",
+      "sourcePath": "src/assets/images/npcs/Clown Jessie & James.png"
+    },
+    {
+      "file": "Co-workers.png",
+      "sourcePath": "src/assets/images/npcs/Co-workers.png"
+    },
+    {
+      "file": "Cogita.png",
+      "sourcePath": "src/assets/images/npcs/Cogita.png"
+    },
+    {
+      "file": "Coin.png",
+      "sourcePath": "src/assets/images/npcs/Coin.png"
+    },
+    {
+      "file": "Collector.png",
+      "sourcePath": "src/assets/images/npcs/Collector.png"
+    },
+    {
+      "file": "Commander (jupiter).png",
+      "sourcePath": "src/assets/images/npcs/Commander (jupiter).png"
+    },
+    {
+      "file": "Commander (mars).png",
+      "sourcePath": "src/assets/images/npcs/Commander (mars).png"
+    },
+    {
+      "file": "Commander (saturn).png",
+      "sourcePath": "src/assets/images/npcs/Commander (saturn).png"
+    },
+    {
+      "file": "Commanders (marsjupiter).png",
+      "sourcePath": "src/assets/images/npcs/Commanders (marsjupiter).png"
+    },
+    {
+      "file": "Contest Champion (Johanna).png",
+      "sourcePath": "src/assets/images/npcs/Contest Champion (Johanna).png"
+    },
+    {
+      "file": "Cook.png",
+      "sourcePath": "src/assets/images/npcs/Cook.png"
+    },
+    {
+      "file": "Cool Couple.png",
+      "sourcePath": "src/assets/images/npcs/Cool Couple.png"
+    },
+    {
+      "file": "Cooltrainer (female).png",
+      "sourcePath": "src/assets/images/npcs/Cooltrainer (female).png"
+    },
+    {
+      "file": "Cooltrainer (male).png",
+      "sourcePath": "src/assets/images/npcs/Cooltrainer (male).png"
+    },
+    {
+      "file": "Crasher Wake.png",
+      "sourcePath": "src/assets/images/npcs/Crasher Wake.png"
+    },
+    {
+      "file": "Crush Girl.png",
+      "sourcePath": "src/assets/images/npcs/Crush Girl.png"
+    },
+    {
+      "file": "Crush Kin.png",
+      "sourcePath": "src/assets/images/npcs/Crush Kin.png"
+    },
+    {
+      "file": "Cue Ball Paxton.png",
+      "sourcePath": "src/assets/images/npcs/Cue Ball Paxton.png"
+    },
+    {
+      "file": "Cyclist (female).png",
+      "sourcePath": "src/assets/images/npcs/Cyclist (female).png"
+    },
+    {
+      "file": "Cyclist (male).png",
+      "sourcePath": "src/assets/images/npcs/Cyclist (male).png"
+    },
+    {
+      "file": "Cyllene.png",
+      "sourcePath": "src/assets/images/npcs/Cyllene.png"
+    },
+    {
+      "file": "Cynthia.png",
+      "sourcePath": "src/assets/images/npcs/Cynthia.png"
+    },
+    {
+      "file": "Dancer (female).png",
+      "sourcePath": "src/assets/images/npcs/Dancer (female).png"
+    },
+    {
+      "file": "Danny.png",
+      "sourcePath": "src/assets/images/npcs/Danny.png"
+    },
+    {
+      "file": "Deep King (angol).png",
+      "sourcePath": "src/assets/images/npcs/Deep King (angol).png"
+    },
+    {
+      "file": "Dendra.png",
+      "sourcePath": "src/assets/images/npcs/Dendra.png"
+    },
+    {
+      "file": "Dexio (Gen 6).png",
+      "sourcePath": "src/assets/images/npcs/Dexio (Gen 6).png"
+    },
+    {
+      "file": "Dexio.png",
+      "sourcePath": "src/assets/images/npcs/Dexio.png"
+    },
+    {
+      "file": "Diantha.png",
+      "sourcePath": "src/assets/images/npcs/Diantha.png"
+    },
+    {
+      "file": "Doctor.png",
+      "sourcePath": "src/assets/images/npcs/Doctor.png"
+    },
+    {
+      "file": "Dojo Master.png",
+      "sourcePath": "src/assets/images/npcs/Dojo Master.png"
+    },
+    {
+      "file": "Double Team.png",
+      "sourcePath": "src/assets/images/npcs/Double Team.png"
+    },
+    {
+      "file": "Dr Cozmo.png",
+      "sourcePath": "src/assets/images/npcs/Dr Cozmo.png"
+    },
+    {
+      "file": "Dr Splash.png",
+      "sourcePath": "src/assets/images/npcs/Dr Splash.png"
+    },
+    {
+      "file": "Draconid Elder.png",
+      "sourcePath": "src/assets/images/npcs/Draconid Elder.png"
+    },
+    {
+      "file": "Dragon Tamer.png",
+      "sourcePath": "src/assets/images/npcs/Dragon Tamer.png"
+    },
+    {
+      "file": "Dragon Warriors.png",
+      "sourcePath": "src/assets/images/npcs/Dragon Warriors.png"
+    },
+    {
+      "file": "Drake.png",
+      "sourcePath": "src/assets/images/npcs/Drake.png"
+    },
+    {
+      "file": "Drasna.png",
+      "sourcePath": "src/assets/images/npcs/Drasna.png"
+    },
+    {
+      "file": "Drayden.png",
+      "sourcePath": "src/assets/images/npcs/Drayden.png"
+    },
+    {
+      "file": "Dulse.png",
+      "sourcePath": "src/assets/images/npcs/Dulse.png"
+    },
+    {
+      "file": "Egg Hunter.png",
+      "sourcePath": "src/assets/images/npcs/Egg Hunter.png"
+    },
+    {
+      "file": "Elder Li.png",
+      "sourcePath": "src/assets/images/npcs/Elder Li.png"
+    },
+    {
+      "file": "Elesa.png",
+      "sourcePath": "src/assets/images/npcs/Elesa.png"
+    },
+    {
+      "file": "Eri.png",
+      "sourcePath": "src/assets/images/npcs/Eri.png"
+    },
+    {
+      "file": "Erika.png",
+      "sourcePath": "src/assets/images/npcs/Erika.png"
+    },
+    {
+      "file": "Es Cade.png",
+      "sourcePath": "src/assets/images/npcs/Es Cade.png"
+    },
+    {
+      "file": "Eusine.png",
+      "sourcePath": "src/assets/images/npcs/Eusine.png"
+    },
+    {
+      "file": "Fairy Tale Girl.png",
+      "sourcePath": "src/assets/images/npcs/Fairy Tale Girl.png"
+    },
+    {
+      "file": "Falkner.png",
+      "sourcePath": "src/assets/images/npcs/Falkner.png"
+    },
+    {
+      "file": "False Dragon Titan.png",
+      "sourcePath": "src/assets/images/npcs/False Dragon Titan.png"
+    },
+    {
+      "file": "Fantina.png",
+      "sourcePath": "src/assets/images/npcs/Fantina.png"
+    },
+    {
+      "file": "Fight & Flight.png",
+      "sourcePath": "src/assets/images/npcs/Fight & Flight.png"
+    },
+    {
+      "file": "Firebreather.png",
+      "sourcePath": "src/assets/images/npcs/Firebreather.png"
+    },
+    {
+      "file": "Fisherman.png",
+      "sourcePath": "src/assets/images/npcs/Fisherman.png"
+    },
+    {
+      "file": "Flannery.png",
+      "sourcePath": "src/assets/images/npcs/Flannery.png"
+    },
+    {
+      "file": "Flint.png",
+      "sourcePath": "src/assets/images/npcs/Flint.png"
+    },
+    {
+      "file": "Furisode Girl Katherine.png",
+      "sourcePath": "src/assets/images/npcs/Furisode Girl Katherine.png"
+    },
+    {
+      "file": "Gaeric.png",
+      "sourcePath": "src/assets/images/npcs/Gaeric.png"
+    },
+    {
+      "file": "Galactic Boss (cyrus).png",
+      "sourcePath": "src/assets/images/npcs/Galactic Boss (cyrus).png"
+    },
+    {
+      "file": "Galactic Grunt (female).png",
+      "sourcePath": "src/assets/images/npcs/Galactic Grunt (female).png"
+    },
+    {
+      "file": "Galactic Grunt (male).png",
+      "sourcePath": "src/assets/images/npcs/Galactic Grunt (male).png"
+    },
+    {
+      "file": "Galactic Grunts (male).png",
+      "sourcePath": "src/assets/images/npcs/Galactic Grunts (male).png"
+    },
+    {
+      "file": "Gardenia.png",
+      "sourcePath": "src/assets/images/npcs/Gardenia.png"
+    },
+    {
+      "file": "Geeta.png",
+      "sourcePath": "src/assets/images/npcs/Geeta.png"
+    },
+    {
+      "file": "Gentleman (Gen 4).png",
+      "sourcePath": "src/assets/images/npcs/Gentleman (Gen 4).png"
+    },
+    {
+      "file": "Gentleman.png",
+      "sourcePath": "src/assets/images/npcs/Gentleman.png"
+    },
+    {
+      "file": "Ghetsis.png",
+      "sourcePath": "src/assets/images/npcs/Ghetsis.png"
+    },
+    {
+      "file": "Giacomo.png",
+      "sourcePath": "src/assets/images/npcs/Giacomo.png"
+    },
+    {
+      "file": "Glacia.png",
+      "sourcePath": "src/assets/images/npcs/Glacia.png"
+    },
+    {
+      "file": "Gladion (stance).png",
+      "sourcePath": "src/assets/images/npcs/Gladion (stance).png"
+    },
+    {
+      "file": "Gladion.png",
+      "sourcePath": "src/assets/images/npcs/Gladion.png"
+    },
+    {
+      "file": "Go-Rock Squad Commander.png",
+      "sourcePath": "src/assets/images/npcs/Go-Rock Squad Commander.png"
+    },
+    {
+      "file": "Go-Rock Squad Grunt (female).png",
+      "sourcePath": "src/assets/images/npcs/Go-Rock Squad Grunt (female).png"
+    },
+    {
+      "file": "Go-Rock Squad Grunt (male).png",
+      "sourcePath": "src/assets/images/npcs/Go-Rock Squad Grunt (male).png"
+    },
+    {
+      "file": "Golfer (male).png",
+      "sourcePath": "src/assets/images/npcs/Golfer (male).png"
+    },
+    {
+      "file": "Gordie.png",
+      "sourcePath": "src/assets/images/npcs/Gordie.png"
+    },
+    {
+      "file": "Grand Master Greevil.png",
+      "sourcePath": "src/assets/images/npcs/Grand Master Greevil.png"
+    },
+    {
+      "file": "Grant.png",
+      "sourcePath": "src/assets/images/npcs/Grant.png"
+    },
+    {
+      "file": "Green.png",
+      "sourcePath": "src/assets/images/npcs/Green.png"
+    },
+    {
+      "file": "Grimsley.png",
+      "sourcePath": "src/assets/images/npcs/Grimsley.png"
+    },
+    {
+      "file": "Grusha.png",
+      "sourcePath": "src/assets/images/npcs/Grusha.png"
+    },
+    {
+      "file": "Guitarist (female).png",
+      "sourcePath": "src/assets/images/npcs/Guitarist (female).png"
+    },
+    {
+      "file": "Guitarist (male).png",
+      "sourcePath": "src/assets/images/npcs/Guitarist (male).png"
+    },
+    {
+      "file": "Guzma.png",
+      "sourcePath": "src/assets/images/npcs/Guzma.png"
+    },
+    {
+      "file": "Gym Leader Bede.png",
+      "sourcePath": "src/assets/images/npcs/Gym Leader Bede.png"
+    },
+    {
+      "file": "Gym Leader Marnie.png",
+      "sourcePath": "src/assets/images/npcs/Gym Leader Marnie.png"
+    },
+    {
+      "file": "Hala.png",
+      "sourcePath": "src/assets/images/npcs/Hala.png"
+    },
+    {
+      "file": "Hapu.png",
+      "sourcePath": "src/assets/images/npcs/Hapu.png"
+    },
+    {
+      "file": "Hassel.png",
+      "sourcePath": "src/assets/images/npcs/Hassel.png"
+    },
+    {
+      "file": "Hau.png",
+      "sourcePath": "src/assets/images/npcs/Hau.png"
+    },
+    {
+      "file": "Hex Maniac.png",
+      "sourcePath": "src/assets/images/npcs/Hex Maniac.png"
+    },
+    {
+      "file": "Hidden Dragons.png",
+      "sourcePath": "src/assets/images/npcs/Hidden Dragons.png"
+    },
+    {
+      "file": "Hiker (Gen 8).png",
+      "sourcePath": "src/assets/images/npcs/Hiker (Gen 8).png"
+    },
+    {
+      "file": "Hiker.png",
+      "sourcePath": "src/assets/images/npcs/Hiker.png"
+    },
+    {
+      "file": "Honey.png",
+      "sourcePath": "src/assets/images/npcs/Honey.png"
+    },
+    {
+      "file": "Honeymooners.png",
+      "sourcePath": "src/assets/images/npcs/Honeymooners.png"
+    },
+    {
+      "file": "Hop.png",
+      "sourcePath": "src/assets/images/npcs/Hop.png"
+    },
+    {
+      "file": "Howard Clifford.png",
+      "sourcePath": "src/assets/images/npcs/Howard Clifford.png"
+    },
+    {
+      "file": "Hugh.png",
+      "sourcePath": "src/assets/images/npcs/Hugh.png"
+    },
+    {
+      "file": "Hunter (female).png",
+      "sourcePath": "src/assets/images/npcs/Hunter (female).png"
+    },
+    {
+      "file": "Hunter (male).png",
+      "sourcePath": "src/assets/images/npcs/Hunter (male).png"
+    },
+    {
+      "file": "Ilima.png",
+      "sourcePath": "src/assets/images/npcs/Ilima.png"
+    },
+    {
+      "file": "Ingo.png",
+      "sourcePath": "src/assets/images/npcs/Ingo.png"
+    },
+    {
+      "file": "Iono.png",
+      "sourcePath": "src/assets/images/npcs/Iono.png"
+    },
+    {
+      "file": "Irida.png",
+      "sourcePath": "src/assets/images/npcs/Irida.png"
+    },
+    {
+      "file": "Iris.png",
+      "sourcePath": "src/assets/images/npcs/Iris.png"
+    },
+    {
+      "file": "Iscan.png",
+      "sourcePath": "src/assets/images/npcs/Iscan.png"
+    },
+    {
+      "file": "Jacq.png",
+      "sourcePath": "src/assets/images/npcs/Jacq.png"
+    },
+    {
+      "file": "Janitor.png",
+      "sourcePath": "src/assets/images/npcs/Janitor.png"
+    },
+    {
+      "file": "Jasmine.png",
+      "sourcePath": "src/assets/images/npcs/Jasmine.png"
+    },
+    {
+      "file": "Jessie and James.png",
+      "sourcePath": "src/assets/images/npcs/Jessie and James.png"
+    },
+    {
+      "file": "Jogger.png",
+      "sourcePath": "src/assets/images/npcs/Jogger.png"
+    },
+    {
+      "file": "Juan.png",
+      "sourcePath": "src/assets/images/npcs/Juan.png"
+    },
+    {
+      "file": "Juggler.png",
+      "sourcePath": "src/assets/images/npcs/Juggler.png"
+    },
+    {
+      "file": "Jump Champ Blue.png",
+      "sourcePath": "src/assets/images/npcs/Jump Champ Blue.png"
+    },
+    {
+      "file": "Jump Champ Green.png",
+      "sourcePath": "src/assets/images/npcs/Jump Champ Green.png"
+    },
+    {
+      "file": "Jump Champ Red.png",
+      "sourcePath": "src/assets/images/npcs/Jump Champ Red.png"
+    },
+    {
+      "file": "Kabu.png",
+      "sourcePath": "src/assets/images/npcs/Kabu.png"
+    },
+    {
+      "file": "Kahili.png",
+      "sourcePath": "src/assets/images/npcs/Kahili.png"
+    },
+    {
+      "file": "Kamado.png",
+      "sourcePath": "src/assets/images/npcs/Kamado.png"
+    },
+    {
+      "file": "Karen.png",
+      "sourcePath": "src/assets/images/npcs/Karen.png"
+    },
+    {
+      "file": "Katy.png",
+      "sourcePath": "src/assets/images/npcs/Katy.png"
+    },
+    {
+      "file": "Kiawe.png",
+      "sourcePath": "src/assets/images/npcs/Kiawe.png"
+    },
+    {
+      "file": "Kimono Girl.png",
+      "sourcePath": "src/assets/images/npcs/Kimono Girl.png"
+    },
+    {
+      "file": "Klara.png",
+      "sourcePath": "src/assets/images/npcs/Klara.png"
+    },
+    {
+      "file": "Kofu.png",
+      "sourcePath": "src/assets/images/npcs/Kofu.png"
+    },
+    {
+      "file": "Koga.png",
+      "sourcePath": "src/assets/images/npcs/Koga.png"
+    },
+    {
+      "file": "Koga2.png",
+      "sourcePath": "src/assets/images/npcs/Koga2.png"
+    },
+    {
+      "file": "Koko.png",
+      "sourcePath": "src/assets/images/npcs/Koko.png"
+    },
+    {
+      "file": "Korrina.png",
+      "sourcePath": "src/assets/images/npcs/Korrina.png"
+    },
+    {
+      "file": "Kurt.png",
+      "sourcePath": "src/assets/images/npcs/Kurt.png"
+    },
+    {
+      "file": "Lady.png",
+      "sourcePath": "src/assets/images/npcs/Lady.png"
+    },
+    {
+      "file": "Lana.png",
+      "sourcePath": "src/assets/images/npcs/Lana.png"
+    },
+    {
+      "file": "Lance.png",
+      "sourcePath": "src/assets/images/npcs/Lance.png"
+    },
+    {
+      "file": "Lance2.png",
+      "sourcePath": "src/assets/images/npcs/Lance2.png"
+    },
+    {
+      "file": "Larry.png",
+      "sourcePath": "src/assets/images/npcs/Larry.png"
+    },
+    {
+      "file": "Lass.png",
+      "sourcePath": "src/assets/images/npcs/Lass.png"
+    },
+    {
+      "file": "Laventon.png",
+      "sourcePath": "src/assets/images/npcs/Laventon.png"
+    },
+    {
+      "file": "Leon.png",
+      "sourcePath": "src/assets/images/npcs/Leon.png"
+    },
+    {
+      "file": "Lian.png",
+      "sourcePath": "src/assets/images/npcs/Lian.png"
+    },
+    {
+      "file": "Lillie (z powered).png",
+      "sourcePath": "src/assets/images/npcs/Lillie (z powered).png"
+    },
+    {
+      "file": "Lillie.png",
+      "sourcePath": "src/assets/images/npcs/Lillie.png"
+    },
+    {
+      "file": "Lisia.png",
+      "sourcePath": "src/assets/images/npcs/Lisia.png"
+    },
+    {
+      "file": "Looker.png",
+      "sourcePath": "src/assets/images/npcs/Looker.png"
+    },
+    {
+      "file": "Lorekeeper.png",
+      "sourcePath": "src/assets/images/npcs/Lorekeeper.png"
+    },
+    {
+      "file": "Lorelei.png",
+      "sourcePath": "src/assets/images/npcs/Lorelei.png"
+    },
+    {
+      "file": "Lt. Surge.png",
+      "sourcePath": "src/assets/images/npcs/Lt. Surge.png"
+    },
+    {
+      "file": "Luana.png",
+      "sourcePath": "src/assets/images/npcs/Luana.png"
+    },
+    {
+      "file": "Lucas.png",
+      "sourcePath": "src/assets/images/npcs/Lucas.png"
+    },
+    {
+      "file": "Lucian.png",
+      "sourcePath": "src/assets/images/npcs/Lucian.png"
+    },
+    {
+      "file": "Lucy Stevens.png",
+      "sourcePath": "src/assets/images/npcs/Lucy Stevens.png"
+    },
+    {
+      "file": "Macro Cosmos (female).png",
+      "sourcePath": "src/assets/images/npcs/Macro Cosmos (female).png"
+    },
+    {
+      "file": "Macro Cosmos (male).png",
+      "sourcePath": "src/assets/images/npcs/Macro Cosmos (male).png"
+    },
+    {
+      "file": "Macro Cosmos (oleana).png",
+      "sourcePath": "src/assets/images/npcs/Macro Cosmos (oleana).png"
+    },
+    {
+      "file": "Macro Cosmos (rose).png",
+      "sourcePath": "src/assets/images/npcs/Macro Cosmos (rose).png"
+    },
+    {
+      "file": "Madame.png",
+      "sourcePath": "src/assets/images/npcs/Madame.png"
+    },
+    {
+      "file": "Magikarp.png",
+      "sourcePath": "src/assets/images/npcs/Magikarp.png"
+    },
+    {
+      "file": "Magma Admin (courtney).png",
+      "sourcePath": "src/assets/images/npcs/Magma Admin (courtney).png"
+    },
+    {
+      "file": "Magma Admin.png",
+      "sourcePath": "src/assets/images/npcs/Magma Admin.png"
+    },
+    {
+      "file": "Magma Leader.png",
+      "sourcePath": "src/assets/images/npcs/Magma Leader.png"
+    },
+    {
+      "file": "Mai.png",
+      "sourcePath": "src/assets/images/npcs/Mai.png"
+    },
+    {
+      "file": "Mallow.png",
+      "sourcePath": "src/assets/images/npcs/Mallow.png"
+    },
+    {
+      "file": "Malva.png",
+      "sourcePath": "src/assets/images/npcs/Malva.png"
+    },
+    {
+      "file": "Man of Mystery.png",
+      "sourcePath": "src/assets/images/npcs/Man of Mystery.png"
+    },
+    {
+      "file": "Marlon.png",
+      "sourcePath": "src/assets/images/npcs/Marlon.png"
+    },
+    {
+      "file": "Marnie.png",
+      "sourcePath": "src/assets/images/npcs/Marnie.png"
+    },
+    {
+      "file": "Marshal.png",
+      "sourcePath": "src/assets/images/npcs/Marshal.png"
+    },
+    {
+      "file": "Master & Apprentice.png",
+      "sourcePath": "src/assets/images/npcs/Master & Apprentice.png"
+    },
+    {
+      "file": "Master Dojo.png",
+      "sourcePath": "src/assets/images/npcs/Master Dojo.png"
+    },
+    {
+      "file": "May.png",
+      "sourcePath": "src/assets/images/npcs/May.png"
+    },
+    {
+      "file": "Maylene.png",
+      "sourcePath": "src/assets/images/npcs/Maylene.png"
+    },
+    {
+      "file": "MayorKarp.png",
+      "sourcePath": "src/assets/images/npcs/MayorKarp.png"
+    },
+    {
+      "file": "Mela.png",
+      "sourcePath": "src/assets/images/npcs/Mela.png"
+    },
+    {
+      "file": "Melded Minds (both).png",
+      "sourcePath": "src/assets/images/npcs/Melded Minds (both).png"
+    },
+    {
+      "file": "Melli.png",
+      "sourcePath": "src/assets/images/npcs/Melli.png"
+    },
+    {
+      "file": "Melony.png",
+      "sourcePath": "src/assets/images/npcs/Melony.png"
+    },
+    {
+      "file": "Merilyn.png",
+      "sourcePath": "src/assets/images/npcs/Merilyn.png"
+    },
+    {
+      "file": "Millis and Argus Steel.png",
+      "sourcePath": "src/assets/images/npcs/Millis and Argus Steel.png"
+    },
+    {
+      "file": "Milo.png",
+      "sourcePath": "src/assets/images/npcs/Milo.png"
+    },
+    {
+      "file": "Mina.png",
+      "sourcePath": "src/assets/images/npcs/Mina.png"
+    },
+    {
+      "file": "Miriam.png",
+      "sourcePath": "src/assets/images/npcs/Miriam.png"
+    },
+    {
+      "file": "Miror B. Peon (ferma).png",
+      "sourcePath": "src/assets/images/npcs/Miror B. Peon (ferma).png"
+    },
+    {
+      "file": "Miror B. Peon (folly).png",
+      "sourcePath": "src/assets/images/npcs/Miror B. Peon (folly).png"
+    },
+    {
+      "file": "Miror B. Peon (reath).png",
+      "sourcePath": "src/assets/images/npcs/Miror B. Peon (reath).png"
+    },
+    {
+      "file": "Miror B. Peon (trudly).png",
+      "sourcePath": "src/assets/images/npcs/Miror B. Peon (trudly).png"
+    },
+    {
+      "file": "Misty.png",
+      "sourcePath": "src/assets/images/npcs/Misty.png"
+    },
+    {
+      "file": "Molayne.png",
+      "sourcePath": "src/assets/images/npcs/Molayne.png"
+    },
+    {
+      "file": "Morty.png",
+      "sourcePath": "src/assets/images/npcs/Morty.png"
+    },
+    {
+      "file": "Mountain Men.png",
+      "sourcePath": "src/assets/images/npcs/Mountain Men.png"
+    },
+    {
+      "file": "Mr Stone.png",
+      "sourcePath": "src/assets/images/npcs/Mr Stone.png"
+    },
+    {
+      "file": "Mr. Fuji.png",
+      "sourcePath": "src/assets/images/npcs/Mr. Fuji.png"
+    },
+    {
+      "file": "Mr. Pokémon.png",
+      "sourcePath": "src/assets/images/npcs/Mr. Pokémon.png"
+    },
+    {
+      "file": "Murph.png",
+      "sourcePath": "src/assets/images/npcs/Murph.png"
+    },
+    {
+      "file": "Musician.png",
+      "sourcePath": "src/assets/images/npcs/Musician.png"
+    },
+    {
+      "file": "Mustard Elite.png",
+      "sourcePath": "src/assets/images/npcs/Mustard Elite.png"
+    },
+    {
+      "file": "Mustard.png",
+      "sourcePath": "src/assets/images/npcs/Mustard.png"
+    },
+    {
+      "file": "Mystery Troop Blue.png",
+      "sourcePath": "src/assets/images/npcs/Mystery Troop Blue.png"
+    },
+    {
+      "file": "Mystery Troop Green.png",
+      "sourcePath": "src/assets/images/npcs/Mystery Troop Green.png"
+    },
+    {
+      "file": "Mystery Troop Red.png",
+      "sourcePath": "src/assets/images/npcs/Mystery Troop Red.png"
+    },
+    {
+      "file": "Nanu.png",
+      "sourcePath": "src/assets/images/npcs/Nanu.png"
+    },
+    {
+      "file": "Nature Friends.png",
+      "sourcePath": "src/assets/images/npcs/Nature Friends.png"
+    },
+    {
+      "file": "Nemona.png",
+      "sourcePath": "src/assets/images/npcs/Nemona.png"
+    },
+    {
+      "file": "Nessa.png",
+      "sourcePath": "src/assets/images/npcs/Nessa.png"
+    },
+    {
+      "file": "Norman.png",
+      "sourcePath": "src/assets/images/npcs/Norman.png"
+    },
+    {
+      "file": "Not Ash.png",
+      "sourcePath": "src/assets/images/npcs/Not Ash.png"
+    },
+    {
+      "file": "Nurse.png",
+      "sourcePath": "src/assets/images/npcs/Nurse.png"
+    },
+    {
+      "file": "Nursery Aide.png",
+      "sourcePath": "src/assets/images/npcs/Nursery Aide.png"
+    },
+    {
+      "file": "Office Worker (female).png",
+      "sourcePath": "src/assets/images/npcs/Office Worker (female).png"
+    },
+    {
+      "file": "Office Worker (male).png",
+      "sourcePath": "src/assets/images/npcs/Office Worker (male).png"
+    },
+    {
+      "file": "Officer Jenny.png",
+      "sourcePath": "src/assets/images/npcs/Officer Jenny.png"
+    },
+    {
+      "file": "Old Couple.png",
+      "sourcePath": "src/assets/images/npcs/Old Couple.png"
+    },
+    {
+      "file": "Old Lady.png",
+      "sourcePath": "src/assets/images/npcs/Old Lady.png"
+    },
+    {
+      "file": "Old Man.png",
+      "sourcePath": "src/assets/images/npcs/Old Man.png"
+    },
+    {
+      "file": "Olivia.png",
+      "sourcePath": "src/assets/images/npcs/Olivia.png"
+    },
+    {
+      "file": "Olympia.png",
+      "sourcePath": "src/assets/images/npcs/Olympia.png"
+    },
+    {
+      "file": "Opal.png",
+      "sourcePath": "src/assets/images/npcs/Opal.png"
+    },
+    {
+      "file": "Ortega.png",
+      "sourcePath": "src/assets/images/npcs/Ortega.png"
+    },
+    {
+      "file": "Owner.png",
+      "sourcePath": "src/assets/images/npcs/Owner.png"
+    },
+    {
+      "file": "Painter.png",
+      "sourcePath": "src/assets/images/npcs/Painter.png"
+    },
+    {
+      "file": "Palina.png",
+      "sourcePath": "src/assets/images/npcs/Palina.png"
+    },
+    {
+      "file": "Penny.png",
+      "sourcePath": "src/assets/images/npcs/Penny.png"
+    },
+    {
+      "file": "Peon (mirakle b).png",
+      "sourcePath": "src/assets/images/npcs/Peon (mirakle b).png"
+    },
+    {
+      "file": "Peonia.png",
+      "sourcePath": "src/assets/images/npcs/Peonia.png"
+    },
+    {
+      "file": "Peony Elite.png",
+      "sourcePath": "src/assets/images/npcs/Peony Elite.png"
+    },
+    {
+      "file": "Peony.png",
+      "sourcePath": "src/assets/images/npcs/Peony.png"
+    },
+    {
+      "file": "Phoebe.png",
+      "sourcePath": "src/assets/images/npcs/Phoebe.png"
+    },
+    {
+      "file": "Phyco.png",
+      "sourcePath": "src/assets/images/npcs/Phyco.png"
+    },
+    {
+      "file": "Picnicker.png",
+      "sourcePath": "src/assets/images/npcs/Picnicker.png"
+    },
+    {
+      "file": "Piers.png",
+      "sourcePath": "src/assets/images/npcs/Piers.png"
+    },
+    {
+      "file": "Pinkan Jessie & James.png",
+      "sourcePath": "src/assets/images/npcs/Pinkan Jessie & James.png"
+    },
+    {
+      "file": "Pinkan Officer Jenny.png",
+      "sourcePath": "src/assets/images/npcs/Pinkan Officer Jenny.png"
+    },
+    {
+      "file": "Plasma Shadow.png",
+      "sourcePath": "src/assets/images/npcs/Plasma Shadow.png"
+    },
+    {
+      "file": "Plumeria (league).png",
+      "sourcePath": "src/assets/images/npcs/Plumeria (league).png"
+    },
+    {
+      "file": "Plumeria.png",
+      "sourcePath": "src/assets/images/npcs/Plumeria.png"
+    },
+    {
+      "file": "Pokemon Ranger (female).png",
+      "sourcePath": "src/assets/images/npcs/Pokemon Ranger (female).png"
+    },
+    {
+      "file": "Poké Kid.png",
+      "sourcePath": "src/assets/images/npcs/Poké Kid.png"
+    },
+    {
+      "file": "Pokéfan (female).png",
+      "sourcePath": "src/assets/images/npcs/Pokéfan (female).png"
+    },
+    {
+      "file": "Pokéfan (male).png",
+      "sourcePath": "src/assets/images/npcs/Pokéfan (male).png"
+    },
+    {
+      "file": "PokéManiac.png",
+      "sourcePath": "src/assets/images/npcs/PokéManiac.png"
+    },
+    {
+      "file": "Pokémon Breeder (female).png",
+      "sourcePath": "src/assets/images/npcs/Pokémon Breeder (female).png"
+    },
+    {
+      "file": "Pokémon Breeder (male).png",
+      "sourcePath": "src/assets/images/npcs/Pokémon Breeder (male).png"
+    },
+    {
+      "file": "Pokémon Ranger (female).png",
+      "sourcePath": "src/assets/images/npcs/Pokémon Ranger (female).png"
+    },
+    {
+      "file": "Pokémon Ranger (male).png",
+      "sourcePath": "src/assets/images/npcs/Pokémon Ranger (male).png"
+    },
+    {
+      "file": "Pokémon Rangers.png",
+      "sourcePath": "src/assets/images/npcs/Pokémon Rangers.png"
+    },
+    {
+      "file": "Poppy.png",
+      "sourcePath": "src/assets/images/npcs/Poppy.png"
+    },
+    {
+      "file": "Preschooler (female).png",
+      "sourcePath": "src/assets/images/npcs/Preschooler (female).png"
+    },
+    {
+      "file": "Preschooler (male).png",
+      "sourcePath": "src/assets/images/npcs/Preschooler (male).png"
+    },
+    {
+      "file": "Professor Birch.png",
+      "sourcePath": "src/assets/images/npcs/Professor Birch.png"
+    },
+    {
+      "file": "Professor Burnet (gen7).png",
+      "sourcePath": "src/assets/images/npcs/Professor Burnet (gen7).png"
+    },
+    {
+      "file": "Professor Burnet.png",
+      "sourcePath": "src/assets/images/npcs/Professor Burnet.png"
+    },
+    {
+      "file": "Professor Elm.png",
+      "sourcePath": "src/assets/images/npcs/Professor Elm.png"
+    },
+    {
+      "file": "Professor Hastings.png",
+      "sourcePath": "src/assets/images/npcs/Professor Hastings.png"
+    },
+    {
+      "file": "Professor Ivy.png",
+      "sourcePath": "src/assets/images/npcs/Professor Ivy.png"
+    },
+    {
+      "file": "Professor Juniper.png",
+      "sourcePath": "src/assets/images/npcs/Professor Juniper.png"
+    },
+    {
+      "file": "Professor Kukui.png",
+      "sourcePath": "src/assets/images/npcs/Professor Kukui.png"
+    },
+    {
+      "file": "Professor Magnolia.png",
+      "sourcePath": "src/assets/images/npcs/Professor Magnolia.png"
+    },
+    {
+      "file": "Professor Oak.png",
+      "sourcePath": "src/assets/images/npcs/Professor Oak.png"
+    },
+    {
+      "file": "Professor Rowan.png",
+      "sourcePath": "src/assets/images/npcs/Professor Rowan.png"
+    },
+    {
+      "file": "Professor Sonia.png",
+      "sourcePath": "src/assets/images/npcs/Professor Sonia.png"
+    },
+    {
+      "file": "Pryce.png",
+      "sourcePath": "src/assets/images/npcs/Pryce.png"
+    },
+    {
+      "file": "Psychic (female).png",
+      "sourcePath": "src/assets/images/npcs/Psychic (female).png"
+    },
+    {
+      "file": "Psychic (male).png",
+      "sourcePath": "src/assets/images/npcs/Psychic (male).png"
+    },
+    {
+      "file": "Punk Couple.png",
+      "sourcePath": "src/assets/images/npcs/Punk Couple.png"
+    },
+    {
+      "file": "Punk Girl.png",
+      "sourcePath": "src/assets/images/npcs/Punk Girl.png"
+    },
+    {
+      "file": "Punk Guy.png",
+      "sourcePath": "src/assets/images/npcs/Punk Guy.png"
+    },
+    {
+      "file": "Quaking Earth Titan.png",
+      "sourcePath": "src/assets/images/npcs/Quaking Earth Titan.png"
+    },
+    {
+      "file": "Raihan.png",
+      "sourcePath": "src/assets/images/npcs/Raihan.png"
+    },
+    {
+      "file": "Rail Staff.png",
+      "sourcePath": "src/assets/images/npcs/Rail Staff.png"
+    },
+    {
+      "file": "Ramos.png",
+      "sourcePath": "src/assets/images/npcs/Ramos.png"
+    },
+    {
+      "file": "Red-masters.png",
+      "sourcePath": "src/assets/images/npcs/Red-masters.png"
+    },
+    {
+      "file": "Red.png",
+      "sourcePath": "src/assets/images/npcs/Red.png"
+    },
+    {
+      "file": "Reporter.png",
+      "sourcePath": "src/assets/images/npcs/Reporter.png"
+    },
+    {
+      "file": "Rich Boy.png",
+      "sourcePath": "src/assets/images/npcs/Rich Boy.png"
+    },
+    {
+      "file": "Rider (female).png",
+      "sourcePath": "src/assets/images/npcs/Rider (female).png"
+    },
+    {
+      "file": "Rider (male).png",
+      "sourcePath": "src/assets/images/npcs/Rider (male).png"
+    },
+    {
+      "file": "Rika.png",
+      "sourcePath": "src/assets/images/npcs/Rika.png"
+    },
+    {
+      "file": "Riley.png",
+      "sourcePath": "src/assets/images/npcs/Riley.png"
+    },
+    {
+      "file": "Riot.png",
+      "sourcePath": "src/assets/images/npcs/Riot.png"
+    },
+    {
+      "file": "Rising Star (male).png",
+      "sourcePath": "src/assets/images/npcs/Rising Star (male).png"
+    },
+    {
+      "file": "Rival Blue.png",
+      "sourcePath": "src/assets/images/npcs/Rival Blue.png"
+    },
+    {
+      "file": "Rival Hau.png",
+      "sourcePath": "src/assets/images/npcs/Rival Hau.png"
+    },
+    {
+      "file": "Roark.png",
+      "sourcePath": "src/assets/images/npcs/Roark.png"
+    },
+    {
+      "file": "Robo Groudon.png",
+      "sourcePath": "src/assets/images/npcs/Robo Groudon.png"
+    },
+    {
+      "file": "Rocket Boss Giovanni.png",
+      "sourcePath": "src/assets/images/npcs/Rocket Boss Giovanni.png"
+    },
+    {
+      "file": "Rocket Executive (archer).png",
+      "sourcePath": "src/assets/images/npcs/Rocket Executive (archer).png"
+    },
+    {
+      "file": "Rocket Executive (ariana).png",
+      "sourcePath": "src/assets/images/npcs/Rocket Executive (ariana).png"
+    },
+    {
+      "file": "Rocket Executive (petrel).png",
+      "sourcePath": "src/assets/images/npcs/Rocket Executive (petrel).png"
+    },
+    {
+      "file": "Rocket Executive (proton).png",
+      "sourcePath": "src/assets/images/npcs/Rocket Executive (proton).png"
+    },
+    {
+      "file": "Roddy Tackle.png",
+      "sourcePath": "src/assets/images/npcs/Roddy Tackle.png"
+    },
+    {
+      "file": "Rogue Cail.png",
+      "sourcePath": "src/assets/images/npcs/Rogue Cail.png"
+    },
+    {
+      "file": "Roller Boy.png",
+      "sourcePath": "src/assets/images/npcs/Roller Boy.png"
+    },
+    {
+      "file": "Roxanne.png",
+      "sourcePath": "src/assets/images/npcs/Roxanne.png"
+    },
+    {
+      "file": "Roxie.png",
+      "sourcePath": "src/assets/images/npcs/Roxie.png"
+    },
+    {
+      "file": "Rudy.png",
+      "sourcePath": "src/assets/images/npcs/Rudy.png"
+    },
+    {
+      "file": "Rui.png",
+      "sourcePath": "src/assets/images/npcs/Rui.png"
+    },
+    {
+      "file": "Ruin Maniac gen3.png",
+      "sourcePath": "src/assets/images/npcs/Ruin Maniac gen3.png"
+    },
+    {
+      "file": "Ruin Maniac.png",
+      "sourcePath": "src/assets/images/npcs/Ruin Maniac.png"
+    },
+    {
+      "file": "Ryme.png",
+      "sourcePath": "src/assets/images/npcs/Ryme.png"
+    },
+    {
+      "file": "Ryuki.png",
+      "sourcePath": "src/assets/images/npcs/Ryuki.png"
+    },
+    {
+      "file": "Sabi.png",
+      "sourcePath": "src/assets/images/npcs/Sabi.png"
+    },
+    {
+      "file": "Sabrina.png",
+      "sourcePath": "src/assets/images/npcs/Sabrina.png"
+    },
+    {
+      "file": "Sada.png",
+      "sourcePath": "src/assets/images/npcs/Sada.png"
+    },
+    {
+      "file": "Sage.png",
+      "sourcePath": "src/assets/images/npcs/Sage.png"
+    },
+    {
+      "file": "Sailor.png",
+      "sourcePath": "src/assets/images/npcs/Sailor.png"
+    },
+    {
+      "file": "School Kid (female).png",
+      "sourcePath": "src/assets/images/npcs/School Kid (female).png"
+    },
+    {
+      "file": "School Kid (male).png",
+      "sourcePath": "src/assets/images/npcs/School Kid (male).png"
+    },
+    {
+      "file": "Scientist (female).png",
+      "sourcePath": "src/assets/images/npcs/Scientist (female).png"
+    },
+    {
+      "file": "Scientist (male).png",
+      "sourcePath": "src/assets/images/npcs/Scientist (male).png"
+    },
+    {
+      "file": "Scientist Gideon.png",
+      "sourcePath": "src/assets/images/npcs/Scientist Gideon.png"
+    },
+    {
+      "file": "Scratch Cat Girl.png",
+      "sourcePath": "src/assets/images/npcs/Scratch Cat Girl.png"
+    },
+    {
+      "file": "Shady Guy (wes).png",
+      "sourcePath": "src/assets/images/npcs/Shady Guy (wes).png"
+    },
+    {
+      "file": "ShadySalesman.png",
+      "sourcePath": "src/assets/images/npcs/ShadySalesman.png"
+    },
+    {
+      "file": "Shauna.png",
+      "sourcePath": "src/assets/images/npcs/Shauna.png"
+    },
+    {
+      "file": "Shauntal.png",
+      "sourcePath": "src/assets/images/npcs/Shauntal.png"
+    },
+    {
+      "file": "Shielbert.png",
+      "sourcePath": "src/assets/images/npcs/Shielbert.png"
+    },
+    {
+      "file": "Siblings.png",
+      "sourcePath": "src/assets/images/npcs/Siblings.png"
+    },
+    {
+      "file": "Sidney.png",
+      "sourcePath": "src/assets/images/npcs/Sidney.png"
+    },
+    {
+      "file": "Siebold.png",
+      "sourcePath": "src/assets/images/npcs/Siebold.png"
+    },
+    {
+      "file": "Sightseer (female).png",
+      "sourcePath": "src/assets/images/npcs/Sightseer (female).png"
+    },
+    {
+      "file": "Sightseer (male).png",
+      "sourcePath": "src/assets/images/npcs/Sightseer (male).png"
+    },
+    {
+      "file": "Silver.png",
+      "sourcePath": "src/assets/images/npcs/Silver.png"
+    },
+    {
+      "file": "Sina.png",
+      "sourcePath": "src/assets/images/npcs/Sina.png"
+    },
+    {
+      "file": "Sky Trainer (female).png",
+      "sourcePath": "src/assets/images/npcs/Sky Trainer (female).png"
+    },
+    {
+      "file": "Sky Trainer (male).png",
+      "sourcePath": "src/assets/images/npcs/Sky Trainer (male).png"
+    },
+    {
+      "file": "Skyla.png",
+      "sourcePath": "src/assets/images/npcs/Skyla.png"
+    },
+    {
+      "file": "Snagem Head (gonzap).png",
+      "sourcePath": "src/assets/images/npcs/Snagem Head (gonzap).png"
+    },
+    {
+      "file": "Socialite.png",
+      "sourcePath": "src/assets/images/npcs/Socialite.png"
+    },
+    {
+      "file": "Soliera.png",
+      "sourcePath": "src/assets/images/npcs/Soliera.png"
+    },
+    {
+      "file": "Sonia.png",
+      "sourcePath": "src/assets/images/npcs/Sonia.png"
+    },
+    {
+      "file": "Sophocles.png",
+      "sourcePath": "src/assets/images/npcs/Sophocles.png"
+    },
+    {
+      "file": "Sordward & Shielbert.png",
+      "sourcePath": "src/assets/images/npcs/Sordward & Shielbert.png"
+    },
+    {
+      "file": "Sordward.png",
+      "sourcePath": "src/assets/images/npcs/Sordward.png"
+    },
+    {
+      "file": "Sparring Partners.png",
+      "sourcePath": "src/assets/images/npcs/Sparring Partners.png"
+    },
+    {
+      "file": "Steven.png",
+      "sourcePath": "src/assets/images/npcs/Steven.png"
+    },
+    {
+      "file": "Street Performer.png",
+      "sourcePath": "src/assets/images/npcs/Street Performer.png"
+    },
+    {
+      "file": "Super Nerd.png",
+      "sourcePath": "src/assets/images/npcs/Super Nerd.png"
+    },
+    {
+      "file": "Supreme Gym Leader Drake.png",
+      "sourcePath": "src/assets/images/npcs/Supreme Gym Leader Drake.png"
+    },
+    {
+      "file": "Surfer.png",
+      "sourcePath": "src/assets/images/npcs/Surfer.png"
+    },
+    {
+      "file": "Sycamore.png",
+      "sourcePath": "src/assets/images/npcs/Sycamore.png"
+    },
+    {
+      "file": "Tamer.png",
+      "sourcePath": "src/assets/images/npcs/Tamer.png"
+    },
+    {
+      "file": "Tate & Liza.png",
+      "sourcePath": "src/assets/images/npcs/Tate & Liza.png"
+    },
+    {
+      "file": "Teacher (gen7).png",
+      "sourcePath": "src/assets/images/npcs/Teacher (gen7).png"
+    },
+    {
+      "file": "Teacher.png",
+      "sourcePath": "src/assets/images/npcs/Teacher.png"
+    },
+    {
+      "file": "Team Aqua Grunt (female).png",
+      "sourcePath": "src/assets/images/npcs/Team Aqua Grunt (female).png"
+    },
+    {
+      "file": "Team Aqua Grunt (male).png",
+      "sourcePath": "src/assets/images/npcs/Team Aqua Grunt (male).png"
+    },
+    {
+      "file": "Team Flare Admin (female).png",
+      "sourcePath": "src/assets/images/npcs/Team Flare Admin (female).png"
+    },
+    {
+      "file": "Team Flare Admin (male).png",
+      "sourcePath": "src/assets/images/npcs/Team Flare Admin (male).png"
+    },
+    {
+      "file": "Team Flare Aliana.png",
+      "sourcePath": "src/assets/images/npcs/Team Flare Aliana.png"
+    },
+    {
+      "file": "Team Flare Boss Lysandre.png",
+      "sourcePath": "src/assets/images/npcs/Team Flare Boss Lysandre.png"
+    },
+    {
+      "file": "Team Flare Bryony.png",
+      "sourcePath": "src/assets/images/npcs/Team Flare Bryony.png"
+    },
+    {
+      "file": "Team Flare Celosia.png",
+      "sourcePath": "src/assets/images/npcs/Team Flare Celosia.png"
+    },
+    {
+      "file": "Team Flare Grunt (female).png",
+      "sourcePath": "src/assets/images/npcs/Team Flare Grunt (female).png"
+    },
+    {
+      "file": "Team Flare Grunt (male).png",
+      "sourcePath": "src/assets/images/npcs/Team Flare Grunt (male).png"
+    },
+    {
+      "file": "Team Flare Grunt Duo.png",
+      "sourcePath": "src/assets/images/npcs/Team Flare Grunt Duo.png"
+    },
+    {
+      "file": "Team Flare Lysandre.png",
+      "sourcePath": "src/assets/images/npcs/Team Flare Lysandre.png"
+    },
+    {
+      "file": "Team Flare Mable.png",
+      "sourcePath": "src/assets/images/npcs/Team Flare Mable.png"
+    },
+    {
+      "file": "Team Flare Xerosic.png",
+      "sourcePath": "src/assets/images/npcs/Team Flare Xerosic.png"
+    },
+    {
+      "file": "Team Magma Grunt (female).png",
+      "sourcePath": "src/assets/images/npcs/Team Magma Grunt (female).png"
+    },
+    {
+      "file": "Team Magma Grunt (male).png",
+      "sourcePath": "src/assets/images/npcs/Team Magma Grunt (male).png"
+    },
+    {
+      "file": "Team Plasma (colress).png",
+      "sourcePath": "src/assets/images/npcs/Team Plasma (colress).png"
+    },
+    {
+      "file": "Team Plasma (zinzolin).png",
+      "sourcePath": "src/assets/images/npcs/Team Plasma (zinzolin).png"
+    },
+    {
+      "file": "Team Plasma Grunt (female).png",
+      "sourcePath": "src/assets/images/npcs/Team Plasma Grunt (female).png"
+    },
+    {
+      "file": "Team Plasma Grunt (male).png",
+      "sourcePath": "src/assets/images/npcs/Team Plasma Grunt (male).png"
+    },
+    {
+      "file": "Team Plasma Grunts (male).png",
+      "sourcePath": "src/assets/images/npcs/Team Plasma Grunts (male).png"
+    },
+    {
+      "file": "Team Rainbow Leader Giovanni.png",
+      "sourcePath": "src/assets/images/npcs/Team Rainbow Leader Giovanni.png"
+    },
+    {
+      "file": "Team Rainbow Rocket Grunt (female).png",
+      "sourcePath": "src/assets/images/npcs/Team Rainbow Rocket Grunt (female).png"
+    },
+    {
+      "file": "Team Rainbow Rocket Grunt (male).png",
+      "sourcePath": "src/assets/images/npcs/Team Rainbow Rocket Grunt (male).png"
+    },
+    {
+      "file": "Team Rocket Boss Giovanni.png",
+      "sourcePath": "src/assets/images/npcs/Team Rocket Boss Giovanni.png"
+    },
+    {
+      "file": "Team Rocket Grunt (female).png",
+      "sourcePath": "src/assets/images/npcs/Team Rocket Grunt (female).png"
+    },
+    {
+      "file": "Team Rocket Grunt (male).png",
+      "sourcePath": "src/assets/images/npcs/Team Rocket Grunt (male).png"
+    },
+    {
+      "file": "Team Rocket Grunts.png",
+      "sourcePath": "src/assets/images/npcs/Team Rocket Grunts.png"
+    },
+    {
+      "file": "Team Skull Boss (guzma).png",
+      "sourcePath": "src/assets/images/npcs/Team Skull Boss (guzma).png"
+    },
+    {
+      "file": "Team Skull Grunt (female).png",
+      "sourcePath": "src/assets/images/npcs/Team Skull Grunt (female).png"
+    },
+    {
+      "file": "Team Skull Grunt (male).png",
+      "sourcePath": "src/assets/images/npcs/Team Skull Grunt (male).png"
+    },
+    {
+      "file": "Team Skull Grunts (both).png",
+      "sourcePath": "src/assets/images/npcs/Team Skull Grunts (both).png"
+    },
+    {
+      "file": "Team Skull Grunts (male).png",
+      "sourcePath": "src/assets/images/npcs/Team Skull Grunts (male).png"
+    },
+    {
+      "file": "Team Snagem.png",
+      "sourcePath": "src/assets/images/npcs/Team Snagem.png"
+    },
+    {
+      "file": "Team Star Grunt (female).png",
+      "sourcePath": "src/assets/images/npcs/Team Star Grunt (female).png"
+    },
+    {
+      "file": "Team Star Grunt (male).png",
+      "sourcePath": "src/assets/images/npcs/Team Star Grunt (male).png"
+    },
+    {
+      "file": "Team Yell Grunts.png",
+      "sourcePath": "src/assets/images/npcs/Team Yell Grunts.png"
+    },
+    {
+      "file": "The Galaxy Team's Kamado.png",
+      "sourcePath": "src/assets/images/npcs/The Galaxy Team's Kamado.png"
+    },
+    {
+      "file": "Thug.png",
+      "sourcePath": "src/assets/images/npcs/Thug.png"
+    },
+    {
+      "file": "Tierno.png",
+      "sourcePath": "src/assets/images/npcs/Tierno.png"
+    },
+    {
+      "file": "Tourist (female).png",
+      "sourcePath": "src/assets/images/npcs/Tourist (female).png"
+    },
+    {
+      "file": "Tourist (male).png",
+      "sourcePath": "src/assets/images/npcs/Tourist (male).png"
+    },
+    {
+      "file": "Tourist Couple.png",
+      "sourcePath": "src/assets/images/npcs/Tourist Couple.png"
+    },
+    {
+      "file": "Trevor & Tierno.png",
+      "sourcePath": "src/assets/images/npcs/Trevor & Tierno.png"
+    },
+    {
+      "file": "Trevor.png",
+      "sourcePath": "src/assets/images/npcs/Trevor.png"
+    },
+    {
+      "file": "Trial Site.png",
+      "sourcePath": "src/assets/images/npcs/Trial Site.png"
+    },
+    {
+      "file": "Triathlete (malecycling).png",
+      "sourcePath": "src/assets/images/npcs/Triathlete (malecycling).png"
+    },
+    {
+      "file": "Tulip.png",
+      "sourcePath": "src/assets/images/npcs/Tulip.png"
+    },
+    {
+      "file": "Turo.png",
+      "sourcePath": "src/assets/images/npcs/Turo.png"
+    },
+    {
+      "file": "Twerps.png",
+      "sourcePath": "src/assets/images/npcs/Twerps.png"
+    },
+    {
+      "file": "Twins.png",
+      "sourcePath": "src/assets/images/npcs/Twins.png"
+    },
+    {
+      "file": "Tyme.png",
+      "sourcePath": "src/assets/images/npcs/Tyme.png"
+    },
+    {
+      "file": "Valerie.png",
+      "sourcePath": "src/assets/images/npcs/Valerie.png"
+    },
+    {
+      "file": "Veteran (female).png",
+      "sourcePath": "src/assets/images/npcs/Veteran (female).png"
+    },
+    {
+      "file": "Veteran (male).png",
+      "sourcePath": "src/assets/images/npcs/Veteran (male).png"
+    },
+    {
+      "file": "Viola.png",
+      "sourcePath": "src/assets/images/npcs/Viola.png"
+    },
+    {
+      "file": "Volkner.png",
+      "sourcePath": "src/assets/images/npcs/Volkner.png"
+    },
+    {
+      "file": "Volo (Ginkgo).png",
+      "sourcePath": "src/assets/images/npcs/Volo (Ginkgo).png"
+    },
+    {
+      "file": "Volo.png",
+      "sourcePath": "src/assets/images/npcs/Volo.png"
+    },
+    {
+      "file": "Waitress.png",
+      "sourcePath": "src/assets/images/npcs/Waitress.png"
+    },
+    {
+      "file": "Wallace.png",
+      "sourcePath": "src/assets/images/npcs/Wallace.png"
+    },
+    {
+      "file": "Wally.png",
+      "sourcePath": "src/assets/images/npcs/Wally.png"
+    },
+    {
+      "file": "Wattson.png",
+      "sourcePath": "src/assets/images/npcs/Wattson.png"
+    },
+    {
+      "file": "Whitney.png",
+      "sourcePath": "src/assets/images/npcs/Whitney.png"
+    },
+    {
+      "file": "Wikstrom.png",
+      "sourcePath": "src/assets/images/npcs/Wikstrom.png"
+    },
+    {
+      "file": "Will.png",
+      "sourcePath": "src/assets/images/npcs/Will.png"
+    },
+    {
+      "file": "Willie.png",
+      "sourcePath": "src/assets/images/npcs/Willie.png"
+    },
+    {
+      "file": "Winona.png",
+      "sourcePath": "src/assets/images/npcs/Winona.png"
+    },
+    {
+      "file": "Worker (female).png",
+      "sourcePath": "src/assets/images/npcs/Worker (female).png"
+    },
+    {
+      "file": "Worker (ice).png",
+      "sourcePath": "src/assets/images/npcs/Worker (ice).png"
+    },
+    {
+      "file": "Worker (male).png",
+      "sourcePath": "src/assets/images/npcs/Worker (male).png"
+    },
+    {
+      "file": "Wulfric.png",
+      "sourcePath": "src/assets/images/npcs/Wulfric.png"
+    },
+    {
+      "file": "Young Couple.png",
+      "sourcePath": "src/assets/images/npcs/Young Couple.png"
+    },
+    {
+      "file": "Youngster.png",
+      "sourcePath": "src/assets/images/npcs/Youngster.png"
+    },
+    {
+      "file": "Youth Athlete (female).png",
+      "sourcePath": "src/assets/images/npcs/Youth Athlete (female).png"
+    },
+    {
+      "file": "Zero.png",
+      "sourcePath": "src/assets/images/npcs/Zero.png"
+    },
+    {
+      "file": "Zinnia.png",
+      "sourcePath": "src/assets/images/npcs/Zinnia.png"
+    },
+    {
+      "file": "Zossie.png",
+      "sourcePath": "src/assets/images/npcs/Zossie.png"
+    }
+  ]
+}

@@ -41,3 +41,4 @@ if (typeof ensureMapHelpButton !== 'undefined' && typeof window !== 'undefined')
 if (typeof toggleMapHelp !== 'undefined' && typeof window !== 'undefined') window.toggleMapHelp = toggleMapHelp;
 
 export {};
+

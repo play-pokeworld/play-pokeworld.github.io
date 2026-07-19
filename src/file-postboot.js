@@ -67,6 +67,8 @@ function installCriticalClickFallback(root) {
     'cancel-delete': function () { callGlobal('cancelDelete'); },
     'close-confirm': function () { callGlobal('closeConfirm'); },
     'scroll-to-window': function (el) { callGlobal('scrollToWin', el.dataset.targetWindow); },
+    'set-mobile-view': function (el) { callGlobal('setMobileView', el.dataset.mobileView); },
+    'set-mobile-manage-view': function (el) { callGlobal('setMobileManageView', el.dataset.mobileManageView); },
     'set-battle-speed': function (el) { callGlobal('setBattleSpeed', Number(el.dataset.speed)); },
     'open-battle-summary': function () { callGlobal('openBattleSummary', false); },
     'leave-battle': function () { callGlobal('doLeaveBattle'); },
@@ -276,7 +278,7 @@ function installCriticalClickFallback(root) {
       var pct = el.dataset.pct;
       if (pct != null) {
         el.style.setProperty('--pct', pct + '%');
-        if (el.classList.contains('stat-fill') || el.classList.contains('location-progress-bar') || el.classList.contains('hatchery-progress') || el.classList.contains('mine-energy-fill') || el.classList.contains('quest-progress-bar') || el.classList.contains('xp-fill') || el.classList.contains('hp-fill')) {
+        if (el.classList.contains('stat-fill') || el.classList.contains('location-progress-bar') || el.classList.contains('hatchery-progress') || el.classList.contains('mine-energy-fill') || el.classList.contains('quest-progress-bar') || el.classList.contains('xp-fill') || el.classList.contains('hp-fill') || el.classList.contains('battle-damage-fill')) {
           el.style.width = pct + '%';
         }
       }
@@ -342,3 +344,4 @@ function installCriticalClickFallback(root) {
   }
 
 })();
+

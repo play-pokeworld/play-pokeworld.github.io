@@ -29,7 +29,7 @@ function levelUp(p){
  if(targetMoves.length > p.moves.length && p.moves.length < 4){
  const newMvId = targetMoves[targetMoves.length - 1].id;
  if(!p.moves.some(m => m.id === newMvId)){
- p.moves.push({id:newMvId, pp:MOVES[newMvId]?.pp||10, maxPP:MOVES[newMvId]?.pp||10});
+ p.moves.push({id:newMvId});
  const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
  addBattleLog(tr("m.progression.9", {p0:p.name, p1:getMoveName(newMvId), p2:p.level}));
  }
@@ -189,3 +189,4 @@ if (typeof evolve !== 'undefined' && typeof window !== 'undefined') window.evolv
 if (typeof tryStoneEvo !== 'undefined' && typeof window !== 'undefined') window.tryStoneEvo = tryStoneEvo;
 
 export {};
+

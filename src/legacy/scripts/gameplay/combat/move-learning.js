@@ -101,3 +101,4 @@ function toggleMoveEditor(idx){
  openPokeModal(idx);
 }
 let moveEditorFor=null;
+

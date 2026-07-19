@@ -8,3 +8,4 @@ var QUEST_TRIGGERS = {
  25:'cianwood', 26:'olivine', 27:'mahogany', 28:'blackthorn',
  30:'pallet', 31:'newbark'
 };
+

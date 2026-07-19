@@ -28,3 +28,4 @@ export function validateBrowserSave() {
     return { ok: false, deleted: true, reason: 'corrupted-json' };
   }
 }
+

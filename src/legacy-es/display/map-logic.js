@@ -239,3 +239,4 @@ if (typeof mapNodeState !== 'undefined' && typeof window !== 'undefined') window
 if (typeof showMapLegend !== 'undefined' && typeof window !== 'undefined') window.showMapLegend = showMapLegend;
 
 export {};
+

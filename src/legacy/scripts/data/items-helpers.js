@@ -91,3 +91,4 @@ function itemSpriteHtml(key, size) {
   }
   return '<span class="extracted-template-style-016">' + icon + '</span>';
 }
+

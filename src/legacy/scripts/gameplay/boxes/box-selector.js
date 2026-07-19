@@ -70,8 +70,8 @@ function renderUnifiedSwapFooter(){
       footer.innerHTML = `<div class="usm-swap-footer">
         <div class="usm-swap-footer-label">${tr('selected_pokemon', {name:teamPoke.name, level:teamPoke.level})}</div>
         <div class="usm-swap-footer-actions">
-          <button class="hbtn usm-cancel-btn" data-action="legacy-call" data-call="cancelTeamSwap" data-call-args="">✖ ${t('cancel')}</button>
-          <button class="hbtn usm-remove-btn" data-action="call-close-selector" data-call="removeFromTeam" data-call-args="${_swapFromTeamIdx}">❌ ${t('remove')}</button>
+          <button class="hbtn usm-cancel-btn" data-action="legacy-call" data-call="cancelTeamSwap" data-call-args="">${typeof getIcon==='function'?getIcon('close',14):''} ${t('cancel')}</button>
+          <button class="hbtn usm-remove-btn" data-action="call-close-selector" data-call="removeFromTeam" data-call-args="${_swapFromTeamIdx}">${typeof getIcon==='function'?getIcon('close',14):''} ${t('remove')}</button>
         </div>
       </div>`;
       footer.style.display = 'block';
@@ -100,7 +100,7 @@ function renderUnifiedGrid(){
     if(showFossilTab){
       subtabBar.style.display = 'flex';
       subtabBar.innerHTML = `
-        <button class="hbtn usm-subtab-btn" class="hbtn usm-subtab-btn" data-action="set-usm-subtab" data-subtab="box">📦 ${t('box_label')}</button>
+        <button class="hbtn usm-subtab-btn" class="hbtn usm-subtab-btn" data-action="set-usm-subtab" data-subtab="box">${typeof getIcon==='function'?getIcon('box',14):''} ${t('box_label')}</button>
         <button class="hbtn usm-subtab-btn" class="hbtn usm-subtab-btn" data-action="set-usm-subtab" data-subtab="fossil"> ${t('fossils')}</button>`;
     } else {
       subtabBar.style.display = 'none';
@@ -173,6 +173,11 @@ function renderUnifiedGrid(){
       const evB = Object.values(b.p.evs||{}).reduce((x,y)=>x+y,0);
       return evB - evA;
     }
+    if(_usmSort === 'rank'){
+      const ra = typeof rankValue==='function' ? rankValue(getPokemonRank(a.p.id)) : 0;
+      const rb = typeof rankValue==='function' ? rankValue(getPokemonRank(b.p.id)) : 0;
+      return rb - ra || (a.p.id||0) - (b.p.id||0);
+    }
     return (a.p.id || 0) - (b.p.id || 0);
   });
 
@@ -187,7 +192,7 @@ function renderUnifiedGrid(){
     const isShiny = p.shinyUnlocked || p.shinyActive || p.shiny || isSpeciesShiny(p.id);
     const queuedH = typeof isPokemonQueuedHatchery === 'function' && isPokemonQueuedHatchery(p);
     const queuedT = typeof isPokemonQueuedTraining === 'function' && isPokemonQueuedTraining(p);
-    const badges = `${p.favorite?'<span class="box-status-badge favorite">⭐</span>':''}${p.locked?'<span class="box-status-badge locked">🔒</span>':''}${queuedH?'<span class="box-status-badge queued">🥚</span>':''}${queuedT?'<span class="box-status-badge queued">🏋️</span>':''}`;
+    const badges = `${p.favorite?'<span class="box-status-badge favorite">F</span>':''}${p.locked?'<span class="box-status-badge locked">L</span>':''}${queuedH?'<span class="box-status-badge queued">H</span>':''}${queuedT?'<span class="box-status-badge queued">T</span>':''}`;
     return `
       <div class="box-card ${_usmAction === 'save_icon' && G.saveMeta && Number(G.saveMeta.iconPokeId) === Number(p.id) ? 'save-icon-selector-card active' : (_usmAction === 'save_icon' ? 'save-icon-selector-card' : '')}" data-action="legacy-call" data-call="selectUnifiedCard" data-call-args="'${loc}','${idStr}'" data-context-call="${loc === 'team' ? 'openPokeModal' : 'openBoxPokeModal'}" data-context-args="${loc === 'team' ? teamIdx : `'${idStr}'`}" title="${t('select_or_details_hint')}">
         <div class="box-level">Lv.${p.level}</div>
@@ -214,10 +219,10 @@ function renderFossilTabContent(){
   const fossils = (typeof getFossilInventory === 'function') ? getFossilInventory() : [];
   if(!fossils.length){
     return `<div class="fossil-empty-state">
-      <div class="fossil-empty-icon">⛏️</div>
+      <div class="fossil-empty-icon">&nbsp;</div>
       <b>${t('no_fossils_yet')}</b><br>
       <span>${t('dig_mine_fossils')}</span>
-      <div><button class="hbtn" data-action="close-selector-show-tab" data-tab="mine">⛏ ${t('go_to_mine')}</button></div>
+      <div><button class="hbtn" data-action="close-selector-show-tab" data-tab="mine">${typeof getIcon==='function'?getIcon('mine',14):''} ${t('go_to_mine')}</button></div>
     </div>`;
   }
   let html = `<div class="fossil-selector-intro">${t('fossil_selector_hint')}</div><div class="fossil-selector-grid">`;
@@ -235,11 +240,11 @@ function renderFossilTabContent(){
           <div class="fossil-name">${getItemName(displayKey)}</div>
           <div class="fossil-qty">${t('quantity_abbrev')} &times;${f.qty}</div>
         </div>
-        <div class="fossil-owned-badge ${owned?'':'is-missing'}" title="${owned?t('owned'):'Non possédé'}">${owned?'✓':'!'}</div>
+        <div class="fossil-owned-badge ${owned?'':'is-missing'}" title="${owned?t('owned'):(t('dict_not_owned')||'Not owned')}">${owned?'✓':'!'}</div>
       </div>
       <div class="fossil-card-body">
         <div class="fossil-arrow">↓</div>
-        <div class="fossil-target-orb">${spriteImg(pokeId,'🦖',{size:68})}</div>
+        <div class="fossil-target-orb">${spriteImg(pokeId,'',{size:68})}</div>
         <div class="fossil-target-name">${seen?pokeName:'???'} <span>#${pokeId}</span></div>
         <div class="fossil-target-sub">${t('revives_into')}</div>
       </div>
@@ -404,4 +409,5 @@ if (typeof cancelTeamSwap !== 'undefined' && typeof window !== 'undefined') wind
 if (typeof renderFossilTabContent !== 'undefined' && typeof window !== 'undefined') window.renderFossilTabContent = renderFossilTabContent;
 if (typeof sendFossilToHatchery !== 'undefined' && typeof window !== 'undefined') window.sendFossilToHatchery = sendFossilToHatchery;
 if (typeof selectUnifiedCard !== 'undefined' && typeof window !== 'undefined') window.selectUnifiedCard = selectUnifiedCard;
+
 

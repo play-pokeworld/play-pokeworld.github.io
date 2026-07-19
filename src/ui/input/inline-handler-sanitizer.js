@@ -100,3 +100,4 @@ export function installInlineHandlerSanitizer(root = document) {
   });
   return observer;
 }
+

@@ -15,3 +15,4 @@ window.L_fr_stats = {
 "stat_spd_short":"Déf Spé",
 "stat_hp_short":"PV",
 };
+

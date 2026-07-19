@@ -36,7 +36,7 @@ function showStarterModal(region){
  </div>
  <div>
  ${starters.map(st=>`
- <div class="starter-card" data-starter-id="${st.id}" data-starter-region="${region}">
+ <div class="starter-card starter-card--custom" data-starter-id="${st.id}" data-starter-region="${region}">
    <div class="poke-sprite">${spriteImg(st.id,'',{size:72})}</div>
    <div class="extracted-template-style-088">
      <div class="poke-name extracted-template-style-104">${st.name} <span class="extracted-template-style-105">#${st.id}</span></div>
@@ -130,3 +130,4 @@ if (typeof pickStarter !== 'undefined' && typeof window !== 'undefined') window.
 if (typeof checkStarterNeeded !== 'undefined' && typeof window !== 'undefined') window.checkStarterNeeded = checkStarterNeeded;
 
 export {};
+

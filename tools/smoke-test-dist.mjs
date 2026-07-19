@@ -26,13 +26,11 @@ checkFile('src/assets/styles/extracted-index.css');
 checkFile('src/assets/styles/extracted-templates.css');
 checkFile('src/assets/styles/extracted-bridges.css');
 
-checkFile('src/assets/font/WinkySans.woff2');
+checkFile('src/assets/font/WinkySans.ttf');
 if (exists('src/assets/css/style.css')) {
   const css = read('src/assets/css/style.css');
-  if (!css.includes('WinkySans.woff2')) failures.push('Source CSS does not reference WinkySans.woff2');
-  if (css.includes('WinkySans.ttf')) failures.push('Source CSS still references WinkySans.ttf');
+  if (!css.includes('WinkySans.ttf')) failures.push('Source CSS does not reference WinkySans.ttf');
 }
-if (exists('src/assets/font/WinkySans.ttf')) failures.push('Invalid legacy WinkySans.ttf should not be shipped');
 
 
 if (exists('index.html')) {
@@ -78,3 +76,4 @@ if (failures.length) {
   process.exit(1);
 }
 console.log('Smoke test passed.');
+

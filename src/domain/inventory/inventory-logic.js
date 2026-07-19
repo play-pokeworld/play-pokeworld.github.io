@@ -36,3 +36,4 @@ export function sortEntries(entries, sortMode, getItemNameFn, itemCatFn) {
 if (typeof window !== 'undefined') {
   window.itemCat = (key) => itemCat(key, globalThis.ITEMS);
 }
+

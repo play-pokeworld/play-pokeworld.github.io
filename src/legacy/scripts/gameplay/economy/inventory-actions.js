@@ -134,3 +134,4 @@ if (typeof onInventoryClick !== 'undefined' && typeof window !== 'undefined') wi
 if (typeof useItem !== 'undefined' && typeof window !== 'undefined') window.useItem = useItem;
 if (typeof consumeItem !== 'undefined' && typeof window !== 'undefined') window.consumeItem = consumeItem;
 
+

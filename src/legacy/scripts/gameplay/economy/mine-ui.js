@@ -1,8 +1,8 @@
 function renderMineManagementTabs(active){
- return `<div class="management-tabs">
-  <button class="hbtn ${active==='upgrades'?'active':''}" data-action="legacy-call" data-call="openMineManagementMenu" data-call-args="'upgrades'">⬆ ${t('management_upgrades')}</button>
-  <button class="hbtn ${active==='automation'?'active':''}" data-action="legacy-call" data-call="openMineManagementMenu" data-call-args="'automation'">🤖 ${t('management_automation')}</button>
-  <button class="hbtn ${active==='miners'?'active':''}" data-action="legacy-call" data-call="openMineManagementMenu" data-call-args="'miners'">⛏️ ${t('management_miners')}</button>
+ return `<div class="management-tabs ui-management-tabs">
+  ${typeof uiTabButtonHtml==='function' ? uiTabButtonHtml({label:t('management_upgrades'), icon:(typeof getIcon==='function'?getIcon('save',14):''), call:'openMineManagementMenu', args:`'upgrades'`, active:active==='upgrades'}) : `<button class="hbtn ${active==='upgrades'?'active':''}" data-action="legacy-call" data-call="openMineManagementMenu" data-call-args="'upgrades'">${t('management_upgrades')}</button>`}
+  ${typeof uiTabButtonHtml==='function' ? uiTabButtonHtml({label:t('management_automation'), icon:(typeof getIcon==='function'?getIcon('settings',14):''), call:'openMineManagementMenu', args:`'automation'`, active:active==='automation'}) : `<button class="hbtn ${active==='automation'?'active':''}" data-action="legacy-call" data-call="openMineManagementMenu" data-call-args="'automation'">${t('management_automation')}</button>`}
+  ${typeof uiTabButtonHtml==='function' ? uiTabButtonHtml({label:t('management_miners'), icon:(typeof getIcon==='function'?getIcon('mine',14):''), call:'openMineManagementMenu', args:`'miners'`, active:active==='miners'}) : `<button class="hbtn ${active==='miners'?'active':''}" data-action="legacy-call" data-call="openMineManagementMenu" data-call-args="'miners'">${t('management_miners')}</button>`}
  </div>`;
 }
 function mineAutoUnlockCard(){
@@ -28,14 +28,14 @@ function openMineManagementMenu(page='upgrades'){
   ? `${typeof renderStaffList==='function'?renderStaffList('mine'):''}`
   : page === 'automation'
   ? `<div class="automation-dashboard">${auto.purchased
-       ? `<button class="hbtn automation-toggle-btn ${auto.enabled?'is-on':'is-off'}" data-action="legacy-call" data-call="toggleMineAutomation" data-call-args=""><span>⛏️ ${t('mine_auto_title')}</span><b>${auto.enabled?t('automation_enabled'):t('automation_disabled')}</b></button>`
-       : `<div class="automation-locked-card"><span>⛏️ ${t('mine_auto_title')}</span><b>${t('automation_locked_upgrade')}</b></div>`}</div>`
+       ? `<button class="hbtn automation-toggle-btn ${auto.enabled?'is-on':'is-off'}" data-action="legacy-call" data-call="toggleMineAutomation" data-call-args=""><span>${typeof getIcon==='function'?getIcon('mine',14):''} ${t('mine_auto_title')}</span><b>${auto.enabled?t('automation_enabled'):t('automation_disabled')}</b></button>`
+       : `<div class="automation-locked-card"><span>${typeof getIcon==='function'?getIcon('mine',14):''} ${t('mine_auto_title')}</span><b>${t('automation_locked_upgrade')}</b></div>`}</div>`
   : `<div class="upgrade-grid">
       <div class="upgrade-card ${energyCost?'':'is-owned'}"><div><b>${t('mine_energy_upgrade_title')}</b><span>${G.mine.maxEnergy||100}</span></div>${energyCost?`<button class="hbtn purchase-btn" data-action="legacy-call" data-call="upgradeMineEnergy" data-call-args="">${energyCost.toLocaleString()}₽</button>`:`<b>${t('automation_owned')}</b>`}</div>
       ${mineAutoUnlockCard()}
       ${['pickaxe','drill','dynamite'].map(tool=>mineToolUpgradeCard(tool)).join('')}
      </div>`;
- inner.innerHTML = `<div class="modal-title management-title"><div>⚙️ ${t('mine_management_title')}</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
+ inner.innerHTML = `<div class="modal-title management-title"><div>${typeof getIcon==='function'?getIcon('settings',14):''} ${t('mine_management_title')}</div><span class="modal-close" data-action="close-poke-modal">✕</span></div>
  <div class="management-shell management-mine">
   ${renderMineManagementTabs(page)}
   <div class="management-content">${body}</div>
@@ -47,7 +47,7 @@ function renderMineToolButton(tool){
  const unlocked = typeof isMineToolUnlocked === 'function' ? isMineToolUnlocked(tool) : (tool==='chisel'||tool==='hammer');
  const selected = G.mine && G.mine.tool === tool;
  const cost = typeof mineToolEnergyCost === 'function' ? mineToolEnergyCost(tool) : 5;
- return `<button class="hbtn mine-tool-btn ${selected?'active':''}" ${unlocked?`data-action="legacy-call" data-call="setMineTool" data-call-args="'${tool}'"`:'disabled'}>${t('mine_tool_'+tool)} · ${cost}⚡</button>`;
+ return `<button class="hbtn mine-tool-btn ${selected?'active':''}" ${unlocked?`data-action="legacy-call" data-call="setMineTool" data-call-args="'${tool}'"`:'disabled'}>${t('mine_tool_'+tool)} · ${cost}</button>`;
 }
 function renderMineWindow(){
  const el = document.getElementById('mine-window-body');
@@ -115,7 +115,7 @@ function renderMine(el){
 
  const foundCount = items.filter(i=>i.collected).length;
 
- el.innerHTML = `<div class="hatchery-upgrade-row"><button class="hbtn" data-action="legacy-call" data-call="openMineManagementMenu" data-call-args="'upgrades'">⚙️ ${t('mine_management_button')}</button></div>
+ el.innerHTML = `<div class="hatchery-upgrade-row"><button class="hbtn" data-action="legacy-call" data-call="openMineManagementMenu" data-call-args="'upgrades'">${typeof getIcon==='function'?getIcon('settings',14):''} ${t('mine_management_button')}</button></div>
  <div class="loc-title">${t('mine_title')}</div>
  <div class="loc-sub">${t('mine_sub')}</div>
 
@@ -152,4 +152,5 @@ function renderMine(el){
 if (typeof openMineManagementMenu !== 'undefined' && typeof window !== 'undefined') window.openMineManagementMenu = openMineManagementMenu;
 if (typeof renderMineWindow !== 'undefined' && typeof window !== 'undefined') window.renderMineWindow = renderMineWindow;
 if (typeof renderMine !== 'undefined' && typeof window !== 'undefined') window.renderMine = renderMine;
+
 

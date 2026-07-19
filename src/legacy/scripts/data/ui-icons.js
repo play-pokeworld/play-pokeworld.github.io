@@ -11,6 +11,21 @@ const UI_ICONS = {
  location: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12"cy="10"r="3"/></svg>',
  
  shortcuts: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>',
+ story: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>',
+ hatchery: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M12 3c-3.5 0-6 4.2-6 9 0 4.5 2.2 8 6 8s6-3.5 6-8c0-4.8-2.5-9-6-9z"/></svg>',
+ mine: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M14 3l7 7"/><path d="M4 20l7-7"/><path d="M14 3l-4 4 7 7 4-4"/><path d="M2 22l8-8"/></svg>',
+ training: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M6 6v12"/><path d="M18 6v12"/><path d="M3 9h6"/><path d="M15 9h6"/><path d="M3 15h6"/><path d="M15 15h6"/><path d="M9 12h6"/></svg>',
+ shop: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M3 9l1-5h16l1 5"/><path d="M4 9h16v11H4z"/><path d="M9 20v-6h6v6"/></svg>',
+ ship: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M3 20c2 1 4 1 6 0 2 1 4 1 6 0 2 1 4 1 6 0"/><path d="M12 3v11"/><path d="M7 8l5-3 5 3"/><path d="M5 14l7 3 7-3"/></svg>',
+ npc: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',
+ explore: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/></svg>',
+ rematch: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10"/><path d="M3.51 15a9 9 0 0014.85 3.36L23 14"/></svg>',
+ box: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M21 8a2 2 0 00-2-2H5a2 2 0 00-2 2v11a2 2 0 002 2h14a2 2 0 002-2z"/><path d="M3 8l3-5h12l3 5"/><path d="M12 12v5"/><path d="M9.5 14.5h5"/></svg>',
+ dictionary: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><path d="M9 7h6"/><path d="M9 11h6"/></svg>',
+ guide: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><circle cx="12"cy="12"r="10"/><path d="M9.09 9a3 3 0 115.82 1c0 2-3 3-3 3"/><line x1="12"y1="17"x2="12.01"y2="17"/></svg>',
+ atoll: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M3 19c3-2 5-2 8 0 3-2 5-2 10 0"/><path d="M7 14c1.5-3 3-4.5 5-4.5S15.5 11 17 14"/><path d="M12 10V4"/><path d="M9 6l3-2 3 2"/></svg>',
+ save: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>',
+ quests: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>',
  
  
  burn: '<svg viewBox="0 0 24 24"fill="#FBA64C"><path d="M12 2c0 0-3 3-3 7a3 3 0 006 0c0-4-3-7-3-7z"/></svg>',
@@ -85,7 +100,7 @@ const UI_ICONS = {
 function getIcon(name, size = 16) {
  const icon = UI_ICONS[name];
  if (!icon) return '';
- return `<span class="ui-icon ui-icon-sized" width="${size}" height="${size}">${icon}</span>`;
+ return `<span class="ui-icon ui-icon--${size}">${icon}</span>`;
 }
 
 
@@ -97,3 +112,4 @@ iconStyle.textContent = `
  }
 `;
 document.head.appendChild(iconStyle);
+

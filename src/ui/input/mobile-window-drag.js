@@ -6,3 +6,4 @@ export function applyMobileWindowDragPolicy() {
   update();
   window.addEventListener('resize', update, { passive: true });
 }
+

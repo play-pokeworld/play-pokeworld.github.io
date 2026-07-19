@@ -148,3 +148,4 @@ if (typeof unequipItem !== 'undefined' && typeof window !== 'undefined') window.
 if (typeof changePokeTalent !== 'undefined' && typeof window !== 'undefined') window.changePokeTalent = changePokeTalent;
 
 export {};
+

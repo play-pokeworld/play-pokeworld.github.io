@@ -46,6 +46,7 @@ const LEGACY_SCRIPT_ORDER = [
   "src/legacy/scripts/data/ui-icons.js" + V,
   "src/legacy/scripts/data/moves.js" + V,
   "src/legacy/scripts/data/sprites.js" + V,
+  "src/legacy/scripts/data/trainer-sprites-data.js" + V,
   "src/legacy/scripts/data/items-data.js" + V,
   "src/legacy/scripts/data/items-helpers.js" + V,
   "src/legacy/scripts/data/talents-data.js" + V,
@@ -122,3 +123,4 @@ const LEGACY_SCRIPT_ORDER = [
   "src/legacy/scripts/display/tutorial.js" + V,
   "src/legacy/scripts/display/bootstrap.js" + V
 ];
+

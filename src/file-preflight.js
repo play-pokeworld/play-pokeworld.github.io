@@ -97,10 +97,10 @@
 
 
   function createInitialGameState() {
-    return { location:'pallet', region:'kanto', team:[], inventory:{}, money:2000, badges:[], defeatedChamps:{}, pokedex:{}, stepsLeft:0, starter:false, starterKanto:false, starterJohto:false, regionStarter:{kanto:false,johto:false}, collection:{}, teamSlotItems:[], evolvedSpecies:[], dupeCatches:{}, lang:'fr', storyIdx:0, storyProgress:0, unlockedTalents:{}, activeQuests:[], repeatables:[], visitedMaps:{}, completedQuests:{}, wildWinsByLoc:{}, regionLeagueWon:{}, playTimeMs:0, saveMeta:{} };
+    return { location:'pallet', region:'kanto', team:[], inventory:{}, money:2000, badges:[], defeatedChamps:{}, pokedex:{}, stepsLeft:0, starter:false, starterKanto:false, starterJohto:false, regionStarter:{kanto:false,johto:false}, collection:{}, teamSlotItems:[], evolvedSpecies:[], dupeCatches:{}, lang:'fr', storyIdx:0, storyProgress:0, unlockedTalents:{}, activeQuests:[], repeatables:[], visitedMaps:{}, completedQuests:{}, wildWinsByLoc:{}, regionLeagueWon:{}, playTimeMs:0, saveMeta:{}, routeEvents:{ seen:{}, active:null, history:[], cooldowns:{} } };
   }
   function createInitialBattleState() {
-    return { active:false, enemy:null, enemyPoke:null, playerPokeIdx:0, isChamp:false, champId:null, champPokeIdx:0, turnLocked:false, escaped:false, chill:false, playerMods:{atk:1,def:1,spe:1}, enemyMods:{atk:1,def:1,spe:1}, log:[], sessionCatches:[], sessionItems:{}, pendingLeave:false, pendingSwitchIdx:null };
+    return { active:false, enemy:null, enemyPoke:null, playerPokeIdx:0, isChamp:false, champId:null, champPokeIdx:0, turnLocked:false, escaped:false, chill:false, playerMods:{atk:1,def:1,spe:1}, enemyMods:{atk:1,def:1,spe:1}, log:[], sessionCatches:[], sessionItems:{}, sessionWins:0, sessionPlayerKOs:0, sessionStartedAt:0, sessionDamageByPokemon:{}, pendingLeave:false, pendingSwitchIdx:null };
   }
   window.PokeWorldState = { gameState: createInitialGameState(), createInitialGameState };
   window.PokeWorldBattleState = { battleState: createInitialBattleState(), createInitialBattleState };
@@ -145,6 +145,83 @@
 
 
   installLegacyGlobalsClassic();
+
+  function uiIconHtml(name, size, fallback) {
+    if (typeof window.getIcon === 'function') return window.getIcon(name, size || 14);
+    return fallback || '';
+  }
+  function uiButtonHtml(options) {
+    options = options || {};
+    var label = options.label || '';
+    var icon = options.icon || '';
+    var call = options.call || '';
+    var args = options.args == null ? '' : String(options.args).replace(/"/g, '&quot;');
+    var variant = options.variant || 'secondary';
+    var active = !!options.active;
+    var extraClass = options.extraClass || '';
+    var disabled = !!options.disabled;
+    var dataAction = options.dataAction || 'legacy-call';
+    var classes = ['hbtn', 'ui-btn', 'ui-btn--' + variant];
+    if (active) classes.push('is-active');
+    if (extraClass) classes.push(extraClass);
+    var attrs = [];
+    if (disabled) attrs.push('disabled');
+    if (dataAction) attrs.push('data-action="' + dataAction + '"');
+    if (call) attrs.push('data-call="' + call + '"');
+    if (args !== '') attrs.push('data-call-args="' + args + '"');
+    return '<button class="' + classes.join(' ') + '" ' + attrs.join(' ') + '>' + (icon ? '<span class="ui-btn-icon">' + icon + '</span>' : '') + '<span class="ui-btn-label">' + label + '</span></button>';
+  }
+  function uiTabButtonHtml(options) {
+    options = options || {};
+    options.variant = 'tab';
+    options.extraClass = ((options.extraClass || '') + ' ui-tab-btn').trim();
+    return uiButtonHtml(options);
+  }
+  function uiStatChipHtml(label, value) {
+    return '<span class="ui-stat-chip"><b>' + value + '</b><small>' + label + '</small></span>';
+  }
+  window.uiIconHtml = uiIconHtml;
+  window.uiButtonHtml = uiButtonHtml;
+  window.uiTabButtonHtml = uiTabButtonHtml;
+  window.uiStatChipHtml = uiStatChipHtml;
+
+  function applyMobileView() {
+    var mobile = window.matchMedia('(max-width: 850px), (pointer: coarse)').matches;
+    document.body.classList.toggle('mobile-mode', mobile);
+    var allWins = Array.prototype.slice.call(document.querySelectorAll('#main-dashboard .dash-win'));
+    if (!mobile) {
+      allWins.forEach(function(win){ win.classList.remove('mobile-visible'); win.style.removeProperty('display'); });
+      var subOff = document.querySelector('.mobile-subnav-bar');
+      if (subOff) subOff.style.display = 'none';
+      return;
+    }
+    var view = document.body.dataset.mobileView || 'adventure';
+    var manageView = document.body.dataset.mobileManageView || 'hatchery';
+    var visible = [];
+    if (view === 'adventure') visible = ['win-map', 'win-tabs'];
+    else if (view === 'combat') visible = ['win-battle'];
+    else if (view === 'team') visible = ['win-team'];
+    else if (view === 'quests') visible = ['win-story'];
+    else visible = ({hatchery:['win-hatchery'], training:['win-training'], mine:['win-mine'], shortcuts:['win-shortcuts']})[manageView] || ['win-hatchery'];
+    allWins.forEach(function(win){
+      var show = visible.indexOf(win.id) !== -1;
+      win.classList.toggle('mobile-visible', show);
+      win.style.display = show ? 'flex' : 'none';
+    });
+    Array.prototype.slice.call(document.querySelectorAll('.mobile-nav-bar [data-mobile-view]')).forEach(function(btn){ btn.classList.toggle('active', btn.dataset.mobileView === view); });
+    Array.prototype.slice.call(document.querySelectorAll('.mobile-subnav-bar [data-mobile-manage-view]')).forEach(function(btn){ btn.classList.toggle('active', btn.dataset.mobileManageView === manageView); });
+    var sub = document.querySelector('.mobile-subnav-bar');
+    if (sub) sub.style.display = view === 'manage' ? 'flex' : 'none';
+  }
+  function setMobileView(view) { document.body.dataset.mobileView = view || 'adventure'; applyMobileView(); }
+  function setMobileManageView(view) { document.body.dataset.mobileView = 'manage'; document.body.dataset.mobileManageView = view || 'hatchery'; applyMobileView(); }
+  window.applyMobileView = applyMobileView;
+  window.setMobileView = setMobileView;
+  window.setMobileManageView = setMobileManageView;
+  if (!document.body.dataset.mobileView) document.body.dataset.mobileView = 'adventure';
+  if (!document.body.dataset.mobileManageView) document.body.dataset.mobileManageView = 'hatchery';
+  window.addEventListener('resize', applyMobileView, { passive: true });
+  window.addEventListener('orientationchange', applyMobileView, { passive: true });
 
   function callGlobal(name) {
     const args = Array.prototype.slice.call(arguments, 1);
@@ -199,7 +276,7 @@
     const actionMap = {
       'open-settings': ['openSettings'], 'close-settings': ['closeSettings'], 'set-language': ['setLanguage', element.dataset.lang], 'set-theme': ['setTheme', element.dataset.themeValue],
       'save-game': ['saveGame', true], 'load-game': ['loadGame', true], 'export-save': ['exportSave'], 'confirm-delete': ['confirmDelete'], 'do-delete': ['doDelete'], 'cancel-delete': ['cancelDelete'],
-      'close-confirm': ['closeConfirm'], 'scroll-to-window': ['scrollToWin', element.dataset.targetWindow], 'set-battle-speed': ['setBattleSpeed', Number(element.dataset.speed)],
+      'close-confirm': ['closeConfirm'], 'scroll-to-window': ['scrollToWin', element.dataset.targetWindow], 'set-mobile-view': ['setMobileView', element.dataset.mobileView], 'set-mobile-manage-view': ['setMobileManageView', element.dataset.mobileManageView], 'set-battle-speed': ['setBattleSpeed', Number(element.dataset.speed)],
       'open-battle-summary': ['openBattleSummary', false], 'leave-battle': ['doLeaveBattle'], 'show-tab': ['showTab', element.dataset.tab], 'close-unified-selector': ['closeUnifiedSelectorModal'],
       'sort-unified-grid': ['sortUnifiedGrid', element.dataset.sort], 'close-battle-summary': ['closeBattleSummary'], 'restart-last-battle': ['restartLastBattle'],
       'debug-give-money': ['debugGiveMoney'], 'debug-give-candies': ['debugGiveCandies'], 'debug-unlock-badges': ['debugUnlockBadges'], 'debug-fill-mine': ['debugFillMine'], 'debug-timeskip-10m': ['debugTimeSkipAfk10Minutes'],
@@ -252,4 +329,6 @@
   installRobustClickFallback();
   validateBrowserSave();
   applyMobileWindowDragPolicy();
+  applyMobileView();
 })();
+

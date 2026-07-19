@@ -28,3 +28,4 @@ function showTab(tab){
  else if(tab==='shop') renderShop(content);
  else if(tab==='mine') renderMine(content);
 }
+

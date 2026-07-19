@@ -97,3 +97,4 @@ function setWindowLayout(preset){
  try{ safeStorage.set('pokeworld_cols_v12', JSON.stringify(dashboardCols)); }catch(e){}
  renderDashboardColumns();
 }
+

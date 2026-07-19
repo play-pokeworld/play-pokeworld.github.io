@@ -36,13 +36,13 @@ function showStarterModal(region){
  </div>
  <div>
  ${starters.map(st=>`
- <div class="starter-card" data-starter-id="${st.id}" data-starter-region="${region}" data-style="cursor:pointer;background:${st.color}22;border-left:4px solid ${st.color}">
-   <div class="poke-sprite" data-style="background:${st.color}44">${spriteImg(st.id,'',{size:72})}</div>
+ <div class="starter-card starter-card--custom" data-starter-id="${st.id}" data-starter-region="${region}" data-color="${st.color}">
+   <div class="poke-sprite poke-sprite--custom" data-bg="${st.color}44">${spriteImg(st.id,'',{size:72})}</div>
    <div class="extracted-template-style-088">
      <div class="poke-name extracted-template-style-104">${st.name} <span class="extracted-template-style-105">#${st.id}</span></div>
      <div class="extracted-template-style-106">${st.desc}</div>
    </div>
-   <div data-style="background:${st.color};color:white;font-size:13px;padding:6px 14px;border-radius:20px;font-weight:bold;align-self:center">${t('choose')}</div>
+   <div class="starter-choose-btn" data-bg="${st.color}">${t('choose')}</div>
  </div>
  `).join('')}
  </div>
@@ -121,3 +121,4 @@ function checkStarterNeeded(){
  if(modal && alreadyShowing) modal.style.display = 'none';
  return false;
 }
+

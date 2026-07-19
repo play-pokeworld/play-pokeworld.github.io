@@ -75,7 +75,7 @@ function openBoxPokeModal(boxId){
  const selected = !battleEditLocked && currentBoxMoveReplaceSlot === mi;
  const selStyle = selected ? 'opacity:0.4;border:1px solid var(--red);' : '';
  const moveActionAttrs = battleEditLocked ? '' : ` data-action="legacy-call" data-call="toggleBoxMoveSelect" data-call-args="'${boxId}',${mi}"`;
- return `<div class="box-move-card ${selected?'is-selected':''}" data-type-color="${TYPE_COLORS[mv?.type||'']||'#555'}" data-style="background:var(--dark2);border-radius:6px;padding:6px 8px;margin-bottom:4px;display:flex;gap:8px;align-items:center;cursor:${battleEditLocked?'default':'pointer'};border:1px solid ${TYPE_COLORS[mv?.type||mv.type]||'var(--dark1)'};${selStyle}"${moveActionAttrs} data-context-call="openMoveInfo" data-context-args="'${m.id}'" title="${battleEditLocked?boxBattleEditLockMessage():t('click_replace_context_info')}">
+ return `<div class="box-move-card ${selected?'is-selected':''} ${battleEditLocked?'is-locked':''}" data-type-color="${TYPE_COLORS[mv?.type||'']||'#555'}"${moveActionAttrs} data-context-call="openMoveInfo" data-context-args="'${m.id}'" title="${battleEditLocked?boxBattleEditLockMessage():t('click_replace_context_info')}">
  <span class="type-badge ${typeClass(mv?.type||'?')}">${mv?.type||'?'}</span>
  <span>${mvName}</span>
  ${selected?'<span class="extracted-template-style-018">'+t('replacement_badge')+'</span>':''}
@@ -88,7 +88,7 @@ function openBoxPokeModal(boxId){
  const canReplace = !battleEditLocked && currentBoxMoveReplaceSlot !== null;
  const fullB=(p.moves||[]).length>=4 && !canReplace;
  let learnHtml=`<div class="extracted-template-style-020">
- 📖 ${t('learnable_moves_title')}
+ ${t('learnable_moves_title')}
  ${battleEditLocked?'<span class="extracted-template-style-021">'+boxBattleEditLockMessage()+'</span>':''}
  ${!battleEditLocked&&canReplace?'<span class="extracted-template-style-021">'+t('click_to_replace_selected')+'</span>':''}
  ${!battleEditLocked&&fullB?'<span class="extracted-template-style-021">'+t('select_move_first')+'</span>':''}
@@ -97,7 +97,7 @@ function openBoxPokeModal(boxId){
  ${pool.length?pool.map(id=>{
  const mv=MOVES[id];
  const clickAction = !battleEditLocked && (canReplace || !fullB) ? `learnBoxMove('${boxId}','${id}')` : '';
- return `<div class="box-move-card box-move-card--learnable ${clickAction?'is-clickable':''} ${canReplace?'is-selectable':''}" data-type-color="${TYPE_COLORS[mv.type]||'#555'}" data-style="background:var(--dark3);border-radius:6px;padding:5px 8px;margin-bottom:4px;display:flex;gap:8px;align-items:center;cursor:${clickAction?'pointer':'default'};border:1px solid ${canReplace?'var(--green)':(TYPE_COLORS[mv.type]||'var(--dark1)')}"${clickAction?` data-action="legacy-call" data-call="learnBoxMove" data-call-args="\'${boxId}\',\'${id}\'"`:''} data-context-call="openMoveInfo" data-context-args="'${id}'" title="${battleEditLocked?boxBattleEditLockMessage():t('context_info_touch')}">
+ return `<div class="box-move-card box-move-card--learnable ${clickAction?'is-clickable':''} ${canReplace?'is-selectable':''}" data-type-color="${TYPE_COLORS[mv.type]||'#555'}"${clickAction?` data-action="legacy-call" data-call="learnBoxMove" data-call-args="\'${boxId}\',\'${id}\'"`:''} data-context-call="openMoveInfo" data-context-args="'${id}'" title="${battleEditLocked?boxBattleEditLockMessage():t('context_info_touch')}">
  <span class="type-badge ${typeClass(mv.type)}">${mv.type}</span>
  <span>${getMoveName(id)}</span>
  <span class="extracted-template-style-019">${t('power_abbrev')} ${mv.pow||'-'}</span>
@@ -133,7 +133,7 @@ function openBoxPokeModal(boxId){
  <span class="stat-label extracted-bridge-style-002">${l}</span>
  <span class="stat-val extracted-bridge-style-003">${v}${showDelta(base,v)}</span>
  </div>
- <div class="stat-bar extracted-bridge-style-004"><div class="stat-fill" data-style="width:${Math.min(100,v/m*100)}%;background:${c}"></div></div>
+ <div class="stat-bar extracted-bridge-style-004"><div class="stat-fill" data-pct="${Math.min(100,v/m*100)}" data-bg="${c}"></div></div>
  <div class="extracted-template-style-030">
  <span><b>IV:</b> ${renderStars(ivVal, false)} (${ivVal}/6)</span>
  <span><b>EV:</b> ${renderStars(evVal, true)} (${evVal}/6)</span>
@@ -171,7 +171,7 @@ function openBoxPokeModal(boxId){
  ${swap
  ? `<button class="hbtn extracted-bridge-style-006" data-action="call-close-poke" data-call="swapBoxWithTeam" data-call-args="'${boxId}'">${tr('swap_with', {name:G.team[_swapFromTeamIdx]?.name||t('the_team')})}</button>
     <button class="hbtn extracted-bridge-style-007" data-action="call-close-poke" data-call="removeFromTeam" data-call-args="${_swapFromTeamIdx}">${t('remove_from_team')}</button>
-    <button class="hbtn extracted-bridge-style-008" data-action="call-close-poke" data-call="cancelSwap">✖ ${t('cancel')}</button>`
+    <button class="hbtn extracted-bridge-style-008" data-action="call-close-poke" data-call="cancelSwap">${typeof getIcon==='function'?getIcon('close',14):''} ${t('cancel')}</button>`
  : `<button class="hbtn extracted-bridge-style-009" data-action="call-close-poke" data-call="addBoxedToTeam" data-call-args="'${boxId}'"${G.team.length>=6 ? 'disabled title="'+t('team_full_title')+'"' : ''}>${t('add_to_team')}</button>`}
  </div>`;
 
@@ -295,3 +295,4 @@ function tryBoxStoneEvo(boxId, stoneKey){
  }
  }
 }
+

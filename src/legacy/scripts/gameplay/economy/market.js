@@ -127,3 +127,4 @@ function buyPokemon(id){
  updateHeader();
  renderTeamWindow();
 }
+

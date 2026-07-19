@@ -323,8 +323,9 @@ window.L_fr_messages = {
 "save_exported":"Sauvegarde exportée !",
 "save_imported_reload":"Sauvegarde importée ! Rechargement...",
 "save_deleted":"Sauvegarde supprimée",
-"debug_x10_on":"⚡ Vitesse x10 activée",
+"debug_x10_on":"Vitesse x10 activée",
 "debug_x10_off":"Vitesse x10 désactivée",
 "mine_found":"⛏ Trouvé : {item} !",
 "mine_battle_log":"⛏ Souterrain : Vous avez déterré {icon} <b>{item}</b> !"
 };
+

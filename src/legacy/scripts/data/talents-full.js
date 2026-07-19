@@ -136,3 +136,4 @@ function getRarityLabel(rarity) {
 }
 
 if (typeof window !== 'undefined') window.TALENTS_FULL = TALENTS_FULL;
+

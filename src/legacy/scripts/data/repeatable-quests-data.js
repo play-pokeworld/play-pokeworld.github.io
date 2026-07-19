@@ -8,7 +8,7 @@ var REPEATABLE_QUESTS = [
  },
  {
   "id": "r2",
-  "icon": "⚔",
+  "icon": "",
   "type": "defeat_wild",
   "target": 60,
   "rewardMoney": 8000
@@ -22,7 +22,7 @@ var REPEATABLE_QUESTS = [
  },
  {
   "id": "r4",
-  "icon": "⛏",
+  "icon": "",
   "type": "mine_sell",
   "target": 10,
   "rewardMoney": 15000
@@ -67,14 +67,14 @@ var REPEATABLE_QUESTS = [
  },
  {
   "id": "r33",
-  "icon": "🧺",
+  "icon": "",
   "type": "catch",
   "target": 25,
   "rewardMoney": 22000
  },
  {
   "id": "r34",
-  "icon": "🌑",
+  "icon": "",
   "type": "defeat_wild",
   "loc": "darkcave",
   "target": 110,
@@ -82,7 +82,7 @@ var REPEATABLE_QUESTS = [
  },
  {
   "id": "r35",
-  "icon": "🌳",
+  "icon": "",
   "type": "defeat_wild",
   "loc": "ilexforest",
   "target": 100,
@@ -90,7 +90,7 @@ var REPEATABLE_QUESTS = [
  },
  {
   "id": "r36",
-  "icon": "🎣",
+  "icon": "",
   "type": "defeat_wild",
   "loc": "jroute40",
   "target": 100,
@@ -98,14 +98,14 @@ var REPEATABLE_QUESTS = [
  },
  {
   "id": "r37",
-  "icon": "📚",
+  "icon": "",
   "type": "catch",
   "target": 30,
   "rewardMoney": 30000
  },
  {
   "id": "r38",
-  "icon": "⛏",
+  "icon": "",
   "type": "mine_sell",
   "target": 12,
   "rewardMoney": 25000
@@ -115,3 +115,4 @@ var REPEATABLE_QUESTS = [
 
 // --- Migrated to ES module, globals exposed ---
 if (typeof REPEATABLE_QUESTS !== 'undefined' && typeof window !== 'undefined') window.REPEATABLE_QUESTS = REPEATABLE_QUESTS;
+

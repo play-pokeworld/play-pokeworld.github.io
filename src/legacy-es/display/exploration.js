@@ -37,7 +37,6 @@ function healTeam(){
  if(p.currentHP<p.maxHP||p.status){
  p.currentHP=p.maxHP;
  p.status=null;
- for(const m of p.moves) m.pp=m.maxPP;
  healed=true;
  }
  }
@@ -64,3 +63,4 @@ if (typeof healTeam !== 'undefined' && typeof window !== 'undefined') window.hea
 if (typeof addToInventory !== 'undefined' && typeof window !== 'undefined') window.addToInventory = addToInventory;
 
 export {};
+

@@ -323,8 +323,9 @@ window.L_en_messages = {
 "save_exported":"Save exported!",
 "save_imported_reload":"Save imported! Reloading...",
 "save_deleted":"Save deleted",
-"debug_x10_on":"⚡ x10 speed enabled",
+"debug_x10_on":"x10 speed enabled",
 "debug_x10_off":"x10 speed disabled",
 "mine_found":"⛏ Found: {item}!",
 "mine_battle_log":"⛏ Underground: You dug up {icon} <b>{item}</b>!"
 };
+

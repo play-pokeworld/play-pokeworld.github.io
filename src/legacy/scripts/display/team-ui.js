@@ -14,9 +14,7 @@ function renderTeamWindow(){
   }
 
   const battleLockBanner = battle.active
-    ? `<div class="extracted-template-style-109">
-        <span>🔒</span><span>${t('battle_lock_team')}</span>
-       </div>`
+    ? `<div class="extracted-template-style-109 battle-lock-banner"><span>${t('battle_lock_team')}</span></div>`
     : '';
 
   const teamCardsHtml = G.team.map((p, i) => {
@@ -61,14 +59,13 @@ function renderTeamPresetsToolbar(){
     preset3: {name: t('preset_training'), uids: []}
   };
 
-  return `<div class="extracted-template-style-114">
-    <span class="extracted-template-style-115"> ${t('presets_label')}</span>
+  return `<div class="ui-control-toolbar team-toolbar"><div class="ui-toolbar-label">${t('presets_label')}</div>
     ${['preset1', 'preset2', 'preset3'].map((pk, idx) => {
       const active = G.activePresetId === pk;
       const count = (G.teamPresets[pk]?.uids || []).length;
-      return `<div class="extracted-template-style-116">
-        <button class="hbtn" data-style="padding:4px 8px;font-size:13px;${active ? 'background:var(--light1);border-color:var(--light1);color:var(--dark1);' : ''}" data-action="legacy-call" data-call="loadTeamFromPreset" data-call-args="'${pk}'" title="${tr('load_preset_title', {name:G.teamPresets[pk]?.name})}">#${idx + 1} (${count})</button>
-        <button class="hbtn extracted-template-style-117" data-action="legacy-call" data-call="saveCurrentTeamToPreset" data-call-args="'${pk}'" title="${t('save_current_team_title')}">💾</button>
+      return `<div class="team-toolbar-group">
+        ${typeof uiButtonHtml==='function' ? uiButtonHtml({label:'#' + (idx + 1) + ' (' + count + ')', call:'loadTeamFromPreset', args:`'${pk}'`, variant:'tool', active:active}) : `<button class="hbtn" data-action="legacy-call" data-call="loadTeamFromPreset" data-call-args="'${pk}'">#${idx + 1} (${count})</button>`}
+        ${typeof uiButtonHtml==='function' ? uiButtonHtml({label:t('save_short') || 'Save', icon:(typeof getIcon==='function'?getIcon('save',14):''), call:'saveCurrentTeamToPreset', args:`'${pk}'`, variant:'icon', extraClass:'team-preset-save-btn'}) : `<button class="hbtn team-preset-save-btn" data-action="legacy-call" data-call="saveCurrentTeamToPreset" data-call-args="'${pk}'">${typeof getIcon==='function'?getIcon('save',14):'S'}</button>`}
       </div>`;
     }).join('')}
   </div>`;
@@ -131,7 +128,7 @@ function showItemSelectorForPokemon(teamIdx){
         <div class="extracted-template-style-088">
           <div class="inv-name">${getItemName(key)}</div>
           <div class="inv-desc">${buffLines}</div>
-          ${lockedByOther ? `<div class="extracted-template-style-007">🔒 Déjà sur ${equipped.name}</div>` : ''}
+          ${lockedByOther ? `<div class="extracted-template-style-007">Déjà équipé par ${equipped.name}</div>` : ''}
         </div>
         <div class="inv-qty">&times;${qty}</div>
       </div>`;
@@ -153,7 +150,7 @@ function equipItemDirect(teamIdx, key){
   if(!(G.inventory[key] > 0)) return;
   const alreadyEquipped = itemEquippedOnTeam(key);
   if(alreadyEquipped && alreadyEquipped !== p){
-    notify(`🔒 ${getItemName(key)} est déjà équipé par ${alreadyEquipped.name}.`, 'var(--red)');
+    notify(`${getItemName(key)} est déjà équipé par ${alreadyEquipped.name}.`, 'var(--red)');
     showItemSelectorForPokemon(teamIdx);
     return;
   }
@@ -344,3 +341,4 @@ function teamDrop(ev, targetIdx) {
   saveGame();
   renderTeamWindow();
 }
+

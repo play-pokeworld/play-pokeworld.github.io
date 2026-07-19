@@ -10,3 +10,4 @@ html = html.replace(/\s*<link rel="stylesheet" href="src\/assets\/styles\/cleane
 html = html.replace(/\s*<script src="src\/file-preflight\.js"><\/script>\s*<script src="src\/legacy-loader\.js"><\/script>\s*<script src="src\/file-postboot\.js"><\/script>/, '\n  <script type="module" src="/src/main.js"></script>');
 fs.writeFileSync('index.vite.html', html, 'utf8');
 console.log('Generated index.vite.html for Vite build.');
+

@@ -8,6 +8,7 @@ import './assets/styles/pw-static.css';
 import './app/import-localization.js';
 import { validateBrowserSave } from './core/save-compatibility.js';
 import { applyMobileWindowDragPolicy } from './ui/input/mobile-window-drag.js';
+import { installMobileViewRouter } from './ui/input/mobile-view-router.js';
 import { installGlobalActionDelegation } from './ui/input/global-action-delegation.js';
 import { installInlineHandlerSanitizer } from './ui/input/inline-handler-sanitizer.js';
 import { installTouchContextMenuBridge } from './ui/input/touch-context-menu.js';
@@ -16,7 +17,9 @@ import './app/legacy-imports.js';
 
 validateBrowserSave();
 applyMobileWindowDragPolicy();
+installMobileViewRouter();
 
 installGlobalActionDelegation(document);
 installInlineHandlerSanitizer(document);
 installTouchContextMenuBridge(document);
+

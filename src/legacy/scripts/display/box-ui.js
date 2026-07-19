@@ -28,7 +28,7 @@ function renderBox(el){
  ${entries.map(({id, cleanId, poke})=>{
  const isShiny = poke.shinyUnlocked || poke.shinyActive || poke.shiny || isSpeciesShiny(poke.id);
  return `
- <div class="box-card" data-style="cursor:pointer;${isShiny?'border:1px solid var(--light2);background:rgba(148,136,107,0.06);box-shadow:0 0 8px rgba(148,136,107,0.3);':''}" data-action="legacy-call" data-call="openBoxPokeModal" data-call-args="'${id}'" data-context-call="openBoxPokeModal" data-context-args="'${id}'" title="${t('select_or_details_hint')}">
+ <div class="box-card ${isShiny?'box-card--shiny':''}" data-action="legacy-call" data-call="openBoxPokeModal" data-call-args="'${id}'" data-context-call="openBoxPokeModal" data-context-args="'${id}'" title="Clic ou Clic Droit pour voir la fiche">
  <div class="ab-icon${isShiny?' shiny-spark is-shiny':''}">${spriteImg(poke.id,poke.emoji,{shiny:isShiny,size:40})}</div>
  <div class="extracted-template-style-042">${isShiny?'<span class="shiny-tag" title="Forme Shiny"></span>':''}${poke.name}</div>
  <div class="extracted-template-style-007">Nv.${poke.level}</div>
@@ -164,5 +164,18 @@ function statusColor(s){
 }
 
 function statusLabel(s){
- return {burn:'BRN',poison:'☠POI',badpoison:'☠TXQ',para:'PAR',sleep:'SOM',freeze:'🧊GEL',confuse:'💫CON'}[s]||s.toUpperCase();
+ return {burn:'bru',poison:'poi',badpoison:'tox',para:'par',sleep:'som',freeze:'gel',confuse:'con'}[s]||String(s||'').slice(0,3).toLowerCase();
 }
+
+
+// --- Migrated to ES module, globals exposed ---
+if (typeof renderBox !== 'undefined' && typeof window !== 'undefined') window.renderBox = renderBox;
+if (typeof addBoxedToTeam !== 'undefined' && typeof window !== 'undefined') window.addBoxedToTeam = addBoxedToTeam;
+if (typeof swapBoxWithTeam !== 'undefined' && typeof window !== 'undefined') window.swapBoxWithTeam = swapBoxWithTeam;
+if (typeof sendTeamToBox !== 'undefined' && typeof window !== 'undefined') window.sendTeamToBox = sendTeamToBox;
+if (typeof refreshAfterShinyToggle !== 'undefined' && typeof window !== 'undefined') window.refreshAfterShinyToggle = refreshAfterShinyToggle;
+if (typeof toggleShinySkin !== 'undefined' && typeof window !== 'undefined') window.toggleShinySkin = toggleShinySkin;
+if (typeof statusColor !== 'undefined' && typeof window !== 'undefined') window.statusColor = statusColor;
+if (typeof statusLabel !== 'undefined' && typeof window !== 'undefined') window.statusLabel = statusLabel;
+
+

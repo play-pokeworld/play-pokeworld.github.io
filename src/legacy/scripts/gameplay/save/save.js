@@ -38,6 +38,18 @@ function inferSaveIconId(state){
  return 0;
 }
 function ensureDefaultSaveIcon(){ if(G && G.saveMeta && !G.saveMeta.iconPokeId){ const id = inferSaveIconId(G); if(id) G.saveMeta.iconPokeId = id; } }
+function stripMoveMetaFromPokemon(p){ if(!p || !Array.isArray(p.moves)) return; p.moves = p.moves.map(m => typeof m === 'string' ? {id:m} : (m && m.id ? {id:m.id} : null)).filter(Boolean); }
+function stripMoveMetaFromState(state){
+ if(!state) return;
+ (state.team || []).forEach(stripMoveMetaFromPokemon);
+ Object.values(state.collection || {}).forEach(stripMoveMetaFromPokemon);
+ (state.hatchery || []).forEach(slot => { if(slot && slot.poke) stripMoveMetaFromPokemon(slot.poke); });
+ (state.trainingSlots || []).forEach(slot => {
+  if(!slot || !slot.battle) return;
+  stripMoveMetaFromPokemon(slot.battle.enemy);
+  (slot.battle.enemies || []).forEach(stripMoveMetaFromPokemon);
+ });
+}
 function isCompatibleSaveData(saveData) { return !!saveData && saveData.version === SAVE_VERSION && !!saveData.G && typeof saveData.G === 'object' && Array.isArray(saveData.G.team) && !!saveData.G.collection && typeof saveData.G.collection === 'object' && !!saveData.G.inventory && typeof saveData.G.inventory === 'object'; }
 function ensureSaveMeta(saveData, desiredId){
  if(!saveData.G) saveData.G = {};
@@ -67,6 +79,7 @@ function normalizeLoadedState(){
  if(!G.unlockedTalents) G.unlockedTalents = {};
  if(!G.mainStep) G.mainStep = { kanto: 0, johto: 0 };
  if(!G.regionLeagueWon || typeof G.regionLeagueWon !== 'object') G.regionLeagueWon = {};
+ if(typeof window !== 'undefined' && window.PokeWorldDomain && window.PokeWorldDomain.routeEvents && typeof window.PokeWorldDomain.routeEvents.ensureRouteEventState === 'function') window.PokeWorldDomain.routeEvents.ensureRouteEventState(G);
  if(typeof ensureRegionProgress === 'function') ensureRegionProgress();
  if(!G.automation) G.automation = { autoHatch: false, autoSeedHatchery: false, autoExplore: false };
  if(!Array.isArray(G.teamSlotItems)) G.teamSlotItems = [];
@@ -78,8 +91,9 @@ function normalizeLoadedState(){
  if(!G.saveMeta || typeof G.saveMeta !== 'object') G.saveMeta = {};
  G.saveMeta.background = normalizeBackground(G.saveMeta.background);
  ensureDefaultSaveIcon();
- for(const p of (G.team || [])){ if(!p.moves) p.moves = []; for(const m of p.moves){ if(m.maxPP === undefined) m.maxPP = MOVES[m.id]?.pp || 10; if(m.pp === undefined) m.pp = m.maxPP; } }
+ stripMoveMetaFromState(G);
  if (typeof applyOfficialPokemonDataToSave === 'function') applyOfficialPokemonDataToSave();
+ stripMoveMetaFromState(G);
  if(typeof canAccessRegion === 'function' && G.region && !canAccessRegion(G.region)){ G.region = 'kanto'; G.location = 'vermilion'; }
  if(typeof ensureTeamSlotItems === 'function') ensureTeamSlotItems();
 }
@@ -242,7 +256,7 @@ function createNewSaveFromMenu(){
 function activateCurrentSave(manual){ if(!currentSaveId && G && G.saveMeta && G.saveMeta.id) currentSaveId = G.saveMeta.id; if(currentSaveId && hasStarterInState(G)) storageSet(ACTIVE_SAVE_ID_KEY, currentSaveId); window.currentSaveId = currentSaveId; resetRuntimeBattleState(); saveSessionStartedAt = saveNow(); hideSaveMenu(); if(typeof initializeGameInterface === 'function') initializeGameInterface(); else if(typeof renderMap === 'function') { renderMap(); updateHeader(); showTab('info'); } if(typeof scheduleAfkCatchup === 'function') scheduleAfkCatchup('load'); if(manual) notify(t('game_loaded'), 'var(--green)'); }
 function startSaveById(id){ const data = readSlot(id); if(!data || !isCompatibleSaveData(data) || !hasStarterInState(data.G)){ notify(t('save_incompatible_deleted') || t('no_save_found'), 'var(--red)'); storageRemove(slotKey(id)); removeSaveFromIndex(id); renderSaveMenu(); return false; } currentSaveId = id; storageSet(ACTIVE_SAVE_ID_KEY, id); return loadGame(true); }
 function updatePlayTimeBeforeSave(){ if(!G) return; if(!G.saveMeta || typeof G.saveMeta !== 'object') G.saveMeta = {}; const now = saveNow(); if(saveSessionStartedAt && window.PokeWorldGameStarted){ const delta = Math.max(0, now - saveSessionStartedAt); if(delta < 24 * 60 * 60 * 1000) G.playTimeMs = Math.max(0, Number(G.playTimeMs || 0)) + delta; saveSessionStartedAt = now; } if(G.playTimeMs == null) G.playTimeMs = 0; G.saveMeta.playTimeMs = Math.max(0, Number(G.playTimeMs || 0)); G.saveMeta.updatedAt = now; }
-function saveGame(manual = false) { try { if(!currentSaveId && G && G.saveMeta && G.saveMeta.id) currentSaveId = G.saveMeta.id; if(!currentSaveId){ if(manual) notify(t('no_save_found'), 'var(--light1)'); return false; } if(!hasStarterInState(G)){ if(manual) notify(t('save_need_starter'), 'var(--red)'); return false; } if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems(); ensureDefaultSaveIcon(); if(!afkApplying && typeof markAfkSeen === 'function') markAfkSeen(false); updatePlayTimeBeforeSave(); G.saveMeta.pendingStarter = false; const saveData = { version:SAVE_VERSION, timestamp:saveNow(), saveId:currentSaveId, G:JSON.parse(JSON.stringify(G)) }; ensureSaveMeta(saveData, currentSaveId); const json = JSON.stringify(saveData); if (json.length > 5 * 1024 * 1024) { console.error('[SAVE] Save too large:', json.length, 'bytes'); if (manual) notify(t('save_error_too_large'), 'var(--red)'); return false; } writeSlot(currentSaveId, saveData, true); storageSet(ACTIVE_SAVE_ID_KEY, currentSaveId); upsertSaveIndex(saveData); if (manual) notify(t('legacy_message_n_partie_sauvegard_e')); const settingsModal = document.getElementById('settings-modal'); const editingProfile = document.activeElement && document.activeElement.closest ? document.activeElement.closest('#save-profile-section') : null; if(settingsModal && settingsModal.classList.contains('open') && !editingProfile) updateSaveProfileControls(); return true; } catch (e) { console.error('[SAVE ERROR]', e); if (manual) notify(tr('save_error_message', {message:e.message}), 'var(--red)'); return false; } }
+function saveGame(manual = false) { try { if(!currentSaveId && G && G.saveMeta && G.saveMeta.id) currentSaveId = G.saveMeta.id; if(!currentSaveId){ if(manual) notify(t('no_save_found'), 'var(--light1)'); return false; } if(!hasStarterInState(G)){ if(manual) notify(t('save_need_starter'), 'var(--red)'); return false; } if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems(); ensureDefaultSaveIcon(); stripMoveMetaFromState(G); if(!afkApplying && typeof markAfkSeen === 'function') markAfkSeen(false); updatePlayTimeBeforeSave(); G.saveMeta.pendingStarter = false; const saveData = { version:SAVE_VERSION, timestamp:saveNow(), saveId:currentSaveId, G:JSON.parse(JSON.stringify(G)) }; ensureSaveMeta(saveData, currentSaveId); const json = JSON.stringify(saveData); if (json.length > 5 * 1024 * 1024) { console.error('[SAVE] Save too large:', json.length, 'bytes'); if (manual) notify(t('save_error_too_large'), 'var(--red)'); return false; } writeSlot(currentSaveId, saveData, true); storageSet(ACTIVE_SAVE_ID_KEY, currentSaveId); upsertSaveIndex(saveData); if (manual) notify(t('legacy_message_n_partie_sauvegard_e')); const settingsModal = document.getElementById('settings-modal'); const editingProfile = document.activeElement && document.activeElement.closest ? document.activeElement.closest('#save-profile-section') : null; if(settingsModal && settingsModal.classList.contains('open') && !editingProfile) updateSaveProfileControls(); return true; } catch (e) { console.error('[SAVE ERROR]', e); if (manual) notify(tr('save_error_message', {message:e.message}), 'var(--red)'); return false; } }
 function loadGame(manual = false) { try { const id = currentSaveId || storageGet(ACTIVE_SAVE_ID_KEY); let saveData = id ? readSlot(id) : null; if(!saveData){ const raw = storageGet(SAVE_KEY); saveData = raw ? JSON.parse(raw) : null; } if (!saveData) { if (manual) notify(t('no_save_found'), 'var(--light1)'); return false; } if (!isCompatibleSaveData(saveData) || !hasStarterInState(saveData.G)) { deleteIncompatibleSave('version=' + (saveData && saveData.version)); if (manual) notify(t('save_incompatible_deleted'), 'var(--red)'); return false; } const loadedId = id || saveData.saveId || saveData.G?.saveMeta?.id || uniqueSaveId(); currentSaveId = loadedId; ensureSaveMeta(saveData, loadedId); assignGlobalState(saveData.G); normalizeLoadedState(); const freshData = {version:SAVE_VERSION, timestamp:saveNow(), saveId:currentSaveId, G:JSON.parse(JSON.stringify(G))}; writeSlot(currentSaveId, freshData, true); upsertSaveIndex(freshData); activateCurrentSave(manual); return true; } catch (e) { console.error('[LOAD ERROR]', e); if (manual) notify(tr('load_error_message', {message:e.message}), 'var(--red)'); return false; } }
 function deleteIncompatibleSave(reason) { try { if(currentSaveId){ storageRemove(slotKey(currentSaveId)); removeSaveFromIndex(currentSaveId); } storageRemove(SAVE_KEY); console.warn('[SAVE] Incompatible browser save removed automatically:', reason || 'unknown reason'); return true; } catch (e) { console.error('[SAVE] Unable to remove incompatible save:', e); return false; } }
 function autoSave() { try { if(currentSaveId && window.PokeWorldGameStarted) saveGame(false); } catch (e) { console.error('[AUTOSAVE ERROR]', e); } }
@@ -785,3 +799,4 @@ if (typeof getCurrentSaveId !== 'undefined' && typeof window !== 'undefined') wi
 if (typeof formatPlayTime !== 'undefined' && typeof window !== 'undefined') window.formatPlayTime = formatPlayTime;
 if (typeof debugTimeSkip10Minutes !== 'undefined' && typeof window !== 'undefined') window.debugTimeSkip10Minutes = debugTimeSkip10Minutes;
 if (typeof closeAfkResultPanel !== 'undefined' && typeof window !== 'undefined') window.closeAfkResultPanel = closeAfkResultPanel;
+

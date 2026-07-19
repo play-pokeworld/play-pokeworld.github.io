@@ -47,12 +47,12 @@ globalThis.applyOfficialPokemonDataToSave = function(){
      for(const mid of fillFrom.slice().reverse()){
        if(known.length>=Math.min(4, fillFrom.length || 1)) break;
        if(seen.has(mid)) continue;
-       const mv=moves[mid]; known.unshift({id:mid, pp:mv.pp||10, maxPP:mv.pp||10}); seen.add(mid);
+       const mv=moves[mid]; known.unshift({id:mid}); seen.add(mid);
      }
-     if(!known.length && moves.tackle) known=[{id:'tackle', pp:moves.tackle.pp||35, maxPP:moves.tackle.pp||35}];
-     p.moves = known.slice(0,4).map(m=>({id:m.id, pp:m.pp||moves[m.id]?.pp||10, maxPP:m.maxPP||moves[m.id]?.pp||10}));
+     if(!known.length && moves.tackle) known=[{id:'tackle'}];
+     p.moves = known.slice(0,4).map(m=>({id:m.id}));
    } else {
-     p.moves = (p.moves||[]).map(normalizeMove).filter(m=>m && moves[m.id]).slice(0,4).map(m=>({id:m.id, pp:m.pp||moves[m.id]?.pp||10, maxPP:m.maxPP||moves[m.id]?.pp||10}));
+     p.moves = (p.moves||[]).map(normalizeMove).filter(m=>m && moves[m.id]).slice(0,4).map(m=>({id:m.id}));
    }
    const tals = talents[id] || talents[p.id] || [];
    if(tals.length && (!p.talent || !tals.includes(p.talent) || !(globalThis.TALENTS_FULL||{})[p.talent])){
@@ -66,3 +66,4 @@ globalThis.applyOfficialPokemonDataToSave = function(){
  });
 };
 })();
+

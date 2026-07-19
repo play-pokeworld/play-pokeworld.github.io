@@ -136,3 +136,4 @@ if (typeof renderMarket !== 'undefined' && typeof window !== 'undefined') window
 if (typeof buyPokemon !== 'undefined' && typeof window !== 'undefined') window.buyPokemon = buyPokemon;
 
 export {};
+

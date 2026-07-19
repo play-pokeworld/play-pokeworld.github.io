@@ -207,3 +207,4 @@ const SHOPS = {
 if (typeof SHOPS !== 'undefined' && typeof window !== 'undefined') window.SHOPS = SHOPS;
 
 export {};
+

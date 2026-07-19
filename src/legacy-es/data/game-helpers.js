@@ -17,10 +17,10 @@ function getTalentByKey(key) {
 
 
 function getRarityLabel(rarity) {
- if(rarity === 1) return 'Commun';
- if(rarity === 2) return 'Peu commun';
- if(rarity === 3) return 'Rare';
- return 'Inconnu';
+ if(rarity === 1) return (typeof t === 'function' ? t('rarity_common_label') : 'Common');
+ if(rarity === 2) return (typeof t === 'function' ? t('rarity_uncommon_label') : 'Uncommon');
+ if(rarity === 3) return (typeof t === 'function' ? t('rarity_rare_label') : 'Rare');
+ return (typeof t === 'function' ? t('rarity_unknown_label') : 'Unknown');
 }
 
 
@@ -75,11 +75,11 @@ function getLearnReqFallbackFromPool(pool, moveId){
 }
 function getMovesForLevel(moveset, level){
  const moveData = (typeof globalThis !== 'undefined' && globalThis.MOVES) ? globalThis.MOVES : MOVES;
- if(!moveset || !moveset.length) return [{id:'tackle', pp:moveData.tackle?.pp||35, maxPP:moveData.tackle?.pp||35}];
+ if(!moveset || !moveset.length) return [{id:'tackle'}];
  const count = level >= 24 ? 4 : level >= 16 ? 3 : level >= 8 ? 2 : 1;
  const available = moveset.filter(m => moveData[m]).filter(m => getLearnReqFallbackFromPool(moveset, m) <= level);
  const picked = (available.length ? available : moveset.filter(m => moveData[m])).slice(-Math.min(count, 4));
- return picked.map(m => ({id:m, pp:moveData[m]?.pp||10, maxPP:moveData[m]?.pp||10}));
+ return picked.map(m => ({id:m}));
 }
 function getMovesForSpeciesLevel(speciesId, moveset, level){
  const pools = (typeof globalThis !== 'undefined' && (globalThis.OFFICIAL_POKE_MOVE_POOLS || globalThis.POKE_MOVE_POOLS)) ? (globalThis.OFFICIAL_POKE_MOVE_POOLS || globalThis.POKE_MOVE_POOLS) : null;
@@ -90,7 +90,7 @@ function getMovesForSpeciesLevel(speciesId, moveset, level){
  const count = level >= 24 ? 4 : level >= 16 ? 3 : level >= 8 ? 2 : 1;
  const available = pool.filter(m => moveData[m] && ((lmap[m] != null ? lmap[m] : getLearnReqFallbackFromPool(pool,m)) <= level));
  const picked = (available.length ? available : pool.filter(m => moveData[m])).slice(-Math.min(count, 4));
- return picked.map(m => ({id:m, pp:moveData[m]?.pp||10, maxPP:moveData[m]?.pp||10}));
+ return picked.map(m => ({id:m}));
 }
 
 
@@ -124,8 +124,8 @@ function recalcPokeStats(p){
 
 function renderStars(val, isEv=false){
  const count = clamp(val || 0, 0, 6);
- const symbol = isEv ? '🟢' : '⭐';
- const empty = isEv ? '' : '☆';
+ const symbol = isEv ? '●' : '★';
+ const empty = isEv ? '○' : '☆';
  let s = '';
  for(let i=0; i<6; i++) s += i < count ? symbol : empty;
  return `<span title="+${count*5}%">${s}</span>`;
@@ -402,7 +402,32 @@ function grantRewardItems(items){
 }
 
 
-const BOX_FILTER_DEFAULTS = {region:'all', type:'all', shiny:'all', evo:'all', favorite:'all', locked:'all', iv:'all', ev:'all'};
+const POKEMON_RANK_ORDER = ['E','D','C','B','A','S','SS'];
+const POKEMON_RANK_OVERRIDES = {
+  10:'E',11:'E',13:'E',14:'E',129:'E',191:'E',172:'D',173:'D',174:'D',175:'D',236:'D',238:'D',239:'D',240:'D',132:'B',25:'C',83:'C',113:'A',115:'A',122:'A',123:'A',127:'A',131:'A',143:'A',149:'S',150:'S',151:'S',243:'S',244:'S',245:'S',248:'S',249:'S',250:'S',251:'S'
+};
+function getPokemonBaseStatTotal(id){
+ const d = PD && PD[Number(id)];
+ if(!d) return 300;
+ return Number(d[3]||0)+Number(d[4]||0)+Number(d[5]||0)+Number(d[6]||0)+Number(d[7]||0)+Number(d[8]||0);
+}
+function getPokemonRank(id){
+ const nid = Number(id);
+ if(POKEMON_RANK_OVERRIDES[nid]) return POKEMON_RANK_OVERRIDES[nid];
+ const bst = getPokemonBaseStatTotal(nid);
+ if(bst < 250) return 'E';
+ if(bst < 330) return 'D';
+ if(bst < 420) return 'C';
+ if(bst < 500) return 'B';
+ if(bst < 580) return 'A';
+ return 'S';
+}
+function rankValue(rank){ return Math.max(0, POKEMON_RANK_ORDER.indexOf(rank || 'E')); }
+function rankAllowsPokemon(maxRank, id){ return rankValue(getPokemonRank(id)) <= rankValue(maxRank || 'S'); }
+function rankBadgeHtml(id){ const rank = getPokemonRank(id); return `<span class="pokemon-rank-badge rank-${rank.toLowerCase()}">${rank}</span>`; }
+
+
+const BOX_FILTER_DEFAULTS = {region:'all', type:'all', shiny:'all', evo:'all', favorite:'all', locked:'all', iv:'all', ev:'all', rank:'all'};
 const FILTER_LEVEL_EVO_MAP = {1:2,2:3,4:5,5:6,7:8,8:9,10:11,11:12,13:14,14:15,16:17,17:18,19:20,21:22,23:24,27:28,29:30,32:33,41:42,43:44,46:47,48:49,50:51,52:53,54:55,56:57,60:61,63:64,64:65,66:67,67:68,69:70,72:73,74:75,75:76,77:78,79:80,81:82,84:85,86:87,88:89,92:93,93:94,96:97,98:99,100:101,104:105,109:110,111:112,116:117,118:119,129:130,138:139,140:141,147:148,148:149,113:242,152:153,153:154,155:156,156:157,158:159,159:160,161:162,163:164,165:166,167:168,170:171,172:25,173:35,174:39,175:176,177:178,179:180,180:181,183:184,187:188,188:189,194:195,204:205,209:210,216:217,218:219,220:221,223:224,228:229,231:232,236:237,238:124,239:125,240:126,246:247,247:248};
 const FILTER_STONE_EVO = {37:{firestone:38},58:{firestone:59},133:{firestone:136,waterstone:134,thunderstone:135},61:{waterstone:62,kings_rock:186},90:{waterstone:91},120:{waterstone:121},25:{thunderstone:26},44:{leafstone:45,sunstone:182},70:{leafstone:71},102:{leafstone:103},30:{moonstone:31},33:{moonstone:34},35:{moonstone:36},39:{moonstone:40},79:{kings_rock:200},95:{metal_coat:208},117:{dragon_scale:230},123:{metal_coat:212},137:{up_grade:233},191:{sunstone:192}};
 
@@ -491,6 +516,7 @@ function pokemonMatchesBoxFilters(p){
  const evTotal = Object.values(p.evs||{}).reduce((a,b)=>a+(Number(b)||0),0);
  if(filters.ev === 'complete' && evTotal < 36) return false;
  if(filters.ev === 'incomplete' && evTotal >= 36) return false;
+ if(filters.rank && filters.rank !== 'all' && typeof getPokemonRank === 'function' && getPokemonRank(p.id) !== filters.rank) return false;
  return true;
 }
 function applyPokemonBoxFilters(entries){
@@ -533,7 +559,8 @@ function renderBoxFiltersHtml(){
   ['complete', t('box_filter_ev_complete')],
   ['incomplete', t('box_filter_ev_incomplete')]
  ].map(o => boxFilterOptionHtml(o[0], o[1], filters.ev)).join('');
- return `<div class="box-filter-panel"><div class="box-filter-title">${t('filters_title')}</div>
+ const rankOptions = ['all','E','D','C','B','A','S'].map(r => boxFilterOptionHtml(r, r==='all'?t('box_filter_all_ranks'):r, filters.rank)).join('');
+ return `<div class="box-filter-panel ui-control-toolbar ui-control-toolbar--box"><div class="box-filter-title">${t('filters_title')}</div>
   <label><span>${t('box_filter_region')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'region', this.value">${regionOptions}</select></label>
   <label><span>${t('box_filter_type')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'type', this.value">${typeOptions}</select></label>
   <label><span>${t('box_filter_shiny')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'shiny', this.value">${shinyOptions}</select></label>
@@ -542,6 +569,7 @@ function renderBoxFiltersHtml(){
   <label><span>${t('box_filter_locked')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'locked', this.value">${lockedOptions}</select></label>
   <label><span>${t('box_filter_iv')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'iv', this.value">${ivOptions}</select></label>
   <label><span>${t('box_filter_ev')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'ev', this.value">${evOptions}</select></label>
+  <label><span>${t('box_filter_rank')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'rank', this.value">${rankOptions}</select></label>
   <button class="hbtn" data-action="legacy-call" data-call="resetBoxFilters" data-call-args="">${t('box_filter_reset')}</button>
  </div>`;
 }
@@ -612,5 +640,11 @@ if (typeof getDuplicateItemPayout !== 'undefined' && typeof window !== 'undefine
 if (typeof grantRewardItem !== 'undefined' && typeof window !== 'undefined') window.grantRewardItem = grantRewardItem;
 if (typeof grantRewardItems !== 'undefined' && typeof window !== 'undefined') window.grantRewardItems = grantRewardItems;
 if (typeof getShopName !== 'undefined' && typeof window !== 'undefined') window.getShopName = getShopName;
+if (typeof getPokemonBaseStatTotal !== 'undefined' && typeof window !== 'undefined') window.getPokemonBaseStatTotal = getPokemonBaseStatTotal;
+if (typeof getPokemonRank !== 'undefined' && typeof window !== 'undefined') window.getPokemonRank = getPokemonRank;
+if (typeof rankValue !== 'undefined' && typeof window !== 'undefined') window.rankValue = rankValue;
+if (typeof rankAllowsPokemon !== 'undefined' && typeof window !== 'undefined') window.rankAllowsPokemon = rankAllowsPokemon;
+if (typeof rankBadgeHtml !== 'undefined' && typeof window !== 'undefined') window.rankBadgeHtml = rankBadgeHtml;
 
 export {};
+

@@ -19,3 +19,4 @@ window.L_fr_champions = {
 "pryce": {"name":"Frédo","title":"Champion Arène Acajou","badgeName":"Badge Glacier"},
 "clair": {"name":"Sandra","title":"Championne Arène Ébénelle","badgeName":"Badge Lever"}
 };
+

@@ -506,3 +506,4 @@ window.POKEDEX_FLAVOR = {
     "251": "This POKéMON wan­ ders across time. Grass and trees flourish in the forests in which it has appeared."
   }
 };
+

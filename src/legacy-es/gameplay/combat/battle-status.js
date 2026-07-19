@@ -32,6 +32,7 @@ function applyEndOfTurnStatus(p){
  if(p.status==='burn'){
  const bd=Math.max(1,Math.floor(p.maxHP/16));
  p.currentHP=Math.max(0,p.currentHP-bd);
+ try{ spawnBattleFloat((p === getActivePlayerPoke() || p === G.team[battle.playerPokeIdx]) ? 'player' : 'enemy', '-' + bd, 'status burn', 'bru'); }catch(_){}
  addBattleLog(tr('burn_damage', {name:p.name, damage:bd}));
  tickStatusDurations(p);
  }
@@ -39,6 +40,7 @@ function applyEndOfTurnStatus(p){
  else if(p.status==='poison'){
  const pd=Math.max(1,Math.floor(p.maxHP/8));
  p.currentHP=Math.max(0,p.currentHP-pd);
+ try{ spawnBattleFloat((p === getActivePlayerPoke() || p === G.team[battle.playerPokeIdx]) ? 'player' : 'enemy', '-' + pd, 'status poison', 'poi'); }catch(_){}
  addBattleLog(tr('poison_damage', {name:p.name, damage:pd}));
  tickStatusDurations(p);
  }
@@ -47,6 +49,7 @@ function applyEndOfTurnStatus(p){
  p.statusTurns=(p.statusTurns||0)+1;
  const bd=Math.max(1,Math.floor(p.maxHP*p.statusTurns/16));
  p.currentHP=Math.max(0,p.currentHP-bd);
+ try{ spawnBattleFloat((p === getActivePlayerPoke() || p === G.team[battle.playerPokeIdx]) ? 'player' : 'enemy', '-' + bd, 'status badpoison', 'tox'); }catch(_){}
  addBattleLog(tr('bad_poison_damage', {name:p.name, damage:bd}));
  
  }
@@ -68,6 +71,7 @@ function applyEndOfTurnStatus(p){
  if((typeof getHeldItemForPokemon === 'function' ? getHeldItemForPokemon(p) : p.heldItem) === 'leftovers' && p.currentHP > 0 && p.currentHP < p.maxHP){
  const heal = Math.max(1, Math.floor(p.maxHP / 16));
  p.currentHP = Math.min(p.maxHP, p.currentHP + heal);
+ try{ const side = (p === getActivePlayerPoke() || p === G.team[battle.playerPokeIdx]) ? 'player' : 'enemy'; visualItem(side, 'leftovers', '+PV'); visualHeal(side, heal); }catch(_){}
  addBattleLog(tr('leftovers_heal', {name:p.name, heal:heal}));
  }
 }
@@ -90,6 +94,7 @@ async function onEnemyFaint(){
  }
  battle.paused=true;
  const e=battle.enemyPoke;
+ if(!battle.isChamp) battle.sessionWins = (battle.sessionWins||0) + 1;
  addBattleLog(tr('pokemon_fainted', {name:e.name}));
  updateBattleUI();
  await wait(500);
@@ -103,7 +108,6 @@ async function onEnemyFaint(){
  if(battle.isTraining && battle.trainee){
  battle.trainingStage = battle.champPokeIdx;
  battle.trainee.currentHP = battle.trainee.maxHP;
- if(battle.trainee.moves) for(const m of battle.trainee.moves) m.pp = m.maxPP;
  addBattleLog(tr('training_room_round', {round:battle.champPokeIdx+1, pokemon:next.name}));
 } else {
  addBattleLog(tr('champion_sends', {champion:getChampName(battle.champId), pokemon:next.name}));
@@ -127,7 +131,6 @@ async function onEnemyFaint(){
  p.currentHP = p.maxHP;
  p.status = null;
  p.statusTurns = 0;
- if(p.moves) for(const m of p.moves) m.pp = m.maxPP;
  }
  addBattleLog(`<span class="extracted-template-style-156">${tr('league_stage_victory', {trainer:leagueTrainers[battle.leagueStage - 1].name})}</span>`);
  notify(tr('league_stage_success', {stage:battle.leagueStage, trainer:trainer.name}), 'var(--green)');
@@ -220,3 +223,4 @@ if (typeof tickStatusDurations !== 'undefined' && typeof window !== 'undefined')
 if (typeof applyEndOfTurnStatus !== 'undefined' && typeof window !== 'undefined') window.applyEndOfTurnStatus = applyEndOfTurnStatus;
 
 export {};
+

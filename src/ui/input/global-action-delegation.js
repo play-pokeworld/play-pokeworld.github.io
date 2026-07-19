@@ -40,6 +40,8 @@ const ACTIONS = {
   'cancel-delete': () => callGlobal('cancelDelete'),
   'close-confirm': () => callGlobal('closeConfirm'),
   'scroll-to-window': (el) => callGlobal('scrollToWin', el.dataset.targetWindow),
+  'set-mobile-view': (el) => callGlobal('setMobileView', el.dataset.mobileView),
+  'set-mobile-manage-view': (el) => callGlobal('setMobileManageView', el.dataset.mobileManageView),
   'set-battle-speed': (el) => callGlobal('setBattleSpeed', Number(el.dataset.speed)),
   'open-battle-summary': () => callGlobal('openBattleSummary', false),
   'leave-battle': () => callGlobal('doLeaveBattle'),
@@ -146,3 +148,4 @@ export function installGlobalActionDelegation(root = document) {
     callGlobal('startWinDrag', event, header.dataset.dragWindow);
   });
 }
+

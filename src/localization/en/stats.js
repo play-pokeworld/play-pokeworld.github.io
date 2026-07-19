@@ -15,3 +15,4 @@ window.L_en_stats = {
 "stat_spd_short":"SpD",
 "stat_hp_short":"HP",
 };
+
