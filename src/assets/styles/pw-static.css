@@ -190,3 +190,5 @@
 .pw-static-198{position:sticky;top:0;background:var(--dark1);padding:12px;border-bottom:2px solid var(--dark3);z-index:10;min-height:60px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .pw-static-199{font-size: 15px;font-weight:bold;color:var(--light2)}
 
+
+.pw-static-200{background:var(--purple);color:white;margin-top:5px;border:none;border-radius:4px;padding:4px}

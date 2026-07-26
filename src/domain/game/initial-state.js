@@ -1,13 +1,28 @@
+import { createRouteEventState } from '../world/route-events.js';
+
 export function createInitialGameState() {
   return {
-    location: 'pallet', region: 'kanto', team: [], inventory: {}, money: 2000,
-    badges: [], defeatedChamps: {}, pokedex: {}, stepsLeft: 0,
-    starter: false, starterKanto: false, starterJohto: false,
-    regionStarter: { kanto: false, johto: false },
-    collection: {}, teamSlotItems: [], evolvedSpecies: [], dupeCatches: {}, lang: 'fr',
-    storyIdx: 0, storyProgress: 0, unlockedTalents: {}, activeQuests: [],
-    repeatables: [], visitedMaps: {}, completedQuests: {}, wildWinsByLoc: {}, regionLeagueWon: {},
-    playTimeMs: 0, saveMeta: {}, routeEvents: { seen: {}, active: null, history: [], cooldowns: {} },
+    version: 3,
+    lang: 'fr',
+    region: 'kanto',
+    money: 2000,
+    badges: 0,
+    team: [],
+    collection: {},
+    inventory: {},
+    storyIdx: 0,
+    routeEvents: createRouteEventState(),
   };
 }
-export const gameState = createInitialGameState();
+
+export function createInitialBattleState() {
+  return {
+    active: false,
+    paused: false,
+    resolvingKO: false,
+    playerPokeIdx: 0,
+    enemyPoke: null,
+    isChamp: false,
+    isTraining: false,
+  };
+}

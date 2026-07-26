@@ -1,116 +1,812 @@
 // ===== FR — Ability (talent) names & descriptions =====
+// Passe 24 : régénéré par tools/gen_talent_locales.mjs — 100 % français.
 window.L_fr_talents = {
-"overgrow": {
-"name":"Engrais",
-"desc":"Attaques Plante +35% de dégâts si PV < 35%."
-},
-"blaze": {
-"name":"Brasier",
-"desc":"Attaques Feu +35% de dégâts si PV < 35%."
-},
-"torrent": {
-"name":"Torrent",
-"desc":"Attaques Eau +35% de dégâts si PV < 35%."
-},
-"chlorophyll": {
-"name":"Chlorophylle",
-"desc":"Vitesse augmentée de +35%."
-},
-"solarpower": {
-"name":"Force Soleil",
-"desc":"Attaque Spéciale augmentée de +30%."
-},
-"intimidate": {
-"name":"Intimidation",
-"desc":"Réduit l'Attaque ennemie de 25% au combat."
-},
-"static": {
-"name":"Statik",
-"desc":"25% de chance de paralyser l'assaillant."
-},
-"lightningrod": {
-"name":"Paratonnerre",
-"desc":"Immunité Électrik, Atk Spéciale +25%."
-},
-"sandveil": {
-"name":"Voile Sable",
-"desc":"Esquive augmentée de +20%."
-},
-"poisonpoint": {
-"name":"Point Poison",
-"desc":"25% de chance d'empoisonner au contact."
-},
-"magicguard": {
-"name":"Garde Magik",
-"desc":"Immunisé aux dégâts de statut et indirects."
-},
-"hugepower": {
-"name":"Coloforce",
-"desc":"La statistique d'Attaque physique augmente de +60% !"
-},
-"sturdy": {
-"name":"Fermeté",
-"desc":"Réduit les dégâts subis de 15% et bloque le K.O. direct."
-},
-"levitate": {
-"name":"Lévitation",
-"desc":"Immunisé contre les attaques Sol."
-},
-"guts": {
-"name":"Cran",
-"desc":"Attaque augmentée de +50% en cas d'altération de statut."
-},
-"adaptability": {
-"name":"Adaptabilité",
-"desc":"Le bonus de type du lanceur (STAB) passe à x2.0 !"
-},
-"thickfat": {
-"name":"Isograisse",
-"desc":"Dégâts subis des capacités Feu et Glace réduits de 50%."
-},
-"multiscale": {
-"name":"Multiécaille",
-"desc":"Dégâts subis réduits de 50% quand les PV sont au maximum."
-},
-"compoundeyes": {
-"name":"Œil Composé",
-"desc":"La précision de toutes les attaques augmente de +30%."
-},
-"speedboost": {
-"name":"Turbo",
-"desc":"La Vitesse augmente de +15% à chaque tour."
-},
-"naturalcure": {
-"name":"Médic Nature",
-"desc":"Soigne automatiquement les statuts à la fin du combat."
-},
-"serenegrace": {
-"name":"Sérénité",
-"desc":"Chances d'effets secondaires des capacités doublées."
-},
-"clearbody": {
-"name":"Corps Sain",
-"desc":"Immunisé contre les baisses de statistiques ennemies."
-},
-"roughskin": {
-"name":"Peau Dure",
-"desc":"L'adversaire subit 12% de ses PV max lorsqu'il attaque."
-},
-"regenerator": {
-"name":"Régé-Force",
-"desc":"Restaure 25% des PV au début ou à la fin d'un combat."
-},
-"sniper": {
-"name":"Sniper",
-"desc":"Les coups critiques infligent des dégâts multipliés par 2.25."
-},
-"technician": {
-"name":"Technicien",
-"desc":"Les capacités de puissance <= 60 infligent +50% de dégâts."
-},
-"noguard": {
-"name":"Annule Garde",
-"desc":"Toutes les attaques du lanceur et de la cible réussissent toujours."
-}
+  "overgrow": {
+    "name": "Engrais",
+    "desc": "Attaques Plante +35% de dégâts si PV < 35%."
+  },
+  "blaze": {
+    "name": "Brasier",
+    "desc": "Attaques Feu +35% de dégâts si PV < 35%."
+  },
+  "torrent": {
+    "name": "Torrent",
+    "desc": "Attaques Eau +35% de dégâts si PV < 35%."
+  },
+  "chlorophyll": {
+    "name": "Chlorophylle",
+    "desc": "Vitesse augmentée de +35%."
+  },
+  "solarpower": {
+    "name": "Force Soleil",
+    "desc": "Attaque Spéciale augmentée de +30%."
+  },
+  "intimidate": {
+    "name": "Intimidation",
+    "desc": "Réduit l'Attaque ennemie de 25% au combat."
+  },
+  "static": {
+    "name": "Statik",
+    "desc": "25% de chance de paralyser l'assaillant."
+  },
+  "lightningrod": {
+    "name": "Paratonnerre",
+    "desc": "Immunité Électrik, Atk Spéciale +25%."
+  },
+  "sandveil": {
+    "name": "Voile Sable",
+    "desc": "Esquive augmentée de +20%."
+  },
+  "poisonpoint": {
+    "name": "Point Poison",
+    "desc": "25% de chance d'empoisonner au contact."
+  },
+  "magicguard": {
+    "name": "Garde Magik",
+    "desc": "Immunisé aux dégâts de statut et indirects."
+  },
+  "hugepower": {
+    "name": "Coloforce",
+    "desc": "La statistique d'Attaque physique augmente de +60% !"
+  },
+  "sturdy": {
+    "name": "Fermeté",
+    "desc": "Réduit les dégâts subis de 15% et bloque le K.O. direct."
+  },
+  "levitate": {
+    "name": "Lévitation",
+    "desc": "Immunisé contre les attaques Sol."
+  },
+  "guts": {
+    "name": "Cran",
+    "desc": "Attaque augmentée de +50% en cas d'altération de statut."
+  },
+  "adaptability": {
+    "name": "Adaptabilité",
+    "desc": "Le bonus de type du lanceur (STAB) passe à x2.0 !"
+  },
+  "thickfat": {
+    "name": "Isograisse",
+    "desc": "Dégâts subis des capacités Feu et Glace réduits de 50%."
+  },
+  "multiscale": {
+    "name": "Multiécaille",
+    "desc": "Dégâts subis réduits de 50% quand les PV sont au maximum."
+  },
+  "compoundeyes": {
+    "name": "Œil Composé",
+    "desc": "La précision de toutes les attaques augmente de +30%."
+  },
+  "speedboost": {
+    "name": "Turbo",
+    "desc": "La Vitesse augmente de +15% à chaque tour."
+  },
+  "naturalcure": {
+    "name": "Médic Nature",
+    "desc": "Soigne automatiquement les statuts à la fin du combat."
+  },
+  "serenegrace": {
+    "name": "Sérénité",
+    "desc": "Chances d'effets secondaires des capacités doublées."
+  },
+  "clearbody": {
+    "name": "Corps Sain",
+    "desc": "Immunisé contre les baisses de statistiques ennemies."
+  },
+  "roughskin": {
+    "name": "Peau Dure",
+    "desc": "L'adversaire subit 12% de ses PV max lorsqu'il attaque."
+  },
+  "regenerator": {
+    "name": "Régé-Force",
+    "desc": "Restaure 25% des PV au début ou à la fin d'un combat."
+  },
+  "sniper": {
+    "name": "Sniper",
+    "desc": "Les coups critiques infligent des dégâts multipliés par 2.25."
+  },
+  "technician": {
+    "name": "Technicien",
+    "desc": "Les capacités de puissance <= 60 infligent +50% de dégâts."
+  },
+  "noguard": {
+    "name": "Annule Garde",
+    "desc": "Toutes les attaques du lanceur et de la cible réussissent toujours."
+  },
+  "hydratation": {
+    "name": "Hydratation",
+    "desc": "Empêche les altérations de statut sous la pluie."
+  },
+  "snowcloak": {
+    "name": "Rideau Neige",
+    "desc": "Esquive augmentée de +20%."
+  },
+  "grabguard": {
+    "name": "Garde Lutte",
+    "desc": "Réduit de moitié les dégâts des capacités de type Combat."
+  },
+  "waterguard": {
+    "name": "Garde Eau",
+    "desc": "Réduit de moitié les dégâts des capacités de type Eau."
+  },
+  "flameguard": {
+    "name": "Garde Feu",
+    "desc": "Réduit de moitié les dégâts des capacités de type Feu."
+  },
+  "curseguard": {
+    "name": "Garde Malédiction",
+    "desc": "Réduit de moitié les dégâts des capacités de type Spectre."
+  },
+  "poisonguard": {
+    "name": "Garde Poison",
+    "desc": "Réduit de moitié les dégâts des capacités de type Poison."
+  },
+  "iceguard": {
+    "name": "Garde Glace",
+    "desc": "Réduit de moitié les dégâts des capacités de type Glace."
+  },
+  "psychicguard": {
+    "name": "Garde Psy",
+    "desc": "Réduit de moitié les dégâts des capacités de type Psy."
+  },
+  "fairyguard": {
+    "name": "Garde Fée",
+    "desc": "Réduit de moitié les dégâts des capacités de type Fée."
+  },
+  "leafguard": {
+    "name": "Garde Feuille",
+    "desc": "Réduit de moitié les dégâts des capacités de type Plante."
+  },
+  "plainguard": {
+    "name": "Garde Normale",
+    "desc": "Réduit de moitié les dégâts des capacités de type Normal."
+  },
+  "sinisterguard": {
+    "name": "Garde Obscure",
+    "desc": "Réduit de moitié les dégâts des capacités de type Ténèbres."
+  },
+  "steelguard": {
+    "name": "Garde Acier",
+    "desc": "Réduit de moitié les dégâts des capacités de type Acier."
+  },
+  "dragonguard": {
+    "name": "Garde Dragon",
+    "desc": "Réduit de moitié les dégâts des capacités de type Dragon."
+  },
+  "bugguard": {
+    "name": "Garde Insecte",
+    "desc": "Réduit de moitié les dégâts des capacités de type Insecte."
+  },
+  "rockguard": {
+    "name": "Garde Roche",
+    "desc": "Réduit de moitié les dégâts des capacités de type Roche."
+  },
+  "groundguard": {
+    "name": "Garde Terre",
+    "desc": "Réduit de moitié les dégâts des capacités de type Sol."
+  },
+  "flyingguard": {
+    "name": "Garde Céleste",
+    "desc": "Réduit de moitié les dégâts des capacités de type Vol."
+  },
+  "insomnia": {
+    "name": "Insomnia",
+    "desc": "Immunisé contre le sommeil."
+  },
+  "immunity": {
+    "name": "Vaccin",
+    "desc": "Immunisé contre le poison."
+  },
+  "limber": {
+    "name": "Échauffement",
+    "desc": "Immunisé contre la paralysie."
+  },
+  "owntempo": {
+    "name": "Tempo Perso",
+    "desc": "Immunisé contre la confusion."
+  },
+  "magmaarmor": {
+    "name": "Armumagma",
+    "desc": "Immunisé contre le gel."
+  },
+  "waterveil": {
+    "name": "Ignifu-Voile",
+    "desc": "Immunisé contre la brûlure."
+  },
+  "marvelscale": {
+    "name": "Écaille Spéciale",
+    "desc": "Défense +50% en cas d'altération de statut."
+  },
+  "livingshield": {
+    "name": "Égide Vivante",
+    "desc": "Défense Spéciale +50% en cas d'altération de statut."
+  },
+  "swarm": {
+    "name": "Essaim",
+    "desc": "Attaques Insecte +35% de dégâts si PV < 35%."
+  },
+  "bastion": {
+    "name": "Bastion",
+    "desc": "Attaques Acier +35% de dégâts si PV < 35%."
+  },
+  "average": {
+    "name": "Normalité",
+    "desc": "Attaques Normal +35% de dégâts si PV < 35%."
+  },
+  "resolve": {
+    "name": "Bravoure",
+    "desc": "Attaques Combat +35% de dégâts si PV < 35%."
+  },
+  "mistify": {
+    "name": "Mystique",
+    "desc": "Attaques Psy +35% de dégâts si PV < 35%."
+  },
+  "hexerei": {
+    "name": "Sortilège",
+    "desc": "Attaques Spectre +35% de dégâts si PV < 35%."
+  },
+  "glimmer": {
+    "name": "Lueur",
+    "desc": "Attaques Fée +35% de dégâts si PV < 35%."
+  },
+  "skyward": {
+    "name": "Ascension",
+    "desc": "Attaques Vol +35% de dégâts si PV < 35%."
+  },
+  "draconic": {
+    "name": "Draconique",
+    "desc": "Attaques Dragon +35% de dégâts si PV < 35%."
+  },
+  "noxious": {
+    "name": "Toxique",
+    "desc": "Attaques Poison +35% de dégâts si PV < 35%."
+  },
+  "solid": {
+    "name": "Robustesse",
+    "desc": "Attaques Roche +35% de dégâts si PV < 35%."
+  },
+  "rime": {
+    "name": "Givre",
+    "desc": "Attaques Glace +35% de dégâts si PV < 35%."
+  },
+  "voltage": {
+    "name": "Tension",
+    "desc": "Attaques Électrik +35% de dégâts si PV < 35%."
+  },
+  "hypercutter": {
+    "name": "Hyper Cutter",
+    "desc": "L'Attaque ne peut pas être baissée."
+  },
+  "bigpecks": {
+    "name": "Cœur de Coq",
+    "desc": "La Défense ne peut pas être baissée."
+  },
+  "wonderskin": {
+    "name": "Peau Miracle",
+    "desc": "50% de chance que les altérations de statut reçues échouent."
+  },
+  "synchronize": {
+    "name": "Synchro",
+    "desc": "Renvoie à l'attaquant l'altération de statut reçue."
+  },
+  "icebody": {
+    "name": "Corps Gel",
+    "desc": "Défense +50% sous la grêle."
+  },
+  "raindish": {
+    "name": "Cuvette",
+    "desc": "Attaque Spéciale +50% sous la pluie."
+  },
+  "sandforce": {
+    "name": "Force Sable",
+    "desc": "Attaque +50% sous la tempête de sable."
+  },
+  "flamebody": {
+    "name": "Corps Ardent",
+    "desc": "15% de chance de brûler au contact."
+  },
+  "strangecharm": {
+    "name": "Charme Étrange",
+    "desc": "15% de chance de rendre confus au contact."
+  },
+  "effectspore": {
+    "name": "Pose Spore",
+    "desc": "5% de chance d'infliger sommeil, poison ou paralysie au contact."
+  },
+  "glacialbody": {
+    "name": "Corps Glacé",
+    "desc": "5% de chance de geler au contact."
+  },
+  "scrappy": {
+    "name": "Querelleur",
+    "desc": "Peut toucher les types Spectre avec des capacités Normal et Combat."
+  },
+  "unaware": {
+    "name": "Inconscient",
+    "desc": "En attaquant, ignore les changements de stats de la cible."
+  },
+  "voltabsorb": {
+    "name": "Volt Absorbeur",
+    "desc": "Annule les capacités Électrik reçues et soigne 25% des PV max."
+  },
+  "waterabsorb": {
+    "name": "Absorb Eau",
+    "desc": "Annule les capacités Eau reçues et soigne 25% des PV max."
+  },
+  "flareabsorb": {
+    "name": "Absorb Feu",
+    "desc": "Annule les capacités Feu reçues et soigne 25% des PV max."
+  },
+  "curseabsorb": {
+    "name": "Absorb Spectre",
+    "desc": "Annule les capacités Spectre reçues et soigne 25% des PV max."
+  },
+  "poisonabsorb": {
+    "name": "Absorb Poison",
+    "desc": "Annule les capacités Poison reçues et soigne 25% des PV max."
+  },
+  "frostabsorb": {
+    "name": "Absorb Glace",
+    "desc": "Annule les capacités Glace reçues et soigne 25% des PV max."
+  },
+  "psychicabsorb": {
+    "name": "Absorb Psy",
+    "desc": "Annule les capacités Psy reçues et soigne 25% des PV max."
+  },
+  "lightabsorb": {
+    "name": "Absorb Fée",
+    "desc": "Annule les capacités Fée reçues et soigne 25% des PV max."
+  },
+  "growthabsorb": {
+    "name": "Absorb Plante",
+    "desc": "Annule les capacités Plante reçues et soigne 25% des PV max."
+  },
+  "strongjaw": {
+    "name": "Prognathe",
+    "desc": "Les capacités « Croc » ont leur puissance de base doublée."
+  },
+  "toughclaws": {
+    "name": "Griffe Dure",
+    "desc": "Les capacités « Griffe » ont leur puissance de base doublée."
+  },
+  "ironfist": {
+    "name": "Poing de Fer",
+    "desc": "Les capacités « Poing » ont leur puissance de base x1.5."
+  },
+  "rivalry": {
+    "name": "Rivalité",
+    "desc": "Dégâts x1.5 quand l'adversaire partage un type."
+  },
+  "pickpocket": {
+    "name": "Pickpocket",
+    "desc": "Augmente de 1% le poids des butins rares (cumulable). Fonctionne toujours, pour tous."
+  },
+  "brittlearmor": {
+    "name": "Armure Fragile",
+    "desc": "Attaque Spéciale +50% en cas d'altération de statut."
+  },
+  "grassypelt": {
+    "name": "Fourrure Herbe",
+    "desc": "Empêche baisses de stats et altérations sous le Champ Herbu."
+  },
+  "sandypelt": {
+    "name": "Fourrure Sable",
+    "desc": "Empêche baisses de stats et altérations sous la tempête de sable."
+  },
+  "icypelt": {
+    "name": "Fourrure Givre",
+    "desc": "Empêche baisses de stats et altérations sous la grêle."
+  },
+  "moistpelt": {
+    "name": "Fourrure Humide",
+    "desc": "Empêche baisses de stats et altérations sous la pluie."
+  },
+  "fierypelt": {
+    "name": "Fourrure Braise",
+    "desc": "Empêche baisses de stats et altérations sous le soleil."
+  },
+  "pixiepelt": {
+    "name": "Fourrure Féerique",
+    "desc": "Empêche baisses de stats et altérations sous le Champ Psychique."
+  },
+  "blackpelt": {
+    "name": "Fourrure Sombre",
+    "desc": "Empêche baisses de stats et altérations sous le Champ Sombre."
+  },
+  "spikypelt": {
+    "name": "Fourrure Électrik",
+    "desc": "Empêche baisses de stats et altérations sous le Champ Électrifié."
+  },
+  "climatact": {
+    "name": "Climatact",
+    "desc": "La météo invoquée par le lanceur dure 15 tours de plus."
+  },
+  "intangible": {
+    "name": "Intangible",
+    "desc": "Vitesse +50% sous le Champ Sombre."
+  },
+  "hyperconductor": {
+    "name": "Hyperconducteur",
+    "desc": "Vitesse +50% sous le Champ Électrifié."
+  },
+  "faerush": {
+    "name": "Ruée Fée",
+    "desc": "Vitesse +50% sous le Champ Brumeux."
+  },
+  "moltshed": {
+    "name": "Mue",
+    "desc": "Vitesse +50% sous le soleil."
+  },
+  "slushrush": {
+    "name": "Chasse-Neige",
+    "desc": "Vitesse +50% sous la grêle."
+  },
+  "swiftswim": {
+    "name": "Glissade",
+    "desc": "Vitesse +50% sous la pluie."
+  },
+  "sandrush": {
+    "name": "Rush Sable",
+    "desc": "Vitesse +50% sous la tempête de sable."
+  },
+  "dauntinglook": {
+    "name": "Regard Intimidant",
+    "desc": "Baisse l'Attaque Spéciale ennemie de 50% à son entrée au combat."
+  },
+  "unburden": {
+    "name": "Délestage",
+    "desc": "Vitesse +50% si aucun objet tenu."
+  },
+  "moxie": {
+    "name": "Impudence",
+    "desc": "Attaque +50% après avoir mis K.O. un Pokémon."
+  },
+  "strategist": {
+    "name": "Stratège",
+    "desc": "Attaque Spéciale +50% après avoir mis K.O. un Pokémon."
+  },
+  "sheerforce": {
+    "name": "Sans Limite",
+    "desc": "Les effets secondaires positifs des capacités offensives sont supprimés et leurs dégâts x1.25."
+  },
+  "ambidextrous": {
+    "name": "Ambidextre",
+    "desc": "Puissance croisée +0.3."
+  },
+  "skilllink": {
+    "name": "Multi-Coups",
+    "desc": "Les capacités à plusieurs coups atteignent toujours leur maximum."
+  },
+  "sharpness": {
+    "name": "Incisif",
+    "desc": "Les capacités « Lame » ont leur puissance de base x1.5."
+  },
+  "angerpoint": {
+    "name": "Colérique",
+    "desc": "Attaque +100% quand touché par une capacité super efficace."
+  },
+  "justified": {
+    "name": "Justicier",
+    "desc": "Attaque Spéciale +100% quand touché par une capacité super efficace."
+  },
+  "filter": {
+    "name": "Filtre",
+    "desc": "Les dégâts super efficaces subis sont réduits de moitié."
+  },
+  "reckless": {
+    "name": "Téméraire",
+    "desc": "Les capacités plus lentes que la normale ont leur puissance de base x1.5."
+  },
+  "libero": {
+    "name": "Libéro",
+    "desc": "Les capacités plus rapides que la normale ont leur puissance de base x2."
+  },
+  "flashelectro": {
+    "name": "Flash Électro",
+    "desc": "Annule les capacités Électrik reçues et Vitesse +50% après en avoir reçu une."
+  },
+  "flashaqua": {
+    "name": "Flash Aqua",
+    "desc": "Annule les capacités Eau reçues et Vitesse +50% après en avoir reçu une."
+  },
+  "flashpyro": {
+    "name": "Flash Pyro",
+    "desc": "Annule les capacités Feu reçues et Vitesse +50% après en avoir reçu une."
+  },
+  "flashumbra": {
+    "name": "Flash Ombre",
+    "desc": "Annule les capacités Spectre reçues et Vitesse +50% après en avoir reçu une."
+  },
+  "flashvenum": {
+    "name": "Flash Venin",
+    "desc": "Annule les capacités Poison reçues et Vitesse +50% après en avoir reçu une."
+  },
+  "flashcryo": {
+    "name": "Flash Cryo",
+    "desc": "Annule les capacités Glace reçues et Vitesse +50% après en avoir reçu une."
+  },
+  "flashpsycha": {
+    "name": "Flash Psy",
+    "desc": "Annule les capacités Psy reçues et Vitesse +50% après en avoir reçu une."
+  },
+  "flashfae": {
+    "name": "Flash Fée",
+    "desc": "Annule les capacités Fée reçues et Vitesse +50% après en avoir reçu une."
+  },
+  "flashherba": {
+    "name": "Flash Herba",
+    "desc": "Annule les capacités Plante reçues et Vitesse +50% après en avoir reçu une."
+  },
+  "stoned": {
+    "name": "Minéral",
+    "desc": "Les boosts de stats positifs durent 3 fois plus longtemps."
+  },
+  "powerofalchemy": {
+    "name": "Pouvoir Alchimique",
+    "desc": "Le lanceur obtient temporairement le talent (non caché) du dernier Pokémon de l'équipe mis K.O., en plus des siens. Un second talent temporaire remplace le premier."
+  },
+  "stamina": {
+    "name": "Endurance",
+    "desc": "Dégâts de fatigue subis réduits de moitié."
+  },
+  "gooey": {
+    "name": "Poisseux",
+    "desc": "Baisse la Vitesse ennemie de 50% quand le lanceur est touché."
+  },
+  "flowerveil": {
+    "name": "Garde Fleur",
+    "desc": "Empêche toute l'équipe de subir des baisses de stats."
+  },
+  "aromaveil": {
+    "name": "Aroma-Voile",
+    "desc": "Empêche toute l'équipe d'être entravée (provocation, tourmente…)."
+  },
+  "sweetveil": {
+    "name": "Gluco-Voile",
+    "desc": "Empêche toute l'équipe de s'endormir."
+  },
+  "pastelveil": {
+    "name": "Pastel-Voile",
+    "desc": "Empêche toute l'équipe d'être empoisonnée."
+  },
+  "shieldsdown": {
+    "name": "Bouclier-Carré",
+    "desc": "Les dégâts super efficaces subis deviennent neutres."
+  },
+  "colorspore": {
+    "name": "Spore Couleur",
+    "desc": "Les altérations de statut infligées à la cible durent 3 fois plus longtemps."
+  },
+  "merciless": {
+    "name": "Cruauté",
+    "desc": "Dégâts x1.5 si la cible a une altération de statut."
+  },
+  "costar": {
+    "name": "Partenaire",
+    "desc": "Quand un allié augmente une stat, le lanceur l'imite."
+  },
+  "purifyingsalt": {
+    "name": "Sel Purifiant",
+    "desc": "Dégâts des capacités Spectre réduits de 25% (cumulable). Fonctionne toujours, pour tous."
+  },
+  "treasureofruin": {
+    "name": "Trésor du Fléau",
+    "desc": "Puissance croisée +0.5."
+  },
+  "thousandarms": {
+    "name": "Mille Bras",
+    "desc": "Toutes les attaques deviennent super efficaces, quel que soit le type."
+  },
+  "goodasgold": {
+    "name": "Corps en Or",
+    "desc": "+15% de chance de rencontrer un Pokémon sauvage chromatique. Fonctionne toujours, pour tous."
+  },
+  "wonderguard": {
+    "name": "Garde Mystère",
+    "desc": "Dégâts subis des capacités non super efficaces réduits de 80%."
+  },
+  "tintedlens": {
+    "name": "Lentiteintée",
+    "desc": "Les capacités résistées par le type infligent des dégâts normaux."
+  },
+  "prankster": {
+    "name": "Farceur",
+    "desc": "Les capacités Spectre et Ténèbres s'exécutent 1.5 fois plus vite."
+  },
+  "galewings": {
+    "name": "Ailes Bourrasque",
+    "desc": "Les capacités Vol et Insecte s'exécutent 1.5 fois plus vite."
+  },
+  "neuroforce": {
+    "name": "Neuroforce",
+    "desc": "Les capacités Psy et Fée s'exécutent 1.5 fois plus vite."
+  },
+  "scorch": {
+    "name": "Incendie",
+    "desc": "Les dégâts de brûlure sur la durée de l'ennemi sont doublés tant que le lanceur est actif."
+  },
+  "corrosion": {
+    "name": "Corrosion",
+    "desc": "Les dégâts de poison sur la durée de l'ennemi sont doublés tant que le lanceur est actif."
+  },
+  "dancer": {
+    "name": "Danseur",
+    "desc": "Les capacités « Danse » s'exécutent deux fois plus vite."
+  },
+  "cacophony": {
+    "name": "Cacophonie",
+    "desc": "Les capacités « Son » s'exécutent deux fois plus vite."
+  },
+  "windrider": {
+    "name": "Aéroporté",
+    "desc": "Les capacités « Vent » s'exécutent deux fois plus vite."
+  },
+  "iaido": {
+    "name": "Iaïdo",
+    "desc": "Les capacités « Lame » s'exécutent deux fois plus vite."
+  },
+  "megalauncher": {
+    "name": "Mégavore",
+    "desc": "Les capacités « Pulsaire » ont leur puissance de base x1.5."
+  },
+  "metalhead": {
+    "name": "Tête de Métal",
+    "desc": "Les capacités « Tête » ont leur puissance de base x1.5."
+  },
+  "imposter": {
+    "name": "Morphing",
+    "desc": "Copie les augmentations de stats positives de l'ennemi."
+  },
+  "toxicboost": {
+    "name": "Rage Poison",
+    "desc": "Dégâts infligés x1.2 en cas d'empoisonnement, et annule ses dégâts sur la durée."
+  },
+  "flareboost": {
+    "name": "Rage Brûlure",
+    "desc": "Dégâts infligés x1.2 en cas de brûlure, et annule ses dégâts sur la durée."
+  },
+  "fullmetalbody": {
+    "name": "Métalloprotection",
+    "desc": "Empêche toute baisse de stats."
+  },
+  "supremeoverlord": {
+    "name": "Général Suprême",
+    "desc": "Dégâts infligés x1.15 par membre de l'équipe mis K.O."
+  },
+  "gorillatactics": {
+    "name": "Entêtement Gorille",
+    "desc": "Attaque x1.5, mais empêche le changement de Pokémon."
+  },
+  "beastboost": {
+    "name": "Boost Chimère",
+    "desc": "La stat la plus élevée du lanceur +50% après avoir mis K.O. un Pokémon."
+  },
+  "quarkdrive": {
+    "name": "Charge Quark",
+    "desc": "La stat la plus élevée du lanceur +50% sous le Champ Électrifié."
+  },
+  "protosynthesis": {
+    "name": "Paléosynthèse",
+    "desc": "La stat la plus élevée du lanceur +50% sous le soleil."
+  },
+  "drizzle": {
+    "name": "Crachin",
+    "desc": "Invoque la pluie en entrant au combat."
+  },
+  "drought": {
+    "name": "Sécheresse",
+    "desc": "Invoque le soleil en entrant au combat."
+  },
+  "sandstream": {
+    "name": "Sable Volant",
+    "desc": "Invoque une tempête de sable en entrant au combat."
+  },
+  "snowwarning": {
+    "name": "Alerte Neige",
+    "desc": "Invoque la grêle en entrant au combat."
+  },
+  "somberfield": {
+    "name": "Champ Sombre",
+    "desc": "Invoque le Champ Sombre en entrant au combat."
+  },
+  "electricsurge": {
+    "name": "Créa-Élec",
+    "desc": "Active un Champ Électrifié en entrant au combat."
+  },
+  "grassysurge": {
+    "name": "Créa-Herbe",
+    "desc": "Active un Champ Herbu en entrant au combat."
+  },
+  "mistysurge": {
+    "name": "Créa-Brume",
+    "desc": "Active un Champ Brumeux en entrant au combat."
+  },
+  "contrary": {
+    "name": "Contestataire",
+    "desc": "Inverse les changements de stats : les hausses deviennent baisses et inversement."
+  },
+  "protean": {
+    "name": "Protéen",
+    "desc": "Le type du lanceur devient celui de la capacité utilisée."
+  },
+  "simple": {
+    "name": "Simple",
+    "desc": "Les changements de stats du lanceur sont amplifiés d'un cran."
+  },
+  "parentalbond": {
+    "name": "Amour Filial",
+    "desc": "Les capacités sont exécutées une seconde fois à demi-puissance."
+  },
+  "moody": {
+    "name": "Lunatique",
+    "desc": "Chaque tour, monte deux stats de 100% pour un tour."
+  },
+  "darkaura": {
+    "name": "Aura Sombre",
+    "desc": "Puissance des capacités Ténèbres de toute l'équipe x1.1."
+  },
+  "soulasterism": {
+    "name": "Astre d'Âmes",
+    "desc": "Dégâts des capacités Spectre de toute l'équipe x1.1."
+  },
+  "normalize": {
+    "name": "Normalise",
+    "desc": "Toutes les capacités deviennent Normal, puissance x1.3."
+  },
+  "ferrilate": {
+    "name": "Ferrisation",
+    "desc": "Les capacités Normal deviennent Acier, puissance x1.3."
+  },
+  "glaciate": {
+    "name": "Réfrigération",
+    "desc": "Les capacités Normal deviennent Glace, puissance x1.3."
+  },
+  "terralate": {
+    "name": "Terrisation",
+    "desc": "Les capacités Normal deviennent Sol, puissance x1.3."
+  },
+  "toxilate": {
+    "name": "Toxisation",
+    "desc": "Les capacités Normal deviennent Poison, puissance x1.3."
+  },
+  "hydrolate": {
+    "name": "Hydrisation",
+    "desc": "Les capacités Normal deviennent Eau, puissance x1.3."
+  },
+  "pyrolate": {
+    "name": "Pyrisation",
+    "desc": "Les capacités Normal deviennent Feu, puissance x1.3."
+  },
+  "chrysilate": {
+    "name": "Chrysalisation",
+    "desc": "Les capacités Normal deviennent Insecte, puissance x1.3."
+  },
+  "galvanize": {
+    "name": "Galvanisation",
+    "desc": "Les capacités Normal deviennent Électrik, puissance x1.3."
+  },
+  "gloomilate": {
+    "name": "Obscurisation",
+    "desc": "Les capacités Normal deviennent Ténèbres, puissance x1.3."
+  },
+  "espilate": {
+    "name": "Psychisation",
+    "desc": "Les capacités Normal deviennent Psy, puissance x1.3."
+  },
+  "aerilate": {
+    "name": "Aérisation",
+    "desc": "Les capacités Normal deviennent Vol, puissance x1.3."
+  },
+  "pixilate": {
+    "name": "Pixilisation",
+    "desc": "Les capacités Normal deviennent Fée, puissance x1.3."
+  },
+  "verdify": {
+    "name": "Verdification",
+    "desc": "Les capacités Normal deviennent Plante, puissance x1.3."
+  },
+  "dragonmaw": {
+    "name": "Mâchoire Draco",
+    "desc": "Les capacités Normal deviennent Dragon, puissance x1.3."
+  }
 };
-

@@ -35,3 +35,4 @@ window.L_fr_economy = {
 "will_replace":"(remplacera l'objet actuel)",
 };
 
+

@@ -1,19 +1,15 @@
 @echo off
-setlocal
-cd /d "%~dp0"
-set PORT=8000
-
-echo Starting PokéWorld on http://127.0.0.1:%PORT%/
-start "" "http://127.0.0.1:%PORT%/"
-
-py -3 -m http.server %PORT%
-if not errorlevel 1 goto :eof
-python -m http.server %PORT%
-if not errorlevel 1 goto :eof
-python3 -m http.server %PORT%
-if not errorlevel 1 goto :eof
-
+echo ========================================
+echo   PokeWorld - Serveur Local
+echo ========================================
 echo.
-echo Python is required to launch a local server automatically.
-echo You can still open index.html directly, but some browsers show file:// security warnings.
+echo Demarrage du serveur HTTP sur le port 8080
+echo.
+echo Ouvre http://localhost:8080 dans ton navigateur
+echo.
+echo Pour arreter le serveur : Ctrl+C
+echo.
+echo ========================================
+echo.
+python3 -m http.server 8080 --directory "%~dp0"
 pause

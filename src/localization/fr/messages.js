@@ -329,3 +329,4 @@ window.L_fr_messages = {
 "mine_battle_log":"⛏ Souterrain : Vous avez déterré {icon} <b>{item}</b> !"
 };
 
+

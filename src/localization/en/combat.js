@@ -143,3 +143,4 @@ window.L_en_combat = {
 "battle_in_progress":"Battle in progress",
 };
 
+

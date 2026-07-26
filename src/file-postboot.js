@@ -13,9 +13,50 @@
     drawer.style.display = getComputedStyle(drawer).display === 'none' ? 'flex' : 'none';
   }
 
+  function splitLegacyArgs(raw) {
+    var parts = [];
+    var current = '';
+    var quote = null;
+    for (var i = 0; i < raw.length; i++) {
+      var ch = raw[i];
+      var prev = raw[i - 1];
+      if ((ch === '"' || ch === "'") && prev !== '\\') {
+        if (quote === ch) quote = null;
+        else if (!quote) quote = ch;
+        current += ch;
+        continue;
+      }
+      if (ch === ',' && !quote) {
+        parts.push(current.trim());
+        current = '';
+        continue;
+      }
+      current += ch;
+    }
+    if (current.trim()) parts.push(current.trim());
+    return parts;
+  }
+
+  function resolveLegacyArg(token, event, element) {
+    var value = String(token || '').trim();
+    if (!value) return undefined;
+    if (value === 'event') return event;
+    if (value === 'this.value' || value === 'element.value') return element && element.value;
+    if (value === 'this.checked' || value === 'element.checked') return !!(element && element.checked);
+    if (value === 'null') return null;
+    if (value === 'undefined') return undefined;
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    if ((value[0] === "'" && value[value.length - 1] === "'") || (value[0] === '"' && value[value.length - 1] === '"')) {
+      return value.slice(1, -1).replace(/\\'/g, "'").replace(/\\\"/g, '"');
+    }
+    if (/^-?\d+(?:\.\d+)?$/.test(value)) return Number(value);
+    return value;
+  }
+
   function parseLegacyArgs(raw, event, element) {
     if (!raw || !raw.trim()) return [];
-    try { return Function('event', 'element', 'return [' + raw + '];').call(element, event, element); }
+    try { return splitLegacyArgs(raw).map(function (token) { return resolveLegacyArg(token, event, element); }); }
     catch (error) { console.error('[PokeWorld] Could not parse legacy call args:', raw, error); return []; }
   }
 
@@ -79,6 +120,7 @@ function installCriticalClickFallback(root) {
     'restart-last-battle': function () { callGlobal('restartLastBattle'); },
     'toggle-debug-menu': function () { toggleDebugDrawerDirect(); },
     'debug-give-money': function () { callGlobal('debugGiveMoney'); },
+    'debug-give-ct-cs': function () { callGlobal('debugGiveCtCs'); },
     'debug-give-candies': function () { callGlobal('debugGiveCandies'); },
     'debug-unlock-badges': function () { callGlobal('debugUnlockBadges'); },
     'debug-fill-mine': function () { callGlobal('debugFillMine'); },
@@ -91,7 +133,6 @@ function installCriticalClickFallback(root) {
     'close-fullscreen-panel': function () { callGlobal('closeFullscreenPanel'); },
     'copy-export-text': function () { callGlobal('copyExportText'); },
     'legacy-call': function (el, event) { callGlobal.apply(null, [el.dataset.call].concat(parseLegacyArgs(el.dataset.callArgs || '', event, el))); },
-    'legacy-code': function (el, event) { try { Function('event', el.dataset.code || '').call(el, event); } catch (error) { console.error('[PokeWorld] Legacy code action failed', error); } },
 
     'call-close-poke': function (el, event) { callGlobal.apply(null, [el.dataset.call].concat(parseLegacyArgs(el.dataset.callArgs || '', event, el))); var m = document.getElementById('poke-modal'); if (m) m.classList.remove('open'); },
     'cancel-box-move-replace': function (el) { window.boxMoveReplaceSlot = null; callGlobal('openBoxPokeModal', el.dataset.boxId); },
@@ -100,8 +141,9 @@ function installCriticalClickFallback(root) {
     'call-close-selector': function (el, event) { callGlobal.apply(null, [el.dataset.call].concat(parseLegacyArgs(el.dataset.callArgs || '', event, el))); callGlobal('closeUnifiedSelectorModal'); },
     'return-inventory': function () { var fsM = document.getElementById('fullscreen-panel-modal'); if (fsM && fsM.style.display === 'flex') callGlobal('renderInventory', document.getElementById('fs-panel-content')); else callGlobal('showTab', 'inventory'); },
     'back-to-move-context': function () { if (window._moveInfoContext && window._moveInfoContext.boxId) callGlobal('openBoxPokeModal', window._moveInfoContext.boxId); else if (window._moveInfoContext && window._moveInfoContext.idx !== null) callGlobal('openPokeModal', window._moveInfoContext.idx); else { var m = document.getElementById('poke-modal'); if (m) m.classList.remove('open'); } },
+    'pw-info-back': function () { if (typeof window.pwInfoBack === 'function') window.pwInfoBack(); },
 
-    'close-poke-modal': function (el) { if (el.dataset.resetMoveInfo) window._moveInfoContext = null; if (el.dataset.resetBoxMove) window.boxMoveReplaceSlot = null; if (el.dataset.resetMoveEditor) window.moveEditorFor = null; var target = document.getElementById('poke-modal'); if (target) target.classList.remove('open'); },
+    'close-poke-modal': function (el) { if (el.dataset.resetMoveInfo) window._moveInfoContext = null; if (el.dataset.resetBoxMove) window.boxMoveReplaceSlot = null; if (el.dataset.resetMoveEditor) window.moveEditorFor = null; window._pwPokeSheet = null; window._pwInfoSource = null; window._atollPrepOpen = false; var target = document.getElementById('poke-modal'); if (target) { target.classList.remove('open'); target.classList.remove('atoll-prep-modal'); } },
     'hide-element': function (el) { var target = document.getElementById(el.dataset.targetElement); if (target) target.style.display = 'none'; },
     'stop-propagation': function (_el, event) { event.stopPropagation(); },
     'select-self': function (el) { if (typeof el.select === 'function') el.select(); },
@@ -118,15 +160,21 @@ function installCriticalClickFallback(root) {
     if (action === 'import-save-file' || action === 'switch-map-region') return;
     const handler = actions[action];
     if (!handler) return;
-    handler(target, event);
+    // Passe 16 : conservation du scroll autour de l'action (filet de sécurité).
+    var _pwSnap = (typeof pwSnapshotScrollAround === 'function') ? pwSnapshotScrollAround(target) : null;
+    try { handler(target, event); }
+    finally { if (_pwSnap && typeof pwRestoreScrollAround === 'function') pwRestoreScrollAround(_pwSnap); }
   });
 
   document.addEventListener('contextmenu', function (event) {
     const target = event.target.closest('[data-context-call], [data-context-code]');
     if (!target) return;
     event.preventDefault();
-    if (target.dataset.contextCall) callGlobal.apply(null, [target.dataset.contextCall].concat(parseLegacyArgs(target.dataset.contextArgs || '', event, target)));
-    else { try { Function('event', target.dataset.contextCode || '').call(target, event); } catch (error) { console.error('[PokeWorld] Legacy context code failed', error); } }
+    var _pwSnap = (typeof pwSnapshotScrollAround === 'function') ? pwSnapshotScrollAround(target) : null;
+    try {
+      if (target.dataset.contextCall) callGlobal.apply(null, [target.dataset.contextCall].concat(parseLegacyArgs(target.dataset.contextArgs || '', event, target)));
+      else console.warn('[PokeWorld] Ignored deprecated context code.');
+    } finally { if (_pwSnap && typeof pwRestoreScrollAround === 'function') pwRestoreScrollAround(_pwSnap); }
   });
 
   document.addEventListener('change', function (event) {
@@ -143,18 +191,6 @@ function installCriticalClickFallback(root) {
     if (!target) return;
     if (target.dataset.action === 'filter-unified-grid') callGlobal('filterUnifiedGrid');
     if (target.dataset.action === 'filter-dictionary') callGlobal('setDictionarySearch', target.value);
-  });
-
-  document.addEventListener('mouseover', function (event) {
-    const target = event.target.closest('[data-hover-in]');
-    if (!target) return;
-    try { Function('event', target.dataset.hoverIn || '').call(target, event); } catch (error) { console.error('[PokeWorld] Legacy hover-in code failed', error); }
-  });
-
-  document.addEventListener('mouseout', function (event) {
-    const target = event.target.closest('[data-hover-out]');
-    if (!target) return;
-    try { Function('event', target.dataset.hoverOut || '').call(target, event); } catch (error) { console.error('[PokeWorld] Legacy hover-out code failed', error); }
   });
 
   document.addEventListener('mousedown', function (event) {
@@ -228,17 +264,7 @@ function installCriticalClickFallback(root) {
       element.removeAttribute(attr);
       element.removeAttribute('data-code-' + eventName);
       element.removeAttribute(dataAttr);
-      element.addEventListener(eventName, function (event) {
-        try {
-          const result = Function('event', code).call(element, event);
-          if (result === false) {
-            event.preventDefault();
-            event.stopPropagation();
-          }
-        } catch (error) {
-          console.error('[PokeWorld] Inline ' + attr + ' bridge failed', error);
-        }
-      });
+      console.warn('[PokeWorld] Ignored deprecated inline ' + attr + ' handler.', code);
     }
     function sanitize(node) {
       if (!node || node.nodeType !== 1) return;
@@ -269,6 +295,38 @@ function installCriticalClickFallback(root) {
 
   installInlineHandlerSanitizerClassic(document);
 
+  function installStaticI18nBindings() {
+    var bindings = [
+      ['#settings-title','settings_title'], ['#settings-inner .settings-section:nth-of-type(1) h3','lang_title'],
+      ['#settings-inner .settings-section:nth-of-type(2) h3','theme_title'], ['[data-theme-btn="dark"]','theme_dark'],
+      ['[data-theme-btn="light"]','theme_light'], ['[data-theme-btn="gameboy"]','theme_gameboy'], ['[data-theme-btn="fire"]','theme_fire'],
+      ['#settings-inner .settings-section:nth-of-type(4) h3','save_title'], ['[data-action="save-game"]','save_btn'],
+      ['[data-action="load-game"]','load_btn'], ['[data-action="export-save"]','export_btn'], ['label[for="import-file"]','import_btn'],
+      ['[data-action="confirm-delete"]','delete_save_btn'], ['[data-action="do-delete"]','confirm_delete_btn'], ['[data-action="cancel-delete"]','cancel_btn'],
+      ['#confirm-yes','confirm_btn'], ['[data-action="close-confirm"]','cancel_btn'], ['.mobile-nav-bar [data-mobile-view="adventure"]','adventure_tab'],
+      ['#mine-win-title','mine_window_title'], ['#map-region-select option[value="kanto"]','map_region_kanto'], ['#map-region-select option[value="johto"]','map_region_johto'],
+      ['#usm-search','search_by_name:placeholder'], ['.usm-sort-btn[data-sort="name"]','sort_name'], ['#battle-summary-title','battle_summary_title'],
+      ['#loot-restart-btn','loot_restart_btn'], ['#loot-continue-btn','loot_continue_btn'], ['#debug-drawer .pw-static-068 span','debug_menu_title_short'],
+      ['#debug-drawer [data-action="debug-give-money"]','debug_money'], ['#debug-drawer [data-action="debug-give-candies"]','debug_candies'],
+      ['#debug-drawer [data-action="debug-unlock-badges"]','debug_badges'], ['#debug-drawer [data-action="debug-fill-mine"]','debug_mine'],
+      ['#debug-drawer [data-action="debug-give-ct-cs"]','debug_ctcs'], ['#debug-drawer [data-call="debugTimeSkip10Minutes"]','debug_afk'],
+      ['#debug-toggle-btn','debug_toggle_btn'], ['#victory-title','victory_title'], ['#victory-msg','victory_message'], ['#victory-screen [data-action="close-victory-screen"]','continue_btn']
+    ];
+    bindings.forEach(function(pair){
+      var selector = pair[0];
+      var parts = pair[1].split(':');
+      var key = parts[0];
+      var attr = parts[1];
+      document.querySelectorAll(selector).forEach(function(el){
+        if (attr === 'placeholder') el.dataset.i18nPlaceholder = key;
+        else el.dataset.i18n = key;
+      });
+    });
+    try { if (typeof updateI18nLabels === 'function') updateI18nLabels(); } catch(_) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', installStaticI18nBindings);
+  else installStaticI18nBindings();
+
 
   // --- Dynamic styles for file:// mode (data-pct, data-grid-cols, etc.) ---
   function applyDynamicStylesFile(root) {
@@ -298,6 +356,13 @@ function installCriticalClickFallback(root) {
         }
       }
     });
+    root.querySelectorAll('[data-type-color]').forEach(function(el){
+      var color = el.dataset.typeColor;
+      if (color) {
+        el.style.setProperty('--type-color', color);
+        if (el.classList.contains('type-badge') || el.classList.contains('move-desc-badge') || el.classList.contains('status-badge')) el.style.background = color;
+      }
+    });
   }
   // Initial apply and observer
   try {
@@ -309,12 +374,12 @@ function installCriticalClickFallback(root) {
             if (node.nodeType === 1) applyDynamicStylesFile(node);
           });
         }
-        if (m.type === 'attributes' && (m.attributeName === 'data-pct' || m.attributeName === 'data-grid-cols')) {
+        if (m.type === 'attributes' && (m.attributeName === 'data-pct' || m.attributeName === 'data-grid-cols' || m.attributeName === 'data-type-color')) {
           applyDynamicStylesFile(m.target.parentElement || m.target);
         }
       });
     });
-    obs.observe(document.documentElement, {childList:true, subtree:true, attributes:true, attributeFilter:['data-pct','data-bg','data-grid-cols']});
+    obs.observe(document.documentElement, {childList:true, subtree:true, attributes:true, attributeFilter:['data-pct','data-bg','data-grid-cols','data-type-color']});
   } catch(_){}
 
   // Fix debug toggle to use class open
@@ -344,4 +409,5 @@ function installCriticalClickFallback(root) {
   }
 
 })();
+
 

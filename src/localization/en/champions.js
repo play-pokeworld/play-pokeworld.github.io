@@ -17,6 +17,18 @@ window.L_en_champions = {
 "chuck": {"name":"Chuck","title":"Cianwood Gym Leader","badgeName":"Storm Badge"},
 "jasmine": {"name":"Jasmine","title":"Olivine Gym Leader","badgeName":"Mineral Badge"},
 "pryce": {"name":"Pryce","title":"Mahogany Gym Leader","badgeName":"Glacier Badge"},
-"clair": {"name":"Clair","title":"Blackthorn Gym Leader","badgeName":"Rising Badge"}
+"clair": {"name":"Clair","title":"Blackthorn Gym Leader","badgeName":"Rising Badge"},
+// League gauntlet stages (pass 19) — names/titles shown during the League
+"lorelei": {"name":"Lorelei","title":"Elite Four — Ice & Water"},
+"bruno": {"name":"Bruno","title":"Elite Four — Fighting & Rock"},
+"agatha": {"name":"Agatha","title":"Elite Four — Ghost & Poison"},
+"lance": {"name":"Lance","title":"Elite Four — Dragon"},
+"blue": {"name":"Blue","title":"Kanto League Champion"},
+"will": {"name":"Will","title":"Elite Four — Psychic"},
+"koga_e4": {"name":"Koga","title":"Elite Four — Poison"},
+"bruno_johto": {"name":"Bruno","title":"Elite Four — Fighting"},
+"karen": {"name":"Karen","title":"Elite Four — Dark"},
+"lance_johto": {"name":"Lance","title":"Johto League Champion"}
 };
+
 

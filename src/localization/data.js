@@ -15,7 +15,7 @@
 // Domains that contribute FLAT keys to the root of the dictionary.
 var LANG_FLAT_DOMAINS = ['ui','economy','combat','stats','pokedex','messages'];
 // Domains kept as NESTED namespaces (data-driven text: items, quests, lore...).
-var LANG_NESTED_DOMAINS = ['items','quests','lore','npc','talents','champions','shops','settings','breeding','training','box','automation','map','types'];
+var LANG_NESTED_DOMAINS = ['items','quests','lore','npc','talents','champions','shops','settings','breeding','training','box','automation','map','types','move_descs'];
 
 var LANGS = ['fr','en'];
 
@@ -45,9 +45,11 @@ window.I18N = {
 
 // Pokémon French names (array indexed by species id).
 window.POKE_NAMES_FR = (typeof L_pokemon_names_fr !== 'undefined') ? L_pokemon_names_fr : [];
+window.POKE_NAMES_EN = (typeof L_pokemon_names_en !== 'undefined') ? L_pokemon_names_en : [];
 // Move English names (object keyed by move id).
 window.MOVE_NAMES_EN = (typeof L_move_names_en !== 'undefined') ? L_move_names_en : {};
 // Location names per language.
 window.LOC_NAMES_FR = (typeof L_location_names_fr !== 'undefined') ? L_location_names_fr : {};
 window.LOC_NAMES_EN = (typeof L_location_names_en !== 'undefined') ? L_location_names_en : {};
+
 

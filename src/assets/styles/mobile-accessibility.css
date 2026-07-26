@@ -71,3 +71,124 @@ button,
 
 .pw-type-info { font-size: 13px; padding: 3px 10px; }
 
+
+
+button.modal-close,
+button.theme-swatch,
+button.tab {
+  font: inherit;
+}
+
+button.modal-close {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+button.theme-swatch,
+button.tab {
+  appearance: none;
+}
+
+:where(button, [href], input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--accent, #f4d35e);
+  outline-offset: 2px;
+}
+
+[role="dialog"] {
+  overscroll-behavior: contain;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+  body.mobile-mode #header {
+    flex-wrap: nowrap;
+    padding: max(8px, env(safe-area-inset-top)) 10px 8px;
+    min-height: 52px;
+  }
+
+  body.mobile-mode #header h1 {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 17px;
+  }
+
+  body.mobile-mode #header .hinfo {
+    gap: 5px;
+    white-space: nowrap;
+    font-size: 11px;
+  }
+
+  body.mobile-mode .mobile-nav-bar,
+  body.mobile-mode .mobile-subnav-bar {
+    padding-left: max(8px, env(safe-area-inset-left));
+    padding-right: max(8px, env(safe-area-inset-right));
+  }
+
+  body.mobile-mode #main-dashboard {
+    height: calc(100dvh - 152px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+
+  body.mobile-mode .win-header {
+    cursor: default;
+    min-height: 44px;
+    padding: 8px 10px;
+  }
+
+  body.mobile-mode .win-body {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body.mobile-mode .map-panel,
+  body.mobile-mode #map-panel {
+    touch-action: pan-x pan-y;
+  }
+
+  body.mobile-mode .mobile-nav-bar {
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+
+  .mobile-nav-bar,
+  .mobile-subnav-bar {
+    scrollbar-width: none;
+  }
+
+  .mobile-nav-bar::-webkit-scrollbar,
+  .mobile-subnav-bar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  body.mobile-mode #header .hinfo {
+    max-width: 38vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  body.mobile-mode .mob-btn,
+  body.mobile-mode .mob-sub-btn {
+    min-width: 56px;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: 10px;
+  }
+}
+
+@media (orientation: landscape) and (max-width: 850px) {
+  body.mobile-mode #main-dashboard {
+    height: calc(100dvh - 104px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+
+  body.mobile-mode .mobile-nav-bar {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  body.mobile-mode .mob-btn,
+  body.mobile-mode .mob-sub-btn {
+    min-height: 36px;
+  }
+}

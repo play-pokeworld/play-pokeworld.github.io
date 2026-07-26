@@ -774,6 +774,8 @@
 .poke-detail-move-meta { color:var(--light1); font-size:12px; white-space:nowrap; }
 .poke-detail-pill { background:var(--green); color:var(--dark1); border-radius:999px; padding:2px 7px; font-size:11px; font-weight:900; }
 .poke-detail-pill.danger { background:var(--red); color:var(--light2); }
+.poke-detail-pill.is-learnable { background:transparent; color:var(--green); border:1px solid var(--green); }
+.poke-detail-move-row.locked { opacity:.55; }
 .poke-detail-learn-title { margin-top:12px; background:var(--panel-bg); color:var(--panel-text); text-align:center; padding:7px; border-radius:5px; }
 .poke-detail-learn-title span { color:var(--panel-text); opacity:.7; margin-left:8px; }
 .poke-detail-empty { color:var(--light1); font-size:12px; padding:8px; text-align:center; }
@@ -852,6 +854,7 @@
   justify-content: center;
 }
 .poke-detail-panel .extracted-template-style-083,
+.poke-detail-panel .pw-card-83,
 .poke-detail-panel .extracted-template-style-034,
 .poke-detail-panel .pw-stone-evo {
   background: rgba(0,0,0,0.18);
@@ -869,7 +872,9 @@
   margin: 6px 0;
 }
 .poke-detail-panel .extracted-template-style-084,
-.poke-detail-panel .extracted-template-style-090 {
+.poke-detail-panel .pw-text-84,
+.poke-detail-panel .extracted-template-style-090,
+.poke-detail-panel .pw-text-sm.pw-light1 {
   color: var(--light1);
   line-height: 1.35;
 }
@@ -2599,6 +2604,25 @@ body.save-menu-active { overflow: hidden; }
 .automation-toggle-btn.is-on b {
   color: #f6f1dc;
 }
+/* Passe 13 : l'état « auto activé » doit être clairement vert (le gradient
+   ci-dessus, partagé avec d'autres boutons, le rendait trop discret). */
+.automation-toggle-btn.is-on {
+  background: linear-gradient(135deg, var(--green), #8bd77d);
+  color: var(--dark1);
+  border-color: var(--green);
+  box-shadow: 0 0 10px rgba(120, 200, 110, 0.35);
+}
+.automation-toggle-btn.is-on span,
+.automation-toggle-btn.is-on b {
+  color: var(--dark1);
+  font-weight: bold;
+}
+.automation-toggle-btn.is-off {
+  background: rgba(0,0,0,0.26);
+  color: var(--light2);
+  border-color: rgba(236, 222, 183, 0.35);
+  border-style: dashed;
+}
 .mine-tool-upgrade-card {
   border: 1px solid var(--dark3);
   border-radius: 10px;
@@ -2621,15 +2645,55 @@ body.save-menu-active { overflow: hidden; }
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 8px;
 }
+/* Passe 14 : couleurs d'état du bouton « auto » de la fenetre entraînement.
+   Ces règles n'étaient jamais appliquées : la règle générique
+   .hbtn:not(...) (pw-unified.css) les écrasait — la classe est désormais
+   exclue de cette règle. Vert franc + texte foncé, comme l'automation. */
 .training-slot-auto-btn.is-off {
-  background: rgba(0,0,0,0.22);
+  background: rgba(0,0,0,0.26);
   color: var(--light2);
-  border-color: var(--dark3);
+  border-color: rgba(236,222,183,0.35);
+  border-style: dashed;
 }
 .training-slot-auto-btn.is-on {
-  background: linear-gradient(135deg, #477a45, #6f9f63);
+  background: linear-gradient(135deg, var(--green), #8bd77d);
+  color: var(--dark1);
+  border-color: var(--green);
+  box-shadow: 0 0 10px rgba(120, 200, 110, 0.35);
+  font-weight: 900;
+}
+
+/* Passe 14 — pension : boutons de mode (garderie vert / incubation violet)
+   et de priorité (pokémon bleu / fossile bronze). Couleurs portées par des
+   classes dédiées car un data-style/fond inline serait masqué par la règle
+   générique .hbtn:not(...) (spécificité supérieure). */
+.hatchery-mode-toggle,
+.hatchery-priority-toggle {
+  font-size: 11px;
+  font-weight: 900;
+  padding: 4px 10px;
+  border-radius: 3px;
+  border: 1px solid transparent;
+}
+.hatchery-mode-toggle.is-exp {
+  background: linear-gradient(135deg, var(--green), #8bd77d);
+  color: var(--dark1);
+  border-color: var(--green);
+}
+.hatchery-mode-toggle.is-breed {
+  background: linear-gradient(135deg, var(--purple), #d79ae8);
+  color: var(--dark1);
+  border-color: var(--purple);
+}
+.hatchery-priority-toggle.is-pokemon {
+  background: linear-gradient(135deg, var(--blue), #7fb2f0);
+  color: var(--dark1);
+  border-color: var(--blue);
+}
+.hatchery-priority-toggle.is-fossil {
+  background: linear-gradient(135deg, #a06a2c, #c89248);
   color: #f6f1dc;
-  border-color: #6f9f63;
+  border-color: #a06a2c;
 }
 #poke-modal-inner.management-inner {
   width: min(96vw, 980px);
@@ -3312,3 +3376,45 @@ button.quest-claim-btn.is-done:not(.is-challenge) {
   align-items: stretch;
 }
 
+/* Passe 17 — glisser-déposer des attaques équipées (fenêtre Party / onglet Équipe) */
+.poke-move.draggable-move { cursor: grab; }
+.poke-move.draggable-move:active { cursor: grabbing; }
+.poke-move.pw-move-drag-src { opacity: .45; }
+.poke-move.pw-move-drop-hover { outline: 2px dashed var(--light2); outline-offset: -2px; }
+
+/* ── Atoll passe 22 : rotation 12 h, bans légendaires, série Usine ── */
+.atoll-rotation-meta { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.atoll-timer-chip, .atoll-cycle-chip { border:1px solid rgba(236,222,183,.28); border-radius:999px; padding:4px 12px; font-size:12px; font-weight:900; color:var(--light2); background:rgba(0,0,0,.28); }
+.atoll-timer-chip { color:var(--red, #ff8a5c); border-color:rgba(255,138,61,.45); }
+.atoll-group-desc { border:1px solid rgba(236,222,183,.22); border-radius:14px; padding:11px 14px; background:rgba(83,157,223,.08); }
+.atoll-group-desc b { color:var(--light2); display:block; margin-bottom:2px; }
+.atoll-group-desc p { margin:0; color:var(--light1); font-size:12px; line-height:1.4; }
+.atoll-preview-row { display:flex; flex-wrap:wrap; gap:3px; margin-top:6px; }
+.atoll-chip { display:inline-flex; align-items:center; justify-content:center; border:1px solid rgba(236,222,183,.18); border-radius:9px; background:rgba(0,0,0,.25); padding:1px; }
+.atoll-rotation-hint { display:block; color:var(--light1); font-size:11px; margin-top:4px; }
+.atoll-ban-row { display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin-top:6px; border-top:1px dashed rgba(255,138,61,.35); padding-top:6px; }
+.atoll-ban-row > span { color:#ff8a5c; font-size:11px; font-weight:900; }
+.atoll-ban-row .atoll-chip { border-color:rgba(255,138,61,.5); }
+.atoll-free-note { display:block; color:var(--green, #93d47b); font-size:11px; margin-top:6px; font-weight:700; }
+.atoll-run-card { display:grid; gap:8px; border:1px solid rgba(183,99,207,.5); border-radius:14px; padding:12px 14px; background:linear-gradient(135deg, rgba(183,99,207,.14), rgba(0,0,0,.24)); }
+.atoll-run-head { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; align-items:baseline; }
+.atoll-run-head b { color:var(--light2); }
+.atoll-run-head span { color:#dcb4ff; font-weight:900; font-size:12px; }
+.atoll-run-moveslist { display:grid; gap:2px; }
+.atoll-run-moves { color:var(--light1); font-size:11px; }
+.atoll-run-moves b { color:var(--light2); }
+.atoll-run-card small { color:var(--light1); font-size:11px; line-height:1.35; }
+.atoll-run-card .hbtn { justify-self:start; }
+/* Passe 25 — panneau de préparation Usine : clone de la fenêtre Équipe Active
+   (mêmes .poke-card empilées, glisser-déposer Pokémon + attaques, pas
+   d'édition d'objet / talent / moveset). */
+#poke-modal.atoll-prep-modal #poke-modal-inner { width:min(470px,96vw); max-height:90vh; overflow-y:auto; box-sizing:border-box; padding:12px; }
+#poke-modal.atoll-prep-modal .atoll-prep-hint { display:block; color:var(--light1); font-size:11.5px; line-height:1.45; margin:8px 2px; }
+#poke-modal.atoll-prep-modal .atoll-prep-note { display:block; color:var(--light1); font-size:10.5px; line-height:1.4; margin-top:8px; }
+#poke-modal.atoll-prep-modal #atoll-prep-body { margin:8px 0; }
+#poke-modal.atoll-prep-modal #atoll-prep-body .poke-card { cursor:grab; }
+#poke-modal.atoll-prep-modal #atoll-prep-body .poke-card.atoll-prep-drag-over { border-color:var(--light2); box-shadow:0 0 15px rgba(236,222,183,.6); }
+#poke-modal.atoll-prep-modal .poke-move.atoll-prep-move-over { outline:2px dashed var(--light2); outline-offset:1px; }
+#poke-modal.atoll-prep-modal .pw-btn-group { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+.atoll-run-card .pw-btn-group { display:flex; gap:8px; flex-wrap:wrap; }
+.pw-roaming-timer { display:block; color:var(--light1); font-size:11px; margin-top:2px; font-weight:700; }

@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="src/assets/styles/extracted-bridges.css">
   <link rel="stylesheet" href="src/assets/styles/cleaned-components.css">
   <link rel="stylesheet" href="src/assets/styles/pw-static.css">
+  <link rel="stylesheet" href="src/assets/styles/pw-unified.css">
   
 </head>
 <body>
@@ -58,31 +59,31 @@
 
 <div id="header">
   <h1><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><circle cx="12" cy="12" r="3"/></svg></span><span>PokéWorld</span></h1>
-  <div class="hinfo pw-static-002"> <span id="h-money">1000</span>₽ &nbsp;|&nbsp;  <span id="h-badges">0</span>/<span id="h-badges-total">8</span> badges</div>
+  <div class="hinfo pw-static-002"> <span id="h-money">1000</span>₽ &nbsp;|&nbsp;  <span id="h-badges">0</span>/<span id="h-badges-total">8</span> <span data-i18n="badges_lbl">badges</span></div>
   <button class="hbtn icon-btn" id="settings-btn" data-action="open-settings" aria-label="Réglages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
 </div>
 
-<div id="settings-modal">
+<div id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
   <div id="settings-inner">
     <div class="modal-title">
-      <div>Réglages</div>
-      <span class="modal-close" data-action="close-settings">✕</span>
+      <div id="settings-title" data-i18n="settings_title">Réglages</div>
+      <button type="button" class="modal-close" data-action="close-settings" aria-label="Close" data-i18n-aria-label="modal_close_btn">✕</button>
     </div>
 
     <div class="settings-section">
-      <h3>Langue / Language</h3>
+      <h3 data-i18n="lang_title">Langue / Language</h3>
       <div class="pw-static-003">
         <button class="hbtn lang-btn pw-static-004" data-lang="fr" data-action="set-language">Français</button>
         <button class="hbtn lang-btn pw-static-004" data-lang="en" data-action="set-language">English</button>
       </div>
     </div>
     <div class="settings-section">
-      <h3>Thème</h3>
+      <h3 data-i18n="theme_title">Thème</h3>
       <div class="theme-grid">
-        <div class="theme-swatch pw-static-005" data-theme-btn="dark" data-action="set-theme" data-theme-value="dark">Sombre</div>
-        <div class="theme-swatch pw-static-006" data-theme-btn="light" data-action="set-theme" data-theme-value="light">Clair</div>
-        <div class="theme-swatch pw-static-007" data-theme-btn="gameboy" data-action="set-theme" data-theme-value="gameboy">Game Boy</div>
-        <div class="theme-swatch pw-static-008" data-theme-btn="fire" data-action="set-theme" data-theme-value="fire">Feu</div>
+        <button type="button" class="theme-swatch pw-static-005" data-theme-btn="dark" data-action="set-theme" data-theme-value="dark" data-i18n="theme_dark">Sombre</button>
+        <button type="button" class="theme-swatch pw-static-006" data-theme-btn="light" data-action="set-theme" data-theme-value="light" data-i18n="theme_light">Clair</button>
+        <button type="button" class="theme-swatch pw-static-007" data-theme-btn="gameboy" data-action="set-theme" data-theme-value="gameboy" data-i18n="theme_gameboy">Game Boy</button>
+        <button type="button" class="theme-swatch pw-static-008" data-theme-btn="fire" data-action="set-theme" data-theme-value="fire" data-i18n="theme_fire">Feu</button>
       </div>
     </div>
 
@@ -109,56 +110,56 @@
     </div>
 
     <div class="settings-section">
-      <h3>Sauvegarde</h3>
+      <h3 data-i18n="save_title">Sauvegarde</h3>
       <div class="settings-row">
-        <button class="hbtn" data-action="save-game">Sauvegarder</button>
-        <button class="hbtn" data-action="load-game">Charger</button>
+        <button class="hbtn" data-action="save-game" data-i18n="save_btn">Sauvegarder</button>
+        <button class="hbtn" data-action="load-game" data-i18n="load_btn">Charger</button>
       </div>
       <div class="settings-row">
-        <button class="hbtn" data-action="export-save">Exporter</button>
-        <label class="hbtn pw-static-009" for="import-file">Importer</label>
+        <button class="hbtn" data-action="export-save" data-i18n="export_btn">Exporter</button>
+        <label class="hbtn pw-static-009" for="import-file" data-i18n="import_btn">Importer</label>
       </div>
       <input type="file" id="import-file" accept=".json,application/json" class="pw-static-010" data-action="import-save-file">
       <div class="settings-row" id="delete-row">
-        <button class="hbtn pw-static-011" data-action="confirm-delete">Supprimer la sauvegarde</button>
+        <button class="hbtn pw-static-011" data-action="confirm-delete" data-i18n="delete_save_btn">Supprimer la sauvegarde</button>
       </div>
       <div class="settings-row pw-static-012" id="delete-confirm-row">
-        <button class="hbtn pw-static-011" data-action="do-delete">Confirmer la suppression</button>
-        <button class="hbtn" data-action="cancel-delete">Annuler</button>
+        <button class="hbtn pw-static-011" data-action="do-delete" data-i18n="confirm_delete_btn">Confirmer la suppression</button>
+        <button class="hbtn" data-action="cancel-delete" data-i18n="cancel_btn">Annuler</button>
       </div>
     </div>
   </div>
 </div>
 
-<div id="quest-modal">
+<div id="quest-modal" role="dialog" aria-modal="true" aria-labelledby="quest-title">
   <div id="quest-inner">
     <div id="quest-title"></div>
     <div id="quest-body"></div>
   </div>
 </div>
 
-<div id="confirm-modal">
+<div id="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-text">
   <div id="confirm-inner">
     <div id="confirm-text"></div>
     <div class="settings-row pw-static-013">
-      <button class="hbtn pw-static-011" id="confirm-yes">Confirmer</button>
-      <button class="hbtn" data-action="close-confirm">Annuler</button>
+      <button class="hbtn pw-static-011" id="confirm-yes" data-i18n="confirm_btn">Confirmer</button>
+      <button class="hbtn" data-action="close-confirm" data-i18n="cancel_btn">Annuler</button>
     </div>
   </div>
 </div>
 
 <div class="mobile-nav-bar">
-  <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="adventure">Aventure</button>
-  <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="combat">Combat</button>
-  <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="team">Équipe</button>
-  <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="quests">Quêtes</button>
-  <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="manage">Gestion</button>
+  <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="adventure" aria-current="false" data-i18n="adventure_tab">Aventure</button>
+  <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="combat" aria-current="false"><span data-i18n="tab_combat">Combat</span></button>
+  <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="team" aria-current="false"><span data-i18n="team_btn">Équipe</span></button>
+  <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="quests" aria-current="false" data-i18n="quests_tab">Quêtes</button>
+  <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="manage" aria-current="false" data-i18n="manage_tab">Gestion</button>
 </div>
 <div class="mobile-subnav-bar">
-  <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="hatchery">Pension</button>
-  <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="training">Entraînement</button>
-  <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="mine">Mine</button>
-  <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="shortcuts">Raccourcis</button>
+  <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="hatchery" aria-current="false"><span data-i18n="tab_hatchery">Pension</span></button>
+  <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="training" aria-current="false" data-i18n="training_tab">Entraînement</button>
+  <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="mine" aria-current="false"><span data-i18n="mine_title">Mine</span></button>
+  <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="shortcuts" aria-current="false" data-i18n="shortcuts_tab">Raccourcis</button>
 </div>
 
 <div id="main-dashboard" class="pw-static-015">
@@ -167,7 +168,7 @@
     
     <div id="win-story" class="dash-win pw-static-021">
       <div class="win-header" data-drag-window="win-story">
-        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span><span id="story-win-title">Histoire & Quêtes</span></span>
+        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span><span id="story-win-title" data-i18n="story_quests_title">Histoire & Quêtes</span></span>
         
       </div>
       <div class="win-body pw-static-022" id="story-panel"></div>
@@ -175,7 +176,7 @@
     
     <div id="win-team" class="dash-win pw-static-021">
       <div class="win-header" data-drag-window="win-team">
-        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span><span id="team-win-title">Équipe Active</span></span>
+        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span><span id="team-win-title" data-i18n="team_btn">Équipe Active</span></span>
         
       </div>
       <div id="team-window-body" class="win-body pw-static-022"></div>
@@ -183,7 +184,7 @@
     
     <div id="win-hatchery" class="dash-win pw-static-021">
       <div class="win-header" data-drag-window="win-hatchery">
-        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3c-3.5 0-6 4.2-6 9 0 4.5 2.2 8 6 8s6-3.5 6-8c0-4.8-2.5-9-6-9z"/></svg></span><span id="hatchery-win-title">Pension & Couveuse</span></span>
+        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3c-3.5 0-6 4.2-6 9 0 4.5 2.2 8 6 8s6-3.5 6-8c0-4.8-2.5-9-6-9z"/></svg></span><span id="hatchery-win-title" data-i18n="hatchery_management_title">Pension & Couveuse</span></span>
         
       </div>
       <div id="hatchery-window-body" class="win-body pw-static-022"></div>
@@ -192,7 +193,7 @@
     
     <div id="win-mine" class="dash-win pw-static-024">
       <div class="win-header" data-drag-window="win-mine">
-        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3l7 7"/><path d="M4 20l7-7"/><path d="M14 3l-4 4 7 7 4-4"/><path d="M2 22l8-8"/></svg></span>Mine souterraine</span>
+        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3l7 7"/><path d="M4 20l7-7"/><path d="M14 3l-4 4 7 7 4-4"/><path d="M2 22l8-8"/></svg></span><span id="mine-win-title" data-i18n="mine_window_title">Mine souterraine</span></span>
         
       </div>
       <div id="mine-window-body" class="win-body pw-static-025"></div>
@@ -204,13 +205,13 @@
     
     <div id="win-map" class="dash-win pw-static-027">
       <div class="win-header" data-drag-window="win-map">
-        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span><span id="map-win-title">Carte Kanto</span></span>
+        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span><span id="map-win-title" data-i18n="map_title_name">Carte {region}</span></span>
         <span class="pw-static-028">
           <select id="map-region-select" data-stop-drag="true" data-action="switch-map-region" class="pw-static-029">
-            <option value="kanto">Région Kanto</option>
-            <option value="johto">Région Johto</option>
-            <option value="hoenn" disabled data-force-disabled="true">Région Hoenn (Bientôt)</option>
-            <option value="sinnoh" disabled data-force-disabled="true">Région Sinnoh (Bientôt)</option>
+            <option value="kanto" data-i18n="map_region_kanto">Région Kanto</option>
+            <option value="johto" data-i18n="map_region_johto">Région Johto</option>
+            <option value="hoenn" disabled data-force-disabled="true" data-i18n="map_region_hoenn">Région Hoenn (Bientôt)</option>
+            <option value="sinnoh" disabled data-force-disabled="true" data-i18n="map_region_sinnoh">Région Sinnoh (Bientôt)</option>
           </select>
         </span>
         
@@ -226,14 +227,14 @@
     
     <div id="win-battle" class="dash-win pw-static-031">
       <div class="win-header" data-drag-window="win-battle">
-        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg></span><span id="battle-win-title">Combat en direct</span></span>
+        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg></span><span id="battle-win-title" data-i18n="win_battle">Combat en direct</span></span>
         
       </div>
       <div class="win-body pw-static-032" id="battle-center-panel">
         <div id="battle-idle-screen" class="pw-static-033">
           <div class="pw-static-034"><span class="idle-scene-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/></svg></span></div>
-          <div class="pw-static-035">Exploration au repos</div>
-          <div class="pw-static-036">Déplacez-vous sur une route de la carte et cliquez sur <b>Explorer</b> ou <b>Défier</b> pour lancer un combat en temps réel au centre de l'écran !</div>
+          <div class="pw-static-035" data-i18n="idle_title">Exploration au repos</div>
+          <div class="pw-static-036" data-i18n="idle_desc">Déplacez-vous sur une route de la carte et cliquez sur <b>Explorer</b> ou <b>Défier</b> pour lancer un combat en temps réel au centre de l'écran !</div>
         </div>
 
         <div id="battle-active-scene" class="pw-static-037">
@@ -251,12 +252,10 @@
                   <button data-spd="3" data-action="set-battle-speed" data-speed="3" class="hbtn pw-static-042">x3</button>
                 <button data-spd="10" data-action="set-battle-speed" data-speed="10" class="hbtn speed-x10 pw-static-043">x10</button>
                 </div>
-                <button id="loot-open-btn" class="hbtn pw-static-044" data-action="open-battle-summary">Résumé</button>
+                <button id="loot-open-btn" class="hbtn pw-static-044" data-action="open-battle-summary" data-i18n="loot_open_btn">Résumé</button>
               </div>
             </div>
-            <button id="leave-btn" data-action="leave-battle" class="pw-static-045">
-             Quitter le combat
-            </button>
+            <button id="leave-btn" data-action="leave-battle" class="pw-static-045" data-i18n="leave_battle_btn">Quitter le combat</button>
           </div>
         </div>
       </div>
@@ -268,7 +267,7 @@
     
     <div id="win-shortcuts" class="dash-win pw-static-046">
       <div class="win-header" data-drag-window="win-shortcuts">
-        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></span>Raccourcis</span>
+        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></span><span id="shortcuts-win-title" data-i18n="shortcuts_tab">Raccourcis</span></span>
         
       </div>
       <div id="shortcuts-window-body" class="win-body pw-static-047"></div>
@@ -278,12 +277,12 @@
     
     <div id="win-tabs" class="dash-win pw-static-048">
       <div class="win-header" data-drag-window="win-tabs">
-        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span id="loc-win-title">Lieu</span></span>
+        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span id="loc-win-title" data-i18n="tab_info">Lieu</span></span>
         
       </div>
       <div id="right-panel" class="pw-static-049">
-        <div id="tabs" class="pw-static-050">
-          <div class="tab active" data-action="show-tab" data-tab="info">Lieu</div>
+        <div id="tabs" class="pw-static-050" data-style="display:none;">
+          <button type="button" class="tab active" role="tab" aria-selected="true" data-action="show-tab" data-tab="info" data-i18n="tab_info">Lieu</button>
           </div>
         <div id="tab-content" class="win-body pw-static-051"></div>
       </div>
@@ -291,35 +290,35 @@
 
     <div id="win-training" class="dash-win pw-static-021">
       <div class="win-header" data-drag-window="win-training">
-        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6v12"/><path d="M18 6v12"/><path d="M3 9h6"/><path d="M15 9h6"/><path d="M3 15h6"/><path d="M15 15h6"/><path d="M9 12h6"/></svg></span><span id="training-win-title">Salle d'Entraînement</span></span>
+        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6v12"/><path d="M18 6v12"/><path d="M3 9h6"/><path d="M15 9h6"/><path d="M3 15h6"/><path d="M15 15h6"/><path d="M9 12h6"/></svg></span><span id="training-win-title" data-i18n="training_center_title">Salle d'Entraînement</span></span>
         
       </div>
       <div id="training-window-body" class="win-body pw-static-022"></div>
     </div>
     </div>
 </div>
-<div id="msg-log">Bienvenue dans PokéWorld ! Cliquez sur un lieu adjacent pour vous déplacer.</div>
+<div id="msg-log" data-i18n="welcome_msg">Bienvenue dans PokéWorld ! Cliquez sur un lieu adjacent pour vous déplacer.</div>
 
 
-<div id="unified-selector-modal" class="pw-static-052">
+<div id="unified-selector-modal" class="pw-static-052" role="dialog" aria-modal="true" aria-labelledby="usm-title">
   <div class="pw-static-053">
     <div class="modal-title pw-static-054">
-      <div id="usm-title" class="pw-static-035">Sélection</div>
-      <span class="modal-close pw-static-055" data-action="close-unified-selector">✕</span>
+      <div id="usm-title" class="pw-static-035" data-i18n="usm_selection">Sélection</div>
+      <button type="button" class="modal-close pw-static-055" data-action="close-unified-selector" aria-label="Fermer" data-i18n-aria-label="modal_close_btn">✕</button>
     </div>
     <div class="pw-static-056">
       <div class="pw-static-057">
-        <span class="pw-static-058">Tri :</span>
-        <button class="hbtn usm-sort-btn active" data-sort="id" data-action="sort-unified-grid">Pokédex #</button>
-        <button class="hbtn usm-sort-btn" data-sort="level" data-action="sort-unified-grid">Niveau</button>
-        <button class="hbtn usm-sort-btn" data-sort="iv" data-action="sort-unified-grid">IVs</button>
-        <button class="hbtn usm-sort-btn" data-sort="ev" data-action="sort-unified-grid">EVs</button>
-        <button class="hbtn usm-sort-btn" data-sort="rank" data-action="sort-unified-grid">Rang</button>
-        <button class="hbtn usm-sort-btn" data-sort="name" data-action="sort-unified-grid">Nom</button>
+        <span class="pw-static-058" data-i18n="sort_label">Tri :</span>
+        <button class="hbtn usm-sort-btn active" data-sort="id" data-action="sort-unified-grid" data-i18n="sort_dex_number">Pokédex #</button>
+        <button class="hbtn usm-sort-btn" data-sort="level" data-action="sort-unified-grid" data-i18n="sort_level">Niveau</button>
+        <button class="hbtn usm-sort-btn" data-sort="iv" data-action="sort-unified-grid" data-i18n="sort_iv">IVs</button>
+        <button class="hbtn usm-sort-btn" data-sort="ev" data-action="sort-unified-grid" data-i18n="sort_ev">EVs</button>
+        <button class="hbtn usm-sort-btn" data-sort="rank" data-action="sort-unified-grid" data-i18n="sort_rank">Rang</button>
+        <button class="hbtn usm-sort-btn" data-sort="name" data-action="sort-unified-grid" data-i18n="sort_name">Nom</button>
       </div>
       <div id="usm-filter-panel" class="usm-filter-panel"></div>
       <div class="pw-static-059">
-        <input type="text" id="usm-search" placeholder="Rechercher par nom..." data-action="filter-unified-grid" class="pw-static-060">
+        <input type="text" id="usm-search" placeholder="Rechercher par nom..." data-action="filter-unified-grid" class="pw-static-060" data-i18n-placeholder="search_by_name">
       </div>
     </div>
     <div id="usm-subtab-bar" class="pw-static-061"></div>
@@ -329,16 +328,16 @@
 </div>
 
 
-<div id="battle-summary-modal">
+<div id="battle-summary-modal" role="dialog" aria-modal="true" aria-labelledby="battle-summary-title">
   <div id="battle-summary-inner">
     <div class="modal-title">
-      <div id="battle-summary-title">Butin & résumé de session</div>
-      <span class="modal-close" data-action="close-battle-summary">✕</span>
+      <div id="battle-summary-title" data-i18n="battle_summary_title">Butin & résumé de session</div>
+      <button type="button" class="modal-close" data-action="close-battle-summary" aria-label="Fermer" data-i18n-aria-label="modal_close_btn">✕</button>
     </div>
     <div id="battle-summary-content"></div>
     <div class="pw-static-063">
-      <button id="loot-restart-btn" class="hbtn pw-static-064" data-action="restart-last-battle">Relancer le combat immédiatement</button>
-      <button id="loot-continue-btn" class="hbtn pw-static-065" data-action="close-battle-summary">Continuer sur la route</button>
+      <button id="loot-restart-btn" class="hbtn pw-static-064" data-action="restart-last-battle" data-i18n="loot_restart_btn">Relancer le combat immédiatement</button>
+      <button id="loot-continue-btn" class="hbtn pw-static-065" data-action="close-battle-summary" data-i18n="loot_continue_btn">Continuer sur la route</button>
     </div>
   </div>
 </div>
@@ -347,49 +346,51 @@
 <div id="debug-widget" class="pw-static-066">
   <div id="debug-drawer" class="pw-static-067">
     <div class="pw-static-068">
-      <span>Menu debug</span>
-      <span class="pw-static-069" data-action="toggle-debug-menu">✕</span>
+      <span data-i18n="debug_menu_title_short">Menu debug</span>
+      <button type="button" class="pw-static-069" data-action="toggle-debug-menu" aria-label="Fermer le menu debug">✕</button>
     </div>
-    <button class="hbtn pw-static-070" data-action="debug-give-money">Monnaie +50 000₽</button>
-    <button class="hbtn pw-static-071" data-action="debug-give-candies">Super Bonbons +10</button>
-    <button class="hbtn pw-static-072" data-action="debug-unlock-badges">Débloquer 8 badges Kanto</button>
-    <button class="hbtn pw-static-073" data-action="debug-fill-mine">Énergie mine +100</button>
-    <button class="hbtn pw-static-073" data-action="legacy-call" data-call="debugTimeSkip10Minutes" data-call-args="">AFK +10 min</button>
-  <button id="debug-x10-toggle" class="hbtn pw-static-074" data-action="toggle-battle-speed-x10">Vitesse x10 : <span id="debug-x10-state">OFF</span></button>
+    <button class="hbtn pw-static-070" data-action="debug-give-money" data-i18n="debug_money">Monnaie +50 000₽</button>
+    <button class="hbtn pw-static-071" data-action="debug-give-candies" data-i18n="debug_candies">Super Bonbons +10</button>
+    <button class="hbtn pw-static-072" data-action="debug-unlock-badges" data-i18n="debug_badges">Débloquer 8 badges Kanto</button>
+    <button class="hbtn pw-static-073" data-action="debug-fill-mine" data-i18n="debug_mine">Énergie mine +100</button>
+    <button class="hbtn pw-static-200" data-action="debug-give-ct-cs" data-i18n="debug_ctcs">Obtenir CT/CS +1</button>
+    <button class="hbtn pw-static-073" data-action="legacy-call" data-call="debugTimeSkip10Minutes" data-call-args="" data-i18n="debug_afk">AFK +10 min</button>
+  <button id="debug-x10-toggle" class="hbtn pw-static-074" data-action="toggle-battle-speed-x10"><span data-i18n="debug_speed_x10">Vitesse x10 :</span> <span id="debug-x10-state">OFF</span></button>
   </div>
-  <button id="debug-toggle-btn" data-action="toggle-debug-menu" class="pw-static-075">Debug</button>
+  <button id="debug-toggle-btn" data-action="toggle-debug-menu" class="pw-static-075" data-i18n="debug_toggle_btn">Debug</button>
 </div>
 
 
-<div id="starter-modal" class="pw-static-076">
+<div id="starter-modal" class="pw-static-076" role="dialog" aria-modal="true" aria-labelledby="starter-modal-title">
   <div id="starter-modal-inner" class="pw-static-077">
   </div>
 </div>
 
 
-<div id="poke-modal">
-  <div id="poke-modal-inner" id="poke-modal-content"></div>
+<div id="poke-modal" role="dialog" aria-modal="true" aria-labelledby="poke-modal-title">
+  <div id="poke-modal-inner"></div>
 </div>
 
 
 <div id="notif"></div>
 
 
-<div id="victory-screen">
+<div id="victory-screen" role="dialog" aria-modal="true" aria-labelledby="victory-title">
   <div class="pw-static-078"><span class="victory-icon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M6 2h12v6a6 6 0 01-12 0V2zm-2 1H2v2a4 4 0 004 4V3zm18 0h-2v6a4 4 0 004-4V3zM9 20h6v2H9z"/></svg></span></div>
-  <h2>CHAMPION !</h2>
-  <p id="victory-msg">Vous avez vaincu tous les Dresseurs!</p>
-  <button class="hbtn pw-static-079" data-action="close-victory-screen">Continuer</button>
+  <h2 id="victory-title" data-i18n="victory_title">CHAMPION !</h2>
+  <p id="victory-msg" data-i18n="victory_message">Vous avez vaincu tous les Dresseurs!</p>
+  <button class="hbtn pw-static-079" data-action="close-victory-screen" data-i18n="continue_btn">Continuer</button>
 </div>
 
 
-<div id="quest-capture-screen" class="pw-static-080">
+<div id="quest-capture-screen" class="pw-static-080" role="dialog" aria-modal="true" aria-labelledby="qcap-title">
   <div id="qcap-content" class="pw-static-081">
   </div>
 </div>
   <script src="src/file-preflight.js"></script>
-  <script src="src/legacy-loader.js"></script>
+  <script src="src/loader.js"></script>
   <script src="src/file-postboot.js"></script>
 </body>
 </html>
+
 

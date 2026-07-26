@@ -1,0 +1,13 @@
+node_modules/
+dist/
+src/legacy-es/
+src/legacy/
+src/domain/battle/battle-state.js
+src/domain/battle/damage.js
+src/domain/battle/type-system.js
+src/domain/economy/market.js
+src/domain/game/initial-state.js
+src/domain/mine/mine-data.js
+src/app/import-localization.js
+src/legacy-loader.js
+

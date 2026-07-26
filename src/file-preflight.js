@@ -2,9 +2,19 @@
   const SAVE_KEY = 'pokeworld_save';
   const CURRENT_SAVE_VERSION = 3;
 
-  function validateBrowserSave() {
+  function quarantineBrowserSave(raw, reason) {
+    if (!raw) return null;
     try {
-      const raw = window.localStorage && window.localStorage.getItem(SAVE_KEY);
+      const key = 'pokeworld_save_recovery_' + Date.now();
+      window.localStorage.setItem(key, JSON.stringify({ reason: reason, timestamp: Date.now(), raw: raw }));
+      return key;
+    } catch (_) { return null; }
+  }
+
+  function validateBrowserSave() {
+    let raw = null;
+    try {
+      raw = window.localStorage && window.localStorage.getItem(SAVE_KEY);
       if (!raw) return;
       const data = JSON.parse(raw);
       const compatible = !!data
@@ -17,12 +27,14 @@
         && !!data.G.inventory
         && typeof data.G.inventory === 'object';
       if (!compatible) {
+        quarantineBrowserSave(raw, 'incompatible');
         window.localStorage.removeItem(SAVE_KEY);
-        console.warn('[PokeWorld] Incompatible browser save removed automatically.');
+        console.warn('[PokeWorld] Incompatible browser save moved to recovery storage.');
       }
     } catch (error) {
+      quarantineBrowserSave(raw, 'corrupted-json');
       try { window.localStorage && window.localStorage.removeItem(SAVE_KEY); } catch (_) {}
-      console.warn('[PokeWorld] Corrupted browser save removed automatically.', error);
+      console.warn('[PokeWorld] Corrupted browser save moved to recovery storage.', error);
     }
   }
 
@@ -77,7 +89,30 @@
       }
     }
   };
-  window.PokeWorldCore = { storage, randomInt, chancePercent, clamp };
+  const PokeWorldTimers = (function () {
+    const timers = new Map();
+    return {
+      set: function (name, callback, delay) {
+        if (timers.has(name)) clearInterval(timers.get(name));
+        const id = setInterval(callback, delay);
+        timers.set(name, id);
+        return id;
+      },
+      stop: function (name) {
+        if (!timers.has(name)) return false;
+        clearInterval(timers.get(name));
+        timers.delete(name);
+        return true;
+      },
+      stopAll: function () {
+        Array.from(timers.keys()).forEach(function (name) { this.stop(name); }, this);
+      },
+      has: function (name) { return timers.has(name); },
+      size: function () { return timers.size; }
+    };
+  }());
+  window.PokeWorldCore = { storage, randomInt, chancePercent, clamp, timers: PokeWorldTimers };
+  window.PokeWorldTimers = PokeWorldTimers;
   window.PokeWorldEventBus = { EVENTS, eventBus };
 
   const TYPES = Object.freeze(['Normal','Fire','Water','Grass','Electric','Ice','Fighting','Poison','Ground','Flying','Psychic','Bug','Rock','Ghost','Dragon','Dark','Steel','Fairy']);
@@ -89,7 +124,7 @@
   const MARKET_STOCK = Object.freeze({ kanto: Object.freeze([1,4,7,133,137,106,107,122]), johto: Object.freeze([152,155,158,172,173,174,175,236,196,197,199,213,238,239,240]) });
   function getPokemonPrice(id, pokemonData) { if(id===151) return 100000; if(id===150) return 75000; if([144,145,146].includes(id)) return 50000; const d=pokemonData[id]; if(!d) return 999999; const bst=d[3]+d[4]+d[5]+d[6]; if([1,4,7,152,155,158].includes(id)) return 5000; if([2,5,8].includes(id)) return 8000; if([3,6,9].includes(id)) return 12000; if([138,140].includes(id)) return 8000; if([139,141].includes(id)) return 12000; if([142].includes(id)) return 15000; if([147].includes(id)) return 10000; if([148].includes(id)) return 15000; if([149].includes(id)) return 25000; let mult=12; if(bst>=350) mult=22; else if(bst>=300) mult=18; else if(bst>=250) mult=15; else if(bst>=200) mult=13; return Math.max(1500, Math.floor(bst*mult)); }
   const MINE_ITEMS = Object.freeze([{key:'firestone',name:'firestone',shape:[[1,1,1],[1,1,1],[1,1,1]]},{key:'waterstone',name:'waterstone',shape:[[1,1,1],[1,1,1],[1,1,0]]},{key:'thunderstone',name:'thunderstone',shape:[[0,1,0],[1,1,1],[0,1,0]]},{key:'leafstone',name:'leafstone',shape:[[0,1,0],[1,1,1],[1,1,1]]},{key:'moonstone',name:'moonstone',shape:[[1,1],[1,1]]},{key:'sunstone',name:'sunstone',shape:[[1,0,1],[0,1,0],[1,0,1]]},{key:'nugget',name:'nugget',shape:[[1,1,1],[1,1,1]]},{key:'stardust',name:'stardust',shape:[[1,1],[1,1]]},{key:'helix_fossil',name:'helix_fossil',shape:[[0,1,1,0],[1,1,1,1],[1,1,1,1],[0,1,1,0]]},{key:'dome_fossil',name:'dome_fossil',shape:[[1,1,1],[1,1,1],[0,1,0]]},{key:'old_amber',name:'old_amber',shape:[[1,1],[1,1],[1,1]]},{key:'root_fossil',name:'root_fossil',shape:[[1,1,0],[1,1,1],[0,1,1]]},{key:'claw_fossil',name:'claw_fossil',shape:[[1,0,1],[1,1,1],[1,0,1]]},{key:'fossil',name:'fossil',shape:[[0,1,1,0],[1,1,1,1],[1,1,1,1],[0,1,1,0]]}]);
-  const FOSSIL_REVIVE_MAP = Object.freeze({fossil:138,helix_fossil:138,dome_fossil:140,old_amber:142,root_fossil:138,claw_fossil:140});
+  const FOSSIL_REVIVE_MAP = Object.freeze({fossil:138,helix_fossil:138,dome_fossil:140,old_amber:142,root_fossil:345,claw_fossil:347});
 
   function calculateBaseDamage(params) { return Math.max(1, Math.floor(((2 * params.level / 5 + 2) * params.power * params.attack / params.defense / 50 + 2) * params.stab * params.effectiveness * params.critical * params.random * params.item)); }
   window.PokeWorldDomain = { typeSystem: { TYPES, TYPE_COLORS, TYPE_CHART, typeEffect, effectivenessText }, damage: { calculateBaseDamage }, market: { MARKET_STOCK, getPokemonPrice }, mineData: { MINE_WIDTH: 10, MINE_HEIGHT: 8, MINE_ITEMS }, fossils: { FOSSIL_REVIVE_MAP } };
@@ -100,7 +135,7 @@
     return { location:'pallet', region:'kanto', team:[], inventory:{}, money:2000, badges:[], defeatedChamps:{}, pokedex:{}, stepsLeft:0, starter:false, starterKanto:false, starterJohto:false, regionStarter:{kanto:false,johto:false}, collection:{}, teamSlotItems:[], evolvedSpecies:[], dupeCatches:{}, lang:'fr', storyIdx:0, storyProgress:0, unlockedTalents:{}, activeQuests:[], repeatables:[], visitedMaps:{}, completedQuests:{}, wildWinsByLoc:{}, regionLeagueWon:{}, playTimeMs:0, saveMeta:{}, routeEvents:{ seen:{}, active:null, history:[], cooldowns:{} } };
   }
   function createInitialBattleState() {
-    return { active:false, enemy:null, enemyPoke:null, playerPokeIdx:0, isChamp:false, champId:null, champPokeIdx:0, turnLocked:false, escaped:false, chill:false, playerMods:{atk:1,def:1,spe:1}, enemyMods:{atk:1,def:1,spe:1}, log:[], sessionCatches:[], sessionItems:{}, sessionWins:0, sessionPlayerKOs:0, sessionStartedAt:0, sessionDamageByPokemon:{}, pendingLeave:false, pendingSwitchIdx:null };
+    return { active:false, enemy:null, enemyPoke:null, playerPokeIdx:0, isChamp:false, champId:null, champPokeIdx:0, turnLocked:false, escaped:false, chill:false, playerMods:{atk:1,def:1,spe:1}, enemyMods:{atk:1,def:1,spe:1}, log:[], sessionCatches:[], sessionItems:{}, sessionWins:0, sessionPlayerKOs:0, sessionStartedAt:0, sessionDamageByPokemon:{}, pendingLeave:false, pendingSwitchIdx:null, weather:'none', terrain:'none', weatherTurns:0, terrainTurns:0 };
   }
   window.PokeWorldState = { gameState: createInitialGameState(), createInitialGameState };
   window.PokeWorldBattleState = { battleState: createInitialBattleState(), createInitialBattleState };
@@ -229,6 +264,9 @@
     if (typeof fn === 'function') return fn.apply(window, args);
     return undefined;
   }
+  // Exposé : pwInfoBack / pwBuildInfoPanel sont définis hors de cette IIFE
+  // et en ont besoin (sinon ReferenceError silencieux -> retour contextuel KO).
+  window.callGlobal = callGlobal;
 
   function toggleDebugDrawerDirect() {
     var drawer = document.getElementById('debug-drawer');
@@ -236,9 +274,50 @@
     drawer.style.display = getComputedStyle(drawer).display === 'none' ? 'flex' : 'none';
   }
 
+  function splitLegacyArgs(raw) {
+    var parts = [];
+    var current = '';
+    var quote = null;
+    for (var i = 0; i < raw.length; i++) {
+      var ch = raw[i];
+      var prev = raw[i - 1];
+      if ((ch === '"' || ch === "'") && prev !== '\\') {
+        if (quote === ch) quote = null;
+        else if (!quote) quote = ch;
+        current += ch;
+        continue;
+      }
+      if (ch === ',' && !quote) {
+        parts.push(current.trim());
+        current = '';
+        continue;
+      }
+      current += ch;
+    }
+    if (current.trim()) parts.push(current.trim());
+    return parts;
+  }
+
+  function resolveLegacyArg(token, event, element) {
+    var value = String(token || '').trim();
+    if (!value) return undefined;
+    if (value === 'event') return event;
+    if (value === 'this.value' || value === 'element.value') return element && element.value;
+    if (value === 'this.checked' || value === 'element.checked') return !!(element && element.checked);
+    if (value === 'null') return null;
+    if (value === 'undefined') return undefined;
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    if ((value[0] === "'" && value[value.length - 1] === "'") || (value[0] === '"' && value[value.length - 1] === '"')) {
+      return value.slice(1, -1).replace(/\\'/g, "'").replace(/\\\"/g, '"');
+    }
+    if (/^-?\d+(?:\.\d+)?$/.test(value)) return Number(value);
+    return value;
+  }
+
   function parseLegacyArgs(raw, event, element) {
     if (!raw || !raw.trim()) return [];
-    try { return Function('event', 'element', 'return [' + raw + '];').call(element, event, element); }
+    try { return splitLegacyArgs(raw).map(function (token) { return resolveLegacyArg(token, event, element); }); }
     catch (_) { return []; }
   }
 
@@ -249,7 +328,15 @@
     if (closeButton.closest('#confirm-modal')) return callGlobal('closeConfirm');
     if (closeButton.closest('#fullscreen-panel-modal')) return callGlobal('closeFullscreenPanel');
     const pokeModal = document.getElementById('poke-modal');
-    if (pokeModal && closeButton.closest('#poke-modal')) pokeModal.classList.remove('open');
+    if (pokeModal && closeButton.closest('#poke-modal')) {
+      pokeModal.classList.remove('open');
+      pokeModal.classList.remove('atoll-prep-modal');
+      // Purge de la fiche mémorisée (sinon elle devient une source « fantôme »
+      // pour le prochain panneau d'info, cf. retour utilisateur passe 6).
+      window._pwPokeSheet = null;
+      window._pwInfoSource = null;
+      window._atollPrepOpen = false; // passe 25 : préparation Usine refermée
+    }
     const mapHelp = document.getElementById('map-help-modal');
     if (mapHelp && closeButton.closest('#map-help-modal')) mapHelp.classList.toggle('open');
     return undefined;
@@ -262,10 +349,11 @@
     if (action === 'legacy-call-stop') { event.stopPropagation(); callGlobal.apply(null, [element.dataset.call].concat(parseLegacyArgs(element.dataset.callArgs || '', event, element))); return true; }
     if (action === 'call-close-poke') { callGlobal.apply(null, [element.dataset.call].concat(parseLegacyArgs(element.dataset.callArgs || '', event, element))); var pm = document.getElementById('poke-modal'); if (pm) pm.classList.remove('open'); return true; }
     if (action === 'call-close-selector') { callGlobal.apply(null, [element.dataset.call].concat(parseLegacyArgs(element.dataset.callArgs || '', event, element))); callGlobal('closeUnifiedSelectorModal'); return true; }
-    if (action === 'close-poke-modal') { window._moveInfoContext = element.dataset.resetMoveInfo ? null : window._moveInfoContext; window.boxMoveReplaceSlot = element.dataset.resetBoxMove ? null : window.boxMoveReplaceSlot; window.moveEditorFor = element.dataset.resetMoveEditor ? null : window.moveEditorFor; var pm2 = document.getElementById('poke-modal'); if (pm2) pm2.classList.remove('open'); return true; }
+    if (action === 'close-poke-modal') { window._moveInfoContext = element.dataset.resetMoveInfo ? null : window._moveInfoContext; window.boxMoveReplaceSlot = element.dataset.resetBoxMove ? null : window.boxMoveReplaceSlot; window.moveEditorFor = element.dataset.resetMoveEditor ? null : window.moveEditorFor; window._pwPokeSheet = null; window._pwInfoSource = null; window._atollPrepOpen = false; var pm2 = document.getElementById('poke-modal'); if (pm2) { pm2.classList.remove('open'); pm2.classList.remove('atoll-prep-modal'); } return true; }
     if (action === 'cancel-box-move-replace') { window.boxMoveReplaceSlot = null; callGlobal('openBoxPokeModal', element.dataset.boxId); return true; }
     if (action === 'cancel-move-replace') { window.moveReplaceSlot = null; callGlobal('openPokeModal', Number(element.dataset.teamIndex)); return true; }
     if (action === 'back-to-move-context') { if (window._moveInfoContext && window._moveInfoContext.boxId) callGlobal('openBoxPokeModal', window._moveInfoContext.boxId); else if (window._moveInfoContext && window._moveInfoContext.idx !== null) callGlobal('openPokeModal', window._moveInfoContext.idx); else { var pm3 = document.getElementById('poke-modal'); if (pm3) pm3.classList.remove('open'); } return true; }
+    if (action === 'pw-info-back') { if (typeof window.pwInfoBack === 'function') window.pwInfoBack(); return true; }
     if (action === 'hide-element') { var target = document.getElementById(element.dataset.targetElement); if (target) target.style.display = 'none'; return true; }
     if (action === 'stop-propagation') { event.stopPropagation(); return true; }
     if (action === 'select-self') { if (typeof element.select === 'function') element.select(); return true; }
@@ -279,7 +367,7 @@
       'close-confirm': ['closeConfirm'], 'scroll-to-window': ['scrollToWin', element.dataset.targetWindow], 'set-mobile-view': ['setMobileView', element.dataset.mobileView], 'set-mobile-manage-view': ['setMobileManageView', element.dataset.mobileManageView], 'set-battle-speed': ['setBattleSpeed', Number(element.dataset.speed)],
       'open-battle-summary': ['openBattleSummary', false], 'leave-battle': ['doLeaveBattle'], 'show-tab': ['showTab', element.dataset.tab], 'close-unified-selector': ['closeUnifiedSelectorModal'],
       'sort-unified-grid': ['sortUnifiedGrid', element.dataset.sort], 'close-battle-summary': ['closeBattleSummary'], 'restart-last-battle': ['restartLastBattle'],
-      'debug-give-money': ['debugGiveMoney'], 'debug-give-candies': ['debugGiveCandies'], 'debug-unlock-badges': ['debugUnlockBadges'], 'debug-fill-mine': ['debugFillMine'], 'debug-timeskip-10m': ['debugTimeSkipAfk10Minutes'],
+      'debug-give-money': ['debugGiveMoney'], 'debug-give-ct-cs': ['debugGiveCtCs'], 'debug-give-candies': ['debugGiveCandies'], 'debug-unlock-badges': ['debugUnlockBadges'], 'debug-fill-mine': ['debugFillMine'], 'debug-timeskip-10m': ['debugTimeSkipAfk10Minutes'],
       'toggle-battle-speed-x10': ['toggleBattleSpeedX10'], 'toggle-map-help': ['toggleMapHelp'], 'open-fullscreen-panel': ['openFullscreenPanel', element.dataset.panel], 'open-unified-selector': ['openUnifiedSelectorModal', element.dataset.panel],
       'close-fullscreen-panel': ['closeFullscreenPanel'], 'copy-export-text': ['copyExportText']
     };
@@ -289,12 +377,17 @@
   }
 
   function installRobustClickFallback() {
-    document.addEventListener('click', function (event) {
-      if (event.__pokeWorldHandled) return;
+    function preflightClickHandler(event) {
       const target = event.target && event.target.closest ? event.target : null;
       if (!target) return;
       const closeButton = target.closest('.modal-close');
-      if (closeButton) { closeNearestModal(closeButton); event.__pokeWorldHandled = true; return; }
+      // Une croix qui porte un data-action (ex. pw-info-back) passe par le
+      // système d'actions : elle ramène au menu d'origine au lieu de fermer
+      // aveuglément. Sans data-action, on garde la fermeture générique.
+      if (closeButton) {
+        if (closeButton.dataset && closeButton.dataset.action && runAction(closeButton, event)) { event.__pokeWorldHandled = true; return; }
+        closeNearestModal(closeButton); event.__pokeWorldHandled = true; return;
+      }
       if (target.closest('#debug-toggle-btn') || target.closest('[data-action="toggle-debug-menu"]')) { toggleDebugDrawerDirect(); event.__pokeWorldHandled = true; return; }
       const actionElement = target.closest('[data-action]');
       if (actionElement && runAction(actionElement, event)) { event.__pokeWorldHandled = true; return; }
@@ -308,13 +401,26 @@
           event.__pokeWorldHandled = true;
         }
       }
+    }
+
+    // Passe 16 : filet de sécurité anti « retour en haut » — on fige le scroll
+    // des ancêtres du clic (panneaux, listes, page) avant l'action, puis on le
+    // remet (synchrone + différé) quoi qu'il arrive, même si l'action a
+    // provoqué un re-rendu non couvert par pwSetHtml.
+    document.addEventListener('click', function (event) {
+      if (event.__pokeWorldHandled) return;
+      var _pwSnap = (typeof pwSnapshotScrollAround === 'function') ? pwSnapshotScrollAround(event.target) : null;
+      try { preflightClickHandler(event); }
+      finally { if (_pwSnap && typeof pwRestoreScrollAround === 'function') pwRestoreScrollAround(_pwSnap); }
     }, true);
 
     document.addEventListener('contextmenu', function (event) {
       const target = event.target && event.target.closest ? event.target.closest('[data-context-call]') : null;
       if (!target) return;
       event.preventDefault();
-      callGlobal.apply(null, [target.dataset.contextCall].concat(parseLegacyArgs(target.dataset.contextArgs || '', event, target)));
+      var _pwSnap = (typeof pwSnapshotScrollAround === 'function') ? pwSnapshotScrollAround(target) : null;
+      try { callGlobal.apply(null, [target.dataset.contextCall].concat(parseLegacyArgs(target.dataset.contextArgs || '', event, target))); }
+      finally { if (_pwSnap && typeof pwRestoreScrollAround === 'function') pwRestoreScrollAround(_pwSnap); }
       event.__pokeWorldHandled = true;
     }, true);
 
@@ -332,3 +438,131 @@
   applyMobileView();
 })();
 
+
+
+/* Marque le poke-modal comme "panneau d'information" (attaque/objet/talent)
+   afin que #poke-modal-inner adopte la largeur canonique unifiée. */
+window.pwModalInfo = function pwModalInfo(on) {
+  var m = document.getElementById('poke-modal');
+  if (m) m.classList.toggle('pw-info-modal', !!on);
+};
+
+// ─── Navigation contextuelle des panneaux d'info (attaque / objet / talent) ──
+// Chaque panneau d'info mémorise d'où il a été ouvert ("dernier menu visité")
+// pour que la croix ET le bouton du bas ramènent à ce menu, avec un libellé
+// adapté (ex. « ← Retour au Dictionnaire », « ← Retour au Sac »…).
+window._pwInfoSource = null;
+
+// Mapping panneau plein écran -> clé i18n du bouton retour
+window.PW_FS_BACK_KEYS = {
+  inventory: 'back_to_inventory',
+  shop: 'back_to_shop',
+  market: 'back_to_market',
+  pokedex: 'back_to_pokedex',
+  dictionary: 'back_to_dictionary',
+  guide: 'back_to_guide',
+  atoll: 'back_to_atoll'
+};
+
+// Déduit la source courante au moment où un panneau d'info s'ouvre.
+window.pwInfoCaptureSource = function pwInfoCaptureSource() {
+  // 0) Passe 25 : fiche objet ouverte depuis le sélecteur d'ÉQUIPEMENT
+  // (indication posée par openItemInfoFromEquip juste avant) — le retour doit
+  // rouvrir ce sélecteur, pas le sac global (le sac EST le fsPanel courant).
+  if (window._pwEquipInfoFrom != null) {
+    return { kind: 'equip-select', teamIdx: Number(window._pwEquipInfoFrom) };
+  }
+  // 1) Ouvert depuis une fiche Pokémon (équipe ou box) — uniquement si le
+  // modal est réellement ouvert sur cette fiche. Sinon, après fermeture d'une
+  // fiche box, window._pwPokeSheet resterait « fantôme » et un panneau d'info
+  // ouvert ensuite (ex. depuis la fenêtre d'équipe) ramènerait à tort vers
+  // cette ancienne fiche box (retour utilisateur, passe 6).
+  var pm = document.getElementById('poke-modal');
+  var sheetOpen = !!(pm && pm.classList && pm.classList.contains('open'));
+  if (sheetOpen && window._pwPokeSheet && (window._pwPokeSheet.kind === 'team' || window._pwPokeSheet.kind === 'box')) {
+    return { kind: window._pwPokeSheet.kind, idx: window._pwPokeSheet.idx, boxId: window._pwPokeSheet.boxId };
+  }
+  // 1b) Passe 25 : ouvert depuis le panneau de préparation Usine (atoll) —
+  // le panneau atoll plein écran reste ouvert derrière, mais le retour doit
+  // rouvrir la PRÉPARATION, pas l'atoll générique.
+  if (window._atollPrepOpen) {
+    return { kind: 'atoll-prep' };
+  }
+  // 2) Ouvert depuis un panneau plein écran (dictionnaire, sac, pokédex…)
+  if (window._fsCurrentPanel) {
+    return { kind: 'fs', panel: window._fsCurrentPanel };
+  }
+  return null;
+};
+
+window.pwInfoBackLabel = function pwInfoBackLabel() {
+  var src = window._pwInfoSource;
+  if (!src) return (typeof t === 'function' ? (t('close') || 'Fermer') : 'Fermer');
+  var key = null;
+  if (src.kind === 'fs') key = window.PW_FS_BACK_KEYS[src.panel] || null;
+  // Le retour rouvre la FICHE du Pokémon (pas la fenêtre équipe/box elle-même) :
+  // le libellé doit donc être « ← Retour au Pokémon » (retour utilisateur, passe 6).
+  else if (src.kind === 'team' || src.kind === 'box') key = 'back_to_pokemon';
+  // Passe 25 : fiche objet ouverte depuis le sélecteur d'équipement → retour
+  // au choix d'objet ; panneau d'info ouvert depuis la préparation Usine →
+  // retour à la préparation.
+  else if (src.kind === 'equip-select') key = 'back_to_equip_selector';
+  else if (src.kind === 'atoll-prep') key = 'back_to_atoll_prep';
+  var fallback = '← Retour';
+  if (key && typeof t === 'function') { var v = t(key); if (v && v !== key) return v; }
+  return fallback;
+};
+
+window.pwInfoClearSource = function pwInfoClearSource() {
+  window._pwInfoSource = null;
+};
+
+// ─── Builder commun des panneaux d'info (attaque / objet / talent) ───
+// Structure UNIQUE : en-tête canonique + sections encadrées .pw-panel
+// + rangées .pw-info-row-between + bouton retour contextuel.
+window.pwBuildInfoPanel = function pwBuildInfoPanel(opts) {
+  opts = opts || {};
+  var backLabel = window.pwInfoBackLabel();
+  var html = '<div class="modal-title pw-info-head"><div class="pw-row">'
+    + (opts.icon ? '<span class="pw-info-icon">' + opts.icon + '</span>' : '')
+    + '<div class="pw-info-head-text"><div class="pw-info-name">' + (opts.title || '') + '</div>'
+    + (opts.subtitle ? '<div class="pw-text-sm pw-light1">' + opts.subtitle + '</div>' : '')
+    + '</div></div>'
+    + '<span class="modal-close" data-action="pw-info-back"></span></div>';
+  if (opts.statCards && opts.statCards.length) {
+    html += '<div class="pw-info-stat-cards">' + opts.statCards.map(function (c) {
+      return '<div class="pw-card-dark pw-center"><div class="pw-text-sm pw-light1">' + c.label + '</div><div class="pw-text-lg pw-bold">' + c.value + '</div></div>';
+    }).join('') + '</div>';
+  }
+  (opts.sections || []).forEach(function (s) {
+    html += '<div class="pw-panel pw-info-section">'
+      + (s.title ? '<div class="pw-section-title">' + s.title + '</div>' : '')
+      + '<div class="pw-info-section-body">' + s.body + '</div></div>';
+  });
+  if (opts.rows && opts.rows.length) {
+    html += '<div class="pw-panel pw-info-section">'
+      + (opts.rowsTitle ? '<div class="pw-section-title">' + opts.rowsTitle + '</div>' : '')
+      + opts.rows.map(function (r) {
+          return '<div class="pw-info-row-between"><span class="pw-text-sm pw-light1">' + r.label + '</span><span class="' + (r.valueClass || 'pw-light2 pw-bold') + '">' + r.value + '</span></div>';
+        }).join('')
+      + '</div>';
+  }
+  html += '<div class="pw-flex-center pw-gap-sm pw-info-actions"><button class="hbtn pw-info-back-btn" data-action="pw-info-back">' + backLabel + '</button></div>';
+  return html;
+};
+
+window.pwInfoBack = function pwInfoBack() {
+  var src = window._pwInfoSource;
+  window._pwInfoSource = null;
+  try {
+    if (src && src.kind === 'fs') { callGlobal('openFullscreenPanel', src.panel); return; }
+    if (src && src.kind === 'team' && src.idx != null) { callGlobal('openPokeModal', src.idx); return; }
+    if (src && src.kind === 'box' && src.boxId != null) { callGlobal('openBoxPokeModal', src.boxId); return; }
+    // Passe 25 : retour au sélecteur d'équipement (sac « équiper ») et au
+    // panneau de préparation Usine de l'atoll.
+    if (src && src.kind === 'equip-select' && src.teamIdx != null) { callGlobal('openItemSelector', src.teamIdx); return; }
+    if (src && src.kind === 'atoll-prep') { callGlobal('openAtollFactoryPrep'); return; }
+  } catch (_) {}
+  var pm = document.getElementById('poke-modal');
+  if (pm) pm.classList.remove('open');
+};

@@ -222,9 +222,9 @@ window.L_pokemon_names_fr = [
 "Ursaring",
 "Limagma",
 "Volcaropod",
+"Marcacrin",
 "Cochignon",
 "Corayon",
-"Corsola",
 "Rémoraid",
 "Octillery",
 "Cadoizo",
@@ -255,4 +255,5 @@ window.L_pokemon_names_fr = [
 "Ho-Oh",
 "Celebi",
 ];
+
 

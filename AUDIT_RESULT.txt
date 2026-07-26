@@ -1,0 +1,10 @@
+PokéWorld audit
+==============
+Image references: 1075
+Missing image references: 0
+Inline/data styles still present: 119
+Potential hardcoded static DOM strings: 195
+
+Notes:
+- Remaining inline styles are mostly legacy runtime sizing/progress values; file-postboot sanitizes data-style/data-inline-css at runtime.
+- Remaining hardcoded strings are candidates for future full localization; static shell bindings now cover the main menu, settings, debug and summary UI.

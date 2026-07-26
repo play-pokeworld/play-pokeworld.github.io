@@ -16,3 +16,4 @@ window.L_fr_stats = {
 "stat_hp_short":"PV",
 };
 
+

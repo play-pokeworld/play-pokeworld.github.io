@@ -1,31 +1,33 @@
-const SAVE_KEY = 'pokeworld_save';
-const CURRENT_SAVE_VERSION = 3;
+const DEFAULT_SAVE_KEY = 'pokeworld_save';
 
-export function validateBrowserSave() {
-  try {
-    const raw = window.localStorage?.getItem(SAVE_KEY);
-    if (!raw) return { ok: true, deleted: false, reason: 'empty' };
-
-    const data = JSON.parse(raw);
-    const compatible = !!data
-      && data.version === CURRENT_SAVE_VERSION
-      && !!data.G
-      && typeof data.G === 'object'
-      && Array.isArray(data.G.team)
-      && !!data.G.collection
-      && typeof data.G.collection === 'object'
-      && !!data.G.inventory
-      && typeof data.G.inventory === 'object';
-
-    if (compatible) return { ok: true, deleted: false, reason: 'compatible' };
-
-    window.localStorage.removeItem(SAVE_KEY);
-    console.warn('[PokeWorld] Incompatible browser save removed automatically.');
-    return { ok: false, deleted: true, reason: 'incompatible-schema-or-version' };
-  } catch (error) {
-    try { window.localStorage?.removeItem(SAVE_KEY); } catch (_) {}
-    console.warn('[PokeWorld] Corrupted browser save removed automatically.', error);
-    return { ok: false, deleted: true, reason: 'corrupted-json' };
-  }
+function isCompatibleSave(save) {
+  return !!(
+    save &&
+    typeof save === 'object' &&
+    Number(save.version || 0) >= 3 &&
+    save.G &&
+    typeof save.G === 'object' &&
+    Array.isArray(save.G.team) &&
+    save.G.collection &&
+    typeof save.G.collection === 'object' &&
+    save.G.inventory &&
+    typeof save.G.inventory === 'object'
+  );
 }
 
+export function validateBrowserSave({ key = DEFAULT_SAVE_KEY, storage } = {}) {
+  const store = storage || globalThis.window?.localStorage;
+  if (!store) return { ok: true, skipped: true };
+  const raw = store.getItem(key);
+  if (raw == null || raw === '') return { ok: true, empty: true };
+  try {
+    const save = JSON.parse(raw);
+    if (isCompatibleSave(save)) return { ok: true };
+    throw new Error('Incompatible PokéWorld save structure');
+  } catch (error) {
+    const recoveryKey = `${key}_recovery_${Date.now()}`;
+    try { store.setItem(recoveryKey, raw); } catch (_) {}
+    try { store.removeItem(key); } catch (_) {}
+    return { ok: false, recovered: true, recoveryKey, error };
+  }
+}

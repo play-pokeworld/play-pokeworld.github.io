@@ -610,13 +610,15 @@ body { font-size: 13px; }
 
 
 .dex-entry.unknown .dex-sprite { background: transparent; }
+/* Silhouettes en pur CSS : évite filter:url(#id) qui, en file://, force le
+   chargement du document lui-même ("Unsafe attempt to load URL ..."). */
 .dex-entry.unknown .dex-sprite img {
-  filter: url(#silhouette-filter);
-  opacity: 1;
+  filter: brightness(0) saturate(0.25);
+  opacity: 0.98;
 }
 
 .dex-entry.seen .dex-sprite img {
-  filter: url(#silhouette-filter-light);
+  filter: brightness(0.42) saturate(0);
   opacity: 1;
 }
 
@@ -796,7 +798,7 @@ body { font-size: 13px; }
 .legend-swatch { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; border: 2px solid var(--dark1); }
 
 
-#notif { position: fixed; top: 20px; left: 20px; background: var(--green); color: white; padding: 12px 18px; border-radius: 8px; font-size: 13px; z-index: 1000; display: none; max-width: 320px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+#notif { position: fixed; top: 20px; left: 20px; background: var(--green); color: white; padding: 12px 18px; border-radius: 8px; font-size: 13px; z-index: 99999; display: none; max-width: 320px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
 #msg-log { display: none; }
 #victory-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; flex-direction: column; }
 #victory-screen.open { display: flex; }
@@ -1286,3 +1288,164 @@ body, .hbtn, .tab, .mob-btn, .action-btn .ab-label,
   line-height: 1.2;
 }
 
+select, option {
+  background-color: #0c0a09 !important;
+  color: var(--light2) !important;
+  font-family: 'Winky Sans', 'Segoe UI', system-ui, sans-serif !important;
+}
+
+.management-content, .upgrade-card, .hatchery-auto-layout, .hatchery-slot-card {
+  font-family: 'Winky Sans', 'Segoe UI', system-ui, sans-serif !important;
+}
+
+
+
+/* PokeChill-style item effect box */
+.item-effect-box {
+  padding: 10px 12px;
+  background: var(--dark3);
+  border-radius: 8px;
+  border: 1px solid rgba(236,222,183,0.12);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--light2);
+}
+.item-effect-box .type-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  margin: 0 2px;
+  vertical-align: middle;
+}
+
+/* PokeChill-style status/weather badges */
+[data-buff] > span {
+  display: inline-block !important;
+  padding: 0.1rem 0.7rem !important;
+  border-radius: 0.2rem !important;
+  font-size: 1.1rem !important;
+  width: auto !important;
+  color: white !important;
+  cursor: help !important;
+}
+.poke-status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+.poke-weather-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* PokeChill-style weather badges for battle display */
+.poke-weather-badge,
+[data-buff="sunny"] span, [data-buff="rainy"] span,
+[data-buff="sandstorm"] span, [data-buff="hail"] span,
+[data-buff="electricTerrain"] span, [data-buff="grassyTerrain"] span,
+[data-buff="mistyTerrain"] span {
+  display: inline-block !important;
+  padding: 0.15rem 0.8rem !important;
+  border-radius: 0.25rem !important;
+  font-size: 1rem !important;
+  font-weight: bold !important;
+  color: white !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
+  line-height: 1.4 !important;
+}
+[data-buff="burn"] span { background: #FBA64C !important; }
+[data-buff="freeze"] span { background: #76D1C1 !important; }
+[data-buff="paralysis"] span { background: #F2D94E !important; color: #222 !important; }
+[data-buff="poisoned"] span { background: #B763CF !important; }
+[data-buff="sleep"] span { background: #A0A29F !important; }
+[data-buff="confused"] span { background: #FA8582 !important; }
+[data-buff="sunny"] span { background: #FBA64C !important; }
+[data-buff="rainy"] span { background: #539DDF !important; }
+[data-buff="sandstorm"] span { background: #DA7C4D !important; }
+[data-buff="hail"] span { background: #76D1C1 !important; }
+[data-buff="electricTerrain"] span { background: #F2D94E !important; color: #222 !important; }
+[data-buff="grassyTerrain"] span { background: #60BE58 !important; }
+[data-buff="mistyTerrain"] span { background: #EF90E6 !important; }
+
+/* Weather label for battle info */
+.weather-indicator, .terrain-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+.weather-indicator.sunny { background: #FBA64C; }
+.weather-indicator.rainy { background: #539DDF; }
+.weather-indicator.sandstorm { background: #DA7C4D; }
+.weather-indicator.hail { background: #76D1C1; }
+.terrain-indicator.electric { background: #F2D94E; color: #222; }
+.terrain-indicator.grassy { background: #60BE58; }
+.terrain-indicator.misty { background: #EF90E6; }
+
+/* Fix dictionary type badge colors */
+.dict-entry .type-badge {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 8px !important;
+  font-size: 10px !important;
+  font-weight: bold !important;
+  color: white !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
+  flex: none !important;
+}
+.type-electric.type-badge { color: #222 !important; }
+.type-normal.type-badge { color: #222 !important; }
+
+.dict-entry .type-badge {
+  width: 42px !important;
+  height: 42px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 8px !important;
+  font-size: 10px !important;
+  font-weight: bold !important;
+  color: white !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
+  flex: none !important;
+  background: inherit !important;
+}
+.dict-entry .type-badge.type-fire { background: #FBA64C !important; }
+.dict-entry .type-badge.type-water { background: #539DDF !important; }
+.dict-entry .type-badge.type-grass { background: #60BE58 !important; }
+.dict-entry .type-badge.type-electric { background: #F2D94E !important; color: #222 !important; }
+.dict-entry .type-badge.type-ice { background: #76D1C1 !important; }
+.dict-entry .type-badge.type-fighting { background: #D3425F !important; }
+.dict-entry .type-badge.type-poison { background: #B763CF !important; }
+.dict-entry .type-badge.type-ground { background: #DA7C4D !important; }
+.dict-entry .type-badge.type-flying { background: #A1BBEC !important; }
+.dict-entry .type-badge.type-psychic { background: #FA8582 !important; }
+.dict-entry .type-badge.type-bug { background: #92BD2D !important; }
+.dict-entry .type-badge.type-rock { background: #C9BC8A !important; }
+.dict-entry .type-badge.type-ghost { background: #5F6DBC !important; }
+.dict-entry .type-badge.type-dragon { background: #0C6AC8 !important; }
+.dict-entry .type-badge.type-dark { background: #595761 !important; }
+.dict-entry .type-badge.type-steel { background: #5795A3 !important; }
+.dict-entry .type-badge.type-fairy { background: #EF90E6 !important; }
+.dict-entry .type-badge.type-normal { background: #A0A29F !important; color: #222 !important; }

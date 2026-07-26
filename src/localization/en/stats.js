@@ -16,3 +16,4 @@ window.L_en_stats = {
 "stat_hp_short":"HP",
 };
 
+

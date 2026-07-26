@@ -1,0 +1,241 @@
+function nodeDims(loc, id){
+ if(loc.w && loc.h) return {w:loc.w, h:loc.h}; 
+ if(loc.type==='town') return {w:96, h:48};
+ if(loc.type==='dungeon') return {w:82, h:48};
+ if(loc.type==='sea') return {w:120, h:44};
+ 
+ const reg = getCurrentRegionLocs();
+ const conns = (loc.conn||[]).map(c=>reg[c]).filter(Boolean);
+ if(conns.length){
+ const ax = conns.reduce((s,c)=>s+c.x,0)/conns.length;
+ const ay = conns.reduce((s,c)=>s+c.y,0)/conns.length;
+ if(Math.abs(ax-loc.x) >= Math.abs(ay-loc.y)) return {w:134, h:46};
+ return {w:46, h:134};
+ }
+ return {w:134, h:46};
+}
+
+
+function _regLocs(){ return getCurrentRegionLocs(); }
+
+function _startNodes(){ return (G.region==='johto') ? ['newbark'] : ['pallet']; }
+
+function regionOfLoc(id){
+ if(LOCS_JOHTO && LOCS_JOHTO[id]) return 'johto';
+ return 'kanto';
+}
+const KANTO_BADGES = ['brock','misty','surge','erika','koga','sabrina','blaine','giovanni'];
+const JOHTO_BADGES = ['falkner','bugsy','whitney','morty','chuck','jasmine','pryce','clair'];
+function regionBadgeCount(region){
+ const ids = region === 'johto' ? JOHTO_BADGES : KANTO_BADGES;
+ return ids.filter(b => G.badges && G.badges.includes(b)).length;
+}
+function locBadgeCount(id){ return regionBadgeCount(regionOfLoc(id)); }
+function hasQuestDone(id){ return !!(G.completedQuests && G.completedQuests[id]); }
+function hasRequiredItem(key){ return !!(key && G.inventory && G.inventory[key] > 0); }
+const EXTRA_LOC_GATES = {
+ route12: {quest:52, item:'pokeflute', label:(typeof t==='function'?t('quest_pokeflute'):(typeof t==='function'?t('poke_flute_snorlax'):'Poké Flute / Snorlax'))},
+ route16: {quest:52, item:'pokeflute', label:(typeof t==='function'?t('poke_flute_snorlax'):'Poké Flute / Snorlax')},
+ ceruleancave: {champion:true, label:(typeof t==='function'?t('quest_league'):(typeof t==='function'?t('pokemon_league'):'Pokémon League'))},
+ mtsilver: {champion:true, label:(typeof t==='function'?t('pokemon_league'):'Pokémon League')},
+ tohjofalls: {champion:true, label:(typeof t==='function'?t('pokemon_league'):'Pokémon League')}
+};
+function locGateStatus(id){
+ const loc = _regLocs()[id] || getLocObj(id);
+ if(!loc) return {ok:false, reason:'missing'};
+ const need = loc.badgeReq || 0;
+ const have = locBadgeCount(id);
+ if(need > have) return {ok:false, reason:'badge', need, have};
+ const gate = EXTRA_LOC_GATES[id];
+ if(gate){
+   if(gate.item && !hasRequiredItem(gate.item)) return {ok:false, reason:'item', item:gate.item, label:gate.label};
+   if(gate.quest && !hasQuestDone(gate.quest)) return {ok:false, reason:'quest', quest:gate.quest, label:gate.label};
+   if(gate.champion && !G.championTitle) return {ok:false, reason:'champion', label:gate.label};
+ }
+ return {ok:true};
+}
+function locGateSatisfied(id){ return locGateStatus(id).ok; }
+function locGateMessage(id){
+ const st = locGateStatus(id);
+ if(st.ok) return '';
+ if(st.reason === 'badge') return tr('requires_badges', {need:st.need, have:st.have});
+ if(st.reason === 'item') return (typeof tr==='function' ? tr('item_required', {item:getItemName(st.item)}) : ('Objet requis : ' + getItemName(st.item)));
+ if(st.reason === 'quest') return (typeof t==='function'?t('quest_required'):'Quête requise : ') + (st.label || '');
+ if(st.reason === 'champion') return (typeof t==='function'?t('requires_league_win'):'Requiert la victoire à la Ligue Pokémon');
+ return tr('location_not_reachable', {location:getLocName(id)});
+}
+
+function locCleared(id){
+ const loc = _regLocs()[id]; if(!loc) return false;
+ const need = loc.minWins || 0;
+ if(need <= 0) return true;
+ const idsToCheck = (typeof getLinkedRouteIds === 'function') ? getLinkedRouteIds(id) : [id];
+ let wins = 0;
+ for(const locId of idsToCheck){ wins += ((G.wildWinsByLoc||{})[locId])||0; }
+ return wins >= need;
+}
+function locReachable(id, _seen){
+ const loc = _regLocs()[id]; if(!loc) return false;
+ if(id === G.location) return true;
+ if(_startNodes().indexOf(id) >= 0) return true;
+ if(!locGateSatisfied(id)) return false;
+ _seen = _seen || new Set();
+ if(_seen.has(id)) return false;
+ _seen.add(id);
+ const conn = loc.conn || [];
+ for(let i=0;i<conn.length;i++){
+ const n = conn[i];
+ if(locReachable(n, new Set(_seen)) && locCleared(n)) return true;
+ }
+ return false;
+}
+
+function canUnlockDirectlyFrom(fromId, targetId){
+ if(!fromId || !targetId || fromId === targetId) return false;
+ const locs = _regLocs();
+ const target = locs[targetId];
+ if(!locs[fromId] || !target) return false;
+ return zonesUnlockedByClearing(fromId).indexOf(targetId) >= 0;
+}
+function zonesUnlockedByClearing(id){
+ const locs = _regLocs();
+ const loc = locs[id];
+ if(!loc || (loc.minWins||0) <= 0 || locCleared(id) || !locReachable(id)) return [];
+ const before = new Set(Object.keys(locs).filter(locId => locReachable(locId)));
+ if(!G.wildWinsByLoc) G.wildWinsByLoc = {};
+ const oldWins = G.wildWinsByLoc[id] || 0;
+ G.wildWinsByLoc[id] = Math.max(oldWins, loc.minWins || 0);
+ const after = Object.keys(locs).filter(locId => locReachable(locId));
+ if(oldWins > 0) G.wildWinsByLoc[id] = oldWins;
+ else delete G.wildWinsByLoc[id];
+ return after.filter(locId => locId !== id && !before.has(locId));
+}
+
+function blockingNeighbor(id){
+ const loc = _regLocs()[id]; if(!loc) return null;
+ if(!locGateSatisfied(id)) return null;
+ const conn = loc.conn || [];
+ for(let i=0;i<conn.length;i++){
+ const n = conn[i];
+ if(locReachable(n) && !locCleared(n)) return n;
+ }
+ return null;
+}
+
+function recomputeUnlocks(){
+ if(!G) return;
+ if(!G.unlockedLocs || typeof G.unlockedLocs!=='object') G.unlockedLocs={};
+ const locs=_regLocs();
+ for(const id in locs){ if(locReachable(id)) G.unlockedLocs[id]=true; }
+}
+
+function isLocUnlocked(id){
+ if(!G) return true;
+ if(!locGateSatisfied(id)) return false;
+ if(id==='route1'){
+ const hasKantoStarter = !!(G.starterKanto || G.starter || (G.regionStarter && G.regionStarter.kanto));
+ if(!hasKantoStarter) return false;
+ }
+ if(id==='jroute29'){
+ const hasJohtoStarter = !!(G.starterJohto || (G.regionStarter && G.regionStarter.johto));
+ if(!hasJohtoStarter) return false;
+ }
+ if(id===G.location) return true;
+ if(_startNodes().indexOf(id) >= 0) return true;
+ if(G.unlockedLocs && G.unlockedLocs[id]) return true;
+ return locReachable(id);
+}
+
+
+function hatcheryUnlocked(){
+ return isLocUnlocked('fuchsia') || isLocUnlocked('jroute34');
+}
+
+
+function trainingUnlocked(){
+ return !!(G.badges && G.badges.includes('surge'));
+}
+
+
+function mineUnlocked(){ return isLocUnlocked('diglettscave'); }
+function updateFeatureWindows(){
+ const hWin = document.getElementById('win-hatchery');
+ if(hWin) hWin.style.display = hatcheryUnlocked() ? 'flex' : 'none';
+ const tWin = document.getElementById('win-training');
+ if(tWin) tWin.style.display = trainingUnlocked() ? 'flex' : 'none';
+ const mWin = document.getElementById('win-mine');
+ if(mWin) mWin.style.display = mineUnlocked() ? 'flex' : 'none';
+ 
+}
+
+
+function mapNodeState(id){
+ const loc=getLocObj(id);
+ if(!loc) return {locked:false, color:'rgba(58,63,68,0.55)', kind:'locked'};
+ const badgeReq=loc.badgeReq||0;
+ const storyReq=loc.storyReq||0;
+ if(storyReq>(G.storyIdx||0) || !isLocUnlocked(id)) return {locked:true, color:'rgba(58,63,68,0.55)', kind:'locked'};
+ const hasQuest = (G.activeQuests||[]).some(i=>{
+ const def = i.cat==='main' ? getMainQuestDef(i.qid) : (i.cat==='side' ? SIDE_QUESTS[i.qid] : null);
+ return def && def.loc && locGroup(def.loc)===locGroup(id);
+ });
+ if(hasQuest) return {locked:false, color:'rgba(31,138,59,0.55)', kind:'quest'};
+ const roam=getRoamingLegendaryForRoute(id);
+ if(roam && !speciesOwned(roam)) return {locked:false, color:'rgba(123,31,162,0.55)', kind:'roaming'};
+ const comp=locCompletion(id);
+ if(comp && comp.caught < comp.total) return {locked:false, color:'rgba(21,101,194,0.55)', kind:'catch'};
+ if(comp && comp.ids && comp.ids.some(sp=>!isSpeciesShiny(sp))) return {locked:false, color:'rgba(201,160,0,0.60)', kind:'shiny'};
+ return {locked:false, color:'rgba(255,255,255,0.10)', kind:'done'};
+}
+
+
+function showMapLegend(){
+  const legendHTML = `
+    <div class="pw-legend-box">
+      <div class="pw-legend-title">${t('map_legend_title')}</div>
+      <div class="pw-legend-list">
+        <div class="pw-row">
+          <div class="pw-dot-visited"></div>
+          <span class="pw-legend-label">${t('current_location')}</span>
+        </div>
+        <div class="pw-row">
+          <div class="pw-dot-reachable"></div>
+          <span class="pw-legend-label">${t('reachable_location')}</span>
+        </div>
+        <div class="pw-row">
+          <div class="pw-dot-locked"></div>
+          <span class="pw-legend-label">${t('locked_location')}</span>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  modal.innerHTML = legendHTML;
+  modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
+  document.body.appendChild(modal);
+}
+
+
+// --- Migrated to ES module, globals exposed ---
+if (typeof nodeDims !== 'undefined' && typeof window !== 'undefined') window.nodeDims = nodeDims;
+if (typeof _regLocs !== 'undefined' && typeof window !== 'undefined') window._regLocs = _regLocs;
+if (typeof _startNodes !== 'undefined' && typeof window !== 'undefined') window._startNodes = _startNodes;
+if (typeof regionBadgeCount !== 'undefined' && typeof window !== 'undefined') window.regionBadgeCount = regionBadgeCount;
+if (typeof locGateStatus !== 'undefined' && typeof window !== 'undefined') window.locGateStatus = locGateStatus;
+if (typeof locGateMessage !== 'undefined' && typeof window !== 'undefined') window.locGateMessage = locGateMessage;
+if (typeof zonesUnlockedByClearing !== 'undefined' && typeof window !== 'undefined') window.zonesUnlockedByClearing = zonesUnlockedByClearing;
+if (typeof locCleared !== 'undefined' && typeof window !== 'undefined') window.locCleared = locCleared;
+if (typeof locReachable !== 'undefined' && typeof window !== 'undefined') window.locReachable = locReachable;
+if (typeof blockingNeighbor !== 'undefined' && typeof window !== 'undefined') window.blockingNeighbor = blockingNeighbor;
+if (typeof recomputeUnlocks !== 'undefined' && typeof window !== 'undefined') window.recomputeUnlocks = recomputeUnlocks;
+if (typeof isLocUnlocked !== 'undefined' && typeof window !== 'undefined') window.isLocUnlocked = isLocUnlocked;
+if (typeof hatcheryUnlocked !== 'undefined' && typeof window !== 'undefined') window.hatcheryUnlocked = hatcheryUnlocked;
+if (typeof trainingUnlocked !== 'undefined' && typeof window !== 'undefined') window.trainingUnlocked = trainingUnlocked;
+if (typeof mineUnlocked !== 'undefined' && typeof window !== 'undefined') window.mineUnlocked = mineUnlocked;
+if (typeof updateFeatureWindows !== 'undefined' && typeof window !== 'undefined') window.updateFeatureWindows = updateFeatureWindows;
+if (typeof mapNodeState !== 'undefined' && typeof window !== 'undefined') window.mapNodeState = mapNodeState;
+if (typeof showMapLegend !== 'undefined' && typeof window !== 'undefined') window.showMapLegend = showMapLegend;
+

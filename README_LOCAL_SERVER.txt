@@ -1,8 +1,21 @@
-To avoid file:// browser security warnings, launch the game with:
+═══════════════════════════════════════════
+  POKÉWORLD — Démarrer le jeu
+═══════════════════════════════════════════
 
-- Windows: double-click launch_local_server.bat
+LE JEU DOIT ÊTRE SERVI VIA UN SERVEUR HTTP LOCAL.
+Ne pas ouvrir index.html directement en file://.
 
-This starts a local web server on:
-http://127.0.0.1:8000/
+MÉTHODE 1 : DOUBLE-CLIC (Windows)
+  - Lance launch_local_server.bat
+  - Ouvre http://localhost:8080 dans ton navigateur
 
-If you open index.html directly, the game should still work, but some browsers may report file:// security/origin warnings.
+MÉTHODE 2 : PYTHON (tout OS)
+  - Ouvre un terminal dans ce dossier
+  - Exécute : python3 -m http.server 8080
+  - Ouvre http://localhost:8080
+
+MÉTHODE 3 : VS CODE
+  - Installe l'extension "Live Server"
+  - Clic droit sur index.html → "Open with Live Server"
+
+Pour arreter le serveur : Ctrl+C dans le terminal

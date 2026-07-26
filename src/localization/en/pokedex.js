@@ -7,3 +7,4 @@ window.L_en_pokedex = {
 "dex_shiny":"Shiny:",
 };
 
+
