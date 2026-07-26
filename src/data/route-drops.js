@@ -1,11 +1,11 @@
 const ROUTE_DROPS = {
- pallet:['oran_berry'],
- route1:['oran_berry','cheri_berry'], route22:['oran_berry','cheri_berry'],
- route2:['oran_berry','sitrus_berry'], route3:['sitrus_berry','prine_berry'],
- route9:['sitrus_berry','prine_berry'], route24:['oran_berry','cheri_berry'],
- route12:['prine_berry','cheri_berry'], route16:['sitrus_berry','prine_berry'],
- route19:['oran_berry','cheri_berry'], route21:['oran_berry','sitrus_berry'],
- route23:['sitrus_berry','prine_berry','cheri_berry'],
+ pallet:[],
+ route1:[], route22:[],
+ route2:[], route3:['prine_berry'],
+ route9:['prine_berry'], route24:[],
+ route12:['prine_berry',], route16:['prine_berry'],
+ route19:[], route21:[],
+ route23:['prine_berry',],
 };
 
 

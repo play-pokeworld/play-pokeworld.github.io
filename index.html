@@ -121,10 +121,11 @@
       </div>
       <input type="file" id="import-file" accept=".json,application/json" class="pw-static-010" data-action="import-save-file">
       <div class="settings-row" id="delete-row">
-        <button class="hbtn pw-static-011" data-action="confirm-delete" data-i18n="delete_save_btn">Supprimer la sauvegarde</button>
+        <button class="hbtn pw-static-011 pw-btn-danger" data-action="confirm-delete" data-i18n="delete_save_btn">Supprimer la sauvegarde</button>
       </div>
-      <div class="settings-row pw-static-012" id="delete-confirm-row">
-        <button class="hbtn pw-static-011" data-action="do-delete" data-i18n="confirm_delete_btn">Confirmer la suppression</button>
+      <div class="settings-row pw-static-012 delete-danger-zone" id="delete-confirm-row">
+        <span class="delete-warn" data-i18n="delete_save_warning">⚠️ Cette action est irréversible : toute ta progression sera effacée.</span>
+        <button class="hbtn pw-static-011 pw-btn-danger" data-action="do-delete" data-i18n="confirm_delete_btn">Confirmer la suppression</button>
         <button class="hbtn" data-action="cancel-delete" data-i18n="cancel_btn">Annuler</button>
       </div>
     </div>

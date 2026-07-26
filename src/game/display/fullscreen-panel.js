@@ -21,21 +21,11 @@ function _dictPokemonList(){
  Object.entries(G.collection||{}).forEach(([k,p])=>{ if(p) out.push({p, loc:t('box_pc_location'), ref:k}); });
  return out;
 }
+// Passe 26 : délègue à getItemSourceList (couvre routes, boutiques — base +
+// CT/CS —, mine, atoll, quêtes, labo fossile). Conservé pour compatibilité.
 function findItemSources(key){
- const sources=[];
- const add=(label)=>{ if(label && !sources.includes(label)) sources.push(label); };
- for(const [locId,drops] of Object.entries(ROUTE_DROPS||{})) if((drops||[]).includes(key)) add(getLocName(locId));
- for(const [shopId,shop] of Object.entries(SHOPS||{})){
-   const items = shop.items || shop.stock || [];
-   if(Array.isArray(items) && items.some(it => (Array.isArray(it) ? it[0] : (it.key || it.id || it)) === key)) add(getShopName(shopId));
- }
- if(typeof MINE_ITEMS !== 'undefined' && MINE_ITEMS.some(it=>it.key===key)) add(t('mine_title')||'Mine');
- for(const q of (STORY_QUESTS||[])) if(q.rewardItems && q.rewardItems[key]) add(t('dict_main_quest')||'Main quest');
- if(typeof SIDE_QUESTS !== 'undefined') for(const q of Object.values(SIDE_QUESTS||{})) if(q.rewardItems && q.rewardItems[key]) add(t('dict_side_quest')||'Side quest');
- for(const r of (G.repeatables||[])) if(r.def && r.def.rewardItems && r.def.rewardItems[key]) add(t('dict_repeatable_quest')||'Repeatable quest');
- if(ITEMS[key] && ITEMS[key].type === 'fossil') add(t('fossil_lab')||'Fossil Lab');
- if(!sources.length) add(t('dict_unknown_source')||'Source not listed');
- return sources;
+ const list = (typeof getItemSourceList === 'function') ? getItemSourceList(key) : [];
+ return list.length ? list : [t('dict_unknown_source')||'Source not listed'];
 }
 // Passe 24 : enrichit une description (badges couleur météo + statuts).
 function _enrichDesc(d){
@@ -54,21 +44,33 @@ function openAbilityInfo(key){
      if(PD[id] && getSpeciesTalents(id).includes(key)) species.push(id);
    }
  }
+ // Passe 26 : porteurs en TALENT CACHÉ aussi (atelier = seule voie pour le
+ // joueur ; la liste répond à « quel Pokémon peut l'avoir »).
+ const hiddenCarriers = [];
+ if(typeof POKEMON_TALENTS !== 'undefined' && POKEMON_TALENTS){
+   const needle = String(key || '').toLowerCase();
+   for(const [nid, rec] of Object.entries(POKEMON_TALENTS)){
+     if(rec && rec.hiddenAbility && String(rec.hiddenAbility).toLowerCase() === needle && PD && PD[Number(nid)]) hiddenCarriers.push(Number(nid));
+   }
+ }
  if(typeof window.pwModalInfo==='function') window.pwModalInfo(true);
  // Mémorise d'où vient ce panneau (dictionnaire, fiche, sac…) pour le bouton retour
  window._pwInfoSource = (typeof window.pwInfoCaptureSource === 'function') ? window.pwInfoCaptureSource() : null;
  const _abilityChips = species.length
    ? species.map(id=>`<span class="dict-chip">#${id} ${getPokeName(id)}</span>`).join('')
    : `<span class="dict-muted">${t('dict_no_pokemon_listed')||'No Pokémon listed.'}</span>`;
+ const _hiddenChips = hiddenCarriers.map(id=>`<span class="dict-chip dict-chip-hidden">#${id} ${getPokeName(id)}</span>`).join('');
  if (typeof window.pwBuildInfoPanel === 'function') {
+   const _sections = [
+     { title: t('description')||'Description', body: `<div class="pw-text-sm pw-light1">${_enrichDesc(getTalentDesc(key))}</div>` },
+     { title: t('affected_pokemon_lbl')||t('dict_affected_pokemon')||'Affected Pokémon', body: `<div class="dict-chip-list">${_abilityChips}</div>` }
+   ];
+   if(hiddenCarriers.length) _sections.push({ title: t('hidden_carriers')||'Talent caché de…', body: `<div class="dict-chip-list">${_hiddenChips}</div>` });
    inner.innerHTML = window.pwBuildInfoPanel({
      icon: (typeof getIcon==='function'?getIcon('training',16):''),
      title: getTalentName(key),
      subtitle: getRarityLabel(info.rarity),
-     sections: [
-       { title: t('description')||'Description', body: `<div class="pw-text-sm pw-light1">${_enrichDesc(getTalentDesc(key))}</div>` },
-       { title: t('affected_pokemon_lbl')||t('dict_affected_pokemon')||'Affected Pokémon', body: `<div class="dict-chip-list">${_abilityChips}</div>` }
-     ],
+     sections: _sections,
      rows: [{ label: t('dict_rarity')||'Rareté', value: getRarityLabel(info.rarity) }]
    });
  } else {
@@ -87,9 +89,10 @@ function renderDictionary(el){
    if(q) keys = keys.filter(k => (getItemName(k)+' '+k+' '+getItemDesc(k)).toLowerCase().includes(q));
    html += `<div class="dict-grid">${keys.map(k=>{
      const owned = (G.inventory&&G.inventory[k]>0);
-     const sources = findItemSources(k);
+     // Passe 26 : les lieux/sources ne s'affichent plus dans la case — ils
+     // sont listés dans le panneau d'information de l'objet (clic).
      return `<div class="dict-entry ${owned?'owned':''}" data-action="legacy-call" data-call="openItemInfo" data-call-args="'${k}'">
-       <div class="dict-entry-icon">${itemSpriteHtml(k,32)}</div><div><b>${getItemName(k)}</b><span>${owned?tr('dict_owned_qty',{count:G.inventory[k]}):(t('dict_not_owned')||'Not owned')}</span><small>${sources.slice(0,3).join(' · ')}${sources.length>3?'…':''}</small></div>
+       <div class="dict-entry-icon">${itemSpriteHtml(k,32)}</div><div><b>${getItemName(k)}</b><span>${owned?tr('dict_owned_qty',{count:G.inventory[k]}):(t('dict_not_owned')||'Not owned')}</span></div>
      </div>`;
    }).join('') || `<div class="dict-muted">${t('dict_no_results')||'No results.'}</div>`}</div>`;
   } else if(tab === 'moves'){
@@ -117,8 +120,10 @@ function renderDictionary(el){
     html += `<div class="dict-grid">${keys.map(k=>{
       const mv = MOVES[k];
       const users = mons.filter(o=>(o.p.moves||[]).some(m=>m.id===k));
+      // Passe 26 : la liste des Pokémon pouvant apprendre l'attaque vit dans
+      // son panneau d'information — la case reste épurée (compteur conservé).
       return `<div class="dict-entry ${users.length?'owned':''}" data-type-color="${TYPE_COLORS[mv?.type||'']||'#555'}" data-action="legacy-call" data-call="openMoveInfo" data-call-args="'${k}'">
-        <div class="dict-entry-icon type-badge ${typeClass(mv?.type||'?')}">${(typeof getTypeName==='function'?getTypeName(mv?.type):(mv?.type))||'?'}</div><div><b>${getMoveName(k)}</b><span>${users.length?tr('dict_move_users',{count:users.length}):(t('dict_move_users_none')||'No Pokémon know this move')}</span><small>${users.slice(0,4).map(u=>typeof getPokeName==='function'?getPokeName(u.p.id):u.p.name).join(' · ')}${users.length>4?'…':''}</small></div>
+        <div class="dict-entry-icon type-badge ${typeClass(mv?.type||'?')}">${(typeof getTypeName==='function'?getTypeName(mv?.type):(mv?.type))||'?'}</div><div><b>${getMoveName(k)}</b><span>${users.length?tr('dict_move_users',{count:users.length}):(t('dict_move_users_none')||'No Pokémon know this move')}</span></div>
       </div>`;
     }).join('') || `<div class="dict-muted">${t('dict_no_results')||'No results.'}</div>`}</div>`;
   } else {
@@ -139,8 +144,10 @@ function renderDictionary(el){
 
     html += `<div class="dict-grid">${keys.map(k=>{
       const info=(typeof getTalentRecord==='function'?getTalentRecord(k):TALENTS_FULL[k])||{rarity:1}; const users=mons.filter(o=>o.p.talent===k);
+      // Passe 26 : porteurs listés dans le panneau d'information du talent
+      // (espèces normales ET talent caché) — case épurée.
       return `<div class="dict-entry ${unlocked.has(k)?'owned':''}" data-action="legacy-call" data-call="openAbilityInfo" data-call-args="'${k}'">
-        <div class="dict-entry-icon">${typeof getIcon==='function'?getIcon('training',16):''}</div><div><b>${getTalentName(k)}</b><span>${unlocked.has(k)?`${t('dict_ability_unlocked')||'Unlocked'} · ${tr('dict_ability_carriers',{count:users.length})}`:(t('dict_ability_locked')||'Locked')} · ${getRarityLabel(info.rarity)}</span><small>${users.slice(0,4).map(u=>typeof getPokeName==='function'?getPokeName(u.p.id):u.p.name).join(' · ')}${users.length>4?'…':''}</small></div>
+        <div class="dict-entry-icon">${typeof getIcon==='function'?getIcon('training',16):''}</div><div><b>${getTalentName(k)}</b><span>${unlocked.has(k)?(t('dict_ability_unlocked')||'Unlocked'):(t('dict_ability_locked')||'Locked')} · ${getRarityLabel(info.rarity)}</span></div>
       </div>`;
     }).join('') || `<div class="dict-muted">${t('dict_no_results')||'No results.'}</div>`}</div>`;
  }
@@ -330,6 +337,18 @@ function atollFactoryPrepAbandon(){
 // Glisser-déposer DANS le panneau de préparation : cartes = ordre des
 // Pokémon ; attaques (data-atoll-move-drag) = ordre au sein d'un Pokémon.
 let _atollPrepDrag = null; // {kind:'poke', idx} | {kind:'move', i, mi}
+// Passe 27 : preview de drop — données fantôme de l'équipe prêtée.
+function _atollPrepGhostPoke(idx){
+ const r=(typeof getAtollFactoryRun==='function')?getAtollFactoryRun():null; const _dp=r&&r.team?r.team[idx]:null;
+ if(!_dp) return {icon:'', title:'?'};
+ return { icon:(typeof spriteImg==='function'?spriteImg(_dp.id,_dp.emoji,{size:26,shiny:!!_dp.shinyActive}):''), title:(typeof getPokeName==='function'?getPokeName(_dp.id):(_dp.name||'')), sub:'Nv.'+(_dp.level||1) };
+}
+function _atollPrepGhostMove(i, mi){
+ const r=(typeof getAtollFactoryRun==='function')?getAtollFactoryRun():null; const _dm=r&&r.team&&r.team[i]&&r.team[i].moves?r.team[i].moves[mi]:null;
+ const _dmv=_dm&&typeof MOVES!=='undefined'?MOVES[_dm.id]:null;
+ if(!_dm) return {icon:'', title:'?'};
+ return { icon:_dmv?'<span class="type-badge type-'+String(_dmv.type||'').toLowerCase()+'">'+(typeof getTypeName==='function'?getTypeName(_dmv.type):(_dmv.type||''))+'</span>':'', title:(typeof getMoveName==='function'?getMoveName(_dm.id):_dm.id) };
+}
 function installAtollPrepDragDrop(){
  const body = document.getElementById('atoll-prep-body');
  if(!body || typeof body.querySelectorAll !== 'function') return;
@@ -342,17 +361,28 @@ function installAtollPrepDragDrop(){
    ev.dataTransfer.effectAllowed = 'move';
    try{ ev.dataTransfer.setData('text/plain', String(idx)); }catch(_){}
    card.style.opacity = '0.6';
+   // Passe 26 : vignette de drag unifiée (équipe prêtée de l'Usine).
+   const _drp = (typeof getAtollFactoryRun === 'function' && getAtollFactoryRun() && getAtollFactoryRun().team) ? getAtollFactoryRun().team[idx] : null;
+   if(_drp && typeof pwApplyDragGhost === 'function'){
+    pwApplyDragGhost(ev, {
+     icon: (typeof spriteImg === 'function') ? spriteImg(_drp.id, _drp.emoji, { size: 26, shiny: !!_drp.shinyActive }) : '',
+     title: (typeof getPokeName === 'function' ? getPokeName(_drp.id) : (_drp.name || '')),
+     sub: 'Nv.' + (_drp.level || 1),
+    });
+   }
   });
   card.addEventListener('dragover', (ev) => {
    if(!_atollPrepDrag || _atollPrepDrag.kind !== 'poke') return;
    ev.preventDefault();
    ev.dataTransfer.dropEffect = 'move';
    card.classList.add('atoll-prep-drag-over');
+   try { if(typeof pwDropPreviewShow==='function' && typeof pwSwapPreviewHtml==='function') pwDropPreviewShow(pwSwapPreviewHtml(_atollPrepGhostPoke(_atollPrepDrag.idx), _atollPrepGhostPoke(idx)), ev.clientX||0, ev.clientY||0); } catch(_){}
   });
-  card.addEventListener('dragleave', () => card.classList.remove('atoll-prep-drag-over'));
+  card.addEventListener('dragleave', () => { card.classList.remove('atoll-prep-drag-over'); if(typeof pwDropPreviewHide==='function') pwDropPreviewHide(); });
   card.addEventListener('drop', (ev) => {
    if(!_atollPrepDrag || _atollPrepDrag.kind !== 'poke') return;
    ev.preventDefault();
+   if(typeof pwDropPreviewHide==='function') pwDropPreviewHide();
    card.classList.remove('atoll-prep-drag-over');
    card.style.opacity = '';
    const from = _atollPrepDrag.idx; _atollPrepDrag = null;
@@ -362,6 +392,7 @@ function installAtollPrepDragDrop(){
    card.style.opacity = '';
    cards.forEach(c => c.classList.remove('atoll-prep-drag-over'));
    if(_atollPrepDrag && _atollPrepDrag.kind === 'poke') _atollPrepDrag = null;
+   if(typeof pwDropPreviewHide==='function') pwDropPreviewHide();
   });
  });
  Array.prototype.slice.call(body.querySelectorAll('[data-atoll-move-drag]')).forEach((el) => {
@@ -372,6 +403,18 @@ function installAtollPrepDragDrop(){
    ev.dataTransfer.effectAllowed = 'move';
    try{ ev.dataTransfer.setData('text/plain', el.dataset.atollMoveDrag); }catch(_){}
    el.classList.add('pw-move-drag-src');
+   // Passe 26 : vignette de drag unifiée pour l'attaque prêtée déplacée.
+   try{
+    const _drr = (typeof getAtollFactoryRun === 'function') ? getAtollFactoryRun() : null;
+    const _dm = _drr && _drr.team && _drr.team[_atollPrepDrag.i] && _drr.team[_atollPrepDrag.i].moves ? _drr.team[_atollPrepDrag.i].moves[_atollPrepDrag.mi] : null;
+    const _dmv = _dm && typeof MOVES !== 'undefined' ? MOVES[_dm.id] : null;
+    if(_dm && typeof pwApplyDragGhost === 'function'){
+     pwApplyDragGhost(ev, {
+      icon: _dmv ? '<span class="type-badge type-' + String(_dmv.type || '').toLowerCase() + '">' + (typeof getTypeName === 'function' ? getTypeName(_dmv.type) : (_dmv.type || '')) + '</span>' : '',
+      title: (typeof getMoveName === 'function' ? getMoveName(_dm.id) : _dm.id),
+     });
+    }
+   }catch(_){}
   });
   el.addEventListener('dragover', (ev) => {
    if(!_atollPrepDrag || _atollPrepDrag.kind !== 'move') return;
@@ -381,12 +424,14 @@ function installAtollPrepDragDrop(){
    ev.stopPropagation();
    ev.dataTransfer.dropEffect = 'move';
    el.classList.add('atoll-prep-move-over');
+   try { if(typeof pwDropPreviewShow==='function' && typeof pwSwapPreviewHtml==='function') pwDropPreviewShow(pwSwapPreviewHtml(_atollPrepGhostMove(_atollPrepDrag.i,_atollPrepDrag.mi), _atollPrepGhostMove(Number(parts[0]),Number(parts[1]))), ev.clientX||0, ev.clientY||0); } catch(_){}
   });
-  el.addEventListener('dragleave', () => el.classList.remove('atoll-prep-move-over'));
+  el.addEventListener('dragleave', () => { el.classList.remove('atoll-prep-move-over'); if(typeof pwDropPreviewHide==='function') pwDropPreviewHide(); });
   el.addEventListener('drop', (ev) => {
    if(!_atollPrepDrag || _atollPrepDrag.kind !== 'move') return;
    ev.preventDefault();
    ev.stopPropagation();
+   if(typeof pwDropPreviewHide==='function') pwDropPreviewHide();
    el.classList.remove('atoll-prep-move-over');
    const parts = String(el.dataset.atollMoveDrag).split('|');
    const src = _atollPrepDrag; _atollPrepDrag = null;
@@ -396,6 +441,7 @@ function installAtollPrepDragDrop(){
   el.addEventListener('dragend', () => {
    el.classList.remove('pw-move-drag-src');
    if(_atollPrepDrag && _atollPrepDrag.kind === 'move') _atollPrepDrag = null;
+   if(typeof pwDropPreviewHide==='function') pwDropPreviewHide();
   });
  });
 }
@@ -456,8 +502,9 @@ function openFullscreenPanel(panelType){
  closeFullscreenPanel();
  if(typeof closeBattleSummary === 'function') closeBattleSummary();
  const pm = document.getElementById('poke-modal');
- if(pm){ pm.classList.remove('open'); pm.classList.remove('atoll-prep-modal'); }
+ if(pm){ pm.classList.remove('open'); pm.classList.remove('atoll-prep-modal'); pm.classList.remove('preset-editor-modal'); }
  window._atollPrepOpen = false; // passe 25 : la préparation Usine ne survit pas à un changement de panneau
+ window._presetEditorOpen = null; window._presetEditorReturn = null; // passe 27 : idem éditeur de preset
  const qm = document.getElementById('quest-modal');
  if(qm) qm.classList.remove('open');
  const sm = document.getElementById('settings-modal');
@@ -475,7 +522,8 @@ function openFullscreenPanel(panelType){
  pokedex: t('panel_pokedex_title'),
  dictionary: t('dictionary_title'),
  guide: t('guide_title'),
- atoll: t('battle_atoll_title')
+ atoll: t('battle_atoll_title'),
+ presets: t('panel_presets_title')
  };
 
  
@@ -504,7 +552,8 @@ function openFullscreenPanel(panelType){
  const content = document.getElementById('fs-panel-content');
  content.classList.remove('dictionary-panel-content');
 
- if(panelType === 'inventory') renderInventory(content);
+ if(panelType === 'presets' && typeof renderPresetManager === 'function') renderPresetManager(content);
+ else if(panelType === 'inventory') renderInventory(content);
  else if(panelType === 'shop') renderShop(content);
  else if(panelType === 'market') renderMarket(content);
  else if(panelType === 'pokedex') renderPokedex(content);

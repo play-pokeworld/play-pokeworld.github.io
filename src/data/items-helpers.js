@@ -109,7 +109,13 @@ function openItemInfo(key){
   if (typeof ItemEngine !== 'undefined' && ItemEngine.getPowerDisplay) powerDisplay = ItemEngine.getPowerDisplay(key);
   
   let sourceBody = '';
-  if (typeof getItemSource === 'function') {
+  // Passe 26 : « où trouver » complet (routes, boutiques + CT/CS, mine,
+  // atoll, quêtes, labo fossile) — une ligne par source.
+  if (typeof getItemSourceList === 'function') {
+    const _sources = getItemSourceList(key);
+    if (_sources.length) sourceBody = '<div class="pw-src-list">' + _sources.map(s => '<div class="pw-src-line">' + s + '</div>').join('') + '</div>';
+  }
+  if (!sourceBody && typeof getItemSource === 'function') {
     const src = getItemSource(key, lang);
     if (src) sourceBody = '<div data-style="padding:8px 10px;background:var(--dark3);border-radius:6px;font-size:11px;color:var(--light1);">' + src + '</div>';
   }
@@ -124,7 +130,6 @@ function openItemInfo(key){
     if (typeof replaceWeatherTerms === 'function') _descRich = replaceWeatherTerms(_descRich);
     if (typeof replaceStatusTerms === 'function') _descRich = replaceStatusTerms(_descRich);
     if (desc) _itemSections.push({ title: (t('description') || 'Description'), body: '<div class="pw-text-sm pw-light1" data-style="line-height:1.6;">' + _descRich + '</div>' });
-    if (powerDisplay) _itemSections.push({ title: ((typeof t === 'function' && t('power_prefix')) || (lang === 'en' ? 'Power' : 'Puissance')), body: '<div data-style="padding:6px 10px;background:rgba(77,166,255,0.1);border-radius:6px;font-size:11px;color:var(--light1);">⚡ ' + powerDisplay + '</div>' });
     if (sourceBody) _itemSections.push({ title: '📍 ' + ((typeof t === 'function' && t('found_in_lbl')) || (lang === 'en' ? 'Found in:' : 'Où trouver :')), body: sourceBody });
     inner.innerHTML = window.pwBuildInfoPanel({
       icon: itemSpriteHtml(key, 48),

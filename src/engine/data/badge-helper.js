@@ -42,18 +42,26 @@ function getBadgeHtml(text, lang) {
   for (var k in dict) { if (lower.includes(k) || k.includes(lower)) return dict[k]; }
   return text;
 }
+// Passe 27 : ne JAMAIS remplacer à l'intérieur d'une balise HTML — les
+// descriptions injectent déjà des badges (<span data-buff="poison">…) et le
+// remplacement naïf mangeait le mot DANS les attributs (Orbe Toxique/Flamme).
+function _replaceOutsideTags(desc, regex, fn) {
+  var parts = String(desc).split(/(<[^>]*>)/g);
+  for (var i = 0; i < parts.length; i += 2) parts[i] = parts[i].replace(regex, fn);
+  return parts.join('');
+}
 function replaceWeatherTerms(desc) {
   if (!desc || typeof desc !== 'string') return desc || '';
   var r = desc;
   // USE CALLBACK FUNCTIONS so $1 is the actual match! (not evaluated at array creation time)
-  r = r.replace(/\b(Sunny|Soleil|soleil)\b/gi, function(m){ return badgeHtml(m,'sunny'); });
-  r = r.replace(/\b(Rainy|Rain|Pluie|pluie)\b/gi, function(m){ return badgeHtml(m,'rainy'); });
-  r = r.replace(/Sandstorm|sandstorm|T[eéèêë]mp[eéèêë]te d[eéèêë] Sabl[eéèêë]|t[eéèêë]mp[eéèêë]te d[eéèêë] sabl[eéèêë]/gi, function(m){ return badgeHtml(m,'sandstorm'); });
-  r = r.replace(/\b(Hail|hail|Gr[eéèêë]l[eéèêë]|gr[eéèêë]l[eéèêë])\b/gi, function(m){ return badgeHtml(m,'hail'); });
-  r = r.replace(/Electric Terrain|electric terrain|Champ [EeéèêëÉÈÊ]lectrifi[eéèêëÉÈÊ]|champ [eéèêë]lectrifi[eéèêë]/gi, function(m){ return badgeHtml(m,'electric'); });
-  r = r.replace(/\b(Grassy Terrain|grassy terrain|Champ Herbu|champ herbu)\b/gi, function(m){ return badgeHtml(m,'grassy'); });
-  r = r.replace(/\b(Misty Terrain|misty terrain|Champ Brumeux|champ brumeux)\b/gi, function(m){ return badgeHtml(m,'misty'); });
-  r = r.replace(/\b(Psychic Terrain|psychic terrain|Champ Psychique|champ psychique)\b/gi, function(m){ return badgeHtml(m,'psychic'); });
+  r = _replaceOutsideTags(r, /\b(Sunny|Soleil|soleil)\b/gi, function(m){ return badgeHtml(m,'sunny'); });
+  r = _replaceOutsideTags(r, /\b(Rainy|Rain|Pluie|pluie)\b/gi, function(m){ return badgeHtml(m,'rainy'); });
+  r = _replaceOutsideTags(r, /Sandstorm|sandstorm|T[eéèêë]mp[eéèêë]te d[eéèêë] Sabl[eéèêë]|t[eéèêë]mp[eéèêë]te d[eéèêë] sabl[eéèêë]/gi, function(m){ return badgeHtml(m,'sandstorm'); });
+  r = _replaceOutsideTags(r, /\b(Hail|hail|Gr[eéèêë]l[eéèêë]|gr[eéèêë]l[eéèêë])\b/gi, function(m){ return badgeHtml(m,'hail'); });
+  r = _replaceOutsideTags(r, /Electric Terrain|electric terrain|Champ [EeéèêëÉÈÊ]lectrifi[eéèêëÉÈÊ]|champ [eéèêë]lectrifi[eéèêë]/gi, function(m){ return badgeHtml(m,'electric'); });
+  r = _replaceOutsideTags(r, /\b(Grassy Terrain|grassy terrain|Champ Herbu|champ herbu)\b/gi, function(m){ return badgeHtml(m,'grassy'); });
+  r = _replaceOutsideTags(r, /\b(Misty Terrain|misty terrain|Champ Brumeux|champ brumeux)\b/gi, function(m){ return badgeHtml(m,'misty'); });
+  r = _replaceOutsideTags(r, /\b(Psychic Terrain|psychic terrain|Champ Psychique|champ psychique)\b/gi, function(m){ return badgeHtml(m,'psychic'); });
   return r;
 }
 // Passe 24 : même traitement couleur pour les mots de STATUT (brûlure, poison,
@@ -63,13 +71,15 @@ function replaceWeatherTerms(desc) {
 function replaceStatusTerms(desc) {
   if (!desc || typeof desc !== 'string') return desc || '';
   var r = desc;
-  r = r.replace(/\b(Empoisonnement grave|empoisonnement grave)\b/g, function(m){ return badgeHtml(m,'poison'); });
-  r = r.replace(/\b(Brûlure|brûlure|Brûlé|brûlé|Brûler|brûler|Burn|burn|Burned|burned)\b/g, function(m){ return badgeHtml(m,'burn'); });
-  r = r.replace(/\b(Paralysie|paralysie|Paralyser|paralyser|Paralysé|paralysé|Paralysis|paralysis|Paralyzed|paralyzed)\b/g, function(m){ return badgeHtml(m,'para'); });
-  r = r.replace(/\b(Poisonned|Poisoned|Poison|poison|Empoisonnement|empoisonnement|Empoisonner|empoisonner|Empoisonné|empoisonné)\b/g, function(m){ return badgeHtml(m,'poison'); });
-  r = r.replace(/\b(Geler|geler|Gelé|gelé|Freeze|freeze|Frozen|frozen|Gel)\b/gi, function(m){ return badgeHtml(m,'freeze'); });
-  r = r.replace(/\b(Endormissement|endormissement|Endormir|endormir|Endormi|endormi|Sommeil|sommeil|Sleep|sleep|Asleep|asleep)\b/g, function(m){ return badgeHtml(m,'sleep'); });
-  r = r.replace(/\b(Confusion|confusion|Confus|confus|Confuse|confuse|Confused|confused)\b/g, function(m){ return badgeHtml(m,'confuse'); });
+  r = _replaceOutsideTags(r, /\b(Empoisonnement grave|empoisonnement grave)\b/g, function(m){ return badgeHtml(m,'poison'); });
+  r = _replaceOutsideTags(r, /\b(Brûlure|brûlure|Brûlé|brûlé|Brûler|brûler|Burn|burn|Burned|burned)\b/g, function(m){ return badgeHtml(m,'burn'); });
+  r = _replaceOutsideTags(r, /\b(Paralysie|paralysie|Paralyser|paralyser|Paralysé|paralysé|Paralysis|paralysis|Paralyzed|paralyzed)\b/g, function(m){ return badgeHtml(m,'para'); });
+  // Passe 27b : (?![\p{L}]) au lieu de \b — la borne ASCII ne matche pas
+  // après une lettre accentuée (« Empoisonné » restait sans badge couleur).
+  r = _replaceOutsideTags(r, /\b(Poisonned|Poisoned|Poison|poison|Empoisonnement|empoisonnement|Empoisonner|empoisonner|Empoisonné|empoisonné)(?![\p{L}])/gu, function(m){ return badgeHtml(m,'poison'); });
+  r = _replaceOutsideTags(r, /\b(Geler|geler|Gelé|gelé|Freeze|freeze|Frozen|frozen|Gel)\b/gi, function(m){ return badgeHtml(m,'freeze'); });
+  r = _replaceOutsideTags(r, /\b(Endormissement|endormissement|Endormir|endormir|Endormi|endormi|Sommeil|sommeil|Sleep|sleep|Asleep|asleep)\b/g, function(m){ return badgeHtml(m,'sleep'); });
+  r = _replaceOutsideTags(r, /\b(Confusion|confusion|Confus|confus|Confuse|confuse|Confused|confused)\b/g, function(m){ return badgeHtml(m,'confuse'); });
   return r;
 }
 if (typeof window !== 'undefined') {

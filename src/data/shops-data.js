@@ -1,21 +1,15 @@
 const SHOPS = {
 "pallet": {
 "items": [
-"oran_berry",
-"cheri_berry"
  ]
  },
 "viridian": {
 "items": [
-"oran_berry",
-"sitrus_berry",
-"cheri_berry",
 "prine_berry"
  ]
  },
 "pewter": {
 "items": [
-"sitrus_berry",
 "prine_berry",
 "muscle_band",
 "metal_coat"
@@ -23,8 +17,6 @@ const SHOPS = {
  },
 "cerulean": {
 "items": [
-"oran_berry",
-"cheri_berry",
 "soft_sand",
  ]
  },
@@ -37,8 +29,6 @@ const SHOPS = {
  },
 "lavender": {
 "items": [
-"oran_berry",
-"sitrus_berry",
  ]
  },
 "celadon": {
@@ -48,9 +38,6 @@ const SHOPS = {
 "thunderstone",
 "leafstone",
 "moonstone",
-"oran_berry",
-"sitrus_berry",
-"cheri_berry",
 "prine_berry",
 "rarecandy",
 "muscle_band",
@@ -60,7 +47,6 @@ const SHOPS = {
  },
 "fuchsia": {
 "items": [
-"cheri_berry",
 "soft_sand",
  ]
  },
@@ -79,23 +65,17 @@ const SHOPS = {
  },
 "jnewbark": {
 "items": [
-"oran_berry",
-"sitrus_berry",
-"cheri_berry",
 "prine_berry",
 "rarecandy"
  ]
  },
 "jcherrygrove": {
 "items": [
-"oran_berry",
-"cheri_berry",
 "rarecandy"
  ]
  },
 "jviolet": {
 "items": [
-"sitrus_berry",
 "muscle_band",
 "twisted_spoon",
 "miracle_seed"
@@ -146,7 +126,6 @@ const SHOPS = {
  },
 "jolivine": {
 "items": [
-"oran_berry",
 "leftovers",
 "mystic_water",
 "hard_stone"
@@ -154,7 +133,6 @@ const SHOPS = {
  },
 "jcianwood": {
 "items": [
-"sitrus_berry",
 "black_belt",
 "charcoal",
 "magnet"

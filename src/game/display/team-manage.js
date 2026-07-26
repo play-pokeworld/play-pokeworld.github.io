@@ -1,9 +1,24 @@
 // Repli si util.js (pwSetHtml) n'est pas chargé — tests unitaires ciblés.
 var _pwSetHtmlSafe = _pwSetHtmlSafe || function(el, html){ if(typeof pwSetHtml === 'function') pwSetHtml(el, html); else el.innerHTML = html; };
 let _swapFromTeamIdx=null;
+// Passe 27 : 20 presets (par rang, par région…). Garantit la structure
+// G.teamPresets.preset1…preset20 avec noms par défaut localisés.
+var PRESET_MAX = 20;
+if (typeof window !== 'undefined') window.PRESET_MAX = PRESET_MAX;
+function ensureTeamPresets(){
+ if(!G.teamPresets || typeof G.teamPresets !== 'object') G.teamPresets = {};
+ const legacyNames = { preset1:'preset_adventure', preset2:'preset_boss', preset3:'preset_training' };
+ for(let i=1;i<=PRESET_MAX;i++){
+  const pk = 'preset' + i;
+  if(!G.teamPresets[pk] || typeof G.teamPresets[pk] !== 'object') G.teamPresets[pk] = {name:'', uids:[]};
+  if(!Array.isArray(G.teamPresets[pk].uids)) G.teamPresets[pk].uids = [];
+  if(!G.teamPresets[pk].name) G.teamPresets[pk].name = legacyNames[pk] ? (t(legacyNames[pk])||'') : tr('preset_default_name', {n:i});
+ }
+ return G.teamPresets;
+}
 
 function saveCurrentTeamToPreset(key){
- if(!G.teamPresets) G.teamPresets = { preset1:{name:t('preset_adventure'),uids:[]}, preset2:{name:t('preset_boss'),uids:[]}, preset3:{name:t('preset_training'),uids:[]} };
+ if(typeof ensureTeamPresets === 'function') ensureTeamPresets();
  if(!G.teamPresets[key]) G.teamPresets[key] = { name:"Preset"+ key, uids: [] };
  G.teamPresets[key].uids = G.team.map(p => p && p.uid).filter(Boolean);
  notify(tr('preset_saved', {name:G.teamPresets[key].name, count:G.team.length}), 'var(--blue)');
@@ -12,6 +27,7 @@ function saveCurrentTeamToPreset(key){
 }
 
 function loadTeamFromPreset(key){
+ if(typeof ensureTeamPresets === 'function') ensureTeamPresets();
  if(typeof battle !== 'undefined' && battle && battle.active){
  notify(t('cannot_change_team_battle'),'var(--red)');
  return;

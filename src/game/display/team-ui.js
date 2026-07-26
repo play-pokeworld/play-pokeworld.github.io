@@ -56,24 +56,52 @@ function renderTeamWindow(){
 }
 
 
+function resolvePresetPoke(uid){
+ // Passe 26 : résout un uid de preset → Pokémon (équipe puis boîte PC).
+ const inTeam=(G.team||[]).find(p=>p&&p.uid===uid); if(inTeam) return {p:inTeam, here:'team'};
+ for(const k in (G.collection||{})){ const c=G.collection[k]; if(c&&c.uid===uid) return {p:c, here:'box'}; }
+ return null;
+}
 function renderTeamPresetsToolbar(){
-    if(!G.teamPresets) G.teamPresets = {
-    preset1: {name: t('preset_adventure'), uids: []},
-    preset2: {name: t('preset_boss'), uids: []},
-    preset3: {name: t('preset_training'), uids: []}
-  };
+  if(typeof ensureTeamPresets === 'function') ensureTeamPresets();
+  // Passe 27 : la barre des 3 presets devient UN bouton vers le gestionnaire
+  // d'équipes (20 emplacements, renommage, aperçu, éditeur complet).
+  {
+  const _ap = (G.teamPresets && G.activePresetId && G.teamPresets[G.activePresetId]) || null;
+  const _sub = _ap ? ` ${_ap.name} (${(_ap.uids||[]).length}/6)` : '';
+  return `<div class="ui-control-toolbar team-toolbar"><div class="ui-toolbar-label">${t('presets_label')}</div>
+    <button class="hbtn team-presets-open-btn" data-action="legacy-call" data-call="openPresetManager" data-call-args="">🗂 ${t('teams_manager_open')}<span class="team-preset-active">${_sub}</span></button>
+  </div>`;
+  }
+
+  if(false){
 
   return `<div class="ui-control-toolbar team-toolbar"><div class="ui-toolbar-label">${t('presets_label')}</div>
     ${['preset1', 'preset2', 'preset3'].map((pk, idx) => {
       const active = G.activePresetId === pk;
-      const count = (G.teamPresets[pk]?.uids || []).length;
-      return `<div class="team-toolbar-group">
+      const uids = (G.teamPresets[pk]?.uids || []);
+      const count = uids.length;
+      // Passe 26 : PRÉVISUALISATION du preset — puce sprite par membre
+      // (grisée si le Pokémon est en boîte, « ? » s'il est introuvable).
+      const chips = count ? uids.slice(0, 6).map(uid => {
+        const found = (typeof resolvePresetPoke === 'function') ? resolvePresetPoke(uid) : null;
+        if(!found) return `<span class="preset-chip missing" title="${t('preset_missing_hint')||'Pokémon introuvable'}">?</span>`;
+        const nm = (typeof getPokeName==='function'?getPokeName(found.p.id):(found.p.name||''));
+        const ttl = `${nm} Nv.${found.p.level||1}${found.here==='box' ? ' · ' + (t('box_pc_location')||'Boîte') : ''}`;
+        return `<span class="preset-chip ${found.here==='box'?'in-box':''}" title="${ttl}">${spriteImg(found.p.id, found.p.emoji, {size:20, shiny:!!found.p.shinyActive})}</span>`;
+      }).join('') : `<span class="preset-chip-empty">${t('preset_empty')||'Vide'}</span>`;
+      return `<div class="team-toolbar-group team-preset-group">
+        <div class="team-preset-btns">
         ${typeof uiButtonHtml==='function' ? uiButtonHtml({label:'#' + (idx + 1) + ' (' + count + ')', call:'loadTeamFromPreset', args:`'${pk}'`, variant:'tool', active:active}) : `<button class="hbtn" data-action="legacy-call" data-call="loadTeamFromPreset" data-call-args="'${pk}'">#${idx + 1} (${count})</button>`}
         ${typeof uiButtonHtml==='function' ? uiButtonHtml({label:t('save_short') || 'Save', icon:(typeof getIcon==='function'?getIcon('save',14):''), call:'saveCurrentTeamToPreset', args:`'${pk}'`, variant:'icon', extraClass:'team-preset-save-btn'}) : `<button class="hbtn team-preset-save-btn" data-action="legacy-call" data-call="saveCurrentTeamToPreset" data-call-args="'${pk}'">${typeof getIcon==='function'?getIcon('save',14):'S'}</button>`}
+        </div>
+        <div class="team-preset-chips">${chips}</div>
       </div>`;
     }).join('')}
   </div>`;
+  }
 }
+
 
 function renderPokeCard(p, i){
   if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
@@ -327,6 +355,17 @@ function addTeamDragAndDrop() {
 // ── Passe 17 : glisser-déposer des ATTAQUES dans les cartes de la fenêtre
 // Party (et l'onglet Équipe) — échange de positions via swapTeamMoves. ──────
 let _pwMoveDrag = null; // {teamIdx, moveIdx}
+// Passe 27 : fiches fantômes partagées (vignette de drag ET preview de drop).
+function _pwPokeGhostData(p){
+  if(!p) return {icon:'', title:'?'};
+  return { icon:(typeof spriteImg==='function'?spriteImg(p.id,p.emoji,{size:26,shiny:!!p.shinyActive}):''), title:(typeof getPokeName==='function'?getPokeName(p.id):(p.name||'')), sub:'Nv.'+(p.level||1) };
+}
+function _pwMoveGhostData(teamIdx, moveIdx){
+  const _dm=(typeof G!=='undefined'&&G&&G.team&&G.team[teamIdx]&&G.team[teamIdx].moves)?G.team[teamIdx].moves[moveIdx]:null;
+  const _dmv=_dm&&typeof MOVES!=='undefined'?MOVES[_dm.id]:null;
+  if(!_dm) return {icon:'', title:'?'};
+  return { icon:_dmv?'<span class="type-badge type-'+String(_dmv.type||'').toLowerCase()+'">'+(typeof getTypeName==='function'?getTypeName(_dmv.type):(_dmv.type||''))+'</span>':'', title:(typeof getMoveName==='function'?getMoveName(_dm.id):_dm.id) };
+}
 function installMoveDragDrop() {
   if (typeof document === 'undefined' || document._pwMoveDragInstalled) return;
   document._pwMoveDragInstalled = true;
@@ -335,6 +374,17 @@ function installMoveDragDrop() {
     if (!el) return;
     const parts = String(el.dataset.moveDrag).split('|');
     _pwMoveDrag = { teamIdx: Number(parts[0]), moveIdx: Number(parts[1]) };
+    // Passe 26 : vignette de drag unifiée pour l'attaque déplacée.
+    try {
+      const _dm = (typeof G !== 'undefined' && G && G.team && G.team[_pwMoveDrag.teamIdx] && G.team[_pwMoveDrag.teamIdx].moves) ? G.team[_pwMoveDrag.teamIdx].moves[_pwMoveDrag.moveIdx] : null;
+      const _dmv = _dm && typeof MOVES !== 'undefined' ? MOVES[_dm.id] : null;
+      if(_dm && typeof pwApplyDragGhost === 'function'){
+        pwApplyDragGhost(ev, {
+          icon: _dmv ? '<span class="type-badge type-' + String(_dmv.type || '').toLowerCase() + '">' + (typeof getTypeName === 'function' ? getTypeName(_dmv.type) : (_dmv.type || '')) + '</span>' : '',
+          title: (typeof getMoveName === 'function' ? getMoveName(_dm.id) : _dm.id),
+        });
+      }
+    } catch(_){}
     try { ev.stopPropagation(); } catch (_) {}
     ev.dataTransfer.effectAllowed = 'move';
     try { ev.dataTransfer.setData('text/plain', el.dataset.moveDrag); } catch (_) {}
@@ -348,10 +398,17 @@ function installMoveDragDrop() {
     ev.preventDefault();
     ev.dataTransfer.dropEffect = 'move';
     el.classList.add('pw-move-drop-hover');
+    // Passe 27 : preview du résultat (attaque source ⇄ attaque cible).
+    try {
+      if(typeof pwDropPreviewShow==='function' && typeof pwSwapPreviewHtml==='function'){
+        pwDropPreviewShow(pwSwapPreviewHtml(_pwMoveGhostData(_pwMoveDrag.teamIdx,_pwMoveDrag.moveIdx), _pwMoveGhostData(_pwMoveDrag.teamIdx,Number(parts[1]))), ev.clientX||0, ev.clientY||0);
+      }
+    } catch(_){}
   });
   document.addEventListener('dragleave', (ev) => {
     const el = ev.target && ev.target.closest ? ev.target.closest('[data-move-drag]') : null;
     if (el) el.classList.remove('pw-move-drop-hover');
+    if (typeof pwDropPreviewHide === 'function') pwDropPreviewHide();
   });
   document.addEventListener('drop', (ev) => {
     const el = ev.target && ev.target.closest ? ev.target.closest('[data-move-drag]') : null;
@@ -363,10 +420,12 @@ function installMoveDragDrop() {
     ev.stopPropagation();
     if (typeof swapTeamMoves === 'function') swapTeamMoves(_pwMoveDrag.teamIdx, _pwMoveDrag.moveIdx, Number(parts[1]));
     _pwMoveDrag = null;
+    if (typeof pwDropPreviewHide === 'function') pwDropPreviewHide();
   });
   document.addEventListener('dragend', () => {
     _pwMoveDrag = null;
     try { document.querySelectorAll('.pw-move-drag-src, .pw-move-drop-hover').forEach((n) => n.classList.remove('pw-move-drag-src', 'pw-move-drop-hover')); } catch (_) {}
+    if (typeof pwDropPreviewHide === 'function') pwDropPreviewHide();
   });
 }
 
@@ -413,23 +472,38 @@ function teamDragStart(ev, idx) {
   clearTimeout(_teamLongPressTimer);
   ev.dataTransfer.effectAllowed = 'move';
   ev.dataTransfer.setData('text/plain', String(idx));
-  
-  try {
-    const rect = ev.currentTarget.getBoundingClientRect();
-    ev.dataTransfer.setDragImage(ev.currentTarget, rect.width / 2, rect.height / 2);
-  } catch(e) {}
+  // Passe 26 : vignette de drag unifiée (sprite + nom + niveau), propre et
+  // identique partout, au lieu de la « photo » géante de la carte.
+  const _dp = (typeof G !== 'undefined' && G && G.team) ? G.team[idx] : null;
+  if(_dp && typeof pwApplyDragGhost === 'function'){
+    pwApplyDragGhost(ev, {
+      icon: (typeof spriteImg === 'function') ? spriteImg(_dp.id, _dp.emoji, { size: 26, shiny: !!_dp.shinyActive }) : '',
+      title: (typeof getPokeName === 'function' ? getPokeName(_dp.id) : (_dp.name || '')),
+      sub: 'Nv.' + (_dp.level || 1),
+    });
+  }
 }
 
 function teamDragOver(ev) {
+  if (_teamDragIdx === null) return;
   ev.preventDefault();
   ev.dataTransfer.dropEffect = 'move';
   ev.currentTarget.style.borderColor = 'var(--light2)';
   ev.currentTarget.style.boxShadow = '0 0 15px rgba(236,222,183,0.6)';
+  // Passe 27 : preview du résultat — le Pokémon déplacé et la cible s'échangent.
+  try {
+    const _toIdx = Number(ev.currentTarget && ev.currentTarget.dataset ? ev.currentTarget.dataset.teamIdx : -1);
+    if(_toIdx >= 0 && _toIdx !== _teamDragIdx && typeof pwDropPreviewShow==='function' && typeof pwSwapPreviewHtml==='function'){
+      pwDropPreviewShow(pwSwapPreviewHtml(_pwPokeGhostData(G.team[_teamDragIdx]), _pwPokeGhostData(G.team[_toIdx])), ev.clientX||0, ev.clientY||0);
+    }
+  } catch(_){}
 }
 
 function teamDragLeave(ev) {
+  if (ev.relatedTarget && ev.currentTarget && ev.currentTarget.contains && ev.currentTarget.contains(ev.relatedTarget)) return; // survol interne : garder highlight + preview
   ev.currentTarget.style.borderColor = '';
   ev.currentTarget.style.boxShadow = '';
+  if (typeof pwDropPreviewHide === 'function') pwDropPreviewHide();
 }
 
 function teamDrop(ev, targetIdx) {
@@ -442,12 +516,15 @@ function teamDrop(ev, targetIdx) {
     ev.currentTarget.style.opacity = '';
     ev.currentTarget.style.cursor = '';
     _teamDragIdx = null;
+    if (typeof pwDropPreviewHide === 'function') pwDropPreviewHide();
     return;
   }
   ev.currentTarget.style.borderColor = '';
   ev.currentTarget.style.boxShadow = '';
   ev.currentTarget.style.opacity = '';
   ev.currentTarget.style.cursor = '';
+  // Passe 27 : la bulle de preview de drop disparaît au lâcher.
+  if (typeof pwDropPreviewHide === 'function') pwDropPreviewHide();
   
   if (_teamDragIdx === null || _teamDragIdx === targetIdx) return;
   
@@ -471,6 +548,7 @@ function teamDrop(ev, targetIdx) {
 // --- Migrated to ES module, globals exposed ---
 if (typeof renderTeamWindow !== 'undefined' && typeof window !== 'undefined') window.renderTeamWindow = renderTeamWindow;
 if (typeof renderTeamPresetsToolbar !== 'undefined' && typeof window !== 'undefined') window.renderTeamPresetsToolbar = renderTeamPresetsToolbar;
+if (typeof resolvePresetPoke !== 'undefined' && typeof window !== 'undefined') window.resolvePresetPoke = resolvePresetPoke;
 if (typeof renderPokeCard !== 'undefined' && typeof window !== 'undefined') window.renderPokeCard = renderPokeCard;
 if (typeof openItemSelector !== 'undefined' && typeof window !== 'undefined') window.openItemSelector = openItemSelector;
 if (typeof showItemSelectorForPokemon !== 'undefined' && typeof window !== 'undefined') window.showItemSelectorForPokemon = showItemSelectorForPokemon;

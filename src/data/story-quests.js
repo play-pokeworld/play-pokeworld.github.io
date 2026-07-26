@@ -29,7 +29,7 @@ var STORY_QUESTS = [
   "loc": "pallet",
   "target": 1,
   "rewardMoney": 400,
-  "rewardItems": { "oran_berry": 1 }
+  "rewardItems": { "stardust": 1 }
  },
  {
   "id": 2,
@@ -38,7 +38,7 @@ var STORY_QUESTS = [
   "loc": "route1",
   "target": 10,
   "rewardMoney": 600,
-  "rewardItems": { "oran_berry": 2 }
+  "rewardItems": { "stardust": 2 }
  },
  {
   "id": 3,
@@ -47,7 +47,7 @@ var STORY_QUESTS = [
   "loc": "viridianforest",
   "target": 15,
   "rewardMoney": 1000,
-  "rewardItems": { "sitrus_berry": 1 }
+  "rewardItems": { "stardust": 1 }
  },
  {
   "id": 4,
@@ -56,7 +56,7 @@ var STORY_QUESTS = [
   "loc": "route22",
   "target": 20,
   "rewardMoney": 1400,
-  "rewardItems": { "cheri_berry": 1 }
+  "rewardItems": { "stardust": 1 }
  },
  {
   "id": 5,
@@ -133,7 +133,7 @@ var STORY_QUESTS = [
   "loc": "route25",
   "target": 1,
   "rewardMoney": 900,
-  "rewardItems": { "sitrus_berry": 1 }
+  "rewardItems": { "stardust": 1 }
  },
  {
   "id": 14,
@@ -142,7 +142,7 @@ var STORY_QUESTS = [
   "loc": "cerulean",
   "target": 1,
   "rewardMoney": 700,
-  "rewardItems": { "oran_berry": 2 }
+  "rewardItems": { "stardust": 2 }
  },
  {
   "id": 15,
@@ -160,7 +160,7 @@ var STORY_QUESTS = [
   "loc": "route5",
   "target": 25,
   "rewardMoney": 2200,
-  "rewardItems": { "sitrus_berry": 1 }
+  "rewardItems": { "stardust": 1 }
  },
  {
   "id": 17,
@@ -169,7 +169,7 @@ var STORY_QUESTS = [
   "loc": "route6",
   "target": 25,
   "rewardMoney": 2200,
-  "rewardItems": { "oran_berry": 1 }
+  "rewardItems": { "stardust": 1 }
  },
  {
   "id": 18,
@@ -186,7 +186,7 @@ var STORY_QUESTS = [
   "loc": "vermilion",
   "target": 1,
   "rewardMoney": 1100,
-  "rewardItems": { "cheri_berry": 2 }
+  "rewardItems": { "stardust": 2 }
  },
  {
   "id": 20,
@@ -231,7 +231,7 @@ var STORY_QUESTS = [
   "loc": "route8",
   "target": 15,
   "rewardMoney": 2800,
-  "rewardItems": { "oran_berry": 2 }
+  "rewardItems": { "stardust": 2 }
  },
  {
   "id": 25,
@@ -292,7 +292,7 @@ var STORY_QUESTS = [
   "loc": "celadon",
   "target": 1,
   "rewardMoney": 800,
-  "rewardItems": { "oran_berry": 1 },
+  "rewardItems": { "stardust": 1 },
   "rewardPoke": 133,
   "rewardLevel": 25
  },
@@ -303,7 +303,7 @@ var STORY_QUESTS = [
   "loc": "celadon",
   "target": 1,
   "rewardMoney": 1000,
-  "rewardItems": { "cheri_berry": 1 },
+  "rewardItems": { "stardust": 1 },
   "rewardPoke": 137,
   "rewardLevel": 20
  },
@@ -332,7 +332,7 @@ var STORY_QUESTS = [
   "loc": "route17",
   "target": 20,
   "rewardMoney": 3600,
-  "rewardItems": { "oran_berry": 2 }
+  "rewardItems": { "stardust": 2 }
  },
  {
   "id": 36,
@@ -341,7 +341,7 @@ var STORY_QUESTS = [
   "loc": "safarizone",
   "target": 15,
   "rewardMoney": 3200,
-  "rewardItems": { "sitrus_berry": 2 }
+  "rewardItems": { "stardust": 2 }
  },
  {
   "id": 37,
@@ -366,7 +366,7 @@ var STORY_QUESTS = [
   "loc": "saffron",
   "target": 1,
   "rewardMoney": 900,
-  "rewardItems": { "sitrus_berry": 1 },
+  "rewardItems": { "stardust": 1 },
   "rewardPoke": 131,
   "rewardLevel": 25
  },
@@ -396,7 +396,7 @@ var STORY_QUESTS = [
   "loc": "saffron",
   "target": 1,
   "rewardMoney": 900,
-  "rewardItems": { "sitrus_berry": 1 }
+  "rewardItems": { "stardust": 1 }
  },
  {
   "id": 43,
@@ -412,7 +412,7 @@ var STORY_QUESTS = [
   "type": "catch",
   "target": 15,
   "rewardMoney": 3000,
-  "rewardItems": { "cheri_berry": 2 }
+  "rewardItems": { "stardust": 2 }
  },
  {
   "id": 45,
@@ -421,7 +421,7 @@ var STORY_QUESTS = [
   "loc": "route20",
   "target": 60,
   "rewardMoney": 6500,
-  "rewardItems": { "oran_berry": 1 }
+  "rewardItems": { "stardust": 1 }
  },
  {
   "id": 46,
@@ -439,7 +439,7 @@ var STORY_QUESTS = [
   "loc": "cinnabar",
   "target": 1,
   "rewardMoney": 1200,
-  "rewardItems": { "cheri_berry": 1 },
+  "rewardItems": { "stardust": 1 },
   "rewardPoke": 142,
   "rewardLevel": 30
  },
@@ -578,7 +578,7 @@ var STORY_QUESTS = [
   "loc": "newbark",
   "target": 1,
   "rewardMoney": 400,
-  "rewardItems": { "oran_berry": 1 }
+  "rewardItems": { "stardust": 1 }
  },
  {
   "id": 102,
@@ -587,7 +587,7 @@ var STORY_QUESTS = [
   "loc": "jroute29",
   "target": 10,
   "rewardMoney": 700,
-  "rewardItems": { "oran_berry": 2 }
+  "rewardItems": { "stardust": 2 }
  },
  {
   "id": 103,
@@ -612,7 +612,7 @@ var STORY_QUESTS = [
   "targetBadge": "falkner",
   "target": 1,
   "rewardMoney": 2800,
-  "rewardItems": { "sitrus_berry": 1 }
+  "rewardItems": { "stardust": 1 }
  },
  {
   "id": 106,
@@ -639,7 +639,7 @@ var STORY_QUESTS = [
   "loc": "azalea",
   "target": 1,
   "rewardMoney": 600,
-  "rewardItems": { "sitrus_berry": 1 }
+  "rewardItems": { "stardust": 1 }
  },
  {
   "id": 109,
@@ -648,7 +648,7 @@ var STORY_QUESTS = [
   "loc": "ilexforest",
   "target": 20,
   "rewardMoney": 2600,
-  "rewardItems": { "oran_berry": 3 }
+  "rewardItems": { "stardust": 3 }
  },
  {
   "id": 110,
@@ -683,7 +683,7 @@ var STORY_QUESTS = [
   "loc": "ruinsofalph",
   "target": 15,
   "rewardMoney": 3200,
-  "rewardItems": { "sitrus_berry": 2 }
+  "rewardItems": { "stardust": 2 }
  },
  {
   "id": 114,
@@ -718,7 +718,7 @@ var STORY_QUESTS = [
   "loc": "burnedtower",
   "target": 1,
   "rewardMoney": 1000,
-  "rewardItems": { "oran_berry": 2 }
+  "rewardItems": { "stardust": 2 }
  },
  {
   "id": 118,
@@ -754,7 +754,7 @@ var STORY_QUESTS = [
   "loc": "olivine",
   "target": 1,
   "rewardMoney": 3000,
-  "rewardItems": { "oran_berry": 2 }
+  "rewardItems": { "stardust": 2 }
  },
  {
   "id": 122,
@@ -872,7 +872,7 @@ var STORY_QUESTS = [
   "loc": "jroute42",
   "target": 25,
   "rewardMoney": 5000,
-  "rewardItems": { "sitrus_berry": 2 }
+  "rewardItems": { "stardust": 2 }
  },
  {
   "id": 135,

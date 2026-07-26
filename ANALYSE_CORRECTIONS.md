@@ -1037,6 +1037,87 @@ python3 tools/audit_project.py # 1096 références d'images, 0 manquante
 
 ---
 
+## Passe 26 — QoL bêta : CT/CS éparpillées, infos « où trouver / qui peut l'avoir », sac unifié boîte PC, drag & drop unifié, presets prévisualisés, suppression de sauvegarde rouge
+
+Grosse passe de confort pré-bêta demandée après validation de la passe 25 : unifier le glisser-déposer, vendre les CT/CS en les éparpillant, améliorer les presets d'équipe + 5 ajouts (panneaux d'info, dictionnaire, sac, paramètres).
+
+1. **A. Toutes les CT canoniques sont achetables, éparpillées dans les 20 boutiques des deux régions** (règle « bon jeu » : Kanto = attaques gen 1 uniquement, Johto = gen 2 + restes gen 1, jamais de CT gen 3+ vendue) :
+   - Nouvel outil `tools/gen_ctcs_shops.mjs` (listes GEN1 = 165 attaques RFVF / GEN2 = 86 attaques OAC hardcodées) qui génère `src/data/ctcs-shop-data.js` : `CTCS_SHOP_STOCK` (43 CT vendables réparties dans les 20 boutiques `pallet…indigo` + `jnewbark…jblackthorn`, **une seule boutique par CT**, triées par prix, préférence thématique ville-arène puis équilibrage, puissance ≥ 110 → `indigo`/`jblackthorn`), `CTCS_PRICES` (paliers 25 000 statut / 30 000 ≤ 60 / 45 000 ≤ 90 / 60 000 ≤ 110 / 80 000 > 110 — patch appliqué au chargement si prix absent, 28 CT reçoivent un prix), `CTCS_META` (move + génération par CT vendue), `CTCS_UNSOLD` (64 CT gen 3+ volontairement jamais vendues : `electricterrain`, `dracometeor`, `voltswitch`…).
+   - `src/loader.js` charge `ctcs-shop-data.js` après `items-helpers` ; `renderShop` (shop.js) fusionne le stock CT/CS au stock de base (dédoublonné). Résultat : le joueur doit **visiter les deux régions entières** pour compléter sa collection de CT, et la Ligue (`indigo`, verrouillée par `G.championTitle`) garde les plus grosses attaques.
+2. **B. Panneaux d'information : « où trouver » et « qui peut l'avoir » partout** :
+   - Nouvelles fonctions dans `src/data/game-helpers.js` (+ exports window) : `getItemSourceList(key)` (routes, herbes/boutiques/mine/quêtes/labo **et atoll + CT** — couvre ce que `findItemSources` manquait) et `getMoveLearners(moveId)` (cache ; 3 catégories : montée en niveau via `getSpeciesMovePool`, CT/CS via `getCtCsMoveIds`, dressage = reste du pool complet).
+   - Fiche objet (`openItemInfo`, items-helpers) : la section « 📍 Où trouver » (auparavant alimentée par le stub `window.ItemDB` quasi vide → toujours vide) liste maintenant toutes les sources (`pw-src-list`/`pw-src-line`, fallback sur l'ancien `getItemSource`). `findItemSources` devient un wrapper de `getItemSourceList`.
+   - Fiche attaque (`openMoveInfo`, poke-modal) : nouvelle section `learners_title` avec 3 lignes — `learners_level` / `learners_ctcs` / `learners_training` — en chips « #id nom » (cap 24 + `dict_and_n_more`).
+   - Fiche talent (`openAbilityInfo`, fullscreen-panel) : nouvelle section `hidden_carriers` (chips `dict-chip-hidden`) listant les porteurs du talent **caché** (scan `POKEMON_TALENTS.hiddenAbility` insensible à la casse) — la liste des talents normaux existait déjà.
+3. **C. Dictionnaire épuré** (`renderDictionary`) : les listes en `<small>` (sources des objets, élèves des attaques, porteurs des talents + mention `dict_ability_carriers`) sont retirées des cases — l'info vit désormais uniquement dans les panneaux d'info du point 2. Les spans d'état (possédé / connue par N / débloqué·rareté) sont conservés.
+4. **D. Sac réaménagé, unifié avec la boîte PC** (`inventory.js`) :
+   - Catégories cohérentes : les baies passent de `berry` à **`held`** (objet tenu — elles portent déjà `type:"held"` dans les données), le fourre-tout `misc` devient `special` (plus de filtres « Baies » / « Divers » orphelins).
+   - `renderInventory` réécrit : barre d'outils `box-filter-panel ui-control-toolbar--box` **intégrée au contenu** (même interface que la boîte PC : select Catégorie `setInvCat`, select Tri `setInvSort` en `data-change-args="this.value"`, champ recherche `data-action="filter-bag"` (`_invSearch`/`setInvSearch`), bouton `resetInvFilters`) ; l'ancienne barre externe `#fs-panel-filters` est désactivée ; focus recherche si une recherche est active ; tri « catégorie » départagé par le nom ; handler `input` `filter-bag` ajouté dans `file-postboot.js`.
+5. **E. Paramètres : suppression de sauvegarde clairement dangereuse** (index.html) : classe `pw-btn-danger` (rouge) sur les boutons « Supprimer la sauvegarde » et « Confirmer », span `data-i18n="delete_save_warning"` (⚠) dans la rangée de confirmation (`.delete-danger-zone`). La confirmation existait déjà mais sans AUCUN signal visuel.
+6. **F. Drag & drop unifié** : nouvelles fonctions `pwDragGhostHtml` / `pwApplyDragGhost` (+ exports) dans `sprite-helpers.js` → preview identique (`pw-drag-ghost`) quelle que soit la chose déplacée, appliquée aux 5 sites : carte d'équipe (sprite + nom + `Nv`), pilule d'attaque d'équipe (badge de type + nom), carte Usine + attaque Usine (panneau de préparation lancé passe 25), et fenêtres (`win-drag` — ghost `pw-drag-ghost-win` + hint `drag_win_hint`). Avant : seul `teamDragStart` avait `setDragImage`, tout le reste affichait le rendu navigateur par défaut.
+7. **G. Presets d'équipe prévisualisés** (`team-ui.js`) : `resolvePresetPoke(uid)` (résout dans l'équipe puis la collection, `{p, here}`) + `renderTeamPresetsToolbar` réécrit : jusqu'à **6 chips** par preset (sprite 20 px, `in-box` grisée + pointillés si le Pokémon est dans la boîte, `missing` « ? » + `preset_missing_hint` s'il a disparu, `preset-chip-empty` sinon) avec tooltips nom/Nv/localisation.
+
+### Validation passe 26
+
+```bash
+node tools/gen_ctcs_shops.mjs   # 43 CT vendables gen≤2 / 20 boutiques / 64 CT gen3+ exclues — invariant vendues∪non-vendues = toutes les CT, sans doublon
+npm run check                   # validate: OK — build: OK — tests: 285/285 OK (278 + 7)
+python3 tools/audit_project.py  # 1096 références d'images, 0 manquante
+```
+
+- Nouvelle suite `tests/passe26-features.test.js` (7 tests) : A — invariant vendues ∪ non-vendues = toutes les CT + unicité de la boutique par CT + Kanto = gen 1 uniquement + prix présents + chacune des 20 boutiques a ≥ 1 CT + câblage loader/shop ; B — sources (route/boutique/Atoll/CT) + élèves (3 catégories) + câblage des 3 panneaux ; C — absence des `<small>` listes dans les 3 branches du dictionnaire ; D — `itemCat` baies→held/misc→special + rendu de la barre boîte-PC + recherche/reset ; E — danger rouge + warning ; F — helper ghost + présence aux 5 sites + capture fonctionnelle (vm) ; G — chips/in-box/missing/empty.
+- i18n (FR + EN, `[fr|en]/ui.js`) : `learners_title`, `learners_level`, `learners_ctcs`, `learners_training`, `hidden_carriers`, `dict_and_n_more`, `bag_search_placeholder`, `delete_save_warning`, `preset_missing_hint`, `drag_win_hint`.
+- CSS (`cleaned-components.css`) : `.pw-drag-ghost(-ico/-txt/-win)`, `.pw-src-list/-line`, `.dict-chip-line/.dict-chip-list/.dict-chip-hidden`, `.box-filter-search`, `.team-preset-group/-btns/-chips`, `.preset-chip(.in-box/.missing/-empty)`, `.delete-danger-zone`, `.delete-warn`.
+- Effets de bord recherchés : aucune modification d'espèces, de niveaux, de movesets, de talents ou d'économie existante (prix des CT = ajout purement additif ; `./tools/sim_battles.mjs` = comportement inchangé). Les 64 CT gen 3+ restent obtenables en debug uniquement — décision canonique assumée.
+
+---
+
+## Passe 27 — retours bêta : descriptions d'objets corrigées, baies sans effet retirées du jeu, sac en onglets, réglages réparés, preview de drop, vraie gestion des équipes (20 presets + éditeur)
+
+1. **A. Descriptions d'objets (Orbe Toxique & co) réparées** :
+   - *Statut manglé (« …inflige **poison**">Empoisonné »)* : `replaceStatusTerms`/`replaceWeatherTerms` (badge-helper) remplaçaient les mots-clés **à l'intérieur des balises HTML** déjà injectées (`data-buff="poison"` des badges de statut construits par ItemEngine). Nouveau helper `_replaceOutsideTags` (découpe sur les balises, ne traite que les nœuds texte) appliqué aux **15 remplacements** des deux fonctions — tous les objets/attaques à badges co-injectés sont couverts (orbes, roches météo, descriptions d'attaques).
+   - *« xx1.15 »* : la clé FR `held_damage_boost` finissait déjà par « x » et le code ajoutait `x` + valeur. Clé corrigée (`…du porteur de `).
+   - *Cadre puissance moche (Orbe Vie, Amulette Claire, Restes…)* : la section encadrée `⚡ x1.20 (max x2.00)` est **supprimée** du panneau ; la description porte désormais la puissance **en ligne** — « Augmente la puissance de x1.20 (max x2.00). » (clé i18n `held_power_sentence`, `powStr` mutualisé dans `generateItemDesc` : branches type_boost / choix / orbes / roches + append aux `desc_*` & `effect` à formule + phrase complète si aucune description). Les orbes/roches passent un **libellé texte** du statut (`_statusLabel`) que le badgeur tag-safe colore ensuite — fini les badges imbriqués.
+2. **B. Baies Oran / Sitrus / Ceriz SUPPRIMÉES du jeu** (sans effet réel) : retirées de `ITEMS`, des 15 boutiques, des drops de routes, de l'ItemDB legacy, des sprites (`ITEM_SPRITE_DATA` + 3 PNG effacés) et des localisations FR/EN. **Récompenses de quêtes compensées** : les 58 récompenses en baies (30 secondaires + 28 principales, uniquement des *rewardItems*, jamais des objectifs) deviennent de la **Poussière Étoile** (même quantité, vendable) ; le tutoriel donne 2 stardust au lieu de 3 Oran. **Sauvegardes purgées** au chargement (`normalizeLoadedState` : liste unique `RETIRED_ITEMS`, sac + `teamSlotItems` + **objets tenus** en équipe **et** en boîte).
+3. **C. Sac réorganisé en ONGLETS** (comme les pages « boîte/fossiles » du PC) : le select de catégorie et l'onglet « Tous » disparaissent ; 6 onglets (Objets tenus / CT-CS / Évolution / Fossiles / Trésors / Spécial) avec **compteurs**, tri + recherche conservés (recherche **globale** pendant la saisie), atterrissage sur le 1er onglet non vide tant que le joueur n'a pas cliqué, et **onglet « Objets tenus » forcé pendant un équipement** (`_equipCallback` actif) → équiper est direct.
+4. **D. Réglages réparés** : les boutons « Supprimer / Confirmer » n'étaient **pas rouges** — la règle générique `.hbtn:not(…` (spécificité 8 classes, chargée après) écrasait `.pw-btn-danger` : `:not(.pw-btn-danger):not(.pw-btn-cancel)` ajouté + `.pw-btn-danger` renforcé (`!important`, texte blanc). **En-tête des réglages vraiment fixe** : le `sticky` était cassé par l'en-tête canonique (marges/padding/fond quasi transparent chargés après) → bloc dédié fin de cascade (`position: sticky; top: 0`, fond opaque, `padding-top: 0` sur `#settings-inner`).
+5. **E. Drag & drop : preview du RÉSULTAT** — bulle flottante `pw-drop-preview` qui suit le curseur et montre **l'échange à venir** (source ⇄ cible, sprites/badges + noms) via `pwDropPreviewShow`/`pwSwapPreviewHtml`/`pwDropPreviewHide` (sprite-helpers). Câblée sur les **5 sites** : cartes d'équipe, attaques d'équipe, cartes Usine, attaques Usine **et** cartes de l'éditeur de preset (point 6) ; masquée proprement au drop/dragend/dragleave (garde `relatedTarget` anti-scintillement).
+6. **F. Vraie gestion des équipes (20 presets)** : `ensureTeamPresets()` (team-manage, `PRESET_MAX = 20`) garantit `preset1…preset20` (noms hérités 1-3, autres `preset_default_name` localisé) + migration des vieilles sauvegardes (`normalizeLoadedState`). La barre de presets devient **un bouton « 🗂 Gérer mes équipes »** (nom + taille du preset actif affichés). Panneau plein écran `renderPresetManager` (route `presets`) : 20 lignes (n°, **renommage en ligne**, chips sprites des 6 membres (grisées boîte / « ? » disparu), compteur, Charger / Sauver ici / **Modifier**, ligne active). **Éditeur d'équipe** `openPresetEditor` (modale clone de la préparation Usine : MÊMES cartes `generatePokeCardHTML`) — clic sprite = **changer de Pokémon** (sélecteur intégré avec recherche, équipe + boîte, dédoublonné, cap 6, retrait), badge objet = **gérer l'objet tenu** (sélecteur intégré — membres de l'équipe active uniquement, cohérent avec `syncTeamSlotHeldItems` qui purge les tenus en boîte ; double équipement refusé), clic droit = **fiche du Pokémon pour le modifier** (retour automatique à l'éditeur via `_presetEditorReturn` + `pwInfoBack` `kind:'preset-editor'`), **glisser-déposer = réordonner** (swap persisté). Boutons « Appliquer à l'équipe » / « 💾 Sauver l'équipe actuelle ici ».
+
+### Validation passe 27
+
+```bash
+npm run check                   # validate: OK — build: OK — tests: 292/292 OK (285 + 7)
+python3 tools/audit_project.py  # 1093 références d'images, 0 manquante (1096 - 3 PNG de baies)
+node tools/sim_battles.mjs      # difficulté atoll/arènes inchangée (aucune modif d'économie active)
+```
+
+- Nouvelle suite `tests/passe27-features.test.js` (7 tests) : descriptions propres (pas de `**`, pas de `xx`, badges intacts, cadre ⚡ retiré, EN cohérent) ; retrait intégral des 3 baies (données, quêtes, tutoriel, purge de sauvegarde par littéraux) ; sac à onglets (atterrissage, clic, recherche globale, forçage équipement, reset) ; réglages (exclusions CSS `:not`, rouge `!important`, sticky opaque) ; preview de drop (helpers exportés, câblage 2+2+1 sites, bulle fonctionnelle contenant les deux Pokémon, masquage) ; gestionnaire (20 presets garantis + migration, rendu 20 lignes, renommage avec repli, éditeur ouvert, swap/pick persistés, navigation des fiches, i18n FR) ; objets de l'éditeur (sélecteur tenables, équipement via slot réel, refus double, retrait, refus boîte explicite).
+- Suites existantes mises à jour (comportement voulu) : `tests/passe26-features.test.js` (témoin de sources Oran→Prine, sac à onglets, reset → onglet tenus, toolbar presets = bouton du gestionnaire), `tests/equip-held-items.test.js` (baie Oran→Babiri), `tests/passe14-gen3-fossils.test.js` (regex de la liste de retrait mutualisée `RETIRED_ITEMS`).
+- i18n (FR+EN) : `held_power_sentence`, `preset_default_name`, `panel_presets_title`, `teams_manager_open`, `presets_hint`, `preset_active_tag`, `preset_load_btn/save_btn/edit_btn`, `back_to_presets`, `back_to_preset_editor`, `preset_editor_sub/hint/sprite_hint`, `preset_add_lbl/apply_btn/save_current_btn/remove_member`, `preset_pick_poke_title/pick_search_ph/in_team_tag/pick_item_title/items_team_only/remove_item/no_item`.
+- CSS : `.pw-drop-preview(+side/txt/arrow)`, `.inv-tabs/.inv-tab(.active)/.inv-tab-count/.inv-controls`, `.preset-list/.preset-row(.active)/.preset-row-idx/.preset-name-input/.preset-row-chips/.preset-chip-more/.preset-row-count/.preset-row-actions/.preset-active-tag`, `.team-presets-open-btn`, `.preset-slot-empty/.preset-slot-missing/.preset-pick-search/.preset-pick-list/.preset-pick-row/.preset-pick-tag(.in-box)`, bloc réglages passe 27 dans `pw-unified.css`.
+- Effets de bord recherchés : économie atoll/jetons inchangée ; movesets/talents/espèces intacts ; les objets des presets ne changent que par les flux existants ; suppression des baies = retrait pur sans remplacement d'effet (elles n'en avaient pas).
+
+---
+
+## Passe 27b — correctif : statut « Poison » non badgé dans la description de l'Orbe Toxique (retour bêta jour 0)
+
+1. **Le mot de statut n'avait pas sa couleur** dans la description de l'Orbe Toxique : la passe 27 injectait le libellé FR `status_poisoned` = « Empoisonné », or le badgeur (`replaceStatusTerms`) s'appuie sur des bornes de mot `\b` ASCII qui **ne matchent jamais après une lettre accentuée** (`é` final). Deux corrections :
+   - Libellé FR = le substantif **`status_poison` « Poison »** (comme les jeux officiels), utilisé par `_statusLabel` — la description affiche « …mais inflige **Poison** » avec le badge violet, conforme à l'attente.
+   - Robustesse générale : la borne finale de la regex poison devient `(?![\p{L}])` (flag `u`) — tout mot accentué terminal redevient badgable où qu'il apparaisse (descriptions d'attaques, futurs objets).
+2. **Vérification croisée FR/EN de tous les objets concernés** : seuls 2 objets ont un `statusEffect` (Orbe Toxique = poison, Orbe Flamme = brûlure) et 4 roches météo (Soleil/Pluie/Grêle/Tempête de Sable). Les 6 sont désormais **badgés en FR comme en EN** (« Poison »/« Poisoned », « Brûlure »/« Burn », météos) — test dédié ajouté (boucle statutItems × langues).
+
+### Validation passe 27b
+
+```bash
+npm run check                   # 292/292 OK (suite passe27 A enrichie : badge « Poison » + boucle 6 objets × 2 langues)
+python3 tools/audit_project.py  # 1093 références d'images, 0 manquante
+```
+
+- Effets de bord : aucun (libellé affiché uniquement ; l'EN garde « Poisoned » qui était déjà badgé correctement).
+
+---
+
 ## Limites restantes recommandées pour une phase suivante
 
 - ~~Terminer la migration complète des 251 chaînes candidates encore en dur.~~ **Fait en passe 2** (UI ; le compteur de l'audit inclut des faux positifs : comparaisons `>= … && … <=`, markup structurel, données de contenu).

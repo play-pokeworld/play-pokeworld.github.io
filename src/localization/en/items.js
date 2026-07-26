@@ -1,17 +1,5 @@
 // ===== EN — Item names & descriptions =====
 window.L_en_items = {
-  "oran_berry": {
-    "name": "Oran Berry",
-    "desc": "Max HP +30% at max stack (25/25)."
-  },
-  "sitrus_berry": {
-    "name": "Sitrus Berry",
-    "desc": "Attack +25% at max stack (25/25)."
-  },
-  "cheri_berry": {
-    "name": "Cheri Berry",
-    "desc": "Speed +30% at max stack (25/25)."
-  },
   "prine_berry": {
     "name": "Lum Berry",
     "desc": "Defense +25% at max stack (25/25)."

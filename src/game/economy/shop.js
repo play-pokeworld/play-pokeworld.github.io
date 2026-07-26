@@ -21,8 +21,13 @@ function renderShop(el){
  return;
  }
  const shop=SHOPS[shopId];
+ // Passe 26 : le stock CT/CS généré (canonique par version : gen 1 à Kanto,
+ // gen 2 + restes à Johto) est fusionné au stock de base de la boutique.
+ const baseItems = shop.items || [];
+ const ctcsStock = (typeof CTCS_SHOP_STOCK !== 'undefined' && CTCS_SHOP_STOCK && CTCS_SHOP_STOCK[shopId]) || [];
+ const stockList = baseItems.concat(ctcsStock.filter(k => !baseItems.includes(k)));
  el.innerHTML=`
- ${shop.items.map(key=>{
+ ${stockList.map(key=>{
  const itm=ITEMS[key];
  if(!itm||!itm.price) return '';
  const owned=G.inventory[key]||0;

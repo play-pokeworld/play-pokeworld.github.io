@@ -457,6 +457,26 @@ function openMoveInfo(moveId, contextIdx, contextBoxId){
  if (moveDesc) _infoSections.push({ title: t('description'), body: '<div class="pw-text-sm pw-light1">' + moveDesc + '</div>' });
  _infoSections.push({ title: t('effects'), body: effHtml });
 
+ // Passe 26 : liste des Pokémon pouvant apprendre l'attaque, par catégorie
+ // légitime du jeu (niveau / CT-CS / dressage) — le dictionnaire n'affiche
+ // plus ces listes, elles vivent ici dans le panneau d'information.
+ if (typeof getMoveLearners === 'function') {
+   var _learners = getMoveLearners(moveId);
+   var _mkChips = function (ids) {
+     var cap = 24, shown = ids.slice(0, cap);
+     var chipsHtml = shown.map(function (sid) { return '<span class="dict-chip">#' + sid + ' ' + (typeof getPokeName === 'function' ? getPokeName(sid) : sid) + '</span>'; }).join('');
+     if (ids.length > shown.length) chipsHtml += '<span class="dict-muted">' + tr('dict_and_n_more', { count: ids.length - shown.length }) + '</span>';
+     return chipsHtml;
+   };
+   var _learnBody = '';
+   ['level', 'ctcs', 'training'].forEach(function (catKey) {
+     var ids = _learners[catKey] || [];
+     if (!ids.length) return;
+     _learnBody += '<div class="dict-chip-line"><b>' + t('learners_' + catKey) + '</b><span class="dict-chip-list">' + _mkChips(ids) + '</span></div>';
+   });
+   if (_learnBody) _infoSections.push({ title: t('learners_title'), body: _learnBody });
+ }
+
  if (typeof window.pwBuildInfoPanel === 'function') {
    _pwSetHtmlSafe(inner, window.pwBuildInfoPanel({
      icon: '<span class="type-badge ' + typeClass(type) + ' pw-type-info">' + (typeof getTypeName === 'function' ? getTypeName(type) : type) + '</span>',

@@ -349,7 +349,7 @@
     if (action === 'legacy-call-stop') { event.stopPropagation(); callGlobal.apply(null, [element.dataset.call].concat(parseLegacyArgs(element.dataset.callArgs || '', event, element))); return true; }
     if (action === 'call-close-poke') { callGlobal.apply(null, [element.dataset.call].concat(parseLegacyArgs(element.dataset.callArgs || '', event, element))); var pm = document.getElementById('poke-modal'); if (pm) pm.classList.remove('open'); return true; }
     if (action === 'call-close-selector') { callGlobal.apply(null, [element.dataset.call].concat(parseLegacyArgs(element.dataset.callArgs || '', event, element))); callGlobal('closeUnifiedSelectorModal'); return true; }
-    if (action === 'close-poke-modal') { window._moveInfoContext = element.dataset.resetMoveInfo ? null : window._moveInfoContext; window.boxMoveReplaceSlot = element.dataset.resetBoxMove ? null : window.boxMoveReplaceSlot; window.moveEditorFor = element.dataset.resetMoveEditor ? null : window.moveEditorFor; window._pwPokeSheet = null; window._pwInfoSource = null; window._atollPrepOpen = false; var pm2 = document.getElementById('poke-modal'); if (pm2) { pm2.classList.remove('open'); pm2.classList.remove('atoll-prep-modal'); } return true; }
+    if (action === 'close-poke-modal') { window._moveInfoContext = element.dataset.resetMoveInfo ? null : window._moveInfoContext; window.boxMoveReplaceSlot = element.dataset.resetBoxMove ? null : window.boxMoveReplaceSlot; window.moveEditorFor = element.dataset.resetMoveEditor ? null : window.moveEditorFor; window._pwPokeSheet = null; window._pwInfoSource = null; window._atollPrepOpen = false; var pm2 = document.getElementById('poke-modal'); if (pm2) { pm2.classList.remove('open'); pm2.classList.remove('atoll-prep-modal'); } if (window._presetEditorReturn) { var _pmPk = window._presetEditorReturn; window._presetEditorReturn = null; callGlobal('openPresetEditor', _pmPk); } else { window._presetEditorOpen = null; if (pm2) pm2.classList.remove('preset-editor-modal'); } return true; }
     if (action === 'cancel-box-move-replace') { window.boxMoveReplaceSlot = null; callGlobal('openBoxPokeModal', element.dataset.boxId); return true; }
     if (action === 'cancel-move-replace') { window.moveReplaceSlot = null; callGlobal('openPokeModal', Number(element.dataset.teamIndex)); return true; }
     if (action === 'back-to-move-context') { if (window._moveInfoContext && window._moveInfoContext.boxId) callGlobal('openBoxPokeModal', window._moveInfoContext.boxId); else if (window._moveInfoContext && window._moveInfoContext.idx !== null) callGlobal('openPokeModal', window._moveInfoContext.idx); else { var pm3 = document.getElementById('poke-modal'); if (pm3) pm3.classList.remove('open'); } return true; }
@@ -461,7 +461,8 @@ window.PW_FS_BACK_KEYS = {
   pokedex: 'back_to_pokedex',
   dictionary: 'back_to_dictionary',
   guide: 'back_to_guide',
-  atoll: 'back_to_atoll'
+  atoll: 'back_to_atoll',
+  presets: 'back_to_presets'
 };
 
 // Déduit la source courante au moment où un panneau d'info s'ouvre.
@@ -488,6 +489,10 @@ window.pwInfoCaptureSource = function pwInfoCaptureSource() {
   if (window._atollPrepOpen) {
     return { kind: 'atoll-prep' };
   }
+  // 1c) Passe 27 : ouvert depuis l'éditeur d'équipe (preset)
+  if (window._presetEditorOpen) {
+    return { kind: 'preset-editor', presetKey: window._presetEditorOpen };
+  }
   // 2) Ouvert depuis un panneau plein écran (dictionnaire, sac, pokédex…)
   if (window._fsCurrentPanel) {
     return { kind: 'fs', panel: window._fsCurrentPanel };
@@ -508,6 +513,7 @@ window.pwInfoBackLabel = function pwInfoBackLabel() {
   // retour à la préparation.
   else if (src.kind === 'equip-select') key = 'back_to_equip_selector';
   else if (src.kind === 'atoll-prep') key = 'back_to_atoll_prep';
+  else if (src.kind === 'preset-editor') key = 'back_to_preset_editor';
   var fallback = '← Retour';
   if (key && typeof t === 'function') { var v = t(key); if (v && v !== key) return v; }
   return fallback;
@@ -562,6 +568,7 @@ window.pwInfoBack = function pwInfoBack() {
     // panneau de préparation Usine de l'atoll.
     if (src && src.kind === 'equip-select' && src.teamIdx != null) { callGlobal('openItemSelector', src.teamIdx); return; }
     if (src && src.kind === 'atoll-prep') { callGlobal('openAtollFactoryPrep'); return; }
+    if (src && src.kind === 'preset-editor' && src.presetKey != null) { callGlobal('openPresetEditor', src.presetKey); return; }
   } catch (_) {}
   var pm = document.getElementById('poke-modal');
   if (pm) pm.classList.remove('open');

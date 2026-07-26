@@ -11,9 +11,11 @@ function startWinDrag(e, winId){
 
  dragGhostEl = document.createElement('div');
  const titleText = win.querySelector('.win-header-title')?.textContent || winId;
- dragGhostEl.innerHTML = `<div class="pw-capture-banner-lg">
- <span>Glisser pour ancrer : ${titleText}</span>
- </div>`;
+ // Passe 26 : même vignette de drag que les Pokémon/attaques (look unifié).
+ dragGhostEl.className = 'pw-drag-ghost pw-drag-ghost-win';
+ dragGhostEl.innerHTML = (typeof pwDragGhostHtml === 'function')
+ ? pwDragGhostHtml('🗔', titleText, (typeof t === 'function' ? t('drag_win_hint') : 'Déplacer la fenêtre'))
+ : `<span>${titleText}</span>`;
  dragGhostEl.style.position = 'fixed';
  dragGhostEl.style.pointerEvents = 'none';
  dragGhostEl.style.zIndex = '10000';

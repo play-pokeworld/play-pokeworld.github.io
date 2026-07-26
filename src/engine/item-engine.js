@@ -112,14 +112,30 @@
     var qty = (window.G && window.G.inventory) ? (window.G.inventory[itemKey] || 0) : 0;
     var level = getPowerLevel(qty);
     var power = evalFormula(item.powerFormula || '1', level);
-    
+    // Passe 27 : affichage puissance SIMPLE et complet « x1.20 (max x2.00) »
+    // directement dans la description (le cadre ⚡ du panneau est retiré).
+    var levelMax = evalFormula(item.powerFormula || '1', 5);
+    var powStr = 'x' + power.toFixed(2) + ' (max x' + levelMax.toFixed(2) + ')';
+    function _statusLabel(key, langKey) {
+            var frKeys = { burn:'status_burn_label', freeze:'status_freeze_label', para:'status_para_label', poison:'status_poison', sleep:'status_sleep_label', confuse:'status_confuse_label', sunny:'weather_sunny', rainy:'weather_rainy', sand:'weather_sandstorm', hail:'weather_hail', eterrain:'terrain_electric', gterrain:'terrain_grassy', mterrain:'terrain_misty' }; // passe 27b : 'status_poison' (« Poison », substantif badgable) à la place de status_poisoned (« Empoisonné », non capturé par le badgeur)
+      if (langKey === 'en') { var enMap = { sand:'Sandstorm', eterrain:'Electric Terrain', gterrain:'Grassy Terrain', mterrain:'Misty Terrain' }; return enMap[key] || EN_STATUS[key] || key; }
+      var k = frKeys[key];
+      var v = k && (typeof t === 'function') ? t(k) : '';
+      return (v && v !== k) ? v : (EN_STATUS[key] || key);
+    }
+    function _powerSentence(langKey) {
+      if (langKey === 'en') return 'Boosts power by ';
+      var v = (typeof t === 'function') ? t('held_power_sentence') : '';
+      return (v && v !== 'held_power_sentence') ? v : 'Augmente la puissance de ';
+    }
+
     // Type boosters
     if (item.category === 'type_boost' && item.typeBoost) {
       var badge = typeBadge(item.typeBoost);
       if (lang === 'en') {
-        return 'When held: Increase the damage of ' + badge + '-Type moves by x' + power.toFixed(2);
+        return 'When held: Increase the damage of ' + badge + '-Type moves by ' + powStr;
       }
-      return (typeof t==='function'?t('held_boost_type'):'Held: boosts ') + badge + ' de x' + power.toFixed(2);
+      return (typeof t==='function'?t('held_boost_type'):'Held: boosts ') + badge + ' de ' + powStr;
     }
     
     // Resistance berries
@@ -137,9 +153,9 @@
       var statEn = ({atk:(typeof t==='function'?t('stat_atk'):'Attack'),spa:(typeof t==='function'?t('stat_spa'):'Sp. Atk'),spe:(typeof t==='function'?t('stat_spe'):'Speed')})[item.stat] || (typeof t==='function'?t('stat_atk'):'Attack');
       var statFr = ({atk: (typeof t==='function'?t('stat_atk'):'Attack'), spa: (typeof t==='function'?t('stat_spa'):'Sp. Atk'), spe: (typeof t==='function'?t('stat_spe'):'Speed')})[item.stat] || (typeof t==='function'?t('stat_atk'):'Attack');
       if (lang === 'en') {
-        return 'When held: Increases the ' + statEn + ' of the user by x' + power.toFixed(2) + ', but prevents them from switching';
+        return 'When held: Increases the ' + statEn + ' of the user by ' + powStr + ', but prevents them from switching';
       }
-      return (typeof t==='function'?t('held_choice_item'):'Held: raises ') + statEn + ' by x' + power.toFixed(2) + (typeof t==='function'?t('held_choice_lock'):", but prevents switching");
+      return (typeof t==='function'?t('held_choice_item'):'Held: raises ') + statEn + ' de ' + powStr + (typeof t==='function'?t('held_choice_lock'):", but prevents switching");
     }
     
     // Gems
@@ -160,18 +176,18 @@
     
     // Weather rocks
     if (item.category === 'weather' && item.weather) {
-      var wTag = getStatusTag(item.weather, lang);
+      var wTag = _statusLabel(item.weather, lang);
       if (lang === 'en') return 'When held: Increases the duration of ' + wTag + ' weather';
       return (typeof t==='function'?t('held_weather_duration'):'Held: extends weather ') + wTag;
     }
     
     // Status orbs
     if (item.category === 'status' && item.statusEffect) {
-      var sTag = getStatusTag(item.statusEffect, lang);
+      var sTag = _statusLabel(item.statusEffect, lang);
       if (lang === 'en') {
-        return 'When held: Increases the Damage of the user by x' + power.toFixed(2) + ', but inflicts ' + sTag;
+        return 'When held: Increases the Damage of the user by ' + powStr + ', but inflicts ' + sTag;
       }
-      return (typeof t==='function'?t('held_damage_boost'):'Held: boost user damage by ') + 'x' + power.toFixed(2) + (typeof t==='function'?t('held_inflicts'):', but inflicts ') + sTag;
+      return (typeof t==='function'?t('held_damage_boost'):'Held: boost user damage by ') + powStr + (typeof t==='function'?t('held_inflicts'):', mais inflige ') + sTag;
     }
     
     // CT/TM items: use localization
@@ -192,11 +208,18 @@
     
     // Special items with explicit desc_en/desc_fr
     if (item.desc_en && item.desc_fr) {
-      return lang === 'en' ? item.desc_en : item.desc_fr;
+      var dTxt = lang === 'en' ? item.desc_en : item.desc_fr;
+      // Passe 27 : puissance ajoutée en ligne pour les objets à formule
+      // (Orbe Vie, Amulette Claire, Restes…) — plus de cadre séparé.
+      if (item.powerFormula) dTxt += ' ' + _powerSentence(lang) + powStr + '.';
+      return dTxt;
     }
     
     // Fallback: raw effect
-    if (item.effect) return item.effect;
+    if (item.effect) { var eTxt = item.effect; if (item.powerFormula) eTxt += ' ' + _powerSentence(lang) + powStr + '.'; return eTxt; }
+    // Passe 27 : objet à formule sans description — la phrase de puissance
+    // EST la description complète (ex. « Augmente la puissance de x1.20 (max x2.00). »).
+    if (item.powerFormula) return _powerSentence(lang) + powStr + '.';
     
     return '';
   }

@@ -21,7 +21,7 @@ function makeSandbox() {
   const G = {
     lang: 'fr', region: 'kanto', badges: [],
     team: [], teamSlotItems: [], collection: {}, hatchery: [],
-    inventory: { mystic_water: 1, oran_berry: 2, prine_berry: 3, fire_stone: 1, choice_band: 1 },
+    inventory: { mystic_water: 1, babiri_berry: 2, prine_berry: 3, fire_stone: 1, choice_band: 1 }, // passe 27 : baies Oran/Sitrus/Ceriz retirées du jeu
     unlockedTalents: {}, money: 0,
   };
   const team = [
@@ -66,7 +66,7 @@ function makeSandbox() {
 test('helper isHeldEquippableItem : held/buff tenables, pierres et CT exclus', () => {
   const sb = makeSandbox();
   assert.equal(sb.isHeldEquippableItem('mystic_water'), true, 'type_boost tenable');
-  assert.equal(sb.isHeldEquippableItem('oran_berry'), true, 'baie tenable');
+  assert.equal(sb.isHeldEquippableItem('babiri_berry'), true, 'baie tenable');
   assert.equal(sb.isHeldEquippableItem('choice_band'), true, 'choice tenable');
   assert.equal(sb.isHeldEquippableItem('prine_berry'), true, 'legacy buff tenable');
   assert.equal(sb.isHeldEquippableItem('fire_stone'), false, "pierre d'évolution NON tenable");
@@ -80,7 +80,7 @@ test('le sélecteur ne plante plus : objets sans buff rendus, pierres filtrées'
   const html = sb._fsContent.innerHTML;
   assert.ok(html.length > 500, 'le sélecteur a bien été rendu (aucun TypeError)');
   assert.ok(html.includes('mystic_water'), 'Eau Mystérieuse (type_boost, sans buff) listée');
-  assert.ok(html.includes('oran_berry'), 'baies listées');
+  assert.ok(html.includes('babiri_berry'), 'baies listées');
   assert.ok(html.includes('prine_berry'), 'Baie Prine (legacy buff) listée');
   assert.ok(html.includes('choice_band'), 'Bandeau Choix listé');
   assert.ok(!html.includes('fire_stone'), "pierre d'évolution exclue du sélecteur");

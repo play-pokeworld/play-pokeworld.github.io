@@ -120,15 +120,6 @@ const ITEMS = {
     "name_fr": "Baie Charti",
   },
 
-  "cheri_berry": {
-    "icon": "🍒",
-    "price": 45000,
-    "type": "held",
-    "category": "berry_cure",
-    "name_en": "Cheri Berry",
-    "name_fr": "Baie Ceriz",
-  },
-
   "chipped_pot": {
     "icon": "📦",
     "price": 0,
@@ -2290,15 +2281,6 @@ const ITEMS = {
     "name_fr": "Vieil Ambre",
   },
 
-  "oran_berry": {
-    "icon": "🍇",
-    "price": 45000,
-    "type": "held",
-    "category": "berry_heal",
-    "name_en": "Oran Berry",
-    "name_fr": "Baie Oran",
-  },
-
   "oval_stone": {
     "icon": "💎",
     "price": 50000,
@@ -2633,15 +2615,6 @@ const ITEMS = {
     "type": "key",
     "name_en": "Silver Wing",
     "name_fr": "Aile Argentée",
-  },
-
-  "sitrus_berry": {
-    "icon": "🍊",
-    "price": 45000,
-    "type": "held",
-    "category": "berry_heal",
-    "name_en": "Sitrus Berry",
-    "name_fr": "Baie Sitrus",
   },
 
   "skull_fossil": {

@@ -143,7 +143,7 @@ function installCriticalClickFallback(root) {
     'back-to-move-context': function () { if (window._moveInfoContext && window._moveInfoContext.boxId) callGlobal('openBoxPokeModal', window._moveInfoContext.boxId); else if (window._moveInfoContext && window._moveInfoContext.idx !== null) callGlobal('openPokeModal', window._moveInfoContext.idx); else { var m = document.getElementById('poke-modal'); if (m) m.classList.remove('open'); } },
     'pw-info-back': function () { if (typeof window.pwInfoBack === 'function') window.pwInfoBack(); },
 
-    'close-poke-modal': function (el) { if (el.dataset.resetMoveInfo) window._moveInfoContext = null; if (el.dataset.resetBoxMove) window.boxMoveReplaceSlot = null; if (el.dataset.resetMoveEditor) window.moveEditorFor = null; window._pwPokeSheet = null; window._pwInfoSource = null; window._atollPrepOpen = false; var target = document.getElementById('poke-modal'); if (target) { target.classList.remove('open'); target.classList.remove('atoll-prep-modal'); } },
+    'close-poke-modal': function (el) { if (el.dataset.resetMoveInfo) window._moveInfoContext = null; if (el.dataset.resetBoxMove) window.boxMoveReplaceSlot = null; if (el.dataset.resetMoveEditor) window.moveEditorFor = null; window._pwPokeSheet = null; window._pwInfoSource = null; window._atollPrepOpen = false; var target = document.getElementById('poke-modal'); if (target) { target.classList.remove('open'); target.classList.remove('atoll-prep-modal'); } if (window._presetEditorReturn) { var pmReturn = window._presetEditorReturn; window._presetEditorReturn = null; callGlobal('openPresetEditor', pmReturn); } else { window._presetEditorOpen = null; if (target) target.classList.remove('preset-editor-modal'); } },
     'hide-element': function (el) { var target = document.getElementById(el.dataset.targetElement); if (target) target.style.display = 'none'; },
     'stop-propagation': function (_el, event) { event.stopPropagation(); },
     'select-self': function (el) { if (typeof el.select === 'function') el.select(); },
@@ -191,6 +191,8 @@ function installCriticalClickFallback(root) {
     if (!target) return;
     if (target.dataset.action === 'filter-unified-grid') callGlobal('filterUnifiedGrid');
     if (target.dataset.action === 'filter-dictionary') callGlobal('setDictionarySearch', target.value);
+    if (target.dataset.action === 'filter-bag') callGlobal('setInvSearch', target.value); // passe 26 : recherche du sac
+    if (target.dataset.action === 'filter-preset-picker') callGlobal('presetPickerFilter', target.value); // passe 27 : recherche du sélecteur de preset
   });
 
   document.addEventListener('mousedown', function (event) {

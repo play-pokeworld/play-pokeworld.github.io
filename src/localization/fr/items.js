@@ -933,9 +933,6 @@ window.L_fr_items = {
 
 // Canonical names for items which must never fall back to a localization key.
 Object.assign(window.L_fr_items, {
-  oran_berry: { name: 'Baie Oran', desc: 'Augmente les PV maximum de 30 % au cumul maximal.' },
-  sitrus_berry: { name: 'Baie Sitrus', desc: "Augmente l’Attaque de 25 % au cumul maximal." },
-  cheri_berry: { name: 'Baie Ceriz', desc: 'Augmente la Vitesse de 30 % au cumul maximal.' },
   prine_berry: { name: 'Baie Prine', desc: 'Augmente la Défense de 25 % au cumul maximal.' },
   fossil: { name: 'Vieux Fossile', desc: 'Un fossile ancien — réanimez-le au Laboratoire de fossiles !' },
   helix_fossil: { name: 'Fossile Nautile', desc: 'Un fossile qui peut être réanimé en Amonita.' },

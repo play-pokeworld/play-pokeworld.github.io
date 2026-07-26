@@ -89,7 +89,12 @@ function normalizeLoadedState(){
  // NB : 'fossil' (fossile générique de la mine, objet jouable depuis la
  // passe 13) ne doit PAS être retiré du sac au chargement — seuls les
  // anciens doubletons legacy ('ancient_fossil','old_fossil') le sont.
- for(const retiredKey of ['choice_scarf','swift_charm','ancient_fossil','old_fossil','focus_lens','power_gem','thick_club']) delete G.inventory[retiredKey];
+ // Passe 27 : retrait des baies sans effet (Oran/Sitrus/Ceriz) du jeu entier.
+ const RETIRED_ITEMS = ['choice_scarf','swift_charm','ancient_fossil','old_fossil','focus_lens','power_gem','thick_club','sitrus_berry','cheri_berry','oran_berry'];
+ for(const retiredKey of RETIRED_ITEMS) delete G.inventory[retiredKey];
+ // …et des porteurs (équipe ET boîte PC) — sinon ils garderaient un objet fantôme.
+ if(Array.isArray(G.team)) for(const _tp of G.team){ if(_tp && RETIRED_ITEMS.includes(_tp.heldItem)) _tp.heldItem = null; }
+ if(G.collection) for(const _ck in G.collection){ const _cp = G.collection[_ck]; if(_cp && RETIRED_ITEMS.includes(_cp.heldItem)) _cp.heldItem = null; }
  // Passe 14 : un fossile Johto déjà en incubation donne désormais sa cible
  // canonique (Racine → Lilia #345, Griffe → Anorith #347) au lieu de
  // l'ancien placeholder (Marcacrin #220 / Embrylex #246).
@@ -100,7 +105,7 @@ function normalizeLoadedState(){
    if(typeof hatcheryStepsForPokemon === 'function') slot.stepsReq = hatcheryStepsForPokemon(slot.reviveId);
   }
  }
- if(Array.isArray(G.teamSlotItems)) G.teamSlotItems = G.teamSlotItems.map(key => itemRenames[key] || (['choice_scarf','swift_charm','focus_lens','power_gem','thick_club'].includes(key) ? null : key));
+ if(Array.isArray(G.teamSlotItems)) G.teamSlotItems = G.teamSlotItems.map(key => { const k2 = itemRenames[key] || key; return (['choice_scarf','swift_charm','focus_lens','power_gem','thick_club','sitrus_berry','cheri_berry','oran_berry'].includes(k2) ? null : k2); });
  if(!G.pokedex) G.pokedex = {};
  if(!G.unlockedTalents) G.unlockedTalents = {};
  if(!G.mainStep) G.mainStep = { kanto: 0, johto: 0 };
@@ -123,7 +128,9 @@ function normalizeLoadedState(){
   }
 
  if(!G.dupeCatches) G.dupeCatches = {};
- if(!G.teamPresets) G.teamPresets = { preset1:{name:t('preset_adventure'),uids:[]}, preset2:{name:t('preset_boss'),uids:[]}, preset3:{name:t('preset_training'),uids:[]} };
+ // Passe 27 : 20 emplacements d'équipe (anciennes sauvegardes migrées).
+ if(typeof ensureTeamPresets === 'function') ensureTeamPresets();
+ else if(!G.teamPresets) G.teamPresets = { preset1:{name:t('preset_adventure'),uids:[]}, preset2:{name:t('preset_boss'),uids:[]}, preset3:{name:t('preset_training'),uids:[]} };
  if(!G.activePresetId) G.activePresetId = 'preset1';
  if(G.playTimeMs == null) G.playTimeMs = 0;
  if(!G.saveMeta || typeof G.saveMeta !== 'object') G.saveMeta = {};

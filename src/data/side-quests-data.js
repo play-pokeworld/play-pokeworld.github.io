@@ -13,7 +13,7 @@ var SIDE_QUESTS = {
 "target": 10,
 "rewardMoney": 700,
 "rewardItems": {
-"sitrus_berry": 2
+"stardust": 2
  }
  },
  "s2": {
@@ -35,7 +35,7 @@ var SIDE_QUESTS = {
 "target": 12,
 "rewardMoney": 1600,
 "rewardItems": {
-"cheri_berry": 2
+"stardust": 2
  }
  },
  "s4": {
@@ -67,7 +67,7 @@ var SIDE_QUESTS = {
 "target": 12,
 "rewardMoney": 1900,
 "rewardItems": {
-"sitrus_berry": 2
+"stardust": 2
  }
  },
  "s7": {
@@ -146,23 +146,23 @@ var SIDE_QUESTS = {
 "firestone": 1
  }
  },
- "s14": { "id":"s14", "region":"kanto", "type":"defeat_wild", "loc":"route24", "target": 12, "rewardMoney": 1000, "rewardItems": { "oran_berry": 2 } },
- "s15": { "id":"s15", "region":"kanto", "type":"defeat_wild", "loc":"route25", "target": 12, "rewardMoney": 1100, "rewardItems": { "cheri_berry": 2 } },
- "s16": { "id":"s16", "region":"kanto", "type":"defeat_wild", "loc":"route5", "target": 12, "rewardMoney": 1200, "rewardItems": { "oran_berry": 2 } },
- "s17": { "id":"s17", "region":"kanto", "type":"defeat_wild", "loc":"route6", "target": 14, "rewardMoney": 1300, "rewardItems": { "cheri_berry": 2 } },
+ "s14": { "id":"s14", "region":"kanto", "type":"defeat_wild", "loc":"route24", "target": 12, "rewardMoney": 1000, "rewardItems": { "stardust": 2 } },
+ "s15": { "id":"s15", "region":"kanto", "type":"defeat_wild", "loc":"route25", "target": 12, "rewardMoney": 1100, "rewardItems": { "stardust": 2 } },
+ "s16": { "id":"s16", "region":"kanto", "type":"defeat_wild", "loc":"route5", "target": 12, "rewardMoney": 1200, "rewardItems": { "stardust": 2 } },
+ "s17": { "id":"s17", "region":"kanto", "type":"defeat_wild", "loc":"route6", "target": 14, "rewardMoney": 1300, "rewardItems": { "stardust": 2 } },
  "s18": { "id":"s18", "region":"kanto", "type":"defeat_wild", "loc":"diglettscave", "target": 12, "rewardMoney": 1500, "rewardItems": { "soft_sand": 1 } },
- "s19": { "id":"s19", "region":"kanto", "type":"defeat_wild", "loc":"route8", "target": 15, "rewardMoney": 1700, "rewardItems": { "oran_berry": 2 } },
+ "s19": { "id":"s19", "region":"kanto", "type":"defeat_wild", "loc":"route8", "target": 15, "rewardMoney": 1700, "rewardItems": { "stardust": 2 } },
  "s20": { "id":"s20", "region":"kanto", "type":"defeat_wild", "loc":"rocktunnel", "target": 15, "rewardMoney": 1900, "rewardItems": { "stardust": 1 } },
- "s21": { "id":"s21", "region":"kanto", "type":"defeat_wild", "loc":"route13", "target": 15, "rewardMoney": 2000, "rewardItems": { "sitrus_berry": 2 } },
- "s22": { "id":"s22", "region":"kanto", "type":"defeat_wild", "loc":"route7", "target": 15, "rewardMoney": 2100, "rewardItems": { "cheri_berry": 2 } },
- "s23": { "id":"s23", "region":"kanto", "type":"defeat_wild", "loc":"route16", "target": 12, "rewardMoney": 2200, "rewardItems": { "oran_berry": 2 } },
- "s24": { "id":"s24", "region":"kanto", "type":"defeat_wild", "loc":"route14", "target": 16, "rewardMoney": 2400, "rewardItems": { "sitrus_berry": 2 } },
- "s25": { "id":"s25", "region":"kanto", "type":"defeat_wild", "loc":"route15", "target": 16, "rewardMoney": 2500, "rewardItems": { "cheri_berry": 2 } },
+ "s21": { "id":"s21", "region":"kanto", "type":"defeat_wild", "loc":"route13", "target": 15, "rewardMoney": 2000, "rewardItems": { "stardust": 2 } },
+ "s22": { "id":"s22", "region":"kanto", "type":"defeat_wild", "loc":"route7", "target": 15, "rewardMoney": 2100, "rewardItems": { "stardust": 2 } },
+ "s23": { "id":"s23", "region":"kanto", "type":"defeat_wild", "loc":"route16", "target": 12, "rewardMoney": 2200, "rewardItems": { "stardust": 2 } },
+ "s24": { "id":"s24", "region":"kanto", "type":"defeat_wild", "loc":"route14", "target": 16, "rewardMoney": 2400, "rewardItems": { "stardust": 2 } },
+ "s25": { "id":"s25", "region":"kanto", "type":"defeat_wild", "loc":"route15", "target": 16, "rewardMoney": 2500, "rewardItems": { "stardust": 2 } },
  "s26": { "id":"s26", "region":"kanto", "type":"catch", "target": 14, "rewardMoney": 2600, "rewardItems": { "black_belt": 1 } },
- "s27": { "id":"s27", "region":"kanto", "type":"defeat_wild", "loc":"route20", "target": 15, "rewardMoney": 2800, "rewardItems": { "sitrus_berry": 2 } },
- "s28": { "id":"s28", "region":"kanto", "type":"defeat_wild", "loc":"route21", "target": 18, "rewardMoney": 3000, "rewardItems": { "sitrus_berry": 2 } },
- "s29": { "id":"s29", "region":"kanto", "type":"mine_sell", "target": 8, "rewardMoney": 2700, "rewardItems": { "cheri_berry": 2 } },
- "s30": { "id":"s30", "region":"kanto", "type":"defeat_wild", "loc":"victoryroad", "target": 18, "rewardMoney": 3500, "rewardItems": { "sitrus_berry": 2 } },
+ "s27": { "id":"s27", "region":"kanto", "type":"defeat_wild", "loc":"route20", "target": 15, "rewardMoney": 2800, "rewardItems": { "stardust": 2 } },
+ "s28": { "id":"s28", "region":"kanto", "type":"defeat_wild", "loc":"route21", "target": 18, "rewardMoney": 3000, "rewardItems": { "stardust": 2 } },
+ "s29": { "id":"s29", "region":"kanto", "type":"mine_sell", "target": 8, "rewardMoney": 2700, "rewardItems": { "stardust": 2 } },
+ "s30": { "id":"s30", "region":"kanto", "type":"defeat_wild", "loc":"victoryroad", "target": 18, "rewardMoney": 3500, "rewardItems": { "stardust": 2 } },
  "s31": {
 "id":"s31",
 "region":"johto",
@@ -171,7 +171,7 @@ var SIDE_QUESTS = {
 "target": 12,
 "rewardMoney": 1600,
 "rewardItems": {
-"sitrus_berry": 2
+"stardust": 2
  }
  },
  "s32": {
@@ -247,7 +247,7 @@ var SIDE_QUESTS = {
 "target": 10,
 "rewardMoney": 1800,
 "rewardItems": {
-"oran_berry": 2
+"stardust": 2
  }
  },
  "s39": {
@@ -313,7 +313,7 @@ var SIDE_QUESTS = {
 "target": 15,
 "rewardMoney": 1500,
 "rewardItems": {
-"oran_berry": 2
+"stardust": 2
  }
  },
  "s45": {
@@ -324,7 +324,7 @@ var SIDE_QUESTS = {
 "target": 15,
 "rewardMoney": 1800,
 "rewardItems": {
-"sitrus_berry": 1
+"stardust": 1
  }
  },
  "s46": {
@@ -335,7 +335,7 @@ var SIDE_QUESTS = {
 "target": 20,
 "rewardMoney": 2400,
 "rewardItems": {
-"oran_berry": 2
+"stardust": 2
  }
  },
  "s47": {
@@ -346,7 +346,7 @@ var SIDE_QUESTS = {
 "target": 15,
 "rewardMoney": 2200,
 "rewardItems": {
-"sitrus_berry": 1
+"stardust": 1
  }
  },
  "s48": {
@@ -357,7 +357,7 @@ var SIDE_QUESTS = {
 "target": 15,
 "rewardMoney": 2600,
 "rewardItems": {
-"sitrus_berry": 2
+"stardust": 2
  }
  },
  "s49": {
@@ -368,7 +368,7 @@ var SIDE_QUESTS = {
 "target": 15,
 "rewardMoney": 2800,
 "rewardItems": {
-"oran_berry": 3
+"stardust": 3
  }
  },
  "s50": {
@@ -379,7 +379,7 @@ var SIDE_QUESTS = {
 "target": 18,
 "rewardMoney": 3200,
 "rewardItems": {
-"sitrus_berry": 1
+"stardust": 1
  }
  },
  "s51": {
@@ -401,7 +401,7 @@ var SIDE_QUESTS = {
 "target": 15,
 "rewardMoney": 3800,
 "rewardItems": {
-"sitrus_berry": 1
+"stardust": 1
  }
  },
  "s53": {
@@ -412,7 +412,7 @@ var SIDE_QUESTS = {
 "target": 18,
 "rewardMoney": 3600,
 "rewardItems": {
-"oran_berry": 3
+"stardust": 3
  }
  },
  "s54": {
@@ -423,7 +423,7 @@ var SIDE_QUESTS = {
 "target": 18,
 "rewardMoney": 4200,
 "rewardItems": {
-"sitrus_berry": 2
+"stardust": 2
  }
  },
  "s55": {
@@ -434,7 +434,7 @@ var SIDE_QUESTS = {
 "target": 20,
 "rewardMoney": 4800,
 "rewardItems": {
-"sitrus_berry": 2
+"stardust": 2
  }
  }
 };

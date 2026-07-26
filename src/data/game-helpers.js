@@ -830,6 +830,56 @@ function resetBoxFilters(){
 }
 
 
+// ── Passe 26 : « où trouver » un objet (section du panneau d'info objet) ──
+// Retourne une liste de libellés lisibles (routes, boutiques — stock de base
+// + stock CT/CS —, mine, atoll, quêtes, laboratoire fossile).
+function getItemSourceList(key){
+ const out=[];
+ const add=(s)=>{ if(s && !out.includes(s)) out.push(s); };
+ if(!key) return out;
+ if(typeof ROUTE_DROPS !== 'undefined' && ROUTE_DROPS){
+  for(const [locId,drops] of Object.entries(ROUTE_DROPS)) if((drops||[]).includes(key)) add('🗺️ ' + (typeof getLocName==='function'?getLocName(locId):locId));
+ }
+ for(const [shopId,shop] of Object.entries((typeof SHOPS !== 'undefined' && SHOPS) ? SHOPS : {})){
+  const items=(shop && (shop.items||shop.stock))||[];
+  if(Array.isArray(items)&&items.some(it=>(Array.isArray(it)?it[0]:(it.key||it.id||it))===key)) add('🏬 ' + (typeof getShopName==='function'?getShopName(shopId):shopId));
+ }
+ for(const [shopId,stock] of Object.entries((typeof CTCS_SHOP_STOCK !== 'undefined' && CTCS_SHOP_STOCK) ? CTCS_SHOP_STOCK : {})){
+  if((stock||[]).includes(key)) add('🏬 ' + (typeof getShopName==='function'?getShopName(shopId):shopId) + ' · CT');
+ }
+ if(typeof ATOLL_SHOP !== 'undefined' && Array.isArray(ATOLL_SHOP)){
+  for(const pair of ATOLL_SHOP) if(pair && pair[0]===key) add('🏭 ' + (typeof t==='function'?t('battle_atoll_title'):'Atoll') + ' — ' + pair[1] + ' ' + (typeof t==='function'?t('atoll_tokens'):'jetons'));
+ }
+ if(typeof MINE_ITEMS !== 'undefined' && Array.isArray(MINE_ITEMS) && MINE_ITEMS.some(it=>it && it.key===key)) add('⛏️ ' + (typeof t==='function'?t('mine_title'):'Mine'));
+ if(typeof STORY_QUESTS !== 'undefined' && Array.isArray(STORY_QUESTS)) for(const q of STORY_QUESTS) if(q && q.rewardItems && q.rewardItems[key]) add('📖 ' + (typeof t==='function'?t('dict_main_quest'):'Main quest'));
+ if(typeof SIDE_QUESTS !== 'undefined' && SIDE_QUESTS) for(const q of Object.values(SIDE_QUESTS)) if(q && q.rewardItems && q.rewardItems[key]) add('📗 ' + (typeof t==='function'?t('dict_side_quest'):'Side quest'));
+ if(typeof G !== 'undefined' && G && Array.isArray(G.repeatables)) for(const r of G.repeatables) if(r && r.def && r.def.rewardItems && r.def.rewardItems[key]) add('🔁 ' + (typeof t==='function'?t('dict_repeatable_quest'):'Repeatable quest'));
+ if(typeof ITEMS !== 'undefined' && ITEMS && ITEMS[key] && ITEMS[key].type === 'fossil') add('🔬 ' + (typeof t==='function'?t('fossil_lab'):'Fossil Lab'));
+ return out;
+}
+
+// ── Passe 26 : qui peut apprendre une attaque (panneau d'info attaque) ─────
+// Classe par catégorie de légitimité du jeu : niveau / CT-CS / dressage.
+function getMoveLearners(moveId){
+ var cache=getMoveLearners._cache || (getMoveLearners._cache={});
+ if(cache[moveId]) return cache[moveId];
+ var res={level:[], ctcs:[], training:[]};
+ if(!moveId || typeof getSpeciesFullLearnablePool !== 'function') return res;
+ var ctcsMap=(typeof getCtCsMoveIds === 'function') ? getCtCsMoveIds() : {};
+ var maxId=(typeof PD !== 'undefined' && PD) ? (PD.length-1) : 251;
+ for(var id=1; id<=maxId; id++){
+  if(typeof PD !== 'undefined' && PD && !PD[id]) continue;
+  var pool=getSpeciesFullLearnablePool(id);
+  if(!pool || !pool.includes(moveId)) continue;
+  var lvPool=(typeof getSpeciesMovePool === 'function') ? getSpeciesMovePool(id) : [];
+  if(lvPool.includes(moveId)) res.level.push(id);
+  else if(ctcsMap[moveId]) res.ctcs.push(id);
+  else res.training.push(id);
+ }
+ cache[moveId]=res;
+ return res;
+}
+
 // --- Migrated to ES module, globals exposed ---
 
 
@@ -935,6 +985,8 @@ if (typeof getDuplicateItemPayout !== 'undefined' && typeof window !== 'undefine
 if (typeof grantRewardItem !== 'undefined' && typeof window !== 'undefined') window.grantRewardItem = grantRewardItem;
 if (typeof grantRewardItems !== 'undefined' && typeof window !== 'undefined') window.grantRewardItems = grantRewardItems;
 if (typeof getShopName !== 'undefined' && typeof window !== 'undefined') window.getShopName = getShopName;
+if (typeof getItemSourceList !== 'undefined' && typeof window !== 'undefined') window.getItemSourceList = getItemSourceList;
+if (typeof getMoveLearners !== 'undefined' && typeof window !== 'undefined') window.getMoveLearners = getMoveLearners;
 if (typeof getPokemonBaseStatTotal !== 'undefined' && typeof window !== 'undefined') window.getPokemonBaseStatTotal = getPokemonBaseStatTotal;
 if (typeof getPokemonRank !== 'undefined' && typeof window !== 'undefined') window.getPokemonRank = getPokemonRank;
 if (typeof rankValue !== 'undefined' && typeof window !== 'undefined') window.rankValue = rankValue;

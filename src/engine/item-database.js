@@ -65,9 +65,6 @@
     pure_incense:     { shop: 'celadon_dpt_5f',       price: 45000,  source: 'Magasin de Céladon (5F)' },
     
     // Berries
-    oran_berry:       { shop: 'celadon_dpt_4f',       price: 45000,  source: 'Magasin de Céladon (4F)' },
-    sitrus_berry:     { shop: 'celadon_dpt_4f',       price: 45000,  source: 'Magasin de Céladon (4F)' },
-    cheri_berry:      { shop: 'celadon_dpt_4f',       price: 45000,  source: 'Magasin de Céladon (4F)' },
     occa_berry:       { shop: 'celadon_dpt_4f',       price: 45000,  source: 'Magasin de Céladon (4F)' },
     passho_berry:     { shop: 'celadon_dpt_4f',       price: 45000,  source: 'Magasin de Céladon (4F)' },
     wacan_berry:      { shop: 'celadon_dpt_4f',       price: 45000,  source: 'Magasin de Céladon (4F)' },

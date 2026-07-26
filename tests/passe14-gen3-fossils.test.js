@@ -234,7 +234,7 @@ test('UI : files/labo/sélecteur affichent les quantités nettes de réservation
 // ── 3. Sauvegarde : fossiles migrés, générique conservé ─────────────────────
 
 test("save : le fossile générique de la mine n'est plus supprimé au chargement", () => {
-  const retired = SAVE.match(/retiredKey of \[([^\]]+)\]/);
+  const retired = SAVE.match(/RETIRED_ITEMS = \[([^\]]+)\]/) || SAVE.match(/retiredKey of \[([^\]]+)\]/); // passe 27 : liste unique mutualisée
   assert.ok(retired, 'liste des objets retirés trouvée');
   assert.ok(!retired[1].split(',').some((k) => k.trim() === "'fossil'"), "'fossil' absent de la purge");
   assert.ok(retired[1].includes("'ancient_fossil'"), 'les doubletons legacy restent purgés');

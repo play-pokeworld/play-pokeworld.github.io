@@ -3418,3 +3418,116 @@ button.quest-claim-btn.is-done:not(.is-challenge) {
 #poke-modal.atoll-prep-modal .pw-btn-group { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
 .atoll-run-card .pw-btn-group { display:flex; gap:8px; flex-wrap:wrap; }
 .pw-roaming-timer { display:block; color:var(--light1); font-size:11px; margin-top:2px; font-weight:700; }
+
+/* ────────────────────────────────────────────────────────────────────────
+   Passe 26 — vignette de drag UNIFIÉE (Pokémon, attaques, fenêtres) ────── */
+.pw-drag-ghost { display:inline-flex; align-items:center; gap:8px; padding:7px 12px; background:rgba(24,23,20,.96); border:1px solid var(--light2); border-radius:12px; box-shadow:0 8px 22px rgba(0,0,0,.45); color:var(--light2); font-weight:700; pointer-events:none; z-index:10000; }
+.pw-drag-ghost-ico { display:inline-flex; width:28px; height:28px; align-items:center; justify-content:center; flex-shrink:0; }
+.pw-drag-ghost-ico img { width:28px; height:28px; image-rendering:pixelated; }
+.pw-drag-ghost-txt { display:flex; flex-direction:column; line-height:1.2; white-space:nowrap; }
+.pw-drag-ghost-txt small { color:var(--light1); font-weight:400; font-size:10.5px; }
+.pw-drag-ghost-win { position:fixed; }
+
+/* Passe 26 — listes « où trouver » et « qui peut l'apprendre » (panneaux d'info) */
+.pw-src-list { display:grid; gap:4px; }
+.pw-src-line { font-size:11.5px; color:var(--light1); background:var(--dark3); border-radius:6px; padding:5px 9px; }
+.dict-chip-line { display:flex; flex-wrap:wrap; align-items:baseline; gap:6px; margin-top:6px; }
+.dict-chip-line > b { color:var(--light2); font-size:11px; min-width:86px; }
+.dict-chip-list { display:flex; flex-wrap:wrap; gap:4px; max-height:132px; overflow-y:auto; }
+.dict-chip-hidden { border-color:rgba(183,99,207,.65) !important; }
+
+/* Passe 26 — barre de filtres du sac (même ergonomie que la boîte PC) */
+.box-filter-search { min-width:150px; flex:1; }
+
+/* Passe 26 — presets d'équipe : prévisualisation des membres */
+.team-preset-group { flex-direction:column; align-items:stretch; gap:3px; }
+.team-preset-btns { display:flex; gap:4px; align-items:center; }
+.team-preset-chips { display:flex; gap:3px; align-items:center; min-height:22px; padding-left:2px; }
+.preset-chip { display:inline-flex; width:22px; height:22px; align-items:center; justify-content:center; border:1px solid rgba(236,222,183,.25); border-radius:50%; background:rgba(0,0,0,.25); overflow:hidden; }
+.preset-chip img { width:20px; height:20px; image-rendering:pixelated; }
+.preset-chip.in-box { opacity:.55; border-style:dashed; }
+.preset-chip.missing { color:var(--light1); font-size:11px; font-weight:900; }
+.preset-chip-empty { color:var(--light1); font-size:10px; font-style:italic; }
+
+/* Passe 26 — zone de danger (suppression de sauvegarde) */
+.delete-danger-zone { background:rgba(198,60,60,.12); border:1px solid rgba(198,60,60,.55); border-radius:10px; padding:10px; flex-wrap:wrap; gap:8px; }
+.delete-warn { color:#ff9d9d; font-size:12px; font-weight:700; width:100%; }
+
+/* ═══ Passe 27 ═══════════════════════════════════════════════════════════ */
+
+/* Bulle de PREVIEW de drop : suit le curseur, montre l'échange à venir. */
+.pw-drop-preview {
+  position: fixed;
+  transform: translate(-50%, -100%);
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(20, 18, 14, 0.97);
+  border: 2px solid var(--light2);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  z-index: 100000;
+  pointer-events: none;
+  font-size: 12px;
+}
+.pw-drop-preview-side { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.pw-drop-preview-txt { display: inline-flex; flex-direction: column; line-height: 1.15; color: var(--light2); max-width: 120px; }
+.pw-drop-preview-txt b { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pw-drop-preview-txt small { font-size: 10px; color: var(--light1); }
+.pw-drop-preview-arrow { font-size: 16px; color: var(--light2); font-weight: 900; }
+
+/* Sac en onglets (harmonisé boîte PC) */
+.inv-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.inv-tab { padding: 6px 10px; font-size: 11px; display: inline-flex; align-items: center; gap: 6px; }
+.inv-tab-count { background: var(--dark1); color: var(--light2); border-radius: 999px; padding: 1px 7px; font-size: 10px; font-weight: 900; }
+.inv-tab.active .inv-tab-count { background: var(--dark1); }
+.inv-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.inv-controls label { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--light1); }
+.inv-controls .box-filter-search { flex: 1; min-width: 140px; }
+
+/* Gestionnaire d'équipes */
+.preset-manager-hint { display: block; color: var(--light1); margin-bottom: 10px; line-height: 1.4; }
+.preset-list { display: flex; flex-direction: column; gap: 6px; }
+.preset-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 8px 10px; border: 1px solid var(--dark3); border-radius: 10px;
+  background: rgba(0,0,0,0.20);
+}
+.preset-row.active { border-color: var(--light2); box-shadow: 0 0 10px rgba(236,222,183,0.25); background: rgba(236,222,183,0.06); }
+.preset-row-idx {
+  width: 22px; height: 22px; border-radius: 6px; background: var(--dark3);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 900; color: var(--light2); flex-shrink: 0;
+}
+.preset-name-input {
+  background: var(--dark2); border: 1px solid transparent; border-radius: 6px;
+  color: var(--light2); font-weight: 900; font-size: 12px; padding: 4px 8px;
+  width: 150px; flex-shrink: 0;
+}
+.preset-name-input:hover, .preset-name-input:focus { border-color: var(--dark3); outline: none; }
+.preset-row.active .preset-name-input { border-color: var(--light2); }
+.preset-row-chips { display: inline-flex; gap: 3px; align-items: center; flex: 1; min-width: 120px; flex-wrap: wrap; }
+.preset-chip-more { font-size: 10px; color: var(--light1); padding: 2px 4px; }
+.preset-row-count { font-size: 11px; color: var(--light1); font-weight: 900; flex-shrink: 0; }
+.preset-row-actions { display: inline-flex; gap: 5px; align-items: center; flex-shrink: 0; }
+.preset-active-tag { font-size: 10px; font-weight: 900; color: var(--dark1); background: var(--light2); border-radius: 999px; padding: 2px 8px; }
+
+/* Bouton d'ouverture du gestionnaire dans la fenêtre Équipe */
+.team-presets-open-btn { display: inline-flex; align-items: center; gap: 6px; font-weight: 900; }
+.team-preset-active { color: var(--light1); font-weight: 400; font-size: 11px; }
+
+/* Éditeur d'équipe : emplacements vides / Pokémon disparus */
+.preset-slot-empty, .preset-slot-missing { min-height: 120px; justify-content: center; text-align: center; }
+.preset-slot-missing { border-style: dashed; opacity: 0.85; }
+.preset-pick-search { width: 100%; margin-bottom: 8px; box-sizing: border-box; }
+.preset-pick-list { display: flex; flex-direction: column; gap: 4px; max-height: 46vh; overflow-y: auto; }
+.preset-pick-row { cursor: pointer; }
+.preset-pick-row:hover { border-color: var(--light2); }
+.preset-pick-tag { font-size: 10px; font-weight: 900; color: var(--dark1); background: var(--light2); border-radius: 999px; padding: 2px 8px; flex-shrink: 0; }
+.preset-pick-tag.in-box { background: var(--dark3); color: var(--light2); }
+@media (max-width: 700px) {
+  .preset-row { flex-direction: column; align-items: stretch; }
+  .preset-row-actions { justify-content: flex-end; }
+  .preset-name-input { width: 100%; }
+}

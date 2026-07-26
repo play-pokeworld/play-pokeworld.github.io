@@ -549,7 +549,7 @@ button[data-action] {
 /* Les boutons à couleur d'état dédiée sont exclus de ce fond générique :
    sinon cette règle (spécificité 5 classes) masquait leurs couleurs
    (boutons mode/priorité pension, auto entraînement — passe 14). */
-.hbtn:not(.quest-claim-btn):not(.automation-toggle-btn):not(.automation-buy-btn):not(.purchase-btn):not(.hatchery-mode-toggle):not(.hatchery-priority-toggle):not(.training-slot-auto-btn),
+.hbtn:not(.quest-claim-btn):not(.automation-toggle-btn):not(.automation-buy-btn):not(.purchase-btn):not(.hatchery-mode-toggle):not(.hatchery-priority-toggle):not(.training-slot-auto-btn):not(.pw-btn-danger):not(.pw-btn-cancel),
 .poke-btn--secondary {
   border: 1px solid var(--pw-border-strong);
   background: rgba(236,222,183,0.12);
@@ -822,3 +822,33 @@ button[data-action] {
 .pw-info-section-body { font-size: 12.5px; line-height: 1.55; color: var(--light2); }
 .pw-info-actions { margin-top: 12px; }
 .pw-info-back-btn { min-width: 130px; }
+
+/* ═══ Passe 27 ═══════════════════════════════════════════════════════════
+   Boutons danger : ROUGES partout, y compris dans les contextes où la règle
+   générique .hbtn (fond pâle) chargeait après .pw-btn-danger. */
+.pw-btn-danger {
+  background: var(--red) !important;
+  border: 1px solid var(--red) !important;
+  color: #fff !important;
+  font-weight: 900;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+}
+.pw-btn-danger:hover { filter: brightness(1.12); transform: translateY(-1px); }
+.pw-btn-cancel { background: var(--dark3) !important; border: 1px solid var(--pw-border-strong); color: var(--light2) !important; }
+
+/* Réglages : en-tête VRAIMENT fixe (passe 27).
+   Avant : la règle « en-tête canonique » (chargée après le sticky) écrasait
+   marges/padding et rendait le fond quasi transparent — le titre défilait. */
+#settings-inner { padding-top: 0; }
+#settings-inner > .modal-title {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  width: 100%;
+  margin: 0 0 12px 0;
+  padding: 0 8px 0 14px;
+  background: linear-gradient(180deg, rgba(68,65,56,0.99), rgba(54,52,47,0.99));
+  border: 1px solid var(--pw-border);
+  border-bottom-width: 2px;
+  border-radius: 12px 12px 10px 10px;
+}
