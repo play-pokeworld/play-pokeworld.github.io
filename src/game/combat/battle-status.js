@@ -79,19 +79,9 @@ function applyEndOfTurnStatus(p){
 
 async function onEnemyFaint(){
  if(!battle || !battle.enemyPoke) return;
- if(G.hatchery && Array.isArray(G.hatchery)){
- let updated = false;
- for(let i=0; i<G.hatchery.length; i++) {
- if(G.hatchery[i]){
- G.hatchery[i].steps = (G.hatchery[i].steps || 0) + 1;
- if(G.automation && G.automation.autoHatch && G.hatchery[i].steps >= (G.hatchery[i].stepsReq || 10)){
- hatchEgg(i);
- }
- updated = true;
- }
- }
- if(updated && typeof renderHatcheryWindow === 'function') renderHatcheryWindow();
- }
+ // Passe 30 : compteur de K.O. partagé de la pension — chaque K.O. nourrit
+ // l'incubation ET la Garderie selon le mode de chaque slot (fonction unique).
+ try{ if(typeof hatcheryRegisterBattleKills === 'function') hatcheryRegisterBattleKills(1); }catch(_){ }
  battle.paused=true;
  const e=battle.enemyPoke;
  if(!battle.isChamp) battle.sessionWins = (battle.sessionWins||0) + 1;

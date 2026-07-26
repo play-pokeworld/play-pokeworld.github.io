@@ -124,7 +124,7 @@ function installCriticalClickFallback(root) {
     'debug-give-candies': function () { callGlobal('debugGiveCandies'); },
     'debug-unlock-badges': function () { callGlobal('debugUnlockBadges'); },
     'debug-fill-mine': function () { callGlobal('debugFillMine'); },
-    'debug-timeskip-10m': function () { callGlobal('debugTimeSkipAfk10Minutes'); },
+    'debug-timeskip-30m': function () { callGlobal('debugTimeSkipAfk30Minutes'); },
     'toggle-battle-speed-x10': function () { callGlobal('toggleBattleSpeedX10'); },
     'close-victory-screen': function () { var el = document.getElementById('victory-screen'); if (el) el.classList.remove('open'); },
     'toggle-map-help': function () { callGlobal('toggleMapHelp'); },
@@ -311,7 +311,7 @@ function installCriticalClickFallback(root) {
       ['#loot-restart-btn','loot_restart_btn'], ['#loot-continue-btn','loot_continue_btn'], ['#debug-drawer .pw-static-068 span','debug_menu_title_short'],
       ['#debug-drawer [data-action="debug-give-money"]','debug_money'], ['#debug-drawer [data-action="debug-give-candies"]','debug_candies'],
       ['#debug-drawer [data-action="debug-unlock-badges"]','debug_badges'], ['#debug-drawer [data-action="debug-fill-mine"]','debug_mine'],
-      ['#debug-drawer [data-action="debug-give-ct-cs"]','debug_ctcs'], ['#debug-drawer [data-call="debugTimeSkip10Minutes"]','debug_afk'],
+      ['#debug-drawer [data-action="debug-give-ct-cs"]','debug_ctcs'], ['#debug-drawer [data-call="debugTimeSkip30Minutes"]','debug_afk'],
       ['#debug-toggle-btn','debug_toggle_btn'], ['#victory-title','victory_title'], ['#victory-msg','victory_message'], ['#victory-screen [data-action="close-victory-screen"]','continue_btn']
     ];
     bindings.forEach(function(pair){

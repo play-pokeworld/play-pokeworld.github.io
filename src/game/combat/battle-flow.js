@@ -1,3 +1,15 @@
+// Passe 30 : « le joueur est-il en pleine chaîne d'exploration sauvage ? »
+// Condition EXACTE pour que le rattrapage hors-ligne (OfflineEngine) rejoue des
+// combats sauvages : uniquement si le joueur ÉTAIT réellement en train
+// d'explorer une route (chaîne chill active), jamais s'il était inactif ou à
+// l'entraînement. Persisté dans G.wildSessionActive au moment de la sauvegarde.
+function isWildChillChainActive(){
+ if(typeof battle === 'undefined' || !battle || !battle.active || !battle.chill) return false;
+ if(battle.isChamp || battle.isTraining || battle.isAtollBattle || battle.isQuestDefeatBattle) return false;
+ if(battle.questRewardQuestId != null || battle.legendaryCatch) return false;
+ return true;
+}
+
 function endBattle(){
  if(typeof restoreAllTransformedPokemon === 'function') restoreAllTransformedPokemon();
  clearInterval(battle.timerId);
@@ -5,6 +17,7 @@ function endBattle(){
  const wasAtollLoss = !!battle.isAtollBattle;
  const wasAtollBorrowedLoss = wasAtollLoss && !!battle.atollBorrowed;
  battle.active=false;
+ try{ if(typeof G !== 'undefined' && G) G.wildSessionActive = false; }catch(_){ } // passe 30 : chaîne sauvage terminée → plus de rattrapage offline
  battle.paused=false;
  battle.resolvingKO=false;
  battle.legendaryCatch=false;
@@ -98,6 +111,7 @@ function wait(ms){return new Promise(r=>setTimeout(r,ms));}
 
 // --- Migrated to ES module, globals exposed ---
 if (typeof endBattle !== 'undefined' && typeof window !== 'undefined') window.endBattle = endBattle;
+if (typeof isWildChillChainActive !== 'undefined' && typeof window !== 'undefined') window.isWildChillChainActive = isWildChillChainActive;
 if (typeof restartLastBattle !== 'undefined' && typeof window !== 'undefined') window.restartLastBattle = restartLastBattle;
 if (typeof leaveBattle !== 'undefined' && typeof window !== 'undefined') window.leaveBattle = leaveBattle;
 if (typeof resumeBattleActions !== 'undefined' && typeof window !== 'undefined') window.resumeBattleActions = resumeBattleActions;

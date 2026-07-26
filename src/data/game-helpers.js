@@ -615,6 +615,15 @@ function getDuplicateItemPayout(key, qty){
  const unit = Math.max(0, Math.floor(((itm && (itm.price || itm.value)) || 0) * 0.25));
  return unit * Math.max(1, qty || 1);
 }
+// Limite de pile d'un objet (même règle que addToInventory) : objets tenus /
+// de combat / baies = 25, le reste est quasi illimité. Passe 30 : la
+// conversion en argent d'un butin ne doit se déclencher QUE lorsque la pile
+// est pleine — avant, posséder UNE seule copie suffisait à tout convertir en
+// argent, et les routes distribuaient des ₽ sans raison (retour bêta).
+function getItemStackLimit(key){
+ const itm = ITEMS[key] || ITEMS[normalizeItemKey ? normalizeItemKey(key) : key];
+ return (itm && (itm.type === 'held' || itm.category || itm.buff)) ? 25 : 999999;
+}
 function grantRewardItem(key, qty){
  qty = Math.max(1, Number(qty || 1));
  if(!ITEMS[key]) return {added:0, money:0};
@@ -623,13 +632,17 @@ function grantRewardItem(key, qty){
   addToInventory(key, qty);
   return {added:qty, money:0};
  }
- if((G.inventory && G.inventory[key] > 0)){
-  const money = getDuplicateItemPayout(key, qty);
+ const cap = getItemStackLimit(key);
+ const cur = Number((G.inventory && G.inventory[key]) || 0);
+ const added = Math.min(Math.max(0, cap - cur), qty);
+ if(added > 0) addToInventory(key, added);
+ const overflow = qty - added;
+ let money = 0;
+ if(overflow > 0){
+  money = getDuplicateItemPayout(key, overflow); // pile pleine : l'excédent EST bien converti
   if(money > 0) G.money = (G.money || 0) + money;
-  return {added:0, money};
  }
- addToInventory(key, qty);
- return {added:qty, money:0};
+ return {added, money};
 }
 function grantRewardItems(items){
  const result = {added:{}, money:0};
@@ -984,6 +997,7 @@ if (typeof getLinkedRouteIds !== 'undefined' && typeof window !== 'undefined') w
 if (typeof getDuplicateItemPayout !== 'undefined' && typeof window !== 'undefined') window.getDuplicateItemPayout = getDuplicateItemPayout;
 if (typeof grantRewardItem !== 'undefined' && typeof window !== 'undefined') window.grantRewardItem = grantRewardItem;
 if (typeof grantRewardItems !== 'undefined' && typeof window !== 'undefined') window.grantRewardItems = grantRewardItems;
+if (typeof getItemStackLimit !== 'undefined' && typeof window !== 'undefined') window.getItemStackLimit = getItemStackLimit;
 if (typeof getShopName !== 'undefined' && typeof window !== 'undefined') window.getShopName = getShopName;
 if (typeof getItemSourceList !== 'undefined' && typeof window !== 'undefined') window.getItemSourceList = getItemSourceList;
 if (typeof getMoveLearners !== 'undefined' && typeof window !== 'undefined') window.getMoveLearners = getMoveLearners;

@@ -294,23 +294,16 @@ function renderHatcheryWindow() {
       const iconEmoji = isFossil ? '' : '';
       const steps = slot.steps || 0;
       const req = slot.stepsReq || 10;
-      const done = steps >= req;
-
-      let lvlPct = 0;
-      let lvlText = '';
-      if (p) {
-        const curBase = typeof xpForLevel === 'function' ? xpForLevel(p.level) : 0;
-        const xpInLevel = Math.max(0, (p.xp || 0) - curBase);
-        const xpReqLevel = Math.max(1, (p.xpNext || 1) - curBase);
-        lvlText = ` (${xpInLevel} / ${xpReqLevel} EXP)`;
-        lvlPct = clamp(Math.floor((xpInLevel / xpReqLevel) * 100), 0, 100);
-      }
 
       const mode = (G.hatcheryModes && G.hatcheryModes[i]) || slot.mode || 'exp';
       const showExp = !isFossil && (!isLocUnlocked('jroute29') || mode === 'exp');
-      const pct = showExp ? lvlPct : clamp(Math.floor((steps / req) * 100), 0, 100);
+      // Passe 30 : la Garderie affiche son compteur de K.O. (10 = 1 niveau) —
+      // plus de barre d'XP. L'incubation garde son compteur historique.
+      const daycareReq = (showExp && p && typeof getDaycareKosPerLevel === 'function') ? getDaycareKosPerLevel(p) : 10;
+      const pct = showExp ? clamp(Math.floor((steps / daycareReq) * 100), 0, 100) : clamp(Math.floor((steps / req) * 100), 0, 100);
+      const done = showExp ? false : steps >= req;
       const statusText = showExp
-        ? `${t('hatchery_passive_daycare')} Niv. ${p.level}${lvlText}`
+        ? `${t('hatchery_passive_daycare')} Niv. ${p.level} · ${steps} / ${daycareReq} KO`
         : done
           ? t('ready')
           : `${t('hatchery_incubation_label')} ${steps} / ${req} KO`;

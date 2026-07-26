@@ -367,7 +367,7 @@
       'close-confirm': ['closeConfirm'], 'scroll-to-window': ['scrollToWin', element.dataset.targetWindow], 'set-mobile-view': ['setMobileView', element.dataset.mobileView], 'set-mobile-manage-view': ['setMobileManageView', element.dataset.mobileManageView], 'set-battle-speed': ['setBattleSpeed', Number(element.dataset.speed)],
       'open-battle-summary': ['openBattleSummary', false], 'leave-battle': ['doLeaveBattle'], 'show-tab': ['showTab', element.dataset.tab], 'close-unified-selector': ['closeUnifiedSelectorModal'],
       'sort-unified-grid': ['sortUnifiedGrid', element.dataset.sort], 'close-battle-summary': ['closeBattleSummary'], 'restart-last-battle': ['restartLastBattle'],
-      'debug-give-money': ['debugGiveMoney'], 'debug-give-ct-cs': ['debugGiveCtCs'], 'debug-give-candies': ['debugGiveCandies'], 'debug-unlock-badges': ['debugUnlockBadges'], 'debug-fill-mine': ['debugFillMine'], 'debug-timeskip-10m': ['debugTimeSkipAfk10Minutes'],
+      'debug-give-money': ['debugGiveMoney'], 'debug-give-ct-cs': ['debugGiveCtCs'], 'debug-give-candies': ['debugGiveCandies'], 'debug-unlock-badges': ['debugUnlockBadges'], 'debug-fill-mine': ['debugFillMine'], 'debug-timeskip-30m': ['debugTimeSkipAfk30Minutes'],
       'toggle-battle-speed-x10': ['toggleBattleSpeedX10'], 'toggle-map-help': ['toggleMapHelp'], 'open-fullscreen-panel': ['openFullscreenPanel', element.dataset.panel], 'open-unified-selector': ['openUnifiedSelectorModal', element.dataset.panel],
       'close-fullscreen-panel': ['closeFullscreenPanel'], 'copy-export-text': ['copyExportText']
     };

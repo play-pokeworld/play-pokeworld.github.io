@@ -161,6 +161,7 @@
   "src/game/save/save.js",
   "src/game/save/save-extras.js",
   "src/game/save/settings.js",
+  "src/game/save/offline-engine.js",
 
   // ─── Game - Display (suite) ───
   "src/game/display/map-logic.js",

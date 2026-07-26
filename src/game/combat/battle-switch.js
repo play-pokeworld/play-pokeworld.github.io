@@ -216,48 +216,9 @@ async function champVictory(){
   while(pk.xp>=pk.xpNext&&pk.level<100) levelUp(pk);
   }
 
-  // Daycare passive EXP on Champion defeat
-  if(G.hatchery && Array.isArray(G.hatchery)){
-   for(let i = 0; i < G.hatchery.length; i++){
-    const slot = G.hatchery[i];
-    if(slot && slot.poke && !slot.isFossil){
-     const mode = (G.hatcheryModes && G.hatcheryModes[i]) || slot.mode || 'exp';
-     if(mode === 'exp') {
-       const p = slot.poke;
-       const daycareXp = Math.max(1, Math.floor(totalXP / 20)); // 5% of total XP
-       if((p.xp||0) < xpForLevel(p.level)) p.xp = xpForLevel(p.level);
-       p.xp += daycareXp;
-       const before = p.level;
-       let levelsGained = 0;
-       while(p.xp >= p.xpNext && p.level < 100) {
-        levelUp(p);
-        levelsGained++;
-       }
-       if(levelsGained > 0) {
-         const feePerLevel = typeof getHatcheryLevelUpFee === 'function' ? getHatcheryLevelUpFee() : 0;
-         const totalFee = feePerLevel * levelsGained;
-         if(G.money < totalFee) {
-           G.collection[String(p.id)] = p;
-           G.hatchery[i] = null;
-           notify(`${p.name} a été retiré de la Garderie : fonds insuffisants pour payer ses nouveaux niveaux (${totalFee}₽ requis) !`, "var(--red)");
-           try{ renderHatcheryWindow(); }catch(_){}
-         } else {
-           G.money -= totalFee;
-           addBattleLog(` [Pension] -${totalFee}₽ payés pour ${levelsGained} niveau(x) gagné(s) par ${p.name}.`);
-           updateHeader();
-           if(p.level >= 100) {
-             G.collection[String(p.id)] = p;
-             G.hatchery[i] = null;
-             addBattleLog(` [Pension] ${p.name} a atteint le Niveau 100 et sort de la Garderie !`);
-             notify(`${p.name} a atteint le Niveau 100 et sort de la Garderie !`, "var(--green)");
-             try{ renderHatcheryWindow(); }catch(_){}
-           }
-         }
-       }
-     }
-    }
-   }
-  }
+  // Passe 30 : bloc « Daycare EXP sur victoire de Champion » supprimé — les
+  // K.O. du champion ont DÉJÀ alimenté le compteur de la pension slot par
+  // slot via onEnemyFaint → hatcheryRegisterBattleKills (mode Garderie inclus).
 
  await wait(1500);
  endBattle();

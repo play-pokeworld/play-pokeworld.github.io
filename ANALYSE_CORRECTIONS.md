@@ -1118,6 +1118,144 @@ python3 tools/audit_project.py  # 1093 références d'images, 0 manquante
 
 ---
 
+## Passe 28 — refonte AFK / hors-ligne par fast-forward du vrai moteur (voie « Melvor »)
+
+Contexte : l'AFK et le timeskip avaient « de gros problèmes » (ne fonctionnaient pas
+partout, double moteur divergent). Après débat d'architecture, décisions
+utilisateur : **fast-forward du vrai moteur** (option B), **efficacité 100 %**,
+**plafond 12 h**, timeskip **debug** (API prête pour de futurs objets de saut de
+temps).
+
+### Faiblesses corrigées
+1. **Détection trouée** — l'AFK ne se déclenchait que sur `visibilitychange`
+   (veille OS, kill mobile, crash, onglet freezé = zéro rattrapage). → Détection
+   par **trou de heartbeat** (`offline-engine.js`) : toute absence > 15 s entre
+   deux battements est rattrapée, quelle que soit la visibilité.
+2. **Plafonds cachés par système** — sur 8 (désormais 12) h annoncées, le joueur
+   recevait en réalité : combats 84-216 min (plafond 720 victoires), entraînement
+   50 min (120 ticks), mine auto **10 min** (500 pas), écloserie indirectement
+   plafonnée. → **Budget en secondes** par système enregistré ; régénération de
+   la mine **intercalée** (+2/s pendant que la pelle consomme, fidélité live).
+3. **Moteur de dégâts parallèle** (`estimateAfkMoveDamage`, ignoraient statuts,
+   météo, 95 % des talents…) → **supprimé** : le rattrapage rejoue la vraie boucle
+   `battleTick()/onEnemyFaint()/spawnNextWild()` en accéléré, UI gelée (muting
+   window), `wait()` instantané. Une seule source de vérité.
+4. **Orchestration dispersée** → **OfflineEngine** central
+   (`OfflineEngine.register(nom, handler)`) : combats, entraînement, mine ;
+   tout futur système (pension Hoenn, bases secrètes, objets de saut de temps)
+   hérite du rattrapage en s'enregistrant.
+5. **Timeskip bancal** (debug-only, `forceBattle` ignoré) → recâblé sur
+   `OfflineEngine.simulate(30 min, 'debug')` + bouton debug passé de 10 à 30 min.
+6. **Pas de verrou de session** → verrou d'onglet par localStorage (10 s)
+   anti double-rattrapage.
+
+### Détails techniques notables
+- **Saut analytique borné** : entre deux actions, un tick n'est qu'une
+  décrémentation de cooldowns → avance directe au prochain tick utile, bornée au
+  budget restant (état à la coupure strictement identique au tick-par-tick).
+  Perf pire cas mesurée : 12 h avec équipe one-shot (45 050 victoires) = **5,6 s**
+  (barre de progression + yields). Cas réalistes : < 1-2 s.
+- **K.O. d'équipe** : fidélité live totale — pénalité 10 % d'argent, fin propre
+  (`endBattle`), mention dans le récap.
+- **saveGame protégé** pendant le fast-forward (`afkApplying`) : sinon chaque
+  capture hors-ligne réécrivait 5 Mo de sauvegarde.
+- **Modale récap** enrichie à 8 mesures (+ Entraînement, + Minages auto),
+  silencieuse sous 60 s (notification simple), barre de progression pendant le
+  calcul.
+- Compat sauvegardes : l'ancien marqueur `pokeworld_afk_last_<id>` est relu tel
+  quel ; les anciennes structures `G.afk` restent acceptées.
+
+### Tests (304/304)
+- **Différentiel live vs FF sur RNG semée** : 60 s de fast-forward ≡ 600 ticks
+  live — équipe, XP, PV, captures, pokedex, argent, inventaire **strictement
+  identiques** (victoires : 26 = 26, chronologie identique à la ms près).
+- Trou heartbeat / masquage 2 h / idempotence ; verrou onglet ; K.O. d'équipe ;
+  mine (digs > 500 en 1 h, régénération intercalée) ; entraînement (144 rounds
+  en 1 h, ancien plafond 120) ; timeskip 30 min ; purge de l'ancien estimateur.
+- Audit assets : 1093 références / 0 manquante. Sim arènes/atoll inchangée.
+
+## Passe 29 — fast-forward de l'entraînement + barre de progression vivante
+
+Suite et fin du chantier AFK/timeskip.
+
+### Entraînement : fini l'approximation
+L'ancien `simulateAfkTrainingProgress` (instant-kill d'un ennemi par tick de
+25 s, sans dégâts réels ni échecs possibles) est **supprimé**. Le rattrapage
+rejoue la vraie boucle `updateTrainingSlots()` (dt = 100 ms × vitesse, pipeline
+de dégâts réel `trainingMoveDamage`, chaîne `completeTrainingSlot` → récompenses
+EV/niveaux/talents → file d'automatisation), avec le même **saut analytique
+borné** exact que pour les combats sauvages. Comptage des sessions/échecs par
+rebind temporaire pendant la simulation. **Conséquence honnête : un pensionnaire
+trop faible échoue désormais hors-ligne comme en live** (avant, il gagnait
+systématiquement). La mine auto était déjà fidèle depuis la passe 28 (vrais
+coups de pelle `mineAutoStep` + régénération intercalée).
+
+### Barre de progression vivante (le « jeu planté » ressenti)
+Le calcul peut durer plusieurs secondes dans le pire cas ; avant, la barre ne
+se peignait que tous les 40 000 ticks (jamais pour un saut de 30 min) et le
+navigateur n'avait aucune respiration pour afficher quoi que ce soit. →
+Rafraîchissement piloté par l'**horloge réelle** (peinture + `setTimeout(0)`
+toutes les ~120 ms, micro-yields intermédiaires), peinture 0 % **avant** le
+premier calcul, segments par système (combats 72 % / entraînement 23 % / mine
+5 %) et **ligne d'étape animée** : « Combats sauvages… · 1 240 victoires »,
+« Entraînement… · 12 sessions », « Mine… ». Le récapitulatif remplace la barre.
+
+### Tests (307/307)
+- **2ᵉ différentiel** : 60 s de FF entraînement ≡ 600 ticks live (rounds, PV,
+  EV, cooldowns, résultats identiques sur RNG semée).
+- Entraînement FF > 120 rounds en 1 h (ancien plafond pulvérisé) ; capture des
+  peintures innerHTML : barre croissante ≥ 2 rendus, étape « Combats sauvages »
+  visible, dernier rendu = récapitulatif complet ; clés i18n FR/EN des étapes.
+- Perf pire cas mesurée : 12 h avec équipe one-shot (45 049 victoires) =
+  **5,4 s avec barre vivante**. Audit assets : 1093 références / 0 manquante.
+
+---
+
+## Passe 30 — correctifs du premier retour bêta (AFK contextuel, argent des routes, pension au compteur de K.O.)
+
+Premier lot de bugs remonté par la bêta fermée. 4 chantiers, tests : 315/315.
+
+### 30.1 — AFK/timeskip : le rattrapage rejouait des combats sauvages même quand le joueur n'était PAS en combat
+
+- **Cause :** `offlineFastForwardWildBattles` démarrait une session d'exploration ex nihilo dès que la *zone courante* avait des Pokémon sauvages (`!hadActiveChain → offlineStartWildSession(loc)`), que le joueur soit inactif sur la route ou en entraînement. Bonus : la chaîne reconstruite était relancée à l'écran au retour → « le jeu me lance un combat ». Le combat fantôme endommageait aussi l'équipe (pensionnaire d'entraînement KO possible) et distribuait captures/XP.
+- **Correctif :** le fast-forward sauvage ne s'exécute QUE si une chaîne d'exploration était réellement active au départ :
+  - onglet resté ouvert : la chaîne est encore active (`battle.active && chill`), on la poursuit ;
+  - jeu relancé (état combat réinitialisé au boot) : nouveau drapeau persisté `G.wildSessionActive`, mis à jour à chaque `saveGame` (snapshot de `isWildChillChainActive()` — chill actif, hors champion/ligue/atoll/quête/légendaire) et effacé dès `endBattle`.
+  - inactif ou en entraînement : 0 combat simulé, aucun combat lancé au retour ; l'entraînement FF (passe 29) progresse normalement seul.
+- **Preuves :** tests passe 30 A — idle sur route1 : `wins=0`, `captures=0`, `battle.active` faux, `enemyPoke` nul après simulation ; entraînement AFK : rounds rejoués (`enemyIndex>3`) avec `wins=0` ; chaîne active mise en pause (onglet masqué) : victoires rattrapées + chaîne reprise + ticker relancé ; jeu relancé avec drapeau : chaîne reconstruite, drapeau vrai en mémoire **et sur disque** après `saveGame` en pleine chaîne, effacé par `endBattle`. Les tests passe 28/29 ont été mis à jour pour énoncer explicitement le contexte « chaîne active » (drapeau) au lieu de compter sur le démarrage implicite.
+
+### 30.2 — Argent des routes : converti dès la 2ᵉ copie au lieu de la pile pleine
+
+- **Cause :** `grantRewardItem` payait le duplicata en ₽ dès que `G.inventory[key] > 0` — posséder UNE baie de la zone suffisait à convertir tous les butins suivants en argent. La règle voulue (confirmée bêta) : argent uniquement quand la pile est pleine (25 pour objets de combat/baies).
+- **Correctif :** nouvelle limite factorisée `getItemStackLimit(key)` (prédicat identique à `addToInventory` : held/catégorie/buff → 25, sinon illimité). `grantRewardItem` remplit la place restante, puis ne convertit QUE l'excédent au-delà de 25 ; trésors et fossiles toujours stockés, jamais convertis. Les routes ne rapportent donc de l'argent qu'une fois l'objet à 25 exemplaires.
+- **Preuves :** test passe 30 B — 1ʳᵉ copie en sac (0₽) ; pile 24 + 5 → 1 ajouté + 4 convertis (11 250₽/u pour la baie à 45 000₽) ; pile pleine → conversion intégrale ; pépite toujours stockée ; total d'argent cumulé exact.
+
+### 30.3 — Pension : la Garderie passe au compteur de K.O. (décision : 10 K.O. = 1 niveau), alimentée aussi par l'entraînement
+
+- **Cause :** la Garderie montait au goutte-à-goutte d'XP (10 % de la part active par victoire sauvage, 5 % du total sur champion) — très lent avec des slots limités ; et les K.O. d'entraînement ne nourrissaient RIEN dans la pension. Bug latent trouvé au passage : le compteur `steps` montait AUSSI sur les slots Garderie, et avec l'éclosion auto activée le pensionnaire était **remis au niveau 1** (« éclosion ») au bout de 25–100 K.O.
+- **Correctif :** point d'entrée unique `hatcheryRegisterBattleKills(count)` (hatchery.js) appelé à chaque K.O. — routes et dresseurs (`onEnemyFaint`), y compris champions et fast-forward, ET adversaires d'entraînement (`updateTrainingSlots`, live et FF). Le mode du slot décide : `breed`/fossile → incubation inchangée (éclosion à `stepsReq`) ; `exp` (Garderie) → +1 niveau tous les `DAYCARE_KOS_PER_LEVEL` (10) K.O., reste conservé au compteur. Frais par niveau inchangés (100₽ si automation pension activée ; impayé → le Pokémon garde ses niveaux mais sort au PC ; niv. 100 → sortie). Blocs XP de Garderie supprimés de `gainXP` et de la victoire de champion (les K.O. du champion alimentent déjà le compteur via `onEnemyFaint`). UI : la carte Garderie affiche `Niv. X · n/10 K.O.` au lieu de la barre d'XP ; description du mode mise à jour FR/EN. Le récap AFK gagne une ligne « Niv. garderie » (mesurée par somme des niveaux avant/après — la pension progresse hors-ligne via le moteur rejoué honnêtement).
+- **Preuves :** tests passe 30 C — 10 K.O. → niv. 20→21, compteur consommé, PAS de remise à 1 malgré `autoHatch` (bug latent éliminé) ; slot incubation 24+10 K.O. → éclosion auto (niv. 1 en collection) ; 25 K.O. → +2 niveaux, reste 5 ; `gainXP` ne touche plus la Garderie ; frais : impayé → sortie au PC avec niveaux conservés, 0 débit partiel ; entraînement live ET `offlineFastForwardTraining` nourrissent le compteur.
+
+## Passe 31 — bêta : auto-remplissage de la pension équitable (slots vides d'abord, files en round-robin)
+
+Retour bêta latéral : l'auto-fill de la pension laissait « un slot et sa liste pleins alors qu'un autre slot dans le même mode était vide ».
+
+- **Cause :** `refillHatcheryQueueFromRules` complétait la file du slot 0 jusqu'à sa capacité (3 à 12) avant de passer au slot suivant, et `processHatcheryQueue` ne vidait les files vers les slots qu'APRÈS ce réassort. Avec peu de candidats, tout partait dans la file 0 ; les slots suivants (files vides) ne pouvaient jamais être servis — d'autant que la consommation ne pioche que dans la file de SON slot.
+- **Correctif (demande utilisateur, appliquée à la lettre) :** nouvel ordre dans `processHatcheryQueue` — sanitize fossiles (inchangé) → **vidange FIFO des files existantes vers les slots vides** (`drainHatcheryQueuesIntoSlots`, extraite) → **réassort ROUND-ROBIN** (`refillHatcheryQueueFromRules` réécrite : rang par rang — 1ᵉʳ élément de chaque file, puis 2ᵉ, etc., ajouts toujours en fin, jamais en milieu) → **seconde vidange** pour servir immédiatement les slots encore libres. Un slot libre reçoit donc le PREMIER nouveau candidat au lieu d'attendre derrière la file d'un autre. Règles préservées : filtrage par mode (Garderie < 100 / Incubation niv. 100 + fossiles), priorité fossile/pokémon par slot avec bascule automatique à l'épuisement (passe 12), anti-doublon fossile (1 exemplaire = 1 seule place), slots en changement de mode différé ignorés, FIFO stricte à la consommation.
+- **Preuves :** 6 nouveaux tests passe 31 — 4 slots vides + 12 candidats : tous les slots remplis en ordre puis files parfaitement équilibrées et interleavées (`[u14,u18]/[u15,u19]/[u16,u20]/[u17,u21]`) ; slot libre servi par le premier candidat frais (la file du slot occupé ne reçoit que le rang suivant) ; files existantes jamais réordonnées ; équilibre exact avec file agrandie (cap 6 : `12/14/16/18` ‖ `13/15/17/19`) ; fossile unique = une seule place, priorité Incubation conservée. Les 47 tests passes 12/14 (fossiles, priorités, files) restent verts à l'identique.
+
+## Passe 32 — bêta : « aucune zone sauvage active à simuler » (K.O. figé par le gel de l'onglet + combats bornés exclus du rattrapage)
+
+Retour bêta : le message « Aucune zone sauvage active à simuler » apparaît souvent — (1) pile quand le Pokémon adverse vient d'être mis K.O. en combat sauvage, ce qui bloque l'AFK et le time skip, et (2) systématiquement en combat contre un dresseur de quête, une arène, la ligue ou l'atoll. Le jeu ne comprenait pas qu'un combat était en cours.
+
+**Cause n°1 — résolution de K.O. figée par la suspension de l'onglet.** Une mise K.O. commencée EN LIVE (`onEnemyFaint` : `battle.paused = true` → `wait(500)` → XP/loot → `wait(700)` → `spawnNextWild`) se fige si l'onglet est suspendu pile pendant un `wait` (mobile : timers gelés). `battle.resolvingKO` reste à `true`. L'ancien drain du fast-forward ne cédait que des MICROtâches (`await Promise.resolve()`) : le timer réel gelé ne tirait jamais, la boucle tournait à vide (~600 000 itérations), 0 victoire, puis le récap concluait à tort « aucune zone sauvage active ». Correctif (`src/game/save/offline-engine.js`) : `offlineDrainStuckLiveKOs` + drain avec vraie macrotâche périodique (`setTimeout(0)` tous les 64 drains, drapeau de suspension d'onglet levé pendant le FF), abandon franc si le même K.O. attend > 5 s ; le FF sauvage draine les résolutions figées à chaque itération (`offlineRunBattleFfLoop`).
+
+**Cause n°2 — combats bornés exclus du rattrapage.** `offlineCanWildBattle` rejetait arène (`isChamp`), ligue, dresseur de quête, atoll, légendaire et `chill=false` → aucun rattrapage possible. Correctif : détecteur `offlineIsBoundedBattle` + exécuteur `offlineRunBoundedBattle` qui TERMINE honnêtement le combat borné en cours pendant l'absence — un seul combat, arrêt au premier `endBattle` (rebind temporaire de `window.endBattle` pendant le FF, issue = `aliveCount()>0 ? 'won' : 'lost'`). Les suites normales s'appliquent : badge + récompense d'arène (`champVictory`), séries de ligue NON enchaînées (arrêt au combat en cours), atoll = un seul combat (économie figée respectée), défaite = pénalité honnête des 10 %. La suspension/reprise de combat à la fermeture couvre désormais aussi les combats bornés. Le récap AFK affiche une cellule dédiée « Combat clé » (✔/✖, clé `afk_panel_boss_battle`) et une notification `afk_boss_won` / `afk_boss_lost` en tête ; le message trompeur `afk_no_progress_summary` devient « AFK {time} : rien en cours à simuler. » (FR) / « AFK {time}: nothing in progress to simulate. » (EN).
+
+**Recouvrement des annonces précédentes** : « le fast-forward ne simule que les chaînes sauvages chill » (passe 28) et « seules les chaînes sauvages chill sont éligibles » (passe 30) sont recouvertes pour les combats bornés EN COURS au départ de l'absence (arène, ligue, dresseur de quête, atoll, légendaire, combat unique `chill=false`) : ils sont terminés, pas farmés.
+
+Tests : `tests/passe32-bounded-battles.test.js` (6 tests — chaîne figée en live avec `wait` réellement gelé ; arène gagnée → badge + récompense ; arène perdue → pénalité 10 % ; légendaire `chill=false` résolu ; double garde chaîne sauvage ; recâblages + clés i18n). 327/327.
+
 ## Limites restantes recommandées pour une phase suivante
 
 - ~~Terminer la migration complète des 251 chaînes candidates encore en dur.~~ **Fait en passe 2** (UI ; le compteur de l'audit inclut des faux positifs : comparaisons `>= … && … <=`, markup structurel, données de contenu).

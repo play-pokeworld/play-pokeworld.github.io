@@ -14,48 +14,9 @@ function gainXP(enemy){
  if(p.level>before) addBattleLog(` ${p.name} passe au niveau ${p.level} !`);
  }
 
-  // Garderie passive EXP gain (Kanto passive storage)
-  if(G.hatchery && Array.isArray(G.hatchery)){
-   for(let i = 0; i < G.hatchery.length; i++){
-    const slot = G.hatchery[i];
-    if(slot && slot.poke && !slot.isFossil){
-     const mode = (G.hatcheryModes && G.hatcheryModes[i]) || slot.mode || 'exp';
-     if(mode === 'exp') {
-       const daycareShare = Math.max(1, Math.floor(share * 0.1)); // 10% of active share
-       const p = slot.poke;
-       if((p.xp||0) < xpForLevel(p.level)) p.xp = xpForLevel(p.level);
-       p.xp += daycareShare;
-       const before = p.level;
-       let levelsGained = 0;
-       while(p.xp >= p.xpNext && p.level < 100){
-        levelUp(p);
-        levelsGained++;
-       }
-       if(levelsGained > 0) {
-         const feePerLevel = typeof getHatcheryLevelUpFee === 'function' ? getHatcheryLevelUpFee() : 0;
-         const totalFee = feePerLevel * levelsGained;
-         if(G.money < totalFee) {
-           G.collection[String(p.id)] = p;
-           G.hatchery[i] = null;
-           notify(`${p.name} a été retiré de la Garderie : fonds insuffisants pour payer ses nouveaux niveaux (${totalFee}₽ requis) !`, "var(--red)");
-           try{ renderHatcheryWindow(); }catch(_){}
-         } else {
-           G.money -= totalFee;
-           addBattleLog(` [Pension] -${totalFee}₽ payés pour ${levelsGained} niveau(x) gagné(s) par ${p.name}.`);
-           updateHeader();
-           if(p.level >= 100) {
-             G.collection[String(p.id)] = p;
-             G.hatchery[i] = null;
-             addBattleLog(` [Pension] ${p.name} a atteint le Niveau 100 et sort de la Garderie !`);
-             notify(`${p.name} a atteint le Niveau 100 et sort de la Garderie !`, "var(--green)");
-             try{ renderHatcheryWindow(); }catch(_){}
-           }
-         }
-       }
-     }
-    }
-   }
-  }
+  // Passe 30 : la Garderie n'utilise PLUS un compteur d'XP — elle progresse
+  // sur le compteur de K.O. partagé (hatcheryRegisterBattleKills, appelé à
+  // chaque ennemi mis K.O.), comme l'incubation. Bloc XP supprimé ici.
 
  return share;
 }

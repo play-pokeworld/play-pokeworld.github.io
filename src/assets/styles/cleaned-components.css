@@ -1510,6 +1510,29 @@ body.save-menu-active { overflow: hidden; }
   background: rgba(96,190,88,0.16);
   border-color: rgba(96,190,88,0.44);
 }
+/* Passe 28 : barre de progression du fast-forward offline */
+.afk-ff-bar {
+  width: 100%;
+  height: 8px;
+  border-radius: 6px;
+  background: rgba(255,255,255,.10);
+  overflow: hidden;
+  margin: 2px 0 4px;
+}
+.afk-ff-stage {
+  font-size: 12px;
+  opacity: .75;
+  text-align: center;
+  margin-top: 6px;
+  min-height: 15px;
+}
+.afk-ff-bar > i {
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--accent, #3db5c8), var(--green, #4caf50));
+  transition: width .18s ease;
+}
 .afk-result-status.danger {
   background: rgba(211,66,95,0.16);
   border-color: rgba(211,66,95,0.48);

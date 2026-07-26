@@ -172,13 +172,18 @@ function mineAutoStep(){
 function simulateAfkMineAutomation(seconds){
  ensureMineAutomation();
  if(!G.mine.automation.enabled || !G.mine.automation.purchased) return 0;
- const steps = Math.min(500, Math.floor(Math.max(0, seconds||0) / 1.2));
+ // Passe 28 : budget TEMPS (plus de plafond caché à 500 pas ≈ 10 min).
+ // La régénération live (+2/s) est intercalée à chaque pas de 1,2 s, comme le
+ // fait le vrai ticker pendant que la pelle tourne — sinon la mine mourrait de
+ // faim au-delà de l'énergie stockée, ce qui trahissait l'efficacité 100 %.
+ const steps = Math.min(40000, Math.floor(Math.max(0, seconds||0) / 1.2)); // garde-fou perf
+ const regenPerStep = 2 * 1.2;
  let done = 0;
  for(let i=0;i<steps;i++){
+  G.mine.energy = Math.min(G.mine.maxEnergy || 100, (G.mine.energy||0) + regenPerStep);
   const before = G.mine.energy || 0;
   mineAutoStep();
-  if((G.mine.energy||0) !== before) done++;
-  if((G.mine.energy||0) < 5) break;
+  if((G.mine.energy||0) < before) done++;
  }
  return done;
 }

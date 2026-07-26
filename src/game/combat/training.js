@@ -577,6 +577,9 @@ function updateTrainingSlots(){
    changed = true;
   }
   if(enemy.currentHP <= 0){
+   // Passe 30 : chaque adversaire d'entraînement mis K.O. compte pour la
+   // pension (incubation + Garderie, selon le mode du slot) — live ET FF.
+   try{ if(typeof hatcheryRegisterBattleKills === 'function') hatcheryRegisterBattleKills(1); }catch(_){ }
    trainingBattleLog(slot, tr('training_live_enemy_down', {enemy:enemy.name}));
    if(trainingStartNextOpponent(i)){ changed = true; continue; }
    completeTrainingSlot(i, true); changed = true; continue;
@@ -630,28 +633,6 @@ function startTrainingSlotTicker(){
    try{ processTrainingAutomationQueues(); }catch(_){}
   }
  }, 100);
-}
-function simulateAfkTrainingProgress(seconds){
- ensureTrainingSlots();
- let ticks = Math.min(120, Math.floor(Math.max(0, seconds||0) / 25));
- let completed = 0;
- while(ticks-- > 0){
-  for(let i=0;i<getTrainingSlotCount();i++){
-   const slot = G.trainingSlots[i];
-   if(!slot || !slot.active || !slot.battle) continue;
-   const tb = slot.battle;
-   const enemy = tb.enemy;
-   if(enemy) enemy.currentHP = 0;
-   if(enemy) trainingBattleLog(slot, tr('training_live_enemy_down', {enemy:enemy.name}));
-   if(!trainingStartNextOpponent(i)){
-    completeTrainingSlot(i, true);
-    completed++;
-   }
-  }
-  try{ processTrainingAutomationQueues(); }catch(_){}
- }
- if(completed){ try{ renderTrainingWindow(); renderTrainingBattlePanel(); }catch(_){} }
- return completed;
 }
 function cancelTrainingSlot(slotIndex){
  ensureTrainingSlots();
@@ -1397,7 +1378,6 @@ if (typeof setTrainingAutomationOption !== 'undefined' && typeof window !== 'und
 if (typeof rebuildTrainingQueue !== 'undefined' && typeof window !== 'undefined') window.rebuildTrainingQueue = rebuildTrainingQueue;
 if (typeof processTrainingAutomationQueues !== 'undefined' && typeof window !== 'undefined') window.processTrainingAutomationQueues = processTrainingAutomationQueues;
 if (typeof trainingAutomationEligible !== 'undefined' && typeof window !== 'undefined') window.trainingAutomationEligible = trainingAutomationEligible;
-if (typeof simulateAfkTrainingProgress !== 'undefined' && typeof window !== 'undefined') window.simulateAfkTrainingProgress = simulateAfkTrainingProgress;
 if (typeof upgradeTrainingQueueSize !== 'undefined' && typeof window !== 'undefined') window.upgradeTrainingQueueSize = upgradeTrainingQueueSize;
 if (typeof addPokemonToTrainingQueue !== 'undefined' && typeof window !== 'undefined') window.addPokemonToTrainingQueue = addPokemonToTrainingQueue;
 if (typeof removePokemonFromTrainingQueue !== 'undefined' && typeof window !== 'undefined') window.removePokemonFromTrainingQueue = removePokemonFromTrainingQueue;

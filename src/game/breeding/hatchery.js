@@ -64,6 +64,77 @@ function pokemonBaseStatTotal(id) {
     Number(d[8] || 0)
   );
 }
+// ─── Passe 30 : Garderie ET Incubation partagent UN compteur de K.O. ───────
+// (Décisions bêta utilisateur) La Garderie abandonne son compteur d'XP : comme
+// l'incubation, elle avance sur un compteur de Pokémon mis K.O. — 10 K.O. =
+// 1 niveau. Chaque K.O. (sauvage, dresseur ou entraînement) nourrit TOUS les
+// slots de pension et le MODE du slot décide du résultat :
+//   - 'breed' / fossile : compteur d'incubation (éclosion à stepsReq K.O.) ;
+//   - 'exp' (Garderie)  : +1 niveau tous les DAYCARE_KOS_PER_LEVEL K.O.
+//                          (frais d'automation par niveau, règles inchangées).
+// Correctif bonus : avant, le compteur de steps montait AUSSI sur les slots
+// Garderie, et avec l'éclosion auto activée le pensionnaire était remis au
+// niveau 1 (« éclosion ») au bout de 25–100 K.O. — le routage élimine ce bug.
+const DAYCARE_KOS_PER_LEVEL = 10; // décision utilisateur (passe 30)
+function getDaycareKosPerLevel(p) { return DAYCARE_KOS_PER_LEVEL; }
+// Retourne le nombre de niveaux de Garderie gagnés (utile au récap offline).
+function hatcheryRegisterBattleKills(count) {
+  if (!G || !Array.isArray(G.hatchery)) return 0;
+  count = Math.max(1, Math.floor(Number(count) || 1));
+  let daycareLevels = 0;
+  let changed = false;
+  for (let i = 0; i < G.hatchery.length; i++) {
+    const slot = G.hatchery[i];
+    if (!slot) continue;
+    const mode = (G.hatcheryModes && G.hatcheryModes[i]) || slot.mode || 'exp';
+    if (slot.isFossil || mode === 'breed') {
+      // Incubation : comportement historique inchangé.
+      slot.steps = (slot.steps || 0) + count;
+      changed = true;
+      if (G.automation && G.automation.autoHatch && slot.steps >= (slot.stepsReq || 10)) {
+        hatchEgg(i);
+      }
+      continue;
+    }
+    // Garderie : le compteur fait gagner des NIVEAUX (plus d'XP au compte-gouttes).
+    const p = slot.poke;
+    if (!p || p.level >= 100) continue;
+    slot.steps = (slot.steps || 0) + count;
+    changed = true;
+    const perLevel = getDaycareKosPerLevel(p);
+    let levelsGained = 0;
+    while ((slot.steps || 0) >= perLevel && p.level < 100) {
+      slot.steps -= perLevel;
+      levelUp(p);
+      levelsGained++;
+    }
+    if (levelsGained <= 0) continue;
+    daycareLevels += levelsGained;
+    const feePerLevel = typeof getHatcheryLevelUpFee === 'function' ? getHatcheryLevelUpFee() : 0;
+    const totalFee = feePerLevel * levelsGained;
+    if (G.money < totalFee) {
+      // Règle inchangée : impayé → le pensionnaire garde ses niveaux mais sort.
+      G.collection[String(p.id)] = p;
+      G.hatchery[i] = null;
+      notify(`${p.name} a été retiré de la Garderie : fonds insuffisants pour payer ses nouveaux niveaux (${totalFee}₽ requis) !`, "var(--red)");
+      continue;
+    }
+    if (totalFee > 0) {
+      G.money -= totalFee;
+      addBattleLog(` [Pension] -${totalFee}₽ payés pour ${levelsGained} niveau(x) gagné(s) par ${p.name}.`);
+      try { updateHeader(); } catch (_) {}
+    }
+    if (p.level >= 100) {
+      G.collection[String(p.id)] = p;
+      G.hatchery[i] = null;
+      addBattleLog(` [Pension] ${p.name} a atteint le Niveau 100 et sort de la Garderie !`);
+      notify(`${p.name} a atteint le Niveau 100 et sort de la Garderie !`, "var(--green)");
+    }
+  }
+  if (changed) { try { if (typeof renderHatcheryWindow === 'function') renderHatcheryWindow(); } catch (_) {} }
+  return daycareLevels;
+}
+
 function hatcheryStepsForPokemon(pOrId) {
   const id = Number(typeof pOrId === 'object' ? pOrId.id : pOrId);
   let base = 100;
@@ -550,11 +621,15 @@ function fossilQueueCandidates() {
   return out;
 }
 
-// Réassort des files : chaque slot est complété jusqu'à sa capacité avec le
-// type de sa priorité en premier (slots d'incubation : Pokémon ou fossiles
-// selon le toggle), puis l'autre type en repli. Les nouvelles entrées sont
-// TOUJOURS ajoutées à la fin — un fossile fraîchement obtenu prend la suite
-// sans passer devant (FIFO garanti à la consommation).
+// Réassort ROUND-ROBIN des files (passe 31, retour bêta) : on tourne RANG PAR
+// RANG — le 1ᵉʳ élément de chaque file, puis le 2ᵉ, etc. — au lieu de remplir
+// la file du slot 0 jusqu'à sa capacité avant de passer au suivant. Avant,
+// avec peu de candidats, tout partait dans la file 0 : un slot et sa liste
+// pleins pendant qu'un autre slot du même mode restait vide (et ne pouvait
+// jamais être servi). Règles conservées : ajouts TOUJOURS en fin de file
+// (FIFO garanti à la consommation), filtrage par mode (Garderie = niv. < 100,
+// Incubation = niv. 100 ou fossiles), priorité fossile/pokémon par slot avec
+// bascule automatique si le type préféré est épuisé (passe 12).
 function refillHatcheryQueueFromRules() {
   ensureHatcheryAutomation();
   if (!G.hatcheryQueues) G.hatcheryQueues = [[], [], [], []];
@@ -577,54 +652,82 @@ function refillHatcheryQueueFromRules() {
   );
   let fossilPool = fossilQueueCandidates();
 
+  // Contexte par slot (compteurs pour la bascule de priorité automatique).
+  const isLv100Match = (en) => (en.p.level || 0) >= 100;
+  const ctx = [];
   for (let slotIdx = 0; slotIdx < maxSlots; slotIdx++) {
     // Changement de mode en attente : ce slot ne doit plus être réassorti.
-    if (Array.isArray(G.hatcheryPendingModes) && G.hatcheryPendingModes[slotIdx]) continue;
-    const q = G.hatcheryQueues[slotIdx] || [];
-    if (q.length >= cap) continue;
-
+    if (Array.isArray(G.hatcheryPendingModes) && G.hatcheryPendingModes[slotIdx]) { ctx.push(null); continue; }
     const mode = G.hatcheryModes[slotIdx] || 'exp';
-    const isLv100Match = (en) => (en.p.level || 0) >= 100;
-    const pokes = pokePool.filter((en) => (mode === 'breed' ? isLv100Match(en) : !isLv100Match(en)));
-    const fossils = mode === 'breed' ? fossilPool : [];
-    const prefer = mode === 'breed' ? hatcherySlotPriority(slotIdx) : 'pokemon';
-    const sources = prefer === 'fossil'
-      ? [{ list: fossils, type: 'fossil' }, { list: pokes, type: 'pokemon' }]
-      : [{ list: pokes, type: 'pokemon' }, { list: fossils, type: 'fossil' }];
+    ctx.push({
+      idx: slotIdx,
+      mode,
+      prefer: mode === 'breed' ? hatcherySlotPriority(slotIdx) : 'pokemon',
+      appendedPreferred: 0,
+      appendedOther: 0,
+    });
+  }
 
-    let appendedPreferred = 0, appendedOther = 0;
-    for (const src of sources) {
-      // Copie : les pools sources sont consommés (splice) pendant l'itération.
-      for (const cand of src.list.slice()) {
-        if (q.length >= cap) break;
-        let entry;
-        if (src.type === 'fossil') {
-          entry = cand;
-          const fi = fossilPool.indexOf(cand);
-          if (fi === -1) continue;
-          fossilPool.splice(fi, 1);
-        } else {
-          entry = cand.uid;
-          queuedPoke.add(entry);
-          const pi = pokePool.indexOf(cand);
-          if (pi !== -1) pokePool.splice(pi, 1);
-        }
-        q.push(entry);
-        added++;
-        if (src === sources[0]) appendedPreferred++; else appendedOther++;
+  // RANG PAR RANG : chaque file reçoit son n-ième élément avant la suivante.
+  // Une file déjà plus longue (pré-remplie) n'est jamais modifiée en milieu.
+  for (let rank = 0; rank < cap; rank++) {
+    for (const c of ctx) {
+      if (!c) continue;
+      const q = G.hatcheryQueues[c.idx] || [];
+      if (q.length !== rank) continue;
+      let entry = null;
+      let usedType = null;
+      if (c.mode === 'breed' && c.prefer === 'fossil' && fossilPool.length) {
+        entry = fossilPool.shift(); usedType = 'fossil';
       }
-      if (q.length >= cap) break;
+      if (entry === null) {
+        const pi = pokePool.findIndex((en) => (c.mode === 'breed' ? isLv100Match(en) : !isLv100Match(en)));
+        if (pi !== -1) { entry = pokePool.splice(pi, 1)[0].uid; usedType = 'pokemon'; }
+      }
+      if (entry === null && c.mode === 'breed' && c.prefer === 'pokemon' && fossilPool.length) {
+        entry = fossilPool.shift(); usedType = 'fossil';
+      }
+      if (entry === null) continue; // plus rien d'éligible pour ce slot
+      q.push(entry);
+      G.hatcheryQueues[c.idx] = q;
+      added++;
+      if (c.mode !== 'breed' || usedType === c.prefer) c.appendedPreferred++; else c.appendedOther++;
     }
-    G.hatcheryQueues[slotIdx] = q;
+  }
 
-    // Si le type priorisé est épuisé mais que l'autre a servi, le toggle suit
-    // (passe 12) — sans jamais réordonner la liste existante.
-    if (mode === 'breed' && appendedPreferred === 0 && appendedOther > 0 &&
-        G.hatcheryAutomation.slots && G.hatcheryAutomation.slots[slotIdx]) {
-      G.hatcheryAutomation.slots[slotIdx].priority = prefer === 'fossil' ? 'pokemon' : 'fossil';
+  // Si le type priorisé est épuisé mais que l'autre a servi, le toggle suit
+  // (passe 12) — évalué par slot sur l'ensemble du réassort.
+  for (const c of ctx) {
+    if (!c || c.mode !== 'breed') continue;
+    if (c.appendedPreferred === 0 && c.appendedOther > 0 &&
+        G.hatcheryAutomation.slots && G.hatcheryAutomation.slots[c.idx]) {
+      G.hatcheryAutomation.slots[c.idx].priority = c.prefer === 'fossil' ? 'pokemon' : 'fossil';
     }
   }
   return added;
+}
+
+// Consommation FIFO : quand un slot se libère, c'est le PREMIER de la liste
+// qui passe — jamais un fossile/Pokémon pris ailleurs. Extraite (passe 31)
+// pour être appelée avant ET après le réassort des files.
+function drainHatcheryQueuesIntoSlots() {
+  let changed = false;
+  const maxSlots = clamp(G.hatcheryMaxSlots || 1, 1, 4);
+  let guard = 0, progress = true;
+  while (progress && guard++ < 8) {
+    progress = false;
+    for (let i = 0; i < maxSlots; i++) {
+      if (!G.hatchery[i]) {
+        // Mode en attente appliqué si le slot est déjà vide (sécurité)
+        applyPendingHatcheryMode(i);
+        if (G.hatchery[i]) continue;
+        const ok = fillHatcherySlotFromQueue(i);
+        changed = ok || changed;
+        progress = ok || progress;
+      }
+    }
+  }
+  return changed;
 }
 
 var _hatcheryQueueProcessing = false;
@@ -648,26 +751,19 @@ function processHatcheryQueue(force = false) {
     if (sanitizeHatcheryFossilQueues() > 0) { changed = true; saveGame(); }
   } catch (_) {}
 
-  // 1) Réassort des files (par slot, selon priorité ; fossiles inclus)
+  // 1) Passe 31 (retour bêta) : les SLOTS VIDES d'abord — consommation FIFO
+  //    des files existantes AVANT tout réassort.
+  if (drainHatcheryQueuesIntoSlots()) changed = true;
+
+  // 2) Réassort round-robin : 1ᵉʳ élément de chaque file, puis 2ᵉ, etc. —
+  //    répartition équitable entre les slots du même mode (plus de file 0
+  //    pleine pendant que les autres restent vides).
   const added = refillHatcheryQueueFromRules();
   if (added) changed = true;
 
-  // 2) Consommation FIFO : quand un slot se libère, c'est le premier de la
-  //    liste qui passe — jamais un fossile/Pokémon pris ailleurs.
-  let guard = 0, progress = true;
-  while (progress && guard++ < 8) {
-    progress = false;
-    for (let i = 0; i < maxSlots; i++) {
-      if (!G.hatchery[i]) {
-        // Mode en attente appliqué si le slot est déjà vide (sécurité)
-        applyPendingHatcheryMode(i);
-        if (G.hatchery[i]) continue;
-        const ok = fillHatcherySlotFromQueue(i);
-        changed = ok || changed;
-        progress = ok || progress;
-      }
-    }
-  }
+  // 3) Consommation : les slots encore vides prennent le 1er élément frais de
+  //    leur file — un slot libre est servi AVANT d'empiler sa propre file.
+  if (drainHatcheryQueuesIntoSlots()) changed = true;
 
   if (changed) {
     saveGame();
@@ -1113,6 +1209,10 @@ if (typeof reviveFossil !== 'undefined' && typeof window !== 'undefined')
 
 if (typeof hatcheryStepsForPokemon !== 'undefined' && typeof window !== 'undefined')
   window.hatcheryStepsForPokemon = hatcheryStepsForPokemon;
+if (typeof getDaycareKosPerLevel !== 'undefined' && typeof window !== 'undefined')
+  window.getDaycareKosPerLevel = getDaycareKosPerLevel;
+if (typeof hatcheryRegisterBattleKills !== 'undefined' && typeof window !== 'undefined')
+  window.hatcheryRegisterBattleKills = hatcheryRegisterBattleKills;
 if (typeof pokemonIvTotal !== 'undefined' && typeof window !== 'undefined')
   window.pokemonIvTotal = pokemonIvTotal;
 if (typeof pokemonEvTotal !== 'undefined' && typeof window !== 'undefined')
@@ -1127,6 +1227,8 @@ if (typeof setHatcheryAutomationOption !== 'undefined' && typeof window !== 'und
   window.setHatcheryAutomationOption = setHatcheryAutomationOption;
 if (typeof processHatcheryQueue !== 'undefined' && typeof window !== 'undefined')
   window.processHatcheryQueue = processHatcheryQueue;
+if (typeof drainHatcheryQueuesIntoSlots !== 'undefined' && typeof window !== 'undefined')
+  window.drainHatcheryQueuesIntoSlots = drainHatcheryQueuesIntoSlots;
 if (typeof renderHatcheryQueuePreview !== 'undefined' && typeof window !== 'undefined')
   window.renderHatcheryQueuePreview = renderHatcheryQueuePreview;
 if (typeof getHatcheryQueueLimit !== 'undefined' && typeof window !== 'undefined')
