@@ -817,21 +817,46 @@ function hatchEgg(slotIdx = 0) {
 
   let p;
   if (slot.isFossil) {
-    const isShiny = rollShiny(slot.reviveId);
-    p = createPoke(slot.reviveId, 1, isShiny);
-    if (!p) {
+    const reviveId = slot.reviveId;
+    const alreadyOwned = (typeof speciesOwned === 'function' && speciesOwned(reviveId)) || (G.pokedex && G.pokedex[reviveId] && G.pokedex[reviveId].caught);
+    // Si déjà possédé, 10% chance d'IV au lieu de doublon (demande utilisateur)
+    if (alreadyOwned) {
+      // Trouve une instance existante (team ou box) pour lui ajouter un IV
+      let existing = null;
+      if (G.team) existing = G.team.find(x => x && Number(x.id) === Number(reviveId));
+      if (!existing) {
+        for (const k in G.collection || {}) {
+          const cand = G.collection[k];
+          if (cand && Number(cand.id) === Number(reviveId)) { existing = cand; break; }
+        }
+      }
+      if (existing && typeof chance === 'function' && chance(10)) {
+        if (!existing.ivs) existing.ivs = {hp:0, atk:0, def:0, spa:0, spd:0, spe:0};
+        const keys = ['hp','atk','def','spa','spd','spe'].filter(k => (existing.ivs[k]||0) < 6);
+        if (keys.length) {
+          const picked = keys[Math.floor(Math.random()*keys.length)];
+          existing.ivs[picked] = (existing.ivs[picked]||0)+1;
+          try { if (typeof recalcPokeStats === 'function') recalcPokeStats(existing); } catch(_){}
+          if (typeof notify === 'function') notify(`Fossile déjà possédé : +1 IV ${picked.toUpperCase()} sur ${existing.name} !`, 'var(--green)');
+        }
+      } else {
+        if (typeof notify === 'function') notify(`Fossile déjà possédé : aucun doublon créé.`, 'var(--light1)');
+      }
+      G.hatchery[slotIdx] = null;
+      applyPendingHatcheryMode(slotIdx);
+      if (typeof addStaffXp === 'function') addStaffXp('hatchery', 1);
+      if (G.automation && G.automation.autoSeedHatchery) processHatcheryQueue();
+      updateHeader(); renderTeamWindow(); renderHatcheryWindow();
+      try { if (typeof saveGame === 'function') saveGame(); } catch(_){}
       return;
     }
-    G.pokedex[slot.reviveId] = {
-      ...(G.pokedex[slot.reviveId] || {}),
-      seen: true,
-      caught: true,
-    };
+    const isShiny = rollShiny(reviveId);
+    p = createPoke(reviveId, 1, isShiny);
+    if (!p) return;
+    G.pokedex[reviveId] = { ...(G.pokedex[reviveId] || {}), seen: true, caught: true };
     if (isShiny) {
-      p.shinyUnlocked = true;
-      p.shinyActive = true;
-      p.shiny = true;
-      unlockShinyForSpecies(slot.reviveId);
+      p.shinyUnlocked = true; p.shinyActive = true; p.shiny = true;
+      unlockShinyForSpecies(reviveId);
     }
   } else {
     p = slot.poke;
@@ -906,6 +931,7 @@ function hatchEgg(slotIdx = 0) {
   updateHeader();
   renderTeamWindow();
   renderHatcheryWindow();
+  try { if (typeof renderBox === 'function') { const el=document.getElementById('tab-content'); if(el) renderBox(el); } } catch(_){}
   if (p && (p.shinyUnlocked || p.shinyActive || p.shiny)) {
     notify(tr('m.hatchery.2', { p0: p.name }), 'var(--light2)');
   } else {
@@ -937,8 +963,6 @@ function reviveFossil(fossilKey) {
     notify(t('no_fossil_left'), 'var(--red)');
     return;
   }
-  // Fossiles réservés dans une file d'attente de la pension : on ne peut
-  // réanimer que les exemplaires LIBRES (anti-doublon, passe 14).
   const reserved = getHatcheryFossilReservations()[fossilKey] || 0;
   if (invQty - reserved < 1) {
     notify(t('fossil_all_queued') || t('no_fossil_left'), 'var(--red)');
@@ -947,6 +971,37 @@ function reviveFossil(fossilKey) {
   const pokeId = getFossilReviveId(fossilKey);
   if (!pokeId) {
     notify(t('unknown_fossil'), 'var(--red)');
+    return;
+  }
+
+  // Si déjà possédé, 10% chance IV au lieu de doublon (demande utilisateur)
+  const alreadyOwned = (typeof speciesOwned === 'function' && speciesOwned(pokeId)) || (G.pokedex && G.pokedex[pokeId] && G.pokedex[pokeId].caught);
+  if (alreadyOwned) {
+    let existing = null;
+    if (G.team) existing = G.team.find(x => x && Number(x.id) === Number(pokeId));
+    if (!existing) {
+      for (const k in G.collection || {}) {
+        const cand = G.collection[k];
+        if (cand && Number(cand.id) === Number(pokeId)) { existing = cand; break; }
+      }
+    }
+    G.inventory[fossilKey]--;
+    if (G.inventory[fossilKey] <= 0) delete G.inventory[fossilKey];
+    if (existing && Math.random() < 0.1) {
+      if (!existing.ivs) existing.ivs = {hp:0,atk:0,def:0,spa:0,spd:0,spe:0};
+      const avail = ['hp','atk','def','spa','spd','spe'].filter(k => (existing.ivs[k]||0) < 6);
+      if (avail.length) {
+        const pick = avail[Math.floor(Math.random()*avail.length)];
+        existing.ivs[pick] = (existing.ivs[pick]||0)+1;
+        try { if (typeof recalcPokeStats === 'function') recalcPokeStats(existing); } catch(_){}
+        notify(`${existing.name} déjà possédé : +1 IV ${pick.toUpperCase()} !`, 'var(--green)');
+      }
+    } else {
+      notify(`${getPokeName(pokeId)} déjà possédé : pas de doublon, IV éventuel à 10%`, 'var(--light1)');
+    }
+    saveGame(); updateHeader(); renderTeamWindow(); try { const el=document.getElementById('tab-content'); if(el && typeof renderBox==='function') renderBox(el); } catch(_){}
+    const el2 = document.getElementById('tab-content');
+    if (el2 && _activeTab === 'fossil') renderFossilLab(el2);
     return;
   }
 

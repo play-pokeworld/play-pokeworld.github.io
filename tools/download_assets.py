@@ -142,13 +142,24 @@ def parse_sprite_entries() -> list[tuple[str, int, Path]]:
 
 
 def pokemon_url(bucket: str, dex: int) -> str:
+    # Corrections pour les formes Castform et Deoxys qui utilisent des IDs custom 387-392
+    # mais dont les vrais sprites PokeAPI sont 10013-10015 et 10001-10003
+    special_map = {
+        387: 10013,  # castform-sunny
+        388: 10014,  # castform-rainy
+        389: 10015,  # castform-snowy
+        390: 10001,  # deoxys-attack
+        391: 10002,  # deoxys-defense
+        392: 10003,  # deoxys-speed
+    }
+    real_dex = special_map.get(dex, dex)
     folder = {
         'front': 'pokemon',
         'back': 'pokemon/back',
         'frontShiny': 'pokemon/shiny',
         'backShiny': 'pokemon/back/shiny',
     }[bucket]
-    return f'{POKEAPI_RAW}/{folder}/{dex}.png'
+    return f'{POKEAPI_RAW}/{folder}/{real_dex}.png'
 
 
 def parse_item_entries() -> list[tuple[str, Path]]:
@@ -246,10 +257,9 @@ def download_region_maps() -> None:
         out = maps_dir / filename
         if out.exists():
             continue
-        write_download(url, out)
-        if not out.exists():
-            region = out.stem.split('-')[0]
-            make_map(out, region.upper(), REGION_ACCENTS.get(region, '#9CB071'))
+        ok = write_download(url, out)
+        if not ok or not out.exists():
+            print(f"[SANS PLACEHOLDER] carte manquante: {filename} (URL {url})")
 
 
 def download_item_overrides() -> None:
@@ -338,14 +348,16 @@ def main() -> None:
             else:
                 failed.append((url, out, label))
 
-    # Generated assets/fallbacks.
+    # Sécurité placeholder SUPPRIMÉE à la demande utilisateur (plus de pastilles)
+    # On ne génère plus de fallback pour les items manquants — ils seront listés comme manquants.
+    missing_items = []
     for key, out in parse_item_entries():
         if not out.exists():
-            if key.startswith('tm_'):
-                typ = key[3:]
-                make_placeholder(out, 'TM', (40, 40), TYPE_COLORS.get(typ, '#53617A'), '#ffffff')
-            else:
-                make_placeholder(out, key[:2].upper(), (40, 40), '#524f48')
+            missing_items.append(key)
+    if missing_items:
+        print(f"[SANS PLACEHOLDER] {len(missing_items)} items sans sprite réel (listés ci-dessous, non générés):")
+        for k in missing_items[:100]:
+            print(f"  - {k}")
 
     # Passe 50 (retour utilisateur « il manque tous les sprites des CT ») :
     # les VRAIES disquettes PokeChill sont téléchargées par
@@ -354,22 +366,27 @@ def main() -> None:
     # et write_download(), qui ne remplace jamais un fichier existant, ne
     # rapatriait plus jamais la vraie disquette.
     download_item_overrides()
-    for typ, color in TYPE_COLORS.items():
+    # Plus de placeholder pour les disquettes TM — on exige le vrai sprite PokeChill
+    missing_tms = []
+    for typ in TYPE_COLORS.keys():
         out = ROOT / f'src/assets/images/items/tm_{typ}.png'
         if not out.exists():
-            make_placeholder(out, 'TM', (40, 40), color, '#ffffff')
+            missing_tms.append(typ)
+    if missing_tms:
+        print(f"[SANS PLACEHOLDER] {len(missing_tms)} disquettes TM sans vrai sprite PokeChill: {', '.join(missing_tms)}")
 
+    # Plus de placeholder pour dresseurs — on liste seulement les échecs
     for _url, out, label in failed:
-        if 'trainers/npcs' in str(out) and not out.exists():
-            make_placeholder(out, label.split(' ', 1)[-1][:2].upper(), (72, 72), '#36342F')
-        elif 'trainers/profil' in str(out) and not out.exists():
-            make_placeholder(out, out.stem.split('-')[-1], (72, 72), '#53617A')
+        if ('trainers/npcs' in str(out) or 'trainers/profil' in str(out)) and not out.exists():
+            print(f"[SANS PLACEHOLDER] dresseur manquant: {label} -> {out}")
 
     download_region_maps()
     download_backgrounds()
-    make_backgrounds()  # repli généré uniquement si un téléchargement a échoué
+    # make_backgrounds() SUPPRIMÉ — on exige les vrais fonds PokeChill
+    # make_backgrounds()  # désactivé à la demande utilisateur
     download_item_overrides()  # (idempotent) sprites à source imposée
-    make_unknown_item()
+    # make_unknown_item() SUPPRIMÉ — plus de placeholder générique
+    # make_unknown_item()
     download_base_assets()  # bases secrètes : 2D Émeraude (passe 33/34)
     for helper_script in ['tools/repair-fonts.py', 'tools/repair-tm-sprites.py', 'tools/fetch-item-sprites.py', 'tools/fix_missing_assets.py']:
         try:

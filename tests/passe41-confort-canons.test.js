@@ -236,7 +236,7 @@ test('passe 41 D : dims catalogue = header.h canon, hauteur visuelle débordante
     assert.deepEqual(out.dims[s], wd, `${s} = ${wd[0]}×${wd[1]} (DECORSHAPE canon)`);
   }
   assert.deepEqual(out.fp0plant, { w: 1, d: 1 }, 'collision = case basse seule (empreinte 1×1)');
-  assert.equal(out.boxPlant.maxH, 32, 'visu 2 cases de haut (16×32 natif) : maxH = h + C');
+  assert.equal(out.boxPlant.maxH, 48, 'visu 3 cases de haut (fix >1 bloc) : maxH = h + 2*C');
   assert.equal(out.boxPlant.h, 16, 'empreinte au sol inchangée');
   assert.equal(out.boxBoard.maxH, 16, 'objet mural : pas de débord (collé au mur)');
   assert.equal(out.rotDesk, 0, 'passe 42 : rotation SUPPRIMÉE (canon RSE)');

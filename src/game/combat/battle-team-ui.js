@@ -113,7 +113,7 @@ function generatePokeCardHTML(p, i, options = {}) {
             ' data-context-call=\"openMoveInfo\" data-context-args=\"' + moveInfoArgs + '\"' +
             ' title="' + t('context_info_touch') + '">' +
             '<span class="move-name">' + getMoveName(m.id) + '</span>' +
-            '<span class="move-type type-' + mv.type.toLowerCase() + '">' + mv.type + '</span>' + battleMoveEffBadgeHtml(mv.type, isEnemy) +
+            '<span class="move-type type-' + mv.type.toLowerCase() + '">' + (typeof getTypeName==='function'?getTypeName(mv.type):mv.type) + '</span>' + battleMoveEffBadgeHtml(mv.type, isEnemy) +
             '</div>';
         } else {
           // Passe 17 : glisser-déposer des attaques équipées (fenêtre Party)
@@ -128,7 +128,7 @@ function generatePokeCardHTML(p, i, options = {}) {
             ' data-context-call=\"openMoveInfo\" data-context-args=\"' + moveInfoArgs + '\"' +
             ' title="' + t('context_info_touch') + '">' +
             '<span class="move-name">' + getMoveName(m.id) + '</span>' +
-            '<span class="move-type type-' + mv.type.toLowerCase() + '">' + mv.type + '</span>' + battleMoveEffBadgeHtml(mv.type, isEnemy) +
+            '<span class="move-type type-' + mv.type.toLowerCase() + '">' + (typeof getTypeName==='function'?getTypeName(mv.type):mv.type) + '</span>' + battleMoveEffBadgeHtml(mv.type, isEnemy) +
             '</div>';
         }
       } else {

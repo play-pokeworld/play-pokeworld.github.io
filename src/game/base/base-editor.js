@@ -26,6 +26,8 @@ const _baseEd = {
   visit: null,           // session baseVisitCreate
   visitOwn: false,       // visite de SA propre base (→ on crédite G.base.record)
   visitName: '',         // nom du propriétaire visité (affichage)
+  visitSig: null,        // id unique d'export (baseId) — pour collecte drapeau unique
+  visitOwnerId: null,    // saveMeta.id du propriétaire — pour éviter de visiter sa propre base exportée
   visitPath: [],         // miroir du chemin pour l'overlay (référence sess.path)
   visitPending: null,    // passe 46 : {x,y} du copain abordé — l'interaction se
                          // déclenche À L'ARRIVÉE (clic à distance sur un PNJ)
@@ -445,11 +447,20 @@ function baseEditorAdoptVisit(sess, meta) {
   baseEditorResetSel();
   _baseEd.mode = 'visit';
   _baseEd.visit = sess;
-  _baseEd.visitOwn = false; // jamais de crédit sur la base d'un ami (anti-triche)
+  // Si ownerId correspond à la save actuelle, c'est SA PROPRE base exportée → on la considère comme own pour éviter le farm de drapeau
+  let isOwnFile = false;
+  try {
+    const curOwner = (typeof G !== 'undefined' && G && G.saveMeta && G.saveMeta.id) ? String(G.saveMeta.id) : null;
+    const impOwner = meta && meta.ownerId ? String(meta.ownerId) : null;
+    if (curOwner && impOwner && curOwner === impOwner) isOwnFile = true;
+  } catch(_){}
+  _baseEd.visitOwn = isOwnFile; // own file = pas de drapeau, comme sa propre base
   _baseEd.visitName = (meta && meta.name) || '';
+  _baseEd.visitSig = (meta && meta.id) ? String(meta.id) : null;
+  _baseEd.visitOwnerId = (meta && meta.ownerId) ? String(meta.ownerId) : null;
   _baseEd.visitPath = sess.path;
   _baseEd.hover = null;
-  // Quête découverte (217) : la visite d'une base d'ami compte aussi.
+  // Quête découverte (217) : la visite d'une base d'ami compte aussi (même own file compte pour la découverte, mais pas pour drapeau).
   try { if (typeof advanceQuests === 'function') advanceQuests('base_visit', (typeof G !== 'undefined' && G) ? G.location : null, 1); } catch (_) {}
   return { ok: true, sess };
 }

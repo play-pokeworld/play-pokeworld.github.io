@@ -172,7 +172,8 @@ def main() -> int:
         print(' '.join(missing))
         return 0
 
-    got = baked = 0
+    got = 0
+    failed_fetch = []
     for k in missing:
         dest = OUT / f'{k}.png'
         name = ALIAS.get(k, k.replace('_', '-'))
@@ -182,11 +183,16 @@ def main() -> int:
             dest.write_bytes(data)
             got += 1
             continue
-        bake(k, dest)
-        baked += 1
+        # Tentative Pokeclicker / PokeChill via ITEM_OVERRIDES étendus (voir download_assets.py)
+        # Ici on NE CUIT PLUS de repli — on liste seulement
+        failed_fetch.append(k)
     still = [k for k in keys
              if not (OUT / f'{k}.png').exists() and not (k.startswith('ct') or k.startswith('cs'))]
-    print(f'objets : {got} téléchargés (PokeAPI) · {baked} cuits en repli · {len(still)} sans sprite')
+    print(f'objets : {got} téléchargés (PokeAPI) · {len(failed_fetch)} sans sprite réel (listés, non générés)')
+    if failed_fetch:
+        print('  Manquants:', ', '.join(failed_fetch[:100]))
+    # still = failed_fetch (plus de bake)
+    print(f'  Total sans sprite après tentative: {len(still)}')
     return 0
 
 

@@ -428,6 +428,8 @@ function installCriticalClickFallback(root) {
     fixDebugToggle();
   }
 
+  // Plus de Proxy – déduplication gérée à l'init dans save.js via deduplicateCollectionAndFixBox()
+
 })();
 
 

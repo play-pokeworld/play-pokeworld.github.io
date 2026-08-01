@@ -19,26 +19,17 @@
 const SHINY_BASE_RATE = 1 / 4096;
 const SHINY_CHARM_RATE = 1 / 2048;
 
-/**
- * @param {number|string|null} speciesId
- * @returns {boolean}
- */
 function rollShiny(speciesId) {
   const rate = getShinyRateForSpecies(speciesId);
   return Math.random() < rate;
 }
 
-/**
- * Taux shiny effectif pour une espèce (0..1).
- * Charme régional : 1/2048 si dex de la région native à 100 %, sinon 1/4096.
- */
 function getShinyRateForSpecies(speciesId) {
   let rate = SHINY_BASE_RATE;
   const nid = Number(speciesId);
   if (Number.isFinite(nid) && nid > 0 && hasRegionalShinyCharmForSpecies(nid)) {
     rate = SHINY_CHARM_RATE;
   }
-  // Talent d'équipe (GoodAsGold, etc.)
   if (typeof getTeamShinyRateMultiplier === 'function') {
     try {
       const mult = Number(getTeamShinyRateMultiplier());
@@ -48,7 +39,6 @@ function getShinyRateForSpecies(speciesId) {
   return rate;
 }
 
-/** True si le joueur possède le charme ET que l'espèce est native d'un dex 100 %. */
 function hasRegionalShinyCharmForSpecies(speciesId) {
   const nid = Number(speciesId);
   if (!Number.isFinite(nid) || nid <= 0) return false;
@@ -75,7 +65,6 @@ function getShinyCharmCompletedRegions() {
     if (typeof isRegionDexComplete === 'function') {
       try { complete = !!isRegionDexComplete(region); } catch (_) { complete = false; }
     }
-    // Flag persistant (posé à la complétion) — tolère un recalcul partiel.
     if (!complete && typeof G !== 'undefined' && G && G.shinyCharmRegions && G.shinyCharmRegions[region]) {
       complete = true;
     }
@@ -84,14 +73,10 @@ function getShinyCharmCompletedRegions() {
   return out;
 }
 
-/** Compat : ancien API « nombre de lancers » — 1 toujours (on n'utilise plus de multi-rolls). */
 function getShinyCharmRollsForSpecies(speciesId) {
-  // Conservé pour UI/tests legacy. 1 = pas de multi-roll ; le taux est géré par getShinyRateForSpecies.
   return 1;
 }
 
-// Appelé après captures / évolutions / imports pour décerner le Charme et
-// enregistrer les régions complétées.
 function syncShinyCharmProgress() {
   if (typeof G === 'undefined' || !G) return { unlocked: false, regions: [], newly: [] };
   if (!G.shinyCharmRegions || typeof G.shinyCharmRegions !== 'object') G.shinyCharmRegions = {};
@@ -116,7 +101,6 @@ function syncShinyCharmProgress() {
   const completedCount = order.filter((r) => !!G.shinyCharmRegions[r]).length;
   const hadCharm = (G.inventory['shiny_charm'] || 0) > 0;
 
-  // Obtention : premier Pokédex régional à 100 % (plus après la Ligue).
   if (completedCount > 0 && !hadCharm) {
     G.inventory['shiny_charm'] = 1;
     if (typeof notify === 'function') {
@@ -141,8 +125,6 @@ function syncShinyCharmProgress() {
     }
   }
 
-  // Migration : ancien charme post-Ligue sans dex 100 % → objet gardé, bonus inerte.
-
   return {
     unlocked: (G.inventory['shiny_charm'] || 0) > 0,
     regions: getShinyCharmCompletedRegions(),
@@ -150,7 +132,6 @@ function syncShinyCharmProgress() {
   };
 }
 
-// Multiplicateur doux via talents d'équipe (GoodAsGold ≈ +15 %).
 function getTeamShinyRateMultiplier() {
   let mult = 1;
   if (typeof G === 'undefined' || !G || !Array.isArray(G.team)) return mult;
@@ -166,23 +147,44 @@ function getEffectiveShinyRate(speciesId) {
   return getShinyRateForSpecies(speciesId);
 }
 
-function speciesOwned(id){
+// ---- Possession d'espèce ----
+// Retourne vrai si l'espèce est possédée en équipe, boîte, garderie, entraînement.
+// Note : ne teste PAS le pokedex ici pour éviter le bug de capture où
+// G.pokedex[caught]=true était posé AVANT le test alreadyOwned, rendant
+// toute première capture considérée comme doublon (bug boîte vide depuis Hoenn).
+function speciesOwnedInstance(id){
  const nid = Number(id);
- if(G.team.some(p=>p && Number(p.id)===nid)) return true;
- if(G.collection[nid] || G.collection[String(nid)]) return true;
- for(const k in (G.collection||{})){
-   const poke = G.collection[k];
-   if(poke && Number(poke.id)===nid) return true;
+ if(!G) return false;
+ if(Array.isArray(G.team) && G.team.some(p=>p && Number(p.id)===nid)) return true;
+ if(G.collection){
+   if(G.collection[nid] || G.collection[String(nid)]) return true;
+   for(const k in G.collection){
+     const poke = G.collection[k];
+     if(poke && Number(poke.id)===nid) return true;
+   }
  }
- for(const s of (G.hatchery||[])){
-   if(s && s.poke && Number(s.poke.id)===nid) return true;
+ if(Array.isArray(G.hatchery)){
+   for(const s of G.hatchery){
+     if(s && s.poke && Number(s.poke.id)===nid) return true;
+   }
  }
- for(const s of (G.training||[])){
-   if(s && s.poke && Number(s.poke.id)===nid) return true;
+ if(Array.isArray(G.training)){
+   for(const s of G.training){
+     if(s && s.poke && Number(s.poke.id)===nid) return true;
+   }
  }
- if(G.pokedex && G.pokedex[nid] && G.pokedex[nid].caught) return true;
  return false;
 }
+
+// Historique : speciesOwned incluait aussi le pokedex (pour comptage route).
+// On garde compatibilité mais on l'implémente comme instance + pokedex.
+function speciesOwned(id){
+ const nid = Number(id);
+ if(speciesOwnedInstance(nid)) return true;
+ if(G && G.pokedex && G.pokedex[nid] && G.pokedex[nid].caught) return true;
+ return false;
+}
+
 function getSpeciesInstance(id){
  const nid=Number(id);
  const inTeam=G.team.find(p=>Number(p.id)===nid);
@@ -196,9 +198,6 @@ function getSpeciesInstance(id){
  return null;
 }
 
-// Présence d'une espèce dans la BOÎTE PC uniquement (l'équipe active ne
-// compte pas) — condition d'affichage des panneaux de formes (Morphéo au
-// Labo Météo, Deoxys à Autopia).
 function speciesInBox(id){
  const nid = Number(id);
  if(!G || !G.collection) return false;
@@ -296,8 +295,12 @@ function locCompletion(locId){
 }
 function boxedEntries(){
  const out=[];
+ // On ignore les clés non-pokémon (ex: éventuel __isProxy accidentel)
  for(const [idStr,poke] of Object.entries(G.collection||{})){
- if(!poke) continue;
+ if(!poke || typeof poke !== 'object') continue;
+ if(!('id' in poke)) continue;
+ // Filtre les entrées techniques (clé commençant par __)
+ if(String(idStr).startsWith('__')) continue;
  const cid = poke.id || parseInt(String(idStr).replace(/\D/g, ''), 10) || 1;
  out.push({id: idStr, cleanId: +cid, poke});
  }
@@ -305,6 +308,146 @@ function boxedEntries(){
  return out;
 }
 
+// ---- Système anti-doublon simple, sans Proxy ----
+// Centralise la logique : si espèce déjà possédée, 10% chance +1 IV sur l'existant
+// sinon ajoute normalement. Utilisé par captures, fossiles, œufs.
+function findExistingPokemonBySpecies(speciesId){
+  const nid = Number(speciesId);
+  if(!G) return null;
+  if(Array.isArray(G.team)){
+    const t = G.team.find(p=>p && Number(p.id)===nid);
+    if(t) return t;
+  }
+  if(G.collection){
+    for(const k in G.collection){
+      const p = G.collection[k];
+      if(p && Number(p.id)===nid) return p;
+    }
+  }
+  return null;
+}
+
+function giveIvBonusToExisting(existing){
+  if(!existing) return null;
+  if(!existing.ivs) existing.ivs = {hp:0,atk:0,def:0,spa:0,spd:0,spe:0};
+  const avail = ['hp','atk','def','spa','spd','spe'].filter(k => (existing.ivs[k]||0) < 6);
+  if(!avail.length) return null;
+  const pick = avail[Math.floor(Math.random()*avail.length)];
+  existing.ivs[pick] = (existing.ivs[pick]||0)+1;
+  try { if (typeof recalcPokeStats === 'function') recalcPokeStats(existing); } catch(_){}
+  return pick;
+}
+
+// Ajoute un Pokémon au PC ou équipe en respectant la règle anti-doublon.
+// Retourne {added: bool, ivBonus: string|null, existing: poke|null}
+function addPokemonRespectingUniqueness(poke, opts={}){
+  // opts: {allowDuplicate: bool} // pour debug, mais par défaut false
+  if(!poke || !poke.id) return {added:false};
+  const nid = Number(poke.id);
+  const existing = findExistingPokemonBySpecies(nid);
+  if(existing && !opts.allowDuplicate){
+    // Doublon -> 10% IV
+    let ivKey = null;
+    if(Math.random() < 0.1){
+      ivKey = giveIvBonusToExisting(existing);
+      if(ivKey && typeof notify === 'function'){
+        try { notify(`${existing.name} déjà possédé : +1 IV ${ivKey.toUpperCase()} !`, 'var(--green)'); } catch(_){}
+      }
+    }
+    return {added:false, ivBonus: ivKey, existing, duplicate:true};
+  }
+  // Ajout normal
+  if(G.team.length < 6 && opts.preferTeam !== false && !existing){
+    // Si équipe pas pleine, on met en équipe sauf si on force boîte
+    // Mais la logique d'origine mettait en équipe seulement si <6, sinon boîte
+    // On laisse l'appelant décider ; ici on ajoute en boîte si demandé
+    // Pour compat : on n'ajoute pas automatiquement en équipe ici
+  }
+  const boxId = (typeof generateUniqueBoxId === 'function') ? generateUniqueBoxId(nid) : String(nid);
+  G.collection[boxId] = poke;
+  return {added:true, boxId, existing:null, duplicate:false};
+}
+
+// Nettoyage des doublons pour réparer les vieilles saves corrompues.
+// Garde le meilleur (max IV total ou niveau) par espèce, donne 10% IV au gardé pour chaque doublon supprimé.
+function deduplicateCollectionAndFixBox(){
+  if(!G) return 0;
+  if(!G.collection) G.collection = {};
+  if(!G.team) G.team = [];
+  let removed = 0;
+
+  // Étape 1 : boîte — regrouper par espèce id numérique exact (formes différentes = id différents donc ok)
+  const bestBySpecies = new Map(); // sid -> {key, poke, ivTotal}
+  const dupKeys = [];
+  for(const [key, poke] of Object.entries(G.collection)){
+    if(!poke || typeof poke !== 'object' || !('id' in poke)) continue;
+    if(String(key).startsWith('__')) { dupKeys.push(key); continue; }
+    const sid = Number(poke.id);
+    if(!Number.isFinite(sid)) continue;
+    const ivTot = Object.values(poke.ivs||{}).reduce((a,b)=>a+(Number(b)||0),0);
+    const lvl = Number(poke.level||0);
+    const score = ivTot*1000 + lvl; // compare IV puis niveau
+    if(!bestBySpecies.has(sid)){
+      bestBySpecies.set(sid, {key, poke, score});
+    } else {
+      const prev = bestBySpecies.get(sid);
+      // garde le meilleur, supprime l'autre
+      if(score > prev.score){
+        dupKeys.push(prev.key);
+        bestBySpecies.set(sid, {key, poke, score});
+      } else {
+        dupKeys.push(key);
+      }
+      // 10% IV sur le gardé
+      if(Math.random() < 0.1){
+        giveIvBonusToExisting(bestBySpecies.get(sid).poke);
+      }
+    }
+  }
+  for(const k of dupKeys){
+    delete G.collection[k];
+    removed++;
+  }
+
+  // Étape 2 : équipe — si un Pokémon d'équipe est déjà en boîte, on le garde en équipe et supprime boîte, ou vice versa
+  // On veut au final 1 exemplaire max par espèce sur l'ensemble team+box
+  const seen = new Set();
+  for(const {poke} of bestBySpecies.values()){
+    seen.add(Number(poke.id));
+  }
+  // Parcours équipe de fin vers début pour splice safe
+  for(let i=G.team.length-1;i>=0;i--){
+    const p = G.team[i];
+    if(!p) continue;
+    const sid = Number(p.id);
+    if(seen.has(sid)){
+      // déjà en boîte -> doublon équipe, on le supprime (avec IV bonus)
+      if(Math.random() < 0.1){
+        const exist = findExistingPokemonBySpecies(sid);
+        if(exist && exist !== p) giveIvBonusToExisting(exist);
+      }
+      G.team.splice(i,1);
+      removed++;
+    } else {
+      seen.add(sid);
+    }
+  }
+
+  if(removed>0){
+    try { if (typeof notify === 'function') notify(`${removed} doublon(s) nettoyé(s) – 10% IV appliqué`, 'var(--green)'); } catch(_){}
+    try { if (typeof saveGame === 'function') saveGame(); } catch(_){}
+  }
+  return removed;
+}
+
+// Expose globals (compat import ES)
+if (typeof window !== 'undefined') {
+  window.speciesOwnedInstance = speciesOwnedInstance;
+  window.findExistingPokemonBySpecies = findExistingPokemonBySpecies;
+  window.giveIvBonusToExisting = giveIvBonusToExisting;
+  window.addPokemonRespectingUniqueness = addPokemonRespectingUniqueness;
+  window.deduplicateCollectionAndFixBox = deduplicateCollectionAndFixBox;
+}
 
 // --- Migrated to ES module, globals exposed ---
 if (typeof rollShiny !== 'undefined' && typeof window !== 'undefined') window.rollShiny = rollShiny;
@@ -318,6 +461,7 @@ if (typeof getEffectiveShinyRate !== 'undefined' && typeof window !== 'undefined
 if (typeof SHINY_BASE_RATE !== 'undefined' && typeof window !== 'undefined') window.SHINY_BASE_RATE = SHINY_BASE_RATE;
 if (typeof SHINY_CHARM_RATE !== 'undefined' && typeof window !== 'undefined') window.SHINY_CHARM_RATE = SHINY_CHARM_RATE;
 if (typeof speciesOwned !== 'undefined' && typeof window !== 'undefined') window.speciesOwned = speciesOwned;
+if (typeof speciesOwnedInstance !== 'undefined' && typeof window !== 'undefined') window.speciesOwnedInstance = speciesOwnedInstance;
 if (typeof getSpeciesInstance !== 'undefined' && typeof window !== 'undefined') window.getSpeciesInstance = getSpeciesInstance;
 if (typeof speciesInBox !== 'undefined' && typeof window !== 'undefined') window.speciesInBox = speciesInBox;
 if (typeof isSpeciesShiny !== 'undefined' && typeof window !== 'undefined') window.isSpeciesShiny = isSpeciesShiny;

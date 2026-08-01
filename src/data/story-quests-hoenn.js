@@ -5,7 +5,7 @@ var STORY_QUESTS_HOENN = [
   { id: 201, region: 'hoenn', type: 'trainer_battle', loc: 'route101', battleId: 'hoenn_poochyena_route101', target: 1, rewardMoney: 500, rewardItems: { pokeball: 5 } },
   { id: 202, region: 'hoenn', type: 'talk', loc: 'oldale', target: 1, rewardMoney: 400, rewardItems: { potion: 3 } },
   { id: 203, region: 'hoenn', type: 'defeat_wild', loc: 'route102', target: 5, rewardMoney: 600, rewardItems: { greatball: 3 } },
-  { id: 204, region: 'hoenn', type: 'talk', loc: 'petalburg', target: 1, rewardMoney: 800 },
+  { id: 204, region: 'hoenn', type: 'defeat_wild', loc: 'petalburg_woods', target: 6, rewardMoney: 800, rewardItems: { potion: 2 } },
   { id: 205, region: 'hoenn', type: 'defeat_wild', loc: 'route104', target: 6, rewardMoney: 700, rewardItems: { superpotion: 2 } },
   { id: 206, region: 'hoenn', type: 'defeat_wild', loc: 'petalburg_woods', target: 8, rewardMoney: 900, rewardItems: { paralyzeheal: 2 } },
   { id: 207, region: 'hoenn', type: 'badge', targetBadge: 'roxanne', target: 1, rewardMoney: 1500, rewardItems: { greatball: 5 } },

@@ -483,7 +483,13 @@ function baseWindowSelectSlug(slug) {
 function baseWindowSelectNpcNew() {
   const st = baseWindowState();
   if (!st || !baseWindowEditorOk()) return;
+  const was = (typeof baseEditorGet === 'function' ? baseEditorGet().npcNew : false);
   baseEditorSelectNpcNew(st);
+  const now = (typeof baseEditorGet === 'function' ? baseEditorGet().npcNew : false);
+  if (typeof notify === 'function') {
+    if (now) notify(t('base.npced.place_hint') || 'PNJ pris en main — cliquez une case pour le poser', 'var(--blue)');
+    else if (was) notify(t('base.edit.select_hint') || 'Sélection annulée', 'var(--light1)');
+  }
   baseWindowInvalidate();
 }
 

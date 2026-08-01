@@ -420,10 +420,7 @@ var NPCS = {
    "mainTalk": 202
   }
  ],
- "petalburg": [
-  {
-   "mainTalk": 204
-  },
+  "petalburg": [
   {
    "mainTalk": 223
   }

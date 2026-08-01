@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PokéWorld</title>
+  <link rel="icon" type="image/png" href="src/assets/images/Icon.png">
+  <link rel="apple-touch-icon" href="src/assets/images/Icon.png">
   <link rel="stylesheet" href="src/assets/css/style.css">
   <link rel="stylesheet" href="src/assets/styles/mobile-accessibility.css">
   <link rel="stylesheet" href="src/assets/styles/extracted-index.css">
@@ -249,10 +251,8 @@
               <div id="battle-loot-inline" class="pw-static-040"></div>
               <div class="pw-static-041">
                 <div id="speed-toggle">
-                  <button data-spd="1" data-action="set-battle-speed" data-speed="1" class="hbtn active pw-static-042">x1</button>
-                  <button data-spd="2" data-action="set-battle-speed" data-speed="2" class="hbtn pw-static-042">x2</button>
-                  <button data-spd="3" data-action="set-battle-speed" data-speed="3" class="hbtn pw-static-042">x3</button>
-                <button data-spd="10" data-action="set-battle-speed" data-speed="10" class="hbtn speed-x10 pw-static-043">x10</button>
+                  <button data-spd="1" data-action="set-battle-speed" data-speed="1" class="hbtn active pw-static-042 speed-x1" style="display:none;">x1</button>
+                <button data-spd="10" data-action="set-battle-speed" data-speed="10" class="hbtn speed-x10 pw-static-043" style="display:none;">x10</button>
                 </div>
                 <button id="loot-open-btn" class="hbtn pw-static-044" data-action="open-battle-summary" data-i18n="loot_open_btn">Résumé</button>
               </div>
@@ -387,6 +387,7 @@
     <button class="hbtn pw-static-200" data-action="debug-give-ct-cs" data-i18n="debug_ctcs">Obtenir CT/CS +1</button>
     <button class="hbtn pw-static-073" data-action="legacy-call" data-call="debugTimeSkip30Minutes" data-call-args="" data-i18n="debug_afk">AFK +10 min</button>
   <button id="debug-x10-toggle" class="hbtn pw-static-074" data-action="toggle-battle-speed-x10"><span data-i18n="debug_speed_x10">Vitesse x10 :</span> <span id="debug-x10-state">OFF</span></button>
+  <button class="hbtn pw-static-073" data-action="legacy-call" data-call="deduplicateCollectionAndFixBox" data-call-args="" data-i18n="debug_dedup">Nettoyer doublons Boîte</button>
   </div>
   <button id="debug-toggle-btn" data-action="toggle-debug-menu" class="pw-static-075" data-i18n="debug_toggle_btn">Debug</button>
 </div>

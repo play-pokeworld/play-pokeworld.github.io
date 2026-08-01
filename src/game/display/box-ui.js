@@ -14,7 +14,7 @@ function renderBox(el){
  return;
  }
  if(!entries.length){
- el.innerHTML= battleLockBanner + filtersHtml + `<div class="pw-empty-state">${t('no_pokemon_found')}</div>`;
+ el.innerHTML= battleLockBanner + filtersHtml + `<div class="pw-empty-state">${t('no_pokemon_found')}<br><button class="hbtn" style="margin-top:8px;" data-action="legacy-call" data-call="resetBoxFilters" data-call-args="">${t('box_filter_reset')}</button><div style="margin-top:6px;font-size:11px;color:var(--light1);">${allEntries.length} Pokémon masqués par filtres</div></div>`;
  return;
  }
  const header=swap
@@ -55,11 +55,13 @@ function addBoxedToTeam(id){
  setMsg(t('team_already_full'));
  return;
  }
- if(G.team.some(p=>Number(p.id)===Number(poke.id))){
+ // Empêche d'avoir deux fois la même espèce (règle du jeu : 1 exemplaire max)
+ if(G.team.some(p=>p && Number(p.id)===Number(poke.id))){
  setMsg(t('species_already_in_team'));
  return;
  }
  if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(poke); else poke.heldItem = null;
+ // Supprime proprement la clé (quelle que soit son nom)
  delete G.collection[id];
  delete G.collection[String(id)];
  for(const k of Object.keys(G.collection)){ if(G.collection[k]===poke) delete G.collection[k]; }
@@ -82,17 +84,28 @@ function swapBoxWithTeam(id){
  const boxed=G.collection[id] || G.collection[String(id)];
  if(!boxed) return;
  const teamP=G.team[idx];
- const incomingSpecies = Number(boxed.id);
- const duplicateInTeam = G.team.some((tp,ti)=>ti!==idx && Number(tp.id)===incomingSpecies);
+
+ const boxedSpecies = Number(boxed.id);
+ const teamSpecies = Number(teamP.id);
+
+ // Si l'espèce entrante existe déjà ailleurs dans l'équipe, on bloque (anti-doublon)
+ const duplicateInTeam = G.team.some((tp,ti)=>ti!==idx && Number(tp.id)===boxedSpecies);
  if(duplicateInTeam){
  setMsg(t('species_already_in_team_present'));
  return;
  }
- const outId = Number(teamP.id);
- if(G.collection[outId] || G.collection[String(outId)]){
- setMsg(t('box_conflict'));
+ // Si l'espèce sortante existe déjà dans la boîte (autre que la case d'échange), on bloque
+ let duplicateInBox = false;
+ for(const k in G.collection){
+   if(k===id || String(k)===String(id)) continue;
+   const p = G.collection[k];
+   if(p && Number(p.id)===teamSpecies){ duplicateInBox = true; break; }
+ }
+ if(duplicateInBox){
+ setMsg(t('species_already_in_box'));
  return;
  }
+
  delete G.collection[id];
  delete G.collection[String(id)];
  for(const k of Object.keys(G.collection)){
@@ -100,9 +113,10 @@ function swapBoxWithTeam(id){
  }
  if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(teamP); else teamP.heldItem = null;
  if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(boxed); else boxed.heldItem = null;
- G.collection[outId] = teamP;
+ // On utilise un ID unique pour ranger le sortant, pour ne jamais écraser
+ const outKey = (typeof generateUniqueBoxId==='function') ? generateUniqueBoxId(teamP.id) : ('box_' + teamP.id + '_' + Date.now());
+ G.collection[outKey] = teamP;
  G.team[idx] = boxed;
- // Passe 16 : le Pokémon sortant emporte son objet (slot libéré).
  if(typeof setTeamSlotItem === 'function') setTeamSlotItem(idx, null);
  else if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
  _swapFromTeamIdx=null;
@@ -117,18 +131,26 @@ function sendTeamToBox(idx){
  if(G.team.length<=1){ setMsg(t('must_keep_one_pokemon')); return; }
  const p=G.team[idx];
  if(!p) return;
- const pid = Number(p.id);
- if(G.collection[pid] || G.collection[String(pid)]){
+ // Anti-doublon : vérifie instance réelle, pas seulement clé numérique
+ let alreadyInBox = false;
+ if(G.collection){
+   for(const k in G.collection){
+     const b = G.collection[k];
+     if(b && Number(b.id)===Number(p.id)){ alreadyInBox=true; break; }
+   }
+ }
+ if(alreadyInBox){
  setMsg(t('species_already_in_box'));
  return;
  }
  if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(p); else p.heldItem = null;
- G.collection[pid]=p;
+ const _boxId = (typeof generateUniqueBoxId==='function') ? generateUniqueBoxId(p.id) : ('box_' + p.id + '_' + Date.now());
+ G.collection[_boxId]=p;
  G.team.splice(idx,1);
- // Passe 16 : l'objet suit le Pokémon retiré ; les suivants glissent.
  if(typeof removeTeamSlotItemAt === 'function') removeTeamSlotItemAt(idx);
  else if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
- document.getElementById('poke-modal').classList.remove('open');
+ const modal = document.getElementById('poke-modal');
+ if(modal) modal.classList.remove('open');
  notify(tr('sent_to_box', {name:p.name}));
  showTab('box');
  saveGame();
@@ -193,5 +215,3 @@ if (typeof toggleShinySkin !== 'undefined' && typeof window !== 'undefined') win
 if (typeof toggleBoxShinySkin !== 'undefined' && typeof window !== 'undefined') window.toggleBoxShinySkin = toggleBoxShinySkin;
 if (typeof statusColor !== 'undefined' && typeof window !== 'undefined') window.statusColor = statusColor;
 if (typeof statusLabel !== 'undefined' && typeof window !== 'undefined') window.statusLabel = statusLabel;
-
-

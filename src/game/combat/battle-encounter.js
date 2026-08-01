@@ -37,10 +37,10 @@ function spawnNextWild(){
  const loc=getLocObj(G.location);
  const wild=loc ? loc.wild : null;
  if(!wild||!wild.length||aliveCount()===0){ endBattle(); return; }
- // Les légendaires vagabonds n'apparaissent QUE sur une exploration manuelle
- // (exploreArea) : jamais dans l'enchaînement automatique, sinon ils seraient
- // auto-capturés (ou mettraient l'équipe K.O.) pendant l'AFK/fast-forward.
- const wp = pickWildEncounter(loc, null);
+ // Modifié : les vagabonds apparaissent aussi en chaîne automatique (retour utilisateur : 10k combats sans aucun roaming)
+ // La capture auto est maintenant garantie pour les vagabonds (catch.js), donc pas de farm abusif en AFK — 3% reste rare.
+ const roamingId = (typeof getRoamingLegendaryForRoute === 'function') ? getRoamingLegendaryForRoute(G.location) : null;
+ const wp = pickWildEncounter(loc, roamingId);
  if(!wp){ endBattle(); return; }
  battle.enemyPoke=wp;
  battle.enemyMods={atk:1,def:1,spe:1};

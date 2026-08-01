@@ -668,13 +668,13 @@ test('passe 50 M : disquettes CT/CS = vrais sprites PokeChill (plus de pastilles
     assert.deepEqual([w, h], [32, 32], `${ty} : vrai sprite PokeChill (32×32), pas une pastille 40×40`);
   }
   assert.ok(E('tools/repair-tm-sprites.py'), 'outil de réparation des disquettes');
-  // la cause racine est corrigée : les vraies disquettes sont téléchargées
-  // AVANT que le repli ne puisse cuire une pastille
+  // Passe 55 : sécurité placeholder SUPPRIMÉE à la demande utilisateur — plus de pastilles générées
+  // Les vrais sprites PokeChill sont exigés, pas de repli
   const dl = R('tools/download_assets.py');
-  const iOverride = dl.indexOf('download_item_overrides()');
-  const iPlaceholder = dl.indexOf("make_placeholder(out, 'TM'");
-  assert.ok(iOverride > 0 && iOverride < iPlaceholder,
-    'les disquettes officielles sont téléchargées avant tout repli');
+  assert.ok(dl.includes('download_item_overrides()'), 'téléchargement des disquettes présent');
+  // L'ancien code générait une pastille 40×40 si le téléchargement échouait — désormais supprimé
+  assert.ok(!dl.includes("make_placeholder(out, 'TM'"), 'plus de génération de pastille TM (sécurité supprimée)');
+  assert.ok(dl.includes('[SANS PLACEHOLDER]'), 'log sans placeholder présent');
 });
 
 test('passe 50 M2 : les sources d’assets sont toutes déclarées et vérifiables', () => {

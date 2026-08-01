@@ -51,6 +51,10 @@ function toggleBattleSpeedX10(){
   debugX10Enabled = !debugX10Enabled;
   const x10btn = document.querySelector('.speed-x10');
   if(x10btn) x10btn.style.display = debugX10Enabled ? 'inline-block' : 'none';
+  const x1btn = document.querySelector('.speed-x1');
+  if(x1btn) x1btn.style.display = debugX10Enabled ? 'inline-block' : 'none';
+  const toggle = document.getElementById('speed-toggle');
+  if(toggle) toggle.style.display = debugX10Enabled ? 'flex' : 'none';
   const body = document.body;
   if(debugX10Enabled) body.classList.add('debug-active');
   else body.classList.remove('debug-active');

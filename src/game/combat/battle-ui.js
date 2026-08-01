@@ -107,7 +107,7 @@ function renderMoveButtons() {
     var effHint = eff === 0 ? ' '+(typeof t==='function'?t('eff_immune'):'×0') : eff >= 4 ? ' '+(typeof t==='function'?t('eff_4x'):'×4') : eff >= 2 ? ' '+(typeof t==='function'?t('eff_2x'):'×2') : eff <= 0.25 ? ' '+(typeof t==='function'?t('eff_quarter'):'×¼') : eff <= 0.5 ? ' '+(typeof t==='function'?t('eff_half'):'×½') : ' '+(typeof t==='function'?t('eff_1x'):'×1');
     var isNext = i === nextIdx;
     return '<div class="auto-move' + (isNext ? ' next-up' : '') + ' type-' + (mv.type || '').toLowerCase() + '" data-move-id="' + m.id + '" data-idx="' + i + '" data-context-call="openMoveInfo" data-context-args="\'' + m.id + '\',-1" title="' + (typeof t === 'function' ? t('context_info_touch') || '' : '') + '">' +
-      '<div class="am-top"><span>' + (i+1) + '. ' + getMoveNameFn(m.id) + ' ' + effHint + '</span><span class="am-type type-' + (mv.type || '').toLowerCase() + '">' + mv.type + '</span></div>' +
+      '<div class="am-top"><span>' + (i+1) + '. ' + getMoveNameFn(m.id) + ' ' + effHint + '</span><span class="am-type type-' + (mv.type || '').toLowerCase() + '">' + (typeof getTypeName==='function'?getTypeName(mv.type):mv.type) + '</span></div>' +
       '<div class="am-bar-bg"><div class="am-bar-fill"></div></div></div>';
   }).join('');
   updateMoveBars();
@@ -186,6 +186,10 @@ function setBattleSpeed(n) {
 function toggleDebugX10(show) {
   var x10btn = document.querySelector('.speed-x10');
   if (x10btn) x10btn.style.display = show ? 'inline-block' : 'none';
+  var x1btn = document.querySelector('.speed-x1');
+  if (x1btn) x1btn.style.display = show ? 'inline-block' : 'none';
+  var toggle = document.getElementById('speed-toggle');
+  if (toggle) toggle.style.display = show ? 'flex' : 'none';
   var body = document.body;
   if (show) body.classList.add('debug-active');
   else body.classList.remove('debug-active');

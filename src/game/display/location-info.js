@@ -398,6 +398,32 @@ function buySpecialFormPokemon(id, price){
   const p = (typeof createPoke === 'function') ? createPoke(id, 1, isShiny) : { id, name: getPokeName(id), level: 1, moves: [] };
   if(!p) return;
   if(isShiny){ p.shinyUnlocked=true; p.shinyActive=true; p.shiny=true; if(typeof unlockShinyForSpecies==='function') unlockShinyForSpecies(id); }
+  // Si déjà possédé (même ID), on ne crée pas de doublon mais on tente +1 IV à 10% (cohérent avec fossiles)
+  const alreadyOwned = (typeof speciesOwned === 'function' && speciesOwned(id));
+  if (alreadyOwned) {
+    let existing = null;
+    if (G.team) existing = G.team.find(x => x && Number(x.id) === Number(id));
+    if (!existing) {
+      for (const k in G.collection || {}) {
+        const cand = G.collection[k];
+        if (cand && Number(cand.id) === Number(id)) { existing = cand; break; }
+      }
+    }
+    if (existing && Math.random() < 0.1) {
+      if (!existing.ivs) existing.ivs = {hp:0,atk:0,def:0,spa:0,spd:0,spe:0};
+      const avail = ['hp','atk','def','spa','spd','spe'].filter(k => (existing.ivs[k]||0) < 6);
+      if (avail.length) {
+        const pick = avail[Math.floor(Math.random()*avail.length)];
+        existing.ivs[pick] = (existing.ivs[pick]||0)+1;
+        try { if (typeof recalcPokeStats === 'function') recalcPokeStats(existing); } catch(_){}
+        if (typeof notify === 'function') notify(`${existing.name} déjà possédé : +1 IV ${pick.toUpperCase()} !`, 'var(--green)');
+      }
+    } else {
+      if (typeof notify === 'function') notify(`${p.name} déjà possédé : pas de doublon créé.`, 'var(--light1)');
+    }
+    if (typeof saveGame === 'function') saveGame();
+    return;
+  }
   let boxId = 'form_' + id + '_' + Date.now();
   while(G.collection[boxId]) boxId = 'form_' + id + '_' + Date.now() + '_' + Math.floor(Math.random()*1000);
   G.collection[boxId] = p;
@@ -405,6 +431,13 @@ function buySpecialFormPokemon(id, price){
   G.pokedex[id] = { ...(G.pokedex[id] || {}), seen: true, caught: true };
   if(isShiny) G.pokedex[id].shiny = true;
   if(typeof saveGame === 'function') saveGame();
+  // Force refresh de la boîte pour que Deoxys apparaisse sans reload (fix très gros problème)
+  try { if (typeof renderBox === 'function') { const el = document.getElementById('tab-content'); if (el) renderBox(el); } } catch(_){}
+  try { if (typeof renderUnifiedGrid === 'function') renderUnifiedGrid(); } catch(_){}
+  try { if (typeof renderTeamWindow === 'function') renderTeamWindow(); } catch(_){}
+  // Reset filtres boîte pour que nouveau Pokémon soit visible même si filtre actif
+  try { if (typeof resetBoxFilters === 'function') resetBoxFilters(); } catch(_){}
+
   const name = p.name || ('Pokemon #' + id);
   if(typeof notify === 'function') notify(name + ' a été ajouté directement dans votre Boîte PC ! (-' + price.toLocaleString() + '₽)', 'var(--green)');
   // Rafraîchit le panneau de formes ouvert (marque « déjà obtenue »)

@@ -18,9 +18,15 @@ function baseExportBuild(st, ownerName) {
     name: n.name, sprite: n.sprite, team: n.team.map((p) => ({ ...p })),
     msgs: { ...n.msgs }, x: n.x, y: n.y,
   }));
+  // ID unique lié au compte joueur (saveMeta.id) + timestamp + random — évite de visiter sa propre base et garantit l'unicité même si on exporte plusieurs fois la même save
+  let ownerId = null;
+  try { ownerId = (typeof G !== 'undefined' && G && G.saveMeta && G.saveMeta.id) ? String(G.saveMeta.id) : null; } catch(_){}
+  const baseUid = (ownerId || 'guest') + '_' + (st.layoutId || 'unknown') + '_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
   return {
     kind: BASE_EXPORT_KIND,
     v: BASE_EXPORT_VERSION,
+    id: baseUid,
+    ownerId: ownerId,
     name: String(ownerName || 'Dresseur').slice(0, 18),
     exportedAt: new Date().toISOString(),
     layoutId: st.layoutId,
@@ -120,6 +126,8 @@ function baseImportValidate(txt) {
   // passe 43 : le champ spawn d'un import est ignoré — le joueur apparaît
   // TOUJOURS devant la porte (marqueur 'S' du gabarit).
   const meta = {
+    id: data.id ? String(data.id).slice(0, 64) : null,
+    ownerId: data.ownerId ? String(data.ownerId).slice(0, 64) : null,
     name: baseCleanText(data.name, 18) || 'Dresseur',
     record: {
       w: Math.min(99999, Math.max(0, data.record && data.record.w | 0)),

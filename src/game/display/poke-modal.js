@@ -201,7 +201,7 @@ function pokemonDetailMoveRows(p, opts){
    const action = readonly || locked ? '' : (boxId ? ` data-action="legacy-call" data-call="toggleBoxMoveSelect" data-call-args="'${boxId}',${mi}"` : ` data-action="legacy-call" data-call="toggleMoveSelect" data-call-args="${idx},${mi}"`);
    const ctxMoveArgs = boxId ? `'${m.id}',null,'${boxId}'` : (idx != null ? `'${m.id}',${idx}` : `'${m.id}'`);
    return `<div class="poke-detail-move-row ${selected?'selected':''}" data-type-color="${TYPE_COLORS[mv?.type||'']||'#555'}"${action} data-context-call="openMoveInfo" data-context-args="${ctxMoveArgs}" title="${locked?battleEditLockMessage():t('click_replace_context_info')}">
-     <span class="type-badge ${typeClass(mv?.type||'?')}">${mv?.type||'?'}</span>
+     <span class="type-badge ${typeClass(mv?.type||'?')}">${(typeof getTypeName==='function'?getTypeName(mv?.type):mv?.type)||'?'}</span>
      <span class="poke-detail-move-name">${getMoveName(m.id)}</span>
      <span class="poke-detail-move-meta">${mv?.pow||0} ${t('power_abbrev')} · ${mv?.cat||''}</span>
      ${selected?`<span class="poke-detail-pill danger">${t('replacement_badge')}</span>`:''}
@@ -214,7 +214,7 @@ function pokemonDetailMoveRows(p, opts){
    const attrs = active ? (boxId ? ` data-action="legacy-call" data-call="learnBoxMove" data-call-args="'${boxId}','${id}'"` : ` data-action="legacy-call" data-call="learnMove" data-call-args="${idx},'${id}'"`) : '';
    const ctxLearnArgs = boxId ? `'${id}',null,'${boxId}'` : (idx != null ? `'${id}',${idx}` : `'${id}'`);
    return `<div class="poke-detail-move-row learnable ${active?'clickable':''}" data-type-color="${TYPE_COLORS[mv?.type||'']||'#555'}"${attrs} data-context-call="openMoveInfo" data-context-args="${ctxLearnArgs}" title="${locked?battleEditLockMessage():t('context_info_touch')}">
-     <span class="type-badge ${typeClass(mv?.type||'?')}">${mv?.type||'?'}</span>
+     <span class="type-badge ${typeClass(mv?.type||'?')}">${(typeof getTypeName==='function'?getTypeName(mv?.type):mv?.type)||'?'}</span>
      <span class="poke-detail-move-name">${getMoveName(id)}</span>
      <span class="poke-detail-move-meta">${mv?.pow||0} ${t('power_abbrev')} · ${mv?.cat||''}</span>
      ${active?'<span class="poke-detail-pill">+</span>':''}

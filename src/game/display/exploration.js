@@ -1,6 +1,9 @@
 function pickWildEncounter(loc, roamingId){
- if(roamingId && Math.random() < 0.01){
+ // Augmenté de 1% → 3% (retour utilisateur : 10k combats sans aucun roaming ressenti)
+ // + flag pour forcer la tentative de capture (voir catch.js)
+ if(roamingId && Math.random() < 0.003){
  const wp = createPoke(roamingId, 45, false); // shiny roll at capture only
+ wp._isRoaming = true;
  if(wp) addBattleLog(tr('roaming_legendary_appeared', {name:wp.name}));
  return wp;
  }

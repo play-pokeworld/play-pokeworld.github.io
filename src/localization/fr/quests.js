@@ -519,9 +519,9 @@ window.L_fr_quests = {
     "rewardDesc": "600₽ + 3 Super Balls"
   },
   "204": {
-    "title": "Rencontre à Clémenti-Ville",
-    "desc": "Parler à Norman à l'Arène de Clémenti-Ville.",
-    "rewardDesc": "800₽"
+    "title": "Échauffement au Bois Clémenti",
+    "desc": "Norman t’a demandé de faire tes preuves : vaincs 6 Pokémon sauvages dans le Bois Clémenti.",
+    "rewardDesc": "800₽ + 2 Potions"
   },
   "205": {
     "title": "L'Orée du Bois Clémenti",

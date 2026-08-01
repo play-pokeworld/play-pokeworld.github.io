@@ -79,6 +79,14 @@ function removeSaveFromIndex(id){ writeSaveIndex(readSaveIndex().filter(entry =>
 function normalizeLoadedState(){
  if(!G) G = {};
  if(!G.collection) G.collection = {};
+ // Suppression du Proxy (lisibilité) – on nettoie juste les clés techniques accidentelles
+ try {
+   for(const k in G.collection){
+     if(String(k).startsWith('__') || k==='__isProxy'){
+       try { delete G.collection[k]; } catch(_){}
+     }
+   }
+ } catch(_){}
  if(!G.team) G.team = [];
  if(!G.inventory) G.inventory = {};
  // One-time inventory migration: canonical item IDs and removal of retired items.
@@ -187,6 +195,13 @@ function normalizeLoadedState(){
      G.repeatableQuestsUnlocked = true;
    }
  }
+ // Réparation des sauvegardes corrompues : déduplication puis restauration des manquants
+ try {
+   if(typeof deduplicateCollectionAndFixBox === 'function'){
+     const removed = deduplicateCollectionAndFixBox();
+     if(removed>0) console.log('[SAVE FIX] Dedup removed', removed);
+   }
+ } catch(_){}
  repairMissingBoxPokemon(G);
 }
 function repairMissingBoxPokemon(targetG) {

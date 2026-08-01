@@ -420,11 +420,10 @@ function base2dSpriteBox(def, fp, img, C) {
   let maxH = h;
   // Canon : certains objets font 2 cases de HAUT mais ne bloquent que la case
   // de base (plantes/boucliers BEHIND, grosses poupées 1×2) → débord visuel.
-  if (def.behind) maxH = h + Math.max(0, ((def.d || 1) - 1)) * C;
-  // passe 45 : surplomb « over » (toboggan) — le sprite monte de `over` cases
-  // AU-DESSUS de l'empreinte : le volume se lit en hauteur et le sol derrière
-  // reste libre.
+  // Fix : tous les objets >1 case (w>1 ou d>1) doivent pouvoir déborder d'1 case vers le haut pour prendre leur vraie taille
+  if (def.behind) maxH = h + Math.max(1, ((def.d || 1))) * C;
   else if (def.over) maxH = h + def.over * C;
+  else if ((def.w && def.w > 1) || (def.d && def.d > 1)) maxH = h + C;
   else if (def.layer === 'surface' && ((def.d || 1) > 1)) maxH = h + ((def.d || 1) - 1) * C;
   return { w, h, maxH };
 }
@@ -457,14 +456,14 @@ function base2dDrawSprite(ctx, img, x, y, def, fp, C, rotIdx) {
   if (base2dHasContactShadow(def)) base2dContactShadow(ctx, x, y, w, h, C);
   const k = C / 16;
   let dw = img.width * k, dh = img.height * k;
-  // Sécurité données : si le sprite dépasse TROP la boîte canon, on borne
-  // (garde le ratio — jamais d'étirement non uniforme).
+  // Fix : les objets >1 case avaient leurs sprites réduits à 1 case car on bridait l'agrandissement à 1.
+  // On autorise l'agrandissement jusqu'à remplir l'empreinte (w/maxH), tout en gardant le ratio.
   const sMaxW = Math.max(w, def.layer === 'surface' ? 2 * C : w) / (img.width * k);
   const sMaxH = maxH / (img.height * k);
-  const s = Math.min(1, sMaxW, sMaxH) * k;
+  const s = Math.min(sMaxW, sMaxH) * k;
   dw = img.width * s; dh = img.height * s;
-  const dx = x + (w - dw) / 2;   // centré sur l'empreinte (poupée sur tapis !)
-  const dy = y + h - dh;          // bas ancré au bas de l'empreinte
+  const dx = x + (w - dw) / 2;
+  const dy = y + h - dh;
   ctx.drawImage(img, Math.round(dx), Math.round(dy), dw, dh);
 }
 

@@ -519,9 +519,9 @@ window.L_en_quests = {
     "rewardDesc": "600₽ + 3 Great Balls"
   },
   "204": {
-    "title": "Meeting in Petalburg",
-    "desc": "Talk to Norman at the Petalburg Gym.",
-    "rewardDesc": "800₽"
+    "title": "Warm-up in Petalburg Woods",
+    "desc": "Norman wants you to prove yourself: defeat 6 wild Pokémon in Petalburg Woods.",
+    "rewardDesc": "800₽ + 2 Potions"
   },
   "205": {
     "title": "Edge of Petalburg Woods",

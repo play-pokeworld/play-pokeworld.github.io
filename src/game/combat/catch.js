@@ -1,4 +1,3 @@
-
 function rollWeightedTalentForSpecies(speciesId){
  const tals = (typeof getSpeciesTalents === 'function') ? getSpeciesTalents(speciesId) : [];
  const recOf = (typeof getTalentRecord === 'function') ? getTalentRecord : (x) => ((typeof TALENTS_FULL !== 'undefined') ? TALENTS_FULL[x] : null);
@@ -44,18 +43,47 @@ function rollCaptureIv(caughtMon){
 }
 
 function attemptAutoCatch(e){
- // Shiny : roll UNIQUEMENT à la capture (pas à l'apparition sur la route).
- // Exception : déjà shiny forcé (quête / légendaire opts.shiny / skin déjà shiny).
+ // BUG FIX historique : avant, G.pokedex[caught]=true était posé AVANT de tester alreadyOwned,
+ // et speciesOwned() incluait le pokedex. Résultat : toute première capture était vue comme doublon,
+ // rien n'était ajouté au PC/équipe -> boîte vide jusqu'au reload (bug introduit avec Hoenn).
+ // On teste d'abord la possession réelle (team/box/hatchery/training) puis on met à jour le dex.
  const forcedShiny = !!(e && (e.shinyActive || e.shiny || e._forceShiny));
  const rolledShiny = forcedShiny ? true : (typeof rollShiny === 'function' ? !!rollShiny(e.id) : false);
  const wasShiny = forcedShiny || rolledShiny;
- if(!wasShiny && !battle.legendaryCatch && !chance(10)){
- addBattleLog(tr("m.catch.7", {p0:e.name}));
- return;
+ const isRoaming = !!(e && (e._isRoaming || [144,145,146,151,243,244,245,251,380,381,385,386].includes(Number(e.id))));
+ if(!wasShiny && !isRoaming && !battle.legendaryCatch && !chance(10)){
+  addBattleLog(tr("m.catch.7", {p0:e.name}));
+  return;
  }
  addBattleLog(tr("m.catch.6", {p0:e.name}));
+
+ // --- 1) Détermine si doublon AVANT de toucher au dex ---
+ const alreadyOwned = (typeof speciesOwnedInstance === 'function')
+   ? speciesOwnedInstance(e.id)
+   : (typeof speciesOwned === 'function' ? speciesOwned(e.id) && !!(G.collection && (G.collection[e.id] || Object.values(G.collection).some(p=>p&&Number(p.id)===Number(e.id)))) : false);
+ // Pour être sûr : on check instance réelle sans pokedex
+ let alreadyOwnedReal = false;
+ if(G){
+   const nid = Number(e.id);
+   if(Array.isArray(G.team) && G.team.some(p=>p && Number(p.id)===nid)) alreadyOwnedReal = true;
+   if(!alreadyOwnedReal && G.collection){
+     for(const k in G.collection){
+       const p = G.collection[k];
+       if(p && Number(p.id)===nid){ alreadyOwnedReal = true; break; }
+     }
+   }
+   if(!alreadyOwnedReal && Array.isArray(G.hatchery)){
+     for(const s of G.hatchery){ if(s && s.poke && Number(s.poke.id)===nid){ alreadyOwnedReal=true; break; } }
+   }
+   if(!alreadyOwnedReal && Array.isArray(G.training)){
+     for(const s of G.training){ if(s && s.poke && Number(s.poke.id)===nid){ alreadyOwnedReal=true; break; } }
+   }
+ }
+ const isDuplicate = alreadyOwnedReal;
+
+ // --- 2) Ensuite on ouvre le dex ---
  G.pokedex[e.id]={...(G.pokedex[e.id]||{}),seen:true,caught:true};
- const alreadyOwned=speciesOwned(e.id);
+
  if(wasShiny) unlockShinyForSpecies(e.id);
  const caughtMon = createPoke(e.id, 1, wasShiny || isSpeciesShiny(e.id));
  if(caughtMon){
@@ -75,10 +103,32 @@ function attemptAutoCatch(e){
    if(ivKey) addBattleLog(`⭐ IV gagné sur ${caughtMon.name} : ${ivKey.toUpperCase()} +1 !`);
  }
  if(!battle.sessionCatches) battle.sessionCatches=[];
- battle.sessionCatches.push({id:e.id, name:e.name, emoji:e.emoji||PD[e.id]?.[12]||'❓', shiny:wasShiny, dupe:alreadyOwned});
+ battle.sessionCatches.push({id:e.id, name:e.name, emoji:e.emoji||PD[e.id]?.[12]||'❓', shiny:wasShiny, dupe:isDuplicate});
+
  try{ if (typeof renderBattleLoot === 'function') renderBattleLoot(); }catch(_){}
  try{ if (typeof renderBattleSummary === 'function') { const m=document.getElementById('battle-summary-modal'); if(m&&m.classList.contains('open')) renderBattleSummary(); } }catch(_){}
- if(alreadyOwned){
+
+ if(isDuplicate){
+   // Doublon : 10% chance +1 IV sur l'existant
+   let existing = null;
+   if (G.team) existing = G.team.find(x => x && Number(x.id) === Number(e.id));
+   if (!existing) {
+     for (const k in G.collection || {}) {
+       const cand = G.collection[k];
+       if (cand && Number(cand.id) === Number(e.id)) { existing = cand; break; }
+     }
+   }
+   if (existing && typeof chance === 'function' && chance(10)) {
+     if (!existing.ivs) existing.ivs = {hp:0, atk:0, def:0, spa:0, spd:0, spe:0};
+     const avail = ['hp','atk','def','spa','spd','spe'].filter(k => (existing.ivs[k]||0) < 6);
+     if (avail.length) {
+       const pick = avail[Math.floor(Math.random()*avail.length)];
+       existing.ivs[pick] = (existing.ivs[pick]||0)+1;
+       try { if (typeof recalcPokeStats === 'function') recalcPokeStats(existing); } catch(_){}
+       addBattleLog(`⭐ IV +1 ${pick.toUpperCase()} sur ${existing.name} (doublon évité)`);
+       if (typeof notify === 'function') notify(`${existing.name} : +1 IV ${pick.toUpperCase()} (doublon)`, 'var(--green)');
+     }
+   }
    if(!G.dupeCatches) G.dupeCatches={};
    G.dupeCatches[e.id]=(G.dupeCatches[e.id]||0)+1;
    if(wasShiny) addBattleLog(tr("m.catch.5", {p0:e.name}));
@@ -94,8 +144,9 @@ function attemptAutoCatch(e){
      addBattleLog(tr("m.catch.1", {p0:e.name}));
    }
  }
+
  if(G.mine) G.mine.energy = Math.min(G.mine.maxEnergy||100, (G.mine.energy||0) + 15);
- EventBus.emit(EVENTS.POKEMON_CAUGHT, { loc: G.location });
+ try { EventBus.emit(EVENTS.POKEMON_CAUGHT, { loc: G.location }); } catch(_){}
  try{ if(typeof syncShinyCharmProgress === 'function') syncShinyCharmProgress(); }catch(_){}
  updateHeader();
  try{ if(typeof refreshMapAndLoc==='function') refreshMapAndLoc(); }catch(_){}
@@ -104,16 +155,20 @@ function attemptAutoCatch(e){
    if(el && typeof renderLocInfo === 'function') renderLocInfo(el);
  }catch(_){}
  try{ renderBattleTeamRow(); }catch(_){}
- try{ if(typeof _activeTab !== 'undefined' && _activeTab === 'team') showTab('team'); }catch(_){}
- try{ if(typeof _activeTab !== 'undefined' && _activeTab === 'box') showTab('box'); }catch(_){}
+ // Rafraîchit la boîte visuellement sans forcer un reset brutal des filtres
+ try{
+   if(typeof renderBox === 'function'){
+     const tabEl = document.getElementById('tab-content');
+     if(tabEl) renderBox(tabEl);
+   }
+ }catch(_){}
+ try{ if (typeof renderUnifiedGrid === 'function') renderUnifiedGrid(); }catch(_){}
+ try{ if (typeof renderTeamWindow === 'function') renderTeamWindow(); }catch(_){}
  saveGame();
 }
-
 
 // --- Migrated to ES module, globals exposed ---
 if (typeof rollWeightedTalentForSpecies !== 'undefined' && typeof window !== 'undefined') window.rollWeightedTalentForSpecies = rollWeightedTalentForSpecies;
 if (typeof unlockCapturedTalent !== 'undefined' && typeof window !== 'undefined') window.unlockCapturedTalent = unlockCapturedTalent;
 if (typeof rollCaptureIv !== 'undefined' && typeof window !== 'undefined') window.rollCaptureIv = rollCaptureIv;
 if (typeof attemptAutoCatch !== 'undefined' && typeof window !== 'undefined') window.attemptAutoCatch = attemptAutoCatch;
-
-
