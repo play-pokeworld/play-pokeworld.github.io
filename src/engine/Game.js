@@ -73,3 +73,4 @@ window.PokeGame = PokeGame;
 if (!window.poke) window.poke = {};
 window.poke.Game = PokeGame;
 })();
+

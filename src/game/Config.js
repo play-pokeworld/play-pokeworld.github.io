@@ -65,6 +65,7 @@ window.GAME = {
   // ─── Starter ───
   KANTO_STARTERS: [1, 4, 7],    // Bulbasaur, Charmander, Squirtle
   JOHTO_STARTERS: [152, 155, 158], // Chikorita, Cyndaquil, Totodile
+  HOENN_STARTERS: [252, 255, 258], // Treecko, Torchic, Mudkip
 
   // ─── Money ───
   STARTING_MONEY: 2000,
@@ -72,13 +73,14 @@ window.GAME = {
 
   // ─── Pokémon ───
   MAX_LEVEL: 100,
-  SHINY_CHANCE: 1/400,
-  POKEMON_PER_REGION: { kanto: 151, johto: 100 },
+  SHINY_CHANCE: 1/4096,
+  POKEMON_PER_REGION: { kanto: 151, johto: 100, hoenn: 135 },
 
   // ─── Regions ───
   REGIONS: {
     kanto: { name: 'Kanto', start: 1, end: 151, badges: 8 },
     johto: { name: 'Johto', start: 152, end: 251, badges: 8 },
+    hoenn: { name: 'Hoenn', start: 252, end: 386, badges: 8 },
   },
 
   // ─── Misc ───
@@ -88,3 +90,4 @@ window.GAME = {
 };
 
 })();
+

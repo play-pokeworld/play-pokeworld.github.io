@@ -171,3 +171,49 @@ if (typeof pwResetScrollNow !== 'undefined' && typeof window !== 'undefined') wi
 if (typeof pwSetHtml !== 'undefined' && typeof window !== 'undefined') window.pwSetHtml = pwSetHtml;
 if (typeof pwSnapshotScrollAround !== 'undefined' && typeof window !== 'undefined') window.pwSnapshotScrollAround = pwSnapshotScrollAround;
 if (typeof pwRestoreScrollAround !== 'undefined' && typeof window !== 'undefined') window.pwRestoreScrollAround = pwRestoreScrollAround;
+
+
+// ─── Panneau de confirmation UNIFIÉ (#confirm-modal, index.html) ────────────
+// Remplace window.confirm : même charte que les autres modales (settings,
+// quêtes…). pwConfirm(message, onConfirm[, opts]) — opts.title (optionnel),
+// opts.confirmLabel / opts.cancelLabel, opts.danger (bouton rouge),
+// opts.onCancel. Fallback : si la modale n'existe pas dans le DOM (tests
+// headless), on retombe sur window.confirm pour ne jamais bloquer un flux.
+var _pwConfirmCb = null;
+function pwConfirm(message, onConfirm, opts) {
+  opts = opts || {};
+  var modal = (typeof document !== 'undefined') ? document.getElementById('confirm-modal') : null;
+  var textEl = modal ? document.getElementById('confirm-text') : null;
+  var yesBtn = modal ? document.getElementById('confirm-yes') : null;
+  if (!modal || !textEl || !yesBtn) {
+    var ok = (typeof confirm === 'function') ? confirm(String(message)) : false;
+    if (ok && typeof onConfirm === 'function') onConfirm();
+    else if (!ok && typeof opts.onCancel === 'function') opts.onCancel();
+    return;
+  }
+  var titleHtml = opts.title ? '<div class="pw-confirm-title">' + String(opts.title) + '</div>' : '';
+  // message : texte brut (échappé) — les retours à la ligne deviennent des <br>
+  var esc = String(message).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+  textEl.innerHTML = titleHtml + '<div class="pw-confirm-msg">' + esc + '</div>';
+  yesBtn.textContent = opts.confirmLabel || ((typeof t === 'function') ? t('confirm_btn') : 'Confirmer');
+  yesBtn.classList.toggle('pw-confirm-danger', !!opts.danger);
+  var cancelBtn = modal.querySelector('[data-action="close-confirm"]');
+  if (cancelBtn) cancelBtn.textContent = opts.cancelLabel || ((typeof t === 'function') ? t('cancel_btn') : 'Annuler');
+  _pwConfirmCb = { ok: onConfirm || null, cancel: opts.onCancel || null };
+  yesBtn.onclick = function () {
+    var cb = _pwConfirmCb && _pwConfirmCb.ok;
+    _pwConfirmCb = null;
+    modal.classList.remove('open');
+    if (typeof cb === 'function') { try { cb(); } catch (e) { try { console.error(e); } catch (_) {} } }
+  };
+  modal.classList.add('open');
+}
+function closeConfirm() {
+  var modal = (typeof document !== 'undefined') ? document.getElementById('confirm-modal') : null;
+  var cb = _pwConfirmCb && _pwConfirmCb.cancel;
+  _pwConfirmCb = null;
+  if (modal) modal.classList.remove('open');
+  if (typeof cb === 'function') { try { cb(); } catch (_) {} }
+}
+if (typeof pwConfirm !== 'undefined' && typeof window !== 'undefined') window.pwConfirm = pwConfirm;
+if (typeof closeConfirm !== 'undefined' && typeof window !== 'undefined') window.closeConfirm = closeConfirm;

@@ -126,3 +126,4 @@
     return 'Trouvé : ' + (loc.source || loc.shop || 'divers endroits');
   };
 })();
+

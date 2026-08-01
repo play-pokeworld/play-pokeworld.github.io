@@ -75,3 +75,4 @@ test('passe 23 : arènes 3v3 — statScale 0.5 appliqué (budgets réduits vs To
   const tower = sb.buildAtollTeam('tower_s', 40, 'enemy');
   assert.ok(Math.max(...tower.map((p) => sum(p.evs))) >= 30, 'tower_s : profil endgame ~36 EV conservé');
 });
+

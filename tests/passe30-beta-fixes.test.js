@@ -347,3 +347,4 @@ test('passe 30 D : recâblages présents, anciens blocs supprimés, clés i18n',
   assert.ok(R('src/localization/fr/ui.js').includes('"afk_panel_daycare_levels"'), 'clé FR récap garderie');
   assert.ok(R('src/localization/en/ui.js').includes('"afk_panel_daycare_levels"'), 'clé EN récap garderie');
 });
+

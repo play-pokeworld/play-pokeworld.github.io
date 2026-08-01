@@ -169,7 +169,7 @@ function generatePokeCardHTML(p, i, options = {}) {
     '<div class="poke-card-top">' +
       '<div class="pw-relative">' +
         '<div class="poke-sprite-container large ' + shinyClass + '" ' + spriteClick + ' ' + spriteRightClick + ' title="' + (spriteTitle || t('sprite_click_context_title')) + '">' +
-          '<div class="poke-sprite">' + spriteImg(p.id, p.emoji, {size: 96, shiny: p.shinyActive}) + '</div>' +
+          '<div class="poke-sprite">' + spriteImg(p.id, p.emoji, {size: 96, shiny: p.shinyActive, back: isActive}) + '</div>' +
         '</div>' +
         itemBadgeHtml +
       '</div>' +
@@ -390,4 +390,5 @@ if (typeof generatePokeCardHTML !== 'undefined' && typeof window !== 'undefined'
 if (typeof renderBattleTeamRow !== 'undefined' && typeof window !== 'undefined') window.renderBattleTeamRow = renderBattleTeamRow;
 if (typeof renderEnemyMoveBars !== 'undefined' && typeof window !== 'undefined') window.renderEnemyMoveBars = renderEnemyMoveBars;
 if (typeof renderBattleLoot !== 'undefined' && typeof window !== 'undefined') window.renderBattleLoot = renderBattleLoot;
+
 

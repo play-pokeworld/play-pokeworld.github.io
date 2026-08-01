@@ -253,3 +253,4 @@ window.L_pokemon_names_en = [
   "Ho-Oh",
   "Celebi"
 ];
+

@@ -192,3 +192,4 @@ test('CS : le titre est suffixé (CS)', () => {
   assert.equal(env.__err, null);
   assert.ok(/\(CS\)/.test(env.titleEl.textContent), `titre CS attendu : ${env.titleEl.textContent}`);
 });
+

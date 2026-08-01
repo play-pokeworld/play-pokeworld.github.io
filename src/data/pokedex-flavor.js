@@ -507,3 +507,4 @@ window.POKEDEX_FLAVOR = {
   }
 };
 
+

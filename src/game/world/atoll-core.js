@@ -253,7 +253,7 @@ function _rotationTickerTick() {
  const time = formatRotationCountdown(getRotationTimeLeftMs());
  for (const el of els) {
   const kind = el.getAttribute('data-rotation-timer');
-  const key = kind === 'roam' ? 'roaming_rotation_timer' : 'atoll_rotation_timer';
+  const key = kind === 'roam' ? 'roaming_rotation_timer' : kind === 'mirage' ? 'mirage_rotation_timer' : 'atoll_rotation_timer';
   el.textContent = (typeof tr === 'function') ? tr(key, { time }) : time;
  }
 }
@@ -294,3 +294,4 @@ if (typeof window !== 'undefined') {
  window.ensureAtollState = ensureAtollState;
  window.startRotationTicker = startRotationTicker;
 }
+

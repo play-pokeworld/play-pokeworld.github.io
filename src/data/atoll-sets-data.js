@@ -107,3 +107,4 @@ if (typeof window !== 'undefined') {
  window.ATOLL_SETS = ATOLL_SETS;
  window.ATOLL_LEGENDARIES = ATOLL_LEGENDARIES;
 }
+

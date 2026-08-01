@@ -681,3 +681,4 @@ window.L_en_move_descs = {
   "zapcannon": "Inflicts",
   "zenheadbutt": "A legitimate strategic combat move."
 };
+

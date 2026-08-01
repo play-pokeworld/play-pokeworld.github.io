@@ -141,3 +141,4 @@ window.addEventListener('mouseup', (e) => {
 // --- Migrated to ES module, globals exposed ---
 if (typeof startWinDrag !== 'undefined' && typeof window !== 'undefined') window.startWinDrag = startWinDrag;
 
+

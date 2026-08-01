@@ -10,49 +10,49 @@ const SHOPS = {
  },
 "pewter": {
 "items": [
-"prine_berry",
+"occa_berry",
 "muscle_band",
 "metal_coat"
  ]
  },
 "cerulean": {
 "items": [
-"soft_sand",
+"passho_berry",
+"soft_sand"
  ]
  },
 "vermilion": {
 "items": [
+"wacan_berry",
 "muscle_band",
 "metal_coat",
-"soft_sand",
+"soft_sand"
  ]
  },
 "lavender": {
 "items": [
+"rindo_berry"
  ]
  },
 "celadon": {
 "items": [
-"firestone",
-"waterstone",
-"thunderstone",
-"leafstone",
-"moonstone",
-"prine_berry",
+"yache_berry",
 "rarecandy",
 "muscle_band",
 "metal_coat",
-"soft_sand",
+"soft_sand"
  ]
  },
 "fuchsia": {
 "items": [
-"soft_sand",
+"chople_berry",
+"soft_sand"
  ]
  },
 "cinnabar": {
 "items": [
-"muscle_band",
+"kebia_berry",
+"muscle_band"
  ]
  },
 "indigo": {
@@ -60,22 +60,23 @@ const SHOPS = {
 "rarecandy",
 "muscle_band",
 "metal_coat",
-"soft_sand",
+"soft_sand"
  ]
  },
 "jnewbark": {
 "items": [
-"prine_berry",
 "rarecandy"
  ]
  },
 "jcherrygrove": {
 "items": [
+"shuca_berry",
 "rarecandy"
  ]
  },
 "jviolet": {
 "items": [
+"coba_berry",
 "muscle_band",
 "twisted_spoon",
 "miracle_seed"
@@ -83,7 +84,7 @@ const SHOPS = {
  },
 "jazalea": {
 "items": [
-"prine_berry",
+"payapa_berry",
 "soft_sand",
 "spell_tag",
 "poison_barb"
@@ -91,8 +92,8 @@ const SHOPS = {
  },
 "jgoldenrod": {
 "items": [
+"tanga_berry",
 "rarecandy",
-"sunstone",
 "kings_rock",
 "dragon_scale",
 "upgrade",
@@ -118,7 +119,7 @@ const SHOPS = {
  },
 "jecruteak": {
 "items": [
-"prine_berry",
+"charti_berry",
 "spell_tag",
 "never_melt_ice",
 "mystic_water"
@@ -126,6 +127,7 @@ const SHOPS = {
  },
 "jolivine": {
 "items": [
+"kasib_berry",
 "leftovers",
 "mystic_water",
 "hard_stone"
@@ -133,6 +135,7 @@ const SHOPS = {
  },
 "jcianwood": {
 "items": [
+"haban_berry",
 "black_belt",
 "charcoal",
 "magnet"
@@ -140,7 +143,6 @@ const SHOPS = {
  },
 "jmahogany": {
 "items": [
-"prine_berry",
 "upgrade",
 "deep_sea_scale",
 "deep_sea_tooth",
@@ -161,4 +163,5 @@ const SHOPS = {
 
 // --- Migrated to ES module, globals exposed ---
 if (typeof SHOPS !== 'undefined' && typeof window !== 'undefined') window.SHOPS = SHOPS;
+
 

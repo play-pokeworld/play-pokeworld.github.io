@@ -155,3 +155,4 @@ if (typeof renderBattleSummary !== 'undefined' && typeof window !== 'undefined')
 if (typeof openBattleSummary !== 'undefined' && typeof window !== 'undefined') window.openBattleSummary = openBattleSummary;
 if (typeof closeBattleSummary !== 'undefined' && typeof window !== 'undefined') window.closeBattleSummary = closeBattleSummary;
 
+

@@ -57,3 +57,4 @@ window.PokeAbilityDB = AbilityDB;
 window.poke = window.poke || {};
 window.poke.AbilityDB = AbilityDB;
 })();
+

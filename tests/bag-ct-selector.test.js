@@ -250,3 +250,4 @@ test('contrat : MOVES connaît désormais tous les moveIds des CT/CS (via alias)
   }
   assert.deepEqual(unresolved, [], 'toutes les CT/CS résolvent vers un move existant');
 });
+

@@ -117,6 +117,13 @@ function openNpc(locId, idx){
  const rew = sqt.rewardDesc;
  if(active){
  html += `<div class="pw-text-sm pw-light2">${(typeof getIcon==='function'?getIcon('quests',16):'')} ${t("m.quest_ui.15")} ${ttl}</div>`;
+ } else if(done && sq.type==='puzzle'){
+ html += `<div class="pw-detail-chip">
+ <div class="pw-detail-label">✓ ${ttl} <span class="pw-text-sm pw-green">(${(G.lang==='en')?'Already cleared · replayable':'Déjà terminée · rejouable'})</span></div>
+ <div class="pw-detail-text">${dsc}</div>
+ <div class="pw-detail-hint"> ${rew}</div>
+ <button class="hbtn extracted-bridge-style-049" data-action="legacy-call" data-call="acceptSideQuest" data-call-args="'${npc.quest}'">${(G.lang==='en')?'Play again':'Rejouer'}</button>
+ </div>`;
  } else if(done){
  html += `<div class="pw-text-sm pw-green"> ${t("m.quest_ui.14")} ${ttl}</div>`;
  } else {
@@ -143,8 +150,14 @@ function acceptSideQuest(sid){
  ensureQuestState();
  if(!SIDE_QUESTS[sid]) return;
  if(G.activeQuests.some(i=>i.qid===sid && i.cat==='side')){ notify(t("legacy_message_n_qu_te_d_j_active"),'var(--light2)'); return; }
- if(G.completedQuests['side_'+sid]){ notify(t("legacy_message_n_qu_te_d_j_termin_e"),'var(--green)'); return; }
- G.activeQuests.push({qid:sid, cat:'side', progress:0, done:false});
+ const _sqDef = SIDE_QUESTS[sid];
+ const _isPuzzle = _sqDef && _sqDef.type === 'puzzle';
+ // Non-puzzle : une seule complétion. Puzzle : rejouable à l'infini.
+ if(!_isPuzzle && G.completedQuests['side_'+sid]){ notify(t("legacy_message_n_qu_te_d_j_termin_e"),'var(--green)'); return; }
+ if(_isPuzzle && _sqDef.targetPuzzleId && typeof resetPuzzleRun==='function'){
+   try{ resetPuzzleRun(_sqDef.targetPuzzleId); }catch(_){}
+ }
+ G.activeQuests.push({qid:sid, cat:'side', progress:0, done:false, replay:!!(_isPuzzle && G.completedQuests['side_'+sid])});
  closeQuestModal();
  updateHeader();
  try{ if(typeof refreshMapAndLoc==='function') refreshMapAndLoc(); }catch(_){}
@@ -364,4 +377,5 @@ if (typeof renderRepeatableBoard !== 'undefined' && typeof window !== 'undefined
 if (typeof acceptRepeatable !== 'undefined' && typeof window !== 'undefined') window.acceptRepeatable = acceptRepeatable;
 if (typeof openRepeatableUpgradeMenu !== 'undefined' && typeof window !== 'undefined') window.openRepeatableUpgradeMenu = openRepeatableUpgradeMenu;
 if (typeof upgradeRepeatableSlots !== 'undefined' && typeof window !== 'undefined') window.upgradeRepeatableSlots = upgradeRepeatableSlots;
+
 

@@ -343,3 +343,4 @@ if (typeof CTCS_SHOP_STOCK !== 'undefined' && typeof window !== 'undefined') win
 if (typeof CTCS_PRICES !== 'undefined' && typeof window !== 'undefined') window.CTCS_PRICES = CTCS_PRICES;
 if (typeof CTCS_META !== 'undefined' && typeof window !== 'undefined') window.CTCS_META = CTCS_META;
 if (typeof CTCS_UNSOLD !== 'undefined' && typeof window !== 'undefined') window.CTCS_UNSOLD = CTCS_UNSOLD;
+

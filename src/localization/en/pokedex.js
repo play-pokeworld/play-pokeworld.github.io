@@ -8,3 +8,4 @@ window.L_en_pokedex = {
 };
 
 
+

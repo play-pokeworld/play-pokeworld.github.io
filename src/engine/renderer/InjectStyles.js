@@ -235,3 +235,4 @@ if (document.readyState === 'complete') injectPokeStyles();
 else document.addEventListener('DOMContentLoaded', injectPokeStyles);
 
 })();
+

@@ -115,9 +115,16 @@ test('passe 27 B : baies Oran/Sitrus/Ceriz supprimées du jeu entier', () => {
   }
   const _berryPng = ['src', 'assets', 'images', 'items'].join('/') + '/oran' + '_berry.png'; // hors littéral (regex de l\'audit)
   assert.ok(!fs.existsSync(new URL('../' + _berryPng, import.meta.url)), 'PNG oran supprimé');
-  // Compensations : quêtes → Poussière Étoile, tutoriel → 2 stardust
-  assert.ok(R('src/data/side-quests-data.js').includes('"stardust":'), 'récompenses remplacées par stardust');
-  assert.ok(R('src/game/display/tutorial.js').includes('items:{stardust:2}'), 'tutoriel compensé');
+  // Passe 53 : la compensation en Poussière Étoile est RÉVOQUÉE. Elle était
+  // à quantité égale (2 baies → 2 poussières) alors qu'une baie ne valait
+  // rien et qu'une poussière se revend 2 000 ₽ : +208 000 ₽ sur l'ensemble
+  // des quêtes, soit +32 % de leur argent total. Les quêtes donnent
+  // désormais UNE baie (dans ~60 % des cas), le tutoriel aussi.
+  for (const f of ['src/data/side-quests-data.js', 'src/data/story-quests.js']) {
+    assert.ok(!R(f).includes('"stardust"'), `${f} : plus aucune poussière en récompense`);
+  }
+  assert.ok(!R('src/game/display/tutorial.js').includes('stardust'), 'tutoriel : plus de poussière');
+  assert.ok(/items:\{\w+_berry:1\}/.test(R('src/game/display/tutorial.js')), 'tutoriel : une baie');
   assert.ok(!R('src/localization/fr/ui.js').includes('3 Baies Oran'), 'texte du tutoriel mis à jour');
   // Purge des sauvegardes (inventaire, tenus, slots)
   const save = R('src/game/save/save.js');
@@ -178,7 +185,13 @@ test('passe 27 E : preview du résultat d\'un drop (cartes + attaques, équipe +
   // Câblage : 2 sites team-ui (carte + attaque), 2 sites Usine
   assert.equal((R('src/game/display/team-ui.js').match(/pwDropPreviewShow\(/g) || []).length, 2, 'équipe : carte + attaque');
   assert.equal((R('src/game/display/fullscreen-panel.js').match(/pwDropPreviewShow\(/g) || []).length, 2, 'Usine : carte + attaque');
-  assert.ok(R('src/game/display/preset-manager.js').includes('pwDropPreviewShow('), 'éditeur de preset aussi');
+  // Passe 50 : l'éditeur de preset n'implémente plus SA preview — il déclare
+  // le contexte et réutilise le glisser-déposer (et donc la preview) unique
+  // de team-ui.js. C'est ce câblage qu'on vérifie désormais.
+  assert.ok(R('src/game/display/preset-manager.js').includes('pwSetMoveDragContext('),
+    'éditeur de preset : contexte de drag partagé');
+  assert.ok(R('src/game/display/preset-manager.js').includes('installMoveDragDrop('),
+    'éditeur de preset : handler unique installé');
   // Fonctionnel : survol d\'une carte cible → bulle contenant les DEUX Pokémon
   sb.G.team = [
     { id: 25, name: 'Pika', level: 12, uid: 'a', xp: 0, xpNext: 8, moves: [], currentHP: 10, maxHP: 10, heldItem: null },
@@ -283,3 +296,4 @@ test('passe 27 G : éditeur — objets tenus gérés (équipe) et refus propre (
   sb.presetEditorPickItem(2);
   assert.ok(sb._notifs.some((n) => n.includes('équipe active')), 'boîte : message « applique d\'abord le preset »');
 });
+

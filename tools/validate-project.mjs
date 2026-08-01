@@ -8,3 +8,4 @@ if (missing.length) {
   process.exit(1);
 }
 console.log('Project structure OK');
+

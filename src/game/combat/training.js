@@ -287,14 +287,18 @@ function isTrainingModeUnlocked(mode){
 }
 
 function trainingButtonHtml(mode, enabled, slotIndex){
+ // Chaque bouton d'entraînement porte une classe de couleur dédiée
+ // (training-mode--<mode>) pour être reconnaissable d'un coup d'œil,
+ // avec un état hover assorti (voir pw-unified.css).
+ const modeCls = `training-mode--${mode}`;
  if(!isTrainingModeUnlocked(mode)){
    let reqGym = mode === 'level' ? (typeof t==='function'?t('req_gym_level'):'Blaine (Cinnabar)') : mode === 'ev' ? (typeof t==='function'?t('req_gym_ev'):'Giovanni (Viridian)') : (typeof t==='function'?t('req_league_kanto'):'the Kanto League');
-   return `<div class="pokechill-row training-mode-row is-disabled">
+   return `<div class="pokechill-row training-mode-row ${modeCls} is-disabled">
      <div class="training-mode-title">🔒 ${getTrainingModeLabel(mode)}</div>
      <div class="pw-text-sm pw-light1">${typeof t==='function'?t('unlocked_after'):'Unlocked after '}${reqGym}</div>
    </div>`;
  }
- return `<div class="pokechill-row training-mode-row ${enabled?'':'is-disabled'}" ${enabled?`data-action="legacy-call" data-call="startTrainingBattle" data-call-args="'${mode}', ${slotIndex}"`:''}>
+ return `<div class="pokechill-row training-mode-row ${modeCls} ${enabled?'':'is-disabled'}" ${enabled?`data-action="legacy-call" data-call="startTrainingBattle" data-call-args="'${mode}', ${slotIndex}"`:''}>
  <div class="training-mode-title">${getTrainingModeLabel(mode)}</div>
  <div class="pw-text-sm pw-light1">${getTrainingModeDescription(mode, enabled)}</div>
  </div>`;
@@ -1417,4 +1421,5 @@ function tryUnlockHiddenAbility(p) {
 }
 
 if (typeof tryUnlockHiddenAbility !== 'undefined' && typeof window !== 'undefined') window.tryUnlockHiddenAbility = tryUnlockHiddenAbility;
+
 

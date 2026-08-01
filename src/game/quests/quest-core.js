@@ -6,7 +6,7 @@
 // hasard. Les équipes sont désormais légitimes (pool naturel ∪ CT/CS),
 // validées par tests, et l'équipe du rival DÉPEND du starter du joueur.
 function getTrainerBattleDef(id){
- const e = (typeof OFFICIAL_TEAMS !== 'undefined' && OFFICIAL_TEAMS) ? OFFICIAL_TEAMS[id] : null;
+ const e = (typeof OFFICIAL_TEAMS !== 'undefined' && OFFICIAL_TEAMS && OFFICIAL_TEAMS[id]) ? OFFICIAL_TEAMS[id] : ((typeof OFFICIAL_TEAMS_HOENN !== 'undefined' && OFFICIAL_TEAMS_HOENN) ? OFFICIAL_TEAMS_HOENN[id] : null);
  if(!e) return null;
  return { name: e.name || id, role: e.role || e.kind || 'trainer', style: e.style || [], rewardMoney: e.rewardMoney || 0, title: e.title || '', id: id, kind: e.kind };
 }
@@ -40,7 +40,7 @@ function getPlayerStarterSpecies(region){
 }
 
 function createTrainerBattleTeam(battleId){
- const entry = (typeof OFFICIAL_TEAMS !== 'undefined' && OFFICIAL_TEAMS) ? OFFICIAL_TEAMS[battleId] : null;
+ const entry = (typeof OFFICIAL_TEAMS !== 'undefined' && OFFICIAL_TEAMS && OFFICIAL_TEAMS[battleId]) ? OFFICIAL_TEAMS[battleId] : ((typeof OFFICIAL_TEAMS_HOENN !== 'undefined' && OFFICIAL_TEAMS_HOENN) ? OFFICIAL_TEAMS_HOENN[battleId] : null);
  if(!entry || typeof getOfficialTeam !== 'function') return [];
  const starter = getPlayerStarterSpecies(entry.region || (typeof G !== 'undefined' && G && G.region) || 'kanto');
  const team = getOfficialTeam(battleId, starter);
@@ -65,7 +65,7 @@ const QUEST_V2_MAIN_REMAP = (function(){
 })();
 function migrateQuestSaveV2(){
  if(!G || G._questIdMigrationV2 === 2) return;
- if(!G.mainStep || typeof G.mainStep !== 'object') G.mainStep = { kanto: 0, johto: 0 };
+ if(!G.mainStep || typeof G.mainStep !== 'object') G.mainStep = { kanto: 0, johto: 0, hoenn: 0 };
  // 1) mainStep : index dans l'ancienne chaîne → index dans la nouvelle.
  const kIdx = (G.mainStep.kanto != null) ? G.mainStep.kanto : 0;
  if(kIdx >= QUEST_V2_OLD_KANTO_ORDER.length) G.mainStep.kanto = QUEST_V2_OLD_KANTO_ORDER.length + 1; // tout était fini (44 quêtes désormais)
@@ -123,7 +123,7 @@ const QUEST_V3_JOHTO_REMAP = {
 };
 function migrateQuestSaveV3(){
  if(!G || (G._questIdMigrationV3 || 0) >= 3) return;
- if(!G.mainStep || typeof G.mainStep !== 'object') G.mainStep = { kanto: 0, johto: 0 };
+ if(!G.mainStep || typeof G.mainStep !== 'object') G.mainStep = { kanto: 0, johto: 0, hoenn: 0 };
  // 1) mainStep.johto : index dans l'ancienne chaîne → index de la même quête
  //    dans la nouvelle (les complétées — par ids — ne bougent pas).
  const chain = (typeof getRegionChain === 'function') ? getRegionChain('johto') : [];
@@ -186,7 +186,7 @@ const QUEST_V4_SIDE_JOHTO_REMAP = {};
 for(let i=14;i<=38;i++) QUEST_V4_SIDE_JOHTO_REMAP['s'+i] = 's'+(i+17);
 function migrateQuestSaveV4(){
  if(!G || (G._questIdMigrationV4 || 0) >= 4) return;
- if(!G.mainStep || typeof G.mainStep !== 'object') G.mainStep = { kanto: 0, johto: 0 };
+ if(!G.mainStep || typeof G.mainStep !== 'object') G.mainStep = { kanto: 0, johto: 0, hoenn: 0 };
  // 1) mainStep.kanto : index dans l'ancienne chaîne → index de la même quête.
  const chain = (typeof getRegionChain === 'function') ? getRegionChain('kanto') : [];
  const oldIdx = (G.mainStep.kanto != null) ? G.mainStep.kanto : 0;
@@ -232,6 +232,44 @@ function migrateQuestSaveV4(){
  G._questIdMigrationV4 = 4;
 }
 
+// ═══ Migration V5 : insertion des quêtes découverte Base Secrète (217/218) ═══
+// Les quêtes Hoenn 217-275 deviennent 219-277 (+2). Les ids 217-275 sont sans
+// ambiguïté (Kanto 1-60, Johto 101-140) → remap direct des clés de sauvegarde.
+function migrateQuestSaveV5(){
+ if(!G || (G._questIdMigrationV5 || 0) >= 5) return;
+ const shift = (id) => { const n = Number(id); return (n >= 217 && n <= 275) ? n + 2 : null; };
+ // 1) mainStep.hoenn : index dans la chaîne — l'insertion se fait à l'index 16
+ //    (quête 217) : tout index ≥ 16 est décalé de +2.
+ if(G.mainStep && typeof G.mainStep.hoenn === 'number' && G.mainStep.hoenn >= 16){
+  G.mainStep.hoenn += 2;
+ }
+ // 2) completedQuests : clés '217'-'275' → '+2'.
+ if(G.completedQuests && typeof G.completedQuests === 'object'){
+  const next = {};
+  for(const k of Object.keys(G.completedQuests)){
+   const s = (!k.startsWith('side_')) ? shift(k) : null;
+   next[s != null ? String(s) : k] = G.completedQuests[k];
+  }
+  G.completedQuests = next;
+ }
+ // 3) questBaselines.hoenn.
+ if(G.questBaselines && G.questBaselines.hoenn && typeof G.questBaselines.hoenn === 'object'){
+  const next = {};
+  for(const k of Object.keys(G.questBaselines.hoenn)){
+   const s = shift(k);
+   next[s != null ? String(s) : k] = G.questBaselines.hoenn[k];
+  }
+  G.questBaselines.hoenn = next;
+ }
+ // 4) Instances actives principales.
+ if(Array.isArray(G.activeQuests)){
+  for(const inst of G.activeQuests){
+   if(inst && inst.cat === 'main'){ const s = shift(inst.qid); if(s != null) inst.qid = s; }
+  }
+ }
+ G._questIdMigrationV5 = 5;
+}
+
 function getRegionChain(region){ return STORY_QUESTS.filter(q=>q.region===region); }
 function getCurrentMain(region){
  const chain = getRegionChain(region);
@@ -246,6 +284,9 @@ function syncActiveMain(){
  G.activeQuests = G.activeQuests.filter(i=>i.cat!=='main');
  const def = getCurrentMain(region);
  if(def){
+ if(def.reqCondition && typeof def.reqCondition === 'function' && !def.reqCondition()){
+   return;
+ }
  let prog = (G.mainProgress && G.mainProgress[region]!=null) ? G.mainProgress[region] : 0;
  if(def.type === 'defeat_wild'){
   const beforeBaseline = G.questBaselines && G.questBaselines[region] && G.questBaselines[region][String(def.id)] != null;
@@ -265,14 +306,19 @@ function ensureQuestState(){
  // Passe 21 : densification Kanto (étape 5) — renumérotation 1-44 → 1-60
  // (+ secondaires Johto s14-s38 → s31-s55).
  try{ migrateQuestSaveV4(); }catch(_){}
+ // V5 : quêtes découverte Base Secrète insérées (Hoenn 217-275 → 219-277).
+ try{ migrateQuestSaveV5(); }catch(_){}
  if(!G.visitedMaps) G.visitedMaps={};
  if(!G.completedQuests) G.completedQuests={};
- if(!G.mainStep || typeof G.mainStep!=='object') G.mainStep={kanto:0, johto:0};
+ if(!G.mainStep || typeof G.mainStep!=='object') G.mainStep={kanto:0, johto:0, hoenn:0};
  if(G.mainStep.kanto==null) G.mainStep.kanto=0;
  if(G.mainStep.johto==null) G.mainStep.johto=0;
- if(!G.mainProgress || typeof G.mainProgress!=='object') G.mainProgress={kanto:0, johto:0};
+ if(G.mainStep.hoenn==null) G.mainStep.hoenn=0;
+ if(!G.mainProgress || typeof G.mainProgress!=='object') G.mainProgress={kanto:0, johto:0, hoenn:0};
  if(G.mainProgress.kanto==null) G.mainProgress.kanto=0;
  if(G.mainProgress.johto==null) G.mainProgress.johto=0;
+ if(G.mainProgress.hoenn==null) G.mainProgress.hoenn=0;
+ if(G.completedQuests[216] || (G.mainStep && G.mainStep.hoenn >= 16)) G.unlockedSecretBaseHoenn = true;
  if(!Array.isArray(G.activeQuests)) G.activeQuests=[];
  if(!Array.isArray(G.repeatables)) G.repeatables=[];
  if(typeof G.totalWildWins!=='number') G.totalWildWins=0;
@@ -365,7 +411,30 @@ function questDone(inst, def){
  }
  if(def.type==='talk') return questProgressValue(inst, def) >= (def.target||1);
  if(def.type==='item') return !!(def.requiredItem && G.inventory && G.inventory[def.requiredItem] > 0);
- if(def.type==='trainer_battle') return !!(G.questTrainerWins && G.questTrainerWins[def.battleId]);
+ if(def.type==='trainer_battle'){
+  if(G.questTrainerWins && G.questTrainerWins[def.battleId]) return true;
+  // Quêtes d'arène / ligue : la victoire RÉELLE contre l'arène (badge,
+  // defeatedChamps) ou la ligue (titre régional) valide la quête — le combat
+  // est lancé contre la vraie arène (startChampBattle), plus jamais contre un
+  // double « quest_trainer_<gym> ».
+  const _e = ((typeof OFFICIAL_TEAMS !== 'undefined' && OFFICIAL_TEAMS && OFFICIAL_TEAMS[def.battleId]) || (typeof OFFICIAL_TEAMS_HOENN !== 'undefined' && OFFICIAL_TEAMS_HOENN && OFFICIAL_TEAMS_HOENN[def.battleId])) || null;
+  if(_e && _e.kind === 'gym') return !!(((G.badges||[]).includes(def.battleId)) || ((G.defeatedChamps||{})[def.battleId]));
+  if(_e && _e.kind === 'league'){
+   const _reg = _e.region || 'kanto';
+   if(typeof isRegionLeagueWon === 'function') return !!isRegionLeagueWon(_reg);
+   return !!G.championTitle;
+  }
+  return false;
+ }
+ if(def.type==='puzzle'){
+  // Progression quête = résolue pendant la run (runSolved). L'historique ever-completed reste pour l'UI.
+  if(def.targetPuzzleId){
+    if(typeof isPuzzleSolvedThisRun==='function' && isPuzzleSolvedThisRun(def.targetPuzzleId)) return true;
+    // compat: progress counter via advanceQuests
+    return questProgressValue(inst, def) >= (def.target||1);
+  }
+  return questProgressValue(inst, def) >= (def.target||1);
+ }
  return questProgressValue(inst, def) >= (def.target||1);
 }
 
@@ -377,6 +446,12 @@ function advanceQuests(type, loc, amount){
  
  
  function locMatches(def, type, loc){
+ if(type === 'puzzle'){
+  if(def.targetPuzzleId && loc === def.targetPuzzleId) return true;
+  if(def.loc && loc === def.loc) return true;
+  if(def.targetPuzzleId && !def.loc) return loc === def.targetPuzzleId;
+  return !def.loc && !def.targetPuzzleId;
+ }
  if(type !== 'defeat_wild' && type !== 'catch') return true;
  if(!def.loc) return true; 
  return locGroup(def.loc) === locGroup(loc);
@@ -445,11 +520,12 @@ function claimQuest(qid, cat){
    return;
  }
 
- if(def.rewardMoney) G.money += def.rewardMoney;
+ if(def.rewardMoney) G.money += (typeof applySecretBaseMoneyBonus==='function' ? applySecretBaseMoneyBonus(def.rewardMoney) : def.rewardMoney);
  if(def.rewardItems){ if(typeof grantRewardItems === 'function') grantRewardItems(def.rewardItems); else for(const k in def.rewardItems) addToInventory(k, def.rewardItems[k]); }
 
  if(cat==='main'){
  G.completedQuests[inst.qid]=true;
+ if(Number(inst.qid) === 216) G.unlockedSecretBaseHoenn = true;
  const region = G.region || 'kanto';
  const chain = getRegionChain(region);
  const idx = chain.findIndex(q=>q.id===inst.qid);
@@ -460,7 +536,15 @@ function claimQuest(qid, cat){
  G.activeQuests = G.activeQuests.filter(i=>!(i.cat==='main'));
  syncActiveMain();
  } else if(cat==='side'){
- G.completedQuests['side_'+inst.qid]=true;
+ // Quêtes puzzle : marquées « déjà terminées » mais rejouables (re-accept OK).
+ if(def && def.type==='puzzle'){
+  G.completedQuests['side_'+inst.qid]=true; // indicateur
+  if(def.targetPuzzleId && typeof resetPuzzleRun==='function'){
+    try{ resetPuzzleRun(def.targetPuzzleId); }catch(_){}
+  }
+ } else {
+  G.completedQuests['side_'+inst.qid]=true;
+ }
  }
  list.splice(idx,1); 
 
@@ -468,7 +552,7 @@ function claimQuest(qid, cat){
  if(def.rewardPoke && cat==='side'){
  const legMon = createPoke(def.rewardPoke, 50, true);
  if(legMon){
- if(G.team.length<6) G.team.push(legMon); else G.collection[String(legMon.id)]=legMon;
+ if(G.team.length<6) G.team.push(legMon); else { const _qKey = (typeof generateUniqueBoxId==='function') ? generateUniqueBoxId(legMon.id) : (!G.collection[String(legMon.id)] ? String(legMon.id) : ('box_' + legMon.id + '_' + Date.now())); G.collection[_qKey]=legMon; }
  G.pokedex[def.rewardPoke]={...(G.pokedex[def.rewardPoke]||{}),seen:true,caught:true};
  unlockTalentForSpecies(def.rewardPoke, legMon.talent);
  notify(tr("m.quest_core.2", {p0:legMon.name}),'var(--green)');
@@ -487,7 +571,7 @@ function completeQuestRewardBattle(qid){
  const inst = (G.activeQuests || []).find(i=>String(i.qid)===String(qid) && i.cat==='main');
  const def = inst ? getMainQuestDef(inst.qid) : getMainQuestDef(qid);
  if(!inst || !def) return false;
- if(def.rewardMoney) G.money += def.rewardMoney;
+ if(def.rewardMoney) G.money += (typeof applySecretBaseMoneyBonus==='function' ? applySecretBaseMoneyBonus(def.rewardMoney) : def.rewardMoney);
  if(def.rewardItems){
   if(typeof grantRewardItems === 'function') grantRewardItems(def.rewardItems);
   else for(const k in def.rewardItems) addToInventory(k, def.rewardItems[k]);
@@ -615,6 +699,19 @@ function startQuestTrainerBattle(qid, cat='main'){
  }
  if(typeof hasActiveTrainingBattle === 'function' && hasActiveTrainingBattle()){ notify(t('training_in_progress_no_battle'), 'var(--red)'); return; }
  if(!G.team || !G.team.length){ notify(t('no_pokemon_in_team'), 'var(--red)'); return; }
+ // ── Quêtes d'arène & de ligue : lancer le VRAI affrontement d'arène ──
+ // (correctif : avant, un double de l'arène était instancié en combat de
+ // dresseur de quête « quest_trainer_<gym> » ; désormais le bouton « Défier »
+ // de la quête démarre startChampBattle sur la véritable arène — badge,
+ // récompenses et revanches passent par le circuit normal, et questDone()
+ // valide la quête via G.badges / G.defeatedChamps / le titre de ligue.)
+ const _entry = ((typeof OFFICIAL_TEAMS !== 'undefined' && OFFICIAL_TEAMS && OFFICIAL_TEAMS[def.battleId]) || (typeof OFFICIAL_TEAMS_HOENN !== 'undefined' && OFFICIAL_TEAMS_HOENN && OFFICIAL_TEAMS_HOENN[def.battleId])) || null;
+ if(_entry && (_entry.kind === 'gym' || _entry.kind === 'league')){
+  const champId = (_entry.kind === 'gym')
+   ? def.battleId
+   : ((_entry.region === 'hoenn') ? 'hoenn_elite4' : (_entry.region === 'johto') ? 'johto_elite4' : 'elite4');
+  if(typeof startChampBattle === 'function'){ startChampBattle(champId); return; }
+ }
  const trainer = getTrainerBattleDef(def.battleId);
  const team = createTrainerBattleTeam(def.battleId);
  if(!trainer || !team.length){ notify(t('enemy_not_found_error'), 'var(--red)'); return; }
@@ -636,7 +733,7 @@ function completeQuestTrainerBattle(battleId){
  if(!G.questTrainerWins || typeof G.questTrainerWins !== 'object') G.questTrainerWins = {};
  G.questTrainerWins[battleId] = true;
  const trainer = getTrainerBattleDef(battleId);
- if(trainer && trainer.rewardMoney) G.money = (G.money||0) + trainer.rewardMoney;
+ if(trainer && trainer.rewardMoney) G.money = (G.money||0) + (typeof applySecretBaseMoneyBonus==='function' ? applySecretBaseMoneyBonus(trainer.rewardMoney) : trainer.rewardMoney);
  updateHeader();
  try{ if(document.getElementById('story-panel')) renderStoryWindow(); }catch(_){}
  saveGame();
@@ -656,6 +753,7 @@ EventBus.on(EVENTS.POKEMON_CAUGHT, ({loc}) => { advanceQuests('catch', loc, 1); 
 EventBus.on(EVENTS.MINE_SELL, ({amount}) => { advanceQuests('mine_sell', null, amount); _refreshUI(); });
 EventBus.on(EVENTS.BADGE_EARNED, () => { advanceQuests('badge', null, 1); _refreshUI(); });
 EventBus.on(EVENTS.LEAGUE_WON, () => { advanceQuests('league', null, 1); _refreshUI(); });
+try{ EventBus.on('PUZZLE_SOLVED', ({id,loc}) => { advanceQuests('puzzle', id, 1); if(loc) advanceQuests('puzzle', loc, 0); _refreshUI(); }); }catch(_){}
 
 
 // --- Migrated to ES module, globals exposed ---
@@ -693,4 +791,5 @@ if (typeof QUEST_V4_SIDE_JOHTO_REMAP !== 'undefined' && typeof window !== 'undef
 if (typeof startQuestTrainerBattle !== 'undefined' && typeof window !== 'undefined') window.startQuestTrainerBattle = startQuestTrainerBattle;
 if (typeof completeQuestTrainerBattle !== 'undefined' && typeof window !== 'undefined') window.completeQuestTrainerBattle = completeQuestTrainerBattle;
 if (typeof _refreshUI !== 'undefined' && typeof window !== 'undefined') window._refreshUI = _refreshUI;
+
 

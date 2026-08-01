@@ -31,3 +31,4 @@ export function validateBrowserSave({ key = DEFAULT_SAVE_KEY, storage } = {}) {
     return { ok: false, recovered: true, recoveryKey, error };
   }
 }
+

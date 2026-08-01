@@ -139,3 +139,4 @@ window.PokePanel = Panel;
 if (!window.poke) window.poke = {};
 window.poke.Panel = Panel;
 })();
+

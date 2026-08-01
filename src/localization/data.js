@@ -15,7 +15,7 @@
 // Domains that contribute FLAT keys to the root of the dictionary.
 var LANG_FLAT_DOMAINS = ['ui','economy','combat','stats','pokedex','messages'];
 // Domains kept as NESTED namespaces (data-driven text: items, quests, lore...).
-var LANG_NESTED_DOMAINS = ['items','quests','lore','npc','talents','champions','shops','settings','breeding','training','box','automation','map','types','move_descs'];
+var LANG_NESTED_DOMAINS = ['items','quests','lore','npc','talents','champions','shops','settings','breeding','training','box','automation','map','types','move_descs','base'];
 
 var LANGS = ['fr','en'];
 
@@ -51,5 +51,6 @@ window.MOVE_NAMES_EN = (typeof L_move_names_en !== 'undefined') ? L_move_names_e
 // Location names per language.
 window.LOC_NAMES_FR = (typeof L_location_names_fr !== 'undefined') ? L_location_names_fr : {};
 window.LOC_NAMES_EN = (typeof L_location_names_en !== 'undefined') ? L_location_names_en : {};
+
 
 

@@ -117,7 +117,7 @@ class ResourceManager {
    * Batch preload pokemon sprites for a region
    */
   static preloadPokemonRegion(ids, variant = 'front') {
-    const dirs = { front:'front', back:'back', frontShiny:'frontShiny', backShiny:'backShiny' };
+    const dirs = { front:'front', back:'front', frontShiny:'frontShiny', backShiny:'frontShiny' };
     const dir = dirs[variant] || 'front';
     return ids.map(id => `src/assets/images/pokemon/${dir}/${id}.png`);
   }
@@ -127,3 +127,4 @@ window.PokeResourceManager = ResourceManager;
 if (!window.poke) window.poke = {};
 window.poke.ResourceManager = ResourceManager;
 })();
+

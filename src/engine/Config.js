@@ -72,7 +72,7 @@ window.GAME = {
 
   // ─── Pokémon ───
   MAX_LEVEL: 100,
-  SHINY_CHANCE: 1/400,
+  SHINY_CHANCE: 1/4096,
   POKEMON_PER_REGION: { kanto: 151, johto: 100 },
 
   // ─── Regions ───
@@ -88,3 +88,4 @@ window.GAME = {
 };
 
 })();
+

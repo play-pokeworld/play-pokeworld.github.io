@@ -362,3 +362,4 @@ test('sélecteur d\'un slot incubation avec priorité Fossile : ouvre l\'onglet 
   assert.equal(env._usmSubTab, 'fossil', 'onglet fossile par défaut');
   assert.ok(env.nodes['usm-grid'].innerHTML.includes('fossil-card'), 'grille de fossiles affichée');
 });
+

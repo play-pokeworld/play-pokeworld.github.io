@@ -3549,8 +3549,41 @@ button.quest-claim-btn.is-done:not(.is-challenge) {
 .preset-pick-row:hover { border-color: var(--light2); }
 .preset-pick-tag { font-size: 10px; font-weight: 900; color: var(--dark1); background: var(--light2); border-radius: 999px; padding: 2px 8px; flex-shrink: 0; }
 .preset-pick-tag.in-box { background: var(--dark3); color: var(--light2); }
+
+/* ── Éditeur de copains (PNJ) — passe 46 ────────────────────────────────
+   Galerie d'allures : chaque bouton montre la VRAIE frame de face du sprite
+   GBA (feuille 64×128 recadrée en CSS), pour « voir ce que l'on met ». */
+.base-npc-sprite { image-rendering: pixelated; flex-shrink: 0; }
+.base-npc-looks { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.base-npc-look {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 6px 8px; cursor: pointer;
+  background: var(--dark2); color: var(--light1);
+  border: 2px solid var(--dark3); border-radius: 8px;
+  font-size: 10px; font-weight: 700;
+}
+.base-npc-look:hover { border-color: var(--light2); }
+.base-npc-look.sel { border-color: var(--yellow, #ffd54f); background: var(--dark3); color: var(--light2); }
 @media (max-width: 700px) {
   .preset-row { flex-direction: column; align-items: stretch; }
   .preset-row-actions { justify-content: flex-end; }
   .preset-name-input { width: 100%; }
+}
+
+
+
+/* ── Boîtes de dialogue de visite (PNJ / PC) — passe 51 ─────────────────── */
+.base-dlg-body { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+.base-dlg-portrait { flex-shrink: 0; }
+.base-dlg-speech {
+  flex: 1; padding: 10px 12px; border-radius: 10px;
+  background: var(--dark2); border: 2px solid var(--dark3);
+  color: var(--light2); font-size: 13px; line-height: 1.45; min-height: 44px;
+}
+.base-dlg-team { gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
+.base-dlg-stats { gap: 14px; font-size: 12px; color: var(--light1); margin: 6px 0 10px; }
+.base-dlg-panel {
+  min-height: 120px; display: flex; align-items: center; justify-content: center;
+  border: 2px dashed var(--dark3); border-radius: 10px;
+  background: var(--dark2); margin-bottom: 10px;
 }

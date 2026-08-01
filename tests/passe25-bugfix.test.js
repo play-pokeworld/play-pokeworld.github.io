@@ -190,3 +190,4 @@ test('passe 25 #3 : navigation de retour et i18n du panneau de préparation', ()
   assert.equal(sb.t('atoll_factory_prep_open'), "⚙ Organiser l'équipe prêtée", 'bouton d\'accès FR');
   assert.equal(sb.t('back_to_atoll_prep'), '← Retour à la préparation', 'libellé retour FR');
 });
+

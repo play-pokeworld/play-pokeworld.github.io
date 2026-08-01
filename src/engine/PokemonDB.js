@@ -77,3 +77,4 @@ window.PokePokemonDB = PokemonDB;
 if (!window.poke) window.poke = {};
 window.poke.PokemonDB = PokemonDB;
 })();
+

@@ -109,7 +109,13 @@ test('drag & drop Party : attributs draggable générés + installation délégu
   assert.ok(TEAM_UI.includes('movesDraggable: !(typeof isTeamStructureLocked'), 'cards non draggables en combat');
   assert.ok(/function installMoveDragDrop\(\)/.test(TEAM_UI), 'installMoveDragDrop défini');
   assert.ok(TEAM_UI.includes('window.installMoveDragDrop = installMoveDragDrop'), 'exporté');
-  assert.ok(TEAM_UI.includes("swapTeamMoves(_pwMoveDrag.teamIdx"), 'le drop délègue à swapTeamMoves');
+  // Passe 50 : le drop passe par _pwDragSwapMoves, qui délègue à swapTeamMoves
+  // pour l'équipe active et au contexte déclaré pour les presets / PNJ / Atoll
+  // (un SEUL mécanisme de glisser-déposer dans tout le jeu).
+  assert.ok(TEAM_UI.includes('_pwDragSwapMoves(_pwMoveDrag.teamIdx'), 'le drop délègue au contexte');
+  assert.ok(TEAM_UI.includes('if (typeof swapTeamMoves === \'function\') return swapTeamMoves(pi, a, b);'),
+    'équipe active : toujours swapTeamMoves');
+  assert.ok(TEAM_UI.includes('function pwSetMoveDragContext'), 'contexte partagé exposé');
   assert.ok(TEAM_UI.includes('installMoveDragDrop();'), 'installé depuis renderTeamWindow');
   assert.ok(CSS.includes('.poke-move.pw-move-drop-hover'), 'styles drag présents');
   // génération HTML effective
@@ -145,3 +151,4 @@ test('i18n : clé moves_swapped présente en fr et en', () => {
   assert.ok(FR.includes('"moves_swapped"'), 'fr');
   assert.ok(EN.includes('"moves_swapped"'), 'en');
 });
+

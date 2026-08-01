@@ -1,6 +1,6 @@
 let dashboardCols = {
  1: ['win-story', 'win-team', 'win-hatchery'],
- 2: ['win-battle', 'win-map'],
+ 2: ['win-battle', 'win-map', 'win-base'],
  3: ['win-tabs', 'win-training']
 };
 
@@ -25,6 +25,16 @@ function renderDashboardColumns(){
  if(!hasTrain){
  if(!dashboardCols[3]) dashboardCols[3] = [];
  dashboardCols[3].push('win-training');
+ }
+ // passe 35 : la fenêtre de base secrète est permanente — l'injecter dans les
+ // dispositions existantes (sauvegardes antérieures) comme les autres fenêtres
+ let hasBase = false;
+ for(let c=1; c<=3; c++){
+ if((dashboardCols[c]||[]).includes('win-base')) hasBase = true;
+ }
+ if(!hasBase){
+ if(!dashboardCols[2]) dashboardCols[2] = [];
+ dashboardCols[2].push('win-base');
  }
  updateFeatureWindows();
 
@@ -92,7 +102,7 @@ function resetAllWins(){
 
 function setWindowLayout(preset){
  if(preset === 'cols3'){
- dashboardCols = { 1: ['win-story', 'win-team', 'win-hatchery'], 2: ['win-battle', 'win-map'], 3: ['win-tabs', 'win-training'] };
+ dashboardCols = { 1: ['win-story', 'win-team', 'win-hatchery'], 2: ['win-battle', 'win-map', 'win-base'], 3: ['win-tabs', 'win-training'] };
  }
  try{ safeStorage.set('pokeworld_cols_v12', JSON.stringify(dashboardCols)); }catch(e){}
  renderDashboardColumns();
@@ -106,4 +116,5 @@ if (typeof moveWinVert !== 'undefined' && typeof window !== 'undefined') window.
 if (typeof scrollToWin !== 'undefined' && typeof window !== 'undefined') window.scrollToWin = scrollToWin;
 if (typeof resetAllWins !== 'undefined' && typeof window !== 'undefined') window.resetAllWins = resetAllWins;
 if (typeof setWindowLayout !== 'undefined' && typeof window !== 'undefined') window.setWindowLayout = setWindowLayout;
+
 

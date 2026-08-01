@@ -73,3 +73,4 @@ window.PokeMoveDB = MoveDB;
 if (!window.poke) window.poke = {};
 window.poke.MoveDB = MoveDB;
 })();
+

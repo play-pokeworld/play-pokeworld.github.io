@@ -90,3 +90,4 @@ for (const rel of ['../src/data/official-teams-data.js', '../src/data/atoll-sets
 }
 
 console.log(changedTotal ? `TOTAL : ${changedTotal}` : 'Rien à normaliser (déjà propre).');
+

@@ -13,7 +13,7 @@ function isWildChillChainActive(){
 function endBattle(){
  if(typeof restoreAllTransformedPokemon === 'function') restoreAllTransformedPokemon();
  clearInterval(battle.timerId);
- const hadLoot=!battle.isChamp&&((((battle.sessionCatches||[]).length)||Object.keys(battle.sessionItems||{}).length||(battle.sessionWins||0)||(battle.sessionPlayerKOs||0)));
+ const hadLoot = !battle.isChamp && !battle.isQuestTrainerBattle && !battle.isBaseNpcBattle && !battle.isQuestDefeatBattle && ((((battle.sessionCatches||[]).length)||Object.keys(battle.sessionItems||{}).length||(battle.sessionWins||0)||(battle.sessionPlayerKOs||0)));
  const wasAtollLoss = !!battle.isAtollBattle;
  const wasAtollBorrowedLoss = wasAtollLoss && !!battle.atollBorrowed;
  battle.active=false;
@@ -33,6 +33,9 @@ function endBattle(){
  battle.atollReward=0;
  battle.atollRank=null;
  battle.atollMode=null;
+ battle.isBaseNpcBattle=false;
+ battle.baseNpcName=null;
+ battle.baseNpcMsgs=null; battle.baseNpcRef=null; battle.baseNpcSprite=null;
  battle.questRewardQuestId=null;
  battle.questRewardCat=null;
  battle.questRewardRegion=null;
@@ -64,6 +67,25 @@ function restartLastBattle(){
 async function doLeaveBattle(){
  if(!battle.active) return;
  battle.paused=true;
+ if(battle.isBaseNpcBattle){
+ // Abandon face à un copain de base secrète = défaite du visiteur (passe 38)
+ const npcName = battle.baseNpcName || '';
+ const winQuote = (battle.baseNpcMsgs && battle.baseNpcMsgs.win) || '';
+ if(typeof baseEditorCreditBattle === 'function') baseEditorCreditBattle(false);
+ // Passe 52 : panneau de fin de combat (abandon = défaite du visiteur).
+ const npcRef = battle.baseNpcRef || null;
+ const npcSprite = battle.baseNpcSprite || null;
+ battle.isBaseNpcBattle=false; battle.baseNpcName=null; battle.baseNpcMsgs=null;
+ battle.baseNpcRef=null; battle.baseNpcSprite=null;
+ if(winQuote && typeof addBattleLog === 'function') addBattleLog('« ' + winQuote + ' » — ' + npcName);
+ notify(tr('base.edit.battle_lost', {name:npcName}),'var(--red)');
+ if(typeof baseDialogNpcResult === 'function'){
+  setTimeout(()=>{ try{ baseDialogNpcResult({npc:npcRef, won:false, name:npcName, sprite:npcSprite, quote:winQuote}); }catch(_){} }, 900);
+ }
+ await wait(300);
+ endBattle();
+ return;
+}
  if(battle.isChamp){
  const cName = getChampName(battle.champId);
  notify(tr('forfeit_champion', {champion:cName}),'var(--blue)');
@@ -116,4 +138,5 @@ if (typeof restartLastBattle !== 'undefined' && typeof window !== 'undefined') w
 if (typeof leaveBattle !== 'undefined' && typeof window !== 'undefined') window.leaveBattle = leaveBattle;
 if (typeof resumeBattleActions !== 'undefined' && typeof window !== 'undefined') window.resumeBattleActions = resumeBattleActions;
 if (typeof wait !== 'undefined' && typeof window !== 'undefined') window.wait = wait;
+
 

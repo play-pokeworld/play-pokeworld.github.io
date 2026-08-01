@@ -24,6 +24,7 @@ const UI_ICONS = {
  dictionary: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><path d="M9 7h6"/><path d="M9 11h6"/></svg>',
  guide: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><circle cx="12"cy="12"r="10"/><path d="M9.09 9a3 3 0 115.82 1c0 2-3 3-3 3"/><line x1="12"y1="17"x2="12.01"y2="17"/></svg>',
  atoll: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M3 19c3-2 5-2 8 0 3-2 5-2 10 0"/><path d="M7 14c1.5-3 3-4.5 5-4.5S15.5 11 17 14"/><path d="M12 10V4"/><path d="M9 6l3-2 3 2"/></svg>',
+ base: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M3 9.5L12 3l9 6.5"/><path d="M5 8.5V21h14V8.5"/><path d="M9 21v-6h6v6"/></svg>',
  save: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>',
  quests: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>',
  
@@ -117,4 +118,5 @@ document.head.appendChild(iconStyle);
 // --- Migrated to ES module, globals exposed ---
 if (typeof getIcon !== 'undefined' && typeof window !== 'undefined') window.getIcon = getIcon;
 if (typeof UI_ICONS !== 'undefined' && typeof window !== 'undefined') window.UI_ICONS = UI_ICONS;
+
 

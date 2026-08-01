@@ -44,8 +44,12 @@ function startBattle(enemyPoke, isChamp, champId=null, champPokeList=null){
  battle.escaped=false;
  battle.paused=false;
  battle.chill=!isChamp;
- battle.weather='none';
- battle.weatherTurns=0;
+ const _curLoc = (typeof G !== 'undefined' && G && G.location) || null;
+ const _locObj = (typeof getLocObj === 'function' && _curLoc) ? getLocObj(_curLoc) : null;
+ const _defWeather = (_locObj && _locObj.defaultWeather) ? _locObj.defaultWeather : 'none';
+ battle.defaultWeather = _defWeather;
+ battle.weather = _defWeather;
+ battle.weatherTurns = _defWeather === 'none' ? 0 : Infinity;
  battle.terrain='none';
  battle.terrainTurns=0;
  battle.speed=battle.speed||1;
@@ -250,4 +254,5 @@ if (typeof calcAttackCd !== 'undefined' && typeof window !== 'undefined') window
 if (typeof effectiveSpeed !== 'undefined' && typeof window !== 'undefined') window.effectiveSpeed = effectiveSpeed;
 if (typeof resetPlayerCd !== 'undefined' && typeof window !== 'undefined') window.resetPlayerCd = resetPlayerCd;
 if (typeof resetEnemyCd !== 'undefined' && typeof window !== 'undefined') window.resetEnemyCd = resetEnemyCd;
+
 

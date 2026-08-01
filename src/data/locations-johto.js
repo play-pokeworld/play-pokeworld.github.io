@@ -8,7 +8,7 @@ var LOCS_JOHTO = {
  jroute46: {name:'Route 46', type:'route', x:1064,y:568,w:48,h:208, conn:['jroute45','jroute29'], wild:[], shopId:null, champ:null, badgeReq:7},
  jroute47: {name:'Route 47', type:'route', x:40,y:664,w:48,h:112, conn:['jroute48'], wild:[], shopId:null, champ:null, badgeReq:8},
  jroute48: {name:'Route 48', type:'route', x:40,y:504,w:48,h:208, conn:['jroute47','victoryroad_jo'], wild:[], shopId:null, champ:null, badgeReq:8},
- nationalpark:{name:'Parc Naturel', type:'town', x:400,y:268,w:96,h:72, conn:['jroute35','jroute36'], wild:[], shopId:null, champ:null, badgeReq:0},
+ nationalpark:{name:'Parc Naturel', type:'dungeon', x:400,y:268,w:96,h:72, conn:['jroute35','jroute36'], wild:[[10,12,15,'common'], [13,12,15,'common'], [165,13,16,'uncommon'], [167,13,16,'uncommon'], [191,14,17,'uncommon'], [123,14,18,'rare'], [127,14,18,'rare'], [193,14,18,'rare']], shopId:null, champ:null, badgeReq:3},
  indigo_jo: {name:'Plateau Indigo', type:'town', x:1496,y:104,w:208,h:208, conn:['jroute26','victoryroad_jo'], wild:[], shopId:'indigo', champ:'johto_elite4', badgeReq:8},
  sprouttower: {name:'Tour Chétiflor', type:'dungeon', x:736,y:260,w:64,h:88, conn:['violet'], wild:[], shopId:null, champ:null, badgeReq:0},
  ruinsofalph: {name:'Ruines d\'Alpha', type:'dungeon', x:696,y:432,w:80,h:64, conn:['jroute32','jroute32_mid'], wild:[], shopId:null, champ:null, badgeReq:0},
@@ -57,4 +57,5 @@ var LOCS_JOHTO = {
 
 // --- Migrated to ES module, globals exposed ---
 if (typeof LOCS_JOHTO !== 'undefined' && typeof window !== 'undefined') window.LOCS_JOHTO = LOCS_JOHTO;
+
 

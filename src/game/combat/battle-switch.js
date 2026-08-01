@@ -113,6 +113,33 @@ async function champVictory(){
  await wait(1200); endBattle(); renderMap(); showTab('info');
  return;
 }
+ if(battle.isBaseNpcBattle){
+ // Passe 38 : victoire du visiteur contre un copain de base secrète.
+ // Crédit du record PROPRIÉTAIRE (copain battu → l++) + citation de défaite.
+ const npcName = battle.baseNpcName || '';
+ const loseQuote = (battle.baseNpcMsgs && battle.baseNpcMsgs.lose) || '';
+ if(typeof baseEditorCreditBattle === 'function') baseEditorCreditBattle(true);
+ // Passe 52 : panneau de fin de combat (le joueur ne voyait jamais la
+ // réplique du PNJ — elle ne vivait que dans le journal, fermé avec le duel).
+ const npcRef = battle.baseNpcRef || null;
+ const npcSprite = battle.baseNpcSprite || null;
+ battle.isBaseNpcBattle = false;
+ battle.baseNpcName = null;
+ battle.baseNpcMsgs = null;
+ battle.baseNpcRef = null;
+ battle.baseNpcSprite = null;
+ if(loseQuote && typeof addBattleLog === 'function') addBattleLog('« ' + loseQuote + ' » — ' + npcName);
+ if(typeof baseDialogNpcResult === 'function'){
+  setTimeout(()=>{ try{ baseDialogNpcResult({npc:npcRef, won:true, name:npcName, sprite:npcSprite, quote:loseQuote}); }catch(_){} }, 1400);
+ }
+ notify(tr('base.edit.battle_won', {name:npcName}), 'var(--green)');
+ updateHeader();
+ saveGame();
+ await wait(1200);
+ endBattle();
+ renderMap();
+ return;
+}
  if(battle.isQuestTrainerBattle){
  const battleId = battle.questTrainerBattleId;
  if(typeof completeQuestTrainerBattle === 'function') completeQuestTrainerBattle(battleId);
@@ -156,7 +183,7 @@ async function champVictory(){
  legMon.shinyActive = wasShiny || legMon.shinyActive;
  legMon.shiny = legMon.shinyActive;
  if(G.team.length < 6) G.team.push(legMon);
- else G.collection[String(legMon.id)] = legMon;
+ else { const _legKey = (typeof generateUniqueBoxId==="function") ? generateUniqueBoxId(legMon.id) : ("box_" + legMon.id + "_" + Date.now()); G.collection[_legKey] = legMon; }
  G.pokedex[q.rewardPoke] = {...(G.pokedex[q.rewardPoke]||{}), seen:true, caught:true};
  if(wasShiny) unlockShinyForSpecies(q.rewardPoke);
  unlockTalentForSpecies(q.rewardPoke, legMon.talent);
@@ -190,14 +217,14 @@ async function champVictory(){
  else if(leagueRegion === 'kanto') G.championTitle = true;
  EventBus.emit(EVENTS.LEAGUE_WON, {region:leagueRegion});
  const leagueMoney = leagueFirstWin ? (champ.reward || 15000) : 0;
- if(leagueMoney) G.money += leagueMoney;
+ if(leagueMoney) G.money += (typeof applySecretBaseMoneyBonus==='function' ? applySecretBaseMoneyBonus(leagueMoney) : leagueMoney);
  updateHeader();
  addBattleLog(`<span class="pw-light2">${tr('league_master_victory_log_region', {region:getRegionDisplayName(leagueRegion)})}</span>`);
  notify(leagueMoney ? tr('league_master_title_reward_region', {region:getRegionDisplayName(leagueRegion), money:leagueMoney.toLocaleString()}) : t('rematch_no_money'), leagueMoney ? 'var(--light2)' : 'var(--light1)');
  } else {
  if(isFirstWin) G.badges.push(battle.champId);
  EventBus.emit(EVENTS.BADGE_EARNED, { champId: battle.champId });
- if(isFirstWin) G.money += champ.reward;
+ if(isFirstWin) G.money += (typeof applySecretBaseMoneyBonus==='function' ? applySecretBaseMoneyBonus(champ.reward) : champ.reward);
  updateHeader();
  addBattleLog(`<span class="pw-light2"> Vous avez vaincu ${getChampName(battle.champId)} !</span>`);
  if(isFirstWin){
@@ -220,6 +247,11 @@ async function champVictory(){
   // K.O. du champion ont DÉJÀ alimenté le compteur de la pension slot par
   // slot via onEnemyFaint → hatcheryRegisterBattleKills (mode Garderie inclus).
 
+ // Quête d'arène/ligue en cours sur ce champion ? La victoire réelle vient
+ // de la valider (badge/defeatedChamps/titre) : rafraîchir la fenêtre quêtes
+ // pour montrer immédiatement le bouton « Réclamer ».
+ try{ if(typeof renderStoryWindow === 'function') renderStoryWindow(); }catch(_){ }
+
  await wait(1500);
  endBattle();
  renderMap();
@@ -241,4 +273,5 @@ if (typeof switchBattlePoke !== 'undefined' && typeof window !== 'undefined') wi
 if (typeof doSwitchBattlePoke !== 'undefined' && typeof window !== 'undefined') window.doSwitchBattlePoke = doSwitchBattlePoke;
 if (typeof healTeamHalf !== 'undefined' && typeof window !== 'undefined') window.healTeamHalf = healTeamHalf;
 if (typeof showQuestCapturePanel !== 'undefined' && typeof window !== 'undefined') window.showQuestCapturePanel = showQuestCapturePanel;
+
 

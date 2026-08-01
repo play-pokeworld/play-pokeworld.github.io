@@ -82,3 +82,4 @@ window.PokeStyles = {
       .join(';');
   }
 };
+

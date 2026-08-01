@@ -200,7 +200,7 @@ test('passe 28 A : trou de heartbeat déclenche le rattrapage, pas de double dé
   assert.ok(sim, 'le trou de heartbeat a lancé une simulation');
   const result = await sim;
   assert.ok(result, 'résultat produit');
-  assert.equal(result.timeMs, 30 * 60 * 1000, 'durée = 30 min comprises dans le trou');
+  assert.ok(result.timeMs >= 30 * 60 * 1000 && result.timeMs <= 30 * 60 * 1000 + 2500, `durée ≈ 30 min comprises dans le trou (${result.timeMs})`);
   // poll suivant immédiat : horodatage frais → AUCUNE nouvelle simulation
   vm.runInContext(`window._lastSimBefore = _offlineGetLastSim(); offlinePollHeartbeat();`, sb);
   const sim2 = vm.runInContext(`_offlineGetLastSim()`, sb);
@@ -225,7 +225,7 @@ test('passe 28 A : onglet masqué = signe de vie figé puis rattrapage de la dur
     offlinePollHeartbeat();
   `, sb);
   const result = await vm.runInContext(`_offlineGetLastSim()`, sb);
-  assert.equal(result.timeMs, 2 * 3600 * 1000, 'les 2 h masquées sont rattrapées au retour');
+  assert.ok(result.timeMs >= 2 * 3600 * 1000 && result.timeMs <= 2 * 3600 * 1000 + 2500, `les 2 h masquées sont rattrapées au retour (${result.timeMs} ms, δ Date.now() toléré)`);
 });
 
 // ————————————————————————— B — Fidélité du fast-forward ——————————————————————
@@ -421,7 +421,7 @@ test('passe 28 D : modale récap = 8 mesures (entraînement + minages ajoutés),
 test('passe 29 E : la progression se PEIND (barre croissante + étapes), puis le récap', async () => {
   const sb = makeSandbox({ seed: 314 });
   seedGame(sb, { location: 'route1', level: 35 });
-  vm.runInContext(`G.wildSessionActive = true;`, sb); // passe 30 : chaîne active pour avoir de l'activité à résumer
+  vm.runInContext(`G.wildSessionActive = true; G.lang = 'fr';`, sb); // passe 30 : chaîne active ; libellés FR attendus par le test
   // capture de chaque écriture innerHTML sur la modale
   const paints = [];
   const el = sb.document.getElementById('afk-result-modal');
@@ -452,3 +452,4 @@ test('passe 29 E : titre/étapes localisés FR+EN', () => {
   }
   assert.ok(R('src/assets/styles/cleaned-components.css').includes('.afk-ff-stage'), 'style de la ligne d\u2019étape');
 });
+

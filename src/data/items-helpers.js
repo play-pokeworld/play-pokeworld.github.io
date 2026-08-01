@@ -4,7 +4,7 @@
  */
 
 function normalizeItemKey(key){
-  const aliases = {berry_oran:'oran_berry', berry_sitrus:'sitrus_berry', berry_ceriz:'cheri_berry', berry_prine:'prine_berry', chroma_charm:'shiny_charm', up_grade:'upgrade'};
+  const aliases = {berry_oran:'oran_berry', berry_sitrus:'sitrus_berry', berry_ceriz:'cheri_berry', berry_prine:'prine_berry', chroma_charm:'shiny_charm', up_grade:'upgrade', fire_stone:'firestone', water_stone:'waterstone', thunder_stone:'thunderstone', leaf_stone:'leafstone', moon_stone:'moonstone', sun_stone:'sunstone', duskstone:'dusk_stone', dawnstone:'dawn_stone', shinystone:'shiny_stone', icestone:'ice_stone'};
   return aliases[key] || key;
 }
 
@@ -182,4 +182,5 @@ if (typeof getItemDesc !== 'undefined' && typeof window !== 'undefined') window.
 if (typeof openItemInfo !== 'undefined' && typeof window !== 'undefined') window.openItemInfo = openItemInfo;
 if (typeof getItemSpriteUrl !== 'undefined' && typeof window !== 'undefined') window.getItemSpriteUrl = getItemSpriteUrl;
 if (typeof itemSpriteHtml !== 'undefined' && typeof window !== 'undefined') window.itemSpriteHtml = itemSpriteHtml;
+
 

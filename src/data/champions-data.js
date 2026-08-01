@@ -22,12 +22,13 @@
 const LEAGUE_META = {
   elite4:       { region: 'kanto', badge: 'champion',       badgeEmoji: '', badgeReq: 8, reward: 12000 },
   johto_elite4: { region: 'johto', badge: 'johto_champion', badgeEmoji: '', badgeReq: 8, reward: 14000 },
+  hoenn_elite4: { region: 'hoenn', badge: 'hoenn_champion', badgeEmoji: '', badgeReq: 8, reward: 16000 },
 };
 
 // Aperçu aplati et instancié des équipes d'une ligue (utilisé pour le calcul
 // d'XP de victoire du gauntlet ; variante de repli pour le Maître).
 function getLeagueFlattenedTeam(region) {
-  const reg = region === 'johto' ? 'johto' : 'kanto';
+  const reg = region === 'johto' ? 'johto' : region === 'hoenn' ? 'hoenn' : 'kanto';
   if (typeof getOfficialLeagueKeys !== 'function' || typeof getOfficialTeam !== 'function') return [];
   const out = [];
   for (const key of getOfficialLeagueKeys(reg)) {
@@ -43,7 +44,8 @@ function getLeagueFlattenedTeam(region) {
 function getChampDef(champId) {
   if (!champId) return null;
   const lg = LEAGUE_META[champId];
-  const off = (typeof OFFICIAL_TEAMS !== 'undefined') ? OFFICIAL_TEAMS[champId] : null;
+  const off = ((typeof OFFICIAL_TEAMS !== 'undefined') ? OFFICIAL_TEAMS[champId] : null) ||
+              ((typeof OFFICIAL_TEAMS_HOENN !== 'undefined') ? OFFICIAL_TEAMS_HOENN[champId] : null);
   if (lg) {
     return {
       id: champId,
@@ -101,3 +103,4 @@ if (typeof LEAGUE_META !== 'undefined' && typeof window !== 'undefined') window.
 if (typeof getLeagueFlattenedTeam !== 'undefined' && typeof window !== 'undefined') window.getLeagueFlattenedTeam = getLeagueFlattenedTeam;
 if (typeof getChampDef !== 'undefined' && typeof window !== 'undefined') window.getChampDef = getChampDef;
 if (typeof getLeagueTrainersForRegion !== 'undefined' && typeof window !== 'undefined') window.getLeagueTrainersForRegion = getLeagueTrainersForRegion;
+

@@ -14,11 +14,13 @@ function getTypeName(type){
 
 
 function getLocObj(id) {
-  // Look up a location by ID from LOCS or LOCS_JOHTO
+  // Look up a location by ID from LOCS, LOCS_JOHTO or LOCS_HOENN
   var locs = typeof LOCS !== 'undefined' ? LOCS : (typeof window !== 'undefined' ? window.LOCS : null);
   var johto = typeof LOCS_JOHTO !== 'undefined' ? LOCS_JOHTO : (typeof window !== 'undefined' ? window.LOCS_JOHTO : null);
+  var hoenn = typeof LOCS_HOENN !== 'undefined' ? LOCS_HOENN : (typeof window !== 'undefined' ? window.LOCS_HOENN : null);
   if (locs && locs[id]) return locs[id];
   if (johto && johto[id]) return johto[id];
+  if (hoenn && hoenn[id]) return hoenn[id];
   return null;
 }
 
@@ -180,10 +182,12 @@ function getSpeciesMovePool(speciesId) {
     }
   }
 
-  // Sort: rarity ASC, then power ASC
   var sorter = function(a, b) {
+    var accA = (moveData[a.id] && moveData[a.id].acc) || 100;
+    var accB = (moveData[b.id] && moveData[b.id].acc) || 100;
+    if ((accA === 100) !== (accB === 100)) return (accB === 100 ? 1 : -1);
     if (a.rarity !== b.rarity) return a.rarity - b.rarity;
-    if (a.power !== b.power) return a.power - b.power;
+    if (a.power !== b.power) return b.power - a.power;
     if (a.id < b.id) return -1;
     if (a.id > b.id) return 1;
     return 0;
@@ -317,7 +321,7 @@ function getMovesForSpeciesLevel(speciesId, moveset, level) {
   var nid = Number(speciesId);
   var pool = getSpeciesMovePool(nid);
   var count = getMoveCountForLevel(level);
-  var sliceCount = Math.min(count, pool.length);
+  var sliceCount = Math.min(4, Math.min(count, pool.length));
   var result = [];
   for (var i = 0; i < sliceCount; i++) {
     result.push({ id: pool[i] });
@@ -382,7 +386,7 @@ function xpForLevel(lv){ return Math.floor(Math.pow(lv,3) * 0.8); }
 const MIN_WINS_DEFAULT = 10;
 (function attachMinWins(){
  const apply = (obj)=>{ for(const id in obj){ const loc=obj[id]; if(!loc) continue; loc.minWins = (loc.type==='town') ? 0 : MIN_WINS_DEFAULT; } };
- apply(LOCS); apply(LOCS_JOHTO);
+ apply(LOCS); apply(LOCS_JOHTO); if(typeof LOCS_HOENN !== 'undefined') apply(LOCS_HOENN);
 })();
 
 
@@ -422,7 +426,7 @@ function _mergeDropLists(ids){
  return out;
 }
 function applyRouteLinkGroups(){
- const objects = [LOCS, LOCS_JOHTO].filter(Boolean);
+ const objects = [LOCS, LOCS_JOHTO, typeof LOCS_HOENN !== 'undefined' ? LOCS_HOENN : null].filter(Boolean);
  for(const obj of objects){
   const groups = getAutoRouteLinkGroups(obj);
   for(const ids of groups){
@@ -442,7 +446,7 @@ function getLinkedRouteIds(id){
  const out = new Set([id]);
  const baseLoc = getLocObj(id);
  const group = (baseLoc && baseLoc.group) || id;
- for(const obj of [LOCS, LOCS_JOHTO]){
+ for(const obj of [LOCS, LOCS_JOHTO, typeof LOCS_HOENN !== 'undefined' ? LOCS_HOENN : null]){
   if(!obj) continue;
   for(const locId in obj){
    const loc = obj[locId];
@@ -457,7 +461,15 @@ applyRouteLinkGroups();
 
 
 function getShopName(id){
- return (typeof t==='function') ? (t('shops.'+id+'.name') || id || 'Boutique') : (id || 'Boutique');
+  if (typeof t === 'function') {
+    let res = t('shops.' + id + '.name');
+    if (!res || res === 'shops.' + id + '.name') {
+      res = t('shops.' + id + '.name.name');
+    }
+    if (res && typeof res === 'object' && res.name) res = res.name;
+    if (res && res !== 'shops.' + id + '.name' && res !== 'shops.' + id + '.name.name') return String(res);
+  }
+  return id || 'Boutique';
 }
 
 
@@ -553,11 +565,21 @@ function countCaughtInRegion(region){
  return count;
 }
 function isRegionDexComplete(region){ return countCaughtInRegion(region) >= getRegionPokedexTotal(region); }
+function isKalosCompleted(){
+  // Épisode Delta / Primo-Résurgences : accessibles seulement après Kalos
+  // (Ligue Kalos gagnée). Le dex Hoenn classique reste libre avant.
+  try {
+    if (typeof isRegionLeagueWon === 'function' && isRegionLeagueWon('kalos')) return true;
+  } catch (_) {}
+  return !!(typeof G !== 'undefined' && G && G.regionLeagueWon && G.regionLeagueWon.kalos);
+}
+
 function ensureRegionProgress(){
  if(!G) return;
  if(!G.regionLeagueWon || typeof G.regionLeagueWon !== 'object') G.regionLeagueWon = {};
  if(G.championTitle || (G.defeatedChamps && G.defeatedChamps.elite4)) G.regionLeagueWon.kanto = true;
  if(G.defeatedChamps && G.defeatedChamps.johto_elite4) G.regionLeagueWon.johto = true;
+ if(G.defeatedChamps && G.defeatedChamps.hoenn_elite4) G.regionLeagueWon.hoenn = true;
 }
 function isRegionLeagueWon(region){
  ensureRegionProgress();
@@ -571,10 +593,12 @@ function markRegionLeagueWon(region){
  G.regionLeagueWon[region || 'kanto'] = true;
  if(region === 'kanto') G.championTitle = true;
  if(region === 'johto') G.johtoChampionTitle = true;
+ if(region === 'hoenn') G.hoennChampionTitle = true;
 }
 function getRegionAccessStatus(targetRegion){
  targetRegion = targetRegion || 'kanto';
  if(targetRegion === 'kanto') return {ok:true};
+ if(targetRegion === 'hoenn' && typeof G !== 'undefined' && G && G._debugUnlockAllRegions) return {ok:true};
  const prev = getPreviousRegion(targetRegion);
  if(!prev) return {ok:true};
  if(!isRegionLeagueWon(prev)) return {ok:false, reason:'league', previous:prev, target:targetRegion};
@@ -640,7 +664,10 @@ function grantRewardItem(key, qty){
  let money = 0;
  if(overflow > 0){
   money = getDuplicateItemPayout(key, overflow); // pile pleine : l'excédent EST bien converti
-  if(money > 0) G.money = (G.money || 0) + money;
+  if(money > 0){
+    if(typeof applySecretBaseMoneyBonus === 'function') money = applySecretBaseMoneyBonus(money);
+    G.money = (G.money || 0) + money;
+  }
  }
  return {added, money};
 }
@@ -682,8 +709,8 @@ function rankBadgeHtml(id){ const rank = getPokemonRank(id); return `<span class
 
 
 const BOX_FILTER_DEFAULTS = {region:'all', type:'all', shiny:'all', evo:'all', favorite:'all', locked:'all', iv:'all', ev:'all', rank:'all'};
-const FILTER_LEVEL_EVO_MAP = {1:2,2:3,4:5,5:6,7:8,8:9,10:11,11:12,13:14,14:15,16:17,17:18,19:20,21:22,23:24,27:28,29:30,32:33,41:42,43:44,46:47,48:49,50:51,52:53,54:55,56:57,60:61,63:64,64:65,66:67,67:68,69:70,72:73,74:75,75:76,77:78,79:80,81:82,84:85,86:87,88:89,92:93,93:94,96:97,98:99,100:101,104:105,109:110,111:112,116:117,118:119,129:130,138:139,140:141,147:148,148:149,113:242,152:153,153:154,155:156,156:157,158:159,159:160,161:162,163:164,165:166,167:168,170:171,172:25,173:35,174:39,175:176,177:178,179:180,180:181,183:184,187:188,188:189,194:195,204:205,209:210,216:217,218:219,220:221,223:224,228:229,231:232,236:237,238:124,239:125,240:126,246:247,247:248};
-const FILTER_STONE_EVO = {37:{firestone:38},58:{firestone:59},133:{firestone:136,waterstone:134,thunderstone:135},61:{waterstone:62,kings_rock:186},90:{waterstone:91},120:{waterstone:121},25:{thunderstone:26},44:{leafstone:45,sunstone:182},70:{leafstone:71},102:{leafstone:103},30:{moonstone:31},33:{moonstone:34},35:{moonstone:36},39:{moonstone:40},79:{kings_rock:200},95:{metal_coat:208},117:{dragon_scale:230},123:{metal_coat:212},137:{upgrade:233},191:{sunstone:192}};
+const FILTER_LEVEL_EVO_MAP = {1:2, 2:3, 4:5, 5:6, 7:8, 8:9, 10:11, 11:12, 13:14, 14:15, 16:17, 17:18, 19:20, 21:22, 23:24, 27:28, 29:30, 32:33, 41:42, 43:44, 46:47, 48:49, 50:51, 52:53, 54:55, 56:57, 60:61, 63:64, 66:67, 69:70, 72:73, 74:75, 75:76, 77:78, 79:80, 81:82, 84:85, 86:87, 88:89, 92:93, 96:97, 98:99, 100:101, 104:105, 109:110, 111:112, 116:117, 118:119, 129:130, 138:139, 140:141, 147:148, 148:149, 152:153, 153:154, 155:156, 156:157, 158:159, 159:160, 161:162, 163:164, 165:166, 167:168, 170:171, 172:25, 173:35, 174:39, 175:176, 177:178, 179:180, 180:181, 183:184, 187:188, 188:189, 194:195, 204:205, 209:210, 216:217, 218:219, 220:221, 223:224, 228:229, 231:232, 236:106, 238:124, 239:125, 240:126, 246:247, 247:248, 252:253, 253:254, 255:256, 256:257, 258:259, 259:260, 261:262, 263:264, 265:266, 266:267, 268:269, 270:271, 273:274, 276:277, 278:279, 280:281, 281:282, 283:284, 285:286, 287:288, 288:289, 290:291, 293:294, 294:295, 296:297, 298:183, 304:305, 305:306, 307:308, 309:310, 316:317, 318:319, 320:321, 322:323, 328:329, 329:330, 331:332, 333:334, 339:340, 341:342, 343:344, 345:346, 347:348, 353:354, 355:356, 360:202, 361:362, 363:364, 364:365, 371:372, 372:373, 374:375, 375:376};
+const FILTER_STONE_EVO = {37:{firestone:38},58:{firestone:59},133:{firestone:136,waterstone:134,thunderstone:135},61:{waterstone:62,kings_rock:186},90:{waterstone:91},120:{waterstone:121},25:{thunderstone:26},44:{leafstone:45,sunstone:182},70:{leafstone:71},102:{leafstone:103},30:{moonstone:31},33:{moonstone:34},35:{moonstone:36},39:{moonstone:40},79:{kings_rock:200},95:{metal_coat:208},117:{dragon_scale:230},123:{metal_coat:212},137:{upgrade:233},191:{sunstone:192},271:{waterstone:272},274:{leafstone:275},300:{moonstone:301},366:{deep_sea_tooth:367,deep_sea_scale:368},349:{prism_scale:350}};
 
 function ensureBoxFilters(){
  if(!G.boxFilters || typeof G.boxFilters !== 'object') G.boxFilters = {...BOX_FILTER_DEFAULTS};
@@ -957,6 +984,7 @@ if (typeof isPokemonNativeToRegion !== 'undefined' && typeof window !== 'undefin
 if (typeof countCaughtInRegion !== 'undefined' && typeof window !== 'undefined') window.countCaughtInRegion = countCaughtInRegion;
 if (typeof getRegionPokedexTotal !== 'undefined' && typeof window !== 'undefined') window.getRegionPokedexTotal = getRegionPokedexTotal;
 if (typeof isRegionDexComplete !== 'undefined' && typeof window !== 'undefined') window.isRegionDexComplete = isRegionDexComplete;
+if (typeof isKalosCompleted !== 'undefined' && typeof window !== 'undefined') window.isKalosCompleted = isKalosCompleted;
 if (typeof ensureRegionProgress !== 'undefined' && typeof window !== 'undefined') window.ensureRegionProgress = ensureRegionProgress;
 if (typeof isRegionLeagueWon !== 'undefined' && typeof window !== 'undefined') window.isRegionLeagueWon = isRegionLeagueWon;
 if (typeof markRegionLeagueWon !== 'undefined' && typeof window !== 'undefined') window.markRegionLeagueWon = markRegionLeagueWon;
@@ -1013,3 +1041,16 @@ if (typeof learnPkmnMove !== 'undefined' && typeof window !== 'undefined') windo
 if (typeof learnPkmnAbility !== 'undefined' && typeof window !== 'undefined') window.learnPkmnAbility = learnPkmnAbility;
 if (typeof isHiddenAbility !== 'undefined' && typeof window !== 'undefined') window.isHiddenAbility = isHiddenAbility;
 if (typeof getLocObj !== 'undefined' && typeof window !== 'undefined') window.getLocObj = getLocObj;
+
+let _boxUidCounter = 1;
+function generateUniqueBoxId(speciesId) {
+  if (typeof G === 'undefined' || !G || !G.collection) return String(speciesId);
+  const strId = String(speciesId);
+  if (!G.collection[strId]) return strId;
+  let candidate = 'box_' + speciesId + '_' + Date.now() + '_' + (++_boxUidCounter);
+  while (G.collection[candidate] || G.collection[String(candidate)]) {
+    candidate = 'box_' + speciesId + '_' + Date.now() + '_' + Math.floor(Math.random() * 100000) + '_' + (++_boxUidCounter);
+  }
+  return candidate;
+}
+if (typeof window !== 'undefined') window.generateUniqueBoxId = generateUniqueBoxId;

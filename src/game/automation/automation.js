@@ -307,3 +307,4 @@ if (typeof toggleAutomationButton !== 'undefined' && typeof window !== 'undefine
 if (typeof getAutomationUpgradeLabelSuffix !== 'undefined' && typeof window !== 'undefined') window.getAutomationUpgradeLabelSuffix = getAutomationUpgradeLabelSuffix;
 if (typeof toggleAutomation !== 'undefined' && typeof window !== 'undefined') window.toggleAutomation = toggleAutomation;
 
+

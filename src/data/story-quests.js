@@ -29,7 +29,7 @@ var STORY_QUESTS = [
   "loc": "pallet",
   "target": 1,
   "rewardMoney": 400,
-  "rewardItems": { "stardust": 1 }
+  "rewardItems": { "babiri_berry": 1 }
  },
  {
   "id": 2,
@@ -38,7 +38,7 @@ var STORY_QUESTS = [
   "loc": "route1",
   "target": 10,
   "rewardMoney": 600,
-  "rewardItems": { "stardust": 2 }
+  "rewardItems": { "roseli_berry": 1 }
  },
  {
   "id": 3,
@@ -47,7 +47,7 @@ var STORY_QUESTS = [
   "loc": "viridianforest",
   "target": 15,
   "rewardMoney": 1000,
-  "rewardItems": { "stardust": 1 }
+  "rewardItems": { "prine_berry": 1 }
  },
  {
   "id": 4,
@@ -56,7 +56,7 @@ var STORY_QUESTS = [
   "loc": "route22",
   "target": 20,
   "rewardMoney": 1400,
-  "rewardItems": { "stardust": 1 }
+  "rewardItems": { "tanga_berry": 1 }
  },
  {
   "id": 5,
@@ -91,7 +91,7 @@ var STORY_QUESTS = [
   "loc": "mtmoon",
   "target": 30,
   "rewardMoney": 2600,
-  "rewardItems": { "stardust": 1 }
+  "rewardItems": { "charti_berry": 1 }
  },
  {
   "id": 9,
@@ -133,7 +133,7 @@ var STORY_QUESTS = [
   "loc": "route25",
   "target": 1,
   "rewardMoney": 900,
-  "rewardItems": { "stardust": 1 }
+  "rewardItems": { "colbur_berry": 1 }
  },
  {
   "id": 14,
@@ -142,7 +142,7 @@ var STORY_QUESTS = [
   "loc": "cerulean",
   "target": 1,
   "rewardMoney": 700,
-  "rewardItems": { "stardust": 2 }
+  "rewardItems": {}
  },
  {
   "id": 15,
@@ -160,7 +160,7 @@ var STORY_QUESTS = [
   "loc": "route5",
   "target": 25,
   "rewardMoney": 2200,
-  "rewardItems": { "stardust": 1 }
+  "rewardItems": { "passho_berry": 1 }
  },
  {
   "id": 17,
@@ -169,7 +169,7 @@ var STORY_QUESTS = [
   "loc": "route6",
   "target": 25,
   "rewardMoney": 2200,
-  "rewardItems": { "stardust": 1 }
+  "rewardItems": {}
  },
  {
   "id": 18,
@@ -186,7 +186,7 @@ var STORY_QUESTS = [
   "loc": "vermilion",
   "target": 1,
   "rewardMoney": 1100,
-  "rewardItems": { "stardust": 2 }
+  "rewardItems": {}
  },
  {
   "id": 20,
@@ -231,7 +231,7 @@ var STORY_QUESTS = [
   "loc": "route8",
   "target": 15,
   "rewardMoney": 2800,
-  "rewardItems": { "stardust": 2 }
+  "rewardItems": { "yache_berry": 1 }
  },
  {
   "id": 25,
@@ -292,7 +292,7 @@ var STORY_QUESTS = [
   "loc": "celadon",
   "target": 1,
   "rewardMoney": 800,
-  "rewardItems": { "stardust": 1 },
+  "rewardItems": { "payapa_berry": 1 },
   "rewardPoke": 133,
   "rewardLevel": 25
  },
@@ -303,7 +303,7 @@ var STORY_QUESTS = [
   "loc": "celadon",
   "target": 1,
   "rewardMoney": 1000,
-  "rewardItems": { "stardust": 1 },
+  "rewardItems": {},
   "rewardPoke": 137,
   "rewardLevel": 20
  },
@@ -332,7 +332,7 @@ var STORY_QUESTS = [
   "loc": "route17",
   "target": 20,
   "rewardMoney": 3600,
-  "rewardItems": { "stardust": 2 }
+  "rewardItems": {}
  },
  {
   "id": 36,
@@ -341,7 +341,7 @@ var STORY_QUESTS = [
   "loc": "safarizone",
   "target": 15,
   "rewardMoney": 3200,
-  "rewardItems": { "stardust": 2 }
+  "rewardItems": { "occa_berry": 1 }
  },
  {
   "id": 37,
@@ -366,7 +366,7 @@ var STORY_QUESTS = [
   "loc": "saffron",
   "target": 1,
   "rewardMoney": 900,
-  "rewardItems": { "stardust": 1 },
+  "rewardItems": { "wacan_berry": 1 },
   "rewardPoke": 131,
   "rewardLevel": 25
  },
@@ -396,7 +396,7 @@ var STORY_QUESTS = [
   "loc": "saffron",
   "target": 1,
   "rewardMoney": 900,
-  "rewardItems": { "stardust": 1 }
+  "rewardItems": { "tanga_berry": 1 }
  },
  {
   "id": 43,
@@ -404,7 +404,7 @@ var STORY_QUESTS = [
   "type": "mine_sell",
   "target": 5,
   "rewardMoney": 5000,
-  "rewardItems": { "stardust": 1 }
+  "rewardItems": { "chople_berry": 1 }
  },
  {
   "id": 44,
@@ -412,7 +412,7 @@ var STORY_QUESTS = [
   "type": "catch",
   "target": 15,
   "rewardMoney": 3000,
-  "rewardItems": { "stardust": 2 }
+  "rewardItems": { "prine_berry": 1 }
  },
  {
   "id": 45,
@@ -421,7 +421,7 @@ var STORY_QUESTS = [
   "loc": "route20",
   "target": 60,
   "rewardMoney": 6500,
-  "rewardItems": { "stardust": 1 }
+  "rewardItems": {}
  },
  {
   "id": 46,
@@ -439,7 +439,7 @@ var STORY_QUESTS = [
   "loc": "cinnabar",
   "target": 1,
   "rewardMoney": 1200,
-  "rewardItems": { "stardust": 1 },
+  "rewardItems": {},
   "rewardPoke": 142,
   "rewardLevel": 30
  },
@@ -542,7 +542,7 @@ var STORY_QUESTS = [
   "loc": "cinnabar",
   "target": 1,
   "rewardMoney": 1500,
-  "rewardItems": { "stardust": 1 }
+  "rewardItems": {}
  },
  {
   "id": 59,
@@ -563,7 +563,7 @@ var STORY_QUESTS = [
   "rewardLevel": 50,
   "target": 150,
   "rewardMoney": 25000,
-  "rewardItems": { "shiny_charm": 1 }
+  "rewardItems": { "rarecandy": 5, "nugget": 3, "leftovers": 1 }
  },
  // ─────────── JOHTO (101-140) — passe 20 : étape 4, densification ───────────
  // Nouveautés : arc GS Ball (Fargot → Bois aux Chênes), arc FILM 3 aux Ruines
@@ -578,7 +578,7 @@ var STORY_QUESTS = [
   "loc": "newbark",
   "target": 1,
   "rewardMoney": 400,
-  "rewardItems": { "stardust": 1 }
+  "rewardItems": { "coba_berry": 1 }
  },
  {
   "id": 102,
@@ -587,7 +587,7 @@ var STORY_QUESTS = [
   "loc": "jroute29",
   "target": 10,
   "rewardMoney": 700,
-  "rewardItems": { "stardust": 2 }
+  "rewardItems": { "roseli_berry": 1 }
  },
  {
   "id": 103,
@@ -612,7 +612,7 @@ var STORY_QUESTS = [
   "targetBadge": "falkner",
   "target": 1,
   "rewardMoney": 2800,
-  "rewardItems": { "stardust": 1 }
+  "rewardItems": {}
  },
  {
   "id": 106,
@@ -639,7 +639,7 @@ var STORY_QUESTS = [
   "loc": "azalea",
   "target": 1,
   "rewardMoney": 600,
-  "rewardItems": { "stardust": 1 }
+  "rewardItems": { "shuca_berry": 1 }
  },
  {
   "id": 109,
@@ -648,7 +648,7 @@ var STORY_QUESTS = [
   "loc": "ilexforest",
   "target": 20,
   "rewardMoney": 2600,
-  "rewardItems": { "stardust": 3 }
+  "rewardItems": { "rindo_berry": 1 }
  },
  {
   "id": 110,
@@ -683,7 +683,7 @@ var STORY_QUESTS = [
   "loc": "ruinsofalph",
   "target": 15,
   "rewardMoney": 3200,
-  "rewardItems": { "stardust": 2 }
+  "rewardItems": { "babiri_berry": 1 }
  },
  {
   "id": 114,
@@ -718,7 +718,7 @@ var STORY_QUESTS = [
   "loc": "burnedtower",
   "target": 1,
   "rewardMoney": 1000,
-  "rewardItems": { "stardust": 2 }
+  "rewardItems": {}
  },
  {
   "id": 118,
@@ -754,7 +754,7 @@ var STORY_QUESTS = [
   "loc": "olivine",
   "target": 1,
   "rewardMoney": 3000,
-  "rewardItems": { "stardust": 2 }
+  "rewardItems": { "yache_berry": 1 }
  },
  {
   "id": 122,
@@ -872,7 +872,7 @@ var STORY_QUESTS = [
   "loc": "jroute42",
   "target": 25,
   "rewardMoney": 5000,
-  "rewardItems": { "stardust": 2 }
+  "rewardItems": {}
  },
  {
   "id": 135,
@@ -942,3 +942,4 @@ var STORY_QUESTS = [
 
 // --- Migrated to ES module, globals exposed ---
 if (typeof STORY_QUESTS !== 'undefined' && typeof window !== 'undefined') window.STORY_QUESTS = STORY_QUESTS;
+

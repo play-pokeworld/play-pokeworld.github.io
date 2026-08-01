@@ -3,16 +3,16 @@ const TRAINER_SPRITES = {
  brock:'Brock.png', misty:'Misty.png', surge:'Lt. Surge.png', erika:'Erika.png', koga:'Koga.png', sabrina:'Sabrina.png', blaine:'Blaine.png',
  falkner:'Falkner.png', bugsy:'Bugsy.png', whitney:'Whitney.png', morty:'Morty.png', chuck:'Chuck.png', jasmine:'Jasmine.png', pryce:'Pryce.png', clair:'Clair.png',
  lorelei:'Lorelei.png', bruno:'Bruno.png', agatha:'Agatha.png', lance:'Lance.png', will:'Will.png', karen:'Karen.png', sage:'Elder Li.png', scientist:'Super Nerd.png', atoll:'Ace Trainer (male).png', trainer:'Ace Trainer (male).png',
- blackbelt:'Black Belt.png'
+ blackbelt:'Black Belt.png', roxanne:'Lass.png', brawly:'Black Belt.png', wattson:'Gentleman.png', flannery:'Battle Girl.png', norman:'Veteran (male).png', winona:'Beauty.png', tate_liza:'Lady.png', juan:'Gentleman.png', hoenn_elite4:'Ace Trainer (male).png', steven:'Ace Trainer (male).png'
 };
 const TRAINER_BATTLE_SPRITES = {
  kanto_rival_route22:'blue', kanto_rival_cerulean:'blue', kanto_rival_ssanne:'blue', kanto_rival_silph:'blue', kanto_rival_victory:'blue',
  johto_rival_cherrygrove:'silver', johto_rival_ilex:'silver', johto_rival_burned:'silver', johto_rival_victory:'silver',
  kanto_rocket_mtmoon:'rocket', kanto_rocket_tower:'rocket', kanto_rocket_hideout:'rocket_admin', kanto_giovanni_hideout:'giovanni', kanto_giovanni_silph:'giovanni',
  johto_rocket_slowpoke:'rocket', johto_rocket_lake:'rocket_admin', johto_rocket_radio:'rocket_admin', kanto_super_nerd_fossil:'scientist', johto_sprout_elder:'sage', johto_film3_entei:'scientist',
- kanto_dojo_master:'blackbelt'
+ kanto_dojo_master:'blackbelt', hoenn_poochyena_route101:'trainer'
 };
-const CHAMPION_TRAINER_SPRITES = {brock:'brock',misty:'misty',surge:'surge',erika:'erika',koga:'koga',sabrina:'sabrina',blaine:'blaine',giovanni:'giovanni',falkner:'falkner',bugsy:'bugsy',whitney:'whitney',morty:'morty',chuck:'chuck',jasmine:'jasmine',pryce:'pryce',clair:'clair',elite4:'lance',johto_elite4:'lance',atoll:'atoll'};
+const CHAMPION_TRAINER_SPRITES = {brock:'brock',misty:'misty',surge:'surge',erika:'erika',koga:'koga',sabrina:'sabrina',blaine:'blaine',giovanni:'giovanni',falkner:'falkner',bugsy:'bugsy',whitney:'whitney',morty:'morty',chuck:'chuck',jasmine:'jasmine',pryce:'pryce',clair:'clair',elite4:'lance',johto_elite4:'lance',atoll:'atoll', roxanne:'roxanne', brawly:'brawly', wattson:'wattson', flannery:'flannery', norman:'norman', winona:'winona', tate_liza:'tate_liza', juan:'juan', hoenn_elite4:'hoenn_elite4', steven:'steven'};
 function getTrainerSpriteKey(key){
  if(!key) return 'trainer';
  if(TRAINER_SPRITES[key]) return key;
@@ -84,4 +84,5 @@ if (typeof getTrainerSpriteKey !== 'undefined' && typeof window !== 'undefined')
 if (typeof trainerSpriteImg !== 'undefined' && typeof window !== 'undefined') window.trainerSpriteImg = trainerSpriteImg;
 if (typeof trainerProfileImg !== 'undefined' && typeof window !== 'undefined') window.trainerProfileImg = trainerProfileImg;
 if (typeof staffSpriteImg !== 'undefined' && typeof window !== 'undefined') window.staffSpriteImg = staffSpriteImg;
+
 

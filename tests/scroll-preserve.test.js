@@ -233,3 +233,4 @@ test('filet de sécurité : les répartiteurs de clics capturent et restaurent l
     assert.ok((src.match(/pwRestoreScrollAround/g) || []).length >= 2, `${name} : click + contextmenu couverts`);
   }
 });
+

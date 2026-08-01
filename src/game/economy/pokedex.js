@@ -4,6 +4,17 @@ function findPokemonSources(id){
  const add=(kind, label)=>{ if(label && !out.some(x=>x.kind===kind&&x.label===label)) out.push({kind,label}); };
  for(const [locId,loc] of Object.entries(LOCS||{})) if((loc.wild||[]).some(w=>Number(w[0])===Number(id))) add('zone', getLocName(locId));
  for(const [locId,loc] of Object.entries(LOCS_JOHTO||{})) if((loc.wild||[]).some(w=>Number(w[0])===Number(id))) add('zone', getLocName(locId));
+ for(const [locId,loc] of Object.entries(typeof LOCS_HOENN !== 'undefined' ? LOCS_HOENN : {})) if((loc.wild||[]).some(w=>Number(w[0])===Number(id))) add('zone', getLocName(locId));
+ const BABY_PARENTS = {
+   172: [25, 26], 173: [35, 36], 174: [39, 40],
+   236: [106, 107, 237], 238: [124], 239: [125], 240: [126],
+   298: [183, 184], 360: [202]
+ };
+ if (BABY_PARENTS[id]) {
+   const parents = BABY_PARENTS[id].map(p => getPokeName(p)).join(' / ');
+   add('evo', `Éclosion en Garderie (Parent : ${parents})`);
+ }
+
  for(const base in (LEVEL_EVO_MAP||{})) if(Number(LEVEL_EVO_MAP[base])===Number(id)) add('evo', `${getPokeName(Number(base))} (${t('level_word')} ${EVO_LEVELS[base]||'?'})`);
  for(const base in (STONE_EVO||{})) for(const stone in STONE_EVO[base]) if(Number(STONE_EVO[base][stone])===Number(id)) add('evo', `${getPokeName(Number(base))} + ${getItemName(stone)}`);
  if(typeof FOSSIL_REVIVE_MAP !== 'undefined') for(const fk in FOSSIL_REVIVE_MAP) if(Number(FOSSIL_REVIVE_MAP[fk])===Number(id)) add('fossil', getItemName(typeof getFossilDisplayKey==='function'?getFossilDisplayKey(fk):fk));
@@ -38,7 +49,38 @@ function renderPokedex(el){
  `;
  }
 
+ // Bannière Charme Chroma régional
+ let charmBanner = '';
+ try {
+   const regions = (typeof getShinyCharmCompletedRegions === 'function') ? getShinyCharmCompletedRegions() : [];
+   const hasCharm = !!(G.inventory && G.inventory['shiny_charm'] > 0);
+   const order = (typeof REGION_ORDER !== 'undefined') ? REGION_ORDER : ['kanto','johto','hoenn'];
+   const unlocked = (typeof getUnlockedRegionsForPokedex === 'function') ? getUnlockedRegionsForPokedex() : ['kanto'];
+   const bits = unlocked.map(r => {
+     const name = (typeof getRegionDisplayName === 'function') ? getRegionDisplayName(r) : r;
+     const total = (typeof getRegionPokedexTotal === 'function') ? getRegionPokedexTotal(r) : '?';
+     const caughtR = (typeof countCaughtInRegion === 'function') ? countCaughtInRegion(r) : 0;
+     const done = regions.includes(r) || (typeof isRegionDexComplete === 'function' && isRegionDexComplete(r));
+     const pct = (typeof total === 'number' && total > 0) ? Math.min(100, Math.round(caughtR/total*100)) : 0;
+     return `<span class="pw-badge" style="margin:2px;padding:3px 8px;border-radius:999px;background:${done ? 'rgba(255,213,79,.2)' : 'rgba(0,0,0,.25)'};border:1px solid ${done ? '#ffd54f' : 'var(--pw-border)'};color:${done ? '#ffd54f' : 'var(--light1)'};font-size:11px;">
+       ${done ? '✨' : '○'} ${name} ${caughtR}/${total} (${pct}%)
+     </span>`;
+   }).join('');
+   const title = hasCharm
+     ? ((G.lang==='en')
+         ? '✨ Shiny Charm — 1/2048 on species from completed Pokédex regions only'
+         : '✨ Charme Chroma — taux 1/2048 uniquement sur les espèces des dex 100 %')
+     : ((G.lang==='en')
+         ? '✨ Complete any regional Pokédex at 100% to obtain the Shiny Charm (1/2048 regional)'
+         : '✨ Complétez un Pokédex régional à 100 % pour obtenir le Charme Chroma (1/2048 régional)');
+   charmBanner = `<div class="pw-panel" style="margin:0 0 12px;padding:10px 12px;border-radius:10px;background:rgba(0,0,0,.28);border:1px solid var(--pw-border);">
+     <div style="font-weight:800;font-size:13px;margin-bottom:6px;">${title}</div>
+     <div style="display:flex;flex-wrap:wrap;gap:4px;">${bits}</div>
+   </div>`;
+ } catch(_){ charmBanner = ''; }
+
  el.innerHTML = `
+ ${charmBanner}
  <div class="dex-grid">
  ${visibleIds.map((id)=>{
  const pd = PD[id];
@@ -102,4 +144,5 @@ function openDexEntry(id){
 if (typeof findPokemonSources !== 'undefined' && typeof window !== 'undefined') window.findPokemonSources = findPokemonSources;
 if (typeof renderPokedex !== 'undefined' && typeof window !== 'undefined') window.renderPokedex = renderPokedex;
 if (typeof openDexEntry !== 'undefined' && typeof window !== 'undefined') window.openDexEntry = openDexEntry;
+
 

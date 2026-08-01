@@ -43,3 +43,4 @@ test('le label du bouton rend l\'icône en HTML et le temps en texte', () => {
   assert.ok(btn.innerHTML.includes('Reroll'), 'label Reroll restauré en HTML');
   assert.equal(btn.attrs['data-call'], 'rollRepeatables', 'action reroll restaurée');
 });
+

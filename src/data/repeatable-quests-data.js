@@ -179,3 +179,4 @@ var REPEATABLE_QUESTS = [
 // --- Migrated to ES module, globals exposed ---
 if (typeof REPEATABLE_QUESTS !== 'undefined' && typeof window !== 'undefined') window.REPEATABLE_QUESTS = REPEATABLE_QUESTS;
 
+

@@ -163,3 +163,4 @@ test('intégration : le bonus d\'objet (getHeldBuff) suit le porteur après éch
   assert.equal(sb.getHeldBuff(A).atk, beforeA, 'le bonus suit A');
   assert.equal(sb.getHeldBuff(B).atk, 0, 'B sans bonus');
 });
+

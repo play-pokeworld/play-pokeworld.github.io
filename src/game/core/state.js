@@ -26,3 +26,4 @@ if (typeof TYPES !== 'undefined' && typeof window !== 'undefined') window.TYPES 
 if (typeof TYPE_COLORS !== 'undefined' && typeof window !== 'undefined') window.TYPE_COLORS = TYPE_COLORS;
 if (typeof CHART !== 'undefined' && typeof window !== 'undefined') window.CHART = CHART;
 
+

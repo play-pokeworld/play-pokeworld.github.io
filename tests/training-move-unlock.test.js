@@ -352,3 +352,4 @@ test('les nouveaux helpers de catégorisation sont exposés sur window', () => {
   assert.ok(GAME_HELPERS.includes('window.getCtCsMoveIds = getCtCsMoveIds'), 'getCtCsMoveIds non exposé');
   assert.ok(GAME_HELPERS.includes('window.getSpeciesTrainingOnlyPool = getSpeciesTrainingOnlyPool'), 'getSpeciesTrainingOnlyPool non exposé');
 });
+

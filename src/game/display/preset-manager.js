@@ -96,12 +96,16 @@ function presetEditorCardHtml(pk, i){
   const inTeam = found.here === 'team';
   return generatePokeCardHTML(found.p, i, {
     isActive:false,
-    isFainted: found.p.currentHP <= 0,
+    // Passe 49 (retour utilisateur : « tous les Pokémon sont grisés ») : un
+    // Pokémon RANGÉ EN BOÎTE n'a pas de PV courants suivis (il est au repos) —
+    // `currentHP <= 0` le déclarait donc K.O. et la carte sortait grisée. Seuls
+    // les membres de l'ÉQUIPE ACTIVE ont un état de PV pertinent ici.
+    isFainted: inTeam && found.p.currentHP <= 0,
     showMoves:true,
     showXP:true,
     showStatus:false,
     movesAsBars:false,
-    movesDraggable:false,
+    movesDraggable:true,
     moveInfoContextless:true,
     // Clic sprite = changer de Pokémon ; clic droit = ouvrir la fiche (modifier)
     onRightClickSprite:`presetEditorOpenInfo(${i})`,
@@ -114,11 +118,17 @@ function presetEditorCardHtml(pk, i){
 function renderPresetEditor(){
   const pk = window._presetEditorOpen;
   const preset = _editorPreset();
-  const inner = document.getElementById('poke-modal-inner');
+  const box = (typeof ensurePokeModal === 'function') ? ensurePokeModal() : { inner: document.getElementById('poke-modal-inner') };
+  const inner = box.inner;
   if(!inner || !preset) return false;
   const uids = preset.uids || [];
   const cards = [];
-  for(let i = 0; i < Math.max(uids.length + (uids.length < 6 ? 1 : 0), 1) && i < 6; i++) cards.push(presetEditorCardHtml(pk, i));
+  try{
+    for(let i = 0; i < Math.max(uids.length + (uids.length < 6 ? 1 : 0), 1) && i < 6; i++) cards.push(presetEditorCardHtml(pk, i));
+  }catch(err){
+    console.error('[preset] card render', err);
+    cards.push(`<div class="pw-empty-state">Erreur de rendu des cartes.</div>`);
+  }
   _pwSetHtmlSafe(inner,
     `<div class="modal-title"><div class="pw-row"><span class="pw-info-icon">🗂</span><div class="pw-info-head-text"><div class="pw-info-name">${_escAttr(preset.name)}</div><div class="pw-text-sm pw-light1">${t('preset_editor_sub')} · ${uids.length}/6</div></div></div><span class="modal-close" data-action="legacy-call" data-call="closePresetEditor" data-call-args=""></span></div>`
     + `<small class="atoll-prep-hint">${t('preset_editor_hint')}</small>`
@@ -129,22 +139,47 @@ function renderPresetEditor(){
 }
 
 function openPresetEditor(pk){
-  if(typeof ensureTeamPresets === 'function') ensureTeamPresets();
-  if(!G.teamPresets[pk]) return false;
-  const modal = document.getElementById('poke-modal');
-  if(!modal) return false;
-  window._presetEditorOpen = pk;
-  const ok = renderPresetEditor();
-  if(!ok){ window._presetEditorOpen = null; return false; }
-  window._pwPokeSheet = null; // ce n'est PAS une fiche d'équipe/box
-  if(typeof window.pwModalInfo === 'function') window.pwModalInfo(false);
-  modal.classList.add('preset-editor-modal');
-  modal.classList.add('open');
-  try{ const inner = document.getElementById('poke-modal-inner'); if(inner) inner.scrollTop = 0; }catch(_){}
-  return true;
+  try{
+    if(typeof ensureTeamPresets === 'function') ensureTeamPresets();
+    if(!G) return false;
+    if(!G.teamPresets || typeof G.teamPresets !== 'object') G.teamPresets = {};
+    if(!G.teamPresets[pk]) {
+      const n = Number(String(pk).replace('preset','')) || 1;
+      G.teamPresets[pk] = { name: (typeof tr==='function' ? tr('preset_default_name',{n}) : ('Équipe '+n)), uids: [] };
+    }
+    const box = (typeof ensurePokeModal === 'function') ? ensurePokeModal() : { modal: document.getElementById('poke-modal'), inner: document.getElementById('poke-modal-inner') };
+    const modal = box.modal;
+    const inner = box.inner;
+    if(!modal || !inner){
+      if(typeof notify==='function') notify((typeof t==='function'&&t('preset_modal_missing'))||"Impossible d'ouvrir l'éditeur (interface non prête). Réessayez.", 'var(--red)');
+      return false;
+    }
+    // Fermer d'autres modes de la même modale
+    modal.classList.remove('atoll-prep-modal');
+    window._atollPrepOpen = false;
+    window._pwPokeSheet = null;
+    window._pwInfoSource = null;
+    if(typeof window.pwModalInfo === 'function') window.pwModalInfo(false);
+    window._presetEditorOpen = pk;
+    const ok = renderPresetEditor();
+    if(!ok){
+      window._presetEditorOpen = null;
+      if(typeof notify==='function') notify('Impossible d\'ouvrir l\'éditeur de preset.', 'var(--red)');
+      return false;
+    }
+    modal.classList.add('preset-editor-modal');
+    modal.classList.add('open');
+    try{ inner.scrollTop = 0; }catch(_){}
+    return true;
+  }catch(err){
+    console.error('[preset] openPresetEditor', err);
+    if(typeof notify==='function') notify('Erreur éditeur d\'équipe : '+(err&&err.message||err), 'var(--red)');
+    return false;
+  }
 }
 
 function closePresetEditor(){
+  if(typeof pwClearMoveDragContext === 'function') pwClearMoveDragContext();
   window._presetEditorOpen = null;
   window._presetPickSlot = null;
   window._presetItemSlot = null;
@@ -181,57 +216,38 @@ function presetEditorSwap(from, to){
 
 let _presetEditDrag = null;
 function installPresetEditorDragDrop(){
-  const body = document.getElementById('preset-editor-body');
-  if(!body || typeof body.querySelectorAll !== 'function') return;
-  const cards = Array.prototype.slice.call(body.querySelectorAll('.poke-card'));
-  cards.forEach((card, idx) => {
-    card.setAttribute('draggable', 'true');
-    card.addEventListener('dragstart', (ev) => {
-      _presetEditDrag = { idx };
-      ev.dataTransfer.effectAllowed = 'move';
-      try{ ev.dataTransfer.setData('text/plain', String(idx)); }catch(_){}
-      card.style.opacity = '0.6';
-      const m = _editorMember(idx);
-      if(m && typeof pwApplyDragGhost === 'function'){
-        pwApplyDragGhost(ev, {
-          icon:(typeof spriteImg === 'function') ? spriteImg(m.p.id, m.p.emoji, { size: 26, shiny: !!m.p.shinyActive }) : '',
-          title:(typeof getPokeName === 'function' ? getPokeName(m.p.id) : (m.p.name || '')),
-          sub:'Nv.' + (m.p.level || 1),
-        });
-      }
+  // Passe 51 : on réutilise TEL QUEL le glisser-déposer de l'équipe active
+  // (cartes ET attaques) — retour utilisateur « exactement le même ». Seul
+  // l'échange final est redirigé par le contexte.
+  if(typeof pwSetMoveDragContext === 'function'){
+    pwSetMoveDragContext({
+      getTeam: () => _presetDragTeam(),
+      swapMoves: (pi, a, b) => presetEditorSwapMove(pi, a, b),
+      swapPokes: (a, b) => presetEditorSwap(a, b),
     });
-    card.addEventListener('dragover', (ev) => {
-      if(!_presetEditDrag) return;
-      ev.preventDefault();
-      ev.dataTransfer.dropEffect = 'move';
-      card.classList.add('atoll-prep-drag-over');
-      try {
-        const a = _editorMember(_presetEditDrag.idx), b = _editorMember(idx);
-        if(a && b && typeof pwDropPreviewShow==='function' && typeof pwSwapPreviewHtml==='function'){
-          pwDropPreviewShow(pwSwapPreviewHtml(
-            { icon:(typeof spriteImg==='function'?spriteImg(a.p.id,a.p.emoji,{size:26,shiny:!!a.p.shinyActive}):''), title:(typeof getPokeName==='function'?getPokeName(a.p.id):(a.p.name||'')), sub:'Nv.'+(a.p.level||1) },
-            { icon:(typeof spriteImg==='function'?spriteImg(b.p.id,b.p.emoji,{size:26,shiny:!!b.p.shinyActive}):''), title:(typeof getPokeName==='function'?getPokeName(b.p.id):(b.p.name||'')), sub:'Nv.'+(b.p.level||1) }
-          ), ev.clientX||0, ev.clientY||0);
-        }
-      } catch(_){}
-    });
-    card.addEventListener('dragleave', () => { card.classList.remove('atoll-prep-drag-over'); if(typeof pwDropPreviewHide==='function') pwDropPreviewHide(); });
-    card.addEventListener('drop', (ev) => {
-      if(!_presetEditDrag) return;
-      ev.preventDefault();
-      if(typeof pwDropPreviewHide==='function') pwDropPreviewHide();
-      card.classList.remove('atoll-prep-drag-over');
-      card.style.opacity = '';
-      const from = _presetEditDrag.idx; _presetEditDrag = null;
-      presetEditorSwap(from, idx);
-    });
-    card.addEventListener('dragend', () => {
-      card.style.opacity = '';
-      cards.forEach(c => c.classList.remove('atoll-prep-drag-over'));
-      _presetEditDrag = null;
-      if(typeof pwDropPreviewHide==='function') pwDropPreviewHide();
-    });
-  });
+    if(typeof installMoveDragDrop === 'function') installMoveDragDrop();
+  }
+  if(typeof installCardDragAndDrop === 'function'){
+    installCardDragAndDrop(document.getElementById('preset-editor-body'));
+  }
+}
+
+// Équipe « virtuelle » du preset en cours (pour le contexte de drag).
+function _presetDragTeam(){
+  const preset = _editorPreset();
+  const uids = (preset && preset.uids) || [];
+  return uids.map(u => { const f = (typeof resolvePresetPoke === 'function') ? resolvePresetPoke(u) : null; return f ? f.p : null; });
+}
+
+// Réordonne deux attaques d'un membre du preset (le Pokémon est RÉEL : on
+// agit sur son objet, exactement comme l'équipe active).
+function presetEditorSwapMove(slot, a, b){
+  const m = _editorMember(Number(slot));
+  if(!m || !Array.isArray(m.p.moves)) return;
+  if(!m.p.moves[a] || !m.p.moves[b] || a === b) return;
+  const tmp = m.p.moves[a]; m.p.moves[a] = m.p.moves[b]; m.p.moves[b] = tmp;
+  try{ saveGame(); }catch(_){}
+  renderPresetEditor();
 }
 
 // Retire un membre (Pokémon disparu ou choix explicite dans le sélecteur).
@@ -247,6 +263,14 @@ function presetEditorRemoveMember(slot){
 window._presetPickerSearch = '';
 function presetEditorPick(slot){
   window._presetPickSlot = Number(slot);
+  // Passe 48 (retour utilisateur) : on ouvre le VRAI sélecteur « boîte PC »,
+  // exactement celui de l'équipe active (onglets Boîte/Équipe, tri, recherche,
+  // fiches), au lieu de la petite liste maison. Repli sur l'ancienne liste si
+  // le module de sélection n'est pas chargé.
+  if(typeof openUnifiedSelectorModal === 'function'){
+    openUnifiedSelectorModal('preset_slot_' + Number(slot));
+    return;
+  }
   renderPresetPicker();
 }
 function presetPickerFilter(v){
@@ -309,6 +333,20 @@ function presetEditorPickItem(slot){
   const found = _editorMember(Number(slot));
   if(!found || found.here !== 'team'){ notify(t('preset_items_team_only'), 'var(--light1)'); return; }
   window._presetItemSlot = Number(slot);
+  // Passe 49 (retour utilisateur) : on ouvre le SAC plein écran, exactement
+  // comme pour un Pokémon de l'équipe active, au lieu de la liste maison.
+  // (le repli liste-en-modale reste utilisé quand le sac plein écran n'est pas
+  //  disponible — notamment dans les tests headless)
+  if(typeof openHeldItemPickerFor === 'function' && typeof openFullscreenPanel === 'function'
+     && typeof closeUnifiedSelectorModal === 'function'){
+    const pk = window._presetEditorOpen;
+    const nm = (typeof getPokeName === 'function') ? getPokeName(found.p.id) : found.p.name;
+    const cur = (typeof getTeamSlotItem === 'function') ? getTeamSlotItem(G.team.indexOf(found.p)) : found.p.heldItem;
+    openHeldItemPickerFor(nm, cur,
+      (key) => { presetEditorEquipItem(Number(slot), key); if(pk) openPresetEditor(pk); },
+      () => { presetEditorClearItem(Number(slot)); if(pk) openPresetEditor(pk); });
+    return;
+  }
   renderPresetItemPicker();
 }
 function renderPresetItemPicker(){
@@ -390,8 +428,10 @@ if (typeof presetEditorSwap !== 'undefined' && typeof window !== 'undefined') wi
 if (typeof presetEditorPick !== 'undefined' && typeof window !== 'undefined') window.presetEditorPick = presetEditorPick;
 if (typeof presetPickerFilter !== 'undefined' && typeof window !== 'undefined') window.presetPickerFilter = presetPickerFilter;
 if (typeof presetEditorPickChoose !== 'undefined' && typeof window !== 'undefined') window.presetEditorPickChoose = presetEditorPickChoose;
+if (typeof presetEditorSwapMove !== 'undefined' && typeof window !== 'undefined') window.presetEditorSwapMove = presetEditorSwapMove;
 if (typeof presetEditorRemoveMember !== 'undefined' && typeof window !== 'undefined') window.presetEditorRemoveMember = presetEditorRemoveMember;
 if (typeof presetEditorPickItem !== 'undefined' && typeof window !== 'undefined') window.presetEditorPickItem = presetEditorPickItem;
 if (typeof presetEditorEquipItem !== 'undefined' && typeof window !== 'undefined') window.presetEditorEquipItem = presetEditorEquipItem;
 if (typeof presetEditorClearItem !== 'undefined' && typeof window !== 'undefined') window.presetEditorClearItem = presetEditorClearItem;
 if (typeof presetEditorOpenInfo !== 'undefined' && typeof window !== 'undefined') window.presetEditorOpenInfo = presetEditorOpenInfo;
+

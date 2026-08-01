@@ -117,7 +117,7 @@ test('passe 26 B : panneaux d\'info — où trouver / qui peut l\'avoir', () => 
   const learners = sb.getMoveLearners('ice_beam');
   const total = learners.level.length + learners.ctcs.length + learners.training.length;
   assert.ok(total > 0, 'ice_beam a des élèves');
-  for (const id of [...learners.level, ...learners.ctcs, ...learners.training]) assert.ok(id >= 1 && id <= 251 && sb.PD[id], 'élève valide');
+  for (const id of [...learners.level, ...learners.ctcs, ...learners.training]) assert.ok(id >= 1 && id <= (sb.PD.length - 1) && sb.PD[id], 'élève valide');
   assert.equal(sb.getMoveLearners('').training.length, 0, 'attaque vide → personne');
   // Câblage des trois panneaux
   assert.ok(R('src/game/display/poke-modal.js').includes('getMoveLearners(moveId)'), 'openMoveInfo : section élèves');
@@ -208,3 +208,4 @@ test('passe 26 G : presets d\'équipe prévisualisés', () => {
   assert.ok(html.includes('openPresetManager'), 'bouton du gestionnaire d\'équipes');
   assert.ok(html.includes('teams_manager_open') === false, 'libellé résolu (clé i18n)');
 });
+

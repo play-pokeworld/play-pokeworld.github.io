@@ -28,7 +28,22 @@ window.L_en_champions = {
 "koga_e4": {"name":"Koga","title":"Elite Four — Poison"},
 "bruno_johto": {"name":"Bruno","title":"Elite Four — Fighting"},
 "karen": {"name":"Karen","title":"Elite Four — Dark"},
-"lance_johto": {"name":"Lance","title":"Johto League Champion"}
+"lance_johto": {"name":"Lance","title":"Johto League Champion"},
+  "roxanne": {"name":"Roxanne","title":"Rustboro Gym Leader","badgeName":"Stone Badge"},
+  "brawly": {"name":"Brawly","title":"Dewford Gym Leader","badgeName":"Knuckle Badge"},
+  "wattson": {"name":"Wattson","title":"Mauville Gym Leader","badgeName":"Dynamo Badge"},
+  "flannery": {"name":"Flannery","title":"Lavaridge Gym Leader","badgeName":"Heat Badge"},
+  "norman": {"name":"Norman","title":"Petalburg Gym Leader","badgeName":"Balance Badge"},
+  "winona": {"name":"Winona","title":"Fortree Gym Leader","badgeName":"Feather Badge"},
+  "tate_liza": {"name":"Tate & Liza","title":"Mossdeep Gym Leaders (Duo)","badgeName":"Mind Badge"},
+  "juan": {"name":"Juan","title":"Sootopolis Gym Leader","badgeName":"Rain Badge"},
+  "sidney": {"name":"Sidney","title":"Elite Four Dark","badgeName":""},
+  "phoebe": {"name":"Phoebe","title":"Elite Four Ghost","badgeName":""},
+  "glacia": {"name":"Glacia","title":"Elite Four Ice","badgeName":""},
+  "drake": {"name":"Drake","title":"Elite Four Dragon","badgeName":""},
+  "steven": {"name":"Steven Stone","title":"Hoenn Champion","badgeName":"Hoenn Champion Title"},
+  "hoenn_elite4": {"name":"Hoenn League","title":"Hoenn League","badgeName":"Hoenn Champion Title"},
 };
+
 
 

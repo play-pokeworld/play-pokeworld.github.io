@@ -144,3 +144,4 @@ if (typeof CTCS_UNSOLD !== 'undefined' && typeof window !== 'undefined') window.
 fs.writeFileSync(OUT, file);
 console.log(`✔ ${sellable.length} CT vendables réparties dans ${Object.keys(stock).length} boutiques — ${unsold.length} CT gen 3+ non vendues.`);
 for (const s of inited) if (assign[s].length) console.log(`  ${s.padEnd(12)} : ${assign[s].length}`);
+

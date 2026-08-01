@@ -169,3 +169,4 @@ var POKE_TALENTS = {
 // --- Migrated to ES module, globals exposed ---
 if (typeof POKE_TALENTS !== 'undefined' && typeof window !== 'undefined') window.POKE_TALENTS = POKE_TALENTS;
 
+

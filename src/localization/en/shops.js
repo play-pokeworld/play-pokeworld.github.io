@@ -1,65 +1,40 @@
 // ===== EN — Shop names =====
 window.L_en_shops = {
-"pallet": {
-"name":"Pallet Shop"
-},
-"viridian": {
-"name":"Viridian Mart"
-},
-"pewter": {
-"name":"Pewter Mart"
-},
-"cerulean": {
-"name":"Cerulean Mart"
-},
-"vermilion": {
-"name":"Vermilion Mart"
-},
-"lavender": {
-"name":"Lavender Mart"
-},
-"celadon": {
-"name":"Dept. Store"
-},
-"fuchsia": {
-"name":"Fuchsia Mart"
-},
-"cinnabar": {
-"name":"Cinnabar Lab Shop"
-},
-"indigo": {
-"name":"Indigo Mart"
-},
-"jnewbark": {
-"name":"Prof. Elm's Lab"
-},
-"jcherrygrove": {
-"name":"Cherrygrove Mart"
-},
-"jviolet": {
-"name":"Violet Mart"
-},
-"jazalea": {
-"name":"Azalea Mart"
-},
-"jgoldenrod": {
-"name":"Goldenrod Dept. Store"
-},
-"jecruteak": {
-"name":"Ecruteak Mart"
-},
-"jolivine": {
-"name":"Olivine Mart"
-},
-"jcianwood": {
-"name":"Cianwood Mart"
-},
-"jmahogany": {
-"name":"Mahogany Mart"
-},
-"jblackthorn": {
-"name":"Blackthorn Mart"
-}
+  "pallet": { "name": "Pallet Town Mart" },
+  "viridian": { "name": "Viridian City Mart" },
+  "pewter": { "name": "Pewter City Mart" },
+  "cerulean": { "name": "Cerulean City Mart" },
+  "vermilion": { "name": "Vermilion City Mart" },
+  "lavender": { "name": "Lavender Town Mart" },
+  "celadon": { "name": "Celadon Dept. Store" },
+  "fuchsia": { "name": "Fuchsia City Mart" },
+  "cinnabar": { "name": "Cinnabar Lab" },
+  "indigo": { "name": "Indigo Plateau Shop" },
+  "jnewbark": { "name": "Prof. Elm's Lab" },
+  "jcherrygrove": { "name": "Cherrygrove City Mart" },
+  "jviolet": { "name": "Violet City Mart" },
+  "jazalea": { "name": "Azalea Town Mart" },
+  "jgoldenrod": { "name": "Goldenrod Dept. Store" },
+  "jecruteak": { "name": "Ecruteak City Mart" },
+  "jolivine": { "name": "Olivine City Mart" },
+  "jcianwood": { "name": "Cianwood City Mart" },
+  "jmahogany": { "name": "Mahogany Town Mart" },
+  "jblackthorn": { "name": "Blackthorn City Mart" },
+  "littleroot": { "name": "Littleroot Town Shop" },
+  "oldale": { "name": "Oldale Town Mart" },
+  "petalburg": { "name": "Petalburg City Mart" },
+  "rustboro": { "name": "Rustboro City Mart" },
+  "dewford": { "name": "Dewford Town Shop" },
+  "slateport_market": { "name": "Slateport Market" },
+  "mauville": { "name": "Mauville City Mart" },
+  "mauville_casino": { "name": "Mauville Game Corner" },
+  "verdanturf": { "name": "Verdanturf Town Mart" },
+  "fallarbor": { "name": "Fallarbor Town Mart" },
+  "lavaridge": { "name": "Lavaridge Town Mart" },
+  "fortree": { "name": "Fortree City Mart" },
+  "lilycove_dept_store": { "name": "Lilycove Dept. Store" },
+  "mossdeep": { "name": "Mossdeep City Mart" },
+  "sootopolis": { "name": "Sootopolis City Mart" },
+  "pacifidlog": { "name": "Pacifidlog Town Shop" },
+  "evergrande": { "name": "Ever Grande City Shop" }
 };
-
-

@@ -1,20 +1,24 @@
-const MARKET_PRICE_OVERRIDES = {1:100000,4:100000,7:100000,133:180000,137:250000,106:140000,107:140000,122:140000,124:160000,131:220000,152:150000,155:150000,158:150000,172:120000,173:120000,174:120000,175:160000,236:180000,196:250000,197:250000,199:220000,213:180000,238:160000,239:160000,240:160000};
+const MARKET_PRICE_OVERRIDES = {1:100000,4:100000,7:100000,133:180000,137:250000,106:140000,107:140000,122:140000,124:160000,131:220000,152:150000,155:150000,158:150000,172:120000,173:120000,174:120000,175:160000,236:180000,196:250000,197:250000,199:220000,213:180000,238:160000,239:160000,240:160000, 252:150000, 255:150000, 258:150000, 298:120000, 351:160000, 374:250000, 385:300000, 386:300000};
 const MARKET_STOCK = {
  kanto: [1,4,7,133,137,106,107,122,124,131],
- johto: [152,155,158,172,173,174,175,236,196,197,199,213,238,239,240]
+ johto: [152,155,158,172,173,174,175,236,196,197,199,213,238,239,240],
+ hoenn: [252,255,258,298,351]
 };
 
 function getMarketPokemon(){
  if(typeof G === 'undefined' || !G) return [];
  const region = (G.region || 'kanto');
- let stock = (region === 'johto') ? MARKET_STOCK.johto.slice() : MARKET_STOCK.kanto.slice();
+ let stock = (MARKET_STOCK[region] || MARKET_STOCK.kanto).slice();
  try {
- const locs = (region === 'johto') ? (typeof LOCS_JOHTO !== 'undefined' ? LOCS_JOHTO : LOCS) : LOCS;
+ const locs = (region === 'hoenn') ? (typeof LOCS_HOENN !== 'undefined' ? LOCS_HOENN : LOCS) : (region === 'johto') ? (typeof LOCS_JOHTO !== 'undefined' ? LOCS_JOHTO : LOCS) : LOCS;
  const wildSet = new Set();
  for(const loc of Object.values(locs)){
  for(const w of (loc.wild || [])) wildSet.add(+w[0]);
  }
- stock = stock.filter(id => !wildSet.has(id));
+ // Morphéo #351 reste au marché même s'il apparaît (rare) au Centre Météo :
+ // il alimente les formes du Labo Météo (achat garanti, spawn très rare).
+ const wildExempt = new Set([351]);
+ stock = stock.filter(id => !wildSet.has(id) || wildExempt.has(id));
  } catch(e){}
  const evoTargets = new Set();
  if(typeof LEVEL_EVO_MAP !== 'undefined'){
@@ -27,7 +31,7 @@ function getMarketPokemon(){
  }
  const allowList = new Set([137,133,124]);
  stock = stock.filter(id => !evoTargets.has(id) || allowList.has(id));
- const banned = (region === 'johto') ? [243,244,245,249,250,251] : [144,145,146,150,151];
+ const banned = (region === 'hoenn') ? [380,381,382,383,384] : (region === 'johto') ? [243,244,245,249,250,251] : [144,145,146,150,151];
  stock = stock.filter(id => !banned.includes(id));
  return stock;
 }
@@ -63,9 +67,9 @@ function renderMarket(el){
  }
  const cats={starter:[],fossil:[],rare:[],other:[]};
  for(const id of ids){
- if([1,4,7,152,155,158].includes(id)) cats.starter.push(id);
- else if([138,139,140,141,142].includes(id)) cats.fossil.push(id);
- else if([133,137,106,107,122,124,131,175,236].includes(id)) cats.rare.push(id);
+ if([1,4,7,152,155,158,252,255,258].includes(id)) cats.starter.push(id);
+ else if([138,139,140,141,142,345,347].includes(id)) cats.fossil.push(id);
+ else if([133,137,106,107,122,124,131,175,236,298,351,374].includes(id)) cats.rare.push(id);
  else cats.other.push(id);
  }
  let html='';
@@ -134,4 +138,5 @@ if (typeof getMarketPokemon !== 'undefined' && typeof window !== 'undefined') wi
 if (typeof getPokemonPrice !== 'undefined' && typeof window !== 'undefined') window.getPokemonPrice = getPokemonPrice;
 if (typeof renderMarket !== 'undefined' && typeof window !== 'undefined') window.renderMarket = renderMarket;
 if (typeof buyPokemon !== 'undefined' && typeof window !== 'undefined') window.buyPokemon = buyPokemon;
+
 

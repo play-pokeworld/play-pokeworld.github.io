@@ -133,7 +133,7 @@ test('carte de réanimation : root→345, claw→347 partout (map + objets)', ()
 });
 
 test('sprites : entrées des 4 buckets + fichiers présents + DEX_MAP', () => {
-  for (const bucket of ['front', 'back', 'frontShiny', 'backShiny']) {
+  for (const bucket of ['front', 'frontShiny']) {
     assert.ok(SPRITES.includes(`"345":"src/assets/images/pokemon/${bucket}/lileep.png"`), bucket + ' 345');
     assert.ok(SPRITES.includes(`"347":"src/assets/images/pokemon/${bucket}/anorith.png"`), bucket + ' 347');
     for (const n of ['lileep', 'anorith']) {
@@ -298,3 +298,4 @@ test('i18n : nouvelles clés présentes en FR et EN', () => {
     assert.ok(EN_UI.includes(`"${key}":`), `EN ${key}`);
   }
 });
+

@@ -73,3 +73,4 @@ function buyItem(key){
 if (typeof renderShop !== 'undefined' && typeof window !== 'undefined') window.renderShop = renderShop;
 if (typeof buyItem !== 'undefined' && typeof window !== 'undefined') window.buyItem = buyItem;
 
+

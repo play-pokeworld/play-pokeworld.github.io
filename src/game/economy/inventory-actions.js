@@ -40,7 +40,7 @@ function onInventoryClick(key){
  return;
  }
 
- if(itm.type === 'stone' || itm.type === 'evolution' || itm.evolution === true){
+ if((typeof isEvolutionItem === 'function' && isEvolutionItem(key)) || itm.type === 'stone' || itm.type === 'evolution' || itm.evolution === true){
  const qty = G.inventory[key] || 0;
  const el = _getActiveContent();
  if(qty <= 0){
@@ -50,15 +50,45 @@ function onInventoryClick(key){
    return;
  }
  const candidates = [];
+ const stoneMap = (typeof STONE_EVO !== 'undefined' && STONE_EVO) ? STONE_EVO : {};
+ const normKey = (typeof normalizeItemKey === 'function') ? normalizeItemKey(key) : key;
  G.team.forEach((p, idx) => {
- const targetId = STONE_EVO[p.id]?.[key];
- if(targetId) candidates.push({p, loc:'team', idx, targetId});
- });
- Object.entries(G.collection).forEach(([idStr, p]) => {
  if(!p) return;
- const targetId = STONE_EVO[p.id]?.[key];
- if(targetId) candidates.push({p, loc:'box', idStr, targetId});
+ const pid = Number(p.id);
+ const targetId = (stoneMap[pid] && (stoneMap[pid][normKey] || stoneMap[pid][key]))
+   || (stoneMap[p.id] && (stoneMap[p.id][normKey] || stoneMap[p.id][key]));
+ // Toujours lister le Pokémon compatible, même si l'évolution cible est déjà possédée
+ if(targetId) candidates.push({p, loc:'team', idx, targetId: Number(targetId)});
  });
+ Object.entries(G.collection||{}).forEach(([idStr, p]) => {
+ if(!p) return;
+ const pid = Number(p.id);
+ const targetId = (stoneMap[pid] && (stoneMap[pid][normKey] || stoneMap[pid][key]))
+   || (stoneMap[p.id] && (stoneMap[p.id][normKey] || stoneMap[p.id][key]));
+ if(targetId) candidates.push({p, loc:'box', idStr, targetId: Number(targetId)});
+ });
+ // Section « espèces concernées » (référence Pokédex) si aucun mon en équipe/boîte
+ let catalogHtml = '';
+ if(candidates.length === 0){
+   const catalog = [];
+   for(const pidStr of Object.keys(stoneMap)){
+     const map = stoneMap[pidStr];
+     const tid = map && (map[normKey] || map[key]);
+     if(tid) catalog.push({ base: Number(pidStr), target: Number(tid) });
+   }
+   if(catalog.length){
+     catalogHtml = '<div class="pw-text-sm pw-light1" style="margin:8px 0;">'
+       + ((typeof t==='function'&&t('evo_catalog_hint'))||'Espèces pouvant utiliser cet objet :')
+       + '</div><div class="pw-starter-grid">'
+       + catalog.map(({base,target})=>{
+           const ownedT = (typeof speciesOwned==='function') ? speciesOwned(target) : false;
+           const ownedB = (typeof speciesOwned==='function') ? speciesOwned(base) : false;
+           return `<div class="pw-starter-card" style="opacity:${ownedB?1:0.55}" title="#${base} → #${target}">
+             <div class="pw-starter-orb">${typeof spriteImg==='function'?spriteImg(base,null,{size:56}):''}
+             <div class="evo-target-label">→ ${(typeof getPokeName==='function'?getPokeName(target):target)}${ownedT?' ✓':''}</div></div></div>`;
+         }).join('') + '</div>';
+   }
+ }
 
  let headerHtml = `<div class="pw-sticky-header">
  <div class="pw-row">
@@ -88,7 +118,7 @@ function onInventoryClick(key){
  </div>`;
  }).join('') + '</div>';
  } else {
- candidatesHtml = `<div class="pw-empty-state">${t('no_evo_stone')} ${getItemName(key)}.</div>`;
+ candidatesHtml = catalogHtml || `<div class="pw-empty-state">${t('no_evo_stone')} ${getItemName(key)}.</div>`;
  }
 
  el.innerHTML = headerHtml + candidatesHtml + `<div class="pw-btn-center"><button class="hbtn extracted-bridge-style-042" data-action="return-inventory" class="hbtn">${t('back_bag')}</button></div>`;
@@ -162,4 +192,5 @@ if (typeof onInventoryClick !== 'undefined' && typeof window !== 'undefined') wi
 if (typeof useItem !== 'undefined' && typeof window !== 'undefined') window.useItem = useItem;
 if (typeof consumeItem !== 'undefined' && typeof window !== 'undefined') window.consumeItem = consumeItem;
 if (typeof startLearnMoveCtCs !== 'undefined' && typeof window !== 'undefined') window.startLearnMoveCtCs = startLearnMoveCtCs;
+
 

@@ -5,6 +5,25 @@ var _invCatTouched = false; // passe 27 : onglet choisi explicitement par le jou
 var _invSort = 'name';
 var _invSearch = ''; // passe 26 : recherche texte (même ergonomie que la boîte PC)
 
+function isEvolutionItem(key) {
+  if (typeof normalizeItemKey === 'function') key = normalizeItemKey(key);
+  const itm = (typeof ITEMS !== 'undefined' && ITEMS) ? ITEMS[key] : null;
+  if (!itm) return false;
+  if (itm.type === 'stone' || itm.type === 'evolution' || itm.evolution === true) return true;
+  const HELD_EVO_KEYS = [
+    'metal_coat', 'kings_rock', 'dragon_scale', 'upgrade',
+    'deep_sea_tooth', 'deep_sea_scale', 'prism_scale',
+    'sunstone', 'moonstone', 'firestone', 'waterstone', 'thunderstone', 'leafstone'
+  ];
+  if (HELD_EVO_KEYS.includes(key)) return true;
+  if (typeof STONE_EVO !== 'undefined' && STONE_EVO) {
+    for (const pid in STONE_EVO) {
+      if (STONE_EVO[pid] && STONE_EVO[pid][key]) return true;
+    }
+  }
+  return false;
+}
+
 function itemCat(key){
  // Passe 26 : les baies SONT des objets tenus (catégorie 'berry' supprimée) ;
  // le filtre « Divers » disparaît — tout ce qui n'est pas classé ailleurs
@@ -12,7 +31,7 @@ function itemCat(key){
  const itm=ITEMS[key]; if(!itm) return 'special';
  const isCtCs = (typeof isCtCsItem==='function') ? isCtCsItem(key) : (itm.type==='ct' || itm.type==='cs');
  if(isCtCs) return 'ct_cs';
- if(itm.type==='stone' || itm.type==='evolution' || itm.evolution===true) return 'evolution';
+ if(isEvolutionItem(key)) return 'evolution';
  if(itm.type==='fossil') return 'fossil';
  if(itm.type==='treasure') return 'treasure';
  if(itm.type==='key') return 'special';
@@ -136,10 +155,11 @@ function renderInventory(el){
 // (liste des Pokémon, vente…) au lieu du panneau d'info. Ce panneau reste
 // accessible au clic droit / appui long (data-context-call="openItemInfo").
 function isUsableBagItem(key){
+  if (typeof normalizeItemKey === 'function') key = normalizeItemKey(key);
   const itm=(typeof ITEMS!=='undefined' && ITEMS) ? ITEMS[key] : null;
   if(!itm) return false;
   if(itm.type==='treasure') return true;                                    // écran de vente
-  if(itm.type==='stone' || itm.type==='evolution' || itm.evolution===true) return true; // liste d'évolution
+  if(isEvolutionItem(key)) return true;                                     // liste d'évolution
   const isCtCs = (typeof isCtCsItem==='function') ? isCtCsItem(key) : (itm.type==='ct' || itm.type==='cs');
   if(isCtCs) return true;                                                   // enseignement d'attaque
   if(itm.type==='candy' || key==='rarecandy') return true;                  // super bonbon
@@ -147,7 +167,10 @@ function isUsableBagItem(key){
 }
 
 function handleInventoryClick(key){
-  const itm = ITEMS[key];
+  // Résolution d'alias (ex. fire_stone → firestone) pour la recherche du
+  // catalogue, tout en conservant la clé d'origine pour le flux d'usage.
+  const lookupKey = (typeof normalizeItemKey === 'function') ? normalizeItemKey(key) : key;
+  const itm = ITEMS[key] || ITEMS[lookupKey];
   if(!itm) return;
   // If in equip mode (from team), call the equip callback
   if(window._equipCallback) {
@@ -180,6 +203,7 @@ function handleInventoryClick(key){
 
 
 // --- Migrated to ES module, globals exposed ---
+if (typeof isEvolutionItem !== 'undefined' && typeof window !== 'undefined') window.isEvolutionItem = isEvolutionItem;
 if (typeof itemCat !== 'undefined' && typeof window !== 'undefined') window.itemCat = itemCat;
 if (typeof isUsableBagItem !== 'undefined' && typeof window !== 'undefined') window.isUsableBagItem = isUsableBagItem;
 if (typeof setInvCat !== 'undefined' && typeof window !== 'undefined') window.setInvCat = setInvCat;
@@ -188,4 +212,5 @@ if (typeof setInvSearch !== 'undefined' && typeof window !== 'undefined') window
 if (typeof resetInvFilters !== 'undefined' && typeof window !== 'undefined') window.resetInvFilters = resetInvFilters;
 if (typeof renderInventory !== 'undefined' && typeof window !== 'undefined') window.renderInventory = renderInventory;
 if (typeof handleInventoryClick !== 'undefined' && typeof window !== 'undefined') window.handleInventoryClick = handleInventoryClick;
+
 

@@ -12,6 +12,9 @@ function updateRegionSelectorLocks(){
 function renderMap(){
  recomputeUnlocks();
  updateFeatureWindows();
+ // passe 35 : la fenêtre Base Secrète est permanente — re-rendre à chaque refresh
+ try{ if(typeof baseWindowRender==='function') baseWindowRender(); }catch(_){}
+
  
  
  const regSel = document.getElementById('map-region-select');
@@ -20,7 +23,7 @@ function renderMap(){
  
  const mapWT = document.getElementById('map-win-title');
  if(mapWT){
- const rName = G.region==='johto'?'Johto':'Kanto';
+ const rName = G.region==='johto'?'Johto':G.region==='hoenn'?'Hoenn':'Kanto';
  mapWT.textContent = tr('map_title_name', {region:rName});
  }
  const svg=document.getElementById('map-svg');
@@ -29,7 +32,7 @@ function renderMap(){
  const nodeG=document.getElementById('nodes');
  const terrainG=document.getElementById('map-terrain');
  const reg = (typeof G!=='undefined'&&G&&G.region)?G.region:'kanto';
- const img = reg==='johto'?JOHTO_MAP_IMG:KANTO_MAP_IMG;
+ const img = reg==='johto'?JOHTO_MAP_IMG:reg==='hoenn'?HOENN_MAP_IMG:KANTO_MAP_IMG;
  if(terrainG){
  terrainG.innerHTML = `<image href="${img}"xlink:href="${img}"x="0"y="0"width="1600"height="960"preserveAspectRatio="xMidYMid meet"/>`;
  }
@@ -56,7 +59,11 @@ function renderMap(){
  const stroke=isCurrent?'var(--light2)':isLocked?'#444':(st.kind==='done'?'rgba(255,255,255,0.25)':'#fff');
  const sw=isCurrent?4:2;
  const icon = loc.type==='town'?'🏘':loc.type==='sea'?'🌊':loc.type==='dungeon'?'⛰':'';
- const lname = getLocName(id);
+ // Sur la carte, les précisions entre parenthèses des trois sites Regi
+ // (Ruines Désert / Grotte Isolée / Tombeau Antique) sont masquées : seul le
+ // nom principal est affiché. Le nom complet reste utilisé partout ailleurs.
+ const _noParenIds = { desert_ruins: 1, island_cave: 1, ancient_tomb: 1 };
+ const lname = _noParenIds[id] ? getLocName(id).replace(/\s*\([^)]*\)\s*$/, '') : getLocName(id);
  const labelW = Math.max(38, lname.length*7 + 14);
  const labelH = 18;
  const labelColor = isCurrent?'#94886B':isReachable?'#ececec':'#9a9a9a';
@@ -145,6 +152,14 @@ function clickLocation(id){
  return;
  }
  }
+ if(id==='route101'){
+ const has = !!(G.starterHoenn || (G.regionStarter && G.regionStarter.hoenn));
+ if(!has){
+ setMsg(t('choose_hoenn_starter_first') || 'Choisis d\'abord ton Pokémon de Hoenn !');
+ if(typeof checkStarterNeeded==='function') checkStarterNeeded();
+ return;
+ }
+ }
  const gateStatus = (typeof locGateStatus === 'function') ? locGateStatus(id) : {ok:true};
  if(!gateStatus.ok){
  setMsg(typeof locGateMessage === 'function' ? locGateMessage(id) : tr('location_not_reachable', {location:getLocName(id)}));
@@ -178,7 +193,16 @@ function clickLocation(id){
 
 function refreshMapAndLoc(){
  try{ if(document.getElementById('map-svg')) renderMap(); }catch(e){}
- try{ if(_activeTab==='info'){ const tc=document.getElementById('tab-content'); if(tc) renderLocInfo(tc); } }catch(e){}
+ try{
+   const tc = document.getElementById('tab-content');
+   if(tc && (typeof _activeTab === 'undefined' || _activeTab === 'info' || !tc.querySelector('.box-panel'))){
+     if(typeof renderLocInfo === 'function') renderLocInfo(tc);
+   }
+ }catch(e){}
+ try{
+   const el = document.getElementById('location-info-panel');
+   if(el && typeof renderLocInfo === 'function') renderLocInfo(el);
+ }catch(e){}
 }
 
 
@@ -187,4 +211,5 @@ if (typeof updateRegionSelectorLocks !== 'undefined' && typeof window !== 'undef
 if (typeof renderMap !== 'undefined' && typeof window !== 'undefined') window.renderMap = renderMap;
 if (typeof clickLocation !== 'undefined' && typeof window !== 'undefined') window.clickLocation = clickLocation;
 if (typeof refreshMapAndLoc !== 'undefined' && typeof window !== 'undefined') window.refreshMapAndLoc = refreshMapAndLoc;
+
 

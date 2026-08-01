@@ -152,14 +152,25 @@ function refreshAfterShinyToggle(){
 
 
 function toggleShinySkin(idx){
- const p=G.team[idx];
- if(!p || !(p.shinyUnlocked || p.shiny || isSpeciesShiny(p.id))) return;
+ const p = (typeof G !== 'undefined' && G && Array.isArray(G.team)) ? G.team[Number(idx)] : null;
+ if(!p || !(p.shinyUnlocked || p.shiny || (typeof isSpeciesShiny === 'function' && isSpeciesShiny(p.id)))) return;
  if(p.shinyActive === undefined) p.shinyActive = true;
- p.shinyActive=!p.shinyActive;
- p.shiny=!!p.shinyActive;
- saveGame();
- refreshAfterShinyToggle();
- openPokeModal(idx);
+ p.shinyActive = !p.shinyActive;
+ p.shiny = !!p.shinyActive;
+ if(typeof saveGame === 'function') saveGame();
+ if(typeof refreshAfterShinyToggle === 'function') refreshAfterShinyToggle();
+ if(typeof openPokeModal === 'function') openPokeModal(Number(idx));
+}
+
+function toggleBoxShinySkin(boxId){
+ const p = (typeof G !== 'undefined' && G && G.collection) ? (G.collection[boxId] || G.collection[String(boxId)]) : null;
+ if(!p || !(p.shinyUnlocked || p.shiny || (typeof isSpeciesShiny === 'function' && isSpeciesShiny(p.id)))) return;
+ if(p.shinyActive === undefined) p.shinyActive = true;
+ p.shinyActive = !p.shinyActive;
+ p.shiny = !!p.shinyActive;
+ if(typeof saveGame === 'function') saveGame();
+ if(typeof refreshAfterShinyToggle === 'function') refreshAfterShinyToggle();
+ if(typeof openBoxPokeModal === 'function') openBoxPokeModal(boxId);
 }
 
 
@@ -179,6 +190,8 @@ if (typeof swapBoxWithTeam !== 'undefined' && typeof window !== 'undefined') win
 if (typeof sendTeamToBox !== 'undefined' && typeof window !== 'undefined') window.sendTeamToBox = sendTeamToBox;
 if (typeof refreshAfterShinyToggle !== 'undefined' && typeof window !== 'undefined') window.refreshAfterShinyToggle = refreshAfterShinyToggle;
 if (typeof toggleShinySkin !== 'undefined' && typeof window !== 'undefined') window.toggleShinySkin = toggleShinySkin;
+if (typeof toggleBoxShinySkin !== 'undefined' && typeof window !== 'undefined') window.toggleBoxShinySkin = toggleBoxShinySkin;
 if (typeof statusColor !== 'undefined' && typeof window !== 'undefined') window.statusColor = statusColor;
 if (typeof statusLabel !== 'undefined' && typeof window !== 'undefined') window.statusLabel = statusLabel;
+
 

@@ -1660,13 +1660,6 @@ const ITEMS = {
     "name_fr": "Joyau Feu",
   },
 
-  "fire_stone": {
-    "icon": "💎",
-    "price": 50000,
-    "type": "stone",
-    "name_en": "Fire Stone",
-    "name_fr": "Pierre Feu",
-  },
 
   "firestone": {
     "icon": "💎",
@@ -1998,13 +1991,6 @@ const ITEMS = {
     "name_fr": "Queue Lente",
   },
 
-  "leaf_stone": {
-    "icon": "💎",
-    "price": 50000,
-    "type": "stone",
-    "name_en": "Leaf Stone",
-    "name_fr": "Pierre Plante",
-  },
 
   "leafstone": {
     "icon": "💎",
@@ -2185,13 +2171,6 @@ const ITEMS = {
     "name_fr": "Graine Brume",
   },
 
-  "moon_stone": {
-    "icon": "💎",
-    "price": 50000,
-    "type": "stone",
-    "name_en": "Moon Stone",
-    "name_fr": "Pierre Lune",
-  },
 
   "moonstone": {
     "icon": "💎",
@@ -2561,11 +2540,13 @@ const ITEMS = {
   },
 
   "shiny_charm": {
-    "icon": "",
+    "icon": "✨",
     "price": 0,
     "type": "key",
     "name_en": "Shiny Charm",
     "name_fr": "Charme Chroma",
+    "desc_fr": "Obtenu en complétant 100 % d'un Pokédex régional. Augmente les chances de chromatique (1/2048 au lieu de 1/4096) uniquement pour les Pokémon des régions au Pokédex 100 %.",
+    "desc_en": "Obtained by completing 100% of a regional Pokédex. Boosts shiny odds to 1/2048 (from 1/4096) only for Pokémon from regions with a completed Pokédex.",
   },
 
   "shiny_stone": {
@@ -2701,13 +2682,6 @@ const ITEMS = {
     "name_fr": "Mémoire Gravée",
   },
 
-  "sun_stone": {
-    "icon": "💎",
-    "price": 50000,
-    "type": "stone",
-    "name_en": "Sun Stone",
-    "name_fr": "Pierre Soleil",
-  },
 
   "sunstone": {
     "icon": "💎",
@@ -2767,13 +2741,6 @@ const ITEMS = {
     "name_fr": "Extension de Terrain",
   },
 
-  "thunder_stone": {
-    "icon": "💎",
-    "price": 50000,
-    "type": "stone",
-    "name_en": "Thunder Stone",
-    "name_fr": "Pierre Foudre",
-  },
 
   "thunderstone": {
     "icon": "💎",
@@ -2846,13 +2813,6 @@ const ITEMS = {
     "name_fr": "Joyau Eau",
   },
 
-  "water_stone": {
-    "icon": "💎",
-    "price": 50000,
-    "type": "stone",
-    "name_en": "Water Stone",
-    "name_fr": "Pierre Eau",
-  },
 
   "waterium_z": {
     "icon": "💠",
@@ -2905,3 +2865,4 @@ const ITEMS = {
 
 // --- Migrated to ES module, globals exposed ---
 if (typeof ITEMS !== "undefined" && typeof window !== "undefined") window.ITEMS = ITEMS;
+

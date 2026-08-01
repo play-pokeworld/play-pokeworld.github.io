@@ -1,65 +1,40 @@
 // ===== FR — Shop names =====
 window.L_fr_shops = {
-"pallet": {
-"name":"Boutique Palette"
-},
-"viridian": {
-"name":"Boutique Jadielle"
-},
-"pewter": {
-"name":"Boutique Argenta"
-},
-"cerulean": {
-"name":"Boutique Azuria"
-},
-"vermilion": {
-"name":"Boutique Carmin"
-},
-"lavender": {
-"name":"Boutique Lavanville"
-},
-"celadon": {
-"name":"Centre Commercial"
-},
-"fuchsia": {
-"name":"Boutique Parmanie"
-},
-"cinnabar": {
-"name":"Labo Cramois'île"
-},
-"indigo": {
-"name":"Boutique Plateau"
-},
-"jnewbark": {
-"name":"Labo du Prof. Orme"
-},
-"jcherrygrove": {
-"name":"Boutique Ville Griotte"
-},
-"jviolet": {
-"name":"Boutique Argenta"
-},
-"jazalea": {
-"name":"Boutique Écorcia"
-},
-"jgoldenrod": {
-"name":"Grand Magasin Doublonville"
-},
-"jecruteak": {
-"name":"Boutique Rosalia"
-},
-"jolivine": {
-"name":"Boutique Oliville"
-},
-"jcianwood": {
-"name":"Boutique Irisia"
-},
-"jmahogany": {
-"name":"Boutique Acajou"
-},
-"jblackthorn": {
-"name":"Boutique Ébénelle"
-}
+  "pallet": { "name": "Boutique Palette" },
+  "viridian": { "name": "Boutique Jadielle" },
+  "pewter": { "name": "Boutique Argenta" },
+  "cerulean": { "name": "Boutique Azuria" },
+  "vermilion": { "name": "Boutique Carmin" },
+  "lavender": { "name": "Boutique Lavanville" },
+  "celadon": { "name": "Centre Commercial Céladon" },
+  "fuchsia": { "name": "Boutique Parmanie" },
+  "cinnabar": { "name": "Labo Cramois'île" },
+  "indigo": { "name": "Boutique Plateau Indigo" },
+  "jnewbark": { "name": "Labo du Prof. Orme" },
+  "jcherrygrove": { "name": "Boutique Ville Griotte" },
+  "jviolet": { "name": "Boutique Mauville" },
+  "jazalea": { "name": "Boutique Écorcia" },
+  "jgoldenrod": { "name": "Grand Magasin Doublonville" },
+  "jecruteak": { "name": "Boutique Rosalia" },
+  "jolivine": { "name": "Boutique Oliville" },
+  "jcianwood": { "name": "Boutique Irisia" },
+  "jmahogany": { "name": "Boutique Acajou" },
+  "jblackthorn": { "name": "Boutique Ébénelle" },
+  "littleroot": { "name": "Boutique de Bourg-en-Vol" },
+  "oldale": { "name": "Boutique de Rosyères" },
+  "petalburg": { "name": "Boutique de Clémenti-Ville" },
+  "rustboro": { "name": "Boutique de Mérouville" },
+  "dewford": { "name": "Boutique de Myokara" },
+  "slateport_market": { "name": "Marché de Poivressel" },
+  "mauville": { "name": "Boutique de Lavandia" },
+  "mauville_casino": { "name": "Casino de Lavandia" },
+  "verdanturf": { "name": "Boutique de Vergazon" },
+  "fallarbor": { "name": "Boutique d'Autopia" },
+  "lavaridge": { "name": "Boutique de Vermilava" },
+  "fortree": { "name": "Boutique de Cimmery" },
+  "lilycove_dept_store": { "name": "Centre Commercial Nénucrique" },
+  "mossdeep": { "name": "Boutique d'Algatia" },
+  "sootopolis": { "name": "Boutique d'Atalanopolis" },
+  "pacifidlog": { "name": "Boutique de Pacifiville" },
+  "evergrande": { "name": "Boutique d'Éternara" }
 };
-
-

@@ -650,3 +650,4 @@ if (typeof visualItem !== 'undefined' && typeof window !== 'undefined') window.v
 if (typeof visualTalent !== 'undefined' && typeof window !== 'undefined') window.visualTalent = visualTalent;
 if (typeof visualStatus !== 'undefined' && typeof window !== 'undefined') window.visualStatus = visualStatus;
 
+

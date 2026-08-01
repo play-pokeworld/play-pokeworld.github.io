@@ -82,7 +82,7 @@ function normalizeLoadedState(){
  if(!G.team) G.team = [];
  if(!G.inventory) G.inventory = {};
  // One-time inventory migration: canonical item IDs and removal of retired items.
- const itemRenames = { berry_oran:'oran_berry', berry_sitrus:'sitrus_berry', berry_ceriz:'cheri_berry', berry_prine:'prine_berry', chroma_charm:'shiny_charm', up_grade:'upgrade' };
+ const itemRenames = { berry_oran:'oran_berry', berry_sitrus:'sitrus_berry', berry_ceriz:'cheri_berry', berry_prine:'prine_berry', chroma_charm:'shiny_charm', up_grade:'upgrade', fire_stone:'firestone', water_stone:'waterstone', thunder_stone:'thunderstone', leaf_stone:'leafstone', moon_stone:'moonstone', sun_stone:'sunstone', duskstone:'dusk_stone', dawnstone:'dawn_stone', shinystone:'shiny_stone', icestone:'ice_stone' };
  for(const [oldKey, newKey] of Object.entries(itemRenames)){
   if(G.inventory[oldKey]) { G.inventory[newKey] = (G.inventory[newKey] || 0) + G.inventory[oldKey]; delete G.inventory[oldKey]; }
  }
@@ -108,10 +108,16 @@ function normalizeLoadedState(){
  if(Array.isArray(G.teamSlotItems)) G.teamSlotItems = G.teamSlotItems.map(key => { const k2 = itemRenames[key] || key; return (['choice_scarf','swift_charm','focus_lens','power_gem','thick_club','sitrus_berry','cheri_berry','oran_berry'].includes(k2) ? null : k2); });
  if(!G.pokedex) G.pokedex = {};
  if(!G.unlockedTalents) G.unlockedTalents = {};
- if(!G.mainStep) G.mainStep = { kanto: 0, johto: 0 };
+ if(!G.mainStep) G.mainStep = { kanto: 0, johto: 0, hoenn: 0 };
  if(!G.regionLeagueWon || typeof G.regionLeagueWon !== 'object') G.regionLeagueWon = {};
  if(typeof window !== 'undefined' && window.PokeWorldDomain && window.PokeWorldDomain.routeEvents && typeof window.PokeWorldDomain.routeEvents.ensureRouteEventState === 'function') window.PokeWorldDomain.routeEvents.ensureRouteEventState(G);
  if(typeof ensureRegionProgress === 'function') ensureRegionProgress();
+ if(!G.secretBaseFlags || typeof G.secretBaseFlags !== 'object') G.secretBaseFlags = { count: 0, collectedIds: {}, lastRankNotified: 'normal' };
+ if(!G.shinyCharmRegions || typeof G.shinyCharmRegions !== 'object') G.shinyCharmRegions = {};
+ if(!G.puzzleExplorations || typeof G.puzzleExplorations !== 'object') G.puzzleExplorations = { completed: {}, progress: {} };
+ try{ if(typeof ensureSecretBaseFlags === 'function') ensureSecretBaseFlags(); }catch(_){}
+ try{ if(typeof ensurePuzzleState === 'function') ensurePuzzleState(); }catch(_){}
+ try{ if(typeof syncShinyCharmProgress === 'function') syncShinyCharmProgress(); }catch(_){}
  if(!G.automation) G.automation = { autoHatch: false, autoSeedHatchery: false, autoExplore: false };
  if(!Array.isArray(G.teamSlotItems)) G.teamSlotItems = [];
  if(!G.evolvedSpecies) G.evolvedSpecies = [];
@@ -121,7 +127,7 @@ function normalizeLoadedState(){
 
   // ─── Sync language with the localization engine ───
   if (typeof window !== 'undefined' && window.L && typeof window.L.set === 'function') {
-    var savedLang = G.lang || 'fr';
+    var savedLang = G.lang || 'en';
     try { var stored = storageGet('pokeworld_lang'); if (stored) savedLang = stored; } catch(_){}
     window.L.set(savedLang);
     G.lang = savedLang;
@@ -181,6 +187,63 @@ function normalizeLoadedState(){
      G.repeatableQuestsUnlocked = true;
    }
  }
+ repairMissingBoxPokemon(G);
+}
+function repairMissingBoxPokemon(targetG) {
+  const gState = targetG || (typeof G !== 'undefined' ? G : null);
+  if (!gState || !gState.pokedex || !gState.collection || !Array.isArray(gState.team)) return false;
+  let repaired = false;
+  const hasInstance = (nid) => {
+    if (gState.team.some(p => p && Number(p.id) === nid)) return true;
+    if (gState.collection[nid] || gState.collection[String(nid)]) return true;
+    for (const k in gState.collection) {
+      const p = gState.collection[k];
+      if (p && Number(p.id) === nid) return true;
+    }
+    for (const s of (gState.hatchery || [])) {
+      if (s && s.poke && Number(s.poke.id) === nid) return true;
+    }
+    for (const s of (gState.training || [])) {
+      if (s && s.poke && Number(s.poke.id) === nid) return true;
+    }
+    return false;
+  };
+
+  for (const idStr in gState.pokedex) {
+    const entry = gState.pokedex[idStr];
+    const nid = Number(idStr);
+    if (nid > 0 && entry && entry.caught) {
+      if (!hasInstance(nid)) {
+        if (typeof createPoke === 'function') {
+          const isShiny = !!entry.shiny;
+          const restored = createPoke(nid, 5, isShiny);
+          if (restored) {
+            const boxKey = (typeof generateUniqueBoxId === 'function') ? generateUniqueBoxId(nid) : ('box_' + nid + '_' + Date.now() + '_' + Math.floor(Math.random() * 1000));
+            gState.collection[boxKey] = restored;
+            repaired = true;
+          }
+        }
+      }
+    }
+  }
+
+  const allOwnedIds = new Set();
+  gState.team.forEach(p => { if (p && Number(p.id) > 0) allOwnedIds.add(Number(p.id)); });
+  for (const k in gState.collection) {
+    const p = gState.collection[k];
+    if (p && Number(p.id) > 0) allOwnedIds.add(Number(p.id));
+  }
+  (gState.hatchery || []).forEach(s => { if (s && s.poke && Number(s.poke.id) > 0) allOwnedIds.add(Number(s.poke.id)); });
+  (gState.training || []).forEach(s => { if (s && s.poke && Number(s.poke.id) > 0) allOwnedIds.add(Number(s.poke.id)); });
+
+  for (const nid of allOwnedIds) {
+    if (!gState.pokedex[nid] || !gState.pokedex[nid].caught) {
+      gState.pokedex[nid] = { ...(gState.pokedex[nid] || {}), seen: true, caught: true };
+      repaired = true;
+    }
+  }
+
+  return repaired;
 }
 function migrateLegacySingleSave(){
  let changed = false; const normalized = [];
@@ -236,8 +299,10 @@ function openSaveCardContextMenu(id, event){
 }
 function saveDownloadFilename(saveData){
  const meta = ensureSaveMeta(saveData, saveData.saveId || saveData.G?.saveMeta?.id);
- const safeName = String(meta.name || 'pokeworld').toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '') || 'pokeworld';
- return `pokeworld-${safeName}-${meta.id}.json`;
+ const d = new Date();
+ const pad = (n) => String(n).padStart(2, '0');
+ const dateStr = `${d.getFullYear()}_${pad(d.getMonth()+1)}_${pad(d.getDate())}`;
+ return `pokeworld_${meta.id}_${dateStr}.json`;
 }
 function downloadSaveById(id){
  closeSaveCardContextMenu();
@@ -294,7 +359,15 @@ function overwriteSaveFromFile(id, file){
 }
 function deleteSaveById(id){
  closeSaveCardContextMenu();
+ // Panneau de confirmation unifié (pwConfirm) — repli window.confirm si absent.
+ if(typeof pwConfirm === 'function'){
+  pwConfirm(t('save_delete_confirm'), function(){ _deleteSaveByIdConfirmed(id); }, { danger: true, title: '🗑️ ' + (t('delete_save_title') !== 'delete_save_title' ? t('delete_save_title') : ((G && G.lang === 'en') ? 'Delete this save?' : 'Supprimer cette sauvegarde ?')) });
+  return;
+ }
  if(!window.confirm(t('save_delete_confirm'))) return;
+ _deleteSaveByIdConfirmed(id);
+}
+function _deleteSaveByIdConfirmed(id){
  storageRemove(slotKey(id));
  removeSaveFromIndex(id);
  let rawActive = null;
@@ -330,7 +403,7 @@ function renderSaveMenu(){
  setTimeout(updateSaveMenuScrollButtons, 0);
 }
 function hideSaveMenu(){ const screen = document.getElementById('save-menu-screen'); if(screen) screen.classList.remove('is-open'); document.body.classList.remove('save-menu-active'); document.body.classList.add('game-started'); }
-function createFreshGameState(){ let state = null; try{ if(window.PokeWorldState && window.PokeWorldState.createInitialGameState) state = window.PokeWorldState.createInitialGameState(); }catch(_){ } if(!state) state = { location:'pallet', region:'kanto', team:[], inventory:{}, money:2000, badges:[], defeatedChamps:{}, pokedex:{}, stepsLeft:0, starter:false, starterKanto:false, starterJohto:false, regionStarter:{kanto:false,johto:false}, collection:{}, teamSlotItems:[], evolvedSpecies:[], dupeCatches:{}, lang:'fr', storyIdx:0, storyProgress:0, unlockedTalents:{}, activeQuests:[], repeatables:[], visitedMaps:{}, completedQuests:{}, wildWinsByLoc:{}, regionLeagueWon:{}, playTimeMs:0, saveMeta:{} }; const storedLang = storageGet('pokeworld_lang'); if(storedLang) state.lang = storedLang; if(state.playTimeMs == null) state.playTimeMs = 0; return state; }
+function createFreshGameState(){ let state = null; try{ if(window.PokeWorldState && window.PokeWorldState.createInitialGameState) state = window.PokeWorldState.createInitialGameState(); }catch(_){ } if(!state) state = { location:'pallet', region:'kanto', team:[], inventory:{}, money:2000, badges:[], defeatedChamps:{}, pokedex:{}, stepsLeft:0, starter:false, starterKanto:false, starterJohto:false, regionStarter:{kanto:false,johto:false}, collection:{}, teamSlotItems:[], evolvedSpecies:[], dupeCatches:{}, lang:'en', storyIdx:0, storyProgress:0, unlockedTalents:{}, activeQuests:[], repeatables:[], visitedMaps:{}, completedQuests:{}, wildWinsByLoc:{}, regionLeagueWon:{}, playTimeMs:0, saveMeta:{}, tutorial:{ enabled:true, completed:{}, dismissedTips:{}, rewards:{} } }; const storedLang = storageGet('pokeworld_lang'); if(storedLang) state.lang = storedLang; if(state.playTimeMs == null) state.playTimeMs = 0; return state; }
 function assignGlobalState(state){ const target = (typeof G !== 'undefined' && G && typeof G === 'object') ? G : {}; for(const key of Object.keys(target)) delete target[key]; Object.assign(target, state || {}); G = target; if(typeof window !== 'undefined'){ window.G = target; if(window.PokeWorldState) window.PokeWorldState.gameState = target; } if(typeof globalThis !== 'undefined') globalThis.G = target; }
 function resetRuntimeBattleState(){ try{ const fresh = window.PokeWorldBattleState && window.PokeWorldBattleState.createInitialBattleState ? window.PokeWorldBattleState.createInitialBattleState() : null; if(fresh && typeof battle !== 'undefined' && battle){ for(const key of Object.keys(battle)) delete battle[key]; Object.assign(battle, fresh); window.battle = battle; } }catch(_){ } }
 function createNewSaveFromMenu(){
@@ -346,7 +419,7 @@ function saveGame(manual = false) { try { if(typeof afkApplying !== 'undefined' 
 function loadGame(manual = false) { try { const id = currentSaveId || storageGet(ACTIVE_SAVE_ID_KEY); let saveData = id ? readSlot(id) : null; if(!saveData){ const raw = storageGet(SAVE_KEY); saveData = raw ? JSON.parse(raw) : null; } if (!saveData) { if (manual) notify(t('no_save_found'), 'var(--light1)'); return false; } if (!isCompatibleSaveData(saveData) || !hasStarterInState(saveData.G)) { deleteIncompatibleSave('version=' + (saveData && saveData.version)); if (manual) notify(t('save_incompatible_deleted'), 'var(--red)'); return false; } const loadedId = id || saveData.saveId || saveData.G?.saveMeta?.id || uniqueSaveId(); currentSaveId = loadedId; ensureSaveMeta(saveData, loadedId); assignGlobalState(saveData.G); normalizeLoadedState(); const freshData = {version:SAVE_VERSION, timestamp:saveNow(), saveId:currentSaveId, G:JSON.parse(JSON.stringify(G))}; writeSlot(currentSaveId, freshData, true); upsertSaveIndex(freshData); activateCurrentSave(manual); return true; } catch (e) { console.error('[LOAD ERROR]', e); if (manual) notify(tr('load_error_message', {message:e.message}), 'var(--red)'); return false; } }
 function deleteIncompatibleSave(reason) { try { if(currentSaveId){ storageRemove(slotKey(currentSaveId)); removeSaveFromIndex(currentSaveId); } storageRemove(SAVE_KEY); console.warn('[SAVE] Incompatible browser save removed automatically:', reason || 'unknown reason'); return true; } catch (e) { console.error('[SAVE] Unable to remove incompatible save:', e); return false; } }
 function autoSave() { try { if(currentSaveId && window.PokeWorldGameStarted) saveGame(false); } catch (e) { console.error('[AUTOSAVE ERROR]', e); } }
-function exportActiveMultiSave(){ try { if(currentSaveId) saveGame(false); const raw = currentSaveId ? storageGet(slotKey(currentSaveId)) : null; if (!raw) { notify(t('no_save_to_export'), 'var(--red)'); return; } const data = JSON.parse(raw); const meta = ensureSaveMeta(data, currentSaveId); const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); const safeName = String(meta.name || 'pokeworld').toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '') || 'pokeworld'; a.href = url; a.download = `pokeworld-${safeName}-${meta.id}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); notify(t('save_exported'), 'var(--green)'); } catch (e) { console.error('[EXPORT ERROR]', e); notify(t('save_export_error'), 'var(--red)'); } }
+function exportActiveMultiSave(){ try { if(currentSaveId) saveGame(false); const raw = currentSaveId ? storageGet(slotKey(currentSaveId)) : null; if (!raw) { notify(t('no_save_to_export'), 'var(--red)'); return; } const data = JSON.parse(raw); const meta = ensureSaveMeta(data, currentSaveId); const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = saveDownloadFilename(data); document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); notify(t('save_exported'), 'var(--green)'); } catch (e) { console.error('[EXPORT ERROR]', e); notify(t('save_export_error'), 'var(--red)'); } }
 function exportSave(){ exportActiveMultiSave(); }
 function normalizeImportedSave(parsed){ if(!parsed || !parsed.G) return null; const saveData = {version: parsed.version || SAVE_VERSION, timestamp: saveNow(), saveId: parsed.saveId || parsed.G?.saveMeta?.id, G: parsed.G}; if(!isCompatibleSaveData(saveData) || !hasStarterInState(saveData.G)) return null; const id = uniqueSaveId(saveData.saveId || saveData.G?.saveMeta?.id); ensureSaveMeta(saveData, id); saveData.G.saveMeta.id = id; saveData.saveId = id; if(!saveData.G.saveMeta.name) saveData.G.saveMeta.name = importedSaveName(); saveData.G.saveMeta.updatedAt = saveNow(); saveData.G.saveMeta.createdAt = saveData.G.saveMeta.createdAt || saveNow(); return saveData; }
 function importMultiSave(eventOrFile){ const file = eventOrFile && eventOrFile.target ? eventOrFile.target.files && eventOrFile.target.files[0] : eventOrFile; if(!file) return; const reader = new FileReader(); reader.onload = (e) => { try { const imported = normalizeImportedSave(JSON.parse(e.target.result)); if(!imported){ notify(t('save_incompatible_deleted'), 'var(--red)'); return; } writeSlot(imported.saveId, imported, false); upsertSaveIndex(imported); const menuOpen = document.body.classList.contains('save-menu-active') || !window.PokeWorldGameStarted; if(menuOpen){ renderSaveMenu(); notify(t('save_imported_library'), 'var(--green)'); } else { currentSaveId = imported.saveId; storageSet(ACTIVE_SAVE_ID_KEY, currentSaveId); loadGame(true); if(typeof closeSettings === 'function') closeSettings(); notify(t('save_imported_library'), 'var(--green)'); } } catch (err) { console.error('[IMPORT ERROR]', err); notify(tr('save_import_error', {message:err.message}), 'var(--red)'); } finally { if(eventOrFile && eventOrFile.target) eventOrFile.target.value = ''; } }; reader.readAsText(file); }
@@ -376,12 +449,23 @@ function cancelDelete() { const deleteRow = document.getElementById('delete-row'
 function doDelete() { deleteSave(); }
 function resetGame() { confirmDelete(); }
 function getBoxIconOptions(){
+ // Icône de sauvegarde : tous les Pokémon POSSÉDÉS sont éligibles — équipe
+ // active, boîte PC, pension et entraînement (pas besoin de retirer son
+ // favori de l'équipe pour l'utiliser comme icône).
  const out = [];
- for(const key of Object.keys(G?.collection || {})){
-  const p = G.collection[key];
+ const push = (key, p) => {
   const id = Number(p && p.id);
   if(id > 0) out.push({key:String(key).replace(/\\/g,'\\\\').replace(/'/g,"\\'"), id, name:p.name || getPokeName(id), level:p.level || 1, shiny:!!p.shiny});
- }
+ };
+ (G?.team || []).forEach((p, i) => { if(p) push('team' + i, p); });
+ for(const key of Object.keys(G?.collection || {})) push(key, G.collection[key]);
+ (G?.hatchery || []).forEach((s, i) => { if(s && s.poke) push('h' + i, s.poke); });
+ (G?.trainingSlots || []).forEach((s, i) => {
+  if(s && s.uid && typeof findPokemonByTrainingSlot === 'function'){
+   const p = findPokemonByTrainingSlot(s);
+   if(p && !out.some(o => o.id === Number(p.id) && o.level === (p.level || 1) && o.name === (p.name || getPokeName(p.id)))) push('t' + i, p);
+  }
+ });
  out.sort((a,b) => a.name.localeCompare(b.name) || a.level - b.level);
  return out;
 }
@@ -408,6 +492,8 @@ function renderSaveIconGrid(){
  grid.innerHTML = options.map(opt => `<button class="save-icon-choice ${selected===opt.id?'active':''}" data-action="legacy-call" data-call="selectSaveProfileIcon" data-call-args="'${opt.key}',${opt.id}"><span class="save-icon-sprite">${renderSaveIcon(opt.id, 54)}</span><span class="save-icon-name">${escHtml(opt.name)}</span><small>#${opt.id} · ${escHtml(t('lvl_lbl'))}${opt.level}${opt.shiny?' ★':''}</small></button>`).join('');
 }
 function selectSaveProfileIcon(boxKey, pokeId){
+ // boxKey peut désigner la boîte, l'équipe (teamN), la pension (hN) ou
+ // l'entraînement (tN) — l'id d'espèce transmis fait foi.
  const p = G && G.collection ? G.collection[boxKey] : null;
  const id = Number(p && p.id ? p.id : pokeId);
  if(id <= 0) return;
@@ -737,6 +823,7 @@ function migrateSinglePokemon(p, moveData) {
 if (typeof migratePokemonData !== 'undefined' && typeof window !== 'undefined') window.migratePokemonData = migratePokemonData;
 if (typeof migrateSinglePokemon !== 'undefined' && typeof window !== 'undefined') window.migrateSinglePokemon = migrateSinglePokemon;
 
+if (typeof repairMissingBoxPokemon !== 'undefined' && typeof window !== 'undefined') window.repairMissingBoxPokemon = repairMissingBoxPokemon;
 if (typeof loadGame !== 'undefined' && typeof window !== 'undefined') window.loadGame = loadGame;
 if (typeof autoSave !== 'undefined' && typeof window !== 'undefined') window.autoSave = autoSave;
 if (typeof exportSave !== 'undefined' && typeof window !== 'undefined') window.exportSave = exportSave;
@@ -764,3 +851,4 @@ if (typeof selectSaveProfileIcon !== 'undefined' && typeof window !== 'undefined
 if (typeof openSaveIconBoxSelector !== 'undefined' && typeof window !== 'undefined') window.openSaveIconBoxSelector = openSaveIconBoxSelector;
 if (typeof getCurrentSaveId !== 'undefined' && typeof window !== 'undefined') window.getCurrentSaveId = getCurrentSaveId;
 if (typeof formatPlayTime !== 'undefined' && typeof window !== 'undefined') window.formatPlayTime = formatPlayTime;
+

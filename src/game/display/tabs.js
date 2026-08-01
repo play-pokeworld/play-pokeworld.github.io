@@ -33,3 +33,4 @@ function showTab(tab){
 // --- Migrated to ES module, globals exposed ---
 if (typeof showTab !== 'undefined' && typeof window !== 'undefined') window.showTab = showTab;
 
+

@@ -9,3 +9,4 @@ const HTML_ENTITIES = {
 export function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (char) => HTML_ENTITIES[char]);
 }
+

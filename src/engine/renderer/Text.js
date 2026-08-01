@@ -72,3 +72,4 @@ window.PokeText = Text;
 if (!window.poke) window.poke = {};
 window.poke.Text = Text;
 })();
+

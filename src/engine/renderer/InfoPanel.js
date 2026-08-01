@@ -362,3 +362,4 @@ class PokemonInfoPanel extends InfoPanel {
 window.PokemonInfoPanel = PokemonInfoPanel;
 
 })();
+

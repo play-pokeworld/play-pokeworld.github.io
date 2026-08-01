@@ -173,3 +173,4 @@ if (typeof openMineManagementMenu !== 'undefined' && typeof window !== 'undefine
 if (typeof renderMineWindow !== 'undefined' && typeof window !== 'undefined') window.renderMineWindow = renderMineWindow;
 if (typeof renderMine !== 'undefined' && typeof window !== 'undefined') window.renderMine = renderMine;
 
+

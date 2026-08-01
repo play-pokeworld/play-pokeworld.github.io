@@ -312,3 +312,4 @@ const esc = (s) => s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
   writeFileSync(path, src);
   console.log(`talents-full.js : ${n} infos réparées`);
 }
+

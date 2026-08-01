@@ -21,3 +21,4 @@ window.L_fr_types = {
   "steel": "Acier",
   "fairy": "Fée"
 };
+

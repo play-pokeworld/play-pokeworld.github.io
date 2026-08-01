@@ -1,6 +1,7 @@
 export const MARKET_STOCK = {
   kanto: [1, 4, 7, 25, 63, 92, 123, 137],
   johto: [152, 155, 158, 172, 179, 196, 197, 246],
+  hoenn: [252, 255, 258, 298, 351],
 };
 
 const PRICE_OVERRIDES = {
@@ -30,3 +31,4 @@ export function getPokemonPrice(id, pokemonData = {}) {
   const rarityMultiplier = total >= 600 ? 650 : total >= 500 ? 520 : 360;
   return Math.max(80000, Math.round(total * rarityMultiplier));
 }
+

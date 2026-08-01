@@ -44,15 +44,19 @@ function rollCaptureIv(caughtMon){
 }
 
 function attemptAutoCatch(e){
- const wasShiny = !!(e.shinyActive || e.shiny);
+ // Shiny : roll UNIQUEMENT à la capture (pas à l'apparition sur la route).
+ // Exception : déjà shiny forcé (quête / légendaire opts.shiny / skin déjà shiny).
+ const forcedShiny = !!(e && (e.shinyActive || e.shiny || e._forceShiny));
+ const rolledShiny = forcedShiny ? true : (typeof rollShiny === 'function' ? !!rollShiny(e.id) : false);
+ const wasShiny = forcedShiny || rolledShiny;
  if(!wasShiny && !battle.legendaryCatch && !chance(10)){
  addBattleLog(tr("m.catch.7", {p0:e.name}));
  return;
  }
  addBattleLog(tr("m.catch.6", {p0:e.name}));
  G.pokedex[e.id]={...(G.pokedex[e.id]||{}),seen:true,caught:true};
- if(wasShiny) unlockShinyForSpecies(e.id);
  const alreadyOwned=speciesOwned(e.id);
+ if(wasShiny) unlockShinyForSpecies(e.id);
  const caughtMon = createPoke(e.id, 1, wasShiny || isSpeciesShiny(e.id));
  if(caughtMon){
    const rolledTalent = rollWeightedTalentForSpecies(e.id);
@@ -79,25 +83,26 @@ function attemptAutoCatch(e){
    G.dupeCatches[e.id]=(G.dupeCatches[e.id]||0)+1;
    if(wasShiny) addBattleLog(tr("m.catch.5", {p0:e.name}));
    addBattleLog(tr('capture_duplicate_no_money', {name:e.name}));
- } else {
-   if(speciesOwned(e.id)){
-     addBattleLog(tr('capture_duplicate_no_money', {name:e.name}));
-   } else if(caughtMon){
-     if(G.team.length < 6){
-       G.team.push(caughtMon);
-       addBattleLog(tr("m.catch.2", {p0:e.name}));
-     } else {
-       let boxId = 'box_' + e.id + '_' + Date.now();
-       while(G.collection[boxId]) boxId = 'box_' + e.id + '_' + Date.now() + Math.floor(Math.random()*1000);
-       G.collection[boxId] = caughtMon;
-       addBattleLog(tr("m.catch.1", {p0:e.name}));
-     }
+ } else if(caughtMon){
+   if(G.team.length < 6){
+     G.team.push(caughtMon);
+     addBattleLog(tr("m.catch.2", {p0:e.name}));
+   } else {
+     let boxId = (typeof generateUniqueBoxId === 'function') ? generateUniqueBoxId(e.id) : ('box_' + e.id + '_' + Date.now());
+     while(G.collection[boxId]) boxId = 'box_' + e.id + '_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+     G.collection[boxId] = caughtMon;
+     addBattleLog(tr("m.catch.1", {p0:e.name}));
    }
  }
  if(G.mine) G.mine.energy = Math.min(G.mine.maxEnergy||100, (G.mine.energy||0) + 15);
  EventBus.emit(EVENTS.POKEMON_CAUGHT, { loc: G.location });
+ try{ if(typeof syncShinyCharmProgress === 'function') syncShinyCharmProgress(); }catch(_){}
  updateHeader();
  try{ if(typeof refreshMapAndLoc==='function') refreshMapAndLoc(); }catch(_){}
+ try{
+   const el = document.getElementById('location-info-panel') || document.getElementById('tab-content');
+   if(el && typeof renderLocInfo === 'function') renderLocInfo(el);
+ }catch(_){}
  try{ renderBattleTeamRow(); }catch(_){}
  try{ if(typeof _activeTab !== 'undefined' && _activeTab === 'team') showTab('team'); }catch(_){}
  try{ if(typeof _activeTab !== 'undefined' && _activeTab === 'box') showTab('box'); }catch(_){}
@@ -110,4 +115,5 @@ if (typeof rollWeightedTalentForSpecies !== 'undefined' && typeof window !== 'un
 if (typeof unlockCapturedTalent !== 'undefined' && typeof window !== 'undefined') window.unlockCapturedTalent = unlockCapturedTalent;
 if (typeof rollCaptureIv !== 'undefined' && typeof window !== 'undefined') window.rollCaptureIv = rollCaptureIv;
 if (typeof attemptAutoCatch !== 'undefined' && typeof window !== 'undefined') window.attemptAutoCatch = attemptAutoCatch;
+
 

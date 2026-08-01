@@ -852,3 +852,380 @@ button[data-action] {
   border-bottom-width: 2px;
   border-radius: 12px 12px 10px 10px;
 }
+
+/* ═══ UNIVERSAL CONTRAST & VISIBILITY SYSTEM ═════════════════════════════
+   Guarantees that no text is ever invisible, dark-on-dark, or light-on-light
+   across all cards, lists, item descriptions, and buttons (default/hover/active). */
+
+/* 1. Item lists, cards, and option rows (default & hover states) */
+/* NB : .save-slot est EXCLU — les cartes de sauvegarde portent leur propre
+   fond thématique (save-bg-classic/emerald/…) qui doit rester visible dans
+   l'aperçu des paramètres comme dans le menu des sauvegardes. */
+.inv-item, .shop-item, .pw-choice-card, .pw-starter-chosen, .pw-starter-card,
+.pw-fossil-card, .dict-entry, .box-card, .usm-item, .preset-row,
+.box-move-card, .pw-card-dark, .pw-card-bordered, .tutorial-step, .guide-card,
+.training-mode-row {
+  background: rgba(0, 0, 0, 0.28) !important;
+  border: 1px solid var(--pw-border) !important;
+  color: var(--light2) !important;
+}
+
+.inv-item:hover, .shop-item:hover, .pw-choice-card:hover, .pw-starter-chosen:hover,
+.pw-starter-card:hover, .pw-fossil-card:hover, .dict-entry:hover, .box-card:hover,
+.usm-item:hover, .preset-row:hover, .box-move-card:hover,
+.tutorial-step:hover, .guide-card:hover, .training-mode-row:hover {
+  background: rgba(236, 222, 183, 0.15) !important;
+  border-color: var(--light2) !important;
+  color: var(--light2) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+/* Cartes de sauvegarde : lisibilité conservée sans écraser le fond thématique */
+.save-slot { border: 1px solid var(--pw-border); color: #fff; }
+.save-slot:hover { border-color: var(--light2); transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35); }
+
+/* 2. Title & main text in cards always bright cream (#ECDEB7) */
+.inv-name, .pw-manage-name, .pw-choice-title, .shop-item b, .dict-entry b,
+.pw-starter-chosen-label, .pw-info-name, .save-slot-name, .preset-name {
+  color: var(--light2) !important;
+  font-weight: 700;
+}
+
+/* 3. Subtitles, descriptions, stock, and secondary text always readable gold (#c9bc8a)
+      Never allow --dark3 text on dark backgrounds */
+.pw-choice-sub, .pw-choice-desc, .pw-manage-sub, .pw-manage-desc, .shop-desc,
+.loc-sub, .dict-desc, .dict-entry span, .hp-text, .pw-info-value, .pw-text-sm,
+.pw-src-line, .extracted-template-style-219, .extracted-template-style-220,
+.extracted-template-style-241, .save-slot-id, .save-slot-stats small,
+.dict-muted, .pw-light1 {
+  color: #c9bc8a !important;
+}
+
+/* 4. Badges, counts, and chips */
+.pw-src-line, .pw-drop-chip, .pw-loc-roaming, .dict-chip {
+  background: rgba(0, 0, 0, 0.45) !important;
+  border: 1px solid var(--pw-border) !important;
+  color: var(--light2) !important;
+}
+
+/* 5. Buttons & Toggles: default, hover, and active/toggled contrast */
+.hbtn, .pw-btn, .poke-btn, .mob-btn, .tab, .inv-tab, .dict-tab,
+.shortcut-action-btn, .mine-tool-btn, .save-icon-choice, .btn,
+button[data-action], .pw-btn-toggle, .toggle {
+  color: var(--light2);
+}
+
+.hbtn:hover, .pw-btn:hover, .poke-btn:hover, .mob-btn:hover, .tab:hover,
+.inv-tab:hover, .dict-tab:hover, .shortcut-action-btn:hover,
+.mine-tool-btn:hover, .save-icon-choice:hover, .pw-btn-toggle:hover, .toggle:hover {
+  filter: brightness(1.15);
+  color: var(--light2);
+}
+
+/* Light background active buttons MUST use dark text (#36342F) */
+.hbtn.active, .hbtn.is-active,
+.tab.active, .inv-tab.active, .dict-tab.active,
+.mob-btn[aria-current="true"], .poke-btn.is-active,
+.save-icon-choice.active, .mine-tool-btn.active,
+.shortcut-action-btn.active, .pw-btn-toggle.active,
+.toggle.active, .usm-sort-btn.active, .dict-chip.active {
+  background: var(--light2) !important;
+  color: var(--dark1) !important;
+  border-color: var(--light2) !important;
+}
+
+.hbtn.active *, .hbtn.is-active *,
+.tab.active *, .inv-tab.active *, .dict-tab.active *,
+.mob-btn[aria-current="true"] *, .poke-btn.is-active *,
+.save-icon-choice.active *, .mine-tool-btn.active *,
+.shortcut-action-btn.active *, .pw-btn-toggle.active *,
+.toggle.active *, .usm-sort-btn.active *, .dict-chip.active * {
+  color: var(--dark1) !important;
+}
+
+/* Colored toggle buttons (green/yellow/purple/blue/red) text contrast */
+.hatchery-mode-toggle.is-exp,
+.hatchery-mode-toggle.is-breed,
+.hatchery-priority-toggle.is-pokemon,
+.automation-toggle-btn.active,
+.quest-claim-btn {
+  color: var(--dark1) !important;
+  font-weight: 900;
+}
+.hatchery-priority-toggle.is-fossil,
+.pw-btn-danger {
+  color: #ffffff !important;
+  font-weight: 900;
+}
+
+/* 6. Location action button icons (Explorer, Boutique, Arènes) & SVG contrast */
+.action-btn, .loc-action-btn, .loc-shop-btn, .loc-gym-btn, .quest-battle-btn {
+  background: rgba(0, 0, 0, 0.45) !important;
+  border: 1px solid var(--pw-border) !important;
+  color: var(--light2) !important;
+}
+.action-btn:hover, .loc-action-btn:hover, .loc-shop-btn:hover, .loc-gym-btn:hover, .quest-battle-btn:hover {
+  background: rgba(236, 222, 183, 0.18) !important;
+  border-color: var(--light2) !important;
+  color: var(--light2) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+.action-btn .ab-label, .loc-action-btn .ab-label {
+  color: var(--light2) !important;
+  font-weight: 700;
+}
+.action-btn .ab-icon, .loc-action-btn .ab-icon, .action-btn .ui-icon, .loc-action-btn .ui-icon,
+.action-btn svg, .loc-action-btn svg {
+  color: var(--light2) !important;
+  stroke: var(--light2) !important;
+  fill: none !important;
+  opacity: 1 !important;
+}
+
+/* 7. NPC Dialogue purple buttons (#location-info-panel) stay purple on hover */
+.loc-npc-btn, .action-btn.pw-badge-purple, .loc-action-btn.pw-badge-purple {
+  background: rgba(156, 39, 176, 0.45) !important;
+  border: 1px solid #c058eb !important;
+  color: #ffffff !important;
+}
+.loc-npc-btn:hover, .action-btn.pw-badge-purple:hover, .loc-action-btn.pw-badge-purple:hover {
+  background: rgba(156, 39, 176, 0.75) !important;
+  border-color: #e886ff !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.55) !important;
+}
+.loc-npc-btn .ab-icon, .loc-npc-btn .ab-icon svg, .loc-npc-btn .ab-label,
+.loc-npc-btn .ui-icon, .loc-npc-btn .ui-icon svg,
+.action-btn.pw-badge-purple .ab-icon, .action-btn.pw-badge-purple .ab-icon svg,
+.action-btn.pw-badge-purple .ab-label {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* 8. Pokémon Protect/Favorite/Lock Toggles in #poke-modal */
+.poke-protect-btn.is-on {
+  background: linear-gradient(135deg, var(--yellow, #ffd54f), #e6c84c) !important;
+  color: var(--dark1) !important;
+  border-color: var(--yellow, #ffd54f) !important;
+  font-weight: 900;
+  box-shadow: 0 0 10px rgba(255, 213, 79, 0.4);
+}
+.poke-protect-btn.is-on * {
+  color: var(--dark1) !important;
+}
+.poke-protect-btn.is-locked {
+  background: linear-gradient(135deg, var(--blue, #42a5f5), #1976d2) !important;
+  color: #ffffff !important;
+  border-color: var(--blue, #42a5f5) !important;
+  font-weight: 900;
+  box-shadow: 0 0 10px rgba(66, 165, 245, 0.4);
+}
+.poke-protect-btn.is-locked * {
+  color: #ffffff !important;
+}
+
+
+
+/* ─── Explorations secrètes : même langage visuel que les panneaux du jeu ─── */
+#poke-modal.pw-puzzle-modal #poke-modal-inner,
+#poke-modal.preset-editor-modal #poke-modal-inner {
+  max-width: min(560px, 96vw);
+  width: 100%;
+  background: var(--dark2, #1a1a22);
+  border: 1px solid var(--pw-border, rgba(236,222,183,0.18));
+  border-radius: 14px;
+  box-shadow: 0 18px 48px rgba(0,0,0,0.55);
+  padding: 0;
+  overflow: hidden;
+}
+.pw-puzzle-shell { display: flex; flex-direction: column; max-height: min(82vh, 720px); }
+.pw-puzzle-shell .modal-title {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 14px 16px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent);
+  border-bottom: 1px solid var(--pw-border, rgba(236,222,183,0.14));
+  font-weight: 800; font-size: 15px;
+}
+.pw-puzzle-body { padding: 14px 16px 8px; overflow: auto; flex: 1; }
+.pw-puzzle-summary {
+  font-size: 13px; line-height: 1.5; color: var(--light1, #c9bc8a);
+  margin-bottom: 12px;
+}
+.pw-puzzle-inscribe {
+  padding: 12px 14px; margin-bottom: 12px;
+  background: rgba(0,0,0,0.28);
+  border: 1px solid var(--pw-border, rgba(236,222,183,0.12));
+  border-radius: 10px;
+  font-size: 13px; line-height: 1.55; white-space: pre-wrap;
+  color: var(--light2, #ece2b7);
+}
+.pw-puzzle-inscribe-label {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--light1, #c9bc8a); margin-bottom: 6px;
+}
+.pw-puzzle-braille {
+  text-align: center; font-size: 30px; letter-spacing: 10px;
+  margin: 10px 0 14px; padding: 14px;
+  background: rgba(0,0,0,0.35);
+  border-radius: 10px; border: 1px dashed var(--pw-border, rgba(236,222,183,0.2));
+}
+.pw-puzzle-seq-btns { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 4px; }
+.pw-puzzle-seq-btns .hbtn {
+  min-width: 72px; min-height: 40px;
+  background: rgba(0,0,0,0.28) !important;
+  border: 1px solid var(--pw-border, rgba(236,222,183,0.16)) !important;
+}
+.pw-puzzle-seq-btns .hbtn:hover { border-color: rgba(255,213,79,0.45) !important; }
+.pw-puzzle-progress {
+  min-height: 1.3em; font-size: 12.5px; color: var(--light1);
+  margin: 6px 0 10px; letter-spacing: 0.02em;
+}
+.pw-puzzle-input {
+  width: 100%; box-sizing: border-box;
+  margin: 6px 0 10px; padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--pw-border, rgba(236,222,183,0.18));
+  background: rgba(0,0,0,0.32);
+  color: var(--light2, #ece2b7);
+  font-size: 15px; font-family: inherit;
+}
+.pw-puzzle-actions {
+  display: flex; gap: 8px; justify-content: flex-end;
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--pw-border, rgba(236,222,183,0.12));
+  background: rgba(0,0,0,0.15);
+}
+.pw-puzzle-wait-bar {
+  height: 10px; background: rgba(0,0,0,0.45); border-radius: 999px;
+  overflow: hidden; margin: 10px 0;
+}
+.pw-puzzle-wait-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, #4fc3f7, #81c784);
+  transition: width 0.2s linear;
+}
+/* Liste d'énigmes dans le panneau plein écran */
+.pw-puzzle-list-hint {
+  font-size: 12.5px; color: var(--light1); margin-bottom: 12px; line-height: 1.45;
+}
+.pw-puzzle-card {
+  margin: 8px 0; padding: 12px 14px;
+  border: 1px solid var(--pw-border, rgba(236,222,183,0.14));
+  border-radius: 12px;
+  background: rgba(0,0,0,0.22);
+}
+.pw-puzzle-card-title { font-weight: 800; font-size: 14px; margin-bottom: 4px; }
+.pw-puzzle-card-sum { font-size: 12.5px; color: var(--light1); line-height: 1.4; }
+
+/* ═══ SLOTS D'ENTRAÎNEMENT — COULEUR PAR MODE (feuille de route) ═════════════
+   Une couleur dédiée par bouton d'entraînement, pour les reconnaître
+   instantanément. Les états hover conservent la teinte du mode (renforcée)
+   au lieu du hover crème générique. Ces règles arrivent après le système de
+   contraste universel et le surclassent volontairement (!important). */
+
+/* Capacités — bleu */
+.training-mode-row.training-mode--move {
+  background: linear-gradient(135deg, rgba(92, 200, 255, .22), rgba(0, 0, 0, .30)) !important;
+  border-color: #5cc8ff !important;
+}
+.training-mode-row.training-mode--move:hover {
+  background: linear-gradient(135deg, rgba(92, 200, 255, .38), rgba(0, 0, 0, .25)) !important;
+  border-color: #8ddaff !important;
+  box-shadow: 0 4px 12px rgba(92, 200, 255, .30);
+}
+
+/* Talents — violet */
+.training-mode-row.training-mode--talent {
+  background: linear-gradient(135deg, rgba(214, 140, 255, .22), rgba(0, 0, 0, .30)) !important;
+  border-color: #d68cff !important;
+}
+.training-mode-row.training-mode--talent:hover {
+  background: linear-gradient(135deg, rgba(214, 140, 255, .38), rgba(0, 0, 0, .25)) !important;
+  border-color: #e5b3ff !important;
+  box-shadow: 0 4px 12px rgba(214, 140, 255, .30);
+}
+
+/* EV — vert */
+.training-mode-row.training-mode--ev {
+  background: linear-gradient(135deg, rgba(96, 190, 88, .24), rgba(0, 0, 0, .30)) !important;
+  border-color: #60be58 !important;
+}
+.training-mode-row.training-mode--ev:hover {
+  background: linear-gradient(135deg, rgba(96, 190, 88, .40), rgba(0, 0, 0, .25)) !important;
+  border-color: #8ad683 !important;
+  box-shadow: 0 4px 12px rgba(96, 190, 88, .30);
+}
+
+/* Talent caché — orange */
+.training-mode-row.training-mode--hidden {
+  background: linear-gradient(135deg, rgba(251, 166, 76, .24), rgba(0, 0, 0, .30)) !important;
+  border-color: #fba64c !important;
+}
+.training-mode-row.training-mode--hidden:hover {
+  background: linear-gradient(135deg, rgba(251, 166, 76, .40), rgba(0, 0, 0, .25)) !important;
+  border-color: #ffc383 !important;
+  box-shadow: 0 4px 12px rgba(251, 166, 76, .30);
+}
+
+/* Niveaux — jaune */
+.training-mode-row.training-mode--level {
+  background: linear-gradient(135deg, rgba(242, 217, 78, .22), rgba(0, 0, 0, .30)) !important;
+  border-color: #f2d94e !important;
+}
+.training-mode-row.training-mode--level:hover {
+  background: linear-gradient(135deg, rgba(242, 217, 78, .38), rgba(0, 0, 0, .25)) !important;
+  border-color: #f8e88a !important;
+  box-shadow: 0 4px 12px rgba(242, 217, 78, .30);
+}
+
+/* États désactivés : teinte conservée mais assourdie, pas de hover. */
+.training-mode-row[class*="training-mode--"].is-disabled {
+  opacity: .45;
+  filter: grayscale(.35);
+  box-shadow: none;
+}
+.training-mode-row[class*="training-mode--"].is-disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* ═══ PANNEAU DE CONFIRMATION UNIFIÉ (#confirm-modal / pwConfirm) ══════════
+   Même charte que les autres modales (dark2, bordure dark3, radius 12px). */
+.pw-confirm-title {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--light2);
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--dark3);
+}
+.pw-confirm-msg {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--light1);
+  margin-bottom: 4px;
+  white-space: normal;
+}
+/* Action destructive (déménagement de base, suppression…) : bouton rouge. */
+#confirm-yes.pw-confirm-danger {
+  background: linear-gradient(135deg, rgba(211, 66, 95, 0.9), rgba(160, 40, 66, 0.95)) !important;
+  border-color: #d3425f !important;
+  color: #fff !important;
+  font-weight: 900;
+}
+#confirm-yes.pw-confirm-danger:hover {
+  background: linear-gradient(135deg, rgba(226, 90, 116, 0.95), rgba(180, 52, 78, 1)) !important;
+  border-color: #e25a74 !important;
+  box-shadow: 0 4px 12px rgba(211, 66, 95, 0.35);
+}
+
+/* ═══ CONFIRMATION TOUJOURS AU PREMIER PLAN ════════════════════════════════
+   #confirm-modal était à z-index 700 : il passait DERRIÈRE le menu des
+   sauvegardes (20000) et la fiche Pokémon en avant-plan (31000) — la
+   confirmation de suppression était invisible. Le panneau de confirmation
+   est par nature la couche la plus haute de l'UI : au-dessus de tout sauf
+   des notifications (#notif à 99999). */
+#confirm-modal { z-index: 50000 !important; }

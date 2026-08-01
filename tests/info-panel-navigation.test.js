@@ -265,3 +265,4 @@ test('les pilules d\'attaque des cartes équipe/combat passent le contexte -1', 
   // Les lignes de la FICHE gardent leur idx (comportement validé par l'utilisateur)
   assert.ok(POKE_MODAL.includes("ctxMoveArgs"), 'fiche : contexte idx conservé');
 });
+

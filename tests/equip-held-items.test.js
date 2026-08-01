@@ -128,3 +128,4 @@ test('getHeldBuff : choice_band/stat+mult actifs (branche morte réparée), prin
   const buff2 = sb.getHeldBuff(sb.G.team[0]);
   assert.ok(Math.abs(buff2.def - 0.25 * (3 / 25)) < 1e-9, `Baie Prine ×3 → +3% DEF, reçu ${buff2.def}`);
 });
+

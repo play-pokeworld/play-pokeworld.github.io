@@ -1,5 +1,7 @@
 const MINE_W = 10;
 const MINE_H = 8;
+// Pierres d'évolution = exclusives Mine (retirées des boutiques).
+// Fossiles + trésors + quelques objets d'évolution tenus rares.
 const MINE_ITEMS = [
  {key:'firestone', name:'firestone', shape:[[1,1,1],[1,1,1],[1,1,1]]},
  {key:'waterstone', name:'waterstone', shape:[[1,1,1],[1,1,1],[1,1,0]]},
@@ -9,13 +11,20 @@ const MINE_ITEMS = [
  {key:'sunstone', name:'sunstone', shape:[[1,0,1],[0,1,0],[1,0,1]]},
  {key:'nugget', name:'nugget', shape:[[1,1,1],[1,1,1]]},
  {key:'stardust', name:'stardust', shape:[[1,1],[1,1]]},
- 
  {key:'helix_fossil', name:'helix_fossil', shape:[[0,1,1,0],[1,1,1,1],[1,1,1,1],[0,1,1,0]]},
  {key:'dome_fossil', name:'dome_fossil', shape:[[1,1,1],[1,1,1],[0,1,0]]},
  {key:'old_amber', name:'old_amber', shape:[[1,1],[1,1],[1,1]]},
  {key:'root_fossil', name:'root_fossil', shape:[[1,1,0],[1,1,1],[0,1,1]]},
  {key:'claw_fossil', name:'claw_fossil', shape:[[1,0,1],[1,1,1],[1,0,1]]},
  {key:'fossil', name:'fossil', shape:[[0,1,1,0],[1,1,1,1],[1,1,1,1],[0,1,1,0]]},
+ // Objets d'évolution tenus (rares) — alternative aux drops de donjon
+ {key:'kings_rock', name:'kings_rock', shape:[[0,1,0],[1,1,1],[0,1,0]]},
+ {key:'metal_coat', name:'metal_coat', shape:[[1,1,1],[1,0,1],[1,1,1]]},
+ {key:'dragon_scale', name:'dragon_scale', shape:[[0,1,1],[1,1,0],[0,1,1]]},
+ {key:'upgrade', name:'upgrade', shape:[[1,1],[1,1],[1,1]]},
+ {key:'deep_sea_tooth', name:'deep_sea_tooth', shape:[[1,0],[1,1],[0,1]]},
+ {key:'deep_sea_scale', name:'deep_sea_scale', shape:[[0,1],[1,1],[1,0]]},
+ {key:'prism_scale', name:'prism_scale', shape:[[0,1,0],[1,1,1],[0,1,0]]},
 ];
 
 function initMineIfNeeded(){
@@ -210,15 +219,16 @@ function generateMineLayer(){
  const occupied = Array.from({length: MINE_H}, () => Array(MINE_W).fill(false));
 
  
- const region = (G && G.region) ? G.region : 'kanto';
- 
- 
- const johtoVisited = (region === 'johto') || (G.regionStarter && G.regionStarter.johto) ||
- (G.badges && G.badges.length >= 8) ||
- (G.visitedMaps && (G.visitedMaps.newbark || G.visitedMaps.jroute29));
- const minePool = MINE_ITEMS.filter(it=>{
- if(!johtoVisited && (it.key==='root_fossil' || it.key==='claw_fossil')) return false;
- return true;
+  const region = (G && G.region) ? G.region : 'kanto';
+ const hoennUnlocked = !!(typeof G !== 'undefined' && G && (
+   G.region === 'hoenn' ||
+   (G.mainStep && (G.mainStep.hoenn > 0)) ||
+   (G.completedQuests && (G.completedQuests[201] || G.completedQuests['201'])) ||
+   (G.visitedMaps && (G.visitedMaps.rustboro || G.visitedMaps.route104 || G.visitedMaps.petalburg || G.visitedMaps.mauville))
+ ));
+ const minePool = MINE_ITEMS.filter(it => {
+   if (!hoennUnlocked && (it.key === 'root_fossil' || it.key === 'claw_fossil')) return false;
+   return true;
  });
  for(let i=0; i<numItems; i++){
  const tmpl = minePool[rand(0, minePool.length - 1)];
@@ -319,6 +329,13 @@ function digMineTile(tx, ty, silent=false){
 
 
 // --- Migrated to ES module, globals exposed ---
+function getMineMaxEnergy() {
+  const base = (G.mine && G.mine.maxEnergy) ? G.mine.maxEnergy : 100;
+  const bonusPct = (typeof getSecretBaseBonuses === 'function') ? (getSecretBaseBonuses().mineBonus || 0) : 0;
+  return Math.round(base * (1 + bonusPct / 100));
+}
+
+if (typeof getMineMaxEnergy !== 'undefined' && typeof window !== 'undefined') window.getMineMaxEnergy = getMineMaxEnergy;
 if (typeof MINE_ITEMS !== 'undefined' && typeof window !== 'undefined') window.MINE_ITEMS = MINE_ITEMS;
 if (typeof initMineIfNeeded !== 'undefined' && typeof window !== 'undefined') window.initMineIfNeeded = initMineIfNeeded;
 if (typeof generateMineLayer !== 'undefined' && typeof window !== 'undefined') window.generateMineLayer = generateMineLayer;
@@ -335,4 +352,5 @@ if (typeof getMineEnergyUpgradeCost !== 'undefined' && typeof window !== 'undefi
 if (typeof upgradeMineEnergy !== 'undefined' && typeof window !== 'undefined') window.upgradeMineEnergy = upgradeMineEnergy;
 if (typeof startMineAutomationTicker !== 'undefined' && typeof window !== 'undefined') window.startMineAutomationTicker = startMineAutomationTicker;
 if (typeof simulateAfkMineAutomation !== 'undefined' && typeof window !== 'undefined') window.simulateAfkMineAutomation = simulateAfkMineAutomation;
+
 

@@ -7,6 +7,11 @@ Sources used (ordre de priorité demandé) :
 3. Poképédia            — carte de Paldea (absente de Pokéclicker : « NO MAP YET »).
 4. PokeAPI sprites      — Pokémon et objets.
 Generated fallback PNGs are created only when an upstream asset does not exist.
+
+Bases secrètes (2D Émeraude uniquement) — voir download_base_assets() :
+5. pret/pokeemerald      — sprites 2D officiels GBA des décorations.
+6. Serebii / objgfx      — icônes et objets 2D (repli).
+La Base Secrète 3D a été retirée du projet.
 """
 from __future__ import annotations
 
@@ -127,7 +132,7 @@ def write_download(url: str, out: Path) -> bool:
 def parse_sprite_entries() -> list[tuple[str, int, Path]]:
     text = SPRITES.read_text(encoding='utf-8')
     entries: list[tuple[str, int, Path]] = []
-    for bucket in ['front', 'back', 'frontShiny', 'backShiny']:
+    for bucket in ['front', 'frontShiny']:
         m = re.search(rf'\s{bucket}: \{{([\s\S]*?)\n \}}', text)
         if not m:
             continue
@@ -271,6 +276,37 @@ def make_unknown_item() -> None:
         make_placeholder(out, '?', (64, 64))
 
 
+
+def download_base_assets() -> None:
+    """Bases secrètes — assets 2D Émeraude (pret/pokeemerald)."""
+    import shutil
+    import subprocess
+    import sys
+
+    py = sys.executable or 'python3'
+    node = shutil.which('node')
+    steps = [
+        ('réparation RSE', [py, 'tools/repair-emerald-ref.py', '--force']),
+        ('staging objgfx', [py, 'tools/fetch-objgfx.py']),
+    ]
+    if node:
+        steps.append(('2D Émeraude fetch', [node, 'tools/fetch-base2d.mjs']))
+    steps.extend([
+        ('2D Émeraude décor fullsize', [py, 'tools/bake-emerald-bgs.py', '--bake-decor-all']),
+        ('2D Émeraude canon', [py, 'tools/bake-emerald-bgs.py', '--bake-canon']),
+        ('2D Émeraude layouts', [py, 'tools/bake-emerald-bgs.py', '--bake-layouts']),
+        ('2D Émeraude custom', [py, 'tools/bake-emerald-bgs.py', '--bake-custom']),
+        ('2D transparence', [py, 'tools/fix-emerald-alpha.py']),
+    ])
+    for label, cmd in steps:
+        try:
+            res = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, timeout=120)
+            tail = (res.stdout.strip().splitlines() or [''])[-3:]
+            print(f'base assets [{label}]: ' + ' | '.join(tail[-2:]))
+        except Exception as exc:
+            print(f'base assets [{label}]: ignoré ({exc})')
+
+
 def main() -> None:
     started = time.time()
     jobs: list[tuple[str, Path, str]] = []
@@ -311,6 +347,13 @@ def main() -> None:
             else:
                 make_placeholder(out, key[:2].upper(), (40, 40), '#524f48')
 
+    # Passe 50 (retour utilisateur « il manque tous les sprites des CT ») :
+    # les VRAIES disquettes PokeChill sont téléchargées par
+    # download_item_overrides() ci-dessous. On ne cuit donc un placeholder que
+    # si le téléchargement a échoué — sinon la pastille grise gagnait la course
+    # et write_download(), qui ne remplace jamais un fichier existant, ne
+    # rapatriait plus jamais la vraie disquette.
+    download_item_overrides()
     for typ, color in TYPE_COLORS.items():
         out = ROOT / f'src/assets/images/items/tm_{typ}.png'
         if not out.exists():
@@ -325,8 +368,15 @@ def main() -> None:
     download_region_maps()
     download_backgrounds()
     make_backgrounds()  # repli généré uniquement si un téléchargement a échoué
-    download_item_overrides()  # sprites d'objets à source imposée (PokeChill/Pokéclicker)
+    download_item_overrides()  # (idempotent) sprites à source imposée
     make_unknown_item()
+    download_base_assets()  # bases secrètes : 2D Émeraude (passe 33/34)
+    for helper_script in ['tools/repair-fonts.py', 'tools/repair-tm-sprites.py', 'tools/fetch-item-sprites.py', 'tools/fix_missing_assets.py']:
+        try:
+            import subprocess, sys
+            subprocess.run([sys.executable or 'python3', helper_script], cwd=ROOT, timeout=120)
+        except Exception as e:
+            print(f'{helper_script}: ignoré ({e})')
 
     existing = sum(1 for p in (ROOT / 'src/assets/images').rglob('*') if p.is_file())
     print(f'Downloaded/existing assets: {ok}/{len(jobs)} upstream jobs')
@@ -337,3 +387,4 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
+

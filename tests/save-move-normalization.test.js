@@ -313,3 +313,4 @@ test('le champ learnableMoves (variante) est normalisé aussi', () => {
   assert.ok(p.learnableMoves.includes('quick_attack'), 'niveau manquant ajouté');
   assert.ok(p.learnableMoves.includes('thunderbolt'));
 });
+

@@ -1,6 +1,6 @@
 function pickWildEncounter(loc, roamingId){
  if(roamingId && Math.random() < 0.01){
- const wp = createPoke(roamingId, 45, rollShiny());
+ const wp = createPoke(roamingId, 45, false); // shiny roll at capture only
  if(wp) addBattleLog(tr('roaming_legendary_appeared', {name:wp.name}));
  return wp;
  }
@@ -16,7 +16,7 @@ function pickWildEncounter(loc, roamingId){
  }
  const entry = bucketEntries[rand(0, bucketEntries.length - 1)];
  const lv = rand(entry[1], entry[2]);
- return createPoke(entry[0], lv, rollShiny());
+ return createPoke(entry[0], lv, false); // shiny roll at capture only
 }
 
 
@@ -61,4 +61,5 @@ if (typeof pickWildEncounter !== 'undefined' && typeof window !== 'undefined') w
 if (typeof exploreArea !== 'undefined' && typeof window !== 'undefined') window.exploreArea = exploreArea;
 if (typeof healTeam !== 'undefined' && typeof window !== 'undefined') window.healTeam = healTeam;
 if (typeof addToInventory !== 'undefined' && typeof window !== 'undefined') window.addToInventory = addToInventory;
+
 

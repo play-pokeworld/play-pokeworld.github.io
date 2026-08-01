@@ -809,3 +809,4 @@ window.L_en_talents = {
     "desc": "Normal-type moves become Dragon-type moves, and their power is multiplied by x1.3"
   }
 };
+

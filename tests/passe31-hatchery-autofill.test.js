@@ -206,3 +206,4 @@ test('passe 31 : contrat source — vidange avant réassort, boucle par rang, ex
   assert.ok(src.includes('q.length !== rank'), 'se réassort : jamais en milieu de file');
   assert.ok(src.includes('window.drainHatcheryQueuesIntoSlots'), 'helper exporté');
 });
+

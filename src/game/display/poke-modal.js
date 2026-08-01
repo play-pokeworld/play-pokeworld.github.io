@@ -739,3 +739,4 @@ function openBoxPokeModal(boxId) {
 if (typeof openBoxPokeModal !== 'undefined' && typeof window !== 'undefined') window.openBoxPokeModal = openBoxPokeModal;
 if (typeof openLearnableMovesPanel !== 'undefined' && typeof window !== 'undefined') window.openLearnableMovesPanel = openLearnableMovesPanel;
 if (typeof refreshLearnableMovesPanelIfOpen !== 'undefined' && typeof window !== 'undefined') window.refreshLearnableMovesPanelIfOpen = refreshLearnableMovesPanelIfOpen;
+

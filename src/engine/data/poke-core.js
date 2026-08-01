@@ -86,7 +86,7 @@ window.PokeCore = {
           if (species === normalized) { num = Number(dexId); break; }
         }
       }
-      var bucket = back ? (shiny ? 'backShiny' : 'back') : (shiny ? 'frontShiny' : 'front');
+      var bucket = shiny ? 'frontShiny' : 'front';
       if (num != null && typeof SPRITE_DATA !== 'undefined' && SPRITE_DATA && SPRITE_DATA[bucket] && SPRITE_DATA[bucket][String(num)]) {
         return SPRITE_DATA[bucket][String(num)];
       }
@@ -259,3 +259,4 @@ window.PokeCore = {
 
 console.log('[PokeCore] Engine initialized');
 })();
+

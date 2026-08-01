@@ -40,3 +40,4 @@ function toggleMapHelp(){
 if (typeof ensureMapHelpButton !== 'undefined' && typeof window !== 'undefined') window.ensureMapHelpButton = ensureMapHelpButton;
 if (typeof toggleMapHelp !== 'undefined' && typeof window !== 'undefined') window.toggleMapHelp = toggleMapHelp;
 
+

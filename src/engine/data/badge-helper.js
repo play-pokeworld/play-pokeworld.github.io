@@ -90,3 +90,4 @@ if (typeof window !== 'undefined') {
   window.replaceWeatherTerms = replaceWeatherTerms;
   window.replaceStatusTerms = replaceStatusTerms;
 }
+

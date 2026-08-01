@@ -18,16 +18,18 @@ function nodeDims(loc, id){
 
 function _regLocs(){ return getCurrentRegionLocs(); }
 
-function _startNodes(){ return (G.region==='johto') ? ['newbark'] : ['pallet']; }
+function _startNodes(){ return (G.region==='johto') ? ['newbark'] : (G.region==='hoenn') ? ['littleroot'] : ['pallet']; }
 
 function regionOfLoc(id){
+ if(typeof LOCS_HOENN !== 'undefined' && LOCS_HOENN && LOCS_HOENN[id]) return 'hoenn';
  if(LOCS_JOHTO && LOCS_JOHTO[id]) return 'johto';
  return 'kanto';
 }
 const KANTO_BADGES = ['brock','misty','surge','erika','koga','sabrina','blaine','giovanni'];
 const JOHTO_BADGES = ['falkner','bugsy','whitney','morty','chuck','jasmine','pryce','clair'];
+const HOENN_BADGES = ['roxanne','brawly','wattson','flannery','norman','winona','tate_liza','juan'];
 function regionBadgeCount(region){
- const ids = region === 'johto' ? JOHTO_BADGES : KANTO_BADGES;
+ const ids = region === 'johto' ? JOHTO_BADGES : region === 'hoenn' ? HOENN_BADGES : KANTO_BADGES;
  return ids.filter(b => G.badges && G.badges.includes(b)).length;
 }
 function locBadgeCount(id){ return regionBadgeCount(regionOfLoc(id)); }
@@ -140,6 +142,14 @@ function isLocUnlocked(id){
  const hasJohtoStarter = !!(G.starterJohto || (G.regionStarter && G.regionStarter.johto));
  if(!hasJohtoStarter) return false;
  }
+ if(id==='route101'){
+ const hasHoennStarter = !!(G.starterHoenn || (G.regionStarter && G.regionStarter.hoenn));
+ if(!hasHoennStarter) return false;
+ }
+ if(id==='mirage_island'){
+ const nowWindow = (typeof getRotationWindow === 'function') ? getRotationWindow() : Math.floor(Date.now() / (12 * 3600 * 1000));
+ if(nowWindow % 2 !== 0) return false;
+ }
  if(id===G.location) return true;
  if(_startNodes().indexOf(id) >= 0) return true;
  if(G.unlockedLocs && G.unlockedLocs[id]) return true;
@@ -158,6 +168,7 @@ function trainingUnlocked(){
 
 
 function mineUnlocked(){ return isLocUnlocked('diglettscave'); }
+function secretBaseUnlocked(){ return !!(typeof G !== 'undefined' && G && G.unlockedSecretBaseHoenn); }
 function updateFeatureWindows(){
  const hWin = document.getElementById('win-hatchery');
  if(hWin) hWin.style.display = hatcheryUnlocked() ? 'flex' : 'none';
@@ -165,7 +176,8 @@ function updateFeatureWindows(){
  if(tWin) tWin.style.display = trainingUnlocked() ? 'flex' : 'none';
  const mWin = document.getElementById('win-mine');
  if(mWin) mWin.style.display = mineUnlocked() ? 'flex' : 'none';
- 
+ const bWin = document.getElementById('win-base');
+ if(bWin) bWin.style.display = secretBaseUnlocked() ? 'flex' : 'none';
 }
 
 
@@ -238,4 +250,5 @@ if (typeof mineUnlocked !== 'undefined' && typeof window !== 'undefined') window
 if (typeof updateFeatureWindows !== 'undefined' && typeof window !== 'undefined') window.updateFeatureWindows = updateFeatureWindows;
 if (typeof mapNodeState !== 'undefined' && typeof window !== 'undefined') window.mapNodeState = mapNodeState;
 if (typeof showMapLegend !== 'undefined' && typeof window !== 'undefined') window.showMapLegend = showMapLegend;
+
 

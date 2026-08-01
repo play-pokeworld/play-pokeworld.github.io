@@ -284,7 +284,8 @@ function atollFactoryPrepCardHtml(p, i){
 }
 function renderAtollFactoryPrep(){
  const run = (typeof getAtollFactoryRun === 'function') ? getAtollFactoryRun() : null;
- const inner = document.getElementById('poke-modal-inner');
+ const box = (typeof ensurePokeModal === 'function') ? ensurePokeModal() : { inner: document.getElementById('poke-modal-inner') };
+ const inner = box.inner;
  if(!inner) return false;
  if(!run || !Array.isArray(run.team) || !run.team.length) return false;
  const mode = ATOLL_MODES[run.modeKey] || {};
@@ -299,8 +300,12 @@ function renderAtollFactoryPrep(){
  return true;
 }
 function openAtollFactoryPrep(){
- const modal = document.getElementById('poke-modal');
- if(!modal) return;
+ const box = (typeof ensurePokeModal === 'function') ? ensurePokeModal() : { modal: document.getElementById('poke-modal'), inner: document.getElementById('poke-modal-inner') };
+ const modal = box.modal;
+ if(!modal){
+  if(typeof notify==='function') notify((typeof t==='function'&&t('preset_modal_missing'))||"Interface non prête. Réessayez.", 'var(--red)');
+  return;
+ }
  const ok = renderAtollFactoryPrep();
  if(!ok){ // pas de série : refermer proprement (retour d'info orphelin…)
   window._atollPrepOpen = false;
@@ -512,6 +517,11 @@ function openFullscreenPanel(panelType){
 
  // Mémorise le panneau plein écran courant (pour le retour des panneaux d'info)
  window._fsCurrentPanel = panelType;
+ if (!window._isEquipOpen) {
+   window._equipCallback = null;
+   window._equipPickerMeta = null;
+ }
+ window._isEquipOpen = false;
  window._pwPokeSheet = null;
  if (typeof window.pwInfoClearSource === 'function') window.pwInfoClearSource();
 
@@ -523,7 +533,10 @@ function openFullscreenPanel(panelType){
  dictionary: t('dictionary_title'),
  guide: t('guide_title'),
  atoll: t('battle_atoll_title'),
- presets: t('panel_presets_title')
+ presets: t('panel_presets_title'),
+ puzzles: (typeof t==='function' && t('panel_puzzles_title') !== 'panel_puzzles_title') ? t('panel_puzzles_title') : '🧩 Explorations à énigmes',
+ castform_forms: '🌤️ Labo Météo — Formes de Morphéo',
+ deoxys_forms: '☄️ Météorites — Formes de Deoxys'
  };
 
  
@@ -560,12 +573,21 @@ function openFullscreenPanel(panelType){
  else if(panelType === 'dictionary') renderDictionary(content);
  else if(panelType === 'guide' && typeof renderGuidePanel === 'function'){ if(typeof window !== 'undefined' && typeof window.setGuideSection === 'function') window.setGuideSection(null); else renderGuidePanel(content); }
  else if(panelType === 'atoll') renderBattleAtoll(content);
+ else if(panelType === 'castform_forms' && typeof renderCastformFormsPanel === 'function') renderCastformFormsPanel(content);
+ else if(panelType === 'deoxys_forms' && typeof renderDeoxysFormsPanel === 'function') renderDeoxysFormsPanel(content);
+ else if(panelType === 'puzzles'){
+   if(typeof renderPuzzleListPanel === 'function') renderPuzzleListPanel(window._puzzleLocPending || (typeof G!=='undefined' && G ? G.location : null));
+   else content.innerHTML = '<div class="pw-empty-state-md">Module énigmes indisponible.</div>';
+ }
 
  modal.style.display = 'flex';
 }
 
 function closeFullscreenPanel(){
  window._fsCurrentPanel = null;
+ window._equipCallback = null;
+ window._equipPickerMeta = null;
+ window._isEquipOpen = false;
  const modal = document.getElementById('fullscreen-panel-modal');
  if(modal) modal.style.display = 'none';
 }
@@ -594,4 +616,5 @@ if (typeof renderAtollFactoryPrep !== 'undefined' && typeof window !== 'undefine
 if (typeof installAtollPrepDragDrop !== 'undefined' && typeof window !== 'undefined') window.installAtollPrepDragDrop = installAtollPrepDragDrop;
 if (typeof completeAtollBattle !== 'undefined' && typeof window !== 'undefined') window.completeAtollBattle = completeAtollBattle;
 if (typeof buyAtollItem !== 'undefined' && typeof window !== 'undefined') window.buyAtollItem = buyAtollItem;
+
 

@@ -9,8 +9,10 @@ function getRoamingLegendaryForRoute(locId){
  const kantoOutdoor = ['route1','route22','route2','route3','route4','route24','route25','route5','route6','route11','route9','route10','route8','route7','route16','route17','route18','route15','route14','route13','route12','route19','route20','route21','route23'];
  
  const johtoOutdoor = ['jroute29','jroute30','jroute31','jroute32','jroute33','jroute34','jroute35','jroute36','jroute37','jroute38','jroute39','jroute42','jroute43','jroute44','jroute45','jroute46','jroute47','jroute48','nationalpark','jroute26','jroute27','jroute28'];
+ const hoennOutdoor = ['route101','route102','route103','route104','route110','route111','route112','route113','route114','route115','route116','route117','route118','route119','route120','route121','route123'];
  let kIdx = nowWindow % kantoOutdoor.length;
  let jIdx = (nowWindow + 5) % johtoOutdoor.length;
+ let hIdx = (nowWindow + 11) % hoennOutdoor.length;
  G.roamingPool = {
  [kantoOutdoor[(kIdx) % kantoOutdoor.length]]: 144,
  [kantoOutdoor[(kIdx+7) % kantoOutdoor.length]]: 145,
@@ -19,7 +21,11 @@ function getRoamingLegendaryForRoute(locId){
  [johtoOutdoor[(jIdx) % johtoOutdoor.length]]: 243,
  [johtoOutdoor[(jIdx+7) % johtoOutdoor.length]]: 244,
  [johtoOutdoor[(jIdx+13) % johtoOutdoor.length]]: 245,
- [johtoOutdoor[(jIdx+19) % johtoOutdoor.length]]: 251
+ [johtoOutdoor[(jIdx+19) % johtoOutdoor.length]]: 251,
+ [hoennOutdoor[(hIdx) % hoennOutdoor.length]]: 380,
+ [hoennOutdoor[(hIdx+4) % hoennOutdoor.length]]: 381,
+ [hoennOutdoor[(hIdx+8) % hoennOutdoor.length]]: 385,
+ [hoennOutdoor[(hIdx+12) % hoennOutdoor.length]]: 386
  };
  }
  return G.roamingPool[locId] || null;
@@ -27,7 +33,7 @@ function getRoamingLegendaryForRoute(locId){
 
 
 function getBadgeDisplayTotal(){
- const supportedRegions = ['kanto','johto'];
+ const supportedRegions = ['kanto','johto','hoenn'];
  let regions = 1;
  try{ regions = supportedRegions.filter(r => (typeof canAccessRegion === 'function') ? canAccessRegion(r) : r === 'kanto').length || 1; }catch(_){ regions = 1; }
  return regions * 8;
@@ -51,4 +57,5 @@ function updateHeader(){
 if (typeof getRoamingLegendaryForRoute !== 'undefined' && typeof window !== 'undefined') window.getRoamingLegendaryForRoute = getRoamingLegendaryForRoute;
 if (typeof getBadgeDisplayTotal !== 'undefined' && typeof window !== 'undefined') window.getBadgeDisplayTotal = getBadgeDisplayTotal;
 if (typeof updateHeader !== 'undefined' && typeof window !== 'undefined') window.updateHeader = updateHeader;
+
 

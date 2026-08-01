@@ -21,7 +21,7 @@
 // ============================================================================
 
 function currentLang(){
- return (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
+ return (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'en';
 }
 
 // Display names consistently in title case without lowercasing official acronyms.
@@ -195,7 +195,12 @@ function getQuestText(cat, id){
 
 // Champion (Gym Leader) localized name / title / badge name.
 function getChampionName(id){return (typeof t==='function') ? (t('champions.'+id+'.name') || id) : id;}
-function getChampName(id){return getChampionName(id);}
+// Passe 38 : le « champion » base_npc est un copain de base secrète — son nom
+// est dynamique (porté par le combat en cours), pas une clé du dictionnaire.
+function getChampName(id){
+ if(id==='base_npc' && typeof battle!=='undefined' && battle && battle.baseNpcName) return battle.baseNpcName;
+ return getChampionName(id);
+}
 function getChampTitle(id){return (typeof t==='function') ? (t('champions.'+id+'.title') || '') : '';}
 function getChampBadgeName(id){return (typeof t==='function') ? (t('champions.'+id+'.badgeName') || '') : '';}
 
@@ -209,6 +214,7 @@ if (typeof getChampBadgeName !== 'undefined' && typeof window !== 'undefined') w
 if (typeof getChampionName !== 'undefined' && typeof window !== 'undefined') window.getChampionName = getChampionName;
 if (typeof getChampionTitle !== 'undefined' && typeof window !== 'undefined') window.getChampionTitle = getChampionTitle;
 if (typeof getChampionBadgeName !== 'undefined' && typeof window !== 'undefined') window.getChampionBadgeName = getChampionBadgeName;
+
 
 
 

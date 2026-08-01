@@ -2,6 +2,10 @@ function openSettings(){
  document.getElementById('settings-modal').classList.add('open');
  document.getElementById('delete-row').style.display='flex';
  document.getElementById('delete-confirm-row').style.display='none';
+ const curLang = (typeof currentLang === 'function') ? currentLang() : (G?.lang || 'fr');
+ document.querySelectorAll('.lang-btn').forEach(btn => {
+   btn.classList.toggle('active', btn.dataset.lang === curLang);
+ });
  document.querySelectorAll('.theme-swatch').forEach(s=>{
  s.classList.toggle('active', s.dataset.themeBtn===(safeStorage.get('pokeworld_theme')||'dark'));
  });
@@ -83,4 +87,5 @@ if (typeof debugUnlockBadges !== 'undefined' && typeof window !== 'undefined') w
 if (typeof toggleBattleSpeedX10 !== 'undefined' && typeof window !== 'undefined') window.toggleBattleSpeedX10 = toggleBattleSpeedX10;
 if (typeof debugFillMine !== 'undefined' && typeof window !== 'undefined') window.debugFillMine = debugFillMine;
 if (typeof debugTimeSkipAfk30Minutes !== 'undefined' && typeof window !== 'undefined') window.debugTimeSkipAfk30Minutes = debugTimeSkipAfk30Minutes;
+
 

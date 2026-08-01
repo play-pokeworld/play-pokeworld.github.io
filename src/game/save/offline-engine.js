@@ -713,3 +713,4 @@ if (typeof showAfkResultPanel !== 'undefined' && typeof window !== 'undefined') 
 if (typeof closeAfkResultPanel !== 'undefined' && typeof window !== 'undefined') window.closeAfkResultPanel = closeAfkResultPanel;
 if (typeof debugTimeSkip30Minutes !== 'undefined' && typeof window !== 'undefined') window.debugTimeSkip30Minutes = debugTimeSkip30Minutes;
 if (typeof window !== 'undefined') window._offlineGetLastSim = () => _offlineLastSim;
+

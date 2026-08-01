@@ -84,7 +84,7 @@ class Sprite {
    */
   static pokemon(idOrName, variant = 'front', size = 72) {
     const base = 'src/assets/images/pokemon/';
-    const dirs = { front: 'front', back: 'back', frontShiny: 'frontShiny', backShiny: 'backShiny' };
+    const dirs = { front: 'front', back: 'front', frontShiny: 'frontShiny', backShiny: 'frontShiny' };
     const dir = dirs[variant] || 'front';
     return new Sprite({ src: `${base}${dir}/${idOrName}.png`, w: size, h: size, pixelated: true, fallback: '?' });
   }
@@ -119,3 +119,4 @@ window.PokeSprite = Sprite;
 if (!window.poke) window.poke = {};
 window.poke.Sprite = Sprite;
 })();
+

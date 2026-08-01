@@ -5,22 +5,22 @@ window.L_fr_quests = {
 "1": {
 "title":"Les Conseils du Prof. Chen",
 "desc":"Au Bourg Palette, cliquez sur le Professeur Chen pour lui parler et lancer officiellement votre voyage !",
-"rewardDesc":"400₽ + 1 Baie Oran"
+"rewardDesc":"400₽ + 1 Baie Babiri"
 },
 "2": {
 "title":"Le Début d'une Aventure",
 "desc":"Bienvenue dans PokéWorld ! Rendez-vous sur la Route 1 et mettez K.O. 10 Pokémon sauvages pour prouver votre talent.",
-"rewardDesc":"600₽ + 2 Baie Oran"
+"rewardDesc":"600₽ + 1 Baie Roseli"
 },
 "3": {
 "title":"La Forêt de Jadielle",
 "desc":"Explorez la Forêt de Jade et mettez K.O. 15 Pokémon sauvages pour aiguiser votre équipe.",
-"rewardDesc":"1 000₽ + 1 Baie Sitrus"
+"rewardDesc":"1 000₽ + 1 Baie Prine"
 },
 "4": {
 "title":"La Route 22 Sauvage",
 "desc":"La Route 22 regorge de Pokémon. Mettez K.O. 20 Pokémon sauvages pour devenir plus fort !",
-"rewardDesc":"1 400₽ + 1 Baie Ceriz"
+"rewardDesc":"1 400₽ + 1 Baie Tanga"
 },
 "5": {
 "title":"Premier Duel : Blue",
@@ -40,7 +40,7 @@ window.L_fr_quests = {
 "8": {
 "title":"L'Expédition du Mont Sélénite",
 "desc":"Explorez le sombre Mont Sélénite. Vainquez 30 Pokémon sauvages pour déterrer une Pierre Lune.",
-"rewardDesc":"2 600₽ + 1 Poussière Étoile"
+"rewardDesc":"2 600₽ + 1 Baie Charti"
 },
 "9": {
 "title":"La Team Rocket s'incruste",
@@ -65,12 +65,12 @@ window.L_fr_quests = {
 "13": {
 "title":"L'Inventeur du Cap",
 "desc":"Léo (Bill), l'inventeur du Système de Stockage, vous attend dans son chalet au bout du Pont Pépite. Allez le voir : il adore les dresseurs curieux !",
-"rewardDesc":"900₽ + 1 Baie Sitrus"
+"rewardDesc":"900₽ + 1 Baie Colbur"
 },
 "14": {
 "title":"Le Président du Fan Club",
 "desc":"Le Président du Fan Club Pokémon d'Azuria radote sur ses Pokémon adorés… Écoutez ses histoires avec patience : la générosité suit toujours.",
-"rewardDesc":"700₽ + 2 Baies Oran"
+"rewardDesc":"700₽"
 },
 "15": {
 "title":"L'Arène Cascade d'Azuria",
@@ -80,12 +80,12 @@ window.L_fr_quests = {
 "16": {
 "title":"Les Eaux de la Route 5",
 "desc":"La Route 5 relie Azuria à Safrania. Mettez K.O. 25 Pokémon sauvages pour vous entraîner.",
-"rewardDesc":"2 200₽ + 1 Baie Sitrus"
+"rewardDesc":"2 200₽ + 1 Baie Passho"
 },
 "17": {
 "title":"La Route 6 — Vers Carmin",
 "desc":"Empruntez la Route 6 vers Carmin sur Mer et mettez K.O. 25 Pokémon sauvages.",
-"rewardDesc":"2 200₽ + 1 Baie Oran"
+"rewardDesc":"2 200₽"
 },
 "18": {
 "title":"À bord du S.S. Anne",
@@ -95,7 +95,7 @@ window.L_fr_quests = {
 "19": {
 "title":"Le Capitaine du Sainte-Anne",
 "desc":"À bord du Sainte-Anne, le Capitaine souffre du mal de mer. Massez-lui le dos pour le remettre d'aplomb : il saura vous remercier.",
-"rewardDesc":"1 100₽ + 2 Baies Ceriz"
+"rewardDesc":"1 100₽"
 },
 "20": {
 "title":"Le Tonnerre de Carmin sur Mer",
@@ -120,7 +120,7 @@ window.L_fr_quests = {
 "24": {
 "title":"La Bande de la Route 8",
 "desc":"Des garnements provoquent les passants sur la Route 8 entre Lavanville et Safrania. Remettez de l'ordre : 15 victoires sur les sauvages de la zone !",
-"rewardDesc":"2 800₽ + 2 Baies Oran"
+"rewardDesc":"2 800₽ + 1 Baie Yache"
 },
 "25": {
 "title":"Les Fantômes de la Tour de Lavanville",
@@ -155,7 +155,7 @@ window.L_fr_quests = {
 "31": {
 "title":"L'Évoli du Manoir Céladon",
 "desc":"Au sommet du Manoir Céladon vit un Évoli solitaire, abandonné en secret. Un employé vous chuchote où le trouver… si vous promettez d'en prendre soin.",
-"rewardDesc":"800₽ + Évoli (Nv.25)"
+"rewardDesc":"800₽ + Évoli (Nv.25) + 1 Baie Payapa"
 },
 "32": {
 "title":"Le Porygon du Casino",
@@ -175,12 +175,12 @@ window.L_fr_quests = {
 "35": {
 "title":"Motards de la Piste Cyclable",
 "desc":"La Piste Cyclable (Route 17) est le terrain de jeux de motards bruyants. Dégagez la voie : 20 victoires sur les sauvages de la piste !",
-"rewardDesc":"3 600₽ + 2 Baies Oran"
+"rewardDesc":"3 600₽"
 },
 "36": {
 "title":"Les Dentiers d'Or du Directeur",
 "desc":"Le Directeur du Parc Safari a encore perdu ses Dentiers d'Or quelque part dans la réserve ! Ratissez les enclos : 15 victoires contre les sauvages du Parc.",
-"rewardDesc":"3 200₽ + 2 Baies Sitrus"
+"rewardDesc":"3 200₽ + 1 Baie Occa"
 },
 "37": {
 "title":"Duel au sommet de la Sylphe",
@@ -195,7 +195,7 @@ window.L_fr_quests = {
 "39": {
 "title":"Le Lokhlass de la Sylphe",
 "desc":"Sauvée de la Team Rocket, la Sylphe SARL reprend vie. Un employé ému vous offre le Lokhlass que lui avait confié le Chef de Projet : prenez-en bien soin.",
-"rewardDesc":"900₽ + Lokhlass (Nv.25)"
+"rewardDesc":"900₽ + Lokhlass (Nv.25) + 1 Baie Wacan"
 },
 "40": {
 "title":"Le Roi du Karaté",
@@ -210,22 +210,22 @@ window.L_fr_quests = {
 "42": {
 "title":"La Devinette de M. Psyché",
 "desc":"Dans une petite maison de Safrania, M. Psyché lit dans les pensées des passants. Devinez ce qu'il voit en vous : il récompense les esprits affûtés.",
-"rewardDesc":"900₽ + 1 Baie Sitrus"
+"rewardDesc":"900₽ + 1 Baie Tanga"
 },
 "43": {
 "title":"Le Grand Souterrain",
 "desc":"Ouvrez l'onglet Mine et utilisez vos outils pour extraire et vendre 5 trésors déterrés dans les roches de Kanto.",
-"rewardDesc":"5 000₽ + 1 Poussière Étoile"
+"rewardDesc":"5 000₽ + 1 Baie Chople"
 },
 "44": {
 "title":"Le Collectionneur de Céladopole",
 "desc":"Un collectionneur fortuné veut constituer un vivarium de Kanto. Capturez 15 Pokémon sauvages pour ses vitrines !",
-"rewardDesc":"3 000₽ + 2 Baies Ceriz"
+"rewardDesc":"3 000₽ + 1 Baie Prine"
 },
 "45": {
 "title":"Les Îles Écume — Route 19 et 20",
 "desc":"Partez vers les Chenaux 19 et 20 au sud de Parmanie. Mettez K.O. 60 Pokémon sauvages en mer.",
-"rewardDesc":"6 500₽ + 1 Baie Oran"
+"rewardDesc":"6 500₽"
 },
 "46": {
 "title":"Le Volcan Flamboyant de Cramois'île",
@@ -290,7 +290,7 @@ window.L_fr_quests = {
 "58": {
 "title":"Les Mémoires du Manoir",
 "desc":"Les journaux du Dr. Fuji retrouvés dans le Manoir Pokémon racontent la naissance… et l'évasion de Mewtwo. Rapportez-les au conservateur du musée de Cramois'île.",
-"rewardDesc":"1 500₽ + 1 Poussière Étoile"
+"rewardDesc":"1 500₽"
 },
 "59": {
 "title":"Le Clone Ultime de la Caverne Azurée",
@@ -305,12 +305,12 @@ window.L_fr_quests = {
 "101": {
 "title":"Le Salut du Prof. Orme",
 "desc":"À Bourg Geon, parlez au Prof. Orme pour débuter officiellement votre aventure Johto.",
-"rewardDesc":"400₽ + 1 Baie Oran"
+"rewardDesc":"400₽ + 1 Baie Coba"
 },
 "102": {
 "title":"Route 29 : premiers K.O. à Johto",
 "desc":"Quittez Bourg Geon vers la Route 29 et mettez K.O. 10 Pokémon sauvages pour atteindre Ville Griotte.",
-"rewardDesc":"700₽ + 2 Baie Oran"
+"rewardDesc":"700₽ + 1 Baie Roseli"
 },
 "103": {
 "title":"Le Mystérieux Silver",
@@ -325,7 +325,7 @@ window.L_fr_quests = {
 "105": {
 "title":"Mauville : le Badge Zéphyr",
 "desc":"Rendez-vous à Mauville et défiez Albert dans son Arène Vol pour obtenir le Badge Zéphyr.",
-"rewardDesc":"2 800₽ + 1 Baie Sitrus"
+"rewardDesc":"2 800₽"
 },
 "106": {
 "title":"Le Trafic du Puits Ramoloss",
@@ -340,12 +340,12 @@ window.L_fr_quests = {
 "108": {
 "title":"La GS Ball de Fargot",
 "desc":"Le Professeur Orme a confié une étrange Ball à Fargot, l'artisan d'Écorcia. Rendez-lui visite pour en apprendre plus sur ce mystère.",
-"rewardDesc":"600₽ + 1 Baie Sitrus"
+"rewardDesc":"600₽ + 1 Baie Shuca"
 },
 "109": {
 "title":"L'énergie du Bois aux Chênes",
 "desc":"Fargot soupçonne la Ball d'être liée au gardien du Bois. Apaisez la forêt : mettez K.O. 20 Pokémon sauvages du Bois aux Chênes pour offrir son énergie au sanctuaire.",
-"rewardDesc":"2 600₽ + 3 Baies Oran"
+"rewardDesc":"2 600₽ + 1 Baie Rindo"
 },
 "110": {
 "title":"Silver frappe encore",
@@ -365,7 +365,7 @@ window.L_fr_quests = {
 "113": {
 "title":"Zarbi, par dizaines !",
 "desc":"Les murs des Ruines s'animent : les Zarbi grouillent ! Mettez K.O. 15 Pokémon sauvages des Ruines d'Alpha pour aider Hale à collecter des données.",
-"rewardDesc":"3 200₽ + 2 Baies Sitrus"
+"rewardDesc":"3 200₽ + 1 Baie Babiri"
 },
 "114": {
 "title":"L'illusion d'Entei",
@@ -385,7 +385,7 @@ window.L_fr_quests = {
 "117": {
 "title":"Eusine, chasseur de légende",
 "desc":"Un mystérieux dresseur nommé Eusine traque Suicune depuis des années. Il vous attend dans la Tour Cendrée de Rosalia, où les bêtes légendaires se sont éveillées.",
-"rewardDesc":"1 000₽ + 2 Baies Oran"
+"rewardDesc":"1 000₽"
 },
 "118": {
 "title":"Rosalia : le Badge Brume",
@@ -405,7 +405,7 @@ window.L_fr_quests = {
 "121": {
 "title":"Un Phare rallumé",
 "desc":"Rapportez le remède secret à Jasmine au Phare d'Oliville. Grâce à vous, Amphy pourra de nouveau illuminer la mer.",
-"rewardDesc":"3 000₽ + 2 Baies Oran"
+"rewardDesc":"3 000₽ + 1 Baie Yache"
 },
 "122": {
 "title":"Oliville : le Badge Minéral",
@@ -470,7 +470,7 @@ window.L_fr_quests = {
 "134": {
 "title":"Sur les traces de Suicune",
 "desc":"Suicune a été aperçu courant le long de la Route 42 ! Suivez ses traces : mettez K.O. 25 Pokémon sauvages sur la route pour le débusquer.",
-"rewardDesc":"5 000₽ + 2 Baies Sitrus"
+"rewardDesc":"5 000₽"
 },
 "135": {
 "title":"Raikou, la Foudre Pourpre",
@@ -501,23 +501,409 @@ window.L_fr_quests = {
 "title":"Bois aux Chênes : Celebi",
 "desc":"Dans la clairière sacrée du Bois aux Chênes, le gardien du temps Celebi apparaît parfois aux dresseurs patients. Mettez K.O. 150 Pokémon sauvages pour l'attirer !",
 "rewardDesc":"20 000₽ + Celebi (Nv.50)"
-}
+},
+
+  "201": {
+    "title": "Au secours du Professeur Seko",
+    "desc": "Vaincre le Medhyèna Nv. 2 agressif sur la Route 101 pour sauver le Professeur Seko.",
+    "rewardDesc": "500₽ + 5 Poké Balls"
+  },
+  "202": {
+    "title": "Rosyères, première étape",
+    "desc": "Parler à l'infirmière Joëlle au Centre Pokémon de Rosyères.",
+    "rewardDesc": "400₽ + 3 Potions"
+  },
+  "203": {
+    "title": "Le premier défi sur la Route 102",
+    "desc": "Vaincre 5 Pokémon sauvages sur la Route 102.",
+    "rewardDesc": "600₽ + 3 Super Balls"
+  },
+  "204": {
+    "title": "Rencontre à Clémenti-Ville",
+    "desc": "Parler à Norman à l'Arène de Clémenti-Ville.",
+    "rewardDesc": "800₽"
+  },
+  "205": {
+    "title": "L'Orée du Bois Clémenti",
+    "desc": "Vaincre 6 Pokémon sauvages sur la Route 104.",
+    "rewardDesc": "700₽ + 2 Super Potions"
+  },
+  "206": {
+    "title": "Le mystère du Bois Clémenti",
+    "desc": "Vaincre 8 Pokémon sauvages dans le Bois Clémenti.",
+    "rewardDesc": "900₽ + 2 Anti-Para"
+  },
+  "207": {
+    "title": "Le Premier Badge (Mérouville)",
+    "desc": "Vaincre Roxanne à l'Arène de Mérouville.",
+    "rewardDesc": "1 500₽ + 5 Super Balls"
+  },
+  "208": {
+    "title": "Le salut du Tunnel Mérazon",
+    "desc": "Vaincre 5 Pokémon sauvages dans le Tunnel Mérazon.",
+    "rewardDesc": "800₽ + 3 Super Potions"
+  },
+  "209": {
+    "title": "Traversée vers Myokara",
+    "desc": "Atteindre Myokara en bateau et parler au PNJ côtier.",
+    "rewardDesc": "600₽"
+  },
+  "210": {
+    "title": "Le Deuxième Badge (Myokara)",
+    "desc": "Vaincre Bastien à l'Arène de Myokara.",
+    "rewardDesc": "2 000₽ + 2 Baies Sitrus"
+  },
+  "211": {
+    "title": "La Lettre Devon (Grotte Granite)",
+    "desc": "Vaincre 8 Pokémon sauvages dans la Grotte Granite.",
+    "rewardDesc": "1 200₽ + 3 Hyper Balls"
+  },
+  "212": {
+    "title": "L'Arrivée à Poivressel",
+    "desc": "Parler au Capitaine Stern au Musée Océanographique de Poivressel.",
+    "rewardDesc": "1 000₽"
+  },
+  "213": {
+    "title": "La Piste Cyclable (Route 110)",
+    "desc": "Vaincre 10 Pokémon sauvages sur la Route 110.",
+    "rewardDesc": "1 400₽ + 1 Guérison"
+  },
+  "214": {
+    "title": "Le Troisième Badge (Lavandia)",
+    "desc": "Vaincre Voltère à l'Arène de Lavandia.",
+    "rewardDesc": "2 500₽ + 1 Aimant"
+  },
+  "215": {
+    "title": "L'air pur de Vergazon",
+    "desc": "Visiter Vergazon et parler au résident local.",
+    "rewardDesc": "800₽"
+  },
+  "216": {
+    "title": "La Tempête de Sable (Route 111)",
+    "desc": "Vaincre 12 Pokémon sauvages dans le désert de la Route 111 (Débloque les Bases Secrètes de Hoenn !).",
+    "rewardDesc": "1 600₽ + 3 Repousses Max"
+  },
+  "217": {
+    "title": "Une alcôve accueillante",
+    "desc": "Découvrez votre nouveau mode de jeu : depuis la fenêtre Lieu d'une route de Hoenn, visitez une alcôve de Base Secrète pour voir l'intérieur (encore vide !).",
+    "rewardDesc": "1 500₽ + 3 Poké Balls"
+  },
+  "218": {
+    "title": "Mon coin secret",
+    "desc": "Prenez possession d'une alcôve qui vous plaît : depuis la fenêtre Lieu d'une route de Hoenn, choisissez « S'installer ici ».",
+    "rewardDesc": "2 000₽ + 2 Super Potions"
+  },
+  "219": {
+    "title": "Autopia des cendres",
+    "desc": "Visiter Autopia et parler à l'astronome.",
+    "rewardDesc": "900₽"
+  },
+  "220": {
+    "title": "La Grotte Tréfonds",
+    "desc": "Vaincre 10 Pokémon sauvages dans la Grotte Tréfonds.",
+    "rewardDesc": "1 800₽ + 1 Éclat d'Étoile"
+  },
+  "221": {
+    "title": "La menace du Mont Chimnée",
+    "desc": "Vaincre 12 Pokémon sauvages au Mont Chimnée sous le soleil intense.",
+    "rewardDesc": "2 000₽ + 1 Pierre Feu"
+  },
+  "222": {
+    "title": "Le Quatrième Badge (Vermilava)",
+    "desc": "Vaincre Adrianna à l'Arène de Vermilava.",
+    "rewardDesc": "3 000₽ + 1 Charbon"
+  },
+  "223": {
+    "title": "Retour à Clémenti-Ville",
+    "desc": "Retourner à Clémenti-Ville pour le défi du père.",
+    "rewardDesc": "1 000₽"
+  },
+  "224": {
+    "title": "Le Cinquième Badge (Clémenti)",
+    "desc": "Vaincre Norman à l'Arène de Clémenti-Ville.",
+    "rewardDesc": "3 500₽ + 1 Mouchoir Soie"
+  },
+  "225": {
+    "title": "Traversée de la Route 118",
+    "desc": "Vaincre 12 Pokémon sauvages sur la Route 118.",
+    "rewardDesc": "1 800₽ + 5 Hyper Balls"
+  },
+  "226": {
+    "title": "Sous la pluie de la Route 119",
+    "desc": "Vaincre 15 Pokémon sauvages sur la Route 119 sous la pluie battante.",
+    "rewardDesc": "2 200₽ + 1 Roche Humide"
+  },
+  "227": {
+    "title": "Le Sixième Badge (Cimmery)",
+    "desc": "Vaincre Alizée à l'Arène de Cimmery.",
+    "rewardDesc": "4 000₽ + 1 Bec Pointu"
+  },
+  "228": {
+    "title": "Les miroirs d'eau de la Route 120",
+    "desc": "Vaincre 15 Pokémon sauvages sur la Route 120.",
+    "rewardDesc": "2 400₽ + 3 Baies Prine"
+  },
+  "229": {
+    "title": "Vers le Parc Safari (Route 121)",
+    "desc": "Vaincre 15 Pokémon sauvages sur la Route 121.",
+    "rewardDesc": "2 400₽ + 3 Repousses Max"
+  },
+  "230": {
+    "title": "Le port de Nénucrique",
+    "desc": "Parler au gérant du Centre Commercial de Nénucrique.",
+    "rewardDesc": "1 500₽"
+  },
+  "231": {
+    "title": "Le sommet du Mont Mémoria",
+    "desc": "Vaincre 12 Pokémon sauvages au Mont Mémoria.",
+    "rewardDesc": "2 600₽ + 1 Rune Sort"
+  },
+  "232": {
+    "title": "Le Septième Badge (Algatia)",
+    "desc": "Vaincre Lévy & Tatia à l'Arène d'Algatia en combat duo.",
+    "rewardDesc": "4 500₽ + 1 Cuillère Tordue"
+  },
+  "233": {
+    "title": "Les marées de la Grotte Tréfonds Mer",
+    "desc": "Vaincre 12 Pokémon sauvages dans la Grotte Tréfonds Mer.",
+    "rewardDesc": "2 800₽ + 1 Roche Glacée"
+  },
+  "234": {
+    "title": "L'Invasion de la Caverne Fond-de-Mer",
+    "desc": "Vaincre 15 Pokémon sauvages dans la Caverne Fond-de-Mer.",
+    "rewardDesc": "3 000₽ + 1 Eau Mystique"
+  },
+  "235": {
+    "title": "L'Urgence à Atalanopolis",
+    "desc": "Parler à Pierre Rochard à Atalanopolis.",
+    "rewardDesc": "2 000₽"
+  },
+  "236": {
+    "title": "L'Éveil de la Grotte Origine",
+    "desc": "Vaincre 15 Pokémon sauvages dans la Grotte Origine sous l'énergie primordiale.",
+    "rewardDesc": "3 500₽ + 1 Roche Chaude"
+  },
+  "237": {
+    "title": "L'Ascension du Pilier Céleste",
+    "desc": "Vaincre 15 Pokémon sauvages au Pilier Céleste.",
+    "rewardDesc": "4 000₽ + 1 Écaille Draco"
+  },
+  "238": {
+    "title": "Le Huitième Badge (Atalanopolis)",
+    "desc": "Vaincre Juan à l'Arène d'Atalanopolis.",
+    "rewardDesc": "5 000₽ + 1 Bel'Écaille"
+  },
+  "239": {
+    "title": "Le calme de Pacifiville",
+    "desc": "Visiter Pacifiville et parler à l'ancien du village.",
+    "rewardDesc": "2 500₽"
+  },
+  "240": {
+    "title": "L'Ultime Épreuve : Route Victoire",
+    "desc": "Vaincre 20 Pokémon sauvages sur la Route Victoire de Hoenn.",
+    "rewardDesc": "5 000₽ + 5 Guérisons"
+  },
+  "241": {
+    "title": "Le Sommet d'Éternara (Ligue Hoenn)",
+    "desc": "Vaincre le Conseil 4 et le Maître Pierre Rochard à la Ligue de Hoenn.",
+    "rewardDesc": "10 000₽ + 3 Super Bonbons"
+  },
+  "242": {
+    "title": "Le Triomphe du Maître de Hoenn",
+    "desc": "Parler au Professeur Seko à Bourg-en-Vol après avoir conquis la Ligue !",
+    "rewardDesc": "5 000₽ + 3 Écailles Cœur"
+  },
+  "243": {
+    "title": "L'Appel de Scott (Émeraude)",
+    "desc": "Rencontrer Scott dans la nouvelle Zone de Combat pour découvrir l'Atoll de Combat.",
+    "rewardDesc": "3 000₽"
+  },
+  "244": {
+    "title": "L'Épreuve des Meneurs de Zone",
+    "desc": "Remporter 15 combats dans la Zone de Combat pour prouver votre valeur aux Meneurs.",
+    "rewardDesc": "4 000₽ + Bandeau Choix"
+  },
+  "245": {
+    "title": "Le Mystère de l'Île Mirage",
+    "desc": "Explorer l'Île Mirage sur le Chenal 130 et vaincre 12 Pokémon sauvages dans la brume.",
+    "rewardDesc": "3 500₽ + 2 Baies Litchii"
+  },
+  "246": {
+    "title": "L'Invasion du Centre Météo",
+    "desc": "La Team Aqua a envahi le Centre Météo ! Vaincre 12 Pokémon pour libérer les scientifiques.",
+    "rewardDesc": "3 000₽ + Roche Humide"
+  },
+  "247": {
+    "title": "Les Formes de Morphéo",
+    "desc": "Parler au chercheur en chef du Centre Météo pour débloquer le simulateur météorologique de Morphéo.",
+    "rewardDesc": "2 500₽ + Roche Chaude"
+  },
+  "248": {
+    "title": "Infiltration de la Planque Aqua",
+    "desc": "Infiltrer la Planque Aqua à Nénucrique et vaincre 15 gardes avant le départ du sous-marin.",
+    "rewardDesc": "4 000₽ + Eau Mystique"
+  },
+  "249": {
+    "title": "L'Épave de Sea Mauville",
+    "desc": "Explorer l'Épave du Chenal 108 pour retrouver le Scanner englouti du Capitaine Poupe.",
+    "rewardDesc": "3 500₽ + Dent Océan"
+  },
+  "250": {
+    "title": "Le Scanner Océanique",
+    "desc": "Rapportez le Scanner au Capitaine Poupe à Poivressel.",
+    "rewardDesc": "4 000₽ + Écaille Océan"
+  },
+  "251": {
+    "title": "La Rumeur du Passe Éon",
+    "desc": "Enquêter à Pacifiville sur l'Île du Sud et les rêves mystérieux de Latios et Latias.",
+    "rewardDesc": "3 000₽"
+  },
+  "252": {
+    "title": "La Rosée Âme de l'Île du Sud (Film 5)",
+    "desc": "Vaincre 15 Pokémon sur l'Île du Sud pour repousser les chasseurs et protéger Latios et Latias.",
+    "rewardDesc": "5 000₽ + 3 Baies Prine"
+  },
+  "253": {
+    "title": "La Comète du Millénaire (Film 6)",
+    "desc": "Un cirque ambulant est arrivé au Mont Chimnée sous la comète ! Enquêter sur 15 Pokémon.",
+    "rewardDesc": "4 500₽ + 2 Morceaux d'Étoile"
+  },
+  "254": {
+    "title": "Le Magicien Butler (Film 6)",
+    "desc": "Vaincre 15 Pokémon corrompus au Chemin Ardent pour libérer le sommeil de Jirachi !",
+    "rewardDesc": "5 000₽ + Roche Lisse"
+  },
+  "255": {
+    "title": "L'Aurore Boréale d'Algatia (Film 7)",
+    "desc": "Des aurores boréales anormales illuminent Algatia. Parler aux astronomes de la ville.",
+    "rewardDesc": "3 500₽"
+  },
+  "256": {
+    "title": "La Météorite de Larousse (Film 7)",
+    "desc": "Une météorite extraterrestre a frappé le Centre Spatial ! Vaincre 15 Pokémon affectés par l'énergie.",
+    "rewardDesc": "5 500₽ + Cuillère Tordue"
+  },
+  "257": {
+    "title": "Destinée : Deoxys contre Rayquaza (Film 7)",
+    "desc": "Rayquaza descend du ciel pour affronter Deoxys au Centre Spatial ! Calmer 15 Pokémon.",
+    "rewardDesc": "6 000₽ + 2 Super Bonbonss"
+  },
+  "258": {
+    "title": "Épisode Delta : L'Appel d'Amaryllis (ROSA)",
+    "desc": "Amaryllis (Zinnia) apparaît au Site Météore et prédit la chute d'un astéroïde ! Vaincre 15 Pokémon.",
+    "rewardDesc": "5 000₽ + Écaille Draco"
+  },
+  "259": {
+    "title": "Épisode Delta : Le Peuple Draconidé (ROSA)",
+    "desc": "Se rendre à Atalanopolis pour écouter les prophéties ancestrales du peuple Draconidé.",
+    "rewardDesc": "4 000₽"
+  },
+  "260": {
+    "title": "Épisode Delta : L'Ascension Céleste (ROSA)",
+    "desc": "Grimper au sommet du Pilier Céleste en affrontant 20 Pokémon pour éveiller Méga-Rayquaza !",
+    "rewardDesc": "7 000₽ + 5 Hyper Balls"
+  },
+  "261": {
+    "title": "Épisode Delta : Le Test de Pierre Rochard",
+    "desc": "Affronter Pierre Rochard à la Ligue de Hoenn dans un ultime combat pour sauver la planète !",
+    "rewardDesc": "15 000₽ + Master Ball"
+  },
+  "262": {
+    "title": "Le Maître Absolu de Hoenn",
+    "desc": "Retourner triomphant à Bourg-en-Vol ! Le Professeur Seko vous félicite d'avoir sauvé Hoenn et la Terre.",
+    "rewardDesc": "10 000₽ + 5 Écailles Cœur"
+  },
+  "263": {
+    "title": "Primo-Résurgence : la Grotte Origine",
+    "desc": "Vaincre 18 Pokémon sauvages dans la Grotte Origine, agitée par l'énergie primordiale.",
+    "rewardDesc": "5 500₽ + Roche Chaude"
+  },
+  "264": {
+    "title": "Le Conseil d'Atalanopolis",
+    "desc": "Parler aux anciens d'Atalanopolis au sujet des Primo-légendes.",
+    "rewardDesc": "4 500₽"
+  },
+  "265": {
+    "title": "Cap sur le Pilier (Chenal 131)",
+    "desc": "Vaincre 15 Pokémon sauvages sur le Chenal 131, en route vers le Pilier Céleste.",
+    "rewardDesc": "5 000₽ + Eau Mystique"
+  },
+  "266": {
+    "title": "Le Gardien du Ciel",
+    "desc": "Vaincre 15 Pokémon sauvages dans les étages inférieurs du Pilier Céleste.",
+    "rewardDesc": "6 000₽ + Écaille Draco"
+  },
+  "267": {
+    "title": "L'Appel de Rayquaza",
+    "desc": "Méditer au sommet du Pilier Céleste et écouter l'appel de Rayquaza.",
+    "rewardDesc": "5 000₽"
+  },
+  "268": {
+    "title": "L'Étage des Tempêtes",
+    "desc": "Vaincre 20 Pokémon sauvages dans les étages balayés par les vents du Pilier Céleste.",
+    "rewardDesc": "7 000₽ + 5 Hyper Balls"
+  },
+  "269": {
+    "title": "Les Anneaux Célestes",
+    "desc": "Vaincre 20 Pokémon sauvages sous les anneaux du dragon céleste.",
+    "rewardDesc": "7 500₽ + 2 Morceaux d'Étoile"
+  },
+  "270": {
+    "title": "Le Sommet du Monde",
+    "desc": "Vaincre 20 Pokémon sauvages tout en haut du Pilier Céleste.",
+    "rewardDesc": "8 000₽ + 2 Super Bonbons"
+  },
+  "271": {
+    "title": "L'Éclat de Comète",
+    "desc": "Vaincre 20 Pokémon au Centre Spatial pour récupérer un éclat de comète.",
+    "rewardDesc": "9 000₽ + Éclat de Comète"
+  },
+  "272": {
+    "title": "Défense Orbitale",
+    "desc": "Vaincre 20 Pokémon pour sécuriser le lancement du Centre Spatial.",
+    "rewardDesc": "10 000₽ + Cuillère Tordue"
+  },
+  "273": {
+    "title": "Le Rêve de Scott",
+    "desc": "Parler à Scott de son grand projet pour la Zone de Combat.",
+    "rewardDesc": "5 000₽"
+  },
+  "274": {
+    "title": "Les Cerveaux de la Zone",
+    "desc": "Rencontrer les Meneurs de la Zone de Combat.",
+    "rewardDesc": "8 000₽ + Bandeau Choix"
+  },
+  "275": {
+    "title": "Le Sanctuaire des Éons",
+    "desc": "Vaincre 20 Pokémon sur l'Île du Sud pour protéger le sanctuaire des Éons.",
+    "rewardDesc": "8 500₽ + 3 Baies Prine"
+  },
+  "276": {
+    "title": "La Revanche du Maître",
+    "desc": "Affronter Pierre Rochard, Maître de Hoenn, dans son ultime défi.",
+    "rewardDesc": "15 000₽ + Master Ball"
+  },
+  "277": {
+    "title": "Légende Vivante de Hoenn",
+    "desc": "Retourner à Bourg-en-Vol : le Professeur Seko célèbre votre légende.",
+    "rewardDesc": "10 000₽ + 5 Écailles Cœur"
+  },
 },
 "side": {
 "s1": {
 "title":"Le Collectionneur de Baies",
 "desc":"Le Jeune Régis veut voir vos talents : vainquez 10 Pokémon sauvages sur la Route 1.",
-"rewardDesc":"700₽ + 2 Baies Sitrus"
+"rewardDesc":"700₽ + 1 Baie Chople"
 },
 "s2": {
 "title":"Apprenti Dresseur",
 "desc":"Le Dresseur Red vous met au défi : mettez K.O. 15 Pokémon sauvages sur la Route 2.",
-"rewardDesc":"1 100₽ + 2 Baies Prine"
+"rewardDesc":"1 100₽ + 1 Baie Prine"
 },
 "s3": {
 "title":"Gardien de Jadielle",
 "desc":"Le Gardien Jo défie les newcomers : mettez K.O. 12 Pokémon sauvages sur la Route 22 !",
-"rewardDesc":"1 600₽ + 2 Baies Ceriz"
+"rewardDesc":"1 600₽"
 },
 "s4": {
 "title":"Chercheur de Pierres",
@@ -532,7 +918,7 @@ window.L_fr_quests = {
 "s6": {
 "title":"Chercheuse d'Azuria",
 "desc":"La Chercheuse Lys traque les Pokémon rares : mettez K.O. 12 Pokémon sauvages sur la Route 9 !",
-"rewardDesc":"1 900₽ + 2 Baies Sitrus"
+"rewardDesc":"1 900₽ + 1 Baie Passho"
 },
 "s7": {
 "title":"Dresseur de Carmin",
@@ -572,22 +958,22 @@ window.L_fr_quests = {
 "s14": {
 "title":"Le Quintet du Pont Pépite",
 "desc":"Les cinq dresseurs du Pont Pépite testent quiconque passe. Échauffez-vous : 12 victoires sur les sauvages du cap.",
-"rewardDesc":"1 000₽ + 2 Baies Oran"
+"rewardDesc":"1 000₽ + 1 Baie Haban"
 },
 "s15": {
 "title":"Le Chalet du Bout du Monde",
 "desc":"Un campeur de la Route 25 craint les rôdeurs nocturnes. 12 victoires pour sécuriser les environs du chalet de Léo.",
-"rewardDesc":"1 100₽ + 2 Baies Ceriz"
+"rewardDesc":"1 100₽ + 1 Baie Shuca"
 },
 "s16": {
 "title":"L'Allée des Dresseurs",
 "desc":"La Route 5 grouille de jeunes prétendants. Restez affûté : 12 victoires sur les sauvages pour leur montrer l'exemple.",
-"rewardDesc":"1 200₽ + 2 Baies Oran"
+"rewardDesc":"1 200₽ + 1 Baie Prine"
 },
 "s17": {
 "title":"Le Verger de la Route 6",
 "desc":"Les sauvages pillent le verger près de Carmin sur Mer. 14 victoires pour les disperser !",
-"rewardDesc":"1 300₽ + 2 Baies Ceriz"
+"rewardDesc":"1 300₽"
 },
 "s18": {
 "title":"Pelleteurs en Furie",
@@ -597,37 +983,37 @@ window.L_fr_quests = {
 "s19": {
 "title":"Mauvaises Herbes",
 "desc":"La végétation de la Route 8 cache trop d'embuscades. 15 victoires pour aérer le passage.",
-"rewardDesc":"1 700₽ + 2 Baies Oran"
+"rewardDesc":"1 700₽ + 1 Baie Charti"
 },
 "s20": {
 "title":"L'Éclaireur du Tunnel",
 "desc":"La Grotte Rocheuse reste plongée dans le noir. Ouvrez la voie : 15 victoires contre les sauvages.",
-"rewardDesc":"1 900₽ + 1 Poussière Étoile"
+"rewardDesc":"1 900₽ + 1 Baie Babiri"
 },
 "s21": {
 "title":"Le Dédale de la Route 13",
 "desc":"Le labyrinthe de clôtures de la Route 13 piège les promeneurs. 15 victoires pour baliser le chemin.",
-"rewardDesc":"2 000₽ + 2 Baies Sitrus"
+"rewardDesc":"2 000₽ + 1 Baie Colbur"
 },
 "s22": {
 "title":"Le Raccourci",
 "desc":"La Route 7 est le passage préféré des livreurs entre Safrania et Céladopole. 15 victoires pour le sécuriser.",
-"rewardDesc":"2 100₽ + 2 Baies Ceriz"
+"rewardDesc":"2 100₽ + 1 Baie Occa"
 },
 "s23": {
 "title":"Le Guet de la Route 16",
 "desc":"Des rôdeurs guettent les cyclistes au départ de la piste. 12 victoires pour les disperser.",
-"rewardDesc":"2 200₽ + 2 Baies Oran"
+"rewardDesc":"2 200₽"
 },
 "s24": {
 "title":"Le Champ en Délire",
 "desc":"Les champs de la Route 14 frémissent de sauvages survoltés. 16 victoires pour apaiser la prairie.",
-"rewardDesc":"2 400₽ + 2 Baies Sitrus"
+"rewardDesc":"2 400₽"
 },
 "s25": {
 "title":"La Percée de la Route 15",
 "desc":"Les ornithologues réclament un couloir sûr vers Parmanie. 16 victoires pour l'ouvrir.",
-"rewardDesc":"2 500₽ + 2 Baies Ceriz"
+"rewardDesc":"2 500₽ + 1 Baie Kasib"
 },
 "s26": {
 "title":"Mécène de Safrania",
@@ -637,27 +1023,27 @@ window.L_fr_quests = {
 "s27": {
 "title":"Les Îlots Jumeaux",
 "desc":"Le Chenal 20 borde les Îles Écume : vagues et sauvages se déchaînent. 15 victoires pour calmer le jeu.",
-"rewardDesc":"2 800₽ + 2 Baies Sitrus"
+"rewardDesc":"2 800₽ + 1 Baie Payapa"
 },
 "s28": {
 "title":"Nage et Contre-Courants",
 "desc":"Le Chenal 21 charrie les sauvages vers Bourg Palette. 18 victoires pour assainir la nage.",
-"rewardDesc":"3 000₽ + 2 Baies Sitrus"
+"rewardDesc":"3 000₽ + 1 Baie Wacan"
 },
 "s29": {
 "title":"La Concession d'Argenta",
 "desc":"Le mineur-en-chef d'Argenta achète toutes vos trouvailles : vendez 8 trésors déterrés à la mine.",
-"rewardDesc":"2 700₽ + 2 Baies Ceriz"
+"rewardDesc":"2 700₽ + 1 Baie Shuca"
 },
 "s30": {
 "title":"Messager du Plateau",
 "desc":"Le Plateau Indigo veut une Route Victoire praticable pour les challengers. 18 victoires pour l'honneur !",
-"rewardDesc":"3 500₽ + 2 Baies Sitrus"
+"rewardDesc":"3 500₽ + 1 Baie Prine"
 },
 "s31": {
 "title":"Le Dresseur de la Route 30",
 "desc":"Le Jeune Hugo défie la Route 30 : 12 victoires !",
-"rewardDesc":"1 600₽ + 2 Baies Sitrus"
+"rewardDesc":"1 600₽ + 1 Baie Yache"
 },
 "s32": {
 "title":"Le Maître de la Tour Chétiflor",
@@ -692,7 +1078,7 @@ window.L_fr_quests = {
 "s38": {
 "title":"Gardien d'Oliville",
 "desc":"Le Gardien Olaf surveille la Route 38/39 : 10 victoires !",
-"rewardDesc":"1 800₽ + 2 Baies Oran"
+"rewardDesc":"1 800₽ + 1 Baie Colbur"
 },
 "s39": {
 "title":"Le Marin d'Oliville",
@@ -722,37 +1108,37 @@ window.L_fr_quests = {
 "s44": {
 "title":"La Route 29 dégagée",
 "desc":"Des Pokémon nerveux bloquent la Route 29 aux nouveaux dresseurs. Mettez K.O. 15 Pokémon sauvages pour sécuriser le passage.",
-"rewardDesc":"1 500₽ + 2 Baies Oran"
+"rewardDesc":"1 500₽ + 1 Baie Tanga"
 },
 "s45": {
 "title":"Sentinelle de la Route 31",
 "desc":"La Route 31 fourmille autour de Mauville. 15 K.O. sauvages et le chemin sera tranquille.",
-"rewardDesc":"1 800₽ + 1 Baie Sitrus"
+"rewardDesc":"1 800₽ + 1 Baie Roseli"
 },
 "s46": {
 "title":"Échos du Bois",
 "desc":"Le ranger du Bois aux Chênes recense les silhouettes entre les arbres : 20 K.O. sauvages pour finir la tournée.",
-"rewardDesc":"2 400₽ + 2 Baies Oran"
+"rewardDesc":"2 400₽ + 1 Baie Rindo"
 },
 "s47": {
 "title":"Retour à la Pension",
 "desc":"La Pension de la Route 34 déborde de visiteurs : mettez K.O. 15 Pokémon sauvages alentour pour apaiser le secteur.",
-"rewardDesc":"2 200₽ + 1 Baie Sitrus"
+"rewardDesc":"2 200₽"
 },
 "s48": {
 "title":"La Ferme Meumeu",
 "desc":"Les Écrémeuh et Tauros de la Route 39 s'éparpillent ! 15 K.O. sauvages pour ramener le calme à la ferme.",
-"rewardDesc":"2 600₽ + 2 Baies Sitrus"
+"rewardDesc":"2 600₽"
 },
 "s49": {
 "title":"Vagues d'Irisia",
 "desc":"Les nageurs d'Irisia veulent une mer sûre : 15 K.O. sauvages sur la Route 40.",
-"rewardDesc":"2 800₽ + 3 Baies Oran"
+"rewardDesc":"2 800₽ + 1 Baie Chople"
 },
 "s50": {
 "title":"Gardiens des Tourb'Îles",
 "desc":"Les Tourb'Îles fourmillent en haute saison. 18 K.O. sauvages pour le gardien des îles.",
-"rewardDesc":"3 200₽ + 1 Baie Sitrus"
+"rewardDesc":"3 200₽ + 1 Baie Passho"
 },
 "s51": {
 "title":"L'Antre Noir s'éclaire",
@@ -762,24 +1148,106 @@ window.L_fr_quests = {
 "s52": {
 "title":"Le défi du Mont Creuset",
 "desc":"Le Karateka Tadashi n'accepte que les dresseurs endurants : 15 K.O. sauvages au Mont Creuset !",
-"rewardDesc":"3 800₽ + 1 Baie Sitrus"
+"rewardDesc":"3 800₽ + 1 Baie Payapa"
 },
 "s53": {
 "title":"Route 42 : passage sécurisé",
 "desc":"Entre Rosalia et Acajou, la Route 42 est un goulot. 18 K.O. sauvages pour les patrouilles.",
-"rewardDesc":"3 600₽ + 3 Baies Oran"
+"rewardDesc":"3 600₽ + 1 Baie Kebia"
 },
 "s54": {
 "title":"Furie du Lac",
 "desc":"Même après la défaite des Rockets, les rives du Lac Colère restent nerveuses. 18 K.O. sauvages sur la Route 43.",
-"rewardDesc":"4 200₽ + 2 Baies Sitrus"
+"rewardDesc":"4 200₽ + 1 Baie Babiri"
 },
 "s55": {
 "title":"Souffle de la Route de Glace",
 "desc":"La Route de Glace gèle les randonneurs imprudents. 20 K.O. sauvages pour baliser le trajet.",
-"rewardDesc":"4 800₽ + 2 Baies Sitrus"
-}
+"rewardDesc":"4 800₽ + 1 Baie Haban"
+}    ,"s56": { "title": "Route 101 (Bourg-en-Vol)", "desc": "Vaincre 10 Pokémon sauvages sur la Route 101.", "rewardDesc": "1 000₽" },
+    "s57": { "title": "Route 102 (Rosyères)", "desc": "Vaincre 12 Pokémon sauvages sur la Route 102.", "rewardDesc": "1 200₽" },
+    "s58": { "title": "Route 104 (Clémenti-Ville)", "desc": "Vaincre 15 Pokémon sauvages sur la Route 104.", "rewardDesc": "1 500₽" },
+    "s59": { "title": "Tunnel Mérazon (Mérouville)", "desc": "Vaincre 15 Pokémon sauvages dans le Tunnel Mérazon.", "rewardDesc": "1 800₽" },
+    "s60": { "title": "Grotte Granite (Myokara)", "desc": "Vaincre 18 Pokémon sauvages dans la Grotte Granite.", "rewardDesc": "2 000₽" },
+    "s61": { "title": "Chenal 109 (Poivressel)", "desc": "Vaincre 20 Pokémon sauvages sur le Chenal 109.", "rewardDesc": "2 200₽" },
+    "s62": { "title": "Route 110 (Lavandia)", "desc": "Vaincre 20 Pokémon sauvages sur la Route 110.", "rewardDesc": "2 400₽" },
+    "s63": { "title": "Route 117 (Vergazon)", "desc": "Vaincre 20 Pokémon sauvages sur la Route 117.", "rewardDesc": "2 500₽" },
+    "s64": { "title": "Route 113 (Autopia)", "desc": "Vaincre 20 Pokémon sauvages sur la Route 113.", "rewardDesc": "2 600₽" },
+    "s65": { "title": "Chemin Ardent (Vermilava)", "desc": "Vaincre 20 Pokémon sauvages au Chemin Ardent.", "rewardDesc": "2 800₽" },
+    "s66": { "title": "Route 119 (Cimmery)", "desc": "Vaincre 20 Pokémon sauvages sur la Route 119.", "rewardDesc": "3 000₽" },
+    "s67": { "title": "Mont Mémoria (Nénucrique)", "desc": "Vaincre 20 Pokémon sauvages au Mont Mémoria.", "rewardDesc": "3 200₽" },
+    "s68": { "title": "Grotte Tréfonds (Algatia)", "desc": "Vaincre 20 Pokémon sauvages dans la Grotte Tréfonds.", "rewardDesc": "3 400₽" },
+    "s69": { "title": "Grotte Origine (Atalanopolis)", "desc": "Vaincre 20 Pokémon sauvages dans la Grotte Origine.", "rewardDesc": "3 600₽" },
+    "s70": { "title": "Chenal 131 (Pacifiville)", "desc": "Vaincre 20 Pokémon sauvages sur le Chenal 131.", "rewardDesc": "3 800₽" },
+    "s71": { "title": "Route Victoire (Éternara)", "desc": "Vaincre 25 Pokémon sauvages sur la Route Victoire Hoenn.", "rewardDesc": "4 000₽" },
+    "s72": { "title": "Sécurité Météo (Centre Météo)", "desc": "Vaincre 15 Pokémon sauvages autour du Centre Météo.", "rewardDesc": "3 500₽" },
+    "s73": { "title": "Patrouille Aqua (Planque Aqua)", "desc": "Vaincre 20 Pokémon sauvages dans la Planque Aqua.", "rewardDesc": "4 000₽" },
+    "s74": { "title": "Défense Spatiale (Centre Spatial)", "desc": "Vaincre 20 Pokémon sauvages autour du Centre Spatial.", "rewardDesc": "4 500₽" },
+    "s75": { "title": "Ligue Pokémon Hoenn", "desc": "Vaincre 25 Pokémon sur la Route Victoire pour la Ligue.", "rewardDesc": "5 000₽" },
+    "s76": { "title": "Défi de la Zone de Combat", "desc": "Vaincre 20 Pokémon dans la Zone de Combat.", "rewardDesc": "5 000₽" },
+    "s77": { "title": "Sanctuaire de l'Île du Sud", "desc": "Vaincre 20 Pokémon sur l'Île du Sud.", "rewardDesc": "5 500₽" },
+    "s78": { "title": "Brume de l'Île Mirage", "desc": "Vaincre 20 Pokémon sur l'Île Mirage.", "rewardDesc": "5 500₽" },
+    "s79": { "title": "Abysses de la Caverne Fond-de-Mer", "desc": "Vaincre 25 Pokémon dans la Caverne Fond-de-Mer.", "rewardDesc": "6 000₽" },
+    "s80": { "title": "Étoiles du Pilier Céleste", "desc": "Vaincre 25 Pokémon dans le Pilier Céleste.", "rewardDesc": "6 500₽" },
+    "s81": { "title": "Roche Météorique (Site Météore)", "desc": "Vaincre 20 Pokémon au Site Météore.", "rewardDesc": "4 500₽" },
+    "s82": { "title": "Épave Engloutie (Sea Mauville)", "desc": "Vaincre 20 Pokémon sur le Chenal 108.", "rewardDesc": "4 000₽" },
+    "s83": { "title": "Désert de la Route 111", "desc": "Vaincre 20 Pokémon dans le désert de la Route 111.", "rewardDesc": "3 500₽" },
+    "s84": { "title": "Hautes Herbes de la Route 120", "desc": "Vaincre 20 Pokémon sur la Route 120.", "rewardDesc": "3 500₽" },
+    "s85": { "title": "Maître Explorateur de Hoenn", "desc": "Vaincre 25 Pokémon sur la Route 101 pour clôturer les enquêtes.", "rewardDesc": "10 000₽" },
+"s86": { "title":"Caverne Azurée — Stèles", "desc":"Résolvez la première énigme des stèles dans la Caverne Azurée.", "rewardDesc":"4 200₽ + Cuillère Tordue" },
+"s87": { "title":"Caverne Azurée — Reflet", "desc":"Résolvez la seconde énigme (ordre inverse) de la Caverne Azurée.", "rewardDesc":"7 000₽ + Restes" },
+"s88": { "title":"Îles Écume — Vannes", "desc":"Ouvrez les trois vannes des Îles Écume dans le bon ordre.", "rewardDesc":"3 500₽ + Eau Mystique" },
+"s89": { "title":"Îles Écume — Glacier", "desc":"Trouvez le mot des glaciers aux Îles Écume.", "rewardDesc":"4 900₽ + Glace Éternelle" },
+"s90": { "title":"Mont Sélénite — Strates", "desc":"Remontez les strates de fouille du Mont Sélénite.", "rewardDesc":"3 000₽ + Pierre Dure" },
+"s91": { "title":"Mont Sélénite — Phase", "desc":"Nommez la phase qui ouvre le sanctuaire lunaire.", "rewardDesc":"3 500₽ + Pierre Lune" },
+"s92": { "title":"Ruines d’Alpha — Cercle", "desc":"Activez les piliers cardinaux dans le sens du jour (aube d’abord).", "rewardDesc":"3 500₽ + Cuillère Tordue" },
+"s93": { "title":"Ruines d’Alpha — Miroir", "desc":"Refaites le chemin solaire puis son reflet, sans doubler le Nord.", "rewardDesc":"5 600₽ + Pierre Lune" },
+"s94": { "title":"Tour Chétiflor — Cloches", "desc":"Faites sonner les cloches de la Tour Chétiflor dans l’ordre du rituel.", "rewardDesc":"3 000₽ + Graine Miracle" },
+"s95": { "title":"Tour Chétiflor — Mantra", "desc":"Retrouvez le mantra des moines de la Tour Chétiflor.", "rewardDesc":"3 150₽ + Rune Sort" },
+"s96": { "title":"Tour Cendrée — Braises", "desc":"Rallumez les braises de la Tour Cendrée dans le bon ordre.", "rewardDesc":"3 000₽ + Charbon" },
+"s97": { "title":"Tour Cendrée — Mot des Bêtes", "desc":"Trouvez le mot qui lie les trois Bêtes légendaires.", "rewardDesc":"4 900₽ + Charbon" },
+"s98": { "title":"Route de Glace — Énigme", "desc":"Résolvez l’énigme gelée de la Route de Glace.", "rewardDesc":"3 500₽ + Baie Yache" },
+"s99": { "title":"Route de Glace — Pas comptés", "desc":"Suivez les pas comptés sur la glace sans glisser.", "rewardDesc":"4 550₽ + Glace Éternelle" },
+"s100": { "title":"Sanctuaire — Peuple antique", "desc":"Au Sanctuaire sous la Route 134, invoquez Relicanth puis Wailord (noms EN).", "rewardDesc":"4 200₽ + Pierre Dure" },
+"s101": { "title":"Regirock — Braille", "desc":"Ruines Désert : apprenez à lire le braille des colosses.", "rewardDesc":"3 500₽ + Pierre Dure" },
+"s102": { "title":"Regirock — Patience", "desc":"Ruines Désert : attendez sans bouger, puis validez le mot du braille.", "rewardDesc":"3 500₽ + Pierre Dure" },
+"s103": { "title":"Regirock — Sceau", "desc":"Ruines Désert : découvrez le nom de pierre du colosse.", "rewardDesc":"5 600₽ + Pierre Dure" },
+"s104": { "title":"Regice — Braille", "desc":"Grotte Isolée : déchiffrez la leçon de braille gelée.", "rewardDesc":"3 500₽ + Glace Éternelle" },
+"s105": { "title":"Regice — Cadran", "desc":"Grotte Isolée : lisez le cadran braille des chiffres.", "rewardDesc":"4 200₽ + Glace Éternelle" },
+"s106": { "title":"Regice — Nom", "desc":"Grotte Isolée : scellez le froid en trois lettres.", "rewardDesc":"5 600₽ + Glace Éternelle" },
+"s107": { "title":"Registeel — Braille", "desc":"Tombeau Antique : apprenez le braille des forgerons.", "rewardDesc":"3 500₽ + Peau Métal" },
+"s108": { "title":"Registeel — Flèches", "desc":"Tombeau Antique : dansez la séquence de flèches d’acier.", "rewardDesc":"4 200₽ + Peau Métal" },
+"s109": { "title":"Registeel — Nom", "desc":"Tombeau Antique : le mot des forgerons (5 lettres).", "rewardDesc":"5 600₽ + Peau Métal" },
+"s110": { "title":"Fond-de-Mer — Pression", "desc":"Caverne Fond-de-Mer : purgez les manomètres dans l’ordre du journal.", "rewardDesc":"4 900₽ + Eau Mystique" },
+"s111": { "title":"Fond-de-Mer — Profondeur", "desc":"Caverne Fond-de-Mer : calculez la profondeur cible du carnet.", "rewardDesc":"6 300₽ + Dent Océan" },
+"s112": { "title":"Mémoria — Offrandes", "desc":"Mont Mémoria : présentez les offrandes du deuil au repos.", "rewardDesc":"3 500₽ + Rune Sort" },
+"s113": { "title":"Mémoria — Sommet", "desc":"Mont Mémoria : le mot de repos au sommet.", "rewardDesc":"4 900₽ + Rune Sort" },
+"s114": { "title":"Patrouille — Route 101", "desc":"Vaincre 10 Pokémon sauvages : Route 101.", "rewardDesc":"800₽" },
+"s115": { "title":"Patrouille — Route 104", "desc":"Vaincre 12 Pokémon sauvages : Route 104.", "rewardDesc":"1 000₽" },
+"s116": { "title":"Patrouille — Bois Clémenti", "desc":"Vaincre 15 Pokémon sauvages : Bois Clémenti.", "rewardDesc":"1 200₽ + Graine Miracle" },
+"s117": { "title":"Patrouille — Route 110", "desc":"Vaincre 15 Pokémon sauvages : Route 110.", "rewardDesc":"1 400₽ + Aimant" },
+"s118": { "title":"Patrouille — Route 111", "desc":"Vaincre 18 Pokémon sauvages : Route 111.", "rewardDesc":"1 600₽ + Sable Doux" },
+"s119": { "title":"Patrouille — Route 112", "desc":"Vaincre 15 Pokémon sauvages : Route 112.", "rewardDesc":"1 500₽ + Charbon" },
+"s120": { "title":"Patrouille — Route 114", "desc":"Vaincre 15 Pokémon sauvages : Route 114.", "rewardDesc":"1 500₽ + Pierre Dure" },
+"s121": { "title":"Patrouille — Route 119", "desc":"Vaincre 20 Pokémon sauvages : Route 119.", "rewardDesc":"2 000₽ + Graine Miracle" },
+"s122": { "title":"Patrouille — Route 120", "desc":"Vaincre 18 Pokémon sauvages : Route 120.", "rewardDesc":"1 800₽ + Baie Coba" },
+"s123": { "title":"Patrouille — Mont Chimnée", "desc":"Vaincre 20 Pokémon sauvages : Mont Chimnée.", "rewardDesc":"2 200₽ + Pierre Feu" },
+"s124": { "title":"Patrouille — Site Météore", "desc":"Vaincre 18 Pokémon sauvages : Site Météore.", "rewardDesc":"2 000₽ + Écaille Draco" },
+"s125": { "title":"Patrouille — Route 123", "desc":"Vaincre 15 Pokémon sauvages : Route 123.", "rewardDesc":"1 700₽ + Baie Kebia" },
+"s126": { "title":"Patrouille — Chenal 124", "desc":"Vaincre 15 Pokémon sauvages : Chenal 124.", "rewardDesc":"1 800₽ + Eau Mystique" },
+"s127": { "title":"Patrouille — Grotte Tréfonds", "desc":"Vaincre 18 Pokémon sauvages : Grotte Tréfonds.", "rewardDesc":"2 000₽ + Glace Éternelle" },
+"s128": { "title":"Patrouille — Chenal 127", "desc":"Vaincre 15 Pokémon sauvages : Chenal 127.", "rewardDesc":"1 800₽" },
+"s129": { "title":"Patrouille — Route Victoire", "desc":"Vaincre 25 Pokémon sauvages : Route Victoire.", "rewardDesc":"3 000₽ + Pierre Dure" },
+"s130": { "title":"Patrouille — Pilier Céleste", "desc":"Vaincre 20 Pokémon sauvages : Pilier Céleste.", "rewardDesc":"2 500₽ + Croc Dragon" },
+"s131": { "title":"Patrouille — Zone Safari", "desc":"Vaincre 20 Pokémon sauvages : Zone Safari.", "rewardDesc":"2 200₽ + Pierre Plante" },
+"s132": { "title":"Rencontre — Poivressel", "desc":"Parlez à l’habitant de Poivressel.", "rewardDesc":"1 000₽ + Mouchoir Soie" },
+"s133": { "title":"Rencontre — Nénucrique", "desc":"Parlez à l’habitant de Nénucrique.", "rewardDesc":"1 200₽ + Super Bonbon" },
+"s134": { "title":"Rencontre — Algatia", "desc":"Parlez à l’habitant de Algatia.", "rewardDesc":"1 200₽ + Cuillère Tordue" },
+"s135": { "title":"Rencontre — Atalanopolis", "desc":"Parlez à l’habitant de Atalanopolis.", "rewardDesc":"1 500₽ + Eau Mystique" },
+"s136": { "title":"Rencontre — Pacifiville", "desc":"Parlez à l’habitant de Pacifiville.", "rewardDesc":"1 200₽ + Écaille Draco" },
+"s137": { "title":"Rencontre — Autéquia", "desc":"Parlez à l’habitant de Autéquia.", "rewardDesc":"1 000₽ + Pierre Lune" }
 },
+
 "repeatable": {
 "r1": {
 "title":"Chasseur de trésors",
@@ -1516,5 +1984,6 @@ window.L_fr_move_descs = {
   "xscissor": "Le lanceur taillade l’ennemi en utilisant ses faux ou ses griffes comme une paire de ciseaux.",
   "yawn": "Fait bâiller l’ennemi qui s’endort au tour suivant.",
   "zapcannon": "Un boulet de canon électrifié qui inflige des dégâts et paralyse l’ennemi.",
-  "zenheadbutt": "Le lanceur concentre sa volonté et donne un coup de tête. Peut aussi apeurer l’ennemi."
+  "zenheadbutt": "Le lanceur concentre sa volonté et donne un coup de tête. Peut aussi apeurer l’ennemi.",
 };
+

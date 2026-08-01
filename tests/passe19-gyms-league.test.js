@@ -181,3 +181,4 @@ test('i18n : les 10 étapes de ligue ont nom + titre en FR et EN', () => {
     assert.equal(frag.lorelei.name, expected, `${file} : contrôle traduction Olga/${expected}`);
   }
 });
+

@@ -426,3 +426,4 @@ if (typeof renderFossilLabCompact !== 'undefined' && typeof window !== 'undefine
 if (typeof renderHatcheryAutomationSlotCard !== 'undefined' && typeof window !== 'undefined')
   window.renderHatcheryAutomationSlotCard = renderHatcheryAutomationSlotCard;
 
+

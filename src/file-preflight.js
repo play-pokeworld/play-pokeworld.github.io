@@ -1,4 +1,33 @@
 (function () {
+
+/** Garantit l'existence de #poke-modal / #poke-modal-inner (presets, usine, énigmes). */
+function ensurePokeModal(){
+  try{
+    var modal = document.getElementById('poke-modal');
+    if(!modal){
+      modal = document.createElement('div');
+      modal.id = 'poke-modal';
+      modal.setAttribute('role', 'dialog');
+      modal.setAttribute('aria-modal', 'true');
+      modal.innerHTML = '<div id="poke-modal-inner"></div>';
+      (document.body || document.documentElement).appendChild(modal);
+      modal.addEventListener('click', function(e){ if(e.target === modal){ modal.classList.remove('open'); modal.classList.remove('preset-editor-modal'); modal.classList.remove('atoll-prep-modal'); modal.classList.remove('pw-info-modal'); }});
+    }
+    var inner = document.getElementById('poke-modal-inner');
+    if(!inner){
+      inner = document.createElement('div');
+      inner.id = 'poke-modal-inner';
+      modal.appendChild(inner);
+    }
+    return { modal: modal, inner: inner };
+  }catch(err){
+    console.error('[ensurePokeModal]', err);
+    return { modal: null, inner: null };
+  }
+}
+if (typeof window !== 'undefined') window.ensurePokeModal = ensurePokeModal;
+
+
   const SAVE_KEY = 'pokeworld_save';
   const CURRENT_SAVE_VERSION = 3;
 
@@ -121,7 +150,7 @@
   function typeEffect(attackType, defendType1, defendType2) { const first = (TYPE_CHART[attackType] || {})[defendType1] ?? 1; const second = defendType2 ? ((TYPE_CHART[attackType] || {})[defendType2] ?? 1) : 1; return first * second; }
   function effectivenessText(multiplier) { const tr = typeof window.t === 'function' ? window.t : function (key) { return key; }; if(multiplier===0) return tr('eff_immune'); if(multiplier>=4) return tr('eff_super_x4'); if(multiplier>=2) return tr('eff_super'); if(multiplier<=0.25) return tr('eff_very_weak'); if(multiplier<=0.5) return tr('eff_weak'); return ''; }
   
-  const MARKET_STOCK = Object.freeze({ kanto: Object.freeze([1,4,7,133,137,106,107,122]), johto: Object.freeze([152,155,158,172,173,174,175,236,196,197,199,213,238,239,240]) });
+  const MARKET_STOCK = Object.freeze({ kanto: Object.freeze([1,4,7,133,137,106,107,122]), johto: Object.freeze([152,155,158,172,173,174,175,236,196,197,199,213,238,239,240]), hoenn: Object.freeze([252,255,258,298,351]) });
   function getPokemonPrice(id, pokemonData) { if(id===151) return 100000; if(id===150) return 75000; if([144,145,146].includes(id)) return 50000; const d=pokemonData[id]; if(!d) return 999999; const bst=d[3]+d[4]+d[5]+d[6]; if([1,4,7,152,155,158].includes(id)) return 5000; if([2,5,8].includes(id)) return 8000; if([3,6,9].includes(id)) return 12000; if([138,140].includes(id)) return 8000; if([139,141].includes(id)) return 12000; if([142].includes(id)) return 15000; if([147].includes(id)) return 10000; if([148].includes(id)) return 15000; if([149].includes(id)) return 25000; let mult=12; if(bst>=350) mult=22; else if(bst>=300) mult=18; else if(bst>=250) mult=15; else if(bst>=200) mult=13; return Math.max(1500, Math.floor(bst*mult)); }
   const MINE_ITEMS = Object.freeze([{key:'firestone',name:'firestone',shape:[[1,1,1],[1,1,1],[1,1,1]]},{key:'waterstone',name:'waterstone',shape:[[1,1,1],[1,1,1],[1,1,0]]},{key:'thunderstone',name:'thunderstone',shape:[[0,1,0],[1,1,1],[0,1,0]]},{key:'leafstone',name:'leafstone',shape:[[0,1,0],[1,1,1],[1,1,1]]},{key:'moonstone',name:'moonstone',shape:[[1,1],[1,1]]},{key:'sunstone',name:'sunstone',shape:[[1,0,1],[0,1,0],[1,0,1]]},{key:'nugget',name:'nugget',shape:[[1,1,1],[1,1,1]]},{key:'stardust',name:'stardust',shape:[[1,1],[1,1]]},{key:'helix_fossil',name:'helix_fossil',shape:[[0,1,1,0],[1,1,1,1],[1,1,1,1],[0,1,1,0]]},{key:'dome_fossil',name:'dome_fossil',shape:[[1,1,1],[1,1,1],[0,1,0]]},{key:'old_amber',name:'old_amber',shape:[[1,1],[1,1],[1,1]]},{key:'root_fossil',name:'root_fossil',shape:[[1,1,0],[1,1,1],[0,1,1]]},{key:'claw_fossil',name:'claw_fossil',shape:[[1,0,1],[1,1,1],[1,0,1]]},{key:'fossil',name:'fossil',shape:[[0,1,1,0],[1,1,1,1],[1,1,1,1],[0,1,1,0]]}]);
   const FOSSIL_REVIVE_MAP = Object.freeze({fossil:138,helix_fossil:138,dome_fossil:140,old_amber:142,root_fossil:345,claw_fossil:347});
@@ -132,7 +161,7 @@
 
 
   function createInitialGameState() {
-    return { location:'pallet', region:'kanto', team:[], inventory:{}, money:2000, badges:[], defeatedChamps:{}, pokedex:{}, stepsLeft:0, starter:false, starterKanto:false, starterJohto:false, regionStarter:{kanto:false,johto:false}, collection:{}, teamSlotItems:[], evolvedSpecies:[], dupeCatches:{}, lang:'fr', storyIdx:0, storyProgress:0, unlockedTalents:{}, activeQuests:[], repeatables:[], visitedMaps:{}, completedQuests:{}, wildWinsByLoc:{}, regionLeagueWon:{}, playTimeMs:0, saveMeta:{}, routeEvents:{ seen:{}, active:null, history:[], cooldowns:{} } };
+    return { location:'pallet', region:'kanto', team:[], inventory:{}, money:2000, badges:[], defeatedChamps:{}, pokedex:{}, stepsLeft:0, starter:false, starterKanto:false, starterJohto:false, regionStarter:{kanto:false,johto:false}, collection:{}, teamSlotItems:[], evolvedSpecies:[], dupeCatches:{}, lang:'en', storyIdx:0, storyProgress:0, unlockedTalents:{}, activeQuests:[], repeatables:[], visitedMaps:{}, completedQuests:{}, wildWinsByLoc:{}, regionLeagueWon:{}, playTimeMs:0, saveMeta:{}, tutorial:{ enabled:true, completed:{}, dismissedTips:{}, rewards:{} }, routeEvents:{ seen:{}, active:null, history:[], cooldowns:{} } };
   }
   function createInitialBattleState() {
     return { active:false, enemy:null, enemyPoke:null, playerPokeIdx:0, isChamp:false, champId:null, champPokeIdx:0, turnLocked:false, escaped:false, chill:false, playerMods:{atk:1,def:1,spe:1}, enemyMods:{atk:1,def:1,spe:1}, log:[], sessionCatches:[], sessionItems:{}, sessionWins:0, sessionPlayerKOs:0, sessionStartedAt:0, sessionDamageByPokemon:{}, pendingLeave:false, pendingSwitchIdx:null, weather:'none', terrain:'none', weatherTurns:0, terrainTurns:0 };
@@ -237,7 +266,7 @@
     else if (view === 'combat') visible = ['win-battle'];
     else if (view === 'team') visible = ['win-team'];
     else if (view === 'quests') visible = ['win-story'];
-    else visible = ({hatchery:['win-hatchery'], training:['win-training'], mine:['win-mine'], shortcuts:['win-shortcuts']})[manageView] || ['win-hatchery'];
+    else visible = ({hatchery:['win-hatchery'], training:['win-training'], mine:['win-mine'], shortcuts:['win-shortcuts'], base:['win-base']})[manageView] || ['win-hatchery'];
     allWins.forEach(function(win){
       var show = visible.indexOf(win.id) !== -1;
       win.classList.toggle('mobile-visible', show);
@@ -573,3 +602,4 @@ window.pwInfoBack = function pwInfoBack() {
   var pm = document.getElementById('poke-modal');
   if (pm) pm.classList.remove('open');
 };
+

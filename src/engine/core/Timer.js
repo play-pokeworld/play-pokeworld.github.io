@@ -114,3 +114,4 @@ window.PokeTimer = TimerManager;
 if (!window.poke) window.poke = {};
 window.poke.Timer = TimerManager;
 })();
+

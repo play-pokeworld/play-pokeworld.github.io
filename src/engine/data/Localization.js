@@ -139,3 +139,4 @@ window.tr = (key, vars) => window.L.tr(key, vars);
 if (!window.poke) window.poke = {};
 window.poke.Localization = Localization;
 })();
+

@@ -1,0 +1,970 @@
+{
+ "DECOR_NONE": {
+  "name": "SMALL DESK",
+  "perm": "DECORPERM_SOLID_FLOOR",
+  "shape": "1x1",
+  "cat": "DESK",
+  "price": 0,
+  "tiles": "DecorGfx_SMALL_DESK"
+ },
+ "DECOR_SMALL_DESK": {
+  "name": "SMALL DESK",
+  "perm": "DECORPERM_SOLID_FLOOR",
+  "shape": "1x1",
+  "cat": "DESK",
+  "price": 3000,
+  "tiles": "DecorGfx_SMALL_DESK"
+ },
+ "DECOR_POKEMON_DESK": {
+  "name": "POK\u00e9MON DESK",
+  "perm": "DECORPERM_SOLID_FLOOR",
+  "shape": "1x1",
+  "cat": "DESK",
+  "price": 3000,
+  "tiles": "DecorGfx_POKEMON_DESK"
+ },
+ "DECOR_HEAVY_DESK": {
+  "name": "HEAVY DESK",
+  "perm": "DECORPERM_SOLID_FLOOR",
+  "shape": "3x2",
+  "cat": "DESK",
+  "price": 6000,
+  "tiles": "DecorGfx_HEAVY_DESK"
+ },
+ "DECOR_RAGGED_DESK": {
+  "name": "RAGGED DESK",
+  "perm": "DECORPERM_SOLID_FLOOR",
+  "shape": "3x2",
+  "cat": "DESK",
+  "price": 6000,
+  "tiles": "DecorGfx_RAGGED_DESK"
+ },
+ "DECOR_COMFORT_DESK": {
+  "name": "COMFORT DESK",
+  "perm": "DECORPERM_SOLID_FLOOR",
+  "shape": "3x2",
+  "cat": "DESK",
+  "price": 6000,
+  "tiles": "DecorGfx_COMFORT_DESK"
+ },
+ "DECOR_PRETTY_DESK": {
+  "name": "PRETTY DESK",
+  "perm": "DECORPERM_SOLID_FLOOR",
+  "shape": "3x3",
+  "cat": "DESK",
+  "price": 9000,
+  "tiles": "DecorGfx_PRETTY_DESK"
+ },
+ "DECOR_BRICK_DESK": {
+  "name": "BRICK DESK",
+  "perm": "DECORPERM_SOLID_FLOOR",
+  "shape": "3x3",
+  "cat": "DESK",
+  "price": 9000,
+  "tiles": "DecorGfx_BRICK_DESK"
+ },
+ "DECOR_CAMP_DESK": {
+  "name": "CAMP DESK",
+  "perm": "DECORPERM_SOLID_FLOOR",
+  "shape": "3x3",
+  "cat": "DESK",
+  "price": 9000,
+  "tiles": "DecorGfx_CAMP_DESK"
+ },
+ "DECOR_HARD_DESK": {
+  "name": "HARD DESK",
+  "perm": "DECORPERM_SOLID_FLOOR",
+  "shape": "3x3",
+  "cat": "DESK",
+  "price": 9000,
+  "tiles": "DecorGfx_HARD_DESK"
+ },
+ "DECOR_SMALL_CHAIR": {
+  "name": "SMALL CHAIR",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "CHAIR",
+  "price": 2000,
+  "tiles": "DecorGfx_SMALL_CHAIR"
+ },
+ "DECOR_POKEMON_CHAIR": {
+  "name": "POK\u00e9MON CHAIR",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "CHAIR",
+  "price": 2000,
+  "tiles": "DecorGfx_POKEMON_CHAIR"
+ },
+ "DECOR_HEAVY_CHAIR": {
+  "name": "HEAVY CHAIR",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "CHAIR",
+  "price": 2000,
+  "tiles": "DecorGfx_HEAVY_CHAIR"
+ },
+ "DECOR_PRETTY_CHAIR": {
+  "name": "PRETTY CHAIR",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "CHAIR",
+  "price": 2000,
+  "tiles": "DecorGfx_PRETTY_CHAIR"
+ },
+ "DECOR_COMFORT_CHAIR": {
+  "name": "COMFORT CHAIR",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "CHAIR",
+  "price": 2000,
+  "tiles": "DecorGfx_COMFORT_CHAIR"
+ },
+ "DECOR_RAGGED_CHAIR": {
+  "name": "RAGGED CHAIR",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "CHAIR",
+  "price": 2000,
+  "tiles": "DecorGfx_RAGGED_CHAIR"
+ },
+ "DECOR_BRICK_CHAIR": {
+  "name": "BRICK CHAIR",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "CHAIR",
+  "price": 2000,
+  "tiles": "DecorGfx_BRICK_CHAIR"
+ },
+ "DECOR_CAMP_CHAIR": {
+  "name": "CAMP CHAIR",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "CHAIR",
+  "price": 2000,
+  "tiles": "DecorGfx_CAMP_CHAIR"
+ },
+ "DECOR_HARD_CHAIR": {
+  "name": "HARD CHAIR",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "CHAIR",
+  "price": 2000,
+  "tiles": "DecorGfx_HARD_CHAIR"
+ },
+ "DECOR_RED_PLANT": {
+  "name": "RED PLANT",
+  "perm": "DECORPERM_BEHIND_FLOOR",
+  "shape": "1x2",
+  "cat": "PLANT",
+  "price": 3000,
+  "tiles": "DecorGfx_RED_PLANT"
+ },
+ "DECOR_TROPICAL_PLANT": {
+  "name": "TROPICAL PLANT",
+  "perm": "DECORPERM_BEHIND_FLOOR",
+  "shape": "1x2",
+  "cat": "PLANT",
+  "price": 3000,
+  "tiles": "DecorGfx_TROPICAL_PLANT"
+ },
+ "DECOR_PRETTY_FLOWERS": {
+  "name": "PRETTY FLOWERS",
+  "perm": "DECORPERM_BEHIND_FLOOR",
+  "shape": "1x2",
+  "cat": "PLANT",
+  "price": 3000,
+  "tiles": "DecorGfx_PRETTY_FLOWERS"
+ },
+ "DECOR_COLORFUL_PLANT": {
+  "name": "COLORFUL PLANT",
+  "perm": "DECORPERM_BEHIND_FLOOR",
+  "shape": "2x2",
+  "cat": "PLANT",
+  "price": 5000,
+  "tiles": "DecorGfx_COLORFUL_PLANT"
+ },
+ "DECOR_BIG_PLANT": {
+  "name": "BIG PLANT",
+  "perm": "DECORPERM_BEHIND_FLOOR",
+  "shape": "2x2",
+  "cat": "PLANT",
+  "price": 5000,
+  "tiles": "DecorGfx_BIG_PLANT"
+ },
+ "DECOR_GORGEOUS_PLANT": {
+  "name": "GORGEOUS PLANT",
+  "perm": "DECORPERM_BEHIND_FLOOR",
+  "shape": "2x2",
+  "cat": "PLANT",
+  "price": 5000,
+  "tiles": "DecorGfx_GORGEOUS_PLANT"
+ },
+ "DECOR_RED_BRICK": {
+  "name": "RED BRICK",
+  "perm": "DECORPERM_SOLID_FLOOR",
+  "shape": "1x2",
+  "cat": "ORNAMENT",
+  "price": 500,
+  "tiles": "DecorGfx_RED_BRICK"
+ },
+ "DECOR_YELLOW_BRICK": {
+  "name": "YELLOW BRICK",
+  "perm": "DECORPERM_SOLID_FLOOR",
+  "shape": "1x2",
+  "cat": "ORNAMENT",
+  "price": 500,
+  "tiles": "DecorGfx_YELLOW_BRICK"
+ },
+ "DECOR_BLUE_BRICK": {
+  "name": "BLUE BRICK",
+  "perm": "DECORPERM_SOLID_FLOOR",
+  "shape": "1x2",
+  "cat": "ORNAMENT",
+  "price": 500,
+  "tiles": "DecorGfx_BLUE_BRICK"
+ },
+ "DECOR_RED_BALLOON": {
+  "name": "RED BALLOON",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "ORNAMENT",
+  "price": 500,
+  "tiles": "DecorGfx_RED_BALLOON"
+ },
+ "DECOR_BLUE_BALLOON": {
+  "name": "BLUE BALLOON",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "ORNAMENT",
+  "price": 500,
+  "tiles": "DecorGfx_BLUE_BALLOON"
+ },
+ "DECOR_YELLOW_BALLOON": {
+  "name": "YELLOW BALLOON",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "ORNAMENT",
+  "price": 500,
+  "tiles": "DecorGfx_YELLOW_BALLOON"
+ },
+ "DECOR_RED_TENT": {
+  "name": "RED TENT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "3x3",
+  "cat": "ORNAMENT",
+  "price": 10000,
+  "tiles": "DecorGfx_RED_TENT"
+ },
+ "DECOR_BLUE_TENT": {
+  "name": "BLUE TENT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "3x3",
+  "cat": "ORNAMENT",
+  "price": 10000,
+  "tiles": "DecorGfx_BLUE_TENT"
+ },
+ "DECOR_SOLID_BOARD": {
+  "name": "SOLID BOARD",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x2",
+  "cat": "ORNAMENT",
+  "price": 3000,
+  "tiles": "DecorGfx_SOLID_BOARD"
+ },
+ "DECOR_SLIDE": {
+  "name": "SLIDE",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "2x4",
+  "cat": "ORNAMENT",
+  "price": 8000,
+  "tiles": "DecorGfx_SLIDE"
+ },
+ "DECOR_FENCE_LENGTH": {
+  "name": "FENCE LENGTH",
+  "perm": "DECORPERM_SOLID_FLOOR",
+  "shape": "1x1",
+  "cat": "ORNAMENT",
+  "price": 500,
+  "tiles": "DecorGfx_FENCE_LENGTH"
+ },
+ "DECOR_FENCE_WIDTH": {
+  "name": "FENCE WIDTH",
+  "perm": "DECORPERM_SOLID_FLOOR",
+  "shape": "1x1",
+  "cat": "ORNAMENT",
+  "price": 500,
+  "tiles": "DecorGfx_FENCE_WIDTH"
+ },
+ "DECOR_TIRE": {
+  "name": "TIRE",
+  "perm": "DECORPERM_SOLID_FLOOR",
+  "shape": "2x2",
+  "cat": "ORNAMENT",
+  "price": 800,
+  "tiles": "DecorGfx_TIRE"
+ },
+ "DECOR_STAND": {
+  "name": "STAND",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "4x2",
+  "cat": "ORNAMENT",
+  "price": 7000,
+  "tiles": "DecorGfx_STAND"
+ },
+ "DECOR_MUD_BALL": {
+  "name": "MUD BALL",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "ORNAMENT",
+  "price": 200,
+  "tiles": "DecorGfx_MUD_BALL"
+ },
+ "DECOR_BREAKABLE_DOOR": {
+  "name": "BREAKABLE DOOR",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x2",
+  "cat": "ORNAMENT",
+  "price": 3000,
+  "tiles": "DecorGfx_BREAKABLE_DOOR"
+ },
+ "DECOR_SAND_ORNAMENT": {
+  "name": "SAND ORNAMENT",
+  "perm": "DECORPERM_BEHIND_FLOOR",
+  "shape": "1x2",
+  "cat": "ORNAMENT",
+  "price": 3000,
+  "tiles": "DecorGfx_SAND_ORNAMENT"
+ },
+ "DECOR_SILVER_SHIELD": {
+  "name": "SILVER SHIELD",
+  "perm": "DECORPERM_BEHIND_FLOOR",
+  "shape": "1x2",
+  "cat": "ORNAMENT",
+  "price": 0,
+  "tiles": "DecorGfx_SILVER_SHIELD"
+ },
+ "DECOR_GOLD_SHIELD": {
+  "name": "GOLD SHIELD",
+  "perm": "DECORPERM_BEHIND_FLOOR",
+  "shape": "1x2",
+  "cat": "ORNAMENT",
+  "price": 0,
+  "tiles": "DecorGfx_GOLD_SHIELD"
+ },
+ "DECOR_GLASS_ORNAMENT": {
+  "name": "GLASS ORNAMENT",
+  "perm": "DECORPERM_BEHIND_FLOOR",
+  "shape": "1x2",
+  "cat": "ORNAMENT",
+  "price": 0,
+  "tiles": "DecorGfx_GLASS_ORNAMENT"
+ },
+ "DECOR_TV": {
+  "name": "TV",
+  "perm": "DECORPERM_SOLID_FLOOR",
+  "shape": "1x1",
+  "cat": "ORNAMENT",
+  "price": 3000,
+  "tiles": "DecorGfx_TV"
+ },
+ "DECOR_ROUND_TV": {
+  "name": "ROUND TV",
+  "perm": "DECORPERM_SOLID_FLOOR",
+  "shape": "1x1",
+  "cat": "ORNAMENT",
+  "price": 4000,
+  "tiles": "DecorGfx_ROUND_TV"
+ },
+ "DECOR_CUTE_TV": {
+  "name": "CUTE TV",
+  "perm": "DECORPERM_SOLID_FLOOR",
+  "shape": "1x1",
+  "cat": "ORNAMENT",
+  "price": 4000,
+  "tiles": "DecorGfx_CUTE_TV"
+ },
+ "DECOR_GLITTER_MAT": {
+  "name": "GLITTER MAT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "MAT",
+  "price": 2000,
+  "tiles": "DecorGfx_GLITTER_MAT"
+ },
+ "DECOR_JUMP_MAT": {
+  "name": "JUMP MAT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "MAT",
+  "price": 2000,
+  "tiles": "DecorGfx_JUMP_MAT"
+ },
+ "DECOR_SPIN_MAT": {
+  "name": "SPIN MAT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "MAT",
+  "price": 2000,
+  "tiles": "DecorGfx_SPIN_MAT"
+ },
+ "DECOR_C_LOW_NOTE_MAT": {
+  "name": "C Low NOTE MAT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "MAT",
+  "price": 500,
+  "tiles": "DecorGfx_C_LOW_NOTE_MAT"
+ },
+ "DECOR_D_NOTE_MAT": {
+  "name": "D NOTE MAT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "MAT",
+  "price": 500,
+  "tiles": "DecorGfx_D_NOTE_MAT"
+ },
+ "DECOR_E_NOTE_MAT": {
+  "name": "E NOTE MAT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "MAT",
+  "price": 500,
+  "tiles": "DecorGfx_E_NOTE_MAT"
+ },
+ "DECOR_F_NOTE_MAT": {
+  "name": "F NOTE MAT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "MAT",
+  "price": 500,
+  "tiles": "DecorGfx_F_NOTE_MAT"
+ },
+ "DECOR_G_NOTE_MAT": {
+  "name": "G NOTE MAT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "MAT",
+  "price": 500,
+  "tiles": "DecorGfx_G_NOTE_MAT"
+ },
+ "DECOR_A_NOTE_MAT": {
+  "name": "A NOTE MAT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "MAT",
+  "price": 500,
+  "tiles": "DecorGfx_A_NOTE_MAT"
+ },
+ "DECOR_B_NOTE_MAT": {
+  "name": "B NOTE MAT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "MAT",
+  "price": 500,
+  "tiles": "DecorGfx_B_NOTE_MAT"
+ },
+ "DECOR_C_HIGH_NOTE_MAT": {
+  "name": "C High NOTE MAT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "1x1",
+  "cat": "MAT",
+  "price": 500,
+  "tiles": "DecorGfx_C_HIGH_NOTE_MAT"
+ },
+ "DECOR_SURF_MAT": {
+  "name": "SURF MAT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "3x3",
+  "cat": "MAT",
+  "price": 4000,
+  "tiles": "DecorGfx_SURF_MAT"
+ },
+ "DECOR_THUNDER_MAT": {
+  "name": "THUNDER MAT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "3x3",
+  "cat": "MAT",
+  "price": 4000,
+  "tiles": "DecorGfx_THUNDER_MAT"
+ },
+ "DECOR_FIRE_BLAST_MAT": {
+  "name": "FIRE BLAST MAT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "3x3",
+  "cat": "MAT",
+  "price": 4000,
+  "tiles": "DecorGfx_FIRE_BLAST_MAT"
+ },
+ "DECOR_POWDER_SNOW_MAT": {
+  "name": "POWDER SNOW MAT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "3x3",
+  "cat": "MAT",
+  "price": 4000,
+  "tiles": "DecorGfx_POWDER_SNOW_MAT"
+ },
+ "DECOR_ATTRACT_MAT": {
+  "name": "ATTRACT MAT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "3x3",
+  "cat": "MAT",
+  "price": 4000,
+  "tiles": "DecorGfx_ATTRACT_MAT"
+ },
+ "DECOR_FISSURE_MAT": {
+  "name": "FISSURE MAT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "3x3",
+  "cat": "MAT",
+  "price": 4000,
+  "tiles": "DecorGfx_FISSURE_MAT"
+ },
+ "DECOR_SPIKES_MAT": {
+  "name": "SPIKES MAT",
+  "perm": "DECORPERM_PASS_FLOOR",
+  "shape": "3x3",
+  "cat": "MAT",
+  "price": 4000,
+  "tiles": "DecorGfx_SPIKES_MAT"
+ },
+ "DECOR_BALL_POSTER": {
+  "name": "BALL POSTER",
+  "perm": "DECORPERM_NA_WALL",
+  "shape": "1x1",
+  "cat": "POSTER",
+  "price": 1000,
+  "tiles": "DecorGfx_BALL_POSTER"
+ },
+ "DECOR_GREEN_POSTER": {
+  "name": "GREEN POSTER",
+  "perm": "DECORPERM_NA_WALL",
+  "shape": "1x1",
+  "cat": "POSTER",
+  "price": 1000,
+  "tiles": "DecorGfx_GREEN_POSTER"
+ },
+ "DECOR_RED_POSTER": {
+  "name": "RED POSTER",
+  "perm": "DECORPERM_NA_WALL",
+  "shape": "1x1",
+  "cat": "POSTER",
+  "price": 1000,
+  "tiles": "DecorGfx_RED_POSTER"
+ },
+ "DECOR_BLUE_POSTER": {
+  "name": "BLUE POSTER",
+  "perm": "DECORPERM_NA_WALL",
+  "shape": "1x1",
+  "cat": "POSTER",
+  "price": 1000,
+  "tiles": "DecorGfx_BLUE_POSTER"
+ },
+ "DECOR_CUTE_POSTER": {
+  "name": "CUTE POSTER",
+  "perm": "DECORPERM_NA_WALL",
+  "shape": "1x1",
+  "cat": "POSTER",
+  "price": 1000,
+  "tiles": "DecorGfx_CUTE_POSTER"
+ },
+ "DECOR_PIKA_POSTER": {
+  "name": "PIKA POSTER",
+  "perm": "DECORPERM_NA_WALL",
+  "shape": "2x1",
+  "cat": "POSTER",
+  "price": 1500,
+  "tiles": "DecorGfx_PIKA_POSTER"
+ },
+ "DECOR_LONG_POSTER": {
+  "name": "LONG POSTER",
+  "perm": "DECORPERM_NA_WALL",
+  "shape": "2x1",
+  "cat": "POSTER",
+  "price": 1500,
+  "tiles": "DecorGfx_LONG_POSTER"
+ },
+ "DECOR_SEA_POSTER": {
+  "name": "SEA POSTER",
+  "perm": "DECORPERM_NA_WALL",
+  "shape": "2x1",
+  "cat": "POSTER",
+  "price": 1500,
+  "tiles": "DecorGfx_SEA_POSTER"
+ },
+ "DECOR_SKY_POSTER": {
+  "name": "SKY POSTER",
+  "perm": "DECORPERM_NA_WALL",
+  "shape": "2x1",
+  "cat": "POSTER",
+  "price": 1500,
+  "tiles": "DecorGfx_SKY_POSTER"
+ },
+ "DECOR_KISS_POSTER": {
+  "name": "KISS POSTER",
+  "perm": "DECORPERM_NA_WALL",
+  "shape": "2x1",
+  "cat": "POSTER",
+  "price": 1500,
+  "tiles": "DecorGfx_KISS_POSTER"
+ },
+ "DECOR_PICHU_DOLL": {
+  "name": "PICHU DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_PICHU_DOLL"
+ },
+ "DECOR_PIKACHU_DOLL": {
+  "name": "PIKACHU DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_PIKACHU_DOLL"
+ },
+ "DECOR_MARILL_DOLL": {
+  "name": "MARILL DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_MARILL_DOLL"
+ },
+ "DECOR_TOGEPI_DOLL": {
+  "name": "TOGEPI DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_TOGEPI_DOLL"
+ },
+ "DECOR_CYNDAQUIL_DOLL": {
+  "name": "CYNDAQUIL DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_CYNDAQUIL_DOLL"
+ },
+ "DECOR_CHIKORITA_DOLL": {
+  "name": "CHIKORITA DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_CHIKORITA_DOLL"
+ },
+ "DECOR_TOTODILE_DOLL": {
+  "name": "TOTODILE DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_TOTODILE_DOLL"
+ },
+ "DECOR_JIGGLYPUFF_DOLL": {
+  "name": "JIGGLYPUFF DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_JIGGLYPUFF_DOLL"
+ },
+ "DECOR_MEOWTH_DOLL": {
+  "name": "MEOWTH DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_MEOWTH_DOLL"
+ },
+ "DECOR_CLEFAIRY_DOLL": {
+  "name": "CLEFAIRY DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_CLEFAIRY_DOLL"
+ },
+ "DECOR_DITTO_DOLL": {
+  "name": "DITTO DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_DITTO_DOLL"
+ },
+ "DECOR_SMOOCHUM_DOLL": {
+  "name": "SMOOCHUM DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_SMOOCHUM_DOLL"
+ },
+ "DECOR_TREECKO_DOLL": {
+  "name": "TREECKO DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_TREECKO_DOLL"
+ },
+ "DECOR_TORCHIC_DOLL": {
+  "name": "TORCHIC DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_TORCHIC_DOLL"
+ },
+ "DECOR_MUDKIP_DOLL": {
+  "name": "MUDKIP DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_MUDKIP_DOLL"
+ },
+ "DECOR_DUSKULL_DOLL": {
+  "name": "DUSKULL DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_DUSKULL_DOLL"
+ },
+ "DECOR_WYNAUT_DOLL": {
+  "name": "WYNAUT DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_WYNAUT_DOLL"
+ },
+ "DECOR_BALTOY_DOLL": {
+  "name": "BALTOY DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_BALTOY_DOLL"
+ },
+ "DECOR_KECLEON_DOLL": {
+  "name": "KECLEON DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_KECLEON_DOLL"
+ },
+ "DECOR_AZURILL_DOLL": {
+  "name": "AZURILL DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_AZURILL_DOLL"
+ },
+ "DECOR_SKITTY_DOLL": {
+  "name": "SKITTY DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_SKITTY_DOLL"
+ },
+ "DECOR_SWABLU_DOLL": {
+  "name": "SWABLU DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_SWABLU_DOLL"
+ },
+ "DECOR_GULPIN_DOLL": {
+  "name": "GULPIN DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_GULPIN_DOLL"
+ },
+ "DECOR_LOTAD_DOLL": {
+  "name": "LOTAD DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_LOTAD_DOLL"
+ },
+ "DECOR_SEEDOT_DOLL": {
+  "name": "SEEDOT DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "DOLL",
+  "price": 3000,
+  "tiles": "DecorGfx_SEEDOT_DOLL"
+ },
+ "DECOR_PIKA_CUSHION": {
+  "name": "PIKA CUSHION",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "CUSHION",
+  "price": 2000,
+  "tiles": "DecorGfx_PIKA_CUSHION"
+ },
+ "DECOR_ROUND_CUSHION": {
+  "name": "ROUND CUSHION",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "CUSHION",
+  "price": 2000,
+  "tiles": "DecorGfx_ROUND_CUSHION"
+ },
+ "DECOR_KISS_CUSHION": {
+  "name": "KISS CUSHION",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "CUSHION",
+  "price": 2000,
+  "tiles": "DecorGfx_KISS_CUSHION"
+ },
+ "DECOR_ZIGZAG_CUSHION": {
+  "name": "ZIGZAG CUSHION",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "CUSHION",
+  "price": 2000,
+  "tiles": "DecorGfx_ZIGZAG_CUSHION"
+ },
+ "DECOR_SPIN_CUSHION": {
+  "name": "SPIN CUSHION",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "CUSHION",
+  "price": 2000,
+  "tiles": "DecorGfx_SPIN_CUSHION"
+ },
+ "DECOR_DIAMOND_CUSHION": {
+  "name": "DIAMOND CUSHION",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "CUSHION",
+  "price": 2000,
+  "tiles": "DecorGfx_DIAMOND_CUSHION"
+ },
+ "DECOR_BALL_CUSHION": {
+  "name": "BALL CUSHION",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "CUSHION",
+  "price": 2000,
+  "tiles": "DecorGfx_BALL_CUSHION"
+ },
+ "DECOR_GRASS_CUSHION": {
+  "name": "GRASS CUSHION",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "CUSHION",
+  "price": 2000,
+  "tiles": "DecorGfx_GRASS_CUSHION"
+ },
+ "DECOR_FIRE_CUSHION": {
+  "name": "FIRE CUSHION",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "CUSHION",
+  "price": 2000,
+  "tiles": "DecorGfx_FIRE_CUSHION"
+ },
+ "DECOR_WATER_CUSHION": {
+  "name": "WATER CUSHION",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x1",
+  "cat": "CUSHION",
+  "price": 2000,
+  "tiles": "DecorGfx_WATER_CUSHION"
+ },
+ "DECOR_SNORLAX_DOLL": {
+  "name": "SNORLAX DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x2",
+  "cat": "DOLL",
+  "price": 10000,
+  "tiles": "DecorGfx_SNORLAX_DOLL"
+ },
+ "DECOR_RHYDON_DOLL": {
+  "name": "RHYDON DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x2",
+  "cat": "DOLL",
+  "price": 10000,
+  "tiles": "DecorGfx_RHYDON_DOLL"
+ },
+ "DECOR_LAPRAS_DOLL": {
+  "name": "LAPRAS DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x2",
+  "cat": "DOLL",
+  "price": 10000,
+  "tiles": "DecorGfx_LAPRAS_DOLL"
+ },
+ "DECOR_VENUSAUR_DOLL": {
+  "name": "VENUSAUR DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x2",
+  "cat": "DOLL",
+  "price": 10000,
+  "tiles": "DecorGfx_VENUSAUR_DOLL"
+ },
+ "DECOR_CHARIZARD_DOLL": {
+  "name": "CHARIZARD DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x2",
+  "cat": "DOLL",
+  "price": 10000,
+  "tiles": "DecorGfx_CHARIZARD_DOLL"
+ },
+ "DECOR_BLASTOISE_DOLL": {
+  "name": "BLASTOISE DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x2",
+  "cat": "DOLL",
+  "price": 10000,
+  "tiles": "DecorGfx_BLASTOISE_DOLL"
+ },
+ "DECOR_WAILMER_DOLL": {
+  "name": "WAILMER DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x2",
+  "cat": "DOLL",
+  "price": 10000,
+  "tiles": "DecorGfx_WAILMER_DOLL"
+ },
+ "DECOR_REGIROCK_DOLL": {
+  "name": "REGIROCK DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x2",
+  "cat": "DOLL",
+  "price": 10000,
+  "tiles": "DecorGfx_REGIROCK_DOLL"
+ },
+ "DECOR_REGICE_DOLL": {
+  "name": "REGICE DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x2",
+  "cat": "DOLL",
+  "price": 10000,
+  "tiles": "DecorGfx_REGICE_DOLL"
+ },
+ "DECOR_REGISTEEL_DOLL": {
+  "name": "REGISTEEL DOLL",
+  "perm": "DECORPERM_SPRITE",
+  "shape": "1x2",
+  "cat": "DOLL",
+  "price": 10000,
+  "tiles": "DecorGfx_REGISTEEL_DOLL"
+ }
+}

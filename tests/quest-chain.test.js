@@ -130,7 +130,9 @@ test('récompenses : objets existants, Pokémon de récompense valides, économi
 test('quêtes secondaires : s1-s55, Kanto puis Johto, donneur PNJ obligatoire, mainTalk valides', () => {
   const SQ = sb.SIDE_QUESTS;
   const keys = Object.keys(SQ);
-  assert.equal(keys.length, 55, '55 quêtes secondaires (30 Kanto + 25 Johto, passes 20 & 21)');
+  // 137 = 30 Kanto + 25 Johto + 30 Hoenn (s1-s85) + 28 énigmes (s86-s113)
+  //     + 24 densification Hoenn (s114-s137) — cf. RESTE_A_FAIRE.md.
+  assert.equal(keys.length, 137, '137 quêtes secondaires (s1-s137)');
   for (let i = 1; i <= 30; i++) assert.ok(SQ['s' + i] && SQ['s' + i].region === 'kanto', `s${i} Kanto`);
   for (let i = 31; i <= 55; i++) assert.ok(SQ['s' + i] && SQ['s' + i].region === 'johto', `s${i} Johto`);
   const npcQuests = [];
@@ -138,7 +140,13 @@ test('quêtes secondaires : s1-s55, Kanto puis Johto, donneur PNJ obligatoire, m
   for (const sid of keys) assert.ok(npcQuests.includes(sid), `quête ${sid} a un donneur PNJ`);
   for (const nq of npcQuests) assert.ok(SQ[nq], `PNJ donne la quête existante ${nq}`);
   // Talk quests : les PNJ Prof. renvoient vers des quêtes talk existantes.
-  const talkIds = STORY.filter((q) => q.type === 'talk').map((q) => q.id);
+  // (chaîne Hoenn chargée séparément : story-quests-hoenn.js étend STORY_QUESTS au boot)
+  const hoennSb = { window: {}, console };
+  hoennSb.window = hoennSb; hoennSb.STORY_QUESTS = [];
+  vm.createContext(hoennSb);
+  vm.runInContext(R('src/data/story-quests-hoenn.js'), hoennSb, { filename: 'story-quests-hoenn.js' });
+  const STORY_ALL = STORY.concat(hoennSb.window.STORY_QUESTS_HOENN || []);
+  const talkIds = STORY_ALL.filter((q) => q.type === 'talk').map((q) => q.id);
   for (const [, list] of Object.entries(sb.NPCS)) for (const npc of list) {
     if (npc.mainTalk != null) assert.ok(talkIds.includes(npc.mainTalk), `mainTalk ${npc.mainTalk} → quête talk existante`);
   }
@@ -381,3 +389,4 @@ test('répétables : pass 21 ajoute des ciblées Kanto, filtrées par région, t
     }
   }
 });
+

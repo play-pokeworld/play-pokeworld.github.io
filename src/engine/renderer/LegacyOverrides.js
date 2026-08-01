@@ -95,3 +95,4 @@ function injectLegacyOverrides() {
 if (document.readyState === 'complete') injectLegacyOverrides();
 else document.addEventListener('DOMContentLoaded', injectLegacyOverrides);
 })();
+

@@ -111,10 +111,13 @@ function getCurrentRegionLocs() {
   // Return locations ONLY for the current region
   const region = (typeof G !== 'undefined' && G && G.region) || 'kanto';
   if (region === 'johto') return (typeof LOCS_JOHTO !== 'undefined') ? LOCS_JOHTO : {};
+  if (region === 'hoenn') return (typeof LOCS_HOENN !== 'undefined') ? LOCS_HOENN : {};
   return (typeof LOCS !== 'undefined') ? LOCS : {};
 }
 
 
 if (typeof LOCS !== 'undefined' && typeof window !== 'undefined') window.LOCS = LOCS;
 if (typeof LOCS_JOHTO !== 'undefined' && typeof window !== 'undefined') window.LOCS_JOHTO = LOCS_JOHTO;
+if (typeof LOCS_HOENN !== 'undefined' && typeof window !== 'undefined') window.LOCS_HOENN = LOCS_HOENN;
+
 

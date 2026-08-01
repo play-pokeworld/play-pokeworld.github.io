@@ -114,7 +114,8 @@ function hatcheryRegisterBattleKills(count) {
     const totalFee = feePerLevel * levelsGained;
     if (G.money < totalFee) {
       // Règle inchangée : impayé → le pensionnaire garde ses niveaux mais sort.
-      G.collection[String(p.id)] = p;
+      const _hKey = (typeof generateUniqueBoxId==='function') ? generateUniqueBoxId(p.id) : (!G.collection[String(p.id)] ? String(p.id) : ('box_' + p.id + '_' + Date.now()));
+      G.collection[_hKey] = p;
       G.hatchery[i] = null;
       notify(`${p.name} a été retiré de la Garderie : fonds insuffisants pour payer ses nouveaux niveaux (${totalFee}₽ requis) !`, "var(--red)");
       continue;
@@ -125,7 +126,8 @@ function hatcheryRegisterBattleKills(count) {
       try { updateHeader(); } catch (_) {}
     }
     if (p.level >= 100) {
-      G.collection[String(p.id)] = p;
+      const _hKey = (typeof generateUniqueBoxId==='function') ? generateUniqueBoxId(p.id) : (!G.collection[String(p.id)] ? String(p.id) : ('box_' + p.id + '_' + Date.now()));
+      G.collection[_hKey] = p;
       G.hatchery[i] = null;
       addBattleLog(` [Pension] ${p.name} a atteint le Niveau 100 et sort de la Garderie !`);
       notify(`${p.name} a atteint le Niveau 100 et sort de la Garderie !`, "var(--green)");
@@ -815,7 +817,7 @@ function hatchEgg(slotIdx = 0) {
 
   let p;
   if (slot.isFossil) {
-    const isShiny = rollShiny();
+    const isShiny = rollShiny(slot.reviveId);
     p = createPoke(slot.reviveId, 1, isShiny);
     if (!p) {
       return;
@@ -834,6 +836,33 @@ function hatchEgg(slotIdx = 0) {
   } else {
     p = slot.poke;
   }
+  const BABY_BREED_MAP = { 25: 172, 26: 172, 35: 173, 36: 173, 39: 174, 40: 174, 106: 236, 107: 236, 237: 236, 124: 238, 125: 239, 126: 240, 183: 298, 184: 298, 202: 360 };
+  const babyId = p ? BABY_BREED_MAP[Number(p.id)] : null;
+  const alreadyHaveBaby = babyId && (
+    (typeof speciesOwned === 'function' && speciesOwned(babyId)) ||
+    (G.pokedex && G.pokedex[babyId] && G.pokedex[babyId].caught) ||
+    (G.team && G.team.some(x => x && Number(x.id) === Number(babyId))) ||
+    Object.values(G.collection || {}).some(x => x && Number(x.id) === Number(babyId))
+  );
+  if (babyId && !alreadyHaveBaby && typeof createPoke === 'function') {
+    const isShiny = rollShiny(babyId);
+    const babyMon = createPoke(babyId, 5, isShiny);
+    if (babyMon) {
+      if (isShiny) { babyMon.shinyUnlocked = true; babyMon.shinyActive = true; babyMon.shiny = true; unlockShinyForSpecies(babyId); }
+      if (G.team.length < 6) {
+        G.team.push(babyMon);
+        if (typeof notify === 'function') notify((typeof tr === 'function' ? tr('hatch_baby_party', { parent: p.name, baby: babyMon.name }) : `L'œuf de ${p.name} a éclot en ${babyMon.name} !`), 'var(--green)');
+      } else {
+        let boxId = 'baby_' + babyId + '_' + Date.now();
+        while(G.collection[boxId]) boxId = 'baby_' + babyId + '_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+        G.collection[boxId] = babyMon;
+        if (typeof notify === 'function') notify((typeof tr === 'function' ? tr('hatch_baby_box', { parent: p.name, baby: babyMon.name }) : `L'œuf de ${p.name} a éclot en ${babyMon.name} dans la Boîte PC !`), 'var(--green)');
+      }
+      G.pokedex[babyId] = { ...(G.pokedex[babyId] || {}), seen: true, caught: true };
+      if (isShiny) G.pokedex[babyId].shiny = true;
+    }
+  }
+
 
   if (!p.ivs) p.ivs = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
   const keys = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
@@ -848,7 +877,7 @@ function hatchEgg(slotIdx = 0) {
     ivMsg = t('iv_money_bonus');
   }
   if (!slot.isFossil) {
-    const wasShiny = rollShiny();
+    const wasShiny = rollShiny(p && p.id);
     if (wasShiny) {
       p.shinyUnlocked = true;
       p.shinyActive = true;
@@ -862,7 +891,8 @@ function hatchEgg(slotIdx = 0) {
   recalcPokeStats(p);
   p.currentHP = p.maxHP;
 
-  G.collection[String(p.id)] = p;
+  const _hKey = (typeof generateUniqueBoxId==='function') ? generateUniqueBoxId(p.id) : (!G.collection[String(p.id)] ? String(p.id) : ('box_' + p.id + '_' + Date.now()));
+      G.collection[_hKey] = p;
   G.hatchery[slotIdx] = null;
   // Un changement de mode mis en attente (incubation → garderie) s'applique
   // maintenant que l'incubation est terminée.
@@ -876,10 +906,7 @@ function hatchEgg(slotIdx = 0) {
   updateHeader();
   renderTeamWindow();
   renderHatcheryWindow();
-  if (
-    (slot.isFossil && (p.shinyUnlocked || p.shinyActive || p.shiny)) ||
-    (!slot.isFossil && rollShiny())
-  ) {
+  if (p && (p.shinyUnlocked || p.shinyActive || p.shiny)) {
     notify(tr('m.hatchery.2', { p0: p.name }), 'var(--light2)');
   } else {
     notify(tr('m.hatchery.1', { p0: p.name, p1: ivMsg }), 'var(--green)');
@@ -926,7 +953,7 @@ function reviveFossil(fossilKey) {
   G.inventory[fossilKey]--;
   if (G.inventory[fossilKey] <= 0) delete G.inventory[fossilKey];
 
-  const isShiny = rollShiny();
+  const isShiny = rollShiny(pokeId);
   const p = createPoke(pokeId, 1, isShiny);
   if (!p) {
     notify(t('n.erreur_revival'), 'var(--red)');
@@ -937,7 +964,8 @@ function reviveFossil(fossilKey) {
     G.team.push(p);
     notify(tr('fossil_revived_party', { name: p.name }), isShiny ? 'var(--light2)' : 'var(--green)');
   } else {
-    G.collection[pokeId] = p;
+    const _hKey2 = (typeof generateUniqueBoxId==='function') ? generateUniqueBoxId(pokeId) : (!G.collection[String(pokeId)] ? String(pokeId) : ('box_' + pokeId + '_' + Date.now()));
+    G.collection[_hKey2] = p;
     notify(tr('fossil_revived_box', { name: p.name }), isShiny ? 'var(--light2)' : 'var(--green)');
   }
   G.pokedex[pokeId] = {
@@ -970,7 +998,8 @@ function withdrawPokemonFromDaycare(slotIdx) {
     return;
   }
   const p = slot.poke;
-  G.collection[String(p.id)] = p;
+  const _hKey = (typeof generateUniqueBoxId==='function') ? generateUniqueBoxId(p.id) : (!G.collection[String(p.id)] ? String(p.id) : ('box_' + p.id + '_' + Date.now()));
+      G.collection[_hKey] = p;
   G.hatchery[slotIdx] = null;
   saveGame();
   renderHatcheryWindow();
@@ -997,7 +1026,7 @@ function toggleHatcherySlotMode(slotIdx) {
     G.hatchery[slotIdx].poke.level < 100
   ) {
     const ejected = G.hatchery[slotIdx].poke;
-    G.collection[String(ejected.id)] = ejected;
+    const _ejKey = (typeof generateUniqueBoxId==="function") ? generateUniqueBoxId(ejected.id) : (!G.collection[String(ejected.id)] ? String(ejected.id) : ("box_" + ejected.id + "_" + Date.now())); G.collection[_ejKey] = ejected;
     G.hatchery[slotIdx] = null;
     G.hatcheryPendingModes[slotIdx] = null;
     G.hatcheryModes[slotIdx] = 'breed';
@@ -1243,4 +1272,7 @@ if (typeof clearHatcheryQueue !== 'undefined' && typeof window !== 'undefined')
   window.clearHatcheryQueue = clearHatcheryQueue;
 if (typeof isPokemonQueuedHatchery !== 'undefined' && typeof window !== 'undefined')
   window.isPokemonQueuedHatchery = isPokemonQueuedHatchery;
+if (typeof FOSSIL_REVIVE_MAP !== 'undefined' && typeof window !== 'undefined')
+  window.FOSSIL_REVIVE_MAP = FOSSIL_REVIVE_MAP;
+
 

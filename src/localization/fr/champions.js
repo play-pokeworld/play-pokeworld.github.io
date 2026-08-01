@@ -28,7 +28,22 @@ window.L_fr_champions = {
 "koga_e4": {"name":"Koga","title":"Conseil 4 — Poison"},
 "bruno_johto": {"name":"Aldo","title":"Conseil 4 — Combat"},
 "karen": {"name":"Marion","title":"Conseil 4 — Ténèbres"},
-"lance_johto": {"name":"Peter","title":"Maître de la Ligue Johto"}
+"lance_johto": {"name":"Peter","title":"Maître de la Ligue Johto"},
+  "roxanne": {"name":"Roxanne","title":"Championne Arène Mérouville","badgeName":"Badge Roche"},
+  "brawly": {"name":"Bastien","title":"Champion Arène Myokara","badgeName":"Badge Poing"},
+  "wattson": {"name":"Voltère","title":"Champion Arène Lavandia","badgeName":"Badge Dynamo"},
+  "flannery": {"name":"Adrianna","title":"Championne Arène Vermilava","badgeName":"Badge Chaleur"},
+  "norman": {"name":"Norman","title":"Champion Arène Clémenti-Ville","badgeName":"Badge Équilibre"},
+  "winona": {"name":"Alizée","title":"Championne Arène Cimmery","badgeName":"Badge Plume"},
+  "tate_liza": {"name":"Lévy & Tatia","title":"Champions Arène Algatia (Duo)","badgeName":"Badge Esprit"},
+  "juan": {"name":"Juan","title":"Champion Arène Atalanopolis","badgeName":"Badge Pluie"},
+  "sidney": {"name":"Damien","title":"Conseil 4 Ténèbres","badgeName":""},
+  "phoebe": {"name":"Spectra","title":"Conseil 4 Spectre","badgeName":""},
+  "glacia": {"name":"Glacia","title":"Conseil 4 Glace","badgeName":""},
+  "drake": {"name":"Aragon","title":"Conseil 4 Dragon","badgeName":""},
+  "steven": {"name":"Pierre Rochard","title":"Maître de Hoenn","badgeName":"Titre de Maître Hoenn"},
+  "hoenn_elite4": {"name":"Ligue Hoenn","title":"Ligue Hoenn","badgeName":"Titre de Maître Hoenn"},
 };
+
 
 

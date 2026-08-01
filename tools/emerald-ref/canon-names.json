@@ -1,0 +1,490 @@
+{
+ "a_note_mat": [
+  "Tapis La",
+  "A Note Mat"
+ ],
+ "attract_mat": [
+  "Tapis Attraction",
+  "Attract Mat"
+ ],
+ "azurill_doll": [
+  "Poupée Azurill",
+  "Azurill Doll"
+ ],
+ "b_note_mat": [
+  "Tapis Si",
+  "B Note Mat"
+ ],
+ "ball_cushion": [
+  "Coussin Ball",
+  "Ball Cushion"
+ ],
+ "ball_poster": [
+  "Poster Ball",
+  "Ball Poster"
+ ],
+ "baltoy_doll": [
+  "Poupée Balbuto",
+  "Baltoy Doll"
+ ],
+ "big_plant": [
+  "Grosse Plante",
+  "Big Plant"
+ ],
+ "blastoise_doll": [
+  "Poupée Tortank",
+  "Blastoise Doll"
+ ],
+ "blue_balloon": [
+  "Ballon Bleu",
+  "Blue Balloon"
+ ],
+ "blue_brick": [
+  "Brique Bleue",
+  "Blue Brick"
+ ],
+ "blue_poster": [
+  "Poster Bleu",
+  "Blue Poster"
+ ],
+ "blue_tent": [
+  "Tente Bleue",
+  "Blue Tent"
+ ],
+ "breakable_door": [
+  "Porte Fragile",
+  "Breakable Door"
+ ],
+ "brick_chair": [
+  "Chaise Brique",
+  "Brick Chair"
+ ],
+ "brick_desk": [
+  "Bureau Brique",
+  "Brick Desk"
+ ],
+ "c_high_note_mat": [
+  "Tapis Do Aigu",
+  "High C Note Mat"
+ ],
+ "c_low_note_mat": [
+  "Tapis Do Grave",
+  "Low C Note Mat"
+ ],
+ "camp_chair": [
+  "Chaise Rondin",
+  "Camp Chair"
+ ],
+ "camp_desk": [
+  "Bureau Rondin",
+  "Camp Desk"
+ ],
+ "charizard_doll": [
+  "Poupée Dracaufeu",
+  "Charizard Doll"
+ ],
+ "chikorita_doll": [
+  "Poupée Germignon",
+  "Chikorita Doll"
+ ],
+ "clefairy_doll": [
+  "Poupée Mélofée",
+  "Clefairy Doll"
+ ],
+ "colorful_plant": [
+  "Plante Colore",
+  "Colorful Plant"
+ ],
+ "comfort_chair": [
+  "Chaise Confort",
+  "Comfort Chair"
+ ],
+ "comfort_desk": [
+  "Bureau Confort",
+  "Comfort Desk"
+ ],
+ "cute_poster": [
+  "Poster Mignon",
+  "Cute Poster"
+ ],
+ "cute_tv": [
+  "Télé Mignonne",
+  "Cute TV"
+ ],
+ "cyndaquil_doll": [
+  "Poupée Héricendre",
+  "Cyndaquil Doll"
+ ],
+ "d_note_mat": [
+  "Tapis Ré",
+  "D Note Mat"
+ ],
+ "diamond_cushion": [
+  "Coussin Diamant",
+  "Diamond Cushion"
+ ],
+ "ditto_doll": [
+  "Poupée Métamorph",
+  "Ditto Doll"
+ ],
+ "duskull_doll": [
+  "Poupée Skelénox",
+  "Duskull Doll"
+ ],
+ "e_note_mat": [
+  "Tapis Mi",
+  "E Note Mat"
+ ],
+ "f_note_mat": [
+  "Tapis Fa",
+  "F Note Mat"
+ ],
+ "fence_length": [
+  "Barrière Long.",
+  "Fence Length"
+ ],
+ "fence_width": [
+  "Barrière Larg.",
+  "Fence Width"
+ ],
+ "fire_blast_mat": [
+  "Tapis Déflagra",
+  "Fire Blast Mat"
+ ],
+ "fire_cushion": [
+  "Coussin Feu",
+  "Fire Cushion"
+ ],
+ "fissure_mat": [
+  "Tapis Fissure",
+  "Fissure Mat"
+ ],
+ "g_note_mat": [
+  "Tapis Sol",
+  "G Note Mat"
+ ],
+ "glass_ornament": [
+  "Objet Verre",
+  "Glass Ornament"
+ ],
+ "glitter_mat": [
+  "Tapis Paillete",
+  "Glitter Mat"
+ ],
+ "gold_shield": [
+  "Bouclier Or",
+  "Gold Shield"
+ ],
+ "gorgeous_plant": [
+  "Plante Superbe",
+  "Gorgeous Plant"
+ ],
+ "grass_cushion": [
+  "Coussin Plante",
+  "Grass Cushion"
+ ],
+ "green_poster": [
+  "Poster Vert",
+  "Green Poster"
+ ],
+ "gulpin_doll": [
+  "Poupée Gloupti",
+  "Gulpin Doll"
+ ],
+ "hard_chair": [
+  "Chaise Massive",
+  "Hard Chair"
+ ],
+ "hard_desk": [
+  "Bureau Massif",
+  "Hard Desk"
+ ],
+ "heavy_chair": [
+  "Grande Chaise",
+  "Heavy Chair"
+ ],
+ "heavy_desk": [
+  "Grand Bureau",
+  "Heavy Desk"
+ ],
+ "jigglypuff_doll": [
+  "Poupée Rondoudou",
+  "Jigglypuff Doll"
+ ],
+ "jump_mat": [
+  "Tapis Saut",
+  "Jump Mat"
+ ],
+ "kecleon_doll": [
+  "Poupée Kecleon",
+  "Kecleon Doll"
+ ],
+ "kiss_cushion": [
+  "Coussin Baiser",
+  "Kiss Cushion"
+ ],
+ "kiss_poster": [
+  "Poster Baiser",
+  "Kiss Poster"
+ ],
+ "lapras_doll": [
+  "Poupée Lokhlass",
+  "Lapras Doll"
+ ],
+ "long_poster": [
+  "Poster Long",
+  "Long Poster"
+ ],
+ "lotad_doll": [
+  "Poupée Nénupiot",
+  "Lotad Doll"
+ ],
+ "marill_doll": [
+  "Poupée Marill",
+  "Marill Doll"
+ ],
+ "meowth_doll": [
+  "Poupée Miaouss",
+  "Meowth Doll"
+ ],
+ "mud_ball": [
+  "Boule de Boue",
+  "Mud Ball"
+ ],
+ "mudkip_doll": [
+  "Poupée Gobou",
+  "Mudkip Doll"
+ ],
+ "pc": [
+  "PC",
+  "PC"
+ ],
+ "pichu_doll": [
+  "Poupée Pichu",
+  "Pichu Doll"
+ ],
+ "pika_cushion": [
+  "Coussin Pika",
+  "Pika Cushion"
+ ],
+ "pika_poster": [
+  "Poster Pika",
+  "Pika Poster"
+ ],
+ "pikachu_doll": [
+  "Poupée Pikachu",
+  "Pikachu Doll"
+ ],
+ "pokemon_chair": [
+  "Chaise Pokémon",
+  "Pokémon Chair"
+ ],
+ "pokemon_desk": [
+  "Bureau Pokémon",
+  "Pokémon Desk"
+ ],
+ "powder_snow_mat": [
+  "Tapis Neige",
+  "Powder Snow Mat"
+ ],
+ "pretty_chair": [
+  "Jolie Chaise",
+  "Pretty Chair"
+ ],
+ "pretty_desk": [
+  "Joli Bureau",
+  "Pretty Desk"
+ ],
+ "pretty_flowers": [
+  "Jolies Fleurs",
+  "Pretty Flowers"
+ ],
+ "ragged_chair": [
+  "Chaise Abîmée",
+  "Ragged Chair"
+ ],
+ "ragged_desk": [
+  "Bureau Abîmé",
+  "Ragged Desk"
+ ],
+ "red_balloon": [
+  "Ballon Rouge",
+  "Red Balloon"
+ ],
+ "red_brick": [
+  "Brique Rouge",
+  "Red Brick"
+ ],
+ "red_plant": [
+  "Plante Rouge",
+  "Red Plant"
+ ],
+ "red_poster": [
+  "Poster Rouge",
+  "Red Poster"
+ ],
+ "red_tent": [
+  "Tente Rouge",
+  "Red Tent"
+ ],
+ "regice_doll": [
+  "Poupée Regice",
+  "Regice Doll"
+ ],
+ "regirock_doll": [
+  "Poupée Regirock",
+  "Regirock Doll"
+ ],
+ "registeel_doll": [
+  "Poupée Registeel",
+  "Registeel Doll"
+ ],
+ "rhydon_doll": [
+  "Poupée Rhinoféros",
+  "Rhydon Doll"
+ ],
+ "round_cushion": [
+  "Coussin Rond",
+  "Round Cushion"
+ ],
+ "round_tv": [
+  "Télé Ronde",
+  "Round TV"
+ ],
+ "sand_ornament": [
+  "Statue Sable",
+  "Sand Ornament"
+ ],
+ "sea_poster": [
+  "Poster Mer",
+  "Sea Poster"
+ ],
+ "seedot_doll": [
+  "Poupée Grainipiot",
+  "Seedot Doll"
+ ],
+ "silver_shield": [
+  "Bouclier Arg.",
+  "Silver Shield"
+ ],
+ "skitty_doll": [
+  "Poupée Skitty",
+  "Skitty Doll"
+ ],
+ "sky_poster": [
+  "Poster Ciel",
+  "Sky Poster"
+ ],
+ "slide": [
+  "Toboggan",
+  "Slide"
+ ],
+ "small_chair": [
+  "Petite Chaise",
+  "Small Chair"
+ ],
+ "small_desk": [
+  "Petit Bureau",
+  "Small Desk"
+ ],
+ "smoochum_doll": [
+  "Poupée Lippouti",
+  "Smoochum Doll"
+ ],
+ "snorlax_doll": [
+  "Poupée Ronflex",
+  "Snorlax Doll"
+ ],
+ "solid_board": [
+  "Planche Solide",
+  "Solid Board"
+ ],
+ "spikes_mat": [
+  "Tapis Pics",
+  "Spikes Mat"
+ ],
+ "spin_cushion": [
+  "Coussin Mimigal",
+  "Spinarak Cushion"
+ ],
+ "spin_mat": [
+  "Tapis Tournant",
+  "Spin Mat"
+ ],
+ "stairs": [
+  "Escalier",
+  "Stairs"
+ ],
+ "stand": [
+  "Présentoir",
+  "Stand"
+ ],
+ "surf_mat": [
+  "Tapis Surf",
+  "Surf Mat"
+ ],
+ "swablu_doll": [
+  "Poupée Tylton",
+  "Swablu Doll"
+ ],
+ "thunder_mat": [
+  "Tapis Éclair",
+  "Thunder Mat"
+ ],
+ "tire": [
+  "Pneu",
+  "Tire"
+ ],
+ "togepi_doll": [
+  "Poupée Togepi",
+  "Togepi Doll"
+ ],
+ "torchic_doll": [
+  "Poupée Poussifeu",
+  "Torchic Doll"
+ ],
+ "totodile_doll": [
+  "Poupée Kaiminus",
+  "Totodile Doll"
+ ],
+ "treecko_doll": [
+  "Poupée Arcko",
+  "Treecko Doll"
+ ],
+ "tropical_plant": [
+  "Plante Tropicale",
+  "Tropical Plant"
+ ],
+ "tv": [
+  "Télé",
+  "TV"
+ ],
+ "venusaur_doll": [
+  "Poupée Florizarre",
+  "Venusaur Doll"
+ ],
+ "wailmer_doll": [
+  "Poupée Wailmer",
+  "Wailmer Doll"
+ ],
+ "water_cushion": [
+  "Coussin Eau",
+  "Water Cushion"
+ ],
+ "wynaut_doll": [
+  "Poupée Okéoké",
+  "Wynaut Doll"
+ ],
+ "yellow_balloon": [
+  "Ballon Jaune",
+  "Yellow Balloon"
+ ],
+ "yellow_brick": [
+  "Brique Jaune",
+  "Yellow Brick"
+ ],
+ "zigzag_cushion": [
+  "Coussin Zigzag",
+  "Zigzag Cushion"
+ ]
+}

@@ -36,3 +36,4 @@ window.L_fr_economy = {
 };
 
 
+

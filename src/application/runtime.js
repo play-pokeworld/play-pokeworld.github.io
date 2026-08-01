@@ -14,3 +14,4 @@ export function createApplicationRuntime() {
     domain: { damage, typeSystem },
   };
 }
+

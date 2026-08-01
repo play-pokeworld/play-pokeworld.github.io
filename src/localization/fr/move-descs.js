@@ -403,3 +403,4 @@ window.L_fr_move_descs = {
   "zen_headbut": "Peut faire trembler la cible.",
   "zing_zap": "Peut faire trembler la cible."
 };
+

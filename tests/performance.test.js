@@ -30,3 +30,4 @@ test('createFrameScheduler can flush immediately', () => {
   assert.equal(calls, 1);
   scheduler.cancel();
 });
+

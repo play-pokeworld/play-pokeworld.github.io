@@ -61,3 +61,4 @@ window.ICONS = ICONS;
 window.getIcon = getIcon;
 
 })();
+

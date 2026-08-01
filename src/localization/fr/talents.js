@@ -810,3 +810,4 @@ window.L_fr_talents = {
     "desc": "Les capacités Normal deviennent Dragon, puissance x1.3."
   }
 };
+

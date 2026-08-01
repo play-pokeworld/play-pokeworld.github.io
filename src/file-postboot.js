@@ -124,6 +124,20 @@ function installCriticalClickFallback(root) {
     'debug-give-candies': function () { callGlobal('debugGiveCandies'); },
     'debug-unlock-badges': function () { callGlobal('debugUnlockBadges'); },
     'debug-fill-mine': function () { callGlobal('debugFillMine'); },
+    'debug-base-grant-all': function () { callGlobal('baseDebugGrantAll'); },
+    'debug-base-add-npc': function () { callGlobal('baseDebugAddNpc'); },
+    'base-window-refresh': function () { callGlobal('baseWindowRender'); },
+
+    'base-ed-select': function (el) { callGlobal('baseWindowSelectSlug', el.dataset.slug); },
+    'base-ed-select-npc': function (el) { callGlobal('baseWindowSelectNpc', el.dataset.npc); },
+    'base-ed-tab': function (el) { callGlobal('baseWindowSelectTab', el.dataset.cat); },
+    'base-ed-rotate': function () { callGlobal('baseWindowRotateSel'); },
+    'base-ed-pickup': function () { callGlobal('baseWindowPickupSel'); },
+    'base-ed-npc-edit': function () { callGlobal('baseWindowEditSelectedNpc'); },
+    'base-ed-select-npc-new': function () { callGlobal('baseWindowSelectNpcNew'); },
+    'base-ed-visit': function () { callGlobal('baseWindowVisitToggle'); },
+    'base-ed-export': function () { callGlobal('baseWindowExport'); },
+    'base-ed-import': function () { callGlobal('baseWindowImport'); },
     'debug-timeskip-30m': function () { callGlobal('debugTimeSkipAfk30Minutes'); },
     'toggle-battle-speed-x10': function () { callGlobal('toggleBattleSpeedX10'); },
     'close-victory-screen': function () { var el = document.getElementById('victory-screen'); if (el) el.classList.remove('open'); },
@@ -158,6 +172,7 @@ function installCriticalClickFallback(root) {
     if (!target) return;
     const action = target.dataset.action;
     if (action === 'import-save-file' || action === 'switch-map-region') return;
+    if (action === 'base-window-mode' || action === 'base-window-layout') return; // gérés au 'change'
     const handler = actions[action];
     if (!handler) return;
     // Passe 16 : conservation du scroll autour de l'action (filet de sécurité).
@@ -182,6 +197,8 @@ function installCriticalClickFallback(root) {
     if (!target) return;
     if (target.dataset.action === 'import-save-file' && target.files && target.files[0]) callGlobal('importSave', event);
     if (target.dataset.action === 'switch-map-region') callGlobal('switchMapRegion', target.value);
+    if (target.dataset.action === 'base-window-mode') callGlobal('baseWindowSetMode', target.value);
+    if (target.dataset.action === 'base-window-layout') callGlobal('baseWindowSetLayout', target.value);
     const legacyChangeTarget = event.target.closest('[data-change-call]');
     if (legacyChangeTarget) { callGlobal.apply(null, [legacyChangeTarget.dataset.changeCall].concat(parseLegacyArgs(legacyChangeTarget.dataset.changeArgs || '', event, legacyChangeTarget))); }
   });
@@ -193,6 +210,7 @@ function installCriticalClickFallback(root) {
     if (target.dataset.action === 'filter-dictionary') callGlobal('setDictionarySearch', target.value);
     if (target.dataset.action === 'filter-bag') callGlobal('setInvSearch', target.value); // passe 26 : recherche du sac
     if (target.dataset.action === 'filter-preset-picker') callGlobal('presetPickerFilter', target.value); // passe 27 : recherche du sélecteur de preset
+    if (target.dataset.action === 'filter-base-npc-picker') callGlobal('baseNpcPickerFilter', target.value); // passe 46 : recherche du sélecteur de copain
   });
 
   document.addEventListener('mousedown', function (event) {
@@ -411,5 +429,6 @@ function installCriticalClickFallback(root) {
   }
 
 })();
+
 
 

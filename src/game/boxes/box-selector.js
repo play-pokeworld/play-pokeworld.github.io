@@ -43,6 +43,10 @@ function openUnifiedSelectorModal(actionType){
   else if(actionType === 'item_rarecandy') titleEl.textContent = t('selector_title_item_use');
   else if(actionType === 'training') titleEl.textContent = t('selector_title_training');
   else if(actionType === 'team') titleEl.textContent = t('selector_title_team');
+  // Passe 48 (retour utilisateur) : presets ET PNJ de base utilisent le MÊME
+  // sélecteur que l'équipe active — l'interface « boîte PC » complète.
+  else if(String(actionType).startsWith('preset_slot_')) titleEl.textContent = t('selector_title_team');
+  else if(String(actionType).startsWith('basenpc_slot_')) titleEl.textContent = t('selector_title_team');
   else if(actionType === 'save_icon') titleEl.textContent = t('save_profile_icon');
   else titleEl.textContent = t('selector_title_box');
   
@@ -159,9 +163,23 @@ function renderUnifiedGrid(){
   Object.entries(G.collection || {}).forEach(([idStr, p]) => {
     if(p) list.push({ p, loc: 'box', idStr });
   });
+  // Icône de sauvegarde : TOUS les Pokémon possédés sont proposés — équipe,
+  // boîte, pension et entraînement (on choisit un favori sans devoir le
+  // retirer de l'équipe).
+  if(_usmAction === 'save_icon'){
+    (G.hatchery || []).forEach((s, i) => {
+      if(s && s.poke) list.push({ p: s.poke, loc: 'hatchery', idStr: 'h' + i });
+    });
+    (G.trainingSlots || []).forEach((s, i) => {
+      if(s && s.uid){
+        const found = (typeof findPokemonByTrainingSlot === 'function') ? findPokemonByTrainingSlot(s) : null;
+        if(found && !list.some(e => e.p === found)) list.push({ p: found, loc: 'training', idStr: 't' + i });
+      }
+    });
+  }
 
   
-  if(_usmAction === 'team' || _usmAction === 'save_icon' || _usmAction === 'hatchery_queue' || String(_usmAction).startsWith('hatchery_queue_') || String(_usmAction).startsWith('training_queue_')){
+  if(_usmAction === 'team' || _usmAction === 'hatchery_queue' || String(_usmAction).startsWith('hatchery_queue_') || String(_usmAction).startsWith('training_queue_')){
     list = list.filter(({loc}) => loc === 'box');
   }
   if(_usmAction === 'item_rarecandy') list = list.filter(({p}) => (p.level||1) < 100);
@@ -392,6 +410,12 @@ function selectUnifiedCard(loc, idStr){
   let p = null;
   if(loc === 'team'){
     p = G.team[Number(idStr)];
+  } else if(loc === 'hatchery'){
+    const s = (G.hatchery || [])[Number(String(idStr).slice(1))];
+    p = s && s.poke ? s.poke : null;
+  } else if(loc === 'training'){
+    const s = (G.trainingSlots || [])[Number(String(idStr).slice(1))];
+    p = (s && typeof findPokemonByTrainingSlot === 'function') ? findPokemonByTrainingSlot(s) : null;
   } else {
     p = G.collection[idStr];
   }
@@ -400,6 +424,27 @@ function selectUnifiedCard(loc, idStr){
   if(_usmAction === 'save_icon'){
     if(typeof window.selectSaveProfileIcon === 'function') window.selectSaveProfileIcon(idStr, p.id);
     closeUnifiedSelectorModal();
+    return;
+  }
+
+  // Passe 48 — choix d'un Pokémon pour un PRESET d'équipe : on enregistre son
+  // uid dans le preset (même geste que pour l'équipe active, même écran).
+  if(String(_usmAction).startsWith('preset_slot_')){
+    const slot = Number(String(_usmAction).split('_').pop());
+    if(typeof presetEditorPickChoose === 'function' && p.uid){
+      presetEditorPickChoose(slot, p.uid);
+    }
+    closeUnifiedSelectorModal();
+    if(typeof openPresetEditor === 'function' && window._presetEditorOpen){
+      openPresetEditor(window._presetEditorOpen);
+    }
+    return;
+  }
+  // Passe 48 — choix d'un Pokémon pour l'équipe d'un PNJ de base secrète.
+  if(String(_usmAction).startsWith('basenpc_slot_')){
+    const slot = Number(String(_usmAction).split('_').pop());
+    closeUnifiedSelectorModal();
+    if(typeof baseNpcEditorAcceptPick === 'function') baseNpcEditorAcceptPick(slot, p);
     return;
   }
 
@@ -555,4 +600,5 @@ if (typeof renderFossilTabContent !== 'undefined' && typeof window !== 'undefine
 if (typeof _renderUsmItemBackFooter !== 'undefined' && typeof window !== 'undefined') window._renderUsmItemBackFooter = _renderUsmItemBackFooter;
 if (typeof sendFossilToHatchery !== 'undefined' && typeof window !== 'undefined') window.sendFossilToHatchery = sendFossilToHatchery;
 if (typeof selectUnifiedCard !== 'undefined' && typeof window !== 'undefined') window.selectUnifiedCard = selectUnifiedCard;
+
 

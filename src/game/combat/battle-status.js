@@ -185,7 +185,9 @@ async function onEnemyFaint(){
 
  
  const drops=isQuestRewardBattle ? null : ROUTE_DROPS[questLoc];
- if(drops&&drops.length&&chance(4)){
+ const _dropBonus = (typeof getSecretBaseBonuses === 'function') ? (Number(getSecretBaseBonuses().dropBonus) || 0) : 0;
+ const _dropChance = Math.min(3, 1 + _dropBonus); // base 1 % ; max 3 % avec drapeaux
+ if(drops&&drops.length&&chance(_dropChance)){
  const drop=drops[rand(0,drops.length-1)];
  const reward = (typeof grantRewardItem === 'function') ? grantRewardItem(drop,1) : (addToInventory(drop,1), {added:1,money:0});
  if(reward.added){
@@ -214,4 +216,5 @@ async function onEnemyFaint(){
 // --- Migrated to ES module, globals exposed ---
 if (typeof tickStatusDurations !== 'undefined' && typeof window !== 'undefined') window.tickStatusDurations = tickStatusDurations;
 if (typeof applyEndOfTurnStatus !== 'undefined' && typeof window !== 'undefined') window.applyEndOfTurnStatus = applyEndOfTurnStatus;
+
 

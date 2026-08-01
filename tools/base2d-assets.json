@@ -1,0 +1,24 @@
+{
+ "comment": "Sprites 2D Pokémon Émeraude (pret/pokeemerald, graphismes officiels GBA extraits du désassemblage). checkedDirs = dossiers du dépôt contenant les PNG. alias = slug du catalogue -> nom de fichier sans extension. Les entrées non listées en alias matchent par identité.",
+ "raw": "https://raw.githubusercontent.com/pret/pokeemerald/master",
+ "checkedDirs": [
+  "graphics/decorations",
+  "graphics/object_events/pics/dolls",
+  "graphics/object_events/pics/cushions"
+ ],
+ "alias": {
+  "spinarak_cushion": "spin_cushion",
+  "log_desk": "camp_desk",
+  "rough_desk": "ragged_desk",
+  "soft_desk": "comfort_desk",
+  "elegant_desk": "pretty_desk",
+  "flowering_plant": "pretty_flowers",
+  "bricks": "red_brick",
+  "note_do_mat": null,
+  "bench": null
+ },
+ "skip": "unused_* (sprites inutilisés GBA) et big_*_doll (les grandes poupées sont servies par graphics/decorations sans préfixe) ; put_away_cursor (curseur UI, pas une décoration ; 404 raw)",
+ "skipList": [
+  "put_away_cursor"
+ ]
+}

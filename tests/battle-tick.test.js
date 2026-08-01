@@ -86,3 +86,4 @@ test('resolveBattleStateAnomalies triggers enemy faint resolver once', async () 
   resetGlobals();
 });
 
+

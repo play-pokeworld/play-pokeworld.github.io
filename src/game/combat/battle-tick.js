@@ -103,11 +103,13 @@ function doPlayerMove() {
 
   // Tick down weather and terrain turns
   if (b) {
-    if (b.weather && b.weather !== 'none') {
+    if (b.weather && b.weather !== 'none' && b.weatherTurns !== Infinity) {
       b.weatherTurns = (b.weatherTurns || 1) - 1;
       if (b.weatherTurns <= 0) {
-        b.weather = 'none';
-        if (typeof addBattleLog === 'function') addBattleLog((typeof t === 'function' ? t('weather_back_to_normal') : 'Le climat revient à la normale.'));
+        const defW = b.defaultWeather || 'none';
+        b.weather = defW;
+        b.weatherTurns = defW === 'none' ? 0 : Infinity;
+        if (typeof addBattleLog === 'function') addBattleLog((typeof t === 'function' ? (defW !== 'none' ? t('weather_restore_default') : t('weather_back_to_normal')) : (defW !== 'none' ? 'Le climat d\'origine revient sur la zone.' : 'Le climat revient à la normale.')));
       }
     }
     if (b.terrain && b.terrain !== 'none') {
@@ -138,7 +140,7 @@ function doPlayerMove() {
   resolveBattleStateAnomalies();
 }
 
-function doEnemyMove() {
+function doEnemyMove() { 
   var b = (typeof battle !== 'undefined') ? battle : null;
   var p = getActivePlayerPoke();
   var e = b ? b.enemyPoke : null;
@@ -215,3 +217,4 @@ if (typeof window !== 'undefined') {
   window.doPlayerMove = doPlayerMove;
   window.doEnemyMove = doEnemyMove;
 }
+

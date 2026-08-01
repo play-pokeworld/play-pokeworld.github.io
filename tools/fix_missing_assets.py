@@ -137,7 +137,7 @@ def main():
     from PIL import Image  # noqa: F401  (vérif présence PIL)
 
     txt = (ROOT / "src" / "data" / "items-data.js").read_text(encoding="utf-8")
-    keys = re.findall(r'^\s*"([a-z0-9_]+)"\s*:\s*\{', txt, re.M)
+    keys = re.findall(r'^  "([a-z0-9_]+)"\s*:\s*\{', txt, re.M)
     missing = [k for k in keys
                if not (ITEMS_DIR / f"{k}.png").exists()
                and not k.startswith(("ct", "cs"))]  # CT/CS -> tm_<type>.png déjà présents
@@ -243,3 +243,4 @@ def _download_winky(dest):
 
 if __name__ == "__main__":
     sys.exit(main())
+

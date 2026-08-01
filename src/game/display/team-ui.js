@@ -128,6 +128,7 @@ function openItemSelector(teamIdx){
   window._equipCallback = function(key) {
     equipItemDirect(teamIdx, key);
   };
+  window._isEquipOpen = true;
   // Passe 18 : le sélecteur est rendu IMMÉDIATEMENT après l'ouverture du
   // panneau (le rendu du sac est synchrone) — fini la fenêtre de 200 ms
   // pendant laquelle un clic tombait sur la liste brute du sac.
@@ -337,9 +338,17 @@ function firstAlive(){ return G.team.findIndex(p => p.currentHP > 0); }
 
 
 function addTeamDragAndDrop() {
-  const teamEl = document.getElementById('team-window-body');
-  if (!teamEl) return;
-  const cards = teamEl.querySelectorAll('.poke-card');
+  installCardDragAndDrop(document.getElementById('team-window-body'));
+}
+
+// Passe 51 : le glisser-déposer des CARTES est extrait ici pour être réutilisé
+// TEL QUEL par les presets, l'Atoll et les PNJ (retour utilisateur : « le drag
+// and drop de Pokémon dans les presets et le PNJ devrait être exactement le
+// même que dans l'équipe et l'Atoll »). Mêmes écouteurs, même appui long,
+// mêmes vignettes ; seul l'ÉCHANGE final passe par le contexte partagé.
+function installCardDragAndDrop(root) {
+  if (!root || typeof root.querySelectorAll !== 'function') return;
+  const cards = root.querySelectorAll('.poke-card');
   cards.forEach((card, idx) => {
     card.setAttribute('data-team-idx', idx);
     card.addEventListener('mousedown', (ev) => teamMouseDown(ev, idx));
@@ -361,13 +370,44 @@ function _pwPokeGhostData(p){
   return { icon:(typeof spriteImg==='function'?spriteImg(p.id,p.emoji,{size:26,shiny:!!p.shinyActive}):''), title:(typeof getPokeName==='function'?getPokeName(p.id):(p.name||'')), sub:'Nv.'+(p.level||1) };
 }
 function _pwMoveGhostData(teamIdx, moveIdx){
-  const _dm=(typeof G!=='undefined'&&G&&G.team&&G.team[teamIdx]&&G.team[teamIdx].moves)?G.team[teamIdx].moves[moveIdx]:null;
+  const _dt=(typeof _pwDragTeam==='function')?_pwDragTeam():((typeof G!=='undefined'&&G&&G.team)?G.team:[]);
+  const _dm=(_dt[teamIdx]&&_dt[teamIdx].moves)?_dt[teamIdx].moves[moveIdx]:null;
   const _dmv=_dm&&typeof MOVES!=='undefined'?MOVES[_dm.id]:null;
   if(!_dm) return {icon:'', title:'?'};
   return { icon:_dmv?'<span class="type-badge type-'+String(_dmv.type||'').toLowerCase()+'">'+(typeof getTypeName==='function'?getTypeName(_dmv.type):(_dmv.type||''))+'</span>':'', title:(typeof getMoveName==='function'?getMoveName(_dm.id):_dm.id) };
 }
+// ── Passe 50 : le glisser-déposer d'attaques est UNIFIÉ ──────────────────
+// Retour utilisateur : « les drag & drop des attaques et Pokémon ne sont pas
+// les mêmes dans le PNJ, les presets et l'équipe : garder uniquement celui de
+// l'équipe afin de tout unifier ».
+//
+// Ce handler délégué (installé UNE fois sur document) est désormais le SEUL
+// mécanisme du jeu. Les écrans qui n'éditent pas G.team (presets, PNJ,
+// Atoll) déclarent simplement un CONTEXTE : d'où lire les Pokémon et quoi
+// appeler pour échanger. Même geste, mêmes vignettes, mêmes previews partout.
+//   pwSetMoveDragContext({ getTeam, swapMoves, swapPokes })
+let _pwMoveDragCtx = null;
+function pwSetMoveDragContext(ctx) { _pwMoveDragCtx = ctx || null; }
+function pwClearMoveDragContext() { _pwMoveDragCtx = null; }
+function _pwDragTeam() {
+  if (_pwMoveDragCtx && typeof _pwMoveDragCtx.getTeam === 'function') return _pwMoveDragCtx.getTeam() || [];
+  return (typeof G !== 'undefined' && G && G.team) ? G.team : [];
+}
+function _pwDragSwapMoves(pi, a, b) {
+  if (_pwMoveDragCtx && typeof _pwMoveDragCtx.swapMoves === 'function') return _pwMoveDragCtx.swapMoves(pi, a, b);
+  if (typeof swapTeamMoves === 'function') return swapTeamMoves(pi, a, b);
+  return undefined;
+}
+function _pwDragSwapPokes(a, b) {
+  if (_pwMoveDragCtx && typeof _pwMoveDragCtx.swapPokes === 'function') return _pwMoveDragCtx.swapPokes(a, b);
+  if (typeof swapTeamMembers === 'function') return swapTeamMembers(a, b);
+  return undefined;
+}
+
 function installMoveDragDrop() {
-  if (typeof document === 'undefined' || document._pwMoveDragInstalled) return;
+  // (garde : environnements sans DOM complet — tests headless)
+  if (typeof document === 'undefined' || typeof document.addEventListener !== 'function') return;
+  if (document._pwMoveDragInstalled) return;
   document._pwMoveDragInstalled = true;
   document.addEventListener('dragstart', (ev) => {
     const el = ev.target && ev.target.closest ? ev.target.closest('[data-move-drag]') : null;
@@ -376,7 +416,8 @@ function installMoveDragDrop() {
     _pwMoveDrag = { teamIdx: Number(parts[0]), moveIdx: Number(parts[1]) };
     // Passe 26 : vignette de drag unifiée pour l'attaque déplacée.
     try {
-      const _dm = (typeof G !== 'undefined' && G && G.team && G.team[_pwMoveDrag.teamIdx] && G.team[_pwMoveDrag.teamIdx].moves) ? G.team[_pwMoveDrag.teamIdx].moves[_pwMoveDrag.moveIdx] : null;
+      const _dt = _pwDragTeam();
+      const _dm = (_dt[_pwMoveDrag.teamIdx] && _dt[_pwMoveDrag.teamIdx].moves) ? _dt[_pwMoveDrag.teamIdx].moves[_pwMoveDrag.moveIdx] : null;
       const _dmv = _dm && typeof MOVES !== 'undefined' ? MOVES[_dm.id] : null;
       if(_dm && typeof pwApplyDragGhost === 'function'){
         pwApplyDragGhost(ev, {
@@ -418,7 +459,7 @@ function installMoveDragDrop() {
     if (targetTeam !== _pwMoveDrag.teamIdx) return;
     ev.preventDefault();
     ev.stopPropagation();
-    if (typeof swapTeamMoves === 'function') swapTeamMoves(_pwMoveDrag.teamIdx, _pwMoveDrag.moveIdx, Number(parts[1]));
+    _pwDragSwapMoves(_pwMoveDrag.teamIdx, _pwMoveDrag.moveIdx, Number(parts[1]));
     _pwMoveDrag = null;
     if (typeof pwDropPreviewHide === 'function') pwDropPreviewHide();
   });
@@ -441,7 +482,9 @@ function teamMouseDown(ev, idx) {
   // Ne pas armer le drag d'une CARTE quand la cible est une attaque
   // (le drag des attaques a priorité, passe 17) ou en combat.
   if (ev.target && ev.target.closest && ev.target.closest('.poke-move')) return;
-  if (typeof isTeamStructureLocked === 'function' && isTeamStructureLocked()) return;
+  // le gel d'ordre en combat ne s'applique qu'à l'ÉQUIPE ACTIVE (passe 51 :
+  // presets / PNJ / Atoll restent réordonnables pendant un combat)
+  if (!_pwMoveDragCtx && typeof isTeamStructureLocked === 'function' && isTeamStructureLocked()) return;
   _teamLongPressReady = false;
   _teamDragIdx = idx;
   _teamLongPressTimer = setTimeout(() => {
@@ -474,7 +517,7 @@ function teamDragStart(ev, idx) {
   ev.dataTransfer.setData('text/plain', String(idx));
   // Passe 26 : vignette de drag unifiée (sprite + nom + niveau), propre et
   // identique partout, au lieu de la « photo » géante de la carte.
-  const _dp = (typeof G !== 'undefined' && G && G.team) ? G.team[idx] : null;
+  const _dp = _pwDragTeam()[idx] || null;   // passe 51 : équipe contextuelle
   if(_dp && typeof pwApplyDragGhost === 'function'){
     pwApplyDragGhost(ev, {
       icon: (typeof spriteImg === 'function') ? spriteImg(_dp.id, _dp.emoji, { size: 26, shiny: !!_dp.shinyActive }) : '',
@@ -509,7 +552,7 @@ function teamDragLeave(ev) {
 function teamDrop(ev, targetIdx) {
   ev.preventDefault();
   // Passe 17 : ordre de l'équipe gelé pendant un combat
-  if(typeof isTeamStructureLocked === 'function' && isTeamStructureLocked()){
+  if(!_pwMoveDragCtx && typeof isTeamStructureLocked === 'function' && isTeamStructureLocked()){
     notifyTeamStructureLocked();
     ev.currentTarget.style.borderColor = '';
     ev.currentTarget.style.boxShadow = '';
@@ -530,6 +573,14 @@ function teamDrop(ev, targetIdx) {
   
   
   const sourceIdx = _teamDragIdx;
+  _teamDragIdx = null;
+  _teamLongPressReady = false;
+  // Passe 51 : hors de l'équipe active (presets, PNJ, Atoll), l'échange est
+  // délégué au CONTEXTE — le geste et les visuels restent identiques.
+  if (_pwMoveDragCtx && typeof _pwMoveDragCtx.swapPokes === 'function') {
+    _pwMoveDragCtx.swapPokes(sourceIdx, targetIdx);
+    return;
+  }
   const temp = G.team[sourceIdx];
   G.team[sourceIdx] = G.team[targetIdx];
   G.team[targetIdx] = temp;
@@ -537,9 +588,7 @@ function teamDrop(ev, targetIdx) {
   // rester collé au numéro de slot.
   if(typeof swapTeamSlotItems === 'function') swapTeamSlotItems(sourceIdx, targetIdx);
   else if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
-  
-  _teamDragIdx = null;
-  _teamLongPressReady = false;
+
   saveGame();
   renderTeamWindow();
 }
@@ -566,7 +615,48 @@ if (typeof installMoveDragDrop !== 'undefined' && typeof window !== 'undefined')
 if (typeof teamMouseDown !== 'undefined' && typeof window !== 'undefined') window.teamMouseDown = teamMouseDown;
 if (typeof teamMouseUp !== 'undefined' && typeof window !== 'undefined') window.teamMouseUp = teamMouseUp;
 if (typeof teamDragStart !== 'undefined' && typeof window !== 'undefined') window.teamDragStart = teamDragStart;
+if (typeof installCardDragAndDrop !== 'undefined' && typeof window !== 'undefined') window.installCardDragAndDrop = installCardDragAndDrop;
 if (typeof teamDragOver !== 'undefined' && typeof window !== 'undefined') window.teamDragOver = teamDragOver;
 if (typeof teamDragLeave !== 'undefined' && typeof window !== 'undefined') window.teamDragLeave = teamDragLeave;
 if (typeof teamDrop !== 'undefined' && typeof window !== 'undefined') window.teamDrop = teamDrop;
 
+
+
+// ── Passe 49 : sélecteur d'objet tenu GÉNÉRIQUE (sac plein écran) ────────
+// Retour utilisateur : « le choix d'item à mettre sur le Pokémon dans les
+// presets, l'Atoll et les PNJ doit se faire comme avec les Pokémon de la team
+// active, avec le sac ».
+//
+// openItemSelector() ci-dessus est câblé sur un index d'ÉQUIPE. Ici on ouvre
+// le MÊME écran (panneau plein écran « inventaire », filtré sur les objets
+// tenables par _equipCallback) mais en rendant la main via un callback libre :
+// chaque appelant décide quoi faire de la clé d'objet choisie.
+//   onPick(key)  : objet retenu
+//   onClear()    : bouton « Retirer » (optionnel)
+function openHeldItemPickerFor(label, currentKey, onPick, onClear) {
+  if (typeof openFullscreenPanel !== 'function') return false;
+  window._equipCallback = function (key) {
+    try { if (typeof onPick === 'function') onPick(key); }
+    finally { if (typeof closeFullscreenPanel === 'function') closeFullscreenPanel(); }
+  };
+  window._equipPickerMeta = { label: String(label || ''), currentKey: currentKey || null, onClear: onClear || null };
+  window._isEquipOpen = true;
+  openFullscreenPanel('inventory');
+  return true;
+}
+
+// Retire l'objet courant depuis le sélecteur générique (bouton « Retirer »).
+function heldItemPickerClear() {
+  const meta = window._equipPickerMeta;
+  window._equipCallback = null;
+  window._equipPickerMeta = null;
+  if (meta && typeof meta.onClear === 'function') meta.onClear();
+  if (typeof closeFullscreenPanel === 'function') closeFullscreenPanel();
+}
+
+if (typeof window !== 'undefined') {
+  window.pwSetMoveDragContext = pwSetMoveDragContext;
+  window.pwClearMoveDragContext = pwClearMoveDragContext;
+  window.openHeldItemPickerFor = openHeldItemPickerFor;
+  window.heldItemPickerClear = heldItemPickerClear;
+}

@@ -208,3 +208,4 @@ if (typeof toggleBoxMoveSelect !== 'undefined' && typeof window !== 'undefined')
 if (typeof learnBoxMove !== 'undefined' && typeof window !== 'undefined') window.learnBoxMove = learnBoxMove;
 if (typeof getBoxPokemon !== 'undefined' && typeof window !== 'undefined') window.getBoxPokemon = getBoxPokemon;
 
+

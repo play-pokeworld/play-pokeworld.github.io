@@ -37,3 +37,4 @@ export function createFrameScheduler(callback, options = {}) {
     },
   };
 }
+

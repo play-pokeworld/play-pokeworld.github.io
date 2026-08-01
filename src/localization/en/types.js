@@ -21,3 +21,4 @@ window.L_en_types = {
   "steel": "Steel",
   "fairy": "Fairy"
 };
+

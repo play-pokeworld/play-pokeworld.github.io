@@ -38,3 +38,4 @@ test('resetGameSession replaces both mutable state objects', () => {
   assert.equal(session.gameState.money, 2000);
   assert.equal(session.battleState.active, false);
 });
+

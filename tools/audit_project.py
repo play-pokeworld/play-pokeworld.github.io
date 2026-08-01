@@ -2,11 +2,15 @@
 from __future__ import annotations
 
 import re
+import urllib.parse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 TEXT_EXT = {'.html', '.js', '.css'}
-IGNORE_DIRS = {'node_modules', 'dist', '.git'}
+# Passe 45 : `tests/` est exclu de l'inventaire d'assets. Les tests citent des
+# chemins pour vérifier qu'ils N'EXISTENT PLUS (staging ORAS purgé passe 42) :
+# les compter comme « références » produisait de faux manquants.
+IGNORE_DIRS = {'node_modules', 'dist', '.git', 'tests'}
 
 hardcoded = []
 inline_style = []
@@ -26,7 +30,7 @@ for path in ROOT.rglob('*'):
         if path.suffix in {'.js', '.html'}:
             if re.search(r'>[^<>{}\n]{3,}<', line) and 'data-i18n' not in line:
                 hardcoded.append((str(rel), i, line.strip()[:160]))
-    for m in re.findall(r"src/assets/images/[^'\"`) ;]+", text):
+    for m in re.findall(r"src/assets/images/[^'\"`) ;\n]+", text):
         if '${' not in m and not m.endswith('/') and not m.endswith('_'):
             asset_refs.add(m)
 
@@ -42,8 +46,14 @@ for part in ['galar-north', 'galar-south',
 asset_refs.add('src/assets/images/items/unknown.png')
 
 for ref in sorted(asset_refs):
-    if not (ROOT / ref).exists():
-        missing_assets.append(ref)
+    # Les chemins écrits dans le code peuvent être PERCENT-ENCODÉS (noms de
+    # dresseurs avec espaces/parenthèses : « Ace%20Trainer%20%28male%29.png »).
+    # On teste le chemin brut ET sa forme décodée avant de crier au manquant.
+    if (ROOT / ref).exists():
+        continue
+    if (ROOT / urllib.parse.unquote(ref)).exists():
+        continue
+    missing_assets.append(ref)
 
 print('PokéWorld audit')
 print('==============')
@@ -58,3 +68,4 @@ if missing_assets:
 print('\nNotes:')
 print('- Remaining inline styles are mostly legacy runtime sizing/progress values; file-postboot sanitizes data-style/data-inline-css at runtime.')
 print('- Remaining hardcoded strings are candidates for future full localization; static shell bindings now cover the main menu, settings, debug and summary UI.')
+

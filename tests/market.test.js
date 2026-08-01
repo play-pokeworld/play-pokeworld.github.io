@@ -5,8 +5,10 @@ import { getPokemonPrice, MARKET_STOCK } from '../src/domain/economy/market.js';
 test('market stock exposes both regions', () => {
   assert.ok(Array.isArray(MARKET_STOCK.kanto));
   assert.ok(Array.isArray(MARKET_STOCK.johto));
+  assert.ok(Array.isArray(MARKET_STOCK.hoenn));
   assert.ok(MARKET_STOCK.kanto.length > 0);
   assert.ok(MARKET_STOCK.johto.length > 0);
+  assert.ok(MARKET_STOCK.hoenn.length > 0);
 });
 
 test('price overrides are applied', () => {
@@ -24,4 +26,5 @@ test('price fallback scales with stats and respects minimum', () => {
   assert.ok(normalPrice >= 80000);
   assert.ok(bossPrice > normalPrice);
 });
+
 

@@ -163,3 +163,4 @@ test('non-régression documentée : aucun id d\'attaque legacy compact (étape 2
     for (const mv of spec.moves) assert.ok(sb.MOVES[mv], `${key} : attaque ${mv} valide (aucun id legacy compact)`);
   });
 });
+

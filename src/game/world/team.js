@@ -231,3 +231,4 @@ if (typeof isHeldEquippableItem !== 'undefined' && typeof window !== 'undefined'
 if (typeof unequipItem !== 'undefined' && typeof window !== 'undefined') window.unequipItem = unequipItem;
 if (typeof changePokeTalent !== 'undefined' && typeof window !== 'undefined') window.changePokeTalent = changePokeTalent;
 
+

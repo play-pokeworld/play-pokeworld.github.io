@@ -138,7 +138,7 @@ window.L_en_items = {
   },
   "shiny_charm": {
     "name": "Shiny Charm",
-    "desc": "Triples the chance of encountering Shiny Pokémon (3x)!"
+    "desc": "Obtained by completing 100% of a regional Pokédex. Boosts shiny odds only for Pokémon from completed regions (1/2048 odds)."
   },
   "sunstone": {
     "name": "Sun Stone",
@@ -1145,3 +1145,4 @@ Object.assign(window.L_en_items, {
   fossilized_drake: { ...(window.L_en_items.fossilized_drake || {name:'fossilized_drake'}), desc: 'A Galar fossil component. Combine it with another fossil to revive a Pokémon.' },
   fossilized_fish: { ...(window.L_en_items.fossilized_fish || {name:'fossilized_fish'}), desc: 'A Galar fossil component. Combine it with another fossil to revive a Pokémon.' }
 });
+

@@ -5,22 +5,22 @@ window.L_en_quests = {
 "1": {
 "title":"Prof. Chen's Advice",
 "desc":"In Pallet Town, talk to Prof. Oak to receive his valuable starter advice.",
-"rewardDesc":"400₽ + 1 Oran Berry"
+"rewardDesc":"400₽ + 1 Steel Berry"
 },
 "2": {
 "title":"A New Adventure Begins",
 "desc":"Welcome to PokéWorld! Travel to Route 1 and knock out 10 wild Pokémon to prove your skills.",
-"rewardDesc":"600₽ + 2 Oran Berry"
+"rewardDesc":"600₽ + 1 Fairy Berry"
 },
 "3": {
 "title":"Viridian Forest Awakens",
 "desc":"Explore Viridian Forest and knock out 15 wild Pokémon to sharpen your team.",
-"rewardDesc":"1,000₽ + 1 Sitrus Berry"
+"rewardDesc":"1,000₽ + 1 Prine Berry"
 },
 "4": {
 "title":"Wild Route 22",
 "desc":"Route 22 is full of Pokémon. Knock out 20 wild Pokémon to grow stronger!",
-"rewardDesc":"1,400₽ + 1 Cheri Berry"
+"rewardDesc":"1,400₽ + 1 Bug Berry"
 },
 "5": {
 "title":"First Duel: Blue",
@@ -40,7 +40,7 @@ window.L_en_quests = {
 "8": {
 "title":"Mt. Moon Expedition",
 "desc":"Explore the dark caverns of Mt. Moon. Defeat 30 wild Pokémon to uncover a Moon Stone.",
-"rewardDesc":"2,600₽ + 1 Stardust"
+"rewardDesc":"2,600₽ + 1 Rock Berry"
 },
 "9": {
 "title":"Team Rocket Crashes In",
@@ -65,7 +65,7 @@ window.L_en_quests = {
 "13": {
 "title":"The Cape's Inventor",
 "desc":"Bill, inventor of the Storage System, awaits you in his cottage at the end of Nugget Bridge. Pay him a visit — he loves curious trainers!",
-"rewardDesc":"900₽ + 1 Sitrus Berry"
+"rewardDesc":"900₽ + 1 Dark Berry"
 },
 "14": {
 "title":"The Fan Club President",
@@ -80,12 +80,12 @@ window.L_en_quests = {
 "16": {
 "title":"Waters of Route 5",
 "desc":"Route 5 links Cerulean to Saffron. Knock out 25 wild Pokémon to train up.",
-"rewardDesc":"2,200₽ + 1 Sitrus Berry"
+"rewardDesc":"2,200₽ + 1 Water Berry"
 },
 "17": {
 "title":"Route 6 — To Vermilion",
 "desc":"Take Route 6 toward Vermilion City and knock out 25 wild Pokémon.",
-"rewardDesc":"2,200₽ + 1 Oran Berry"
+"rewardDesc":"2,200₽"
 },
 "18": {
 "title":"Aboard the S.S. Anne",
@@ -120,7 +120,7 @@ window.L_en_quests = {
 "24": {
 "title":"Route 8 Ruffians",
 "desc":"Ruffians harass travelers on Route 8 between Lavender and Saffron. Restore order: 15 wild victories in the area!",
-"rewardDesc":"2,800₽ + 2 Oran Berries"
+"rewardDesc":"2,800₽ + 2 Oran Berries + 1 Ice Berry"
 },
 "25": {
 "title":"Pokémon Tower Ghosts",
@@ -155,7 +155,7 @@ window.L_en_quests = {
 "31": {
 "title":"Celadon Mansion's Eevee",
 "desc":"On the roof of Celadon Mansion lives a lonely Eevee, left behind in secret. An employee whispers where to find it… if you promise to care for it.",
-"rewardDesc":"800₽ + Eevee (Lv.25)"
+"rewardDesc":"800₽ + Eevee (Lv.25) + 1 Psychic Berry"
 },
 "32": {
 "title":"The Game Corner's Porygon",
@@ -180,7 +180,7 @@ window.L_en_quests = {
 "36": {
 "title":"The Warden's Gold Teeth",
 "desc":"The Safari Zone Warden lost his Gold Teeth somewhere in the reserve again! Comb the grounds: 15 victories against the Zone's wilds.",
-"rewardDesc":"3,200₽ + 2 Sitrus Berries"
+"rewardDesc":"3,200₽ + 2 Sitrus Berries + 1 Fire Berry"
 },
 "37": {
 "title":"Duel at Silph Summit",
@@ -195,7 +195,7 @@ window.L_en_quests = {
 "39": {
 "title":"The Silph Co. Lapras",
 "desc":"Saved from Team Rocket, Silph Co. hums back to life. A moved employee gives you the Lapras the Project Lead entrusted to him: take good care of it.",
-"rewardDesc":"900₽ + Lapras (Lv.25)"
+"rewardDesc":"900₽ + Lapras (Lv.25) + 1 Electric Berry"
 },
 "40": {
 "title":"The Karate Master",
@@ -210,22 +210,22 @@ window.L_en_quests = {
 "42": {
 "title":"Mr. Psychic's Riddle",
 "desc":"In a small Saffron house, Mr. Psychic reads passers-by's minds. Guess what he sees in you: he rewards sharp minds.",
-"rewardDesc":"900₽ + 1 Sitrus Berry"
+"rewardDesc":"900₽ + 1 Bug Berry"
 },
 "43": {
 "title":"Grand Underground Discovery",
 "desc":"Open the Mine tab and use mining tools to unearth and sell 5 treasures from Kanto's depths.",
-"rewardDesc":"5,000₽ + 1 Stardust"
+"rewardDesc":"5,000₽ + 1 Fighting Berry"
 },
 "44": {
 "title":"The Celadon Collector",
 "desc":"A wealthy collector wants to build a Kanto vivarium. Catch 15 wild Pokémon for his displays!",
-"rewardDesc":"3,000₽ + 2 Cheri Berries"
+"rewardDesc":"3,000₽ + 2 Cheri Berries + 1 Prine Berry"
 },
 "45": {
 "title":"Seafoam Islands — Roads 19 & 20",
 "desc":"Head to Sea Routes 19 & 20 south of Fuchsia. Win 60 wild sea battles.",
-"rewardDesc":"6,500₽ + 1 Oran Berry"
+"rewardDesc":"6,500₽"
 },
 "46": {
 "title":"Cinnabar Volcano Enigma",
@@ -290,7 +290,7 @@ window.L_en_quests = {
 "58": {
 "title":"The Mansion Journals",
 "desc":"Dr. Fuji's journals found in the Pokémon Mansion recount the birth… and the escape of Mewtwo. Bring them to Cinnabar's museum curator.",
-"rewardDesc":"1,500₽ + 1 Stardust"
+"rewardDesc":"1,500₽"
 },
 "59": {
 "title":"The Ultimate Clone of Cerulean Cave",
@@ -305,12 +305,12 @@ window.L_en_quests = {
 "101": {
 "title":"Prof. Elm's Greeting",
 "desc":"In New Bark Town, talk to Prof. Elm to officially begin your Johto adventure.",
-"rewardDesc":"400₽ + 1 Oran Berry"
+"rewardDesc":"400₽ + 1 Flying Berry"
 },
 "102": {
 "title":"Route 29: First Johto KOs",
 "desc":"Leave New Bark Town for Route 29 and knock out 10 wild Pokémon to reach Cherrygrove City.",
-"rewardDesc":"700₽ + 2 Oran Berry"
+"rewardDesc":"700₽ + 1 Fairy Berry"
 },
 "103": {
 "title":"The Mysterious Silver",
@@ -325,7 +325,7 @@ window.L_en_quests = {
 "105": {
 "title":"Violet City: Zephyr Badge",
 "desc":"Go to Violet City and defeat Falkner in his Flying-type Gym to obtain the Zephyr Badge.",
-"rewardDesc":"2,800₽ + 1 Sitrus Berry"
+"rewardDesc":"2,800₽"
 },
 "106": {
 "title":"The Slowpoke Well Racket",
@@ -340,12 +340,12 @@ window.L_en_quests = {
 "108": {
 "title":"Kurt and the GS Ball",
 "desc":"Professor Elm entrusted a strange Ball to Kurt, Azalea's craftsman. Pay him a visit to learn more about this mystery.",
-"rewardDesc":"600₽ + 1 Sitrus Berry"
+"rewardDesc":"600₽ + 1 Ground Berry"
 },
 "109": {
 "title":"Energy of Ilex Forest",
 "desc":"Kurt suspects the Ball is tied to the Forest's guardian. Soothe the woods: knock out 20 wild Pokémon in Ilex Forest to offer its energy to the shrine.",
-"rewardDesc":"2,600₽ + 3 Oran Berries"
+"rewardDesc":"2,600₽ + 3 Oran Berries + 1 Grass Berry"
 },
 "110": {
 "title":"Silver Strikes Again",
@@ -365,7 +365,7 @@ window.L_en_quests = {
 "113": {
 "title":"Unown by the Dozen!",
 "desc":"The Ruins' walls come alive: Unown are swarming! Knock out 15 wild Pokémon in the Ruins of Alph to help Hale gather data.",
-"rewardDesc":"3,200₽ + 2 Sitrus Berries"
+"rewardDesc":"3,200₽ + 2 Sitrus Berries + 1 Steel Berry"
 },
 "114": {
 "title":"The Crystal Entei",
@@ -405,7 +405,7 @@ window.L_en_quests = {
 "121": {
 "title":"A Beacon Relit",
 "desc":"Bring the secret cure to Jasmine at Olivine's Lighthouse. Thanks to you, Amphy will shine over the sea once more.",
-"rewardDesc":"3,000₽ + 2 Oran Berries"
+"rewardDesc":"3,000₽ + 2 Oran Berries + 1 Ice Berry"
 },
 "122": {
 "title":"Olivine City: Mineral Badge",
@@ -501,18 +501,404 @@ window.L_en_quests = {
 "title":"Ilex Forest: Celebi",
 "desc":"In Ilex Forest's sacred clearing, the time-travel guardian Celebi sometimes appears to patient trainers. Knock out 150 wild Pokémon to draw it out!",
 "rewardDesc":"20,000₽ + Celebi (Lv.50)"
-}
+},
+
+  "201": {
+    "title": "Rescue Professor Birch",
+    "desc": "Defeat the aggressive wild Mightyena Lv. 2 on Route 101.",
+    "rewardDesc": "500₽ + 5 Poké Balls"
+  },
+  "202": {
+    "title": "First Steps in Oldale",
+    "desc": "Talk to Nurse Joy at the Oldale Town Pokémon Center.",
+    "rewardDesc": "400₽ + 3 Potions"
+  },
+  "203": {
+    "title": "First Challenge on Route 102",
+    "desc": "Defeat 5 wild Pokémon on Route 102.",
+    "rewardDesc": "600₽ + 3 Great Balls"
+  },
+  "204": {
+    "title": "Meeting in Petalburg",
+    "desc": "Talk to Norman at the Petalburg Gym.",
+    "rewardDesc": "800₽"
+  },
+  "205": {
+    "title": "Edge of Petalburg Woods",
+    "desc": "Defeat 6 wild Pokémon on Route 104.",
+    "rewardDesc": "700₽ + 2 Super Potions"
+  },
+  "206": {
+    "title": "Mystery of Petalburg Woods",
+    "desc": "Defeat 8 wild Pokémon in Petalburg Woods.",
+    "rewardDesc": "900₽ + 2 Paralyze Heals"
+  },
+  "207": {
+    "title": "First Badge (Rustboro)",
+    "desc": "Defeat Roxanne at the Rustboro Gym.",
+    "rewardDesc": "1,500₽ + 5 Great Balls"
+  },
+  "208": {
+    "title": "Rusturf Tunnel Rescue",
+    "desc": "Defeat 5 wild Pokémon in Rusturf Tunnel.",
+    "rewardDesc": "800₽ + 3 Super Potions"
+  },
+  "209": {
+    "title": "Crossing to Dewford",
+    "desc": "Reach Dewford by boat and talk to the coastal NPC.",
+    "rewardDesc": "600₽"
+  },
+  "210": {
+    "title": "Second Badge (Dewford)",
+    "desc": "Defeat Brawly at the Dewford Gym.",
+    "rewardDesc": "2,000₽ + 2 Sitrus Berries"
+  },
+  "211": {
+    "title": "The Devon Letter (Granite Cave)",
+    "desc": "Defeat 8 wild Pokémon in Granite Cave.",
+    "rewardDesc": "1,200₽ + 3 Ultra Balls"
+  },
+  "212": {
+    "title": "Arrival in Slateport",
+    "desc": "Talk to Captain Stern at the Slateport Oceanic Museum.",
+    "rewardDesc": "1,000₽"
+  },
+  "213": {
+    "title": "The Cycling Road (Route 110)",
+    "desc": "Defeat 10 wild Pokémon on Route 110.",
+    "rewardDesc": "1,400₽ + Full Restore"
+  },
+  "214": {
+    "title": "Third Badge (Mauville)",
+    "desc": "Defeat Wattson at the Mauville Gym.",
+    "rewardDesc": "2,500₽ + Magnet"
+  },
+  "215": {
+    "title": "Fresh Air of Verdanturf",
+    "desc": "Visit Verdanturf and talk to the local resident.",
+    "rewardDesc": "800₽"
+  },
+  "216": {
+    "title": "Desert Storm (Route 111)",
+    "desc": "Defeat 12 wild Pokémon in Route 111 sandstorm (Unlocks Hoenn Secret Bases!).",
+    "rewardDesc": "1,600₽ + 3 Max Repels"
+  },
+  "217": {
+    "title": "A Welcoming Alcove",
+    "desc": "Discover your new game mode: from a Hoenn route's Location window, visit a Secret Base alcove to see the inside (still empty!).",
+    "rewardDesc": "1,500₽ + 3 Poké Balls"
+  },
+  "218": {
+    "title": "My Secret Spot",
+    "desc": "Take possession of an alcove you like: from a Hoenn route's Location window, choose \"Settle here\".",
+    "rewardDesc": "2,000₽ + 2 Super Potions"
+  },
+  "219": {
+    "title": "Fallarbor of the Ashes",
+    "desc": "Visit Fallarbor and talk to the astronomer.",
+    "rewardDesc": "900₽"
+  },
+  "220": {
+    "title": "The Shoal Cave",
+    "desc": "Defeat 10 wild Pokémon in Shoal Cave.",
+    "rewardDesc": "1,800₽ + Star Piece"
+  },
+  "221": {
+    "title": "Threat of Mt. Chimney",
+    "desc": "Defeat 12 wild Pokémon at Mt. Chimney under harsh sunlight.",
+    "rewardDesc": "2,000₽ + Fire Stone"
+  },
+  "222": {
+    "title": "Fourth Badge (Lavaridge)",
+    "desc": "Defeat Flannery at the Lavaridge Gym.",
+    "rewardDesc": "3,000₽ + Charcoal"
+  },
+  "223": {
+    "title": "Return to Petalburg",
+    "desc": "Return to Petalburg for your father's challenge.",
+    "rewardDesc": "1,000₽"
+  },
+  "224": {
+    "title": "Fifth Badge (Petalburg)",
+    "desc": "Defeat Norman at the Petalburg Gym.",
+    "rewardDesc": "3,500₽ + Silk Scarf"
+  },
+  "225": {
+    "title": "Crossing Route 118",
+    "desc": "Defeat 12 wild Pokémon on Route 118.",
+    "rewardDesc": "1,800₽ + 5 Ultra Balls"
+  },
+  "226": {
+    "title": "Rain on Route 119",
+    "desc": "Defeat 15 wild Pokémon on Route 119 in the pouring rain.",
+    "rewardDesc": "2,200₽ + Damp Rock"
+  },
+  "227": {
+    "title": "Sixth Badge (Fortree)",
+    "desc": "Defeat Winona at the Fortree Gym.",
+    "rewardDesc": "4,000₽ + Sharp Beak"
+  },
+  "228": {
+    "title": "Water Mirrors of Route 120",
+    "desc": "Defeat 15 wild Pokémon on Route 120.",
+    "rewardDesc": "2,400₽ + 3 Lum Berries"
+  },
+  "229": {
+    "title": "Toward the Safari Zone (Route 121)",
+    "desc": "Defeat 15 wild Pokémon on Route 121.",
+    "rewardDesc": "2,400₽ + 3 Max Repels"
+  },
+  "230": {
+    "title": "Lilycove Harbor",
+    "desc": "Talk to the Lilycove Department Store manager.",
+    "rewardDesc": "1,500₽"
+  },
+  "231": {
+    "title": "Summit of Mt. Pyre",
+    "desc": "Defeat 12 wild Pokémon at Mt. Pyre.",
+    "rewardDesc": "2,600₽ + Spell Tag"
+  },
+  "232": {
+    "title": "Seventh Badge (Mossdeep)",
+    "desc": "Defeat Tate & Liza at the Mossdeep Gym in a double battle.",
+    "rewardDesc": "4,500₽ + Twisted Spoon"
+  },
+  "233": {
+    "title": "Tides of Shoal Cave",
+    "desc": "Defeat 12 wild Pokémon in Shoal Cave.",
+    "rewardDesc": "2,800₽ + Icy Rock"
+  },
+  "234": {
+    "title": "Seafloor Cavern Invasion",
+    "desc": "Defeat 15 wild Pokémon in Seafloor Cavern.",
+    "rewardDesc": "3,000₽ + Mystic Water"
+  },
+  "235": {
+    "title": "Emergency in Sootopolis",
+    "desc": "Talk to Steven in Sootopolis.",
+    "rewardDesc": "2,000₽"
+  },
+  "236": {
+    "title": "Awakening of the Cave of Origin",
+    "desc": "Defeat 15 wild Pokémon in the Cave of Origin under primal energy.",
+    "rewardDesc": "3,500₽ + Heat Rock"
+  },
+  "237": {
+    "title": "Ascent of Sky Pillar",
+    "desc": "Defeat 15 wild Pokémon at Sky Pillar.",
+    "rewardDesc": "4,000₽ + Dragon Scale"
+  },
+  "238": {
+    "title": "Eighth Badge (Sootopolis)",
+    "desc": "Defeat Juan at the Sootopolis Gym.",
+    "rewardDesc": "5,000₽ + Prism Scale"
+  },
+  "239": {
+    "title": "Calm of Pacifidlog",
+    "desc": "Visit Pacifidlog and talk to the village elder.",
+    "rewardDesc": "2,500₽"
+  },
+  "240": {
+    "title": "Final Trial: Victory Road",
+    "desc": "Defeat 20 wild Pokémon on Hoenn's Victory Road.",
+    "rewardDesc": "5,000₽ + 5 Full Restores"
+  },
+  "241": {
+    "title": "Ever Grande Summit (Hoenn League)",
+    "desc": "Defeat the Elite Four and Champion Steven at the Hoenn League.",
+    "rewardDesc": "10,000₽ + 3 Rare Candies"
+  },
+  "242": {
+    "title": "Triumph of the Hoenn Master",
+    "desc": "Talk to Professor Birch in Littleroot after conquering the League!",
+    "rewardDesc": "5,000₽ + 3 Heart Scales"
+  },
+  "243": {
+    "title": "Scott's Call (Emerald)",
+    "desc": "Meet Scott in the new Battle Zone to discover the Battle Atoll.",
+    "rewardDesc": "3,000₽"
+  },
+  "244": {
+    "title": "Trial of the Frontier Brains",
+    "desc": "Win 15 battles in the Battle Zone to prove your worth to the Brains.",
+    "rewardDesc": "4,000₽ + Choice Band"
+  },
+  "245": {
+    "title": "Mystery of Mirage Island",
+    "desc": "Explore Mirage Island on Route 130 and defeat 12 wild Pokémon in the mist.",
+    "rewardDesc": "3,500₽ + 2 Liechi Berries"
+  },
+  "246": {
+    "title": "Weather Institute Invasion",
+    "desc": "Team Aqua has invaded the Weather Institute! Defeat 12 Pokémon to free the scientists.",
+    "rewardDesc": "3,000₽ + Damp Rock"
+  },
+  "247": {
+    "title": "Castform's Forms",
+    "desc": "Talk to the Weather Institute's head researcher to unlock Castform's weather simulator.",
+    "rewardDesc": "2,500₽ + Heat Rock"
+  },
+  "248": {
+    "title": "Aqua Hideout Infiltration",
+    "desc": "Infiltrate the Aqua Hideout in Lilycove and defeat 15 guards before the submarine departs.",
+    "rewardDesc": "4,000₽ + Mystic Water"
+  },
+  "249": {
+    "title": "The Wreck of Sea Mauville",
+    "desc": "Explore the wreck on Route 108 to recover Captain Stern's sunken Scanner.",
+    "rewardDesc": "3,500₽ + Deep Sea Tooth"
+  },
+  "250": {
+    "title": "The Ocean Scanner",
+    "desc": "Bring the Scanner back to Captain Stern in Slateport.",
+    "rewardDesc": "4,000₽ + Deep Sea Scale"
+  },
+  "251": {
+    "title": "The Eon Ticket Rumor",
+    "desc": "Investigate in Pacifidlog about Southern Island and the strange dreams of Latios and Latias.",
+    "rewardDesc": "3,000₽"
+  },
+  "252": {
+    "title": "Soul Dew of Southern Island (Movie 5)",
+    "desc": "Defeat 15 Pokémon on Southern Island to repel the hunters and protect Latios and Latias.",
+    "rewardDesc": "5,000₽ + 3 Lum Berries"
+  },
+  "253": {
+    "title": "The Millennium Comet (Movie 6)",
+    "desc": "A traveling circus arrived at Mt. Chimney under the comet! Investigate 15 Pokémon.",
+    "rewardDesc": "4,500₽ + 2 Star Pieces"
+  },
+  "254": {
+    "title": "Butler the Magician (Movie 6)",
+    "desc": "Defeat 15 corrupted Pokémon on the Fiery Path to free Jirachi's slumber!",
+    "rewardDesc": "5,000₽ + Smooth Rock"
+  },
+  "255": {
+    "title": "Mossdeep's Aurora (Movie 7)",
+    "desc": "Strange auroras light up Mossdeep. Talk to the town's astronomers.",
+    "rewardDesc": "3,500₽"
+  },
+  "256": {
+    "title": "The LaRousse Meteorite (Movie 7)",
+    "desc": "An alien meteorite struck the Space Center! Defeat 15 Pokémon affected by its energy.",
+    "rewardDesc": "5,500₽ + Twisted Spoon"
+  },
+  "257": {
+    "title": "Destiny: Deoxys vs Rayquaza (Movie 7)",
+    "desc": "Rayquaza descends from the sky to face Deoxys at the Space Center! Calm 15 Pokémon.",
+    "rewardDesc": "6,000₽ + 2 Rare Candys"
+  },
+  "258": {
+    "title": "Delta Episode: Zinnia's Call (ORAS)",
+    "desc": "Zinnia appears at Meteor Falls and predicts an asteroid's fall! Defeat 15 Pokémon.",
+    "rewardDesc": "5,000₽ + Dragon Scale"
+  },
+  "259": {
+    "title": "Delta Episode: The Draconid People (ORAS)",
+    "desc": "Go to Sootopolis to hear the ancestral prophecies of the Draconid people.",
+    "rewardDesc": "4,500₽ + Damp Rock"
+  },
+  "260": {
+    "title": "Delta Episode: Sky Ascent (ORAS)",
+    "desc": "Climb to the top of Sky Pillar, defeating 20 Pokémon to awaken Mega Rayquaza!",
+    "rewardDesc": "4,000₽"
+  },
+  "261": {
+    "title": "Delta Episode: Steven's Test",
+    "desc": "Face Steven at the Hoenn League in one final battle to save the planet!",
+    "rewardDesc": "5,500₽ + Twisted Spoon"
+  },
+  "262": {
+    "title": "Absolute Master of Hoenn",
+    "desc": "Return triumphant to Littleroot! Professor Birch congratulates you for saving Hoenn and the Earth.",
+    "rewardDesc": "4,000₽"
+  },
+  "263": {
+    "title": "Primal Surge: Cave of Origin",
+    "desc": "Defeat 18 wild Pokémon in the Cave of Origin, stirred by primal energy.",
+    "rewardDesc": "5,500₽ + Heat Rock"
+  },
+  "264": {
+    "title": "Council of Sootopolis",
+    "desc": "Talk to the Sootopolis elders about the primal legends.",
+    "rewardDesc": "4,500₽"
+  },
+  "265": {
+    "title": "Course to the Pillar (Route 131)",
+    "desc": "Defeat 15 wild Pokémon on Route 131, en route to Sky Pillar.",
+    "rewardDesc": "5,000₽ + Mystic Water"
+  },
+  "266": {
+    "title": "Guardian of the Sky",
+    "desc": "Defeat 15 wild Pokémon on Sky Pillar's lower floors.",
+    "rewardDesc": "6,000₽ + Dragon Scale"
+  },
+  "267": {
+    "title": "Rayquaza's Call",
+    "desc": "Meditate atop Sky Pillar and heed Rayquaza's call.",
+    "rewardDesc": "5,000₽"
+  },
+  "268": {
+    "title": "Floor of Storms",
+    "desc": "Defeat 20 wild Pokémon on the wind-swept floors of Sky Pillar.",
+    "rewardDesc": "7,000₽ + 5 Ultra Balls"
+  },
+  "269": {
+    "title": "Celestial Rings",
+    "desc": "Defeat 20 wild Pokémon beneath the sky dragon's rings.",
+    "rewardDesc": "7,500₽ + 2 Star Pieces"
+  },
+  "270": {
+    "title": "Top of the World",
+    "desc": "Defeat 20 wild Pokémon at the very top of Sky Pillar.",
+    "rewardDesc": "8,000₽ + 2 Rare Candys"
+  },
+  "271": {
+    "title": "The Comet Shard",
+    "desc": "Defeat 20 Pokémon at the Space Center to recover a comet shard.",
+    "rewardDesc": "9,000₽ + Comet Shard"
+  },
+  "272": {
+    "title": "Orbital Defense",
+    "desc": "Defeat 20 Pokémon to secure the Space Center's launch.",
+    "rewardDesc": "10,000₽ + Twisted Spoon"
+  },
+  "273": {
+    "title": "Scott's Dream",
+    "desc": "Talk to Scott about his grand plan for the Battle Zone.",
+    "rewardDesc": "5,000₽"
+  },
+  "274": {
+    "title": "The Frontier Brains",
+    "desc": "Meet the Brains of the Battle Zone.",
+    "rewardDesc": "8,000₽ + Choice Band"
+  },
+  "275": {
+    "title": "Sanctuary of the Eons",
+    "desc": "Defeat 20 Pokémon on Southern Island to protect the Eon sanctuary.",
+    "rewardDesc": "8,500₽ + 3 Lum Berries"
+  },
+  "276": {
+    "title": "The Champion's Rematch",
+    "desc": "Face Steven, Champion of Hoenn, in his ultimate challenge.",
+    "rewardDesc": "15,000₽ + Master Ball"
+  },
+  "277": {
+    "title": "Living Legend of Hoenn",
+    "desc": "Return to Littleroot: Professor Birch celebrates your legend.",
+    "rewardDesc": "10,000₽ + 5 Heart Scales"
+  },
 },
 "side": {
 "s1": {
 "title":"The Berry Collector",
 "desc":"Young Régis wants to see your skill: defeat 10 wild Pokémon on Route 1.",
-"rewardDesc":"700₽ + 2 Sitrus Berries"
+"rewardDesc":"700₽ + 2 Sitrus Berries + 1 Fighting Berry"
 },
 "s2": {
 "title":"Trainer Apprentice",
 "desc":"Trainer Red challenges you: knock out 15 wild Pokémon on Route 2.",
-"rewardDesc":"1,100₽ + 2 Prine Berries"
+"rewardDesc":"1,100₽ + 2 Prine Berries + 1 Prine Berry"
 },
 "s3": {
 "title":"Viridian Guardian",
@@ -532,7 +918,7 @@ window.L_en_quests = {
 "s6": {
 "title":"Cerulean Researcher",
 "desc":"Researcher Lys tracks rare Pokémon: knock out 12 wild Pokémon on Route 9!",
-"rewardDesc":"1,900₽ + 2 Sitrus Berries"
+"rewardDesc":"1,900₽ + 2 Sitrus Berries + 1 Water Berry"
 },
 "s7": {
 "title":"Vermilion Trainer",
@@ -572,17 +958,17 @@ window.L_en_quests = {
 "s14": {
 "title":"Nugget Bridge's Challenge",
 "desc":"Five trainers test all who cross Nugget Bridge. Warm up: 12 wild victories by the cape.",
-"rewardDesc":"1,000₽ + 2 Oran Berries"
+"rewardDesc":"1,000₽ + 2 Oran Berries + 1 Dragon Berry"
 },
 "s15": {
 "title":"The Far Cape Cottage",
 "desc":"A Route 25 camper fears nighttime prowlers. 12 victories to secure Bill's cottage surroundings.",
-"rewardDesc":"1,100₽ + 2 Cheri Berries"
+"rewardDesc":"1,100₽ + 2 Cheri Berries + 1 Ground Berry"
 },
 "s16": {
 "title":"The Trainers' Lane",
 "desc":"Route 5 teems with young hopefuls. Stay sharp: 12 wild victories to set the example.",
-"rewardDesc":"1,200₽ + 2 Oran Berries"
+"rewardDesc":"1,200₽ + 2 Oran Berries + 1 Prine Berry"
 },
 "s17": {
 "title":"The Route 6 Orchard",
@@ -597,22 +983,22 @@ window.L_en_quests = {
 "s19": {
 "title":"Weeds Gone Wild",
 "desc":"Route 8's vegetation hides too many ambushes. 15 victories to clear the passage.",
-"rewardDesc":"1,700₽ + 2 Oran Berries"
+"rewardDesc":"1,700₽ + 2 Oran Berries + 1 Rock Berry"
 },
 "s20": {
 "title":"The Tunnel Scout",
 "desc":"Rock Tunnel stays pitch dark. Blaze the trail: 15 wild victories.",
-"rewardDesc":"1,900₽ + 1 Stardust"
+"rewardDesc":"1,900₽ + 1 Steel Berry"
 },
 "s21": {
 "title":"The Route 13 Maze",
 "desc":"Route 13's fence maze traps wanderers. 15 victories to mark the path.",
-"rewardDesc":"2,000₽ + 2 Sitrus Berries"
+"rewardDesc":"2,000₽ + 2 Sitrus Berries + 1 Dark Berry"
 },
 "s22": {
 "title":"The Shortcut",
 "desc":"Route 7 is the couriers' favorite passage between Saffron and Celadon. 15 victories to secure it.",
-"rewardDesc":"2,100₽ + 2 Cheri Berries"
+"rewardDesc":"2,100₽ + 2 Cheri Berries + 1 Fire Berry"
 },
 "s23": {
 "title":"The Route 16 Watch",
@@ -627,7 +1013,7 @@ window.L_en_quests = {
 "s25": {
 "title":"The Route 15 Push",
 "desc":"Bird watchers demand a safe corridor to Fuchsia. 16 victories to open it.",
-"rewardDesc":"2,500₽ + 2 Cheri Berries"
+"rewardDesc":"2,500₽ + 2 Cheri Berries + 1 Ghost Berry"
 },
 "s26": {
 "title":"Saffron's Patron",
@@ -637,27 +1023,27 @@ window.L_en_quests = {
 "s27": {
 "title":"The Twin Isles",
 "desc":"Route 20 borders the Seafoam Islands: waves and wilds run wild. 15 victories to calm things down.",
-"rewardDesc":"2,800₽ + 2 Sitrus Berries"
+"rewardDesc":"2,800₽ + 2 Sitrus Berries + 1 Psychic Berry"
 },
 "s28": {
 "title":"Swimming Against the Current",
 "desc":"Route 21 carries wilds toward Pallet Town. 18 victories to cleanse the swim.",
-"rewardDesc":"3,000₽ + 2 Sitrus Berries"
+"rewardDesc":"3,000₽ + 2 Sitrus Berries + 1 Electric Berry"
 },
 "s29": {
 "title":"The Pewter Claim",
 "desc":"Pewter's head miner buys everything you dig up: sell 8 mined treasures.",
-"rewardDesc":"2,700₽ + 2 Cheri Berries"
+"rewardDesc":"2,700₽ + 2 Cheri Berries + 1 Ground Berry"
 },
 "s30": {
 "title":"Plateau Messenger",
 "desc":"Indigo Plateau wants Victory Road passable for challengers. 18 victories, for honor!",
-"rewardDesc":"3,500₽ + 2 Sitrus Berries"
+"rewardDesc":"3,500₽ + 2 Sitrus Berries + 1 Prine Berry"
 },
 "s31": {
 "title":"The Route 30 Trainer",
 "desc":"Young Hugo challenges Route 30: 12 wins!",
-"rewardDesc":"1,600₽ + 2 Sitrus Berries"
+"rewardDesc":"1,600₽ + 2 Sitrus Berries + 1 Ice Berry"
 },
 "s32": {
 "title":"Sprout Tower Master",
@@ -692,7 +1078,7 @@ window.L_en_quests = {
 "s38": {
 "title":"Olivine Guardian",
 "desc":"Guard Olaf watches Route 38/39: 10 wins!",
-"rewardDesc":"1,800₽ + 2 Oran Berries"
+"rewardDesc":"1,800₽ + 2 Oran Berries + 1 Dark Berry"
 },
 "s39": {
 "title":"The Olivine Sailor",
@@ -722,22 +1108,22 @@ window.L_en_quests = {
 "s44": {
 "title":"Route 29 Cleared",
 "desc":"Jumpy Pokémon block Route 29 to new trainers. Knock out 15 wild Pokémon to secure the path.",
-"rewardDesc":"1,500₽ + 2 Oran Berries"
+"rewardDesc":"1,500₽ + 2 Oran Berries + 1 Bug Berry"
 },
 "s45": {
 "title":"Route 31 Sentry",
 "desc":"Route 31 teems outside Violet City. 15 wild K.O. and the road will be quiet again.",
-"rewardDesc":"1,800₽ + 1 Sitrus Berry"
+"rewardDesc":"1,800₽ + 1 Fairy Berry"
 },
 "s46": {
 "title":"Echoes of the Forest",
 "desc":"The Ilex Forest ranger counts silhouettes between the trees: 20 wild K.O. to finish the rounds.",
-"rewardDesc":"2,400₽ + 2 Oran Berries"
+"rewardDesc":"2,400₽ + 2 Oran Berries + 1 Grass Berry"
 },
 "s47": {
 "title":"Back to the Day-Care",
 "desc":"Route 34's Day-Care overflows with visitors: knock out 15 wild Pokémon nearby to soothe the area.",
-"rewardDesc":"2,200₽ + 1 Sitrus Berry"
+"rewardDesc":"2,200₽"
 },
 "s48": {
 "title":"Moomoo Farm",
@@ -747,12 +1133,12 @@ window.L_en_quests = {
 "s49": {
 "title":"Cianwood Swells",
 "desc":"Cianwood swimmers want safe waters: 15 wild K.O. on Route 40.",
-"rewardDesc":"2,800₽ + 3 Oran Berries"
+"rewardDesc":"2,800₽ + 3 Oran Berries + 1 Fighting Berry"
 },
 "s50": {
 "title":"Wardens of the Whirl Islands",
 "desc":"The Whirl Islands teem in high season. 18 wild K.O. for the islands' warden.",
-"rewardDesc":"3,200₽ + 1 Sitrus Berry"
+"rewardDesc":"3,200₽ + 1 Water Berry"
 },
 "s51": {
 "title":"Lighting Dark Cave",
@@ -762,24 +1148,106 @@ window.L_en_quests = {
 "s52": {
 "title":"The Mt. Mortar Challenge",
 "desc":"Karate King Kiyo only respects enduring trainers: 15 wild K.O. inside Mt. Mortar!",
-"rewardDesc":"3,800₽ + 1 Sitrus Berry"
+"rewardDesc":"3,800₽ + 1 Psychic Berry"
 },
 "s53": {
 "title":"Route 42: Safe Passage",
 "desc":"Between Ecruteak and Mahogany, Route 42 is a choke point. 18 wild K.O. for the patrols.",
-"rewardDesc":"3,600₽ + 3 Oran Berries"
+"rewardDesc":"3,600₽ + 3 Oran Berries + 1 Poison Berry"
 },
 "s54": {
 "title":"Rage of the Lake",
 "desc":"Even after Team Rocket's defeat, the Lake of Rage shores stay restless. 18 wild K.O. on Route 43.",
-"rewardDesc":"4,200₽ + 2 Sitrus Berries"
+"rewardDesc":"4,200₽ + 2 Sitrus Berries + 1 Steel Berry"
 },
 "s55": {
 "title":"Breath of the Ice Path",
 "desc":"The Ice Path freezes careless hikers. 20 wild K.O. to mark the way through.",
-"rewardDesc":"4,800₽ + 2 Sitrus Berries"
-}
+"rewardDesc":"4,800₽ + 2 Sitrus Berries + 1 Dragon Berry"
+}    ,"s56": { "title": "Route 101 (Littleroot Town)", "desc": "Defeat 10 wild Pokémon on Route 101.", "rewardDesc": "1,000₽" },
+    "s57": { "title": "Route 102 (Oldale Town)", "desc": "Defeat 12 wild Pokémon on Route 102.", "rewardDesc": "1,200₽" },
+    "s58": { "title": "Route 104 (Petalburg City)", "desc": "Defeat 15 wild Pokémon on Route 104.", "rewardDesc": "1,500₽" },
+    "s59": { "title": "Rusturf Tunnel (Rustboro)", "desc": "Defeat 15 wild Pokémon in Rusturf Tunnel.", "rewardDesc": "1,800₽" },
+    "s60": { "title": "Granite Cave (Dewford)", "desc": "Defeat 18 wild Pokémon in Granite Cave.", "rewardDesc": "2,000₽" },
+    "s61": { "title": "Route 109 (Slateport City)", "desc": "Defeat 20 wild Pokémon on Route 109.", "rewardDesc": "2,200₽" },
+    "s62": { "title": "Route 110 (Mauville City)", "desc": "Defeat 20 wild Pokémon on Route 110.", "rewardDesc": "2,400₽" },
+    "s63": { "title": "Route 117 (Verdanturf)", "desc": "Defeat 20 wild Pokémon on Route 117.", "rewardDesc": "2,500₽" },
+    "s64": { "title": "Route 113 (Fallarbor)", "desc": "Defeat 20 wild Pokémon on Route 113.", "rewardDesc": "2,600₽" },
+    "s65": { "title": "Fiery Path (Lavaridge)", "desc": "Defeat 20 wild Pokémon in Fiery Path.", "rewardDesc": "2,800₽" },
+    "s66": { "title": "Route 119 (Fortree City)", "desc": "Defeat 20 wild Pokémon on Route 119.", "rewardDesc": "3,000₽" },
+    "s67": { "title": "Mt. Pyre (Lilycove City)", "desc": "Defeat 20 wild Pokémon at Mt. Pyre.", "rewardDesc": "3,200₽" },
+    "s68": { "title": "Shoal Cave (Mossdeep)", "desc": "Defeat 20 wild Pokémon in Shoal Cave.", "rewardDesc": "3,400₽" },
+    "s69": { "title": "Cave of Origin (Sootopolis)", "desc": "Defeat 20 wild Pokémon in Cave of Origin.", "rewardDesc": "3,600₽" },
+    "s70": { "title": "Route 131 (Pacifidlog)", "desc": "Defeat 20 wild Pokémon on Route 131.", "rewardDesc": "3,800₽" },
+    "s71": { "title": "Victory Road (Ever Grande)", "desc": "Defeat 25 wild Pokémon on Hoenn Victory Road.", "rewardDesc": "4,000₽" },
+    "s72": { "title": "Weather Security", "desc": "Defeat 15 wild Pokémon around Weather Institute.", "rewardDesc": "3,500₽" },
+    "s73": { "title": "Aqua Patrol", "desc": "Defeat 20 wild Pokémon in Aqua Hideout.", "rewardDesc": "4,000₽" },
+    "s74": { "title": "Space Defense", "desc": "Defeat 20 wild Pokémon around Mossdeep Space Center.", "rewardDesc": "4,500₽" },
+    "s75": { "title": "Hoenn Pokémon League", "desc": "Defeat 25 wild Pokémon on Victory Road.", "rewardDesc": "5,000₽" },
+    "s76": { "title": "Battle Frontier Challenge", "desc": "Defeat 20 wild Pokémon at Battle Frontier.", "rewardDesc": "5,000₽" },
+    "s77": { "title": "Southern Island Sanctuary", "desc": "Defeat 20 wild Pokémon on Southern Island.", "rewardDesc": "5,500₽" },
+    "s78": { "title": "Mirage Island Mist", "desc": "Defeat 20 wild Pokémon on Mirage Island.", "rewardDesc": "5,500₽" },
+    "s79": { "title": "Seafloor Cavern Depths", "desc": "Defeat 25 wild Pokémon in Seafloor Cavern.", "rewardDesc": "6,000₽" },
+    "s80": { "title": "Sky Pillar Stars", "desc": "Defeat 25 wild Pokémon in Sky Pillar.", "rewardDesc": "6,500₽" },
+    "s81": { "title": "Meteor Falls Rocks", "desc": "Defeat 20 wild Pokémon in Meteor Falls.", "rewardDesc": "4,500₽" },
+    "s82": { "title": "Sunken Ship (Sea Mauville)", "desc": "Defeat 20 wild Pokémon on Route 108.", "rewardDesc": "4,000₽" },
+    "s83": { "title": "Route 111 Desert", "desc": "Defeat 20 wild Pokémon in Route 111 desert.", "rewardDesc": "3,500₽" },
+    "s84": { "title": "Route 120 Tall Grass", "desc": "Defeat 20 wild Pokémon on Route 120.", "rewardDesc": "3,500₽" },
+    "s85": { "title": "Hoenn Master Explorer", "desc": "Defeat 25 wild Pokémon on Route 101 to finish side investigations.", "rewardDesc": "10,000₽" },
+"s86": { "title":"Cerulean Cave — Steles", "desc":"Solve the first stele puzzle in Cerulean Cave.", "rewardDesc":"₽4,200 + Twisted Spoon" },
+"s87": { "title":"Cerulean Cave — Reflection", "desc":"Solve the inverse-order stele puzzle in Cerulean Cave.", "rewardDesc":"₽7,000 + Leftovers" },
+"s88": { "title":"Seafoam — Valves", "desc":"Open Seafoam’s three valves in the correct order.", "rewardDesc":"₽3,500 + Mystic Water" },
+"s89": { "title":"Seafoam — Glacier", "desc":"Find the glacier word on Seafoam Islands.", "rewardDesc":"₽4,900 + Never Melt Ice" },
+"s90": { "title":"Mt. Moon — Strata", "desc":"Order Mt. Moon dig layers from oldest to newest.", "rewardDesc":"₽3,000 + Hard Stone" },
+"s91": { "title":"Mt. Moon — Phase", "desc":"Name the phase that opens the lunar sanctum.", "rewardDesc":"₽3,500 + Moon Stone" },
+"s92": { "title":"Ruins of Alph — Circle", "desc":"Activate cardinal pillars in the order of the day (dawn first).", "rewardDesc":"₽3,500 + Twisted Spoon" },
+"s93": { "title":"Ruins of Alph — Mirror", "desc":"Walk the solar path then its reflection without doubling North.", "rewardDesc":"₽5,600 + Moon Stone" },
+"s94": { "title":"Sprout Tower — Bells", "desc":"Ring the Sprout Tower bells in ritual order.", "rewardDesc":"₽3,000 + Miracle Seed" },
+"s95": { "title":"Sprout Tower — Mantra", "desc":"Recover the monks’ mantra of Sprout Tower.", "rewardDesc":"₽3,150 + Spell Tag" },
+"s96": { "title":"Burned Tower — Embers", "desc":"Rekindle the Burned Tower embers in the right order.", "rewardDesc":"₽3,000 + Charcoal" },
+"s97": { "title":"Burned Tower — Beast Word", "desc":"Find the word that binds the three legendary Beasts.", "rewardDesc":"₽4,900 + Charcoal" },
+"s98": { "title":"Ice Path — Riddle", "desc":"Solve the frozen riddle of the Ice Path.", "rewardDesc":"₽3,500 + Ice Berry" },
+"s99": { "title":"Ice Path — Counted Steps", "desc":"Follow the counted steps on the ice without slipping.", "rewardDesc":"₽4,550 + Never Melt Ice" },
+"s100": { "title":"Sealed Chamber — Ancients", "desc":"At the Sealed Chamber, invoke Relicanth then Wailord (English names).", "rewardDesc":"₽4,200 + Hard Stone" },
+"s101": { "title":"Regirock — Braille", "desc":"Desert Ruins: learn to read the colossi’s braille.", "rewardDesc":"₽3,500 + Hard Stone" },
+"s102": { "title":"Regirock — Patience", "desc":"Desert Ruins: wait still, then confirm the braille keyword.", "rewardDesc":"₽3,500 + Hard Stone" },
+"s103": { "title":"Regirock — Seal", "desc":"Desert Ruins: discover the stone colossus’ name.", "rewardDesc":"₽5,600 + Hard Stone" },
+"s104": { "title":"Regice — Braille", "desc":"Island Cave: decipher the frozen braille lesson.", "rewardDesc":"₽3,500 + Never Melt Ice" },
+"s105": { "title":"Regice — Dial", "desc":"Island Cave: read the braille digit dial.", "rewardDesc":"₽4,200 + Never Melt Ice" },
+"s106": { "title":"Regice — Name", "desc":"Island Cave: seal the cold in three letters.", "rewardDesc":"₽5,600 + Never Melt Ice" },
+"s107": { "title":"Registeel — Braille", "desc":"Ancient Tomb: learn the smiths’ braille.", "rewardDesc":"₽3,500 + Metal Coat" },
+"s108": { "title":"Registeel — Arrows", "desc":"Ancient Tomb: perform the steel arrow dance.", "rewardDesc":"₽4,200 + Metal Coat" },
+"s109": { "title":"Registeel — Name", "desc":"Ancient Tomb: the smiths’ five-letter word.", "rewardDesc":"₽5,600 + Metal Coat" },
+"s110": { "title":"Seafloor — Pressure", "desc":"Seafloor Cavern: purge gauges in the logbook order.", "rewardDesc":"₽4,900 + Mystic Water" },
+"s111": { "title":"Seafloor — Depth", "desc":"Seafloor Cavern: compute the notebook’s target depth.", "rewardDesc":"₽6,300 + Deep Sea Tooth" },
+"s112": { "title":"Mt. Pyre — Offerings", "desc":"Mt. Pyre: present offerings from grief to rest.", "rewardDesc":"₽3,500 + Spell Tag" },
+"s113": { "title":"Mt. Pyre — Summit", "desc":"Mt. Pyre: the summit word of rest.", "rewardDesc":"₽4,900 + Spell Tag" },
+"s114": { "title":"Patrol — Route 101", "desc":"Defeat 10 wild Pokémon: Route 101.", "rewardDesc":"₽800" },
+"s115": { "title":"Patrol — Route 104", "desc":"Defeat 12 wild Pokémon: Route 104.", "rewardDesc":"₽1,000" },
+"s116": { "title":"Patrol — Petalburg Woods", "desc":"Defeat 15 wild Pokémon: Petalburg Woods.", "rewardDesc":"₽1,200 + Miracle Seed" },
+"s117": { "title":"Patrol — Route 110", "desc":"Defeat 15 wild Pokémon: Route 110.", "rewardDesc":"₽1,400 + Magnet" },
+"s118": { "title":"Patrol — Route 111", "desc":"Defeat 18 wild Pokémon: Route 111.", "rewardDesc":"₽1,600 + Soft Sand" },
+"s119": { "title":"Patrol — Route 112", "desc":"Defeat 15 wild Pokémon: Route 112.", "rewardDesc":"₽1,500 + Charcoal" },
+"s120": { "title":"Patrol — Route 114", "desc":"Defeat 15 wild Pokémon: Route 114.", "rewardDesc":"₽1,500 + Hard Stone" },
+"s121": { "title":"Patrol — Route 119", "desc":"Defeat 20 wild Pokémon: Route 119.", "rewardDesc":"₽2,000 + Miracle Seed" },
+"s122": { "title":"Patrol — Route 120", "desc":"Defeat 18 wild Pokémon: Route 120.", "rewardDesc":"₽1,800 + Flying Berry" },
+"s123": { "title":"Patrol — Mt. Chimney", "desc":"Defeat 20 wild Pokémon: Mt. Chimney.", "rewardDesc":"₽2,200 + Fire Stone" },
+"s124": { "title":"Patrol — Meteor Falls", "desc":"Defeat 18 wild Pokémon: Meteor Falls.", "rewardDesc":"₽2,000 + Dragon Scale" },
+"s125": { "title":"Patrol — Route 123", "desc":"Defeat 15 wild Pokémon: Route 123.", "rewardDesc":"₽1,700 + Poison Berry" },
+"s126": { "title":"Patrol — Route 124", "desc":"Defeat 15 wild Pokémon: Route 124.", "rewardDesc":"₽1,800 + Mystic Water" },
+"s127": { "title":"Patrol — Shoal Cave", "desc":"Defeat 18 wild Pokémon: Shoal Cave.", "rewardDesc":"₽2,000 + Never Melt Ice" },
+"s128": { "title":"Patrol — Route 127", "desc":"Defeat 15 wild Pokémon: Route 127.", "rewardDesc":"₽1,800" },
+"s129": { "title":"Patrol — Victory Road", "desc":"Defeat 25 wild Pokémon: Victory Road.", "rewardDesc":"₽3,000 + Hard Stone" },
+"s130": { "title":"Patrol — Sky Pillar", "desc":"Defeat 20 wild Pokémon: Sky Pillar.", "rewardDesc":"₽2,500 + Dragon Fang" },
+"s131": { "title":"Patrol — Safari Zone", "desc":"Defeat 20 wild Pokémon: Safari Zone.", "rewardDesc":"₽2,200 + Leaf Stone" },
+"s132": { "title":"Meet-up — Slateport City", "desc":"Talk to the local in Slateport City.", "rewardDesc":"₽1,000 + Silk Scarf" },
+"s133": { "title":"Meet-up — Lilycove City", "desc":"Talk to the local in Lilycove City.", "rewardDesc":"₽1,200 + Rare Candy" },
+"s134": { "title":"Meet-up — Mossdeep City", "desc":"Talk to the local in Mossdeep City.", "rewardDesc":"₽1,200 + Twisted Spoon" },
+"s135": { "title":"Meet-up — Sootopolis City", "desc":"Talk to the local in Sootopolis City.", "rewardDesc":"₽1,500 + Mystic Water" },
+"s136": { "title":"Meet-up — Pacifidlog Town", "desc":"Talk to the local in Pacifidlog Town.", "rewardDesc":"₽1,200 + Dragon Scale" },
+"s137": { "title":"Meet-up — Fallarbor Town", "desc":"Talk to the local in Fallarbor Town.", "rewardDesc":"₽1,000 + Moon Stone" }
 },
+
 "repeatable": {
 "r1": {
 "title":"Treasure Hunter",
@@ -896,7 +1364,8 @@ window.L_en_quests = {
 "desc":"Knock out 80 wild Pokémon on Victory Road.",
 "rewardDesc":"30,000₽"
 }
-}
+},
 };
+
 
 

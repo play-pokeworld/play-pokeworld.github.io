@@ -139,3 +139,4 @@ window.PokeRenderer = Renderer;
 if (!window.poke) window.poke = {};
 window.poke.Renderer = Renderer;
 })();
+

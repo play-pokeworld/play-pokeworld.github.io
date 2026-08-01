@@ -204,3 +204,4 @@ if (typeof window !== 'undefined') {
   window.setBattleSpeed = setBattleSpeed;
   window.toggleDebugX10 = toggleDebugX10;
 }
+

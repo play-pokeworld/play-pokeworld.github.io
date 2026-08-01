@@ -5,7 +5,7 @@ function startWildBattle(){
  if(!wild||!wild.length||!G.team.length) return;
  const entry=wild[rand(0,wild.length-1)];
  const lv=rand(entry[1],entry[2]);
- const wp=createPoke(entry[0],lv,rollShiny());
+ const wp=createPoke(entry[0],lv,false); // shiny: roll at capture/hatch only
  startBattle(wp,false);
 }
 
@@ -16,7 +16,7 @@ function startLegendaryEncounter(pokeId, level=65, opts){
  if(typeof battle !== 'undefined' && battle && battle.active){ notify(t('battle_in_progress'), 'var(--red)'); return false; }
  // opts.shiny (passe 20) force la forme chromatique — ex. Léviator rouge
  // du Lac Colère (canon OAC). Sinon : règle habituelle (espèce droguée/hasard).
- const isShiny = !!(opts && opts.shiny) || isSpeciesShiny(pokeId) || rollShiny();
+ const isShiny = !!(opts && opts.shiny); // pas de roll à l'apparition ; capture gère le shiny sauvage
  const legPoke = createPoke(pokeId, level || 65, isShiny);
  if(!legPoke) return false;
  legPoke.maxHP = Math.floor(legPoke.maxHP * 2.2);
@@ -37,8 +37,10 @@ function spawnNextWild(){
  const loc=getLocObj(G.location);
  const wild=loc ? loc.wild : null;
  if(!wild||!wild.length||aliveCount()===0){ endBattle(); return; }
- const roamingId = getRoamingLegendaryForRoute(G.location);
- const wp = pickWildEncounter(loc, roamingId);
+ // Les légendaires vagabonds n'apparaissent QUE sur une exploration manuelle
+ // (exploreArea) : jamais dans l'enchaînement automatique, sinon ils seraient
+ // auto-capturés (ou mettraient l'équipe K.O.) pendant l'AFK/fast-forward.
+ const wp = pickWildEncounter(loc, null);
  if(!wp){ endBattle(); return; }
  battle.enemyPoke=wp;
  battle.enemyMods={atk:1,def:1,spe:1};
@@ -60,7 +62,7 @@ function spawnNextWild(){
 }
 
 
-async function onPlayerPokeFaint(){
+async function onPlayerPokeFaint(){ 
  battle.paused=true;
  const p=getActivePlayerPoke();
  if(!battle.isChamp && !battle.isTraining) battle.sessionPlayerKOs = (battle.sessionPlayerKOs||0) + 1;
@@ -84,6 +86,25 @@ async function onPlayerPokeFaint(){
  G.money-=penalty;
  updateHeader();
  addBattleLog(tr('money_lost', {money:penalty}));
+ if(battle.isBaseNpcBattle){
+ // Passe 38 : blackout du visiteur chez un copain -> record proprio (w++).
+ const npcName = battle.baseNpcName || '';
+ const winQuote = (battle.baseNpcMsgs && battle.baseNpcMsgs.win) || '';
+ if(typeof baseEditorCreditBattle === 'function') baseEditorCreditBattle(false);
+ // Passe 52 : panneau de fin de combat (réplique de victoire du PNJ).
+ const npcRef = battle.baseNpcRef || null;
+ const npcSprite = battle.baseNpcSprite || null;
+ battle.isBaseNpcBattle = false;
+ battle.baseNpcName = null;
+ battle.baseNpcMsgs = null;
+ battle.baseNpcRef = null;
+ battle.baseNpcSprite = null;
+ if(winQuote && typeof addBattleLog === 'function') addBattleLog('« ' + winQuote + ' » — ' + npcName);
+ notify(tr('base.edit.battle_lost', {name:npcName}), 'var(--red)');
+ if(typeof baseDialogNpcResult === 'function'){
+  setTimeout(()=>{ try{ baseDialogNpcResult({npc:npcRef, won:false, name:npcName, sprite:npcSprite, quote:winQuote}); }catch(_){} }, 1400);
+ }
+ }
  await wait(1200);
  endBattle();
  setMsg(t('battle_lost_recover'));
@@ -107,4 +128,5 @@ async function onPlayerPokeFaint(){
 if (typeof startWildBattle !== 'undefined' && typeof window !== 'undefined') window.startWildBattle = startWildBattle;
 if (typeof startLegendaryEncounter !== 'undefined' && typeof window !== 'undefined') window.startLegendaryEncounter = startLegendaryEncounter;
 if (typeof spawnNextWild !== 'undefined' && typeof window !== 'undefined') window.spawnNextWild = spawnNextWild;
+
 

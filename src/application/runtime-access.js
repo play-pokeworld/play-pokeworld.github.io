@@ -5,3 +5,4 @@ export function getGameState() {
 export function getBattleState() {
   return globalThis.PokeWorldApp?.battle || globalThis.battle || null;
 }
+

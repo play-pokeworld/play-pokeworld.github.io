@@ -104,3 +104,4 @@ window.PokeProgressBar = ProgressBar;
 if (!window.poke) window.poke = {};
 window.poke.ProgressBar = ProgressBar;
 })();
+

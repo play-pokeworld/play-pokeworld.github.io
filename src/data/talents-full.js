@@ -216,3 +216,4 @@ if (typeof getTalentInfo !== 'undefined' && typeof window !== 'undefined') windo
 if (typeof getRarityLabel !== 'undefined' && typeof window !== 'undefined') window.getRarityLabel = getRarityLabel;
 if (typeof TALENTS_FULL !== 'undefined' && typeof window !== 'undefined') window.TALENTS_FULL = TALENTS_FULL;
 
+

@@ -2,8 +2,8 @@ function gainXP(enemy){
  const base=Math.floor(enemy.xpYield*enemy.level/7);
  const alive=G.team.filter(p=>p.currentHP>0);
  if(!alive.length) return 0;
- 
- const share=Math.max(1,Math.floor(base*0.7));
+ const xpMult = (typeof getSecretBaseBonuses === 'function' && Number.isFinite(getSecretBaseBonuses().xpMult)) ? getSecretBaseBonuses().xpMult : 1;
+ const share=Math.max(1,Math.floor(base*0.7*xpMult));
  for(const p of alive){
  if((p.xp||0) < xpForLevel(p.level)) p.xp = xpForLevel(p.level) + (p.xp || 0);
  const before=p.level;
@@ -115,8 +115,24 @@ function getEvolutionMethodsHtml(id){
  </div>`;
 }
 function checkEvolution(p){
- const evoLevel=EVO_LEVELS[p.id];
- const targetId=LEVEL_EVO_MAP[p.id];
+ if(!p) return;
+ if(p.id === 265 && p.level >= 7){ // Wurmple -> Silcoon & Cascoon
+   if(!p._evoDone || (!p._evoDone[266] && !p._evoDone[268])){
+     evolve(p, 266);
+     evolve(p, 268);
+   }
+   return;
+ }
+ if(p.id === 290 && p.level >= 20){ // Nincada -> Ninjask & Shedinja
+   if(!p._evoDone || !p._evoDone[291]){
+     evolve(p, 291);
+     evolve(p, 292);
+   }
+   return;
+ }
+ const pid = Number(p.id);
+ const evoLevel=EVO_LEVELS[pid] || EVO_LEVELS[p.id];
+ const targetId=LEVEL_EVO_MAP[pid] || LEVEL_EVO_MAP[p.id];
  if(evoLevel&&targetId&&p.level>=evoLevel){
  if(p._evoDone && p._evoDone[targetId]) return;
  evolve(p,targetId);
@@ -151,7 +167,8 @@ function evolve(p,targetId){
  evo.shinyActive=shinyUnlock; evo.shiny=shinyUnlock;
  evo.shinyUnlocked=shinyUnlock;
  if(G.collection[targetId]) return; 
- G.collection[targetId]=evo;
+ const _pKey = (typeof generateUniqueBoxId==='function') ? generateUniqueBoxId(targetId) : (!G.collection[String(targetId)] ? String(targetId) : ('box_' + targetId + '_' + Date.now()));
+ G.collection[_pKey]=evo;
  G.evolvedSpecies.push(targetId);
  if(!p._evoDone) p._evoDone={};
  p._evoDone[targetId]=true;
@@ -163,10 +180,10 @@ function evolve(p,targetId){
  try{ autoSave(); }catch(e){}
 }
 const LEVEL_EVO_MAP = {
- 1:2, 2:3, 4:5, 5:6, 7:8, 8:9, 10:11, 11:12, 13:14, 14:15, 16:17, 17:18, 19:20, 21:22, 23:24, 27:28, 29:30, 32:33, 41:42, 43:44, 46:47, 48:49, 50:51, 52:53, 54:55, 56:57, 60:61, 63:64, 64:65, 66:67, 67:68, 69:70, 72:73, 74:75, 75:76, 77:78, 79:80, 81:82, 84:85, 86:87, 88:89, 92:93, 93:94, 96:97, 98:99, 100:101, 104:105, 109:110, 111:112, 116:117, 118:119, 129:130, 138:139, 140:141, 147:148, 148:149, 113:242, 152:153, 153:154, 155:156, 156:157, 158:159, 159:160, 161:162, 163:164, 165:166, 167:168, 170:171, 172:25, 173:35, 174:39, 175:176, 177:178, 179:180, 180:181, 183:184, 187:188, 188:189, 194:195, 204:205, 209:210, 216:217, 218:219, 220:221, 223:224, 228:229, 231:232, 236:237, 238:124, 239:125, 240:126, 246:247, 247:248
+ 1:2, 2:3, 4:5, 5:6, 7:8, 8:9, 10:11, 11:12, 13:14, 14:15, 16:17, 17:18, 19:20, 21:22, 23:24, 27:28, 29:30, 32:33, 41:42, 43:44, 46:47, 48:49, 50:51, 52:53, 54:55, 56:57, 60:61, 63:64, 66:67, 69:70, 72:73, 74:75, 75:76, 77:78, 79:80, 81:82, 84:85, 86:87, 88:89, 92:93, 96:97, 98:99, 100:101, 104:105, 109:110, 111:112, 116:117, 118:119, 129:130, 138:139, 140:141, 147:148, 148:149, 152:153, 153:154, 155:156, 156:157, 158:159, 159:160, 161:162, 163:164, 165:166, 167:168, 170:171, 172:25, 173:35, 174:39, 175:176, 177:178, 179:180, 180:181, 183:184, 187:188, 188:189, 194:195, 204:205, 209:210, 216:217, 218:219, 220:221, 223:224, 228:229, 231:232, 236:106, 238:124, 239:125, 240:126, 246:247, 247:248, 252:253, 253:254, 255:256, 256:257, 258:259, 259:260, 261:262, 263:264, 265:266, 266:267, 268:269, 270:271, 273:274, 276:277, 278:279, 280:281, 281:282, 283:284, 285:286, 287:288, 288:289, 290:291, 293:294, 294:295, 296:297, 298:183, 304:305, 305:306, 307:308, 309:310, 316:317, 318:319, 320:321, 322:323, 328:329, 329:330, 331:332, 333:334, 339:340, 341:342, 343:344, 345:346, 347:348, 353:354, 355:356, 360:202, 361:362, 363:364, 364:365, 371:372, 372:373, 374:375, 375:376
 };
 const EVO_LEVELS = {
- 1:16, 2:32, 4:16, 5:36, 7:16, 8:36, 10:7, 11:32, 13:7, 14:32, 16:18, 17:36, 19:20, 21:20, 23:22, 27:22, 29:16, 32:16, 41:22, 43:16, 46:24, 48:31, 50:26, 52:28, 54:33, 56:28, 60:25, 63:16, 64:32, 66:28, 67:32, 69:21, 72:30, 74:25, 75:32, 77:40, 79:37, 81:30, 84:31, 86:34, 88:38, 92:25, 93:32, 96:26, 98:28, 100:30, 104:28, 109:35, 111:42, 116:32, 118:33, 129:20, 138:40, 140:40, 147:30, 148:55, 113:36, 152:16, 153:32, 155:14, 156:36, 158:18, 159:30, 161:15, 163:20, 165:18, 167:22, 170:27, 172:20, 173:20, 174:20, 175:20, 177:25, 179:15, 180:30, 183:18, 187:18, 188:27, 194:20, 204:31, 209:23, 216:30, 218:38, 220:33, 223:25, 228:24, 231:25, 236:20, 238:30, 239:30, 240:30, 246:30, 247:55
+ 1:16, 2:32, 4:16, 5:36, 7:16, 8:36, 10:7, 11:10, 13:7, 14:10, 16:18, 17:36, 19:20, 21:20, 23:22, 27:22, 29:16, 32:16, 41:22, 43:21, 46:24, 48:31, 50:26, 52:28, 54:33, 56:28, 60:25, 63:16, 66:28, 69:21, 72:30, 74:25, 75:40, 77:40, 79:37, 81:30, 84:31, 86:34, 88:38, 92:25, 96:26, 98:28, 100:30, 104:28, 109:35, 111:42, 116:32, 118:33, 129:20, 138:40, 140:40, 147:30, 148:55, 152:16, 153:32, 155:14, 156:36, 158:18, 159:30, 161:15, 163:20, 165:18, 167:22, 170:27, 172:20, 175:20, 177:25, 179:15, 180:30, 183:18, 187:18, 188:27, 194:20, 204:31, 209:23, 216:30, 218:38, 220:33, 223:25, 228:24, 231:25, 236:20, 238:30, 239:30, 240:30, 246:30, 247:55, 252:16, 253:36, 255:16, 256:36, 258:16, 259:36, 261:18, 263:20, 265:7, 266:10, 268:10, 270:14, 273:14, 276:14, 278:25, 280:20, 281:30, 283:22, 285:23, 287:18, 288:36, 290:20, 293:20, 294:40, 296:24, 304:32, 305:42, 307:37, 309:26, 316:26, 318:30, 320:40, 322:33, 328:35, 329:45, 331:32, 333:35, 339:30, 341:30, 343:36, 345:40, 347:40, 353:37, 355:37, 360:15, 361:42, 363:32, 364:44, 371:30, 372:50, 374:20, 375:45
 };
 const STONE_EVO = {
  37: {firestone:38},
@@ -189,20 +206,37 @@ const STONE_EVO = {
  123: {metal_coat:212},
  137: {upgrade:233},
  191: {sunstone:192},
+ 271: {waterstone:272},
+ 274: {leafstone:275},
+ 300: {moonstone:301},
+ 366: {deep_sea_tooth:367, deep_sea_scale:368},
+ 349: {prism_scale:350},
+ // Hoenn held / stones already covered above for lombre/nuzleaf/skitty/clamperl/feebas
 };
 function tryStoneEvo(teamIdx, stoneKey){
  const p=G.team[teamIdx];
  if(!p) return;
- const evo = STONE_EVO[p.id]?.[stoneKey];
+ const evo = (STONE_EVO[Number(p.id)] || STONE_EVO[p.id] || {})[stoneKey];
  if(!evo){ setMsg(t("legacy_message_n2_cet_objet_na_aucun_effet_sur_ce_pok_mon")); return; }
+ const minLvl = [350, 367, 368, 208, 212, 186, 192, 182, 134, 135, 136, 196, 197, 26, 62, 91, 121, 230, 233].includes(evo) ? 50 : 25;
+ if ((p.level || 1) < minLvl) {
+   const msg = `Niveau ${minLvl} minimum requis pour évoluer (actuel : Nv. ${p.level || 1}) !`;
+   setMsg(msg);
+   if (typeof notify === 'function') notify(msg, 'var(--red)');
+   return;
+ }
+
  if((G.inventory[stoneKey]||0)<1){ setMsg(t("n.pierre_manquante")); return; }
  G.inventory[stoneKey]--;
  if(G.inventory[stoneKey]<=0) delete G.inventory[stoneKey];
 const shinyUnlock = !!(p.shinyUnlocked || p.shinyActive || p.shiny || isSpeciesShiny(evo) || rollShiny());
  const evoMon = createPoke(evo, 1, shinyUnlock);
  if(evoMon){
+ if(!G.evolvedSpecies) G.evolvedSpecies = [];
+ if(G.evolvedSpecies.indexOf(evo) === -1) G.evolvedSpecies.push(evo);
  evoMon.shinyActive = shinyUnlock; evoMon.shiny = shinyUnlock;
- G.collection[evo]=evoMon;
+ const _pKey2 = (typeof generateUniqueBoxId==='function') ? generateUniqueBoxId(evo) : (!G.collection[String(evo)] ? String(evo) : ('box_' + evo + '_' + Date.now()));
+ G.collection[_pKey2]=evoMon;
  G.pokedex[evo]={...(G.pokedex[evo]||{}), seen:true,caught:true};
  if(shinyUnlock) unlockShinyForSpecies(evo);
  const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
@@ -230,3 +264,44 @@ if (typeof checkEvolution !== 'undefined' && typeof window !== 'undefined') wind
 if (typeof evolve !== 'undefined' && typeof window !== 'undefined') window.evolve = evolve;
 if (typeof tryStoneEvo !== 'undefined' && typeof window !== 'undefined') window.tryStoneEvo = tryStoneEvo;
 
+
+
+function tryBoxStoneEvo(boxKey, stoneKey){
+ const p = G.collection[boxKey];
+ if(!p) return;
+ const evo = (STONE_EVO[Number(p.id)] || STONE_EVO[p.id] || {})[stoneKey];
+ if(!evo){ setMsg(t("legacy_message_n2_cet_objet_na_aucun_effet_sur_ce_pok_mon")); return; }
+ const minLvl = [350, 367, 368, 208, 212, 186, 192, 182, 134, 135, 136, 196, 197, 26, 62, 91, 121, 230, 233].includes(evo) ? 50 : 25;
+ if ((p.level || 1) < minLvl) {
+   const msg = `Niveau ${minLvl} minimum requis pour évoluer (actuel : Nv. ${p.level || 1}) !`;
+   setMsg(msg);
+   if (typeof notify === 'function') notify(msg, 'var(--red)');
+   return;
+ }
+ if((G.inventory[stoneKey]||0)<1){ setMsg(t("n.pierre_manquante")); return; }
+ G.inventory[stoneKey]--;
+ if(G.inventory[stoneKey]<=0) delete G.inventory[stoneKey];
+ const shinyUnlock = !!(p.shinyUnlocked || p.shinyActive || p.shiny || isSpeciesShiny(evo) || rollShiny());
+ const evoMon = createPoke(evo, p.level || 1, shinyUnlock);
+ if(evoMon){
+ if(!G.evolvedSpecies) G.evolvedSpecies = [];
+ if(G.evolvedSpecies.indexOf(evo) === -1) G.evolvedSpecies.push(evo);
+   evoMon.shinyActive = shinyUnlock; evoMon.shiny = shinyUnlock;
+   delete G.collection[boxKey];
+   let newBoxId = 'box_' + evo + '_' + Date.now();
+   while(G.collection[newBoxId]) newBoxId = 'box_' + evo + '_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+   G.collection[newBoxId] = evoMon;
+   G.pokedex[evo] = { ...(G.pokedex[evo]||{}), seen:true, caught:true };
+   if(shinyUnlock) unlockShinyForSpecies(evo);
+   notify(tr("m.progression.1", {p0:p.name, p1:evoMon.name, p2:getItemName(stoneKey)}), "var(--accent)");
+   saveGame();
+   try{ autoSave(); }catch(e){}
+   if(document.querySelector('.tab.active')?.textContent.includes('Sac') || (document.getElementById('fullscreen-panel-modal')?.style.display==='flex')){
+     onInventoryClick(stoneKey);
+   } else {
+     renderTeamWindow();
+     const m = document.getElementById('poke-modal'); if(m) m.classList.remove('open');
+   }
+ }
+}
+if (typeof tryBoxStoneEvo !== 'undefined' && typeof window !== 'undefined') window.tryBoxStoneEvo = tryBoxStoneEvo;

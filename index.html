@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -73,7 +73,7 @@
     <div class="settings-section">
       <h3 data-i18n="lang_title">Langue / Language</h3>
       <div class="pw-static-003">
-        <button class="hbtn lang-btn pw-static-004" data-lang="fr" data-action="set-language">Français</button>
+        <button class="hbtn lang-btn active pw-static-004" data-lang="fr" data-action="set-language">Français</button>
         <button class="hbtn lang-btn pw-static-004" data-lang="en" data-action="set-language">English</button>
       </div>
     </div>
@@ -161,6 +161,7 @@
   <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="training" aria-current="false" data-i18n="training_tab">Entraînement</button>
   <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="mine" aria-current="false"><span data-i18n="mine_title">Mine</span></button>
   <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="shortcuts" aria-current="false" data-i18n="shortcuts_tab">Raccourcis</button>
+  <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="base" aria-current="false" data-i18n="base_tab">Base</button>
 </div>
 
 <div id="main-dashboard" class="pw-static-015">
@@ -211,7 +212,7 @@
           <select id="map-region-select" data-stop-drag="true" data-action="switch-map-region" class="pw-static-029">
             <option value="kanto" data-i18n="map_region_kanto">Région Kanto</option>
             <option value="johto" data-i18n="map_region_johto">Région Johto</option>
-            <option value="hoenn" disabled data-force-disabled="true" data-i18n="map_region_hoenn">Région Hoenn (Bientôt)</option>
+            <option value="hoenn" data-i18n="map_region_hoenn">Région Hoenn</option>
             <option value="sinnoh" disabled data-force-disabled="true" data-i18n="map_region_sinnoh">Région Sinnoh (Bientôt)</option>
           </select>
         </span>
@@ -225,7 +226,7 @@
         </svg>
       </div>
     </div>
-    
+
     <div id="win-battle" class="dash-win pw-static-031">
       <div class="win-header" data-drag-window="win-battle">
         <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg></span><span id="battle-win-title" data-i18n="win_battle">Combat en direct</span></span>
@@ -261,6 +262,33 @@
         </div>
       </div>
     </div>
+
+    <div id="win-base" class="dash-win">
+      <div class="win-header" data-drag-window="win-base">
+        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9.5L12 3l9 6.5"/><path d="M5 8.5V21h14V8.5"/><path d="M9 21v-6h6v6"/></svg></span><span id="base-win-title" data-i18n="base.win.title">Base Secrète</span></span>
+        <span class="base-win-controls">
+          <select id="base-layout-select" data-stop-drag="true" data-action="base-window-layout" style="display: none;"></select>
+          <button id="base-refresh-btn" type="button" class="hbtn" data-stop-drag="true" data-action="base-window-refresh">↻</button>
+        </span>
+      </div>
+      <div class="win-body" id="base-panel">
+        <div id="base-win-empty" data-i18n="base.win.empty"></div>
+        <canvas id="base-canvas-2d"></canvas>
+        <canvas id="base-canvas-3d"></canvas>
+        <div id="base-toolbar">
+          <button id="base-ed-rotate" type="button" class="hbtn" data-stop-drag="true" data-action="base-ed-rotate" data-i18n="base.edit.rotate" hidden>Pivoter</button>
+          <button id="base-ed-pickup" type="button" class="hbtn" data-stop-drag="true" data-action="base-ed-pickup" data-i18n="base.edit.pickup">Ramasser</button>
+          <button id="base-ed-npc-edit" type="button" class="hbtn" data-stop-drag="true" data-action="base-ed-npc-edit" data-i18n="base.npced.edit_selected" hidden>Modifier le PNJ</button>
+          <span id="base-ed-hint"></span>
+          <span class="base-toolbar-spacer"></span>
+          <button id="base-ed-export" type="button" class="hbtn" data-stop-drag="true" data-action="base-ed-export" data-i18n="base.edit.export">Exporter</button>
+          <button id="base-ed-import" type="button" class="hbtn" data-stop-drag="true" data-action="base-ed-import" data-i18n="base.edit.import">Visiter un fichier…</button>
+          <button id="base-ed-visit" type="button" class="hbtn" data-stop-drag="true" data-action="base-ed-visit" data-i18n="base.edit.visit">Visiter</button>
+        </div>
+        <div id="base-stock"></div>
+      </div>
+    </div>
+
   </div>
 
   
@@ -354,6 +382,8 @@
     <button class="hbtn pw-static-071" data-action="debug-give-candies" data-i18n="debug_candies">Super Bonbons +10</button>
     <button class="hbtn pw-static-072" data-action="debug-unlock-badges" data-i18n="debug_badges">Débloquer 8 badges Kanto</button>
     <button class="hbtn pw-static-073" data-action="debug-fill-mine" data-i18n="debug_mine">Énergie mine +100</button>
+    <button class="hbtn pw-static-073" data-action="debug-base-grant-all" data-i18n="debug_base_grant">Base : toutes les décos +1</button>
+    <button class="hbtn pw-static-073" data-action="debug-base-add-npc" data-i18n="debug_base_npc">Base : +1 copain (équipe actuelle)</button>
     <button class="hbtn pw-static-200" data-action="debug-give-ct-cs" data-i18n="debug_ctcs">Obtenir CT/CS +1</button>
     <button class="hbtn pw-static-073" data-action="legacy-call" data-call="debugTimeSkip30Minutes" data-call-args="" data-i18n="debug_afk">AFK +10 min</button>
   <button id="debug-x10-toggle" class="hbtn pw-static-074" data-action="toggle-battle-speed-x10"><span data-i18n="debug_speed_x10">Vitesse x10 :</span> <span id="debug-x10-state">OFF</span></button>
@@ -393,5 +423,6 @@
   <script src="src/file-postboot.js"></script>
 </body>
 </html>
+
 
 

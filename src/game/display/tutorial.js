@@ -20,17 +20,55 @@ function tutorialDeviceHint(kind){
  if(kind === 'map') return touch ? (typeof t === 'function' ? t('tutorial_hint_map_mobile') : 'Mobile : utilise la barre du bas pour revenir à la Carte ou au Lieu.') : (typeof t === 'function' ? t('tutorial_hint_map_pc') : 'PC : clique directement sur la Carte puis sur les boutons du panneau Lieu.');
  return touch ? 'Mobile : utilise la barre du bas et les gros boutons.' : 'PC : utilise les raccourcis et le clic droit pour les infos.';
 }
+// Passe 54 (retour utilisateur : « les quêtes de tuto donnent beaucoup trop
+// de baies, elles m'ont donné le max directement au lieu de juste une »).
+//
+// Cause racine — DOUBLE COMPTABILITÉ des récompenses :
+// le verrou anti-doublon vivait UNIQUEMENT dans `G.tutorial.rewards`, un objet
+// recréé de zéro par `ensureTutorialState()` dès que `G.tutorial` est absent
+// (nouvelle partie, sauvegarde antérieure au tutoriel, import, ou tout
+// chargement où la branche `tutorial` n'a pas été persistée). L'INVENTAIRE,
+// lui, est bien sauvegardé. À chaque session où l'état du tutoriel repartait
+// à vide, les étapes déjà validées (3 combats sur la Route 1, badge de
+// Pierre…) étaient re-détectées comme « fraîchement terminées » et payées une
+// fois de plus. Reproduit : 30 sessions → 25 baies, soit exactement le
+// plafond de pile (`addToInventory` borne les objets tenus à 25) — d'où le
+// « max directement ».
+//
+// Correctif : le verrou est ADOSSÉ À L'INVENTAIRE, pas au seul drapeau. Une
+// récompense n'est versée que si le joueur ne possède pas déjà l'objet, et
+// le versement est plafonné à la quantité prévue par l'étape. Un flag perdu
+// ne peut donc plus rejouer un paiement.
+function tutorialRewardAlreadyPaid(step){
+ if(!step || !step.items) return false;
+ for(const k in step.items){
+  const have = Number((G.inventory && G.inventory[k]) || 0);
+  if(have >= Number(step.items[k] || 1)) return true;   // déjà en poche
+ }
+ return false;
+}
 function tutorialGiveReward(step){
  const st=ensureTutorialState();
  if(!step || st.rewards[step.id]) return;
- if(step.money){ G.money=(G.money||0)+step.money; try{ updateHeader(); }catch(_){} }
- if(step.items){ for(const k in step.items) addToInventory(k, step.items[k]); }
+ // Garde-fou anti-rejeu : on pose le drapeau AVANT toute remise, pour qu'un
+ // second passage dans la même session ne puisse pas repayer non plus.
+ const alreadyPaid = tutorialRewardAlreadyPaid(step);
  st.rewards[step.id]=true;
+ if(alreadyPaid) return;
+ if(step.money){ G.money=(G.money||0)+step.money; try{ updateHeader(); }catch(_){} }
+ if(step.items){
+  for(const k in step.items){
+   const want = Math.max(1, Number(step.items[k] || 1));
+   const have = Number((G.inventory && G.inventory[k]) || 0);
+   const give = Math.max(0, want - have);      // jamais plus que prévu
+   if(give > 0) addToInventory(k, give);
+  }
+ }
  if(step.rewardText) notify(step.rewardText, 'var(--green)');
 }
 function tutorialSteps(){
  return [
-  {id:'route1_battles', title:t('tutorial_step_route1_title')||'Premiers combats', desc:t('tutorial_step_route1_desc')||'Gagne 3 combats sauvages sur la Route 1.', how:()=>`${t('tutorial_step_route1_how')} ${tutorialDeviceHint('map')}`, actionLabel:t('tutorial_step_route1_action'), actionCall:'clickLocation', actionArgs:"'route1'", done:()=>((G.wildWinsByLoc||{}).route1||0)>=3, money:300, items:{stardust:2}, rewardText:t('tutorial_step_route1_reward')},
+  {id:'route1_battles', title:t('tutorial_step_route1_title')||'Premiers combats', desc:t('tutorial_step_route1_desc')||'Gagne 3 combats sauvages sur la Route 1.', how:()=>`${t('tutorial_step_route1_how')} ${tutorialDeviceHint('map')}`, actionLabel:t('tutorial_step_route1_action'), actionCall:'clickLocation', actionArgs:"'route1'", done:()=>((G.wildWinsByLoc||{}).route1||0)>=3, money:300, items:{occa_berry:1}, rewardText:t('tutorial_step_route1_reward')},
   {id:'open_poke_sheet', title:t('tutorial_step_sheet_title')||'Lire une fiche Pokémon', desc:t('tutorial_step_sheet_desc')||'Ouvre une fiche Pokémon pour lire ses stats, IV, EV, talents et attaques.', how:()=>`${tutorialDeviceHint('sheet')} ${t('tutorial_step_sheet_how')}`, actionLabel:t('tutorial_step_sheet_action'), actionCall:'showTab', actionArgs:"'team'", done:()=>!!ensureTutorialState().completed.open_poke_sheet, money:200, rewardText:t('tutorial_step_sheet_reward')},
   {id:'open_bag', title:t('tutorial_step_bag_title')||'Ouvrir le sac', desc:t('tutorial_step_bag_desc')||'Ouvre le Sac depuis les Raccourcis pour voir tes objets.', how:()=>t('tutorial_step_bag_how'), actionLabel:t('tutorial_step_bag_action'), actionCall:'openFullscreenPanel', actionArgs:"'inventory'", items:{potion:2}, done:()=>!!ensureTutorialState().completed.open_bag, rewardText:t('tutorial_step_bag_reward')},
   {id:'open_pokedex', title:t('tutorial_step_dex_title')||'Consulter le Pokédex', desc:t('tutorial_step_dex_desc')||'Ouvre le Pokédex et clique sur un Pokémon déjà vu.', how:()=>t('tutorial_step_dex_how'), actionLabel:t('tutorial_step_dex_action'), actionCall:'openFullscreenPanel', actionArgs:"'pokedex'", done:()=>!!ensureTutorialState().completed.open_pokedex, money:500, rewardText:t('tutorial_step_dex_reward')},
@@ -157,8 +195,22 @@ function guideSections(){
   atoll:{icon:(typeof getIcon==='function'?getIcon('atoll',14):''), title:t('battle_atoll_title')||'Atoll de Combat', pages:[
    [(typeof t==='function'?t('guide_battle_atoll'):'Battle Atoll'),(typeof t==='function'?t('guide_battle_atoll_desc'):'L’Atoll de Combat est le contenu de fin d’alpha. Il sert à tester des équipes optimisées dans plusieurs formats.')],
    [(typeof t==='function'?t('guide_formats'):'Formats'),(typeof t==='function'?t('guide_formats_desc'):'Tour, Usine, Arène et Dôme appliquent chacun des contraintes différentes : rang maximum, location, objets interdits ou équipe prêtée.')],
+   [(typeof t==='function'?t('guide_atoll_rotation'):(G&&G.lang==='en'?'12-hour rotation':'Rotation de 12 h')),(typeof t==='function'?t('guide_atoll_rotation_desc'):(G&&G.lang==='en'?'Opposing teams, banned legendaries and the shop rotate every 12 hours (shared UTC window). The timer is shown in the Atoll menu.':'Les équipes adverses, les légendaires bannis et la boutique tournent toutes les 12 heures (fenêtre UTC partagée). Le minuteur est affiché dans le menu de l’Atoll.'))],
    [(typeof t==='function'?t('guide_training_prep'):(typeof t==='function'?t('guide_training_prep'):'Preparation')),(typeof t==='function'?t('guide_training_prep_desc'):'Les objets tenus, les talents, les EV et l’ordre d’équipe comptent beaucoup plus ici que dans les combats sauvages classiques.')],
    [(typeof t==='function'?t('guide_rewards'):'Rewards'),(typeof t==='function'?t('guide_atoll_rewards_desc'):'Les victoires donnent des jetons Atoll utilisables dans la boutique dédiée. Les séries augmentent l’intérêt du farm.')]
+  ]},
+  base:{icon:(typeof getIcon==='function'?getIcon('base',14):'🏠'), title:t('guide_base_title')||((G&&G.lang==='en')?'Secret Bases':'Bases Secrètes'), pages:(G&&G.lang==='en')?[
+   ['Unlocking','Secret Bases unlock in Hoenn after the Route 111 desert quest. The Secret Base window then appears in the middle column of the dashboard.'],
+   ['Establishing your base','On many Hoenn routes, the Location window offers to examine the alcove and establish your base there. Each route has its own canonical room (cave, tree or shrub).'],
+   ['Decorating','Collect furniture, mats, posters and dolls, then place them in edit mode. Placement follows the Emerald rules: floor, wall or surface items, and the entrance must stay clear.'],
+   ['Visiting','You can visit your own base or import a friend\u2019s base from a file. Some visits include NPC buddies you can battle for daily records.'],
+   ['Perks','An established base grants small comfort bonuses (route loot, money). Flags collected from visits improve your base rank.'],
+  ]:[
+   ['Déblocage','Les Bases Secrètes se débloquent à Hoenn après la quête du désert de la Route 111. La fenêtre Base Secrète apparaît alors dans la colonne centrale du tableau de bord.'],
+   ['Établir sa base','Sur de nombreuses routes de Hoenn, la fenêtre Lieu propose d’examiner l’alcôve et d’y établir votre base. Chaque route possède sa salle canonique (grotte, arbre ou buisson).'],
+   ['Décorer','Collectionnez meubles, tapis, posters et poupées, puis placez-les en mode édition. La pose suit les règles d’Émeraude : objets au sol, au mur ou sur surface, et l’entrée doit rester dégagée.'],
+   ['Visiter','Vous pouvez visiter votre propre base ou importer celle d’un ami depuis un fichier. Certaines visites incluent des copains PNJ à affronter pour des records quotidiens.'],
+   ['Avantages','Une base établie donne de petits bonus de confort (butin de route, argent). Les drapeaux récoltés en visite améliorent le rang de votre base.'],
   ]},
   dictionary:{icon:(typeof getIcon==='function'?getIcon('dictionary',14):''), title:t('guide_dictionary_title')||'Dictionnaire', pages:[
    [(typeof t==='function'?t('guide_dict_items'):'Items'),(typeof t==='function'?t('guide_dict_items_desc'):'Search for an item to see if you own it, where to find it and what it does.')],
@@ -176,7 +228,10 @@ function renderGuidePanel(el){
   if(id === 'mine' && typeof mineUnlocked === 'function' && !mineUnlocked()) continue;
   if(id === 'hatchery' && typeof hatcheryUnlocked === 'function' && !hatcheryUnlocked()) continue;
   if(id === 'training' && typeof trainingUnlocked === 'function' && !trainingUnlocked()) continue;
-  if(id === 'atoll' && !(G.badges && (G.badges.includes('elite4') || G.badges.includes('johto_elite4')))) continue;
+  // Atoll : visible uniquement quand l'Atoll est réellement débloqué (Ligue gagnée)
+  if(id === 'atoll' && !((typeof isAtollUnlocked === 'function') ? isAtollUnlocked() : (G.badges && (G.badges.includes('elite4') || G.badges.includes('johto_elite4'))))) continue;
+  // Bases Secrètes : visible uniquement après le déblocage à Hoenn (quête 216)
+  if(id === 'base' && !((typeof secretBaseUnlocked === 'function') ? secretBaseUnlocked() : !!(G && G.unlockedSecretBaseHoenn))) continue;
   if(id === 'automation' && typeof hatcheryUnlocked === 'function' && typeof trainingUnlocked === 'function' && typeof mineUnlocked === 'function' && !hatcheryUnlocked() && !trainingUnlocked() && !mineUnlocked()) continue;
   unlockedSections[id] = sec;
  }
@@ -215,4 +270,5 @@ if(typeof window !== 'undefined'){
  window.showTutorialTip=showTutorialTip;
  window.installTutorialHooks=installTutorialHooks;
 }
+
 

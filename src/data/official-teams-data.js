@@ -831,6 +831,7 @@ const OFFICIAL_TEAMS = {
 const OFFICIAL_LEAGUE_ORDER = {
   kanto: ['lorelei', 'bruno', 'agatha', 'lance', 'blue'],
   johto: ['will', 'koga_e4', 'bruno_johto', 'karen', 'lance_johto'],
+  hoenn: ['sidney', 'phoebe', 'glacia', 'drake', 'steven'],
 };
 
 function getOfficialLeagueKeys(region) {
@@ -868,7 +869,7 @@ function buildOfficialTeamPoke(spec) {
 // Renvoie la LISTE DE SPECS d'une entrée officielle, en résolvant la
 // variante du rival selon le starter du joueur si nécessaire.
 function getOfficialTeamSpecs(key, starterId) {
-  const entry = OFFICIAL_TEAMS[key];
+  const entry = OFFICIAL_TEAMS[key] || ((typeof OFFICIAL_TEAMS_HOENN !== 'undefined') ? OFFICIAL_TEAMS_HOENN[key] : null);
   if (!entry) return null;
   if (entry.variantsByStarter) {
     const byStarter = entry.variantsByStarter[String(starterId)];
@@ -893,3 +894,4 @@ if (typeof OFFICIAL_TEAMS !== 'undefined' && typeof window !== 'undefined') wind
 if (typeof buildOfficialTeamPoke !== 'undefined' && typeof window !== 'undefined') window.buildOfficialTeamPoke = buildOfficialTeamPoke;
 if (typeof getOfficialTeamSpecs !== 'undefined' && typeof window !== 'undefined') window.getOfficialTeamSpecs = getOfficialTeamSpecs;
 if (typeof getOfficialTeam !== 'undefined' && typeof window !== 'undefined') window.getOfficialTeam = getOfficialTeam;
+

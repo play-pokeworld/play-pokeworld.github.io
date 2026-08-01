@@ -32,3 +32,4 @@ test('timer registry stops all named timers', () => {
   assert.equal(registry.size(), 0);
   assert.equal(cleared.length, 2);
 });
+

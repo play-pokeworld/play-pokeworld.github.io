@@ -19,3 +19,4 @@ test('effectivenessText maps multipliers to localization keys', () => {
   assert.equal(effectivenessText(1, translate), '');
 });
 
+

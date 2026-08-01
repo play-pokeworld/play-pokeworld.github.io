@@ -103,3 +103,4 @@ if (document.readyState === 'complete') {
   document.addEventListener('DOMContentLoaded', () => window.PokeInit.init());
 }
 })();
+

@@ -11,7 +11,7 @@ function spriteImg(id, emoji, {shiny=false, back=false, size=40, cls='', silhoue
  var lookupId = String(id);
  var num = (typeof DEX_MAP !== 'undefined' && DEX_MAP) ? DEX_MAP[lookupId] : null;
  if (num == null) num = Number(id);
- var bucket = back ? (shiny?'backShiny':'back') : (shiny?'frontShiny':'front');
+ var bucket = shiny ? 'frontShiny' : 'front';
  var src = (SPRITE_DATA && SPRITE_DATA[bucket] && SPRITE_DATA[bucket][String(num)]) ? SPRITE_DATA[bucket][String(num)] : null;
  if(!src){ if(typeof console !== 'undefined') console.warn('[PokeWorld] Missing Pokémon sprite:', id, '-> num:', num, 'bucket:', bucket); return `<span class="sprite-fallback-emoji">${emoji}</span>`; }
  if(silhouette){
@@ -68,18 +68,20 @@ function silhouetteCanvas(img, canvasId, size){
  }
 }
 function itemIcon(key, size=20, cls=''){
- let src = ITEM_SPRITE_DATA[key];
+ // Préfère le chemin canonique items/<key>.png (baies distinctes), puis ITEM_SPRITE_DATA.
+ let src = null;
+ if (typeof getItemSpriteUrl === 'function') {
+   try { src = getItemSpriteUrl(key); } catch (_) { src = null; }
+ }
+ if (!src && typeof ITEM_SPRITE_DATA !== 'undefined' && ITEM_SPRITE_DATA) src = ITEM_SPRITE_DATA[key];
  if(!src){
- if(key === 'rarecandy') src = ITEM_SPRITE_DATA['rarcandy'];
- else if(key === 'shiny_charm') src = ITEM_SPRITE_DATA['stardust'];
- else if(key.includes('berry')) src = ITEM_SPRITE_DATA['berry'];
- else if(key.includes('choice')) src = ITEM_SPRITE_DATA['choice_band'] || ITEM_SPRITE_DATA['muscle_band'];
- else if(key.includes('stone')) src = ITEM_SPRITE_DATA['moonstone'];
- else if(key.includes('charm')) src = ITEM_SPRITE_DATA['shiny_charm'] || ITEM_SPRITE_DATA['pearl'];
- else if(key === 'leftovers') src = ITEM_SPRITE_DATA['fullrestore'];
- else if(key === 'life_orb') src = ITEM_SPRITE_DATA['revive'];
- else if(key === 'assault_vest' || key === 'eviolite') src = ITEM_SPRITE_DATA[key] || ITEM_SPRITE_DATA['muscle_band'];
- else src = ITEM_SPRITE_DATA['potion'];
+ if(key === 'rarecandy') src = (ITEM_SPRITE_DATA && ITEM_SPRITE_DATA['rarcandy']) || 'src/assets/images/items/rarecandy.png';
+ else if(key === 'shiny_charm') src = 'src/assets/images/items/shiny_charm.png';
+ else if(key && String(key).endsWith('_berry')) src = 'src/assets/images/items/' + key + '.png';
+ else if(key && key.includes('choice')) src = (ITEM_SPRITE_DATA && (ITEM_SPRITE_DATA['choice_band'] || ITEM_SPRITE_DATA['muscle_band']));
+ else if(key === 'leftovers') src = 'src/assets/images/items/leftovers.png';
+ else if(key === 'life_orb') src = 'src/assets/images/items/life_orb.png';
+ else if(key) src = 'src/assets/images/items/' + key + '.png';
  }
  const emoji = ITEMS[key]?.icon || '?';
  if(!src){ if(typeof console !== 'undefined') console.warn('[PokeWorld] Missing item sprite for:', key); return `<span class="sprite-fallback-emoji">${emoji}</span>`; }
@@ -153,4 +155,5 @@ if (typeof spriteImg !== 'undefined' && typeof window !== 'undefined') window.sp
 if (typeof spriteSilhouette !== 'undefined' && typeof window !== 'undefined') window.spriteSilhouette = spriteSilhouette;
 if (typeof silhouetteCanvas !== 'undefined' && typeof window !== 'undefined') window.silhouetteCanvas = silhouetteCanvas;
 if (typeof itemIcon !== 'undefined' && typeof window !== 'undefined') window.itemIcon = itemIcon;
+
 

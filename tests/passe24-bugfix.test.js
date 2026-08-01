@@ -289,3 +289,4 @@ test('passe 24 #8 : descriptions de talents 100 % françaises et complètes', ()
   assert.ok(sb.getTalentDesc('waterveil').includes('brûlure'), 'waterveil immunise contre la brûlure');
   assert.ok(sb.getTalentDesc('magmaarmor').includes('gel'), 'magmaarmor immunise contre le gel');
 });
+

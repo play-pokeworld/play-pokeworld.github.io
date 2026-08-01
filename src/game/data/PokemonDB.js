@@ -48,7 +48,7 @@ class PokemonDB {
       this._byName.set(pokemon.name.toLowerCase(), pokemon);
       
       // Region classification
-      const region = numId <= 151 ? 'kanto' : numId <= 251 ? 'johto' : 'other';
+      const region = numId <= 151 ? 'kanto' : numId <= 251 ? 'johto' : numId <= 386 ? 'hoenn' : 'other';
       if (!this._byRegion.has(region)) this._byRegion.set(region, []);
       this._byRegion.get(region).push(numId);
     }
@@ -77,3 +77,4 @@ window.PokePokemonDB = PokemonDB;
 if (!window.poke) window.poke = {};
 window.poke.PokemonDB = PokemonDB;
 })();
+

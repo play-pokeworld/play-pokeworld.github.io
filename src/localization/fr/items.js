@@ -940,7 +940,7 @@ Object.assign(window.L_fr_items, {
   old_amber: { name: 'Vieil Ambre', desc: 'Un ambre contenant de l’ADN d’un Pokémon ancien.' },
   root_fossil: { name: 'Fossile Racine', desc: 'Un fossile qui peut être réanimé en Lilia.' },
   claw_fossil: { name: 'Fossile Griffe', desc: 'Un fossile qui peut être réanimé en Anorith.' },
-  shiny_charm: { name: 'Charme Chroma', desc: 'Augmente les chances de rencontrer un Pokémon chromatique.' },
+  shiny_charm: { name: 'Charme Chroma', desc: 'Obtenu en complétant 100 % d\'un Pokédex régional. Augmente les chances de chromatique uniquement pour les Pokémon des régions complétées (taux 1/2048).' },
   upgrade: { name: 'Améliorator', desc: 'Objet d’évolution pour les Pokémon compatibles.' }
 });
 
@@ -1039,3 +1039,4 @@ Object.assign(window.L_fr_items, {
   fossilized_drake: { ...(window.L_fr_items.fossilized_drake || {name:'fossilized_drake'}), desc: 'Un fossile de Galar à combiner avec un autre fossile pour réanimer un Pokémon.' },
   fossilized_fish: { ...(window.L_fr_items.fossilized_fish || {name:'fossilized_fish'}), desc: 'Un fossile de Galar à combiner avec un autre fossile pour réanimer un Pokémon.' }
 });
+

@@ -13,6 +13,7 @@
   "src/localization/fr/types.js",
   "src/localization/fr/talents.js",
   "src/localization/fr/shops.js",
+  "src/localization/fr/base.js",
   "src/localization/fr/champions.js",
   "src/localization/fr/lore.js",
   "src/localization/fr/quests.js",
@@ -30,6 +31,7 @@
   "src/localization/en/talents.js",
   "src/localization/en/pokemon-names.js",
   "src/localization/en/shops.js",
+  "src/localization/en/base.js",
   "src/localization/en/champions.js",
   "src/localization/en/lore.js",
   "src/localization/en/quests.js",
@@ -83,6 +85,9 @@
   "src/data/sprites.js",
   "src/data/trainer-sprites-data.js",
   "src/data/items-data.js",
+  "src/data/base-layouts-data.js",
+  "src/data/base-items-data.js",
+  "src/data/base-manifest-2d-data.js",
   "src/data/items-helpers.js",
   "src/data/ctcs-shop-data.js",
   "src/data/talents-data.js",
@@ -92,15 +97,19 @@
   "src/data/pd-data.js",
   "src/data/poke-talents-data.js",
   "src/data/story-quests.js",
+  "src/data/story-quests-hoenn.js",
   "src/data/locations-data.js",
   "src/data/locations-johto.js",
+  "src/data/locations-hoenn.js",
   "src/data/shops-data.js",
+  "src/data/shops-hoenn.js",
   "src/data/story-lore.js",
   "src/data/route-drops.js",
   "src/data/game-helpers.js",
   "src/data/unlock-logic.js",
   "src/data/champions-data.js",
   "src/data/official-teams-data.js",
+  "src/data/official-teams-hoenn.js",
   "src/data/atoll-sets-data.js",
   "src/data/quest-data.js",
   "src/data/side-quests-data.js",
@@ -116,6 +125,7 @@
   "src/game/world/atoll-core.js",
   "src/game/world/world.js",
   "src/game/world/collection.js",
+  "src/game/world/puzzle-explorations.js",
   "src/game/world/team.js",
 
   // ─── Game - Quests ───
@@ -159,6 +169,16 @@
 
   // ─── Game - Save ───
   "src/game/save/save.js",
+  "src/game/base/base-core.js",
+  "src/game/base/base-visit.js",
+  "src/game/base/base-exchange.js",
+  "src/game/base/base-editor.js",
+  "src/game/base/base-debug.js",
+  "src/game/base/base-npc-editor.js",
+  "src/game/base/base-dialog.js",
+  "src/game/base/base-view2d.js",
+  "src/game/base/base-window.js",
+
   "src/game/save/save-extras.js",
   "src/game/save/settings.js",
   "src/game/save/offline-engine.js",
@@ -196,3 +216,4 @@
   }
   loadScript(0);
 })();
+

@@ -3,7 +3,7 @@ import { createRouteEventState } from '../world/route-events.js';
 export function createInitialGameState() {
   return {
     version: 3,
-    lang: 'fr',
+    lang: 'en',
     region: 'kanto',
     money: 2000,
     badges: 0,
@@ -26,3 +26,4 @@ export function createInitialBattleState() {
     isTraining: false,
   };
 }
+

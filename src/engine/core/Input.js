@@ -150,3 +150,4 @@ window.PokeInput = InputManager;
 if (!window.poke) window.poke = {};
 window.poke.Input = InputManager;
 })();
+

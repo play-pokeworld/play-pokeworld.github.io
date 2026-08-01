@@ -450,3 +450,4 @@ export const __simExports = { get results() { return results; } };
 // Exécution CLI uniquement (le module est aussi importé par tests/passe23-simulations.test.js)
 const isMain = (() => { try { return import.meta.url === pathToFileURL(process.argv[1]).href; } catch (_) { return false; } })();
 if (isMain) main().catch((e) => { console.error(e); process.exit(1); });
+

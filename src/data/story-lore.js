@@ -60,3 +60,4 @@ var STORY_LORE = {
 // --- Migrated to ES module, globals exposed ---
 if (typeof STORY_LORE !== 'undefined' && typeof window !== 'undefined') window.STORY_LORE = STORY_LORE;
 
+

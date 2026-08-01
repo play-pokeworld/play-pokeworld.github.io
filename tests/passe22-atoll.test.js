@@ -299,3 +299,4 @@ test('UI : descriptions de modes en haut de page + minuteur atoll & roamers', ()
   assert.ok(loc.includes('data-rotation-timer="roam"'), 'minuteur sur les routes roamers');
   assert.ok(loc.includes('startRotationTicker'), 'ticker démarré depuis les routes');
 });
+

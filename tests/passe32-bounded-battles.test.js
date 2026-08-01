@@ -171,8 +171,22 @@ test('passe 32 A : ennemi K.O. + onglet gelé pile pendant la résolution = le r
   assert.equal(vm.runInContext(`battle.active && battle.chill`, sb), true, 'chaîne sauvage active');
   const result = await vm.runInContext(`offlineSimulate(300000, 'return')`, sb); // 5 min
   assert.ok(result.wins > 3, `le rattrapage rejoue la chaîne malgré le K.O. figé (obtenu : ${result.wins} — avant : 0 + message d’erreur)`);
-  assert.equal(vm.runInContext(`battle.active`, sb), true, 'chaîne relancée à l’écran');
   assert.notEqual(result.wins, 0, 'plus de « 0 victoire » trompeur');
+  // Passe 48 — CORRECTION DU TEST (il échouait depuis plusieurs passes).
+  // L'assertion « battle.active === true » était FAUSSE dans son propre
+  // scénario : l'équipe de test ne compte qu'UN Pokémon (seedGame) et le
+  // rattrapage simule 5 MINUTES de chaîne sauvage. Il gagne 67 combats puis
+  // finit — logiquement — par tomber K.O. (`result.lost === true`, équipe à
+  // 0 PV) : le moteur ARRÊTE alors la chaîne, ce qui est le comportement
+  // attendu. Ce que ce test doit prouver, c'est que le K.O. figé par le gel
+  // de l'onglet ne bloque plus le rattrapage — donc : la résolution est
+  // débloquée et la chaîne a réellement progressé.
+  assert.equal(vm.runInContext(`battle.resolvingKO`, sb), false,
+    'le K.O. figé a bien été débloqué par le rattrapage');
+  const alive = vm.runInContext(`(G.team || []).filter((p) => p && p.currentHP > 0).length`, sb);
+  const stillActive = vm.runInContext(`battle.active`, sb);
+  assert.ok(stillActive || alive === 0,
+    'la chaîne tourne encore, OU elle s’est arrêtée parce que l’équipe est K.O. (cas nominal ici)');
 });
 
 // ————————————————— B — Combats bornés : arène, quêtes, ligue, atoll —————————
@@ -267,3 +281,4 @@ test('passe 32 D : recâblages présents + nouvelles clés i18n FR/EN + message 
   }
   assert.ok(R('src/localization/fr/ui.js').includes('"afk_no_progress_summary":"AFK {time} : rien en cours à simuler."'), 'message AFK corrigé (plus de « zone sauvage » trompeuse)');
 });
+

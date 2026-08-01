@@ -62,7 +62,8 @@ function loadTeamFromPreset(key){
  for(const oldP of G.team){
  if(!newTeam.includes(oldP)){
  if(typeof clearPokemonHeldItem === 'function') clearPokemonHeldItem(oldP); else oldP.heldItem = null;
- G.collection[String(oldP.id)] = oldP;
+ const _depKey = (typeof generateUniqueBoxId==='function') ? generateUniqueBoxId(oldP.id) : (!G.collection[String(oldP.id)] ? String(oldP.id) : ('box_' + oldP.id + '_' + Date.now()));
+      G.collection[_depKey] = oldP;
  }
  }
  G.team = newTeam;
@@ -211,4 +212,5 @@ if (typeof removeFromTeam !== 'undefined' && typeof window !== 'undefined') wind
 if (typeof cancelSwap !== 'undefined' && typeof window !== 'undefined') window.cancelSwap = cancelSwap;
 if (typeof swapBoxWithTeam !== 'undefined' && typeof window !== 'undefined') window.swapBoxWithTeam = swapBoxWithTeam;
 if (typeof addBoxedToTeam !== 'undefined' && typeof window !== 'undefined') window.addBoxedToTeam = addBoxedToTeam;
+
 
