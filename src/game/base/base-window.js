@@ -19,7 +19,7 @@
 const _baseWin = {
   inited: false,
   root: null, c2d: null, c3d: null, modeSel: null, layoutSel: null, empty: null,
-  rotateBtn: null, pickupBtn: null, visitBtn: null, expBtn: null, impBtn: null, npcEditBtn: null,
+  rotateBtn: null, pickupBtn: null, visitBtn: null, expBtn: null, impBtn: null, npcEditBtn: null, pcEditBtn: null,
   hint: null, stock: null,
   r3d: undefined,       // renderer WebGL2 (undefined = pas encore tenté, null = absent)
   broken3d: false,      // passe 40 : 3D coupée pour la session après 1er échec
@@ -54,6 +54,7 @@ function baseWindowEls() {
   baseWindowHideRotate();
   _baseWin.pickupBtn = document.getElementById('base-ed-pickup');
   _baseWin.npcEditBtn = document.getElementById('base-ed-npc-edit');
+  _baseWin.pcEditBtn = document.getElementById('base-ed-pc-edit');
   _baseWin.visitBtn = document.getElementById('base-ed-visit');
   _baseWin.expBtn = document.getElementById('base-ed-export');
   _baseWin.impBtn = document.getElementById('base-ed-import');
@@ -121,13 +122,18 @@ function baseWindowFillSelects() {
   }
 }
 
-// ——— Minuteur de visite (pas animés ; registre natif si présent) —————————
+// ——— Minuteur de visite — robuste, avance toujours ————————————————
+// Fix : utilise PokeWorldTimers si dispo (gère visibilité) sinon setInterval,
+// et toujours un pas immédiat après le clic pour feedback.
 function baseWindowVisitTicker(on) {
-  if (on && !_baseWin.visitTimer) {
+  if (on) {
+    if (_baseWin.visitTimer) {
+      // déjà en cours : on garde le timer existant, il avancera le nouveau chemin
+      return;
+    }
     const cb = () => {
       try {
         const r = baseEditorVisitTick();
-        // passe 46 : arrivée à côté d'un copain abordé de loin → interaction
         if (r.interact) baseWindowVisitInteractShow(r.interact);
         if (r.ev && r.ev.msg) {
           let msg;
@@ -139,15 +145,42 @@ function baseWindowVisitTicker(on) {
         }
         baseWindowInvalidate();
         if (r.done) baseWindowVisitTicker(false);
-      } catch (e) { baseWindowVisitTicker(false); try { console.warn('[base-window] visit tick:', e); } catch (_) {} }
+      } catch (e) {
+        baseWindowVisitTicker(false);
+        try { console.warn('[base-window] visit tick:', e); } catch (_) {}
+      }
     };
-    if (typeof PokeWorldTimers !== 'undefined' && PokeWorldTimers && PokeWorldTimers.set) {
-      PokeWorldTimers.set('baseVisit', cb, 140);
-      _baseWin.visitTimer = { pw: true };
-    } else _baseWin.visitTimer = { id: setInterval(cb, 140) };
-  } else if (!on && _baseWin.visitTimer) {
-    if (_baseWin.visitTimer.pw && typeof PokeWorldTimers !== 'undefined' && PokeWorldTimers.stop) PokeWorldTimers.stop('baseVisit');
-    else clearInterval(_baseWin.visitTimer.id);
+    try {
+      if (typeof PokeWorldTimers !== 'undefined' && PokeWorldTimers.set) {
+        PokeWorldTimers.set('baseVisit', cb, 120);
+        _baseWin.visitTimer = { pw: true };
+      } else {
+        const id = setInterval(cb, 110);
+        _baseWin.visitTimer = { id };
+      }
+    } catch (_) {
+      // fallback RAF
+      const loop = () => {
+        if (!_baseWin.visitTimer) return;
+        cb();
+        if (_baseWin.visitTimer) {
+          if (typeof requestAnimationFrame === 'function') requestAnimationFrame(loop);
+          else setTimeout(loop, 110);
+        }
+      };
+      _baseWin.visitTimer = { id: 1, raf: true };
+      if (typeof requestAnimationFrame === 'function') requestAnimationFrame(loop);
+      else setTimeout(loop, 110);
+    }
+  } else {
+    if (!_baseWin.visitTimer) return;
+    try {
+      if (_baseWin.visitTimer.pw && typeof PokeWorldTimers !== 'undefined' && PokeWorldTimers.stop) {
+        PokeWorldTimers.stop('baseVisit');
+      } else if (_baseWin.visitTimer.id) {
+        clearInterval(_baseWin.visitTimer.id);
+      }
+    } catch (_) {}
     _baseWin.visitTimer = null;
   }
 }
@@ -287,16 +320,25 @@ async function baseWindowRenderStock(st) {
   box.appendChild(page);
   const cur = tabs.find((tb) => tb.cat === _baseWin.stockTab);
   if (cur.cat === '__pals') {
-    // UN bouton « PNJ » : on le prend puis on clique une case, comme un meuble.
-    const b = baseWindowStockBtn(t('base.npced.place_npc'), npcRoom);
-    b.dataset.action = 'base-ed-select-npc-new';
-    b.title = t('base.npced.place_hint');
-    if (ed.npcNew) b.classList.add('sel');
-    if (!npcRoom) b.disabled = true;
-    const im = b.querySelector('img');
-    if (im && typeof baseNpcSpriteUrl === 'function') im.src = baseNpcSpriteUrl(BASE_NPC_SPRITE_DEFAULT);
-    else if (im) im.remove();
-    page.appendChild(b);
+    // Fix demandé : un seul bouton PNJ créateur, pas de banque qui s'accumule
+    // Pas de compteur ×0/×8 : c'est un bouton de création, pas un objet possédé
+    const placedCount = (st.npcs || []).length;
+    const canCreate = placedCount < (typeof BASE_NPC_MAX !== 'undefined' ? BASE_NPC_MAX : 8);
+    const bNew = baseWindowStockBtn(t('base.npced.place_npc'), null);
+    bNew.dataset.action = 'base-ed-select-npc-new';
+    bNew.title = t('base.npced.place_hint');
+    if (ed.npcNew) bNew.classList.add('sel');
+    if (!canCreate) bNew.disabled = true;
+    const imNew = bNew.querySelector('img');
+    if (imNew && typeof baseNpcSpriteUrl === 'function') imNew.src = baseNpcSpriteUrl(BASE_NPC_SPRITE_DEFAULT);
+    else if (imNew) imNew.remove();
+    page.appendChild(bNew);
+    if (!canCreate) {
+      const d = document.createElement('div');
+      d.className = 'base-stock-empty';
+      d.textContent = t('base.err.npc_max');
+      page.appendChild(d);
+    }
     return;
   }
   for (const s of cur.entries) {
@@ -348,6 +390,16 @@ function baseWindowRefreshToolbar(st) {
     _baseWin.npcEditBtn.hidden = !selNpc;
     _baseWin.npcEditBtn.disabled = !selNpc;
     _baseWin.npcEditBtn.textContent = t('base.npced.edit_selected');
+  }
+  if (_baseWin.pcEditBtn) {
+    let selPc = false;
+    if (!visit && ed.selUid != null) {
+      const it = (typeof basePlacedFind === 'function') ? basePlacedFind(st, ed.selUid) : null;
+      selPc = !!(it && it.s === 'pc');
+    }
+    _baseWin.pcEditBtn.hidden = !selPc;
+    _baseWin.pcEditBtn.disabled = !selPc;
+    try { _baseWin.pcEditBtn.textContent = t('base.pc.edit_selected') || 'Modifier le PC'; } catch(_) { _baseWin.pcEditBtn.textContent = 'Modifier le PC'; }
   }
   _baseWin.impBtn.disabled = visit;
   const movPlaced = !visit && ed.moveUid != null && basePlacedFind(st, ed.moveUid);
@@ -442,13 +494,25 @@ function baseWindowCanvasClick(ev) {
   if (ed.mode === 'visit') {
     baseEditorSetHover(cell);
     const r = baseEditorVisitClick(cell.x, cell.y);
-    if (r.type === 'move') baseWindowVisitTicker(true);
+    if (r.type === 'move') {
+      baseWindowVisitTicker(true);
+      // Premier pas immédiat pour feedback instantané (si ticker a un léger délai)
+      try {
+        const step = baseEditorVisitTick();
+        if (step && step.interact) baseWindowVisitInteractShow(step.interact);
+      } catch(_){}
+    }
     else if (r.type === 'blocked' && typeof notify === 'function') notify(t('base.edit.blocked'), 'var(--light1)');
     else if (r.type === 'interact') baseWindowVisitInteractShow(r.res);
     baseWindowInvalidate();
     return;
   }
   const r = baseEditorClickCell(st, cell.x, cell.y);
+  if (r.type === 'pc_dialog') {
+    // Panneau PC ouvert en édition – pas de notif, juste refresh
+    baseWindowInvalidate();
+    return;
+  }
   if (typeof notify === 'function') {
     if (r.type === 'place') {
       if (r.ok) notify(tr('base.edit.placed', { name: t('base.i.' + r.slug) }), 'var(--green)');
@@ -498,6 +562,12 @@ function baseWindowEditSelectedNpc() {
   const ed = baseEditorGet();
   if (!ed || ed.selNpc == null) return;
   if (typeof openBaseNpcEditor === 'function') openBaseNpcEditor(ed.selNpc);
+}
+
+function baseWindowEditSelectedPc() {
+  if (typeof baseDialogPc === 'function') {
+    try { baseDialogPc(); } catch(_){}
+  }
 }
 
 function baseWindowSelectNpc(npcId) {
@@ -914,5 +984,6 @@ window.baseWindowOverlay = baseWindowOverlay;
 window.baseWindowVisitTicker = baseWindowVisitTicker;
 window.baseWindowSelectNpcNew = baseWindowSelectNpcNew;
 window.baseWindowEditSelectedNpc = baseWindowEditSelectedNpc;
+window.baseWindowEditSelectedPc = baseWindowEditSelectedPc;
 window.baseWindowIsFileUrl = baseWindowIsFileUrl;
 

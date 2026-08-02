@@ -221,12 +221,21 @@ test('passe 47 D : PNJ — créer, éditer, supprimer, plafonner', () => {
     r.newName = npc2.name; r.newTeam = npc2.team.map((p) => p.id + '@' + p.level);
     baseNpcUpdate(st, c.id, { team: [{ id: 25, level: 999 }] });
     r.clamped = baseNpcFind(st, c.id).team[0].level;
-    // plafond
+    // plafond - on place sur des cases libres trouvées dynamiquement
     let guard = 0;
-    while (baseNpcCreate(st, { name: 'P', sprite: 'trainer-0', team: [] }).ok && guard++ < 50) {}
+    const tryPlace = () => {
+      for (let y=1; y<9; y++) for (let x=1; x<9; x++) {
+        const res = baseNpcPlaceNew(st, x, y, { name: 'P', sprite: 'trainer-0', team: [] });
+        if (res.ok) return true;
+      }
+      return false;
+    };
+    while (tryPlace() && guard++ < 50) {}
     r.capped = baseNpcCount(st);
-    r.overflow = baseNpcCreate(st, { name: 'trop', sprite: 'trainer-0', team: [] });
-    r.deleted = baseNpcDelete(st, c.id);
+    r.overflow = baseNpcPlaceNew(st, 5, 5, { name: 'trop', sprite: 'trainer-0', team: [] });
+    // Supprime un PNJ placé (pas celui du stock) pour tester décrément
+    const toDel = (st.npcs[0] && st.npcs[0].id) || c.id;
+    r.deleted = baseNpcDelete(st, toDel);
     r.after = baseNpcCount(st);
     return JSON.stringify(r);
   })()`, sb));

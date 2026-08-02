@@ -206,7 +206,7 @@ test('passe 33 C : pickup en cascade + relocate conserve meubles et PNJ', () => 
   assert.equal(vm.runInContext('window._npcPlaced', sb), true);
   assert.equal(vm.runInContext('window._reloc.ok', sb), true);
   assert.equal(vm.runInContext('window._npcsLeft', sb), 0, 'PNJ retiré de la base');
-  assert.equal(vm.runInContext('window._npcInStock', sb), 1, 'PNJ conservé dans le vivier');
+  assert.equal(vm.runInContext('window._npcInStock', sb), 0, 'PNJ supprimé au déménagement (fix demandé : pas de banque invisible)');
   assert.equal(vm.runInContext('window._layout', sb), 'tree_2');
   assert.ok(vm.runInContext('window._stockLeft', sb) >= 2, 'meubles conservés au déménagement');
 });

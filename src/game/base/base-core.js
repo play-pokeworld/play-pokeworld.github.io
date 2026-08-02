@@ -25,6 +25,7 @@ function baseCreateDefault() {
     spawn: null,
     uidSeq: 1,
     record: { w: 0, l: 0, visits: 0 },
+    pcMessage: '',            // message perso du PC pour visiteurs (flag)
   };
 }
 
@@ -502,7 +503,7 @@ function baseCanPlace(st, slug, x, y, rot, opts) {
   const placedCount = st.items.filter((i) => baseItemGet(i.s) && baseItemGet(i.s).acq !== 'auto').length;
   if (def.acq !== 'auto' && placedCount >= BASE_ITEM_MAX_PLACED) return { ok: false, reason: 'base.err.max_placed' };
 
-  // Anti-blocage : l'entrée doit toujours rejoindre le spawn et chaque PNJ.
+  // Anti-blocage : l'entrée doit toujours rejoindre le spawn, le PC et chaque PNJ.
   const hypo = baseWithPlaced(st, { uid: -1, s: slug, x: px, y: py, rot });
   const grid2 = baseBuildGrid(hypo);
   if (def.layer !== 'wall') {
@@ -511,21 +512,32 @@ function baseCanPlace(st, slug, x, y, rot, opts) {
     if (sp && !reach.has(sp.x + ',' + sp.y)) return { ok: false, reason: 'base.err.blocks_spawn' };
     for (const n of hypo.npcs) {
       if (n.x == null) continue;
-      // un PNJ doit être joignable sur une case adjacente
       let okAdj = false;
       for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
         if (reach.has((n.x + dx) + ',' + (n.y + dy))) { okAdj = true; break; }
       }
       if (!okAdj) return { ok: false, reason: 'base.err.blocks_npc' };
     }
-    // Passe 40 (décision utilisateur) : le PC est déplaçable MAIS doit rester
-    // joignable à pied depuis l'ouverture — au moins une case VOISINE de son
-    // empreinte atteignable depuis l'arrivée (BFS sur l'état hypothétique).
+    // Vérifie que le PC reste accessible même quand on pose autre chose que le PC
+    const pcIt = hypo.items.find(i => i.s === 'pc');
+    if (pcIt) {
+      let pcAdj = false;
+      const pcDef = baseItemGet('pc');
+      const pcFp = pcDef ? baseItemFootprint(pcDef, pcIt.rot) : { w: 1, d: 1 };
+      for (let dy = -1; dy <= pcFp.d && !pcAdj; dy++) {
+        for (let dx = -1; dx <= pcFp.w && !pcAdj; dx++) {
+          if (dx >= 0 && dx < pcFp.w && dy >= 0 && dy < pcFp.d) continue;
+          if (reach.has((pcIt.x + dx) + ',' + (pcIt.y + dy))) pcAdj = true;
+        }
+      }
+      if (!pcAdj) return { ok: false, reason: 'base.err.pc_unreachable' };
+    }
+    // Ancien check spécifique PC (garde pour pose du PC lui-même, redondant mais explicite)
     if (slug === 'pc') {
       let adj = false;
       for (let dy = -1; dy <= fp.d && !adj; dy++) {
         for (let dx = -1; dx <= fp.w && !adj; dx++) {
-          if (dx >= 0 && dx < fp.w && dy >= 0 && dy < fp.d) continue; // dedans
+          if (dx >= 0 && dx < fp.w && dy >= 0 && dy < fp.d) continue;
           if (reach.has((px + dx) + ',' + (py + dy))) adj = true;
         }
       }
@@ -638,9 +650,10 @@ function basePcSpot(layout, st) {
 function baseRelocate(st, newLayoutId) {
   if (!baseLayoutGet(newLayoutId)) return { ok: false, reason: 'base.err.unknown' };
   baseClearAll(st);
-  // Les PNJ retournent dans le vivier (leurs définitions sont conservées).
-  for (const n of st.npcs) { n.x = null; n.y = null; st.npcStock.push(n); }
+  // Fix demandé : pas de sauvegarde des PNJ en stock qui bloquait le créateur
+  // On vide tout au déménagement
   st.npcs = [];
+  st.npcStock = [];
   st.layoutId = newLayoutId;
   st.spawn = null;
   // Objet AUTOMATIQUE canon : le PC (présent dans TOUTE base) est repositionné
@@ -692,6 +705,8 @@ function baseNpcAdd(st, def) {
 function baseNpcPlace(st, npcId, x, y) {
   const i = st.npcStock.findIndex((n) => n.id === npcId);
   if (i < 0) return { ok: false, reason: 'base.err.unknown' };
+  const layout = baseLayoutGet(st.layoutId);
+  if (!layout) return { ok: false, reason: 'base.err.no_base' };
   const grid = baseBuildGrid(st);
   const cell = baseCellAt(grid, x, y);
   // Occupée = occupant non marchable ; un PNJ peut se tenir sur un tapis.
@@ -705,6 +720,47 @@ function baseNpcPlace(st, npcId, x, y) {
     else if (typeof cur === 'number') free = baseCellWalkable(st, grid, x, y, null);
   }
   if (!free) return { ok: false, reason: 'base.err.occupied' };
+
+  // ——— Vérif accessibilité PC / PNJ (fix demandé) ————————————————
+  // On construit l'état hypothétique avec le PNJ posé et on vérifie que :
+  //  - le PC reste accessible (adjacence)
+  //  - chaque PNJ EXISTANT reste accessible (le nouveau peut être sur mezzanine non encore reliée, on l'autorise)
+  //  - le spawn reste atteignable
+  const npcSrc = st.npcStock[i];
+  const npcHypo = { ...npcSrc, x, y };
+  const hypo = {
+    ...st,
+    items: st.items,
+    npcs: st.npcs.concat([npcHypo]),
+  };
+  const grid2 = baseBuildGrid(hypo);
+  const reach = baseReachableSet(hypo, grid2, layout.spawn.x, layout.spawn.y);
+  const sp = st.spawn || layout.spawn;
+  if (sp && !reach.has(sp.x + ',' + sp.y)) return { ok: false, reason: 'base.err.blocks_spawn' };
+  // PC doit rester accessible
+  const pcIt = hypo.items.find(it => it.s === 'pc');
+  if (pcIt) {
+    let pcAdj = false;
+    const pcDef = baseItemGet('pc');
+    const pcFp = pcDef ? baseItemFootprint(pcDef, pcIt.rot) : { w:1, d:1 };
+    for (let dy=-1; dy<=pcFp.d && !pcAdj; dy++) {
+      for (let dx=-1; dx<=pcFp.w && !pcAdj; dx++) {
+        if (dx>=0 && dx<pcFp.w && dy>=0 && dy<pcFp.d) continue;
+        if (reach.has((pcIt.x+dx)+','+(pcIt.y+dy))) pcAdj = true;
+      }
+    }
+    if (!pcAdj) return { ok: false, reason: 'base.err.pc_unreachable' };
+  }
+  // PNJ existants doivent rester abordables (le nouveau peut être sur mezzanine)
+  for (const n of st.npcs) {
+    if (n.x == null) continue;
+    let okAdj = false;
+    for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) {
+      if (reach.has((n.x+dx)+','+(n.y+dy))) { okAdj = true; break; }
+    }
+    if (!okAdj) return { ok: false, reason: 'base.err.blocks_npc' };
+  }
+
   const npc = st.npcStock.splice(i, 1)[0];
   npc.x = x; npc.y = y;
   st.npcs.push(npc);
@@ -731,12 +787,17 @@ const BASE_NPC_MAX = 8;
 // fichiers trainer-N.png). On en expose une sélection variée ; l'identifiant
 // d'allure EST le nom du fichier, ce qui rend le rendu direct et sans cuisson.
 const BASE_NPC_SPRITES = [
-  'trainer-0', 'trainer-2', 'trainer-3', 'trainer-5', 'trainer-7', 'trainer-9',
-  'trainer-12', 'trainer-14', 'trainer-17', 'trainer-19', 'trainer-21', 'trainer-24',
-  'trainer-27', 'trainer-30', 'trainer-33', 'trainer-36', 'trainer-39', 'trainer-42',
-  'trainer-45', 'trainer-48', 'trainer-51', 'trainer-54', 'trainer-57', 'trainer-60',
-  'trainer-63', 'trainer-66', 'trainer-69', 'trainer-72', 'trainer-75', 'trainer-78',
-  'trainer-81', 'trainer-84', 'trainer-87', 'trainer-90', 'trainer-93', 'trainer-96',
+  'trainer-0','trainer-1','trainer-2','trainer-3','trainer-4','trainer-5','trainer-6','trainer-7','trainer-8','trainer-9',
+  'trainer-10','trainer-11','trainer-12','trainer-13','trainer-14','trainer-15','trainer-16','trainer-17','trainer-18','trainer-19',
+  'trainer-20','trainer-21','trainer-22','trainer-23','trainer-24','trainer-25','trainer-26','trainer-27','trainer-28','trainer-29',
+  'trainer-30','trainer-31','trainer-32','trainer-33','trainer-34','trainer-35','trainer-36','trainer-37','trainer-38','trainer-39',
+  'trainer-40','trainer-41','trainer-42','trainer-43','trainer-44','trainer-45','trainer-46','trainer-47','trainer-48','trainer-49',
+  'trainer-50','trainer-51','trainer-52','trainer-53','trainer-54','trainer-55','trainer-56','trainer-57','trainer-58','trainer-59',
+  'trainer-60','trainer-61','trainer-62','trainer-63','trainer-64','trainer-65','trainer-66','trainer-67','trainer-68','trainer-69',
+  'trainer-70','trainer-71','trainer-72','trainer-73','trainer-74','trainer-75','trainer-76','trainer-77','trainer-78','trainer-79',
+  'trainer-80','trainer-81','trainer-82','trainer-83','trainer-84','trainer-85','trainer-86','trainer-87','trainer-88','trainer-89',
+  'trainer-90','trainer-91','trainer-92','trainer-93','trainer-94','trainer-95','trainer-96','trainer-97','trainer-98','trainer-99',
+  'trainer-100',
 ];
 const BASE_NPC_SPRITE_DEFAULT = 'trainer-0';
 // Chemin du portrait d'une allure (identique côté rendu et côté UI).
@@ -752,7 +813,9 @@ function baseNpcFind(st, npcId) {
 }
 
 function baseNpcCount(st) {
-  return ((st.npcs || []).length + (st.npcStock || []).length);
+  // Fix demandé : on ne compte que les PNJ placés, le stock est vidé au chargement
+  // pour éviter la banque invisible qui bloquait le créateur (x0)
+  return ((st.npcs || []).length);
 }
 
 // Normalise une équipe saisie par le joueur → INSTANTANÉ GELÉ.
@@ -879,11 +942,15 @@ function baseSanitizeState(st) {
     }
   }
   for (const n of (Array.isArray(st.npcs) ? st.npcs : [])) {
-    if (!Array.isArray(n.team) || !n.team.length) continue;
-    if (n.x == null || !baseCellWalkable(clean, baseBuildGrid(clean), n.x, n.y, null)) { n.x = null; n.y = null; clean.npcStock.push(n); }
+    // Fix : on autorise les PNJ à équipe vide (décor) – ne pas les supprimer à la sanitization
+    if (!Array.isArray(n.team)) n.team = [];
+    if (n.x == null || !baseCellWalkable(clean, baseBuildGrid(clean), n.x, n.y, null)) { n.x = null; n.y = null; clean.npcs.push(n); }
     else clean.npcs.push(n);
   }
-  for (const n of (Array.isArray(st.npcStock) ? st.npcStock : [])) clean.npcStock.push(n);
+  // Fix demandé : pas de sauvegarde des PNJ en stock (banque invisible qui bloquait le créateur)
+  // On vide le stock à chaque chargement
+  clean.npcStock = [];
+  clean.pcMessage = (st.pcMessage || '').slice(0, 200);
   clean.uidSeq = Math.max(clean.uidSeq, (st.uidSeq | 0) || 1);
   clean.record = { w: (st.record && st.record.w | 0) || 0, l: (st.record && st.record.l | 0) || 0, visits: (st.record && st.record.visits | 0) || 0 };
   // passe 43 : pas de spawn personnalisé — toujours le marqueur 'S' (porte).

@@ -43,10 +43,8 @@ function rollCaptureIv(caughtMon){
 }
 
 function attemptAutoCatch(e){
- // BUG FIX historique : avant, G.pokedex[caught]=true était posé AVANT de tester alreadyOwned,
- // et speciesOwned() incluait le pokedex. Résultat : toute première capture était vue comme doublon,
- // rien n'était ajouté au PC/équipe -> boîte vide jusqu'au reload (bug introduit avec Hoenn).
- // On teste d'abord la possession réelle (team/box/hatchery/training) puis on met à jour le dex.
+ // Fix Hoenn : on vérifie la possession réelle AVANT de toucher au dex
+ // (avant on faisait pokedex=true puis speciesOwned() qui incluait le dex => doublon fantôme et boîte vide)
  const forcedShiny = !!(e && (e.shinyActive || e.shiny || e._forceShiny));
  const rolledShiny = forcedShiny ? true : (typeof rollShiny === 'function' ? !!rollShiny(e.id) : false);
  const wasShiny = forcedShiny || rolledShiny;
@@ -57,11 +55,7 @@ function attemptAutoCatch(e){
  }
  addBattleLog(tr("m.catch.6", {p0:e.name}));
 
- // --- 1) Détermine si doublon AVANT de toucher au dex ---
- const alreadyOwned = (typeof speciesOwnedInstance === 'function')
-   ? speciesOwnedInstance(e.id)
-   : (typeof speciesOwned === 'function' ? speciesOwned(e.id) && !!(G.collection && (G.collection[e.id] || Object.values(G.collection).some(p=>p&&Number(p.id)===Number(e.id)))) : false);
- // Pour être sûr : on check instance réelle sans pokedex
+ // 1) déjà possédé ? sans regarder le dex
  let alreadyOwnedReal = false;
  if(G){
    const nid = Number(e.id);
@@ -81,7 +75,7 @@ function attemptAutoCatch(e){
  }
  const isDuplicate = alreadyOwnedReal;
 
- // --- 2) Ensuite on ouvre le dex ---
+ // 2) maintenant on ouvre le dex
  G.pokedex[e.id]={...(G.pokedex[e.id]||{}),seen:true,caught:true};
 
  if(wasShiny) unlockShinyForSpecies(e.id);
@@ -109,7 +103,6 @@ function attemptAutoCatch(e){
  try{ if (typeof renderBattleSummary === 'function') { const m=document.getElementById('battle-summary-modal'); if(m&&m.classList.contains('open')) renderBattleSummary(); } }catch(_){}
 
  if(isDuplicate){
-   // Doublon : 10% chance +1 IV sur l'existant
    let existing = null;
    if (G.team) existing = G.team.find(x => x && Number(x.id) === Number(e.id));
    if (!existing) {
@@ -155,15 +148,8 @@ function attemptAutoCatch(e){
    if(el && typeof renderLocInfo === 'function') renderLocInfo(el);
  }catch(_){}
  try{ renderBattleTeamRow(); }catch(_){}
- // Rafraîchit la boîte visuellement sans forcer un reset brutal des filtres
- try{
-   if(typeof renderBox === 'function'){
-     const tabEl = document.getElementById('tab-content');
-     if(tabEl) renderBox(tabEl);
-   }
- }catch(_){}
- try{ if (typeof renderUnifiedGrid === 'function') renderUnifiedGrid(); }catch(_){}
- try{ if (typeof renderTeamWindow === 'function') renderTeamWindow(); }catch(_){}
+ try{ if(typeof _activeTab !== 'undefined' && _activeTab === 'team') showTab('team'); }catch(_){}
+ try{ if(typeof _activeTab !== 'undefined' && _activeTab === 'box') showTab('box'); }catch(_){}
  saveGame();
 }
 

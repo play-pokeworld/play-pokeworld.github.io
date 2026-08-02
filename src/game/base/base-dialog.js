@@ -312,10 +312,39 @@ function collectSecretBaseFlag(baseId) {
 }
 
 // ——— PC : panneau ORAS de capture de drapeaux et rangs ——————
+function getBasePcMessage(st) {
+  try {
+    const s = st || (typeof baseGetState === 'function' ? baseGetState() : null);
+    return (s && s.pcMessage) ? String(s.pcMessage).slice(0, 200) : '';
+  } catch(_) { return ''; }
+}
+function setBasePcMessage(msg) {
+  try {
+    const st = (typeof baseGetState === 'function') ? baseGetState() : null;
+    if (!st) return false;
+    st.pcMessage = String(msg || '').slice(0, 200);
+    if (typeof saveGame === 'function') saveGame(false);
+    if (typeof notify === 'function') notify((typeof t==='function'?t('base.pc.msg_saved'):'Message PC enregistre'), 'var(--green)');
+    return true;
+  } catch(_) { return false; }
+}
+function saveBasePcMessage() {
+  const input = document.getElementById('base-pc-msg-input');
+  const msg = input ? input.value : '';
+  setBasePcMessage(msg);
+  if (typeof baseDialogPc === 'function') baseDialogPc();
+}
+
 function baseDialogPc(res) {
   _baseDialog.kind = 'pc';
   const ed = (typeof baseEditorGet === 'function') ? baseEditorGet() : null;
-  const own = !!(ed && ed.visitOwn);
+  const isEditMode = !!(ed && ed.mode === 'edit');
+  const isOwnVisit = !!(ed && ed.visitOwn);
+  const own = isEditMode || isOwnVisit;
+  const ownSt = (typeof baseGetState === 'function') ? baseGetState() : null;
+  const visitSt = ed && ed.visit && ed.visit.st ? ed.visit.st : null;
+  const displaySt = own ? ownSt : (visitSt || ownSt);
+  const pcMsg = getBasePcMessage(displaySt);
   const flags = ensureSecretBaseFlags();
   const rank = getSecretBaseFlagRank();
   const bonuses = getSecretBaseBonuses();
@@ -406,6 +435,20 @@ function baseDialogPc(res) {
       `)}
     </div>`;
 
+  const pcMessageHtml = isEditMode ? `
+    <div class="pw-panel" style="background:rgba(83,157,223,0.12);border:1px solid rgba(83,157,223,0.25);border-radius:12px;padding:12px;margin-top:10px;">
+      <div style="font-weight:800;margin-bottom:6px;">💬 ${en ? 'PC Message for visitors' : 'Message PC pour visiteurs'}</div>
+      <div style="font-size:11px;color:var(--light1);margin-bottom:6px;">${en ? 'This message will be shown to players who take your flag.' : 'Ce message sera affiché aux joueurs qui prennent votre drapeau.'}</div>
+      <textarea id="base-pc-msg-input" maxlength="200" placeholder="${en ? 'Welcome to my base! Good luck!' : 'Bienvenue dans ma base ! Bonne visite !'}" style="width:100%;min-height:70px;background:rgba(0,0,0,0.3);border:1px solid rgba(236,222,183,0.2);border-radius:8px;color:var(--light2);padding:8px;resize:vertical;">${_bdEsc(pcMsg)}</textarea>
+      <div style="display:flex;gap:6px;margin-top:8px;"><button class="hbtn" data-action="legacy-call" data-call="saveBasePcMessage" data-call-args="">${en ? 'Save message' : 'Enregistrer message'}</button><span style="font-size:11px;color:var(--light1);align-self:center;">${pcMsg.length}/200</span></div>
+    </div>` : (pcMsg ? `
+    <div class="pw-panel" style="background:rgba(0,0,0,0.25);border:1px solid rgba(236,222,183,0.15);border-radius:12px;padding:12px;margin-top:10px;">
+      <div style="font-weight:800;margin-bottom:6px;">💬 ${en ? 'Owner\'s PC Message' : 'Message du propriétaire'}</div>
+      <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:10px;font-style:italic;color:var(--light2);">“${_bdEsc(pcMsg)}”</div>
+    </div>` : '');
+
+
+
   const stats = res && res.record
     ? `<div class="pw-row base-dlg-stats" style="margin-top: 8px;">
          <span>${_bdT('base.dlg.pc_visits')} <b>${res.record.visits | 0}</b></span>
@@ -419,7 +462,7 @@ function baseDialogPc(res) {
     + `<span class="modal-close" data-action="legacy-call" data-call="closeBaseDialog" data-call-args=""></span></div>`
     + stats
     + `<div id="base-pc-panel" class="base-dlg-panel">`
-    + flagCardHtml
+    + flagCardHtml + pcMessageHtml
     + `</div>`
     + `<div class="pw-btn-group">`
     + `<button class="hbtn pw-btn-cancel" data-action="legacy-call" data-call="closeBaseDialog" data-call-args="">${_bdT('base.dlg.close')}</button></div>`);
@@ -438,3 +481,6 @@ window.getSecretBaseRankLabel = getSecretBaseRankLabel;
 window.getSecretBaseRankDesc = getSecretBaseRankDesc;
 window.applySecretBaseMoneyBonus = applySecretBaseMoneyBonus;
 window.ORAS_FLAG_RANKS = ORAS_FLAG_RANKS;
+window.getBasePcMessage = getBasePcMessage;
+window.setBasePcMessage = setBasePcMessage;
+window.saveBasePcMessage = saveBasePcMessage;

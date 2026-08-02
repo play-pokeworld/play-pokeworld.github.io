@@ -38,18 +38,57 @@ function getBadgeDisplayTotal(){
  try{ regions = supportedRegions.filter(r => (typeof canAccessRegion === 'function') ? canAccessRegion(r) : r === 'kanto').length || 1; }catch(_){ regions = 1; }
  return regions * 8;
 }
+let _headerRaf = null;
+let _headerPending = false;
+function _flushHeaderWindows(){
+  _headerRaf = null;
+  _headerPending = false;
+  try{ renderTeamWindow(); }catch(_){}
+  try{ renderStoryWindow(); }catch(_){}
+  try{ renderHatcheryWindow(); }catch(_){}
+  try{ renderTrainingWindow(); }catch(_){}
+  try{ renderMineWindow(); }catch(_){}
+  try{ renderAutomationWindow(); }catch(_){}
+  try{ renderShortcutsWindow(); }catch(_){}
+}
 function updateHeader(){
- document.getElementById('h-money').textContent=G.money.toLocaleString();
- document.getElementById('h-badges').textContent=G.badges.length;
- const totalEl = document.getElementById('h-badges-total');
- if(totalEl) totalEl.textContent = getBadgeDisplayTotal();
- try{ renderTeamWindow(); }catch(_){}
- try{ renderStoryWindow(); }catch(_){}
- try{ renderHatcheryWindow(); }catch(_){}
- try{ renderTrainingWindow(); }catch(_){}
- try{ renderMineWindow(); }catch(_){}
- try{ renderAutomationWindow(); }catch(_){}
- try{ renderShortcutsWindow(); }catch(_){}
+  try{
+    const m = document.getElementById('h-money');
+    if(m) m.textContent = (G && typeof G.money === 'number') ? G.money.toLocaleString() : '0';
+    const b = document.getElementById('h-badges');
+    if(b) b.textContent = (G && Array.isArray(G.badges)) ? G.badges.length : 0;
+    const totalEl = document.getElementById('h-badges-total');
+    if(totalEl) totalEl.textContent = getBadgeDisplayTotal();
+  }catch(_){}
+  // RAF batch pour les fenêtres lourdes afin d'éviter tremblement à chaque KO
+  if(_headerPending) return;
+  _headerPending = true;
+  try{
+    if(typeof requestAnimationFrame === 'function'){
+      _headerRaf = requestAnimationFrame(_flushHeaderWindows);
+    } else {
+      _flushHeaderWindows();
+    }
+  }catch(_){
+    _flushHeaderWindows();
+  }
+}
+function updateHeaderImmediate(){
+  // Pour les cas où on veut forcer le refresh synchrone (ex: changement de lieu)
+  if(_headerRaf && typeof cancelAnimationFrame === 'function'){
+    try{ cancelAnimationFrame(_headerRaf); }catch(_){}
+  }
+  _headerRaf = null;
+  _headerPending = false;
+  try{
+    const m = document.getElementById('h-money');
+    if(m) m.textContent = (G && typeof G.money === 'number') ? G.money.toLocaleString() : '0';
+    const b = document.getElementById('h-badges');
+    if(b) b.textContent = (G && Array.isArray(G.badges)) ? G.badges.length : 0;
+    const totalEl = document.getElementById('h-badges-total');
+    if(totalEl) totalEl.textContent = getBadgeDisplayTotal();
+  }catch(_){}
+  _flushHeaderWindows();
 }
 
 
@@ -57,5 +96,6 @@ function updateHeader(){
 if (typeof getRoamingLegendaryForRoute !== 'undefined' && typeof window !== 'undefined') window.getRoamingLegendaryForRoute = getRoamingLegendaryForRoute;
 if (typeof getBadgeDisplayTotal !== 'undefined' && typeof window !== 'undefined') window.getBadgeDisplayTotal = getBadgeDisplayTotal;
 if (typeof updateHeader !== 'undefined' && typeof window !== 'undefined') window.updateHeader = updateHeader;
+if (typeof updateHeaderImmediate !== 'undefined' && typeof window !== 'undefined') window.updateHeaderImmediate = updateHeaderImmediate;
 
 

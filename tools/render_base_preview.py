@@ -239,7 +239,7 @@ SCENES = {
  },
  'tree_2': {
    'items': [('blue_poster', 2, 0, 0), ('solid_board', 3, 1, 0), ('small_desk', 1, 3, 0), 
-             ('mudkip_doll', 1, 3, 0), ('tire', 2, 10, 0), ('skitty_doll', 2, 10, 0), 
+             ('mudkip_doll', 1, 3, 0), ('tire', 4, 9, 0), ('skitty_doll', 4, 9, 0), 
              ('surf_mat', 1, 5, 0)],
    'npcs': [(4, 8)],
  },

@@ -174,11 +174,24 @@ window.L_en_base = {
 "quote_lose":"If they lose",
 "save":"Save",
 "back":"Back",
+"edit_sprite_hint":"Click sprite to change appearance",
+"sprite_picker_title":"Choose appearance",
+"sprite_picker_hint":"Click to change, closes automatically",
+"preset_picker_title":"Choose a team",
+"preset_picker_hint":"Click a team to import",
 "delete":"Delete this NPC",
 "delete_confirm":"Delete {name}? This cannot be undone.",
 "updated":"{name} updated.",
 "deleted":"{name} deleted.",
 "imported":"Team imported: {n} Pok\u00e9mon."
+},
+"pc":{
+"msg_saved":"PC message saved!",
+"msg_title":"PC Message",
+"msg_hint":"Message for visitors who take your flag",
+"msg_placeholder":"Welcome to my base! Have fun!",
+"msg_label":"Custom message",
+"edit_selected":"Edit PC"
 },
 
 "npc":{

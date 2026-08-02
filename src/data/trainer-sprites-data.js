@@ -3,7 +3,7 @@ const TRAINER_SPRITES = {
  brock:'Brock.png', misty:'Misty.png', surge:'Lt. Surge.png', erika:'Erika.png', koga:'Koga.png', sabrina:'Sabrina.png', blaine:'Blaine.png',
  falkner:'Falkner.png', bugsy:'Bugsy.png', whitney:'Whitney.png', morty:'Morty.png', chuck:'Chuck.png', jasmine:'Jasmine.png', pryce:'Pryce.png', clair:'Clair.png',
  lorelei:'Lorelei.png', bruno:'Bruno.png', agatha:'Agatha.png', lance:'Lance.png', will:'Will.png', karen:'Karen.png', sage:'Elder Li.png', scientist:'Super Nerd.png', atoll:'Ace Trainer (male).png', trainer:'Ace Trainer (male).png',
- blackbelt:'Black Belt.png', roxanne:'Lass.png', brawly:'Black Belt.png', wattson:'Gentleman.png', flannery:'Battle Girl.png', norman:'Veteran (male).png', winona:'Beauty.png', tate_liza:'Lady.png', juan:'Gentleman.png', hoenn_elite4:'Ace Trainer (male).png', steven:'Ace Trainer (male).png'
+ blackbelt:'Black Belt.png', roxanne:'Roxanne.png', brawly:'Brawly.png', wattson:'Wattson.png', flannery:'Flannery.png', norman:'Norman.png', winona:'Winona.png', tate_liza:'Tate & Liza.png', juan:'Juan.png', hoenn_elite4:'Drake.png', steven:'Steven.png'
 };
 const TRAINER_BATTLE_SPRITES = {
  kanto_rival_route22:'blue', kanto_rival_cerulean:'blue', kanto_rival_ssanne:'blue', kanto_rival_silph:'blue', kanto_rival_victory:'blue',
@@ -71,8 +71,20 @@ function staffSpriteImg(staffId, size=52){
  const fallbackKey = String(staffId || '').includes('miner') ? 'scientist' : 'trainer';
  return trainerSpriteImg(fallbackKey, size);
 }
+const HOENN_TRAINER_PROFILE_MAP = {
+  atoll: 5, trainer: 0,
+};
 function trainerSpriteImg(key, size=72){
  const spriteKey = getTrainerSpriteKey(key);
+ if (HOENN_TRAINER_PROFILE_MAP[spriteKey] != null) {
+  return trainerProfileImg(HOENN_TRAINER_PROFILE_MAP[spriteKey], size);
+ }
+ if ((spriteKey === 'trainer' || spriteKey === 'atoll') && key && key !== spriteKey) {
+  let hash = 0;
+  const s = String(key);
+  for (let i=0;i<s.length;i++) hash = (hash*31 + s.charCodeAt(i)) % 101;
+  return trainerProfileImg(hash, size);
+ }
  const file = TRAINER_SPRITES[spriteKey] || TRAINER_SPRITES.trainer;
  const safeFile = String(file).replace(/"/g, '&quot;').replace(/ /g, '%20').replace(/\(/g, '%28').replace(/\)/g, '%29');
  return `<img class="trainer-sprite-img" src="src/assets/images/trainers/npcs/${safeFile}" width="${size}" height="${size}" alt="${spriteKey}">`;

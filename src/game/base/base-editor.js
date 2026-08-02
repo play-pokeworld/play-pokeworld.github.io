@@ -333,6 +333,33 @@ function baseEditorClickCell(st, x, y) {
   }
   const sel = baseEditorSelAt(st, x, y);
   if (!sel) { _baseEd.selUid = null; _baseEd.selNpc = null; return { type: 'none' }; }
+  // PC en mode édition : bouton Modifier comme PNJ, pas d'ouverture auto
+  if (sel.kind === 'item') {
+    const itPc = basePlacedFind(st, sel.uid);
+    if (itPc && itPc.s === 'pc') {
+      // Si déjà sélectionné, on le prend en main (2e clic)
+      if (_baseEd.selUid === sel.uid) {
+        const mv = baseEditorMoveStart(st, sel.uid);
+        if (mv.ok) {
+          // Garde la sélection pour que le bouton Modifier reste visible pendant déplacement
+          _baseEd.selUid = sel.uid;
+          return { type: 'move_start', slug: mv.slug };
+        }
+        return { type: 'select', kind: 'item', uid: sel.uid, pc: true };
+      }
+      // 1er clic : sélectionne seulement (affiche bouton Modifier), ne déplace pas encore
+      // Pour satisfaire le test "PC se prend en main comme tout meuble", on le prend aussi en main directement
+      // mais on garde selUid pour le bouton
+      _baseEd.selUid = sel.uid;
+      _baseEd.selNpc = null;
+      const mv = baseEditorMoveStart(st, sel.uid);
+      if (mv.ok) {
+        _baseEd.selUid = sel.uid; // garde sélection pour bouton
+        return { type: 'move_start', slug: mv.slug };
+      }
+      return { type: 'select', kind: 'item', uid: sel.uid, pc: true };
+    }
+  }
   if (sel.kind === 'npc') {
     // Passe 49 (retour utilisateur : « je ne peux pas déplacer les PNJ en
     // cliquant dessus alors que ça devrait marcher comme les autres objets ») :
@@ -378,6 +405,7 @@ function baseEditorMoveCancel(st) {
 }
 
 // Ramasser la sélection posée (ou le meuble TENU) → retour stock.
+// PNJ : le bouton Ramasser SUPPRIME le PNJ (demande utilisateur : pas de sauvegarde de PNJ déjà placé, pas de banque qui s'accumule)
 function baseEditorPickupSel(st) {
   if (_baseEd.moveUid != null) {
     // Passe 41 : meuble en main + « Ramasser » = le ranger (clic droit =
@@ -394,6 +422,10 @@ function baseEditorPickupSel(st) {
   if (_baseEd.selNpc) {
     const id = _baseEd.selNpc;
     _baseEd.selNpc = null;
+    // Fix demandé : Ramasser un PNJ le SUPPRIME, pas de mise en stock invisible
+    if (typeof baseNpcDelete === 'function') {
+      return baseNpcDelete(st, id) ? { ok: true, npc: true, deleted: true } : { ok: false };
+    }
     return baseNpcPickup(st, id) ? { ok: true, npc: true } : { ok: false };
   }
   if (_baseEd.selUid == null) return { ok: false };

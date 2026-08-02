@@ -178,6 +178,10 @@ body { font-size: 13px; }
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   position: relative;
   z-index: 2;
+  min-height: 56px;
+}
+#header .hinfo {
+  min-width: 200px;
 }
 
 #header h1 {
@@ -751,8 +755,139 @@ body { font-size: 13px; }
   width: 90%;
   max-height: 85vh;
   overflow-y: auto;
+  overscroll-behavior: contain;
   box-shadow: 0 8px 32px rgba(0,0,0,0.6);
   color: var(--light2);
+}
+.preset-editor-modal #poke-modal-inner {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px 22px;
+  gap: 14px;
+  overscroll-behavior: contain;
+}
+#base-npced-team {
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: 58vh;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  background: rgba(0,0,0,0.08);
+  border-radius: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+#base-npced-team .poke-card {
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-bottom: 0;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+#base-npced-team .poke-card:hover {
+  z-index: 5;
+}
+#base-npced-team .poke-moves {
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+#preset-editor-body {
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: 62vh;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  background: rgba(0,0,0,0.08);
+  border-radius: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+#preset-editor-body .poke-card {
+  overflow: hidden;
+  flex-shrink: 0;
+  width: 100%;
+}
+.preset-row-idx {
+  padding: 0 18px 0 12px;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.preset-row {
+  padding: 12px 18px;
+  margin: 4px 6px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+}
+.preset-list {
+  padding: 14px 18px;
+  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+}
+.base-npc-looks {
+  max-height: 36vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid rgba(236,222,183,0.12);
+  border-radius: 10px;
+  background: rgba(0,0,0,0.12);
+}
+.base-npc-portrait-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--dark1);
+  border-radius: 12px;
+  background: var(--light1);
+  padding: 6px;
+  margin: 4px 12px 4px 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.base-npc-portrait-btn:hover {
+  border-color: var(--light2);
+  transform: scale(1.05);
+}
+.base-npc-portrait-edit {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--dark1);
+  color: var(--light2);
+  border-radius: 50%;
+  font-size: 12px;
+  border: 1px solid var(--light2);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.base-npc-portrait-btn:hover .base-npc-portrait-edit {
+  opacity: 1;
 }
 
 #settings-inner *, #quest-inner *, #confirm-inner *, #poke-modal-inner *, #battle-summary-inner * { color: var(--light2); }
@@ -1175,12 +1310,57 @@ body { font-size: 13px; }
   padding: 10px;
 }
 #battle-center-panel.win-body {
-  padding: 12px;
+  padding: 14px;
+  min-height: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+#battle-active-scene {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  gap: 10px;
+  min-height: 380px;
+}
+#battle-team-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 #col-2 { flex: 1.22; }
 #col-1, #col-3 { flex: 0.96; }
 #win-map { min-height: 360px; }
-#win-battle { min-height: 340px; }
+#win-battle { min-height: 480px; }
+#win-battle .win-body { min-height: 460px; }
+.battle-field {
+  min-height: 300px;
+  position: relative;
+  padding-bottom: 8px;
+}
+.poke-card {
+  min-height: 88px;
+  contain: layout style;
+}
+.poke-status, .poke-buffs {
+  min-height: 26px;
+}
+#battle-log {
+  min-height: 80px;
+  max-height: 100px;
+  overflow-y: auto;
+  overflow-anchor: none;
+}
+/* Fix tremblement : taille fixe + marge */
+#main-dashboard {
+  container-type: inline-size;
+}
+.dash-win {
+  contain: layout style;
+}
+.win-body {
+  will-change: auto;
+}
 .action-btn,
 .loc-npc-btn,
 .loc-action-btn,

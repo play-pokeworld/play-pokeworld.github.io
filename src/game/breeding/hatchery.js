@@ -931,7 +931,6 @@ function hatchEgg(slotIdx = 0) {
   updateHeader();
   renderTeamWindow();
   renderHatcheryWindow();
-  try { if (typeof renderBox === 'function') { const el=document.getElementById('tab-content'); if(el) renderBox(el); } } catch(_){}
   if (p && (p.shinyUnlocked || p.shinyActive || p.shiny)) {
     notify(tr('m.hatchery.2', { p0: p.name }), 'var(--light2)');
   } else {
@@ -999,7 +998,7 @@ function reviveFossil(fossilKey) {
     } else {
       notify(`${getPokeName(pokeId)} déjà possédé : pas de doublon, IV éventuel à 10%`, 'var(--light1)');
     }
-    saveGame(); updateHeader(); renderTeamWindow(); try { const el=document.getElementById('tab-content'); if(el && typeof renderBox==='function') renderBox(el); } catch(_){}
+    saveGame(); updateHeader(); renderTeamWindow();
     const el2 = document.getElementById('tab-content');
     if (el2 && _activeTab === 'fossil') renderFossilLab(el2);
     return;

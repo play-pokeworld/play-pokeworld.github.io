@@ -134,6 +134,7 @@ function installCriticalClickFallback(root) {
     'base-ed-rotate': function () { callGlobal('baseWindowRotateSel'); },
     'base-ed-pickup': function () { callGlobal('baseWindowPickupSel'); },
     'base-ed-npc-edit': function () { callGlobal('baseWindowEditSelectedNpc'); },
+    'base-ed-pc-edit': function () { callGlobal('baseWindowEditSelectedPc'); },
     'base-ed-select-npc-new': function () { callGlobal('baseWindowSelectNpcNew'); },
     'base-ed-visit': function () { callGlobal('baseWindowVisitToggle'); },
     'base-ed-export': function () { callGlobal('baseWindowExport'); },
@@ -211,6 +212,7 @@ function installCriticalClickFallback(root) {
     if (target.dataset.action === 'filter-bag') callGlobal('setInvSearch', target.value); // passe 26 : recherche du sac
     if (target.dataset.action === 'filter-preset-picker') callGlobal('presetPickerFilter', target.value); // passe 27 : recherche du sélecteur de preset
     if (target.dataset.action === 'filter-base-npc-picker') callGlobal('baseNpcPickerFilter', target.value); // passe 46 : recherche du sélecteur de copain
+    if (target.dataset.action === 'filter-base-npc-sprite') callGlobal('baseNpcEditorFilterSprite', target.value);
   });
 
   document.addEventListener('mousedown', function (event) {

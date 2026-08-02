@@ -431,12 +431,8 @@ function buySpecialFormPokemon(id, price){
   G.pokedex[id] = { ...(G.pokedex[id] || {}), seen: true, caught: true };
   if(isShiny) G.pokedex[id].shiny = true;
   if(typeof saveGame === 'function') saveGame();
-  // Force refresh de la boîte pour que Deoxys apparaisse sans reload (fix très gros problème)
-  try { if (typeof renderBox === 'function') { const el = document.getElementById('tab-content'); if (el) renderBox(el); } } catch(_){}
   try { if (typeof renderUnifiedGrid === 'function') renderUnifiedGrid(); } catch(_){}
   try { if (typeof renderTeamWindow === 'function') renderTeamWindow(); } catch(_){}
-  // Reset filtres boîte pour que nouveau Pokémon soit visible même si filtre actif
-  try { if (typeof resetBoxFilters === 'function') resetBoxFilters(); } catch(_){}
 
   const name = p.name || ('Pokemon #' + id);
   if(typeof notify === 'function') notify(name + ' a été ajouté directement dans votre Boîte PC ! (-' + price.toLocaleString() + '₽)', 'var(--green)');

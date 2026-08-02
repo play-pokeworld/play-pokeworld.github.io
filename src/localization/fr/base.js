@@ -174,11 +174,24 @@ window.L_fr_base = {
 "quote_lose":"S\u2019il perd",
 "save":"Enregistrer",
 "back":"Retour",
+"edit_sprite_hint":"Clique le sprite pour changer d'apparence",
+"sprite_picker_title":"Choisir une apparence",
+"sprite_picker_hint":"Clique un visuel pour changer, se ferme automatiquement",
+"preset_picker_title":"Choisir une équipe",
+"preset_picker_hint":"Clique une team pour importer",
 "delete":"Supprimer ce PNJ",
 "delete_confirm":"Supprimer {name} ? Cette action est d\u00e9finitive.",
 "updated":"{name} mis \u00e0 jour.",
 "deleted":"{name} supprim\u00e9.",
 "imported":"\u00c9quipe import\u00e9e : {n} Pok\u00e9mon."
+},
+"pc":{
+"msg_saved":"Message PC enregistré !",
+"msg_title":"Message du PC",
+"msg_hint":"Message pour les visiteurs qui prennent ton drapeau",
+"msg_placeholder":"Bienvenue dans ma base ! Amuse-toi bien !",
+"msg_label":"Message personnalisé",
+"edit_selected":"Modifier le PC"
 },
 
 "npc":{
