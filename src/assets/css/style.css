@@ -1791,3 +1791,30 @@ button[data-action].pw-loc-gym-btn:hover,
   font-size: 16px;
   padding: 4px 8px;
 }
+
+
+/* ── Unified Progress Bar Styling (Quests match Tutorial & Hatchery) ── */
+.quest-progress-container,
+.pw-progress-bar-sm.quest-progress-container {
+  height: 8px !important;
+  border-radius: 999px !important;
+  background: var(--dark1) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  overflow: hidden !important;
+  width: 100% !important;
+}
+.quest-progress-container .quest-progress-bar,
+.quest-progress-bar {
+  height: 100% !important;
+  width: var(--pct, 0%);
+  border-radius: 999px !important;
+  transition: width .3s ease, background .3s ease !important;
+}
+.quest-progress-bar.is-done,
+.quest-progress-container .quest-progress-bar.is-done {
+  background: var(--green) !important;
+}
+.quest-progress-bar:not(.is-done),
+.quest-progress-container .quest-progress-bar:not(.is-done) {
+  background: var(--blue) !important;
+}
