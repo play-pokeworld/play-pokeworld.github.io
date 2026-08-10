@@ -1,5 +1,5 @@
 // ===== FR — Base secrète =====
-window.L_fr_base = {
+export const L_fr_base = {
 "title":"Base Secrète",
 "export_done":"Base exportée en JSON !",
 "win":{
@@ -125,7 +125,7 @@ window.L_fr_base = {
 "import_npcs":"Liste de PNJ invalide.",
 "export":"Échec de l'export."
 },
-// Noms + répliques des PNJ (avant/victoire/défaite)
+// NPC names + quotes (before/victory/defeat)
 
 "dlg":{
 "npc_sub":"Rencontre",
@@ -331,3 +331,6 @@ window.L_fr_base = {
 }
 };
 
+// T2 (vague 38) : module ESM — export natif ; la surface classique est
+// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
+if (typeof globalThis !== 'undefined') globalThis.L_fr_base = L_fr_base;

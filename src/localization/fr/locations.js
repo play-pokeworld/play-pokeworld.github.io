@@ -1,6 +1,6 @@
-// ===== FR — Noms des lieux (toutes régions) =====
+// ===== FR — Location names (all regions) =====
 
-window.L_location_names_fr = {
+export const L_location_names_fr = {
   "abandoned_ship": "Épave",
   "ancient_tomb": "Tombeau Antique (Registeel)",
   "aqua_hideout": "Planque Aqua",
@@ -177,3 +177,7 @@ window.L_location_names_fr = {
   "weather_institute": "Centre Météo",
   "whirlislands": "Tourb'Îles"
 };
+
+// T2 (vague 38) : module ESM — export natif ; la surface classique est
+// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
+if (typeof globalThis !== 'undefined') globalThis.L_location_names_fr = L_location_names_fr;

@@ -1,7 +1,9 @@
-// ─── Équipes Officielles Hoenn (RSE) — Arènes & Ligue ───
-// Stratégiques, même difficulté que Kanto (RFVF) et Johto (OAC)
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
+// ─── Hoenn Official Teams (RSE) — Gyms & League ───
+// Strategic, same difficulty as Kanto (FRLG) and Johto (HGSS)
 
-var OFFICIAL_TEAMS_HOENN = {
+export var OFFICIAL_TEAMS_HOENN = {
   hoenn_poochyena_route101: {
     id: 'hoenn_poochyena_route101', kind: 'quest', region: 'hoenn',
     name: 'Medhyèna sauvage', title: 'Pokémon sauvage',
@@ -123,7 +125,7 @@ var OFFICIAL_TEAMS_HOENN = {
     ]
   },
 
-  // Conseil 4 et Maître
+  // Elite Four and Champion
   sidney: {
     id: 'sidney', kind: 'league', region: 'hoenn',
     name: 'Damien (Conseil 4 Hoenn)', title: 'Conseil 4 Ténèbres',
@@ -192,9 +194,8 @@ var OFFICIAL_TEAMS_HOENN = {
   }
 };
 
-if (typeof window !== 'undefined') {
-  window.OFFICIAL_TEAMS_HOENN = OFFICIAL_TEAMS_HOENN;
-}
+// Wave 40 — surface kept (window → globalThis block, same scope).
+if (typeof globalThis !== 'undefined') globalThis.OFFICIAL_TEAMS_HOENN = OFFICIAL_TEAMS_HOENN;
 if (typeof OFFICIAL_TEAMS !== 'undefined' && OFFICIAL_TEAMS && typeof OFFICIAL_TEAMS_HOENN !== 'undefined') {
   Object.assign(OFFICIAL_TEAMS, OFFICIAL_TEAMS_HOENN);
 }

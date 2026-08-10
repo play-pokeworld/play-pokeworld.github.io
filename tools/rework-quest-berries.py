@@ -1,26 +1,26 @@
 #!/usr/bin/env python3
-"""Passe 53 — retire la Poussière Étoile de TOUTES les quêtes.
+"""Passe 53 — removes Star Dust from ALL quests.
 
-Retour utilisateur : « supprime de toutes les quêtes les poussières d'Étoile,
-et donne à la place (dans certaines, pas toutes) une seule baie random parmi
-toutes les baies (pas à chaque fois la même) par quête. »
+User request: "remove the Star Dusts from all quests, and give instead
+(in some, not all) a single random berry among all the berries (not the
+same one every time) per quest."
 
-Contexte (diagnostic de la passe 52) : à la passe 27 les Baies Oran/Sitrus/
-Ceriz avaient été supprimées et leurs 58 récompenses converties en Poussière
-Étoile À QUANTITÉ ÉGALE — sauf qu'une baie ne valait rien et qu'une poussière
-se revend 2 000 ₽. Résultat : 104 poussières = 208 000 ₽, soit +32 % sur les
-649 900 ₽ de toutes les quêtes réunies.
+Context (passe 52 diagnostic): at passe 27 the Oran/Sitrus/Ceriz Berries
+had been removed and their 58 rewards converted into Star Dust AT EQUAL
+QUANTITY — except a berry was worthless while a dust resells for 2,000 ₽.
+Result: 104 dusts = 208,000 ₽, i.e. +32% on top of the 649,900 ₽ of all
+quests combined.
 
-Règle appliquée ici :
-  · plus AUCUNE quête ne donne de poussière ;
-  · ~60 % des quêtes concernées reçoivent UNE baie (quantité 1) ;
-  · les ~40 % restantes gardent seulement leur argent ;
-  · la baie est tirée parmi les 18 du jeu, avec un PRNG DÉTERMINISTE semé par
-    l'id de la quête (rejouable, testable) et un anti-répétition qui interdit
-    deux fois la même baie d'affilée et lisse la distribution.
+Rule applied here:
+  · NO quest gives dust anymore;
+  · ~60% of the affected quests receive ONE berry (quantity 1);
+  · the remaining ~40% keep only their money;
+  · the berry is drawn among the game's 18, with a DETERMINISTIC PRNG seeded
+    by the quest id (replayable, testable) and an anti-repeat rule that bans
+    the same berry twice in a row and smooths the distribution.
 
-Les textes FR/EN (`rewardDesc`) sont resynchronisés : ils annonçaient encore
-« 2 Baies Oran » alors que le jeu versait 2 poussières.
+The FR/EN texts (`rewardDesc`) are resynchronized: they still announced
+"2 Oran Berries" while the game granted 2 dusts.
 """
 import json
 import os
@@ -43,7 +43,7 @@ def load_names():
     for key in BERRIES:
         blk = re.search(r'"%s":\s*\{(.*?)\n  \}' % key, js, re.S)
         if not blk:
-            raise SystemExit('baie inconnue dans ITEMS : ' + key)
+            raise SystemExit('unknown berry in ITEMS: ' + key)
         fr = re.search(r'"name_fr":\s*"([^"]+)"', blk.group(1))
         en = re.search(r'"name_en":\s*"([^"]+)"', blk.group(1))
         NAME_FR[key] = fr.group(1)
@@ -51,7 +51,7 @@ def load_names():
 
 
 def prng(seed):
-    """mulberry32 — déterministe et portable (même famille que le jeu)."""
+    """mulberry32 — deterministic and portable (same family as the game)."""
     state = seed & 0xFFFFFFFF
 
     def nxt():
@@ -71,14 +71,14 @@ def main():
     sd = os.path.join(ROOT, 'src', 'data', 'side-quests-data.js')
     src = {p: open(p).read() for p in (sq, sd)}
 
-    # ordre stable : on parcourt les quêtes dans l'ordre d'apparition
-    targets = []          # (fichier, position, id, quantité de poussière)
+    # stable order: scan the quests in order of appearance
+    targets = []          # (file, position, id, dust quantity)
     for p in (sq, sd):
         for m in re.finditer(r'"stardust":\s*(\d+)', src[p]):
             targets.append((p, m.start(), int(m.group(1))))
 
     rnd = prng(0x50 * 53)      # graine fixe → tirage rejouable
-    recent = []                # anti-répétition (fenêtre glissante)
+    recent = []                # anti-repetition (sliding window)
     plan = {}                  # (fichier, position) -> baie | None
     given = 0
     for (p, pos, _qty) in targets:
@@ -93,14 +93,14 @@ def main():
         plan[(p, pos)] = pick
         given += 1
 
-    # réécriture (de la fin vers le début : les positions restent valides)
+    # rewrite (from end to start: positions stay valid)
     counts = {}
     for p in (sq, sd):
         s = src[p]
         for m in reversed(list(re.finditer(r'"stardust":\s*(\d+)', s))):
             pick = plan[(p, m.start())]
             if pick is None:
-                # supprime l'entrée ET la virgule qui la précède si besoin
+                # delete the entry AND the preceding comma if needed
                 a, b = m.start(), m.end()
                 before = s[:a].rstrip()
                 after = s[b:].lstrip()
@@ -114,12 +114,12 @@ def main():
                 counts[pick] = counts.get(pick, 0) + 1
         open(p, 'w').write(s)
 
-    # ── textes FR/EN : resynchronisation des rewardDesc ───────────────────
+    # ── FR/EN texts: rewardDesc resynchronization ───────────────────
     for lang, names in (('fr', NAME_FR), ('en', NAME_EN)):
         lp = os.path.join(ROOT, 'src', 'localization', lang, 'quests.js')
         txt = open(lp).read()
-        # « 400₽ + 1 Baie Oran » / « 400₽ + 1 Oran Berry » → argent seul,
-        # puis on rajoutera la baie réellement donnée plus bas.
+        # "400₽ + 1 Baie Oran" / "400₽ + 1 Oran Berry" -> money only,
+        # then we will re-add the actually given berry below.
         if lang == 'fr':
             txt = re.sub(r'\s*\+\s*\d+\s+Baies?\s+\w+', '', txt)
             txt = re.sub(r'\s*\+\s*\d+\s+Poussières?\s+Étoiles?', '', txt)
@@ -128,11 +128,11 @@ def main():
             txt = re.sub(r'\s*\+\s*\d+\s+Stardust', '', txt)
         open(lp, 'w').write(txt)
 
-    print('quêtes touchées      :', len(targets))
-    print('avec une baie        :', given)
-    print('argent seul          :', len(targets) - given)
-    print('baies distinctes     :', len(counts), '/', len(BERRIES))
-    print('distribution         :', dict(sorted(counts.items(), key=lambda kv: -kv[1])))
+    print('quests affected       :', len(targets))
+    print('with a berry          :', given)
+    print('money only            :', len(targets) - given)
+    print('distinct berries      :', len(counts), '/', len(BERRIES))
+    print('distribution          :', dict(sorted(counts.items(), key=lambda kv: -kv[1])))
 
 
 if __name__ == '__main__':

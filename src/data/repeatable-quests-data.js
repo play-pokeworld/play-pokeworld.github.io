@@ -1,3 +1,5 @@
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
 var REPEATABLE_QUESTS = [
  {
   "id": "r1",
@@ -41,7 +43,7 @@ var REPEATABLE_QUESTS = [
   "target": 8,
   "rewardMoney": 12000
  },
- // ── Passe 21 : répétables Kanto diversifiées par lieu (r7-r14) ──
+ // ── Phase 21: repeatable Kanto quests diversified by location (r7-r14) ──
  {
   "id": "r7",
   "icon": "",
@@ -177,6 +179,12 @@ var REPEATABLE_QUESTS = [
 
 
 // --- Migrated to ES module, globals exposed ---
-if (typeof REPEATABLE_QUESTS !== 'undefined' && typeof window !== 'undefined') window.REPEATABLE_QUESTS = REPEATABLE_QUESTS;
+if (typeof REPEATABLE_QUESTS !== 'undefined') { if (typeof window !== 'undefined') window.REPEATABLE_QUESTS = REPEATABLE_QUESTS; if (typeof globalThis !== 'undefined') globalThis.REPEATABLE_QUESTS = REPEATABLE_QUESTS; }
 
 
+
+// Wave 40 — native ESM module: grouped export of the same names as the
+// classic surface kept above/here (bodies unchanged).
+export {
+  REPEATABLE_QUESTS,
+};

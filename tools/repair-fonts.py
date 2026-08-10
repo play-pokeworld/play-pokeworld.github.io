@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
-"""Passe 46 — RÉPARATION des polices `src/assets/font/*.ttf`.
+"""Passe 46 — REPAIR of the `src/assets/font/*.ttf` fonts.
 
-Symptôme signalé par l'utilisateur (console du navigateur) :
+Symptom reported by the user (browser console):
     Failed to decode downloaded font: .../WinkySans.ttf
     OTS parsing error: GDEF: table length exceeds 1GB
 
-Cause : comme tous les binaires du projet, les .ttf ont traversé l'archive
-texte (code2prompt) et ont été ré-encodés en UTF-8. Le magic `00010000` en
-tête survit — d'où l'illusion d'un fichier valide — mais le RÉPERTOIRE DE
-TABLES est détruit : 13 tables cassées sur 15 dans Megrim, 15 sur 17 dans
-WinkySans (offsets/longueurs aberrants, d'où le « exceeds 1GB » d'OTS).
+Cause: like all project binaries, the .ttf files went through the text
+archive (code2prompt) and were re-encoded as UTF-8. The `00010000` magic
+at the start survives — hence the illusion of a valid file — but the TABLE
+DIRECTORY is destroyed: 13 tables broken out of 15 in Megrim, 15 out of 17
+in WinkySans (absurd offsets/lengths, hence OTS's "exceeds 1GB").
 
-Ce script re-télécharge les deux polices depuis Google Fonts (leur source
-d'origine) et VALIDE la structure avant d'écrire : magic sfnt correct + chaque
-table entièrement contenue dans le fichier.
+This script downloads both fonts again from Google Fonts (their original
+source) and VALIDATES the structure before writing: correct sfnt magic +
+every table fully contained in the file.
 
-Idempotent : une police déjà valide n'est pas retéléchargée (sauf `--force`).
-Usage : python3 tools/repair-fonts.py [--force]
+Idempotent: an already valid font is not downloaded again (unless `--force`).
+Usage: python3 tools/repair-fonts.py [--force]
 """
 from __future__ import annotations
 
@@ -30,13 +30,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 FONTS = ROOT / 'src' / 'assets' / 'font'
-# NB : User-Agent VOLONTAIREMENT non-navigateur. L'API CSS2 de Google Fonts
-# négocie le format selon le client : woff2 pour un navigateur moderne, et une
-# URL /l/font sans extension pour un très vieux MSIE. Un UA neutre type curl
-# est le seul qui renvoie une vraie URL `.ttf` — le format livré ici.
+# NB: DELIBERATELY non-browser User-Agent. The Google Fonts CSS2 API
+# negotiates the format per client: woff2 for a modern browser, and an
+# extension-less /l/font URL for a very old MSIE. A neutral curl-like UA
+# is the only one returning a real `.ttf` URL — the format shipped here.
 UA = 'curl/7.68.0'
 
-# fichier livré -> famille Google Fonts
+# shipped file -> Google Fonts family
 FAMILIES = {
     'Megrim-Regular.ttf': 'Megrim',
     'WinkySans.ttf': 'Winky Sans',
@@ -44,8 +44,8 @@ FAMILIES = {
 
 
 def font_is_valid(data: bytes) -> bool:
-    """Vrai si le sfnt est cohérent : magic connu + toutes les tables tiennent
-    dans le fichier (c'est exactement ce que vérifie OTS côté navigateur)."""
+    """True if the sfnt is coherent: known magic + all tables fit
+    in the file (exactly what OTS checks in the browser)."""
     if len(data) < 12:
         return False
     if data[:4] not in (b'\x00\x01\x00\x00', b'OTTO', b'true', b'ttcf'):
@@ -77,8 +77,8 @@ def get(url: str) -> bytes | None:
 
 
 def ttf_url(family: str) -> str | None:
-    """L'API CSS2 de Google Fonts renvoie l'URL directe du .ttf quand on se
-    présente sans support woff2 (User-Agent générique)."""
+    """The Google Fonts CSS2 API returns the direct .ttf URL when the
+    client presents itself without woff2 support (generic User-Agent)."""
     css = get('https://fonts.googleapis.com/css2?family='
               + urllib.parse.quote(family) + '&display=swap')
     if not css:
@@ -103,7 +103,7 @@ def main() -> int:
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_bytes(data)
         fixed.append(f'{name} ({len(data)} o.)')
-    print(f'polices : {len(fixed)} réparée(s), {len(ok)} déjà valide(s), {len(failed)} échec(s)')
+    print(f'fonts: {len(fixed)} repaired, {len(ok)} already valid, {len(failed)} failure(s)')
     for f in fixed:
         print('  ✔', f)
     for f in failed:

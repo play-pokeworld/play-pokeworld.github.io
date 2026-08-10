@@ -1,7 +1,7 @@
 // ===== EN — ECONOMY strings =====
 // Auto-extracted & grouped by domain. Edit text here, never hardcode in logic.
 
-window.L_en_economy = {
+export const L_en_economy = {
 "already_eq":"Already equipped",
 "already_held":"Already held by",
 "already_owned_sp":"Species owned",
@@ -35,5 +35,6 @@ window.L_en_economy = {
 "will_replace":"(will replace current item)",
 };
 
-
-
+// T2 (vague 38) : module ESM — export natif ; la surface classique est
+// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
+if (typeof globalThis !== 'undefined') globalThis.L_en_economy = L_en_economy;

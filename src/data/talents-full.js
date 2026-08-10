@@ -1,3 +1,5 @@
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
 const TALENTS_FULL = {
   hydratation: { name: 'Hydration', rarity: 1, info: 'Prevents negative status effects while on rainy weather', types: ["water","grass"] },
   sandveil: { name: 'SandVeil', rarity: 1, info: 'Increases evasion by 20%', types: ["ground"] },
@@ -212,8 +214,16 @@ function getRarityLabel(rarity) {
 
 
 // --- Migrated to ES module, globals exposed ---
-if (typeof getTalentInfo !== 'undefined' && typeof window !== 'undefined') window.getTalentInfo = getTalentInfo;
-if (typeof getRarityLabel !== 'undefined' && typeof window !== 'undefined') window.getRarityLabel = getRarityLabel;
-if (typeof TALENTS_FULL !== 'undefined' && typeof window !== 'undefined') window.TALENTS_FULL = TALENTS_FULL;
+if (typeof getTalentInfo !== 'undefined') { if (typeof window !== 'undefined') window.getTalentInfo = getTalentInfo; if (typeof globalThis !== 'undefined') globalThis.getTalentInfo = getTalentInfo; }
+if (typeof getRarityLabel !== 'undefined') { if (typeof window !== 'undefined') window.getRarityLabel = getRarityLabel; if (typeof globalThis !== 'undefined') globalThis.getRarityLabel = getRarityLabel; }
+if (typeof TALENTS_FULL !== 'undefined') { if (typeof window !== 'undefined') window.TALENTS_FULL = TALENTS_FULL; if (typeof globalThis !== 'undefined') globalThis.TALENTS_FULL = TALENTS_FULL; }
 
 
+
+// Wave 40 — native ESM module: grouped export of the same names as the
+// classic surface kept above/here (bodies unchanged).
+export {
+  getTalentInfo,
+  getRarityLabel,
+  TALENTS_FULL,
+};

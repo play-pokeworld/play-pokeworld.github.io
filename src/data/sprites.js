@@ -1,3 +1,5 @@
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
 const SPRITE_DATA = {
  front: {
 "1":"src/assets/images/pokemon/front/bulbasaur.png",
@@ -1050,8 +1052,29 @@ const DEX_MAP = {
 
 
 // --- Migrated to ES module, globals exposed ---
-if (typeof DEX_MAP !== 'undefined' && typeof window !== 'undefined') window.DEX_MAP = DEX_MAP;
-if (typeof SPRITE_DATA !== 'undefined' && typeof window !== 'undefined') window.SPRITE_DATA = SPRITE_DATA;
-if (typeof ITEM_SPRITE_DATA !== 'undefined' && typeof window !== 'undefined') window.ITEM_SPRITE_DATA = ITEM_SPRITE_DATA;
+function getPokemonSpriteUrl(id, shiny = false) {
+  var num = String(id);
+  if (typeof DEX_MAP !== 'undefined' && DEX_MAP && DEX_MAP[num]) {
+    num = String(DEX_MAP[num]);
+  }
+  var bucket = shiny ? 'frontShiny' : 'front';
+  if (typeof SPRITE_DATA !== 'undefined' && SPRITE_DATA && SPRITE_DATA[bucket] && SPRITE_DATA[bucket][num]) {
+    return SPRITE_DATA[bucket][num];
+  }
+  return `src/assets/images/pokemon/${bucket}/${num}.png`;
+}
+if (typeof getPokemonSpriteUrl !== 'undefined') { if (typeof window !== 'undefined') window.getPokemonSpriteUrl = getPokemonSpriteUrl; if (typeof globalThis !== 'undefined') globalThis.getPokemonSpriteUrl = getPokemonSpriteUrl; }
+if (typeof DEX_MAP !== 'undefined') { if (typeof window !== 'undefined') window.DEX_MAP = DEX_MAP; if (typeof globalThis !== 'undefined') globalThis.DEX_MAP = DEX_MAP; }
+if (typeof SPRITE_DATA !== 'undefined') { if (typeof window !== 'undefined') window.SPRITE_DATA = SPRITE_DATA; if (typeof globalThis !== 'undefined') globalThis.SPRITE_DATA = SPRITE_DATA; }
+if (typeof ITEM_SPRITE_DATA !== 'undefined') { if (typeof window !== 'undefined') window.ITEM_SPRITE_DATA = ITEM_SPRITE_DATA; if (typeof globalThis !== 'undefined') globalThis.ITEM_SPRITE_DATA = ITEM_SPRITE_DATA; }
 
 
+
+// Wave 40 — native ESM module: grouped export of the same names as the
+// classic surface kept above/here (bodies unchanged).
+export {
+  getPokemonSpriteUrl,
+  DEX_MAP,
+  SPRITE_DATA,
+  ITEM_SPRITE_DATA,
+};

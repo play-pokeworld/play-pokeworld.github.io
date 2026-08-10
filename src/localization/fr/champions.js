@@ -1,5 +1,5 @@
 // ===== FR — Gym Leader / Champion names & titles =====
-window.L_fr_champions = {
+export const L_fr_champions = {
 "brock": {"name":"Pierre","title":"Champion Arène Argenta","badgeName":"Badge Roche"},
 "misty": {"name":"Ondine","title":"Championne Arène Azuria","badgeName":"Badge Cascade"},
 "surge": {"name":"Major Bob","title":"Champion Arène Carmin sur Mer","badgeName":"Badge Foudre"},
@@ -18,7 +18,7 @@ window.L_fr_champions = {
 "jasmine": {"name":"Jasmine","title":"Championne Arène Oliville","badgeName":"Badge Minéral"},
 "pryce": {"name":"Frédo","title":"Champion Arène Acajou","badgeName":"Badge Glacier"},
 "clair": {"name":"Sandra","title":"Championne Arène Ébénelle","badgeName":"Badge Lever"},
-// Étapes des ligues (passe 19) — noms/titres affichés pendant le gauntlet
+// League steps (phase 19) — names/titles shown during the gauntlet
 "lorelei": {"name":"Olga","title":"Conseil 4 — Glace & Eau"},
 "bruno": {"name":"Aldo","title":"Conseil 4 — Combat & Roche"},
 "agatha": {"name":"Agatha","title":"Conseil 4 — Spectre & Poison"},
@@ -45,5 +45,6 @@ window.L_fr_champions = {
   "hoenn_elite4": {"name":"Ligue Hoenn","title":"Ligue Hoenn","badgeName":"Titre de Maître Hoenn"},
 };
 
-
-
+// T2 (vague 38) : module ESM — export natif ; la surface classique est
+// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
+if (typeof globalThis !== 'undefined') globalThis.L_fr_champions = L_fr_champions;

@@ -2,8 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { harnessIsEsm, harnessBundleSource } from '../tools/harness-bundle.mjs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { computeRequiredHatchKos } from '../src/domain/breeding/hatchery-rules.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
@@ -51,12 +53,18 @@ function loadCollectionSandbox(extra = {}) {
     ...extra,
   };
   sandbox.window = sandbox;
+  sandbox.computeRequiredHatchKos = computeRequiredHatchKos; // hatchery rule port (wave 33)
   vm.createContext(sandbox);
-  vm.runInContext(R('src/game/world/collection.js'), sandbox, { filename: 'collection.js' });
+  // Vague 41 — hybride individuelle (collection ESM = bundle isolé, globales via shim).
+  {
+    const f = 'src/application/world/collection.js';
+    const src = R(f);
+    vm.runInContext(harnessIsEsm(src) ? harnessBundleSource([f]) : src, sandbox, { filename: 'collection.js' });
+  }
   return sandbox;
 }
 
-test('passe 46 A : taux shiny de base 1/4096 sans charme régional', () => {
+test('phase 46 A: base shiny rate 1/4096 without regional charm', () => {
   const sb = loadCollectionSandbox();
   assert.ok(Math.abs(sb.getShinyRateForSpecies(25) - 1/4096) < 1e-12);
   sb.Math.random = () => 0.999;
@@ -66,7 +74,7 @@ test('passe 46 A : taux shiny de base 1/4096 sans charme régional', () => {
   assert.equal(sb.rollShiny(25), true);
 });
 
-test('passe 46 B : Charme Chroma régional — 1/2048 seulement si dex de la région OK', () => {
+test('phase 46 B: regional Shiny Charm — 1/2048 only if the region\'s dex is OK', () => {
   const sb = loadCollectionSandbox({
     G: {
       inventory: { shiny_charm: 1 },
@@ -76,13 +84,13 @@ test('passe 46 B : Charme Chroma régional — 1/2048 seulement si dex de la ré
   });
   // Kanto species (#25) → 1/2048
   assert.ok(Math.abs(sb.getShinyRateForSpecies(25) - 1/2048) < 1e-12, 'Kanto + charme + dex = 1/2048');
-  // Hoenn species (#252) sans dex hoenn → 1/4096
-  assert.ok(Math.abs(sb.getShinyRateForSpecies(252) - 1/4096) < 1e-12, 'Hoenn sans dex 100% = 1/4096');
-  // Sans espèce → base
+  // Hoenn species (#252) without hoenn dex → 1/4096
+  assert.ok(Math.abs(sb.getShinyRateForSpecies(252) - 1/4096) < 1e-12, 'Hoenn without 100% dex = 1/4096');
+  // Without species → base
   assert.ok(Math.abs(sb.getShinyRateForSpecies(null) - 1/4096) < 1e-12);
 });
 
-test('passe 46 C : syncShinyCharmProgress débloque le charme au 1er dex 100%', () => {
+test('phase 46 C: syncShinyCharmProgress unlocks the charm at the 1st 100% dex', () => {
   const sb = loadCollectionSandbox({
     G: {
       inventory: {},
@@ -99,32 +107,32 @@ test('passe 46 C : syncShinyCharmProgress débloque le charme au 1er dex 100%', 
   assert.equal(res.newly[0], 'kanto');
 });
 
-test('passe 46 D : drapeaux ORAS — aucun shinyBonus, moneyMult plafonné', () => {
-  const src = R('src/game/base/base-dialog.js');
-  assert.ok(src.includes("shinyBonus: 0"), 'tous les rangs shinyBonus 0');
+test('phase 46 D: ORAS flags — no shinyBonus, moneyMult capped', () => {
+  const src = R('src/ui/game/base/base-dialog.js');
+  assert.ok(src.includes("shinyBonus: 0"), 'all ranks shinyBonus 0');
   assert.ok(!src.includes('shinyBonus: 1') && !src.includes('shinyBonus: 2'), 'plus de +1/+2 shiny');
-  assert.ok(src.includes('moneyMult: 1.08') || src.includes('moneyMult: 1.05'), 'argent modéré');
+  assert.ok(src.includes('moneyMult: 1.08') || src.includes('moneyMult: 1.05'), 'moderate money');
   assert.ok(src.includes('dropBonus'), 'bonus butin de route');
-  assert.ok(src.includes('applySecretBaseMoneyBonus'), 'helper argent exposé');
+  assert.ok(src.includes('applySecretBaseMoneyBonus'), 'money helper exposed');
   assert.ok(src.includes('24 * 3600 * 1000'), 'cooldown 24h');
 });
 
-test('passe 46 E : Charme Chroma retiré de la quête Safari (id 60)', () => {
+test('phase 46 E: Shiny Charm removed from the Safari quest (id 60)', () => {
   const src = R('src/data/story-quests.js');
   // Find quest 60 block
   const m = src.match(/"id"\s*:\s*60[\s\S]{0,400}/);
-  assert.ok(m, 'quête 60 présente');
-  assert.ok(!m[0].includes('shiny_charm'), 'plus de shiny_charm en récompense de la quête 60');
+  assert.ok(m, 'quest 60 present');
+  assert.ok(!m[0].includes('shiny_charm'), 'no more shiny_charm as quest 60 reward');
 });
 
-test('passe 46 F : module explorations à énigmes présent et cohérent', () => {
-  const src = R('src/game/world/puzzle-explorations.js');
+test('phase 46 F: puzzle-exploration module present and coherent', () => {
+  const src = R('src/application/world/puzzle-explorations.js');
   assert.ok(src.includes('PUZZLE_EXPLORATIONS'));
   assert.ok(src.includes('regirock_seal') || src.includes('regirock_braille'));
   assert.ok(src.includes('alph_panel_escape') || src.includes('alph_chamber_a') || src.includes('alph_unown_circle') || src.includes('alph_mirror_path'));
   assert.ok(src.includes('submitPuzzleAnswer'));
-  const loader = R('src/loader.js');
-  assert.ok(loader.includes('puzzle-explorations.js'), 'chargé par loader.js');
+  const loader = R('src/main.js');
+  assert.ok(loader.includes('puzzle-explorations.js'), 'loaded by src/main.js');
   // locations regi
   const hoenn = R('src/data/locations-hoenn.js');
   assert.ok(hoenn.includes('desert_ruins'));
@@ -132,32 +140,35 @@ test('passe 46 F : module explorations à énigmes présent et cohérent', () =>
   assert.ok(hoenn.includes('ancient_tomb'));
 });
 
-test('passe 46 G : shiny roll à la capture/hatch — PAS à l\'apparition wild', () => {
-  const expl = R('src/game/display/exploration.js');
-  const enc = R('src/game/combat/battle-encounter.js');
-  const catchSrc = R('src/game/combat/catch.js');
-  assert.ok(!/rollShiny\s*\(/.test(expl), 'exploration ne roll plus au spawn');
-  assert.ok(/createPoke\([^)]*false/.test(enc), 'encounter spawn non-shiny');
-  assert.ok(/rollShiny\s*\(/.test(catchSrc), 'capture effectue le roll');
-  const hatch = R('src/game/breeding/hatchery.js');
-  assert.ok(/rollShiny\s*\(/.test(hatch), 'hatchery roll à l\'éclosion');
+test('phase 46 G: shiny roll at spawn time (visible in combat) — NO catch rate bonus', () => {
+  const enc = R('src/application/combat/battle-encounter.js');
+  const systems = R('src/application/ecs-gameplay-systems.js');
+  const catchSrc = R('src/application/combat/catch.js');
+  assert.ok(/rollShiny/.test(enc), 'battle-encounter rolls shiny at spawn time');
+  assert.ok(/rollShiny/.test(systems), 'ECS spawn rolls shiny at spawn time');
+  assert.ok(!/rollShiny/.test(catchSrc), 'capture no longer performs shiny roll');
+  const hatch = R('src/application/breeding/hatchery.js');
+  assert.ok(/rollShiny/.test(hatch), 'hatchery roll at hatching');
 });
 
-test('passe 46 H : Épisode Delta toujours verrouillé derrière Kalos', () => {
+test('phase 46 H: Delta Episode still locked behind Kalos', () => {
   const src = R('src/data/story-quests-hoenn.js');
   assert.ok(src.includes('isKalosCompleted'));
   const helpers = R('src/data/game-helpers.js');
   assert.ok(helpers.includes('function isKalosCompleted'));
 });
 
-test('passe 46 I : plus de renderer Base 3D dans le projet runtime', () => {
+test('phase 46 I: no more Base 3D renderer in the runtime project', () => {
   assert.ok(!fs.existsSync(path.join(ROOT, 'src/game/base/base3d-view.js')));
   assert.ok(!fs.existsSync(path.join(ROOT, 'src/game/base/base3d-window.js')));
   const idx = R('index.html');
   assert.ok(!idx.includes('win-base3d'));
 });
 
-test('passe 46 J : SHINY_CHANCE config aligné sur 1/4096', () => {
-  assert.ok(R('src/game/Config.js').includes('SHINY_CHANCE: 1/4096'));
-  assert.ok(R('src/engine/Config.js').includes('SHINY_CHANCE: 1/4096'));
+test('phase 46 J: SHINY_CHANCE config aligned to 1/4096', () => {
+  // Single canonical engine config (legacy src/game/Config.js removed)
+  assert.ok(R('src/data/game-config.js').includes('SHINY_CHANCE: 1/4096'));
+  // Hoenn merged into the canonical config
+  assert.ok(R('src/data/game-config.js').includes('HOENN_STARTERS: [252, 255, 258]'));
+  assert.ok(R('src/data/game-config.js').includes("hoenn: { name: 'Hoenn', start: 252, end: 386, badges: 8 }"));
 });

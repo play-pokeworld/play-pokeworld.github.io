@@ -1,3 +1,17 @@
+// Vague 41 — module ESM natif. La surface classique (window/globalThis) est
+// gardée : consommateurs classiques, harnais VM et registre moteur.
+// Storage service (engine boot layer): resolved once, shared through the
+// global object — concatenated VM harnesses and all chunks share ONE binding.
+// Fallback if util.js is not loaded — targeted unit tests.
+// Shared safe-HTML service (engine pwSetHtml when present, else direct).
+// globalThis-backed so concatenated VM harnesses and classic stubs stay valid.
+if (typeof globalThis !== 'undefined' && typeof globalThis._pwSetHtmlSafe !== 'function') {
+  globalThis._pwSetHtmlSafe = function (el, html) { if (typeof pwSetHtml === 'function') pwSetHtml(el, html); else el.innerHTML = html; };
+}
+
+if (typeof globalThis !== 'undefined' && !globalThis.safeStorage) {
+  globalThis.safeStorage = (typeof window !== 'undefined' && window.safeStorage) || (typeof PokeWorldCore !== 'undefined' && PokeWorldCore.storage) || null;
+}
 // ============================================================================
 // LOCALIZATION ENGINE (i18n)
 // ----------------------------------------------------------------------------
@@ -21,7 +35,12 @@
 // ============================================================================
 
 function currentLang(){
- return (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'en';
+ // Wave 27: default to 'fr' when no save (G.lang) is loaded yet. The static
+ // markup (index.html) is written in French — defaulting t() to 'en' painted
+ // boot screens (save menu, starter modal, team toolbar) in English while
+ // the surrounding UI stayed French, a mixed-language mess for new players.
+ // An explicit language choice (settings -> G.lang) always wins.
+ return (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
 }
 
 // Display names consistently in title case without lowercasing official acronyms.
@@ -78,7 +97,7 @@ function updateI18nLabels() {
       if (text && text !== key) {
         // Use innerHTML if element contains HTML badges, otherwise textContent
         if (String(text).indexOf('<') !== -1) {
-          el.innerHTML = text;
+          _pwSetHtmlSafe(el, text);
         } else {
           el.textContent = text;
         }
@@ -102,9 +121,9 @@ function updateI18nLabels() {
   });
 }
 
-// Espèces hors dex 1-251 (passe 14 : fossiles Johto → cibles canoniques).
-// Les tables de noms restent à 252 entrées (dex Kanto/Johto) ; ces deux-là
-// vivent dans un override épars pour ne pas perturber les boucles du dex.
+// Species outside dex 1-251 (phase 14: Johto fossils -> canonical targets).
+// The name tables stay at 252 entries (Kanto/Johto dex); these two live
+// in a sparse override so dex loops are not disturbed.
 const POKE_NAMES_EXTRA_EN = { 345: 'Lileep', 347: 'Anorith' };
 const POKE_NAMES_EXTRA_FR = { 345: 'Lilia', 347: 'Anorith' };
 function getPokeName(id){
@@ -137,6 +156,9 @@ function getLocName(id){
 
 // ---- Language switch ---------------------------------------------------------
 function setLanguage(lang){
+ // Wave 32: the target language pack may still be streaming in the
+ // background — make sure its fragments are merged right away.
+ try{ if(typeof window !== 'undefined' && typeof window.__pwEnsureLanguage === 'function') window.__pwEnsureLanguage(lang); }catch(_){}
  if(!G) G = {};
  G.lang = lang;
  // Sync the new Localization engine too
@@ -150,6 +172,11 @@ function setLanguage(lang){
  document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
  syncAllNames();
  updateI18nLabels();
+ // Settings modal body is DS-rendered with t() at open time: re-render it
+ // live if it is open, so its labels switch language immediately.
+ try{ const sm = document.getElementById('settings-modal'); if(sm && sm.classList.contains('open') && typeof openSettings === 'function') openSettings(); }catch(_){}
+ // Same for the save-game main menu face (SaveMenuView, wave 5).
+ try{ const sms = document.getElementById('save-menu-screen'); if(sms && sms.classList.contains('is-open') && typeof renderSaveMenu === 'function') renderSaveMenu(); }catch(_){}
  try{ if(typeof updateHeader === 'function') updateHeader(); }catch(_){}
  try{ if(typeof renderTeamWindow === 'function') renderTeamWindow(); }catch(_){}
  try{renderHatcheryWindow();}catch(_){}
@@ -195,8 +222,8 @@ function getQuestText(cat, id){
 
 // Champion (Gym Leader) localized name / title / badge name.
 function getChampionName(id){return (typeof t==='function') ? (t('champions.'+id+'.name') || id) : id;}
-// Passe 38 : le « champion » base_npc est un copain de base secrète — son nom
-// est dynamique (porté par le combat en cours), pas une clé du dictionnaire.
+// Passe 38: the base_npc "champion" is a secret-base pal — its name is
+// dynamic (carried by the ongoing battle), not a dictionary key.
 function getChampName(id){
  if(id==='base_npc' && typeof battle!=='undefined' && battle && battle.baseNpcName) return battle.baseNpcName;
  return getChampionName(id);
@@ -204,17 +231,76 @@ function getChampName(id){
 function getChampTitle(id){return (typeof t==='function') ? (t('champions.'+id+'.title') || '') : '';}
 function getChampBadgeName(id){return (typeof t==='function') ? (t('champions.'+id+'.badgeName') || '') : '';}
 
+// FIX (2026-08): long-spelling aliases expected by the guarded export below
+// (getChampionTitle / getChampionBadgeName without the short "Champ" form).
+export const getChampionTitle = getChampTitle;
+export const getChampionBadgeName = getChampBadgeName;
+
+// FIX (2026-08): canonical accessor for NPC dialogs (L_fr_npc / L_en_npc
+// were loaded but never consumed — the function no longer existed).
+// getNpcDialog(locId) -> [{name, lines:[...]}] in the current language.
+function getNpcDialog(locId){
+ const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang : ((typeof window !== 'undefined' && window.L && window.L.lang) || 'fr');
+ const dict = (lang === 'en')
+   ? ((typeof window !== 'undefined' && window.L_en_npc) || (typeof L_en_npc !== 'undefined' ? L_en_npc : null))
+   : ((typeof window !== 'undefined' && window.L_fr_npc) || (typeof L_fr_npc !== 'undefined' ? L_fr_npc : null));
+ const list = (dict && dict[locId]) ? dict[locId] : [];
+ return Array.isArray(list) ? list : [];
+}
+
 // Expose key functions globally
-if (typeof getPokeName !== 'undefined' && typeof window !== 'undefined') window.getPokeName = getPokeName;
-if (typeof getNpcDialog !== 'undefined' && typeof window !== 'undefined') window.getNpcDialog = getNpcDialog;
-if (typeof getQuestText !== 'undefined' && typeof window !== 'undefined') window.getQuestText = getQuestText;
-if (typeof getChampName !== 'undefined' && typeof window !== 'undefined') window.getChampName = getChampName;
-if (typeof getChampTitle !== 'undefined' && typeof window !== 'undefined') window.getChampTitle = getChampTitle;
-if (typeof getChampBadgeName !== 'undefined' && typeof window !== 'undefined') window.getChampBadgeName = getChampBadgeName;
-if (typeof getChampionName !== 'undefined' && typeof window !== 'undefined') window.getChampionName = getChampionName;
-if (typeof getChampionTitle !== 'undefined' && typeof window !== 'undefined') window.getChampionTitle = getChampionTitle;
-if (typeof getChampionBadgeName !== 'undefined' && typeof window !== 'undefined') window.getChampionBadgeName = getChampionBadgeName;
+if (typeof getPokeName !== 'undefined') { if (typeof window !== 'undefined') window.getPokeName = getPokeName; if (typeof globalThis !== 'undefined') globalThis.getPokeName = getPokeName; }
+if (typeof getNpcDialog !== 'undefined') { if (typeof window !== 'undefined') window.getNpcDialog = getNpcDialog; if (typeof globalThis !== 'undefined') globalThis.getNpcDialog = getNpcDialog; }
+if (typeof getQuestText !== 'undefined') { if (typeof window !== 'undefined') window.getQuestText = getQuestText; if (typeof globalThis !== 'undefined') globalThis.getQuestText = getQuestText; }
+if (typeof getChampName !== 'undefined') { if (typeof window !== 'undefined') window.getChampName = getChampName; if (typeof globalThis !== 'undefined') globalThis.getChampName = getChampName; }
+if (typeof getChampTitle !== 'undefined') { if (typeof window !== 'undefined') window.getChampTitle = getChampTitle; if (typeof globalThis !== 'undefined') globalThis.getChampTitle = getChampTitle; }
+if (typeof getChampBadgeName !== 'undefined') { if (typeof window !== 'undefined') window.getChampBadgeName = getChampBadgeName; if (typeof globalThis !== 'undefined') globalThis.getChampBadgeName = getChampBadgeName; }
+if (typeof getChampionName !== 'undefined') { if (typeof window !== 'undefined') window.getChampionName = getChampionName; if (typeof globalThis !== 'undefined') globalThis.getChampionName = getChampionName; }
+if (typeof getChampionTitle !== 'undefined') { if (typeof window !== 'undefined') window.getChampionTitle = getChampionTitle; if (typeof globalThis !== 'undefined') globalThis.getChampionTitle = getChampionTitle; }
+if (typeof getChampionBadgeName !== 'undefined') { if (typeof window !== 'undefined') window.getChampionBadgeName = getChampionBadgeName; if (typeof globalThis !== 'undefined') globalThis.getChampionBadgeName = getChampionBadgeName; }
 
 
 
 
+
+// --- Exported globals ---
+if (typeof currentLang !== 'undefined') { if (typeof window !== 'undefined') window.currentLang = currentLang; if (typeof globalThis !== 'undefined') globalThis.currentLang = currentLang; }
+if (typeof getLocName !== 'undefined') { if (typeof window !== 'undefined') window.getLocName = getLocName; if (typeof globalThis !== 'undefined') globalThis.getLocName = getLocName; }
+if (typeof getLore !== 'undefined') { if (typeof window !== 'undefined') window.getLore = getLore; if (typeof globalThis !== 'undefined') globalThis.getLore = getLore; }
+if (typeof getMoveName !== 'undefined') { if (typeof window !== 'undefined') window.getMoveName = getMoveName; if (typeof globalThis !== 'undefined') globalThis.getMoveName = getMoveName; }
+if (typeof getNpc !== 'undefined') { if (typeof window !== 'undefined') window.getNpc = getNpc; if (typeof globalThis !== 'undefined') globalThis.getNpc = getNpc; }
+if (typeof setLanguage !== 'undefined') { if (typeof window !== 'undefined') window.setLanguage = setLanguage; if (typeof globalThis !== 'undefined') globalThis.setLanguage = setLanguage; }
+if (typeof syncAllNames !== 'undefined') { if (typeof window !== 'undefined') window.syncAllNames = syncAllNames; if (typeof globalThis !== 'undefined') globalThis.syncAllNames = syncAllNames; }
+if (typeof t !== 'undefined') { if (typeof window !== 'undefined') window.t = t; if (typeof globalThis !== 'undefined') globalThis.t = t; }
+if (typeof titleCaseDisplayName !== 'undefined') { if (typeof window !== 'undefined') window.titleCaseDisplayName = titleCaseDisplayName; if (typeof globalThis !== 'undefined') globalThis.titleCaseDisplayName = titleCaseDisplayName; }
+if (typeof tr !== 'undefined') { if (typeof window !== 'undefined') window.tr = tr; if (typeof globalThis !== 'undefined') globalThis.tr = tr; }
+if (typeof updateI18nLabels !== 'undefined') { if (typeof window !== 'undefined') window.updateI18nLabels = updateI18nLabels; if (typeof globalThis !== 'undefined') globalThis.updateI18nLabels = updateI18nLabels; }
+
+// Vague 41 — module ESM natif : export des mêmes noms que la surface
+// classique gardée ci-dessus (corps inchangé).
+export {
+  getPokeName,
+  getNpcDialog,
+  getQuestText,
+  getChampName,
+  getChampTitle,
+  getChampBadgeName,
+  getChampionName,
+  currentLang,
+  getLocName,
+  getLore,
+  getMoveName,
+  getNpc,
+  setLanguage,
+  syncAllNames,
+  t,
+  titleCaseDisplayName,
+  tr,
+  updateI18nLabels,
+};
+
+// Vague 42 — absorption registre moteur : ces actions dispatchées
+// s'enregistrent dans le registre (dispatcher registry-first = indirection
+// moteur au lieu du fallback window) ; la surface window est conservée pour
+// les consommateurs classiques inter-modules (doublon documenté, T2-B).
+if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('setLanguage', setLanguage); } catch (_) {} }

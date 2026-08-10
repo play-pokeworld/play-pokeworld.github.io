@@ -1,3 +1,5 @@
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
 var LOCS = {
  pallet: {name:'Bourg Palette', type:'town', x:392,y:620,w:80,h:72, conn:['route1','route21'], wild:[], shopId:'pallet', champ:null, badgeReq:0},
  route1: {name:'Route 1', type:'route', x:392,y:524,w:48,h:120, conn:['pallet','viridian'], wild:[[16,2,5,'common'],[19,2,4,'common']], shopId:null, champ:null, badgeReq:0},
@@ -53,26 +55,26 @@ var LOCS_JOHTO = {
  jroute26: {name:'Route 26', type:'route', x:1512,y:504,w:48,h:336, conn:['indigo_jo','jroute27'], wild:[[20,32,36,'common'],[24,33,37,'uncommon'],[85,34,38,'uncommon'],[78,34,38,'rare'],[195,35,40,'rare']], shopId:null, champ:null, badgeReq:8},
  jroute27: {name:'Route 27', type:'route', x:1384,y:696,w:304,h:48, conn:['newbark','jroute26','jroute28','tohjofalls'], wild:[[20,28,32,'common'],[24,30,34,'uncommon'],[85,30,35,'uncommon'],[195,30,35,'rare']], shopId:null, champ:null, badgeReq:8},
  jroute28: {name:'Route 28', type:'route', x:1392,y:504,w:192,h:144, conn:['jroute27','mtsilver'], wild:[[77,40,45,'common'],[84,38,42,'common'],[114,40,44,'uncommon'],[215,42,46,'rare']], shopId:null, champ:null, badgeReq:8},
- jroute37: {name:'Route 37', type:'route', x:552,y:256,w:48,h:96, conn:['jroute36','ecruteak'], wild:[], shopId:null, champ:null, badgeReq:3},
+ jroute37: {name:'Route 37', type:'route', x:552,y:256,w:48,h:96, conn:['jroute36','ecruteak'], wild:[[16,13,15,'common'], [17,14,16,'uncommon'], [163,13,15,'common'], [165,14,16,'uncommon'], [167,14,16,'uncommon'], [234,13,15,'rare']], shopId:null, champ:null, badgeReq:3},
  jroute39: {name:'Route 39', type:'route', x:264,y:232,w:48,h:144, conn:['ecruteak','jroute38'], wild:[[19,15,20,'common'],[20,16,21,'uncommon'],[128,16,20,'uncommon'],[241,16,20,'rare']], shopId:null, champ:null, badgeReq:4},
- jroute41: {name:'Route 41', type:'sea', x:176,y:624,w:96,h:192, conn:['olivine','cianwood'], wild:[], shopId:null, champ:null, badgeReq:4},
- jroute46: {name:'Route 46', type:'route', x:1064,y:568,w:48,h:208, conn:['jroute45','jroute29'], wild:[], shopId:null, champ:null, badgeReq:7},
- jroute47: {name:'Route 47', type:'route', x:40,y:664,w:48,h:112, conn:['jroute48'], wild:[], shopId:null, champ:null, badgeReq:8},
- jroute48: {name:'Route 48', type:'route', x:40,y:504,w:48,h:208, conn:['jroute47','victoryroad_jo'], wild:[], shopId:null, champ:null, badgeReq:8},
+ jroute41: {name:'Route 41', type:'sea', x:176,y:624,w:96,h:192, conn:['olivine','cianwood'], wild:[[72,20,22,'common'], [73,22,24,'uncommon'], [170,20,23,'common'], [171,22,25,'uncommon'], [226,20,24,'rare']], shopId:null, champ:null, badgeReq:4},
+ jroute46: {name:'Route 46', type:'route', x:1064,y:568,w:48,h:208, conn:['jroute45','jroute29'], wild:[[19,2,4,'common'], [21,2,4,'common'], [74,2,4,'uncommon'], [231,2,5,'rare']], shopId:null, champ:null, badgeReq:7},
+ jroute47: {name:'Route 47', type:'route', x:40,y:664,w:48,h:112, conn:['jroute48'], wild:[[20,20,24,'common'], [21,20,24,'common'], [22,22,25,'uncommon'], [44,21,24,'uncommon'], [83,21,24,'rare'], [132,22,25,'rare'], [164,22,26,'uncommon'], [241,21,25,'rare']], shopId:null, champ:null, badgeReq:8},
+ jroute48: {name:'Route 48', type:'route', x:40,y:504,w:48,h:208, conn:['jroute47','victoryroad_jo'], wild:[[22,22,26,'common'], [37,22,25,'uncommon'], [44,23,26,'uncommon'], [50,22,25,'common'], [58,22,25,'uncommon'], [83,23,26,'rare'], [128,23,26,'rare'], [203,23,26,'uncommon']], shopId:null, champ:null, badgeReq:8},
  nationalpark:{name:'Parc Naturel', type:'town', x:400,y:268,w:96,h:72, conn:['jroute35','jroute36'], wild:[], shopId:null, champ:null, badgeReq:0},
  indigo_jo: {name:'Plateau Indigo', type:'town', x:1496,y:104,w:208,h:208, conn:['jroute26','victoryroad_jo'], wild:[], shopId:null, champ:null, badgeReq:8},
- sprouttower: {name:'Tour Chétiflor', type:'dungeon', x:736,y:260,w:64,h:88, conn:['violet'], wild:[], shopId:null, champ:null, badgeReq:0},
+ sprouttower: {name:'Tour Chétiflor', type:'dungeon', x:736,y:260,w:64,h:88, conn:['violet'], wild:[[19,3,5,'common'], [92,3,6,'common']], shopId:null, champ:null, badgeReq:0},
  ruinsofalph: {name:'Ruines d\'Alpha', type:'dungeon', x:696,y:432,w:80,h:64, conn:['jroute32','jroute32_mid'], wild:[[201,10,16,'common'],[177,16,22,'uncommon']], shopId:null, champ:null, badgeReq:0},
  burnedtower: {name:'Tour Cendrée', type:'dungeon', x:472,y:96,w:112,h:128, conn:['ecruteak'], wild:[[19,13,16,'common'],[41,14,18,'common'],[109,15,18,'uncommon'],[126,16,20,'rare']], shopId:null, champ:null, badgeReq:0},
  tintower: {name:'Tour Carillon', type:'dungeon', x:616,y:80,w:112,h:160, conn:['ecruteak'], wild:[[19,20,24,'common'],[20,22,26,'common'],[92,22,26,'uncommon'],[164,24,28,'rare']], shopId:null, champ:null, badgeReq:0},
  mtmortar: {name:'Mont Creuset', type:'dungeon', x:816,y:136,w:96,h:80, conn:['mahogany'], wild:[[66,22,28,'common'],[74,22,28,'common'],[19,22,28,'uncommon'],[41,22,28,'uncommon']], shopId:null, champ:null, badgeReq:6},
  icepath: {name:'Route de Glace', type:'dungeon', x:1152,y:176,w:96,h:64, conn:['mahogany','blackthorn'], wild:[[220,22,28,'common'],[41,22,28,'common'],[42,24,30,'uncommon'],[124,25,32,'rare']], shopId:null, champ:null, badgeReq:6},
  darkcave: {name:'Antre Noir', type:'dungeon', x:848,y:280,w:64,h:64, conn:['jroute42'], wild:[[41,20,26,'common'],[74,22,28,'common'],[206,22,28,'uncommon'],[202,24,30,'rare']], shopId:null, champ:null, badgeReq:6},
- slowpokewell:{name:'Puits Ramoloss', type:'dungeon', x:576,y:856,w:64,h:48, conn:['azalea'], wild:[], shopId:null, champ:null, badgeReq:0},
+ slowpokewell:{name:'Puits Ramoloss', type:'dungeon', x:576,y:856,w:64,h:48, conn:['azalea'], wild:[[41,6,8,'common'], [79,6,9,'common'], [80,10,12,'rare']], shopId:null, champ:null, badgeReq:0},
  whirlislands:{name:'Tourb\'Îles', type:'dungeon', x:256,y:680,w:128,h:112, conn:['cianwood'], wild:[[41,22,28,'common'],[72,22,28,'common'],[86,24,30,'uncommon'],[98,24,30,'uncommon'],[170,25,32,'rare']], shopId:null, champ:null, badgeReq:4},
  victoryroad_jo:{name:'Route Victoire (Johto)',type:'dungeon',x:1512,y:272,w:112,h:128, conn:['indigo_jo','jroute26'], wild:[[42,36,42,'common'],[75,38,44,'common'],[95,40,45,'uncommon'],[217,40,46,'rare'],[232,42,46,'rare']], shopId:null, champ:null, badgeReq:8},
- mtsilver: {name:'Mont Argenté', type:'dungeon', x:1264,y:448,w:160,h:288, conn:['jroute28','tohjofalls'], wild:[], shopId:null, champ:null, badgeReq:8},
- tohjofalls: {name:'Chutes Tohjo', type:'dungeon', x:1264,y:648,w:64,h:48, conn:['jroute27','mtsilver'], wild:[], shopId:null, champ:null, badgeReq:8},
+ mtsilver: {name:'Mont Argenté', type:'dungeon', x:1264,y:448,w:160,h:288, conn:['jroute28','tohjofalls'], wild:[[24,45,48,'common'], [85,45,48,'uncommon'], [114,45,48,'common'], [126,45,49,'uncommon'], [195,45,48,'uncommon'], [200,45,48,'rare'], [215,45,48,'rare'], [217,46,50,'uncommon'], [232,46,50,'uncommon'], [246,45,48,'rare'], [247,48,52,'rare']], shopId:null, champ:null, badgeReq:8},
+ tohjofalls: {name:'Chutes Tohjo', type:'dungeon', x:1264,y:648,w:64,h:48, conn:['jroute27','mtsilver'], wild:[[41,20,23,'common'], [42,22,25,'uncommon'], [79,20,24,'common'], [118,20,24,'common'], [119,23,26,'uncommon']], shopId:null, champ:null, badgeReq:8},
 
  newbark: {name:'Bourg Geon', type:'town', x:1192,y:684,w:80,h:72, conn:['jroute29','jroute27'], wild:[], shopId:'jnewbark', champ:null, badgeReq:0},
  jroute29: {name:'Route 29', type:'route', x:1008,y:696,w:288,h:48, conn:['newbark','cherrygrove'], wild:[[16,3,5,'common'], [19,3,5,'common'], [13,4,7,'uncommon']], shopId:null, champ:null, badgeReq:0},
@@ -116,8 +118,17 @@ function getCurrentRegionLocs() {
 }
 
 
-if (typeof LOCS !== 'undefined' && typeof window !== 'undefined') window.LOCS = LOCS;
-if (typeof LOCS_JOHTO !== 'undefined' && typeof window !== 'undefined') window.LOCS_JOHTO = LOCS_JOHTO;
-if (typeof LOCS_HOENN !== 'undefined' && typeof window !== 'undefined') window.LOCS_HOENN = LOCS_HOENN;
+if (typeof LOCS !== 'undefined') { if (typeof window !== 'undefined') window.LOCS = LOCS; if (typeof globalThis !== 'undefined') globalThis.LOCS = LOCS; }
+if (typeof LOCS_JOHTO !== 'undefined') { if (typeof window !== 'undefined') window.LOCS_JOHTO = LOCS_JOHTO; if (typeof globalThis !== 'undefined') globalThis.LOCS_JOHTO = LOCS_JOHTO; }
+if (typeof LOCS_HOENN !== 'undefined') { if (typeof window !== 'undefined') window.LOCS_HOENN = LOCS_HOENN; if (typeof globalThis !== 'undefined') globalThis.LOCS_HOENN = LOCS_HOENN; }
+if (typeof getCurrentRegionLocs !== 'undefined') { if (typeof window !== 'undefined') window.getCurrentRegionLocs = getCurrentRegionLocs; if (typeof globalThis !== 'undefined') globalThis.getCurrentRegionLocs = getCurrentRegionLocs; }
 
 
+
+// Wave 40 — native ESM module: grouped export of the same names as the
+// classic surface kept above/here (bodies unchanged).
+export {
+  LOCS,
+  LOCS_JOHTO,
+  getCurrentRegionLocs,
+};

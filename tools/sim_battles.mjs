@@ -1,25 +1,27 @@
 #!/usr/bin/env node
 // ═══════════════════════════════════════════════════════════════════════════
-// Étape 7 — Simulations d'équilibrage (« battable au niveau attendu »)
+// Step 7 — Balance simulations ("beatable at the expected level")
 // ═══════════════════════════════════════════════════════════════════════════
-// Simulateur HEADLESS réutilisant le VRAI moteur de combat du jeu (battle-tick,
-// battle-attack, battle-status, battle-init) dans un bac à sable vm :
-//  • IA adverse = celle du jeu (round-robin des attaques — fidèle à 100 %) ;
-//  • IA joueur = heuristique « joueur raisonnable » (meilleure attaque attendue
-//    à chaque action, switch au premier vivant) ;
-//  • hasard (précision, critique, variance 85-100 %) seedé par matchup →
+// HEADLESS simulator reusing the REAL battle engine of the game (battle-tick,
+// battle-attack, battle-status, battle-init) in a vm sandbox:
+//  • Opponent AI = the game's (move round-robin — 100% faithful);
+//  • Player AI = "reasonable player" heuristic (best expected move each
+//    action, switch to first alive);
+//  • randomness (accuracy, crit, 85-100% variance) seeded by matchup ->
 //    taux de victoire reproductibles.
-// Profils joueur :
-//  • 'casual'  : espèces plausibles des zones accessibles (badgeReq ≤ badges),
-//                niveau = as adverse, attaques naturelles du niveau, 0 IV/EV ;
-//  • 'trained' : 6 Pokémon, attaques optimales légales (naturel ∪ CT), EV/IV
-//                focalisés (≤ 18 chacun, règle du projet), objet type_boost.
+// Player profiles:
+//  • 'casual'  : plausible species of accessible zones (badgeReq ≤ badges),
+//                level = opponent aces, natural moves for the level, 0 IV/EV;
+//  • 'trained' : 6 Pokemon, legal optimal moves (natural ∪ TM), focused
+//                EV/IV (≤ 18 each, project rule), type_boost item.
 // Usage : node tools/sim_battles.mjs [--runs 200] [--group all|gyms|story|league|atoll]
 // ─────────────────────────────────────────────────────────────────────────────
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { ecsGameplayBundleSource } from './ecs-loop-bundle.mjs';
+import { harnessIsEsm, harnessBundleSource } from './harness-bundle.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const R = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
@@ -56,14 +58,14 @@ function typeEffect(atk, d1, d2) { const a = normType(atk), t1 = normType(d1), t
 
 const ENGINE_FILES = [
   'src/data/moves.js', 'src/data/pd-data.js', 'src/data/items-data.js', 'src/data/items-helpers.js',
-  'src/data/poke-talents-data.js', 'src/data/pokemon-talents.js',
+  'src/data/poke-talents-data.js',
   'src/data/locations-data.js', 'src/data/locations-johto.js', 'src/data/game-helpers.js',
-  'src/game/world/team.js', 'src/game/core/pokemon-factory.js',
+  'src/application/world/team.js', 'src/application/pokemon-factory.js',
   'src/data/champions-data.js', 'src/data/official-teams-data.js',
-  'src/data/atoll-sets-data.js', 'src/game/world/atoll-core.js',
-  'src/game/combat/battle-init.js', 'src/game/combat/battle-attack.js',
-  'src/game/combat/battle-status.js', 'src/game/combat/battle-tick.js',
-  'src/game/combat/progression.js',
+  'src/data/atoll-sets-data.js', 'src/application/world/atoll-core.js',
+  'src/application/combat/battle-init.js', 'src/application/combat/battle-attack.js',
+  'src/application/combat/battle-status.js',
+  'src/application/combat/progression.js',
 ];
 
 function makeEngineSandbox() {
@@ -80,8 +82,8 @@ function makeEngineSandbox() {
   sandbox.globalThis = sandbox;
   sandbox.G = myG;
   sandbox.battle = myBattle;
-  // Coeur + domaine (graphes de types fidèles à file-preflight.js)
-  let vmMath = null; // handle sur l'objet Math du realm vm (capturé après createContext)
+  // Core + domain (type charts faithful to file-preflight.js)
+  let vmMath = null; // handle on the vm realm Math object (captured after createContext)
   sandbox.PokeWorldCore = {
     storage: { get: () => null, set: () => {} },
     randomInt: (a, b) => a + Math.floor(vmMath.random() * (b - a + 1)),
@@ -91,12 +93,53 @@ function makeEngineSandbox() {
   sandbox.PokeWorldDomain = { typeSystem: { TYPES, TYPE_COLORS: {}, TYPE_CHART, typeEffect, effectivenessText: () => '' } };
   sandbox.PokeWorldState = { gameState: myG };
   sandbox.PokeWorldBattleState = { battleState: myBattle };
+  // Vague 41 — stub DOM headless : les fichiers de combat étant de vrais
+  // modules ESM, leurs fonctions visuelles ne sont plus patchables via le
+  // global (elles vivent dans la fermeture du module). Avec getElementById/
+  // querySelector → null, tous les chemins visuels terminent en early-return
+  // exactement comme le monkey-patch d'avant les neutralisait.
+  const __pwNullEl = () => ({
+    className: '', id: '', textContent: '', value: '',
+    innerHTML: '',
+    style: { setProperty() {} },
+    dataset: {},
+    classList: { add() {}, remove() {}, toggle() {}, contains: () => false },
+    appendChild() {}, append() {}, remove() {}, insertBefore() {}, replaceChildren() {},
+  });
+  sandbox.document = {
+    getElementById: () => null,
+    querySelector: () => null,
+    querySelectorAll: () => [],
+    createElement: __pwNullEl,
+    body: { appendChild() {}, append() {} },
+    head: { appendChild() {}, append() {} },
+  };
   vm.createContext(sandbox);
   vmMath = vm.runInContext('Math', sandbox);
   sandbox._vmMath = vmMath;
-  vm.runInContext(R('src/game/core/state.js'), sandbox, { filename: 'state.js' });
-  vm.runInContext(R('src/game/core/util.js'), sandbox, { filename: 'util.js' });
-  for (const f of ENGINE_FILES) vm.runInContext(R(f), sandbox, { filename: f });
+  // Vague 41 — hybride individuelle (game-state est formellement ESM : export {}).
+  {
+    const gsSrc = R('src/application/game-state.js');
+    vm.runInContext(harnessIsEsm(gsSrc) ? harnessBundleSource(['src/application/game-state.js']) : gsSrc, sandbox, { filename: 'state.js' });
+  }
+  // Vague 41 — hybride individuelle (game-utils est ESM depuis la vague 41).
+  {
+    const utilSrc = R('src/core/game-utils.js');
+    vm.runInContext(harnessIsEsm(utilSrc) ? harnessBundleSource(['src/core/game-utils.js']) : utilSrc, sandbox, { filename: 'util.js' });
+  }
+  // Vague 40 — boucle hybride (T2-D) : fichiers restés classiques = texte vm
+  // direct (parité exacte, un runInContext par fichier comme avant) ; fichiers
+  // convertis ESM (src/data/* vague 40) = bundle isolé, globales via leur shim.
+  for (const f of ENGINE_FILES) {
+    const src = R(f);
+    vm.runInContext(harnessIsEsm(src) ? harnessBundleSource([f]) : src, sandbox, {
+      filename: harnessIsEsm(src) ? f + ' [iife]' : f,
+    });
+  }
+  // The real battle loop is ECS-driven (battle-tick.js deleted): inject the
+  // same production bundle the browser gets through Vite (engine ECS core +
+  // gameplay systems + domain tick), which exposes battleTick/runBattleTick.
+  vm.runInContext(ecsGameplayBundleSource(), sandbox, { filename: 'src/application/gameplay-bundle.js [esbuild iife]' });
   // Neutralisation headless : visuels/DOM/log → no-ops
   for (const fn of ['spawnBattleFloat','spawnBattleChip','playAttackAnim','playHitAnim','visualDamage','visualHeal',
     'visualStatus','visualTalent','visualItem','visualMoveUsed','visualStatusChanges','addBattleTimeline',
@@ -128,10 +171,10 @@ function topLegalMoves(id, n = 4) {
   return legal.slice(0, n);
 }
 
-// Meilleures attaques NATURELLES accessibles au niveau donné (pool PokeChill,
-// niveau d'apprentissage 1 + idx·7) — modélise un joueur qui a appris ses
-// meilleurs moves via le menu d'apprentissage, sans CT.
-function bestNaturalMovesAtLevel(id, level, n = 4) {
+// Best NATURAL moves accessible at the given level (PokeChill pool,
+// learning level 1 + idx·7) — models a player who learned their best
+// moves via the learning menu, without TMs.
+function _bestNaturalMovesAtLevel(id, level, n = 4) {
   const pool = (sb.getSpeciesMovePool(id) || []).filter((m) => sb.MOVES[m]);
   const atLevel = pool.filter((m) => (sb.getMoveLearnLevel(id, m) || 999) <= level && (sb.MOVES[m].power || 0) > 0);
   const d = sb.PD[id];
@@ -150,8 +193,8 @@ function bestNaturalMovesAtLevel(id, level, n = 4) {
   return picked.slice(0, n);
 }
 
-// Évolution par niveau (LEVEL_EVO_MAP/EVO_LEVELS du jeu) : le joueur préparé
-// joue la forme évoluée atteignable à son niveau.
+// Level-up evolution (game LEVEL_EVO_MAP/EVO_LEVELS): the prepared player
+// fields the evolved form reachable at their level.
 function evolvedFormAt(id, level) {
   let cur = Number(id);
   let guard = 0;
@@ -172,9 +215,9 @@ function buildPlayerPoke(id, level, { trained = false } = {}) {
     p.ivs = Object.assign({ hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 }, { hp: 4, def: 4, spd: 4, spe: 6 });
     p.heldItem = BOOST_BY_TYPE[p.type1] || 'silk_scarf';
   } else {
-    // Casual « réaliste » (passe 23) : le joueur utilise le menu d'apprentissage
-    // du jeu — pool légal COMPLET (naturel ∪ CT/CS) — mais n'investit ni
-    // en IV/EV, ni en objet tenu. C'est le modèle « connaît le jeu, non optimisé ».
+    // "Realistic" casual (phase 23): the player uses the game's learning
+    // menu — COMPLETE legal pool (natural ∪ TM/HM) — but invests in neither
+    // IV/EV nor held item. The "knows the game, unoptimized" model.
     const mv = topLegalMoves(finalId, 4);
     if (mv.length) p.moves = mv.map((m) => ({ id: m }));
   }
@@ -183,7 +226,7 @@ function buildPlayerPoke(id, level, { trained = false } = {}) {
   return p;
 }
 
-// Espèces capture-plausibles : tables sauvages des lieux dont badgeReq ≤ badges.
+// Capture-plausible species: wild tables of locations with badgeReq ≤ badges.
 function wildSpeciesByBadges(region, badgeCount) {
   const locs = region === 'johto' ? sb.LOCS_JOHTO : sb.LOCS;
   const set = new Set();
@@ -207,8 +250,8 @@ function bstOf(id) { const d = sb.PD[id]; return d ? (d[3] + d[4] + d[5] + d[6] 
 
 function buildCasualTeam(region, ace, badges, size = 6, counterTypes = null) {
   const avail = wildSpeciesByBadges(region, badges !== undefined ? badges : badgeGuessForAce(ace));
-  // Le joueur préparé fait évoluer ses captures au niveau atteint et privilégie
-  // les espèces dont le STAB frappe la faiblesse de l'arène (adaptation type).
+  // The prepared player evolves their captures at the reached level and
+  // favors species whose STAB hits the gym's weakness (type adaptation).
   const enemyTypes = counterTypes || [];
   const effBonus = (id) => {
     if (!enemyTypes.length) return 0;
@@ -236,7 +279,7 @@ function buildTrainedTeam(speciesIds, level) {
   return speciesIds.map((id) => buildPlayerPoke(id, level, { trained: true })).filter(Boolean);
 }
 
-// ── Boucle de combat headless ────────────────────────────────────────────────
+// ── Headless battle loop ────────────────────────────────────────────────
 function expectedScore(p, e, mid) {
   const mv = sb.MOVES[mid];
   if (!mv) return 0;
@@ -256,14 +299,14 @@ function bestMoveIndex(p, e) {
 }
 
 async function simulateBattle(playerTeam, enemyTeam, rng, { maxTicks = 6000 } = {}) {
-  // RNG seedé pour la reproductibilité des taux
+  // Seeded RNG for rate reproducibility
   const vmMath = sb._vmMath;
   const realRandom = vmMath.random;
   vmMath.random = rng;
   const G = sb.G, battle = sb.battle;
   G.team = playerTeam;
   G.teamSlotItems = playerTeam.map((p) => p.heldItem || null);
-  // Réinitialisation de l'état de combat (miroir de startBattle, sans DOM)
+  // Battle state reset (mirror of startBattle, without DOM)
   Object.keys(battle).forEach((k) => delete battle[k]);
   battle.log = [];
   battle.active = true;
@@ -284,7 +327,7 @@ async function simulateBattle(playerTeam, enemyTeam, rng, { maxTicks = 6000 } = 
   battle.sessionDamageByPokemon = {};
   battle._simResult = null;
 
-  // Surcharge des flux de KO : version headless
+  // KO flow override: headless version
   sandbox_onEnemyFaint(sb, battle);
   sandbox_onPlayerPokeFaint(sb, battle, G);
 
@@ -328,7 +371,7 @@ function sandbox_onEnemyFaint(sb, battle) {
       battle._simResult = 'win';
       battle.active = false;
     }
-    battle.paused = false; // headless : la pause UI n'existe pas
+    battle.paused = false; // headless: the UI pause does not exist
   };
 }
 function sandbox_onPlayerPokeFaint(sb, battle, G) {
@@ -342,11 +385,11 @@ function sandbox_onPlayerPokeFaint(sb, battle, G) {
       battle._simResult = 'loss';
       battle.active = false;
     }
-    battle.paused = false; // headless : la pause UI n'existe pas
+    battle.paused = false; // headless: the UI pause does not exist
   };
 }
 
-// ── Mesure de taux de victoire ───────────────────────────────────────────────
+// ── Win-rate measurement ───────────────────────────────────────────────
 async function winRate(label, playerFactory, enemyFactory, { runs = RUNS, seedKey = label } = {}) {
   let wins = 0;
   for (let i = 0; i < runs; i++) {
@@ -447,7 +490,7 @@ const results = [];
 export { sb, winRate, buildCasualTeam, buildTrainedTeam, mulberry32, hashSeed, ENDGAME_IDS, STORY_TRAINED_IDS };
 export const __simExports = { get results() { return results; } };
 
-// Exécution CLI uniquement (le module est aussi importé par tests/passe23-simulations.test.js)
+// CLI execution only (the module is also imported by tests/passe23-simulations.test.js)
 const isMain = (() => { try { return import.meta.url === pathToFileURL(process.argv[1]).href; } catch (_) { return false; } })();
 if (isMain) main().catch((e) => { console.error(e); process.exit(1); });
 

@@ -1,4 +1,4 @@
-window.POKEDEX_FLAVOR = {
+export const POKEDEX_FLAVOR = {
   "fr": {
     "1": "Au matin de sa vie, la graine sur son dos lui fournit les éléments dont il a besoin pour grandir.",
     "2": "Lorsque le bourgeon sur son dos éclot, il répand un doux parfum pour célébrer sa floraison.",
@@ -507,4 +507,6 @@ window.POKEDEX_FLAVOR = {
   }
 };
 
-
+// T2 (wave 38): ESM module — native export; the classic surface is
+// kept on the global object for the registries (data.js) and the VM harnesses.
+if (typeof globalThis !== 'undefined') globalThis.POKEDEX_FLAVOR = POKEDEX_FLAVOR;

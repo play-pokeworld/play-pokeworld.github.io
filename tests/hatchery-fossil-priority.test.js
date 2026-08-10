@@ -2,17 +2,20 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { computeRequiredHatchKos } from '../src/domain/breeding/hatchery-rules.js';
+import { harnessIsEsm, harnessBundleSource } from '../tools/harness-bundle.mjs';
 
-// ── Passe 12 — pension : fossiles en incubation, priorité, mode différé,
+// ── Phase 12 — day care: fossils in incubation, priority, deferred mode,
 // auto-remplissage conditionnel ─────────────────────────────────────────────
-const HATCHERY = fs.readFileSync(new URL('../src/game/breeding/hatchery.js', import.meta.url), 'utf8');
-const HATCHERY_UI = fs.readFileSync(new URL('../src/game/breeding/hatchery-ui.js', import.meta.url), 'utf8');
+const HATCHERY = fs.readFileSync(new URL('../src/application/breeding/hatchery.js', import.meta.url), 'utf8');
+const HATCHERY_UI = fs.readFileSync(new URL('../src/ui/game/hatchery-ui.js', import.meta.url), 'utf8');
 const ITEMS_DATA = fs.readFileSync(new URL('../src/data/items-data.js', import.meta.url), 'utf8');
-const BOX_SELECTOR = fs.readFileSync(new URL('../src/game/boxes/box-selector.js', import.meta.url), 'utf8');
+const BOX_SELECTOR = fs.readFileSync(new URL('../src/ui/game/box-selector.js', import.meta.url), 'utf8');
 
 function fakeNode() {
   return {
     innerHTML: '', textContent: '', value: '',
+    replaceChildren() { this.innerHTML = ''; },
     style: {},
     classList: { add() {}, remove() {}, toggle() {}, contains: () => false },
   };
@@ -84,34 +87,41 @@ function makeEnv(overrides = {}) {
   Object.assign(sandbox.G, overrides.G || {});
   sandbox.globalThis = sandbox;
   sandbox.window = sandbox;
+  sandbox.computeRequiredHatchKos = computeRequiredHatchKos; // hatchery rule port (wave 33)
   vm.createContext(sandbox);
-  vm.runInContext(HATCHERY, sandbox, { filename: 'hatchery.js' });
-  vm.runInContext(BOX_SELECTOR, sandbox, { filename: 'box-selector.js' });
+  // Vague 41 — hybride individuelle : classique = texte vm direct ;
+  // converti ESM (box-selector, vague 41) = bundle isolé, globales via shim.
+  for (const [label, src] of [
+    ['src/application/breeding/hatchery.js', HATCHERY],
+    ['src/ui/game/box-selector.js', BOX_SELECTOR],
+  ]) {
+    vm.runInContext(harnessIsEsm(src) ? harnessBundleSource([label]) : src, sandbox, { filename: label });
+  }
   return sandbox;
 }
 
-// ── 1. Mode différé : impossible d'annuler une incubation ───────────────────
+// ── 1. Deferred mode: cannot cancel an incubation ───────────────────────────
 
-test('incubation → garderie sur slot occupé : changement mis en attente', () => {
+test('incubation → day care on occupied slot: change queued', () => {
   const env = makeEnv();
   env.G.hatchery[0] = { poke: { id: 25, level: 100, uid: 'u1' }, steps: 3, stepsReq: 50, mode: 'breed' };
   env.toggleHatcherySlotMode(0);
-  assert.equal(env.G.hatcheryModes[0], 'breed', 'le mode reste Incubation tant que le slot est occupé');
-  assert.equal(env.G.hatcheryPendingModes[0], 'exp', 'changement en attente');
-  assert.ok(env.notifs.some(([m]) => m.includes('hatchery_mode_deferred')), 'notification de différé');
-  assert.equal(env.G.hatchery[0].mode, 'breed', 'incubation en cours non altérée');
+  assert.equal(env.G.hatcheryModes[0], 'breed', 'the mode stays Incubation while the slot is occupied');
+  assert.equal(env.G.hatcheryPendingModes[0], 'exp', 'pending change');
+  assert.ok(env.notifs.some(([m]) => m.includes('hatchery_mode_deferred')), 'deferred-change notification');
+  assert.equal(env.G.hatchery[0].mode, 'breed', 'incubation in progress not altered');
 });
 
-test('incubation en cours + bascule : la liste d\'attente est vidée tout de suite', () => {
+test('incubation in progress + switch: the waiting list is emptied right away', () => {
   const env = makeEnv();
   env.G.hatchery[0] = { poke: { id: 25, level: 100, uid: 'u1' }, steps: 3, stepsReq: 50, mode: 'breed' };
   env.G.hatcheryQueues = [['u9', 'fossil:helix_fossil'], []];
   env.toggleHatcherySlotMode(0);
-  assert.deepEqual([...env.G.hatcheryQueues[0]], [], 'liste vidée dès la demande');
+  assert.deepEqual([...env.G.hatcheryQueues[0]], [], 'list emptied upon request');
   assert.equal(env.G.hatcheryPendingModes[0], 'exp');
 });
 
-test('incubation terminée + bascule : collecte (éclosion), mode appliqué, liste vidée', () => {
+test('incubation done + switch: collect (hatch), mode applied, list emptied', () => {
   const env = makeEnv();
   env.G.hatchery[0] = {
     poke: { id: 25, level: 100, uid: 'u1', name: 'POKE_25', ivs: { hp: 3, atk: 3, def: 3, spa: 3, spd: 3, spe: 3 }, evs: {} },
@@ -119,132 +129,132 @@ test('incubation terminée + bascule : collecte (éclosion), mode appliqué, lis
   };
   env.G.hatcheryQueues = [['u9'], []];
   env.toggleHatcherySlotMode(0);
-  assert.equal(env.G.hatchery[0], null, 'slot vidé par la collecte');
-  assert.ok(env.G.collection['25'], 'le résultat rejoint la boîte (incubation jamais annulée)');
-  assert.equal(env.G.hatcheryModes[0], 'exp', 'Garderie appliquée immédiatement');
+  assert.equal(env.G.hatchery[0], null, 'slot emptied by collection');
+  assert.ok(env.G.collection['25'], 'the result joins the box (incubation never cancelled)');
+  assert.equal(env.G.hatcheryModes[0], 'exp', 'Day care applied immediately');
   assert.equal(env.G.hatcheryAutomation.slots[0].mode, 'exp');
-  assert.deepEqual([...env.G.hatcheryQueues[0]], [], 'liste vidée');
-  assert.equal(env.G.hatcheryPendingModes[0], null, 'aucun changement en attente');
+  assert.deepEqual([...env.G.hatcheryQueues[0]], [], 'list emptied');
+  assert.equal(env.G.hatcheryPendingModes[0], null, 'no pending change');
 });
 
-test('re-clic sur le toggle annule le changement en attente', () => {
+test('re-clicking the toggle cancels the pending change', () => {
   const env = makeEnv();
   env.G.hatchery[0] = { poke: { id: 25, level: 100, uid: 'u1' }, steps: 3, stepsReq: 50, mode: 'breed' };
   env.toggleHatcherySlotMode(0);
   env.toggleHatcherySlotMode(0);
-  assert.equal(env.G.hatcheryPendingModes[0], null, 'en attente annulé');
+  assert.equal(env.G.hatcheryPendingModes[0], null, 'pending change cancelled');
   assert.equal(env.G.hatcheryModes[0], 'breed');
 });
 
-test('le changement en attente s\'applique quand le slot se vide (éclosion)', () => {
+test('the pending change applies when the slot empties (hatch)', () => {
   const env = makeEnv();
   env.G.hatchery[0] = { poke: { id: 25, level: 100, uid: 'u1', name: 'POKE_25', ivs: { hp: 3, atk: 3, def: 3, spa: 3, spd: 3, spe: 3 } }, steps: 50, stepsReq: 50, mode: 'breed' };
-  env.toggleHatcherySlotMode(0); // passe en attente
+  env.toggleHatcherySlotMode(0); // set pending
   env.hatchEgg(0);
-  assert.equal(env.G.hatchery[0], null, 'slot vidé après éclosion');
-  assert.equal(env.G.hatcheryModes[0], 'exp', 'mode Garderie appliqué');
+  assert.equal(env.G.hatchery[0], null, 'slot emptied after hatching');
+  assert.equal(env.G.hatcheryModes[0], 'exp', 'Day Care mode applied');
   assert.equal(env.G.hatcheryPendingModes[0], null);
-  assert.equal(env.G.hatcheryAutomation.slots[0].mode, 'exp', 'config automation synchronisée');
-  assert.ok(env.G.collection['25'], 'l\'œuf rejoint la boîte');
+  assert.equal(env.G.hatcheryAutomation.slots[0].mode, 'exp', 'automation config synced');
+  assert.ok(env.G.collection['25'], 'the egg joins the box');
 });
 
-test('applyPendingHatcheryMode est sans effet tant que le slot est occupé', () => {
+test('applyPendingHatcheryMode has no effect while the slot is occupied', () => {
   const env = makeEnv();
   env.ensureHatcheryAutomation(); // initialise G.hatcheryPendingModes
   env.G.hatchery[0] = { poke: { id: 25, level: 100, uid: 'u1' }, steps: 1, stepsReq: 50, mode: 'breed' };
   env.G.hatcheryPendingModes[0] = 'exp';
   env.applyPendingHatcheryMode(0);
   assert.equal(env.G.hatcheryModes[0], 'breed');
-  assert.equal(env.G.hatcheryPendingModes[0], 'exp', 'toujours en attente');
+  assert.equal(env.G.hatcheryPendingModes[0], 'exp', 'still pending');
 });
 
-test('slot vide : changement de mode immédiat (pas d\'attente)', () => {
+test('empty slot: immediate mode change (no pending)', () => {
   const env = makeEnv();
-  env.toggleHatcherySlotMode(0); // breed → exp sur slot vide
+  env.toggleHatcherySlotMode(0); // breed → exp on an empty slot
   assert.equal(env.G.hatcheryModes[0], 'exp');
   assert.equal(env.G.hatcheryPendingModes[0], null);
 });
 
-test('garderie → incubation sur Pokémon < 100 : éjecté au PC + liste vidée, mode basculé (passe 14)', () => {
+test('day care → incubation on Pokémon < 100: ejected to PC + list emptied, mode switched (phase 14)', () => {
   const env = makeEnv();
   env.G.hatcheryModes[1] = 'exp';
   env.G.hatchery[1] = { poke: { id: 16, level: 50, uid: 'u2', name: 'Roucool' }, steps: 0, stepsReq: 25, mode: 'exp' };
   env.G.hatcheryQueues[1] = ['u9'];
   env.toggleHatcherySlotMode(1);
-  assert.equal(env.G.hatcheryModes[1], 'breed', 'le mode bascule (plus de blocage)');
-  assert.equal(env.G.hatchery[1], null, 'slot vidé');
-  assert.ok(env.G.collection['16'] && env.G.collection['16'].uid === 'u2', 'Pokémon renvoyé au PC');
-  assert.equal(env.G.hatcheryQueues[1].length, 0, 'liste vidée');
-  assert.ok(env.notifs.some(([m]) => m.includes('hatchery_mode_ejected')), 'notification d\'éjection');
+  assert.equal(env.G.hatcheryModes[1], 'breed', 'the mode flips (no more blocking)');
+  assert.equal(env.G.hatchery[1], null, 'slot emptied');
+  assert.ok(env.G.collection['16'] && env.G.collection['16'].uid === 'u2', 'Pokémon sent back to the PC');
+  assert.equal(env.G.hatcheryQueues[1].length, 0, 'list emptied');
+  assert.ok(env.notifs.some(([m]) => m.includes('hatchery_mode_ejected')), 'ejection notification');
 });
 
-test('garderie → incubation sur Pokémon Niv. 100 : conversion conservée (comportement historique)', () => {
+test('day care → incubation on Lv. 100 Pokémon: conversion kept (legacy behavior)', () => {
   const env = makeEnv();
   env.G.hatcheryModes[1] = 'exp';
   env.G.hatchery[1] = { poke: { id: 25, level: 100, uid: 'u1', name: 'Pikachu' }, steps: 0, stepsReq: 25, mode: 'exp' };
   env.toggleHatcherySlotMode(1);
   assert.equal(env.G.hatcheryModes[1], 'breed');
-  assert.ok(env.G.hatchery[1] && env.G.hatchery[1].poke && env.G.hatchery[1].poke.uid === 'u1', 'le Niv. 100 reste et est converti');
+  assert.ok(env.G.hatchery[1] && env.G.hatchery[1].poke && env.G.hatchery[1].poke.uid === 'u1', 'the Lv. 100 stays and is converted');
   assert.equal(env.G.hatchery[1].mode, 'breed');
 });
 
 // ── 2. Fossiles en incubation ───────────────────────────────────────────────
 
-test('sendFossilToHatchery cible le slot demandé (onglet fossile du slot)', () => {
+test('sendFossilToHatchery targets the requested slot (slot\'s fossil tab)', () => {
   const env = makeEnv();
   env.sendFossilToHatchery('helix_fossil', 0);
   const slot = env.G.hatchery[0];
-  assert.ok(slot && slot.isFossil, 'fossile placé dans le slot 0');
+  assert.ok(slot && slot.isFossil, 'fossil placed in slot 0');
   assert.equal(slot.fossilKey, 'helix_fossil');
   assert.equal(slot.reviveId, 138);
-  assert.equal((env.G.inventory.helix_fossil || 0), 0, 'fossile consommé');
+  assert.equal((env.G.inventory.helix_fossil || 0), 0, 'fossil consumed');
 });
 
-test('sendFossilToHatchery sans slot : préfère un slot vide en mode incubation', () => {
+test('sendFossilToHatchery without slot: prefers an empty incubation-mode slot', () => {
   const env = makeEnv();
   env.G.hatcheryModes = ['exp', 'breed'];
   env.sendFossilToHatchery('helix_fossil');
-  assert.ok(env.G.hatchery[1] && env.G.hatchery[1].isFossil, 'fossile vers le slot incubation (index 1)');
+  assert.ok(env.G.hatchery[1] && env.G.hatchery[1].isFossil, 'fossil to the incubation slot (index 1)');
   assert.equal(env.G.hatchery[0], null);
 });
 
-test('sendFossilToHatchery refuse un slot occupé', () => {
+test('sendFossilToHatchery refuses an occupied slot', () => {
   const env = makeEnv();
   env.G.hatchery[0] = { poke: { id: 25, level: 100, uid: 'u1' }, mode: 'breed' };
   env.sendFossilToHatchery('helix_fossil', 0);
-  assert.equal(env.G.hatchery[0].isFossil, undefined, 'rien n\'est remplacé');
-  assert.equal(env.G.inventory.helix_fossil, 1, 'fossile non consommé');
+  assert.equal(env.G.hatchery[0].isFossil, undefined, 'nothing is replaced');
+  assert.equal(env.G.inventory.helix_fossil, 1, 'fossil not consumed');
   assert.ok(env.notifs.some(([m]) => m.includes('hatchery_full')));
 });
 
-test('entrée fossile en file : consommée et placée quand le slot se libère', () => {
+test('queued fossil entry: consumed and placed when the slot frees up', () => {
   const env = makeEnv();
   env.G.hatcheryQueues = [['fossil:helix_fossil'], []];
   assert.equal(env.fillHatcherySlotFromQueue(0), true);
-  assert.ok(env.G.hatchery[0].isFossil, 'fossile placé');
-  assert.equal((env.G.inventory.helix_fossil || 0), 0, 'fossile consommé du sac');
-  assert.equal(env.fillHatcherySlotFromQueue(0), false, 'slot déjà occupé');
+  assert.ok(env.G.hatchery[0].isFossil, 'fossil placed');
+  assert.equal((env.G.inventory.helix_fossil || 0), 0, 'fossil consumed from the bag');
+  assert.equal(env.fillHatcherySlotFromQueue(0), false, 'slot already occupied');
 });
 
-test('entrée fossile sauté si le fossile n\'est plus en sac', () => {
+test('fossil entry skipped if the fossil is no longer in the bag', () => {
   const env = makeEnv();
-  env.G.inventory = {}; // fossile utilisé entre-temps
+  env.G.inventory = {}; // fossil used in the meantime
   env.G.hatcheryQueues = [['fossil:helix_fossil'], []];
   assert.equal(env.fillHatcherySlotFromQueue(0), false);
   assert.equal(env.G.hatchery[0], null);
 });
 
-test('cleanHatcheryQueue conserve les fossiles en stock, purge les épuisés', () => {
+test('cleanHatcheryQueue keeps in-stock fossils, purges depleted ones', () => {
   const env = makeEnv();
   env.G.hatcheryQueues = [['fossil:helix_fossil', 'fossil:root_fossil'], []];
-  env.G.inventory = { helix_fossil: 1 }; // root épuisé
+  env.G.inventory = { helix_fossil: 1 }; // root exhausted
   env.cleanHatcheryQueue(0);
   assert.deepEqual([...env.G.hatcheryQueues[0]], ['fossil:helix_fossil']);
 });
 
-// ── 3. Priorité Pokémon / Fossile ───────────────────────────────────────────
+// ── 3. Pokémon / Fossil priority ────────────────────────────────────────────
 
-test('toggle de priorité : flip Pokémon ↔ Fossile', () => {
+test('priority toggle: Pokémon ↔ Fossil flip', () => {
   const env = makeEnv();
   assert.equal(env.hatcherySlotPriority(0), 'pokemon');
   env.toggleHatcherySlotPriority(0);
@@ -253,26 +263,26 @@ test('toggle de priorité : flip Pokémon ↔ Fossile', () => {
   assert.equal(env.hatcherySlotPriority(0), 'pokemon');
 });
 
-test('FIFO : avec priorité Fossile, un Pokémon déjà en tête de liste passe d\'abord', () => {
+test('FIFO: with Fossil priority, a Pokémon already at the head goes first', () => {
   const env = makeEnv();
   env.G.hatcheryAutomation.slots[0].priority = 'fossil';
   env.G.collection = { b1: { id: 25, level: 100, uid: 'u1', name: 'POKE_25' } };
   env.G.hatcheryQueues = [['u1', 'fossil:helix_fossil'], []];
   env.fillHatcherySlotFromQueue(0);
-  assert.ok(env.G.hatchery[0].poke, 'le Pokémon en tête passe (pas le fossile)');
+  assert.ok(env.G.hatchery[0].poke, 'the leading Pokémon goes (not the fossil)');
 });
 
-test('FIFO : fossile en tête de liste → le fossile passe, même priorisé Pokémon', () => {
+test('FIFO: fossil at the head → the fossil goes, even with Pokémon priority', () => {
   const env = makeEnv();
   env.G.collection = { b1: { id: 25, level: 100, uid: 'u1', name: 'POKE_25' } };
   env.G.hatcheryQueues = [['fossil:helix_fossil', 'u1'], []];
   env.fillHatcherySlotFromQueue(0);
-  assert.ok(env.G.hatchery[0].isFossil, 'le fossile en tête passe');
-  assert.ok(!env.G.hatcheryQueues[0].includes('fossil:helix_fossil'), 'entrée consommée');
-  assert.ok(env.G.hatcheryQueues[0].includes('u1'), 'le Pokémon reste derrière');
+  assert.ok(env.G.hatchery[0].isFossil, 'the leading fossil goes');
+  assert.ok(!env.G.hatcheryQueues[0].includes('fossil:helix_fossil'), 'entry consumed');
+  assert.ok(env.G.hatcheryQueues[0].includes('u1'), 'the Pokémon stays behind');
 });
 
-test('réassort : priorité Fossile remplit la liste de fossiles (pas de Pokémon)', () => {
+test('restock: Fossil priority fills the list with fossils (no Pokémon)', () => {
   const env = makeEnv();
   env.G.hatcheryAutomation.slots[0].priority = 'fossil';
   env.G.inventory = { helix_fossil: 2 };
@@ -280,24 +290,24 @@ test('réassort : priorité Fossile remplit la liste de fossiles (pas de Pokémo
   env.refillHatcheryQueueFromRules();
   const q = [...env.G.hatcheryQueues[0]];
   assert.deepEqual(q, ['fossil:helix_fossil', 'fossil:helix_fossil', 'u1'],
-    'fossiles d\'abord, puis le Pokémon en repli pour compléter');
-  assert.equal(env.G.hatcheryAutomation.slots[0].priority, 'fossil', 'pas de bascule (le préféré a servi)');
+    'fossils first, then the fallback Pokémon to complete');
+  assert.equal(env.G.hatcheryAutomation.slots[0].priority, 'fossil', 'no flip (the preferred one served)');
 });
 
-test('réassort : priorité Fossile épuisée → Pokémon en repli + toggle bascule', () => {
+test('restock: Fossil priority exhausted → Pokémon fallback + toggle flips', () => {
   const env = makeEnv();
   env.G.hatcheryAutomation.slots[0].priority = 'fossil';
-  env.G.inventory = {}; // plus de fossile
+  env.G.inventory = {}; // no fossil left
   env.G.collection = { b1: { id: 25, level: 100, uid: 'u1', name: 'POKE_25' } };
   env.refillHatcheryQueueFromRules();
   assert.deepEqual([...env.G.hatcheryQueues[0]], ['u1']);
-  assert.equal(env.G.hatcheryAutomation.slots[0].priority, 'pokemon', 'le toggle bascule');
+  assert.equal(env.G.hatcheryAutomation.slots[0].priority, 'pokemon', 'the toggle flips');
 });
 
-test('réassort : un nouveau fossile prend la SUITE de la liste, jamais la tête', () => {
+test('restock: a new fossil takes the list\'s TAIL, never the head', () => {
   const env = makeEnv();
   env.G.hatcheryAutomation.slots[0].priority = 'fossil';
-  env.G.hatcheryQueues = [['u1', 'u2'], []]; // deux Pokémon déjà en file
+  env.G.hatcheryQueues = [['u1', 'u2'], []]; // two Pokémon already queued
   env.G.collection = {
     b1: { id: 25, level: 100, uid: 'u1', name: 'A' },
     b2: { id: 26, level: 100, uid: 'u2', name: 'B' },
@@ -305,31 +315,31 @@ test('réassort : un nouveau fossile prend la SUITE de la liste, jamais la tête
   env.G.inventory = { helix_fossil: 1 };
   env.refillHatcheryQueueFromRules();
   const q = [...env.G.hatcheryQueues[0]];
-  assert.deepEqual(q, ['u1', 'u2', 'fossil:helix_fossil'], 'fossile ajouté à la fin');
+  assert.deepEqual(q, ['u1', 'u2', 'fossil:helix_fossil'], 'fossil added at the end');
 });
 
-test('réassort : un slot avec changement de mode en attente n\'est pas alimenté', () => {
+test('restock: a slot with a pending mode change is not fed', () => {
   const env = makeEnv();
   env.ensureHatcheryAutomation();
   env.G.hatcheryPendingModes[0] = 'exp';
   env.G.collection = { b1: { id: 25, level: 100, uid: 'u1', name: 'POKE_25' } };
   env.refillHatcheryQueueFromRules();
-  assert.equal(env.G.hatcheryQueues[0].length, 0, 'aucune entrée ajoutée pendant l\'attente');
+  assert.equal(env.G.hatcheryQueues[0].length, 0, 'no entry added while waiting');
 });
 
 // ── 4. Auto-remplissage conditionnel ────────────────────────────────────────
 
-test('processHatcheryQueue sans activation : rien ne se remplit (ni slot ni file)', () => {
+test('processHatcheryQueue without activation: nothing fills (neither slot nor queue)', () => {
   const env = makeEnv();
   env.G.collection = { b1: { id: 25, level: 100, uid: 'u1', name: 'POKE_25' } };
   const changed = env.processHatcheryQueue();
   assert.equal(changed, false);
-  assert.equal(env.G.hatchery[0], null, 'slot resté vide');
-  assert.equal(env.G.hatcheryQueues[0].length, 0, 'file restée vide');
-  assert.equal(env.G.inventory.helix_fossil, 1, 'fossile non consommé');
+  assert.equal(env.G.hatchery[0], null, 'slot stayed empty');
+  assert.equal(env.G.hatcheryQueues[0].length, 0, 'queue stayed empty');
+  assert.equal(env.G.inventory.helix_fossil, 1, 'fossil not consumed');
 });
 
-test('processHatcheryQueue avec activation : le slot incubation se remplit', () => {
+test('processHatcheryQueue with activation: the incubation slot fills', () => {
   const env = makeEnv();
   env.G.automation.autoSeedHatchery = true;
   env.G.collection = { b1: { id: 25, level: 100, uid: 'u1', name: 'POKE_25' } };
@@ -339,27 +349,27 @@ test('processHatcheryQueue avec activation : le slot incubation se remplit', () 
 
 test('contrat : renderHatcheryWindow et addPokemonToHatcheryQueue ne forcent plus le remplissage', () => {
   const render = HATCHERY_UI.match(/function renderHatcheryWindow\(\)\s*\{[\s\S]*?\n\}/);
-  assert.ok(render, 'renderHatcheryWindow trouvé');
-  assert.ok(!/processHatcheryQueue\(true\)/.test(render[0]), 'plus d\'appel forcé dans renderHatcheryWindow');
-  assert.ok(/processHatcheryQueue\(\)/.test(render[0]), 'appel non forcé conservé');
+  assert.ok(render, 'renderHatcheryWindow found');
+  assert.ok(!/processHatcheryQueue\(true\)/.test(render[0]), 'no more forced call in renderHatcheryWindow');
+  assert.ok(/processHatcheryQueue\(\)/.test(render[0]), 'unforced call kept');
   const add = HATCHERY.match(/function addPokemonToHatcheryQueue\(boxId[\s\S]*?\n\}/);
-  assert.ok(add, 'addPokemonToHatcheryQueue trouvé');
-  assert.ok(!/processHatcheryQueue\(true\)/.test(add[0]), 'plus d\'appel forcé dans addPokemonToHatcheryQueue');
+  assert.ok(add, 'addPokemonToHatcheryQueue found');
+  assert.ok(!/processHatcheryQueue\(true\)/.test(add[0]), 'no more forced call in addPokemonToHatcheryQueue');
 });
 
-// ── 5. Sélecteur : onglet fossile pour les slots d'incubation ───────────────
+// ── 5. Selector: fossil tab for incubation slots ────────────────────────────
 
-test('contrat : l\'onglet fossile est proposé pour hatchery_queue_N en mode incubation', () => {
-  assert.ok(/startsWith\('hatchery_queue_'\)[\s\S]{0,200}hatcherySlotIsIncubation/.test(BOX_SELECTOR), 'showFossilTab étendu');
-  assert.ok(/_fossilSlotArg/.test(BOX_SELECTOR), 'le bouton Incuber transmet le slot cible');
+test('contract: the fossil tab is offered for hatchery_queue_N in incubation mode', () => {
+  assert.ok(/startsWith\('hatchery_queue_'\)[\s\S]{0,200}hatcherySlotIsIncubation/.test(BOX_SELECTOR), 'showFossilTab extended');
+  assert.ok(/_fossilSlotArg/.test(BOX_SELECTOR), 'the Incubate button passes the target slot');
 });
 
-test('sélecteur d\'un slot incubation avec priorité Fossile : ouvre l\'onglet fossiles', () => {
+test('selector of an incubation slot with Fossil priority: opens the fossils tab', () => {
   const env = makeEnv();
   env.G.hatcheryAutomation.slots[0].priority = 'fossil';
   vm.runInContext('closeFullscreenPanel = function(){}; closeBattleSummary = function(){};', env);
   env.openUnifiedSelectorModal('hatchery_queue_0');
-  assert.equal(env._usmSubTab, 'fossil', 'onglet fossile par défaut');
-  assert.ok(env.nodes['usm-grid'].innerHTML.includes('fossil-card'), 'grille de fossiles affichée');
+  assert.equal(env._usmSubTab, 'fossil', 'fossil tab by default');
+  assert.ok(env.nodes['usm-grid'].innerHTML.includes('fossil-card'), 'fossil grid shown');
 });
 

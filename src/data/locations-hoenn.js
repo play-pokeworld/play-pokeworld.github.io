@@ -1,8 +1,10 @@
-// ─── Carte de la région de Hoenn (50 lieux) ───
-// RSE / Pokéclicker - dimensions homothétiques sur le canvas 1600x960
-// Tous les Pokémon #252 à #386 sont répartis dans wild/roaming/évolutions.
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
+// ─── Map of the Hoenn region (50 locations) ───
+// RSE / Pokéclicker - scaled dimensions on the 1600x960 canvas
+// All Pokemon #252 to #386 + special forms obtainable
 
-var LOCS_HOENN = {
+export var LOCS_HOENN = {
   // Villes et villages (16)
   littleroot:     { name: 'Bourg-en-Vol',    type: 'town', x: 264, y: 732, w: 80, h: 72, conn: ['route101'], wild: [], shopId: 'littleroot', champ: null, badgeReq: 0 },
   oldale:         { name: 'Rosyères',        type: 'town', x: 260, y: 628, w: 72, h: 72, conn: ['route101', 'route102', 'route103'], wild: [], shopId: 'oldale', champ: null, badgeReq: 0 },
@@ -81,14 +83,13 @@ var LOCS_HOENN = {
   mirage_island:   { name: 'Île Mirage',      type: 'dungeon', x: 1030, y: 820, w: 80, h: 64, conn: ['battle_frontier', 'southern_island', 'route130'], wild: [[360, 30, 50, 'common']], shopId: null, champ: null, badgeReq: 7 },
   abandoned_ship:  { name: 'Épave',           type: 'dungeon', x: 416, y: 848, w: 96, h: 64, conn: ['route108'], wild: [[72, 20, 26, 'common'], [73, 24, 28, 'uncommon'], [319, 24, 28, 'uncommon']], shopId: null, champ: null, badgeReq: 4 },
   sealed_chamber:  { name: 'Sanctuaire',      type: 'dungeon', x: 656, y: 600, w: 96, h: 80, conn: ['route134'], wild: [[41, 28, 34, 'common'], [369, 30, 36, 'rare']], shopId: null, champ: null, badgeReq: 7 },
-  // Ruines Regi (explorations à énigmes) — accessibles après badges avancés
+  // Regi ruins (puzzle explorations) — accessible after advanced badges
   desert_ruins:    { name: 'Ruines Désert (Regirock)',   type: 'dungeon', x: 520, y: 280, w: 72, h: 64, conn: ['route111'], wild: [[27, 20, 26, 'common'], [328, 20, 26, 'common'], [74, 20, 26, 'uncommon']], shopId: null, champ: null, badgeReq: 4 },
   island_cave:     { name: 'Grotte Isolée (Regice)',   type: 'dungeon', x: 1520, y: 200, w: 72, h: 64, conn: ['route105'], wild: [[86, 20, 28, 'common'], [363, 22, 28, 'uncommon'], [361, 22, 28, 'uncommon']], shopId: null, champ: null, badgeReq: 5 },
-  // Tombeau Antique : positionné entre la Route 119 et la Route 120, mais
-  // ACCESSIBLE uniquement depuis la Route 120 (c'est elle qui le débloque).
+  // Ancient Tomb: positioned between Route 119 and Route 120, but
+  // ONLY ACCESSIBLE from Route 120 (the route that unlocks it).
   ancient_tomb:    { name: 'Tombeau Antique (Registeel)', type: 'dungeon', x: 720, y: 260, w: 56, h: 48, conn: ['route120'], wild: [[337, 26, 32, 'common'], [338, 26, 32, 'common'], [344, 28, 34, 'uncommon']], shopId: null, champ: null, badgeReq: 6 },
 };
 
-if (typeof window !== 'undefined') {
-  window.LOCS_HOENN = LOCS_HOENN;
-}
+// Wave 40 — surface kept (window → globalThis block, same scope).
+if (typeof globalThis !== 'undefined') globalThis.LOCS_HOENN = LOCS_HOENN;

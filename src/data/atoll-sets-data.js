@@ -1,25 +1,27 @@
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
 // ═══════════════════════════════════════════════════════════════════════════
-// ATOLL DE COMBAT — Sets canoniques curated (passe 22, étape 6 du grand projet)
+// BATTLE ATOLL — Curated canonical sets (phase 22, step 6 of the master project)
 // ═══════════════════════════════════════════════════════════════════════════
-// Chaque espèce utilisée dans les formats « vrai défi » (Tour C→S/Libre,
-// Usine, Arène, Dôme) a un set FIXE, légitime et fort :
-//   t : talent ∈ pool réel de l'espèce (talents actifs du moteur privilégiés :
+// Each species used in the "real challenge" formats (Tower C->S/Free,
+// Factory, Arena, Dome) has a FIXED, legitimate and strong set:
+//   t : ability ∈ the species real pool (engine-active abilities preferred:
 //       levitate, intimidate, multiscale, filter, ironFist, static, scrappy…)
-//   i : objet tenu (uniquement type_boost / choice, règle économique validée)
+//   i : held item (only type_boost / choice, validated economic rule)
 //   m : 1-4 attaques ∈ pool légal (apprentissage naturel ∪ CT/CS)
-//   prof : profil de stats (voir ATOLL_STAT_PROFILES — IV/EV ≤ 18 au total,
-//          même règle que les dresseurs officiels de la campagne)
-// Les espèces « fun » des rangs E/D (Chenipan, Magicarpe…) n'ont pas de set
-// fixe : le générateur déterministe d'atoll-core.js leur construit un set
-// légal à la volée (même graine → même set), cf. buildFallbackSet().
+//   prof : stat profile (see ATOLL_STAT_PROFILES — IV/EV ≤ 18 total,
+//          same rule as the campaign official trainers)
+// "Fun" species of the E/D ranks (Caterpie, Magikarp…) have no fixed
+// set: the deterministic generator of atoll-core.js builds them a legal
+// set on the fly (same seed -> same set), cf. buildFallbackSet().
 //
 // Format compact :  id: [talent, item|0, [moves], profil]
 // ─────────────────────────────────────────────────────────────────────────────
-const ATOLL_STAT_PROFILES = {
- // EXCEPTION ENDGAME (passe 23, validée par simulations moteur) : l'Atoll est le
- // sommet du jeu — ses dresseurs poussent les budgets à 36 EV / 36 IV, soit le
- // maximum qu'un joueur peut légalement atteindre en jeu (training 36 EV max,
- // hatchery 36 IV max). Tout le reste de l'histoire reste plafonné à 18/18.
+export const ATOLL_STAT_PROFILES = {
+ // ENDGAME EXCEPTION (phase 23, validated by engine simulations): the Atoll
+ // is the summit of the game — its trainers push budgets to 36 EV / 36 IV,
+ // the maximum a player can legally reach in game (training 36 EV max,
+ // hatchery 36 IV max). The rest of the story stays capped at 18/18.
  phys:  { evs: { atk: 18, spe: 18 },          ivs: { atk: 12, spe: 12, hp: 12 } },
  spec:  { evs: { spa: 18, spe: 18 },          ivs: { spa: 12, spe: 12, hp: 12 } },
  tank:  { evs: { hp: 18, def: 9, spd: 9 },    ivs: { hp: 12, def: 12, spd: 12 } },
@@ -28,8 +30,8 @@ const ATOLL_STAT_PROFILES = {
  bulks: { evs: { hp: 12, spa: 18, spd: 6 },   ivs: { hp: 12, spa: 12, def: 6, spd: 6 } },
 };
 
-const ATOLL_SETS = {
- // ── Tour/Arène/Dôme — rangs C et + ─────────────────────────────────────
+export const ATOLL_SETS = {
+ // ── Tower/Arena/Dome — ranks C and up ─────────────────────────────────────
  18:  ['thickfat', 'choice_specs', ['hyper_beam', 'hurricane', 'earthquake', 'giga_impact'], 'spec'],
  26:  ['levitate',    'choice_specs',       ['thunderbolt', 'volt_switch', 'nasty_plot', 'surf'], 'spec'],
  45:  ['solarpower', 'choice_specs', ['energy_ball', 'sludge_bomb', 'moonblast', 'toxic'], 'bulks'],
@@ -96,15 +98,14 @@ const ATOLL_SETS = {
  251: ['adaptability', 'choice_specs', ['leaf_storm', 'future_sight', 'giga_impact', 'solar_blade'], 'spec'],
 };
 
-// Légendaires concernés par les bans tournants de la rotation 12 h.
-// Règle absolue (spec utilisateur) : JAMAIS bannis de tous les modes à la fois
-// — le mode « Tour Libre » n'a jamais de ban, c'est le refuge des légendaires.
-const ATOLL_LEGENDARIES = [144, 145, 146, 150, 151, 243, 244, 245, 249, 250, 251];
+// Legendaries affected by the rotating bans of the 12h rotation.
+// Absolute rule (user spec): NEVER banned from all modes at once
+// — the "Free Tower" mode never has a ban; it is the legendaries' refuge.
+export const ATOLL_LEGENDARIES = [144, 145, 146, 150, 151, 243, 244, 245, 249, 250, 251];
 
-// --- Globals exposés (chargé par le loader après official-teams-data) ---
-if (typeof window !== 'undefined') {
- window.ATOLL_STAT_PROFILES = ATOLL_STAT_PROFILES;
- window.ATOLL_SETS = ATOLL_SETS;
- window.ATOLL_LEGENDARIES = ATOLL_LEGENDARIES;
-}
+// --- Exposed globals (loaded by the loader after official-teams-data) ---
+// Wave 40 — surface kept (window → globalThis block, same scope).
+if (typeof globalThis !== 'undefined') globalThis.ATOLL_STAT_PROFILES = ATOLL_STAT_PROFILES;
+if (typeof globalThis !== 'undefined') globalThis.ATOLL_SETS = ATOLL_SETS;
+if (typeof globalThis !== 'undefined') globalThis.ATOLL_LEGENDARIES = ATOLL_LEGENDARIES;
 

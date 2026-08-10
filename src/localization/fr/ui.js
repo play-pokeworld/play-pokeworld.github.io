@@ -1,7 +1,9 @@
 // ===== FR — UI strings =====
 // Auto-extracted & grouped by domain. Edit text here, never hardcode in logic.
 
-window.L_fr_ui = {
+// T2 (vague 37) : module ESM — export natif + exposition gardée sur l'objet
+// global (registre de langues wave-32 + harnais VM) — gabarit fr/quests.js.
+export const L_fr_ui = {
 "debug_toggle_btn":"Debug",
 "debug_x10_toggle":"Vitesse x10 :",
 "debug_fill_mine":"Recharger l'énergie de mine (100)",
@@ -120,7 +122,7 @@ window.L_fr_ui = {
 "market_sub":"Achetez des Pokémon introuvables dans la nature !",
 "market_title":"PokéMarket",
 "mine_sub":"Creusez les couches rocheuses pour déterrer des <b>Pierres d'Évolution</b>, Pépites et Fossiles !",
-"mine_title":"Grand Souterrain (Mines de Kanto)",
+"mine_title":"Grand Souterrain",
 "modify_btn":"Modifier",
 "moves_lbl":"Capacités :",
 "no_item":"Aucun objet",
@@ -232,7 +234,7 @@ window.L_fr_ui = {
 "roaming_legendary_rotation":"Légendaire errant (rotation 12h) :",
 "can_appear_here":"peut apparaître ici !",
 "roaming_short":"Errant (1%)",
-"map_title_name":"Carte {region}",
+"map_title_name":"Carte : {region}",
 "requires_badges":"nécessite {need} badge(s) (vous en avez {have})",
 "win_wild_battles_req":"remporte {need} combats sauvages à {location} (tu en as {have})",
 "locked_by_story":"verrouillé par l'histoire — {current}/{required}",
@@ -287,6 +289,7 @@ window.L_fr_ui = {
   "hidden_carriers":"Talent caché de…",
   "dict_and_n_more":"… et {count} autres",
   "bag_search_placeholder":"Rechercher un objet…",
+  "box_filter_search_placeholder":"Rechercher un Pokémon…",
   "delete_save_warning":"⚠️ Cette action est irréversible : toute ta progression sera effacée.",
   "preset_missing_hint":"Pokémon introuvable (déplacé ou relâché)",
   "drag_win_hint":"Déplacer la fenêtre",
@@ -341,8 +344,21 @@ window.L_fr_ui = {
 "sort_name":"Nom",
 "sort_quantity":"Quantité",
 "sort_category":"Catégorie",
+"sort_name_asc":"Nom A→Z",
+"sort_name_desc":"Nom Z→A",
+"sort_quantity_asc":"Quantité 0→9",
+"sort_quantity_desc":"Quantité 9→0",
 "filter_label":"Filtre:",
 "sort_label":"Tri:",
+  "dex_sort_number":"Numéro",
+  "dex_sort_name":"Nom",
+  "dex_sort_rank":"Rang",
+  "dex_sort_number_asc":"N° 1→9",
+  "dex_sort_number_desc":"N° 9→1",
+  "dex_sort_name_asc":"Nom A→Z",
+  "dex_sort_name_desc":"Nom Z→A",
+  "dex_sort_rank_asc":"Rang E→S",
+  "dex_sort_rank_desc":"Rang S→E",
 "mine_locked_badges":"Mine verrouillée (2 Badges requis)",
 "pokedex_seen":"Vus",
 "pokedex_caught":"Capturés",
@@ -847,12 +863,21 @@ window.L_fr_ui = {
 "training_trainers_title":"Entraîneurs",
 "staff_active":"Actifs",
 "staff_bonus":"Bonus",
-"staff_bonus_hatchery_speed":"réduction des K.O. d’éclosion",
-"staff_bonus_hatchery_queue":"optimisation de pension",
-"staff_bonus_training_ease":"avantage en combat d’entraînement",
-"staff_bonus_training_mastery":"maîtrise d’entraînement",
-"staff_bonus_mine_efficiency":"réduction du coût d’énergie",
-"staff_bonus_mine_energy":"endurance minière",
+"staff_bonus_hatchery_speed":"Vitesse d'incubation / Pension",
+"staff_bonus_hatchery_cost":"Réduction des Frais de Pension",
+"staff_bonus_hatchery_shiny":"Chance d'Œuf Shiny",
+"staff_bonus_hatchery_exp":"Boost d'Expérience Pension",
+"staff_bonus_hatchery_double_iv_level":"Double IV / Niveau d'Œuf",
+"staff_bonus_training_exp":"Gain d'XP Entraînement",
+"staff_bonus_training_kill_reduction":"Réduction des K.O. requis",
+"staff_bonus_training_cost":"Réduction des Frais d'Entraînement",
+"staff_bonus_training_crit":"Chance de Succès Critique",
+"staff_bonus_training_drop":"Butin de Fin de Stage",
+"staff_bonus_mine_energy_cost":"Réduction Consommation d'Énergie",
+"staff_bonus_mine_energy_regen":"Vitesse Recharge Énergie",
+"staff_bonus_mine_value":"Valeur de Revente des Trésors",
+"staff_bonus_mine_extra_items":"Objets Supplémentaires par Couche",
+"staff_bonus_mine_energy_max":"Énergie Maximale",
 "staff_name_manager_saffron":"Gérant Sacha",
 "staff_desc_manager_saffron":"Spécialiste de l’éclosion régulière et des cycles longs.",
 "staff_name_manager_cinnabar":"Chercheuse Ambre",
@@ -1598,7 +1623,7 @@ window.L_fr_ui = {
   "sort_ev":"EVs",
   "sort_rank":"Rang",
   "language_title":"Langue / Language",
-  "badges_lbl":"badges",
+  "badges_lbl":"Badges",
   "leave_battle_btn":"Quitter le combat",
   "map_region_hoenn":"Région Hoenn",
   "map_region_sinnoh":"Région Sinnoh (Bientôt)",
@@ -1658,5 +1683,7 @@ window.L_fr_ui = {
   "guide_alpha_safety_desc":"Comme le projet est encore en alpha, garde toujours une exportation récente avant de tester un nouveau zip.",
   "guide_battle_atoll_desc":"L’Atoll de Combat est le contenu de fin d’alpha. Il sert à tester des équipes optimisées dans plusieurs formats.",
   "guide_atoll_rewards_desc":"Les victoires donnent des jetons Atoll utilisables dans la boutique dédiée. Les séries augmentent l’intérêt du farm."
-}
+};
 
+// Consommateurs classiques : exposition gardée sur l'objet global à l'éval.
+if (typeof globalThis !== 'undefined') globalThis.L_fr_ui = L_fr_ui;

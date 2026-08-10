@@ -1,6 +1,6 @@
 // ===== EN — Move names (French id -> English name) =====
 
-window.L_move_names_en = {
+export const L_move_names_en = {
 "absorb":"Absorb",
 "bite":"Bite",
 "blizzard":"Blizzard",
@@ -64,7 +64,7 @@ window.L_move_names_en = {
 
 
 
-window.L_en_move_descs = {
+export const L_en_move_descs = {
   "absorb": "A legitimate strategic combat move.",
   "acid": "10% chance to decrease enemy Special Defense by 50%",
   "acidarmor": "Increases Defense by 100%",
@@ -682,3 +682,10 @@ window.L_en_move_descs = {
   "zenheadbutt": "A legitimate strategic combat move."
 };
 
+
+// Wave 36 (T2 slice): real ES module — data.js merges L_* dictionaries
+// through the global object at eval.
+if (typeof globalThis !== 'undefined') {
+  globalThis.L_move_names_en = L_move_names_en;
+  globalThis.L_en_move_descs = L_en_move_descs;
+}

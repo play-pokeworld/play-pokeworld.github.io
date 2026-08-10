@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 # ============================================================================
-# Passe 42 : GÉNÈRE src/data/base-items-data.js depuis la table canon RSE
+# Phase 42: GENERATES src/data/base-items-data.js from the RSE canon table
 # (tools/emerald-ref/canon-decor.json = pokeemerald gDecorations, extrait de
-# decor/header.h). 119 décorations officielles + 3 objets du jeu
-# (stairs / pc) = 122 objets au catalogue.
+# decor/header.h). 119 official decorations + 2 game objects
+# (stairs / pc) = 122 catalog objects.
 #
-# Modèle de collision (demandes utilisateur répétées + canon) :
-#  - surface (poupées/coussins, DECORPERM_SPRITE) : collision = case de base ;
-#  - behind  (plantes/boucliers, DECORPERM_BEHIND_FLOOR) : collision = rangée
-#    de base (on peut coller au mur, le visuel déborde derrière le joueur) ;
-#  - le reste : empreinte = forme canon (bureaux 3×2/3×3, tapis 3×3 …).
-#  - ROTATION SUPPRIMÉE (rot:0 partout) : la 2D Émeraude ne pivote pas.
+# Collision model (repeated user requests + canon):
+#  - surface (dolls/cushions, DECORPERM_SPRITE): collision = base tile;
+#  - behind  (plants/shields, DECORPERM_BEHIND_FLOOR): collision = base
+#    row (you can hug the wall, the visual sticks out behind the player);
+#  - the rest: footprint = canon shape (desks 3×2/3×3, mats 3×3 …).
+#  - ROTATION REMOVED (rot:0 everywhere): Emerald 2D does not rotate.
 # ============================================================================
 import json, os
 
@@ -20,7 +20,7 @@ CANON = json.load(open(os.path.join(ROOT, 'tools/emerald-ref/canon-decor.json'))
 CAT = {'DESK': 'desks', 'CHAIR': 'chairs', 'PLANT': 'plants', 'ORNAMENT': 'objects',
        'MAT': 'mats', 'POSTER': 'wall', 'DOLL': 'dolls', 'CUSHION': 'cushions'}
 
-# fx de visite conservés (gameplay existant — pas de visuel ORAS ici)
+# visit fx kept (existing gameplay — no ORAS visual here)
 FX = {
     'red_balloon': 'burst', 'blue_balloon': 'burst', 'yellow_balloon': 'burst',
     'mud_ball': 'burst', 'breakable_door': 'door',
@@ -31,8 +31,8 @@ FX = {
     'solid_board': 'board', 'stairs': 'stairs', 'pc': 'pc',
 }
 
-# Acquisition (répartition boutique) — canon = Lilycove D5 / marché de Slateport /
-# déstockage Lilycove / atelier de verre, mappé sur nos sources existantes.
+# Acquisition (shop distribution) — canon = Lilycove D5 / Slateport market /
+# Lilycove clearance / glass workshop, mapped to our existing sources.
 ACQ = {
     'guild_shop': ['small_desk', 'pokemon_desk', 'heavy_desk', 'solid_board',
                    'small_chair', 'pokemon_chair', 'heavy_chair'],
@@ -66,7 +66,7 @@ ACQ = {
 }
 ACQ_OF = {slug: src for src, slugs in ACQ.items() for slug in slugs}
 
-# Poupées sur tapis / bureau / pneu / présentoir (demande utilisateur).
+# Dolls on mat / desk / tire / stand (user request).
 SURF = {'tire', 'stand'}
 
 # Noms affichés (i18n) — charte RSE française.
@@ -164,7 +164,7 @@ for key, v in CANON.items():
     else:
         it['layer'] = 'floor'
         if perm == 'DECORPERM_BEHIND_FLOOR':
-            it['behind'] = True   # collision = rangée de base, dessin derrière
+            it['behind'] = True   # collision = base row, drawn behind
         if perm == 'DECORPERM_PASS_FLOOR':
             it['walk'] = True
     if cat == 'desks' or cat == 'mats' or slug in SURF:
@@ -173,14 +173,14 @@ for key, v in CANON.items():
         it['fx'] = 'sit'
     if slug in FX:
         it['fx'] = FX[slug]
-    it['rot'] = 0  # passe 42 : rotation supprimée (canon RSE = sans rotation)
+    it['rot'] = 0  # phase 42: rotation removed (RSE canon = no rotation)
     it['price'] = v['price'] if v['price'] else None
     it['acq'] = ACQ_OF.get(slug, 'lilycove_clearance')
     items.append(it)
 
-# objets du jeu (hors gDecorations canon)
-# passe 43 : plus de « tapis d'accueil » visible (demande utilisateur — RSE
-# n'en montre pas ; le spawn = case devant la porte, marqueur 'S' des gabarits)
+# game objects (outside canon gDecorations)
+# phase 43: no more visible "welcome mat" (user request — RSE shows none;
+# spawn = tile in front of the door, the 'S' marker of the layouts)
 items.append({'s': 'stairs', 'cat': 'objects', 'w': 2, 'd': 2, 'layer': 'floor',
               'walk': True, 'rot': 0, 'fx': 'stairs', 'price': None, 'acq': 'fortree'})
 items.append({'s': 'pc', 'cat': 'objects', 'w': 1, 'd': 1, 'layer': 'floor',
@@ -192,25 +192,25 @@ missing_acq = [it['s'] for it in items if it['s'] not in ACQ_OF]
 assert not missing_acq, missing_acq
 
 HDR = '''// ============================================================================
-// DONNÉES — Catalogue des décorations de base secrète — CANON RSE ÉMERAUDE
+// DATA — Secret base decoration catalog — EMERALD RSE CANON
 // ----------------------------------------------------------------------------
-// GÉNÉRÉ par tools/build-canon-items.py depuis tools/emerald-ref/canon-decor.json
-// (= gDecorations du désassemblage pokeemerald : 119 décorations officielles)
-// + 2 objets du jeu (stairs / pc). NE PAS ÉDITER À LA MAIN.
+// GENERATED by tools/build-canon-items.py from tools/emerald-ref/canon-decor.json
+// (= gDecorations of the pokeemerald decompilation: 119 official decorations)
+// + 2 game objects (stairs / pc). DO NOT EDIT BY HAND.
 //
-// Champs :
-//   s      slug (clé i18n base.i.<s>)
+// Fields:
+//   s      slug (i18n key base.i.<s>)
 //   cat    desks|chairs|plants|objects|mats|wall|dolls|cushions
-//   w,d    forme canon DECORSHAPE (rendu ; collision selon layer/behind)
-//   layer  floor | surface (poupée/coussin) | wall (poster mural)
-//   behind canon BEHIND_FLOOR : collision = rangée de base, dessin DERRIÈRE
-//          le joueur (on colle au mur sans blocage, visuel 2 cases de haut)
-//   surf   reçoit les objets « surface » (bureaux, tapis, pneu, présentoir)
-//   rot    0 partout — PASSE 42 : ROTATION SUPPRIMÉE (canon RSE + demande)
-//   walk   le visiteur marche dessus (DECORPERM_PASS_FLOOR)
-//   fx     effet de visite : burst|door|glitter|jump|spin|note:N|board|
+//   w,d    canon DECORSHAPE shape (rendering; collision per layer/behind)
+//   layer  floor | surface (doll/cushion) | wall (wall poster)
+//   behind canon BEHIND_FLOOR: collision = base row, drawn BEHIND the
+//          player (hug the wall without blocking, 2-tiles-tall visual)
+//   surf   receives "surface" objects (desks, mats, tire, stand)
+//   rot    0 everywhere — PASSE 42: ROTATION REMOVED (RSE canon + request)
+//   walk   the visitor walks on it (DECORPERM_PASS_FLOOR)
+//   fx     visit effect: burst|door|glitter|jump|spin|note:N|board|
 //          stairs|pc|sit
-//   price  prix canon ₽ (null = jamais vendu), acq = verrou d'acquisition
+//   price  canon ₽ price (null = never sold), acq = acquisition lock
 // ============================================================================
 '''
 
@@ -230,13 +230,13 @@ lines = [HDR,
          "const BASE_ITEM_CATEGORIES = ['desks', 'chairs', 'plants', 'objects', 'mats', 'wall', 'dolls', 'cushions'];",
          '',
          'const BASE_ITEMS = [']
-groups = [('desks', 'bureaux (porteurs, 3×2/3×3 canon)'), ('chairs', 'chaises (franchissables, fx sit)'),
-          ('plants', 'plantes (collision rangée de base, 2 cases de haut visuel)'),
-          ('objects', 'gros objets & ornements (formes canon 1×2…4×2)'),
-          ('mats', 'tapis (franchissables, porteurs)'),
-          ('wall', 'posters (mur nord / face de falaise, 1×1 et 2×1)'),
-          ('dolls', 'poupées (couche surface : tapis/bureau/sol, 1 par case)'),
-          ('cushions', 'coussins (couche surface)')]
+groups = [('desks', 'desks (carriers, 3×2/3×3 canon)'), ('chairs', 'chairs (walkable, fx sit)'),
+          ('plants', 'plants (base-row collision, 2-tiles-tall visual)'),
+          ('objects', 'large objects & ornaments (canon shapes 1×2…4×2)'),
+          ('mats', 'mats (walkable, carriers)'),
+          ('wall', 'posters (north wall / cliff face, 1×1 and 2×1)'),
+          ('dolls', 'dolls (surface layer: mat/desk/floor, 1 per tile)'),
+          ('cushions', 'cushions (surface layer)')]
 for cat, label in groups:
     lines.append(' // ─── %s ─────────────────────────────────────────' % label)
     for it in items:
@@ -253,15 +253,15 @@ lines += [
 function baseItemNameKey(slug) { return 'base.i.' + slug; }
 function baseItemList(cat) { return cat ? BASE_ITEMS.filter((i) => i.cat === cat) : BASE_ITEMS.slice(); }
 
-// Passe 42 : rotation SUPPRIMÉE (canon RSE + demande utilisateur) — compteurs
-// figés à 1, normalisation → 0. Les signatures restent (appelants inchangés).
+// Passe 42: rotation REMOVED (RSE canon + user request) — counters
+// frozen to 1, normalization -> 0. Signatures stay (callers unchanged).
 function baseItemRotCount(item) { return 1; }
 function baseItemRotNormalize(item, rotIndex) { return 0; }
 
-// Empreinte de COLLISION/pose :
-//  - surface (poupées/coussins) : 1×1 sur la case de base ;
-//  - behind (plantes/boucliers, forme 1×2 ou 2×2) : rangée de base w×1 ;
-//  - sinon : forme canon complète (bureaux 3×2, tapis 3×3, toboggan 2×4…).
+// COLLISION/placement footprint:
+//  - surface (dolls/cushions): 1×1 on the base tile;
+//  - behind (plants/shields, 1×2 or 2×2 shape): base row w×1;
+//  - otherwise: full canon shape (desks 3×2, mats 3×3, slide 2×4…).
 function baseItemFootprint(item, rotIndex) {
   if (!item) return { w: 1, d: 1 };
   if (item.layer === 'surface') return { w: 1, d: 1 };
@@ -269,8 +269,8 @@ function baseItemFootprint(item, rotIndex) {
   return { w: item.w, d: item.d };
 }
 
-// Migration des anciens slugs (avant le catalogue canon de la passe 42) :
-// renommages → slug canon ; le reste est abandonné (objets hors DA Émeraude).
+// Migration of old slugs (before the canon catalog of phase 42):
+// renames -> canon slug; the rest is dropped (objects outside Emerald canon).
 const BASE_ITEM_MIGRATE = Object.freeze({
   pokeball_desk: 'pokemon_desk', rough_desk: 'ragged_desk', soft_desk: 'comfort_desk',
   elegant_desk: 'pretty_desk', log_desk: 'camp_desk',
@@ -283,7 +283,7 @@ const BASE_ITEM_MIGRATE = Object.freeze({
   note_fa_mat: 'f_note_mat', note_sol_mat: 'g_note_mat', note_la_mat: 'a_note_mat',
   note_si_mat: 'b_note_mat', note_do2_mat: 'c_high_note_mat',
   substitute_doll: 'wynaut_doll', big_snorlax_doll: 'snorlax_doll', big_rhydon_doll: 'rhydon_doll',
-  // hors-canon/ORAS retirés passe 42 → équivalent canon le plus proche
+  // off-canon/ORAS removed passe 42 → closest canon equivalent
   bench: 'small_chair', poke_flute: 'mud_ball', tall_grass: 'pretty_flowers',
   berry_tree: 'gorgeous_plant', globe: 'gold_shield', comfortable_bed: 'blue_tent',
   star_light: 'glass_ornament', cardboard_boxes: 'red_brick', trash_can: 'yellow_brick',
@@ -316,9 +316,9 @@ window.baseItemMigrate = baseItemMigrate;
 
 out = os.path.join(ROOT, 'src/data/base-items-data.js'.replace('/', os.sep))
 open(out, 'w').write('\n'.join(lines) + '\n')
-print('→', os.path.relpath(out, ROOT), '|', len(items), 'objets (120 canon + 2 jeu)')
+print('→', os.path.relpath(out, ROOT), '|', len(items), 'items (120 canon + 2 game)')
 
-# table i18n pour patch séparé
+# i18n table for a separate patch
 names_path = os.path.join(ROOT, 'tools/emerald-ref/canon-names.json'.replace('/', os.sep))
 json.dump({s: NAMES[s] for s in [it['s'] for it in items]}, open(names_path, 'w'),
           ensure_ascii=False, indent=1, sort_keys=True)

@@ -1,10 +1,7 @@
 export default [
   {
     files: [
-      'src/core/**/*.js',
-      'src/application/**/*.js',
-      'src/domain/**/*.js',
-      'src/ui/**/*.js',
+      'src/**/*.js',
       'tools/**/*.js',
       'tools/**/*.mjs',
       '*.js',
@@ -15,6 +12,8 @@ export default [
       'dist/**',
       'node_modules/**',
       'src/ui/input/inline-handler-sanitizer.js',
+      'src/data/**',
+      'src/localization/**',
     ],
     languageOptions: {
       ecmaVersion: 2022,
@@ -30,11 +29,22 @@ export default [
         URL: 'readonly',
         process: 'readonly',
         Buffer: 'readonly',
+        HTMLElement: 'readonly',
+        HTMLButtonElement: 'readonly',
+        HTMLSpanElement: 'readonly',
         MouseEvent: 'readonly',
         setTimeout: 'readonly',
         clearTimeout: 'readonly',
         setInterval: 'readonly',
         clearInterval: 'readonly',
+        requestAnimationFrame: 'readonly',
+        cancelAnimationFrame: 'readonly',
+        getComputedStyle: 'readonly',
+        performance: 'readonly',
+        Audio: 'readonly',
+        Image: 'readonly',
+        CustomEvent: 'readonly',
+        localStorage: 'readonly',
         getIcon: 'readonly',
         t: 'readonly',
       },
@@ -59,5 +69,33 @@ export default [
       'prefer-const': 'warn',
     },
   },
+  {
+    files: [
+      'src/engine/**/*.js',
+      'src/game/**/*.js',
+      // Classic window-wired modules (wave 33: ex-src/game, moved to their
+      // architectural layers unchanged) — they resolve game globals through
+      // the window surface like before by design.
+      'src/ui/game/**/*.js',
+      'src/application/combat/**/*.js',
+      'src/application/world/**/*.js',
+      'src/application/economy/**/*.js',
+      'src/application/quests/**/*.js',
+      'src/application/automation/**/*.js',
+      'src/application/base/**/*.js',
+      'src/application/save/**/*.js',
+      'src/application/breeding/**/*.js',
+      'src/application/bootstrap-timers.js',
+      'src/application/game-state.js',
+      'src/application/pokemon-factory.js',
+      'src/core/game-utils.js',
+      'src/engine/input/action-dispatcher.js',
+      'src/engine/runtime/classic-bridge.js',
+    ],
+    rules: {
+      'no-undef': 'off',
+    },
+  },
 ];
+
 

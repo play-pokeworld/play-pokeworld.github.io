@@ -1,3 +1,5 @@
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
 const TRAINER_SPRITES = {
  blue:'Rival Blue.png', silver:'Silver.png', rocket:'Team Rocket Grunt (male).png', rocket_f:'Team Rocket Grunt (female).png', rocket_admin:'Rocket Executive (archer).png', giovanni:'Team Rocket Boss Giovanni.png',
  brock:'Brock.png', misty:'Misty.png', surge:'Lt. Surge.png', erika:'Erika.png', koga:'Koga.png', sabrina:'Sabrina.png', blaine:'Blaine.png',
@@ -89,12 +91,24 @@ function trainerSpriteImg(key, size=72){
  const safeFile = String(file).replace(/"/g, '&quot;').replace(/ /g, '%20').replace(/\(/g, '%28').replace(/\)/g, '%29');
  return `<img class="trainer-sprite-img" src="src/assets/images/trainers/npcs/${safeFile}" width="${size}" height="${size}" alt="${spriteKey}">`;
 }
-if (typeof TRAINER_SPRITES !== 'undefined' && typeof window !== 'undefined') window.TRAINER_SPRITES = TRAINER_SPRITES;
-if (typeof TRAINER_BATTLE_SPRITES !== 'undefined' && typeof window !== 'undefined') window.TRAINER_BATTLE_SPRITES = TRAINER_BATTLE_SPRITES;
-if (typeof CHAMPION_TRAINER_SPRITES !== 'undefined' && typeof window !== 'undefined') window.CHAMPION_TRAINER_SPRITES = CHAMPION_TRAINER_SPRITES;
-if (typeof getTrainerSpriteKey !== 'undefined' && typeof window !== 'undefined') window.getTrainerSpriteKey = getTrainerSpriteKey;
-if (typeof trainerSpriteImg !== 'undefined' && typeof window !== 'undefined') window.trainerSpriteImg = trainerSpriteImg;
-if (typeof trainerProfileImg !== 'undefined' && typeof window !== 'undefined') window.trainerProfileImg = trainerProfileImg;
-if (typeof staffSpriteImg !== 'undefined' && typeof window !== 'undefined') window.staffSpriteImg = staffSpriteImg;
+if (typeof TRAINER_SPRITES !== 'undefined') { if (typeof window !== 'undefined') window.TRAINER_SPRITES = TRAINER_SPRITES; if (typeof globalThis !== 'undefined') globalThis.TRAINER_SPRITES = TRAINER_SPRITES; }
+if (typeof TRAINER_BATTLE_SPRITES !== 'undefined') { if (typeof window !== 'undefined') window.TRAINER_BATTLE_SPRITES = TRAINER_BATTLE_SPRITES; if (typeof globalThis !== 'undefined') globalThis.TRAINER_BATTLE_SPRITES = TRAINER_BATTLE_SPRITES; }
+if (typeof CHAMPION_TRAINER_SPRITES !== 'undefined') { if (typeof window !== 'undefined') window.CHAMPION_TRAINER_SPRITES = CHAMPION_TRAINER_SPRITES; if (typeof globalThis !== 'undefined') globalThis.CHAMPION_TRAINER_SPRITES = CHAMPION_TRAINER_SPRITES; }
+if (typeof getTrainerSpriteKey !== 'undefined') { if (typeof window !== 'undefined') window.getTrainerSpriteKey = getTrainerSpriteKey; if (typeof globalThis !== 'undefined') globalThis.getTrainerSpriteKey = getTrainerSpriteKey; }
+if (typeof trainerSpriteImg !== 'undefined') { if (typeof window !== 'undefined') window.trainerSpriteImg = trainerSpriteImg; if (typeof globalThis !== 'undefined') globalThis.trainerSpriteImg = trainerSpriteImg; }
+if (typeof trainerProfileImg !== 'undefined') { if (typeof window !== 'undefined') window.trainerProfileImg = trainerProfileImg; if (typeof globalThis !== 'undefined') globalThis.trainerProfileImg = trainerProfileImg; }
+if (typeof staffSpriteImg !== 'undefined') { if (typeof window !== 'undefined') window.staffSpriteImg = staffSpriteImg; if (typeof globalThis !== 'undefined') globalThis.staffSpriteImg = staffSpriteImg; }
 
 
+
+// Wave 40 — native ESM module: grouped export of the same names as the
+// classic surface kept above/here (bodies unchanged).
+export {
+  TRAINER_SPRITES,
+  TRAINER_BATTLE_SPRITES,
+  CHAMPION_TRAINER_SPRITES,
+  getTrainerSpriteKey,
+  trainerSpriteImg,
+  trainerProfileImg,
+  staffSpriteImg,
+};

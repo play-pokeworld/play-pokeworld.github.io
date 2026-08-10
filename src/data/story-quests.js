@@ -1,27 +1,29 @@
-// ═══ Quêtes principales — passe 18 : rangement, renumérotation, rééquilibrage ═══
-// • Kanto  1 → 44  (ordre strict de l'aventure ; la quête 22 « Team Rocket à
-//   la Tour Pokémon » est NOUVELLE — canon RFVF, insertion documentée)
-// • Johto 101 → 126 (même ordre qu'avant, numérotation unique — les anciens
-//   ids 20-31/60-66/1101-1108 pouvaient entrer en conflit avec Kanto, la
-//   recherche getMainQuestDef ne filtrant pas par région)
-// • Récompenses rééquilibrées (règle validée : le joueur ne doit pas devenir
-//   trop riche ni crouler sous les objets) : total argent Kanto ≈ 241 300₽
-//   (-33 % vs 358 000₽) + ≈ 57 000₽ de primes de combats de dresseurs ;
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
+// ═══ Main quests — phase 18: tidying, renumbering, rebalancing ═══
+// • Kanto  1 -> 44  (strict adventure order; quest 22 "Team Rocket at
+//   the Pokemon Tower" is NEW — FRLG canon, documented insertion)
+// • Johto 101 -> 126 (same order as before, unique numbering — the old
+//   ids 20-31/60-66/1101-1108 could clash with Kanto, since
+//   getMainQuestDef lookup does not filter by region)
+// • Rebalanced rewards (validated rule: the player must not become
+//   too rich nor drown in items): total Kanto money ≈ 241,300₽
+//   (-33% vs 358,000₽) + ≈ 57,000₽ of trainer-battle bonuses;
 //   Johto ≈ 226 100₽ (-25 % vs 301 800₽) + ≈ 42 300₽ de primes.
-//   Objets : jamais de doublon de pierre, une seule récompense « prestige »
-//   par quête, Baie Prine désormais réellement définie dans ITEMS.
-// • Quêtes trainer_battle : l'argent est versé à la victoire par le dresseur
-//   (OFFICIAL_TEAMS[idx].rewardMoney), le claim de quête ne donne rien.
-// Migration des sauvegardes : voir migrateQuestSaveV2 (quest-core.js).
+//   Items: never a duplicate stone, only one "prestige" reward per
+//   quest; the Prine Berry is now actually defined in ITEMS.
+// • trainer_battle quests: money is paid on victory by the trainer
+//   (OFFICIAL_TEAMS[idx].rewardMoney); the quest claim gives nothing.
+// Save migration: see migrateQuestSaveV2 (quest-core.js).
 var STORY_QUESTS = [
- // ─────────── KANTO (1-60) — passe 21 : densification (+16 quêtes) ───────────
+ // ─────────── KANTO (1-60) — phase 21: densification (+16 quests) ───────────
 // Insertions canon RFVF : Bill (13), Fan Club (14), Capitaine S.S. Anne (19),
-// Route 8 (24), Évoli/Porygon de Céladopole (31-32), Piste Cyclable (35),
-// Dentiers d'or du Parc Safari (36), Lokhlass de la Sylphe (39), DOJO de
+// Route 8 (24), Eevee/Porygon of Celadon (31-32), Cycling Road (35),
+// Gold Teeth of the Safari Zone (36), Sylph Lapras (39), DOJO of
 // Safrania → Tyrogue (40, RFVF : Kicklee/Tygnon Nv.37 @ Ceinture Noire),
-// M. Psyché (42), Collecteur (44), labo des fossiles → Ptéra (47), Chenal 21
-// (50), Ultime entraînement de la Route Victoire (52), Mémoires du Manoir (58).
-// Migration des sauvegardes : migrateQuestSaveV4 (quest-core.js).
+// Mr. Psychic (42), Collector (44), fossil lab -> Aerodactyl (47), Channel 21
+// (50), Ultimate training on Victory Road (52), Mansion Memories (58).
+// Save migration: migrateQuestSaveV4 (quest-core.js).
  {
   "id": 1,
   "region": "kanto",
@@ -565,12 +567,13 @@ var STORY_QUESTS = [
   "rewardMoney": 25000,
   "rewardItems": { "rarecandy": 5, "nugget": 3, "leftovers": 1 }
  },
- // ─────────── JOHTO (101-140) — passe 20 : étape 4, densification ───────────
- // Nouveautés : arc GS Ball (Fargot → Bois aux Chênes), arc FILM 3 aux Ruines
- // d'Alpha (Professeur Hale / Zarbi / Entei cristallin), Eusine & Suicune,
- // le remède d'Amphy le Pharamp (canon OAC : le Pharamp malade du phare),
- // Peter au Lac Colère, le LÉVIATOR ROUGE (rencontre shiny), l'épreuve du
- // dragon d'Ébénelle (Minidraco). Renumérotation → migration V3 côté core.
+ // ─────────── JOHTO (101-140) — passe 20: step 4, densification ───────────
+ // New content: GS Ball arc (Kurt -> Ilex Forest), MOVIE 3 arc at the
+ // Ruins of Alph (Professor Hale / Unown / crystal Entei), Eusine &
+ // Suicune, the remedy for Amphy the Ampharos (HGSS canon: the sick
+ // lighthouse Ampharos), Lance at the Lake of Rage, the RED GYARADOS
+ // (shiny encounter), the Blackthorn dragon trial (Dratini).
+ // Renumbering → V3 migration on the core side.
  {
   "id": 101,
   "region": "johto",
@@ -631,7 +634,7 @@ var STORY_QUESTS = [
   "rewardMoney": 4200,
   "rewardItems": { "silver_powder": 1 }
  },
- // ── Arc GS Ball (film 4) : Fargot étudie la mystérieuse GS Ball ──
+ // ── GS Ball arc (movie 4): Kurt studies the mysterious GS Ball ──
  {
   "id": 108,
   "region": "johto",
@@ -667,7 +670,7 @@ var STORY_QUESTS = [
   "rewardMoney": 6500,
   "rewardItems": { "silk_scarf": 1 }
  },
- // ── Arc FILM 3 (Le Sort des Zarbi) : Ruines d'Alpha ──
+ // ── MOVIE 3 arc (Spell of the Unown): Ruins of Alph ──
  {
   "id": 112,
   "region": "johto",
@@ -710,7 +713,7 @@ var STORY_QUESTS = [
   "battleId": "johto_rival_burned",
   "target": 1
  },
- // ── Eusine, le chasseur de Suicune (canon Cristal) ──
+ // ── Eusine, the Suicune hunter (Crystal canon) ──
  {
   "id": 117,
   "region": "johto",
@@ -738,7 +741,7 @@ var STORY_QUESTS = [
   "rewardMoney": 10000,
   "rewardItems": { "black_belt": 1 }
  },
- // ── Amphy malade (canon OAC) : le remède d'Irisia pour le Phare d'Oliville ──
+ // ── Sick Amphy (HGSS canon): the Cianwood remedy for the Olivine Lighthouse ──
  {
   "id": 120,
   "region": "johto",
@@ -765,7 +768,7 @@ var STORY_QUESTS = [
   "rewardMoney": 11500,
   "rewardItems": { "metal_coat": 1 }
  },
- // ── Lac Colère : Peter enquête + le LÉVIATOR ROUGE (canon OAC) ──
+ // ── Lake of Rage: Lance investigates + the RED GYARADOS (HGSS canon) ──
  {
   "id": 123,
   "region": "johto",
@@ -819,7 +822,7 @@ var STORY_QUESTS = [
   "rewardMoney": 17500,
   "rewardItems": { "dragon_fang": 1, "rarecandy": 1 }
  },
- // ── Épreuve du dragon d'Ébénelle (canon OAC : l'Antre du Dragon) ──
+ // ── Blackthorn dragon trial (HGSS canon: the Dragon's Den) ──
  {
   "id": 129,
   "region": "johto",
@@ -864,7 +867,7 @@ var STORY_QUESTS = [
   "rewardMoney": 9000,
   "rewardItems": { "silver_wing": 1 }
  },
- // ── Poursuite de Suicune (repérages le long de la Route 42) ──
+ // ── Suicune pursuit (sightings along Route 42) ──
  {
   "id": 134,
   "region": "johto",
@@ -941,5 +944,11 @@ var STORY_QUESTS = [
 
 
 // --- Migrated to ES module, globals exposed ---
-if (typeof STORY_QUESTS !== 'undefined' && typeof window !== 'undefined') window.STORY_QUESTS = STORY_QUESTS;
+if (typeof STORY_QUESTS !== 'undefined') { if (typeof window !== 'undefined') window.STORY_QUESTS = STORY_QUESTS; if (typeof globalThis !== 'undefined') globalThis.STORY_QUESTS = STORY_QUESTS; }
 
+
+// Wave 40 — native ESM module: grouped export of the same names as the
+// classic surface kept above/here (bodies unchanged).
+export {
+  STORY_QUESTS,
+};

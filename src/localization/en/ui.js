@@ -1,7 +1,7 @@
 // ===== EN — UI strings =====
 // Auto-extracted & grouped by domain. Edit text here, never hardcode in logic.
 
-window.L_en_ui = {
+export const L_en_ui = {
 "debug_toggle_btn":"Debug",
 "debug_x10_toggle":"x10 speed:",
 "debug_fill_mine":"Refill mine energy (100)",
@@ -120,7 +120,7 @@ window.L_en_ui = {
 "market_sub":"Buy rare Pokémon not found in the wild!",
 "market_title":"PokéMarket",
 "mine_sub":"Dig through rock layers to uncover <b>Evolution Stones</b>, Nuggets and Fossils!",
-"mine_title":"Grand Underground (Kanto Mines)",
+"mine_title":"Grand Underground",
 "modify_btn":"Modify",
 "moves_lbl":"Moves:",
 "no_item":"No item",
@@ -287,6 +287,7 @@ window.L_en_ui = {
   "hidden_carriers":"Hidden ability of…",
   "dict_and_n_more":"… and {count} more",
   "bag_search_placeholder":"Search an item…",
+  "box_filter_search_placeholder":"Search a Pokémon…",
   "delete_save_warning":"⚠️ This action is irreversible: all your progress will be wiped.",
   "preset_missing_hint":"Pokémon not found (moved or released)",
   "drag_win_hint":"Move window",
@@ -341,8 +342,21 @@ window.L_en_ui = {
 "sort_name":"Name",
 "sort_quantity":"Quantity",
 "sort_category":"Category",
+"sort_name_asc":"Name A→Z",
+"sort_name_desc":"Name Z→A",
+"sort_quantity_asc":"Quantity 0→9",
+"sort_quantity_desc":"Quantity 9→0",
 "filter_label":"Filter:",
 "sort_label":"Sort:",
+  "dex_sort_number":"Number",
+  "dex_sort_name":"Name",
+  "dex_sort_rank":"Rank",
+  "dex_sort_number_asc":"No. 1→9",
+  "dex_sort_number_desc":"No. 9→1",
+  "dex_sort_name_asc":"Name A→Z",
+  "dex_sort_name_desc":"Name Z→A",
+  "dex_sort_rank_asc":"Rank E→S",
+  "dex_sort_rank_desc":"Rank S→E",
 "mine_locked_badges":"Mine locked (2 Badges required)",
 "pokedex_seen":"Seen",
 "pokedex_caught":"Caught",
@@ -847,12 +861,21 @@ window.L_en_ui = {
 "training_trainers_title":"Trainers",
 "staff_active":"Active",
 "staff_bonus":"Bonus",
-"staff_bonus_hatchery_speed":"hatching K.O. reduction",
-"staff_bonus_hatchery_queue":"hatchery optimization",
-"staff_bonus_training_ease":"training battle advantage",
-"staff_bonus_training_mastery":"training mastery",
-"staff_bonus_mine_efficiency":"energy cost reduction",
-"staff_bonus_mine_energy":"mining endurance",
+"staff_bonus_hatchery_speed":"Hatchery / Daycare Speed",
+"staff_bonus_hatchery_cost":"Daycare Fee Reduction",
+"staff_bonus_hatchery_shiny":"Shiny Egg Chance",
+"staff_bonus_hatchery_exp":"Daycare XP Boost",
+"staff_bonus_hatchery_double_iv_level":"Double IV / Egg Level",
+"staff_bonus_training_exp":"Training XP Boost",
+"staff_bonus_training_kill_reduction":"Required K.O. Reduction",
+"staff_bonus_training_cost":"Training Fee Reduction",
+"staff_bonus_training_crit":"Critical Success Chance",
+"staff_bonus_training_drop":"Training Stage Loot",
+"staff_bonus_mine_energy_cost":"Energy Cost Reduction",
+"staff_bonus_mine_energy_regen":"Energy Regen Speed",
+"staff_bonus_mine_value":"Treasure Resale Value",
+"staff_bonus_mine_extra_items":"Extra Items per Layer",
+"staff_bonus_mine_energy_max":"Max Energy",
 "staff_name_manager_saffron":"Manager Sacha",
 "staff_desc_manager_saffron":"Regular hatching specialist for long cycles.",
 "staff_name_manager_cinnabar":"Researcher Amber",
@@ -1660,3 +1683,6 @@ window.L_en_ui = {
   "guide_atoll_rewards_desc":"Victories give Atoll tokens usable in the dedicated shop. Streaks increase the farming value."
 }
 
+// T2 (vague 38) : module ESM — export natif ; la surface classique est
+// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
+if (typeof globalThis !== 'undefined') globalThis.L_en_ui = L_en_ui;

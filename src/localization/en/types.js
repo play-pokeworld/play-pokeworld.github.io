@@ -1,7 +1,7 @@
 // ===== EN — Type names =====
 // Keys are the engine type ids (lowercase). Consumed via t('types.fire') and
 // getTypeName().
-window.L_en_types = {
+export const L_en_types = {
   "normal": "Normal",
   "fire": "Fire",
   "water": "Water",
@@ -22,3 +22,6 @@ window.L_en_types = {
   "fairy": "Fairy"
 };
 
+// T2 (vague 38) : module ESM — export natif ; la surface classique est
+// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
+if (typeof globalThis !== 'undefined') globalThis.L_en_types = L_en_types;

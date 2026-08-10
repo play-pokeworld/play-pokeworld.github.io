@@ -2,37 +2,50 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { pokeCardHTML } from '../src/ui/components/poke-card.js';
+import { harnessRunMixed } from '../tools/harness-bundle.mjs';
 
-// ── Passe 12 — sac : filtre CT/CS du sélecteur, retour au sac, debug CS ────
-// Bugs remontés :
-//  a. « La plupart des CT ne peuvent pas être apprises, aucun Pokémon ne
-//     s'affiche » → les movesets de MOVES sont en minuscules ("grass") alors
-//     que les types des Pokémon sont capitalisés ("Grass") ; 6 CT pointaient
-//     aussi vers des moveIds absents de MOVES (icebeam → ice_beam…, et
-//     bodyslam/doubleedge carrément manquants).
-//  b. Sélecteur CT : n'afficher que les Pokémon n'ayant PAS encore la
-//     capacité (current moves) et ne pouvant PAS déjà l'équiper.
-//  c. Retour au sac quand la CT n'est plus en stock.
-//  d. Bouton « Retour au sac » dans les listes ouvertes depuis le sac.
-//  e. Debug « obtenir toutes les CS » : clés périmées → liste dynamique.
+// ── Phase 12 — bag: TM/HM selector filter, back to bag, HM debug ─────────
+// Reported bugs:
+//  a. "Most TMs cannot be learned, no Pokémon shows up" → MOVES movesets
+//     are lowercase ("grass") while Pokémon types are capitalized ("Grass");
+//     6 TMs also pointed to moveIds absent from MOVES (icebeam → ice_beam…, and
+//     bodyslam/doubleedge completely missing).
+//  b. TM selector: only show Pokémon that do NOT have the
+//     move yet (current moves) and CANNOT already equip it.
+//  c. Back to the bag when the TM runs out of stock.
+//  d. "Back to bag" button in lists opened from the bag.
+//  e. "get all HMs" debug: stale keys → dynamic list.
 
-const MOVES_DATA = fs.readFileSync(new URL('../src/data/moves.js', import.meta.url), 'utf8');
-const ITEMS_DATA = fs.readFileSync(new URL('../src/data/items-data.js', import.meta.url), 'utf8');
-const PD_DATA = fs.readFileSync(new URL('../src/data/pd-data.js', import.meta.url), 'utf8');
-const HELPERS = fs.readFileSync(new URL('../src/data/items-helpers.js', import.meta.url), 'utf8');
-const BOX_SELECTOR = fs.readFileSync(new URL('../src/game/boxes/box-selector.js', import.meta.url), 'utf8');
-const ACTIONS = fs.readFileSync(new URL('../src/game/economy/inventory-actions.js', import.meta.url), 'utf8');
-const SAVE = fs.readFileSync(new URL('../src/game/save/save.js', import.meta.url), 'utf8');
+// Vague 40 — les lectures texte destinées à l'évaluation partent par PROD_R /
+// runMixedEnv (plus bas). Ne restent ici que les lecteurs de TEXTE pour locks
+// d'intention (jamais évalués) :
+const BOX_SELECTOR = fs.readFileSync(new URL('../src/ui/game/box-selector.js', import.meta.url), 'utf8');
+const SAVE = fs.readFileSync(new URL('../src/application/save/save.js', import.meta.url), 'utf8');
+
+// ── Vague 40 — boucle mixte ordonnée (T2-D généralisé) ────────────────────
+// Intention préservée : les mêmes fichiers, dans le même ordre, sous la même
+// sémantique que l'ancienne concat unique (un seul script → const inter-
+// fichiers partagées). Tant qu'un fichier reste classique, ses segments sont
+// concaténés à l'identique ; un fichier converti ESM est bundlé isolément
+// (ses globales passent par son shim globalThis gardé).
+const PROD_R = (p) => fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8');
+function runMixedEnv(labels, readText, sandbox) {
+  for (const seg of harnessRunMixed(labels, readText || PROD_R)) {
+    vm.runInContext(seg.source, sandbox, { filename: seg.filename });
+  }
+}
 
 function fakeNode() {
   return {
     innerHTML: '', textContent: '', value: '',
+    replaceChildren() { this.innerHTML = ''; },
     style: {},
     classList: { add() {}, remove() {}, toggle() {}, contains: () => false },
   };
 }
 
-// Bulbizarre (Plante/Poison) et Pikachu (Électrik) factices.
+// Fake Bulbasaur (Grass/Poison) and Pikachu (Electric).
 function bulba(extra = {}) { return Object.assign({ id: 1, name: 'Bulba', level: 50, type1: 'Grass', type2: 'Poison', moves: [], trainingUnlockedMoves: [], uid: 'u_b' }, extra); }
 function pika(extra = {}) { return Object.assign({ id: 25, name: 'Pika', level: 50, type1: 'Electric', type2: null, moves: [], trainingUnlockedMoves: [], uid: 'u_p' }, extra); }
 function squirtle(extra = {}) { return Object.assign({ id: 7, name: 'Carapuce', level: 50, type1: 'Water', type2: null, moves: [], trainingUnlockedMoves: [], uid: 'u_s' }, extra); }
@@ -68,12 +81,15 @@ function makeEnv(collect, opts = {}) {
   };
   sandbox.globalThis = sandbox;
   sandbox.window = sandbox;
+  // The selector grid renders through the single PokeCard DS component.
+  sandbox.PokeUI = { components: { pokeCardHTML } };
   vm.createContext(sandbox);
-  vm.runInContext(
-    MOVES_DATA + '\n' + ITEMS_DATA + '\n' + PD_DATA + '\n' + HELPERS + '\n' + BOX_SELECTOR + '\n' + ACTIONS,
-    sandbox,
-    { filename: 'bag-ct#passe12' }
-  );
+  // Vague 40 — ex 'bag-ct#passe12' concat : mêmes 6 fichiers, même ordre.
+  runMixedEnv([
+    'src/data/moves.js', 'src/data/items-data.js', 'src/data/pd-data.js',
+    'src/data/items-helpers.js', 'src/ui/game/box-selector.js',
+    'src/application/economy/inventory-actions.js',
+  ], null, sandbox);
   return sandbox;
 }
 
@@ -84,31 +100,31 @@ function gridHtml(env, action, pendingKey) {
   return env.nodes['usm-grid'].innerHTML;
 }
 
-// ── a. Compatibilité type : casse insensible ────────────────────────────────
+// ── a. Type compatibility: case-insensitive ────────────────────────────────
 
-test('CS Coupe (moveset [normal,grass]) : Bulbizarre Plante affiché, pas Pikachu Électrik', () => {
+test('HM Cut (moveset [normal,grass]): Bulbasaur Grass shown, not Pikachu Electric', () => {
   const env = makeEnv({ b1: bulba(), b2: pika() });
   const html = gridHtml(env, 'item_ct_cs_cs01_cut', 'cs01_cut');
   const cards = html.split('box-card').length - 1;
-  assert.equal(cards, 1, 'un seul Pokémon éligible');
-  assert.ok(html.includes("Bulba") === false || true); // le nom n'est pas rendu, on vérifie via le sprite/level
-  assert.ok(html.includes('Lv.50'), 'carte affichée');
+  assert.equal(cards, 1, 'a single eligible Pokémon');
+  assert.ok(html.includes("Bulba") === false || true); // the name is not rendered, verified via sprite/level
+  assert.ok(html.includes('Lv.50'), 'card shown');
 });
 
-test('CS Coupe : TOUS les Pokémon exclus si leur type ne matche pas → état vide (et non crash)', () => {
+test('HM Cut: ALL Pokémon excluded if their type does not match → empty state (not a crash)', () => {
   const env = makeEnv({ b2: pika() });
   const html = gridHtml(env, 'item_ct_cs_cs01_cut', 'cs01_cut');
-  assert.ok(html.includes('no_pokemon_found'), 'aucun candidat affiché');
+  assert.ok(html.includes('no_pokemon_found'), 'no candidate shown');
 });
 
-test('compatibilité via le type2 du Pokémon', () => {
-  // Coupe moveset [normal,grass] ; type1 Électrik ne matche pas, type2 Plante oui.
+test('compatibility via the Pokémon\'s type2', () => {
+  // Splits moveset [normal,grass]; Electric type1 does not match, Grass type2 does.
   const env = makeEnv({ b1: pika({ type2: 'Grass' }) });
   const html = gridHtml(env, 'item_ct_cs_cs01_cut', 'cs01_cut');
-  assert.ok((html.split('box-card').length - 1) === 1, 'éligible via type2');
+  assert.ok((html.split('box-card').length - 1) === 1, 'eligible via type2');
 });
 
-// ── a-bis. Alias legacy : CT dont le moveId n'existe pas en l'état ──────────
+// ── a-bis. Legacy aliases: TM whose moveId does not exist as-is ───────────
 
 test('resolveCtCsMoveId : icebeam → ice_beam, shadowball → shadow_ball', () => {
   const env = makeEnv({});
@@ -116,89 +132,89 @@ test('resolveCtCsMoveId : icebeam → ice_beam, shadowball → shadow_ball', () 
   assert.equal(env.resolveCtCsMoveId('ct30_shadowball'), 'shadow_ball');
   assert.equal(env.resolveCtCsMoveId('ct22_solarbeam'), 'solar_beam');
   assert.equal(env.resolveCtCsMoveId('ct15_hyperbeam'), 'hyper_beam');
-  assert.equal(env.resolveCtCsMoveId('ct06_toxic'), 'toxic', 'id déjà canonique inchangé');
+  assert.equal(env.resolveCtCsMoveId('ct06_toxic'), 'toxic', 'already-canonical id unchanged');
 });
 
-test('CT13 Laser Glace (alias) : Carapuce Eau affiché, Bulbizarre non', () => {
+test('TM13 Ice Beam (alias): Squirtle Water shown, Bulbasaur not', () => {
   const env = makeEnv({ b1: bulba(), b2: squirtle() });
   const html = gridHtml(env, 'item_ct_cs_ct13_icebeam', 'ct13_icebeam');
   const cards = html.split('box-card').length - 1;
-  assert.equal(cards, 1, 'un seul éligible (Eau ∈ moveset ice_beam)');
+  assert.equal(cards, 1, 'a single eligible (Water ∈ moveset ice_beam)');
 });
 
-test('CT Plaquage / Damoclès : moves présents dans MOVES et appris par tous (moveset all)', () => {
+test('TM Body Slam / Double-Edge: moves present in MOVES and learned by all (moveset all)', () => {
   const env = makeEnv({});
-  assert.ok(env.MOVES.bodyslam, 'bodyslam ajouté');
-  assert.ok(env.MOVES.doubleedge, 'doubleedge ajouté');
+  assert.ok(env.MOVES.bodyslam, 'bodyslam added');
+  assert.ok(env.MOVES.doubleedge, 'doubleedge added');
   assert.ok(env.MOVES.bodyslam.moveset.includes('all'));
   assert.ok(env.MOVES.doubleedge.moveset.includes('all'));
   const html = gridHtml(env, 'item_ct_cs_ct08_bodyslam', 'ct08_bodyslam');
-  assert.ok(!html.includes('no_pokemon_found') || true); // pas de crash
+  assert.ok(!html.includes('no_pokemon_found') || true); // no crash
   const env2 = makeEnv({ b1: bulba(), b2: pika() });
   const html2 = gridHtml(env2, 'item_ct_cs_ct08_bodyslam', 'ct08_bodyslam');
-  assert.equal(html2.split('box-card').length - 1, 2, 'tous éligibles (moveset all)');
+  assert.equal(html2.split('box-card').length - 1, 2, 'all eligible (moveset all)');
 });
 
-// ── b. Exclusions : déjà connue / déjà équipable ────────────────────────────
+// ── b. Exclusions: already known / already equippable ────────────────────────────
 
-test('exclus : Pokémon connaissant déjà la capacité (current moves)', () => {
+test('excluded: Pokémon already knowing the move (current moves)', () => {
   const env = makeEnv({ b1: bulba({ moves: [{ id: 'cut' }] }), b2: pika() });
   const html = gridHtml(env, 'item_ct_cs_cs01_cut', 'cs01_cut');
-  assert.ok(html.includes('no_pokemon_found'), 'Bulba la connaît : exclu');
+  assert.ok(html.includes('no_pokemon_found'), 'Bulba knows it: excluded');
 });
 
-test('exclus : capacité déjà débloquée par une CT précédente (trainingUnlockedMoves)', () => {
+test('excluded: move already unlocked by a previous TM (trainingUnlockedMoves)', () => {
   const env = makeEnv({ b1: bulba({ trainingUnlockedMoves: ['cut'] }) });
   const html = gridHtml(env, 'item_ct_cs_cs01_cut', 'cs01_cut');
-  assert.ok(html.includes('no_pokemon_found'), 'déjà débloquée : exclu');
+  assert.ok(html.includes('no_pokemon_found'), 'already unlocked: excluded');
 });
 
-test('exclus : capacité déjà apprenable au niveau actuel (équippable)', () => {
+test('excluded: move already learnable at current level (equippable)', () => {
   const env = makeEnv({ b1: bulba() }, { learnLevel: (nid, id) => (id === 'cut' ? 12 : 999) });
   const html = gridHtml(env, 'item_ct_cs_cs01_cut', 'cs01_cut'); // Bulba nv 50 ≥ 12
-  assert.ok(html.includes('no_pokemon_found'), 'niveau atteint : la CT serait inutile');
+  assert.ok(html.includes('no_pokemon_found'), 'level reached: the TM would be useless');
   const env2 = makeEnv({ b1: bulba({ level: 5 }) }, { learnLevel: (nid, id) => (id === 'cut' ? 12 : 999) });
   const html2 = gridHtml(env2, 'item_ct_cs_cs01_cut', 'cs01_cut'); // nv 5 < 12
-  assert.equal(html2.split('box-card').length - 1, 1, 'encore non apprenable : affiché');
+  assert.equal(html2.split('box-card').length - 1, 1, 'still not learnable: shown');
 });
 
-// ── c. Retour au sac quand la CT est épuisée ────────────────────────────────
+// ── c. Back to the bag when the TM is exhausted ────────────────────────────
 
-test('startLearnMoveCtCs sans stock : retour au sac, pas de sélecteur', () => {
+test('startLearnMoveCtCs without stock: back to bag, no selector', () => {
   const env = makeEnv({});
   env.G.inventory = {}; // 0 ct06_toxic
   env.startLearnMoveCtCs('ct06_toxic');
-  assert.equal(env.calls.filter((c) => c[0] === 'selector').length, 0, 'pas de sélecteur ouvert');
-  assert.ok(env.calls.some((c) => (c[0] === 'showTab' && c[1] === 'inventory') || c[0] === 'renderInventory'), 'retour au sac');
+  assert.equal(env.calls.filter((c) => c[0] === 'selector').length, 0, 'no selector opened');
+  assert.ok(env.calls.some((c) => (c[0] === 'showTab' && c[1] === 'inventory') || c[0] === 'renderInventory'), 'back to bag');
 });
 
-test('startLearnMoveCtCs avec stock : sélecteur ouvert normalement', () => {
+test('startLearnMoveCtCs with stock: selector opens normally', () => {
   const env = makeEnv({});
   env.G.inventory = { ct06_toxic: 1 };
   env.startLearnMoveCtCs('ct06_toxic');
-  assert.equal(env._usmAction, 'item_ct_cs_ct06_toxic', 'sélecteur ouvert en mode CT');
+  assert.equal(env._usmAction, 'item_ct_cs_ct06_toxic', 'selector opened in TM mode');
   assert.equal(env.nodes['unified-selector-modal'].style.display, 'flex');
   assert.equal(env.G.pendingItemUseKey, 'ct06_toxic');
-  assert.ok(env.nodes['usm-title'].textContent.includes('(CT)'), 'titre suffixé CT');
+  assert.ok(env.nodes['usm-title'].textContent.includes('(CT)'), 'title suffixed with TM');
 });
 
-// ── d. Bouton retour au sac dans le sélecteur ───────────────────────────────
+// ── d. Back-to-bag button in the selector ──────────────────────────────────
 
-test('bouton « Retour au sac » présent pour les actions item_*, absent sinon', () => {
+test('"Back to bag" button present for item_* actions, absent otherwise', () => {
   const env = makeEnv({ b1: bulba() });
   gridHtml(env, 'item_ct_cs_cs01_cut', 'cs01_cut');
   const footer = env.nodes['usm-footer'].innerHTML;
-  assert.ok(footer.includes('close-selector-show-tab') && footer.includes('data-tab="inventory"'), 'bouton retour vers le sac');
-  assert.ok(footer.includes('back_bag'), 'libellé retour sac');
+  assert.ok(footer.includes('close-selector-show-tab') && footer.includes('data-tab="inventory"'), 'back-to-bag button');
+  assert.ok(footer.includes('back_bag'), 'back-to-bag label');
   const env2 = makeEnv({ b1: bulba() });
   env2._usmAction = 'team';
   env2.renderUnifiedGrid();
-  assert.ok(!String(env2.nodes['usm-footer'].innerHTML).includes('close-selector-show-tab'), 'pas de bouton hors sac');
+  assert.ok(!String(env2.nodes['usm-footer'].innerHTML).includes('close-selector-show-tab'), 'no button outside the bag');
 });
 
-// ── e. Debug « obtenir toutes les CS » : liste dynamique ────────────────────
+// ── e. "get all HMs" debug: dynamic list ───────────────────────────────────
 
-test('debugGiveCtCs : tous les objets donnés existent et incluent les 3 CS', () => {
+test('debugGiveCtCs: all given items exist and include the 3 HMs', () => {
   const notifs = [];
   const sandbox = {
     console,
@@ -211,43 +227,55 @@ test('debugGiveCtCs : tous les objets donnés existent et incluent les 3 CS', ()
   };
   sandbox.globalThis = sandbox;
   sandbox.window = sandbox;
+  // The selector grid renders through the single PokeCard DS component.
+  sandbox.PokeUI = { components: { pokeCardHTML } };
   vm.createContext(sandbox);
   const fn = SAVE.match(/function debugGiveCtCs\(\)\s*\{[\s\S]*?\n\}/);
   assert.ok(fn, 'debugGiveCtCs extrait');
-  vm.runInContext(ITEMS_DATA + '\n' + HELPERS + '\n' + fn[0], sandbox, { filename: 'debug#passe12' });
+  // Vague 40 — ex concat 'debug#passe12' : data + slice de save.js. Le slice
+  // reste DANS le segment classique (parité exacte : même scope de script —
+  // il lit ITEMS / isCtCsItem via typeof gardé comme avant la conversion).
+  runMixedEnv(
+    ['src/data/items-data.js', 'src/data/items-helpers.js', '__slice/debugGiveCtCs(save.js)'],
+    (label) => (label === '__slice/debugGiveCtCs(save.js)' ? fn[0] : PROD_R(label)),
+    sandbox
+  );
   sandbox.debugGiveCtCs();
   const inv = sandbox.G.inventory;
   const keys = Object.keys(inv);
-  assert.ok(keys.length >= 100, `au moins 100 objets (${keys.length})`);
-  // Toutes les clés données doivent exister dans ITEMS (aucune clé morte)
+  assert.ok(keys.length >= 100, `at least 100 objects (${keys.length})`);
+  // Every given key must exist in ITEMS (no dead key)
   const dead = keys.filter((k) => !sandbox.ITEMS[k]);
-  assert.deepEqual(dead, [], 'aucune clé inexistante');
+  assert.deepEqual(dead, [], 'no missing key');
   for (const cs of ['cs01_cut', 'cs02_fly', 'cs03_surf']) {
-    assert.ok(inv[cs] > 0, `CS donnée : ${cs}`);
+    assert.ok(inv[cs] > 0, `HM given: ${cs}`);
   }
-  assert.ok(inv['ct06_toxic'] > 0, 'CT06 (ancienne clé ct_toxic corrigée via la dynamique)');
+  assert.ok(inv['ct06_toxic'] > 0, 'TM06 (old ct_toxic key fixed via the dynamic list)');
 });
 
 // ── Contrats sources ────────────────────────────────────────────────────────
 
-test('contrat : le filtre CT compare les types en minuscules et exclut connues/équipables', () => {
-  assert.ok(/toLowerCase\(\)/.test(BOX_SELECTOR), 'comparaison casse insensible présente');
-  assert.ok(/resolveCtCsMoveId/.test(BOX_SELECTOR), 'alias résolu dans le sélecteur');
-  assert.ok(/trainingUnlockedMoves[\s\S]{0,120}indexOf\(moveId\) !== -1[\s\S]{0,40}return false/.test(BOX_SELECTOR), 'exclusion débloquées');
+test('contract: the TM filter compares types in lowercase and excludes known/equippable', () => {
+  assert.ok(/toLowerCase\(\)/.test(BOX_SELECTOR), 'case-insensitive comparison present');
+  assert.ok(/resolveCtCsMoveId/.test(BOX_SELECTOR), 'alias resolved in the selector');
+  assert.ok(/trainingUnlockedMoves[\s\S]{0,120}indexOf\(moveId\) !== -1[\s\S]{0,40}return false/.test(BOX_SELECTOR), 'unlocked-moves exclusion');
 });
 
-test('contrat : MOVES connaît désormais tous les moveIds des CT/CS (via alias)', () => {
+test('contract: MOVES now knows all TM/HM moveIds (via aliases)', () => {
   const sandbox = { window: {}, console };
   sandbox.globalThis = sandbox;
   sandbox.window = sandbox;
+  // The selector grid renders through the single PokeCard DS component.
+  sandbox.PokeUI = { components: { pokeCardHTML } };
   vm.createContext(sandbox);
-  vm.runInContext(MOVES_DATA + '\n' + ITEMS_DATA + '\n' + HELPERS, sandbox);
+  // Vague 40 — ex concat : mêmes 3 fichiers (moves/items-data/items-helpers), même ordre.
+  runMixedEnv(['src/data/moves.js', 'src/data/items-data.js', 'src/data/items-helpers.js'], null, sandbox);
   const unresolved = [];
   for (const k of Object.keys(sandbox.ITEMS)) {
     if (!sandbox.isCtCsItem(k)) continue;
     const id = sandbox.resolveCtCsMoveId(k);
     if (!id || !sandbox.MOVES[id]) unresolved.push(`${k}→${id}`);
   }
-  assert.deepEqual(unresolved, [], 'toutes les CT/CS résolvent vers un move existant');
+  assert.deepEqual(unresolved, [], 'all TMs/HMs resolve to an existing move');
 });
 

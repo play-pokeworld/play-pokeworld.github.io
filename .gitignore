@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Legacy fallback bundle (regenerated on demand, never committed)
+pw-bundle.js
+
+# Test/build artefacts
+coverage/
+*.log
+
+# OS / editor noise
+.DS_Store
+Thumbs.db

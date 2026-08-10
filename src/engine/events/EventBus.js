@@ -2,9 +2,10 @@
  * PokeEngine — EventBus
  * Typed event system with wildcard, once, and async support
  */
-(function() {
-  'use strict';
-  class EventBus {
+// Wave 41 — native ESM module (IIFE removed, wave-38 template): native export;
+// the engine surface (globalThis.PokeEventBus + poke.* namespace) is
+// kept for classic consumers and the T2-C bridge.
+class EventBus {
     constructor() {
       this._listeners = new Map();
       this._wildcard = null;
@@ -27,6 +28,7 @@
       return this;
     }
     emit(event, ...args) {
+      try { if (typeof PokeTrace !== 'undefined' && PokeTrace) PokeTrace.count('event', String(event)); } catch (_) {}
       if (this._wildcard) this._wildcard.fn.call(this._wildcard.ctx, event, ...args);
       const list = this._listeners.get(event);
       if (!list) return this;
@@ -51,8 +53,8 @@
       return this;
     }
   }
-  window.PokeEventBus = EventBus;
-  if (!window.poke) window.poke = {};
-  window.poke.EventBus = EventBus;
-})();
+if (typeof globalThis !== 'undefined') globalThis.PokeEventBus = EventBus;
+if (typeof window !== 'undefined') { if (!window.poke) window.poke = {}; window.poke.EventBus = EventBus; }
 
+export { EventBus };
+export default EventBus;

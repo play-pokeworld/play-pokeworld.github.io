@@ -1,5 +1,5 @@
 // ===== EN — UI messages & notifications =====
-window.L_en_messages = {
+export const L_en_messages = {
 "m.automation.1":"Disabled",
 "m.automation.2":"Enabled",
 "m.automation.3":"Puts Boxed Pokémon into empty egg slots",
@@ -326,8 +326,22 @@ window.L_en_messages = {
 "debug_x10_on":"x10 speed enabled",
 "debug_x10_off":"x10 speed disabled",
 "mine_found":"⛏ Found: {item}!",
-"mine_battle_log":"⛏ Underground: You dug up {icon} <b>{item}</b>!"
+"mine_battle_log":"⛏ Underground: You dug up {icon} <b>{item}</b>!",
+"no_castform_in_team":"No Castform in your team!",
+"castform_weather_transformed":"Castform transformed its weather structure into {name}!",
+"no_deoxys_in_team":"No Deoxys in your team!",
+"deoxys_mutated":"Meteorites mutated Deoxys into {name}!",
+"preset_modal_missing":"Unable to open preset editor (interface not ready). Try again.",
+"preset_editor_failed":"Unable to open preset editor.",
+"preset_error":"Team editor error: {err}",
+"daycare_fee_log":" [Daycare] -{fee}₽ paid for {n} level(s) gained by {name}.",
+"daycare_max_log":" [Daycare] {name} reached Level 100 and leaves the Daycare!",
+"daycare_evicted_funds":"{name} was removed from the Daycare: not enough money to pay for its new levels ({fee}₽ required)!",
+"daycare_evicted_max":"{name} reached Level 100 and leaves the Daycare!",
+"treasure_sold":" Sold {n}x {item} for +{gain}₽!",
+"evolution_region_locked":"This evolution ({region}) will unlock after discovering {region}!"
 };
 
-
-
+// T2 (vague 38) : module ESM — export natif ; la surface classique est
+// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
+if (typeof globalThis !== 'undefined') globalThis.L_en_messages = L_en_messages;

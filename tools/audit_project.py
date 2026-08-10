@@ -7,9 +7,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 TEXT_EXT = {'.html', '.js', '.css'}
-# Passe 45 : `tests/` est exclu de l'inventaire d'assets. Les tests citent des
-# chemins pour vérifier qu'ils N'EXISTENT PLUS (staging ORAS purgé passe 42) :
-# les compter comme « références » produisait de faux manquants.
+# Phase 45: `tests/` is excluded from the asset inventory. Tests cite
+# paths to verify they NO LONGER EXIST (ORAS staging purged in phase 42):
+# counting them as "references" produced false missing-asset reports.
 IGNORE_DIRS = {'node_modules', 'dist', '.git', 'tests'}
 
 hardcoded = []
@@ -34,10 +34,10 @@ for path in ROOT.rglob('*'):
         if '${' not in m and not m.endswith('/') and not m.endswith('_'):
             asset_refs.add(m)
 
-# Références dynamiques invisibles à l'analyse statique : cartes de régions
-# (spriteUrl.map(region)) et sprite générique des objets inconnus.
-# Passe 6 : Alola et Galar sont enregistrées en PARTIES séparées (noms
-# Pokéclicker), jamais fusionnées — l'audit vérifie chaque partie.
+# Dynamic references invisible to static analysis: region maps
+# (spriteUrl.map(region)) and the generic sprite of unknown items.
+# Phase 6: Alola and Galar are saved as SEPARATE PARTS (Pokéclicker
+# names), never merged — the audit checks each part.
 for region in ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'paldea']:
     asset_refs.add(f'src/assets/images/maps/{region}.png')
 for part in ['galar-north', 'galar-south',
@@ -46,9 +46,9 @@ for part in ['galar-north', 'galar-south',
 asset_refs.add('src/assets/images/items/unknown.png')
 
 for ref in sorted(asset_refs):
-    # Les chemins écrits dans le code peuvent être PERCENT-ENCODÉS (noms de
-    # dresseurs avec espaces/parenthèses : « Ace%20Trainer%20%28male%29.png »).
-    # On teste le chemin brut ET sa forme décodée avant de crier au manquant.
+    # Paths written in the code may be PERCENT-ENCODED (trainer names
+    # with spaces/parentheses: "Ace%20Trainer%20%28male%29.png").
+    # Test the raw path AND its decoded form before reporting missing.
     if (ROOT / ref).exists():
         continue
     if (ROOT / urllib.parse.unquote(ref)).exists():

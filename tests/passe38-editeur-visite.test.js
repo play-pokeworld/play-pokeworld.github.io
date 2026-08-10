@@ -2,37 +2,38 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { harnessBundleSource } from '../tools/harness-bundle.mjs';
 import { fileURLToPath } from 'node:url';
 
-// ── Passe 38 : éditeur de pose 2D + visite interactive + combat de copain ──
-//  A. Sélection dans le stock → pose au clic (stock décrémenté, sélection
-//     auto relâchée quand épuisé), pose illégale → raison i18n
-//  B. Fantôme de pose (vert/rouge + raison) et conversion souris → case
-//     (échelle CSS gérée, hors-limites → null)
-//  C. Rotation d'un meuble posé (banc 90°) + ramassage qui embarque les
-//     objets « surface » orphelins (bureau + poupée)
-//  D. Visite : départ du spawn, toucher-pour-marcher vers un copain (case
-//     bloquée → case voisine), interaction face-à-face, combat borné
-//     (startBattle champ 'base_npc', équipe instanciée, 1× par visite),
-//     record propriétaire crédité ; visite d'un fichier d'ami SANS crédit
-//  E. Câblage UI/combat : index.html (barre+actions), postboot, loader,
+// ── Phase 38: 2D placement editor + interactive visit + buddy battle ───────
+//  A. Selection from stock → place on click (stock decremented, selection
+//     auto-released when exhausted), illegal placement → i18n reason
+//  B. Placement ghost (green/red + reason) and mouse → tile conversion
+//     (CSS scale handled, out-of-bounds → null)
+//  C. Rotating placed furniture (90° bench) + pickup taking along
+//     orphaned "surface" objects (desk + doll)
+//  D. Visit: start from spawn, touch-to-walk towards a buddy (blocked
+//     tile → neighbor tile), face-to-face interaction, bounded battle
+//     (startBattle 'base_npc' field, instantiated team, 1× per visit),
+//     owner record credited; visiting a friend's file WITHOUT credit
+//  E. UI/battle wiring: index.html (bar+actions), postboot, loader,
 //     styles, hooks battle (victoire/blackout/abandon), getChampName
-//  F. Garde WebGL2 : 3D désactivée sans GL, repli 2D, visite forcée en 2D
+//  F. WebGL2 guard: 3D disabled without GL, 2D fallback, visit forced to 2D
 const R = (p) => fs.readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
 const E = (p) => fs.existsSync(new URL(`../${p}`, import.meta.url));
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 
 const SANDBOX_FILES = [
-  'src/file-preflight.js',
+  'src/engine/input/action-dispatcher.js', 'src/engine/runtime/classic-bridge.js',
   'src/localization/fr/base.js', 'src/localization/en/base.js',
   'src/localization/data.js', 'src/localization/i18n.js',
-  'src/game/core/state.js',
+  'src/application/game-state.js',
   'src/data/base-layouts-data.js', 'src/data/base-items-data.js',
-  'src/game/base/base-core.js',
-  'src/game/base/base-visit.js',
-  'src/game/base/base-exchange.js',
-  'src/game/base/base-editor.js',
-  'src/game/base/base-debug.js',
+  'src/application/base/base-core.js',
+  'src/ui/game/base/base-visit.js',
+  'src/ui/game/base/base-exchange.js',
+  'src/ui/game/base/base-editor.js',
+  'src/ui/game/base/base-debug.js',
 ];
 
 function makeSandbox(withBattleStubs) {
@@ -59,9 +60,9 @@ function makeSandbox(withBattleStubs) {
   sandbox.window = sandbox;
   sandbox.globalThis = sandbox;
   vm.createContext(sandbox);
-  for (const f of SANDBOX_FILES) vm.runInContext(R(f), sandbox, { filename: f });
+  vm.runInContext(harnessBundleSource(SANDBOX_FILES), sandbox, { filename: 'passe38-editeur-visite [iife]' });
   if (withBattleStubs) {
-    // Doublures combat : le duel borné est testé SANS le moteur temps réel.
+    // Battle stand-ins: the bounded duel is tested WITHOUT the real-time engine.
     vm.runInContext(`
       var MOVES = { tackle: { name: 'Charge' }, growl: { name: 'Rugissement' } };
       function createPoke(id, level, shiny) {
@@ -80,12 +81,12 @@ function makeSandbox(withBattleStubs) {
   return sandbox;
 }
 
-// Ameublement de test partagé : trou recouvert, bureau, copain au sud.
+// Shared test furnishing: covered hole, desk, buddy to the south.
 const FURNISH = `
   const st = baseGetState();
   baseDebugCreate('cave_1');
   baseDebugGrantAll();
-  basePlace(st, 'solid_board', 5, 2, 0);            // trou comblé (canon)
+  basePlace(st, 'solid_board', 5, 2, 0);            // filled hole (canon)
   baseNpcAdd(st, { name: 'Leo', sprite: 'youngster',
     team: [{ id: 25, level: 50, moves: ['tackle', 'growl'], talent: null, shiny: false }],
     msgs: { pre: 'Go !', win: 'Bien joué.', lose: 'Ouch…' } });
@@ -93,8 +94,8 @@ const FURNISH = `
   baseNpcPlace(st, npcId, 2, 6);
 `;
 
-// ——— A — Stock → pose au clic ————————————————————————————————————————————
-test('passe 38 A : sélection stock puis pose au clic, stock décrémenté, auto-relâche', () => {
+// ——— A — Stock → click placement ————————————————————————————————————————————
+test('phase 38 A: stock selection then click-placement, stock decremented, auto-release', () => {
   const sb = makeSandbox(false);
   const out = JSON.parse(vm.runInContext(`(() => {
     const st = baseGetState();
@@ -108,48 +109,48 @@ test('passe 38 A : sélection stock puis pose au clic, stock décrémenté, auto
     r.placeOk = p.ok === true && p.type === 'place';
     const it = st.items.find((i) => i.s === 'small_desk');
     r.at = it ? it.x + ',' + it.y : null;
-    r.selAfter = ed.slug;                 // stock épuisé (1 ex.) → relâché
+    r.selAfter = ed.slug;                 // stock exhausted (1 copy) → released
     r.stockLeft = baseStockCount(st, 'small_desk');
-    r.reSel = baseEditorSelectSlug(st, 'small_desk'); // plus rien en stock
+    r.reSel = baseEditorSelectSlug(st, 'small_desk'); // nothing left in stock
     baseEditorSelectSlug(st, 'pokemon_desk');
-    const bad = baseEditorClickCell(st, 5, 7);        // S = point d'arrivée (passe 43 : devant la porte)
+    const bad = baseEditorClickCell(st, 5, 7);        // S = spawn point (pass 43: in front of the door)
     r.bad = { ok: bad.ok, reason: bad.reason, kept: ed.slug, stock: baseStockCount(st, 'pokemon_desk') };
     return JSON.stringify(r);
   })()`, sb));
   assert.equal(out.sel, 'small_desk');
   assert.equal(out.slugInState, 'small_desk');
-  assert.equal(out.placeOk, true, 'pose au clic acceptée');
+  assert.equal(out.placeOk, true, 'click placement accepted');
   assert.equal(out.at, '1,3');
-  assert.equal(out.selAfter, null, 'sélection relâchée une fois le stock épuisé');
+  assert.equal(out.selAfter, null, 'selection released once stock is exhausted');
   assert.equal(out.stockLeft, 0);
-  assert.equal(out.reSel, null, 'impossible de re-sélectionner un objet épuisé');
+  assert.equal(out.reSel, null, 'cannot re-select an exhausted item');
   assert.equal(out.bad.ok, false);
-  assert.equal(out.bad.reason, 'base.err.entrance', 'raison i18n remontée');
-  assert.equal(out.bad.kept, 'pokemon_desk', 'sélection conservée après un refus');
-  assert.equal(out.bad.stock, 1, 'stock intact après un refus');
+  assert.equal(out.bad.reason, 'base.err.entrance', 'i18n reason surfaced');
+  assert.equal(out.bad.kept, 'pokemon_desk', 'selection kept after a refusal');
+  assert.equal(out.bad.stock, 1, 'stock intact after a refusal');
 });
 
-// ——— B — Fantôme + géométrie souris ——————————————————————————————————————
-test('passe 38 B : fantôme vert/rouge + baseEditorCellFromEvent (échelle CSS, bornes)', () => {
+// ——— B — Ghost + mouse geometry ——————————————————————————————————————
+test('phase 38 B: green/red ghost + baseEditorCellFromEvent (CSS scale, bounds)', () => {
   const sb = makeSandbox(false);
   const out = JSON.parse(vm.runInContext(`(() => {
     const st = baseGetState();
     baseDebugCreate('cave_1');
     baseDebugGrantAll();
     baseEditorSelectSlug(st, 'red_poster');
-    baseEditorSetHover({ x: 5, y: 0 });              // mur nord, sol au sud → canon
+    baseEditorSetHover({ x: 5, y: 0 });              // north wall, floor to the south → canon
     const g1 = baseEditorGhost(st);
-    baseEditorSetHover({ x: 5, y: 8 });              // tapis de sortie (sol)
+    baseEditorSetHover({ x: 5, y: 8 });              // exit mat (floor)
     const g2 = baseEditorGhost(st);
     baseEditorSetHover(null);
     const g3 = baseEditorGhost(st);
-    // fantôme copain : case du trou nu → rouge
+    // buddy ghost: bare hole tile → red
     baseEditorSelectSlug(st, null);
     baseNpcAdd(st, { name: 'N', sprite: 's', team: [{ id: 1, level: 5, moves: [], talent: null, shiny: false }], msgs: {} });
     baseEditorSelectNpc(st, st.npcStock[0].id);
     baseEditorSetHover({ x: 5, y: 2 });
     const g4 = baseEditorGhost(st);
-    // souris : canvas 360×296 (11×9 cases de 32px + marge 4), rect à l'échelle 1 puis 0.5
+    // mouse: 360×296 canvas (11×9 tiles of 32px + 4 margin), rect at scale 1 then 0.5
     const L = baseLayoutGet('cave_1');
     const fake = (rw, rh) => ({ width: L.w * 32 + 8, height: L.h * 32 + 8,
       getBoundingClientRect: () => ({ left: 10, top: 20, width: rw, height: rh, right: 10 + rw, bottom: 20 + rh }) });
@@ -158,45 +159,45 @@ test('passe 38 B : fantôme vert/rouge + baseEditorCellFromEvent (échelle CSS, 
     const c3 = baseEditorCellFromEvent(st, fake(360, 296), { clientX: 0, clientY: 0 });
     return JSON.stringify({ g1, g2, g3, g4, c1, c2, c3 });
   })()`, sb));
-  assert.equal(out.g1.ok, true, 'poster : mur nord avec sol au sud → vert');
+  assert.equal(out.g1.ok, true, 'poster: north wall with floor to the south → green');
   assert.equal(out.g1.slug, 'red_poster');
   assert.equal(out.g1.w >= 1 && out.g1.d >= 1, true);
-  assert.equal(out.g2.ok, false, 'poster sur la sortie (sol) → rouge');
-  assert.ok(String(out.g2.reason).startsWith('base.err.'), 'raison i18n présente');
-  assert.equal(out.g3, null, 'pas de fantôme sans survol');
-  assert.equal(out.g4.ok, false, 'copain sur un trou nu → rouge');
+  assert.equal(out.g2.ok, false, 'poster on the exit (floor) → red');
+  assert.ok(String(out.g2.reason).startsWith('base.err.'), 'i18n reason present');
+  assert.equal(out.g3, null, 'no ghost without hover');
+  assert.equal(out.g4.ok, false, 'buddy on a bare hole → red');
   assert.equal(out.g4.npc, true);
-  assert.deepEqual(out.c1, { x: 1, y: 1 }, 'échelle 1 : case (1,1)');
-  assert.deepEqual(out.c2, { x: 1, y: 1 }, 'échelle 0.5 : même case (mise à l’échelle CSS gérée)');
+  assert.deepEqual(out.c1, { x: 1, y: 1 }, 'scale 1: tile (1,1)');
+  assert.deepEqual(out.c2, { x: 1, y: 1 }, 'scale 0.5: same tile (CSS scaling handled)');
   assert.equal(out.c3, null, 'hors-limites → null');
 });
 
-// ——— C — Rotation posée + ramassage chaîné ———————————————————————————————
-test('passe 38 C : pivot d’un meuble posé + ramassage qui embarque la poupée', () => {
+// ——— C — Placement rotation + chained pickup ———————————————————————————————
+test('phase 38 C: pivot of placed furniture + pickup taking the doll along', () => {
   const sb = makeSandbox(false);
   const out = JSON.parse(vm.runInContext(`(() => {
     const st = baseGetState();
     baseDebugCreate('cave_1');
     baseDebugGrantAll();
     const ed = baseEditorGet();
-    // Brique rouge 1×2 (canon, remplace l'ancien « banc » ORAS) : UN clic —
-    // même sur la 2ᵉ case de l'empreinte — = prise en main directe (passe 41).
-    // Passe 42 : ROTATION SUPPRIMÉE → le pivot est refusé proprement,
-    // l'objet garde son orientation canon (DA Émeraude 2D).
+    // Red brick 1×2 (canon, replaces the old ORAS "bench"): ONE click —
+    // even on the 2nd tile of the footprint — = direct pickup (pass 41).
+    // Pass 42: ROTATION REMOVED → the pivot is cleanly refused,
+    // the item keeps its canon orientation (Emerald 2D art direction).
     basePlace(st, 'red_brick', 2, 4, 0);
-    const sel1 = baseEditorClickCell(st, 2, 5);       // seconde case de l'empreinte 1×2
-    const r1 = baseEditorRotateSel(st);               // sans effet (rotation supprimée)
+    const sel1 = baseEditorClickCell(st, 2, 5);       // second cell of the 1×2 footprint
+    const r1 = baseEditorRotateSel(st);               // no effect (rotation removed)
     const bench = st.items.find((i) => i.s === 'red_brick');
-    const repose = baseEditorClickCell(st, 2, 4);     // reposé tel quel
-    // Bureau + poupée « surface » dessus
+    const repose = baseEditorClickCell(st, 2, 4);     // placed back as is
+    // Desk + "surface" doll on top
     basePlace(st, 'small_desk', 4, 4, 0);
-    basePlace(st, 'pichu_doll', 4, 4, 0);             // layer surface SUR le bureau
+    basePlace(st, 'pichu_doll', 4, 4, 0);             // surface layer ON the desk
     const pichu = st.items.find((i) => i.s === 'pichu_doll');
     const desk = st.items.find((i) => i.s === 'small_desk');
-    const sel2 = baseEditorClickCell(st, 4, 4);       // priorité à la surface
+    const sel2 = baseEditorClickCell(st, 4, 4);       // priority to the surface
     const held2 = baseEditorGet().moveUid;
-    const pk1 = baseEditorPickupSel(st);              // « Ramasser » RANGE la poupée tenue
-    const sel3 = baseEditorClickCell(st, 4, 4);       // maintenant : le bureau
+    const pk1 = baseEditorPickupSel(st);              // "Pick up" PUTS AWAY the held doll
+    const sel3 = baseEditorClickCell(st, 4, 4);       // now: the desk
     const held3 = baseEditorGet().moveUid;
     const pk2 = baseEditorPickupSel(st);              // range aussi le bureau tenu
     const left = st.items.filter((i) => i.s === 'small_desk' || i.s === 'pichu_doll').length;
@@ -211,24 +212,24 @@ test('passe 38 C : pivot d’un meuble posé + ramassage qui embarque la poupée
       stockDesk: baseStockCount(st, 'small_desk'), stockPichu: baseStockCount(st, 'pichu_doll'),
     });
   })()`, sb));
-  assert.equal(out.sel1, 'move_start', 'UN clic sur la 2ᵉ case de l’empreinte prend la brique en main');
-  assert.equal(out.rotOk, true, 'pivot refusé proprement (rotation supprimée — passe 42)');
-  assert.equal(out.reposeOk, true, 'repose au même endroit');
-  assert.equal(out.benchRot, 0, 'orientation inchangée (0 — pas de rotation)');
+  assert.equal(out.sel1, 'move_start', 'ONE click on the footprint\'s 2nd tile picks up the brick');
+  assert.equal(out.rotOk, true, 'pivot cleanly refused (rotation removed — phase 42)');
+  assert.equal(out.reposeOk, true, 'lands back in the same place');
+  assert.equal(out.benchRot, 0, 'orientation unchanged (0 — no rotation)');
   assert.deepEqual(out.fpAfter, { w: 1, d: 2 }, 'empreinte 1×2 canon fixe');
   assert.equal(out.sel2, 'move_start');
-  assert.equal(out.sel2IsPichu, true, 'la poupée (surface) est prise en priorité');
-  assert.equal(out.pk1.ok, true, '« Ramasser » range la poupée tenue');
-  assert.equal(out.sel3, 'move_start', 'puis le bureau');
-  assert.equal(out.sel3IsDesk, true, 'le bureau est bien le meuble tenu');
+  assert.equal(out.sel2IsPichu, true, 'the (surface) doll is taken first');
+  assert.equal(out.pk1.ok, true, '"Pick up" stores the held doll');
+  assert.equal(out.sel3, 'move_start', 'then the desk');
+  assert.equal(out.sel3IsDesk, true, 'the desk is indeed the held furniture');
   assert.equal(out.pk2.ok, true);
-  assert.equal(out.left, 0, 'bureau et poupée rangés');
+  assert.equal(out.left, 0, 'desk and doll stored');
   assert.equal(out.stockDesk, 1);
   assert.equal(out.stockPichu, 1);
 });
 
-// ——— D — Visite interactive + combat borné + record ——————————————————————
-test('passe 38 D : visite tap-to-move, interaction copain, combat borné, record crédité', () => {
+// ——— D — Interactive visit + bounded battle + record ————————————————————
+test('phase 38 D: tap-to-move visit, buddy interaction, bounded battle, record credited', () => {
   const sb = makeSandbox(true);
   const out = JSON.parse(vm.runInContext(`(() => {
     ${FURNISH}
@@ -239,13 +240,13 @@ test('passe 38 D : visite tap-to-move, interaction copain, combat borné, record
     r.mode = baseEditorGet().mode;
     r.pos0 = baseEditorGet().visit.pos.x + ',' + baseEditorGet().visit.pos.y;
     r.visits = st.record.visits;
-    // Clic SUR le copain (2,6) depuis le spawn → trop loin : on s'en approche
+    // Click ON the buddy (2,6) from the spawn → too far: approach it
     const mv = baseEditorVisitClick(2, 6);
     r.moveType = mv.type;
     r.moveSteps = mv.steps;
-    // Passe 46 : cliquer un copain À DISTANCE l'aborde — on marche jusqu'à lui
-    // et l'interaction se déclenche TOUTE SEULE à l'arrivée (retour
-    // utilisateur : « une interaction de visite quand on clique dessus »).
+    // Pass 46: clicking a buddy FROM A DISTANCE approaches it — we walk up to it
+    // and the interaction fires ALL BY ITSELF on arrival (user
+    // feedback: "a visit interaction when you click it").
     let guard = 0, arrival = null;
     while (guard++ < 40) {
       const tk = baseEditorVisitTick();
@@ -270,13 +271,13 @@ test('passe 38 D : visite tap-to-move, interaction copain, combat borné, record
     r.teamLevel = battle.champTeam[0].level;
     r.teamShiny = !!battle.champTeam[0].shiny;
     r.launches = _launches.length;
-    // Victoire du visiteur → record proprio : l++ ; session : battlesWon++
+    // Visitor victory → owner record: l++; session: battlesWon++
     battle.active = false;
     r.credit = baseEditorCreditBattle(true);
     r.recL = st.record.l; r.recW = st.record.w;
     r.sessW = v.battlesWon;
     // 1 combat par copain et par visite
-    // 1 combat par copain et par visite : ré-aborder ne relance rien
+    // 1 battle per buddy per visit: re-approaching restarts nothing
     const again = baseEditorVisitClick(2, 6);
     r.again = (again.res && again.res.type)
       || (baseVisitInteract(baseEditorGet().visit, 2, 6).type);
@@ -286,42 +287,42 @@ test('passe 38 D : visite tap-to-move, interaction copain, combat borné, record
   })()`, sb));
   assert.equal(out.startOk, true);
   assert.equal(out.mode, 'visit');
-  assert.equal(out.pos0, '5,7', 'départ au point d’arrivée S (passe 43 : devant la porte)');
-  assert.equal(out.visits, 1, 'visite comptée sur le record propriétaire');
-  assert.equal(out.moveType, 'move', 'case occupée à distance → approche voisine');
+  assert.equal(out.pos0, '5,7', 'start at the S arrival point (phase 43: in front of the door)');
+  assert.equal(out.visits, 1, 'visit counted on the owner record');
+  assert.equal(out.moveType, 'move', 'tile occupied at distance → neighbor approach');
   assert.ok(out.moveSteps >= 2);
-  assert.notEqual(out.pos1, '5,7', 'le visiteur a marché');
-  assert.equal(out.adjacent, true, 'arrêt face au copain');
+  assert.notEqual(out.pos1, '5,7', 'the visitor walked');
+  assert.equal(out.adjacent, true, 'stop face to the buddy');
   assert.equal(out.interact, 'interact');
   assert.equal(out.battleType, 'npc_battle');
-  assert.equal(out.launchOk, true, 'combat borné lancé');
+  assert.equal(out.launchOk, true, 'bounded battle started');
   assert.equal(out.champId, 'base_npc');
   assert.equal(out.isNpcBattle, true);
   assert.equal(out.npcName, 'Leo');
-  assert.equal(out.noCatch, true, 'jamais de capture chez un copain');
+  assert.equal(out.noCatch, true, 'never a capture at a buddy\'s');
   assert.equal(out.teamLen, 1);
-  assert.deepEqual(out.teamMoves, ['tackle', 'growl'], 'capacités nommées instanciées en objets');
+  assert.deepEqual(out.teamMoves, ['tackle', 'growl'], 'named moves instantiated as objects');
   assert.equal(out.teamLevel, 50);
   assert.equal(out.teamShiny, false);
-  assert.equal(out.launches, 1, 'un seul duel lancé');
+  assert.equal(out.launches, 1, 'a single duel launched');
   assert.equal(out.credit, true);
-  assert.equal(out.recL, 1, 'copain battu → l++ (point de vue propriétaire, canon)');
+  assert.equal(out.recL, 1, 'buddy beaten → l++ (owner point of view, canon)');
   assert.equal(out.recW, 0);
   assert.equal(out.sessW, 1);
-  // Passe 52 (retour utilisateur : « on doit pouvoir le combattre autant
-  //    qu'on veut ») : plus de verrou d'un combat par visite. Ouvrir le
-  //    dialogue ne consomme plus rien non plus — c'était le second bug :
-  //    « passer son chemin » brûlait quand même le duel.
-  assert.equal(out.again, 'npc_battle', 'le PNJ reste combattable — revanche possible');
+  // Phase 52 (user feedback: "we must be able to battle it as much
+  //    as we want"): no more one-battle-per-visit lock. Opening the
+  //    dialogue no longer consumes anything either — that was the second bug:
+  //    "walking away" still burned the duel.
+  assert.equal(out.again, 'npc_battle', 'the NPC stays battleable — rematch possible');
   assert.deepEqual(out.sum, { w: 1, l: 0 });
   assert.equal(out.modeAfter, 'edit');
 });
 
-test('passe 38 D2 : conversion d’équipe bornée + visite d’un fichier ami SANS crédit', () => {
+test('phase 38 D2: bounded team conversion + friend\'s-file visit WITHOUT credit', () => {
   const sb = makeSandbox(true);
   const out = JSON.parse(vm.runInContext(`(() => {
     const r = {};
-    // Conversion : bornes id/niveau, capacités inconnues filtrées, 4 max, shiny/talent
+    // Conversion: id/level bounds, unknown moves filtered, 4 max, shiny/ability
     const team = baseNpcTeamToChampTeam([
       { id: 9999, level: 0, moves: ['tackle', 'nope', 'growl', 'tackle', 'growl', 'nope2'], talent: 'statik', shiny: true },
       { id: -5, level: 250, moves: null, talent: null, shiny: false },
@@ -329,7 +330,7 @@ test('passe 38 D2 : conversion d’équipe bornée + visite d’un fichier ami S
     r.t0 = { id: team[0].id, level: team[0].level, shiny: team[0].shiny, talent: team[0].talent, moves: team[0].moves.map((m) => m.id) };
     r.t1 = { id: team[1].id, level: team[1].level, moves: team[1].moves.map((m) => m.id) };
     r.empty = baseNpcTeamToChampTeam(null).length === 0;
-    // Export → visite par fichier : AUCUN crédit sur le record local
+    // Export → visit by file: NO credit on the local record
     ${FURNISH}
     const txt = baseExportString(st, 'Ami');
     const res = baseVisitFromJson(txt);
@@ -344,24 +345,24 @@ test('passe 38 D2 : conversion d’équipe bornée + visite d’un fichier ami S
     r.recAfter = { w: st.record.w, l: st.record.l, v: st.record.visits };
     return JSON.stringify(r);
   })()`, sb));
-  assert.equal(out.t0.id, 1025, 'id borné au dex national');
+  assert.equal(out.t0.id, 1025, 'id bounded to the national dex');
   assert.equal(out.t0.level, 1, 'niveau plancher 1');
   assert.equal(out.t0.shiny, true);
   assert.equal(out.t0.talent, 'statik');
-  assert.deepEqual(out.t0.moves, ['tackle', 'growl', 'tackle', 'growl'], 'capacités inconnues filtrées, 4 conservées');
+  assert.deepEqual(out.t0.moves, ['tackle', 'growl', 'tackle', 'growl'], 'unknown moves filtered, 4 kept');
   assert.equal(out.t1.id, 1);
   assert.equal(out.t1.level, 100, 'niveau plafond 100');
-  assert.deepEqual(out.t1.moves, ['tackle'], 'pas de noms → moveset naturel conservé');
+  assert.deepEqual(out.t1.moves, ['tackle'], 'no names → natural moveset kept');
   assert.equal(out.empty, true);
   assert.equal(out.importOk, true);
   assert.equal(out.adopt, true);
-  assert.equal(out.own, false, 'visite d’ami : jamais « own »');
-  assert.deepEqual(out.recBefore, out.recAfter, 'aucun crédit sur le record local (anti-triche)');
-  assert.equal(out.sessW, 1, 'compteur de session seul');
+  assert.equal(out.own, false, 'friend visit: never "own"');
+  assert.deepEqual(out.recBefore, out.recAfter, 'no credit on the local record (anti-cheat)');
+  assert.equal(out.sessW, 1, 'session counter only');
 });
 
-// ——— E — Câblage UI + hooks combat ———————————————————————————————————————
-test('passe 38 E : index/postboot/loader/styles + hooks victoire/blackout/abandon', () => {
+// ——— E — UI wiring + battle hooks ———————————————————————————————————————
+test('phase 38 E: index/postboot/loader/styles + victory/blackout/forfeit hooks', () => {
   const html = R('index.html');
   for (const id of ['base-toolbar', 'base-stock', 'base-ed-hint', 'base-ed-visit', 'base-ed-export', 'base-ed-import']) {
     assert.ok(html.includes(`id="${id}"`), `index.html #${id}`);
@@ -369,28 +370,28 @@ test('passe 38 E : index/postboot/loader/styles + hooks victoire/blackout/abando
   for (const act of ['base-ed-rotate', 'base-ed-pickup', 'base-ed-visit', 'base-ed-export', 'base-ed-import', 'base-ed-select']) {
     assert.ok(html.includes(`data-action="${act}"`) || act === 'base-ed-select', `action ${act}`);
   }
-  const post = R('src/file-postboot.js');
+  const post = [R('src/engine/input/action-dispatcher.js'), R('src/engine/runtime/classic-bridge.js')].join('\n');
   for (const act of ['base-ed-select', 'base-ed-select-npc', 'base-ed-rotate', 'base-ed-pickup', 'base-ed-visit', 'base-ed-export', 'base-ed-import', 'debug-base-add-npc']) {
     assert.ok(post.includes(`'${act}'`), `postboot ${act}`);
   }
-  const loader = R('src/loader.js');
-  assert.ok(loader.indexOf('base-editor.js') > -1 && loader.indexOf('base-editor.js') < loader.indexOf('base-window.js'), 'base-editor chargé avant base-window');
+  const loader = R('src/main.js');
+  assert.ok(loader.indexOf('base-editor.js') > -1 && loader.indexOf('base-editor.js') < loader.indexOf('base-window.js'), 'base-editor loaded before base-window');
   const css = R('src/assets/css/style.css');
   for (const sel of ['.base-stock-item', '#base-ed-hint', '#base-toolbar']) assert.ok(css.includes(sel), `style ${sel}`);
-  // Renderer : overlay optionnel dessiné Après PNJ
-  const v2d = R('src/game/base/base-view2d.js');
+  // Renderer: optional overlay drawn AFTER the NPC
+  const v2d = R('src/ui/game/base/base-view2d.js');
   assert.ok(/baseView2dDraw\(canvas, st, sprites, overlay\)/.test(v2d), 'signature overlay');
-  assert.ok(v2d.includes('base2dOverlay') && v2d.includes('overlay.ghost') && v2d.includes('overlay.visitor') && v2d.includes('overlay.select') && v2d.includes('overlay.path'), 'surcouche complète');
-  // Hooks combat du duel borné (3 issues : victoire, blackout, abandon)
-  assert.ok(R('src/game/combat/battle-switch.js').includes('battle.isBaseNpcBattle'), 'champVictory hook');
-  assert.ok(R('src/game/combat/battle-encounter.js').includes('battle.isBaseNpcBattle'), 'blackout hook');
-  assert.ok(R('src/game/combat/battle-flow.js').includes('battle.isBaseNpcBattle'), 'abandon hook');
+  assert.ok(v2d.includes('base2dOverlay') && v2d.includes('overlay.ghost') && v2d.includes('overlay.visitor') && v2d.includes('overlay.select') && v2d.includes('overlay.path'), 'complete overlay');
+  // Battle hooks of the bounded duel (3 outcomes: victory, blackout, forfeit)
+  assert.ok(R('src/application/combat/battle-switch.js').includes('battle.isBaseNpcBattle'), 'champVictory hook');
+  assert.ok(R('src/application/combat/battle-encounter.js').includes('battle.isBaseNpcBattle'), 'blackout hook');
+  assert.ok(R('src/application/combat/battle-flow.js').includes('battle.isBaseNpcBattle'), 'abandon hook');
   for (const f of ['battle-switch.js', 'battle-encounter.js', 'battle-flow.js']) {
-    assert.ok(R(`src/game/combat/${f}`).includes('baseEditorCreditBattle'), `crédit dans ${f}`);
+    assert.ok(R(`src/application/combat/${f}`).includes('baseEditorCreditBattle'), `credit in ${f}`);
   }
   const i18n = R('src/localization/i18n.js');
   assert.ok(i18n.includes("id==='base_npc'"), 'getChampName : nom dynamique du copain');
-  // Parité i18n fr/en des nouvelles clés
+  // fr/en i18n parity of the new keys
   const fr = R('src/localization/fr/base.js'), en = R('src/localization/en/base.js');
   const keys = (src, re) => [...src.matchAll(re)].map((m) => m[1]);
   const editFr = keys(fr, /"([a-z_0-9]+)":"/g);
@@ -398,23 +399,23 @@ test('passe 38 E : index/postboot/loader/styles + hooks victoire/blackout/abando
     assert.ok(fr.includes(k + ':'), `fr ${k}`);
     assert.ok(en.includes(k + ':'), `en ${k}`);
   }
-  assert.ok(R('src/localization/fr/ui.js').includes('"debug_base_npc"') && R('src/localization/en/ui.js').includes('"debug_base_npc"'), 'clé debug_base_npc fr+en');
-  assert.ok(R('index.html').includes('data-action="debug-base-add-npc"'), 'bouton debug copain');
+  assert.ok(R('src/localization/fr/ui.js').includes('"debug_base_npc"') && R('src/localization/en/ui.js').includes('"debug_base_npc"'), 'debug_base_npc key fr+en');
+  assert.ok(R('index.html').includes('data-action="debug-base-add-npc"'), 'buddy debug button');
 });
 
-// ——— F — Garde WebGL2 ————————————————————————————————————————————————————
-test('passe 38 F : sans WebGL2 la 3D est désactivée, repli 2D, visite forcée 2D', () => {
-  // Passe 55 : la fenêtre « Base Secrète » est PUREMENT 2D — la 3D a la
-  // sienne (win-base3d), avec son propre gameplay. La garde WebGL2 a donc
-  // déménagé : c'est la fenêtre 3D qui affiche le message si le contexte
-  // n'est pas disponible, et la 2D n'a plus rien à replier.
-  const win = R('src/game/base/base-window.js');
-  assert.ok(win.includes("_baseWin.c2d.addEventListener('click', baseWindowCanvasClick)"), 'interactions éditeur UNIQUEMENT sur le canvas 2D');
-  // drawSt = état du propriétaire OU de la session de visite (alcôve vide / base d'ami)
-  assert.ok(win.includes('baseView2dDraw(_baseWin.c2d, drawSt, _baseWin.sprites2d, overlay)'), 'overlay passé au renderer 2D');
-  assert.ok(!win.includes("modeSel.value = hasGl"), 'plus de bascule de mode dans la fenêtre 2D');
+// ——— F — WebGL2 guard ————————————————————————————————————————————————————
+test('phase 38 F: without WebGL2, 3D is disabled, 2D fallback, visit forced to 2D', () => {
+  // Pass 55: the "Secret Base" window is PURELY 2D — the 3D has its
+  // own window (win-base3d), with its own gameplay. The WebGL2 guard has
+  // therefore moved: the 3D window shows the message when the context
+  // is unavailable, and the 2D has nothing left to fall back to.
+  const win = R('src/ui/game/base/base-window.js');
+  assert.ok(win.includes("_baseWin.c2d.addEventListener('click', baseWindowCanvasClick)"), 'editor interactions ONLY on the 2D canvas');
+  // drawSt = owner state OR visit session state (empty alcove / friend's base)
+  assert.ok(win.includes('baseView2dDraw(_baseWin.c2d, drawSt, _baseWin.sprites2d, overlay)'), 'overlay passed to the 2D renderer');
+  assert.ok(!win.includes("modeSel.value = hasGl"), 'no more mode switch in the 2D window');
 
-  assert.ok(!E('src/game/base/base3d-window.js'), 'fenêtre 3D supprimée');
-  assert.ok(!E('src/game/base/base3d-view.js'), 'renderer 3D supprimé');
+  assert.ok(!E('src/game/base/base3d-window.js'), '3D window removed');
+  assert.ok(!E('src/game/base/base3d-view.js'), '3D renderer removed');
 });
 

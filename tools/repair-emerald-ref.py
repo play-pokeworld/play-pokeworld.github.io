@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""Passe 45 — RÉPARATION des références binaires `tools/emerald-ref/data/`.
+"""Passe 45 — REPAIR of the binary references `tools/emerald-ref/data/`.
 
-Pourquoi : l'archive texte du projet (code2prompt) ne transporte que du texte.
-Les fichiers BINAIRES (`*.bin`, `tiles.png`) y ont été ré-encodés en UTF-8 et
-sont revenus CORROMPUS (ex. `primary/general/metatiles.bin` = 8001 octets au
-lieu de 8192) ou tout simplement ABSENTS (aucun `tiles.png` dans l'arbre).
-Sans eux, tous les bakers (`bake-emerald-bgs.py`) plantent.
+Why: the project's text archive (code2prompt) only carries text.
+The BINARY files (`*.bin`, `tiles.png`) were re-encoded as UTF-8 there and
+came back CORRUPTED (e.g. `primary/general/metatiles.bin` = 8001 bytes
+instead of 8192) or simply ABSENT (no `tiles.png` in the tree).
+Without them, all the bakers (`bake-emerald-bgs.py`) crash.
 
-Ce script re-télécharge ces fichiers depuis pret/pokeemerald (source d'origine
-déclarée par le projet) et VÉRIFIE les tailles attendues :
-  - metatiles.bin primaires/secondaires (16 octets par métatile),
+This script downloads those files again from pret/pokeemerald (the original
+source declared by the project) and CHECKS the expected sizes:
+  - primary/secondary metatiles.bin (16 bytes per metatile),
   - metatile_attributes.bin,
-  - palettes JASC (texte : réparées seulement si manquantes/vides),
+  - JASC palettes (text: repaired only if missing/empty),
   - tiles.png (jamais présents dans l'archive texte),
   - layouts map.bin / border.bin (2 octets par bloc).
 
@@ -32,7 +32,7 @@ UA = 'PokeWorldAssetDownloader/1.0 (+repair emerald-ref)'
 
 THEMES = ['brown_cave', 'blue_cave', 'red_cave', 'yellow_cave', 'tree', 'shrub']
 
-# Salles canon utilisées par les gabarits (4 par famille de base).
+# Canon rooms used by the layouts (4 per base family).
 LAYOUTS = [f'SecretBase_{fam}{i}' for fam in
            ('BrownCave', 'BlueCave', 'RedCave', 'YellowCave', 'Tree', 'Shrub')
            for i in (1, 2, 3, 4)]
@@ -48,7 +48,7 @@ def fetch(rel: str) -> bytes | None:
 
 
 def looks_valid(path: Path, kind: str) -> bool:
-    """Un binaire rescapé de l'archive texte a une taille incohérente."""
+    """A binary that survived the text archive has an incoherent size."""
     if not path.exists() or path.stat().st_size == 0:
         return False
     n = path.stat().st_size
@@ -81,7 +81,7 @@ def main() -> int:
     force = '--force' in sys.argv
     report: list[tuple[str, str]] = []
 
-    # 1) Tilesets : tiles.png (absents de l'archive) + metatiles/attributs
+    # 1) Tilesets: tiles.png (missing from the archive) + metatiles/attributes
     repair('data/tilesets/primary/secret_base/tiles.png', 'png', force, report)
     repair('data/tilesets/primary/secret_base/metatiles.bin', 'meta', force, report)
     repair('data/tilesets/primary/secret_base/metatile_attributes.bin', 'attr', force, report)
@@ -92,7 +92,7 @@ def main() -> int:
     for th in THEMES:
         repair(f'data/tilesets/secondary/secret_base/{th}/tiles.png', 'png', force, report)
 
-    # 2) Layouts canon : map.bin (+ border.bin quand il existe en amont)
+    # 2) Canon layouts: map.bin (+ border.bin when available upstream)
     for name in LAYOUTS:
         repair(f'data/layouts/{name}/map.bin', 'map', force, report)
         b = CACHE / f'data/layouts/{name}/border.bin'
@@ -106,7 +106,7 @@ def main() -> int:
     n_ok = sum(1 for s, _ in report if s == 'ok')
     n_rep = sum(1 for s, _ in report if s == 'repaired')
     fails = [r for s, r in report if s == 'FAIL']
-    print(f'emerald-ref : {n_rep} fichier(s) réparé(s), {n_ok} déjà valide(s), {len(fails)} échec(s)')
+    print(f'emerald-ref: {n_rep} file(s) repaired, {n_ok} already valid, {len(fails)} failure(s)')
     for f in fails:
         print('  ✖', f)
     return 1 if fails else 0

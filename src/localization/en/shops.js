@@ -1,5 +1,5 @@
 // ===== EN — Shop names =====
-window.L_en_shops = {
+export const L_en_shops = {
   "pallet": { "name": "Pallet Town Mart" },
   "viridian": { "name": "Viridian City Mart" },
   "pewter": { "name": "Pewter City Mart" },
@@ -38,3 +38,7 @@ window.L_en_shops = {
   "pacifidlog": { "name": "Pacifidlog Town Shop" },
   "evergrande": { "name": "Ever Grande City Shop" }
 };
+
+// T2 (vague 38) : module ESM — export natif ; la surface classique est
+// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
+if (typeof globalThis !== 'undefined') globalThis.L_en_shops = L_en_shops;

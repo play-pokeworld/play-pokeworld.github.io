@@ -1,26 +1,26 @@
 #!/usr/bin/env python3
-"""Passe 53 — complète la table d'autotiling par SYMÉTRIE HORIZONTALE.
+"""Passe 53 — completes the autotiling table by HORIZONTAL SYMMETRY.
 
-Retour utilisateur : « les cases à côté de la porte ne sont toujours pas les
-bonnes ». Cause racine : la table `autotile-walls.json` a été APPRISE sur les
-24 maps canon du désassemblage ; elle ne couvre donc que les voisinages que
-Game Freak a effectivement employés. Nos salles à étage, plus hautes et plus
-découpées, produisent des voisinages légitimes mais ABSENTS de la table — le
-baker tombe alors sur sa tuile de repli (roche pleine) et le mur « ne boucle
-pas ».
+User feedback: "the tiles next to the door are still not the
+right ones". Root cause: the `autotile-walls.json` table was LEARNED on the
+24 canon maps of the decompilation; it therefore only covers the
+neighborhoods that Game Freak actually used. Our floor rooms, taller and
+more carved, produce legitimate neighborhoods ABSENT from the table — the
+baker then falls back to its fallback tile (solid rock) and the wall
+"does not wrap".
 
-Plutôt que d'inventer des tuiles, on EXPLOITE une propriété vérifiée de la
-table : elle est symétrique. Pour toute paire (masque, masque miroir) déjà
-présente, les métatiles se répondent exactement —
+Rather than inventing tiles, we EXPLOIT a verified property of the
+table: it is symmetric. For every (mask, mirror mask) pair already
+present, the metatiles match exactly —
 
     0x201<->0x203   0x205<->0x207   0x209<->0x20b   0x20d<->0x20f
-    0x211<->0x213   0x202, 0x20c, 0x210, 0x212 : symétriques d'eux-mêmes
+    0x211<->0x213   0x202, 0x20c, 0x210, 0x212: self-symmetric
 
-(14 correspondances observées, 0 contre-exemple). On peut donc DÉRIVER sans
-risque le métatile d'un masque manquant depuis son miroir connu : c'est la
-même règle canon, lue dans l'autre sens.
+(14 correspondences observed, 0 counter-example). We can therefore safely
+DERIVE the metatile of a missing mask from its known mirror: it is the
+same canon rule, read the other way around.
 
-Sortie : autotile-walls.json enrichi (les entrées apprises ne bougent pas).
+Output: autotile-walls.json enriched (learned entries unchanged).
 """
 import json
 import os
@@ -40,18 +40,18 @@ def main():
     at = {int(k): int(v) for k, v in raw.items()}
     learned = dict(at)
 
-    # 1) table de correspondance des métatiles, DÉDUITE des paires connues
+    # 1) metatile correspondence table, INFERRED from known pairs
     pair = {}
     for m, v in learned.items():
         mm = mirror_mask(m)
         if mm in learned:
             other = learned[mm]
             if v in pair and pair[v] != other:
-                raise SystemExit(f'symétrie incohérente : {hex(v)} -> {hex(pair[v])} et {hex(other)}')
+                raise SystemExit(f'incoherent symmetry: {hex(v)} -> {hex(pair[v])} and {hex(other)}')
             pair[v] = other
-    print(f'{len(pair)} correspondances de métatiles déduites des paires apprises')
+    print(f'{len(pair)} metatile correspondences derived from the learned pairs')
 
-    # 2) complétion : tout masque dont le miroir est connu devient dérivable
+    # 2) completion: any mask whose mirror is known becomes derivable
     added = 0
     for m in range(256):
         if m in at:
@@ -62,7 +62,7 @@ def main():
             added += 1
 
     json.dump({str(k): at[k] for k in sorted(at)}, open(P, 'w'), indent=1)
-    print(f'{len(learned)} entrées apprises + {added} dérivées par miroir = {len(at)}')
+    print(f'{len(learned)} learned entries + {added} derived by mirror = {len(at)}')
 
 
 if __name__ == '__main__':

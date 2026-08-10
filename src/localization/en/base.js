@@ -1,5 +1,5 @@
 // ===== EN — Secret Base =====
-window.L_en_base = {
+export const L_en_base = {
 "title":"Secret Base",
 "export_done":"Base exported as JSON!",
 "win":{
@@ -331,3 +331,6 @@ window.L_en_base = {
 }
 };
 
+// T2 (vague 38) : module ESM — export natif ; la surface classique est
+// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
+if (typeof globalThis !== 'undefined') globalThis.L_en_base = L_en_base;

@@ -2,6 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { BagView } from '../src/ui/views/BagView.js';
+import { BasePcDialogView, BaseNpcDialogView } from '../src/ui/views/BaseViews.js'; // wave 22 (legitimate move)
+import { harnessBundleSource, harnessIsEsm } from '../tools/harness-bundle.mjs';
 
 const R = (p) => fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 
@@ -33,7 +36,7 @@ function makeSandbox() {
       documentElement: { lang: 'fr' },
       querySelector: () => null,
       querySelectorAll: () => [],
-      getElementById: () => ({ style: {}, innerHTML: '', textContent: '', remove: () => {}, classList: { add: () => {}, remove: () => {} } }),
+      getElementById: () => ({ style: {}, innerHTML: '', textContent: '', replaceChildren() { this.innerHTML = ''; }, remove: () => {}, classList: { add: () => {}, remove: () => {} } }),
       createElement: () => ({ setAttribute: () => {}, appendChild: () => {}, classList: { add: () => {}, remove: () => {} }, style: {} }),
       body: { classList: { add: () => {}, remove: () => {} }, appendChild: () => {} }
     },
@@ -47,11 +50,13 @@ function makeSandbox() {
     tr: (k) => k
   };
   sandbox.window = sandbox;
+  // The bag renderer is the ECS design-system screen — injected into the vm world.
+  sandbox.PokeUI = { views: { BagView, BasePcDialogView, BaseNpcDialogView } }; // wave 22: base dialogs rendered by the ECS views (legitimate move)
   sandbox.globalThis = sandbox;
   vm.createContext(sandbox);
 
   const files = [
-    'src/game/Config.js',
+    'src/data/game-config.js',
     'src/data/pd-data.js',
     'src/data/moves.js',
     'src/data/talents-data.js',
@@ -68,21 +73,24 @@ function makeSandbox() {
     'src/localization/en/shops.js',
     'src/localization/data.js',
     'src/localization/i18n.js',
-    'src/game/core/pokemon-factory.js',
+    'src/application/pokemon-factory.js',
     'src/data/game-helpers.js',
-    'src/game/world/collection.js',
-    'src/game/display/box-ui.js',
-    'src/game/economy/inventory.js',
-    'src/game/economy/inventory-actions.js',
-    'src/game/display/fullscreen-panel.js',
-    'src/game/save/save.js',
-    'src/game/save/settings.js',
+    'src/application/world/collection.js',
+    'src/ui/game/box-ui.js',
+    'src/ui/game/inventory.js',
+    'src/application/economy/inventory-actions.js',
+    'src/ui/game/fullscreen-panel.js',
+    'src/application/save/save.js',
+    'src/application/save/settings.js',
     'src/data/story-quests-hoenn.js',
-    'src/game/base/base-dialog.js'
+    'src/ui/game/base/base-dialog.js'
   ];
 
   for (const f of files) {
-    vm.runInContext(R(f), sandbox);
+    // T2-D (vague 37) : classiques évalués en vm directe (parité exacte,
+    // const inter-fichiers préservés) ; les converts ESM sont bundlés à la volée.
+    const __text = R(f);
+    vm.runInContext(harnessIsEsm(__text) ? harnessBundleSource([f]) : __text, sandbox, { filename: f });
   }
   return sandbox;
 }
@@ -137,7 +145,7 @@ test('Fix 4: opening bag from shortcut or closing modal clears equip mode callba
 });
 
 test('Fix 5: pw-unified.css enforces high-contrast visibility on cards, items, and active buttons', () => {
-  const css = fs.readFileSync(new URL('../src/assets/styles/pw-unified.css', import.meta.url), 'utf8');
+  const css = fs.readFileSync(new URL('../src/assets/styles/design-system.css', import.meta.url), 'utf8');
   assert.ok(css.includes('UNIVERSAL CONTRAST & VISIBILITY SYSTEM'), 'Should contain universal contrast system block');
   assert.ok(css.includes('.pw-choice-sub') && css.includes('#c9bc8a !important'), 'pw-choice-sub should be styled with high-contrast gold #c9bc8a');
   assert.ok(css.includes('.inv-item:hover') && css.includes('rgba(236, 222, 183, 0.15) !important'), 'inv-item hover should keep readable dark card background');
@@ -179,7 +187,7 @@ test('Fix 7: saveDownloadFilename format, ORAS Secret Base Flag System, and Delt
   assert.equal(sandbox.G.secretBaseFlags.count, 1, 'Should increment flag count');
 
   // Verify the Delta Episode quest is locked until Kalos completion
-  // (id 258 depuis l'insertion des quêtes Base Secrète 217/218 — ex-256)
+  // (id 258 since the insertion of Secret Base quests 217/218 — ex-256)
   const quest258 = sandbox.window.STORY_QUESTS_HOENN.find(q => q.id === 258);
   assert.ok(quest258 && typeof quest258.reqCondition === 'function', 'Quest 258 must have reqCondition');
   assert.equal(quest258.reqCondition(), false, 'Quest 258 should be locked before Kalos completion');

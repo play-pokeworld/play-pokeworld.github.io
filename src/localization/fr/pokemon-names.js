@@ -1,7 +1,7 @@
 // ===== FR — Pokémon species names (Pokédex order 1-151 + Johto 152-251) =====
 // Array indexed by species id; null = English fallback.
 
-window.L_pokemon_names_fr = [
+export const L_pokemon_names_fr = [
  null,
 "Bulbizarre",
 "Herbizarre",
@@ -397,3 +397,7 @@ window.L_pokemon_names_fr = [
 "Deoxys Défense",
 "Deoxys Vitesse",
 ];
+
+// T2 (vague 38) : module ESM — export natif ; la surface classique est
+// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
+if (typeof globalThis !== 'undefined') globalThis.L_pokemon_names_fr = L_pokemon_names_fr;

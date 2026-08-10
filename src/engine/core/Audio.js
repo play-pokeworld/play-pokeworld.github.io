@@ -2,7 +2,6 @@
  * PokeEngine — Audio Manager
  * SFX + BGM with volume control, pool management, lazy load
  */
-(function() {
 'use strict';
 
 class AudioManager {
@@ -35,7 +34,7 @@ class AudioManager {
         src.currentTime = 0;
         await src.play().catch(() => {});
       }
-    } catch(e) { /* silent fail */ }
+    } catch(_e) { /* silent fail */ }
   }
 
   // ─── BGM ───
@@ -49,7 +48,7 @@ class AudioManager {
       this._bgm = audio;
       this._bgmKey = key;
       await audio.play().catch(() => {});
-    } catch(e) { /* silent fail */ }
+    } catch(_e) { /* silent fail */ }
   }
 
   stopBGM() {
@@ -73,8 +72,14 @@ class AudioManager {
   }
 }
 
-window.PokeAudio = AudioManager;
-if (!window.poke) window.poke = {};
-window.poke.Audio = AudioManager;
-})();
+// T2 (wave 38): ESM module — native class export; the engine surface
+// (PokeAudio + poke.* namespace) stays kept on the global object for
+// classic consumers not yet migrated.
+export { AudioManager };
+export default AudioManager;
+if (typeof globalThis !== 'undefined') {
+  globalThis.PokeAudio = AudioManager;
+  if (!globalThis.poke) globalThis.poke = {};
+  globalThis.poke.Audio = AudioManager;
+}
 

@@ -1,7 +1,7 @@
 // ===== EN — COMBAT strings =====
 // Auto-extracted & grouped by domain. Edit text here, never hardcode in logic.
 
-window.L_en_combat = {
+export const L_en_combat = {
 "battle_lock_box":"<b>Battle in progress:</b> Adding or swapping is disabled.",
 "battle_lock_team":"<b>Battle in progress:</b> Party is locked.",
 "champ_no_loot":"Gym Leader battles do not award wild Pokémon captures.",
@@ -143,5 +143,6 @@ window.L_en_combat = {
 "battle_in_progress":"Battle in progress",
 };
 
-
-
+// T2 (vague 38) : module ESM — export natif ; la surface classique est
+// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
+if (typeof globalThis !== 'undefined') globalThis.L_en_combat = L_en_combat;

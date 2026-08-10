@@ -1,3 +1,5 @@
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
 var STORY_LORE = {
 "pallet": {},
 "route1": {},
@@ -58,6 +60,12 @@ var STORY_LORE = {
 
 
 // --- Migrated to ES module, globals exposed ---
-if (typeof STORY_LORE !== 'undefined' && typeof window !== 'undefined') window.STORY_LORE = STORY_LORE;
+if (typeof STORY_LORE !== 'undefined') { if (typeof window !== 'undefined') window.STORY_LORE = STORY_LORE; if (typeof globalThis !== 'undefined') globalThis.STORY_LORE = STORY_LORE; }
 
 
+
+// Wave 40 — native ESM module: grouped export of the same names as the
+// classic surface kept above/here (bodies unchanged).
+export {
+  STORY_LORE,
+};

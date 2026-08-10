@@ -4,148 +4,54 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PokéWorld</title>
-  <link rel="icon" type="image/png" href="src/assets/images/Icon.png">
-  <link rel="apple-touch-icon" href="src/assets/images/Icon.png">
-  <link rel="stylesheet" href="src/assets/css/style.css">
-  <link rel="stylesheet" href="src/assets/styles/mobile-accessibility.css">
-  <link rel="stylesheet" href="src/assets/styles/extracted-index.css">
-  <link rel="stylesheet" href="src/assets/styles/extracted-templates.css">
-  <link rel="stylesheet" href="src/assets/styles/extracted-bridges.css">
-  <link rel="stylesheet" href="src/assets/styles/cleaned-components.css">
-  <link rel="stylesheet" href="src/assets/styles/pw-static.css">
-  <link rel="stylesheet" href="src/assets/styles/pw-unified.css">
+  <link rel="icon" type="image/png" href="src/assets/images/pokemon/front/pikachu.png">
+  <link rel="apple-touch-icon" href="src/assets/images/pokemon/front/pikachu.png">
+  <link rel="stylesheet" href="src/assets/styles/design-system.css">
   
 </head>
 <body>
 
-<div id="save-menu-screen" class="save-menu-screen is-open">
-  <div class="save-menu-bg-layer"></div>
-  <section class="save-menu-panel" aria-labelledby="save-menu-title">
-    <div class="save-menu-title-block">
-      <div class="save-menu-kicker">PokéWorld</div>
-      <h1 id="save-menu-title">PokéWorld</h1>
-      <p id="save-menu-subtitle"></p>
-    </div>
-    <div class="save-menu-list-shell">
-      <button id="save-menu-prev" class="hbtn save-menu-scroll-btn" data-action="legacy-call" data-call="scrollSaveList" data-call-args="-1">‹</button>
-      <div id="save-menu-list" class="save-menu-list"></div>
-      <button id="save-menu-next" class="hbtn save-menu-scroll-btn" data-action="legacy-call" data-call="scrollSaveList" data-call-args="1">›</button>
-    </div>
-    <div class="save-menu-actions">
-      <button id="save-menu-new-btn" class="hbtn save-menu-action-primary" data-action="legacy-call" data-call="createNewSaveFromMenu" data-call-args=""></button>
-      <label id="save-menu-import-label" class="hbtn save-menu-action-secondary" for="save-menu-import-file"></label>
-      <input type="file" id="save-menu-import-file" accept=".json,application/json" class="pw-static-010" data-action="import-save-file">
-    </div>
-  </section>
-</div>
+<!-- Save-game main menu face: rendered from ZERO by the ECS design system
+     (SaveMenuView) at open/refresh time — see src/game/save/save.js -->
+<div id="save-menu-screen" class="save-menu-screen is-open"></div>
 
 
-<svg class="pw-static-001">
-  <defs>
-    <filter id="silhouette-filter">
-      <feColorMatrix type="matrix" values="
-        0 0 0 0 0.1
-        0 0 0 0 0.1
-        0 0 0 0 0.1
-        0 0 0 1 0"/>
-    </filter>
-    <filter id="silhouette-filter-light">
-      <feColorMatrix type="matrix" values="
-        0 0 0 0 0.15
-        0 0 0 0 0.15
-        0 0 0 0 0.15
-        0 0 0 1 0"/>
-    </filter>
-  </defs>
-</svg>
+
 
 <div id="header">
   <h1><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><circle cx="12" cy="12" r="3"/></svg></span><span>PokéWorld</span></h1>
-  <div class="hinfo pw-static-002"> <span id="h-money">1000</span>₽ &nbsp;|&nbsp;  <span id="h-badges">0</span>/<span id="h-badges-total">8</span> <span data-i18n="badges_lbl">badges</span></div>
-  <button class="hbtn icon-btn" id="settings-btn" data-action="open-settings" aria-label="Réglages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
+  <div class="hinfo pw-static-002"> <span id="h-money">1000</span>₽ &nbsp;|&nbsp;  <span data-i18n="badges_lbl">Badges</span>&nbsp;: <span id="h-badges">0</span>/<span id="h-badges-total">8</span></div>
+  <button class="hbtn icon-btn" id="settings-btn" data-action="open-settings" aria-label="" data-i18n-aria-label="settings_title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
 </div>
 
 <div id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
   <div id="settings-inner">
     <div class="modal-title">
       <div id="settings-title" data-i18n="settings_title">Réglages</div>
-      <button type="button" class="modal-close" data-action="close-settings" aria-label="Close" data-i18n-aria-label="modal_close_btn">✕</button>
+      <button type="button" class="modal-close" data-action="close-settings" aria-label="" data-i18n-aria-label="modal_close_btn">✕</button>
     </div>
-
-    <div class="settings-section">
-      <h3 data-i18n="lang_title">Langue / Language</h3>
-      <div class="pw-static-003">
-        <button class="hbtn lang-btn active pw-static-004" data-lang="fr" data-action="set-language">Français</button>
-        <button class="hbtn lang-btn pw-static-004" data-lang="en" data-action="set-language">English</button>
-      </div>
-    </div>
-    <div class="settings-section">
-      <h3 data-i18n="theme_title">Thème</h3>
-      <div class="theme-grid">
-        <button type="button" class="theme-swatch pw-static-005" data-theme-btn="dark" data-action="set-theme" data-theme-value="dark" data-i18n="theme_dark">Sombre</button>
-        <button type="button" class="theme-swatch pw-static-006" data-theme-btn="light" data-action="set-theme" data-theme-value="light" data-i18n="theme_light">Clair</button>
-        <button type="button" class="theme-swatch pw-static-007" data-theme-btn="gameboy" data-action="set-theme" data-theme-value="gameboy" data-i18n="theme_gameboy">Game Boy</button>
-        <button type="button" class="theme-swatch pw-static-008" data-theme-btn="fire" data-action="set-theme" data-theme-value="fire" data-i18n="theme_fire">Feu</button>
-      </div>
-    </div>
-
-
-    <div class="settings-section" id="save-profile-section">
-      <h3 id="save-profile-heading"></h3>
-      <div id="save-profile-preview" class="save-profile-preview"></div>
-      <label class="save-profile-field" for="save-profile-name">
-        <span id="save-profile-name-label"></span>
-        <input type="text" id="save-profile-name" maxlength="32" autocomplete="off">
-      </label>
-      <label class="save-profile-field" for="save-profile-background">
-        <span id="save-profile-background-label"></span>
-        <select id="save-profile-background"></select>
-      </label>
-      <div class="save-profile-field">
-        <span id="save-profile-icon-label"></span>
-        <div id="save-profile-icon-current" class="save-profile-icon-current"></div>
-        <button id="save-profile-icon-btn" class="hbtn" data-action="legacy-call" data-call="openSaveIconBoxSelector" data-call-args=""></button>
-      </div>
-      <div class="settings-row">
-        <button id="save-profile-apply-btn" class="hbtn" data-action="legacy-call" data-call="applySaveProfileSettings" data-call-args=""></button>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <h3 data-i18n="save_title">Sauvegarde</h3>
-      <div class="settings-row">
-        <button class="hbtn" data-action="save-game" data-i18n="save_btn">Sauvegarder</button>
-        <button class="hbtn" data-action="load-game" data-i18n="load_btn">Charger</button>
-      </div>
-      <div class="settings-row">
-        <button class="hbtn" data-action="export-save" data-i18n="export_btn">Exporter</button>
-        <label class="hbtn pw-static-009" for="import-file" data-i18n="import_btn">Importer</label>
-      </div>
-      <input type="file" id="import-file" accept=".json,application/json" class="pw-static-010" data-action="import-save-file">
-      <div class="settings-row" id="delete-row">
-        <button class="hbtn pw-static-011 pw-btn-danger" data-action="confirm-delete" data-i18n="delete_save_btn">Supprimer la sauvegarde</button>
-      </div>
-      <div class="settings-row pw-static-012 delete-danger-zone" id="delete-confirm-row">
-        <span class="delete-warn" data-i18n="delete_save_warning">⚠️ Cette action est irréversible : toute ta progression sera effacée.</span>
-        <button class="hbtn pw-static-011 pw-btn-danger" data-action="do-delete" data-i18n="confirm_delete_btn">Confirmer la suppression</button>
-        <button class="hbtn" data-action="cancel-delete" data-i18n="cancel_btn">Annuler</button>
-      </div>
-    </div>
+    <!-- Body rendered from zero by the ECS design system
+         (SettingsModalView) at open time — see src/game/save/settings.js -->
+    <div id="settings-body" class="pw-settings-body"></div>
   </div>
 </div>
 
 <div id="quest-modal" role="dialog" aria-modal="true" aria-labelledby="quest-title">
   <div id="quest-inner">
-    <div id="quest-title"></div>
-    <div id="quest-body"></div>
+    <div class="modal-title">
+      <div id="quest-title"></div>
+      <button type="button" class="modal-close" data-action="legacy-call" data-call="closeQuestModal" data-call-args="" aria-label="Fermer" data-i18n-aria-label="modal_close_btn">✕</button>
+    </div>
+    <div id="quest-body" class="pw-modal-body"></div>
+    <div id="quest-footer" class="pw-actions"></div>
   </div>
 </div>
 
 <div id="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-text">
   <div id="confirm-inner">
     <div id="confirm-text"></div>
-    <div class="settings-row pw-static-013">
-      <button class="hbtn pw-static-011" id="confirm-yes" data-i18n="confirm_btn">Confirmer</button>
+    <div class="pw-confirm-actions">
+      <button class="hbtn" id="confirm-yes" data-i18n="confirm_btn">Confirmer</button>
       <button class="hbtn" data-action="close-confirm" data-i18n="cancel_btn">Annuler</button>
     </div>
   </div>
@@ -155,14 +61,13 @@
   <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="adventure" aria-current="false" data-i18n="adventure_tab">Aventure</button>
   <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="combat" aria-current="false"><span data-i18n="tab_combat">Combat</span></button>
   <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="team" aria-current="false"><span data-i18n="team_btn">Équipe</span></button>
-  <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="quests" aria-current="false" data-i18n="quests_tab">Quêtes</button>
+  <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="shortcuts" aria-current="false" data-i18n="shortcuts_tab">Raccourcis</button>
   <button class="mob-btn" data-action="set-mobile-view" data-mobile-view="manage" aria-current="false" data-i18n="manage_tab">Gestion</button>
 </div>
 <div class="mobile-subnav-bar">
   <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="hatchery" aria-current="false"><span data-i18n="tab_hatchery">Pension</span></button>
   <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="training" aria-current="false" data-i18n="training_tab">Entraînement</button>
   <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="mine" aria-current="false"><span data-i18n="mine_title">Mine</span></button>
-  <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="shortcuts" aria-current="false" data-i18n="shortcuts_tab">Raccourcis</button>
   <button class="mob-sub-btn" data-action="set-mobile-manage-view" data-mobile-manage-view="base" aria-current="false" data-i18n="base_tab">Base</button>
 </div>
 
@@ -171,24 +76,24 @@
   <div id="col-1" class="dash-col pw-static-016" data-col="1">
     
     <div id="win-story" class="dash-win pw-static-021">
-      <div class="win-header" data-drag-window="win-story">
-        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span><span id="story-win-title" data-i18n="story_quests_title">Histoire & Quêtes</span></span>
+      <div class="pw-win-hdr" data-drag-window="win-story">
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span><span id="story-win-title" class="pw-win-hdr-label" data-i18n="story_quests_title">Histoire & Quêtes</span></span>
         
       </div>
       <div class="win-body pw-static-022" id="story-panel"></div>
     </div>
     
     <div id="win-team" class="dash-win pw-static-021">
-      <div class="win-header" data-drag-window="win-team">
-        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span><span id="team-win-title" data-i18n="team_btn">Équipe Active</span></span>
+      <div class="pw-win-hdr" data-drag-window="win-team">
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span><span id="team-win-title" class="pw-win-hdr-label" data-i18n="team_btn">Équipe Active</span></span>
         
       </div>
       <div id="team-window-body" class="win-body pw-static-022"></div>
     </div>
     
     <div id="win-hatchery" class="dash-win pw-static-021">
-      <div class="win-header" data-drag-window="win-hatchery">
-        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3c-3.5 0-6 4.2-6 9 0 4.5 2.2 8 6 8s6-3.5 6-8c0-4.8-2.5-9-6-9z"/></svg></span><span id="hatchery-win-title" data-i18n="hatchery_management_title">Pension & Couveuse</span></span>
+      <div class="pw-win-hdr" data-drag-window="win-hatchery">
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3c-3.5 0-6 4.2-6 9 0 4.5 2.2 8 6 8s6-3.5 6-8c0-4.8-2.5-9-6-9z"/></svg></span><span id="hatchery-win-title" class="pw-win-hdr-label" data-i18n="hatchery_management_title">Pension & Couveuse</span></span>
         
       </div>
       <div id="hatchery-window-body" class="win-body pw-static-022"></div>
@@ -196,8 +101,8 @@
     </div>
     
     <div id="win-mine" class="dash-win pw-static-024">
-      <div class="win-header" data-drag-window="win-mine">
-        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3l7 7"/><path d="M4 20l7-7"/><path d="M14 3l-4 4 7 7 4-4"/><path d="M2 22l8-8"/></svg></span><span id="mine-win-title" data-i18n="mine_window_title">Mine souterraine</span></span>
+      <div class="pw-win-hdr" data-drag-window="win-mine">
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3l7 7"/><path d="M4 20l7-7"/><path d="M14 3l-4 4 7 7 4-4"/><path d="M2 22l8-8"/></svg></span><span id="mine-win-title" class="pw-win-hdr-label" data-i18n="mine_window_title">Mine souterraine</span></span>
         
       </div>
       <div id="mine-window-body" class="win-body pw-static-025"></div>
@@ -208,8 +113,12 @@
   <div id="col-2" class="dash-col center-col pw-static-026" data-col="2">
     
     <div id="win-map" class="dash-win pw-static-027">
-      <div class="win-header" data-drag-window="win-map">
-        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span><span id="map-win-title" data-i18n="map_title_name">Carte {region}</span></span>
+      <div class="pw-win-hdr" data-drag-window="win-map">
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span><!-- Wave 27: no data-i18n here. map_title_name contains a {region} placeholder
+     that the data-i18n label pass paints RAW (without interpolation), and two
+     real writers already own this node with the full interpolated title
+     (region.js: map_title_prefix + region name; map-render.js: tr(map_title_name)). -->
+<span id="map-win-title" class="pw-win-hdr-label">Carte</span></span>
         <span class="pw-static-028">
           <select id="map-region-select" data-stop-drag="true" data-action="switch-map-region" class="pw-static-029">
             <option value="kanto" data-i18n="map_region_kanto">Région Kanto</option>
@@ -230,8 +139,8 @@
     </div>
 
     <div id="win-battle" class="dash-win pw-static-031">
-      <div class="win-header" data-drag-window="win-battle">
-        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg></span><span id="battle-win-title" data-i18n="win_battle">Combat en direct</span></span>
+      <div class="pw-win-hdr" data-drag-window="win-battle">
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg></span><span id="battle-win-title" class="pw-win-hdr-label" data-i18n="win_battle">Combat en direct</span></span>
         
       </div>
       <div class="win-body pw-static-032" id="battle-center-panel">
@@ -245,6 +154,11 @@
 
           
           <div id="battle-team-row" class="team-container"></div>
+          <!-- Wave 28 (user feedback): the extra move-buttons bar under the
+               team row is REMOVED — the charge bars live directly ON the
+               attack chips of the active card (they always did). The empty
+               host confused everyone; renderMoveButtons() no-ops on the
+               missing host. -->
 
           <div class="pw-static-038">
             <div class="pw-static-039">
@@ -264,8 +178,8 @@
     </div>
 
     <div id="win-base" class="dash-win">
-      <div class="win-header" data-drag-window="win-base">
-        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9.5L12 3l9 6.5"/><path d="M5 8.5V21h14V8.5"/><path d="M9 21v-6h6v6"/></svg></span><span id="base-win-title" data-i18n="base.win.title">Base Secrète</span></span>
+      <div class="pw-win-hdr" data-drag-window="win-base">
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9.5L12 3l9 6.5"/><path d="M5 8.5V21h14V8.5"/><path d="M9 21v-6h6v6"/></svg></span><span id="base-win-title" class="pw-win-hdr-label" data-i18n="base.win.title">Base Secrète</span></span>
         <span class="base-win-controls">
           <select id="base-layout-select" data-stop-drag="true" data-action="base-window-layout" style="display: none;"></select>
           <button id="base-refresh-btn" type="button" class="hbtn" data-stop-drag="true" data-action="base-window-refresh">↻</button>
@@ -277,7 +191,7 @@
         <canvas id="base-canvas-3d"></canvas>
         <div id="base-toolbar">
           <button id="base-ed-rotate" type="button" class="hbtn" data-stop-drag="true" data-action="base-ed-rotate" data-i18n="base.edit.rotate" hidden>Pivoter</button>
-          <button id="base-ed-pickup" type="button" class="hbtn" data-stop-drag="true" data-action="base-ed-pickup" data-i18n="base.edit.pickup">Ramasser</button>
+          <button id="base-ed-pickup" type="button" class="hbtn pw-btn-danger" data-stop-drag="true" data-action="base-ed-pickup" data-i18n="base.edit.pickup">Ramasser</button><!-- wave 18 (user): picking up a placed item REMOVES it — danger red, same as every red button -->
           <button id="base-ed-npc-edit" type="button" class="hbtn" data-stop-drag="true" data-action="base-ed-npc-edit" data-i18n="base.npced.edit_selected" hidden>Modifier le PNJ</button>
           <button id="base-ed-pc-edit" type="button" class="hbtn" data-stop-drag="true" data-action="base-ed-pc-edit" data-i18n="base.pc.edit_selected" hidden>Modifier le PC</button>
           <span id="base-ed-hint"></span>
@@ -296,8 +210,8 @@
   <div id="col-3" class="dash-col pw-static-016" data-col="3">
     
     <div id="win-shortcuts" class="dash-win pw-static-046">
-      <div class="win-header" data-drag-window="win-shortcuts">
-        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></span><span id="shortcuts-win-title" data-i18n="shortcuts_tab">Raccourcis</span></span>
+      <div class="pw-win-hdr" data-drag-window="win-shortcuts">
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></span><span id="shortcuts-win-title" class="pw-win-hdr-label" data-i18n="shortcuts_tab">Raccourcis</span></span>
         
       </div>
       <div id="shortcuts-window-body" class="win-body pw-static-047"></div>
@@ -306,12 +220,12 @@
     
     
     <div id="win-tabs" class="dash-win pw-static-048">
-      <div class="win-header" data-drag-window="win-tabs">
-        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span id="loc-win-title" data-i18n="tab_info">Lieu</span></span>
+      <div class="pw-win-hdr" data-drag-window="win-tabs">
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span id="loc-win-title" class="pw-win-hdr-label" data-i18n="tab_info">Lieu</span></span>
         
       </div>
       <div id="right-panel" class="pw-static-049">
-        <div id="tabs" class="pw-static-050" data-style="display:none;">
+        <div id="tabs" class="pw-static-050 pw-win-tabs">
           <button type="button" class="tab active" role="tab" aria-selected="true" data-action="show-tab" data-tab="info" data-i18n="tab_info">Lieu</button>
           </div>
         <div id="tab-content" class="win-body pw-static-051"></div>
@@ -319,8 +233,8 @@
     </div>
 
     <div id="win-training" class="dash-win pw-static-021">
-      <div class="win-header" data-drag-window="win-training">
-        <span class="win-header-title"><span class="drag-handle" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6v12"/><path d="M18 6v12"/><path d="M3 9h6"/><path d="M15 9h6"/><path d="M3 15h6"/><path d="M15 15h6"/><path d="M9 12h6"/></svg></span><span id="training-win-title" data-i18n="training_center_title">Salle d'Entraînement</span></span>
+      <div class="pw-win-hdr" data-drag-window="win-training">
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6v12"/><path d="M18 6v12"/><path d="M3 9h6"/><path d="M15 9h6"/><path d="M3 15h6"/><path d="M15 15h6"/><path d="M9 12h6"/></svg></span><span id="training-win-title" class="pw-win-hdr-label" data-i18n="training_center_title">Salle d'Entraînement</span></span>
         
       </div>
       <div id="training-window-body" class="win-body pw-static-022"></div>
@@ -337,15 +251,8 @@
       <button type="button" class="modal-close pw-static-055" data-action="close-unified-selector" aria-label="Fermer" data-i18n-aria-label="modal_close_btn">✕</button>
     </div>
     <div class="pw-static-056">
-      <div class="pw-static-057">
-        <span class="pw-static-058" data-i18n="sort_label">Tri :</span>
-        <button class="hbtn usm-sort-btn active" data-sort="id" data-action="sort-unified-grid" data-i18n="sort_dex_number">Pokédex #</button>
-        <button class="hbtn usm-sort-btn" data-sort="level" data-action="sort-unified-grid" data-i18n="sort_level">Niveau</button>
-        <button class="hbtn usm-sort-btn" data-sort="iv" data-action="sort-unified-grid" data-i18n="sort_iv">IVs</button>
-        <button class="hbtn usm-sort-btn" data-sort="ev" data-action="sort-unified-grid" data-i18n="sort_ev">EVs</button>
-        <button class="hbtn usm-sort-btn" data-sort="rank" data-action="sort-unified-grid" data-i18n="sort_rank">Rang</button>
-        <button class="hbtn usm-sort-btn" data-sort="name" data-action="sort-unified-grid" data-i18n="sort_name">Nom</button>
-      </div>
+      <!-- wave 15 (user feedback): the legacy TRI row is gone — sort chips
+           now live inside the DS FilterBar (usm-filter-panel). -->
       <div id="usm-filter-panel" class="usm-filter-panel"></div>
       <div class="pw-static-059">
         <input type="text" id="usm-search" placeholder="Rechercher par nom..." data-action="filter-unified-grid" class="pw-static-060" data-i18n-placeholder="search_by_name">
@@ -377,7 +284,7 @@
   <div id="debug-drawer" class="pw-static-067">
     <div class="pw-static-068">
       <span data-i18n="debug_menu_title_short">Menu debug</span>
-      <button type="button" class="pw-static-069" data-action="toggle-debug-menu" aria-label="Fermer le menu debug">✕</button>
+      <button type="button" class="pw-static-069" data-action="toggle-debug-menu" aria-label="" data-i18n-aria-label="modal_close_btn">✕</button>
     </div>
     <button class="hbtn pw-static-070" data-action="debug-give-money" data-i18n="debug_money">Monnaie +50 000₽</button>
     <button class="hbtn pw-static-071" data-action="debug-give-candies" data-i18n="debug_candies">Super Bonbons +10</button>
@@ -405,7 +312,7 @@
 </div>
 
 
-<div id="notif"></div>
+<div id="notif" class="pw-toast"></div>
 
 
 <div id="victory-screen" role="dialog" aria-modal="true" aria-labelledby="victory-title">
@@ -420,9 +327,38 @@
   <div id="qcap-content" class="pw-static-081">
   </div>
 </div>
-  <script src="src/file-preflight.js"></script>
-  <script src="src/loader.js"></script>
-  <script src="src/file-postboot.js"></script>
+  <script type="module">
+    // Wave 32 (section 3 — lazy loading): load ONLY the active language pack
+    // BEFORE the application graph. Sequential awaits in plain runtime code
+    // (not a link-time barrier): the pack's window.L_<lang>_* fragments are
+    // merged when src/localization/data.js evaluates inside the main graph.
+    (async function bootPokeWorld() {
+      var lang = 'fr';
+      try { lang = window.localStorage.getItem('pokeworld_lang') === 'en' ? 'en' : 'fr'; } catch (_) {}
+      window.__pwActiveLang = lang;
+      if (lang === 'en') {
+        await import('./src/localization/en-pack.js');
+      } else {
+        await import('./src/localization/fr-pack.js');
+      }
+      await import('./src/main.js');
+    })();
+  </script>
+  <script>
+    // ES modules cannot load over file:// (CORS). Detect that case explicitly
+    // (no arbitrary timeout) and invite the user to start a local server.
+    if (location.protocol === 'file:') {
+      window.addEventListener('DOMContentLoaded', function() {
+        var warn = document.createElement('div');
+        warn.setAttribute('role', 'alert');
+        warn.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;' +
+          'background:#1a1a18;color:#ECDEB7;font-family:sans-serif;padding:2rem;text-align:center;z-index:99999;';
+        warn.textContent = 'PokéWorld cannot start by double-clicking index.html (ES modules are blocked over file://). ' +
+          'Please start a local server (e.g. npx vite, or launch_local_server.bat on Windows) and open the indicated address.';
+        document.body.appendChild(warn);
+      });
+    }
+  </script>
 </body>
 </html>
 

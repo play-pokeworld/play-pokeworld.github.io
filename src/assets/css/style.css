@@ -13,7 +13,7 @@
   --dark1: #36342F;
   --dark2: #444138;
   --dark3: #524f48;
-  --light1: #94886B;
+  --light1: #C9BC9C;
   --light2: #ECDEB7;
   --accent: #94886B;
   --panel: #444138;
@@ -53,7 +53,7 @@
   --dark1: #E8E0D0;
   --dark2: #F5F0E0;
   --dark3: #D8CDB5;
-  --light1: #8B7355;
+  --light1: #806A4E;
   --light2: #4A3B2A;
   --accent: #8B7355;
   --panel: #F5F0E0;
@@ -74,8 +74,8 @@
   --dark1: #0F380F;
   --dark2: #306230;
   --dark3: #8BAC0F;
-  --light1: #4A8A4A;
-  --light2: #9BBC0F;
+  --light1: #BCD4BC;
+  --light2: #C2D66D;
   --accent: #4A8A4A;
   --panel: #306230;
   --panel-bg: #9BBC0F;
@@ -614,8 +614,8 @@ body { font-size: 13px; }
 
 
 .dex-entry.unknown .dex-sprite { background: transparent; }
-/* Silhouettes en pur CSS : évite filter:url(#id) qui, en file://, force le
-   chargement du document lui-même ("Unsafe attempt to load URL ..."). */
+/* Pure-CSS silhouettes: avoids filter:url(#id) which, over file://, forces
+   the document itself to load ("Unsafe attempt to load URL ..."). */
 .dex-entry.unknown .dex-sprite img {
   filter: brightness(0) saturate(0.25);
   opacity: 0.98;
@@ -1219,11 +1219,11 @@ body { font-size: 13px; }
 .win-body {
   padding: 10px;
 }
-/* Passe 37 : salles canon larges (jusqu'à 17×16 cases) — le canvas de la
-   base déborde la colonne si besoin, scroll interne plutôt que découpe. */
+/* Phase 37: large canon rooms (up to 17×16 tiles) — the base canvas may
+   overflow the column when needed; internal scroll instead of cropping. */
 #base-panel.win-body { overflow: auto; max-width: 100%; }
 #base-panel.win-body canvas { display: block; margin: 0 auto; }
-/* Passe 38 : éditeur de pose + visite interactive (barre d'outils + stock). */
+/* Phase 38: placement editor + interactive visit (toolbar + stock). */
 #base-canvas-2d { cursor: pointer; }
 
 #base-toolbar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 6px 2px 2px; }
@@ -1233,10 +1233,10 @@ body { font-size: 13px; }
 .base-toolbar-spacer { flex: 0 0 0; }
 #base-stock { display: flex; flex-direction: column; gap: 6px; align-items: stretch; padding: 6px 2px 4px; }
 .base-stock-cat { flex: 0 0 100%; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; opacity: .6; margin-top: 4px; }
-/* Passe 39 : pages par catégorie (onglets) — plus de longue liste.
-   Passe 40 : habillage aligné sur les menus (sac / dictionnaire) :
-   onglets façon .hbtn (+ pastille de comptage façon .inv-qty),
-   objets en cartes claires façon .inv-item / .dex-entry. */
+/* Phase 39: per-category pages (tabs) — no more endless list.
+   Phase 40: skin aligned with the menus (bag / dictionary):
+   .hbtn-style tabs (+ .inv-qty-style count badge),
+   objects on light cards like .inv-item / .dex-entry. */
 .base-stock-tabs { display: flex; flex-wrap: wrap; gap: 4px; }
 .base-stock-tab {
   display: inline-flex; align-items: center; gap: 6px;

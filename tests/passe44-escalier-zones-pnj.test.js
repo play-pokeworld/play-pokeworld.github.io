@@ -2,37 +2,38 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { harnessBundleSource } from '../tools/harness-bundle.mjs';
 
-// ── Passe 44 : retours utilisateur « escalier pire qu'avant » + PNJ ─────────
-//  1. ESCALIER : sprite = VRAIS métatiles RSE (paire du présentoir), et les
-//     DEUX colonnes de l'escalier sont franchissables (« pas que un seul »).
-//  2. PRÉSENTOIR / TOBOGGAN : vraies hauteurs d'objets façon RSE — dessus
-//     accessible UNIQUEMENT par l'escalier intégré (présentoir : escaliers
-//     aux deux extrémités ; toboggan : escalier à gauche), jamais par les
-//     bords ; toboggan : glissade FORCÉE jusqu'au tapis si on touche la tête
-//     de rampe ; pose uniquement sur socle de niveau.
-//  3. GABARITS À ÉTAGE organiques façon ROSA : salle non carrée, montée en
-//     petit détour, niche d'escalier encadrée de hauteurs (position unique).
-//     (invariants de forme vérifiés dans passe43-porte-lock-hauteurs.test.js D)
-//  4. PNJ : début du système — vivier roster (8 copains, sprites de foule
-//     dédiés, répliques i18n, équipes gen 1-2), pose/refus sur ancre,
-//     interaction → combat borné (1/visite).
+// ── Pass 44: user feedback "stairs worse than before" + NPCs ─────────
+//  1. STAIRS: sprite = REAL RSE metatiles (display-stand pair), and
+//     BOTH stairs columns are walkable ("not just one").
+//  2. DISPLAY STAND / SLIDE: real RSE-style object heights — top
+//     reachable ONLY via the built-in stairs (stand: stairs
+//     at both ends; slide: stairs on the left), never via the
+//     edges; slide: FORCED slide down to the mat when touching the ramp
+//     head; placement only on an even base.
+//  3. ORGANIC MULTI-FLOOR LAYOUTS, FRLG style: non-square room, climb via
+//     a small detour, stairs niche framed by heights (unique position).
+//     (shape invariants verified in passe43-porte-lock-hauteurs.test.js D)
+//  4. NPC: system kickoff — roster pool (8 buddies, dedicated crowd
+//     sprites, i18n lines, gen 1-2 teams), placement/refusal on anchor,
+//     interaction → bounded battle (1/visit).
 
 const R = (p) => fs.readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
 const J = (p) => JSON.parse(R(p));
 const E = (p) => fs.existsSync(new URL(`../${p}`, import.meta.url));
 
 const SANDBOX_FILES = [
-  'src/file-preflight.js',
+  'src/engine/input/action-dispatcher.js', 'src/engine/runtime/classic-bridge.js',
   'src/localization/fr/base.js', 'src/localization/en/base.js',
   'src/localization/data.js', 'src/localization/i18n.js',
-  'src/game/core/state.js',
+  'src/application/game-state.js',
   'src/data/base-layouts-data.js', 'src/data/base-items-data.js',
-  'src/game/base/base-core.js',
-  'src/game/base/base-visit.js',
-  'src/game/base/base-exchange.js',
-  'src/game/base/base-editor.js',
-  'src/game/base/base-debug.js',
+  'src/application/base/base-core.js',
+  'src/ui/game/base/base-visit.js',
+  'src/ui/game/base/base-exchange.js',
+  'src/ui/game/base/base-editor.js',
+  'src/ui/game/base/base-debug.js',
 ];
 
 function makeSandbox() {
@@ -58,35 +59,35 @@ function makeSandbox() {
   sandbox.window = sandbox;
   sandbox.globalThis = sandbox;
   vm.createContext(sandbox);
-  for (const f of SANDBOX_FILES) vm.runInContext(R(f), sandbox, { filename: f });
+  vm.runInContext(harnessBundleSource(SANDBOX_FILES), sandbox, { filename: 'passe44-escalier-zones-pnj [iife]' });
   return sandbox;
 }
 
-// ——— A — escalier : franchissement des DEUX colonnes (visite réelle) ———————
-test('passe 44 A : les DEUX colonnes de l\u2019escalier sont franchissables', () => {
+// ——— A — stairs: crossing BOTH columns (real visit) ——————————————————————
+test('phase 44 A: BOTH stairs columns are walkable', () => {
   const sb = makeSandbox();
   const out = JSON.parse(vm.runInContext(`(() => {
     const st = baseGetState();
     baseDebugCreate('cave_5');
     baseDebugGrantAll();
-    // passe 47 : les salles sont redessinées — on LIT la niche dans le gabarit
-    // au lieu de coder ses coordonnées en dur.
+    // pass 47: the rooms are redesigned — we READ the niche from the layout
+    // instead of hardcoding its coordinates.
     const L = baseLayoutGet('cave_5');
     const a0 = L.stairAnchors[0];
-    const W = a0.x, E = a0.x + 1, AY = a0.y;   // paire d'ancres, rangée AY
+    const W = a0.x, E = a0.x + 1, AY = a0.y;   // anchor pair, row AY
     basePlace(st, 'stairs', W, AY, 0);
     const r = { W, E, AY };
-    // colonne OUEST : spawn → plateau (2 rangées au-dessus de l'ancre)
+    // WEST column: spawn → plateau (2 rows above the anchor)
     let sess = baseVisitCreate(st);
     let ok = baseVisitSetDestination(sess, W, AY - 2);
     while (sess.path.length) baseVisitStepAlong(sess);
     r.westPath = !!ok; r.west = sess.pos; r.westElev = sess.elev;
-    // colonne EST
+    // EAST column
     sess = baseVisitCreate(st);
     ok = baseVisitSetDestination(sess, E, AY - 2);
     while (sess.path.length) baseVisitStepAlong(sess);
     r.eastPath = !!ok; r.east = sess.pos; r.eastElev = sess.elev;
-    // latéralité SUR l'escalier : on rejoint l'autre colonne d'ancre
+    // laterality ON the stairs: we join the other anchor column
     sess = baseVisitCreate(st);
     baseVisitSetDestination(sess, E, AY);
     while (sess.path.length) baseVisitStepAlong(sess);
@@ -94,56 +95,56 @@ test('passe 44 A : les DEUX colonnes de l\u2019escalier sont franchissables', ()
     return JSON.stringify(r);
   })()`, sb));
   assert.equal(out.westPath, true, 'colonne OUEST traversable');
-  assert.deepEqual([out.west.x, out.west.y, out.westElev], [out.W, out.AY - 2, 1], 'montée OUEST → mezzanine');
-  assert.equal(out.eastPath, true, 'colonne EST traversable');
-  assert.deepEqual([out.east.x, out.east.y, out.eastElev], [out.E, out.AY - 2, 1], 'montée EST → mezzanine');
-  assert.deepEqual([out.onStairs.x, out.onStairs.y], [out.E, out.AY], 'passage latéral entre colonnes d\u2019escalier');
+  assert.deepEqual([out.west.x, out.west.y, out.westElev], [out.W, out.AY - 2, 1], 'WEST climb → mezzanine');
+  assert.equal(out.eastPath, true, 'EAST column crossable');
+  assert.deepEqual([out.east.x, out.east.y, out.eastElev], [out.E, out.AY - 2, 1], 'EAST climb → mezzanine');
+  assert.deepEqual([out.onStairs.x, out.onStairs.y], [out.E, out.AY], 'side passage between stairs columns');
 });
 
-// ——— B — présentoir : hauteur d'objet canon (escaliers aux 2 extrémités) ———
-test('passe 44 B : présentoir — montée/descente UNIQUEMENT par ses escaliers', () => {
+// ——— B — display stand: canonical object height (stairs at both ends) ————
+test('phase 44 B: display stand — up/down ONLY via its stairs', () => {
   const sb = makeSandbox();
   const out = JSON.parse(vm.runInContext(`(() => {
     const st = baseGetState();
     baseDebugCreate('cave_1');
     baseDebugGrantAll();
-    basePlace(st, 'stand', 2, 3, 0);         // présentoir 4×2 : rangée 3 = dessus, rangée 4 = base
+    basePlace(st, 'stand', 2, 3, 0);         // 4×2 display stand: row 3 = top, row 4 = base
     const r = {};
     const g = baseBuildGrid(st);
-    // base pleine bloquée (entre les 2 escaliers)
+    // solid base blocked (between the 2 stairs)
     r.baseBlocked = [baseCellWalkable(st, g, 3, 4, null), baseCellWalkable(st, g, 4, 4, null)];
-    // escaliers d'extrémités franchissables ; dessus franchissable
+    // end stairs walkable; top walkable
     r.stairW = baseCellWalkable(st, g, 2, 4, null);
     r.stairE = baseCellWalkable(st, g, 5, 4, null);
     r.topWalk = baseCellWalkable(st, g, 3, 3, null);
-    // montée par un escalier : spawn → dessus
+    // climbing via stairs: spawn → top
     let sess = baseVisitCreate(st);
     r.upPath = baseVisitSetDestination(sess, 3, 3).map((s) => s.x + ',' + s.y);
     while (sess.path.length) baseVisitStepAlong(sess);
     r.atTop = sess.pos; r.sub = sess.subElev;
-    // depuis le dessus, AUCUNE sortie par les bords : (5,3) ne s'ouvre que sur
-    // le dessus (4,3) et son escalier (5,4) — jamais (5,2) nord ni (6,3) est.
+    // from the top, NO exit through the edges: (5,3) only opens onto
+    // the top (4,3) and its stairs (5,4) — never (5,2) north nor (6,3) east.
     r.vois = baseVisitNeighbors(sess, 5, 3, 0).map((n) => n.x + ',' + n.y).sort();
     r.vois2 = baseVisitNeighbors(sess, 2, 3, 0).map((n) => n.x + ',' + n.y).sort();
-    // descente possible par l'escalier EST (5,4) : chemin dessus → sol sud-est
+    // descent possible via the EAST stairs (5,4): top path → southeast floor
     r.downPath = baseVisitSetDestination(sess, 5, 5).map((s) => s.x + ',' + s.y);
     while (sess.path.length) baseVisitStepAlong(sess);
     r.gone = sess.pos;
     return JSON.stringify(r);
   })()`, sb));
-  assert.deepEqual(out.baseBlocked, [false, false], 'soubassement plein bloqué');
-  assert.equal(out.stairW && out.stairE, true, 'escaliers des DEUX extrémités franchissables');
-  assert.equal(out.topWalk, true, 'dessus marchable');
-  assert.deepEqual(out.atTop, { x: 3, y: 3 }, 'monté sur le présentoir');
-  assert.equal(out.sub, 1, 'subElev = 1 sur le dessus (hauteur simulée)');
-  // ✋ le verrou canon : depuis le dessus, seuls le dessus et l'escalier intégré
-  assert.deepEqual(out.vois, ['4,3', '5,4'], 'coin EST : sortie = escalier EST seulement');
-  assert.deepEqual(out.vois2, ['2,4', '3,3'], 'coin OUEST : sortie = escalier OUEST seulement');
-  assert.ok(out.downPath && out.downPath.length > 0, 'sortie par l’escalier EST');
-  assert.deepEqual(out.gone, { x: 5, y: 5 }, 'descendu au sol par l’escalier');
+  assert.deepEqual(out.baseBlocked, [false, false], 'solid substructure blocked');
+  assert.equal(out.stairW && out.stairE, true, 'BOTH ends\' stairs walkable');
+  assert.equal(out.topWalk, true, 'top walkable');
+  assert.deepEqual(out.atTop, { x: 3, y: 3 }, 'climbed onto the display stand');
+  assert.equal(out.sub, 1, 'subElev = 1 on top (simulated height)');
+  // ✋ the canon lock: from the top, only the top and the built-in stairs
+  assert.deepEqual(out.vois, ['4,3', '5,4'], 'EAST corner: exit = EAST stairs only');
+  assert.deepEqual(out.vois2, ['2,4', '3,3'], 'WEST corner: exit = WEST stairs only');
+  assert.ok(out.downPath && out.downPath.length > 0, 'exit via the EAST stairs');
+  assert.deepEqual(out.gone, { x: 5, y: 5 }, 'descended to the floor via the stairs');
 });
 
-test('passe 44 B2 : présentoir/toboggan — socle de niveau exigé (pas à cheval)', () => {
+test('phase 44 B2: display stand/slide — even base required (no straddling)', () => {
   const sb = makeSandbox();
   const out = JSON.parse(vm.runInContext(`(() => {
     const r = {};
@@ -156,18 +157,18 @@ test('passe 44 B2 : présentoir/toboggan — socle de niveau exigé (pas à chev
       const c = L.cells[y] && L.cells[y][x];
       return (c && c.t === 'floor') ? c.elev : null;
     };
-    // Passe 48 : les salles sont maintenant DEUX espaces séparés par une
-    // falaise pleine largeur — il n'existe plus de cellules d'élévations
-    // différentes côte à côte. Le cas « à cheval » se teste donc en visant
-    // délibérément la rangée qui chevauche la falaise (plateau au nord,
-    // sol au sud) : la pose doit être refusée.
+    // Pass 48: the rooms are now TWO spaces separated by a
+    // full-width cliff — there are no longer any cells of different
+    // elevations side by side. The "straddling" case is therefore tested by
+    // deliberately targeting the row overlapping the cliff (plateau to the
+    // north, floor to the south): the placement must be refused.
     let cliffRow = -1;
     for (let y = 0; y < L.h && cliffRow < 0; y++) {
       for (let x = 0; x < L.w; x++) if (L.cells[y][x].t === 'cliff') { cliffRow = y; break; }
     }
-    // On vérifie qu'AUCUNE pose 4×2 ne peut mélanger deux élévations : avec
-    // la cloison de falaise pleine largeur, le cas « à cheval » n'existe même
-    // plus géométriquement — c'est le résultat recherché.
+    // We verify that NO 4×2 placement can mix two elevations: with
+    // the full-width cliff partition, the "straddling" case does not even
+    // exist geometrically — that is the intended result.
     r.anyStraddle = null;
     for (let y = 0; y + 1 < L.h && !r.anyStraddle; y++) {
       for (let x = 0; x + 3 < L.w; x++) {
@@ -177,15 +178,15 @@ test('passe 44 B2 : présentoir/toboggan — socle de niveau exigé (pas à chev
         if (new Set(es).size > 1) { r.anyStraddle = baseCanPlace(st, 'stand', x, y, 0); break; }
       }
     }
-    // la falaise elle-même n'accepte jamais un meuble
+    // the cliff itself never accepts a furniture
     r.onCliff = baseCanPlace(st, 'stand', 4, cliffRow, 0);
-    // de niveau sur le plateau
+    // same-level on the plateau
     for (let x = 1; x + 3 < L.w && !r.onMezz; x++) {
       const es = [];
       for (let dy = 0; dy < 2; dy++) for (let dx = 0; dx < 4; dx++) es.push(elevAt(x + dx, cliffRow - 2 + dy));
       if (es.every((e) => e === 1)) r.onMezz = baseCanPlace(st, 'stand', x, cliffRow - 2, 0);
     }
-    // de niveau au sol : empreinte 2×3 du toboggan
+    // same-level on the floor: 2×3 slide footprint
     for (let y = cliffRow + 1; y + 2 < L.h && !r.onFloor; y++) {
       for (let x = 1; x + 1 < L.w; x++) {
         const es = [];
@@ -197,85 +198,85 @@ test('passe 44 B2 : présentoir/toboggan — socle de niveau exigé (pas à chev
     }
     return JSON.stringify(r);
   })()`, sb));
-  // Passe 48 : plus aucune configuration « à cheval » possible (deux salles
-  // séparées par une falaise pleine largeur). Si une subsiste, elle DOIT être
-  // refusée pour socle inégal.
+  // Phase 48: no more "straddling" configuration possible (two rooms
+  // separated by a full-width cliff). If one remains, it MUST be
+  // rejected for an uneven base.
   if (out.anyStraddle) {
-    assert.equal(out.anyStraddle.ok, false, 'présentoir à cheval refusé');
-    assert.equal(out.anyStraddle.reason, 'base.err.uneven', 'raison : socle de niveau');
+    assert.equal(out.anyStraddle.ok, false, 'straddling display stand refused');
+    assert.equal(out.anyStraddle.reason, 'base.err.uneven', 'reason: even base');
   }
-  assert.equal(out.onCliff.ok, false, 'aucun meuble posé sur la falaise');
-  assert.equal(out.onMezz.ok, true, 'présentoir sur le plateau (de niveau)');
-  assert.equal(out.onFloor.ok, true, 'toboggan au sol (de niveau)');
+  assert.equal(out.onCliff.ok, false, 'no furniture placed on the cliff');
+  assert.equal(out.onMezz.ok, true, 'display stand on the (even) plateau');
+  assert.equal(out.onFloor.ok, true, 'slide on the (even) floor');
 });
 
-// ——— C — toboggan : escalier à gauche, glissade forcée, rampe infranchie ———
-test('passe 44 C : toboggan — montée par l\u2019escalier, glissade forcée au tapis', () => {
+// ——— C — slide: left stairs, forced slide, unclimbable ramp ———
+test('phase 44 C: slide — climb via the stairs, forced slide down to the mat', () => {
   const sb = makeSandbox();
   const out = JSON.parse(vm.runInContext(`(() => {
     const st = baseGetState();
     baseDebugCreate('cave_1');
     baseDebugGrantAll();
-    st.items = st.items.filter((i) => i.s !== 'pc');  // le PC auto-posé occupe (3,1)
-    // passe 45 : empreinte 2×3 (6 cases) — le carter est un surplomb VISUEL
-    // hors empreinte. Posé en (3,2) : palier r0 (y2), esc/rampe r1 (y3),
-    // tapis r2 (y4) ; la case (3,1)/(4,1) SOUS le carter reste libre.
+    st.items = st.items.filter((i) => i.s !== 'pc');  // the auto-placed PC occupies (3,1)
+    // pass 45: 2×3 footprint (6 tiles) — the cover is a VISUAL overhang
+    // outside the footprint. Placed at (3,2): landing r0 (y2), stairs/ramp r1 (y3),
+    // mat r2 (y4); the (3,1)/(4,1) tiles UNDER the cover stay free.
     const put = basePlace(st, 'slide', 3, 2, 0);
     if (!put.ok) return JSON.stringify({ placeFailed: put.reason });
     const r = {};
     const g = baseBuildGrid(st);
-    // le sol DERRIÈRE le toboggan (sous le carter) est libre — retour utilisateur
+    // the floor BEHIND the slide (under the cover) is free — user feedback
     r.behindFree = baseCellWalkable(st, g, 3, 1, null) && baseCellWalkable(st, g, 4, 1, null);
-    // passe 46 : la glissière n'est PLUS une case morte — elle est franchissable
-    // (on y met le pied et on glisse), mais à SENS UNIQUE (cf. r.upRamp plus bas).
+    // pass 46: the ramp is NO LONGER a dead tile — it is walkable
+    // (you step on it and slide), but ONE-WAY (cf. r.upRamp below).
     r.rampSurf = baseCellWalkable(st, g, 4, 3, null);
     r.stairs = baseCellWalkable(st, g, 3, 3, null);
     r.mat = baseCellWalkable(st, g, 4, 4, null);
-    // montée : tapis → escalier → palier → tête de rampe
+    // climb: mat → stairs → landing → ramp head
     const sess = baseVisitCreate(st);
     r.climb = baseVisitSetDestination(sess, 4, 2).map((s) => s.x + ',' + s.y);
     while (sess.path.length) baseVisitStepAlong(sess);
-    // la tête de rampe a DÉCLENCHÉ la glissade avant d'y stationner…
+    // the ramp head TRIGGERED the slide before idling there…
     r.after = sess.pos;
     r.logSlides = sess.log.filter((e) => e.fx === 'slide').length;
     r.subEnd = sess.subElev;
-    // concrètement : destination intermédiaire = palier gauche (3,2) SANS glissade
+    // concretely: intermediate destination = left landing (3,2) WITHOUT sliding
     const sess2 = baseVisitCreate(st);
     baseVisitSetDestination(sess2, 3, 2);
     while (sess2.path.length) baseVisitStepAlong(sess2);
     r.onLanding = sess2.pos; r.subLand = sess2.subElev;
     r.noSlide = sess2.log.filter((e) => e.fx === 'slide').length;
-    // impossible de remonter la rampe : tapis (4,4) → rampe (4,3) refusé
+    // impossible to climb the ramp back: mat (4,4) → ramp (4,3) refused
     r.upRamp = baseVisitSetDestination(sess2, 4, 3);
     return JSON.stringify(r);
   })()`, sb));
-  assert.ok(!out.placeFailed, 'pose du toboggan acceptée' + (out.placeFailed ? ' (' + out.placeFailed + ')' : ''));
-  assert.equal(out.behindFree, true, 'passe 45 : les 2 cases SOUS le carter restent libres (on passe derrière)');
-  assert.equal(out.rampSurf, true, 'passe 46 : la glissière est une case utilisable (plus de case morte)');
-  assert.equal(out.stairs && out.mat, true, 'escalier + tapis franchissables');
+  assert.ok(!out.placeFailed, 'slide placement accepted' + (out.placeFailed ? ' (' + out.placeFailed + ')' : ''));
+  assert.equal(out.behindFree, true, 'phase 45: the 2 tiles UNDER the body stay free (you pass behind)');
+  assert.equal(out.rampSurf, true, 'phase 46: the slide is a usable tile (no more dead tile)');
+  assert.equal(out.stairs && out.mat, true, 'stairs + mat crossable');
   const chain = out.climb.join(' ');
-  assert.ok(chain.indexOf('3,4 3,3') >= 0, 'approche par le tapis puis l’escalier');
-  assert.deepEqual(out.climb.slice(-3), ['3,3', '3,2', '4,2'], 'montée par l’escalier gauche jusqu’à la tête de rampe');
-  assert.deepEqual(out.after, { x: 4, y: 4 }, 'tête de rampe touchée → glissade au tapis');
-  assert.equal(out.logSlides, 1, 'un événement glissade');
-  assert.equal(out.subEnd, 0, 'retombé au niveau du sol');
-  assert.deepEqual(out.onLanding, { x: 3, y: 2 }, 'palier atteignable à pied');
-  assert.equal(out.subLand, 1, 'perché sur le palier');
-  assert.equal(out.noSlide, 0, 'pas de glissade sur le palier gauche');
-  // Passe 50 : le haut du toboggan est désormais ACCESSIBLE (par l'escalier
-  // intégré) — c'était la demande. Un chemin vers la glissière existe donc,
-  // mais il passe forcément par le HAUT : il descend, il ne remonte pas.
+  assert.ok(chain.indexOf('3,4 3,3') >= 0, 'approach via the mat then the stairs');
+  assert.deepEqual(out.climb.slice(-3), ['3,3', '3,2', '4,2'], 'climb via the left stairs up to the ramp head');
+  assert.deepEqual(out.after, { x: 4, y: 4 }, 'ramp head touched → slide to the mat');
+  assert.equal(out.logSlides, 1, 'one slide event');
+  assert.equal(out.subEnd, 0, 'back down to floor level');
+  assert.deepEqual(out.onLanding, { x: 3, y: 2 }, 'landing reachable on foot');
+  assert.equal(out.subLand, 1, 'perched on the landing');
+  assert.equal(out.noSlide, 0, 'no sliding on the left landing');
+  // Phase 50: the slide top is now REACHABLE (via the built-in
+  // stairs) — that was the request. So a path to the slide exists,
+  // but it necessarily goes through the TOP: it descends, it does not climb.
   {
     const path = out.upRamp || [];
     const iTop = path.findIndex((s2) => s2.y <= 2);
     const iRamp = path.findIndex((s2) => s2.x === 4 && s2.y === 3);
     assert.ok(iRamp < 0 || (iTop >= 0 && iTop < iRamp),
-      'la glissière n’est empruntée que du HAUT vers le bas');
+      'the slide is only taken TOP to bottom');
   }
 });
 
-// ——— D — gabarits : tout le plateau atteignable en visite (escalier posé) ——
-test('passe 44 D : les 12 niches relient 100 % du plateau en visite', () => {
+// ——— D — layouts: whole plateau reachable during visit (stairs placed) ———
+test('phase 44 D: the 12 niches connect 100% of the plateau during visit', () => {
   const sb = makeSandbox();
   const out = JSON.parse(vm.runInContext(`(() => {
     const res = {};
@@ -284,12 +285,12 @@ test('passe 44 D : les 12 niches relient 100 % du plateau en visite', () => {
       baseDebugCreate(lid);
       st.items = []; st.stock = {}; st.npcs = []; st.npcStock = []; st.uidSeq = 1;
       const L = baseLayoutGet(lid);
-      // pose UN escalier par paire d'ancres (toutes les niches)
+      // place ONE stairs per anchor pair (all niches)
       const runs = [];
       for (const a of L.stairAnchors) if (!runs.some((r) => Math.abs(r - a.x) <= 1)) runs.push(a.x);
       let n = 0;
       for (const x of runs) { st.stock.stairs = (st.stock.stairs || 0) + 1; if (basePlace(st, 'stairs', x, L.stairAnchors[0].y, 0).ok) n++; }
-      // portée totale depuis le spawn
+      // full reach from the spawn
       const from = L.spawn;
       const reach = baseReachableSet(st, baseBuildGrid(st), from.x, from.y);
       let hi = 0, hiOk = 0;
@@ -302,25 +303,25 @@ test('passe 44 D : les 12 niches relient 100 % du plateau en visite', () => {
     return JSON.stringify(res);
   })()`, sb));
   for (const [lid, r] of Object.entries(out)) {
-    assert.equal(r.stairs, r.runs, `${lid} : escalier posé dans chaque niche`);
-    assert.ok(r.hi >= 10, `${lid} : plateau conséquent (${r.hi} cases)`);
+    assert.equal(r.stairs, r.runs, `${lid}: stairs placed in each niche`);
+    assert.ok(r.hi >= 10, `${lid}: substantial plateau (${r.hi} tiles)`);
     assert.equal(r.hiOk, r.hi, `${lid} : 100 % du plateau atteignable (${r.hiOk}/${r.hi})`);
   }
 });
 
-// ——— F — PNJ : pose, refus sur ancre, combat borné ————————————————————————
-test('passe 44 F : PNJ — pose légale, refus sur ancre, combat borné', () => {
+// ——— F — NPC: placement, refusal on anchor, bounded battle ———————————————
+test('phase 44 F: NPC — legal placement, refusal on anchor, bounded battle', () => {
   const sb = makeSandbox();
   const out = JSON.parse(vm.runInContext(`(() => {
     const r = {};
     const st = baseGetState();
     baseDebugCreate('cave_5');
-    // passe 47 : plus de vivier — on pose des PNJ directement, comme un objet.
+    // pass 47: no more roster — NPCs are placed directly, like a furniture.
     const mk = (name) => baseNpcCreate(st, { name, sprite: 'trainer-0',
       team: [{ id: 19, level: 13 }, { id: 21, level: 14 }] });
     const a = mk('PNJ A');
     const b = mk('PNJ B');
-    // pose légale sur sol libre
+    // legal placement on free floor
     const g0 = baseBuildGrid(st);
     let free = null;
     const L = baseLayoutGet('cave_5');
@@ -330,10 +331,10 @@ test('passe 44 F : PNJ — pose légale, refus sur ancre, combat borné', () => 
           && g0.occ[y][x] == null) { free = { x, y }; break; }
     }
     r.place = baseNpcPlace(st, a.id, free.x, free.y);
-    // refus sur une ancre d'escalier
+    // refused on a stairs anchor
     const anch = L.stairAnchors[0];
     r.onAnchor = baseNpcPlace(st, b.id, anch.x, anch.y);
-    // interaction → combat borné (1 fois par visite)
+    // interaction → bounded battle (once per visit)
     const sess = baseVisitCreate(st);
     const inter = baseVisitInteract(sess, free.x, free.y);
     r.interType = inter.type;
@@ -342,16 +343,16 @@ test('passe 44 F : PNJ — pose légale, refus sur ancre, combat borné', () => 
     r.again = baseVisitInteract(sess, free.x, free.y).type;
     return JSON.stringify(r);
   })()`, sb));
-  assert.equal(out.place.ok, true, 'pose sur sol libre');
-  assert.equal(out.onAnchor.ok, false, 'pose refusée sur une ancre d’escalier');
-  assert.equal(out.interType, 'npc_battle', 'interaction → duel borné');
+  assert.equal(out.place.ok, true, 'placement on free floor');
+  assert.equal(out.onAnchor.ok, false, 'placement refused on a stairs anchor');
+  assert.equal(out.interType, 'npc_battle', 'interaction → bounded duel');
   assert.equal(out.battle.kind, 'base_npc', 'duel base_npc');
-  assert.equal(out.battle.team, 2, 'équipe transmise au duel');
-  // Passe 52 (retour utilisateur : « on doit pouvoir le combattre autant
-  //    qu'on veut ») : plus de verrou d'un combat par visite. Ouvrir le
-  //    dialogue ne consomme plus rien non plus — c'était le second bug :
-  //    « passer son chemin » brûlait quand même le duel.
-  assert.equal(out.again, 'npc_battle', 'le PNJ reste combattable autant de fois qu’on veut');
+  assert.equal(out.battle.team, 2, 'team passed to the duel');
+  // Phase 52 (user feedback: "we must be able to battle it as much
+  //    as we want"): no more one-battle-per-visit lock. Opening the
+  //    dialogue no longer consumes anything either — that was the second bug:
+  //    "walking away" still burned the duel.
+  assert.equal(out.again, 'npc_battle', 'the NPC stays battleable as many times as wanted');
 });
 
 

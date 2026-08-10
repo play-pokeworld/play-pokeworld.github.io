@@ -1,3 +1,5 @@
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
 const UI_ICONS = {
  
  bag: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3"y1="6"x2="21"y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>',
@@ -116,7 +118,14 @@ document.head.appendChild(iconStyle);
 
 
 // --- Migrated to ES module, globals exposed ---
-if (typeof getIcon !== 'undefined' && typeof window !== 'undefined') window.getIcon = getIcon;
-if (typeof UI_ICONS !== 'undefined' && typeof window !== 'undefined') window.UI_ICONS = UI_ICONS;
+if (typeof getIcon !== 'undefined') { if (typeof window !== 'undefined') window.getIcon = getIcon; if (typeof globalThis !== 'undefined') globalThis.getIcon = getIcon; }
+if (typeof UI_ICONS !== 'undefined') { if (typeof window !== 'undefined') window.UI_ICONS = UI_ICONS; if (typeof globalThis !== 'undefined') globalThis.UI_ICONS = UI_ICONS; }
 
 
+
+// Wave 40 — native ESM module: grouped export of the same names as the
+// classic surface kept above/here (bodies unchanged).
+export {
+  getIcon,
+  UI_ICONS,
+};

@@ -1,4 +1,6 @@
-var QUEST_TRIGGERS = {
+// Wave 40 — orphan data: no classic consumer (measured grep);
+// pure ESM module, no window surface to keep (never placed in module).
+export var QUEST_TRIGGERS = {
  0:'pallet', 1:'pewter', 2:'route3', 3:'cerulean', 4:'route11', 5:'vermilion',
  6:'vermilion', 7:'lavender', 8:'celadon', 9:'fuchsia', 10:'saffron',
  11:'cinnabar', 12:'viridian', 13:'indigo', 14:'seafoamislands', 15:'powerplant',

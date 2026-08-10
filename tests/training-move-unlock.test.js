@@ -2,17 +2,25 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { LearnableMovesPanelView } from '../src/ui/views/LearnableMovesPanelView.js';
+import { moveRowHTML } from '../src/ui/components/move-row.js';
 
-// ── Passe 6 : attaques de niveau débloquées / apprentissage en boîte ────────
-// Bug remonté : un Pokémon niveau 100 d'une ancienne save n'avait « aucune
-// attaque apprenable ». Cause : isMoveTrainingLocked verrouillait TOUTES les
-// attaques non connues (sauf dressage/CT) — le niveau n'était jamais pris en
-// compte. Et learnBoxMove / toggleBoxMoveSelect (appelés par la fiche box)
-// n'existaient pas -> l'apprentissage en boîte était un no-op silencieux.
+// Wave 9: the learnable-moves panel shell is rendered by the ECS
+// LearnableMovesPanelView; the marker contract lives in the view source
+// (legitimate move — the rendered marker [data-learnable-panel="1"] is
+// unchanged, the assertions below still check the same rendered classes).
+const LEARNABLE_VIEW = fs.readFileSync(new URL('../src/ui/views/LearnableMovesPanelView.js', import.meta.url), 'utf8');
 
-const TRAINING = fs.readFileSync(new URL('../src/game/combat/training.js', import.meta.url), 'utf8');
-const MOVE_LEARNING = fs.readFileSync(new URL('../src/game/combat/move-learning.js', import.meta.url), 'utf8');
-const POKE_MODAL = fs.readFileSync(new URL('../src/game/display/poke-modal.js', import.meta.url), 'utf8');
+// ── Phase 6: unlocked level moves / box learning ───────────────────────────
+// Reported bug: a level-100 Pokémon from an old save had "no learnable
+// move". Cause: isMoveTrainingLocked locked ALL unknown moves
+// (except training/TM) — the level was never taken into
+// account. And learnBoxMove / toggleBoxMoveSelect (called by the box sheet)
+// did not exist -> box learning was a silent no-op.
+
+const TRAINING = fs.readFileSync(new URL('../src/application/combat/training.js', import.meta.url), 'utf8');
+const MOVE_LEARNING = fs.readFileSync(new URL('../src/ui/game/move-learning.js', import.meta.url), 'utf8');
+const POKE_MODAL = fs.readFileSync(new URL('../src/ui/game/poke-modal.js', import.meta.url), 'utf8');
 
 function extractFrom(src, signature) {
   const re = new RegExp('function ' + signature + '\\s*\\{[\\s\\S]*?\\n\\}');
@@ -21,7 +29,7 @@ function extractFrom(src, signature) {
   return m[0];
 }
 
-// Pool de niveau simulé : a(niv 1) b(8) c(15) d(99). `a` est connue.
+// Simulated level pool: a(lvl 1) b(8) c(15) d(99). `a` is known.
 function makeEnv(level, unlocked) {
   const sandbox = {
     console,
@@ -43,32 +51,32 @@ function makeEnv(level, unlocked) {
   return { sandbox, p };
 }
 
-test('niveau 100 : tout le pool de niveau est apprenable', () => {
+test('level 100: the whole level pool is learnable', () => {
   const { sandbox, p } = makeEnv(100);
   assert.deepEqual(sandbox.learnableMoves(p), ['b', 'c', 'd']);
 });
 
-test('niveau 20 : seules les attaques dont le niveau est atteint sont apprenables', () => {
+test('level 20: only moves whose level is reached are learnable', () => {
   const { sandbox, p } = makeEnv(20);
-  assert.deepEqual(sandbox.learnableMoves(p), ['b', 'c'], 'd (niv 99) reste verrouillée');
+  assert.deepEqual(sandbox.learnableMoves(p), ['b', 'c'], 'd (lvl 99) stays locked');
 });
 
-test('le dressage/CT débloque au-delà du niveau', () => {
+test('training/TM unlocks beyond level', () => {
   const { sandbox, p } = makeEnv(20, ['d']);
   assert.deepEqual(sandbox.learnableMoves(p), ['b', 'c', 'd']);
 });
 
-test('isMoveTrainingLocked : règle de niveau explicite', () => {
+test('isMoveTrainingLocked: explicit level rule', () => {
   const { sandbox, p } = makeEnv(50);
-  assert.equal(sandbox.isMoveTrainingLocked(p, 'b'), false, 'niv 8 atteint -> débloquée');
-  assert.equal(sandbox.isMoveTrainingLocked(p, 'd'), true, 'niv 99 non atteint -> verrouillée');
+  assert.equal(sandbox.isMoveTrainingLocked(p, 'b'), false, 'lv 8 reached -> unlocked');
+  assert.equal(sandbox.isMoveTrainingLocked(p, 'd'), true, 'lv 99 not reached -> locked');
   p.trainingUnlockedMoves = ['d'];
-  assert.equal(sandbox.isMoveTrainingLocked(p, 'd'), false, 'déblocage dressage conservé');
-  assert.equal(sandbox.isMoveTrainingLocked(p, 'a'), false, 'attaque connue : pas verrouillée');
+  assert.equal(sandbox.isMoveTrainingLocked(p, 'd'), false, 'training unlock kept');
+  assert.equal(sandbox.isMoveTrainingLocked(p, 'a'), false, 'known move: not locked');
 });
 
-test('getTrainableLockedMoves exclut les attaques déjà apprenables par niveau', () => {
-  assert.ok(/isMoveTrainingLocked\(p, id\)/.test(TRAINING), 'le filtre de dressage doit réutiliser isMoveTrainingLocked');
+test('getTrainableLockedMoves excludes moves already learnable by level', () => {
+  assert.ok(/isMoveTrainingLocked\(p, id\)/.test(TRAINING), 'the training filter must reuse isMoveTrainingLocked');
 });
 
 // ── learnBoxMove / toggleBoxMoveSelect (fiche box) ─────────────────────────
@@ -101,23 +109,23 @@ function makeBoxEnv() {
   return sandbox;
 }
 
-test('learnBoxMove ajoute une attaque au Pokémon de la boîte', () => {
+test('learnBoxMove adds a move to the box Pokémon', () => {
   const env = makeBoxEnv();
   vm.runInContext('learnBoxMove("b7", "b")', env);
   const p = env.G.collection.b7;
   assert.deepEqual(p.moves.map((m) => m.id), ['a', 'b']);
-  assert.equal(env.calls.save, 1, 'sauvegarde déclenchée');
-  assert.deepEqual(env.calls.open, ['b7'], 'fiche box rafraîchie');
+  assert.equal(env.calls.save, 1, 'save triggered');
+  assert.deepEqual(env.calls.open, ['b7'], 'box sheet refreshed');
   assert.equal(env.calls.notify.length, 1);
 });
 
-test('learnBoxMove remplace le slot sélectionné via toggleBoxMoveSelect', () => {
+test('learnBoxMove replaces the slot selected via toggleBoxMoveSelect', () => {
   const env = makeBoxEnv();
   env.G.collection.b7.moves = [{ id: 'a' }, { id: 'b' }];
   env.window.boxMoveReplaceSlot = 1;
   vm.runInContext('learnBoxMove("b7", "c")', env);
   assert.deepEqual(env.G.collection.b7.moves.map((m) => m.id), ['a', 'c']);
-  assert.equal(env.window.boxMoveReplaceSlot, null, 'slot de remplacement consommé');
+  assert.equal(env.window.boxMoveReplaceSlot, null, 'replacement slot consumed');
 });
 
 test('toggleBoxMoveSelect bascule le slot de remplacement', () => {
@@ -128,43 +136,58 @@ test('toggleBoxMoveSelect bascule le slot de remplacement', () => {
   assert.equal(env.window.boxMoveReplaceSlot, null);
 });
 
-test('les fonctions box existent et sont exposées (fiche box les appelle via data-call)', () => {
-  assert.ok(POKE_MODAL.includes('data-call="learnBoxMove"'), 'la fiche box appelle learnBoxMove');
-  assert.ok(POKE_MODAL.includes('data-call="toggleBoxMoveSelect"'), 'la fiche box appelle toggleBoxMoveSelect');
-  assert.ok(MOVE_LEARNING.includes('function learnBoxMove'), 'learnBoxMove doit exister (sinon callGlobal no-op silencieux)');
-  assert.ok(MOVE_LEARNING.includes('function toggleBoxMoveSelect'), 'toggleBoxMoveSelect doit exister');
-  assert.ok(MOVE_LEARNING.includes('window.learnBoxMove = learnBoxMove'), 'learnBoxMove exposé sur window');
-  assert.ok(MOVE_LEARNING.includes('window.toggleBoxMoveSelect = toggleBoxMoveSelect'), 'toggleBoxMoveSelect exposé sur window');
+test('box functions exist and are exposed (the box sheet calls them via data-call)', () => {
+  // Wave 10 (legitimate move): the box sheet's move rows are built from the
+  // action models shaped by the adapter (call: 'learnBoxMove' …) and rendered
+  // into real data-call attributes by moveRowVNode. The intent is unchanged —
+  // the box sheet still calls learnBoxMove / toggleBoxMoveSelect via data-call —
+  // the assertions now check the model AND the rendered attribute.
+  assert.ok(POKE_MODAL.includes("call: 'learnBoxMove'"), 'the box sheet models a learnBoxMove action');
+  assert.ok(POKE_MODAL.includes("call: 'toggleBoxMoveSelect'"), 'the box sheet models a toggleBoxMoveSelect action');
+  const rendered = moveRowHTML({
+    name: 'X', typeCls: 'type-normal', typeName: 'Normal',
+    action: { action: 'legacy-call', call: 'learnBoxMove', callArgs: "'b7','c'" },
+  });
+  assert.ok(rendered.includes('data-call="learnBoxMove"'), 'the rendered sheet calls learnBoxMove via data-call');
+  const renderedSel = moveRowHTML({
+    name: 'X', typeCls: 'type-normal', typeName: 'Normal',
+    action: { action: 'legacy-call', call: 'toggleBoxMoveSelect', callArgs: "'b7',0" },
+  });
+  assert.ok(renderedSel.includes('data-call="toggleBoxMoveSelect"'), 'the rendered sheet calls toggleBoxMoveSelect via data-call');
+  assert.ok(MOVE_LEARNING.includes('function learnBoxMove'), 'learnBoxMove must exist (otherwise callGlobal silent no-op)');
+  assert.ok(MOVE_LEARNING.includes('function toggleBoxMoveSelect'), 'toggleBoxMoveSelect must exist');
+  assert.ok(MOVE_LEARNING.includes('window.learnBoxMove = learnBoxMove'), 'learnBoxMove exposed on window');
+  assert.ok(MOVE_LEARNING.includes('window.toggleBoxMoveSelect = toggleBoxMoveSelect'), 'toggleBoxMoveSelect exposed on window');
 });
 
-// ── Passe 7 : rafraîchissement des indicateurs du panneau « attaques apprenables » ──
+// ── Phase 7: refreshing the "learnable moves" panel indicators ─────────────
 
-const BOX_SELECTOR = fs.readFileSync(new URL('../src/game/boxes/box-selector.js', import.meta.url), 'utf8');
-const SAVE_JS = fs.readFileSync(new URL('../src/game/save/save.js', import.meta.url), 'utf8');
+const BOX_SELECTOR = fs.readFileSync(new URL('../src/ui/game/box-selector.js', import.meta.url), 'utf8');
+const SAVE_JS = fs.readFileSync(new URL('../src/application/save/save.js', import.meta.url), 'utf8');
 
-test('le panneau complet porte un marqueur et résout le Pokémon depuis la fiche rendue', () => {
-  assert.ok(POKE_MODAL.includes('data-learnable-panel'), 'marqueur de panneau absent');
-  assert.ok(POKE_MODAL.includes('function refreshLearnableMovesPanelIfOpen'), 'helper de rafraîchissement absent');
-  assert.ok(POKE_MODAL.includes('window.refreshLearnableMovesPanelIfOpen = refreshLearnableMovesPanelIfOpen'), 'helper non exposé');
+test('the full panel carries a marker and resolves the Pokémon from the rendered sheet', () => {
+  assert.ok(LEARNABLE_VIEW.includes("learnablePanel: '1'"), 'marqueur de panneau absent (view)');
+  assert.ok(POKE_MODAL.includes('function refreshLearnableMovesPanelIfOpen'), 'refresh helper missing');
+  assert.ok(POKE_MODAL.includes('window.refreshLearnableMovesPanelIfOpen = refreshLearnableMovesPanelIfOpen'), 'helper not exposed');
   const body = POKE_MODAL.match(/function openLearnableMovesPanel\(idxOrBoxId, opts\) \{[\s\S]*?\n\}/);
-  assert.ok(body, 'extraction du panneau impossible');
+  assert.ok(body, 'panel extraction impossible');
   const iSheet = body[0].indexOf('_pwPokeSheet');
   const iAmbient = body[0].indexOf('_POKEMODAL_SOURCE');
-  assert.ok(iSheet > -1 && iAmbient > -1 && iSheet < iAmbient, 'la fiche rendue (_pwPokeSheet) doit primer sur la source ambiante');
+  assert.ok(iSheet > -1 && iAmbient > -1 && iSheet < iAmbient, 'the rendered sheet (_pwPokeSheet) must win over the ambient source');
 });
 
-test('chaque mutation d\'attaques déclenche le rafraîchissement du panneau', () => {
+test('every move mutation triggers the panel refresh', () => {
   const NEEDLE = 'refreshLearnableMovesPanelIfOpen';
-  assert.equal((MOVE_LEARNING.match(/window\.refreshLearnableMovesPanelIfOpen\(\);/g) || []).length, 4, 'learnMove(×2)/forgetMove/learnBoxMove doivent rafraîchir');
-  assert.ok(TRAINING.includes(NEEDLE), 'unlockTrainingMove doit rafraîchir');
-  assert.ok(BOX_SELECTOR.includes(NEEDLE), 'usage d\'une CT/CS doit rafraîchir');
-  assert.ok(SAVE_JS.includes(NEEDLE), 'la migration de sauvegarde doit rafraîchir');
+  assert.equal((MOVE_LEARNING.match(/window\.refreshLearnableMovesPanelIfOpen\(\);/g) || []).length, 4, 'learnMove(×2)/forgetMove/learnBoxMove must refresh');
+  assert.ok(TRAINING.includes(NEEDLE), 'unlockTrainingMove must refresh');
+  assert.ok(BOX_SELECTOR.includes(NEEDLE), 'using a TM/HM must refresh');
+  assert.ok(SAVE_JS.includes(NEEDLE), 'save migration must refresh');
 });
 
-test('refreshLearnableMovesPanelIfOpen : no-op sans panneau, re-rendu sinon, jamais de réouverture', () => {
+test('refreshLearnableMovesPanelIfOpen: no-op without panel, re-render otherwise, never reopens', () => {
   const body = POKE_MODAL.match(/function refreshLearnableMovesPanelIfOpen\(\) \{[\s\S]*?\n\}/);
-  assert.ok(body, 'extraction du helper impossible');
-  assert.ok(body[0].includes("contains('open')"), 'passe 8 : le helper doit vérifier que le modal est VRAIMENT ouvert (sinon un entraînement rouvre le panneau tout seul)');
+  assert.ok(body, 'helper extraction impossible');
+  assert.ok(body[0].includes("contains('open')"), 'phase 8: the helper must check the modal is REALLY open (otherwise a training reopens the panel by itself)');
   const calls = [];
   const sandbox = {
     console,
@@ -178,8 +201,8 @@ test('refreshLearnableMovesPanelIfOpen : no-op sans panneau, re-rendu sinon, jam
   vm.runInContext("var _pwSetHtmlSafe = function (el, html) { if (typeof pwSetHtml === 'function') pwSetHtml(el, html); else el.innerHTML = html; };", sandbox); // repli passe 16 (slices de fonctions)
   vm.runInContext(body[0], sandbox, { filename: 'poke-modal.js#refresh' });
   vm.runInContext('refreshLearnableMovesPanelIfOpen()', sandbox);
-  assert.equal(calls.length, 0, 'sans #poke-modal-inner, rien à rafraîchir');
-  // Marqueur présent (DOM conservé) MAIS modal fermé -> ne rouvre pas (bug entraînement)
+  assert.equal(calls.length, 0, 'without #poke-modal-inner, nothing to refresh');
+  // Marker present (DOM kept) BUT modal closed -> does not reopen (training bug)
   sandbox.document = {
     getElementById: (id) => {
       if (id === 'poke-modal') return { classList: { contains: () => false } };
@@ -188,8 +211,8 @@ test('refreshLearnableMovesPanelIfOpen : no-op sans panneau, re-rendu sinon, jam
     },
   };
   vm.runInContext('refreshLearnableMovesPanelIfOpen()', sandbox);
-  assert.equal(calls.length, 0, 'modal fermé + marqueur résiduel : aucune réouverture');
-  // Marqueur présent ET modal ouvert -> re-rendu avec la source mémorisée
+  assert.equal(calls.length, 0, 'modal closed + residual marker: no reopening');
+  // Marker present AND modal open -> re-render with the memorized source
   sandbox.document = {
     getElementById: (id) => {
       if (id === 'poke-modal') return { classList: { contains: () => true } };
@@ -198,7 +221,7 @@ test('refreshLearnableMovesPanelIfOpen : no-op sans panneau, re-rendu sinon, jam
     },
   };
   vm.runInContext('refreshLearnableMovesPanelIfOpen()', sandbox);
-  assert.deepEqual(calls, [[3, 'team']], 'le panneau ouvert est re-rendu avec id + source mémorisés');
+  assert.deepEqual(calls, [[3, 'team']], 'the open panel is re-rendered with memorized id + source');
 });
 
 // ── Passe 8 : source explicite du panneau « attaques apprenables » ──────────
@@ -224,43 +247,50 @@ function makePanelEnv() {
     TYPE_COLORS: { normal: '#999' },
     t: (k) => k, tr: (k, o) => k, getMoveName: (id) => id.toUpperCase(),
     document: { getElementById: (id) => (id === 'poke-modal-inner' ? INNER : (id === 'poke-modal' ? MODAL : null)) },
-    window: { _pwPokeSheet: { kind: 'team', idx: 0 }, typeClass: (tp) => 'type-' + tp, pwModalInfo: () => {} },
+    window: {
+      _pwPokeSheet: { kind: 'team', idx: 0 },
+      typeClass: (tp) => 'type-' + tp,
+      pwModalInfo: () => {},
+      // Wave 9: the panel shell delegates to the ECS LearnableMovesPanelView
+      // — the real view is injected into the sandbox (DOM-free).
+      PokeUI: { views: { LearnableMovesPanelView } },
+    },
   };
   sandbox.globalThis = sandbox;
   vm.createContext(sandbox);
   vm.runInContext("var _pwSetHtmlSafe = function (el, html) { if (typeof pwSetHtml === 'function') pwSetHtml(el, html); else el.innerHTML = html; };", sandbox); // repli passe 16 (slices de fonctions)
   const body = POKE_MODAL.match(/function openLearnableMovesPanel\(idxOrBoxId, opts\) \{[\s\S]*?\n\}/);
-  assert.ok(body, 'extraction du panneau impossible');
+  assert.ok(body, 'panel extraction impossible');
   vm.runInContext(body[0], sandbox, { filename: 'poke-modal.js#panel8' });
   return sandbox;
 }
 
-test('le bouton de la fiche passe la source explicite (\'team\'/\'box\')', () => {
+test('the sheet button passes the explicit source (\'team\'/\'box\')', () => {
   assert.ok(POKE_MODAL.includes(`'box','\${boxId}'`), 'argument explicite box attendu');
   assert.ok(POKE_MODAL.includes(`'team',\${idx != null ? idx : 0}`), 'argument explicite team attendu');
-  // Passe 8 : le bouton est masqué sur les fiches readonly (sinon il ouvrirait team[0])
-  assert.ok(/readonly \? '' : `<button class="hbtn poke-detail-full-list-btn"/.test(POKE_MODAL), 'bouton masqué en readonly attendu');
+  // Phase 8: the button is hidden on readonly sheets (otherwise it would open team[0])
+  assert.ok(/readonly \? '' : `<button class="hbtn poke-detail-full-list-btn"/.test(POKE_MODAL), 'button hidden in readonly as expected');
 });
 
-test('source explicite \'box\' : résout le Pokémon de la boîte (même avec fiche équipe affichée)', () => {
+test('explicit \'box\' source: resolves the box Pokémon (even with team sheet shown)', () => {
   const env = makePanelEnv();
   vm.runInContext("openLearnableMovesPanel('box','b7')", env);
   assert.equal(env.window._pwLearnableCtx.source, 'box');
   assert.equal(env.window._pwLearnableCtx.id, 'b7');
   const html = env._INNER.innerHTML;
-  assert.equal((html.match(/move-row known/g) || []).length, 2, 'BoxMon a 2 attaques connues cochées');
+  assert.equal((html.match(/move-row known/g) || []).length, 2, 'BoxMon has 2 known moves checked');
 });
 
-test('source explicite team via opts : prime sur la fiche box affichée', () => {
+test('explicit team source via opts: takes precedence over the displayed box sheet', () => {
   const env = makePanelEnv();
   env.window._pwPokeSheet = { kind: 'box', boxId: 'b7' };
   vm.runInContext("openLearnableMovesPanel(0,{source:'team'})", env);
   assert.equal(env.window._pwLearnableCtx.source, 'team');
   const html = env._INNER.innerHTML;
-  assert.equal((html.match(/move-row known/g) || []).length, 1, 'TeamMon a 1 attaque connue cochée');
+  assert.equal((html.match(/move-row known/g) || []).length, 1, 'TeamMon has 1 known move checked');
 });
 
-test('sans source explicite : la fiche rendue sert de résolution (passe 7 conservée)', () => {
+test('without explicit source: the rendered sheet serves as resolution (phase 7 kept)', () => {
   const env = makePanelEnv();
   env.window._pwPokeSheet = { kind: 'box', boxId: 'b7' };
   vm.runInContext("openLearnableMovesPanel('b7')", env);
@@ -268,40 +298,40 @@ test('sans source explicite : la fiche rendue sert de résolution (passe 7 conse
   assert.equal((env._INNER.innerHTML.match(/move-row known/g) || []).length, 2);
 });
 
-// ── Passe 9 : « possédée » = équipée OU apprenable maintenant ──────────────
+// ── Pass 9: "owned" = equipped OR learnable now ──────────────
 
-test('les attaques apprenables reçoivent la pilule validée et comptent dans le total possédé', () => {
+test('learnable moves get the validated pill and count in the owned total', () => {
   const env = makePanelEnv();
-  // TeamMon connaît 'a' ; le niveau/dressage a aussi débloqué 'b'
+  // TeamMon knows 'a'; level/training also unlocked 'b'
   vm.runInContext('var learnableMoves = function(p){ return ["b"]; };', env);
   vm.runInContext("openLearnableMovesPanel('team',0)", env);
   const html = env._INNER.innerHTML;
-  assert.equal((html.match(/poke-detail-pill is-known/g) || []).length, 1, '1 attaque équipée');
-  assert.equal((html.match(/poke-detail-pill is-learnable/g) || []).length, 1, '1 attaque apprenable validée (avant : non prise en compte)');
-  assert.ok(html.includes('2/4'), 'compteur = équipées + apprenables (2/4), reçu : ' + (html.match(/\d\/\d/g) || [])[0]);
-  assert.equal((html.match(/move-row learnable locked/g) || []).length, 2, 'les 2 attaques encore verrouillées sont estompées');
+  assert.equal((html.match(/poke-detail-pill is-known/g) || []).length, 1, '1 move equipped');
+  assert.equal((html.match(/poke-detail-pill is-learnable/g) || []).length, 1, '1 learnable move validated (before: not taken into account)');
+  assert.ok(html.includes('2/4'), 'counter = equipped + learnable (2/4), got: ' + (html.match(/\d\/\d/g) || [])[0]);
+  assert.equal((html.match(/move-row learnable locked/g) || []).length, 2, 'the 2 still-locked moves are dimmed');
 });
 
-test('bouton sans emoji : seul le texte est affiché', () => {
-  assert.ok(!POKE_MODAL.includes('📋 ${typeof t'), 'le bouton ne doit plus préfixer le libellé d\'un emoji');
+test('button without emoji: only text is shown', () => {
+  assert.ok(!POKE_MODAL.includes('📋 ${typeof t'), 'the button must no longer prefix the label with an emoji');
   for (const lang of ['fr', 'en']) {
     const ui = fs.readFileSync(new URL(`../src/localization/${lang}/ui.js`, import.meta.url), 'utf8');
     const m = ui.match(/"view_all_learnable_moves":"([^"]*)"/);
-    assert.ok(m, `clé view_all_learnable_moves absente (${lang})`);
-    assert.ok(!m[1].includes('📋'), `emoji 📋 encore présent (${lang})`);
+    assert.ok(m, `view_all_learnable_moves key missing (${lang})`);
+    assert.ok(!m[1].includes('📋'), `emoji 📋 still present (${lang})`);
   }
 });
 
-test('les nouvelles clés i18n du panneau existent dans les deux locales', () => {
+test('the new panel i18n keys exist in both locales', () => {
   for (const lang of ['fr', 'en']) {
     const ui = fs.readFileSync(new URL(`../src/localization/${lang}/ui.js`, import.meta.url), 'utf8');
     for (const key of ['possessed_short', 'move_pill_equipped', 'move_pill_available']) {
-      assert.ok(ui.includes(`"${key}"`), `${key} manquant (${lang})`);
+      assert.ok(ui.includes(`"${key}"`), `${key} missing (${lang})`);
     }
   }
 });
 
-// ── Passe 10 : le dressage ne propose QUE la catégorie « dressage » ─────────
+// ── Pass 10: training only offers the "training" category ─────────
 
 const GAME_HELPERS = fs.readFileSync(new URL('../src/data/game-helpers.js', import.meta.url), 'utf8');
 
@@ -328,13 +358,13 @@ test('getSpeciesTrainingOnlyPool = pool complet − niveau − CT/CS', () => {
   assert.equal(JSON.stringify(sandbox.getSpeciesTrainingOnlyPool(25)), JSON.stringify(['d', 'e']), 'a,b = niveau ; c = CT ; restent d,e (dressage)');
 });
 
-test('getTrainableLockedMoves pioche dans la catégorie dressage uniquement', () => {
-  assert.ok(/getSpeciesTrainingOnlyPool/.test(TRAINING), 'le dressage doit utiliser getSpeciesTrainingOnlyPool');
-  assert.ok(/getSpeciesTrainingOnlyPool/.test(POKE_MODAL), 'la catégorie « dressage » du panneau partage la même source');
+test('getTrainableLockedMoves draws from the training category only', () => {
+  assert.ok(/getSpeciesTrainingOnlyPool/.test(TRAINING), 'training must use getSpeciesTrainingOnlyPool');
+  assert.ok(/getSpeciesTrainingOnlyPool/.test(POKE_MODAL), 'the panel\'s "training" category shares the same source');
   const sandbox = {
     console,
     getSpeciesTrainingOnlyPool: () => ['d', 'e'],
-    getTrainingLockedMoves: () => { throw new Error('ne doit plus être utilisé comme pool principal'); },
+    getTrainingLockedMoves: () => { throw new Error('must no longer be used as the main pool'); },
     isMoveTrainingLocked: (p, id) => !(p.trainingUnlockedMoves || []).includes(id),
   };
   sandbox.globalThis = sandbox;
@@ -345,11 +375,11 @@ test('getTrainableLockedMoves pioche dans la catégorie dressage uniquement', ()
   assert.ok(m, 'extraction impossible');
   vm.runInContext(m[0], sandbox, { filename: 'training.js#passe10' });
   const p = { id: 25, moves: [{ id: 'a' }], trainingUnlockedMoves: ['e'] };
-  assert.deepEqual(sandbox.getTrainableLockedMoves(p), ['d'], 'reste d : e déjà débloquée, a connue, niveau/CT exclus du pool');
+  assert.deepEqual(sandbox.getTrainableLockedMoves(p), ['d'], 'rest d: e already unlocked, a known, level/TM excluded from pool');
 });
 
-test('les nouveaux helpers de catégorisation sont exposés sur window', () => {
-  assert.ok(GAME_HELPERS.includes('window.getCtCsMoveIds = getCtCsMoveIds'), 'getCtCsMoveIds non exposé');
-  assert.ok(GAME_HELPERS.includes('window.getSpeciesTrainingOnlyPool = getSpeciesTrainingOnlyPool'), 'getSpeciesTrainingOnlyPool non exposé');
+test('the new categorization helpers are exposed on window', () => {
+  assert.ok(GAME_HELPERS.includes('window.getCtCsMoveIds = getCtCsMoveIds'), 'getCtCsMoveIds not exposed');
+  assert.ok(GAME_HELPERS.includes('window.getSpeciesTrainingOnlyPool = getSpeciesTrainingOnlyPool'), 'getSpeciesTrainingOnlyPool not exposed');
 });
 

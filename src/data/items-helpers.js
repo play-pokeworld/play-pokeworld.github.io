@@ -1,16 +1,25 @@
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
 /**
  * Items Helpers — Item display helpers
  * Names, descriptions, sprites, info panels
  */
+
+// Fallback if util.js is not loaded — targeted unit tests.
+// Shared safe-HTML service (engine pwSetHtml when present, else direct).
+// globalThis-backed so concatenated VM harnesses and classic stubs stay valid.
+if (typeof globalThis !== 'undefined' && typeof globalThis._pwSetHtmlSafe !== 'function') {
+  globalThis._pwSetHtmlSafe = function (el, html) { if (typeof pwSetHtml === 'function') pwSetHtml(el, html); else el.innerHTML = html; };
+}
 
 function normalizeItemKey(key){
   const aliases = {berry_oran:'oran_berry', berry_sitrus:'sitrus_berry', berry_ceriz:'cheri_berry', berry_prine:'prine_berry', chroma_charm:'shiny_charm', up_grade:'upgrade', fire_stone:'firestone', water_stone:'waterstone', thunder_stone:'thunderstone', leaf_stone:'leafstone', moon_stone:'moonstone', sun_stone:'sunstone', duskstone:'dusk_stone', dawnstone:'dawn_stone', shinystone:'shiny_stone', icestone:'ice_stone'};
   return aliases[key] || key;
 }
 
-// Reconnaît une CT/CS même quand le type n'est pas déclaré :
-// 28 CT (ex. ct_airshlash) n'ont pas de `type` mais portent un `moveId`
-// et une clé préfixée ct_*/cs_*.
+// Recognize a TM/HM even when the type is not declared:
+// 28 TMs (e.g. ct_airshlash) have no `type` but carry a `moveId`
+// and a ct_*/hm_* key.
 function isCtCsItem(key){
   const itm = (typeof ITEMS !== 'undefined' && ITEMS) ? ITEMS[key] : null;
   if(!itm) return false;
@@ -19,15 +28,15 @@ function isCtCsItem(key){
   return false;
 }
 
-// Certaines CT pointent vers d'anciens ids compacts absents de MOVES
-// (ex. ct13_icebeam → moveId "icebeam", alors que MOVES connaît "ice_beam").
+// Some TMs point to old compact ids missing from MOVES
+// (e.g. ct13_icebeam -> moveId "icebeam", while MOVES knows "ice_beam").
 const CT_MOVE_ALIASES = {
   icebeam: 'ice_beam',
   hyperbeam: 'hyper_beam',
   solarbeam: 'solar_beam',
   shadowball: 'shadow_ball',
 };
-// MoveId canonique (existant dans MOVES) enseigné par une CT/CS.
+// Canonical moveId (existing in MOVES) taught by a TM/HM.
 function resolveCtCsMoveId(key){
   const itm = (typeof ITEMS !== 'undefined' && ITEMS) ? ITEMS[key] : null;
   if(!itm || !itm.moveId) return null;
@@ -68,9 +77,8 @@ function getItemDesc(key){
 }
 
 function openItemInfo(key){
-  // Panneau d'info unifié : même modale #poke-modal que les attaques et talents
-  // (la variante PokePanel séparée est désactivée pour garantir une largeur,
-  // un en-tête et un bouton retour identiques partout).
+  // Unified info panel: same #poke-modal modal as moves and abilities
+  // (the separate PokePanel variant is disabled to guarantee a
   const itm = ITEMS && ITEMS[key];
   if(!itm) return;
   const inner = document.getElementById('poke-modal-inner');
@@ -109,8 +117,8 @@ function openItemInfo(key){
   if (typeof ItemEngine !== 'undefined' && ItemEngine.getPowerDisplay) powerDisplay = ItemEngine.getPowerDisplay(key);
   
   let sourceBody = '';
-  // Passe 26 : « où trouver » complet (routes, boutiques + CT/CS, mine,
-  // atoll, quêtes, labo fossile) — une ligne par source.
+  // Passe 26: complete "where to find" (routes, shops + TM/HM, mine,
+  // atoll, quests, fossil lab) — one line per source.
   if (typeof getItemSourceList === 'function') {
     const _sources = getItemSourceList(key);
     if (_sources.length) sourceBody = '<div class="pw-src-list">' + _sources.map(s => '<div class="pw-src-line">' + s + '</div>').join('') + '</div>';
@@ -120,18 +128,18 @@ function openItemInfo(key){
     if (src) sourceBody = '<div data-style="padding:8px 10px;background:var(--dark3);border-radius:6px;font-size:11px;color:var(--light1);">' + src + '</div>';
   }
 
-  // Mémorise d'où vient ce panneau (dictionnaire, fiche, sac…) pour le bouton retour
+  // Remembers where this panel was opened from (dictionary, sheet, bag…) for the back button
   if (typeof window.pwInfoCaptureSource === 'function') window._pwInfoSource = window.pwInfoCaptureSource();
 
   if (typeof window.pwBuildInfoPanel === 'function') {
     var _itemSections = [];
-    // Passe 24 : badges couleur météo/statuts dans les descriptions d'objets.
+    // Phase 24: weather/status color badges in item descriptions.
     var _descRich = desc;
     if (typeof replaceWeatherTerms === 'function') _descRich = replaceWeatherTerms(_descRich);
     if (typeof replaceStatusTerms === 'function') _descRich = replaceStatusTerms(_descRich);
     if (desc) _itemSections.push({ title: (t('description') || 'Description'), body: '<div class="pw-text-sm pw-light1" data-style="line-height:1.6;">' + _descRich + '</div>' });
     if (sourceBody) _itemSections.push({ title: '📍 ' + ((typeof t === 'function' && t('found_in_lbl')) || (lang === 'en' ? 'Found in:' : 'Où trouver :')), body: sourceBody });
-    inner.innerHTML = window.pwBuildInfoPanel({
+    _pwSetHtmlSafe(inner, window.pwBuildInfoPanel({
       icon: itemSpriteHtml(key, 48),
       title: name,
       subtitle: typeLabel,
@@ -140,13 +148,14 @@ function openItemInfo(key){
         { label: (t('price') || 'Prix'), value: (itm.price||0).toLocaleString() + '₽' },
         { label: (t('owned') || 'Possédé'), value: '&times;' + qty, valueClass: 'pw-info-value-green' }
       ]
-    });
+    }));
   } else {
-    inner.innerHTML = '<div class="modal-title"><div class="pw-row">'
+    _pwSetHtmlSafe(inner, '<div class="modal-title"><div class="pw-row">'
       + itemSpriteHtml(key, 48)
       + '<div><div>' + name + '</div><div class="pw-text-sm pw-light1">' + typeLabel + '</div></div></div>'
-      + '<span class="modal-close" data-action="pw-info-back"></span></div>';
+      + '<span class="modal-close" data-action="pw-info-back"></span></div>');
   }
+  if(typeof window.pwApplyWindowChrome==='function') window.pwApplyWindowChrome(inner); // wave 30: canonical window chrome
   if(typeof window.pwModalInfo==='function') window.pwModalInfo(true);
   document.getElementById('poke-modal').classList.add('open');
 }
@@ -174,13 +183,26 @@ function itemSpriteHtml(key, size){
 }
 
 // --- Globals ---
-if (typeof normalizeItemKey !== 'undefined' && typeof window !== 'undefined') window.normalizeItemKey = normalizeItemKey;
-if (typeof isCtCsItem !== 'undefined' && typeof window !== 'undefined') window.isCtCsItem = isCtCsItem;
-if (typeof resolveCtCsMoveId !== 'undefined' && typeof window !== 'undefined') window.resolveCtCsMoveId = resolveCtCsMoveId;
-if (typeof getItemName !== 'undefined' && typeof window !== 'undefined') window.getItemName = getItemName;
-if (typeof getItemDesc !== 'undefined' && typeof window !== 'undefined') window.getItemDesc = getItemDesc;
-if (typeof openItemInfo !== 'undefined' && typeof window !== 'undefined') window.openItemInfo = openItemInfo;
-if (typeof getItemSpriteUrl !== 'undefined' && typeof window !== 'undefined') window.getItemSpriteUrl = getItemSpriteUrl;
-if (typeof itemSpriteHtml !== 'undefined' && typeof window !== 'undefined') window.itemSpriteHtml = itemSpriteHtml;
+if (typeof normalizeItemKey !== 'undefined') { if (typeof window !== 'undefined') window.normalizeItemKey = normalizeItemKey; if (typeof globalThis !== 'undefined') globalThis.normalizeItemKey = normalizeItemKey; }
+if (typeof isCtCsItem !== 'undefined') { if (typeof window !== 'undefined') window.isCtCsItem = isCtCsItem; if (typeof globalThis !== 'undefined') globalThis.isCtCsItem = isCtCsItem; }
+if (typeof resolveCtCsMoveId !== 'undefined') { if (typeof window !== 'undefined') window.resolveCtCsMoveId = resolveCtCsMoveId; if (typeof globalThis !== 'undefined') globalThis.resolveCtCsMoveId = resolveCtCsMoveId; }
+if (typeof getItemName !== 'undefined') { if (typeof window !== 'undefined') window.getItemName = getItemName; if (typeof globalThis !== 'undefined') globalThis.getItemName = getItemName; }
+if (typeof getItemDesc !== 'undefined') { if (typeof window !== 'undefined') window.getItemDesc = getItemDesc; if (typeof globalThis !== 'undefined') globalThis.getItemDesc = getItemDesc; }
+if (typeof openItemInfo !== 'undefined') { if (typeof window !== 'undefined') window.openItemInfo = openItemInfo; if (typeof globalThis !== 'undefined') globalThis.openItemInfo = openItemInfo; }
+if (typeof getItemSpriteUrl !== 'undefined') { if (typeof window !== 'undefined') window.getItemSpriteUrl = getItemSpriteUrl; if (typeof globalThis !== 'undefined') globalThis.getItemSpriteUrl = getItemSpriteUrl; }
+if (typeof itemSpriteHtml !== 'undefined') { if (typeof window !== 'undefined') window.itemSpriteHtml = itemSpriteHtml; if (typeof globalThis !== 'undefined') globalThis.itemSpriteHtml = itemSpriteHtml; }
 
 
+
+// Wave 40 — native ESM module: grouped export of the same names as the
+// classic surface kept above/here (bodies unchanged).
+export {
+  normalizeItemKey,
+  isCtCsItem,
+  resolveCtCsMoveId,
+  getItemName,
+  getItemDesc,
+  openItemInfo,
+  getItemSpriteUrl,
+  itemSpriteHtml,
+};

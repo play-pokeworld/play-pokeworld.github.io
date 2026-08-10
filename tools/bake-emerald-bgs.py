@@ -1,33 +1,33 @@
 #!/usr/bin/env python3
 # ============================================================================
-# OUTIL — Cuisson des fonds Émeraude authentiques (GBA tilesets, pret/pokeemerald)
+# TOOL — Baking authentic Emerald backgrounds (GBA tilesets, pret/pokeemerald)
 # ----------------------------------------------------------------------------
-# Rend les VRAIS tiles GBA : palettes JASC-PAL + tiles.png par type de base
-# (brown_cave/tree/shrub) + metatiles.bin (général 512 + secret_base 324) +
+# Renders the TRUE GBA tiles: JASC-PAL palettes + tiles.png per base type
+# (brown_cave/tree/shrub) + metatiles.bin (general 512 + secret_base 324) +
 # blocks de layout (u16 : low10 = metatile, bits10-11 collision, bits12-15 elev).
 #
-#   --render-canonical   fonds canon (SecretBase_BrownCave1/Tree1/Shrub1) pour
-#                        référence visuelle + audit des métatiles
-#   --render-grids       les 9 fonds du jeu (grilles ASCII de base-layouts-data.js
-#                        habillées avec les métatiles canon choisis)
-# Sortie : src/assets/images/secret-base/bg/emerald/<layout>.png
+#   --render-canonical   canon backgrounds (SecretBase_BrownCave1/Tree1/Shrub1) for
+#                        visual reference + metatile audit
+#   --render-grids       the 9 game backgrounds (ASCII grids of base-layouts-data.js
+#                        dressed with the chosen canon metatiles)
+# Output: src/assets/images/secret-base/bg/emerald/<layout>.png
 # ============================================================================
 import json, os, re, struct, sys
 from PIL import Image, ImageDraw
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CACHE = os.path.join(ROOT, 'tools', 'emerald-ref')  # staging persisté DANS le
-# projet (passe 37 : .cache n'est pas restauré entre sessions)
+CACHE = os.path.join(ROOT, 'tools', 'emerald-ref')  # staging persisted INSIDE the
+# project (phase 37: .cache is not restored between sessions)
 OUT = os.path.join(ROOT, 'src', 'assets', 'images', 'secret-base', 'bg', 'emerald')
 
-# Passe 47 — AUTOTILING des murs (retour utilisateur : « les assets bouclent
-# mal par rapport aux blocs posés à côté, contrairement aux autres salles »).
-# Les salles CANON n'utilisent pas une tuile de roche unique : elles emploient
-# tout un jeu de bordures et de coins (0x201..0x213, 0x220…). La table
-# ci-dessous a été APPRISE automatiquement sur les 24 maps canon du
-# désassemblage : pour chaque voisinage 8-connexe de cellules solides
-# (bits NW,N,NE,W,E,SW,S,SE) elle donne le métatile employé par Game Freak.
-# Générée par l'analyse de data/layouts/*/map.bin ; voir emerald-ref/autotile-walls.json.
+# Phase 47 — WALL AUTOTILING (user feedback: "the assets tile poorly
+# against blocks placed next to them, unlike the other rooms").
+# CANON rooms do not use a single rock tile: they use a full set of edges
+# and corners (0x201..0x213, 0x220…). The table below was LEARNT
+# automatically from the 24 canon maps of the decompilation: for each
+# 8-connected neighborhood of solid cells (bits NW,N,NE,W,E,SW,S,SE) it
+# gives the metatile used by Game Freak.
+# Generated from the analysis of data/layouts/*/map.bin; see emerald-ref/autotile-walls.json.
 def load_wall_autotile():
     p = os.path.join(CACHE, 'autotile-walls.json')
     try:
@@ -39,7 +39,7 @@ def load_wall_autotile():
 WALL_AUTOTILE = load_wall_autotile()
 
 def wall_metatile(rows, x, y, solid_of, fallback):
-    """Métatile de mur pour (x,y) selon le voisinage — règles canon RSE."""
+    """Wall metatile for (x,y) from the neighborhood — RSE canon rules."""
     m = 0
     for i, (dx, dy) in enumerate([(-1, -1), (0, -1), (1, -1), (-1, 0),
                                   (1, 0), (-1, 1), (0, 1), (1, 1)]):
@@ -51,8 +51,8 @@ def wall_metatile(rows, x, y, solid_of, fallback):
 NUM_META_PRIMARY = 512
 NUM_TILES_PRIMARY = 512
 SPLIT_PAL = 6  # slots 0-5 → primaire (gTileset_SecretBase), slot 6 → secondaire
-               # (brown_cave/tree/shrub) — prouvé par les références réelles des
-               # métatiles utilisés : tuiles P avec slots {0..5}, tuiles S avec {6}
+               # (brown_cave/tree/shrub) — proven by the real references of
+               # the metatiles used: P tiles with slots {0..5}, S tiles with {6}
 
 # ——— Chargement GBA ———————————————————————————————————————————————————————
 def load_pal(path):
@@ -68,7 +68,7 @@ def load_tiles(path):
     im = Image.open(path).convert('P')
     w, h = im.size
     px = im.load()
-    return (im, px, w // 8, h // 8)  # image + accès + tuiles par ligne
+    return (im, px, w // 8, h // 8)  # image + access + tiles per row
 
 def parse_jasc_dir(d):
     return [load_pal(os.path.join(d, '%02d.pal' % i)) if os.path.exists(os.path.join(d, '%02d.pal' % i))
@@ -78,19 +78,19 @@ class Tilesets:
     def __init__(self, theme):
         sec = {'cave': 'brown_cave', 'red_cave': 'red_cave', 'blue_cave': 'blue_cave',
                'yellow_cave': 'yellow_cave', 'tree': 'tree', 'bush': 'shrub'}[theme]
-        # PRIMAIRE = gTileset_SecretBase (PAS general !) : les layouts de bases
-        # secrètes déclarent primary_tileset=gTileset_SecretBase — c'est là que
-        # vivent les tuiles + palettes des DÉCORATIONS (posters rouges = rouge…)
-        # et le split slot<6 → primaire / slot 6 → secondaire est prouvé par le
-        # croisement des références réelles de metatiles.bin (slots 0-5 tuiles
-        # primaires, slot 6 tuiles secondaires).
+        # PRIMARY = gTileset_SecretBase (NOT general!): secret-base layouts
+        # declare primary_tileset=gTileset_SecretBase — this is where
+        # the DECORATION tiles + palettes live (red posters = red…)
+        # and the slot<6 -> primary / slot 6 -> secondary split is proven by
+        # cross-referencing real metatiles.bin references (slots 0-5 tiles
+        # primary tiles, slot 6 secondary tiles).
         self.pal_p = parse_jasc_dir(os.path.join(CACHE, 'data/tilesets/primary/secret_base/palettes'))
         self.pal_s = parse_jasc_dir(os.path.join(CACHE, f'data/tilesets/secondary/secret_base/{sec}/palettes'))
         self.tiles_p = load_tiles(os.path.join(CACHE, 'data/tilesets/primary/secret_base/tiles.png'))
         self.tiles_s = load_tiles(os.path.join(CACHE, f'data/tilesets/secondary/secret_base/{sec}/tiles.png'))
         self.meta_p = open(os.path.join(CACHE, 'data/tilesets/primary/general/metatiles.bin'), 'rb').read()
         self.meta_s = open(os.path.join(CACHE, 'data/tilesets/secondary/secret_base/metatiles.bin'), 'rb').read()
-        # transparence : slot 0 de chaque palette = transparent si couche haute
+        # transparency: slot 0 of each palette = transparent when upper layer
         self.out_p = Image.new('RGB', (8, 8))
 
     def palette(self, slot):
@@ -116,7 +116,7 @@ class Tilesets:
         if idx * 16 + 16 > len(data): idx = 0
         entries = struct.unpack_from('<8H', data, idx * 16)
         im = Image.new('RGB', (16, 16))
-        # couches RSE : entrées 0-3 = bas (BG bas), 4-7 = haut (BG haut)
+        # RSE layers: entries 0-3 = low (low BG), 4-7 = high (high BG)
         order = entries[4:8] if top else entries[0:4]
         for i, e in enumerate(order):
             tid = e & 0x3FF
@@ -125,23 +125,23 @@ class Tilesets:
         return im
 
     def metatile_full(self, mid):
-        """couche bas (opaque) + couche haut (slot0 transparent) = vue finale in-game"""
+        """low layer (opaque) + high layer (slot0 transparent) = final in-game view"""
         data = self.meta_p if mid < NUM_META_PRIMARY else self.meta_s
         idx = mid if mid < NUM_META_PRIMARY else mid - NUM_META_PRIMARY
         if idx * 16 + 16 > len(data): idx = 0
         entries = struct.unpack_from('<8H', data, idx * 16)
         im = Image.new('RGB', (16, 16))
-        for i, e in enumerate(entries[0:4]):  # couche bas — opaque
+        for i, e in enumerate(entries[0:4]):  # low layer — opaque
             tid = e & 0x3FF
             hf = bool(e & 0x400); vf = bool(e & 0x800); slot = (e >> 12) & 0xF
             self.draw_tile(im, tid, (i % 2) * 8, (i // 2) * 8, hf, vf, slot)
-        for i, e in enumerate(entries[4:8]):  # couche haut — index 0 transparent
+        for i, e in enumerate(entries[4:8]):  # high layer — index 0 transparent
             tid = e & 0x3FF
             hf = bool(e & 0x400); vf = bool(e & 0x800); slot = (e >> 12) & 0xF
             self.draw_tile(im, tid, (i % 2) * 8, (i // 2) * 8, hf, vf, slot, transparent0=True)
         return im
 
-# ——— Rendu d'un layout canon ———————————————————————————————————————————————
+# ——— Canon layout rendering ———
 def render_canonical(name, theme):
     ts = Tilesets(theme)
     blocks = open(os.path.join(CACHE, f'data/layouts/{name}/map.bin'), 'rb').read()
@@ -162,7 +162,7 @@ def render_canonical(name, theme):
     print('canon', name, '→', p)
     return ts
 
-# ——— Les 9 fonds du jeu (grilles custom + métatiles canon choisis) ——————————
+# ——— The 9 game backgrounds (custom grids + chosen canon metatiles) ———
 def grids_parse():
     src = open(os.path.join(ROOT, 'src/data/base-layouts-data.js'), encoding='utf8').read()
     import re
@@ -171,20 +171,20 @@ def grids_parse():
         shapes[m.group(1)] = re.findall(r"'([^']*)'", m.group(2))
     return shapes
 
-# ——— Composition des 9 fonds du jeu avec les métatiles canon ———————————————
-# IDs extraits POSITIONNELLEMENT des layouts canon (BrownCave1/Tree1/Shrub1
-# partagent le même plan de métatiles — vérifié par dump des map.bin) :
+# ——— Composition of the 9 game backgrounds with canon metatiles ———
+# IDs POSITIONALLY extracted from the canon layouts (BrownCave1/Tree1/Shrub1
+# share the same metatile plan — verified by map.bin dump):
 MT = {
     'floor': 522, 'void': 528, 'entr': 524,
     'nwall': 514, 'swall': 530, 'wwall': 521, 'ewall': 523,
     'nw': 513, 'ne': 515, 'sw': 529, 'se': 531,          # coins EXTÉRIEURS
     'inw': 527, 'ine': 525, 'isw': 519, 'ise': 517,      # coins INTÉRIEURS
-    'cliff': 530,  # face de plateforme = métatile de mur sud (rocher/planche/
-                   # sureau selon le thème — le rendu GBA canon des élévations)
+    'cliff': 530,  # platform face = south wall metatile (rock/board/
+                   # elder depending on theme — the canon GBA render of elevations)
 }
 
-FLOORISH = set('.E=_A')   # cellules visuellement praticables
-SOLID = set('#o')         # # = mur, o = trou bouché
+FLOORISH = set('.E=_A')   # visually walkable cells
+SOLID = set('#o')         # # = wall, o = filled hole
 
 def cell_at(rows, x, y):
     if y < 0 or y >= len(rows) or x < 0 or x >= len(rows[y]): return 'x'
@@ -195,14 +195,14 @@ def metatile_for(rows, x, y):
     n = cell_at(rows, x, y - 1); s = cell_at(rows, x, y + 1)
     w = cell_at(rows, x - 1, y); e = cell_at(rows, x + 1, y)
     if c == '.':
-        # coin intérieur : cellule de sol accolée à deux murs perpendiculaires
+        # inner corner: floor cell adjoining two perpendicular walls
         if n in SOLID and w in SOLID: return MT['inw']
         if n in SOLID and e in SOLID: return MT['ine']
         if s in SOLID and w in SOLID: return MT['isw']
         if s in SOLID and e in SOLID: return MT['ise']
         return MT['floor']
     if c == '#':
-        # cardinal d'abord (couloirs/épaisseurs), diagonal ensuite (coins)
+        # cardinal first (corridors/thicknesses), diagonal next (corners)
         if s in FLOORISH: return MT['nwall']
         if n in FLOORISH: return MT['swall']
         if e in FLOORISH: return MT['wwall']
@@ -212,12 +212,12 @@ def metatile_for(rows, x, y):
         if cell_at(rows, x + 1, y - 1) in FLOORISH: return MT['sw']
         if cell_at(rows, x - 1, y - 1) in FLOORISH: return MT['se']
         return MT['void']
-    if c == 'o': return MT['void']       # trou = roche/feuillage plein (bouché)
+    if c == 'o': return MT['void']       # hole = solid rock/foliage (filled)
     if c == 'E': return MT['entr']
-    if c == '=': return MT['floor']      # sol haut = même sol (l'élévation est
-    if c == '_': return MT['cliff']      #   portée par la falaise + l'escalier)
-    if c == 'A': return MT['floor']      # rampe/escalier = sol (2D), le 3D
-                                         #   affiche la vraie échelle procédurale
+    if c == '=': return MT['floor']      # top floor = same floor (elevation is
+    if c == '_': return MT['cliff']      #   carried by the cliff + the stair)
+    if c == 'A': return MT['floor']      # ramp/stairs = floor (2D), the 3D
+                                         #   shows the true procedural scale
     return MT['void']
 
 def render_shape(theme, shape, rows):
@@ -229,7 +229,7 @@ def render_shape(theme, shape, rows):
             im.paste(ts.metatile_full(metatile_for(rows, x, y)), (x * 16, y * 16))
     os.makedirs(OUT, exist_ok=True)
     p = os.path.join(OUT, f'{theme}_{shape}.png')
-    im.save(p)  # natif 16 px/cellule : le canvas 2D agrandit en pixel-art net
+    im.save(p)  # native 16 px/cell: the 2D canvas upscales in crisp pixel-art
     print('fond', f'{theme}_{shape}', f'{w}x{h}', '→', os.path.relpath(p, ROOT))
 
 def render_grids():
@@ -252,12 +252,12 @@ def render_atlas(theme, mids, path):
     im.save(path)
     print('atlas →', path)
 
-# ——— Les 9 layouts CANON du jeu (passe 37 : formes GBA officielles) ————————
-# id du jeu → dossier pokeemerald. Formes authentiques (plus de grilles
-# inventées : les salles sont celles de RSE, tailles réelles 11×9 → 17×8).
+# ——— The 9 CANON layouts of the game (phase 37: official GBA shapes) ———
+# game id -> pokeemerald folder. Authentic shapes (no more invented
+# grids: the rooms are RSE's, real sizes 11×9 -> 17×8).
 CANON_LAYOUTS = [
-    # Grottes CANON : 4 couleurs × 4 formes (map.bin du désassemblage) — passe
-    # 40 : les 12 manquantes (rouge/bleue/jaune) sont stagées comme brown.
+    # CANON caves: 4 colors × 4 shapes (decompilation map.bin) — phase
+    # 40: the 12 missing ones (red/blue/yellow) are staged like brown.
     ('cave_1', 'SecretBase_BrownCave1'), ('cave_2', 'SecretBase_BrownCave2'), ('cave_3', 'SecretBase_BrownCave3'),
     ('cave_4', 'SecretBase_BrownCave4'),
     ('cave_red_1', 'SecretBase_RedCave1'), ('cave_red_2', 'SecretBase_RedCave2'),
@@ -292,9 +292,9 @@ def canon_blocks(name):
     return w, h, [struct.unpack_from('<H', raw, i * 2)[0] & 0x3FF for i in range(w * h)]
 
 def bake_layouts():
-    """Fonds 2D DÉFINITIFS : rendu tel quel du map.bin canon (transitions
-    exactes — autotiling natif des données officielles, plus de composition).
-    544 (point d'arrivée/spawn) est un MARQUEUR invisible in-game : sol 522."""
+    """DEFINITIVE 2D backgrounds: straight rendering of the canon map.bin
+    (exact transitions — native autotiling of the official data, no composition).
+    544 (arrival/spawn point) is an in-game invisible MARKER: floor 522."""
     for lid, name in CANON_LAYOUTS:
         theme = THEME_OF(lid)
         ts = Tilesets(theme)
@@ -307,7 +307,7 @@ def bake_layouts():
         im.save(p)
         print('fond', lid, f'{w}x{h}', '→', os.path.relpath(p, ROOT))
 
-# Textures de la coquille 3D : métatiles Émeraude réels, atlas 80×16 par thème
+# 3D shell textures: real Emerald metatiles, 80×16 atlas per theme
 # [floor(522), wallTop(528), wallFace(530), rock(526), entrance(524)]
 def bake_tex3d():
     atlas_out = os.path.join(ROOT, 'src', 'assets', 'images', 'secret-base', 'bg', 'emerald')
@@ -321,11 +321,11 @@ def bake_tex3d():
         im.save(p)
         print('tex3d', theme, '→', os.path.relpath(p, ROOT))
 
-# Classification des cellules (bits de collision + nature du métatile)
+# Cell classification (collision bits + metatile nature)
 def canon_grids():
-    """Grille de JEU par layout — '.' sol, '#' mur/vide, 'o' trou/rocher
-    (comblable par planche), 'E' tapis de sortie (524), 'S' point d'arrivée
-    (544 : là où le joueur apparaît en entrant dans la base)."""
+    """GAME grid per layout — '.' floor, '#' wall/void, 'o' hole/rock
+    (board-fillable), 'E' exit mat (524), 'S' arrival point
+    (544: where the player appears when entering the base)."""
     out = {}
     for lid, name in CANON_LAYOUTS:
         theme = THEME_OF(lid)
@@ -339,10 +339,10 @@ def canon_grids():
                 b = struct.unpack_from('<H', raw, i * 2)[0]
                 mid = b & 0x3FF
                 blocked = bool((b >> 10) & 3)
-                if mid == 524: row.append('E')       # tapis de sortie
-                elif mid == 544: row.append('S')     # point d'arrivée (spawn)
-                elif mid == 526: row.append('o')     # rocher/trou comblable
-                elif mid in (546, 547): row.append('o')  # creux jumeaux 1×2 (salles « 4 »), comblables par planche
+                if mid == 524: row.append('E')       # exit mat
+                elif mid == 544: row.append('S')     # arrival point (spawn)
+                elif mid == 526: row.append('o')     # fillable rock/hole
+                elif mid in (546, 547): row.append('o')  # twin 1×2 hollows (‘4’-shaped rooms), board-fillable
                 elif blocked:  row.append('#')
                 else:          row.append('.')
             rows.append(''.join(row))
@@ -353,17 +353,17 @@ def dump_grids():
     grids = canon_grids()
     print(json.dumps(grids, indent=2, ensure_ascii=False))
 
-# ——— Sprites de décorations CANON (passe 37) ——————————————————————————————
-# Les meubles RSE posés dans la base sont des MÉTATILES du tileset secret_base
-# (pret/pokeemerald : src/data/decoration/tiles.h + header.h). On rend la
-# couche HAUTE seule (RGBA, transparente) : le sol de la salle reste visible
-# autour, exactement comme in-game. Références persistées tools/emerald-ref/decor/.
+# ——— CANON decoration sprites (phase 37) ———
+# RSE furniture placed in the base are METATILES of the secret_base tileset
+# (pret/pokeemerald: src/data/decoration/tiles.h + header.h). We render the
+# TOP layer only (RGBA, transparent): the room floor stays visible around,
+# exactly like in-game. References persisted in tools/emerald-ref/decor/.
 DECOR_DIR = os.path.join(CACHE, 'decor')
 DECOR_OUT = os.path.join(ROOT, 'src', 'assets', 'images', 'secret-base', 'emerald')
 
 def decor_refs():
-    """→ (gfx, shapes) : gfx[NAME] = [ids métatile GBA] ; shapes[DECOR_NAME] =
-    (w, h, gfxName) — parsage de tiles.h + header.h du désassemblage."""
+    """→ (gfx, shapes): gfx[NAME] = [GBA metatile ids]; shapes[DECOR_NAME] =
+    (w, h, gfxName) — parsing tiles.h + header.h from the decompilation."""
     labels = {}
     for m in re.finditer(r'#define\s+(METATILE_\w+)\s+(0x[0-9A-Fa-f]+|\d+)',
                          open(os.path.join(DECOR_DIR, 'metatile_labels.h')).read()):
@@ -384,39 +384,36 @@ def decor_refs():
 
 
 def write_manifest_js(man):
-    """Passe 40 : version SCRIPT du manifeste 2D. Le jeu tourne aussi ouvert
-    en file:// (double-clic), où fetch() est bloque par CORS → le manifeste
-    doit etre disponible en <script> classique comme toutes les autres
-    donnees (localization/data.js…). window.PokeWorldBaseManifest2D est lu
-    EN PRIORITE par base-view2d.js / base-window.js ; le fetch reste en
-    repli pour un serveur http."""
+    """Passe 40: SCRIPT version of the 2D manifest. The game also runs when
+    opened from file:// (double-click), where fetch() is blocked by CORS → the
+    manifest must be available as a classic <script> like all other data
+    (localization/data.js…). window.PokeWorldBaseManifest2D is read FIRST by
+    base-view2d.js / base-window.js; the fetch stays as a fallback for an
+    http server."""
     from datetime import datetime, timezone
     out = os.path.join(ROOT, 'src', 'data', 'base-manifest-2d-data.js')
     body = json.dumps(man, ensure_ascii=False, separators=(',', ':'))
     with open(out, 'w') as f:
-        f.write('// GENERE par tools/bake-emerald-bgs.py — ne pas editer a la main.\n')
-        f.write('// Manifeste sprites base secrete (version script : compatible file://).\n')
+        f.write('// GENERATED by tools/bake-emerald-bgs.py — do not edit by hand.\n')
+        f.write('// Secret base sprite manifest (script version: file:// compatible).\n')
         f.write('window.PokeWorldBaseManifest2D = ')
         f.write(body)
         f.write(';\n')
-    print('manifeste JS ecrit →', os.path.relpath(out, ROOT))
+    print('JS manifest written →', os.path.relpath(out, ROOT))
 
 def bake_decor(pairs):
-    """pairs = [(slug catalogue, NOM_DECOR)]. Cuisson RGBA (couche haute,
-    index 0 transparent) de chaque métatile de la décoration, puis repliage
-    ligne-major selon la forme DECORSHAPE_WxH (ex. BIG_PLANT 2x2)."""
+    """pairs = [(catalog slug, DECOR_NAME)]. RGBA baking (high layer,
+    index 0 transparent) of each decoration metatile, then row-major
+    folding per the DECORSHAPE_WxH shape (e.g. BIG_PLANT 2x2)."""
     from PIL import Image as _I
     gfx, shapes = decor_refs()
-    ts = Tilesets('cave')  # les tiles décoratifs hauts sont communs aux 3 thèmes
+    ts = Tilesets('cave')  # the top decorative tiles are shared by the 3 themes
     man_path = os.path.join(ROOT, 'src', 'assets', 'images', 'secret-base', 'manifest.render2d.json')
     man = json.load(open(man_path))
     os.makedirs(DECOR_OUT, exist_ok=True)
     for slug, dname in pairs:
         p = os.path.join(DECOR_OUT, f'{slug}.png')
-        if os.path.exists(p) and os.path.getsize(p) > 50:
-            man['items'].setdefault(slug, {})['emerald'] = os.path.relpath(p, ROOT)
-            continue
-        assert dname in shapes, f'DECOR_{dname} inconnu (ou sans gfx)'
+        assert dname in shapes, f'unknown DECOR_{dname} (or without gfx)'
         w, h, gname = shapes[dname]
         mids = gfx[gname]
         assert len(mids) == w * h, (dname, w, h, len(mids))
@@ -425,7 +422,7 @@ def bake_decor(pairs):
             data = ts.meta_p if mid < NUM_META_PRIMARY else ts.meta_s
             idx = mid if mid < NUM_META_PRIMARY else mid - NUM_META_PRIMARY
             entries = struct.unpack_from('<8H', data, idx * 16)
-            # couche haute SEULE, index 0 transparent (le sol de la salle reste)
+            # TOP layer ONLY, index 0 transparent (the room floor stays)
             for j, e in enumerate(entries[4:8]):
                 tid = e & 0x3FF
                 if tid == 0: continue
@@ -448,16 +445,16 @@ def bake_decor(pairs):
         print('décor', slug, f'{w}x{h} ({dname})', '→', os.path.relpath(p, ROOT))
     json.dump(man, open(man_path, 'w'), indent=1, ensure_ascii=False)
     write_manifest_js(man)
-    print('manifeste 2D mis à jour')
+    print('2D manifest updated')
 
 # Passe 39 : mapping CATALOGUE complet -> DECOR_* du desassemblage (canon RSE).
-# Tout objet ayant un equivalent RSE est cuit depuis son DECOR_TILE ; les
-# slugs sans equivalent RSE (coussins, tapis ORAS, masques, panneaux
-# warp/spin/pitfall, proclamation, confettis…) gardent la pastille 2D.
-# Approximations assumees (commentaire ~) : objet ORAS sans art RSE propre,
-# on prend le decor RSE visuellement le plus proche.
-# Passe 42 : CATALOGUE CANON — chaque entree = le DECOR_* officiel RSE
-# (metatiles du tileset, mode 'metatile'). Poupées/coussins = objgfx natifs.
+# Every object with an RSE equivalent is baked from its DECOR_TILE; the
+# slugs without an RSE equivalent (cushions, ORAS mats, masks, warp/spin/pitfall
+# boards, proclamation, confetti…) keep the 2D dot.
+# Assumed approximations (~ comment): ORAS object without its own RSE art,
+# take the visually closest RSE decor.
+# Phase 42: CANON CATALOG — each entry = the official RSE DECOR_*
+# (tileset metatiles, 'metatile' mode). Dolls/cushions = native objgfx.
 DECOR_MAP = [
     ('small_desk', 'SMALL_DESK'),
     ('pokemon_desk', 'POKEMON_DESK'),
@@ -536,8 +533,8 @@ DECOR_MAP = [
     ('kiss_poster', 'KISS_POSTER'),
 ]
 
-# Passe 39 : poupées et coussins = SPRITES D'OBJETS RSE (OBJ_EVENT_GFX_*),
-# pas des métatiles — staging offline tools/emerald-ref/objgfx/ (sources.json).
+# Phase 39: dolls and cushions = RSE OBJECT SPRITES (OBJ_EVENT_GFX_*),
+# not metatiles — offline staging tools/emerald-ref/objgfx/ (sources.json).
 def bake_objgfx():
     from PIL import Image as _I
     stage = os.path.join(DECOR_DIR, '..', 'objgfx')
@@ -550,7 +547,7 @@ def bake_objgfx():
             continue
         src = _I.open(os.path.join(stage, fn))
         im = src.convert('RGBA')
-        if src.mode == 'P':  # index 0 = fond transparent (sprites d'objets GBA)
+        if src.mode == 'P':  # index 0 = transparent background (GBA object sprites)
             px = src.load()
             argb = im.load()
             for yy in range(im.height):
@@ -563,18 +560,18 @@ def bake_objgfx():
         print('objgfx', slug, f'{im.width}x{im.height}', '→', os.path.relpath(p, ROOT))
     json.dump(man, open(man_path, 'w'), indent=1, ensure_ascii=False)
     write_manifest_js(man)
-    print('manifeste 2D mis à jour (objgfx)')
+    print('2D manifest updated (objgfx)')
 
 
-# ——— Fonds des gabarits PERSO deux-niveaux (passe 40) —————————————————————
-# Source unique = src/data/base-layouts-data.js (blocs '^'/'='/'a'), pas de
-# duplication. Composition : 523 rocher, 522 sol, 526 trou, 524 tapis ;
-# mezzanine = sol éclairci, falaise = rocher assombri + liseré clair au contact.
+# ——— Backgrounds for the two-level CUSTOM templates (passe 40) —————————————
+# Single source = src/data/base-layouts-data.js ('^'/'='/'a' blocks), no
+# duplication. Composition: 523 rock, 522 floor, 526 hole, 524 mat;
+# mezzanine = lightened floor, cliff = darkened rock + light rim at contact.
 
 def read_custom_shapes():
-    """→ {lid: rows} pour TOUS les gabarits perso (canon: null) de
-    base-layouts-data — passe 42 : 12 salles deux-niveaux (cave/tree/bush +
-    grottes rouge/bleue/jaune 5 & 6)."""
+    """→ {lid: rows} for ALL the custom templates (canon: null) of
+    base-layouts-data — passe 42: 12 two-level rooms (cave/tree/bush +
+    red/blue/yellow caves 5 & 6)."""
     js = open(os.path.join(ROOT, 'src', 'data', 'base-layouts-data.js')).read()
     out = {}
     for m in re.finditer(r"^  (\w+):\s*\{\s*canon: null.*?rows:\s*\[(.*?)\]", js, re.S | re.M):
@@ -584,7 +581,7 @@ def read_custom_shapes():
 def bake_custom_layouts():
     from PIL import ImageEnhance as _E
     shapes = read_custom_shapes()
-    LOWISH = set('.aoSE')   # cellules « basses » (côté exposé d'une hauteur)
+    LOWISH = set('.aoSE')   # "low" cells (exposed side of a height)
     def atc(rows, x, y):
         if y < 0 or y >= len(rows) or x < 0 or x >= len(rows[y]): return 'x'
         return rows[y][x]
@@ -594,21 +591,22 @@ def bake_custom_layouts():
         w, h = len(rows[0]), len(rows)
         im = Image.new('RGB', (w * 16, h * 16))
         ROCK, FLOOR, HOLE, MAT = 523, 522, 526, 524
-        # passe 43 : dénivelé BIEN VISIBLE façon ORAS (demande utilisateur) —
-        #  mezzanine = sol lisé x1.30 avec DÉGRADÉ nord→sud (le haut « capte
-        #              la lumière » : très clair au fond, atténué au bord) ;
-        #  falaise   = TEXTURE rocheuse assombrie x0.42 avec 4 STRATES sombres
-        #              enfoncées (paroi lue comme TALLLE) + trait d'encre sous
-        #              la corniche + arête supérieure lumineuse (2 px x1.45) ;
-        #  ombre portée LONGUE (13 px) en dégradé fort sur le sol inférieur.
-        # passe 44 : formes ORGANIQUES (demande utilisateur « salles pas
-        #  carrées ») — faces LATÉRALES ouest/est quand le plateau est exposé
-        #  sur le côté (bande stratifiée sombre + arête claire côté plateau),
-        #  NICHE assombrie sur la case falaise qui surplombe une ancre
-        #  d'escalier, ombres latérales dans les alcôves.
+        # phase 43: CLEARLY VISIBLE height difference, ORAS style (user
+        #  mezzanine = floor x1.30 with a north->south GRADIENT (the top
+        #              "catches the light": very light at the back, dimmed
+        #              at the edge);
+        #  cliff     = rocky TEXTURE darkened x0.42 with 4 dark STRATA
+        #              sunken (wall read as HEIGHT) + ink stroke under
+        #              the ledge + bright top edge (2 px x1.45);
+        #  LONG cast shadow (13 px) with a strong gradient on the lower floor.
+        # passe 44: ORGANIC shapes (user request “rooms not
+        #  square”) — west/east SIDE faces when the plateau is exposed
+        #  on the side (dark stratified band + bright edge on the plateau
+        #  side), darkened NICHE on the cliff cell overhanging a stair
+        #  anchor, side shadows in the alcoves.
         d_cliff = _E.Brightness(ts.metatile_full(ROCK)).enhance(0.42)
         cp = d_cliff.load()
-        for yy in (4, 8, 11, 14):  # strates de la paroi
+        for yy in (4, 8, 11, 14):  # wall strata
             for xx in range(16):
                 if yy < 16:
                     r, g, b = cp[xx, yy]
@@ -616,7 +614,7 @@ def bake_custom_layouts():
         rim = _E.Brightness(ts.metatile_full(ROCK)).enhance(1.45).crop((0, 0, 16, 2))
         ink_ln = _E.Brightness(ts.metatile_full(ROCK)).enhance(0.30).crop((0, 0, 16, 1))
         base_d = _E.Brightness(ts.metatile_full(ROCK)).enhance(0.30).crop((0, 14, 16, 16))
-        # face latérale (retrait ouest/est d'une hauteur) : rock très sombre
+        # side face (west/east recess of a height): very dark rock
         # stratifié + arête claire côté plateau (1 px)
         side = _E.Brightness(ts.metatile_full(ROCK)).enhance(0.34).crop((0, 0, 4, 16))
         sp = side.load()
@@ -625,9 +623,9 @@ def bake_custom_layouts():
                 r, g, b = sp[xx, yy]
                 sp[xx, yy] = (int(r * 0.60), int(g * 0.60), int(b * 0.60))
         side_hi = _E.Brightness(ts.metatile_full(ROCK)).enhance(1.35).crop((0, 0, 1, 16))
-        # rainures de la niche d'escalier ('=' dont le sud est une ancre 'a')
+        # grooves of the stair niche ('=' whose south is an 'a' anchor)
         notch = _E.Brightness(ts.metatile_full(ROCK)).enhance(0.24).crop((0, 2, 2, 16))
-        # dégradé vertical de la mezzanine : 1.30 nord → 1.14 sud
+        # vertical gradient of the mezzanine: 1.30 north -> 1.14 south
         d_hi_rows = []
         for i in range(16):
             k = 1.30 - (1.30 - 1.14) * (i / 15.0)
@@ -636,18 +634,17 @@ def bake_custom_layouts():
             for x in range(w):
                 ch = rows[y][x]
                 if ch == '#':
-                    # passe 47 : bordure/coin choisis selon les voisins (canon)
-                    # Passe 54 (retour utilisateur : « les cases autour des
-                    # portes devraient être plates mais elles sont courbées
-                    # vers le bas ») : l'ENTRÉE compte comme SOLIDE pour
-                    # l'autotiling de ses voisins. Traitée comme un vide, elle
-                    # faisait choisir aux deux murs qui l'encadrent un coin
-                    # concave (0x207 / 0x205) : le mur du bas s'incurvait
-                    # autour de la porte au lieu de rester droit.
-                    # Vérifié sur les 24 maps canon : « E = solide » donne le
-                    # mur plat 0x212 dans 38 cas sur 38 ; « E = vide », 0 fois.
-                    # Au canon, la porte est un TROU percé dans un mur plat,
-                    # pas une échancrure.
+                    # phase 47: border/corner chosen by neighbors (canon)
+                    # Phase 54 (user feedback: "the tiles around doors
+                    # should be flat but they curve downward"): the ENTRY
+                    # counts as SOLID for its neighbors' autotiling. Treated
+                    # as void, it made the two walls framing it pick a concave
+                    # corner (0x207 / 0x205): the lower wall curved around
+                    # the door instead of staying straight.
+                    # Verified on the 24 canon maps: "E = solid" yields the
+                    # flat wall 0x212 in 38 cases out of 38; "E = void", 0 times.
+                    # In canon, the door is a HOLE drilled in a flat wall,
+                    # not a notch.
                     mid = wall_metatile(rows, x, y,
                                         lambda R, xx, yy: atc(R, xx, yy) in ('#', 'x', 'E'),
                                         ROCK)
@@ -660,19 +657,19 @@ def bake_custom_layouts():
                         im.paste(rim, (x * 16, y * 16))
                         im.paste(ink_ln, (x * 16, y * 16 + 2))
                     im.paste(base_d, (x * 16, y * 16 + 14))
-                    # flanc exposé ouest/est (alcôve / décroché de plateau)
+                    # exposed west/east flank (alcove / plateau setback)
                     if atc(rows, x - 1, y) in LOWISH:
                         im.paste(side, (x * 16, y * 16))
                     if atc(rows, x + 1, y) in LOWISH:
                         im.paste(side.transpose(Image.FLIP_LEFT_RIGHT), (x * 16 + 12, y * 16))
-                    # niche d'escalier : rainures verticales internes du retrait
+                    # stair niche: inner vertical grooves of the recess
                     if atc(rows, x, y + 1) == 'a':
                         im.paste(notch, (x * 16, y * 16))
                         im.paste(notch.transpose(Image.FLIP_LEFT_RIGHT), (x * 16 + 14, y * 16))
                 elif ch == '^':
                     for i in range(16):
                         im.paste(d_hi_rows[i], (x * 16, y * 16 + i))
-                    # faces latérales (plateau exposé sur le côté — formes)
+                    # side faces (plateau exposed on the side — shapes)
                     if atc(rows, x - 1, y) in LOWISH:
                         im.paste(side, (x * 16, y * 16))
                         im.paste(side_hi, (x * 16 + 4, y * 16))
@@ -680,17 +677,14 @@ def bake_custom_layouts():
                         im.paste(side.transpose(Image.FLIP_LEFT_RIGHT), (x * 16 + 12, y * 16))
                         im.paste(side_hi, (x * 16 + 11, y * 16))
                 else: im.paste(ts.metatile_full(FLOOR), (x * 16, y * 16))
-        # Passe 53 (retour utilisateur : « le mur (hauteur) doit faire pile une
-        # tuile de haut ») : l'ombre portée au pied des falaises faisait 13 px
-        # de dégradé sur la tuile SUIVANTE. Visuellement, la falaise semblait
-        # donc haute de 16 + 13 = 29 px — presque deux tuiles — et le regard
-        # plaçait le bord de l'étage 13 px trop bas, d'où l'impression de
-        # « tuiles pas à la bonne taille » et de meubles mal alignés.
-        # L'ombre est ramenée à 4 px : elle marque le contact au sol sans
-        # jamais empiéter visuellement sur la case du dessous.
-        # ombre portée au pied des falaises + passe 44 :
-        # ombres latérales courtes dans les alcôves (cellule basse accotée à
-        # une falaise à l'ouest/est — l'escalier se niche dans le renfoncement).
+        # Phase 53 (user feedback: "the wall (height) must be exactly one
+        # tile high"): the cast shadow at the cliffs' foot ran a 13 px
+        # gradient onto the NEXT tile. Visually, the cliff looked
+        # 16 + 13 = 29 px high — nearly two tiles — and the eye
+        # placed the floor edge 13 px too low, hence the feeling of
+        # "tiles not the right size" and misaligned furniture.
+        # The shadow is cut to 4 px: it marks ground contact without ever
+        # visually encroaching on the tile below.
         px = im.load()
         for y in range(h):
             for x in range(w):
@@ -717,30 +711,30 @@ def bake_custom_layouts():
         print('fond(perso)', lid, f'{w}x{h}', '→', os.path.relpath(p, ROOT))
 
 def bake_stairs_sprite():
-    """Sprite « stairs » v9 (passe 46, retours utilisateur).
+    """‘stairs’ sprite v9 (passe 46, user feedback).
 
-    Deux reproches à la v8 : (1) « il doit faire la même taille tout le temps »
-    — la v8 était un trapèze en perspective, donc les marches RÉTRÉCISSAIENT
-    vers le haut et la volée ne se raccordait ni à sa case ni à elle-même quand
-    on en posait deux ; (2) « plutôt en bois comme les planches pour rester
-    dans la même DA ».
+    Two complaints about v8: (1) “it must be the same size all the time”
+    — v8 was a perspective trapezoid, so the steps SHRANK upward and the
+    flight connected neither to its own cell nor to itself when two were
+    placed; (2) “rather in wood like the boards to stay
+    in the same art direction”.
 
-    v9 : escalier de bois à LARGEUR CONSTANTE (32 px de mur à mur sur toute la
-    hauteur, aucune perspective), 6 marches dessinées comme autant de PLANCHES
-    horizontales, à la palette EXACTE de `solid_board` (la planche du jeu) :
-      nez éclairé #c6b777 · face #b4a462 · contremarche #948341 ·
-      veine #7b6220 · encre #525252.
-    Chaque marche = nez clair + face + veine basse + joint encré ; limons
-    latéraux verticaux constants, comme les traverses de la planche.
+    v9: wooden staircase with CONSTANT WIDTH (32 px wall to wall over its
+    full height, no perspective), 6 steps drawn as so many horizontal
+    PLANKS, with the EXACT palette of `solid_board` (the game's board):
+      lit nosing #c6b777 · tread #b4a462 · riser #948341 ·
+      grain #7b6220 · ink #525252.
+    Each step = light nosing + tread + low grain + inked joint; constant
+    vertical side stringers, like the board's crosspieces.
 
-    Empreinte gameplay inchangée : 2×2, les DEUX colonnes franchissables.
+    Gameplay footprint unchanged: 2×2, BOTH columns walkable.
     """
     from PIL import ImageDraw as _D
     INK = (0x52, 0x52, 0x52, 255)
-    W_L = (0xc6, 0xb7, 0x77, 255)   # nez de marche (lumière haut-gauche)
-    W_M = (0xb4, 0xa4, 0x62, 255)   # bois de base — identique à solid_board
-    W_S = (0x94, 0x83, 0x41, 255)   # contremarche dans l'ombre
-    W_D = (0x7b, 0x62, 0x20, 255)   # veine / limon sombre
+    W_L = (0xc6, 0xb7, 0x77, 255)   # step nosing (light top-left)
+    W_M = (0xb4, 0xa4, 0x62, 255)   # base wood — identical to solid_board
+    W_S = (0x94, 0x83, 0x41, 255)   # riser in shadow
+    W_D = (0x7b, 0x62, 0x20, 255)   # grain / dark stringer
 
     im = Image.new('RGBA', (32, 32), (0, 0, 0, 0))
     d = _D.Draw(im)
@@ -748,38 +742,38 @@ def bake_stairs_sprite():
     ys = [round(i * 32 / N) for i in range(N + 1)]
     for i in range(N):
         y0, y1 = ys[i], ys[i + 1]
-        d.rectangle([2, y0, 29, y1 - 1], fill=W_S)      # contremarche
+        d.rectangle([2, y0, 29, y1 - 1], fill=W_S)      # riser
         d.rectangle([2, y0, 29, y0], fill=W_L)          # nez éclairé
-        d.rectangle([2, y0 + 1, 29, y1 - 3], fill=W_M)  # face de la planche
-        d.rectangle([2, y1 - 2, 29, y1 - 2], fill=W_D)  # veine basse
-        d.rectangle([2, y1 - 1, 29, y1 - 1], fill=INK)  # joint entre marches
+        d.rectangle([2, y0 + 1, 29, y1 - 3], fill=W_M)  # board face
+        d.rectangle([2, y1 - 2, 29, y1 - 2], fill=W_D)  # low grain
+        d.rectangle([2, y1 - 1, 29, y1 - 1], fill=INK)  # joint between steps
     d.rectangle([0, 0, 1, 31], fill=INK)                # limons constants
     d.rectangle([2, 0, 2, 31], fill=W_L)
     d.rectangle([29, 0, 29, 31], fill=W_D)
     d.rectangle([30, 0, 31, 31], fill=INK)
-    d.rectangle([0, 0, 31, 0], fill=INK)                # arête haute
+    d.rectangle([0, 0, 31, 0], fill=INK)                # top edge
 
     p = os.path.join(DECOR_OUT, 'stairs.png')
     im.save(p)
     man_path = os.path.join(ROOT, 'src', 'assets', 'images', 'secret-base', 'manifest.render2d.json')
     man = json.load(open(man_path))
     man['items'].setdefault('stairs', {})['emerald'] = os.path.relpath(p, ROOT)
-    # passe 43 : le manifeste people ne doit plus référencer « hero »
+    # phase 43: the people manifest must no longer reference "hero"
     if 'people' in man:
         man['people'].pop('hero', None)
     json.dump(man, open(man_path, 'w'), indent=1, ensure_ascii=False)
     write_manifest_js(man)
-    print('objgfx(perso) stairs 32x32 (v9 bois LARGEUR CONSTANTE, 6 marches, '
-          '2 COLONNES, palette solid_board) →', os.path.relpath(p, ROOT))
+    print('objgfx(custom) stairs 32x32 (v9 wood CONSTANT WIDTH, 6 steps, '
+          '2 COLUMNS, solid_board palette) →', os.path.relpath(p, ROOT))
 
 
 def bake_canon():
-    """Passe 42 : TOUS les sprites du catalogue canon RSE + le vrai PC.
-    - 119 décos : DecorGfx métatiles (déjà pareil pour les meubles) — les
-      poupées/coussins restent aux objgfx (vrais sprites GBA stagés) ;
-    - pc.png : métatile METATILE_SecretBase_PC (0x220) du tileset, couche
-      haute index 0 transparent (l'ordinateur gris-bleu authentique) ;
-    - manifeste purgé des entrées hors canon (ORAS transformées retirées)."""
+    """Passe 42: ALL sprites of the RSE canon catalog + the real PC.
+    - 119 decors: DecorGfx metatiles (already the same for furniture) — the
+      dolls/cushions stay on objgfx (real staged GBA sprites);
+    - pc.png: metatile METATILE_SecretBase_PC (0x220) from the tileset, high
+      layer index 0 transparent (the authentic grey-blue computer);
+    - manifest purged of off-canon entries (transformed ORAS removed)."""
     from PIL import Image as _I
     gfx, shapes = decor_refs()
     canon = json.load(open(os.path.join(CACHE, 'canon-decor.json')))
@@ -788,9 +782,9 @@ def bake_canon():
     os.makedirs(DECOR_OUT, exist_ok=True)
     done = 0
     skip = {'NONE'}
-    # manifeste RECHARGÉ avant cuisson du PC
+    # manifest RELOADED before baking the PC
     man = json.load(open(man_path))
-    # ——— PC authentique : métatile 0x220 (couche haute, fond transparent) ———
+    # ——— Authentic PC: metatile 0x220 (high layer, transparent background) ———
     MID_PC = 0x220
     data = ts.meta_p if MID_PC < NUM_META_PRIMARY else ts.meta_s
     idx = MID_PC if MID_PC < NUM_META_PRIMARY else MID_PC - NUM_META_PRIMARY
@@ -822,16 +816,16 @@ def bake_canon():
     bake_stairs_sprite()
     man = json.load(open(man_path))
     canon_slugs = {k.replace('DECOR_', '').lower() for k in canon if k != 'DECOR_NONE'}
-    keep = canon_slugs | {'pc', 'stairs'}  # passe 43 : welcome_mat supprimé du jeu
+    keep = canon_slugs | {'pc', 'stairs'}  # phase 43: welcome_mat removed from the game
     removed = [s for s in list(man['items']) if s not in keep]
     for s in removed:
         del man['items'][s]
         fp = os.path.join(ROOT, 'src/assets/images/secret-base/emerald', s + '.png'.replace('/', os.sep))
         if os.path.exists(fp):
             os.remove(fp)
-    man['comment'] = ('Renderer 2D — CANON RSE (passe 42) : chaque entrée est le '
-                      'sprite Émeraude natif (métatiles DecorGfx ou objgfx officiels). '
-                      'Généré par tools/bake-emerald-bgs.py --bake-canon.')
+    man['comment'] = ('2D renderer — RSE CANON (passe 42): each entry is the '
+                      'native Emerald sprite (DecorGfx metatiles or official objgfx). '
+                      'Generated by tools/bake-emerald-bgs.py --bake-canon.')
     man['people'] = {'player': 'src/assets/images/trainers/profil/trainer-54.png'}
     sprites = {e['emerald'].split('/')[-1] for e in man['items'].values() if e.get('emerald')}
     man['stats'] = {
@@ -841,8 +835,8 @@ def bake_canon():
     }
     json.dump(man, open(man_path, 'w'), indent=1, ensure_ascii=False)
     write_manifest_js(man)
-    print(f'bake_canon : décos Émeraude + objgfx + pc 16x16 authentique ; '
-          f'{len(removed)} sprites hors canon purgés ({", ".join(sorted(removed))})')
+    print(f'bake_canon: Emerald decors + objgfx + authentic 16x16 pc; '
+          f'{len(removed)} off-canon sprites purged ({", ".join(sorted(removed))})')
 
 if __name__ == '__main__':
     mode = sys.argv[1] if len(sys.argv) > 1 else '--bake-layouts'

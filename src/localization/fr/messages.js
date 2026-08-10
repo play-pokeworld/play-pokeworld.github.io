@@ -1,5 +1,5 @@
 // ===== FR — UI messages & notifications =====
-window.L_fr_messages = {
+export const L_fr_messages = {
 "m.automation.1":"Désactivé",
 "m.automation.2":"Activé",
 "m.automation.3":"Place automatiquement un Pokémon du PC dans la couveuse",
@@ -326,8 +326,22 @@ window.L_fr_messages = {
 "debug_x10_on":"Vitesse x10 activée",
 "debug_x10_off":"Vitesse x10 désactivée",
 "mine_found":"⛏ Trouvé : {item} !",
-"mine_battle_log":"⛏ Souterrain : Vous avez déterré {icon} <b>{item}</b> !"
+"mine_battle_log":"⛏ Souterrain : Vous avez déterré {icon} <b>{item}</b> !",
+"no_castform_in_team":"Aucun Morphéo dans votre équipe !",
+"castform_weather_transformed":"Morphéo a transformé sa structure météorologique en {name} !",
+"no_deoxys_in_team":"Aucun Deoxys dans votre équipe !",
+"deoxys_mutated":"Les météorites font muter Deoxys en {name} !",
+"preset_modal_missing":"Impossible d'ouvrir l'éditeur (interface non prête). Réessayez.",
+"preset_editor_failed":"Impossible d'ouvrir l'éditeur de preset.",
+"preset_error":"Erreur éditeur d'équipe : {err}",
+"daycare_fee_log":" [Pension] -{fee}₽ payés pour {n} niveau(x) gagné(s) par {name}.",
+"daycare_max_log":" [Pension] {name} a atteint le Niveau 100 et sort de la Garderie !",
+"daycare_evicted_funds":"{name} a été retiré de la Garderie : fonds insuffisants pour payer ses nouveaux niveaux ({fee}₽ requis) !",
+"daycare_evicted_max":"{name} a atteint le Niveau 100 et sort de la Garderie !",
+"treasure_sold":" Vendu {n}x {item} pour +{gain}₽ !",
+"evolution_region_locked":"Cette évolution ({region}) se débloquera après avoir découvert {region} !"
 };
 
-
-
+// T2 (vague 38) : module ESM — export natif ; la surface classique est
+// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
+if (typeof globalThis !== 'undefined') globalThis.L_fr_messages = L_fr_messages;

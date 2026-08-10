@@ -1,7 +1,10 @@
 import test from 'node:test';
+import { ecsGameplayBundleSource } from '../tools/ecs-loop-bundle.mjs';
+import { harnessBundleSource, harnessIsEsm } from '../tools/harness-bundle.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { LocationInfoView } from '../src/ui/views/LocationInfoView.js'; // wave 13: real DS view injected into the vm sandbox
 
 const R = (p) => fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 
@@ -43,11 +46,12 @@ function makeSandbox() {
     _logs: logs,
   };
   sandbox.window = sandbox;
+  sandbox.PokeUI = { views: { LocationInfoView } }; // wave 13 (legitimate move: renderLocInfo delegates to the DS view)
   sandbox.globalThis = sandbox;
   vm.createContext(sandbox);
 
   const files = [
-    'src/game/Config.js',
+    'src/data/game-config.js',
     'src/data/pd-data.js',
     'src/data/moves.js',
     'src/data/items-data.js',
@@ -62,145 +66,150 @@ function makeSandbox() {
     'src/data/official-teams-hoenn.js',
     'src/data/story-quests.js',
     'src/data/story-quests-hoenn.js',
-    'src/game/quests/quest-core.js',
+    'src/application/quests/quest-core.js',
     'src/data/game-helpers.js',
-    'src/game/combat/progression.js',
-    'src/game/world/world.js',
-    'src/game/display/starter.js',
-    'src/game/economy/mine.js',
-    'src/game/breeding/hatchery.js',
-    'src/game/economy/pokedex.js',
-    'src/game/display/map-render.js',
+    'src/application/combat/progression.js',
+    'src/application/world/roaming.js', 'src/ui/game/header-window.js',
+    'src/ui/game/starter.js',
+    'src/application/economy/mine.js',
+    'src/application/breeding/hatchery.js',
+    'src/ui/game/pokedex.js',
+    'src/ui/game/map-render.js',
     'src/data/sprites.js',
     'src/data/side-quests-data.js',
-    'src/domain/economy/market.js',
-    'src/game/economy/market.js',
-    'src/game/base/base-window.js',
-    'src/game/display/location-info.js',
+    // market is ECS-backed (wave 33): loaded below via the production
+    // gameplay bundle (same code the browser runs), not as text files.
+    'src/ui/game/base/base-window.js',
+    'src/ui/game/location-info.js',
   ];
   for (const f of files) {
     try {
-      vm.runInContext(R(f), sandbox, { filename: f });
+      // T2-D (vague 37) : classiques en vm directe ; converts ESM bundlés.
+      const __text = R(f);
+      vm.runInContext(harnessIsEsm(__text) ? harnessBundleSource([f]) : __text, sandbox, { filename: f });
     } catch (e) {
       if (e instanceof SyntaxError) throw e;
     }
   }
+  // ECS gameplay layer (battle loop + world:encounter + breeding:hatch +
+  // economy:market) — the SAME production bundle the browser executes.
+  vm.runInContext(ecsGameplayBundleSource(), sandbox, { filename: 'src/application/gameplay-bundle.js [esbuild iife]' });
   return sandbox;
 }
 
-test('Hoenn 1 : carte et 75 lieux chargés (LOCS_HOENN)', () => {
+test('Hoenn 1: map and 75 locations loaded (LOCS_HOENN)', () => {
   const sb = makeSandbox();
   const locs = sb.window.LOCS_HOENN;
-  assert.ok(locs, 'LOCS_HOENN défini');
-  assert.equal(Object.keys(locs).length, 75, '75 lieux dans Hoenn (72 + 3 ruines Regi)');
+  assert.ok(locs, 'LOCS_HOENN defined');
+  assert.equal(Object.keys(locs).length, 75, '75 locations in Hoenn (72 + 3 Regi ruins)');
   const r111 = sb.window.getLocObj('route111');
   assert.ok(r111, 'route111 joignable via getLocObj');
-  assert.equal(r111.defaultWeather, 'sandstorm', 'route111 a une tempête de sable par défaut');
+  assert.equal(r111.defaultWeather, 'sandstorm', 'route111 has a sandstorm by default');
 });
 
-test('Hoenn 2 : équipes stratégiques arènes et ligue (OFFICIAL_TEAMS_HOENN)', () => {
+test('Hoenn 2: strategic gym and league teams (OFFICIAL_TEAMS_HOENN)', () => {
   const sb = makeSandbox();
   const teams = sb.window.OFFICIAL_TEAMS_HOENN;
-  assert.ok(teams, 'OFFICIAL_TEAMS_HOENN défini');
+  assert.ok(teams, 'OFFICIAL_TEAMS_HOENN defined');
   for (const leader of ['roxanne', 'brawly', 'wattson', 'flannery', 'norman', 'winona', 'tate_liza', 'juan', 'sidney', 'phoebe', 'glacia', 'drake', 'steven']) {
-    assert.ok(teams[leader], `dresseur/champion ${leader} présent`);
-    assert.ok(teams[leader].team.length >= 2, `${leader} a une équipe complète`);
+    assert.ok(teams[leader], `trainer/champion ${leader} present`);
+    assert.ok(teams[leader].team.length >= 2, `${leader} has a complete team`);
   }
 });
 
-test('Hoenn 3 : 77 quêtes principales Hoenn (STORY_QUESTS_HOENN)', () => {
+test('Hoenn 3: 77 Hoenn main quests (STORY_QUESTS_HOENN)', () => {
   const sb = makeSandbox();
   const hQuests = sb.window.STORY_QUESTS_HOENN;
-  assert.ok(hQuests, 'STORY_QUESTS_HOENN défini');
-  // 77 = 75 historiques + 2 quêtes découverte Base Secrète (217/218)
-  assert.equal(hQuests.length, 77, '77 quêtes principales pour Hoenn');
-  assert.equal(hQuests[hQuests.length - 1].id, 277, 'dernière quête est 277');
-  assert.equal(hQuests[16].id, 217, '217 = visite de Base Secrète');
+  assert.ok(hQuests, 'STORY_QUESTS_HOENN defined');
+  // 77 = 75 historical + 2 Secret Base discovery quests (217/218)
+  assert.equal(hQuests.length, 77, '77 main quests for Hoenn');
+  assert.equal(hQuests[hQuests.length - 1].id, 277, 'last quest is 277');
+  assert.equal(hQuests[16].id, 217, '217 = Secret Base visit');
   assert.equal(hQuests[16].type, 'base_visit', 'type base_visit');
-  assert.equal(hQuests[17].id, 218, '218 = établir sa Base Secrète');
+  assert.equal(hQuests[17].id, 218, '218 = establish your Secret Base');
   assert.equal(hQuests[17].type, 'base_establish', 'type base_establish');
   const ids = hQuests.map(q => q.id);
-  assert.ok(ids.every((v, i) => i === 0 || v > ids[i - 1]), 'ids strictement croissants (fichier rangé dans l\u2019ordre)');
+  assert.ok(ids.every((v, i) => i === 0 || v > ids[i - 1]), 'strictly increasing ids (file kept in order)');
   
-  assert.equal(hQuests[0].id, 201, 'quêtes commencent à 201');
-  assert.equal(hQuests[0].type, 'trainer_battle', 'quête 201 est un combat de quête');
+  assert.equal(hQuests[0].id, 201, 'quests start at 201');
+  assert.equal(hQuests[0].type, 'trainer_battle', 'quest 201 is a quest battle');
   assert.equal(hQuests[0].battleId, 'hoenn_poochyena_route101', 'battleId = hoenn_poochyena_route101');
   const curMain = sb.window.getCurrentMain('hoenn');
-  assert.ok(curMain, 'getCurrentMain(hoenn) retourne une quête');
-  assert.equal(curMain.id, 201, 'quête courante à hoenn = 201');
+  assert.ok(curMain, 'getCurrentMain(hoenn) returns a quest');
+  assert.equal(curMain.id, 201, 'current quest in hoenn = 201');
 });
 
-test('Hoenn 4 : boutiques et objets (SHOPS_HOENN)', () => {
+test('Hoenn 4: shops and items (SHOPS_HOENN)', () => {
   const sb = makeSandbox();
   const shops = sb.window.SHOPS_HOENN;
-  assert.ok(shops, 'SHOPS_HOENN défini');
-  assert.ok(shops.lilycove_dept_store, 'centre commercial de Nénucrique présent');
-  assert.ok(shops.slateport_market, 'marché de Poivressel présent');
+  assert.ok(shops, 'SHOPS_HOENN defined');
+  assert.ok(shops.lilycove_dept_store, 'Lilycove department store present');
+  assert.ok(shops.slateport_market, 'Slateport market present');
 });
 
-test('Hoenn 5 : évolution multiple simultanée sans aléatoire (Chenipotte Nv. 7)', () => {
+test('Hoenn 5: simultaneous multiple evolution, no randomness (Wurmple Lv. 7)', () => {
   const sb = makeSandbox();
   sb.G.team = [{ id: 265, name: 'Chenipotte', level: 7, _evoDone: {} }];
   sb.window.checkEvolution(sb.G.team[0]);
-  assert.equal(sb.G.evolvedSpecies.includes(266), true, 'Armulys (266) évolué');
-  assert.equal(sb.G.evolvedSpecies.includes(268), true, 'Blindalys (268) évolué simultanément');
+  assert.equal(sb.G.evolvedSpecies.includes(266), true, 'Silcoon (266) evolved');
+  assert.equal(sb.G.evolvedSpecies.includes(268), true, 'Cascoon (268) evolved simultaneously');
 });
 
-test('Hoenn 6 : Munja évolue au Nv. 20 avec Ninjask (Munja Nv. 1 dans boîte PC)', () => {
+test('Hoenn 6: Nincada evolves at Lv. 20 with Ninjask (Lv. 1 Shedinja in PC box)', () => {
   const sb = makeSandbox();
   sb.G.team = [{ id: 290, name: 'Ningale', level: 20, _evoDone: {} }];
   sb.window.checkEvolution(sb.G.team[0]);
-  assert.equal(sb.G.evolvedSpecies.includes(291), true, 'Ninjask (291) évolué');
-  assert.equal(sb.G.evolvedSpecies.includes(292), true, 'Munja (292) créé simultanément');
+  assert.equal(sb.G.evolvedSpecies.includes(291), true, 'Ninjask (291) evolved');
+  assert.equal(sb.G.evolvedSpecies.includes(292), true, 'Shedinja (292) created simultaneously');
 });
 
-test('Hoenn 7 : seuil de niveau minimum pour évolution par objet (25 et 50)', () => {
+test('Hoenn 7: minimum level threshold for item evolution (25 and 50)', () => {
   const sb = makeSandbox();
   sb.G.team = [{ id: 349, name: 'Barpau', level: 30, _evoDone: {} }];
   sb.G.inventory.prism_scale = 1;
   sb.window.tryStoneEvo(0, 'prism_scale');
-  assert.equal(sb.G.team[0].id, 349, 'Barpau Nv. 30 refuse d évoluer avant le Nv. 50');
+  assert.equal(sb.G.team[0].id, 349, 'Feebas Lv. 30 refuses to evolve before Lv. 50');
   
   sb.G.team[0].level = 50;
   sb.window.tryStoneEvo(0, 'prism_scale');
-  assert.ok(sb.G.collection[350] || sb.G.evolvedSpecies.includes(350), 'Barpau Nv. 50 évolue en Milobellus (350)');
+  assert.ok(sb.G.collection[350] || sb.G.evolvedSpecies.includes(350), 'Feebas Lv. 50 evolves into Milotic (350)');
 });
 
 test('Hoenn 8 : Latios (381), Latias (380), Jirachi (385), Deoxys (386) en roaming 24/7 (12h rotation)', () => {
   const sb = makeSandbox();
   const pool = sb.window.getRoamingLegendaryForRoute('route101') || sb.window.getRoamingLegendaryForRoute('route110') || sb.window.getRoamingLegendaryForRoute('route118');
-  assert.ok([380, 381, 385, 386, null].includes(pool), 'Latias, Latios, Jirachi ou Deoxys est dans le pool de roaming Hoenn');
+  assert.ok([380, 381, 385, 386, null].includes(pool), 'Latias, Latios, Jirachi or Deoxys is in the Hoenn roaming pool');
 });
 
 test('Hoenn 9 : Fossiles Racine (345 Lilia) et Griffe (347 Anorith)', () => {
   const sb = makeSandbox();
-  assert.equal(sb.window.FOSSIL_REVIVE_MAP.root_fossil, 345, 'root_fossil éclot en Lilia 345');
-  assert.equal(sb.window.FOSSIL_REVIVE_MAP.claw_fossil, 347, 'claw_fossil éclot en Anorith 347');
+  assert.equal(sb.window.FOSSIL_REVIVE_MAP.root_fossil, 345, 'root_fossil revives into Lileep 345');
+  assert.equal(sb.window.FOSSIL_REVIVE_MAP.claw_fossil, 347, 'claw_fossil revives into Anorith 347');
 });
 
-test('Hoenn 10 : Pokedex Hoenn complet #252 à #386 disponible', () => {
+test('Hoenn 10: full Hoenn Pokedex #252 to #386 available', () => {
   const sb = makeSandbox();
   for (let i = 252; i <= 386; i++) {
-    assert.ok(sb.window.PD[i], `Pokémon Hoenn #${i} défini dans PD`);
+    assert.ok(sb.window.PD[i], `Hoenn Pokémon #${i} defined in PD`);
   }
 });
 
-test('Hoenn 11 : marché de Hoenn propose les Pokémon rares et starters de Hoenn (et pas Kanto)', () => {
+test('Hoenn 11: the Hoenn market offers Hoenn rares and starters (not Kanto)', () => {
   const sb = makeSandbox();
   sb.G.region = 'hoenn';
   const marketIds = sb.window.getMarketPokemon();
-  assert.ok(Array.isArray(marketIds), 'getMarketPokemon retourne un tableau');
-  assert.ok(marketIds.includes(252), 'Treecko #252 dans le marché Hoenn');
-  assert.ok(marketIds.includes(255), 'Torchic #255 dans le marché Hoenn');
-  assert.ok(marketIds.includes(258), 'Mudkip #258 dans le marché Hoenn');
-  assert.equal(marketIds.includes(385), false, 'Jirachi #385 retiré du marché Hoenn (roaming)');
-  assert.equal(marketIds.includes(386), false, 'Deoxys #386 retiré du marché Hoenn (roaming)');
-  assert.ok(marketIds.includes(351), 'Morphéo #351 dans le marché Hoenn');
+  assert.ok(Array.isArray(marketIds), 'getMarketPokemon returns an array');
+  assert.ok(marketIds.includes(252), 'Treecko #252 in the Hoenn market');
+  assert.ok(marketIds.includes(255), 'Torchic #255 in the Hoenn market');
+  assert.ok(marketIds.includes(258), 'Mudkip #258 in the Hoenn market');
+  assert.equal(marketIds.includes(385), false, 'Jirachi #385 removed from the Hoenn market (roaming)');
+  assert.equal(marketIds.includes(386), false, 'Deoxys #386 removed from the Hoenn market (roaming)');
+  assert.ok(marketIds.includes(351), 'Castform #351 in the Hoenn market');
 
-  assert.equal(marketIds.includes(1), false, 'Bulbizarre #1 (Kanto) n est pas dans le marché Hoenn');
+  assert.equal(marketIds.includes(1), false, 'Bulbasaur #1 (Kanto) is not in the Hoenn market');
 });
 
-test('Hoenn 12 : fenêtre Base Secrète masquée à Hoenn tant que la quête 216 Route 111 n est pas accomplie', async () => {
+test('Hoenn 12: Secret Base window hidden in Hoenn until quest 216 Route 111 is done', async () => {
   const sb = makeSandbox();
   sb.G.region = 'hoenn';
   sb.G.unlockedSecretBaseHoenn = false;
@@ -213,14 +222,14 @@ test('Hoenn 12 : fenêtre Base Secrète masquée à Hoenn tant que la quête 216
   };
   
   await sb.window.baseWindowRender();
-  assert.equal(baseWinStyle.display, 'none', 'fenêtre #win-base est masquée tant que !unlockedSecretBaseHoenn');
+  assert.equal(baseWinStyle.display, 'none', '#win-base window is hidden while !unlockedSecretBaseHoenn');
   
   sb.G.unlockedSecretBaseHoenn = true;
   await sb.window.baseWindowRender();
-  assert.equal(baseWinStyle.display, '', 'fenêtre #win-base est visible une fois unlockedSecretBaseHoenn=true');
+  assert.equal(baseWinStyle.display, '', '#win-base window is visible once unlockedSecretBaseHoenn=true');
 });
 
-test('Hoenn 13 : location-info n affiche pas d avertissement de blocage Base Secrète et débloque après quête 216', () => {
+test('Hoenn 13: location-info shows no Secret Base lock warning and unlocks after quest 216', () => {
   const sb = makeSandbox();
   sb.G.region = 'hoenn';
   sb.G.location = 'route111';
@@ -228,31 +237,31 @@ test('Hoenn 13 : location-info n affiche pas d avertissement de blocage Base Sec
   
   const el = { innerHTML: '', style: {} };
   sb.window.renderLocInfo(el);
-  assert.equal(el.innerHTML.includes('Base Secrète : nécessite'), false, 'aucun texte d avertissement sur Base Secrète dans location-info');
-  assert.equal(el.innerHTML.includes('baseWindowConfirmEstablish'), false, 'boutons Base Secrète absents avant déblocage');
+  assert.equal(el.innerHTML.includes('Base Secrète : nécessite'), false, 'no Secret Base warning text in location-info');
+  assert.equal(el.innerHTML.includes('baseWindowConfirmEstablish'), false, 'Secret Base buttons absent before unlock');
   
   sb.G.unlockedSecretBaseHoenn = true;
   sb.window.renderLocInfo(el);
-  // Alcôves disséminées : chaque emplacement de la route a son bouton « S'installer »
-  assert.equal(el.innerHTML.includes('baseWindowConfirmEstablish'), true, 'boutons S\u2019installer présents après déblocage sur route111');
+  // Scattered alcoves: every route location has its "Settle" button
+  assert.equal(el.innerHTML.includes('baseWindowConfirmEstablish'), true, 'Settle buttons present after unlock on route111');
   const alcoves = sb.window.baseWindowGetRouteAlcoves ? sb.window.baseWindowGetRouteAlcoves('route111') : [];
-  assert.ok(alcoves.length >= 2, 'route111 propose plusieurs alcôves');
+  assert.ok(alcoves.length >= 2, 'route111 offers several alcoves');
 });
 
-test('Hoenn 14 : achat des formes Morphéo (#387-#389) et Deoxys (#390-#392) via les boutiques spéciales', () => {
+test('Hoenn 14: buying Castform forms (#387-#389) and Deoxys (#390-#392) via special shops', () => {
   const sb = makeSandbox();
   sb.G.money = 100000;
   sb.window.buySpecialFormPokemon(387, 20000);
   sb.window.buySpecialFormPokemon(390, 50000);
-  assert.equal(sb.G.money, 30000, 'argent débité correctement pour 2 formes');
+  assert.equal(sb.G.money, 30000, 'money debited correctly for 2 forms');
   const ownedIds = Object.values(sb.G.collection).map(x => Number(x.id));
-  assert.ok(ownedIds.includes(387), 'Morphéo Solaire #387 dans le PC');
-  assert.ok(ownedIds.includes(390), 'Deoxys Attaque #390 dans le PC');
-  assert.ok(sb.window.PD[387], 'PD[387] défini');
-  assert.ok(sb.window.PD[392], 'PD[392] défini');
+  assert.ok(ownedIds.includes(387), 'Castform Sunny #387 in the PC');
+  assert.ok(ownedIds.includes(390), 'Deoxys Attack #390 in the PC');
+  assert.ok(sb.window.PD[387], 'PD[387] defined');
+  assert.ok(sb.window.PD[392], 'PD[392] defined');
 });
 
-test('Hoenn 15 : fossiles Racine et Griffe bloqués en début de partie à Johto, mais accessibles partout après déblocage Hoenn', () => {
+test('Hoenn 15: Root and Claw fossils locked early in Johto, but accessible everywhere after Hoenn unlock', () => {
   const sb = makeSandbox();
   sb.G.region = 'johto';
   sb.G.mainStep = { kanto: 0, johto: 0, hoenn: 0 };
@@ -262,43 +271,43 @@ test('Hoenn 15 : fossiles Racine et Griffe bloqués en début de partie à Johto
     return sb.window.MINE_ITEMS.filter(it => !(!hoennUnlocked && (it.key === 'root_fossil' || it.key === 'claw_fossil'))).map(it => it.key);
   };
   const beforeUnlock = filterFossils();
-  assert.equal(beforeUnlock.includes('root_fossil'), false, 'root_fossil absent à Johto avant déblocage Hoenn');
-  assert.equal(beforeUnlock.includes('claw_fossil'), false, 'claw_fossil absent à Johto avant déblocage Hoenn');
+  assert.equal(beforeUnlock.includes('root_fossil'), false, 'root_fossil absent in Johto before Hoenn unlock');
+  assert.equal(beforeUnlock.includes('claw_fossil'), false, 'claw_fossil absent in Johto before Hoenn unlock');
   
   sb.G.mainStep.hoenn = 1;
   const afterUnlock = filterFossils();
-  assert.equal(afterUnlock.includes('root_fossil'), true, 'root_fossil accessible à Johto après déblocage Hoenn');
-  assert.equal(afterUnlock.includes('claw_fossil'), true, 'claw_fossil accessible à Johto après déblocage Hoenn');
+  assert.equal(afterUnlock.includes('root_fossil'), true, 'root_fossil accessible in Johto after Hoenn unlock');
+  assert.equal(afterUnlock.includes('claw_fossil'), true, 'claw_fossil accessible in Johto after Hoenn unlock');
 });
 
-test('Hoenn 16 : reproduction en Garderie unique (pas de dupli, pas de farm) et affichage Pokédex', () => {
+test('Hoenn 16: single Day-Care breeding (no dupe, no farm) and Pokédex display', () => {
   const sb = makeSandbox();
   sb.window.G.hatchery = [{ poke: { id: 25, name: 'Pikachu', level: 30 }, steps: 100, stepsReq: 10, isFossil: false }];
   sb.window.hatchEgg(0);
   const ownedIds1 = [...sb.window.G.team, ...Object.values(sb.window.G.collection)].filter(x => x && Number(x.id) === 172);
-  assert.equal(ownedIds1.length, 1, 'Premier œuf éclot en exactement 1 Pichu #172');
+  assert.equal(ownedIds1.length, 1, 'First egg hatches into exactly 1 Pichu #172');
   
-  // Deuxième incubation du même parent : ne doit PAS créer un 2e Pichu
+  // Second incubation of the same parent: must NOT create a 2nd Pichu
   sb.window.G.hatchery = [{ poke: { id: 25, name: 'Pikachu', level: 31 }, steps: 100, stepsReq: 10, isFossil: false }];
   sb.window.hatchEgg(0);
   const ownedIds2 = [...sb.window.G.team, ...Object.values(sb.window.G.collection)].filter(x => x && Number(x.id) === 172);
-  assert.equal(ownedIds2.length, 1, 'Seconde incubation : aucun Pichu supplémentaire (pas de dupli / farm)');
+  assert.equal(ownedIds2.length, 1, 'Second incubation: no extra Pichu (no dupe / farm)');
   
   const sources = sb.window.findPokemonSources(172);
-  assert.ok(sources.some(s => s.label.includes('Éclosion en Garderie')), 'Pokédex affiche Éclosion en Garderie (Parent : Pikachu / Raichu)');
+  assert.ok(sources.some(s => s.label.includes('Éclosion en Garderie')), 'Pokédex shows Hatch in Day Care (Parent: Pikachu / Raichu)');
 });
 
-test('Hoenn 17 : quêtes secondaires exclusives à Hoenn (s56-s85 + énigmes + densification)', () => {
+test('Hoenn 17: Hoenn-exclusive side quests (s56-s85 + puzzles + densification)', () => {
   const sb = makeSandbox();
   const hoennSide = Object.values(sb.window.SIDE_QUESTS || {}).filter(q => q.region === 'hoenn');
-  // 30 (s56-s85) + 14 énigmes (s100-s113) + 24 densification (s114-s137) = 68
-  assert.equal(hoennSide.length, 68, '68 quêtes secondaires à Hoenn');
-  assert.equal(hoennSide[0].id, 's56', 'début à s56');
-  // le socle historique s56-s85 reste complet
-  for (let i = 56; i <= 85; i++) assert.ok(hoennSide.some(q => q.id === 's' + i), `s${i} présente`);
+  // 30 (s56-s85) + 14 riddles (s100-s113) + 24 densification (s114-s137) = 68
+  assert.equal(hoennSide.length, 68, '68 side quests in Hoenn');
+  assert.equal(hoennSide[0].id, 's56', 'starts at s56');
+  // the historical s56-s85 base stays complete
+  for (let i = 56; i <= 85; i++) assert.ok(hoennSide.some(q => q.id === 's' + i), `s${i} present`);
 });
 
-test('Hoenn 18 : la capture d un Pokémon à Hoenn met à jour immédiatement la fenêtre de lieu (renderLocInfo)', () => {
+test('Hoenn 18: catching a Pokémon in Hoenn immediately updates the location window (renderLocInfo)', () => {
   const sb = makeSandbox();
   sb.G.region = 'hoenn';
   sb.G.location = 'route101';
@@ -308,46 +317,46 @@ test('Hoenn 18 : la capture d un Pokémon à Hoenn met à jour immédiatement la
   const el = { innerHTML: '', style: {} };
   sb.document.getElementById = (id) => (id === 'location-info-panel' ? el : { style: {}, textContent: '', innerHTML: '' });
   sb.window.renderLocInfo(el);
-  assert.equal(el.innerHTML.includes('loc-caught-badge is-owned'), false, 'Pas encore capturé sur route101');
+  assert.equal(el.innerHTML.includes('loc-caught-badge is-owned'), false, 'Not yet caught on route101');
   
   sb.G.pokedex[263] = { seen: true, caught: true };
   sb.G.collection[263] = { id: 263, name: 'Zigzaton', level: 3 };
   sb.window.refreshMapAndLoc();
-  assert.equal(el.innerHTML.includes('loc-caught-badge is-owned'), true, 'Fenêtre de lieu mise à jour immédiatement après capture via refreshMapAndLoc');
+  assert.equal(el.innerHTML.includes('loc-caught-badge is-owned'), true, 'Location window updated immediately after capture via refreshMapAndLoc');
 });
 
-test('Hoenn 19 : Hoenn est verrouillé derrière la victoire à la Ligue Johto ET le Pokédex Johto complet (100/100)', () => {
+test('Hoenn 19: Hoenn is locked behind the Johto League victory AND the complete Johto Pokédex (100/100)', () => {
   const sb = makeSandbox();
   sb.G.defeatedChamps = {};
   sb.G.pokedex = {};
-  assert.equal(sb.window.canAccessRegion('hoenn'), false, 'Hoenn inaccessible en début de partie');
-  assert.equal(sb.window.regionAccessMessage('hoenn'), 'region_locked_league', 'Message mentionne la Ligue de Johto (cle i18n)');
+  assert.equal(sb.window.canAccessRegion('hoenn'), false, 'Hoenn inaccessible early in the game');
+  assert.equal(sb.window.regionAccessMessage('hoenn'), 'region_locked_league', 'Message mentions the Johto League (i18n key)');
   
-  // Victoire Ligue Johto (johto_elite4) mais Pokédex incomplet
+  // Johto League victory (johto_elite4) but incomplete Pokédex
   sb.G.defeatedChamps['johto_elite4'] = true;
-  assert.equal(sb.window.canAccessRegion('hoenn'), false, 'Hoenn inaccessible sans le Pokédex Johto 100/100');
-  assert.equal(sb.window.regionAccessMessage('hoenn'), 'region_locked_dex', 'Message mentionne le Pokédex de Johto (cle i18n)');
+  assert.equal(sb.window.canAccessRegion('hoenn'), false, 'Hoenn inaccessible without the Johto Pokédex 100/100');
+  assert.equal(sb.window.regionAccessMessage('hoenn'), 'region_locked_dex', 'Message mentions the Johto Pokédex (i18n key)');
   
-  // Complétion des 100 Pokémon Johto (#152 à #251)
+  // Completion of the 100 Johto Pokémon (#152 to #251)
   for (let i = 152; i <= 251; i++) {
     sb.G.pokedex[i] = { caught: true };
   }
-  assert.equal(sb.window.canAccessRegion('hoenn'), true, 'Hoenn accessible après Ligue Johto et Pokédex Johto complet');
+  assert.equal(sb.window.canAccessRegion('hoenn'), true, 'Hoenn accessible after Johto League and complete Johto Pokédex');
 });
 
-test('Hoenn 20 : objets d évolution sans restriction de niveau dans le Sac (équipe et Boîte PC) + speciesOwned en pension/entraînement', () => {
+test('Hoenn 20: evolution items without level restriction in the Bag (team and PC Box) + speciesOwned in day care/training', () => {
   const sb = makeSandbox();
   sb.window.G.collection['box_137_test'] = { id: 137, name: 'Porygon', level: 50 };
   sb.window.G.inventory['upgrade'] = 1;
   sb.window.tryBoxStoneEvo('box_137_test', 'upgrade');
   
   const ownedIds = Object.values(sb.window.G.collection).map(x => Number(x.id));
-  assert.ok(ownedIds.includes(233), 'Porygon2 (#233) a évolué dans la Boîte PC avec Améliorator sans restriction de niveau');
-  assert.equal(sb.window.G.inventory['upgrade'], undefined, 'Améliorator consommé');
+  assert.ok(ownedIds.includes(233), 'Porygon2 (#233) evolved in the PC Box with Upgrade without level restriction');
+  assert.equal(sb.window.G.inventory['upgrade'], undefined, 'Up-Grade consumed');
   
   sb.window.G.hatchery = [{ poke: { id: 182, name: 'Joliflor', level: 15 }, steps: 0, stepsReq: 10 }];
-  assert.equal(sb.window.speciesOwned(182), true, 'speciesOwned reconnaît Joliflor (#182) en pension/garderie');
+  assert.equal(sb.window.speciesOwned(182), true, 'speciesOwned recognizes Bellossom (#182) in breeding/day care');
   
   sb.window.G.training = [{ poke: { id: 200, name: 'Roigada', level: 20 }, steps: 0, stepsReq: 10 }];
-  assert.equal(sb.window.speciesOwned(200), true, 'speciesOwned reconnaît Roigada (#200) en entraînement');
+  assert.equal(sb.window.speciesOwned(200), true, 'speciesOwned recognizes Slowking (#200) in training');
 });

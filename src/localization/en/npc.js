@@ -1,4 +1,4 @@
-window.L_en_npc = {
+export const L_en_npc = {
   "abandoned_ship": [{"name":"Lea & Jed","lines":["Ce navire abrite un scanner."]}],
   "ancient_tomb": [{"name":"Hex Maniac Cedric","lines":["I have a request for you…","Let's talk when you have a moment."]},{"name":"Ruin Maniac Fernand","lines":["I have a request for you…","Let's talk when you have a moment."]},{"name":"Psychic Hector","lines":["There are secrets nearby…","Watch walls, tiles, and silences."]}],
   "aqua_hideout": [{"name":"Sbire Aqua","lines":["Notre sous-marin est prêt."]}],
@@ -106,3 +106,7 @@ window.L_en_npc = {
   "weather_institute": [{"name":"Head Researcher","lines":["La météo change vite."]},{"name":"Scientist Dalton","lines":["I have a request for you…","Let's talk if you have a moment."]}],
   "whirlislands": [{"name":"Old Fisherman","lines":["Deep in the Whirl Islands sleeps Lugia.","Listen to the abyss's song."]}]
 };
+
+// T2 (vague 38) : module ESM — export natif ; la surface classique est
+// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
+if (typeof globalThis !== 'undefined') globalThis.L_en_npc = L_en_npc;

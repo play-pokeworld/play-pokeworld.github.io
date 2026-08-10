@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 # ============================================================================
-# OUTIL — Transparence des sprites Émeraude (src/assets/images/secret-base/emerald/*.png)
+# TOOL — Transparency of Emerald sprites (src/assets/images/secret-base/emerald/*.png)
 # ----------------------------------------------------------------------------
-# Les PNG du désassemblage pret/pokeemerald sont en palette SANS chunk tRNS :
-# le fond est un vert GBA opaque (~ (98,197,98) / (115,197,164)) qui s'affiche
-# en carré derrière chaque sprite dans les renderers 2D et 3D (billboards).
-# Correctif idempotent : couleur du pixel (0,0) → alpha 0 (les sprites GBA
-# n'ont pas d'anti-aliasing, l'égalité exacte est sûre ; le coin (0,0) est du
-# fond sur toutes les planches de décorations/poupées/coussins).
-# Appelé par download_assets.py après fetch-base2d.mjs ; peut être relancé
-# tel quel (déjà transparents → aucun effet).
+# PNGs from the pret/pokeemerald decompilation use a palette WITHOUT a tRNS chunk:
+# the background is an opaque GBA green (~ (98,197,98) / (115,197,164)) shown
+# as a square behind each sprite in the 2D and 3D renderers (billboards).
+# Idempotent fix: color of pixel (0,0) -> alpha 0 (GBA sprites have no
+# anti-aliasing; exact equality is safe; the (0,0) corner is background on
+# all decoration/doll/cushion sheets).
+# Called by download_assets.py after fetch-base2d.mjs; can be re-run
+# as-is (already transparent -> no effect).
 # ============================================================================
 import os, sys
 
@@ -20,7 +20,7 @@ def main():
     try:
         from PIL import Image
     except ImportError:
-        print('fix-emerald-alpha: PIL indisponible, étape ignorée (réseau/assets non bloquants)')
+        print('fix-emerald-alpha: PIL unavailable, step skipped (network/assets non-blocking)')
         return 0
     if not os.path.isdir(DIR):
         return 0
@@ -43,7 +43,7 @@ def main():
         rgba.putdata(out)
         rgba.save(p)
         fixed += 1
-    print(f'fix-emerald-alpha: {fixed} sprite(s) transparent-ifié(s), {skipped} déjà OK')
+    print(f'fix-emerald-alpha: {fixed} sprite(s) transparent-ified, {skipped} already OK')
     return 0
 
 if __name__ == '__main__':

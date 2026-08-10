@@ -1,7 +1,9 @@
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
 // ─── Boutiques de Hoenn (RSE) ───
-// Objets tenus / d'évolution tenus. Les PIERRES d'évolution sont exclusives à la Mine.
+// Held / held-evolution items. Evolution STONES are exclusive to the Mine.
 
-var SHOPS_HOENN = {
+export var SHOPS_HOENN = {
   littleroot: { items: [] },
   oldale: { items: ["colbur_berry", "silk_scarf"] },
   petalburg: { items: ["muscle_band", "hard_stone"] },
@@ -25,6 +27,5 @@ var SHOPS_HOENN = {
 if (typeof SHOPS !== 'undefined' && typeof SHOPS_HOENN !== 'undefined') {
   Object.assign(SHOPS, SHOPS_HOENN);
 }
-if (typeof window !== 'undefined') {
-  window.SHOPS_HOENN = SHOPS_HOENN;
-}
+// Wave 40 — surface kept (window → globalThis block, same scope).
+if (typeof globalThis !== 'undefined') globalThis.SHOPS_HOENN = SHOPS_HOENN;

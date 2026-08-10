@@ -3,7 +3,9 @@ import { createRouteEventState } from '../world/route-events.js';
 export function createInitialGameState() {
   return {
     version: 3,
-    lang: 'en',
+    // Wave 27: native language is French (static markup, dict fallbacks, items-helpers convention);
+    // the player's stored choice overrides this at load/createFreshGameState.
+    lang: 'fr',
     region: 'kanto',
     money: 2000,
     badges: 0,

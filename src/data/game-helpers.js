@@ -1,6 +1,14 @@
-// Passe 24 : nom LOCALISÉ d'un type ('Fire' → 'Feu' en fr). Les données
-// stockent les types en anglais ; ce helper couvre cartes, fiches, pokédex,
-// badges d'objets et panneaux d'info.
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
+// Phase 24: LOCALIZED name of a type ('Fire' -> 'Feu' in French). Data
+// stores types in English; this helper covers cards, sheets, pokedex,
+// item badges and info panels.
+// Wave 43 — lazy cross-module links (P7 regression fix):
+// zero static imports (chunks + VM harness isolates frozen); each alias resolves
+// AT CALL TIME — engine registry first, then the global surface (VM harness).
+const __pwV43Link = (n) => ((typeof PokeActions !== 'undefined' && PokeActions && typeof PokeActions.get === 'function') ? PokeActions.get(n) : null)
+  || (typeof globalThis !== 'undefined' ? globalThis[n] : null) || null;
+function applySecretBaseMoneyBonus(...args) { const f = __pwV43Link('applySecretBaseMoneyBonus'); return f ? f(...args) : undefined; }
 function getTypeName(type){
  if(!type) return '';
  const raw = String(type).trim();
@@ -48,10 +56,10 @@ function getSpeciesTalents(id){
 
 
 
-// Passe 24 : résolution canonique d'un id de talent. Les pools et les sets
-// curés sont normalisés en minuscules, mais les ANCIENNES SAUVEGARDES peuvent
-// encore contenir des ids camelCase ('waterAbsorb'…) — on résout exact puis
-// en minuscules pour rester compatible sans migration destructive.
+// Phase 24: canonical resolution of an ability id. Pools and curated sets
+// are normalized to lowercase, but OLD SAVES may still hold camelCase ids
+// ('waterAbsorb'…) — resolve exact first, then lowercase, to stay
+// compatible without a destructive migration.
 function getTalentRecord(key) {
  if(!key || typeof TALENTS_FULL === 'undefined') return null;
  if(TALENTS_FULL[key]) return TALENTS_FULL[key];
@@ -76,7 +84,7 @@ function getRarityLabel(rarity) {
 function getTalentName(tal){
  if(!tal) return 'Normal';
  if(typeof t==='function'){
-   // Locale : id exact puis id normalisé (minuscules) pour les vieilles saves.
+   // Locale: exact id, then normalized id (lowercase) for old saves.
    for(const cand of [tal, String(tal).toLowerCase()]){
      const loc = t('talents.'+cand+'.name');
      if(loc && loc !== 'talents.'+cand+'.name') return typeof titleCaseDisplayName === 'function' ? titleCaseDisplayName(loc) : loc;
@@ -128,7 +136,7 @@ function unlockTalentForSpecies(id, tal){
 }
 
 
-// ── Seeded PRNG (mulberry32) pour pools déterministes ──
+// ── Seeded PRNG (mulberry32) for deterministic pools ──
 function _seedRng(seed) {
   return function() {
     seed |= 0;
@@ -139,7 +147,7 @@ function _seedRng(seed) {
   };
 }
 
-// ── Pool de moves déterministe par espèce (PokeChill-style) ──
+// ── Deterministic per-species move pool (PokeChill-style) ──
 
 function getSpeciesMovePool(speciesId) {
   var cache = getSpeciesMovePool._cache || (getSpeciesMovePool._cache = {});
@@ -241,19 +249,19 @@ function getSpeciesMovePool(speciesId) {
   return result;
 }
 
-// ── Niveau auquel un move est appris ──
+// ── Level at which a move is learned ──
 function getMoveLearnLevel(speciesId, moveId) {
   var pool = getSpeciesMovePool(speciesId);
   var idx = pool.indexOf(moveId);
-  if (idx === -1) return 999; // Pas dans le pool → pas appris par level-up
-  // PokeChill : niv 1, puis tous les 7 niveaux (1, 7, 14, 21, 28, ... 98)
+  if (idx === -1) return 999; // Not in the pool -> not learned by level-up
+  // PokeChill: level 1, then every 7 levels (1, 7, 14, 21, 28, ... 98)
   if (idx === 0) return 1;
   return Math.min(100, 1 + idx * 7);
 }
 
-// ── Catégorie d'une attaque apprenable : niveau / CT-CS / dressage ──
-// (passe 10 : le dressage ne doit proposer QUE la catégorie « dressage » ;
-// le pool de niveau se débloque par level-up, les CT/CS par usage de l'objet.)
+// ── Category of a learnable move: level / TM-HM / training ──
+// (phase 10: training must only offer the "training" category; the level
+// pool unlocks by level-up, TMs/HMs by item usage.)
 function getCtCsMoveIds() {
   var cache = getCtCsMoveIds._cache || (getCtCsMoveIds._cache = {});
   if (cache.done) return cache.map;
@@ -262,14 +270,14 @@ function getCtCsMoveIds() {
   for (var k in items) {
     var it = items[k];
     if (!it || !it.moveId) continue;
-    // Prédicat partagé (items-helpers.js) + repli local : reconnaît aussi les
-    // CT sans `type` déclaré (clé ct_*/cs_* + moveId, ex. ct_airshlash).
+    // Shared predicate (items-helpers.js) + local fallback: also recognizes
+    // TMs without a declared `type` (ct_*/hm_* key + moveId, e.g. ct_airshlash).
     var isCtCs = (typeof isCtCsItem === 'function')
       ? isCtCsItem(k)
       : (it.type === 'ct' || it.type === 'cs' || /^(ct|cs)/.test(String(k)));
     if (!isCtCs) continue;
-    // Id canonique de l'attaque (alias legacy résolu : icebeam → ice_beam…)
-    // pour correspondre aux pools construits sur les clés de MOVES.
+    // Canonical move id (legacy alias resolved: icebeam -> ice_beam…)
+    // to match pools built on MOVES keys.
     var moveId = (typeof resolveCtCsMoveId === 'function') ? (resolveCtCsMoveId(k) || it.moveId) : it.moveId;
     map[moveId] = true;
   }
@@ -278,8 +286,8 @@ function getCtCsMoveIds() {
   return map;
 }
 
-// Pool « catégorie dressage » d'une espèce = pool apprenable complet
-// − pool de niveau − attaques des CT/CS.
+// "Training category" pool of a species = full learnable pool
+// - level pool - TM/HM moves.
 function getSpeciesTrainingOnlyPool(speciesId) {
   var cache = getSpeciesTrainingOnlyPool._cache || (getSpeciesTrainingOnlyPool._cache = {});
   var nid = Number(speciesId);
@@ -289,15 +297,15 @@ function getSpeciesTrainingOnlyPool(speciesId) {
   var out = [];
   for (var i = 0; i < full.length; i++) {
     var id = full[i];
-    if (ct[id]) continue;                               // catégorie CT/CS → déblocage par objet
-    if (getMoveLearnLevel(nid, id) !== 999) continue;   // pool de niveau → déblocage par level-up
+    if (ct[id]) continue;                               // TM/HM category -> unlocked by item usage
+    if (getMoveLearnLevel(nid, id) !== 999) continue;   // level pool -> unlocked by level-up
     out.push(id);
   }
   cache[nid] = out;
   return out;
 }
 
-// ── Nombre de moves connus à un niveau donné ──
+// ── Number of moves known at a given level ──
 function getMoveCountForLevel(level) {
   if (level >= 99) return 15;
   if (level >= 92) return 14;
@@ -316,7 +324,7 @@ function getMoveCountForLevel(level) {
   return 1; // niveau 1-7 : 1 move
 }
 
-// ── Récupère les moves appris par level-up pour une espèce à un niveau donné ──
+// ── Get moves learned by level-up for a species at a given level ──
 function getMovesForSpeciesLevel(speciesId, moveset, level) {
   var nid = Number(speciesId);
   var pool = getSpeciesMovePool(nid);
@@ -330,7 +338,7 @@ function getMovesForSpeciesLevel(speciesId, moveset, level) {
   return result;
 }
 
-// ── Raccourci : moves pour une espèce à un niveau (sans moveset passé) ──
+// ── Shortcut: moves for a species at a level (no passsed moveset) ──
 function getMovesForLevel(speciesId, level) {
   return getMovesForSpeciesLevel(speciesId, null, level);
 }
@@ -386,7 +394,10 @@ function xpForLevel(lv){ return Math.floor(Math.pow(lv,3) * 0.8); }
 const MIN_WINS_DEFAULT = 10;
 (function attachMinWins(){
  const apply = (obj)=>{ for(const id in obj){ const loc=obj[id]; if(!loc) continue; loc.minWins = (loc.type==='town') ? 0 : MIN_WINS_DEFAULT; } };
- apply(LOCS); apply(LOCS_JOHTO); if(typeof LOCS_HOENN !== 'undefined') apply(LOCS_HOENN);
+  const _L = (typeof LOCS !== 'undefined') ? LOCS : ((typeof window !== 'undefined' && window.LOCS) || {});
+  const _LJ = (typeof LOCS_JOHTO !== 'undefined') ? LOCS_JOHTO : ((typeof window !== 'undefined' && window.LOCS_JOHTO) || {});
+  const _LH = (typeof LOCS_HOENN !== 'undefined') ? LOCS_HOENN : ((typeof window !== 'undefined' && window.LOCS_HOENN) || {});
+  apply(_L); apply(_LJ); apply(_LH);
 })();
 
 
@@ -425,28 +436,34 @@ function _mergeDropLists(ids){
  }
  return out;
 }
+function _allLocsObjs(){
+  const _L = (typeof LOCS !== 'undefined') ? LOCS : ((typeof window !== 'undefined' && window.LOCS) || null);
+  const _LJ = (typeof LOCS_JOHTO !== 'undefined') ? LOCS_JOHTO : ((typeof window !== 'undefined' && window.LOCS_JOHTO) || null);
+  const _LH = (typeof LOCS_HOENN !== 'undefined') ? LOCS_HOENN : ((typeof window !== 'undefined' && window.LOCS_HOENN) || null);
+  return [_L, _LJ, _LH].filter(Boolean);
+}
 function applyRouteLinkGroups(){
- const objects = [LOCS, LOCS_JOHTO, typeof LOCS_HOENN !== 'undefined' ? LOCS_HOENN : null].filter(Boolean);
- for(const obj of objects){
-  const groups = getAutoRouteLinkGroups(obj);
-  for(const ids of groups){
-   const primary = ids[0];
-   const wild = _mergeWildLists(ids, obj);
-   const drops = _mergeDropLists(ids);
-   for(const id of ids){
-    if(!obj[id]) continue;
-    obj[id].group = primary;
-    obj[id].wild = wild.map(w => w.slice ? w.slice() : w);
-    if(drops.length && typeof ROUTE_DROPS !== 'undefined') ROUTE_DROPS[id] = drops.slice();
-   }
+  const objects = _allLocsObjs();
+  for(const obj of objects){
+    const groups = getAutoRouteLinkGroups(obj);
+    for(const ids of groups){
+      const primary = ids[0];
+      const wild = _mergeWildLists(ids, obj);
+      const drops = _mergeDropLists(ids);
+      for(const id of ids){
+        if(!obj[id]) continue;
+        obj[id].group = primary;
+        obj[id].wild = wild.map(w => w.slice ? w.slice() : w);
+        if(drops.length && typeof ROUTE_DROPS !== 'undefined') ROUTE_DROPS[id] = drops.slice();
+      }
+    }
   }
- }
 }
 function getLinkedRouteIds(id){
- const out = new Set([id]);
- const baseLoc = getLocObj(id);
- const group = (baseLoc && baseLoc.group) || id;
- for(const obj of [LOCS, LOCS_JOHTO, typeof LOCS_HOENN !== 'undefined' ? LOCS_HOENN : null]){
+  const out = new Set([id]);
+  const baseLoc = getLocObj(id);
+  const group = (baseLoc && baseLoc.group) || id;
+  for(const obj of _allLocsObjs()){
   if(!obj) continue;
   for(const locId in obj){
    const loc = obj[locId];
@@ -528,6 +545,9 @@ applyRouteLinkGroups();
 
 
 const REGION_ORDER = ['kanto','johto','hoenn','sinnoh','unova','kalos','alola','galar','paldea'];
+// FIX (2026-08) : partage inter-modules (pokedex.js, collection.js).
+if (typeof window !== 'undefined') window.REGION_ORDER = REGION_ORDER;
+if (typeof globalThis !== 'undefined') globalThis.REGION_ORDER = REGION_ORDER;
 const REGION_POKE_RANGES = {
   kanto: {start:1, end:151, previous:null, league:'elite4'},
   johto: {start:152, end:251, previous:'kanto', league:'johto_elite4'},
@@ -566,8 +586,8 @@ function countCaughtInRegion(region){
 }
 function isRegionDexComplete(region){ return countCaughtInRegion(region) >= getRegionPokedexTotal(region); }
 function isKalosCompleted(){
-  // Épisode Delta / Primo-Résurgences : accessibles seulement après Kalos
-  // (Ligue Kalos gagnée). Le dex Hoenn classique reste libre avant.
+  // Delta Episode / Primal Reversions: only accessible after Kalos
+  // (Kalos League won). The classic Hoenn dex stays open before that.
   try {
     if (typeof isRegionLeagueWon === 'function' && isRegionLeagueWon('kalos')) return true;
   } catch (_) {}
@@ -639,11 +659,11 @@ function getDuplicateItemPayout(key, qty){
  const unit = Math.max(0, Math.floor(((itm && (itm.price || itm.value)) || 0) * 0.25));
  return unit * Math.max(1, qty || 1);
 }
-// Limite de pile d'un objet (même règle que addToInventory) : objets tenus /
-// de combat / baies = 25, le reste est quasi illimité. Passe 30 : la
-// conversion en argent d'un butin ne doit se déclencher QUE lorsque la pile
-// est pleine — avant, posséder UNE seule copie suffisait à tout convertir en
-// argent, et les routes distribuaient des ₽ sans raison (retour bêta).
+// Item stack limit (same rule as addToInventory): held / battle items /
+// berries = 25, everything else is virtually unlimited. Phase 30: loot
+// money-conversion must only trigger WHEN the stack is full — before,
+// owning ONE single copy was enough to convert everything into money,
+// and routes were handing out cash for no reason (beta feedback).
 function getItemStackLimit(key){
  const itm = ITEMS[key] || ITEMS[normalizeItemKey ? normalizeItemKey(key) : key];
  return (itm && (itm.type === 'held' || itm.category || itm.buff)) ? 25 : 999999;
@@ -663,9 +683,9 @@ function grantRewardItem(key, qty){
  const overflow = qty - added;
  let money = 0;
  if(overflow > 0){
-  money = getDuplicateItemPayout(key, overflow); // pile pleine : l'excédent EST bien converti
+  money = getDuplicateItemPayout(key, overflow); // stack full: the overflow IS converted
   if(money > 0){
-    if(typeof applySecretBaseMoneyBonus === 'function') money = applySecretBaseMoneyBonus(money);
+    if(typeof __pwV43Link('applySecretBaseMoneyBonus') === 'function') money = applySecretBaseMoneyBonus(money);
     G.money = (G.money || 0) + money;
   }
  }
@@ -708,7 +728,7 @@ function rankAllowsPokemon(maxRank, id){ return rankValue(getPokemonRank(id)) <=
 function rankBadgeHtml(id){ const rank = getPokemonRank(id); return `<span class="pokemon-rank-badge rank-${rank.toLowerCase()}">${rank}</span>`; }
 
 
-const BOX_FILTER_DEFAULTS = {region:'all', type:'all', shiny:'all', evo:'all', favorite:'all', locked:'all', iv:'all', ev:'all', rank:'all'};
+const BOX_FILTER_DEFAULTS = {region:'all', type:'all', shiny:'all', evo:'all', favorite:'all', locked:'all', iv:'all', ev:'all', rank:'all', search:''};
 const FILTER_LEVEL_EVO_MAP = {1:2, 2:3, 4:5, 5:6, 7:8, 8:9, 10:11, 11:12, 13:14, 14:15, 16:17, 17:18, 19:20, 21:22, 23:24, 27:28, 29:30, 32:33, 41:42, 43:44, 46:47, 48:49, 50:51, 52:53, 54:55, 56:57, 60:61, 63:64, 66:67, 69:70, 72:73, 74:75, 75:76, 77:78, 79:80, 81:82, 84:85, 86:87, 88:89, 92:93, 96:97, 98:99, 100:101, 104:105, 109:110, 111:112, 116:117, 118:119, 129:130, 138:139, 140:141, 147:148, 148:149, 152:153, 153:154, 155:156, 156:157, 158:159, 159:160, 161:162, 163:164, 165:166, 167:168, 170:171, 172:25, 173:35, 174:39, 175:176, 177:178, 179:180, 180:181, 183:184, 187:188, 188:189, 194:195, 204:205, 209:210, 216:217, 218:219, 220:221, 223:224, 228:229, 231:232, 236:106, 238:124, 239:125, 240:126, 246:247, 247:248, 252:253, 253:254, 255:256, 256:257, 258:259, 259:260, 261:262, 263:264, 265:266, 266:267, 268:269, 270:271, 273:274, 276:277, 278:279, 280:281, 281:282, 283:284, 285:286, 287:288, 288:289, 290:291, 293:294, 294:295, 296:297, 298:183, 304:305, 305:306, 307:308, 309:310, 316:317, 318:319, 320:321, 322:323, 328:329, 329:330, 331:332, 333:334, 339:340, 341:342, 343:344, 345:346, 347:348, 353:354, 355:356, 360:202, 361:362, 363:364, 364:365, 371:372, 372:373, 374:375, 375:376};
 const FILTER_STONE_EVO = {37:{firestone:38},58:{firestone:59},133:{firestone:136,waterstone:134,thunderstone:135},61:{waterstone:62,kings_rock:186},90:{waterstone:91},120:{waterstone:121},25:{thunderstone:26},44:{leafstone:45,sunstone:182},70:{leafstone:71},102:{leafstone:103},30:{moonstone:31},33:{moonstone:34},35:{moonstone:36},39:{moonstone:40},79:{kings_rock:200},95:{metal_coat:208},117:{dragon_scale:230},123:{metal_coat:212},137:{upgrade:233},191:{sunstone:192},271:{waterstone:272},274:{leafstone:275},300:{moonstone:301},366:{deep_sea_tooth:367,deep_sea_scale:368},349:{prism_scale:350}};
 
@@ -778,7 +798,7 @@ function canPokemonEvolveToUnowned(p){
  }
  return false;
 }
-function pokemonMatchesBoxFilters(p){
+function pokemonMatchesBoxFilters(p, ignoreSearch){
  const filters = ensureBoxFilters();
  if(!p) return false;
  if(filters.region && filters.region !== 'all' && getPokemonRegion(p.id) !== filters.region) return false;
@@ -798,61 +818,89 @@ function pokemonMatchesBoxFilters(p){
  if(filters.ev === 'complete' && evTotal < 36) return false;
  if(filters.ev === 'incomplete' && evTotal >= 36) return false;
  if(filters.rank && filters.rank !== 'all' && typeof getPokemonRank === 'function' && getPokemonRank(p.id) !== filters.rank) return false;
+ if(!ignoreSearch && filters.search){
+  const q = String(filters.search).toLowerCase().trim();
+  if(q){
+   const disp = (typeof getPokeName === 'function' ? getPokeName(p.id) : '') || '';
+   const hay = (disp + ' ' + (p.name || '') + ' #' + (p.id != null ? p.id : '')).toLowerCase();
+   if(!hay.includes(q)) return false;
+  }
+ }
  return true;
 }
-function applyPokemonBoxFilters(entries){
+// opts.ignoreSearch: contexts owning their own search field (unified
+// selector) must not inherit the box tab's text search invisibly.
+function applyPokemonBoxFilters(entries, opts){
  ensureBoxFilters();
- return (entries || []).filter(entry => pokemonMatchesBoxFilters(entry.p || entry.poke));
+ const ignoreSearch = !!(opts && opts.ignoreSearch);
+ return (entries || []).filter(entry => pokemonMatchesBoxFilters(entry.p || entry.poke, ignoreSearch));
 }
 function boxFilterOptionHtml(value, label, current){ return `<option value="${value}"${String(current)===String(value)?' selected':''}>${label}</option>`; }
-function renderBoxFiltersHtml(){
+// THE single filter toolbar (shared with the bag): the PC box bar renders
+// through the exact same DS FilterBar component — identical skeleton
+// (quick-filter chips + labeled selects + name search + reset), identical
+// look. Classic files cannot import: this goes through window.PokeUI.
+// opts.search !== false renders the name-search field; the unified selector
+// passes {search:false} because it owns its own top search input. opts.sorts
+// prepends sort chips (wave 15: legacy top TRI row removed).
+function renderBoxFiltersHtml(opts){
+ const comps = (typeof window !== 'undefined' && window.PokeUI && window.PokeUI.components) ? window.PokeUI.components : null;
+ if(!comps || typeof comps.filterBarHTML !== 'function') throw new Error('[ui] PokeUI components not loaded (filterBarHTML)');
+ const wantSearch = !opts || opts.search !== false;
  const filters = ensureBoxFilters();
  const regions = getBoxFilterRegions();
  const types = getBoxFilterTypes();
- const regionOptions = regions.map(r => boxFilterOptionHtml(r, r==='all'?t('box_filter_all_regions'):getRegionDisplayName(r), filters.region)).join('');
- const typeOptions = types.map(tp => boxFilterOptionHtml(tp, tp==='all'?t('box_filter_all_types'):tp, filters.type)).join('');
- const shinyOptions = [
-  ['all', t('box_filter_all_shiny')],
-  ['shiny', t('box_filter_shiny_only')],
-  ['normal', t('box_filter_non_shiny_only')]
- ].map(o => boxFilterOptionHtml(o[0], o[1], filters.shiny)).join('');
- const evoOptions = [
-  ['all', t('box_filter_all_evo')],
-  ['missing', t('box_filter_evo_missing')]
- ].map(o => boxFilterOptionHtml(o[0], o[1], filters.evo)).join('');
- const favoriteOptions = [
-  ['all', t('box_filter_all_favorites')],
-  ['favorite', t('box_filter_favorite_only')],
-  ['not_favorite', t('box_filter_not_favorite')]
- ].map(o => boxFilterOptionHtml(o[0], o[1], filters.favorite)).join('');
- const lockedOptions = [
-  ['all', t('box_filter_all_locked')],
-  ['locked', t('box_filter_locked_only')],
-  ['unlocked', t('box_filter_unlocked_only')]
- ].map(o => boxFilterOptionHtml(o[0], o[1], filters.locked)).join('');
- const ivOptions = [
-  ['all', t('box_filter_all_iv')],
-  ['complete', t('box_filter_iv_complete')],
-  ['incomplete', t('box_filter_iv_incomplete')]
- ].map(o => boxFilterOptionHtml(o[0], o[1], filters.iv)).join('');
- const evOptions = [
-  ['all', t('box_filter_all_ev')],
-  ['complete', t('box_filter_ev_complete')],
-  ['incomplete', t('box_filter_ev_incomplete')]
- ].map(o => boxFilterOptionHtml(o[0], o[1], filters.ev)).join('');
- const rankOptions = ['all','E','D','C','B','A','S'].map(r => boxFilterOptionHtml(r, r==='all'?t('box_filter_all_ranks'):r, filters.rank)).join('');
- return `<div class="box-filter-panel ui-control-toolbar ui-control-toolbar--box"><div class="box-filter-title">${t('filters_title')}</div>
-  <label><span>${t('box_filter_region')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'region', this.value">${regionOptions}</select></label>
-  <label><span>${t('box_filter_type')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'type', this.value">${typeOptions}</select></label>
-  <label><span>${t('box_filter_shiny')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'shiny', this.value">${shinyOptions}</select></label>
-  <label><span>${t('box_filter_evolution')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'evo', this.value">${evoOptions}</select></label>
-  <label><span>${t('box_filter_favorite')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'favorite', this.value">${favoriteOptions}</select></label>
-  <label><span>${t('box_filter_locked')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'locked', this.value">${lockedOptions}</select></label>
-  <label><span>${t('box_filter_iv')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'iv', this.value">${ivOptions}</select></label>
-  <label><span>${t('box_filter_ev')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'ev', this.value">${evOptions}</select></label>
-  <label><span>${t('box_filter_rank')}</span><select data-action="select-self" data-change-call="setBoxFilter" data-change-args="'rank', this.value">${rankOptions}</select></label>
-  <button class="hbtn" data-action="legacy-call" data-call="resetBoxFilters" data-call-args="">${t('box_filter_reset')}</button>
- </div>`;
+ const chip = (label, key, value) => ({
+  label: label,
+  active: String(filters[key]) === String(value),
+  call: 'setBoxFilter',
+  callArgs: `'${key}','${value}'`,
+ });
+ // Wave 15 (user feedback): the legacy TRI button row ON TOP of the USM
+ // is gone — sort chips live INSIDE the one FilterBar (same bar as the bag).
+ // opts.sorts: [{ label, active, dir, call, callArgs }] built by the caller
+ // (sort state is owned by the unified selector module).
+ const sortChips = (opts && Array.isArray(opts.sorts)) ? opts.sorts : [];
+ const model = {
+  chips: [
+   ...sortChips.map((sc, i) => ({
+     label: sc.label,
+     active: !!sc.active,
+     call: sc.call,
+     callArgs: sc.callArgs,
+     extraClass: 'usm-sort-btn usm-sort-chip' + (i === sortChips.length - 1 ? ' usm-sort-chip-last' : ''),
+     // data-sort locates a criterion independently of the locale text;
+     // data-dir carries the ▲/▼ marker for the CSS content:attr() marker.
+     data: Object.assign({ sort: sc.sort || '' }, (sc.active && sc.dir) ? { dir: sc.dir } : {}),
+   })),
+   chip(t('box_filter_all_shiny'), 'shiny', 'all'),
+   chip('★ ' + t('box_filter_shiny_only'), 'shiny', 'shiny'),
+   chip(t('box_filter_non_shiny_only'), 'shiny', 'normal'),
+   chip(t('box_filter_favorite_only'), 'favorite', filters.favorite === 'favorite' ? 'all' : 'favorite'),
+   chip(t('box_filter_locked_only'), 'locked', filters.locked === 'locked' ? 'all' : 'locked'),
+  ],
+  fields: [
+   { label: t('box_filter_region'), name: 'box-filter-region', changeCall: 'setBoxFilter', changeArgs: "'region', this.value", current: filters.region,
+     options: regions.map(r => ({ value: r, label: r === 'all' ? t('box_filter_all_regions') : getRegionDisplayName(r) })) },
+   { label: t('box_filter_type'), name: 'box-filter-type', changeCall: 'setBoxFilter', changeArgs: "'type', this.value", current: filters.type,
+     options: types.map(tp => ({ value: tp, label: tp === 'all' ? t('box_filter_all_types') : tp })) },
+   { label: t('box_filter_evolution'), name: 'box-filter-evo', changeCall: 'setBoxFilter', changeArgs: "'evo', this.value", current: filters.evo,
+     options: [{ value: 'all', label: t('box_filter_all_evo') }, { value: 'missing', label: t('box_filter_evo_missing') }] },
+   { label: t('box_filter_iv'), name: 'box-filter-iv', changeCall: 'setBoxFilter', changeArgs: "'iv', this.value", current: filters.iv,
+     options: [{ value: 'all', label: t('box_filter_all_iv') }, { value: 'complete', label: t('box_filter_iv_complete') }, { value: 'incomplete', label: t('box_filter_iv_incomplete') }] },
+   { label: t('box_filter_ev'), name: 'box-filter-ev', changeCall: 'setBoxFilter', changeArgs: "'ev', this.value", current: filters.ev,
+     options: [{ value: 'all', label: t('box_filter_all_ev') }, { value: 'complete', label: t('box_filter_ev_complete') }, { value: 'incomplete', label: t('box_filter_ev_incomplete') }] },
+   { label: t('box_filter_rank'), name: 'box-filter-rank', changeCall: 'setBoxFilter', changeArgs: "'rank', this.value", current: filters.rank,
+     options: ['all', 'E', 'D', 'C', 'B', 'A', 'S'].map(r => ({ value: r, label: r === 'all' ? t('box_filter_all_ranks') : r })) },
+  ],
+  search: wantSearch ? {
+   value: filters.search || '',
+   placeholder: t('box_filter_search_placeholder'),
+   action: 'filter-box',
+  } : null,
+  reset: { label: t('box_filter_reset'), call: 'resetBoxFilters' },
+ };
+ return comps.filterBarHTML(model);
 }
 function setBoxFilter(key, value){
  const filters = ensureBoxFilters();
@@ -868,11 +916,19 @@ function resetBoxFilters(){
  try{ const tab = document.getElementById('tab-content'); if(tab && typeof _activeTab !== 'undefined' && _activeTab === 'box') renderBox(tab); }catch(_){}
  try{ saveGame(false); }catch(_){}
 }
+// Text search (same ergonomics as the bag): updates instantly without a save
+// hit per keystroke; the filter is folded into the next regular save.
+function setBoxSearch(value){
+ ensureBoxFilters();
+ G.boxFilters.search = String(value || '');
+ try{ if(typeof renderUnifiedGrid === 'function') renderUnifiedGrid(); }catch(_){}
+ try{ const tab = document.getElementById('tab-content'); if(tab && typeof _activeTab !== 'undefined' && _activeTab === 'box') renderBox(tab); }catch(_){}
+}
 
 
-// ── Passe 26 : « où trouver » un objet (section du panneau d'info objet) ──
-// Retourne une liste de libellés lisibles (routes, boutiques — stock de base
-// + stock CT/CS —, mine, atoll, quêtes, laboratoire fossile).
+// ── Phase 26: "where to find" an item (item info panel section) ──
+// Returns a list of readable labels (routes, shops — base stock
+// + TM/HM stock —, mine, atoll, quests, fossil lab).
 function getItemSourceList(key){
  const out=[];
  const add=(s)=>{ if(s && !out.includes(s)) out.push(s); };
@@ -898,8 +954,8 @@ function getItemSourceList(key){
  return out;
 }
 
-// ── Passe 26 : qui peut apprendre une attaque (panneau d'info attaque) ─────
-// Classe par catégorie de légitimité du jeu : niveau / CT-CS / dressage.
+// ── Phase 26: who can learn a move (move info panel) ──
+// Sorted by the game's legitimacy category: level / TM-HM / training.
 function getMoveLearners(moveId){
  var cache=getMoveLearners._cache || (getMoveLearners._cache={});
  if(cache[moveId]) return cache[moveId];
@@ -923,7 +979,7 @@ function getMoveLearners(moveId){
 // --- Migrated to ES module, globals exposed ---
 
 
-// PokeChill-style move learning: utilise le pool déterministe par espèce
+// PokeChill-style move learning: uses the deterministic per-species pool
 function learnPkmnMove(id, level) {
   var pool = getSpeciesMovePool(id);
   if (!pool || pool.length === 0) return 'tackle';
@@ -967,80 +1023,81 @@ function isHiddenAbility(speciesId, abilityKey) {
   return pt[Number(speciesId)] && pt[Number(speciesId)].hiddenAbility === abilityKey;
 }
 
-if (typeof ensureBoxFilters !== 'undefined' && typeof window !== 'undefined') window.ensureBoxFilters = ensureBoxFilters;
-if (typeof getPokemonRegion !== 'undefined' && typeof window !== 'undefined') window.getPokemonRegion = getPokemonRegion;
-if (typeof getUnlockedRegionsForPokedex !== 'undefined' && typeof window !== 'undefined') window.getUnlockedRegionsForPokedex = getUnlockedRegionsForPokedex;
-if (typeof getUnlockedDexIds !== 'undefined' && typeof window !== 'undefined') window.getUnlockedDexIds = getUnlockedDexIds;
-if (typeof isEvolutionTargetObtained !== 'undefined' && typeof window !== 'undefined') window.isEvolutionTargetObtained = isEvolutionTargetObtained;
-if (typeof canPokemonEvolveToUnowned !== 'undefined' && typeof window !== 'undefined') window.canPokemonEvolveToUnowned = canPokemonEvolveToUnowned;
-if (typeof pokemonMatchesBoxFilters !== 'undefined' && typeof window !== 'undefined') window.pokemonMatchesBoxFilters = pokemonMatchesBoxFilters;
-if (typeof applyPokemonBoxFilters !== 'undefined' && typeof window !== 'undefined') window.applyPokemonBoxFilters = applyPokemonBoxFilters;
-if (typeof renderBoxFiltersHtml !== 'undefined' && typeof window !== 'undefined') window.renderBoxFiltersHtml = renderBoxFiltersHtml;
-if (typeof setBoxFilter !== 'undefined' && typeof window !== 'undefined') window.setBoxFilter = setBoxFilter;
-if (typeof resetBoxFilters !== 'undefined' && typeof window !== 'undefined') window.resetBoxFilters = resetBoxFilters;
-if (typeof getRegionMeta !== 'undefined' && typeof window !== 'undefined') window.getRegionMeta = getRegionMeta;
-if (typeof getRegionDisplayName !== 'undefined' && typeof window !== 'undefined') window.getRegionDisplayName = getRegionDisplayName;
-if (typeof isPokemonNativeToRegion !== 'undefined' && typeof window !== 'undefined') window.isPokemonNativeToRegion = isPokemonNativeToRegion;
-if (typeof countCaughtInRegion !== 'undefined' && typeof window !== 'undefined') window.countCaughtInRegion = countCaughtInRegion;
-if (typeof getRegionPokedexTotal !== 'undefined' && typeof window !== 'undefined') window.getRegionPokedexTotal = getRegionPokedexTotal;
-if (typeof isRegionDexComplete !== 'undefined' && typeof window !== 'undefined') window.isRegionDexComplete = isRegionDexComplete;
-if (typeof isKalosCompleted !== 'undefined' && typeof window !== 'undefined') window.isKalosCompleted = isKalosCompleted;
-if (typeof ensureRegionProgress !== 'undefined' && typeof window !== 'undefined') window.ensureRegionProgress = ensureRegionProgress;
-if (typeof isRegionLeagueWon !== 'undefined' && typeof window !== 'undefined') window.isRegionLeagueWon = isRegionLeagueWon;
-if (typeof markRegionLeagueWon !== 'undefined' && typeof window !== 'undefined') window.markRegionLeagueWon = markRegionLeagueWon;
-if (typeof getRegionAccessStatus !== 'undefined' && typeof window !== 'undefined') window.getRegionAccessStatus = getRegionAccessStatus;
-if (typeof canAccessRegion !== 'undefined' && typeof window !== 'undefined') window.canAccessRegion = canAccessRegion;
-if (typeof regionAccessMessage !== 'undefined' && typeof window !== 'undefined') window.regionAccessMessage = regionAccessMessage;
-if (typeof regionRequiresNativeTeam !== 'undefined' && typeof window !== 'undefined') window.regionRequiresNativeTeam = regionRequiresNativeTeam;
-if (typeof getInvalidTeamPokemonForRegion !== 'undefined' && typeof window !== 'undefined') window.getInvalidTeamPokemonForRegion = getInvalidTeamPokemonForRegion;
-if (typeof canUseCurrentTeamForRegion !== 'undefined' && typeof window !== 'undefined') window.canUseCurrentTeamForRegion = canUseCurrentTeamForRegion;
-if (typeof regionTeamRestrictionMessage !== 'undefined' && typeof window !== 'undefined') window.regionTeamRestrictionMessage = regionTeamRestrictionMessage;
-if (typeof getLeagueChampionIdForRegion !== 'undefined' && typeof window !== 'undefined') window.getLeagueChampionIdForRegion = getLeagueChampionIdForRegion;
-if (typeof getLeagueRegionForChampion !== 'undefined' && typeof window !== 'undefined') window.getLeagueRegionForChampion = getLeagueRegionForChampion;
-if (typeof isLeagueChampionId !== 'undefined' && typeof window !== 'undefined') window.isLeagueChampionId = isLeagueChampionId;
-if (typeof getSpeciesTalents !== 'undefined' && typeof window !== 'undefined') window.getSpeciesTalents = getSpeciesTalents;
-if (typeof getTalentByKey !== 'undefined' && typeof window !== 'undefined') window.getTalentByKey = getTalentByKey;
-if (typeof getTalentRecord !== 'undefined' && typeof window !== 'undefined') window.getTalentRecord = getTalentRecord;
-if (typeof getTypeName !== 'undefined' && typeof window !== 'undefined') window.getTypeName = getTypeName;
-if (typeof getRarityLabel !== 'undefined' && typeof window !== 'undefined') window.getRarityLabel = getRarityLabel;
-if (typeof getTalentName !== 'undefined' && typeof window !== 'undefined') window.getTalentName = getTalentName;
-if (typeof getTalentDesc !== 'undefined' && typeof window !== 'undefined') window.getTalentDesc = getTalentDesc;
-if (typeof isTalentHidden !== 'undefined' && typeof window !== 'undefined') window.isTalentHidden = isTalentHidden;
-if (typeof unlockTalentForSpecies !== 'undefined' && typeof window !== 'undefined') window.unlockTalentForSpecies = unlockTalentForSpecies;
-if (typeof getMovesForSpeciesLevel !== 'undefined' && typeof window !== 'undefined') window.getMovesForSpeciesLevel = getMovesForSpeciesLevel;
-if (typeof getSpeciesMovePool !== 'undefined' && typeof window !== 'undefined') window.getSpeciesMovePool = getSpeciesMovePool;
-if (typeof getSpeciesFullLearnablePool !== 'undefined' && typeof window !== 'undefined') window.getSpeciesFullLearnablePool = getSpeciesFullLearnablePool;
-if (typeof getMoveLearnLevel !== 'undefined' && typeof window !== 'undefined') window.getMoveLearnLevel = getMoveLearnLevel;
-if (typeof getCtCsMoveIds !== 'undefined' && typeof window !== 'undefined') window.getCtCsMoveIds = getCtCsMoveIds;
-if (typeof getSpeciesTrainingOnlyPool !== 'undefined' && typeof window !== 'undefined') window.getSpeciesTrainingOnlyPool = getSpeciesTrainingOnlyPool;
-if (typeof getMoveCountForLevel !== 'undefined' && typeof window !== 'undefined') window.getMoveCountForLevel = getMoveCountForLevel;
-if (typeof getMovesForLevel !== 'undefined' && typeof window !== 'undefined') window.getMovesForLevel = getMovesForLevel;
-if (typeof calcStat !== 'undefined' && typeof window !== 'undefined') window.calcStat = calcStat;
-if (typeof recalcPokeStats !== 'undefined' && typeof window !== 'undefined') window.recalcPokeStats = recalcPokeStats;
-if (typeof renderStars !== 'undefined' && typeof window !== 'undefined') window.renderStars = renderStars;
-if (typeof isShinyDisplay !== 'undefined' && typeof window !== 'undefined') window.isShinyDisplay = isShinyDisplay;
-if (typeof xpForLevel !== 'undefined' && typeof window !== 'undefined') window.xpForLevel = xpForLevel;
-if (typeof applyRouteLinkGroups !== 'undefined' && typeof window !== 'undefined') window.applyRouteLinkGroups = applyRouteLinkGroups;
-if (typeof getLinkedRouteIds !== 'undefined' && typeof window !== 'undefined') window.getLinkedRouteIds = getLinkedRouteIds;
-if (typeof getDuplicateItemPayout !== 'undefined' && typeof window !== 'undefined') window.getDuplicateItemPayout = getDuplicateItemPayout;
-if (typeof grantRewardItem !== 'undefined' && typeof window !== 'undefined') window.grantRewardItem = grantRewardItem;
-if (typeof grantRewardItems !== 'undefined' && typeof window !== 'undefined') window.grantRewardItems = grantRewardItems;
-if (typeof getItemStackLimit !== 'undefined' && typeof window !== 'undefined') window.getItemStackLimit = getItemStackLimit;
-if (typeof getShopName !== 'undefined' && typeof window !== 'undefined') window.getShopName = getShopName;
-if (typeof getItemSourceList !== 'undefined' && typeof window !== 'undefined') window.getItemSourceList = getItemSourceList;
-if (typeof getMoveLearners !== 'undefined' && typeof window !== 'undefined') window.getMoveLearners = getMoveLearners;
-if (typeof getPokemonBaseStatTotal !== 'undefined' && typeof window !== 'undefined') window.getPokemonBaseStatTotal = getPokemonBaseStatTotal;
-if (typeof getPokemonRank !== 'undefined' && typeof window !== 'undefined') window.getPokemonRank = getPokemonRank;
-if (typeof rankValue !== 'undefined' && typeof window !== 'undefined') window.rankValue = rankValue;
-if (typeof rankAllowsPokemon !== 'undefined' && typeof window !== 'undefined') window.rankAllowsPokemon = rankAllowsPokemon;
-if (typeof rankBadgeHtml !== 'undefined' && typeof window !== 'undefined') window.rankBadgeHtml = rankBadgeHtml;
+if (typeof ensureBoxFilters !== 'undefined') { if (typeof window !== 'undefined') window.ensureBoxFilters = ensureBoxFilters; if (typeof globalThis !== 'undefined') globalThis.ensureBoxFilters = ensureBoxFilters; }
+if (typeof getPokemonRegion !== 'undefined') { if (typeof window !== 'undefined') window.getPokemonRegion = getPokemonRegion; if (typeof globalThis !== 'undefined') globalThis.getPokemonRegion = getPokemonRegion; }
+if (typeof getUnlockedRegionsForPokedex !== 'undefined') { if (typeof window !== 'undefined') window.getUnlockedRegionsForPokedex = getUnlockedRegionsForPokedex; if (typeof globalThis !== 'undefined') globalThis.getUnlockedRegionsForPokedex = getUnlockedRegionsForPokedex; }
+if (typeof getUnlockedDexIds !== 'undefined') { if (typeof window !== 'undefined') window.getUnlockedDexIds = getUnlockedDexIds; if (typeof globalThis !== 'undefined') globalThis.getUnlockedDexIds = getUnlockedDexIds; }
+if (typeof isEvolutionTargetObtained !== 'undefined') { if (typeof window !== 'undefined') window.isEvolutionTargetObtained = isEvolutionTargetObtained; if (typeof globalThis !== 'undefined') globalThis.isEvolutionTargetObtained = isEvolutionTargetObtained; }
+if (typeof canPokemonEvolveToUnowned !== 'undefined') { if (typeof window !== 'undefined') window.canPokemonEvolveToUnowned = canPokemonEvolveToUnowned; if (typeof globalThis !== 'undefined') globalThis.canPokemonEvolveToUnowned = canPokemonEvolveToUnowned; }
+if (typeof pokemonMatchesBoxFilters !== 'undefined') { if (typeof window !== 'undefined') window.pokemonMatchesBoxFilters = pokemonMatchesBoxFilters; if (typeof globalThis !== 'undefined') globalThis.pokemonMatchesBoxFilters = pokemonMatchesBoxFilters; }
+if (typeof applyPokemonBoxFilters !== 'undefined') { if (typeof window !== 'undefined') window.applyPokemonBoxFilters = applyPokemonBoxFilters; if (typeof globalThis !== 'undefined') globalThis.applyPokemonBoxFilters = applyPokemonBoxFilters; }
+if (typeof renderBoxFiltersHtml !== 'undefined') { if (typeof window !== 'undefined') window.renderBoxFiltersHtml = renderBoxFiltersHtml; if (typeof globalThis !== 'undefined') globalThis.renderBoxFiltersHtml = renderBoxFiltersHtml; }
+if (typeof setBoxFilter !== 'undefined') { if (typeof window !== 'undefined') window.setBoxFilter = setBoxFilter; if (typeof globalThis !== 'undefined') globalThis.setBoxFilter = setBoxFilter; }
+if (typeof resetBoxFilters !== 'undefined') { if (typeof window !== 'undefined') window.resetBoxFilters = resetBoxFilters; if (typeof globalThis !== 'undefined') globalThis.resetBoxFilters = resetBoxFilters; }
+if (typeof setBoxSearch !== 'undefined') { if (typeof window !== 'undefined') window.setBoxSearch = setBoxSearch; if (typeof globalThis !== 'undefined') globalThis.setBoxSearch = setBoxSearch; }
+if (typeof getRegionMeta !== 'undefined') { if (typeof window !== 'undefined') window.getRegionMeta = getRegionMeta; if (typeof globalThis !== 'undefined') globalThis.getRegionMeta = getRegionMeta; }
+if (typeof getRegionDisplayName !== 'undefined') { if (typeof window !== 'undefined') window.getRegionDisplayName = getRegionDisplayName; if (typeof globalThis !== 'undefined') globalThis.getRegionDisplayName = getRegionDisplayName; }
+if (typeof isPokemonNativeToRegion !== 'undefined') { if (typeof window !== 'undefined') window.isPokemonNativeToRegion = isPokemonNativeToRegion; if (typeof globalThis !== 'undefined') globalThis.isPokemonNativeToRegion = isPokemonNativeToRegion; }
+if (typeof countCaughtInRegion !== 'undefined') { if (typeof window !== 'undefined') window.countCaughtInRegion = countCaughtInRegion; if (typeof globalThis !== 'undefined') globalThis.countCaughtInRegion = countCaughtInRegion; }
+if (typeof getRegionPokedexTotal !== 'undefined') { if (typeof window !== 'undefined') window.getRegionPokedexTotal = getRegionPokedexTotal; if (typeof globalThis !== 'undefined') globalThis.getRegionPokedexTotal = getRegionPokedexTotal; }
+if (typeof isRegionDexComplete !== 'undefined') { if (typeof window !== 'undefined') window.isRegionDexComplete = isRegionDexComplete; if (typeof globalThis !== 'undefined') globalThis.isRegionDexComplete = isRegionDexComplete; }
+if (typeof isKalosCompleted !== 'undefined') { if (typeof window !== 'undefined') window.isKalosCompleted = isKalosCompleted; if (typeof globalThis !== 'undefined') globalThis.isKalosCompleted = isKalosCompleted; }
+if (typeof ensureRegionProgress !== 'undefined') { if (typeof window !== 'undefined') window.ensureRegionProgress = ensureRegionProgress; if (typeof globalThis !== 'undefined') globalThis.ensureRegionProgress = ensureRegionProgress; }
+if (typeof isRegionLeagueWon !== 'undefined') { if (typeof window !== 'undefined') window.isRegionLeagueWon = isRegionLeagueWon; if (typeof globalThis !== 'undefined') globalThis.isRegionLeagueWon = isRegionLeagueWon; }
+if (typeof markRegionLeagueWon !== 'undefined') { if (typeof window !== 'undefined') window.markRegionLeagueWon = markRegionLeagueWon; if (typeof globalThis !== 'undefined') globalThis.markRegionLeagueWon = markRegionLeagueWon; }
+if (typeof getRegionAccessStatus !== 'undefined') { if (typeof window !== 'undefined') window.getRegionAccessStatus = getRegionAccessStatus; if (typeof globalThis !== 'undefined') globalThis.getRegionAccessStatus = getRegionAccessStatus; }
+if (typeof canAccessRegion !== 'undefined') { if (typeof window !== 'undefined') window.canAccessRegion = canAccessRegion; if (typeof globalThis !== 'undefined') globalThis.canAccessRegion = canAccessRegion; }
+if (typeof regionAccessMessage !== 'undefined') { if (typeof window !== 'undefined') window.regionAccessMessage = regionAccessMessage; if (typeof globalThis !== 'undefined') globalThis.regionAccessMessage = regionAccessMessage; }
+if (typeof regionRequiresNativeTeam !== 'undefined') { if (typeof window !== 'undefined') window.regionRequiresNativeTeam = regionRequiresNativeTeam; if (typeof globalThis !== 'undefined') globalThis.regionRequiresNativeTeam = regionRequiresNativeTeam; }
+if (typeof getInvalidTeamPokemonForRegion !== 'undefined') { if (typeof window !== 'undefined') window.getInvalidTeamPokemonForRegion = getInvalidTeamPokemonForRegion; if (typeof globalThis !== 'undefined') globalThis.getInvalidTeamPokemonForRegion = getInvalidTeamPokemonForRegion; }
+if (typeof canUseCurrentTeamForRegion !== 'undefined') { if (typeof window !== 'undefined') window.canUseCurrentTeamForRegion = canUseCurrentTeamForRegion; if (typeof globalThis !== 'undefined') globalThis.canUseCurrentTeamForRegion = canUseCurrentTeamForRegion; }
+if (typeof regionTeamRestrictionMessage !== 'undefined') { if (typeof window !== 'undefined') window.regionTeamRestrictionMessage = regionTeamRestrictionMessage; if (typeof globalThis !== 'undefined') globalThis.regionTeamRestrictionMessage = regionTeamRestrictionMessage; }
+if (typeof getLeagueChampionIdForRegion !== 'undefined') { if (typeof window !== 'undefined') window.getLeagueChampionIdForRegion = getLeagueChampionIdForRegion; if (typeof globalThis !== 'undefined') globalThis.getLeagueChampionIdForRegion = getLeagueChampionIdForRegion; }
+if (typeof getLeagueRegionForChampion !== 'undefined') { if (typeof window !== 'undefined') window.getLeagueRegionForChampion = getLeagueRegionForChampion; if (typeof globalThis !== 'undefined') globalThis.getLeagueRegionForChampion = getLeagueRegionForChampion; }
+if (typeof isLeagueChampionId !== 'undefined') { if (typeof window !== 'undefined') window.isLeagueChampionId = isLeagueChampionId; if (typeof globalThis !== 'undefined') globalThis.isLeagueChampionId = isLeagueChampionId; }
+if (typeof getSpeciesTalents !== 'undefined') { if (typeof window !== 'undefined') window.getSpeciesTalents = getSpeciesTalents; if (typeof globalThis !== 'undefined') globalThis.getSpeciesTalents = getSpeciesTalents; }
+if (typeof getTalentByKey !== 'undefined') { if (typeof window !== 'undefined') window.getTalentByKey = getTalentByKey; if (typeof globalThis !== 'undefined') globalThis.getTalentByKey = getTalentByKey; }
+if (typeof getTalentRecord !== 'undefined') { if (typeof window !== 'undefined') window.getTalentRecord = getTalentRecord; if (typeof globalThis !== 'undefined') globalThis.getTalentRecord = getTalentRecord; }
+if (typeof getTypeName !== 'undefined') { if (typeof window !== 'undefined') window.getTypeName = getTypeName; if (typeof globalThis !== 'undefined') globalThis.getTypeName = getTypeName; }
+if (typeof getRarityLabel !== 'undefined') { if (typeof window !== 'undefined') window.getRarityLabel = getRarityLabel; if (typeof globalThis !== 'undefined') globalThis.getRarityLabel = getRarityLabel; }
+if (typeof getTalentName !== 'undefined') { if (typeof window !== 'undefined') window.getTalentName = getTalentName; if (typeof globalThis !== 'undefined') globalThis.getTalentName = getTalentName; }
+if (typeof getTalentDesc !== 'undefined') { if (typeof window !== 'undefined') window.getTalentDesc = getTalentDesc; if (typeof globalThis !== 'undefined') globalThis.getTalentDesc = getTalentDesc; }
+if (typeof isTalentHidden !== 'undefined') { if (typeof window !== 'undefined') window.isTalentHidden = isTalentHidden; if (typeof globalThis !== 'undefined') globalThis.isTalentHidden = isTalentHidden; }
+if (typeof unlockTalentForSpecies !== 'undefined') { if (typeof window !== 'undefined') window.unlockTalentForSpecies = unlockTalentForSpecies; if (typeof globalThis !== 'undefined') globalThis.unlockTalentForSpecies = unlockTalentForSpecies; }
+if (typeof getMovesForSpeciesLevel !== 'undefined') { if (typeof window !== 'undefined') window.getMovesForSpeciesLevel = getMovesForSpeciesLevel; if (typeof globalThis !== 'undefined') globalThis.getMovesForSpeciesLevel = getMovesForSpeciesLevel; }
+if (typeof getSpeciesMovePool !== 'undefined') { if (typeof window !== 'undefined') window.getSpeciesMovePool = getSpeciesMovePool; if (typeof globalThis !== 'undefined') globalThis.getSpeciesMovePool = getSpeciesMovePool; }
+if (typeof getSpeciesFullLearnablePool !== 'undefined') { if (typeof window !== 'undefined') window.getSpeciesFullLearnablePool = getSpeciesFullLearnablePool; if (typeof globalThis !== 'undefined') globalThis.getSpeciesFullLearnablePool = getSpeciesFullLearnablePool; }
+if (typeof getMoveLearnLevel !== 'undefined') { if (typeof window !== 'undefined') window.getMoveLearnLevel = getMoveLearnLevel; if (typeof globalThis !== 'undefined') globalThis.getMoveLearnLevel = getMoveLearnLevel; }
+if (typeof getCtCsMoveIds !== 'undefined') { if (typeof window !== 'undefined') window.getCtCsMoveIds = getCtCsMoveIds; if (typeof globalThis !== 'undefined') globalThis.getCtCsMoveIds = getCtCsMoveIds; }
+if (typeof getSpeciesTrainingOnlyPool !== 'undefined') { if (typeof window !== 'undefined') window.getSpeciesTrainingOnlyPool = getSpeciesTrainingOnlyPool; if (typeof globalThis !== 'undefined') globalThis.getSpeciesTrainingOnlyPool = getSpeciesTrainingOnlyPool; }
+if (typeof getMoveCountForLevel !== 'undefined') { if (typeof window !== 'undefined') window.getMoveCountForLevel = getMoveCountForLevel; if (typeof globalThis !== 'undefined') globalThis.getMoveCountForLevel = getMoveCountForLevel; }
+if (typeof getMovesForLevel !== 'undefined') { if (typeof window !== 'undefined') window.getMovesForLevel = getMovesForLevel; if (typeof globalThis !== 'undefined') globalThis.getMovesForLevel = getMovesForLevel; }
+if (typeof calcStat !== 'undefined') { if (typeof window !== 'undefined') window.calcStat = calcStat; if (typeof globalThis !== 'undefined') globalThis.calcStat = calcStat; }
+if (typeof recalcPokeStats !== 'undefined') { if (typeof window !== 'undefined') window.recalcPokeStats = recalcPokeStats; if (typeof globalThis !== 'undefined') globalThis.recalcPokeStats = recalcPokeStats; }
+if (typeof renderStars !== 'undefined') { if (typeof window !== 'undefined') window.renderStars = renderStars; if (typeof globalThis !== 'undefined') globalThis.renderStars = renderStars; }
+if (typeof isShinyDisplay !== 'undefined') { if (typeof window !== 'undefined') window.isShinyDisplay = isShinyDisplay; if (typeof globalThis !== 'undefined') globalThis.isShinyDisplay = isShinyDisplay; }
+if (typeof xpForLevel !== 'undefined') { if (typeof window !== 'undefined') window.xpForLevel = xpForLevel; if (typeof globalThis !== 'undefined') globalThis.xpForLevel = xpForLevel; }
+if (typeof applyRouteLinkGroups !== 'undefined') { if (typeof window !== 'undefined') window.applyRouteLinkGroups = applyRouteLinkGroups; if (typeof globalThis !== 'undefined') globalThis.applyRouteLinkGroups = applyRouteLinkGroups; }
+if (typeof getLinkedRouteIds !== 'undefined') { if (typeof window !== 'undefined') window.getLinkedRouteIds = getLinkedRouteIds; if (typeof globalThis !== 'undefined') globalThis.getLinkedRouteIds = getLinkedRouteIds; }
+if (typeof getDuplicateItemPayout !== 'undefined') { if (typeof window !== 'undefined') window.getDuplicateItemPayout = getDuplicateItemPayout; if (typeof globalThis !== 'undefined') globalThis.getDuplicateItemPayout = getDuplicateItemPayout; }
+if (typeof grantRewardItem !== 'undefined') { if (typeof window !== 'undefined') window.grantRewardItem = grantRewardItem; if (typeof globalThis !== 'undefined') globalThis.grantRewardItem = grantRewardItem; }
+if (typeof grantRewardItems !== 'undefined') { if (typeof window !== 'undefined') window.grantRewardItems = grantRewardItems; if (typeof globalThis !== 'undefined') globalThis.grantRewardItems = grantRewardItems; }
+if (typeof getItemStackLimit !== 'undefined') { if (typeof window !== 'undefined') window.getItemStackLimit = getItemStackLimit; if (typeof globalThis !== 'undefined') globalThis.getItemStackLimit = getItemStackLimit; }
+if (typeof getShopName !== 'undefined') { if (typeof window !== 'undefined') window.getShopName = getShopName; if (typeof globalThis !== 'undefined') globalThis.getShopName = getShopName; }
+if (typeof getItemSourceList !== 'undefined') { if (typeof window !== 'undefined') window.getItemSourceList = getItemSourceList; if (typeof globalThis !== 'undefined') globalThis.getItemSourceList = getItemSourceList; }
+if (typeof getMoveLearners !== 'undefined') { if (typeof window !== 'undefined') window.getMoveLearners = getMoveLearners; if (typeof globalThis !== 'undefined') globalThis.getMoveLearners = getMoveLearners; }
+if (typeof getPokemonBaseStatTotal !== 'undefined') { if (typeof window !== 'undefined') window.getPokemonBaseStatTotal = getPokemonBaseStatTotal; if (typeof globalThis !== 'undefined') globalThis.getPokemonBaseStatTotal = getPokemonBaseStatTotal; }
+if (typeof getPokemonRank !== 'undefined') { if (typeof window !== 'undefined') window.getPokemonRank = getPokemonRank; if (typeof globalThis !== 'undefined') globalThis.getPokemonRank = getPokemonRank; }
+if (typeof rankValue !== 'undefined') { if (typeof window !== 'undefined') window.rankValue = rankValue; if (typeof globalThis !== 'undefined') globalThis.rankValue = rankValue; }
+if (typeof rankAllowsPokemon !== 'undefined') { if (typeof window !== 'undefined') window.rankAllowsPokemon = rankAllowsPokemon; if (typeof globalThis !== 'undefined') globalThis.rankAllowsPokemon = rankAllowsPokemon; }
+if (typeof rankBadgeHtml !== 'undefined') { if (typeof window !== 'undefined') window.rankBadgeHtml = rankBadgeHtml; if (typeof globalThis !== 'undefined') globalThis.rankBadgeHtml = rankBadgeHtml; }
 
 
 
-if (typeof learnPkmnMove !== 'undefined' && typeof window !== 'undefined') window.learnPkmnMove = learnPkmnMove;
-if (typeof learnPkmnAbility !== 'undefined' && typeof window !== 'undefined') window.learnPkmnAbility = learnPkmnAbility;
-if (typeof isHiddenAbility !== 'undefined' && typeof window !== 'undefined') window.isHiddenAbility = isHiddenAbility;
-if (typeof getLocObj !== 'undefined' && typeof window !== 'undefined') window.getLocObj = getLocObj;
+if (typeof learnPkmnMove !== 'undefined') { if (typeof window !== 'undefined') window.learnPkmnMove = learnPkmnMove; if (typeof globalThis !== 'undefined') globalThis.learnPkmnMove = learnPkmnMove; }
+if (typeof learnPkmnAbility !== 'undefined') { if (typeof window !== 'undefined') window.learnPkmnAbility = learnPkmnAbility; if (typeof globalThis !== 'undefined') globalThis.learnPkmnAbility = learnPkmnAbility; }
+if (typeof isHiddenAbility !== 'undefined') { if (typeof window !== 'undefined') window.isHiddenAbility = isHiddenAbility; if (typeof globalThis !== 'undefined') globalThis.isHiddenAbility = isHiddenAbility; }
+if (typeof getLocObj !== 'undefined') { if (typeof window !== 'undefined') window.getLocObj = getLocObj; if (typeof globalThis !== 'undefined') globalThis.getLocObj = getLocObj; }
 
 let _boxUidCounter = 1;
 function generateUniqueBoxId(speciesId) {
@@ -1054,3 +1111,107 @@ function generateUniqueBoxId(speciesId) {
   return candidate;
 }
 if (typeof window !== 'undefined') window.generateUniqueBoxId = generateUniqueBoxId;
+
+// --- Exported globals ---
+if (typeof boxFilterOptionHtml !== 'undefined') { if (typeof window !== 'undefined') window.boxFilterOptionHtml = boxFilterOptionHtml; if (typeof globalThis !== 'undefined') globalThis.boxFilterOptionHtml = boxFilterOptionHtml; }
+if (typeof getAutoRouteLinkGroups !== 'undefined') { if (typeof window !== 'undefined') window.getAutoRouteLinkGroups = getAutoRouteLinkGroups; if (typeof globalThis !== 'undefined') globalThis.getAutoRouteLinkGroups = getAutoRouteLinkGroups; }
+if (typeof getBoxFilterRegions !== 'undefined') { if (typeof window !== 'undefined') window.getBoxFilterRegions = getBoxFilterRegions; if (typeof globalThis !== 'undefined') globalThis.getBoxFilterRegions = getBoxFilterRegions; }
+if (typeof getBoxFilterTypes !== 'undefined') { if (typeof window !== 'undefined') window.getBoxFilterTypes = getBoxFilterTypes; if (typeof globalThis !== 'undefined') globalThis.getBoxFilterTypes = getBoxFilterTypes; }
+if (typeof getPreviousRegion !== 'undefined') { if (typeof window !== 'undefined') window.getPreviousRegion = getPreviousRegion; if (typeof globalThis !== 'undefined') globalThis.getPreviousRegion = getPreviousRegion; }
+
+// Wave 40 — native ESM module: grouped export of the same names as the
+// classic surface kept above/here (bodies unchanged).
+export {
+  REGION_ORDER,
+  ensureBoxFilters,
+  getPokemonRegion,
+  getUnlockedRegionsForPokedex,
+  getUnlockedDexIds,
+  isEvolutionTargetObtained,
+  canPokemonEvolveToUnowned,
+  pokemonMatchesBoxFilters,
+  applyPokemonBoxFilters,
+  renderBoxFiltersHtml,
+  setBoxFilter,
+  resetBoxFilters,
+  setBoxSearch,
+  getRegionMeta,
+  getRegionDisplayName,
+  isPokemonNativeToRegion,
+  countCaughtInRegion,
+  getRegionPokedexTotal,
+  isRegionDexComplete,
+  isKalosCompleted,
+  ensureRegionProgress,
+  isRegionLeagueWon,
+  markRegionLeagueWon,
+  getRegionAccessStatus,
+  canAccessRegion,
+  regionAccessMessage,
+  regionRequiresNativeTeam,
+  getInvalidTeamPokemonForRegion,
+  canUseCurrentTeamForRegion,
+  regionTeamRestrictionMessage,
+  getLeagueChampionIdForRegion,
+  getLeagueRegionForChampion,
+  isLeagueChampionId,
+  getSpeciesTalents,
+  getTalentByKey,
+  getTalentRecord,
+  getTypeName,
+  getRarityLabel,
+  getTalentName,
+  getTalentDesc,
+  isTalentHidden,
+  unlockTalentForSpecies,
+  getMovesForSpeciesLevel,
+  getSpeciesMovePool,
+  getSpeciesFullLearnablePool,
+  getMoveLearnLevel,
+  getCtCsMoveIds,
+  getSpeciesTrainingOnlyPool,
+  getMoveCountForLevel,
+  getMovesForLevel,
+  calcStat,
+  recalcPokeStats,
+  renderStars,
+  isShinyDisplay,
+  xpForLevel,
+  applyRouteLinkGroups,
+  getLinkedRouteIds,
+  getDuplicateItemPayout,
+  grantRewardItem,
+  grantRewardItems,
+  getItemStackLimit,
+  getShopName,
+  getItemSourceList,
+  getMoveLearners,
+  getPokemonBaseStatTotal,
+  getPokemonRank,
+  rankValue,
+  rankAllowsPokemon,
+  rankBadgeHtml,
+  learnPkmnMove,
+  learnPkmnAbility,
+  isHiddenAbility,
+  getLocObj,
+  generateUniqueBoxId,
+  boxFilterOptionHtml,
+  getAutoRouteLinkGroups,
+  getBoxFilterRegions,
+  getBoxFilterTypes,
+  getPreviousRegion,
+};
+
+// Wave 42 — engine-registry absorption: these dispatched actions
+// register in the registry (registry-first dispatcher = engine
+// indirection instead of the window fallback); the window surface is kept for
+// classic cross-module consumers (documented duplicate, T2-B).
+// Wave 43 — same measured lesson as closeConfirm (game-utils): this module
+// lives in an early chunk evaluated BEFORE the engine chunk — microtask re-arm.
+const __pwV43RegisterSetBoxSearch = () => { if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('setBoxSearch', setBoxSearch); } catch (_) {} } };
+__pwV43RegisterSetBoxSearch();
+if ((typeof PokeActions === 'undefined' || !PokeActions || (typeof PokeActions.has === 'function' && !PokeActions.has('setBoxSearch')))
+  && typeof queueMicrotask === 'function') {
+  queueMicrotask(__pwV43RegisterSetBoxSearch);
+}

@@ -2,15 +2,20 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { pokeFullCardHTML } from '../src/ui/components/poke-full-card.js';
+import { moveButtonsBarHTML } from '../src/ui/components/move-buttons.js';
+import { AtollPanelView } from '../src/ui/views/AtollPanelView.js'; // wave 13: real DS view injected into the vm sandbox
+import { AtollFactoryPrepView } from '../src/ui/views/AtollFactoryPrepView.js'; // wave 22: real DS view injected into the vm sandbox
+import { harnessBundleSource, harnessIsEsm } from '../tools/harness-bundle.mjs';
 
-// ── Passe 25 : correctifs des 3 retours utilisateur ──────────────────────
-//  #1 description du bouton « talent caché » cassée (clés i18n
-//     training_mode_hidden_desc/_done manquantes → libellé brut affiché)
-//  #2 fiche objet ouverte depuis le sélecteur d'ÉQUIPEMENT : le bouton
-//     retour ramenait au sac global au lieu du choix d'objet
-//  #3 Usine (atoll) : la réorganisation pré-combat devient un panneau clone
-//     de la fenêtre « Équipe Active » (glisser-déposer, lecture seule :
-//     pas d'objet / talent / moveset à changer)
+// ── Passe 25: fixes for the 3 user reports ──────────────────────
+//  #1 broken "hidden ability" button description (i18n keys
+//     training_mode_hidden_desc/_done missing → raw label shown)
+//  #2 item sheet opened from the EQUIPMENT selector: the back
+//     button returned to the global bag instead of the item choice
+//  #3 Factory (atoll): the pre-battle reorganization becomes a cloned panel
+//     of the "Active Team" window (drag & drop, read-only:
+//     no item / ability / moveset changes)
 const R = (p) => fs.readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
 
 function makeSandbox() {
@@ -35,35 +40,40 @@ function makeSandbox() {
     _notifications: notifications,
   };
   sandbox.window = sandbox;
+  sandbox.PokeUI = sandbox.PokeUI || {}; sandbox.PokeUI.components = Object.assign({}, sandbox.PokeUI.components, { pokeFullCardHTML, moveButtonsBarHTML });
+  sandbox.PokeUI.views = Object.assign({}, sandbox.PokeUI.views, { AtollPanelView, AtollFactoryPrepView }); // wave 13 + wave 22 (legitimate moves)
   sandbox.globalThis = sandbox;
   vm.createContext(sandbox);
   for (const f of [
     'src/data/moves.js', 'src/data/pd-data.js',
     'src/data/items-data.js', 'src/data/items-helpers.js',
-    'src/data/poke-talents-data.js', 'src/data/pokemon-talents.js', 'src/data/talents-full.js',
+    'src/data/poke-talents-data.js', 'src/data/talents-full.js',
     'src/data/locations-data.js', 'src/data/locations-johto.js', 'src/data/game-helpers.js',
-    'src/game/core/pokemon-factory.js',
-    'src/data/atoll-sets-data.js', 'src/game/world/atoll-core.js',
+    'src/application/pokemon-factory.js',
+    'src/data/atoll-sets-data.js', 'src/application/world/atoll-core.js',
     'src/localization/fr/types.js', 'src/localization/en/types.js',
     'src/localization/fr/talents.js', 'src/localization/en/talents.js',
     'src/localization/fr/move-descs.js',
     'src/localization/fr/ui.js', 'src/localization/en/ui.js',
-    'src/engine/data/badge-helper.js',
+    'src/ui/game/badge-helper.js',
     'src/localization/data.js', 'src/localization/i18n.js',
-    'src/game/combat/training.js',
-    'src/game/combat/battle-team-ui.js',
-    'src/game/display/team-manage.js',
-    'src/game/display/team-ui.js',
-    'src/game/display/fullscreen-panel.js',
+    'src/application/combat/training.js',
+    'src/ui/game/battle-team-ui.js',
+    'src/ui/game/team-manage.js',
+    'src/ui/game/team-ui.js',
+    'src/ui/game/fullscreen-panel.js',
   ]) {
-    vm.runInContext(R(f), sandbox, { filename: f });
+    // T2-D (vague 37) : classiques évalués en vm directe (parité exacte,
+    // const inter-fichiers préservés) ; les converts ESM sont bundlés à la volée.
+    const __text = R(f);
+    vm.runInContext(harnessIsEsm(__text) ? harnessBundleSource([f]) : __text, sandbox, { filename: f });
   }
   return sandbox;
 }
 const sb = makeSandbox();
 const join = (a) => Array.from(a).join(',');
 
-// Mini-DOM factice pour exercer le panneau de préparation en vm.
+// Dummy mini-DOM to exercise the preparation panel in vm.
 function makeFakeEl() {
   const classes = new Set();
   return {
@@ -80,114 +90,114 @@ function makeFakeEl() {
 }
 
 // ————————————————————————— #1 —————————————————————————
-test('passe 25 #1 : la description du mode « talent caché » est traduite', () => {
-  assert.equal(sb.t('training_mode_hidden_title'), 'Déblocage Talent Caché', 'titre FR');
-  assert.equal(sb.t('training_mode_hidden_desc'), 'Tente de débloquer le talent caché de ce Pokémon.', 'desc FR (plus de clé brute)');
-  assert.equal(sb.t('training_mode_hidden_done'), 'Talent caché déjà débloqué.', 'état « fait » FR');
-  // Le libellé réellement utilisé par les boutons d'entraînement (mode 'hidden')
-  assert.equal(sb.getTrainingModeLabel('hidden'), 'Déblocage Talent Caché', 'label du bouton');
-  assert.equal(sb.getTrainingModeDescription('hidden', true), 'Tente de débloquer le talent caché de ce Pokémon.', 'description du bouton (canDo)');
-  assert.equal(sb.getTrainingModeDescription('hidden', false), 'Talent caché déjà débloqué.', 'description du bouton (done)');
-  assert.ok(!String(sb.getTrainingModeDescription('hidden', true)).includes('training_mode_'), 'plus aucune clé i18n brute affichée');
-  // Anglais paré aussi
-  assert.ok(R('src/localization/en/ui.js').includes('"training_mode_hidden_desc":"Attempts to unlock'), 'desc EN présente');
-  assert.ok(R('src/localization/en/ui.js').includes('"training_mode_hidden_done":"Hidden ability already unlocked."'), 'done EN présent');
+test('phase 25 #1: the "hidden ability" mode description is translated', () => {
+  assert.equal(sb.t('training_mode_hidden_title'), 'Déblocage Talent Caché', 'FR title');
+  assert.equal(sb.t('training_mode_hidden_desc'), 'Tente de débloquer le talent caché de ce Pokémon.', 'FR desc (no more raw key)');
+  assert.equal(sb.t('training_mode_hidden_done'), 'Talent caché déjà débloqué.', 'FR "done" state');
+  // The label actually used by the training buttons ('hidden' mode)
+  assert.equal(sb.getTrainingModeLabel('hidden'), 'Déblocage Talent Caché', 'button label');
+  assert.equal(sb.getTrainingModeDescription('hidden', true), 'Tente de débloquer le talent caché de ce Pokémon.', 'button description (canDo)');
+  assert.equal(sb.getTrainingModeDescription('hidden', false), 'Talent caché déjà débloqué.', 'button description (done)');
+  assert.ok(!String(sb.getTrainingModeDescription('hidden', true)).includes('training_mode_'), 'no more raw i18n key displayed');
+  // English covered too
+  assert.ok(R('src/localization/en/ui.js').includes('"training_mode_hidden_desc":"Attempts to unlock'), 'EN desc present');
+  assert.ok(R('src/localization/en/ui.js').includes('"training_mode_hidden_done":"Hidden ability already unlocked."'), 'EN done present');
 });
 
 // ————————————————————————— #2 —————————————————————————
-test('passe 25 #2 : la fiche objet ouverte depuis l\'équipement y revient', () => {
-  // Wrapper appelé par le clic droit des lignes du sélecteur d'équipement.
+test('phase 25 #2: the item sheet opened from equipment returns there', () => {
+  // Wrapper called by right-clicking the equipment selector rows.
   sb.openItemInfoFromEquip('leftovers', 2);
   assert.deepEqual(
     { kind: sb.window._pwInfoSource.kind, teamIdx: sb.window._pwInfoSource.teamIdx },
     { kind: 'equip-select', teamIdx: 2 },
-    'la source de retour mémorisée est le sélecteur d\'équipement',
+    'the memorized return source is the equipment selector',
   );
-  // Le sélecteur rendu invoque bien ce wrapper (clic droit) avec le slot visé.
-  const srcTeamUi = R('src/game/display/team-ui.js');
+  // The rendered selector does invoke this wrapper (right-click) with the aimed slot.
+  const srcTeamUi = R('src/ui/game/team-ui.js');
   assert.ok(srcTeamUi.includes('data-context-call="openItemInfoFromEquip" data-context-args="\'${key}\', ${teamIdx}"'),
-    'lignes du sélecteur : clic droit → wrapper avec teamIdx');
-  // La navigation de retour connaît ce kind : elle rouvre openItemSelector.
-  const preflight = R('src/file-preflight.js');
-  assert.ok(preflight.includes("src.kind === 'equip-select'"), 'pwInfoBack/Label gèrent kind equip-select');
-  assert.ok(preflight.includes("callGlobal('openItemSelector', src.teamIdx)"), 'retour → réouverture du sélecteur d\'équipement');
-  assert.ok(preflight.includes("key = 'back_to_equip_selector'"), 'libellé de retour dédié');
-  assert.ok(preflight.includes('window._pwEquipInfoFrom != null'), 'capture : indication sélecteur lue pendant la construction (libellé exact)');
-  assert.equal(sb.t('back_to_equip_selector'), "← Retour au choix d'objet", 'libellé FR');
+    'selector rows: right-click → wrapper with teamIdx');
+  // The back navigation knows this kind: it reopens openItemSelector.
+  const preflight = [R('src/engine/input/action-dispatcher.js'), R('src/engine/runtime/classic-bridge.js')].join('\n');
+  assert.ok(preflight.includes("src.kind === 'equip-select'"), 'pwInfoBack/Label handle kind equip-select');
+  assert.ok(preflight.includes("callGlobal('openItemSelector', src.teamIdx)"), 'back → equipment selector reopens');
+  assert.ok(preflight.includes("key = 'back_to_equip_selector'"), 'dedicated back label');
+  assert.ok(preflight.includes('window._pwEquipInfoFrom != null'), 'capture: selector hint read during construction (exact label)');
+  assert.equal(sb.t('back_to_equip_selector'), "← Retour au choix d'objet", 'FR label');
 });
 
 // ————————————————————————— #3 —————————————————————————
-test('passe 25 #3 : le panneau de préparation Usine clone l\'Équipe Active', () => {
+test('phase 25 #3: the Factory preparation panel clones the Active Team', () => {
   sb.G.championTitle = true; // atoll accessible
   sb.G.atoll = null;
   sb.prepareAtollFactoryBattle('factory_c');
   const run = sb.getAtollFactoryRun();
-  assert.ok(run && Array.isArray(run.team) && run.team.length > 1, 'série Usine créée');
+  assert.ok(run && Array.isArray(run.team) && run.team.length > 1, 'Factory streak created');
 
-  // Mini-DOM : le rendu du panneau produit les MÊMES cartes que l'Équipe Active.
+  // Mini-DOM: the panel render produces the SAME cards as the Active Team.
   const realDoc = sb.document;
   const els = { 'poke-modal': makeFakeEl(), 'poke-modal-inner': makeFakeEl() };
   sb.document = { getElementById: (id) => els[id] || null, querySelectorAll: () => [] };
   try {
-    assert.equal(sb.renderAtollFactoryPrep(), true, 'rendu du panneau');
+    assert.equal(sb.renderAtollFactoryPrep(), true, 'panel rendered');
     const html = els['poke-modal-inner'].innerHTML;
-    assert.ok(html.includes('poke-card'), 'cartes Pokémon identiques à l\'Équipe Active');
-    assert.ok(html.includes('id="atoll-prep-body" class="team-view"'), 'conteneur .team-view (look Équipe)');
-    assert.ok(html.includes('data-atoll-move-drag='), 'attaques réordonnables par glisser-déposer');
-    assert.ok(!html.includes('data-move-drag="'), 'aucun drag d\'attaque lié à G.team');
-    assert.ok(!html.includes('data-call="switchBattlePoke"'), 'pas de switch de combat sur le sprite');
-    assert.ok(!html.includes('data-call="openPokeModal"'), 'pas de fiche éditable (talent/moveset/objet figés)');
-    assert.ok(!html.includes('data-call="openItemSelector"'), 'pas de changement d\'objet');
-    assert.ok(!html.includes('poke-item-badge empty'), 'pas de badge « + » d\'équipement');
-    assert.ok(html.includes('data-call="atollFactoryPrepFight"'), 'bouton Combattre');
-    assert.ok(html.includes('data-call="atollFactoryPrepAbandon"'), 'bouton Abandonner');
-    assert.ok(html.includes('data-context-call="openMoveInfo"'), 'info attaque toujours disponible (clic droit)');
-    assert.ok(!html.includes("',-1\""), 'fiche attaque sans contexte « ferme et oublie » : le retour revient à la préparation');
+    assert.ok(html.includes('poke-card'), 'Pokémon cards identical to the Active Team');
+    assert.ok(html.includes('id="atoll-prep-body" class="team-view"'), '.team-view container (Team look)');
+    assert.ok(html.includes('data-atoll-move-drag='), 'moves reorderable by drag & drop');
+    assert.ok(!html.includes('data-move-drag="'), 'no move drag bound to G.team');
+    assert.ok(!html.includes('data-call="switchBattlePoke"'), 'no battle switch on the sprite');
+    assert.ok(!html.includes('data-call="openPokeModal"'), 'no editable sheet (ability/moveset/item frozen)');
+    assert.ok(!html.includes('data-call="openItemSelector"'), 'no item change');
+    assert.ok(!html.includes('poke-item-badge empty'), 'no equipment "+" badge');
+    assert.ok(html.includes('data-call="atollFactoryPrepFight"'), 'Battle button');
+    assert.ok(html.includes('data-call="atollFactoryPrepAbandon"'), 'Forfeit button');
+    assert.ok(html.includes('data-context-call="openMoveInfo"'), 'move info always available (right-click)');
+    assert.ok(!html.includes("',-1\""), 'context-less move sheet "closes and forgets": back returns to preparation');
 
     sb.openAtollFactoryPrep();
-    assert.ok(els['poke-modal'].classList.contains('open'), 'panneau ouvert');
-    assert.ok(els['poke-modal'].classList.contains('atoll-prep-modal'), 'classe de largeur dédiée');
-    assert.equal(sb.window._atollPrepOpen, true, 'source « panneau d\'info » armée pour les fiches');
+    assert.ok(els['poke-modal'].classList.contains('open'), 'panel opened');
+    assert.ok(els['poke-modal'].classList.contains('atoll-prep-modal'), 'dedicated width class');
+    assert.equal(sb.window._atollPrepOpen, true, '"info panel" source armed for sheets');
     sb.closeAtollFactoryPrep();
-    assert.equal(sb.window._atollPrepOpen, false, 'fermeture : drapeau purgé');
-    assert.ok(!els['poke-modal'].classList.contains('open'), 'fermeture : modale refermée');
+    assert.equal(sb.window._atollPrepOpen, false, 'close: flag purged');
+    assert.ok(!els['poke-modal'].classList.contains('open'), 'close: modal closed again');
   } finally {
     sb.document = realDoc;
   }
 
-  // Réorganisation par swaps (ce que le glisser-déposer invoque).
+  // Reorganization by swaps (what drag & drop invokes).
   const orderBefore = join(run.team.map((p) => p.id));
   const last = run.team.length - 1;
   sb.atollFactorySwapPoke(0, last);
   const after = run.team.map((p) => p.id);
-  assert.notEqual(join(after), orderBefore, 'swap extrémités : ordre modifié');
+  assert.notEqual(join(after), orderBefore, 'ends swap: order changed');
   sb.atollFactorySwapPoke(last, 0);
-  assert.equal(join(run.team.map((p) => p.id)), orderBefore, 'swap inverse : ordre restauré');
-  sb.atollFactorySwapPoke(0, 0); // identité : no-op
-  assert.equal(join(run.team.map((p) => p.id)), orderBefore, 'swap identité ignoré');
+  assert.equal(join(run.team.map((p) => p.id)), orderBefore, 'reverse swap: order restored');
+  sb.atollFactorySwapPoke(0, 0); // identity: no-op
+  assert.equal(join(run.team.map((p) => p.id)), orderBefore, 'identity swap ignored');
 
-  // Sans série : les ouvertures se referment proprement, sans crash.
+  // Without a streak: openings close cleanly, without crash.
   sb.G.atoll = null;
   assert.equal(sb.getAtollFactoryRun(), null);
-  assert.doesNotThrow(() => sb.openAtollFactoryPrep(), 'ouverture sans série : aucun crash');
+  assert.doesNotThrow(() => sb.openAtollFactoryPrep(), 'opening without a streak: no crash');
 });
 
-test('passe 25 #3 : navigation de retour et i18n du panneau de préparation', () => {
-  const preflight = R('src/file-preflight.js');
-  assert.ok(preflight.includes("return { kind: 'atoll-prep' };"), 'capture de source : panneau de préparation détecté');
-  assert.ok(preflight.includes("src.kind === 'atoll-prep'"), 'pwInfoBack/Label gèrent kind atoll-prep');
-  assert.ok(preflight.includes("callGlobal('openAtollFactoryPrep')"), 'retour → réouverture de la préparation');
-  assert.ok(preflight.includes("key = 'back_to_atoll_prep'"), 'libellé de retour dédié');
-  assert.ok(preflight.includes('window._atollPrepOpen = false'), 'fermetures génériques : drapeau purgé');
-  assert.ok(R('src/file-postboot.js').includes('window._atollPrepOpen = false'), 'postboot : purge aussi');
-  const fsSrc = R('src/game/display/fullscreen-panel.js');
-  assert.ok(!fsSrc.includes('atollFactoryMovePoke'), 'ancien éditeur à flèches supprimé');
-  assert.ok(fsSrc.includes('window._atollPrepOpen = false'), 'openFullscreenPanel purge la préparation');
-  assert.ok(fsSrc.includes('openAtollFactoryPrep();'), 'prepareAtollFactoryBattle ouvre le panneau');
-  const cardSrc = R('src/game/combat/battle-team-ui.js');
+test('phase 25 #3: back navigation and i18n of the preparation panel', () => {
+  const preflight = [R('src/engine/input/action-dispatcher.js'), R('src/engine/runtime/classic-bridge.js')].join('\n');
+  assert.ok(preflight.includes("return { kind: 'atoll-prep' };"), 'source capture: preparation panel detected');
+  assert.ok(preflight.includes("src.kind === 'atoll-prep'"), 'pwInfoBack/Label handle kind atoll-prep');
+  assert.ok(preflight.includes("callGlobal('openAtollFactoryPrep')"), 'back → preparation reopens');
+  assert.ok(preflight.includes("key = 'back_to_atoll_prep'"), 'dedicated back label');
+  assert.ok(preflight.includes('window._atollPrepOpen = false'), 'generic closes: flag purged');
+  assert.ok([R('src/engine/input/action-dispatcher.js'), R('src/engine/runtime/classic-bridge.js')].join('\n').includes('window._atollPrepOpen = false'), 'postboot : purge aussi');
+  const fsSrc = R('src/ui/game/fullscreen-panel.js');
+  assert.ok(!fsSrc.includes('atollFactoryMovePoke'), 'old arrow editor removed');
+  assert.ok(fsSrc.includes('window._atollPrepOpen = false'), 'openFullscreenPanel purges the preparation');
+  assert.ok(fsSrc.includes('openAtollFactoryPrep();'), 'prepareAtollFactoryBattle opens the panel');
+  const cardSrc = R('src/ui/game/battle-team-ui.js');
   assert.ok(cardSrc.includes('noSpriteHandlers') && cardSrc.includes('itemReadonly') && cardSrc.includes("data-' + moveDragAttr"),
-    'generatePokeCardHTML : options lecture seule + attribut de drag alternatif');
-  assert.equal(sb.t('atoll_factory_prep_open'), "⚙ Organiser l'équipe prêtée", 'bouton d\'accès FR');
-  assert.equal(sb.t('back_to_atoll_prep'), '← Retour à la préparation', 'libellé retour FR');
+    'generatePokeCardHTML: readonly options + alternate drag attribute');
+  assert.equal(sb.t('atoll_factory_prep_open'), "⚙ Organiser l'équipe prêtée", 'FR access button');
+  assert.equal(sb.t('back_to_atoll_prep'), '← Retour à la préparation', 'FR back label');
 });
 

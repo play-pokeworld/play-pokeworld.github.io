@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
-"""Passe 49 — sprites d'objets MANQUANTS (baies de résistance, gemmes, orbes…).
+"""Passe 49 — MISSING item sprites (resistance berries, gems, orbs…).
 
-Symptôme signalé par l'utilisateur (console, dizaines de lignes) :
+Symptom reported by the user (console, dozens of lines):
     clear_amulet.png   Failed to load resource: net::ERR_FILE_NOT_FOUND
     babiri_berry.png   Failed to load resource: net::ERR_FILE_NOT_FOUND
     steel_gem.png      … etc.
 
-Cause : `getItemSpriteUrl()` (src/data/items-helpers.js) FABRIQUE l'URL
-`src/assets/images/items/<clé>.png` pour n'importe quel objet du catalogue,
-sans vérifier que le fichier existe. Le catalogue compte 289 objets et seuls
-48 avaient un PNG : tous les autres partaient en 404 dès l'ouverture du sac.
-L'audit ne les voyait pas car ces chemins n'apparaissent nulle part en dur
-dans le code — ils sont calculés à l'exécution.
+Cause: `getItemSpriteUrl()` (src/data/items-helpers.js) BUILDS the URL
+`src/assets/images/items/<key>.png` for any item of the catalog,
+without checking that the file exists. The catalog has 289 items and only
+48 had a PNG: all the others went 404 as soon as the bag opened.
+The audit could not see them because those paths never appear hardcoded
+in the code — they are computed at runtime.
 
-Ce script télécharge les sprites officiels depuis PokeAPI (dépôt PokeAPI/
-sprites, nommage à tirets) et, pour le reliquat introuvable en amont
-(objets récents ou inventés par le jeu), CUIT une vignette lisible dans la
-DA du jeu à partir d'une famille visuelle (baie, gemme, orbe, fossile…).
+This script downloads the official sprites from PokeAPI (PokeAPI/sprites
+repo, dash naming) and, for the remainder not found upstream
+(recent items or game-invented ones), BAKES a readable vignette in the
+game's art style from a visual family (berry, gem, orb, fossil…).
 
-Idempotent : un PNG déjà présent n'est ni retéléchargé ni recuit.
-Usage : python3 tools/fetch-item-sprites.py [--force] [--report]
+Idempotent: an existing PNG is neither downloaded again nor re-baked.
+Usage: python3 tools/fetch-item-sprites.py [--force] [--report]
 """
 from __future__ import annotations
 
@@ -35,32 +35,32 @@ OUT = ROOT / 'src/assets/images/items'
 UA = 'PokeWorldAssetDownloader/1.0 (+item sprites)'
 POKEAPI = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/'
 
-# Clés du jeu dont le nom PokeAPI diffère du simple underscore→tiret.
+# Game keys whose PokeAPI name differs from the simple underscore->dash.
 ALIAS = {
     'never_melt_ice': 'never-melt-ice',
     'deep_sea_scale': 'deep-sea-scale',
     'deep_sea_tooth': 'deep-sea-tooth',
     'rarcandy': 'rare-candy',
-    # Passe 51 (retour utilisateur : « baie Prine, Améliorator et toutes les
-    # pierres Z sont manquantes »). Ces trois familles portent un nom PokeAPI
-    # différent de la simple transformation underscore→tiret :
-    #  · la « Baie Prine » est le nom FR officiel de la Lum Berry ;
-    #  · l'« Améliorator » est `up-grade` (et non `upgrade`) ;
-    #  · les pierres Z sont suffixées `--held` (variante sac : `--bag`).
+    # Phase 51 (user feedback: "Prine Berry, Upgrade and all the
+    # Z stones are missing"). These three families carry a PokeAPI name
+    # different from the plain underscore->dash transform:
+    #  · "Baie Prine" is the official FR name of the Lum Berry;
+    #  · "Améliorator" is `up-grade` (not `upgrade`);
+    #  · Z stones are suffixed `--held` (bag variant: `--bag`).
     'prine_berry': 'lum-berry',
     'upgrade': 'up-grade',
     'ct_normal': 'tm-normal',
 }
 
-# Pierres Z : le radical PokeAPI est identique à la clé du jeu, seul le
-# suffixe change (`--held` = sprite tenu, `--bag` = icône de sac).
+# Z stones: the PokeAPI stem matches the game key; only the
+# suffix changes (`--held` = held sprite, `--bag` = bag icon).
 for _z in ('normalium', 'firium', 'waterium', 'grassium', 'electrium', 'icium',
            'fightinium', 'poisonium', 'groundium', 'flyinium', 'psychium',
            'buginium', 'rockium', 'ghostium', 'dragonium', 'darkinium',
            'steelium', 'fairium'):
     ALIAS[f'{_z}_z'] = f'{_z}-z--held'
 
-# Familles visuelles pour la cuisson de repli (couleur, forme).
+# Visual families for fallback baking (color, shape).
 BERRY = (0xE0, 0x50, 0x40)
 FAMILIES = [
     ('_berry', 'berry', BERRY),
@@ -86,13 +86,13 @@ TYPE_TINT = {
 
 
 def catalog_keys() -> list[str]:
-    """Clés d'objets du jeu, lues depuis ITEMS (source de vérité)."""
+    """Game item keys, read from ITEMS (source of truth)."""
     js = r"""
     const fs=require('fs'),vm=require('vm');
     const s={window:{},console,document:{createElement:()=>({}),getElementById:()=>null}};
     s.globalThis=s; vm.createContext(s);
     for(const f of ['src/data/items-data.js','src/data/items-helpers.js']){
-      try{ vm.runInContext(fs.readFileSync(f,'utf8'),s,{filename:f}); }catch(e){}
+      try{ let c=fs.readFileSync(f,'utf8').replace(/export\s+(const|let|var|function|class|default)\s+/g, '\$1 ').replace(/export\s+\{[^}]*\};?/g, ''); vm.runInContext(c,s,{filename:f}); }catch(e){console.error(e);}
     }
     process.stdout.write(JSON.stringify(Object.keys(s.window.ITEMS||s.ITEMS||{})));
     """
@@ -116,14 +116,14 @@ def fetch(url: str) -> bytes | None:
 
 
 def bake(key: str, dest: Path) -> None:
-    """Vignette de repli 32×32 : forme de famille + teinte, contour encré."""
+    """32×32 fallback vignette: family shape + tint, inked outline."""
     from PIL import Image, ImageDraw
     shape, col = 'orb', (0x9A, 0x9A, 0xA2)
     for suffix, sh, c in FAMILIES:
         if key.endswith(suffix) or suffix in key:
             shape, col = sh, c
             break
-    for t, tint in TYPE_TINT.items():          # gemmes/CT : teinte par type
+    for t, tint in TYPE_TINT.items():          # gems/TMs: tint by type
         if key.startswith(t + '_') or key.endswith('_' + t):
             col = tint
             break
@@ -149,7 +149,7 @@ def bake(key: str, dest: Path) -> None:
         d.polygon([(5, 26), (9, 10), (20, 6), (27, 16), (24, 27)], fill=base, outline=ink)
         d.polygon([(9, 10), (20, 6), (18, 15)], fill=lite)
         d.polygon([(18, 15), (27, 16), (24, 27)], fill=dark)
-    else:                                       # orbe / générique
+    else:                                       # orb / generic
         d.ellipse((5, 5, 27, 27), fill=base, outline=ink, width=2)
         d.ellipse((10, 9, 18, 16), fill=lite)
         d.arc((7, 7, 25, 25), 30, 150, fill=dark, width=2)
@@ -165,9 +165,9 @@ def main() -> int:
         print('✖ catalogue ITEMS illisible')
         return 1
     missing = [k for k in keys if force or not (OUT / f'{k}.png').exists()]
-    # les CT/CS ont déjà un repli par TYPE (tm_<type>.png) géré en amont
+    # TMs/HMs already have a per-TYPE fallback (tm_<type>.png) handled upstream
     missing = [k for k in missing if not (k.startswith('ct') or k.startswith('cs'))]
-    print(f'catalogue : {len(keys)} objets · {len(missing)} sans sprite')
+    print(f'catalog: {len(keys)} items · {len(missing)} without sprite')
     if report:
         print(' '.join(missing))
         return 0
@@ -183,16 +183,16 @@ def main() -> int:
             dest.write_bytes(data)
             got += 1
             continue
-        # Tentative Pokeclicker / PokeChill via ITEM_OVERRIDES étendus (voir download_assets.py)
-        # Ici on NE CUIT PLUS de repli — on liste seulement
+        # Pokéclicker / PokeChill attempt via extended ITEM_OVERRIDES (see download_assets.py)
+        # Here we NO LONGER bake a fallback — only list
         failed_fetch.append(k)
     still = [k for k in keys
              if not (OUT / f'{k}.png').exists() and not (k.startswith('ct') or k.startswith('cs'))]
-    print(f'objets : {got} téléchargés (PokeAPI) · {len(failed_fetch)} sans sprite réel (listés, non générés)')
+    print(f'items: {got} downloaded (PokeAPI) · {len(failed_fetch)} without a real sprite (listed, not generated)')
     if failed_fetch:
-        print('  Manquants:', ', '.join(failed_fetch[:100]))
-    # still = failed_fetch (plus de bake)
-    print(f'  Total sans sprite après tentative: {len(still)}')
+        print('  Missing:', ', '.join(failed_fetch[:100]))
+    # still = failed_fetch (no more bake)
+    print(f'  Total without sprite after attempt: {len(still)}')
     return 0
 
 

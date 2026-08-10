@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Passe 53 — resynchronise les rewardDesc FR/EN sur les récompenses RÉELLES.
+"""Passe 53 — resynchronizes the FR/EN rewardDesc on the REAL rewards.
 
-Les textes annonçaient « 2 Baies Oran » là où le jeu versait 2 Poussières
-Étoile (dette de la passe 27, cf. diagnostic passe 52). Après le passage de
-`rework-quest-berries.py`, ils n'annoncent plus que l'argent : on y remet la
-baie effectivement donnée, lue dans les données — plus jamais de texte écrit
-à la main qui puisse diverger.
+The texts announced "2 Oran Berries" where the game actually granted 2
+Star Dusts (debt from passe 27, cf. passe 52 diagnostic). After running
+`rework-quest-berries.py`, they only announce money: this puts the actually
+given berry back, read from the data — never again a hand-written text
+that could drift.
 """
 import os
 import re
@@ -33,7 +33,7 @@ def quest_berries():
         ('side-quests-data.js', 'side', r'"id"\s*:\s*"(s\d+)"'),
     ):
         js = open(os.path.join(ROOT, 'src', 'data', fname)).read()
-        # découpe par quête : chaque bloc va d'un "id" au suivant
+        # split by quest: each block runs from one "id" to the next
         marks = [(m.start(), m.group(1)) for m in re.finditer(pat, js)]
         for i, (pos, qid) in enumerate(marks):
             end = marks[i + 1][0] if i + 1 < len(marks) else len(js)
@@ -53,7 +53,7 @@ def main():
         txt = open(p).read()
         n = 0
         for (cat, qid), key in berries.items():
-            # bloc "<id>": { ... } dans la section "main"/"side"
+            # "<id>": { ... } block in the "main"/"side" section
             sec = re.search(r'"%s":\s*\{' % cat, txt)
             if not sec:
                 continue

@@ -1,5 +1,5 @@
 // ===== FR — Location lore (speaker + text) =====
-window.L_fr_lore = {
+export const L_fr_lore = {
 "pallet": {
 "speaker":"Prof. Chen",
 "text":"Bienvenue, jeune Dresseur ! Ton voyage à travers le monde des Pokémon débute aujourd'hui. Noue des liens profonds avec tes partenaires et sois patient et attentif dans les hautes herbes !"
@@ -222,5 +222,6 @@ window.L_fr_lore = {
 }
 };
 
-
-
+// T2 (vague 38) : module ESM — export natif ; la surface classique est
+// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
+if (typeof globalThis !== 'undefined') globalThis.L_fr_lore = L_fr_lore;

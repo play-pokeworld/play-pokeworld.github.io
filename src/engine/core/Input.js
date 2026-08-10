@@ -3,7 +3,6 @@
  * Unified input: mouse, touch, keyboard, gamepad
  * Features: click, double-click, long-press, drag, key bindings
  */
-(function() {
 'use strict';
 
 class InputManager {
@@ -69,7 +68,7 @@ class InputManager {
     this._keyBindings.get(k).push(fn);
   }
   onKeyCombo(combo, fn) {
-    // combo: 'Ctrl+S', 'Shift+A', etc.
+    // combo: 'Ctrl+S', 'Shift+HAS', etc.
     const parts = combo.toLowerCase().split('+');
     const mods = { ctrl: false, shift: false, alt: false };
     let key = '';
@@ -146,8 +145,14 @@ class InputManager {
   getDragState() { return this._dragState; }
 }
 
-window.PokeInput = InputManager;
-if (!window.poke) window.poke = {};
-window.poke.Input = InputManager;
-})();
+// T2 (wave 38): ESM module — native class export; the engine surface
+// (PokeInput + poke.* namespace) stays kept on the global object for
+// classic consumers not yet migrated.
+export { InputManager };
+export default InputManager;
+if (typeof globalThis !== 'undefined') {
+  globalThis.PokeInput = InputManager;
+  if (!globalThis.poke) globalThis.poke = {};
+  globalThis.poke.Input = InputManager;
+}
 

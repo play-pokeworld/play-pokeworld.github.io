@@ -1,3 +1,5 @@
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
 var POKE_TALENTS = {
  1:['overgrow','overgrow','chlorophyll'], 2:['overgrow','overgrow','chlorophyll'], 3:['overgrow','overgrow','chlorophyll'],
  4:['blaze','blaze','solarpower'], 5:['blaze','blaze','solarpower'], 6:['blaze','blaze','solarpower'],
@@ -167,6 +169,12 @@ var POKE_TALENTS = {
 
 
 // --- Migrated to ES module, globals exposed ---
-if (typeof POKE_TALENTS !== 'undefined' && typeof window !== 'undefined') window.POKE_TALENTS = POKE_TALENTS;
+if (typeof POKE_TALENTS !== 'undefined') { if (typeof window !== 'undefined') window.POKE_TALENTS = POKE_TALENTS; if (typeof globalThis !== 'undefined') globalThis.POKE_TALENTS = POKE_TALENTS; }
 
 
+
+// Wave 40 — native ESM module: grouped export of the same names as the
+// classic surface kept above/here (bodies unchanged).
+export {
+  POKE_TALENTS,
+};

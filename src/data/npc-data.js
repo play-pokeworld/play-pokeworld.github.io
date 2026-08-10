@@ -1,3 +1,5 @@
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
 var NPCS = {
  "pallet": [
   {
@@ -818,4 +820,10 @@ var NPCS = {
 
 
 // --- Migrated to ES module, globals exposed ---
-if (typeof NPCS !== 'undefined' && typeof window !== 'undefined') window.NPCS = NPCS;
+if (typeof NPCS !== 'undefined') { if (typeof window !== 'undefined') window.NPCS = NPCS; if (typeof globalThis !== 'undefined') globalThis.NPCS = NPCS; }
+
+// Wave 40 — native ESM module: grouped export of the same names as the
+// classic surface kept above/here (bodies unchanged).
+export {
+  NPCS,
+};

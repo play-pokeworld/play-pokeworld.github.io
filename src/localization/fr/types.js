@@ -1,7 +1,8 @@
 // ===== FR — Noms des types =====
-// Passe 24 : consommé via le domaine nested 'types' (t('types.fire')) et
-// getTypeName(). Les clés sont les ids moteur (minuscules).
-window.L_fr_types = {
+// ===== FR — Type names =====
+// Phase 24: consumed via the nested 'types' domain (t('types.fire')) and
+// getTypeName(). Keys are the engine ids (lowercase).
+export const L_fr_types = {
   "normal": "Normal",
   "fire": "Feu",
   "water": "Eau",
@@ -22,3 +23,6 @@ window.L_fr_types = {
   "fairy": "Fée"
 };
 
+// T2 (vague 38) : module ESM — export natif ; la surface classique est
+// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
+if (typeof globalThis !== 'undefined') globalThis.L_fr_types = L_fr_types;

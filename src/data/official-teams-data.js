@@ -1,53 +1,55 @@
-// ─── Équipes officielles (grand projet « Histoire & Dresseurs canoniques ») ──
-// Étape 1 (passe 17) : socle de données + validateur automatique.
-// Étape 2 (passe 18) : arc rival & Team Rocket Kanto (+ réécriture légitime
-//                      des combats de dresseurs de quêtes Johto existants).
-// Étape 3 (passe 19) : arènes & ligues des DEUX régions branchées sur ce
-//                      socle — 8 arènes Kanto (RFVF), 8 arènes Johto (OAC),
-//                      Conseil 4 + Maître de chaque ligue ; le Maître Blue
-//                      varie selon le starter du joueur (variantsByStarter).
-//                      champions-data.js n'est plus qu'une couche de
-//                      métadonnées (LEAGUE_META + getChampDef).
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
+// ─── Official teams (grand "Story & Canonical Trainers" project) ──
+// Step 1 (phase 17): data foundation + automatic validator.
+// Step 2 (phase 18): rival arc & Team Rocket Kanto (+ legitimate rewrite
+//                      from existing Johto quest trainer battles).
+// Step 3 (phase 19): gyms & leagues of BOTH regions wired to this
+//                      foundation — 8 Kanto gyms (FRLG), 8 Johto gyms (GSC),
+//                      Elite 4 + Champion of each league; Champion Blue
+//                      varies with the player starter (variantsByStarter).
+//                      champions-data.js is now only a
+//                      metadata file (LEAGUE_META + getChampDef).
 //
-// FORMAT v2 d'une entrée OFFICIAL_TEAMS :
+// FORMAT v2 of an OFFICIAL_TEAMS entry:
 // {
 //   id:      clé unique (ex. 'brock'),
 //   kind:    'gym' | 'rival' | 'team_enemy' | 'league' | 'atoll' | 'quest' | 'boss',
 //   region:  'kanto' | 'johto',
-//   name / title: libellés d'affichage,
-//   role:    'rival' | 'rocket' | 'boss' | 'trainer' | 'sage' — visuel de combat,
-//   style:   étiquettes d'archétype affichées en combat,
-//   rewardMoney: argent gagné à la victoire (combats de quêtes),
-//   source:  référence canonique (jeu utilisé pour les niveaux),
-//   team:    liste de Pokémon {
-//     id:     numéro de dex (PD),
-//     level:  niveau = celui du jeu officiel à ce stade de l'aventure,
-//     moves:  ≤ 4 attaques ; chaque id doit faire partie du pool légal
-//             (apprentissage naturel ∪ CT/CS — le joueur peut refaire la
-//             team, quitte à utiliser des CS) ; < 4 attaques est accepté
-//             en début d'aventure (comme dans les jeux officiels),
-//     talent: id ∈ getSpeciesTalents(id) (pool réellement obtenable par le
-//             joueur via l'entraînement — cf. audit passe 17). Préférence
-//             pour les talents réellement ACTIFS dans le moteur (levitate,
-//             intimidate…) quand le pool le permet ; sinon talent maison
-//             cosmétique (aucun avantage caché, conforme à la règle),
-//     item:   null ou clé ITEMS type 'held'/buff (obtenable en jeu) dont
-//             l'effet est actif dans le moteur (type_boost / choice / buff),
-//     ivs/evs: totaux ≤ 18 CHACUN (moitié du max 36, règle utilisateur) ;
-//             concentration autorisée sur une stat si le Pokémon ne devient
-//             pas invincible (validé manuellement à la revue d'équilibrage).
+//   name / title: display labels,
+//   role:    'rival' | 'rocket' | 'boss' | 'trainer' | 'sage' — battle visual,
+//   style:   archetype labels shown in battle,
+//   rewardMoney: money earned on victory (quest battles),
+//   source:  canonical reference (game used for levels),
+//   team:    list of Pokemon {
+//     id:     dex number (PD),
+//     level:  level of the official game at this adventure stage,
+//     moves:  ≤ 4 moves; each id must belong to the legal pool
+//             (natural learning ∪ TM/HM — the player can rebuild the
+//             team, even using HMs); < 4 moves is accepted early in
+//             the adventure (as in the official games),
+//     talent: id ∈ getSpeciesTalents(id) (pool actually obtainable by the
+//             player via training — cf. phase 17 audit). Preference for
+//             abilities actually ACTIVE in the engine (levitate,
+//             intimidate…) when the pool allows; otherwise cosmetic
+//             custom ability (no hidden advantage, per the rule),
+//     item:   null or ITEMS key of type 'held'/buff (obtainable in game)
+//             whose effect is active in the engine (type_boost / choice / buff),
+//     ivs/evs: totals ≤ 18 EACH (half of the 36 max, user rule);
+//             concentration allowed on one stat if the Pokemon does not
+//             become invincible (manually validated at balance review).
 //   },
 //   variantsByStarter (optionnel, rivaux) : { '<idStarterJoueur>': team }
-//             — l'équipe du rival dépend du starter choisi par le joueur
-//             (canon : le rival possède le starter fort contre le vôtre).
+//             — the rival team depends on the starter chosen by the player
+//             (canon: the rival owns the starter strong against yours).
 // }
 //
-// Étapes suivantes (non faites ici) : Johto histoire complète incl. film 3
-// (validé), atoll (6 équipes tournantes/mode, graine déterministe datée,
+// Next steps (not done here): full Johto story incl. movie 3
+// (validated), atoll (6 rotating teams/mode, dated deterministic seed,
 // rotation 12 h).
 const OFFICIAL_TEAMS = {
 
-  // ── Champions d'arène (pilotes étape 1 — étape 3 les branchera partout) ──
+  // ── Gym leaders (step 1 pilots — step 3 will wire them everywhere) ──
   brock: {
     id: 'brock', kind: 'gym', region: 'kanto',
     name: 'Pierre (Arène d\'Argenta)', title: 'Champion d\'Arène Roche',
@@ -72,7 +74,7 @@ const OFFICIAL_TEAMS = {
       { id: 121, level: 21, moves: ['swift', 'water_pulse', 'psybeam'], talent: 'naturalcure', item: 'mystic_water', ivs: { spa: 9, spe: 9 }, evs: { spa: 9, spe: 9 } },
     ],
   },
-  // ── Arènes 3 à 8 de Kanto (étape 3, passe 19) — espèces et niveaux RFVF ──
+  // ── Kanto gyms 3 to 8 (step 3, phase 19) — FRLG species and levels ──
   surge: {
     id: 'surge', kind: 'gym', region: 'kanto',
     name: 'Major Bob (Arène de Carmin sur Mer)', title: 'Champion d\'Arène Électrik',
@@ -158,11 +160,11 @@ const OFFICIAL_TEAMS = {
   },
 
   // ═══════════ ARC RIVAL — BLUE (Kanto) ═══════════
-  // Canon RFVF : le rival possède le starter fort contre celui du joueur.
-  // Les équipes ci-dessous reprennent espèces et niveaux des combats
-  // officiels (route 22 optionnel, Pont Pépite, S.S. Anne, Sylphe,
-  // route 22 pré-Ligue). Ratticane 20 sur le S.S. Anne (canon 16) : le
-  // jeu fait évoluer Rattata au niveau 20 — ajustement de légitimité.
+  // FRLG canon: the rival owns the starter strong against the player's.
+  // The teams below reuse species and levels from the battles
+  // officials (optional route 22, Nugget Bridge, S.S. Anne, Silph Co.,
+  // route 22 pre-League). Raticate 20 on the S.S. Anne (canon 16): the
+  // game evolves Rattata at level 20 — legitimacy adjustment.
   kanto_rival_route22: {
     id: 'kanto_rival_route22', kind: 'rival', region: 'kanto', role: 'rival',
     name: 'Blue (Route 22)', title: 'Rival',
@@ -245,7 +247,7 @@ const OFFICIAL_TEAMS = {
     rewardMoney: 8000,
     source: 'RFVF — combat de la Sylphe S.A. (Safrania)',
     variantsByStarter: {
-      // Joueur Bulbizarre → Blue a Salamèche : couvertures Feu + Plante.
+      // Player Bulbasaur -> Blue has Charmander: Fire + Grass coverage.
       '1': [
       { id: 18, level: 37, moves: ['strength', 'body_press', 'hurricane', 'fly'], talent: 'bigpecks', item: null },
       { id: 58, level: 38, moves: ['fire_punch', 'fire_fang', 'flamethrower', 'strength'], talent: 'flamebody', item: null },
@@ -253,7 +255,7 @@ const OFFICIAL_TEAMS = {
       { id: 65, level: 33, moves: ['extrasensory', 'psychic', 'zen_headbut', 'psychic_fangs'], talent: 'synchronize', item: null },
       { id: 6, level: 38, moves: ['hurricane', 'flamethrower', 'fly', 'drill_peck'], talent: 'blaze', item: 'charcoal', ivs: { spa: 4, spe: 6 }, evs: { spa: 8, spe: 4 } },
       ],
-      // Joueur Salamèche → Blue a Carapuce : couvertures Plante + Eau.
+      // Player Charmander -> Blue has Squirtle: Grass + Water coverage.
       '4': [
       { id: 18, level: 37, moves: ['strength', 'body_press', 'hurricane', 'fly'], talent: 'bigpecks', item: null },
       { id: 102, level: 38, moves: ['extrasensory', 'energy_ball', 'psychic', 'seed_bomb'], talent: 'insomnia', item: null },
@@ -261,7 +263,7 @@ const OFFICIAL_TEAMS = {
       { id: 65, level: 33, moves: ['extrasensory', 'psychic', 'zen_headbut', 'psychic_fangs'], talent: 'synchronize', item: null },
       { id: 9, level: 38, moves: ['muddy_water', 'surf', 'aqua_tail', 'liquidation'], talent: 'torrent', item: 'mystic_water', ivs: { spa: 4, spe: 6 }, evs: { spa: 8, spe: 4 } },
       ],
-      // Joueur Carapuce → Blue a Bulbizarre : couvertures Eau + Plante.
+      // Player has Carapuce → Blue has Bulbizarre: Eau + Plante coverage.
       '7': [
       { id: 18, level: 37, moves: ['strength', 'body_press', 'hurricane', 'fly'], talent: 'bigpecks', item: null },
       { id: 130, level: 38, moves: ['aqua_tail', 'fly', 'hurricane', 'muddy_water'], talent: 'multiscale', item: null },
@@ -382,9 +384,9 @@ const OFFICIAL_TEAMS = {
   },
 
   // ═══════════ DOJO DE SAFRANIA (passe 21 — RFVF : Koichi, 888₽ canon) ═══════════
-  // Canon FRLG : Kicklee ♂37 (Limber) + Tygnon ♂37 (Keen Eye), les deux @
-  // Ceinture Noire ; le cadeau (au choix, Nv.25) devient ici un Tyrogue Nv.25,
-  // qui évolue vers la voie du pied OU du poing selon ses stats.
+  // FRLG canon: Kicklee ♂37 (Limber) + Tygnon ♂37 (Keen Eye), both @
+  // Black Belt; the gift (player's choice, Lv.25) becomes a Tyrogue Lv.25 here,
+  // evolving along the kick OR punch path depending on its stats.
   kanto_dojo_master: {
     id: 'kanto_dojo_master', kind: 'quest', region: 'kanto', role: 'trainer',
     name: 'Karatéka Karuo (Dojo de Safrania)', title: 'Roi du Karaté',
@@ -543,10 +545,10 @@ const OFFICIAL_TEAMS = {
       { id: 229, level: 38, moves: ['flamethrower', 'crunch', 'fire_fang', 'bite'], talent: 'moxie', item: 'charcoal', ivs: { spa: 9, spe: 9 }, evs: { spa: 12, spe: 6 } },
     ],
   },
-  // ── Boss du FILM 3 (Le Sort des Zarbi), étape 4 (passe 20) ──
-  // Le Professeur Hale, pétrifié dans l\'illusion des Zarbi, projette un
-  // Entei cristallin. Rencontre de milieu d\'aventure (après Blanche) :
-  // l\'Entei n\'est que N.30 (illusion affaiblie), Zarbi en escorte.
+  // ── MOVIE 3 boss (Spell of the Unown), step 4 (phase 20) ──
+  // Professor Hale, petrified inside the Unown illusion, projects a
+  // crystalline Entei. Mid-adventure encounter (after Whitney):
+  // the Entei is only Lv.30 (weakened illusion), Unown as escort.
   johto_film3_entei: {
     id: 'johto_film3_entei', kind: 'boss', region: 'johto', role: 'boss',
     name: 'Professeur Hale (possédé)', title: 'L\'illusion des Zarbi',
@@ -560,8 +562,8 @@ const OFFICIAL_TEAMS = {
     ],
   },
 
-  // ═══════════ LIGUE KANTO (étape 3, passe 19) — RFVF 1er passage ═══════════
-  // Les 5 étapes du gauntlet, dans l'ordre (voir OFFICIAL_LEAGUE_ORDER).
+  // ═══════════ KANTO LEAGUE (step 3, pass 19) — FRLG first run ═══════════
+  // The 5 gauntlet steps, in order (see OFFICIAL_LEAGUE_ORDER).
   lorelei: {
     id: 'lorelei', kind: 'league', region: 'kanto', role: 'league',
     name: 'Olga (Conseil 4)', title: 'Conseil 4 — Glace & Eau',
@@ -614,10 +616,10 @@ const OFFICIAL_TEAMS = {
       { id: 149, level: 60, moves: ['outrage', 'dragon_rush', 'draco_meteor', 'giga_impact'], talent: 'intimidate', item: 'choice_band', ivs: { atk: 6, spe: 12 }, evs: { atk: 16, spe: 2 } },
     ],
   },
-  // Maître Blue : canon RFVF — le duo variable dépend du starter du JOUEUR
-  // (joueur Bulbizarre → Blue a Dracaufeu + Noadkoko 59/Léviator 61,
-  //  joueur Salamèche → Tortank + Arcanin 59/Noadkoko 61,
-  //  joueur Carapuce → Florizarre + Léviator 59/Arcanin 61).
+  // Champion Blue: FRLG canon — the variable duo depends on the PLAYER's starter
+  // (player Bulbasaur -> Blue has Charizard + Exeggutor 59/Gyarados 61,
+  //  player Charmander -> Blastoise + Arcanine 59/Exeggutor 61,
+  //  player Squirtle -> Venusaur + Gyarados 59/Arcanine 61).
   blue: {
     id: 'blue', kind: 'league', region: 'kanto', role: 'league',
     name: 'Bleu (Maître de la Ligue)', title: 'Maître de la Ligue Kanto',
@@ -651,7 +653,7 @@ const OFFICIAL_TEAMS = {
     },
   },
 
-  // ═══════════ ARÈNES JOHTO (étape 3, passe 19) — espèces/niveaux OAC ═════
+  // ═══════════ JOHTO GYMS (step 3, pass 19) — GSC species/levels ═════
   falkner: {
     id: 'falkner', kind: 'gym', region: 'johto',
     name: 'Albert (Arène de Mauville)', title: 'Champion d\'Arène Vol',
@@ -756,7 +758,7 @@ const OFFICIAL_TEAMS = {
     ],
   },
 
-  // ═══════════ LIGUE JOHTO (étape 3, passe 19) — OAC 1er passage ═══════════
+  // ═══════════ JOHTO LEAGUE (step 3, pass 19) — GSC first run ═══════════
   will: {
     id: 'will', kind: 'league', region: 'johto', role: 'league',
     name: 'Clément (Conseil 4)', title: 'Conseil 4 — Psy',
@@ -825,9 +827,9 @@ const OFFICIAL_TEAMS = {
   },
 };
 
-// Ordre des étapes du gauntlet de chaque ligue (clés OFFICIAL_TEAMS).
-// Le dernier membre est le Maître (chez Kanto, équipe variable selon le
-// starter du joueur — voir variantsByStarter de 'blue').
+// Gauntlet step order of each league (OFFICIAL_TEAMS keys).
+// The last member is the Champion (in Kanto, team varies with the
+// player starter — see variantsByStarter of 'blue').
 const OFFICIAL_LEAGUE_ORDER = {
   kanto: ['lorelei', 'bruno', 'agatha', 'lance', 'blue'],
   johto: ['will', 'koga_e4', 'bruno_johto', 'karen', 'lance_johto'],
@@ -838,22 +840,22 @@ function getOfficialLeagueKeys(region) {
   return (OFFICIAL_LEAGUE_ORDER[region] || OFFICIAL_LEAGUE_ORDER.kanto).slice();
 }
 
-// Équipe instanciée de l'étape `stageIdx` du gauntlet — résout la variante
-// du Maître Blue via le starter du joueur (null → repli 1re variante).
+// Instantiated team of gauntlet stage `stageIdx` — resolves the
+// Champion Blue variant via the player starter (null -> 1st-variant fallback).
 function getOfficialLeagueTeam(region, stageIdx, starterId) {
   const keys = getOfficialLeagueKeys(region);
   const key = keys[Math.max(0, Math.min(stageIdx || 0, keys.length - 1))];
   return getOfficialTeam(key, starterId) || [];
 }
 
-if (typeof OFFICIAL_LEAGUE_ORDER !== 'undefined' && typeof window !== 'undefined') window.OFFICIAL_LEAGUE_ORDER = OFFICIAL_LEAGUE_ORDER;
-if (typeof getOfficialLeagueKeys !== 'undefined' && typeof window !== 'undefined') window.getOfficialLeagueKeys = getOfficialLeagueKeys;
-if (typeof getOfficialLeagueTeam !== 'undefined' && typeof window !== 'undefined') window.getOfficialLeagueTeam = getOfficialLeagueTeam;
+if (typeof OFFICIAL_LEAGUE_ORDER !== 'undefined') { if (typeof window !== 'undefined') window.OFFICIAL_LEAGUE_ORDER = OFFICIAL_LEAGUE_ORDER; if (typeof globalThis !== 'undefined') globalThis.OFFICIAL_LEAGUE_ORDER = OFFICIAL_LEAGUE_ORDER; }
+if (typeof getOfficialLeagueKeys !== 'undefined') { if (typeof window !== 'undefined') window.getOfficialLeagueKeys = getOfficialLeagueKeys; if (typeof globalThis !== 'undefined') globalThis.getOfficialLeagueKeys = getOfficialLeagueKeys; }
+if (typeof getOfficialLeagueTeam !== 'undefined') { if (typeof window !== 'undefined') window.getOfficialLeagueTeam = getOfficialLeagueTeam; if (typeof globalThis !== 'undefined') globalThis.getOfficialLeagueTeam = getOfficialLeagueTeam; }
 
-// Construit une instance jouable d'un Pokémon d'équipe officielle (miroir de
-// trainerPoke du legacy, sans dépendre de sa portée). Les attaques absentes
-// de MOVES sont filtrées (comme trainerPoke) — le validateur de tests les
-// signale, elles ne doivent donc jamais en contenir.
+// Builds a playable instance of an official-team Pokemon (mirror of
+// legacy trainerPoke, without depending on its scope). Moves missing
+// from MOVES are filtered (like trainerPoke) — the test validator
+// reports them, so they must never appear.
 function buildOfficialTeamPoke(spec) {
   const p = createPoke(spec.id, spec.level, !!spec.shiny);
   if (!p) return p;
@@ -866,23 +868,23 @@ function buildOfficialTeamPoke(spec) {
   return p;
 }
 
-// Renvoie la LISTE DE SPECS d'une entrée officielle, en résolvant la
-// variante du rival selon le starter du joueur si nécessaire.
+// Returns the SPEC LIST of an official entry, resolving the
+// rival variant via the player starter if needed.
 function getOfficialTeamSpecs(key, starterId) {
   const entry = OFFICIAL_TEAMS[key] || ((typeof OFFICIAL_TEAMS_HOENN !== 'undefined') ? OFFICIAL_TEAMS_HOENN[key] : null);
   if (!entry) return null;
   if (entry.variantsByStarter) {
     const byStarter = entry.variantsByStarter[String(starterId)];
     if (byStarter) return byStarter;
-    // Repli : première variante (joueur sans starter connu — ex. équipe box).
+    // Fallback: first variant (player with no known starter — e.g. box team).
     const first = Object.keys(entry.variantsByStarter)[0];
     return entry.variantsByStarter[first];
   }
   return entry.team || null;
 }
 
-// Renvoie l'équipe instanciée d'une entrée officielle (ou null si inconnue).
-// starterId : starter du JOUEUR pour les entrées à variantsByStarter.
+// Returns the instantiated team of an official entry (or null if unknown).
+// starterId: the PLAYER's starter for variantsByStarter entries.
 function getOfficialTeam(key, starterId) {
   const specs = getOfficialTeamSpecs(key, starterId);
   if (!specs) return null;
@@ -890,8 +892,20 @@ function getOfficialTeam(key, starterId) {
 }
 
 // --- Migrated to ES module, globals exposed ---
-if (typeof OFFICIAL_TEAMS !== 'undefined' && typeof window !== 'undefined') window.OFFICIAL_TEAMS = OFFICIAL_TEAMS;
-if (typeof buildOfficialTeamPoke !== 'undefined' && typeof window !== 'undefined') window.buildOfficialTeamPoke = buildOfficialTeamPoke;
-if (typeof getOfficialTeamSpecs !== 'undefined' && typeof window !== 'undefined') window.getOfficialTeamSpecs = getOfficialTeamSpecs;
-if (typeof getOfficialTeam !== 'undefined' && typeof window !== 'undefined') window.getOfficialTeam = getOfficialTeam;
+if (typeof OFFICIAL_TEAMS !== 'undefined') { if (typeof window !== 'undefined') window.OFFICIAL_TEAMS = OFFICIAL_TEAMS; if (typeof globalThis !== 'undefined') globalThis.OFFICIAL_TEAMS = OFFICIAL_TEAMS; }
+if (typeof buildOfficialTeamPoke !== 'undefined') { if (typeof window !== 'undefined') window.buildOfficialTeamPoke = buildOfficialTeamPoke; if (typeof globalThis !== 'undefined') globalThis.buildOfficialTeamPoke = buildOfficialTeamPoke; }
+if (typeof getOfficialTeamSpecs !== 'undefined') { if (typeof window !== 'undefined') window.getOfficialTeamSpecs = getOfficialTeamSpecs; if (typeof globalThis !== 'undefined') globalThis.getOfficialTeamSpecs = getOfficialTeamSpecs; }
+if (typeof getOfficialTeam !== 'undefined') { if (typeof window !== 'undefined') window.getOfficialTeam = getOfficialTeam; if (typeof globalThis !== 'undefined') globalThis.getOfficialTeam = getOfficialTeam; }
 
+
+// Wave 40 — native ESM module: grouped export of the same names as the
+// classic surface kept above/here (bodies unchanged).
+export {
+  OFFICIAL_LEAGUE_ORDER,
+  getOfficialLeagueKeys,
+  getOfficialLeagueTeam,
+  OFFICIAL_TEAMS,
+  buildOfficialTeamPoke,
+  getOfficialTeamSpecs,
+  getOfficialTeam,
+};

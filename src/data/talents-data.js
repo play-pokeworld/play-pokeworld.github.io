@@ -1,5 +1,7 @@
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
 // Auto-generated from PokeChill — FR translations
-const TALENTS = {
+export const TALENTS = {
 
   "adaptability": {
     "id": "adaptability",
@@ -742,7 +744,7 @@ const TALENTS = {
   "imposter": {
     "id": "imposter",
     "name": "imposter",
-    "name_fr": "Imitation",
+    "name_fr": "Morphing",
     "desc": "Le Pokémon imite l'apparence et la capacité de l'ennemi.",
     "rarity": 3,
     "type": ["all"]
@@ -787,7 +789,7 @@ const TALENTS = {
   "justified": {
     "id": "justified",
     "name": "justified",
-    "name_fr": "Juste",
+    "name_fr": "Cœur Noble",
     "desc": "Augmente l'Attaque quand le Pokémon est touché par une capacité Ténèbres.",
     "rarity": 3,
     "type": ["fighting"]
@@ -832,7 +834,7 @@ const TALENTS = {
   "limber": {
     "id": "limber",
     "name": "limber",
-    "name_fr": "Souplesse",
+    "name_fr": "Échauffement",
     "desc": "Empêche la paralysie.",
     "rarity": 1,
     "type": ["all"]
@@ -886,7 +888,7 @@ const TALENTS = {
   "merciless": {
     "id": "merciless",
     "name": "merciless",
-    "name_fr": "Sans Pitié",
+    "name_fr": "Cruauté",
     "desc": "Les capacités portent toujours un coup critique si l'ennemi est empoisonné.",
     "rarity": 3,
     "type": ["all"]
@@ -1758,4 +1760,6 @@ const TALENTS = {
 
 };
 
-if (typeof TALENTS !== "undefined" && typeof window !== "undefined") window.TALENTS = TALENTS;
+// Wave 40 — surface kept (T2 template): prod (window === globalThis
+// in the browser), VM harnesses and classic consumers.
+if (typeof globalThis !== 'undefined') globalThis.TALENTS = TALENTS;

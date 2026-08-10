@@ -2,16 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { harnessIsEsm, harnessBundleSource } from '../tools/harness-bundle.mjs';
 
-// ── Passe 16 — objets tenus : ils suivent le POKÉMON, pas le n° de slot ────
-// Bug remonté : échanger deux Pokémon dans la fenêtre Party laissait l'objet
-// sur le slot (les deux Pokémon se retrouvaient avec l'objet de l'autre) ;
-// supprimer un Pokémon laissait son objet au slot, hérité par le suivant.
-const TEAM = fs.readFileSync(new URL('../src/game/world/team.js', import.meta.url), 'utf8');
-const TEAM_UI = fs.readFileSync(new URL('../src/game/display/team-ui.js', import.meta.url), 'utf8');
-const TEAM_MANAGE = fs.readFileSync(new URL('../src/game/display/team-manage.js', import.meta.url), 'utf8');
-const BOX_UI = fs.readFileSync(new URL('../src/game/display/box-ui.js', import.meta.url), 'utf8');
-const BOX_SELECTOR = fs.readFileSync(new URL('../src/game/boxes/box-selector.js', import.meta.url), 'utf8');
+// ── Phase 16 — held items: they follow the POKÉMON, not the slot number ─────
+// Reported bug: swapping two Pokémon in the Party window left the item
+// on the slot (both Pokémon ended up with each other's item);
+// removing a Pokémon left its item on the slot, inherited by the next one.
+const TEAM = fs.readFileSync(new URL('../src/application/world/team.js', import.meta.url), 'utf8');
+const TEAM_UI = fs.readFileSync(new URL('../src/ui/game/team-ui.js', import.meta.url), 'utf8');
+const TEAM_MANAGE = fs.readFileSync(new URL('../src/ui/game/team-manage.js', import.meta.url), 'utf8');
+const BOX_UI = fs.readFileSync(new URL('../src/ui/game/box-ui.js', import.meta.url), 'utf8');
+const BOX_SELECTOR = fs.readFileSync(new URL('../src/ui/game/box-selector.js', import.meta.url), 'utf8');
 
 function makeSandbox(withManage = false) {
   const G = {
@@ -46,31 +47,35 @@ function makeSandbox(withManage = false) {
   sandbox.window = sandbox;
   sandbox.globalThis = sandbox;
   vm.createContext(sandbox);
-  vm.runInContext(TEAM, sandbox, { filename: 'team.js' });
-  if (withManage) vm.runInContext(TEAM_MANAGE, sandbox, { filename: 'team-manage.js' });
+  // Vague 41 — hybride individuelle : classique = texte vm direct ;
+  // converti ESM (team-manage, vague 41) = bundle isolé, globales via shim.
+  for (const [label, src] of [['src/application/world/team.js', TEAM]]
+    .concat(withManage ? [['src/ui/game/team-manage.js', TEAM_MANAGE]] : [])) {
+    vm.runInContext(harnessIsEsm(src) ? harnessBundleSource([label]) : src, sandbox, { filename: label });
+  }
   return sandbox;
 }
 function poke(name, uid) {
   return { id: 25, name, uid: uid || name, level: 20, currentHP: 40, maxHP: 40, heldItem: null };
 }
 
-test('helpers présents et exportés (swapTeamSlotItems, removeTeamSlotItemAt)', () => {
-  assert.ok(/function swapTeamSlotItems\(/.test(TEAM), 'swapTeamSlotItems défini');
-  assert.ok(/function removeTeamSlotItemAt\(/.test(TEAM), 'removeTeamSlotItemAt défini');
-  assert.ok(TEAM.includes('window.swapTeamSlotItems = swapTeamSlotItems'), 'swap exporté');
-  assert.ok(TEAM.includes('window.removeTeamSlotItemAt = removeTeamSlotItemAt'), 'remove exporté');
-  // Call sites mis à jour
-  assert.ok(TEAM_UI.includes('swapTeamSlotItems(sourceIdx, targetIdx)'), 'glisser-déposer Party : items échangés');
-  assert.ok(TEAM_MANAGE.includes('removeTeamSlotItemAt(idx)'), 'removeFromTeam : item supprimé avec le Pokémon');
-  assert.ok(TEAM_MANAGE.includes('setTeamSlotItem(teamIdx, null)'), 'swap équipe↔box : item libéré');
-  assert.ok(TEAM_MANAGE.includes('_itemByPoke'), 'preset : réagencement des items mémorisé');
-  assert.ok(BOX_UI.includes('setTeamSlotItem(idx, null)'), 'swap box-ui : item libéré');
-  assert.ok(BOX_UI.includes('removeTeamSlotItemAt(idx)'), 'sendTeamToBox : item supprimé');
-  assert.ok(BOX_SELECTOR.includes('setTeamSlotItem(_swapSlotIdx, null)'), 'sélecteur : remplacement libère l\'item');
-  assert.ok(BOX_SELECTOR.includes('removeTeamSlotItemAt(_depIdx)'), 'sélecteur : dépôt pension retire l\'item');
+test('helpers present and exported (swapTeamSlotItems, removeTeamSlotItemAt)', () => {
+  assert.ok(/function swapTeamSlotItems\(/.test(TEAM), 'swapTeamSlotItems defined');
+  assert.ok(/function removeTeamSlotItemAt\(/.test(TEAM), 'removeTeamSlotItemAt defined');
+  assert.ok(TEAM.includes('window.swapTeamSlotItems = swapTeamSlotItems'), 'swap exported');
+  assert.ok(TEAM.includes('window.removeTeamSlotItemAt = removeTeamSlotItemAt'), 'remove exported');
+  // Call sites updated
+  assert.ok(TEAM_UI.includes('swapTeamSlotItems(sourceIdx, targetIdx)'), 'Party drag & drop: items swapped');
+  assert.ok(TEAM_MANAGE.includes('removeTeamSlotItemAt(idx)'), 'removeFromTeam: item removed with the Pokémon');
+  assert.ok(TEAM_MANAGE.includes('setTeamSlotItem(teamIdx, null)'), 'team↔box swap: item freed');
+  assert.ok(TEAM_MANAGE.includes('_itemByPoke'), 'preset: item rearrangement memorized');
+  assert.ok(BOX_UI.includes('setTeamSlotItem(idx, null)'), 'box-ui swap: item freed');
+  assert.ok(BOX_UI.includes('removeTeamSlotItemAt(idx)'), 'sendTeamToBox: item removed');
+  assert.ok(BOX_SELECTOR.includes('setTeamSlotItem(_swapSlotIdx, null)'), 'selector: replacement frees the item');
+  assert.ok(BOX_SELECTOR.includes('removeTeamSlotItemAt(_depIdx)'), 'selector: day-care deposit removes the item');
 });
 
-test('échange drag & drop : les objets échangent de place avec leurs porteurs', () => {
+test('drag & drop swap: items swap places with their carriers', () => {
   const sb = makeSandbox();
   const A = poke('A'); const B = poke('B');
   sb.G.team = [A, B];
@@ -78,34 +83,34 @@ test('échange drag & drop : les objets échangent de place avec leurs porteurs'
   sb.syncTeamSlotHeldItems();
   assert.equal(A.heldItem, 'choice_band');
   assert.equal(B.heldItem, 'leftovers');
-  // Simule teamDrop : les Pokémon échangent leurs places…
+  // Simulates teamDrop: the Pokémon swap places…
   sb.G.team[0] = B; sb.G.team[1] = A;
-  // …puis les objets sont échangés eux aussi (passe 16)
+  // …then the items are swapped too (phase 16)
   sb.swapTeamSlotItems(0, 1);
-  assert.equal(sb.G.teamSlotItems[0], 'leftovers', 'slot 0 = objet de B');
-  assert.equal(sb.G.teamSlotItems[1], 'choice_band', 'slot 1 = objet de A');
-  assert.equal(A.heldItem, 'choice_band', 'A garde SON objet après l\'échange');
-  assert.equal(B.heldItem, 'leftovers', 'B garde SON objet après l\'échange');
+  assert.equal(sb.G.teamSlotItems[0], 'leftovers', 'slot 0 = item of B');
+  assert.equal(sb.G.teamSlotItems[1], 'choice_band', 'slot 1 = item of A');
+  assert.equal(A.heldItem, 'choice_band', 'A keeps ITS item after the swap');
+  assert.equal(B.heldItem, 'leftovers', 'B keeps ITS item after the swap');
 });
 
-test('suppression : l\'objet du Pokémon retiré part, ceux des suivants glissent', () => {
+test('removal: the removed Pokémon\'s item leaves, the followers\' slide', () => {
   const sb = makeSandbox();
   const A = poke('A'); const B = poke('B'); const C = poke('C');
   sb.G.team = [A, B, C];
   sb.G.teamSlotItems = ['choice_band', 'leftovers', 'focus_band'];
   sb.syncTeamSlotHeldItems();
-  // Retire A (index 0) : B et C remontent d'un cran
+  // Removes A (index 0): B and C move up one
   sb.G.team.splice(0, 1);
   sb.removeTeamSlotItemAt(0);
-  assert.equal(sb.G.teamSlotItems[0], 'leftovers', 'B récupère SA propre ceinture…');
-  assert.equal(sb.G.teamSlotItems[1], 'focus_band', 'C garde SON objet');
+  assert.equal(sb.G.teamSlotItems[0], 'leftovers', 'B gets ITS own belt back…');
+  assert.equal(sb.G.teamSlotItems[1], 'focus_band', 'C keeps ITS item');
   assert.equal(B.heldItem, 'leftovers');
   assert.equal(C.heldItem, 'focus_band');
-  assert.equal(sb.itemEquippedOnTeam('choice_band'), null, 'objet de A libéré (réassignable)');
-  assert.equal(sb.G.teamSlotItems.length, 6, 'toujours 6 slots');
+  assert.equal(sb.itemEquippedOnTeam('choice_band'), null, 'item of A freed (reassignable)');
+  assert.equal(sb.G.teamSlotItems.length, 6, 'always 6 slots');
 });
 
-test('remplacement équipe↔box : l\'objet du sortant est libéré, l\'arrivant sans objet', () => {
+test('team↔box replacement: the outgoing one\'s item is freed, the incoming one itemless', () => {
   const sb = makeSandbox();
   const A = poke('A'); const B = poke('B');
   sb.G.team = [A];
@@ -113,43 +118,43 @@ test('remplacement équipe↔box : l\'objet du sortant est libéré, l\'arrivant
   sb.syncTeamSlotHeldItems();
   const boxed = poke('Boxmon');
   sb.G.collection['box_1'] = boxed;
-  // Simule swapBoxWithTeam : A part au box, boxed arrive au slot 0
+  // Simulates swapBoxWithTeam: A goes to the box, boxed arrives at slot 0
   sb.G.team[0] = boxed;
   sb.setTeamSlotItem(0, null);
-  assert.equal(boxed.heldItem, null, 'le remplaçant arrive sans objet');
-  assert.equal(sb.itemEquippedOnTeam('choice_band'), null, 'objet du sortant libéré');
+  assert.equal(boxed.heldItem, null, 'the substitute arrives itemless');
+  assert.equal(sb.itemEquippedOnTeam('choice_band'), null, 'outgoing item freed');
 });
 
-test('preset : chaque Pokémon retrouve SON objet à sa nouvelle place', () => {
+test('preset: every Pokémon gets ITS item back at its new place', () => {
   const sb = makeSandbox(true);
   const A = poke('A', 'uidA'); const B = poke('B', 'uidB'); const C = poke('C', 'uidC');
   sb.G.team = [A, B];
   sb.G.teamSlotItems = ['choice_band', 'leftovers'];
   sb.syncTeamSlotHeldItems();
   sb.G.teamPresets = { preset1: { name: 'X', uids: ['uidB', 'uidC', 'uidA'] } };
-  sb.G.collection['999'] = C; // C au PC (sans objet)
+  sb.G.collection['999'] = C; // C at the PC (no item)
   sb.loadTeamFromPreset('preset1');
-  assert.equal(sb.G.team[0], B, 'B en tête');
-  assert.equal(sb.G.team[1], C, 'C rappelé du PC');
+  assert.equal(sb.G.team[0], B, 'B at the head');
+  assert.equal(sb.G.team[1], C, 'C recalled from the PC');
   assert.equal(sb.G.team[2], A, 'A en 3e');
-  assert.equal(B.heldItem, 'leftovers', 'B a gardé SON objet');
-  assert.equal(A.heldItem, 'choice_band', 'A a gardé SON objet');
-  assert.equal(C.heldItem, null, 'C (venu du PC) sans objet');
-  assert.equal(sb.itemEquippedOnTeam('leftovers'), B, 'porteur cohérent');
+  assert.equal(B.heldItem, 'leftovers', 'B kept ITS item');
+  assert.equal(A.heldItem, 'choice_band', 'A kept ITS item');
+  assert.equal(C.heldItem, null, 'C (from the PC) itemless');
+  assert.equal(sb.itemEquippedOnTeam('leftovers'), B, 'coherent holder');
 });
 
-test('purge des objets orphelins au-delà de la taille de l\'équipe', () => {
+test('purge of orphan items beyond the team size', () => {
   const sb = makeSandbox();
   const A = poke('A');
   sb.G.team = [A];
   sb.G.teamSlotItems = ['choice_band', 'leftovers', null, 'focus_band'];
   sb.syncTeamSlotHeldItems();
-  assert.equal(sb.G.teamSlotItems[1], null, 'slot 1 (hors équipe) purgé');
-  assert.equal(sb.G.teamSlotItems[3], null, 'slot 3 (hors équipe) purgé');
-  assert.equal(A.heldItem, 'choice_band', 'objet du Pokémon conservé');
+  assert.equal(sb.G.teamSlotItems[1], null, 'slot 1 (off team) purged');
+  assert.equal(sb.G.teamSlotItems[3], null, 'slot 3 (off team) purged');
+  assert.equal(A.heldItem, 'choice_band', 'the Pokémon\'s item kept');
 });
 
-test('intégration : le bonus d\'objet (getHeldBuff) suit le porteur après échange', () => {
+test('integration: the item bonus (getHeldBuff) follows the carrier after swap', () => {
   const sb = makeSandbox();
   const A = poke('A'); const B = poke('B');
   A.atk = 50; B.atk = 80;
@@ -161,6 +166,6 @@ test('intégration : le bonus d\'objet (getHeldBuff) suit le porteur après éch
   sb.G.team[0] = B; sb.G.team[1] = A;
   sb.swapTeamSlotItems(0, 1);
   assert.equal(sb.getHeldBuff(A).atk, beforeA, 'le bonus suit A');
-  assert.equal(sb.getHeldBuff(B).atk, 0, 'B sans bonus');
+  assert.equal(sb.getHeldBuff(B).atk, 0, 'B without bonus');
 });
 

@@ -2,43 +2,44 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { harnessBundleSource } from '../tools/harness-bundle.mjs';
 
-// ── Passe 41 : confort d'édition, hauteur visuelle, objets canon ───────────
-// Retours utilisateur traités :
-//  A. « Je ne peux pas cliquer sur un objet pour le redéplacer » → UN clic =
-//     prise en main directe (la sélection en 2 temps était invisible) ;
-//     « Ramasser » RANGE le meuble tenu ; un clic sur le rendu 3D rappelle
-//     que l'édition se fait en 2D (need2d).
-//  B. « Les nouvelles maps sont mal faites… la porte donne sur un mur » →
-//     les 6 gabarits perso sont regrillés : porte E avec case NORD libre,
-//     BFS plaine-pied complet, ancres d'escalier par PAIRES (2 de large),
-//     mezzanine ≥ 6 cases. Invariants vérifiés sur les 30 gabarits.
-//  C. « L'escalier est gigantesque, inspire-toi de ROSA (2 de large) » →
-//     escalier = empreinte canon 2×2, rot 90, sprite 32×32 cuit DA Émeraude.
-//  D. « Rotation : tu réduis la largeur au lieu de pivoter » + « objets de
-//     2 cases de haut réduits » → base2dSpriteBox autorise +1 case de haut
-//     visuelle (collision = case basse seule), base2dDrawSprite PIVOTE le
-//     bitmap (échelle uniforme, jamais étiré). Dimensions catalogue =
-//     DECORSHAPE canon (header.h du désassemblage pokeemerald).
-//  E. « Objets sans sprites (mélange ROSA/Émeraude) » → 19 sprites
-//     redessinés DA Émeraude (pc rouge à barres jaunes inclus), 150 PNG,
-//     invisible_doll retiré du catalogue ; seul welcome_mat reste procédural.
-//  F. i18n : need2d/select_hint/move_hint présents FR+EN, zéro chaîne en dur.
+// ── Phase 41: editing comfort, visual height, canonical objects ───────────
+// Addressed user feedback:
+//  A. "I can't click an object to move it again" → ONE click =
+//     direct pick-up (the 2-step selection was invisible);
+//     "Pick up" STORES the held furniture; a click on the 3D render recalls
+//     that editing happens in 2D (need2d).
+//  B. "The new maps are poorly made… the door opens onto a wall" →
+//     the 6 custom layouts are re-gridded: E door with free NORTH tile,
+//     full flat BFS, stairs anchors in PAIRS (2 wide),
+//     mezzanine ≥ 6 tiles. Invariants verified on the 30 layouts.
+//  C. "The stairs are gigantic, take inspiration from FRLG (2 wide)" →
+//     stairs = canon 2×2 footprint, rot 90, 32×32 sprite baked with Emerald art direction.
+//  D. "Rotation: you shrink the width instead of rotating" + "2-tile-tall
+//     objects shrunk" → base2dSpriteBox allows +1 tile of VISUAL height
+//     (collision = bottom cell only), and base2dDrawSprite ROTATES the
+//     bitmap (uniform scale, never stretched). Catalog dimensions =
+//     canonical DECORSHAPE (header.h from the pokeemerald disassembly).
+//  E. "Objects without sprites (FRLG/Emerald mix)" → 19 sprites
+//     redrawn with Emerald art direction (red pc with yellow bars included), 150 PNG,
+//     invisible_doll removed from the catalog; only welcome_mat stays procedural.
+//  F. i18n: need2d/select_hint/move_hint present FR+EN, zero hardcoded string.
 const R = (p) => fs.readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
 const J = (p) => JSON.parse(R(p));
 const E = (p) => fs.existsSync(new URL(`../${p}`, import.meta.url));
 
 const SANDBOX_FILES = [
-  'src/file-preflight.js',
+  'src/engine/input/action-dispatcher.js', 'src/engine/runtime/classic-bridge.js',
   'src/localization/fr/base.js', 'src/localization/en/base.js',
   'src/localization/data.js', 'src/localization/i18n.js',
-  'src/game/core/state.js',
+  'src/application/game-state.js',
   'src/data/base-layouts-data.js', 'src/data/base-items-data.js',
-  'src/game/base/base-core.js',
-  'src/game/base/base-visit.js',
-  'src/game/base/base-editor.js',
-  'src/game/base/base-debug.js',
-  'src/game/base/base-view2d.js',
+  'src/application/base/base-core.js',
+  'src/ui/game/base/base-visit.js',
+  'src/ui/game/base/base-editor.js',
+  'src/ui/game/base/base-debug.js',
+  'src/ui/game/base/base-view2d.js',
 ];
 
 function makeSandbox() {
@@ -65,33 +66,33 @@ function makeSandbox() {
   sandbox.window = sandbox;
   sandbox.globalThis = sandbox;
   vm.createContext(sandbox);
-  for (const f of SANDBOX_FILES) vm.runInContext(R(f), sandbox, { filename: f });
+  vm.runInContext(harnessBundleSource(SANDBOX_FILES), sandbox, { filename: 'passe41-confort-canons [iife]' });
   return sandbox;
 
 }
 
-// ——— A — Clic direct = prise en main (code + boutons) ————————————————————
-test('passe 41 A : édition directe câblée (clic unique, Ramasser le tenu, hint 3D)', () => {
-  const ed = R('src/game/base/base-editor.js');
-  const win = R('src/game/base/base-window.js');
-  // le clic sur un meuble posé appelle DIRECTEMENT baseEditorMoveStart
+// ——— A — Direct click = pick-up (code + buttons) ————————————————————
+test('phase 41 A: direct editing wired (single click, Pick up the held one, 3D hint)', () => {
+  const ed = R('src/ui/game/base/base-editor.js');
+  const win = R('src/ui/game/base/base-window.js');
+  // clicking placed furniture DIRECTLY calls baseEditorMoveStart
   const clickIdx = ed.indexOf('function baseEditorClickCell');
   const mvIdx = ed.indexOf('baseEditorMoveStart(st, sel.uid)', clickIdx);
   assert.ok(mvIdx > clickIdx, 'baseEditorClickCell → baseEditorMoveStart direct');
-  assert.ok(ed.includes('UN clic sur un meuble posé'), 'commentaire passe 41 (traçabilité du choix UX)');
-  // « Ramasser » accepte le meuble TENU (hors automatiques)
-  assert.ok(win.includes('Ramasser » range aussi le meuble TENU'), 'toolbar : pickup gère le tenu');
-  // préfixe de fonctions banni (convention du projet)
-  for (const f of ['src/game/base/base-editor.js', 'src/game/base/base-window.js', 'src/game/base/base-view2d.js', 'src/game/base/base-core.js']) {
-    assert.ok(!R(f).includes('baseWindowToggle'), `pas de baseWindowToggle* dans ${f}`);
+assert.ok(ed.includes('ONE click on a placed furniture takes it'), 'pass 41 comment (UX choice traceability)');
+// "Pick up" also accepts the HELD furniture (except automatic items)
+assert.ok(R('src/ui/game/base/base-editor.js').includes('Pick up the placed selection (or the HELD furniture)'), 'toolbar: pickup handles the held item');
+  // banned function prefix (project convention)
+  for (const f of ['src/ui/game/base/base-editor.js', 'src/ui/game/base/base-window.js', 'src/ui/game/base/base-view2d.js', 'src/application/base/base-core.js']) {
+    assert.ok(!R(f).includes('baseWindowToggle'), `no baseWindowToggle* in ${f}`);
   }
-  // helpers 2D exportés (tests + outils)
-  assert.ok(R('src/game/base/base-view2d.js').includes('window.base2dSpriteBox = base2dSpriteBox'), 'base2dSpriteBox exporté');
-  assert.ok(R('src/game/base/base-view2d.js').includes('window.base2dDrawSprite = base2dDrawSprite'), 'base2dDrawSprite exporté');
+  // exported 2D helpers (tests + tools) — canonical export = engine action registry (wave 34)
+  assert.ok(R('src/ui/game/base/base-view2d.js').includes("PokeActions.register('base2dSpriteBox', base2dSpriteBox)"), 'base2dSpriteBox exported');
+  assert.ok(R('src/ui/game/base/base-view2d.js').includes("PokeActions.register('base2dDrawSprite', base2dDrawSprite)"), 'base2dDrawSprite exported');
 });
 
-// ——— B — Invariants des 30 gabarits (porte libre, BFS, ancres, mezzanine) —
-test('passe 41 B : les 30 gabarits respectent les invariants d’aménagement', () => {
+// ——— B — Invariants of the 30 layouts (free door, BFS, anchors, mezzanine) —
+test('phase 41 B: the 30 layouts respect the furnishing invariants', () => {
   const sb = makeSandbox();
   const out = JSON.parse(vm.runInContext(`(() => {
     const report = [];
@@ -103,16 +104,16 @@ test('passe 41 B : les 30 gabarits respectent les invariants d’aménagement', 
       for (let y = 0; y < L.h; y++) for (let x = 0; x < L.w; x++) {
         const c = at(x, y);
         if (c.t === 'floor' || c.t === 'hole') floors.push([x, y]);
-        if (c.entrance) { if (E) report.push(id + ': 2e entrée'); E = [x, y]; }
+        if (c.entrance) { if (E) report.push(id + ': 2nd entrance'); E = [x, y]; }
         if (c.spawnPt) { if (S) report.push(id + ': 2e spawn'); S = [x, y]; }
       }
       if (!E) { report.push(id + ': pas de porte'); continue; }
       if (!S) { report.push(id + ': pas de spawn'); continue; }
-      // la PORTE ne donne jamais sur un mur : la case au NORD est du sol libre
+      // the DOOR never faces a wall: the tile NORTH of it is free floor
       const nE = at(E[0], E[1] - 1);
       if (!(nE.t === 'floor' && !nE.entrance)) report.push(id + ': case NORD de la porte = ' + nE.t);
       if (at(S[0], S[1]).t !== 'floor') report.push(id + ': spawn hors sol');
-      // BFS plaine-pied depuis le spawn : TOUT le rez-de-chaussée est atteint
+      // level-walk BFS from the spawn: the WHOLE ground floor is reached
       const seen = new Set([S[0] + ',' + S[1]]);
       const q = [S];
       while (q.length) {
@@ -129,19 +130,19 @@ test('passe 41 B : les 30 gabarits respectent les invariants d’aménagement', 
         if (c.elev) continue;
         if (!seen.has(f[0] + ',' + f[1])) { report.push(id + ': case plaine-pied inaccessible ' + f); break; }
       }
-      if (!seen.has(E[0] + ',' + (E[1] - 1))) report.push(id + ': porte non atteignable à pied');
-      // gabarits 2 niveaux : ancres par PAIRES (escalier 2 de large), falaise
-      // au N, mezzanine au N-2, ≥ 6 cases surélevées
+      if (!seen.has(E[0] + ',' + (E[1] - 1))) report.push(id + ': door not reachable on foot');
+      // 2-level layouts: anchors in PAIRS (2-wide stairs), cliff
+      // at N, mezzanine at N-2, ≥ 6 raised tiles
       if (id.endsWith('_5') || id.endsWith('_6')) {
-        if (!L.stairAnchors.length) report.push(id + ': aucune ancre');
+        if (!L.stairAnchors.length) report.push(id + ': no anchor');
         if (L.stairAnchors.length % 2) report.push(id + ': ancres impaires (paires requises)');
         for (const a of L.stairAnchors) {
           const N = at(a.x, a.y - 1), NN = at(a.x, a.y - 2);
           const right = at(a.x + 1, a.y), rightN = at(a.x + 1, a.y - 1);
           const leftIsAnchor = !!at(a.x - 1, a.y).stairAnchor;
-          if (N.t !== 'cliff') report.push(id + ': ancre ' + a.x + ',' + a.y + ' sans falaise au N');
-          if (NN.elev !== 1) report.push(id + ': ancre ' + a.x + ',' + a.y + ' sans mezzanine au N-2');
-          if (!leftIsAnchor && !(right.stairAnchor && rightN.t === 'cliff')) report.push(id + ': ancre ' + a.x + ',' + a.y + ' sans PAIRE à droite');
+          if (N.t !== 'cliff') report.push(id + ': anchor ' + a.x + ',' + a.y + ' without cliff at N');
+          if (NN.elev !== 1) report.push(id + ': anchor ' + a.x + ',' + a.y + ' without mezzanine at N-2');
+          if (!leftIsAnchor && !(right.stairAnchor && rightN.t === 'cliff')) report.push(id + ': anchor ' + a.x + ',' + a.y + ' without PAIR on the right');
         }
         let mezz = 0;
         for (let y = 0; y < L.h; y++) for (let x = 0; x < L.w; x++) if (at(x, y).elev === 1) mezz++;
@@ -150,20 +151,20 @@ test('passe 41 B : les 30 gabarits respectent les invariants d’aménagement', 
     }
     return JSON.stringify({ n: ids.length, report });
   })()`, sb));
-  assert.equal(out.n, 36, '36 gabarits (24 canon + 6 perso + 6 grottes colorées à étage, passe 42)');
-  assert.deepEqual(out.report, [], 'porte dégagée + BFS complet + ancres par paires + mezzanine ≥ 6');
+  assert.equal(out.n, 36, '36 layouts (24 canon + 6 custom + 6 colored multi-floor caves, phase 42)');
+  assert.deepEqual(out.report, [], 'clear door + full BFS + anchors in pairs + mezzanine ≥ 6');
 });
 
-// ——— C — Escalier canon ROSA : 2×2, paire d'ancres, exclusion chevauche ——
-test('passe 51 C : escalier 2×2 style ROSA — dims, paire d’ancres, exclusion', () => {
+// ——— C — ORAS canon stairs: 2×2, anchor pair, overlap exclusion ——
+test('phase 51 C: 2×2 FRLG-style stairs — dims, anchor pair, exclusion', () => {
   const sb = makeSandbox();
   const out = JSON.parse(vm.runInContext(`(() => {
     const r = {};
     const def = baseItemGet('stairs');
     r.def = { w: def.w, d: def.d, rot: def.rot, acq: def.acq, walk: !!def.walk, fx: def.fx };
-    // Passe 51 : chaque gabarit à étage est DEUX salles reliées par un couloir
-    // et UN escalier — on vérifie donc la paire d'ancres et le refus du
-    // chevauchement sur cette même paire.
+    // Pass 51: each two-level layout is TWO rooms joined by a corridor
+    // and ONE stairs — so we check the anchor pair and the refusal to
+    // overlap that same pair.
     const st = baseGetState();
     baseDebugCreate('bush_6');
     st.items = []; st.stock = {}; st.npcs = []; st.npcStock = []; st.uidSeq = 1;
@@ -173,33 +174,33 @@ test('passe 51 C : escalier 2×2 style ROSA — dims, paire d’ancres, exclusio
     const p1 = basePlace(st, 'stairs', anchors[0].x, anchors[0].y, 0);
     const s1 = st.items.find((i) => i.s === 'stairs');
     r.first = p1.ok === true && s1.x === anchors[0].x && s1.y === anchors[0].y - 1;
-    // la 2e ancre de la MÊME paire chevauche l'escalier posé → refusée
+    // the 2nd anchor of the SAME pair overlaps the placed stairs → refused
     r.overlapReason = baseCanPlace(st, 'stairs', anchors[1].x, anchors[1].y, 0).reason;
     r.stairsCount = st.items.filter((i) => i.s === 'stairs').length;
     return JSON.stringify(r);
   })()`, sb));
-  assert.deepEqual(out.def, { w: 2, d: 2, rot: 0, acq: 'fortree', walk: true, fx: 'stairs' }, 'escalier canon : 2×2 (deux de large comme ROSA), SANS rotation (passe 42), marchable');
-  assert.equal(vm.runInContext(`baseItemRotCount(baseItemGet('stairs'))`, sb), 1, 'escalier : orientation unique');
-  assert.equal(out.pairs, 2, 'une paire d’ancres (2 cases) par gabarit à étage');
-  assert.equal(out.first, true, 'escalier posé, empreinte normalisée ancre-1');
-  assert.equal(out.overlapReason, 'base.err.occupied', '2e ancre de la même paire = chevauchement refusé');
-  assert.equal(out.stairsCount, 1, 'un seul escalier tient dans la niche');
+  assert.deepEqual(out.def, { w: 2, d: 2, rot: 0, acq: 'fortree', walk: true, fx: 'stairs' }, 'canon stairs: 2×2 (two wide like FRLG), NO rotation (phase 42), walkable');
+  assert.equal(vm.runInContext(`baseItemRotCount(baseItemGet('stairs'))`, sb), 1, 'stairs: single orientation');
+  assert.equal(out.pairs, 2, 'one anchor pair (2 tiles) per multi-floor layout');
+  assert.equal(out.first, true, 'stairs placed, footprint normalized anchor-1');
+  assert.equal(out.overlapReason, 'base.err.occupied', '2nd anchor of the same pair = overlap refused');
+  assert.equal(out.stairsCount, 1, 'a single staircase fits in the niche');
 });
 
-// ——— D — Dimensions canon DECORSHAPE + hauteur visuelle ———————————————————
-test('passe 41 D : dims catalogue = header.h canon, hauteur visuelle débordante', () => {
+// ——— D — Canonical DECORSHAPE dims + visual height ———————————————————
+test('phase 41 D: catalog dims = canon header.h, overflowing visual height', () => {
   const sb = makeSandbox();
   const out = JSON.parse(vm.runInContext(`(() => {
     const CANON = {
       heavy_desk: [3, 2], ragged_desk: [3, 2], comfort_desk: [3, 2], // bureaux canon
       pretty_desk: [3, 3], brick_desk: [3, 3], camp_desk: [3, 3], hard_desk: [3, 3],
-      blue_tent: [3, 3], red_tent: [3, 3], // passe 42 : 3×3 canon (était 3×2)
+      blue_tent: [3, 3], red_tent: [3, 3], // pass 42: 3×3 canon (was 3×2)
       tv: [1, 1], round_tv: [1, 1], cute_tv: [1, 1], pc: [1, 1],
       breakable_door: [1, 2], stairs: [2, 2], tropical_plant: [1, 2],
-      // passe 42 : objets canon ajoutés (banner demande « il manque des assets »)
+      // pass 42: canon items added (request: "assets are missing")
       pika_poster: [2, 1], kiss_poster: [2, 1], gate_poster_none: null,
     };
-    delete CANON.gate_poster_none; // garde-fou local (hors catalogue)
+    delete CANON.gate_poster_none; // local guard (outside the catalog)
     Object.assign(CANON, { stand: [4, 2], slide: [2, 4], colorful_plant: [2, 2],
       surf_mat: [3, 3], fissure_mat: [3, 3], c_low_note_mat: [1, 1] });
     const dims = {}, fp0 = {};
@@ -208,16 +209,16 @@ test('passe 41 D : dims catalogue = header.h canon, hauteur visuelle débordante
       dims[s] = d ? [d.w, d.d] : null;
       fp0[s] = d ? baseItemFootprint(d, 0) : null;
     }
-    // hauteur visuelle : une plante tropicale (sprite 16×32) déborde d'une
-    // case vers le haut mais ne bloque QUE sa case basse (empreinte 1×1).
+    // Visual height: a tropical plant (16×32 sprite) overflows one cell
+    // upward but only blocks its LOWER cell (1×1 footprint).
     const C = 16;
     const plant = baseItemGet('tropical_plant');
     const plantImg = { width: 16, height: 32 };
     const boxPlant = base2dSpriteBox(plant, baseItemFootprint(plant, 0), plantImg, C);
-    // un poster MURAL (layer wall) ne déborde PAS vers le haut (collé au mur)
+    // a WALL poster (wall layer) does NOT overflow upward (stuck to the wall)
     const poster = baseItemGet('blue_poster');
     const boxBoard = base2dSpriteBox(poster, baseItemFootprint(poster, 0), { width: 16, height: 16 }, C);
-    // rotation BITMAP : l'angle est imposé par rotIdx × def.rot (90° bureau)
+    // BITMAP rotation: the angle is imposed by rotIdx × def.rot (90° desk)
     const desk = baseItemGet('heavy_desk');
     const turns = [0, 1, 2, 3].map((i) => (((i * desk.rot) % 360) + 360) % 360);
     return JSON.stringify({ dims, fp0plant: fp0.tropical_plant, boxPlant, boxBoard, turns, rotDesk: desk.rot, rotPlant: plant.rot });
@@ -235,67 +236,67 @@ test('passe 41 D : dims catalogue = header.h canon, hauteur visuelle débordante
   for (const [s, wd] of Object.entries(CANON)) {
     assert.deepEqual(out.dims[s], wd, `${s} = ${wd[0]}×${wd[1]} (DECORSHAPE canon)`);
   }
-  assert.deepEqual(out.fp0plant, { w: 1, d: 1 }, 'collision = case basse seule (empreinte 1×1)');
-  assert.equal(out.boxPlant.maxH, 48, 'visu 3 cases de haut (fix >1 bloc) : maxH = h + 2*C');
-  assert.equal(out.boxPlant.h, 16, 'empreinte au sol inchangée');
-  assert.equal(out.boxBoard.maxH, 16, 'objet mural : pas de débord (collé au mur)');
-  assert.equal(out.rotDesk, 0, 'passe 42 : rotation SUPPRIMÉE (canon RSE)');
-  assert.equal(out.rotPlant, 0, 'objet sans rotation');
-  assert.deepEqual(out.turns, [0, 0, 0, 0], 'aucun pivot possible (orientation unique)');
+  assert.deepEqual(out.fp0plant, { w: 1, d: 1 }, 'collision = bottom cell only (1×1 footprint)');
+  assert.equal(out.boxPlant.maxH, 48, '3-tile-tall visual (fix >1 block): maxH = h + 2*C');
+  assert.equal(out.boxPlant.h, 16, 'ground footprint unchanged');
+  assert.equal(out.boxBoard.maxH, 16, 'wall object: no overhang (flush with the wall)');
+  assert.equal(out.rotDesk, 0, 'phase 42: rotation REMOVED (RSE canon)');
+  assert.equal(out.rotPlant, 0, 'object without rotation');
+  assert.deepEqual(out.turns, [0, 0, 0, 0], 'no pivot possible (single orientation)');
 });
 
-// ——— E — Sprites : 150 PNG, 19 redessinés, PC 16×32, manifeste cohérent ———
-test('passe 41 E : sprites canon RSE complets (122 PNG natifs, ORAS purgés)', () => {
+// ——— E — Sprites: 150 PNGs, 19 redrawn, PC 16×32, coherent manifest ———
+test('phase 41 E: complete RSE canon sprites (122 native PNGs, ORAS purged)', () => {
   const dir = 'src/assets/images/secret-base/emerald';
   const files = fs.readdirSync(new URL(`../${dir}`, import.meta.url)).filter((f) => f.endsWith('.png'));
-  assert.equal(files.length, 122, '122 PNG Émeraude canon natifs (passe 42)');
-  // Passe 42 : les 19 « redessinés » (pc rouge/jaune, tapis ORAS, blackboard,
-  // vending_machine, lit, proclamation…) étaient HORS DA → supprimés du jeu,
-  // leurs fichiers purgés. Tout sprite du repo = métatile/objgfx officiel.
+  assert.equal(files.length, 122, '122 native canon Emerald PNGs (phase 42)');
+  // Phase 42: the 19 "redrawn" ones (red/yellow pc, ORAS rugs, blackboard,
+  // vending_machine, bed, proclamation…) were OFF-brand → removed from the game,
+  // their files purged. Every sprite in the repo = official metatile/objgfx.
   const FORMER_ORAS = ['bench', 'green_mat', 'red_mat', 'blue_mat', 'flat_mat',
     'proclamation', 'blackboard', 'confetti_ball', 'poke_flute', 'berry_blender',
     'comfortable_bed', 'substitute_doll', 'vending_machine', 'tall_grass',
     'pitfall_mat', 'square_one_mat', 'blue_warp_panel', 'red_warp_panel'];
   for (const s of FORMER_ORAS) {
-    assert.ok(!E(`${dir}/${s}.png`), `purgé : ${s}.png (pas dans le diverticule Émeraude)`);
+    assert.ok(!E(`${dir}/${s}.png`), `purged: ${s}.png (not in the Emerald offshoot)`);
   }
-  // PC authentique : métatile 0x220 du tileset SecretBase (gris-bleu, 16×16)
+  // Authentic PC: metatile 0x220 from the SecretBase tileset (blue-grey, 16×16)
   const man = J('src/assets/images/secret-base/manifest.render2d.json').items;
   const ihdr = (p) => { const b = fs.readFileSync(new URL(`../${p}`, import.meta.url)); return [b.readUInt32BE(16), b.readUInt32BE(20)]; };
   assert.ok(man.pc && man.pc.emerald, 'pc au manifeste');
-  assert.deepEqual(ihdr(`${dir}/pc.png`), [16, 16], 'pc.png = métatile canon 16×16');
+  assert.deepEqual(ihdr(`${dir}/pc.png`), [16, 16], 'pc.png = canon 16×16 metatile');
   assert.deepEqual(ihdr(`${dir}/stairs.png`), [32, 32], 'stairs.png 32×32 (2×2 natif GBA)');
-  // catalogue canon : 123 objets (120 RSE + welcome_mat + stairs + pc)
+  // canon catalog: 123 items (120 RSE + welcome_mat + stairs + pc)
   const catalogue = [...R('src/data/base-items-data.js').matchAll(/s:'([a-z0-9_]+)'/g)].map((m) => m[1]);
-  assert.equal(catalogue.length, 122, '122 objets au catalogue (passe 43 : welcome_mat retiré)');
+  assert.equal(catalogue.length, 122, '122 objects in the catalog (phase 43: welcome_mat removed)');
   const without = catalogue.filter((s) => !(man[s] && man[s].emerald));
-  assert.deepEqual(without, [], 'passe 43 : plus AUCUN sprite procédural (tapis d\u2019accueil supprimé)');
-  // les 11 poupées téléchargées (ditto, meowth, pikachu…) + 5 personnages
+  assert.deepEqual(without, [], 'phase 43: NO procedural sprite left (welcome mat removed)');
+  // the 11 downloaded dolls (ditto, meowth, pikachu…) + 5 characters
   for (const s of ['ditto_doll', 'meowth_doll', 'pikachu_doll', 'gulpin_doll', 'kecleon_doll', 'seedot_doll', 'lotad_doll', 'duskull_doll', 'snoothum_doll'.replace('snoothum', 'smoochum'), 'snorlax_doll', 'rhydon_doll']) {
-    assert.ok(E(`${dir}/${s}.png`), `poupée téléchargée ${s}`);
+    assert.ok(E(`${dir}/${s}.png`), `downloaded doll ${s}`);
   }
-  assert.ok(!E(`${dir}/people`), 'dossier people supprimé');
+  assert.ok(!E(`${dir}/people`), 'people folder removed');
 });
 
-test('passe 41 F : i18n need2d + hints édition FR/EN, listener 3D branché', () => {
+test('phase 41 F: i18n need2d + FR/EN editing hints, 3D listener hooked', () => {
   const sb = makeSandbox();
   const out = JSON.parse(vm.runInContext(`JSON.stringify({
     fr: { need2d: I18N.fr.base.edit.need2d, sel: I18N.fr.base.edit.select_hint, mv: I18N.fr.base.edit.move_hint },
     en: { need2d: I18N.en.base.edit.need2d, sel: I18N.en.base.edit.select_hint, mv: I18N.en.base.edit.move_hint },
   })`, sb));
   for (const lang of ['fr', 'en']) {
-    assert.equal(typeof out[lang].need2d, 'string', `${lang} : need2d présent`);
+    assert.equal(typeof out[lang].need2d, 'string', `${lang}: need2d present`);
     assert.ok(out[lang].need2d.length > 10, `${lang} : need2d explicite`);
-    assert.equal(typeof out[lang].sel, 'string', `${lang} : select_hint présent`);
-    assert.equal(typeof out[lang].mv, 'string', `${lang} : move_hint présent`);
+    assert.equal(typeof out[lang].sel, 'string', `${lang}: select_hint present`);
+    assert.equal(typeof out[lang].mv, 'string', `${lang}: move_hint present`);
   }
-  assert.ok(out.fr.sel.includes('prendre en main'), 'FR select_hint : UN clic = prendre en main');
+  assert.ok(out.fr.sel.includes('prendre en main'), 'FR select_hint: ONE click = pick up');
   assert.ok(out.en.sel.includes('pick it up'), 'EN select_hint : one click = pick up');
   assert.ok(out.fr.mv.includes('Ramasser'), 'FR move_hint : « Ramasser » range le tenu');
   assert.ok(out.en.mv.includes('Pick up'), 'EN move_hint : Pick up stashes the held item');
-  // le canvas 3D rappelle que l'édition = 2D (notification, pas d'alert en dur)
-  const win = R('src/game/base/base-window.js');
-  assert.ok(win.includes("_baseWin.c3d.addEventListener('click'"), 'listener clic sur canvas 3D');
-  assert.ok(win.includes("t('base.edit.need2d')"), 'notification i18n need2d (zéro chaîne en dur)');
+  // the 3D canvas recalls that editing = 2D (notification, no hardcoded alert)
+  const win = R('src/ui/game/base/base-window.js');
+  assert.ok(win.includes("_baseWin.c3d.addEventListener('click'"), 'click listener on the 3D canvas');
+  assert.ok(win.includes("t('base.edit.need2d')"), 'i18n need2d notification (zero hardcoded string)');
 });
 

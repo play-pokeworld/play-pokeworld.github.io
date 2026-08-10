@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Passe 41 — cuit les sprites manquants dans la DA Émeraude (contour sombre,
-2 tons + lumière haut-gauche, 16 px/case), pour les objets qui tombaient en
-repli « pastille violette + initiale » :
+"""Passe 41 — bakes the missing sprites in the Emerald art style (dark outline,
+2 tones + top-left light, 16 px/tile), for the objects that used to fall back
+to the "purple dot + initial" placeholder:
   pc, bench, green/red/blue/flat_mat, proclamation, blackboard, confetti_ball,
   poke_flute, berry_blender, comfortable_bed, substitute_doll, vending_machine,
   tall_grass, pitfall_mat, square_one_mat, blue_warp_panel, red_warp_panel.
-Le PC reprend l'identité visuelle du terminal ROSA (rouge à barres jaunes).
-Écrit src/assets/images/secret-base/emerald/<slug>.png + manifeste (JSON+JS).
-Usage : python3 tools/bake-missing-sprites.py [--sheet]"""
+The PC reuses the visual identity of the ROSA terminal (red with yellow bars).
+Writes src/assets/images/secret-base/emerald/<slug>.png + manifest (JSON+JS).
+Usage: python3 tools/bake-missing-sprites.py [--sheet]"""
 import os, sys, json
 from PIL import Image, ImageDraw
 import importlib.util
@@ -30,17 +30,17 @@ def sh(c, k):  # éclaircit
     return (min(255, int(c[0] + (255 - c[0]) * k)), min(255, int(c[1] + (255 - c[1]) * k)), min(255, int(c[2] + (255 - c[2]) * k)), c[3])
 
 
-# ——— PC (terminal rouge à barres jaunes, comme la référence ROSA) ——————————
+# ——— PC (red terminal with yellow bars, like the ORAS reference) ———
 def spr_pc():
     im, d = cv(16, 32)
     red, red_d = (202, 70, 48, 255), (148, 44, 30, 255)
     yel = (232, 190, 64, 255)
     scr, scr_l = (38, 76, 86, 255), (88, 158, 168, 255)
-    # socle (rattaché au corps)
+    # base (attached to the body)
     d.polygon([(4, 24), (11, 24), (11, 28), (4, 28)], fill=INK)
     d.polygon([(4, 23), (12, 22), (12, 24), (4, 25)], fill=red_d)
     R(d, 5, 25, 10, 27, red_d)
-    # corps (caisson légèrement incliné vers l'arrière)
+    # body (casing slightly tilted backwards)
     d.polygon([(3, 6), (12, 4), (12, 21), (3, 24)], fill=red)
     d.polygon([(12, 4), (13, 5), (13, 22), (12, 21)], fill=red_d)
     d.line([(3, 6), (12, 4)], fill=INK); d.line([(3, 24), (12, 21)], fill=INK)
@@ -48,20 +48,20 @@ def spr_pc():
     # écran
     d.polygon([(4, 8), (11, 7), (11, 13), (4, 15)], fill=scr)
     d.line([(5, 10), (10, 9)], fill=scr_l); d.line([(5, 11), (10, 10)], fill=scr_l)
-    # barres jaunes (clavier / fentes — la signature « barres jaunes »)
+    # yellow bars (keyboard / slots — the "yellow bars" signature)
     d.polygon([(4, 17), (12, 16), (12, 20), (4, 22)], fill=yel)
     d.line([(6, 17), (6, 21)], fill=sl(yel, .55)); d.line([(9, 16), (9, 20)], fill=sl(yel, .55))
     # lumière
     d.line([(4, 6), (11, 5)], fill=sh(red, .35))
     return im
 
-# ——— Banc en bois (2x1, dossier haut) ———————————————————————————————————————
+# ——— Wooden bench (2x1, high backrest) ———
 def spr_bench():
     im, d = cv(32, 24)
     wood, wood_d = (152, 112, 66, 255), (112, 78, 44, 255)
     for (px0, px1) in ((6, 9), (22, 25)):           # pieds
         R(d, px0, 15, px1, 23, INK); R(d, px0, 15, px1 - 1, 22, wood_d)
-    for yy in (2, 7, 12):                            # lames du dossier
+    for yy in (2, 7, 12):                            # backrest slats
         R(d, 3, yy, 28, yy + 4, wood)
         R(d, 3, yy, 28, yy, sh(wood, .3))
         R(d, 3, yy + 4, 28, yy + 4, wood_d)
@@ -71,7 +71,7 @@ def spr_bench():
     R(d, 4, 14, 27, 14, sh(wood, .2))
     return im
 
-# ——— Tapis unis 3x3 (vert/rouge/bleu/gris) ——————————————————————————————————
+# ——— Plain 3x3 mats (green/red/blue/grey) —————————————————————————————————
 def spr_mat(color, fringe=True):
     im, d = cv(48, 48)
     col, dk = color, sl(color, .62)
@@ -92,7 +92,7 @@ def spr_mat(color, fringe=True):
             d.line([(xx, 46), (xx, 46)], fill=sh(col, .5))
     return im
 
-# ——— Proclamation (parchemin sur lutrin) 1x1 haut ——————————————————————————
+# ——— Proclamation (parchment on a lectern) 1x1 tall ————————————————————————
 def spr_proclamation():
     im, d = cv(16, 32)
     wood, gold = (120, 84, 46, 255), (222, 190, 78, 255)
@@ -106,7 +106,7 @@ def spr_proclamation():
     d.line([(5, 4), (5, 19)], fill=sh(parch, .5))
     return im
 
-# ——— Tableau noir (2x1, grand tableau sur pieds) ————————————————————————————
+# ——— Blackboard (2x1, big board on legs) ———————————————————————————————————
 def spr_blackboard():
     im, d = cv(32, 32)
     board = (56, 88, 66, 255)
@@ -135,7 +135,7 @@ def spr_confetti_ball():
     d.point([(5, 7)], fill=sh(cols[0], .45)); d.point([(6, 7)], fill=sh(cols[0], .45))
     return im
 
-# ——— Pokéflûte dressée sur son socle (1x1 haut) ————————————————————————————
+# ——— Pokéflute standing on its base (1x1 tall) ———
 def spr_poke_flute():
     im, d = cv(16, 32)
     blue, blue_d = (84, 128, 200, 255), (56, 92, 156, 255)
@@ -147,14 +147,14 @@ def spr_poke_flute():
     for yy in (10, 14, 18): R(d, 7, yy, 8, yy + 1, INK)
     return im
 
-# ——— Berry Blender (machine à mixeur) 1x1 haut ——————————————————————————————
+# ——— Berry Blender (blender machine) 1x1 tall ———————————————————————————————
 def spr_berry_blender():
     im, d = cv(16, 32)
     grey, grey_d = (158, 158, 168, 255), (112, 112, 124, 255)
     jar = (176, 214, 226, 255)
     R(d, 3, 18, 12, 29, INK); R(d, 4, 19, 11, 28, grey)
     R(d, 4, 19, 5, 28, sh(grey, .2)); R(d, 10, 19, 11, 28, grey_d)
-    R(d, 5, 22, 6, 23, (208, 70, 48, 255))   # bouton
+    R(d, 5, 22, 6, 23, (208, 70, 48, 255))   # button
     d.polygon([(5, 5), (10, 5), (11, 17), (4, 17)], fill=INK)
     d.polygon([(6, 6), (10, 6), (10, 16), (5, 16)], fill=jar)
     d.polygon([(6, 6), (7, 6), (6, 16), (5, 16)], fill=sh(jar, .4))
@@ -192,7 +192,7 @@ def spr_substitute_doll():
     d.polygon([(5, 12), (6, 14), (7, 12)], fill=INK)
     return im
 
-# ——— Distributeur (1x1 haut) ————————————————————————————————————————————————
+# ——— Vending machine (1x1 tall) ————————————————————————————————————————————
 def spr_vending_machine():
     im, d = cv(16, 32)
     teal, teal_d = (64, 132, 140, 255), (44, 96, 102, 255)
@@ -204,10 +204,10 @@ def spr_vending_machine():
     d.line([(6, 9), (9, 9)], fill=(150, 190, 200, 255))
     d.line([(6, 11), (9, 11)], fill=(100, 160, 170, 255))
     R(d, 5, 16, 10, 17, (238, 220, 140, 255))                 # bandeau
-    R(d, 6, 20, 9, 26, INK); R(d, 6, 20, 8, 21, (60, 60, 66, 255))  # récup
+    R(d, 6, 20, 9, 26, INK); R(d, 6, 20, 8, 21, (60, 60, 66, 255))  # touch-up
     return im
 
-# ——— Hautes herbes (1x1, marchable) ————————————————————————————————————————
+# ——— Tall grass (1x1, walkable) ————————————————————————————————————————————
 def spr_tall_grass():
     im, d = cv(16, 16)
     g1, g2 = (88, 158, 76, 255), (58, 116, 52, 255)
@@ -217,7 +217,7 @@ def spr_tall_grass():
     d.line([(3, 14), (14, 14)], fill=g2)
     return im
 
-# ——— Tapis piège 1x1 : fissuré / « 1 » / portails warp ——————————————————————
+# ——— Trap mats 1x1: cracked / "1" / warp pads ———————————————————————————————
 def spr_pitfall_mat():
     im, d = cv(16, 16)
     base, dk = (152, 142, 124, 255), (110, 100, 84, 255)
@@ -276,7 +276,7 @@ def main(sheet_only=False):
     imgs = {}
     for slug, fn in BAKES.items():
         imgs[slug] = fn()
-    # planche de contrôle x4
+    # control board x4
     cols = 6
     cell = 48 * 4 + 24
     rows = (len(imgs) + cols - 1) // cols
@@ -289,7 +289,7 @@ def main(sheet_only=False):
         sheet.paste(big, (x + 12, y + 12), big)
         dd.text((x + 12, y + cell - 4), slug, fill=(255, 255, 160))
     sheet.save('/tmp/missing_sprites_sheet.png')
-    print('planche → /tmp/missing_sprites_sheet.png')
+    print('sheet → /tmp/missing_sprites_sheet.png')
     if sheet_only:
         return
     os.makedirs(OUT, exist_ok=True)
@@ -304,7 +304,7 @@ def main(sheet_only=False):
     bk = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(bk)
     bk.write_manifest_js(man)
-    print(len(imgs), 'sprites cuits + manifeste à jour')
+    print(len(imgs), 'sprites baked + manifest updated')
 
 
 if __name__ == '__main__':

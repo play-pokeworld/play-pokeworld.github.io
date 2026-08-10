@@ -1,14 +1,14 @@
 // ============================================================================
-// Passe 24 — Normalisation des identifiants de talents en minuscules.
+// Passe 24 — Normalize ability ids to lowercase.
 // ----------------------------------------------------------------------------
-// Constat : le moteur de combat, TALENTS_FULL et les locales utilisent des ids
-// EN MINUSCULES ('waterabsorb', 'noguard', 'solarpower'…), alors que les pools
-// générés (POKE_TALENTS / POKEMON_TALENTS.hiddenAbility) et certains talents
-// épinglés dans les sets curés étaient en camelCase ('waterAbsorb'…).
-// Conséquences : filtre TALENTS_FULL[tal] vide → rareté « Unknown », fiche
-// « Aucun talent », talent INERTE en combat (comparaisons === en minuscules).
-// Ce script réécrit les ids en minuscules (déduplique les listes de pools) et
-// idempotent : le relancer ne change plus rien.
+// Finding: the battle engine, TALENTS_FULL and the locales use lowercase ids
+// ('waterabsorb', 'noguard', 'solarpower'…), while the generated pools
+// (POKE_TALENTS / POKEMON_TALENTS.hiddenAbility) and some abilities pinned in
+// curated sets were camelCase ('waterAbsorb'…).
+// Consequences: empty TALENTS_FULL[tal] lookup → 'Unknown' rarity, sheet shows
+// 'No talent', ability INERT in battle (lowercase === comparisons).
+// This script lowercases ids (deduplicating pool lists) and is idempotent:
+// running it again changes nothing.
 // ============================================================================
 import { readFileSync, writeFileSync } from 'fs';
 
@@ -17,12 +17,12 @@ const tfKeys = new Set([...TF.matchAll(/^ {2}(\w+):\s*\{/gm)].map((m) => m[1]));
 
 let changedTotal = 0;
 
-// ——— 1) Pools générés (poke-talents-data.js) ———
+// ——— 1) Generated pools (poke-talents-data.js) ———
 {
   const path = new URL('../src/data/poke-talents-data.js', import.meta.url);
   let src = readFileSync(path, 'utf8');
   let changed = 0;
-  // Tableaux JSON "id":["a","b",…] → lowercase + déduplication (ordre conservé)
+  // JSON arrays "id":["a","b",…] → lowercase + dedupe (order preserved)
   src = src.replace(/\[((?:"[A-Za-z]+",?)+)\]/g, (whole, body) => {
     const ids = body.match(/"([A-Za-z]+)"/g).map((s) => s.slice(1, -1));
     const seen = new Set();
@@ -46,36 +46,18 @@ let changedTotal = 0;
   console.log(`poke-talents-data.js : ${changed} id(s) normalisé(s)/dédupliqué(s)`);
 }
 
-// ——— 1b) Talents cachés par espèce (pokemon-talents.js, format JSON) ———
-// Ce fichier REDÉFINIT POKEMON_TALENTS en binding lexical (const) — c'est lui
-// que lit le code unqualified ensuite : ses valeurs DOIVENT aussi être
-// normalisées (sinon 132 talents cachés restent camelCase et inertes).
-{
-  const path = new URL('../src/data/pokemon-talents.js', import.meta.url);
-  let src = readFileSync(path, 'utf8');
-  let changed = 0;
-  src = src.replace(/"hiddenAbility":\s*"([A-Za-z]+)"/g, (whole, id) => {
-    const low = id.toLowerCase();
-    if (low === id || !tfKeys.has(low)) return whole;
-    changed++;
-    return `"hiddenAbility": "${low}"`;
-  });
-  if (changed) { writeFileSync(path, src); changedTotal += changed; }
-  console.log(`pokemon-talents.js : ${changed} hiddenAbility normalisé(s)`);
-}
-
-// ——— 2) Talents épinglés dans les sets curés ———
-// 2 formats : `talent: 'xxx'` (official teams) et tableaux positionnels
-// `id: ['xxx', 'item', [moves], 'style']` (atoll) — le talent est le PREMIER
-// token du tableau. On ne normalise que si la version minuscule est un talent
-// connu de TALENTS_FULL (sinon on ne touche à rien).
+// ——— 2) Abilities pinned in curated sets ———
+// 2 formats: `talent: 'xxx'` (official teams) and positional arrays
+// `id: ['xxx', 'item', [moves], 'style']` (atoll) — the ability is the FIRST
+// token of the array. Only normalized when the lowercase form is a known
+// TALENTS_FULL ability (otherwise left untouched).
 for (const rel of ['../src/data/official-teams-data.js', '../src/data/atoll-sets-data.js']) {
   const path = new URL(rel, import.meta.url);
   let src = readFileSync(path, 'utf8');
   let changed = 0;
   src = src.replace(/talent:\s*'([A-Za-z]+)'/g, (whole, id) => {
     const low = id.toLowerCase();
-    if (low === id || !tfKeys.has(low)) return whole; // inconnu → on ne touche pas
+    if (low === id || !tfKeys.has(low)) return whole; // unknown → leave untouched
     changed++;
     return `talent: '${low}'`;
   });
@@ -89,5 +71,5 @@ for (const rel of ['../src/data/official-teams-data.js', '../src/data/atoll-sets
   console.log(`${rel.split('/').pop()} : ${changed} talent(s) normalisé(s)`);
 }
 
-console.log(changedTotal ? `TOTAL : ${changedTotal}` : 'Rien à normaliser (déjà propre).');
+console.log(changedTotal ? `TOTAL : ${changedTotal}` : 'Nothing to normalize (already clean).');
 

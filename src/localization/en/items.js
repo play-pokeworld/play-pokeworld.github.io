@@ -1,5 +1,5 @@
 // ===== EN — Item names & descriptions =====
-window.L_en_items = {
+export const L_en_items = {
   "prine_berry": {
     "name": "Lum Berry",
     "desc": "Defense +25% at max stack (25/25)."
@@ -380,15 +380,11 @@ window.L_en_items = {
     "name": "Pure Incense",
     "desc": "When held: Increases the weight of rare pokemon by %. Works always for everyone regardless of the holder"
   },
-  "lucky_egg": {
-    "name": "Lucky Egg",
-    "desc": "When held: Increases the experience gained by the pokemon by %"
-  },
-  "shiny_charm": {
-    "name": "Shiny Charm",
-    "desc": "When held: Increases the chance of encountering a wild shiny pokemon by %. Works always for everyone regardless of the holder"
-  },
-  "occa_berry": {
+    "lucky_egg": {
+      "name": "Lucky Egg",
+      "desc": "When held: Increases the experience gained by the pokemon by %"
+    },
+    "occa_berry": {
     "name": "Occa Berry",
     "desc": "When held: Decreases the super-effective damage taken from Fire-Type moves by %"
   },
@@ -1055,7 +1051,7 @@ window.L_en_items = {
 };
 
 
-Object.assign(window.L_en_items, {
+Object.assign(L_en_items, {
   skull_fossil: { name: 'Skull Fossil', desc: 'An official fossil reserved for its future compatible Pokémon.' },
   armor_fossil: { name: 'Armor Fossil', desc: 'An official fossil reserved for its future compatible Pokémon.' },
   cover_fossil: { name: 'Cover Fossil', desc: 'An official fossil reserved for its future compatible Pokémon.' },
@@ -1091,58 +1087,61 @@ Object.assign(window.L_en_items, {
 });
 
 
-Object.assign(window.L_en_items, {
-  occa_berry: { name: window.L_en_items.occa_berry?.name || 'occa berry', desc: 'When held: reduces super-effective Fire-type damage by 30%.' },
-  passho_berry: { name: window.L_en_items.passho_berry?.name || 'passho berry', desc: 'When held: reduces super-effective Water-type damage by 30%.' },
-  wacan_berry: { name: window.L_en_items.wacan_berry?.name || 'wacan berry', desc: 'When held: reduces super-effective Electric-type damage by 30%.' },
-  rindo_berry: { name: window.L_en_items.rindo_berry?.name || 'rindo berry', desc: 'When held: reduces super-effective Grass-type damage by 30%.' },
-  yache_berry: { name: window.L_en_items.yache_berry?.name || 'yache berry', desc: 'When held: reduces super-effective Ice-type damage by 30%.' },
-  chople_berry: { name: window.L_en_items.chople_berry?.name || 'chople berry', desc: 'When held: reduces super-effective Fighting-type damage by 30%.' },
-  kebia_berry: { name: window.L_en_items.kebia_berry?.name || 'kebia berry', desc: 'When held: reduces super-effective Poison-type damage by 30%.' },
-  shuca_berry: { name: window.L_en_items.shuca_berry?.name || 'shuca berry', desc: 'When held: reduces super-effective Ground-type damage by 30%.' },
-  coba_berry: { name: window.L_en_items.coba_berry?.name || 'coba berry', desc: 'When held: reduces super-effective Flying-type damage by 30%.' },
-  payapa_berry: { name: window.L_en_items.payapa_berry?.name || 'payapa berry', desc: 'When held: reduces super-effective Psychic-type damage by 30%.' },
-  tanga_berry: { name: window.L_en_items.tanga_berry?.name || 'tanga berry', desc: 'When held: reduces super-effective Bug-type damage by 30%.' },
-  charti_berry: { name: window.L_en_items.charti_berry?.name || 'charti berry', desc: 'When held: reduces super-effective Rock-type damage by 30%.' },
-  kasib_berry: { name: window.L_en_items.kasib_berry?.name || 'kasib berry', desc: 'When held: reduces super-effective Ghost-type damage by 30%.' },
-  haban_berry: { name: window.L_en_items.haban_berry?.name || 'haban berry', desc: 'When held: reduces super-effective Dragon-type damage by 30%.' },
-  colbur_berry: { name: window.L_en_items.colbur_berry?.name || 'colbur berry', desc: 'When held: reduces super-effective Dark-type damage by 30%.' },
-  babiri_berry: { name: window.L_en_items.babiri_berry?.name || 'babiri berry', desc: 'When held: reduces super-effective Steel-type damage by 30%.' },
-  roseli_berry: { name: window.L_en_items.roseli_berry?.name || 'roseli berry', desc: 'When held: reduces super-effective Fairy-type damage by 30%.' }
+Object.assign(L_en_items, {
+  occa_berry: { name: L_en_items.occa_berry?.name || 'occa berry', desc: 'When held: reduces super-effective Fire-type damage by 30%.' },
+  passho_berry: { name: L_en_items.passho_berry?.name || 'passho berry', desc: 'When held: reduces super-effective Water-type damage by 30%.' },
+  wacan_berry: { name: L_en_items.wacan_berry?.name || 'wacan berry', desc: 'When held: reduces super-effective Electric-type damage by 30%.' },
+  rindo_berry: { name: L_en_items.rindo_berry?.name || 'rindo berry', desc: 'When held: reduces super-effective Grass-type damage by 30%.' },
+  yache_berry: { name: L_en_items.yache_berry?.name || 'yache berry', desc: 'When held: reduces super-effective Ice-type damage by 30%.' },
+  chople_berry: { name: L_en_items.chople_berry?.name || 'chople berry', desc: 'When held: reduces super-effective Fighting-type damage by 30%.' },
+  kebia_berry: { name: L_en_items.kebia_berry?.name || 'kebia berry', desc: 'When held: reduces super-effective Poison-type damage by 30%.' },
+  shuca_berry: { name: L_en_items.shuca_berry?.name || 'shuca berry', desc: 'When held: reduces super-effective Ground-type damage by 30%.' },
+  coba_berry: { name: L_en_items.coba_berry?.name || 'coba berry', desc: 'When held: reduces super-effective Flying-type damage by 30%.' },
+  payapa_berry: { name: L_en_items.payapa_berry?.name || 'payapa berry', desc: 'When held: reduces super-effective Psychic-type damage by 30%.' },
+  tanga_berry: { name: L_en_items.tanga_berry?.name || 'tanga berry', desc: 'When held: reduces super-effective Bug-type damage by 30%.' },
+  charti_berry: { name: L_en_items.charti_berry?.name || 'charti berry', desc: 'When held: reduces super-effective Rock-type damage by 30%.' },
+  kasib_berry: { name: L_en_items.kasib_berry?.name || 'kasib berry', desc: 'When held: reduces super-effective Ghost-type damage by 30%.' },
+  haban_berry: { name: L_en_items.haban_berry?.name || 'haban berry', desc: 'When held: reduces super-effective Dragon-type damage by 30%.' },
+  colbur_berry: { name: L_en_items.colbur_berry?.name || 'colbur berry', desc: 'When held: reduces super-effective Dark-type damage by 30%.' },
+  babiri_berry: { name: L_en_items.babiri_berry?.name || 'babiri berry', desc: 'When held: reduces super-effective Steel-type damage by 30%.' },
+  roseli_berry: { name: L_en_items.roseli_berry?.name || 'roseli berry', desc: 'When held: reduces super-effective Fairy-type damage by 30%.' }
 });
 
-Object.assign(window.L_en_items, {
-  razor_claw: { ...(window.L_en_items.razor_claw || {name:'razor_claw'}), desc: 'Raises critical-hit ratio; evolves compatible Pokémon.' },
-  razor_fang: { ...(window.L_en_items.razor_fang || {name:'razor_fang'}), desc: 'May make the target flinch; evolves compatible Pokémon.' },
-  protector: { ...(window.L_en_items.protector || {name:'protector'}), desc: 'Evolves compatible Pokémon when traded.' },
-  electirizer: { ...(window.L_en_items.electirizer || {name:'electirizer'}), desc: 'Evolves compatible Pokémon when traded.' },
-  magmarizer: { ...(window.L_en_items.magmarizer || {name:'magmarizer'}), desc: 'Evolves compatible Pokémon when traded.' },
-  reaper_cloth: { ...(window.L_en_items.reaper_cloth || {name:'reaper_cloth'}), desc: 'Evolves compatible Pokémon when traded.' },
-  dubious_disc: { ...(window.L_en_items.dubious_disc || {name:'dubious_disc'}), desc: 'Evolves compatible Pokémon when traded.' },
-  prism_scale: { ...(window.L_en_items.prism_scale || {name:'prism_scale'}), desc: 'Evolves compatible Pokémon when traded.' },
-  whipped_dream: { ...(window.L_en_items.whipped_dream || {name:'whipped_dream'}), desc: 'Evolves compatible Pokémon when traded.' },
-  sachet: { ...(window.L_en_items.sachet || {name:'sachet'}), desc: 'Evolves compatible Pokémon when traded.' },
-  sweet_apple: { ...(window.L_en_items.sweet_apple || {name:'sweet_apple'}), desc: 'Evolves a compatible Pokémon.' },
-  tart_apple: { ...(window.L_en_items.tart_apple || {name:'tart_apple'}), desc: 'Evolves a compatible Pokémon.' },
-  cracked_pot: { ...(window.L_en_items.cracked_pot || {name:'cracked_pot'}), desc: 'Evolves a compatible Pokémon.' },
-  chipped_pot: { ...(window.L_en_items.chipped_pot || {name:'chipped_pot'}), desc: 'Evolves a compatible Pokémon.' },
-  galarica_cuff: { ...(window.L_en_items.galarica_cuff || {name:'galarica_cuff'}), desc: 'Evolves a compatible Pokémon.' },
-  galarica_wreath: { ...(window.L_en_items.galarica_wreath || {name:'galarica_wreath'}), desc: 'Evolves a compatible Pokémon.' },
-  peat_block: { ...(window.L_en_items.peat_block || {name:'peat_block'}), desc: 'Evolves a compatible Pokémon under the right conditions.' },
-  auspicious_armor: { ...(window.L_en_items.auspicious_armor || {name:'auspicious_armor'}), desc: 'Evolves a compatible Pokémon.' },
-  malicious_armor: { ...(window.L_en_items.malicious_armor || {name:'malicious_armor'}), desc: 'Evolves a compatible Pokémon.' },
-  syrupy_apple: { ...(window.L_en_items.syrupy_apple || {name:'syrupy_apple'}), desc: 'Evolves a compatible Pokémon.' },
-  unremarkable_teacup: { ...(window.L_en_items.unremarkable_teacup || {name:'unremarkable_teacup'}), desc: 'Evolves a compatible Pokémon.' },
-  masterpiece_teacup: { ...(window.L_en_items.masterpiece_teacup || {name:'masterpiece_teacup'}), desc: 'Evolves a compatible Pokémon.' },
-  skull_fossil: { ...(window.L_en_items.skull_fossil || {name:'skull_fossil'}), desc: 'Revives into Cranidos.' },
-  armor_fossil: { ...(window.L_en_items.armor_fossil || {name:'armor_fossil'}), desc: 'Revives into Shieldon.' },
-  cover_fossil: { ...(window.L_en_items.cover_fossil || {name:'cover_fossil'}), desc: 'Revives into Tirtouga.' },
-  plume_fossil: { ...(window.L_en_items.plume_fossil || {name:'plume_fossil'}), desc: 'Revives into Archen.' },
-  jaw_fossil: { ...(window.L_en_items.jaw_fossil || {name:'jaw_fossil'}), desc: 'Revives into Tyrunt.' },
-  sail_fossil: { ...(window.L_en_items.sail_fossil || {name:'sail_fossil'}), desc: 'Revives into Amaura.' },
-  fossilized_bird: { ...(window.L_en_items.fossilized_bird || {name:'fossilized_bird'}), desc: 'A Galar fossil component. Combine it with another fossil to revive a Pokémon.' },
-  fossilized_dino: { ...(window.L_en_items.fossilized_dino || {name:'fossilized_dino'}), desc: 'A Galar fossil component. Combine it with another fossil to revive a Pokémon.' },
-  fossilized_drake: { ...(window.L_en_items.fossilized_drake || {name:'fossilized_drake'}), desc: 'A Galar fossil component. Combine it with another fossil to revive a Pokémon.' },
-  fossilized_fish: { ...(window.L_en_items.fossilized_fish || {name:'fossilized_fish'}), desc: 'A Galar fossil component. Combine it with another fossil to revive a Pokémon.' }
+Object.assign(L_en_items, {
+  razor_claw: { ...(L_en_items.razor_claw || {name:'razor_claw'}), desc: 'Raises critical-hit ratio; evolves compatible Pokémon.' },
+  razor_fang: { ...(L_en_items.razor_fang || {name:'razor_fang'}), desc: 'May make the target flinch; evolves compatible Pokémon.' },
+  protector: { ...(L_en_items.protector || {name:'protector'}), desc: 'Evolves compatible Pokémon when traded.' },
+  electirizer: { ...(L_en_items.electirizer || {name:'electirizer'}), desc: 'Evolves compatible Pokémon when traded.' },
+  magmarizer: { ...(L_en_items.magmarizer || {name:'magmarizer'}), desc: 'Evolves compatible Pokémon when traded.' },
+  reaper_cloth: { ...(L_en_items.reaper_cloth || {name:'reaper_cloth'}), desc: 'Evolves compatible Pokémon when traded.' },
+  dubious_disc: { ...(L_en_items.dubious_disc || {name:'dubious_disc'}), desc: 'Evolves compatible Pokémon when traded.' },
+  prism_scale: { ...(L_en_items.prism_scale || {name:'prism_scale'}), desc: 'Evolves compatible Pokémon when traded.' },
+  whipped_dream: { ...(L_en_items.whipped_dream || {name:'whipped_dream'}), desc: 'Evolves compatible Pokémon when traded.' },
+  sachet: { ...(L_en_items.sachet || {name:'sachet'}), desc: 'Evolves compatible Pokémon when traded.' },
+  sweet_apple: { ...(L_en_items.sweet_apple || {name:'sweet_apple'}), desc: 'Evolves a compatible Pokémon.' },
+  tart_apple: { ...(L_en_items.tart_apple || {name:'tart_apple'}), desc: 'Evolves a compatible Pokémon.' },
+  cracked_pot: { ...(L_en_items.cracked_pot || {name:'cracked_pot'}), desc: 'Evolves a compatible Pokémon.' },
+  chipped_pot: { ...(L_en_items.chipped_pot || {name:'chipped_pot'}), desc: 'Evolves a compatible Pokémon.' },
+  galarica_cuff: { ...(L_en_items.galarica_cuff || {name:'galarica_cuff'}), desc: 'Evolves a compatible Pokémon.' },
+  galarica_wreath: { ...(L_en_items.galarica_wreath || {name:'galarica_wreath'}), desc: 'Evolves a compatible Pokémon.' },
+  peat_block: { ...(L_en_items.peat_block || {name:'peat_block'}), desc: 'Evolves a compatible Pokémon under the right conditions.' },
+  auspicious_armor: { ...(L_en_items.auspicious_armor || {name:'auspicious_armor'}), desc: 'Evolves a compatible Pokémon.' },
+  malicious_armor: { ...(L_en_items.malicious_armor || {name:'malicious_armor'}), desc: 'Evolves a compatible Pokémon.' },
+  syrupy_apple: { ...(L_en_items.syrupy_apple || {name:'syrupy_apple'}), desc: 'Evolves a compatible Pokémon.' },
+  unremarkable_teacup: { ...(L_en_items.unremarkable_teacup || {name:'unremarkable_teacup'}), desc: 'Evolves a compatible Pokémon.' },
+  masterpiece_teacup: { ...(L_en_items.masterpiece_teacup || {name:'masterpiece_teacup'}), desc: 'Evolves a compatible Pokémon.' },
+  skull_fossil: { ...(L_en_items.skull_fossil || {name:'skull_fossil'}), desc: 'Revives into Cranidos.' },
+  armor_fossil: { ...(L_en_items.armor_fossil || {name:'armor_fossil'}), desc: 'Revives into Shieldon.' },
+  cover_fossil: { ...(L_en_items.cover_fossil || {name:'cover_fossil'}), desc: 'Revives into Tirtouga.' },
+  plume_fossil: { ...(L_en_items.plume_fossil || {name:'plume_fossil'}), desc: 'Revives into Archen.' },
+  jaw_fossil: { ...(L_en_items.jaw_fossil || {name:'jaw_fossil'}), desc: 'Revives into Tyrunt.' },
+  sail_fossil: { ...(L_en_items.sail_fossil || {name:'sail_fossil'}), desc: 'Revives into Amaura.' },
+  fossilized_bird: { ...(L_en_items.fossilized_bird || {name:'fossilized_bird'}), desc: 'A Galar fossil component. Combine it with another fossil to revive a Pokémon.' },
+  fossilized_dino: { ...(L_en_items.fossilized_dino || {name:'fossilized_dino'}), desc: 'A Galar fossil component. Combine it with another fossil to revive a Pokémon.' },
+  fossilized_drake: { ...(L_en_items.fossilized_drake || {name:'fossilized_drake'}), desc: 'A Galar fossil component. Combine it with another fossil to revive a Pokémon.' },
+  fossilized_fish: { ...(L_en_items.fossilized_fish || {name:'fossilized_fish'}), desc: 'A Galar fossil component. Combine it with another fossil to revive a Pokémon.' }
 });
 
+// T2 (vague 38) : module ESM — export natif ; la surface classique est
+// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
+if (typeof globalThis !== 'undefined') globalThis.L_en_items = L_en_items;

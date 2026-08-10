@@ -1,9 +1,7 @@
-// ═══ Quêtes secondaires — passe 18 : regroupées par région et renumérotées ═══
-// Avant : Kanto s1-s8 + s11-s15 entremêlés avec Johto s9-s10 + s30-s40, dans
-// un ordre sans rapport avec la progression. Désormais : Kanto s1-s13 puis
-// Johto s14-s26, dans l'ordre de l'aventure (ville par ville).
-// Récompenses légèrement réduites (~-10 %) pour coller à la règle validée
-// d'économie (pas d'enrichissement excessif). Migration : QUEST_V2_SIDE_REMAP.
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
+// ═══ Side quests — phase 18: grouped by region and renumbered ═══
+// Before: Kanto s1-s8 + s11-s15 interleaved with Johto s9-s10 + s30
 var SIDE_QUESTS = {
  "s1": {
 "id":"s1",
@@ -462,7 +460,7 @@ var SIDE_QUESTS = {
   "s84": { id: "s84", region: "hoenn", type: "defeat_wild", loc: "route120", target: 20, rewardMoney: 3500, rewardItems: { leppa_berry: 1 } },
   "s85": { id: "s85", region: "hoenn", type: "defeat_wild", loc: "route101", target: 25, rewardMoney: 10000, rewardItems: { ultraball: 5 } },
 
-  // Explorations secrètes rejouables
+  // Replayable secret explorations
   "s86": { id: "s86", region: "kanto", type: "puzzle", loc: "ceruleancave", targetPuzzleId: "cerulean_sigil_a", target: 1, rewardMoney: 4200, rewardItems: { twisted_spoon: 1 } },
   "s87": { id: "s87", region: "kanto", type: "puzzle", loc: "ceruleancave", targetPuzzleId: "cerulean_sigil_b", target: 1, rewardMoney: 7000, rewardItems: { leftovers: 1 } },
   "s88": { id: "s88", region: "kanto", type: "puzzle", loc: "seafoamislands", targetPuzzleId: "seafoam_valves_a", target: 1, rewardMoney: 3500, rewardItems: { mystic_water: 1 } },
@@ -491,7 +489,7 @@ var SIDE_QUESTS = {
   "s111": { id: "s111", region: "hoenn", type: "puzzle", loc: "seafloor_cavern", targetPuzzleId: "seafloor_depth_code", target: 1, rewardMoney: 6300, rewardItems: { deep_sea_tooth: 1 } },
   "s112": { id: "s112", region: "hoenn", type: "puzzle", loc: "mt_pyre", targetPuzzleId: "mtpyre_ashes_a", target: 1, rewardMoney: 3500, rewardItems: { spell_tag: 1 } },
   "s113": { id: "s113", region: "hoenn", type: "puzzle", loc: "mt_pyre", targetPuzzleId: "mtpyre_summit_word", target: 1, rewardMoney: 4900, rewardItems: { spell_tag: 1 } },
-  // ─── Quêtes secondaires Hoenn (densification) ───
+  // ─── Hoenn side quests (densification) ───
   "s114": { id: "s114", region: "hoenn", type: "defeat_wild", loc: "route101", target: 10, rewardMoney: 800, rewardItems: {} },
   "s115": { id: "s115", region: "hoenn", type: "defeat_wild", loc: "route104", target: 12, rewardMoney: 1000, rewardItems: {} },
   "s116": { id: "s116", region: "hoenn", type: "defeat_wild", loc: "petalburg_woods", target: 15, rewardMoney: 1200, rewardItems: {"miracle_seed": 1} },
@@ -518,4 +516,10 @@ var SIDE_QUESTS = {
   "s137": { id: "s137", region: "hoenn", type: "talk", loc: "fallarbor", target: 1, rewardMoney: 1000, rewardItems: {"moonstone": 1} }
 };
 
-if (typeof SIDE_QUESTS !== 'undefined' && typeof window !== 'undefined') window.SIDE_QUESTS = SIDE_QUESTS;
+if (typeof SIDE_QUESTS !== 'undefined') { if (typeof window !== 'undefined') window.SIDE_QUESTS = SIDE_QUESTS; if (typeof globalThis !== 'undefined') globalThis.SIDE_QUESTS = SIDE_QUESTS; }
+
+// Wave 40 — native ESM module: grouped export of the same names as the
+// classic surface kept above/here (bodies unchanged).
+export {
+  SIDE_QUESTS,
+};

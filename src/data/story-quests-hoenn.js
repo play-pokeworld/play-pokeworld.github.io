@@ -1,7 +1,9 @@
-// ─── Quêtes principales de la région de Hoenn (IDs 201 à 277) ───
-// RSE / Anime / Films — 40 quêtes immersives
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
+// ─── Main quests of the Hoenn region (IDs 201 to 277) ───
+// RSE / Anime / Movies — 40 immersive quests
 
-var STORY_QUESTS_HOENN = [
+export var STORY_QUESTS_HOENN = [
   { id: 201, region: 'hoenn', type: 'trainer_battle', loc: 'route101', battleId: 'hoenn_poochyena_route101', target: 1, rewardMoney: 500, rewardItems: { pokeball: 5 } },
   { id: 202, region: 'hoenn', type: 'talk', loc: 'oldale', target: 1, rewardMoney: 400, rewardItems: { potion: 3 } },
   { id: 203, region: 'hoenn', type: 'defeat_wild', loc: 'route102', target: 5, rewardMoney: 600, rewardItems: { greatball: 3 } },
@@ -18,7 +20,7 @@ var STORY_QUESTS_HOENN = [
   { id: 214, region: 'hoenn', type: 'badge', targetBadge: 'wattson', target: 1, rewardMoney: 2500, rewardItems: { magnet: 1 } },
   { id: 215, region: 'hoenn', type: 'talk', loc: 'verdanturf', target: 1, rewardMoney: 800 },
   { id: 216, region: 'hoenn', type: 'defeat_wild', loc: 'route111', target: 12, rewardMoney: 1600, rewardItems: { superrepel: 3 } },
-  // ─── Découverte des Bases Secrètes (déblocage par la quête 216) ───
+  // ─── Discovery of Secret Bases (unlocked by quest 216) ───
   { id: 217, region: 'hoenn', type: 'base_visit', loc: 'route111', target: 1, rewardMoney: 1500, rewardItems: { pokeball: 3 } },
   { id: 218, region: 'hoenn', type: 'base_establish', loc: 'route111', target: 1, rewardMoney: 2000, rewardItems: { superpotion: 2 } },
   { id: 219, region: 'hoenn', type: 'talk', loc: 'fallarbor', target: 1, rewardMoney: 900 },
@@ -85,6 +87,5 @@ var STORY_QUESTS_HOENN = [
 if (typeof STORY_QUESTS !== 'undefined' && Array.isArray(STORY_QUESTS)) {
   STORY_QUESTS.push(...STORY_QUESTS_HOENN);
 }
-if (typeof window !== 'undefined') {
-  window.STORY_QUESTS_HOENN = STORY_QUESTS_HOENN;
-}
+// Wave 40 — surface kept (window → globalThis block, same scope).
+if (typeof globalThis !== 'undefined') globalThis.STORY_QUESTS_HOENN = STORY_QUESTS_HOENN;

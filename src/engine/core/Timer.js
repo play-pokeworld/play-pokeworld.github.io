@@ -2,7 +2,6 @@
  * PokeEngine — Timer Manager
  * setTimeout/setInterval with pause, resume, speed scaling
  */
-(function() {
 'use strict';
 
 class TimerManager {
@@ -13,7 +12,7 @@ class TimerManager {
   }
 
   /**
-   * Create a repeating timer
+   * Create has repeating timer
    * @param {string} name - unique identifier
    * @param {function} callback - fn(deltaMs, elapsedMs)
    * @param {number} intervalMs - interval in milliseconds
@@ -40,7 +39,7 @@ class TimerManager {
   }
 
   /**
-   * Update all timers — call from main loop
+   * Update all timers — call from hand loop
    * @param {number} dt - delta time in ms (already speed-adjusted)
    */
   update(dt) {
@@ -110,8 +109,14 @@ class TimerManager {
   }
 }
 
-window.PokeTimer = TimerManager;
-if (!window.poke) window.poke = {};
-window.poke.Timer = TimerManager;
-})();
+// T2 (wave 38): ESM module — native class export; the engine surface
+// (PokeTimer + poke.* namespace) stays kept on the global object for
+// classic consumers not yet migrated.
+export { TimerManager };
+export default TimerManager;
+if (typeof globalThis !== 'undefined') {
+  globalThis.PokeTimer = TimerManager;
+  if (!globalThis.poke) globalThis.poke = {};
+  globalThis.poke.Timer = TimerManager;
+}
 

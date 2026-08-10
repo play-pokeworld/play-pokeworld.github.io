@@ -2,25 +2,26 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { harnessBundleSource } from '../tools/harness-bundle.mjs';
 
-// ── Passe 33 : moteur de base secrète (sans rendu) ─────────────────────────
-//  A. Intégrité du catalogue + gabarits + i18n
-//  B. Règles de pose (couches, limites, rotation, anti-blocage, cap 26)
-//  C. Stock / ramassage en cascade / déménagement
-//  D. Visite : pathfinding, élévation (escalier), pièges ROSA, PNJ
-//  E. Échange JSON : export/import strict, rien n'est jamais crédité
+// ── Phase 33: secret-base engine (no rendering) ───────────────────────────
+//  A. Catalog + layouts + i18n integrity
+//  B. Placement rules (layers, limits, rotation, anti-blocking, cap 26)
+//  C. Stock / cascading pickup / moving out
+//  D. Visit: pathfinding, elevation (stairs), ORAS traps, NPCs
+//  E. JSON exchange: strict export/import, nothing is ever credited
 const R = (p) => fs.readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
 
 const SANDBOX_FILES = [
-  'src/file-preflight.js',
+  'src/engine/input/action-dispatcher.js', 'src/engine/runtime/classic-bridge.js',
   'src/localization/fr/base.js', 'src/localization/en/base.js',
   'src/localization/data.js', 'src/localization/i18n.js',
-  'src/game/core/state.js',
+  'src/application/game-state.js',
   'src/data/base-layouts-data.js', 'src/data/base-items-data.js',
-  'src/game/base/base-core.js',
-  'src/game/base/base-visit.js',
-  'src/game/base/base-exchange.js',
-  'src/game/base/base-debug.js',
+  'src/application/base/base-core.js',
+  'src/ui/game/base/base-visit.js',
+  'src/ui/game/base/base-exchange.js',
+  'src/ui/game/base/base-debug.js',
 ];
 
 function makeSandbox() {
@@ -46,12 +47,13 @@ function makeSandbox() {
   sandbox.window = sandbox;
   sandbox.globalThis = sandbox;
   vm.createContext(sandbox);
-  for (const f of SANDBOX_FILES) vm.runInContext(R(f), sandbox, { filename: f });
+  // T2-D: same files, SAME order — bundled IIFE keeps vm parity AND tolerates ESM converts
+  vm.runInContext(harnessBundleSource(SANDBOX_FILES), sandbox, { filename: 'passe33-base [iife]' });
   return sandbox;
 }
 
-// ——— A — Catalogue, gabarits, i18n ————————————————————————————————————————
-test('passe 33 A : catalogue cohérent + 12 gabarits canon + i18n FR/EN complet', () => {
+// ——— A — Catalogue, layouts, i18n ————————————————————————————————————————
+test('phase 33 A: coherent catalog + 12 canon layouts + complete FR/EN i18n', () => {
   const sb = makeSandbox();
   vm.runInContext(`
     const slugs = new Set();
@@ -59,19 +61,19 @@ test('passe 33 A : catalogue cohérent + 12 gabarits canon + i18n FR/EN complet'
       if (slugs.has(it.s)) throw new Error('doublon ' + it.s);
       slugs.add(it.s);
       if (!BASE_ITEM_CATEGORIES.includes(it.cat)) throw new Error('cat inconnue ' + it.s);
-      if (it.rot !== 0) throw new Error('rot doit être 0 (passe 42) ' + it.s);
+      if (it.rot !== 0) throw new Error('rot must be 0 (pass 42) ' + it.s);
       if (!['floor', 'wall', 'surface'].includes(it.layer)) throw new Error('layer invalide ' + it.s);
     }
     window._cats = BASE_ITEM_CATEGORIES.length;
     window._n = BASE_ITEMS.length;
     window._layouts = baseLayoutIds().length;
   `, sb);
-  assert.equal(vm.runInContext('window._cats', sb), 8, '8 catégories canon RSE (passe 42)');
-  assert.equal(vm.runInContext('window._n', sb), 122, '122 objets (120 canon RSE + stairs/pc — passe 43 : tapis d\u2019accueil retiré)');
-  assert.equal(vm.runInContext('window._layouts', sb), 36, '36 gabarits (24 canon + 6 perso + 6 grottes colorées à étage, passse 42)');
-  // passe 42 : rotation supprimée (canon RSE n'en a pas) — figurée à 1
-  assert.equal(vm.runInContext(`baseItemRotCount(baseItemGet('surf_mat'))`, sb), 1, 'tapis : fixe (rotation supprimée)');
-  assert.equal(vm.runInContext(`baseItemRotCount(baseItemGet('small_desk'))`, sb), 1, 'bureau : fixe (rotation supprimée)');
+  assert.equal(vm.runInContext('window._cats', sb), 8, '8 RSE canon categories (phase 42)');
+  assert.equal(vm.runInContext('window._n', sb), 122, '122 objects (120 RSE canon + stairs/pc — phase 43: welcome mat removed)');
+  assert.equal(vm.runInContext('window._layouts', sb), 36, '36 layouts (24 canon + 6 custom + 6 colored multi-floor caves, phase 42)');
+  // phase 42: rotation removed (RSE canon has none) — kept at 1
+  assert.equal(vm.runInContext(`baseItemRotCount(baseItemGet('surf_mat'))`, sb), 1, 'mat: fixed (rotation removed)');
+  assert.equal(vm.runInContext(`baseItemRotCount(baseItemGet('small_desk'))`, sb), 1, 'desk: fixed (rotation removed)');
   assert.equal(vm.runInContext(`baseItemRotCount(baseItemGet('blue_poster'))`, sb), 1, 'mural : fixe');
   vm.runInContext(`
     for (const it of BASE_ITEMS) {
@@ -88,81 +90,81 @@ test('passe 33 A : catalogue cohérent + 12 gabarits canon + i18n FR/EN complet'
     }
     window._i18n_ok = true;
   `, sb);
-  assert.ok(vm.runInContext('window._i18n_ok', sb), 'noms + messages dans les 2 langues');
-  // Langue par défaut du jeu = EN ; on vérifie les deux locales explicitement.
+  assert.ok(vm.runInContext('window._i18n_ok', sb), 'names + messages in both languages');
+  // Game default language = EN; both locales are checked explicitly.
   assert.equal(vm.runInContext(`(G.lang='fr', t('base.i.surf_mat'))`, sb), 'Tapis Surf');
   assert.equal(vm.runInContext(`(G.lang='en', t('base.i.surf_mat'))`, sb), 'Surf Mat');
 });
 
-// ——— B — Règles de pose ———————————————————————————————————————————————————
-test('passe 33 B : couches, limites, trous/planches (gabarit canon cave_1)', () => {
+// ——— B — Placement rules ————————————————————————————————————————————————
+test('phase 33 B: layers, limits, holes/boards (canon cave_1 layout)', () => {
   const sb = makeSandbox();
   const out = JSON.parse(vm.runInContext(`
     const r = {};
     const st = baseGetState();
-    baseDebugCreate('cave_1');   // SecretBase_BrownCave1 : 11×9, E(5,8), S(2,2), trou o(5,2)
+    baseDebugCreate('cave_1');   // SecretBase_BrownCave1: 11×9, E(5,8), S(2,2), hole o(5,2)
     baseDebugGrantAll();
     r.pcAuto = st.items.some((i) => i.s === 'pc');
     r.deskOk = basePlace(st, 'small_desk', 1, 5, 0).ok;
     r.deskOccupied = baseCanPlace(st, 'small_desk', 1, 5, 0).reason;
     r.deskOob = baseCanPlace(st, 'small_desk', 40, 40, 0).reason;
     r.deskEntrance = baseCanPlace(st, 'small_desk', 5, 8, 0).reason;
-    r.deskSpawn = baseCanPlace(st, 'small_desk', 5, 7, 0).reason;   // point d'arrivée S non décorable (passe 43 : devant la porte)
-    r.matOk = basePlace(st, 'surf_mat', 6, 3, 0).ok;   // tapis 3×3 au sud-est
-    r.dollFloor = baseCanPlace(st, 'torchic_doll', 4, 5, 0).ok;   // passe 39 : poupée AU SOL admise
+    r.deskSpawn = baseCanPlace(st, 'small_desk', 5, 7, 0).reason;   // spawn point S not decorable (pass 43: in front of the door)
+    r.matOk = basePlace(st, 'surf_mat', 6, 3, 0).ok;   // 3×3 mat in the southeast
+    r.dollFloor = baseCanPlace(st, 'torchic_doll', 4, 5, 0).ok;   // pass 39: doll ON THE FLOOR allowed
     r.dollOnMat = basePlace(st, 'torchic_doll', 6, 3, 0).ok;
     r.dollTaken = baseCanPlace(st, 'azurill_doll', 6, 3, 0).reason;
-    r.posterWallOk = baseCanPlace(st, 'blue_poster', 5, 0, 0).ok;   // mur nord, sol au sud
+    r.posterWallOk = baseCanPlace(st, 'blue_poster', 5, 0, 0).ok;   // north wall, floor to the south
     r.posterFloor = baseCanPlace(st, 'blue_poster', 3, 3, 0).reason;
-    r.boardOk = basePlace(st, 'solid_board', 3, 5, 0).ok; // passe 42 : planche posable sur sol nu
-    r.stairsWrong = baseCanPlace(st, 'stairs', 1, 3, 0).reason;     // RSE : aucune ancre d'escalier
+    r.boardOk = basePlace(st, 'solid_board', 3, 5, 0).ok; // passe 42: board placeable on bare floor
+    r.stairsWrong = baseCanPlace(st, 'stairs', 1, 3, 0).reason;     // RSE: no stairs anchor
     JSON.stringify(r);
   `, sb));
-  assert.equal(out.pcAuto, true, 'PC automatique (passe 43 : plus de tapis d\u2019accueil visible)');
-  assert.equal(out.deskOk, true, 'bureau posé au sol');
+  assert.equal(out.pcAuto, true, 'automatic PC (phase 43: no more visible welcome mat)');
+  assert.equal(out.deskOk, true, 'desk placed on the floor');
   assert.equal(out.deskOccupied, 'base.err.occupied');
   assert.equal(out.deskOob, 'base.err.out_of_bounds');
-  assert.equal(out.deskEntrance, 'base.err.entrance', 'l’entrée reste libre');
-  assert.equal(out.deskSpawn, 'base.err.entrance', 'le point d’arrivée (métatile 544) reste libre');
+  assert.equal(out.deskEntrance, 'base.err.entrance', 'the entrance stays free');
+  assert.equal(out.deskSpawn, 'base.err.entrance', 'the arrival point (metatile 544) stays free');
   assert.equal(out.matOk, true);
-  assert.equal(out.dollFloor, true, 'poupée au sol admise (passe 39, décision utilisateur)');
-  assert.equal(out.dollOnMat, true, 'poupée sur le tapis');
-  assert.equal(out.dollTaken, 'base.err.surface_taken', 'une seule poupée par cellule');
-  assert.equal(out.posterWallOk, true, 'poster au mur près du sol');
-  assert.equal(out.posterFloor, 'base.err.wall_only', 'poster interdit au sol');
-  assert.equal(out.boardOk, true, 'planche posable sur sol nu (passe 42)');
-  assert.equal(out.stairsWrong, 'base.err.stairs_anchor', 'RSE : pas de deuxième niveau → escalier toujours refusé');
+  assert.equal(out.dollFloor, true, 'floor doll allowed (phase 39, user decision)');
+  assert.equal(out.dollOnMat, true, 'doll on the rug');
+  assert.equal(out.dollTaken, 'base.err.surface_taken', 'a single doll per cell');
+  assert.equal(out.posterWallOk, true, 'poster on wall near the floor');
+  assert.equal(out.posterFloor, 'base.err.wall_only', 'poster forbidden on the floor');
+  assert.equal(out.boardOk, true, 'board placeable on bare floor (phase 42)');
+  assert.equal(out.stairsWrong, 'base.err.stairs_anchor', 'RSE: no second level → stairs always refused');
   // dimensions canon DECORSHAPE (header.h) — heavy_desk = 3×2 ; passe 42 :
-  // rotation supprimée → l'empreinte ne permute JAMAIS (index ignoré).
+  // rotation removed → the footprint NEVER swaps (index ignored).
   assert.deepEqual(JSON.parse(vm.runInContext(`JSON.stringify(baseItemFootprint(baseItemGet('heavy_desk'), 0))`, sb)), { w: 3, d: 2 });
-  assert.deepEqual(JSON.parse(vm.runInContext(`JSON.stringify(baseItemFootprint(baseItemGet('heavy_desk'), 1))`, sb)), { w: 3, d: 2 }, 'rotation supprimée : empreinte inchangée');
+  assert.deepEqual(JSON.parse(vm.runInContext(`JSON.stringify(baseItemFootprint(baseItemGet('heavy_desk'), 1))`, sb)), { w: 3, d: 2 }, 'rotation removed: unchanged footprint');
   assert.equal(vm.runInContext(`
-    baseStockAdd(baseGetState(), 'solid_board', 1);   // le debug n'en donne qu'une : 1re posée en (3,5)
+    baseStockAdd(baseGetState(), 'solid_board', 1);   // debug only gives one: 1st placed at (3,5)
     basePlace(baseGetState(), 'solid_board', 5, 2, 0).ok
-  `, sb), true, 'planche sur le trou canon (5,2)');
-  assert.equal(vm.runInContext(`baseCellWalkable(baseGetState(), baseBuildGrid(baseGetState()), 5, 2, null)`, sb), true, 'trou bouché franchissable');
+  `, sb), true, 'board on the canonical hole (5,2)');
+  assert.equal(vm.runInContext(`baseCellWalkable(baseGetState(), baseBuildGrid(baseGetState()), 5, 2, null)`, sb), true, 'filled hole crossable');
 });
 
-test('passe 33 B2 : anti-blocage BFS + plafond canon de 26', () => {
+test('phase 33 B2: BFS anti-blocking + canon cap of 26', () => {
   const sb = makeSandbox();
   vm.runInContext(`
     const st = baseGetState();
-    baseDebugCreate('cave_1');   // passe 43 : S fixe devant la porte (5,7) — le
-    baseDebugGrantAll();         // rideau y=4 scellerait le nord (9,5 = mur !)
-    baseStockAdd(st, 'small_desk', 7);  // le debug n'en donne qu'un : on complète
+    baseDebugCreate('cave_1');   // passe 43: S fixed in front of the door (5,7) — the
+    baseDebugGrantAll();         // curtain y=4 would seal the north (9,5 = wall!)
+    baseStockAdd(st, 'small_desk', 7);  // debug only gives one: we top up
     const npc = baseNpcAdd(st, { name: 'Rex', team: [{ id: 25, level: 20, moves: ['thunderbolt'] }] });
     window._npcPlace = baseNpcPlace(st, npc.id, 3, 2).ok;  // copain AU NORD
     window._poses = [];
     for (let x = 1; x <= 7; x++) window._poses.push(basePlace(st, 'small_desk', x, 4, 0).ok);
     window._blocking = baseCanPlace(st, 'small_desk', 8, 4, 0).reason;
   `, sb);
-  assert.equal(vm.runInContext('window._npcPlace', sb), true, 'copain posé au nord');
+  assert.equal(vm.runInContext('window._npcPlace', sb), true, 'buddy placed north');
   assert.deepEqual(JSON.parse(vm.runInContext('JSON.stringify(window._poses)', sb)), [true, true, true, true, true, true, true]);
-  // passe 43 : le rideau scelle le copain au nord → blocks_npc (le spawn fixe
-  // devant la porte au sud ne peut plus être coupé ; la protection canon
-  // passe par les PNJ, toujours joignables depuis l'arrivée).
-  assert.equal(vm.runInContext('window._blocking', sb), 'base.err.blocks_npc', 'le rideau complet est refusé (copain scellé)');
-  // plafond 26 (synthétique : on compte uniquement les objets posés, canon)
+  // phase 43: the curtain seals the buddy to the north → blocks_npc (the fixed
+  // spawn in front of the south door can no longer be cut off; canon
+  // protection goes through NPCs, always reachable from the entrance).
+  assert.equal(vm.runInContext('window._blocking', sb), 'base.err.blocks_npc', 'the full curtain is refused (sealed buddy)');
+  // cap 26 (synthetic: only placed objects are counted, canonical)
   assert.equal(vm.runInContext(`
     const st2 = baseGetState();
     for (let i = 0; i < 26; i++) st2.items.push({ uid: 1000 + i, s: 'small_desk', x: 1, y: 1, rot: 0 });
@@ -170,8 +172,8 @@ test('passe 33 B2 : anti-blocage BFS + plafond canon de 26', () => {
   `, sb), 'base.err.max_placed', '26 objets max (limite ROSA)');
 });
 
-// ——— C — Stock, ramassage en cascade, déménagement ————————————————————————
-test('passe 33 C : pickup en cascade + relocate conserve meubles et PNJ', () => {
+// ——— C — Stock, cascading pickup, moving out ————————————————————————————
+test('phase 33 C: cascading pickup + relocate keeps furniture and NPCs', () => {
   const sb = makeSandbox();
   vm.runInContext(`
     const st = baseGetState();
@@ -183,7 +185,7 @@ test('passe 33 C : pickup en cascade + relocate conserve meubles et PNJ', () => 
     window._picked = basePickup(st, matUid);
     window._dollBack = baseStockCount(st, 'charizard_doll');
     window._matBack = baseStockCount(st, 'surf_mat');
-    // passe 39 : la poupée sur un porteur ramassé RESTE au sol (sol admis)
+    // pass 39: a doll on a picked-up holder STAYS on the floor (floor allowed)
     const doll = st.items.find((i) => i.s === 'charizard_doll');
     window._dollStayed = !!(doll && doll.x === 1 && doll.y === 3);
     const npc = baseNpcAdd(st, { name: 'Léo', sprite: 'camper', team: [{ id: 25, level: 50, moves: ['thunderbolt'], talent: 'static' }], msgs: { pre: 'Go !', win: 'Bravo !', lose: 'Bien joué !' } });
@@ -195,43 +197,43 @@ test('passe 33 C : pickup en cascade + relocate conserve meubles et PNJ', () => 
     window._stockLeft = Object.keys(st.stock).length;
     window._layout = st.layoutId;
   `, sb);
-  // passe 39 (décision utilisateur) : poupée/coussin au sol = légal → le
-  // ramassage du porteur laisse la poupée posée au sol (re-validation), il
-  // ne repart au stock que le tapis seul.
-  assert.equal(vm.runInContext('window._picked', sb), 1, 'le tapis seul repart au stock');
-  assert.equal(vm.runInContext('window._dollBack', sb), 0, 'poupée NON ramassée');
-  assert.equal(vm.runInContext('window._matBack', sb), 1, 'tapis récupéré');
-  assert.equal(vm.runInContext('window._dollStayed', sb), true, 'la poupée reste au sol à sa place');
+  // phase 39 (user decision): doll/cushion on the floor = legal → picking
+  // up the carrier leaves the doll placed on the floor (re-validated); only
+  // the rug alone goes back to stock.
+  assert.equal(vm.runInContext('window._picked', sb), 1, 'the rug alone goes back to stock');
+  assert.equal(vm.runInContext('window._dollBack', sb), 0, 'doll NOT picked up');
+  assert.equal(vm.runInContext('window._matBack', sb), 1, 'mat recovered');
+  assert.equal(vm.runInContext('window._dollStayed', sb), true, 'the doll stays on the floor in its place');
   assert.equal(vm.runInContext('window._npcOk', sb), true);
   assert.equal(vm.runInContext('window._npcPlaced', sb), true);
   assert.equal(vm.runInContext('window._reloc.ok', sb), true);
-  assert.equal(vm.runInContext('window._npcsLeft', sb), 0, 'PNJ retiré de la base');
-  assert.equal(vm.runInContext('window._npcInStock', sb), 0, 'PNJ supprimé au déménagement (fix demandé : pas de banque invisible)');
+  assert.equal(vm.runInContext('window._npcsLeft', sb), 0, 'NPC removed from the base');
+  assert.equal(vm.runInContext('window._npcInStock', sb), 0, 'NPC deleted on move-out (requested fix: no invisible bank)');
   assert.equal(vm.runInContext('window._layout', sb), 'tree_2');
-  assert.ok(vm.runInContext('window._stockLeft', sb) >= 2, 'meubles conservés au déménagement');
+  assert.ok(vm.runInContext('window._stockLeft', sb) >= 2, 'furniture kept on relocation');
 });
 
-// ——— D — Visite : déplacement, élévation, pièges, PNJ —————————————————————
-test('passe 33 D : visite, planche sur trou et pièges ROSA (gabarit canon cave_1)', () => {
+// ——— D — Visit: movement, elevation, traps, NPCs —————————————————————
+test('phase 33 D: visit, board over hole and FRLG traps (canon cave_1 layout)', () => {
   const sb = makeSandbox();
   vm.runInContext(`{
     const st = baseGetState();
-    baseDebugCreate('cave_1');   // S(2,2), E(5,8), trou o(5,2) — RSE : plain-pied, pas d'escalier
+    baseDebugCreate('cave_1');   // S(2,2), E(5,8), hole o(5,2) — RSE: single level, no stairs
     baseDebugGrantAll();
-    // Phase A : planche SEULEMENT — les pièges viennent après, sinon le trajet
-    // vers le trou passerait sur le square-one.
-    basePlace(st, 'solid_board', 5, 2, 0);   // planche sur le trou canon
-    const sessA = baseVisitCreate(st);       // la visite clone l'état ! départ = point d'arrivée S
-    // 1) chemin spawn → trou (praticable uniquement grâce à la planche)
+    // Phase A: board ONLY — traps come after, otherwise the path
+    // to the hole would cross the square-one mat.
+    basePlace(st, 'solid_board', 5, 2, 0);   // board on the canonical hole
+    const sessA = baseVisitCreate(st);       // the visit clones the state! start = spawn point S
+    // 1) spawn → hole path (walkable only thanks to the board)
     window._pathLen = (baseVisitSetDestination(sessA, 5, 2) || []).length;
     while (sessA.path.length) baseVisitStepAlong(sessA);
     window._posTop = JSON.stringify([sessA.pos.x, sessA.pos.y]);
-    window._elevTop = sessA.elev;            // RSE : pas de deuxième niveau → toujours 0
-    // Phase B : pièges canon posés, nouvelle session clonée depuis le spawn
-    basePlace(st, 'spin_mat', 6, 6, 0);      // tapis tournant : repousse en arrière
-    basePlace(st, 'd_note_mat', 7, 6, 0);    // tapis-note ré (note 1, fixe)
+    window._elevTop = sessA.elev;            // RSE: no second level → always 0
+    // Phase B: canon traps placed, new session cloned from the spawn
+    basePlace(st, 'spin_mat', 6, 6, 0);      // spin mat: pushes backward
+    basePlace(st, 'd_note_mat', 7, 6, 0);    // D note mat (note 1, fixed)
     const sessB = baseVisitCreate(st);
-    // 2) spin : le visiteur est REPoussé à la case précédente (jamais sur 6,6)
+    // 2) spin: the visitor is PUSHED BACK to the previous tile (never on 6,6)
     baseVisitSetDestination(sessB, 6, 6);
     let before = JSON.stringify([sessB.pos.x, sessB.pos.y]);
     const seq = [];
@@ -243,22 +245,22 @@ test('passe 33 D : visite, planche sur trou et pièges ROSA (gabarit canon cave_
     window._spinPushed = seq.length ? seq[seq.length - 1] : null;
     window._afterSpin = JSON.stringify([sessB.pos.x, sessB.pos.y]);
     window._beforeSpin = before;
-    // 3) tapis-note canon : ré = note 1 (rotation supprimée → fixe)
+    // 3) canon note mat: D = note 1 (rotation removed → fixed)
     baseVisitSetDestination(sessB, 7, 6);
     window._note = null;
     while (sessB.path.length) { const r = baseVisitStepAlong(sessB); if (r.ev && r.ev.msg === 'base.visit.note') window._note = r.ev.note; }
   }`, sb);
-  assert.ok(vm.runInContext('window._pathLen', sb) > 0, 'chemin vers le trou via la planche');
+  assert.ok(vm.runInContext('window._pathLen', sb) > 0, 'path to the hole via the board');
   assert.equal(vm.runInContext('window._posTop', sb), '[5,2]');
-  assert.equal(vm.runInContext('window._elevTop', sb), 0, 'RSE : tout est de plain-pied (pas d’étage)');
-  assert.equal(vm.runInContext('window._spinPushed', sb), 'push', 'spin : visiteur repoussé');
-  assert.equal(vm.runInContext('window._afterSpin', sb), vm.runInContext('window._beforeSpin', sb), 'spin : retour à la case précédente');
-  assert.equal(vm.runInContext('window._note', sb), 1, 'tapis-note ré = note 1 (fixe)');
+  assert.equal(vm.runInContext('window._elevTop', sb), 0, 'RSE: everything is single-floor (no upper floor)');
+  assert.equal(vm.runInContext('window._spinPushed', sb), 'push', 'spin: visitor pushed back');
+  assert.equal(vm.runInContext('window._afterSpin', sb), vm.runInContext('window._beforeSpin', sb), 'spin: back to the previous tile');
+  assert.equal(vm.runInContext('window._note', sb), 1, 'D note mat = note 1 (fixed)');
 
-  // 4) tapis saut canon (passe 42 : les panneaux warp ORAS n'existent plus)
+  // 4) canonical jump mat (phase 42: ORAS warp panels no longer exist)
   const jump = JSON.parse(vm.runInContext(`{
     const stw = baseGetState();
-    baseStockAdd(stw, 'jump_mat', 1);   // le debug n'en donne qu'un
+    baseStockAdd(stw, 'jump_mat', 1);   // the debug only gives one
     basePlace(stw, 'jump_mat', 5, 5, 0);
     const sess2 = baseVisitCreate(stw);
     baseVisitSetDestination(sess2, 5, 5);
@@ -266,10 +268,10 @@ test('passe 33 D : visite, planche sur trou et pièges ROSA (gabarit canon cave_
     while (sess2.path.length) { const r = baseVisitStepAlong(sess2); if (r.ev) ev = r.ev; }
     JSON.stringify({ ev: ev && ev.msg, pos: [sess2.pos.x, sess2.pos.y] });
   }`, sb));
-  assert.equal(jump.ev, 'base.visit.jump', 'tapis saut : message canon');
-  assert.deepEqual(jump.pos, [5, 5], 'le visiteur atteint le tapis');
+  assert.equal(jump.ev, 'base.visit.jump', 'jump mat: canon message');
+  assert.deepEqual(jump.pos, [5, 5], 'the visitor reaches the mat');
 
-  // 5) PNJ : parler → combat borné, une seule fois par visite
+  // 5) NPC: talk → bounded battle, once per visit
   const n = JSON.parse(vm.runInContext(`{
     const st3 = baseGetState();
     const added = baseNpcAdd(st3, { name: 'Léo', sprite: 'camper', team: [{ id: 25, level: 50, moves: ['thunderbolt'], talent: 'static' }] });
@@ -279,17 +281,17 @@ test('passe 33 D : visite, planche sur trou et pièges ROSA (gabarit canon cave_
     const second = baseVisitInteract(sess3, 1, 5);
     JSON.stringify({ t1: first.type, kind: first.battle && first.battle.kind, team: first.battle && first.battle.team.length, t2: second.type });
   }`, sb));
-  assert.equal(n.t1, 'npc_battle', 'parler au PNJ propose le combat');
+  assert.equal(n.t1, 'npc_battle', 'talking to the NPC offers the battle');
   assert.equal(n.kind, 'base_npc');
   assert.equal(n.team, 1);
-  // Passe 52 (retour utilisateur : « on doit pouvoir le combattre autant
-  //    qu'on veut ») : plus de verrou d'un combat par visite. Ouvrir le
-  //    dialogue ne consomme plus rien non plus — c'était le second bug :
-  //    « passer son chemin » brûlait quand même le duel.
-  assert.equal(n.t2, 'npc_battle', 'le PNJ reste combattable autant de fois qu’on veut');
+  // Phase 52 (user feedback: "we must be able to battle it as much
+  //    as we want"): no more one-battle-per-visit lock. Opening the
+  //    dialogue no longer consumes anything either — that was the second bug:
+  //    "walking away" still burned the duel.
+  assert.equal(n.t2, 'npc_battle', 'the NPC stays battleable as many times as wanted');
 
-  // 6) ballon canon (fx burst) : éclate UNE seule fois par visite (base
-  //    remise à plat pour isoler le piège des autres mécanismes déjà posés)
+  // 6) canonical balloon (burst fx): pops exactly ONCE per visit (base
+  //    reset flat to isolate the trap from other already-placed mechanisms)
   const pit = JSON.parse(vm.runInContext(`{
     const st4 = baseGetState();
     baseRelocate(st4, 'cave_1');
@@ -305,12 +307,12 @@ test('passe 33 D : visite, planche sur trou et pièges ROSA (gabarit canon cave_
     while (sess4.path.length) { const r = baseVisitStepAlong(sess4); if (r.ev) second = r.ev; }
     JSON.stringify({ first: first && first.msg, second: second && second.msg, stopped: sess4.pos.x + ',' + sess4.pos.y });
   }`, sb));
-  assert.equal(pit.first, 'base.visit.burst', 'ballon éclaté au passage');
-  assert.equal(pit.second, null, 'le même ballon ne se regonfle pas pendant la visite');
+  assert.equal(pit.first, 'base.visit.burst', 'balloon burst on the way');
+  assert.equal(pit.second, null, 'the same balloon does not re-inflate during the visit');
 });
 
-// ——— E — Échange JSON —————————————————————————————————————————————————————
-test('passe 33 E : export/import strict — visite seule, rien n’est crédité', () => {
+// ——— E — JSON exchange —————————————————————————————————————————————————————
+test('phase 33 E: strict export/import — visit only, nothing is credited', () => {
   const sb = makeSandbox();
   vm.runInContext(`{
     const st = baseGetState();
@@ -325,7 +327,7 @@ test('passe 33 E : export/import strict — visite seule, rien n’est crédité
     window._json = baseExportString(st, 'Dresseur');
     window._stockBefore = JSON.stringify(Object.keys(st.stock).sort());
   }`, sb);
-  assert.ok(vm.runInContext('window._json', sb).includes('pw-secret-base'), 'marqueur de type présent');
+  assert.ok(vm.runInContext('window._json', sb).includes('pw-secret-base'), 'type marker present');
 
   const imp = JSON.parse(vm.runInContext(`{
     const chk = baseImportValidate(window._json);
@@ -333,41 +335,41 @@ test('passe 33 E : export/import strict — visite seule, rien n’est crédité
       npcLvl: chk.visit.npcs[0].team[0].level, npcMoves: chk.visit.npcs[0].team[0].moves.length,
       npcName: chk.visit.npcs[0].name, recW: chk.meta.record.w });
   }`, sb));
-  assert.equal(imp.ok, true, 'import accepté');
-  assert.equal(imp.items, 4, '3 objets + PC (auto — passe 43 : plus de tapis d\u2019accueil)');
+  assert.equal(imp.ok, true, 'import accepted');
+  assert.equal(imp.items, 4, '3 objects + PC (auto — phase 43: no more welcome mat)');
   assert.equal(imp.npcs, 1);
-  assert.equal(imp.npcLvl, 100, 'niveau borné à 100');
+  assert.equal(imp.npcLvl, 100, 'level capped at 100');
   assert.equal(imp.npcMoves, 4, '4 coups max');
-  assert.equal(imp.npcName.includes('<'), false, 'HTML nettoyé des noms');
-  assert.equal(imp.recW, 7, 'record transporté');
+  assert.equal(imp.npcName.includes('<'), false, 'HTML cleaned from names');
+  assert.equal(imp.recW, 7, 'record carried over');
 
-  // rien n'est crédité au joueur par la visite
+  // nothing is credited to the player by the visit
   assert.equal(vm.runInContext(`
     baseVisitFromJson(window._json);
     JSON.stringify(Object.keys(baseGetState().stock).sort());
-  `, sb), vm.runInContext('window._stockBefore', sb), 'aucun objet offert à l’import');
+  `, sb), vm.runInContext('window._stockBefore', sb), 'no gifted item on import');
 
   // rejets stricts
-  assert.equal(vm.runInContext(`baseImportValidate('pas du json').reason`, sb), 'base.err.import_json');
+  assert.equal(vm.runInContext(`baseImportValidate('not the json').reason`, sb), 'base.err.import_json');
   assert.equal(vm.runInContext(`baseImportValidate('{"kind":"autre"}').reason`, sb), 'base.err.import_kind');
   assert.equal(vm.runInContext(`baseImportValidate(JSON.stringify({kind:'pw-secret-base', v:99})).reason`, sb), 'base.err.import_version');
   assert.equal(vm.runInContext(`
     const dr = JSON.parse(window._json);
     dr.items = new Array(40).fill(dr.items[1]);
     baseImportValidate(JSON.stringify(dr)).reason;
-  `, sb), 'base.err.import_items', 'trop d’objets rejeté');
+  `, sb), 'base.err.import_items', 'too many items rejected');
 
-  // objet trafiqué hors limites → écarté proprement
+  // out-of-bounds tampered object → cleanly discarded
   const t2 = JSON.parse(vm.runInContext(`{
     const d = JSON.parse(window._json);
     d.items[0].x = 99;
     const chk2 = baseImportValidate(JSON.stringify(d));
     JSON.stringify({ ok: chk2.ok, items: chk2.visit.items.length });
   }`, sb));
-  assert.equal(t2.ok, true, 'fichier partiellement valide accepté');
-  assert.equal(t2.items, 3, 'objet trafiqué (items[0]) écarté, les 3 autres conservés (+ PC passe 40)');
+  assert.equal(t2.ok, true, 'partially valid file accepted');
+  assert.equal(t2.items, 3, 'tampered object (items[0]) discarded, the 3 others kept (+ PC phase 40)');
 
-  // et la visite de la base de l'ami démarre
+  // and the friend's base visit starts
   assert.equal(vm.runInContext(`baseVisitFromJson(window._json).ok`, sb), true);
 });
 

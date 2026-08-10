@@ -1,4 +1,6 @@
-const ITEMS = {
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
+export const ITEMS = {
 
   "prine_berry": {
     "icon": "\u{1F347}",
@@ -387,9 +389,9 @@ const ITEMS = {
     "moveId": "aqua_tail",
 
     "name_en": "Aquatail",
-    "name_fr": "Hydro-Queue",
+    "name_fr": "Hydroqueue",
     "desc_en": "Teaches Aquatail to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Hydro-Queue à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Hydroqueue à un Pokémon compatible."
   },
 
   "ct_aurasphere":{
@@ -432,9 +434,9 @@ const ITEMS = {
     "moveId": "bug_bite",
 
     "name_en": "Bug Bite",
-    "name_fr": "Mord-Croq",
+    "name_fr": "Piqûre",
     "desc_en": "Teaches Bug Bite to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Mord-Croq à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Piqûre à un Pokémon compatible."
   },
 
   "ct_bugbuzz": {
@@ -480,9 +482,9 @@ const ITEMS = {
     "moveId": "bullet_punch",
 
     "name_en": "Bulletpunch",
-    "name_fr": "Poing Météore",
+    "name_fr": "Pisto-Poing",
     "desc_en": "Teaches Bulletpunch to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Poing Météore à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Pisto-Poing à un Pokémon compatible."
   },
 
   "ct_calmmind": {
@@ -512,7 +514,7 @@ const ITEMS = {
     "name_en": "Chillingwater",
     "name_fr": "Eau Glacée",
     "desc_en": "Teaches Chillingwater to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité chillingwater à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Eau Glacée à un Pokémon compatible."
   },
 
   "ct_confusion": {
@@ -540,9 +542,9 @@ const ITEMS = {
     "moveId": "cross_room",
 
     "name_en": "Crossroom",
-    "name_fr": "Force Croisée",
+    "name_fr": "Cross Room",
     "desc_en": "Teaches Crossroom to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Force Croisée à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Cross Room à un Pokémon compatible."
   },
 
   "ct_crunch": {
@@ -552,9 +554,9 @@ const ITEMS = {
     "moveId": "crunch",
 
     "name_en": "Crunch",
-    "name_fr": "Croquefer",
+    "name_fr": "Mâchouille",
     "desc_en": "Teaches Crunch to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Croquefer à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Mâchouille à un Pokémon compatible."
   },
 
   "ct_darkpulse": {
@@ -606,9 +608,9 @@ const ITEMS = {
     "moveId": "draco_meteor",
 
     "name_en": "Dracometeor",
-    "name_fr": "Draco Météor",
+    "name_fr": "Draco-Météore",
     "desc_en": "Teaches Dracometeor to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Draco Météor à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Draco-Météore à un Pokémon compatible."
   },
 
   "ct_dragonpulse": {
@@ -663,9 +665,9 @@ const ITEMS = {
     "moveId": "ember",
 
     "name_en": "Ember",
-    "name_fr": "Flammèche",
+    "name_fr": "Flamèche",
     "desc_en": "Teaches Ember to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Flammèche à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Flamèche à un Pokémon compatible."
   },
 
   "ct_energyball":{
@@ -729,9 +731,9 @@ const ITEMS = {
     "moveId": "fog",
 
     "name_en": "Fog",
-    "name_fr": "Brume",
+    "name_fr": "Fog",
     "desc_en": "Teaches Fog to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Brume à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Fog à un Pokémon compatible."
   },
 
   "ct_forcepalm": {
@@ -741,9 +743,9 @@ const ITEMS = {
     "moveId": "force_palm",
 
     "name_en": "Forcepalm",
-    "name_fr": "Pressure",
+    "name_fr": "Fort-Paume",
     "desc_en": "Teaches Forcepalm to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Pressure à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Fort-Paume à un Pokémon compatible."
   },
 
   "ct_grassyterrain":{
@@ -786,9 +788,9 @@ const ITEMS = {
     "moveId": "hydro_pump",
 
     "name_en": "Hydro Pump",
-    "name_fr": "Hydroblast",
+    "name_fr": "Hydrocanon",
     "desc_en": "Teaches Hydro Pump to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Hydroblast à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Hydrocanon à un Pokémon compatible."
   },
 
   "ct_iceshard": {
@@ -864,9 +866,9 @@ const ITEMS = {
     "moveId": "leer",
 
     "name_en": "Leer",
-    "name_fr": "Groz Yeux",
+    "name_fr": "Groz'Yeux",
     "desc_en": "Teaches Leer to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Groz Yeux à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Groz'Yeux à un Pokémon compatible."
   },
 
   "ct_lick": {
@@ -876,9 +878,9 @@ const ITEMS = {
     "moveId": "lick",
 
     "name_en": "Lick",
-    "name_fr": "Léchage",
+    "name_fr": "Léchouille",
     "desc_en": "Teaches Lick to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Léchage à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Léchouille à un Pokémon compatible."
   },
 
   "ct_lightscreen":{
@@ -897,9 +899,9 @@ const ITEMS = {
     "moveId": "liquidation",
 
     "name_en": "Liquidation",
-    "name_fr": "Trempage",
+    "name_fr": "Aqua-Brèche",
     "desc_en": "Teaches Liquidation to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Trempage à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Aqua-Brèche à un Pokémon compatible."
   },
 
   "ct_magicalleaf":{
@@ -939,9 +941,9 @@ const ITEMS = {
     "moveId": "moonblast",
 
     "name_en": "Moonblast",
-    "name_fr": "Éblouissement",
+    "name_fr": "Pouvoir Lunaire",
     "desc_en": "Teaches Moonblast to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Éblouissement à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Pouvoir Lunaire à un Pokémon compatible."
   },
 
   "ct_mudslap": {
@@ -951,9 +953,9 @@ const ITEMS = {
     "moveId": "mud_slap",
 
     "name_en": "Mudslap",
-    "name_fr": "Boue-Bombe",
+    "name_fr": "Coud'Boue",
     "desc_en": "Teaches Mudslap to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Boue-Bombe à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Coud'Boue à un Pokémon compatible."
   },
 
   "ct_nastyplot": {
@@ -996,9 +998,9 @@ const ITEMS = {
     "moveId": "peck",
 
     "name_en": "Peck",
-    "name_fr": "Coup d'Bec",
+    "name_fr": "Picpic",
     "desc_en": "Teaches Peck to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Coup d'Bec à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Picpic à un Pokémon compatible."
   },
 
   "ct_playrough": {
@@ -1008,9 +1010,9 @@ const ITEMS = {
     "moveId": "play_rough",
 
     "name_en": "Playrough",
-    "name_fr": "Câlin",
+    "name_fr": "Câlinerie",
     "desc_en": "Teaches Playrough to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Câlin à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Câlinerie à un Pokémon compatible."
   },
 
   "ct_poisonjab":{
@@ -1029,18 +1031,18 @@ const ITEMS = {
     "moveId": "power_gem",
 
     "name_en": "Powergem",
-    "name_fr": "Joyau Lumineux",
+    "name_fr": "Rayon Gemme",
     "desc_en": "Teaches Powergem to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Joyau Lumineux à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Rayon Gemme à un Pokémon compatible."
   },
 
   "ct_psychocut":{
     "moveId": "psycho_cut",
 
     "name_en": "Psychocut",
-    "name_fr": "Coupe Psycho",
+    "name_fr": "Coupe-Psyko",
     "desc_en": "Teaches Psychocut to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Coupe Psycho à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Coupe-Psyko à un Pokémon compatible."
   },
 
   "ct_pursuit": {
@@ -1119,9 +1121,9 @@ const ITEMS = {
     "moveId": "safeguard",
 
     "name_en": "Safeguard",
-    "name_fr": "Rune Protect",
+    "name_fr": "Rune Protectrice",
     "desc_en": "Teaches Safeguard to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Rune Protect à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Rune Protectrice à un Pokémon compatible."
   },
 
   "ct_sandstorm": {
@@ -1140,9 +1142,9 @@ const ITEMS = {
     "moveId": "scorching_sands",
 
     "name_en": "Scorchingsands",
-    "name_fr": "Sable Brûlant",
+    "name_fr": "Sable Ardent",
     "desc_en": "Teaches Scorchingsands to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Sable Brûlant à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Sable Ardent à un Pokémon compatible."
   },
 
   "ct_silverwind":{
@@ -1239,9 +1241,9 @@ const ITEMS = {
     "moveId": "swords_dance",
 
     "name_en": "Swordsdance",
-    "name_fr": "Danse Lames",
+    "name_fr": "Danse Lame",
     "desc_en": "Teaches Swordsdance to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Danse Lames à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Danse Lame à un Pokémon compatible."
   },
 
   "ct_tackle": {
@@ -1263,9 +1265,9 @@ const ITEMS = {
     "moveId": "thunder",
 
     "name_en": "Thunder",
-    "name_fr": "Foudre",
+    "name_fr": "Fatal-Foudre",
     "desc_en": "Teaches Thunder to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Foudre à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Fatal-Foudre à un Pokémon compatible."
   },
 
   "ct_thunderpunch": {
@@ -1296,9 +1298,9 @@ const ITEMS = {
     "moveId": "trick_room",
 
     "name_en": "Trickroom",
-    "name_fr": "Tour de Magie",
+    "name_fr": "Distorsion",
     "desc_en": "Teaches Trickroom to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Tour de Magie à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Distorsion à un Pokémon compatible."
   },
 
   "ct_twineedle": {
@@ -1308,9 +1310,9 @@ const ITEMS = {
     "moveId": "twineedle",
 
     "name_en": "Twineedle",
-    "name_fr": "Double Dard",
+    "name_fr": "Double-Dard",
     "desc_en": "Teaches Twineedle to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Double Dard à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Double-Dard à un Pokémon compatible."
   },
 
   "ct_twister": {
@@ -1341,9 +1343,9 @@ const ITEMS = {
     "moveId": "volt_switch",
 
     "name_en": "Voltswitch",
-    "name_fr": "Change-Éclair",
+    "name_fr": "Change Éclair",
     "desc_en": "Teaches Voltswitch to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Change-Éclair à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Change Éclair à un Pokémon compatible."
   },
 
   "ct_watergun": {
@@ -1374,9 +1376,9 @@ const ITEMS = {
     "moveId": "weird_room",
 
     "name_en": "Weirdroom",
-    "name_fr": "Distorsion",
+    "name_fr": "Weird Room",
     "desc_en": "Teaches Weirdroom to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Distorsion à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Weird Room à un Pokémon compatible."
   },
 
   "ct_willowisp": {
@@ -1398,9 +1400,9 @@ const ITEMS = {
     "moveId": "x_scissor",
 
     "name_en": "Xscissor",
-    "name_fr": "Plaie Croix",
+    "name_fr": "Plaie-Croix",
     "desc_en": "Teaches Xscissor to a compatible Pokémon.",
-    "desc_fr": "Enseigne la capacité Plaie Croix à un Pokémon compatible."
+    "desc_fr": "Enseigne la capacité Plaie-Croix à un Pokémon compatible."
   },
 
   "damp_rock": {
@@ -2864,5 +2866,7 @@ const ITEMS = {
 };
 
 // --- Migrated to ES module, globals exposed ---
-if (typeof ITEMS !== "undefined" && typeof window !== "undefined") window.ITEMS = ITEMS;
+// Wave 40 — surface kept (T2 template): prod (window === globalThis
+// in the browser), VM harnesses and classic consumers.
+if (typeof globalThis !== 'undefined') globalThis.ITEMS = ITEMS;
 

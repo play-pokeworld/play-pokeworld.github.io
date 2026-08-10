@@ -1,6 +1,6 @@
 // Auto-generated PD from PokeChill
 (function() {
-  if (!window.PD) window.PD = [];
+  var PD = window.PD = window.PD || [];
   PD[1] = ["Bulbasaur", "Grass", "Poison", 45, 49, 49, 65, 65, 45, [], 45, 60];
   PD[2] = ["Ivysaur", "Grass", "Poison", 60, 62, 63, 80, 80, 60, [], 45, 60];
   PD[3] = ["Venusaur", "Grass", "Poison", 80, 82, 83, 100, 100, 80, [], 45, 60];
@@ -247,10 +247,10 @@
   PD[248] = ["tyranitar", "Rock", "Dark", 100, 134, 110, 95, 100, 61, [], 45, 60];
   PD[249] = ["lugia", "Psychic", "Flying", 106, 90, 130, 90, 154, 110, [], 45, 60];
   PD[251] = ["celebi", "Psychic", "Grass", 100, 100, 100, 100, 100, 100, [], 45, 60];
-  // Passe 14 — fossiles Johto : les Fossiles Racine/Griffe donnent leurs cibles
-  // canoniques (cf. descriptions des objets : « réanimé en Lilia/Anorith »).
-  // Les entrées sont éparses volontairement : le dex reste Kanto/Johto (1-251),
-  // ces deux espèces Hoenn ne sont obtenables QUE par réanimation de fossile.
+  // Phase 14 — Johto fossils: Root/Claw Fossils give their canonical
+  // targets (cf. item descriptions: "revived into Lileep/Anorith").
+  // Entries are sparse on purpose: the dex stays Kanto/Johto (1-251);
+  // these two Hoenn species are obtainable ONLY through fossil revival.
   PD[345] = ["Lileep", "Rock", "Grass", 66, 41, 77, 61, 87, 23, [], 45, 60];
   PD[347] = ["Anorith", "Rock", "Bug", 45, 95, 50, 40, 50, 75, [], 45, 60];
 PD[87] = ["Dewgong", "Water", "Ice", 90, 70, 80, 70, 95, 70, , 75, 59];

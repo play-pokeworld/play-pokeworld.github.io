@@ -1,5 +1,7 @@
-// Butin d'exploration — baies présentes (chacune ≥1 route) ; trésors/pierres exclus (Mine).
-// Chance : 1 % base, max 3 % avec drapeaux Or/Platine.
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
+// Exploration loot — berries present (each on ≥1 route); treasures/stones excluded (Mine).
+// Chance: 1% base, max 3% with Gold/Platinum flags.
 
 const ROUTE_DROPS = {
   abandoned_ship: ['deep_sea_scale'],
@@ -81,5 +83,11 @@ const ROUTE_DROPS = {
   whirlislands: ['mystic_water', 'dragon_scale'],
 };
 
-if (typeof ROUTE_DROPS !== 'undefined' && typeof window !== 'undefined') window.ROUTE_DROPS = ROUTE_DROPS;
+if (typeof ROUTE_DROPS !== 'undefined') { if (typeof window !== 'undefined') window.ROUTE_DROPS = ROUTE_DROPS; if (typeof globalThis !== 'undefined') globalThis.ROUTE_DROPS = ROUTE_DROPS; }
 
+
+// Wave 40 — native ESM module: grouped export of the same names as the
+// classic surface kept above/here (bodies unchanged).
+export {
+  ROUTE_DROPS,
+};

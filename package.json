@@ -5,18 +5,21 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
+    "build": "vite build && node tools/copy-runtime-assets.mjs",
     "preview": "vite preview --host 0.0.0.0",
     "validate": "node tools/validate-project.mjs",
+    "check:i18n": "node tools/check-i18n.mjs",
     "test": "node --test tests",
-    "check": "npm run validate && npm run build && npm test",
+    "check": "npm run validate && npm run check:i18n && npm run build && npm test",
     "download:assets": "python3 tools/download_assets.py",
     "audit": "python3 tools/audit_project.py"
   },
   "devDependencies": {
+    "esbuild": "^0.28.1",
     "eslint": "^10.7.0",
+    "jsdom": "^29.1.1",
+    "playwright": "^1.62.1",
     "prettier": "^3.9.5",
     "vite": "latest"
   }
 }
-

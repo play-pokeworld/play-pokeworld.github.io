@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
-"""Passe 50 — VÉRIFICATION des sources d'assets déclarées par les outils.
+"""Passe 50 — CHECK of the asset sources declared by the tools.
 
-Demande utilisateur : « si des liens des assets sont manquants ou pas bons
-dans le tool, rajoute-les ».
+User request: "if some asset links are missing or broken
+in the tool, add/fix them".
 
-Ce script interroge chaque source déclarée par la chaîne de téléchargement et
-signale celles qui ne répondent plus (404, domaine mort, chemin renommé). Il
-sert de garde-fou : quand une source change en amont, on le sait ici au lieu
-de le découvrir par des 404 dans la console du jeu.
+This script queries every source declared by the download chain and
+reports those that no longer answer (404, dead domain, renamed path). It
+acts as a safeguard: when an upstream source changes, we learn it here
+instead of discovering it through 404s in the game console.
 
-Sources contrôlées :
-  · PokeChill      — disquettes CT/CS par type, fonds, objets imposés ;
-  · PokeAPI        — sprites Pokémon (face/dos/chromatiques) et objets ;
-  · Pokéclicker    — cartes de régions, dresseurs, icônes de profil ;
-  · Poképédia      — carte de Paldea ;
-  · pret/pokeemerald — tilesets, layouts et objgfx des bases secrètes.
+Sources checked:
+  · PokeChill      — TM/HM disks by type, backgrounds, required items;
+  · PokeAPI        — Pokémon sprites (front/back/shiny) and items;
+  · Pokéclicker    — region maps, trainers, profile icons;
+  · Poképédia      — Paldea map;
+  · pret/pokeemerald — tilesets, layouts and secret base objgfx.
 
-Usage : python3 tools/check-asset-sources.py
-Sortie : 0 si toutes les sources répondent, 1 sinon.
+Usage: python3 tools/check-asset-sources.py
+Exit: 0 if every source answers, 1 otherwise.
 """
 from __future__ import annotations
 
@@ -33,29 +33,29 @@ PRET = 'https://raw.githubusercontent.com/pret/pokeemerald/master'
 PALDEA = 'https://www.pokepedia.fr/images/thumb/8/88/Paldea_-_EV.png/1600px-Paldea_-_EV.png'
 
 CHECKS = [
-    # (famille, description, URL témoin)
-    ('PokeChill', 'disquette CT (type Normal)', f'{POKECHILL}/img/items/tmNormal.png'),
-    ('PokeChill', 'disquette CT (type Fée)', f'{POKECHILL}/img/items/tmFairy.png'),
-    ('PokeChill', 'fond principal', f'{POKECHILL}/img/bg/main-bg.png'),
-    ('PokeChill', 'baie générique (Oran)', f'{POKECHILL}/img/items/berryOran.png'),
-    ('PokeChill', 'fossile (Hélix)', f'{POKECHILL}/img/items/fossilHelix.png'),
-    ('PokeAPI', 'Pokémon face #1', f'{POKEAPI}/pokemon/1.png'),
-    ('PokeAPI', 'Pokémon dos #1', f'{POKEAPI}/pokemon/back/1.png'),
-    ('PokeAPI', 'Pokémon chromatique #1', f'{POKEAPI}/pokemon/shiny/1.png'),
-    ('PokeAPI', 'objet (Restes)', f'{POKEAPI}/items/leftovers.png'),
-    ('Pokéclicker', 'carte de Kanto', f'{POKECLICKER}/kanto-kanto.png'),
-    ('Pokéclicker', 'icône de profil', f'{POKECLICKER}/profile/trainer-0.png'),
-    ('Pokéclicker', 'objet d’évolution', f'{POKECLICKER}/items/evolution/Kings_rock.png'),
-    ('Poképédia', 'carte de Paldea', PALDEA),
-    ('pret/pokeemerald', 'tileset primaire (base secrète)',
+    # (family, description, witness URL)
+    ('PokeChill', 'TM disk (Normal type)', f'{POKECHILL}/img/items/tmNormal.png'),
+    ('PokeChill', 'TM disk (Fairy type)', f'{POKECHILL}/img/items/tmFairy.png'),
+    ('PokeChill', 'main background', f'{POKECHILL}/img/bg/main-bg.png'),
+    ('PokeChill', 'generic berry (Oran)', f'{POKECHILL}/img/items/berryOran.png'),
+    ('PokeChill', 'fossil (Helix)', f'{POKECHILL}/img/items/fossilHelix.png'),
+    ('PokeAPI', 'Pokémon front #1', f'{POKEAPI}/pokemon/1.png'),
+    ('PokeAPI', 'Pokémon back #1', f'{POKEAPI}/pokemon/back/1.png'),
+    ('PokeAPI', 'shiny Pokémon #1', f'{POKEAPI}/pokemon/shiny/1.png'),
+    ('PokeAPI', 'item (Leftovers)', f'{POKEAPI}/items/leftovers.png'),
+    ('Pokéclicker', 'Kanto map', f'{POKECLICKER}/kanto-kanto.png'),
+    ('Pokéclicker', 'profile icon', f'{POKECLICKER}/profile/trainer-0.png'),
+    ('Pokéclicker', 'evolution item', f'{POKECLICKER}/items/evolution/Kings_rock.png'),
+    ('Poképédia', 'Paldea map', PALDEA),
+    ('pret/pokeemerald', 'primary tileset (secret base)',
      f'{PRET}/data/tilesets/primary/secret_base/tiles.png'),
-    ('pret/pokeemerald', 'métatiles généraux',
+    ('pret/pokeemerald', 'general metatiles',
      f'{PRET}/data/tilesets/primary/general/metatiles.bin'),
-    ('pret/pokeemerald', 'layout canon BrownCave1',
+    ('pret/pokeemerald', 'canon layout BrownCave1',
      f'{PRET}/data/layouts/SecretBase_BrownCave1/map.bin'),
-    ('pret/pokeemerald', 'objgfx (poupée Azurill)',
+    ('pret/pokeemerald', 'objgfx (Azurill doll)',
      f'{PRET}/graphics/object_events/pics/dolls/azurill_doll.png'),
-    ('pret/pokeemerald', 'décoration 2D (tente rouge)',
+    ('pret/pokeemerald', '2D decoration (red tent)',
      f'{PRET}/graphics/decorations/red_tent.png'),
 ]
 
@@ -65,11 +65,11 @@ def head(url: str) -> tuple[bool, str]:
     try:
         with urllib.request.urlopen(req, timeout=25) as r:
             n = len(r.read())
-            return (r.status == 200 and n > 80), f'{r.status} · {n} o.'
+            return (r.status == 200 and n > 80), f'{r.status} · {n} B'
     except urllib.error.HTTPError as e:
         return False, f'HTTP {e.code}'
     except (urllib.error.URLError, TimeoutError) as e:
-        return False, f'réseau : {e}'
+        return False, f'network: {e}'
 
 
 def main() -> int:
@@ -85,11 +85,11 @@ def main() -> int:
             bad.append((family, label, url))
     print()
     if bad:
-        print(f'{len(bad)} source(s) EN ÉCHEC — à corriger dans les outils :')
+        print(f'{len(bad)} FAILING source(s) — fix in the tools:')
         for family, label, url in bad:
             print(f'  · [{family}] {label}\n    {url}')
         return 1
-    print(f'Toutes les sources répondent ({len(CHECKS)} contrôles).')
+    print(f'All sources answer ({len(CHECKS)} checks).')
     return 0
 
 

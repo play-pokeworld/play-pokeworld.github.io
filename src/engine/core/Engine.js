@@ -1,5 +1,5 @@
 /**
- * PokeEngine — Main Engine
+ * PokeEngine — Hand Engine
  * 
  * Central hub: creates and wires all subsystems
  * Manages the frame loop with fixed timestep
@@ -9,7 +9,6 @@
  *   engine.start();
  *   engine.world.create(); // ECS world
  */
-(function() {
 'use strict';
 
 class PokeEngine {
@@ -146,8 +145,14 @@ class PokeEngine {
   }
 }
 
-window.PokeEngine = PokeEngine;
-if (!window.poke) window.poke = {};
-window.poke.Engine = PokeEngine;
-})();
+// T2 (wave 38): ESM module — native class export; the engine surface
+// (PokeEngine + poke.* namespace) stays kept on the global object for
+// classic consumers not yet migrated.
+export { PokeEngine };
+export default PokeEngine;
+if (typeof globalThis !== 'undefined') {
+  globalThis.PokeEngine = PokeEngine;
+  if (!globalThis.poke) globalThis.poke = {};
+  globalThis.poke.Engine = PokeEngine;
+}
 

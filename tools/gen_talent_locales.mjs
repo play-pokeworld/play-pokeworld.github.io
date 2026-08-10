@@ -1,13 +1,13 @@
 // ============================================================================
-// Passe 24 — Régénération des locales de talents (fr/en) + réparation des
-// descriptions tronquées dans talents-full.js.
+// Phase 24 — Regeneration of the ability locales (fr/en) + repair of
+// truncated descriptions in talents-full.js.
 // ----------------------------------------------------------------------------
-// Problèmes traités :
-//  • 41+ descriptions tronquées (« Grants immunity to », « on  weather »,
-//    « inflict  when attacked »…) — copiées en l'état dans les DEUX langues ;
-//  • 175/202 descriptions françaises restées en anglais ;
-//  • réparation à la SOURCE (talents-full.js info) pour les replis d'affichage.
-// Idempotent : on peut relancer le script sans effet de bord.
+// Issues handled:
+//  • 41+ truncated descriptions ("Grants immunity to", "on  weather",
+//    "inflict  when attacked"…) — copied as-is in BOTH languages;
+//  • 175/202 French descriptions left in English;
+//  • repair at the SOURCE (talents-full.js info) for display fallbacks.
+// Idempotent: the script can be re-run without side effects.
 // ============================================================================
 import { readFileSync, writeFileSync } from 'fs';
 
@@ -217,7 +217,7 @@ const FR = {
   dragonmaw:['Mâchoire Draco','Les capacités Normal deviennent Dragon, puissance x1.3.'],
 };
 
-// ——— Réparations des descriptions ANGLAISES tronquées (locale en + talents-full) ———
+// ——— Repair of truncated ENGLISH descriptions (en locale + talents-full) ———
 const EN_FIX = {
   hydratation:'Prevents negative status effects while on rainy weather',
   sandveil:'Increases evasion by 20%',
@@ -276,15 +276,15 @@ const esc = (s) => s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
   const src = readFileSync(path, 'utf8');
   const order = [...src.matchAll(/"(\w+)":\s*\{/g)].map((m) => m[1]);
   const missing = order.filter((k) => !FR[k]);
-  if (missing.length) throw new Error('Clés FR non traduites: ' + missing.join(','));
+  if (missing.length) throw new Error('untranslated FR keys: ' + missing.join(','));
   const extra = Object.keys(FR).filter((k) => !order.includes(k));
-  if (extra.length) console.log('⚠ clés table FR absentes du fichier (ignorées):', extra.join(','));
+  if (extra.length) console.log('⚠ FR table keys absent from the file (ignored):', extra.join(','));
   const body = order.map((k) => `  "${k}": {\n    "name": "${esc(FR[k][0])}",\n    "desc": "${esc(FR[k][1])}"\n  }`).join(',\n');
   writeFileSync(path, `// ===== FR — Ability (talent) names & descriptions =====\n// Passe 24 : régénéré par tools/gen_talent_locales.mjs — 100 % français.\nwindow.L_fr_talents = {\n${body}\n};\n`);
   console.log(`fr/talents.js : ${order.length} entrées réécrites (100 % FR)`);
 }
 
-// ——— 2) Locale EN : répare UNIQUEMENT les descriptions tronquées ———
+// ——— 2) EN locale: repair ONLY the truncated descriptions ———
 {
   const path = new URL('../src/localization/en/talents.js', import.meta.url);
   let src = readFileSync(path, 'utf8');
@@ -293,13 +293,13 @@ const esc = (s) => s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
     const re = new RegExp(`("${k}":\\s*\\{\\s*"name":\\s*"((?:[^"\\\\]|\\\\.)*)",\\s*"desc":\\s*")((?:[^"\\\\]|\\\\.)*)(")`, '');
     if (re.test(src)) { src = src.replace(re, `$1${desc}$4`); n++; }
   }
-  // Double espaces résiduels dans les descriptions
+  // Residual double spaces in the descriptions
   src = src.replace(/"desc": "([^"]*?) {2,}([^"]*?)"/g, (w, a, b) => `"desc": "${a} ${b}"`);
   writeFileSync(path, src);
-  console.log(`en/talents.js : ${n} descriptions réparées`);
+  console.log(`en/talents.js: ${n} descriptions repaired`);
 }
 
-// ——— 3) talents-full.js : répare les infos tronquées à la source ———
+// ——— 3) talents-full.js: repair the truncated infos at the source ———
 {
   const path = new URL('../src/data/talents-full.js', import.meta.url);
   let src = readFileSync(path, 'utf8');
@@ -307,9 +307,9 @@ const esc = (s) => s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
   for (const [k, info] of Object.entries(EN_FIX)) {
     const re = new RegExp(`(\\n  ${k}:\\s*\\{\\s*name:\\s*'[^']*',\\s*rarity:\\s*\\d,\\s*info:\\s*')((?:[^'\\\\\\\\]|\\\\\\\\.)*)(')`, '');
     if (re.test(src)) { src = src.replace(re, `$1${info}$3`); n++; }
-    else console.log('  (info talents-full introuvable pour', k + ')');
+    else console.log('  (no talents-full info found for', k + ')');
   }
   writeFileSync(path, src);
-  console.log(`talents-full.js : ${n} infos réparées`);
+  console.log(`talents-full.js: ${n} infos repaired`);
 }
 

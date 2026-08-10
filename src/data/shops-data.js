@@ -1,3 +1,5 @@
+// Wave 40 — native ESM module. The classic surface (window/globalThis) is
+// kept verbatim further down: classic consumers and VM harnesses.
 const SHOPS = {
 "pallet": {
 "items": [
@@ -162,6 +164,12 @@ const SHOPS = {
 
 
 // --- Migrated to ES module, globals exposed ---
-if (typeof SHOPS !== 'undefined' && typeof window !== 'undefined') window.SHOPS = SHOPS;
+if (typeof SHOPS !== 'undefined') { if (typeof window !== 'undefined') window.SHOPS = SHOPS; if (typeof globalThis !== 'undefined') globalThis.SHOPS = SHOPS; }
 
 
+
+// Wave 40 — native ESM module: grouped export of the same names as the
+// classic surface kept above/here (bodies unchanged).
+export {
+  SHOPS,
+};

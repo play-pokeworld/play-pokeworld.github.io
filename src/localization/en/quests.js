@@ -1,9 +1,9 @@
-// ===== EN — Quest texts (main / side / repeatable) — passe 18 : renumérotées & textes de l'arc rival/Rocket =====
+// ===== EN — Quest texts (main / side / repeatable) — phase 18: renumbered & rival/Rocket arc texts =====
 // quests.<cat>.<id>.{title,desc,rewardDesc}
-window.L_en_quests = {
+export const L_en_quests = {
 "main": {
 "1": {
-"title":"Prof. Chen's Advice",
+"title":"Prof. Oak's Advice",
 "desc":"In Pallet Town, talk to Prof. Oak to receive his valuable starter advice.",
 "rewardDesc":"400₽ + 1 Steel Berry"
 },
@@ -69,7 +69,7 @@ window.L_en_quests = {
 },
 "14": {
 "title":"The Fan Club President",
-"desc":"The President of Cerulean's Pokémon Fan Club rambles on about his beloved Pokémon… Listen patiently: generosity follows.",
+"desc":"The President of Vermilion's Pokémon Fan Club rambles on about his beloved Pokémon… Listen patiently: generosity follows.",
 "rewardDesc":"700₽ + 2 Oran Berries"
 },
 "15": {
@@ -78,7 +78,7 @@ window.L_en_quests = {
 "rewardDesc":"3,500₽ + 1 Nugget"
 },
 "16": {
-"title":"Waters of Route 5",
+"title":"Grasses of Route 5",
 "desc":"Route 5 links Cerulean to Saffron. Knock out 25 wild Pokémon to train up.",
 "rewardDesc":"2,200₽ + 1 Water Berry"
 },
@@ -199,7 +199,7 @@ window.L_en_quests = {
 },
 "40": {
 "title":"The Karate Master",
-"desc":"Saffron's Fighting Dojo, once an official Gym, still challenges worthy trainers. Defeat Master Koichi and his two champions: he'll entrust you a promising Tyrogue.",
+"desc":"Saffron's Fighting Dojo, once an official Gym, still challenges worthy trainers. Defeat Master Koichi and his two champions: he'll entrust you a Hitmonlee or Hitmonchan.",
 "rewardDesc":"4,000₽ + Tyrogue (Lv.25)"
 },
 "41": {
@@ -505,7 +505,7 @@ window.L_en_quests = {
 
   "201": {
     "title": "Rescue Professor Birch",
-    "desc": "Defeat the aggressive wild Mightyena Lv. 2 on Route 101.",
+    "desc": "Defeat the aggressive wild Poochyena Lv. 2 on Route 101.",
     "rewardDesc": "500₽ + 5 Poké Balls"
   },
   "202": {
@@ -892,7 +892,7 @@ window.L_en_quests = {
 "side": {
 "s1": {
 "title":"The Berry Collector",
-"desc":"Young Régis wants to see your skill: defeat 10 wild Pokémon on Route 1.",
+"desc":"Youngster Joey wants to see your skill: defeat 10 wild Pokémon on Route 1.",
 "rewardDesc":"700₽ + 2 Sitrus Berries + 1 Fighting Berry"
 },
 "s2": {
@@ -1056,8 +1056,8 @@ window.L_en_quests = {
 "rewardDesc":"1,800₽ + 1 Spell Tag"
 },
 "s34": {
-"title":"Union Cave Evolutions",
-"desc":"Eevee Specialist explores Union Cave: 10 wins!",
+"title":"Union Cave Explorer",
+"desc":"A Lapras seeker explores Union Cave: 10 wins!",
 "rewardDesc":"1,800₽ + 1 King's Rock"
 },
 "s35": {
@@ -1208,7 +1208,7 @@ window.L_en_quests = {
 "s97": { "title":"Burned Tower — Beast Word", "desc":"Find the word that binds the three legendary Beasts.", "rewardDesc":"₽4,900 + Charcoal" },
 "s98": { "title":"Ice Path — Riddle", "desc":"Solve the frozen riddle of the Ice Path.", "rewardDesc":"₽3,500 + Ice Berry" },
 "s99": { "title":"Ice Path — Counted Steps", "desc":"Follow the counted steps on the ice without slipping.", "rewardDesc":"₽4,550 + Never Melt Ice" },
-"s100": { "title":"Sealed Chamber — Ancients", "desc":"At the Sealed Chamber, invoke Relicanth then Wailord (English names).", "rewardDesc":"₽4,200 + Hard Stone" },
+"s100": { "title":"Sealed Chamber — Ancients", "desc":"At the Sealed Chamber, invoke Relicanth then Wailord.", "rewardDesc":"₽4,200 + Hard Stone" },
 "s101": { "title":"Regirock — Braille", "desc":"Desert Ruins: learn to read the colossi’s braille.", "rewardDesc":"₽3,500 + Hard Stone" },
 "s102": { "title":"Regirock — Patience", "desc":"Desert Ruins: wait still, then confirm the braille keyword.", "rewardDesc":"₽3,500 + Hard Stone" },
 "s103": { "title":"Regirock — Seal", "desc":"Desert Ruins: discover the stone colossus’ name.", "rewardDesc":"₽5,600 + Hard Stone" },
@@ -1367,5 +1367,6 @@ window.L_en_quests = {
 },
 };
 
-
-
+// T2 (vague 38) : module ESM — export natif ; la surface classique est
+// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
+if (typeof globalThis !== 'undefined') globalThis.L_en_quests = L_en_quests;

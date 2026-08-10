@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 # ============================================================================
-# OUTIL — Aperçu logiciel du renderer 3D/2D des bases secrètes (hors navigateur)
+# TOOL — Software preview of the 3D/2D secret-base renderer (outside the browser)
 # ----------------------------------------------------------------------------
-# Réplique FIDÈLE du pipeline de src/game/base/base-view3d.js (passe 37 :
-# gabarits CANON GBA, coquille TEXTURÉE par les vrais métatiles Émeraude
-# (atlas tex3d_<thème>, 5 slots 16×16), caméra ROSA pitch 0.95 yaw 0, murs
-# hauts sauf rebord bas au sud-void, posters plaqués au mur nord, modèles
-# ORAS pour les meubles, icônes serebii OK en billboards 3D) et de
-# base-view2d.js (fond Émeraude cuit depuis les map.bin officiels + sprites
-# GBA UNIQUEMENT — plus de repli serebii 2.5D, DA 2D 100 % GBA).
+# FAITHFUL replica of the src/game/base/base-view3d.js pipeline (phase 37:
+# CANON GBA layouts, shell TEXTURED with real Emerald metatiles
+# (atlas tex3d_<theme>, 5 slots 16×16), ROSA camera pitch 0.95 yaw 0, walls
+# high except low ledge at south-void, posters stuck on the north wall, ORAS
+# models for furniture, serebii icons OK as 3D billboards) and of
+# base-view2d.js (Emerald background baked from official map.bin + GBA
+# sprites ONLY — no more 2.5D serebii fallback, 100% GBA 2D art direction).
 #
 #   python3 tools/render_base_preview.py --layout cave_1
-#   python3 tools/render_base_preview.py --all          # les 9 fonds 3D+2D
-#   python3 tools/render_base_preview.py --examples     # 9×(3d+2d) + 3 meublés
-#                                                       # + planche d'ensemble
-# Sortie : src/assets/images/secret-base/examples/
+#   python3 tools/render_base_preview.py --all          # the 9 3D+2D backgrounds
+#   python3 tools/render_base_preview.py --examples     # 9×(3d+2d) + 3 furnished
+#                                                       # + contact sheet
+# Output: src/assets/images/secret-base/examples/
 # ============================================================================
 import argparse, json, math, os, re
 import numpy as np
@@ -26,20 +26,20 @@ EX_OUT = os.path.join(ROOT, 'src', 'assets', 'images', 'secret-base', 'examples'
 LAYOUT_IDS = ['cave_1', 'cave_2', 'cave_3', 'cave_4',
               'tree_1', 'tree_2', 'tree_3', 'tree_4',
               'bush_1', 'bush_2', 'bush_3', 'bush_4']
-# Passe 40 : 12 grottes couleur (extractions canon red/blue/yellow 1-4)
-# + 6 gabarits perso à niveaux (mezzanine + escalier). 2D uniquement pour
-# ces 24-là : la 3D ORAS reste celle des 12 salles brunes d'origine
-# (refonte 3D prévue plus tard).
+# Passe 40: 12 colored caves (canon red/blue/yellow 1-4 extractions)
+# + 6 custom leveled layouts (mezzanine + stairs). 2D only for those
+# 24: the ORAS 3D remains the one of the 12 original brown rooms
+# (3D rework planned later).
 LAYOUT_IDS_COLOR = ['cave_red_1', 'cave_red_2', 'cave_red_3', 'cave_red_4',
                     'cave_blue_1', 'cave_blue_2', 'cave_blue_3', 'cave_blue_4',
                     'cave_yellow_1', 'cave_yellow_2', 'cave_yellow_3', 'cave_yellow_4']
 LAYOUT_IDS_CUSTOM = ['cave_5', 'cave_6', 'tree_5', 'tree_6', 'bush_5', 'bush_6']
 LAYOUT_IDS_ALL = LAYOUT_IDS + LAYOUT_IDS_COLOR + LAYOUT_IDS_CUSTOM
 
-# Slots de l'atlas tex3d_<thème> (réplique des const TEX3D_* du JS)
+# Slots of the tex3d_<theme> atlas (replica of the JS TEX3D_* consts)
 TEX3D_FLOOR, TEX3D_ROCK, TEX3D_FACE, TEX3D_ROCKO, TEX3D_ENTR = 0, 1, 2, 3, 4
 
-# ——— Matrices colonne-major (réplique exacte du JS) ————————————————————————
+# ——— Column-major matrices (exact replica of the JS) ———
 def m4Ortho(l, r, b, t, n, f):
     return np.array([2/(r-l),0,0,0, 0,2/(t-b),0,0, 0,0,-2/(f-n),0,
                      -(r+l)/(r-l), -(t+b)/(t-b), -(f+n)/(f-n), 1], dtype=np.float64)
@@ -62,7 +62,7 @@ def m4Scale(x, y, z):
 def m4v(m, v):
     return np.array([sum(m[c*4+rw]*v[c] for c in range(4)) for rw in range(4)])
 
-# ——— Constantes relues DIRECTEMENT dans les sources JS (réplique synchronisée)
+# ——— Constants re-read DIRECTLY from the JS sources (synchronized replica)
 def js_consts():
     src = open(os.path.join(ROOT, 'src/game/base/base-view3d.js'), encoding='utf8').read()
     def f(name):
@@ -86,8 +86,8 @@ def js_array(name):
     assert m, name
     return [float(x) for x in m.group(1).replace('\n', ' ').split(',') if x.strip()]
 
-# Gabarits canon (clés = ids complets : cave_1 … bush_3) — réplique EXACTE de
-# baseLayoutGet() : '#' mur, '.' sol, 'S' spawn, 'E' entrée, 'o' trou, reste void.
+# Canon layouts (keys = full ids: cave_1 … bush_3) — EXACT replica of
+# baseLayoutGet(): '#' wall, '.' floor, 'S' spawn, 'E' entry, 'o' hole, rest void.
 def layouts_parse():
     src = open(os.path.join(ROOT, 'src/data/base-layouts-data.js'), encoding='utf8').read()
     shapes = {}
@@ -125,7 +125,7 @@ def items_parse():
                            'fx': fxm.group(1) if fxm else None}
     return out
 
-# ——— Chargement OBJ/MTL (mêmes règles que base-view3d.js) ——————————————————
+# ——— OBJ/MTL loading (same rules as base-view3d.js) ———
 def parse_obj(path, flip_v=True):
     v, vt = [], []
     groups, cur = [], {'mat': '', 'tris': []}
@@ -219,12 +219,12 @@ class Raster:
         if scale != 1: im = im.resize((self.w*scale, self.h*scale), Image.NEAREST)
         im.save(path)
 
-# ——— Scènes d'exemple meublées (100 % sprites Émeraude authentiques — objets
-# posés légalement : sol praticable, posters sur mur nord, planche sur trou,
-# poupées sur porteurs, PNJ sur sol). Vérifié par les tests passe 37.
+# ——— Furnished sample scenes (100% authentic Emerald sprites — objects
+# placed legally: walkable floor, posters on north wall, board over hole,
+# dolls on carriers, NPC on floor). Verified by the phase 37 tests.
 SCENES = {
- # passe 42 : poses 100 % canon (tailles DECORSHAPE réelles ; trou bouché par
- # la planche ; stand 4×2 au large ; poster mural sur la face nord)
+ # phase 42: 100% canon placements (real DECORSHAPE sizes; hole plugged by
+ # the board; 4×2 stand on the wide room; wall poster on the north face)
  'cave_1': {
    'items': [('red_poster', 4, 0, 0), ('stand', 1, 3, 0), ('torchic_doll', 1, 3, 0), 
              ('small_desk', 7, 3, 0), ('azurill_doll', 7, 3, 0), ('tire', 7, 5, 0), 
@@ -244,19 +244,19 @@ SCENES = {
    'npcs': [(4, 8)],
  },
  # ——— Passe 40/41 ———
- # Passe 44 : scènes À ÉTAGE re-câblées sur l'architecture organique ROSA
- # (plateau dessiné non rectangulaire, escalier 2 colonnes ENCASTRÉ dans sa
- # niche = unique position, alcôve encadrée de hauteurs).
- # Passe 45 : gabarits à étage REDESSINÉS (terrasses, baies, atriums) — les
- # scènes sont recâblées sur les nouvelles niches d'escalier.
- 'cave_5': {  # terrasses décroissantes : niche d'escalier x2-3 (ancres y4)
+ # Phase 44: LEVELED scenes re-wired to the ORAS organic architecture
+ # (non-rectangular drawn plateau, 2-column stair EMBEDDED in its niche =
+ # unique position, alcove framed by heights).
+ # Phase 45: leveled layouts REDESIGNED (terraces, bays, atriums) — scenes
+ # re-wired to the new stair niches.
+ 'cave_5': {  # stepped terraces: stair niche x2-3 (anchors y4)
    'items': [('stairs', 4, 3, 0), ('red_poster', 6, 4, 0), ('stand', 3, 1, 0), 
              ('azurill_doll', 4, 1, 0), ('small_desk', 9, 1, 0), ('torchic_doll', 6, 1, 0), 
              ('big_plant', 6, 3, 0), ('tire', 5, 5, 0), ('tropical_plant', 8, 5, 0), 
              ('pc', 8, 8, 0), ('tv', 3, 9, 0)],
    'npcs': [(6, 2), (4, 5), (3, 1), (3, 2)],
  },
- 'tree_5': {  # plateau en L : niche d'escalier x6-7 (ancres y3)
+ 'tree_5': {  # L-shaped plateau: stair niche x6-7 (anchors y3)
    'items': [('stairs', 6, 3, 0), ('blue_poster', 5, 0, 0), ('stand', 4, 1, 0), 
              ('skitty_doll', 3, 3, 0), ('tropical_plant', 8, 2, 0), 
              ('pretty_flowers', 8, 1, 0), ('pc', 7, 8, 0), ('small_chair', 4, 7, 0)],
@@ -268,7 +268,7 @@ SCENES = {
              ('pc', 8, 7, 0)],
    'npcs': [(4, 6)],
  },
- 'bush_6': {  # coursive en U : DEUX niches d'escalier (ouest x2-3, est x10-11)
+ 'bush_6': {  # U-shaped gallery: TWO stair niches (west x2-3, east x10-11)
    'items': [('stairs', 8, 3, 0), ('small_desk', 3, 1, 0), ('pichu_doll', 3, 1, 0), 
              ('pretty_flowers', 10, 1, 0), ('tropical_plant', 3, 2, 0), 
              ('solid_board', 4, 2, 0), ('mud_ball', 5, 3, 0), ('pc', 9, 5, 0), 
@@ -276,7 +276,7 @@ SCENES = {
    'npcs': [(5, 3), (10, 2)],
  },
 }
-# Scènes 2D uniquement (pas de rendu 3D logiciel pour les niveaux/couleurs)
+# 2D-only scenes (no software 3D render for levels/colors)
 SCENES_NO3D = {'cave_5', 'tree_5', 'cave_red_1', 'bush_6'}
 
 # ——— Renderer 3D (réplique passe 37) ———————————————————————————————————————
@@ -295,7 +295,7 @@ def render3d(layout_id, out_path, scene=None):
     R = Raster(cw, ch)
     cx, cz = W/2, H/2
     view = m4Mul(m4RotX(PITCH), m4Translate(-cx, -0.5, -cz))
-    # cadrage : les 8 coins du volume, Y ∈ [0, 1.9] (constante littérale du JS)
+    # framing: the 8 volume corners, Y ∈ [0, 1.9] (literal constant of the JS)
     corners = [(x, y, z) for x in (0.0, float(W)) for y in (0.0, 1.9) for z in (0.0, float(H))]
     pv = [m4v(view, (x, y, z, 1)) for x, y, z in corners]
     needx = max(abs(p[0]) for p in pv) * 1.05
@@ -320,15 +320,15 @@ def render3d(layout_id, out_path, scene=None):
         tris.append(((A, Cc, B), (uv[0], uv[2], uv[1]), n))
         tris.append(((A, D, Cc), (uv[0], uv[3], uv[2]), n))
 
-    # ——— atlas tex3d_<thème> (coquille texturée passe 37) + UV de slots ———
+    # ——— tex3d_<theme> atlas (phase-37 textured shell) + slot UVs ———
     UVD = 1.0 / 5.0
     def uv_slab(i):
         u = i * UVD
         return [(u, 0), (u + UVD, 0), (u + UVD, 1), (u, 1)]
-    def uv_side(i):   # A bas-gauche, B haut-gauche, C haut-droite, D bas-droite
+    def uv_side(i):   # A low-left, B high-left, C high-right, D low-right
         u = i * UVD
         return [(u, 1), (u, 0), (u + UVD, 0), (u + UVD, 1)]
-    def uv_sidex(i):  # A bas-nord, B bas-sud, C haut-sud, D haut-nord
+    def uv_sidex(i):  # A low-north, B low-south, C high-south, D high-north
         u = i * UVD
         return [(u, 1), (u + UVD, 1), (u + UVD, 0), (u, 0)]
     atlas_path = os.path.join(ROOT, f'src/assets/images/secret-base/bg/emerald/tex3d_{theme}.png')
@@ -364,14 +364,14 @@ def render3d(layout_id, out_path, scene=None):
             R.tri(tuple(nd), tuple(uvs), np.array(n, dtype=float),
                   color=color, tex=tex, alpha_test=alpha_test)
 
-    # ——— Cases du gabarit : coquille TEXTURÉE (métatiles Émeraude réels) ———
+    # ——— Layout cells: TEXTURED shell (real Emerald metatiles) ———
     for y in range(H):
         for x in range(W):
             c = grid[y][x]
             t = c['t']
             if t == 'floor':
                 if c.get('entrance'):
-                    # entrée = dalle du tapis de sortie (slot 4), ou jaune en repli
+                    # entry = exit-mat slab (slot 4), or yellow as fallback
                     if atlas is not None: slab(x, 0.002, y, 1, 1, slot=TEX3D_ENTR)
                     else:
                         slab(x, 0, y, 1, 1, color=rgb(pal['floor']))
@@ -380,18 +380,18 @@ def render3d(layout_id, out_path, scene=None):
                     if atlas is not None: slab(x, 0, y, 1, 1, slot=TEX3D_FLOOR)
                     else: slab(x, 0, y, 1, 1, color=rgb(pal['floor']))
             elif t == 'wall':
-                # règle passe 37 : mur HAUT, sauf rebord BAS si la case au sud
-                # est hors salle (sinon on ne verrait plus la pièce)
+                # phase 37 rule: HIGH wall, except LOW ledge if the cell to
+                # the south is outside the room (else the room would be hidden)
                 south = grid[y + 1][x] if y + 1 < H else None
                 tall = WLO if (south is None or south['t'] == 'void') else WHI
                 if atlas is not None: box(x, y, 0, tall, slots=(TEX3D_ROCK, TEX3D_ROCK, TEX3D_FACE))
                 else: box(x, y, 0, tall, color=rgb(pal['wall']))
             elif t == 'hole':
-                # trou = rocher comblable (slot 3) ou dalle sombre en repli
+                # hole = fillable rock (slot 3) or dark slab as fallback
                 if atlas is not None: slab(x, 0.001, y, 1, 1, slot=TEX3D_ROCKO)
                 else: slab(x, -0.02, y, 1, 1, color=rgb(pal['hole']))
 
-    # ——— Modèles OBJ / sprites 2D ———
+    # ——— OBJ models / 2D sprites ———
     model_cache = {}
     def load_model(slug):
         if slug in model_cache: return model_cache[slug]
@@ -477,7 +477,7 @@ def render3d(layout_id, out_path, scene=None):
         fw, fd = (d['w'], d['d']) if rot % 2 == 0 else (d['d'], d['w'])
         cell = grid[y][x]
         elev = ELEV if (cell['t'] == 'floor' and cell['elev']) else 0
-        # ——— posters/muraux : quad VERTICAL sur la face sud du mur nord ———
+        # ——— posters/wall items: VERTICAL quad on the south face of the north wall ———
         if d['layer'] == 'wall':
             img = icon2d(slug)
             z = y + fd + 0.02
@@ -558,7 +558,7 @@ def render2d(layout_id, out_path, scene=None):
     img.alpha_composite(bg.resize((W*CELL, H*CELL), Image.NEAREST), (ox, oy))
 
     def load_icon(slug):
-        # passe 37 (DA) : sprite Émeraude UNIQUEMENT — pas de repli serebii.
+        # phase 37 (art direction): Emerald sprite ONLY — no serebii fallback.
         e = man2.get(slug)
         if not e or not e.get('emerald'): return None
         p = os.path.join(ROOT, e['emerald'])
@@ -572,8 +572,8 @@ def render2d(layout_id, out_path, scene=None):
         c = grid[y][x] if 0 <= y < len(grid) and 0 <= x < len(grid[0]) else None
         return ELEV_PX if c and c.get('elev') else 0
 
-    # passe 41 : rotation RÉELLE du bitmap + visu haute (débord 1 case vers le
-    # haut, collision inchangée) — réplique base2dDrawSprite (view2d).
+    # phase 41: REAL bitmap rotation + raised visual (1-tile overhang
+    # above, collision unchanged) — replica of base2dDrawSprite (view2d).
     def draw_sprite(icon, d, rot, px, py, w, h):
         import math as _m
         angle = ((rot * (d.get('rot') or 0)) % 360 + 360) % 360
@@ -590,9 +590,9 @@ def render2d(layout_id, out_path, scene=None):
             return
         stepped = icon.resize((dw, dh), Image.NEAREST).rotate(-angle, expand=True, resample=Image.NEAREST)
         bw, bh = stepped.size
-        if angle % 90 == 0:  # 90/270 : bas ancré au sol
+        if angle % 90 == 0:  # 90/270: bottom anchored to the ground
             img.alpha_composite(stepped, (int(px + (w - bw)/2), int(py + h - bh)))
-        else:                # 45° (tapis) : centré
+        else:                # 45° (mat): centered
             img.alpha_composite(stepped, (int(px + (w - bw)/2), int(py + h - min(maxH, bh) - (max(0, bh-min(maxH,bh)))/2)))
 
     for slug, x, y, rot in items:
@@ -601,8 +601,8 @@ def render2d(layout_id, out_path, scene=None):
         px, py = ox + x*CELL, oy + y*CELL - elevoff(x, y)
         w, h = fw*CELL, fd*CELL
         icon = load_icon(slug)
-        # passe 43 : ombre de contact au pied des meubles AU SOL (réplique
-        # view2d : objects/desks/chairs/plants, hors planche & escalier)
+        # phase 43: contact shadow at the foot of FLOOR furniture (replica
+        # view2d: objects/desks/chairs/plants, except board & stairs)
         if d['layer'] != 'wall' and d['cat'] in ('objects', 'desks', 'chairs', 'plants') and slug not in ('solid_board', 'stairs'):
             sh = Image.new('RGBA', img.size, (0, 0, 0, 0))
             ImageDraw.Draw(sh).ellipse([px + w*0.08, py + h - CELL*0.22, px + w*0.92, py + h + CELL*0.02], fill=(20, 12, 6, 76))
@@ -620,8 +620,8 @@ def render2d(layout_id, out_path, scene=None):
         else:
             dr.rectangle([px + 4, py + h - CELL + 4, px + CELL - 5, py + h - 5],
                          fill=(138, 95, 191, 255), outline=(82, 53, 125, 255))
-    # passe 44 : hauteurs d'objets (canon) — un copain sur le dessus d'un
-    # présentoir / palier de toboggan est dessiné perché (réplique view2d).
+    # phase 44: object heights (canon) — a pal on top of a display /
+    # slide landing is drawn perched (view2d replica).
     zone_top = set()
     for slug, x, y, rot in sc['items']:
         dw = defs[slug]['w']
@@ -632,7 +632,7 @@ def render2d(layout_id, out_path, scene=None):
     for nx, ny in sc['npcs']:
         px, py = ox + nx*CELL, oy + ny*CELL - elevoff(nx, ny)
         if (nx, ny) in zone_top: py -= ELEV_PX
-        u = CELL / 16  # petit dresseur chibi détouré (réplique view2d passe 41)
+        u = CELL / 16  # small cut-out chibi trainer (view2d phase 41 replica)
         def rr(x0, y0, x1, y1, c):
             dr.rounded_rectangle([x0, y0, x1, y1], radius=2 * u, fill=c)
         ink, shirt, shi_hi, skin, hair = (28, 39, 51, 255), (62, 102, 140, 255), (93, 135, 173, 255), (232, 195, 158, 255), (51, 38, 28, 255)
@@ -651,10 +651,10 @@ def render2d(layout_id, out_path, scene=None):
     img.save(out_path)
     print('2D', layout_id, '→', os.path.relpath(out_path, ROOT))
 
-# ——— Génération des exemples livrés ————————————————————————————————————————
+# ——— Generation of the shipped examples ———
 def gen_examples():
     os.makedirs(EX_OUT, exist_ok=True)
-    # les anciens exemples (ids legacy square_a/wide_b/twolevel_a) sont obsolètes
+    # the old examples (legacy square_a/wide_b/twolevel_a ids) are obsolete
     for f in os.listdir(EX_OUT):
         if f.startswith('example_') and f.endswith('.png') or f == 'examples_sheet.png':
             os.remove(os.path.join(EX_OUT, f))
@@ -666,7 +666,7 @@ def gen_examples():
         if lid not in SCENES_NO3D:
             render3d(lid, os.path.join(EX_OUT, f'example_furnished_{lid}_3d.png'), sc)
         render2d(lid, os.path.join(EX_OUT, f'example_furnished_{lid}_2d.png'), sc)
-    # planche d'ensemble (les 30 salles en 2D, gabarits à tailles réelles)
+    # overall board (the 30 rooms in 2D, layouts at their real sizes)
     imgs = [Image.open(os.path.join(EX_OUT, f'example_{lid}_2d.png')) for lid in LAYOUT_IDS_ALL]
     cellw = max(i.width for i in imgs) + 8
     cellh = max(i.height for i in imgs) + 24
@@ -679,7 +679,7 @@ def gen_examples():
         d.text((x + 2, y - 13), f'{lid} →', fill=(255, 255, 0))
         sheet.paste(im, (x, y))
     sheet.save(os.path.join(EX_OUT, 'examples_sheet.png'))
-    print('planche →', os.path.relpath(os.path.join(EX_OUT, 'examples_sheet.png'), ROOT))
+    print('sheet →', os.path.relpath(os.path.join(EX_OUT, 'examples_sheet.png'), ROOT))
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()

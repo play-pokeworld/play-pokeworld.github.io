@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Migre les chaînes FR en dur de src/game/display/tutorial.js vers les locales
-fr/ui.js + en/ui.js. Idempotent : réutilise les clés existantes quand elles
-existent déjà, n'ajoute que les nouvelles. Vérifie chaque remplacement.
+Migrate the hardcoded FR strings of src/game/display/tutorial.js to the
+fr/ui.js + en/ui.js locales. Idempotent: reuses existing keys when they
+already exist, only adds the new ones. Checks every replacement.
+
+NB: the French strings below are the fr/ui.js locale PAYLOADS (game data).
 """
 import io, re, sys
 
@@ -13,7 +15,7 @@ FR = ROOT + '/src/localization/fr/ui.js'
 EN = ROOT + '/src/localization/en/ui.js'
 
 # ---------------------------------------------------------------- clés ------
-# (clé, FR, EN) — FR doit matcher EXACTEMENT le littéral en dur du fichier.
+# (key, FR, EN) — FR must EXACTLY match the hardcoded literal of the file.
 KEYS = [
  ("tutorial_step_route1_how",
   "Où aller : fenêtre Carte → Route 1. Ensuite, dans la fenêtre Lieu, clique sur Explorer.",
@@ -214,8 +216,8 @@ KEYS = [
 ]
 
 # ----------------------------------------------------------- remplacements --
-# (marqueur_unique_dans_tutorial.js, texte_de_remplacement)
-# {K:key} est substitué par le nom de clé.
+# (unique_marker_in_tutorial.js, replacement_text)
+# {K:key} is substituted with the key name.
 REPLACEMENTS = [
  # --- tutorialSteps ---
  ("how:()=>`Où aller : fenêtre Carte → Route 1. Ensuite, dans la fenêtre Lieu, clique sur Explorer. ${tutorialDeviceHint('map')}`",
@@ -246,15 +248,15 @@ REPLACEMENTS = [
   "<div class=\"tutorial-how\"><b>${t('{K:tutorial_howto}')}</b><br>"),
  ("${step.actionLabel||'Faire'}", "${step.actionLabel||t('{K:tutorial_do_btn}')}"),
 
- # --- guideSections : remplacement des littéraux 'FR' par ref clé ---
- # Clés EXISTANTES réutilisées (pas d'ajout dans les locales) :
+ # --- guideSections: replacing 'FR' literals with key refs ---
+ # EXISTING keys reused (no addition to the locales):
  ("'Les talents et objets tenus peuvent réduire des dégâts, soigner, booster des stats ou modifier des types d’attaque. Observe les petites capsules visuelles quand ils s’activent.'",
   "(typeof t==='function'?t('guide_combat_items_desc'):'Les talents et objets tenus peuvent réduire des dégâts, soigner, booster des stats ou modifier des types d’attaque. Observe les petites capsules visuelles quand ils s’activent.')"),
  ("'Les objets tenus sont pensés pour la préparation d’équipe. Le bonus réel dépend parfois du stock possédé dans le sac.'",
   "(typeof t==='function'?t('guide_bag_held_desc'):'Les objets tenus sont pensés pour la préparation d’équipe. Le bonus réel dépend parfois du stock possédé dans le sac.')"),
 ]
 
-# Remplacements génériques de descriptions de pages : (clé, valeur FR exacte)
+# Generic page-description replacements: (key, exact FR value)
 PAGE_REPLACEMENTS = [
  ("guide_map_read_desc", KEYS), ("guide_movement_desc", KEYS),
  ("guide_progress_locks_desc", KEYS), ("guide_regions_desc", KEYS),
@@ -299,7 +301,7 @@ def main():
     en = load(EN)
     kd = {k: (vfr, ven) for k, vfr, ven in KEYS}
 
-    # ---- 1) descriptions de pages : 'FR exact' -> ref clé ----
+    # ---- 1) page descriptions: 'exact FR' -> key ref ----
     fails = []
     for key, _ in PAGE_REPLACEMENTS:
         vfr, _ven = kd[key]
@@ -319,15 +321,15 @@ def main():
         ("title:'Automatisation & personnel'", "title:t('guide_automation_title')||'Automatisation & personnel'"),
         ("title:'Sauvegardes & AFK'", "title:t('guide_save_title')||'Sauvegardes & AFK'"),
     ]
-    # La page pokemon utilise déjà guide_pokemon_sheet_desc via PAGE_REPLACEMENTS ?
-    # Non : sa desc est dans un template string, géré ci-dessus. On retire donc
-    # guide_pokemon_sheet_desc des fail s'il y était.
+    # The pokemon page already uses guide_pokemon_sheet_desc via PAGE_REPLACEMENTS?
+    # No: its desc is inside a template string, handled above. So remove
+    # guide_pokemon_sheet_desc from the fails if it was there.
     for old, new in title_repls:
         new = new.replace('{K:guide_pokemon_sheet_desc}', 'guide_pokemon_sheet_desc').replace('{K:guide_pokemon_sheet}', 'guide_pokemon_sheet')
         if old in tut:
             tut = tut.replace(old, new, 1)
         elif old.startswith("['Fiche Pokémon'"):
-            # le template contient déjà la desc remplacée ? essayer forme modifiée
+            # template already contains the replaced desc? try the modified form
             alt = "['Fiche Pokémon',`${tutorialDeviceHint('sheet')} (typeof t==='function'?t('guide_pokemon_sheet_desc')"
             if "['Fiche Pokémon'," in tut:
                 tut = tut.replace("['Fiche Pokémon',", "[t('guide_pokemon_sheet'),", 1)
@@ -345,14 +347,14 @@ def main():
             continue
         tut = tut.replace(old, new, 1)
 
-    # ---- 4) renderGuidePanel : "pages d'informations" ----
+    # ---- 4) renderGuidePanel: "pages d'informations" (historical FR needle) ----
     old_pi = "<p>${sec.pages.length} pages d'informations</p>"
     if old_pi in tut:
         tut = tut.replace(old_pi, "<p>${tr('guide_pages_info',{count:sec.pages.length})}</p>", 1)
     else:
         fails.append(('renderGuidePanel', 'pages info'))
 
-    # ---- 5) injection des clés manquantes dans les locales ----
+    # ---- 5) injecting missing keys into the locales ----
     def existing_keys(txt):
         return set(re.findall(r'^\s*"([A-Za-z0-9_\.]+)"\s*:', txt, re.M))
 
@@ -373,7 +375,7 @@ def main():
         if not lines:
             return txt
         block = ',\n'.join(lines) + '\n'
-        # remplacer le "  \"tutorial_do_btn\":\"...\"\n}" final pour insérer avant }
+        # replace the final "  \"tutorial_do_btn\":\"...\"\n}" to insert before }
         idx = txt.rstrip().rfind('}')
         head = txt.rstrip()[:idx]
         if not head.rstrip().endswith(','):
@@ -394,7 +396,7 @@ def main():
         for kind, info in fails:
             print(' -', kind, info)
         return 1
-    print('Tous les remplacements ont réussi.')
+    print('All replacements succeeded.')
     return 0
 
 if __name__ == '__main__':

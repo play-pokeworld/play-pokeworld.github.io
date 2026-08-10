@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Passe 45 — (re)staging des sprites d'objets GBA `tools/emerald-ref/objgfx/`.
+"""Passe 45 — (re)staging of the GBA object sprites `tools/emerald-ref/objgfx/`.
 
-`sources.json` décrit 45 sprites officiels (poupées, coussins…) du dépôt
-pret/pokeemerald ; les PNG eux-mêmes sont des BINAIRES, donc absents de
-l'archive texte du projet. Sans eux, `bake-emerald-bgs.py --bake-objgfx` ne
-produit rien et le manifeste 2D perd 45 slugs.
+`sources.json` describes 45 official sprites (dolls, cushions…) from the
+pret/pokeemerald repo; the PNGs themselves are BINARIES, hence absent from
+the project's text archive. Without them, `bake-emerald-bgs.py --bake-objgfx`
+produces nothing and the 2D manifest loses 45 slugs.
 
-Idempotent : un PNG déjà valide n'est pas retéléchargé (sauf `--force`).
-Usage : python3 tools/fetch-objgfx.py [--force]
+Idempotent: an already valid PNG is not downloaded again (unless `--force`).
+Usage: python3 tools/fetch-objgfx.py [--force]
 """
 from __future__ import annotations
 
@@ -49,7 +49,7 @@ def main() -> int:
             continue
         dest.write_bytes(data)
         got += 1
-    print(f'objgfx : {got} téléchargé(s), {skip} déjà présent(s), {err} échec(s)')
+    print(f'objgfx: {got} downloaded, {skip} already present, {err} failure(s)')
     for m in missing:
         print('  ✖', m)
     return 1 if err else 0

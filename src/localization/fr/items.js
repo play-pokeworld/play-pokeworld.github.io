@@ -1,5 +1,5 @@
 // ===== FR — Item names & descriptions =====
-window.L_fr_items = {
+export const L_fr_items = {
   "black_belt": {
     "name": "Ceinture Noire",
     "desc": "Objet tenu avec un effet spécial."
@@ -238,10 +238,6 @@ window.L_fr_items = {
   },
   "lucky_egg": {
     "name": "Œuf Chance",
-    "desc": "Objet tenu avec un effet spécial."
-  },
-  "shiny_charm": {
-    "name": "Charme Chroma",
     "desc": "Objet tenu avec un effet spécial."
   },
   "occa_berry": {
@@ -501,8 +497,8 @@ window.L_fr_items = {
     "desc": "Enseigne la capacité Force à un Pokémon compatible."
   },
   "ct_ember": {
-    "name": "Flammèche",
-    "desc": "Enseigne la capacité Flammèche à un Pokémon compatible."
+    "name": "Flamèche",
+    "desc": "Enseigne la capacité Flamèche à un Pokémon compatible."
   },
   "ct_incinerate": {
     "name": "Calcination",
@@ -517,16 +513,16 @@ window.L_fr_items = {
     "desc": "Enseigne la capacité Poing Éclair à un Pokémon compatible."
   },
   "ct_mudslap": {
-    "name": "Boue-Bombe",
-    "desc": "Enseigne la capacité Boue-Bombe à un Pokémon compatible."
+    "name": "Coud'Boue",
+    "desc": "Enseigne la capacité Coud'Boue à un Pokémon compatible."
   },
   "ct_bulldoze": {
     "name": "Piétisol",
     "desc": "Enseigne la capacité Piétisol à un Pokémon compatible."
   },
   "ct_bulletpunch": {
-    "name": "Poing Météore",
-    "desc": "Enseigne la capacité Poing Météore à un Pokémon compatible."
+    "name": "Pisto-Poing",
+    "desc": "Enseigne la capacité Pisto-Poing à un Pokémon compatible."
   },
   "ct_metalclaw": {
     "name": "Griffe Acier",
@@ -537,8 +533,8 @@ window.L_fr_items = {
     "desc": "Enseigne la capacité Luminocanon à un Pokémon compatible."
   },
   "ct_peck": {
-    "name": "Coup d'Bec",
-    "desc": "Enseigne la capacité Coup d'Bec à un Pokémon compatible."
+    "name": "Picpic",
+    "desc": "Enseigne la capacité Picpic à un Pokémon compatible."
   },
   "ct_acrobatics": {
     "name": "Acrobatie",
@@ -565,12 +561,12 @@ window.L_fr_items = {
     "desc": "Enseigne la capacité Avalanche à un Pokémon compatible."
   },
   "ct_twineedle": {
-    "name": "Double Dard",
-    "desc": "Enseigne la capacité Double Dard à un Pokémon compatible."
+    "name": "Double-Dard",
+    "desc": "Enseigne la capacité Double-Dard à un Pokémon compatible."
   },
   "ct_bugbite": {
-    "name": "Mord-Croq",
-    "desc": "Enseigne la capacité Mord-Croq à un Pokémon compatible."
+    "name": "Piqûre",
+    "desc": "Enseigne la capacité Piqûre à un Pokémon compatible."
   },
   "ct_bugbuzz": {
     "name": "Bourdon",
@@ -585,8 +581,8 @@ window.L_fr_items = {
     "desc": "Enseigne la capacité Vibraqua à un Pokémon compatible."
   },
   "ct_aquatail": {
-    "name": "Hydro-Queue",
-    "desc": "Enseigne la capacité Hydro-Queue à un Pokémon compatible."
+    "name": "Hydroqueue",
+    "desc": "Enseigne la capacité Hydroqueue à un Pokémon compatible."
   },
   "ct_leafage": {
     "name": "Feuillage",
@@ -605,8 +601,8 @@ window.L_fr_items = {
     "desc": "Enseigne la capacité Éclate-Roc à un Pokémon compatible."
   },
   "ct_forcepalm": {
-    "name": "Pressure",
-    "desc": "Enseigne la capacité Pressure à un Pokémon compatible."
+    "name": "Fort-Paume",
+    "desc": "Enseigne la capacité Fort-Paume à un Pokémon compatible."
   },
   "ct_aurasphere": {
     "name": "Aurasphère",
@@ -617,8 +613,8 @@ window.L_fr_items = {
     "desc": "Enseigne la capacité Choc Mental à un Pokémon compatible."
   },
   "ct_psychocut": {
-    "name": "Coupe Psycho",
-    "desc": "Enseigne la capacité Coupe Psycho à un Pokémon compatible."
+    "name": "Coupe-Psyko",
+    "desc": "Enseigne la capacité Coupe-Psyko à un Pokémon compatible."
   },
   "ct_rockthrow": {
     "name": "Jet-Pierres",
@@ -629,12 +625,12 @@ window.L_fr_items = {
     "desc": "Enseigne la capacité Éboulement à un Pokémon compatible."
   },
   "ct_powergem": {
-    "name": "Joyau Lumineux",
-    "desc": "Enseigne la capacité Joyau Lumineux à un Pokémon compatible."
+    "name": "Rayon Gemme",
+    "desc": "Enseigne la capacité Rayon Gemme à un Pokémon compatible."
   },
   "ct_lick": {
-    "name": "Léchage",
-    "desc": "Enseigne la capacité Léchage à un Pokémon compatible."
+    "name": "Léchouille",
+    "desc": "Enseigne la capacité Léchouille à un Pokémon compatible."
   },
   "ct_hex": {
     "name": "Châtiment",
@@ -677,16 +673,16 @@ window.L_fr_items = {
     "desc": "Enseigne la capacité Éclat Magique à un Pokémon compatible."
   },
   "ct_playrough": {
-    "name": "Câlin",
-    "desc": "Enseigne la capacité Câlin à un Pokémon compatible."
+    "name": "Câlinerie",
+    "desc": "Enseigne la capacité Câlinerie à un Pokémon compatible."
   },
   "ct_tackle": {
     "name": "Charge",
     "desc": "Enseigne la capacité Charge à un Pokémon compatible."
   },
   "ct_leer": {
-    "name": "Groz Yeux",
-    "desc": "Enseigne la capacité Groz Yeux à un Pokémon compatible."
+    "name": "Groz'Yeux",
+    "desc": "Enseigne la capacité Groz'Yeux à un Pokémon compatible."
   },
   "ct_bulkup": {
     "name": "Gonflette",
@@ -713,28 +709,28 @@ window.L_fr_items = {
     "desc": "Enseigne la capacité Danse Pluie à un Pokémon compatible."
   },
   "ct_crunch": {
-    "name": "Croquefer",
-    "desc": "Enseigne la capacité Croquefer à un Pokémon compatible."
+    "name": "Mâchouille",
+    "desc": "Enseigne la capacité Mâchouille à un Pokémon compatible."
   },
   "ct_xscissor": {
-    "name": "Plaie Croix",
-    "desc": "Enseigne la capacité Plaie Croix à un Pokémon compatible."
+    "name": "Plaie-Croix",
+    "desc": "Enseigne la capacité Plaie-Croix à un Pokémon compatible."
   },
   "ct_moonblast": {
-    "name": "Éblouissement",
-    "desc": "Enseigne la capacité Éblouissement à un Pokémon compatible."
+    "name": "Pouvoir Lunaire",
+    "desc": "Enseigne la capacité Pouvoir Lunaire à un Pokémon compatible."
   },
   "ct_fireblast": {
     "name": "Déflagration",
     "desc": "Enseigne la capacité Déflagration à un Pokémon compatible."
   },
   "ct_hydropump": {
-    "name": "Hydroblast",
-    "desc": "Enseigne la capacité Hydroblast à un Pokémon compatible."
+    "name": "Hydrocanon",
+    "desc": "Enseigne la capacité Hydrocanon à un Pokémon compatible."
   },
   "ct_thunder": {
-    "name": "Foudre",
-    "desc": "Enseigne la capacité Foudre à un Pokémon compatible."
+    "name": "Fatal-Foudre",
+    "desc": "Enseigne la capacité Fatal-Foudre à un Pokémon compatible."
   },
   "ct_swagger": {
     "name": "Vantardise",
@@ -750,7 +746,7 @@ window.L_fr_items = {
   },
   "ct_chillingwater": {
     "name": "Eau Glacée",
-    "desc": "Enseigne la capacité chillingwater à un Pokémon compatible."
+    "desc": "Enseigne la capacité Eau Glacée à un Pokémon compatible."
   },
   "ct_silverwind": {
     "name": "Vent Argenté",
@@ -777,8 +773,8 @@ window.L_fr_items = {
     "desc": "Enseigne la capacité Grêle à un Pokémon compatible."
   },
   "ct_fog": {
-    "name": "Brume",
-    "desc": "Enseigne la capacité Brume à un Pokémon compatible."
+    "name": "Fog",
+    "desc": "Enseigne la capacité Fog à un Pokémon compatible."
   },
   "ct_sandstorm": {
     "name": "Tempête de Sable",
@@ -801,12 +797,12 @@ window.L_fr_items = {
     "desc": "Enseigne la capacité Machination à un Pokémon compatible."
   },
   "ct_swordsdance": {
-    "name": "Danse Lames",
-    "desc": "Enseigne la capacité Danse Lames à un Pokémon compatible."
+    "name": "Danse Lame",
+    "desc": "Enseigne la capacité Danse Lame à un Pokémon compatible."
   },
   "ct_voltswitch": {
-    "name": "Change-Éclair",
-    "desc": "Enseigne la capacité Change-Éclair à un Pokémon compatible."
+    "name": "Change Éclair",
+    "desc": "Enseigne la capacité Change Éclair à un Pokémon compatible."
   },
   "ct_uturn": {
     "name": "Demi-Tour",
@@ -821,8 +817,8 @@ window.L_fr_items = {
     "desc": "Enseigne la capacité Coup d'Jus à un Pokémon compatible."
   },
   "ct_scorchingsands": {
-    "name": "Sable Brûlant",
-    "desc": "Enseigne la capacité Sable Brûlant à un Pokémon compatible."
+    "name": "Sable Ardent",
+    "desc": "Enseigne la capacité Sable Ardent à un Pokémon compatible."
   },
   "ct_airshlash": {
     "name": "Lame d'Air",
@@ -833,8 +829,8 @@ window.L_fr_items = {
     "desc": "Enseigne la capacité Direct Toxik à un Pokémon compatible."
   },
   "ct_liquidation": {
-    "name": "Trempage",
-    "desc": "Enseigne la capacité Trempage à un Pokémon compatible."
+    "name": "Aqua-Brèche",
+    "desc": "Enseigne la capacité Aqua-Brèche à un Pokémon compatible."
   },
   "ct_energyball": {
     "name": "Éco-Sphère",
@@ -845,28 +841,28 @@ window.L_fr_items = {
     "desc": "Enseigne la capacité Stratopercut à un Pokémon compatible."
   },
   "ct_dracometeor": {
-    "name": "Draco Météor",
-    "desc": "Enseigne la capacité Draco Météor à un Pokémon compatible."
+    "name": "Draco-Météore",
+    "desc": "Enseigne la capacité Draco-Météore à un Pokémon compatible."
   },
   "ct_spiritbreak": {
     "name": "Choc Émotion",
     "desc": "Enseigne la capacité Choc Émotion à un Pokémon compatible."
   },
   "ct_trickroom": {
-    "name": "Tour de Magie",
-    "desc": "Enseigne la capacité Tour de Magie à un Pokémon compatible."
-  },
-  "ct_crossroom": {
-    "name": "Force Croisée",
-    "desc": "Enseigne la capacité Force Croisée à un Pokémon compatible."
-  },
-  "ct_weirdroom": {
     "name": "Distorsion",
     "desc": "Enseigne la capacité Distorsion à un Pokémon compatible."
   },
+  "ct_crossroom": {
+    "name": "Cross Room",
+    "desc": "Enseigne la capacité Cross Room à un Pokémon compatible."
+  },
+  "ct_weirdroom": {
+    "name": "Weird Room",
+    "desc": "Enseigne la capacité Weird Room à un Pokémon compatible."
+  },
   "ct_safeguard": {
-    "name": "Rune Protect",
-    "desc": "Enseigne la capacité Rune Protect à un Pokémon compatible."
+    "name": "Rune Protectrice",
+    "desc": "Enseigne la capacité Rune Protectrice à un Pokémon compatible."
   },
   "ct_lightscreen": {
     "name": "Mur Lumière",
@@ -932,7 +928,7 @@ window.L_fr_items = {
 
 
 // Canonical names for items which must never fall back to a localization key.
-Object.assign(window.L_fr_items, {
+Object.assign(L_fr_items, {
   prine_berry: { name: 'Baie Prine', desc: 'Augmente la Défense de 25 % au cumul maximal.' },
   fossil: { name: 'Vieux Fossile', desc: 'Un fossile ancien — réanimez-le au Laboratoire de fossiles !' },
   helix_fossil: { name: 'Fossile Nautile', desc: 'Un fossile qui peut être réanimé en Amonita.' },
@@ -945,7 +941,7 @@ Object.assign(window.L_fr_items, {
 });
 
 
-Object.assign(window.L_fr_items, {
+Object.assign(L_fr_items, {
   skull_fossil: { name: 'Fossile Crâne', desc: 'Un fossile officiel réservé à son futur Pokémon compatible.' },
   armor_fossil: { name: 'Fossile Armure', desc: 'Un fossile officiel réservé à son futur Pokémon compatible.' },
   cover_fossil: { name: 'Fossile Plaque', desc: 'Un fossile officiel réservé à son futur Pokémon compatible.' },
@@ -980,63 +976,66 @@ Object.assign(window.L_fr_items, {
   masterpiece_teacup: { name: 'Théière d’Exception', desc: 'Un objet d’évolution officiel pour un Pokémon compatible.' }
 });
 
-Object.assign(window.L_fr_items, {
+Object.assign(L_fr_items, {
  firestone:{name:'Pierre Feu',desc:'Une pierre permettant à certains Pokémon d’évoluer.'}, waterstone:{name:'Pierre Eau',desc:'Une pierre permettant à certains Pokémon d’évoluer.'}, thunderstone:{name:'Pierre Foudre',desc:'Une pierre permettant à certains Pokémon d’évoluer.'}, leafstone:{name:'Pierre Plante',desc:'Une pierre permettant à certains Pokémon d’évoluer.'}, moonstone:{name:'Pierre Lune',desc:'Une pierre permettant à certains Pokémon d’évoluer.'}, sunstone:{name:'Pierre Soleil',desc:'Une pierre permettant à certains Pokémon d’évoluer.'}, pokeflute:{name:'Poké Flûte',desc:'Réveille les Pokémon endormis et permet de progresser dans l’aventure.'}, nugget:{name:'Pépite',desc:'Un objet précieux à vendre pour gagner de l’argent.'}, stardust:{name:'Poussière Étoile',desc:'Un objet précieux à vendre pour gagner de l’argent.'}, muscle_band:{name:'Muscle Band',desc:'Objet tenu qui augmente l’Attaque.'}, rarecandy:{name:'Super Bonbon',desc:'Augmente instantanément le niveau d’un Pokémon de 1.'}, kings_rock:{name:'Roche Royale',desc:'Objet d’évolution pour les Pokémon compatibles.'}, dragon_scale:{name:'Écaille Draco',desc:'Objet d’évolution pour les Pokémon compatibles.'}, deep_sea_scale:{name:'Écaille Océan',desc:'Objet d’évolution pour les Pokémon compatibles.'}, deep_sea_tooth:{name:'Dent Océan',desc:'Objet d’évolution pour les Pokémon compatibles.'}, silver_wing:{name:'Aile Argentée',desc:'Objet-clé requis pour rencontrer Lugia.'}, rainbow_wing:{name:'Arcenci’Aile',desc:'Objet-clé requis pour rencontrer Ho-Oh.'}
 });
 
 
-Object.assign(window.L_fr_items, {
-  occa_berry: { name: window.L_fr_items.occa_berry?.name || 'occa berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Feu.' },
-  passho_berry: { name: window.L_fr_items.passho_berry?.name || 'passho berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Eau.' },
-  wacan_berry: { name: window.L_fr_items.wacan_berry?.name || 'wacan berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Électrik.' },
-  rindo_berry: { name: window.L_fr_items.rindo_berry?.name || 'rindo berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Plante.' },
-  yache_berry: { name: window.L_fr_items.yache_berry?.name || 'yache berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Glace.' },
-  chople_berry: { name: window.L_fr_items.chople_berry?.name || 'chople berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Combat.' },
-  kebia_berry: { name: window.L_fr_items.kebia_berry?.name || 'kebia berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Poison.' },
-  shuca_berry: { name: window.L_fr_items.shuca_berry?.name || 'shuca berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Sol.' },
-  coba_berry: { name: window.L_fr_items.coba_berry?.name || 'coba berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Vol.' },
-  payapa_berry: { name: window.L_fr_items.payapa_berry?.name || 'payapa berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Psy.' },
-  tanga_berry: { name: window.L_fr_items.tanga_berry?.name || 'tanga berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Insecte.' },
-  charti_berry: { name: window.L_fr_items.charti_berry?.name || 'charti berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Roche.' },
-  kasib_berry: { name: window.L_fr_items.kasib_berry?.name || 'kasib berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Spectre.' },
-  haban_berry: { name: window.L_fr_items.haban_berry?.name || 'haban berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Dragon.' },
-  colbur_berry: { name: window.L_fr_items.colbur_berry?.name || 'colbur berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Ténèbres.' },
-  babiri_berry: { name: window.L_fr_items.babiri_berry?.name || 'babiri berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Acier.' },
-  roseli_berry: { name: window.L_fr_items.roseli_berry?.name || 'roseli berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Fée.' }
+Object.assign(L_fr_items, {
+  occa_berry: { name: L_fr_items.occa_berry?.name || 'occa berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Feu.' },
+  passho_berry: { name: L_fr_items.passho_berry?.name || 'passho berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Eau.' },
+  wacan_berry: { name: L_fr_items.wacan_berry?.name || 'wacan berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Électrik.' },
+  rindo_berry: { name: L_fr_items.rindo_berry?.name || 'rindo berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Plante.' },
+  yache_berry: { name: L_fr_items.yache_berry?.name || 'yache berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Glace.' },
+  chople_berry: { name: L_fr_items.chople_berry?.name || 'chople berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Combat.' },
+  kebia_berry: { name: L_fr_items.kebia_berry?.name || 'kebia berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Poison.' },
+  shuca_berry: { name: L_fr_items.shuca_berry?.name || 'shuca berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Sol.' },
+  coba_berry: { name: L_fr_items.coba_berry?.name || 'coba berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Vol.' },
+  payapa_berry: { name: L_fr_items.payapa_berry?.name || 'payapa berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Psy.' },
+  tanga_berry: { name: L_fr_items.tanga_berry?.name || 'tanga berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Insecte.' },
+  charti_berry: { name: L_fr_items.charti_berry?.name || 'charti berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Roche.' },
+  kasib_berry: { name: L_fr_items.kasib_berry?.name || 'kasib berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Spectre.' },
+  haban_berry: { name: L_fr_items.haban_berry?.name || 'haban berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Dragon.' },
+  colbur_berry: { name: L_fr_items.colbur_berry?.name || 'colbur berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Ténèbres.' },
+  babiri_berry: { name: L_fr_items.babiri_berry?.name || 'babiri berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Acier.' },
+  roseli_berry: { name: L_fr_items.roseli_berry?.name || 'roseli berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Fée.' }
 });
 
-Object.assign(window.L_fr_items, {
-  razor_claw: { ...(window.L_fr_items.razor_claw || {name:'razor_claw'}), desc: 'Augmente le taux de coup critique et fait évoluer certains Pokémon.' },
-  razor_fang: { ...(window.L_fr_items.razor_fang || {name:'razor_fang'}), desc: 'Peut apeurer la cible et fait évoluer certains Pokémon.' },
-  protector: { ...(window.L_fr_items.protector || {name:'protector'}), desc: 'Fait évoluer certains Pokémon lors d’un échange.' },
-  electirizer: { ...(window.L_fr_items.electirizer || {name:'electirizer'}), desc: 'Fait évoluer certains Pokémon lors d’un échange.' },
-  magmarizer: { ...(window.L_fr_items.magmarizer || {name:'magmarizer'}), desc: 'Fait évoluer certains Pokémon lors d’un échange.' },
-  reaper_cloth: { ...(window.L_fr_items.reaper_cloth || {name:'reaper_cloth'}), desc: 'Fait évoluer certains Pokémon lors d’un échange.' },
-  dubious_disc: { ...(window.L_fr_items.dubious_disc || {name:'dubious_disc'}), desc: 'Fait évoluer certains Pokémon lors d’un échange.' },
-  prism_scale: { ...(window.L_fr_items.prism_scale || {name:'prism_scale'}), desc: 'Fait évoluer certains Pokémon lors d’un échange.' },
-  whipped_dream: { ...(window.L_fr_items.whipped_dream || {name:'whipped_dream'}), desc: 'Fait évoluer certains Pokémon lors d’un échange.' },
-  sachet: { ...(window.L_fr_items.sachet || {name:'sachet'}), desc: 'Fait évoluer certains Pokémon lors d’un échange.' },
-  sweet_apple: { ...(window.L_fr_items.sweet_apple || {name:'sweet_apple'}), desc: 'Fait évoluer un Pokémon compatible.' },
-  tart_apple: { ...(window.L_fr_items.tart_apple || {name:'tart_apple'}), desc: 'Fait évoluer un Pokémon compatible.' },
-  cracked_pot: { ...(window.L_fr_items.cracked_pot || {name:'cracked_pot'}), desc: 'Fait évoluer un Pokémon compatible.' },
-  chipped_pot: { ...(window.L_fr_items.chipped_pot || {name:'chipped_pot'}), desc: 'Fait évoluer un Pokémon compatible.' },
-  galarica_cuff: { ...(window.L_fr_items.galarica_cuff || {name:'galarica_cuff'}), desc: 'Fait évoluer un Pokémon compatible.' },
-  galarica_wreath: { ...(window.L_fr_items.galarica_wreath || {name:'galarica_wreath'}), desc: 'Fait évoluer un Pokémon compatible.' },
-  peat_block: { ...(window.L_fr_items.peat_block || {name:'peat_block'}), desc: 'Fait évoluer un Pokémon compatible dans les bonnes conditions.' },
-  auspicious_armor: { ...(window.L_fr_items.auspicious_armor || {name:'auspicious_armor'}), desc: 'Fait évoluer un Pokémon compatible.' },
-  malicious_armor: { ...(window.L_fr_items.malicious_armor || {name:'malicious_armor'}), desc: 'Fait évoluer un Pokémon compatible.' },
-  syrupy_apple: { ...(window.L_fr_items.syrupy_apple || {name:'syrupy_apple'}), desc: 'Fait évoluer un Pokémon compatible.' },
-  unremarkable_teacup: { ...(window.L_fr_items.unremarkable_teacup || {name:'unremarkable_teacup'}), desc: 'Fait évoluer un Pokémon compatible.' },
-  masterpiece_teacup: { ...(window.L_fr_items.masterpiece_teacup || {name:'masterpiece_teacup'}), desc: 'Fait évoluer un Pokémon compatible.' },
-  skull_fossil: { ...(window.L_fr_items.skull_fossil || {name:'skull_fossil'}), desc: 'Peut être réanimé en Kranidos.' },
-  armor_fossil: { ...(window.L_fr_items.armor_fossil || {name:'armor_fossil'}), desc: 'Peut être réanimé en Dinoclier.' },
-  cover_fossil: { ...(window.L_fr_items.cover_fossil || {name:'cover_fossil'}), desc: 'Peut être réanimé en Carapagos.' },
-  plume_fossil: { ...(window.L_fr_items.plume_fossil || {name:'plume_fossil'}), desc: 'Peut être réanimé en Arkeapti.' },
-  jaw_fossil: { ...(window.L_fr_items.jaw_fossil || {name:'jaw_fossil'}), desc: 'Peut être réanimé en Ptyranidur.' },
-  sail_fossil: { ...(window.L_fr_items.sail_fossil || {name:'sail_fossil'}), desc: 'Peut être réanimé en Amagara.' },
-  fossilized_bird: { ...(window.L_fr_items.fossilized_bird || {name:'fossilized_bird'}), desc: 'Un fossile de Galar à combiner avec un autre fossile pour réanimer un Pokémon.' },
-  fossilized_dino: { ...(window.L_fr_items.fossilized_dino || {name:'fossilized_dino'}), desc: 'Un fossile de Galar à combiner avec un autre fossile pour réanimer un Pokémon.' },
-  fossilized_drake: { ...(window.L_fr_items.fossilized_drake || {name:'fossilized_drake'}), desc: 'Un fossile de Galar à combiner avec un autre fossile pour réanimer un Pokémon.' },
-  fossilized_fish: { ...(window.L_fr_items.fossilized_fish || {name:'fossilized_fish'}), desc: 'Un fossile de Galar à combiner avec un autre fossile pour réanimer un Pokémon.' }
+Object.assign(L_fr_items, {
+  razor_claw: { ...(L_fr_items.razor_claw || {name:'razor_claw'}), desc: 'Augmente le taux de coup critique et fait évoluer certains Pokémon.' },
+  razor_fang: { ...(L_fr_items.razor_fang || {name:'razor_fang'}), desc: 'Peut apeurer la cible et fait évoluer certains Pokémon.' },
+  protector: { ...(L_fr_items.protector || {name:'protector'}), desc: 'Fait évoluer certains Pokémon lors d’un échange.' },
+  electirizer: { ...(L_fr_items.electirizer || {name:'electirizer'}), desc: 'Fait évoluer certains Pokémon lors d’un échange.' },
+  magmarizer: { ...(L_fr_items.magmarizer || {name:'magmarizer'}), desc: 'Fait évoluer certains Pokémon lors d’un échange.' },
+  reaper_cloth: { ...(L_fr_items.reaper_cloth || {name:'reaper_cloth'}), desc: 'Fait évoluer certains Pokémon lors d’un échange.' },
+  dubious_disc: { ...(L_fr_items.dubious_disc || {name:'dubious_disc'}), desc: 'Fait évoluer certains Pokémon lors d’un échange.' },
+  prism_scale: { ...(L_fr_items.prism_scale || {name:'prism_scale'}), desc: 'Fait évoluer certains Pokémon lors d’un échange.' },
+  whipped_dream: { ...(L_fr_items.whipped_dream || {name:'whipped_dream'}), desc: 'Fait évoluer certains Pokémon lors d’un échange.' },
+  sachet: { ...(L_fr_items.sachet || {name:'sachet'}), desc: 'Fait évoluer certains Pokémon lors d’un échange.' },
+  sweet_apple: { ...(L_fr_items.sweet_apple || {name:'sweet_apple'}), desc: 'Fait évoluer un Pokémon compatible.' },
+  tart_apple: { ...(L_fr_items.tart_apple || {name:'tart_apple'}), desc: 'Fait évoluer un Pokémon compatible.' },
+  cracked_pot: { ...(L_fr_items.cracked_pot || {name:'cracked_pot'}), desc: 'Fait évoluer un Pokémon compatible.' },
+  chipped_pot: { ...(L_fr_items.chipped_pot || {name:'chipped_pot'}), desc: 'Fait évoluer un Pokémon compatible.' },
+  galarica_cuff: { ...(L_fr_items.galarica_cuff || {name:'galarica_cuff'}), desc: 'Fait évoluer un Pokémon compatible.' },
+  galarica_wreath: { ...(L_fr_items.galarica_wreath || {name:'galarica_wreath'}), desc: 'Fait évoluer un Pokémon compatible.' },
+  peat_block: { ...(L_fr_items.peat_block || {name:'peat_block'}), desc: 'Fait évoluer un Pokémon compatible dans les bonnes conditions.' },
+  auspicious_armor: { ...(L_fr_items.auspicious_armor || {name:'auspicious_armor'}), desc: 'Fait évoluer un Pokémon compatible.' },
+  malicious_armor: { ...(L_fr_items.malicious_armor || {name:'malicious_armor'}), desc: 'Fait évoluer un Pokémon compatible.' },
+  syrupy_apple: { ...(L_fr_items.syrupy_apple || {name:'syrupy_apple'}), desc: 'Fait évoluer un Pokémon compatible.' },
+  unremarkable_teacup: { ...(L_fr_items.unremarkable_teacup || {name:'unremarkable_teacup'}), desc: 'Fait évoluer un Pokémon compatible.' },
+  masterpiece_teacup: { ...(L_fr_items.masterpiece_teacup || {name:'masterpiece_teacup'}), desc: 'Fait évoluer un Pokémon compatible.' },
+  skull_fossil: { ...(L_fr_items.skull_fossil || {name:'skull_fossil'}), desc: 'Peut être réanimé en Kranidos.' },
+  armor_fossil: { ...(L_fr_items.armor_fossil || {name:'armor_fossil'}), desc: 'Peut être réanimé en Dinoclier.' },
+  cover_fossil: { ...(L_fr_items.cover_fossil || {name:'cover_fossil'}), desc: 'Peut être réanimé en Carapagos.' },
+  plume_fossil: { ...(L_fr_items.plume_fossil || {name:'plume_fossil'}), desc: 'Peut être réanimé en Arkeapti.' },
+  jaw_fossil: { ...(L_fr_items.jaw_fossil || {name:'jaw_fossil'}), desc: 'Peut être réanimé en Ptyranidur.' },
+  sail_fossil: { ...(L_fr_items.sail_fossil || {name:'sail_fossil'}), desc: 'Peut être réanimé en Amagara.' },
+  fossilized_bird: { ...(L_fr_items.fossilized_bird || {name:'fossilized_bird'}), desc: 'Un fossile de Galar à combiner avec un autre fossile pour réanimer un Pokémon.' },
+  fossilized_dino: { ...(L_fr_items.fossilized_dino || {name:'fossilized_dino'}), desc: 'Un fossile de Galar à combiner avec un autre fossile pour réanimer un Pokémon.' },
+  fossilized_drake: { ...(L_fr_items.fossilized_drake || {name:'fossilized_drake'}), desc: 'Un fossile de Galar à combiner avec un autre fossile pour réanimer un Pokémon.' },
+  fossilized_fish: { ...(L_fr_items.fossilized_fish || {name:'fossilized_fish'}), desc: 'Un fossile de Galar à combiner avec un autre fossile pour réanimer un Pokémon.' }
 });
 
+// T2 (vague 38) : module ESM — export natif ; la surface classique est
+// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
+if (typeof globalThis !== 'undefined') globalThis.L_fr_items = L_fr_items;

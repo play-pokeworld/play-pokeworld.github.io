@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-PokéWorld - Réparation des assets manquants.
+PokéWorld - Repair of the missing assets.
 
-1. Télécharge les sprites d'objets manquants depuis PokeAPI (sprites/items).
-2. Gère les objets custom (keystones, foggy_seed, link_stone, stoned_memory)
-   via un mapping explicite + recoloration PIL.
-3. Retélécharge la police WinkySans.ttf (l'ancienne est corrompue).
+1. Download the missing item sprites from PokeAPI (sprites/items).
+2. Handle the custom items (keystones, foggy_seed, link_stone, stoned_memory)
+   via an explicit mapping + PIL recoloring.
+3. Download the WinkySans.ttf font again (the old one is corrupted).
 
 Usage: python3 tools/fix_missing_assets.py
 """
@@ -28,17 +28,17 @@ POKECLICKER_BASE = "https://raw.githubusercontent.com/pokeclicker/pokeclicker/de
 
 UA = {"User-Agent": "Mozilla/5.0 (PokeWorld asset fixer)"}
 
-# Objets custom du jeu qui n'existent pas (sous ce nom) dans PokeAPI.
-# value: (source, teinte optionnelle)
-#   source = ("pokeapi", <nom>) ou ("pokeclicker", <chemin>)
+# Custom game items that do not exist (under this name) in PokeAPI.
+# value: (source, optional tint)
+#   source = ("pokeapi", <name>) or ("pokeclicker", <path>)
 CUSTOM_MAP = {
-    # "Clé de Voûte" = Odd Keystone en français
+    # "Clé de Voûte" = Odd Keystone in French (FR item name)
     "ancient_keystone": (("pokeapi", "odd-keystone"), None),
-    "frozen_keystone": (("pokeapi", "odd-keystone"), 0.58),   # recolorée bleu glace
-    "steel_keystone": (("pokeapi", "odd-keystone"), "gray"),  # recolorée acier
+    "frozen_keystone": (("pokeapi", "odd-keystone"), 0.58),   # recolored ice blue
+    "steel_keystone": (("pokeapi", "odd-keystone"), "gray"),  # recolored steel
     "stoned_memory": (("pokeapi", "rock-memory"), None),
-    "foggy_seed": (("pokeapi", "misty-seed"), "fog"),         # recolorée gris-bleu pâle
-    "link_stone": (("pokeapi", "dawn-stone"), 0.85),          # pierre violet/lien
+    "foggy_seed": (("pokeapi", "misty-seed"), "fog"),         # recolored pale grey-blue
+    "link_stone": (("pokeapi", "dawn-stone"), 0.85),          # purple/link stone
 }
 
 
@@ -81,10 +81,10 @@ def recolor(png_bytes, hue):
     return out.getvalue()
 
 
-# ─── Phase 2 : sprites non présents dans le dépôt PokeAPI ───
+# ─── Phase 2: sprites not present in the PokeAPI repo ───
 # kind: "pokeapi_bag" (<nom>.png --bag), "pokeclicker" (chemin exact), "bulba" (titre File:)
 PHASE2_MAP = {
-    # Z-cristaux : le dépôt PokeAPI les nomme "<nom>--bag.png"
+    # Z crystals: the PokeAPI repo names them "<name>--bag.png"
     **{f"{t}ium_z": ("pokeapi_bag", f"{t}ium-z") for t in [
         "bugin", "darkin", "dragon", "electr", "fair", "fightin", "fir", "flyin",
         "ghost", "grass", "ground", "ic", "normal", "poison", "psych", "rock",
@@ -114,7 +114,7 @@ PHASE2_MAP = {
 
 
 def _fetch_phase2(kind, name):
-    """Récupère un sprite selon la source de phase 2."""
+    """Fetch a sprite per the phase 2 source."""
     if kind == "pokeapi_bag":
         return fetch(POKEAPI_SPRITE.format(name + "--bag"))
     if kind == "pokeclicker":
@@ -128,23 +128,23 @@ def _fetch_phase2(kind, name):
             infos = page.get("imageinfo")
             if infos:
                 return fetch(infos[0]["url"])
-        raise RuntimeError(f"Bulbagarden: fichier introuvable {name}")
-    raise RuntimeError(f"kind inconnu {kind}")
+        raise RuntimeError(f"Bulbagarden: file not found {name}")
+    raise RuntimeError(f"unknown kind {kind}")
 
 
 
 def main():
-    from PIL import Image  # noqa: F401  (vérif présence PIL)
+    from PIL import Image  # noqa: F401  (PIL presence check)
 
     txt = (ROOT / "src" / "data" / "items-data.js").read_text(encoding="utf-8")
     keys = re.findall(r'^  "([a-z0-9_]+)"\s*:\s*\{', txt, re.M)
     missing = [k for k in keys
                if not (ITEMS_DIR / f"{k}.png").exists()
-               and not k.startswith(("ct", "cs"))]  # CT/CS -> tm_<type>.png déjà présents
-    print(f"Objets manquants à traiter: {len(missing)}")
+               and not k.startswith(("ct", "cs"))]  # TM/HM -> tm_<type>.png already present
+    print(f"Missing items to process: {len(missing)}")
 
     names = {it["name"] for it in json.loads(fetch(POKEAPI_LIST_URL, binary=False))["results"]}
-    print(f"PokeAPI: {len(names)} objets connus")
+    print(f"PokeAPI: {len(names)} known items")
 
     ok, custom, failed = 0, 0, []
     for k in missing:
@@ -179,19 +179,19 @@ def main():
         except Exception as e:  # noqa: BLE001
             failed.append((k, str(e)))
 
-    print(f"  téléchargés PokeAPI: {ok}")
-    print(f"  générés custom:      {custom}")
+    print(f"  downloaded PokeAPI:  {ok}")
+    print(f"  custom generated:    {custom}")
     if failed:
-        print(f"  échecs ({len(failed)}):")
+        print(f"  failures ({len(failed)}):")
         for k, why in failed:
             print(f"    - {k}: {why}")
 
-    # ─── Police WinkySans ───
+    # ─── WinkySans font ───
     winky = FONT_DIR / "WinkySans.ttf"
     if not _font_valid(winky):
-        print("WinkySans.ttf corrompue, retéléchargement…")
+        print("WinkySans.ttf corrupted, downloading again…")
         _download_winky(winky)
-    print("Terminé.")
+    print("Done.")
 
 
 def _font_valid(path):
@@ -216,7 +216,7 @@ def _download_winky(dest):
             candidates.append(m.group(1))
     except Exception:  # noqa: BLE001
         pass
-    # Fallback 2 : css2 avec UA ancien
+    # Fallback 2: css2 with an old UA
     try:
         css = fetch("https://fonts.googleapis.com/css2?family=Winky+Sans:wght@400&display=swap",
                     binary=False)
@@ -233,11 +233,11 @@ def _download_winky(dest):
                 continue
             dest.write_bytes(data)
             if _font_valid(dest):
-                print(f"  police OK depuis {url}")
+                print(f"  font OK from {url}")
                 return True
         except Exception:  # noqa: BLE001
             continue
-    print("  !! impossible de récupérer une police WinkySans valide")
+    print("  !! unable to fetch a valid WinkySans font")
     return False
 
 

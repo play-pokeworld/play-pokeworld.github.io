@@ -1,18 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-// ── Passe 23 / Étape 7 (finale) : équilibrage par simulations ───────────
-// Le vrai moteur de combat (vm) mesure les taux de victoire d'un joueur de
-// référence lv 100 entraîné (benchmark figé = borne BASSE : un joueur réel
-// adapte son équipe grâce à l'aperçu de la rotation, mesuré séparément).
-// Bandes validées en passe 23 (8 fenêtres de rotation × 12 runs, RNG seedé
-// → mesures déterministes) :
-//   Tour E/D 100 % · C 99 · B 92,7 · A 73,4 · S 61,5 · Libre 16,7
-//   Usine C 87,5 · A 93,8 (miroir : même constructeur des deux côtés)
-//   Arènes 3v3 : 25,0 / 18,2 (sans objets) / 38,0 — modes contrainte
-//   Dôme : 71,4 (quarts) · 36,5 (finale)
-//   Équipe « adaptée » (choisie via l'aperçu) : Libre 57,3 · S 77,1 ·
-//   finale 86,5 % → le défi est franchissable AVEC préparation.
+// ── Phase 23 / Step 7 (final): balancing by simulations ──────────────────
+// The real battle engine (vm) measures the win rates of a trained
+// lv-100 reference player (frozen benchmark = LOWER bound: a real player
+// adapts their team thanks to the rotation preview, measured separately).
+// Bands validated in phase 23 (8 rotation windows × 12 runs, seeded RNG
+// → deterministic measurements):
+//   Tower E/D 100 % · C 99 · B 92.7 · A 73.4 · S 61.5 · Free 16.7
+//   Factory C 87.5 · A 93.8 (mirror: same builder on both sides)
+//   3v3 Gyms: 25.0 / 18.2 (without items) / 38.0 — constraint modes
+//   Dome: 71.4 (quarterfinals) · 36.5 (final)
+//   "Adapted" team (picked via the preview): Open 57.3 · S 77.1 ·
+//   finale 86.5% → the challenge is beatable WITH preparation.
 const SIM = await import('../tools/sim_battles.mjs');
 const { sb, winRate, buildTrainedTeam, ENDGAME_IDS } = SIM;
 
@@ -33,8 +33,8 @@ async function atollRate(mk) {
   return wins / runs;
 }
 
-// Bandes [min, max] : le benchmark figé ne s'adapte jamais (borne basse) et
-// les plafonds documentent la marge de progression du contenu endgame.
+// [min, max] bands: the frozen benchmark never adapts (lower bound) and
+// the ceilings document the endgame content's progression margin.
 const BANDS = {
   tower_e: [0.99, 1.0], tower_d: [0.99, 1.0],
   tower_c: [0.85, 1.0], tower_b: [0.70, 1.0], tower_a: [0.45, 0.95],
@@ -44,35 +44,35 @@ const BANDS = {
   dome_quarter: [0.40, 1.0], dome_final: [0.10, 0.75],
 };
 
-test('passe 23 : chaque mode de l\'atoll dans sa bande de difficulté cible', { timeout: 300000 }, async () => {
+test('phase 23: every atoll mode in its target difficulty band', { timeout: 300000 }, async () => {
   const rates = {};
   for (const mk of Object.keys(BANDS)) rates[mk] = await atollRate(mk);
   for (const [mk, [lo, hi]] of Object.entries(BANDS)) {
     const r = rates[mk];
-    assert.ok(r >= lo, `${mk} : ${(r * 100).toFixed(1)} % < plancher ${(lo * 100).toFixed(0)} % (mode devenu trop dur)`);
+    assert.ok(r >= lo, `${mk}: ${(r * 100).toFixed(1)}% < floor ${(lo * 100).toFixed(0)}% (mode became too hard)`);
     assert.ok(r <= hi, `${mk} : ${(r * 100).toFixed(1)} % > plafond ${(hi * 100).toFixed(0)} % (mode devenu trop facile)`);
   }
-  // Progression globale : la Tour reste l'échelle de difficulté croissante
-  assert.ok(rates.tower_c >= rates.tower_a, `progression : C (${(rates.tower_c * 100).toFixed(0)} %) ≥ A (${(rates.tower_a * 100).toFixed(0)} %)`);
-  assert.ok(rates.tower_a >= rates.tower_free - 0.75, `progression : A vs Libre`);
-  assert.ok(rates.tower_s <= rates.tower_c, `rang S (${(rates.tower_s * 100).toFixed(0)} %) ≤ rang C (${(rates.tower_c * 100).toFixed(0)} %)`);
-  // L'atoll garde un vrai défi : la Tour Libre et la Finale du Dôme restent dures
-  assert.ok(rates.tower_free <= 0.5, `Tour Libre = défi ultime (${(rates.tower_free * 100).toFixed(1)} %)`);
-  assert.ok(rates.dome_final <= 0.7, `Finale Dôme = défi (${(rates.dome_final * 100).toFixed(1)} %)`);
-  console.log('  taux mesurés : ' + Object.entries(rates).map(([k, v]) => `${k}=${(v * 100).toFixed(0)}%`).join(' '));
+  // Global progression: the Tower remains the ladder of increasing difficulty
+  assert.ok(rates.tower_c >= rates.tower_a, `progression: C (${(rates.tower_c * 100).toFixed(0)} %) ≥ A (${(rates.tower_a * 100).toFixed(0)} %)`);
+  assert.ok(rates.tower_a >= rates.tower_free - 0.75, `progression: A vs Free`);
+  assert.ok(rates.tower_s <= rates.tower_c, `rank S (${(rates.tower_s * 100).toFixed(0)} %) ≤ rank C (${(rates.tower_c * 100).toFixed(0)} %)`);
+  // The atoll keeps a real challenge: the Open Tower and the Dome Finale stay hard
+  assert.ok(rates.tower_free <= 0.5, `Open Tower = ultimate challenge (${(rates.tower_free * 100).toFixed(1)} %)`);
+  assert.ok(rates.dome_final <= 0.7, `Dome Final = challenge (${(rates.dome_final * 100).toFixed(1)} %)`);
+  console.log('  measured rates: ' + Object.entries(rates).map(([k, v]) => `${k}=${(v * 100).toFixed(0)}%`).join(' '));
 });
 
-test('passe 23 : arènes 3v3 — statScale 0.5 appliqué (budgets réduits vs Tour)', { timeout: 60000 }, () => {
+test('phase 23: 3v3 gyms — statScale 0.5 applied (reduced budgets vs Tower)', { timeout: 60000 }, () => {
   const sum = (o) => Object.values(o || {}).reduce((a, b) => a + b, 0);
   for (const mk of ['arena_three', 'arena_no_item', 'arena_type']) {
     assert.equal(sb.ATOLL_MODES[mk].statScale, 0.5, `${mk} : statScale 0.5`);
     const team = sb.buildAtollTeam(mk, 40, 'enemy');
     for (const p of team) {
-      assert.ok(sum(p.ivs) <= 18 && sum(p.evs) <= 18, `${mk} ${p.id} : budgets ×0.5 → ≤ 18/18 (niveau campagne)`);
+      assert.ok(sum(p.ivs) <= 18 && sum(p.evs) <= 18, `${mk} ${p.id}: budgets ×0.5 → ≤ 18/18 (campaign level)`);
     }
   }
-  // Tour/Dôme : budgets endgame 36/36 intacts
+  // Tower/Dome: endgame 36/36 budgets intact
   const tower = sb.buildAtollTeam('tower_s', 40, 'enemy');
-  assert.ok(Math.max(...tower.map((p) => sum(p.evs))) >= 30, 'tower_s : profil endgame ~36 EV conservé');
+  assert.ok(Math.max(...tower.map((p) => sum(p.evs))) >= 30, 'tower_s: endgame ~36 EV profile kept');
 });
 
