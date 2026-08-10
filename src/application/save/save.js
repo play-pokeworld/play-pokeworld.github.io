@@ -106,6 +106,8 @@ function summarizeSaveData(saveData){ const meta = ensureSaveMeta(saveData, save
 function upsertSaveIndex(saveData){ if(!hasStarterInState(saveData && saveData.G)) return; const summary = summarizeSaveData(saveData); const list = readSaveIndex().filter(entry => entry && entry.id !== summary.id && readSlot(entry.id)); list.push(summary); list.sort((a,b) => Number(b.updatedAt || 0) - Number(a.updatedAt || 0)); writeSaveIndex(list); }
 function removeSaveFromIndex(id){ writeSaveIndex(readSaveIndex().filter(entry => entry && entry.id !== id)); }
 function normalizeLoadedState(){
+ if(G){ delete G.updateAvailable; delete G.updateBannerDismissed; }
+ if(typeof resetUpdateBannerState === 'function') resetUpdateBannerState();
  if(!G) G = {};
  if(!G.collection) G.collection = {};
  // deletion of the Proxy (lisibilite) – on nettoie juste the cles techniques accidentelles
@@ -491,7 +493,8 @@ function renderSaveMenu(){
 }
 function hideSaveMenu(){ const screen = document.getElementById('save-menu-screen'); if(screen) screen.classList.remove('is-open'); document.body.classList.remove('save-menu-active'); document.body.classList.add('game-started'); }
 function createFreshGameState(){ let state = null; try{ if(window.PokeWorldState && window.PokeWorldState.createInitialGameState) state = window.PokeWorldState.createInitialGameState(); }catch(_){ } if(!state) state = { location:'pallet', region:'kanto', team:[], inventory:{}, money:2000, badges:[], defeatedChamps:{}, pokedex:{}, stepsLeft:0, starter:false, starterKanto:false, starterJohto:false, regionStarter:{kanto:false,johto:false}, collection:{}, teamSlotItems:[], evolvedSpecies:[], dupeCatches:{}, lang:'fr', storyIdx:0, storyProgress:0, unlockedTalents:{}, activeQuests:[], repeatables:[], visitedMaps:{}, completedQuests:{}, wildWinsByLoc:{}, regionLeagueWon:{}, playTimeMs:0, saveMeta:{}, tutorial:{ enabled:true, completed:{}, dismissedTips:{}, rewards:{} } }; const storedLang = storageGet('pokeworld_lang'); if(storedLang) state.lang = storedLang; if(state.playTimeMs == null) state.playTimeMs = 0; return state; }
-function assignGlobalState(state){ const target = (typeof G !== 'undefined' && G && typeof G === 'object') ? G : {}; for(const key of Object.keys(target)) delete target[key]; Object.assign(target, state || {}); G = target; if(typeof window !== 'undefined'){ window.G = target; if(window.PokeWorldState) window.PokeWorldState.gameState = target; } if(typeof globalThis !== 'undefined') globalThis.G = target; }
+function assignGlobalState(state){
+ if(state){ delete state.updateAvailable; delete state.updateBannerDismissed; } const target = (typeof G !== 'undefined' && G && typeof G === 'object') ? G : {}; for(const key of Object.keys(target)) delete target[key]; Object.assign(target, state || {}); G = target; if(typeof window !== 'undefined'){ window.G = target; if(window.PokeWorldState) window.PokeWorldState.gameState = target; } if(typeof globalThis !== 'undefined') globalThis.G = target; }
 function resetRuntimeBattleState(){ try{ const fresh = window.PokeWorldBattleState && window.PokeWorldBattleState.createInitialBattleState ? window.PokeWorldBattleState.createInitialBattleState() : null; if(fresh && typeof battle !== 'undefined' && battle){ for(const key of Object.keys(battle)) delete battle[key]; Object.assign(battle, fresh); window.battle = battle; } }catch(_){ } }
 function createNewSaveFromMenu(){
  const index = readSaveIndex(); const id = uniqueSaveId(); const state = createFreshGameState();
