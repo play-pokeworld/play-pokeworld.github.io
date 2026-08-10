@@ -22,6 +22,10 @@ export const L_fr_ui = {
 "guide_mine_title":"Mine",
 "guide_bag_text":"Les objets sont classés par catégorie. Certains se tiennent, d’autres évoluent, se vendent ou servent aux quêtes.",
 "guide_bag_title":"Sac",
+"app_update_banner_text":"🚀 Une nouvelle version de PokéWorld est disponible sur GitHub !",
+"app_update_banner_btn":"🔄 Mettre à jour",
+"app_update_banner_close":"Fermer la notification",
+
 "guide_pokemon_text":"La fiche Pokémon montre Base Stats, IV, EV, talents, objet tenu, attaques connues et attaques apprenables.",
 "guide_pokemon_title":"Pokémon",
 "guide_combat_text":"Les combats sont automatiques. Surveille les PV, les attaques qui se chargent, le butin et change de Pokémon si besoin.",

@@ -20,6 +20,10 @@ export const L_en_ui = {
 "guide_mine_title":"Mine",
 "guide_bag_text":"Items are sorted by category. Some are held items, some evolve Pokémon, sell for money or serve quests.",
 "guide_bag_title":"Bag",
+"app_update_banner_text":"🚀 A new version of PokéWorld is available on GitHub!",
+"app_update_banner_btn":"🔄 Update now",
+"app_update_banner_close":"Dismiss notification",
+
 "guide_pokemon_text":"The Pokémon sheet shows Base Stats, IV, EV, abilities, held item, known and learnable moves.",
 "guide_pokemon_title":"Pokémon",
 "guide_combat_text":"Battles are automatic. Watch HP, charging moves and loot, and switch Pokémon if needed.",

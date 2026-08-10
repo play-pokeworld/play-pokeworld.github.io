@@ -9679,42 +9679,67 @@ button[data-action].pw-loc-gym-btn:hover,
 }
 
 
-/* ── App Update Banner (ECS UI Component) ── */
+/* ── Highly Visible Universal Update Alert Banner (Centered text, button below) ── */
 .pw-update-banner {
-  background: var(--pw-bg-header);
-  border-bottom: 2px solid var(--pw-accent-color);
-  color: var(--pw-text-primary);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 20px;
-  position: sticky;
-  top: 56px;
-  z-index: 940;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.45);
+  background: linear-gradient(135deg, #D96B0C 0%, #B84A00 100%) !important;
+  border-bottom: 3px solid #FFC27F !important;
+  color: #FFFFFF !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  gap: 10px !important;
+  padding: 14px 40px !important;
+  position: sticky !important;
+  top: 56px !important;
+  z-index: 940 !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.6) !important;
+  font-family: "WinkySans", sans-serif !important;
+}
+.pw-update-banner-text {
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  color: #FFFFFF !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
+}
+.pw-update-banner-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
 }
 .pw-update-banner-btn {
-  background: var(--pw-accent-color) !important;
-  border: 1px solid var(--pw-border-color) !important;
-  color: var(--dark1) !important;
-  font-weight: 800 !important;
-  cursor: pointer;
-  border-radius: 6px;
-  padding: 6px 14px;
-  transition: all 0.2s;
+  background: #FFFFFF !important;
+  border: 2px solid #FFC27F !important;
+  color: #7F2B00 !important;
+  font-weight: 900 !important;
+  font-size: 13px !important;
+  cursor: pointer !important;
+  border-radius: 8px !important;
+  padding: 8px 22px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+  transition: all 0.2s !important;
 }
 .pw-update-banner-btn:hover {
-  filter: brightness(1.15);
-  transform: translateY(-1px);
+  background: #FFE0BA !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.45) !important;
 }
 .pw-update-banner-close {
   background: transparent !important;
   border: none !important;
-  color: var(--pw-text-secondary) !important;
-  cursor: pointer;
-  font-size: 16px;
-  padding: 4px 8px;
+  color: #FFE0BA !important;
+  cursor: pointer !important;
+  font-size: 18px !important;
+  padding: 4px 8px !important;
+  position: absolute !important;
+  right: 14px !important;
+  top: 10px !important;
+}
+.pw-update-banner-close:hover {
+  color: #FFFFFF !important;
+  transform: scale(1.1);
 }
 
 

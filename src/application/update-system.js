@@ -11,6 +11,14 @@ export function initUpdateSystem(checkIntervalMs = 10 * 60 * 1000) {
 
   fetchVersionFingerprint().then((fp) => {
     _initialFingerprint = fp;
+    try {
+      const known = sessionStorage.getItem('pw_known_fp');
+      if (known && known === fp && typeof G !== 'undefined' && G) {
+        G.updateAvailable = false;
+        G.updateBannerDismissed = false;
+        if (typeof updateHeader === 'function') updateHeader();
+      }
+    } catch (_) {}
   }).catch(() => {});
 
   if (_updateCheckTimer) clearInterval(_updateCheckTimer);
@@ -27,12 +35,21 @@ export function initUpdateSystem(checkIntervalMs = 10 * 60 * 1000) {
 
 async function fetchVersionFingerprint() {
   try {
-    const res = await fetch(location.href, {
+    const url = (typeof location !== 'undefined' && location.pathname) ? location.pathname.split('#')[0].split('?')[0] : './index.html';
+    const res = await fetch(url, {
       method: 'HEAD',
-      cache: 'no-store',
+      cache: 'no-cache',
       headers: { 'Cache-Control': 'no-cache' }
     });
-    return res.headers.get('ETag') || res.headers.get('Last-Modified') || null;
+    const lm = res.headers.get('Last-Modified');
+    if (lm) return 'lm:' + lm.trim();
+
+    const etag = res.headers.get('ETag');
+    if (etag) {
+      const clean = etag.replace(/^W\//i, '').replace(/-(?:gzip|br|deflate)["']?$/i, '"').trim();
+      return 'etag:' + clean;
+    }
+    return null;
   } catch (_) {
     return null;
   }
@@ -57,7 +74,16 @@ export async function checkForAppUpdate() {
 }
 
 export function applyAppUpdate() {
-  if (typeof location !== 'undefined') location.reload();
+  if (typeof G !== 'undefined' && G) {
+    G.updateAvailable = false;
+    G.updateBannerDismissed = false;
+  }
+  if (typeof location !== 'undefined') {
+    try {
+      if (_initialFingerprint) sessionStorage.setItem('pw_known_fp', _initialFingerprint);
+    } catch (_) {}
+    location.reload();
+  }
 }
 
 export function dismissAppUpdate() {
