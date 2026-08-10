@@ -68,7 +68,7 @@ function locationInfoModel(){
    const label = (typeof t==='function' && t('puzzle_explore_btn') !== 'puzzle_explore_btn')
     ? t('puzzle_explore_btn')
     : ((G.lang==='en') ? 'Puzzle explorations' : 'Explorations à énigmes');
-   model.actions.push({ kind: 'button', iconHtml: '🧩', label: label + ' (' + done + '/' + puzzlesHere.length + ')', call: 'openPuzzleListForLocation', callArgs: "'" + G.location + "'" });
+   model.actions.push({ kind: 'button', cls: 'pw-loc-quest-btn', iconHtml: '🧩', label: label + ' (' + done + '/' + puzzlesHere.length + ')', call: 'openPuzzleListForLocation', callArgs: "'" + G.location + "'" });
   }
  }
  const localDefeatQuest = (typeof getActiveLocalDefeatQuestForLocation === 'function') ? getActiveLocalDefeatQuestForLocation(G.location) : null;
@@ -95,10 +95,10 @@ function locationInfoModel(){
    model.actions.push({ kind: 'info', iconHtml: uiIcon('battle', '•'), label: lockedLabel });
   } else if(champDefeated){
    const rematchLabel = isLeague ? tr('league_rematch_label', { champion: champName }) : tr('arena_rematch_label', { champion: champName });
-   model.actions.push({ kind: 'button', iconHtml: uiIcon('rematch', '•'), label: rematchLabel, call: 'startChampBattle', callArgs: "'" + champId + "'" });
+   model.actions.push({ kind: 'button', cls: 'pw-loc-gym-btn', iconHtml: uiIcon('rematch', '•'), label: rematchLabel, call: 'startChampBattle', callArgs: "'" + champId + "'" });
   } else {
    const challengeLabel = isLeague ? tr('league_challenge_label', { champion: champName }) : tr('arena_challenge_label', { champion: champName });
-   model.actions.push({ kind: 'button', iconHtml: uiIcon('battle', '•'), label: challengeLabel, call: 'startChampBattle', callArgs: "'" + champId + "'" });
+   model.actions.push({ kind: 'button', cls: 'pw-loc-gym-btn', iconHtml: uiIcon('battle', '•'), label: challengeLabel, call: 'startChampBattle', callArgs: "'" + champId + "'" });
   }
  }
 

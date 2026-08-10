@@ -8392,8 +8392,47 @@ button.hatchery-hatch-btn[data-call="hatchEgg"] * { color: #f6f1dc !important; }
 .pw-loc-action-row { border: 1px dashed var(--pw-border-color); color: var(--light1); background: rgba(0,0,0,.18); }
 .pw-loc-action-icon { font-size: 20px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; }
 .pw-loc-action-icon .ui-icon { width: 18px; height: 18px; }
-.pw-loc-quest-btn { border-color: rgba(217,160,232,.55) !important; }
-.pw-loc-npc-btn { border-color: rgba(217,160,232,.4) !important; }
+/* ── Unconditional High-Contrast Location Action Buttons (Beats universal button[data-action] blanket) ── */
+button[data-action].pw-loc-quest-btn,
+button[data-action].pw-loc-npc-btn,
+.pw-loc-action-btn.pw-loc-quest-btn,
+.pw-loc-action-btn.pw-loc-npc-btn {
+  background: #5B4099 !important;
+  background-color: #5B4099 !important;
+  border: 2px solid #A98DE8 !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 10px rgba(169, 141, 232, 0.55) !important;
+}
+button[data-action].pw-loc-quest-btn:hover,
+button[data-action].pw-loc-npc-btn:hover,
+.pw-loc-action-btn.pw-loc-quest-btn:hover,
+.pw-loc-action-btn.pw-loc-npc-btn:hover {
+  background: #7252BA !important;
+  background-color: #7252BA !important;
+  border-color: #D3C2FB !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 0 14px rgba(211, 194, 251, 0.75) !important;
+  transform: translateY(-2px);
+}
+button[data-action].pw-loc-gym-btn,
+.pw-loc-action-btn.pw-loc-gym-btn {
+  background: #C05C15 !important;
+  background-color: #C05C15 !important;
+  border: 2px solid #FFC27F !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 10px rgba(255, 194, 127, 0.55) !important;
+}
+button[data-action].pw-loc-gym-btn:hover,
+.pw-loc-action-btn.pw-loc-gym-btn:hover {
+  background: #D86E22 !important;
+  background-color: #D86E22 !important;
+  border-color: #FFE0BA !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 0 14px rgba(255, 224, 186, 0.75) !important;
+  transform: translateY(-2px);
+}
 
 .pw-loc-unlock-tip { padding: 10px 12px; border-radius: 12px; display: grid; gap: 6px; }
 .pw-loc-unlock-bar { height: 8px; border-radius: 999px; background: #221E1C; overflow: hidden; border: 1px solid var(--pw-border-color); }
@@ -9594,4 +9633,47 @@ textarea.pw-base-pc-input {
   gap: 14px;
   max-height: none !important;
   overflow: visible !important;
+}
+
+
+/* ── Unconditional High-Contrast Location Action Buttons (Beats universal button[data-action] blanket) ── */
+button[data-action].pw-loc-quest-btn,
+button[data-action].pw-loc-npc-btn,
+.pw-loc-action-btn.pw-loc-quest-btn,
+.pw-loc-action-btn.pw-loc-npc-btn {
+  background: #5B4099 !important;
+  background-color: #5B4099 !important;
+  border: 2px solid #A98DE8 !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 10px rgba(169, 141, 232, 0.55) !important;
+}
+button[data-action].pw-loc-quest-btn:hover,
+button[data-action].pw-loc-npc-btn:hover,
+.pw-loc-action-btn.pw-loc-quest-btn:hover,
+.pw-loc-action-btn.pw-loc-npc-btn:hover {
+  background: #7252BA !important;
+  background-color: #7252BA !important;
+  border-color: #D3C2FB !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 0 14px rgba(211, 194, 251, 0.75) !important;
+  transform: translateY(-2px);
+}
+button[data-action].pw-loc-gym-btn,
+.pw-loc-action-btn.pw-loc-gym-btn {
+  background: #C05C15 !important;
+  background-color: #C05C15 !important;
+  border: 2px solid #FFC27F !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 10px rgba(255, 194, 127, 0.55) !important;
+}
+button[data-action].pw-loc-gym-btn:hover,
+.pw-loc-action-btn.pw-loc-gym-btn:hover {
+  background: #D86E22 !important;
+  background-color: #D86E22 !important;
+  border-color: #FFE0BA !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 0 14px rgba(255, 224, 186, 0.75) !important;
+  transform: translateY(-2px);
 }
