@@ -1,3 +1,22 @@
+function isPokemonTakenByHatcheryOrTraining(p) {
+  if (!p) return false;
+  if (typeof isPokemonQueuedHatchery === 'function' && isPokemonQueuedHatchery(p)) return true;
+  if (typeof isPokemonQueuedTraining === 'function' && isPokemonQueuedTraining(p)) return true;
+  if (G && Array.isArray(G.hatchery)) {
+    for (const s of G.hatchery) {
+      if (s && s.poke && (s.poke === p || (p.uid && s.poke.uid === p.uid))) return true;
+    }
+  }
+  if (G && Array.isArray(G.trainingSlots)) {
+    for (const s of G.trainingSlots) {
+      if (s && s.active) {
+        const tr = (typeof findPokemonByTrainingSlot === 'function') ? findPokemonByTrainingSlot(s) : null;
+        if (tr && (tr === p || (p.uid && tr.uid === p.uid))) return true;
+      }
+    }
+  }
+  return false;
+}
 // Wave 41 — native ESM module. The classic surface (window/globalThis) is
 // kept: classic consumers, VM harnesses and the engine registry.
 // Selector state lives on the shared global object: the unified-selector
@@ -255,6 +274,9 @@ function renderUnifiedGrid(){
     list = list.filter(({loc}) => loc === 'box');
   }
   if(_usmAction === 'item_rarecandy') list = list.filter(({p}) => (p.level||1) < 100);
+  if(_usmAction === 'hatchery' || _usmAction === 'hatchery_queue' || String(_usmAction).startsWith('hatchery_queue_') || _usmAction === 'training' || String(_usmAction).startsWith('training_queue_')){
+    list = list.filter(({p}) => !isPokemonTakenByHatcheryOrTraining(p));
+  }
 
   
   if(q) list = list.filter(({p}) => p.name.toLowerCase().includes(q));

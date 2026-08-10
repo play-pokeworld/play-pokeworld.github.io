@@ -917,6 +917,23 @@ function trainingAutomationCandidates(slotIndex){
   const evTotal = (typeof pokemonEvTotal==='function'?pokemonEvTotal(p):0);
   if(cfg.filterEv === 'complete' && evTotal < 36) continue;
   if(cfg.filterEv === 'incomplete' && evTotal >= 36) continue;
+  if (cfg.filterFav === 'fav_only' && !(p.favorite || p.fav || p.locked)) continue;
+  if (cfg.filterFav === 'no_fav' && (p.favorite || p.fav || p.locked)) continue;
+  if (cfg.filterRegion && cfg.filterRegion !== 'all') {
+    const nid = Number(p.id);
+    const reg = nid <= 151 ? 'kanto' : nid <= 251 ? 'johto' : 'hoenn';
+    if (reg !== cfg.filterRegion) continue;
+  }
+  if (cfg.filterRank && cfg.filterRank !== 'all') {
+    const ivTotalVal = typeof pokemonIvTotal === 'function' ? pokemonIvTotal(p) : 0;
+    if (cfg.filterRank === 'S_or_better' && ivTotalVal < 24) continue;
+    if (cfg.filterRank === 'A_or_worse' && ivTotalVal >= 24) continue;
+  }
+  if (cfg.filterType && cfg.filterType !== 'all') {
+    const t1 = String(p.type1 || '').toLowerCase();
+    const t2 = String(p.type2 || '').toLowerCase();
+    if (t1 !== cfg.filterType && t2 !== cfg.filterType) continue;
+  }
   list.push({key:k, uid:p.uid, p, iv:ivTotal, ev:evTotal, talents:getTrainableTalents(p).length, moves:getTrainableLockedMoves(p).length, levelMissing:(p.level||1)<100?1:0});
  }
  const sort = cfg.sort || 'ev_asc';
@@ -1149,6 +1166,43 @@ function trainingAutomationRulesModel(i, cfg){
     {value:'complete',label:t('box_filter_ev_complete'),selected:cfg.filterEv==='complete'},
     {value:'incomplete',label:t('box_filter_ev_incomplete'),selected:cfg.filterEv==='incomplete'},
   ]},
+      { label: (typeof t==='function'?t('filter_fav'):'Favoris'), changeCall: 'setTrainingAutomationOption', changeArgs: `${i}, 'filterFav', this.value`, options: [
+        { value: 'all', label: (typeof t==='function'?t('hatchery_filter_all'):'All'), selected: cfg.filterFav === 'all' || !cfg.filterFav },
+        { value: 'fav_only', label: '⭐ Favoris', selected: cfg.filterFav === 'fav_only' },
+        { value: 'no_fav', label: 'Sans ⭐', selected: cfg.filterFav === 'no_fav' },
+      ]},
+      { label: (typeof t==='function'?t('filter_region'):'Région'), changeCall: 'setTrainingAutomationOption', changeArgs: `${i}, 'filterRegion', this.value`, options: [
+        { value: 'all', label: (typeof t==='function'?t('hatchery_filter_all'):'All'), selected: cfg.filterRegion === 'all' || !cfg.filterRegion },
+        { value: 'kanto', label: 'Kanto', selected: cfg.filterRegion === 'kanto' },
+        { value: 'johto', label: 'Johto', selected: cfg.filterRegion === 'johto' },
+        { value: 'hoenn', label: 'Hoenn', selected: cfg.filterRegion === 'hoenn' },
+      ]},
+      { label: (typeof t==='function'?t('filter_rank'):'Rang / IV'), changeCall: 'setTrainingAutomationOption', changeArgs: `${i}, 'filterRank', this.value`, options: [
+        { value: 'all', label: (typeof t==='function'?t('hatchery_filter_all'):'All'), selected: cfg.filterRank === 'all' || !cfg.filterRank },
+        { value: 'S_or_better', label: 'Rang S+', selected: cfg.filterRank === 'S_or_better' },
+        { value: 'A_or_worse', label: 'Rang A-', selected: cfg.filterRank === 'A_or_worse' },
+      ]},
+      { label: (typeof t==='function'?t('filter_type'):'Type'), changeCall: 'setTrainingAutomationOption', changeArgs: `${i}, 'filterType', this.value`, options: [
+        { value: 'all', label: (typeof t==='function'?t('hatchery_filter_all'):'All'), selected: cfg.filterType === 'all' || !cfg.filterType },
+        { value: 'fire', label: 'Feu', selected: cfg.filterType === 'fire' },
+        { value: 'water', label: 'Eau', selected: cfg.filterType === 'water' },
+        { value: 'grass', label: 'Plante', selected: cfg.filterType === 'grass' },
+        { value: 'electric', label: 'Électrik', selected: cfg.filterType === 'electric' },
+        { value: 'normal', label: 'Normal', selected: cfg.filterType === 'normal' },
+        { value: 'fighting', label: 'Combat', selected: cfg.filterType === 'fighting' },
+        { value: 'flying', label: 'Vol', selected: cfg.filterType === 'flying' },
+        { value: 'poison', label: 'Poison', selected: cfg.filterType === 'poison' },
+        { value: 'ground', label: 'Sol', selected: cfg.filterType === 'ground' },
+        { value: 'rock', label: 'Roche', selected: cfg.filterType === 'rock' },
+        { value: 'bug', label: 'Insecte', selected: cfg.filterType === 'bug' },
+        { value: 'ghost', label: 'Spectre', selected: cfg.filterType === 'ghost' },
+        { value: 'steel', label: 'Acier', selected: cfg.filterType === 'steel' },
+        { value: 'psychic', label: 'Psy', selected: cfg.filterType === 'psychic' },
+        { value: 'ice', label: 'Glace', selected: cfg.filterType === 'ice' },
+        { value: 'dragon', label: 'Dragon', selected: cfg.filterType === 'dragon' },
+        { value: 'dark', label: 'Ténèbres', selected: cfg.filterType === 'dark' },
+        { value: 'fairy', label: 'Fée', selected: cfg.filterType === 'fairy' },
+      ]},
   { label: t('sort_label'), changeCall: 'setTrainingAutomationOption', changeArgs: `${i}, 'sort', this.value`, options: [
     {value:'ev_asc',label:t('auto_sort_ev_asc'),selected:cfg.sort==='ev_asc'},
     {value:'ev_desc',label:t('auto_sort_ev_desc'),selected:cfg.sort==='ev_desc'},

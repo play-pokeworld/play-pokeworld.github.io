@@ -394,6 +394,23 @@ function hatcheryCandidateEntries() {
     const ivTotal = pokemonIvTotal(p);
     if (cfg.filterIv === 'complete' && ivTotal < 36) continue;
     if (cfg.filterIv === 'incomplete' && ivTotal >= 36) continue;
+    if (cfg.filterFav === 'fav_only' && !(p.favorite || p.fav || p.locked)) continue;
+    if (cfg.filterFav === 'no_fav' && (p.favorite || p.fav || p.locked)) continue;
+    if (cfg.filterRegion && cfg.filterRegion !== 'all') {
+      const nid = Number(p.id);
+      const reg = nid <= 151 ? 'kanto' : nid <= 251 ? 'johto' : 'hoenn';
+      if (reg !== cfg.filterRegion) continue;
+    }
+    if (cfg.filterRank && cfg.filterRank !== 'all') {
+      const ivTotalVal = typeof pokemonIvTotal === 'function' ? pokemonIvTotal(p) : 0;
+      if (cfg.filterRank === 'S_or_better' && ivTotalVal < 24) continue;
+      if (cfg.filterRank === 'A_or_worse' && ivTotalVal >= 24) continue;
+    }
+    if (cfg.filterType && cfg.filterType !== 'all') {
+      const t1 = String(p.type1 || '').toLowerCase();
+      const t2 = String(p.type2 || '').toLowerCase();
+      if (t1 !== cfg.filterType && t2 !== cfg.filterType) continue;
+    }
     list.push({ key: k, uid: p.uid, p, iv: ivTotal, ev: pokemonEvTotal(p) });
   }
   const sort = cfg.sort || 'iv_desc';
