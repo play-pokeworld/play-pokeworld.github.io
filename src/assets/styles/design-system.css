@@ -9677,3 +9677,42 @@ button[data-action].pw-loc-gym-btn:hover,
   box-shadow: 0 0 14px rgba(255, 224, 186, 0.75) !important;
   transform: translateY(-2px);
 }
+
+
+/* ── App Update Banner (ECS UI Component) ── */
+.pw-update-banner {
+  background: var(--pw-bg-header);
+  border-bottom: 2px solid var(--pw-accent-color);
+  color: var(--pw-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  position: sticky;
+  top: 56px;
+  z-index: 940;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.45);
+}
+.pw-update-banner-btn {
+  background: var(--pw-accent-color) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  color: var(--dark1) !important;
+  font-weight: 800 !important;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 6px 14px;
+  transition: all 0.2s;
+}
+.pw-update-banner-btn:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+.pw-update-banner-close {
+  background: transparent !important;
+  border: none !important;
+  color: var(--pw-text-secondary) !important;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+}

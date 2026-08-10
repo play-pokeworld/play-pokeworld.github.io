@@ -1,3 +1,4 @@
+import { initUpdateSystem } from "./application/update-system.js";
 // PokeWorld — Single ES Module Entry Point (src/hand.js)
 
 // Wave 32 (section 3 — lazy loading): secondary dashboard screens are no
@@ -269,6 +270,7 @@ async function __pwLoadDeferredScreens() {
     }
   } catch (_) {}
   try { if (typeof window.startTrainingSlotTicker === 'function') window.startTrainingSlotTicker(); } catch (_) {}
+  try { initUpdateSystem(); } catch (_) {}
   window.__pwScreensReady = true;
   document.dispatchEvent(new CustomEvent('pw:screensReady'));
   try { PokeTrace.hit('boot', 'screens:ready'); } catch (_) {}

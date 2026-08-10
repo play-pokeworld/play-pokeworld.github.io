@@ -26,7 +26,58 @@ function _flushHeaderWindows(){
   try{ renderAutomationWindow(); }catch(_){}
   try{ renderShortcutsWindow(); }catch(_){}
 }
+
+function renderUpdateBanner(){
+  if (typeof document === 'undefined') return;
+  const existing = document.getElementById('pw-update-banner-container');
+  if (!G || !G.updateAvailable || G.updateBannerDismissed) {
+    if (existing) existing.remove();
+    return;
+  }
+  if (existing) return;
+  const container = document.createElement('div');
+  container.id = 'pw-update-banner-container';
+  container.className = 'pw-update-banner';
+  container.setAttribute('role', 'alert');
+
+  const textWrap = document.createElement('div');
+  textWrap.className = 'pw-update-banner-text';
+  textWrap.textContent = (typeof t === 'function' ? t('app_update_banner_text') : 'Une nouvelle version est disponible !');
+
+  const actionsWrap = document.createElement('div');
+  actionsWrap.className = 'pw-update-banner-actions';
+  actionsWrap.style.cssText = 'display:flex;align-items:center;gap:8px;';
+
+  const updateBtn = document.createElement('button');
+  updateBtn.className = 'pw-update-banner-btn';
+  updateBtn.type = 'button';
+  updateBtn.setAttribute('data-action', 'legacy-call');
+  updateBtn.setAttribute('data-call', 'applyAppUpdate');
+  updateBtn.textContent = (typeof t === 'function' ? t('app_update_banner_btn') : 'Mettre à jour');
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'pw-update-banner-close';
+  closeBtn.type = 'button';
+  closeBtn.setAttribute('data-action', 'legacy-call');
+  closeBtn.setAttribute('data-call', 'dismissAppUpdate');
+  closeBtn.setAttribute('aria-label', (typeof t === 'function' ? t('app_update_banner_close') : 'Fermer'));
+  closeBtn.textContent = '✕';
+
+  actionsWrap.appendChild(updateBtn);
+  actionsWrap.appendChild(closeBtn);
+  container.appendChild(textWrap);
+  container.appendChild(actionsWrap);
+
+  const header = document.getElementById('header');
+  if (header && header.nextSibling) {
+    header.parentNode.insertBefore(container, header.nextSibling);
+  } else if (header && header.parentNode) {
+    header.parentNode.appendChild(container);
+  }
+}
+
 function updateHeader(){
+  try{ renderUpdateBanner(); }catch(_){}
   try{
     const m = document.getElementById('h-money');
     if(m) m.textContent = (G && typeof G.money === 'number') ? G.money.toLocaleString() : '0';
