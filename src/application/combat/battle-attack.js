@@ -29,6 +29,19 @@ function battleEffKind(mult){
  if(mult < 1) return 'resist';
  return 'normal';
 }
+function isImmuneToStatus(poke, statusName, weather) {
+ if (!poke) return false;
+ const tal = poke.talent;
+ if (tal === 'insomnia' && statusName === 'sleep') return true;
+ if (tal === 'immunity' && (statusName === 'poison' || statusName === 'badpoison')) return true;
+ if (tal === 'limber' && statusName === 'para') return true;
+ if (tal === 'owntempo' && statusName === 'confuse') return true;
+ if (tal === 'magmaarmor' && statusName === 'freeze') return true;
+ if (tal === 'waterveil' && statusName === 'burn') return true;
+ if (tal === 'hydratation' && (weather === 'rainy' || weather === 'rain')) return true;
+ if (tal === 'wonderskin' && chance(50)) return true;
+ return false;
+}
 function spawnBattleFloat(side, text, kind='normal', sub=''){
  const card = getBattleSideCard(side);
  if(!card) return;
@@ -341,6 +354,10 @@ function executeAttack(attacker, defender, moveId, side){
  addBattleLog(tr('combat_attack_auto_5', {p0:defender.name}));
  return;
  }
+ if(mv.eff && isImmuneToStatus(defender, mv.eff, battle.weather)){
+   addBattleLog(`${defender.name} est immunisé grâce à son talent !`);
+   return;
+ }
  if(mv.eff==='para'){
  if(defender.type1==='Electric'||defender.type2==='Electric'||defender.type1==='Ground'||defender.type2==='Ground'){
  addBattleLog(tr('combat_attack_auto_6', {p0:defender.name}));
@@ -440,12 +457,23 @@ function executeAttack(attacker, defender, moveId, side){
  let atk = (isSpec ? (attacker.spa || attacker.atk) : attacker.atk) * atkBuff * atkModVal;
  let def = (isSpec ? (defender.spd || defender.def) : defender.def) * defBuff * defModVal;
 
+ if(defender.talent === 'intimidate' && !isSpec){
+   atk = Math.max(1, Math.floor(atk * 0.75));
+ }
+ if(attacker.talent === 'lightningrod' && isSpec){
+   atk = Math.floor(atk * 1.25);
+ }
+ if(defender.talent === 'livingshield' && defender.status && isSpec){
+   def *= 1.5;
+ }
+
  if((attacker.talent === 'hugepower' || attacker.talent === 'purepower') && !isSpec){
  atk *= 1.6;
  if(chance(35)) addBattleLog(t('combat_attack_auto_25'));
  }
  if(attacker.talent === 'solarpower' && isSpec){
  atk *= 1.3;
+ if(chance(35)) visualTalent(side, attacker.talent, '+30%');
  }
  if(attacker.talent === 'guts' && attacker.status && !isSpec){
  atk *= 1.5;
@@ -453,21 +481,20 @@ function executeAttack(attacker, defender, moveId, side){
  }
  if(attacker.talent === 'technician' && power <= 60){
  power = Math.floor(power * 1.5);
+ if(chance(35)){
+   visualTalent(side, attacker.talent, '+50%');
+   addBattleLog(`${attacker.name} renforce ${getMoveName(moveId)} avec Technicien !`);
  }
- if(attacker.talent === 'overgrow' && mv.type === 'Grass' && attacker.currentHP < attacker.maxHP * 0.35){
- power = Math.floor(power * 1.35);
- addBattleLog(t('combat_attack_auto_27'));
  }
- if(attacker.talent === 'blaze' && mv.type === 'Fire' && attacker.currentHP < attacker.maxHP * 0.35){
- power = Math.floor(power * 1.35);
- addBattleLog(t('combat_attack_auto_28'));
- }
- if(attacker.talent === 'torrent' && mv.type === 'Water' && attacker.currentHP < attacker.maxHP * 0.35){
- power = Math.floor(power * 1.35);
- addBattleLog(t('combat_attack_auto_29'));
- }
- if(attacker.talent === 'swarm' && mv.type === 'Bug' && attacker.currentHP < attacker.maxHP * 0.35){
- power = Math.floor(power * 1.35);
+ const LOW_HP_BOOST_MAP = {
+   overgrow: 'Grass', blaze: 'Fire', torrent: 'Water', swarm: 'Bug',
+   bastion: 'Steel', average: 'Normal', resolve: 'Fighting', mistify: 'Psychic',
+   hexerei: 'Ghost', glimmer: 'Fairy', skyward: 'Flying', draconic: 'Dragon',
+   noxious: 'Poison', solid: 'Rock', rime: 'Ice', voltage: 'Electric',
+   earthy: 'Ground', shadowy: 'Dark'
+ };
+ if(LOW_HP_BOOST_MAP[attacker.talent] === mv.type && attacker.currentHP < attacker.maxHP * 0.35){
+   power = Math.floor(power * 1.35);
  }
  if(attacker.talent === 'steelyspirit' && mv.type === 'Steel') power = Math.floor(power * 1.25);
 
@@ -543,6 +570,22 @@ function executeAttack(attacker, defender, moveId, side){
  }
  }
 
+ const TYPE_GUARD_MAP = {
+   flameguard: 'Fire', waterguard: 'Water', leafguard: 'Grass',
+   electricguard: 'Electric', voltage: 'Electric', iceguard: 'Ice', frostguard: 'Ice',
+   fightingguard: 'Fighting', grabguard: 'Fighting', poisonguard: 'Poison',
+   groundguard: 'Ground', flyingguard: 'Flying', psychicguard: 'Psychic',
+   bugguard: 'Bug', rockguard: 'Rock', ghostguard: 'Ghost', curseguard: 'Ghost',
+   dragonguard: 'Dragon', darkguard: 'Dark', sinisterguard: 'Dark',
+   steelguard: 'Steel', fairyguard: 'Fairy', normalguard: 'Normal', plainguard: 'Normal'
+ };
+ if(TYPE_GUARD_MAP[defender.talent] === mv.type){
+   dmg = Math.max(1, Math.floor(dmg * 0.5));
+ }
+ if(defender.talent === 'sturdy'){
+   dmg = Math.max(1, Math.floor(dmg * 0.85));
+ }
+
  if(defender.talent === 'sturdy' && dmg >= defender.currentHP && defender.currentHP >= defender.maxHP){
  dmg = defender.currentHP - 1;
  visualTalent(side === 'player' ? 'enemy' : 'player', defender.talent, '1 PV');
@@ -563,7 +606,7 @@ function executeAttack(attacker, defender, moveId, side){
  playHitAnim(side);
  visualDamage(side, dmg, eff, critMult>1);
 
- if(defender.talent === 'roughskin' && mv.cat === 'phys'){
+ if((defender.talent === 'roughskin' || defender.talent === 'ironbarbs' || defender.talent === 'spikypelt') && mv.cat === 'phys'){
  const refl = Math.max(1, Math.floor(attacker.maxHP * 0.12));
  attacker.currentHP = Math.max(0, attacker.currentHP - refl);
  addBattleLog(tr('combat_attack_auto_34', {p0:attacker.name, p1:refl}));
@@ -619,7 +662,7 @@ function executeAttack(attacker, defender, moveId, side){
  
  let secChance = mv.effC || 0;
  if(attacker.talent === 'serenegrace') secChance *= 2;
- if(mv.eff&&secChance&&defender.currentHP>0&&!defender.status){
+ if(mv.eff&&secChance&&defender.currentHP>0&&!defender.status&&!isImmuneToStatus(defender, mv.eff, battle.weather)){
  if(chance(secChance)){
  if(mv.eff==='burn'&&defender.type1!=='Fire'&&defender.type2!=='Fire'){
  defender.status='burn';defender.statusTurns=3;addBattleLog(tr('combat_attack_auto_40', {p0:defender.name}));

@@ -114,9 +114,11 @@ function buildTalentModel(p, idx, boxId){
    const hiddenTal = pokeData ? pokeData.hiddenAbility : null;
    if (hiddenTal && typeof getTalentName === 'function') {
      const haInfo = (typeof getTalentRecord === 'function') ? getTalentRecord(hiddenTal) : (TALENTS_FULL && TALENTS_FULL[hiddenTal] ? TALENTS_FULL[hiddenTal] : null);
+     const isUnlocked = (G.unlockedTalents?.[nid] || []).includes(hiddenTal) || (G.unlockedTalents?.[nid] || []).map(x=>String(x).toLowerCase()).includes(String(hiddenTal).toLowerCase());
      hidden = {
        isHidden: true,
-       label: (t('hidden_ability_label')||'Talent Caché') + ': ' + getTalentName(hiddenTal),
+       isUnlocked: isUnlocked,
+       label: (isUnlocked ? '★ ' : '🔒 ') + (t('hidden_ability_label') || 'Talent Caché') + ' : ' + getTalentName(hiddenTal) + (isUnlocked ? ' (' + (t('unlocked') || 'Débloqué') + ')' : ' (' + (t('locked') || 'Verrouillé') + ')'),
        rarity: haInfo && haInfo.rarity ? getRarityLabel(haInfo.rarity) : '',
        desc: haInfo ? getTalentDesc(hiddenTal) : '',
      };
@@ -154,9 +156,11 @@ function readonlyTalentModel(p){
    const hiddenTal = pokeData ? pokeData.hiddenAbility : null;
    if (hiddenTal && typeof getTalentName === 'function') {
      const haInfo = (typeof getTalentRecord === 'function') ? getTalentRecord(hiddenTal) : (TALENTS_FULL && TALENTS_FULL[hiddenTal] ? TALENTS_FULL[hiddenTal] : null);
+     const isUnlocked = (G.unlockedTalents?.[Number(p.id)] || []).includes(hiddenTal) || (G.unlockedTalents?.[Number(p.id)] || []).map(x=>String(x).toLowerCase()).includes(String(hiddenTal).toLowerCase());
      chips.push({
        isHidden: true,
-       label: (t('hidden_ability_label')||'Talent Caché') + ': ' + getTalentName(hiddenTal),
+       isUnlocked: isUnlocked,
+       label: (isUnlocked ? '★ ' : '🔒 ') + (t('hidden_ability_label') || 'Talent Caché') + ' : ' + getTalentName(hiddenTal) + (isUnlocked ? ' (' + (t('unlocked') || 'Débloqué') + ')' : ' (' + (t('locked') || 'Verrouillé') + ')'),
        rarity: haInfo && haInfo.rarity ? getRarityLabel(haInfo.rarity) : '',
        desc: haInfo ? getTalentDesc(hiddenTal) : '',
      });

@@ -21,6 +21,21 @@ function isWildChillChainActive(){
 
 function endBattle(){
  if(typeof restoreAllTransformedPokemon === 'function') restoreAllTransformedPokemon();
+ try {
+   if (typeof G !== 'undefined' && G && Array.isArray(G.team)) {
+     G.team.forEach(p => {
+       if (!p || p.currentHP <= 0) return;
+       if (p.talent === 'naturalcure' && p.status) {
+         p.status = null;
+         p.statusTurns = 0;
+       }
+       if (p.talent === 'regenerator' && p.currentHP < p.maxHP) {
+         const heal = Math.max(1, Math.floor(p.maxHP * 0.25));
+         p.currentHP = Math.min(p.maxHP, p.currentHP + heal);
+       }
+     });
+   }
+ } catch (_) {}
  clearInterval(battle.timerId);
  const hadLoot = !battle.isChamp && !battle.isQuestTrainerBattle && !battle.isBaseNpcBattle && !battle.isQuestDefeatBattle && ((((battle.sessionCatches||[]).length)||Object.keys(battle.sessionItems||{}).length||(battle.sessionWins||0)||(battle.sessionPlayerKOs||0)));
  const wasAtollLoss = !!battle.isAtollBattle;

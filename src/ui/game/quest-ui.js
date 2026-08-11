@@ -66,7 +66,7 @@ function renderStoryWindow(){
  if(def.type==='trainer_battle' && !done){
   card.action = { cls: 'is-challenge', call: 'startQuestTrainerBattle', callArgs: `'${inst.qid}','${cat}'`, label: t('quest_challenge_btn') };
  } else if(done){
-  card.action = { cls: 'is-done' + ((cat==='main'&&def.rewardPoke) ? ' is-challenge' : ''), call: 'claimQuest', callArgs: `'${inst.qid}','${cat}'`, label: (cat==='main' && def.rewardPoke) ? t('quest_challenge_btn') : (def.type==='trainer_battle' ? t('quest_challenge_btn') : t("m.quest_ui.26")) };
+  card.action = { cls: 'is-done', call: 'claimQuest', callArgs: `'${inst.qid}','${cat}'`, label: t("m.quest_ui.26") };
  }
  if(def.type==='badge'){
   card.kind = 'text'; card.bodyText = done ? t("m.quest_ui.25") : t("m.quest_ui.24");

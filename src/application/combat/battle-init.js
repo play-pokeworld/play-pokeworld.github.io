@@ -207,7 +207,17 @@ function effectiveSpeed(poke, mods){
  if(b && b.spe) s *= (1 + b.spe);
  }catch(_){}
  if(poke.status==='para') s*=0.5;
- return Math.max(5,s);
+ try{
+   const tal = poke.talent;
+   const w = (typeof battle !== 'undefined' && battle) ? battle.weather : null;
+   if(tal === 'chlorophyll' && (w === 'sunny' || w === 'sun')) s *= 1.35;
+   else if(tal === 'swiftswim' && (w === 'rainy' || w === 'rain')) s *= 1.5;
+   else if(tal === 'sandrush' && (w === 'sand' || w === 'sandstorm')) s *= 1.5;
+   else if(tal === 'slushrush' && (w === 'hail' || w === 'snow')) s *= 1.5;
+   else if(tal === 'quickfeet' && poke.status) s *= 1.5;
+   else if(tal === 'unburden' && !poke.heldItem) s *= 1.5;
+ }catch(_){}
+ return Math.max(5,Math.floor(s));
 }
 
 

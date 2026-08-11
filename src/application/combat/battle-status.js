@@ -36,14 +36,16 @@ function applyEndOfTurnStatus(p){
  if(!p||p.currentHP<=0) return;
  
  
- if(p.talent === 'speedboost' || p.talent === 'quickfeet' || p.talent === 'swiftswim' || p.talent === 'chlorophyll'){
+ if(p.talent === 'speedboost'){
  const isPlayerSide = (p === getActivePlayerPoke() || p === G.team[battle.playerPokeIdx]);
  const mods = isPlayerSide ? battle.playerMods : battle.enemyMods;
  if(mods) mods.spe = Math.min(3.0, (mods.spe || 1) * 1.15);
  }
  
- 
- if(p.status==='burn'){
+ if(p.talent === 'magicguard'){
+   // Immunisé aux dégâts de statut et indirects
+ }
+ else if(p.status==='burn'){
  const bd=Math.max(1,Math.floor(p.maxHP/16));
  p.currentHP=Math.max(0,p.currentHP-bd);
  try{ spawnBattleFloat((p === getActivePlayerPoke() || p === G.team[battle.playerPokeIdx]) ? 'player' : 'enemy', '-' + bd, 'status burn', 'bru'); }catch(_){}

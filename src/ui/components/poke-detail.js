@@ -20,6 +20,7 @@
  * @module ui/components/poke-detail
  */
 import { h, toHTMLString } from '../../engine/render/vdom.js';
+import { cx } from './component-utils.js';
 
 /* ── Stat row (base / IV / EV) ─────────────────────────────────────────── */
 export function statRowVNode(row) {
@@ -57,8 +58,8 @@ export function rankPanelVNode(m) {
 /* ── Ability chip (talent / hidden talent) ─────────────────────────────── */
 export function abilityChipVNode(chip) {
   return h('div', {
-    class: `poke-detail-ability-chip${chip.isHidden ? ' is-hidden' : ''}`,
-    style: chip.isHidden ? { opacity: '0.7', border: '1px dashed var(--light1)' } : null,
+    class: cx('poke-detail-ability-chip', chip.isHidden && 'pw-hidden-ability-chip', chip.isUnlocked ? 'pw-ha-unlocked' : 'pw-ha-locked'),
+    style: chip.isHidden ? (chip.isUnlocked ? { border: '1px solid var(--accent)', background: 'rgba(236,222,183,0.14)', marginTop: '8px' } : { opacity: '0.85', border: '1px dashed var(--light1)', marginTop: '8px' }) : null,
   },
     h('span', null, chip.label || ''),
     chip.rarity ? h('small', null, chip.rarity) : null);

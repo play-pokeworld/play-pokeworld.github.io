@@ -47,6 +47,19 @@ function doSwitchBattlePoke(idx){
  return;
  }
 if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
+ try {
+   const oldP = G.team[battle.playerPokeIdx];
+   if (oldP && oldP.currentHP > 0 && oldP !== p) {
+     if (oldP.talent === 'naturalcure' && oldP.status) {
+       oldP.status = null;
+       oldP.statusTurns = 0;
+     }
+     if (oldP.talent === 'regenerator' && oldP.currentHP < oldP.maxHP) {
+       const heal = Math.max(1, Math.floor(oldP.maxHP * 0.25));
+       oldP.currentHP = Math.min(oldP.maxHP, oldP.currentHP + heal);
+     }
+   }
+ } catch (_) {}
  battle.playerPokeIdx=idx;
  battle.playerMods={atk:1,def:1,spe:1};
  battle.pMoveIdx=0;

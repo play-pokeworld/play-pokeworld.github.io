@@ -76,8 +76,11 @@ function t(key){
 function tr(key, params){
  let s = t(key);
  if(params && typeof s === 'string'){
- for(const k in params){s = s.split('{'+k+'}').join(params[k]);}
-}
+  for(const k in params){s = s.split('{'+k+'}').join(params[k] == null ? '' : params[k]);}
+ }
+ if(typeof s === 'string'){
+  s = s.replace(/\{hidden\}/g, '');
+ }
  return s;
 }
 

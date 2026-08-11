@@ -85,12 +85,33 @@ function generatePokeCardHTML(p, i, options = {}) {
   };
 
   const sideMods = isEnemy ? battle.enemyMods : battle.playerMods;
-  const pAtkMod = (sideMods?.atk || 1) * (1 + (b.atk || 0));
-  const pDefMod = (sideMods?.def || 1) * (1 + (b.def || 0));
-  const pSpeMod = (sideMods?.spe || 1) * (1 + (b.spe || 0));
+  let pAtkMod = (sideMods?.atk || 1) * (1 + (b.atk || 0));
+  let pDefMod = (sideMods?.def || 1) * (1 + (b.def || 0));
+  let pSpeMod = (sideMods?.spe || 1) * (1 + (b.spe || 0));
+  let pSpaMod = (sideMods?.spa || 1) * (1 + (b.spa || 0));
+  let pSpdMod = (sideMods?.spd || 1) * (1 + (b.spd || 0));
+
+  const tal = p.talent;
+  const w = battle ? battle.weather : null;
+  if (tal === 'chlorophyll' && (w === 'sunny' || w === 'sun')) pSpeMod *= 1.35;
+  else if (tal === 'swiftswim' && (w === 'rainy' || w === 'rain')) pSpeMod *= 1.5;
+  else if (tal === 'sandrush' && (w === 'sand' || w === 'sandstorm')) pSpeMod *= 1.5;
+  else if (tal === 'slushrush' && (w === 'hail' || w === 'snow')) pSpeMod *= 1.5;
+  else if (tal === 'quickfeet' && p.status) pSpeMod *= 1.5;
+  else if (tal === 'unburden' && !p.heldItem) pSpeMod *= 1.5;
+
+  if (tal === 'hugepower' || tal === 'purepower') pAtkMod *= 1.6;
+  else if (tal === 'guts' && p.status) pAtkMod *= 1.5;
+
+  if (tal === 'solarpower') pSpaMod *= 1.3;
+  if (tal === 'marvelscale' && p.status) pDefMod *= 1.5;
+  if (tal === 'livingshield' && p.status) pSpdMod *= 1.5;
+
   const atkArrow = getArrows(pAtkMod);
   const defArrow = getArrows(pDefMod);
   const speArrow = getArrows(pSpeMod);
+  const spaArrow = getArrows(pSpaMod);
+  const spdArrow = getArrows(pSpdMod);
 
   let statusBadgesHtml = '';
   if (showStatus) {
@@ -100,6 +121,8 @@ function generatePokeCardHTML(p, i, options = {}) {
     if (atkArrow) statusBadgesHtml += '<span class="buff-badge ' + (atkArrow.includes('\u25B2') ? 'atk-up' : 'atk-down') + '">ATK ' + atkArrow + '</span>';
     if (defArrow) statusBadgesHtml += '<span class="buff-badge ' + (defArrow.includes('\u25B2') ? 'def-up' : 'def-down') + '">DEF ' + defArrow + '</span>';
     if (speArrow) statusBadgesHtml += '<span class="buff-badge ' + (speArrow.includes('\u25B2') ? 'spe-up' : 'spe-down') + '">VIT ' + speArrow + '</span>';
+    if (spaArrow) statusBadgesHtml += '<span class="buff-badge ' + (spaArrow.includes('\u25B2') ? 'atk-up' : 'atk-down') + '">SPA ' + spaArrow + '</span>';
+    if (spdArrow) statusBadgesHtml += '<span class="buff-badge ' + (spdArrow.includes('\u25B2') ? 'def-up' : 'def-down') + '">SPD ' + spdArrow + '</span>';
   }
 
   // Held item badge (readonly ⇒ info sheet only; hidden when empty).
