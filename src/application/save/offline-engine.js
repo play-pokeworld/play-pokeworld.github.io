@@ -97,6 +97,12 @@ function offlineScheduleCatchup(_reason){
 }
 function offlinePollHeartbeat(){
   const now = saveNow();
+  const afkModal = typeof document !== 'undefined' ? document.getElementById('afk-result-modal') : null;
+  if(afkModal && afkModal.classList.contains('open')){
+    offlineLastHeartbeat = now;
+    offlinePersistSeen(now);
+    return;
+  }
   if(typeof window === 'undefined' || !window.PokeWorldGameStarted || offlineEngineApplying || typeof G === 'undefined' || !G || !hasStarterInState(G)){
     offlineLastHeartbeat = now;
     return;
@@ -703,7 +709,10 @@ async function offlineSimulate(ms, reason){
     } else if(wantRecap){
       try{ showAfkResultPanel(result); }catch(_){ }
     } else {
-      try{ closeAfkResultPanel(); }catch(_){ }
+      const modal = typeof document !== 'undefined' ? document.getElementById('afk-result-modal') : null;
+      if(modal && !modal.classList.contains('open')){
+        try{ closeAfkResultPanel(); }catch(_){ }
+      }
     }
     try{
       if(result.boundedBattle){
@@ -724,6 +733,7 @@ async function offlineSimulate(ms, reason){
     try{ if(document.getElementById('map-svg')) renderMap(); }catch(_){ }
     try{ saveGame(false); }catch(_){ }
     offlineEngineApplying = false;
+    try{ offlineLastHeartbeat = saveNow(); offlinePersistSeen(offlineLastHeartbeat); }catch(_){ }
     OfflineEngine._lastResult = result;
     return result;
   }

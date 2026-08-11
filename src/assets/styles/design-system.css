@@ -9903,31 +9903,36 @@ button[data-action].pw-loc-gym-btn:hover,
   }
 }
 
-/* ── 3. Shortcuts Tab — Zero Margin Below Buttons & Compact Auto-Fit Grid ── */
+/* ── 3. Shortcuts Tab — Zero Margin Below Buttons & Compact Grid ── */
 @media (max-width: 850px), (pointer: coarse) {
   body.mobile-mode #win-shortcuts {
     order: 15;
     height: auto !important;
     min-height: 0 !important;
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
+    max-height: none !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
+  body.mobile-mode #win-shortcuts .win-body,
   body.mobile-mode #shortcuts-window-body {
-    padding: 6px 8px !important;
-    margin-bottom: 0 !important;
-    min-height: 0 !important;
-  }
-  body.mobile-mode .shortcuts-grid {
     display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
-    gap: 6px !important;
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    padding: 8px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    flex: 0 0 auto !important;
+    flex-grow: 0 !important;
+    margin: 0 !important;
   }
-  body.mobile-mode .shortcut-action-btn {
-    padding: 8px 10px !important;
-    min-height: 38px !important;
-    margin-bottom: 0 !important;
+  body.mobile-mode #shortcuts-window-body .shortcut-action-btn {
+    width: 100% !important;
+    padding: 10px !important;
+    min-height: 42px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
   }
 }
 
@@ -9948,11 +9953,21 @@ button[data-action].pw-loc-gym-btn:hover,
     width: 100% !important;
     box-sizing: border-box !important;
   }
-  .team-container,
-  #battle-team-row {
+  .team-container {
     display: grid !important;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
     gap: 8px !important;
+  }
+  #battle-team-row {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 100% !important;
+  }
+  #battle-team-row .poke-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
   }
   .pw-poke-card,
   .poke-card {
