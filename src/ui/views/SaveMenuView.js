@@ -58,7 +58,7 @@ export class SaveMenuView extends UIView {
               ? h('div', { class: 'save-menu-empty' },
                   h('div', { class: 'save-menu-empty-icon' }, '◇'),
                   h('h2', null, m.empty.title || ''),
-                  h('p', null, m.empty.desc || ''))
+                  h('p', null, h.raw(m.empty.desc || '')))
               : null,
             ...(Array.isArray(m.cardsHtml) ? m.cardsHtml.filter(Boolean).map((html) => h.raw(html)) : [])),
           h('button', {

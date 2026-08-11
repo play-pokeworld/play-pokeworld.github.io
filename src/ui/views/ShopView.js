@@ -36,7 +36,7 @@ export class ShopView extends UIView {
       return h('div', { class: 'pw-empty-state-lg' },
         h('div', { class: 'pw-big-icon' }),
         h('div', { class: 'pw-choice-title' }, (m.locked && m.locked.title) || ''),
-        h('div', { class: 'pw-choice-desc' }, (m.locked && m.locked.desc) || ''));
+        h('div', { class: 'pw-choice-desc' }, h.raw((m.locked && m.locked.desc) || '')));
     }
     if (m.state !== 'ok' || !Array.isArray(m.items) || !m.items.length) {
       return h('div', { class: 'pw-empty-state-lg' }, m.emptyLabel || '');
@@ -49,7 +49,7 @@ export class ShopView extends UIView {
         h('div', { class: 'pw-choice-icon' }, h.raw(it.spriteHtml || '')),
         h('div', { class: 'pw-flex-1' },
           h('div', { class: 'pw-manage-name' }, it.name || ''),
-          h('div', { class: 'pw-choice-sub' }, it.desc || ''),
+          h('div', { class: 'pw-choice-sub' }, h.raw(it.desc || '')),
           h('div', { class: 'pw-choice-sub' },
             it.stockLabel || '',
             it.maxLabel ? h('span', { class: 'pw-red' }, ` ${it.maxLabel}`) : null)),

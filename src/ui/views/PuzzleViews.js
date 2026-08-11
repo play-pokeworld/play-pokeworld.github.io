@@ -170,7 +170,7 @@ export class SpecialFormsView extends UIView {
           h('div', { class: 'pw-manage-name' }, r.nameLabel || ''),
           r.owned
             ? h('div', { class: 'pw-text-sm pw-green' }, r.ownedText || '')
-            : h('div', { class: 'pw-manage-desc pw-text-sm' }, r.descText || '')),
+            : h('div', { class: 'pw-manage-desc pw-text-sm' }, h.raw(r.descText || ''))),
         h('div', { class: 'pw-manage-level' }, r.sideText || '')));
     }
     return nodes;

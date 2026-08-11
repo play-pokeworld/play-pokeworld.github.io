@@ -345,7 +345,7 @@ export class BaseNpcItemPickerView extends UIView {
               h('div', { class: 'inv-icon' }, h.raw(r.spriteHtml || '')),
               h('div', { class: 'pw-flex-1' },
                 h('div', { class: 'inv-name' }, r.nameText || ''),
-                h('div', { class: 'inv-desc' }, r.descText || ''))))
+                h('div', { class: 'inv-desc' }, h.raw(r.descText || '')))))
           : h('div', { class: 'pw-empty-state-md' }, m.emptyLabel || '')),
       h('div', { class: 'pw-btn-group' },
         m.remove

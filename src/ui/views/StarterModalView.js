@@ -49,7 +49,7 @@ export class StarterModalView extends UIView {
           h('div', { class: 'poke-sprite' }, st.spriteHtml ? h.raw(st.spriteHtml) : null),
           h('div', { class: 'pw-flex-1' },
             h('div', { class: 'poke-name pw-text-md' }, st.name || '?', h('span', { class: 'pw-text-sm' }, ` #${st.id}`)),
-            h('div', { class: 'pw-text-glow' }, st.desc || '')),
+            h('div', { class: 'pw-text-glow' }, h.raw(st.desc || ''))),
           h('div', null, m.chooseLabel || '')))),
       h('div', { class: 'pw-text-sm pw-light1 pw-center' }, m.required || ''));
   }

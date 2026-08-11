@@ -217,7 +217,7 @@ export class RepeatableUpgradeView extends UIView {
           }, h.raw(m.buy.label || ''))
         : h('span', { class: 'pw-text-sm pw-light1' }, m.maxText || '')),
     h('div', { class: 'pw-panel pw-info-section' },
-      h('div', { class: 'pw-text-sm pw-light1' }, m.descText || ''))];
+      h('div', { class: 'pw-text-sm pw-light1' }, h.raw(m.descText || '')))];
   }
 
   onLoad() {
