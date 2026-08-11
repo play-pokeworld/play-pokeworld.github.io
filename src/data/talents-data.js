@@ -781,7 +781,7 @@ export const TALENTS = {
     "id": "ironFist",
     "name": "ironFist",
     "name_fr": "ironFist",
-    "desc": "\"Punch\"-related moves have their base power multiplied by x1.5 <span style=\"opacity:0.7\">()</span>",
+    "desc": "\"Punch\"-related moves have their base power multiplied by x1.5.",
     "rarity": 2,
     "type": ["fighting"]
   },
@@ -1321,7 +1321,7 @@ export const TALENTS = {
     "id": "sharpness",
     "name": "sharpness",
     "name_fr": "sharpness",
-    "desc": "\"Sharp\"-related moves have their base power multiplied by x1.5 <span style=\"opacity:0.7\">()</span>",
+    "desc": "\"Sharp\"-related moves have their base power multiplied by x1.5.",
     "rarity": 3,
     "type": ["steel"]
   },
@@ -1519,7 +1519,7 @@ export const TALENTS = {
     "id": "strongJaw",
     "name": "strongJaw",
     "name_fr": "strongJaw",
-    "desc": "\"Fang\"-related moves have their base power multiplied by x2 <span style=\"opacity:0.7\">()</span>",
+    "desc": "\"Fang\"-related moves have their base power multiplied by x2.",
     "rarity": 2,
     "type": ["dark"]
   },
@@ -1627,7 +1627,7 @@ export const TALENTS = {
     "id": "toughClaws",
     "name": "toughClaws",
     "name_fr": "toughClaws",
-    "desc": "\"Claw\"-related moves have their base power multiplied by x2 <span style=\"opacity:0.7\">()</span>",
+    "desc": "\"Claw\"-related moves have their base power multiplied by x2.",
     "rarity": 2,
     "type": ["dragon"]
   },

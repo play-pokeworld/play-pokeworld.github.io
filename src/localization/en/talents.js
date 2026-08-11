@@ -362,15 +362,15 @@ export const L_en_talents = {
   },
   "strongjaw": {
     "name": "Strong Jaw",
-    "desc": "\"Fang\"-related moves have their base power multiplied by x2 <span style=\"opacity:0.7\">()</span>"
+    "desc": "\"Fang\"-related moves have their base power multiplied by x2."
   },
   "toughclaws": {
     "name": "Tough Claws",
-    "desc": "\"Claw\"-related moves have their base power multiplied by x2 <span style=\"opacity:0.7\">()</span>"
+    "desc": "\"Claw\"-related moves have their base power multiplied by x2."
   },
   "ironfist": {
     "name": "Iron Fist",
-    "desc": "\"Punch\"-related moves have their base power multiplied by x1.5 <span style=\"opacity:0.7\">()</span>"
+    "desc": "\"Punch\"-related moves have their base power multiplied by x1.5."
   },
   "rivalry": {
     "name": "Rivalry",
@@ -478,7 +478,7 @@ export const L_en_talents = {
   },
   "sharpness": {
     "name": "Sharpness",
-    "desc": "\"Sharp\"-related moves have their base power multiplied by x1.5 <span style=\"opacity:0.7\">()</span>"
+    "desc": "\"Sharp\"-related moves have their base power multiplied by x1.5."
   },
   "angerpoint": {
     "name": "Anger Point",

@@ -342,6 +342,7 @@ function renderPokemonDetailModal(p, opts){
 
 
 function openPokeModal(idx){
+  try { if (typeof tutorialMark === 'function') tutorialMark('open_poke_sheet'); else if (window.tutorialMark) window.tutorialMark('open_poke_sheet'); } catch(_){}
   window._POKEMODAL_SOURCE = 'team';
   const p = (typeof G !== 'undefined' && G && G.team) ? G.team[idx] : null;
   if (!p) { if(typeof moveEditorFor !== 'undefined') moveEditorFor = null; return; }
@@ -731,6 +732,7 @@ if (typeof openMoveInfo !== 'undefined') { if (typeof window !== 'undefined') wi
 
 
 function openBoxPokeModal(boxId) {
+  try { if (typeof tutorialMark === 'function') tutorialMark('open_poke_sheet'); else if (window.tutorialMark) window.tutorialMark('open_poke_sheet'); } catch(_){}
   window._POKEMODAL_SOURCE = 'box';
   const p = (typeof G !== 'undefined' && G && G.collection) ? (G.collection[boxId] || G.collection[String(boxId)]) : null;
   if (!p) return;
