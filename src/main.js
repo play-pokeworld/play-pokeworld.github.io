@@ -295,16 +295,6 @@ window.__pwBootContinuation = new Promise((resolve) => {
   else window.addEventListener('DOMContentLoaded', run, { once: true });
 });
 
-// Mobile Filter Toolbar Drawer/Accordion Toggle (user-validated mobile preference)
-if (typeof document !== 'undefined') {
-  document.addEventListener('click', (e) => {
-    const tb = e.target.closest('.ui-control-toolbar, .box-filter-panel, .box-filter-bar, .dict-toolbar, .inv-toolbar');
-    if (!tb) return;
-    if (e.target.closest('input, select, button, a, label')) return;
-    tb.classList.toggle('mobile-drawer-open');
-  });
-}
-
 // Note: the single canonical engine lives under src/engine/ (ECS core). The
 // legacy engine copies formerly duplicated under src/game/ have been removed;
 // every module above is imported exactly once from its canonical location.

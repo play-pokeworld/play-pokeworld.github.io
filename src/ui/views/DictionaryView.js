@@ -56,6 +56,12 @@ export class DictionaryView extends UIView {
     });
     // Compat: legacy markup expects .dict-tabs > hbtn.dict-tab wrappers.
     this.toolbarEntity.get(UIRenderComponent).template = (e) => h('div', { class: 'dict-toolbar pw-ui-toolbar', dataset: { fixed: 'true', pwEid: String(e.id) } },
+      h('button', {
+        type: 'button',
+        class: 'hbtn pw-drawer-toggle',
+        title: 'Tiroir de filtres',
+        dataset: { action: 'legacy-call', call: 'toggleMobileDrawer', callArgs: "''" },
+      }, ''),
       h('div', { class: 'dict-tabs' }, (model.tabs || []).map((tab) => h('button', {
         type: 'button',
         class: cx('hbtn dict-tab', tab.active && 'active'),

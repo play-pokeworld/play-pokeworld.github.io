@@ -50,6 +50,12 @@ export function filterBarVNode(model = {}) {
     class: cx('box-filter-panel ui-control-toolbar ui-control-toolbar--box pw-ui-toolbar pw-filterbar', model.className),
     dataset,
   },
+    h('button', {
+      type: 'button',
+      class: 'hbtn pw-drawer-toggle',
+      title: 'Tiroir de filtres',
+      dataset: { action: 'legacy-call', call: 'toggleMobileDrawer', callArgs: "''" },
+    }, ''),
     chips.length
       ? h('div', { class: cx('pw-chip-row', model.chipsRowClass || 'inv-tabs') },
           ...chips.map((chip) => h('button', {

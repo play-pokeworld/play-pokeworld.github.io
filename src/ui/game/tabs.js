@@ -39,8 +39,24 @@ function showTab(tab){
 }
 
 
+function toggleMobileDrawer(e) {
+  let tb = null;
+  if (e && e.target && typeof e.target.closest === 'function') {
+    const btn = e.target.closest('.pw-drawer-toggle, button');
+    if (btn) tb = btn.closest('.box-filter-panel, .dict-toolbar, .inv-toolbar');
+  }
+  if (!tb && typeof document !== 'undefined') {
+    const activeBtn = document.activeElement;
+    if (activeBtn) tb = activeBtn.closest('.box-filter-panel, .dict-toolbar, .inv-toolbar');
+  }
+  if (tb) {
+    tb.classList.toggle('mobile-drawer-open');
+  }
+}
+
 // --- Migrated to ES module, globals exposed ---
 if (typeof showTab !== 'undefined') { if (typeof window !== 'undefined') window.showTab = showTab; if (typeof globalThis !== 'undefined') globalThis.showTab = showTab; }
+if (typeof toggleMobileDrawer !== 'undefined') { if (typeof window !== 'undefined') window.toggleMobileDrawer = toggleMobileDrawer; if (typeof globalThis !== 'undefined') globalThis.toggleMobileDrawer = toggleMobileDrawer; }
 
 
 
@@ -48,10 +64,11 @@ if (typeof showTab !== 'undefined') { if (typeof window !== 'undefined') window.
 // classic surface kept above (bodies unchanged).
 export {
   showTab,
+  toggleMobileDrawer,
 };
 
 // Wave 42 — engine-registry absorption: these dispatched actions
 // register in the registry (registry-first dispatcher = engine
 // indirection instead of the window fallback); the window surface is kept for
 // classic cross-module consumers (documented duplicate, T2-B).
-if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('showTab', showTab); } catch (_) {} }
+if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('showTab', showTab); PokeActions.register('toggleMobileDrawer', toggleMobileDrawer); } catch (_) {} }

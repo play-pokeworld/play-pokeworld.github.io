@@ -9773,6 +9773,35 @@ button[data-action].pw-loc-gym-btn:hover,
    MOBILE RESPONSIVE ENHANCEMENTS — ALL DISPLAYS & SCREENS (USER VALIDATED)
    ========================================================================== */
 
+/* ── 0. Prevent Long-Press Callouts (Copy Image / Google Lens / Share) on Mobile ── */
+@media (max-width: 850px), (pointer: coarse) {
+  body.mobile-mode,
+  body.mobile-mode *,
+  #map-svg,
+  #map-panel,
+  #map-terrain image,
+  .sprite-img,
+  .pw-poke-circle-img,
+  img,
+  svg,
+  canvas,
+  button,
+  .hbtn,
+  .mob-btn,
+  .mob-sub-btn,
+  .shortcut-action-btn {
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+  }
+  input[type="text"],
+  input[type="search"],
+  textarea {
+    -webkit-user-select: text !important;
+    user-select: text !important;
+  }
+}
+
 /* ── 1. Header & Global Navigation Sizing on Mobile ── */
 @media (max-width: 850px), (pointer: coarse) {
   #header {
@@ -9798,11 +9827,111 @@ button[data-action].pw-loc-gym-btn:hover,
   .dash-win {
     width: 100% !important;
     max-width: 100% !important;
-    margin-bottom: 10px !important;
+    margin-bottom: 8px !important;
   }
 }
 
-/* ── 2. Story / Quests, Active Team, Hatchery & Mine Windows on Mobile ── */
+/* ── 2. Save Menu & Settings Windows — Compact Sizing so Cards are Never Cut Off ── */
+@media (max-width: 850px), (pointer: coarse) {
+  .save-menu-screen {
+    padding: 8px !important;
+  }
+  .save-menu-panel {
+    width: 100% !important;
+    max-width: 98vw !important;
+    max-height: 94dvh !important;
+    padding: 12px !important;
+    grid-template-rows: auto 1fr auto !important;
+    gap: 10px !important;
+    border-radius: 16px !important;
+  }
+  #save-menu-title {
+    font-size: clamp(24px, 6vw, 32px) !important;
+  }
+  .save-menu-kicker {
+    padding: 2px 8px !important;
+    font-size: 10px !important;
+  }
+  #save-menu-subtitle {
+    font-size: 12px !important;
+  }
+  .save-menu-list {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    padding: 2px !important;
+    min-height: 0 !important;
+  }
+  .save-slot {
+    padding: 10px 12px !important;
+    gap: 6px !important;
+  }
+  .save-slot-top,
+  .save-slot-bottom {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+  .save-slot-stats {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 4px 10px !important;
+    font-size: 11px !important;
+  }
+  .save-menu-actions {
+    gap: 8px !important;
+  }
+  .save-menu-actions .hbtn {
+    min-width: 130px !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+  }
+
+  #settings-inner {
+    width: 100% !important;
+    max-width: 96vw !important;
+    max-height: 92dvh !important;
+    padding: 14px !important;
+    overflow-y: auto !important;
+  }
+  #settings-inner .theme-grid,
+  #settings-inner .pw-settings-choices,
+  #settings-inner .save-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+}
+
+/* ── 3. Shortcuts Tab — Zero Margin Below Buttons & Compact Auto-Fit Grid ── */
+@media (max-width: 850px), (pointer: coarse) {
+  body.mobile-mode #win-shortcuts {
+    order: 15;
+    height: auto !important;
+    min-height: 0 !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  body.mobile-mode #shortcuts-window-body {
+    padding: 6px 8px !important;
+    margin-bottom: 0 !important;
+    min-height: 0 !important;
+  }
+  body.mobile-mode .shortcuts-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
+    gap: 6px !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  body.mobile-mode .shortcut-action-btn {
+    padding: 8px 10px !important;
+    min-height: 38px !important;
+    margin-bottom: 0 !important;
+  }
+}
+
+/* ── 4. Story / Quests, Active Team, Hatchery, Mine & Live Battle on Mobile ── */
 @media (max-width: 850px), (pointer: coarse) {
   #win-story .win-body,
   #win-team .win-body,
@@ -9831,10 +9960,6 @@ button[data-action].pw-loc-gym-btn:hover,
     width: 100% !important;
     box-sizing: border-box !important;
   }
-}
-
-/* ── 3. Live Battle Scene Sizing on Mobile ── */
-@media (max-width: 850px), (pointer: coarse) {
   #battle-center-panel,
   #battle-active-scene {
     width: 100% !important;
@@ -9849,7 +9974,7 @@ button[data-action].pw-loc-gym-btn:hover,
   }
 }
 
-/* ── 4. Tabs Navigation & Sub-screens (PC Box, Pokédex, Bag, Base, Atoll) on Mobile ── */
+/* ── 5. Tabs Navigation & Sub-screens (PC Box, Pokédex, Bag, Base, Atoll) on Mobile ── */
 @media (max-width: 850px), (pointer: coarse) {
   .pw-tabs-nav,
   #win-tabs .pw-win-hdr {
@@ -9887,17 +10012,19 @@ button[data-action].pw-loc-gym-btn:hover,
   }
 }
 
-/* ── 5. Compact Drawer/Accordion for Filters on Mobile PC Box, Pokédex, and Bag ── */
+/* ── 6. Compact Drawer/Accordion ONLY for PC Box, Pokédex, and Bag Filters ── */
+.pw-drawer-toggle {
+  display: none !important;
+}
+
 @media (max-width: 850px), (pointer: coarse) {
-  .ui-control-toolbar,
   .box-filter-panel,
-  .box-filter-bar,
   .dict-toolbar,
   .inv-toolbar {
     display: flex !important;
     flex-wrap: wrap !important;
     gap: 6px !important;
-    padding: 6px 10px !important;
+    padding: 6px 44px 6px 10px !important;
     background: var(--dark2) !important;
     border-radius: 12px !important;
     border: 1px solid var(--dark3) !important;
@@ -9905,51 +10032,55 @@ button[data-action].pw-loc-gym-btn:hover,
     overflow: hidden;
     transition: max-height 0.35s ease, box-shadow 0.35s ease;
     position: relative;
-    cursor: pointer;
   }
 
-  .ui-control-toolbar::after,
-  .box-filter-panel::after,
-  .box-filter-bar::after,
-  .dict-toolbar::after,
-  .inv-toolbar::after {
-    content: "⚙️ Filtres ▾";
-    font-size: 11px;
-    font-weight: bold;
-    color: var(--light2);
-    position: absolute;
-    right: 12px;
-    top: 14px;
-    background: rgba(0,0,0,0.35);
-    padding: 2px 8px;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.12);
-    pointer-events: none;
+  .pw-drawer-toggle {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 8px !important;
+    background: var(--dark3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #FFFFFF !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    position: absolute !important;
+    right: 8px !important;
+    top: 8px !important;
+    z-index: 10 !important;
   }
 
-  .ui-control-toolbar.mobile-drawer-open,
+  .pw-drawer-toggle::after {
+    content: "▾";
+  }
+
   .box-filter-panel.mobile-drawer-open,
-  .box-filter-bar.mobile-drawer-open,
   .dict-toolbar.mobile-drawer-open,
   .inv-toolbar.mobile-drawer-open {
     max-height: 600px !important;
     overflow: visible !important;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-    z-index: 25;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+    z-index: 25 !important;
   }
 
-  .ui-control-toolbar.mobile-drawer-open::after,
-  .box-filter-panel.mobile-drawer-open::after,
-  .box-filter-bar.mobile-drawer-open::after,
-  .dict-toolbar.mobile-drawer-open::after,
-  .inv-toolbar.mobile-drawer-open::after {
-    content: "⚙️ Fermer ▴";
-    background: var(--blue);
-    color: #FFFFFF;
+  .box-filter-panel.mobile-drawer-open .pw-drawer-toggle,
+  .dict-toolbar.mobile-drawer-open .pw-drawer-toggle,
+  .inv-toolbar.mobile-drawer-open .pw-drawer-toggle {
+    background: var(--blue) !important;
+    color: #FFFFFF !important;
+  }
+
+  .box-filter-panel.mobile-drawer-open .pw-drawer-toggle::after,
+  .dict-toolbar.mobile-drawer-open .pw-drawer-toggle::after,
+  .inv-toolbar.mobile-drawer-open .pw-drawer-toggle::after {
+    content: "▴";
   }
 }
 
-/* ── 6. Scale Down Overflowing Modals on Mobile ── */
+/* ── 7. Scale Down Overflowing Modals on Mobile ── */
 @media (max-width: 850px), (pointer: coarse) {
   #poke-modal-inner,
   #settings-inner,
@@ -9959,8 +10090,7 @@ button[data-action].pw-loc-gym-btn:hover,
   #battle-summary-inner,
   #fullscreen-panel-modal > div,
   .modal-inner,
-  .pw-modal-inner,
-  .save-menu-panel {
+  .pw-modal-inner {
     max-width: 96vw !important;
     max-height: 90vh !important;
     width: 100% !important;
