@@ -83,6 +83,8 @@ function pokemonProtectionModel(p, idx, boxId, readonly){
 function buildTalentModel(p, idx, boxId){
  const nid = Number(p.id);
  const tals = getSpeciesTalents(nid);
+ const pt = (typeof POKEMON_TALENTS !== 'undefined') ? POKEMON_TALENTS : (globalThis.POKEMON_TALENTS || {});
+ const ha = pt[nid] ? String(pt[nid].hiddenAbility).toLowerCase() : null;
  const locked = isPokemonLockedForBattleEdits(p, idx, boxId);
 
  if(!G.unlockedTalents) G.unlockedTalents = {};
@@ -91,7 +93,7 @@ function buildTalentModel(p, idx, boxId){
 
  const uniqueTals = [];
  tals.forEach(tal => {
-   if(!uniqueTals.includes(tal)) {
+   if((!ha || String(tal).toLowerCase() !== ha) && !uniqueTals.includes(tal)) {
      uniqueTals.push(tal);
    }
  });

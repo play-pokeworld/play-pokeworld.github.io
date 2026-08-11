@@ -102,7 +102,7 @@ export const L_en_talents = {
   },
   "sniper": {
     "name": "Sniper",
-    "desc": "Critical hit damage multiplier becomes 2.25x."
+    "desc": "Super-effective moves deal 25% more damage."
   },
   "technician": {
     "name": "Technician",

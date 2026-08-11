@@ -128,7 +128,7 @@ export const MOVES = {
     "split": "special",
     "acc": 100,
     "priority": 0,
-    "desc": "Has an increased chance for a critical hit.",
+    "desc": "A powerful attacking move that deals direct damage.",
     "pokeSplit": "special"
   },
 
@@ -1442,7 +1442,7 @@ export const MOVES = {
     "split": "physical",
     "acc": 100,
     "priority": 0,
-    "desc": "Has an increased chance for a critical hit.",
+    "desc": "A powerful attacking move that deals direct damage.",
     "moveset": ["fighting"],
     "pokeSplit": "physical"
   },
@@ -3800,7 +3800,7 @@ export const MOVES = {
     "split": "physical",
     "acc": 100,
     "priority": 0,
-    "desc": "Has an increased chance for a critical hit.",
+    "desc": "A powerful attacking move that deals direct damage.",
     "moveset": ["grass"],
     "pokeSplit": "physical"
   },
@@ -4605,7 +4605,7 @@ export const MOVES = {
     "split": "physical",
     "acc": 100,
     "priority": 0,
-    "desc": "Has an increased chance for a critical hit.",
+    "desc": "A powerful attacking move that deals direct damage.",
     "moveset": ["dark"],
     "pokeSplit": "physical"
   },
@@ -5150,7 +5150,7 @@ export const MOVES = {
     "split": "physical",
     "acc": 100,
     "priority": 0,
-    "desc": "Has an increased chance for a critical hit.",
+    "desc": "A powerful attacking move that deals direct damage.",
     "moveset": ["psychic","fighting"],
     "pokeSplit": "physical"
   },
@@ -5834,7 +5834,7 @@ export const MOVES = {
     "split": "physical",
     "acc": 100,
     "priority": 0,
-    "desc": "Has an increased chance for a critical hit.",
+    "desc": "A powerful attacking move that deals direct damage.",
     "moveset": ["ghost"],
     "pokeSplit": "physical"
   },
@@ -6042,7 +6042,7 @@ export const MOVES = {
     "split": "physical",
     "acc": 100,
     "priority": 0,
-    "desc": "Has an increased chance for a critical hit.",
+    "desc": "A powerful attacking move that deals direct damage.",
     "moveset": ["normal","grass"],
     "pokeSplit": "physical"
   },
@@ -6313,7 +6313,7 @@ export const MOVES = {
     "split": "special",
     "acc": 100,
     "priority": 0,
-    "desc": "Has an increased chance for a critical hit.",
+    "desc": "A powerful attacking move that deals direct damage.",
     "pokeSplit": "special"
   },
 
@@ -6482,7 +6482,7 @@ export const MOVES = {
     "split": "physical",
     "acc": 100,
     "priority": 0,
-    "desc": "Has an increased chance for a critical hit.",
+    "desc": "A powerful attacking move that deals direct damage.",
     "moveset": ["rock"],
     "pokeSplit": "physical"
   },

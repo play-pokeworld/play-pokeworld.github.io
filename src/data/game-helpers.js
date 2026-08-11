@@ -35,23 +35,53 @@ function getLocObj(id) {
 
 function getSpeciesTalents(id){
   const nid = Number(id);
-  // Use type-based POKE_TALENTS first (POKE_TALENTS from data)
   var pokeTalents = (typeof POKE_TALENTS !== 'undefined') ? POKE_TALENTS : (globalThis.POKE_TALENTS || null);
-  if (pokeTalents && pokeTalents[nid]) return pokeTalents[nid].slice();
-  // Fallback: PokeChill type-based system - get abilities matching Pokémon's types
-  const d = (typeof PD !== 'undefined' && PD) ? PD[nid] : null;
-  if (!d) return ['sturdy', 'intimidate', 'hugepower'];
-  const t1 = String(d[1] || '').toLowerCase();
-  const t2 = String(d[2] || '').toLowerCase();
-  // From TALENTS_FULL which mirrors ability.xxx from PokeChill
-  const matched = [];
-  if (typeof TALENTS_FULL !== 'undefined') {
-    for (const [key, obj] of Object.entries(TALENTS_FULL)) {
-      const types = obj.types || [];
-      if (types.includes('all') || (t1 && types.includes(t1)) || (t2 && types.includes(t2))) matched.push(key);
+  let list = [];
+  if (pokeTalents && pokeTalents[nid]) list = pokeTalents[nid].slice();
+  else {
+    const d = (typeof PD !== 'undefined' && PD) ? PD[nid] : null;
+    if (!d) list = ['sturdy', 'intimidate', 'hugepower'];
+    else {
+      const t1 = String(d[1] || '').toLowerCase();
+      const t2 = String(d[2] || '').toLowerCase();
+      if (typeof TALENTS_FULL !== 'undefined') {
+        for (const [key, obj] of Object.entries(TALENTS_FULL)) {
+          const types = obj.types || [];
+          if (types.includes('all') || (t1 && types.includes(t1)) || (t2 && types.includes(t2))) list.push(key);
+        }
+      }
+      if (!list.length) list = ['sturdy', 'intimidate', 'hugepower'];
     }
   }
-  return matched.length > 0 ? matched : ['sturdy', 'intimidate', 'hugepower'];
+  return list;
+}
+
+function isSpeciesHiddenAbilityUnlocked(speciesId, haKey) {
+  if (typeof G === 'undefined' || !G || !speciesId || !haKey) return false;
+  const nid = Number(speciesId);
+  if (!G.unlockedTalents || !G.unlockedTalents[nid]) return false;
+  const lowHA = String(haKey).toLowerCase();
+  return G.unlockedTalents[nid].some(function(x) { return String(x).toLowerCase() === lowHA; });
+}
+
+function getPokemonHiddenTalent(poke) {
+  if (!poke || !poke.id) return null;
+  const nid = Number(poke.id);
+  const pt = (typeof POKEMON_TALENTS !== 'undefined') ? POKEMON_TALENTS : (globalThis.POKEMON_TALENTS || {});
+  const ha = pt[nid] ? pt[nid].hiddenAbility : null;
+  if (!ha) return null;
+  if (poke._isEnemy || poke.isEnemy || poke.wild || poke.isTrainerPoke) return ha;
+  if (isSpeciesHiddenAbilityUnlocked(nid, ha)) return ha;
+  return null;
+}
+
+function hasTalent(poke, talentName) {
+  if (!poke || !talentName) return false;
+  const t1 = poke.talent ? String(poke.talent).toLowerCase() : '';
+  const t2 = getPokemonHiddenTalent(poke);
+  const t2Low = t2 ? String(t2).toLowerCase() : '';
+  const needle = String(talentName).toLowerCase();
+  return t1 === needle || t2Low === needle;
 }
 
 
@@ -1056,6 +1086,9 @@ if (typeof getLeagueChampionIdForRegion !== 'undefined') { if (typeof window !==
 if (typeof getLeagueRegionForChampion !== 'undefined') { if (typeof window !== 'undefined') window.getLeagueRegionForChampion = getLeagueRegionForChampion; if (typeof globalThis !== 'undefined') globalThis.getLeagueRegionForChampion = getLeagueRegionForChampion; }
 if (typeof isLeagueChampionId !== 'undefined') { if (typeof window !== 'undefined') window.isLeagueChampionId = isLeagueChampionId; if (typeof globalThis !== 'undefined') globalThis.isLeagueChampionId = isLeagueChampionId; }
 if (typeof getSpeciesTalents !== 'undefined') { if (typeof window !== 'undefined') window.getSpeciesTalents = getSpeciesTalents; if (typeof globalThis !== 'undefined') globalThis.getSpeciesTalents = getSpeciesTalents; }
+if (typeof hasTalent !== 'undefined') { if (typeof window !== 'undefined') window.hasTalent = hasTalent; if (typeof globalThis !== 'undefined') globalThis.hasTalent = hasTalent; }
+if (typeof getPokemonHiddenTalent !== 'undefined') { if (typeof window !== 'undefined') window.getPokemonHiddenTalent = getPokemonHiddenTalent; if (typeof globalThis !== 'undefined') globalThis.getPokemonHiddenTalent = getPokemonHiddenTalent; }
+if (typeof isSpeciesHiddenAbilityUnlocked !== 'undefined') { if (typeof window !== 'undefined') window.isSpeciesHiddenAbilityUnlocked = isSpeciesHiddenAbilityUnlocked; if (typeof globalThis !== 'undefined') globalThis.isSpeciesHiddenAbilityUnlocked = isSpeciesHiddenAbilityUnlocked; }
 if (typeof getTalentByKey !== 'undefined') { if (typeof window !== 'undefined') window.getTalentByKey = getTalentByKey; if (typeof globalThis !== 'undefined') globalThis.getTalentByKey = getTalentByKey; }
 if (typeof getTalentRecord !== 'undefined') { if (typeof window !== 'undefined') window.getTalentRecord = getTalentRecord; if (typeof globalThis !== 'undefined') globalThis.getTalentRecord = getTalentRecord; }
 if (typeof getTypeName !== 'undefined') { if (typeof window !== 'undefined') window.getTypeName = getTypeName; if (typeof globalThis !== 'undefined') globalThis.getTypeName = getTypeName; }
@@ -1156,6 +1189,9 @@ export {
   getLeagueRegionForChampion,
   isLeagueChampionId,
   getSpeciesTalents,
+  hasTalent,
+  getPokemonHiddenTalent,
+  isSpeciesHiddenAbilityUnlocked,
   getTalentByKey,
   getTalentRecord,
   getTypeName,

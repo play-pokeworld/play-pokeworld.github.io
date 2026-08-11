@@ -50,11 +50,12 @@ if(typeof syncTeamSlotHeldItems === 'function') syncTeamSlotHeldItems();
  try {
    const oldP = G.team[battle.playerPokeIdx];
    if (oldP && oldP.currentHP > 0 && oldP !== p) {
-     if (oldP.talent === 'naturalcure' && oldP.status) {
+     const hasTal = (t) => (typeof globalThis.hasTalent === 'function') ? globalThis.hasTalent(oldP, t) : oldP.talent === t;
+     if (hasTal('naturalcure') && oldP.status) {
        oldP.status = null;
        oldP.statusTurns = 0;
      }
-     if (oldP.talent === 'regenerator' && oldP.currentHP < oldP.maxHP) {
+     if (hasTal('regenerator') && oldP.currentHP < oldP.maxHP) {
        const heal = Math.max(1, Math.floor(oldP.maxHP * 0.25));
        oldP.currentHP = Math.min(oldP.maxHP, oldP.currentHP + heal);
      }

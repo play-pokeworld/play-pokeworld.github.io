@@ -239,29 +239,31 @@ export function triggerEntryTalents(side) {
 
   function applyTalent(poke, isPlayer) {
     if (!poke) return;
-    const talent = poke.talent;
+    const hasTal = (t) => (typeof globalThis.hasTalent === 'function') ? globalThis.hasTalent(poke, t) : poke.talent === t;
     const log = typeof globalThis.addBattleLog === 'function' ? globalThis.addBattleLog : () => {};
     const tr = typeof globalThis.t === 'function' ? globalThis.t : null;
 
-    if (talent === 'intimidate') {
+    if (hasTal('intimidate')) {
       if (isPlayer) { b.enemyMods.atk = Math.max(0.25, b.enemyMods.atk * 0.75); log('[Talent] Intimidation : baisse l\'Attaque adverse !'); }
       else { b.playerMods.atk = Math.max(0.25, b.playerMods.atk * 0.75); log('[Talent] Intimidation : baisse votre Attaque !'); }
-    } else if (talent === 'regenerator') {
+    }
+    if (hasTal('regenerator')) {
       poke.currentHP = Math.min(poke.maxHP, poke.currentHP + Math.floor(poke.maxHP * 0.25));
       log(tr ? tr('regenerator_proc') : '[Talent] Régé-Force : ' + poke.name + ' récupère des PV !');
-    } else if (talent === 'drizzle') { b.weather = 'rainy'; b.weatherTurns = poke.heldItem === 'damp_rock' ? 8 : 5; log(tr ? tr('drizzle_proc') : '[Talent] Crachin : ' + poke.name + ' invoque la pluie !'); }
-    else if (talent === 'drought') { b.weather = 'sunny'; b.weatherTurns = poke.heldItem === 'heat_rock' ? 8 : 5; log(tr ? tr('drought_proc') : '[Talent] Sécheresse : ' + poke.name + ' invoque le soleil !'); }
-    else if (talent === 'sandstream') { b.weather = 'sand'; b.weatherTurns = poke.heldItem === 'smooth_rock' ? 8 : 5; log(tr ? tr('sandstream_proc') : '[Talent] Sable Volant : ' + poke.name + ' invoque une tempête de sable !'); }
-    else if (talent === 'snowwarning') { b.weather = 'hail'; b.weatherTurns = poke.heldItem === 'icy_rock' ? 8 : 5; log(tr ? tr('snowwarning_proc') : '[Talent] Alerte Neige : ' + poke.name + ' invoque la grêle !'); }
-    else if (talent === 'electricsurge') { b.terrain = 'electric'; b.terrainTurns = poke.heldItem === 'terrain_extender' ? 8 : 5; log(tr ? tr('electricsurge_proc') : '[Talent] Créa-Élec : ' + poke.name + ' active un Champ Électrique !'); }
-    else if (talent === 'grassysurge') { b.terrain = 'grassy'; b.terrainTurns = poke.heldItem === 'terrain_extender' ? 8 : 5; log(tr ? tr('grassysurge_proc') : '[Talent] Créa-Herbe : ' + poke.name + ' active un Champ Herbeux !'); }
-    else if (talent === 'mistysurge') { b.terrain = 'misty'; b.terrainTurns = poke.heldItem === 'terrain_extender' ? 8 : 5; log(tr ? tr('mistysurge_proc') : '[Talent] Créa-Brum : ' + poke.name + ' active un Champ Brumeux !'); }
-    else if (talent === 'psychicsurge') { b.terrain = 'psychic'; b.terrainTurns = poke.heldItem === 'terrain_extender' ? 8 : 5; log(tr ? tr('psychicsurge_proc') : '[Talent] Créa-Psy : ' + poke.name + ' active un Champ Psychique !'); }
-    else if (talent === 'chlorophyll' && (b.weather === 'sunny' || b.weather === 'sun')) { log('[Talent] Chlorophylle : Vitesse de ' + poke.name + ' augmentée sous le soleil !'); }
-    else if (talent === 'swiftswim' && (b.weather === 'rainy' || b.weather === 'rain')) { log('[Talent] Glissade : Vitesse de ' + poke.name + ' augmentée sous la pluie !'); }
-    else if (talent === 'sandrush' && (b.weather === 'sand' || b.weather === 'sandstorm')) { log('[Talent] Rush Sable : Vitesse de ' + poke.name + ' augmentée dans la tempête !'); }
-    else if (talent === 'slushrush' && (b.weather === 'hail' || b.weather === 'snow')) { log('[Talent] Chasse-Neige : Vitesse de ' + poke.name + ' augmentée sous la grêle !'); }
-    else if (talent === 'speedboost') { log('[Talent] Turbo : La Vitesse de ' + poke.name + ' augmente à chaque tour !'); }
+    }
+    if (hasTal('drizzle')) { b.weather = 'rainy'; b.weatherTurns = poke.heldItem === 'damp_rock' ? 8 : 5; log(tr ? tr('drizzle_proc') : '[Talent] Crachin : ' + poke.name + ' invoque la pluie !'); }
+    if (hasTal('drought')) { b.weather = 'sunny'; b.weatherTurns = poke.heldItem === 'heat_rock' ? 8 : 5; log(tr ? tr('drought_proc') : '[Talent] Sécheresse : ' + poke.name + ' invoque le soleil !'); }
+    if (hasTal('sandstream')) { b.weather = 'sand'; b.weatherTurns = poke.heldItem === 'smooth_rock' ? 8 : 5; log(tr ? tr('sandstream_proc') : '[Talent] Sable Volant : ' + poke.name + ' invoque une tempête de sable !'); }
+    if (hasTal('snowwarning')) { b.weather = 'hail'; b.weatherTurns = poke.heldItem === 'icy_rock' ? 8 : 5; log(tr ? tr('snowwarning_proc') : '[Talent] Alerte Neige : ' + poke.name + ' invoque la grêle !'); }
+    if (hasTal('electricsurge')) { b.terrain = 'electric'; b.terrainTurns = poke.heldItem === 'terrain_extender' ? 8 : 5; log(tr ? tr('electricsurge_proc') : '[Talent] Créa-Élec : ' + poke.name + ' active un Champ Électrique !'); }
+    if (hasTal('grassysurge')) { b.terrain = 'grassy'; b.terrainTurns = poke.heldItem === 'terrain_extender' ? 8 : 5; log(tr ? tr('grassysurge_proc') : '[Talent] Créa-Herbe : ' + poke.name + ' active un Champ Herbeux !'); }
+    if (hasTal('mistysurge')) { b.terrain = 'misty'; b.terrainTurns = poke.heldItem === 'terrain_extender' ? 8 : 5; log(tr ? tr('mistysurge_proc') : '[Talent] Créa-Brum : ' + poke.name + ' active un Champ Brumeux !'); }
+    if (hasTal('psychicsurge')) { b.terrain = 'psychic'; b.terrainTurns = poke.heldItem === 'terrain_extender' ? 8 : 5; log(tr ? tr('psychicsurge_proc') : '[Talent] Créa-Psy : ' + poke.name + ' active un Champ Psychique !'); }
+    if (hasTal('chlorophyll') && (b.weather === 'sunny' || b.weather === 'sun')) { log('[Talent] Chlorophylle : Vitesse de ' + poke.name + ' augmentée sous le soleil !'); }
+    if (hasTal('swiftswim') && (b.weather === 'rainy' || b.weather === 'rain')) { log('[Talent] Glissade : Vitesse de ' + poke.name + ' augmentée sous la pluie !'); }
+    if (hasTal('sandrush') && (b.weather === 'sand' || b.weather === 'sandstorm')) { log('[Talent] Rush Sable : Vitesse de ' + poke.name + ' augmentée dans la tempête !'); }
+    if (hasTal('slushrush') && (b.weather === 'hail' || b.weather === 'snow')) { log('[Talent] Chasse-Neige : Vitesse de ' + poke.name + ' augmentée sous la grêle !'); }
+    if (hasTal('speedboost')) { log('[Talent] Turbo : La Vitesse de ' + poke.name + ' augmente à chaque tour !'); }
   }
 
   if (side === 'player' || side === 'both') applyTalent(p, true);

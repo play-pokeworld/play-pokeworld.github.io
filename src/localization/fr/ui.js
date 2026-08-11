@@ -336,7 +336,7 @@ export const L_fr_ui = {
 "effect_slow_chance":"{pct}% de baisser la Vitesse",
 "effect_confuse_chance":"{pct}% de rendre confus",
 "effect_flinch_chance":"{pct}% de faire hésiter",
-"effect_crit":"Taux de critique élevé (×1.5 dégâts)",
+"effect_crit":"Capacité offensive de haute puissance",
 "effect_recoil":"Dégâts de recul: 25% des dégâts infligés",
 "effect_recharge":"Doit recharger au tour suivant",
 "effect_trap":"Piège l'adversaire pendant 4-5 tours",

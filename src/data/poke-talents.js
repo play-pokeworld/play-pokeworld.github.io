@@ -6,7 +6,7 @@ var POKE_TALENTS = {
  7:['torrent','torrent','regenerator'], 8:['torrent','torrent','regenerator'], 9:['torrent','torrent','regenerator'],
  10:['compoundeyes','sniper','speedboost'], 11:['compoundeyes','sniper','speedboost'], 12:['compoundeyes','sniper','speedboost'],
  13:['poisonpoint','sniper','adaptability'], 14:['poisonpoint','sniper','adaptability'], 15:['poisonpoint','sniper','adaptability'],
- 16:['sandveil','compoundeyes','sniper'], 17:['sandveil','compoundeyes','sniper'], 18:['sandveil','compoundeyes','sniper'],
+ 16:['keeneye','tangledfeet','unburden'], 17:['keeneye','tangledfeet','unburden'], 18:['keeneye','tangledfeet','unburden'],
  19:['guts','intimidate','hugepower'], 20:['guts','intimidate','hugepower'],
  21:['sniper','speedboost','technician'], 22:['sniper','speedboost','technician'],
  23:['intimidate','poisonpoint','regenerator'], 24:['intimidate','poisonpoint','regenerator'],
@@ -15,14 +15,14 @@ var POKE_TALENTS = {
  29:['poisonpoint','sturdy','hugepower'], 30:['poisonpoint','sturdy','hugepower'], 31:['poisonpoint','sturdy','hugepower'],
  32:['poisonpoint','sturdy','hugepower'], 33:['poisonpoint','sturdy','hugepower'], 34:['poisonpoint','sturdy','hugepower'],
  35:['magicguard','serenegrace','regenerator'], 36:['magicguard','serenegrace','regenerator'],
- 37:['blaze','solarpower','speedboost'], 38:['blaze','solarpower','speedboost'],
+ 37:['flashfire','flashfire','drought'], 38:['flashfire','flashfire','drought'],
  39:['serenegrace','magicguard','hugepower'], 40:['serenegrace','magicguard','hugepower'],
  41:['intimidate','sniper','speedboost'], 42:['intimidate','sniper','speedboost'],
  43:['chlorophyll','overgrow','poisonpoint'], 44:['chlorophyll','overgrow','poisonpoint'], 45:['chlorophyll','overgrow','poisonpoint'],
  46:['compoundeyes','chlorophyll','regenerator'], 47:['compoundeyes','chlorophyll','regenerator'],
  48:['speedboost','sniper','intimidate'], 49:['speedboost','sniper','intimidate'],
  50:['sandveil','sturdy','hugepower'], 51:['sandveil','sturdy','hugepower'],
- 52:['technician','intimidate','adaptability'], 53:['technician','intimidate','adaptability'],
+ 52:['pickup','technician','unnerve'], 53:['pickup','technician','unnerve'],
  54:['serenegrace','magicguard','compoundeyes'], 55:['serenegrace','magicguard','compoundeyes'],
  56:['intimidate','technician','guts'], 57:['intimidate','technician','guts'],
  58:['intimidate','blaze','solarpower'], 59:['intimidate','blaze','solarpower'],
@@ -42,7 +42,7 @@ var POKE_TALENTS = {
  92:['levitate','magicguard','regenerator'], 93:['levitate','magicguard','regenerator'], 94:['levitate','magicguard','regenerator'],
  95:['sturdy','roughskin','sandveil'], 96:['magicguard','serenegrace','regenerator'], 97:['magicguard','serenegrace','regenerator'],
  98:['hugepower','sturdy','adaptability'], 99:['hugepower','sturdy','adaptability'],
- 100:['static','speedboost','lightningrod'], 101:['static','speedboost','lightningrod'],
+ 100:['soundproof','static','hyperconductor'], 101:['soundproof','static','hyperconductor'],
  102:['chlorophyll','solarpower','regenerator'], 103:['chlorophyll','solarpower','regenerator'],
  104:['sturdy','lightningrod','hugepower'], 105:['sturdy','lightningrod','hugepower'],
  106:['technician','speedboost','hugepower'], 107:['technician','speedboost','hugepower'],
@@ -55,7 +55,7 @@ var POKE_TALENTS = {
  122:['magicguard','technician','serenegrace'], 123:['technician','speedboost','adaptability'],
  124:['magicguard','serenegrace','regenerator'], 125:['static','speedboost','lightningrod'],
  126:['blaze','speedboost','solarpower'], 127:['hugepower','technician','adaptability'],
- 128:['intimidate','sturdy','hugepower'], 129:['speedboost','intimidate','multiscale'], 130:['intimidate','speedboost','multiscale'],
+ 128:['intimidate','sturdy','hugepower'], 129:['swiftswim','swiftswim','rattled'], 130:['intimidate','intimidate','moxie'],
  131:['thickfat','sturdy','torrent'], 132:['adaptability','regenerator','magicguard'],
  133:['adaptability','speedboost','serenegrace'], 134:['torrent','thickfat','regenerator'],
  135:['static','speedboost','lightningrod'], 136:['blaze','speedboost','solarpower'],
@@ -63,7 +63,7 @@ var POKE_TALENTS = {
  140:['speedboost','sturdy','adaptability'], 141:['speedboost','sturdy','adaptability'],
  142:['sturdy','speedboost','noguard'], 143:['thickfat','sturdy','hugepower'],
  144:['thickfat','multiscale','serenegrace'], 145:['static','lightningrod','speedboost'], 146:['blaze','solarpower','speedboost'],
- 147:['multiscale','serenegrace','hugepower'], 148:['multiscale','serenegrace','hugepower'], 149:['multiscale','serenegrace','hugepower'],
+ 147:['shedskin','shedskin','marvelscale'], 148:['shedskin','shedskin','marvelscale'], 149:['innerfocus','innerfocus','multiscale'],
  150:['magicguard','regenerator','adaptability'], 151:['serenegrace','adaptability','regenerator'],
  152:['overgrow','overgrow','chlorophyll'],
  153:['overgrow','overgrow','chlorophyll'],
@@ -88,8 +88,8 @@ var POKE_TALENTS = {
  172:['static','static','lightningrod'],
  173:['magicguard','serenegrace','regenerator'],
  174:['magicguard','serenegrace','regenerator'],
- 175:['serenegrace','magicguard','naturalcure'],
- 176:['serenegrace','naturalcure','magicguard'],
+ 175:['hustle','superluck','serenegrace'],
+ 176:['hustle','superluck','serenegrace'],
  177:['serenegrace','compoundeyes','naturalcure'],
  178:['serenegrace','compoundeyes','naturalcure'],
  179:['static','static','lightningrod'],
@@ -111,7 +111,7 @@ var POKE_TALENTS = {
  195:['sturdy','regenerator','guts'],
  196:['serenegrace','magicguard','naturalcure'],
  197:['serenegrace','clearbody','guts'],
- 198:['compoundeyes','guts','hugepower'],
+ 198:['insomnia','superluck','prankster'],
  199:['regenerator','naturalcure','serenegrace'],
  200:['levitate','levitate','magicguard'],
  201:['levitate','levitate','clearbody'],
@@ -125,7 +125,7 @@ var POKE_TALENTS = {
  209:['intimidate','guts','hugepower'],
  210:['intimidate','guts','hugepower'],
  211:['poisonpoint','guts','hugepower'],
- 212:['technician','guts','hugepower'],
+ 212:['swarm','lightmetal','technician'],
  213:['sturdy','guts','hugepower'],
  214:['guts','technician','hugepower'],
  215:['clearbody','guts','hugepower'],
@@ -168,8 +168,20 @@ var POKE_TALENTS = {
 };
 
 
+// Build canonical POKEMON_TALENTS from POKE_TALENTS (where index 2 is the hidden ability)
+var POKEMON_TALENTS = {};
+for (var _id in POKE_TALENTS) {
+  var _tals = POKE_TALENTS[_id];
+  if (_tals && _tals.length >= 3 && _tals[2] && _tals[2] !== _tals[0] && _tals[2] !== _tals[1]) {
+    POKEMON_TALENTS[_id] = { hiddenAbility: _tals[2] };
+  } else {
+    POKEMON_TALENTS[_id] = {};
+  }
+}
+
 // --- Migrated to ES module, globals exposed ---
 if (typeof POKE_TALENTS !== 'undefined') { if (typeof window !== 'undefined') window.POKE_TALENTS = POKE_TALENTS; if (typeof globalThis !== 'undefined') globalThis.POKE_TALENTS = POKE_TALENTS; }
+if (typeof POKEMON_TALENTS !== 'undefined') { if (typeof window !== 'undefined') window.POKEMON_TALENTS = POKEMON_TALENTS; if (typeof globalThis !== 'undefined') globalThis.POKEMON_TALENTS = POKEMON_TALENTS; }
 
 
 
@@ -177,4 +189,5 @@ if (typeof POKE_TALENTS !== 'undefined') { if (typeof window !== 'undefined') wi
 // classic surface kept above/here (bodies unchanged).
 export {
   POKE_TALENTS,
+  POKEMON_TALENTS,
 };

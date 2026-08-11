@@ -334,7 +334,7 @@ export const L_en_ui = {
 "effect_slow_chance":"{pct}% chance to lower Speed",
 "effect_confuse_chance":"{pct}% chance to confuse",
 "effect_flinch_chance":"{pct}% chance to make flinch",
-"effect_crit":"High critical hit ratio (×1.5 damage)",
+"effect_crit":"High power attacking move",
 "effect_recoil":"Recoil: 25% of damage dealt",
 "effect_recharge":"Must recharge next turn",
 "effect_trap":"Traps opponent for 4-5 turns",

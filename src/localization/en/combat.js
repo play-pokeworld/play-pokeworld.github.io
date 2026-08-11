@@ -65,7 +65,7 @@ export const L_en_combat = {
 "combat_attack_auto_43":"{p0} was frozen!",
 "combat_attack_auto_44":"{p0} fell asleep!",
 "combat_damage_lost":"{name} lost {damage} HP!{effect}",
-"critical_hit":"Critical hit!",
+"critical_hit":"Powerful hit!",
 "status_burn_faded":"{name}'s burn faded!",
 "status_poison_faded":"{name} is no longer poisoned!",
 "status_para_faded":"{name} is no longer paralyzed!",

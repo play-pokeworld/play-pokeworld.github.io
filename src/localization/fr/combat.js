@@ -65,7 +65,7 @@ export const L_fr_combat = {
 "combat_attack_auto_43":"{p0} est gelé !",
 "combat_attack_auto_44":"{p0} s'est endormi !",
 "combat_damage_lost":"{name} perd {damage} PV !{effect}",
-"critical_hit":"Coup critique !",
+"critical_hit":"Coup surpuissant !",
 "status_burn_faded":"La brûlure de {name} s'est estompée !",
 "status_poison_faded":"{name} n'est plus empoisonné !",
 "status_para_faded":"{name} n'est plus paralysé !",

@@ -140,8 +140,12 @@ function getTeamShinyRateMultiplier() {
   const talents = new Set();
   for (const p of G.team) {
     if (p && p.talent) talents.add(String(p.talent).toLowerCase());
+    const ha = (typeof getPokemonHiddenTalent === 'function') ? getPokemonHiddenTalent(p) : null;
+    if (ha) talents.add(String(ha).toLowerCase());
   }
   if (talents.has('goodasgold')) mult *= 1.15;
+  if (talents.has('superluck')) mult *= 1.15;
+  if (talents.has('serenegrace')) mult *= 1.10;
   return mult;
 }
 

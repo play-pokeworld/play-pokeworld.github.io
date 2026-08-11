@@ -24,7 +24,9 @@ function createPoke(id, level, shinyUnlocked=false){
    const hasTF = typeof TALENTS_FULL !== 'undefined';
    const recOf = (typeof getTalentRecord === 'function') ? getTalentRecord : (x) => (hasTF ? TALENTS_FULL[x] : null);
    if(hasTF) {
-     const available = tals.filter(t => recOf(t));
+     const pt = (typeof POKEMON_TALENTS !== 'undefined') ? POKEMON_TALENTS : (globalThis.POKEMON_TALENTS || {});
+     const ha = pt[id] ? String(pt[id].hiddenAbility).toLowerCase() : null;
+     const available = tals.filter(t => recOf(t) && (!ha || String(t).toLowerCase() !== ha));
      if(available.length > 0) {
        const roll = rand(0, 99);
        if(roll < 60) {

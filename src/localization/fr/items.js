@@ -1002,7 +1002,7 @@ Object.assign(L_fr_items, {
 });
 
 Object.assign(L_fr_items, {
-  razor_claw: { ...(L_fr_items.razor_claw || {name:'razor_claw'}), desc: 'Augmente le taux de coup critique et fait évoluer certains Pokémon.' },
+  razor_claw: { ...(L_fr_items.razor_claw || {name:'razor_claw'}), desc: 'Augmente la précision en combat et fait évoluer certains Pokémon.' },
   razor_fang: { ...(L_fr_items.razor_fang || {name:'razor_fang'}), desc: 'Peut apeurer la cible et fait évoluer certains Pokémon.' },
   protector: { ...(L_fr_items.protector || {name:'protector'}), desc: 'Fait évoluer certains Pokémon lors d’un échange.' },
   electirizer: { ...(L_fr_items.electirizer || {name:'electirizer'}), desc: 'Fait évoluer certains Pokémon lors d’un échange.' },

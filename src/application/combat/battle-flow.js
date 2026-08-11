@@ -25,11 +25,12 @@ function endBattle(){
    if (typeof G !== 'undefined' && G && Array.isArray(G.team)) {
      G.team.forEach(p => {
        if (!p || p.currentHP <= 0) return;
-       if (p.talent === 'naturalcure' && p.status) {
+       const hasTal = (t) => (typeof globalThis.hasTalent === 'function') ? globalThis.hasTalent(p, t) : p.talent === t;
+       if (hasTal('naturalcure') && p.status) {
          p.status = null;
          p.statusTurns = 0;
        }
-       if (p.talent === 'regenerator' && p.currentHP < p.maxHP) {
+       if (hasTal('regenerator') && p.currentHP < p.maxHP) {
          const heal = Math.max(1, Math.floor(p.maxHP * 0.25));
          p.currentHP = Math.min(p.maxHP, p.currentHP + heal);
        }

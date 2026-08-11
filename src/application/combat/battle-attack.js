@@ -443,9 +443,10 @@ function executeAttack(attacker, defender, moveId, side){
  }
  if(!power) return;
 
- const stabMult=(attacker.type1===mv.type||attacker.type2===mv.type)?(attacker.talent==='adaptability'?2.0:1.5):1;
- const critBlocked = defender.talent === 'shellarmor' || defender.talent === 'battlearmor';
- const critMult=(mv.crit&&!critBlocked&&chance(15))?(attacker.talent==='sniper'?2.25:1.5):1;
+ const _hasTal = (poke, talentName) => (typeof hasTalent === 'function') ? hasTalent(poke, talentName) : poke.talent === talentName;
+ const stabMult=(attacker.type1===mv.type||attacker.type2===mv.type)?(_hasTal(attacker, 'adaptability')?2.0:1.5):1;
+ const critBlocked = _hasTal(defender, 'shellarmor') || _hasTal(defender, 'battlearmor');
+ const critMult = (mv.crit && !critBlocked && chance(15)) ? (_hasTal(attacker, 'sniper') ? 2.25 : 1.5) : 1;
  const randMult=(rand(85,100)/100);
 
  const isSpec = mv.cat === 'spec';
@@ -457,32 +458,32 @@ function executeAttack(attacker, defender, moveId, side){
  let atk = (isSpec ? (attacker.spa || attacker.atk) : attacker.atk) * atkBuff * atkModVal;
  let def = (isSpec ? (defender.spd || defender.def) : defender.def) * defBuff * defModVal;
 
- if(defender.talent === 'intimidate' && !isSpec){
+ if(_hasTal(defender, 'intimidate') && !isSpec){
    atk = Math.max(1, Math.floor(atk * 0.75));
  }
- if(attacker.talent === 'lightningrod' && isSpec){
+ if(_hasTal(attacker, 'lightningrod') && isSpec){
    atk = Math.floor(atk * 1.25);
  }
- if(defender.talent === 'livingshield' && defender.status && isSpec){
+ if(_hasTal(defender, 'livingshield') && defender.status && isSpec){
    def *= 1.5;
  }
 
- if((attacker.talent === 'hugepower' || attacker.talent === 'purepower') && !isSpec){
+ if((_hasTal(attacker, 'hugepower') || _hasTal(attacker, 'purepower')) && !isSpec){
  atk *= 1.6;
  if(chance(35)) addBattleLog(t('combat_attack_auto_25'));
  }
- if(attacker.talent === 'solarpower' && isSpec){
+ if(_hasTal(attacker, 'solarpower') && isSpec){
  atk *= 1.3;
- if(chance(35)) visualTalent(side, attacker.talent, '+30%');
+ if(chance(35)) visualTalent(side, 'solarpower', '+30%');
  }
- if(attacker.talent === 'guts' && attacker.status && !isSpec){
+ if(_hasTal(attacker, 'guts') && attacker.status && !isSpec){
  atk *= 1.5;
  addBattleLog(t('combat_attack_auto_26'));
  }
- if(attacker.talent === 'technician' && power <= 60){
+ if(_hasTal(attacker, 'technician') && power <= 60){
  power = Math.floor(power * 1.5);
  if(chance(35)){
-   visualTalent(side, attacker.talent, '+50%');
+   visualTalent(side, 'technician', '+50%');
    addBattleLog(`${attacker.name} renforce ${getMoveName(moveId)} avec Technicien !`);
  }
  }
@@ -493,23 +494,24 @@ function executeAttack(attacker, defender, moveId, side){
    noxious: 'Poison', solid: 'Rock', rime: 'Ice', voltage: 'Electric',
    earthy: 'Ground', shadowy: 'Dark'
  };
- if(LOW_HP_BOOST_MAP[attacker.talent] === mv.type && attacker.currentHP < attacker.maxHP * 0.35){
+ const talLowHp = LOW_HP_BOOST_MAP[attacker.talent] ? attacker.talent : (LOW_HP_BOOST_MAP[getPokemonHiddenTalent(attacker)] ? getPokemonHiddenTalent(attacker) : null);
+ if(talLowHp && LOW_HP_BOOST_MAP[talLowHp] === mv.type && attacker.currentHP < attacker.maxHP * 0.35){
    power = Math.floor(power * 1.35);
  }
- if(attacker.talent === 'steelyspirit' && mv.type === 'Steel') power = Math.floor(power * 1.25);
+ if(_hasTal(attacker, 'steelyspirit') && mv.type === 'Steel') power = Math.floor(power * 1.25);
 
- if(defender.talent === 'thickfat' && (mv.type === 'Fire' || mv.type === 'Ice')){
+ if(_hasTal(defender, 'thickfat') && (mv.type === 'Fire' || mv.type === 'Ice')){
  def *= 2;
  addBattleLog(t('combat_attack_auto_30'));
  }
- if(defender.talent === 'multiscale' && defender.currentHP >= defender.maxHP){
+ if(_hasTal(defender, 'multiscale') && defender.currentHP >= defender.maxHP){
  def *= 2;
  addBattleLog(t('combat_attack_auto_31'));
  }
- if((defender.talent === 'filter' || defender.talent === 'solidrock') && eff > 1){
+ if((_hasTal(defender, 'filter') || _hasTal(defender, 'solidrock')) && eff > 1){
  def *= 1.33;
  }
- if(defender.talent === 'marvelscale' && defender.status && !isSpec){
+ if(_hasTal(defender, 'marvelscale') && defender.status && !isSpec){
  def *= 1.5;
  }
 
@@ -579,16 +581,17 @@ function executeAttack(attacker, defender, moveId, side){
    dragonguard: 'Dragon', darkguard: 'Dark', sinisterguard: 'Dark',
    steelguard: 'Steel', fairyguard: 'Fairy', normalguard: 'Normal', plainguard: 'Normal'
  };
- if(TYPE_GUARD_MAP[defender.talent] === mv.type){
+ const talGuard = TYPE_GUARD_MAP[defender.talent] ? defender.talent : (TYPE_GUARD_MAP[getPokemonHiddenTalent(defender)] ? getPokemonHiddenTalent(defender) : null);
+ if(talGuard && TYPE_GUARD_MAP[talGuard] === mv.type){
    dmg = Math.max(1, Math.floor(dmg * 0.5));
  }
- if(defender.talent === 'sturdy'){
+ if(_hasTal(defender, 'sturdy')){
    dmg = Math.max(1, Math.floor(dmg * 0.85));
  }
 
- if(defender.talent === 'sturdy' && dmg >= defender.currentHP && defender.currentHP >= defender.maxHP){
+ if(_hasTal(defender, 'sturdy') && dmg >= defender.currentHP && defender.currentHP >= defender.maxHP){
  dmg = defender.currentHP - 1;
- visualTalent(side === 'player' ? 'enemy' : 'player', defender.talent, '1 PV');
+ visualTalent(side === 'player' ? 'enemy' : 'player', 'sturdy', '1 PV');
  addBattleLog(tr('combat_attack_auto_33', {p0:defender.name}));
  }
 
@@ -606,7 +609,7 @@ function executeAttack(attacker, defender, moveId, side){
  playHitAnim(side);
  visualDamage(side, dmg, eff, critMult>1);
 
- if((defender.talent === 'roughskin' || defender.talent === 'ironbarbs' || defender.talent === 'spikypelt') && mv.cat === 'phys'){
+ if((_hasTal(defender, 'roughskin') || _hasTal(defender, 'ironbarbs') || _hasTal(defender, 'spikypelt')) && mv.cat === 'phys'){
  const refl = Math.max(1, Math.floor(attacker.maxHP * 0.12));
  attacker.currentHP = Math.max(0, attacker.currentHP - refl);
  addBattleLog(tr('combat_attack_auto_34', {p0:attacker.name, p1:refl}));

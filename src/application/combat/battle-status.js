@@ -34,15 +34,15 @@ function tickStatusDurations(p){
 
 function applyEndOfTurnStatus(p){
  if(!p||p.currentHP<=0) return;
+ const hasTal = (t) => (typeof globalThis.hasTalent === 'function') ? globalThis.hasTalent(p, t) : p.talent === t;
  
- 
- if(p.talent === 'speedboost'){
+ if(hasTal('speedboost')){
  const isPlayerSide = (p === getActivePlayerPoke() || p === G.team[battle.playerPokeIdx]);
  const mods = isPlayerSide ? battle.playerMods : battle.enemyMods;
  if(mods) mods.spe = Math.min(3.0, (mods.spe || 1) * 1.15);
  }
  
- if(p.talent === 'magicguard'){
+ if(hasTal('magicguard')){
    // Immunisé aux dégâts de statut et indirects
  }
  else if(p.status==='burn'){
@@ -206,7 +206,15 @@ async function onEnemyFaint(){
  
  const drops=isQuestRewardBattle ? null : ROUTE_DROPS[questLoc];
  const _dropBonus = (typeof __pwV43Link('getSecretBaseBonuses') === 'function') ? (Number(getSecretBaseBonuses().dropBonus) || 0) : 0;
- const _dropChance = Math.min(3, 1 + _dropBonus); // base 1 % ; max 3 % with drapeaux
+ let _talentDropBonus = 0;
+ if (typeof G !== 'undefined' && G && Array.isArray(G.team)) {
+   for (const p of G.team) {
+     if (p && p.currentHP > 0 && ((typeof hasTalent === 'function' && (hasTalent(p, 'pickup') || hasTalent(p, 'pickpocket') || hasTalent(p, 'hoarder'))) || p.talent === 'pickup' || p.talent === 'pickpocket' || p.talent === 'hoarder')) {
+       _talentDropBonus += 1;
+     }
+   }
+ }
+ const _dropChance = Math.min(6, 1 + _dropBonus + _talentDropBonus); // base 1 % ; max 6 % with drapeaux + pickpocket/hoarder
  if(drops&&drops.length&&chance(_dropChance)){
  const drop=drops[rand(0,drops.length-1)];
  const reward = (typeof grantRewardItem === 'function') ? grantRewardItem(drop,1) : (addToInventory(drop,1), {added:1,money:0});

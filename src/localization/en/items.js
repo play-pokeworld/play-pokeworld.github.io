@@ -1108,7 +1108,7 @@ Object.assign(L_en_items, {
 });
 
 Object.assign(L_en_items, {
-  razor_claw: { ...(L_en_items.razor_claw || {name:'razor_claw'}), desc: 'Raises critical-hit ratio; evolves compatible Pokémon.' },
+  razor_claw: { ...(L_en_items.razor_claw || {name:'razor_claw'}), desc: 'Increases accuracy in battle; evolves compatible Pokémon.' },
   razor_fang: { ...(L_en_items.razor_fang || {name:'razor_fang'}), desc: 'May make the target flinch; evolves compatible Pokémon.' },
   protector: { ...(L_en_items.protector || {name:'protector'}), desc: 'Evolves compatible Pokémon when traded.' },
   electirizer: { ...(L_en_items.electirizer || {name:'electirizer'}), desc: 'Evolves compatible Pokémon when traded.' },

@@ -103,7 +103,7 @@ export const L_fr_talents = {
   },
   "sniper": {
     "name": "Sniper",
-    "desc": "Les coups critiques infligent des dégâts multipliés par 2.25."
+    "desc": "Les capacités super efficaces infligent +25% de dégâts supplémentaires."
   },
   "technician": {
     "name": "Technicien",

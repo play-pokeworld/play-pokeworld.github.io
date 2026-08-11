@@ -91,21 +91,21 @@ function generatePokeCardHTML(p, i, options = {}) {
   let pSpaMod = (sideMods?.spa || 1) * (1 + (b.spa || 0));
   let pSpdMod = (sideMods?.spd || 1) * (1 + (b.spd || 0));
 
-  const tal = p.talent;
+  const _hasTal = (t) => (typeof hasTalent === 'function') ? hasTalent(p, t) : p.talent === t;
   const w = battle ? battle.weather : null;
-  if (tal === 'chlorophyll' && (w === 'sunny' || w === 'sun')) pSpeMod *= 1.35;
-  else if (tal === 'swiftswim' && (w === 'rainy' || w === 'rain')) pSpeMod *= 1.5;
-  else if (tal === 'sandrush' && (w === 'sand' || w === 'sandstorm')) pSpeMod *= 1.5;
-  else if (tal === 'slushrush' && (w === 'hail' || w === 'snow')) pSpeMod *= 1.5;
-  else if (tal === 'quickfeet' && p.status) pSpeMod *= 1.5;
-  else if (tal === 'unburden' && !p.heldItem) pSpeMod *= 1.5;
+  if (_hasTal('chlorophyll') && (w === 'sunny' || w === 'sun')) pSpeMod *= 1.35;
+  else if (_hasTal('swiftswim') && (w === 'rainy' || w === 'rain')) pSpeMod *= 1.5;
+  else if (_hasTal('sandrush') && (w === 'sand' || w === 'sandstorm')) pSpeMod *= 1.5;
+  else if (_hasTal('slushrush') && (w === 'hail' || w === 'snow')) pSpeMod *= 1.5;
+  else if (_hasTal('quickfeet') && p.status) pSpeMod *= 1.5;
+  else if (_hasTal('unburden') && !p.heldItem) pSpeMod *= 1.5;
 
-  if (tal === 'hugepower' || tal === 'purepower') pAtkMod *= 1.6;
-  else if (tal === 'guts' && p.status) pAtkMod *= 1.5;
+  if (_hasTal('hugepower') || _hasTal('purepower')) pAtkMod *= 1.6;
+  else if (_hasTal('guts') && p.status) pAtkMod *= 1.5;
 
-  if (tal === 'solarpower') pSpaMod *= 1.3;
-  if (tal === 'marvelscale' && p.status) pDefMod *= 1.5;
-  if (tal === 'livingshield' && p.status) pSpdMod *= 1.5;
+  if (_hasTal('solarpower')) pSpaMod *= 1.3;
+  if (_hasTal('marvelscale') && p.status) pDefMod *= 1.5;
+  if (_hasTal('livingshield') && p.status) pSpdMod *= 1.5;
 
   const atkArrow = getArrows(pAtkMod);
   const defArrow = getArrows(pDefMod);
