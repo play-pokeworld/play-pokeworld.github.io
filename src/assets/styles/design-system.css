@@ -10112,3 +10112,21 @@ button[data-action].pw-loc-gym-btn:hover,
     margin-left: -4% !important;
   }
 }
+
+/* ── 8. Map Touch Action None & Universal Update Alert Banner Fixed at Top on Mobile ── */
+@media (max-width: 850px), (pointer: coarse) {
+  #map-svg,
+  #map-panel,
+  .map-panel {
+    touch-action: none !important;
+  }
+  .pw-update-banner {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 99999 !important;
+    padding: 12px 24px !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.85) !important;
+  }
+}

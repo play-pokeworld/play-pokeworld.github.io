@@ -134,64 +134,97 @@ function renderMap(){
 }
 
 let __pwMapZoom = 1.0;
-let __pwMapPanX = 0;
-let __pwMapPanY = 0;
+let __pwMapVbX = 0;
+let __pwMapVbY = 0;
 let __pwIsPinchingOrDragging = false;
 let __pwPinchResetTimer = null;
 const __pwActivePointers = new Map();
 
-function applyMobileMapTransform() {
+function applyMapViewBox() {
   const svg = document.getElementById('map-svg');
   if (!svg) return;
-  svg.style.transform = `translate(${__pwMapPanX}px, ${__pwMapPanY}px) scale(${__pwMapZoom})`;
-  svg.style.transformOrigin = 'center center';
-  svg.style.transition = 'transform 0.1s ease-out';
+  const w = 1600 / __pwMapZoom;
+  const h = 960 / __pwMapZoom;
+  __pwMapVbX = Math.max(0, Math.min(1600 - w, __pwMapVbX));
+  __pwMapVbY = Math.max(0, Math.min(960 - h, __pwMapVbY));
+  svg.setAttribute('viewBox', `${__pwMapVbX} ${__pwMapVbY} ${w} ${h}`);
+  svg.style.transform = 'none';
 }
 
 function initMobileMapPinchZoom() {
   const panel = document.getElementById('map-panel');
-  if (!panel || panel.dataset.pinchZoomInit === 'true') return;
+  const svg = document.getElementById('map-svg');
+  if (!panel || !svg || panel.dataset.pinchZoomInit === 'true') return;
   panel.dataset.pinchZoomInit = 'true';
 
   let lastPinchDist = null;
-  let dragStart = null;
+  let lastDragScreen = null;
+  let touchDownPos = { x: 0, y: 0 };
+  let maxMoveDist = 0;
 
   panel.addEventListener('pointerdown', (e) => {
     if (!e.target.closest('#map-svg')) return;
     __pwActivePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (__pwActivePointers.size === 2) {
+    if (__pwActivePointers.size === 1) {
+      touchDownPos = { x: e.clientX, y: e.clientY };
+      lastDragScreen = { x: e.clientX, y: e.clientY };
+      maxMoveDist = 0;
+    } else if (__pwActivePointers.size === 2) {
       const pts = Array.from(__pwActivePointers.values());
       lastPinchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-      __pwIsPinchingOrDragging = true;
-    } else if (__pwActivePointers.size === 1 && __pwMapZoom > 1.0) {
-      dragStart = { x: e.clientX - __pwMapPanX, y: e.clientY - __pwMapPanY };
     }
-    try { panel.setPointerCapture(e.pointerId); } catch (_) {}
   });
 
   panel.addEventListener('pointermove', (e) => {
     if (!__pwActivePointers.has(e.pointerId)) return;
     __pwActivePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (__pwActivePointers.size === 2 && lastPinchDist !== null) {
+
+    const moved = Math.hypot(e.clientX - touchDownPos.x, e.clientY - touchDownPos.y);
+    if (moved > maxMoveDist) maxMoveDist = moved;
+
+    const rect = svg.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const curW = 1600 / __pwMapZoom;
+    const curH = 960 / __pwMapZoom;
+    const scaleX = curW / rect.width;
+    const scaleY = curH / rect.height;
+
+    if (__pwActivePointers.size === 2 && lastPinchDist != null) {
       const pts = Array.from(__pwActivePointers.values());
       const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-      if (lastPinchDist > 0) {
+      if (lastPinchDist > 5 && dist > 5) {
         const factor = dist / lastPinchDist;
-        __pwMapZoom = Math.max(1.0, Math.min(3.0, __pwMapZoom * factor));
-        if (__pwMapZoom === 1.0) { __pwMapPanX = 0; __pwMapPanY = 0; }
-        applyMobileMapTransform();
-        __pwIsPinchingOrDragging = true;
+        const oldZoom = __pwMapZoom;
+        const newZoom = Math.max(1.0, Math.min(3.0, oldZoom * factor));
+
+        const cx = ((pts[0].x + pts[1].x) / 2) - rect.left;
+        const cy = ((pts[0].y + pts[1].y) / 2) - rect.top;
+        const svgCx = __pwMapVbX + cx * scaleX;
+        const svgCy = __pwMapVbY + cy * scaleY;
+
+        __pwMapZoom = newZoom;
+        const newW = 1600 / __pwMapZoom;
+        const newH = 960 / __pwMapZoom;
+        const newScaleX = newW / rect.width;
+        const newScaleY = newH / rect.height;
+
+        __pwMapVbX = svgCx - cx * newScaleX;
+        __pwMapVbY = svgCy - cy * newScaleY;
+
+        if (__pwMapZoom === 1.0) {
+          __pwMapVbX = 0;
+          __pwMapVbY = 0;
+        }
+        applyMapViewBox();
       }
       lastPinchDist = dist;
-    } else if (__pwActivePointers.size === 1 && dragStart && __pwMapZoom > 1.0) {
-      const dx = e.clientX - dragStart.x;
-      const dy = e.clientY - dragStart.y;
-      if (Math.hypot(dx - __pwMapPanX, dy - __pwMapPanY) > 4) {
-        __pwIsPinchingOrDragging = true;
-      }
-      __pwMapPanX = dx;
-      __pwMapPanY = dy;
-      applyMobileMapTransform();
+    } else if (__pwActivePointers.size === 1 && lastDragScreen && __pwMapZoom > 1.0 && maxMoveDist > 8) {
+      const dx = e.clientX - lastDragScreen.x;
+      const dy = e.clientY - lastDragScreen.y;
+      __pwMapVbX -= dx * scaleX;
+      __pwMapVbY -= dy * scaleY;
+      lastDragScreen = { x: e.clientX, y: e.clientY };
+      applyMapViewBox();
     }
   });
 
@@ -201,15 +234,17 @@ function initMobileMapPinchZoom() {
       lastPinchDist = null;
     }
     if (__pwActivePointers.size === 0) {
-      dragStart = null;
-      if (__pwIsPinchingOrDragging) {
+      lastDragScreen = null;
+      if (maxMoveDist >= 10) {
+        __pwIsPinchingOrDragging = true;
         clearTimeout(__pwPinchResetTimer);
         __pwPinchResetTimer = setTimeout(() => {
           __pwIsPinchingOrDragging = false;
         }, 150);
+      } else {
+        __pwIsPinchingOrDragging = false;
       }
     }
-    try { panel.releasePointerCapture(e.pointerId); } catch (_) {}
   };
 
   panel.addEventListener('pointerup', onPointerUp);
