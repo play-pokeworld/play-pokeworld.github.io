@@ -80,12 +80,12 @@ export class SaveMenuView extends UIView {
             type: 'button',
             class: `hbtn lang-btn${(typeof currentLang === 'function' && currentLang() === 'fr') ? ' active' : ''}`,
             dataset: { action: 'legacy-call', call: 'setSaveMenuLang', callArgs: "'fr'" },
-          }, '🇫🇷 FR'),
+          }, 'FR'),
           h('button', {
             type: 'button',
             class: `hbtn lang-btn${(typeof currentLang === 'function' && currentLang() === 'en') ? ' active' : ''}`,
             dataset: { action: 'legacy-call', call: 'setSaveMenuLang', callArgs: "'en'" },
-          }, '🇬🇧 EN')
+          }, 'EN')
         )),
     ];
   }

@@ -9768,3 +9768,217 @@ button[data-action].pw-loc-gym-btn:hover,
 .quest-progress-container .quest-progress-bar:not(.is-done) {
   background: var(--blue) !important;
 }
+
+/* ==========================================================================
+   MOBILE RESPONSIVE ENHANCEMENTS — ALL DISPLAYS & SCREENS (USER VALIDATED)
+   ========================================================================== */
+
+/* ── 1. Header & Global Navigation Sizing on Mobile ── */
+@media (max-width: 850px), (pointer: coarse) {
+  #header {
+    flex-wrap: wrap !important;
+    padding: 8px 10px !important;
+    gap: 6px !important;
+  }
+  #header .hinfo {
+    font-size: 11px !important;
+    white-space: nowrap !important;
+  }
+  #main-dashboard {
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+  .dash-col {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 auto !important;
+  }
+  .dash-win {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-bottom: 10px !important;
+  }
+}
+
+/* ── 2. Story / Quests, Active Team, Hatchery & Mine Windows on Mobile ── */
+@media (max-width: 850px), (pointer: coarse) {
+  #win-story .win-body,
+  #win-team .win-body,
+  #win-hatchery .win-body,
+  #win-mine .win-body,
+  #win-battle .win-body {
+    padding: 10px !important;
+    box-sizing: border-box !important;
+  }
+  .quest-card,
+  .pw-quest-item,
+  .hatchery-card,
+  .mine-grid {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .team-container,
+  #battle-team-row {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+    gap: 8px !important;
+  }
+  .pw-poke-card,
+  .poke-card {
+    min-width: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* ── 3. Live Battle Scene Sizing on Mobile ── */
+@media (max-width: 850px), (pointer: coarse) {
+  #battle-center-panel,
+  #battle-active-scene {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+  .battle-enemy,
+  .battle-player {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+}
+
+/* ── 4. Tabs Navigation & Sub-screens (PC Box, Pokédex, Bag, Base, Atoll) on Mobile ── */
+@media (max-width: 850px), (pointer: coarse) {
+  .pw-tabs-nav,
+  #win-tabs .pw-win-hdr {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    gap: 4px !important;
+  }
+  .pw-tabs-nav::-webkit-scrollbar {
+    display: none !important;
+  }
+  .box-grid {
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)) !important;
+    gap: 6px !important;
+  }
+  .dex-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+    gap: 8px !important;
+  }
+  .inv-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+    gap: 8px !important;
+  }
+  #base-canvas-2d,
+  #base-canvas-3d {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+  .atoll-grid,
+  .atoll-panel {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* ── 5. Compact Drawer/Accordion for Filters on Mobile PC Box, Pokédex, and Bag ── */
+@media (max-width: 850px), (pointer: coarse) {
+  .ui-control-toolbar,
+  .box-filter-panel,
+  .box-filter-bar,
+  .dict-toolbar,
+  .inv-toolbar {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    padding: 6px 10px !important;
+    background: var(--dark2) !important;
+    border-radius: 12px !important;
+    border: 1px solid var(--dark3) !important;
+    max-height: 52px;
+    overflow: hidden;
+    transition: max-height 0.35s ease, box-shadow 0.35s ease;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .ui-control-toolbar::after,
+  .box-filter-panel::after,
+  .box-filter-bar::after,
+  .dict-toolbar::after,
+  .inv-toolbar::after {
+    content: "⚙️ Filtres ▾";
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--light2);
+    position: absolute;
+    right: 12px;
+    top: 14px;
+    background: rgba(0,0,0,0.35);
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.12);
+    pointer-events: none;
+  }
+
+  .ui-control-toolbar.mobile-drawer-open,
+  .box-filter-panel.mobile-drawer-open,
+  .box-filter-bar.mobile-drawer-open,
+  .dict-toolbar.mobile-drawer-open,
+  .inv-toolbar.mobile-drawer-open {
+    max-height: 600px !important;
+    overflow: visible !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    z-index: 25;
+  }
+
+  .ui-control-toolbar.mobile-drawer-open::after,
+  .box-filter-panel.mobile-drawer-open::after,
+  .box-filter-bar.mobile-drawer-open::after,
+  .dict-toolbar.mobile-drawer-open::after,
+  .inv-toolbar.mobile-drawer-open::after {
+    content: "⚙️ Fermer ▴";
+    background: var(--blue);
+    color: #FFFFFF;
+  }
+}
+
+/* ── 6. Scale Down Overflowing Modals on Mobile ── */
+@media (max-width: 850px), (pointer: coarse) {
+  #poke-modal-inner,
+  #settings-inner,
+  #starter-modal-inner,
+  #quest-inner,
+  #confirm-inner,
+  #battle-summary-inner,
+  #fullscreen-panel-modal > div,
+  .modal-inner,
+  .pw-modal-inner,
+  .save-menu-panel {
+    max-width: 96vw !important;
+    max-height: 90vh !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-y: auto !important;
+    transform-origin: center center !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #poke-modal-inner,
+  #settings-inner,
+  #starter-modal-inner,
+  #fullscreen-panel-modal > div,
+  .modal-inner,
+  .pw-modal-inner {
+    transform: scale(0.92) !important;
+    width: 108% !important;
+    margin-left: -4% !important;
+  }
+}

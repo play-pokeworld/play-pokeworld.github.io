@@ -129,11 +129,96 @@ function renderMap(){
  }
  _pwSetHtmlSafe(nodeG, rectsHTML + labelsHTML);
  ensureMapHelpButton();
+ initMobileMapPinchZoom();
 
+}
+
+let __pwMapZoom = 1.0;
+let __pwMapPanX = 0;
+let __pwMapPanY = 0;
+let __pwIsPinchingOrDragging = false;
+let __pwPinchResetTimer = null;
+const __pwActivePointers = new Map();
+
+function applyMobileMapTransform() {
+  const svg = document.getElementById('map-svg');
+  if (!svg) return;
+  svg.style.transform = `translate(${__pwMapPanX}px, ${__pwMapPanY}px) scale(${__pwMapZoom})`;
+  svg.style.transformOrigin = 'center center';
+  svg.style.transition = 'transform 0.1s ease-out';
+}
+
+function initMobileMapPinchZoom() {
+  const panel = document.getElementById('map-panel');
+  if (!panel || panel.dataset.pinchZoomInit === 'true') return;
+  panel.dataset.pinchZoomInit = 'true';
+
+  let lastPinchDist = null;
+  let dragStart = null;
+
+  panel.addEventListener('pointerdown', (e) => {
+    if (!e.target.closest('#map-svg')) return;
+    __pwActivePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (__pwActivePointers.size === 2) {
+      const pts = Array.from(__pwActivePointers.values());
+      lastPinchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+      __pwIsPinchingOrDragging = true;
+    } else if (__pwActivePointers.size === 1 && __pwMapZoom > 1.0) {
+      dragStart = { x: e.clientX - __pwMapPanX, y: e.clientY - __pwMapPanY };
+    }
+    try { panel.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+
+  panel.addEventListener('pointermove', (e) => {
+    if (!__pwActivePointers.has(e.pointerId)) return;
+    __pwActivePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (__pwActivePointers.size === 2 && lastPinchDist !== null) {
+      const pts = Array.from(__pwActivePointers.values());
+      const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+      if (lastPinchDist > 0) {
+        const factor = dist / lastPinchDist;
+        __pwMapZoom = Math.max(1.0, Math.min(3.0, __pwMapZoom * factor));
+        if (__pwMapZoom === 1.0) { __pwMapPanX = 0; __pwMapPanY = 0; }
+        applyMobileMapTransform();
+        __pwIsPinchingOrDragging = true;
+      }
+      lastPinchDist = dist;
+    } else if (__pwActivePointers.size === 1 && dragStart && __pwMapZoom > 1.0) {
+      const dx = e.clientX - dragStart.x;
+      const dy = e.clientY - dragStart.y;
+      if (Math.hypot(dx - __pwMapPanX, dy - __pwMapPanY) > 4) {
+        __pwIsPinchingOrDragging = true;
+      }
+      __pwMapPanX = dx;
+      __pwMapPanY = dy;
+      applyMobileMapTransform();
+    }
+  });
+
+  const onPointerUp = (e) => {
+    __pwActivePointers.delete(e.pointerId);
+    if (__pwActivePointers.size < 2) {
+      lastPinchDist = null;
+    }
+    if (__pwActivePointers.size === 0) {
+      dragStart = null;
+      if (__pwIsPinchingOrDragging) {
+        clearTimeout(__pwPinchResetTimer);
+        __pwPinchResetTimer = setTimeout(() => {
+          __pwIsPinchingOrDragging = false;
+        }, 150);
+      }
+    }
+    try { panel.releasePointerCapture(e.pointerId); } catch (_) {}
+  };
+
+  panel.addEventListener('pointerup', onPointerUp);
+  panel.addEventListener('pointercancel', onPointerUp);
 }
 
 
 function clickLocation(id){
+ if (__pwIsPinchingOrDragging) return;
  const loc=getLocObj(id);
  if(!loc) return;
  
@@ -224,6 +309,7 @@ if (typeof updateRegionSelectorLocks !== 'undefined') { if (typeof window !== 'u
 if (typeof renderMap !== 'undefined') { if (typeof window !== 'undefined') window.renderMap = renderMap; if (typeof globalThis !== 'undefined') globalThis.renderMap = renderMap; }
 if (typeof clickLocation !== 'undefined') { if (typeof window !== 'undefined') window.clickLocation = clickLocation; if (typeof globalThis !== 'undefined') globalThis.clickLocation = clickLocation; }
 if (typeof refreshMapAndLoc !== 'undefined') { if (typeof window !== 'undefined') window.refreshMapAndLoc = refreshMapAndLoc; if (typeof globalThis !== 'undefined') globalThis.refreshMapAndLoc = refreshMapAndLoc; }
+if (typeof initMobileMapPinchZoom !== 'undefined') { if (typeof window !== 'undefined') window.initMobileMapPinchZoom = initMobileMapPinchZoom; if (typeof globalThis !== 'undefined') globalThis.initMobileMapPinchZoom = initMobileMapPinchZoom; }
 
 
 
@@ -234,4 +320,5 @@ export {
   renderMap,
   clickLocation,
   refreshMapAndLoc,
+  initMobileMapPinchZoom,
 };
