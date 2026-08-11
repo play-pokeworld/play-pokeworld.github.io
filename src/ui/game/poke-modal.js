@@ -253,6 +253,7 @@ function pokemonDetailMoveModels(p, opts){
 }
 
 function renderPokemonDetailModal(p, opts){
+  try { if (typeof tutorialMark === 'function') tutorialMark('open_poke_sheet'); else if (window.tutorialMark) window.tutorialMark('open_poke_sheet'); } catch(_){}
  opts = opts || {};
  if(!p) return;
  const modal = document.getElementById('poke-modal');

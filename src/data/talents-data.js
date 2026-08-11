@@ -898,7 +898,7 @@ export const TALENTS = {
     "id": "metalhead",
     "name": "metalhead",
     "name_fr": "metalhead",
-    "desc": "\"Head\"-related moves have their base power multiplied by x1.5 <span style=\"opacity:0.7\">()<span>",
+    "desc": "\"Head\"-related moves have their base power multiplied by x1.5.",
     "rarity": 3,
     "type": ["all"]
   },
@@ -1735,7 +1735,7 @@ export const TALENTS = {
     "id": "windRider",
     "name": "windRider",
     "name_fr": "windRider",
-    "desc": "\"Wind\"-related moves are executed twice as fast <span style=\"opacity:0.7\">()<span>",
+    "desc": "\"Wind\"-related moves are executed twice as fast.",
     "rarity": 3,
     "type": ["all"]
   },

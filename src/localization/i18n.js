@@ -158,7 +158,13 @@ function getLocName(id){
 function setLanguage(lang){
  // Wave 32: the target language pack may still be streaming in the
  // background — make sure its fragments are merged right away.
- try{ if(typeof window !== 'undefined' && typeof window.__pwEnsureLanguage === 'function') window.__pwEnsureLanguage(lang); }catch(_){}
+ try{
+   if(typeof window !== 'undefined' && typeof window.__pwEnsureLanguage === 'function') {
+     window.__pwEnsureLanguage(lang).then(() => {
+       try{ const sms = document.getElementById('save-menu-screen'); if(sms && sms.classList.contains('is-open') && typeof renderSaveMenu === 'function') renderSaveMenu(); }catch(_){}
+     }).catch(() => {});
+   }
+ }catch(_){}
  if(!G) G = {};
  G.lang = lang;
  // Sync the new Localization engine too

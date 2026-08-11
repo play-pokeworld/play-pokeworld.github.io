@@ -630,27 +630,27 @@ export const L_en_talents = {
   },
   "dancer": {
     "name": "Dancer",
-    "desc": "\"Dance\"-related moves are executed twice as fast <span style=\"opacity:0.7\">()<span>"
+    "desc": "\"Dance\"-related moves are executed twice as fast."
   },
   "cacophony": {
     "name": "Cacophony",
-    "desc": "\"Sound\"-related moves are executed twice as fast <span style=\"opacity:0.7\">()<span>"
+    "desc": "\"Sound\"-related moves are executed twice as fast."
   },
   "windrider": {
     "name": "Wind Rider",
-    "desc": "\"Wind\"-related moves are executed twice as fast <span style=\"opacity:0.7\">()<span>"
+    "desc": "\"Wind\"-related moves are executed twice as fast."
   },
   "iaido": {
     "name": "Iaido",
-    "desc": "\"Sharp\"-related moves are executed twice as fast <span style=\"opacity:0.7\">()<span>"
+    "desc": "\"Sharp\"-related moves are executed twice as fast."
   },
   "megalauncher": {
     "name": "Mega Launcher",
-    "desc": "\"Pulse\"-related moves have their base power multiplied by x1.5 <span style=\"opacity:0.7\">()<span>"
+    "desc": "\"Pulse\"-related moves have their base power multiplied by x1.5."
   },
   "metalhead": {
     "name": "Metalhead",
-    "desc": "\"Head\"-related moves have their base power multiplied by x1.5 <span style=\"opacity:0.7\">()<span>"
+    "desc": "\"Head\"-related moves have their base power multiplied by x1.5."
   },
   "imposter": {
     "name": "Imposter",

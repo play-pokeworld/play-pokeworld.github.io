@@ -215,6 +215,12 @@ const __pwLoadedLanguages = new Set([__pwActiveLangNow]);
 function __pwRefreshLocalization() {
   try { if (typeof window.__pwLocalizeRemerge === 'function') window.__pwLocalizeRemerge(); } catch (_) {}
   try { if (window.L && typeof window.L._captureLegacyData === 'function') window.L._captureLegacyData(); } catch (_) {}
+  try {
+    const sms = document.getElementById('save-menu-screen');
+    if (sms && sms.classList.contains('is-open') && typeof window.renderSaveMenu === 'function') {
+      window.renderSaveMenu();
+    }
+  } catch (_) {}
 }
 
 /**
