@@ -314,7 +314,7 @@ if(typeof window !== 'undefined'){
  window.tutorialEnable=tutorialEnable;
  window.tutorialDismissTip=tutorialDismissTip;
  window.closeTutorialTip=closeTutorialTip;
- window.tutorialMark=tutorialMark;
+ window.tutorialMark=tutorialMark; if(typeof globalThis!=="undefined") globalThis.tutorialMark=tutorialMark;
  window.renderTutorialQuestBlock=renderTutorialQuestBlock;
  window.renderGuidePanel=renderGuidePanel;
  window.setGuideSection=setGuideSection;

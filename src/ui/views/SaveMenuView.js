@@ -74,7 +74,19 @@ export class SaveMenuView extends UIView {
           h('input', {
             type: 'file', id: 'save-menu-import-file', accept: '.json,application/json',
             class: 'pw-static-010', dataset: { action: 'import-save-file' },
-          }))),
+          })),
+        h('div', { class: 'save-menu-lang-actions', style: { display: 'flex', gap: '8px', marginTop: '14px', justifyContent: 'center' } },
+          h('button', {
+            type: 'button',
+            class: `hbtn lang-btn${(typeof currentLang === 'function' && currentLang() === 'fr') ? ' active' : ''}`,
+            dataset: { action: 'legacy-call', call: 'setSaveMenuLang', callArgs: "'fr'" },
+          }, '🇫🇷 FR'),
+          h('button', {
+            type: 'button',
+            class: `hbtn lang-btn${(typeof currentLang === 'function' && currentLang() === 'en') ? ' active' : ''}`,
+            dataset: { action: 'legacy-call', call: 'setSaveMenuLang', callArgs: "'en'" },
+          }, '🇬🇧 EN')
+        )),
     ];
   }
 

@@ -1,3 +1,12 @@
+function setSaveMenuLang(lang) {
+  if (typeof window !== 'undefined') {
+    window.__pwActiveSaveMenuLang = lang;
+    try { localStorage.setItem('pokeworld_lang', lang); } catch (_) {}
+    try { if (safeStorage) safeStorage.set('pokeworld_lang', lang); } catch (_) {}
+  }
+  if (typeof setLanguage === 'function') setLanguage(lang);
+  if (typeof renderSaveMenu === 'function') renderSaveMenu();
+}
 // Wave 41 — native ESM module. The classic surface (window/globalThis) is
 // kept: classic consumers, VM harnesses and the engine registry.
 // Fallback if util.js is not loaded — targeted unit tests.
@@ -948,7 +957,7 @@ if (typeof confirmDelete !== 'undefined') { if (typeof window !== 'undefined') w
 if (typeof cancelDelete !== 'undefined') { if (typeof window !== 'undefined') window.cancelDelete = cancelDelete; if (typeof globalThis !== 'undefined') globalThis.cancelDelete = cancelDelete; }
 if (typeof doDelete !== 'undefined') { if (typeof window !== 'undefined') window.doDelete = doDelete; if (typeof globalThis !== 'undefined') globalThis.doDelete = doDelete; }
 if (typeof resetGame !== 'undefined') { if (typeof window !== 'undefined') window.resetGame = resetGame; if (typeof globalThis !== 'undefined') globalThis.resetGame = resetGame; }
-if (typeof renderSaveMenu !== 'undefined') { if (typeof window !== 'undefined') window.renderSaveMenu = renderSaveMenu; if (typeof globalThis !== 'undefined') globalThis.renderSaveMenu = renderSaveMenu; }
+if (typeof renderSaveMenu !== 'undefined') { if (typeof window !== 'undefined') window.renderSaveMenu = renderSaveMenu; window.setSaveMenuLang = setSaveMenuLang; if (typeof globalThis !== 'undefined') globalThis.renderSaveMenu = renderSaveMenu; }
 if (typeof createNewSaveFromMenu !== 'undefined') { if (typeof window !== 'undefined') window.createNewSaveFromMenu = createNewSaveFromMenu; if (typeof globalThis !== 'undefined') globalThis.createNewSaveFromMenu = createNewSaveFromMenu; }
 if (typeof startSaveById !== 'undefined') { if (typeof window !== 'undefined') window.startSaveById = startSaveById; if (typeof globalThis !== 'undefined') globalThis.startSaveById = startSaveById; }
 if (typeof importMultiSave !== 'undefined') { if (typeof window !== 'undefined') window.importMultiSave = importMultiSave; if (typeof globalThis !== 'undefined') globalThis.importMultiSave = importMultiSave; }
@@ -1129,5 +1138,5 @@ if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.regis
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('confirmDelete', confirmDelete); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('doDelete', doDelete); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('loadGame', loadGame); } catch (_) {} }
-if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('saveGame', saveGame); } catch (_) {} }
+if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('saveGame', saveGame); PokeActions.register('setSaveMenuLang', setSaveMenuLang); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('debugGiveCtCs', debugGiveCtCs); } catch (_) {} }

@@ -1,3 +1,12 @@
+function _pwMarkTutorial(id) {
+  try {
+    const fn = (typeof tutorialMark === 'function') ? tutorialMark
+      : (typeof window !== 'undefined' && typeof window.tutorialMark === 'function') ? window.tutorialMark
+      : (typeof globalThis !== 'undefined' && typeof globalThis.tutorialMark === 'function') ? globalThis.tutorialMark
+      : null;
+    if (fn) fn(id);
+  } catch (_) {}
+}
 // Wave 41 — native ESM module. The classic surface (window/globalThis) is
 // kept: classic consumers, VM harnesses and the engine registry.
 // Fallback if util.js is not loaded — targeted unit tests.
@@ -253,7 +262,7 @@ function pokemonDetailMoveModels(p, opts){
 }
 
 function renderPokemonDetailModal(p, opts){
-  try { if (typeof tutorialMark === 'function') tutorialMark('open_poke_sheet'); else if (window.tutorialMark) window.tutorialMark('open_poke_sheet'); } catch(_){}
+  _pwMarkTutorial('open_poke_sheet');
  opts = opts || {};
  if(!p) return;
  const modal = document.getElementById('poke-modal');
@@ -343,7 +352,7 @@ function renderPokemonDetailModal(p, opts){
 
 
 function openPokeModal(idx){
-  try { if (typeof tutorialMark === 'function') tutorialMark('open_poke_sheet'); else if (window.tutorialMark) window.tutorialMark('open_poke_sheet'); } catch(_){}
+  _pwMarkTutorial('open_poke_sheet');
   window._POKEMODAL_SOURCE = 'team';
   const p = (typeof G !== 'undefined' && G && G.team) ? G.team[idx] : null;
   if (!p) { if(typeof moveEditorFor !== 'undefined') moveEditorFor = null; return; }
@@ -733,7 +742,7 @@ if (typeof openMoveInfo !== 'undefined') { if (typeof window !== 'undefined') wi
 
 
 function openBoxPokeModal(boxId) {
-  try { if (typeof tutorialMark === 'function') tutorialMark('open_poke_sheet'); else if (window.tutorialMark) window.tutorialMark('open_poke_sheet'); } catch(_){}
+  _pwMarkTutorial('open_poke_sheet');
   window._POKEMODAL_SOURCE = 'box';
   const p = (typeof G !== 'undefined' && G && G.collection) ? (G.collection[boxId] || G.collection[String(boxId)]) : null;
   if (!p) return;

@@ -1,3 +1,12 @@
+function _pwMarkTutorial(id) {
+  try {
+    const fn = (typeof tutorialMark === 'function') ? tutorialMark
+      : (typeof window !== 'undefined' && typeof window.tutorialMark === 'function') ? window.tutorialMark
+      : (typeof globalThis !== 'undefined' && typeof globalThis.tutorialMark === 'function') ? globalThis.tutorialMark
+      : null;
+    if (fn) fn(id);
+  } catch (_) {}
+}
 // Wave 41 — native ESM module. The classic surface (window/globalThis) is
 // kept: classic consumers, VM harnesses and the engine registry.
 
@@ -606,6 +615,10 @@ function prepareAtollFactoryBattle(modeKey='factory_c'){
 }
 
 function openFullscreenPanel(panelType){
+  try {
+    if (panelType === 'inventory') { _pwMarkTutorial('open_bag'); }
+    if (panelType === 'pokedex') { _pwMarkTutorial('open_pokedex'); }
+  } catch(_){}
  
  closeUnifiedSelectorModal();
  closeFullscreenPanel();

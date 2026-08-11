@@ -40,6 +40,7 @@ function currentLang(){
  // boot screens (save menu, starter modal, team toolbar) in English while
  // the surrounding UI stayed French, a mixed-language mess for new players.
  // An explicit language choice (settings -> G.lang) always wins.
+ if (typeof window !== 'undefined' && window.__pwActiveSaveMenuLang) return window.__pwActiveSaveMenuLang;
  return (typeof G !== 'undefined' && G && G.lang) ? G.lang : 'fr';
 }
 
