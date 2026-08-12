@@ -8,6 +8,7 @@ export const L_location_names_en = {
   "battle_frontier": "Battle Frontier",
   "blackthorn": "Blackthorn City",
   "burnedtower": "Burned Tower",
+  "billshouse": "Bill's Cottage",
   "cave_of_origin": "Cave of Origin",
   "celadon": "Celadon City",
   "cerulean": "Cerulean City",

@@ -132,7 +132,7 @@ var STORY_QUESTS = [
   "id": 13,
   "region": "kanto",
   "type": "talk",
-  "loc": "route25",
+  "loc": "billshouse",
   "target": 1,
   "rewardMoney": 900,
   "rewardItems": { "colbur_berry": 1 }
@@ -143,7 +143,7 @@ var STORY_QUESTS = [
   "type": "talk",
   "loc": "cerulean",
   "target": 1,
-  "rewardMoney": 700,
+  "rewardMoney": 1000,
   "rewardItems": {}
  },
  {

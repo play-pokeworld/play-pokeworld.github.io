@@ -10161,3 +10161,27 @@ button[data-action].pw-loc-gym-btn:hover,
     box-shadow: 0 6px 20px rgba(0,0,0,0.85) !important;
   }
 }
+
+/* ── NPC button status visual indicators ─────────────────────────────── */
+.pw-npc-done, .pw-npc-talked {
+  background: rgba(31, 138, 59, 0.15) !important;
+  border-color: rgba(31, 138, 59, 0.50) !important;
+  color: #4ade80 !important;
+  opacity: 0.90;
+}
+.pw-npc-quest-offer {
+  background: rgba(217, 119, 6, 0.20) !important;
+  border-color: rgba(245, 158, 11, 0.70) !important;
+  color: #f59e0b !important;
+  font-weight: bold !important;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.25) !important;
+}
+.pw-npc-quest-active {
+  background: rgba(37, 99, 235, 0.20) !important;
+  border-color: rgba(96, 165, 250, 0.70) !important;
+  color: #60a5fa !important;
+  font-weight: bold !important;
+}
+.pw-npc-untalked {
+  opacity: 1;
+}

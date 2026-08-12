@@ -91,5 +91,7 @@ export var LOCS_HOENN = {
   ancient_tomb:    { name: 'Tombeau Antique (Registeel)', type: 'dungeon', x: 720, y: 260, w: 56, h: 48, conn: ['route120'], wild: [[337, 26, 32, 'common'], [338, 26, 32, 'common'], [344, 28, 34, 'uncommon']], shopId: null, champ: null, badgeReq: 6 },
 };
 
+for (const id in LOCS_HOENN) { const loc = LOCS_HOENN[id]; if (loc && loc.minWins === undefined) loc.minWins = (loc.type === 'town') ? 0 : 10; }
+
 // Wave 40 — surface kept (window → globalThis block, same scope).
 if (typeof globalThis !== 'undefined') globalThis.LOCS_HOENN = LOCS_HOENN;

@@ -14,8 +14,9 @@ var LOCS = {
  route4: {name:'Route 4', type:'route', x:896,y:184,w:192,h:48, conn:['mtmoon','cerulean'], wild:[[19,8,12,'common'],[21,8,12,'common'],[23,6,12,'uncommon'],[27,6,12,'uncommon']], shopId:null, champ:null, badgeReq:1},
  cerulean: {name:'Azuria', type:'town', x:1064,y:176,w:144,h:64, conn:['route4','route24','route5','route9','ceruleancave'], wild:[], shopId:'cerulean', champ:'misty', badgeReq:1},
  ceruleancave: {name:'Caverne Azurée', type:'dungeon', x:1008,y:104,w:64,h:48, conn:['cerulean'], wild:[[42,46,52,'common'],[64,46,52,'common'],[112,46,52,'common'],[113,50,56,'rare'],[132,45,50,'uncommon'],[150,70,70,'rare']], shopId:null, champ:null, badgeReq:8},
- route24: {name:'Pont Pépite (24)', type:'route', x:1080,y:88,w:48,h:112, conn:['cerulean','route25'], wild:[[118,15,20,'uncommon'],[10,7,10,'common'],[13,7,10,'common'],[16,12,14,'common'],[43,12,14,'uncommon'],[69,12,14,'uncommon'],[63,8,12,'rare'],[129,5,15,'common'],[98,15,20,'uncommon']], shopId:null, champ:null, badgeReq:2},
- route25: {name:'Route 25', type:'route', x:1216,y:56,w:224,h:48, conn:['route24'], wild:[[118,15,20,'uncommon'],[10,8,12,'common'],[13,8,12,'common'],[16,13,15,'common'],[43,13,15,'uncommon'],[69,13,15,'uncommon'],[129,5,15,'common'],[98,15,20,'uncommon']], shopId:null, champ:null, badgeReq:2},
+ route24: {name:'Pont Pépite (24)', type:'route', x:1080,y:88,w:48,h:112, conn:['cerulean','route25'], wild:[[118,15,20,'uncommon'],[10,7,10,'common'],[13,7,10,'common'],[16,12,14,'common'],[43,12,14,'uncommon'],[69,12,14,'uncommon'],[63,8,12,'rare'],[129,5,15,'common'],[98,15,20,'uncommon']], shopId:null, champ:null, badgeReq:1},
+ route25: {name:'Route 25', type:'route', x:1216,y:56,w:224,h:48, conn:['route24','billshouse'], wild:[[118,15,20,'uncommon'],[10,8,12,'common'],[13,8,12,'common'],[16,13,15,'common'],[43,13,15,'uncommon'],[69,13,15,'uncommon'],[129,5,15,'common'],[98,15,20,'uncommon']], shopId:null, champ:null, badgeReq:1},
+ billshouse: {name:'Chalet de Léo', type:'town', x:1368,y:32,w:80,h:64, conn:['route25'], wild:[], shopId:null, champ:null, badgeReq:1},
  route5: {name:'Route 5', type:'route', x:1080,y:248,w:48,h:80, conn:['cerulean','saffron','route6'], wild:[[16,13,16,'common'],[19,13,16,'common'],[43,13,16,'uncommon'],[69,13,16,'uncommon'],[52,10,16,'uncommon'],[56,10,16,'uncommon']], shopId:null, champ:null, badgeReq:2},
  saffron: {name:'Safrania', type:'town', x:1048,y:352,w:176,h:128, conn:['route5','route6','route8','route7'], wild:[], shopId:'celadon', champ:'sabrina', badgeReq:3},
  route6: {name:'Route 6', type:'route', x:1080,y:456,w:48,h:80, conn:['saffron','vermilion','route5'], wild:[[54,15,20,'common'],[16,13,16,'common'],[19,13,16,'common'],[43,13,16,'uncommon'],[69,13,16,'uncommon'],[52,10,16,'uncommon'],[56,10,16,'uncommon'],[129,5,15,'common'],[98,15,20,'uncommon']], shopId:null, champ:null, badgeReq:2},
@@ -123,6 +124,12 @@ if (typeof LOCS !== 'undefined') { if (typeof window !== 'undefined') window.LOC
 if (typeof LOCS_JOHTO !== 'undefined') { if (typeof window !== 'undefined') window.LOCS_JOHTO = LOCS_JOHTO; if (typeof globalThis !== 'undefined') globalThis.LOCS_JOHTO = LOCS_JOHTO; }
 if (typeof LOCS_HOENN !== 'undefined') { if (typeof window !== 'undefined') window.LOCS_HOENN = LOCS_HOENN; if (typeof globalThis !== 'undefined') globalThis.LOCS_HOENN = LOCS_HOENN; }
 if (typeof getCurrentRegionLocs !== 'undefined') { if (typeof window !== 'undefined') window.getCurrentRegionLocs = getCurrentRegionLocs; if (typeof globalThis !== 'undefined') globalThis.getCurrentRegionLocs = getCurrentRegionLocs; }
+
+for (const id in LOCS) { const loc = LOCS[id]; if (loc && loc.minWins === undefined) loc.minWins = (loc.type === 'town') ? 0 : 10; }
+for (const id in LOCS_JOHTO) { const loc = LOCS_JOHTO[id]; if (loc && loc.minWins === undefined) loc.minWins = (loc.type === 'town') ? 0 : 10; }
+if (typeof LOCS_HOENN !== 'undefined' && LOCS_HOENN) {
+  for (const id in LOCS_HOENN) { const loc = LOCS_HOENN[id]; if (loc && loc.minWins === undefined) loc.minWins = (loc.type === 'town') ? 0 : 10; }
+}
 
 
 

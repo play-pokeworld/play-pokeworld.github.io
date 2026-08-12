@@ -46,6 +46,7 @@ var NPCS = {
   }
  ],
  "vermilion": [
+  {},
   {
    "quest": "s5"
   },
@@ -99,9 +100,6 @@ var NPCS = {
  "route25": [
   {
    "board": true
-  },
-  {
-   "mainTalk": 13
   }
  ],
  "fuchsia": [
@@ -342,6 +340,11 @@ var NPCS = {
   },
   {
    "quest": "s97"
+  }
+ ],
+ "billshouse": [
+  {
+   "mainTalk": 13
   }
  ],
  "tintower": [

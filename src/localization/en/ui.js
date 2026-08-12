@@ -2,6 +2,8 @@
 // Auto-extracted & grouped by domain. Edit text here, never hardcode in logic.
 
 export const L_en_ui = {
+"npc_reward_received":"NPC Gift",
+"leo_reward_received":"Bill's Gift",
 "debug_toggle_btn":"Debug",
 "debug_x10_toggle":"x10 speed:",
 "debug_fill_mine":"Refill mine energy (100)",
@@ -10,6 +12,7 @@ export const L_en_ui = {
 "debug_give_money":"+50,000₽",
 "debug_menu_title":"Debug / cheats",
 "guide_pokedex_title":"Pokédex",
+"evo_catalog_hint":"Species that can evolve with this item:",
 "guide_dictionary_text":"Search items, moves and abilities. See who knows a move, who owns an ability and where to get an item.",
 "guide_dictionary_title":"Dictionary",
 "guide_training_text":"Train a Pokémon for levels, EV, abilities or advanced moves.",

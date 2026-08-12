@@ -68,9 +68,9 @@ export const L_en_quests = {
 "rewardDesc":"900₽ + 1 Dark Berry"
 },
 "14": {
-"title":"The Fan Club President",
-"desc":"The President of Vermilion's Pokémon Fan Club rambles on about his beloved Pokémon… Listen patiently: generosity follows.",
-"rewardDesc":"700₽ + 2 Oran Berries"
+"title":"Cerulean Miracle Cycle",
+"desc":"Talk to the Bike Shop Owner in Cerulean City: he loves praising his amazing bicycles! Listen to him before challenging Misty's Gym.",
+"rewardDesc":"1,000₽"
 },
 "15": {
 "title":"The Cascade Gym of Cerulean",

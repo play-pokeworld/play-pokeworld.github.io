@@ -8,6 +8,7 @@ export const L_location_names_fr = {
   "battle_frontier": "Zone de Combat",
   "blackthorn": "Ébénelle",
   "burnedtower": "Tour Cendrée",
+  "billshouse": "Chalet de Léo",
   "cave_of_origin": "Grotte Origine",
   "celadon": "Céladopole",
   "cerulean": "Azuria",

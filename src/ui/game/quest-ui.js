@@ -122,8 +122,68 @@ function renderStoryWindow(){
  if(!views || !views.StoryWindowView) throw new Error('[ui] PokeUI views not loaded (StoryWindowView)');
  _pwSetHtmlSafe(panel, views.StoryWindowView.toHTML(model));
 }
+
+function claimFirstTimeNpcReward(locId, idx, npcName) {
+  if (!G.npcRewardsClaimed || typeof G.npcRewardsClaimed !== 'object') G.npcRewardsClaimed = {};
+  const key = locId + '_' + idx;
+  if (G.npcRewardsClaimed[key]) return false;
+
+  let claimed = false;
+  if ((npcName === "Président Fan Club" || npcName === "Fan Club President") && locId === 'vermilion') {
+    G.npcRewardsClaimed[key] = true;
+    addToInventory('rarecandy', 1);
+    G.money = (G.money || 0) + 1000;
+    notify(t('npc_reward_received') + " : 1 Super Bonbon + 1 000₽ !", "var(--green)");
+    claimed = true;
+  } else if ((npcName === "Léo" || npcName === "Bill") && locId === 'billshouse') {
+    const isQ13Active = (G.activeQuests || []).some(i => i.qid === 13 && i.cat === 'main');
+    if (!isQ13Active) {
+      G.npcRewardsClaimed[key] = true;
+      addToInventory('upgrade', 1);
+      G.money = (G.money || 0) + 1000;
+      notify(t('leo_reward_received') + " : 1 Évoluteur + 1 000₽ !", "var(--green)");
+      claimed = true;
+    }
+  } else if ((npcName === "Employé de la Sylphe" || npcName === "Silph Employee") && locId === 'saffron') {
+    G.npcRewardsClaimed[key] = true;
+    G.money = (G.money || 0) + 1500;
+    const lapras = (typeof createPoke === 'function') ? createPoke(131, 1) : null;
+    if (lapras) {
+      if (G.team.length < 6) G.team.push(lapras);
+      else {
+        const _qKey = (typeof generateUniqueBoxId === 'function') ? generateUniqueBoxId(131) : ('box_131_' + Date.now());
+        G.collection[_qKey] = lapras;
+      }
+      if (G.pokedex && G.pokedex[131]) G.pokedex[131] = {...G.pokedex[131], seen: true, caught: true};
+      if (typeof unlockTalentForSpecies === 'function') unlockTalentForSpecies(131, lapras.talent);
+    }
+    notify(t('npc_reward_received') + " : Lokhlass (Nv.1) + 1 500₽ !", "var(--green)");
+    claimed = true;
+  } else if ((npcName === "M. Psyché" || npcName === "Mr. Psychic") && locId === 'saffron') {
+    G.npcRewardsClaimed[key] = true;
+    addToInventory('twisted_spoon', 1);
+    G.money = (G.money || 0) + 1000;
+    notify(t('npc_reward_received') + " : 1 Cuillère Tordue + 1 000₽ !", "var(--green)");
+    claimed = true;
+  } else if ((npcName === "Pharmacien Didier" || npcName === "Pharmacist Didier") && locId === 'cianwood') {
+    G.npcRewardsClaimed[key] = true;
+    addToInventory('prine_berry', 1);
+    G.money = (G.money || 0) + 1500;
+    notify(t('npc_reward_received') + " : 1 Baie Prine + 1 500₽ !", "var(--green)");
+    claimed = true;
+  }
+
+  if (claimed) {
+    saveGame();
+    try { if (document.getElementById('location-info-body')) renderLocationInfo(); } catch (_) {}
+  }
+  return claimed;
+}
+
 function openNpc(locId, idx){
  ensureQuestState();
+ if (!G.npcTalked || typeof G.npcTalked !== 'object') G.npcTalked = {};
+ G.npcTalked[locId + '_' + idx] = true;
  const arr = (typeof NPCS!=='undefined') ? NPCS[locId] : null;
  if(!arr || !arr[idx]) return;
  const npc = arr[idx];
@@ -131,6 +191,8 @@ function openNpc(locId, idx){
   const npcText = getNpc(locId, idx);
   const npcName = npcText.name;
   
+  claimFirstTimeNpcReward(locId, idx, npcName);
+
   if((npcName === "Nageuse Ondée" || npcName === "Swimmer Ondée" || npcName === "Swimmer Ondee") && !G.repeatableQuestsUnlocked){
     G.repeatableQuestsUnlocked = true;
     saveGame();
@@ -139,7 +201,21 @@ function openNpc(locId, idx){
       try { renderStoryWindow(); } catch(_){}
     }, 100);
   }
- const lines = npcText.lines;
+ let lines = Array.isArray(npcText.lines) ? [...npcText.lines] : [];
+ const key = locId + '_' + idx;
+ if (G.npcRewardsClaimed && G.npcRewardsClaimed[key]) {
+   if (npcName === "Président Fan Club" || npcName === "Fan Club President") {
+     lines = [(G.lang === 'en') ? "My Pokémon are the cutest in the world! Thank you for listening so passionately." : "Mes Pokémon sont les plus mignons du monde ! Merci d'avoir écouté mes histoires avec tant de passion."];
+   } else if (npcName === "Léo" || npcName === "Bill") {
+     lines = [(G.lang === 'en') ? "Thanks again for visiting! My teleporter and Storage System are working like a charm." : "Merci encore d'être passé ! Mon téléporteur et mon Système de Stockage fonctionnent à merveille maintenant."];
+   } else if (npcName === "Employé de la Sylphe" || npcName === "Silph Employee") {
+     lines = [(G.lang === 'en') ? "Take good care of little Lapras! It has great potential." : "Prenez bien soin du petit Lokhlass ! Il a un grand potentiel dans votre équipe."];
+   } else if (npcName === "M. Psyché" || npcName === "Mr. Psychic") {
+     lines = [(G.lang === 'en') ? "The Twisted Spoon boosts the power of Psychic moves!" : "La Cuillère Tordue augmente la puissance des capacités Psy !"];
+   } else if (npcName === "Pharmacien Didier" || npcName === "Pharmacist Didier") {
+     lines = [(G.lang === 'en') ? "Amphy at the Lighthouse is feeling much better thanks to you!" : "Amphy au Phare va mieux grâce à toi ! Bonne route en Johto."];
+   }
+ }
  // Wave 20 (ECS DS): the dialog body is rendered from zero by
  // NpcDialogView — model shaping only, action contracts unchanged
  // (acceptSideQuest / openRepeatableMenu / closeQuestModal).

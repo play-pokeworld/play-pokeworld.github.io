@@ -473,7 +473,9 @@ function offlineAfkViews(){
   if(!views || typeof views.AfkRecapView !== 'function') throw new Error('[ui] PokeUI views not loaded (AfkRecapView)');
   return views;
 }
+let _offlineWantRecap = true;
 function offlineShowProgress(pct, infoText){
+  if (typeof _offlineWantRecap !== 'undefined' && !_offlineWantRecap) return;
   // Phase 29: refresh driven by the REAL clock (OFFLINE_PAINT_MS cadence)
   // — before, the bar only repainted once every 40,000 ticks and the game
   // looked frozen for the whole computation.
@@ -634,6 +636,7 @@ async function offlineSimulate(ms, reason){
   const capped = Math.min(Math.max(0, Number(ms) || 0), OFFLINE_MAX_MS);
   const seconds = Math.floor(capped / 1000);
   const wantRecap = reason === 'debug' || capped >= OFFLINE_RECAP_MIN_MS;
+  _offlineWantRecap = wantRecap;
   const startMoney = Number(G.money || 0);
   const startEnergy = G.mine ? Number(G.mine.energy || 0) : 0;
   const invBefore = snapshotInventory();
@@ -709,10 +712,7 @@ async function offlineSimulate(ms, reason){
     } else if(wantRecap){
       try{ showAfkResultPanel(result); }catch(_){ }
     } else {
-      const modal = typeof document !== 'undefined' ? document.getElementById('afk-result-modal') : null;
-      if(modal && !modal.classList.contains('open')){
-        try{ closeAfkResultPanel(); }catch(_){ }
-      }
+      try{ closeAfkResultPanel(); }catch(_){ }
     }
     try{
       if(result.boundedBattle){

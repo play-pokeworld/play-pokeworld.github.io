@@ -13,7 +13,7 @@ export const L_fr_lore = {
 "text":"L'Arène de notre ville est fermée pour l'instant. Le Champion Giovanni est en voyage d'affaires mystérieux..."
 },
 "pewter": {
-"speaker":"Pierre (Brock)",
+"speaker":"Pierre",
 "text":"Ma volonté est aussi solide que la roche ! Si tu veux mon Badge Roche, tu vas devoir briser ma défense !"
 },
 "mtmoon": {
@@ -21,11 +21,11 @@ export const L_fr_lore = {
 "text":"Cette grotte regorge de mystérieux fragments lunaires tombés du ciel. On raconte que de timides Mélofée s'y rassemblent les soirs de pleine lune !"
 },
 "cerulean": {
-"speaker":"Ondine (Misty)",
+"speaker":"Ondine",
 "text":"Moi, c'est Ondine ! La Sirène As de l'Arène ! Mes Pokémon Eau vont submerger ton équipe sous un torrent d'attaques !"
 },
 "vermilion": {
-"speaker":"Major Bob (Lt. Surge)",
+"speaker":"Major Bob",
 "text":"Repos, soldat ! Pendant la guerre, mes Pokémon Électrik ont sauvé ma vie. Montre-moi si tu as les nerfs assez solides !"
 },
 "celadon": {
@@ -37,7 +37,7 @@ export const L_fr_lore = {
 "text":"Fufufu... Le désespoir, la terreur et le poison ! Telles sont les armes secrètes du ninjutsu Pokémon !"
 },
 "cinnabar": {
-"speaker":"Auguste (Blaine)",
+"speaker":"Auguste",
 "text":"Hahaha ! Mon arène est un volcan en éruption ! Tu vas avoir besoin d'un anti-brûlure si tu ne veux pas finir en cendres !"
 },
 "seafoamislands": {
@@ -69,7 +69,7 @@ export const L_fr_lore = {
 "text":"Ville Griotte : la première ville des dresseurs de Johto, bercée par la mer."
 },
 "violet": {
-"speaker":"Albert (Falkner)",
+"speaker":"Albert",
 "text":"Mauville, ville des vents. Mon arène Vol teste l'agilité !"
 },
 "azalea": {
@@ -93,11 +93,11 @@ export const L_fr_lore = {
 "text":"Irisia, île des vagues et des poings. Mon corps est un temple !"
 },
 "mahogany": {
-"speaker":"Frédo (Pryce)",
+"speaker":"Frédo",
 "text":"Acajou, ville des neiges. Le Lac Colère bouillonne d'étrange."
 },
 "blackthorn": {
-"speaker":"Sandra (Clair)",
+"speaker":"Sandra",
 "text":"Ébénelle, cité des dragons. Ma famille veille sur eux."
 },
 "jroute29": {

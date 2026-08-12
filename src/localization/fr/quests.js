@@ -64,13 +64,13 @@ export const L_fr_quests = {
 },
 "13": {
 "title":"L'Inventeur du Cap",
-"desc":"Léo (Bill), l'inventeur du Système de Stockage, vous attend dans son chalet au bout du Pont Pépite. Allez le voir : il adore les dresseurs curieux !",
+"desc":"Léo, l'inventeur du Système de Stockage, vous attend dans son chalet au bout du Pont Pépite. Allez le voir : il adore les dresseurs curieux !",
 "rewardDesc":"900₽ + 1 Baie Colbur"
 },
 "14": {
-"title":"Le Président du Fan Club",
-"desc":"Le Président du Fan Club Pokémon de Carmin sur Mer radote sur ses Pokémon adorés… Écoutez ses histoires avec patience : la générosité suit toujours.",
-"rewardDesc":"700₽"
+"title":"Les Cycles à Gogo d'Azuria",
+"desc":"Parlez au Vendeur de Vélos d'Azuria : il adore vanter ses superbes bicyclettes ! Écoutez-le avant de défier l'Arène d'Ondine.",
+"rewardDesc":"1 000₽"
 },
 "15": {
 "title":"L'Arène Cascade d'Azuria",
@@ -204,7 +204,7 @@ export const L_fr_quests = {
 },
 "41": {
 "title":"Les Pouvoirs Psychiques de Safrania",
-"desc":"Pénétrez dans l'arène psychique de Safrania et vainquez Morgane (Sabrina) pour décrocher le Badge Marais.",
+"desc":"Pénétrez dans l'arène psychique de Safrania et vainquez Morgane pour décrocher le Badge Marais.",
 "rewardDesc":"10 000₽ + 1 Cuillère Tordue"
 },
 "42": {
@@ -790,7 +790,7 @@ export const L_fr_quests = {
   },
   "258": {
     "title": "Épisode Delta : L'Appel d'Amaryllis (ROSA)",
-    "desc": "Amaryllis (Zinnia) apparaît au Site Météore et prédit la chute d'un astéroïde ! Vaincre 15 Pokémon.",
+    "desc": "Amaryllis apparaît au Site Météore et prédit la chute d'un astéroïde ! Vaincre 15 Pokémon.",
     "rewardDesc": "5 000₽ + Écaille Draco"
   },
   "259": {

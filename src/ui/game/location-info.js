@@ -52,11 +52,45 @@ function locationInfoModel(){
  const lore = getLore(G.location);
  if(lore && lore.text) model.lore = { speaker: lore.speaker, text: lore.text };
 
+function getNpcButtonStatus(G, locId, npc, ni, npcName) {
+  const isRewardNpc = (
+    npcName === "Président Fan Club" || npcName === "Fan Club President" ||
+    npcName === "Léo" || npcName === "Bill" ||
+    npcName === "Employé de la Sylphe" || npcName === "Silph Employee" ||
+    npcName === "M. Psyché" || npcName === "Mr. Psychic" ||
+    npcName === "Pharmacien Didier" || npcName === "Pharmacist Didier"
+  );
+  const key = locId + '_' + ni;
+
+  if (npc.quest && typeof SIDE_QUESTS !== 'undefined' && SIDE_QUESTS[npc.quest]) {
+    const active = (G.activeQuests || []).some(i => i.qid === npc.quest && i.cat === 'side');
+    const done = G.completedQuests && G.completedQuests['side_' + npc.quest];
+    if (active) return { badge: '⏳ ', cls: 'pw-loc-npc-btn pw-npc-quest-active' };
+    if (done) return { badge: '✓ ', cls: 'pw-loc-npc-btn pw-npc-done' };
+    return { badge: '❗ ', cls: 'pw-loc-npc-btn pw-npc-quest-offer' };
+  }
+  if (npc.mainTalk != null) {
+    const active = (G.activeQuests || []).some(i => i.cat === 'main' && i.qid === npc.mainTalk && !i.done);
+    const done = G.completedQuests && G.completedQuests[npc.mainTalk];
+    if (active) return { badge: '❗ ', cls: 'pw-loc-npc-btn pw-npc-quest-offer' };
+    if (done) return { badge: '✓ ', cls: 'pw-loc-npc-btn pw-npc-done' };
+  }
+  if (isRewardNpc) {
+    const claimed = G.npcRewardsClaimed && G.npcRewardsClaimed[key];
+    if (claimed) return { badge: '✓ ', cls: 'pw-loc-npc-btn pw-npc-done' };
+    return { badge: '❗ ', cls: 'pw-loc-npc-btn pw-npc-quest-offer' };
+  }
+  const talked = G.npcTalked && G.npcTalked[key];
+  if (talked) return { badge: '✓ ', cls: 'pw-loc-npc-btn pw-npc-talked' };
+  return { badge: '💬 ', cls: 'pw-loc-npc-btn pw-npc-untalked' };
+}
+
  // ── Action buttons (locked entries = informational rows, user rule) ────
  const locNpcs = (typeof NPCS!=='undefined') ? (NPCS[G.location]||[]) : [];
  locNpcs.forEach((npc, ni)=>{
   const npcName = getNpc(G.location, ni).name || ('NPC ' + (ni + 1));
-  model.actions.push({ kind: 'button', cls: 'pw-loc-npc-btn', iconHtml: uiIcon('npc', '•'), label: npcName, call: 'openNpc', callArgs: "'" + G.location + "'," + ni });
+  const st = getNpcButtonStatus(G, G.location, npc, ni, npcName);
+  model.actions.push({ kind: 'button', cls: st.cls, iconHtml: uiIcon('npc', '•'), label: st.badge + npcName, call: 'openNpc', callArgs: "'" + G.location + "'," + ni });
  });
  if(loc.type !== 'town'){
   model.actions.push({ kind: 'button', iconHtml: uiIcon('explore', '•'), label: t('explore_btn'), call: 'exploreArea', callArgs: '' });

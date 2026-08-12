@@ -4,12 +4,15 @@
 // T2 (vague 37) : module ESM — export natif + exposition gardée sur l'objet
 // global (registre de langues wave-32 + harnais VM) — gabarit fr/quests.js.
 export const L_fr_ui = {
+"npc_reward_received":"Cadeau PNJ",
+"leo_reward_received":"Cadeau de Léo",
 "debug_toggle_btn":"Debug",
 "debug_x10_toggle":"Vitesse x10 :",
 "debug_fill_mine":"Recharger l'énergie de mine (100)",
 "debug_unlock_badges":"Débloquer 8 badges Kanto",
 "debug_give_candies":"+10 Super Bonbons",
 "debug_give_money":"+50 000₽",
+"evo_catalog_hint":"Espèces pouvant évoluer avec cet objet :",
 "debug_menu_title":"Menu debug / triche",
 "guide_pokedex_title":"Pokédex",
 "guide_dictionary_text":"Cherche les objets, attaques et talents. Tu peux voir qui connaît une attaque, qui possède un talent et où trouver un objet.",
