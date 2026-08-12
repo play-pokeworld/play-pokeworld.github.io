@@ -19,6 +19,7 @@ export const L_location_names_fr = {
   "desert_ruins": "Ruines Désert (Regirock)",
   "dewford": "Myokara",
   "diglettscave": "Cave Taupiqueur",
+  "diglettscave_2": "Cave Taupiqueur",
   "ecruteak": "Rosalia",
   "evergrande": "Éternara",
   "fallarbor": "Autopia",

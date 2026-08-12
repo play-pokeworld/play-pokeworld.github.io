@@ -163,7 +163,7 @@ function isLocUnlocked(id){
 
 
 function hatcheryUnlocked(){
- return isLocUnlocked('fuchsia') || isLocUnlocked('jroute34');
+ return isLocUnlocked('route5');
 }
 
 
@@ -172,7 +172,7 @@ function trainingUnlocked(){
 }
 
 
-function mineUnlocked(){ return isLocUnlocked('diglettscave'); }
+function mineUnlocked(){ return isLocUnlocked('diglettscave') || isLocUnlocked('diglettscave_2'); }
 function secretBaseUnlocked(){ return !!(typeof G !== 'undefined' && G && G.unlockedSecretBaseHoenn); }
 function updateFeatureWindows(){
  // Wave 15 (user feedback): in mobile mode this used to force inline

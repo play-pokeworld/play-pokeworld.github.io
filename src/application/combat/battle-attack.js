@@ -685,6 +685,25 @@ function executeAttack(attacker, defender, moveId, side){
  }
  }
 
+ if((moveId === 'u_turn' || moveId === 'volt_switch' || moveId === 'baton_pass') && side === 'player' && typeof G !== 'undefined' && G && Array.isArray(G.team)){
+   const curIdx = battle.playerPokeIdx || 0;
+   let nextIdx = -1;
+   for(let i = 1; i < G.team.length; i++){
+     const candIdx = (curIdx + i) % G.team.length;
+     const cand = G.team[candIdx];
+     if(cand && cand.currentHP > 0){
+       nextIdx = candIdx;
+       break;
+     }
+   }
+   if(nextIdx !== -1 && nextIdx !== curIdx){
+     addBattleLog(`${attacker.name} fait relais à ${G.team[nextIdx].name} !`);
+     if(typeof doSwitchBattlePoke === 'function') doSwitchBattlePoke(nextIdx);
+     else if(typeof switchBattlePoke === 'function') switchBattlePoke(nextIdx);
+     return;
+   }
+ }
+
  visualStatusChanges(side, prevAttackerStatus, prevDefenderStatus, attacker, defender);
  updateBattleUI();
 }

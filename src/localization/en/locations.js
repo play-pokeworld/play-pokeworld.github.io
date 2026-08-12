@@ -19,6 +19,7 @@ export const L_location_names_en = {
   "desert_ruins": "Desert Ruins (Regirock)",
   "dewford": "Dewford Town",
   "diglettscave": "Diglett's Cave",
+  "diglettscave_2": "Diglett's Cave",
   "ecruteak": "Ecruteak City",
   "evergrande": "Ever Grande City",
   "fallarbor": "Fallarbor Town",

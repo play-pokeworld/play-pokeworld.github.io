@@ -238,12 +238,12 @@ function renderHatcheryWindow() {
   if (typeof processHatcheryQueue === 'function') { try { processHatcheryQueue(); } catch(_){} }
   const el = document.getElementById('hatchery-window-body');
   if (!el) return;
-  const unlocked = G.badges.includes('koga') || G.badges.length >= 4 || isLocUnlocked('fuchsia');
+  const unlocked = (typeof hatcheryUnlocked === 'function') ? hatcheryUnlocked() : (G.badges.length >= 2 || isLocUnlocked('route5'));
   if (!unlocked) {
     _pwSetHtmlSafe(el, `<div class="pw-hatchery-empty">
  <div class="pw-hatchery-empty-icon"></div>
  <b>${typeof t==='function'?t('hatchery_locked_title'):'Daycare locked'}</b><br>
- ${typeof t==='function'?t('hatchery_locked_desc'):'The Daycare opens its doors in Fuchsia City, after defeating Koga.'}
+ ${typeof t==='function'?t('hatchery_locked_desc'):'Defeat Misty in Cerulean City (2 Badges) to unlock the Route 5 Hatchery!'}
  </div>`);
     return;
   }

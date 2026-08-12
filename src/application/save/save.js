@@ -225,6 +225,7 @@ function normalizeLoadedState(){
      G.unlockedLocs['route6'] = true;
      G.unlockedLocs['vermilion'] = true;
      G.unlockedLocs['diglettscave'] = true;
+     G.unlockedLocs['diglettscave_2'] = true;
      G.repeatableQuestsUnlocked = true;
    }
    if(G.badges.includes('koga')) {

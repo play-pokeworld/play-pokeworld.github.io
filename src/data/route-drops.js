@@ -11,6 +11,7 @@ const ROUTE_DROPS = {
   darkcave: ['hard_stone'],
   desert_ruins: ['soft_sand', 'hard_stone'],
   diglettscave: ['colbur_berry'],
+  diglettscave_2: ['colbur_berry'],
   fiery_path: ['charcoal'],
   granite_cave: ['hard_stone'],
   icepath: ['never_melt_ice', 'yache_berry'],
