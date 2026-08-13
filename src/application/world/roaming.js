@@ -49,3 +49,4 @@ if (typeof getRoamingLegendaryForRoute !== 'undefined') { if (typeof window !== 
 export {
   getRoamingLegendaryForRoute,
 };
+

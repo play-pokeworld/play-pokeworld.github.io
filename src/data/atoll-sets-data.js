@@ -109,3 +109,4 @@ if (typeof globalThis !== 'undefined') globalThis.ATOLL_STAT_PROFILES = ATOLL_ST
 if (typeof globalThis !== 'undefined') globalThis.ATOLL_SETS = ATOLL_SETS;
 if (typeof globalThis !== 'undefined') globalThis.ATOLL_LEGENDARIES = ATOLL_LEGENDARIES;
 
+

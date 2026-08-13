@@ -7,6 +7,26 @@ let _activeTab='info';
 function _syncActiveTab(){ try{ if(typeof window !== 'undefined') window._activeTab = _activeTab; if(typeof globalThis !== 'undefined') globalThis._activeTab = _activeTab; }catch(_){} }
 _syncActiveTab();
 
+// FIX (2026-08) — single source of truth for the mine gate: the Diglett cave.
+// mineUnlocked() lives in map-logic.js and is a free identifier here, so the
+// read is defensive; the fallbacks mirror it exactly.
+//
+// They must NOT test `diglettscave_2` (the Route 2 back entrance, open on the
+// 3rd badge alone) nor a badge count — both were the reported "the mine opens
+// as soon as I beat Surge" bug.
+function _mineTabUnlocked(){
+ try{
+  if(typeof mineUnlocked === 'function') return !!mineUnlocked();
+ }catch(_){}
+ try{
+  if(typeof isLocUnlocked === 'function'){
+   if(G && (G.location === 'diglettscave' || G.location === 'diglettscave_2')) return true;
+   return !!isLocUnlocked('diglettscave');
+  }
+ }catch(_){}
+ return false;
+}
+
 function showTab(tab){
  
  try{ if(typeof checkStarterNeeded==="function"&& checkStarterNeeded()) return; }catch(_e){}
@@ -24,7 +44,13 @@ function showTab(tab){
  syncShinyState();
  renderTeamWindow();
  if(tab==='team'){ _activeTab='info'; _syncActiveTab(); }
- if(tab === 'mine' && G.badges.length < 2){
+ // FIX (2026-08) — the mine used to open as soon as 2 badges were held, i.e.
+ // at the same time as Route 11 (badgeReq: 2). It must unlock with the
+ // Taupiqueur / Diglett cave (badgeReq: 3), which is exactly what
+ // mineUnlocked() already tests everywhere else (feature window, tutorial,
+ // renderMineWindow). This tab gate was the last place still using the old,
+ // looser badge count — hence a mine reachable one badge too early.
+ if(tab === 'mine' && !_mineTabUnlocked()){
  _activeTab='info';
  _syncActiveTab();
  return;
@@ -72,3 +98,4 @@ export {
 // indirection instead of the window fallback); the window surface is kept for
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('showTab', showTab); PokeActions.register('toggleMobileDrawer', toggleMobileDrawer); } catch (_) {} }
+

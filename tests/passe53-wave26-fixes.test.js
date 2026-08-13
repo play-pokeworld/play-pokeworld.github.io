@@ -69,18 +69,39 @@ test('wave26 D: save-icon current row is centred', () => {
   assert.ok(rule && rule[0].includes('justify-content: center'), 'justify-content: center');
 });
 
-/* ── E/F: modal sheets get the full-bleed band + the summary breathes ─── */
-test('wave26 E/F: full-bleed header bands with per-shell margins', () => {
+/* ── E/F: modal sheets share the ONE canonical band ────────────────────
+   Wave 33 supersedes the wave-26 intent. The per-shell full-bleed variants
+   (negative margins + `11px 11px 0 0` / `17px 17px 0 0` top-only rounding)
+   are what made these headers read as a different component from the
+   reference panels (sac / marché / pokédex), which wear a band rounded on
+   all four corners with a gap under it. The rules still exist — they now
+   normalise every sheet ONTO the shared tokens instead of away from them. */
+test('wave26/33 E/F: every sheet header resolves to the canonical band', () => {
   for (const needle of [
-    '#poke-modal-inner > .pw-view > .modal-title:first-child',
     '#battle-summary-inner > .pw-view > .modal-title:first-child',
     '.afk-result-card > .modal-title:first-child',
-    '#poke-modal.preset-editor-modal #poke-modal-inner .pw-base-npced > .modal-title:first-child',
     '#poke-modal-inner.management-inner > .pw-view > .modal-title.management-title:first-child',
   ]) assert.ok(DS1.includes(needle), `band rule: ${needle}`);
-  assert.ok(DS1.includes('margin: -20px -20px 16px !important'), 'summary/block sheets: band + 16px gap (beats the margin:0 hammer)');
-  assert.ok(DS1.includes('margin: -16px -16px 12px !important'), 'management sheets: band margins');
-  assert.ok(DS1.includes('border-radius: 11px 11px 0 0'), 'band hugs the 12px shell corners');
+
+  // The retired shapes must not come back on a HEADER. (`11px 11px 0 0` is
+  // still legitimate elsewhere — .poke-card-top caps a 12px card.)
+  for (const gone of [
+    'margin: -20px -20px 16px !important',
+    'margin: -16px -16px 12px !important',
+    'margin: -20px -22px 12px !important',
+    'border-radius: 17px 17px 0 0',
+  ]) assert.ok(!DS1.includes(gone), `retired full-bleed shape must be gone: ${gone}`);
+  const headerRules = DS1.match(/^[^{}]*\.modal-title[^{}]*\{[^}]*\}/gm) || [];
+  for (const rule of headerRules) {
+    assert.ok(!/border-radius:\s*\d+px \d+px 0 0/.test(rule),
+      `no header may square its bottom corners: ${rule.split('\n')[0]}`);
+  }
+
+  // …and they must be replaced by the shared tokens.
+  assert.ok(DS1.includes('margin: 0 0 var(--pw-header-gap) 0 !important'),
+    'sheets keep the canonical gap under the band');
+  assert.ok(DS1.includes('border-radius: var(--pw-header-radius)'),
+    'sheets keep the canonical radius on all four corners');
 });
 
 /* ── G: NPC editor — middle scroller + pinned footer ───────────────────── */
@@ -128,3 +149,4 @@ test('wave26 J: .management-content padding is the canonical 14px', () => {
   assert.ok(rule && rule[0].includes('padding: 14px'), '14px, like #usm-grid');
   assert.ok(!rule[0].includes('padding-right: 4px'), 'edge-glued grids gone');
 });
+

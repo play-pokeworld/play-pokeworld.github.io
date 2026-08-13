@@ -39,3 +39,4 @@ export class HatcheryWindowView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

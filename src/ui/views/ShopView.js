@@ -74,3 +74,4 @@ export class ShopView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

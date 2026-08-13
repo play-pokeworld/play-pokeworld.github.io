@@ -190,3 +190,4 @@ export {
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('doLeaveBattle', doLeaveBattle); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('restartLastBattle', restartLastBattle); } catch (_) {} }
+

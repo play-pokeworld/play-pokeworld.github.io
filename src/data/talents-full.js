@@ -227,3 +227,4 @@ export {
   getRarityLabel,
   TALENTS_FULL,
 };
+

@@ -38,3 +38,4 @@ export function winHeaderTitleVNode(m) {
 
 /* ── String helpers (DOM-free, classic adapters / preview) ─────────────── */
 export function winHeaderTitleHTML(model) { return toHTMLString(winHeaderTitleVNode(model)); }
+

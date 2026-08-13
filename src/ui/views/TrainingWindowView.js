@@ -42,3 +42,4 @@ export class TrainingWindowView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

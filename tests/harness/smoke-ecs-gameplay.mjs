@@ -194,3 +194,4 @@ assert.equal(market.walletSynced, true, 'C9 — Wallet component and G.money agr
 assert.deepEqual(pageErrors, [], 'no page errors during the ECS gameplay run');
 await browser.close();
 console.log('smoke-ecs_gameplay: OK — world:encounter, breeding:hatch and economy:market run IN GAME on real ECS entities/components (wild spawn identity, daycare level+fee on Wallet, market wallet/stock/inventory).');
+

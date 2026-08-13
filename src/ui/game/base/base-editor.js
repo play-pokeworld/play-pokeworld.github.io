@@ -767,3 +767,4 @@ export {
 // harnesses (26/26 ceremony — external consumer measured in
 // tests/vague35-base-visit-finale.test.js). Never placed in prod (module).
 if (typeof globalThis !== 'undefined') globalThis.baseEditorCelebrateIfFurnished = baseEditorCelebrateIfFurnished;
+

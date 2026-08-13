@@ -60,3 +60,4 @@ export class UIInteractiveComponent extends Component {
     if (render) render.markDirty();
   }
 }
+

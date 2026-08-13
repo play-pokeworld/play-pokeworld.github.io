@@ -52,3 +52,4 @@ export function moveButtonsBarVNode(model = {}) {
 export function moveButtonsBarHTML(model = {}) {
   return toHTMLString(moveButtonsBarVNode(model));
 }
+

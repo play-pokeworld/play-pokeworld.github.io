@@ -130,3 +130,4 @@ for (const [name, ok] of expectMarkup) {
 if (pageErrors.length) throw new Error('pageerrors: ' + pageErrors.join(' | '));
 await browser.close();
 console.log('smoke-secret-base: OK — baseGetState résout, fenêtre base + alcôves Lieu restaurées, balises i18n rendues (4 sites), 0 erreur page.');
+

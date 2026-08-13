@@ -62,3 +62,4 @@ export default PokeActions;
 // harnesses may inject their own stub before evaluating classic files).
 if (typeof window !== 'undefined') window.PokeActions = PokeActions;
 if (typeof globalThis !== 'undefined') globalThis.PokeActions = PokeActions;
+

@@ -155,3 +155,4 @@ export class BoxView extends UIView {
     return { full: toHTMLString(view.buildView()) };
   }
 }
+

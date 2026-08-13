@@ -86,3 +86,4 @@ export class GameScene extends Scene {
     this._openViews.clear();
   }
 }
+

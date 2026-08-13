@@ -17,3 +17,4 @@ export {
   JOHTO_MAP_IMG,
   HOENN_MAP_IMG,
 };
+

@@ -1078,3 +1078,4 @@ export {
   SPRITE_DATA,
   ITEM_SPRITE_DATA,
 };
+

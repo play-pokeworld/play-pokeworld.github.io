@@ -6,6 +6,15 @@
 // Wave 43 — lazy cross-module links (P7 regression fix):
 // zero static imports (chunks + VM harness isolates frozen); each alias resolves
 // AT CALL TIME — engine registry first, then the global surface (VM harness).
+// FIX (2026-08) — mine energy per won battle / capture (was hardcoded 15).
+// Read defensively: game-config.js publishes MINE_ENERGY_PER_BATTLE on the
+// global surface before this module loads, but VM harnesses may not.
+function _mineEnergyPerBattle(){
+ try{ if(typeof MINE_ENERGY_PER_BATTLE === 'number') return MINE_ENERGY_PER_BATTLE; }catch(_){}
+ try{ if(typeof GAME !== 'undefined' && GAME && GAME.MINE && typeof GAME.MINE.ENERGY_PER_BATTLE === 'number') return GAME.MINE.ENERGY_PER_BATTLE; }catch(_){}
+ return 5;
+}
+
 const __pwV43Link = (n) => ((typeof PokeActions !== 'undefined' && PokeActions && typeof PokeActions.get === 'function') ? PokeActions.get(n) : null)
   || (typeof globalThis !== 'undefined' ? globalThis[n] : null) || null;
 function getSecretBaseBonuses(...args) { const f = __pwV43Link('getSecretBaseBonuses'); return f ? f(...args) : undefined; }
@@ -182,9 +191,15 @@ async function onEnemyFaint(){
  G.totalWildWins = (G.totalWildWins||0) + 1;
  if(!G.wildWinsByLoc) G.wildWinsByLoc = {};
  G.wildWinsByLoc[questLoc] = (G.wildWinsByLoc[questLoc]||0) + 1;
+ try {
+  const _defShiny = !!(e && (e.shiny || e.shinyActive || e._forceShiny));
+  if (typeof recordDexDefeat === 'function' && e) recordDexDefeat(e.id, _defShiny);
+  if (typeof recordLocStat === 'function' && questLoc) recordLocStat(questLoc, 'beaten', 1);
+ } catch (_) {}
  if(G.mine && typeof G.mine.energy === 'number'){
    const maxE = G.mine.maxEnergy || 100;
-   G.mine.energy = Math.min(maxE, G.mine.energy + 15);
+   // FIX (2026-08): mine energy granted per won battle rebalanced 15 -> 5.
+   G.mine.energy = Math.min(maxE, G.mine.energy + _mineEnergyPerBattle());
  }
  }
 
@@ -259,3 +274,4 @@ export {
   applyEndOfTurnStatus,
   onEnemyFaint,
 };
+

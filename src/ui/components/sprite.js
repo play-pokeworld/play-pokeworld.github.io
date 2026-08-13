@@ -99,3 +99,4 @@ export function pokemonSpriteVNode(props = {}) {
       : h('span', { class: 'pw-poke-circle-emoji' }, props.emoji || '❓'),
     props.shiny ? h('span', { class: 'pw-poke-circle-shiny' }) : null);
 }
+

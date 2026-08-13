@@ -112,3 +112,4 @@ test('wave30 #3 kept: mobile gates (coarse pointer MQ + scroll reset) intact', (
   assert.match(bridge, /function pwScrollTopForMobileView\(\)/);
   assert.match(bridge, /matchMedia\('\(max-width: 850px\), \(pointer: coarse\)'\)/);
 });
+

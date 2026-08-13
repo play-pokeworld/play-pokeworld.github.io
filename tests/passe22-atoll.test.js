@@ -310,3 +310,4 @@ test('UI: mode descriptions at the top of the page + atoll & roamer timers', () 
   assert.ok(loc.includes('startRotationTicker'), 'ticker started from the routes');
 });
 
+

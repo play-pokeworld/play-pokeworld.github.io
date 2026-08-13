@@ -1,3 +1,4 @@
+import { panelHeaderHTML } from '../components/panel-header.js';
 function _pwMarkTutorial(id) {
   try {
     const fn = (typeof tutorialMark === 'function') ? tutorialMark
@@ -89,7 +90,12 @@ function openAbilityInfo(key){
      rows: [{ label: t('dict_rarity')||'Rareté', value: getRarityLabel(info.rarity) }]
    }));
  } else {
-   _pwSetHtmlSafe(inner, `<div class="modal-title"><div>${typeof getIcon==='function'?getIcon('training',16):''} ${getTalentName(key)}</div><span class="modal-close" data-action="pw-info-back">✕</span></div>`);
+   // Wave 32: header built by THE shared constructor (components/panel-header.js).
+   _pwSetHtmlSafe(inner, panelHeaderHTML({
+     iconHtml: (typeof getIcon === 'function' ? getIcon('training', 16) : ''),
+     title: getTalentName(key),
+     close: { action: 'pw-info-back', glyph: '✕' }
+   }));
  }
  if(typeof window.pwApplyWindowChrome==='function') window.pwApplyWindowChrome(inner); // wave 30: canonical window chrome
  document.getElementById('poke-modal').classList.add('open');
@@ -664,10 +670,12 @@ function openFullscreenPanel(panelType){
  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:600;display:none;align-items:center;justify-content:center;padding:16px;';
  _pwSetHtmlSafe(modal, `
  <div class="pw-modal-container">
-   <div id="fs-panel-header" class="pw-modal-header">
-     <div id="fs-panel-title" class="pw-modal-title"></div>
-     <span class="pw-modal-close" data-action="legacy-call" data-call="closeFullscreenPanel" data-call-args="">✕</span>
-   </div>
+   ${panelHeaderHTML({
+     id: 'fs-panel-header',
+     titleProps: { id: 'fs-panel-title' },
+     title: '',
+     close: { call: 'closeFullscreenPanel', glyph: '✕' },
+   })}
    <div id="fs-panel-filters" class="pw-modal-search-bar"></div>
    <div id="fs-panel-content" class="pw-modal-body"></div>
  </div>`);
@@ -788,3 +796,4 @@ export {
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('closeFullscreenPanel', closeFullscreenPanel); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('openFullscreenPanel', openFullscreenPanel); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('setDictionarySearch', setDictionarySearch); } catch (_) {} }
+

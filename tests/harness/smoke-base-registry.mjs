@@ -85,3 +85,4 @@ assert.deepEqual(errors, [], 'C3 — no page errors during the whole flow');
 
 await browser.close();
 console.log(`smoke-base-registry: OK — ${reg.size} engine actions, zero legacy window base fn, fallback intact, no errors.`);
+

@@ -32,3 +32,4 @@ export function validateBrowserSave({ key = DEFAULT_SAVE_KEY, storage } = {}) {
   }
 }
 
+

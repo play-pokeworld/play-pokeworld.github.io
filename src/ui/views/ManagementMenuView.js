@@ -32,6 +32,7 @@
 import { UIView } from './UIView.js';
 import { UIRenderComponent } from '../../engine/components/UIRenderComponent.js';
 import { h, toHTMLString } from '../../engine/render/vdom.js';
+import { panelHeaderVNode } from '../components/panel-header.js';
 import {
   managementTabBarVNode,
   managementTabBarHTML,
@@ -46,11 +47,13 @@ export class ManagementMenuView extends UIView {
 
   titleVNode() {
     const m = this.model;
-    return h('div', { class: 'modal-title management-title' },
-      h('div', null,
-        m.titleIconHtml ? h.raw(`${m.titleIconHtml} `) : null,
-        m.title || ''),
-      h('span', { class: 'modal-close', dataset: { action: 'close-poke-modal' } }, '✕'));
+    // Wave 32: built by THE shared constructor (see components/panel-header).
+    return panelHeaderVNode({
+      class: 'management-title',
+      iconHtml: m.titleIconHtml || null,
+      title: m.title || '',
+      close: { action: 'close-poke-modal', glyph: '✕' },
+    });
   }
 
   shellVNode() {
@@ -92,3 +95,4 @@ export class ManagementMenuView extends UIView {
     return managementBlocksHTML(model ? model.blocks : []);
   }
 }
+

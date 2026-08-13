@@ -125,3 +125,4 @@ export {
   startLegendaryEncounter,
   onPlayerPokeFaint,
 };
+

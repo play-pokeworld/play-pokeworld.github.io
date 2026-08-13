@@ -48,3 +48,4 @@ export class UIRenderComponent extends Component {
     return this.template ? this.template(this.entity) : null;
   }
 }
+

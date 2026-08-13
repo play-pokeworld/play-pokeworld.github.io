@@ -101,3 +101,4 @@ export function computeSaleValue(item, count) {
   const unitValue = Math.max(0, Number(item && item.value) || 2000);
   return Math.max(0, Math.floor(Number(count) || 0)) * unitValue;
 }
+

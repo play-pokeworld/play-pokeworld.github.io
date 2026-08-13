@@ -145,3 +145,4 @@ fs.writeFileSync(OUT, file);
 console.log(`✔ ${sellable.length} sellable TMs distributed across ${Object.keys(stock).length} shops — ${unsold.length} gen 3+ TMs not sold.`);
 for (const s of inited) if (assign[s].length) console.log(`  ${s.padEnd(12)} : ${assign[s].length}`);
 
+

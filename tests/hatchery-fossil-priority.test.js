@@ -373,3 +373,4 @@ test('selector of an incubation slot with Fossil priority: opens the fossils tab
   assert.ok(env.nodes['usm-grid'].innerHTML.includes('fossil-card'), 'fossil grid shown');
 });
 
+

@@ -106,3 +106,4 @@ test('wave24: legacy file readers migrated — savemenu scenario + all test file
     }
   }
 });
+

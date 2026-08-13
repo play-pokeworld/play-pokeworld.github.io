@@ -93,3 +93,4 @@ assert.deepEqual(errors, [], 'C11 — no page errors during the whole flow');
 
 await browser.close();
 console.log(`smoke-trace-report: OK — ${report.summary.total} events, kinds=[${Object.keys(kinds).join(',')}], action via=${JSON.stringify(viaCount)}, dump → reports/trace-live.json`);
+

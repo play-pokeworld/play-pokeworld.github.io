@@ -17,6 +17,22 @@ function getTypeName(type){
    const loc = t('types.' + low);
    if(loc && loc !== 'types.' + low) return loc;
  }
+ const lang = (typeof G !== 'undefined' && G && G.lang) ? G.lang
+   : ((typeof currentLang === 'function') ? currentLang() : 'fr');
+ const FR = {
+   normal:'Normal', fire:'Feu', water:'Eau', grass:'Plante', electric:'Électrik',
+   ice:'Glace', fighting:'Combat', poison:'Poison', ground:'Sol', flying:'Vol',
+   psychic:'Psy', bug:'Insecte', rock:'Roche', ghost:'Spectre', dragon:'Dragon',
+   dark:'Ténèbres', steel:'Acier', fairy:'Fée',
+ };
+ const EN = {
+   normal:'Normal', fire:'Fire', water:'Water', grass:'Grass', electric:'Electric',
+   ice:'Ice', fighting:'Fighting', poison:'Poison', ground:'Ground', flying:'Flying',
+   psychic:'Psychic', bug:'Bug', rock:'Rock', ghost:'Ghost', dragon:'Dragon',
+   dark:'Dark', steel:'Steel', fairy:'Fairy',
+ };
+ const table = (lang === 'en') ? EN : FR;
+ if (table[low]) return table[low];
  return typeof titleCaseDisplayName === 'function' ? titleCaseDisplayName(raw) : raw;
 }
 
@@ -1251,3 +1267,4 @@ if ((typeof PokeActions === 'undefined' || !PokeActions || (typeof PokeActions.h
   && typeof queueMicrotask === 'function') {
   queueMicrotask(__pwV43RegisterSetBoxSearch);
 }
+

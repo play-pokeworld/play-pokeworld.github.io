@@ -42,3 +42,4 @@ export function calculateQuestRewards(questDef = {}) {
     items: Array.isArray(rewards.items) ? [...rewards.items] : [],
   };
 }
+

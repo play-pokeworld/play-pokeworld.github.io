@@ -233,8 +233,14 @@ test('day-care menu: same page = scroll kept (persistent node), tab change = res
 test('unified selector: _usmSetGridHtml helper + context key, deterministic reset', () => {
   assert.ok(/(var|globalThis\.)_usmLastScrollKey/.test(BOX_SELECTOR), 'context key declared');
   assert.ok(/function _usmSetGridHtml\(grid, html, prevScroll\)/.test(BOX_SELECTOR), 'helper defined');
+  // Intent (not a frozen count): EVERY grid write point routes through the
+  // helper. renderUnifiedGrid grew a 4th early-return (breeding-locked
+  // notice), so we compare the two populations instead of hard-coding a
+  // number that goes stale each time a branch is added.
   const calls = BOX_SELECTOR.match(/, _usmPrevScroll\);/g) || [];
-  assert.equal(calls.length, 3, 'the 3 write points go through the helper');
+  const helperCalls = BOX_SELECTOR.match(/(?<!function )_usmSetGridHtml\(grid,/g) || [];
+  assert.ok(calls.length >= 3, 'at least the 3 historical write points go through the helper');
+  assert.equal(calls.length, helperCalls.length, 'every helper call forwards the captured scroll');
   // Vague 39 : l'unique écriture passe par le puits canonique (même unité,
   // même intention « un seul point d'écriture, dans le helper »).
   const direct = BOX_SELECTOR.match(/_pwSetHtmlSafe\(grid, html\)/g) || [];
@@ -266,4 +272,5 @@ test('safety net: click dispatchers capture and restore scroll', () => {
     assert.ok((src.match(/pwRestoreScrollAround/g) || []).length >= 2, `${name}: click + contextmenu covered`);
   }
 });
+
 

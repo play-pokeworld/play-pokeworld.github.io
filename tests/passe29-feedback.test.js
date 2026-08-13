@@ -157,3 +157,4 @@ test('sprites: canonical sizes bumped (user: out-of-team sprites too small)', as
   const css = R('src/assets/styles/design-system.css');
   assert.ok(css.includes('--pw-size-poke-sm: 72px') && css.includes('--pw-size-poke-lg: 104px'), 'CSS tokens in parity');
 });
+

@@ -32,3 +32,4 @@ for (const [relSrc, relDst] of SOURCES) {
   }
 }
 console.log(`[runtime-assets] src/assets/images -> dist/src/assets/images : ${copied} copie(s), ${kept + copied} fichier(s) presents.`);
+

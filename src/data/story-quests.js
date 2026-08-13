@@ -16,14 +16,6 @@
 //   (OFFICIAL_TEAMS[idx].rewardMoney); the quest claim gives nothing.
 // Save migration: see migrateQuestSaveV2 (quest-core.js).
 var STORY_QUESTS = [
- // ─────────── KANTO (1-60) — phase 21: densification (+16 quests) ───────────
-// Insertions canon RFVF : Bill (13), Fan Club (14), Capitaine S.S. Anne (19),
-// Route 8 (24), Eevee/Porygon of Celadon (31-32), Cycling Road (35),
-// Gold Teeth of the Safari Zone (36), Sylph Lapras (39), DOJO of
-// Safrania → Tyrogue (40, RFVF : Kicklee/Tygnon Nv.37 @ Ceinture Noire),
-// Mr. Psychic (42), Collector (44), fossil lab -> Aerodactyl (47), Channel 21
-// (50), Ultimate training on Victory Road (52), Mansion Memories (58).
-// Save migration: migrateQuestSaveV4 (quest-core.js).
  {
   "id": 1,
   "region": "kanto",
@@ -31,7 +23,9 @@ var STORY_QUESTS = [
   "loc": "pallet",
   "target": 1,
   "rewardMoney": 400,
-  "rewardItems": { "babiri_berry": 1 }
+  "rewardItems": {
+   "babiri_berry": 1
+  }
  },
  {
   "id": 2,
@@ -40,7 +34,9 @@ var STORY_QUESTS = [
   "loc": "route1",
   "target": 10,
   "rewardMoney": 600,
-  "rewardItems": { "roseli_berry": 1 }
+  "rewardItems": {
+   "roseli_berry": 1
+  }
  },
  {
   "id": 3,
@@ -49,7 +45,9 @@ var STORY_QUESTS = [
   "loc": "viridianforest",
   "target": 15,
   "rewardMoney": 1000,
-  "rewardItems": { "prine_berry": 1 }
+  "rewardItems": {
+   "prine_berry": 1
+  }
  },
  {
   "id": 4,
@@ -58,7 +56,9 @@ var STORY_QUESTS = [
   "loc": "route22",
   "target": 20,
   "rewardMoney": 1400,
-  "rewardItems": { "tanga_berry": 1 }
+  "rewardItems": {
+   "tanga_berry": 1
+  }
  },
  {
   "id": 5,
@@ -84,7 +84,9 @@ var STORY_QUESTS = [
   "loc": "route3",
   "target": 25,
   "rewardMoney": 1800,
-  "rewardItems": { "moonstone": 1 }
+  "rewardItems": {
+   "moonstone": 1
+  }
  },
  {
   "id": 8,
@@ -93,7 +95,9 @@ var STORY_QUESTS = [
   "loc": "mtmoon",
   "target": 30,
   "rewardMoney": 2600,
-  "rewardItems": { "charti_berry": 1 }
+  "rewardItems": {
+   "charti_berry": 1
+  }
  },
  {
   "id": 9,
@@ -118,7 +122,9 @@ var STORY_QUESTS = [
   "loc": "route4",
   "target": 20,
   "rewardMoney": 1600,
-  "rewardItems": { "prine_berry": 1 }
+  "rewardItems": {
+   "prine_berry": 1
+  }
  },
  {
   "id": 12,
@@ -135,7 +141,9 @@ var STORY_QUESTS = [
   "loc": "billshouse",
   "target": 1,
   "rewardMoney": 900,
-  "rewardItems": { "colbur_berry": 1 }
+  "rewardItems": {
+   "colbur_berry": 1
+  }
  },
  {
   "id": 14,
@@ -153,7 +161,9 @@ var STORY_QUESTS = [
   "targetBadge": "misty",
   "target": 1,
   "rewardMoney": 3500,
-  "rewardItems": { "nugget": 1 }
+  "rewardItems": {
+   "nugget": 1
+  }
  },
  {
   "id": 16,
@@ -162,10 +172,23 @@ var STORY_QUESTS = [
   "loc": "route5",
   "target": 25,
   "rewardMoney": 2200,
-  "rewardItems": { "passho_berry": 1 }
+  "rewardItems": {
+   "passho_berry": 1
+  }
  },
  {
   "id": 17,
+  "region": "kanto",
+  "type": "hatchery_level",
+  "loc": "route5",
+  "target": 1,
+  "rewardMoney": 2500,
+  "rewardItems": {
+   "prine_berry": 1
+  }
+ },
+ {
+  "id": 18,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "route6",
@@ -174,7 +197,7 @@ var STORY_QUESTS = [
   "rewardItems": {}
  },
  {
-  "id": 18,
+  "id": 19,
   "region": "kanto",
   "type": "trainer_battle",
   "loc": "vermilion",
@@ -182,7 +205,7 @@ var STORY_QUESTS = [
   "target": 1
  },
  {
-  "id": 19,
+  "id": 20,
   "region": "kanto",
   "type": "talk",
   "loc": "vermilion",
@@ -191,61 +214,107 @@ var STORY_QUESTS = [
   "rewardItems": {}
  },
  {
-  "id": 20,
+  "id": 21,
   "region": "kanto",
   "type": "badge",
   "targetBadge": "surge",
   "target": 1,
   "rewardMoney": 5000,
-  "rewardItems": { "thunderstone": 1 }
- },
- {
-  "id": 21,
-  "region": "kanto",
-  "type": "defeat_wild",
-  "loc": "diglettscave",
-  "target": 35,
-  "rewardMoney": 4000,
-  "rewardItems": { "soft_sand": 1 }
+  "rewardItems": {
+   "thunderstone": 1
+  }
  },
  {
   "id": 22,
   "region": "kanto",
-  "type": "defeat_wild",
-  "loc": "route10",
-  "target": 40,
-  "rewardMoney": 4000,
-  "rewardItems": { "prine_berry": 1 }
+  "type": "training_session",
+  "loc": "vermilion",
+  "target": 1,
+  "rewardMoney": 3500,
+  "rewardItems": {
+   "wacan_berry": 1
+  }
  },
  {
   "id": 23,
   "region": "kanto",
   "type": "defeat_wild",
-  "loc": "rocktunnel",
-  "target": 50,
-  "rewardMoney": 5200,
-  "rewardItems": { "hard_stone": 1 }
+  "loc": "diglettscave",
+  "target": 35,
+  "rewardMoney": 4000,
+  "rewardItems": {
+   "soft_sand": 1
+  }
  },
  {
   "id": 24,
+  "region": "kanto",
+  "type": "mine_items",
+  "loc": "diglettscave",
+  "target": 3,
+  "rewardMoney": 4000,
+  "rewardItems": {
+   "old_amber": 1
+  }
+ },
+ {
+  "id": 25,
+  "region": "kanto",
+  "type": "fossil_revive",
+  "loc": "pewter",
+  "target": 1,
+  "rewardMoney": 4500,
+  "rewardItems": {
+   "moonstone": 1
+  }
+ },
+ {
+  "id": 26,
+  "region": "kanto",
+  "type": "defeat_wild",
+  "loc": "route10",
+  "target": 40,
+  "rewardMoney": 4000,
+  "rewardItems": {
+   "prine_berry": 1
+  }
+ },
+ {
+  "id": 27,
+  "region": "kanto",
+  "type": "defeat_wild",
+  "loc": "rocktunnel",
+  "target": 50,
+  "rewardMoney": 5200,
+  "rewardItems": {
+   "hard_stone": 1
+  }
+ },
+ {
+  "id": 28,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "route8",
   "target": 15,
   "rewardMoney": 2800,
-  "rewardItems": { "yache_berry": 1 }
+  "rewardItems": {
+   "yache_berry": 1
+  }
  },
  {
-  "id": 25,
+  "id": 29,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "pokemontower",
   "target": 45,
   "rewardMoney": 5800,
-  "rewardItems": { "rarecandy": 1, "pokeflute": 1 }
+  "rewardItems": {
+   "rarecandy": 1,
+   "pokeflute": 1
+  }
  },
  {
-  "id": 26,
+  "id": 30,
   "region": "kanto",
   "type": "trainer_battle",
   "loc": "pokemontower",
@@ -253,7 +322,7 @@ var STORY_QUESTS = [
   "target": 1
  },
  {
-  "id": 27,
+  "id": 31,
   "region": "kanto",
   "type": "item",
   "requiredItem": "pokeflute",
@@ -263,16 +332,18 @@ var STORY_QUESTS = [
   "rewardMoney": 3500
  },
  {
-  "id": 28,
+  "id": 32,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "route7",
   "target": 35,
   "rewardMoney": 3800,
-  "rewardItems": { "leafstone": 1 }
+  "rewardItems": {
+   "leafstone": 1
+  }
  },
  {
-  "id": 29,
+  "id": 33,
   "region": "kanto",
   "type": "trainer_battle",
   "loc": "celadon",
@@ -280,7 +351,7 @@ var STORY_QUESTS = [
   "target": 1
  },
  {
-  "id": 30,
+  "id": 34,
   "region": "kanto",
   "type": "trainer_battle",
   "loc": "celadon",
@@ -288,18 +359,20 @@ var STORY_QUESTS = [
   "target": 1
  },
  {
-  "id": 31,
+  "id": 35,
   "region": "kanto",
   "type": "talk",
   "loc": "celadon",
   "target": 1,
   "rewardMoney": 800,
-  "rewardItems": { "payapa_berry": 1 },
+  "rewardItems": {
+   "payapa_berry": 1
+  },
   "rewardPoke": 133,
   "rewardLevel": 25
  },
  {
-  "id": 32,
+  "id": 36,
   "region": "kanto",
   "type": "talk",
   "loc": "celadon",
@@ -310,25 +383,29 @@ var STORY_QUESTS = [
   "rewardLevel": 20
  },
  {
-  "id": 33,
+  "id": 37,
   "region": "kanto",
   "type": "badge",
   "targetBadge": "erika",
   "target": 1,
   "rewardMoney": 7000,
-  "rewardItems": { "leafstone": 1 }
+  "rewardItems": {
+   "leafstone": 1
+  }
  },
  {
-  "id": 34,
+  "id": 38,
   "region": "kanto",
   "type": "badge",
   "targetBadge": "koga",
   "target": 1,
   "rewardMoney": 8500,
-  "rewardItems": { "poison_barb": 1 }
+  "rewardItems": {
+   "poison_barb": 1
+  }
  },
  {
-  "id": 35,
+  "id": 39,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "route17",
@@ -337,16 +414,18 @@ var STORY_QUESTS = [
   "rewardItems": {}
  },
  {
-  "id": 36,
+  "id": 40,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "safarizone",
   "target": 15,
   "rewardMoney": 3200,
-  "rewardItems": { "occa_berry": 1 }
+  "rewardItems": {
+   "occa_berry": 1
+  }
  },
  {
-  "id": 37,
+  "id": 41,
   "region": "kanto",
   "type": "trainer_battle",
   "loc": "saffron",
@@ -354,7 +433,7 @@ var STORY_QUESTS = [
   "target": 1
  },
  {
-  "id": 38,
+  "id": 42,
   "region": "kanto",
   "type": "trainer_battle",
   "loc": "saffron",
@@ -362,18 +441,20 @@ var STORY_QUESTS = [
   "target": 1
  },
  {
-  "id": 39,
+  "id": 43,
   "region": "kanto",
   "type": "talk",
   "loc": "saffron",
   "target": 1,
   "rewardMoney": 900,
-  "rewardItems": { "wacan_berry": 1 },
+  "rewardItems": {
+   "wacan_berry": 1
+  },
   "rewardPoke": 131,
   "rewardLevel": 25
  },
  {
-  "id": 40,
+  "id": 44,
   "region": "kanto",
   "type": "trainer_battle",
   "loc": "saffron",
@@ -383,41 +464,49 @@ var STORY_QUESTS = [
   "rewardLevel": 25
  },
  {
-  "id": 41,
+  "id": 45,
   "region": "kanto",
   "type": "badge",
   "targetBadge": "sabrina",
   "target": 1,
   "rewardMoney": 10000,
-  "rewardItems": { "twisted_spoon": 1 }
+  "rewardItems": {
+   "twisted_spoon": 1
+  }
  },
  {
-  "id": 42,
+  "id": 46,
   "region": "kanto",
   "type": "talk",
   "loc": "saffron",
   "target": 1,
   "rewardMoney": 900,
-  "rewardItems": { "tanga_berry": 1 }
+  "rewardItems": {
+   "tanga_berry": 1
+  }
  },
  {
-  "id": 43,
+  "id": 47,
   "region": "kanto",
   "type": "mine_sell",
   "target": 5,
   "rewardMoney": 5000,
-  "rewardItems": { "chople_berry": 1 }
+  "rewardItems": {
+   "chople_berry": 1
+  }
  },
  {
-  "id": 44,
+  "id": 48,
   "region": "kanto",
   "type": "catch",
   "target": 15,
   "rewardMoney": 3000,
-  "rewardItems": { "prine_berry": 1 }
+  "rewardItems": {
+   "prine_berry": 1
+  }
  },
  {
-  "id": 45,
+  "id": 49,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "route20",
@@ -426,16 +515,18 @@ var STORY_QUESTS = [
   "rewardItems": {}
  },
  {
-  "id": 46,
+  "id": 50,
   "region": "kanto",
   "type": "badge",
   "targetBadge": "blaine",
   "target": 1,
   "rewardMoney": 12500,
-  "rewardItems": { "firestone": 1 }
+  "rewardItems": {
+   "firestone": 1
+  }
  },
  {
-  "id": 47,
+  "id": 51,
   "region": "kanto",
   "type": "talk",
   "loc": "cinnabar",
@@ -446,34 +537,40 @@ var STORY_QUESTS = [
   "rewardLevel": 30
  },
  {
-  "id": 48,
+  "id": 52,
   "region": "kanto",
   "type": "badge",
   "targetBadge": "giovanni",
   "target": 1,
   "rewardMoney": 16000,
-  "rewardItems": { "rarecandy": 1 }
+  "rewardItems": {
+   "rarecandy": 1
+  }
  },
  {
-  "id": 49,
+  "id": 53,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "route23",
   "target": 80,
   "rewardMoney": 10000,
-  "rewardItems": { "rarecandy": 1 }
+  "rewardItems": {
+   "rarecandy": 1
+  }
  },
  {
-  "id": 50,
+  "id": 54,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "route21",
   "target": 20,
   "rewardMoney": 5200,
-  "rewardItems": { "mystic_water": 1 }
+  "rewardItems": {
+   "mystic_water": 1
+  }
  },
  {
-  "id": 51,
+  "id": 55,
   "region": "kanto",
   "type": "trainer_battle",
   "loc": "victoryroad",
@@ -481,25 +578,29 @@ var STORY_QUESTS = [
   "target": 1
  },
  {
-  "id": 52,
+  "id": 56,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "victoryroad",
   "target": 25,
   "rewardMoney": 7000,
-  "rewardItems": { "silk_scarf": 1 }
+  "rewardItems": {
+   "silk_scarf": 1
+  }
  },
  {
-  "id": 53,
+  "id": 57,
   "region": "kanto",
   "type": "badge",
   "targetBadge": "elite4",
   "target": 1,
   "rewardMoney": 28000,
-  "rewardItems": { "rarecandy": 1 }
+  "rewardItems": {
+   "rarecandy": 1
+  }
  },
  {
-  "id": 54,
+  "id": 58,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "seafoamislands",
@@ -509,7 +610,7 @@ var STORY_QUESTS = [
   "rewardMoney": 9000
  },
  {
-  "id": 55,
+  "id": 59,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "powerplant",
@@ -519,7 +620,7 @@ var STORY_QUESTS = [
   "rewardMoney": 9000
  },
  {
-  "id": 56,
+  "id": 60,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "victoryroad",
@@ -529,16 +630,18 @@ var STORY_QUESTS = [
   "rewardMoney": 9000
  },
  {
-  "id": 57,
+  "id": 61,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "pokemonmansion",
   "target": 90,
   "rewardMoney": 13000,
-  "rewardItems": { "rarecandy": 1 }
+  "rewardItems": {
+   "rarecandy": 1
+  }
  },
  {
-  "id": 58,
+  "id": 62,
   "region": "kanto",
   "type": "talk",
   "loc": "cinnabar",
@@ -547,7 +650,7 @@ var STORY_QUESTS = [
   "rewardItems": {}
  },
  {
-  "id": 59,
+  "id": 63,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "ceruleancave",
@@ -557,7 +660,7 @@ var STORY_QUESTS = [
   "rewardMoney": 22000
  },
  {
-  "id": 60,
+  "id": 64,
   "region": "kanto",
   "type": "defeat_wild",
   "loc": "safarizone",
@@ -565,15 +668,12 @@ var STORY_QUESTS = [
   "rewardLevel": 50,
   "target": 150,
   "rewardMoney": 25000,
-  "rewardItems": { "rarecandy": 5, "nugget": 3, "leftovers": 1 }
+  "rewardItems": {
+   "rarecandy": 5,
+   "nugget": 3,
+   "leftovers": 1
+  }
  },
- // ─────────── JOHTO (101-140) — passe 20: step 4, densification ───────────
- // New content: GS Ball arc (Kurt -> Ilex Forest), MOVIE 3 arc at the
- // Ruins of Alph (Professor Hale / Unown / crystal Entei), Eusine &
- // Suicune, the remedy for Amphy the Ampharos (HGSS canon: the sick
- // lighthouse Ampharos), Lance at the Lake of Rage, the RED GYARADOS
- // (shiny encounter), the Blackthorn dragon trial (Dratini).
- // Renumbering → V3 migration on the core side.
  {
   "id": 101,
   "region": "johto",
@@ -581,7 +681,9 @@ var STORY_QUESTS = [
   "loc": "newbark",
   "target": 1,
   "rewardMoney": 400,
-  "rewardItems": { "coba_berry": 1 }
+  "rewardItems": {
+   "coba_berry": 1
+  }
  },
  {
   "id": 102,
@@ -590,7 +692,9 @@ var STORY_QUESTS = [
   "loc": "jroute29",
   "target": 10,
   "rewardMoney": 700,
-  "rewardItems": { "roseli_berry": 1 }
+  "rewardItems": {
+   "roseli_berry": 1
+  }
  },
  {
   "id": 103,
@@ -632,9 +736,10 @@ var STORY_QUESTS = [
   "targetBadge": "bugsy",
   "target": 1,
   "rewardMoney": 4200,
-  "rewardItems": { "silver_powder": 1 }
+  "rewardItems": {
+   "silver_powder": 1
+  }
  },
- // ── GS Ball arc (movie 4): Kurt studies the mysterious GS Ball ──
  {
   "id": 108,
   "region": "johto",
@@ -642,7 +747,9 @@ var STORY_QUESTS = [
   "loc": "azalea",
   "target": 1,
   "rewardMoney": 600,
-  "rewardItems": { "shuca_berry": 1 }
+  "rewardItems": {
+   "shuca_berry": 1
+  }
  },
  {
   "id": 109,
@@ -651,7 +758,9 @@ var STORY_QUESTS = [
   "loc": "ilexforest",
   "target": 20,
   "rewardMoney": 2600,
-  "rewardItems": { "rindo_berry": 1 }
+  "rewardItems": {
+   "rindo_berry": 1
+  }
  },
  {
   "id": 110,
@@ -664,15 +773,27 @@ var STORY_QUESTS = [
  {
   "id": 111,
   "region": "johto",
+  "type": "egg_hatch",
+  "loc": "jroute34",
+  "target": 1,
+  "rewardMoney": 5000,
+  "rewardItems": {
+   "lucky_egg": 1
+  }
+ },
+ {
+  "id": 112,
+  "region": "johto",
   "type": "badge",
   "targetBadge": "whitney",
   "target": 1,
   "rewardMoney": 6500,
-  "rewardItems": { "silk_scarf": 1 }
+  "rewardItems": {
+   "silk_scarf": 1
+  }
  },
- // ── MOVIE 3 arc (Spell of the Unown): Ruins of Alph ──
  {
-  "id": 112,
+  "id": 113,
   "region": "johto",
   "type": "talk",
   "loc": "ruinsofalph",
@@ -680,16 +801,18 @@ var STORY_QUESTS = [
   "rewardMoney": 800
  },
  {
-  "id": 113,
+  "id": 114,
   "region": "johto",
   "type": "defeat_wild",
   "loc": "ruinsofalph",
   "target": 15,
   "rewardMoney": 3200,
-  "rewardItems": { "babiri_berry": 1 }
+  "rewardItems": {
+   "babiri_berry": 1
+  }
  },
  {
-  "id": 114,
+  "id": 115,
   "region": "johto",
   "type": "trainer_battle",
   "loc": "ruinsofalph",
@@ -697,25 +820,26 @@ var STORY_QUESTS = [
   "target": 1
  },
  {
-  "id": 115,
+  "id": 116,
   "region": "johto",
   "type": "talk",
   "loc": "ruinsofalph",
   "target": 1,
   "rewardMoney": 4000,
-  "rewardItems": { "charcoal": 1 }
+  "rewardItems": {
+   "charcoal": 1
+  }
  },
  {
-  "id": 116,
+  "id": 117,
   "region": "johto",
   "type": "trainer_battle",
   "loc": "burnedtower",
   "battleId": "johto_rival_burned",
   "target": 1
  },
- // ── Eusine, the Suicune hunter (Crystal canon) ──
  {
-  "id": 117,
+  "id": 118,
   "region": "johto",
   "type": "talk",
   "loc": "burnedtower",
@@ -724,26 +848,29 @@ var STORY_QUESTS = [
   "rewardItems": {}
  },
  {
-  "id": 118,
+  "id": 119,
   "region": "johto",
   "type": "badge",
   "targetBadge": "morty",
   "target": 1,
   "rewardMoney": 8500,
-  "rewardItems": { "spell_tag": 1 }
+  "rewardItems": {
+   "spell_tag": 1
+  }
  },
  {
-  "id": 119,
+  "id": 120,
   "region": "johto",
   "type": "badge",
   "targetBadge": "chuck",
   "target": 1,
   "rewardMoney": 10000,
-  "rewardItems": { "black_belt": 1 }
+  "rewardItems": {
+   "black_belt": 1
+  }
  },
- // ── Sick Amphy (HGSS canon): the Cianwood remedy for the Olivine Lighthouse ──
  {
-  "id": 120,
+  "id": 121,
   "region": "johto",
   "type": "talk",
   "loc": "cianwood",
@@ -751,26 +878,29 @@ var STORY_QUESTS = [
   "rewardMoney": 800
  },
  {
-  "id": 121,
+  "id": 122,
   "region": "johto",
   "type": "talk",
   "loc": "olivine",
   "target": 1,
   "rewardMoney": 3000,
-  "rewardItems": { "yache_berry": 1 }
+  "rewardItems": {
+   "yache_berry": 1
+  }
  },
  {
-  "id": 122,
+  "id": 123,
   "region": "johto",
   "type": "badge",
   "targetBadge": "jasmine",
   "target": 1,
   "rewardMoney": 11500,
-  "rewardItems": { "metal_coat": 1 }
+  "rewardItems": {
+   "metal_coat": 1
+  }
  },
- // ── Lake of Rage: Lance investigates + the RED GYARADOS (HGSS canon) ──
  {
-  "id": 123,
+  "id": 124,
   "region": "johto",
   "type": "talk",
   "loc": "lakerage",
@@ -778,7 +908,7 @@ var STORY_QUESTS = [
   "rewardMoney": 1000
  },
  {
-  "id": 124,
+  "id": 125,
   "region": "johto",
   "type": "defeat_wild",
   "loc": "lakerage",
@@ -789,7 +919,7 @@ var STORY_QUESTS = [
   "rewardShiny": true
  },
  {
-  "id": 125,
+  "id": 126,
   "region": "johto",
   "type": "trainer_battle",
   "loc": "lakerage",
@@ -797,16 +927,18 @@ var STORY_QUESTS = [
   "target": 1
  },
  {
-  "id": 126,
+  "id": 127,
   "region": "johto",
   "type": "badge",
   "targetBadge": "pryce",
   "target": 1,
   "rewardMoney": 13000,
-  "rewardItems": { "never_melt_ice": 1 }
+  "rewardItems": {
+   "never_melt_ice": 1
+  }
  },
  {
-  "id": 127,
+  "id": 128,
   "region": "johto",
   "type": "trainer_battle",
   "loc": "goldenrod",
@@ -814,17 +946,19 @@ var STORY_QUESTS = [
   "target": 1
  },
  {
-  "id": 128,
+  "id": 129,
   "region": "johto",
   "type": "badge",
   "targetBadge": "clair",
   "target": 1,
   "rewardMoney": 17500,
-  "rewardItems": { "dragon_fang": 1, "rarecandy": 1 }
+  "rewardItems": {
+   "dragon_fang": 1,
+   "rarecandy": 1
+  }
  },
- // ── Blackthorn dragon trial (HGSS canon: the Dragon's Den) ──
  {
-  "id": 129,
+  "id": 130,
   "region": "johto",
   "type": "talk",
   "loc": "blackthorn",
@@ -832,7 +966,7 @@ var STORY_QUESTS = [
   "rewardMoney": 1000
  },
  {
-  "id": 130,
+  "id": 131,
   "region": "johto",
   "type": "defeat_wild",
   "loc": "mtmortar",
@@ -842,7 +976,7 @@ var STORY_QUESTS = [
   "rewardLevel": 15
  },
  {
-  "id": 131,
+  "id": 132,
   "region": "johto",
   "type": "trainer_battle",
   "loc": "victoryroad_jo",
@@ -850,26 +984,29 @@ var STORY_QUESTS = [
   "target": 1
  },
  {
-  "id": 132,
+  "id": 133,
   "region": "johto",
   "type": "badge",
   "targetBadge": "johto_elite4",
   "target": 1,
   "rewardMoney": 30000,
-  "rewardItems": { "rarecandy": 1 }
+  "rewardItems": {
+   "rarecandy": 1
+  }
  },
  {
-  "id": 133,
+  "id": 134,
   "region": "johto",
   "type": "defeat_wild",
   "loc": "burnedtower",
   "target": 60,
   "rewardMoney": 9000,
-  "rewardItems": { "silver_wing": 1 }
+  "rewardItems": {
+   "silver_wing": 1
+  }
  },
- // ── Suicune pursuit (sightings along Route 42) ──
  {
-  "id": 134,
+  "id": 135,
   "region": "johto",
   "type": "defeat_wild",
   "loc": "jroute42",
@@ -878,7 +1015,7 @@ var STORY_QUESTS = [
   "rewardItems": {}
  },
  {
-  "id": 135,
+  "id": 136,
   "region": "johto",
   "type": "defeat_wild",
   "loc": "burnedtower",
@@ -888,7 +1025,7 @@ var STORY_QUESTS = [
   "rewardMoney": 16000
  },
  {
-  "id": 136,
+  "id": 137,
   "region": "johto",
   "type": "defeat_wild",
   "loc": "burnedtower",
@@ -898,7 +1035,7 @@ var STORY_QUESTS = [
   "rewardMoney": 16000
  },
  {
-  "id": 137,
+  "id": 138,
   "region": "johto",
   "type": "defeat_wild",
   "loc": "burnedtower",
@@ -906,10 +1043,12 @@ var STORY_QUESTS = [
   "rewardLevel": 50,
   "target": 150,
   "rewardMoney": 16000,
-  "rewardItems": { "rainbow_wing": 1 }
+  "rewardItems": {
+   "rainbow_wing": 1
+  }
  },
  {
-  "id": 138,
+  "id": 139,
   "region": "johto",
   "type": "item",
   "loc": "whirlislands",
@@ -920,7 +1059,7 @@ var STORY_QUESTS = [
   "rewardMoney": 20000
  },
  {
-  "id": 139,
+  "id": 140,
   "region": "johto",
   "type": "item",
   "loc": "tintower",
@@ -931,7 +1070,7 @@ var STORY_QUESTS = [
   "rewardMoney": 20000
  },
  {
-  "id": 140,
+  "id": 141,
   "region": "johto",
   "type": "defeat_wild",
   "loc": "ilexforest",
@@ -952,3 +1091,4 @@ if (typeof STORY_QUESTS !== 'undefined') { if (typeof window !== 'undefined') wi
 export {
   STORY_QUESTS,
 };
+

@@ -41,3 +41,4 @@ export const SPRITE_SIZE_VARS = Object.freeze({
   standard: 'var(--pw-size-poke-sm, 72px)',
   team: 'var(--pw-size-poke-lg, 104px)',
 });
+

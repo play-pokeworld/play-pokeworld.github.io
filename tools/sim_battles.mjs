@@ -494,3 +494,4 @@ export const __simExports = { get results() { return results; } };
 const isMain = (() => { try { return import.meta.url === pathToFileURL(process.argv[1]).href; } catch (_) { return false; } })();
 if (isMain) main().catch((e) => { console.error(e); process.exit(1); });
 
+

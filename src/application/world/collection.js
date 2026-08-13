@@ -286,6 +286,95 @@ function unlockShinyForSpecies(id){
  }
  }
 }
+// ── Play records (Pokédex sheet + location panel) ────────────────────────
+// Counts live on G.pokedex[id] (per species) and G.locStats[locId] (per
+// place). Missing keys default to 0 so old saves stay valid. shinyHatched
+// follows the incubation DICE only: a successful roll always +1 (even if
+// that individual was already shiny — a shiny never reverts). A failed
+// roll never increments, whether the mon was shiny or not.
+const DEX_COUNT_KEYS = [
+  'encountered', 'captured', 'beaten',
+  'hatcheryIncub', 'training',
+  'shinyEncountered', 'shinyCaptured', 'shinyBeaten', 'shinyHatched',
+];
+const LOC_COUNT_KEYS = ['beaten', 'encountered', 'captured'];
+
+function ensureDexEntry(id) {
+  const nid = Number(id);
+  if (!Number.isFinite(nid) || nid <= 0 || typeof G === 'undefined' || !G) return null;
+  if (!G.pokedex || typeof G.pokedex !== 'object') G.pokedex = {};
+  if (!G.pokedex[nid] || typeof G.pokedex[nid] !== 'object') G.pokedex[nid] = {};
+  return G.pokedex[nid];
+}
+
+function recordDexStat(id, key, n) {
+  const entry = ensureDexEntry(id);
+  if (!entry || DEX_COUNT_KEYS.indexOf(key) < 0) return 0;
+  const add = Number(n);
+  entry[key] = (Number(entry[key]) || 0) + (Number.isFinite(add) ? add : 1);
+  return entry[key];
+}
+
+function getDexRecordStats(id) {
+  const entry = (typeof G !== 'undefined' && G && G.pokedex && G.pokedex[Number(id)]) || {};
+  const out = {};
+  for (let i = 0; i < DEX_COUNT_KEYS.length; i++) {
+    const k = DEX_COUNT_KEYS[i];
+    out[k] = Number(entry[k]) || 0;
+  }
+  return out;
+}
+
+function isPokeIndividualShiny(p) {
+  return !!(p && (p.shinyUnlocked || p.shinyActive || p.shiny || p._forceShiny));
+}
+
+function recordDexEncounter(id, shiny) {
+  recordDexStat(id, 'encountered', 1);
+  if (shiny) recordDexStat(id, 'shinyEncountered', 1);
+}
+
+function recordDexCapture(id, shiny) {
+  recordDexStat(id, 'captured', 1);
+  if (shiny) recordDexStat(id, 'shinyCaptured', 1);
+}
+
+function recordDexDefeat(id, shiny) {
+  recordDexStat(id, 'beaten', 1);
+  if (shiny) recordDexStat(id, 'shinyBeaten', 1);
+}
+
+function ensureLocStats(locId) {
+  if (!locId || typeof G === 'undefined' || !G) return null;
+  if (!G.locStats || typeof G.locStats !== 'object') G.locStats = {};
+  if (!G.locStats[locId] || typeof G.locStats[locId] !== 'object') {
+    G.locStats[locId] = {
+      beaten: (G.wildWinsByLoc && G.wildWinsByLoc[locId]) || 0,
+      encountered: 0,
+      captured: 0,
+    };
+  }
+  return G.locStats[locId];
+}
+
+function recordLocStat(locId, key, n) {
+  const st = ensureLocStats(locId);
+  if (!st || LOC_COUNT_KEYS.indexOf(key) < 0) return 0;
+  const add = Number(n);
+  st[key] = (Number(st[key]) || 0) + (Number.isFinite(add) ? add : 1);
+  return st[key];
+}
+
+function getLocRecordStats(locId) {
+  const st = (typeof G !== 'undefined' && G && G.locStats && G.locStats[locId]) || {};
+  const beatenFromWins = (typeof G !== 'undefined' && G && G.wildWinsByLoc && G.wildWinsByLoc[locId]) || 0;
+  return {
+    beaten: Math.max(Number(st.beaten) || 0, beatenFromWins),
+    encountered: Number(st.encountered) || 0,
+    captured: Number(st.captured) || 0,
+  };
+}
+
 function locCompletion(locId){
  const idsToCheck = (typeof getLinkedRouteIds === 'function') ? getLinkedRouteIds(locId) : [locId];
  const species = new Set();
@@ -474,6 +563,15 @@ if (typeof isSpeciesShiny !== 'undefined') { if (typeof window !== 'undefined') 
 if (typeof syncShinyState !== 'undefined') { if (typeof window !== 'undefined') window.syncShinyState = syncShinyState; if (typeof globalThis !== 'undefined') globalThis.syncShinyState = syncShinyState; }
 if (typeof unlockShinyForSpecies !== 'undefined') { if (typeof window !== 'undefined') window.unlockShinyForSpecies = unlockShinyForSpecies; if (typeof globalThis !== 'undefined') globalThis.unlockShinyForSpecies = unlockShinyForSpecies; }
 if (typeof locCompletion !== 'undefined') { if (typeof window !== 'undefined') window.locCompletion = locCompletion; if (typeof globalThis !== 'undefined') globalThis.locCompletion = locCompletion; }
+if (typeof recordDexStat !== 'undefined') { if (typeof window !== 'undefined') window.recordDexStat = recordDexStat; if (typeof globalThis !== 'undefined') globalThis.recordDexStat = recordDexStat; }
+if (typeof getDexRecordStats !== 'undefined') { if (typeof window !== 'undefined') window.getDexRecordStats = getDexRecordStats; if (typeof globalThis !== 'undefined') globalThis.getDexRecordStats = getDexRecordStats; }
+if (typeof recordDexEncounter !== 'undefined') { if (typeof window !== 'undefined') window.recordDexEncounter = recordDexEncounter; if (typeof globalThis !== 'undefined') globalThis.recordDexEncounter = recordDexEncounter; }
+if (typeof recordDexCapture !== 'undefined') { if (typeof window !== 'undefined') window.recordDexCapture = recordDexCapture; if (typeof globalThis !== 'undefined') globalThis.recordDexCapture = recordDexCapture; }
+if (typeof recordDexDefeat !== 'undefined') { if (typeof window !== 'undefined') window.recordDexDefeat = recordDexDefeat; if (typeof globalThis !== 'undefined') globalThis.recordDexDefeat = recordDexDefeat; }
+if (typeof recordLocStat !== 'undefined') { if (typeof window !== 'undefined') window.recordLocStat = recordLocStat; if (typeof globalThis !== 'undefined') globalThis.recordLocStat = recordLocStat; }
+if (typeof getLocRecordStats !== 'undefined') { if (typeof window !== 'undefined') window.getLocRecordStats = getLocRecordStats; if (typeof globalThis !== 'undefined') globalThis.getLocRecordStats = getLocRecordStats; }
+if (typeof ensureLocStats !== 'undefined') { if (typeof window !== 'undefined') window.ensureLocStats = ensureLocStats; if (typeof globalThis !== 'undefined') globalThis.ensureLocStats = ensureLocStats; }
+if (typeof isPokeIndividualShiny !== 'undefined') { if (typeof window !== 'undefined') window.isPokeIndividualShiny = isPokeIndividualShiny; if (typeof globalThis !== 'undefined') globalThis.isPokeIndividualShiny = isPokeIndividualShiny; }
 if (typeof boxedEntries !== 'undefined') { if (typeof window !== 'undefined') window.boxedEntries = boxedEntries; if (typeof globalThis !== 'undefined') globalThis.boxedEntries = boxedEntries; }
 
 // Wave 41 — native ESM module: exports the same names as the
@@ -501,3 +599,4 @@ export {
   locCompletion,
   boxedEntries,
 };
+

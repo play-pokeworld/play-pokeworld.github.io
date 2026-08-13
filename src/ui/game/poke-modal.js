@@ -1,3 +1,4 @@
+import { panelHeaderHTML } from '../components/panel-header.js';
 function _pwMarkTutorial(id) {
   try {
     const fn = (typeof tutorialMark === 'function') ? tutorialMark
@@ -279,6 +280,11 @@ function renderPokemonDetailModal(p, opts){
  else if (opts.idx != null) window._pwPokeSheet = { kind: 'team', idx: opts.idx };
  else window._pwPokeSheet = null;
  if (typeof window.pwInfoClearSource === 'function') window.pwInfoClearSource();
+ // FIX (2026-08) — same surface reclaim as openDexEntry: drop any
+ // `pw-info-modal` / `.pw-panel-shell` state an info panel may have left on
+ // #poke-modal, otherwise this sheet renders with the info-panel geometry and
+ // a non-scrolling container.
+ if (typeof window.pwResetInfoModalSurface === 'function') window.pwResetInfoModalSurface();
  inner.classList.remove('management-inner');
  inner.classList.add('poke-detail-inner');
  const idx = opts.idx;
@@ -517,9 +523,13 @@ function openMoveInfo(moveId, contextIdx, contextBoxId){
      sections: _infoSections
    }));
  } else {
-   _pwSetHtmlSafe(inner, '<div class="modal-title"><div class="pw-row">'
-     + '<span class="type-badge ' + typeClass(type) + ' pw-type-info">' + (typeof getTypeName === 'function' ? getTypeName(type) : type) + '</span><div>' + name + '</div></div>'
-     + '<span class="modal-close" data-action="pw-info-back"></span></div>');
+   // Wave 32: header built by THE shared constructor (components/panel-header.js).
+   _pwSetHtmlSafe(inner, panelHeaderHTML({
+     iconHtml: '<span class="type-badge ' + typeClass(type) + ' pw-type-info">'
+       + (typeof getTypeName === 'function' ? getTypeName(type) : type) + '</span>',
+     title: name,
+     close: { action: 'pw-info-back', glyph: false }
+   }));
  }
  if(typeof window.pwApplyWindowChrome==='function') window.pwApplyWindowChrome(inner); // wave 30: canonical window chrome
  document.getElementById('poke-modal').classList.add('open');
@@ -792,3 +802,4 @@ export {
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('openPokeModal', openPokeModal); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('openBoxPokeModal', openBoxPokeModal); } catch (_) {} }
+

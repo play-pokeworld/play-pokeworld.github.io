@@ -158,6 +158,11 @@ export function spawnNextWild() {
   globalThis.resetEnemyCd();
   globalThis.resetPlayerCd();
   G.pokedex[battle.enemyPoke.id] = Object.assign({}, G.pokedex[battle.enemyPoke.id] || {}, { seen: true });
+  try {
+    const _encShiny = !!(wp.shiny || wp.shinyActive || wp._forceShiny);
+    if (typeof globalThis.recordDexEncounter === 'function') globalThis.recordDexEncounter(wp.id, _encShiny);
+    if (typeof globalThis.recordLocStat === 'function' && G.location) globalThis.recordLocStat(G.location, 'encountered', 1);
+  } catch (_) {}
   globalThis.clearBattleLog();
   globalThis.triggerEntryTalents('both');
   globalThis.updateBattleUI();
@@ -219,3 +224,4 @@ if (typeof globalThis !== 'undefined') {
   globalThis.exploreArea = exploreArea;
   globalThis.startWildBattle = startWildBattle;
 }
+

@@ -86,3 +86,4 @@ export class Toggle {
     return this.checked;
   }
 }
+

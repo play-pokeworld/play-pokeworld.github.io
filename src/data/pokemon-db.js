@@ -78,3 +78,4 @@ if (typeof globalThis !== 'undefined') {
   globalThis.poke.PokemonDB = PokemonDB;
 }
 
+

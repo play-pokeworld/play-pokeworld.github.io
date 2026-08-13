@@ -92,12 +92,12 @@ test('wave19: DexDetailView — empty moves/talents fall back to muted info line
   assert.ok(!html.includes('openMoveInfo'), 'no dead chips when empty');
 });
 
-test('wave19: DexDetailView — shared framed sections + stat cards (info-panel language)', () => {
+test('wave19: DexDetailView — shared framed sections + compact stat cells', () => {
   const html = DexDetailView.toHTML(sampleModel());
   assert.ok(html.includes('pw-panel pw-info-section'), 'framed sections');
-  assert.ok(html.includes('pw-info-stat-cards pw-dex-stats'), 'shared stat cards grid');
-  const cards = html.match(/pw-card-dark pw-center/g) || [];
-  assert.equal(cards.length, 6, 'six base stat cards');
+  assert.ok(html.includes('pw-dex-stats'), 'compact base-stat grid');
+  const cells = html.match(/pw-dex-stat-cell/g) || [];
+  assert.equal(cells.length, 6, 'six compact base stat cells');
   assert.ok(html.includes('pw-panel pw-dex-hero'), 'flat hero panel');
   assert.ok(html.includes('type-badge type-electric'), 'type badges in hero');
   assert.ok(html.includes('pw-poke-circle-wrap'), 'canonical sprite disc fragment');
@@ -189,3 +189,4 @@ test('wave19: kind mapping — full matrix documented and locked', () => {
   assert.ok(UTIL_JS.includes('return \'neutral\''), 'neutral kind exists');
   assert.ok(UTIL_JS.includes("return c ? 'neutral' : 'success'"), 'default stays success (historical var(--green))');
 });
+

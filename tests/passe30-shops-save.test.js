@@ -101,3 +101,4 @@ test('views/components are registered in the DS index files', () => {
   const comps = R('src/ui/components/index.js');
   assert.ok(comps.includes("from './save-extras.js'") && comps.includes('saveContextMenuHTML') && comps.includes('saveIconGridHTML'), 'save extras registered');
 });
+

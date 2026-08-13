@@ -327,6 +327,7 @@ function digMineTile(tx, ty, silent=false){
   }
   if(allUncovered){
    itm.collected = true;
+   try { if (typeof progressMainQuestType === 'function') progressMainQuestType('mine_items', 1); } catch (_) {}
    addToInventory(itm.key, 1);
    if(!G.mine.completedCount) G.mine.completedCount = 0;
    G.mine.completedCount++;
@@ -419,3 +420,4 @@ export {
 // indirection instead of the window fallback); the window surface is kept for
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('generateMineLayer', generateMineLayer); } catch (_) {} }
+

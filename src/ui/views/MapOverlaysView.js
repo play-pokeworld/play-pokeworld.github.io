@@ -38,3 +38,4 @@ export class MapOverlaysView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

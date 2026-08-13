@@ -95,3 +95,4 @@ export {
 // indirection instead of the window fallback); the window surface is kept for
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('toggleMapHelp', toggleMapHelp); } catch (_) {} }
+

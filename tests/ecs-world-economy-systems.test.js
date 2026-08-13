@@ -286,3 +286,4 @@ test('shop domain rules reproduce the classic bag/sale rules', () => {
   assert.equal(computeSaleValue({}, 2), 4000, 'default 2 000₽ per unit (classic)');
   assert.deepEqual(mergeShopStock(['a', 'b'], ['b', 'c']), ['a', 'b', 'c']);
 });
+

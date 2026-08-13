@@ -356,3 +356,4 @@ export {
   renderBaseNpcSpritePicker,
   renderBaseNpcPresetPicker,
 };
+

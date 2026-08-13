@@ -371,3 +371,4 @@ test('phase 30 D: rewirings present, old blocks removed, i18n keys', () => {
   assert.ok(R('src/localization/en/ui.js').includes('"afk_panel_daycare_levels"'), 'EN day-care recap key');
 });
 
+

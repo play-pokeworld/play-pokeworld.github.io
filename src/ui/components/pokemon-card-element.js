@@ -191,3 +191,4 @@ export class PokemonCardTemplate {
     return el.outerHTML;
   }
 }
+

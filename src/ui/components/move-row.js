@@ -52,3 +52,4 @@ export function moveRowVNode(row) {
 export function moveRowHTML(row) {
   return toHTMLString(moveRowVNode(row));
 }
+

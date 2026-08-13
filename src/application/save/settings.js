@@ -176,3 +176,4 @@ if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.regis
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('debugTimeSkipAfk30Minutes', debugTimeSkipAfk30Minutes); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('debugUnlockBadges', debugUnlockBadges); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('toggleBattleSpeedX10', toggleBattleSpeedX10); } catch (_) {} }
+

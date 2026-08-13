@@ -237,7 +237,10 @@ if (typeof globalThis !== 'undefined') {
     };
     window.clearBattleLog = function () { window.battle.log = []; };
     window.typeClass = function (type) { return 'type-' + String(type || 'unknown').toLowerCase().replace(/[^a-z0-9]+/g, '-'); };
-    window.typeSpan = function (type) { return '<span class="type-badge ' + window.typeClass(type) + '">' + type + '</span>'; };
+    window.typeSpan = function (type) {
+      const label = (typeof window.getTypeName === 'function') ? window.getTypeName(type) : type;
+      return '<span class="type-badge ' + window.typeClass(type) + '">' + label + '</span>';
+    };
     window.hpColor = function (percent) { if (percent > 0.5) return 'var(--green)'; if (percent > 0.25) return 'var(--light2)'; return 'var(--red)'; };
   }
 
@@ -283,6 +286,23 @@ if (typeof globalThis !== 'undefined') {
   window.uiTabButtonHtml = uiTabButtonHtml;
   window.uiStatChipHtml = uiStatChipHtml;
 
+  // FIX (2026-08, user follow-up): the MOBILE surface had no unlock gate at
+  // all. updateFeatureWindows() gates win-mine/win-training/... behind
+  // mineUnlocked() & co on desktop, but in mobile-mode it delegates entirely
+  // to applyMobileView(), which used to show whatever "manage view" was
+  // selected — so the Gestion > Mine sub-tab exposed the mine as soon as the
+  // subnav existed (i.e. around Route 11), one badge too early. The manage
+  // sub-views are now gated by the SAME predicates as the desktop windows.
+  function pwManageViewUnlocked(view) {
+    try {
+      if (view === 'mine') return typeof window.mineUnlocked === 'function' ? !!window.mineUnlocked() : true;
+      if (view === 'training') return typeof window.trainingUnlocked === 'function' ? !!window.trainingUnlocked() : true;
+      if (view === 'hatchery') return typeof window.hatcheryUnlocked === 'function' ? !!window.hatcheryUnlocked() : true;
+      if (view === 'base') return typeof window.secretBaseUnlocked === 'function' ? !!window.secretBaseUnlocked() : true;
+    } catch (_) {}
+    return true;
+  }
+
   function applyMobileView() {
     const mobile = typeof window.matchMedia === 'function' ? window.matchMedia('(max-width: 850px), (pointer: coarse)').matches : false;
     document.body.classList.toggle('mobile-mode', mobile);
@@ -294,7 +314,14 @@ if (typeof globalThis !== 'undefined') {
       return;
     }
     const view = document.body.dataset.mobileView || 'adventure';
-    const manageView = document.body.dataset.mobileManageView || 'hatchery';
+    let manageView = document.body.dataset.mobileManageView || 'hatchery';
+    // A locked machine must never be reachable: fall back to the first
+    // unlocked one (hatchery is the earliest), else show nothing.
+    if (!pwManageViewUnlocked(manageView)) {
+      const fallback = ['hatchery', 'training', 'mine', 'base'].filter(pwManageViewUnlocked)[0] || null;
+      manageView = fallback;
+      document.body.dataset.mobileManageView = fallback || '';
+    }
     let visible = [];
     // Wave 15 (user feedback): quests live with adventure (under the lieu
     // window), and shortcuts are their own top-level view, out of Gestion.
@@ -303,14 +330,20 @@ if (typeof globalThis !== 'undefined') {
     else if (view === 'team') visible = ['win-team'];
     else if (view === 'quests') visible = ['win-map', 'win-tabs', 'win-story']; // legacy saved state → adventure
     else if (view === 'shortcuts') visible = ['win-shortcuts'];
-    else visible = ({hatchery:['win-hatchery'], training:['win-training'], mine:['win-mine'], base:['win-base']})[manageView] || ['win-hatchery'];
+    else visible = (manageView ? ({hatchery:['win-hatchery'], training:['win-training'], mine:['win-mine'], base:['win-base']})[manageView] : null) || [];
     allWins.forEach(function(win){
       const show = visible.indexOf(win.id) !== -1;
       win.classList.toggle('mobile-visible', show);
       win.style.display = show ? 'flex' : 'none';
     });
     Array.prototype.slice.call(document.querySelectorAll('.mobile-nav-bar [data-mobile-view]')).forEach(function(btn){ btn.classList.toggle('active', btn.dataset.mobileView === view); });
-    Array.prototype.slice.call(document.querySelectorAll('.mobile-subnav-bar [data-mobile-manage-view]')).forEach(function(btn){ btn.classList.toggle('active', btn.dataset.mobileManageView === manageView); });
+    Array.prototype.slice.call(document.querySelectorAll('.mobile-subnav-bar [data-mobile-manage-view]')).forEach(function(btn){
+      // Locked machines are hidden outright — the mine button used to sit
+      // there, tappable, long before the Diglett cave was reachable.
+      const unlocked = pwManageViewUnlocked(btn.dataset.mobileManageView);
+      btn.style.display = unlocked ? '' : 'none';
+      btn.classList.toggle('active', unlocked && btn.dataset.mobileManageView === manageView);
+    });
     const sub = document.querySelector('.mobile-subnav-bar');
     if (sub) sub.style.display = view === 'manage' ? 'flex' : 'none';
   }
@@ -461,9 +494,40 @@ function pwBuildInfoPanel(opts) {
   });
 };
 
+// FIX (2026-08) — info-panel surface reset.
+// The info panel (move / talent / item) borrows #poke-modal and marks it with
+// the class `pw-info-modal`, while pwApplyWindowChrome() re-roots the content
+// into a `.pw-panel-shell`. Two design-system rules are keyed on that state:
+//   • #poke-modal.pw-info-modal #poke-modal-inner  -> narrow info geometry
+//     (width: min(--pw-panel-w-info, 94vw); max-height: 88vh; padding: 12px)
+//   • #poke-modal #poke-modal-inner:has(.pw-panel-shell)
+//     -> overflow-y: hidden !important (the .pw-panel-body becomes the scroller)
+// Leaving either behind poisons the NEXT panel rendered into #poke-modal —
+// most visibly the Pokédex detail sheet, which then renders with the info
+// geometry and a non-scrolling container, so its bottom is unreachable.
+// This helper restores the neutral modal surface and is called both when
+// leaving an info panel and defensively when a panel takes the surface over.
+function pwResetInfoModalSurface() {
+  if (typeof document === 'undefined') return;
+  const pm = document.getElementById('poke-modal');
+  if (pm) pm.classList.remove('pw-info-modal');
+  const inner = document.getElementById('poke-modal-inner');
+  if (inner) {
+    const shell = inner.querySelector(':scope > .pw-panel-shell');
+    if (shell) shell.remove();
+    inner.classList.remove('pw-panel-host');
+    inner.style.removeProperty('overflow-y');
+    inner.style.removeProperty('padding');
+  }
+}
+
 function pwInfoBack() {
   const src = window._pwInfoSource;
   window._pwInfoSource = null;
+  // Always leave the info surface before restoring the previous panel:
+  // the destination re-renders #poke-modal-inner and must not inherit the
+  // info-panel geometry / overflow contract.
+  pwResetInfoModalSurface();
   try {
     if (src && src.kind === 'fs') { callGlobal('openFullscreenPanel', src.panel); return; }
     if (src && src.kind === 'team' && src.idx != null) { callGlobal('openPokeModal', src.idx); return; }
@@ -484,12 +548,14 @@ if (typeof window !== 'undefined') {
   window.pwModalInfo = pwModalInfo; window.pwInfoCaptureSource = pwInfoCaptureSource;
   window.pwInfoBackLabel = pwInfoBackLabel; window.pwInfoClearSource = pwInfoClearSource;
   window.pwBuildInfoPanel = pwBuildInfoPanel; window.pwInfoBack = pwInfoBack;
+  window.pwResetInfoModalSurface = pwResetInfoModalSurface;
   window.PW_FS_BACK_KEYS = PW_FS_BACK_KEYS;
 }
 if (typeof globalThis !== 'undefined') {
   globalThis.pwModalInfo = pwModalInfo; globalThis.pwInfoCaptureSource = pwInfoCaptureSource;
   globalThis.pwInfoBackLabel = pwInfoBackLabel; globalThis.pwInfoClearSource = pwInfoClearSource;
   globalThis.pwBuildInfoPanel = pwBuildInfoPanel; globalThis.pwInfoBack = pwInfoBack;
+  globalThis.pwResetInfoModalSurface = pwResetInfoModalSurface;
   globalThis.PW_FS_BACK_KEYS = PW_FS_BACK_KEYS;
 }
 
@@ -641,3 +707,4 @@ export {
   pwInfoCaptureSource, pwInfoBackLabel, pwInfoClearSource,
   pwBuildInfoPanel, pwInfoBack,
 };
+

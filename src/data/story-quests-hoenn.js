@@ -89,3 +89,4 @@ if (typeof STORY_QUESTS !== 'undefined' && Array.isArray(STORY_QUESTS)) {
 }
 // Wave 40 — surface kept (window → globalThis block, same scope).
 if (typeof globalThis !== 'undefined') globalThis.STORY_QUESTS_HOENN = STORY_QUESTS_HOENN;
+

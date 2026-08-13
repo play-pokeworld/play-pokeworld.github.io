@@ -155,6 +155,14 @@ function normalizeLoadedState(){
  }
  if(Array.isArray(G.teamSlotItems)) G.teamSlotItems = G.teamSlotItems.map(key => { const k2 = itemRenames[key] || key; return (['choice_scarf','swift_charm','focus_lens','power_gem','thick_club','sitrus_berry','cheri_berry','oran_berry'].includes(k2) ? null : k2); });
  if(!G.pokedex) G.pokedex = {};
+ if(!G.locStats || typeof G.locStats !== 'object') G.locStats = {};
+ if(G.wildWinsByLoc && typeof G.wildWinsByLoc === 'object'){
+  for(const locId in G.wildWinsByLoc){
+   if(!G.locStats[locId] || typeof G.locStats[locId] !== 'object') G.locStats[locId] = { beaten: 0, encountered: 0, captured: 0 };
+   const wins = Number(G.wildWinsByLoc[locId]) || 0;
+   if((Number(G.locStats[locId].beaten) || 0) < wins) G.locStats[locId].beaten = wins;
+  }
+ }
  if(!G.unlockedTalents) G.unlockedTalents = {};
  if(!G.mainStep) G.mainStep = { kanto: 0, johto: 0, hoenn: 0 };
  if(!G.regionLeagueWon || typeof G.regionLeagueWon !== 'object') G.regionLeagueWon = {};
@@ -224,8 +232,11 @@ function normalizeLoadedState(){
    if(G.badges.includes('surge')) {
      G.unlockedLocs['route6'] = true;
      G.unlockedLocs['vermilion'] = true;
-     G.unlockedLocs['diglettscave'] = true;
-     G.unlockedLocs['diglettscave_2'] = true;
+     // FIX (2026-08, user follow-up #3): the Diglett cave was force-unlocked
+     // here as soon as the 3rd badge (Surge) was earned. That made the MINE
+     // open on the badge count alone — the player had never set foot in the
+     // cave. The mine must follow the CAVE's real unlock (reach it on the
+     // map + its own badgeReq), so this backfill must not pre-open it.
      G.repeatableQuestsUnlocked = true;
    }
    if(G.badges.includes('koga')) {
@@ -235,6 +246,18 @@ function normalizeLoadedState(){
    if(G.badges.includes('elite4') || G.region === 'johto') {
      G.repeatableQuestsUnlocked = true;
    }
+ }
+ // FIX (2026-08, user follow-up #3) — one-shot repair for saves written by a
+ // build that force-unlocked the Diglett cave on the Surge badge. The flag is
+ // dropped ONLY when the player has never actually been there (no recorded
+ // visit and not standing in it); locReachable() re-grants it legitimately as
+ // soon as the cave is really reached, so real progress is never lost.
+ if(!G._diglettUnlockRepaired){
+   const visited = (id) => !!((G.visitedMaps && G.visitedMaps[id]) || ((G.wildWinsByLoc||{})[id] > 0) || G.location === id);
+   for(const id of ['diglettscave','diglettscave_2']){
+     if(G.unlockedLocs && G.unlockedLocs[id] && !visited(id)) delete G.unlockedLocs[id];
+   }
+   G._diglettUnlockRepaired = true;
  }
  // Reparation of the saves corrompues : deduplication then restauration of the missing
  try {
@@ -502,7 +525,7 @@ function renderSaveMenu(){
  _pwSyncScenes();
 }
 function hideSaveMenu(){ const screen = document.getElementById('save-menu-screen'); if(screen) screen.classList.remove('is-open'); document.body.classList.remove('save-menu-active'); document.body.classList.add('game-started'); }
-function createFreshGameState(){ let state = null; try{ if(window.PokeWorldState && window.PokeWorldState.createInitialGameState) state = window.PokeWorldState.createInitialGameState(); }catch(_){ } if(!state) state = { location:'pallet', region:'kanto', team:[], inventory:{}, money:2000, badges:[], defeatedChamps:{}, pokedex:{}, stepsLeft:0, starter:false, starterKanto:false, starterJohto:false, regionStarter:{kanto:false,johto:false}, collection:{}, teamSlotItems:[], evolvedSpecies:[], dupeCatches:{}, lang:'fr', storyIdx:0, storyProgress:0, unlockedTalents:{}, activeQuests:[], repeatables:[], visitedMaps:{}, completedQuests:{}, wildWinsByLoc:{}, regionLeagueWon:{}, playTimeMs:0, saveMeta:{}, tutorial:{ enabled:true, completed:{}, dismissedTips:{}, rewards:{} } }; const storedLang = storageGet('pokeworld_lang'); if(storedLang) state.lang = storedLang; if(state.playTimeMs == null) state.playTimeMs = 0; return state; }
+function createFreshGameState(){ let state = null; try{ if(window.PokeWorldState && window.PokeWorldState.createInitialGameState) state = window.PokeWorldState.createInitialGameState(); }catch(_){ } if(!state) state = { location:'pallet', region:'kanto', team:[], inventory:{}, money:2000, badges:[], defeatedChamps:{}, pokedex:{}, stepsLeft:0, starter:false, starterKanto:false, starterJohto:false, regionStarter:{kanto:false,johto:false}, collection:{}, teamSlotItems:[], evolvedSpecies:[], dupeCatches:{}, lang:'fr', storyIdx:0, storyProgress:0, unlockedTalents:{}, activeQuests:[], repeatables:[], visitedMaps:{}, completedQuests:{}, wildWinsByLoc:{}, locStats:{}, regionLeagueWon:{}, playTimeMs:0, saveMeta:{}, tutorial:{ enabled:true, completed:{}, dismissedTips:{}, rewards:{} } }; const storedLang = storageGet('pokeworld_lang'); if(storedLang) state.lang = storedLang; if(state.playTimeMs == null) state.playTimeMs = 0; return state; }
 function assignGlobalState(state){
  if(state){ delete state.updateAvailable; delete state.updateBannerDismissed; } const target = (typeof G !== 'undefined' && G && typeof G === 'object') ? G : {}; for(const key of Object.keys(target)) delete target[key]; Object.assign(target, state || {}); G = target; if(typeof window !== 'undefined'){ window.G = target; if(window.PokeWorldState) window.PokeWorldState.gameState = target; } if(typeof globalThis !== 'undefined') globalThis.G = target; }
 function resetRuntimeBattleState(){ try{ const fresh = window.PokeWorldBattleState && window.PokeWorldBattleState.createInitialBattleState ? window.PokeWorldBattleState.createInitialBattleState() : null; if(fresh && typeof battle !== 'undefined' && battle){ for(const key of Object.keys(battle)) delete battle[key]; Object.assign(battle, fresh); window.battle = battle; } }catch(_){ } }
@@ -1141,3 +1164,4 @@ if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.regis
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('loadGame', loadGame); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('saveGame', saveGame); PokeActions.register('setSaveMenuLang', setSaveMenuLang); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('debugGiveCtCs', debugGiveCtCs); } catch (_) {} }
+

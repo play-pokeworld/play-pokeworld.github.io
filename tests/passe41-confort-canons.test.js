@@ -300,3 +300,4 @@ test('phase 41 F: i18n need2d + FR/EN editing hints, 3D listener hooked', () => 
   assert.ok(win.includes("t('base.edit.need2d')"), 'i18n need2d notification (zero hardcoded string)');
 });
 
+

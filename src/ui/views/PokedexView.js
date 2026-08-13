@@ -139,3 +139,4 @@ export class PokedexView extends UIView {
     return { filters, content, full: filters + content };
   }
 }
+

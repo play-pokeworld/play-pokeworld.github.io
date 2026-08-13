@@ -144,3 +144,4 @@ export class BagView extends UIView {
     return { filters, content, full: filters + content };
   }
 }
+

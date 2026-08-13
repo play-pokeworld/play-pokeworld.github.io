@@ -78,12 +78,12 @@ export class SaveMenuView extends UIView {
         h('div', { class: 'save-menu-lang-actions', style: { display: 'flex', gap: '8px', marginTop: '14px', justifyContent: 'center' } },
           h('button', {
             type: 'button',
-            class: `hbtn lang-btn${(typeof currentLang === 'function' && currentLang() === 'fr') ? ' active' : ''}`,
+            class: `hbtn lang-btn${(typeof globalThis.currentLang === 'function' && globalThis.currentLang() === 'fr') ? ' active' : ''}`,
             dataset: { action: 'legacy-call', call: 'setSaveMenuLang', callArgs: "'fr'" },
           }, 'FR'),
           h('button', {
             type: 'button',
-            class: `hbtn lang-btn${(typeof currentLang === 'function' && currentLang() === 'en') ? ' active' : ''}`,
+            class: `hbtn lang-btn${(typeof globalThis.currentLang === 'function' && globalThis.currentLang() === 'en') ? ' active' : ''}`,
             dataset: { action: 'legacy-call', call: 'setSaveMenuLang', callArgs: "'en'" },
           }, 'EN')
         )),
@@ -108,3 +108,4 @@ export class SaveMenuView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

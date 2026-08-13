@@ -44,7 +44,15 @@ export const GAME = {
     WIDTH: 10,
     HEIGHT: 8,
     ENERGY_MAX: 100,
-    ENERGY_REGEN: 1,  // per second
+    // FIX (2026-08): was 1 and read by nobody, while the real recharge ticker
+    // (bootstrap-timers.js, every 1000 ms) grants +2. Aligned on the actual
+    // behaviour and now published below so the UI hint quotes it instead of
+    // hardcoding a number that silently rots.
+    ENERGY_REGEN: 2,  // per second
+    // FIX (2026-08): mine energy granted by a won battle / a capture.
+    // Was 15, which refilled the whole bar far too fast and made the
+    // energy budget meaningless; rebalanced to 5.
+    ENERGY_PER_BATTLE: 5,
   },
 
   // ─── Hatchery ───
@@ -91,3 +99,17 @@ export const GAME = {
 // T2 (wave 38): ESM module — native export; the classic surface is
 // kept on the global object for the registries (data.js) and the VM harnesses.
 if (typeof globalThis !== 'undefined') globalThis.GAME = GAME;
+
+// Mine energy granted per won battle / per capture. Surfaced as a standalone
+// constant because the combat modules (battle-status.js, catch.js) and the
+// offline engine read it as a free identifier — application/economy/mine.js is
+// lazy-loaded, so it cannot own this value.
+export const MINE_ENERGY_PER_BATTLE = GAME.MINE.ENERGY_PER_BATTLE;
+if (typeof globalThis !== 'undefined') globalThis.MINE_ENERGY_PER_BATTLE = MINE_ENERGY_PER_BATTLE;
+if (typeof window !== 'undefined') window.MINE_ENERGY_PER_BATTLE = MINE_ENERGY_PER_BATTLE;
+
+// Same deal for the per-second recharge: the mine UI hint interpolates it.
+export const MINE_ENERGY_REGEN = GAME.MINE.ENERGY_REGEN;
+if (typeof globalThis !== 'undefined') globalThis.MINE_ENERGY_REGEN = MINE_ENERGY_REGEN;
+if (typeof window !== 'undefined') window.MINE_ENERGY_REGEN = MINE_ENERGY_REGEN;
+

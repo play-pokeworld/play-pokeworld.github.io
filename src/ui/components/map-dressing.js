@@ -35,6 +35,19 @@ export function locOverviewVNode(m) {
     h('div', { class: 'pw-loc-overview-meta' }, (m.metas || []).map((t) => h('span', { class: 'pw-loc-meta-chip' }, t || ''))));
 }
 
+export function locPlayStatsVNode(m) {
+  if (!m) return null;
+  return h('div', { class: 'pw-panel pw-loc-play-stats' },
+    m.title ? h('div', { class: 'pw-loc-play-stats-title' }, m.title) : null,
+    h('div', { class: 'pw-loc-play-stats-row' },
+      h('div', { class: 'pw-loc-play-stat' },
+        h('span', { class: 'pw-loc-play-stat-val' }, String(m.beaten == null ? 0 : m.beaten)),
+        h('span', { class: 'pw-loc-play-stat-lbl' }, m.beatenLabel || '')),
+      h('div', { class: 'pw-loc-play-stat' },
+        h('span', { class: 'pw-loc-play-stat-val' }, String(m.captured == null ? 0 : m.captured)),
+        h('span', { class: 'pw-loc-play-stat-lbl' }, m.capturedLabel || ''))));
+}
+
 /* ── Lore tip (speaker quote) ──────────────────────────────────────────── */
 export function locLoreVNode(m) {
   return h('div', { class: 'pw-loc-lore' },
@@ -178,3 +191,4 @@ export function mapHelpCardVNode(m) {
 }
 
 export function mapHelpCardHTML(model) { return toHTMLString(mapHelpCardVNode(model)); }
+

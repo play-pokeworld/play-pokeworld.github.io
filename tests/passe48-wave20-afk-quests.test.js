@@ -60,7 +60,11 @@ test('wave20: AfkRecapView result mode — shared grid + summary components + cl
   assert.ok(html.includes('afk-result-status success'), 'success status pill');
   const closes = html.match(/data-call="closeAfkResultPanel"/g) || [];
   assert.equal(closes.length, 2, 'cross + footer button share the close contract');
-  assert.ok(html.includes('class="afk-modal-close"'), 'afk-modal-close class kept');
+  // Wave 32: the bespoke `.afk-modal-close` (a drifted copy of the shared
+  // cross) was retired — the recap now uses the canonical `.modal-close`
+  // emitted by components/panel-header.js, like every other panel.
+  assert.ok(html.includes('class="modal-close"'), 'shared close control');
+  assert.ok(!html.includes('afk-modal-close'), 'the private cross class is gone');
   assert.ok(html.includes('Roucool') && html.includes('Potion'), 'names rendered');
 });
 
@@ -191,3 +195,4 @@ test('wave20: legacy quest CSS deleted; challenge button is FLAT accent', () => 
   assert.ok(CSS1.includes('.pw-quest-section.is-blue { color: var(--blue)'), 'section tones tokenized');
   assert.ok(CSS1.includes('.pw-quest-reward { display: inline-flex'), 'reward pill on tokens');
 });
+

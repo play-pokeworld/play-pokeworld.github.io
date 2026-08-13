@@ -67,3 +67,4 @@ if (typeof LOCS_JOHTO !== 'undefined') { if (typeof window !== 'undefined') wind
 export {
   LOCS_JOHTO,
 };
+

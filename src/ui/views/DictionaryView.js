@@ -140,3 +140,4 @@ export class DictionaryView extends UIView {
     return { filters, content, full: filters + content };
   }
 }
+

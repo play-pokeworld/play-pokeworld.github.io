@@ -192,3 +192,4 @@ test('HM: the title is (HM)-suffixed', () => {
   assert.ok(/\(CS\)/.test(env.titleEl.textContent), `titre CS attendu : ${env.titleEl.textContent}`);
 });
 
+

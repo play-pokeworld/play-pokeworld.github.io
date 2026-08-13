@@ -27,6 +27,7 @@ import json
 import subprocess
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -174,10 +175,21 @@ def main() -> int:
 
     got = 0
     failed_fetch = []
+    pc_map, pc_base = {}, 'https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/src/assets/images/'
+    try:
+        cfg = json.loads((ROOT / 'tools' / 'pokeclicker-items.json').read_text(encoding='utf-8'))
+        pc_map = cfg.get('items') or {}
+        pc_base = (cfg.get('base') or pc_base).rstrip('/') + '/'
+    except Exception:
+        pass
     for k in missing:
         dest = OUT / f'{k}.png'
-        name = ALIAS.get(k, k.replace('_', '-'))
-        data = fetch(POKEAPI + name + '.png')
+        data = None
+        if k in pc_map:
+            data = fetch(pc_base + urllib.parse.quote(pc_map[k]))
+        if not data:
+            name = ALIAS.get(k, k.replace('_', '-'))
+            data = fetch(POKEAPI + name + '.png')
         if data:
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_bytes(data)
@@ -198,3 +210,4 @@ def main() -> int:
 
 if __name__ == '__main__':
     raise SystemExit(main())
+

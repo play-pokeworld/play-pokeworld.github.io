@@ -17,3 +17,4 @@ export function chancePercent(percent) {
   return Math.random() * 100 < p;
 }
 
+

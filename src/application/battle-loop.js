@@ -88,3 +88,4 @@ if (typeof window !== 'undefined') {
   window.resolveBattleStateAnomalies = resolveBattleStateAnomalies;
   window.PokeGameplayWorld = getGameplayWorld;
 }
+

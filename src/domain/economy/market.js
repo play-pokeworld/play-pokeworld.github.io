@@ -123,3 +123,4 @@ export function categorizeMarketSpecies(id) {
   if (MARKET_CATEGORIES.rare.includes(n)) return 'rare';
   return 'other';
 }
+

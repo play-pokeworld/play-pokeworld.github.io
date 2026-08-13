@@ -183,10 +183,21 @@ test('phase 27 D: settings — effective red danger + fixed header', () => {
   assert.ok(/\.pw-btn-danger\s*\{[^}]*background:\s*var\(--red\)\s*!important/.test(css), 'reinforced red (!important)');
   assert.ok(/\.pw-btn-danger\s*\{[^}]*color:\s*#fff/.test(css), 'texte blanc lisible');
   assert.ok(/#settings-inner\s*>\s*\.modal-title\s*\{[^}]*position:\s*sticky/.test(css), 'sticky settings header');
-  assert.ok(/#settings-inner\s*\{\s*padding-top:\s*0;?\s*\}/.test(css), 'top padding neutralized for the sticky');
+  // Wave 28: the shell's padding is now zeroed wholesale (`padding: 0`)
+  // instead of only `padding-top: 0`, so the header spans the FULL panel
+  // width like every other panel; the 20px inset moved onto #settings-body.
+  // Assert the intent (no shell padding above the sticky header), not the
+  // one exact spelling it used to have.
+  assert.ok(/#settings-inner\s*\{[^}]*padding:\s*0;/.test(css), 'shell padding neutralized for the sticky full-width header');
+  assert.ok(/#settings-inner\s*>\s*#settings-body\s*\{[^}]*padding:/.test(css), 'the inset moved onto the scrolling body');
   // wave 24: wave 23 flattened rgba(0,0,0,0.99) into the solid --pw-bg-header token
   // (fully opaque -> same 'no see-through' guarantee, single source of truth).
-  assert.ok(/#settings-inner\s*>\s*\.modal-title\s*\{[^}]*background:\s*var\(--pw-bg-header\)/.test(css), 'opaque flat token background (content no longer shows through)');
+  // Wave 34: the panel header surface moved to its OWN token,
+  // --pw-bg-panel-header. --pw-bg-header also paints toggle knobs, tutorial
+  // bars, guide buttons and panel feet, so it could not be repointed to the
+  // reference header colour without repainting half the UI. Still one opaque
+  // token, still a single source of truth — just a narrower one.
+  assert.ok(/#settings-inner\s*>\s*\.modal-title\s*\{[^}]*background:\s*var\(--pw-bg-panel-header\)/.test(css), 'opaque flat token background (content no longer shows through)');
 });
 
 // ————————————————————————— E —————————————————————————
@@ -310,4 +321,5 @@ test('phase 27 G: editor — held items handled (team) and clean refusal (box)',
   sb.presetEditorPickItem(2);
   assert.ok(sb._notifs.some((n) => n.includes('équipe active')), 'box: "apply the preset first" message');
 });
+
 

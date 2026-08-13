@@ -1,4 +1,7 @@
-function canEvolveToRegion(targetId) {
+// NOTE: region gate kept for reference — no evolution path currently calls it
+// (region access is enforced upstream, at capture/team level). Underscored so
+// the lint rule for deliberately unused declarations applies.
+function _canEvolveToRegion(targetId) {
  const nid = Number(targetId);
  if (nid >= 152 && nid <= 251) return (typeof canAccessRegion === 'function' ? canAccessRegion('johto') : true);
  if (nid >= 252 && nid <= 386) return (typeof canAccessRegion === 'function' ? canAccessRegion('hoenn') : true);
@@ -12,13 +15,30 @@ function canEvolveToRegion(targetId) {
 const __pwV43Link = (n) => ((typeof PokeActions !== 'undefined' && PokeActions && typeof PokeActions.get === 'function') ? PokeActions.get(n) : null)
   || (typeof globalThis !== 'undefined' ? globalThis[n] : null) || null;
 function getSecretBaseBonuses(...args) { const f = __pwV43Link('getSecretBaseBonuses'); return f ? f(...args) : undefined; }
+export function calculateScaledXp(pLevel, enemyLevel, baseShare) {
+  const diff = Number(pLevel) - Number(enemyLevel);
+  if (diff >= 10) return 0;
+  let factor = 1.0;
+  if (diff > 0) {
+    factor = (10 - diff) / 10;
+  } else if (diff < 0) {
+    factor = 1 + Math.abs(diff) * 0.15;
+  }
+  return Math.max(0, Math.floor(baseShare * factor));
+}
+if (typeof globalThis !== 'undefined') globalThis.calculateScaledXp = calculateScaledXp;
+
 function gainXP(enemy){
  const base=Math.floor(enemy.xpYield*enemy.level/7);
  const alive=G.team.filter(p=>p.currentHP>0);
  if(!alive.length) return 0;
  const xpMult = (typeof __pwV43Link('getSecretBaseBonuses') === 'function' && Number.isFinite(getSecretBaseBonuses().xpMult)) ? getSecretBaseBonuses().xpMult : 1;
- const share=Math.max(1,Math.floor(base*0.7*xpMult));
+ const baseShare=Math.max(1,Math.floor(base*0.7*xpMult));
+ let maxShare = 0;
  for(const p of alive){
+ const share = calculateScaledXp(p.level, enemy.level, baseShare);
+ if (share > maxShare) maxShare = share;
+ if (share <= 0) continue;
  if((p.xp||0) < xpForLevel(p.level)) p.xp = xpForLevel(p.level) + (p.xp || 0);
  const before=p.level;
  p.xp+=share;
@@ -27,12 +47,10 @@ function gainXP(enemy){
  }
  if(p.level>before) addBattleLog(` ${p.name} passe au niveau ${p.level} !`);
  }
-
-  // Phase 30: daycare no longer uses an XP counter — it progresses on
-  // the shared K.O. counter (hatcheryRegisterBattleKills, called on each
-  // enemy knocked out), like incubation. XP block removed here.
-
- return share;
+ if (maxShare === 0) {
+   try { addBattleLog((typeof t === 'function' && t('xp_cap_reached') !== 'xp_cap_reached') ? t('xp_cap_reached') : ' [XP] Adversaire trop faible (+0 XP).'); } catch(_) {}
+ }
+ return maxShare;
 }
 function levelUp(p){
  p.level++;
@@ -331,3 +349,4 @@ export {
   tryStoneEvo,
   tryBoxStoneEvo,
 };
+

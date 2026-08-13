@@ -1,0 +1,40 @@
+{
+  "comment": "Game item key → path under pokeclicker/develop/src/assets/images/. Used by download_assets.py, fetch-item-sprites.py and fix_missing_assets.py. Prefer these over PokeAPI 24px icons when Pokeclicker ships a larger official sprite.",
+  "base": "https://raw.githubusercontent.com/pokeclicker/pokeclicker/develop/src/assets/images/",
+  "items": {
+    "auspicious_armor": "items/evolution/Auspicious_armor.png",
+    "cracked_pot": "items/evolution/Cracked_pot.png",
+    "fairy_feather": "items/heldItems/Fairy_Feather.png",
+    "fossilized_bird": "items/underground/Fossilized Bird.png",
+    "fossilized_dino": "items/underground/Fossilized Dino.png",
+    "fossilized_drake": "items/underground/Fossilized Drake.png",
+    "fossilized_fish": "items/underground/Fossilized Fish.png",
+    "galarica_cuff": "items/evolution/Galarica_cuff.png",
+    "galarica_wreath": "items/evolution/Galarica_wreath.png",
+    "malicious_armor": "items/evolution/Malicious_armor.png",
+    "peat_block": "items/evolution/Peat_block.png",
+    "sweet_apple": "items/evolution/Sweet_apple.png",
+    "syrupy_apple": "items/evolution/Syrupy_apple.png",
+    "tart_apple": "items/evolution/Tart_apple.png",
+    "unremarkable_teacup": "items/evolution/Unremarkable_teacup.png",
+    "ancient_keystone": "items/underground/Odd Keystone.png",
+    "frozen_keystone": "items/collectible/Ice_Memory_Silvally.png",
+    "steel_keystone": "items/collectible/Steel_Memory_Silvally.png",
+    "link_stone": "items/evolution/Linking_cord.png",
+    "stoned_memory": "items/collectible/Rock_Memory_Silvally.png",
+    "kings_rock": "items/evolution/Kings_rock.png",
+    "upgrade": "items/evolution/Upgrade.png",
+    "prine_berry": "items/berry/Lum.png",
+    "berry": "items/berry/Oran.png"
+  },
+  "bulba": {
+    "comment": "Not in Pokeclicker — Bulbagarden Archives File: titles (Bag … SV Sprite).",
+    "clear_amulet": "Bag Clear Amulet SV Sprite.png",
+    "eject_pack": "Bag Eject Pack SV Sprite.png",
+    "heavy_duty_boots": "Bag Heavy-Duty Boots SV Sprite.png",
+    "loaded_dice": "Bag Loaded Dice SV Sprite.png",
+    "chipped_pot": "Bag Chipped Pot SV Sprite.png",
+    "masterpiece_teacup": "Bag Masterpiece Teacup SV Sprite.png"
+  }
+}
+

@@ -38,3 +38,4 @@ if (rawAssign.length) {
 }
 console.log('HTML sink contract OK (0 raw .innerHTML = outside the documented engine sinks)');
 
+

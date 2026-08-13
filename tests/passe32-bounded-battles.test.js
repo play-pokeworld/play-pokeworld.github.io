@@ -304,3 +304,4 @@ test('phase 32 D: rewirings present + new FR/EN i18n keys + fixed message', () =
   assert.ok(R('src/localization/fr/ui.js').includes('"afk_no_progress_summary":"AFK {time} : rien en cours à simuler."'), 'AFK message fixed (no more misleading "wild zone")');
 });
 
+

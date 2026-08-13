@@ -273,3 +273,4 @@ test('phase 39 E: hollows 546/547 reclassified as holes (engine + reference + ba
   assert.ok(bake.includes('546, 547'), 'twin hollows recognized by the baker');
 });
 
+

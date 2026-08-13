@@ -105,3 +105,4 @@ export function pokeCardVNode(model = {}) {
 export function pokeCardHTML(model = {}) {
   return toHTMLString(pokeCardVNode(model));
 }
+

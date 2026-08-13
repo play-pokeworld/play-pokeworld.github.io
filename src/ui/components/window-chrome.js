@@ -116,3 +116,4 @@ export function pwApplyWindowChrome(inner) {
 // through window; the ECS graph can also import it directly.
 if (typeof window !== 'undefined') window.pwApplyWindowChrome = pwApplyWindowChrome;
 if (typeof globalThis !== 'undefined') globalThis.pwApplyWindowChrome = pwApplyWindowChrome;
+

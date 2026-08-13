@@ -94,3 +94,4 @@ export class Tabs {
     return el;
   }
 }
+

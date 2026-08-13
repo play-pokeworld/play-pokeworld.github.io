@@ -572,3 +572,4 @@ const u8 DecorDesc_REGISTEEL_DOLL[] = _(
         "Place it on a mat\n"
         "or a desk.");
 
+

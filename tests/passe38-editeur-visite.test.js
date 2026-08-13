@@ -419,3 +419,4 @@ test('phase 38 F: without WebGL2, 3D is disabled, 2D fallback, visit forced to 2
   assert.ok(!E('src/game/base/base3d-view.js'), '3D renderer removed');
 });
 
+

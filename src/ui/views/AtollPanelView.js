@@ -85,3 +85,4 @@ export class AtollPanelView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

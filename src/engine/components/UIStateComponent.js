@@ -47,3 +47,4 @@ export class UIStateComponent extends Component {
     return key in this.data ? this.data[key] : fallback;
   }
 }
+

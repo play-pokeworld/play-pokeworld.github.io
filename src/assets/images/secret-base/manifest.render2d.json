@@ -8,23 +8,14 @@
   ]
  },
  "items": {
-  "a_note_mat": {
-   "emerald": "src/assets/images/secret-base/emerald/a_note_mat.png"
-  },
   "attract_mat": {
    "emerald": "src/assets/images/secret-base/emerald/attract_mat.png"
   },
   "azurill_doll": {
    "emerald": "src/assets/images/secret-base/emerald/azurill_doll.png"
   },
-  "b_note_mat": {
-   "emerald": "src/assets/images/secret-base/emerald/b_note_mat.png"
-  },
   "ball_cushion": {
    "emerald": "src/assets/images/secret-base/emerald/ball_cushion.png"
-  },
-  "ball_poster": {
-   "emerald": "src/assets/images/secret-base/emerald/ball_poster.png"
   },
   "baltoy_doll": {
    "emerald": "src/assets/images/secret-base/emerald/baltoy_doll.png"
@@ -35,14 +26,8 @@
   "blastoise_doll": {
    "emerald": "src/assets/images/secret-base/emerald/blastoise_doll.png"
   },
-  "blue_balloon": {
-   "emerald": "src/assets/images/secret-base/emerald/blue_balloon.png"
-  },
   "blue_brick": {
    "emerald": "src/assets/images/secret-base/emerald/blue_brick.png"
-  },
-  "blue_poster": {
-   "emerald": "src/assets/images/secret-base/emerald/blue_poster.png"
   },
   "blue_tent": {
    "emerald": "src/assets/images/secret-base/emerald/blue_tent.png"
@@ -50,20 +35,8 @@
   "breakable_door": {
    "emerald": "src/assets/images/secret-base/emerald/breakable_door.png"
   },
-  "brick_chair": {
-   "emerald": "src/assets/images/secret-base/emerald/brick_chair.png"
-  },
   "brick_desk": {
    "emerald": "src/assets/images/secret-base/emerald/brick_desk.png"
-  },
-  "c_high_note_mat": {
-   "emerald": "src/assets/images/secret-base/emerald/c_high_note_mat.png"
-  },
-  "c_low_note_mat": {
-   "emerald": "src/assets/images/secret-base/emerald/c_low_note_mat.png"
-  },
-  "camp_chair": {
-   "emerald": "src/assets/images/secret-base/emerald/camp_chair.png"
   },
   "camp_desk": {
    "emerald": "src/assets/images/secret-base/emerald/camp_desk.png"
@@ -80,23 +53,11 @@
   "colorful_plant": {
    "emerald": "src/assets/images/secret-base/emerald/colorful_plant.png"
   },
-  "comfort_chair": {
-   "emerald": "src/assets/images/secret-base/emerald/comfort_chair.png"
-  },
   "comfort_desk": {
    "emerald": "src/assets/images/secret-base/emerald/comfort_desk.png"
   },
-  "cute_poster": {
-   "emerald": "src/assets/images/secret-base/emerald/cute_poster.png"
-  },
-  "cute_tv": {
-   "emerald": "src/assets/images/secret-base/emerald/cute_tv.png"
-  },
   "cyndaquil_doll": {
    "emerald": "src/assets/images/secret-base/emerald/cyndaquil_doll.png"
-  },
-  "d_note_mat": {
-   "emerald": "src/assets/images/secret-base/emerald/d_note_mat.png"
   },
   "diamond_cushion": {
    "emerald": "src/assets/images/secret-base/emerald/diamond_cushion.png"
@@ -107,18 +68,6 @@
   "duskull_doll": {
    "emerald": "src/assets/images/secret-base/emerald/duskull_doll.png"
   },
-  "e_note_mat": {
-   "emerald": "src/assets/images/secret-base/emerald/e_note_mat.png"
-  },
-  "f_note_mat": {
-   "emerald": "src/assets/images/secret-base/emerald/f_note_mat.png"
-  },
-  "fence_length": {
-   "emerald": "src/assets/images/secret-base/emerald/fence_length.png"
-  },
-  "fence_width": {
-   "emerald": "src/assets/images/secret-base/emerald/fence_width.png"
-  },
   "fire_blast_mat": {
    "emerald": "src/assets/images/secret-base/emerald/fire_blast_mat.png"
   },
@@ -128,17 +77,8 @@
   "fissure_mat": {
    "emerald": "src/assets/images/secret-base/emerald/fissure_mat.png"
   },
-  "g_note_mat": {
-   "emerald": "src/assets/images/secret-base/emerald/g_note_mat.png"
-  },
   "glass_ornament": {
    "emerald": "src/assets/images/secret-base/emerald/glass_ornament.png"
-  },
-  "glitter_mat": {
-   "emerald": "src/assets/images/secret-base/emerald/glitter_mat.png"
-  },
-  "gold_shield": {
-   "emerald": "src/assets/images/secret-base/emerald/gold_shield.png"
   },
   "gorgeous_plant": {
    "emerald": "src/assets/images/secret-base/emerald/gorgeous_plant.png"
@@ -146,20 +86,11 @@
   "grass_cushion": {
    "emerald": "src/assets/images/secret-base/emerald/grass_cushion.png"
   },
-  "green_poster": {
-   "emerald": "src/assets/images/secret-base/emerald/green_poster.png"
-  },
   "gulpin_doll": {
    "emerald": "src/assets/images/secret-base/emerald/gulpin_doll.png"
   },
-  "hard_chair": {
-   "emerald": "src/assets/images/secret-base/emerald/hard_chair.png"
-  },
   "hard_desk": {
    "emerald": "src/assets/images/secret-base/emerald/hard_desk.png"
-  },
-  "heavy_chair": {
-   "emerald": "src/assets/images/secret-base/emerald/heavy_chair.png"
   },
   "heavy_desk": {
    "emerald": "src/assets/images/secret-base/emerald/heavy_desk.png"
@@ -167,23 +98,14 @@
   "jigglypuff_doll": {
    "emerald": "src/assets/images/secret-base/emerald/jigglypuff_doll.png"
   },
-  "jump_mat": {
-   "emerald": "src/assets/images/secret-base/emerald/jump_mat.png"
-  },
   "kecleon_doll": {
    "emerald": "src/assets/images/secret-base/emerald/kecleon_doll.png"
   },
   "kiss_cushion": {
    "emerald": "src/assets/images/secret-base/emerald/kiss_cushion.png"
   },
-  "kiss_poster": {
-   "emerald": "src/assets/images/secret-base/emerald/kiss_poster.png"
-  },
   "lapras_doll": {
    "emerald": "src/assets/images/secret-base/emerald/lapras_doll.png"
-  },
-  "long_poster": {
-   "emerald": "src/assets/images/secret-base/emerald/long_poster.png"
   },
   "lotad_doll": {
    "emerald": "src/assets/images/secret-base/emerald/lotad_doll.png"
@@ -194,14 +116,8 @@
   "meowth_doll": {
    "emerald": "src/assets/images/secret-base/emerald/meowth_doll.png"
   },
-  "mud_ball": {
-   "emerald": "src/assets/images/secret-base/emerald/mud_ball.png"
-  },
   "mudkip_doll": {
    "emerald": "src/assets/images/secret-base/emerald/mudkip_doll.png"
-  },
-  "pc": {
-   "emerald": "src/assets/images/secret-base/emerald/pc.png"
   },
   "pichu_doll": {
    "emerald": "src/assets/images/secret-base/emerald/pichu_doll.png"
@@ -209,23 +125,11 @@
   "pika_cushion": {
    "emerald": "src/assets/images/secret-base/emerald/pika_cushion.png"
   },
-  "pika_poster": {
-   "emerald": "src/assets/images/secret-base/emerald/pika_poster.png"
-  },
   "pikachu_doll": {
    "emerald": "src/assets/images/secret-base/emerald/pikachu_doll.png"
   },
-  "pokemon_chair": {
-   "emerald": "src/assets/images/secret-base/emerald/pokemon_chair.png"
-  },
-  "pokemon_desk": {
-   "emerald": "src/assets/images/secret-base/emerald/pokemon_desk.png"
-  },
   "powder_snow_mat": {
    "emerald": "src/assets/images/secret-base/emerald/powder_snow_mat.png"
-  },
-  "pretty_chair": {
-   "emerald": "src/assets/images/secret-base/emerald/pretty_chair.png"
   },
   "pretty_desk": {
    "emerald": "src/assets/images/secret-base/emerald/pretty_desk.png"
@@ -233,23 +137,14 @@
   "pretty_flowers": {
    "emerald": "src/assets/images/secret-base/emerald/pretty_flowers.png"
   },
-  "ragged_chair": {
-   "emerald": "src/assets/images/secret-base/emerald/ragged_chair.png"
-  },
   "ragged_desk": {
    "emerald": "src/assets/images/secret-base/emerald/ragged_desk.png"
-  },
-  "red_balloon": {
-   "emerald": "src/assets/images/secret-base/emerald/red_balloon.png"
   },
   "red_brick": {
    "emerald": "src/assets/images/secret-base/emerald/red_brick.png"
   },
   "red_plant": {
    "emerald": "src/assets/images/secret-base/emerald/red_plant.png"
-  },
-  "red_poster": {
-   "emerald": "src/assets/images/secret-base/emerald/red_poster.png"
   },
   "red_tent": {
    "emerald": "src/assets/images/secret-base/emerald/red_tent.png"
@@ -269,35 +164,17 @@
   "round_cushion": {
    "emerald": "src/assets/images/secret-base/emerald/round_cushion.png"
   },
-  "round_tv": {
-   "emerald": "src/assets/images/secret-base/emerald/round_tv.png"
-  },
   "sand_ornament": {
    "emerald": "src/assets/images/secret-base/emerald/sand_ornament.png"
-  },
-  "sea_poster": {
-   "emerald": "src/assets/images/secret-base/emerald/sea_poster.png"
   },
   "seedot_doll": {
    "emerald": "src/assets/images/secret-base/emerald/seedot_doll.png"
   },
-  "silver_shield": {
-   "emerald": "src/assets/images/secret-base/emerald/silver_shield.png"
-  },
   "skitty_doll": {
    "emerald": "src/assets/images/secret-base/emerald/skitty_doll.png"
   },
-  "sky_poster": {
-   "emerald": "src/assets/images/secret-base/emerald/sky_poster.png"
-  },
   "slide": {
    "emerald": "src/assets/images/secret-base/emerald/slide.png"
-  },
-  "small_chair": {
-   "emerald": "src/assets/images/secret-base/emerald/small_chair.png"
-  },
-  "small_desk": {
-   "emerald": "src/assets/images/secret-base/emerald/small_desk.png"
   },
   "smoochum_doll": {
    "emerald": "src/assets/images/secret-base/emerald/smoochum_doll.png"
@@ -313,12 +190,6 @@
   },
   "spin_cushion": {
    "emerald": "src/assets/images/secret-base/emerald/spin_cushion.png"
-  },
-  "spin_mat": {
-   "emerald": "src/assets/images/secret-base/emerald/spin_mat.png"
-  },
-  "stairs": {
-   "emerald": "src/assets/images/secret-base/emerald/stairs.png"
   },
   "stand": {
    "emerald": "src/assets/images/secret-base/emerald/stand.png"
@@ -350,9 +221,6 @@
   "tropical_plant": {
    "emerald": "src/assets/images/secret-base/emerald/tropical_plant.png"
   },
-  "tv": {
-   "emerald": "src/assets/images/secret-base/emerald/tv.png"
-  },
   "venusaur_doll": {
    "emerald": "src/assets/images/secret-base/emerald/venusaur_doll.png"
   },
@@ -365,14 +233,146 @@
   "wynaut_doll": {
    "emerald": "src/assets/images/secret-base/emerald/wynaut_doll.png"
   },
-  "yellow_balloon": {
-   "emerald": "src/assets/images/secret-base/emerald/yellow_balloon.png"
-  },
   "yellow_brick": {
    "emerald": "src/assets/images/secret-base/emerald/yellow_brick.png"
   },
   "zigzag_cushion": {
    "emerald": "src/assets/images/secret-base/emerald/zigzag_cushion.png"
+  },
+  "small_desk": {
+   "emerald": "src/assets/images/secret-base/emerald/small_desk.png"
+  },
+  "pokemon_desk": {
+   "emerald": "src/assets/images/secret-base/emerald/pokemon_desk.png"
+  },
+  "small_chair": {
+   "emerald": "src/assets/images/secret-base/emerald/small_chair.png"
+  },
+  "pokemon_chair": {
+   "emerald": "src/assets/images/secret-base/emerald/pokemon_chair.png"
+  },
+  "heavy_chair": {
+   "emerald": "src/assets/images/secret-base/emerald/heavy_chair.png"
+  },
+  "pretty_chair": {
+   "emerald": "src/assets/images/secret-base/emerald/pretty_chair.png"
+  },
+  "comfort_chair": {
+   "emerald": "src/assets/images/secret-base/emerald/comfort_chair.png"
+  },
+  "ragged_chair": {
+   "emerald": "src/assets/images/secret-base/emerald/ragged_chair.png"
+  },
+  "brick_chair": {
+   "emerald": "src/assets/images/secret-base/emerald/brick_chair.png"
+  },
+  "camp_chair": {
+   "emerald": "src/assets/images/secret-base/emerald/camp_chair.png"
+  },
+  "hard_chair": {
+   "emerald": "src/assets/images/secret-base/emerald/hard_chair.png"
+  },
+  "red_balloon": {
+   "emerald": "src/assets/images/secret-base/emerald/red_balloon.png"
+  },
+  "blue_balloon": {
+   "emerald": "src/assets/images/secret-base/emerald/blue_balloon.png"
+  },
+  "yellow_balloon": {
+   "emerald": "src/assets/images/secret-base/emerald/yellow_balloon.png"
+  },
+  "fence_length": {
+   "emerald": "src/assets/images/secret-base/emerald/fence_length.png"
+  },
+  "fence_width": {
+   "emerald": "src/assets/images/secret-base/emerald/fence_width.png"
+  },
+  "mud_ball": {
+   "emerald": "src/assets/images/secret-base/emerald/mud_ball.png"
+  },
+  "silver_shield": {
+   "emerald": "src/assets/images/secret-base/emerald/silver_shield.png"
+  },
+  "gold_shield": {
+   "emerald": "src/assets/images/secret-base/emerald/gold_shield.png"
+  },
+  "tv": {
+   "emerald": "src/assets/images/secret-base/emerald/tv.png"
+  },
+  "round_tv": {
+   "emerald": "src/assets/images/secret-base/emerald/round_tv.png"
+  },
+  "cute_tv": {
+   "emerald": "src/assets/images/secret-base/emerald/cute_tv.png"
+  },
+  "glitter_mat": {
+   "emerald": "src/assets/images/secret-base/emerald/glitter_mat.png"
+  },
+  "jump_mat": {
+   "emerald": "src/assets/images/secret-base/emerald/jump_mat.png"
+  },
+  "spin_mat": {
+   "emerald": "src/assets/images/secret-base/emerald/spin_mat.png"
+  },
+  "c_low_note_mat": {
+   "emerald": "src/assets/images/secret-base/emerald/c_low_note_mat.png"
+  },
+  "d_note_mat": {
+   "emerald": "src/assets/images/secret-base/emerald/d_note_mat.png"
+  },
+  "e_note_mat": {
+   "emerald": "src/assets/images/secret-base/emerald/e_note_mat.png"
+  },
+  "f_note_mat": {
+   "emerald": "src/assets/images/secret-base/emerald/f_note_mat.png"
+  },
+  "g_note_mat": {
+   "emerald": "src/assets/images/secret-base/emerald/g_note_mat.png"
+  },
+  "a_note_mat": {
+   "emerald": "src/assets/images/secret-base/emerald/a_note_mat.png"
+  },
+  "b_note_mat": {
+   "emerald": "src/assets/images/secret-base/emerald/b_note_mat.png"
+  },
+  "c_high_note_mat": {
+   "emerald": "src/assets/images/secret-base/emerald/c_high_note_mat.png"
+  },
+  "ball_poster": {
+   "emerald": "src/assets/images/secret-base/emerald/ball_poster.png"
+  },
+  "green_poster": {
+   "emerald": "src/assets/images/secret-base/emerald/green_poster.png"
+  },
+  "red_poster": {
+   "emerald": "src/assets/images/secret-base/emerald/red_poster.png"
+  },
+  "blue_poster": {
+   "emerald": "src/assets/images/secret-base/emerald/blue_poster.png"
+  },
+  "cute_poster": {
+   "emerald": "src/assets/images/secret-base/emerald/cute_poster.png"
+  },
+  "pika_poster": {
+   "emerald": "src/assets/images/secret-base/emerald/pika_poster.png"
+  },
+  "long_poster": {
+   "emerald": "src/assets/images/secret-base/emerald/long_poster.png"
+  },
+  "sea_poster": {
+   "emerald": "src/assets/images/secret-base/emerald/sea_poster.png"
+  },
+  "sky_poster": {
+   "emerald": "src/assets/images/secret-base/emerald/sky_poster.png"
+  },
+  "kiss_poster": {
+   "emerald": "src/assets/images/secret-base/emerald/kiss_poster.png"
+  },
+  "pc": {
+   "emerald": "src/assets/images/secret-base/emerald/pc.png"
+  },
+  "stairs": {
+   "emerald": "src/assets/images/secret-base/emerald/stairs.png"
   }
  },
  "people": {

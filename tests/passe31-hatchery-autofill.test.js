@@ -215,3 +215,4 @@ test('phase 31: source contract — drain before restock, per-rank loop, exports
   assert.ok(src.includes('window.drainHatcheryQueuesIntoSlots'), 'helper exported');
 });
 
+

@@ -138,6 +138,7 @@ export function hatcheryRegisterBattleKills(count) {
     }
     if (outcome.kind === 'daycare-levelup') {
       daycareLevels += outcome.levelsGained;
+      try { if (typeof globalThis.progressMainQuestType === 'function') globalThis.progressMainQuestType('hatchery_level', outcome.levelsGained); } catch (_) {}
       if (outcome.fee > 0 && typeof globalThis.addBattleLog === 'function') {
         const slot = G.hatchery[i];
         globalThis.addBattleLog(globalThis.tr('daycare_fee_log', {
@@ -151,6 +152,7 @@ export function hatcheryRegisterBattleKills(count) {
       const poke = slot && slot.poke;
       if (!poke) continue;
       daycareLevels += outcome.levelsGained || 0;
+      try { if (outcome.levelsGained > 0 && typeof globalThis.progressMainQuestType === 'function') globalThis.progressMainQuestType('hatchery_level', outcome.levelsGained); } catch (_) {}
       evictSlotToCollection(G, i, poke);
       if (outcome.reason === 'max-level') {
         if (typeof globalThis.addBattleLog === 'function') globalThis.addBattleLog(globalThis.tr('daycare_max_log', { name: poke.name }));
@@ -181,3 +183,4 @@ if (typeof globalThis !== 'undefined') {
   globalThis.hatcheryRegisterBattleKills = hatcheryRegisterBattleKills;
   globalThis.computeRequiredHatchKos = computeRequiredHatchKos;
 }
+

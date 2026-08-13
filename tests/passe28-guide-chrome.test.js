@@ -127,3 +127,4 @@ test('win-drag ghost + flash adapters carry no inline chrome styles', () => {
   const boot = R('src/application/bootstrap-timers.js');
   assert.ok(boot.includes('renderDashboardChrome'), 'stamped at boot');
 });
+

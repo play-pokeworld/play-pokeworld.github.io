@@ -272,3 +272,4 @@ export const ItemEngine = {
 // Wave 41 — surface kept (ex window.ItemEngine): classic
 // consumers, VM harnesses and the engine registry.
 if (typeof globalThis !== 'undefined') globalThis.ItemEngine = ItemEngine;
+

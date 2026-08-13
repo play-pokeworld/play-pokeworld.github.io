@@ -120,3 +120,4 @@ for (const [name, el] of Object.entries(els)) {
   const bg = w['background-color'] || w['background'];
   console.log('  ⇒ effective background-color:', bg ? bg.val : '(none)');
 }
+

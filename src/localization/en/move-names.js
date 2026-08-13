@@ -689,3 +689,4 @@ if (typeof globalThis !== 'undefined') {
   globalThis.L_move_names_en = L_move_names_en;
   globalThis.L_en_move_descs = L_en_move_descs;
 }
+

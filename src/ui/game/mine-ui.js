@@ -13,6 +13,18 @@ if (typeof globalThis !== 'undefined' && typeof globalThis._pwSetHtmlSafe !== 'f
  * ECS design-system blocks; the staff list remains a staged classic
  * fragment for now.
  */
+// FIX (2026-08): the energy hint used to be a frozen string ("+2 / sec · +15
+// par victoire sauvage"), so rebalancing ENERGY_PER_BATTLE from 15 to 5 left
+// the UI lying to the player. It now interpolates the real constants.
+function _mineEnergyHint(){
+ let regen = 2, perBattle = 5;
+ try{ if(typeof MINE_ENERGY_REGEN === 'number') regen = MINE_ENERGY_REGEN; }catch(_){}
+ try{ if(typeof MINE_ENERGY_PER_BATTLE === 'number') perBattle = MINE_ENERGY_PER_BATTLE; }catch(_){}
+ return (typeof tr === 'function')
+  ? tr('mine_energy_hint', { regen, perBattle })
+  : t('mine_energy_hint');
+}
+
 function mineManagementModel(page){
  const icon=(n)=> (typeof getIcon==='function'?getIcon(n,14):'');
  const call='openMineManagementMenu';
@@ -146,13 +158,22 @@ function renderMine(el){
   header: { classes: 'hatchery-upgrade-row', actions: [{ label: t('mine_management_button'), iconHtml: (typeof getIcon==='function'?getIcon('settings',14):''), call: 'openMineManagementMenu', callArgs: `'upgrades'` }] },
   title: t('mine_title'),
   subtitle: t('mine_sub'),
-  energy: { label: t('mine_energy'), valueText: `${energy||0} / ${maxEnergy||100}`, pct: clamp(Math.floor(((energy||0)/Math.max(1,(maxEnergy||100)))*100), 0, 100), hint: t('mine_energy_hint') },
+  energy: { label: t('mine_energy'), valueText: `${energy||0} / ${maxEnergy||100}`, pct: clamp(Math.floor(((energy||0)/Math.max(1,(maxEnergy||100)))*100), 0, 100), hint: _mineEnergyHint() },
   tools: ['chisel','hammer','pickaxe','drill','dynamite']
    .filter(tl => (typeof isMineToolUnlocked === 'function' ? isMineToolUnlocked(tl) : (tl==='chisel'||tl==='hammer')))
    .map(tl => ({ id: tl, label: t('mine_tool_'+tl), cost: (typeof mineToolEnergyCost==='function' ? mineToolEnergyCost(tl) : 5), selected: tool === tl, call: 'setMineTool', callArgs: `'${tl}'` })),
   grid: { cols: MINE_W, tiles: tiles },
+  // Wave 32 (retour utilisateur) : chaque trésor est une pastille dont le
+  // FOND et la couleur du nom disent s'il est encore enfoui ; une fois
+  // déterré, le sprite de l'objet précède son nom. Aucun marqueur ❓/✔ :
+  // le fond suffit (l'état reste annoncé aux lecteurs d'écran via `state`).
   treasures: { label: t('mine_treasures'), found: foundCount, total: items.length,
-   rows: items.map(i => ({ collected: !!i.collected, name: getItemName(i.key) })) },
+   rows: items.map(i => ({
+     collected: !!i.collected,
+     name: getItemName(i.key),
+     iconHtml: i.collected ? itemIcon(i.key, 18, 'pw-mine-treasure-icon') : '',
+     state: i.collected ? t('mine_treasure_found') : t('mine_treasure_buried'),
+   })) },
   newLayerLabel: t('mine_new_layer'),
  }));
 }
@@ -180,3 +201,4 @@ export {
 // indirection instead of the window fallback); the window surface is kept for
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('renderMineWindow', renderMineWindow); } catch (_) {} }
+

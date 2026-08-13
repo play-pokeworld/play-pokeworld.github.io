@@ -40,3 +40,4 @@ export function canPlaceDecoration(currentDecorationCount, maxCapacity = 16) {
   const max = Math.max(1, Number(maxCapacity) || 16);
   return current < max;
 }
+

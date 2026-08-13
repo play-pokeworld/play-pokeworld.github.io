@@ -118,7 +118,32 @@ function zonesUnlockedByClearing(id){
  return after.filter(locId => locId !== id && !before.has(locId));
 }
 
+// A few places are drawn as TWO map nodes sharing one `group` (the Diglett
+// cave: main entrance behind Route 11 + back entrance under Viridian on
+// Route 2; likewise Route 2 and its southern half). They are one and the same
+// place, so they must unlock TOGETHER — the back door is not an independent
+// shortcut that opens earlier.
+//
+// The group's unlock is owned by its PRIMARY node: the one whose id equals the
+// group name (`diglettscave`, `route2`). Secondary nodes mirror it, so the
+// whole cave opens on the Route 11 progression, both halves at once.
+function _locGroupPrimary(id){
+ const locs = _regLocs();
+ const loc = locs[id];
+ const group = loc && loc.group;
+ if(!group || group === id) return id;
+ if(locs[group]) return group;
+ // No node is named after the group: fall back to a stable, deterministic pick.
+ const members = Object.keys(locs).filter(k => (locs[k].group || k) === group).sort();
+ return members[0] || id;
+}
+
 function blockingNeighbor(id){
+ // Secondary half of a grouped place: report what blocks the REAL entrance, so
+ // the map tooltip reads "win N battles on Route 11" instead of a vague
+ // "not reachable".
+ const primaryId = _locGroupPrimary(id);
+ if(primaryId !== id) return blockingNeighbor(primaryId);
  const loc = _regLocs()[id]; if(!loc) return null;
  if(!locGateSatisfied(id)) return null;
  const conn = loc.conn || [];
@@ -134,11 +159,29 @@ function recomputeUnlocks(){
  if(!G.unlockedLocs || typeof G.unlockedLocs!=='object') G.unlockedLocs={};
  const locs=_regLocs();
  for(const id in locs){ if(locReachable(id)) G.unlockedLocs[id]=true; }
+ // Grouped places open as a whole: once the primary entrance is unlocked, its
+ // other half is too (and not before). Without this, the persisted
+ // `unlockedLocs` could keep a stale "back door open" flag from an older save.
+ for(const id in locs){
+  const primaryId = _locGroupPrimary(id);
+  if(primaryId === id) continue;
+  if(G.unlockedLocs[primaryId] || _locGroupPrimary(G.location) === primaryId) G.unlockedLocs[id] = true;
+  else delete G.unlockedLocs[id];
+ }
 }
 
 function isLocUnlocked(id){
  if(!G) return true;
  if(!locGateSatisfied(id)) return false;
+ // Grouped place (two nodes, one location): the secondary half follows the
+ // primary entrance so both open at the same moment. Standing inside the place
+ // obviously still counts as unlocked.
+ {
+  const primaryId = _locGroupPrimary(id);
+  // Standing anywhere inside the place unlocks every one of its entrances.
+  if(G.location && G.location !== id && _locGroupPrimary(G.location) === primaryId) return true;
+  if(primaryId !== id) return isLocUnlocked(primaryId);
+ }
  if(id==='route1'){
  const hasKantoStarter = !!(G.starterKanto || G.starter || (G.regionStarter && G.regionStarter.kanto));
  if(!hasKantoStarter) return false;
@@ -172,7 +215,16 @@ function trainingUnlocked(){
 }
 
 
-function mineUnlocked(){ return isLocUnlocked('diglettscave') || isLocUnlocked('diglettscave_2'); }
+// The mine opens exactly when the Diglett cave is REALLY accessible, i.e. when
+// the player can actually travel there — never on a badge count.
+//
+// Both halves of the cave now share a single unlock (see _locGroupPrimary), so
+// testing the main entrance covers the whole place: the Route 2 back entrance
+// can no longer open on the 3rd badge while the real one is still locked.
+function mineUnlocked(){
+ if(G && (G.location === 'diglettscave' || G.location === 'diglettscave_2')) return true;
+ return isLocUnlocked('diglettscave');
+}
 function secretBaseUnlocked(){ return !!(typeof G !== 'undefined' && G && G.unlockedSecretBaseHoenn); }
 function updateFeatureWindows(){
  // Wave 15 (user feedback): in mobile mode this used to force inline
@@ -273,3 +325,4 @@ export {
   regionOfLoc,
   secretBaseUnlocked,
 };
+

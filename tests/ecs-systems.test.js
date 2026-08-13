@@ -102,3 +102,4 @@ test('ECSSystemsManager executes real ECS gameplay systems (combat:tick, combat:
   assert.ok(wildComp && wildComp.locationId === 'route_1' && wildComp.reason === 'ko-chain');
   offSpawn();
 });
+

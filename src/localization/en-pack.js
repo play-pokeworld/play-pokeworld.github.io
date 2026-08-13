@@ -23,3 +23,4 @@ import './en/messages.js';
 // Vague 41 — module ESM formel : ce pack était déjà un module latéral
 // (agrégateur d'imports lazy vague 32) ; export {} explicite, rien d'autre.
 export {};
+

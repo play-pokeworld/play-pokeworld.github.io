@@ -73,3 +73,4 @@ for (const rel of ['../src/data/official-teams-data.js', '../src/data/atoll-sets
 
 console.log(changedTotal ? `TOTAL : ${changedTotal}` : 'Nothing to normalize (already clean).');
 
+

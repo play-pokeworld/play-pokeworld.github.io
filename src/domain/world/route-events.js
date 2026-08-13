@@ -48,3 +48,4 @@ export function setRouteEventCooldown(gameState, eventId, durationMs, now = Date
   state.cooldowns[eventId] = now + Math.max(0, Number(durationMs || 0));
 }
 
+

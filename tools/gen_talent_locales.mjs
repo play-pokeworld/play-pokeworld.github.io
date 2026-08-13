@@ -313,3 +313,4 @@ const esc = (s) => s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
   console.log(`talents-full.js: ${n} infos repaired`);
 }
 
+

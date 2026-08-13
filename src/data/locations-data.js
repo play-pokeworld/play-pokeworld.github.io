@@ -140,3 +140,4 @@ export {
   LOCS_JOHTO,
   getCurrentRegionLocs,
 };
+

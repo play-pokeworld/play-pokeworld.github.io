@@ -28,6 +28,7 @@
 import { UIView } from './UIView.js';
 import { UIRenderComponent } from '../../engine/components/UIRenderComponent.js';
 import { h, toHTMLString } from '../../engine/render/vdom.js';
+import { panelHeaderVNode } from '../components/panel-header.js';
 
 /* ─── Quest card (main / side / repeatable lines of the story window) ─── */
 
@@ -203,9 +204,10 @@ export class RepeatableUpgradeView extends UIView {
 
   windowVNode() {
     const m = this.model;
-    return [h('div', { class: 'modal-title' },
-      h('div', null, h.raw(m.titleHtml || '')),
-      h('span', { class: 'modal-close', dataset: { action: 'close-poke-modal' } })),
+    return [panelHeaderVNode({
+      titleHtml: m.titleHtml || '',
+      close: { action: 'close-poke-modal' },
+    }),
     h('div', { class: 'pw-panel pw-info-section' },
       h('b', null, m.currentTitle || ''),
       h('div', { class: 'pw-text-sm pw-light1' }, m.currentText || '')),
@@ -232,3 +234,4 @@ export class RepeatableUpgradeView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

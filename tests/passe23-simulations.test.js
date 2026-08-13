@@ -76,3 +76,4 @@ test('phase 23: 3v3 gyms — statScale 0.5 applied (reduced budgets vs Tower)', 
   assert.ok(Math.max(...tower.map((p) => sum(p.evs))) >= 30, 'tower_s: endgame ~36 EV profile kept');
 });
 
+

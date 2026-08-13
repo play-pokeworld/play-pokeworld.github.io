@@ -98,7 +98,9 @@ function hatcherySlotCardModel(i) {
   // toggle / bronze) come from the dedicated DS classes (.hatchery-mode-
   // toggle / .hatchery-priority-toggle), flattened by DS2811.
   const priority = hatcherySlotPriority(i);
-  const priorityCtl = (mode === 'breed')
+  const modeUnlocked = typeof isHatcheryModeSwitchUnlocked !== 'function' || isHatcheryModeSwitchUnlocked();
+  const fossilsOk = typeof isFossilReviveUnlocked !== 'function' || isFossilReviveUnlocked();
+  const priorityCtl = (mode === 'breed' && fossilsOk)
     ? {
       label: t('hatchery_priority_label') || 'Priorité :',
       current: priority === 'fossil' ? 'fossil' : 'pokemon',
@@ -106,9 +108,9 @@ function hatcherySlotCardModel(i) {
       call: 'toggleHatcherySlotPriority', args: String(i),
     }
     : null;
-  const modeBtn = isLocUnlocked('jroute29')
+  const modeBtn = (modeUnlocked || mode === 'breed')
     ? { label: mode === 'exp' ? t('hatchery_mode_daycare') : t('hatchery_mode_incubation'), mode, call: 'toggleHatcherySlotMode', args: String(i) }
-    : { lockedLabel: t('johto_required') || '🔒 Johto requis' };
+    : null;
   return {
     title: `Slot #${i + 1}`,
     mode, modeLabel, desc: modeDesc, pendingBadge,
@@ -236,6 +238,7 @@ function renderHatcheryWindow() {
   // Auto-fill only if the upgrade is enabled
   // (non-forced processHatcheryQueue respects G.automation.autoSeedHatchery).
   if (typeof processHatcheryQueue === 'function') { try { processHatcheryQueue(); } catch(_){} }
+  try { if (typeof normalizeHatcheryModesForUnlocks === 'function') normalizeHatcheryModesForUnlocks(); } catch(_){}
   const el = document.getElementById('hatchery-window-body');
   if (!el) return;
   const unlocked = (typeof hatcheryUnlocked === 'function') ? hatcheryUnlocked() : (G.badges.length >= 2 || isLocUnlocked('route5'));
@@ -261,11 +264,21 @@ function renderHatcheryWindow() {
     if (!slot) {
       const mode = (G.hatcheryModes && G.hatcheryModes[i]) || 'exp';
       const modeLabel = mode === 'exp' ? (typeof t==='function'?t('hatchery_daycare_short'):'Daycare') : (typeof t==='function'?t('hatchery_breeding_short'):'Breed.');
+      const modeUnlocked = typeof isHatcheryModeSwitchUnlocked !== 'function' || isHatcheryModeSwitchUnlocked();
+      const canToggleMode = modeUnlocked || mode === 'breed';
       slots.push({
+        cardClass: 'hatchery-slot-card',
+        classes: mode === 'exp' ? 'is-exp' : 'is-breed',
         offerClass: `pw-hatchery-offer ${mode === 'exp' ? 'pw-hatchery-offer--exp' : 'pw-hatchery-offer--breed'}`,
         offer: { label: tr('hatchery_place_slot', { slot: i + 1 }),
           rightHtml: `<b class="pw-hatchery-offer-mode">(${modeLabel})</b>`,
           call: 'openUnifiedSelectorModal', callArgs: `'hatchery_queue_${i}'` },
+        modeToggle: canToggleMode ? {
+          label: mode === 'exp' ? t('hatchery_mode_daycare') : t('hatchery_mode_incubation'),
+          call: 'toggleHatcherySlotMode',
+          callArgs: String(i),
+          classes: `hatchery-mode-toggle ${mode === 'exp' ? 'is-exp' : 'is-breed'}`,
+        } : null,
       });
     } else {
       const p = slot.poke;
@@ -283,7 +296,7 @@ function renderHatcheryWindow() {
       const req = slot.stepsReq || 10;
 
       const mode = (G.hatcheryModes && G.hatcheryModes[i]) || slot.mode || 'exp';
-      const showExp = !isFossil && (!isLocUnlocked('jroute29') || mode === 'exp');
+      const showExp = !isFossil && mode === 'exp';
       // Phase 30: daycare shows its K.O. counter (10 = 1 level) —
       // no more XP bar. Incubation keeps its historical counter.
       const daycareReq = (showExp && p && typeof getDaycareKosPerLevel === 'function') ? getDaycareKosPerLevel(p) : 10;
@@ -303,15 +316,20 @@ function renderHatcheryWindow() {
       const slotActions = [];
       const withdrawBtn = { label: (typeof t==='function'?t('hatchery_withdraw'):'Withdraw'), call: 'withdrawPokemonFromDaycare', callArgs: i, classes: 'hatchery-hatch-btn pw-btn-cancel' };
       const hatchBtn = { label: t('hatch'), call: 'hatchEgg', callArgs: i, classes: 'hatchery-hatch-btn' };
-      if (!isLocUnlocked('jroute29')) {
-        if (!isFossil) slotActions.push(withdrawBtn);
-      } else {
-        if (!isFossil) {
-          if (mode === 'exp') slotActions.push(withdrawBtn);
-          else if (done) slotActions.push(hatchBtn);
-        } else if (done) {
-          slotActions.push(hatchBtn);
-        }
+      if (!isFossil) {
+        if (mode === 'exp') slotActions.push(withdrawBtn);
+        else if (done) slotActions.push(hatchBtn);
+      } else if (done) {
+        slotActions.push(hatchBtn);
+      }
+      const modeUnlocked = typeof isHatcheryModeSwitchUnlocked !== 'function' || isHatcheryModeSwitchUnlocked();
+      if (modeUnlocked || mode === 'breed') {
+        slotActions.push({
+          label: mode === 'exp' ? t('hatchery_mode_daycare') : t('hatchery_mode_incubation'),
+          call: 'toggleHatcherySlotMode',
+          callArgs: String(i),
+          classes: `hatchery-mode-toggle ${mode === 'exp' ? 'is-exp' : 'is-breed'}`,
+        });
       }
 
       slots.push({
@@ -342,6 +360,10 @@ function renderHatcheryWindow() {
 }
 
 function renderFossilLab(el) {
+  if (typeof isFossilReviveUnlocked === 'function' && !isFossilReviveUnlocked()) {
+    _pwSetHtmlSafe(el, '');
+    return;
+  }
   const fossils = getFossilInventory();
   let html = `<div class="loc-title"> ${t('fossil_lab')}</div>
  <div class="loc-sub extracted-bridge-style-032">${t('fossil_lab_desc')}</div>`;
@@ -431,3 +453,4 @@ export {
   renderHatcheryAutomationSlotCard,
   hatcherySlotCardModel,
 };
+

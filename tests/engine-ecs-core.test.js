@@ -320,3 +320,4 @@ test('QuestView: canonical shell, footer actions, strict unusable-button hiding'
   assert.ok(ready.body.includes('data-call-args="2"'), 'accept rendered when usable');
   assert.ok(!ready.footer.includes('is-hidden'), 'reroll visible when ready');
 });
+

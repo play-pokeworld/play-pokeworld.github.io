@@ -13,3 +13,4 @@ test('escapeHtml preserves safe text', () => {
   assert.equal(escapeHtml('Pikachu & Raichu'), 'Pikachu &amp; Raichu');
 });
 
+

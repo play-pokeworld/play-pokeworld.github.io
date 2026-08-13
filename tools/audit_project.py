@@ -69,3 +69,4 @@ print('\nNotes:')
 print('- Remaining inline styles are mostly legacy runtime sizing/progress values; file-postboot sanitizes data-style/data-inline-css at runtime.')
 print('- Remaining hardcoded strings are candidates for future full localization; static shell bindings now cover the main menu, settings, debug and summary UI.')
 
+

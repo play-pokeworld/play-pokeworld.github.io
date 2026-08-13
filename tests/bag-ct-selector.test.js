@@ -279,3 +279,4 @@ test('contract: MOVES now knows all TM/HM moveIds (via aliases)', () => {
   assert.deepEqual(unresolved, [], 'all TMs/HMs resolve to an existing move');
 });
 
+

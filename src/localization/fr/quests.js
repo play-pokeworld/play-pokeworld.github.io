@@ -83,221 +83,241 @@ export const L_fr_quests = {
 "rewardDesc":"2 200₽ + 1 Baie Passho"
 },
 "17": {
+"title":"La Pension de la Route 5",
+"desc":"La Pension de la Route 5 est débloquée dans votre tableau de bord ! Confiez un de vos Pokémon à la Pension et faites-lui gagner 1 niveau (en remportant 10 victoires sauvages).",
+"rewardDesc":"2 500₽ + 1 Baie Prine"
+},
+"18": {
 "title":"La Route 6 — Vers Carmin",
 "desc":"Empruntez la Route 6 vers Carmin sur Mer et mettez K.O. 25 Pokémon sauvages.",
 "rewardDesc":"2 200₽"
 },
-"18": {
+"19": {
 "title":"À bord du S.S. Anne",
 "desc":"Le S.S. Anne mouille à Carmin-sur-Mer, et Blue s'est incrusté à la fête. Sur le pont, il exige une revanche devant tous les passagers !",
 "rewardDesc":"Victoire : 3 500₽"
 },
-"19": {
+"20": {
 "title":"Le Capitaine de l'Océane",
 "desc":"À bord de l'Océane, le Capitaine souffre du mal de mer. Massez-lui le dos pour le remettre d'aplomb : il saura vous remercier.",
 "rewardDesc":"1 100₽"
 },
-"20": {
+"21": {
 "title":"Le Tonnerre de Carmin sur Mer",
 "desc":"Naviguez jusqu'à Carmin sur Mer et affrontez le Major Bob dans son arène Électrik pour décrocher le Badge Foudre.",
 "rewardDesc":"5 000₽ + 1 Pierre Foudre"
 },
-"21": {
+"22": {
+"title":"Le Centre d'Entraînement Avancé",
+"desc":"Avec le Badge Foudre du Major Bob, vous débloquez le Centre d'Entraînement dans votre tableau de bord ! Lancez et complétez une session d'entraînement sur un Pokémon de votre équipe pour progresser en EV, talents ou capacités.",
+"rewardDesc":"3 500₽ + 1 Baie Wacan"
+},
+"23": {
 "title":"Les Secrets de la Cave Taupiqueur",
 "desc":"Traversez la Route 11 et explorez la mystérieuse Cave Taupiqueur. Mettez K.O. 35 Pokémon sauvages.",
 "rewardDesc":"4 000₽ + 1 Sable Doux"
 },
-"22": {
-"title":"L'Écluse de la Route 9 et 10",
-"desc":"Les Routes 9 et 10 mènent au nord. Mettez K.O. 40 Pokémon sauvages pour progresser.",
+"24": {
+"title":"L'Exploration de la Mine",
+"desc":"En explorant la Cave Taupiqueur, vous avez débloqué la Mine dans la colonne centrale du tableau de bord ! Ouvrez la Mine, creusez et extrayez 3 objets ou trésors enfouis.",
+"rewardDesc":"4 000₽ + 1 Vieil Ambre"
+},
+"25": {
+"title":"Le Scientifique du Musée d'Argenta & Fossiles",
+"desc":"En sortant de la Cave Taupiqueur à Argenta, visitez le Musée. Placez un fossile (comme le Vieil Ambre) dans le Laboratoire à Fossiles de la Pension pour le faire ressusciter en Pokémon !",
+"rewardDesc":"4 500₽ + 1 Pierre Lune"
+},
+"26": {
+"title":"L'Écluse de la Route 10",
+"desc":"Traversez la Route 9 jusqu'à l'écluse de la Route 10, où les dresseurs font halte avant le Tunnel Rocheux. Mettez K.O. 40 Pokémon sauvages sur la Route 10 pour vous y faire une réputation.",
 "rewardDesc":"4 000₽ + 1 Baie Prine"
 },
-"23": {
+"27": {
 "title":"Le Tunnel Rocheux",
 "desc":"Franchissez le Tunnel Rocheux vers Lavanville. Mettez K.O. 50 Pokémon sauvages dans l'obscurité.",
 "rewardDesc":"5 200₽ + 1 Pierre Dure"
 },
-"24": {
+"28": {
 "title":"La Bande de la Route 8",
 "desc":"Des garnements provoquent les passants sur la Route 8 entre Lavanville et Safrania. Remettez de l'ordre : 15 victoires sur les sauvages de la zone !",
 "rewardDesc":"2 800₽ + 1 Baie Yache"
 },
-"25": {
+"29": {
 "title":"Les Fantômes de la Tour de Lavanville",
 "desc":"Rejoignez Lavanville et bravez les esprits de la Tour Pokémon. Mettez K.O. 45 Pokémon sauvages pour obtenir la Poké Flûte.",
 "rewardDesc":"5 800₽ + 1 Super Bonbon + 1 Pokéflûte"
 },
-"26": {
+"30": {
 "title":"Libérez la Tour Pokémon !",
 "desc":"La Team Rocket a investi la Tour Pokémon de Lavanville et s'en prend aux habitants. Chassez le sbire posté près du sommet pour libérer la tour !",
 "rewardDesc":"Victoire : 3 000₽"
 },
-"27": {
+"31": {
 "title":"La Poké Flûte et Ronflex",
 "desc":"Grâce à la Poké Flûte obtenue à Lavanville, réveillez le Ronflex qui bloque les routes et battez-le pour le capturer.",
 "rewardDesc":"3 500₽ + Ronflex (Nv.30)"
 },
-"28": {
+"32": {
 "title":"La Route 7 — Céladopole",
 "desc":"La Route 7 relie Safrania à Céladopole. Mettez K.O. 35 Pokémon sauvages pour vous préparer à l'arène.",
 "rewardDesc":"3 800₽ + 1 Pierre Plante"
 },
-"29": {
+"33": {
 "title":"Le Repaire du Casino",
 "desc":"Sous le casino de Céladopole, la Team Rocket cache son véritable repaire. L'Admin qui garde l'antre du boss ne vous laissera pas passer sans combat !",
 "rewardDesc":"Victoire : 4 500₽"
 },
-"30": {
+"34": {
 "title":"Giovanni, le Boss aux Pieds de Terre",
 "desc":"Au fond du repaire du casino, Giovanni en personne vous attend. Renversez le boss de la Team Rocket et libérez Céladopole de son emprise !",
 "rewardDesc":"Victoire : 6 000₽"
 },
-"31": {
+"35": {
 "title":"L'Évoli du Manoir Céladon",
 "desc":"Au sommet du Manoir Céladon vit un Évoli solitaire, abandonné en secret. Un employé vous chuchote où le trouver… si vous promettez d'en prendre soin.",
 "rewardDesc":"800₽ + Évoli (Nv.25) + 1 Baie Payapa"
 },
-"32": {
+"36": {
 "title":"Le Porygon du Casino",
 "desc":"Le gérant du Game Corner de Céladopole a un Porygon à céder, mais il ne le confiera qu'à un dresseur de bonne réputation. Allez vous présenter !",
 "rewardDesc":"1 000₽ + Porygon (Nv.20)"
 },
-"33": {
+"37": {
 "title":"La Grâce Naturelle de Céladopole",
 "desc":"Rendez-vous dans la métropole de Céladopole et triomphez d'Erika pour remporter le Badge Prisme.",
 "rewardDesc":"7 000₽ + 1 Pierre Plante"
 },
-"34": {
+"38": {
 "title":"Le Maître de l'Ombre à Parmanie",
 "desc":"Atteignez Parmanie et déjouez les pièges toxiques de Koga pour capturer le Badge Âme.",
 "rewardDesc":"8 500₽ + 1 Croc Poison"
 },
-"35": {
+"39": {
 "title":"Motards de la Piste Cyclable",
 "desc":"La Piste Cyclable (Route 17) est le terrain de jeux de motards bruyants. Dégagez la voie : 20 victoires sur les sauvages de la piste !",
 "rewardDesc":"3 600₽"
 },
-"36": {
+"40": {
 "title":"Les Dentiers d'Or du Directeur",
 "desc":"Le Directeur du Parc Safari a encore perdu ses Dentiers d'Or quelque part dans la réserve ! Ratissez les enclos : 15 victoires contre les sauvages du Parc.",
 "rewardDesc":"3 200₽ + 1 Baie Occa"
 },
-"37": {
+"41": {
 "title":"Duel au sommet de la Sylphe",
 "desc":"La Sylphe S.A. est assiégée par la Team Rocket, mais Blue n'a qu'une idée en tête : vous défier dans le hall de l'entreprise. Son équipe est devenue redoutable !",
 "rewardDesc":"Victoire : 8 000₽"
 },
-"38": {
+"42": {
 "title":"Sauvez la Sylphe S.A. !",
 "desc":"Giovanni a pris le contrôle du siège de la Sylphe S.A. à Safrania. Montez au sommet et mettez fin à l'occupation de la Team Rocket !",
 "rewardDesc":"Victoire : 10 000₽"
 },
-"39": {
+"43": {
 "title":"Le Lokhlass de la Sylphe",
 "desc":"Sauvée de la Team Rocket, la Sylphe SARL reprend vie. Un employé ému vous offre le Lokhlass que lui avait confié le Chef de Projet : prenez-en bien soin.",
 "rewardDesc":"900₽ + Lokhlass (Nv.25) + 1 Baie Wacan"
 },
-"40": {
+"44": {
 "title":"Le Roi du Karaté",
 "desc":"Le Dojo de Safrania, jadis arène officielle, défie encore les dresseurs de valeur. Battez le Maître Karuo et ses deux champions : il vous confiera un Kicklee ou un Tygnon.",
 "rewardDesc":"4 000₽ + Tyrogue (Nv.25)"
 },
-"41": {
+"45": {
 "title":"Les Pouvoirs Psychiques de Safrania",
 "desc":"Pénétrez dans l'arène psychique de Safrania et vainquez Morgane pour décrocher le Badge Marais.",
 "rewardDesc":"10 000₽ + 1 Cuillère Tordue"
 },
-"42": {
+"46": {
 "title":"La Devinette de M. Psyché",
 "desc":"Dans une petite maison de Safrania, M. Psyché lit dans les pensées des passants. Devinez ce qu'il voit en vous : il récompense les esprits affûtés.",
 "rewardDesc":"900₽ + 1 Baie Tanga"
 },
-"43": {
+"47": {
 "title":"Le Grand Souterrain",
 "desc":"Ouvrez l'onglet Mine et utilisez vos outils pour extraire et vendre 5 trésors déterrés dans les roches de Kanto.",
 "rewardDesc":"5 000₽ + 1 Baie Chople"
 },
-"44": {
+"48": {
 "title":"Le Collectionneur de Céladopole",
 "desc":"Un collectionneur fortuné veut constituer un vivarium de Kanto. Capturez 15 Pokémon sauvages pour ses vitrines !",
 "rewardDesc":"3 000₽ + 1 Baie Prine"
 },
-"45": {
+"49": {
 "title":"Les Îles Écume — Route 19 et 20",
 "desc":"Partez vers les Chenaux 19 et 20 au sud de Parmanie. Mettez K.O. 60 Pokémon sauvages en mer.",
 "rewardDesc":"6 500₽"
 },
-"46": {
+"50": {
 "title":"Le Volcan Flamboyant de Cramois'île",
 "desc":"Traversez les chenaux maritimes jusqu'à Cramois'île et battez Auguste pour le Badge Volcan.",
 "rewardDesc":"12 500₽ + 1 Pierre Feu"
 },
-"47": {
+"51": {
 "title":"Renaissance au Laboratoire",
 "desc":"Le Laboratoire de Cramois'île a achevé la restauration du fossile rapporté du Mont Sélénite : un Ptéra préhistorique s'envole à nouveau… et cherche un dresseur !",
 "rewardDesc":"1 200₽ + Ptéra (Nv.30)"
 },
-"48": {
+"52": {
 "title":"L'Ultime Arène de Jadielle",
 "desc":"Retournez à Jadielle et affrontez le mystérieux Giovanni dans sa redoutable arène Sol pour obtenir le 8ᵉ Badge Kanto !",
 "rewardDesc":"16 000₽ + 1 Super Bonbon"
 },
-"49": {
+"53": {
 "title":"La Route 23 — L'Avant-Garde",
 "desc":"La Route 23 garde l'accès à la Route Victoire. Mettez K.O. 80 Pokémon sauvages pour vous aguerrir.",
 "rewardDesc":"10 000₽ + 1 Super Bonbon"
 },
-"50": {
+"54": {
 "title":"Le Grand Plongeon",
 "desc":"Un pêcheur du Chenal 21 parie que les gros poissons lui échappent à cause de votre bateau. Prouvez-lui le contraire : 20 victoires contre les sauvages du chenal !",
 "rewardDesc":"5 200₽ + 1 Eau Mystique"
 },
-"51": {
+"55": {
 "title":"Le Dernier Duel avant la Ligue",
 "desc":"Sur la Route 22, Blue vous barre une dernière fois le chemin de la Ligue Pokémon. Il aligne six Pokémon — et son starter n'a jamais été aussi fort.",
 "rewardDesc":"Victoire : 15 000₽"
 },
-"52": {
+"56": {
 "title":"Ultime Entraînement",
 "desc":"La Route Victoire est le dernier filtre avant la Ligue. Forgez vos Pokémon dans ses entrailles : 25 victoires contre les sauvages !",
 "rewardDesc":"7 000₽ + 1 Foulard de Soie"
 },
-"53": {
+"57": {
 "title":"Le Maître Suprême de Kanto",
 "desc":"Franchissez la Route Victoire et triomphez des 5 combats du Conseil 4 au Plateau Indigo pour devenir le nouveau Maître de Kanto !",
 "rewardDesc":"28 000₽ + 1 Super Bonbon"
 },
-"54": {
+"58": {
 "title":"L'Oiseau de Glace des Îles Écume",
 "desc":"Explorez les profondeurs glacées des Îles Écume (Chenal 20) et triomphez de 150 Pokémon pour défier Artikodin !",
 "rewardDesc":"9 000₽ + Artikodin (Nv.50)"
 },
-"55": {
+"59": {
 "title":"L'Oiseau de Foudre de la Centrale",
 "desc":"Pénétrez dans la Centrale Électrique abandonnée (Route 10) et vainquez 150 Pokémon pour faire apparaître Électhor !",
 "rewardDesc":"9 000₽ + Électhor (Nv.50)"
 },
-"56": {
+"60": {
 "title":"L'Oiseau de Feu de la Route Victoire",
 "desc":"Traversez les épreuves de la Route Victoire et mettez K.O. 150 Pokémon sauvages pour défier Sulfura !",
 "rewardDesc":"9 000₽ + Sulfura (Nv.50)"
 },
-"57": {
+"61": {
 "title":"Les Archives du Manoir Pokémon",
 "desc":"Fouillez les ruines du Manoir Pokémon sur Cramois'île. Vainquez 90 Pokémon sauvages pour découvrir des secrets.",
 "rewardDesc":"13 000₽ + 1 Super Bonbon"
 },
-"58": {
+"62": {
 "title":"Les Mémoires du Manoir",
 "desc":"Les journaux du Dr. Fuji retrouvés dans le Manoir Pokémon racontent la naissance… et l'évasion de Mewtwo. Rapportez-les au conservateur du musée de Cramois'île.",
 "rewardDesc":"1 500₽"
 },
-"59": {
+"63": {
 "title":"Le Clone Ultime de la Caverne Azurée",
 "desc":"Maintenant que vous êtes Maître de Kanto, accédez à la mystérieuse Caverne Azurée au nord d'Azuria. Triomphez de 150 Pokémon pour capturer Mewtwo !",
 "rewardDesc":"22 000₽ + Mewtwo (Nv.70)"
 },
-"60": {
+"64": {
 "title":"Le Fabuleux Miraculeux du Parc Safari",
 "desc":"Explorez le vaste Parc Safari à Parmanie. Vainquez 150 Pokémon sauvages pour rencontrer et capturer le fabuleux Mew. Mew peut aussi apparaître en roaming à Kanto.",
 "rewardDesc":"25 000₽ + 1 Charme Chroma + Mew (Nv.50)"
@@ -353,151 +373,156 @@ export const L_fr_quests = {
 "rewardDesc":"Victoire : 3 000₽"
 },
 "111": {
+"title":"Le Secret des Œufs de Johto",
+"desc":"Bienvenue à la Garderie de Johto (Route 34) ! Vous y débloquez la deuxième partie de la Pension : la reproduction et l'incubation d'œufs. Placez un œuf en incubation (ou faites éclore un Pokémon) pour progresser.",
+"rewardDesc":"5 000₽ + 1 Œuf Chance"
+},
+"112": {
 "title":"Doublonville : le Badge Plaine",
 "desc":"Traversez le Bois aux Chênes et la Route 34, puis battez Blanche à Doublonville pour obtenir le Badge Plaine.",
 "rewardDesc":"6 500₽ + 1 Mouchoir Soie"
 },
-"112": {
+"113": {
 "title":"Le secret des Ruines d'Alpha",
 "desc":"Le Professeur Hale étudie de mystérieux glyphes dans les Ruines d'Alpha. Rejoignez-le : sa dernière transmission parle de cristaux… et d'un lion de feu.",
 "rewardDesc":"800₽"
 },
-"113": {
+"114": {
 "title":"Zarbi, par dizaines !",
 "desc":"Les murs des Ruines s'animent : les Zarbi grouillent ! Mettez K.O. 15 Pokémon sauvages des Ruines d'Alpha pour aider Hale à collecter des données.",
 "rewardDesc":"3 200₽ + 1 Baie Babiri"
 },
-"114": {
+"115": {
 "title":"L'illusion d'Entei",
 "desc":"Hale a été pétrifié dans un monde de cristal par les Zarbi ! Affrontez l'Entei cristallin qu'il projette malgré lui et brisez l'illusion !",
 "rewardDesc":"Victoire : 6 000₽"
 },
-"115": {
+"116": {
 "title":"L'aube après le cristal",
 "desc":"L'illusion est brisée, les Ruines retrouvent le calme. Parlez au Professeur Hale libéré : il a tant à vous raconter sur les Zarbi… et sur Entei.",
 "rewardDesc":"4 000₽ + 1 Charbon"
 },
-"116": {
+"117": {
 "title":"Duel à la Tour Cendrée",
 "desc":"Silver vous attend dans les ruines de la Tour Cendrée de Rosalia, obsédé par les Pokémon légendaires. Son équipe s'est encore durcie !",
 "rewardDesc":"Victoire : 4 500₽"
 },
-"117": {
+"118": {
 "title":"Eusine, chasseur de légende",
 "desc":"Un mystérieux dresseur nommé Eusine traque Suicune depuis des années. Il vous attend dans la Tour Cendrée de Rosalia, où les bêtes légendaires se sont éveillées.",
 "rewardDesc":"1 000₽"
 },
-"118": {
+"119": {
 "title":"Rosalia : le Badge Brume",
 "desc":"Passez par la Route 36, rejoignez Rosalia et vainquez Mortimer dans son Arène Spectre.",
 "rewardDesc":"8 500₽ + 1 Tag Sort"
 },
-"119": {
+"120": {
 "title":"Irisia : le Badge Choc",
 "desc":"Depuis Oliville, traversez les Chenaux 40 et 41 jusqu’à Irisia, puis battez Chuck.",
 "rewardDesc":"10 000₽ + 1 Ceinture Noire"
 },
-"120": {
+"121": {
 "title":"Le remède d'Irisia",
 "desc":"Le Pharamp du Phare d'Oliville, Amphy, est malade ! Le pharmacien d'Irisia détient un remède secret. Allez le chercher pour Jasmine.",
 "rewardDesc":"800₽"
 },
-"121": {
+"122": {
 "title":"Un Phare rallumé",
 "desc":"Rapportez le remède secret à Jasmine au Phare d'Oliville. Grâce à vous, Amphy pourra de nouveau illuminer la mer.",
 "rewardDesc":"3 000₽ + 1 Baie Yache"
 },
-"122": {
+"123": {
 "title":"Oliville : le Badge Minéral",
 "desc":"Retournez à Oliville et triomphez de Jasmine dans son Arène Acier pour obtenir le Badge Minéral.",
 "rewardDesc":"11 500₽ + 1 Peau Métal"
 },
-"123": {
+"124": {
 "title":"Peter au Lac Colère",
 "desc":"Le Maître Dragon Peter enquête sur des ondes étranges qui rendent les Pokémon du Lac Colère furieux. Retrouvez-le au bord du lac.",
 "rewardDesc":"1 000₽"
 },
-"124": {
+"125": {
 "title":"Le Léviator rouge !",
 "desc":"Les ondes ont rendu furieux le roi du lac : un LÉVIATOR ROUGE unique ! Apaisez le lac (25 K.O. sauvages), puis affrontez-le pour tenter de le capturer !",
 "rewardDesc":"6 000₽ + Léviator chromatique (Nv.30)"
 },
-"125": {
+"126": {
 "title":"Le Signal du Lac Colère",
 "desc":"La Team Rocket s'est tapie dans un repaire secret à Acajou et force l'évolution des Magicarpe du Lac Colère — dont le célèbre Léviator rouge ! Démantelez le repaire.",
 "rewardDesc":"Victoire : 7 000₽"
 },
-"126": {
+"127": {
 "title":"Acajou : le Badge Glacier",
 "desc":"Rejoignez Acajou après Rosalia et le Mont Creuset, puis vainquez Frédo pour obtenir le Badge Glacier.",
 "rewardDesc":"13 000₽ + 1 Glace Éternelle"
 },
-"127": {
+"128": {
 "title":"La Prise de la Tour Radio",
 "desc":"La Team Rocket a pris la Tour Radio de Doublonville et implore Giovanni de revenir par ondes. Reprenez la tour de haute lutte et brisez l'organisation pour de bon !",
 "rewardDesc":"Victoire : 10 000₽"
 },
-"128": {
+"129": {
 "title":"Ébénelle : le Badge Lever",
 "desc":"Traversez la Route de Glace jusqu’à Ébénelle et affrontez Sandra pour obtenir le Badge Lever.",
 "rewardDesc":"17 500₽ + 1 Dent Dragon + 1 Super Bonbon"
 },
-"129": {
+"130": {
 "title":"Le doyen de l'Antre du Dragon",
 "desc":"Le doyen des dragons veut juger de votre valeur avant de vous laisser affronter la Ligue. Rencontrez-le à Ébénelle.",
 "rewardDesc":"1 000₽"
 },
-"130": {
+"131": {
 "title":"L'épreuve des dracomanciens",
 "desc":"Prouvez votre maîtrise au Mont Creuset : mettez K.O. 20 Pokémon sauvages, et un jeune Minidraco pourrait choisir de vous suivre.",
 "rewardDesc":"5 000₽ + Minidraco (Nv.15)"
 },
-"131": {
+"132": {
 "title":"Silver, un dernier affront",
 "desc":"Sur la Route Victoire, Silver vous tend une dernière embuscade avant la Ligue de Johto. Son Ectoplasma intimidant et son Magnéton lévitant ne font pas semblant !",
 "rewardDesc":"Victoire : 13 000₽"
 },
-"132": {
+"133": {
 "title":"Plateau Indigo : Ligue Johto",
 "desc":"Après les 8 badges de Johto, traversez les Routes 26 et 27 puis la Route Victoire pour triompher de la Ligue Johto.",
 "rewardDesc":"30 000₽ + 1 Super Bonbon"
 },
-"133": {
+"134": {
 "title":"Rosalia : la Tour Cendrée",
 "desc":"À Rosalia, explorez la Tour Cendrée et mettez K.O. 60 Pokémon sauvages pour lever le mystère des Bêtes légendaires.",
 "rewardDesc":"9 000₽ + 1 Aile d'Argent"
 },
-"134": {
+"135": {
 "title":"Sur les traces de Suicune",
 "desc":"Suicune a été aperçu courant le long de la Route 42 ! Suivez ses traces : mettez K.O. 25 Pokémon sauvages sur la route pour le débusquer.",
 "rewardDesc":"5 000₽"
 },
-"135": {
+"136": {
 "title":"Raikou, la Foudre Pourpre",
 "desc":"À la Tour Cendrée de Rosalia, mettez K.O. 150 Pokémon sauvages pour attirer Raikou et le défier.",
 "rewardDesc":"16 000₽ + Raikou (Nv.50)"
 },
-"136": {
+"137": {
 "title":"Entei, le Volcan Vivant",
 "desc":"À la Tour Cendrée de Rosalia, mettez K.O. 150 Pokémon sauvages pour attirer Entei et le défier.",
 "rewardDesc":"16 000₽ + Entei (Nv.50)"
 },
-"137": {
+"138": {
 "title":"Suicune, l’Aurore Boréale",
 "desc":"À la Tour Cendrée de Rosalia, mettez K.O. 150 Pokémon sauvages pour attirer Suicune et le défier.",
 "rewardDesc":"16 000₽ + 1 Aile Arc-en-ciel + Suicune (Nv.50)"
 },
-"138": {
+"139": {
 "title":"Tourb’Îles : Lugia",
 "desc":"Aux Tourb’Îles, mettez K.O. 150 Pokémon sauvages pour éveiller Lugia, gardien des mers.",
 "rewardDesc":"20 000₽ + Lugia (Nv.70)"
 },
-"139": {
+"140": {
 "title":"Tour Carillon : Ho-Oh",
 "desc":"À la Tour Carillon de Rosalia, mettez K.O. 150 Pokémon sauvages pour faire apparaître Ho-Oh.",
 "rewardDesc":"20 000₽ + Ho-Oh (Nv.70)"
 },
-"140": {
+"141": {
 "title":"Bois aux Chênes : Celebi",
 "desc":"Dans la clairière sacrée du Bois aux Chênes, le gardien du temps Celebi apparaît parfois aux dresseurs patients. Mettez K.O. 150 Pokémon sauvages pour l'attirer !",
 "rewardDesc":"20 000₽ + Celebi (Nv.50)"
@@ -1379,3 +1404,4 @@ export { L_fr_move_descs } from './move-descs.js';
 if (typeof globalThis !== 'undefined') {
   globalThis.L_fr_quests = L_fr_quests;
 }
+

@@ -20,6 +20,15 @@
 // Fallback if util.js is not loaded — targeted unit tests.
 // Shared safe-HTML service (engine pwSetHtml when present, else direct).
 // globalThis-backed so concatenated VM harnesses and classic stubs stay valid.
+// FIX (2026-08) — mine energy per won battle / capture (was hardcoded 15).
+// Read defensively: game-config.js publishes MINE_ENERGY_PER_BATTLE on the
+// global surface before this module loads, but VM harnesses may not.
+function _mineEnergyPerBattle(){
+ try{ if(typeof MINE_ENERGY_PER_BATTLE === 'number') return MINE_ENERGY_PER_BATTLE; }catch(_){}
+ try{ if(typeof GAME !== 'undefined' && GAME && GAME.MINE && typeof GAME.MINE.ENERGY_PER_BATTLE === 'number') return GAME.MINE.ENERGY_PER_BATTLE; }catch(_){}
+ return 5;
+}
+
 if (typeof globalThis !== 'undefined' && typeof globalThis._pwSetHtmlSafe !== 'function') {
   globalThis._pwSetHtmlSafe = function (el, html) { if (typeof pwSetHtml === 'function') pwSetHtml(el, html); else el.innerHTML = html; };
 }
@@ -351,7 +360,8 @@ async function offlineFastForwardWildBattles(secondsBudget){
   res.won = (b.sessionWins || 0) - winsBefore;
   if(res.won > 0 && G.mine && typeof G.mine.energy === 'number'){
     const maxE = G.mine.maxEnergy || 100;
-    G.mine.energy = Math.min(maxE, G.mine.energy + 15 * res.won);
+    // FIX (2026-08): mine energy granted per won battle rebalanced 15 -> 5.
+    G.mine.energy = Math.min(maxE, G.mine.energy + _mineEnergyPerBattle() * res.won);
   }
   res.fights = res.won;
   res.lost = !b.active;
@@ -705,7 +715,9 @@ async function offlineSimulate(ms, reason){
       daycareLevels: Math.max(0, offlineDaycareLevelSum() - daycareLevelsBefore),
       boundedBattle: battlesRes.bounded || null, // phase 32 : 'won' | 'lost' | null
     };
-    const hasActivity = !!(result.wins > 0 || result.lost || result.captures > 0 || result.items.length > 0 || result.energy > 0 || result.training > 0 || result.mineDigs > 0 || result.money > 0 || result.daycareLevels > 0 || result.boundedBattle);
+    // Computed for readability/debug of the recap decision below, which is
+    // driven by wantRecap; underscored as deliberately unused.
+    const _hasActivity = !!(result.wins > 0 || result.lost || result.captures > 0 || result.items.length > 0 || result.energy > 0 || result.training > 0 || result.mineDigs > 0 || result.money > 0 || result.daycareLevels > 0 || result.boundedBattle);
     offlineEngineApplying = false;
     if(agg._error){
       try{ showAfkResultPanel({ error: true, timeMs: capped, wins: 0, money: 0, fainted: 0, captures: 0, energy: 0, training: 0, mineDigs: 0, items: [], message: t('afk_error_resume') }); notify(t('afk_error_resume'), 'var(--red)'); }catch(_){ }
@@ -854,3 +866,4 @@ export {
   snapshotInventory,
   snapshotSessionItems,
 };
+

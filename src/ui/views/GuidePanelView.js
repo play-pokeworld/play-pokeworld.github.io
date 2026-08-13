@@ -55,3 +55,4 @@ export class TutorialCardView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

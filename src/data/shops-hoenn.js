@@ -29,3 +29,4 @@ if (typeof SHOPS !== 'undefined' && typeof SHOPS_HOENN !== 'undefined') {
 }
 // Wave 40 — surface kept (window → globalThis block, same scope).
 if (typeof globalThis !== 'undefined') globalThis.SHOPS_HOENN = SHOPS_HOENN;
+

@@ -96,7 +96,15 @@ test('wave17: save context menu — one scoped colour per action, AA-checked', (
 
 test('wave17: active buttons use per-theme tokens, not fixed cream', () => {
   assert.ok(!/button\[data-action\]:not\(\.save-slot\)\.active\s*\{[^}]*#ECDEB7\s*!important/.test(CSS1), 'no fixed-cream active blanket');
-  assert.ok(CSS1.includes('button[data-action]:not(.save-slot):not(.theme-swatch).active'), 'theme swatches exempt (preview colours kept)');
+  // Wave 33 added `:not(.modal-close)` to this selector (the shared ✕ is a
+  // <button data-action> in some panels and was being repainted with the
+  // standard button chrome). Assert the EXEMPTIONS, not the literal string,
+  // so adding a further guard cannot fail a test about theme swatches.
+  // (the selector list is wrapped over several lines, so match across newlines)
+  const activeBlanket = (CSS1.match(/[^{}]*button\[data-action\][^{}]*\.active\s*\{/g) || [])
+    .find((sel) => sel.includes(':not(.theme-swatch)'));
+  assert.ok(activeBlanket, 'theme swatches exempt (preview colours kept)');
+  assert.ok(activeBlanket.includes(':not(.save-slot)'), 'save slots exempt');
   assert.ok(/button\[data-action\][^{]*\.active\s*\{[^}]*var\(--pw-btn-active-bg\)\s*!important/.test(CSS1), 'active bg = per-theme token');
   // The settings blanket flattens class rules → the ACTIVE language is
   // re-asserted with the id scope (wins over "#settings-inner .hbtn").
@@ -150,3 +158,4 @@ test('wave17: training — panel on top, chrome hidden/restored, red abandon', (
   // consistency won over the marginal contrast bump).
   assert.ok(/button\[data-action\]\.pw-btn-danger,\s*button\[data-call\]\.pw-btn-danger,\s*\.hbtn\.pw-btn-danger \{\s*background:\s*#D3425F !important/.test(CSS1), 'danger colour = family crimson #D3425F (same as every red button)');
 });
+

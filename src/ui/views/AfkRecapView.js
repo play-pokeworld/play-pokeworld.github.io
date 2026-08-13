@@ -16,7 +16,7 @@
  *  - the result paint contains `.afk-result-grid`,
  *  - `.afk-result-status` + success/danger variants, `.afk-ff-stage`,
  *    `.modal-title`,
- *  - the close cross keeps `.afk-modal-close` and BOTH close controls
+ *  - the close cross is the shared `.modal-close` (Wave 32) and BOTH controls
  *    carry data-action="legacy-call" data-call="closeAfkResultPanel"
  *    data-call-args="".
  *
@@ -34,6 +34,7 @@
 import { UIView } from './UIView.js';
 import { UIRenderComponent } from '../../engine/components/UIRenderComponent.js';
 import { h, toHTMLString } from '../../engine/render/vdom.js';
+import { panelHeaderVNode } from '../components/panel-header.js';
 import {
   sessionStatGridVNode,
   summarySectionTitleVNode,
@@ -54,7 +55,7 @@ export class AfkRecapView extends UIView {
     if (m.mode === 'progress') {
       const pct = Math.max(0, Math.min(100, Math.round(Number(m.pct) || 0)));
       return [h('div', { class: 'afk-result-card' },
-        h('div', { class: 'modal-title' }, h('div', null, m.title || '')),
+        panelHeaderVNode({ title: m.title || '' }),
         h('div', { class: 'afk-result-status' }, m.statusText || ''),
         h('div', { class: 'afk-ff-bar' }, h('i', { style: { width: `${pct}%` } })),
         m.stageText ? h('div', { class: 'afk-ff-stage' }, m.stageText) : null)];
@@ -62,9 +63,12 @@ export class AfkRecapView extends UIView {
 
     const statusCls = m.statusKind === 'success' ? ' success' : (m.statusKind === 'danger' ? ' danger' : '');
     return [h('div', { class: 'afk-result-card' },
-      h('div', { class: 'modal-title' },
-        h('div', null, m.title || ''),
-        h('span', { class: 'afk-modal-close', dataset: CLOSE_DS }, '✕')),
+      panelHeaderVNode({
+        title: m.title || '',
+        // Wave 32: was `.afk-modal-close` (24px glyph in a 36px round hit
+        // area) — a private copy of the shared cross that had drifted.
+        close: { dataset: CLOSE_DS, glyph: '✕' },
+      }),
       h('div', { class: `afk-result-status${statusCls}` }, m.statusText || ''),
       // .afk-result-grid is a kept needle (passe28); the real grid is the
       // shared battle-session one (same b/span cells).
@@ -98,3 +102,4 @@ export class AfkRecapView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

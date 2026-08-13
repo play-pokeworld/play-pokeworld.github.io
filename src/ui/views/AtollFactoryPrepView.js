@@ -21,6 +21,7 @@
 import { UIView } from './UIView.js';
 import { UIRenderComponent } from '../../engine/components/UIRenderComponent.js';
 import { h, toHTMLString } from '../../engine/render/vdom.js';
+import { panelHeaderVNode } from '../components/panel-header.js';
 
 export class AtollFactoryPrepView extends UIView {
   constructor(model) {
@@ -30,13 +31,12 @@ export class AtollFactoryPrepView extends UIView {
   windowVNode() {
     const m = this.model;
     return [
-      h('div', { class: 'modal-title' },
-        h('div', { class: 'pw-row' },
-          h('span', { class: 'pw-info-icon' }, '🏭'),
-          h('div', { class: 'pw-info-head-text' },
-            h('div', { class: 'pw-info-name' }, m.title || ''),
-            h('div', { class: 'pw-text-sm pw-light1' }, m.streakText || ''))),
-        h('span', { class: 'modal-close', dataset: { action: 'legacy-call', call: 'closeAtollFactoryPrep', callArgs: '' } })),
+      panelHeaderVNode({
+        icon: '🏭',
+        title: m.title || '',
+        subtitle: m.streakText || '',
+        close: { call: 'closeAtollFactoryPrep' },
+      }),
       h('small', { class: 'atoll-prep-hint' }, m.hintText || ''),
       h('div', { id: 'atoll-prep-body', class: 'team-view' }, h.raw(m.cardsHtml || '')),
       h('div', { class: 'pw-btn-group' },
@@ -60,3 +60,4 @@ export class AtollFactoryPrepView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

@@ -12,7 +12,7 @@
  *
  * Model (shaped by the classic adapter, labels localized there):
  * {
- *   overview?, lore?, actions: [], unlockTip?, timerChips: [],
+ *   overview?, playStats?, lore?, actions: [], unlockTip?, timerChips: [],
  *   wild: { meta, entries }|null, drops?|null, alcoves?|null,
  * }
  *
@@ -23,6 +23,7 @@ import { UIRenderComponent } from '../../engine/components/UIRenderComponent.js'
 import { h, toHTMLString } from '../../engine/render/vdom.js';
 import {
   locOverviewVNode,
+  locPlayStatsVNode,
   locLoreVNode,
   locActionGridVNode,
   locUnlockTipVNode,
@@ -42,6 +43,7 @@ export class LocationInfoView extends UIView {
     const m = this.model;
     return h('div', { class: 'pw-loc-info' },
       m.overview ? locOverviewVNode(m.overview) : null,
+      m.playStats ? locPlayStatsVNode(m.playStats) : null,
       m.lore ? locLoreVNode(m.lore) : null,
       (m.actions || []).length ? locActionGridVNode(m.actions) : null,
       m.unlockTip ? locUnlockTipVNode(m.unlockTip) : null,
@@ -65,3 +67,4 @@ export class LocationInfoView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

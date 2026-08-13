@@ -47,6 +47,22 @@ function locationInfoModel(){
    hasShop ? (t('tab_shop') || 'Boutique') : null,
   ].filter(Boolean),
  };
+ // FIX (2026-08): the "Bilan du lieu" box counts what you beat / caught HERE,
+ // so it only means something where you can actually explore and meet wild
+ // Pokémon. Towns have no Explore button -> the box would always read 0 / 0.
+ // Single source of truth, shared with the Explore action below, so the two
+ // can never drift apart.
+ const canExplore = (loc.type !== 'town');
+ const locRec = (canExplore && typeof getLocRecordStats === 'function') ? getLocRecordStats(G.location) : null;
+ if (locRec) {
+  model.playStats = {
+   title: t('loc_stats_title') || 'Bilan',
+   beatenLabel: t('loc_stat_beaten') || 'Vaincus',
+   capturedLabel: t('loc_stat_captured') || 'Capturés',
+   beaten: locRec.beaten,
+   captured: locRec.captured,
+  };
+ }
 
  // ── Lore quote ─────────────────────────────────────────────────────────
  const lore = getLore(G.location);
@@ -92,7 +108,7 @@ function getNpcButtonStatus(G, locId, npc, ni, npcName) {
   const st = getNpcButtonStatus(G, G.location, npc, ni, npcName);
   model.actions.push({ kind: 'button', cls: st.cls, iconHtml: uiIcon('npc', '•'), label: st.badge + npcName, call: 'openNpc', callArgs: "'" + G.location + "'," + ni });
  });
- if(loc.type !== 'town'){
+ if(canExplore){
   model.actions.push({ kind: 'button', iconHtml: uiIcon('explore', '•'), label: t('explore_btn'), call: 'exploreArea', callArgs: '' });
  }
  if(typeof getPuzzlesForLocation === 'function'){
@@ -515,3 +531,4 @@ export {
   renderDeoxysFormsPanel,
   buySpecialFormPokemon,
 };
+

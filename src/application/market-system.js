@@ -221,3 +221,4 @@ if (typeof globalThis !== 'undefined') {
   globalThis.buyItem = buyItem;
   globalThis.sellTreasure = sellTreasure;
 }
+

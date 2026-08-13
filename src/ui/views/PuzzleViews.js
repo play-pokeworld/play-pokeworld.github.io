@@ -29,6 +29,7 @@
 import { UIView } from './UIView.js';
 import { UIRenderComponent } from '../../engine/components/UIRenderComponent.js';
 import { h, toHTMLString } from '../../engine/render/vdom.js';
+import { panelHeaderVNode } from '../components/panel-header.js';
 
 /* ─── Secret explorations list (fullscreen panel content) ─────────────── */
 
@@ -122,9 +123,11 @@ export class PuzzleExplorationView extends UIView {
     }
 
     return [h('div', { class: 'pw-puzzle-shell' },
-      h('div', { class: 'modal-title' },
-        h('div', null, (m.icon || '✦') + ' ', m.title || ''),
-        h('span', { class: 'modal-close', dataset: { action: 'legacy-call', call: 'closePuzzleExploration', callArgs: '' } }, '✕')),
+      panelHeaderVNode({
+        icon: m.icon || '✦',
+        title: m.title || '',
+        close: { call: 'closePuzzleExploration', glyph: '✕' },
+      }),
       h('div', { class: 'pw-puzzle-body' }, body),
       h('div', { class: 'pw-puzzle-actions' },
         h('button', { class: 'hbtn pw-btn-cancel', dataset: { action: 'legacy-call', call: 'closePuzzleExploration', callArgs: '' } },
@@ -188,3 +191,4 @@ export class SpecialFormsView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

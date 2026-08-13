@@ -86,6 +86,21 @@ ITEM_OVERRIDES = {
     # Generic mine fossil: PokeChill fossilHelix sprite (same target #138)
     'fossil.png':      f'{POKECHILL_RAW}/img/items/fossilHelix.png',
 }
+
+# Pokeclicker catalog (tools/pokeclicker-items.json) — larger official
+# sprites for items PokeAPI only ships as 24×24 icons, or does not ship.
+def _load_pokeclicker_item_overrides() -> None:
+    cfg_path = ROOT / 'tools' / 'pokeclicker-items.json'
+    try:
+        import json as _json
+        cfg = _json.loads(cfg_path.read_text(encoding='utf-8'))
+    except Exception:
+        return
+    base = (cfg.get('base') or f'{POKECLICKER_RAW}/').rstrip('/') + '/'
+    for key, rel in (cfg.get('items') or {}).items():
+        ITEM_OVERRIDES.setdefault(f'{key}.png', base + urllib.parse.quote(rel))
+
+_load_pokeclicker_item_overrides()
 for _t in TM_TYPES:
     ITEM_OVERRIDES[f'tm_{_t.lower()}.png'] = f'{POKECHILL_RAW}/img/items/tm{_t}.png'
 
@@ -313,13 +328,27 @@ def download_region_maps() -> None:
             print(f"[SANS PLACEHOLDER] missing map: {filename} (URL {url})")
 
 
-def download_item_overrides() -> None:
+def _looks_tiny_item(path: Path) -> bool:
+    """True for 24–40 px PokeAPI icons / recolors we want to replace."""
+    try:
+        im = Image.open(path)
+        return max(im.size) <= 40
+    except Exception:
+        return path.stat().st_size < 800 if path.exists() else True
+
+
+def download_item_overrides(force: bool = False) -> None:
     """Download the item sprites whose official source is mandated
-    (see ITEM_OVERRIDES). Never replaces an existing file."""
+    (see ITEM_OVERRIDES). `force` replaces a file that looks like a
+    tiny PokeAPI icon / recolor (≤ 40×40) so the larger Pokeclicker
+    sprite can win."""
     items_dir = ROOT / 'src/assets/images/items'
     items_dir.mkdir(parents=True, exist_ok=True)
     for name, url in ITEM_OVERRIDES.items():
-        write_download(url, items_dir / name)
+        dest = items_dir / name
+        if force and dest.exists() and _looks_tiny_item(dest):
+            dest.unlink()
+        write_download(url, dest)
 
 
 def download_backgrounds() -> None:
@@ -416,7 +445,7 @@ def main() -> None:
     # when the download failed — otherwise the grey badge won the race
     # and write_download(), which never replaces an existing file,
     # would never fetch the real disk back.
-    download_item_overrides()
+    download_item_overrides(force=True)
     # No more placeholder for TM disks — the real PokeChill sprite is required
     missing_tms = []
     for typ in TYPE_COLORS.keys():
@@ -455,4 +484,5 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
+
 

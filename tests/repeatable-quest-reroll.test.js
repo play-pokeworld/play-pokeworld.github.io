@@ -46,3 +46,4 @@ test('the button label renders the icon as HTML and the time as text', () => {
   assert.equal(btn.attrs['data-call'], 'rollRepeatables', 'reroll action restored');
 });
 
+

@@ -9,6 +9,10 @@
  */
 export { THEME_TOKENS, THEME_IDS, SPRITE_SIZES, spriteSizeFor, token, contrastRatio, assertContrast, MIN_CONTRAST_RATIO } from './theme.js';
 export { renderChildren, entityDataset, cx } from './component-utils.js';
+// Wave 32 — THE shared panel-header constructor (see panel-header.js).
+export { panelHeaderVNode, panelHeaderHTML } from './panel-header.js';
+// Wave 33 — the same constructor applied to the static index.html headers.
+export { pwBuildStaticHeaders } from './static-headers.js';
 export { createButton, createToggle, BUTTON_VARIANTS } from './controls.js';
 export { createHeader, createFooter, createPanel, createWindow } from './containers.js';
 export { createLayout, createVerticalLayout, createHorizontalLayout, createGridLayout } from './layouts.js';
@@ -122,3 +126,4 @@ export {
   winHeaderTitleVNode,
   winHeaderTitleHTML,
 } from './win-chrome.js';
+

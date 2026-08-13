@@ -314,3 +314,4 @@ test('the learnableMoves field (variant) is normalized too', () => {
   assert.ok(p.learnableMoves.includes('thunderbolt'));
 });
 
+

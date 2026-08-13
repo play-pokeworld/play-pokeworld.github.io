@@ -78,3 +78,4 @@ export class WriteBox {
     return this.value;
   }
 }
+

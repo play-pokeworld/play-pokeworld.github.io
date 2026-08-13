@@ -1,5 +1,14 @@
 // Wave 41 — native ESM module. The classic surface (window/globalThis) is
 // kept: classic consumers, VM harnesses and the engine registry.
+// FIX (2026-08) — mine energy per won battle / capture (was hardcoded 15).
+// Read defensively: game-config.js publishes MINE_ENERGY_PER_BATTLE on the
+// global surface before this module loads, but VM harnesses may not.
+function _mineEnergyPerBattle(){
+ try{ if(typeof MINE_ENERGY_PER_BATTLE === 'number') return MINE_ENERGY_PER_BATTLE; }catch(_){}
+ try{ if(typeof GAME !== 'undefined' && GAME && GAME.MINE && typeof GAME.MINE.ENERGY_PER_BATTLE === 'number') return GAME.MINE.ENERGY_PER_BATTLE; }catch(_){}
+ return 5;
+}
+
 function rollWeightedTalentForSpecies(speciesId){
  const tals = (typeof getSpeciesTalents === 'function') ? getSpeciesTalents(speciesId) : [];
  const recOf = (typeof getTalentRecord === 'function') ? getTalentRecord : (x) => ((typeof TALENTS_FULL !== 'undefined') ? TALENTS_FULL[x] : null);
@@ -78,6 +87,10 @@ function attemptAutoCatch(e){
 
  // 2) now open the dex
  G.pokedex[e.id]={...(G.pokedex[e.id]||{}),seen:true,caught:true};
+ try {
+  if (typeof recordDexCapture === 'function') recordDexCapture(e.id, wasShiny);
+  if (typeof recordLocStat === 'function' && G.location) recordLocStat(G.location, 'captured', 1);
+ } catch (_) {}
 
  if(wasShiny) unlockShinyForSpecies(e.id);
  const caughtMon = createPoke(e.id, 1, wasShiny || isSpeciesShiny(e.id));
@@ -139,7 +152,8 @@ function attemptAutoCatch(e){
    }
  }
 
- if(G.mine) G.mine.energy = Math.min(G.mine.maxEnergy||100, (G.mine.energy||0) + 15);
+ // FIX (2026-08): mine energy granted per capture rebalanced 15 -> 5.
+ if(G.mine) G.mine.energy = Math.min(G.mine.maxEnergy||100, (G.mine.energy||0) + _mineEnergyPerBattle());
  try { EventBus.emit(EVENTS.POKEMON_CAUGHT, { loc: G.location }); } catch(_){}
  try{ if(typeof syncShinyCharmProgress === 'function') syncShinyCharmProgress(); }catch(_){}
  updateHeader();
@@ -168,3 +182,4 @@ export {
   rollCaptureIv,
   attemptAutoCatch,
 };
+

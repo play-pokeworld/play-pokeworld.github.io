@@ -34,3 +34,4 @@ export class DashboardChromeView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

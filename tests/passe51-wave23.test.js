@@ -166,7 +166,10 @@ test('wave23: surface flattening + theme-aware borders', () => {
   const hIdx = CSS_NC.indexOf('height: var(--pw-header-h);');
   const headerRule = CSS_NC.slice(CSS_NC.lastIndexOf('}', hIdx) + 1, CSS_NC.indexOf('}', hIdx));
   assert.ok(headerRule.includes('.modal-title,'), 'located the universal panel-header rule');
-  assert.ok(headerRule.includes('background: var(--pw-bg-header);'), 'universal panel header on the per-theme token');
+  // Wave 34: dedicated per-theme token (see passe27 D for why --pw-bg-header
+  // itself could not be repointed). --pw-bg-panel-header resolves to --dark1,
+  // which every theme redeclares, so it stays theme-aware.
+  assert.ok(headerRule.includes('background: var(--pw-bg-panel-header);'), 'universal panel header on the per-theme token');
   assert.ok(!/linear-gradient/.test(headerRule), 'white sheen gradient deleted from panel headers');
 });
 
@@ -200,3 +203,4 @@ test('wave23: _repeatableRoll is declared AND mirrored by its sole consumer', ()
   // (window === globalThis au navigateur).
   assert.ok(QUEST_UI.includes('globalThis._repeatableRoll = _repeatableRoll;'), 'window mirrored for legacy readers');
 });
+

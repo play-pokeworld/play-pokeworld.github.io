@@ -173,3 +173,4 @@ if (typeof SHOPS !== 'undefined') { if (typeof window !== 'undefined') window.SH
 export {
   SHOPS,
 };
+

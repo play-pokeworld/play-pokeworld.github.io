@@ -212,3 +212,4 @@ décision. Régénérer après chaque instrumentation : \`node tools/trace-inven
 fs.writeFileSync(path.join(REPORTS, 'TRACE_ETAT_DES_LIEUX.md'), md);
 console.log(`trace-inventory: ${inventory.scannedFiles} files scanned → reports/trace-inventory.json + reports/TRACE_ETAT_DES_LIEUX.md`);
 console.log(`  beacons=${M.beacons} kinds=[${M.beaconKinds.join(',')}] actions=${M.uniqueActions} htmlActions=${M.htmlDataActions} timers(app/interval/timeout)=${M.timers.appBattleTimer}/${M.timers.setInterval}/${M.timers.setTimeout} renderers=${M.renderers} states=${M.states} events(on/emit)=${M.eventsOn}/${M.eventsEmit}`);
+

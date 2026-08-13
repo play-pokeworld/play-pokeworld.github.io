@@ -100,6 +100,12 @@ function startBattle(enemyPoke, isChamp, champId=null, champPokeList=null){
  if(activeScene){ activeScene.style.display = 'flex'; activeScene.classList.add('is-live'); } // wave 17: chrome (Résumé/Quitter) only exists while a battle is live (DS2817)
  clearBattleLog();
  G.pokedex[battle.enemyPoke.id]={...(G.pokedex[battle.enemyPoke.id]||{}),seen:true};
+ try {
+  const _encId = battle.enemyPoke.id;
+  const _encShiny = !!(battle.enemyPoke.shiny || battle.enemyPoke.shinyActive || battle.enemyPoke._forceShiny);
+  if (typeof recordDexEncounter === 'function') recordDexEncounter(_encId, _encShiny);
+  if (!isChamp && typeof recordLocStat === 'function' && G.location) recordLocStat(G.location, 'encountered', 1);
+ } catch (_) {}
 
  resetPlayerCd();
  resetEnemyCd();
@@ -297,3 +303,4 @@ export {
   getMoveCooldownMultiplier,
   stopBattleTimer,
 };
+

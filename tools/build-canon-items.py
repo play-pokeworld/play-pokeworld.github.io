@@ -324,3 +324,4 @@ json.dump({s: NAMES[s] for s in [it['s'] for it in items]}, open(names_path, 'w'
           ensure_ascii=False, indent=1, sort_keys=True)
 print('→', os.path.relpath(names_path, ROOT), '| paires fr/en')
 
+

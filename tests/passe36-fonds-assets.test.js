@@ -192,3 +192,4 @@ test('phase 36 E: examples in src/assets/images/secret-base/examples/ (removed)'
   assert.ok(!E(dir), '3D examples removed');
 });
 
+

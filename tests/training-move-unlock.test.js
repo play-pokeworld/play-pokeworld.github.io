@@ -383,3 +383,4 @@ test('the new categorization helpers are exposed on window', () => {
   assert.ok(GAME_HELPERS.includes('window.getSpeciesTrainingOnlyPool = getSpeciesTrainingOnlyPool'), 'getSpeciesTrainingOnlyPool not exposed');
 });
 
+

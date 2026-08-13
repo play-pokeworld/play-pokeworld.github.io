@@ -43,6 +43,7 @@
 import { UIView } from './UIView.js';
 import { UIRenderComponent } from '../../engine/components/UIRenderComponent.js';
 import { h, toHTMLString } from '../../engine/render/vdom.js';
+import { panelHeaderVNode } from '../components/panel-header.js';
 
 /* ─── NPC dialog (encounter OR battle-end, driven by the model) ───────── */
 
@@ -54,14 +55,13 @@ export class BaseNpcDialogView extends UIView {
   windowVNode() {
     const m = this.model;
     return [h('div', { class: 'pw-base-dialog' },
-      h('div', { class: 'modal-title' },
-        h('div', { class: 'pw-row' },
-          h('span', { class: 'pw-info-icon' },
-            h('img', { class: 'pw-base-portrait is-28', src: m.titleIconUrl || '', alt: '' })),
-          h('div', { class: 'pw-info-head-text' },
-            h('div', { class: 'pw-info-name' }, m.name || ''),
-            h('div', { class: `pw-text-sm pw-${m.subKind || 'light1'}` }, m.subText || ''))),
-        h('span', { class: 'modal-close', dataset: { action: 'legacy-call', call: 'closeBaseDialog', callArgs: '' } })),
+      panelHeaderVNode({
+        icon: h('img', { class: 'pw-base-portrait is-28', src: m.titleIconUrl || '', alt: '' }),
+        title: m.name || '',
+        subtitle: m.subText || '',
+        subtitleClass: `pw-${m.subKind || 'light1'}`,
+        close: { call: 'closeBaseDialog' },
+      }),
       h('div', { class: 'base-dlg-body' },
         h('div', { class: 'base-dlg-portrait' },
           h('img', { class: 'pw-base-portrait is-96', src: m.portraitUrl || '', alt: '' })),
@@ -154,13 +154,12 @@ export class BasePcDialogView extends UIView {
     const m = this.model;
     const stats = m.stats || null;
     return [h('div', { class: 'pw-base-dialog' },
-      h('div', { class: 'modal-title' },
-        h('div', { class: 'pw-row' },
-          h('span', { class: 'pw-info-icon' }, '🖥️'),
-          h('div', { class: 'pw-info-head-text' },
-            h('div', { class: 'pw-info-name' }, m.title || ''),
-            h('div', { class: 'pw-text-sm pw-light1' }, m.subText || ''))),
-        h('span', { class: 'modal-close', dataset: { action: 'legacy-call', call: 'closeBaseDialog', callArgs: '' } })),
+      panelHeaderVNode({
+        icon: '🖥️',
+        title: m.title || '',
+        subtitle: m.subText || '',
+        close: { call: 'closeBaseDialog' },
+      }),
       stats
         ? h('div', { class: 'pw-row base-dlg-stats' },
             h('span', null, (stats.visitsLabel || '') + ' ', h('b', null, String(stats.visits | 0))),
@@ -198,13 +197,11 @@ export class BaseNpcEditorView extends UIView {
   windowVNode() {
     const m = this.model;
     return [h('div', { class: 'pw-base-npced' },
-      h('div', { class: 'modal-title' },
-        h('div', { class: 'pw-row' },
-          h('span', { class: 'pw-info-icon' },
-            h('img', { class: 'pw-base-portrait is-28', src: m.titleIconUrl || '', alt: '' })),
-          h('div', { class: 'pw-info-head-text' },
-            h('div', { class: 'pw-info-name' }, m.title || ''))),
-        h('span', { class: 'modal-close', dataset: { action: 'legacy-call', call: 'closeBaseNpcEditor', callArgs: '' } })),
+      panelHeaderVNode({
+        icon: h('img', { class: 'pw-base-portrait is-28', src: m.titleIconUrl || '', alt: '' }),
+        title: m.title || '',
+        close: { call: 'closeBaseNpcEditor' },
+      }),
       // Wave 26 (user): everything between the header and the footer lives
       // in ONE scroller (.pw-base-npced / DS2826) — the team and the quote
       // fields no longer slide under the actions bar and off the sheet.
@@ -271,13 +268,12 @@ export class BaseNpcPickerView extends UIView {
   windowVNode() {
     const m = this.model;
     return [h('div', { class: 'pw-base-picker' },
-      h('div', { class: 'modal-title' },
-        h('div', { class: 'pw-row' },
-          h('span', { class: 'pw-info-icon' }, '🔍'),
-          h('div', { class: 'pw-info-head-text' },
-            h('div', { class: 'pw-info-name' }, m.title || ''),
-            h('div', { class: 'pw-text-sm pw-light1' }, m.sub || ''))),
-        h('span', { class: 'modal-close', dataset: { action: 'legacy-call', call: 'renderBaseNpcEditor', callArgs: '' } })),
+      panelHeaderVNode({
+        icon: '🔍',
+        title: m.title || '',
+        subtitle: m.sub || '',
+        close: { call: 'renderBaseNpcEditor' },
+      }),
       h('input', {
         class: 'dict-search preset-pick-search', value: m.searchValue || '',
         placeholder: m.searchPlaceholder || '',
@@ -326,13 +322,12 @@ export class BaseNpcItemPickerView extends UIView {
   windowVNode() {
     const m = this.model;
     return [h('div', { class: 'pw-base-picker' },
-      h('div', { class: 'modal-title' },
-        h('div', { class: 'pw-row' },
-          h('span', { class: 'pw-info-icon' }, h.raw(m.titleIconHtml || '')),
-          h('div', { class: 'pw-info-head-text' },
-            h('div', { class: 'pw-info-name' }, m.title || ''),
-            h('div', { class: 'pw-text-sm pw-light1' }, m.sub || ''))),
-        h('span', { class: 'modal-close', dataset: { action: 'legacy-call', call: 'renderBaseNpcEditor', callArgs: '' } })),
+      panelHeaderVNode({
+        iconHtml: m.titleIconHtml || '',
+        title: m.title || '',
+        subtitle: m.sub || '',
+        close: { call: 'renderBaseNpcEditor' },
+      }),
       h('div', { class: 'preset-pick-list pw-base-pick-scroll' },
         (m.rows || []).length
           ? (m.rows || []).map((r) => h('div', {
@@ -386,13 +381,12 @@ export class BaseNpcSpritePickerView extends UIView {
   windowVNode() {
     const m = this.model;
     return [h('div', { class: 'pw-base-picker' },
-      h('div', { class: 'modal-title' },
-        h('div', { class: 'pw-row' },
-          h('span', { class: 'pw-info-icon' }, '🎨'),
-          h('div', { class: 'pw-info-head-text' },
-            h('div', { class: 'pw-info-name' }, m.title || ''),
-            m.hint ? h('div', { class: 'pw-text-sm pw-light1' }, m.hint) : null)),
-        h('span', { class: 'modal-close', dataset: { action: 'legacy-call', call: m.closeCall || 'renderBaseNpcEditor', callArgs: '' } })),
+      panelHeaderVNode({
+        icon: '🎨',
+        title: m.title || '',
+        subtitle: m.hint || null,
+        close: { call: m.closeCall || 'renderBaseNpcEditor' },
+      }),
       h('input', {
         class: 'dict-search pw-base-looks-filter', value: m.filterValue || '',
         placeholder: m.filterPlaceholder || 'trainer-42...',
@@ -438,13 +432,12 @@ export class BaseNpcPresetPickerView extends UIView {
   windowVNode() {
     const m = this.model;
     return [h('div', { class: 'pw-base-picker' },
-      h('div', { class: 'modal-title' },
-        h('div', { class: 'pw-row' },
-          h('span', { class: 'pw-info-icon' }, '📋'),
-          h('div', { class: 'pw-info-head-text' },
-            h('div', { class: 'pw-info-name' }, m.title || ''),
-            h('div', { class: 'pw-text-sm pw-light1' }, m.hint || ''))),
-        h('span', { class: 'modal-close', dataset: { action: 'legacy-call', call: 'renderBaseNpcEditor', callArgs: '' } })),
+      panelHeaderVNode({
+        icon: '📋',
+        title: m.title || '',
+        subtitle: m.hint || '',
+        close: { call: 'renderBaseNpcEditor' },
+      }),
       h('div', { class: 'preset-pick-list pw-base-pick-scroll' },
         (m.rows || []).length
           ? (m.rows || []).map((r) => h('div', {
@@ -472,3 +465,4 @@ export class BaseNpcPresetPickerView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

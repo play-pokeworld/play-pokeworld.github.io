@@ -230,3 +230,4 @@ export {
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('renderInventory', renderInventory); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('setInvSearch', setInvSearch); } catch (_) {} }
+

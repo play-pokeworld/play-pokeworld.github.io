@@ -112,3 +112,4 @@ export {
   trainerProfileImg,
   staffSpriteImg,
 };
+

@@ -47,8 +47,8 @@ function makeEnv() {
   vm.createContext(sandbox);
   vm.runInContext("var _pwSetHtmlSafe = function (el, html) { if (typeof pwSetHtml === 'function') pwSetHtml(el, html); else el.innerHTML = html; };", sandbox); // repli passe 16 (slices de fonctions)
   vm.runInContext(
-    extract('pwInfoCaptureSource') + '\n' + extract('pwInfoBackLabel') + '\n' + extract('pwBuildInfoPanel') + '\n' + extract('pwInfoBack')
-      + '\nwindow.pwInfoCaptureSource = pwInfoCaptureSource;\nwindow.pwInfoBackLabel = pwInfoBackLabel;\nwindow.pwBuildInfoPanel = pwBuildInfoPanel;\nwindow.pwInfoBack = pwInfoBack;',
+    extract('pwInfoCaptureSource') + '\n' + extract('pwInfoBackLabel') + '\n' + extract('pwBuildInfoPanel') + '\n' + extract('pwResetInfoModalSurface') + '\n' + extract('pwInfoBack')
+      + '\nwindow.pwInfoCaptureSource = pwInfoCaptureSource;\nwindow.pwInfoBackLabel = pwInfoBackLabel;\nwindow.pwBuildInfoPanel = pwBuildInfoPanel;\nwindow.pwResetInfoModalSurface = pwResetInfoModalSurface;\nwindow.pwInfoBack = pwInfoBack;',
     sandbox,
     { filename: 'file-preflight.js#passe3' }
   );
@@ -84,6 +84,43 @@ test('pwInfoBack without a source simply closes the modal', () => {
   env.window.pwInfoBack();
   assert.equal(env.calls.length, 0, 'no navigation call');
   assert.equal(env.fakeModal.classList.contains('open'), false, 'modal closed');
+});
+
+// ── FIX (2026-08): leaving an info panel must free the modal surface ───────
+// Regression guard for the Pokédex detail sheet losing its scroll: the
+// `pw-info-modal` class (narrow info geometry) and the `.pw-panel-shell`
+// child (which triggers `overflow-y: hidden !important`) must both be gone
+// once pwInfoBack has run, whatever the origin.
+
+test('pwInfoBack clears the pw-info-modal class from #poke-modal', () => {
+  const env = makeEnv();
+  env.fakeModal.classList.add('pw-info-modal');
+  env.window._pwInfoSource = { kind: 'fs', panel: 'pokedex' };
+  env.window.pwInfoBack();
+  assert.equal(env.fakeModal.classList.contains('pw-info-modal'), false, 'info geometry dropped');
+  assert.deepEqual(env.calls[0], ['openFullscreenPanel', 'pokedex']);
+});
+
+test('pwInfoBack drops the .pw-panel-shell left inside #poke-modal-inner', () => {
+  const env = makeEnv();
+  let removed = false;
+  const inner = {
+    classList: { remove: () => {} },
+    style: { removeProperty: () => {} },
+    querySelector: (sel) => (sel.includes('pw-panel-shell') ? { remove: () => { removed = true; } } : null),
+  };
+  env.document.getElementById = (id) => (id === 'poke-modal' ? env.fakeModal : id === 'poke-modal-inner' ? inner : null);
+  env.fakeModal.classList.add('pw-info-modal');
+  env.window._pwInfoSource = null;
+  env.window.pwInfoBack();
+  assert.equal(removed, true, 'the leftover shell is removed');
+  assert.equal(env.fakeModal.classList.contains('pw-info-modal'), false, 'info geometry dropped');
+});
+
+test('pwResetInfoModalSurface is safe when the modal is absent', () => {
+  const env = makeEnv();
+  env.document.getElementById = () => null;
+  assert.doesNotThrow(() => env.window.pwResetInfoModalSurface());
 });
 
 // ── pwBuildInfoPanel: cross + button bound to pw-info-back, adapted label ──
@@ -282,4 +319,5 @@ test('team/battle card move pills pass context -1', () => {
   // SHEET lines keep their idx (behavior validated by the user)
   assert.ok(POKE_MODAL.includes("ctxMoveArgs"), 'sheet: idx context kept');
 });
+
 

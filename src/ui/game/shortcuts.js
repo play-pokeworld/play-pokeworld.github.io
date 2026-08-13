@@ -95,3 +95,4 @@ export function renderShortcutsWindow() {
 // Wave 41 — surface kept (ex `window.renderShortcutsWindow = …` inside
 // the IIFE): classic consumers, VM harnesses and the engine registry.
 if (typeof globalThis !== 'undefined') globalThis.renderShortcutsWindow = renderShortcutsWindow;
+

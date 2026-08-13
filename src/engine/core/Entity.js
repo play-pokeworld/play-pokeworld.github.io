@@ -101,3 +101,4 @@ export class Entity {
     this.world.destroyEntityTree(this.id);
   }
 }
+

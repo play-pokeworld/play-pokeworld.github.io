@@ -1,3 +1,4 @@
+import { panelHeaderHTML } from '../components/panel-header.js';
 /**
  * PokeWorld — UI Component System (Unified)
  * 
@@ -29,12 +30,20 @@ C.modal = function(title, body, opts) {
   const icon = opts.icon || '';
   const shell = opts.shell || 'default';
   const w = opts.w ? ' data-style="max-width:var(--pw-modal-w);" style="--pw-modal-w:' + opts.w + 'px"' : '';
-  return '<div class="modal-title"><div>' + icon + ' ' + ttl + '</div><span class="modal-close" data-action="close-poke-modal">\u2715</span></div>' +
+  // Wave 32: header built by THE shared constructor (components/panel-header.js).
+  return panelHeaderHTML({
+    iconHtml: icon,
+    titleHtml: ttl,
+    close: { action: 'close-poke-modal', glyph: '\u2715' }
+  }) +
     '<div class="pw-ui-window management-shell management-' + shell + '"' + w + '>' + body + '</div>';
 };
 
 C.modalSimple = function(title, body) {
-  return '<div class="modal-title"><div>' + title + '</div><span class="modal-close" data-action="close-poke-modal">\u2715</span></div>' + body;
+  return panelHeaderHTML({
+    titleHtml: title,
+    close: { action: 'close-poke-modal', glyph: '\u2715' }
+  }) + body;
 };
 
 // ─── BUTTON ───
@@ -242,3 +251,4 @@ C.actions = function(buttons) {
 export { C as Components };
 export default C;
 if (typeof globalThis !== 'undefined') globalThis.Components = C;
+

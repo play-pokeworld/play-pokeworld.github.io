@@ -123,3 +123,4 @@ export class SettingsModalView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

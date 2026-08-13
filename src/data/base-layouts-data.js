@@ -782,3 +782,4 @@ if (typeof globalThis !== 'undefined') {
 
 // --- Exported globals ---
 if (typeof baseLayoutId !== 'undefined') { if (typeof window !== 'undefined') window.baseLayoutId = baseLayoutId; if (typeof globalThis !== 'undefined') globalThis.baseLayoutId = baseLayoutId; }
+

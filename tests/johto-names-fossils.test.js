@@ -177,3 +177,4 @@ test('training: the slot card shows "Auto: on/off"', () => {
   assert.ok(EN_UI.includes('"training_auto_off"'), 'EN off');
 });
 
+

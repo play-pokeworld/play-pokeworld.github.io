@@ -84,9 +84,14 @@ function openUnifiedSelectorModal(actionType){
   _usmSubTab = 'box';
   // Hatchery slot in incubation with "Fossil" priority: open the fossils
   // tab directly (switching back to Pokemon stays possible).
-  if(String(actionType).startsWith('hatchery_queue_') && typeof hatcherySlotIsIncubation === 'function' && typeof hatcherySlotPriority === 'function'){
+  // Before the Johto eggs quest, Pokémon incubation is locked — land on fossils
+  // (only once the Pewter fossil quest has unlocked revival).
+  if(String(actionType).startsWith('hatchery_queue_') && typeof hatcherySlotIsIncubation === 'function'){
     const _slotN = Number(String(actionType).split('_').pop()) || 0;
-    if(hatcherySlotIsIncubation(_slotN) && hatcherySlotPriority(_slotN) === 'fossil') _usmSubTab = 'fossil';
+    const _breedLocked = (typeof isPokemonIncubationUnlocked === 'function') && !isPokemonIncubationUnlocked();
+    const _preferFossil = (typeof hatcherySlotPriority === 'function') && hatcherySlotPriority(_slotN) === 'fossil';
+    const _fossilsOk = typeof isFossilReviveUnlocked !== 'function' || isFossilReviveUnlocked();
+    if(hatcherySlotIsIncubation(_slotN) && _fossilsOk && (_preferFossil || _breedLocked)) _usmSubTab = 'fossil';
   }
   const modal = document.getElementById('unified-selector-modal');
   const titleEl = document.getElementById('usm-title');
@@ -214,15 +219,11 @@ function renderUnifiedGrid(){
   grid.classList.remove('usm-fossil-view');
 
   
-  // The fossils tab is also offered for a hatchery slot in breeding
-  // mode (phase 12: fossil revival from the hatchery).
-  let showFossilTab = (_usmAction === 'box_view' || _usmAction === 'hatchery');
-  if(!showFossilTab && String(_usmAction).startsWith('hatchery_queue_')){
-    const _slotN = Number(String(_usmAction).split('_').pop()) || 0;
-    showFossilTab = (typeof hatcherySlotIsIncubation === 'function')
-      ? hatcherySlotIsIncubation(_slotN)
-      : (((G.hatcheryModes && G.hatcheryModes[_slotN]) || 'exp') === 'breed');
-  }
+  // Fossils can be placed from any hatchery slot once quest 25 has started:
+  // sending one flips the slot to incubation. Before that quest the tab is
+  // hidden (revival is not a usable control yet).
+  const _fossilsOk = typeof isFossilReviveUnlocked !== 'function' || isFossilReviveUnlocked();
+  const showFossilTab = _fossilsOk && (_usmAction === 'box_view' || _usmAction === 'hatchery' || String(_usmAction).startsWith('hatchery_queue_'));
   if(subtabBar){
     if(showFossilTab){
       subtabBar.style.display = 'flex';
@@ -236,6 +237,21 @@ function renderUnifiedGrid(){
   }
 
   
+  // Incubation slot before the Johto eggs quest: the Pokémon tab is a lock
+  // notice — fossils stay the only legal deposit.
+  if(showFossilTab && _usmSubTab !== 'fossil' && String(_usmAction).startsWith('hatchery_queue_')){
+    const _slotN = Number(String(_usmAction).split('_').pop()) || 0;
+    const _isBreed = (typeof hatcherySlotIsIncubation === 'function')
+      ? hatcherySlotIsIncubation(_slotN)
+      : (((G.hatcheryModes && G.hatcheryModes[_slotN]) || 'exp') === 'breed');
+    if(_isBreed && typeof isPokemonIncubationUnlocked === 'function' && !isPokemonIncubationUnlocked()){
+      if(filterPanel){ filterPanel.replaceChildren(); filterPanel.style.display = 'none'; }
+      if(footer){ footer.replaceChildren(); footer.style.display = 'none'; }
+      _usmSetGridHtml(grid, `<div class="pw-empty-state box-filter-empty"><b>${t('hatchery_breeding_locked_title') || 'Reproduction inconnue'}</b><br>${t('hatchery_breeding_locked') || 'Il faut en apprendre plus sur la reproduction des Pokémon.'}</div>`, _usmPrevScroll);
+      return;
+    }
+  }
+
   if(showFossilTab && _usmSubTab === 'fossil'){
     grid.classList.remove('usm-modern-grid');
     grid.classList.add('usm-fossil-view');
@@ -483,6 +499,7 @@ function renderFossilTabContent(){
 }
 
 function sendFossilToHatchery(fossilKey, slotIdx){
+  if(typeof isFossilReviveUnlocked === 'function' && !isFossilReviveUnlocked()) return;
   const invQty = (G.inventory && G.inventory[fossilKey]) || 0;
   if(invQty < 1){ notify(t('no_fossil_left'),'var(--red)'); return; }
   // only take a FREE copy: units reserved in a waiting
@@ -512,9 +529,21 @@ function sendFossilToHatchery(fossilKey, slotIdx){
     notify(t('hatchery_full'),'var(--red)');
     return;
   }
+  // Fossils always incubate: flip the chosen slot to breed so Kanto
+  // (quest 25) can place a fossil without first opening the management menu.
+  if(!G.hatcheryModes) G.hatcheryModes = ['exp','exp','exp','exp'];
+  G.hatcheryModes[target] = 'breed';
+  try {
+    if (typeof ensureHatcheryAutomation === 'function') ensureHatcheryAutomation();
+    if (G.hatcheryAutomation && G.hatcheryAutomation.slots && G.hatcheryAutomation.slots[target]) {
+      G.hatcheryAutomation.slots[target].mode = 'breed';
+    }
+  } catch (_) {}
   G.inventory[fossilKey]--;
   if(G.inventory[fossilKey] <= 0) delete G.inventory[fossilKey];
-  G.hatchery[target] = { poke: null, isFossil: true, fossilKey: fossilKey, reviveId: pokeId, steps: 0, stepsReq: (typeof hatcheryStepsForPokemon === 'function' ? hatcheryStepsForPokemon(pokeId) : 50), mode: ((G.hatcheryModes[target] || 'exp') === 'breed' ? 'breed' : 'exp') };
+  G.hatchery[target] = { poke: null, isFossil: true, fossilKey: fossilKey, reviveId: pokeId, steps: 0, stepsReq: (typeof hatcheryStepsForPokemon === 'function' ? hatcheryStepsForPokemon(pokeId) : 50), mode: 'breed' };
+  try { if (typeof progressMainQuestType === 'function') progressMainQuestType('fossil_revive', 1); } catch (_) {}
+  try { if (typeof recordDexStat === 'function' && pokeId) recordDexStat(pokeId, 'hatcheryIncub', 1); } catch (_) {}
   saveGame();
   renderHatcheryWindow();
   notify(tr('fossil_sent_hatchery', {item:getItemName(typeof getFossilDisplayKey === 'function' ? getFossilDisplayKey(fossilKey) : fossilKey)}),'var(--green)');
@@ -749,3 +778,4 @@ if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.regis
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('openUnifiedSelectorModal', openUnifiedSelectorModal); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('setUsmSubTab', setUsmSubTab); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('sortUnifiedGrid', sortUnifiedGrid); } catch (_) {} }
+

@@ -1,3 +1,4 @@
+import { panelHeaderHTML } from '../ui/components/panel-header.js';
 // Wave 40 — native ESM module. The classic surface (window/globalThis) is
 // kept verbatim further down: classic consumers and VM harnesses.
 /**
@@ -150,10 +151,13 @@ function openItemInfo(key){
       ]
     }));
   } else {
-    _pwSetHtmlSafe(inner, '<div class="modal-title"><div class="pw-row">'
-      + itemSpriteHtml(key, 48)
-      + '<div><div>' + name + '</div><div class="pw-text-sm pw-light1">' + typeLabel + '</div></div></div>'
-      + '<span class="modal-close" data-action="pw-info-back"></span></div>');
+    // Wave 32: header built by THE shared constructor (components/panel-header.js).
+    _pwSetHtmlSafe(inner, panelHeaderHTML({
+      iconHtml: itemSpriteHtml(key, 48),
+      title: name,
+      subtitle: typeLabel,
+      close: { action: 'pw-info-back', glyph: false }
+    }));
   }
   if(typeof window.pwApplyWindowChrome==='function') window.pwApplyWindowChrome(inner); // wave 30: canonical window chrome
   if(typeof window.pwModalInfo==='function') window.pwModalInfo(true);
@@ -206,3 +210,4 @@ export {
   getItemSpriteUrl,
   itemSpriteHtml,
 };
+

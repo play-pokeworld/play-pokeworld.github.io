@@ -191,3 +191,4 @@ export {
   POKE_TALENTS,
   POKEMON_TALENTS,
 };
+

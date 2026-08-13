@@ -17,7 +17,7 @@ function hashString(s) {
 }
 
 export function initUpdateSystem(checkIntervalMs = 60 * 1000) {
-  if (typeof location === 'undefined' || location.protocol === 'file:') return;
+  if (typeof globalThis.location === 'undefined' || globalThis.location.protocol === 'file:') return;
 
   fetchVersionFingerprint().then((fp) => {
     if (fp) _initialFingerprint = fp;
@@ -72,8 +72,8 @@ export async function checkForAppUpdate() {
     }
     if (currentFp !== _initialFingerprint) {
       _updateAvailable = true;
-      if (typeof G !== 'undefined' && G) G.updateAvailable = true;
-      if (typeof updateHeader === 'function') updateHeader();
+      if (typeof globalThis.G !== 'undefined' && globalThis.G) globalThis.G.updateAvailable = true;
+      if (typeof globalThis.updateHeader === 'function') globalThis.updateHeader();
       if (typeof window !== 'undefined' && window.EventBus && window.EventBus.emit) {
         window.EventBus.emit('app:update-available', { fingerprint: currentFp });
       }
@@ -87,21 +87,21 @@ export async function checkForAppUpdate() {
 export function applyAppUpdate() {
   _updateAvailable = false;
   _bannerDismissed = false;
-  if (typeof G !== 'undefined' && G) {
-    delete G.updateAvailable;
-    delete G.updateBannerDismissed;
+  if (typeof globalThis.G !== 'undefined' && globalThis.G) {
+    delete globalThis.G.updateAvailable;
+    delete globalThis.G.updateBannerDismissed;
   }
-  if (typeof location !== 'undefined') {
-    location.reload();
+  if (typeof globalThis.location !== 'undefined') {
+    globalThis.location.reload();
   }
 }
 
 export function dismissAppUpdate() {
   _bannerDismissed = true;
-  if (typeof G !== 'undefined' && G) {
-    G.updateBannerDismissed = true;
+  if (typeof globalThis.G !== 'undefined' && globalThis.G) {
+    globalThis.G.updateBannerDismissed = true;
   }
-  if (typeof updateHeader === 'function') updateHeader();
+  if (typeof globalThis.updateHeader === 'function') globalThis.updateHeader();
 }
 
 export function resetUpdateBannerState() {
@@ -121,3 +121,4 @@ if (typeof globalThis !== 'undefined') {
   globalThis.checkForAppUpdate = checkForAppUpdate;
   globalThis.resetUpdateBannerState = resetUpdateBannerState;
 }
+

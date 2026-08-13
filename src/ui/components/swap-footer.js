@@ -40,3 +40,4 @@ export function swapFooterVNode(m) {
 export function swapFooterHTML(m) {
   return toHTMLString(swapFooterVNode(m));
 }
+

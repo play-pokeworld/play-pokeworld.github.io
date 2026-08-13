@@ -270,3 +270,4 @@ export function triggerEntryTalents(side) {
   if (side === 'enemy' || side === 'both') applyTalent(e, false);
   if (typeof globalThis.updateBattleUI === 'function') globalThis.updateBattleUI();
 }
+

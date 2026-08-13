@@ -169,3 +169,4 @@ test('integration: the item bonus (getHeldBuff) follows the carrier after swap',
   assert.equal(sb.getHeldBuff(B).atk, 0, 'B without bonus');
 });
 
+

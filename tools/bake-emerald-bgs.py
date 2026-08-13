@@ -869,3 +869,4 @@ if __name__ == '__main__':
         n = int(sys.argv[3]) if len(sys.argv) > 3 else 324
         render_atlas(theme, list(range(n)), os.path.join(ROOT, 'out', f'atlas_{theme}.png'))
 
+

@@ -78,3 +78,4 @@ export class MarketView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

@@ -80,3 +80,4 @@ test('wave29 regression: effContent is DECLARED (ES-module strict crash gone)', 
   assert.ok(!/var badge =[\s\S]{0,120}\beffContent = badge;[\s\S]{0,80}var effContentVar = typeof effContent/.test(pokeModalJs),
     'the old undeclared-assignment + typeof-guard pattern must be gone');
 });
+

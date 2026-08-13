@@ -136,6 +136,7 @@ function ensureHatcheryAutomation() {
   if (!G.hatcheryQueues) G.hatcheryQueues = [[], [], [], []];
   if (!G.hatcheryModes) G.hatcheryModes = ['exp', 'exp', 'exp', 'exp'];
   if (!Array.isArray(G.hatcheryPendingModes)) G.hatcheryPendingModes = [null, null, null, null];
+  try { normalizeHatcheryModesForUnlocks(); } catch (_) {}
 
   if (!a.slots || !Array.isArray(a.slots)) a.slots = [];
   const maxSlots = clamp(G.hatcheryMaxSlots || 1, 1, 4);
@@ -155,7 +156,60 @@ function ensureHatcheryAutomation() {
   return a;
 }
 
-// Mode of a slot (incubation = 'breeof ) — centralise for the UI and the selector.
+// Pokémon incubation (eggs / IV) unlocks when the Johto eggs quest (#111,
+// Route 34 Daycare) is completed. Fossil revival + mode switch unlock when
+// Kanto quest #25 (Pewter fossil lab) is the current quest or already done.
+const JOHTO_EGGS_QUEST_ID = 111;
+const KANTO_FOSSIL_QUEST_ID = 25;
+function isStoryQuestReached(questId, region, { completedOnly = false } = {}) {
+  if (typeof G === 'undefined' || !G) return false;
+  const done = G.completedQuests || {};
+  if (done[questId] || done[String(questId)]) return true;
+  try {
+    if (!completedOnly && Array.isArray(G.activeQuests)
+      && G.activeQuests.some((i) => i && i.cat === 'main' && Number(i.qid) === Number(questId))) {
+      return true;
+    }
+  } catch (_) {}
+  const story = (typeof STORY_QUESTS !== 'undefined' && Array.isArray(STORY_QUESTS)) ? STORY_QUESTS : null;
+  // Isolated unit tests do not load the campaign table — do not break them.
+  if (!story || !story.length) return true;
+  try {
+    if (G.mainStep) {
+      const chain = story.filter((q) => q && q.region === region);
+      const idx = chain.findIndex((q) => Number(q.id) === Number(questId));
+      if (idx < 0) return false;
+      const step = Number(G.mainStep[region]);
+      if (completedOnly) return step > idx;
+      return step >= idx;
+    }
+  } catch (_) {}
+  return false;
+}
+function isPokemonIncubationUnlocked() {
+  return isStoryQuestReached(JOHTO_EGGS_QUEST_ID, 'johto', { completedOnly: true });
+}
+function isFossilReviveUnlocked() {
+  return isStoryQuestReached(KANTO_FOSSIL_QUEST_ID, 'kanto');
+}
+function isHatcheryModeSwitchUnlocked() {
+  return isFossilReviveUnlocked();
+}
+function normalizeHatcheryModesForUnlocks() {
+  if (isHatcheryModeSwitchUnlocked()) return;
+  if (!G || !G.hatcheryModes) return;
+  for (let i = 0; i < G.hatcheryModes.length; i++) {
+    if (G.hatcheryModes[i] !== 'breed') continue;
+    const slot = G.hatchery && G.hatchery[i];
+    if (slot) continue;
+    G.hatcheryModes[i] = 'exp';
+    if (G.hatcheryAutomation && G.hatcheryAutomation.slots && G.hatcheryAutomation.slots[i]) {
+      G.hatcheryAutomation.slots[i].mode = 'exp';
+    }
+    if (Array.isArray(G.hatcheryPendingModes)) G.hatcheryPendingModes[i] = null;
+  }
+}
+// Mode of a slot (incubation = 'breed') — centralise for the UI and the selector.
 function hatcherySlotIsIncubation(slotIdx) {
   return ((G.hatcheryModes && G.hatcheryModes[slotIdx]) || 'exp') === 'breed';
 }
@@ -279,6 +333,10 @@ function addPokemonToHatcheryQueue(boxId, slotIdx = null, silent = false) {
       notify(t('hatchery_no_lvl100_passive'), 'var(--red)');
       return false;
     }
+    if (targetMode === 'breed' && !isPokemonIncubationUnlocked()) {
+      notify(t('hatchery_breeding_locked') || 'Il faut en apprendre plus sur la reproduction des Pokémon.', 'var(--red)');
+      return false;
+    }
     if (targetMode === 'breed' && p.level < 100) {
       notify(t('hatchery_only_lvl100_breed'), 'var(--red)');
       return false;
@@ -310,6 +368,8 @@ function addPokemonToHatcheryQueue(boxId, slotIdx = null, silent = false) {
       paid: paid,
       mode: targetMode,
     };
+    try { if (typeof progressMainQuestType === 'function') progressMainQuestType('egg_hatch', 1); } catch (_) {}
+    try { if (targetMode === 'breed' && typeof recordDexStat === 'function' && p && p.id) recordDexStat(p.id, 'hatcheryIncub', 1); } catch (_) {}
     saveGame();
     try {
       renderHatcheryWindow();
@@ -324,6 +384,12 @@ function addPokemonToHatcheryQueue(boxId, slotIdx = null, silent = false) {
     } catch (_) {}
     if (!silent) notify(tr('deposited_hatchery', { name: p.name }), 'var(--green)');
     return 'slot';
+  }
+
+  const queueMode = (G.hatcheryModes && G.hatcheryModes[targetSlotIdx]) || 'exp';
+  if (queueMode === 'breed' && !isPokemonIncubationUnlocked()) {
+    notify(t('hatchery_breeding_locked') || 'Il faut en apprendre plus sur la reproduction des Pokémon.', 'var(--red)');
+    return false;
   }
 
   const q = G.hatcheryQueues[targetSlotIdx] || [];
@@ -478,6 +544,7 @@ function fillHatcherySlotFromQueue(slotIdx) {
     // Strict FIFO: the head of the list goes — Pokemon or fossil.
     const fossilKey = fossilKeyOfQueueEntry(entry);
     if (fossilKey) {
+      if (!isFossilReviveUnlocked()) continue;
       const qty = (G.inventory && G.inventory[fossilKey]) || 0;
       if (qty < 1) continue; // fossil used in the meantime → skip it
       const reviveId = getFossilReviveId(fossilKey);
@@ -493,6 +560,7 @@ function fillHatcherySlotFromQueue(slotIdx) {
         stepsReq: hatcheryStepsForPokemon(reviveId),
         mode: 'breed',
       };
+      try { if (typeof progressMainQuestType === 'function') progressMainQuestType('fossil_revive', 1); } catch (_) {}
       if (typeof addBattleLog === 'function') addBattleLog(` [Pension] ${getItemName(fossilKey)} placé en incubation (slot #${slotIdx + 1}).`);
       return true;
     }
@@ -502,6 +570,7 @@ function fillHatcherySlotFromQueue(slotIdx) {
     const p = G.collection[key];
     if (!p || p.locked || isPokemonInTeamByUid(uid)) continue;
 
+    if (targetMode === 'breed' && !isPokemonIncubationUnlocked()) continue;
     if (targetMode === 'breed' && p.level < 100) continue;
     if (targetMode === 'exp' && p.level >= 100) continue;
 
@@ -532,6 +601,7 @@ function fillHatcherySlotFromQueue(slotIdx) {
       paid: paid,
       mode: targetMode,
     };
+    try { if (targetMode === 'breed' && typeof recordDexStat === 'function' && p && p.id) recordDexStat(p.id, 'hatcheryIncub', 1); } catch (_) {}
     return true;
   }
   return false;
@@ -620,7 +690,7 @@ function refillHatcheryQueueFromRules() {
   const pokePool = hatcheryCandidateEntries().filter((en) =>
     !queuedPoke.has(en.uid) && !busy.has(en.uid) && !isUidInAnyTrainingQueue(en.uid)
   );
-  const fossilPool = fossilQueueCandidates();
+  const fossilPool = isFossilReviveUnlocked() ? fossilQueueCandidates() : [];
 
   // Per-slot context (counters for the automatic priority switch).
   const isLv100Match = (en) => (en.p.level || 0) >= 100;
@@ -650,7 +720,7 @@ function refillHatcheryQueueFromRules() {
       if (c.mode === 'breed' && c.prefer === 'fossil' && fossilPool.length) {
         entry = fossilPool.shift(); usedType = 'fossil';
       }
-      if (entry === null) {
+      if (entry === null && !(c.mode === 'breed' && !isPokemonIncubationUnlocked())) {
         const pi = pokePool.findIndex((en) => (c.mode === 'breed' ? isLv100Match(en) : !isLv100Match(en)));
         if (pi !== -1) { entry = pokePool.splice(pi, 1)[0].uid; usedType = 'pokemon'; }
       }
@@ -778,6 +848,23 @@ function renderHatcheryQueuePreview(slotIdx, limit = 24) {
   return rows || `<div class="dict-muted">${t('queue_empty') || 'Vide'}</div>`;
 }
 
+// Incubation shiny roll: a shiny NEVER reverts to normal.
+// shinyHatched follows the DICE only — success = +1 even if this
+// individual was already shiny; failure = no increment (still shiny).
+function applyHatcheryShinyRoll(p) {
+  if (!p) return false;
+  const rolledShiny = typeof rollShiny === 'function' ? rollShiny(p.id) : false;
+  if (!rolledShiny) return false;
+  if (!(p.shinyUnlocked || p.shinyActive || p.shiny)) {
+    p.shinyUnlocked = true;
+    p.shinyActive = true;
+    p.shiny = true;
+    try { if (typeof unlockShinyForSpecies === 'function') unlockShinyForSpecies(p.id); } catch (_) {}
+  }
+  try { if (typeof recordDexStat === 'function' && p.id) recordDexStat(p.id, 'shinyHatched', 1); } catch (_) {}
+  return true;
+}
+
 function hatchEgg(slotIdx = 0) {
   if (!G.hatchery || !G.hatchery[slotIdx]) return;
   const slot = G.hatchery[slotIdx];
@@ -813,6 +900,7 @@ function hatchEgg(slotIdx = 0) {
       G.hatchery[slotIdx] = null;
       applyPendingHatcheryMode(slotIdx);
       if (typeof addStaffXp === 'function') addStaffXp('hatchery', 1);
+      try { if (typeof progressMainQuestType === 'function') progressMainQuestType('fossil_revive', 1); } catch (_) {}
       if (G.automation && G.automation.autoSeedHatchery) processHatcheryQueue();
       updateHeader(); renderTeamWindow(); renderHatcheryWindow();
       try { if (typeof saveGame === 'function') saveGame(); } catch(_){}
@@ -825,6 +913,7 @@ function hatchEgg(slotIdx = 0) {
     if (isShiny) {
       p.shinyUnlocked = true; p.shinyActive = true; p.shiny = true;
       unlockShinyForSpecies(reviveId);
+      try { if (typeof recordDexStat === 'function') recordDexStat(reviveId, 'shinyHatched', 1); } catch (_) {}
     }
   } else {
     p = slot.poke;
@@ -878,13 +967,7 @@ function hatchEgg(slotIdx = 0) {
     ivMsg = t('iv_money_bonus');
   }
   if (!slot.isFossil) {
-    const wasShiny = rollShiny(p && p.id);
-    if (wasShiny) {
-      p.shinyUnlocked = true;
-      p.shinyActive = true;
-      p.shiny = true;
-      unlockShinyForSpecies(p.id);
-    }
+    applyHatcheryShinyRoll(p);
   }
   p.level = 1;
   p.xp = xpForLevel(1);
@@ -894,11 +977,18 @@ function hatchEgg(slotIdx = 0) {
 
   const _hKey = (typeof generateUniqueBoxId==='function') ? generateUniqueBoxId(p.id) : (!G.collection[String(p.id)] ? String(p.id) : ('box_' + p.id + '_' + Date.now()));
       G.collection[_hKey] = p;
+  const hatchedWasFossil = !!slot.isFossil;
   G.hatchery[slotIdx] = null;
   // a pending mode change (incubation → day care) applies
   // now that the incubation is over.
   applyPendingHatcheryMode(slotIdx);
   if (typeof addStaffXp === 'function') addStaffXp('hatchery', 1);
+  try {
+    if (typeof progressMainQuestType === 'function') {
+      if (hatchedWasFossil) progressMainQuestType('fossil_revive', 1);
+      else progressMainQuestType('egg_hatch', 1);
+    }
+  } catch (_) {}
 
   if (G.automation && G.automation.autoSeedHatchery) {
     processHatcheryQueue();
@@ -933,6 +1023,7 @@ function getFossilInventory() {
 }
 
 function reviveFossil(fossilKey) {
+  if (!isFossilReviveUnlocked()) return;
   const invQty = (G.inventory && G.inventory[fossilKey]) || 0;
   if (invQty < 1) {
     notify(t('no_fossil_left'), 'var(--red)');
@@ -1043,6 +1134,7 @@ function toggleHatcherySlotMode(slotIdx) {
   if (!Array.isArray(G.hatcheryPendingModes)) G.hatcheryPendingModes = [null, null, null, null];
   const currentMode = G.hatcheryModes[slotIdx] || 'exp';
   const nextMode = currentMode === 'exp' ? 'breed' : 'exp';
+  if (nextMode === 'breed' && !isHatcheryModeSwitchUnlocked()) return;
   const occupied = !!(G.hatchery && G.hatchery[slotIdx]);
 
   // Phase 14 — switch to incubation while a non-Lv.100 Pokemon occupies
@@ -1238,6 +1330,12 @@ function toggleHatcheryAutomationSlot(slotIdx){
 // --- Migrated to ES module, globals exposed ---
 if (typeof setHatcherySlotAutomationOption !== 'undefined') { if (typeof window !== 'undefined') window.setHatcherySlotAutomationOption = setHatcherySlotAutomationOption; if (typeof globalThis !== 'undefined') globalThis.setHatcherySlotAutomationOption = setHatcherySlotAutomationOption; }
 if (typeof toggleHatcheryAutomationSlot !== 'undefined') { if (typeof window !== 'undefined') window.toggleHatcheryAutomationSlot = toggleHatcheryAutomationSlot; if (typeof globalThis !== 'undefined') globalThis.toggleHatcheryAutomationSlot = toggleHatcheryAutomationSlot; }
+if (typeof applyHatcheryShinyRoll !== 'undefined') { if (typeof window !== 'undefined') window.applyHatcheryShinyRoll = applyHatcheryShinyRoll; if (typeof globalThis !== 'undefined') globalThis.applyHatcheryShinyRoll = applyHatcheryShinyRoll; }
+if (typeof isPokemonIncubationUnlocked !== 'undefined') { if (typeof window !== 'undefined') window.isPokemonIncubationUnlocked = isPokemonIncubationUnlocked; if (typeof globalThis !== 'undefined') globalThis.isPokemonIncubationUnlocked = isPokemonIncubationUnlocked; }
+if (typeof isFossilReviveUnlocked !== 'undefined') { if (typeof window !== 'undefined') window.isFossilReviveUnlocked = isFossilReviveUnlocked; if (typeof globalThis !== 'undefined') globalThis.isFossilReviveUnlocked = isFossilReviveUnlocked; }
+if (typeof isHatcheryModeSwitchUnlocked !== 'undefined') { if (typeof window !== 'undefined') window.isHatcheryModeSwitchUnlocked = isHatcheryModeSwitchUnlocked; if (typeof globalThis !== 'undefined') globalThis.isHatcheryModeSwitchUnlocked = isHatcheryModeSwitchUnlocked; }
+if (typeof isStoryQuestReached !== 'undefined') { if (typeof window !== 'undefined') window.isStoryQuestReached = isStoryQuestReached; if (typeof globalThis !== 'undefined') globalThis.isStoryQuestReached = isStoryQuestReached; }
+if (typeof normalizeHatcheryModesForUnlocks !== 'undefined') { if (typeof window !== 'undefined') window.normalizeHatcheryModesForUnlocks = normalizeHatcheryModesForUnlocks; if (typeof globalThis !== 'undefined') globalThis.normalizeHatcheryModesForUnlocks = normalizeHatcheryModesForUnlocks; }
 if (typeof hatcherySlotIsIncubation !== 'undefined') { if (typeof window !== 'undefined') window.hatcherySlotIsIncubation = hatcherySlotIsIncubation; if (typeof globalThis !== 'undefined') globalThis.hatcherySlotIsIncubation = hatcherySlotIsIncubation; }
 if (typeof hatcherySlotPriority !== 'undefined') { if (typeof window !== 'undefined') window.hatcherySlotPriority = hatcherySlotPriority; if (typeof globalThis !== 'undefined') globalThis.hatcherySlotPriority = hatcherySlotPriority; }
 if (typeof toggleHatcherySlotPriority !== 'undefined') { if (typeof window !== 'undefined') window.toggleHatcherySlotPriority = toggleHatcherySlotPriority; if (typeof globalThis !== 'undefined') globalThis.toggleHatcherySlotPriority = toggleHatcherySlotPriority; }
@@ -1298,6 +1396,12 @@ if (typeof pokemonBaseStatTotal !== 'undefined') { if (typeof window !== 'undefi
 export {
   setHatcherySlotAutomationOption,
   toggleHatcheryAutomationSlot,
+  isPokemonIncubationUnlocked,
+  isFossilReviveUnlocked,
+  isHatcheryModeSwitchUnlocked,
+  isStoryQuestReached,
+  normalizeHatcheryModesForUnlocks,
+  applyHatcheryShinyRoll,
   hatcherySlotIsIncubation,
   hatcherySlotPriority,
   toggleHatcherySlotPriority,
@@ -1346,3 +1450,4 @@ export {
   isUidInHatchery,
   pokemonBaseStatTotal,
 };
+

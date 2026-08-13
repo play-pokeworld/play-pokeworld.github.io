@@ -137,3 +137,4 @@ export class Window {
     return this._isOpen;
   }
 }
+

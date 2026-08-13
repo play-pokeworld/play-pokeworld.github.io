@@ -7601,3 +7601,4 @@ export const MOVES = {
 // Wave 40 — surface kept (T2 template): prod (window === globalThis
 // in the browser), VM harnesses and classic consumers.
 if (typeof globalThis !== 'undefined') globalThis.MOVES = MOVES;
+

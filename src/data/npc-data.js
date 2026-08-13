@@ -54,7 +54,7 @@ var NPCS = {
    "quest": "s7"
   },
   {
-   "mainTalk": 19
+   "mainTalk": 20
   },
   {
    "quest": "s17"
@@ -85,10 +85,10 @@ var NPCS = {
    "quest": "s11"
   },
   {
-   "mainTalk": 31
+   "mainTalk": 35
   },
   {
-   "mainTalk": 32
+   "mainTalk": 36
   },
   {
    "quest": "s22"
@@ -118,7 +118,7 @@ var NPCS = {
    "board": true
   },
   {
-   "mainTalk": 39
+   "mainTalk": 43
   },
   {
    "quest": "s19"
@@ -127,7 +127,7 @@ var NPCS = {
    "quest": "s26"
   },
   {
-   "mainTalk": 42
+   "mainTalk": 46
   }
  ],
  "cinnabar": [
@@ -135,7 +135,7 @@ var NPCS = {
    "quest": "s13"
   },
   {
-   "mainTalk": 47
+   "mainTalk": 51
   },
   {
    "quest": "s27"
@@ -144,7 +144,7 @@ var NPCS = {
    "quest": "s28"
   },
   {
-   "mainTalk": 58
+   "mainTalk": 62
   }
  ],
  "indigo": [
@@ -177,7 +177,7 @@ var NPCS = {
    "quest": "s48"
   },
   {
-   "mainTalk": 121
+   "mainTalk": 122
   }
  ],
  "blackthorn": [
@@ -188,7 +188,7 @@ var NPCS = {
    "quest": "s55"
   },
   {
-   "mainTalk": 129
+   "mainTalk": 130
   }
  ],
  "ecruteak": [
@@ -240,7 +240,7 @@ var NPCS = {
    "quest": "s50"
   },
   {
-   "mainTalk": 120
+   "mainTalk": 121
   }
  ],
  "mahogany": [
@@ -259,7 +259,7 @@ var NPCS = {
    "quest": "s54"
   },
   {
-   "mainTalk": 123
+   "mainTalk": 124
   }
  ],
  "jroute29": [
@@ -830,3 +830,4 @@ if (typeof NPCS !== 'undefined') { if (typeof window !== 'undefined') window.NPC
 export {
   NPCS,
 };
+

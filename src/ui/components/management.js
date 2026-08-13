@@ -245,14 +245,14 @@ export function hatcherySlotCardVNode(m) {
             class: `hbtn hatchery-priority-toggle ${m.priority.current === 'fossil' ? 'is-fossil' : 'is-pokemon'}`,
             dataset: { action: 'legacy-call-stop', call: m.priority.call || '', callArgs: m.priority.args == null ? '' : String(m.priority.args) },
           }, m.priority.currentLabel || '')) : null,
-        h('div', { class: 'pw-hatchery-auto-control' },
-          h('span', null, (m.modeLabelCtl && m.modeLabelCtl.label) || ''),
-          m.modeBtn && m.modeBtn.call
-            ? h('button', {
+        m.modeBtn && m.modeBtn.call
+          ? h('div', { class: 'pw-hatchery-auto-control' },
+            h('span', null, (m.modeLabelCtl && m.modeLabelCtl.label) || ''),
+            h('button', {
               class: `hbtn hatchery-mode-toggle is-${m.modeBtn.mode || 'exp'}`,
               dataset: { action: 'legacy-call-stop', call: m.modeBtn.call || '', callArgs: m.modeBtn.args == null ? '' : String(m.modeBtn.args) },
-            }, m.modeBtn.label || '')
-            : h('span', { class: 'pw-johto-lock' }, (m.modeBtn && m.modeBtn.lockedLabel) || '')))),
+            }, m.modeBtn.label || ''))
+          : null)),
     automationRulesGridVNode(m.rules),
     m.queue ? queuePanelVNode(m.queue) : null);
 }
@@ -287,3 +287,4 @@ export function managementBlockVNode(block) {
 export function managementBlocksHTML(blocks) {
   return toHTMLString((blocks || []).map(managementBlockVNode).filter(Boolean));
 }
+

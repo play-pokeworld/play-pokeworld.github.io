@@ -141,3 +141,4 @@ test('wave21: views exported by the registry', () => {
   const idx = R('src/ui/views/index.js');
   assert.ok(idx.includes("export { PuzzleListView, PuzzleExplorationView, SpecialFormsView } from './PuzzleViews.js';"), 'PuzzleViews.js exports wired');
 });
+

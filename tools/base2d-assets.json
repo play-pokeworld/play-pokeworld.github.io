@@ -20,5 +20,7 @@
  "skip": "unused_* (sprites inutilisés GBA) et big_*_doll (les grandes poupées sont servies par graphics/decorations sans préfixe) ; put_away_cursor (curseur UI, pas une décoration ; 404 raw)",
  "skipList": [
   "put_away_cursor"
- ]
+ ],
+ "bakedBy": "tools/bake-emerald-bgs.py --bake-decor-all + --bake-canon (DECOR_MAP, objgfx, pc, stairs). Chairs, posters, TVs, mats, balloons, fences, PC and stairs are official Emerald metatiles, not standalone PNGs in pret/pokeemerald/graphics/decorations."
 }
+

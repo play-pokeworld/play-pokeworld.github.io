@@ -60,3 +60,4 @@ function getIcon(name, size) {
 export { ICONS, getIcon };
 if (typeof globalThis !== 'undefined') { globalThis.ICONS = ICONS; globalThis.getIcon = getIcon; }
 
+

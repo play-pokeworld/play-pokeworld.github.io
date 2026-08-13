@@ -89,14 +89,28 @@ function actionButtonVNode(action) {
 /** One slot card of the machine window. */
 function machineSlotVNode(slot) {
   // Variant 1 (hatchery empty slot): the whole card is ONE big offer button.
+  // Optional modeToggle sits beside it so the player can switch daycare /
+  // incubation without opening the management menu.
   if (slot.offer) {
-    return h('button', {
+    const offerBtn = h('button', {
       type: 'button',
       class: cx('hbtn', slot.offerClass, 'pw-machine-offer'),
       dataset: { action: 'legacy-call', call: slot.offer.call, callArgs: slot.offer.callArgs != null ? String(slot.offer.callArgs) : '' },
     },
       h('span', null, slot.offer.label),
       slot.offer.rightHtml ? h.raw(slot.offer.rightHtml) : null);
+    if (slot.modeToggle) {
+      return h('div', { class: cx('pw-machine-card', 'pw-hatchery-empty-slot', slot.cardClass, slot.classes) },
+        h('div', { class: 'pw-hatchery-empty-tools' }, actionButtonVNode(slot.modeToggle)),
+        offerBtn);
+    }
+    if (slot.modeLock) {
+      return h('div', { class: cx('pw-machine-card', 'pw-hatchery-empty-slot', slot.cardClass, slot.classes) },
+        h('div', { class: 'pw-hatchery-empty-tools' },
+          h('div', { class: 'pw-hatchery-mode-lock' }, slot.modeLock)),
+        offerBtn);
+    }
+    return offerBtn;
   }
   const isEmpty = !!slot.empty;
   return h('div', { class: cx('pw-machine-card', slot.cardClass, slot.classes) },
@@ -206,3 +220,4 @@ export function machineWindowVNode(model = {}) {
 export function machineWindowHTML(model = {}) {
   return toHTMLString(machineWindowVNode(model));
 }
+

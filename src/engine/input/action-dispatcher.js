@@ -486,3 +486,4 @@ function installCriticalClickFallback(root) {
 if (typeof installCriticalClickFallback !== 'undefined') { if (typeof window !== 'undefined') window.installCriticalClickFallback = installCriticalClickFallback; if (typeof globalThis !== 'undefined') globalThis.installCriticalClickFallback = installCriticalClickFallback; }
 
 export { callGlobal, installCriticalClickFallback };
+

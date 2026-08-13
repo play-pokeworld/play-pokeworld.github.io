@@ -698,3 +698,4 @@ if __name__ == '__main__':
         render3d(lid, os.path.join(EX_OUT, f'example_{lid}_3d.png'), {'items': [], 'npcs': []})
         render2d(lid, os.path.join(EX_OUT, f'example_{lid}_2d.png'), {'items': [], 'npcs': []})
 
+

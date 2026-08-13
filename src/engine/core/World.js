@@ -133,3 +133,4 @@ export class World extends ECSWorld {
     return this._handles.size;
   }
 }
+

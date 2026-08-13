@@ -360,3 +360,4 @@ test('Hoenn 20: evolution items without level restriction in the Bag (team and P
   sb.window.G.training = [{ poke: { id: 200, name: 'Roigada', level: 20 }, steps: 0, stepsReq: 10 }];
   assert.equal(sb.window.speciesOwned(200), true, 'speciesOwned recognizes Slowking (#200) in training');
 });
+

@@ -61,3 +61,4 @@ export function buildSpriteCircle(options = {}) {
 
   return wrap;
 }
+

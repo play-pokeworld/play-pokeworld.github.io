@@ -116,3 +116,4 @@ test('BoxView: battle lock banner, swap header, empty and filtered-empty states'
   assert.ok(emptyFiltered.full.includes('data-call="resetBoxFilters"'), 'reset offered when filters hide everything');
   assert.ok(emptyFiltered.full.includes('3 Pokémon masqués'), 'hidden count shown');
 });
+

@@ -352,3 +352,4 @@ test('phase 42/43 H: characters wired to the renderer (static player + NPC)', ()
   assert.ok(!v2.includes('people.hero'), 'no more people.hero reference in the renderer');
 });
 
+

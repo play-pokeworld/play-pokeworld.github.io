@@ -281,3 +281,4 @@ if ((typeof PokeActions === 'undefined' || !PokeActions || (typeof PokeActions.h
   && typeof queueMicrotask === 'function') {
   queueMicrotask(__pwV42RegisterCloseConfirm);
 }
+

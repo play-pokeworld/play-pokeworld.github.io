@@ -195,7 +195,9 @@ function setBattleSpeed(n) {
   if (!b) return;
   b.speed = n;
   document.querySelectorAll('#speed-toggle button').forEach(function(btn) {
-    btn.classList.toggle('active', +btn.dataset.spd === n);
+    const isActive = +btn.dataset.spd === n;
+    btn.classList.toggle('active', isActive);
+    btn.textContent = (isActive ? '✓ x' : 'x') + btn.dataset.spd;
   });
 }
 
@@ -245,3 +247,4 @@ export {
 // indirection instead of the window fallback); the window surface is kept for
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('setBattleSpeed', setBattleSpeed); } catch (_) {} }
+

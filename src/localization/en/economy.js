@@ -18,9 +18,11 @@ export const L_en_economy = {
 "market_owned":"Already Owned",
 "mine_chisel":"Chisel (1x1 deep, -5 Energy)",
 "mine_energy":"Drilling Energy",
-"mine_energy_hint":"+2 / sec · +15 per wild battle victory",
+"mine_energy_hint":"+{regen} / sec · +{perBattle} per wild battle victory",
 "mine_hammer":"Hammer (3x3 wide, -15 Energy)",
 "mine_new_layer":"New Layer Survey",
+"mine_treasure_buried":"Still buried",
+"mine_treasure_found":"Unearthed",
 "mine_treasures":"Excavated Treasures:",
 "no_evo_stone":"No evolution stones available.",
 "remove_q":"Remove",
@@ -38,3 +40,4 @@ export const L_en_economy = {
 // T2 (vague 38) : module ESM — export natif ; la surface classique est
 // gardée sur l'objet global pour les registres (data.js) et les harnais VM.
 if (typeof globalThis !== 'undefined') globalThis.L_en_economy = L_en_economy;
+

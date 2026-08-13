@@ -314,3 +314,4 @@ export {
 // moteur au lieu du fallback window) ; la surface window est conservée pour
 // les consommateurs classiques inter-modules (doublon documenté, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('setLanguage', setLanguage); } catch (_) {} }
+

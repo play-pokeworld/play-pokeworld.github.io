@@ -86,3 +86,4 @@ assert.ok(top < 400, `visible window is near the top (top=${Math.round(top)}px)`
 
 await browser.close();
 console.log('visual-wave31: OK — real session path, columns compute to `contents`, no void.');
+

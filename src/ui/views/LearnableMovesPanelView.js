@@ -37,6 +37,7 @@ import { UIView } from './UIView.js';
 import { UIRenderComponent } from '../../engine/components/UIRenderComponent.js';
 import { h, toHTMLString } from '../../engine/render/vdom.js';
 import { moveRowVNode } from '../components/move-row.js';
+import { panelHeaderVNode } from '../components/panel-header.js';
 
 export class LearnableMovesPanelView extends UIView {
   constructor(model) {
@@ -68,11 +69,11 @@ export class LearnableMovesPanelView extends UIView {
   windowVNode() {
     const m = this.model;
     return [
-      h('div', { class: 'modal-title' },
-        h('div', null,
-          m.title || '',
-          h('span', { style: { fontSize: '12px', color: 'var(--light1)', fontWeight: '400' } }, ` ${m.countLabel || ''}`)),
-        h('span', { class: 'modal-close', dataset: { action: 'close-poke-modal' } }, '✕')),
+      panelHeaderVNode({
+        title: m.title || '',
+        titleExtra: h('span', { class: 'pw-hdr-count' }, ` ${m.countLabel || ''}`),
+        close: { action: 'close-poke-modal', glyph: '✕' },
+      }),
       h('div', { class: 'poke-detail-moves-block', dataset: { learnablePanel: '1' } },
         (m.sections || []).map((sec) => this.sectionVNode(sec))),
       h('div', { class: 'pw-flex-center pw-gap-sm', style: { marginTop: '8px' } },
@@ -102,3 +103,4 @@ export class LearnableMovesPanelView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

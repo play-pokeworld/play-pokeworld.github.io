@@ -175,6 +175,7 @@ function setTrainingSlotPokemon(slotIndex, loc, idStr, p){
   G.selectedTraineeLoc = loc;
   G.selectedTraineeId = String(idStr);
  }
+ try { if (typeof recordDexStat === 'function' && p && p.id) recordDexStat(p.id, 'training', 1); } catch (_) {}
  saveGame();
  return true;
 }
@@ -546,6 +547,7 @@ function completeTrainingSlot(slotIndex, success=true){
   notify(tr('training_slot_failed', {name:trainee.name}), 'var(--red)');
  }
  if(typeof addStaffXp === 'function') addStaffXp('training', success ? 1 : 0.5);
+ try { if (typeof progressMainQuestType === 'function') progressMainQuestType('training_session', 1); } catch (_) {}
  if(success) {
    try {
      const active = (G.staff && G.staff.active && G.staff.active.training) || [];
@@ -1767,3 +1769,4 @@ export {
   trainingStartNextOpponent,
   unlockTrainingMove,
 };
+

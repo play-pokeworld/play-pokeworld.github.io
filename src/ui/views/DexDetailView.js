@@ -36,9 +36,10 @@
 import { UIView } from './UIView.js';
 import { UIRenderComponent } from '../../engine/components/UIRenderComponent.js';
 import { h, toHTMLString } from '../../engine/render/vdom.js';
+import { panelHeaderVNode } from '../components/panel-header.js';
 
 function sectionVNode(title, ...bodyNodes) {
-  return h('div', { class: 'pw-panel pw-info-section' },
+  return h('div', { class: 'pw-panel pw-info-section pw-dex-compact-section' },
     title ? h('div', { class: 'pw-section-title' }, h.raw(title)) : null,
     h('div', { class: 'pw-info-section-body' }, ...bodyNodes));
 }
@@ -57,12 +58,13 @@ export class DexDetailView extends UIView {
     const nodes = [];
 
     // ── Header (cross = close the sheet, contract unchanged) ────────
-    nodes.push(h('div', { class: 'modal-title poke-detail-title' },
-      h('div', { class: 'pw-dex-title-text' },
-        `#${m.id} `,
-        m.shiny ? h('span', { class: 'shiny-tag' }, '★') : null,
-        String(m.name || '')),
-      h('span', { class: 'modal-close', dataset: { action: 'close-poke-modal' } })));
+    nodes.push(panelHeaderVNode({
+      class: 'poke-detail-title',
+      titleProps: { class: 'pw-info-name pw-dex-title-text' },
+      title: `#${m.id} `,
+      titleExtra: [m.shiny ? h('span', { class: 'shiny-tag' }, '★') : null, String(m.name || '')],
+      close: { action: 'close-poke-modal' },
+    }));
 
     // ── Hero: canonical sprite disc + type badges (flat panel) ──────
     nodes.push(h('div', { class: 'pw-panel pw-dex-hero' },
@@ -105,16 +107,34 @@ export class DexDetailView extends UIView {
           }, String(tal.label))))
         : h('span', { class: 'dict-muted' }, String(m.noTalentsLabel || ''))));
 
-    // ── Base stats (shared stat cards, same as the info panels) ─────
+    // ── Base stats (compact inline cells — no oversized cards) ──────
     const stats = m.stats || [];
     if (stats.length) {
-      nodes.push(h('div', { class: 'pw-panel pw-info-section' },
+      nodes.push(h('div', { class: 'pw-panel pw-info-section pw-dex-compact-section' },
         m.statsLabel ? h('div', { class: 'pw-section-title' }, h.raw(m.statsLabel)) : null,
-        h('div', { class: 'pw-info-section-body' },
-          h('div', { class: 'pw-info-stat-cards pw-dex-stats' },
-            stats.map((s) => h('div', { class: 'pw-card-dark pw-center' },
-              h('div', { class: 'pw-text-sm pw-light1' }, String(s.label || '')),
-              h('div', { class: 'pw-text-lg pw-bold' }, String(s.value == null ? '' : s.value))))))));
+        h('div', { class: 'pw-dex-stats' },
+          stats.map((s) => h('div', { class: 'pw-dex-stat-cell' },
+            h('span', { class: 'pw-dex-stat-lbl' }, String(s.label || '')),
+            h('span', { class: 'pw-dex-stat-val' }, String(s.value == null ? '' : s.value)))))));
+    }
+
+    // ── Play records (grouped: combat / machines / shiny) ──────────
+    const groups = m.recordsGroups || [];
+    const flatRecords = m.records || [];
+    if (groups.length || flatRecords.length) {
+      nodes.push(h('div', { class: 'pw-panel pw-info-section pw-dex-compact-section' },
+        m.recordsLabel ? h('div', { class: 'pw-section-title' }, h.raw(m.recordsLabel)) : null,
+        groups.length
+          ? h('div', { class: 'pw-dex-records' },
+              groups.map((g) => h('div', { class: 'pw-dex-record-group' },
+                g.title ? h('div', { class: 'pw-dex-record-group-title' }, String(g.title)) : null,
+                ...(g.rows || []).map((r) => h('div', { class: 'pw-dex-record' },
+                  h('span', { class: 'pw-dex-record-lbl' }, String(r.label || '')),
+                  h('span', { class: 'pw-dex-record-val' }, String(r.value == null ? '0' : r.value)))))))
+          : h('div', { class: 'pw-dex-records' },
+              flatRecords.map((r) => h('div', { class: 'pw-dex-record' },
+                h('span', { class: 'pw-dex-record-lbl' }, String(r.label || '')),
+                h('span', { class: 'pw-dex-record-val' }, String(r.value == null ? '0' : r.value)))))));
     }
 
     return nodes;
@@ -138,3 +158,4 @@ export class DexDetailView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

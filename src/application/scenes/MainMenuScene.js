@@ -76,3 +76,4 @@ export class MainMenuScene extends Scene {
       || (el.style && el.style.display === 'flex'));
   }
 }
+

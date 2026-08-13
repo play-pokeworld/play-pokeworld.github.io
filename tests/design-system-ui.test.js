@@ -223,3 +223,4 @@ test('Data screens: fixed toolbars routed out of the scrollers, charm out of the
     assert.ok(m[1].includes(mode), `filters enabled for selector mode ${mode}`);
   }
 });
+

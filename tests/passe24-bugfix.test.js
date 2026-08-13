@@ -300,3 +300,4 @@ test('phase 24 #8: ability descriptions 100% French and complete', () => {
   assert.ok(sb.getTalentDesc('magmaarmor').includes('gel'), 'magmaarmor immunizes against freeze');
 });
 
+

@@ -47,6 +47,7 @@ import { h, toHTMLString } from '../../engine/render/vdom.js';
 import { cx } from '../components/component-utils.js';
 import { moveRowVNode } from '../components/move-row.js';
 import { statRowVNode, rankPanelVNode, talentBlockVNode, evoMethodsVNode, shinyToggleVNode, protectionBarVNode } from '../components/poke-detail.js';
+import { panelHeaderVNode } from '../components/panel-header.js';
 
 export class PokeDetailView extends UIView {
   constructor(model) {
@@ -67,12 +68,14 @@ export class PokeDetailView extends UIView {
     const moves = m.moves || {};
     return h('div', { class: 'pw-poke-detail-root' },
       // ── Title bar ─────────────────────────────────────────────────
-      h('div', { class: 'modal-title poke-detail-title' },
-        h('div', null, h.raw(m.titleHtml || '')),
-        h('span', {
-          class: 'modal-close',
-          dataset: { action: 'close-poke-modal', resetMoveEditor: 'true', resetBoxMove: 'true' },
-        }, '✕')),
+      panelHeaderVNode({
+        class: 'poke-detail-title',
+        titleHtml: m.titleHtml || '',
+        close: {
+          action: 'close-poke-modal', glyph: '✕',
+          dataset: { resetMoveEditor: 'true', resetBoxMove: 'true' },
+        },
+      }),
       // ── Hero + stats ──────────────────────────────────────────────
       h('div', { class: 'poke-detail-shell' },
         h('section', { class: 'poke-detail-hero' },
@@ -150,3 +153,4 @@ export class PokeDetailView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

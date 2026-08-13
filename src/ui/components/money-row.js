@@ -35,3 +35,4 @@ export function moneyRowVNode(model = {}) {
 export function moneyRowHTML(model = {}) {
   return toHTMLString(moneyRowVNode(model));
 }
+

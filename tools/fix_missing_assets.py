@@ -32,13 +32,10 @@ UA = {"User-Agent": "Mozilla/5.0 (PokeWorld asset fixer)"}
 # value: (source, optional tint)
 #   source = ("pokeapi", <name>) or ("pokeclicker", <path>)
 CUSTOM_MAP = {
-    # "Clé de Voûte" = Odd Keystone in French (FR item name)
-    "ancient_keystone": (("pokeapi", "odd-keystone"), None),
-    "frozen_keystone": (("pokeapi", "odd-keystone"), 0.58),   # recolored ice blue
-    "steel_keystone": (("pokeapi", "odd-keystone"), "gray"),  # recolored steel
-    "stoned_memory": (("pokeapi", "rock-memory"), None),
-    "foggy_seed": (("pokeapi", "misty-seed"), "fog"),         # recolored pale grey-blue
-    "link_stone": (("pokeapi", "dawn-stone"), 0.85),          # purple/link stone
+    # Prefer Pokeclicker when it ships a larger official sprite (see
+    # tools/pokeclicker-items.json). These leftovers are items that
+    # Pokeclicker does not have under the game's name.
+    "foggy_seed": (("pokeapi", "misty-seed"), None),  # official Misty Seed
 }
 
 
@@ -136,11 +133,37 @@ def _fetch_phase2(kind, name):
 def main():
     from PIL import Image  # noqa: F401  (PIL presence check)
 
+    # Merge tools/pokeclicker-items.json into PHASE2_MAP so a fresh
+    # checkout always prefers the larger Pokeclicker sprites.
+    try:
+        pc = json.loads((ROOT / "tools" / "pokeclicker-items.json").read_text(encoding="utf-8"))
+        for key, rel in (pc.get("items") or {}).items():
+            PHASE2_MAP.setdefault(key, ("pokeclicker", rel))
+        for key, title in (pc.get("bulba") or {}).items():
+            if key == "comment":
+                continue
+            PHASE2_MAP.setdefault(key, ("bulba", title))
+    except Exception as e:  # noqa: BLE001
+        print(f"pokeclicker-items.json: ignoré ({e})")
+
+    def _is_tiny(path):
+        if not path.exists():
+            return True
+        try:
+            from PIL import Image
+            return max(Image.open(path).size) <= 40
+        except Exception:  # noqa: BLE001
+            return path.stat().st_size < 800
+
     txt = (ROOT / "src" / "data" / "items-data.js").read_text(encoding="utf-8")
     keys = re.findall(r'^  "([a-z0-9_]+)"\s*:\s*\{', txt, re.M)
+    upgradeable = set(PHASE2_MAP) | set(CUSTOM_MAP)
     missing = [k for k in keys
-               if not (ITEMS_DIR / f"{k}.png").exists()
-               and not k.startswith(("ct", "cs"))]  # TM/HM -> tm_<type>.png already present
+               if not k.startswith(("ct", "cs"))
+               and (
+                   not (ITEMS_DIR / f"{k}.png").exists()
+                   or (k in upgradeable and _is_tiny(ITEMS_DIR / f"{k}.png"))
+               )]
     print(f"Missing items to process: {len(missing)}")
 
     names = {it["name"] for it in json.loads(fetch(POKEAPI_LIST_URL, binary=False))["results"]}
@@ -243,4 +266,5 @@ def _download_winky(dest):
 
 if __name__ == "__main__":
     sys.exit(main())
+
 

@@ -199,3 +199,4 @@ export class PokemonFactory {
       : this.createEnemyPokemon(world, spec);
   }
 }
+

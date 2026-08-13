@@ -295,3 +295,4 @@ export class UnifiedPokemonSelectorModal extends UIView {
     return out;
   }
 }
+

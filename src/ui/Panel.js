@@ -61,3 +61,4 @@ export class Panel {
     return this._element;
   }
 }
+

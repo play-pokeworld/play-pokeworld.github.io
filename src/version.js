@@ -15,3 +15,4 @@ export const PW_BUILD = 'w31 · 2026-08-07 22:41';
 
 if (typeof window !== 'undefined') window.PW_BUILD = PW_BUILD;
 if (typeof globalThis !== 'undefined') globalThis.PW_BUILD = PW_BUILD;
+

@@ -36,6 +36,7 @@
 import { UIView } from './UIView.js';
 import { UIRenderComponent } from '../../engine/components/UIRenderComponent.js';
 import { h, toHTMLString } from '../../engine/render/vdom.js';
+import { panelHeaderVNode } from '../components/panel-header.js';
 import {
   sessionStatGridVNode,
   summarySectionTitleVNode,
@@ -53,15 +54,14 @@ export class SessionSummaryView extends UIView {
 
   titleVNode() {
     const m = this.model;
-    return h('div', { class: 'modal-title' },
-      h('div', { id: 'battle-summary-title' }, m.title || ''),
-      h('button', {
-        type: 'button',
-        class: 'modal-close',
-        dataset: { action: 'close-battle-summary' },
-        'aria-label': m.closeLabel || '',
-        'data-i18n-aria-label': 'modal_close_btn',
-      }, '✕'));
+    return panelHeaderVNode({
+      title: m.title || '',
+      titleProps: { id: 'battle-summary-title' },
+      close: {
+        tag: 'button', action: 'close-battle-summary', glyph: '✕',
+        ariaLabel: m.closeLabel || '', i18nAriaLabel: 'modal_close_btn',
+      },
+    });
   }
 
   contentVNode() {
@@ -115,3 +115,4 @@ export class SessionSummaryView extends UIView {
     return toHTMLString((loot.chips || []).map(lootChipVNode));
   }
 }
+

@@ -28,6 +28,7 @@
 import { UIView } from './UIView.js';
 import { UIRenderComponent } from '../../engine/components/UIRenderComponent.js';
 import { h, toHTMLString } from '../../engine/render/vdom.js';
+import { panelHeaderVNode } from '../components/panel-header.js';
 
 export class InfoPanelView extends UIView {
   constructor(model) {
@@ -38,13 +39,13 @@ export class InfoPanelView extends UIView {
     const m = this.model;
     const nodes = [];
     // ── Header (cross = contextual back) ────────────────────────────
-    nodes.push(h('div', { class: 'modal-title pw-info-head' },
-      h('div', { class: 'pw-row' },
-        m.iconHtml ? h('span', { class: 'pw-info-icon' }, h.raw(m.iconHtml)) : null,
-        h('div', { class: 'pw-info-head-text' },
-          h('div', { class: 'pw-info-name' }, h.raw(m.title || '')),
-          m.subtitle ? h('div', { class: 'pw-text-sm pw-light1' }, h.raw(m.subtitle)) : null)),
-      h('span', { class: 'modal-close', dataset: { action: 'pw-info-back' } })));
+    nodes.push(panelHeaderVNode({
+      class: 'pw-info-head',
+      iconHtml: m.iconHtml || null,
+      titleHtml: m.title || '',
+      subtitleHtml: m.subtitle || null,
+      close: { action: 'pw-info-back' },
+    }));
     // ── Stat cards ──────────────────────────────────────────────────
     if (m.statCards && m.statCards.length) {
       nodes.push(h('div', { class: 'pw-info-stat-cards' },
@@ -90,3 +91,4 @@ export class InfoPanelView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

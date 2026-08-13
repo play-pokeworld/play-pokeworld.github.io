@@ -11,6 +11,9 @@ import { initUpdateSystem } from "./application/update-system.js";
 const __pwDeferredScreens = [];
 import "./version.js";
 import "./ui/components/window-chrome.js";
+// Wave 33: the four headers typed into index.html are rebuilt from the ONE
+// panelHeaderVNode() constructor at boot — see ui/components/static-headers.js
+import "./ui/components/static-headers.js";
 // Engine input system (action registry + dispatcher) + engine runtime classic
 // bridge (absorbed with the legacy bridge in wave T2).
 import "./engine/input/action-registry.js";
@@ -302,3 +305,4 @@ window.__pwBootContinuation = new Promise((resolve) => {
 // timer) was removed in wave 32: the file:// case is now detected
 // explicitly in index.html instead (see .gitignore: the bundle is a build
 // artefact, never committed).
+

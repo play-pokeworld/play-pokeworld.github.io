@@ -18,9 +18,11 @@ export const L_fr_economy = {
 "market_owned":"Déjà possédé",
 "mine_chisel":"Burin (1x1 profond, -5 Énergie)",
 "mine_energy":"Énergie de Forage",
-"mine_energy_hint":"+2 / sec · +15 par victoire sauvage",
+"mine_energy_hint":"+{regen} / sec · +{perBattle} par victoire sauvage",
 "mine_hammer":"Marteau (3x3 large, -15 Énergie)",
 "mine_new_layer":"Sondage (Nouvelle Couche)",
+"mine_treasure_buried":"Encore enfoui",
+"mine_treasure_found":"Déterré",
 "mine_treasures":"Trésors déterrés :",
 "no_evo_stone":"Aucune pierre d'évolution disponible.",
 "remove_q":"Retirer",
@@ -38,3 +40,4 @@ export const L_fr_economy = {
 // T2 (vague 38) : module ESM — export natif ; la surface classique est
 // gardée sur l'objet global pour les registres (data.js) et les harnais VM.
 if (typeof globalThis !== 'undefined') globalThis.L_fr_economy = L_fr_economy;
+

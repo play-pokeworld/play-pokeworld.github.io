@@ -43,7 +43,10 @@ function initializeGameInterface(){
  appTimer('mine-energy-recharge', () => {
  if(!window.PokeWorldGameStarted || !G.mine) return;
  if((G.mine.energy||0) < (G.mine.maxEnergy||100)){
- G.mine.energy = Math.min(G.mine.maxEnergy||100, (G.mine.energy||0) + 2);
+   // FIX (2026-08): single source of truth (GAME.MINE.ENERGY_REGEN), so the
+   // mine UI hint and the actual recharge can never disagree again.
+   const regen = (typeof MINE_ENERGY_REGEN === 'number') ? MINE_ENERGY_REGEN : 2;
+   G.mine.energy = Math.min(G.mine.maxEnergy||100, (G.mine.energy||0) + regen);
  const el = document.getElementById('mine-energy-val');
  const bar = document.getElementById('mine-energy-bar');
  if(el && bar){
@@ -270,3 +273,4 @@ export {
   initializeGameInterface,
   appTimer,
 };
+

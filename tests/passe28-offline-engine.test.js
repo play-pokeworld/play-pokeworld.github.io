@@ -480,3 +480,4 @@ test('phase 29 E: FR+EN localized title/steps', () => {
   assert.ok(R('src/assets/styles/design-system.css').includes('.afk-ff-stage'), 'stage line style');
 });
 
+

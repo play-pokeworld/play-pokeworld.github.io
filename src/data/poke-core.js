@@ -268,3 +268,4 @@ console.debug('[PokeCore] Engine initialized');
 export { PokeCore };
 export default PokeCore;
 if (typeof globalThis !== 'undefined') globalThis.PokeCore = PokeCore;
+

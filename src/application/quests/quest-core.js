@@ -275,7 +275,67 @@ function migrateQuestSaveV5(){
    if(inst && inst.cat === 'main'){ const s = shift(inst.qid); if(s != null) inst.qid = s; }
   }
  }
- G._questIdMigrationV5 = 5;
+  G._questIdMigrationV5 = 5;
+}
+
+function migrateQuestSaveV6(){
+ if(!G || (G._questIdMigrationV6 || 0) >= 6) return;
+ const shiftK = (id) => {
+   const n = Number(id);
+   if (n >= 17 && n <= 20) return n + 1;
+   if (n === 21) return n + 2;
+   if (n >= 22 && n <= 60) return n + 4;
+   return null;
+ };
+ const shiftJ = (id) => {
+   const n = Number(id);
+   if (n >= 111 && n <= 140) return n + 1;
+   return null;
+ };
+ if(G.mainStep && typeof G.mainStep.kanto === 'number'){
+   if (G.mainStep.kanto >= 22) G.mainStep.kanto += 4;
+   else if (G.mainStep.kanto >= 21) G.mainStep.kanto += 2;
+   else if (G.mainStep.kanto >= 16) G.mainStep.kanto += 1;
+ }
+ if(G.mainStep && typeof G.mainStep.johto === 'number' && G.mainStep.johto >= 10){
+   G.mainStep.johto += 1;
+ }
+ if(G.completedQuests && typeof G.completedQuests === 'object'){
+  const next = {};
+  for(const k of Object.keys(G.completedQuests)){
+   if(k.startsWith('side_')) { next[k] = G.completedQuests[k]; continue; }
+   const sk = shiftK(k), sj = shiftJ(k);
+   const s = (sk != null) ? sk : (sj != null) ? sj : null;
+   next[s != null ? String(s) : k] = G.completedQuests[k];
+  }
+  G.completedQuests = next;
+ }
+ if(G.questBaselines && G.questBaselines.kanto && typeof G.questBaselines.kanto === 'object'){
+  const next = {};
+  for(const k of Object.keys(G.questBaselines.kanto)){
+   const s = shiftK(k);
+   next[s != null ? String(s) : k] = G.questBaselines.kanto[k];
+  }
+  G.questBaselines.kanto = next;
+ }
+ if(G.questBaselines && G.questBaselines.johto && typeof G.questBaselines.johto === 'object'){
+  const next = {};
+  for(const k of Object.keys(G.questBaselines.johto)){
+   const s = shiftJ(k);
+   next[s != null ? String(s) : k] = G.questBaselines.johto[k];
+  }
+  G.questBaselines.johto = next;
+ }
+ if(Array.isArray(G.activeQuests)){
+  for(const inst of G.activeQuests){
+   if(inst && inst.cat === 'main'){
+     const sk = shiftK(inst.qid), sj = shiftJ(inst.qid);
+     const s = (sk != null) ? sk : (sj != null) ? sj : null;
+     if(s != null) inst.qid = s;
+   }
+  }
+ }
+ G._questIdMigrationV6 = 6;
 }
 
 function getRegionChain(region){ return STORY_QUESTS.filter(q=>q.region===region); }
@@ -316,6 +376,7 @@ function ensureQuestState(){
  try{ migrateQuestSaveV4(); }catch(_){}
  // V5 : quetes decouverte Base Secrete inserees (Hoenn 217-275 → 219-277).
  try{ migrateQuestSaveV5(); }catch(_){}
+ try{ migrateQuestSaveV6(); }catch(_){}
  if(!G.visitedMaps) G.visitedMaps={};
  if(!G.completedQuests) G.completedQuests={};
  if(!G.mainStep || typeof G.mainStep!=='object') G.mainStep={kanto:0, johto:0, hoenn:0};
@@ -417,7 +478,7 @@ function questDone(inst, def){
  if(def.targetBadge && G.badges.includes(def.targetBadge)) return true;
  return questProgressValue(inst, def) >= (def.target||1);
  }
- if(def.type==='talk') return questProgressValue(inst, def) >= (def.target||1);
+ if(def.type==='talk' || def.type==='hatchery_level' || def.type==='training_session' || def.type==='mine_items' || def.type==='fossil_revive' || def.type==='egg_hatch') return questProgressValue(inst, def) >= (def.target||1);
  if(def.type==='item') return !!(def.requiredItem && G.inventory && G.inventory[def.requiredItem] > 0);
  if(def.type==='trainer_battle'){
   if(G.questTrainerWins && G.questTrainerWins[def.battleId]) return true;
@@ -509,10 +570,16 @@ function claimQuest(qid, cat){
  : inst.def;
  if(!questDone(inst, def)){ notify(t("legacy_message_n_objectif_pas_encore_termin"),'var(--red)'); return; }
  if(def.rewardPoke && cat==='main'){
-   if(typeof battle !== 'undefined' && battle && battle.active){
-     notify(t('quest_battle_stop_current'), 'var(--blue)');
+   // FIX (2026-08) — same contract as startQuestTrainerBattle: a click during
+   // a battle only closes it; the reward encounter needs a second click, and
+   // never starts under an open battle summary.
+   if(_isBattleRunning()){
      try{ endBattle(); }catch(_){}
-     setTimeout(()=>{ try{ claimQuest(qid, cat); }catch(e){ console.error(e); } }, 350);
+     notify(t('quest_battle_stop_current'), 'var(--blue)');
+     return;
+   }
+   if(_isBattleSummaryOpen()){
+     notify(t('quest_battle_summary_open'), 'var(--red)');
      return;
    }
    if(!G.team || !G.team.length){
@@ -605,6 +672,17 @@ function completeQuestRewardBattle(qid){
  return true;
 }
 
+function progressMainQuestType(type, amount = 1) {
+  if (typeof G === 'undefined' || !G || !G.activeQuests) return false;
+  const inst = G.activeQuests.find(i => i.cat === 'main' && !i.done);
+  if (!inst) return false;
+  const def = getMainQuestDef(inst.qid);
+  if (!def || def.type !== type) return false;
+  const region = def.region || G.region || 'kanto';
+  G.mainProgress[region] = (Number(G.mainProgress[region]) || 0) + amount;
+  return true;
+}
+if (typeof globalThis !== 'undefined') globalThis.progressMainQuestType = progressMainQuestType;
 
 function talkNpcMainQuest(npc){
  if(!npc || npc.mainTalk==null) return false;
@@ -678,7 +756,16 @@ function startQuestDefeatBattle(locId){
  if(!G.team || !G.team.length){ notify(t('no_pokemon_in_team'), 'var(--red)'); return; }
  if(typeof hasActiveTrainingBattle === 'function' && hasActiveTrainingBattle()){ notify(t('training_in_progress_no_battle'), 'var(--red)'); return; }
  if(typeof canUseCurrentTeamForRegion === 'function' && !canUseCurrentTeamForRegion(G.region || 'kanto')){ notify(regionTeamRestrictionMessage(G.region || 'kanto'), 'var(--red)'); return; }
- if(battle && battle.active){ notify(t('battle_in_progress'), 'var(--red)'); return; }
+ // FIX (2026-08) — same contract as the "Défier" button of trainer quests:
+ // a click that finds a battle running only CLOSES it (the quest battle is
+ // started by a second, explicit click), and nothing may start while the
+ // end-of-battle summary is still on screen.
+ if(_isBattleRunning()){
+  try{ endBattle(); }catch(_){}
+  notify(t('quest_battle_stop_current'), 'var(--blue)');
+  return;
+ }
+ if(_isBattleSummaryOpen()){ notify(t('quest_battle_summary_open'), 'var(--red)'); return; }
  const pool = getQuestBattlePool(locId || G.location);
  const picked = pool[rand(0, pool.length-1)];
  const minLv = Number(picked[1] || picked[0] || 10);
@@ -696,16 +783,45 @@ function startQuestDefeatBattle(locId){
 }
 
 
+// FIX (2026-08) — shared guards for quest-initiated battles.
+// `battle` is a free identifier here (provided by the combat module through
+// the classic bridge), so every read is defensive.
+function _isBattleRunning(){
+ try{ return !!(typeof battle !== 'undefined' && battle && battle.active); }catch(_){ return false; }
+}
+function _isBattleSummaryOpen(){
+ try{
+  if(typeof document === 'undefined') return false;
+  const m = document.getElementById('battle-summary-modal');
+  return !!(m && m.classList && m.classList.contains('open'));
+ }catch(_){ return false; }
+}
+
 function startQuestTrainerBattle(qid, cat='main'){
  ensureQuestState();
  const inst = (G.activeQuests || []).find(i=>String(i.qid)===String(qid) && i.cat===cat);
  const def = inst ? getQuestDefinitionForInstance(inst) : (cat==='main' ? getMainQuestDef(qid) : null);
  if(!def || def.type !== 'trainer_battle') return;
  if(questDone(inst || {progress:0}, def)){ claimQuest(qid, cat); return; }
- if(typeof battle !== 'undefined' && battle && battle.active){
-  notify(t('quest_battle_stop_current'), 'var(--blue)');
+ // FIX (2026-08) — "Défier" while a battle is running.
+ // Before: the current battle was ended and the quest battle was re-armed on a
+ // 350 ms timer. endBattle() is asynchronous in its effects (end-of-battle
+ // hooks, summary panel, auto-catch, re-render), so the deferred call landed
+ // in an indeterminate state and the quest battle was regularly swallowed —
+ // the button looked like it did nothing, or a wild battle started instead.
+ // Now: a click that finds a battle running only CLOSES that battle and
+ // returns. The quest battle is started by a second, explicit click, once no
+ // battle is active. Nothing is scheduled behind the user's back.
+ if(_isBattleRunning()){
   try{ endBattle(); }catch(_){}
-  setTimeout(()=>{ try{ startQuestTrainerBattle(qid, cat); }catch(e){ console.error(e); } }, 350);
+  notify(t('quest_battle_stop_current'), 'var(--blue)');
+  return;
+ }
+ // Never start while the end-of-battle summary is still open: the summary
+ // belongs to the battle that just ended and starting a new battle underneath
+ // it leaves the panel stuck over the new fight.
+ if(_isBattleSummaryOpen()){
+  notify(t('quest_battle_summary_open'), 'var(--red)');
   return;
  }
  if(typeof hasActiveTrainingBattle === 'function' && hasActiveTrainingBattle()){ notify(t('training_in_progress_no_battle'), 'var(--red)'); return; }
@@ -852,4 +968,7 @@ export {
   _refreshUI,
   createTrainerBattleTeam,
   migrateQuestSaveV5,
+  migrateQuestSaveV6,
+  progressMainQuestType,
 };
+

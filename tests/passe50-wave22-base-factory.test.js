@@ -257,3 +257,4 @@ test('wave22: DS2822 tokens — flat fill, rank vars, pw-btn-danger collect', ()
   const collectRule = CSS_NC.split('button.hbtn.pw-base-flag-collect')[1].split('}')[0];
   assert.ok(collectRule.includes('width: 100%') && !/background|gradient/.test(collectRule), 'collect rule = layout only, colour inherited from the flat danger kind');
 });
+

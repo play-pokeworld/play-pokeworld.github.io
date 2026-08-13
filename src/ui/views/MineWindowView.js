@@ -97,9 +97,17 @@ export class MineWindowView extends UIView {
             h('div', null,
               h('span', { class: 'pw-bold' }, `${m.treasures.label} `,
                 h('span', { class: 'pw-light2' }, `${m.treasures.found} / ${m.treasures.total}`)),
-              h('div', { class: 'pw-field-text' },
-                ...(m.treasures.rows || []).map((row) => h('span', { class: cx('pw-mine-treasure', row.collected && 'is-collected') },
-                  `${row.collected ? '' : '❓ '}${row.name}`)))),
+              // Wave 32: buried vs unearthed is carried by the pill itself
+              // (background + name colour) and, once unearthed, by the item
+              // sprite placed BEFORE the name — no ❓/✔ marker.
+              h('div', { class: 'pw-field-text pw-mine-treasure-list' },
+                ...(m.treasures.rows || []).map((row) => h('span', {
+                  class: cx('pw-mine-treasure', row.collected && 'is-collected'),
+                  title: row.state ? `${row.name} — ${row.state}` : row.name,
+                  'aria-label': row.state ? `${row.name} — ${row.state}` : row.name,
+                },
+                  row.collected && row.iconHtml ? h.raw(row.iconHtml) : null,
+                  h('span', { class: 'pw-mine-treasure-name' }, row.name))))),
             h('button', { type: 'button', class: 'hbtn', dataset: { action: 'generate-mine-layer' } }, m.newLayerLabel || ''))
         : null);
   }
@@ -122,3 +130,4 @@ export class MineWindowView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

@@ -146,3 +146,4 @@ assert.deepEqual(uniqueFailures, [], 'F1 — zero failed network resource (404/5
 
 await browser.close();
 console.log('smoke-boot: OK — boot FR, real session, deferred screens, lazy languages, ECS-driven battle loop, 0 failed HTTP resource.');
+

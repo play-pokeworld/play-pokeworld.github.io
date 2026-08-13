@@ -80,3 +80,4 @@ if (typeof renderShop !== 'undefined') { if (typeof window !== 'undefined') wind
 export {
   renderShop,
 };
+

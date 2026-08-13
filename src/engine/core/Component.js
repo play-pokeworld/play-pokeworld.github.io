@@ -87,3 +87,4 @@ export class Component {
     this.enabled = false;
   }
 }
+

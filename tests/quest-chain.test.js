@@ -68,15 +68,15 @@ const kanto = STORY.filter((q) => q.region === 'kanto');
 const johto = STORY.filter((q) => q.region === 'johto');
 const TRAINER_QUESTS = STORY.filter((q) => q.type === 'trainer_battle');
 
-test('main chain: unique ids, Kanto 1-60 ordered, Johto 101-140, Rocket Tower at 26', () => {
-  assert.equal(STORY.length, 100, '100 main quests (60 Kanto + 40 Johto, steps 4 & 5)');
+test('main chain: unique ids, Kanto 1-64 ordered, Johto 101-141, Rocket Tower at 30', () => {
+  assert.equal(STORY.length, 105, '105 main quests (64 Kanto + 41 Johto, steps 4 & 5)');
   const ids = new Set(STORY.map((q) => q.id));
-  assert.equal(ids.size, 100, 'no duplicate id (getMainQuestDef does not filter by region!)');
+  assert.equal(ids.size, 105, 'no duplicate id (getMainQuestDef does not filter by region!)');
   kanto.forEach((q, i) => assert.equal(q.id, i + 1, `Kanto #${i} → id ${i + 1}`));
   johto.forEach((q, i) => assert.equal(q.id, 101 + i, `Johto #${i} → id ${101 + i}`));
-  assert.equal(kanto[25].type, 'trainer_battle', 'position 26 = combat de dresseur');
-  assert.equal(kanto[25].battleId, 'kanto_rocket_tower', 'Team Rocket at the Pokémon Tower (shifted to 26 in phase 21)');
-  assert.equal(kanto[25].loc, 'pokemontower', 'Rocket Tower located at Lavender Pokémon Tower');
+  assert.equal(kanto[29].type, 'trainer_battle', 'position 30 = combat de dresseur');
+  assert.equal(kanto[29].battleId, 'kanto_rocket_tower', 'Team Rocket at the Pokémon Tower (shifted to 30)');
+  assert.equal(kanto[29].loc, 'pokemontower', 'Rocket Tower located at Lavender Pokémon Tower');
   // Mr. Fuji's flute (id 27) always precedes route-12 Snorlax (id 27=item quest)
   const fluteSource = kanto.find((q) => q.rewardItems && q.rewardItems.pokeflute);
   const snorlax = kanto.find((q) => q.rewardPoke === 143);
@@ -244,13 +244,13 @@ test('V2 migration: endgame preserved (all quests done)', () => {
 
 test('phase 20 — Johto special rewards: red Gyarados, Dratini, movie-3 boss', () => {
   const byId = {}; for (const q of STORY) byId[q.id] = q;
-  assert.equal(byId[124].rewardPoke, 130, 'quest 124: Gyarados offered at the Lake of Rage');
-  assert.equal(byId[124].rewardShiny, true, 'quest 124: forced shiny (the red Gyarados!)');
-  assert.equal(byId[124].rewardLevel, 30, 'quest 124: Lv.30 (Lake of Rage canon)');
-  assert.equal(byId[130].rewardPoke, 147, 'quest 130: Dratini from the dragon trial');
-  assert.equal(byId[130].rewardLevel, 15, 'quest 130: Lv.15 (GS Dragon\'s Den canon)');
-  assert.equal(byId[114].type, 'trainer_battle', 'quest 114: scripted boss');
-  assert.equal(byId[114].battleId, 'johto_film3_entei', 'quest 114: Entei/Unown — Spell of the Unown');
+  assert.equal(byId[125].rewardPoke, 130, 'quest 125: Gyarados offered at the Lake of Rage');
+  assert.equal(byId[125].rewardShiny, true, 'quest 125: forced shiny (the red Gyarados!)');
+  assert.equal(byId[125].rewardLevel, 30, 'quest 125: Lv.30 (Lake of Rage canon)');
+  assert.equal(byId[131].rewardPoke, 147, 'quest 131: Dratini from the dragon trial');
+  assert.equal(byId[131].rewardLevel, 15, 'quest 131: Lv.15 (GS Dragon\'s Den canon)');
+  assert.equal(byId[115].type, 'trainer_battle', 'quest 115: scripted boss');
+  assert.equal(byId[115].battleId, 'johto_film3_entei', 'quest 115: Entei/Unown — Spell of the Unown');
 });
 
 test('V3 save migration: Johto 101-126 → 101-140 (phase 20), idempotent', () => {
@@ -283,7 +283,7 @@ test('V3 migration: Johto endgame preserved (26/26 old → complete chain)', () 
   const g = { mainStep: { kanto: 44, johto: 26 }, completedQuests: {}, questBaselines: {}, activeQuests: [] };
   sb.G = g;
   sb.migrateQuestSaveV3();
-  assert.equal(g.mainStep.johto, 40, '26/26 old quests → 40 (new complete chain)');
+  assert.equal(g.mainStep.johto, 41, '26/26 old quests → 41 (new complete chain)');
 });
 
 test('NPC: data and locations strictly parallel (every entry has name + FR/EN lines)', () => {
@@ -313,18 +313,18 @@ test('NPC: data and locations strictly parallel (every entry has name + FR/EN li
 
 test('phase 21 — Kanto special rewards: Eevee, Porygon, Lapras, Tyrogue (Dojo), Aerodactyl', () => {
   const byId = {}; for (const q of kanto) byId[q.id] = q;
-  assert.equal(byId[31].rewardPoke, 133, 'quest 31: Eevee from Celadon Mansion');
-  assert.equal(byId[31].rewardLevel, 25, 'quest 31: Lv.25 (FRLG canon)');
-  assert.equal(byId[32].rewardPoke, 137, 'quest 32: Game Corner Porygon');
-  assert.equal(byId[32].rewardLevel, 20, 'quest 32: Lv.20');
-  assert.equal(byId[39].rewardPoke, 131, 'quest 39: Silph Lapras');
-  assert.equal(byId[39].rewardLevel, 25, 'quest 39: Lv.25 (FRLG canon: Silph employee)');
-  assert.equal(byId[40].type, 'trainer_battle', 'quest 40: the Dojo is a scripted battle');
-  assert.equal(byId[40].battleId, 'kanto_dojo_master', 'quest 40: Karate King (Koichi, FRLG)');
-  assert.equal(byId[40].rewardPoke, 236, 'quest 40: gift = Tyrogue (hitmonlee OR hitmonchan path)');
-  assert.equal(byId[40].rewardLevel, 25, 'quest 40: Lv.25 (FRLG gift canon)');
-  assert.equal(byId[47].rewardPoke, 142, 'quest 47: Aerodactyl from the Cinnabar lab');
-  assert.equal(byId[47].rewardLevel, 30, 'quest 47: Lv.30');
+  assert.equal(byId[35].rewardPoke, 133, 'quest 35: Eevee from Celadon Mansion');
+  assert.equal(byId[35].rewardLevel, 25, 'quest 35: Lv.25 (FRLG canon)');
+  assert.equal(byId[36].rewardPoke, 137, 'quest 36: Game Corner Porygon');
+  assert.equal(byId[36].rewardLevel, 20, 'quest 36: Lv.20');
+  assert.equal(byId[43].rewardPoke, 131, 'quest 43: Silph Lapras');
+  assert.equal(byId[43].rewardLevel, 25, 'quest 43: Lv.25 (FRLG canon: Silph employee)');
+  assert.equal(byId[44].type, 'trainer_battle', 'quest 44: the Dojo is a scripted battle');
+  assert.equal(byId[44].battleId, 'kanto_dojo_master', 'quest 44: Karate King (Koichi, FRLG)');
+  assert.equal(byId[44].rewardPoke, 236, 'quest 44: gift = Tyrogue (hitmonlee OR hitmonchan path)');
+  assert.equal(byId[44].rewardLevel, 25, 'quest 44: Lv.25 (FRLG gift canon)');
+  assert.equal(byId[51].rewardPoke, 142, 'quest 51: Aerodactyl from the Cinnabar lab');
+  assert.equal(byId[51].rewardLevel, 30, 'quest 51: Lv.30');
   const dojo = sb.OFFICIAL_TEAMS.kanto_dojo_master;
   assert.ok(dojo, 'kanto_dojo_master team defined');
   assert.equal(dojo.team.length, 2, 'Dojo : 2 Pokémon (canon Koichi)');
@@ -368,7 +368,7 @@ test('V4 migration: Kanto endgame preserved (44/44 old → complete chain)', () 
   const g = { mainStep: { kanto: 44, johto: 40 }, completedQuests: {}, questBaselines: {}, activeQuests: [] };
   sb.G = g;
   sb.migrateQuestSaveV4();
-  assert.equal(g.mainStep.kanto, 60, '44/44 old quests → 60 (new complete chain)');
+  assert.equal(g.mainStep.kanto, 64, '44/44 old quests → 64 (new complete chain)');
 });
 
 test('repeatables: pass 21 adds targeted Kanto ones, region-filtered, FR/EN texts synced', () => {
@@ -393,4 +393,5 @@ test('repeatables: pass 21 adds targeted Kanto ones, region-filtered, FR/EN text
     }
   }
 });
+
 

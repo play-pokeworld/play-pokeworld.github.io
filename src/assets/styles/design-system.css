@@ -134,7 +134,21 @@
   padding: 0 !important;
 }
 
-.modal-title, .pw-panel-header, .pw-ui-window-header, .repeatable-upgrade-head,
+/* Wave 28 — `.modal-title` REMOVED from this legacy !important block.
+   Root cause of the header divergence: this early rule hard-forced
+   `padding:12px 16px !important` + `margin:0 !important` on `.modal-title`
+   but NOT on `.pw-modal-header`. The canonical header rule further down
+   (~line 6595, "IDENTICAL on all non-draggable panels") lists BOTH
+   selectors with `padding: 0 8px 0 14px; height: var(--pw-header-h)`, but
+   it has no `!important`, so it only ever won on `.pw-modal-header`.
+   Result: the panels built by openFullscreenPanel() (sac, marché, pokédex,
+   dictionnaire, guide) use `.pw-modal-header` and got the canonical look
+   = the reference; the panels built from `.modal-title` markup (boîte PC,
+   quêtes répétables, paramètres) were silently pinned to the legacy
+   geometry. Same intended component, two headers.
+   `.modal-title` now falls through to the canonical rule like everything
+   else; the other legacy selectors below keep their old treatment. */
+.pw-panel-header, .pw-ui-window-header, .repeatable-upgrade-head,
 .pw-trainer-head, .pw-header-row, .modal-footer, .pw-ui-window-footer, .pw-actions {
   margin: 0 !important;
   padding: 12px 16px !important;
@@ -198,6 +212,13 @@
 
 :root {
   --dark1: #36342F;
+  /* Wave 34: dedicated semantic token for THE panel header surface.
+     It is NOT --pw-bg-header: that token also paints toggle knobs, tutorial
+     bars, guide buttons and panel feet, so repointing it would repaint half
+     the UI to fix the headers. --dark1/--light1 are redeclared by every
+     theme, so this token follows the theme on its own. */
+  --pw-bg-panel-header: var(--dark1);
+  --pw-border-panel-header: var(--light1);
   --dark2: #444138;
   --dark3: #524f48;
   --light1: #C9BC9C; /* AA readability (was #94886B, 2.9 contrast on --panel) */
@@ -1032,16 +1053,13 @@ body { font-size: 13px; }
 #settings-inner *, #quest-inner *, #confirm-inner *, #poke-modal-inner *, #battle-summary-inner * { color: var(--light2); }
 #settings-inner .type-badge, #quest-inner .type-badge, #confirm-inner .type-badge, #poke-modal-inner .type-badge, #battle-summary-inner .type-badge { color: white; }
 
+/* Wave 33: the original `.modal-title` rule (15px, 16px bottom margin, 12px
+   bottom padding, hairline border) is retired. It described a THIRD header
+   shape that only survived because the canonical block came later in the
+   file — dead weight that made the real source of truth impossible to find.
+   Colour is kept; geometry belongs to the canonical block alone. */
 .modal-title {
-  font-size: 15px;
-  font-weight: bold;
   color: var(--light2);
-  margin-bottom: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--dark3);
 }
 
 .modal-close { cursor: pointer; color: var(--light2); font-size: 20px; font-weight: bold; }
@@ -1539,12 +1557,13 @@ body { font-size: 13px; }
 .theme-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 
 
+/* Wave 34: paint moved into the canonical `.modal-title` rule (it WAS the
+   reference look, applied here to one family only). Only the sticky
+   behaviour, which is specific to the fullscreen panel, remains. */
 #fullscreen-panel-modal > div > div:first-child {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--dark1);
-  border-bottom: 2px solid var(--light1);
 }
 
 #unified-selector-modal > div > div:nth-child(2) {
@@ -1581,7 +1600,12 @@ body, .hbtn, .tab, .mob-btn, .action-btn .ab-label,
 #notif, #msg-log,
 #header h1, #header .hinfo,
 .dash-win, .win-body,
-#quest-inner *, #settings-inner *,
+/* Wave 33: the blanket 13px hammer must NOT reach inside a panel header —
+   it was resizing the shared ✕ control down to 13px on the two panels whose
+   shell has an id in this list (réglages, quêtes), while the identical
+   control rendered at 17px everywhere else. The header owns its own sizes. */
+#quest-inner *:not(.modal-title):not(.modal-title *),
+#settings-inner *:not(.modal-title):not(.modal-title *),
 #battle-idle-screen *, #battle-summary-inner *,
 #usm-title, #fs-panel-title,
 .starter-card .poke-name,
@@ -1590,6 +1614,14 @@ body, .hbtn, .tab, .mob-btn, .action-btn .ab-label,
 }
 
 
+/* NB (wave 33): the header title size is NOT decided here any more. It is
+   `--pw-header-title-size`, applied by the canonical header block to
+   `.modal-title .pw-info-name`. The wave-28 note that used to sit here was
+   right that the reference panels measured 13px, but it drew the wrong
+   conclusion: it left `.pw-info-name` (15px/900) free to win inside the
+   rebranded headers, so the two families really did differ on screen.
+   The id entries above are harmless leftovers — the ids no longer carry
+   the title text (the constructor puts it on `.pw-info-name`). */
 .modal-title > div,
 .starter-card .poke-name,
 #battle-idle-screen div:nth-child(2),
@@ -1842,7 +1874,8 @@ button,
 @media (max-width: 600px) {
   .settings-row,
   .theme-grid { gap: 10px; }
-  .modal-title { min-height: 44px; }
+  /* Wave 33: no mobile-only header height — the band is 48px everywhere,
+     and the ✕ already grows to 40px under 850px. */
 }
 
 @media (max-width: 420px) {
@@ -1876,15 +1909,22 @@ button,
 
 
 
-button.modal-close,
+/* Wave 33 — `font: inherit` was the reason the ✕ rendered at 13px on the
+   panels whose close control is a <button> (réglages, quêtes, boîte PC) and
+   at 17px on the ones using a <span> (sac, marché, pokédex): the shorthand
+   resets font-size to the inherited header size and, being later in the
+   cascade than the canonical `.modal-close` rule, it won. Only the family
+   needs inheriting — the size belongs to the shared header tokens. */
 button.theme-swatch,
 button.tab {
   font: inherit;
 }
+button.modal-close {
+  font-family: inherit;
+}
 
 button.modal-close {
   background: transparent;
-  border: 0;
   padding: 0;
 }
 
@@ -2376,9 +2416,13 @@ button.tab {
 .pw-row-between{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .pw-bold.pw-text-sm{font-weight:bold;font-size: 13px}
 .pw-modal-container{background:var(--dark2);border:1px solid var(--dark3);border-radius:12px;width:95vw;max-width:960px;height:90vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,0.6);overflow:hidden}
-.pw-modal-header{background:var(--dark1);padding:12px 18px;border-bottom:2px solid var(--dark3);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;min-height:50px}
-.pw-modal-title{font-size:15px;font-weight:bold;color:var(--light2)}
-.pw-modal-close{cursor:pointer;font-size:22px;color:var(--light2);font-weight:bold}
+/* Wave 33 — the legacy `.pw-modal-header/-title/-close` geometry is GONE.
+   It described a second, disjoint header (dark1 background, 12px 18px
+   padding, 50px min-height, square corners, bare 22px ✕) that only the
+   fullscreen panels ever wore. Those panels now emit the canonical markup
+   through components/panel-header.js, so the shared rule owns the band and
+   these classes only keep their flex-shrink role. See the canonical block. */
+.pw-modal-header{flex-shrink:0}
 .pw-modal-search-bar{background:var(--dark1);padding:10px 18px;border-bottom:2px solid var(--dark3);flex-shrink:0;display:none}
 .pw-modal-body{flex:1;overflow-y:auto;padding:16px;background:var(--dark2)}
 .pw-tip.pw-text-sm{background:rgba(255,255,255,0.05);border-left:3px solid var(--light1);padding:8px 10px;border-radius:0 6px 6px 0;margin:8px 0;font-size:13px;color:#ddd;line-height:1.4}
@@ -2883,6 +2927,53 @@ button.tab {
   font-weight: bold;
 }
 
+/* ── Wave 32 (retour utilisateur) — liste des trésors de la mine ──────────
+ * Cause racine : `.pw-mine-treasure` était bien émis par MineWindowView mais
+ * n'avait AUCUNE règle ; les trésors héritaient donc du `.pw-field-text`
+ * parent (13px, --light1) et enfouis/déterrés se ressemblaient trait pour
+ * trait — seul un `❓` en préfixe les distinguait.
+ * Correctif : une vraie pastille par trésor. L'état est porté par le FOND et
+ * la couleur du nom (enfoui = surface sourde + bordure pointillée + nom
+ * atténué ; déterré = vert translucide + bordure pleine + nom clair), et le
+ * sprite de l'objet apparaît devant le nom une fois déterré. Pas de marqueur
+ * ❓/✔ : le fond suffit. L'état reste énoncé via title/aria-label. */
+.pw-mine-treasure-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.pw-mine-treasure {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1.5;
+  /* enfoui : surface sourde, contour pointillé, nom atténué */
+  background: rgba(148, 136, 107, 0.16);
+  border: 1px dashed var(--dark3);
+  color: var(--light1);
+  opacity: 0.75;
+  transition: background 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+.pw-mine-treasure.is-collected {
+  /* déterré : vert translucide, contour plein, nom clair et appuyé */
+  background: rgba(76, 175, 80, 0.22);
+  border: 1px solid var(--green);
+  color: var(--light2);
+  font-weight: 600;
+  opacity: 1;
+}
+.pw-mine-treasure-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+
 .quest-status {
   font-size: 13px;
   font-weight: bold;
@@ -3265,7 +3356,7 @@ button.tab {
   padding: 16px;
   background: linear-gradient(180deg, var(--dark2), var(--dark1));
 }
-.poke-detail-title { margin-bottom: 12px; }
+/* Wave 33: gap owned by --pw-header-gap in the canonical header block. */
 .poke-detail-id { color: var(--light1); font-size: 13px; }
 .poke-detail-shell {
   display: grid;
@@ -3363,9 +3454,35 @@ button.tab {
    the shared info panel. Flat hero panel with the canonical sprite disc
    (the old 144px radial-gradient orb is gone), framed .pw-panel sections
    and the shared .pw-info-stat-cards stat cards. */
-.pw-dex-hero { display:flex; flex-direction:column; align-items:center; gap:10px; padding:14px; }
-.pw-dex-hero-types { display:flex; flex-wrap:wrap; justify-content:center; gap:6px; }
-.pw-dex-flavor { line-height:1.6; }
+.pw-dex-hero { display:flex; flex-direction:row; align-items:center; gap:10px; padding:8px 10px; }
+.pw-dex-hero .pw-poke-circle-wrap { flex:0 0 auto; }
+.pw-dex-hero-copy { display:flex; flex-direction:column; gap:6px; min-width:0; flex:1; }
+.pw-dex-hero-types { display:flex; flex-wrap:wrap; justify-content:flex-start; gap:4px; }
+.pw-dex-flavor { line-height:1.4; margin:0; }
+.poke-detail-inner .pw-dex-compact-section { padding:8px 10px; margin-bottom:6px; }
+.poke-detail-inner .pw-dex-compact-section .pw-section-title { margin-bottom:6px; font-size:12px; }
+.pw-dex-stats { display:grid; grid-template-columns: repeat(6, 1fr); gap:4px; }
+.pw-dex-stat-cell { display:flex; flex-direction:column; align-items:center; gap:1px; padding:4px 2px; border-radius:6px; background:rgba(0,0,0,.18); }
+.pw-dex-stat-lbl { font-size:10px; font-weight:800; letter-spacing:.04em; color:var(--light1); text-transform:uppercase; }
+.pw-dex-stat-val { font-size:14px; font-weight:900; line-height:1.1; }
+.pw-dex-records { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:8px; }
+.pw-dex-record-group { background:rgba(0,0,0,.18); border-radius:8px; padding:6px 8px; }
+.pw-dex-record-group-title { font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--light1); margin-bottom:4px; }
+.pw-dex-record { display:flex; justify-content:space-between; align-items:baseline; gap:8px; min-height:18px; }
+.pw-dex-record-lbl { font-size:12px; color:var(--light1); }
+.pw-dex-record-val { font-size:13px; font-weight:800; }
+.pw-loc-play-stats { padding:8px 10px; margin-bottom:8px; }
+.pw-loc-play-stats-title { font-size:11px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; color:var(--light1); margin-bottom:6px; }
+.pw-loc-play-stats-row { display:grid; grid-template-columns: 1fr 1fr; gap:8px; }
+.pw-loc-play-stat { display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 4px; border-radius:8px; background:rgba(0,0,0,.18); }
+.pw-loc-play-stat-val { font-size:18px; font-weight:900; line-height:1.1; }
+.pw-loc-play-stat-lbl { font-size:11px; font-weight:700; color:var(--light1); }
+@media (max-width: 520px) {
+  .pw-dex-stats { grid-template-columns: repeat(3, 1fr); }
+  .pw-dex-records { grid-template-columns: 1fr; }
+  .pw-dex-hero { flex-direction:column; align-items:center; text-align:center; }
+  .pw-dex-hero-types { justify-content:center; }
+}
 /* 6 base stats read naturally in two rows of three (specificity tie-break:
    this rule sits before the shared .pw-info-stat-cards grid definition). */
 .pw-info-stat-cards.pw-dex-stats { grid-template-columns: repeat(3, 1fr); }
@@ -3941,22 +4058,8 @@ body.save-menu-active { overflow: hidden; }
   justify-content: flex-end;
 }
 
-.afk-modal-close {
-  cursor: pointer;
-  color: var(--light1);
-  font-size: 24px;
-  font-weight: 900;
-  width: 36px;
-  height: 36px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-}
-.afk-modal-close:hover {
-  background: color-mix(in srgb, var(--pw-text-primary) 14%, transparent);
-  color: var(--light2);
-}
+/* Wave 32 — `.afk-modal-close` removed: the AFK recap now uses the shared
+   `.modal-close` built by components/panel-header.js, like every panel. */
 
 
 
@@ -4875,12 +4978,10 @@ body.save-menu-active { overflow: hidden; }
 }
 
 #unified-selector-modal { z-index: 30000; }
-#poke-modal-inner.management-inner {
-  width: min(96vw, 920px);
-  min-height: min(70vh, 620px);
-  max-height: 90vh;
-  overflow-y: auto;
-}
+/* Wave 35: doublon mort supprimé — cette règle était intégralement écrasée
+   par `#poke-modal-inner.management-inner` plus bas (mêmes propriétés, même
+   spécificité). Deux règles identiques rendaient l'audit ambigu : c'est ce
+   doublon qui a d'abord fait croire que le padding de coque avait survécu. */
 #mine-window-body .mine-grid {
   display: grid;
   grid-template-columns: repeat(10, minmax(0, 1fr));
@@ -4979,6 +5080,15 @@ body.save-menu-active { overflow: hidden; }
 }
 /* State colors: fixed FLAT pairs live in DS2811 (end of file) — user rule,
    no gradients on colored controls. */
+/* Wave 35 (user): the three management panels (mine / pension /
+   entraînement) placed their header DIFFERENTLY from every other panel.
+   The header markup was already the shared one — the defect was here, on
+   the HOST: a 16px shell padding pushed the header 17px inwards and made
+   it 34px narrower than its panel, while every reference panel lets its
+   header span the full width flush to the border (measured: reference
+   offset 1px = the border alone, management offset 17px).
+   Same remedy as wave 28 for #settings-inner: the shell no longer pads,
+   the inset moves onto the scrolling content below the header. */
 #poke-modal-inner.management-inner {
   width: min(96vw, 980px);
   height: min(84vh, 760px);
@@ -4987,14 +5097,15 @@ body.save-menu-active { overflow: hidden; }
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
+  gap: 0;
+  padding: 0;
   background: linear-gradient(180deg, var(--dark2), var(--dark1));
 }
+/* Wave 33: the management header (mine / pension / entraînement) kept a
+   local 10px bottom padding + its own hairline border, which made its band
+   taller and flatter-edged than the reference. Layout role only now. */
 #poke-modal-inner.management-inner .management-title {
   flex: 0 0 auto;
-  border-bottom: 1px solid rgba(236,222,183,0.22);
-  padding-bottom: 10px;
 }
 .management-shell {
   flex: 1 1 auto;
@@ -5002,6 +5113,10 @@ body.save-menu-active { overflow: hidden; }
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   gap: 12px;
+  /* Wave 35: the 16px the panel shell used to apply to EVERYTHING (header
+     included) now applies only to the content under the header. */
+  padding: 0 16px 16px;
+  box-sizing: border-box;
 }
 .management-tabs {
   position: sticky;
@@ -5206,15 +5321,15 @@ body.save-menu-active { overflow: hidden; }
 .training-slot-actions .hbtn {
   min-height: 36px;
 }
-#poke-modal-inner.poke-detail-inner .poke-detail-title,
-#settings-inner > .modal-title {
+/* Wave 28: `#settings-inner > .modal-title` dropped from this pair — the
+   vertical padding here fought the canonical fixed-height header.
+   Wave 33: the same fight remained for the pokédex detail sheet (it kept
+   `padding-top/bottom` + a 1px bottom border, so its band was taller and
+   thinner-edged than the reference). Only sticky positioning is local. */
+#poke-modal-inner.poke-detail-inner .poke-detail-title {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: var(--pw-bg-header);
-  border-bottom: 1px solid var(--pw-border-color);
-  padding-top: 6px;
-  padding-bottom: 10px;
 }
 #settings-inner {
   overflow-y: auto;
@@ -5258,19 +5373,17 @@ body.save-menu-active { overflow: hidden; }
   .hatchery-auto-layout .automation-toggle-row,
   .automation-two-cols { grid-template-columns: 1fr; }
 }
+/* Wave 33: the pokédex detail header kept its own bleed (-16px, 14px 16px
+   10px padding, top-only radius). It is the same component as every other
+   panel header — only the sticky offset stays local. */
 #poke-modal-inner.poke-detail-inner .poke-detail-title {
-  top: -16px;
-  margin: -16px -16px 12px;
-  padding: 14px 16px 10px;
-  width: calc(100% + 32px);
-  border-radius: 12px 12px 0 0;
+  top: 0;
 }
+/* Wave 33: this rule used to re-flatten the settings header (margin 0,
+   top-only 12px radius) after the canonical block had already shaped it.
+   Only the sticky offset is legitimately local now. */
 #settings-inner > .modal-title {
-  top: -18px;
-  margin: -18px -18px 12px;
-  padding: 14px 18px 10px;
-  width: calc(100% + 36px);
-  border-radius: 12px 12px 0 0;
+  top: 0;
 }
 .status-badge {
   text-transform: uppercase;
@@ -5735,7 +5848,7 @@ buttonbutton.quest-claim-btn.is-done:not(.is-challenge) {
 .pw-static-014{width:16px;height:16px}
 .pw-static-015{display:flex;flex:1;overflow-y:auto;overflow-x:hidden;background:transparent;padding:6px;gap:8px;min-height:100%;height:auto;position:relative}
 .pw-static-016{flex:1;display:flex;flex-direction:column;gap:8px;height:auto;overflow:visible;min-width:240px}
-.pw-static-021{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--dark3);border-radius:8px;overflow:visible;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto}
+.pw-static-021{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--dark3);border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto}
 .pw-static-022{padding:8px;background:var(--panel);gap:6px;overflow:visible;height:auto}
 .pw-static-023{padding:0;background:transparent}
 .pw-static-024{display:none;flex-direction:column;background:var(--panel);border:1px solid var(--dark3);border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto}
@@ -5745,11 +5858,13 @@ buttonbutton.quest-claim-btn.is-done:not(.is-challenge) {
 .pw-static-028{margin-left:12px}
 .pw-static-029{background:var(--dark1);color:var(--light2);border:1px solid var(--pw-border-color);padding:3px 8px;border-radius:4px;font-size: 13px;font-weight:bold;cursor:pointer}
 .pw-static-030{background:var(--pw-map-surface);overflow:hidden;flex:1}
-.pw-static-031{display:flex;flex-direction:column;background:var(--dark2);border:1px solid var(--dark3);border-radius:8px;overflow:visible;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto}
+.pw-static-031{display:flex;flex-direction:column;background:var(--dark2);border:1px solid var(--dark3);border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto}
 .pw-static-032{padding:10px;gap:10px;background:var(--dark2);height:auto;overflow:visible}
 .pw-static-033{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:20px;text-align:center;color:var(--light1);gap:14px}
 .pw-static-034{font-size: 15px;animation:pulse 2s infinite}
-.pw-static-035{font-size: 15px;font-weight:bold;color:var(--light2)}
+/* Wave 33: `#usm-title` is a canonical header title — size/weight come from
+   the shared header block, not from this hoisted legacy inline style. */
+.pw-static-035{color:var(--light2)}
 .pw-static-036{font-size: 13px;max-width:280px}
 .pw-static-037{display:none;flex-direction:column;gap:10px;flex:0 0 auto;height:auto;overflow:visible}
 .pw-static-038{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
@@ -5764,14 +5879,15 @@ buttonbutton.quest-claim-btn.is-done:not(.is-challenge) {
 button.pw-static-045[data-action]{width:100%;background:var(--red) !important;color:#fff;font-weight:bold;font-size: 13px;padding:10px;border:2px solid var(--red) !important;border-radius:8px;cursor:pointer;transition:0.2s}
 .pw-static-046{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--dark3);border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto}
 .pw-static-047{padding:8px;background:var(--panel);display:flex;flex-direction:column;gap:6px}
-.pw-static-048{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--dark3);border-radius:8px;overflow:visible;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto;min-height:280px}
+.pw-static-048{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--dark3);border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex:0 0 auto;height:auto;min-height:280px}
 .pw-static-049{display:flex;flex-direction:column;flex:0 0 auto;height:auto;overflow:visible;background:var(--panel)}
 .pw-static-050{display:flex;flex-wrap:wrap;border-bottom:2px solid var(--pw-border-color);flex-shrink:0}
 .pw-static-051{padding:10px;background:var(--panel);height:auto;overflow:visible}
 .pw-static-052{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:270;display:none;align-items:center;justify-content:center;padding:16px}
 .pw-static-053{background:var(--panel);border:1px solid var(--dark3);border-radius:12px;width:95vw;max-width:960px;height:90vh;display:flex;flex-direction:column;box-shadow:0 0 35px rgba(148,136,107,0.25);overflow:hidden}
-.pw-static-054{padding:12px 18px;border-bottom:1px solid var(--dark3);display:flex;align-items:center;justify-content:space-between;background:var(--dark1)}
-.pw-static-055{cursor:pointer;font-size: 15px;color:var(--light2)}
+/* Wave 33: the box-PC header defers entirely to the canonical block. */
+.pw-static-054{flex-shrink:0}
+.pw-static-055{cursor:pointer}
 .pw-static-056{padding:10px 18px;background:var(--dark2);border-bottom:1px solid var(--dark3);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
 .pw-static-057{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .pw-static-058{font-size: 13px;color:var(--light1)}
@@ -6068,26 +6184,12 @@ button.pw-static-045[data-action]{width:100%;background:var(--red) !important;co
 }
 
 /* ─── Modal parts ─── */
+/* Wave 33: the duplicate legacy header block that lived here is retired for
+   the same reason as its twin (~line 2399) — it re-declared a competing
+   geometry for the reference panels. The canonical header rule is the only
+   place where a panel header is described. */
 .pw-modal-header {
-  background: var(--dark1);
-  padding: 12px 18px;
-  border-bottom: 2px solid var(--dark3);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   flex-shrink: 0;
-  min-height: 50px;
-}
-.pw-modal-title {
-  font-size: 15px;
-  font-weight: bold;
-  color: var(--light2);
-}
-.pw-modal-close {
-  cursor: pointer;
-  font-size: 22px;
-  color: var(--light2);
-  font-weight: bold;
 }
 .pw-modal-body {
   flex: 1;
@@ -6346,6 +6448,10 @@ button.pw-static-045[data-action]{width:100%;background:var(--red) !important;co
 .pw-chip-group { display: flex; gap: 6px; }
 .pw-trainer-head { display: flex; justify-content: space-between; align-items: center; background: var(--dark3); padding: 10px 14px; border-radius: 8px; flex-wrap: wrap; gap: 10px; }
 .pw-field-text { font-size: 13px; color: var(--light1); margin-top: 4px; }
+
+/* Wave 32 — header count suffix (was an inline style in
+   LearnableMovesPanelView before the shared panel-header constructor). */
+.pw-hdr-count { font-size: 12px; color: var(--light1); font-weight: 400; }
 .pw-big-icon { font-size: 40px; margin-bottom: 10px; }
 .pw-choice-title { font-size: 15px; font-weight: bold; color: var(--light2); margin-bottom: 8px; }
 .pw-choice-desc { font-size: 13px; max-width: 300px; margin: 0 auto; line-height: 1.4; color: var(--light1); }
@@ -6397,8 +6503,9 @@ button.pw-static-045[data-action]{width:100%;background:var(--red) !important;co
   color: var(--light2);
 }
 
-.modal-title,
-.pw-modal-header,
+/* Wave 33: 46px dropped — a fourth competing height. `.poke-panel-header`
+   keeps the flex contract; the two header classes get theirs (and 48px)
+   from the canonical block. */
 .poke-panel-header {
   min-height: 46px;
   display: flex;
@@ -6423,9 +6530,14 @@ button.pw-static-045[data-action]{width:100%;background:var(--red) !important;co
 .hbtn,
 .poke-btn,
 .mob-btn,
+/* Wave 33: `cursor: pointer` added. `.tab` (the Lieu/Quêtes/… switcher in
+   index.html) is a real <button data-action="show-tab"> but no rule in the
+   sheet ever gave it a pointer — measured in Chromium it read `default`,
+   so the tabs did not feel clickable while every neighbouring control did. */
 .tab,
 .modal-close,
-button[data-action]:not(.save-slot) {
+button[data-action]:not(.save-slot):where(:not(.modal-close)) {
+  cursor: pointer;
   border-radius: 10px;
   font-family: 'Winky Sans','Segoe UI',system-ui,sans-serif;
   font-weight: 900;
@@ -6533,6 +6645,15 @@ button[data-action]:not(.save-slot) {
    ════════════════════════════════════════════════════════════════════════ */
 :root {
   --pw-header-h: 48px;
+  /* Wave 33 — the header band is defined by these four tokens ONLY. Every
+     panel header (reference fullscreen panels included) resolves to them;
+     no panel may redeclare height/padding/radius/title-size locally. */
+  --pw-header-pad: 0 8px 0 14px;
+  --pw-header-radius: 10px;
+  --pw-header-gap: 12px;      /* breathing space between the band and the body */
+  --pw-header-title-size: 13px;
+  --pw-header-close-size: 34px;
+  --pw-header-close-glyph: 17px;
   --pw-panel-w-info: 560px; /* wave 18 (user): info panels (move/item/ability) were too narrow */
   --pw-panel-w-md: 560px;
   --pw-panel-w-lg: 860px;
@@ -6560,18 +6681,26 @@ button[data-action]:not(.save-slot) {
   height: var(--pw-header-h);
   min-height: var(--pw-header-h);
   box-sizing: border-box;
-  padding: 0 8px 0 14px;
-  margin: 0 0 12px 0;
+  padding: var(--pw-header-pad);
+  margin: 0 0 var(--pw-header-gap) 0;
   /* Wave 23: the universal panel header used a theme-blind white sheen
      gradient — the header token already exists per theme (same measured
      result, honest single source). */
-  background: var(--pw-bg-header);
+  /* Wave 34 — ROOT CAUSE of "les en-têtes ne sont toujours pas tous les
+     mêmes": the reference panels (sac / marché / pokédex) were NOT painted
+     by this canonical rule at all. A positional rule,
+     `#fullscreen-panel-modal > div > div:first-child`, overrode them with
+     `background: var(--dark1)` + `border-bottom: 2px solid var(--light1)`.
+     Because it targets no class, it escaped every class-based audit AND the
+     visual harness — hence the false "9/9 identical". The reference look is
+     now THE canonical look, and that positional override is gone. */
+  background: var(--pw-bg-panel-header);
   border: 1px solid var(--pw-border);
-  border-bottom-width: 2px;
-  border-radius: calc(var(--pw-radius) - 4px);
+  border-bottom: 2px solid var(--pw-border-panel-header);
+  border-radius: var(--pw-header-radius);
   color: var(--light2);
-  font-size: 15px;
-  font-weight: 900;
+  font-size: var(--pw-header-title-size);
+  font-weight: 700;
   letter-spacing: 0.4px;
   line-height: 1;
 }
@@ -6582,29 +6711,58 @@ button[data-action]:not(.save-slot) {
   align-items: center;
   gap: 8px;
   min-width: 0;
-  font-size: 15px;
-  font-weight: 900;
+  font-size: var(--pw-header-title-size);
+  font-weight: 700;
   letter-spacing: 0.4px;
   line-height: 1;
   color: var(--light2);
 }
+/* Wave 33 — the title text node itself. `.pw-info-name` is ALSO used in the
+   body of info sheets at 15px/900, so the header instance is scoped to the
+   header band and pinned to the shared token. Without this the constructor's
+   `.pw-info-name` beat the inherited size and the rebranded panels rendered
+   their title 2px larger than the reference ones (measured: 15px vs 13px). */
+.modal-title .pw-info-name,
+.pw-modal-header .pw-info-name {
+  font-size: var(--pw-header-title-size);
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  line-height: 1.15;
+  color: var(--light2);
+}
+/* The header's optional subtitle stays one step down, never larger. */
+.modal-title .pw-info-head-text > .pw-text-sm,
+.pw-modal-header .pw-info-head-text > .pw-text-sm {
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.2;
+}
 
-/* Uniform close button */
+/* Uniform close button.
+   ROOT CAUSE (wave 33, found by comparing the LIVE game panels): the close
+   control is a <span> in the reference panels (sac/marché/pokédex) but a
+   <button data-action="…"> in réglages/quêtes/boîte PC. Four generic
+   `button[data-action]:not(.save-slot)` rules — two of them `!important` —
+   therefore painted the BUTTON form with the standard button chrome (12%
+   background + 35% border + 10px radius) while the SPAN form stayed bare.
+   Same class, same tokens, two different-looking ✕. Every one of those
+   generic selectors now excludes `.modal-close`, so the shared rule below
+   is the only thing that paints it, whatever the tag. */
 .modal-close {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  min-width: 34px;
-  min-height: 34px;
+  width: var(--pw-header-close-size);
+  height: var(--pw-header-close-size);
+  min-width: var(--pw-header-close-size);
+  min-height: var(--pw-header-close-size);
   padding: 0;
   box-sizing: border-box;
   border: 1px solid transparent;
   border-radius: 9px;
   background: transparent;
   color: var(--light2);
-  font-size: 17px;
+  font-size: var(--pw-header-close-glyph);
   font-weight: 900;
   line-height: 1;
   cursor: pointer;
@@ -6688,18 +6846,36 @@ button[data-action]:not(.save-slot) {
    Before: the "canonical header" rule (loaded after the sticky one)
    overrode margins/padding and made the background almost transparent —
    the title would scroll away. */
-#settings-inner { padding-top: 0; }
+/* Wave 28 — the settings header now spans the FULL panel width, like every
+   other panel. Root cause: `#settings-inner` (rule ~line 888) carries
+   `padding: 20px`, so its `.modal-title` child was inset by 20px on each
+   side and read as a floating bar instead of a header band. The sibling
+   shells do not have that problem: `#quest-inner` sets `padding: 0` and
+   the fullscreen panels put the header outside the padded body. Rather
+   than fight the padding with negative margins, the shell is switched to
+   the same layout contract as `#quest-inner` (zero padding on the shell,
+   padding carried by the body). */
+#settings-inner {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* Wave 33: only the STICKY behaviour is local. Geometry (padding, border,
+   radius, background, height) comes from the canonical header block — the
+   settings panel used to redeclare a 12px top-only radius and drop the side
+   borders, which is exactly the kind of local override that made this
+   header read as a different component from the sac/marché reference. */
 #settings-inner > .modal-title {
   position: sticky;
   top: 0;
   z-index: 60;
+  flex: none;
   width: 100%;
-  margin: 0 0 12px 0;
-  padding: 0 8px 0 14px;
-  background: var(--pw-bg-header);
-  border: 1px solid var(--pw-border);
-  border-bottom-width: 2px;
-  border-radius: 12px 12px 10px 10px;
+}
+/* The padding the shell used to own now lives on the scrolling body. */
+#settings-inner > #settings-body {
+  flex: 1 1 auto;
+  padding: 16px 20px 20px;
 }
 
 /* ═══ UNIVERSAL CONTRAST & VISIBILITY SYSTEM ═════════════════════════════
@@ -6761,7 +6937,7 @@ button[data-action]:not(.save-slot) {
 /* 5. Buttons & Toggles: default, hover, and active/toggled contrast */
 .hbtn, .pw-btn, .poke-btn, .mob-btn, .tab, .inv-tab, .dict-tab,
 .shortcut-action-btn, .mine-tool-btn, .save-icon-choice, .btn,
-button[data-action]:not(.save-slot), .pw-btn-toggle, .toggle {
+button[data-action]:not(.save-slot):where(:not(.modal-close)), .pw-btn-toggle, .toggle {
   color: var(--light2);
 }
 
@@ -6899,13 +7075,9 @@ button[data-action]:not(.save-slot), .pw-btn-toggle, .toggle {
 /* DS2821 (wave 21): header flattened (no gradient on DS surfaces) and every
    theme-blind rgba(0,0,0,…) surface moved to light2-mix tokens so the
    puzzle sheets read on EVERY theme (measured in Chromium, light included). */
-.pw-puzzle-shell .modal-title {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 10px; padding: 14px 16px;
-  background: var(--pw-bg-header);
-  border-bottom: 1px solid var(--pw-border-color);
-  font-weight: 800; font-size: 15px;
-}
+/* Wave 33: this rule sits AFTER the canonical block, so its `padding:
+   14px 16px` and `font-size: 15px` genuinely won — the puzzle sheets were a
+   further header variant. Nothing local is needed any more. */
 .pw-puzzle-body { padding: 14px 16px 8px; overflow: auto; flex: 1; }
 .pw-puzzle-summary {
   font-size: 13px; line-height: 1.5; color: var(--light1);
@@ -7216,7 +7388,7 @@ button[data-action]:not(.save-slot), .pw-btn-toggle, .toggle {
 
 /* 5. Buttons & Toggles: High-contrast Default, Hover, and Active states */
 .hbtn, .pw-btn, .poke-btn, .tab, .mob-btn, .inv-tab, .usm-sort-btn,
-button[data-action]:not(.save-slot) {
+button[data-action]:not(.save-slot):where(:not(.modal-close)) {
   background: color-mix(in srgb, var(--light2) 12%, transparent) !important; /* wave 17: theme-adaptive (was fixed rgba(236,222,183)) */
   border: 1px solid color-mix(in srgb, var(--light2) 35%, transparent) !important;
   color: var(--light2) !important;
@@ -7225,7 +7397,7 @@ button[data-action]:not(.save-slot) {
 }
 
 .hbtn:hover, .pw-btn:hover, .poke-btn:hover, .tab:hover, .mob-btn:hover,
-.inv-tab:hover, .usm-sort-btn:hover, button[data-action]:not(.save-slot):hover {
+.inv-tab:hover, .usm-sort-btn:hover, button[data-action]:not(.save-slot):where(:not(.modal-close)):hover {
   background: color-mix(in srgb, var(--light2) 24%, transparent) !important; /* wave 17 */
   border-color: var(--light2) !important;
   color: var(--light2) !important;
@@ -7239,7 +7411,7 @@ button[data-action]:not(.save-slot) {
 .hbtn.active, .hbtn.is-active,
 .tab.active, .inv-tab.active, .usm-sort-btn.active,
 .mob-btn[aria-current="true"], .poke-btn.is-active,
-button[data-action]:not(.save-slot):not(.theme-swatch).active {
+button[data-action]:not(.save-slot):not(.theme-swatch):where(:not(.modal-close)).active {
   background: var(--pw-btn-active-bg) !important;
   color: var(--pw-btn-active-text) !important;
   border-color: var(--pw-btn-active-bg) !important;
@@ -7249,7 +7421,7 @@ button[data-action]:not(.save-slot):not(.theme-swatch).active {
 .hbtn.active *, .hbtn.is-active *,
 .tab.active *, .inv-tab.active *, .usm-sort-btn.active *,
 .mob-btn[aria-current="true"] *, .poke-btn.is-active *,
-button[data-action]:not(.save-slot):not(.theme-swatch).active * {
+button[data-action]:not(.save-slot):not(.theme-swatch):where(:not(.modal-close)).active * {
   color: var(--pw-btn-active-text) !important;
 }
 
@@ -7544,7 +7716,10 @@ button.danger:hover, .hbtn.pw-btn-danger:hover {
   padding: 0;
   overflow: hidden;
 }
-#quest-inner > .modal-title { flex: none; margin: 0; }
+/* Wave 33: `margin: 0` removed — the canonical band owns its 12px gap, and
+   zeroing it here is what made the quest header sit flush while the
+   reference panels had breathing room. Only `flex: none` is layout-local. */
+#quest-inner > .modal-title { flex: none; }
 #quest-body {
   flex: 1 1 auto;
   overflow-y: auto;
@@ -7825,6 +8000,23 @@ button.usm-sort-btn.active::after {
 .pw-machine-card-actions--end { margin-top: 4px; display: flex; justify-content: flex-end; gap: 6px; }
 .hatchery-slot-card.is-exp { border-left: 4px solid var(--green) !important; }
 .hatchery-slot-card.is-breed { border-left: 4px solid var(--purple) !important; }
+.pw-hatchery-empty-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+}
+.pw-hatchery-empty-tools { display: flex; justify-content: flex-end; }
+.pw-hatchery-empty-tools .hatchery-mode-toggle { min-height: 28px; padding: 4px 10px; font-size: 11px; font-weight: 800; }
+.pw-hatchery-mode-lock {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--light2);
+  text-align: right;
+  padding: 4px 6px;
+  line-height: 1.3;
+  max-width: 220px;
+}
 button.pw-hatchery-offer {
   width: 100%;
   text-align: left;
@@ -8151,6 +8343,42 @@ button.hatchery-hatch-btn[data-call="hatchEgg"] * { color: #f6f1dc !important; }
 #battle-summary-inner {
   margin-top: auto;
   margin-bottom: auto;
+}
+
+/* ══ Wave 36 — « le panneau résumé n'a toujours pas le même header » ═══════
+   Cause racine (mesurée en direct, pas déduite du CSS) : l'en-tête du résumé
+   était bien le composant partagé, mais son HÔTE `#battle-summary-inner`
+   hérite du `padding: 20px` de la règle groupée des coques modales. La bande
+   était donc enfoncée de 21px au lieu de 1px et amputée de 42px de largeur
+   (1038 au lieu de 1080) — exactement le défaut corrigé pour les panneaux de
+   gestion à la vague 35, jamais généralisé à cette coque-ci.
+   Remède identique : la coque ne pousse plus rien, le retrait est déplacé sur
+   le CONTENU. `.pw-view` étant en `display: contents`, ses enfants sont les
+   enfants de mise en page réels de la coque. */
+#battle-summary-inner {
+  padding: 0 0 20px;
+}
+#battle-summary-inner > .pw-view > *:not(.modal-title) {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+/* ══ Wave 36 — même défaut sur le récapitulatif AFK ════════════════════════
+   `.afk-result-card` appliquait `padding: 16px` : en-tête à 17/17, largeur
+   586 sur 620. La carte ne pousse plus que par le bas ; les enfants autres
+   que la bande portent le retrait latéral. L'écart de 12px sous l'en-tête
+   est déjà fourni par le `gap` de la grille : la marge basse canonique est
+   donc neutralisée ICI pour ne pas cumuler 12+12 (résultat mesuré identique
+   à la référence). */
+.afk-result-card {
+  padding: 0 0 16px;
+}
+.afk-result-card > *:not(.modal-title) {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+.afk-result-card > .modal-title:first-child {
+  margin-bottom: 0;
 }
 
 /* ══ 15. Machine-management internals — DS components (DS2811) ════════════
@@ -8536,10 +8764,20 @@ button[data-action].pw-loc-gym-btn:hover,
    flat token surfaces, visible insertion indicators (they had NO style in
    the legacy file), flash via animation class. #539DDF indicators: 5.50:1.
    ═══════════════════════════════════════════════════════════════════════════ */
-.pw-win-hdr { height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 10px 0 14px; background: var(--pw-bg-header); border-bottom: 2px solid var(--pw-border-color); cursor: grab; user-select: none; flex-shrink: 0; }
+/* Wave 33 — the dashboard window title bar is the SAME header component as
+   the panel band; it only differs where it must (it is attached to the top
+   of a draggable window, so it keeps the grip, the grab cursor and the
+   top-only rounding instead of floating with a gap under it). Height,
+   padding and typography now come from the shared tokens: they used to be
+   44px / 0 10px 0 14px / 14px-900 against the reference's 48px / 0 8px 0
+   14px / 13px-700, which is why the windows read as another family. */
+.pw-win-hdr { height: var(--pw-header-h); box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: var(--pw-header-pad); background: var(--pw-bg-panel-header); border-bottom: 2px solid var(--pw-border-panel-header); cursor: grab; user-select: none; flex-shrink: 0; }
 .pw-win-hdr:active { cursor: grabbing; }
-.pw-win-hdr-title { display: flex; align-items: center; gap: 9px; min-width: 0; font-size: 14px; font-weight: 900; letter-spacing: .35px; color: var(--pw-text-primary); }
-.pw-win-hdr-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pw-win-hdr-title { display: flex; align-items: center; gap: 9px; min-width: 0; font-size: var(--pw-header-title-size); font-weight: 700; letter-spacing: 0.4px; color: var(--pw-text-primary); }
+/* Wave 33: letter-spacing restated — the universal `* { letter-spacing:
+   0.5px }` matches this span directly and therefore beats the 0.4px
+   inherited from .pw-win-hdr-title (same trick as .pw-info-name). */
+.pw-win-hdr-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: 0.4px; }
 .pw-win-hdr-grip { display: inline-grid; grid-template-columns: repeat(2, 4px); grid-auto-rows: 4px; gap: 2px; flex: none; opacity: .72; }
 .pw-win-hdr-grip span { width: 4px; height: 4px; border-radius: 999px; background: var(--pw-text-secondary); }
 .pw-win-hdr-icon { display: inline-flex; width: 22px; height: 22px; flex: none; color: var(--pw-text-primary); }
@@ -8549,6 +8787,28 @@ button[data-action].pw-loc-gym-btn:hover,
 .pw-win-tool-btn:hover { border-color: var(--pw-accent-color); color: var(--pw-accent-color); }
 .window-drag-disabled .pw-win-hdr { cursor: default; }
 .window-drag-disabled .pw-win-hdr .pw-win-hdr-grip { display: none; }
+
+/* ---------------------------------------------------------------------------
+   Wave 28 — dashboard window radius hardening.
+   Root cause of the old divergence: the legacy inline styles that were hoisted
+   into the generated `.pw-static-0XX` classes (block starting ~line 5750)
+   carry their own `overflow`. Those classes have the SAME specificity as
+   `.dash-win` (0,1,0) but are emitted LATER in this file, so they win the
+   cascade. Half of them said `overflow:hidden` (map / mine / shortcuts ->
+   header corners clipped, looked right), the other half said
+   `overflow:visible` (story / team / hatchery / battle / tabs / training ->
+   the square header painted over the rounded parent). Same markup, same
+   `.dash-win` rule, different generated class = different corners.
+   The two rules below re-assert the shared contract AFTER the generated block
+   so any future extracted class cannot silently break it again. The radius is
+   scoped to non-mobile because mobile-mode deliberately squares the windows.
+   --------------------------------------------------------------------------- */
+.dash-win { overflow: hidden; }
+body:not(.mobile-mode) .dash-win { border-radius: var(--pw-radius-md); }
+.dash-win > .pw-win-hdr:first-child {
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
 .dash-win.insert-above { box-shadow: inset 0 4px 0 0 #539DDF; }
 .dash-win.insert-below { box-shadow: inset 0 -4px 0 0 #539DDF; }
 .dash-col.col-hovered { outline: 2px dashed #539DDF; outline-offset: 4px; border-radius: var(--pw-radius-lg); }
@@ -9214,37 +9474,23 @@ textarea.pw-base-pc-input {
    shell padding is 20px → band margins -20px, 16px gap under the band.
    The ECS serializer wraps every view in ONE `.pw-view` div, so the title
    is grabbed THROUGH it (direct child of the wrapper). ────────────────── */
-/* wave 30: panels wearing the DS2830 window chrome (.pw-panel-shell) are
-   EXCLUDED — their title is the flat template header, margin 0. */
+/* ── Wave 33 — the full-bleed band variants are RETIRED. ────────────────
+   Root cause of the "some headers are not like the others" report: these
+   rules pulled the band out to the shell edge with negative margins and
+   squared its bottom corners (`11px 11px 0 0`, `17px 17px 0 0`), while the
+   reference panels (sac / marché / pokédex) wear a floating band rounded on
+   all four corners with a 12px gap under it. Same constructor, two shapes.
+   Every sheet now keeps the canonical band; the shell padding simply insets
+   it, which is what the reference already did. */
 #poke-modal-inner > .pw-view:not(.pw-panel-shell) > .modal-title:first-child,
-#battle-summary-inner > .pw-view > .modal-title:first-child {
-  margin: -20px -20px 16px !important; /* beats the universal margin:0 !important hammer */
-  border-radius: 11px 11px 0 0;
-}
-/* The offline/AFK recap card (18px radius, 16px padding) hosts its own title. */
-.afk-result-card > .modal-title:first-child {
-  margin: -16px -16px 16px !important;
-  border-radius: 17px 17px 0 0;
-}
-
-/* ── E/F2. Flex sheets opened with .preset-editor-modal (preset & NPC
-   editors, the base dialogs): padding is 20px 22px; the NPC editor owns a
-   12px column gap under its title, the others get 12px of band margin. ── */
+#battle-summary-inner > .pw-view > .modal-title:first-child,
+.afk-result-card > .modal-title:first-child,
 #poke-modal.preset-editor-modal #poke-modal-inner > .pw-view:not(.pw-panel-shell) > .modal-title:first-child,
-#poke-modal.preset-editor-modal #poke-modal-inner .pw-base-dialog:not(.pw-panel-shell) > .modal-title:first-child {
-  margin: -20px -22px 12px !important;
-  border-radius: 11px 11px 0 0;
-}
-#poke-modal.preset-editor-modal #poke-modal-inner .pw-base-npced:not(.pw-panel-shell) > .modal-title:first-child {
-  margin: -20px -22px 0 !important;
-  border-radius: 11px 11px 0 0;
-}
-
-/* ── E/F3. Management sheets (mine / day-care / training): padding 16px,
-   12px under the band (the content keeps its own 14px padding). ───────── */
+#poke-modal.preset-editor-modal #poke-modal-inner .pw-base-dialog:not(.pw-panel-shell) > .modal-title:first-child,
+#poke-modal.preset-editor-modal #poke-modal-inner .pw-base-npced:not(.pw-panel-shell) > .modal-title:first-child,
 #poke-modal-inner.management-inner > .pw-view > .modal-title.management-title:first-child {
-  margin: -16px -16px 12px !important;
-  border-radius: 11px 11px 0 0;
+  margin: 0 0 var(--pw-header-gap) 0 !important; /* beats the legacy margin:0 !important hammer */
+  border-radius: var(--pw-header-radius);
 }
 
 /* ── G. NPC editor: flex columns + own scroller + pinned footer. ─────── */
@@ -9584,10 +9830,18 @@ textarea.pw-base-pc-input {
   min-height: 0;
   gap: 0;
 }
+/* Wave 36 — « l'éditeur PNJ et le PC de base n'ont pas le même header ».
+   La vague 30 imposait ici `border-radius: 0` + `margin: 0` en justifiant
+   que les barres devaient toucher les bords « comme la fenêtre de quête ».
+   Vérification faite en direct, la fenêtre de quête porte en réalité le
+   rayon 10px et la marge basse 12px de la bande flottante canonique : la
+   prémisse était fausse, et ces trois panneaux étaient les seuls du jeu à
+   arborer une bande à angles vifs collée au corps. Ils reprennent la bande
+   canonique ; seul `flex: none` (contrat de la colonne) reste local. */
 .pw-panel-shell > .modal-title {
   flex: none;
-  margin: 0 !important;
-  border-radius: 0 !important;
+  margin: 0 0 var(--pw-header-gap) 0 !important;
+  border-radius: var(--pw-header-radius) !important;
   max-width: none !important;
 }
 .pw-panel-body {
@@ -10184,4 +10438,47 @@ button[data-action].pw-loc-gym-btn:hover,
 }
 .pw-npc-untalked {
   opacity: 1;
+}
+#speed-toggle button.active {
+  background: rgba(31, 138, 59, 0.25) !important;
+  border: 1px solid #4ade80 !important;
+  color: #4ade80 !important;
+  font-weight: bold !important;
+  box-shadow: 0 0 8px rgba(74, 222, 128, 0.35) !important;
+}
+
+
+/* ─── FIX (2026-08) — Pokédex / Pokémon detail sheet scroll contract ───
+   #poke-modal is a surface shared by the detail sheet and the move / talent /
+   item info panels. The info panels mark the modal with `pw-info-modal` and
+   wrap their content in a `.pw-panel-shell`, which switches the inner to the
+   narrow info geometry and hands scrolling to `.pw-panel-body`
+   (overflow-y: hidden on the inner). When that state survived a "back"
+   navigation, the detail sheet inherited it and its bottom rows became
+   unreachable — no scrollbar, content simply cut off.
+   The JS reset (pwResetInfoModalSurface) removes the leftover state; these
+   rules make the sheet self-sufficient so it scrolls even if some other panel
+   re-introduces those classes. */
+#poke-modal #poke-modal-inner.poke-detail-inner {
+  display: block;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  max-height: 85vh;
+  padding: 16px !important;
+  width: min(96vw, 860px);
+}
+
+/* The detail sheet never uses the narrow info width, even if the modal still
+   carries `pw-info-modal` from a previous panel. */
+#poke-modal.pw-info-modal #poke-modal-inner.poke-detail-inner {
+  width: min(96vw, 860px);
+  max-height: 85vh;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+  #poke-modal #poke-modal-inner.poke-detail-inner {
+    max-height: 90vh;
+    padding: 12px !important;
+  }
 }

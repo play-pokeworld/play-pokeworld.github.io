@@ -1,3 +1,4 @@
+import { panelHeaderHTML } from '../components/panel-header.js';
 // Phase 27 — legacy feature update
 // 20 persistent presets (G.teamPresets.preset1…preset20 = {name, uids[]}).
 // Three screens:
@@ -135,8 +136,14 @@ function renderPresetEditor(){
     console.error('[preset] card render', err);
     cards.push(`<div class="pw-empty-state">Erreur de rendu des cartes.</div>`);
   }
+  // Wave 32: header built by THE shared constructor (components/panel-header.js).
   _pwSetHtmlSafe(inner,
-    `<div class="modal-title"><div class="pw-row"><span class="pw-info-icon">🗂</span><div class="pw-info-head-text"><div class="pw-info-name">${_escAttr(preset.name)}</div><div class="pw-text-sm pw-light1">${t('preset_editor_sub')} · ${uids.length}/6</div></div></div><span class="modal-close" data-action="legacy-call" data-call="closePresetEditor" data-call-args=""></span></div>`
+    panelHeaderHTML({
+      icon: '🗂',
+      titleHtml: _escAttr(preset.name),
+      subtitle: `${t('preset_editor_sub')} · ${uids.length}/6`,
+      close: { call: 'closePresetEditor', glyph: false }
+    })
     + `<small class="atoll-prep-hint">${t('preset_editor_hint')}</small>`
     + `<div id="preset-editor-body" class="team-view">${cards.join('')}</div>`
     + `<div class="pw-btn-group"><button class="hbtn" data-action="legacy-call" data-call="presetEditorApply" data-call-args="">${t('preset_apply_btn')}</button><button class="hbtn" data-action="legacy-call" data-call="presetEditorSaveCurrent" data-call-args="">${t('preset_save_current_btn')}</button></div>`);
@@ -317,7 +324,12 @@ function renderPresetPicker(){
   }).join('');
   const hasMember = preset.uids && preset.uids[slot] !== undefined;
   _pwSetHtmlSafe(inner,
-    `<div class="modal-title"><div class="pw-row"><span class="pw-info-icon">🔍</span><div class="pw-info-head-text"><div class="pw-info-name">${t('preset_pick_poke_title')}</div><div class="pw-text-sm pw-light1">${_escAttr(preset.name)} · ${slot + 1}/6</div></div></div><span class="modal-close" data-action="legacy-call" data-call="renderPresetEditor" data-call-args=""></span></div>`
+    panelHeaderHTML({
+      icon: '🔍',
+      title: t('preset_pick_poke_title'),
+      subtitleHtml: `${_escAttr(preset.name)} · ${slot + 1}/6`,
+      close: { call: 'renderPresetEditor', glyph: false }
+    })
     + `<input class="dict-search preset-pick-search" data-action="filter-preset-picker" value="${_escAttr(q)}" placeholder="${t('preset_pick_search_ph')}">`
     + `<div class="preset-pick-list">${rows || `<div class="pw-empty-state-md">${t('box_empty_result')||'—'}</div>`}</div>`
     + `<div class="pw-btn-group">${hasMember ? `<button class="hbtn pw-btn-danger" data-action="legacy-call" data-call="presetEditorRemoveMember" data-call-args="${slot}">${t('preset_remove_member')}</button>` : ''}<button class="hbtn pw-btn-cancel" data-action="legacy-call" data-call="renderPresetEditor" data-call-args="">${t('cancel_btn')||'Annuler'}</button></div>`);
@@ -385,7 +397,12 @@ function renderPresetItemPicker(){
   }).join('');
   const nm = (typeof getPokeName==='function'?getPokeName(p.id):(p.name||''));
   _pwSetHtmlSafe(inner,
-    `<div class="modal-title"><div class="pw-row"><span class="pw-info-icon">${itemSpriteHtml(currentKey || '', 30)}</span><div class="pw-info-head-text"><div class="pw-info-name">${tr('preset_pick_item_title', {name: nm})}</div><div class="pw-text-sm pw-light1">${t('equipped_item_label')}: ${currentKey ? getItemName(currentKey) : t('none')}</div></div></div><span class="modal-close" data-action="legacy-call" data-call="renderPresetEditor" data-call-args=""></span></div>`
+    panelHeaderHTML({
+      iconHtml: itemSpriteHtml(currentKey || '', 30),
+      titleHtml: tr('preset_pick_item_title', {name: nm}),
+      subtitleHtml: `${t('equipped_item_label')}: ${currentKey ? getItemName(currentKey) : t('none')}`,
+      close: { call: 'renderPresetEditor', glyph: false }
+    })
     + `<div class="preset-pick-list">${rows || `<div class="pw-empty-state-md">${t('preset_no_item')}</div>`}</div>`
     + `<div class="pw-btn-group">${currentKey ? `<button class="hbtn pw-btn-danger" data-action="legacy-call" data-call="presetEditorClearItem" data-call-args="${slot}">${t('preset_remove_item')}</button>` : ''}<button class="hbtn pw-btn-cancel" data-action="legacy-call" data-call="renderPresetEditor" data-call-args="">${t('cancel_btn')||'Annuler'}</button></div>`);
   if(typeof window.pwApplyWindowChrome==='function') window.pwApplyWindowChrome(inner); // wave 30: canonical window chrome
@@ -465,3 +482,4 @@ export { renderPresetManager, openPresetEditor, renderPresetPicker, renderPreset
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('openPresetEditor', openPresetEditor); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('presetPickerFilter', presetPickerFilter); } catch (_) {} }
+

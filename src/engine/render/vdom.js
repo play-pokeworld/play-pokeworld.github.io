@@ -164,3 +164,4 @@ export function renderInto(node, host, doc = (typeof document !== 'undefined' ? 
   host.replaceChildren(dom);
   return host;
 }
+

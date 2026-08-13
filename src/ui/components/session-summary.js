@@ -97,3 +97,4 @@ export function lootChipVNode(c) {
     h.raw(c.html || ''),
     c.count > 1 ? h('span', { class: 'loot-count' }, `×${c.count}`) : null);
 }
+

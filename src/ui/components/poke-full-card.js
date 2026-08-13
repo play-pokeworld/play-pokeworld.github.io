@@ -167,3 +167,4 @@ export function pokeFullCardVNode(model = {}) {
 export function pokeFullCardHTML(model = {}) {
   return toHTMLString(pokeFullCardVNode(model));
 }
+

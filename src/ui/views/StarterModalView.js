@@ -72,3 +72,4 @@ export class StarterModalView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+

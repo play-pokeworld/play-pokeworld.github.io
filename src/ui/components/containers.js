@@ -141,3 +141,4 @@ export function createWindow(scene, props) {
   }));
   return entity;
 }
+

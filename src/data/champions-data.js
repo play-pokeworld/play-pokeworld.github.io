@@ -115,3 +115,4 @@ export {
   getChampDef,
   getLeagueTrainersForRegion,
 };
+

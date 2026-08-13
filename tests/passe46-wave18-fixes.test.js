@@ -172,3 +172,4 @@ test('wave18: drag boundaries ignore hidden windows (strip never swallowed)', ()
 test('wave18: save-slot icon contained & centred (70px wrap in the 74px box)', () => {
   assert.ok(/\.save-slot-icon \.pw-poke-circle-wrap \{\s*width:\s*70px !important;\s*height:\s*70px !important/.test(CSS1), 'wrap cannot overflow the rounded box');
 });
+

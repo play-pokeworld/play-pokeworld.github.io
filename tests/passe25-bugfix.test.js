@@ -201,3 +201,4 @@ test('phase 25 #3: back navigation and i18n of the preparation panel', () => {
   assert.equal(sb.t('back_to_atoll_prep'), '← Retour à la préparation', 'FR back label');
 });
 
+

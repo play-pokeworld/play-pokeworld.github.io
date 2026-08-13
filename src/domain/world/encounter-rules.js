@@ -100,3 +100,4 @@ export function pickWildFromTable(wildEntries, opts = {}) {
     isRoaming: false,
   };
 }
+

@@ -111,3 +111,4 @@ if (errorCount > 0) {
   console.log('[i18n check] OK: No unlocalized hardcoded strings detected in audited targets.');
   process.exit(0);
 }
+

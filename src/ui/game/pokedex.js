@@ -176,22 +176,79 @@ function renderPokedex(el){
  }catch(_){}
 }
 
+// FIX (2026-08, user follow-up) — resolve the move list shown on a dex sheet.
+//
+// Pass 1 only listed the LEVEL-UP pool (getSpeciesMovePool, 15 moves max).
+// User follow-up #2: the sheet must list EVERY move the species can learn,
+// including the TM/HM ones and the training-only ones. The three categories
+// are exactly the ones the training UI already uses:
+//   ★ level-up   → getSpeciesMovePool()
+//   ◇ TM/HM      → full learnable pool ∩ getCtCsMoveIds()
+//   ▽ training   → getSpeciesTrainingOnlyPool()  (full − level − TM/HM)
+// Returns [{key, label, cat}] deduplicated, level-up first.
+function _dexSpeciesMoves(id, pd){
+ const seen = new Set();
+ const out = [];
+ const push = (key, cat) => {
+  if(!key || seen.has(key)) return;
+  seen.add(key);
+  out.push({ key, cat });
+ };
+ try{
+  // ★ level-up — the pool the battle engine itself draws from
+  if(typeof getSpeciesMovePool === 'function'){
+   for(const k of (getSpeciesMovePool(id) || [])) push(k, 'level');
+  }
+  // ◇ TM/HM — full learnable pool restricted to moves taught by a CT/CS item
+  const ctIds = (typeof getCtCsMoveIds === 'function') ? (getCtCsMoveIds() || {}) : {};
+  if(typeof getSpeciesFullLearnablePool === 'function'){
+   for(const k of (getSpeciesFullLearnablePool(id) || [])){ if(ctIds[k]) push(k, 'ct'); }
+  }
+  // ▽ training — everything else the species can still learn
+  if(typeof getSpeciesTrainingOnlyPool === 'function'){
+   for(const k of (getSpeciesTrainingOnlyPool(id) || [])) push(k, 'training');
+  }
+ }catch(_){}
+ // Legacy PD[…][9] slot (empty in the shipped data) as a last resort.
+ if(!out.length && Array.isArray(pd && pd[9])){
+  for(const k of pd[9]) push(k, 'level');
+ }
+ return out;
+}
+
 function openDexEntry(id){
  const pd = PD[id];
  if(!pd) return;
  const name = getPokeName(id);
  const t1 = pd[1], t2 = pd[2];
  const bhp = pd[3] || 0, batk = pd[4] || 0, bdef = pd[5] || 0, bspa = pd[6] || batk, bspd = pd[7] || bdef, bspe = pd[8] || 0;
- const moves = Array.isArray(pd[9]) ? pd[9] : [];
+ // FIX (2026-08, user follow-up): the dex sheet listed NO attack for any
+ // species. PD[…][9] is the legacy per-species move slot and it is `[]` for
+ // every entry in pd-data.js (auto-generated), so the "Attaques" section was
+ // always the empty-state. The real move pool is the one the battle engine
+ // itself uses — getSpeciesMovePool() (level-up pool, up to 15 moves, same
+ // ordering as getMovesForSpeciesLevel). Fall back to the legacy slot if the
+ // helper is unavailable.
+ const moves = _dexSpeciesMoves(id, pd);
  const emoji = pd[12] || '';
  const isShiny = isSpeciesShiny(id);
  const inner = document.getElementById('poke-modal-inner');
  if(!inner) return;
+ // FIX (2026-08) — the dex sheet takes over #poke-modal, a surface shared with
+ // the move/talent/item info panels. Those panels add `pw-info-modal` on the
+ // modal and a `.pw-panel-shell` wrapper inside the inner; both change the
+ // container contract (narrow info geometry + overflow-y:hidden !important).
+ // If a previous panel left them behind, the detail sheet inherits them and
+ // its bottom content becomes unreachable. Reclaim a neutral surface first.
+ try{ if(typeof pwResetInfoModalSurface === 'function') pwResetInfoModalSurface(); }catch(_){}
+ try{ if(typeof pwInfoClearSource === 'function') pwInfoClearSource(); }catch(_){}
  const views = (typeof window !== 'undefined' && window.PokeUI && window.PokeUI.views) ? window.PokeUI.views : null;
  if(!views || typeof views.DexDetailView !== 'function') throw new Error('[ui] PokeUI views not loaded (DexDetailView)');
  const desc = getDexFlavor(id);
  const sources = findPokemonSources(id);
  const tals = (typeof getSpeciesTalents === 'function') ? getSpeciesTalents(id) : [];
+ const rec = (typeof getDexRecordStats === 'function') ? getDexRecordStats(id) : {};
+ const incubKos = (typeof hatcheryStepsForPokemon === 'function') ? hatcheryStepsForPokemon(id) : null;
  // Wave 19 (ECS DS): the sheet is rendered from zero by DexDetailView —
  // this adapter only shapes the (localized) model. Contracts kept:
  // .poke-detail-inner on the host, .poke-detail-title + close-poke-modal
@@ -210,7 +267,13 @@ function openDexEntry(id){
   sourcesLabel: t('dict_where_find') || 'Where to find it',
   sources: sources.map(s => s.label),
   movesLabel: t('pokedex_moves'),
-  moves: moves.map(mv => ({ key: mv, label: getMoveName(mv) || mv })),
+  // Each chip keeps its origin marker (★ level / ◇ TM-HM / ▽ training) so the
+  // sheet stays readable now that all three categories are listed together.
+  moves: moves.map(mv => {
+   const name = getMoveName(mv.key) || mv.key;
+   const badge = mv.cat === 'ct' ? '◇' : (mv.cat === 'training' ? '▽' : '★');
+   return { key: mv.key, label: badge + ' ' + name };
+  }),
   noMovesLabel: t('dict_no_moves_listed') || 'No moves listed.',
   talentsLabel: t('pokemon_talents'),
   talents: tals.map(tal => ({ key: tal, label: (typeof getTalentName === 'function' ? getTalentName(tal) : (TALENTS_FULL[tal]?.name || tal)) })),
@@ -219,6 +282,34 @@ function openDexEntry(id){
   stats: [
    { label: 'PV', value: bhp }, { label: 'ATK', value: batk }, { label: 'DEF', value: bdef },
    { label: 'ASP', value: bspa }, { label: 'DSP', value: bspd }, { label: 'VIT', value: bspe },
+  ],
+  recordsLabel: t('dex_records_label') || 'Carnet',
+  recordsGroups: [
+   {
+    title: t('dex_records_combat') || 'Combat',
+    rows: [
+     { label: t('dex_stat_encountered') || 'Rencontré', value: rec.encountered || 0 },
+     { label: t('dex_stat_captured') || 'Capturé', value: rec.captured || 0 },
+     { label: t('dex_stat_beaten') || 'Vaincu', value: rec.beaten || 0 },
+    ],
+   },
+   {
+    title: t('dex_records_machines') || 'Pension & entraînement',
+    rows: [
+     { label: t('dex_stat_hatchery') || 'Incubation', value: rec.hatcheryIncub || 0 },
+     { label: t('dex_stat_training') || 'Entraînement', value: rec.training || 0 },
+     { label: t('dex_stat_incub_kos') || 'K.O. pour éclore', value: incubKos == null ? '—' : incubKos },
+    ],
+   },
+   {
+    title: t('dex_records_shiny') || 'Chromatique',
+    rows: [
+     { label: t('dex_stat_shiny_encountered') || 'Rencontré', value: rec.shinyEncountered || 0 },
+     { label: t('dex_stat_shiny_captured') || 'Capturé', value: rec.shinyCaptured || 0 },
+     { label: t('dex_stat_shiny_beaten') || 'Vaincu', value: rec.shinyBeaten || 0 },
+     { label: t('dex_stat_shiny_hatched') || 'Obtenu à l’incubation', value: rec.shinyHatched || 0 },
+    ],
+   },
   ],
  }));
  document.getElementById('poke-modal').classList.add('open');
@@ -255,3 +346,4 @@ export {
 // indirection instead of the window fallback); the window surface is kept for
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('setDexSearch', setDexSearch); } catch (_) {} }
+

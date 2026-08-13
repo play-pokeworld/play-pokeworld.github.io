@@ -112,3 +112,4 @@ test('wave 26 guards stay intact (CSS blanket edits did not regress them)', () =
   assert.match(css, /#move-buttons/);
   assert.match(css, /\.poke-card-top\s*\{[^}]*border-radius:\s*11px 11px 0 0/s);
 });
+

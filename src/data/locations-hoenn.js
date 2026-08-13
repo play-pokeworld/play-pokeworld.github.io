@@ -95,3 +95,4 @@ for (const id in LOCS_HOENN) { const loc = LOCS_HOENN[id]; if (loc && loc.minWin
 
 // Wave 40 — surface kept (window → globalThis block, same scope).
 if (typeof globalThis !== 'undefined') globalThis.LOCS_HOENN = LOCS_HOENN;
+

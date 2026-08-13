@@ -467,3 +467,4 @@ export class ECSSystemsManager {
 if (typeof window !== 'undefined') {
   window.PokeECSSystemsManager = ECSSystemsManager;
 }
+

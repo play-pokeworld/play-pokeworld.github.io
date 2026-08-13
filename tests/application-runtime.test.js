@@ -39,3 +39,4 @@ test('resetGameSession replaces both mutable state objects', () => {
   assert.equal(session.battleState.active, false);
 });
 
+

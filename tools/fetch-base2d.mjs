@@ -98,5 +98,11 @@ const manifest = {
 };
 fs.writeFileSync(path.join(ROOT, 'src', 'assets', 'images', 'secret-base', 'manifest.render2d.json'), JSON.stringify(manifest, null, 1) + '\n');
 console.log(`manifest.render2d.json: ${nEmerald} Emerald sprites + ${nIcon} 2D icons = ${Object.keys(render).length}/${slugs.length} covered.`);
-console.log('Not covered (procedural rendering):', manifest.stats.uncovered.join(', ') || 'none');
+const leftover = (manifest.stats.uncovered || []).filter(Boolean);
+if (leftover.length) {
+  console.log('Not in pret/pokeemerald PNG folders — baked next by tools/bake-emerald-bgs.py --bake-decor-all / --bake-canon (DECOR_MAP + objgfx + PC/stairs):', leftover.join(', '));
+} else {
+  console.log('Catalog fully covered by Emerald 2D sprites.');
+}
+
 
