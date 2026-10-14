@@ -317,12 +317,12 @@ test('Hoenn 18: catching a Pokémon in Hoenn immediately updates the location wi
   const el = { innerHTML: '', style: {} };
   sb.document.getElementById = (id) => (id === 'location-info-panel' ? el : { style: {}, textContent: '', innerHTML: '' });
   sb.window.renderLocInfo(el);
-  assert.equal(el.innerHTML.includes('loc-caught-badge is-owned'), false, 'Not yet caught on route101');
+  assert.equal(el.innerHTML.includes('None.svg'), true, 'balle vide avant capture (non possédé) sur route101');
   
   sb.G.pokedex[263] = { seen: true, caught: true };
   sb.G.collection[263] = { id: 263, name: 'Zigzaton', level: 3 };
   sb.window.refreshMapAndLoc();
-  assert.equal(el.innerHTML.includes('loc-caught-badge is-owned'), true, 'Location window updated immediately after capture via refreshMapAndLoc');
+  assert.equal(el.innerHTML.includes('Pokeball.svg'), true, 'Location window updated immediately after capture via refreshMapAndLoc');
 });
 
 test('Hoenn 19: Hoenn is locked behind the Johto League victory AND the complete Johto Pokédex (100/100)', () => {
@@ -360,4 +360,6 @@ test('Hoenn 20: evolution items without level restriction in the Bag (team and P
   sb.window.G.training = [{ poke: { id: 200, name: 'Roigada', level: 20 }, steps: 0, stepsReq: 10 }];
   assert.equal(sb.window.speciesOwned(200), true, 'speciesOwned recognizes Slowking (#200) in training');
 });
+
+
 

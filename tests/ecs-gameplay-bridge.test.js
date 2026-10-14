@@ -56,3 +56,5 @@ test('ECSGameplayBridge synchronizes legacy G state to real ECS Entities and syn
   assert.equal(world.stats().entities, 4, 'Still 4 active entities in ECSWorld (no duplicate IDs created)');
 });
 
+
+

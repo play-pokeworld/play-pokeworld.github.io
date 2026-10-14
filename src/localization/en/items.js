@@ -1146,3 +1146,5 @@ Object.assign(L_en_items, {
 // gardée sur l'objet global pour les registres (data.js) et les harnais VM.
 if (typeof globalThis !== 'undefined') globalThis.L_en_items = L_en_items;
 
+
+

@@ -4,7 +4,8 @@ function renderAutomationWindow(){
  const el = document.getElementById('automation-window-body');
  if(el) el.replaceChildren();
 }
-export const AUTOMATION_UPGRADE_COSTS = {autoHatch:1000000, autoSeedHatchery:1000000};
+// P0 — les déblocages d'auto-modes se paient en Points de quête (PQ).
+export const AUTOMATION_UPGRADE_COSTS = {autoHatch:500, autoSeedHatchery:1000};
 // FIX (2026-08): hatchery-ui.js reads the automation costs from here.
 if (typeof globalThis !== 'undefined') globalThis.AUTOMATION_UPGRADE_COSTS = AUTOMATION_UPGRADE_COSTS;
 if (typeof globalThis !== 'undefined') globalThis.AUTOMATION_UPGRADE_COSTS = AUTOMATION_UPGRADE_COSTS;
@@ -16,17 +17,20 @@ function isAutomationPurchased(key){
 }
 function getAutomationUpgradeLabelSuffix(key){
  const cost = AUTOMATION_UPGRADE_COSTS[key] || 0;
- return (!isAutomationPurchased(key) && cost) ? ` · ${cost.toLocaleString()}₽` : '';
+ return (!isAutomationPurchased(key) && cost) ? ` · ${formatNumber(cost)} PQ` : '';
 }
 function purchaseAutomationIfNeeded(key){
  const cost = AUTOMATION_UPGRADE_COSTS[key] || 0;
  if(!cost || isAutomationPurchased(key)) return true;
- if(G.money < cost){ notify(tr('automation_upgrade_need_money', {price:cost.toLocaleString()}), 'var(--red)'); return false; }
- G.money -= cost;
+ // P0 — paiement en Points de quête.
+ const w = (typeof ensureWallet === 'function') ? ensureWallet() : null;
+ if(!w || (w.questPoints || 0) < cost){ notify(tr('automation_upgrade_need_pq', {price:formatNumber(cost)}), 'var(--red)'); return false; }
+ if(typeof spendQuestPoints === 'function') spendQuestPoints(cost);
+ else w.questPoints -= cost;
  if(!G.automationUpgrades || typeof G.automationUpgrades !== 'object') G.automationUpgrades = {};
  G.automationUpgrades[key] = true;
  updateHeader();
- notify(tr('automation_upgrade_bought', {name:t('automation_'+key), price:cost.toLocaleString()}), 'var(--green)');
+ notify(tr('automation_upgrade_bought_pq', {name:t('automation_'+key), price:formatNumber(cost)}), 'var(--green)');
  return true;
 }
 function buyAutomationUpgrade(key){
@@ -178,14 +182,49 @@ function canAccessStaffLocation(def){
  const have = (typeof regionBadgeCount === 'function') ? regionBadgeCount(typeof regionOfLoc === 'function' ? regionOfLoc(def.loc) : (G.region||'kanto')) : (G.badges||[]).length;
  return (loc.badgeReq || 0) <= have;
 }
+// P0 — chaque membre a un prix FIXE en rotation ₽ → PQ → 💎 → PC (par ordre
+// de la liste STAFF_DEFS, déterministe : 1ᵉʳ ₽, 2ᵉ PQ, 3ᵉ 💎, 4ᵉ PC, 5ᵉ ₽…).
+const STAFF_CYCLE = ['money', 'questPoints', 'diamonds', 'battlePoints'];
+const STAFF_LADDERS = {
+  money: [25000, 75000, 200000, 500000],
+  questPoints: [1000, 2000, 4000, 8000],
+  diamonds: [20, 50, 100, 200],
+  battlePoints: [100, 200, 400],
+};
+function staffCurrencySymbol(cur){ return cur === 'money' ? '₽' : cur === 'questPoints' ? 'PQ' : cur === 'diamonds' ? '💎' : 'PC'; }
+function staffPrice(def){
+  const idx = STAFF_DEFS.indexOf(def);
+  if(idx < 0) return { currency: 'money', price: 25000 };
+  const cur = STAFF_CYCLE[idx % STAFF_CYCLE.length];
+  const ladder = STAFF_LADDERS[cur];
+  const price = ladder[Math.min(Math.floor(idx / STAFF_CYCLE.length), ladder.length - 1)];
+  return { currency: cur, price };
+}
+function staffHasFunds(hire){
+ if(hire.currency === 'money') return (G.money || 0) >= hire.price;
+ if(hire.currency === 'questPoints'){ const w = (typeof ensureWallet === 'function') ? ensureWallet() : null; return !!(w && w.questPoints >= hire.price); }
+ if(hire.currency === 'diamonds'){ const w = (typeof ensureWallet === 'function') ? ensureWallet() : null; return !!(w && w.diamonds >= hire.price); }
+ return ((G.atoll && G.atoll.tokens) || 0) >= hire.price;
+}
+function staffCharge(hire){
+ if(hire.currency === 'money'){ G.money -= hire.price; }
+ else if(hire.currency === 'questPoints'){ if(typeof spendQuestPoints === 'function') spendQuestPoints(hire.price); }
+ else if(hire.currency === 'diamonds'){ if(typeof spendDiamonds === 'function') spendDiamonds(hire.price); }
+ else { if(G.atoll) G.atoll.tokens -= hire.price; }
+}
 function buyStaff(id){
  ensureStaffState();
  const def = getStaffDef(id);
  if(!def) return;
  if(G.staff.owned[id]){ notify(t('staff_already_owned'), 'var(--green)'); return; }
  if(!canAccessStaffLocation(def)){ notify(tr('staff_location_locked', {loc:getLocName(def.loc)}), 'var(--red)'); return; }
- if(G.money < def.cost){ notify(t('n.pas_assez_dargent'), 'var(--red)'); return; }
- G.money -= def.cost;
+ const hire = staffPrice(def);
+ if(!staffHasFunds(hire)){
+  if(hire.currency === 'money') notify(t('n.pas_assez_dargent'), 'var(--red)');
+  else notify(tr('staff_need_currency', {need: formatNumber(hire.price), currency: staffCurrencySymbol(hire.currency)}), 'var(--red)');
+  return;
+ }
+ staffCharge(hire);
  G.staff.owned[id] = true;
  G.staff.level[id] = 1;
  G.staff.xp[id] = 0;
@@ -310,7 +349,9 @@ function staffListModel(type){
     name: getStaffName(def.id), location: getLocName(def.loc), desc: getStaffDesc(def.id),
     // Locked location: informational label (no dead button — user rule).
     hire: unlocked
-     ? { label: tr('staff_hire_price', {price:def.cost.toLocaleString()}), call: 'buyStaff', args: `'${def.id}'` }
+     ? { label: (typeof currencyAmountSpriteHtml === 'function'
+        ? currencyAmountSpriteHtml(staffPrice(def).currency, staffPrice(def).price)
+        : formatNumber(staffPrice(def).price) + ' ' + staffCurrencySymbol(staffPrice(def).currency)), call: 'goToStaffShop', args: `'${def.id}'` }
      : { lockedLabel: `🔒 ${tr('staff_unlock_at', {loc:getLocName(def.loc)})}` },
    };
   }),
@@ -324,6 +365,20 @@ function renderStaffList(type){
 
 if (typeof ensureStaffState !== 'undefined') { if (typeof window !== 'undefined') window.ensureStaffState = ensureStaffState; if (typeof globalThis !== 'undefined') globalThis.ensureStaffState = ensureStaffState; }
 if (typeof buyStaff !== 'undefined') { if (typeof window !== 'undefined') window.buyStaff = buyStaff; if (typeof globalThis !== 'undefined') globalThis.buyStaff = buyStaff; }
+// P0 — les employés s'achètent dans la boutique de leur ville : le bouton
+// amène à la boutique, il n'achète pas directement.
+function goToStaffShop(id){
+ const def = getStaffDef(id);
+ if(!def) return;
+ try { if(typeof clickLocation === 'function') clickLocation(def.loc); } catch(_) {}
+ try { if(typeof openFullscreenPanel === 'function') openFullscreenPanel('shop'); } catch(_) {}
+}
+// Employés dont la boutique est à ce lieu (pour la section "Employés" du shop).
+function staffDefsForLocation(locId){
+ return STAFF_DEFS.filter(s => s.loc === locId);
+}
+if (typeof goToStaffShop !== 'undefined') { if (typeof window !== 'undefined') window.goToStaffShop = goToStaffShop; if (typeof globalThis !== 'undefined') globalThis.goToStaffShop = goToStaffShop; }
+if (typeof staffDefsForLocation !== 'undefined') { if (typeof window !== 'undefined') window.staffDefsForLocation = staffDefsForLocation; if (typeof globalThis !== 'undefined') globalThis.staffDefsForLocation = staffDefsForLocation; }
 if (typeof toggleStaff !== 'undefined') { if (typeof window !== 'undefined') window.toggleStaff = toggleStaff; if (typeof globalThis !== 'undefined') globalThis.toggleStaff = toggleStaff; }
 if (typeof addStaffXp !== 'undefined') { if (typeof window !== 'undefined') window.addStaffXp = addStaffXp; if (typeof globalThis !== 'undefined') globalThis.addStaffXp = addStaffXp; }
 if (typeof getStaffBonus !== 'undefined') { if (typeof window !== 'undefined') window.getStaffBonus = getStaffBonus; if (typeof globalThis !== 'undefined') globalThis.getStaffBonus = getStaffBonus; }
@@ -356,6 +411,8 @@ if (typeof getStaffName !== 'undefined') { if (typeof window !== 'undefined') wi
 if (typeof purchaseAutomationIfNeeded !== 'undefined') { if (typeof window !== 'undefined') window.purchaseAutomationIfNeeded = purchaseAutomationIfNeeded; if (typeof globalThis !== 'undefined') globalThis.purchaseAutomationIfNeeded = purchaseAutomationIfNeeded; }
 if (typeof staffBonusHtml !== 'undefined') { if (typeof window !== 'undefined') window.staffBonusHtml = staffBonusHtml; if (typeof globalThis !== 'undefined') globalThis.staffBonusHtml = staffBonusHtml; }
 if (typeof staffLevel !== 'undefined') { if (typeof window !== 'undefined') window.staffLevel = staffLevel; if (typeof globalThis !== 'undefined') globalThis.staffLevel = staffLevel; }
+if (typeof staffPrice !== 'undefined') { if (typeof window !== 'undefined') window.staffPrice = staffPrice; if (typeof globalThis !== 'undefined') globalThis.staffPrice = staffPrice; }
+if (typeof staffCurrencySymbol !== 'undefined') { if (typeof window !== 'undefined') window.staffCurrencySymbol = staffCurrencySymbol; if (typeof globalThis !== 'undefined') globalThis.staffCurrencySymbol = staffCurrencySymbol; }
 if (typeof staffXpNeed !== 'undefined') { if (typeof window !== 'undefined') window.staffXpNeed = staffXpNeed; if (typeof globalThis !== 'undefined') globalThis.staffXpNeed = staffXpNeed; }
 
 // Wave 41 — native ESM module: exports the same names as the
@@ -389,5 +446,9 @@ export {
   staffBonusHtml,
   staffLevel,
   staffXpNeed,
+  staffPrice,
+  staffCurrencySymbol,
 };
+
+
 

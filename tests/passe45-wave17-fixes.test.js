@@ -129,11 +129,11 @@ test('wave17: drag insertion markers are ::after bars above the header, dual mar
   assert.ok(/\.dash-win\.insert-below::after\s*\{[^}]*bottom:\s*2px/.test(CSS1), 'below marker bar at the window bottom');
   assert.ok(/\.dash-win\.insert-above::after, \.dash-win\.insert-below::after\s*\{[^}]*z-index:\s*60/.test(CSS1), 'bars paint over the window header');
   const drag = R('src/ui/game/win-drag.js');
-  // Wave 18: the same dual marking now runs on the VISIBLE-window list
-  // (pwVisibleWinEls) — a hidden last window used to swallow the strip.
-  assert.ok(drag.includes("vis[vi].el.classList.add('insert-above')"), 'lower window marked insert-above');
-  assert.ok(drag.includes("vis[vi - 1].el.classList.add('insert-below')"), 'upper window marked insert-below');
-  assert.ok(/for\(let c=1; c<=3; c\+\+\)/.test(drag), 'marking logic walks ALL three columns');
+  // DND-01 (prototype validé) : l'indicateur de dépôt est une ligne unique,
+  // placée par frame (RAF) dans la colonne la plus proche.
+  assert.ok(drag.includes('pw-drop-indicator'), 'drop indicator line present (DND-01)');
+  assert.ok(drag.includes('requestAnimationFrame'), 'position updated once per frame (rect cache, DND-01)');
+  assert.ok(/for\s*\(\s*let c\s*=\s*1;\s*c\s*<=\s*3;\s*c\+\+\s*\)/.test(drag), 'targeting logic walks ALL three columns');
 });
 
 /* ─── 10/11. Battle chrome & training ───────────────────────────────────── */
@@ -158,4 +158,6 @@ test('wave17: training — panel on top, chrome hidden/restored, red abandon', (
   // consistency won over the marginal contrast bump).
   assert.ok(/button\[data-action\]\.pw-btn-danger,\s*button\[data-call\]\.pw-btn-danger,\s*\.hbtn\.pw-btn-danger \{\s*background:\s*#D3425F !important/.test(CSS1), 'danger colour = family crimson #D3425F (same as every red button)');
 });
+
+
 

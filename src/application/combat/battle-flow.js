@@ -21,10 +21,19 @@ function isWildChillChainActive(){
 
 function endBattle(){
  if(typeof restoreAllTransformedPokemon === 'function') restoreAllTransformedPokemon();
+ // PASSE 38e — DONJON : pas de soin automatique (naturalcure / régénérateur)
+ // entre deux combats : les PV persistent pendant toute l'expédition. Ce
+ // drapeau sert aussi plus bas (écran de repos, résumé, relance).
+ let _dgRunActive = false;
+ try {
+   const _run = (typeof globalThis.currentDungeonRun === 'function') ? globalThis.currentDungeonRun() : null;
+   _dgRunActive = !!(_run && _run.active);
+ } catch(_){}
  try {
    if (typeof G !== 'undefined' && G && Array.isArray(G.team)) {
      G.team.forEach(p => {
        if (!p || p.currentHP <= 0) return;
+       if (_dgRunActive) return;
        const hasTal = (t) => (typeof globalThis.hasTalent === 'function') ? globalThis.hasTalent(p, t) : p.talent === t;
        if (hasTal('naturalcure') && p.status) {
          p.status = null;
@@ -38,10 +47,17 @@ function endBattle(){
    }
  } catch (_) {}
  clearInterval(battle.timerId);
- const hadLoot = !battle.isChamp && !battle.isQuestTrainerBattle && !battle.isBaseNpcBattle && !battle.isQuestDefeatBattle && ((((battle.sessionCatches||[]).length)||Object.keys(battle.sessionItems||{}).length||(battle.sessionWins||0)||(battle.sessionPlayerKOs||0)));
+ // PASSE 39 — l'argent gagné en combat compte comme du butin (le résumé
+ // s'ouvre même pour un combat qui n'a rapporté que des pièces) et le
+ // drapeau « gardien » ne survit jamais à la fin d'un combat (une victoire
+ // de case ne peut pas transformer le combat suivant en boss).
+ const hadLoot = !battle.isChamp && !battle.isQuestTrainerBattle && !battle.isBaseNpcBattle && !battle.isQuestDefeatBattle && ((((battle.sessionCatches||[]).length)||Object.keys(battle.sessionItems||{}).length||Number(battle.sessionMoney||0)>0||(battle.sessionWins||0)||(battle.sessionPlayerKOs||0)));
+ battle.pendingDungeonBoss = false;
  const wasAtollLoss = !!battle.isAtollBattle;
  const wasAtollBorrowedLoss = wasAtollLoss && !!battle.atollBorrowed;
  battle.active=false;
+ // PASSE 33 — le bandeau se met à jour (bouton « reprendre » / disparition).
+ try{ if(typeof renderBattleDungeonBar === 'function') renderBattleDungeonBar(); }catch(_){}
  try{ if(typeof G !== 'undefined' && G) G.wildSessionActive = false; }catch(_){ } // phase 30 : chaine sauvage terminee → more of rattrapage offline
  battle.paused=false;
  battle.resolvingKO=false;
@@ -70,12 +86,29 @@ function endBattle(){
  battle.champTeam=null;
  const idleScreen = document.getElementById('battle-idle-screen');
  const activeScene = document.getElementById('battle-active-scene');
- if(idleScreen) idleScreen.style.display = 'flex';
+ // PASSE 34 — tant qu'une expédition est EN COURS, la fin d'un combat ne
+ // ramène pas « Exploration au repos » : le joueur est entre deux paliers, le
+ // bandeau d'expédition doit rester à l'écran avec le bouton « Combattre ».
+ // L'écran de repos revient quand le run se termine (remontée, abandon, wipe).
+ // (_dgRunActive est déjà calculé en tête de fonction pour le garde-fou
+ // « pas de soin en donjon ».)
+ if(idleScreen) idleScreen.style.display = _dgRunActive ? 'none' : 'flex';
  if(activeScene){ activeScene.style.display = 'none'; activeScene.classList.remove('is-live'); } // wave 17 (DS2817)
+ try{ if(_dgRunActive && typeof globalThis.refreshDungeonPanel === 'function') globalThis.refreshDungeonPanel(); }catch(_){}
  renderTeamWindow();
  try{ renderMap(); }catch(_){}
- if(hadLoot) openBattleSummary(true);
+ // PASSE 34 — en pleine expédition, le combat est arrêté volontairement à
+ // chaque palier : ouvrir le résumé de session à ce moment-là faisait surgir
+ // une fenêtre modale entre deux paliers (« la fenêtre de fin de combat
+ // s'ouvre »). Le butin d'expédition est déjà suivi par le bandeau dédié ;
+ // le résumé reste disponible manuellement et à la fin réelle du run.
+ if(hadLoot && !_dgRunActive) openBattleSummary(true);
  try{ if(typeof renderTrainingBattlePanel === 'function') renderTrainingBattlePanel(); }catch(_){}
+ // PASSE 35 — « si le quota n'est pas atteint, le combat se relance
+ // automatiquement ; sinon, rien. » La relance est portée par le moteur
+ // d'expédition, qui sait distinguer une fin de combat subie (on enchaîne)
+ // d'une sortie volontaire (on ne relance surtout pas).
+ try{ if(_dgRunActive && typeof globalThis._dgAutoResume === 'function') globalThis._dgAutoResume(); }catch(_){}
 }
 
 
@@ -92,6 +125,23 @@ function restartLastBattle(){
 async function doLeaveBattle(){
  if(!battle.active) return;
  battle.paused=true;
+ // PASSE 35 — EN EXPÉDITION, « QUITTER » ABANDONNE LE DONJON.
+ // Retour joueur : « on ne doit pas pouvoir quitter le combat puis le
+ // reprendre » et « le quitter en bas du combat fait comme le remonter et
+ // encaisser, ce n'est pas ce qu'il doit faire ».
+ // Quitter n'est donc ni une fuite (qui laissait l'expédition en suspens avec
+ // un bouton de reprise), ni un encaissement : c'est une sortie sèche, le sac
+ // reste dans le donjon. Pour repartir avec le butin, il y a « Remonter et
+ // encaisser » dans le bandeau.
+ try{
+  const _dgFn = globalThis.currentDungeonRun;
+  const _run = (typeof _dgFn === 'function') ? _dgFn() : null;
+  if(_run && _run.active && typeof globalThis.dungeonQuitFromBattle === 'function'){
+   await wait(200);
+   globalThis.dungeonQuitFromBattle();
+   return;
+  }
+ }catch(_){}
  if(battle.isBaseNpcBattle){
  // Phase 38 — legacy feature update
  const npcName = battle.baseNpcName || '';
@@ -190,4 +240,6 @@ export {
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('doLeaveBattle', doLeaveBattle); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('restartLastBattle', restartLastBattle); } catch (_) {} }
+
+
 

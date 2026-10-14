@@ -216,3 +216,5 @@ test('wave 32 J: only unearthed treasures carry a sprite', () => {
   assert.ok(/i\.collected\s*\?\s*itemIcon/.test(rows[0]),
     'a buried treasure must not reveal which item it is');
 });
+
+

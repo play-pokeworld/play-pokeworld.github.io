@@ -142,3 +142,5 @@ test('wave21: views exported by the registry', () => {
   assert.ok(idx.includes("export { PuzzleListView, PuzzleExplorationView, SpecialFormsView } from './PuzzleViews.js';"), 'PuzzleViews.js exports wired');
 });
 
+
+

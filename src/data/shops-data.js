@@ -1,68 +1,68 @@
 // Wave 40 — native ESM module. The classic surface (window/globalThis) is
 // kept verbatim further down: classic consumers and VM harnesses.
+// Passe 19 — règle joueur : pas d'objets post-Gen 3, et pas d'objets d'une
+// génération « future » dans une région antérieure (Gen 2 → Johto/Hoenn,
+// Gen 3 → Hoenn uniquement). Les baies de résistance (Gen 4) et Muscle Band
+// (Gen 4) ont été retirés ; metal_coat/soft_sand (Gen 2) quittent Kanto ;
+// silk_scarf/deep_sea_* (Gen 3) quittent Johto.
 const SHOPS = {
 "pallet": {
 "items": [
+"cheri_berry"
  ]
  },
 "viridian": {
 "items": [
-"prine_berry"
+"prine_berry",
+"chesto_berry"
  ]
  },
 "pewter": {
 "items": [
 "occa_berry",
-"muscle_band",
-"metal_coat"
+"rawst_berry"
  ]
  },
 "cerulean": {
 "items": [
 "passho_berry",
-"soft_sand"
+"aspear_berry"
  ]
  },
 "vermilion": {
 "items": [
 "wacan_berry",
-"muscle_band",
-"metal_coat",
-"soft_sand"
+"pecha_berry"
  ]
  },
 "lavender": {
 "items": [
-"rindo_berry"
+"rindo_berry",
+"persim_berry"
  ]
  },
 "celadon": {
 "items": [
 "yache_berry",
-"rarecandy",
-"muscle_band",
-"metal_coat",
-"soft_sand"
+"leppa_berry",
+"oran_berry",
+"rarecandy"
  ]
  },
 "fuchsia": {
 "items": [
 "chople_berry",
-"soft_sand"
+"sitrus_berry"
  ]
  },
 "cinnabar": {
 "items": [
-"kebia_berry",
-"muscle_band"
+"kebia_berry"
  ]
  },
 "indigo": {
 "items": [
-"rarecandy",
-"muscle_band",
-"metal_coat",
-"soft_sand"
+"rarecandy"
  ]
  },
 "jnewbark": {
@@ -79,7 +79,6 @@ const SHOPS = {
 "jviolet": {
 "items": [
 "coba_berry",
-"muscle_band",
 "twisted_spoon",
 "miracle_seed"
  ]
@@ -94,13 +93,14 @@ const SHOPS = {
  },
 "jgoldenrod": {
 "items": [
+"lucky_punch",
+"quick_claw",
 "tanga_berry",
 "rarecandy",
 "kings_rock",
 "dragon_scale",
 "upgrade",
-"deep_sea_scale",
-"deep_sea_tooth",
+"metal_coat",
 "twisted_spoon",
 "black_belt",
 "black_glasses",
@@ -114,7 +114,6 @@ const SHOPS = {
 "spell_tag",
 "hard_stone",
 "magnet",
-"silk_scarf",
 "silver_wing",
 "rainbow_wing"
  ]
@@ -146,8 +145,6 @@ const SHOPS = {
 "jmahogany": {
 "items": [
 "upgrade",
-"deep_sea_scale",
-"deep_sea_tooth",
 "dragon_fang"
  ]
  },

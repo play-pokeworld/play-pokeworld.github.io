@@ -23,18 +23,18 @@ const _PATHS = {
 
 // ─── Type/weather color map (single source of truth) ───
 const _TYPE_COLORS = {
-  fire:'#f08030', water:'#6890f0', grass:'#78c850', electric:'#f8d030',
-  ice:'#98d8d8', fighting:'#c03028', poison:'#a040a0', ground:'#e0c068',
-  flying:'#a890f0', psychic:'#f85888', bug:'#a8b820', rock:'#b8a038',
-  ghost:'#705898', dragon:'#7038f8', dark:'#705848', steel:'#b8b8d0',
-  fairy:'#ee99ac', normal:'#a8a878'
+  normal:'#A0A29F', fire:'#FBA64C', water:'#539DDF', grass:'#60BE58',
+  electric:'#F2D94E', ice:'#76D1C1', fighting:'#CE3E5A', poison:'#BA68D2',
+  ground:'#DA7C4D', flying:'#A1BBEC', psychic:'#FA8582', bug:'#92BD2D',
+  rock:'#C9BC8A', ghost:'#5F6DBC', dragon:'#0C6AC8', dark:'#595761',
+  steel:'#5795A3', fairy:'#EF90E6'
 };
 
 const _WEATHER_COLORS = {
   sunny:'#FBA64C', rainy:'#539DDF', sandstorm:'#DA7C4D', hail:'#76D1C1',
   electric:'#F2D94E', grassy:'#60BE58', misty:'#EF90E6', psychic:'#FA8582',
-  burn:'#f08030', freeze:'#98d8d8', para:'#f8d030', poison:'#a040a0',
-  sleep:'#705898', confuse:'#FA8582', flinch:'#d3524b', slow:'#539DDF'
+  burn:'#FBA64C', freeze:'#76D1C1', para:'#F2D94E', poison:'#BA68D2',
+  sleep:'#A0A29F', confuse:'#FA8582', flinch:'#d3524b', slow:'#539DDF'
 };
 
 // ─── Status/weather badge definitions ───
@@ -268,4 +268,6 @@ console.debug('[PokeCore] Engine initialized');
 export { PokeCore };
 export default PokeCore;
 if (typeof globalThis !== 'undefined') globalThis.PokeCore = PokeCore;
+
+
 

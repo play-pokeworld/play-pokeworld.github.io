@@ -599,7 +599,9 @@ test('phase 49 L: every catalog object has a sprite (no more 404s)', () => {
   // (tm_<type>.png) — getItemSpriteUrl routes them explicitly, so they
   // have no PNG of their own. Everything ELSE must exist on disk.
   const isTm = (k) => /^(ct|cs)(\d|_)/.test(k);
-  const missing = keys.filter((k) => !isTm(k) && !E(`src/assets/images/items/${k}.png`));
+  // DORM-06 — les Poké Balls ont un sprite SVG dédié (src/assets/images/pokeball/*.svg).
+  const isBall = (k) => !!(sbx.ITEMS && sbx.ITEMS[k] && sbx.ITEMS[k].type === 'ball');
+  const missing = keys.filter((k) => !isTm(k) && !isBall(k) && !E(`src/assets/images/items/${k}.png`));
   assert.deepEqual(missing, [], 'no item without PNG (getItemSpriteUrl builds the URL)');
   // and the 18 type floppies are indeed there
   for (const ty of ['normal', 'fire', 'water', 'grass', 'electric', 'ice', 'fighting',
@@ -1125,6 +1127,8 @@ test('phase 54 Q2: the tutorial never re-pays its rewards', () => {
     assert.equal(inv[k], 1, `${k}: a single unit despite 30 resets (got ${inv[k]})`);
   }
 });
+
+
 
 
 

@@ -11,3 +11,5 @@ export const L_en_pokedex = {
 // gardée sur l'objet global pour les registres (data.js) et les harnais VM.
 if (typeof globalThis !== 'undefined') globalThis.L_en_pokedex = L_en_pokedex;
 
+
+

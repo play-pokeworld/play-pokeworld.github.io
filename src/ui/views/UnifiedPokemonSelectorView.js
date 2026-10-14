@@ -155,6 +155,8 @@ export class UnifiedPokemonSelectorModal extends UIView {
     let filtered = this.pokemonList.filter(this.filterFn);
     if (this.searchQuery) {
       filtered = filtered.filter((p) => {
+        // PASSE 29 (item 11): search the localized name for the ACTIVE language.
+        if (typeof globalThis.pokemonMatchesSearch === 'function') return globalThis.pokemonMatchesSearch(p, this.searchQuery);
         const n = String(p.name || '').toLowerCase();
         const id = String(p.id || '').toLowerCase();
         return n.includes(this.searchQuery) || id.includes(this.searchQuery);
@@ -295,4 +297,6 @@ export class UnifiedPokemonSelectorModal extends UIView {
     return out;
   }
 }
+
+
 

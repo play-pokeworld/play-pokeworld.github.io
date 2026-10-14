@@ -38,7 +38,7 @@ function makeSandbox() {
   vm.createContext(sandbox);
   for (const f of [
     'src/data/moves.js', 'src/data/pd-data.js', 'src/data/items-data.js', 'src/data/items-helpers.js',
-    'src/data/poke-talents-data.js',
+    'src/data/poke-talents.js',
     'src/data/locations-data.js', 'src/data/locations-johto.js', 'src/data/game-helpers.js',
     'src/application/world/team.js', 'src/application/pokemon-factory.js',
     'src/data/champions-data.js', 'src/data/official-teams-data.js',
@@ -125,7 +125,7 @@ test('rewards: existing items, valid reward Pokémon, capped economy (user rule)
   assert.ok(moneyJ >= 230000 && moneyJ <= 275000, `Johto quests ${moneyJ}₽ ∈ [230k, 275k] (was 302k before phase 18)`);
   assert.ok(moneyTrainers >= 80000 && moneyTrainers <= 120000, `trainer prizes ${moneyTrainers}₽ ∈ [80k, 120k]`);
   // The Prine Berry (absent from ITEMS before phase 18) is now real.
-  assert.ok(sb.ITEMS.prine_berry && sb.ITEMS.prine_berry.buff, 'prine_berry defined (legacy buff def)');
+  assert.ok(sb.ITEMS.prine_berry && sb.ITEMS.prine_berry.category === 'cure_all', 'prine_berry = Lum (soigne tout, une fois par combat)');
 });
 
 test('side quests: s1-s55, Kanto then Johto, mandatory NPC giver, valid mainTalk', () => {
@@ -393,5 +393,7 @@ test('repeatables: pass 21 adds targeted Kanto ones, region-filtered, FR/EN text
     }
   }
 });
+
+
 
 

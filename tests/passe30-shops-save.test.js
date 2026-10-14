@@ -15,7 +15,10 @@ test('shop adapter routes through ShopView (throw contract, labels stay in the a
   assert.ok(shop.includes('views.ShopView.toHTML'), 'render through the view');
   assert.ok(shop.includes("state: 'locked'"), 'indigo lock is a model state');
   assert.ok(!shop.includes('` ${stockList.map'), 'no legacy row template left');
-  assert.ok(shop.includes('stockLabel') && shop.includes("getItemDesc(key)"), 'adapter still localizes');
+  assert.ok(shop.includes('stockLabel') && shop.includes("getItemName(key)"), 'adapter still localizes');
+  // P1 : boutique façon PokéClicker — sélection + quantité + Acheter en bas.
+  assert.ok(shop.includes('selectShopItem') && shop.includes('buySelectedFromShop'), 'select + buy contract');
+  assert.ok(shop.includes('shopMaxQty') && shop.includes('shopAddQty'), 'quantity controls');
 });
 
 test('market adapter routes through MarketView (buckets + labels in the adapter)', () => {
@@ -57,7 +60,7 @@ test('MarketView renders categories + cards with the buy contract', async () => 
     }] },
   ] });
   assert.ok(html.includes('pw-market-cat'), 'category titles');
-  assert.ok(html.includes('data-call="buyPokemon"') && html.includes('data-call-args="25"'), 'buy contract + numeric arg');
+  assert.ok(html.includes('data-call="selectMarketPokemon"') && html.includes('data-call-args="25"'), 'select contract + numeric arg (achat via la barre du bas)');
   assert.ok(html.includes('???'), 'unseen species hidden');
   assert.ok(html.includes('pw-text-sm pw-green') && html.includes('Bought'), 'owned line only when owned');
   assert.ok((html.match(/pw-market-row/g) || []).length === 2, 'exactly two cards');
@@ -101,4 +104,6 @@ test('views/components are registered in the DS index files', () => {
   const comps = R('src/ui/components/index.js');
   assert.ok(comps.includes("from './save-extras.js'") && comps.includes('saveContextMenuHTML') && comps.includes('saveIconGridHTML'), 'save extras registered');
 });
+
+
 

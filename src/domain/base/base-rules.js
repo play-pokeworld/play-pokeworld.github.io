@@ -41,3 +41,5 @@ export function canPlaceDecoration(currentDecorationCount, maxCapacity = 16) {
   return current < max;
 }
 
+
+

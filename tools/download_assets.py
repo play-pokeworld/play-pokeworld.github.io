@@ -61,11 +61,65 @@ REGION_ACCENTS = {
 }
 
 # Original PokeChill backgrounds (the game this project derives from).
+# PASSE 28 — on récupère TOUT le dossier img/bg de PokeChill : les décors de
+# combat/exploration doivent venir du jeu d'origine, pas de PokéClicker.
+_POKECHILL_BG_NAMES = [
+    'main-bg.png', 'empty.jpg', 'forest.png', 'beach.png', 'cave.png',
+    'desert.png', 'iceCave.png', 'lab.png', 'lake.png', 'mall.png',
+    'missing.png', 'mountain.png', 'night.png', 'plant.png', 'route.png',
+    'sea.png', 'snow.png', 'space.png', 'tower.png', 'town.png',
+    'trench.png', 'volcano.png', 'gym.png', 'gymCard.png',
+    'exploreHead1.png', 'exploreHead2.png', 'dimension1.png',
+]
 BACKGROUNDS = {
-    'main-bg.png': f'{POKECHILL_RAW}/img/bg/main-bg.png',
-    'empty.jpg':   f'{POKECHILL_RAW}/img/bg/empty.jpg',
-    'forest.png':  f'{POKECHILL_RAW}/img/bg/forest.png',
+    name: f'{POKECHILL_RAW}/img/bg/{name}' for name in _POKECHILL_BG_NAMES
 }
+
+# Vignettes de zone PokeChill (img/bg/mini/*) : utilisées comme décor de la
+# rangée du Pokémon actif en combat.
+_POKECHILL_BG_MINI_NAMES = [
+    'beach.png', 'cave.png', 'cavern.png', 'city.png', 'city2.png',
+    'desert.png', 'forest.png', 'mountain.png', 'ocean.png', 'pink.png',
+    'river.png', 'sky.png', 'space.png', 'volcano.png',
+    'special1.png', 'special2.png', 'special3.png', 'special4.png',
+    'special5.png', 'special6.png', 'special7.png',
+]
+BACKGROUNDS_MINI = {
+    name: f'{POKECHILL_RAW}/img/bg/mini/{name}' for name in _POKECHILL_BG_MINI_NAMES
+}
+
+# Ressources PokeChill : l'ombre portée sous le sprite au combat, la Poké Ball
+# décorative qui tourne derrière le Pokémon actif.
+RESOURCES = {
+    'pkmn-shadow.png': f'{POKECHILL_RAW}/img/resources/pkmn-shadow.png',
+    'none.png':        f'{POKECHILL_RAW}/img/resources/none.png',
+    'pokeball.svg':    f'{POKECHILL_RAW}/img/icons/pokeball.svg',
+}
+
+# PASSE 29 (item 10) — favicons référencés par index.html (lignes 7 à 9) et
+# jamais téléchargés : ils apparaissaient donc comme « introuvables » alors
+# que l'icône existe bel et bien en amont (img/icons/icon.png). Les trois
+# tailles sont dérivées de cette source unique.
+APP_ICONS = {
+    'Icon.png': f'{POKECHILL_RAW}/img/icons/icon.png',
+    'icon-192.png': f'{POKECHILL_RAW}/img/icons/icon.png',
+    'icon-180.png': f'{POKECHILL_RAW}/img/icons/icon.png',
+}
+
+# PASSE 26o — décors de combat PokéClicker (src/assets/images/battleBackground).
+# La feuille de style (design-system.css, skin combat) référence
+# `../images/battleBackground/<name>.png` : sans ces fichiers la scène de
+# combat tombait sur un aplat sombre (« affichage du combat cassé »).
+BATTLE_BACKGROUNDS = [
+    'default.png', 'battlefield.png', 'cave.png', 'cave-gem.png', 'desert.png',
+    'fire.png', 'forest.png', 'graveyard.png', 'ice.png', 'mansion.png',
+    'power-plant.png', 'space.png', 'water.png',
+]
+
+# PASSE 38 — tuiles de DONJON façon Pokéclicker (retour joueur : « il faut des
+# assets : vide → case vide, combat → symbole de pokéball, boss → symbole de
+# boss »). Ce sont les icônes officielles du dépôt Pokéclicker (dungeons/).
+DUNGEON_TILES = ['encounter.png', 'boss.png', 'chest.png', 'ladder.png']
 
 # Item sprites whose official source is mandated (user feedback):
 #  - TMs (tm_<type>) come from PokeChill, official type disks;
@@ -85,6 +139,222 @@ ITEM_OVERRIDES = {
     'berry.png':       f'{POKECHILL_RAW}/img/items/berryOran.png',
     # Generic mine fossil: PokeChill fossilHelix sprite (same target #138)
     'fossil.png':      f'{POKECHILL_RAW}/img/items/fossilHelix.png',
+    # Passe 0 (2026-08-14): 7 objets tenus sans sprite — 5 réels sur PokeChill,
+    # 2 stand-ins de la même famille depuis PokéClicker (à remplacer si mieux).
+    'clear_amulet.png':      f'{POKECHILL_RAW}/img/items/clearAmulet.png',
+    'eject_pack.png':        f'{POKECHILL_RAW}/img/items/ejectPack.png',
+    'foggy_seed.png':        f'{POKECHILL_RAW}/img/items/foggySeed.png',
+    'heavy_duty_boots.png':  f'{POKECHILL_RAW}/img/items/heavyDutyBoots.png',
+    'loaded_dice.png':       f'{POKECHILL_RAW}/img/items/loadedDice.png',
+    'cracked_pot.png':       f'{POKECLICKER_RAW}/items/evolution/Cracked_pot.png',
+    'chipped_pot.png':       f'{POKECLICKER_RAW}/items/evolution/Cracked_pot.png',   # stand-in
+    'unremarkable_teacup.png': f'{POKECLICKER_RAW}/items/evolution/Unremarkable_teacup.png',
+    'masterpiece_teacup.png':  f'{POKECLICKER_RAW}/items/evolution/Unremarkable_teacup.png',  # stand-in
+
+    # DORM-06 — baies (PokéClicker) + consommables (PokeChill).
+    'cheri_berry.png': f'{POKECLICKER_RAW}/items/berry/Cheri.png',
+    'chesto_berry.png': f'{POKECLICKER_RAW}/items/berry/Chesto.png',
+    'pecha_berry.png': f'{POKECLICKER_RAW}/items/berry/Pecha.png',
+    'rawst_berry.png': f'{POKECLICKER_RAW}/items/berry/Rawst.png',
+    'aspear_berry.png': f'{POKECLICKER_RAW}/items/berry/Aspear.png',
+    'persim_berry.png': f'{POKECLICKER_RAW}/items/berry/Persim.png',
+    'leppa_berry.png': f'{POKECLICKER_RAW}/items/berry/Leppa.png',
+    'oran_berry.png': f'{POKECLICKER_RAW}/items/berry/Oran.png',
+    'sitrus_berry.png': f'{POKECLICKER_RAW}/items/berry/Sitrus.png',
+    'figy_berry.png': f'{POKECLICKER_RAW}/items/berry/Figy.png',
+    'wiki_berry.png': f'{POKECLICKER_RAW}/items/berry/Wiki.png',
+    'mago_berry.png': f'{POKECLICKER_RAW}/items/berry/Mago.png',
+    'aguav_berry.png': f'{POKECLICKER_RAW}/items/berry/Aguav.png',
+    'iapapa_berry.png': f'{POKECLICKER_RAW}/items/berry/Iapapa.png',
+    'liechi_berry.png': f'{POKECLICKER_RAW}/items/berry/Liechi.png',
+    'ganlon_berry.png': f'{POKECLICKER_RAW}/items/berry/Ganlon.png',
+    'salac_berry.png': f'{POKECLICKER_RAW}/items/berry/Salac.png',
+    'petaya_berry.png': f'{POKECLICKER_RAW}/items/berry/Petaya.png',
+    'apicot_berry.png': f'{POKECLICKER_RAW}/items/berry/Apicot.png',
+    'lansat_berry.png': f'{POKECLICKER_RAW}/items/berry/Lansat.png',
+    'starf_berry.png': f'{POKECLICKER_RAW}/items/berry/Starf.png',
+    'pomeg_berry.png': f'{POKECLICKER_RAW}/items/berry/Pomeg.png',
+    'kelpsy_berry.png': f'{POKECLICKER_RAW}/items/berry/Kelpsy.png',
+    'qualot_berry.png': f'{POKECLICKER_RAW}/items/berry/Qualot.png',
+    'hondew_berry.png': f'{POKECLICKER_RAW}/items/berry/Hondew.png',
+    'grepa_berry.png': f'{POKECLICKER_RAW}/items/berry/Grepa.png',
+    'tamato_berry.png': f'{POKECLICKER_RAW}/items/berry/Tamato.png',
+    'chilan_berry.png': f'{POKECLICKER_RAW}/items/berry/Chilan.png',
+    'micle_berry.png': f'{POKECLICKER_RAW}/items/berry/Micle.png',
+    'custap_berry.png': f'{POKECLICKER_RAW}/items/berry/Custap.png',
+    'jaboca_berry.png': f'{POKECLICKER_RAW}/items/berry/Jaboca.png',
+    'rowap_berry.png': f'{POKECLICKER_RAW}/items/berry/Rowap.png',
+    'kee_berry.png': f'{POKECLICKER_RAW}/items/berry/Kee.png',
+    'maranga_berry.png': f'{POKECLICKER_RAW}/items/berry/Maranga.png',
+    'enigma_berry.png': f'{POKECLICKER_RAW}/items/berry/Enigma.png',
+    'snover_berry.png': f'{POKECLICKER_RAW}/items/berry/Snover.png',
+    'hopo_berry.png': f'{POKECLICKER_RAW}/items/berry/Hopo.png',
+    'pinkan_berry.png': f'{POKECLICKER_RAW}/items/berry/Pinkan.png',
+    'razz_berry.png': f'{POKECLICKER_RAW}/items/berry/Razz.png',
+    'bluk_berry.png': f'{POKECLICKER_RAW}/items/berry/Bluk.png',
+    'nanab_berry.png': f'{POKECLICKER_RAW}/items/berry/Nanab.png',
+    'wepear_berry.png': f'{POKECLICKER_RAW}/items/berry/Wepear.png',
+    'pinap_berry.png': f'{POKECLICKER_RAW}/items/berry/Pinap.png',
+    'cornn_berry.png': f'{POKECLICKER_RAW}/items/berry/Cornn.png',
+    'magost_berry.png': f'{POKECLICKER_RAW}/items/berry/Magost.png',
+    'rabuta_berry.png': f'{POKECLICKER_RAW}/items/berry/Rabuta.png',
+    'nomel_berry.png': f'{POKECLICKER_RAW}/items/berry/Nomel.png',
+    'spelon_berry.png': f'{POKECLICKER_RAW}/items/berry/Spelon.png',
+    'pamtre_berry.png': f'{POKECLICKER_RAW}/items/berry/Pamtre.png',
+    'watmel_berry.png': f'{POKECLICKER_RAW}/items/berry/Watmel.png',
+    'durin_berry.png': f'{POKECLICKER_RAW}/items/berry/Durin.png',
+    'belue_berry.png': f'{POKECLICKER_RAW}/items/berry/Belue.png',
+    'hp_up.png': f'{POKECHILL_RAW}/img/items/hpUp.png',
+    'protein.png': f'{POKECHILL_RAW}/img/items/protein.png',
+    'iron.png': f'{POKECHILL_RAW}/img/items/iron.png',
+    'calcium.png': f'{POKECHILL_RAW}/img/items/calcium.png',
+    'zinc.png': f'{POKECHILL_RAW}/img/items/zinc.png',
+    'carbos.png': f'{POKECHILL_RAW}/img/items/carbos.png',
+    'bottle_cap.png': f'{POKECHILL_RAW}/img/items/bottleCap.png',
+    'golden_bottle_cap.png': f'{POKECHILL_RAW}/img/items/goldenBottleCap.png',
+    'ability_capsule.png': f'{POKECHILL_RAW}/img/items/abilityCapsule.png',
+    'ability_patch.png': f'{POKECHILL_RAW}/img/items/abilityPatch.png',
+
+    # DORM-06b — objets futurs (mega-gemmes, apricorns, souterrains…).
+    'abomasite.png': f'{POKECHILL_RAW}/img/items/abomasite.png',
+    'absolite.png': f'{POKECHILL_RAW}/img/items/absolite.png',
+    'aerodactylite.png': f'{POKECHILL_RAW}/img/items/aerodactylite.png',
+    'aggronite.png': f'{POKECHILL_RAW}/img/items/aggronite.png',
+    'alakazite.png': f'{POKECHILL_RAW}/img/items/alakazite.png',
+    'altarianite.png': f'{POKECHILL_RAW}/img/items/altarianite.png',
+    'ampharosite.png': f'{POKECHILL_RAW}/img/items/ampharosite.png',
+    'audinite.png': f'{POKECHILL_RAW}/img/items/audinite.png',
+    'banettite.png': f'{POKECHILL_RAW}/img/items/banettite.png',
+    'barbaracite.png': f'{POKECHILL_RAW}/img/items/barbaracite.png',
+    'baxcaliburite.png': f'{POKECHILL_RAW}/img/items/baxcaliburite.png',
+    'beedrillite.png': f'{POKECHILL_RAW}/img/items/beedrillite.png',
+    'blastoisinite.png': f'{POKECHILL_RAW}/img/items/blastoisinite.png',
+    'blazikenite.png': f'{POKECHILL_RAW}/img/items/blazikenite.png',
+    'cameruptite.png': f'{POKECHILL_RAW}/img/items/cameruptite.png',
+    'diancite.png': f'{POKECHILL_RAW}/img/items/diancite.png',
+    'dragonitite.png': f'{POKECHILL_RAW}/img/items/dragonitite.png',
+    'falinksite.png': f'{POKECHILL_RAW}/img/items/falinksite.png',
+    'galladite.png': f'{POKECHILL_RAW}/img/items/galladite.png',
+    'garchompite.png': f'{POKECHILL_RAW}/img/items/garchompite.png',
+    'gardevoirite.png': f'{POKECHILL_RAW}/img/items/gardevoirite.png',
+    'gengarite.png': f'{POKECHILL_RAW}/img/items/gengarite.png',
+    'glalitite.png': f'{POKECHILL_RAW}/img/items/glalitite.png',
+    'gyaradosite.png': f'{POKECHILL_RAW}/img/items/gyaradosite.png',
+    'hawluchanite.png': f'{POKECHILL_RAW}/img/items/hawluchanite.png',
+    'heracronite.png': f'{POKECHILL_RAW}/img/items/heracronite.png',
+    'houndoominite.png': f'{POKECHILL_RAW}/img/items/houndoominite.png',
+    'kangaskhanite.png': f'{POKECHILL_RAW}/img/items/kangaskhanite.png',
+    'latiasite.png': f'{POKECHILL_RAW}/img/items/latiasite.png',
+    'latiosite.png': f'{POKECHILL_RAW}/img/items/latiosite.png',
+    'lopunnite.png': f'{POKECHILL_RAW}/img/items/lopunnite.png',
+    'lucarionite.png': f'{POKECHILL_RAW}/img/items/lucarionite.png',
+    'manectite.png': f'{POKECHILL_RAW}/img/items/manectite.png',
+    'mawilite.png': f'{POKECHILL_RAW}/img/items/mawilite.png',
+    'medichamite.png': f'{POKECHILL_RAW}/img/items/medichamite.png',
+    'metagrossite.png': f'{POKECHILL_RAW}/img/items/metagrossite.png',
+    'pidgeotite.png': f'{POKECHILL_RAW}/img/items/pidgeotite.png',
+    'pinsirite.png': f'{POKECHILL_RAW}/img/items/pinsirite.png',
+    'pyroarite.png': f'{POKECHILL_RAW}/img/items/pyroarite.png',
+    'sablenite.png': f'{POKECHILL_RAW}/img/items/sablenite.png',
+    'salamencite.png': f'{POKECHILL_RAW}/img/items/salamencite.png',
+    'sceptilite.png': f'{POKECHILL_RAW}/img/items/sceptilite.png',
+    'scizorite.png': f'{POKECHILL_RAW}/img/items/scizorite.png',
+    'sharpedonite.png': f'{POKECHILL_RAW}/img/items/sharpedonite.png',
+    'slowbronite.png': f'{POKECHILL_RAW}/img/items/slowbronite.png',
+    'steelixite.png': f'{POKECHILL_RAW}/img/items/steelixite.png',
+    'swampertite.png': f'{POKECHILL_RAW}/img/items/swampertite.png',
+    'tyranitarite.png': f'{POKECHILL_RAW}/img/items/tyranitarite.png',
+    'venusaurite.png': f'{POKECHILL_RAW}/img/items/venusaurite.png',
+    'charizardite_x.png': f'{POKECHILL_RAW}/img/items/charizarditeX.png',
+    'charizardite_y.png': f'{POKECHILL_RAW}/img/items/charizarditeY.png',
+    'mewtwonite_x.png': f'{POKECHILL_RAW}/img/items/mewtwoniteX.png',
+    'mewtwonite_y.png': f'{POKECHILL_RAW}/img/items/mewtwoniteY.png',
+    'raichutite_x.png': f'{POKECHILL_RAW}/img/items/raichutiteX.png',
+    'raichutite_y.png': f'{POKECHILL_RAW}/img/items/raichutiteY.png',
+    'mega_piece.png': f'{POKECHILL_RAW}/img/items/megaPiece.png',
+    'mega_shard.png': f'{POKECHILL_RAW}/img/items/megaShard.png',
+    'mega_cluster.png': f'{POKECHILL_RAW}/img/items/megaCluster.png',
+    'mega_chunk.png': f'{POKECHILL_RAW}/img/items/megaChunk.png',
+    'mystery_egg.png': f'{POKECHILL_RAW}/img/items/mysteryEgg.png',
+    'time_candy.png': f'{POKECHILL_RAW}/img/items/timeCandy.png',
+    'time_candy_xl.png': f'{POKECHILL_RAW}/img/items/timeCandyXL.png',
+    'red_apricorn.png': f'{POKECHILL_RAW}/img/items/redApricorn.png',
+    'blue_apricorn.png': f'{POKECHILL_RAW}/img/items/blueApricorn.png',
+    'yellow_apricorn.png': f'{POKECHILL_RAW}/img/items/yellowApricorn.png',
+    'green_apricorn.png': f'{POKECHILL_RAW}/img/items/greenApricorn.png',
+    'pink_apricorn.png': f'{POKECHILL_RAW}/img/items/pinkApricorn.png',
+    'white_apricorn.png': f'{POKECHILL_RAW}/img/items/whiteApricorn.png',
+    'black_apricorn.png': f'{POKECHILL_RAW}/img/items/blackApricorn.png',
+    'red_orb.png': f'{POKEAPI_RAW}/items/red-orb.png',
+    'blue_orb.png': f'{POKEAPI_RAW}/items/blue-orb.png',
+    'gs_ball_celebi.png': f'{POKECLICKER_RAW}/items/collectible/GS_Ball_Celebi.png',
+    'clear_bell_hooh.png': f'{POKECLICKER_RAW}/items/collectible/Clear_Bell_Hooh.png',
+    'tidal_bell_lugia.png': f'{POKECLICKER_RAW}/items/collectible/Tidal_Bell_Lugia.png',
+    'eon_ticket_latis.png': f'{POKECLICKER_RAW}/keyitems/Eon_ticket.png',
+    'meteorite_shard_delta.png': f'{POKECLICKER_RAW}/items/collectible/Meteorite_Shard_Delta.png',
+    'meteorite_bills_errand.png': f'{POKECLICKER_RAW}/items/collectible/Meteorite_Bills_Errand.png',
+    'destiny_knot.png': f'{POKECHILL_RAW}/img/items/destinyKnot.png',
+    'macho_brace.png': f'{POKECHILL_RAW}/img/items/machoBrace.png',
+    'power_bracer.png': f'{POKECHILL_RAW}/img/items/powerBracer.png',
+    'power_belt.png': f'{POKECHILL_RAW}/img/items/powerBelt.png',
+    'power_lens.png': f'{POKECHILL_RAW}/img/items/powerLens.png',
+    'power_band.png': f'{POKECHILL_RAW}/img/items/powerBand.png',
+    'power_anklet.png': f'{POKECHILL_RAW}/img/items/powerAnklet.png',
+    'power_weight.png': f'{POKECHILL_RAW}/img/items/powerWeight.png',
+    'neutral_mint.png': f'{POKECHILL_RAW}/img/items/neutralMint.png',
+    'red_shard.png': f'{POKECLICKER_RAW}/items/underground/Red%20Shard.png',
+    'blue_shard.png': f'{POKECLICKER_RAW}/items/underground/Blue%20Shard.png',
+    'yellow_shard.png': f'{POKECLICKER_RAW}/items/underground/Yellow%20Shard.png',
+    'green_shard.png': f'{POKECLICKER_RAW}/items/underground/Green%20Shard.png',
+    'white_shard.png': f'{POKECLICKER_RAW}/items/underground/White%20Shard.png',
+    'black_shard.png': f'{POKECLICKER_RAW}/items/underground/Black%20Shard.png',
+    'purple_shard.png': f'{POKECLICKER_RAW}/items/underground/Purple%20Shard.png',
+    'pink_shard.png': f'{POKECLICKER_RAW}/items/underground/Pink%20Shard.png',
+    'cyan_shard.png': f'{POKECLICKER_RAW}/items/underground/Cyan%20Shard.png',
+    'beige_shard.png': f'{POKECLICKER_RAW}/items/underground/Beige%20Shard.png',
+    'brown_shard.png': f'{POKECLICKER_RAW}/items/underground/Brown%20Shard.png',
+    'crimson_shard.png': f'{POKECLICKER_RAW}/items/underground/Crimson%20Shard.png',
+    'grey_shard.png': f'{POKECLICKER_RAW}/items/underground/Grey%20Shard.png',
+    'lime_shard.png': f'{POKECLICKER_RAW}/items/underground/Lime%20Shard.png',
+    'ochre_shard.png': f'{POKECLICKER_RAW}/items/underground/Ochre%20Shard.png',
+    'rose_shard.png': f'{POKECLICKER_RAW}/items/underground/Rose%20Shard.png',
+    'slate_shard.png': f'{POKECLICKER_RAW}/items/underground/Slate%20Shard.png',
+    'blank_plate.png': f'{POKECLICKER_RAW}/items/collectible/Sacred%20Blank%20Plate.png',
+    'draco_plate.png': f'{POKECLICKER_RAW}/items/collectible/Sacred%20Draco%20Plate.png',
+    'dread_plate.png': f'{POKECLICKER_RAW}/items/collectible/Sacred%20Dread%20Plate.png',
+    'earth_plate.png': f'{POKECLICKER_RAW}/items/collectible/Sacred%20Earth%20Plate.png',
+    'fist_plate.png': f'{POKECLICKER_RAW}/items/collectible/Sacred%20Fist%20Plate.png',
+    'flame_plate.png': f'{POKECLICKER_RAW}/items/collectible/Sacred%20Flame%20Plate.png',
+    'icicle_plate.png': f'{POKECLICKER_RAW}/items/collectible/Sacred%20Icicle%20Plate.png',
+    'insect_plate.png': f'{POKECLICKER_RAW}/items/collectible/Sacred%20Insect%20Plate.png',
+    'iron_plate.png': f'{POKECLICKER_RAW}/items/collectible/Sacred%20Iron%20Plate.png',
+    'meadow_plate.png': f'{POKECLICKER_RAW}/items/collectible/Sacred%20Meadow%20Plate.png',
+    'mind_plate.png': f'{POKECLICKER_RAW}/items/collectible/Sacred%20Mind%20Plate.png',
+    'pixie_plate.png': f'{POKECLICKER_RAW}/items/collectible/Sacred%20Pixie%20Plate.png',
+    'sky_plate.png': f'{POKECLICKER_RAW}/items/collectible/Sacred%20Sky%20Plate.png',
+    'splash_plate.png': f'{POKECLICKER_RAW}/items/collectible/Sacred%20Splash%20Plate.png',
+    'spooky_plate.png': f'{POKECLICKER_RAW}/items/collectible/Sacred%20Spooky%20Plate.png',
+    'stone_plate.png': f'{POKECLICKER_RAW}/items/collectible/Sacred%20Stone%20Plate.png',
+    'toxic_plate.png': f'{POKECLICKER_RAW}/items/collectible/Sacred%20Toxic%20Plate.png',
+    'zap_plate.png': f'{POKECLICKER_RAW}/items/collectible/Sacred%20Zap%20Plate.png',
+    'amaze_mulch.png': f'{POKECLICKER_RAW}/items/farm/Amaze_Mulch.png',
+    'boost_mulch.png': f'{POKECLICKER_RAW}/items/farm/Boost_Mulch.png',
+    'freeze_mulch.png': f'{POKECLICKER_RAW}/items/farm/Freeze_Mulch.png',
+    'gooey_mulch.png': f'{POKECLICKER_RAW}/items/farm/Gooey_Mulch.png',
+    'rich_mulch.png': f'{POKECLICKER_RAW}/items/farm/Rich_Mulch.png',
+    'surprise_mulch.png': f'{POKECLICKER_RAW}/items/farm/Surprise_Mulch.png',
+    'berry_shovel.png': f'{POKECLICKER_RAW}/items/farm/Berry_Shovel.png',
+    'mulch_shovel.png': f'{POKECLICKER_RAW}/items/farm/Mulch_Shovel.png',
+    'cerulean_berry_shop_permit.png': f'{POKECLICKER_RAW}/items/collectible/CeruleanBerryShopPermit.png',
+    'red_flute.png': f'{POKECLICKER_RAW}/items/fluteItem/Red_Flute.png',
+    'blue_flute.png': f'{POKECLICKER_RAW}/items/fluteItem/Blue_Flute.png',
+    'yellow_flute.png': f'{POKECLICKER_RAW}/items/fluteItem/Yellow_Flute.png',
+    'white_flute.png': f'{POKECLICKER_RAW}/items/fluteItem/White_Flute.png',
+    'black_flute.png': f'{POKECLICKER_RAW}/items/fluteItem/Black_Flute.png',
+    'time_flute.png': f'{POKECLICKER_RAW}/items/fluteItem/Time_Flute.png',
+    'treasure_scanner.png': f'{POKECLICKER_RAW}/oakitems/Treasure_Scanner.png',
+    'dowsing_machine.png': f'{POKECLICKER_RAW}/items/battleItem/Dowsing_machine.png',
+    'token_collector.png': f'{POKECLICKER_RAW}/items/battleItem/Token_collector.png',
 }
 
 # Pokeclicker catalog (tools/pokeclicker-items.json) — larger official
@@ -119,6 +389,21 @@ ITEM_ALIASES = {
     'pokeflute': 'poke-flute', 'rarecandy': 'rare-candy', 'rarcandy': 'rare-candy',
     'firestone': 'fire-stone', 'waterstone': 'water-stone', 'thunderstone': 'thunder-stone',
     'leafstone': 'leaf-stone', 'moonstone': 'moon-stone', 'sunstone': 'sun-stone',
+    # PASSE 29 (item 10) — les Poké Balls spéciales avaient été déclarées
+    # « absentes de PokeAPI » : c'était faux, seul le nom de fichier diffère
+    # (tiret entre les deux mots). Vérifié : les 12 renvoient HTTP 200.
+    'lureball': 'lure-ball', 'moonball': 'moon-ball', 'fastball': 'fast-ball',
+    'diveball': 'dive-ball', 'luxuryball': 'luxury-ball', 'nestball': 'nest-ball',
+    'repeatball': 'repeat-ball', 'timerball': 'timer-ball', 'duskball': 'dusk-ball',
+    'quickball': 'quick-ball', 'beastball': 'beast-ball', 'masterball': 'master-ball',
+    'premierball': 'premier-ball', 'healball': 'heal-ball', 'netball': 'net-ball',
+    'levelball': 'level-ball', 'loveball': 'love-ball', 'friendball': 'friend-ball',
+    'safariball': 'safari-ball', 'sportball': 'sport-ball',
+    # PASSE 29 (item 10) — également faussement déclarés introuvables : les
+    # trois existent sur PokeAPI sous leur nom officiel anglais.
+    'prine_berry': 'lum-berry',   # Baie Prine = Lum Berry
+    'upgrade': 'up-grade',        # Améliorator = Up-Grade
+    'berry': 'oran-berry',        # « baie » générique = Oran Berry
 }
 
 
@@ -358,6 +643,119 @@ def download_backgrounds() -> None:
     for name, url in BACKGROUNDS.items():
         write_download(url, bg_dir / name)
 
+    mini_dir = bg_dir / 'mini'
+    mini_dir.mkdir(parents=True, exist_ok=True)
+    for name, url in BACKGROUNDS_MINI.items():
+        write_download(url, mini_dir / name)
+
+    res_dir = ROOT / 'src/assets/images/resources'
+    res_dir.mkdir(parents=True, exist_ok=True)
+    for name, url in RESOURCES.items():
+        write_download(url, res_dir / name)
+
+    # Favicons / icône d'application (index.html l.7-9).
+    img_dir = ROOT / 'src/assets/images'
+    for name, url in APP_ICONS.items():
+        write_download(url, img_dir / name)
+
+
+def download_battle_backgrounds() -> None:
+    """PASSE 26o — décors de combat officiels PokéClicker.
+
+    Un fichier par entrée de BATTLE_BACKGROUNDS, jamais de placeholder :
+    un décor absent est signalé pour que l'utilisateur le fournisse.
+    """
+    bb_dir = ROOT / 'src/assets/images/battleBackground'
+    bb_dir.mkdir(parents=True, exist_ok=True)
+    missing = []
+    for name in BATTLE_BACKGROUNDS:
+        out = bb_dir / name
+        if out.exists() and out.stat().st_size > 0:
+            continue
+        if not write_download(f'{POKECLICKER_RAW}/battleBackground/{name}', out):
+            missing.append(name)
+    if missing:
+        print(f"[SANS PLACEHOLDER] {len(missing)} battle background(s) absent(s) : {', '.join(missing)}")
+    else:
+        print(f'battle backgrounds: {len(BATTLE_BACKGROUNDS)} décor(s) PokéClicker OK')
+
+
+def download_dungeon_tiles() -> None:
+    """PASSE 38/38c — icônes de tuiles de donjon.
+
+    PASSE 38 : les silhouettes d'origine viennent du dépôt Pokéclicker
+    (Combat = encounter.png, boss = boss.png, coffre = chest.png, échelle =
+    ladder.png). Un fichier par entrée de DUNGEON_TILES, jamais de
+    placeholder : une icône absente est signalée.
+
+    PASSE 38c (retour joueur) : après téléchargement, les tuiles sont
+    RÉGÉNÉRÉES en monochrome NOIR (glyphes) — encounter.png devient la
+    « pokéball vide » (contour) dessinée, boss/chest/ladder conservent leur
+    silhouette mais en noir pur. La couleur est appliquée en CSS (masque +
+    teinte partagée boss/pokéball/coffre, teinte propre pour l'échelle).
+    """
+    dg_dir = ROOT / 'src/assets/images/dungeon'
+    dg_dir.mkdir(parents=True, exist_ok=True)
+    missing = []
+    for name in DUNGEON_TILES:
+        out = dg_dir / name
+        if out.exists() and out.stat().st_size > 0:
+            continue
+        if not write_download(f'{POKECLICKER_RAW}/dungeons/{name}', out):
+            missing.append(name)
+    if missing:
+        print(f"[SANS PLACEHOLDER] {len(missing)} tuile(s) de donjon absente(s) : {', '.join(missing)}")
+    else:
+        print(f'dungeon tiles: {len(DUNGEON_TILES)} icône(s) PokéClicker OK')
+    # PASSE 38c — monochrome : identique à tools/regenerate_dungeon_tiles.py.
+    try:
+        from PIL import Image, ImageDraw
+    except Exception:
+        print('[ATTENTION] PIL indisponible — tuiles laissées en couleurs d\'origine')
+        return
+    # encounter.png → POKÉBALL VIDE (contour) : le logo des cases de combat.
+    W, H, cx, cy, r, lw = 70, 71, 35, 35, 30, 5
+    im = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.ellipse((cx - r, cy - r, cx + r, cy + r), outline=(0, 0, 0, 255), width=lw)
+    d.line((cx - r, cy, cx + r, cy), fill=(0, 0, 0, 255), width=lw)
+    d.ellipse((cx - 8, cy - r - 8, cx + 8, cy - r + 8), outline=(0, 0, 0, 255), width=4)
+    im.save(dg_dir / 'encounter.png')
+    # boss/chest/ladder → glyphes noirs (RGB → 0, alpha conservé).
+    for name in ('boss.png', 'chest.png', 'ladder.png'):
+        out = dg_dir / name
+        if not (out.exists() and out.stat().st_size > 0):
+            continue
+        im2 = Image.open(out).convert('RGBA')
+        px = im2.load()
+        for y in range(im2.size[1]):
+            for x in range(im2.size[0]):
+                r_, g_, b_, a_ = px[x, y]
+                px[x, y] = (0, 0, 0, a_)
+        im2.save(out)
+    print('dungeon tiles: régénérées en glyphes monochromes (PASSE 38c)')
+    # PASSE 39/38e — les cases de COMBAT utilisent la pokéball de la barre de
+    # titre (icône officielle, pas le contour dessiné) : asset SVG local, créé
+    # ici s'il manque (même SVG que l'icône de la fenêtre « Poké Balls »).
+    # L'élite ajoute une étoile (combat corsé) en surimpression.
+    local_svgs = {
+        'pokeball.svg': (
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" '
+            'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/>'
+            '<line x1="2" y1="12" x2="22" y2="12"/><circle cx="12" cy="12" r="3"/></svg>\n'
+        ),
+        'star.svg': (
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#000000">'
+            '<path d="M12 2l2.9 6.26 6.6.72-4.9 4.54 1.34 6.48L12 16.77 6.06 20l1.34-6.48L2.5 8.98l6.6-.72L12 2z"/></svg>\n'
+        ),
+    }
+    for name, svg in local_svgs.items():
+        out = dg_dir / name
+        if not (out.exists() and out.stat().st_size > 0):
+            out.write_text(svg, encoding='utf-8')
+    print('dungeon tiles: pokeball.svg + star.svg (icônes locales) OK')
+
+
 
 def make_unknown_item() -> None:
     """Generic sprite shown when an item key is unknown."""
@@ -395,6 +793,46 @@ def download_base_assets() -> None:
             print(f'base assets [{label}]: ' + ' | '.join(tail[-2:]))
         except Exception as exc:
             print(f'base assets [{label}]: ignoré ({exc})')
+
+
+def download_ball_sprites() -> None:
+    """Official PokéClicker Poké Ball sprites (SVG)."""
+    ball_dir = ROOT / 'src/assets/images/pokeball'
+    ball_dir.mkdir(parents=True, exist_ok=True)
+    # Balls « classiques » (officielles PokéClicker).
+    for name in ['Pokeball', 'Greatball', 'Ultraball', 'Masterball', 'Premierball',
+                 'None', 'Pokeball-shiny', 'Lureball', 'Moonball', 'Fastball',
+                 'Diveball', 'Luxuryball', 'Nestball', 'Repeatball', 'Timerball',
+                 'Duskball', 'Quickball', 'Beastball']:
+        write_download(f'{POKECLICKER_RAW}/pokeball/{name}.svg', ball_dir / f'{name}.svg')
+
+
+def download_currency_sprites() -> None:
+    """PokeClicker currency icons (window « Monnaies »)."""
+    cur_dir = ROOT / 'src/assets/images/currency'
+    cur_dir.mkdir(parents=True, exist_ok=True)
+    names = ['money', 'dungeonToken', 'questPoint', 'diamond',
+             'battlePoint', 'farmPoint', 'contestToken']
+    for name in names:
+        write_download(f'{POKECLICKER_RAW}/currency/{name}.svg', cur_dir / f'{name}.svg')
+
+
+def make_honorball() -> None:
+    """Honor Ball (blanche et rouge) — générée, pas de source officielle fiable."""
+    out = ROOT / 'src/assets/images/items/honorball.png'
+    if out.exists():
+        return
+    size = 96
+    im = Image.new('RGBA', (size, size), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    cx = cy = size / 2
+    d.ellipse([2, 2, size - 2, size - 2], fill=(30, 30, 34, 255))
+    d.ellipse([6, 6, size - 6, size - 6], fill=(245, 245, 245, 255))
+    d.rectangle([6, cy - 10, size - 6, cy + 10], fill=(216, 60, 60, 255))
+    d.ellipse([cx - 9, cy - 9, cx + 9, cy + 9], fill=(245, 245, 245, 255), outline=(60, 60, 66, 255), width=3)
+    d.ellipse([cx - 5, cy - 5, cx + 5, cy + 5], fill=(216, 60, 60, 255))
+    d.ellipse([cx - 20, cy - 26, cx - 2, cy - 16], fill=(255, 255, 255, 140))
+    im.save(out)
 
 
 def main() -> None:
@@ -462,6 +900,11 @@ def main() -> None:
 
     download_region_maps()
     download_backgrounds()
+    download_battle_backgrounds()
+    download_dungeon_tiles()
+    download_ball_sprites()
+    download_currency_sprites()
+    make_honorball()
     # make_backgrounds() REMOVED — the real PokeChill backgrounds are required
     # make_backgrounds()  # disabled at user request
     download_item_overrides()  # (idempotent) mandated-source sprites
@@ -484,5 +927,7 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
+
+
 
 

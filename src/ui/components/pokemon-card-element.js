@@ -38,6 +38,16 @@ if (typeof globalThis !== 'undefined' && typeof globalThis._pwSetHtmlSafe !== 'f
   globalThis._pwSetHtmlSafe = function (el, html) { if (typeof globalThis.pwSetHtml === 'function') globalThis.pwSetHtml(el, html); else el.innerHTML = html; };
 }
 
+/**
+ * PASSE 26o — PV affichables : le moteur travaille en flottant, l'interface
+ * doit rester entière (« 7/19 PV », jamais « 6.899999999999999/19 PV »).
+ */
+function _hpDisp(v) {
+  const n = Number(v);
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  return Math.max(1, Math.ceil(n - 1e-9));
+}
+
 function resolveLegacyCardHtml(poke, options) {
   const gen = (typeof globalThis !== 'undefined' && typeof globalThis.generatePokeCardHTML === 'function'
     ? globalThis.generatePokeCardHTML
@@ -126,10 +136,15 @@ function renderStandaloneCard(template) {
   if (options.showHP && poke.maxHP) {
     const hpBox = document.createElement('div');
     hpBox.className = 'hp-bar-container';
-    const pct = Math.max(0, Math.min(100, Math.floor(((poke.currentHP || 0) / poke.maxHP) * 100)));
+    // PASSE 38f — la barre utilise les PV AFFICHÉS (mêmes entiers que le
+    // texte) : à « full hp » la barre est pleine, plus d'oscillation flottante.
+    const _dm = _hpDisp(poke.maxHP);
+    const pct = _dm > 0 ? Math.max(0, Math.min(100, Math.floor((_hpDisp(poke.currentHP) / _dm) * 100))) : 0;
     globalThis._pwSetHtmlSafe(hpBox, // Wave 13: inline width (self-contained bar), data-pct contract kept.
       `<div class="hp-bar"><div class="hp-fill ${pct > 50 ? 'high' : pct > 20 ? 'medium' : 'low'}" data-pct="${pct}" style="width:${pct}%"></div></div>` +
-      `<div class="hp-text">${poke.currentHP || 0}/${poke.maxHP} PV</div>`);
+      // PASSE 26o — PV flottants côté moteur : arrondi à l'affichage (jamais de
+      // « 6.899999999999999 »), plancher à 1 tant que le Pokémon est debout.
+      `<div class="hp-text">${_hpDisp(poke.currentHP)}/${_hpDisp(poke.maxHP)} PV</div>`);
     info.appendChild(hpBox);
   }
   el.appendChild(info);
@@ -191,4 +206,6 @@ export class PokemonCardTemplate {
     return el.outerHTML;
   }
 }
+
+
 

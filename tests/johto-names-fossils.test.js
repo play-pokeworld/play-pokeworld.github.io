@@ -178,3 +178,5 @@ test('training: the slot card shows "Auto: on/off"', () => {
 });
 
 
+
+

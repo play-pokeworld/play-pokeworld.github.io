@@ -95,3 +95,5 @@ test('I — index.html still hosts the four bands the rebuild targets', () => {
   assert.equal(bands.length, 4,
     'a new hand-rolled .modal-title appeared in index.html — add it to static-headers.js');
 });
+
+

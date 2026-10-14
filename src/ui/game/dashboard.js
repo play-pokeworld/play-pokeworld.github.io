@@ -12,10 +12,14 @@ if (typeof globalThis !== 'undefined' && typeof globalThis._pwSetHtmlSafe !== 'f
 if (typeof globalThis !== 'undefined' && !globalThis.safeStorage) {
   globalThis.safeStorage = (typeof window !== 'undefined' && window.safeStorage) || (typeof PokeWorldCore !== 'undefined' && PokeWorldCore.storage) || null;
 }
+// Colonnes de base (ordre validé par le joueur — Passe 26g) :
+// gauche  = Poké Balls · Quêtes · Équipe · Pension
+// milieu  = Monnaies · Carte · Combat · Base secrète
+// droite  = Raccourcis · Lieu · Entraînement · Mine
 let dashboardCols = {
- 1: ['win-story', 'win-team', 'win-hatchery'],
- 2: ['win-battle', 'win-map', 'win-base'],
- 3: ['win-tabs', 'win-training']
+ 1: ['win-pokeballs', 'win-story', 'win-team', 'win-hatchery'],
+ 2: ['win-currency', 'win-map', 'win-battle', 'win-base'],
+ 3: ['win-shortcuts', 'win-tabs', 'win-training', 'win-mine']
 };
 
 // FIX (2026-08, window drag & drop): `dashboardCols` was a module-scope `let`
@@ -29,7 +33,7 @@ function getDashboardCols(){ return dashboardCols; }
 function setDashboardCols(cols, opts){
  if(cols && typeof cols === 'object') dashboardCols = cols;
  if(!(opts && opts.persist === false)){
-   try{ safeStorage.set('pokeworld_cols_v12', JSON.stringify(dashboardCols)); }catch(_e){}
+   try{ safeStorage.set('pokeworld_cols_v13', JSON.stringify(dashboardCols)); }catch(_e){}
  }
  renderDashboardColumns();
  return dashboardCols;
@@ -38,36 +42,22 @@ function setDashboardCols(cols, opts){
 function renderDashboardColumns(){
  // Re-sync the global mirror before any legacy access.
  try{ if(typeof window !== 'undefined') window.dashboardCols = dashboardCols; if(typeof globalThis !== 'undefined') globalThis.dashboardCols = dashboardCols; }catch(_){}
- let hasStory = false;
- for(let c=1; c<=3; c++){
- if((dashboardCols[c]||[]).includes('win-story')) hasStory = true;
- }
- if(!hasStory) {
- if(!dashboardCols[1]) dashboardCols[1] = [];
- dashboardCols[1].unshift('win-story');
- }
- let hasHatch = false, hasTrain = false;
- for(let c=1; c<=3; c++){
- if((dashboardCols[c]||[]).includes('win-hatchery')) hasHatch = true;
- if((dashboardCols[c]||[]).includes('win-training')) hasTrain = true;
- }
- if(!hasHatch){
- if(!dashboardCols[1]) dashboardCols[1] = [];
- dashboardCols[1].push('win-hatchery');
- }
- if(!hasTrain){
- if(!dashboardCols[3]) dashboardCols[3] = [];
- dashboardCols[3].push('win-training');
- }
- // Phase 35: the secret-base window is permanent — inject it into
- // existing layouts (older saves) like the other windows
- let hasBase = false;
- for(let c=1; c<=3; c++){
- if((dashboardCols[c]||[]).includes('win-base')) hasBase = true;
- }
- if(!hasBase){
- if(!dashboardCols[2]) dashboardCols[2] = [];
- dashboardCols[2].push('win-base');
+ // Fenêtres permanentes : chaque fenêtre du tableau de bord doit exister
+ // (migration des anciennes sauvegardes) — injectée dans sa colonne de base
+ // (Passe 26g) si absente de toutes les colonnes.
+ const DEFAULT_COL = {
+  'win-story':1, 'win-team':1, 'win-hatchery':1, 'win-pokeballs':1,
+  'win-currency':2, 'win-map':2, 'win-battle':2, 'win-base':2,
+  'win-shortcuts':3, 'win-tabs':3, 'win-training':3, 'win-mine':3
+ };
+ for(const wid of Object.keys(DEFAULT_COL)){
+  let found = false;
+  for(let c=1; c<=3; c++){ if((dashboardCols[c]||[]).includes(wid)){ found = true; break; } }
+  if(!found){
+   const col = DEFAULT_COL[wid];
+   if(!dashboardCols[col]) dashboardCols[col] = [];
+   dashboardCols[col].push(wid);
+  }
  }
  updateFeatureWindows();
 
@@ -96,26 +86,7 @@ function moveWinToCol(winId, targetCol){
  }
  if(!dashboardCols[targetCol]) dashboardCols[targetCol] = [];
  dashboardCols[targetCol].push(winId);
- try{ safeStorage.set('pokeworld_cols_v12', JSON.stringify(dashboardCols)); }catch(_e){}
- renderDashboardColumns();
-}
-
-function moveWinVert(winId, dir){
- let col = null;
- let idx = -1;
- for(let c=1; c<=3; c++){
- const arr = dashboardCols[c] || [];
- const i = arr.indexOf(winId);
- if(i !== -1){ col = c; idx = i; break; }
- }
- if(!col) return;
- const arr = dashboardCols[col];
- const targetIdx = idx + dir;
- if(targetIdx < 0 || targetIdx >= arr.length) return;
- const tmp = arr[idx];
- arr[idx] = arr[targetIdx];
- arr[targetIdx] = tmp;
- try{ safeStorage.set('pokeworld_cols_v12', JSON.stringify(dashboardCols)); }catch(_e){}
+ try{ safeStorage.set('pokeworld_cols_v13', JSON.stringify(dashboardCols)); }catch(_e){}
  renderDashboardColumns();
 }
 
@@ -169,7 +140,30 @@ function renderDashboardChrome(){
   const tools = Array.from(head.children).filter((c) => c !== title);
   head.classList.add('pw-win-hdr');
   _pwSetHtmlSafe(head, views.DashboardChromeView.titleHTML(model));
-  tools.forEach((node) => head.appendChild(node));
+  const toolsWrap = document.createElement('div');
+  toolsWrap.className = 'pw-win-hdr-tools';
+  tools.forEach((node) => toolsWrap.appendChild(node));
+  head.appendChild(toolsWrap);
+  const WIN_GUIDE_SECTION = {
+   'win-story':'quests', 'win-team':'pokemon', 'win-hatchery':'hatchery', 'win-mine':'mine',
+   'win-battle':'combat', 'win-base':'base', 'win-currency':'economy', 'win-pokeballs':'economy',
+   'win-training':'training', 'win-tabs':'map', 'win-shortcuts':false,
+  };
+  const winId = head.dataset.dragWindow;
+  const guideMap = (typeof window !== 'undefined' && window.WIN_GUIDE_SECTION) ? window.WIN_GUIDE_SECTION : WIN_GUIDE_SECTION;
+  const section = Object.prototype.hasOwnProperty.call(guideMap, winId) ? guideMap[winId] : null;
+  if (winId !== 'win-map' && section !== false && !head.querySelector('.pw-win-help-btn')) {
+   const btn = document.createElement('button');
+   btn.type = 'button';
+   btn.className = 'pw-win-tool-btn pw-win-help-btn';
+   btn.dataset.action = 'open-guide-section';
+   btn.dataset.section = section || '';
+   btn.dataset.stopDrag = 'true';
+   btn.title = '?';
+   btn.setAttribute('aria-label', '?');
+   btn.textContent = '?';
+   toolsWrap.appendChild(btn);
+  }
  });
 }
 
@@ -180,9 +174,9 @@ function resetAllWins(){
 
 function setWindowLayout(preset){
  if(preset === 'cols3'){
- dashboardCols = { 1: ['win-story', 'win-team', 'win-hatchery'], 2: ['win-battle', 'win-map', 'win-base'], 3: ['win-tabs', 'win-training'] };
+ dashboardCols = { 1: ['win-pokeballs', 'win-story', 'win-team', 'win-hatchery'], 2: ['win-currency', 'win-map', 'win-battle', 'win-base'], 3: ['win-shortcuts', 'win-tabs', 'win-training', 'win-mine'] };
  }
- try{ safeStorage.set('pokeworld_cols_v12', JSON.stringify(dashboardCols)); }catch(_e){}
+ try{ safeStorage.set('pokeworld_cols_v13', JSON.stringify(dashboardCols)); }catch(_e){}
  renderDashboardColumns();
 }
 
@@ -193,7 +187,6 @@ if (typeof moveWinToCol !== 'undefined') { if (typeof window !== 'undefined') wi
 if (typeof getDashboardCols !== 'undefined') { if (typeof window !== 'undefined') window.getDashboardCols = getDashboardCols; if (typeof globalThis !== 'undefined') globalThis.getDashboardCols = getDashboardCols; }
 if (typeof setDashboardCols !== 'undefined') { if (typeof window !== 'undefined') window.setDashboardCols = setDashboardCols; if (typeof globalThis !== 'undefined') globalThis.setDashboardCols = setDashboardCols; }
 try{ if(typeof window !== 'undefined') window.dashboardCols = dashboardCols; if(typeof globalThis !== 'undefined') globalThis.dashboardCols = dashboardCols; }catch(_){}
-if (typeof moveWinVert !== 'undefined') { if (typeof window !== 'undefined') window.moveWinVert = moveWinVert; if (typeof globalThis !== 'undefined') globalThis.moveWinVert = moveWinVert; }
 if (typeof scrollToWin !== 'undefined') { if (typeof window !== 'undefined') window.scrollToWin = scrollToWin; if (typeof globalThis !== 'undefined') globalThis.scrollToWin = scrollToWin; }
 if (typeof resetAllWins !== 'undefined') { if (typeof window !== 'undefined') window.resetAllWins = resetAllWins; if (typeof globalThis !== 'undefined') globalThis.resetAllWins = resetAllWins; }
 if (typeof renderDashboardChrome !== 'undefined') { if (typeof window !== 'undefined') window.renderDashboardChrome = renderDashboardChrome; if (typeof globalThis !== 'undefined') globalThis.renderDashboardChrome = renderDashboardChrome; }
@@ -208,7 +201,6 @@ export {
   moveWinToCol,
   getDashboardCols,
   setDashboardCols,
-  moveWinVert,
   scrollToWin,
   resetAllWins,
   renderDashboardChrome,
@@ -220,4 +212,6 @@ export {
 // indirection instead of the window fallback); the window surface is kept for
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('scrollToWin', scrollToWin); } catch (_) {} }
+
+
 

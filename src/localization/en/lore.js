@@ -226,3 +226,5 @@ export const L_en_lore = {
 // gardée sur l'objet global pour les registres (data.js) et les harnais VM.
 if (typeof globalThis !== 'undefined') globalThis.L_en_lore = L_en_lore;
 
+
+

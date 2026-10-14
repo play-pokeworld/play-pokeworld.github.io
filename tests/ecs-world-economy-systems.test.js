@@ -82,6 +82,32 @@ test('pickWildFromTable reproduces the classic rule (roaming, buckets, fallbacks
   assert.equal(pickWildFromTable([], { rng: () => 0.5 }), null);
 });
 
+test('pickWildFromTable bucketHint — PASSES 38f/38g donjon : le seau forcé prime sur le tirage', () => {
+  const wild = [[10, 3, 6, 'common'], [11, 4, 6, 'uncommon'], [150, 50, 55, 'rare']];
+  // hint 'rare' → toujours le rare, même si le tirage pondéré aurait donné commun
+  const boss = pickWildFromTable(wild, { bucketHint: 'rare', rng: () => 0.99 });
+  assert.equal(boss.bucket, 'rare');
+  assert.equal(boss.speciesId, 150);
+  // hint 'uncommon' → toujours le peu commun, même si le tirage aurait donné rare
+  const elite = pickWildFromTable(wild, { bucketHint: 'uncommon', rng: () => 0.0 });
+  assert.equal(elite.bucket, 'uncommon');
+  assert.equal(elite.speciesId, 11);
+  // hint 'common' → toujours le commun, jamais le rare
+  const combat = pickWildFromTable(wild, { bucketHint: 'common', rng: () => 0.0 });
+  assert.equal(combat.bucket, 'common');
+  assert.equal(combat.speciesId, 10);
+  // hint + roamingId → le seau DÉSACTIVE le roaming (case de donjon)
+  const locked = pickWildFromTable([[10, 3, 6, 'common']], { roamingId: 144, bucketHint: 'common', rng: () => 0.001 });
+  assert.equal(locked.isRoaming, false);
+  assert.equal(locked.speciesId, 10);
+  // hint sans seau dans la table → repli par palier (peu commun puis commun)
+  const tiered = pickWildFromTable([[10, 3, 6, 'common']], { bucketHint: 'rare', rng: () => 0.5 });
+  assert.equal(tiered.speciesId, 10, 'pas de rare → repli commun (jamais la table entière)');
+  // hint invalide → ignoré (tirage pondéré normal)
+  const bogus = pickWildFromTable(wild, { bucketHint: 'shiny', rng: () => 0.0 });
+  assert.equal(bogus.bucket, 'rare', 'un hint inconnu retombe sur le tirage pondéré');
+});
+
 // ─── breeding:hatch — real ECS daycare/incubation (§1.2) ────────────────────
 
 test('breeding:hatch daycare mode levels through the injected port and settles the fee on the Wallet component', () => {
@@ -286,4 +312,6 @@ test('shop domain rules reproduce the classic bag/sale rules', () => {
   assert.equal(computeSaleValue({}, 2), 4000, 'default 2 000₽ per unit (classic)');
   assert.deepEqual(mergeShopStock(['a', 'b'], ['b', 'c']), ['a', 'b', 'c']);
 });
+
+
 

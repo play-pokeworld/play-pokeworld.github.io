@@ -116,8 +116,7 @@ var SIDE_QUESTS = {
 "target": 10,
 "rewardMoney": 2300,
 "rewardItems": {
-"leafstone": 1,
-"life_orb": 1
+"leafstone": 1
  }
  },
  "s12": {
@@ -230,10 +229,7 @@ var SIDE_QUESTS = {
 "region":"johto",
 "type":"catch",
 "target": 8,
-"rewardMoney": 2300,
-"rewardItems": {
-"life_orb": 1
- }
+"rewardMoney": 2300
  },
  "s38": {
 "id":"s38",
@@ -445,9 +441,9 @@ var SIDE_QUESTS = {
   "s69": { id: "s69", region: "hoenn", type: "defeat_wild", loc: "cave_of_origin", target: 20, rewardMoney: 3600, rewardItems: { waterstone: 1 } },
   "s70": { id: "s70", region: "hoenn", type: "defeat_wild", loc: "route131", target: 20, rewardMoney: 3800, rewardItems: { heart_scale: 1 } },
   "s71": { id: "s71", region: "hoenn", type: "defeat_wild", loc: "victoryroad_ho", target: 25, rewardMoney: 4000, rewardItems: { ultraball: 3 } },
-  "s72": { id: "s72", region: "hoenn", type: "defeat_wild", loc: "weather_institute", target: 15, rewardMoney: 3500, rewardItems: { damp_rock: 1 } },
-  "s73": { id: "s73", region: "hoenn", type: "defeat_wild", loc: "aqua_hideout", target: 20, rewardMoney: 4000, rewardItems: { heat_rock: 1 } },
-  "s74": { id: "s74", region: "hoenn", type: "defeat_wild", loc: "mossdeep_space_center", target: 20, rewardMoney: 4500, rewardItems: { smooth_rock: 1 } },
+  "s72": { id: "s72", region: "hoenn", type: "defeat_wild", loc: "weather_institute", target: 15, rewardMoney: 3500 },
+  "s73": { id: "s73", region: "hoenn", type: "defeat_wild", loc: "aqua_hideout", target: 20, rewardMoney: 4000 },
+  "s74": { id: "s74", region: "hoenn", type: "defeat_wild", loc: "mossdeep_space_center", target: 20, rewardMoney: 4500 },
   "s75": { id: "s75", region: "hoenn", type: "defeat_wild", loc: "victoryroad_ho", target: 25, rewardMoney: 5000, rewardItems: { max_repel: 3 } },
   "s76": { id: "s76", region: "hoenn", type: "defeat_wild", loc: "battle_frontier", target: 20, rewardMoney: 5000, rewardItems: { choice_band: 1 } },
   "s77": { id: "s77", region: "hoenn", type: "defeat_wild", loc: "southern_island", target: 20, rewardMoney: 5500, rewardItems: { lum_berry: 1 } },
@@ -498,10 +494,10 @@ var SIDE_QUESTS = {
   "s119": { id: "s119", region: "hoenn", type: "defeat_wild", loc: "route112", target: 15, rewardMoney: 1500, rewardItems: {"charcoal": 1} },
   "s120": { id: "s120", region: "hoenn", type: "defeat_wild", loc: "route114", target: 15, rewardMoney: 1500, rewardItems: {"hard_stone": 1} },
   "s121": { id: "s121", region: "hoenn", type: "defeat_wild", loc: "route119", target: 20, rewardMoney: 2000, rewardItems: {"miracle_seed": 1} },
-  "s122": { id: "s122", region: "hoenn", type: "defeat_wild", loc: "route120", target: 18, rewardMoney: 1800, rewardItems: {"coba_berry": 1} },
+  "s122": { id: "s122", region: "hoenn", type: "defeat_wild", loc: "route120", target: 18, rewardMoney: 1800, rewardItems: { coba_berry: 1 } },
   "s123": { id: "s123", region: "hoenn", type: "defeat_wild", loc: "mt_chimney", target: 20, rewardMoney: 2200, rewardItems: {"firestone": 1} },
   "s124": { id: "s124", region: "hoenn", type: "defeat_wild", loc: "meteor_falls", target: 18, rewardMoney: 2000, rewardItems: {"dragon_scale": 1} },
-  "s125": { id: "s125", region: "hoenn", type: "defeat_wild", loc: "route123", target: 15, rewardMoney: 1700, rewardItems: {"kebia_berry": 1} },
+  "s125": { id: "s125", region: "hoenn", type: "defeat_wild", loc: "route123", target: 15, rewardMoney: 1700, rewardItems: { kebia_berry: 1 } },
   "s126": { id: "s126", region: "hoenn", type: "defeat_wild", loc: "route124", target: 15, rewardMoney: 1800, rewardItems: {"mystic_water": 1} },
   "s127": { id: "s127", region: "hoenn", type: "defeat_wild", loc: "shoal_cave", target: 18, rewardMoney: 2000, rewardItems: {"never_melt_ice": 1} },
   "s128": { id: "s128", region: "hoenn", type: "defeat_wild", loc: "route127", target: 15, rewardMoney: 1800, rewardItems: {} },
@@ -523,4 +519,6 @@ if (typeof SIDE_QUESTS !== 'undefined') { if (typeof window !== 'undefined') win
 export {
   SIDE_QUESTS,
 };
+
+
 

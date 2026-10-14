@@ -68,10 +68,45 @@ export function locActionVNode(a) {
     dataset: { action: 'legacy-call', call: a.call || '', callArgs: a.callArgs == null ? '' : String(a.callArgs) },
   },
     h('span', { class: 'pw-loc-action-icon', 'aria-hidden': 'true' }, h.raw(a.iconHtml || '')),
-    h('span', { class: 'pw-loc-action-label pw-text-sm' }, a.label || ''));
+    h('span', { class: 'pw-loc-action-label pw-text-sm' }, a.labelHtml != null ? h.raw(a.labelHtml) : (a.label || '')));
 }
 export function locActionGridVNode(actions) {
   return h('div', { class: 'pw-loc-action-grid' }, (actions || []).map(locActionVNode));
+}
+
+/* ── PASSE 32 — Panneau d'expédition de donjon ──────────────────────────
+ * Affiché à la place / au-dessus de la grille d'actions quand une descente
+ * est en cours dans le lieu courant. Il doit répondre d'un coup d'oeil aux
+ * trois seules questions du joueur : où suis-je, qu'ai-je dans le sac, et
+ * qu'est-ce que je risque en continuant.
+ * Modèle : { floorLabel, floorPct, quotaLabel, quotaPct, multLabel,
+ *            bagLabel, bagTokens, bagMoney, riskLabel, bossLabel,
+ *            actions: [ … même forme que la grille d'actions … ] }
+ */
+export function locDungeonRunVNode(m) {
+  if (!m) return null;
+  const clamp = (v) => Math.max(0, Math.min(100, Math.round(Number(v) || 0)));
+  return h('div', { class: cx('pw-loc-dungeon-run', m.isBossFloor ? 'is-boss' : null) },
+    h('div', { class: 'pw-loc-dungeon-head' },
+      h('span', { class: 'pw-loc-dungeon-title' }, m.floorLabel || ''),
+      h('span', { class: 'pw-loc-dungeon-mult' }, m.multLabel || '')),
+    h('div', { class: 'pw-loc-dungeon-depth' },
+      h('div', { class: 'pw-loc-dungeon-depth-fill', style: { width: `${clamp(m.floorPct)}%` } })),
+    h('div', { class: 'pw-loc-dungeon-quota' },
+      h('span', { class: 'pw-text-sm' }, m.quotaLabel || ''),
+      h('div', { class: 'pw-loc-dungeon-quota-bar' },
+        h('div', { class: 'pw-loc-dungeon-quota-fill', style: { width: `${clamp(m.quotaPct)}%` } }))),
+    h('div', { class: 'pw-loc-dungeon-bag' },
+      h('span', { class: 'pw-loc-dungeon-bag-lbl pw-text-sm' }, m.bagLabel || ''),
+      h('span', { class: 'pw-loc-dungeon-bag-val' },
+        h('img', { class: 'pw-loc-dungeon-coin', src: 'src/assets/images/currency/dungeonToken.svg', alt: '' }),
+        h('span', null, String(m.bagTokens == null ? 0 : m.bagTokens)),
+        h('span', { class: 'pw-loc-dungeon-money' }, String(m.bagMoney == null ? '' : m.bagMoney)))),
+    m.riskLabel ? h('div', { class: 'pw-loc-dungeon-risk pw-text-sm' }, m.riskLabel) : null,
+    m.bossLabel ? h('div', { class: 'pw-loc-dungeon-boss pw-text-sm' }, m.bossLabel) : null,
+    (m.actions || []).length
+      ? h('div', { class: 'pw-loc-dungeon-actions' }, (m.actions || []).map(locActionVNode))
+      : null);
 }
 
 /* ── Unlock progress tip (self-contained bar, inline width) ────────────── */
@@ -99,6 +134,13 @@ export function locWildMetaVNode(m) {
 }
 
 /* ── One wild entry (canonical disc + state badges) ────────────────────── */
+// Indicateur de capture à la PokéClicker : balle vide / normale / dorée.
+function caughtBallSrc(owned, shinyOwned) {
+  if (!owned) return 'src/assets/images/pokeball/None.svg';
+  if (shinyOwned) return 'src/assets/images/pokeball/Pokeball-shiny.svg';
+  return 'src/assets/images/pokeball/Pokeball.svg';
+}
+
 export function locWildCardVNode(e) {
   return h('div', {
     class: cx('pw-loc-wild-card',
@@ -107,12 +149,13 @@ export function locWildCardVNode(e) {
       e.seen ? 'is-seen' : 'is-unseen',
       e.roaming && 'is-roaming'),
   },
-    h('div', { class: cx('loc-caught-badge', e.owned ? 'is-owned' : 'is-missing') }, e.owned ? '✓' : '?'),
     // Wave 18 (user feedback): e.spriteHtml (spriteImg) ALREADY carries the
     // canonical disc (.pw-poke-circle-wrap > .pw-poke-circle-bg + img) —
     // wrapping it in a SECOND wrap+bg painted two offset discs over the
     // sprite ("double ronds", sprite invisible on some themes). Keep ONE.
-    h('div', { class: 'pw-loc-wild-disc' }, h.raw(e.spriteHtml || '')),
+    h('div', { class: 'pw-loc-wild-disc' },
+      h.raw(e.spriteHtml || ''),
+      h('img', { class: 'pw-caught-ball', src: caughtBallSrc(e.owned, e.shinyOwned), alt: '' })),
     h('div', { class: cx('pw-bold pw-text-sm', e.accentCls) },
       e.name || '',
       e.shinyOwned ? h('span', { class: 'pw-shiny-star' }, '★') : null),
@@ -191,4 +234,6 @@ export function mapHelpCardVNode(m) {
 }
 
 export function mapHelpCardHTML(model) { return toHTMLString(mapHelpCardVNode(model)); }
+
+
 

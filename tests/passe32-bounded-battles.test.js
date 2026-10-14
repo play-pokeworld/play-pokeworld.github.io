@@ -54,7 +54,7 @@ const SANDBOX_FILES = [
   'src/engine/input/action-dispatcher.js', 'src/engine/runtime/classic-bridge.js',
   'src/data/moves.js', 'src/data/pd-data.js',
   'src/data/items-data.js', 'src/data/items-helpers.js',
-  'src/data/poke-talents-data.js', 'src/data/talents-full.js',
+  'src/data/poke-talents.js', 'src/data/talents-full.js',
   'src/data/locations-data.js', 'src/data/locations-johto.js',
   'src/data/shops-data.js', 'src/data/route-drops.js', 'src/data/ctcs-shop-data.js',
   'src/data/game-helpers.js',
@@ -303,5 +303,7 @@ test('phase 32 D: rewirings present + new FR/EN i18n keys + fixed message', () =
   }
   assert.ok(R('src/localization/fr/ui.js').includes('"afk_no_progress_summary":"AFK {time} : rien en cours à simuler."'), 'AFK message fixed (no more misleading "wild zone")');
 });
+
+
 
 

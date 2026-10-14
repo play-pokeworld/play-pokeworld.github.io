@@ -44,39 +44,100 @@ function tickStatusDurations(p){
 function applyEndOfTurnStatus(p){
  if(!p||p.currentHP<=0) return;
  const hasTal = (t) => (typeof globalThis.hasTalent === 'function') ? globalThis.hasTalent(p, t) : p.talent === t;
+ // DORM-02c — orbes de statut : brûlure / poison auto-infligés.
+ const heldOrb = (typeof getHeldItemForPokemon === 'function') ? getHeldItemForPokemon(p) : (p && p.heldItem);
+ if(!p.status){
+  if(heldOrb === 'flame_orb' && p.type1 !== 'Fire' && p.type2 !== 'Fire'){ p.status='burn'; p.statusTurns=3; addBattleLog(`${p.name} est brûlé par son Orbe Flamme !`); }
+  else if(heldOrb === 'toxic_orb' && p.type1 !== 'Poison' && p.type2 !== 'Poison'){ p.status='poison'; p.statusTurns=5; addBattleLog(`${p.name} est empoisonné par son Orbe Toxique !`); }
+ }
  
+ const _isPlayerSide = (p === getActivePlayerPoke() || p === G.team[battle.playerPokeIdx]);
+
+ // DORM-04 — Moody : +50 % sur deux stats au hasard à chaque tour.
+ if(hasTal('moody')){
+  const _side = _isPlayerSide ? 'player' : 'enemy';
+  if(typeof pwStatChange === 'function'){
+   const pool = ['atk','def','spa','spd','spe'];
+   const a = pool[Math.floor(Math.random() * pool.length)];
+   let b = pool[Math.floor(Math.random() * pool.length)];
+   if(b === a) b = pool[(pool.indexOf(a) + 1) % pool.length];
+   pwStatChange(_side, a, 1.5, {poke:p});
+   pwStatChange(_side, b, 1.5, {poke:p});
+  }
+  addBattleLog(`${p.name} devient lunatique (Moody) !`);
+ }
+
+ // DORM-04 — fatigue de combat (PokeChill) : drain lent en combat automatique.
+ if(battle && battle.chill && !battle._offlineSim && _isPlayerSide && p === getActivePlayerPoke()){
+  try{
+   const _heldFat = heldOrb;
+   let fraction = 100 + (p.maxHP || 0) * 30 + (p.def || 0) * 15 + (p.spd || 0) * 15;
+   let fd = (p.maxHP || 0) / Math.max(1, fraction);
+   if(_heldFat === 'leftovers') fd /= 1.2;
+   if(hasTal('stamina')) fd /= 2;
+   if(fd > 0 && p.currentHP > 0){
+    p.currentHP = Math.max(0, p.currentHP - Math.max(0.05, fd));
+   }
+  }catch(_){}
+ }
+ 
+ if(typeof pwTickBoostDurations === 'function') pwTickBoostDurations(_isPlayerSide ? 'player' : 'enemy');
+
  if(hasTal('speedboost')){
- const isPlayerSide = (p === getActivePlayerPoke() || p === G.team[battle.playerPokeIdx]);
- const mods = isPlayerSide ? battle.playerMods : battle.enemyMods;
+ const mods = _isPlayerSide ? battle.playerMods : battle.enemyMods;
  if(mods) mods.spe = Math.min(3.0, (mods.spe || 1) * 1.15);
+ }
+
+ // DORM-06 — baies de soin de PV (Oran/Sitrus/Figy…) : une fois par combat,
+ // quand PV < 25 % (l'objet reste équipé).
+ const _bh = (typeof berryHeld === 'function') ? berryHeld(p) : null;
+ if(_bh && _bh.itm.category === 'pinch_heal' && p.currentHP > 0 && p.currentHP < p.maxHP * 0.25
+    && (typeof berryUsed !== 'function' || !berryUsed(p, '_pinchHealUsed'))){
+  const lvl = (typeof berryLevel === 'function') ? berryLevel(p, _bh.key, _isPlayerSide ? 'player' : 'enemy') : 3;
+  const heal = Math.max(1, Math.floor(p.maxHP * ((typeof berryPowerVal === 'function') ? berryPowerVal(_bh.key, lvl) : 0.25)));
+  p.currentHP = Math.min(p.maxHP, p.currentHP + heal);
+  if(typeof berryMark === 'function') berryMark(p, '_pinchHealUsed');
+  addBattleLog(`${p.name} récupère ${heal} PV (${typeof getItemName === 'function' ? getItemName(_bh.key) : _bh.key}) !`);
  }
  
  if(hasTal('magicguard')){
    // Immunisé aux dégâts de statut et indirects
  }
  else if(p.status==='burn'){
- const bd=Math.max(1,Math.floor(p.maxHP/16));
- p.currentHP=Math.max(0,p.currentHP-bd);
- try{ spawnBattleFloat((p === getActivePlayerPoke() || p === G.team[battle.playerPokeIdx]) ? 'player' : 'enemy', '-' + bd, 'status burn', 'bru'); }catch(_){}
- addBattleLog(tr('burn_damage', {name:p.name, damage:bd}));
- tickStatusDurations(p);
+ // DORM-04 — Brasier : la brûlure ne blesse plus, mais booste les dégâts (×1,2 côté attaque).
+ if(hasTal('flareboost')){ tickStatusDurations(p); }
+ else{
+  let bd=Math.max(1,Math.floor(p.maxHP/16));
+  if(hasTal('scorch')) bd *= 2; // DORM-04 — Cramé : dégâts de brûlure doublés.
+  p.currentHP=Math.max(0,p.currentHP-bd);
+  try{ spawnBattleFloat((p === getActivePlayerPoke() || p === G.team[battle.playerPokeIdx]) ? 'player' : 'enemy', '-' + bd, 'status burn', 'bru'); }catch(_){}
+  addBattleLog(tr('burn_damage', {name:p.name, damage:bd}));
+  tickStatusDurations(p);
+ }
  }
  
  else if(p.status==='poison'){
- const pd=Math.max(1,Math.floor(p.maxHP/8));
- p.currentHP=Math.max(0,p.currentHP-pd);
- try{ spawnBattleFloat((p === getActivePlayerPoke() || p === G.team[battle.playerPokeIdx]) ? 'player' : 'enemy', '-' + pd, 'status poison', 'poi'); }catch(_){}
- addBattleLog(tr('poison_damage', {name:p.name, damage:pd}));
- tickStatusDurations(p);
+ if(hasTal('toxicboost')){ tickStatusDurations(p); }
+ else{
+  let pd=Math.max(1,Math.floor(p.maxHP/8));
+  if(hasTal('corrosion')) pd *= 2; // DORM-04 — Corrosion : dégâts de poison doublés.
+  p.currentHP=Math.max(0,p.currentHP-pd);
+  try{ spawnBattleFloat((p === getActivePlayerPoke() || p === G.team[battle.playerPokeIdx]) ? 'player' : 'enemy', '-' + pd, 'status poison', 'poi'); }catch(_){}
+  addBattleLog(tr('poison_damage', {name:p.name, damage:pd}));
+  tickStatusDurations(p);
+ }
  }
  
  else if(p.status==='badpoison'){
  p.statusTurns=(p.statusTurns||0)+1;
- const bd=Math.max(1,Math.floor(p.maxHP*p.statusTurns/16));
- p.currentHP=Math.max(0,p.currentHP-bd);
- try{ spawnBattleFloat((p === getActivePlayerPoke() || p === G.team[battle.playerPokeIdx]) ? 'player' : 'enemy', '-' + bd, 'status badpoison', 'tox'); }catch(_){}
- addBattleLog(tr('bad_poison_damage', {name:p.name, damage:bd}));
- 
+ let bd=Math.max(1,Math.floor(p.maxHP*p.statusTurns/16));
+ if(hasTal('corrosion')) bd *= 2; // DORM-04 — Corrosion : dégâts de poison doublés.
+ if(hasTal('toxicboost')){ bd = 0; tickStatusDurations(p); } // toxine absorbée.
+ if(bd > 0){
+  p.currentHP=Math.max(0,p.currentHP-bd);
+  try{ spawnBattleFloat((p === getActivePlayerPoke() || p === G.team[battle.playerPokeIdx]) ? 'player' : 'enemy', '-' + bd, 'status badpoison', 'tox'); }catch(_){}
+  addBattleLog(tr('bad_poison_damage', {name:p.name, damage:bd}));
+ }
  }
  
  else if(p.status==='sleep'){
@@ -109,7 +170,46 @@ async function onEnemyFaint(){
  try{ if(typeof hatcheryRegisterBattleKills === 'function') hatcheryRegisterBattleKills(1); }catch(_){ }
  battle.paused=true;
  const e=battle.enemyPoke;
+ // DORM-04 — Moxie / Turbo : bonus du Pokémon actif quand il met K.O. l'ennemi.
+ const _koPoke = (typeof getActivePlayerPoke === 'function') ? getActivePlayerPoke() : null;
+ if(_koPoke && _koPoke.currentHP > 0){
+  const _ht = (t) => (typeof hasTalent === 'function') ? hasTalent(_koPoke, t) : (_koPoke.talent === t);
+  if(_ht('moxie') && battle.playerMods){
+   battle.playerMods.atk = Math.min(3.0, (battle.playerMods.atk || 1) * 1.5);
+   addBattleLog(`${_koPoke.name} gagne en Attaque (Moxie) !`);
+  }
+  if(_ht('strategist') && battle.playerMods){
+   battle.playerMods.spa = Math.min(3.0, (battle.playerMods.spa || 1) * 1.5);
+   addBattleLog(`${_koPoke.name} gagne en Attaque Spéciale (Stratège) !`);
+  }
+  if(_ht('beastboost') && battle.playerMods){
+   const _useSpa = Number(_koPoke.spa || 0) > Number(_koPoke.atk || 0);
+   battle.playerMods[_useSpa ? 'spa' : 'atk'] = Math.min(3.0, (battle.playerMods[_useSpa ? 'spa' : 'atk'] || 1) * 1.5);
+   addBattleLog(`${_koPoke.name} booste sa meilleure stat (Beast Boost) !`);
+  }
+  if(_ht('speedboost') && battle.playerMods){
+   battle.playerMods.spe = Math.min(3.0, (battle.playerMods.spe || 1) * 1.5);
+   if(typeof resetPlayerCd === 'function') resetPlayerCd();
+   addBattleLog(`${_koPoke.name} gagne en Vitesse (Turbo) !`);
+  }
+ }
  if(!battle.isChamp) battle.sessionWins = (battle.sessionWins||0) + 1;
+ // PASSE 32 — donjons : une victoire remplit le sac d'expédition. Le gardien
+ // du dernier palier clôt la session et verse le bonus de complétion.
+ try{
+  if(!battle.isChamp && !battle.isTraining && typeof currentDungeonRun === 'function' && currentDungeonRun()){
+   if(e && e.isDungeonBoss && typeof dungeonOnBossDefeated === 'function'){
+    const _res = dungeonOnBossDefeated();
+    if(_res) addBattleLog(`<span class="pw-green">${tr('dungeon_log_cleared', {tokens:String(_res.gained.tokens), money:String(_res.gained.money)})}</span>`);
+   } else if(typeof dungeonOnWin === 'function'){
+    const _run = dungeonOnWin();
+    if(_run && typeof dungeonFloorCleared === 'function' && dungeonFloorCleared()){
+     addBattleLog(`<span class="pw-green">${tr('dungeon_log_floor_cleared', {floor:String(_run.floor)})}</span>`);
+    }
+   }
+   if(typeof refreshDungeonPanel === 'function') refreshDungeonPanel();
+  }
+ }catch(_){}
  addBattleLog(tr('pokemon_fainted', {name:e.name}));
  updateBattleUI();
  await wait(500);
@@ -120,6 +220,8 @@ async function onEnemyFaint(){
  const next=battle.champTeam[battle.champPokeIdx];
  battle.enemyPoke=next;
  battle.eMoveIdx=0;
+ battle.attacksOnCurrentEnemy = 0; battle.enemyTurnsOnField = 0; // DORM-06 — balls spéciales
+ battle.zTurns = 0; // DORM-06b — Cristaux Z (réinitialisé à chaque nouvel ennemi).
  if(battle.isTraining && battle.trainee){
  battle.trainingStage = battle.champPokeIdx;
  battle.trainee.currentHP = battle.trainee.maxHP;
@@ -188,6 +290,13 @@ async function onEnemyFaint(){
 
  
  if(!isQuestRewardBattle){
+ // P0 — chaque victoire sauvage rapporte des Pokédollars (formule PokéClicker).
+ // PASSE 39 — le montant est mémorisé dans la session : le butin de combat
+ // affiche « les monnaies obtenues pendant ce combat » (retour joueur).
+ if(typeof awardWildVictoryMoney === 'function'){
+  const _wildMoney = awardWildVictoryMoney() || 0;
+  if(_wildMoney > 0) battle.sessionMoney = (battle.sessionMoney||0) + _wildMoney;
+ }
  G.totalWildWins = (G.totalWildWins||0) + 1;
  if(!G.wildWinsByLoc) G.wildWinsByLoc = {};
  G.wildWinsByLoc[questLoc] = (G.wildWinsByLoc[questLoc]||0) + 1;
@@ -229,7 +338,14 @@ async function onEnemyFaint(){
      }
    }
  }
- const _dropChance = Math.min(6, 1 + _dropBonus + _talentDropBonus); // base 1 % ; max 6 % with drapeaux + pickpocket/hoarder
+ // DORM-02g — Encens Veine : +1 taux de butin (1 % → 2 %).
+ let _incenseBonus = 0;
+ try { if(Array.isArray(G.team)) for(const tp of G.team){ if(tp && tp.currentHP > 0 && (typeof getHeldItemForPokemon === 'function')){
+  const hk = getHeldItemForPokemon(tp);
+  if(hk === 'luck_incense') _incenseBonus += 1;
+  else if(hk === 'hopo_berry') _incenseBonus += 1; // DORM-06 — Baie Hopo : +1 butin
+ } } } catch(_){}
+ const _dropChance = Math.min(6, 1 + _dropBonus + _talentDropBonus + _incenseBonus); // base 1 % ; max 6 %
  if(drops&&drops.length&&chance(_dropChance)){
  const drop=drops[rand(0,drops.length-1)];
  const reward = (typeof grantRewardItem === 'function') ? grantRewardItem(drop,1) : (addToInventory(drop,1), {added:1,money:0});
@@ -239,16 +355,61 @@ async function onEnemyFaint(){
  try{ if (typeof renderBattleLoot === 'function') renderBattleLoot(); }catch(_){}
  addBattleLog(tr('item_found_log', {icon:itemIcon(drop,16), item:getItemName(drop)}));
  } else if(reward.money){
- addBattleLog(tr('duplicate_item_money_log', {item:getItemName(drop), money:reward.money.toLocaleString()}));
+ // PASSE 39 — l'argent des doublons entre dans le butin de combat affiché.
+ battle.sessionMoney = (battle.sessionMoney||0) + Number(reward.money||0);
+ addBattleLog(tr('duplicate_item_money_log', {item:getItemName(drop), money:formatNumber(reward.money)}));
  }
  }
 
  updateHeader();
 
- await wait(700);
+ // Attend la fin de l'animation de capture si elle est en cours (le combat ne
+ // repart pas pendant qu'elle joue).
+ let _baseWait = 700;
+ try { if (typeof globalThis !== 'undefined' && globalThis.__pwCaptureAnimUntil && Date.now() < globalThis.__pwCaptureAnimUntil) _baseWait = Math.max(_baseWait, globalThis.__pwCaptureAnimUntil - Date.now()); } catch (_) {}
+ await wait(_baseWait);
 
  
- if(battle.chill && battle.active && aliveCount()>0){
+ // PASSE 33 — donjons : la chaîne de combats est BORNÉE par le palier.
+ // Sans ce garde-fou, `spawnNextWild()` relançait à l'infini. Issues :
+ //   · palier final purgé, gardien non vaincu → on ENVOIE LE GARDIEN ;
+ //   · palier courant purgé                   → on ARRÊTE le combat ;
+ //   · sinon                                  → adversaire suivant.
+ // PASSE 35 — quota non atteint : la chaîne continue seule ; quota atteint :
+ // arrêt UNE FOIS (palier normal) ou gardien sans coupure (palier final).
+ // PASSE 39 — CARTE : le gardien ne s'engage QUE depuis sa case (clic sur la
+ // tuile boss). Une victoire sur le plateau rend TOUJOURS la main à la carte
+ // (retour joueur : « on me lance le combat de boss au hasard après un combat
+ // normal, sans que je me sois déplacé »). Le « N combats puis le boss » de
+ // la chaîne historique n'existe plus en grille.
+ let _dgStop = false;
+ try{
+  if(battle.chill && battle.active && !battle.isChamp && !battle.isTraining
+     && typeof currentDungeonRun === 'function' && currentDungeonRun()
+     && typeof dungeonFloorCleared === 'function' && dungeonFloorCleared()){
+   const _run = currentDungeonRun();
+   const _bossFloor = (typeof dungeonIsBossFloor === 'function') && dungeonIsBossFloor();
+   if(_run && _run.map){
+    _dgStop = true;
+   } else if(_bossFloor && _run && !_run.bossDone){
+    // On N'ARRÊTE PAS : le gardien est le prochain adversaire de la chaîne.
+    battle.pendingDungeonBoss = true;
+    addBattleLog(`<span class="pw-green">${tr('dungeon_bar_boss_next')}</span>`);
+   } else if(!_bossFloor){
+    _dgStop = true;
+    addBattleLog(`<span class="pw-green">${tr('dungeon_log_floor_done')}</span>`);
+   }
+  }
+ }catch(_){}
+
+ // PASSE 36 — carte : 1 case = 1 engagement, on rend la main à la carte.
+ let _dgMapPause=false; try{ const _mr=currentDungeonRun(); if(battle.chill&&battle.active&&!battle.isChamp&&!battle.isTraining&&_mr&&_mr.map&&!battle.pendingDungeonBoss){ if(_mr.auto) setTimeout(()=>{try{_dgAutoStep();}catch(_){}},650); else _dgMapPause=true; } }catch(_){}
+
+ if(_dgStop && battle.active){
+ endBattle();
+ } else if(_dgMapPause && battle.active){
+ endBattle();
+ } else if(battle.chill && battle.active && aliveCount()>0){
  spawnNextWild();
  } else if(battle.active){
  endBattle();
@@ -274,4 +435,6 @@ export {
   applyEndOfTurnStatus,
   onEnemyFaint,
 };
+
+
 

@@ -43,3 +43,5 @@ export class TrainingWindowView extends UIView {
   }
 }
 
+
+

@@ -47,6 +47,28 @@ function portRng() {
   return typeof gameplayPorts.rng === 'function' ? gameplayPorts.rng : Math.random;
 }
 
+// DORM-02g — Encens Pur (PokeChill) : augmente le poids des Pokémon sauvages
+// rares. Bonus = 0,5 % + 0,5 % par palier de possession (1→25) pour chaque
+// membre vivant de l'équipe qui le porte, plafonné à 20 %.
+function pureIncenseRareBoostPct() {
+  try {
+    const G = (typeof globalThis !== 'undefined') ? globalThis.G : null;
+    if (!G || !Array.isArray(G.team)) return 0;
+    let pct = 0;
+    for (const tp of G.team) {
+      if (!tp || Number(tp.currentHP ?? tp.hp ?? 1) <= 0) continue;
+      const key = (typeof globalThis.getHeldItemForPokemon === 'function')
+        ? globalThis.getHeldItemForPokemon(tp)
+        : (tp.heldItem || null);
+      if (key !== 'pure_incense') continue;
+      const qty = Math.max(0, Number((G.inventory && G.inventory[key]) || 0));
+      const level = qty >= 25 ? 6 : qty >= 20 ? 5 : qty >= 15 ? 4 : qty >= 10 ? 3 : qty >= 5 ? 2 : 1;
+      pct += 0.5 + 0.5 * level;
+    }
+    return Math.min(20, pct);
+  } catch (_) { return 0; }
+}
+
 export class ECSSystemsManager {
   /**
    * @param {Object} world - ECSWorld instance
@@ -193,9 +215,21 @@ export class ECSSystemsManager {
       if (!cd.pendingSpawn) return;
       if (cd.elapsedMs < (cd.intervalMs || 0)) return;
 
+      // PASSE 38f — DONJON : l'espèce d'un combat dépend de la case engagée.
+      // Les rares de la zone ne sont QUE les boss, les peu communs QUE les
+      // combats corsés, les communs QUE les combats ordinaires (retour
+      // joueur). Le seau forcé désactive aussi le roaming dans le donjon.
+      let bucketHint = null;
+      try {
+        const run = (typeof globalThis.currentDungeonRun === 'function') ? globalThis.currentDungeonRun() : null;
+        const pn = run && run.active && run.pendingNode && run.map && run.map.tiles ? run.map.tiles[run.pendingNode] : null;
+        if (pn) bucketHint = (pn.type === 'elite') ? 'uncommon' : (pn.type === 'combat' ? 'common' : (pn.type === 'boss' ? 'rare' : null));
+      } catch (_) {}
       const pick = pickWildFromTable(table.entries || [], {
         roamingId: table.roamingId || 0,
+        rareBoostPct: pureIncenseRareBoostPct(),
         rng: portRng(),
+        bucketHint,
       });
       cd.pendingSpawn = false;
       cd.elapsedMs = 0;
@@ -387,26 +421,35 @@ export class ECSSystemsManager {
         const key = String(op.itemKey || '');
         const itemDef = typeof gameplayPorts.getItemDef === 'function' ? gameplayPorts.getItemDef(key) : null;
         if (!itemDef || !itemDef.price) { market.lastOutcome = { ok: false, op: 'buy-item', reason: 'unknown-item', itemKey: key }; return; }
+        if (!wallet) { market.lastOutcome = { ok: false, op: 'buy-item', reason: 'no-wallet', itemKey: key }; return; }
         const owned = inventory && inventory.counts ? (inventory.counts[key] || 0) : 0;
-        if (!canAddToBag(itemDef, owned)) {
+        const unitPrice = Number(itemDef.price) || 0;
+        // Quantité demandée (défaut 1) — bornée par la place en sac (objets
+        // tenus plafonnés à 25) et par le solde (achat « Max »).
+        const want = Math.max(1, Math.floor(Number(op.count) || 1));
+        const capped = !!(itemDef.type === 'held' || itemDef.category || itemDef.buff);
+        const limit = capped ? 25 : Number.MAX_SAFE_INTEGER;
+        const room = Math.max(0, limit - (Number(owned) || 0));
+        if (room <= 0) {
           market.lastOutcome = { ok: false, op: 'buy-item', reason: 'bag-full', itemKey: key };
           eventBus.emit('economy:purchase-denied', { kind: 'item', itemKey: key, reason: 'bag-full' });
           return;
         }
-        if (!wallet) { market.lastOutcome = { ok: false, op: 'buy-item', reason: 'no-wallet', itemKey: key }; return; }
-        const price = Number(itemDef.price) || 0;
-        if (!canAffordPurchase(wallet.money, price)) {
-          market.lastOutcome = { ok: false, op: 'buy-item', reason: 'insufficient-funds', itemKey: key, price };
-          eventBus.emit('economy:purchase-denied', { kind: 'item', itemKey: key, price, money: wallet.money });
+        const affordable = unitPrice > 0 ? Math.floor((Number(wallet.money) || 0) / unitPrice) : want;
+        const count = Math.min(want, room, Math.max(0, affordable));
+        if (count <= 0) {
+          market.lastOutcome = { ok: false, op: 'buy-item', reason: 'insufficient-funds', itemKey: key, price: unitPrice };
+          eventBus.emit('economy:purchase-denied', { kind: 'item', itemKey: key, price: unitPrice, money: wallet.money });
           return;
         }
-        wallet.money = (Number(wallet.money) || 0) - price;
+        const total = unitPrice * count;
+        wallet.money = (Number(wallet.money) || 0) - total;
         if (inventory) {
           if (!inventory.counts) inventory.counts = {};
-          inventory.counts[key] = (inventory.counts[key] || 0) + 1;
+          inventory.counts[key] = (inventory.counts[key] || 0) + count;
         }
-        market.lastOutcome = { ok: true, op: 'buy-item', itemKey: key, price, moneyAfter: wallet.money };
-        eventBus.emit('economy:item-bought', { itemKey: key, price, moneyAfter: wallet.money });
+        market.lastOutcome = { ok: true, op: 'buy-item', itemKey: key, count, price: total, moneyAfter: wallet.money };
+        eventBus.emit('economy:item-bought', { itemKey: key, count, price: total, moneyAfter: wallet.money });
         return;
       }
 
@@ -423,9 +466,15 @@ export class ECSSystemsManager {
         const gain = computeSaleValue(itemDef, count);
         inventory.counts[key] = owned - count;
         if (inventory.counts[key] <= 0) delete inventory.counts[key];
-        if (wallet) wallet.money = (Number(wallet.money) || 0) + gain;
-        market.lastOutcome = { ok: true, op: 'sell-treasure', itemKey: key, count, gain, moneyAfter: wallet ? wallet.money : null };
-        eventBus.emit('economy:item-sold', { itemKey: key, count, gain });
+        // P0 — les trésors se revendent en 💎 (diamants), plus en ₽.
+        const diamondUnit = Number((itemDef && itemDef.diamondValue) || 0);
+        if (diamondUnit > 0) {
+          if (wallet) wallet.diamonds = (Number(wallet.diamonds) || 0) + diamondUnit * count;
+        } else if (wallet) {
+          wallet.money = (Number(wallet.money) || 0) + gain;
+        }
+        market.lastOutcome = { ok: true, op: 'sell-treasure', itemKey: key, count, gain, diamondUnit, diamondsAfter: wallet ? (Number(wallet.diamonds) || 0) : null, moneyAfter: wallet ? wallet.money : null };
+        eventBus.emit('economy:item-sold', { itemKey: key, count, gain, diamondUnit });
         return;
       }
 
@@ -467,4 +516,6 @@ export class ECSSystemsManager {
 if (typeof window !== 'undefined') {
   window.PokeECSSystemsManager = ECSSystemsManager;
 }
+
+
 

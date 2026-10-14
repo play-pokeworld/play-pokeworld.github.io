@@ -122,3 +122,5 @@ if (typeof globalThis !== 'undefined') {
   globalThis.resetUpdateBannerState = resetUpdateBannerState;
 }
 
+
+

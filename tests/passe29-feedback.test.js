@@ -134,20 +134,21 @@ test('header: sticky + explicit badge label before the numbers', () => {
   assert.ok(en.includes('"mine_title":"Grand Underground"'), 'en mine label fixed');
 });
 
-test('ultrawide: sides absorb extra space until they match the centre', () => {
+test('ultrawide: sides stay at half the centre (PASSE 38, user feedback)', () => {
   const css = R('src/assets/styles/design-system.css');
   assert.ok(css.includes('min-aspect-ratio: 17/9'), 'media query present');
-  assert.ok(css.includes('#main-dashboard #col-2 {\n    flex: 0 0 800px !important;'), 'centre kept at its 16:9 width while sides grow');
-  assert.ok(css.includes('@media (min-aspect-ratio: 17/9) and (min-width: 2720px)'), 'equal columns beyond the breakpoint');
+  assert.ok(css.includes('#main-dashboard #col-2 {\n    flex: 2 1 0 !important;'), 'centre column stays ×2 (1:2:1)');
+  assert.ok(css.includes('@media (min-aspect-ratio: 17/9) and (min-width: 2720px)'), 'breakpoint present');
+  assert.ok(css.includes('#main-dashboard #col-2 {\n    flex: 2 1 0 !important;'), 'no equal columns on ultrawide — the sides never pass half the centre');
 });
 
-test('window drag: re-drop at origin is a no-op, markers above AND below, every column', () => {
+test('window drag: re-drop at origin is a no-op, single drop indicator, nearest column', () => {
   const drag = R('src/ui/game/win-drag.js');
-  assert.ok(drag.includes('dragOrigin'), 'origin slot remembered');
+  assert.ok(drag.includes('originCol'), 'origin slot remembered');
   assert.ok(drag.includes('backHome'), 'drop at origin = no-op (window keeps its place)');
-  assert.ok(drag.includes("classList.add('insert-above')") && drag.includes("classList.add('insert-below')"), 'both neighbours marked between two windows');
-  const css = R('src/assets/styles/design-system.css');
-  assert.ok(css.includes('.dash-win.insert-above') && css.includes('.dash-win.insert-below'), 'marker styles both ways');
+  // DND-01 : un seul indicateur de dépôt (ligne) au lieu du double marquage.
+  assert.ok(drag.includes('pw-drop-indicator'), 'single drop indicator (DND-01)');
+  assert.ok(drag.includes('_targetColumn'), 'nearest column targeting (DND-01)');
 });
 
 test('sprites: canonical sizes bumped (user: out-of-team sprites too small)', async () => {
@@ -157,4 +158,6 @@ test('sprites: canonical sizes bumped (user: out-of-team sprites too small)', as
   const css = R('src/assets/styles/design-system.css');
   assert.ok(css.includes('--pw-size-poke-sm: 72px') && css.includes('--pw-size-poke-lg: 104px'), 'CSS tokens in parity');
 });
+
+
 

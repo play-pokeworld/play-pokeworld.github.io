@@ -59,7 +59,6 @@ function makeSandbox() {
     'src/data/game-config.js',
     'src/data/pd-data.js',
     'src/data/moves.js',
-    'src/data/talents-data.js',
     'src/data/items-data.js',
     'src/data/items-helpers.js',
     'src/data/locations-data.js',
@@ -192,6 +191,8 @@ test('Fix 7: saveDownloadFilename format, ORAS Secret Base Flag System, and Delt
   assert.ok(quest258 && typeof quest258.reqCondition === 'function', 'Quest 258 must have reqCondition');
   assert.equal(quest258.reqCondition(), false, 'Quest 258 should be locked before Kalos completion');
 });
+
+
 
 
 

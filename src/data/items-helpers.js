@@ -66,11 +66,11 @@ function getItemName(key){
   return name;
 }
 
-function getItemDesc(key){
+function getItemDesc(key, opts){
   const displayKey = normalizeItemKey(key);
   const lang = (typeof G !== 'undefined' && G && G.lang === 'en') ? 'en' : 'fr';
   if (typeof ItemEngine !== 'undefined' && typeof ItemEngine.generateItemDesc === 'function') {
-    return ItemEngine.generateItemDesc(displayKey, lang);
+    return ItemEngine.generateItemDesc(displayKey, lang, opts);
   }
   const item = (typeof ITEMS !== 'undefined' && ITEMS[displayKey]) ? ITEMS[displayKey] : null;
   if (item && item.effect) return item.effect;
@@ -86,8 +86,14 @@ function openItemInfo(key){
   if(!inner) return;
   const lang = (typeof G !== 'undefined' && G && G.lang === 'en') ? 'en' : 'fr';
   const name = getItemName(key);
-  const desc = getItemDesc(key);
-  const qty = (G.inventory && G.inventory[key]) || 0;
+  // Règle joueur (Passe 26e) : dans le dictionnaire, la description montre la
+  // valeur de base (1 exemplaire) ; dans le sac, la valeur au stock actuel.
+  const fromDictionary = (typeof window !== 'undefined') && window._fsCurrentPanel === 'dictionary';
+  const desc = getItemDesc(key, fromDictionary ? { baseOnly: true } : undefined);
+  // Poké Balls : quantité lue dans le système dédié (G.pokeballs).
+  const qty = itm.type === 'ball'
+    ? ((typeof G !== 'undefined' && G && G.pokeballs && G.pokeballs[key]) || 0)
+    : ((G.inventory && G.inventory[key]) || 0);
   
   var lang2 = (typeof G !== 'undefined' && G && G.lang === 'en') ? 'en' : 'fr';
   var TL = lang2 === 'en' ? {stone:'Stone',treasure:'Treasure',candy:'Candy',key:'Key Item',held:'Held Item',fossil:'Fossil',ct:'TM/HM',cs:'HM',evolution:'Evo. Item',berry:'Berry',memory:'Memory',z_crystal:'Z-Crystal',keystone:'Keystone'}
@@ -112,6 +118,7 @@ function openItemInfo(key){
   else if(itm.type === 'memory') typeLabel = TL.memory;
   else if(itm.type === 'z_crystal') typeLabel = TL.z_crystal;
   else if(itm.type === 'keystone') typeLabel = TL.keystone;
+  else if(itm.type === 'ball') typeLabel = _typeLabel('cat_pokeballs', 'Poké Ball');
   else typeLabel = _typeLabel('item_type_berry', TL.berry);
 
   let powerDisplay = '';
@@ -146,7 +153,7 @@ function openItemInfo(key){
       subtitle: typeLabel,
       sections: _itemSections,
       rows: [
-        { label: (t('price') || 'Prix'), value: (itm.price||0).toLocaleString() + '₽' },
+        { label: (t('price') || 'Prix'), value: formatNumber((itm.price||0)) + '₽' },
         { label: (t('owned') || 'Possédé'), value: '&times;' + qty, valueClass: 'pw-info-value-green' }
       ]
     }));
@@ -167,6 +174,8 @@ function openItemInfo(key){
 function getItemSpriteUrl(key){
   const displayKey = normalizeItemKey(key);
   if (!displayKey || !ITEMS || !ITEMS[displayKey]) return null;
+  // Sprite explicite (ex. Poké Balls : SVG PokéClicker).
+  if (ITEMS[displayKey].sprite) return ITEMS[displayKey].sprite;
   if (displayKey.startsWith('ct') || displayKey.startsWith('cs')) {
     if (typeof resolveCtCsMoveId === 'function') {
       const moveId = resolveCtCsMoveId(displayKey);
@@ -210,4 +219,6 @@ export {
   getItemSpriteUrl,
   itemSpriteHtml,
 };
+
+
 

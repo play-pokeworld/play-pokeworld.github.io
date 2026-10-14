@@ -49,7 +49,7 @@ function makeSandbox() {
   vm.createContext(sandbox);
   for (const f of [
     'src/data/moves.js', 'src/data/pd-data.js', 'src/data/items-data.js', 'src/data/items-helpers.js',
-    'src/data/poke-talents-data.js', 'src/data/talents-full.js',
+    'src/data/poke-talents.js', 'src/data/talents-full.js',
     'src/data/locations-data.js', 'src/data/locations-johto.js', 'src/data/shops-data.js',
     'src/data/route-drops.js', 'src/data/ctcs-shop-data.js', 'src/data/game-helpers.js',
     'src/application/pokemon-factory.js',
@@ -78,7 +78,9 @@ test('phase 27 A: clean item descriptions (toxic orb & co)', () => {
   sb.G.inventory = { toxic_orb: 1, flame_orb: 1, life_orb: 1, leftovers: 1, muscle_band: 1, choice_band: 1, heat_rock: 1 };
   const toxic = sb.ItemEngine.generateItemDesc('toxic_orb', 'fr');
   assert.ok(!toxic.includes('xx'), 'plus de « xx1.15 »');
-  assert.ok(toxic.includes('x1.15 (max x1.75)'), `current + max multiplier shown: ${toxic}`);
+  // Passe 26e : valeur unique au stock actuel (plus de « (max x…) » ni de « X → Y »).
+  assert.ok(toxic.includes('x1.15'), `current multiplier shown: ${toxic}`);
+  assert.ok(!toxic.includes('(max x'), 'plus de mention du maximum (valeur au stock uniquement)');
   // Phase 27b: the FR status is the noun "Poison" (badgeable), not "Empoisonné"
   assert.ok(toxic.includes('Poison') && !toxic.includes('Empoisonné'), 'FR status = "Poison"');
   assert.ok(!toxic.includes('**') && !toxic.includes('data-buff'), 'no mangled markup in the description');
@@ -86,11 +88,11 @@ test('phase 27 A: clean item descriptions (toxic orb & co)', () => {
   assert.ok(flame.includes('Brûlure') && !flame.includes('xx'), 'flame orb ditto');
   // Inline power for formula items with no clean description
   const life = sb.ItemEngine.generateItemDesc('life_orb', 'fr');
-  assert.equal(life, 'Augmente la puissance de x1.20 (max x2.00).', 'Orbe Vie : phrase simple');
+  assert.equal(life, 'Augmente la puissance de x1.20.', 'Orbe Vie : phrase simple (valeur au stock)');
   const left = sb.ItemEngine.generateItemDesc('leftovers', 'fr');
-  assert.ok(left.includes('Augmente la puissance de x1.15 (max x1.75)'), 'Leftovers: same format');
+  assert.ok(left.includes('récupère des PV à chaque tour'), 'Leftovers: soin décrit (plus de phrase générique)');
   const en = sb.ItemEngine.generateItemDesc('toxic_orb', 'en');
-  assert.ok(en.includes('x1.15 (max x1.75)') && en.includes('Poisoned'), 'EN coherent');
+  assert.ok(en.includes('x1.15') && en.includes('Poisoned'), 'EN coherent');
   // Co-injected badges: enriched html without breakage (no mangled attributes, no **)
   const rich = sb.replaceStatusTerms(sb.replaceWeatherTerms(sb.ItemEngine.generateItemDesc('toxic_orb', 'fr')));
   assert.ok(!rich.includes('**'), 'no residual **');
@@ -113,19 +115,16 @@ test('phase 27 A: clean item descriptions (toxic orb & co)', () => {
 });
 
 // ————————————————————————— B —————————————————————————
-test('phase 27 B: Oran/Sitrus/Ceriz berries removed from the whole game', () => {
+test('phase 27 B: Oran/Sitrus/Cheri berries re-added (DORM-06)', () => {
+  // Décision joueur (Passe 26) : ces baies reviennent dans le jeu.
   for (const k of ['oran_berry', 'sitrus_berry', 'cheri_berry']) {
-    assert.ok(!sb.ITEMS[k], `${k} absent from ITEMS`);
-    assert.ok(!R('src/data/shops-data.js').includes(k), `${k} absent from shops`);
-    assert.ok(!R('src/data/route-drops.js').includes(k), `${k} absent from routes`);
-    assert.ok(!R('src/data/side-quests-data.js').includes(k), `${k} absent from side quests`);
-    assert.ok(!R('src/data/story-quests.js').includes(k), `${k} absent from main quests`);
-    assert.ok(!R('src/data/item-database.js').includes(k), `${k} absent from legacy ItemDB`);
-    assert.ok(!R('src/data/sprites.js').includes(k), `${k} absent from sprites`);
-    assert.ok(!R('src/localization/fr/items.js').includes(k) && !R('src/localization/en/items.js').includes(k), `${k} absent from the localizations`);
+    assert.ok(sb.ITEMS[k], `${k} présent dans ITEMS`);
+    assert.ok(R('src/data/shops-data.js').includes(k), `${k} distribué en boutique`);
   }
+  assert.equal(sb.ITEMS.oran_berry.category, 'pinch_heal', 'Oran = soin à PV bas');
+  assert.equal(sb.ITEMS.cheri_berry.category, 'immunity_berry', 'Cheri = immunité Paralysie');
   const _berryPng = ['src', 'assets', 'images', 'items'].join('/') + '/oran' + '_berry.png'; // off-literal (audit regex)
-  assert.ok(!fs.existsSync(new URL('../' + _berryPng, import.meta.url)), 'oran PNG removed');
+  assert.ok(fs.existsSync(new URL('../' + _berryPng, import.meta.url)), 'oran PNG présent (re-ajouté)');
   // Pass 53: the Stardust compensation is REVOKED. It was paid
   // at equal quantity (2 berries → 2 dusts) while a berry was worth
   // nothing, and a Stardust sells for 2,000 ₽: +208,000 ₽ across all
@@ -321,5 +320,7 @@ test('phase 27 G: editor — held items handled (team) and clean refusal (box)',
   sb.presetEditorPickItem(2);
   assert.ok(sb._notifs.some((n) => n.includes('équipe active')), 'box: "apply the preset first" message');
 });
+
+
 
 

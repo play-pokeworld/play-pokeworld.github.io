@@ -113,7 +113,7 @@ test('wave 28 C: .modal-title is no longer pinned to the legacy header geometry'
   // them locally without being caught by the computed-style test.
   assert.ok(/padding:\s*var\(--pw-header-pad\)/.test(canonical[0]), 'canonical padding token');
   assert.ok(/min-height:\s*var\(--pw-header-h\)/.test(canonical[0]), 'canonical height');
-  assert.ok(/--pw-header-pad:\s*0 8px 0 14px/.test(css), 'the padding token still resolves to the reference value');
+  assert.ok(/--pw-header-pad:\s*0 8px 0 10px/.test(css), 'the padding token still resolves to the reference value');
 });
 
 test('wave 28 D: the settings header spans the full panel width', () => {
@@ -159,3 +159,5 @@ test('wave 28 E: the PC box header defers to the canonical header', () => {
     'the box close glyph must inherit the shared .modal-close sizing'
   );
 });
+
+

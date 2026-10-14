@@ -1165,3 +1165,5 @@ if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.regis
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('saveGame', saveGame); PokeActions.register('setSaveMenuLang', setSaveMenuLang); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('debugGiveCtCs', debugGiveCtCs); } catch (_) {} }
 
+
+

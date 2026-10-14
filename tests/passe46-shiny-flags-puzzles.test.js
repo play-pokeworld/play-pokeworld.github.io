@@ -173,3 +173,5 @@ test('phase 46 J: SHINY_CHANCE config aligned to 1/4096', () => {
   assert.ok(R('src/data/game-config.js').includes("hoenn: { name: 'Hoenn', start: 252, end: 386, badges: 8 }"));
 });
 
+
+

@@ -126,3 +126,5 @@ export function panelHeaderVNode(opts = {}) {
 export function panelHeaderHTML(opts) {
   return toHTMLString(panelHeaderVNode(opts));
 }
+
+

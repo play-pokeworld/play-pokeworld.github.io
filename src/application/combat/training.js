@@ -91,7 +91,8 @@ function unlockTrainingMove(p){
  return moveId;
 }
 
-const TRAINING_MULTI_SLOT_COST = 750000;
+// P0 — emplacement d'entraînement en Points de quête (PQ).
+const TRAINING_MULTI_SLOT_COST = 2500;
 let _trainingSlotTicker = null;
 const _lastTrainingPanelRenderAt = 0;
 function appSetInterval(name, callback, delay){
@@ -489,11 +490,13 @@ function applyTrainingReward(trainee, mode){
  if(mode === 'ev'){
   if(!trainee.evs) trainee.evs = {hp:0, atk:0, def:0, spa:0, spd:0, spe:0};
   const keys = ['hp','atk','def','spa','spd','spe'];
-  const avail = keys.filter(k => (trainee.evs[k]||0) < 6);
+  // FIX-02 : plafond EV par stat = 18, total EV borné à 36.
+  const totalEv = keys.reduce((s,k) => s + (trainee.evs[k]||0), 0);
+  const avail = keys.filter(k => (trainee.evs[k]||0) < 18 && totalEv < 36);
   if(avail.length){
    const pk = avail[rand(0, avail.length - 1)];
    trainee.evs[pk]++;
-   rewardMsg = ` (+1 EV ${pk.toUpperCase()} → ${trainee.evs[pk]}/6)`;
+   rewardMsg = ` (+1 EV ${pk.toUpperCase()} → ${trainee.evs[pk]}/18)`;
   } else rewardMsg = ' (EV au maximum)';
  } else if(mode === 'level'){
   const gain = Math.min(rand(2,5), Math.max(0, 100 - (trainee.level||1)));
@@ -554,7 +557,7 @@ function completeTrainingSlot(slotIndex, success=true){
      if (active.includes('trainer_blackthorn')) {
        const lvl = (typeof staffLevel === 'function') ? staffLevel('trainer_blackthorn') : 1;
        if (Math.random() < (0.002 * lvl)) {
-         const drops = ['potion', 'superpotion', 'oran_berry', 'sitrus_berry'];
+         const drops = ['occa_berry', 'babiri_berry', 'shuca_berry', 'passho_berry'];
          const pick = drops[Math.floor(Math.random() * drops.length)];
          if (typeof addToInventory === 'function') addToInventory(pick, 1);
        }
@@ -791,8 +794,10 @@ function renderTrainingBattlePanel(){
 }
 function upgradeTrainingMultiSlot(){
  if(G.trainingMultiSlot){ notify(t('training_multi_slot_max'), 'var(--green)'); return; }
- if(G.money < TRAINING_MULTI_SLOT_COST){ notify(t('n.pas_assez_dargent'), 'var(--red)'); return; }
- G.money -= TRAINING_MULTI_SLOT_COST;
+ const w = (typeof ensureWallet === 'function') ? ensureWallet() : null;
+ if(!w || (w.questPoints || 0) < TRAINING_MULTI_SLOT_COST){ notify(tr('training_slot_need_pq', {price:formatNumber(TRAINING_MULTI_SLOT_COST)}), 'var(--red)'); return; }
+ if(typeof spendQuestPoints === 'function') spendQuestPoints(TRAINING_MULTI_SLOT_COST);
+ else w.questPoints -= TRAINING_MULTI_SLOT_COST;
  G.trainingMultiSlot = true;
  ensureTrainingSlots();
  updateHeader();
@@ -800,8 +805,10 @@ function upgradeTrainingMultiSlot(){
  notify(t('training_multi_slot_bought'), 'var(--green)');
  openTrainingUpgradeMenu();
 }
-const TRAINING_AUTOMATION_SLOT_COST = 1000000;
-const TRAINING_QUEUE_UPGRADE_COSTS = [250000, 750000, 1500000, 3000000];
+// P0 — déblocage de l'auto-entraînement en PQ.
+const TRAINING_AUTOMATION_SLOT_COST = 1000;
+// P0 — file d'attente d'entraînement en Points de quête (PQ).
+const TRAINING_QUEUE_UPGRADE_COSTS = [5000, 10000, 25000, 50000];
 function getTrainingQueueLimit(){
  const a = ensureTrainingAutomation();
  return 3 + clamp(a.queueUpgradeLevel || 0, 0, TRAINING_QUEUE_UPGRADE_COSTS.length) * 3;
@@ -813,8 +820,10 @@ function getTrainingQueueUpgradeCost(){
 function upgradeTrainingQueueSize(){
  const cost = getTrainingQueueUpgradeCost();
  if(!cost){ notify(t('queue_size_maxed'), 'var(--green)'); return; }
- if(G.money < cost){ notify(t('n.pas_assez_dargent'), 'var(--red)'); return; }
- G.money -= cost;
+ const w = (typeof ensureWallet === 'function') ? ensureWallet() : null;
+ if(!w || (w.questPoints || 0) < cost){ notify(tr('training_slot_need_pq', {price:formatNumber(cost)}), 'var(--red)'); return; }
+ if(typeof spendQuestPoints === 'function') spendQuestPoints(cost);
+ else w.questPoints -= cost;
  const a = ensureTrainingAutomation();
  a.queueUpgradeLevel = (a.queueUpgradeLevel || 0) + 1;
  updateHeader(); saveGame();
@@ -843,13 +852,15 @@ function isTrainingAutomationPurchased(slotIndex){
 function buyTrainingAutomationSlot(slotIndex){
  const idx = clamp(Number(slotIndex)||0, 0, 1);
  if(isTrainingAutomationPurchased(idx)){ notify(t('automation_already_bought'), 'var(--green)'); return; }
- if(G.money < TRAINING_AUTOMATION_SLOT_COST){ notify(tr('automation_upgrade_need_money', {price:TRAINING_AUTOMATION_SLOT_COST.toLocaleString()}), 'var(--red)'); return; }
- G.money -= TRAINING_AUTOMATION_SLOT_COST;
+ const w = (typeof ensureWallet === 'function') ? ensureWallet() : null;
+ if(!w || (w.questPoints || 0) < TRAINING_AUTOMATION_SLOT_COST){ notify(tr('automation_upgrade_need_pq', {price:formatNumber(TRAINING_AUTOMATION_SLOT_COST)}), 'var(--red)'); return; }
+ if(typeof spendQuestPoints === 'function') spendQuestPoints(TRAINING_AUTOMATION_SLOT_COST);
+ else w.questPoints -= TRAINING_AUTOMATION_SLOT_COST;
  const a = ensureTrainingAutomation();
  a.purchasedSlots[String(idx)] = true;
  updateHeader();
  saveGame();
- notify(tr('automation_upgrade_bought', {name:tr('training_slot_title',{slot:idx+1}), price:TRAINING_AUTOMATION_SLOT_COST.toLocaleString()}), 'var(--green)');
+ notify(tr('automation_upgrade_bought_pq', {name:tr('training_slot_title',{slot:idx+1}), price:formatNumber(TRAINING_AUTOMATION_SLOT_COST)}), 'var(--green)');
  openTrainingManagementMenu('automation');
 }
 function setTrainingAutomationOption(slotIndex, key, value){
@@ -1281,14 +1292,14 @@ function trainingManagementModel(page){
    const purchased=isTrainingAutomationPurchased(i);
    return purchased
     ? {title:`${tr('training_slot_title',{slot:i+1})} · ${t('management_automation')}`,value:t('automation_owned'),state:'owned',stateLabel:t('automation_owned')}
-    : {title:`${tr('training_slot_title',{slot:i+1})} · ${t('management_automation')}`,value:tr('automation_buy_button',{price:TRAINING_AUTOMATION_SLOT_COST.toLocaleString()}),state:'buy',call:'buyTrainingAutomationSlot',args:String(i),buyLabel:t('buy_btn')};
+    : {title:`${tr('training_slot_title',{slot:i+1})} · ${t('management_automation')}`,value:'',state:'buy',call:'buyTrainingAutomationSlot',args:String(i),buyLabel:(typeof pqSpriteHtml==='function'?pqSpriteHtml(TRAINING_AUTOMATION_SLOT_COST):formatNumber(TRAINING_AUTOMATION_SLOT_COST))};
   };
   blocks.push({kind:'upgrades',cards:[
    G.trainingMultiSlot
     ? {title:t('training_slots'),value:`${getTrainingSlotCount()}/2`,state:'owned',stateLabel:t('automation_owned')}
-    : {title:t('training_slots'),value:`${getTrainingSlotCount()}/2`,state:'buy',call:'upgradeTrainingMultiSlot',args:'',buyLabel:`${TRAINING_MULTI_SLOT_COST.toLocaleString()}₽`},
+    : {title:t('training_slots'),value:`${getTrainingSlotCount()}/2`,state:'buy',call:'upgradeTrainingMultiSlot',args:'',buyLabel:(typeof pqSpriteHtml==='function'?pqSpriteHtml(TRAINING_MULTI_SLOT_COST):`${formatNumber(TRAINING_MULTI_SLOT_COST)} PQ`)},
    queueCost
-    ? {title:t('queue_size_title'),value:tr('queue_capacity',{count:0,max:queueLimit}),state:'buy',call:'upgradeTrainingQueueSize',args:'',buyLabel:`${queueCost.toLocaleString()}₽`}
+    ? {title:t('queue_size_title'),value:tr('queue_capacity',{count:0,max:queueLimit}),state:'buy',call:'upgradeTrainingQueueSize',args:'',buyLabel:(typeof pqSpriteHtml==='function'?pqSpriteHtml(queueCost):`${formatNumber(queueCost)} PQ`)}
     : {title:t('queue_size_title'),value:tr('queue_capacity',{count:0,max:queueLimit}),state:'owned',stateLabel:t('queue_size_maxed')},
    autoCard(0),
    autoCard(1),
@@ -1422,7 +1433,7 @@ function trainingSlotModel(slotIndex){
  const autoPurchased = typeof isTrainingAutomationPurchased === 'function' && isTrainingAutomationPurchased(slotIndex);
  // Phase 14: explicit "Auto: on/off" label (like the management menu
  // card) — the green color comes from the .training-slot-auto-btn CSS.
- actions.push({ label: autoPurchased ? (autoState.enabled?t('training_auto_on'):t('training_auto_off')) : tr('automation_buy_button', {price:TRAINING_AUTOMATION_SLOT_COST.toLocaleString()}),
+ actions.push({ label: autoPurchased ? (autoState.enabled?t('training_auto_on'):t('training_auto_off')) : tr('automation_buy_button', {price:formatNumber(TRAINING_AUTOMATION_SLOT_COST)}),
    iconHtml: (typeof getIcon==='function'?getIcon('settings',14):''), call: 'toggleTrainingAutomationSlot', callArgs: `${slotIndex}, false`,
    classes: `training-slot-auto-btn ${autoState.enabled?'is-on':'is-off'}` });
  return {
@@ -1473,7 +1484,7 @@ function renderTrainingWindow(){
  // component) — zero legacy markup below this line.
  const slots = [];
  for(let i=0;i<count;i++) slots.push(trainingSlotModel(i));
- const lockedHint = !G.trainingMultiSlot ? `<div class="training-locked-slot"><b>${t('training_slot_locked')}</b><button class="hbtn" data-action="legacy-call" data-call="openTrainingUpgradeMenu" data-call-args="">${typeof getIcon==='function'?getIcon('settings',14):''} ${tr('training_multi_slot_buy', {price:TRAINING_MULTI_SLOT_COST.toLocaleString()})}</button></div>` : '';
+ const lockedHint = !G.trainingMultiSlot ? `<div class="training-locked-slot"><b>${t('training_slot_locked')}</b><button class="hbtn" data-action="legacy-call" data-call="openTrainingUpgradeMenu" data-call-args="">${typeof getIcon==='function'?getIcon('settings',14):''} ${tr('training_multi_slot_buy', {price:formatNumber(TRAINING_MULTI_SLOT_COST)})}</button></div>` : '';
  const views = (typeof window!=='undefined' && window.PokeUI && window.PokeUI.views) ? window.PokeUI.views : null;
  if(!views || !views.TrainingWindowView) throw new Error('[ui] PokeUI views not loaded (TrainingWindowView)');
  _pwSetHtmlSafe(el, views.TrainingWindowView.toHTML({
@@ -1769,4 +1780,6 @@ export {
   trainingStartNextOpponent,
   unlockTrainingMove,
 };
+
+
 

@@ -11,7 +11,10 @@
 'use strict';
   
   // ───── Power levels by quantity owned (PokeChill system) ─────
+  // PokeChill scale 1→20 (5 paliers) ; PokéWorld sac = 25 → 6 paliers
+  // (le palier 6 est atteint à 25 exemplaires).
   function getPowerLevel(qty) {
+    if (qty >= 25) return 6;
     if (qty >= 20) return 5;
     if (qty >= 15) return 4;
     if (qty >= 10) return 3;
@@ -45,17 +48,17 @@
     const qty = (window.G && window.G.inventory) ? (window.G.inventory[itemKey] || 0) : 0;
     const level = getPowerLevel(qty);
     const power = evalFormula(item.powerFormula, level);
-    const level5 = evalFormula(item.powerFormula, 5);
-    return 'x' + power.toFixed(2) + ' (max x' + level5.toFixed(2) + ')';
+    const levelMax = evalFormula(item.powerFormula, 6);
+    return 'x' + power.toFixed(2) + ' (max x' + levelMax.toFixed(2) + ')';
   }
   
   // ───── Status/type badge HTML generator ─────
   const TYPE_COLORS = {
-    fire:'#f08030', water:'#6890f0', grass:'#78c850', electric:'#f8d030',
-    ice:'#98d8d8', fighting:'#c03028', poison:'#a040a0', ground:'#e0c068',
-    flying:'#a890f0', psychic:'#f85888', bug:'#a8b820', rock:'#b8a038',
-    ghost:'#705898', dragon:'#7038f8', dark:'#705848', steel:'#b8b8d0',
-    fairy:'#ee99ac', normal:'#a8a878'
+    normal:'#A0A29F', fire:'#FBA64C', water:'#539DDF', grass:'#60BE58',
+    electric:'#F2D94E', ice:'#76D1C1', fighting:'#CE3E5A', poison:'#BA68D2',
+    ground:'#DA7C4D', flying:'#A1BBEC', psychic:'#FA8582', bug:'#92BD2D',
+    rock:'#C9BC8A', ghost:'#5F6DBC', dragon:'#0C6AC8', dark:'#595761',
+    steel:'#5795A3', fairy:'#EF90E6'
   };
   
   function typeBadge(typeName) {
@@ -103,19 +106,104 @@
     return STATUS_TAGS[key] || key;
   }
   
+  // ───── DORM-06b — tables de description des objets futurs ─────
+  // Gemmes Méga : clé → [nom FR, nom EN, forme ' X'/' Y'/'']
+  const MEGA_SPECIES = {
+    abomasite:['Blizzaroi','Abomasnow',''], absolite:['Absol','Absol',''],
+    aerodactylite:['Ptéra','Aerodactyl',''], aggronite:['Galeking','Aggron',''],
+    alakazite:['Alakazam','Alakazam',''], altarianite:['Altaria','Altaria',''],
+    ampharosite:['Pharamp','Ampharos',''], audinite:['Nanméouïe','Audino',''],
+    banettite:['Branette','Banette',''], barbaracite:['Golgopathe','Barbaracle',''],
+    baxcaliburite:['Glaivodo','Baxcalibur',''], beedrillite:['Dardargnan','Beedrill',''],
+    blastoisinite:['Tortank','Blastoise',''], blazikenite:['Braségali','Blaziken',''],
+    cameruptite:['Camérupt','Camerupt',''], diancite:['Diancie','Diancie',''],
+    dragonitite:['Dracolosse','Dragonite',''], falinksite:['Salarsen','Falinks',''],
+    galladite:['Gallame','Gallade',''], garchompite:['Carchacrok','Garchomp',''],
+    gardevoirite:['Gardevoir','Gardevoir',''], gengarite:['Ectoplasma','Gengar',''],
+    glalitite:['Oniglali','Glalie',''], gyaradosite:['Léviator','Gyarados',''],
+    hawluchanite:['Brutalibré','Hawlucha',''], heracronite:['Scarhino','Heracross',''],
+    houndoominite:['Démolosse','Houndoom',''], kangaskhanite:['Kangourex','Kangaskhan',''],
+    latiasite:['Latias','Latias',''], latiosite:['Latios','Latios',''],
+    lopunnite:['Lockpin','Lopunny',''], lucarionite:['Lucario','Lucario',''],
+    manectite:['Élecsprint','Manectric',''], mawilite:['Mysdibule','Mawile',''],
+    medichamite:['Charmina','Medicham',''], metagrossite:['Métalosse','Metagross',''],
+    pidgeotite:['Roucarnage','Pidgeot',''], pinsirite:['Scarabrute','Pinsir',''],
+    pyroarite:['Némélios','Pyroar',''], sablenite:['Ténéfix','Sableye',''],
+    salamencite:['Drattak','Salamence',''], sceptilite:['Jungko','Sceptile',''],
+    scizorite:['Cizayox','Scizor',''], sharpedonite:['Sharpedo','Sharpedo',''],
+    slowbronite:['Flagadoss','Slowbro',''], steelixite:['Steelix','Steelix',''],
+    swampertite:['Laggron','Swampert',''], tyranitarite:['Tyranocif','Tyranitar',''],
+    venusaurite:['Florizarre','Venusaur',''],
+    charizardite_x:['Dracaufeu','Charizard',' X'], charizardite_y:['Dracaufeu','Charizard',' Y'],
+    mewtwonite_x:['Mewtwo','Mewtwo',' X'], mewtwonite_y:['Mewtwo','Mewtwo',' Y'],
+    raichutite_x:['Raichu','Raichu',' X'], raichutite_y:['Raichu','Raichu',' Y'],
+    apricorn: {
+      red_apricorn:{fr:'Rouge',en:'Red'}, blue_apricorn:{fr:'Bleu',en:'Blue'},
+      yellow_apricorn:{fr:'Jaune',en:'Yellow'}, green_apricorn:{fr:'Vert',en:'Green'},
+      pink_apricorn:{fr:'Rose',en:'Pink'}, white_apricorn:{fr:'Blanc',en:'White'},
+      black_apricorn:{fr:'Noir',en:'Black'},
+    },
+  };
+  const LEGEND_KEY_DESC = {
+    red_orb:['The Red Orb: a relic tied to Groudon. A legendary quest trophy.', 'Orbe Rouge : relique liée à Groudon. Trophée de quête légendaire.'],
+    blue_orb:['The Blue Orb: a relic tied to Kyogre. A legendary quest trophy.', 'Orbe Bleu : relique liée à Kyogre. Trophée de quête légendaire.'],
+    gs_ball_celebi:['The GS Ball: a relic tied to Celebi. A legendary quest trophy.', 'GS Ball : relique liée à Celebi. Trophée de quête légendaire.'],
+    clear_bell_hooh:['The Clear Bell: a relic tied to Ho-Oh. A legendary quest trophy.', 'Cloche Claire : relique liée à Ho-Oh. Trophée de quête légendaire.'],
+    tidal_bell_lugia:['The Tidal Bell: a relic tied to Lugia. A legendary quest trophy.', 'Cloche Marée : relique liée à Lugia. Trophée de quête légendaire.'],
+    eon_ticket_latis:['The Eon Ticket: allows you to encounter Latias and Latios.', 'Ticket Éon : permet de rencontrer Latias et Latios.'],
+    meteorite_shard_delta:['A Meteorite Shard: a fragment tied to Deoxys.', 'Éclat de Météorite : fragment lié à Deoxys.'],
+    meteorite_bills_errand:['A meteorite sought during Bill\'s errand.', 'Météorite recherchée durant la quête de Léo.'],
+  };
+  const TRAINING_STAT = {
+    power_bracer:{fr:'Attaque',en:'Attack'}, power_belt:{fr:'Défense',en:'Defense'},
+    power_lens:{fr:'Att. Spé',en:'Sp. Atk'}, power_band:{fr:'Déf. Spé',en:'Sp. Def'},
+    power_anklet:{fr:'Vitesse',en:'Speed'}, power_weight:{fr:'PV',en:'HP'},
+  };
+  const PLATE_TYPE = {
+    blank_plate:'Normal', draco_plate:'Dragon', dread_plate:'Dark', earth_plate:'Ground',
+    fist_plate:'Fighting', flame_plate:'Fire', icicle_plate:'Ice', insect_plate:'Bug',
+    iron_plate:'Steel', meadow_plate:'Grass', mind_plate:'Psychic', pixie_plate:'Fairy',
+    sky_plate:'Flying', splash_plate:'Water', spooky_plate:'Ghost', stone_plate:'Rock',
+    toxic_plate:'Poison', zap_plate:'Electric',
+  };
+  const FARM_DESC = {
+    amaze_mulch:['Amaze Mulch: greatly speeds up berry growth.', 'Terreau Prodige : accélère fortement la pousse des baies.'],
+    boost_mulch:['Boost Mulch: increases the berry harvest.', 'Terreau Boost : augmente la récolte de baies.'],
+    freeze_mulch:['Freeze Mulch: keeps planted berries fresh longer.', 'Terreau Gel : conserve les baies plantées plus longtemps.'],
+    gooey_mulch:['Gooey Mulch: favors rarer berries.', 'Terreau Glueux : favorise les baies rares.'],
+    rich_mulch:['Rich Mulch: improves the harvest quality.', 'Terreau Riche : améliore la qualité de la récolte.'],
+    surprise_mulch:['Surprise Mulch: produces a random harvest.', 'Terreau Surprise : produit une récolte aléatoire.'],
+    berry_shovel:['Berry Shovel: used to plant berries on the farm.', 'Pelle à Baies : sert à planter des baies à la ferme.'],
+    mulch_shovel:['Mulch Shovel: used to spread mulch on the farm.', 'Pelle à Terreau : sert à appliquer du terreau à la ferme.'],
+    cerulean_berry_shop_permit:['Berry Shop Permit: allows berry purchases in Celadon.', 'Permis Baies : autorise l\'achat de baies à Céladon.'],
+  };
+  const FLUTE_DESC = {
+    red_flute:['Red Flute: cures infatuation.', 'Flûte Rouge : guérit l\'attirance.'],
+    blue_flute:['Blue Flute: wakes the Pokémon (cures Sleep).', 'Flûte Bleue : réveille le Pokémon (retire le Sommeil).'],
+    yellow_flute:['Yellow Flute: snaps the Pokémon out of Confusion.', 'Flûte Jaune : dissipe la Confusion.'],
+    white_flute:['White Flute: attracts wild Pokémon.', 'Flûte Blanche : attire les Pokémon sauvages.'],
+    black_flute:['Black Flute: repels wild Pokémon.', 'Flûte Noire : éloigne les Pokémon sauvages.'],
+    time_flute:['Time Flute: speeds up time-based effects.', 'Flûte Tempo : accélère les effets temporels.'],
+  };
+  const TOOL_DESC = {
+    treasure_scanner:['Treasure Scanner: reveals hidden underground treasures.', 'Scanner de Trésors : révèle les trésors cachés au Souterrain.'],
+    dowsing_machine:['Dowsing Machine: detects hidden items nearby.', 'Détecteur : détecte les objets cachés à proximité.'],
+    token_collector:['Token Collector: automatically gathers tokens.', 'Collecteur de Jetons : récolte automatiquement les jetons.'],
+  };
+
   // ───── Generate description for an item ─────
-  function generateItemDesc(itemKey, lang) {
+  function generateItemDesc(itemKey, lang, opts) {
     lang = lang || 'fr';
     const item = window.ITEMS && window.ITEMS[itemKey];
     if (!item) return '';
     
-    const qty = (window.G && window.G.inventory) ? (window.G.inventory[itemKey] || 0) : 0;
-    const level = getPowerLevel(qty);
+    // Règle joueur (Passe 26e) : afficher UNIQUEMENT la valeur au stock actuel
+    // (sac) ou la valeur de base à 1 exemplaire (dictionnaire) — jamais « X → Y ».
+    const baseOnly = !!(opts && opts.baseOnly);
+    const qty = (!baseOnly && window.G && window.G.inventory) ? (window.G.inventory[itemKey] || 0) : 0;
+    const level = baseOnly ? 1 : getPowerLevel(qty);
     const power = evalFormula(item.powerFormula || '1', level);
-    // Phase 27: display the SIMPLE and full power "x1.20 (max x2.00)"
-    // directly in the description (the panel's ⚡ frame is removed).
-    const levelMax = evalFormula(item.powerFormula || '1', 5);
-    const powStr = 'x' + power.toFixed(2) + ' (max x' + levelMax.toFixed(2) + ')';
+    const powStr = 'x' + power.toFixed(2);
     function _statusLabel(key, langKey) {
             const frKeys = { burn:'status_burn_label', freeze:'status_freeze_label', para:'status_para_label', poison:'status_poison', sleep:'status_sleep_label', confuse:'status_confuse_label', sunny:'weather_sunny', rainy:'weather_rainy', sand:'weather_sandstorm', hail:'weather_hail', eterrain:'terrain_electric', gterrain:'terrain_grassy', mterrain:'terrain_misty' }; // phase 27b: 'status_poison' (badgable noun) instead of status_poisoned
  // (the past participle was not caught by the status badger)
@@ -128,6 +216,27 @@
       if (langKey === 'en') return 'Boosts power by ';
       const v = (typeof t === 'function') ? t('held_power_sentence') : '';
       return (v && v !== 'held_power_sentence') ? v : 'Augmente la puissance de ';
+    }
+
+    // Poké Balls — le taux vient de BALL_DEFS (source unique), jamais en dur.
+    if (item.type === 'ball') {
+      const _defs = (typeof window !== 'undefined' && window.BALL_DEFS) ? window.BALL_DEFS : null;
+      const _def = _defs ? _defs[itemKey] : null;
+      const _rate = _def ? Number(_def.rate) : (Number(item.rate) || 10);
+      const _scaling = !!( _def && _def.scaling );
+      const _flavor = lang === 'en' ? (item.desc_en || '') : (item.desc_fr || '');
+      // retire la phrase de taux en dur (elle est recalculée ci-dessous)
+      const _clean = String(_flavor).replace(/\s*(?:Taux de capture|Catch rate)\s*:\s*\d+\s*%\.?/i, '').trim();
+      const _rateLine = (typeof tr === 'function')
+        ? tr('ball_catch_rate', { rate: _rate })
+        : (lang === 'en' ? ('Catch rate: ' + _rate + '%') : ('Taux de capture : ' + _rate + ' %'));
+      if (_scaling) {
+        const _scaleLine = lang === 'en'
+          ? '+2% per owned tier (up to +10% at 25 copies).'
+          : '+2 % par palier possédé (jusqu\'à +10 % à 25 ex.).';
+        return [_rateLine, _scaleLine, _clean].filter((x) => x && String(x).trim()).join(' · ');
+      }
+      return [_rateLine, _clean].filter((x) => x && String(x).trim()).join(' · ');
     }
 
     // Type boosters
@@ -190,7 +299,296 @@
       }
       return (typeof t==='function'?t('held_damage_boost'):'Held: boost user damage by ') + powStr + (typeof t==='function'?t('held_inflicts'):', mais inflige ') + sTag;
     }
+
+    // DORM-00 — descriptions réelles des objets tenus (source PokeChill).
+    if (item.category === 'eviolite') {
+      return lang === 'en'
+        ? 'When held: +50% Defense and Sp. Def if the Pokémon can still evolve.'
+        : 'Held: +50 % Défense et Défense Spéciale si le Pokémon peut encore évoluer.';
+    }
+    if (item.category === 'exp') {
+      return lang === 'en'
+        ? 'When held: +50% experience gained.'
+        : 'Held: +50 % d\'EXP gagnée.';
+    }
+    if (item.category === 'loot') {
+      return lang === 'en'
+        ? 'When held: increases the drop rate of wild Pokémon for the whole team.'
+        : 'Held: augmente le taux de butin des Pokémon sauvages (pour toute l\'équipe).';
+    }
+    if (item.category === 'encounter') {
+      return lang === 'en'
+        ? 'When held: increases the weight of rare wild Pokémon for the whole team.'
+        : 'Held: augmente le poids des Pokémon sauvages rares (pour toute l\'équipe).';
+    }
+    if (item.category === 'boost') {
+      return lang === 'en'
+        ? 'When held: +2 Attack and Sp. Atk stages after taking a super-effective hit.'
+        : 'Held: +2 crans d\'Attaque et d\'Attaque Spéciale après un coup super efficace subi.';
+    }
+    if (item.category === 'defense') {
+      return lang === 'en'
+        ? 'When held: -10% special damage taken.'
+        : 'Held: -10 % de dégâts spéciaux subis.';
+    }
+    if (item.category === 'terrain') {
+      return lang === 'en'
+        ? 'When held: extends the active terrain to 8 turns instead of 5.'
+        : 'Held: prolonge le terrain actif (8 tours au lieu de 5).';
+    }
+    if (item.category === 'leftovers') {
+      return lang === 'en'
+        ? 'When held: restores HP every turn.'
+        : 'Held: récupère des PV à chaque tour.';
+    }
+    if (item.category === 'speed') { // Vive Griffe
+      return lang === 'en'
+        ? 'When held: the holder attacks a little faster than usual.'
+        : 'Held: le porteur attaque un peu plus vite que d\'habitude.';
+    }
+    if (item.category === 'multi_hit') { // Dé à Jouer
+      return lang === 'en'
+        ? 'When held: multi-hit moves always strike the maximum number of times.'
+        : 'Held: les capacités multi-coups frappent toujours le nombre maximal de fois.';
+    }
+    if (item.category === 'extend') { // Lumargile
+      return lang === 'en'
+        ? 'When held: positive effects last 1 extra turn.'
+        : 'Held: les effets positifs durent 1 tour de plus.';
+    }
+    if (item.category === 'charge') { // Herbe Pouvoir
+      return lang === 'en'
+        ? 'When held: moves that need charging are executed immediately.'
+        : 'Held: les capacités à charger s\'exécutent immédiatement.';
+    }
+    if (item.category === 'cure') { // Herbe Mentale
+      return lang === 'en'
+        ? 'When held: negative effects last 1 turn less.'
+        : 'Held: les effets négatifs durent 1 tour de moins.';
+    }
+    if (item.category === 'slow') { // Queue Lente
+      return lang === 'en'
+        ? 'When held: the holder attacks a little slower but deals more damage.'
+        : 'Held: le porteur attaque un peu moins vite mais inflige plus de dégâts.';
+    }
+    if (item.category === 'hazards') { // Bottes Lourdes
+      return lang === 'en'
+        ? 'When held: immune to entry hazards on the field.'
+        : 'Held: immunisé contre les pièges posés sur le terrain.';
+    }
+    if (item.category === 'protect') { // Amulette Pure
+      return lang === 'en'
+        ? 'When held: prevents the holder\'s stats from being lowered.'
+        : 'Held: empêche la baisse des statistiques du porteur.';
+    }
+    if (item.category === 'punch') { // Poing Chance
+      return lang === 'en'
+        ? 'When held: punch moves deal more damage.'
+        : 'Held: les capacités de poing infligent plus de dégâts.';
+    }
+    if (item.category === 'consecutive') { // Métronome
+      return lang === 'en'
+        ? 'When held: repeating the same move keeps increasing its power.'
+        : 'Held: répéter la même capacité augmente progressivement sa puissance.';
+    }
+    if (item.category === 'eject') { // Bouton de Fuite / Sac de Fuite
+      return lang === 'en'
+        ? 'When held: forces the holder to switch out after attacking.'
+        : 'Held: force le porteur à être remplacé après avoir attaqué.';
+    }
     
+    // DORM-06 — baies tenues (aucune consommée) & consommables : descriptions
+    // générées par catégorie, avec la valeur 1→25 exemplaires si powerFormula.
+    const _statFr = { hp:'PV', atk:'Attaque', def:'Défense', spa:'Att. Spé', spd:'Déf. Spé', spe:'Vitesse' };
+    const _statEn = { hp:'HP', atk:'Attack', def:'Defense', spa:'Sp. Atk', spd:'Sp. Def', spe:'Speed' };
+    if (item.category === 'immunity_berry' && item.immunity) {
+      const stFr = { para:'Paralysie', sleep:'Sommeil', poison:'Poison', burn:'Brûlure', freeze:'Gel', confuse:'Confusion' }[item.immunity] || item.immunity;
+      const stEn = { para:'Paralysis', sleep:'Sleep', poison:'Poison', burn:'Burn', freeze:'Freeze', confuse:'Confusion' }[item.immunity] || item.immunity;
+      return lang === 'en'
+        ? `When held: immune to ${stEn} for the whole battle.`
+        : `Tenue : immunise contre ${stFr} pendant tout le combat.`;
+    }
+    if (item.category === 'cure_all') {
+      return lang === 'en'
+        ? 'When held: cures all status conditions once per battle.'
+        : 'Tenue : soigne tous les statuts une fois par combat.';
+    }
+    if (item.category === 'skip_cd') {
+      if (lang === 'en') return `When held: ${Math.round(evalFormula(item.powerFormula, level)*100)}% chance to skip the attack cooldown.`;
+      return `Tenue : ${Math.round(evalFormula(item.powerFormula, level)*100)} % de chance de sauter le cooldown d'attaque.`;
+    }
+    if (item.category === 'pinch_heal') {
+      if (lang === 'en') return `When held: restores ${Math.round(evalFormula(item.powerFormula, level)*100)}% of max HP when HP is below 25% (once per battle).`;
+      return `Tenue : restaure ${Math.round(evalFormula(item.powerFormula, level)*100)} % des PV max quand les PV passent sous 25 % (une fois par combat).`;
+    }
+    if (item.category === 'pinch_stat' && item.stat) {
+      if (lang === 'en') return `When held: +${Math.round(evalFormula(item.powerFormula, level)*100)}% ${_statEn[item.stat]} when HP is below 25%.`;
+      return `Tenue : +${Math.round(evalFormula(item.powerFormula, level)*100)} % ${_statFr[item.stat]} quand les PV passent sous 25 %.`;
+    }
+    if (item.category === 'pinch_dmg') {
+      if (lang === 'en') return `When held: +${Math.round(evalFormula(item.powerFormula, level)*100)}% damage when HP is below 25%.`;
+      return `Tenue : +${Math.round(evalFormula(item.powerFormula, level)*100)} % de dégâts quand les PV passent sous 25 %.`;
+    }
+    if (item.category === 'pinch_random') {
+      if (lang === 'en') return `When held: +${Math.round(evalFormula(item.powerFormula, level)*100)}% to a random stat when HP is below 25%.`;
+      return `Tenue : +${Math.round(evalFormula(item.powerFormula, level)*100)} % à une stat au hasard quand les PV passent sous 25 %.`;
+    }
+    if (item.category === 'entry_debuff' && item.stat) {
+      if (lang === 'en') return `When held: lowers the enemy's ${_statEn[item.stat]} by ${Math.round(evalFormula(item.powerFormula, level)*100)}% on entry.`;
+      return `Tenue : réduit ${_statFr[item.stat]} de l'ennemi de ${Math.round(evalFormula(item.powerFormula, level)*100)} % à l'entrée en combat.`;
+    }
+    if (item.category === 'pinch_fast') {
+      return lang === 'en'
+        ? 'When held: the next move is executed 2× faster when HP is below 25% (once per battle).'
+        : 'Tenue : la prochaine attaque est 2× plus rapide quand les PV passent sous 25 % (une fois par combat).';
+    }
+    if (item.category === 'pinch_first') {
+      return lang === 'en'
+        ? 'When held: moves first when HP is below 25% (once per battle).'
+        : 'Tenue : agit en premier quand les PV passent sous 25 % (une fois par combat).';
+    }
+    if (item.category === 'counter_phys' || item.category === 'counter_spec') {
+      const kind = item.category === 'counter_phys' ? (lang === 'en' ? 'physical' : 'physique') : (lang === 'en' ? 'special' : 'spéciale');
+      return lang === 'en'
+        ? `When held: reflects 12% of the holder's max HP back to ${kind} attackers.`
+        : `Tenue : renvoie 12 % des PV max du porteur aux attaquants ${kind}s.`;
+    }
+    if (item.category === 'hit_buff' && item.stat) {
+      if (lang === 'en') return `When held: +${Math.round(evalFormula(item.powerFormula, level)*100)}% ${_statEn[item.stat]} after taking a hit.`;
+      return `Tenue : +${Math.round(evalFormula(item.powerFormula, level)*100)} % ${_statFr[item.stat]} après avoir subi une attaque.`;
+    }
+    if (item.category === 'super_heal') {
+      if (lang === 'en') return `When held: restores ${Math.round(evalFormula(item.powerFormula, level)*100)}% of max HP after taking a super-effective hit.`;
+      return `Tenue : restaure ${Math.round(evalFormula(item.powerFormula, level)*100)} % des PV max après un coup super efficace subi.`;
+    }
+    if (item.category === 'ice_boost') {
+      if (lang === 'en') return `When held: +${Math.round(evalFormula(item.powerFormula, level)*100)}% Ice-type damage.`;
+      return `Tenue : +${Math.round(evalFormula(item.powerFormula, level)*100)} % de dégâts Glace.`;
+    }
+    if (item.category === 'loot_boost') {
+      return lang === 'en'
+        ? 'When held: +1 item drop rate for the whole team.'
+        : 'Tenue : +1 au taux de butin pour toute l\'équipe.';
+    }
+    if (item.category === 'flavor') {
+      return lang === 'en'
+        ? 'A berry used as a Pokéblock ingredient (no battle effect).'
+        : 'Baie utilisée comme ingrédient de Pokéblocks (aucun effet en combat).';
+    }
+    if (item.category === 'vitamin') {
+      return lang === 'en'
+        ? 'Use from the bag on a Pokémon: +1 random EV.'
+        : 'À utiliser depuis le sac sur un Pokémon : +1 EV aléatoire.';
+    }
+    if (item.category === 'iv_boost') {
+      return lang === 'en'
+        ? 'Use from the bag on a Pokémon: +1 random IV.'
+        : 'À utiliser depuis le sac sur un Pokémon : +1 IV aléatoire.';
+    }
+    if (item.category === 'iv_boost_all') {
+      return lang === 'en'
+        ? 'Use from the bag on a Pokémon: +1 IV on every stat.'
+        : 'À utiliser depuis le sac sur un Pokémon : +1 IV sur toutes les stats.';
+    }
+    if (item.category === 'ability_reroll') {
+      return lang === 'en'
+        ? 'Use from the bag on a Pokémon: rerolls its ability.'
+        : 'À utiliser depuis le sac sur un Pokémon : re-tire son talent.';
+    }
+    if (item.category === 'ability_hidden') {
+      return lang === 'en'
+        ? 'Use from the bag on a Pokémon: unlocks its hidden ability.'
+        : 'À utiliser depuis le sac sur un Pokémon : débloque son talent caché.';
+    }
+    // DORM-06b — objets futurs / non distribués : descriptions RÉELLES.
+    // Règle joueur : jamais de « à venir » — l'objet est décrit pour ce
+    // qu'il fait, même si la mécanique n'est pas encore branchée.
+    if (item.category === 'z_crystal' && item.zType) {
+      const badge = typeBadge(item.zType);
+      const zPeriod = Math.max(8, 20 - 2 * level); // 18 → 8 tours (1 → 25 ex.)
+      if (lang === 'en') return `When held: every ${zPeriod} turns, launches a coordinated ${badge}-type attack if the holder isn't KO. Physical or special based on the holder's best stat (×1.25 if equal). One Z-Crystal per team.`;
+      return `Tenue : tous les ${zPeriod} tours, lance une attaque coordonnée de type ${badge} si le porteur n'est pas K.O. Physique ou spéciale selon la meilleure stat du porteur (×1,25 si égales). Un seul Cristal Z par équipe.`;
+    }
+    if (item.category === 'mega_stone') {
+      // Format PokeChill (source itemDictionary) : un objet d'évolution qui,
+      // TENU par la forme méga, augmente SES dégâts de x1.15 → x1.65.
+      const s = MEGA_SPECIES[itemKey] || null; // [nom FR, nom EN, forme]
+      const megaName = (s && s[0])
+        ? (lang === 'en' ? ('Mega ' + s[1] + s[2]) : ('Méga-' + s[0] + s[2]))
+        : (lang === 'en' ? 'the Mega-Evolved Pokémon' : 'le Pokémon méga-évolué');
+      const useLine = lang === 'en'
+        ? 'Use: Evolve a certain Pokemon.'
+        : 'Utilisation : fait évoluer un Pokémon précis.';
+      const heldLine = lang === 'en'
+        ? `When held: Increases the damage dealt by ${megaName} by x${power.toFixed(2)}.`
+        : `Tenue : augmente les dégâts infligés par ${megaName} de x${power.toFixed(2)}.`;
+      return useLine + ' ' + heldLine;
+    }
+    if (item.category === 'mega_shard') {
+      return lang === 'en'
+        ? 'A Mega Evolution crafting material used to forge Mega Stones.'
+        : 'Matériau de Méga-Évolution : sert à forger des Gemmes Méga.';
+    }
+    if (item.category === 'mystery_egg') {
+      return lang === 'en'
+        ? 'A mysterious egg received from a quest: hatches into a random Pokémon at the day care.'
+        : 'Œuf mystérieux reçu en quête : éclot en un Pokémon aléatoire à la pension.';
+    }
+    if (item.category === 'time_candy') {
+      const minutes = itemKey === 'time_candy_xl' ? 30 : 10;
+      return lang === 'en'
+        ? `Use during battle: fast-forwards battle time by ${minutes} minutes.`
+        : `Utilisable en combat : accélère le temps de combat de ${minutes} minutes.`;
+    }
+    if (item.category === 'apricorn') {
+      const c = (MEGA_SPECIES.apricorn || {})[itemKey];
+      if (c) return lang === 'en'
+        ? `${c.en} Apricorn: used to craft special Poké Balls (farm).`
+        : `Noigrume ${c.fr} : sert à fabriquer des Poké Balls spéciales (ferme).`;
+    }
+    if (item.category === 'legend_key' && LEGEND_KEY_DESC[itemKey]) {
+      return lang === 'en' ? LEGEND_KEY_DESC[itemKey][0] : LEGEND_KEY_DESC[itemKey][1];
+    }
+    if (item.category === 'breeding') {
+      return lang === 'en'
+        ? 'Destiny Knot: at the day care, passes 5 of the parents\' IVs to the egg.'
+        : 'Nœud Destin : à la pension, transmet 5 IV des parents au petit.';
+    }
+    if (item.category === 'training') {
+      const st = TRAINING_STAT[itemKey] || null;
+      if (st) return lang === 'en'
+        ? `Power item: boosts ${st.en} EV gain from training.`
+        : `Objet Pouvoir : favorise le gain d'EV ${st.fr} à l'entraînement.`;
+      return lang === 'en'
+        ? 'Macho Brace: doubles EVs gained from training.'
+        : 'Bracelet Macho : double les EV gagnées à l\'entraînement.';
+    }
+    if (item.category === 'mint') {
+      return lang === 'en'
+        ? 'Neutral Mint: changes a Pokémon\'s nature to a neutral one.'
+        : 'Aromate Neutre : change la nature du Pokémon en nature neutre.';
+    }
+    if (item.category === 'underground_shard') {
+      return lang === 'en'
+        ? 'A colored shard: an underground exchange material.'
+        : 'Éclat coloré : matériau d\'échange au Souterrain.';
+    }
+    if (item.category === 'plate') {
+      const t = PLATE_TYPE[itemKey] || null;
+      if (t) return lang === 'en'
+        ? `${t} Plate: an underground treasure tied to Arceus.`
+        : `Plaque ${t} : trésor du Souterrain, liée à Arceus.`;
+    }
+    if (item.category === 'farm' && FARM_DESC[itemKey]) {
+      return lang === 'en' ? FARM_DESC[itemKey][0] : FARM_DESC[itemKey][1];
+    }
+    if (item.category === 'flute' && FLUTE_DESC[itemKey]) {
+      return lang === 'en' ? FLUTE_DESC[itemKey][0] : FLUTE_DESC[itemKey][1];
+    }
+    if (item.category === 'tool' && TOOL_DESC[itemKey]) {
+      return lang === 'en' ? TOOL_DESC[itemKey][0] : TOOL_DESC[itemKey][1];
+    }
+
     // CT/TM items: use localization
     if (itemKey.startsWith('ct') || itemKey.startsWith('cs')) {
       const locKey = 'items.' + itemKey + '.desc';
@@ -272,4 +670,6 @@ export const ItemEngine = {
 // Wave 41 — surface kept (ex window.ItemEngine): classic
 // consumers, VM harnesses and the engine registry.
 if (typeof globalThis !== 'undefined') globalThis.ItemEngine = ItemEngine;
+
+
 

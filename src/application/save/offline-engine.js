@@ -204,6 +204,7 @@ function offlineStartWildSession(_loc){
   b.isLeague = false; b.leagueRegion = null; b.leagueStage = null;
   b.champPokeIdx = 0;
   b.escaped = false; b.paused = false; b.chill = true;
+  b._offlineSim = true; // DORM-04 : la fatigue de combat ne s'applique pas au rattrapage hors-ligne.
   b.weather = 'none'; b.weatherTurns = 0; b.terrain = 'none'; b.terrainTurns = 0;
   b.speed = b.speed || 1;
   b.playerMods = { atk:1, def:1, spe:1 }; b.enemyMods = { atk:1, def:1, spe:1 };
@@ -212,6 +213,8 @@ function offlineStartWildSession(_loc){
   b.trainerVisual = null;
   b.sessionWins = 0; b.sessionPlayerKOs = 0; b.sessionStartedAt = Date.now();
   b.sessionDamageByPokemon = {}; b.sessionCatches = []; b.sessionItems = {};
+  b.sessionMoney = 0;
+  b.sessionTokens = 0;
   b.playerPokeIdx = (typeof firstAlive === 'function') ? firstAlive() : 0;
   b.enemyPoke = null;
   try{ spawnNextWild(); }catch(e){ console.error('[OfflineEngine] spawnNextWild', e); }
@@ -602,7 +605,7 @@ function showAfkResultPanel(result){
   const stats = [
     stat(formatPlayTime(result.timeMs || 0), 'afk_panel_duration'),
     stat(result.wins || 0, 'afk_panel_battles'),
-    stat('+' + Number(result.money || 0).toLocaleString() + '₽', 'afk_panel_money'),
+    stat('+' + formatNumber(Number(result.money || 0)) + '₽', 'afk_panel_money'),
     stat(result.fainted || 0, 'afk_panel_team_ko'),
     stat(result.captures || 0, 'afk_panel_captures'),
     stat('+' + (result.energy || 0), 'afk_panel_energy'),
@@ -730,7 +733,7 @@ async function offlineSimulate(ms, reason){
       if(result.boundedBattle){
         notify(t(result.boundedBattle === 'won' ? 'afk_boss_won' : 'afk_boss_lost'), result.boundedBattle === 'won' ? 'var(--green)' : 'var(--red)');
       } else if(result.wins > 0 || result.lost){
-        const params = { time: formatPlayTime(capped), wins: result.wins, money: Number(result.money || 0).toLocaleString(), fainted: result.fainted };
+        const params = { time: formatPlayTime(capped), wins: result.wins, money: formatNumber(Number(result.money || 0)), fainted: result.fainted };
         notify(tr(result.lost ? 'afk_progress_lost_summary' : 'afk_progress_summary', params), result.lost ? 'var(--red)' : 'var(--green)');
         try{ addBattleLog(tr(result.lost ? 'afk_battle_log_lost_summary' : 'afk_battle_log_summary', params)); }catch(_){ }
       } else if(seconds >= 30 && G.mine && result.energy > 0){
@@ -866,4 +869,6 @@ export {
   snapshotInventory,
   snapshotSessionItems,
 };
+
+
 

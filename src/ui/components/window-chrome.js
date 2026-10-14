@@ -117,3 +117,5 @@ export function pwApplyWindowChrome(inner) {
 if (typeof window !== 'undefined') window.pwApplyWindowChrome = pwApplyWindowChrome;
 if (typeof globalThis !== 'undefined') globalThis.pwApplyWindowChrome = pwApplyWindowChrome;
 
+
+

@@ -24,3 +24,5 @@
  "bakedBy": "tools/bake-emerald-bgs.py --bake-decor-all + --bake-canon (DECOR_MAP, objgfx, pc, stairs). Chairs, posters, TVs, mats, balloons, fences, PC and stairs are official Emerald metatiles, not standalone PNGs in pret/pokeemerald/graphics/decorations."
 }
 
+
+

@@ -113,17 +113,20 @@ function getHeldBuff(p){
    out[itm.stat] = itm.mult - 1;
    return out;
  }
- // Type boost: translate to atk/spa boost
+ // DORM-03 — boosters de type : plus de +10 % générique (incohérent).
+ // Leur effet réel est le ×1,2 conditionnel appliqué dans battle-attack.js
+ // (typeItemMap) quand la capacité correspond au type de l'objet.
  if(itm.category === 'type_boost') {
-   // Phase 17: these items (Mystic Water, Hard Stone…) were INERT in
-   // battle — their power was only consumed for the description text.
-   // Their effect becomes active: +10% damage (×1.10 displayed,
-   // powerFormula level 1), translated as an atk/spa bonus — neutral
-   // typing, so valid
-    // Team management and slot position swap rules
-   out.atk = itm.boost || 0.1;
-   out.spa = itm.boost || 0.1;
    return out;
+ }
+ // DORM-02e — Évoluroc : +50 % def/spd si l'espèce peut encore évoluer.
+ if(itm.category === 'eviolite' && p && p.id != null){
+  const nid = Number(p.id);
+  const lvlMap = (typeof LEVEL_EVO_MAP !== 'undefined' && LEVEL_EVO_MAP && Object.keys(LEVEL_EVO_MAP).length) ? LEVEL_EVO_MAP : (typeof FILTER_LEVEL_EVO_MAP !== 'undefined' ? FILTER_LEVEL_EVO_MAP : {});
+  const stoneMap = (typeof STONE_EVO !== 'undefined' && STONE_EVO && Object.keys(STONE_EVO).length) ? STONE_EVO : (typeof FILTER_STONE_EVO !== 'undefined' ? FILTER_STONE_EVO : {});
+  const canEvolve = !!(lvlMap[nid] || stoneMap[nid]);
+  if(canEvolve){ out.def += 0.5; out.spd += 0.5; }
+  return out;
  }
  // Legacy buff system
  if(itm.buff){
@@ -259,4 +262,6 @@ export {
   changePokeTalent,
   getTeamIndexOfPokemon,
 };
+
+
 

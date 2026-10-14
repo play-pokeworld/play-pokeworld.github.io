@@ -190,3 +190,5 @@ test('wave19: kind mapping — full matrix documented and locked', () => {
   assert.ok(UTIL_JS.includes("return c ? 'neutral' : 'success'"), 'default stays success (historical var(--green))');
 });
 
+
+

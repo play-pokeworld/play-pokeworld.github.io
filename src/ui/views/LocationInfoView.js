@@ -12,7 +12,8 @@
  *
  * Model (shaped by the classic adapter, labels localized there):
  * {
- *   overview?, playStats?, lore?, actions: [], unlockTip?, timerChips: [],
+ *   overview?, playStats?, lore?, dungeonRun?, actions: [], unlockTip?,
+ *   timerChips: [],
  *   wild: { meta, entries }|null, drops?|null, alcoves?|null,
  * }
  *
@@ -26,6 +27,7 @@ import {
   locPlayStatsVNode,
   locLoreVNode,
   locActionGridVNode,
+  locDungeonRunVNode,
   locUnlockTipVNode,
   locTimerChipVNode,
   locWildMetaVNode,
@@ -45,6 +47,7 @@ export class LocationInfoView extends UIView {
       m.overview ? locOverviewVNode(m.overview) : null,
       m.playStats ? locPlayStatsVNode(m.playStats) : null,
       m.lore ? locLoreVNode(m.lore) : null,
+      m.dungeonRun ? locDungeonRunVNode(m.dungeonRun) : null,
       (m.actions || []).length ? locActionGridVNode(m.actions) : null,
       m.unlockTip ? locUnlockTipVNode(m.unlockTip) : null,
       ...(m.timerChips || []).map(locTimerChipVNode),
@@ -67,4 +70,6 @@ export class LocationInfoView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+
+
 

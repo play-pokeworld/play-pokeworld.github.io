@@ -25,6 +25,8 @@ function _flushHeaderWindows(){
   try{ renderMineWindow(); }catch(_){}
   try{ renderAutomationWindow(); }catch(_){}
   try{ renderShortcutsWindow(); }catch(_){}
+  try{ renderCurrencyWindow(); }catch(_){}
+  try{ renderPokeballWindow(); }catch(_){}
 }
 
 function renderUpdateBanner(){
@@ -76,11 +78,36 @@ function renderUpdateBanner(){
   }
 }
 
+
+// ── P3 · CUR-01 — barre de monnaies persistante ────────────────────────────
+// Un seul point d'écriture pour les 4 compteurs du header. Chaque montant
+// est comparé à sa valeur précédente (feedback-fx) : un gain fait monter un
+// « +1 250 ₽ » qui s'efface en 800 ms. Les monnaies non encore débloquées
+// restent masquées (révélation progressive, comme la fenêtre Monnaies).
+/* PASSE 28 — les monnaies et l'énergie de mine ont quitté la barre de titre
+   (demande utilisateur). Tout l'affichage chiffré + les animations de gain
+   vivent désormais dans la fenêtre « Monnaies » (src/ui/game/currency-window.js).
+   Ici on se contente d'entretenir #h-money, resté masqué dans l'entête, parce
+   que du code historique et des tests le lisent encore. */
+function updateCurrencyHud(){
+  if(typeof document === 'undefined' || typeof G === 'undefined' || !G) return;
+  try{
+    const el = document.getElementById('h-money');
+    if(el){
+      const money = (typeof G.money === 'number') ? G.money : 0;
+      const fmt = (typeof formatNumber === 'function') ? formatNumber(money) : String(money);
+      if(el.textContent !== fmt) el.textContent = fmt;
+    }
+  }catch(_){}
+  // la fenêtre Monnaies est la seule surface d'affichage : on la rafraîchit
+  // pour que les deltas s'y animent, jamais ailleurs.
+  try{ if(typeof renderCurrencyWindow === 'function') renderCurrencyWindow(); }catch(_){}
+}
+
 function updateHeader(){
   try{ renderUpdateBanner(); }catch(_){}
   try{
-    const m = document.getElementById('h-money');
-    if(m) m.textContent = (G && typeof G.money === 'number') ? G.money.toLocaleString() : '0';
+    updateCurrencyHud();
     const b = document.getElementById('h-badges');
     if(b) b.textContent = (G && Array.isArray(G.badges)) ? G.badges.length : 0;
     const totalEl = document.getElementById('h-badges-total');
@@ -107,8 +134,7 @@ function updateHeaderImmediate(){
   _headerRaf = null;
   _headerPending = false;
   try{
-    const m = document.getElementById('h-money');
-    if(m) m.textContent = (G && typeof G.money === 'number') ? G.money.toLocaleString() : '0';
+    updateCurrencyHud();
     const b = document.getElementById('h-badges');
     if(b) b.textContent = (G && Array.isArray(G.badges)) ? G.badges.length : 0;
     const totalEl = document.getElementById('h-badges-total');
@@ -120,6 +146,7 @@ function updateHeaderImmediate(){
 
 // --- Migrated to ES module, globals exposed ---
 if (typeof getBadgeDisplayTotal !== 'undefined') { if (typeof window !== 'undefined') window.getBadgeDisplayTotal = getBadgeDisplayTotal; if (typeof globalThis !== 'undefined') globalThis.getBadgeDisplayTotal = getBadgeDisplayTotal; }
+if (typeof updateCurrencyHud !== 'undefined') { if (typeof window !== 'undefined') window.updateCurrencyHud = updateCurrencyHud; if (typeof globalThis !== 'undefined') globalThis.updateCurrencyHud = updateCurrencyHud; }
 if (typeof updateHeader !== 'undefined') { if (typeof window !== 'undefined') window.updateHeader = updateHeader; if (typeof globalThis !== 'undefined') globalThis.updateHeader = updateHeader; }
 if (typeof updateHeaderImmediate !== 'undefined') { if (typeof window !== 'undefined') window.updateHeaderImmediate = updateHeaderImmediate; if (typeof globalThis !== 'undefined') globalThis.updateHeaderImmediate = updateHeaderImmediate; }
 
@@ -129,7 +156,10 @@ if (typeof updateHeaderImmediate !== 'undefined') { if (typeof window !== 'undef
 // classic surface kept above (bodies unchanged).
 export {
   getBadgeDisplayTotal,
+  updateCurrencyHud,
   updateHeader,
   updateHeaderImmediate,
 };
+
+
 

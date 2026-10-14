@@ -599,7 +599,15 @@ function claimQuest(qid, cat){
    return;
  }
 
- if(def.rewardMoney) G.money += (typeof __pwV43Link('applySecretBaseMoneyBonus') === 'function' ? applySecretBaseMoneyBonus(def.rewardMoney) : def.rewardMoney);
+ if(def.rewardMoney){
+  // P0 — TOUTES les quêtes (principales, secondaires, répétables) paient en
+  // Points de quête. Plus aucun Pokédollar en récompense de quête.
+  if(typeof gainQuestPoints === 'function' && typeof pqForMoney === 'function') gainQuestPoints(pqForMoney(def.rewardMoney));
+ }
+ if(cat === 'repeatable'){
+  // P0 — compteur de complétion (tutoriel / succès).
+  G.repeatablesCompleted = (G.repeatablesCompleted || 0) + 1;
+ }
  if(def.rewardItems){ if(typeof grantRewardItems === 'function') grantRewardItems(def.rewardItems); else for(const k in def.rewardItems) addToInventory(k, def.rewardItems[k]); }
 
  if(cat==='main'){
@@ -649,7 +657,7 @@ function completeQuestRewardBattle(qid){
  const inst = (G.activeQuests || []).find(i=>String(i.qid)===String(qid) && i.cat==='main');
  const def = inst ? getMainQuestDef(inst.qid) : getMainQuestDef(qid);
  if(!inst || !def) return false;
- if(def.rewardMoney) G.money += (typeof __pwV43Link('applySecretBaseMoneyBonus') === 'function' ? applySecretBaseMoneyBonus(def.rewardMoney) : def.rewardMoney);
+ if(def.rewardMoney && typeof gainQuestPoints === 'function' && typeof pqForMoney === 'function') gainQuestPoints(pqForMoney(def.rewardMoney));
  if(def.rewardItems){
   if(typeof grantRewardItems === 'function') grantRewardItems(def.rewardItems);
   else for(const k in def.rewardItems) addToInventory(k, def.rewardItems[k]);
@@ -861,7 +869,7 @@ function completeQuestTrainerBattle(battleId){
  if(!G.questTrainerWins || typeof G.questTrainerWins !== 'object') G.questTrainerWins = {};
  G.questTrainerWins[battleId] = true;
  const trainer = getTrainerBattleDef(battleId);
- if(trainer && trainer.rewardMoney) G.money = (G.money||0) + (typeof __pwV43Link('applySecretBaseMoneyBonus') === 'function' ? applySecretBaseMoneyBonus(trainer.rewardMoney) : trainer.rewardMoney);
+ if(trainer && trainer.rewardMoney && typeof gainQuestPoints === 'function' && typeof pqForMoney === 'function') gainQuestPoints(pqForMoney(trainer.rewardMoney));
  updateHeader();
  try{ if(document.getElementById('story-panel')) renderStoryWindow(); }catch(_){}
  saveGame();
@@ -873,6 +881,38 @@ function completeQuestTrainerBattle(battleId){
 
 
 const _repeatableRoll = [];
+
+
+// P0 — description de récompense DÉRIVÉE du tableau de récompenses (jamais
+// écrite en dur) : les quêtes répétables affichent des PQ, les autres des ₽.
+function computeRewardText(cat, def){
+ if(!def) return '';
+ const parts = [];
+ if(def.rewardMoney){
+  // P0 — toutes les quêtes paient en PQ.
+  if(typeof pqForMoney === 'function'){
+   parts.push((typeof pqSpriteHtml === 'function' ? pqSpriteHtml(pqForMoney(def.rewardMoney)) : formatNumber(pqForMoney(def.rewardMoney))));
+  } else {
+   parts.push(formatNumber(Number(def.rewardMoney)));
+  }
+ }
+ if(def.rewardItems){
+  for(const k in def.rewardItems){
+   const qty = Number(def.rewardItems[k]) || 1;
+   const name = (typeof getItemName === 'function') ? getItemName(k) : k;
+   const icon = (typeof itemSpriteHtml === 'function') ? itemSpriteHtml(k, 16) : '';
+   parts.push(icon + ' ' + (qty > 1 ? qty + '× ' : '') + name);
+  }
+ }
+ if(def.rewardPoke){
+  parts.push((typeof getPokeName === 'function') ? getPokeName(def.rewardPoke) : ('#' + def.rewardPoke));
+ }
+ if(!parts.length){
+  const qt = (typeof getQuestText === 'function') ? getQuestText(cat, def.id) : null;
+  return qt ? qt.rewardDesc : '';
+ }
+ return ((typeof t === 'function' ? t('reward_lbl') : 'Récompense') + ' : ' + parts.join(' · '));
+}
 
 
 function _refreshUI(){ try{ if(typeof refreshMapAndLoc==='function') refreshMapAndLoc(); }catch(_){} }
@@ -907,6 +947,7 @@ if (typeof questDone !== 'undefined') { if (typeof window !== 'undefined') windo
 if (typeof advanceQuests !== 'undefined') { if (typeof window !== 'undefined') window.advanceQuests = advanceQuests; if (typeof globalThis !== 'undefined') globalThis.advanceQuests = advanceQuests; }
 if (typeof locMatches !== 'undefined') { if (typeof window !== 'undefined') window.locMatches = locMatches; if (typeof globalThis !== 'undefined') globalThis.locMatches = locMatches; }
 if (typeof claimQuest !== 'undefined') { if (typeof window !== 'undefined') window.claimQuest = claimQuest; if (typeof globalThis !== 'undefined') globalThis.claimQuest = claimQuest; }
+if (typeof computeRewardText !== 'undefined') { if (typeof window !== 'undefined') window.computeRewardText = computeRewardText; if (typeof globalThis !== 'undefined') globalThis.computeRewardText = computeRewardText; }
 if (typeof completeQuestRewardBattle !== 'undefined') { if (typeof window !== 'undefined') window.completeQuestRewardBattle = completeQuestRewardBattle; if (typeof globalThis !== 'undefined') globalThis.completeQuestRewardBattle = completeQuestRewardBattle; }
 if (typeof talkNpcMainQuest !== 'undefined') { if (typeof window !== 'undefined') window.talkNpcMainQuest = talkNpcMainQuest; if (typeof globalThis !== 'undefined') globalThis.talkNpcMainQuest = talkNpcMainQuest; }
 if (typeof getQuestDefinitionForInstance !== 'undefined') { if (typeof window !== 'undefined') window.getQuestDefinitionForInstance = getQuestDefinitionForInstance; if (typeof globalThis !== 'undefined') globalThis.getQuestDefinitionForInstance = getQuestDefinitionForInstance; }
@@ -950,6 +991,7 @@ export {
   questDone,
   advanceQuests,
   claimQuest,
+  computeRewardText,
   completeQuestRewardBattle,
   talkNpcMainQuest,
   getQuestDefinitionForInstance,
@@ -971,4 +1013,6 @@ export {
   migrateQuestSaveV6,
   progressMainQuestType,
 };
+
+
 

@@ -49,3 +49,5 @@ export const L_en_champions = {
 // gardée sur l'objet global pour les registres (data.js) et les harnais VM.
 if (typeof globalThis !== 'undefined') globalThis.L_en_champions = L_en_champions;
 
+
+

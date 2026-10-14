@@ -84,3 +84,5 @@ test('ECSWorld O(1) entity ID recycling and EnTT-style query performance', () =>
   console.log(`[EnTT ECS Benchmark] 1,000,000 entity updates completed in ${durationMs.toFixed(2)} ms (informational).`);
 });
 
+
+

@@ -100,6 +100,7 @@ function openUnifiedSelectorModal(actionType){
   else if(actionType === 'hatchery_queue') titleEl.textContent = t('selector_title_hatchery_queue');
   else if(String(actionType).startsWith('training_queue_')) titleEl.textContent = tr('selector_title_training_queue', {slot:Number(String(actionType).split('_').pop())+1});
   else if(actionType === 'item_rarecandy') titleEl.textContent = t('selector_title_item_use');
+  else if(actionType === 'item_consumable') titleEl.textContent = t('selector_title_item_use');
   else if(actionType === 'training') titleEl.textContent = t('selector_title_training');
   else if(actionType === 'team') titleEl.textContent = t('selector_title_team');
   // Phase 48 (user feedback): presets and base NPCs use the same selector
@@ -209,7 +210,7 @@ function renderUnifiedGrid(){
    // UI overhaul: EVERY Pokémon selection mode gets the same fixed
    // filters/sorts (training slot + queue, hatchery parent + queue,
    // presets, base NPC) — no more filter-less pickers.
-   const showBoxFilters = (_usmAction === 'box_view' || _usmAction === 'team' || _usmAction === 'save_icon' || _usmAction === 'hatchery' || String(_usmAction).startsWith('hatchery_queue_') || _usmAction === 'item_rarecandy' || _usmAction === 'training' || String(_usmAction).startsWith('training_queue_') || String(_usmAction).startsWith('preset_slot_') || String(_usmAction).startsWith('basenpc_slot_')) && _usmSubTab === 'box';
+   const showBoxFilters = (_usmAction === 'box_view' || _usmAction === 'team' || _usmAction === 'save_icon' || _usmAction === 'hatchery' || String(_usmAction).startsWith('hatchery_queue_') || _usmAction === 'item_rarecandy' || _usmAction === 'item_consumable' || _usmAction === 'training' || String(_usmAction).startsWith('training_queue_') || String(_usmAction).startsWith('preset_slot_') || String(_usmAction).startsWith('basenpc_slot_')) && _usmSubTab === 'box';
   // The selector has its own top search input (#usm-search): the shared box
   // filter bar renders WITHOUT a second search field here.
   const filtersHtml = showBoxFilters && typeof renderBoxFiltersHtml === 'function' ? renderBoxFiltersHtml({ search: false, sorts: usmSortChips() }) : '';
@@ -295,7 +296,8 @@ function renderUnifiedGrid(){
   }
 
   
-  if(q) list = list.filter(({p}) => p.name.toLowerCase().includes(q));
+  // PASSE 29 (item 11): match the CURRENT language, not the name frozen at creation.
+  if(q) list = list.filter(({p}) => (typeof pokemonMatchesSearch === 'function') ? pokemonMatchesSearch(p, q) : String(p.name||'').toLowerCase().includes(q));
   if(globalThis._usmFilter.type) list = list.filter(({p}) => p.type1 === globalThis._usmFilter.type || p.type2 === globalThis._usmFilter.type);
   if(globalThis._usmFilter.shiny) list = list.filter(({p}) => p.shinyUnlocked || p.shinyActive || p.shiny);
   if(globalThis._usmFilter.inTeam === 'yes') list = list.filter(({loc}) => loc === 'team');
@@ -648,6 +650,15 @@ function selectUnifiedCard(loc, idStr){
     } else {
       notify(t('legacy_message_n_ce_pok_mon_est_d_j_au_niveau_100_maximu'), 'var(--red)');
     }
+  } else if(_usmAction === 'item_consumable'){
+    const cKey = G.pendingItemUseKey;
+    if(cKey && (G.inventory && (G.inventory[cKey]||0) > 0)){
+      if(loc === 'team'){ if(typeof useConsumableOnTeam === 'function') useConsumableOnTeam(Number(idStr)); }
+      else { if(typeof useConsumableOnBox === 'function') useConsumableOnBox(idStr); }
+      try{ renderUnifiedGrid(); }catch(_){}
+    } else {
+      notify(t('consumable_none'), 'var(--red)');
+    }
   } else if(_usmAction === 'training'){
     if(!p.uid) p.uid = 'p_' + Math.random().toString(36).substr(2, 9);
     const slotIndex = (typeof G.pendingTrainingSlotIndex === 'number') ? G.pendingTrainingSlotIndex : 0;
@@ -778,4 +789,6 @@ if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.regis
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('openUnifiedSelectorModal', openUnifiedSelectorModal); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('setUsmSubTab', setUsmSubTab); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('sortUnifiedGrid', sortUnifiedGrid); } catch (_) {} }
+
+
 

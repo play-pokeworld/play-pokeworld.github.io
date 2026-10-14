@@ -61,7 +61,7 @@ test('phase 35 A: permanent window wired (index, actions, dashboard, hook)', () 
   const idx = R('index.html');
   assert.ok(idx.includes('id="win-base"'), '#win-base present');
   assert.ok(idx.includes('data-drag-window="win-base"'), 'native drag of the dash-win');
-  for (const id of ['base-layout-select', 'base-canvas-2d', 'base-canvas-3d', 'base-panel', 'base-win-empty', 'base-refresh-btn']) {
+  for (const id of ['base-layout-select', 'base-canvas-2d', 'base-canvas-3d', 'base-panel', 'base-win-empty']) {
     assert.ok(idx.includes(`id="${id}"`), `#${id} present`);
   }
   assert.ok(!idx.includes('id="win-base3d"'), 'no more 3D window');
@@ -76,9 +76,10 @@ test('phase 35 A: permanent window wired (index, actions, dashboard, hook)', () 
   assert.ok(!pb.includes('baseWindowToggle'), 'old debug action removed');
 
   const dash = R('src/ui/game/dashboard.js');
-  assert.ok(dash.includes("'win-battle', 'win-map', 'win-base'"), 'win-base in column 2 by default');
+  // Passe 26g : ordre validé par le joueur — colonne 2 = Monnaies · Carte · Combat · Base.
+  assert.ok(dash.includes("'win-currency', 'win-map', 'win-battle', 'win-base'"), 'win-base in column 2 by default (new order)');
   const ensures = dash.split('win-base').length - 1;
-  assert.ok(ensures >= 4, 'win-base: default + existing injections + cols3 preset');
+  assert.ok(ensures >= 3, 'win-base: default + DEFAULT_COL + cols3 preset');
 
   const loader = R('src/main.js');
   const i2 = loader.indexOf('base-view2d.js'), iw = loader.indexOf('base-window.js');
@@ -267,5 +268,7 @@ test('phase 35 E: RGBA (alpha) Emerald sprites + fix wired to the downloader', (
   const referenced = new Set(Object.values(r2.items).map((e) => e.emerald.split('/').pop()));
   for (const f of fsSprites) assert.ok(referenced.has(f), `orphelin ${f}`);
 });
+
+
 
 

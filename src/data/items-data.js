@@ -4,11 +4,10 @@ export const ITEMS = {
 
   "prine_berry": {
     "icon": "\u{1F347}",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
-    "category": "boost",
-    "buff": { "def": 0.25 },
-    "name_en": "Prine Berry",
+    "category": "cure_all",
+    "name_en": "Lum Berry",
     "name_fr": "Baie Prine",
   },
 
@@ -31,7 +30,7 @@ export const ITEMS = {
 
   "assault_vest": {
     "icon": "",
-    "price": 250000,
+    "price": 60000,
     "type": "held",
     "category": "defense",
     "powerFormula": "1+0.2*level",
@@ -51,7 +50,7 @@ export const ITEMS = {
 
   "babiri_berry": {
     "icon": "🍇",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "resistance_berry",
     "resistType": "Steel",
@@ -62,7 +61,7 @@ export const ITEMS = {
 
   "black_belt": {
     "icon": "",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "type_boost",
     "typeBoost": "Fighting",
@@ -73,7 +72,7 @@ export const ITEMS = {
 
   "black_glasses": {
     "icon": "",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "type_boost",
     "typeBoost": "Dark",
@@ -84,7 +83,7 @@ export const ITEMS = {
 
   "bug_gem": {
     "icon": "💎",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "gem",
     "gemType": "Bug",
@@ -95,14 +94,16 @@ export const ITEMS = {
   "buginium_z": {
     "icon": "💠",
     "price": 45000,
-    "type": "z_crystal",
+    "type": "held",
+    "category": "z_crystal",
+    "zType": "Bug",
     "name_en": "Buginium Z",
     "name_fr": "Insectozélite Z",
   },
 
   "charcoal": {
     "icon": "",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "type_boost",
     "typeBoost": "Fire",
@@ -113,7 +114,7 @@ export const ITEMS = {
 
   "charti_berry": {
     "icon": "🍇",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "resistance_berry",
     "resistType": "Rock",
@@ -134,7 +135,7 @@ export const ITEMS = {
 
   "choice_band": {
     "icon": "",
-    "price": 350000,
+    "price": 60000,
     "type": "held",
     "category": "choice",
     "powerFormula": "1+0.15*level",
@@ -146,7 +147,7 @@ export const ITEMS = {
 
   "choice_specs": {
     "icon": "",
-    "price": 350000,
+    "price": 60000,
     "type": "held",
     "category": "choice",
     "powerFormula": "1+0.15*level",
@@ -158,7 +159,7 @@ export const ITEMS = {
 
   "chople_berry": {
     "icon": "🍇",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "resistance_berry",
     "resistType": "Fighting",
@@ -178,7 +179,7 @@ export const ITEMS = {
 
   "clear_amulet": {
     "icon": "",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "protect",
     "powerFormula": "0.5+0.5*level",
@@ -188,7 +189,7 @@ export const ITEMS = {
 
   "coba_berry": {
     "icon": "🍇",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "resistance_berry",
     "resistType": "Flying",
@@ -199,7 +200,7 @@ export const ITEMS = {
 
   "colbur_berry": {
     "icon": "🍇",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "resistance_berry",
     "resistType": "Dark",
@@ -262,7 +263,7 @@ export const ITEMS = {
 
   "ct06_toxic": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "toxic",
   },
@@ -283,63 +284,63 @@ export const ITEMS = {
 
   "ct13_icebeam": {
     "icon": "💿",
-    "price": 50000,
+    "price": 60000,
     "type": "ct",
     "moveId": "icebeam",
   },
 
   "ct15_hyperbeam": {
     "icon": "💿",
-    "price": 75000,
+    "price": 60000,
     "type": "ct",
     "moveId": "hyperbeam",
   },
 
   "ct22_solarbeam": {
     "icon": "💿",
-    "price": 75000,
+    "price": 60000,
     "type": "ct",
     "moveId": "solarbeam",
   },
 
   "ct24_thunderbolt": {
     "icon": "💿",
-    "price": 50000,
+    "price": 60000,
     "type": "ct",
     "moveId": "thunderbolt",
   },
 
   "ct26_earthquake": {
     "icon": "💿",
-    "price": 75000,
+    "price": 60000,
     "type": "ct",
     "moveId": "earthquake",
   },
 
   "ct29_psychic": {
     "icon": "💿",
-    "price": 75000,
+    "price": 60000,
     "type": "ct",
     "moveId": "psychic",
   },
 
   "ct30_shadowball": {
     "icon": "💿",
-    "price": 50000,
+    "price": 25000,
     "type": "ct",
     "moveId": "shadowball",
   },
 
   "ct35_flamethrower": {
     "icon": "💿",
-    "price": 50000,
+    "price": 60000,
     "type": "ct",
     "moveId": "flamethrower",
   },
 
   "ct_acid": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "acid",
 
@@ -417,7 +418,7 @@ export const ITEMS = {
 
   "ct_bite": {
     "icon": "💿",
-    "price": 50000,
+    "price": 25000,
     "type": "ct",
     "moveId": "bite",
 
@@ -519,7 +520,7 @@ export const ITEMS = {
 
   "ct_confusion": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "confusion",
 
@@ -549,7 +550,7 @@ export const ITEMS = {
 
   "ct_crunch": {
     "icon": "💿",
-    "price": 50000,
+    "price": 25000,
     "type": "ct",
     "moveId": "crunch",
 
@@ -660,7 +661,7 @@ export const ITEMS = {
 
   "ct_ember": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "ember",
 
@@ -690,7 +691,7 @@ export const ITEMS = {
 
   "ct_fireblast": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "fire_blast",
 
@@ -783,7 +784,7 @@ export const ITEMS = {
 
   "ct_hydropump": {
     "icon": "💿",
-    "price": 50000,
+    "price": 60000,
     "type": "ct",
     "moveId": "hydro_pump",
 
@@ -861,7 +862,7 @@ export const ITEMS = {
 
   "ct_leer": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "leer",
 
@@ -873,7 +874,7 @@ export const ITEMS = {
 
   "ct_lick": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "lick",
 
@@ -894,7 +895,7 @@ export const ITEMS = {
 
   "ct_liquidation": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "liquidation",
 
@@ -948,7 +949,7 @@ export const ITEMS = {
 
   "ct_mudslap": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "mud_slap",
 
@@ -993,7 +994,7 @@ export const ITEMS = {
 
   "ct_peck": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "peck",
 
@@ -1047,7 +1048,7 @@ export const ITEMS = {
 
   "ct_pursuit": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "pursuit",
 
@@ -1059,7 +1060,7 @@ export const ITEMS = {
 
   "ct_quickattack": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "quick_attack",
 
@@ -1071,7 +1072,7 @@ export const ITEMS = {
 
   "ct_raindance": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "rain_dance",
 
@@ -1083,7 +1084,7 @@ export const ITEMS = {
 
   "ct_rockslide": {
     "icon": "💿",
-    "price": 50000,
+    "price": 25000,
     "type": "ct",
     "moveId": "rock_slide",
 
@@ -1104,7 +1105,7 @@ export const ITEMS = {
 
   "ct_rockthrow": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "rock_throw",
 
@@ -1116,7 +1117,7 @@ export const ITEMS = {
 
   "ct_safeguard": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "safeguard",
 
@@ -1128,7 +1129,7 @@ export const ITEMS = {
 
   "ct_sandstorm": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "sandstorm",
 
@@ -1167,7 +1168,7 @@ export const ITEMS = {
 
   "ct_sludgebomb": {
     "icon": "💿",
-    "price": 50000,
+    "price": 25000,
     "type": "ct",
     "moveId": "sludge_bomb",
 
@@ -1188,7 +1189,7 @@ export const ITEMS = {
 
   "ct_strength": {
     "icon": "💿",
-    "price": 50000,
+    "price": 60000,
     "type": "ct",
     "moveId": "strength",
 
@@ -1200,7 +1201,7 @@ export const ITEMS = {
 
   "ct_sunnyday": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "sunny_day",
 
@@ -1212,7 +1213,7 @@ export const ITEMS = {
 
   "ct_swagger": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "swagger",
 
@@ -1224,7 +1225,7 @@ export const ITEMS = {
 
   "ct_swift": {
     "icon": "💿",
-    "price": 50000,
+    "price": 25000,
     "type": "ct",
     "moveId": "swift",
 
@@ -1236,7 +1237,7 @@ export const ITEMS = {
 
   "ct_swordsdance": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "swords_dance",
 
@@ -1248,7 +1249,7 @@ export const ITEMS = {
 
   "ct_tackle": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "tackle",
 
@@ -1260,7 +1261,7 @@ export const ITEMS = {
 
   "ct_thunder": {
     "icon": "💿",
-    "price": 50000,
+    "price": 60000,
     "type": "ct",
     "moveId": "thunder",
 
@@ -1272,7 +1273,7 @@ export const ITEMS = {
 
   "ct_thunderpunch": {
     "icon": "💿",
-    "price": 50000,
+    "price": 25000,
     "type": "ct",
     "moveId": "thunder_punch",
 
@@ -1284,7 +1285,7 @@ export const ITEMS = {
 
   "ct_thunderwave": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "thunder_wave",
 
@@ -1305,7 +1306,7 @@ export const ITEMS = {
 
   "ct_twineedle": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "twineedle",
 
@@ -1317,7 +1318,7 @@ export const ITEMS = {
 
   "ct_twister": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "twister",
 
@@ -1350,7 +1351,7 @@ export const ITEMS = {
 
   "ct_watergun": {
     "icon": "💿",
-    "price": 50000,
+    "price": 10000,
     "type": "ct",
     "moveId": "water_gun",
 
@@ -1407,7 +1408,7 @@ export const ITEMS = {
 
   "damp_rock": {
     "icon": "🪨",
-    "price": 80000,
+    "price": 60000,
     "type": "held",
     "category": "weather",
     "weather": "rainy",
@@ -1417,7 +1418,7 @@ export const ITEMS = {
 
   "dark_gem": {
     "icon": "💎",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "gem",
     "gemType": "Dark",
@@ -1428,7 +1429,9 @@ export const ITEMS = {
   "darkinium_z": {
     "icon": "💠",
     "price": 45000,
-    "type": "z_crystal",
+    "type": "held",
+    "category": "z_crystal",
+    "zType": "Dark",
     "name_en": "Darkinium Z",
     "name_fr": "Ténébrozélite Z",
   },
@@ -1472,7 +1475,7 @@ export const ITEMS = {
 
   "dragon_fang": {
     "icon": "",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "type_boost",
     "typeBoost": "Dragon",
@@ -1483,7 +1486,7 @@ export const ITEMS = {
 
   "dragon_gem": {
     "icon": "💎",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "gem",
     "gemType": "Dragon",
@@ -1504,7 +1507,9 @@ export const ITEMS = {
   "dragonium_z": {
     "icon": "💠",
     "price": 45000,
-    "type": "z_crystal",
+    "type": "held",
+    "category": "z_crystal",
+    "zType": "Dragon",
     "name_en": "Dragonium Z",
     "name_fr": "Dracozélite Z",
   },
@@ -1529,7 +1534,7 @@ export const ITEMS = {
 
   "eject_button": {
     "icon": "",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "eject",
     "powerFormula": "1+0.15*level",
@@ -1539,7 +1544,7 @@ export const ITEMS = {
 
   "eject_pack": {
     "icon": "",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "eject",
     "powerFormula": "1+0.15*level",
@@ -1559,7 +1564,7 @@ export const ITEMS = {
 
   "electric_gem": {
     "icon": "💎",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "gem",
     "gemType": "Electric",
@@ -1569,7 +1574,7 @@ export const ITEMS = {
 
   "electric_seed": {
     "icon": "🌱",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "seed",
     "seedType": "Electric",
@@ -1580,7 +1585,9 @@ export const ITEMS = {
   "electrium_z": {
     "icon": "💠",
     "price": 45000,
-    "type": "z_crystal",
+    "type": "held",
+    "category": "z_crystal",
+    "zType": "Electric",
     "name_en": "Electrium Z",
     "name_fr": "Voltazélite Z",
   },
@@ -1597,7 +1604,7 @@ export const ITEMS = {
 
   "eviolite": {
     "icon": "",
-    "price": 200000,
+    "price": 60000,
     "type": "held",
     "category": "eviolite",
     "powerFormula": "1+level/5",
@@ -1608,14 +1615,16 @@ export const ITEMS = {
   "fairium_z": {
     "icon": "💠",
     "price": 45000,
-    "type": "z_crystal",
+    "type": "held",
+    "category": "z_crystal",
+    "zType": "Fairy",
     "name_en": "Fairium Z",
     "name_fr": "Nymphézélite Z",
   },
 
   "fairy_feather": {
     "icon": "",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "type_boost",
     "typeBoost": "Fairy",
@@ -1626,7 +1635,7 @@ export const ITEMS = {
 
   "fairy_gem": {
     "icon": "💎",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "gem",
     "gemType": "Fairy",
@@ -1636,7 +1645,7 @@ export const ITEMS = {
 
   "fighting_gem": {
     "icon": "💎",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "gem",
     "gemType": "Fighting",
@@ -1647,14 +1656,16 @@ export const ITEMS = {
   "fightinium_z": {
     "icon": "💠",
     "price": 45000,
-    "type": "z_crystal",
+    "type": "held",
+    "category": "z_crystal",
+    "zType": "Fighting",
     "name_en": "Fightinium Z",
     "name_fr": "Combazélite Z",
   },
 
   "fire_gem": {
     "icon": "💎",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "gem",
     "gemType": "Fire",
@@ -1674,14 +1685,16 @@ export const ITEMS = {
   "firium_z": {
     "icon": "💠",
     "price": 45000,
-    "type": "z_crystal",
+    "type": "held",
+    "category": "z_crystal",
+    "zType": "Fire",
     "name_en": "Firium Z",
     "name_fr": "Pyrozélite Z",
   },
 
   "flame_orb": {
     "icon": "",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "status",
     "powerFormula": "1+0.15*level",
@@ -1692,7 +1705,7 @@ export const ITEMS = {
 
   "flying_gem": {
     "icon": "💎",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "gem",
     "gemType": "Flying",
@@ -1703,14 +1716,16 @@ export const ITEMS = {
   "flyinium_z": {
     "icon": "💠",
     "price": 45000,
-    "type": "z_crystal",
+    "type": "held",
+    "category": "z_crystal",
+    "zType": "Flying",
     "name_en": "Flyinium Z",
     "name_fr": "Aérozélite Z",
   },
 
   "foggy_seed": {
     "icon": "🌱",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "seed",
     "seedType": "Fog",
@@ -1784,7 +1799,7 @@ export const ITEMS = {
 
   "ghost_gem": {
     "icon": "💎",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "gem",
     "gemType": "Ghost",
@@ -1795,14 +1810,16 @@ export const ITEMS = {
   "ghostium_z": {
     "icon": "💠",
     "price": 45000,
-    "type": "z_crystal",
+    "type": "held",
+    "category": "z_crystal",
+    "zType": "Ghost",
     "name_en": "Ghostium Z",
     "name_fr": "Spectrozélite Z",
   },
 
   "grass_gem": {
     "icon": "💎",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "gem",
     "gemType": "Grass",
@@ -1813,14 +1830,16 @@ export const ITEMS = {
   "grassium_z": {
     "icon": "💠",
     "price": 45000,
-    "type": "z_crystal",
+    "type": "held",
+    "category": "z_crystal",
+    "zType": "Grass",
     "name_en": "Grassium Z",
     "name_fr": "Florazélite Z",
   },
 
   "grassy_seed": {
     "icon": "🌱",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "seed",
     "seedType": "Grass",
@@ -1830,7 +1849,7 @@ export const ITEMS = {
 
   "ground_gem": {
     "icon": "💎",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "gem",
     "gemType": "Ground",
@@ -1841,14 +1860,16 @@ export const ITEMS = {
   "groundium_z": {
     "icon": "💠",
     "price": 45000,
-    "type": "z_crystal",
+    "type": "held",
+    "category": "z_crystal",
+    "zType": "Ground",
     "name_en": "Groundium Z",
     "name_fr": "Terrazélite Z",
   },
 
   "haban_berry": {
     "icon": "🍇",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "resistance_berry",
     "resistType": "Dragon",
@@ -1859,7 +1880,7 @@ export const ITEMS = {
 
   "hard_stone": {
     "icon": "",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "type_boost",
     "typeBoost": "Rock",
@@ -1870,7 +1891,7 @@ export const ITEMS = {
 
   "heat_rock": {
     "icon": "🪨",
-    "price": 80000,
+    "price": 60000,
     "type": "held",
     "category": "weather",
     "weather": "sunny",
@@ -1880,7 +1901,7 @@ export const ITEMS = {
 
   "heavy_duty_boots": {
     "icon": "",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "hazards",
     "powerFormula": "1+0.15*level",
@@ -1908,7 +1929,7 @@ export const ITEMS = {
 
   "ice_gem": {
     "icon": "💎",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "gem",
     "gemType": "Ice",
@@ -1927,14 +1948,16 @@ export const ITEMS = {
   "icium_z": {
     "icon": "💠",
     "price": 45000,
-    "type": "z_crystal",
+    "type": "held",
+    "category": "z_crystal",
+    "zType": "Ice",
     "name_en": "Icium Z",
     "name_fr": "Cryozélite Z",
   },
 
   "icy_rock": {
     "icon": "🪨",
-    "price": 80000,
+    "price": 60000,
     "type": "held",
     "category": "weather",
     "weather": "hail",
@@ -1953,7 +1976,7 @@ export const ITEMS = {
 
   "kasib_berry": {
     "icon": "🍇",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "resistance_berry",
     "resistType": "Ghost",
@@ -1964,7 +1987,7 @@ export const ITEMS = {
 
   "kebia_berry": {
     "icon": "🍇",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "resistance_berry",
     "resistType": "Poison",
@@ -1985,7 +2008,7 @@ export const ITEMS = {
 
   "lagging_tail": {
     "icon": "",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "slow",
     "powerFormula": "1+0.15*level",
@@ -2004,7 +2027,7 @@ export const ITEMS = {
 
   "leftovers": {
     "icon": "",
-    "price": 120000,
+    "price": 60000,
     "type": "held",
     "category": "leftovers",
     "powerFormula": "1+0.15*level",
@@ -2014,7 +2037,7 @@ export const ITEMS = {
 
   "life_orb": {
     "icon": "",
-    "price": 450000,
+    "price": 60000,
     "type": "held",
     "category": "life_orb",
     "powerFormula": "1+0.2*level",
@@ -2024,7 +2047,7 @@ export const ITEMS = {
 
   "light_clay": {
     "icon": "",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "extend",
     "powerFormula": "1+0.06*level",
@@ -2042,7 +2065,7 @@ export const ITEMS = {
 
   "loaded_dice": {
     "icon": "",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "multi_hit",
     "powerFormula": "1+0.1*level",
@@ -2052,7 +2075,7 @@ export const ITEMS = {
 
   "luck_incense": {
     "icon": "",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "loot",
     "powerFormula": "1+0.15*level",
@@ -2062,7 +2085,7 @@ export const ITEMS = {
 
   "lucky_egg": {
     "icon": "",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "exp",
     "powerFormula": "1+0.15*level",
@@ -2072,7 +2095,7 @@ export const ITEMS = {
 
   "lucky_punch": {
     "icon": "",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "punch",
     "powerFormula": "1+0.15*level",
@@ -2092,7 +2115,7 @@ export const ITEMS = {
 
   "magnet": {
     "icon": "",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "type_boost",
     "typeBoost": "Electric",
@@ -2123,7 +2146,7 @@ export const ITEMS = {
 
   "mental_herb": {
     "icon": "",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "cure",
     "powerFormula": "1+0.06*level",
@@ -2133,7 +2156,7 @@ export const ITEMS = {
 
   "metal_coat": {
     "icon": "",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "type_boost",
     "typeBoost": "Steel",
@@ -2144,7 +2167,7 @@ export const ITEMS = {
 
   "metronome": {
     "icon": "",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "consecutive",
     "powerFormula": "1+0.1*level",
@@ -2154,7 +2177,7 @@ export const ITEMS = {
 
   "miracle_seed": {
     "icon": "",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "type_boost",
     "typeBoost": "Grass",
@@ -2165,7 +2188,7 @@ export const ITEMS = {
 
   "misty_seed": {
     "icon": "🌱",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "seed",
     "seedType": "Misty",
@@ -2184,7 +2207,7 @@ export const ITEMS = {
 
   "muscle_band": {
     "icon": "🎒",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "type_boost",
     "typeBoost": "Fighting",
@@ -2195,7 +2218,7 @@ export const ITEMS = {
 
   "mystic_water": {
     "icon": "",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "type_boost",
     "typeBoost": "Water",
@@ -2206,7 +2229,7 @@ export const ITEMS = {
 
   "never_melt_ice": {
     "icon": "",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "type_boost",
     "typeBoost": "Ice",
@@ -2217,7 +2240,7 @@ export const ITEMS = {
 
   "normal_gem": {
     "icon": "💎",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "gem",
     "gemType": "Normal",
@@ -2228,7 +2251,9 @@ export const ITEMS = {
   "normalium_z": {
     "icon": "💠",
     "price": 45000,
-    "type": "z_crystal",
+    "type": "held",
+    "category": "z_crystal",
+    "zType": "Normal",
     "name_en": "Normalium Z",
     "name_fr": "Normazélite Z",
   },
@@ -2238,13 +2263,64 @@ export const ITEMS = {
     "price": 5000,
     "type": "treasure",
     "value": 5000,
+    "diamondValue": 100,
     "name_en": "Nugget",
     "name_fr": "Pépite",
   },
 
+  "iron_ball": {
+    "icon": "⚙️",
+    "price": 5000,
+    "type": "treasure",
+    "value": 5000,
+    "diamondValue": 70,
+    "name_en": "Iron Ball",
+    "name_fr": "Boule de Fer",
+  },
+
+  "rare_bone": {
+    "icon": "🦴",
+    "price": 5000,
+    "type": "treasure",
+    "value": 5000,
+    "diamondValue": 100,
+    "name_en": "Rare Bone",
+    "name_fr": "Os rare",
+  },
+
+  "star_piece": {
+    "icon": "✨",
+    "price": 8000,
+    "type": "treasure",
+    "value": 8000,
+    "diamondValue": 175,
+    "name_en": "Star Piece",
+    "name_fr": "Morceau d'Étoile",
+  },
+
+  "big_nugget": {
+    "icon": "💎",
+    "price": 12000,
+    "type": "treasure",
+    "value": 12000,
+    "diamondValue": 250,
+    "name_en": "Big Nugget",
+    "name_fr": "Grosse Pépite",
+  },
+
+  "heart_scale": {
+    "icon": "🐚",
+    "price": 15000,
+    "type": "treasure",
+    "value": 15000,
+    "diamondValue": 350,
+    "name_en": "Heart Scale",
+    "name_fr": "Écaille Cœur",
+  },
+
   "occa_berry": {
     "icon": "🍇",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "resistance_berry",
     "resistType": "Fire",
@@ -2272,7 +2348,7 @@ export const ITEMS = {
 
   "passho_berry": {
     "icon": "🍇",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "resistance_berry",
     "resistType": "Water",
@@ -2283,7 +2359,7 @@ export const ITEMS = {
 
   "payapa_berry": {
     "icon": "🍇",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "resistance_berry",
     "resistType": "Psychic",
@@ -2313,7 +2389,7 @@ export const ITEMS = {
 
   "poison_barb": {
     "icon": "",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "type_boost",
     "typeBoost": "Poison",
@@ -2324,7 +2400,7 @@ export const ITEMS = {
 
   "poison_gem": {
     "icon": "💎",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "gem",
     "gemType": "Poison",
@@ -2335,7 +2411,9 @@ export const ITEMS = {
   "poisonium_z": {
     "icon": "💠",
     "price": 45000,
-    "type": "z_crystal",
+    "type": "held",
+    "category": "z_crystal",
+    "zType": "Poison",
     "name_en": "Poisonium Z",
     "name_fr": "Toxizélite Z",
   },
@@ -2350,7 +2428,7 @@ export const ITEMS = {
 
   "power_herb": {
     "icon": "",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "charge",
     "powerFormula": "1+0.15*level",
@@ -2380,7 +2458,7 @@ export const ITEMS = {
 
   "psychic_gem": {
     "icon": "💎",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "gem",
     "gemType": "Psychic",
@@ -2391,14 +2469,16 @@ export const ITEMS = {
   "psychium_z": {
     "icon": "💠",
     "price": 45000,
-    "type": "z_crystal",
+    "type": "held",
+    "category": "z_crystal",
+    "zType": "Psychic",
     "name_en": "Psychium Z",
     "name_fr": "Psychézélite Z",
   },
 
   "pure_incense": {
     "icon": "",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "encounter",
     "powerFormula": "1+0.15*level",
@@ -2408,7 +2488,7 @@ export const ITEMS = {
 
   "quick_claw": {
     "icon": "",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "speed",
     "powerFormula": "1+0.15*level",
@@ -2426,7 +2506,7 @@ export const ITEMS = {
 
   "rarecandy": {
     "icon": "",
-    "price": 50000,
+    "price": 10000,
     "type": "candy",
     "name_en": "Rare Candy",
     "name_fr": "Super Bonbon",
@@ -2464,7 +2544,7 @@ export const ITEMS = {
 
   "rindo_berry": {
     "icon": "🍇",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "resistance_berry",
     "resistType": "Grass",
@@ -2475,7 +2555,7 @@ export const ITEMS = {
 
   "rock_gem": {
     "icon": "💎",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "gem",
     "gemType": "Rock",
@@ -2486,7 +2566,9 @@ export const ITEMS = {
   "rockium_z": {
     "icon": "💠",
     "price": 45000,
-    "type": "z_crystal",
+    "type": "held",
+    "category": "z_crystal",
+    "zType": "Rock",
     "name_en": "Rockium Z",
     "name_fr": "Petrozélite Z",
   },
@@ -2502,7 +2584,7 @@ export const ITEMS = {
 
   "roseli_berry": {
     "icon": "🍇",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "resistance_berry",
     "resistType": "Fairy",
@@ -2532,7 +2614,7 @@ export const ITEMS = {
 
   "sharp_beak": {
     "icon": "",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "type_boost",
     "typeBoost": "Flying",
@@ -2561,7 +2643,7 @@ export const ITEMS = {
 
   "shuca_berry": {
     "icon": "🍇",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "resistance_berry",
     "resistType": "Ground",
@@ -2572,7 +2654,7 @@ export const ITEMS = {
 
   "silk_scarf": {
     "icon": "",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "type_boost",
     "typeBoost": "Normal",
@@ -2583,7 +2665,7 @@ export const ITEMS = {
 
   "silver_powder": {
     "icon": "",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "type_boost",
     "typeBoost": "Bug",
@@ -2611,7 +2693,7 @@ export const ITEMS = {
 
   "smooth_rock": {
     "icon": "🪨",
-    "price": 80000,
+    "price": 60000,
     "type": "held",
     "category": "weather",
     "weather": "sand",
@@ -2621,7 +2703,7 @@ export const ITEMS = {
 
   "soft_sand": {
     "icon": "",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "type_boost",
     "typeBoost": "Ground",
@@ -2632,7 +2714,7 @@ export const ITEMS = {
 
   "spell_tag": {
     "icon": "",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "type_boost",
     "typeBoost": "Ghost",
@@ -2646,13 +2728,14 @@ export const ITEMS = {
     "price": 750,
     "type": "treasure",
     "value": 2000,
+    "diamondValue": 70,
     "name_en": "Stardust",
     "name_fr": "Poussière Étoile",
   },
 
   "steel_gem": {
     "icon": "💎",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "gem",
     "gemType": "Steel",
@@ -2671,7 +2754,9 @@ export const ITEMS = {
   "steelium_z": {
     "icon": "💠",
     "price": 45000,
-    "type": "z_crystal",
+    "type": "held",
+    "category": "z_crystal",
+    "zType": "Steel",
     "name_en": "Steelium Z",
     "name_fr": "Métallozélite Z",
   },
@@ -2715,7 +2800,7 @@ export const ITEMS = {
 
   "tanga_berry": {
     "icon": "🍇",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "resistance_berry",
     "resistType": "Bug",
@@ -2736,7 +2821,7 @@ export const ITEMS = {
 
   "terrain_extender": {
     "icon": "🔌",
-    "price": 100000,
+    "price": 60000,
     "type": "held",
     "category": "terrain",
     "name_en": "Terrain Extender",
@@ -2754,7 +2839,7 @@ export const ITEMS = {
 
   "toxic_orb": {
     "icon": "",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "status",
     "powerFormula": "1+0.15*level",
@@ -2765,7 +2850,7 @@ export const ITEMS = {
 
   "twisted_spoon": {
     "icon": "",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "type_boost",
     "typeBoost": "Psychic",
@@ -2796,7 +2881,7 @@ export const ITEMS = {
 
   "wacan_berry": {
     "icon": "🍇",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "resistance_berry",
     "resistType": "Electric",
@@ -2807,7 +2892,7 @@ export const ITEMS = {
 
   "water_gem": {
     "icon": "💎",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "gem",
     "gemType": "Water",
@@ -2819,7 +2904,9 @@ export const ITEMS = {
   "waterium_z": {
     "icon": "💠",
     "price": 45000,
-    "type": "z_crystal",
+    "type": "held",
+    "category": "z_crystal",
+    "zType": "Water",
     "name_en": "Waterium Z",
     "name_fr": "Aquazélite Z",
   },
@@ -2834,7 +2921,7 @@ export const ITEMS = {
 
   "weakness_policy": {
     "icon": "",
-    "price": 45000,
+    "price": 60000,
     "type": "held",
     "category": "boost",
     "powerFormula": "1+0.15*level",
@@ -2854,7 +2941,7 @@ export const ITEMS = {
 
   "yache_berry": {
     "icon": "🍇",
-    "price": 45000,
+    "price": 20000,
     "type": "held",
     "category": "resistance_berry",
     "resistType": "Ice",
@@ -2863,11 +2950,2063 @@ export const ITEMS = {
     "name_fr": "Baie Yache",
   },
 
+  "cheri_berry": {
+    "immunity": "para",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "immunity_berry",
+    "name_en": "Cheri Berry",
+    "name_fr": "Baie Ceriz"
+  },
+  "chesto_berry": {
+    "immunity": "sleep",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "immunity_berry",
+    "name_en": "Chesto Berry",
+    "name_fr": "Baie Maron"
+  },
+  "pecha_berry": {
+    "immunity": "poison",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "immunity_berry",
+    "name_en": "Pecha Berry",
+    "name_fr": "Baie Pêcha"
+  },
+  "rawst_berry": {
+    "immunity": "burn",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "immunity_berry",
+    "name_en": "Rawst Berry",
+    "name_fr": "Baie Fraive"
+  },
+  "aspear_berry": {
+    "immunity": "freeze",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "immunity_berry",
+    "name_en": "Aspear Berry",
+    "name_fr": "Baie Willia"
+  },
+  "persim_berry": {
+    "immunity": "confuse",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "immunity_berry",
+    "name_en": "Persim Berry",
+    "name_fr": "Baie Kika"
+  },
+  "leppa_berry": {
+    "powerFormula": "0.15+0.05*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "skip_cd",
+    "name_en": "Leppa Berry",
+    "name_fr": "Baie Mepo"
+  },
+  "oran_berry": {
+    "powerFormula": "0.25+0.05*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "pinch_heal",
+    "name_en": "Oran Berry",
+    "name_fr": "Baie Oran"
+  },
+  "sitrus_berry": {
+    "powerFormula": "0.25+0.05*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "pinch_heal",
+    "name_en": "Sitrus Berry",
+    "name_fr": "Baie Sitrus"
+  },
+  "figy_berry": {
+    "powerFormula": "0.25+0.05*(level-1)",
+    "nature": "spicy",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "pinch_heal",
+    "name_en": "Figy Berry",
+    "name_fr": "Baie Figuy"
+  },
+  "wiki_berry": {
+    "powerFormula": "0.25+0.05*(level-1)",
+    "nature": "dry",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "pinch_heal",
+    "name_en": "Wiki Berry",
+    "name_fr": "Baie Wiki"
+  },
+  "mago_berry": {
+    "powerFormula": "0.25+0.05*(level-1)",
+    "nature": "sweet",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "pinch_heal",
+    "name_en": "Mago Berry",
+    "name_fr": "Baie Mago"
+  },
+  "aguav_berry": {
+    "powerFormula": "0.25+0.05*(level-1)",
+    "nature": "bitter",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "pinch_heal",
+    "name_en": "Aguav Berry",
+    "name_fr": "Baie Gowav"
+  },
+  "iapapa_berry": {
+    "powerFormula": "0.25+0.05*(level-1)",
+    "nature": "sour",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "pinch_heal",
+    "name_en": "Iapapa Berry",
+    "name_fr": "Baie Papaya"
+  },
+  "liechi_berry": {
+    "stat": "atk",
+    "powerFormula": "0.25+0.05*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "pinch_stat",
+    "name_en": "Liechi Berry",
+    "name_fr": "Baie Lichii"
+  },
+  "ganlon_berry": {
+    "stat": "def",
+    "powerFormula": "0.25+0.05*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "pinch_stat",
+    "name_en": "Ganlon Berry",
+    "name_fr": "Baie Lingan"
+  },
+  "salac_berry": {
+    "stat": "spe",
+    "powerFormula": "0.25+0.05*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "pinch_stat",
+    "name_en": "Salac Berry",
+    "name_fr": "Baie Salac"
+  },
+  "petaya_berry": {
+    "stat": "spa",
+    "powerFormula": "0.25+0.05*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "pinch_stat",
+    "name_en": "Petaya Berry",
+    "name_fr": "Baie Pitaye"
+  },
+  "apicot_berry": {
+    "stat": "spd",
+    "powerFormula": "0.25+0.05*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "pinch_stat",
+    "name_en": "Apicot Berry",
+    "name_fr": "Baie Abriko"
+  },
+  "lansat_berry": {
+    "powerFormula": "0.15+0.05*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "pinch_dmg",
+    "name_en": "Lansat Berry",
+    "name_fr": "Baie Lansat"
+  },
+  "starf_berry": {
+    "powerFormula": "0.25+0.05*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "pinch_random",
+    "name_en": "Starf Berry",
+    "name_fr": "Baie Frista"
+  },
+  "pomeg_berry": {
+    "stat": "hp",
+    "powerFormula": "0.15+0.03*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "entry_debuff",
+    "name_en": "Pomeg Berry",
+    "name_fr": "Baie Grana"
+  },
+  "kelpsy_berry": {
+    "stat": "atk",
+    "powerFormula": "0.15+0.03*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "entry_debuff",
+    "name_en": "Kelpsy Berry",
+    "name_fr": "Baie Alga"
+  },
+  "qualot_berry": {
+    "stat": "def",
+    "powerFormula": "0.15+0.03*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "entry_debuff",
+    "name_en": "Qualot Berry",
+    "name_fr": "Baie Qualot"
+  },
+  "hondew_berry": {
+    "stat": "spa",
+    "powerFormula": "0.15+0.03*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "entry_debuff",
+    "name_en": "Hondew Berry",
+    "name_fr": "Baie Lonme"
+  },
+  "grepa_berry": {
+    "stat": "spd",
+    "powerFormula": "0.15+0.03*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "entry_debuff",
+    "name_en": "Grepa Berry",
+    "name_fr": "Baie Resin"
+  },
+  "tamato_berry": {
+    "stat": "spe",
+    "powerFormula": "0.15+0.03*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "entry_debuff",
+    "name_en": "Tamato Berry",
+    "name_fr": "Baie Tamato"
+  },
+  "chilan_berry": {
+    "resistType": "Normal",
+    "resistPercent": 30,
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "resistance_berry",
+    "name_en": "Chilan Berry",
+    "name_fr": "Baie Chilan"
+  },
+  "micle_berry": {
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "pinch_fast",
+    "name_en": "Micle Berry",
+    "name_fr": "Baie Micle"
+  },
+  "custap_berry": {
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "pinch_first",
+    "name_en": "Custap Berry",
+    "name_fr": "Baie Chaipô"
+  },
+  "jaboca_berry": {
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "counter_phys",
+    "name_en": "Jaboca Berry",
+    "name_fr": "Baie Jaboca"
+  },
+  "rowap_berry": {
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "counter_spec",
+    "name_en": "Rowap Berry",
+    "name_fr": "Baie Rowap"
+  },
+  "kee_berry": {
+    "stat": "def",
+    "powerFormula": "0.25+0.05*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "hit_buff",
+    "name_en": "Kee Berry",
+    "name_fr": "Baie Éka"
+  },
+  "maranga_berry": {
+    "stat": "spd",
+    "powerFormula": "0.25+0.05*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "hit_buff",
+    "name_en": "Maranga Berry",
+    "name_fr": "Baie Rangma"
+  },
+  "enigma_berry": {
+    "powerFormula": "0.20+0.05*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "super_heal",
+    "name_en": "Enigma Berry",
+    "name_fr": "Baie Enigma"
+  },
+  "snover_berry": {
+    "powerFormula": "0.10+0.02*(level-1)",
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "ice_boost",
+    "name_en": "Snover Berry",
+    "name_fr": "Baie Snover"
+  },
+  "hopo_berry": {
+    "icon": "🍇",
+    "price": 60000,
+    "type": "held",
+    "category": "loot_boost",
+    "name_en": "Hopo Berry",
+    "name_fr": "Baie Hopo"
+  },
+  "pinkan_berry": {
+    "notForSale": true,
+    "icon": "🍇",
+    "price": 20000,
+    "type": "held",
+    "category": "flavor",
+    "name_en": "Pinkan Berry",
+    "name_fr": "Baie Pinkan"
+  },
+  "razz_berry": {
+    "icon": "🍇",
+    "price": 20000,
+    "type": "held",
+    "category": "flavor",
+    "name_en": "Razz Berry",
+    "name_fr": "Baie Framby"
+  },
+  "bluk_berry": {
+    "icon": "🍇",
+    "price": 20000,
+    "type": "held",
+    "category": "flavor",
+    "name_en": "Bluk Berry",
+    "name_fr": "Baie Nanone"
+  },
+  "nanab_berry": {
+    "icon": "🍇",
+    "price": 20000,
+    "type": "held",
+    "category": "flavor",
+    "name_en": "Nanab Berry",
+    "name_fr": "Baie Nanab"
+  },
+  "wepear_berry": {
+    "icon": "🍇",
+    "price": 20000,
+    "type": "held",
+    "category": "flavor",
+    "name_en": "Wepear Berry",
+    "name_fr": "Baie Poire"
+  },
+  "pinap_berry": {
+    "icon": "🍇",
+    "price": 20000,
+    "type": "held",
+    "category": "flavor",
+    "name_en": "Pinap Berry",
+    "name_fr": "Baie Ananas"
+  },
+  "cornn_berry": {
+    "icon": "🍇",
+    "price": 20000,
+    "type": "held",
+    "category": "flavor",
+    "name_en": "Cornn Berry",
+    "name_fr": "Baie Maïs"
+  },
+  "magost_berry": {
+    "icon": "🍇",
+    "price": 20000,
+    "type": "held",
+    "category": "flavor",
+    "name_en": "Magost Berry",
+    "name_fr": "Baie Mangou"
+  },
+  "rabuta_berry": {
+    "icon": "🍇",
+    "price": 20000,
+    "type": "held",
+    "category": "flavor",
+    "name_en": "Rabuta Berry",
+    "name_fr": "Baie Framboise"
+  },
+  "nomel_berry": {
+    "icon": "🍇",
+    "price": 20000,
+    "type": "held",
+    "category": "flavor",
+    "name_en": "Nomel Berry",
+    "name_fr": "Baie Citron"
+  },
+  "spelon_berry": {
+    "icon": "🍇",
+    "price": 20000,
+    "type": "held",
+    "category": "flavor",
+    "name_en": "Spelon Berry",
+    "name_fr": "Baie Pastèque"
+  },
+  "pamtre_berry": {
+    "icon": "🍇",
+    "price": 20000,
+    "type": "held",
+    "category": "flavor",
+    "name_en": "Pamtre Berry",
+    "name_fr": "Baie Palmier"
+  },
+  "watmel_berry": {
+    "icon": "🍇",
+    "price": 20000,
+    "type": "held",
+    "category": "flavor",
+    "name_en": "Watmel Berry",
+    "name_fr": "Baie Melon"
+  },
+  "durin_berry": {
+    "icon": "🍇",
+    "price": 20000,
+    "type": "held",
+    "category": "flavor",
+    "name_en": "Durin Berry",
+    "name_fr": "Baie Durin"
+  },
+  "belue_berry": {
+    "icon": "🍇",
+    "price": 20000,
+    "type": "held",
+    "category": "flavor",
+    "name_en": "Belue Berry",
+    "name_fr": "Baie Myrtille"
+  },
+
+  "hp_up": {
+    "icon": "",
+    "price": 30000,
+    "type": "consumable",
+    "category": "vitamin",
+    "name_en": "HP Up",
+    "name_fr": "PV Plus"
+  },
+  "protein": {
+    "icon": "",
+    "price": 30000,
+    "type": "consumable",
+    "category": "vitamin",
+    "name_en": "Protein",
+    "name_fr": "Protéine"
+  },
+  "iron": {
+    "icon": "",
+    "price": 30000,
+    "type": "consumable",
+    "category": "vitamin",
+    "name_en": "Iron",
+    "name_fr": "Fer"
+  },
+  "calcium": {
+    "icon": "",
+    "price": 30000,
+    "type": "consumable",
+    "category": "vitamin",
+    "name_en": "Calcium",
+    "name_fr": "Calcium"
+  },
+  "zinc": {
+    "icon": "",
+    "price": 30000,
+    "type": "consumable",
+    "category": "vitamin",
+    "name_en": "Zinc",
+    "name_fr": "Zinc"
+  },
+  "carbos": {
+    "icon": "",
+    "price": 30000,
+    "type": "consumable",
+    "category": "vitamin",
+    "name_en": "Carbos",
+    "name_fr": "Carbone"
+  },
+  "bottle_cap": {
+    "icon": "",
+    "price": 50000,
+    "type": "consumable",
+    "category": "iv_boost",
+    "name_en": "Bottle Cap",
+    "name_fr": "Capsule"
+  },
+  "golden_bottle_cap": {
+    "icon": "",
+    "price": 200000,
+    "type": "consumable",
+    "category": "iv_boost_all",
+    "name_en": "Golden Bottle Cap",
+    "name_fr": "Capsule d'Or"
+  },
+  "ability_capsule": {
+    "icon": "",
+    "price": 50000,
+    "type": "consumable",
+    "category": "ability_reroll",
+    "name_en": "Ability Capsule",
+    "name_fr": "Capsule Talent"
+  },
+  "ability_patch": {
+    "icon": "",
+    "price": 200000,
+    "type": "consumable",
+    "category": "ability_hidden",
+    "name_en": "Ability Patch",
+    "name_fr": "Patch Talent"
+  },
+  "lureball": {
+    "icon": "",
+    "price": 0,
+    "type": "ball",
+    "rate": 10,
+    "notForSale": true,
+    "sprite": "src/assets/images/pokeball/Lureball.svg",
+    "name_en": "Lure Ball",
+    "name_fr": "Appât Ball",
+    "desc_en": "A Poké Ball that works especially well on Water-type Pokémon (+25%).",
+    "desc_fr": "Poké Ball très efficace sur les Pokémon de type Eau (+25 %)."
+  },
+  "moonball": {
+    "icon": "",
+    "price": 0,
+    "type": "ball",
+    "rate": 10,
+    "notForSale": true,
+    "sprite": "src/assets/images/pokeball/Moonball.svg",
+    "name_en": "Moon Ball",
+    "name_fr": "Lune Ball",
+    "desc_en": "A Poké Ball that works especially well on Pokémon that evolve with a Moon Stone (+25%).",
+    "desc_fr": "Poké Ball très efficace sur les Pokémon évoluant avec une Pierre Lune (+25 %)."
+  },
+  "fastball": {
+    "icon": "",
+    "price": 0,
+    "type": "ball",
+    "rate": 10,
+    "notForSale": true,
+    "sprite": "src/assets/images/pokeball/Fastball.svg",
+    "name_en": "Fast Ball",
+    "name_fr": "Speed Ball",
+    "desc_en": "A Poké Ball that works especially well on very fast Pokémon, Speed 100 or more (+25%).",
+    "desc_fr": "Poké Ball très efficace sur les Pokémon rapides, Vitesse 100 ou plus (+25 %)."
+  },
+  "diveball": {
+    "icon": "",
+    "price": 0,
+    "type": "ball",
+    "rate": 10,
+    "notForSale": true,
+    "sprite": "src/assets/images/pokeball/Diveball.svg",
+    "name_en": "Dive Ball",
+    "name_fr": "Scuba Ball",
+    "desc_en": "A Poké Ball that works especially well under rain (+25%).",
+    "desc_fr": "Poké Ball très efficace sous la pluie (+25 %)."
+  },
+  "luxuryball": {
+    "icon": "",
+    "price": 0,
+    "type": "ball",
+    "rate": 10,
+    "notForSale": true,
+    "sprite": "src/assets/images/pokeball/Luxuryball.svg",
+    "name_en": "Luxury Ball",
+    "name_fr": "Luxe Ball",
+    "desc_en": "A Poké Ball that makes the caught Pokémon gain 1 extra level.",
+    "desc_fr": "Poké Ball qui fait gagner 1 niveau supplémentaire au Pokémon capturé."
+  },
+  "nestball": {
+    "icon": "",
+    "price": 0,
+    "type": "ball",
+    "rate": 10,
+    "notForSale": true,
+    "sprite": "src/assets/images/pokeball/Nestball.svg",
+    "name_en": "Nest Ball",
+    "name_fr": "Faiblo Ball",
+    "desc_en": "A Poké Ball that works especially well on low-level Pokémon, level 25 or less (+25%).",
+    "desc_fr": "Poké Ball très efficace sur les Pokémon de bas niveau, niveau 25 ou moins (+25 %)."
+  },
+  "repeatball": {
+    "icon": "",
+    "price": 0,
+    "type": "ball",
+    "rate": 10,
+    "notForSale": true,
+    "sprite": "src/assets/images/pokeball/Repeatball.svg",
+    "name_en": "Repeat Ball",
+    "name_fr": "Bis Ball",
+    "desc_en": "A Poké Ball that works especially well on Pokémon already caught (+25%).",
+    "desc_fr": "Poké Ball très efficace sur les Pokémon déjà capturés (+25 %)."
+  },
+  "timerball": {
+    "icon": "",
+    "price": 0,
+    "type": "ball",
+    "rate": 10,
+    "notForSale": true,
+    "sprite": "src/assets/images/pokeball/Timerball.svg",
+    "name_en": "Timer Ball",
+    "name_fr": "Chrono Ball",
+    "desc_en": "A Poké Ball that gets better as the battle drags on: +2% per enemy turn on the field, up to +25%.",
+    "desc_fr": "Poké Ball qui s'améliore à mesure que le combat s'éternise : +2 % par tour ennemi sur le terrain, jusqu'à +25 %."
+  },
+  "duskball": {
+    "icon": "",
+    "price": 0,
+    "type": "ball",
+    "rate": 10,
+    "notForSale": true,
+    "sprite": "src/assets/images/pokeball/Duskball.svg",
+    "name_en": "Dusk Ball",
+    "name_fr": "Sombre Ball",
+    "desc_en": "A Poké Ball that works especially well in dungeons (+25%).",
+    "desc_fr": "Poké Ball très efficace dans les donjons (+25 %)."
+  },
+  "quickball": {
+    "icon": "",
+    "price": 0,
+    "type": "ball",
+    "rate": 10,
+    "notForSale": true,
+    "sprite": "src/assets/images/pokeball/Quickball.svg",
+    "name_en": "Quick Ball",
+    "name_fr": "Rapide Ball",
+    "desc_en": "A Poké Ball that works better the fewer attacks it takes to win: up to +30% if the KO comes in 1 attack.",
+    "desc_fr": "Poké Ball d'autant plus efficace que le K.O. est rapide : jusqu'à +30 % si le K.O. survient en 1 attaque."
+  },
+  "beastball": {
+    "icon": "",
+    "price": 0,
+    "type": "ball",
+    "rate": 10,
+    "notForSale": true,
+    "sprite": "src/assets/images/pokeball/Beastball.svg",
+    "name_en": "Beast Ball",
+    "name_fr": "Chimère Ball",
+    "desc_en": "A Poké Ball designed for Ultra Beasts (Chimeras) (+25%).",
+    "desc_fr": "Poké Ball conçue pour les Ultra-Chimères (+25 %)."
+  },
+
+  "abomasite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Abomasite",
+    "name_fr": "Blizzarite"
+  },
+  "absolite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Absolite",
+    "name_fr": "Absolite"
+  },
+  "aerodactylite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Aerodactylite",
+    "name_fr": "Ptéraite"
+  },
+  "aggronite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Aggronite",
+    "name_fr": "Galekingite"
+  },
+  "alakazite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Alakazite",
+    "name_fr": "Alakazamite"
+  },
+  "altarianite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Altarianite",
+    "name_fr": "Altarite"
+  },
+  "ampharosite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Ampharosite",
+    "name_fr": "Pharampite"
+  },
+  "audinite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Audinite",
+    "name_fr": "Nanméouïte"
+  },
+  "banettite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Banettite",
+    "name_fr": "Branettite"
+  },
+  "barbaracite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Barbaracite",
+    "name_fr": "Barbaraclite"
+  },
+  "baxcaliburite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Baxcaliburite",
+    "name_fr": "Glaivodoite"
+  },
+  "beedrillite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Beedrillite",
+    "name_fr": "Dardargnite"
+  },
+  "blastoisinite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Blastoisinite",
+    "name_fr": "Tortankite"
+  },
+  "blazikenite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Blazikenite",
+    "name_fr": "Braségaliite"
+  },
+  "cameruptite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Cameruptite",
+    "name_fr": "Caméruptite"
+  },
+  "diancite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Diancite",
+    "name_fr": "Diancite"
+  },
+  "dragonitite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Dragonitite",
+    "name_fr": "Dracolosseite"
+  },
+  "falinksite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Falinksite",
+    "name_fr": "Hexadronite"
+  },
+  "galladite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Galladite",
+    "name_fr": "Gallamite"
+  },
+  "garchompite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Garchompite",
+    "name_fr": "Carchacrokite"
+  },
+  "gardevoirite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Gardevoirite",
+    "name_fr": "Gardevoirite"
+  },
+  "gengarite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Gengarite",
+    "name_fr": "Ectoplasmite"
+  },
+  "glalitite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Glalitite",
+    "name_fr": "Oniglalite"
+  },
+  "gyaradosite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Gyaradosite",
+    "name_fr": "Léviatorite"
+  },
+  "hawluchanite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Hawluchanite",
+    "name_fr": "Brutalibréite"
+  },
+  "heracronite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Heracronite",
+    "name_fr": "Scarhinoite"
+  },
+  "houndoominite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Houndoominite",
+    "name_fr": "Démolossite"
+  },
+  "kangaskhanite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Kangaskhanite",
+    "name_fr": "Kangourexite"
+  },
+  "latiasite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Latiasite",
+    "name_fr": "Latiasite"
+  },
+  "latiosite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Latiosite",
+    "name_fr": "Latiosite"
+  },
+  "lopunnite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Lopunnite",
+    "name_fr": "Lockpinite"
+  },
+  "lucarionite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Lucarionite",
+    "name_fr": "Lucarionite"
+  },
+  "manectite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Manectite",
+    "name_fr": "Élecsprintite"
+  },
+  "mawilite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Mawilite",
+    "name_fr": "Mysdibulite"
+  },
+  "medichamite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Medichamite",
+    "name_fr": "Charminite"
+  },
+  "metagrossite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Metagrossite",
+    "name_fr": "Métalossite"
+  },
+  "pidgeotite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Pidgeotite",
+    "name_fr": "Roucarnagite"
+  },
+  "pinsirite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Pinsirite",
+    "name_fr": "Scarabruteite"
+  },
+  "pyroarite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Pyroarite",
+    "name_fr": "Néméliosite"
+  },
+  "sablenite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Sablenite",
+    "name_fr": "Ténéfixite"
+  },
+  "salamencite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Salamencite",
+    "name_fr": "Drattakite"
+  },
+  "sceptilite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Sceptilite",
+    "name_fr": "Jungkoite"
+  },
+  "scizorite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Scizorite",
+    "name_fr": "Cizayoxite"
+  },
+  "sharpedonite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Sharpedonite",
+    "name_fr": "Sharpedoite"
+  },
+  "slowbronite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Slowbronite",
+    "name_fr": "Flagadossite"
+  },
+  "steelixite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Steelixite",
+    "name_fr": "Steelixite"
+  },
+  "swampertite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Swampertite",
+    "name_fr": "Laggronite"
+  },
+  "tyranitarite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Tyranitarite",
+    "name_fr": "Tyranocivite"
+  },
+  "venusaurite": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Venusaurite",
+    "name_fr": "Florizarrite"
+  },
+  "charizardite_x": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Charizardite X",
+    "name_fr": "Charizardite X"
+  },
+  "charizardite_y": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Charizardite Y",
+    "name_fr": "Charizardite Y"
+  },
+  "mewtwonite_x": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Mewtwonite X",
+    "name_fr": "Mewtwonite X"
+  },
+  "mewtwonite_y": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Mewtwonite Y",
+    "name_fr": "Mewtwonite Y"
+  },
+  "raichutite_x": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Raichutite X",
+    "name_fr": "Raichutite X"
+  },
+  "raichutite_y": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "mega_stone",
+    "powerFormula": "1.05+0.1*level",
+    "notForSale": true,
+    "name_en": "Raichutite Y",
+    "name_fr": "Raichutite Y"
+  },
+  "mega_piece": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "mega_shard",
+    "notForSale": true,
+    "name_en": "Mega Piece",
+    "name_fr": "Fragment Méga"
+  },
+  "mega_shard": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "mega_shard",
+    "notForSale": true,
+    "name_en": "Mega Shard",
+    "name_fr": "Éclat Méga"
+  },
+  "mega_cluster": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "mega_shard",
+    "notForSale": true,
+    "name_en": "Mega Cluster",
+    "name_fr": "Amas Méga"
+  },
+  "mega_chunk": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "mega_shard",
+    "notForSale": true,
+    "name_en": "Mega Chunk",
+    "name_fr": "Bloc Méga"
+  },
+  "mystery_egg": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "mystery_egg",
+    "notForSale": true,
+    "name_en": "Mystery Egg",
+    "name_fr": "Œuf Mystère"
+  },
+  "time_candy": {
+    "icon": "",
+    "price": 0,
+    "type": "candy",
+    "category": "time_candy",
+    "notForSale": true,
+    "name_en": "Time Candy",
+    "name_fr": "Bonbon Tempo"
+  },
+  "time_candy_xl": {
+    "icon": "",
+    "price": 0,
+    "type": "candy",
+    "category": "time_candy",
+    "notForSale": true,
+    "name_en": "Time Candy XL",
+    "name_fr": "Maxi Bonbon Tempo"
+  },
+  "red_apricorn": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "apricorn",
+    "notForSale": true,
+    "name_en": "Red Apricorn",
+    "name_fr": "Noigrume Rouge"
+  },
+  "blue_apricorn": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "apricorn",
+    "notForSale": true,
+    "name_en": "Blue Apricorn",
+    "name_fr": "Noigrume Bleu"
+  },
+  "yellow_apricorn": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "apricorn",
+    "notForSale": true,
+    "name_en": "Yellow Apricorn",
+    "name_fr": "Noigrume Jaune"
+  },
+  "green_apricorn": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "apricorn",
+    "notForSale": true,
+    "name_en": "Green Apricorn",
+    "name_fr": "Noigrume Vert"
+  },
+  "pink_apricorn": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "apricorn",
+    "notForSale": true,
+    "name_en": "Pink Apricorn",
+    "name_fr": "Noigrume Rose"
+  },
+  "white_apricorn": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "apricorn",
+    "notForSale": true,
+    "name_en": "White Apricorn",
+    "name_fr": "Noigrume Blanc"
+  },
+  "black_apricorn": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "apricorn",
+    "notForSale": true,
+    "name_en": "Black Apricorn",
+    "name_fr": "Noigrume Noir"
+  },
+  "red_orb": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "legend_key",
+    "notForSale": true,
+    "name_en": "Red Orb",
+    "name_fr": "Orbe Rouge"
+  },
+  "blue_orb": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "legend_key",
+    "notForSale": true,
+    "name_en": "Blue Orb",
+    "name_fr": "Orbe Bleu"
+  },
+  "gs_ball_celebi": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "legend_key",
+    "notForSale": true,
+    "name_en": "GS Ball (Celebi)",
+    "name_fr": "GS Ball"
+  },
+  "clear_bell_hooh": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "legend_key",
+    "notForSale": true,
+    "name_en": "Clear Bell (Ho-Oh)",
+    "name_fr": "Cloche Claire"
+  },
+  "tidal_bell_lugia": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "legend_key",
+    "notForSale": true,
+    "name_en": "Tidal Bell (Lugia)",
+    "name_fr": "Cloche Marée"
+  },
+  "eon_ticket_latis": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "legend_key",
+    "notForSale": true,
+    "name_en": "Eon Ticket",
+    "name_fr": "Ticket Éon"
+  },
+  "meteorite_shard_delta": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "legend_key",
+    "notForSale": true,
+    "name_en": "Meteorite Shard (Delta)",
+    "name_fr": "Éclat de Météorite"
+  },
+  "meteorite_bills_errand": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "legend_key",
+    "notForSale": true,
+    "name_en": "Meteorite (Bill)",
+    "name_fr": "Météorite"
+  },
+  "destiny_knot": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "breeding",
+    "notForSale": true,
+    "name_en": "Destiny Knot",
+    "name_fr": "Nœud Destin"
+  },
+  "macho_brace": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "training",
+    "notForSale": true,
+    "name_en": "Macho Brace",
+    "name_fr": "Bracelet Macho"
+  },
+  "power_bracer": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "training",
+    "notForSale": true,
+    "name_en": "Power Bracer",
+    "name_fr": "Poignet Pouvoir"
+  },
+  "power_belt": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "training",
+    "notForSale": true,
+    "name_en": "Power Belt",
+    "name_fr": "Ceinture Pouvoir"
+  },
+  "power_lens": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "training",
+    "notForSale": true,
+    "name_en": "Power Lens",
+    "name_fr": "Lentille Pouvoir"
+  },
+  "power_band": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "training",
+    "notForSale": true,
+    "name_en": "Power Band",
+    "name_fr": "Bandeau Pouvoir"
+  },
+  "power_anklet": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "training",
+    "notForSale": true,
+    "name_en": "Power Anklet",
+    "name_fr": "Chaîne Pouvoir"
+  },
+  "power_weight": {
+    "icon": "",
+    "price": 0,
+    "type": "held",
+    "category": "training",
+    "notForSale": true,
+    "name_en": "Power Weight",
+    "name_fr": "Poids Pouvoir"
+  },
+  "neutral_mint": {
+    "icon": "",
+    "price": 0,
+    "type": "consumable",
+    "category": "mint",
+    "notForSale": true,
+    "name_en": "Neutral Mint",
+    "name_fr": "Aromate Neutre"
+  },
+  "red_shard": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "underground_shard",
+    "notForSale": true,
+    "name_en": "Red Shard",
+    "name_fr": "Éclat Rouge"
+  },
+  "blue_shard": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "underground_shard",
+    "notForSale": true,
+    "name_en": "Blue Shard",
+    "name_fr": "Éclat Bleu"
+  },
+  "yellow_shard": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "underground_shard",
+    "notForSale": true,
+    "name_en": "Yellow Shard",
+    "name_fr": "Éclat Jaune"
+  },
+  "green_shard": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "underground_shard",
+    "notForSale": true,
+    "name_en": "Green Shard",
+    "name_fr": "Éclat Vert"
+  },
+  "white_shard": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "underground_shard",
+    "notForSale": true,
+    "name_en": "White Shard",
+    "name_fr": "Éclat Blanc"
+  },
+  "black_shard": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "underground_shard",
+    "notForSale": true,
+    "name_en": "Black Shard",
+    "name_fr": "Éclat Noir"
+  },
+  "purple_shard": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "underground_shard",
+    "notForSale": true,
+    "name_en": "Purple Shard",
+    "name_fr": "Éclat Violet"
+  },
+  "pink_shard": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "underground_shard",
+    "notForSale": true,
+    "name_en": "Pink Shard",
+    "name_fr": "Éclat Rose"
+  },
+  "cyan_shard": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "underground_shard",
+    "notForSale": true,
+    "name_en": "Cyan Shard",
+    "name_fr": "Éclat Cyan"
+  },
+  "beige_shard": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "underground_shard",
+    "notForSale": true,
+    "name_en": "Beige Shard",
+    "name_fr": "Éclat Beige"
+  },
+  "brown_shard": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "underground_shard",
+    "notForSale": true,
+    "name_en": "Brown Shard",
+    "name_fr": "Éclat Marron"
+  },
+  "crimson_shard": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "underground_shard",
+    "notForSale": true,
+    "name_en": "Crimson Shard",
+    "name_fr": "Éclat Cramoisi"
+  },
+  "grey_shard": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "underground_shard",
+    "notForSale": true,
+    "name_en": "Grey Shard",
+    "name_fr": "Éclat Gris"
+  },
+  "lime_shard": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "underground_shard",
+    "notForSale": true,
+    "name_en": "Lime Shard",
+    "name_fr": "Éclat Citron Vert"
+  },
+  "ochre_shard": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "underground_shard",
+    "notForSale": true,
+    "name_en": "Ochre Shard",
+    "name_fr": "Éclat Ocre"
+  },
+  "rose_shard": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "underground_shard",
+    "notForSale": true,
+    "name_en": "Rose Shard",
+    "name_fr": "Éclat Rosé"
+  },
+  "slate_shard": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "underground_shard",
+    "notForSale": true,
+    "name_en": "Slate Shard",
+    "name_fr": "Éclat Ardoise"
+  },
+  "blank_plate": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "plate",
+    "notForSale": true,
+    "name_en": "Blank Plate",
+    "name_fr": "Plaque Vierge"
+  },
+  "draco_plate": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "plate",
+    "notForSale": true,
+    "name_en": "Draco Plate",
+    "name_fr": "Plaque Draco"
+  },
+  "dread_plate": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "plate",
+    "notForSale": true,
+    "name_en": "Dread Plate",
+    "name_fr": "Plaque Effroi"
+  },
+  "earth_plate": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "plate",
+    "notForSale": true,
+    "name_en": "Earth Plate",
+    "name_fr": "Plaque Terre"
+  },
+  "fist_plate": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "plate",
+    "notForSale": true,
+    "name_en": "Fist Plate",
+    "name_fr": "Plaque Poing"
+  },
+  "flame_plate": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "plate",
+    "notForSale": true,
+    "name_en": "Flame Plate",
+    "name_fr": "Plaque Feu"
+  },
+  "icicle_plate": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "plate",
+    "notForSale": true,
+    "name_en": "Icicle Plate",
+    "name_fr": "Plaque Glace"
+  },
+  "insect_plate": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "plate",
+    "notForSale": true,
+    "name_en": "Insect Plate",
+    "name_fr": "Plaque Insecte"
+  },
+  "iron_plate": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "plate",
+    "notForSale": true,
+    "name_en": "Iron Plate",
+    "name_fr": "Plaque Fer"
+  },
+  "meadow_plate": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "plate",
+    "notForSale": true,
+    "name_en": "Meadow Plate",
+    "name_fr": "Plaque Herbe"
+  },
+  "mind_plate": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "plate",
+    "notForSale": true,
+    "name_en": "Mind Plate",
+    "name_fr": "Plaque Esprit"
+  },
+  "pixie_plate": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "plate",
+    "notForSale": true,
+    "name_en": "Pixie Plate",
+    "name_fr": "Plaque Pixie"
+  },
+  "sky_plate": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "plate",
+    "notForSale": true,
+    "name_en": "Sky Plate",
+    "name_fr": "Plaque Ciel"
+  },
+  "splash_plate": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "plate",
+    "notForSale": true,
+    "name_en": "Splash Plate",
+    "name_fr": "Plaque Hydro"
+  },
+  "spooky_plate": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "plate",
+    "notForSale": true,
+    "name_en": "Spooky Plate",
+    "name_fr": "Plaque Fantôme"
+  },
+  "stone_plate": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "plate",
+    "notForSale": true,
+    "name_en": "Stone Plate",
+    "name_fr": "Plaque Roche"
+  },
+  "toxic_plate": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "plate",
+    "notForSale": true,
+    "name_en": "Toxic Plate",
+    "name_fr": "Plaque Poison"
+  },
+  "zap_plate": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "plate",
+    "notForSale": true,
+    "name_en": "Zap Plate",
+    "name_fr": "Plaque Éclair"
+  },
+  "amaze_mulch": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "farm",
+    "notForSale": true,
+    "name_en": "Amaze Mulch",
+    "name_fr": "Terreau Prodige"
+  },
+  "boost_mulch": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "farm",
+    "notForSale": true,
+    "name_en": "Boost Mulch",
+    "name_fr": "Terreau Boost"
+  },
+  "freeze_mulch": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "farm",
+    "notForSale": true,
+    "name_en": "Freeze Mulch",
+    "name_fr": "Terreau Gel"
+  },
+  "gooey_mulch": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "farm",
+    "notForSale": true,
+    "name_en": "Gooey Mulch",
+    "name_fr": "Terreau Glueux"
+  },
+  "rich_mulch": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "farm",
+    "notForSale": true,
+    "name_en": "Rich Mulch",
+    "name_fr": "Terreau Riche"
+  },
+  "surprise_mulch": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "farm",
+    "notForSale": true,
+    "name_en": "Surprise Mulch",
+    "name_fr": "Terreau Surprise"
+  },
+  "berry_shovel": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "farm",
+    "notForSale": true,
+    "name_en": "Berry Shovel",
+    "name_fr": "Pelle à Baies"
+  },
+  "mulch_shovel": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "farm",
+    "notForSale": true,
+    "name_en": "Mulch Shovel",
+    "name_fr": "Pelle à Terreau"
+  },
+  "cerulean_berry_shop_permit": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "farm",
+    "notForSale": true,
+    "name_en": "Berry Shop Permit",
+    "name_fr": "Permis Baies (Céladon)"
+  },
+  "red_flute": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "flute",
+    "notForSale": true,
+    "name_en": "Red Flute",
+    "name_fr": "Flûte Rouge"
+  },
+  "blue_flute": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "flute",
+    "notForSale": true,
+    "name_en": "Blue Flute",
+    "name_fr": "Flûte Bleue"
+  },
+  "yellow_flute": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "flute",
+    "notForSale": true,
+    "name_en": "Yellow Flute",
+    "name_fr": "Flûte Jaune"
+  },
+  "white_flute": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "flute",
+    "notForSale": true,
+    "name_en": "White Flute",
+    "name_fr": "Flûte Blanche"
+  },
+  "black_flute": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "flute",
+    "notForSale": true,
+    "name_en": "Black Flute",
+    "name_fr": "Flûte Noire"
+  },
+  "time_flute": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "flute",
+    "notForSale": true,
+    "name_en": "Time Flute",
+    "name_fr": "Flûte Tempo"
+  },
+  "treasure_scanner": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "tool",
+    "notForSale": true,
+    "name_en": "Treasure Scanner",
+    "name_fr": "Scanner de Trésors"
+  },
+  "dowsing_machine": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "tool",
+    "notForSale": true,
+    "name_en": "Dowsing Machine",
+    "name_fr": "Détecteur"
+  },
+  "token_collector": {
+    "icon": "",
+    "price": 0,
+    "type": "key",
+    "category": "tool",
+    "notForSale": true,
+    "name_en": "Token Collector",
+    "name_fr": "Collecteur de Jetons"
+  },
+
+  // ── Poké Balls (P0) ─────────────────────────────────────────────────────
+  // Les balls vivent dans G.pokeballs (système dédié) mais sont AUSSI dans le
+  // dictionnaire des objets : nom, description, sprite, catégorie « Poké Balls »
+  // du sac. Le prix/sprite correspond au shopPokeballs de PokéClicker.
+  "pokeball": {
+    "icon": "",
+    "price": 100,
+    "type": "ball",
+    "rate": 10,
+    "sprite": "src/assets/images/pokeball/Pokeball.svg",
+    "name_en": "Poké Ball",
+    "name_fr": "Poké Ball",
+    "desc_en": "The basic Poké Ball.",
+    "desc_fr": "La Poké Ball de base."
+  },
+  "greatball": {
+    "icon": "",
+    "price": 500,
+    "type": "ball",
+    "rate": 20,
+    "sprite": "src/assets/images/pokeball/Greatball.svg",
+    "name_en": "Great Ball",
+    "name_fr": "Super Ball",
+    "desc_en": "A better Poké Ball.",
+    "desc_fr": "Une Poké Ball améliorée."
+  },
+  "ultraball": {
+    "icon": "",
+    "price": 2000,
+    "type": "ball",
+    "rate": 30,
+    "sprite": "src/assets/images/pokeball/Ultraball.svg",
+    "name_en": "Ultra Ball",
+    "name_fr": "Hyper Ball",
+    "desc_en": "A high-performance Poké Ball.",
+    "desc_fr": "Une Poké Ball haute performance."
+  },
+  "masterball": {
+    "icon": "",
+    "price": 10000000,
+    "type": "ball",
+    "rate": 100,
+    "sprite": "src/assets/images/pokeball/Masterball.svg",
+    "name_en": "Master Ball",
+    "name_fr": "Master Ball",
+    "desc_en": "Never fails.",
+    "desc_fr": "Ne rate jamais."
+  },
+  "honorball": {
+    "icon": "",
+    "price": 0,
+    "type": "ball",
+    "rate": 10,
+    "notForSale": true,
+    "sprite": "src/assets/images/pokeball/Premierball.svg",
+    "name_en": "Honor Ball",
+    "name_fr": "Honor Ball",
+    "desc_en": "A free ball offered every 10 Poké Balls bought.",
+    "desc_fr": "Ball offerte toutes les 10 Poké Balls achetées."
+  },
+
 };
 
 // --- Migrated to ES module, globals exposed ---
 // Wave 40 — surface kept (T2 template): prod (window === globalThis
 // in the browser), VM harnesses and classic consumers.
 if (typeof globalThis !== 'undefined') globalThis.ITEMS = ITEMS;
+
+
 
 

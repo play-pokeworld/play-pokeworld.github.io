@@ -52,15 +52,15 @@ function mineManagementModel(page){
    const def=typeof MINE_TOOL_DEFS!=='undefined'?MINE_TOOL_DEFS[tool]:null;
    return unlocked
     ? {title:t('mine_tool_'+tool),value:t('owned'),state:'owned',stateLabel:t('owned')}
-    : {title:t('mine_tool_'+tool),value:(def&&def.cost?def.cost.toLocaleString()+'₽':''),state:'buy',call:'buyMineTool',args:`'${tool}'`,buyLabel:t('buy_btn')};
+    : {title:t('mine_tool_'+tool),value:'',state:'buy',call:'buyMineTool',args:`'${tool}'`,buyLabel:(typeof diamondSpriteHtml==='function'?diamondSpriteHtml(def&&def.diamondCost?def.diamondCost:0):'')};
   };
   blocks.push({kind:'upgrades',cards:[
    energyCost
-    ? {title:t('mine_energy_upgrade_title'),value:String(G.mine.maxEnergy||100),state:'buy',call:'upgradeMineEnergy',args:'',buyLabel:`${energyCost.toLocaleString()}₽`}
+    ? {title:t('mine_energy_upgrade_title'),value:String(G.mine.maxEnergy||100),state:'buy',call:'upgradeMineEnergy',args:'',buyLabel:(typeof diamondSpriteHtml==='function'?diamondSpriteHtml(energyCost):'')}
     : {title:t('mine_energy_upgrade_title'),value:String(G.mine.maxEnergy||100),state:'owned',stateLabel:t('automation_owned')},
    auto.purchased
     ? {title:t('mine_auto_title'),value:t('automation_owned'),state:'owned',stateLabel:t('automation_owned')}
-    : {title:t('mine_auto_title'),value:tr('automation_buy_button',{price:'1 000 000'}),state:'buy',call:'buyMineAutomation',args:'',buyLabel:t('buy_btn')},
+    : {title:t('mine_auto_title'),value:'',state:'buy',call:'buyMineAutomation',args:'',buyLabel:(typeof diamondSpriteHtml==='function'?diamondSpriteHtml(1000):'')},
    toolCard('pickaxe'),
    toolCard('drill'),
    toolCard('dynamite'),
@@ -179,10 +179,44 @@ function renderMine(el){
 }
 
 
+// ── PASSE 30 (P3) — ANIMATION DE CASSAGE DES TUILES ────────────────────────
+// digMineTile() nous transmet la liste des cases qui ont bougé au dernier coup
+// (impact) et celles qui viennent d'atteindre la profondeur 0 (cassage). Comme
+// renderMineWindow() reconstruit intégralement la grille, l'animation ne peut
+// être posée qu'APRÈS le rendu : d'où cette fonction appelée en fin de coup.
+// L'interrupteur d'animations (G.settings.uiAnimations, ANI-01) est respecté :
+// coupé, on ne touche pas au DOM du tout.
+function playMineDigFx(cells){
+ if(!Array.isArray(cells) || !cells.length) return;
+ if(typeof document === 'undefined') return;
+ if(typeof uiAnimationsOn === 'function' && !uiAnimationsOn()) return;
+ try{
+  if(typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+ }catch(_){}
+ const grid = document.querySelector('#mine-window-body .mine-grid');
+ if(!grid) return;
+ for(const c of cells){
+  const tile = grid.querySelector('.mine-tile[data-mine-x="' + c.x + '"][data-mine-y="' + c.y + '"]');
+  if(!tile) continue;
+  const cls = c.broken ? 'pw-mine-break' : 'pw-mine-hit';
+  const ms = c.broken ? 420 : 280;
+  tile.classList.remove('pw-mine-break', 'pw-mine-hit');
+  void tile.offsetWidth; // reflow : rejoue l'animation sur un coup répété
+  tile.classList.add(cls);
+  // un trésor mis au jour scintille en plus de se casser
+  if(c.broken && tile.classList.contains('mine-tile-revealed-item')){
+   tile.classList.add('pw-mine-reveal');
+   setTimeout(() => { try{ tile.classList.remove('pw-mine-reveal'); }catch(_){} }, 620);
+  }
+  setTimeout(() => { try{ tile.classList.remove(cls); }catch(_){} }, ms);
+ }
+}
+
 // --- Migrated to ES module, globals exposed ---
 if (typeof openMineManagementMenu !== 'undefined') { if (typeof window !== 'undefined') window.openMineManagementMenu = openMineManagementMenu; if (typeof globalThis !== 'undefined') globalThis.openMineManagementMenu = openMineManagementMenu; }
 if (typeof renderMineWindow !== 'undefined') { if (typeof window !== 'undefined') window.renderMineWindow = renderMineWindow; if (typeof globalThis !== 'undefined') globalThis.renderMineWindow = renderMineWindow; }
 if (typeof renderMine !== 'undefined') { if (typeof window !== 'undefined') window.renderMine = renderMine; if (typeof globalThis !== 'undefined') globalThis.renderMine = renderMine; }
+if (typeof playMineDigFx !== 'undefined') { if (typeof window !== 'undefined') window.playMineDigFx = playMineDigFx; if (typeof globalThis !== 'undefined') globalThis.playMineDigFx = playMineDigFx; }
 
 
 
@@ -194,6 +228,7 @@ export {
   openMineManagementMenu,
   renderMineWindow,
   renderMine,
+  playMineDigFx,
 };
 
 // Wave 42 — engine-registry absorption: these dispatched actions
@@ -201,4 +236,6 @@ export {
 // indirection instead of the window fallback); the window surface is kept for
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('renderMineWindow', renderMineWindow); } catch (_) {} }
+
+
 

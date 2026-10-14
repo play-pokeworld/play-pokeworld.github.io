@@ -130,8 +130,9 @@
       'close-confirm': ['closeConfirm'], 'scroll-to-window': ['scrollToWin', element.dataset.targetWindow], 'set-mobile-view': ['setMobileView', element.dataset.mobileView], 'set-mobile-manage-view': ['setMobileManageView', element.dataset.mobileManageView], 'set-battle-speed': ['setBattleSpeed', Number(element.dataset.speed)],
       'open-battle-summary': ['openBattleSummary', false], 'leave-battle': ['doLeaveBattle'], 'show-tab': ['showTab', element.dataset.tab], 'close-unified-selector': ['closeUnifiedSelectorModal'],
       'sort-unified-grid': ['sortUnifiedGrid', element.dataset.sort], 'close-battle-summary': ['closeBattleSummary'], 'restart-last-battle': ['restartLastBattle'],
-      'debug-give-money': ['debugGiveMoney'], 'debug-give-ct-cs': ['debugGiveCtCs'], 'debug-give-candies': ['debugGiveCandies'], 'debug-unlock-badges': ['debugUnlockBadges'], 'debug-fill-mine': ['debugFillMine'], 'debug-timeskip-30m': ['debugTimeSkipAfk30Minutes'],
+      'debug-give-money': ['debugGiveMoney'], 'debug-give-ct-cs': ['debugGiveCtCs'], 'debug-give-candies': ['debugGiveCandies'], 'debug-unlock-badges': ['debugUnlockBadges'], 'debug-fill-mine': ['debugFillMine'], 'debug-timeskip-30m': ['debugTimeSkipAfk30Minutes'], 'debug-give-all-items': ['debugGiveAllItems'], 'debug-show-all-items': ['debugShowAllItems'],
       'toggle-battle-speed-x10': ['toggleBattleSpeedX10'], 'toggle-map-help': ['toggleMapHelp'], 'open-fullscreen-panel': ['openFullscreenPanel', element.dataset.panel], 'open-unified-selector': ['openUnifiedSelectorModal', element.dataset.panel],
+      'open-guide-section': ['openGuideSection', element.dataset.section || null],
       'close-fullscreen-panel': ['closeFullscreenPanel'], 'copy-export-text': ['copyExportText']
     };
     if (action === 'close-victory-screen') { const v = document.getElementById('victory-screen'); if (v) v.classList.remove('open'); return true; }
@@ -261,6 +262,8 @@ function installCriticalClickFallback(root) {
     'debug-give-candies': function () { callGlobal('debugGiveCandies'); },
     'debug-unlock-badges': function () { callGlobal('debugUnlockBadges'); },
     'debug-fill-mine': function () { callGlobal('debugFillMine'); },
+    'debug-give-all-items': function () { callGlobal('debugGiveAllItems'); },
+    'debug-show-all-items': function () { callGlobal('debugShowAllItems'); },
     'debug-base-grant-all': function () { callGlobal('baseDebugGrantAll'); },
     'debug-base-add-npc': function () { callGlobal('baseDebugAddNpc'); },
     'base-window-refresh': function () { callGlobal('baseWindowRender'); },
@@ -354,7 +357,7 @@ function installCriticalClickFallback(root) {
     if (target.dataset.action === 'filter-base-npc-sprite') callGlobal('baseNpcEditorFilterSprite', target.value);
   });
 
-  document.addEventListener('mousedown', function (event) {
+  document.addEventListener('pointerdown', function (event) {
     if (event.target.closest('[data-stop-drag]')) {
       event.stopPropagation();
       return;
@@ -486,4 +489,6 @@ function installCriticalClickFallback(root) {
 if (typeof installCriticalClickFallback !== 'undefined') { if (typeof window !== 'undefined') window.installCriticalClickFallback = installCriticalClickFallback; if (typeof globalThis !== 'undefined') globalThis.installCriticalClickFallback = installCriticalClickFallback; }
 
 export { callGlobal, installCriticalClickFallback };
+
+
 

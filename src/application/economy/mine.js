@@ -19,6 +19,8 @@ export const MINE_ITEMS = [
  {key:'sunstone', name:'sunstone', shape:[[1,0,1],[0,1,0],[1,0,1]]},
  {key:'nugget', name:'nugget', shape:[[1,1,1],[1,1,1]]},
  {key:'stardust', name:'stardust', shape:[[1,1],[1,1]]},
+ {key:'star_piece', name:'star_piece', shape:[[0,1,0],[1,1,1],[0,1,0]]},
+ {key:'heart_scale', name:'heart_scale', shape:[[1,0],[1,1]]},
  {key:'helix_fossil', name:'helix_fossil', shape:[[0,1,1,0],[1,1,1,1],[1,1,1,1],[0,1,1,0]]},
  {key:'dome_fossil', name:'dome_fossil', shape:[[1,1,1],[1,1,1],[0,1,0]]},
  {key:'old_amber', name:'old_amber', shape:[[1,1],[1,1],[1,1]]},
@@ -51,15 +53,16 @@ function initMineIfNeeded(){
  }
 }
 
-export const MINE_AUTO_COST = 1000000;
+// P0 — tout l'équipement de la mine se paie en Diamants (💎).
+export const MINE_AUTO_COST = 1000;
 export const MINE_TOOL_DEFS = {
  chisel:{cost:5, power:2, shape:'single'},
  hammer:{cost:15, power:1, shape:'square3'},
- pickaxe:{cost:500000, energy:20, power:2, shape:'cross'},
- drill:{cost:1500000, energy:35, power:2, shape:'line5'},
- dynamite:{cost:3000000, energy:60, power:4, shape:'square3'}
+ pickaxe:{cost:5, energy:20, power:2, shape:'cross', diamondCost:400},
+ drill:{cost:5, energy:35, power:2, shape:'line5', diamondCost:800},
+ dynamite:{cost:5, energy:60, power:4, shape:'square3', diamondCost:1200}
 };
-export const MINE_ENERGY_UPGRADE_COSTS = [250000, 750000, 1500000, 3000000];
+export const MINE_ENERGY_UPGRADE_COSTS = [100, 250, 500, 1000]; // en 💎
 let _mineAutoTicker = null;
 function appSetInterval(name, callback, delay){
  if(typeof PokeWorldTimers !== 'undefined' && PokeWorldTimers?.set) return PokeWorldTimers.set(name, callback, delay);
@@ -85,10 +88,12 @@ function isMineToolUnlocked(tool){ return !!ensureMineTools()[tool]; }
 function buyMineTool(tool){
  ensureMineTools();
  const def = MINE_TOOL_DEFS[tool];
- if(!def || !def.cost){ return; }
+ if(!def || !def.diamondCost){ return; }
  if(isMineToolUnlocked(tool)){ notify(t('mine_tool_owned'), 'var(--green)'); return; }
- if(G.money < def.cost){ notify(t('n.pas_assez_dargent'), 'var(--red)'); return; }
- G.money -= def.cost;
+ const w = (typeof ensureWallet === 'function') ? ensureWallet() : null;
+ if(!w || (w.diamonds || 0) < def.diamondCost){ notify(tr('mine_tool_need_diamonds', {price:formatNumber(def.diamondCost)}), 'var(--red)'); return; }
+ if(typeof spendDiamonds === 'function') spendDiamonds(def.diamondCost);
+ else w.diamonds -= def.diamondCost;
  G.mine.unlockedTools[tool] = true;
  updateHeader(); saveGame();
  notify(tr('mine_tool_bought', {tool:t('mine_tool_'+tool)}), 'var(--green)');
@@ -120,12 +125,15 @@ function mineToolCells(tool, tx, ty){
 function buyMineAutomation(){
  ensureMineAutomation();
  if(G.mine.automation.purchased){ notify(t('automation_already_bought'), 'var(--green)'); return; }
- if(G.money < MINE_AUTO_COST){ notify(tr('automation_upgrade_need_money', {price:MINE_AUTO_COST.toLocaleString()}), 'var(--red)'); return; }
- G.money -= MINE_AUTO_COST;
+ // P0 — paiement en Diamants (💎).
+ const w = (typeof ensureWallet === 'function') ? ensureWallet() : null;
+ if(!w || (w.diamonds || 0) < MINE_AUTO_COST){ notify(tr('mine_auto_need_diamonds', {price:formatNumber(MINE_AUTO_COST)}), 'var(--red)'); return; }
+ if(typeof spendDiamonds === 'function') spendDiamonds(MINE_AUTO_COST);
+ else w.diamonds -= MINE_AUTO_COST;
  G.mine.automation.purchased = true;
  updateHeader();
  saveGame();
- notify(tr('automation_upgrade_bought', {name:t('mine_auto_title'), price:MINE_AUTO_COST.toLocaleString()}), 'var(--green)');
+ notify(tr('automation_upgrade_bought_diamonds', {name:t('mine_auto_title'), price:formatNumber(MINE_AUTO_COST)}), 'var(--green)');
  try{ openMineManagementMenu('automation'); }catch(_){}
 }
 function toggleMineAutomation(){
@@ -145,8 +153,10 @@ function upgradeMineEnergy(){
  ensureMineAutomation();
  const cost = getMineEnergyUpgradeCost();
  if(!cost){ notify(t('mine_energy_maxed'), 'var(--green)'); return; }
- if(G.money < cost){ notify(t('n.pas_assez_dargent'), 'var(--red)'); return; }
- G.money -= cost;
+ const w = (typeof ensureWallet === 'function') ? ensureWallet() : null;
+ if(!w || (w.diamonds || 0) < cost){ notify(tr('mine_energy_need_diamonds', {price:formatNumber(cost)}), 'var(--red)'); return; }
+ if(typeof spendDiamonds === 'function') spendDiamonds(cost);
+ else w.diamonds -= cost;
  G.mine.upgrades.energyLevel = (G.mine.upgrades.energyLevel||0)+1;
  G.mine.maxEnergy = (G.mine.maxEnergy||100) + 25;
  G.mine.energy = Math.min(G.mine.maxEnergy, (G.mine.energy||0) + 25);
@@ -169,19 +179,35 @@ function mineAutoStep(){
  if(!G.mine.automation.enabled || !G.mine.automation.purchased) return;
  if((G.mine.energy||0) < 5) return;
  
- const fee = typeof getMineAutomationFee === 'function' ? getMineAutomationFee() : 0;
- if(fee > 0) {
-   if(G.money < fee) {
-     G.mine.automation.enabled = false;
-     notify(t('mine_auto_no_money'), "var(--red)");
-     saveGame();
-     try{ renderMineWindow(); }catch(_){}
-     return;
+ // P0 — usage de l'auto-mine : 1 💎 par tuile (tout en Diamants).
+ // Repli legacy pour les harnais VM sans currency.js (ancien frais en ₽).
+ const w = (typeof ensureWallet === 'function') ? ensureWallet() : null;
+ if(!w){
+   const fee = typeof getMineAutomationFee === 'function' ? getMineAutomationFee() : 0;
+   if(fee > 0) {
+     if((G.money || 0) < fee) {
+       G.mine.automation.enabled = false;
+       notify(t('mine_auto_no_money'), "var(--red)");
+       saveGame();
+       try{ renderMineWindow(); }catch(_){}
+       return;
+     }
+     G.money -= fee;
    }
-   G.money -= fee;
-   addBattleLog((typeof tr === 'function' ? tr('mine_auto_fee_log', {fee: fee}) : ` [Mine] -${fee}₽ payés pour l'extraction automatique d'une tuile.`));
+ } else if((w.diamonds || 0) < 1) {
+   G.mine.automation.enabled = false;
+   notify(t('mine_auto_no_diamonds'), "var(--red)");
+   saveGame();
+   try{ renderMineWindow(); }catch(_){}
+   return;
+ } else if(typeof spendDiamonds === 'function') {
+   spendDiamonds(1);
+   addBattleLog((typeof tr === 'function' ? tr('mine_auto_fee_diamonds_log') : ' [Mine] -1💎 pour l\'extraction automatique d\'une tuile.'));
    updateHeader();
+ } else {
+   w.diamonds -= 1;
  }
+
 
  const oldTool = G.mine.tool;
  G.mine.tool = 'chisel';
@@ -311,8 +337,17 @@ function digMineTile(tx, ty, silent=false){
   return;
  }
  G.mine.energy -= cost;
+ // PASSE 30 (P3) — ANIMATION DE CASSAGE DES TUILES. On relève l'état de chaque
+ // case AVANT et APRÈS le coup : celles qui perdent de la profondeur reçoivent
+ // un impact, celles qui tombent à zéro se désintègrent. La liste est confiée
+ // à la vue (playMineDigFx), qui la rejouera APRÈS le re-rendu de la grille —
+ // renderMineWindow() reconstruit tout le DOM de la mine à chaque coup.
+ const _fxCells = [];
  for(const [x,y] of cells){
-  if(G.mine.grid[y][x] > 0) G.mine.grid[y][x] = Math.max(0, G.mine.grid[y][x] - (def.power || 1));
+  const before = G.mine.grid[y][x];
+  if(before > 0) G.mine.grid[y][x] = Math.max(0, before - (def.power || 1));
+  const after = G.mine.grid[y][x];
+  if(after !== before) _fxCells.push({x:x, y:y, broken: after === 0});
  }
  for(const itm of G.mine.items){
   if(itm.collected) continue;
@@ -343,6 +378,9 @@ function digMineTile(tx, ty, silent=false){
  saveGame();
  try{ autoSave(); }catch(_e){}
  renderMineWindow();
+ // Le DOM vient d'être reconstruit : c'est seulement maintenant que les
+ // classes d'animation peuvent être posées sur les nouvelles tuiles.
+ try{ if(typeof playMineDigFx === 'function') playMineDigFx(_fxCells); }catch(_){}
 }
 
 
@@ -420,4 +458,6 @@ export {
 // indirection instead of the window fallback); the window surface is kept for
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('generateMineLayer', generateMineLayer); } catch (_) {} }
+
+
 

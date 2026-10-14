@@ -815,3 +815,5 @@ export const L_fr_talents = {
 // gardée sur l'objet global pour les registres (data.js) et les harnais VM.
 if (typeof globalThis !== 'undefined') globalThis.L_fr_talents = L_fr_talents;
 
+
+

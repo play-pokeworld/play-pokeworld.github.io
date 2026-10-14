@@ -72,6 +72,13 @@ function defaultInt(minIncl, maxIncl, rng) {
  * @param {Array<Array>} wildEntries - Route spawn table rows [speciesId, minLv, maxLv, bucket?]
  * @param {Object} [opts]
  * @param {number} [opts.roamingId=0] - Roaming legendary species id on this route (0 = none)
+ * @param {number} [opts.rareBoostPct=0] - % d'augmentation du poids du seau « rare » (Encens Pur, PokeChill)
+ * @param {string} [opts.bucketHint=null] - PASSE 38f : force le seau ('common' |
+ *   'uncommon' | 'rare'). Utilisé par les donjons : les cases combats = seau
+ *   commun, les cases élites = seau peu commun, le boss = seau rare (retour
+ *   joueur : « les rares de la zone doivent être les boss, les peu communs
+ *   les combats corsés, les autres les communs »). Un seau forcé désactive le
+ *   tirage roaming (jamais de légendaire errant dans un donjon).
  * @param {Function} [opts.rng=Math.random] - Deterministic RNG source (tests/offline)
  * @returns {{speciesId:number, level:number, bucket:string, isRoaming:boolean}|null}
  */
@@ -79,19 +86,29 @@ export function pickWildFromTable(wildEntries, opts = {}) {
   const roamingId = Number(opts.roamingId) || 0;
   const rng = typeof opts.rng === 'function' ? opts.rng : Math.random;
   const wild = Array.isArray(wildEntries) ? wildEntries : [];
+  const rareBoostPct = Math.max(0, Math.min(100, Number(opts.rareBoostPct) || 0));
+  const bucketHint = (opts.bucketHint === 'rare' || opts.bucketHint === 'uncommon' || opts.bucketHint === 'common') ? opts.bucketHint : null;
 
-  if (roamingId && rng() < ROAMING_CHANCE) {
+  if (!bucketHint && roamingId && rng() < ROAMING_CHANCE) {
     return { speciesId: roamingId, level: ROAMING_LEVEL, bucket: 'roaming', isRoaming: true };
   }
   if (!wild.length) return null;
 
+  // DORM-02g — Encens Pur : le poids du seau « rare » augmente de rareBoostPct %.
+  // PASSE 38f — un seau FORCÉ (case de donjon) prime sur le tirage pondéré.
+  const rareOdds = BUCKET_ODDS.rare * (1 + rareBoostPct / 100);
   const r = rng();
-  const targetBucket = r < BUCKET_ODDS.rare ? 'rare' : (r < BUCKET_ODDS.rare + BUCKET_ODDS.uncommon ? 'uncommon' : 'common');
-  let bucketEntries = wild.filter((w) => (w[3] || 'common') === targetBucket);
-  if (!bucketEntries.length) {
-    bucketEntries = wild.filter((w) => (w[3] || 'common') === 'common');
-    if (!bucketEntries.length) bucketEntries = wild;
+  const targetBucket = bucketHint || (r < rareOdds ? 'rare' : (r < rareOdds + BUCKET_ODDS.uncommon ? 'uncommon' : 'common'));
+  // Repli par PALIER (jamais de saut) : seau visé → rare → peu commun →
+  // commun → toute la table. C'est ce qui garantit qu'un donjon sans rare
+  // utilise ses peu communs pour le boss, et ainsi de suite.
+  const bucketOrder = ['rare', 'uncommon', 'common'].slice(['rare', 'uncommon', 'common'].indexOf(targetBucket));
+  let bucketEntries = [];
+  for (const b of bucketOrder) {
+    const ent = wild.filter((w) => (w[3] || 'common') === b);
+    if (ent.length) { bucketEntries = ent; break; }
   }
+  if (!bucketEntries.length) bucketEntries = wild;
   const entry = bucketEntries[defaultInt(0, bucketEntries.length - 1, rng)];
   return {
     speciesId: Number(entry[0]),
@@ -100,4 +117,6 @@ export function pickWildFromTable(wildEntries, opts = {}) {
     isRoaming: false,
   };
 }
+
+
 

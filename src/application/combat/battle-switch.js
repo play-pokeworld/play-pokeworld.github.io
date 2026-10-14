@@ -118,11 +118,13 @@ async function champVictory(){ // shared-scope battle API: called from battle-st
    if(mode === 'ev'){
      if(!trainee.evs) trainee.evs = {hp:0, atk:0, def:0, spa:0, spd:0, spe:0};
      const keys = ['hp','atk','def','spa','spd','spe'];
-     const avail = keys.filter(k => (trainee.evs[k]||0) < 6);
+     // FIX-02 : plafond EV par stat = 18, total EV borné à 36.
+     const totalEv = keys.reduce((s,k) => s + (trainee.evs[k]||0), 0);
+     const avail = keys.filter(k => (trainee.evs[k]||0) < 18 && totalEv < 36);
      if(avail.length){
        const pk = avail[rand(0, avail.length - 1)];
        trainee.evs[pk]++;
-       rewardMsg = ` (+1 EV ${pk.toUpperCase()} → ${trainee.evs[pk]}/6)`;
+       rewardMsg = ` (+1 EV ${pk.toUpperCase()} → ${trainee.evs[pk]}/18)`;
      } else rewardMsg = ' (EV au maximum)';
    } else if(mode === 'level'){
      const gain = Math.min(rand(2,5), Math.max(0, 100 - (trainee.level||1)));
@@ -257,7 +259,7 @@ async function champVictory(){ // shared-scope battle API: called from battle-st
  if(leagueMoney) G.money += (typeof __pwV43Link('applySecretBaseMoneyBonus') === 'function' ? applySecretBaseMoneyBonus(leagueMoney) : leagueMoney);
  updateHeader();
  addBattleLog(`<span class="pw-light2">${tr('league_master_victory_log_region', {region:getRegionDisplayName(leagueRegion)})}</span>`);
- notify(leagueMoney ? tr('league_master_title_reward_region', {region:getRegionDisplayName(leagueRegion), money:leagueMoney.toLocaleString()}) : t('rematch_no_money'), leagueMoney ? 'var(--light2)' : 'var(--light1)');
+ notify(leagueMoney ? tr('league_master_title_reward_region', {region:getRegionDisplayName(leagueRegion), money:formatNumber(leagueMoney)}) : t('rematch_no_money'), leagueMoney ? 'var(--light2)' : 'var(--light1)');
  } else {
  if(isFirstWin) G.badges.push(battle.champId);
  EventBus.emit(EVENTS.BADGE_EARNED, { champId: battle.champId });
@@ -322,4 +324,6 @@ export {
   showQuestCapturePanel,
   champVictory,
 };
+
+
 

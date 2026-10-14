@@ -27,7 +27,7 @@ function makeSandbox() {
   vm.createContext(sandbox);
   for (const f of [
     'src/data/moves.js', 'src/data/pd-data.js', 'src/data/items-data.js', 'src/data/items-helpers.js',
-    'src/data/poke-talents-data.js',
+    'src/data/poke-talents.js',
     'src/data/locations-data.js', 'src/data/locations-johto.js', 'src/data/game-helpers.js',
     'src/application/world/team.js', 'src/application/pokemon-factory.js',
     'src/data/champions-data.js', 'src/data/official-teams-data.js', // order of the real loader
@@ -187,5 +187,7 @@ test('i18n: the 10 league steps have name + title in FR and EN', () => {
     assert.equal(frag.lorelei.name, expected, `${file}: translation check Olga/${expected}`);
   }
 });
+
+
 
 

@@ -27,7 +27,7 @@ function makeSandbox() {
   vm.createContext(sandbox);
   for (const f of [
     'src/data/moves.js', 'src/data/pd-data.js', 'src/data/items-data.js', 'src/data/items-helpers.js',
-    'src/data/poke-talents-data.js',
+    'src/data/poke-talents.js',
     'src/data/locations-data.js', 'src/data/locations-johto.js', 'src/data/game-helpers.js',
     'src/application/world/team.js', 'src/application/pokemon-factory.js',
     'src/data/atoll-sets-data.js', 'src/application/world/atoll-core.js',
@@ -309,5 +309,7 @@ test('UI: mode descriptions at the top of the page + atoll & roamer timers', () 
   assert.ok(loc.includes("timerKind: 'roam'"), 'timer on the roamer routes');
   assert.ok(loc.includes('startRotationTicker'), 'ticker started from the routes');
 });
+
+
 
 

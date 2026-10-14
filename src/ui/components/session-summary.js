@@ -93,8 +93,17 @@ export function itemListVNode(entries) {
 
 /** One inline loot chip (sprite fragment + absolute ×N counter). */
 export function lootChipVNode(c) {
+  // PASSE 39 — les monnaies s'affichent sprite + chiffre (jamais « × ») :
+  // « +150 » pour l'argent gagné en combat, « 250 » pour les jetons.
+  if (c.currency) {
+    return h('div', { class: 'loot-item loot-currency', title: c.title || '' },
+      h.raw(c.html || ''),
+      h('span', { class: 'loot-count' }, (c.prefix || '') + String(c.amount)));
+  }
   return h('div', { class: 'loot-item', title: c.title || '' },
     h.raw(c.html || ''),
     c.count > 1 ? h('span', { class: 'loot-count' }, `×${c.count}`) : null);
 }
+
+
 

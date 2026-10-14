@@ -60,7 +60,7 @@ export class QuestView extends UIView {
         template: () => h('div', { class: 'pw-ui-panel upgrade-card pw-panel' },
           h('div', { class: 'pw-evo-title' }, offer.iconHtml ? h.raw(`${offer.iconHtml} `) : null, offer.title),
           h('div', { class: 'pw-detail-text' }, h.raw(offer.desc || '')),
-          h('div', { class: 'pw-detail-hint' }, offer.reward),
+          h('div', { class: 'pw-detail-hint' }, h.raw(offer.reward || '')),
           offer.active
             ? h('div', { class: 'pw-green-text' }, offer.activeLabel)
             : QuestView.acceptVNode(offer)),
@@ -136,4 +136,6 @@ export class QuestView extends UIView {
     };
   }
 }
+
+
 

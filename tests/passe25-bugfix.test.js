@@ -47,7 +47,7 @@ function makeSandbox() {
   for (const f of [
     'src/data/moves.js', 'src/data/pd-data.js',
     'src/data/items-data.js', 'src/data/items-helpers.js',
-    'src/data/poke-talents-data.js', 'src/data/talents-full.js',
+    'src/data/poke-talents.js', 'src/data/talents-full.js',
     'src/data/locations-data.js', 'src/data/locations-johto.js', 'src/data/game-helpers.js',
     'src/application/pokemon-factory.js',
     'src/data/atoll-sets-data.js', 'src/application/world/atoll-core.js',
@@ -200,5 +200,7 @@ test('phase 25 #3: back navigation and i18n of the preparation panel', () => {
   assert.equal(sb.t('atoll_factory_prep_open'), "⚙ Organiser l'équipe prêtée", 'FR access button');
   assert.equal(sb.t('back_to_atoll_prep'), '← Retour à la préparation', 'FR back label');
 });
+
+
 
 

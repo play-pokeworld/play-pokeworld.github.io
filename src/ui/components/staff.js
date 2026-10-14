@@ -74,7 +74,7 @@ export function staffCardVNode(c) {
         call: c.hire.call || '',
         callArgs: c.hire.args == null ? '' : String(c.hire.args),
       },
-    }, c.hire.label || ''));
+    }, h.raw(c.hire.label || '')));
   }
   return h('div', {
     class: cx('staff-card', c.owned ? 'is-owned' : 'is-unowned', c.active && 'is-active'),
@@ -93,4 +93,6 @@ export function staffListVNode(m) {
 export function staffListHTML(m) {
   return toHTMLString(staffListVNode(m));
 }
+
+
 

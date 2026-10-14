@@ -74,10 +74,14 @@ test('wave29 #4: setMobileView / setMobileManageView scroll back to the top', ()
 
 // REGRESSION (found by the wave-29 recon): move-info crash on badge effects
 test('wave29 regression: effContent is DECLARED (ES-module strict crash gone)', () => {
-  const i = pokeModalJs.indexOf("getBadgeHtml === 'function' ? getBadgeHtml(e) : null");
+  // Passe 26d : les effets portent désormais une clé de statut (e.badge) pour
+  // afficher la bulle colorée ; effContent reste déclaré.
+  const i = pokeModalJs.indexOf("getBadgeHtml === 'function' ? getBadgeHtml(e.badge) : null");
   assert.ok(i > 0);
   assert.ok(pokeModalJs.indexOf('let effContent;') > 0, 'effContent must be declared');
   assert.ok(!/var badge =[\s\S]{0,120}\beffContent = badge;[\s\S]{0,80}var effContentVar = typeof effContent/.test(pokeModalJs),
     'the old undeclared-assignment + typeof-guard pattern must be gone');
 });
+
+
 

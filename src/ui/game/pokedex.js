@@ -347,3 +347,5 @@ export {
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('setDexSearch', setDexSearch); } catch (_) {} }
 
+
+

@@ -52,11 +52,12 @@ function tutorialDeviceHint(kind){
 // reward is only paid if the player does not already own the item, and
 // the payout is capped at the quantity planned by the step. A lost flag
 // can therefore no longer replay a payment.
+function _isBallItem(k){ return (typeof BALL_DEFS !== 'undefined' && BALL_DEFS && BALL_DEFS[k]); }
 function tutorialRewardAlreadyPaid(step){
  if(!step || !step.items) return false;
  for(const k in step.items){
-  const have = Number((G.inventory && G.inventory[k]) || 0);
-  if(have >= Number(step.items[k] || 1)) return true;   // already owned in the inventory
+  if(_isBallItem(k)){ const have = ((G.pokeballs && G.pokeballs[k]) || 0); if(have >= Number(step.items[k] || 1)) return true; }
+  else { const have = Number((G.inventory && G.inventory[k]) || 0); if(have >= Number(step.items[k] || 1)) return true; }
  }
  return false;
 }
@@ -72,32 +73,68 @@ function tutorialGiveReward(step){
  if(step.items){
   for(const k in step.items){
    const want = Math.max(1, Number(step.items[k] || 1));
-   const have = Number((G.inventory && G.inventory[k]) || 0);
-   const give = Math.max(0, want - have);      // never more that prevu
-   if(give > 0) addToInventory(k, give);
+   if(_isBallItem(k)){
+    // Les Poké Balls ne sont pas des items d'inventaire : G.pokeballs.
+    if(typeof ensurePokeballs === 'function') ensurePokeballs();
+    if(!G.pokeballs) G.pokeballs = {};
+    const have = Number(G.pokeballs[k] || 0);
+    const give = Math.max(0, want - have);
+    if(give > 0) G.pokeballs[k] = have + give;
+   } else {
+    const have = Number((G.inventory && G.inventory[k]) || 0);
+    const give = Math.max(0, want - have);      // never more that prevu
+    if(give > 0) addToInventory(k, give);
+   }
   }
  }
+ if(step.jd){ if(typeof gainDungeonTokens === 'function') gainDungeonTokens(step.jd); }
  if(step.rewardText) notify(step.rewardText, 'var(--green)');
 }
 function tutorialSteps(){
+ // Helper : une ball est posée sur au moins un filtre actif.
+ const _ballSet = ()=>{ try{ if(G && G.pokeballs && Array.isArray(G.pokeballs.filters)){ return G.pokeballs.filters.some(f=>f.enabled!==false && f.ball && f.ball!=='none'); } }catch(_){} return false; };
  return [
-  {id:'route1_battles', title:t('tutorial_step_route1_title')||'Premiers combats', desc:t('tutorial_step_route1_desc')||'Gagne 3 combats sauvages sur la Route 1.', how:()=>`${t('tutorial_step_route1_how')} ${tutorialDeviceHint('map')}`, actionLabel:t('tutorial_step_route1_action'), actionCall:'clickLocation', actionArgs:"'route1'", done:()=>((G.wildWinsByLoc||{}).route1||0)>=3, money:300, items:{occa_berry:1}, rewardText:t('tutorial_step_route1_reward')},
+  // ── Phase 1 · Combats et argent ──────────────────────────────────────────
+  {id:'route1_battles', title:t('tutorial_step_route1_title')||'Premiers combats', desc:t('tutorial_step_route1_desc')||'Gagne 5 combats sauvages sur la Route 1.', how:()=>`${t('tutorial_step_route1_how')} ${tutorialDeviceHint('map')}`, actionLabel:t('tutorial_step_route1_action'), actionCall:'clickLocation', actionArgs:"'route1'", done:()=>((G.wildWinsByLoc||{}).route1||0)>=5, progress:()=>({cur:Math.min(5,(G.wildWinsByLoc||{}).route1||0), max:5}), money:300, items:{occa_berry:1}, rewardText:t('tutorial_step_route1_reward')},
+  // ── Phase 2 · Capture ────────────────────────────────────────────────────
+  {id:'set_pokeball_filter', title:t('tutorial_step_setball_title')||'Configure tes Poké Balls', desc:t('tutorial_step_setball_desc')||'Ouvre la fenêtre Poké Balls et pose la Poké Ball sur le filtre « Nouveau » : c\'est lui qui décide quelle ball lancer en combat.', how:()=>t('tutorial_step_setball_how')||'Dans la fenêtre Poké Balls, clique sur la Poké Ball vide du filtre « Nouveau » puis choisis « Poké Ball ».', actionLabel:t('tutorial_step_setball_action'), actionCall:'scrollToWin', actionArgs:"'win-pokeballs'", done:()=>_ballSet(), progress:()=>({cur:_ballSet()?1:0, max:1}), rewardText:t('tutorial_step_setball_reward')},
+  {id:'catch_first', title:t('tutorial_step_catch_title')||'Capturer ton premier Pokémon', desc:t('tutorial_step_catch_desc')||'Combats sur une route : ta première capture est garantie !', how:()=>t('tutorial_step_catch_how')||'Reste sur la Route 1 et enchaîne les combats : la Poké Ball lancée sur un Pokémon capturera à coup sûr la première fois.', actionLabel:t('tutorial_step_catch_action'), actionCall:'clickLocation', actionArgs:"'route1'", done:()=>((G.team||[]).length >= 2 || Object.keys(G.collection||{}).length >= 1), progress:()=>({cur:(((G.team||[]).length >= 2 || Object.keys(G.collection||{}).length >= 1))?1:0, max:1}), rewardText:t('tutorial_step_catch_reward')},
+  {id:'buy_pokeballs', title:t('tutorial_step_buyballs_title')||'Acheter des Poké Balls', desc:t('tutorial_step_buyballs_desc')||'Tes Poké Balls sont consommées à chaque tentative : va à la boutique de Bourg Palette pour en racheter.', how:()=>t('tutorial_step_buyballs_how')||'Ouvre la boutique de Bourg Palette, choisis une quantité et clique « Acheter ».', actionLabel:t('tutorial_step_buyballs_action'), actionCall:'openFullscreenPanel', actionArgs:"'shop'", done:()=>((G.totalBallsBought||0) >= 1), progress:()=>({cur:((G.totalBallsBought||0)>=1)?1:0, max:1}), money:200, rewardText:t('tutorial_step_buyballs_reward')},
+  {id:'honor_ball_intro', title:t('tutorial_step_honor_title')||'L\'Honor Ball', desc:t('tutorial_step_honor_desc')||'Toutes les 10 Poké Balls achetées, le magasin t\'offre une Honor Ball (blanche et rouge).', how:()=>t('tutorial_step_honor_how')||'Continue d\'acheter des Poké Balls pour en gagner.', actionLabel:t('tutorial_step_honor_action'), actionCall:'scrollToWin', actionArgs:"'win-pokeballs'", done:()=>!!(G.pokeballs && G.pokeballs.honorball > 0), progress:()=>({cur:(G.pokeballs&&G.pokeballs.honorball>0)?1:0, max:1}), rewardText:t('tutorial_step_honor_reward')},
+  // ── Phase 3 · Interfaces ─────────────────────────────────────────────────
   {id:'open_poke_sheet', title:t('tutorial_step_sheet_title')||'Lire une fiche Pokémon', desc:t('tutorial_step_sheet_desc')||'Ouvre une fiche Pokémon pour lire ses stats, IV, EV, talents et attaques.', how:()=>`${tutorialDeviceHint('sheet')} ${t('tutorial_step_sheet_how')}`, actionLabel:t('tutorial_step_sheet_action'), actionCall:'showTab', actionArgs:"'team'", done:()=>!!ensureTutorialState().completed.open_poke_sheet, money:200, rewardText:t('tutorial_step_sheet_reward')},
-  {id:'open_bag', title:t('tutorial_step_bag_title')||'Ouvrir le sac', desc:t('tutorial_step_bag_desc')||'Ouvre le Sac depuis les Raccourcis pour voir tes objets.', how:()=>t('tutorial_step_bag_how'), actionLabel:t('tutorial_step_bag_action'), actionCall:'openFullscreenPanel', actionArgs:"'inventory'", items:{potion:2}, done:()=>!!ensureTutorialState().completed.open_bag, rewardText:t('tutorial_step_bag_reward')},
+  {id:'open_bag', title:t('tutorial_step_bag_title')||'Ouvrir le sac', desc:t('tutorial_step_bag_desc')||'Ouvre le Sac depuis les Raccourcis pour voir tes objets.', how:()=>t('tutorial_step_bag_how'), actionLabel:t('tutorial_step_bag_action'), actionCall:'openFullscreenPanel', actionArgs:"'inventory'", items:{pokeball:5}, done:()=>!!ensureTutorialState().completed.open_bag, rewardText:t('tutorial_step_bag_reward')},
   {id:'open_pokedex', title:t('tutorial_step_dex_title')||'Consulter le Pokédex', desc:t('tutorial_step_dex_desc')||'Ouvre le Pokédex et clique sur un Pokémon déjà vu.', how:()=>t('tutorial_step_dex_how'), actionLabel:t('tutorial_step_dex_action'), actionCall:'openFullscreenPanel', actionArgs:"'pokedex'", done:()=>!!ensureTutorialState().completed.open_pokedex, money:500, rewardText:t('tutorial_step_dex_reward')},
-  {id:'first_badge', title:t('tutorial_step_badge_title')||'Premier badge', desc:t('tutorial_step_badge_desc')||'Progresse jusqu’à Argenta et bats Pierre.', how:()=>t('tutorial_step_badge_how'), actionLabel:t('tutorial_step_badge_action'), actionCall:'showTab', actionArgs:"'info'", done:()=>G.badges&&G.badges.includes('brock'), items:{rarecandy:1}, rewardText:t('tutorial_step_badge_reward')},
+  // ── Phase 4 · Donjons ────────────────────────────────────────────────────
+  {id:'dungeon_intro', title:t('tutorial_step_dungeon_title')||'Les Jetons de donjon', desc:t('tutorial_step_dungeon_desc')||'Chaque capture rapporte des Jetons de donjon : ils servent à explorer les donjons (⛰).', how:()=>t('tutorial_step_dungeon_how')||'Capture un Pokémon pour gagner tes premiers jetons : la quête t\'en offre 100 pour entrer dans la Forêt de Jade.', actionLabel:t('tutorial_step_dungeon_action'), actionCall:'scrollToWin', actionArgs:"'win-currency'", done:()=>!!(G.wallet && G.wallet.dungeonTokens >= 1), progress:()=>({cur:((G.wallet&&G.wallet.dungeonTokens>=1)?1:0), max:1}), jd:100, rewardText:t('tutorial_step_dungeon_reward')},
+  {id:'dungeon_clear', title:t('tutorial_step_dungeon2_title')||'Explorer un donjon', desc:t('tutorial_step_dungeon2_desc')||'Les donjons (⛰ sur la carte) se paient en Jetons de donjon. Explore la Forêt de Jade !', how:()=>t('tutorial_step_dungeon2_how')||'Clique sur la Forêt de Jade puis sur « Explorer — [jetons] ».', actionLabel:t('tutorial_step_dungeon2_action'), actionCall:'clickLocation', actionArgs:"'viridianforest'", done:()=>((G.dungeonsExplored||0) >= 1), progress:()=>({cur:((G.dungeonsExplored||0)>=1)?1:0, max:1}), money:300, rewardText:t('tutorial_step_dungeon2_reward')},
+  // ── Phase 5 · Progression ────────────────────────────────────────────────
  ];
 }
+let _tutorialUpdating = false;
 function updateTutorialProgress(){
- const st=ensureTutorialState();
- for(const step of tutorialSteps()){
-  if(!st.completed[step.id] && step.done()) st.completed[step.id]=true;
-  if(st.completed[step.id]) tutorialGiveReward(step);
+ if(_tutorialUpdating) return;
+ _tutorialUpdating = true;
+ let changed = false;
+ try{
+  const st=ensureTutorialState();
+  for(const step of tutorialSteps()){
+   if(!st.completed[step.id] && step.done()){ st.completed[step.id]=true; changed=true; }
+   if(st.completed[step.id]) tutorialGiveReward(step);
+  }
+  const allDone = tutorialSteps().every(step => st.completed[step.id]);
+  if(allDone && st.enabled){
+   st.enabled = false;
+   changed = true;
+  }
+ } finally {
+  _tutorialUpdating = false;
  }
- const allDone = tutorialSteps().every(step => st.completed[step.id]);
- if(allDone && st.enabled){
-  st.enabled = false;
+ if(changed){
   try{ saveGame(); }catch(_){}
+  // Re-render immédiat de la fenêtre Quêtes pour que la carte avance
+  // (sans ça, la quête semble « ne pas se valider »).
+  try{ renderStoryWindow(); }catch(_){}
  }
 }
 function currentTutorialStep(){ updateTutorialProgress(); const st=ensureTutorialState(); return tutorialSteps().find(step=>!st.completed[step.id]) || null; }
@@ -118,13 +155,24 @@ function tutorialQuestModel(){
  const step=currentTutorialStep();
  if(!step){ st.enabled=false; try{ saveGame(); }catch(_){} return null; }
  const idx=steps.findIndex(s=>s.id===step.id)+1;
+ // Progression de L'ÉTAPE COURANTE (comme les autres quêtes : 3/5…).
+ let prog = null;
+ if(typeof step.progress === 'function'){
+  try{
+   const p = step.progress();
+   if(p && typeof p.max === 'number' && p.max > 0){
+    prog = { cur: Math.max(0, Math.min(p.max, Number(p.cur)||0)), max: p.max };
+   }
+  }catch(_){}
+ }
  return {
   badge: tr('tutorial_step_lbl',{idx:idx,total:steps.length}),
   title: step.title,
   desc: step.desc,
   howLabel: t('tutorial_howto'),
   how: step.how(),
-  pct: Math.round(doneCount/steps.length*100),
+  progressText: prog ? tr('tutorial_step_progress_lbl', { cur: prog.cur, max: prog.max }) : '',
+  pct: prog ? Math.round(prog.cur/prog.max*100) : Math.round(doneCount/steps.length*100),
   actions: [
    ...(step.actionCall?[{label:step.actionLabel||t('tutorial_do_btn'), call:step.actionCall, callArgs:step.actionArgs||'', primary:true}]:[]),
    { label: t('guide_title')||'Guide', call:'openFullscreenPanel', callArgs:"'guide'" },
@@ -231,6 +279,13 @@ function guideSections(){
    [(typeof t==='function'?t('guide_training_prep'):(typeof t==='function'?t('guide_training_prep'):'Preparation')),(typeof t==='function'?t('guide_training_prep_desc'):'Les objets tenus, les talents, les EV et l’ordre d’équipe comptent beaucoup plus ici que dans les combats sauvages classiques.')],
    [(typeof t==='function'?t('guide_rewards'):'Rewards'),(typeof t==='function'?t('guide_atoll_rewards_desc'):'Les victoires donnent des jetons Atoll utilisables dans la boutique dédiée. Les séries augmentent l’intérêt du farm.')]
   ]},
+  dungeon:{icon:(typeof getIcon==='function'?getIcon('dungeon',14):''), title:t('guide_dungeon_title')||'Donjons', pages:[
+   [(typeof t==='function'?t('guide_dungeon_goal'):'Objectif'),(typeof t==='function'?t('guide_dungeon_goal_desc'):'Les donjons sont des expéditions payées en jetons. Une forêt n’a qu’un niveau ; une grotte en compte plusieurs. Sur chaque niveau, une carte à explorer : combats, coffres, boss, échelle pour descendre.')],
+   [(typeof t==='function'?t('guide_dungeon_map'):'Lire la carte'),(typeof t==='function'?t('guide_dungeon_map_desc'):'La carte se lit comme une légende : la pokéball violette est un combat, la pokéball étoilée orange un combat corsé, le coffre doré un trésor, le boss rouge le gardien, l’échelle bleue la sortie. Le brouillard cache ce qui reste à découvrir.')],
+   [(typeof t==='function'?t('guide_dungeon_move'):'Se déplacer'),(typeof t==='function'?t('guide_dungeon_move_desc'):'Clique une case visible pour t’y téléporter, le boss compris. Les flèches font avancer d’une case. Le boss est protégé par des combats : bats-les pour l’atteindre.')],
+   [(typeof t==='function'?t('guide_dungeon_floor'):'Butin'),(typeof t==='function'?t('guide_dungeon_floor_desc'):'Chaque victoire remplit le sac et le butin s’affiche sous la carte. Quand tu veux repartir, « Remonter et encaisser » rassemble tout ce que tu as récolté.')],
+   [(typeof t==='function'?t('guide_dungeon_auto'):'Pilote automatique'),(typeof t==='function'?t('guide_dungeon_auto_desc'):'Une fois le donjon complété plusieurs fois, le mode auto se débloque avec trois options : foncer vers le boss, explorer tout le plateau, ou ne ramasser que les coffres.')]
+  ]},
   base:{icon:(typeof getIcon==='function'?getIcon('base',14):'🏠'), title:t('guide_base_title')||((G&&G.lang==='en')?'Secret Bases':'Bases Secrètes'), pages:(G&&G.lang==='en')?[
    ['Unlocking','Secret Bases unlock in Hoenn after the Route 111 desert quest. The Secret Base window then appears in the middle column of the dashboard.'],
    ['Establishing your base','On many Hoenn routes, the Location window offers to examine the alcove and establish your base there. Each route has its own canonical room (cave, tree or shrub).'],
@@ -257,10 +312,30 @@ function setGuideSection(section){ _guideSection = section || null; const el=doc
  * Guide panel model — localized HERE (classic adapter). Same unlock
  * filtering as before: locked features never leak a dead card.
  */
+/** PASSE 38c — la rubrique Donjon du guide devient visible dès que le joueur
+ *  a la quête du PREMIER donjon (Forêt de Jade, débloquée au tout début de
+ *  l'aventure) : dès qu'un donjon est déverrouillé sur la carte, la page est
+ *  là. */
+function dungeonGuideUnlocked(){
+  try{
+    const G = globalThis.G;
+    if(!G || !G.unlockedLocs) return false;
+    for(const id in G.unlockedLocs){
+      if(!G.unlockedLocs[id]) continue;
+      try{
+        const loc = (typeof getLocObj === 'function') ? getLocObj(id) : null;
+        if(loc && loc.type === 'dungeon') return true;
+      }catch(_e){}
+    }
+    return false;
+  }catch(_e){ return false; }
+}
+
 function guidePanelModel(){
  const sections=guideSections();
  const unlockedSections = {};
  for(const [id, sec] of Object.entries(sections)){
+  if(id === 'dungeon' && !dungeonGuideUnlocked()) continue;
   if(id === 'mine' && typeof mineUnlocked === 'function' && !mineUnlocked()) continue;
   if(id === 'hatchery' && typeof hatcheryUnlocked === 'function' && !hatcheryUnlocked()) continue;
   if(id === 'training' && typeof trainingUnlocked === 'function' && !trainingUnlocked()) continue;
@@ -305,6 +380,8 @@ function installTutorialHooks(){
  wrap('openBoxPokeModal', ()=>{ tutorialMark('open_poke_sheet'); });
  wrap('exploreArea', ()=>{ updateTutorialProgress(); });
  wrap('renderMap', ()=>{ updateTutorialProgress(); });
+ wrap('pickBallForFilter', ()=>{ updateTutorialProgress(); }); // tuto : poser la Poké Ball
+ wrap('scrollToWin', ([winId])=>{ if(winId==='win-pokeballs') tutorialMark('honor_ball_intro'); });
 }
 setTimeout(installTutorialHooks, 500);
 
@@ -334,6 +411,7 @@ if (typeof tutorialRewardAlreadyPaid !== 'undefined') { if (typeof window !== 'u
 if (typeof tutorialSteps !== 'undefined') { if (typeof window !== 'undefined') window.tutorialSteps = tutorialSteps; if (typeof globalThis !== 'undefined') globalThis.tutorialSteps = tutorialSteps; }
 if (typeof updateTutorialProgress !== 'undefined') { if (typeof window !== 'undefined') window.updateTutorialProgress = updateTutorialProgress; if (typeof globalThis !== 'undefined') globalThis.updateTutorialProgress = updateTutorialProgress; }
 if (typeof guidePanelModel !== 'undefined') { if (typeof window !== 'undefined') window.guidePanelModel = guidePanelModel; if (typeof globalThis !== 'undefined') globalThis.guidePanelModel = guidePanelModel; }
+if (typeof dungeonGuideUnlocked !== 'undefined') { if (typeof window !== 'undefined') window.dungeonGuideUnlocked = dungeonGuideUnlocked; if (typeof globalThis !== 'undefined') globalThis.dungeonGuideUnlocked = dungeonGuideUnlocked; }
 if (typeof tutorialQuestModel !== 'undefined') { if (typeof window !== 'undefined') window.tutorialQuestModel = tutorialQuestModel; if (typeof globalThis !== 'undefined') globalThis.tutorialQuestModel = tutorialQuestModel; }
 
 // Wave 41 — native ESM module: exports the same names as the
@@ -348,6 +426,9 @@ export {
   tutorialSteps,
   updateTutorialProgress,
   guidePanelModel,
+  dungeonGuideUnlocked,
   tutorialQuestModel,
 };
+
+
 

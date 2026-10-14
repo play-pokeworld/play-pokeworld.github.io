@@ -122,3 +122,104 @@ if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.regis
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('exportSave', exportSave); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('importSave', importSave); } catch (_) {} }
 
+
+
+// ── DORM-06 — consommables (vitamines, bouchons, capsules) ───────────────
+const _CONS_STATS = ['hp','atk','def','spa','spd','spe'];
+function _consEnsure(p){
+ if(!p) return;
+ if(!p.evs) p.evs = {hp:0, atk:0, def:0, spa:0, spd:0, spe:0};
+ if(!p.ivs) p.ivs = {hp:0, atk:0, def:0, spa:0, spd:0, spe:0};
+}
+function applyConsumableToPoke(p, key){
+ const itm = (typeof ITEMS !== 'undefined' && ITEMS[key]) ? ITEMS[key] : null;
+ if(!p || !itm) return false;
+ const cat = itm.category;
+ if(cat === 'vitamin'){
+  // Décision joueur : les vitamines donnent UNIQUEMENT des EV (+1 aléatoire).
+  // Les IV se montent via les Capsules (bottle_cap / golden_bottle_cap).
+  _consEnsure(p);
+  const evTotal = _CONS_STATS.reduce((a,s)=>a+(Number(p.evs[s])||0), 0);
+  const evCands = _CONS_STATS.filter(s => (p.evs[s]||0) < 18 && evTotal < 36);
+  if(evCands.length) p.evs[evCands[Math.floor(Math.random()*evCands.length)]]++;
+  if(typeof recalcPokeStats === 'function') recalcPokeStats(p);
+  return true;
+ }
+ if(cat === 'iv_boost'){
+  _consEnsure(p);
+  const ivCands = _CONS_STATS.filter(s => (p.ivs[s]||0) < 12);
+  if(ivCands.length) p.ivs[ivCands[Math.floor(Math.random()*ivCands.length)]]++;
+  if(typeof recalcPokeStats === 'function') recalcPokeStats(p);
+  return true;
+ }
+ if(cat === 'iv_boost_all'){
+  _consEnsure(p);
+  for(const s of _CONS_STATS) if((p.ivs[s]||0) < 12) p.ivs[s]++;
+  if(typeof recalcPokeStats === 'function') recalcPokeStats(p);
+  return true;
+ }
+ if(cat === 'ability_reroll'){
+  if(typeof getSpeciesTalents === 'function'){
+   const pool = (getSpeciesTalents(p.id) || []).filter(t => t !== p.talent);
+   if(pool.length) p.talent = pool[Math.floor(Math.random()*pool.length)];
+  }
+  return true;
+ }
+ if(cat === 'ability_hidden'){
+  const nid = Number(p.id);
+  const ha = (typeof POKEMON_TALENTS !== 'undefined' && POKEMON_TALENTS[nid]) ? POKEMON_TALENTS[nid].hiddenAbility : null;
+  if(ha){
+   p.talent = ha;
+   try{ if(typeof unlockSpeciesHiddenAbility === 'function') unlockSpeciesHiddenAbility(nid, ha); }catch(_){}
+  }
+  return true;
+ }
+ return false;
+}
+function _consConsume(){
+ const key = G.pendingItemUseKey; if(!key) return false;
+ if((G.inventory[key]||0) < 1) return false;
+ G.inventory[key]--;
+ if(G.inventory[key] <= 0) delete G.inventory[key];
+ return true;
+}
+function useConsumableOnTeam(teamIdx){
+ const key = G.pendingItemUseKey; if(!key) return;
+ const p = G.team[teamIdx]; if(!p) return;
+ if(!_consConsume()) return;
+ const ok = applyConsumableToPoke(p, key);
+ saveGame();
+ notify(tr('consumable_used', {item:getItemName(key), name:p.name}), 'var(--accent)');
+ updateHeader();
+ renderTeamWindow();
+ const fsModal = document.getElementById('fullscreen-panel-modal');
+ if(fsModal && fsModal.style.display === 'flex'){
+  const fsContent = document.getElementById('fs-panel-content');
+  if(fsContent){ const fsTitle = document.getElementById('fs-panel-title');
+   if(fsTitle && (fsTitle.textContent.includes('Sac') || fsTitle.textContent.includes('Bag'))) renderInventory(fsContent); }
+ }
+ if(!ok) notify(t('consumable_no_effect'), 'var(--red)');
+ G.pendingItemUseKey = null;
+}
+function useConsumableOnBox(boxId){
+ const key = G.pendingItemUseKey; if(!key) return;
+ const p = G.collection[boxId] || G.collection[String(boxId)]; if(!p) return;
+ if(!_consConsume()) return;
+ const ok = applyConsumableToPoke(p, key);
+ saveGame();
+ notify(tr('consumable_used', {item:getItemName(key), name:p.name}), 'var(--accent)');
+ updateHeader();
+ renderTeamWindow();
+ const fsModal = document.getElementById('fullscreen-panel-modal');
+ if(fsModal && fsModal.style.display === 'flex'){
+  const fsContent = document.getElementById('fs-panel-content');
+  if(fsContent){ const fsTitle = document.getElementById('fs-panel-title');
+   if(fsTitle && (fsTitle.textContent.includes('Sac') || fsTitle.textContent.includes('Bag'))) renderInventory(fsContent); }
+ }
+ if(!ok) notify(t('consumable_no_effect'), 'var(--red)');
+ G.pendingItemUseKey = null;
+}
+if (typeof applyConsumableToPoke !== 'undefined') { if (typeof window !== 'undefined') window.applyConsumableToPoke = applyConsumableToPoke; if (typeof globalThis !== 'undefined') globalThis.applyConsumableToPoke = applyConsumableToPoke; }
+if (typeof useConsumableOnTeam !== 'undefined') { if (typeof window !== 'undefined') window.useConsumableOnTeam = useConsumableOnTeam; if (typeof globalThis !== 'undefined') globalThis.useConsumableOnTeam = useConsumableOnTeam; }
+if (typeof useConsumableOnBox !== 'undefined') { if (typeof window !== 'undefined') window.useConsumableOnBox = useConsumableOnBox; if (typeof globalThis !== 'undefined') globalThis.useConsumableOnBox = useConsumableOnBox; }
+

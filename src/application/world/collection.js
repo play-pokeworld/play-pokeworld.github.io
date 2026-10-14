@@ -425,7 +425,7 @@ function findExistingPokemonBySpecies(speciesId){
 function giveIvBonusToExisting(existing){
   if(!existing) return null;
   if(!existing.ivs) existing.ivs = {hp:0,atk:0,def:0,spa:0,spd:0,spe:0};
-  const avail = ['hp','atk','def','spa','spd','spe'].filter(k => (existing.ivs[k]||0) < 6);
+  const avail = ['hp','atk','def','spa','spd','spe'].filter(k => (existing.ivs[k]||0) < 12);
   if(!avail.length) return null;
   const pick = avail[Math.floor(Math.random()*avail.length)];
   existing.ivs[pick] = (existing.ivs[pick]||0)+1;
@@ -599,4 +599,6 @@ export {
   locCompletion,
   boxedEntries,
 };
+
+
 

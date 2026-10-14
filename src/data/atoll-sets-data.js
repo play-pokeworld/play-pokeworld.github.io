@@ -18,10 +18,10 @@
 // Format compact :  id: [talent, item|0, [moves], profil]
 // ─────────────────────────────────────────────────────────────────────────────
 export const ATOLL_STAT_PROFILES = {
- // ENDGAME EXCEPTION (phase 23, validated by engine simulations): the Atoll
- // is the summit of the game — its trainers push budgets to 36 EV / 36 IV,
- // the maximum a player can legally reach in game (training 36 EV max,
- // hatchery 36 IV max). The rest of the story stays capped at 18/18.
+ // FIX-02 (échelle unique) : l'Atoll est le sommet du jeu — ses dresseurs
+ // utilisent exactement le maximum qu'un joueur peut atteindre légalement :
+ // 12 IV par stat (éclosion) et 18 EV par stat (entraînement), soit ×2,50.
+ // Le total EV est borné à 36 par Pokémon.
  phys:  { evs: { atk: 18, spe: 18 },          ivs: { atk: 12, spe: 12, hp: 12 } },
  spec:  { evs: { spa: 18, spe: 18 },          ivs: { spa: 12, spe: 12, hp: 12 } },
  tank:  { evs: { hp: 18, def: 9, spd: 9 },    ivs: { hp: 12, def: 12, spd: 12 } },
@@ -108,5 +108,7 @@ export const ATOLL_LEGENDARIES = [144, 145, 146, 150, 151, 243, 244, 245, 249, 2
 if (typeof globalThis !== 'undefined') globalThis.ATOLL_STAT_PROFILES = ATOLL_STAT_PROFILES;
 if (typeof globalThis !== 'undefined') globalThis.ATOLL_SETS = ATOLL_SETS;
 if (typeof globalThis !== 'undefined') globalThis.ATOLL_LEGENDARIES = ATOLL_LEGENDARIES;
+
+
 
 

@@ -2,24 +2,27 @@
  * PokéWorld UI — MarketView (rebuilt from zero on the ECS DS)
  *
  * The Pokémon market panel (fullscreen panel content): purchasable species
- * grouped by category (starters / fossils / rare / other). The classic
- * adapter buckets the species, localizes labels and shapes the model; the
- * view owns 100% of the markup.
+ * grouped by category (starters / fossils / rare / other), displayed as a
+ * GRID (like the shops). Each card shows the species sprite with a Poké Ball
+ * status indicator (empty / normal / golden) and a click-to-select contract;
+ * the actual purchase happens through the bottom bar (market-panel.js).
  *
  * Kept contracts (classic layer + harness drive them):
- *   - one card per species: `.shop-item` with data-action="legacy-call",
- *     data-call="buyPokemon", data-call-args="<speciesId>" (numeric),
+ *   - one card per species: `.shop-item .pw-market-row` with
+ *     data-action="legacy-call", data-call="selectMarketPokemon",
+ *     data-call-args="<speciesId>" (numeric),
  *   - `.pw-empty-state-lg` empty state,
  *   - unseen species show "???" (localization is language-free by nature),
  *   - owned species get the `pw-text-sm pw-green` "bought" line,
- *   - the money row lives OUTSIDE (fs-panel-filters slot, DS MoneyRow).
+ *   - the money/currency row lives OUTSIDE (fs-panel-filters slot).
  *
  * Model (labels pre-localized by the adapter):
  * {
  *   emptyLabel: string,
+ *   selectedId: number|null,
  *   categories: [{ key, label, cards: [{
- *     id, name, numLabel, typesHtml, bstLabel, priceLabel,
- *     ownedLabel|null, spriteHtml,
+ *     id, name, numLabel, typesHtml, priceLabel,
+ *     ownedLabel|null, ballSrc, spriteHtml,
  *   }] }],
  * }
  *
@@ -43,20 +46,8 @@ export class MarketView extends UIView {
     return h('div', { class: 'pw-market-list' },
       ...cats.map((cat) => [
         h('div', { class: 'pw-manage-title pw-market-cat' }, cat.label || ''),
-        ...cat.cards.filter(Boolean).map((card) => h('div', {
-          class: 'shop-item pw-manage-card pw-market-row',
-          dataset: { action: 'legacy-call', call: 'buyPokemon', callArgs: String(card.id) },
-        },
-          h('div', { class: 'pw-manage-orb' },
-            h('div', { class: 'pw-manage-sprite' }, h.raw(card.spriteHtml || ''))),
-          h('div', { class: 'pw-flex-1' },
-            h('div', { class: 'pw-manage-name' },
-              card.name || '',
-              ' ',
-              h('span', { class: 'pw-manage-sub' }, card.numLabel || '')),
-            h('div', { class: 'pw-manage-desc' }, h.raw(card.typesHtml || ''), ` · ${card.bstLabel || ''}`),
-            card.ownedLabel ? h('div', { class: 'pw-text-sm pw-green' }, card.ownedLabel) : null),
-          h('div', { class: 'pw-manage-level' }, card.priceLabel || ''))),
+        h('div', { class: 'pw-market-grid' },
+          ...cat.cards.filter(Boolean).map((card) => marketCardVNode(m, card))),
       ]).flat());
   }
 
@@ -68,7 +59,7 @@ export class MarketView extends UIView {
   }
 
   /**
-   * DOM-free serialization for the classic adapter (market.js).
+   * DOM-free serialization for the classic adapter (market-panel.js).
    * @param {Object} model
    * @returns {string}
    */
@@ -77,5 +68,24 @@ export class MarketView extends UIView {
     view.enter();
     return toHTMLString(view.buildView());
   }
+}
+
+function marketCardVNode(m, card) {
+  const selected = String(card.id) === String(m.selectedId);
+  return h('div', {
+    class: 'shop-item pw-manage-card pw-market-row' + (selected ? ' selected' : ''),
+    dataset: { action: 'legacy-call', call: 'selectMarketPokemon', callArgs: String(card.id) },
+  },
+    h('div', { class: 'pw-manage-orb pw-market-orb' },
+      h('div', { class: 'pw-manage-sprite' }, h.raw(card.spriteHtml || '')),
+      card.ballSrc ? h('img', { class: 'pw-market-ball', src: card.ballSrc, alt: '' }) : null),
+    h('div', { class: 'pw-flex-1' },
+      h('div', { class: 'pw-manage-name' },
+        card.name || '',
+        ' ',
+        h('span', { class: 'pw-manage-sub' }, card.numLabel || '')),
+      h('div', { class: 'pw-manage-desc' }, h.raw(card.typesHtml || '')),
+      card.ownedLabel ? h('div', { class: 'pw-text-sm pw-green' }, card.ownedLabel) : null),
+    h('div', { class: 'pw-manage-level pw-market-price' }, h.raw(card.priceLabel || '')));
 }
 

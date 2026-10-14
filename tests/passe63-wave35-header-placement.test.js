@@ -88,3 +88,5 @@ test('wave 35: les trois panneaux de gestion partagent UNE seule coque', () => {
   assert.ok(view.includes('panelHeaderVNode'), 'l’en-tête vient du constructeur partagé');
   assert.ok(/management-shell management-\$\{m\.machine\}/.test(view), 'une coque unique paramétrée par machine');
 });
+
+

@@ -402,3 +402,5 @@ export const L_pokemon_names_fr = [
 // gardée sur l'objet global pour les registres (data.js) et les harnais VM.
 if (typeof globalThis !== 'undefined') globalThis.L_pokemon_names_fr = L_pokemon_names_fr;
 
+
+

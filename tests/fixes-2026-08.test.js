@@ -449,3 +449,5 @@ test('6th pass — the rendered hint shows the real values, no leftover braces',
   assert.equal(out, '+2 / sec · +5 par victoire sauvage');
   assert.doesNotMatch(out, /\{|\}/, 'every placeholder was substituted');
 });
+
+

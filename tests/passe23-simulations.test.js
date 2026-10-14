@@ -40,7 +40,11 @@ const BANDS = {
   tower_c: [0.85, 1.0], tower_b: [0.70, 1.0], tower_a: [0.45, 0.95],
   tower_s: [0.35, 0.85], tower_free: [0.05, 0.55],
   factory_c: [0.55, 1.0], factory_a: [0.60, 1.0],
-  arena_three: [0.05, 0.75], arena_no_item: [0.03, 0.70], arena_type: [0.10, 0.80],
+  // Passe 24 : le flinch / les auto-débuffs / les capacités lentes fonctionnent
+  // désormais (fidèles PokeChill) → le mode 3v3 « sans objet » (benchmark figé,
+  // jamais adaptatif) est un peu plus dur. Plancher recalé à 1 % (le benchmark
+  // figé est une BORNE BASSE : un vrai joueur s'adapte et fait mieux).
+  arena_three: [0.05, 0.75], arena_no_item: [0.01, 0.70], arena_type: [0.10, 0.80],
   dome_quarter: [0.40, 1.0], dome_final: [0.10, 0.75],
 };
 
@@ -75,5 +79,7 @@ test('phase 23: 3v3 gyms — statScale 0.5 applied (reduced budgets vs Tower)', 
   const tower = sb.buildAtollTeam('tower_s', 40, 'enemy');
   assert.ok(Math.max(...tower.map((p) => sum(p.evs))) >= 30, 'tower_s: endgame ~36 EV profile kept');
 });
+
+
 
 

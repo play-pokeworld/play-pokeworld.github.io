@@ -63,6 +63,23 @@ export class SettingsModalView extends UIView {
                 dataset: { themeBtn: s.theme, action: 'set-theme', themeValue: s.theme },
               }, s.label))))
         : null,
+      // ── Combat / animations ──────────────────────────────────────────
+      m.combat
+        ? h('div', { class: 'settings-section' },
+            h('h3', null, m.combat.heading),
+            h('button', {
+              type: 'button',
+              class: 'hbtn',
+              dataset: { action: 'legacy-call', call: 'toggleCaptureAnimations', callArgs: '' },
+            }, (m.combat.animationsOn ? '✔ ' : '✖ ') + m.combat.animationsLabel),
+            // P3 · ANI-01 — un seul interrupteur coupe TOUS les retours visuels.
+            h('button', {
+              type: 'button',
+              class: 'hbtn',
+              id: 'ui-animations-toggle',
+              dataset: { action: 'legacy-call', call: 'toggleUiAnimations', callArgs: '' },
+            }, (m.combat.uiFxOn ? '✔ ' : '✖ ') + (m.combat.uiFxLabel || '')))
+        : null,
       // ── Save profile (skeleton — updateSaveProfileControls fills it) ──
       h('div', { class: 'settings-section', id: 'save-profile-section' },
         h('h3', { id: 'save-profile-heading' }),
@@ -123,4 +140,6 @@ export class SettingsModalView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+
+
 

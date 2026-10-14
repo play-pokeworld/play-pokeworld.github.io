@@ -108,9 +108,37 @@ function getNpcButtonStatus(G, locId, npc, ni, npcName) {
   const st = getNpcButtonStatus(G, G.location, npc, ni, npcName);
   model.actions.push({ kind: 'button', cls: st.cls, iconHtml: uiIcon('npc', '•'), label: st.badge + npcName, call: 'openNpc', callArgs: "'" + G.location + "'," + ni });
  });
+ // PASSE 32 — donjons : état de l'expédition en cours dans CE lieu.
+ const dgRun = (typeof dungeonRunSummary === 'function') ? dungeonRunSummary() : null;
+ const dgHere = !!(dgRun && dgRun.loc === G.location);
  if(canExplore){
-  model.actions.push({ kind: 'button', iconHtml: uiIcon('explore', '•'), label: t('explore_btn'), call: 'exploreArea', callArgs: '' });
+  // P0 — donjon : le bouton affiche le tarif avec le SPRITE de la monnaie.
+  let exploreLabel = t('explore_btn');
+  let exploreLabelHtml = null;
+  if(loc.type === 'dungeon' && typeof dungeonToll === 'function'){
+   const toll = dungeonToll(loc.badgeReq || 0);
+   // PASSE 32 — le péage n'est dû qu'à l'OUVERTURE de l'expédition : une fois
+   // la descente en cours, les combats du donjon sont gratuits.
+   if(dgHere){
+    exploreLabelHtml = null;
+    exploreLabel = tr('dungeon_fight_btn', { floor: String(dgRun.floor) });
+   } else if(toll > 0){
+    // PASSE 39 — les forêts n'ont qu'UN niveau : pas de « (N paliers) ».
+    const dgDepth = (typeof dungeonDepthFor === 'function') ? dungeonDepthFor(loc.badgeReq || 0, G.location) : 1;
+    exploreLabelHtml = (dgDepth > 1
+        ? tr('dungeon_enter_btn', { depth: String(dgDepth) })
+        : tr('dungeon_enter_btn_single'))
+     + ' — <img src="src/assets/images/currency/dungeonToken.svg" alt="" style="width:14px;height:14px;vertical-align:-2px;"> ' + formatNumber(toll);
+   }
+  }
+  model.actions.push({ kind: 'button', cls: dgHere ? 'pw-loc-dungeon-btn' : null, iconHtml: uiIcon('explore', '•'), label: exploreLabel, labelHtml: exploreLabelHtml, call: 'exploreArea', callArgs: '' });
  }
+ // PASSE 33 — le suivi d'expédition (palier, quota, sac, descendre/remonter)
+ // a été DÉPLACÉ dans la fenêtre de COMBAT (#battle-dungeon-bar) : « le fait
+ // que l'affichage soit dans la fenêtre lieu et non dans celle de combat est
+ // un problème ». La fenêtre LIEU ne garde donc que l'entrée en donjon ; le
+ // pilotage de l'expédition se fait entièrement depuis le bandeau de combat.
+ // `model.dungeonRun` n'est plus alimenté (le rendu associé devient inerte).
  if(typeof getPuzzlesForLocation === 'function'){
   const puzzlesHere = getPuzzlesForLocation(G.location) || [];
   if(puzzlesHere.length){
@@ -364,7 +392,7 @@ function renderSpecialFormsPanel(el, panelKey){
     filterBar.style.display = 'flex';
     filterBar.style.alignItems = 'center';
     filterBar.style.justifyContent = 'flex-end';
-    _pwSetHtmlSafe(filterBar, `<span class="pw-text-sm pw-light2">${t('money')}: <b class="pw-text-md pw-light2">${G.money.toLocaleString()}₽</b></span>`);
+    _pwSetHtmlSafe(filterBar, `<span class="pw-text-sm pw-light2">${t('money')}: <b class="pw-text-md pw-light2">${formatNumber(G.money)}₽</b></span>`);
   }
   // Condition: the base species must be in the PC box (not the team).
   // Until this is the case, the form buttons are not shown —
@@ -393,7 +421,7 @@ function renderSpecialFormsPanel(el, panelKey){
       owned: owned,
       ownedText: en ? `${t('bought')} — form already obtained, it awaits you in the PC Box.` : `${t('bought')} — forme déjà obtenue, elle vous attend dans la Boîte PC.`,
       descText: en ? 'Stabilized form, delivered straight to the PC Box.' : 'Forme stabilisée, livrée directement dans la Boîte PC.',
-      sideText: owned ? '✓' : f.price.toLocaleString()+'₽',
+      sideText: owned ? '✓' : formatNumber(f.price)+'₽',
       callArgs: f.id + ',' + f.price,
     };
   });
@@ -480,7 +508,7 @@ function buySpecialFormPokemon(id, price){
     }
     if (existing && Math.random() < 0.1) {
       if (!existing.ivs) existing.ivs = {hp:0,atk:0,def:0,spa:0,spd:0,spe:0};
-      const avail = ['hp','atk','def','spa','spd','spe'].filter(k => (existing.ivs[k]||0) < 6);
+      const avail = ['hp','atk','def','spa','spd','spe'].filter(k => (existing.ivs[k]||0) < 12);
       if (avail.length) {
         const pick = avail[Math.floor(Math.random()*avail.length)];
         existing.ivs[pick] = (existing.ivs[pick]||0)+1;
@@ -504,7 +532,7 @@ function buySpecialFormPokemon(id, price){
   try { if (typeof renderTeamWindow === 'function') renderTeamWindow(); } catch(_){}
 
   const name = p.name || ('Pokemon #' + id);
-  if(typeof notify === 'function') notify(name + ' a été ajouté directement dans votre Boîte PC ! (-' + price.toLocaleString() + '₽)', 'var(--green)');
+  if(typeof notify === 'function') notify(name + ' a été ajouté directement dans votre Boîte PC ! (-' + formatNumber(price) + '₽)', 'var(--green)');
   // Refresh the open forms panel (marks "already obtained")
   try{
     const fsContent = document.getElementById('fs-panel-content');
@@ -531,4 +559,6 @@ export {
   renderDeoxysFormsPanel,
   buySpecialFormPokemon,
 };
+
+
 

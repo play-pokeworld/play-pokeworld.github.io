@@ -38,12 +38,25 @@ function startBattle(enemyPoke, isChamp, champId=null, champPokeList=null){
  }
  stopBattleTimer('battle', battle.timerId);
  
- for(const mp of G.team){
- mp.currentHP=mp.maxHP;
- mp.status=null;
- mp.statusTurns=0;
+ // PASSE 38e — DONJON : AUCUN soin en début de combat. Les PV persistent
+ // d'un engagement à l'autre pendant toute l'expédition — c'est la
+ // difficulté demandée (« pendant toute la durée du donjon l'équipe ne doit
+ // pas être heal »). Hors donjon, l'équipe est soignée comme avant ; le
+ // K.O. général reste l'échappatoire : la descente s'arrête, la moitié du
+ // sac est perdue, mais l'équipe n'est jamais perdue (soignée au combat
+ // suivant).
+ let _dgRunNow = null;
+ try { _dgRunNow = (typeof globalThis.currentDungeonRun === 'function') ? globalThis.currentDungeonRun() : null; } catch (_) {}
+ if (!(_dgRunNow && _dgRunNow.active)) {
+  for(const mp of G.team){
+   mp.currentHP=mp.maxHP;
+   mp.status=null;
+   mp.statusTurns=0;
+  }
  }
  battle.active=true;
+ // PASSE 33 — le bandeau d'expédition suit l'ouverture du combat.
+ try{ if(typeof renderBattleDungeonBar === 'function') renderBattleDungeonBar(); }catch(_){}
  battle.isChamp=isChamp;
  battle.champId=champId;
  battle.lastIsChamp=isChamp;
@@ -63,6 +76,10 @@ function startBattle(enemyPoke, isChamp, champId=null, champPokeList=null){
  battle.speed=battle.speed||1;
  battle.playerMods={atk:1,def:1,spe:1};
  battle.enemyMods={atk:1,def:1,spe:1};
+ battle.boostTurns={player:{},enemy:{}}; // DORM-04 — durées des boosts.
+ battle.berryEpoch = (battle.berryEpoch || 0) + 1; // DORM-06 — drapeaux « une fois par combat ».
+ battle.attacksOnCurrentEnemy = 0; battle.enemyTurnsOnField = 0; // balls spéciales (timer/quick).
+ battle.zTurns = 0; // DORM-06b — Cristaux Z (compteur de tours).
  battle.pMoveIdx=0;
  battle.eMoveIdx=0;
  battle.pendingLeave=false;
@@ -77,6 +94,11 @@ function startBattle(enemyPoke, isChamp, champId=null, champPokeList=null){
  
  battle.sessionCatches=[];
  battle.sessionItems={};
+ // PASSE 39 — argent gagné pendant CE combat (victoire sauvage + doublons),
+ // affiché dans le butin ; remis à zéro à chaque engagement.
+ battle.sessionMoney=0;
+ // PASSE 39 — jetons de donjon encaissés (résumé de sortie) ; zéro en combat.
+ battle.sessionTokens=0;
  try{ if (typeof renderBattleLoot === 'function') renderBattleLoot(); }catch(_){}
  try{ if (typeof renderBattleSummary === 'function') renderBattleSummary(); }catch(_){}
  }
@@ -97,6 +119,8 @@ function startBattle(enemyPoke, isChamp, champId=null, champPokeList=null){
  const idleScreen = document.getElementById('battle-idle-screen');
  const activeScene = document.getElementById('battle-active-scene');
  if(idleScreen) idleScreen.style.display = 'none';
+ // PASSE 29 (item 1) : le décor de combat suit le lieu, comme Pokechill.
+ try{ if(typeof applyLocationBackground === 'function') applyLocationBackground(); }catch(_){}
  if(activeScene){ activeScene.style.display = 'flex'; activeScene.classList.add('is-live'); } // wave 17: chrome (Résumé/Quitter) only exists while a battle is live (DS2817)
  clearBattleLog();
  G.pokedex[battle.enemyPoke.id]={...(G.pokedex[battle.enemyPoke.id]||{}),seen:true};
@@ -220,6 +244,10 @@ function effectiveSpeed(poke, mods){
    else if(hasTal('swiftswim') && (w === 'rainy' || w === 'rain')) s *= 1.5;
    else if(hasTal('sandrush') && (w === 'sand' || w === 'sandstorm')) s *= 1.5;
    else if(hasTal('slushrush') && (w === 'hail' || w === 'snow')) s *= 1.5;
+   else if(hasTal('moltshed') && (w === 'sunny' || w === 'sun')) s *= 1.5;
+   else if(hasTal('intangible') && w === 'somber') s *= 1.5;
+   else if(hasTal('faerush') && (typeof battle !== 'undefined' && battle && battle.terrain === 'misty')) s *= 1.5;
+   else if(hasTal('hyperconductor') && (typeof battle !== 'undefined' && battle && battle.terrain === 'electric')) s *= 1.5;
    else if(hasTal('quickfeet') && poke.status) s *= 1.5;
    else if(hasTal('unburden') && !poke.heldItem) s *= 1.5;
  }catch(_){}
@@ -230,13 +258,39 @@ function effectiveSpeed(poke, mods){
 function getMoveCooldownMultiplier(mv){
   if(!mv) return 1.0;
   const mvId = String(mv.id || '').toLowerCase();
-  if(mv.prio > 0 || mvId === 'quickattack' || mvId === 'extremespeed' || mvId === 'machpunch' || mvId === 'iceshard' || mvId === 'aquajet') {
-    return 0.5; // Fast move
+  const desc = String(mv.desc || '').toLowerCase();
+  // Fidèle PokeChill : « Attacks x1.2/x1.5 slower/faster than usual ».
+  const m = desc.match(/x([\d.]+)\s+(slower|faster)/);
+  if(m){
+    const v = parseFloat(m[1]);
+    if(Number.isFinite(v) && v > 0) return m[2] === 'faster' ? (1/v) : v;
   }
-  if(mv.recharge || mv.charge || mvId === 'hyperbeam' || mvId === 'solarbeam') {
-    return 2.0; // Slow move
-  }
+  // Capacités à charge / recharge (deux temps) : ×2.
+  if(mv.recharge || mv.charge) return 2.0;
+  // Capacités prioritaires : demi-cooldown.
+  if(mv.prio > 0 || mvId === 'quickattack' || mvId === 'extremespeed' || mvId === 'machpunch' || mvId === 'iceshard' || mvId === 'aquajet') return 0.5;
   return 1.0; // Normal move
+}
+
+// DORM-04 — talents de vitesse par famille de capacités (PokeChill) :
+// « exécutées ×1,5 plus vite » → cooldown divisé par 1,5.
+function moveSpeedTalentMult(poke, mv){
+  if(!poke || !mv) return 1;
+  const mvId = String(mv.id || '').toLowerCase();
+  const hasTal = (t) => (typeof hasTalent === 'function') ? hasTalent(poke, t) : (poke.talent === t);
+  const SOUND = ['alluring_voice','bug_buzz','chatter','disarming_voice','echoed_voice','growl','hyper_voice','metal_sound','noble_roar','relic_song','roar_of_time','screech','snarl','sparkling_aria'];
+  const DANCE = ['dragon_dance','feather_dance','fiery_dance','quiver_dance','revelation_dance','swords_dance'];
+  const WIND = ['fairy_wind','gust','hurricane','icy_wind','ominous_wind','silver_wind','tailwind'];
+  const SHARP = ['bitter_blade','cut','fury_cutter','leaf_blade','night_slash','psycho_cut','razor_leaf','razor_shell','razor_talons','slash','solar_blade','x_scissor'];
+  const type = (typeof MOVES !== 'undefined' && MOVES[mvId]) ? MOVES[mvId].type : (mv.type || '');
+  if(hasTal('galewings') && (type === 'Flying' || type === 'Bug')) return 1/1.5;
+  if(hasTal('prankster') && (type === 'Ghost' || type === 'Dark')) return 1/1.5;
+  if(hasTal('neuroforce') && (type === 'Psychic' || type === 'Fairy')) return 1/1.5;
+  if(hasTal('cacophony') && SOUND.indexOf(mvId) >= 0) return 1/1.5;
+  if(hasTal('dancer') && DANCE.indexOf(mvId) >= 0) return 1/1.5;
+  if(hasTal('windrider') && WIND.indexOf(mvId) >= 0) return 1/1.5;
+  if(hasTal('iaido') && SHARP.indexOf(mvId) >= 0) return 1/1.5;
+  return 1;
 }
 
 function getActivePlayerPoke(){
@@ -250,9 +304,40 @@ function getActivePlayerPoke(){
 function resetPlayerCd(){
   const p=getActivePlayerPoke();
   let baseCd=calcAttackCd(effectiveSpeed(p,battle.playerMods));
-  if(p && Array.isArray(p.moves) && p.moves.length > 0){
-    const nextMv = p.moves[battle.pMoveIdx % p.moves.length];
-    baseCd *= getMoveCooldownMultiplier(nextMv);
+  const lastId = (battle && battle.lastPlayerMoveId) ? battle.lastPlayerMoveId : null;
+  const usedMv = (p && lastId && typeof MOVES !== 'undefined' && MOVES[lastId]) ? MOVES[lastId] : null;
+  if(usedMv){
+    baseCd *= getMoveCooldownMultiplier(usedMv);
+    // DORM-02h — Vive Griffe : les capacités rapides s'exécutent encore
+    // plus vite (PokeChill).
+    const held = (typeof getHeldItemForPokemon === 'function') ? getHeldItemForPokemon(p) : (p && p.heldItem);
+    if(held === 'quick_claw' && getMoveCooldownMultiplier(usedMv) < 1){
+      const pow = (typeof heldItemPower === 'function') ? heldItemPower('quick_claw') : 1.15;
+      baseCd = Math.max(1, baseCd / Math.max(1, pow));
+    }
+    // DORM-04 — talents de vitesse par famille (galewings, prankster…).
+    baseCd *= moveSpeedTalentMult(p, usedMv);
+    // DORM-02h — Herbe Pouvoir : les capacités lentes s'exécutent aussitôt.
+    if(held === 'power_herb' && getMoveCooldownMultiplier(usedMv) > 1) baseCd /= getMoveCooldownMultiplier(usedMv);
+    // DORM-06 — baies de vitesse : Mepo (skip CD), Micle (×2 rapide), Chaipô (1er).
+    if(typeof berryHeld === 'function'){
+     const _bv = berryHeld(p);
+     if(_bv){
+      if(_bv.itm.category === 'skip_cd'){
+       const lvl = (typeof berryLevel === 'function') ? berryLevel(p, _bv.key, 'player') : 3;
+       const skipChance = (typeof berryPowerVal === 'function') ? berryPowerVal(_bv.key, lvl) : 0.15;
+       if((typeof chance === 'function') ? chance(skipChance * 100) : (Math.random() < skipChance)) baseCd = 100;
+      }
+      if(_bv.itm.category === 'pinch_fast' && p.currentHP < p.maxHP * 0.25 && (typeof berryUsed !== 'function' || !berryUsed(p, '_micleUsed'))){
+       baseCd = Math.max(100, baseCd / 2);
+       if(typeof berryMark === 'function') berryMark(p, '_micleUsed');
+      }
+      if(_bv.itm.category === 'pinch_first' && p.currentHP < p.maxHP * 0.25 && (typeof berryUsed !== 'function' || !berryUsed(p, '_custapUsed'))){
+       baseCd = 100;
+       if(typeof berryMark === 'function') berryMark(p, '_custapUsed');
+      }
+     }
+    }
   }
   battle.pCd=Math.round(baseCd);
   battle.pCdMax=battle.pCd;
@@ -262,9 +347,40 @@ function resetPlayerCd(){
 function resetEnemyCd(){
   const e=battle.enemyPoke;
   let baseCd=calcAttackCd(effectiveSpeed(e,battle.enemyMods));
-  if(e && Array.isArray(e.moves) && e.moves.length > 0){
-    const nextMv = e.moves[battle.eMoveIdx % e.moves.length];
-    baseCd *= getMoveCooldownMultiplier(nextMv);
+  const lastId = (battle && battle.lastEnemyMoveId) ? battle.lastEnemyMoveId : null;
+  const usedMv = (e && lastId && typeof MOVES !== 'undefined' && MOVES[lastId]) ? MOVES[lastId] : null;
+  if(usedMv){
+    baseCd *= getMoveCooldownMultiplier(usedMv);
+    // DORM-02h — Vive Griffe : idem côté ennemi (effet symétrique, aucune
+    // dépendance à l'inventaire du joueur).
+    const held = (typeof getHeldItemForPokemon === 'function') ? getHeldItemForPokemon(e) : (e && e.heldItem);
+    if(held === 'quick_claw' && getMoveCooldownMultiplier(usedMv) < 1){
+      const pow = 1.15; // valeur canonique NPC (jamais l'inventaire du joueur)
+      baseCd = Math.max(1, baseCd / Math.max(1, pow));
+    }
+    // DORM-04 — talents de vitesse par famille (symétrique côté ennemi).
+    baseCd *= moveSpeedTalentMult(e, usedMv);
+    // DORM-02h — Herbe Pouvoir : idem côté ennemi.
+    if(held === 'power_herb' && getMoveCooldownMultiplier(usedMv) > 1) baseCd /= getMoveCooldownMultiplier(usedMv);
+    // DORM-06 — baies de vitesse (côté ennemi, valeur canonique NPC).
+    if(typeof berryHeld === 'function'){
+     const _bv = berryHeld(e);
+     if(_bv){
+      if(_bv.itm.category === 'skip_cd'){
+       const lvl = (typeof berryLevel === 'function') ? berryLevel(e, _bv.key, 'enemy') : 3;
+       const skipChance = (typeof berryPowerVal === 'function') ? berryPowerVal(_bv.key, lvl) : 0.15;
+       if((typeof chance === 'function') ? chance(skipChance * 100) : (Math.random() < skipChance)) baseCd = 100;
+      }
+      if(_bv.itm.category === 'pinch_fast' && e.currentHP < e.maxHP * 0.25 && (typeof berryUsed !== 'function' || !berryUsed(e, '_micleUsed'))){
+       baseCd = Math.max(100, baseCd / 2);
+       if(typeof berryMark === 'function') berryMark(e, '_micleUsed');
+      }
+      if(_bv.itm.category === 'pinch_first' && e.currentHP < e.maxHP * 0.25 && (typeof berryUsed !== 'function' || !berryUsed(e, '_custapUsed'))){
+       baseCd = 100;
+       if(typeof berryMark === 'function') berryMark(e, '_custapUsed');
+      }
+     }
+    }
   }
   battle.eCd=Math.round(baseCd);
   battle.eCdMax=battle.eCd;
@@ -303,4 +419,6 @@ export {
   getMoveCooldownMultiplier,
   stopBattleTimer,
 };
+
+
 

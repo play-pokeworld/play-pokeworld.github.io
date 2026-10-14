@@ -113,3 +113,5 @@ export const MINE_ENERGY_REGEN = GAME.MINE.ENERGY_REGEN;
 if (typeof globalThis !== 'undefined') globalThis.MINE_ENERGY_REGEN = MINE_ENERGY_REGEN;
 if (typeof window !== 'undefined') window.MINE_ENERGY_REGEN = MINE_ENERGY_REGEN;
 
+
+

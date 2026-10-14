@@ -17,9 +17,9 @@ const tfKeys = new Set([...TF.matchAll(/^ {2}(\w+):\s*\{/gm)].map((m) => m[1]));
 
 let changedTotal = 0;
 
-// ——— 1) Generated pools (poke-talents-data.js) ———
+// ——— 1) Generated pools (poke-talents.js) ———
 {
-  const path = new URL('../src/data/poke-talents-data.js', import.meta.url);
+  const path = new URL('../src/data/poke-talents.js', import.meta.url);
   let src = readFileSync(path, 'utf8');
   let changed = 0;
   // JSON arrays "id":["a","b",…] → lowercase + dedupe (order preserved)
@@ -43,7 +43,7 @@ let changedTotal = 0;
     return `hiddenAbility="${low}"`;
   });
   if (changed) { writeFileSync(path, src); changedTotal += changed; }
-  console.log(`poke-talents-data.js : ${changed} id(s) normalisé(s)/dédupliqué(s)`);
+  console.log(`poke-talents.js : ${changed} id(s) normalisé(s)/dédupliqué(s)`);
 }
 
 // ——— 2) Abilities pinned in curated sets ———
@@ -72,5 +72,7 @@ for (const rel of ['../src/data/official-teams-data.js', '../src/data/atoll-sets
 }
 
 console.log(changedTotal ? `TOTAL : ${changedTotal}` : 'Nothing to normalize (already clean).');
+
+
 
 

@@ -68,11 +68,11 @@ test('wave 33 C: the legacy .pw-modal-* header geometry is deleted', () => {
 /* ── 3. Geometry lives in tokens, so no panel can silently drift ────── */
 test('wave 33 D: the header band is described by shared tokens only', () => {
   for (const token of [
-    '--pw-header-h: 48px',
-    '--pw-header-pad: 0 8px 0 14px',
+    '--pw-header-h: 34px',
+    '--pw-header-pad: 0 8px 0 10px',
     '--pw-header-radius: 10px',
-    '--pw-header-gap: 12px',
-    '--pw-header-title-size: 13px',
+    '--pw-header-gap: 8px',
+    '--pw-header-title-size: 12px',
     '--pw-header-close-size: 34px',
     '--pw-header-close-glyph: 17px',
   ]) assert.ok(DS.includes(token), `token defined: ${token}`);
@@ -186,3 +186,5 @@ test('wave 33 H: every header family MEASURES identically in a browser', (t) => 
   assert.match(out, /Toutes les familles d'en-tête mesurent à l'identique/,
     `browser measurement reported a divergence:\n${out}`);
 });
+
+

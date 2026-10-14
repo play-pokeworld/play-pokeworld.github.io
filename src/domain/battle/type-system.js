@@ -47,3 +47,5 @@ export function effectivenessText(multiplier, translate = (key) => key) {
 export { CHART as TYPE_CHART };
 
 
+
+

@@ -62,9 +62,17 @@ function generatePokeCardHTML(p, i, options = {}) {
     moveDragAttr = null,
     spriteTitle = null,
     moveInfoContextless = false,
+    // PASSE 29 (item 9) — gabarit Pokéchill complet : objet tenu + bonus.
+    // Réservé à la fenêtre Équipe ; la rangée de combat reste compacte.
   } = options;
 
-  const pct = p.currentHP / p.maxHP;
+  // PASSE 38f — la barre et le texte partagent les MÊMES PV affichés :
+  // « full hp » = barre pleine (les PV du moteur sont flottants, le ratio
+  // brut donnait 99,9 % qui oscillait avec la transition 0,3 s).
+  const _hpD = (typeof globalThis.hpDisplay === 'function') ? globalThis.hpDisplay : (v) => String(Math.max(1, Math.ceil(Number(v) - 1e-9)));
+  const _dc = Number(_hpD(p.currentHP));
+  const _dm = Number(_hpD(p.maxHP));
+  const pct = _dm > 0 ? Math.max(0, Math.min(1, _dc / _dm)) : 0;
   const hpClass = pct > 0.5 ? 'high' : pct > 0.2 ? 'medium' : 'low';
   const nextIdx = isEnemy
     ? ((battle.eMoveIdx || 0) % Math.max(1, (p.moves || []).length))
@@ -210,7 +218,29 @@ function generatePokeCardHTML(p, i, options = {}) {
     active: !!isActive,
     fainted: !!isFainted,
     shiny: !!p.shinyActive,
-    shinyStar: !!p.shinyActive,
+    // PASSE 32 — identité stable pour la réconciliation DOM. Elle repose sur
+    // l'`uid` du Pokémon (posé par `createPoke`) et non sur son index : la
+    // carte d'un Pokémon reste ainsi LE MÊME noeud d'un rendu à l'autre, même
+    // s'il passe du banc au poste actif. C'est la condition pour que la Poké
+    // Ball décorative garde sa rotation au lieu de se réinitialiser.
+    // Le camp est préfixé : un sauvage et un équipier ne se confondent jamais.
+    morphKey: (isEnemy ? 'enemy:' : 'team:') + (p.uid || ('id' + p.id + '_' + i)),
+    // PASSE 31 — item 7 : la carte du Pokémon SAUVAGE reçoit une classe propre.
+    // L'éclat de capture visait jusqu'ici `#battle-team-row .poke-card`, c.-à-d.
+    // la PREMIÈRE carte de la rangée — celle de notre Pokémon actif. On voyait
+    // donc clignoter le mauvais camp. Un repère explicite vaut mieux qu'un
+    // index positionnel, que le dresseur adverse décale déjà.
+    // PASSE 33 — le GARDIEN de donjon doit se voir : sa carte reçoit un
+    // repère de classe pour être encadrée distinctement du tout-venant.
+    extraClass: isEnemy ? ('pw-enemy-card' + (p.isDungeonBoss ? ' pw-dungeon-boss-card' : '')) : null,
+    // PASSE 31 — item 6 : l'étoile chromatique NE DOIT PLUS APPARAÎTRE EN
+    // COMBAT (consigne explicite, elle remplace celle de la passe 30 qui
+    // demandait de la rendre « signifiante »). L'information n'est pas perdue :
+    // la Poké Ball d'état ci-dessous distingue déjà « capturé » de « capturé
+    // chromatique », et le sprite lui-même est la version chromatique.
+    // On coupe la source côté MODÈLE, jamais en CSS : masquer un élément avec
+    // `display:none !important` laisse le JS le produire pour rien (piège 30.7).
+    shinyStar: false,
     sprite: {
       imgSrc: _pwCardSpriteSrc(p.id, !!p.shinyActive),
       emoji: p.emoji,
@@ -220,6 +250,12 @@ function generatePokeCardHTML(p, i, options = {}) {
       handlers: !noSpriteHandlers,
     },
     item: itemModel,
+    // PASSE 30 — item 6 : la Poké Ball d'état (capturé / capturé chromatique /
+    // non capturé) n'était rendue QUE pour le Pokémon sauvage — on ne la voyait
+    // donc jamais sur nos propres Pokémon. Elle est désormais rendue pour tout
+    // le monde, exactement comme dans la vue Équipe.
+    caughtBallHtml: (options.caughtBallHtml != null) ? options.caughtBallHtml
+      : ((typeof caughtStatusBallHtml === 'function') ? caughtStatusBallHtml(p.id, 16) : ''),
     name: (typeof getPokeName === 'function' ? getPokeName(p.id) : p.name),
     level: p.level,
     hp: { current: p.currentHP, max: p.maxHP, pct: Math.floor(pct * 100), cls: hpClass },
@@ -381,7 +417,16 @@ function renderBattleTeamRow() {
     }
   }
 
-  _pwSetHtmlSafe(row, html);
+  // PASSE 32 — item 1 : mise à jour CIBLÉE au lieu d'un remplacement total.
+  // « La page de combat entière se refresh au lieu de refresh uniquement les
+  //   bons éléments, ce qui donne que la Poké Ball se reset. »
+  // `pwMorphHtml` compare le balisage voulu au DOM en place et ne touche que
+  // ce qui a changé (texte des PV, largeur des barres, badges…). Les noeuds
+  // conservés gardent leurs animations CSS en cours d'exécution.
+  // Repli : si le module n'est pas chargé (harnais VM, tests unitaires
+  // ciblés), on retombe sur l'ancien comportement, strictement équivalent.
+  if (typeof globalThis.pwMorphHtml === 'function') globalThis.pwMorphHtml(row, html);
+  else _pwSetHtmlSafe(row, html);
 }
 
 
@@ -399,12 +444,46 @@ function renderBattleLoot() {
     return;
   }
 
-  const catches = battle.sessionCatches || [];
-  const itemEntries = Object.entries(battle.sessionItems || {}).filter(([, qty]) => Number(qty) > 0);
+  // PASSE 39e — UN SEUL rendu de butin pour TOUT le jeu (combats normaux,
+  // donjons, résumé modal) : on passe par le MÊME modèle (battleSummaryUIModel
+  // → getBattleSessionSummaryData, qui agrège TOUT le run en donjon) et la
+  // MÊME vue (SessionSummaryView.inlineHTML) que le résumé. Fini les deux
+  // butins différents, fini l'argent dupliqué (un seul total obtenu).
+  try {
+    const views = (typeof window !== 'undefined' && window.PokeUI && window.PokeUI.views) ? window.PokeUI.views : null;
+    if (views && typeof views.SessionSummaryView === 'function' && typeof globalThis.battleSummaryUIModel === 'function') {
+      const model = globalThis.battleSummaryUIModel();
+      _pwSetHtmlSafe(container, views.SessionSummaryView.inlineHTML(model));
+      return;
+    }
+  } catch (_) {}
 
-  if (!catches.length && !itemEntries.length) {
+  // Repli (harnais VM sans PokeUI) : mêmes puces, construites à partir des
+  // données UNIFIÉES (toute la session / tout le run en donjon).
+  let data = null;
+  try {
+    if (typeof globalThis.getBattleSessionSummaryData === 'function') data = globalThis.getBattleSessionSummaryData();
+  } catch (_) {}
+  const catches = data ? data.catches : ((battle && battle.sessionCatches) || []);
+  const itemEntries = data ? data.itemEntries
+    : Object.entries((battle && battle.sessionItems) || {}).filter(([, qty]) => Number(qty) > 0);
+  const money = data ? data.money : Number((battle && battle.sessionMoney) || 0);
+  const tokens = data ? data.tokens : 0;
+
+  if (!catches.length && !itemEntries.length && money <= 0 && tokens <= 0) {
     _pwSetHtmlSafe(container, '<div class="pw-text-sm pw-light1">' + (t('no_loot_yet') || 'Aucun butin récolté pour le moment.') + '</div>');
     return;
+  }
+
+  const parts = [];
+  // UN SEUL total d'argent (+N) — jamais « total ET dernier combat ».
+  if (money > 0) {
+    parts.push('<div class="loot-item loot-money" title="' + (t('battle_loot_money_title') || 'Argent gagné en combat') + '">' +
+      '<span class="loot-money-icon">₽</span><span class="loot-count">+' + formatNumber(money) + '</span></div>');
+  }
+  if (tokens > 0) {
+    parts.push('<div class="loot-item loot-money" title="' + (t('dungeon_loot_bag_tokens') || 'Jetons de donjon (sac)') + '">' +
+      '<span class="loot-money-icon">◆</span><span class="loot-count">' + formatNumber(tokens) + '</span></div>');
   }
 
   const lootCounts = {};
@@ -416,11 +495,11 @@ function renderBattleLoot() {
     lootCounts[key].count++;
   });
 
-  const parts = Object.values(lootCounts).map(item => {
-    return '<div class="loot-item" title="' + item.name + (item.shiny ? ' (Shiny)' : '') + '">' +
+  Object.values(lootCounts).forEach(item => {
+    parts.push('<div class="loot-item" title="' + item.name + (item.shiny ? ' (Shiny)' : '') + '">' +
       spriteImg(item.id, item.emoji, {shiny: item.shiny, size: 40}) +
       (item.count > 1 ? '<span class="loot-count">\u00d7' + item.count + '</span>' : '') +
-    '</div>';
+    '</div>');
   });
 
   itemEntries.forEach(([key, qty]) => {
@@ -464,4 +543,6 @@ export {
   trainerVisualHtml,
   trainerVisualModel,
 };
+
+
 

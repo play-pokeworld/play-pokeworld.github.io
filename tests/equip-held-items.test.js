@@ -52,7 +52,7 @@ function makeSandbox() {
   vm.createContext(sandbox);
   for (const f of [
     'src/data/moves.js', 'src/data/pd-data.js', 'src/data/items-data.js', 'src/data/items-helpers.js',
-    'src/data/poke-talents-data.js',
+    'src/data/poke-talents.js',
     'src/data/locations-data.js', 'src/data/locations-johto.js', 'src/data/game-helpers.js',
     'src/application/world/team.js', 'src/application/pokemon-factory.js',
     'src/ui/game/inventory.js', 'src/ui/game/team-ui.js',
@@ -126,11 +126,13 @@ test('getHeldBuff: choice_band/stat+mult active (dead branch repaired), prine_be
   sb.G.team[0].heldItem = 'choice_band';
   const buff = sb.getHeldBuff(sb.G.team[0]);
   assert.ok(Math.abs(buff.atk - 0.5) < 1e-9, `Choice Band → +50% ATK (canon), got ${buff.atk}`);
-  // Prine Berry: legacy buff system (3 units / 25 → +3% DEF)
+  // DORM-06 — Prine Berry (Lum) : plus de buff défensif legacy, effet « soigne tout ».
   sb.setTeamSlotItem(0, 'prine_berry');
   sb.G.team[0].heldItem = 'prine_berry';
   const buff2 = sb.getHeldBuff(sb.G.team[0]);
-  assert.ok(Math.abs(buff2.def - 0.25 * (3 / 25)) < 1e-9, `Prine Berry ×3 → +3% DEF, got ${buff2.def}`);
+  assert.equal(buff2.def, 0, 'Prine Berry : plus de +DEF legacy (Lum)');
 });
+
+
 
 

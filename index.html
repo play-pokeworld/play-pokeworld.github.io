@@ -20,8 +20,12 @@
 
 
 <div id="header">
-  <h1><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><circle cx="12" cy="12" r="3"/></svg></span><span>PokéWorld</span></h1>
-  <div class="hinfo pw-static-002"> <span id="h-money">1000</span>₽ &nbsp;|&nbsp;  <span data-i18n="badges_lbl">Badges</span>&nbsp;: <span id="h-badges">0</span>/<span id="h-badges-total">8</span></div>
+  <h1><span class="brand-mark"><!-- PASSE 38 : l'icône du joueur (Icon.png) remplace le pokéball SVG générique de la barre de titre. --><img src="src/assets/images/Icon.png" alt="PokéWorld" width="28" height="28"></span><span>PokéWorld</span></h1>
+  <!-- PASSE 28 - retour a l'entete d'origine : aucune devise ni energie de
+       mine dans la barre de titre (demande utilisateur). Seuls les badges
+       restent. #h-money est conserve masque : updateHeader() l'alimente
+       toujours et des tests historiques le referencent. -->
+  <div class="hinfo pw-static-002"><span data-i18n="badges_lbl">Badges</span>&nbsp;: <span id="h-badges">0</span>/<span id="h-badges-total">8</span><span id="h-money" hidden aria-hidden="true">0</span></div>
   <button class="hbtn icon-btn" id="settings-btn" data-action="open-settings" aria-label="" data-i18n-aria-label="settings_title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
 </div>
 
@@ -85,7 +89,7 @@
     
     <div id="win-story" class="dash-win pw-static-021">
       <div class="pw-win-hdr" data-drag-window="win-story">
-        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span><span id="story-win-title" class="pw-win-hdr-label" data-i18n="story_quests_title">Histoire & Quêtes</span></span>
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span><span id="story-win-title" class="pw-win-hdr-label" data-i18n="story_quests_title">Histoire & Quêtes</span></span>
         
       </div>
       <div class="win-body pw-static-022" id="story-panel"></div>
@@ -93,7 +97,7 @@
     
     <div id="win-team" class="dash-win pw-static-021">
       <div class="pw-win-hdr" data-drag-window="win-team">
-        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span><span id="team-win-title" class="pw-win-hdr-label" data-i18n="team_btn">Équipe Active</span></span>
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span><span id="team-win-title" class="pw-win-hdr-label" data-i18n="team_btn">Équipe Active</span></span>
         
       </div>
       <div id="team-window-body" class="win-body pw-static-022"></div>
@@ -101,7 +105,7 @@
     
     <div id="win-hatchery" class="dash-win pw-static-021">
       <div class="pw-win-hdr" data-drag-window="win-hatchery">
-        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3c-3.5 0-6 4.2-6 9 0 4.5 2.2 8 6 8s6-3.5 6-8c0-4.8-2.5-9-6-9z"/></svg></span><span id="hatchery-win-title" class="pw-win-hdr-label" data-i18n="hatchery_management_title">Pension & Couveuse</span></span>
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3c-3.5 0-6 4.2-6 9 0 4.5 2.2 8 6 8s6-3.5 6-8c0-4.8-2.5-9-6-9z"/></svg></span><span id="hatchery-win-title" class="pw-win-hdr-label" data-i18n="hatchery_management_title">Pension & Couveuse</span></span>
         
       </div>
       <div id="hatchery-window-body" class="win-body pw-static-022"></div>
@@ -110,7 +114,7 @@
     
     <div id="win-mine" class="dash-win pw-static-024">
       <div class="pw-win-hdr" data-drag-window="win-mine">
-        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3l7 7"/><path d="M4 20l7-7"/><path d="M14 3l-4 4 7 7 4-4"/><path d="M2 22l8-8"/></svg></span><span id="mine-win-title" class="pw-win-hdr-label" data-i18n="mine_window_title">Mine souterraine</span></span>
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3l7 7"/><path d="M4 20l7-7"/><path d="M14 3l-4 4 7 7 4-4"/><path d="M2 22l8-8"/></svg></span><span id="mine-win-title" class="pw-win-hdr-label" data-i18n="mine_window_title">Mine souterraine</span></span>
         
       </div>
       <div id="mine-window-body" class="win-body pw-static-025"></div>
@@ -122,20 +126,15 @@
     
     <div id="win-map" class="dash-win pw-static-027">
       <div class="pw-win-hdr" data-drag-window="win-map">
-        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span><!-- Wave 27: no data-i18n here. map_title_name contains a {region} placeholder
-     that the data-i18n label pass paints RAW (without interpolation), and two
-     real writers already own this node with the full interpolated title
-     (region.js: map_title_prefix + region name; map-render.js: tr(map_title_name)). -->
-<span id="map-win-title" class="pw-win-hdr-label">Carte</span></span>
-        <span class="pw-static-028">
+        <span class="pw-win-hdr-title"><span id="map-win-title" class="pw-win-hdr-label">Carte</span></span>
+        <span class="pw-static-028 map-region-wrap">
           <select id="map-region-select" data-stop-drag="true" data-action="switch-map-region" class="pw-static-029">
-            <option value="kanto" data-i18n="map_region_kanto">Région Kanto</option>
-            <option value="johto" data-i18n="map_region_johto">Région Johto</option>
-            <option value="hoenn" data-i18n="map_region_hoenn">Région Hoenn</option>
-            <option value="sinnoh" disabled data-force-disabled="true" data-i18n="map_region_sinnoh">Région Sinnoh (Bientôt)</option>
+            <option value="kanto" data-i18n="map_region_kanto">Kanto</option>
+            <option value="johto" data-i18n="map_region_johto">Johto</option>
+            <option value="hoenn" data-i18n="map_region_hoenn">Hoenn</option>
+            <option value="sinnoh" disabled data-force-disabled="true" data-i18n="map_region_sinnoh">Sinnoh (bientôt)</option>
           </select>
         </span>
-        
       </div>
       <div class="win-body pw-static-030" id="map-panel">
         <svg id="map-svg" viewBox="0 0 720 520" preserveAspectRatio="xMidYMid meet">
@@ -148,10 +147,20 @@
 
     <div id="win-battle" class="dash-win pw-static-031">
       <div class="pw-win-hdr" data-drag-window="win-battle">
-        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg></span><span id="battle-win-title" class="pw-win-hdr-label" data-i18n="win_battle">Combat en direct</span></span>
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg></span><span id="battle-win-title" class="pw-win-hdr-label" data-i18n="win_battle">Combat en direct</span></span>
         
       </div>
       <div class="win-body pw-static-032" id="battle-center-panel">
+        <!-- PASSE 33 — bandeau d'expédition. Retour joueur : « le fait que
+             l'affichage soit dans la fenêtre lieu et non dans celle de combat
+             est un problème ». Le suivi du donjon (palier, quota, sac, boutons
+             descendre / remonter / défier) vit donc ICI, dans la fenêtre de
+             COMBAT. Il est volontairement placé HORS de #battle-active-scene :
+             le combat s'arrête à chaque palier et `endBattle()` masque cette
+             scène ; le bandeau, lui, doit rester visible et cliquable pour
+             enchaîner. Masqué hors expédition. -->
+        <div id="battle-dungeon-bar" class="pw-battle-dungeon-bar" hidden></div>
+
         <div id="battle-idle-screen" class="pw-static-033">
           <div class="pw-static-034"><span class="idle-scene-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3z"/></svg></span></div>
           <div class="pw-static-035" data-i18n="idle_title">Exploration au repos</div>
@@ -160,26 +169,31 @@
 
         <div id="battle-active-scene" class="pw-static-037">
 
-          
           <div id="battle-team-row" class="team-container"></div>
           <!-- Wave 28 (user feedback): the extra move-buttons bar under the
                team row is REMOVED — the charge bars live directly ON the
                attack chips of the active card (they always did). The empty
                host confused everyone; renderMoveButtons() no-ops on the
                missing host. -->
-
           <div class="pw-static-038">
-            <div class="pw-static-039">
-              <div id="battle-loot-inline" class="pw-static-040"></div>
-              <div class="pw-static-041">
-                <div id="speed-toggle">
-                  <button data-spd="1" data-action="set-battle-speed" data-speed="1" class="hbtn active pw-static-042 speed-x1" style="display:none;">x1</button>
-                <button data-spd="10" data-action="set-battle-speed" data-speed="10" class="hbtn speed-x10 pw-static-043" style="display:none;">x10</button>
-                </div>
-                <button id="loot-open-btn" class="hbtn pw-static-044" data-action="open-battle-summary" data-i18n="loot_open_btn">Résumé</button>
-              </div>
-            </div>
             <button id="leave-btn" data-action="leave-battle" class="pw-static-045" data-i18n="leave_battle_btn">Quitter le combat</button>
+          </div>
+        </div>
+
+        <!-- PASSE 39e — UN SEUL butin/résumé pour TOUT le jeu : la réglette
+             #battle-loot-inline (la même que celle des combats normaux) vit
+             ICI, SOUS la carte de donjon. En expédition elle affiche le butin
+             de TOUT le run (captures, objets, argent, jetons cumulés) ; en
+             combat normal elle affiche la session du combat. Même composant,
+             mêmes données, même position par rapport à la carte. -->
+        <div class="pw-static-039" id="battle-loot-row">
+          <div id="battle-loot-inline" class="pw-static-040"></div>
+          <div class="pw-static-041">
+            <div id="speed-toggle">
+              <button data-spd="1" data-action="set-battle-speed" data-speed="1" class="hbtn active pw-static-042 speed-x1" style="display:none;">x1</button>
+              <button data-spd="10" data-action="set-battle-speed" data-speed="10" class="hbtn speed-x10 pw-static-043" style="display:none;">x10</button>
+            </div>
+            <button id="loot-open-btn" class="hbtn pw-static-044" data-action="open-battle-summary" data-i18n="loot_open_btn">Résumé</button>
           </div>
         </div>
       </div>
@@ -187,10 +201,9 @@
 
     <div id="win-base" class="dash-win">
       <div class="pw-win-hdr" data-drag-window="win-base">
-        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9.5L12 3l9 6.5"/><path d="M5 8.5V21h14V8.5"/><path d="M9 21v-6h6v6"/></svg></span><span id="base-win-title" class="pw-win-hdr-label" data-i18n="base.win.title">Base Secrète</span></span>
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9.5L12 3l9 6.5"/><path d="M5 8.5V21h14V8.5"/><path d="M9 21v-6h6v6"/></svg></span><span id="base-win-title" class="pw-win-hdr-label" data-i18n="base.win.title">Base Secrète</span></span>
         <span class="base-win-controls">
           <select id="base-layout-select" data-stop-drag="true" data-action="base-window-layout" style="display: none;"></select>
-          <button id="base-refresh-btn" type="button" class="hbtn" data-stop-drag="true" data-action="base-window-refresh">↻</button>
         </span>
       </div>
       <div class="win-body" id="base-panel">
@@ -219,17 +232,34 @@
     
     <div id="win-shortcuts" class="dash-win pw-static-046">
       <div class="pw-win-hdr" data-drag-window="win-shortcuts">
-        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></span><span id="shortcuts-win-title" class="pw-win-hdr-label" data-i18n="shortcuts_tab">Raccourcis</span></span>
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></span><span id="shortcuts-win-title" class="pw-win-hdr-label" data-i18n="shortcuts_tab">Raccourcis</span></span>
         
       </div>
       <div id="shortcuts-window-body" class="win-body pw-static-047"></div>
+    </div>
+    
+    <div id="win-currency" class="dash-win pw-static-021">
+      <div class="pw-win-hdr" data-drag-window="win-currency">
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-icon pw-hdr-pdollar" aria-hidden="true">₽</span><span id="currency-win-title" class="pw-win-hdr-label" data-i18n="panel_currency_title">Monnaies</span></span>
+        
+      </div>
+      <div id="currency-window-body" class="win-body pw-static-022"></div>
+    </div>
+    
+    <div id="win-pokeballs" class="dash-win pw-static-021">
+      <div class="pw-win-hdr" data-drag-window="win-pokeballs">
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><circle cx="12" cy="12" r="3"/></svg></span><span id="pokeballs-win-title" class="pw-win-hdr-label" data-i18n="panel_pokeballs_title">Poké Balls</span></span>
+        <button type="button" class="pw-win-tool-btn" data-stop-drag="true" data-action="legacy-call" data-call="openBallFilterEditor" data-call-args="" title="Paramètres des Poké Balls" aria-label="" data-i18n-aria-label="ball_settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
+        
+      </div>
+      <div id="pokeballs-window-body" class="win-body pw-static-022"></div>
     </div>
     
     
     
     <div id="win-tabs" class="dash-win pw-static-048">
       <div class="pw-win-hdr" data-drag-window="win-tabs">
-        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span id="loc-win-title" class="pw-win-hdr-label" data-i18n="tab_info">Lieu</span></span>
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span id="loc-win-title" class="pw-win-hdr-label" data-i18n="tab_info">Lieu</span></span>
         
       </div>
       <div id="right-panel" class="pw-static-049">
@@ -242,7 +272,7 @@
 
     <div id="win-training" class="dash-win pw-static-021">
       <div class="pw-win-hdr" data-drag-window="win-training">
-        <span class="pw-win-hdr-title"><span class="pw-win-hdr-grip" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6v12"/><path d="M18 6v12"/><path d="M3 9h6"/><path d="M15 9h6"/><path d="M3 15h6"/><path d="M15 15h6"/><path d="M9 12h6"/></svg></span><span id="training-win-title" class="pw-win-hdr-label" data-i18n="training_center_title">Salle d'Entraînement</span></span>
+        <span class="pw-win-hdr-title"><span class="pw-win-hdr-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6v12"/><path d="M18 6v12"/><path d="M3 9h6"/><path d="M15 9h6"/><path d="M3 15h6"/><path d="M15 15h6"/><path d="M9 12h6"/></svg></span><span id="training-win-title" class="pw-win-hdr-label" data-i18n="training_center_title">Salle d'Entraînement</span></span>
         
       </div>
       <div id="training-window-body" class="win-body pw-static-022"></div>
@@ -306,7 +336,10 @@
     <button class="hbtn pw-static-073" data-action="debug-base-add-npc" data-i18n="debug_base_npc">Base : +1 copain (équipe actuelle)</button>
     <button class="hbtn pw-static-200" data-action="debug-give-ct-cs" data-i18n="debug_ctcs">Obtenir CT/CS +1</button>
     <button class="hbtn pw-static-073" data-action="legacy-call" data-call="debugTimeSkip30Minutes" data-call-args="" data-i18n="debug_afk">AFK +10 min</button>
+    <button class="hbtn pw-static-073" data-action="debug-give-all-items" data-i18n="debug_all_items">Tous les objets +1</button>
+    <button class="hbtn pw-static-073" data-action="debug-show-all-items" data-i18n="debug_all_items_shown">Dictionnaire : tout afficher</button>
   <button id="debug-x10-toggle" class="hbtn pw-static-074" data-action="toggle-battle-speed-x10"><span data-i18n="debug_speed_x10">Vitesse x10 :</span> <span id="debug-x10-state">OFF</span></button>
+  <button id="debug-daytime-btn" class="hbtn pw-static-074" data-action="legacy-call" data-call="debugCycleDaytime" data-call-args=""><span data-i18n="debug_daytime">Cycle jour/nuit :</span> <span id="debug-daytime-state">AUTO</span></button>
   <button class="hbtn pw-static-073" data-action="legacy-call" data-call="deduplicateCollectionAndFixBox" data-call-args="" data-i18n="debug_dedup">Nettoyer doublons Boîte</button>
   </div>
   <button id="debug-toggle-btn" data-action="toggle-debug-menu" class="pw-static-075" data-i18n="debug_toggle_btn">Debug</button>
@@ -373,6 +406,8 @@
   </script>
 </body>
 </html>
+
+
 
 
 

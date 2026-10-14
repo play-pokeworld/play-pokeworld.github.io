@@ -35,6 +35,18 @@ import { pokemonSpriteVNode } from './sprite.js';
 import { h, toHTMLString } from '../../engine/render/vdom.js';
 import { cx } from './component-utils.js';
 
+/**
+ * PASSE 26o — les PV vivent en flottant côté moteur (dégâts fractionnaires du
+ * ticker 60 fps) : on n'affiche jamais `6.899999999999999`, on arrondit à
+ * l'entier supérieur (un Pokémon à 0.1 PV est encore debout, il doit lire 1).
+ */
+function hpNum(v) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return '?';
+  if (n <= 0) return '0';
+  return String(Math.max(1, Math.ceil(n - 1e-9)));
+}
+
 /** Dataset for an optional legacy click/context pair (order preserved). */
 function actionDataset(prefix, click, context) {
   const dataset = {};
@@ -99,6 +111,7 @@ export function pokeFullCardVNode(model = {}) {
         h('span', null,
           model.shinyStar ? h.raw('<span class="pw-shiny-star">★</span>') : null,
           model.name || '?'),
+        model.caughtBallHtml ? h.raw(model.caughtBallHtml) : null,
         h('span', { class: 'poke-level' }, `Nv.${model.level != null ? model.level : '?'}`)),
       h('div', { class: 'hp-bar-container' },
         h('div', { class: 'hp-bar' },
@@ -109,7 +122,7 @@ export function pokeFullCardVNode(model = {}) {
             dataset: { pct: String(model.hp ? Math.max(0, Math.min(100, Math.round(model.hp.pct || 0))) : 0) },
             style: { width: `${model.hp ? Math.max(0, Math.min(100, Math.round(model.hp.pct || 0))) : 0}%` },
           })),
-        h('div', { class: 'hp-text' }, `${model.hp ? model.hp.current : '?'}/${model.hp ? model.hp.max : '?'} PV`)),
+        h('div', { class: 'hp-text' }, `${model.hp ? hpNum(model.hp.current) : '?'}/${model.hp ? hpNum(model.hp.max) : '?'} PV`)),
       model.xp
         ? h('div', { class: 'xp-bar-container' },
             h('div', { class: 'xp-bar' },
@@ -154,8 +167,17 @@ export function pokeFullCardVNode(model = {}) {
     children.push(h('div', { class: 'poke-moves' }, ...cells));
   }
 
+  // PASSE 32 — clé d'identité pour la réconciliation DOM (`pwMorphHtml`).
+  // Sans elle, deux cartes voisines de même balise seraient considérées
+  // interchangeables : le morphing recyclerait la carte du banc en carte
+  // active et les animations sauteraient d'un Pokémon à l'autre. La clé suit
+  // l'OCCUPANT (uid), pas la position, pour que la carte survive à un
+  // changement de Pokémon actif — c'est ce qui laisse tourner la Poké Ball.
+  const morphKey = model.morphKey || null;
+
   return h('div', {
     class: cx('poke-card pw-poke-card', model.active && 'active', model.fainted && 'fainted', model.extraClass),
+    dataset: morphKey ? { pwKey: morphKey } : undefined,
   }, ...children);
 }
 
@@ -167,4 +189,6 @@ export function pokeFullCardVNode(model = {}) {
 export function pokeFullCardHTML(model = {}) {
   return toHTMLString(pokeFullCardVNode(model));
 }
+
+
 

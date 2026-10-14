@@ -35,6 +35,7 @@ function renderTeamWindow(){
     return generatePokeCardHTML(p, i, {
       isActive: false,
       isFainted: false,
+      caughtBallHtml: (typeof caughtStatusBallHtml === 'function' ? caughtStatusBallHtml(p.id, 18) : ''),
       showMoves: true,
       showXP: true,
       showStatus: false,
@@ -699,4 +700,6 @@ export {
   openHeldItemPickerFor,
   heldItemPickerClear,
 };
+
+
 

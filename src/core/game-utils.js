@@ -3,6 +3,17 @@
 function rand(min,max){ const c = (typeof window !== 'undefined' && window.PokeWorldCore) || (typeof globalThis !== 'undefined' && globalThis.PokeWorldCore); return c && c.randomInt ? c.randomInt(min,max) : Math.floor(Math.random() * (max - min + 1)) + min; }
 function chance(pct){ const c = (typeof window !== 'undefined' && window.PokeWorldCore) || (typeof globalThis !== 'undefined' && globalThis.PokeWorldCore); return c && c.chancePercent ? c.chancePercent(pct) : Math.random() * 100 < pct; }
 function clamp(v,lo,hi){ const c = (typeof window !== 'undefined' && window.PokeWorldCore) || (typeof globalThis !== 'undefined' && globalThis.PokeWorldCore); return c && c.clamp ? c.clamp(v,lo,hi) : Math.max(lo, Math.min(hi, v)); }
+// Passe 26j — format d'affichage des nombres à la PokéClicker (K/M/B/T).
+function formatNumber(input){
+ let num = Number(input);
+ if (Number.isNaN(num)) return '0';
+ if (num > 1e21) return 'N/A';
+ if (num >= 1e12) { num = Math.floor(num / 1e11); num = num < 100 ? num / 10 : Math.floor(num / 10); return num + 'T'; }
+ if (num >= 1e9)  { num = Math.floor(num / 1e8);  num = num < 100 ? num / 10 : Math.floor(num / 10); return num + 'B'; }
+ if (num >= 1e6)  { num = Math.floor(num / 1e5);  num = num < 100 ? num / 10 : Math.floor(num / 10); return num + 'M'; }
+ if (num >= 1e3)  { num = Math.floor(num / 1e2);  num = num < 100 ? num / 10 : Math.floor(num / 10); return num + 'K'; }
+ return num.toString();
+}
 // Wave 19 (ECS DS): the toast is pure design-system now — flat surface,
 // theme-token text, and a coloured kind bar on the left (same colour
 // language as the buttons: crimson danger / positive green / accent info).
@@ -58,6 +69,7 @@ function hpColor(pct){
 if (typeof rand !== 'undefined') { if (typeof window !== 'undefined') window.rand = rand; if (typeof globalThis !== 'undefined') globalThis.rand = rand; }
 if (typeof chance !== 'undefined') { if (typeof window !== 'undefined') window.chance = chance; if (typeof globalThis !== 'undefined') globalThis.chance = chance; }
 if (typeof clamp !== 'undefined') { if (typeof window !== 'undefined') window.clamp = clamp; if (typeof globalThis !== 'undefined') globalThis.clamp = clamp; }
+if (typeof formatNumber !== 'undefined') { if (typeof window !== 'undefined') window.formatNumber = formatNumber; if (typeof globalThis !== 'undefined') globalThis.formatNumber = formatNumber; }
 if (typeof notify !== 'undefined') { if (typeof window !== 'undefined') window.notify = notify; if (typeof globalThis !== 'undefined') globalThis.notify = notify; }
 if (typeof pwToastKind !== 'undefined') { if (typeof window !== 'undefined') window.pwToastKind = pwToastKind; if (typeof globalThis !== 'undefined') globalThis.pwToastKind = pwToastKind; }
 if (typeof setMsg !== 'undefined') { if (typeof window !== 'undefined') window.setMsg = setMsg; if (typeof globalThis !== 'undefined') globalThis.setMsg = setMsg; }
@@ -247,6 +259,7 @@ export {
   rand,
   chance,
   clamp,
+  formatNumber,
   notify,
   pwToastKind,
   setMsg,
@@ -281,4 +294,6 @@ if ((typeof PokeActions === 'undefined' || !PokeActions || (typeof PokeActions.h
   && typeof queueMicrotask === 'function') {
   queueMicrotask(__pwV42RegisterCloseConfirm);
 }
+
+
 

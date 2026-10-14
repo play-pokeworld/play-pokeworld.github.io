@@ -17,6 +17,7 @@ export const STATUS_BADGES = {
   burn: badgeHtml('Brûlure','burn'), freeze: badgeHtml('Gel','freeze'),
   para: badgeHtml('Paralysie','para'), poison: badgeHtml((typeof t==='function'?t('status_toxic'):'Toxic'),'poison'),
   sleep: badgeHtml('Sommeil','sleep'), confuse: badgeHtml('Confusion','confuse'),
+  flinch: badgeHtml('Hésitation','flinch'), slow: badgeHtml('Vitesse ↓','slow'),
   sunny: badgeHtml('Soleil','sunny'), rainy: badgeHtml('Pluie','rainy'),
   sand: badgeHtml((typeof t==='function'?t('weather_sandstorm'):'Sandstorm'),'sandstorm'), hail: badgeHtml('Grêle','hail'),
   eterrain: badgeHtml((typeof t==='function'?t('terrain_electric'):'Electric Terrain'),'electric'),
@@ -28,6 +29,7 @@ export const EN_STATUS_BADGES = {
   burn: badgeHtml('Burn','burn'), freeze: badgeHtml('Freeze','freeze'),
   para: badgeHtml('Paralysis','para'), poison: badgeHtml('Poisoned','poison'),
   sleep: badgeHtml('Sleep','sleep'), confuse: badgeHtml('Confused','confuse'),
+  flinch: badgeHtml('Flinch','flinch'), slow: badgeHtml('Speed ↓','slow'),
   sunny: badgeHtml('Sunny','sunny'), rainy: badgeHtml('Rainy','rainy'),
   sand: badgeHtml('Sandstorm','sandstorm'), hail: badgeHtml('Hail','hail'),
   eterrain: badgeHtml('Electric Terrain','electric'),
@@ -101,4 +103,6 @@ export {
   replaceWeatherTerms,
   replaceStatusTerms,
 };
+
+
 

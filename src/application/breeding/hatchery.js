@@ -22,7 +22,8 @@ function getFossilReviveId(key) {
   );
 }
 
-const HATCHERY_SLOT_UPGRADE_COSTS = [100000, 300000, 750000];
+// P0 — emplacements de pension en Points de quête (PQ).
+const HATCHERY_SLOT_UPGRADE_COSTS = [500, 1000, 2500];
 function getHatcherySlotUpgradeCost() {
   const maxSlots = clamp(G.hatcheryMaxSlots || 1, 1, 4);
   return HATCHERY_SLOT_UPGRADE_COSTS[maxSlots - 1] || null;
@@ -34,11 +35,13 @@ function upgradeHatcherySlots(cost) {
     return;
   }
   cost = expected;
-  if (G.money < cost) {
-    notify(t('n.pas_assez_dargent'), 'var(--red)');
+  const w = (typeof ensureWallet === 'function') ? ensureWallet() : null;
+  if (!w || (w.questPoints || 0) < cost) {
+    notify(tr('training_slot_need_pq', { price: formatNumber(cost) }), 'var(--red)');
     return;
   }
-  G.money -= cost;
+  if (typeof spendQuestPoints === 'function') spendQuestPoints(cost);
+  else w.questPoints -= cost;
   G.hatcheryMaxSlots = (G.hatcheryMaxSlots || 1) + 1;
   updateHeader();
   renderHatcheryWindow();
@@ -238,7 +241,8 @@ function fossilKeyOfQueueEntry(entry) {
   return isHatcheryFossilEntry(entry) ? entry.slice(HATCHERY_FOSSIL_QPREFIX.length) : null;
 }
 
-const HATCHERY_QUEUE_UPGRADE_COSTS = [250000, 750000, 1500000, 3000000];
+// P0 — file d'attente de pension en Points de quête (PQ).
+const HATCHERY_QUEUE_UPGRADE_COSTS = [5000, 10000, 25000, 50000];
 function getHatcheryQueueLimit() {
   return 3 + clamp(G.hatcheryQueueUpgradeLevel || 0, 0, HATCHERY_QUEUE_UPGRADE_COSTS.length) * 3;
 }
@@ -251,11 +255,13 @@ function upgradeHatcheryQueueSize() {
     notify(t('queue_size_maxed'), 'var(--green)');
     return;
   }
-  if (G.money < cost) {
-    notify(t('n.pas_assez_dargent'), 'var(--red)');
+  const w = (typeof ensureWallet === 'function') ? ensureWallet() : null;
+  if (!w || (w.questPoints || 0) < cost) {
+    notify(tr('training_slot_need_pq', { price: formatNumber(cost) }), 'var(--red)');
     return;
   }
-  G.money -= cost;
+  if (typeof spendQuestPoints === 'function') spendQuestPoints(cost);
+  else w.questPoints -= cost;
   G.hatcheryQueueUpgradeLevel = (G.hatcheryQueueUpgradeLevel || 0) + 1;
   updateHeader();
   saveGame();
@@ -887,7 +893,7 @@ function hatchEgg(slotIdx = 0) {
       }
       if (existing && typeof chance === 'function' && chance(10)) {
         if (!existing.ivs) existing.ivs = {hp:0, atk:0, def:0, spa:0, spd:0, spe:0};
-        const keys = ['hp','atk','def','spa','spd','spe'].filter(k => (existing.ivs[k]||0) < 6);
+        const keys = ['hp','atk','def','spa','spd','spe'].filter(k => (existing.ivs[k]||0) < 12);
         if (keys.length) {
           const picked = keys[Math.floor(Math.random()*keys.length)];
           existing.ivs[picked] = (existing.ivs[picked]||0)+1;
@@ -948,7 +954,7 @@ function hatchEgg(slotIdx = 0) {
 
   if (!p.ivs) p.ivs = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
   const keys = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
-  const avail = keys.filter((k) => (p.ivs[k] || 0) < 6);
+  const avail = keys.filter((k) => (p.ivs[k] || 0) < 12);
   let ivMsg = '';
   if (avail.length > 0) {
     const picked = avail[rand(0, avail.length - 1)];
@@ -960,11 +966,11 @@ function hatchEgg(slotIdx = 0) {
         if (Math.random() < (0.002 * lvl)) gain = 2;
       }
     } catch(_){}
-    p.ivs[picked] = Math.min(6, (p.ivs[picked] || 0) + gain);
+    p.ivs[picked] = Math.min(12, (p.ivs[picked] || 0) + gain);
     ivMsg = ` (+${gain} IV ${picked.toUpperCase()})`;
   } else {
-    G.money += 5000;
-    ivMsg = t('iv_money_bonus');
+    // P1 / FIX-04 : plus de bonus d'argent à l'éclosion (remplacé par DUP-01).
+    ivMsg = '';
   }
   if (!slot.isFossil) {
     applyHatcheryShinyRoll(p);
@@ -1055,7 +1061,7 @@ function reviveFossil(fossilKey) {
     if (G.inventory[fossilKey] <= 0) delete G.inventory[fossilKey];
     if (existing && Math.random() < 0.1) {
       if (!existing.ivs) existing.ivs = {hp:0,atk:0,def:0,spa:0,spd:0,spe:0};
-      const avail = ['hp','atk','def','spa','spd','spe'].filter(k => (existing.ivs[k]||0) < 6);
+      const avail = ['hp','atk','def','spa','spd','spe'].filter(k => (existing.ivs[k]||0) < 12);
       if (avail.length) {
         const pick = avail[Math.floor(Math.random()*avail.length)];
         existing.ivs[pick] = (existing.ivs[pick]||0)+1;
@@ -1450,4 +1456,6 @@ export {
   isUidInHatchery,
   pokemonBaseStatTotal,
 };
+
+
 

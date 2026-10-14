@@ -58,12 +58,13 @@ function typeEffect(atk, d1, d2) { const a = normType(atk), t1 = normType(d1), t
 
 const ENGINE_FILES = [
   'src/data/moves.js', 'src/data/pd-data.js', 'src/data/items-data.js', 'src/data/items-helpers.js',
-  'src/data/poke-talents-data.js',
+  'src/data/poke-talents.js',
   'src/data/locations-data.js', 'src/data/locations-johto.js', 'src/data/game-helpers.js',
   'src/application/world/team.js', 'src/application/pokemon-factory.js',
   'src/data/champions-data.js', 'src/data/official-teams-data.js',
   'src/data/atoll-sets-data.js', 'src/application/world/atoll-core.js',
   'src/application/combat/battle-init.js', 'src/application/combat/battle-attack.js',
+  'src/application/combat/stat-mods.js',
   'src/application/combat/battle-status.js',
   'src/application/combat/progression.js',
 ];
@@ -158,16 +159,21 @@ function bestTalentFor(id) {
 }
 const BOOST_BY_TYPE = { Fighting:'black_belt', Dark:'black_glasses', Fire:'charcoal', Dragon:'dragon_fang', Grass:'miracle_seed', Water:'mystic_water', Ice:'never_melt_ice', Flying:'sharp_beak', Poison:'poison_barb', Ghost:'spell_tag', Rock:'hard_stone', Electric:'magnet', Normal:'silk_scarf', Psychic:'twisted_spoon', Steel:'metal_coat' };
 
+function _moveScore(id, mv) {
+  const d = sb.PD[id];
+  const stab = (d[1] === mv.type || d[2] === mv.type) ? 1.5 : 1;
+  // DORM-04 : un joueur « entraîné » optimise le ratio dégâts/temps.
+  const speed = (typeof sb.getMoveCooldownMultiplier === 'function') ? sb.getMoveCooldownMultiplier(mv) : 1;
+  // Capacités « demerit » (auto-débuff du porteur) : moins intéressantes.
+  const desc = String(mv.desc || '').toLowerCase();
+  const demerit = /decreases\s+[\w ,]+by\s+\d+%/.test(desc) && !/decreases enemy/.test(desc);
+  return mv.power * stab / speed * (demerit ? 0.6 : 1);
+}
 function topLegalMoves(id, n = 4) {
   const natural = new Set(sb.getSpeciesFullLearnablePool(id) || []);
   const ctcs = new Set(Object.keys(sb.getCtCsMoveIds(id) || {}));
-  const d = sb.PD[id];
   const legal = [...new Set([...natural, ...ctcs])].filter((m) => sb.MOVES[m] && (sb.MOVES[m].power || 0) > 0);
-  legal.sort((a, b) => {
-    const sa = (sb.MOVES[a].power * ((d[1] === sb.MOVES[a].type || d[2] === sb.MOVES[a].type) ? 1.5 : 1));
-    const sc = (sb.MOVES[b].power * ((d[1] === sb.MOVES[b].type || d[2] === sb.MOVES[b].type) ? 1.5 : 1));
-    return sc - sa;
-  });
+  legal.sort((a, b) => _moveScore(id, sb.MOVES[b]) - _moveScore(id, sb.MOVES[a]));
   return legal.slice(0, n);
 }
 
@@ -290,7 +296,12 @@ function expectedScore(p, e, mid) {
   const eff = typeEffect(mv.type, e.type1, e.type2);
   const acc = (mv.acc || 100) / 100;
   const burnHalve = (p.status === 'burn' && mv.cat === 'phys') ? 0.5 : 1;
-  return pow * stab * eff * acc * burnHalve;
+  // DORM-04 : une capacité lente (charge ×2) rapporte deux fois moins par
+  // unité de temps — l'IA « raisonnable » choisit le meilleur ratio.
+  const speed = (typeof sb.getMoveCooldownMultiplier === 'function') ? sb.getMoveCooldownMultiplier(mv) : 1;
+  const desc = String(mv.desc || '').toLowerCase();
+  const demerit = /decreases\s+[\w ,]+by\s+\d+%/.test(desc) && !/decreases enemy/.test(desc);
+  return pow * stab * eff * acc * burnHalve / speed * (demerit ? 0.6 : 1);
 }
 function bestMoveIndex(p, e) {
   let bi = 0, bs = -1;
@@ -306,6 +317,18 @@ async function simulateBattle(playerTeam, enemyTeam, rng, { maxTicks = 6000 } = 
   const G = sb.G, battle = sb.battle;
   G.team = playerTeam;
   G.teamSlotItems = playerTeam.map((p) => p.heldItem || null);
+  // DORM-02j — la puissance des objets tenus suit le nombre possédé.
+  // Le benchmark fige 10 exemplaires de chaque objet utilisé (= palier 3,
+  // multiplicateurs historiques : boosters ×1,3). Les modes « sans objet »
+  // gardent heldItem=null et ne sont donc pas affectés.
+  G.inventory = Object.assign({}, G.inventory, {
+    black_belt: 10, black_glasses: 10, charcoal: 10, dragon_fang: 10,
+    miracle_seed: 10, mystic_water: 10, never_melt_ice: 10, sharp_beak: 10,
+    poison_barb: 10, spell_tag: 10, hard_stone: 10, magnet: 10,
+    silk_scarf: 10, twisted_spoon: 10, metal_coat: 10, fairy_feather: 10,
+    silver_powder: 10, soft_sand: 10, muscle_band: 10,
+    choice_band: 10, choice_specs: 10, life_orb: 10,
+  });
   // Battle state reset (mirror of startBattle, without DOM)
   Object.keys(battle).forEach((k) => delete battle[k]);
   battle.log = [];
@@ -493,5 +516,7 @@ export const __simExports = { get results() { return results; } };
 // CLI execution only (the module is also imported by tests/passe23-simulations.test.js)
 const isMain = (() => { try { return import.meta.url === pathToFileURL(process.argv[1]).href; } catch (_) { return false; } })();
 if (isMain) main().catch((e) => { console.error(e); process.exit(1); });
+
+
 
 

@@ -194,7 +194,7 @@ test('Design tokens: theme palette parity + the two sprite sizes in the styleshe
     if (id === 'dark') continue; // dark = :root defaults
     assert.ok(inCss.has(id), `theme "${id}" has a CSS palette block`);
   }
-  assert.deepEqual(THEME_IDS, ['dark', 'light', 'gameboy', 'fire'], 'single theme catalog');
+  assert.deepEqual(THEME_IDS, ['dark', 'light', 'gameboy', 'fire', 'ocean', 'forest', 'sakura', 'midnight', 'desert', 'contrast'], 'single theme catalog');
   assert.ok(css.includes('--pw-size-poke-sm:'), 'sm sprite token in CSS');
   assert.ok(css.includes('--pw-size-poke-lg:'), 'lg sprite token in CSS');
   assert.ok(css.includes(`--pw-size-poke-sm: ${SPRITE_SIZES.standard}px`), 'JS/CSS parity for the standard size');
@@ -223,4 +223,6 @@ test('Data screens: fixed toolbars routed out of the scrollers, charm out of the
     assert.ok(m[1].includes(mode), `filters enabled for selector mode ${mode}`);
   }
 });
+
+
 

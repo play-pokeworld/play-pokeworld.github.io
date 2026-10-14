@@ -112,3 +112,5 @@ export function filterBarHTML(model = {}) {
   return toHTMLString(filterBarVNode(model));
 }
 
+
+

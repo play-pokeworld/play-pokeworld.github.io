@@ -59,7 +59,7 @@ function renderStoryWindow(){
  const card = {
   title: (numLabel?numLabel+' ':'') + qt.title,
   desc: qt.desc,
-  rewardText: qt.rewardDesc,
+  rewardText: (typeof computeRewardText === 'function') ? computeRewardText(cat, def) : qt.rewardDesc,
   done: done,
  };
  // action: challenge (trainer battle) / claim (done) / informative line
@@ -238,11 +238,11 @@ function openNpc(locId, idx){
  if(active){
   dlgModel.quest = { state: 'active', iconHtml: (typeof getIcon==='function'?getIcon('quests',16):''), text: `${t("m.quest_ui.15")} ${sqt.title}` };
  } else if(done && sq.type==='puzzle'){
-  dlgModel.quest = { state: 'doneReplay', title: '✓ ' + sqt.title, doneSuffix: (G.lang==='en')?'Already cleared · replayable':'Déjà terminée · rejouable', desc: sqt.desc, rewardText: sqt.rewardDesc, actionLabel: (G.lang==='en')?'Play again':'Rejouer', callArgs: `'${npc.quest}'` };
+  dlgModel.quest = { state: 'doneReplay', title: '✓ ' + sqt.title, doneSuffix: (G.lang==='en')?'Already cleared · replayable':'Déjà terminée · rejouable', desc: sqt.desc, rewardText: (typeof computeRewardText === 'function') ? computeRewardText('side', sq) : sqt.rewardDesc, actionLabel: (G.lang==='en')?'Play again':'Rejouer', callArgs: `'${npc.quest}'` };
  } else if(done){
   dlgModel.quest = { state: 'done', text: `${t("m.quest_ui.14")} ${sqt.title}` };
  } else {
-  dlgModel.quest = { state: 'offer', title: sqt.title, desc: sqt.desc, rewardText: sqt.rewardDesc, actionLabel: t("m.quest_ui.13"), callArgs: `'${npc.quest}'` };
+  dlgModel.quest = { state: 'offer', title: sqt.title, desc: sqt.desc, rewardText: (typeof computeRewardText === 'function') ? computeRewardText('side', sq) : sqt.rewardDesc, actionLabel: t("m.quest_ui.13"), callArgs: `'${npc.quest}'` };
  }
  }
  const viewsN = (typeof window!=='undefined' && window.PokeUI && window.PokeUI.views) ? window.PokeUI.views : null;
@@ -382,7 +382,7 @@ function renderRepeatableBoard(){
     iconHtml: (tpl.iconHtml || (typeof getIcon==='function'?getIcon('rematch',14):'')),
     title: rt.title,
     desc: rt.desc,
-    reward: rt.rewardDesc,
+    reward: (typeof computeRewardText === 'function') ? computeRewardText('repeatable', tpl) : rt.rewardDesc,
     active: active,
     canAccept: (activeCount<max && !active),
     acceptLabel: t("m.quest_ui.5"),
@@ -455,7 +455,7 @@ function openRepeatableUpgradeMenu(){
   titleHtml: `${typeof getIcon==='function'?getIcon('settings',14):''} ${t('repeatable_upgrades')}`,
   currentTitle: t('repeatable_slots'),
   currentText: tr('repeatable_slots_current', {count:max, max:5}),
-  buy: nextCost ? { cost: nextCost, label: `${typeof getIcon==='function'?getIcon('save',14):''} ${tr('repeatable_slot_upgrade_buy', {next:max+1, price:nextCost.toLocaleString()})}` } : null,
+  buy: nextCost ? { cost: nextCost, label: `${typeof getIcon==='function'?getIcon('save',14):''} ${tr('repeatable_slot_upgrade_buy', {next:max+1, price:formatNumber(nextCost)})}` } : null,
   maxText: t('repeatable_slots_max'),
   descText: t('repeatable_reroll_free_desc'),
  }));
@@ -562,4 +562,6 @@ export {
   repeatableCooldownLeft,
   repeatablePool,
 };
+
+
 

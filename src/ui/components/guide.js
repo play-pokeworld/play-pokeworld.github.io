@@ -80,6 +80,7 @@ export function tutorialQuestCardVNode(m) {
     h('div', { class: 'pw-tut-how' },
       h('div', { class: 'pw-tut-how-label' }, m.howLabel || ''),
       h('div', { class: 'pw-tut-how-text' }, m.how || '')),
+    m.progressText ? h('div', { class: 'pw-tut-progress' }, m.progressText) : null,
     h('div', { class: 'pw-tut-bar' },
       h('div', {
         class: 'pw-tut-bar-fill',
@@ -93,4 +94,6 @@ export function tutorialQuestCardVNode(m) {
 export function guideHomeHTML(model) { return toHTMLString(guideHomeVNode(model)); }
 export function guideDetailHTML(model) { return toHTMLString(guideDetailVNode(model)); }
 export function tutorialQuestCardHTML(model) { return toHTMLString(tutorialQuestCardVNode(model)); }
+
+
 

@@ -182,3 +182,5 @@ test('wave 35 N2 sim: baseWindowVisitOwnBase — polite refusal, then real visit
   assert.ok(s2.notes.some((n) => String(n.msg).includes('ta propre base')), 'entry toasted (canonical FR welcome)');
 });
 
+
+

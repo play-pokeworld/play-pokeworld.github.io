@@ -26,3 +26,5 @@ export const L_en_types = {
 // gardée sur l'objet global pour les registres (data.js) et les harnais VM.
 if (typeof globalThis !== 'undefined') globalThis.L_en_types = L_en_types;
 
+
+

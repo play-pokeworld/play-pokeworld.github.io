@@ -100,3 +100,5 @@ export function pokemonSpriteVNode(props = {}) {
     props.shiny ? h('span', { class: 'pw-poke-circle-shiny' }) : null);
 }
 
+
+

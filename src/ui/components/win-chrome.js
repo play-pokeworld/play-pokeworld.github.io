@@ -31,11 +31,12 @@ export function winHeaderTitleVNode(m) {
   if (m.labelId) labelAttrs.id = m.labelId;
   if (m.labelKey) labelAttrs.dataset = { i18n: m.labelKey };
   return h('span', { class: 'pw-win-hdr-title' },
-    winGripVNode(),
     h('span', { class: 'pw-win-hdr-icon', 'aria-hidden': 'true' }, h.raw(m.iconHtml || '')),
     h('span', labelAttrs, m.labelText || ''));
 }
 
 /* ── String helpers (DOM-free, classic adapters / preview) ─────────────── */
 export function winHeaderTitleHTML(model) { return toHTMLString(winHeaderTitleVNode(model)); }
+
+
 

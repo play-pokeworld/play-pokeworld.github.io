@@ -31,3 +31,5 @@ export function trainerCardHTML(m) {
   return toHTMLString(trainerCardVNode(m));
 }
 
+
+

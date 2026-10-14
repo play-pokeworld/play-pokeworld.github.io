@@ -83,9 +83,12 @@ export class MineWindowView extends UIView {
               tile.clickable && 'mine-tile-clickable',
               revealed && 'mine-tile-revealed-item',
               revealed && (`mine-tile--item-${tile.itemKey}`)),
+            // PASSE 30 (P3) — les coordonnées sont désormais portées par TOUTE
+            // tuile, cliquable ou non : l'animation de cassage doit pouvoir
+            // retrouver la case touchée après le re-rendu complet de la grille.
             dataset: tile.clickable
-              ? { action: 'legacy-call', call: 'digMineTile', callArgs: `${tile.x},${tile.y}` }
-              : undefined,
+              ? { action: 'legacy-call', call: 'digMineTile', callArgs: `${tile.x},${tile.y}`, mineX: String(tile.x), mineY: String(tile.y) }
+              : { mineX: String(tile.x), mineY: String(tile.y) },
           },
             revealed
               ? h('div', { class: cx('mine-revealed-item', tile.itemCollected && 'is-collected', `mine-item--${tile.itemKey}`) },
@@ -130,4 +133,6 @@ export class MineWindowView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
+
+
 

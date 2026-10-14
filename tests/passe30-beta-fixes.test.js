@@ -58,7 +58,7 @@ const SANDBOX_FILES = [
   'src/engine/input/action-dispatcher.js', 'src/engine/runtime/classic-bridge.js',
   'src/data/moves.js', 'src/data/pd-data.js',
   'src/data/items-data.js', 'src/data/items-helpers.js',
-  'src/data/poke-talents-data.js', 'src/data/talents-full.js',
+  'src/data/poke-talents.js', 'src/data/talents-full.js',
   'src/data/locations-data.js', 'src/data/locations-johto.js',
   'src/data/shops-data.js', 'src/data/route-drops.js', 'src/data/ctcs-shop-data.js',
   'src/data/game-helpers.js',
@@ -263,17 +263,17 @@ test('phase 30 B: loot converted to money ONLY when the stack is full (25)', () 
   let r = vm.runInContext(`grantRewardItem('occa_berry', 1)`, sb);
   assert.equal(r.added, 1, 'first copy → item into bag');
   assert.equal(r.money, 0, 'no money while the stack is not full');
-  // stack at 24 + 5: 1 slots into bag, 4 converted (25% of 45,000₽ = 11,250₽/ea)
+  // stack at 24 + 5: 1 slots into bag, 4 converted (25% of 20,000₽ = 5,000₽/ea)
   vm.runInContext(`G.inventory['occa_berry'] = 24;`, sb);
   r = vm.runInContext(`grantRewardItem('occa_berry', 5)`, sb);
   assert.equal(r.added, 1, 'the remaining room is filled');
-  assert.equal(r.money, 11250 * 4, 'only the excess beyond 25 is converted');
+  assert.equal(r.money, 5000 * 4, 'only the excess beyond 25 is converted');
   assert.equal(vm.runInContext(`G.inventory['occa_berry']`, sb), 25, 'stack capped at 25');
   // stack already full: full conversion
   r = vm.runInContext(`grantRewardItem('occa_berry', 1)`, sb);
   assert.equal(r.added, 0);
-  assert.equal(r.money, 11250, 'full stack → money');
-  assert.equal(vm.runInContext(`G.money`, sb), 11250 * 5, 'exact cumulative total');
+  assert.equal(r.money, 5000, 'full stack → money');
+  assert.equal(vm.runInContext(`G.money`, sb), 5000 * 5, 'exact cumulative total');
   // treasure: never converted, always stocked
   r = vm.runInContext(`grantRewardItem('nugget', 3)`, sb);
   assert.equal(r.added, 3, 'nugget: still in bag');
@@ -370,5 +370,7 @@ test('phase 30 D: rewirings present, old blocks removed, i18n keys', () => {
   assert.ok(R('src/localization/fr/ui.js').includes('"afk_panel_daycare_levels"'), 'FR day-care recap key');
   assert.ok(R('src/localization/en/ui.js').includes('"afk_panel_daycare_levels"'), 'EN day-care recap key');
 });
+
+
 
 

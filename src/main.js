@@ -57,12 +57,14 @@ import "./localization/localization-manager.js";
 import "./data/poke-core.js";
 import "./ui/game/badge-helper.js";
 import "./application/economy/item-engine.js";
-import "./data/item-database.js";
 import "./data/game-config.js";
+// P0 — portefeuille multi-monnaies + système de Poké Balls (avant le combat,
+// car battle-status/catch y font appel à l'exécution).
+import "./application/economy/currency.js";
+import "./application/economy/pokeballs.js";
 import "./data/game-icons.js";
 import "./data/pokemon-db.js";
 import "./data/move-db.js";
-import "./data/ability-db.js";
 import "./application/game-state.js";
 import "./core/game-utils.js";
 import "./application/pokemon-factory.js";
@@ -71,14 +73,13 @@ import "./data/moves.js";
 import "./data/sprites.js";
 import "./data/trainer-sprites-data.js";
 import "./data/items-data.js";
+import "./data/item-generations.js";
 import "./data/base-layouts-data.js";
 import "./data/base-items-data.js";
 import "./data/base-manifest-2d-data.js";
 import "./data/items-helpers.js";
 import "./data/ctcs-shop-data.js";
-import "./data/talents-data.js";
 import "./data/talents-full.js";
-import "./data/poke-talents-data.js";
 import "./data/poke-talents.js";
 import "./data/pokedex-flavor.js";
 import "./data/pd-data.js";
@@ -87,6 +88,7 @@ import "./data/story-quests-hoenn.js";
 import "./data/locations-data.js";
 import "./data/locations-johto.js";
 import "./data/locations-hoenn.js";
+import "./data/location-backgrounds.js";
 import "./data/shops-data.js";
 import "./data/shops-hoenn.js";
 import "./data/story-lore.js";
@@ -106,6 +108,8 @@ import "./ui/game/shortcuts.js";
 __pwDeferredScreens.push('./data/atoll-sets-data.js', () => import('./data/atoll-sets-data.js'));
 __pwDeferredScreens.push('./application/world/atoll-core.js', () => import('./application/world/atoll-core.js'));
 import "./application/world/roaming.js";
+// PASSE 32 — donjons : sessions d'expédition (paliers, sac, remontée).
+import "./application/world/dungeon-run.js";
 import "./ui/game/header-window.js";
 import "./application/world/collection.js";
 import "./application/world/puzzle-explorations.js";
@@ -127,6 +131,7 @@ import "./application/market-system.js";
 // Pokedex / dictionary — deferred (tab content, rendered after load / on open).
 __pwDeferredScreens.push('./ui/game/pokedex.js', () => import('./ui/game/pokedex.js'));
 import "./application/combat/battle-init.js";
+import "./application/combat/stat-mods.js";
 import "./application/combat/battle-encounter.js";
 // The whole gameplay runtime is ECS-driven through ONE aggregate entry
 // (src/application/gameplay-bundle.js): combat:tick (replaces the retired
@@ -135,6 +140,8 @@ import "./application/combat/battle-encounter.js";
 import "./application/gameplay-bundle.js";
 import "./application/combat/battle-attack.js";
 import "./application/combat/battle-status.js";
+import "./ui/game/dom-morph.js";
+import "./ui/game/daytime.js";
 import "./ui/game/battle-ui.js";
 import "./ui/game/battle-team-ui.js";
 import "./application/combat/battle-flow.js";
@@ -142,6 +149,7 @@ import "./application/combat/battle-switch.js";
 import "./ui/game/battle-summary.js";
 import "./application/combat/progression.js";
 import "./application/combat/catch.js";
+import "./ui/game/capture-animation.js";
 // Training workshop — deferred (persistent dashboard window, repainted after load).
 __pwDeferredScreens.push('./application/combat/training.js', () => import('./application/combat/training.js'));
 import "./ui/game/move-learning.js";
@@ -180,6 +188,15 @@ import "./ui/game/box-ui.js";
 import "./ui/game/poke-modal.js";
 import "./ui/game/starter.js";
 import "./ui/game/map-help.js";
+// P0 — fenêtres Monnaies + Poké Balls (avant fullscreen-panel qui les route).
+import "./ui/game/feedback-fx.js";
+// PASSE 30 (P3) — promeneurs de fond (nos Pokémon capturés).
+import "./ui/game/bg-pokemon.js";
+// PASSE 38 — couche de premier plan du paysage (rochers devant la végétation) :
+// le module garantit le nœud #pw-land-fg, la frise est peinte en CSS pur.
+import "./ui/game/landscape-layers.js";
+import "./ui/game/currency-window.js";
+import "./ui/game/pokeball-window.js";
 import "./ui/game/fullscreen-panel.js";
 import "./ui/game/preset-manager.js";
 import "./ui/game/tutorial.js";
@@ -266,6 +283,8 @@ async function __pwLoadDeferredScreens() {
   // Repaint the pieces boot had to render before those modules existed
   // (persistent dashboard windows + whichever tab is currently shown).
   try { if (typeof window.renderDashboardColumns === 'function') window.renderDashboardColumns(); } catch (_) {}
+  try { if (typeof window.renderCurrencyWindow === 'function') window.renderCurrencyWindow(); } catch (_) {}
+  try { if (typeof window.renderPokeballWindow === 'function') window.renderPokeballWindow(); } catch (_) {}
   try { if (typeof window.renderHatcheryWindow === 'function') window.renderHatcheryWindow(); } catch (_) {}
   try { if (typeof window.renderTrainingWindow === 'function') window.renderTrainingWindow(); } catch (_) {}
   try { if (typeof window.renderMineWindow === 'function') window.renderMineWindow(); } catch (_) {}
@@ -305,4 +324,6 @@ window.__pwBootContinuation = new Promise((resolve) => {
 // timer) was removed in wave 32: the file:// case is now detected
 // explicitly in index.html instead (see .gitignore: the bundle is a build
 // artefact, never committed).
+
+
 

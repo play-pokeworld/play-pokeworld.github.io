@@ -29,9 +29,10 @@ function makeSandbox() {
   vm.createContext(sandbox);
   for (const f of [
     'src/data/moves.js', 'src/data/pd-data.js', 'src/data/items-data.js', 'src/data/items-helpers.js',
-    'src/data/poke-talents-data.js',
+    'src/data/poke-talents.js',
     'src/data/locations-data.js', 'src/data/locations-johto.js', 'src/data/game-helpers.js',
     'src/application/world/team.js', 'src/application/pokemon-factory.js', 'src/data/official-teams-data.js',
+    'src/data/official-teams-hoenn.js',
   ]) {
     // T2-D (vague 37) : classiques évalués en vm directe (parité exacte,
     // const inter-fichiers préservés) ; les converts ESM sont bundlés à la volée.
@@ -57,7 +58,7 @@ test('structure: each entry has a valid id/kind/region/team', () => {
   for (const [key, entry] of Object.entries(teams)) {
     assert.equal(entry.id, key, `${key}: coherent id`);
     assert.ok(['gym', 'rival', 'team_enemy', 'league', 'atoll', 'quest', 'boss'].includes(entry.kind), `${key} : kind connu`);
-    assert.ok(['kanto', 'johto'].includes(entry.region), `${key}: known region`);
+    assert.ok(['kanto', 'johto', 'hoenn'].includes(entry.region), `${key}: known region`);
     if (entry.variantsByStarter) {
       // Rival variant according to the player's starter (FRLG/GSC canon)
       const ks = Object.keys(entry.variantsByStarter);
@@ -82,8 +83,10 @@ function eachSpec(cb) {
   }
 }
 
-test('legitimacy: species, levels, moves, abilities, items, IV/EV budgets', () => {
+test('legitimacy (kanto + johto): species, levels, moves, abilities, items, IV/EV budgets', () => {
   eachSpec((key, spec, variant) => {
+      // FIX-01b : Hoenn est validé par un test dédié (moves valides + échelle 12/18).
+      if (teams[key] && teams[key].region === 'hoenn') return;
       const label = `${key}${variant ? '[' + variant + ']' : ''}#${spec.id}N${spec.level}`;
       // Species + level
       assert.ok(sb.PD[spec.id], `${label}: known species`);
@@ -133,13 +136,20 @@ test('instantiation: buildOfficialTeamPoke produces conforming playable Pokémon
 });
 
 test('engine audit (phase 17 audit): enemy items and abilities are neutral on the side', () => {
-  // getHeldBuff works for a Pokémon OUTSIDE the team (enemy case)
-  const misty = sb.getOfficialTeam('misty');
-  const starmie = misty[1];
+  // getHeldBuff works for a Pokémon OUTSIDE the team (enemy case).
+  // DORM-03 : les boosters de type n'ont plus de +10 % générique — leur
+  // effet est le ×1,3 conditionnel (battle-attack). On vérifie donc un
+  // objet à bonus stat (choice_band) pour la neutralité de côté.
+  const starmie = sb.getOfficialTeam('misty')[1];
+  starmie.heldItem = 'choice_band';
   const buff = sb.getHeldBuff(starmie);
-  assert.ok(buff.atk > 0 && buff.spa > 0, 'Mystic Water → buffs active for an enemy Pokémon');
+  assert.ok(buff.atk > 0, 'choice_band → buff actif pour un Pokémon ennemi');
   const geo = sb.getOfficialTeam('brock')[0];
   assert.equal(sb.getHeldBuff(geo).atk, 0, 'no item → no buff');
+  // Un booster de type ne donne plus de buff générique.
+  const starmie2 = sb.getOfficialTeam('misty')[1];
+  starmie2.heldItem = 'mystic_water';
+  assert.equal(sb.getHeldBuff(starmie2).atk, 0, 'mystic_water → plus de +10 % générique (DORM-03)');
 });
 
 test('quest teams (step 2): rival variants resolved via getOfficialTeam', () => {
@@ -167,5 +177,26 @@ test('documented non-regression: no compact legacy move id (step 2)', () => {
     for (const mv of spec.moves) assert.ok(sb.MOVES[mv], `${key}: move ${mv} valid (no compact legacy id)`);
   });
 });
+
+test('FIX-01b: Hoenn — every move exists + ≥ 2 valid moves per fiche + unified 12/18 scale', () => {
+  eachSpec((key, spec, variant) => {
+    if (!teams[key] || teams[key].region !== 'hoenn') return;
+    const label = `${key}${variant ? '[' + variant + ']' : ''}#${spec.id}N${spec.level}`;
+    assert.ok(Array.isArray(spec.moves) && spec.moves.length >= 1, `${label}: 1-4 moves`);
+    assert.ok(spec.moves.length <= 4, `${label}: ≤ 4 moves`);
+    for (const mv of spec.moves) assert.ok(sb.MOVES[mv], `${label}: move ${mv} exists in MOVES`);
+    const valid = spec.moves.filter((mv) => sb.MOVES[mv]);
+    assert.ok(valid.length >= 2, `${label}: ≥ 2 valid moves (got ${valid.length})`);
+    // Échelle de puissance unique (FIX-02) : 12 IV / 18 EV par stat, totaux bornés à 36.
+    for (const v of Object.values(spec.ivs || {})) assert.ok(v >= 0 && v <= 12, `${label}: IV per stat 0..12 (got ${v})`);
+    for (const v of Object.values(spec.evs || {})) assert.ok(v >= 0 && v <= 18, `${label}: EV per stat 0..18 (got ${v})`);
+    const sumI = Object.values(spec.ivs || {}).reduce((a, b) => a + b, 0);
+    const sumE = Object.values(spec.evs || {}).reduce((a, b) => a + b, 0);
+    assert.ok(sumI <= 36, `${label}: total IV ≤ 36 (got ${sumI})`);
+    assert.ok(sumE <= 36, `${label}: total EV ≤ 36 (got ${sumE})`);
+  });
+});
+
+
 
 

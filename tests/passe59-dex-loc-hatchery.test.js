@@ -339,3 +339,5 @@ test('DexDetailView renders grouped carnet records and LocationInfoView the play
   assert.ok(!locHtml.includes('Rencontres'), 'encountered dropped');
 });
 
+
+

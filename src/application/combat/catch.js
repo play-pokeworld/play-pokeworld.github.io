@@ -45,12 +45,23 @@ function rollCaptureIv(caughtMon){
  if(!caughtMon.ivs) caughtMon.ivs = {hp:0, atk:0, def:0, spa:0, spd:0, spe:0};
  if(!chance(10)) return null;
  const keys = ['hp','atk','def','spa','spd','spe'];
- const avail = keys.filter(k => (caughtMon.ivs[k]||0) < 6);
+ const avail = keys.filter(k => (caughtMon.ivs[k]||0) < 12);
  if(!avail.length) return null;
  const picked = avail[rand(0, avail.length-1)];
  caughtMon.ivs[picked] = (caughtMon.ivs[picked]||0) + 1;
  try{ recalcPokeStats(caughtMon); }catch(_){}
  return picked;
+}
+
+// P0 — propriété réelle d'une espèce (sans consulter le dex : anti doublon fantôme).
+function isSpeciesOwnedReal(e){
+ if(!e || !G) return false;
+ const nid = Number(e.id);
+ if(Array.isArray(G.team) && G.team.some(p=>p && Number(p.id)===nid)) return true;
+ if(G.collection){ for(const k in G.collection){ const p = G.collection[k]; if(p && Number(p.id)===nid) return true; } }
+ if(Array.isArray(G.hatchery)){ for(const s of G.hatchery){ if(s && s.poke && Number(s.poke.id)===nid) return true; } }
+ if(Array.isArray(G.training)){ for(const s of G.training){ if(s && s.poke && Number(s.poke.id)===nid) return true; } }
+ return false;
 }
 
 function attemptAutoCatch(e){
@@ -59,11 +70,51 @@ function attemptAutoCatch(e){
  // dex => ghost duplicate and empty box)
  const wasShiny = !!(e && (e.shinyActive || e.shiny || e._forceShiny));
  const isRoaming = !!(e && (e._isRoaming || [144,145,146,151,243,244,245,251,380,381,385,386].includes(Number(e.id))));
- if(!isRoaming && !battle.legendaryCatch && !chance(10)){
-  addBattleLog(tr("m.catch.7", {p0:e.name}));
+
+ // P0 — capture par Poké Ball : filtre PokéClicker + ball consommée.
+ if(typeof ensurePokeballs === 'function') ensurePokeballs();
+ const ballKey = (typeof ballForEnemy === 'function') ? ballForEnemy(e) : null;
+ if(!ballKey){
+  addBattleLog(tr('ball_no_target', {p0:e.name}));
   return;
  }
+ const ballDefNow = (typeof ballDef === 'function') ? ballDef(ballKey) : null;
+ const ballRate = (typeof ballEffectiveRate === 'function') ? ballEffectiveRate(ballKey, e) : ((ballDefNow && ballDefNow.rate) || 10);
+ if(G && G.pokeballs) G.pokeballs[ballKey] = Math.max(0, (G.pokeballs[ballKey] || 0) - 1); // ball consommée (réussite ou échec)
+ // P1 / FIX-06 : les roamers ne contournent plus le jet — même taux que tout le monde.
+ // TUTO : la toute première capture (aucun Pokémon attrapé hors starter) est
+ // garantie à 100 % pour ne jamais bloquer la quête « Capturer ton premier ».
+ const isFirstCatch = !G._firstCatchDone && (Object.keys(G.collection || {}).length === 0) && ((G.team || []).length <= 1);
+ const success = (ballRate >= 100) || battle.legendaryCatch || isFirstCatch || chance(ballRate);
+ if(!success){
+  addBattleLog(tr('ball_broke', {ball:(ballDefNow && typeof t === 'function' ? t(ballDefNow.labelKey) : ballKey), p0:e.name}));
+  try{ if(typeof playCaptureAnimation === 'function') playCaptureAnimation(ballKey, false, (typeof t === 'function' ? t('ball_catch_fail') : 'Échec…'), ballRate); }catch(_){}
+  try{ updateHeader(); }catch(_){}
+  try{ saveGame(); }catch(_){}
+  return;
+ }
+ G._firstCatchDone = true;
+ // DORM-06 — Luxe Ball : le Pokémon capturé gagne +1 niveau.
+ if(ballKey === 'luxuryball' && typeof levelUp === 'function'){
+  try{ levelUp(e); addBattleLog(`${e.name} gagne un niveau (Luxe Ball) !`); }catch(_){}
+ }
+ try{ if(typeof playCaptureAnimation === 'function') playCaptureAnimation(ballKey, true, (typeof t === 'function' ? t('ball_catch_success') : 'Capturé !'), ballRate); }catch(_){}
+ // P3 · ANI-01 — éclat de 600 ms sur la rangée du sauvage capturé.
+ try{
+  if(typeof flashCapture === 'function' && typeof document !== 'undefined'){
+   // PASSE 31 — l'éclat doit frapper le Pokémon SAUVAGE, pas le nôtre :
+   // `.poke-card` tout court renvoyait la première carte de la rangée, donc
+   // notre combattant. La carte adverse porte désormais `.pw-enemy-card`.
+   const row = document.getElementById('battle-team-row');
+   const wild = row && (row.querySelector('.pw-enemy-card') || row.querySelector('.poke-card'));
+   if(wild) flashCapture(wild);
+  }
+ }catch(_){}
  addBattleLog(tr("m.catch.6", {p0:e.name}));
+ // PASSE 30 (P3) — la population du fond suit les captures : on la recalcule
+ // ici pour que la progression se voie immédiatement (différé d'un tick pour
+ // laisser la capture s'inscrire dans G.pokedex / G.collection plus bas).
+ try{ if(typeof setTimeout === 'function') setTimeout(() => { try{ if(typeof renderBgPokemon === 'function') renderBgPokemon(); }catch(_){} }, 0); }catch(_){}
 
  // 1) already owned? without looking at the dex
  let alreadyOwnedReal = false;
@@ -127,7 +178,7 @@ function attemptAutoCatch(e){
    }
    if (existing && typeof chance === 'function' && chance(10)) {
      if (!existing.ivs) existing.ivs = {hp:0, atk:0, def:0, spa:0, spd:0, spe:0};
-     const avail = ['hp','atk','def','spa','spd','spe'].filter(k => (existing.ivs[k]||0) < 6);
+     const avail = ['hp','atk','def','spa','spd','spe'].filter(k => (existing.ivs[k]||0) < 12);
      if (avail.length) {
        const pick = avail[Math.floor(Math.random()*avail.length)];
        existing.ivs[pick] = (existing.ivs[pick]||0)+1;
@@ -154,6 +205,12 @@ function attemptAutoCatch(e){
 
  // FIX (2026-08): mine energy granted per capture rebalanced 15 -> 5.
  if(G.mine) G.mine.energy = Math.min(G.mine.maxEnergy||100, (G.mine.energy||0) + _mineEnergyPerBattle());
+ // P0 — chaque capture rapporte des jetons de donjon (doublons compris).
+ if(typeof gainDungeonTokens === 'function' && typeof tokensPerCatchForLocation === 'function'){
+  const jd = tokensPerCatchForLocation();
+  gainDungeonTokens(jd);
+  try{ addBattleLog(tr('jd_gained_log', {n:jd})); }catch(_){}
+ }
  try { EventBus.emit(EVENTS.POKEMON_CAUGHT, { loc: G.location }); } catch(_){}
  try{ if(typeof syncShinyCharmProgress === 'function') syncShinyCharmProgress(); }catch(_){}
  updateHeader();
@@ -169,6 +226,7 @@ function attemptAutoCatch(e){
 }
 
 // --- Migrated to ES module, globals exposed ---
+if (typeof isSpeciesOwnedReal !== 'undefined') { if (typeof window !== 'undefined') window.isSpeciesOwnedReal = isSpeciesOwnedReal; if (typeof globalThis !== 'undefined') globalThis.isSpeciesOwnedReal = isSpeciesOwnedReal; }
 if (typeof rollWeightedTalentForSpecies !== 'undefined') { if (typeof window !== 'undefined') window.rollWeightedTalentForSpecies = rollWeightedTalentForSpecies; if (typeof globalThis !== 'undefined') globalThis.rollWeightedTalentForSpecies = rollWeightedTalentForSpecies; }
 if (typeof unlockCapturedTalent !== 'undefined') { if (typeof window !== 'undefined') window.unlockCapturedTalent = unlockCapturedTalent; if (typeof globalThis !== 'undefined') globalThis.unlockCapturedTalent = unlockCapturedTalent; }
 if (typeof rollCaptureIv !== 'undefined') { if (typeof window !== 'undefined') window.rollCaptureIv = rollCaptureIv; if (typeof globalThis !== 'undefined') globalThis.rollCaptureIv = rollCaptureIv; }
@@ -177,9 +235,12 @@ if (typeof attemptAutoCatch !== 'undefined') { if (typeof window !== 'undefined'
 // Wave 41 — native ESM module: exports the same names as the
 // classic surface kept above (bodies unchanged).
 export {
+  isSpeciesOwnedReal,
   rollWeightedTalentForSpecies,
   unlockCapturedTalent,
   rollCaptureIv,
   attemptAutoCatch,
 };
+
+
 

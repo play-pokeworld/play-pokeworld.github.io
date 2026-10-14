@@ -122,3 +122,5 @@ if (failures || pageErrors.length) {
   process.exit(1);
 }
 console.log('\nToutes les familles d’en-tête sont identiques DANS LE JEU.');
+
+

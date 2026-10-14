@@ -106,3 +106,5 @@ export function pokeCardHTML(model = {}) {
   return toHTMLString(pokeCardVNode(model));
 }
 
+
+

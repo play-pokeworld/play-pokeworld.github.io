@@ -50,6 +50,17 @@ function startLegendaryEncounter(pokeId, level=65, opts){
 async function onPlayerPokeFaint(){
  battle.paused=true;
  const p=getActivePlayerPoke();
+ // DORM-04 — Pouvoir d'Alchimie : un coéquipier hérite temporairement du
+ // talent du Pokémon K.O. (le dernier tombé de l'équipe).
+ try{
+  if(p && p.talent){
+   for(const tp of (G.team||[])){
+    if(!tp || tp === p || Number(tp.currentHP ?? tp.hp ?? 1) <= 0) continue;
+    const hasPoA = (typeof hasTalent === 'function') ? hasTalent(tp, 'powerofalchemy') : (tp.talent === 'powerofalchemy');
+    if(hasPoA){ tp._tempTalent = p.talent; addBattleLog(`${tp.name} hérite du talent de ${p.name} (Pouvoir d'Alchimie) !`); break; }
+   }
+  }
+ }catch(_){}
  if(!battle.isChamp && !battle.isTraining) battle.sessionPlayerKOs = (battle.sessionPlayerKOs||0) + 1;
  addBattleLog(tr('player_pokemon_ko', {name:p.name}));
  updateBattleUI();
@@ -67,6 +78,18 @@ async function onPlayerPokeFaint(){
  const nextAlive=G.team.findIndex((pk,i)=>i!==battle.playerPokeIdx&&pk.currentHP>0);
  if(nextAlive===-1){
  addBattleLog(`<span class="pw-red">${t('all_pokemon_ko_lost')}</span>`);
+ // PASSE 32 — donjons : l'équipe entière est à terre, la descente s'arrête et
+ // la MOITIÉ du sac d'expédition est perdue (péage remboursé au palier 1).
+ try{
+  if(typeof currentDungeonRun === 'function' && currentDungeonRun() && typeof dungeonOnWipe === 'function'){
+   const _w = dungeonOnWipe();
+   if(_w){
+    addBattleLog(`<span class="pw-red">${tr('dungeon_log_wipe', {tokens:String(_w.kept.tokens), money:String(_w.kept.money), floor:String(_w.floor)})}</span>`);
+    if(_w.refunded) addBattleLog(`<span class="pw-green">${tr('dungeon_log_refund', {toll:String(_w.refunded)})}</span>`);
+   }
+   if(typeof refreshDungeonPanel === 'function') refreshDungeonPanel();
+  }
+ }catch(_){}
  const penalty=Math.floor(G.money*0.1);
  G.money-=penalty;
  updateHeader();
@@ -125,4 +148,6 @@ export {
   startLegendaryEncounter,
   onPlayerPokeFaint,
 };
+
+
 

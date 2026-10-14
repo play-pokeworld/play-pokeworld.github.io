@@ -9,6 +9,32 @@
 const __pwV43Link = (n) => ((typeof PokeActions !== 'undefined' && PokeActions && typeof PokeActions.get === 'function') ? PokeActions.get(n) : null)
   || (typeof globalThis !== 'undefined' ? globalThis[n] : null) || null;
 function applySecretBaseMoneyBonus(...args) { const f = __pwV43Link('applySecretBaseMoneyBonus'); return f ? f(...args) : undefined; }
+// Passe 26l — symbole de capture PokéClicker : dorée (chroma capturé), normale (capturé), vide (non capturé).
+function caughtStatusBallHtml(speciesId, size){
+ size = size || 16;
+ const nid = Number(speciesId);
+ const dex = (typeof G !== 'undefined' && G && G.pokedex && G.pokedex[nid]) || null;
+ const caught = !!(dex && dex.caught);
+ const shiny = caught && ((dex && dex.shiny) || (typeof isSpeciesShiny === 'function' && isSpeciesShiny(nid)));
+ const src = shiny ? 'src/assets/images/pokeball/Pokeball-shiny.svg'
+   : caught ? 'src/assets/images/pokeball/Pokeball.svg'
+   : 'src/assets/images/pokeball/None.svg';
+ const title = shiny ? 'Chromatique capturé' : caught ? 'Capturé' : 'Non capturé';
+ return '<img class="caught-status-ball" src="' + src + '" alt="" title="' + title + '" style="width:' + size + 'px;height:' + size + 'px;">';
+}
+if (typeof globalThis !== 'undefined') globalThis.caughtStatusBallHtml = caughtStatusBallHtml;
+if (typeof globalThis !== 'undefined' && typeof globalThis.formatNumber !== 'function') {
+  globalThis.formatNumber = function formatNumber(input) {
+    let num = Number(input);
+    if (Number.isNaN(num)) return '0';
+    if (num > 1e21) return 'N/A';
+    if (num >= 1e12) { num = Math.floor(num / 1e11); num = num < 100 ? num / 10 : Math.floor(num / 10); return num + 'T'; }
+    if (num >= 1e9)  { num = Math.floor(num / 1e8);  num = num < 100 ? num / 10 : Math.floor(num / 10); return num + 'B'; }
+    if (num >= 1e6)  { num = Math.floor(num / 1e5);  num = num < 100 ? num / 10 : Math.floor(num / 10); return num + 'M'; }
+    if (num >= 1e3)  { num = Math.floor(num / 1e2);  num = num < 100 ? num / 10 : Math.floor(num / 10); return num + 'K'; }
+    return num.toString();
+  };
+}
 function getTypeName(type){
  if(!type) return '';
  const raw = String(type).trim();
@@ -50,26 +76,24 @@ function getLocObj(id) {
 
 
 function getSpeciesTalents(id){
+  // Le pool de talents appartient à l'ESPÈCE (POKE_TALENTS[nid]) : on ne
+  // cherche jamais l'espèce à partir d'un talent. Fallback par types
+  // uniquement pour une espèce hors table (régions non couvertes).
   const nid = Number(id);
-  var pokeTalents = (typeof POKE_TALENTS !== 'undefined') ? POKE_TALENTS : (globalThis.POKE_TALENTS || null);
-  let list = [];
-  if (pokeTalents && pokeTalents[nid]) list = pokeTalents[nid].slice();
-  else {
-    const d = (typeof PD !== 'undefined' && PD) ? PD[nid] : null;
-    if (!d) list = ['sturdy', 'intimidate', 'hugepower'];
-    else {
-      const t1 = String(d[1] || '').toLowerCase();
-      const t2 = String(d[2] || '').toLowerCase();
-      if (typeof TALENTS_FULL !== 'undefined') {
-        for (const [key, obj] of Object.entries(TALENTS_FULL)) {
-          const types = obj.types || [];
-          if (types.includes('all') || (t1 && types.includes(t1)) || (t2 && types.includes(t2))) list.push(key);
-        }
-      }
-      if (!list.length) list = ['sturdy', 'intimidate', 'hugepower'];
+  const pokeTalents = (typeof POKE_TALENTS !== 'undefined') ? POKE_TALENTS : (globalThis.POKE_TALENTS || null);
+  if (pokeTalents && pokeTalents[nid]) return pokeTalents[nid].slice();
+  const d = (typeof PD !== 'undefined' && PD) ? PD[nid] : null;
+  if (!d) return ['sturdy', 'intimidate', 'hugepower'];
+  const t1 = String(d[1] || '').toLowerCase();
+  const t2 = String(d[2] || '').toLowerCase();
+  const list = [];
+  if (typeof TALENTS_FULL !== 'undefined') {
+    for (const [key, obj] of Object.entries(TALENTS_FULL)) {
+      const types = obj.types || [];
+      if (types.includes('all') || (t1 && types.includes(t1)) || (t2 && types.includes(t2))) list.push(key);
     }
   }
-  return list;
+  return list.length ? list : ['sturdy', 'intimidate', 'hugepower'];
 }
 
 function isSpeciesHiddenAbilityUnlocked(speciesId, haKey) {
@@ -96,8 +120,10 @@ function hasTalent(poke, talentName) {
   const t1 = poke.talent ? String(poke.talent).toLowerCase() : '';
   const t2 = getPokemonHiddenTalent(poke);
   const t2Low = t2 ? String(t2).toLowerCase() : '';
+  // DORM-04 — talent temporaire (Pouvoir d'Alchimie).
+  const t3 = poke._tempTalent ? String(poke._tempTalent).toLowerCase() : '';
   const needle = String(talentName).toLowerCase();
-  return t1 === needle || t2Low === needle;
+  return t1 === needle || t2Low === needle || t3 === needle;
 }
 
 
@@ -584,7 +610,7 @@ applyRouteLinkGroups();
  
  
  if(LOCS_JOHTO['victoryroad_jo']) LOCS_JOHTO['victoryroad_jo'].wild = [[95, 30, 36, 'common'], [169, 32, 38, 'common'], [111, 30, 36, 'uncommon']];
- if(LOCS_JOHTO['mtsilver']) LOCS_JOHTO['mtsilver'].wild = [[246, 40, 46, 'common'], [247, 42, 48, 'common'], [112, 40, 46, 'uncommon']];
+ if(LOCS_JOHTO['mtsilver']) LOCS_JOHTO['mtsilver'].wild = [[246, 40, 46, 'common'], [247, 42, 48, 'common'], [112, 40, 46, 'uncommon'], [200, 42, 48, 'rare']];
  if(LOCS_JOHTO['tohjofalls']) LOCS_JOHTO['tohjofalls'].wild = [[129, 28, 34, 'common'], [130, 30, 36, 'rare']];
 })();
 applyRouteLinkGroups();
@@ -775,7 +801,7 @@ function rankBadgeHtml(id){ const rank = getPokemonRank(id); return `<span class
 
 
 const BOX_FILTER_DEFAULTS = {region:'all', type:'all', shiny:'all', evo:'all', favorite:'all', locked:'all', iv:'all', ev:'all', rank:'all', search:''};
-const FILTER_LEVEL_EVO_MAP = {1:2, 2:3, 4:5, 5:6, 7:8, 8:9, 10:11, 11:12, 13:14, 14:15, 16:17, 17:18, 19:20, 21:22, 23:24, 27:28, 29:30, 32:33, 41:42, 43:44, 46:47, 48:49, 50:51, 52:53, 54:55, 56:57, 60:61, 63:64, 66:67, 69:70, 72:73, 74:75, 75:76, 77:78, 79:80, 81:82, 84:85, 86:87, 88:89, 92:93, 96:97, 98:99, 100:101, 104:105, 109:110, 111:112, 116:117, 118:119, 129:130, 138:139, 140:141, 147:148, 148:149, 152:153, 153:154, 155:156, 156:157, 158:159, 159:160, 161:162, 163:164, 165:166, 167:168, 170:171, 172:25, 173:35, 174:39, 175:176, 177:178, 179:180, 180:181, 183:184, 187:188, 188:189, 194:195, 204:205, 209:210, 216:217, 218:219, 220:221, 223:224, 228:229, 231:232, 236:106, 238:124, 239:125, 240:126, 246:247, 247:248, 252:253, 253:254, 255:256, 256:257, 258:259, 259:260, 261:262, 263:264, 265:266, 266:267, 268:269, 270:271, 273:274, 276:277, 278:279, 280:281, 281:282, 283:284, 285:286, 287:288, 288:289, 290:291, 293:294, 294:295, 296:297, 298:183, 304:305, 305:306, 307:308, 309:310, 316:317, 318:319, 320:321, 322:323, 328:329, 329:330, 331:332, 333:334, 339:340, 341:342, 343:344, 345:346, 347:348, 353:354, 355:356, 360:202, 361:362, 363:364, 364:365, 371:372, 372:373, 374:375, 375:376};
+const FILTER_LEVEL_EVO_MAP = {1:2, 2:3, 4:5, 5:6, 7:8, 8:9, 10:11, 11:12, 13:14, 14:15, 16:17, 17:18, 19:20, 21:22, 23:24, 27:28, 29:30, 32:33, 41:42, 43:44, 46:47, 48:49, 50:51, 52:53, 54:55, 56:57, 60:61, 63:64, 66:67, 69:70, 72:73, 74:75, 75:76, 77:78, 79:80, 81:82, 84:85, 86:87, 88:89, 92:93, 96:97, 98:99, 100:101, 104:105, 109:110, 111:112, 116:117, 118:119, 129:130, 138:139, 140:141, 147:148, 148:149, 152:153, 153:154, 155:156, 156:157, 158:159, 159:160, 161:162, 163:164, 165:166, 167:168, 170:171, 172:25, 173:35, 174:39, 175:176, 177:178, 179:180, 180:181, 183:184, 187:188, 188:189, 194:195, 204:205, 209:210, 216:217, 218:219, 220:221, 223:224, 228:229, 231:232, 236:106, 238:124, 239:125, 240:126, 246:247, 247:248, 252:253, 253:254, 255:256, 256:257, 258:259, 259:260, 261:262, 263:264, 265:266, 266:267, 268:269, 270:271, 273:274, 276:277, 278:279, 280:281, 281:282, 283:284, 285:286, 287:288, 288:289, 290:291, 293:294, 294:295, 296:297, 298:183, 304:305, 305:306, 307:308, 309:310, 316:317, 318:319, 320:321, 322:323, 325:326, 328:329, 329:330, 331:332, 333:334, 339:340, 341:342, 343:344, 345:346, 347:348, 353:354, 355:356, 360:202, 361:362, 363:364, 364:365, 371:372, 372:373, 374:375, 375:376};
 const FILTER_STONE_EVO = {37:{firestone:38},58:{firestone:59},133:{firestone:136,waterstone:134,thunderstone:135},61:{waterstone:62,kings_rock:186},90:{waterstone:91},120:{waterstone:121},25:{thunderstone:26},44:{leafstone:45,sunstone:182},70:{leafstone:71},102:{leafstone:103},30:{moonstone:31},33:{moonstone:34},35:{moonstone:36},39:{moonstone:40},79:{kings_rock:200},95:{metal_coat:208},117:{dragon_scale:230},123:{metal_coat:212},137:{upgrade:233},191:{sunstone:192},271:{waterstone:272},274:{leafstone:275},300:{moonstone:301},366:{deep_sea_tooth:367,deep_sea_scale:368},349:{prism_scale:350}};
 
 function ensureBoxFilters(){
@@ -802,6 +828,43 @@ function getUnlockedDexIds(){
  }
  return out;
 }
+// FIX-08 : espèces atteignables — rencontres sauvages des 3 régions,
+// évolutions (cartes canoniques progression.js, sinon fallback), starters,
+// fossiles, légendaires errants, marché PQ et récompenses Pokémon des quêtes.
+function getReachableSpecies(){
+ const reach = new Set();
+ const addWild = (loc) => { if(!loc || !Array.isArray(loc.wild)) return; for(const entry of loc.wild){ if(Array.isArray(entry) && entry.length) reach.add(Number(entry[0])); } };
+ const locSets = [ (typeof LOCS !== 'undefined' ? LOCS : null), (typeof LOCS_JOHTO !== 'undefined' ? LOCS_JOHTO : null), (typeof LOCS_HOENN !== 'undefined' ? LOCS_HOENN : null) ];
+ for(const locs of locSets){ if(!locs) continue; for(const id in locs) addWild(locs[id]); }
+ // Starters donnés au départ.
+ for(let i=1;i<=9;i++) reach.add(i);
+ for(let i=152;i<=160;i++) reach.add(i);
+ for(let i=252;i<=260;i++) reach.add(i);
+ // Fossiles (champ revive ≤ 386).
+ if(typeof ITEMS !== 'undefined' && ITEMS){ for(const k in ITEMS){ const r = Number(ITEMS[k] && ITEMS[k].revive); if(r && r <= 386) reach.add(r); } }
+ // Légendaires errants.
+ for(const id of [144,145,146,151,243,244,245,251,380,381,385,386]) reach.add(id);
+ // Marché PQ (stock classique).
+ for(const id of [1,4,7,133,137,106,107,122,124,131,152,155,158,172,173,174,175,236,196,197,199,213,238,239,240,252,255,258,298,351]) reach.add(id);
+ // Récompenses Pokémon des quêtes (histoire + annexes + Hoenn).
+ const addReward = (qs) => { if(!qs) return; if(Array.isArray(qs)){ for(const q of qs){ const r = q && q.rewardPoke; if(r && Number(r) <= 386) reach.add(Number(r)); } } else { for(const k in qs){ const q = qs[k]; const r = q && q.rewardPoke; if(r && Number(r) <= 386) reach.add(Number(r)); } } };
+ addReward(typeof STORY_QUESTS !== 'undefined' ? STORY_QUESTS : null);
+ addReward(typeof STORY_QUESTS_HOENN !== 'undefined' ? STORY_QUESTS_HOENN : null);
+ addReward(typeof SIDE_QUESTS !== 'undefined' ? SIDE_QUESTS : null);
+ // Fermeture par évolution.
+ const lvlMap = (typeof LEVEL_EVO_MAP !== 'undefined' && LEVEL_EVO_MAP && Object.keys(LEVEL_EVO_MAP).length) ? LEVEL_EVO_MAP : FILTER_LEVEL_EVO_MAP;
+ const stMap = (typeof STONE_EVO !== 'undefined' && STONE_EVO && Object.keys(STONE_EVO).length) ? STONE_EVO : FILTER_STONE_EVO;
+ let changed = true;
+ while(changed){
+  changed = false;
+  for(const f in lvlMap){ const t = Number(lvlMap[f]); if(reach.has(Number(f)) && !reach.has(t)){ reach.add(t); changed = true; } }
+  for(const f in stMap){ if(!reach.has(Number(f))) continue; const targets = stMap[f]; if(!targets) continue; for(const sk in targets){ const t = Number(targets[sk]); if(!reach.has(t)){ reach.add(t); changed = true; } } }
+ }
+ const out = [];
+ for(let i=1;i<=386;i++) if(reach.has(i)) out.push(i);
+ return out;
+}
+
 function getBoxFilterRegions(){
  const regions = new Set(['all']);
  for(const p of Object.values(G.collection || {})) if(p) regions.add(getPokemonRegion(p.id));
@@ -844,6 +907,21 @@ function canPokemonEvolveToUnowned(p){
  }
  return false;
 }
+// PASSE 29 — item 11: a Pokemon's `p.name` is frozen at creation time in the
+// language that was active back then, so a search typed in the CURRENT
+// language missed anything created in another one. Every search field must
+// build its haystack from the live localized name (getPokeName) while keeping
+// the stored name and the dex number as extra matches (old saves, nicknames).
+function pokemonSearchHaystack(p){
+ if(!p) return '';
+ const disp = (typeof getPokeName === 'function' ? getPokeName(p.id) : '') || '';
+ return (disp + ' ' + (p.name || '') + ' #' + (p.id != null ? p.id : '') + ' ' + (p.id != null ? p.id : '')).toLowerCase();
+}
+function pokemonMatchesSearch(p, query){
+ const q = String(query || '').toLowerCase().trim();
+ if(!q) return true;
+ return pokemonSearchHaystack(p).includes(q);
+}
 function pokemonMatchesBoxFilters(p, ignoreSearch){
  const filters = ensureBoxFilters();
  if(!p) return false;
@@ -864,14 +942,7 @@ function pokemonMatchesBoxFilters(p, ignoreSearch){
  if(filters.ev === 'complete' && evTotal < 36) return false;
  if(filters.ev === 'incomplete' && evTotal >= 36) return false;
  if(filters.rank && filters.rank !== 'all' && typeof getPokemonRank === 'function' && getPokemonRank(p.id) !== filters.rank) return false;
- if(!ignoreSearch && filters.search){
-  const q = String(filters.search).toLowerCase().trim();
-  if(q){
-   const disp = (typeof getPokeName === 'function' ? getPokeName(p.id) : '') || '';
-   const hay = (disp + ' ' + (p.name || '') + ' #' + (p.id != null ? p.id : '')).toLowerCase();
-   if(!hay.includes(q)) return false;
-  }
- }
+ if(!ignoreSearch && filters.search && !pokemonMatchesSearch(p, filters.search)) return false;
  return true;
 }
 // opts.ignoreSearch: contexts owning their own search field (unified
@@ -1073,8 +1144,11 @@ if (typeof ensureBoxFilters !== 'undefined') { if (typeof window !== 'undefined'
 if (typeof getPokemonRegion !== 'undefined') { if (typeof window !== 'undefined') window.getPokemonRegion = getPokemonRegion; if (typeof globalThis !== 'undefined') globalThis.getPokemonRegion = getPokemonRegion; }
 if (typeof getUnlockedRegionsForPokedex !== 'undefined') { if (typeof window !== 'undefined') window.getUnlockedRegionsForPokedex = getUnlockedRegionsForPokedex; if (typeof globalThis !== 'undefined') globalThis.getUnlockedRegionsForPokedex = getUnlockedRegionsForPokedex; }
 if (typeof getUnlockedDexIds !== 'undefined') { if (typeof window !== 'undefined') window.getUnlockedDexIds = getUnlockedDexIds; if (typeof globalThis !== 'undefined') globalThis.getUnlockedDexIds = getUnlockedDexIds; }
+if (typeof getReachableSpecies !== 'undefined') { if (typeof window !== 'undefined') window.getReachableSpecies = getReachableSpecies; if (typeof globalThis !== 'undefined') globalThis.getReachableSpecies = getReachableSpecies; }
 if (typeof isEvolutionTargetObtained !== 'undefined') { if (typeof window !== 'undefined') window.isEvolutionTargetObtained = isEvolutionTargetObtained; if (typeof globalThis !== 'undefined') globalThis.isEvolutionTargetObtained = isEvolutionTargetObtained; }
 if (typeof canPokemonEvolveToUnowned !== 'undefined') { if (typeof window !== 'undefined') window.canPokemonEvolveToUnowned = canPokemonEvolveToUnowned; if (typeof globalThis !== 'undefined') globalThis.canPokemonEvolveToUnowned = canPokemonEvolveToUnowned; }
+if (typeof pokemonSearchHaystack !== 'undefined') { if (typeof window !== 'undefined') window.pokemonSearchHaystack = pokemonSearchHaystack; if (typeof globalThis !== 'undefined') globalThis.pokemonSearchHaystack = pokemonSearchHaystack; }
+if (typeof pokemonMatchesSearch !== 'undefined') { if (typeof window !== 'undefined') window.pokemonMatchesSearch = pokemonMatchesSearch; if (typeof globalThis !== 'undefined') globalThis.pokemonMatchesSearch = pokemonMatchesSearch; }
 if (typeof pokemonMatchesBoxFilters !== 'undefined') { if (typeof window !== 'undefined') window.pokemonMatchesBoxFilters = pokemonMatchesBoxFilters; if (typeof globalThis !== 'undefined') globalThis.pokemonMatchesBoxFilters = pokemonMatchesBoxFilters; }
 if (typeof applyPokemonBoxFilters !== 'undefined') { if (typeof window !== 'undefined') window.applyPokemonBoxFilters = applyPokemonBoxFilters; if (typeof globalThis !== 'undefined') globalThis.applyPokemonBoxFilters = applyPokemonBoxFilters; }
 if (typeof renderBoxFiltersHtml !== 'undefined') { if (typeof window !== 'undefined') window.renderBoxFiltersHtml = renderBoxFiltersHtml; if (typeof globalThis !== 'undefined') globalThis.renderBoxFiltersHtml = renderBoxFiltersHtml; }
@@ -1249,6 +1323,8 @@ export {
   getLocObj,
   generateUniqueBoxId,
   boxFilterOptionHtml,
+  pokemonSearchHaystack,
+  pokemonMatchesSearch,
   getAutoRouteLinkGroups,
   getBoxFilterRegions,
   getBoxFilterTypes,
@@ -1267,4 +1343,6 @@ if ((typeof PokeActions === 'undefined' || !PokeActions || (typeof PokeActions.h
   && typeof queueMicrotask === 'function') {
   queueMicrotask(__pwV43RegisterSetBoxSearch);
 }
+
+
 

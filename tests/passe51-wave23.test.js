@@ -204,3 +204,5 @@ test('wave23: _repeatableRoll is declared AND mirrored by its sole consumer', ()
   assert.ok(QUEST_UI.includes('globalThis._repeatableRoll = _repeatableRoll;'), 'window mirrored for legacy readers');
 });
 
+
+

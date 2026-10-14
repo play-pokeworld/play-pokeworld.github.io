@@ -82,3 +82,5 @@ test('PokemonFactory creates clean ECS Pokémon entities with strict component s
   assert.equal(world.get(bulbaEid, 'Experience').currentExp, 1200);
 });
 
+
+

@@ -346,3 +346,5 @@ export const L_en_messages = {
 // gardée sur l'objet global pour les registres (data.js) et les harnais VM.
 if (typeof globalThis !== 'undefined') globalThis.L_en_messages = L_en_messages;
 
+
+

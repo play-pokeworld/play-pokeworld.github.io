@@ -9,6 +9,16 @@
  */
 function getRoamingLegendaryForRoute(locId){
  if(typeof G === 'undefined' || !G) return null;
+ // PASSE 38f — les DONJONS n'accueillent JAMAIS de légendaire errant
+ // (retour joueur : « comment ça se passe pour les roaming qui peuvent
+ // tomber sur une zone donjon ? »). Les créatures errantes appartiennent
+ // aux routes extérieures ; une expédition se joue contre la faune locale
+ // (le boss est le rare du lieu). Garde-fou explicite, même si un donjon
+ // entrait un jour dans le pool.
+ try {
+   const loc = (typeof globalThis.getLocObj === 'function') ? globalThis.getLocObj(locId) : null;
+   if (loc && loc.type === 'dungeon') return null;
+ } catch (_) {}
  // Phase 22 — roaming legendaries: deterministic window seed, same
  // UTC-dated seed for everyone, timer shown on the routes (location-info).
  const nowWindow = (typeof getRotationWindow === 'function') ? getRotationWindow() : Math.floor(Date.now() / (12 * 3600 * 1000));
@@ -49,4 +59,6 @@ if (typeof getRoamingLegendaryForRoute !== 'undefined') { if (typeof window !== 
 export {
   getRoamingLegendaryForRoute,
 };
+
+
 

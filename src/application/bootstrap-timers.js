@@ -20,7 +20,7 @@ function initializeGameInterface(){
  applySavedTheme();
  if(typeof updateSaveProfileControls === 'function') updateSaveProfileControls();
  try{
- const savedCols = safeStorage.get('pokeworld_cols_v12');
+ const savedCols = safeStorage.get('pokeworld_cols_v13');
  if(savedCols){
  // FIX (2026-08): go through the canonical accessor (module-safe reassignment).
  setDashboardCols(JSON.parse(savedCols), {persist:false});
@@ -34,6 +34,9 @@ function initializeGameInterface(){
  try{ if(typeof renderTrainingWindow === 'function') renderTrainingWindow(); }catch(_){}
  renderMap();
  updateHeader();
+ // PASSE 30 (P3) — peuple le fond avec nos Pokémon capturés (couche décorative
+ // derrière l'interface ; se recalcule après chaque capture).
+ try{ if(typeof renderBgPokemon === 'function') renderBgPokemon(); }catch(_){}
  showTab('info');
  updateI18nLabels();
  ensureQuestState();
@@ -273,4 +276,6 @@ export {
   initializeGameInterface,
   appTimer,
 };
+
+
 

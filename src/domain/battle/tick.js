@@ -83,6 +83,12 @@ export function resolveBattleStateAnomalies() {
     return true;
   }
 
+  // PASSE 35 — le gardien de donjon entre en furie sous 50 % de PV.
+  // Sans effet hors combat de boss ; ne se déclenche qu'une fois.
+  if (e.isDungeonBoss && typeof globalThis.dungeonBossTick === 'function') {
+    try { globalThis.dungeonBossTick(); } catch (_) {}
+  }
+
   if (Number(e.currentHP ?? e.hp ?? 1) <= 0) {
     b.resolvingKO = true;
     b.paused = true;
@@ -186,8 +192,21 @@ export function doPlayerMove() {
     const mv = p.moves[b.pMoveIdx % p.moves.length];
     if (mv && mv.id) {
       b.pMoveIdx = (b.pMoveIdx + 1) % p.moves.length;
+      b.lastPlayerMoveId = mv.id; // DORM-04 : cooldown = capacité UTILISÉE
       if (typeof globalThis.flashMoveFiring === 'function') globalThis.flashMoveFiring(mv.id, 'player');
       if (typeof globalThis.executeAttack === 'function') globalThis.executeAttack(p, e, mv.id, 'player');
+    }
+  }
+  // DORM-06b — Cristal Z : attaque coordonnée tous les N tours (PokeChill).
+  const _zHeld = (typeof globalThis.getHeldItemForPokemon === 'function') ? globalThis.getHeldItemForPokemon(p) : (p && p.heldItem);
+  if (_zHeld && typeof globalThis.ITEMS !== 'undefined' && globalThis.ITEMS[_zHeld] && globalThis.ITEMS[_zHeld].category === 'z_crystal') {
+    b.zTurns = (b.zTurns || 0) + 1;
+    const _zQty = (typeof globalThis.G !== 'undefined' && globalThis.G.inventory) ? (globalThis.G.inventory[_zHeld] || 0) : 0;
+    const _zLevel = (typeof globalThis.ItemEngine !== 'undefined' && globalThis.ItemEngine.getPowerLevel) ? globalThis.ItemEngine.getPowerLevel(_zQty) : 1;
+    const _zPeriod = Math.max(8, 20 - 2 * _zLevel);
+    if (b.zTurns >= _zPeriod) {
+      b.zTurns = 0;
+      if (typeof globalThis.executeZCrystalAttack === 'function') globalThis.executeZCrystalAttack(p, e, globalThis.ITEMS[_zHeld].zType);
     }
   }
   if (typeof globalThis.resetPlayerCd === 'function') globalThis.resetPlayerCd();
@@ -221,6 +240,8 @@ export function doEnemyMove() {
     const mv = e.moves[b.eMoveIdx % e.moves.length];
     if (mv && mv.id) {
       b.eMoveIdx = (b.eMoveIdx + 1) % e.moves.length;
+      b.lastEnemyMoveId = mv.id; // DORM-04 : cooldown = capacité UTILISÉE
+      b.enemyTurnsOnField = (b.enemyTurnsOnField || 0) + 1; // DORM-06 — Chrono Ball
       if (typeof globalThis.flashMoveFiring === 'function') globalThis.flashMoveFiring(mv.id, 'enemy');
       if (typeof globalThis.executeAttack === 'function') globalThis.executeAttack(e, p, mv.id, 'enemy');
     }
@@ -242,19 +263,56 @@ export function triggerEntryTalents(side) {
     const hasTal = (t) => (typeof globalThis.hasTalent === 'function') ? globalThis.hasTalent(poke, t) : poke.talent === t;
     const log = typeof globalThis.addBattleLog === 'function' ? globalThis.addBattleLog : () => {};
     const tr = typeof globalThis.t === 'function' ? globalThis.t : null;
+    // DORM-04 — Médic Nature : le statut est effacé à l'entrée/au switch.
+    if (hasTal('naturalcure') && poke.status) { poke.status = null; poke.statusTurns = 0; log('[Talent] Médic Nature : ' + poke.name + ' est guéri !'); }
+    // DORM-04 — Climatact : la météo invoquée dure 15 tours.
+    const clim = (turns) => hasTal('climatact') ? 15 : turns;
 
     if (hasTal('intimidate')) {
-      if (isPlayer) { b.enemyMods.atk = Math.max(0.25, b.enemyMods.atk * 0.75); log('[Talent] Intimidation : baisse l\'Attaque adverse !'); }
-      else { b.playerMods.atk = Math.max(0.25, b.playerMods.atk * 0.75); log('[Talent] Intimidation : baisse votre Attaque !'); }
+      const target = isPlayer ? b.enemyPoke : getActivePlayerPoke();
+      const targetHeld = target ? (typeof globalThis.getHeldItemForPokemon === 'function' ? globalThis.getHeldItemForPokemon(target) : target.heldItem) : null;
+      const targetImmune = target && ((typeof globalThis.hasTalent === 'function' && (globalThis.hasTalent(target, 'fullmetalbody') || globalThis.hasTalent(target, 'hypercutter'))) || target.talent === 'fullmetalbody' || target.talent === 'hypercutter' || targetHeld === 'clear_amulet');
+      if (!targetImmune) {
+        if (isPlayer) { b.enemyMods.atk = Math.max(0.25, b.enemyMods.atk * 0.75); log('[Talent] Intimidation : baisse l\'Attaque adverse !'); }
+        else { b.playerMods.atk = Math.max(0.25, b.playerMods.atk * 0.75); log('[Talent] Intimidation : baisse votre Attaque !'); }
+      }
     }
     if (hasTal('regenerator')) {
       poke.currentHP = Math.min(poke.maxHP, poke.currentHP + Math.floor(poke.maxHP * 0.25));
       log(tr ? tr('regenerator_proc') : '[Talent] Régé-Force : ' + poke.name + ' récupère des PV !');
     }
-    if (hasTal('drizzle')) { b.weather = 'rainy'; b.weatherTurns = poke.heldItem === 'damp_rock' ? 8 : 5; log(tr ? tr('drizzle_proc') : '[Talent] Crachin : ' + poke.name + ' invoque la pluie !'); }
-    if (hasTal('drought')) { b.weather = 'sunny'; b.weatherTurns = poke.heldItem === 'heat_rock' ? 8 : 5; log(tr ? tr('drought_proc') : '[Talent] Sécheresse : ' + poke.name + ' invoque le soleil !'); }
-    if (hasTal('sandstream')) { b.weather = 'sand'; b.weatherTurns = poke.heldItem === 'smooth_rock' ? 8 : 5; log(tr ? tr('sandstream_proc') : '[Talent] Sable Volant : ' + poke.name + ' invoque une tempête de sable !'); }
-    if (hasTal('snowwarning')) { b.weather = 'hail'; b.weatherTurns = poke.heldItem === 'icy_rock' ? 8 : 5; log(tr ? tr('snowwarning_proc') : '[Talent] Alerte Neige : ' + poke.name + ' invoque la grêle !'); }
+    // DORM-06 — baies d'EV : à l'entrée, réduisent la stat correspondante de l'ennemi.
+    try {
+      if (typeof globalThis.berryHeld === 'function') {
+        const bv = globalThis.berryHeld(poke);
+        if (bv && bv.itm.category === 'entry_debuff') {
+          if (typeof globalThis.pwStatChange === 'function') {
+            if (bv.itm.stat === 'hp') {
+              const tgt = isPlayer ? b.enemyPoke : getActivePlayerPoke();
+              if (tgt) { tgt.maxHP = Math.max(1, Math.floor(tgt.maxHP * 0.85)); tgt.currentHP = Math.min(tgt.currentHP, tgt.maxHP); }
+            } else {
+              globalThis.pwStatChange(isPlayer ? 'enemy' : 'player', bv.itm.stat, 0.85, { poke: isPlayer ? b.enemyPoke : getActivePlayerPoke() });
+            }
+            log('[Baie] ' + poke.name + ' affaiblit l\'adversaire (' + bv.key + ') !');
+          }
+        }
+      }
+    } catch (_) {}
+    // DORM-04 — Regard Intimidant : −50 % d'Attaque Spéciale adverse à l'entrée.
+    if (hasTal('dauntinglook')) {
+      if (typeof globalThis.pwStatChange === 'function') {
+        globalThis.pwStatChange(isPlayer ? 'enemy' : 'player', 'spa', 0.5, { poke: isPlayer ? b.enemyPoke : getActivePlayerPoke() });
+      } else {
+        if (isPlayer) b.enemyMods.spa = Math.max(0.25, (b.enemyMods.spa || 1) * 0.5);
+        else b.playerMods.spa = Math.max(0.25, (b.playerMods.spa || 1) * 0.5);
+      }
+      log('[Talent] Regard Intimidant : l\'Attaque Spéciale adverse chute !');
+    }
+    if (hasTal('drizzle')) { b.weather = 'rainy'; b.weatherTurns = clim(poke.heldItem === 'damp_rock' ? 8 : 5); log(tr ? tr('drizzle_proc') : '[Talent] Crachin : ' + poke.name + ' invoque la pluie !'); }
+    if (hasTal('drought')) { b.weather = 'sunny'; b.weatherTurns = clim(poke.heldItem === 'heat_rock' ? 8 : 5); log(tr ? tr('drought_proc') : '[Talent] Sécheresse : ' + poke.name + ' invoque le soleil !'); }
+    if (hasTal('sandstream')) { b.weather = 'sand'; b.weatherTurns = clim(poke.heldItem === 'smooth_rock' ? 8 : 5); log(tr ? tr('sandstream_proc') : '[Talent] Sable Volant : ' + poke.name + ' invoque une tempête de sable !'); }
+    if (hasTal('snowwarning')) { b.weather = 'hail'; b.weatherTurns = clim(poke.heldItem === 'icy_rock' ? 8 : 5); log(tr ? tr('snowwarning_proc') : '[Talent] Alerte Neige : ' + poke.name + ' invoque la grêle !'); }
+    if (hasTal('somberfield')) { b.weather = 'somber'; b.weatherTurns = clim(5); log('[Talent] Champ Sombre : ' + poke.name + ' étend un champ sombre !'); }
     if (hasTal('electricsurge')) { b.terrain = 'electric'; b.terrainTurns = poke.heldItem === 'terrain_extender' ? 8 : 5; log(tr ? tr('electricsurge_proc') : '[Talent] Créa-Élec : ' + poke.name + ' active un Champ Électrique !'); }
     if (hasTal('grassysurge')) { b.terrain = 'grassy'; b.terrainTurns = poke.heldItem === 'terrain_extender' ? 8 : 5; log(tr ? tr('grassysurge_proc') : '[Talent] Créa-Herbe : ' + poke.name + ' active un Champ Herbeux !'); }
     if (hasTal('mistysurge')) { b.terrain = 'misty'; b.terrainTurns = poke.heldItem === 'terrain_extender' ? 8 : 5; log(tr ? tr('mistysurge_proc') : '[Talent] Créa-Brum : ' + poke.name + ' active un Champ Brumeux !'); }
@@ -270,4 +328,6 @@ export function triggerEntryTalents(side) {
   if (side === 'enemy' || side === 'both') applyTalent(e, false);
   if (typeof globalThis.updateBattleUI === 'function') globalThis.updateBattleUI();
 }
+
+
 

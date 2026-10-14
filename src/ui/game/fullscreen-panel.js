@@ -108,11 +108,17 @@ function renderDictionary(el){
  const entries = [];
  if(tab === 'items'){
   let keys = Object.keys(ITEMS||{}).sort((a,b)=>getItemName(a).localeCompare(getItemName(b)));
+  // Passe 19 — découverte progressive : on ne voit que les objets des
+  // générations débloquées (Kanto → Gen 1, Johto → +Gen 2, Hoenn → +Gen 3).
+  if(typeof isItemGenUnlocked === 'function') keys = keys.filter(k => (typeof G !== 'undefined' && G && G._debugShowAllItems) ? true : isItemGenUnlocked(k));
   if(q) keys = keys.filter(k => (getItemName(k)+' '+k+' '+getItemDesc(k)).toLowerCase().includes(q));
   keys.forEach(k=>{
-   const owned = !!(G.inventory&&G.inventory[k]>0);
+   const itm = ITEMS[k];
+   const isBall = itm && itm.type === 'ball';
+   const ownedQty = isBall ? ((G.pokeballs && G.pokeballs[k]) || 0) : ((G.inventory && G.inventory[k]) || 0);
+   const owned = ownedQty > 0;
    entries.push({ key:k, iconHtml:itemSpriteHtml(k,32), title:getItemName(k),
-    subtitle: owned?tr('dict_owned_qty',{count:G.inventory[k]}):(t('dict_not_owned')||'Not owned'),
+    subtitle: owned?tr('dict_owned_qty',{count:ownedQty}):(t('dict_not_owned')||'Not owned'),
     owned: owned, dataset:{ action:'legacy-call', call:'openItemInfo', callArgs:`'${k}'` } });
   });
  } else if(tab === 'moves'){
@@ -186,7 +192,7 @@ function renderDictionary(el){
 let _atollTab = 'menu';
 // ATOLL_MODES / ATOLL_RANK_SEQUENCE / rotation 12 h / bans / serie Usine :
 // Phase 22 — legacy feature update
-export const ATOLL_SHOP = [ ['rarecandy',25], ['leftovers',120], ['assault_vest',180], ['eviolite',200], ['choice_band',260], ['choice_specs',260], ['life_orb',360] ];
+export const ATOLL_SHOP = [ ['rarecandy',25], ['leftovers',120], ['choice_band',260], ['choice_specs',260] ];
 // FIX (2026-08): game-helpers.js references ATOLL_SHOP as a free identifier.
 if (typeof globalThis !== 'undefined') globalThis.ATOLL_SHOP = ATOLL_SHOP;
 if (typeof globalThis !== 'undefined') globalThis.ATOLL_SHOP = ATOLL_SHOP;
@@ -717,6 +723,12 @@ function closeFullscreenPanel(){
  if(modal) modal.style.display = 'none';
 }
 
+// HLP-00 — le bouton « ? » d'une fenêtre ouvre le Guide SUR sa rubrique.
+function openGuideSection(section){
+ if(typeof openFullscreenPanel === 'function') openFullscreenPanel('guide');
+ if(typeof setGuideSection === 'function') setGuideSection(section || null);
+}
+
 
 // --- Migrated to ES module, globals exposed ---
 if (typeof setDictionarySearch !== 'undefined') { if (typeof window !== 'undefined') window.setDictionarySearch = setDictionarySearch; if (typeof globalThis !== 'undefined') globalThis.setDictionarySearch = setDictionarySearch; }
@@ -726,6 +738,7 @@ if (typeof renderDictionary !== 'undefined') { if (typeof window !== 'undefined'
 if (typeof openAbilityInfo !== 'undefined') { if (typeof window !== 'undefined') window.openAbilityInfo = openAbilityInfo; if (typeof globalThis !== 'undefined') globalThis.openAbilityInfo = openAbilityInfo; }
 if (typeof openFullscreenPanel !== 'undefined') { if (typeof window !== 'undefined') window.openFullscreenPanel = openFullscreenPanel; if (typeof globalThis !== 'undefined') globalThis.openFullscreenPanel = openFullscreenPanel; }
 if (typeof closeFullscreenPanel !== 'undefined') { if (typeof window !== 'undefined') window.closeFullscreenPanel = closeFullscreenPanel; if (typeof globalThis !== 'undefined') globalThis.closeFullscreenPanel = closeFullscreenPanel; }
+if (typeof openGuideSection !== 'undefined') { if (typeof window !== 'undefined') window.openGuideSection = openGuideSection; if (typeof globalThis !== 'undefined') globalThis.openGuideSection = openGuideSection; }
 if (typeof renderBattleAtoll !== 'undefined') { if (typeof window !== 'undefined') window.renderBattleAtoll = renderBattleAtoll; if (typeof globalThis !== 'undefined') globalThis.renderBattleAtoll = renderBattleAtoll; }
 if (typeof atollPanelModel !== 'undefined') { if (typeof window !== 'undefined') window.atollPanelModel = atollPanelModel; if (typeof globalThis !== 'undefined') globalThis.atollPanelModel = atollPanelModel; }
 if (typeof setAtollTab !== 'undefined') { if (typeof window !== 'undefined') window.setAtollTab = setAtollTab; if (typeof globalThis !== 'undefined') globalThis.setAtollTab = setAtollTab; }
@@ -796,4 +809,6 @@ export {
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('closeFullscreenPanel', closeFullscreenPanel); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('openFullscreenPanel', openFullscreenPanel); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('setDictionarySearch', setDictionarySearch); } catch (_) {} }
+
+
 

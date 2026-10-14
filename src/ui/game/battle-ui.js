@@ -39,9 +39,39 @@ function getBattleViewSnapshot() {
   }
 }
 
+/**
+ * PASSE 26o — PV affichables. Le moteur stocke des PV flottants ; on arrondit
+ * au supérieur pour ne jamais afficher 0 PV sur un Pokémon encore debout
+ * (et jamais une queue binaire du type `.899999999999999`).
+ */
+function hpDisplay(v) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return '?';
+  if (n <= 0) return '0';
+  return String(Math.max(1, Math.ceil(n - 1e-9)));
+}
+
+/** PASSE 38f — pourcentage de BARRE calculé sur les PV AFFICHÉS (mêmes
+ *  entiers que le texte « 46/46 PV »), pas sur le ratio flottant brut.
+ *  Bug joueur : « la barre bouge et n'est pas remplie au max alors que le
+ *  Pokémon est full hp ». Le moteur stocke des PV flottants (45,9999/46) :
+ *  le texte arrondit au-dessus (→ « 46/46 ») mais la barre affichait le
+ *  ratio brut (→ 99,98 %, qui oscille avec la transition 0,3 s). En
+ *  calculant sur les valeurs affichées, « plein » dans le texte = barre
+ *  pleine, et plus d'oscillation. */
+function hpBarPct(current, max) {
+  const c = Number(hpDisplay(current));
+  const m = Number(hpDisplay(max));
+  if (!(m > 0)) return 0;
+  return Math.max(0, Math.min(1, c / m));
+}
+
 function updatePokemonCardDynamicState(card, pokemon) {
   if (!card || !pokemon) return;
-  const pct = pokemon.maxHP ? Math.max(0, Math.min(1, pokemon.currentHP / pokemon.maxHP)) : 0;
+  // PASSE 38f — la barre et le texte partagent les MÊMES PV affichés :
+  // à « full hp » (texte 46/46) la barre est pleine à 100 %, jamais à
+  // 99,9 % qui oscillait avec la transition.
+  const pct = pokemon.maxHP ? hpBarPct(pokemon.currentHP, pokemon.maxHP) : 0;
   const hpClass = pct > 0.5 ? 'high' : pct > 0.2 ? 'medium' : 'low';
   const hpFill = card.querySelector('.hp-fill');
   if (hpFill) {
@@ -51,7 +81,9 @@ function updatePokemonCardDynamicState(card, pokemon) {
     hpFill.classList.toggle('low', hpClass === 'low');
   }
   const hpText = card.querySelector('.hp-text');
-  if (hpText) hpText.textContent = pokemon.currentHP + '/' + pokemon.maxHP + ' ' + (typeof t === 'function' ? t('stat_hp_short') || (typeof t==='function'?t('stat_hp_short')||'PV':'PV') : (typeof t==='function'?t('stat_hp_short')||'PV':'PV'));
+  // PASSE 26o — les PV du moteur sont flottants (dégâts fractionnaires du
+  // ticker 60 fps) : sans arrondi le joueur lisait « 6.899999999999999/19 PV ».
+  if (hpText) hpText.textContent = hpDisplay(pokemon.currentHP) + '/' + hpDisplay(pokemon.maxHP) + ' ' + (typeof t === 'function' ? t('stat_hp_short') || (typeof t==='function'?t('stat_hp_short')||'PV':'PV') : (typeof t==='function'?t('stat_hp_short')||'PV':'PV'));
   const levelText = card.querySelector('.poke-level');
   if (levelText) levelText.textContent = (typeof t === 'function' ? t('level_abbrev') || (typeof t==='function'?t('level_abbrev')||'Nv.':'Nv.') : (typeof t==='function'?t('level_abbrev')||'Nv.':'Nv.')) + pokemon.level;
   card.classList.toggle('fainted', pokemon.currentHP <= 0);
@@ -60,7 +92,21 @@ function updatePokemonCardDynamicState(card, pokemon) {
     const curBase = xpForLevel(pokemon.level);
     const xpInLevel = Math.max(0, (pokemon.xp || 0) - curBase);
     const xpReqLevel = Math.max(1, (pokemon.xpNext || 1) - curBase);
-    xpFill.style.width = Math.min(100, (xpInLevel / xpReqLevel) * 100) + '%';
+    const xpPct = Math.min(100, (xpInLevel / xpReqLevel) * 100);
+    // PASSE 30 (P3 · ANI-01) — barre d'XP FLUIDE (400 ms). Le ticker de combat
+    // repeint cette barre à 60 fps : sans transition, la progression était une
+    // succession de sauts d'un pixel. smoothBar() pose `.pw-fx-smooth`, qui
+    // porte la transition CSS, et la retire si le joueur a coupé les
+    // animations (ou si le système demande « réduire les animations »).
+    if (typeof smoothBar === 'function') smoothBar(xpFill, xpPct);
+    else xpFill.style.width = xpPct + '%';
+    // PASSE 30 (P3 · ANI-01) — PULSATION au passage de niveau : le palier de
+    // succès doit se voir. On mémorise le dernier niveau peint sur la carte.
+    const seenLvl = Number(card.dataset.pwLvlSeen);
+    if (Number.isFinite(seenLvl) && pokemon.level > seenLvl && typeof pulseElement === 'function') {
+      try { pulseElement(card); } catch (_) {}
+    }
+    card.dataset.pwLvlSeen = String(pokemon.level);
   }
 }
 
@@ -215,6 +261,8 @@ function toggleDebugX10(show) {
 
 // Expose globally
 // Wave 41 — surface kept (window → globalThis block, same scope).
+if (typeof globalThis !== 'undefined') globalThis.hpDisplay = hpDisplay;
+if (typeof globalThis !== 'undefined') globalThis.hpBarPct = hpBarPct;
 if (typeof globalThis !== 'undefined') globalThis.getActivePlayerPoke = getActivePlayerPoke;
 if (typeof globalThis !== 'undefined') globalThis.getBattleViewSnapshot = getBattleViewSnapshot;
 if (typeof globalThis !== 'undefined') globalThis.updatePokemonCardDynamicState = updatePokemonCardDynamicState;
@@ -230,6 +278,8 @@ if (typeof globalThis !== 'undefined') globalThis.toggleDebugX10 = toggleDebugX1
 // Wave 41 — native ESM module: exports the same names as the
 // classic surface kept above (bodies unchanged).
 export {
+  hpDisplay,
+  hpBarPct,
   getActivePlayerPoke,
   getBattleViewSnapshot,
   updatePokemonCardDynamicState,
@@ -247,4 +297,6 @@ export {
 // indirection instead of the window fallback); the window surface is kept for
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('setBattleSpeed', setBattleSpeed); } catch (_) {} }
+
+
 

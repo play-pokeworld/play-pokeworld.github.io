@@ -208,3 +208,5 @@ if (pageErrors.length) throw new Error('pageerrors: ' + pageErrors.join(' | '));
 await browser.close();
 console.log('smoke-unified-views: OK — modales = vues ECS, surface classique inchangée, délégation [data-pw-eid] mesurée, focus conservé, fermeture propre.');
 
+
+

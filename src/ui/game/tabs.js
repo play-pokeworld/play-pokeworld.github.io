@@ -99,3 +99,5 @@ export {
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('showTab', showTab); PokeActions.register('toggleMobileDrawer', toggleMobileDrawer); } catch (_) {} }
 
+
+

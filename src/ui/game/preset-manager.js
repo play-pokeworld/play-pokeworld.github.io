@@ -311,7 +311,7 @@ function renderPresetPicker(){
   if(!inner || !preset) return;
   const q = window._presetPickerSearch || '';
   let cands = _presetPickerCandidates();
-  if(q) cands = cands.filter(c => ((typeof getPokeName==='function'?getPokeName(c.p.id):(c.p.name||'')) + ' ' + c.p.id).toLowerCase().includes(q));
+  if(q) cands = cands.filter(c => (typeof pokemonMatchesSearch === 'function') ? pokemonMatchesSearch(c.p, q) : ((typeof getPokeName==='function'?getPokeName(c.p.id):(c.p.name||'')) + ' ' + c.p.id).toLowerCase().includes(q));
   const slot = window._presetPickSlot;
   const rows = cands.slice(0, 120).map((c) => {
     const nm = (typeof getPokeName==='function'?getPokeName(c.p.id):(c.p.name||''));
@@ -482,4 +482,6 @@ export { renderPresetManager, openPresetEditor, renderPresetPicker, renderPreset
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('openPresetEditor', openPresetEditor); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('presetPickerFilter', presetPickerFilter); } catch (_) {} }
+
+
 

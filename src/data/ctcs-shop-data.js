@@ -88,11 +88,11 @@ const CTCS_SHOP_STOCK = {
   "ct_twister"
  ]
 };
-// Prices computed for TMs that had none (tiers by power).
+// Prices computed for TMs that had none (tiers by power, PokéClicker-style).
 const CTCS_PRICES = {
- "ct_lightscreen": 25000,
- "ct_feintattack": 30000,
- "ct_rocksmash": 30000
+ "ct_lightscreen": 10000,
+ "ct_feintattack": 25000,
+ "ct_rocksmash": 10000
 };
 // Meta (taught move + generation) — used by tests and the display.
 const CTCS_META = {
@@ -355,4 +355,6 @@ export {
   CTCS_META,
   CTCS_UNSOLD,
 };
+
+
 

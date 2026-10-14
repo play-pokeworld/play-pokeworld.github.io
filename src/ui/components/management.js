@@ -80,7 +80,7 @@ export function upgradeCardVNode(card) {
     ? h('button', {
         class: 'hbtn purchase-btn',
         dataset: { action: 'legacy-call', call: card.call || '', callArgs: card.args == null ? '' : String(card.args) },
-      }, card.buyLabel || '')
+      }, h.raw(card.buyLabel || ''))
     // Unusable/purchased upgrades are INFORMATIONAL state rows — never a
     // dead or disabled button (user rule).
     : h('b', { class: 'upgrade-card-state' }, card.stateLabel || '');
@@ -287,4 +287,6 @@ export function managementBlockVNode(block) {
 export function managementBlocksHTML(blocks) {
   return toHTMLString((blocks || []).map(managementBlockVNode).filter(Boolean));
 }
+
+
 

@@ -6,9 +6,9 @@
 export var SHOPS_HOENN = {
   littleroot: { items: [] },
   oldale: { items: ["colbur_berry", "silk_scarf"] },
-  petalburg: { items: ["muscle_band", "hard_stone"] },
+  petalburg: { items: ["hard_stone"] },
   rustboro: { items: ["babiri_berry", "hard_stone", "metal_coat"] },
-  dewford: { items: ["roseli_berry", "black_belt", "muscle_band"] },
+  dewford: { items: ["roseli_berry", "black_belt"] },
   slateport_market: { items: ["kings_rock", "metal_coat", "upgrade", "dragon_scale", "deep_sea_tooth", "deep_sea_scale", "mystic_water"] },
   mauville: { items: ["magnet"] },
   mauville_casino: { items: ["rarecandy", "leftovers"] },
@@ -16,7 +16,7 @@ export var SHOPS_HOENN = {
   fallarbor: { items: ["spell_tag"] },
   lavaridge: { items: ["charcoal"] },
   fortree: { items: ["sharp_beak"] },
-  lilycove_dept_store: { items: ["leftovers", "muscle_band"] },
+  lilycove_dept_store: { items: ["leftovers", "mental_herb"] },
   mossdeep: { items: ["twisted_spoon"] },
   sootopolis: { items: ["mystic_water"] },
   pacifidlog: { items: ["mystic_water", "dragon_scale"] },
@@ -29,4 +29,6 @@ if (typeof SHOPS !== 'undefined' && typeof SHOPS_HOENN !== 'undefined') {
 }
 // Wave 40 — surface kept (window → globalThis block, same scope).
 if (typeof globalThis !== 'undefined') globalThis.SHOPS_HOENN = SHOPS_HOENN;
+
+
 

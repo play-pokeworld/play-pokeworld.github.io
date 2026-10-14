@@ -121,6 +121,8 @@ export const L_fr_combat = {
 "item_removed_team":"{item} retiré de l'équipe.",
 "evolution_duplicate_bonus":" {name} aurait évolué en {target}, déjà possédé ! (+{money}₽)",
 "evolution_duplicate_bonus_html":" {name} aurait évolué en <b>{target}</b>, déjà possédé ! (+{money}₽)",
+"evolution_duplicate_no_bonus":" {name} aurait évolué en {target}, déjà possédé !",
+"evolution_duplicate_no_bonus_html":" {name} aurait évolué en <b>{target}</b>, déjà possédé !",
 "evolution_triggered_box":" {name} déclenche une évolution : {target} apparaît dans la boîte PC !",
 "evolution_created_box":" Une évolution de {name} est née : <b>{target}</b> (Nv.1, → boîte) !",
 "captured_pokemon_title":"Pokémon capturés :",
@@ -146,4 +148,6 @@ export const L_fr_combat = {
 // T2 (vague 38) : module ESM — export natif ; la surface classique est
 // gardée sur l'objet global pour les registres (data.js) et les harnais VM.
 if (typeof globalThis !== 'undefined') globalThis.L_fr_combat = L_fr_combat;
+
+
 

@@ -50,7 +50,7 @@ function makeSandbox() {
   for (const f of [
     'src/data/moves.js', 'src/data/pd-data.js',
     'src/data/items-data.js', 'src/data/items-helpers.js',
-    'src/data/poke-talents-data.js', 'src/data/talents-full.js',
+    'src/data/poke-talents.js', 'src/data/talents-full.js',
     'src/data/locations-data.js', 'src/data/locations-johto.js',
     'src/data/shops-data.js', 'src/data/route-drops.js', 'src/data/ctcs-shop-data.js',
     'src/data/game-helpers.js', 'src/application/pokemon-factory.js',
@@ -214,7 +214,10 @@ test('phase 26 F: unified drag thumbnail everywhere', () => {
   // The 5 drag sites use it
   assert.equal((R('src/ui/game/team-ui.js').match(/pwApplyDragGhost\(ev/g) || []).length, 2, 'team card + team move');
   assert.equal((R('src/ui/game/fullscreen-panel.js').match(/pwApplyDragGhost\(ev/g) || []).length, 2, 'carte Usine + attaque Usine');
-  assert.ok(R('src/ui/game/win-drag.js').includes('pwDragGhostHtml('), 'windows (same look)');
+  // DND-01 (prototype validé) : les FENÊTRES ne passent plus par la vignette
+  // ghost — elles sont traînées en entier avec marque-place + indicateur.
+  const wd = R('src/ui/game/win-drag.js');
+  assert.ok(wd.includes('.pw-win-dragging') && wd.includes('.pw-win-placeholder'), 'windows drag the window itself (DND-01)');
   // Functional: browserless image capture
   let captured = null;
   sb.document.createElement = () => ({ style: {}, innerHTML: '', className: '', remove() {} });
@@ -236,5 +239,7 @@ test('phase 26 G: previewed team presets', () => {
   assert.ok(html.includes('openPresetManager'), 'team-manager button');
   assert.ok(html.includes('teams_manager_open') === false, 'label resolved (i18n key)');
 });
+
+
 
 

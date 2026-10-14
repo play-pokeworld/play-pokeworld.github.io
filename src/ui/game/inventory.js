@@ -38,13 +38,14 @@ function itemCat(key){
  // the "Misc." filter disappears — anything not classified elsewhere
  // joins "special" (keys, candies, supplies).
  const itm=ITEMS[key]; if(!itm) return 'special';
+ if(itm.type==='ball') return 'pokeballs';
  const isCtCs = (typeof isCtCsItem==='function') ? isCtCsItem(key) : (itm.type==='ct' || itm.type==='cs');
  if(isCtCs) return 'ct_cs';
  if(isEvolutionItem(key)) return 'evolution';
  if(itm.type==='fossil') return 'fossil';
  if(itm.type==='treasure') return 'treasure';
  if(itm.type==='key') return 'special';
- if(itm.type==='candy' || itm.type==='special') return 'special';
+ if(itm.type==='candy' || itm.type==='special' || itm.type==='consumable') return 'special';
  if(itm.type==='held' || itm.category || itm.buff || String(key).endsWith('_berry')) return 'held';
  return 'special';
 }
@@ -76,10 +77,24 @@ function resetInvFilters(){
  if(el) renderInventory(el);
 }
 
+// Poké Balls du sac : lues dans G.pokeballs (système dédié), présentées
+// comme des objets du sac (catégorie « Poké Balls »).
+function ballBagEntries(){
+ const b = (typeof ensurePokeballs === 'function') ? ensurePokeballs() : null;
+ if(!b) return [];
+ // DORM-06b — toutes les balls (BALL_DEFS), pas seulement les 5 de base :
+ // les balls spéciales (Appât, Lune, Chrono…) s'affichent aussi dans le sac.
+ const keys = (typeof BALL_DEFS !== 'undefined' && BALL_DEFS) ? Object.keys(BALL_DEFS) : ['pokeball','greatball','ultraball','masterball','honorball'];
+ return keys.filter(k => (b[k]||0) > 0).map(k => [k, b[k]]);
+}
+
 function renderInventory(el){
  const entries=Object.entries(G.inventory).filter(([k,v])=>v>0 && ITEMS[k]);
+ const ballEntries = ballBagEntries();
+ const allEntries = entries.concat(ballEntries);
  // Bag in TABS (same ergonomics as the PC box pages).
  const cats=[
+ {id:'pokeballs', label: (typeof t==='function'?t('cat_pokeballs'):'Poké Balls')},
  {id:'held', label: (typeof t==='function'?t('cat_held_items'):'Objets tenus')},
  {id:'ct_cs', label: "CT / CS"},
  {id:'evolution', label: (typeof t==='function'?t('cat_evolution'):'Evolution')},
@@ -102,7 +117,7 @@ function renderInventory(el){
  const counts={}; cats.forEach(c=>counts[c.id]=0);
  // FIX (wave 15, user feedback): the inner variable shadowed `c` —
  // `c.id` on a STRING is undefined, so every category stayed at 0.
- entries.forEach(([k])=>{ const cat=itemCat(k); counts[cat]=(counts[cat]||0)+1; });
+ allEntries.forEach(([k])=>{ const cat=itemCat(k); counts[cat]=(counts[cat]||0)+1; });
  if(window._equipCallback) _invCat='held';
  if(!_invCatTouched && (counts[_invCat]||0)===0){
   const firstNonEmpty = cats.find(c=>(counts[c.id]||0)>0);
@@ -111,7 +126,7 @@ function renderInventory(el){
  if(!cats.some(c=>c.id===_invCat)) _invCat='held';
  if(!sorts.some(o=>o.id===_invSort)) _invSort='name';
  // Search = GLOBAL (across all tabs); otherwise the active tab filters.
- let filtered = _invSearch ? entries : entries.filter(([k])=>itemCat(k)===_invCat);
+ let filtered = _invSearch ? allEntries : allEntries.filter(([k])=>itemCat(k)===_invCat);
  if(_invSearch) filtered = filtered.filter(([k]) => (getItemName(k)+' '+k+' '+(typeof getItemDesc==='function'?getItemDesc(k):'')).toLowerCase().includes(_invSearch));
  if(_invSort==='qty' || _invSort==='qty_asc'){
   // 'qty' keeps its historical meaning (highest first); 'qty_asc' reverses.
@@ -129,7 +144,7 @@ function renderInventory(el){
   sortLabel: t('sort_label'),
   search: { value: _invSearch, placeholder: t('bag_search_placeholder') },
   resetLabel: t('box_filter_reset'),
-  emptyInventory: !entries.length,
+  emptyInventory: !allEntries.length,
   emptyLabel: t('inv_empty'),
   noResultsLabel: t("m.inventory.6"),
   items: filtered.map(([key,qty])=>{ const eq=_eqFinder(key); return { key:key, qty:qty, name:getItemName(key), iconHtml:itemSpriteHtml(key,40), equippedName:(eq&&eq.name)||null }; })
@@ -156,7 +171,8 @@ function isUsableBagItem(key){
   if(isEvolutionItem(key)) return true;                                     // evolution list
   const isCtCs = (typeof isCtCsItem==='function') ? isCtCsItem(key) : (itm.type==='ct' || itm.type==='cs');
   if(isCtCs) return true;                                                   // move teaching
-  if(itm.type==='candy' || key==='rarecandy') return true;                  // rare candy
+  if(itm.type==='consumable') return true;                                  // vitamins, capsules, bouchons…
+  if(itm.type==='candy' || key==='rarecandy') return true;                  // rare candy + bonbons tempo
   return false;
 }
 
@@ -230,4 +246,6 @@ export {
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('renderInventory', renderInventory); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('setInvSearch', setInvSearch); } catch (_) {} }
+
+
 

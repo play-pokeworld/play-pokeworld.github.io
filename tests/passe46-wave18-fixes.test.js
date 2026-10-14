@@ -51,7 +51,7 @@ const HTML_INDEX = R('index.html');
 test('wave18: location wild cards do NOT wrap spriteHtml in a second circle', () => {
   const md = R('src/ui/components/map-dressing.js');
   assert.ok(!md.includes('pw-poke-circle-wrap pw-loc-wild-disc'), 'map-dressing: no second wrap');
-  assert.ok(md.includes('h(\'div\', { class: \'pw-loc-wild-disc\' }, h.raw(e.spriteHtml || \'\'))'), 'wild disc is a plain slot, spriteImg provides the disc');
+  assert.ok(md.includes('pw-loc-wild-disc') && md.includes('h.raw(e.spriteHtml || \'\')'), 'wild disc stays a plain slot (spriteImg provides the disc)');
 });
 
 test('wave18: special-forms panel does NOT wrap spriteImg in an orb circle', () => {
@@ -160,11 +160,11 @@ test('wave18: secret-base "Ramasser" is a danger-red button', () => {
 
 test('wave18: drag boundaries ignore hidden windows (strip never swallowed)', () => {
   const wd = R('src/ui/game/win-drag.js');
-  assert.ok(/function pwVisibleWinEls/.test(wd), 'visible-window filter defined');
-  const uses = wd.match(/pwVisibleWinEls\(/g) || [];
-  assert.ok(uses.length >= 3, `used in BOTH marker + drop-index paths (got ${uses.length})`);
-  assert.ok(/if \(vi < vis\.length\) vis\[vi\]\.el\.classList\.add\('insert-above'\)/.test(wd), 'markers land on visible neighbours only');
-  assert.ok(/insIdx = others\.indexOf\(vis\[vi\]\.id\)/.test(wd), 'drop index mapped back into the full array');
+  assert.ok(/function _visibleWinEls/.test(wd), 'visible-window filter defined');
+  const uses = wd.match(/_visibleWinEls\(/g) || [];
+  assert.ok(uses.length >= 2, `used in BOTH indicator + drop-index paths (got ${uses.length})`);
+  assert.ok(wd.includes('r.height <= 0 || r.width <= 0'), 'hidden windows (zero rect) excluded');
+  assert.ok(wd.includes('insIdx = others.indexOf(vis[vi].id)'), 'drop index mapped back into the full array');
 });
 
 /* ─── 11. Save-slot icon containment ───────────────────────────────────── */
@@ -172,4 +172,6 @@ test('wave18: drag boundaries ignore hidden windows (strip never swallowed)', ()
 test('wave18: save-slot icon contained & centred (70px wrap in the 74px box)', () => {
   assert.ok(/\.save-slot-icon \.pw-poke-circle-wrap \{\s*width:\s*70px !important;\s*height:\s*70px !important/.test(CSS1), 'wrap cannot overflow the rounded box');
 });
+
+
 

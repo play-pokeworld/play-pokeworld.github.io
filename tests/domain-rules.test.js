@@ -52,3 +52,5 @@ test('base/base-rules works correctly', () => {
   assert.equal(canPlaceDecoration(16, 16), false);
 });
 
+
+

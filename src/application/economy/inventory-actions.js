@@ -28,11 +28,15 @@ function onInventoryClick(key){
  const qty = G.inventory[key] || 0;
  const el = _getActiveContent();
  if(qty <= 0){ showTab('inventory'); return; }
+ // P0 — les trésors se revendent en 💎 (diamants).
+ const diamonds = (typeof diamondValueOf === 'function' ? diamondValueOf(key) : 0) || Number(itm.diamondValue) || 0;
+ const one = diamonds > 0 ? `+${formatNumber(diamonds)}💎` : `+${formatNumber((itm.value||2000))}₽`;
+ const all = diamonds > 0 ? `+${formatNumber((diamonds*qty))}💎` : `+${formatNumber(((itm.value||2000)*qty))}₽`;
  _pwSetHtmlSafe(el, `<div class="loc-title">${t("m.inventory.5")} ${itemSpriteHtml(key, 24)} ${getItemName(key)}</div>
- <div class="loc-sub">${tr("m.treasure_sell_sub", {qty: qty, value: (itm.value?.toLocaleString()||'2 000')})}</div>
+ <div class="loc-sub">${tr("m.treasure_sell_sub", {qty: qty, value: (diamonds>0 ? formatNumber(diamonds)+'💎' : (itm.value != null ? formatNumber(itm.value) : '2 000')+'₽')})}</div>
  <div class="pw-starter-actions">
- <button class="hbtn extracted-bridge-style-040" data-action="legacy-call" data-call="sellTreasure" data-call-args="'${key}', 1">${t('sell_one')} (+${(itm.value||2000).toLocaleString()}₽)</button>
- ${qty>1?`<button class="hbtn extracted-bridge-style-041" data-action="legacy-call" data-call="sellTreasure" data-call-args="'${key}', ${qty}">${t('sell_all')} (+${((itm.value||2000)*qty).toLocaleString()}₽)</button>`:''}
+ <button class="hbtn extracted-bridge-style-040" data-action="legacy-call" data-call="sellTreasure" data-call-args="'${key}', 1">${t('sell_one')} (${one})</button>
+ ${qty>1?`<button class="hbtn extracted-bridge-style-041" data-action="legacy-call" data-call="sellTreasure" data-call-args="'${key}', ${qty}">${t('sell_all')} (${all})</button>`:''}
  <button class="hbtn extracted-bridge-style-042" data-action="return-inventory" class="hbtn">${t('back_bag')}</button>
  </div>`);
  return;
@@ -129,6 +133,23 @@ function onInventoryClick(key){
     return;
   }
 
+  // DORM-06b — Bonbons Tempo : accélèrent le temps de combat (PokeChill).
+  if(itm.category === 'time_candy'){
+    if((G.inventory[key] || 0) < 1) return;
+    const minutes = key === 'time_candy_xl' ? 30 : 10;
+    G.inventory[key]--;
+    if(G.inventory[key] <= 0) delete G.inventory[key];
+    try{ saveGame(); }catch(_){}
+    if(typeof offlineSimulate === 'function'){
+      notify(tr('time_candy_used', {item:getItemName(key), minutes:minutes}), 'var(--accent)');
+      offlineSimulate(minutes * 60 * 1000, 'debug');
+    } else {
+      notify(t('consumable_none'), 'var(--red)');
+    }
+    try{ updateHeader(); }catch(_){}
+    return;
+  }
+
   if(itm.type === 'candy' || key === 'rarecandy'){
  const qty = G.inventory[key] || 0;
  if(qty <= 0){
@@ -140,6 +161,24 @@ function onInventoryClick(key){
  G.pendingItemUseKey = key;
  if(typeof openUnifiedSelectorModal === 'function'){
   openUnifiedSelectorModal('item_rarecandy');
+  const titleEl = document.getElementById('usm-title');
+  if(titleEl) titleEl.textContent = `${t("m.inventory.4")} ${getItemName(key)} ×${qty}`;
+ }
+ return;
+ }
+
+  // DORM-06 — consommables (vitamines, bouchons, capsules) : usage sac.
+  if(itm.type === 'consumable'){
+ const qty = G.inventory[key] || 0;
+ if(qty <= 0){
+  const fsM=document.getElementById('fullscreen-panel-modal');
+  if(fsM&&fsM.style.display==='flex'){renderInventory(document.getElementById('fs-panel-content'))}
+  else{showTab('inventory')}
+  return;
+ }
+ G.pendingItemUseKey = key;
+ if(typeof openUnifiedSelectorModal === 'function'){
+  openUnifiedSelectorModal('item_consumable');
   const titleEl = document.getElementById('usm-title');
   if(titleEl) titleEl.textContent = `${t("m.inventory.4")} ${getItemName(key)} ×${qty}`;
  }
@@ -202,4 +241,6 @@ export {
   consumeItem,
   startLearnMoveCtCs,
 };
+
+
 

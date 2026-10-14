@@ -154,3 +154,5 @@ export class PokeDetailView extends UIView {
   }
 }
 
+
+

@@ -20,12 +20,42 @@ function buildBattleSessionCaptureGroups(catches){
 }
 
 function getBattleSessionSummaryData(){
-  const catches = battle.sessionCatches || [];
-  const itemEntries = Object.entries(battle.sessionItems || {}).filter(([, qty]) => Number(qty) > 0);
+  const b = (typeof battle !== 'undefined') ? battle : null;
+  // PASSE 39e — DONJON : le butin et le résumé concernent TOUT le run, pas
+  // seulement le dernier combat. Quand une expédition est active, on agrège
+  // run.loot + run.bag + la session de combat en cours : captures, objets,
+  // argent (UN SEUL total obtenu) et jetons du sac. Hors donjon, c'est la
+  // session du combat normal (comportement d'origine).
+  let catches = (b && b.sessionCatches) || [];
+  let itemEntries = Object.entries((b && b.sessionItems) || {}).filter(([, qty]) => Number(qty) > 0);
+  let money = Number((b && b.sessionMoney) || 0);
+  let tokens = Number((b && b.sessionTokens) || 0);
+  let wins = Number((b && b.sessionWins) || 0);
+  let startedAt = (b && b.sessionStartedAt) || 0;
+  let playerKOs = Number((b && b.sessionPlayerKOs) || 0);
+  let run = null;
+  try {
+    if (typeof globalThis.currentDungeonRun === 'function') run = globalThis.currentDungeonRun();
+  } catch (_) {}
+  if (run && run.active) {
+    const loot = run.loot || {};
+    const bag = run.bag || {};
+    const runCatches = (loot.catches || []).map((c) => Object.assign({}, c));
+    catches = runCatches.concat(catches || []);
+    const merged = Object.assign({}, loot.items || {}, (b && b.sessionItems) || {});
+    itemEntries = Object.entries(merged).filter(([, qty]) => Number(qty) > 0);
+    // UN SEUL total d'argent : tout ce qui a été gagné pendant le run.
+    money = Number(loot.money || 0) + Number((b && b.sessionMoney) || 0);
+    // Jetons : le sac d'expédition (cumul du run).
+    tokens = Number(bag.tokens) || 0;
+    wins = Number(run.totalWins || 0);
+    startedAt = Number(run.startedAt) || startedAt;
+    playerKOs = Number((b && b.sessionPlayerKOs) || 0);
+  }
   const captureGroups = buildBattleSessionCaptureGroups(catches);
-  const durationMs = battle.sessionStartedAt ? Math.max(0, Date.now() - battle.sessionStartedAt) : 0;
+  const durationMs = startedAt ? Math.max(0, Date.now() - startedAt) : 0;
   const totalItems = itemEntries.reduce((sum, [, qty]) => sum + Number(qty || 0), 0);
-  const damageEntries = Object.values(battle.sessionDamageByPokemon || {}).sort((a,b) => (b.damage||0) - (a.damage||0));
+  const damageEntries = Object.values((b && b.sessionDamageByPokemon) || {}).sort((a,b) => (b.damage||0) - (a.damage||0));
   const totalDamage = damageEntries.reduce((sum, entry) => sum + Number(entry.damage || 0), 0);
   return {
     catches,
@@ -39,9 +69,14 @@ function getBattleSessionSummaryData(){
     duplicateCaptures: catches.filter(c => c && c.dupe).length,
     totalItems,
     distinctItems: itemEntries.length,
-    wins: Number(battle.sessionWins || 0),
-    playerKOs: Number(battle.sessionPlayerKOs || 0),
+    wins,
+    playerKOs,
     durationMs,
+    // PASSE 39 — monnaies gagnées PENDANT les combats de la session (en
+    // donjon : TOUT le run, un seul total — plus de doublon « total / dernier
+    // combat »).
+    money,
+    tokens,
   };
 }
 
@@ -61,7 +96,12 @@ function battleSummaryUIModel(){
     : (Math.max(0, Math.floor(data.durationMs / 1000)) + 's');
   const locationLabel = typeof getLocName === 'function' ? getLocName(G.location) : (G.location || '');
 
-  const hasLoot = data.captureGroups.length || data.itemEntries.length;
+  const hasLoot = data.captureGroups.length || data.itemEntries.length || data.money > 0 || data.tokens > 0;
+  // PASSE 39 — les monnaies du résumé : sprite + chiffre (pièce ₽, jeton JD),
+  // jamais un multiplicateur « × » comme les Pokémon. Le chiffre est
+  // « +N » pour l'argent gagné en combat, brut pour les jetons encaissés.
+  const moneySprite = '<img src="' + (typeof location !== 'undefined' ? new URL('src/assets/images/currency/money.svg', location.href).href : 'src/assets/images/currency/money.svg') + '" alt="" draggable="false">';
+  const tokenSprite = '<img src="' + (typeof location !== 'undefined' ? new URL('src/assets/images/currency/dungeonToken.svg', location.href).href : 'src/assets/images/currency/dungeonToken.svg') + '" alt="" draggable="false">';
   return {
     title,
     stats: [
@@ -71,13 +111,16 @@ function battleSummaryUIModel(){
       { value: data.playerKOs, label: t('afk_panel_team_ko') || 'K.O. équipe' },
       { value: formatDuration, label: t('afk_panel_duration') || 'Durée' },
       { value: locationLabel, label: t('tab_info') || 'Lieu' },
+      // PASSE 39e — plus d'argent dans la grille : les monnaies n'apparaissent
+      // qu'UNE fois, dans les puces ci-dessous (sprite + chiffre). Fini le
+      // doublon « total / dernier combat ».
     ],
     damage: {
       title: t('battle_team_damage_title') || 'Dégâts de l’équipe',
       rows: data.damageEntries.map((entry) => ({
         spriteHtml: spriteImg(entry.id, entry.emoji || '', { shiny: entry.shiny, size: 30 }),
         name: entry.name,
-        valueText: (entry.damage || 0).toLocaleString(),
+        valueText: formatNumber((entry.damage || 0)),
         pct: data.totalDamage > 0 ? Math.max(2, Math.round((entry.damage / data.totalDamage) * 100)) : 0,
         koCount: entry.kos || 0,
       })),
@@ -106,6 +149,10 @@ function battleSummaryUIModel(){
     loot: hasLoot
       ? {
         chips: [
+          // PASSE 39 — monnaies en tête : jeton JD (brut) puis argent de
+          // combat (+N) — sprite + chiffre, pas de multiplicateur.
+          ...(data.tokens > 0 ? [{ html: tokenSprite, title: t('dungeon_loot_bag_tokens') || 'Dungeon tokens (bag)', amount: data.tokens, currency: true }] : []),
+          ...(data.money > 0 ? [{ html: moneySprite, title: t('battle_loot_money_title') || 'Money earned in battle', amount: data.money, prefix: '+', currency: true }] : []),
           ...data.captureGroups.map((a) => ({
             html: spriteImg(a.id, a.emoji || '', { shiny: a.shinyCount > 0, size: 40 }),
             title: `${a.name}${a.shinyCount ? ' (Shiny)' : ''}`,
@@ -175,4 +222,6 @@ export {
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('openBattleSummary', openBattleSummary); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('closeBattleSummary', closeBattleSummary); } catch (_) {} }
+
+
 

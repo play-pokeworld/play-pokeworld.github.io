@@ -140,3 +140,5 @@ export function calculateBreedingExpReward(level, baseExp) {
   return Math.round((lvl * bexp) / 5);
 }
 
+
+

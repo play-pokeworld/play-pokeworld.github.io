@@ -142,7 +142,7 @@ export function hatcheryRegisterBattleKills(count) {
       if (outcome.fee > 0 && typeof globalThis.addBattleLog === 'function') {
         const slot = G.hatchery[i];
         globalThis.addBattleLog(globalThis.tr('daycare_fee_log', {
-          fee: outcome.fee.toLocaleString(), n: outcome.levelsGained, name: slot && slot.poke ? slot.poke.name : '',
+          fee: formatNumber(outcome.fee), n: outcome.levelsGained, name: slot && slot.poke ? slot.poke.name : '',
         }));
       }
       continue;
@@ -158,7 +158,7 @@ export function hatcheryRegisterBattleKills(count) {
         if (typeof globalThis.addBattleLog === 'function') globalThis.addBattleLog(globalThis.tr('daycare_max_log', { name: poke.name }));
         globalThis.notify(globalThis.tr('daycare_evicted_max', { name: poke.name }), 'var(--green)');
       } else {
-        globalThis.notify(globalThis.tr('daycare_evicted_funds', { name: poke.name, fee: (outcome.fee || 0).toLocaleString() }), 'var(--red)');
+        globalThis.notify(globalThis.tr('daycare_evicted_funds', { name: poke.name, fee: formatNumber((outcome.fee || 0)) }), 'var(--red)');
       }
     }
   }
@@ -183,4 +183,6 @@ if (typeof globalThis !== 'undefined') {
   globalThis.hatcheryRegisterBattleKills = hatcheryRegisterBattleKills;
   globalThis.computeRequiredHatchKos = computeRequiredHatchKos;
 }
+
+
 

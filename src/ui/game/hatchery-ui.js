@@ -54,16 +54,16 @@ function hatcheryManagementModel(page) {
       const bought = typeof isAutomationPurchased === 'function' ? isAutomationPurchased(key) : true;
       return bought
         ? { title: t('automation_' + key), titleIconHtml: icon(iconName), value: t('automation_owned'), state: 'owned', stateLabel: t('automation_owned') }
-        : { title: t('automation_' + key), titleIconHtml: icon(iconName), value: tr('automation_buy_button', { price: autoCost(key).toLocaleString() }), state: 'buy', call: 'buyAutomationUpgrade', args: `'${key}'`, buyLabel: t('buy_btn') };
+        : { title: t('automation_' + key), titleIconHtml: icon(iconName), value: '', state: 'buy', call: 'buyAutomationUpgrade', args: `'${key}'`, buyLabel: (typeof pqSpriteHtml === 'function' ? pqSpriteHtml(autoCost(key)) : formatNumber(autoCost(key))) };
     };
     blocks.push({
       kind: 'upgrades',
       cards: [
         maxSlots >= 4 || upgradeCost == null
           ? { title: t('hatchery_slots_title'), value: `${maxSlots}/4`, state: 'owned', stateLabel: t('automation_owned') }
-          : { title: t('hatchery_slots_title'), value: `${maxSlots}/4`, state: 'buy', call: 'upgradeHatcherySlots', args: String(upgradeCost), buyLabel: `${upgradeCost.toLocaleString()}₽` },
+          : { title: t('hatchery_slots_title'), value: `${maxSlots}/4`, state: 'buy', call: 'upgradeHatcherySlots', args: String(upgradeCost), buyLabel: (typeof pqSpriteHtml === 'function' ? pqSpriteHtml(upgradeCost) : `${formatNumber(upgradeCost)} PQ`) },
         queueCost
-          ? { title: t('queue_size_title'), value: tr('queue_capacity', { count: 0, max: queueLimit }), state: 'buy', call: 'upgradeHatcheryQueueSize', args: '', buyLabel: `${queueCost.toLocaleString()}₽` }
+          ? { title: t('queue_size_title'), value: tr('queue_capacity', { count: 0, max: queueLimit }), state: 'buy', call: 'upgradeHatcheryQueueSize', args: '', buyLabel: (typeof pqSpriteHtml === 'function' ? pqSpriteHtml(queueCost) : `${formatNumber(queueCost)} PQ`) }
           : { title: t('queue_size_title'), value: tr('queue_capacity', { count: 0, max: queueLimit }), state: 'owned', stateLabel: t('automation_owned') },
         autoCard('autoHatch', 'hatchery'),
         autoCard('autoSeedHatchery', 'box'),
@@ -453,4 +453,6 @@ export {
   renderHatcheryAutomationSlotCard,
   hatcherySlotCardModel,
 };
+
+
 

@@ -73,8 +73,15 @@ export class SessionSummaryView extends UIView {
     const damage = m.damage || {};
     const captures = m.captures || {};
     const items = m.items || {};
+    // PASSE 39 — les monnaies du résumé avec leur SPRITE + chiffre : pièce ₽
+    // et jeton JD s'affichent aussi dans le panneau (pas seulement dans les
+    // statistiques). Les captures/objets gardent leurs sections dédiées.
+    const currencyChips = ((m.loot && m.loot.chips) || []).filter((c) => c && c.currency);
     return h('div', { id: 'battle-summary-content' },
       sessionStatGridVNode(m.stats),
+      currencyChips.length
+        ? h('div', { class: 'pw-summary-currency' }, currencyChips.map(lootChipVNode))
+        : null,
       summarySectionTitleVNode(damage.title),
       (damage.rows || []).length ? damageListVNode(damage.rows) : summaryEmptyVNode(damage.emptyLabel),
       summarySectionTitleVNode(captures.title),
@@ -115,4 +122,6 @@ export class SessionSummaryView extends UIView {
     return toHTMLString((loot.chips || []).map(lootChipVNode));
   }
 }
+
+
 

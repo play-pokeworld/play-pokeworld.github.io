@@ -125,3 +125,5 @@ test('vague 36 C: tous les hôtes de panneau appliquent le même remède', () =>
       `${h} enfonce encore sa bande (padding "${pad.trim()}")`);
   }
 });
+
+

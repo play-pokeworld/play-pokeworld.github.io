@@ -39,7 +39,7 @@ function makeSandbox() {
   for (const f of [
     'src/data/moves.js', 'src/data/pd-data.js',
     'src/data/items-data.js', 'src/data/items-helpers.js',
-    'src/data/poke-talents-data.js', 'src/data/talents-full.js',
+    'src/data/poke-talents.js', 'src/data/talents-full.js',
     'src/data/locations-data.js', 'src/data/locations-johto.js', 'src/data/game-helpers.js',
     'src/application/pokemon-factory.js',
     'src/data/atoll-sets-data.js', 'src/application/world/atoll-core.js',
@@ -71,7 +71,7 @@ test('phase 24 #1: ability pools 100% lowercase and covered by TALENTS_FULL', ()
       if (tal !== tal.toLowerCase() || !sb.TALENTS_FULL[tal]) bad++;
     }
   }
-  assert.equal(pools, 251, 'one ability pool per species (Kanto+Johto)');
+  assert.equal(pools, 386, 'one ability pool per species (1..386)');
   assert.equal(bad, 0, 'no camelCase id nor any outside TALENTS_FULL in the pools');
   let badHidden = 0, hiddenCount = 0;
   for (const [id, rec] of Object.entries(sb.POKEMON_TALENTS)) {
@@ -265,9 +265,12 @@ test('phase 24 #8: move descriptions in French (400/400) and read first', () => 
   assert.ok(sb.t('move_descs.thunderbolt').includes('paralyser'), 't() resolves FR descriptions');
   assert.ok(sb.t('move_descs.tackle').length > 0);
   const modal = R('src/ui/game/poke-modal.js');
-  const iLoc = modal.indexOf("t('move_descs.' + moveId)");
+  // Passe 26d : la clé FR est d'abord essayée à l'exact (snake_case), puis
+  // sous forme compacte (« airslash »), toujours AVANT le fallback anglais.
+  const iLoc = modal.indexOf("t('move_descs.' + cand)");
   const iEn = modal.indexOf('moveDesc = mv.desc');
   assert.ok(iLoc > 0 && iEn > iLoc, 'openMoveInfo reads the locale BEFORE the English mv.desc text');
+  assert.ok(modal.includes("String(moveId || '').replace(/_/g, '')"), 'FR lookup also tries the compact (underscore-stripped) key');
 });
 
 test('phase 24 #8: statuses colored like weather in descriptions', () => {
@@ -299,5 +302,7 @@ test('phase 24 #8: ability descriptions 100% French and complete', () => {
   assert.ok(sb.getTalentDesc('waterveil').includes('brûlure'), 'waterveil immunizes against burn');
   assert.ok(sb.getTalentDesc('magmaarmor').includes('gel'), 'magmaarmor immunizes against freeze');
 });
+
+
 
 

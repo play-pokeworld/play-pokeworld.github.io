@@ -24,8 +24,79 @@ function updateRegionSelectorLocks(){
  });
 }
 
+// ── PASSE 30 (P3) — construction des marqueurs de la carte ─────────────────
+// Sortie : une chaîne de <g> SVG (position du joueur + pastilles d'ennemis).
+// Fonction pure vis-à-vis du DOM : elle ne fait que produire du balisage, ce
+// qui la rend testable hors navigateur.
+const PW_MAP_PLAYER_SPRITE = 'src/assets/images/trainers/profil/trainer-54.png';
+
+function playerMapSpriteUrl(){
+ try{
+  const id = (typeof G !== 'undefined' && G && G.settings) ? G.settings.playerSprite : null;
+  if(id != null && id !== '' && Number.isFinite(Number(id))) return 'src/assets/images/trainers/profil/trainer-' + Number(id) + '.png';
+ }catch(_){}
+ return PW_MAP_PLAYER_SPRITE;
+}
+
+// Combien d'espèces sauvages ce lieu héberge-t-il ? (0 = pas d'ennemis)
+function locWildCount(loc){
+ if(!loc || !Array.isArray(loc.wild)) return 0;
+ return loc.wild.length;
+}
+
+function buildMapMarkers(regLocs){
+ if(!regLocs) return '';
+ let out = '';
+ for(const [id, loc] of Object.entries(regLocs)){
+  if(!loc) continue;
+  const dims = nodeDims(loc, id);
+  const isCurrent = (typeof G !== 'undefined' && G) ? (id === G.location) : false;
+  const storyReq = loc.storyReq || 0;
+  const isLocked = storyReq > ((typeof G !== 'undefined' && G && G.storyIdx) || 0) || !isLocUnlocked(id);
+  // ennemis : pastille en bas-droite du nœud
+  const foes = locWildCount(loc);
+  if(foes > 0 && !isLocked && !isCurrent){
+   const fx = loc.x + dims.w/2 - 6;
+   const fy = loc.y + dims.h/2 - 6;
+   const label = tr('map_foes_here', {count:foes});
+   // La pastille se pose sur le coin du nœud : sans cela elle avalerait le clic
+   // de déplacement. Elle relaie donc EXACTEMENT la même action que le nœud.
+   out += `<g class="pw-map-foe" data-action="legacy-call" data-call="clickLocation" data-call-args="'${id}'"><title>${label}</title>`
+     + `<circle class="pw-map-foe-body" cx="${fx}" cy="${fy}" r="10" fill="#B4342E" stroke="#FFF" stroke-width="2"/>`
+     + `<text class="pw-map-foe-count" x="${fx}" y="${fy+0.5}" text-anchor="middle" dominant-baseline="middle">${foes}</text>`
+     + `</g>`;
+  }
+  // notre position : sprite planté au-dessus du nœud courant
+  if(isCurrent){
+   // PASSE 31 — le marqueur « vous êtes ici » était planté AU-DESSUS de la case
+   // (les pieds sur le bord haut) : sur une carte dense on ne savait plus à
+   // quel nœud il se rapportait. On le CENTRE désormais sur le nœud, halo et
+   // ombre compris, et on l'agrandit pour qu'il se repère d'un coup d'œil.
+   const size = 62;
+   const cx = loc.x;
+   const cy = loc.y;
+   const px = cx - size/2;
+   const py = cy - size/2;
+   const href = playerMapSpriteUrl();
+   const you = tr('map_you_are_here');
+   out += `<g class="pw-map-player"><title>${you}</title>`
+     + `<ellipse class="pw-map-player-ring" cx="${cx}" cy="${cy}" rx="26" ry="26"/>`
+     + `<g class="pw-map-player-bob">`
+     + `<ellipse cx="${cx}" cy="${cy + size/2 - 4}" rx="16" ry="5" fill="#000" opacity="0.35"/>`
+     + `<image href="${href}" xlink:href="${href}" x="${px}" y="${py}" width="${size}" height="${size}" preserveAspectRatio="xMidYMid meet"/>`
+     + `</g></g>`;
+  }
+ }
+ return out;
+}
+
 function renderMap(){
  recomputeUnlocks();
+ // PASSE 29 (items 1 & 2) : le paysage suit le lieu. renderMap() est appelée
+ // au démarrage ET à chaque déplacement, c'est donc le point unique où poser
+ // le décor courant sur <body data-bg="…"> (le CSS s'occupe du reste, combat
+ // comme hors combat).
+ try{ if(typeof applyLocationBackground === 'function') applyLocationBackground(); }catch(_){}
  updateFeatureWindows();
  // Phase 35: the window Base Secrete is permanente — re-rendre has each refresh
  try{ if(typeof __pwV43Link('baseWindowRender') === 'function') baseWindowRender(); }catch(_){}
@@ -127,7 +198,19 @@ function renderMap(){
  }
  }
  }
- _pwSetHtmlSafe(nodeG, rectsHTML + labelsHTML);
+ // ── PASSE 30 (P3) — MARQUEURS FAÇON POKÉCLICKER ───────────────────────────
+ // « sprite de personnage pour notre position et les ennemis sur la carte ».
+ // Les deux marqueurs sont injectés DANS le SVG, après les libellés, donc
+ // au-dessus de tout : ils suivent zoom et déplacement sans code dédié.
+ //  • notre position : le sprite du dresseur planté sur le nœud courant, qui
+ //    sautille, avec un anneau qui se propage (on voit où l'on est du premier
+ //    coup d'œil, même carte dézoomée) ;
+ //  • les ennemis : une pastille rouge portant le nombre d'espèces sauvages du
+ //    lieu, sur chaque lieu accessible qui en héberge — les lieux verrouillés
+ //    n'en reçoivent pas (on ne divulgue rien d'une zone fermée).
+ let markersHTML = '';
+ try{ markersHTML = buildMapMarkers(regLocs); }catch(e){ console.error('[map] marqueurs', e); }
+ _pwSetHtmlSafe(nodeG, rectsHTML + labelsHTML + markersHTML);
  ensureMapHelpButton();
  initMobileMapPinchZoom();
 
@@ -256,6 +339,22 @@ function clickLocation(id){
  if (__pwIsPinchingOrDragging) return;
  const loc=getLocObj(id);
  if(!loc) return;
+
+ // PASSE 34 — on ne change PAS de route pendant une expédition en cours.
+ // Retour joueur : « on peut changer de route en plein combat ». Le donjon est
+ // une descente engagée : pour partir il faut « Remonter et encaisser » (on
+ // garde le sac) ou abandonner — jamais un clic sur la carte.
+ try {
+   const _dgFn = globalThis.currentDungeonRun;
+   const run = (typeof _dgFn === 'function') ? _dgFn() : null;
+   if (run && run.active && id !== run.loc) {
+     if (typeof setMsg === 'function') {
+       setMsg((typeof t === 'function' ? t('dungeon_locked_travel') : '') || 'Termine ou quitte ton expédition avant de changer de lieu.');
+     }
+     try { if (typeof showTab === 'function') showTab('battle'); } catch (_) {}
+     return;
+   }
+ } catch (_) {}
  
  if(typeof battle !== 'undefined' && battle && battle.active && id !== G.location){
  if(typeof endBattle === 'function'){
@@ -342,6 +441,9 @@ function refreshMapAndLoc(){
 // --- Migrated to ES module, globals exposed ---
 if (typeof updateRegionSelectorLocks !== 'undefined') { if (typeof window !== 'undefined') window.updateRegionSelectorLocks = updateRegionSelectorLocks; if (typeof globalThis !== 'undefined') globalThis.updateRegionSelectorLocks = updateRegionSelectorLocks; }
 if (typeof renderMap !== 'undefined') { if (typeof window !== 'undefined') window.renderMap = renderMap; if (typeof globalThis !== 'undefined') globalThis.renderMap = renderMap; }
+if (typeof buildMapMarkers !== 'undefined') { if (typeof window !== 'undefined') window.buildMapMarkers = buildMapMarkers; if (typeof globalThis !== 'undefined') globalThis.buildMapMarkers = buildMapMarkers; }
+if (typeof locWildCount !== 'undefined') { if (typeof window !== 'undefined') window.locWildCount = locWildCount; if (typeof globalThis !== 'undefined') globalThis.locWildCount = locWildCount; }
+if (typeof playerMapSpriteUrl !== 'undefined') { if (typeof window !== 'undefined') window.playerMapSpriteUrl = playerMapSpriteUrl; if (typeof globalThis !== 'undefined') globalThis.playerMapSpriteUrl = playerMapSpriteUrl; }
 if (typeof clickLocation !== 'undefined') { if (typeof window !== 'undefined') window.clickLocation = clickLocation; if (typeof globalThis !== 'undefined') globalThis.clickLocation = clickLocation; }
 if (typeof refreshMapAndLoc !== 'undefined') { if (typeof window !== 'undefined') window.refreshMapAndLoc = refreshMapAndLoc; if (typeof globalThis !== 'undefined') globalThis.refreshMapAndLoc = refreshMapAndLoc; }
 if (typeof initMobileMapPinchZoom !== 'undefined') { if (typeof window !== 'undefined') window.initMobileMapPinchZoom = initMobileMapPinchZoom; if (typeof globalThis !== 'undefined') globalThis.initMobileMapPinchZoom = initMobileMapPinchZoom; }
@@ -356,5 +458,10 @@ export {
   clickLocation,
   refreshMapAndLoc,
   initMobileMapPinchZoom,
+  buildMapMarkers,
+  locWildCount,
+  playerMapSpriteUrl,
 };
+
+
 

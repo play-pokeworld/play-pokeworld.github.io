@@ -38,6 +38,21 @@ CUSTOM_MAP = {
     "foggy_seed": (("pokeapi", "misty-seed"), None),  # official Misty Seed
 }
 
+# PASSE 46+ — names whose official PokeAPI file uses a hyphen the game's
+# key does not contain (special Poké Balls, a few berries/evolution items).
+# Without this map, `k.replace("_", "-")` leaves "lureball" unchanged and
+# the sprite is wrongly reported "absent de PokeAPI" (fix 2026-08-29).
+POKEAPI_ALIASES = {
+    "lureball": "lure-ball", "moonball": "moon-ball", "fastball": "fast-ball",
+    "diveball": "dive-ball", "luxuryball": "luxury-ball", "nestball": "nest-ball",
+    "repeatball": "repeat-ball", "timerball": "timer-ball", "duskball": "dusk-ball",
+    "quickball": "quick-ball", "beastball": "beast-ball", "masterball": "master-ball",
+    "premierball": "premier-ball", "healball": "heal-ball", "netball": "net-ball",
+    "levelball": "level-ball", "loveball": "love-ball", "friendball": "friend-ball",
+    "safariball": "safari-ball", "sportball": "sport-ball",
+    "prine_berry": "lum-berry", "upgrade": "up-grade", "berry": "oran-berry",
+}
+
 
 def fetch(url, binary=True, retries=3):
     last = None
@@ -188,7 +203,7 @@ def main():
                 custom += 1
                 tag = f"{kind}:{name}"
             else:
-                kebab = k.replace("_", "-")
+                kebab = POKEAPI_ALIASES.get(k, k.replace("_", "-"))
                 if kebab not in names:
                     failed.append((k, "absent de PokeAPI"))
                     continue
@@ -266,5 +281,7 @@ def _download_winky(dest):
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
 
 

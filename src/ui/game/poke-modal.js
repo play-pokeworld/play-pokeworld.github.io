@@ -212,8 +212,8 @@ function pokemonDetailStatsModel(p){
  const colors = ['#60BE58','#D3425F','#539DDF','#EF90E6','#B763CF','#FBA64C'];
  return {
    base: labels.map((label,i)=>({ name: label, pct: Math.min(100, Math.round(baseVals[i]/maxVals[i]*100)), color: colors[i], value: baseVals[i] })),
-   iv: labels.map((label,i)=>{ const val=(p.ivs||{})[keys[i]]||0; return { name: label, pct: Math.round(val/6*100), color: colors[i], value: `${val}/6` }; }),
-   ev: labels.map((label,i)=>{ const val=(p.evs||{})[keys[i]]||0; return { name: label, pct: Math.round(val/6*100), color: colors[i], value: `${val}/6` }; })
+   iv: labels.map((label,i)=>{ const val=(p.ivs||{})[keys[i]]||0; return { name: label, pct: Math.round(val/12*100), color: colors[i], value: `${val}/12` }; }),
+   ev: labels.map((label,i)=>{ const val=(p.evs||{})[keys[i]]||0; return { name: label, pct: Math.round(val/18*100), color: colors[i], value: `${val}/18` }; })
  };
 }
 
@@ -405,61 +405,67 @@ function openMoveInfo(moveId, contextIdx, contextBoxId){
  // NB: mv.acc is not displayed (absent from the data -> always 100 in the engine).
 
  
- const effects = [];
+ const effects = []; // {badge:key|null, text} — badge = bulle colorée de statut.
+ const _pushEff = (badgeKey, text) => effects.push({ badge: badgeKey, text: text });
  const effC = mv.effC || 0;
  if(mv.cat === 'stat') {
-   
-   const pct = effC || 100;
-   if(mv.eff === 'burn') effects.push(tr('effect_burn_stat', {pct:pct}));
-   if(mv.eff === 'para') effects.push(tr('effect_para_stat', {pct:pct}));
-   if(mv.eff === 'poison') effects.push(tr('effect_poison_stat', {pct:pct}));
-   if(mv.eff === 'badpoison') effects.push(tr('effect_badpoison_stat', {pct:pct}));
-   if(mv.eff === 'sleep') effects.push(tr('effect_sleep_stat', {pct:pct}));
-   if(mv.eff === 'freeze') effects.push(tr('effect_freeze_stat', {pct:pct}));
-   if(mv.eff === 'slow') effects.push(tr('effect_slow_stat', {pct:pct}));
- } else if(mv.eff && effC > 0) {
-   
-   if(mv.eff === 'burn') effects.push(tr('effect_burn_chance', {pct:effC}));
-   if(mv.eff === 'para') effects.push(tr('effect_para_chance', {pct:effC}));
-   if(mv.eff === 'poison') effects.push(tr('effect_poison_chance', {pct:effC}));
-   if(mv.eff === 'freeze') effects.push(tr('effect_freeze_chance', {pct:effC}));
-   if(mv.eff === 'sleep') effects.push(tr('effect_sleep_chance', {pct:effC}));
-   if(mv.eff === 'slow') effects.push(tr('effect_slow_chance', {pct:effC}));
-   if(mv.eff === 'confuse') effects.push(tr('effect_confuse_chance', {pct:effC}));
-   if(mv.eff === 'flinch') effects.push(tr('effect_flinch_chance', {pct:effC}));
- }
- if(mv.crit) effects.push(t('effect_crit'));
- if(mv.recoil) effects.push(t('effect_recoil'));
- if(mv.recharge) effects.push(t('effect_recharge'));
- if(mv.trap) effects.push(t('effect_trap'));
- if(mv.drain) effects.push(t('effect_drain'));
- if(mv.charge) effects.push(t('effect_charge'));
- if(mv.heal) effects.push(tr('effect_heal', {pct:mv.heal*100}));
- if(mv.prio && mv.prio > 0) effects.push(tr('effect_priority', {prio:mv.prio}));
- if(mv.fixed) effects.push(tr('effect_fixed', {damage:typeof mv.fixed === 'number' ? mv.fixed : t('level_word')}));
 
- const effHtml = effects.length 
+   const pct = effC || 100;
+   if(mv.eff === 'burn') _pushEff('burn', tr('effect_burn_stat', {pct:pct}));
+   if(mv.eff === 'para') _pushEff('para', tr('effect_para_stat', {pct:pct}));
+   if(mv.eff === 'poison') _pushEff('poison', tr('effect_poison_stat', {pct:pct}));
+   if(mv.eff === 'badpoison') _pushEff('poison', tr('effect_badpoison_stat', {pct:pct}));
+   if(mv.eff === 'sleep') _pushEff('sleep', tr('effect_sleep_stat', {pct:pct}));
+   if(mv.eff === 'freeze') _pushEff('freeze', tr('effect_freeze_stat', {pct:pct}));
+   if(mv.eff === 'slow') _pushEff('slow', tr('effect_slow_stat', {pct:pct}));
+ } else if(mv.eff && effC > 0) {
+
+   if(mv.eff === 'burn') _pushEff('burn', tr('effect_burn_chance', {pct:effC}));
+   if(mv.eff === 'para') _pushEff('para', tr('effect_para_chance', {pct:effC}));
+   if(mv.eff === 'poison') _pushEff('poison', tr('effect_poison_chance', {pct:effC}));
+   if(mv.eff === 'freeze') _pushEff('freeze', tr('effect_freeze_chance', {pct:effC}));
+   if(mv.eff === 'sleep') _pushEff('sleep', tr('effect_sleep_chance', {pct:effC}));
+   if(mv.eff === 'slow') _pushEff('slow', tr('effect_slow_chance', {pct:effC}));
+   if(mv.eff === 'confuse') _pushEff('confuse', tr('effect_confuse_chance', {pct:effC}));
+   if(mv.eff === 'flinch') _pushEff('flinch', tr('effect_flinch_chance', {pct:effC}));
+ }
+ if(mv.crit) _pushEff(null, t('effect_crit'));
+ if(mv.recoil) _pushEff(null, t('effect_recoil'));
+ if(mv.recharge) _pushEff(null, t('effect_recharge'));
+ if(mv.trap) _pushEff(null, t('effect_trap'));
+ if(mv.drain) _pushEff(null, t('effect_drain'));
+ if(mv.charge) _pushEff(null, t('effect_charge'));
+ if(mv.heal) _pushEff(null, tr('effect_heal', {pct:mv.heal*100}));
+ if(mv.prio && mv.prio > 0) _pushEff(null, tr('effect_priority', {prio:mv.prio}));
+ if(mv.fixed) _pushEff(null, tr('effect_fixed', {damage:typeof mv.fixed === 'number' ? mv.fixed : t('level_word')}));
+
+ const effHtml = effects.length
    ? effects.map(e => {
        let bg = 'rgba(236,222,183,0.06)';
        let border = '1px solid rgba(236,222,183,0.22)';
        let color = 'var(--light2)';
-       const badge = typeof getBadgeHtml === 'function' ? getBadgeHtml(e) : null;
-       // Wave 29: effContent must be DECLARED per effect row — assigning to
-       // an undeclared identifier throws in ES-module strict mode whenever
-       // getBadgeHtml returns a badge (the whole move-info panel crashed
-       // with "effContent is not defined").
+       // Bulle colorée pour les statuts (Brûlure, Paralysie…) ; les autres
+       // effets restent en texte simple précédé de ✦.
+       const badge = e.badge ? (typeof getBadgeHtml === 'function' ? getBadgeHtml(e.badge) : null) : null;
+       const hasBadge = badge && typeof badge === 'string' && badge !== e.badge && badge !== e.text;
        let effContent;
-       if (badge && typeof badge === 'string') { bg = 'transparent'; border = 'none'; color = 'inherit'; effContent = badge; }
-       const effContentVar = effContent !== undefined ? effContent : '✦ ' + e;
+       if (hasBadge) { bg = 'transparent'; border = 'none'; color = 'inherit'; effContent = badge + ' ' + e.text; }
+       const effContentVar = effContent !== undefined ? effContent : '✦ ' + e.text;
        return `<div data-style="background:var(--pm-note-bg);border:var(--pm-note-border);color:var(--pm-note-c);padding:8px 12px;border-radius:8px;font-size:12.5px;font-weight:bold;margin:6px 0;display:flex;align-items:center;gap:6px;box-shadow:0 2px 4px rgba(0,0,0,0.15);width:100%;box-sizing:border-box;" style="--pm-note-bg:${bg};--pm-note-border:${border};--pm-note-c:${color};">${effContentVar}</div>`;
-     }).join('') 
+     }).join('')
    : `<div class="pw-text-sm pw-light1">${t('no_special_effects')}</div>`;
  // Phase 24b: resolve the description through t() first, otherwise the
- // translation was never displayed.
+ // translation was never displayed. Les clés FR sont compactes (PokeChill :
+ // « airslash »), les ids MOVES sont en snake_case (« air_slash ») — on
+ // essaie l'exact PUIS la forme sans underscores.
  let moveDesc = '';
  if(typeof t === 'function'){
-   const locDesc = t('move_descs.' + moveId);
-   if(locDesc && locDesc !== 'move_descs.' + moveId) moveDesc = locDesc;
+   const cands = [moveId, String(moveId || '').replace(/_/g, '')];
+   for(const cand of cands){
+     if(!cand) continue;
+     const locDesc = t('move_descs.' + cand);
+     if(locDesc && locDesc !== 'move_descs.' + cand){ moveDesc = locDesc; break; }
+   }
  }
  if(!moveDesc) moveDesc = mv.desc || (typeof MOVE_DESCRIPTIONS !== 'undefined' && MOVE_DESCRIPTIONS[moveId]) || '';
  moveDesc = typeof replaceWeatherTerms === 'function' ? replaceWeatherTerms(moveDesc) : moveDesc;
@@ -802,4 +808,6 @@ export {
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('openPokeModal', openPokeModal); } catch (_) {} }
 if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('openBoxPokeModal', openBoxPokeModal); } catch (_) {} }
+
+
 

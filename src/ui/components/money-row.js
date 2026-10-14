@@ -12,7 +12,10 @@
  *   - moneyRowHTML(model)  → HTML string (classic adapters through
  *                            window.PokeUI.components.moneyRowHTML).
  *
- * Model: { label: string, amount: string|number }  (amount pre-formatted)
+ * Model: { label, amount, suffix?, prefixHtml? }
+ *   - amount pre-formatted (string|number)
+ *   - suffix defaults to '₽' (Pokédollars) — pass '' for other currencies,
+ *   - prefixHtml is an optional icon (e.g. currency sprite).
  */
 import { h, toHTMLString } from '../../engine/render/vdom.js';
 
@@ -22,9 +25,12 @@ import { h, toHTMLString } from '../../engine/render/vdom.js';
  */
 export function moneyRowVNode(model = {}) {
   const amount = (model.amount !== undefined && model.amount !== null) ? String(model.amount) : '0';
+  const suffix = (model.suffix !== undefined && model.suffix !== null) ? String(model.suffix) : '₽';
   return h('div', { class: 'pw-money-row', role: 'status', 'aria-live': 'polite' },
     h('span', { class: 'pw-money-label' }, model.label || ''),
-    h('b', { class: 'pw-money-amount' }, `${amount}₽`));
+    h('b', { class: 'pw-money-amount' },
+      model.prefixHtml ? h.raw(model.prefixHtml) : null,
+      `${amount}${suffix}`));
 }
 
 /**

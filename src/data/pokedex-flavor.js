@@ -511,3 +511,5 @@ export const POKEDEX_FLAVOR = {
 // kept on the global object for the registries (data.js) and the VM harnesses.
 if (typeof globalThis !== 'undefined') globalThis.POKEDEX_FLAVOR = POKEDEX_FLAVOR;
 
+
+
