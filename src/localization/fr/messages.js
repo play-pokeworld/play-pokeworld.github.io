@@ -216,7 +216,7 @@ export const L_fr_messages = {
 "m.talent_hidden":"(Caché )",
 "m.stat_badpoison":"{name} est gravement empoisonné !",
 "m.stat_poison":"{name} est empoisonné !",
-"m.treasure_sell_sub":"Vous possédez <b>{qty}</b> exemplaire(s). Chaque exemplaire vaut <b>{value}₽</b>.",
+"m.treasure_sell_sub":"Vous possédez <b>{qty}</b> exemplaire(s). Chaque exemplaire vaut <b>{value}</b>.",
 "m.repeatable_limit":"Limite {n}",
 "m.stat_label_0":"PV Max",
 "m.stat_label_1":"Attaque",

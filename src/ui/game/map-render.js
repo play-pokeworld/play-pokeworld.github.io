@@ -261,11 +261,26 @@ function renderMap() {
   _pwSetHtmlSafe(nodeG, rectsHTML + labelsHTML + markersHTML);
   ensureMapHelpButton();
   initMobileMapPinchZoom();
+  // V7-R1c — retour joueur : « garder le zoom même après un clic, sur
+  // téléphone c'est embêtant de devoir re-zoomer au bon endroit à chaque
+  // clic ». Un clic sur un lieu re-dessine la carte, qui repartait au zoom 1
+  // (viewBox complet) alors que l'état de pincement, lui, était conservé.
+  // On ré-applique donc le cadrage courant ; seul un changement de RÉGION
+  // (autre carte) remet le zoom à 1.
+  if (__pwMapZoomRegion !== reg) {
+    __pwMapZoomRegion = reg;
+    __pwMapZoom = 1.0;
+    __pwMapVbX = 0;
+    __pwMapVbY = 0;
+  } else if (__pwMapZoom > 1.0) {
+    applyMapViewBox();
+  }
 }
 
 let __pwMapZoom = 1.0;
 let __pwMapVbX = 0;
 let __pwMapVbY = 0;
+let __pwMapZoomRegion = null; // région du dernier rendu (le zoom lui est propre)
 let __pwIsPinchingOrDragging = false;
 let __pwPinchResetTimer = null;
 const __pwActivePointers = new Map();

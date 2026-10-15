@@ -169,6 +169,14 @@
 
         <div id="battle-active-scene" class="pw-static-037">
 
+          <!-- V7-R1c — la carte du DRESSEUR (arène, Ligue, rival, Atoll) vit
+               HORS de la rangée : toute la mise en page de la rangée (CSS §A,
+               ticker des barres de charge, flashMoveFiring) identifie le
+               Pokémon ADVERSE comme « première carte » de #battle-team-row.
+               Insérée en tête de rangée, la carte dresseur reléguait l'adversaire
+               au rang de remplaçant : compact, sans attaques (retour joueur :
+               « on ne voit pas les attaques ennemies »). -->
+          <div id="battle-trainer-host"></div>
           <div id="battle-team-row" class="team-container"></div>
           <!-- Wave 28 (user feedback): the extra move-buttons bar under the
                team row is REMOVED — the charge bars live directly ON the

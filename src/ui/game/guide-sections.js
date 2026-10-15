@@ -78,6 +78,34 @@ function captureGuidePages() {
   ];
 }
 
+/**
+ * V7-R1c · retour joueur « Diamants : comment en obtenir ? » — valeurs réelles
+ * citées par la page « Monnaies » : trésors convertibles et leur valeur en 💎
+ * (diamondTreasureList, currency.js) et nom du lieu qui ouvre la Mine.
+ */
+function currencyGuideValues() {
+  const listFn = globalThis.diamondTreasureList;
+  const nameFn = globalThis.getItemName;
+  const fmtFn = globalThis.formatNumber;
+  const locFn = globalThis.getLocName;
+  const list = typeof listFn === 'function' ? listFn() : [];
+  const treasures = list
+    .map((e) => {
+      let name = e.key;
+      try {
+        if (typeof nameFn === 'function') name = nameFn(e.key) || e.key;
+      } catch (_) {}
+      const val = typeof fmtFn === 'function' ? fmtFn(e.value) : String(e.value);
+      return `${name} ${val} 💎`;
+    })
+    .join(', ');
+  let mine = 'Diglett\u2019s Cave';
+  try {
+    if (typeof locFn === 'function') mine = locFn('diglettscave') || mine;
+  } catch (_) {}
+  return { treasures, mine };
+}
+
 function guideSections() {
   return {
     map: {
@@ -475,6 +503,8 @@ function guideSections() {
       icon: _icon('shop'),
       title: typeof t === 'function' ? t('guide_economy') : 'Economy & Market',
       pages: [
+        // V7-R1c — les 5 monnaies et leur source (les 💎 n'en ont qu'une : la Mine).
+        [t('guide_currencies'), tr('guide_currencies_desc', currencyGuideValues())],
         [
           typeof t === 'function' ? t('guide_shops') : 'Shops',
           typeof t === 'function'

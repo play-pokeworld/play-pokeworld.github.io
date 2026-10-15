@@ -216,7 +216,7 @@ export const L_en_messages = {
 "m.talent_hidden":"(Hidden )",
 "m.stat_badpoison":"{name} was badly poisoned!",
 "m.stat_poison":"{name} was poisoned!",
-"m.treasure_sell_sub":"You own <b>{qty}</b> unit(s). Each unit is worth <b>{value}₽</b>.",
+"m.treasure_sell_sub":"You own <b>{qty}</b> unit(s). Each unit is worth <b>{value}</b>.",
 "m.repeatable_limit":"Limit {n}",
 "m.stat_label_0":"Max HP",
 "m.stat_label_1":"Attack",

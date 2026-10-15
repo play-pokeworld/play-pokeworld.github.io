@@ -135,6 +135,29 @@ function dungeonToll(badgeReq) {
 function diamondValueOf(itemKey) {
   return DIAMOND_VALUES[itemKey] || 0;
 }
+// V7-R1c — retour joueur « Diamants : comment en obtenir ? ». Les 💎 n'ont
+// qu'une source : la revente des trésors déterrés dans la Mine. La liste
+// triée alimente la page « Monnaies » du guide (chiffres lus ici, jamais
+// recopiés dans un texte) ; et la colonne 💎 de la fenêtre Monnaies se dévoile
+// dès que la Mine est ouverte (même à 0) — avant, la monnaie n'existait nulle
+// part à l'écran tant qu'on n'avait pas déjà vendu un trésor, alors que ses
+// prix (outils de la mine, Master Ball…) étaient déjà affichés.
+function diamondTreasureList() {
+  return Object.keys(DIAMOND_VALUES)
+    .map((key) => ({ key, value: DIAMOND_VALUES[key] }))
+    .sort((a, b) => a.value - b.value || (a.key < b.key ? -1 : 1));
+}
+function diamondsDiscoverable() {
+  const w = ensureWallet();
+  if (w && w.revealed && w.revealed.diamonds) return true;
+  const fn = globalThis.mineUnlocked;
+  if (typeof fn !== 'function') return false;
+  try {
+    return !!fn();
+  } catch (_) {
+    return false;
+  }
+}
 
 // Récompense d'une victoire sauvage (le robinet principal de ₽).
 function awardWildVictoryMoney() {
@@ -269,7 +292,7 @@ function currencySnapshot() {
       symbol: '💎',
       labelKey: 'currency_diamonds',
       amount: w.diamonds,
-      revealed: !!w.revealed.diamonds,
+      revealed: diamondsDiscoverable(),
     },
     {
       id: 'battlePoints',
@@ -290,6 +313,8 @@ if (typeof window !== 'undefined') {
   window.tokensPerCatchForLocation = tokensPerCatchForLocation;
   window.dungeonToll = dungeonToll;
   window.diamondValueOf = diamondValueOf;
+  window.diamondTreasureList = diamondTreasureList;
+  window.diamondsDiscoverable = diamondsDiscoverable;
   window.awardWildVictoryMoney = awardWildVictoryMoney;
   window.gainDungeonTokens = gainDungeonTokens;
   window.gainQuestPoints = gainQuestPoints;
@@ -320,6 +345,8 @@ if (typeof globalThis !== 'undefined') {
   globalThis.tokensPerCatchForLocation = tokensPerCatchForLocation;
   globalThis.dungeonToll = dungeonToll;
   globalThis.diamondValueOf = diamondValueOf;
+  globalThis.diamondTreasureList = diamondTreasureList;
+  globalThis.diamondsDiscoverable = diamondsDiscoverable;
   globalThis.awardWildVictoryMoney = awardWildVictoryMoney;
   globalThis.gainDungeonTokens = gainDungeonTokens;
   globalThis.gainQuestPoints = gainQuestPoints;
@@ -355,6 +382,8 @@ export {
   tokensPerCatchForLocation,
   dungeonToll,
   diamondValueOf,
+  diamondTreasureList,
+  diamondsDiscoverable,
   awardWildVictoryMoney,
   gainDungeonTokens,
   gainQuestPoints,

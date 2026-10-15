@@ -136,6 +136,10 @@ test('37-D5 — boss battu : échelle à sa place, carte dévoilée, palier purg
   while (run && !run.bossDefeated && guard++ < 300) {
     if (run.pendingNode) M.dungeonOnWin();
     run = M.currentDungeonRun();
+    // V7-R1c — le pilote « farm » ramasse TOUT avant le boss : une fois le
+    // boss battu il n'a plus rien à faire et descend aussitôt ; on observe
+    // donc l'état du palier juste après la victoire, avant son pas suivant.
+    if (run && run.bossDefeated) break;
     if (run && !run.pendingNode) M._dgAutoStep();
     run = M.currentDungeonRun();
   }

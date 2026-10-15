@@ -471,12 +471,7 @@ function dungeonDescend() {
   _dgNoAutoResume = false;
   _dgAutoResume();
   // PASSE 36 — pilote auto : il entame lui-même la nouvelle carte.
-  if (run.auto)
-    setTimeout(() => {
-      try {
-        _dgAutoStep();
-      } catch (_) {}
-    }, 500);
+  _dgAutoKick(run, 500);
   return run;
 }
 
@@ -1307,36 +1302,42 @@ function _dgRevealAll(run) {
   for (const t of Object.values(run.map.tiles)) t.revealed = true;
 }
 
-/** Plus court chemin (BFS) de la position vers `targetId`, ou null. */
-function _dgBfsPath(run, targetId) {
+/** Plus court chemin de la position vers `targetId`, ou null.
+ *  V7-R1c — (1) la case du BOSS (puis l'échelle qui la remplace) n'est JAMAIS
+ *  traversée « en passant » : y poser le pied l'engage, et c'est ainsi que le
+ *  pilote « allait directement au boss » ; (2) `fightCost` > 0 fait éviter
+ *  les combats non soldés quand un détour existe (mode coffres). */
+function _dgBfsPath(run, targetId, fightCost) {
   if (run.pos === targetId) return [run.pos];
+  const cost = { [run.pos]: 0 };
   const prev = { [run.pos]: null };
-  const queue = [run.pos];
-  while (queue.length) {
-    const cur = queue.shift();
+  const open = [run.pos];
+  while (open.length) {
+    open.sort((a, b2) => cost[a] - cost[b2]); // ≤ 88 cases : un tri suffit
+    const cur = open.shift();
+    if (cur === targetId) break;
     for (const n of _dgNeighbors(run, cur)) {
-      if (n.id in prev) continue;
-      prev[n.id] = cur;
-      if (n.id === targetId) {
-        const path = [n.id];
-        let p = cur;
-        while (p) {
-          path.unshift(p);
-          p = prev[p];
-        }
-        return path;
+      if (n.id !== targetId && n.id === run.bossTile) continue;
+      const fight = !n.done && (n.type === 'combat' || n.type === 'elite');
+      const c = cost[cur] + 1 + (fightCost && fight && n.id !== targetId ? fightCost : 0);
+      if (!(n.id in cost) || c < cost[n.id]) {
+        cost[n.id] = c;
+        prev[n.id] = cur;
+        if (!open.includes(n.id)) open.push(n.id);
       }
-      queue.push(n.id);
     }
   }
-  return null;
+  if (!(targetId in prev)) return null;
+  const path = [];
+  for (let p = targetId; p; p = prev[p]) path.unshift(p);
+  return path;
 }
 
-function _dgNearestPath(run, filter) {
+function _dgNearestPath(run, filter, fightCost) {
   let best = null;
   for (const t of Object.values(run.map.tiles)) {
     if (!filter(t)) continue;
-    const path = _dgBfsPath(run, t.id);
+    const path = _dgBfsPath(run, t.id, fightCost);
     if (path && (!best || path.length < best.length)) best = path;
   }
   return best;
@@ -1402,12 +1403,7 @@ function dungeonMoveTo(id) {
       'var(--green)'
     );
     refreshDungeonPanel();
-    if (run.auto)
-      setTimeout(() => {
-        try {
-          _dgAutoStep();
-        } catch (_) {}
-      }, 450);
+    _dgAutoKick(run, 450);
     return run;
   }
   if (tile.type === 'ladder') {
@@ -1423,12 +1419,7 @@ function dungeonMoveTo(id) {
     return run;
   }
   refreshDungeonPanel();
-  if (run.auto)
-    setTimeout(() => {
-      try {
-        _dgAutoStep();
-      } catch (_) {}
-    }, 350);
+  _dgAutoKick(run, 350);
   return run;
 }
 
@@ -1479,16 +1470,30 @@ function dungeonSetAuto(mode) {
   }
   run.auto = next;
   refreshDungeonPanel();
-  if (run.auto)
-    setTimeout(() => {
-      try {
-        _dgAutoStep();
-      } catch (_) {}
-    }, 400);
+  _dgAutoKick(run, 400);
   return run;
 }
 
-/** Le pilote auto selon le MODE choisi (boss / farm / coffres). */
+/** Relance différée du pilote (après un coffre, un pas, une descente…). */
+function _dgAutoKick(run, delay) {
+  if (!run || !run.auto) return;
+  setTimeout(() => {
+    try {
+      _dgAutoStep();
+    } catch (_) {}
+  }, delay);
+}
+
+/** Le pilote auto selon le MODE choisi (boss / farm / coffres).
+ *  V7-R1c — retour joueur : « le plateau va directement au boss au lieu de
+ *  faire tout le plateau, pareil pour coffres ». Le boss n'est engagé QU'UNE
+ *  FOIS la mission du mode accomplie sur le palier :
+ *    · farm   → tout le plateau révélé ET soldé (combats, élites, coffres) ;
+ *    · chest  → tous les coffres du plateau ouverts (les combats sont évités
+ *               quand un détour existe) ;
+ *    · boss   → droit au boss, ne combat que ce qui barre la route.
+ *  Boss battu (échelle à sa place) → on descend. Sur le dernier palier, le
+ *  gardien clôt l'expédition : d'où l'importance de tout ramasser AVANT. */
 function _dgAutoStep() {
   const run = currentDungeonRun();
   if (!run || !run.map || !run.map.grid || !run.auto) return null;
@@ -1496,43 +1501,19 @@ function _dgAutoStep() {
   if (b && b.active) return null;
   if (typeof globalThis.aliveCount === 'function' && globalThis.aliveCount() <= 0) return null;
   const mode = run.auto === 'chest' ? 'chest' : run.auto === 'boss' ? 'boss' : 'farm';
+  const tiles = Object.values(run.map.tiles);
+  const isChest = (t) => !t.done && t.type === 'chest';
+  const isLoot = (t) => isChest(t) || (!t.done && (t.type === 'combat' || t.type === 'elite'));
   let path = null;
-
-  if (mode === 'boss') {
-    // fonce vers le boss ; une fois battu (échelle à sa place), descend.
-    if (!run.bossDefeated) {
-      path = _dgBfsPath(run, run.bossTile);
-    } else if (run.pos === run.bossTile) {
-      return dungeonDescend();
-    } else {
-      path = _dgBfsPath(run, run.bossTile);
-    }
-  } else if (mode === 'chest') {
-    // coffres uniquement : la cible la plus proche non ouverte ; à défaut,
-    // plus de coffres → on va défier le boss.
-    if (!run.bossDefeated) {
-      path = _dgNearestPath(run, (t) => !t.done && t.type === 'chest');
-      if (!path) path = _dgBfsPath(run, run.bossTile);
-    } else if (run.pos === run.bossTile) {
-      return dungeonDescend();
-    } else {
-      path = _dgBfsPath(run, run.bossTile);
-    }
+  if (mode === 'farm' && tiles.some((t) => !t.revealed || isLoot(t))) {
+    path = _dgNearestPath(run, (t) => isLoot(t) || !t.revealed);
+  } else if (mode === 'chest' && tiles.some(isChest)) {
+    path = _dgNearestPath(run, isChest, 4);
+  } else if (run.bossDefeated && run.pos === run.bossTile) {
+    return dungeonDescend();
   } else {
-    // farm : explorer les cases cachées, puis tout ramasser, puis descendre.
-    if (!run.bossDefeated) {
-      path = _dgNearestPath(run, (t) => !t.revealed);
-      if (!path) path = _dgBfsPath(run, run.bossTile);
-    } else {
-      path = _dgNearestPath(
-        run,
-        (t) => !t.done && (t.type === 'chest' || t.type === 'combat' || t.type === 'elite')
-      );
-      if (!path) {
-        if (run.pos === run.bossTile) return dungeonDescend();
-        path = _dgBfsPath(run, run.bossTile);
-      }
-    }
+    // mission accomplie (ou mode boss) : le boss, puis l'échelle qui le remplace.
+    path = _dgBfsPath(run, run.bossTile);
   }
   if (!path || path.length < 2) return null;
   // PASSE 38 — le pilote téléporte directement sur la cible si elle est déjà

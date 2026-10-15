@@ -82,11 +82,11 @@ export const L_en_items = {
   },
   "nugget": {
     "name": "Nugget",
-    "desc": "Precious gold item worth 5,000₽."
+    "desc": "Precious gold nugget dug up in the mine — sells for diamonds."
   },
   "stardust": {
     "name": "Stardust",
-    "desc": "Lovely red dust worth 2,000₽."
+    "desc": "Lovely red dust dug up in the mine — sells for diamonds."
   },
   "fossil": {
     "name": "Old Fossil",

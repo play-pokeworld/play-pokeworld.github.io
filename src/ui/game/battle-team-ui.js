@@ -445,7 +445,22 @@ function renderBattleTeamRow() {
 
   const e = battle.enemyPoke;
 
-  let html = trainerVisualHtml();
+  // V7-R1c — la carte du dresseur est rendue dans SON hôte (#battle-trainer-host,
+  // au-dessus de la rangée) : ainsi le Pokémon adverse reste la PREMIÈRE carte
+  // de #battle-team-row, celle que le CSS et le ticker traitent comme l'ennemi
+  // (sprite large, PV, attaques avec barres de charge). Avant, en combat de
+  // dresseur, l'adversaire était affiché comme un remplaçant, sans attaques.
+  // Repli (ancien index.html / harnais sans l'hôte) : en tête de rangée.
+  const trainerHtml = trainerVisualHtml();
+  const trainerHost = document.getElementById('battle-trainer-host');
+  let html = '';
+  if (trainerHost) {
+    if (typeof globalThis.pwMorphHtml === 'function')
+      globalThis.pwMorphHtml(trainerHost, trainerHtml);
+    else _pwSetHtmlSafe(trainerHost, trainerHtml);
+  } else {
+    html = trainerHtml;
+  }
 
   if (e) {
     html += generatePokeCardHTML(e, -1, {

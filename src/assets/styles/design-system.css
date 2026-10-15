@@ -5809,6 +5809,9 @@ body.save-menu-active { overflow: hidden; }
 .trainer-visual-card.role-rival .trainer-sprite-placeholder { border-color: rgba(83,157,223,.7); color:#9fd0ff; }
 .trainer-visual-card.role-gym .trainer-sprite-placeholder { border-color: rgba(242,217,78,.7); color:#f2d94e; }
 .trainer-visual-card.role-atoll .trainer-sprite-placeholder { border-color: rgba(183,99,207,.7); color:#dcb4ff; }
+/* V7-R1c — l'hôte de la carte dresseur (au-dessus de la rangée de combat) :
+   même respiration que le `gap` de #battle-team-row, rien quand il est vide. */
+#battle-trainer-host:not(:empty) { margin-bottom: 8px; }
 .trainer-visual-card b { display:block; color:var(--light2); }
 .trainer-visual-card span { color:var(--light1); font-size:12px; text-transform:capitalize; }
 .trainer-style-row { display:flex; flex-wrap:wrap; gap:5px; margin-top:4px; }

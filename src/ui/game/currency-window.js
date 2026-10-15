@@ -83,7 +83,11 @@ function currencyColumns() {
       labelKey: 'currency_diamonds',
       gainKey: 'currency_diamond_gain',
       amount: w.diamonds,
-      revealed: !!w.revealed.diamonds,
+      // V7-R1c — visible dès que la Mine est ouverte (cf. diamondsDiscoverable).
+      revealed:
+        typeof globalThis.diamondsDiscoverable === 'function'
+          ? !!globalThis.diamondsDiscoverable()
+          : !!w.revealed.diamonds,
       icon: 'src/assets/images/currency/diamond.svg',
     },
     {
