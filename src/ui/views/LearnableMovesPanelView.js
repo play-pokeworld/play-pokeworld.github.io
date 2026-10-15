@@ -45,25 +45,44 @@ export class LearnableMovesPanelView extends UIView {
   }
 
   sectionVNode(sec) {
-    const body = (sec.moves && sec.moves.length)
-      ? h('div', { class: 'poke-detail-moves-list learn' },
-          sec.moves.map((mv) => moveRowVNode({
-            name: mv.name,
-            typeCls: mv.typeCls,
-            typeName: mv.typeName,
-            typeColor: mv.typeColor,
-            meta: mv.meta,
-            stateClass: mv.stateClass,
-            pill: mv.pill || null,
-            context: { call: 'openMoveInfo', args: mv.contextArgs },
-          })))
-      : h('div', { class: 'poke-detail-empty' }, sec.emptyMsg || '');
-    return h('div', { class: 'poke-detail-moves-section' },
-      h('div', { class: 'poke-detail-moves-title' },
-        h('span', null,
+    const body =
+      sec.moves && sec.moves.length
+        ? h(
+            'div',
+            { class: 'poke-detail-moves-list learn' },
+            sec.moves.map((mv) =>
+              moveRowVNode({
+                name: mv.name,
+                typeCls: mv.typeCls,
+                typeName: mv.typeName,
+                typeColor: mv.typeColor,
+                meta: mv.meta,
+                stateClass: mv.stateClass,
+                pill: mv.pill || null,
+                context: { call: 'openMoveInfo', args: mv.contextArgs },
+              })
+            )
+          )
+        : h('div', { class: 'poke-detail-empty' }, sec.emptyMsg || '');
+    return h(
+      'div',
+      { class: 'poke-detail-moves-section' },
+      h(
+        'div',
+        { class: 'poke-detail-moves-title' },
+        h(
+          'span',
+          null,
           sec.label || '',
-          h('span', { style: { fontSize: '11px', color: 'var(--light1)', fontWeight: '400' } }, ` (${sec.count != null ? sec.count : (sec.moves ? sec.moves.length : 0)})`))),
-      body);
+          h(
+            'span',
+            { style: { fontSize: '11px', color: 'var(--light1)', fontWeight: '400' } },
+            ` (${sec.count != null ? sec.count : sec.moves ? sec.moves.length : 0})`
+          )
+        )
+      ),
+      body
+    );
   }
 
   windowVNode() {
@@ -74,22 +93,40 @@ export class LearnableMovesPanelView extends UIView {
         titleExtra: h('span', { class: 'pw-hdr-count' }, ` ${m.countLabel || ''}`),
         close: { action: 'close-poke-modal', glyph: '✕' },
       }),
-      h('div', { class: 'poke-detail-moves-block', dataset: { learnablePanel: '1' } },
-        (m.sections || []).map((sec) => this.sectionVNode(sec))),
-      h('div', { class: 'pw-flex-center pw-gap-sm', style: { marginTop: '8px' } },
-        m.back ? h('button', {
-          class: 'hbtn poke-detail-mini-btn',
-          dataset: { action: 'legacy-call', call: m.back.call || '', callArgs: m.back.args == null ? '' : String(m.back.args) },
-        }, m.back.label || '') : null,
-        h('button', { class: 'hbtn', dataset: { action: 'close-poke-modal' } }, m.closeLabel || '')),
+      h(
+        'div',
+        { class: 'poke-detail-moves-block', dataset: { learnablePanel: '1' } },
+        (m.sections || []).map((sec) => this.sectionVNode(sec))
+      ),
+      h(
+        'div',
+        { class: 'pw-flex-center pw-gap-sm', style: { marginTop: '8px' } },
+        m.back
+          ? h(
+              'button',
+              {
+                class: 'hbtn poke-detail-mini-btn',
+                dataset: {
+                  action: 'legacy-call',
+                  call: m.back.call || '',
+                  callArgs: m.back.args == null ? '' : String(m.back.args),
+                },
+              },
+              m.back.label || ''
+            )
+          : null,
+        h('button', { class: 'hbtn', dataset: { action: 'close-poke-modal' } }, m.closeLabel || '')
+      ),
     ];
   }
 
   onLoad() {
     this.windowEntity = this.spawn('ui:learnable-moves-panel', []);
-    this.windowEntity.addComponent(new UIRenderComponent({
-      template: () => this.windowVNode(),
-    }));
+    this.windowEntity.addComponent(
+      new UIRenderComponent({
+        template: () => this.windowVNode(),
+      })
+    );
   }
 
   /**
@@ -103,6 +140,3 @@ export class LearnableMovesPanelView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
-
-
-

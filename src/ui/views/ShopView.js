@@ -33,34 +33,53 @@ export class ShopView extends UIView {
   windowVNode() {
     const m = this.model;
     if (m.state === 'locked') {
-      return h('div', { class: 'pw-empty-state-lg' },
+      return h(
+        'div',
+        { class: 'pw-empty-state-lg' },
         h('div', { class: 'pw-big-icon' }),
         h('div', { class: 'pw-choice-title' }, (m.locked && m.locked.title) || ''),
-        h('div', { class: 'pw-choice-desc' }, h.raw((m.locked && m.locked.desc) || '')));
+        h('div', { class: 'pw-choice-desc' }, h.raw((m.locked && m.locked.desc) || ''))
+      );
     }
     if (m.state !== 'ok' || !Array.isArray(m.items) || !m.items.length) {
       return h('div', { class: 'pw-empty-state-lg' }, m.emptyLabel || '');
     }
-    return h('div', { class: 'pw-shop-list' },
-      ...m.items.filter(Boolean).map((it) => h('div', {
-        class: 'shop-item pw-choice-card pw-shop-row',
-        dataset: { action: 'legacy-call', call: 'buyItem', callArgs: `'${it.key}'` },
-      },
-        h('div', { class: 'pw-choice-icon' }, h.raw(it.spriteHtml || '')),
-        h('div', { class: 'pw-flex-1' },
-          h('div', { class: 'pw-manage-name' }, it.name || ''),
-          h('div', { class: 'pw-choice-sub' }, h.raw(it.desc || '')),
-          h('div', { class: 'pw-choice-sub' },
-            it.stockLabel || '',
-            it.maxLabel ? h('span', { class: 'pw-red' }, ` ${it.maxLabel}`) : null)),
-        h('div', { class: 'pw-manage-level pw-shop-price' }, it.priceLabel || ''))));
+    return h(
+      'div',
+      { class: 'pw-shop-list' },
+      ...m.items.filter(Boolean).map((it) =>
+        h(
+          'div',
+          {
+            class: 'shop-item pw-choice-card pw-shop-row',
+            dataset: { action: 'legacy-call', call: 'buyItem', callArgs: `'${it.key}'` },
+          },
+          h('div', { class: 'pw-choice-icon' }, h.raw(it.spriteHtml || '')),
+          h(
+            'div',
+            { class: 'pw-flex-1' },
+            h('div', { class: 'pw-manage-name' }, it.name || ''),
+            h('div', { class: 'pw-choice-sub' }, h.raw(it.desc || '')),
+            h(
+              'div',
+              { class: 'pw-choice-sub' },
+              it.stockLabel || '',
+              it.maxLabel ? h('span', { class: 'pw-red' }, ` ${it.maxLabel}`) : null
+            )
+          ),
+          h('div', { class: 'pw-manage-level pw-shop-price' }, it.priceLabel || '')
+        )
+      )
+    );
   }
 
   onLoad() {
     this.windowEntity = this.spawn('ui:shop', []);
-    this.windowEntity.addComponent(new UIRenderComponent({
-      template: () => this.windowVNode(),
-    }));
+    this.windowEntity.addComponent(
+      new UIRenderComponent({
+        template: () => this.windowVNode(),
+      })
+    );
   }
 
   /**
@@ -74,6 +93,3 @@ export class ShopView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
-
-
-

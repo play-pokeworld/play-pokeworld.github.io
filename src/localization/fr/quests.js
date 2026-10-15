@@ -913,6 +913,66 @@ export const L_fr_quests = {
     "desc": "Retourner à Bourg-en-Vol : le Professeur Seko célèbre votre légende.",
     "rewardDesc": "10 000₽ + 5 Écailles Cœur"
   },
+  "278": {
+    "title": "Première rivale : Flora",
+    "desc": "Flora vous attend sur la Route 103 avec la starter qui bat la vôtre. Premier duel de votre aventure à Hoenn !",
+    "rewardDesc": "300₽ + 2 Potions"
+  },
+  "279": {
+    "title": "Le voleur du Tunnel Mérazon",
+    "desc": "Un Sbire de la Team Aqua s'est enfui avec les Pièces Devon. Rattrapez-le dans le Tunnel Mérazon.",
+    "rewardDesc": "600₽ + 2 Super Balls"
+  },
+  "280": {
+    "title": "Alerte au Musée",
+    "desc": "La Team Aqua a envahi le Musée Océanographique de Poivressel pour voler le Capitaine Poupe. Chassez les sbires !",
+    "rewardDesc": "900₽ + 2 Super Potions"
+  },
+  "281": {
+    "title": "Revanche sur la Route 110",
+    "desc": "Flora a progressé depuis la Route 103 : affrontez son équipe sur la piste cyclable de la Route 110.",
+    "rewardDesc": "1 500₽ + 3 Super Balls"
+  },
+  "282": {
+    "title": "Le premier combat de Timmy",
+    "desc": "Timmy a capturé son Tarsal grâce à vous. Il vous défie devant l'arène de Lavandia pour prouver sa valeur.",
+    "rewardDesc": "800₽ + 5 Poké Balls"
+  },
+  "283": {
+    "title": "La Météorite du Mont Chimnée",
+    "desc": "Courtney, admin de la Team Magma, veut réveiller le volcan avec la Météorite. Battez-la au sommet du Mont Chimnée.",
+    "rewardDesc": "2 500₽ + 2 Hyper Balls"
+  },
+  "284": {
+    "title": "L'assaut de l'Institut Météo",
+    "desc": "Matt et la Team Aqua ont pris l'Institut Météo pour voler les données climatiques. Libérez les chercheurs !",
+    "rewardDesc": "3 000₽ + 3 Hyper Balls"
+  },
+  "285": {
+    "title": "Flora sur la Route 119",
+    "desc": "Devant l'Institut Météo, Flora vous propose un troisième duel : son équipe compte maintenant trois Pokémon.",
+    "rewardDesc": "3 000₽ + 1 Guérison"
+  },
+  "286": {
+    "title": "Duel à Nénucrique",
+    "desc": "Devant le Centre Commercial de Nénucrique, Flora joue sa dernière carte : quatre Pokémon et sa starter en pleine forme.",
+    "rewardDesc": "4 000₽ + 3 Hyper Balls"
+  },
+  "287": {
+    "title": "La Planque Magma",
+    "desc": "Max, chef de la Team Magma, se terre dans sa planque au flanc du Mont Chimnée avec l'Orbe Bleu volé. Affrontez-le.",
+    "rewardDesc": "5 000₽ + 1 Super Bonbon"
+  },
+  "288": {
+    "title": "Au fond de la Caverne",
+    "desc": "Arthur, chef de la Team Aqua, s'apprête à réveiller Kyogre au fond de la Caverne Fond-de-Mer. Arrêtez-le !",
+    "rewardDesc": "6 000₽ + 5 Hyper Balls"
+  },
+  "289": {
+    "title": "Timmy, Route Victoire",
+    "desc": "Timmy est devenu un dresseur accompli : il vous barre la Route Victoire avec Gardevoir et une équipe complète.",
+    "rewardDesc": "6 000₽ + 2 Super Bonbons"
+  },
 },
 "side": {
 "s1": {
@@ -1270,7 +1330,36 @@ export const L_fr_quests = {
 "s134": { "title":"Rencontre — Algatia", "desc":"Parlez à l’habitant d'Algatia.", "rewardDesc":"1 200₽ + Cuillère Tordue" },
 "s135": { "title":"Rencontre — Atalanopolis", "desc":"Parlez à l’habitant d'Atalanopolis.", "rewardDesc":"1 500₽ + Eau Mystique" },
 "s136": { "title":"Rencontre — Pacifiville", "desc":"Parlez à l’habitant de Pacifiville.", "rewardDesc":"1 200₽ + Écaille Draco" },
-"s137": { "title":"Rencontre — Autéquia", "desc":"Parlez à l’habitant d'Autéquia.", "rewardDesc":"1 000₽ + Pierre Lune" }
+"s137": { "title":"Rencontre — Autéquia", "desc":"Parlez à l’habitant d'Autéquia.", "rewardDesc":"1 000₽ + Pierre Lune" },
+// V7 · LEG-02 — chaînes légendaires de Hoenn (legendary-quests.js)
+"leg_regirock_1": { "title":"Les Sceaux I — Le Sanctuaire", "desc":"Résolvez l’énigme « Peuple des profondeurs » au Sanctuaire : la Gardienne des Sceaux veut voir les deux gardiens des mers éveiller le panneau.", "rewardDesc":"Points de quête" },
+"leg_regirock_2": { "title":"Les Sceaux I — Regirock", "desc":"Dans les Ruines Désert, résolvez l’énigme « Le nom du gardien de pierre ». Le golem de roche vous attendra sur place : capture non garantie, taux doublé, rencontre relançable.", "rewardDesc":"Rencontre : Regirock (Nv. 40)" },
+"leg_regice_1": { "title":"Les Sceaux II — Regice", "desc":"Regirock capturé, l’Ermite des Glaces vous ouvre la Grotte Isolée : résolvez l’énigme « Le nom du gardien de glace ». Regice vous attendra sur place (taux doublé, relançable).", "rewardDesc":"Rencontre : Regice (Nv. 40)" },
+"leg_registeel_1": { "title":"Les Sceaux III — Registeel", "desc":"Regice capturé, le Gardien du Tombeau vous confie la dernière énigme : « Le nom du gardien d’acier ». Registeel vous attendra sur place (taux doublé, relançable).", "rewardDesc":"Rencontre : Registeel (Nv. 40)" },
+"leg_latias_1": { "title":"Éon I — La rumeur de Poivressel", "desc":"Parlez à la reporter Gabby à Poivressel : elle a filmé une silhouette rouge au-dessus de la mer et vous remet un Passe Éon.", "rewardDesc":"Passe Éon" },
+"leg_latias_2": { "title":"Éon II — Route 118", "desc":"Latias survole la Route 118. Gagnez 50 combats sauvages sur la Route 118 pour attirer son attention.", "rewardDesc":"Points de quête" },
+"leg_latias_3": { "title":"Éon III — Route 119", "desc":"Elle se dirige vers le nord. Gagnez 50 combats sauvages sur la Route 119.", "rewardDesc":"Points de quête" },
+"leg_latias_4": { "title":"Éon IV — Île du Sud", "desc":"Rendez-vous sur l’Île du Sud avec le Passe Éon. Latias vous y attend : capture non garantie, taux doublé, rencontre relançable.", "rewardDesc":"Rencontre : Latias (Nv. 50)" },
+"leg_latios_1": { "title":"Éon V — Chenal 124", "desc":"Latias capturée et la Ligue de Hoenn remportée, le Vieux Marin de l’Île du Sud parle d’un frère bleu. Gagnez 50 combats sauvages sur le Chenal 124.", "rewardDesc":"Points de quête" },
+"leg_latios_2": { "title":"Éon VI — Chenal 125", "desc":"Gagnez 50 combats sauvages sur le Chenal 125.", "rewardDesc":"Points de quête" },
+"leg_latios_3": { "title":"Éon VII — Latios", "desc":"Gagnez 50 combats sauvages sur le Chenal 126, puis retournez sur l’Île du Sud : Latios vous y attend (taux doublé, relançable).", "rewardDesc":"Rencontre : Latios (Nv. 50)" },
+"leg_kyogre_1": { "title":"Abysses I — L’Orbe Bleu", "desc":"Parlez à l’Ancienne du Mont Mémoria : elle vous confie l’Orbe Bleu avant que la Team Aqua ne s’en empare.", "rewardDesc":"Orbe Bleu" },
+"leg_kyogre_2": { "title":"Abysses II — Caverne Fond-de-Mer", "desc":"Affrontez l’Amiral Arthur et la Team Aqua dans la Caverne Fond-de-Mer pour les empêcher de réveiller Kyogre.", "rewardDesc":"Points de quête" },
+"leg_kyogre_3": { "title":"Abysses III — Chenal 128", "desc":"La mer s’agite. Gagnez 150 combats sauvages sur le Chenal 128.", "rewardDesc":"Points de quête" },
+"leg_kyogre_4": { "title":"Abysses IV — Kyogre", "desc":"Descendez dans la Grotte Origine avec l’Orbe Bleu : Kyogre vous y attend (capture non garantie, taux doublé, rencontre relançable).", "rewardDesc":"Rencontre : Kyogre (Nv. 70)" },
+"leg_groudon_1": { "title":"Magma I — L’Orbe Rouge", "desc":"Parlez à l’Ancien du Mont Mémoria : il vous confie l’Orbe Rouge avant que la Team Magma ne s’en empare.", "rewardDesc":"Orbe Rouge" },
+"leg_groudon_2": { "title":"Magma II — Mont Chimnée", "desc":"Affrontez Max et la Team Magma au sommet du Mont Chimnée pour les empêcher de réveiller Groudon.", "rewardDesc":"Points de quête" },
+"leg_groudon_3": { "title":"Magma III — Route 111", "desc":"Le désert gronde. Gagnez 150 combats sauvages sur la Route 111.", "rewardDesc":"Points de quête" },
+"leg_groudon_4": { "title":"Magma IV — Groudon", "desc":"Descendez dans la Grotte Origine avec l’Orbe Rouge : Groudon vous y attend (capture non garantie, taux doublé, rencontre relançable).", "rewardDesc":"Rencontre : Groudon (Nv. 70)" },
+"leg_rayquaza_1": { "title":"Ciel I — Le Fragment de Météorite", "desc":"Kyogre et Groudon capturés, le Sage Draconide du Pilier Céleste vous remet le Fragment de Météorite Delta.", "rewardDesc":"Fragment de Météorite Delta" },
+"leg_rayquaza_2": { "title":"Ciel II — Chenal 131", "desc":"Gagnez 100 combats sauvages sur le Chenal 131, au pied du Pilier Céleste.", "rewardDesc":"Points de quête" },
+"leg_rayquaza_3": { "title":"Ciel III — Rayquaza", "desc":"Gravissez le Pilier Céleste avec le Fragment de Météorite Delta : Rayquaza vous y attend (capture non garantie, taux doublé, rencontre relançable).", "rewardDesc":"Rencontre : Rayquaza (Nv. 70)" },
+"leg_jirachi_1": { "title":"Vœu I — Mille victoires", "desc":"L’Enfant au vœu d’Autopia rêve d’une étoile. Premier vœu : remportez 1 000 combats sauvages dans la région de Hoenn (toutes vos victoires comptent).", "rewardDesc":"Points de quête" },
+"leg_jirachi_2": { "title":"Vœu II — Cinquante espèces", "desc":"Deuxième vœu : capturez 50 espèces de Hoenn (le Pokédex régional fait foi).", "rewardDesc":"Points de quête" },
+"leg_jirachi_3": { "title":"Vœu III — Jirachi", "desc":"Troisième vœu : gagnez 200 combats sauvages au Mont Chimnée. L’étoile descendra alors au sommet : Jirachi vous y attend (taux doublé, relançable).", "rewardDesc":"Rencontre : Jirachi (Nv. 70)" },
+"leg_deoxys_1": { "title":"Aurore I — Le Centre Spatial", "desc":"Parlez au Chercheur du Centre Spatial à Autopia : un météore a ouvert une île au large. La navette vous y emmène.", "rewardDesc":"Points de quête" },
+"leg_deoxys_2": { "title":"Aurore II — Le triangle", "desc":"Sur l’Île de l’Aurore, résolvez l’énigme « Le triangle de l’aurore ».", "rewardDesc":"Points de quête" },
+"leg_deoxys_3": { "title":"Aurore III — Deoxys", "desc":"Gagnez 100 combats sauvages sur l’Île de l’Aurore. Deoxys se montrera alors (capture non garantie, taux doublé, rencontre relançable).", "rewardDesc":"Rencontre : Deoxys (Nv. 70)" }
 },
 
 "repeatable": {

@@ -28,11 +28,14 @@ import { SPRITE_SIZES } from '../core/design-tokens.js';
  *   the sprite image (.pw-poke-circle-img).
  */
 export function buildSpriteCircle(options = {}) {
-  const sizeToken = Object.prototype.hasOwnProperty.call(SPRITE_SIZES, options.size) ? options.size : 'standard';
+  const sizeToken = Object.prototype.hasOwnProperty.call(SPRITE_SIZES, options.size)
+    ? options.size
+    : 'standard';
   const px = SPRITE_SIZES[sizeToken];
 
   const wrap = document.createElement('span');
-  wrap.className = `pw-poke-circle-wrap pw-poke-circle-wrap--${sizeToken} ${options.className || ''}`.trim();
+  wrap.className =
+    `pw-poke-circle-wrap pw-poke-circle-wrap--${sizeToken} ${options.className || ''}`.trim();
   wrap.dataset.size = sizeToken;
   wrap.style.width = px + 'px';
   wrap.style.height = px + 'px';
@@ -61,6 +64,3 @@ export function buildSpriteCircle(options = {}) {
 
   return wrap;
 }
-
-
-

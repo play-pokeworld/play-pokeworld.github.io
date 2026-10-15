@@ -55,25 +55,47 @@ export class DictionaryView extends UIView {
       },
     });
     // Compat: legacy markup expects .dict-tabs > hbtn.dict-tab wrappers.
-    this.toolbarEntity.get(UIRenderComponent).template = (e) => h('div', { class: 'dict-toolbar pw-ui-toolbar', dataset: { fixed: 'true', pwEid: String(e.id) } },
-      h('button', {
-        type: 'button',
-        class: 'hbtn pw-drawer-toggle',
-        title: 'Tiroir de filtres',
-        dataset: { action: 'legacy-call', call: 'toggleMobileDrawer', callArgs: "''" },
-      }, ''),
-      h('div', { class: 'dict-tabs' }, (model.tabs || []).map((tab) => h('button', {
-        type: 'button',
-        class: cx('hbtn dict-tab', tab.active && 'active'),
-        dataset: { action: 'legacy-call', call: 'setDictionaryTab', callArgs: `'${tab.id}'` },
-      }, tab.label))),
-      h('input', {
-        type: 'search',
-        class: 'dict-search pw-ui-toolbar-search',
-        value: model.search ? (model.search.value || '') : '',
-        placeholder: model.search ? model.search.placeholder : 'Search...',
-        dataset: { action: 'filter-dictionary' },
-      }));
+    this.toolbarEntity.get(UIRenderComponent).template = (e) =>
+      h(
+        'div',
+        { class: 'dict-toolbar pw-ui-toolbar', dataset: { fixed: 'true', pwEid: String(e.id) } },
+        h(
+          'button',
+          {
+            type: 'button',
+            class: 'hbtn pw-drawer-toggle',
+            title: 'Tiroir de filtres',
+            dataset: { action: 'legacy-call', call: 'toggleMobileDrawer', callArgs: "''" },
+          },
+          ''
+        ),
+        h(
+          'div',
+          { class: 'dict-tabs' },
+          (model.tabs || []).map((tab) =>
+            h(
+              'button',
+              {
+                type: 'button',
+                class: cx('hbtn dict-tab', tab.active && 'active'),
+                dataset: {
+                  action: 'legacy-call',
+                  call: 'setDictionaryTab',
+                  callArgs: `'${tab.id}'`,
+                },
+              },
+              tab.label
+            )
+          )
+        ),
+        h('input', {
+          type: 'search',
+          class: 'dict-search pw-ui-toolbar-search',
+          value: model.search ? model.search.value || '' : '',
+          placeholder: model.search ? model.search.placeholder : 'Search...',
+          dataset: { action: 'filter-dictionary' },
+        })
+      );
 
     // Scrollable grid entity of entry cells (interactive entities).
     this.gridEntity = createLayout(this, {
@@ -85,24 +107,31 @@ export class DictionaryView extends UIView {
     });
     for (const entry of model.entries || []) {
       const cell = this.spawn('ui:dict-entry', [], this.gridEntity);
-      cell.addComponent(new UIInteractiveComponent({
-        disabled: !!entry.disabled,
-        hideWhenDisabled: true,
-        action: 'legacy-call',
-      }));
-      cell.addComponent(new UIRenderComponent({
-        template: (ce) => {
-          const inter = ce.get(UIInteractiveComponent);
-          if (inter.renderHidden) return null;
-          return h('div', {
-            class: cx('dict-entry', entry.owned && 'owned'),
-            dataset: { ...entry.dataset, pwEid: String(ce.id) },
-            attrs: undefined,
+      cell.addComponent(
+        new UIInteractiveComponent({
+          disabled: !!entry.disabled,
+          hideWhenDisabled: true,
+          action: 'legacy-call',
+        })
+      );
+      cell.addComponent(
+        new UIRenderComponent({
+          template: (ce) => {
+            const inter = ce.get(UIInteractiveComponent);
+            if (inter.renderHidden) return null;
+            return h(
+              'div',
+              {
+                class: cx('dict-entry', entry.owned && 'owned'),
+                dataset: { ...entry.dataset, pwEid: String(ce.id) },
+                attrs: undefined,
+              },
+              h('div', { class: 'dict-entry-icon' }, entry.iconHtml ? h.raw(entry.iconHtml) : null),
+              h('div', null, h('b', null, entry.title), h('span', null, entry.subtitle || ''))
+            );
           },
-            h('div', { class: 'dict-entry-icon' }, entry.iconHtml ? h.raw(entry.iconHtml) : null),
-            h('div', null, h('b', null, entry.title), h('span', null, entry.subtitle || '')));
-        },
-      }));
+        })
+      );
     }
   }
 
@@ -115,16 +144,22 @@ export class DictionaryView extends UIView {
   contentVNode() {
     const tpl = this.gridEntity.get(UIRenderComponent).renderTemplate();
     if (!(this.model.entries || []).length) {
-      return h('div', { class: 'dict-grid' },
-        h('div', { class: 'dict-muted' }, this.model.emptyLabel || 'No results.'));
+      return h(
+        'div',
+        { class: 'dict-grid' },
+        h('div', { class: 'dict-muted' }, this.model.emptyLabel || 'No results.')
+      );
     }
     return tpl;
   }
 
   buildView() {
-    return h('div', { class: 'pw-scene dictionary-panel-content', dataset: { scene: this.name } },
+    return h(
+      'div',
+      { class: 'pw-scene dictionary-panel-content', dataset: { scene: this.name } },
       this.filtersVNode(),
-      this.contentVNode());
+      this.contentVNode()
+    );
   }
 
   /**
@@ -140,6 +175,3 @@ export class DictionaryView extends UIView {
     return { filters, content, full: filters + content };
   }
 }
-
-
-

@@ -161,6 +161,3 @@ export class Scene {
     }
   }
 }
-
-
-

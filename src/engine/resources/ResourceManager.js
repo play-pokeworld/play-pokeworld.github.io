@@ -6,7 +6,7 @@
 
 class ResourceManager {
   constructor() {
-    this._cache = new Map();   // url -> { img, refs, size, loaded }
+    this._cache = new Map(); // url -> { img, refs, size, loaded }
     this._maxCache = 200;
     this._pending = new Map();
     this._enabled = true;
@@ -17,7 +17,7 @@ class ResourceManager {
    */
   loadImage(url) {
     if (!url) return Promise.reject('No URL');
-    
+
     // Check cache
     if (this._cache.has(url)) {
       this._cache.get(url).refs++;
@@ -51,7 +51,7 @@ class ResourceManager {
    * Preload multiple images
    */
   preload(urls) {
-    return Promise.all(urls.map(u => this.loadImage(u).catch(() => null)));
+    return Promise.all(urls.map((u) => this.loadImage(u).catch(() => null)));
   }
 
   /**
@@ -71,8 +71,8 @@ class ResourceManager {
    * Force garbage collect unreferenced resources
    */
   gc() {
-    for (const [url] of this._cache) {
-      if (entry.releasable && entry.refs <= 0) {
+    for (const [url, entry] of this._cache) {
+      if (entry && entry.releasable && entry.refs <= 0) {
         URL.revokeObjectURL(url);
         this._cache.delete(url);
       }
@@ -112,13 +112,24 @@ class ResourceManager {
     if (this._cache.size > this._maxCache) this.gc();
   }
 
-  /** 
+  /**
    * Batch preload pokemon sprites for a region
    */
   static preloadPokemonRegion(ids, variant = 'front') {
-    const dirs = { front:'front', back:'front', frontShiny:'frontShiny', backShiny:'frontShiny' };
+    const dirs = {
+      front: 'front',
+      back: 'front',
+      frontShiny: 'frontShiny',
+      backShiny: 'frontShiny',
+    };
     const dir = dirs[variant] || 'front';
-      return ids.map(id => (typeof getPokemonSpriteUrl === 'function' ? getPokemonSpriteUrl(id, variant.includes('Shiny')) : ((typeof window !== 'undefined' && typeof window.getPokemonSpriteUrl === 'function') ? window.getPokemonSpriteUrl(id, variant.includes('Shiny')) : `src/assets/images/pokemon/${dir}/${id}.png`)));
+    return ids.map((id) =>
+      typeof getPokemonSpriteUrl === 'function'
+        ? getPokemonSpriteUrl(id, variant.includes('Shiny'))
+        : typeof window !== 'undefined' && typeof window.getPokemonSpriteUrl === 'function'
+          ? window.getPokemonSpriteUrl(id, variant.includes('Shiny'))
+          : `src/assets/images/pokemon/${dir}/${id}.png`
+    );
   }
 }
 
@@ -132,7 +143,3 @@ if (typeof globalThis !== 'undefined') {
   if (!globalThis.poke) globalThis.poke = {};
   globalThis.poke.ResourceManager = ResourceManager;
 }
-
-
-
-

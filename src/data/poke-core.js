@@ -1,3 +1,4 @@
+import { esc } from '../engine/render/vdom.js';
 /**
  * PokeCore - Centralized engine API
  * All game code must use these getters - NEVER hardcode strings, URLs, or display logic.
@@ -78,6 +79,7 @@ const PokeCore = {
       var num = null;
       if (typeof DEX_MAP !== 'undefined' && DEX_MAP && DEX_MAP[lookup] != null) num = DEX_MAP[lookup];
       else if (/^\d+$/.test(lookup)) num = Number(lookup);
+      else if (/^\d+-\d+$/.test(lookup)) num = lookup; // V7 · FORM-01 — clé de forme "351-1"
       else if (typeof PD !== 'undefined' && PD) {
         var normalized = lookup.toLowerCase().replace(/[^a-z0-9]/g, '');
         for (var dexId in PD) {
@@ -250,9 +252,8 @@ const PokeCore = {
   },
 
   // ─── HTML helper (safe, consistent) ───
-  escapeHtml: function(str) {
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  },
+  // V7 · DBT-05 — délègue à l'échappement unique (engine/render/vdom.js `esc`).
+  escapeHtml: function(str) { return esc(str); },
 
   // ─── Button HTML (standardized across game) ───
   buttonHtml: function(label, action, args, variant) {

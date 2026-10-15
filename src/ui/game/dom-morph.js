@@ -130,7 +130,11 @@ function morphChildren(target, source) {
     if (wantedKey) {
       let probe = tChild;
       while (probe) {
-        if (probe.nodeType === 1 && morphKey(probe) === wantedKey && probe.tagName === sChild.tagName) {
+        if (
+          probe.nodeType === 1 &&
+          morphKey(probe) === wantedKey &&
+          probe.tagName === sChild.tagName
+        ) {
           matched = probe;
           break;
         }
@@ -210,4 +214,3 @@ if (typeof globalThis !== 'undefined') {
 }
 
 export { pwMorphHtml, morphKey };
-

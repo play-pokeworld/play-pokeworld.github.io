@@ -7,7 +7,16 @@
  *
  * @module ui/components
  */
-export { THEME_TOKENS, THEME_IDS, SPRITE_SIZES, spriteSizeFor, token, contrastRatio, assertContrast, MIN_CONTRAST_RATIO } from './theme.js';
+export {
+  THEME_TOKENS,
+  THEME_IDS,
+  SPRITE_SIZES,
+  spriteSizeFor,
+  token,
+  contrastRatio,
+  assertContrast,
+  MIN_CONTRAST_RATIO,
+} from './theme.js';
 export { renderChildren, entityDataset, cx } from './component-utils.js';
 // Wave 32 — THE shared panel-header constructor (see panel-header.js).
 export { panelHeaderVNode, panelHeaderHTML } from './panel-header.js';
@@ -15,7 +24,12 @@ export { panelHeaderVNode, panelHeaderHTML } from './panel-header.js';
 export { pwBuildStaticHeaders } from './static-headers.js';
 export { createButton, createToggle, BUTTON_VARIANTS } from './controls.js';
 export { createHeader, createFooter, createPanel, createWindow } from './containers.js';
-export { createLayout, createVerticalLayout, createHorizontalLayout, createGridLayout } from './layouts.js';
+export {
+  createLayout,
+  createVerticalLayout,
+  createHorizontalLayout,
+  createGridLayout,
+} from './layouts.js';
 export { createToolbar } from './toolbar.js';
 export { createPokemonSprite, pokemonSpriteVNode, POKEMON_SPRITE_SIZES } from './sprite.js';
 export { pokeCardVNode, pokeCardHTML } from './poke-card.js';
@@ -26,13 +40,21 @@ export { pokeFullCardVNode, pokeFullCardHTML } from './poke-full-card.js';
 export { filterBarVNode, filterBarHTML } from './filter-bar.js';
 export { moneyRowVNode, moneyRowHTML } from './money-row.js';
 export {
-  saveContextMenuVNode, saveContextMenuHTML,
-  saveIconGridVNode, saveIconGridHTML,
-  saveProfileCurrentIconVNode, saveProfileCurrentIconHTML,
+  saveContextMenuVNode,
+  saveContextMenuHTML,
+  saveIconGridVNode,
+  saveIconGridHTML,
+  saveProfileCurrentIconVNode,
+  saveProfileCurrentIconHTML,
 } from './save-extras.js';
 export { moveButtonsBarVNode, moveButtonsBarHTML } from './move-buttons.js';
 export { machineWindowVNode, machineWindowHTML } from './machine-window.js';
-export { saveCardVNode, saveCardHTML, normalizeSaveCardBackground, SAVE_CARD_BACKGROUNDS } from './save-card.js';
+export {
+  saveCardVNode,
+  saveCardHTML,
+  normalizeSaveCardBackground,
+  SAVE_CARD_BACKGROUNDS,
+} from './save-card.js';
 export { moveRowVNode, moveRowHTML } from './move-row.js';
 export {
   statRowVNode,
@@ -121,11 +143,4 @@ export {
   guideDetailHTML,
   tutorialQuestCardHTML,
 } from './guide.js';
-export {
-  winGripVNode,
-  winHeaderTitleVNode,
-  winHeaderTitleHTML,
-} from './win-chrome.js';
-
-
-
+export { winGripVNode, winHeaderTitleVNode, winHeaderTitleHTML } from './win-chrome.js';

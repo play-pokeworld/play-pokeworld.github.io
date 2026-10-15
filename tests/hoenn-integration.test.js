@@ -36,7 +36,7 @@ function makeSandbox() {
     isSpeciesShiny: () => false,
     rollShiny: () => false,
     battle: { active: false },
-    createPoke: (id, lvl) => ({ id, name: 'Poke_' + id, level: lvl, moves: [], _evoDone: {} }),
+    createPoke: (id, lvl, shiny, opts) => ({ id, form: (opts && opts.form) || 0, name: 'Poke_' + id, level: lvl, moves: [], _evoDone: {} }), // V7 · FORM-01 (form-aware stub)
     saveGame: () => {}, updateHeader: () => {}, renderMap: () => {}, showTab: () => {}, renderTeamWindow: () => {}, openPokeModal: () => {}, addBattleLog: () => {},
     document: {
       getElementById: () => ({ style: {}, innerHTML: '', textContent: '', remove: () => {}, classList: { add: () => {}, remove: () => {} } }), createElement: () => ({ style: {}, appendChild: () => {}, classList: { add: () => {}, remove: () => {} } }),
@@ -53,6 +53,10 @@ function makeSandbox() {
   const files = [
     'src/data/game-config.js',
     'src/data/pd-data.js',
+    // V7 · FORM-01 / DEX-01 — forms + species-key + shared species sources.
+    'src/data/forms-data.js',
+    'src/domain/pokemon/species-key.js',
+    'src/domain/world/species-sources.js',
     'src/data/moves.js',
     'src/data/items-data.js',
     'src/data/items-helpers.js',
@@ -97,11 +101,13 @@ function makeSandbox() {
   return sandbox;
 }
 
-test('Hoenn 1: map and 75 locations loaded (LOCS_HOENN)', () => {
+test('Hoenn 1: map and 76 locations loaded (LOCS_HOENN)', () => {
   const sb = makeSandbox();
   const locs = sb.window.LOCS_HOENN;
   assert.ok(locs, 'LOCS_HOENN defined');
-  assert.equal(Object.keys(locs).length, 75, '75 locations in Hoenn (72 + 3 Regi ruins)');
+  // V7 · LEG-02 : + Île de l'Aurore (birth_island, Deoxys) → 76.
+  assert.equal(Object.keys(locs).length, 76, '76 locations in Hoenn (72 + 3 Regi ruins + Birth Island)');
+  assert.ok(locs.birth_island && locs.birth_island.conn.includes('fallarbor'), 'Birth Island reachable from Fallarbor');
   const r111 = sb.window.getLocObj('route111');
   assert.ok(r111, 'route111 joignable via getLocObj');
   assert.equal(r111.defaultWeather, 'sandstorm', 'route111 has a sandstorm by default');
@@ -117,19 +123,23 @@ test('Hoenn 2: strategic gym and league teams (OFFICIAL_TEAMS_HOENN)', () => {
   }
 });
 
-test('Hoenn 3: 77 Hoenn main quests (STORY_QUESTS_HOENN)', () => {
+test('Hoenn 3: 89 Hoenn main quests (STORY_QUESTS_HOENN)', () => {
   const sb = makeSandbox();
   const hQuests = sb.window.STORY_QUESTS_HOENN;
   assert.ok(hQuests, 'STORY_QUESTS_HOENN defined');
-  // 77 = 75 historical + 2 Secret Base discovery quests (217/218)
-  assert.equal(hQuests.length, 77, '77 main quests for Hoenn');
+  // 89 = 75 historical + 2 Secret Base discovery quests (217/218)
+  //    + 12 scripted battles (278–289, V7 · HOE-01) inserted at their narrative position.
+  assert.equal(hQuests.length, 89, '89 main quests for Hoenn');
   assert.equal(hQuests[hQuests.length - 1].id, 277, 'last quest is 277');
-  assert.equal(hQuests[16].id, 217, '217 = Secret Base visit');
-  assert.equal(hQuests[16].type, 'base_visit', 'type base_visit');
-  assert.equal(hQuests[17].id, 218, '218 = establish your Secret Base');
-  assert.equal(hQuests[17].type, 'base_establish', 'type base_establish');
+  const q217 = hQuests.find(q => q.id === 217), q218 = hQuests.find(q => q.id === 218);
+  assert.equal(q217.type, 'base_visit', '217 = Secret Base visit');
+  assert.equal(q218.type, 'base_establish', '218 = establish your Secret Base');
+  assert.equal(hQuests.indexOf(q218), hQuests.indexOf(q217) + 1, '218 right after 217');
   const ids = hQuests.map(q => q.id);
-  assert.ok(ids.every((v, i) => i === 0 || v > ids[i - 1]), 'strictly increasing ids (file kept in order)');
+  assert.equal(new Set(ids).size, ids.length, 'unique ids');
+  // The historical ids stay in increasing order once the V7 insertions are removed.
+  const hist = ids.filter(id => id < 278);
+  assert.ok(hist.every((v, i) => i === 0 || v > hist[i - 1]), 'historical ids kept in order');
   
   assert.equal(hQuests[0].id, 201, 'quests start at 201');
   assert.equal(hQuests[0].type, 'trainer_battle', 'quest 201 is a quest battle');
@@ -248,17 +258,31 @@ test('Hoenn 13: location-info shows no Secret Base lock warning and unlocks afte
   assert.ok(alcoves.length >= 2, 'route111 offers several alcoves');
 });
 
-test('Hoenn 14: buying Castform forms (#387-#389) and Deoxys (#390-#392) via special shops', () => {
+test('Hoenn 14: buying Castform forms (351-1…) and Deoxys forms (386-1…) via special shops', () => {
+  // V7 · FORM-01 — a form is a separate Pokémon `{id: base, form: slot}` keyed "351-1";
+  // PD stops at #386 (no more fake dex numbers 387–392).
   const sb = makeSandbox();
   sb.G.money = 100000;
-  sb.window.buySpecialFormPokemon(387, 20000);
-  sb.window.buySpecialFormPokemon(390, 50000);
+  sb.window.buySpecialFormPokemon(351, 1, 20000);
+  sb.window.buySpecialFormPokemon(386, 1, 50000);
   assert.equal(sb.G.money, 30000, 'money debited correctly for 2 forms');
-  const ownedIds = Object.values(sb.G.collection).map(x => Number(x.id));
-  assert.ok(ownedIds.includes(387), 'Castform Sunny #387 in the PC');
-  assert.ok(ownedIds.includes(390), 'Deoxys Attack #390 in the PC');
-  assert.ok(sb.window.PD[387], 'PD[387] defined');
-  assert.ok(sb.window.PD[392], 'PD[392] defined');
+  const owned = Object.values(sb.G.collection).map(x => `${x.id}-${x.form || 0}`);
+  assert.ok(owned.includes('351-1'), 'Castform Sunny (351-1) in the PC');
+  assert.ok(owned.includes('386-1'), 'Deoxys Attack (386-1) in the PC');
+  assert.ok(sb.G.collection['351-1'] && sb.G.collection['386-1'], 'box keys are speciesKeys');
+  assert.equal(sb.window.PD[387], undefined, 'PD[387] no longer exists');
+  assert.equal(sb.window.PD.length, 387, 'PD stops at #386');
+  assert.ok(sb.window.FORMS['351-1'] && sb.window.FORMS['386-3'], 'FORMS table carries the 6 forms');
+  // Legacy contract (id 387–392, price) still routes to the right form.
+  sb.G.money = 60000;
+  sb.window.buySpecialFormPokemon(392, 50000);
+  assert.equal(sb.G.money, 10000, 'legacy purchase debited at the data price');
+  assert.ok(Object.values(sb.G.collection).some(x => Number(x.id) === 386 && Number(x.form) === 3), 'legacy 392 → Deoxys Speed (386-3)');
+  // Buying the same form twice never creates a duplicate nor debits money.
+  const moneyBefore = sb.G.money;
+  sb.window.buySpecialFormPokemon(351, 1, 20000);
+  assert.equal(sb.G.money, moneyBefore, 'no debit for an already-owned form');
+  assert.equal(Object.values(sb.G.collection).filter(x => `${x.id}-${x.form || 0}` === '351-1').length, 1, 'still one 351-1');
 });
 
 test('Hoenn 15: Root and Claw fossils locked early in Johto, but accessible everywhere after Hoenn unlock', () => {
@@ -294,7 +318,8 @@ test('Hoenn 16: single Day-Care breeding (no dupe, no farm) and Pokédex display
   assert.equal(ownedIds2.length, 1, 'Second incubation: no extra Pichu (no dupe / farm)');
   
   const sources = sb.window.findPokemonSources(172);
-  assert.ok(sources.some(s => s.label.includes('Éclosion en Garderie')), 'Pokédex shows Hatch in Day Care (Parent: Pikachu / Raichu)');
+  // V7 · DEX-01 — the sandbox `tr` returns raw keys: the egg source is the `dex_src_egg` label.
+  assert.ok(sources.some(s => s.label.includes('Éclosion en Garderie') || s.label === 'dex_src_egg'), 'Pokédex shows Hatch in Day Care (Parent: Pikachu / Raichu)');
 });
 
 test('Hoenn 17: Hoenn-exclusive side quests (s56-s85 + puzzles + densification)', () => {

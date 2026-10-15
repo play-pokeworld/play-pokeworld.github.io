@@ -24,7 +24,13 @@
 import * as damageRules from '../domain/battle/damage.js';
 import * as hatcheryRules from '../domain/breeding/hatchery-rules.js';
 import * as marketRules from '../domain/economy/market.js';
-import { canAffordPurchase, canAddToBag, canSellTreasure, computeSaleValue, mergeShopStock } from '../domain/economy/shop-rules.js';
+import {
+  canAffordPurchase,
+  canAddToBag,
+  canSellTreasure,
+  computeSaleValue,
+  mergeShopStock,
+} from '../domain/economy/shop-rules.js';
 import { battleTick as domainBattleTick } from '../domain/battle/tick.js';
 import { pickWildFromTable } from '../domain/world/encounter-rules.js';
 import { eventBus } from '../core/event-bus.js';
@@ -52,21 +58,25 @@ function portRng() {
 // membre vivant de l'équipe qui le porte, plafonné à 20 %.
 function pureIncenseRareBoostPct() {
   try {
-    const G = (typeof globalThis !== 'undefined') ? globalThis.G : null;
+    const G = typeof globalThis !== 'undefined' ? globalThis.G : null;
     if (!G || !Array.isArray(G.team)) return 0;
     let pct = 0;
     for (const tp of G.team) {
       if (!tp || Number(tp.currentHP ?? tp.hp ?? 1) <= 0) continue;
-      const key = (typeof globalThis.getHeldItemForPokemon === 'function')
-        ? globalThis.getHeldItemForPokemon(tp)
-        : (tp.heldItem || null);
+      const key =
+        typeof globalThis.getHeldItemForPokemon === 'function'
+          ? globalThis.getHeldItemForPokemon(tp)
+          : tp.heldItem || null;
       if (key !== 'pure_incense') continue;
       const qty = Math.max(0, Number((G.inventory && G.inventory[key]) || 0));
-      const level = qty >= 25 ? 6 : qty >= 20 ? 5 : qty >= 15 ? 4 : qty >= 10 ? 3 : qty >= 5 ? 2 : 1;
+      const level =
+        qty >= 25 ? 6 : qty >= 20 ? 5 : qty >= 15 ? 4 : qty >= 10 ? 3 : qty >= 5 ? 2 : 1;
       pct += 0.5 + 0.5 * level;
     }
     return Math.min(20, pct);
-  } catch (_) { return 0; }
+  } catch (_) {
+    return 0;
+  }
 }
 
 export class ECSSystemsManager {
@@ -84,17 +94,35 @@ export class ECSSystemsManager {
   _registerComponents() {
     const comps = [
       // battle
-      'Fighter', 'Stats', 'Level', 'BattleState', 'Experience', 'Reward',
-      'TeamSlot', 'Fainted', 'BattleLoop',
+      'Fighter',
+      'Stats',
+      'Level',
+      'BattleState',
+      'Experience',
+      'Reward',
+      'TeamSlot',
+      'Fainted',
+      'BattleLoop',
       // world / encounters (wave 33)
-      'Position', 'WorldLocation', 'WildSpawnTable', 'EncounterCooldown',
-      'WildPokemon', 'PokemonRef',
+      'Position',
+      'WorldLocation',
+      'WildSpawnTable',
+      'EncounterCooldown',
+      'WildPokemon',
+      'PokemonRef',
       // breeding / daycare (wave 33)
-      'HatcheryProgress', 'SlotIndex',
+      'HatcheryProgress',
+      'SlotIndex',
       // economy (wave 33)
-      'Wallet', 'ShopStock', 'InventoryItems', 'Marketplace',
+      'Wallet',
+      'ShopStock',
+      'InventoryItems',
+      'Marketplace',
       // ui
-      'Display', 'UIComponent', 'Hierarchy', 'Scene',
+      'Display',
+      'UIComponent',
+      'Hierarchy',
+      'Scene',
     ];
     for (const c of comps) {
       this.world.register(c);
@@ -104,7 +132,9 @@ export class ECSSystemsManager {
   /** First entity carrying `name`, or -1 (singleton component lookup). */
   _firstWith(name) {
     let found = -1;
-    this.world.query([name], (eid) => { if (found < 0) found = eid; });
+    this.world.query([name], (eid) => {
+      if (found < 0) found = eid;
+    });
     return found;
   }
 
@@ -150,10 +180,14 @@ export class ECSSystemsManager {
       const dmg = damageRules.calculateDamage(
         fighter.currentMove || { power: 60, category: 'phys', type: 'Normal' },
         { level: stats.level || 50, atk: stats.atk || 100, spa: stats.spa || 100 },
-        { defense: targetStats.def || 10, spDefense: targetStats.spd || 10, type1: targetStats.type1 || 'Normal' }
+        {
+          defense: targetStats.def || 10,
+          spDefense: targetStats.spd || 10,
+          type1: targetStats.type1 || 'Normal',
+        }
       );
 
-      const actualDmg = Math.max(1, typeof dmg === 'number' ? dmg : (dmg.damage || 10));
+      const actualDmg = Math.max(1, typeof dmg === 'number' ? dmg : dmg.damage || 10);
       targetFighter.currentHP = Math.max(0, targetFighter.currentHP - actualDmg);
       fighter.readyToAttack = false;
 
@@ -173,18 +207,22 @@ export class ECSSystemsManager {
     });
 
     // 3. battle XP Reward System
-    this.world.system('combat:xp-reward', ['Fighter', 'Level', 'Experience'], (eid, fighter, levelComp, exp) => {
-      if (!fighter.active || fighter.currentHP <= 0 || !fighter.pendingExpReward) return;
-      const gain = Number(fighter.pendingExpReward) || 0;
-      fighter.pendingExpReward = 0;
-      exp.currentExp = (exp.currentExp || 0) + gain;
-      while (exp.currentExp >= (exp.expToNextLevel || 1000) && (levelComp.level || 1) < 100) {
-        exp.currentExp -= (exp.expToNextLevel || 1000);
-        levelComp.level = (levelComp.level || 1) + 1;
-        exp.expToNextLevel = Math.round((exp.expToNextLevel || 1000) * 1.2);
-        eventBus.emit('pokemon:level-up', { eid, level: levelComp.level });
+    this.world.system(
+      'combat:xp-reward',
+      ['Fighter', 'Level', 'Experience'],
+      (eid, fighter, levelComp, exp) => {
+        if (!fighter.active || fighter.currentHP <= 0 || !fighter.pendingExpReward) return;
+        const gain = Number(fighter.pendingExpReward) || 0;
+        fighter.pendingExpReward = 0;
+        exp.currentExp = (exp.currentExp || 0) + gain;
+        while (exp.currentExp >= (exp.expToNextLevel || 1000) && (levelComp.level || 1) < 100) {
+          exp.currentExp -= exp.expToNextLevel || 1000;
+          levelComp.level = (levelComp.level || 1) + 1;
+          exp.expToNextLevel = Math.round((exp.expToNextLevel || 1000) * 1.2);
+          eventBus.emit('pokemon:level-up', { eid, level: levelComp.level });
+        }
       }
-    });
+    );
 
     // 4. battle Fighter Switch System
     this.world.system('combat:switch', ['Fighter', 'Stats'], (eid, fighter, _stats) => {
@@ -210,71 +248,105 @@ export class ECSSystemsManager {
     //    whole idle-loop is balanced around continuous K.O. chains. The
     //    `EncounterCooldown` component still records the cadence explicitly so
     //    a timed mode can be tuned by data, not by code.
-    this.world.system('world:encounter', ['WorldLocation', 'WildSpawnTable', 'EncounterCooldown'], (eid, loc, table, cd, dt = 16) => {
-      cd.elapsedMs = (cd.elapsedMs || 0) + Math.max(0, Number(dt) || 0);
-      if (!cd.pendingSpawn) return;
-      if (cd.elapsedMs < (cd.intervalMs || 0)) return;
+    this.world.system(
+      'world:encounter',
+      ['WorldLocation', 'WildSpawnTable', 'EncounterCooldown'],
+      (eid, loc, table, cd, dt = 16) => {
+        cd.elapsedMs = (cd.elapsedMs || 0) + Math.max(0, Number(dt) || 0);
+        if (!cd.pendingSpawn) return;
+        if (cd.elapsedMs < (cd.intervalMs || 0)) return;
 
-      // PASSE 38f — DONJON : l'espèce d'un combat dépend de la case engagée.
-      // Les rares de la zone ne sont QUE les boss, les peu communs QUE les
-      // combats corsés, les communs QUE les combats ordinaires (retour
-      // joueur). Le seau forcé désactive aussi le roaming dans le donjon.
-      let bucketHint = null;
-      try {
-        const run = (typeof globalThis.currentDungeonRun === 'function') ? globalThis.currentDungeonRun() : null;
-        const pn = run && run.active && run.pendingNode && run.map && run.map.tiles ? run.map.tiles[run.pendingNode] : null;
-        if (pn) bucketHint = (pn.type === 'elite') ? 'uncommon' : (pn.type === 'combat' ? 'common' : (pn.type === 'boss' ? 'rare' : null));
-      } catch (_) {}
-      const pick = pickWildFromTable(table.entries || [], {
-        roamingId: table.roamingId || 0,
-        rareBoostPct: pureIncenseRareBoostPct(),
-        rng: portRng(),
-        bucketHint,
-      });
-      cd.pendingSpawn = false;
-      cd.elapsedMs = 0;
-      if (!pick) { cd.lastSpawnEid = -1; cd.lastOutcome = 'empty-table'; return; }
+        // PASSE 38f — DONJON : l'espèce d'un combat dépend de la case engagée.
+        // Les rares de la zone ne sont QUE les boss, les peu communs QUE les
+        // combats corsés, les communs QUE les combats ordinaires (retour
+        // joueur). Le seau forcé désactive aussi le roaming dans le donjon.
+        let bucketHint = null;
+        try {
+          const run =
+            typeof globalThis.currentDungeonRun === 'function'
+              ? globalThis.currentDungeonRun()
+              : null;
+          const pn =
+            run && run.active && run.pendingNode && run.map && run.map.tiles
+              ? run.map.tiles[run.pendingNode]
+              : null;
+          if (pn)
+            bucketHint =
+              pn.type === 'elite'
+                ? 'uncommon'
+                : pn.type === 'combat'
+                  ? 'common'
+                  : pn.type === 'boss'
+                    ? 'rare'
+                    : null;
+        } catch (_) {}
+        const pick = pickWildFromTable(table.entries || [], {
+          roamingId: table.roamingId || 0,
+          rareBoostPct: pureIncenseRareBoostPct(),
+          rng: portRng(),
+          bucketHint,
+        });
+        cd.pendingSpawn = false;
+        cd.elapsedMs = 0;
+        if (!pick) {
+          cd.lastSpawnEid = -1;
+          cd.lastOutcome = 'empty-table';
+          return;
+        }
 
-      const createPoke = gameplayPorts.createPoke;
-      if (typeof createPoke !== 'function') { cd.lastSpawnEid = -1; cd.lastOutcome = 'no-factory'; return; }
-      const isShiny = (typeof globalThis.rollShiny === 'function') ? globalThis.rollShiny(pick.speciesId) : false;
-      const poke = createPoke(pick.speciesId, pick.level, isShiny);
-      if (!poke) { cd.lastSpawnEid = -1; cd.lastOutcome = 'factory-null'; return; }
-      if (pick.isRoaming) poke._isRoaming = true;
-      if (isShiny) {
-        poke.shiny = true;
-        poke.shinyActive = true;
-        poke.shinyUnlocked = true;
+        const createPoke = gameplayPorts.createPoke;
+        if (typeof createPoke !== 'function') {
+          cd.lastSpawnEid = -1;
+          cd.lastOutcome = 'no-factory';
+          return;
+        }
+        const isShiny =
+          typeof globalThis.rollShiny === 'function' ? globalThis.rollShiny(pick.speciesId) : false;
+        const poke = createPoke(pick.speciesId, pick.level, isShiny);
+        if (!poke) {
+          cd.lastSpawnEid = -1;
+          cd.lastOutcome = 'factory-null';
+          return;
+        }
+        if (pick.isRoaming) poke._isRoaming = true;
+        if (isShiny) {
+          poke.shiny = true;
+          poke.shinyActive = true;
+          poke.shinyUnlocked = true;
+        }
+
+        const wildEid = this.world.create();
+        this.world.add(wildEid, 'WildPokemon', {
+          speciesId: pick.speciesId,
+          level: pick.level,
+          bucket: pick.bucket,
+          isRoaming: !!pick.isRoaming,
+          locationId: loc.id || null,
+          reason: cd.pendingReason || 'ko-chain',
+        });
+        this.world.add(wildEid, 'PokemonRef', { poke });
+        this.world.add(wildEid, 'Stats', {
+          level: poke.level || pick.level,
+          maxHP: poke.maxHP || 100,
+          atk: poke.atk || 50,
+          def: poke.def || 50,
+          spa: poke.spa || 50,
+          spd: poke.spd || 50,
+          spe: poke.spe || 50,
+        });
+        cd.lastSpawnEid = wildEid;
+        cd.lastOutcome = 'spawned';
+        eventBus.emit('world:encounter-spawned', {
+          locationId: loc.id || null,
+          wildEid,
+          speciesId: pick.speciesId,
+          level: pick.level,
+          bucket: pick.bucket,
+          isRoaming: !!pick.isRoaming,
+          reason: cd.pendingReason || 'ko-chain',
+        });
       }
-
-      const wildEid = this.world.create();
-      this.world.add(wildEid, 'WildPokemon', {
-        speciesId: pick.speciesId,
-        level: pick.level,
-        bucket: pick.bucket,
-        isRoaming: !!pick.isRoaming,
-        locationId: loc.id || null,
-        reason: cd.pendingReason || 'ko-chain',
-      });
-      this.world.add(wildEid, 'PokemonRef', { poke });
-      this.world.add(wildEid, 'Stats', {
-        level: poke.level || pick.level,
-        maxHP: poke.maxHP || 100,
-        atk: poke.atk || 50, def: poke.def || 50,
-        spa: poke.spa || 50, spd: poke.spd || 50, spe: poke.spe || 50,
-      });
-      cd.lastSpawnEid = wildEid;
-      cd.lastOutcome = 'spawned';
-      eventBus.emit('world:encounter-spawned', {
-        locationId: loc.id || null,
-        wildEid,
-        speciesId: pick.speciesId,
-        level: pick.level,
-        bucket: pick.bucket,
-        isRoaming: !!pick.isRoaming,
-        reason: cd.pendingReason || 'ko-chain',
-      });
-    });
+    );
 
     // 6. Breeding & Hatchery System (wave 33 §1.2 — REAL ECS migration).
     //
@@ -293,72 +365,114 @@ export class ECSSystemsManager {
     //    progression stays K.O.-count based (10 K.O. = 1 daycare level;
     //    25–100 K.O. to hatch/revive), modelled on components, not switched to
     //    the step counter of the mainline games.
-    this.world.system('breeding:hatch', ['HatcheryProgress', 'SlotIndex', 'PokemonRef'], (eid, progress, slotIdx, ref, koCount = 1) => {
-      const count = Math.max(1, Math.floor(Number(koCount) || 1));
-      progress.lastOutcome = null;
+    this.world.system(
+      'breeding:hatch',
+      ['HatcheryProgress', 'SlotIndex', 'PokemonRef'],
+      (eid, progress, slotIdx, ref, koCount = 1) => {
+        const count = Math.max(1, Math.floor(Number(koCount) || 1));
+        progress.lastOutcome = null;
 
-      if (progress.mode === 'incubate') {
-        const res = hatcheryRules.applyIncubationKills(
-          { stepsKo: progress.stepsKo, requiredKos: progress.requiredKos },
+        if (progress.mode === 'incubate') {
+          const res = hatcheryRules.applyIncubationKills(
+            { stepsKo: progress.stepsKo, requiredKos: progress.requiredKos },
+            count,
+            { autoHatch: !!progress.autoHatch }
+          );
+          progress.stepsKo = res.stepsKo;
+          if (res.hatchReady && !progress.hatchPending) {
+            progress.hatchPending = true;
+            progress.lastOutcome = { kind: 'hatch-ready', slotIndex: slotIdx.index };
+            eventBus.emit('breeding:hatch-ready', { slotIndex: slotIdx.index, eid });
+          }
+          return;
+        }
+
+        // daycare ('exp') mode
+        const poke = ref && ref.poke ? ref.poke : null;
+        if (!poke || (poke.level || 1) >= 100) {
+          progress.lastOutcome = { kind: 'noop' };
+          return;
+        }
+        const res = hatcheryRules.applyDaycareKills(
+          { stepsKo: progress.stepsKo, level: poke.level || 1 },
           count,
-          { autoHatch: !!progress.autoHatch }
+          {
+            kosPerLevel: progress.kosPerLevel || hatcheryRules.DAYCARE_KOS_PER_LEVEL,
+            maxLevel: 100,
+          }
         );
         progress.stepsKo = res.stepsKo;
-        if (res.hatchReady && !progress.hatchPending) {
-          progress.hatchPending = true;
-          progress.lastOutcome = { kind: 'hatch-ready', slotIndex: slotIdx.index };
-          eventBus.emit('breeding:hatch-ready', { slotIndex: slotIdx.index, eid });
+        if (res.levelsGained <= 0) {
+          progress.lastOutcome = { kind: 'progress' };
+          return;
         }
-        return;
+
+        const levelUp = gameplayPorts.levelUpPokemon;
+        if (typeof levelUp === 'function') {
+          for (let i = 0; i < res.levelsGained; i++) levelUp(poke);
+        } else {
+          poke.level = res.level;
+        }
+
+        const feePerLevel =
+          typeof gameplayPorts.getDaycareLevelUpFee === 'function'
+            ? gameplayPorts.getDaycareLevelUpFee()
+            : 0;
+        const totalFee = hatcheryRules.computeDaycareFee(res.levelsGained, feePerLevel);
+        const walletEid = this._firstWith('Wallet');
+        const wallet = walletEid >= 0 ? this.world.get(walletEid, 'Wallet') : null;
+        const funds = wallet ? Number(wallet.money) || 0 : Infinity;
+
+        if (!canAffordPurchase(funds, totalFee)) {
+          progress.lastOutcome = {
+            kind: 'evict',
+            reason: 'insufficient-funds',
+            slotIndex: slotIdx.index,
+            levelsGained: res.levelsGained,
+            fee: totalFee,
+          };
+          eventBus.emit('breeding:daycare-evict', {
+            slotIndex: slotIdx.index,
+            reason: 'insufficient-funds',
+            fee: totalFee,
+            pokemonName: poke.name,
+          });
+          return;
+        }
+        if (wallet && totalFee > 0) wallet.money = (Number(wallet.money) || 0) - totalFee;
+
+        const reachedHundred = (poke.level || 1) >= 100;
+        progress.lastOutcome = {
+          kind: 'daycare-levelup',
+          slotIndex: slotIdx.index,
+          levelsGained: res.levelsGained,
+          fee: totalFee,
+          reachedHundred,
+        };
+        eventBus.emit('breeding:daycare-levelup', {
+          slotIndex: slotIdx.index,
+          levels: res.levelsGained,
+          fee: totalFee,
+          pokemonName: poke.name,
+          newLevel: poke.level,
+        });
+        if (reachedHundred) {
+          progress.lastOutcome = {
+            kind: 'evict',
+            reason: 'max-level',
+            slotIndex: slotIdx.index,
+            levelsGained: res.levelsGained,
+            fee: totalFee,
+          };
+          eventBus.emit('breeding:daycare-evict', {
+            slotIndex: slotIdx.index,
+            reason: 'max-level',
+            fee: 0,
+            pokemonName: poke.name,
+          });
+        }
       }
-
-      // daycare ('exp') mode
-      const poke = ref && ref.poke ? ref.poke : null;
-      if (!poke || (poke.level || 1) >= 100) { progress.lastOutcome = { kind: 'noop' }; return; }
-      const res = hatcheryRules.applyDaycareKills(
-        { stepsKo: progress.stepsKo, level: poke.level || 1 },
-        count,
-        { kosPerLevel: progress.kosPerLevel || hatcheryRules.DAYCARE_KOS_PER_LEVEL, maxLevel: 100 }
-      );
-      progress.stepsKo = res.stepsKo;
-      if (res.levelsGained <= 0) { progress.lastOutcome = { kind: 'progress' }; return; }
-
-      const levelUp = gameplayPorts.levelUpPokemon;
-      if (typeof levelUp === 'function') {
-        for (let i = 0; i < res.levelsGained; i++) levelUp(poke);
-      } else {
-        poke.level = res.level;
-      }
-
-      const feePerLevel = typeof gameplayPorts.getDaycareLevelUpFee === 'function' ? gameplayPorts.getDaycareLevelUpFee() : 0;
-      const totalFee = hatcheryRules.computeDaycareFee(res.levelsGained, feePerLevel);
-      const walletEid = this._firstWith('Wallet');
-      const wallet = walletEid >= 0 ? this.world.get(walletEid, 'Wallet') : null;
-      const funds = wallet ? (Number(wallet.money) || 0) : Infinity;
-
-      if (!canAffordPurchase(funds, totalFee)) {
-        progress.lastOutcome = { kind: 'evict', reason: 'insufficient-funds', slotIndex: slotIdx.index, levelsGained: res.levelsGained, fee: totalFee };
-        eventBus.emit('breeding:daycare-evict', { slotIndex: slotIdx.index, reason: 'insufficient-funds', fee: totalFee, pokemonName: poke.name });
-        return;
-      }
-      if (wallet && totalFee > 0) wallet.money = (Number(wallet.money) || 0) - totalFee;
-
-      const reachedHundred = (poke.level || 1) >= 100;
-      progress.lastOutcome = {
-        kind: 'daycare-levelup',
-        slotIndex: slotIdx.index,
-        levelsGained: res.levelsGained,
-        fee: totalFee,
-        reachedHundred,
-      };
-      eventBus.emit('breeding:daycare-levelup', {
-        slotIndex: slotIdx.index, levels: res.levelsGained, fee: totalFee, pokemonName: poke.name, newLevel: poke.level,
-      });
-      if (reachedHundred) {
-        progress.lastOutcome = { kind: 'evict', reason: 'max-level', slotIndex: slotIdx.index, levelsGained: res.levelsGained, fee: totalFee };
-        eventBus.emit('breeding:daycare-evict', { slotIndex: slotIdx.index, reason: 'max-level', fee: 0, pokemonName: poke.name });
-      }
-    });
+    );
 
     // 7. Economy System (wave 33 §1.3 — REAL ECS migration).
     //
@@ -370,117 +484,233 @@ export class ECSSystemsManager {
     //    domain rules (src/domain/economy/*) and emits events. The
     //    application layer persists the outcome (G.money, inventory pokes,
     //    saves) and refreshes the UI.
-    this.world.system('economy:market', ['Marketplace', 'ShopStock'], (eid, market, stock, op = {}) => {
-      const walletEid = this._firstWith('Wallet');
-      const wallet = walletEid >= 0 ? this.world.get(walletEid, 'Wallet') : null;
-      const inventory = walletEid >= 0 ? this.world.get(walletEid, 'InventoryItems') : null;
-      market.lastOutcome = null;
+    this.world.system(
+      'economy:market',
+      ['Marketplace', 'ShopStock'],
+      (eid, market, stock, op = {}) => {
+        const walletEid = this._firstWith('Wallet');
+        const wallet = walletEid >= 0 ? this.world.get(walletEid, 'Wallet') : null;
+        const inventory = walletEid >= 0 ? this.world.get(walletEid, 'InventoryItems') : null;
+        market.lastOutcome = null;
 
-      if (op.op === 'refresh-market') {
-        const region = op.region || stock.region || 'kanto';
-        stock.region = region;
-        const ctx = {
-          wildSpeciesIds: typeof gameplayPorts.getWildSpeciesIds === 'function' ? gameplayPorts.getWildSpeciesIds(region) : new Set(),
-          evoTargetIds: typeof gameplayPorts.getEvoTargetIds === 'function' ? gameplayPorts.getEvoTargetIds() : new Set(),
-          pokemonData: typeof gameplayPorts.getPokemonData === 'function' ? gameplayPorts.getPokemonData() : {},
-        };
-        stock.items = marketRules.computeMarketStock(region, ctx);
-        market.lastOutcome = { ok: true, op: 'refresh-market', count: stock.items.length };
-        return;
-      }
-
-      if (op.op === 'refresh-shop') {
-        // Shop stock rule (domain): static stock + generated TM/HM stock,
-        // deduplicated. The shop UI reads `ShopStock.shopItems` as its model.
-        const shopId = String(op.shopId || stock.shopId || '');
-        stock.shopId = shopId;
-        const base = typeof gameplayPorts.getShopBaseStock === 'function' ? gameplayPorts.getShopBaseStock(shopId) : [];
-        const generated = typeof gameplayPorts.getShopGeneratedStock === 'function' ? gameplayPorts.getShopGeneratedStock(shopId) : [];
-        stock.shopItems = mergeShopStock(base, generated);
-        market.lastOutcome = { ok: true, op: 'refresh-shop', shopId, count: stock.shopItems.length };
-        return;
-      }
-
-      if (op.op === 'buy-pokemon') {
-        const id = Number(op.speciesId);
-        const entry = (stock.items || []).find((it) => it.id === id);
-        if (!entry) { market.lastOutcome = { ok: false, op: 'buy-pokemon', reason: 'not-listed', speciesId: id }; return; }
-        if (!wallet) { market.lastOutcome = { ok: false, op: 'buy-pokemon', reason: 'no-wallet', speciesId: id }; return; }
-        if (!canAffordPurchase(wallet.money, entry.price)) {
-          market.lastOutcome = { ok: false, op: 'buy-pokemon', reason: 'insufficient-funds', speciesId: id, price: entry.price };
-          eventBus.emit('economy:purchase-denied', { kind: 'pokemon', speciesId: id, price: entry.price, money: wallet.money });
+        if (op.op === 'refresh-market') {
+          const region = op.region || stock.region || 'kanto';
+          stock.region = region;
+          const ctx = {
+            wildSpeciesIds:
+              typeof gameplayPorts.getWildSpeciesIds === 'function'
+                ? gameplayPorts.getWildSpeciesIds(region)
+                : new Set(),
+            evoTargetIds:
+              typeof gameplayPorts.getEvoTargetIds === 'function'
+                ? gameplayPorts.getEvoTargetIds()
+                : new Set(),
+            pokemonData:
+              typeof gameplayPorts.getPokemonData === 'function'
+                ? gameplayPorts.getPokemonData()
+                : {},
+          };
+          stock.items = marketRules.computeMarketStock(region, ctx);
+          market.lastOutcome = { ok: true, op: 'refresh-market', count: stock.items.length };
           return;
         }
-        wallet.money = (Number(wallet.money) || 0) - entry.price;
-        market.lastOutcome = { ok: true, op: 'buy-pokemon', speciesId: id, price: entry.price, moneyAfter: wallet.money };
-        eventBus.emit('economy:pokemon-bought', { speciesId: id, price: entry.price, moneyAfter: wallet.money });
-        return;
-      }
 
-      if (op.op === 'buy-item') {
-        const key = String(op.itemKey || '');
-        const itemDef = typeof gameplayPorts.getItemDef === 'function' ? gameplayPorts.getItemDef(key) : null;
-        if (!itemDef || !itemDef.price) { market.lastOutcome = { ok: false, op: 'buy-item', reason: 'unknown-item', itemKey: key }; return; }
-        if (!wallet) { market.lastOutcome = { ok: false, op: 'buy-item', reason: 'no-wallet', itemKey: key }; return; }
-        const owned = inventory && inventory.counts ? (inventory.counts[key] || 0) : 0;
-        const unitPrice = Number(itemDef.price) || 0;
-        // Quantité demandée (défaut 1) — bornée par la place en sac (objets
-        // tenus plafonnés à 25) et par le solde (achat « Max »).
-        const want = Math.max(1, Math.floor(Number(op.count) || 1));
-        const capped = !!(itemDef.type === 'held' || itemDef.category || itemDef.buff);
-        const limit = capped ? 25 : Number.MAX_SAFE_INTEGER;
-        const room = Math.max(0, limit - (Number(owned) || 0));
-        if (room <= 0) {
-          market.lastOutcome = { ok: false, op: 'buy-item', reason: 'bag-full', itemKey: key };
-          eventBus.emit('economy:purchase-denied', { kind: 'item', itemKey: key, reason: 'bag-full' });
+        if (op.op === 'refresh-shop') {
+          // Shop stock rule (domain): static stock + generated TM/HM stock,
+          // deduplicated. The shop UI reads `ShopStock.shopItems` as its model.
+          const shopId = String(op.shopId || stock.shopId || '');
+          stock.shopId = shopId;
+          const base =
+            typeof gameplayPorts.getShopBaseStock === 'function'
+              ? gameplayPorts.getShopBaseStock(shopId)
+              : [];
+          const generated =
+            typeof gameplayPorts.getShopGeneratedStock === 'function'
+              ? gameplayPorts.getShopGeneratedStock(shopId)
+              : [];
+          stock.shopItems = mergeShopStock(base, generated);
+          market.lastOutcome = {
+            ok: true,
+            op: 'refresh-shop',
+            shopId,
+            count: stock.shopItems.length,
+          };
           return;
         }
-        const affordable = unitPrice > 0 ? Math.floor((Number(wallet.money) || 0) / unitPrice) : want;
-        const count = Math.min(want, room, Math.max(0, affordable));
-        if (count <= 0) {
-          market.lastOutcome = { ok: false, op: 'buy-item', reason: 'insufficient-funds', itemKey: key, price: unitPrice };
-          eventBus.emit('economy:purchase-denied', { kind: 'item', itemKey: key, price: unitPrice, money: wallet.money });
+
+        if (op.op === 'buy-pokemon') {
+          const id = Number(op.speciesId);
+          const entry = (stock.items || []).find((it) => it.id === id);
+          if (!entry) {
+            market.lastOutcome = {
+              ok: false,
+              op: 'buy-pokemon',
+              reason: 'not-listed',
+              speciesId: id,
+            };
+            return;
+          }
+          if (!wallet) {
+            market.lastOutcome = {
+              ok: false,
+              op: 'buy-pokemon',
+              reason: 'no-wallet',
+              speciesId: id,
+            };
+            return;
+          }
+          if (!canAffordPurchase(wallet.money, entry.price)) {
+            market.lastOutcome = {
+              ok: false,
+              op: 'buy-pokemon',
+              reason: 'insufficient-funds',
+              speciesId: id,
+              price: entry.price,
+            };
+            eventBus.emit('economy:purchase-denied', {
+              kind: 'pokemon',
+              speciesId: id,
+              price: entry.price,
+              money: wallet.money,
+            });
+            return;
+          }
+          wallet.money = (Number(wallet.money) || 0) - entry.price;
+          market.lastOutcome = {
+            ok: true,
+            op: 'buy-pokemon',
+            speciesId: id,
+            price: entry.price,
+            moneyAfter: wallet.money,
+          };
+          eventBus.emit('economy:pokemon-bought', {
+            speciesId: id,
+            price: entry.price,
+            moneyAfter: wallet.money,
+          });
           return;
         }
-        const total = unitPrice * count;
-        wallet.money = (Number(wallet.money) || 0) - total;
-        if (inventory) {
-          if (!inventory.counts) inventory.counts = {};
-          inventory.counts[key] = (inventory.counts[key] || 0) + count;
-        }
-        market.lastOutcome = { ok: true, op: 'buy-item', itemKey: key, count, price: total, moneyAfter: wallet.money };
-        eventBus.emit('economy:item-bought', { itemKey: key, count, price: total, moneyAfter: wallet.money });
-        return;
-      }
 
-      if (op.op === 'sell-treasure') {
-        const key = String(op.itemKey || '');
-        const itemDef = typeof gameplayPorts.getItemDef === 'function' ? gameplayPorts.getItemDef(key) : null;
-        const owned = inventory && inventory.counts ? (inventory.counts[key] || 0) : 0;
-        if (!canSellTreasure(itemDef, owned)) {
-          market.lastOutcome = { ok: false, op: 'sell-treasure', reason: 'not-sellable', itemKey: key };
-          eventBus.emit('economy:sale-denied', { itemKey: key });
+        if (op.op === 'buy-item') {
+          const key = String(op.itemKey || '');
+          const itemDef =
+            typeof gameplayPorts.getItemDef === 'function' ? gameplayPorts.getItemDef(key) : null;
+          if (!itemDef || !itemDef.price) {
+            market.lastOutcome = {
+              ok: false,
+              op: 'buy-item',
+              reason: 'unknown-item',
+              itemKey: key,
+            };
+            return;
+          }
+          if (!wallet) {
+            market.lastOutcome = { ok: false, op: 'buy-item', reason: 'no-wallet', itemKey: key };
+            return;
+          }
+          const owned = inventory && inventory.counts ? inventory.counts[key] || 0 : 0;
+          const unitPrice = Number(itemDef.price) || 0;
+          // Quantité demandée (défaut 1) — bornée par la place en sac (objets
+          // tenus plafonnés à 25) et par le solde (achat « Max »).
+          const want = Math.max(1, Math.floor(Number(op.count) || 1));
+          const capped = !!(itemDef.type === 'held' || itemDef.category || itemDef.buff);
+          const limit = capped ? 25 : Number.MAX_SAFE_INTEGER;
+          const room = Math.max(0, limit - (Number(owned) || 0));
+          if (room <= 0) {
+            market.lastOutcome = { ok: false, op: 'buy-item', reason: 'bag-full', itemKey: key };
+            eventBus.emit('economy:purchase-denied', {
+              kind: 'item',
+              itemKey: key,
+              reason: 'bag-full',
+            });
+            return;
+          }
+          const affordable =
+            unitPrice > 0 ? Math.floor((Number(wallet.money) || 0) / unitPrice) : want;
+          const count = Math.min(want, room, Math.max(0, affordable));
+          if (count <= 0) {
+            market.lastOutcome = {
+              ok: false,
+              op: 'buy-item',
+              reason: 'insufficient-funds',
+              itemKey: key,
+              price: unitPrice,
+            };
+            eventBus.emit('economy:purchase-denied', {
+              kind: 'item',
+              itemKey: key,
+              price: unitPrice,
+              money: wallet.money,
+            });
+            return;
+          }
+          const total = unitPrice * count;
+          wallet.money = (Number(wallet.money) || 0) - total;
+          if (inventory) {
+            if (!inventory.counts) inventory.counts = {};
+            inventory.counts[key] = (inventory.counts[key] || 0) + count;
+          }
+          market.lastOutcome = {
+            ok: true,
+            op: 'buy-item',
+            itemKey: key,
+            count,
+            price: total,
+            moneyAfter: wallet.money,
+          };
+          eventBus.emit('economy:item-bought', {
+            itemKey: key,
+            count,
+            price: total,
+            moneyAfter: wallet.money,
+          });
           return;
         }
-        const count = Math.min(Math.max(1, Math.floor(Number(op.count) || 1)), owned);
-        const gain = computeSaleValue(itemDef, count);
-        inventory.counts[key] = owned - count;
-        if (inventory.counts[key] <= 0) delete inventory.counts[key];
-        // P0 — les trésors se revendent en 💎 (diamants), plus en ₽.
-        const diamondUnit = Number((itemDef && itemDef.diamondValue) || 0);
-        if (diamondUnit > 0) {
-          if (wallet) wallet.diamonds = (Number(wallet.diamonds) || 0) + diamondUnit * count;
-        } else if (wallet) {
-          wallet.money = (Number(wallet.money) || 0) + gain;
-        }
-        market.lastOutcome = { ok: true, op: 'sell-treasure', itemKey: key, count, gain, diamondUnit, diamondsAfter: wallet ? (Number(wallet.diamonds) || 0) : null, moneyAfter: wallet ? wallet.money : null };
-        eventBus.emit('economy:item-sold', { itemKey: key, count, gain, diamondUnit });
-        return;
-      }
 
-      // unknown op — no silent success
-      market.lastOutcome = { ok: false, op: op.op || 'none', reason: 'unknown-op' };
-    });
+        if (op.op === 'sell-treasure') {
+          const key = String(op.itemKey || '');
+          const itemDef =
+            typeof gameplayPorts.getItemDef === 'function' ? gameplayPorts.getItemDef(key) : null;
+          const owned = inventory && inventory.counts ? inventory.counts[key] || 0 : 0;
+          if (!canSellTreasure(itemDef, owned)) {
+            market.lastOutcome = {
+              ok: false,
+              op: 'sell-treasure',
+              reason: 'not-sellable',
+              itemKey: key,
+            };
+            eventBus.emit('economy:sale-denied', { itemKey: key });
+            return;
+          }
+          const count = Math.min(Math.max(1, Math.floor(Number(op.count) || 1)), owned);
+          const gain = computeSaleValue(itemDef, count);
+          inventory.counts[key] = owned - count;
+          if (inventory.counts[key] <= 0) delete inventory.counts[key];
+          // P0 — les trésors se revendent en 💎 (diamants), plus en ₽.
+          const diamondUnit = Number((itemDef && itemDef.diamondValue) || 0);
+          if (diamondUnit > 0) {
+            if (wallet) wallet.diamonds = (Number(wallet.diamonds) || 0) + diamondUnit * count;
+          } else if (wallet) {
+            wallet.money = (Number(wallet.money) || 0) + gain;
+          }
+          market.lastOutcome = {
+            ok: true,
+            op: 'sell-treasure',
+            itemKey: key,
+            count,
+            gain,
+            diamondUnit,
+            diamondsAfter: wallet ? Number(wallet.diamonds) || 0 : null,
+            moneyAfter: wallet ? wallet.money : null,
+          };
+          eventBus.emit('economy:item-sold', { itemKey: key, count, gain, diamondUnit });
+          return;
+        }
+
+        // unknown op — no silent success
+        market.lastOutcome = { ok: false, op: op.op || 'none', reason: 'unknown-op' };
+      }
+    );
 
     // 8. UI Synchronization System
     this.world.system('ui:sync', ['Display', 'UIComponent'], (eid, display, uiComp) => {
@@ -516,6 +746,3 @@ export class ECSSystemsManager {
 if (typeof window !== 'undefined') {
   window.PokeECSSystemsManager = ECSSystemsManager;
 }
-
-
-

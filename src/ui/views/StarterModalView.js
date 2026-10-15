@@ -36,29 +36,53 @@ export class StarterModalView extends UIView {
 
   windowVNode() {
     const m = this.model;
-    return h('div', null,
+    return h(
+      'div',
+      null,
       h('div', { class: 'pw-text-sm pw-light1 pw-center' }, m.welcome || ''),
-      h('div', { class: 'pw-center' },
+      h(
+        'div',
+        { class: 'pw-center' },
         h('div', { class: 'pw-text-md pw-bold pw-light2' }, m.title || ''),
-        h('div', { class: 'pw-text-sm pw-light1' }, m.subtitle || '')),
-      h('div', null,
-        ...(m.starters || []).map((st) => h('div', {
-          class: 'starter-card starter-card--custom',
-          dataset: { starterId: String(st.id), starterRegion: m.region || 'kanto' },
-        },
-          h('div', { class: 'poke-sprite' }, st.spriteHtml ? h.raw(st.spriteHtml) : null),
-          h('div', { class: 'pw-flex-1' },
-            h('div', { class: 'poke-name pw-text-md' }, st.name || '?', h('span', { class: 'pw-text-sm' }, ` #${st.id}`)),
-            h('div', { class: 'pw-text-glow' }, h.raw(st.desc || ''))),
-          h('div', null, m.chooseLabel || '')))),
-      h('div', { class: 'pw-text-sm pw-light1 pw-center' }, m.required || ''));
+        h('div', { class: 'pw-text-sm pw-light1' }, m.subtitle || '')
+      ),
+      h(
+        'div',
+        null,
+        ...(m.starters || []).map((st) =>
+          h(
+            'div',
+            {
+              class: 'starter-card starter-card--custom',
+              dataset: { starterId: String(st.id), starterRegion: m.region || 'kanto' },
+            },
+            h('div', { class: 'poke-sprite' }, st.spriteHtml ? h.raw(st.spriteHtml) : null),
+            h(
+              'div',
+              { class: 'pw-flex-1' },
+              h(
+                'div',
+                { class: 'poke-name pw-text-md' },
+                st.name || '?',
+                h('span', { class: 'pw-text-sm' }, ` #${st.id}`)
+              ),
+              h('div', { class: 'pw-text-glow' }, h.raw(st.desc || ''))
+            ),
+            h('div', null, m.chooseLabel || '')
+          )
+        )
+      ),
+      h('div', { class: 'pw-text-sm pw-light1 pw-center' }, m.required || '')
+    );
   }
 
   onLoad() {
     this.windowEntity = this.spawn('ui:starter-modal', []);
-    this.windowEntity.addComponent(new UIRenderComponent({
-      template: () => this.windowVNode(),
-    }));
+    this.windowEntity.addComponent(
+      new UIRenderComponent({
+        template: () => this.windowVNode(),
+      })
+    );
   }
 
   /**
@@ -72,6 +96,3 @@ export class StarterModalView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
-
-
-

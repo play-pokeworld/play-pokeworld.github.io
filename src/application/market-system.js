@@ -20,7 +20,10 @@
  */
 import { getGameplayWorld } from './battle-loop.js';
 import { syncPlayerPresence, applyEconomyComponents } from './encounter-system.js';
-import { getPokemonPrice as domainPokemonPrice, categorizeMarketSpecies } from '../domain/economy/market.js';
+import {
+  getPokemonPrice as domainPokemonPrice,
+  categorizeMarketSpecies,
+} from '../domain/economy/market.js';
 import * as marketRules from '../domain/economy/market.js';
 
 let marketEid = -1;
@@ -98,11 +101,14 @@ export function buyPokemon(id, qty) {
     globalThis.notify(globalThis.t('market_not_listed'), 'var(--red)');
     return;
   }
-  const price = (typeof globalThis.pqMarketPrice === 'function') ? globalThis.pqMarketPrice(id) : 0;
-  const w = (typeof globalThis.ensureWallet === 'function') ? globalThis.ensureWallet() : null;
+  const price = typeof globalThis.pqMarketPrice === 'function' ? globalThis.pqMarketPrice(id) : 0;
+  const w = typeof globalThis.ensureWallet === 'function' ? globalThis.ensureWallet() : null;
   const total = price * qty;
   if (!w || (w.questPoints || 0) < total) {
-    globalThis.notify(globalThis.tr('market_need_pq', { price: formatNumber(total) }), 'var(--red)');
+    globalThis.notify(
+      globalThis.tr('market_need_pq', { price: formatNumber(total) }),
+      'var(--red)'
+    );
     return;
   }
   if (typeof globalThis.spendQuestPoints === 'function') globalThis.spendQuestPoints(total);
@@ -112,35 +118,62 @@ export function buyPokemon(id, qty) {
   // ── Persistence / world handoff (identique au classique retiré) ─────────
   let added = 0;
   for (let k = 0; k < qty; k++) {
-    const isShiny = (typeof globalThis.rollShiny === 'function') ? globalThis.rollShiny() : false;
+    const isShiny = typeof globalThis.rollShiny === 'function' ? globalThis.rollShiny() : false;
     const p = globalThis.createPoke(id, 1, isShiny);
     if (!p) continue;
     if (isShiny) {
-      p.shinyUnlocked = true; p.shinyActive = true; p.shiny = true;
-      if (typeof globalThis.unlockShinyForSpecies === 'function') globalThis.unlockShinyForSpecies(id);
+      p.shinyUnlocked = true;
+      p.shinyActive = true;
+      p.shiny = true;
+      if (typeof globalThis.unlockShinyForSpecies === 'function')
+        globalThis.unlockShinyForSpecies(id);
     }
-    if (typeof globalThis.unlockTalentForSpecies === 'function' && p.talent) globalThis.unlockTalentForSpecies(id, p.talent);
+    if (typeof globalThis.unlockTalentForSpecies === 'function' && p.talent)
+      globalThis.unlockTalentForSpecies(id, p.talent);
     if (G.team.length < 6 && !globalThis.speciesOwned(id)) {
       G.team.push(p);
-      if (typeof globalThis.syncTeamSlotHeldItems === 'function') globalThis.syncTeamSlotHeldItems();
+      if (typeof globalThis.syncTeamSlotHeldItems === 'function')
+        globalThis.syncTeamSlotHeldItems();
     } else {
       let boxId = 'market_' + id + '_' + Date.now() + '_' + k;
-      while (G.collection[boxId]) boxId = 'market_' + id + '_' + Date.now() + '_' + k + '_' + Math.floor(Math.random() * 1000);
+      while (G.collection[boxId])
+        boxId =
+          'market_' + id + '_' + Date.now() + '_' + k + '_' + Math.floor(Math.random() * 1000);
       G.collection[boxId] = p;
     }
     G.pokedex[id] = Object.assign({}, G.pokedex[id] || {}, { seen: true, caught: true });
     if (isShiny) G.pokedex[id].shiny = true;
     added++;
   }
-  if (!added) { globalThis.notify(globalThis.t('legacy_message_n_erreur_lors_de_la_cr_ation_du_pok_mon'), 'var(--red)'); return; }
+  if (!added) {
+    globalThis.notify(
+      globalThis.t('legacy_message_n_erreur_lors_de_la_cr_ation_du_pok_mon'),
+      'var(--red)'
+    );
+    return;
+  }
 
   globalThis.updateHeader();
-  globalThis.notify(globalThis.tr('market_bought_n', { n: added, name: globalThis.getPokeName(id), price: formatNumber((price * added)) }), 'var(--green)');
+  globalThis.notify(
+    globalThis.tr('market_bought_n', {
+      n: added,
+      name: globalThis.getPokeName(id),
+      price: formatNumber(price * added),
+    }),
+    'var(--green)'
+  );
   globalThis.saveGame();
-  try { globalThis.autoSave(); } catch (_e) { /* autosave optional */ }
+  try {
+    globalThis.autoSave();
+  } catch (_e) {
+    /* autosave optional */
+  }
   const fsContent = globalThis.document && globalThis.document.getElementById('fs-panel-content');
-  if (fsContent && globalThis.document.getElementById('fullscreen-panel-modal')?.style.display === 'flex'
-      && typeof globalThis.renderMarket === 'function') {
+  if (
+    fsContent &&
+    globalThis.document.getElementById('fullscreen-panel-modal')?.style.display === 'flex' &&
+    typeof globalThis.renderMarket === 'function'
+  ) {
     globalThis.renderMarket(fsContent);
   }
   globalThis.renderTeamWindow();
@@ -164,10 +197,17 @@ export function buyItem(key, count) {
   }
   syncPlayerPresence();
   runMarketOp({ op: 'refresh-shop', shopId: shopId || '' });
-  const outcome = runMarketOp({ op: 'buy-item', itemKey: key, count: Math.max(1, Math.floor(Number(count) || 1)) });
+  const outcome = runMarketOp({
+    op: 'buy-item',
+    itemKey: key,
+    count: Math.max(1, Math.floor(Number(count) || 1)),
+  });
   if (!outcome || !outcome.ok) {
     if (outcome && outcome.reason === 'bag-full') {
-      globalThis.notify(globalThis.tr('bag_full_for', { item: globalThis.getItemName(key), max: 25 }), 'var(--red)');
+      globalThis.notify(
+        globalThis.tr('bag_full_for', { item: globalThis.getItemName(key), max: 25 }),
+        'var(--red)'
+      );
     } else if (outcome && outcome.reason === 'insufficient-funds') {
       globalThis.notify(globalThis.t('n.pas_assez_dargent'), 'var(--red)');
     }
@@ -177,10 +217,16 @@ export function buyItem(key, count) {
   applyEconomyComponents();
   globalThis.updateHeader();
   const n = (outcome && outcome.count) || 1;
-  globalThis.notify(globalThis.tr('item_bought_n', { n, item: globalThis.getItemName(key) }), 'var(--green)');
+  globalThis.notify(
+    globalThis.tr('item_bought_n', { n, item: globalThis.getItemName(key) }),
+    'var(--green)'
+  );
   const fsContent = globalThis.document && globalThis.document.getElementById('fs-panel-content');
-  if (fsContent && globalThis.document.getElementById('fullscreen-panel-modal')?.style.display === 'flex'
-      && typeof globalThis.renderShop === 'function') {
+  if (
+    fsContent &&
+    globalThis.document.getElementById('fullscreen-panel-modal')?.style.display === 'flex' &&
+    typeof globalThis.renderShop === 'function'
+  ) {
     globalThis.renderShop(fsContent);
   }
 }
@@ -211,15 +257,25 @@ export function sellTreasure(key, count) {
     EventBusRef.emit(EVENTSRef.MINE_SELL, { key, amount: outcome.count });
   }
   globalThis.updateHeader();
-  const diamondGain = (outcome.diamondUnit > 0) ? (outcome.diamondUnit * outcome.count) : 0;
+  const diamondGain = outcome.diamondUnit > 0 ? outcome.diamondUnit * outcome.count : 0;
   if (diamondGain > 0) {
-    globalThis.notify(globalThis.tr('treasure_sold_diamonds', {
-      n: outcome.count, item: globalThis.getItemName(key), diamonds: formatNumber(diamondGain),
-    }), 'var(--green)');
+    globalThis.notify(
+      globalThis.tr('treasure_sold_diamonds', {
+        n: outcome.count,
+        item: globalThis.getItemName(key),
+        diamonds: formatNumber(diamondGain),
+      }),
+      'var(--green)'
+    );
   } else {
-    globalThis.notify(globalThis.tr('treasure_sold', {
-      n: outcome.count, item: globalThis.getItemName(key), gain: formatNumber(outcome.gain),
-    }), 'var(--green)');
+    globalThis.notify(
+      globalThis.tr('treasure_sold', {
+        n: outcome.count,
+        item: globalThis.getItemName(key),
+        gain: formatNumber(outcome.gain),
+      }),
+      'var(--green)'
+    );
   }
   globalThis.saveGame();
   globalThis.onInventoryClick(key);
@@ -244,6 +300,3 @@ if (typeof globalThis !== 'undefined') {
   globalThis.buyItem = buyItem;
   globalThis.sellTreasure = sellTreasure;
 }
-
-
-

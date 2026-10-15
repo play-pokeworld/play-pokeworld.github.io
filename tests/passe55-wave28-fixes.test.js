@@ -5,6 +5,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 const R = (rel) => fs.readFileSync(path.join(new URL('..', import.meta.url).pathname, rel), 'utf8');
 const DS = R('src/assets/styles/design-system.css');
@@ -38,7 +39,7 @@ test('wave28 #2: settings save-icon section no longer recaps sprite + name', () 
   assert.ok(SMV.includes('openSaveIconBoxSelector'), 'the picker button stays');
   // the legacy writer no-ops through its guard (contract kept for passe30)
   assert.ok(SV.includes('renderSaveProfileCurrentIcon'), 'writer kept');
-  assert.ok(SV.includes("if(!target) return;"), 'missing-target guard');
+  assert.ok(wsIncludes(SV, "if(!target) return;"), 'missing-target guard'); // V7 · DBT-01
 });
 
 /* ── 3. Management / editors / summary header bands = full sheet width ────── */

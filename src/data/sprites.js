@@ -294,12 +294,12 @@ const SPRITE_DATA = {
 "384":"src/assets/images/pokemon/front/rayquaza.png",
 "385":"src/assets/images/pokemon/front/jirachi.png",
 "386":"src/assets/images/pokemon/front/deoxys.png",
-"387":"src/assets/images/pokemon/front/castform-sunny.png",
-"388":"src/assets/images/pokemon/front/castform-rainy.png",
-"389":"src/assets/images/pokemon/front/castform-snowy.png",
-"390":"src/assets/images/pokemon/front/deoxys-attack.png",
-"391":"src/assets/images/pokemon/front/deoxys-defense.png",
-"392":"src/assets/images/pokemon/front/deoxys-speed.png",
+"351-1":"src/assets/images/pokemon/front/castform-sunny.png",
+"351-2":"src/assets/images/pokemon/front/castform-rainy.png",
+"351-3":"src/assets/images/pokemon/front/castform-snowy.png",
+"386-1":"src/assets/images/pokemon/front/deoxys-attack.png",
+"386-2":"src/assets/images/pokemon/front/deoxys-defense.png",
+"386-3":"src/assets/images/pokemon/front/deoxys-speed.png",
 "252":"src/assets/images/pokemon/front/treecko.png",
 "253":"src/assets/images/pokemon/front/grovyle.png",
 "254":"src/assets/images/pokemon/front/sceptile.png",
@@ -688,12 +688,12 @@ const SPRITE_DATA = {
 "384":"src/assets/images/pokemon/frontShiny/rayquaza.png",
 "385":"src/assets/images/pokemon/frontShiny/jirachi.png",
 "386":"src/assets/images/pokemon/frontShiny/deoxys.png",
-"387":"src/assets/images/pokemon/frontShiny/castform-sunny.png",
-"388":"src/assets/images/pokemon/frontShiny/castform-rainy.png",
-"389":"src/assets/images/pokemon/frontShiny/castform-snowy.png",
-"390":"src/assets/images/pokemon/frontShiny/deoxys-attack.png",
-"391":"src/assets/images/pokemon/frontShiny/deoxys-defense.png",
-"392":"src/assets/images/pokemon/frontShiny/deoxys-speed.png",
+"351-1":"src/assets/images/pokemon/frontShiny/castform-sunny.png",
+"351-2":"src/assets/images/pokemon/frontShiny/castform-rainy.png",
+"351-3":"src/assets/images/pokemon/frontShiny/castform-snowy.png",
+"386-1":"src/assets/images/pokemon/frontShiny/deoxys-attack.png",
+"386-2":"src/assets/images/pokemon/frontShiny/deoxys-defense.png",
+"386-3":"src/assets/images/pokemon/frontShiny/deoxys-speed.png",
 "252":"src/assets/images/pokemon/frontShiny/treecko.png",
 "253":"src/assets/images/pokemon/frontShiny/grovyle.png",
 "254":"src/assets/images/pokemon/frontShiny/sceptile.png",
@@ -1053,6 +1053,8 @@ const DEX_MAP = {
 
 // --- Migrated to ES module, globals exposed ---
 function getPokemonSpriteUrl(id, shiny = false) {
+  // V7 · FORM-01 — accepte un Pokémon `{id, form}` (forme → clé "351-1").
+  if (id && typeof id === 'object') id = (Number(id.form) > 0) ? (Number(id.id) + '-' + Number(id.form)) : id.id;
   var num = String(id);
   if (typeof DEX_MAP !== 'undefined' && DEX_MAP && DEX_MAP[num]) {
     num = String(DEX_MAP[num]);

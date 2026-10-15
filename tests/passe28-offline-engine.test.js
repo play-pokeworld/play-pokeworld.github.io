@@ -15,6 +15,7 @@ import { SessionSummaryView } from '../src/ui/views/SessionSummaryView.js';
 // above (paints are asserted on `afk-ff-bar`/`afk-result-grid`, which the
 // view still emits).
 import { AfkRecapView } from '../src/ui/views/AfkRecapView.js';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 // ── Phase 28: OfflineEngine — offline catch-up via fast-forward ─────────────
 //  A. Single orchestrator (registry) + heartbeat-gap detection (>15 s,
@@ -36,6 +37,7 @@ function makeEl() {
     setAttribute() {}, getAttribute() { return null; }, removeAttribute() {},
     addEventListener() {}, removeEventListener() {},
     appendChild() {}, remove() {},
+    children: [], firstChild: null, // battle timeline chips (super-effective hits)
     querySelector() { return null; }, querySelectorAll() { return []; },
     closest() { return null; }, contains() { return false; },
   };
@@ -172,6 +174,11 @@ function seedGame(sb, { location = 'route1', level = 12, money = 1000 } = {}) {
     G.team[0].currentHP = G.team[0].maxHP;
     battle.active = false; battle.enemyPoke = null; battle.chill = true; battle.speed = 1;
     battle.sessionCatches = []; battle.sessionItems = {}; battle.sessionWins = 0;
+    // V7 · ROAM-01 — the roamer pool follows the wall clock (12 h UTC windows):
+    // depending on the day, route1 hosts a Nv. 75 roamer (1 %/spawn) that can
+    // wipe the test team. These tests exercise the ENGINE, so they run without
+    // a roamer; the offline-roamer behaviour has its own tests (V7 ROAM-01).
+    window.getRoamingLegendaryForRoute = function(){ return 0; }; globalThis.getRoamingLegendaryForRoute = window.getRoamingLegendaryForRoute;
   `, sb);
 }
 
@@ -198,7 +205,7 @@ test('phase 28 A: OfflineEngine exposed, 3 default handlers, 12 h cap', () => {
   const src = R('src/application/save/offline-engine.js');
   assert.ok(src.includes('const OFFLINE_MIN_GAP_MS = 15000;'), '15 s heartbeat-gap threshold');
   assert.ok(src.includes("appTimer('offline-heartbeat', offlinePollHeartbeat, 2000)"), '2 s heartbeat installed');
-  assert.ok(R('src/main.js').includes('"./application/save/offline-engine.js"'), 'loader charge le moteur');
+  assert.ok(/import ['"]\.\/application\/save\/offline-engine\.js['"]/.test(R('src/main.js')), 'loader charge le moteur'); // V7 · DBT-01 — guillemets simples
 });
 
 test('phase 28 A: tab lock against double catch-up', () => {
@@ -429,7 +436,7 @@ test('phase 28 D: old AFK estimator purged (single source of truth)', () => {
     assert.ok(!R(f).includes('debugTimeSkip10Minutes') && !R(f).includes('debugTimeSkipAfk10Minutes'), `${f} no longer references the 10-min timeskip`);
   }
   // saveGame guarded during a fast-forward
-  assert.ok(R('src/application/save/save.js').includes("if(typeof afkApplying !== 'undefined' && afkApplying) return false;"), 'saveGame skipped during FF');
+  assert.ok(wsIncludes(R('src/application/save/save.js'), "if(typeof afkApplying !== 'undefined' && afkApplying) return false;"), 'saveGame skipped during FF'); // V7 · DBT-01
   // compat shim kept (saveGame/activateCurrentSave use it)
   assert.ok(R('src/application/save/save.js').includes('function markAfkSeen(force)'), 'markAfkSeen kept');
   assert.ok(R('src/application/save/save.js').includes('function scheduleAfkCatchup(reason)'), 'scheduleAfkCatchup → offlineScheduleCatchup');
@@ -483,3 +490,57 @@ test('phase 29 E: FR+EN localized title/steps', () => {
 
 
 
+// ————————————————— V7 · ROAM-01 — roamers DURING the offline catch-up ——————————
+// Player decision (2026-10-14): a roaming legendary CAN show up while the
+// player is away — parking the team on the roamer's route is a legitimate AFK
+// farm. If the Nv. 75 roamer wipes the team, that is the player's call.
+function armRoamerOnRoute(sb, { forcedRolls = 3 } = {}) {
+  // Articuno roams route1 whatever the wall-clock window…
+  vm.runInContext(`window.getRoamingLegendaryForRoute = function(){ return 144; }; globalThis.getRoamingLegendaryForRoute = window.getRoamingLegendaryForRoute;`, sb);
+  // …and the first spawn rolls the roamer for sure: the roaming roll is the
+  // FIRST draw of a free spawn (encounter-rules.js), so the first calls of
+  // the sandbox RNG are pinned under ROAMING_CHANCE before the seeded LCG
+  // takes over for the battle itself.
+  const lcg = sb.Math.random;
+  let n = 0;
+  sb.Math.random = () => (++n <= forcedRolls ? 0.005 : lcg());
+}
+
+test('V7 ROAM-01 — a roamer CAN appear during the offline catch-up; a strong team beats it and the recap reports it', async () => {
+  const sb = makeSandbox({ seed: 777 });
+  seedGame(sb, { location: 'route1', level: 100 });
+  vm.runInContext(`G.team = [createPoke(6, 100, false), createPoke(9, 100, false)]; G.team.forEach(p => { p.currentHP = p.maxHP; }); G.wildSessionActive = true;`, sb);
+  armRoamerOnRoute(sb);
+  const result = await vm.runInContext(`offlineSimulate(300000, 'return')`, sb); // 5 min
+  assert.equal(vm.runInContext(`!!(G.pokedex[144] && G.pokedex[144].seen)`, sb), true, 'Articuno was met while away (dex: seen)');
+  assert.ok(result.roamers >= 1, `roamers counted in the recap (got: ${result.roamers})`);
+  assert.equal(result.roamer && result.roamer.id, 144, 'the recap names the roamer');
+  assert.equal(result.roamer.level, 75, 'roamer level 75 (ROAM-01)');
+  assert.equal(result.lost, false, 'a Lv. 100 duo survives the roamer');
+  assert.ok(result.wins >= 1, `the catch-up went on after the roamer (wins: ${result.wins})`);
+});
+
+test('V7 ROAM-01 — a weak team parked on the roamer\'s route gets wiped: honest loss, roamer reported', async () => {
+  const sb = makeSandbox({ seed: 778 });
+  seedGame(sb, { location: 'route1', level: 5, money: 1000 });
+  vm.runInContext(`G.wildSessionActive = true;`, sb);
+  armRoamerOnRoute(sb);
+  const result = await vm.runInContext(`offlineSimulate(120000, 'return')`, sb);
+  assert.equal(result.lost, true, 'Lv. 5 Charmander vs Lv. 75 Articuno: party K.O.');
+  assert.ok(result.roamers >= 1, 'the recap explains the wipe (roamer met)');
+  assert.equal(vm.runInContext(`G.money`, sb), 900, 'usual 10 % defeat penalty, nothing more');
+  assert.equal(vm.runInContext(`battle.active`, sb), false, 'clean end, no loop');
+});
+
+test('V7 ROAM-01 — recap panel: roamer row + note (FR/EN keys, no hard-coded level)', () => {
+  const src = R('src/application/save/offline-engine.js');
+  assert.match(src, /afk_panel_roamers/, 'stat row');
+  assert.match(src, /afk_roamer_note/, 'note line');
+  assert.doesNotMatch(src, /PW_FF[^\n]*roamingId|roamingId[^\n]*PW_FF/, 'no offline roamer guard');
+  assert.doesNotMatch(R('src/application/encounter-system.js'), /if \(globalThis\.PW_FF\) table\.roamingId = 0/, 'roamers are NOT disabled during the catch-up');
+  for (const key of ['afk_panel_roamers', 'afk_roamer_note', 'afk_roamer_note_many']) {
+    assert.ok(R('src/localization/fr/ui.js').includes(`"${key}"`), `FR key ${key}`);
+    assert.ok(R('src/localization/en/ui.js').includes(`"${key}"`), `EN key ${key}`);
+  }
+  assert.match(R('src/localization/fr/ui.js'), /"afk_roamer_note":"[^"]*\{lvl\}/, 'level comes from the data, not the text');
+});

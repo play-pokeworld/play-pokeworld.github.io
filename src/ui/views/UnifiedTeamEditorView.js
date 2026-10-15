@@ -79,45 +79,63 @@ export class UnifiedTeamEditorModal extends UIView {
   _buildFooterButton(label, variant, onClick) {
     const entity = this.spawn(`ui:team-editor-${label.toLowerCase()}`, []);
     entity.addComponent(new UIInteractiveComponent({ onClick }));
-    entity.addComponent(new UIRenderComponent({
-      template: (e) => h('button', {
-        class: `pw-ui-btn pw-ui-btn--${variant}`,
-        dataset: entityDataset(e),
-      }, h('span', { class: 'pw-ui-btn-text' }, label)),
-    }));
+    entity.addComponent(
+      new UIRenderComponent({
+        template: (e) =>
+          h(
+            'button',
+            {
+              class: `pw-ui-btn pw-ui-btn--${variant}`,
+              dataset: entityDataset(e),
+            },
+            h('span', { class: 'pw-ui-btn-text' }, label)
+          ),
+      })
+    );
     return entity;
   }
 
   _buildSlotEntity(index) {
     const slot = this.spawn(`ui:team-editor-slot-${index + 1}`, []);
-    slot.addComponent(new UIRenderComponent({
-      template: () => {
-        const poke = this.teamData[index];
-        if (poke) {
-          return h('div', { class: 'pw-ui-panel slot-card' },
-            // Trusted internal markup: canonical card generator / DS fallback.
-            h('span', { style: { display: 'contents' } },
-              h.raw(new PokemonCardTemplate(poke, { size: 64, showHP: true }).html())),
-            this._slotButtonVNode(slot, 'Retirer', 'danger', () => {
-              this.teamData.splice(index, 1);
-              this._refreshSlots();
-            }));
-        }
-        return h('div', { class: 'pw-ui-panel slot-card is-empty' },
-          h('div', { class: 'slot-empty-text' }, `Emplacement ${index + 1} vide`),
-          this._slotButtonVNode(slot, '+ Ajouter', 'secondary', () => {
-            UnifiedPokemonSelectorModal.open({
-              mode: 'team_select',
-              title: `Ajouter au slot ${index + 1}`,
-              pokemonList: this.availablePokemon,
-              onSelect: (selectedPoke) => {
-                this.teamData[index] = selectedPoke;
+    slot.addComponent(
+      new UIRenderComponent({
+        template: () => {
+          const poke = this.teamData[index];
+          if (poke) {
+            return h(
+              'div',
+              { class: 'pw-ui-panel slot-card' },
+              // Trusted internal markup: canonical card generator / DS fallback.
+              h(
+                'span',
+                { style: { display: 'contents' } },
+                h.raw(new PokemonCardTemplate(poke, { size: 64, showHP: true }).html())
+              ),
+              this._slotButtonVNode(slot, 'Retirer', 'danger', () => {
+                this.teamData.splice(index, 1);
                 this._refreshSlots();
-              },
-            });
-          }));
-      },
-    }));
+              })
+            );
+          }
+          return h(
+            'div',
+            { class: 'pw-ui-panel slot-card is-empty' },
+            h('div', { class: 'slot-empty-text' }, `Emplacement ${index + 1} vide`),
+            this._slotButtonVNode(slot, '+ Ajouter', 'secondary', () => {
+              UnifiedPokemonSelectorModal.open({
+                mode: 'team_select',
+                title: `Ajouter au slot ${index + 1}`,
+                pokemonList: this.availablePokemon,
+                onSelect: (selectedPoke) => {
+                  this.teamData[index] = selectedPoke;
+                  this._refreshSlots();
+                },
+              });
+            })
+          );
+        },
+      })
+    );
     return slot;
   }
 
@@ -132,12 +150,19 @@ export class UnifiedTeamEditorModal extends UIView {
     if (!slotEntity._pwButtons[key]) {
       const btn = this.spawn(`ui:team-editor-slot-btn-${label}`, [], slotEntity);
       btn.addComponent(new UIInteractiveComponent({ onClick }));
-      btn.addComponent(new UIRenderComponent({
-        template: (e) => h('button', {
-          class: `pw-ui-btn pw-ui-btn--${variant}`,
-          dataset: entityDataset(e),
-        }, h('span', { class: 'pw-ui-btn-text' }, label)),
-      }));
+      btn.addComponent(
+        new UIRenderComponent({
+          template: (e) =>
+            h(
+              'button',
+              {
+                class: `pw-ui-btn pw-ui-btn--${variant}`,
+                dataset: entityDataset(e),
+              },
+              h('span', { class: 'pw-ui-btn-text' }, label)
+            ),
+        })
+      );
       slotEntity._pwButtons[key] = btn;
     }
     return slotEntity._pwButtons[key].get(UIRenderComponent).renderTemplate();
@@ -145,8 +170,11 @@ export class UnifiedTeamEditorModal extends UIView {
 
   /** @returns {*} vnode of the slot cells fragment. */
   _slotsFragmentVNode() {
-    return h('span', { class: 'pw-team-editor-cells', style: { display: 'contents' } },
-      ...this.slotEntities.map((e) => e.get(UIRenderComponent).renderTemplate()));
+    return h(
+      'span',
+      { class: 'pw-team-editor-cells', style: { display: 'contents' } },
+      ...this.slotEntities.map((e) => e.get(UIRenderComponent).renderTemplate())
+    );
   }
 
   /** Live re-render of the 6 slots (footer/search never touched). */
@@ -157,13 +185,27 @@ export class UnifiedTeamEditorModal extends UIView {
 
   /** Monolithic virtual tree (doctrine: ONE tree — adapters/tests string mode). */
   buildView() {
-    return h('div', { dataset: { view: this.name } },
-      h('div', {
-        class: 'pw-ui-layout pw-ui-layout--grid',
-        style: { display: 'grid', 'grid-template-columns': 'repeat(3, minmax(200px, 1fr))', gap: '12px' },
-      }, this._slotsFragmentVNode()),
-      h('div', { class: 'pw-actions' },
-        ...this.footerEntities.map((e) => e.get(UIRenderComponent).renderTemplate())));
+    return h(
+      'div',
+      { dataset: { view: this.name } },
+      h(
+        'div',
+        {
+          class: 'pw-ui-layout pw-ui-layout--grid',
+          style: {
+            display: 'grid',
+            'grid-template-columns': 'repeat(3, minmax(200px, 1fr))',
+            gap: '12px',
+          },
+        },
+        this._slotsFragmentVNode()
+      ),
+      h(
+        'div',
+        { class: 'pw-actions' },
+        ...this.footerEntities.map((e) => e.get(UIRenderComponent).renderTemplate())
+      )
+    );
   }
 
   /**
@@ -191,8 +233,11 @@ export class UnifiedTeamEditorModal extends UIView {
     this._bindDelegation(footerLayout);
     renderInto(this._slotsFragmentVNode(), this.gridContainer);
     renderInto(
-      h('span', { style: { display: 'contents' } },
-        ...this.footerEntities.map((e) => e.get(UIRenderComponent).renderTemplate())),
+      h(
+        'span',
+        { style: { display: 'contents' } },
+        ...this.footerEntities.map((e) => e.get(UIRenderComponent).renderTemplate())
+      ),
       footerLayout
     );
     this.hostElement = this.gridContainer;
@@ -243,6 +288,3 @@ export class UnifiedTeamEditorModal extends UIView {
     return out;
   }
 }
-
-
-

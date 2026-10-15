@@ -7,29 +7,54 @@
  * public surface (updateHeader / updateHeaderImmediate / getBadgeDisplayTotal)
  * is unchanged.
  */
-function getBadgeDisplayTotal(){
- const supportedRegions = ['kanto','johto','hoenn'];
- let regions = 1;
- try{ regions = supportedRegions.filter(r => (typeof canAccessRegion === 'function') ? canAccessRegion(r) : r === 'kanto').length || 1; }catch(_){ regions = 1; }
- return regions * 8;
+function getBadgeDisplayTotal() {
+  const supportedRegions = ['kanto', 'johto', 'hoenn'];
+  let regions = 1;
+  try {
+    regions =
+      supportedRegions.filter((r) =>
+        typeof canAccessRegion === 'function' ? canAccessRegion(r) : r === 'kanto'
+      ).length || 1;
+  } catch (_) {
+    regions = 1;
+  }
+  return regions * 8;
 }
 let _headerRaf = null;
 let _headerPending = false;
-function _flushHeaderWindows(){
+function _flushHeaderWindows() {
   _headerRaf = null;
   _headerPending = false;
-  try{ renderTeamWindow(); }catch(_){}
-  try{ renderStoryWindow(); }catch(_){}
-  try{ renderHatcheryWindow(); }catch(_){}
-  try{ renderTrainingWindow(); }catch(_){}
-  try{ renderMineWindow(); }catch(_){}
-  try{ renderAutomationWindow(); }catch(_){}
-  try{ renderShortcutsWindow(); }catch(_){}
-  try{ renderCurrencyWindow(); }catch(_){}
-  try{ renderPokeballWindow(); }catch(_){}
+  try {
+    renderTeamWindow();
+  } catch (_) {}
+  try {
+    renderStoryWindow();
+  } catch (_) {}
+  try {
+    renderHatcheryWindow();
+  } catch (_) {}
+  try {
+    renderTrainingWindow();
+  } catch (_) {}
+  try {
+    renderMineWindow();
+  } catch (_) {}
+  try {
+    renderAutomationWindow();
+  } catch (_) {}
+  try {
+    renderShortcutsWindow();
+  } catch (_) {}
+  try {
+    renderCurrencyWindow();
+  } catch (_) {}
+  try {
+    renderPokeballWindow();
+  } catch (_) {}
 }
 
-function renderUpdateBanner(){
+function renderUpdateBanner() {
   if (typeof document === 'undefined') return;
   const existing = document.getElementById('pw-update-banner-container');
   if (!G || !G.updateAvailable || G.updateBannerDismissed) {
@@ -44,7 +69,8 @@ function renderUpdateBanner(){
 
   const textWrap = document.createElement('div');
   textWrap.className = 'pw-update-banner-text';
-  textWrap.textContent = (typeof t === 'function' ? t('app_update_banner_text') : 'Une nouvelle version est disponible !');
+  textWrap.textContent =
+    typeof t === 'function' ? t('app_update_banner_text') : 'Une nouvelle version est disponible !';
 
   const actionsWrap = document.createElement('div');
   actionsWrap.className = 'pw-update-banner-actions';
@@ -55,14 +81,17 @@ function renderUpdateBanner(){
   updateBtn.type = 'button';
   updateBtn.setAttribute('data-action', 'legacy-call');
   updateBtn.setAttribute('data-call', 'applyAppUpdate');
-  updateBtn.textContent = (typeof t === 'function' ? t('app_update_banner_btn') : 'Mettre à jour');
+  updateBtn.textContent = typeof t === 'function' ? t('app_update_banner_btn') : 'Mettre à jour';
 
   const closeBtn = document.createElement('button');
   closeBtn.className = 'pw-update-banner-close';
   closeBtn.type = 'button';
   closeBtn.setAttribute('data-action', 'legacy-call');
   closeBtn.setAttribute('data-call', 'dismissAppUpdate');
-  closeBtn.setAttribute('aria-label', (typeof t === 'function' ? t('app_update_banner_close') : 'Fermer'));
+  closeBtn.setAttribute(
+    'aria-label',
+    typeof t === 'function' ? t('app_update_banner_close') : 'Fermer'
+  );
   closeBtn.textContent = '✕';
 
   actionsWrap.appendChild(updateBtn);
@@ -78,7 +107,6 @@ function renderUpdateBanner(){
   }
 }
 
-
 // ── P3 · CUR-01 — barre de monnaies persistante ────────────────────────────
 // Un seul point d'écriture pour les 4 compteurs du header. Chaque montant
 // est comparé à sa valeur précédente (feedback-fx) : un gain fait monter un
@@ -89,77 +117,84 @@ function renderUpdateBanner(){
    vivent désormais dans la fenêtre « Monnaies » (src/ui/game/currency-window.js).
    Ici on se contente d'entretenir #h-money, resté masqué dans l'entête, parce
    que du code historique et des tests le lisent encore. */
-function updateCurrencyHud(){
-  if(typeof document === 'undefined' || typeof G === 'undefined' || !G) return;
-  try{
+function updateCurrencyHud() {
+  if (typeof document === 'undefined' || typeof G === 'undefined' || !G) return;
+  try {
     const el = document.getElementById('h-money');
-    if(el){
-      const money = (typeof G.money === 'number') ? G.money : 0;
-      const fmt = (typeof formatNumber === 'function') ? formatNumber(money) : String(money);
-      if(el.textContent !== fmt) el.textContent = fmt;
+    if (el) {
+      const money = typeof G.money === 'number' ? G.money : 0;
+      const fmt = typeof formatNumber === 'function' ? formatNumber(money) : String(money);
+      if (el.textContent !== fmt) el.textContent = fmt;
     }
-  }catch(_){}
+  } catch (_) {}
   // la fenêtre Monnaies est la seule surface d'affichage : on la rafraîchit
   // pour que les deltas s'y animent, jamais ailleurs.
-  try{ if(typeof renderCurrencyWindow === 'function') renderCurrencyWindow(); }catch(_){}
+  try {
+    if (typeof renderCurrencyWindow === 'function') renderCurrencyWindow();
+  } catch (_) {}
 }
 
-function updateHeader(){
-  try{ renderUpdateBanner(); }catch(_){}
-  try{
+function updateHeader() {
+  try {
+    renderUpdateBanner();
+  } catch (_) {}
+  try {
     updateCurrencyHud();
     const b = document.getElementById('h-badges');
-    if(b) b.textContent = (G && Array.isArray(G.badges)) ? G.badges.length : 0;
+    if (b) b.textContent = G && Array.isArray(G.badges) ? G.badges.length : 0;
     const totalEl = document.getElementById('h-badges-total');
-    if(totalEl) totalEl.textContent = getBadgeDisplayTotal();
-  }catch(_){}
+    if (totalEl) totalEl.textContent = getBadgeDisplayTotal();
+  } catch (_) {}
   // RAF batch for the heavy windows to avoid jitter on each K.O.
-  if(_headerPending) return;
+  if (_headerPending) return;
   _headerPending = true;
-  try{
-    if(typeof requestAnimationFrame === 'function'){
+  try {
+    if (typeof requestAnimationFrame === 'function') {
       _headerRaf = requestAnimationFrame(_flushHeaderWindows);
     } else {
       _flushHeaderWindows();
     }
-  }catch(_){
+  } catch (_) {
     _flushHeaderWindows();
   }
 }
-function updateHeaderImmediate(){
+function updateHeaderImmediate() {
   // for cases where we want to force a synchronous refresh (e.g. location change)
-  if(_headerRaf && typeof cancelAnimationFrame === 'function'){
-    try{ cancelAnimationFrame(_headerRaf); }catch(_){}
+  if (_headerRaf && typeof cancelAnimationFrame === 'function') {
+    try {
+      cancelAnimationFrame(_headerRaf);
+    } catch (_) {}
   }
   _headerRaf = null;
   _headerPending = false;
-  try{
+  try {
     updateCurrencyHud();
     const b = document.getElementById('h-badges');
-    if(b) b.textContent = (G && Array.isArray(G.badges)) ? G.badges.length : 0;
+    if (b) b.textContent = G && Array.isArray(G.badges) ? G.badges.length : 0;
     const totalEl = document.getElementById('h-badges-total');
-    if(totalEl) totalEl.textContent = getBadgeDisplayTotal();
-  }catch(_){}
+    if (totalEl) totalEl.textContent = getBadgeDisplayTotal();
+  } catch (_) {}
   _flushHeaderWindows();
 }
 
-
 // --- Migrated to ES module, globals exposed ---
-if (typeof getBadgeDisplayTotal !== 'undefined') { if (typeof window !== 'undefined') window.getBadgeDisplayTotal = getBadgeDisplayTotal; if (typeof globalThis !== 'undefined') globalThis.getBadgeDisplayTotal = getBadgeDisplayTotal; }
-if (typeof updateCurrencyHud !== 'undefined') { if (typeof window !== 'undefined') window.updateCurrencyHud = updateCurrencyHud; if (typeof globalThis !== 'undefined') globalThis.updateCurrencyHud = updateCurrencyHud; }
-if (typeof updateHeader !== 'undefined') { if (typeof window !== 'undefined') window.updateHeader = updateHeader; if (typeof globalThis !== 'undefined') globalThis.updateHeader = updateHeader; }
-if (typeof updateHeaderImmediate !== 'undefined') { if (typeof window !== 'undefined') window.updateHeaderImmediate = updateHeaderImmediate; if (typeof globalThis !== 'undefined') globalThis.updateHeaderImmediate = updateHeaderImmediate; }
-
-
+if (typeof getBadgeDisplayTotal !== 'undefined') {
+  if (typeof window !== 'undefined') window.getBadgeDisplayTotal = getBadgeDisplayTotal;
+  if (typeof globalThis !== 'undefined') globalThis.getBadgeDisplayTotal = getBadgeDisplayTotal;
+}
+if (typeof updateCurrencyHud !== 'undefined') {
+  if (typeof window !== 'undefined') window.updateCurrencyHud = updateCurrencyHud;
+  if (typeof globalThis !== 'undefined') globalThis.updateCurrencyHud = updateCurrencyHud;
+}
+if (typeof updateHeader !== 'undefined') {
+  if (typeof window !== 'undefined') window.updateHeader = updateHeader;
+  if (typeof globalThis !== 'undefined') globalThis.updateHeader = updateHeader;
+}
+if (typeof updateHeaderImmediate !== 'undefined') {
+  if (typeof window !== 'undefined') window.updateHeaderImmediate = updateHeaderImmediate;
+  if (typeof globalThis !== 'undefined') globalThis.updateHeaderImmediate = updateHeaderImmediate;
+}
 
 // Wave 41 — native ESM module: exports the same names as the
 // classic surface kept above (bodies unchanged).
-export {
-  getBadgeDisplayTotal,
-  updateCurrencyHud,
-  updateHeader,
-  updateHeaderImmediate,
-};
-
-
-
+export { getBadgeDisplayTotal, updateCurrencyHud, updateHeader, updateHeaderImmediate };

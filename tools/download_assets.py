@@ -449,21 +449,23 @@ def parse_sprite_entries() -> list[tuple[str, int, Path]]:
         m = re.search(rf'\s{bucket}: \{{([\s\S]*?)\n \}}', text)
         if not m:
             continue
-        for dex, rel in re.findall(r'"(\d+)":"([^"]+)"', m.group(1)):
-            entries.append((bucket, int(dex), ROOT / rel))
+        # V7 · FORM-01 — les formes ont des clés "351-1" (plus d'ids 387–392).
+        for dex, rel in re.findall(r'"([\d-]+)":"([^"]+)"', m.group(1)):
+            entries.append((bucket, dex if '-' in dex else int(dex), ROOT / rel))
     return entries
 
 
-def pokemon_url(bucket: str, dex: int) -> str:
-    # Fixes for Castform and Deoxys forms using custom IDs 387-392
-    # whose real PokeAPI sprites are 10013-10015 and 10001-10003
+def pokemon_url(bucket: str, dex) -> str:
+    # V7 · FORM-01 — form sprite keys "base-slot" map to PokeAPI form ids
+    # (Castform 10013-10015, Deoxys 10001-10003). Legacy 387-392 kept for
+    # older sprite tables.
     special_map = {
-        387: 10013,  # castform-sunny
-        388: 10014,  # castform-rainy
-        389: 10015,  # castform-snowy
-        390: 10001,  # deoxys-attack
-        391: 10002,  # deoxys-defense
-        392: 10003,  # deoxys-speed
+        '351-1': 10013, 387: 10013,  # castform-sunny
+        '351-2': 10014, 388: 10014,  # castform-rainy
+        '351-3': 10015, 389: 10015,  # castform-snowy
+        '386-1': 10001, 390: 10001,  # deoxys-attack
+        '386-2': 10002, 391: 10002,  # deoxys-defense
+        '386-3': 10003, 392: 10003,  # deoxys-speed
     }
     real_dex = special_map.get(dex, dex)
     folder = {

@@ -22,20 +22,32 @@ class TimerManager {
   setInterval(name, callback, intervalMs, options = {}) {
     this.clear(name);
     const timer = {
-      name, callback, interval: intervalMs, elapsed: 0,
-      calls: 0, maxCalls: options.maxCalls || 0,
+      name,
+      callback,
+      interval: intervalMs,
+      elapsed: 0,
+      calls: 0,
+      maxCalls: options.maxCalls || 0,
       lastUpdate: performance.now(),
       running: options.autostart !== false,
-      id: performance.now() + Math.random()
+      id: performance.now() + Math.random(),
     };
     this._timers.set(name, timer);
     return timer.id;
   }
 
   setTimeout(name, callback, delayMs) {
-    return this.setInterval(name, (dt, elapsed) => {
-      if (elapsed >= delayMs) { callback(); this.clear(name); }
-    }, 16, { maxCalls: Math.ceil(delayMs / 16) + 1 });
+    return this.setInterval(
+      name,
+      (dt, elapsed) => {
+        if (elapsed >= delayMs) {
+          callback();
+          this.clear(name);
+        }
+      },
+      16,
+      { maxCalls: Math.ceil(delayMs / 16) + 1 }
+    );
   }
 
   /**
@@ -46,16 +58,16 @@ class TimerManager {
     if (this._paused) return;
     const adjustedDt = dt * this._globalSpeed;
     const now = performance.now();
-    
+
     for (const [name, timer] of this._timers) {
       if (!timer.running) continue;
       timer.elapsed += adjustedDt;
       const localDt = now - timer.lastUpdate;
       timer.lastUpdate = now;
-      
+
       timer.callback(localDt * this._globalSpeed, timer.elapsed);
       timer.calls++;
-      
+
       if (timer.maxCalls > 0 && timer.calls >= timer.maxCalls) {
         this.clear(name);
       }
@@ -63,13 +75,20 @@ class TimerManager {
   }
 
   pause(name) {
-    if (name) { const t = this._timers.get(name); if (t) t.running = false; }
-    else this._paused = true;
+    if (name) {
+      const t = this._timers.get(name);
+      if (t) t.running = false;
+    } else this._paused = true;
   }
 
   resume(name) {
-    if (name) { const t = this._timers.get(name); if (t) { t.running = true; t.lastUpdate = performance.now(); } }
-    else this._paused = false;
+    if (name) {
+      const t = this._timers.get(name);
+      if (t) {
+        t.running = true;
+        t.lastUpdate = performance.now();
+      }
+    } else this._paused = false;
   }
 
   clear(name) {
@@ -84,10 +103,18 @@ class TimerManager {
     this._globalSpeed = Math.max(0.1, speed);
   }
 
-  getSpeed() { return this._globalSpeed; }
-  isPaused(name) { return name ? !this._timers.get(name)?.running : this._paused; }
-  getElapsed(name) { return this._timers.get(name)?.elapsed || 0; }
-  count() { return this._timers.size; }
+  getSpeed() {
+    return this._globalSpeed;
+  }
+  isPaused(name) {
+    return name ? !this._timers.get(name)?.running : this._paused;
+  }
+  getElapsed(name) {
+    return this._timers.get(name)?.elapsed || 0;
+  }
+  count() {
+    return this._timers.size;
+  }
 
   /**
    * RAF-based frame loop
@@ -105,7 +132,9 @@ class TimerManager {
       requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
-    return () => { running = false; };
+    return () => {
+      running = false;
+    };
   }
 }
 
@@ -119,7 +148,3 @@ if (typeof globalThis !== 'undefined') {
   if (!globalThis.poke) globalThis.poke = {};
   globalThis.poke.Timer = TimerManager;
 }
-
-
-
-

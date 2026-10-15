@@ -6,6 +6,7 @@ import { BagView } from '../src/ui/views/BagView.js';
 import { SettingsModalView } from '../src/ui/views/SettingsModalView.js';
 import { AtollPanelView } from '../src/ui/views/AtollPanelView.js'; // wave 13: real DS view injected into the vm sandbox
 import { harnessBundleSource, harnessIsEsm } from '../tools/harness-bundle.mjs';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 // ── Phase 26: beta QoL ───────────────────────────────────────────────────
 //  A. All TMs/HMs of the right versions purchasable, scattered across
@@ -145,7 +146,7 @@ test('phase 26 C: streamlined dictionary (no more locations or lists)', () => {
   assert.ok(!src.includes('<small>${sources'), 'item tiles: locations removed');
   assert.ok(!src.includes('${users.slice(0,4)'), 'move/ability tiles: lists removed');
   assert.ok(!src.includes('dict_ability_carriers'), 'ability tiles: holders removed');
-  assert.ok(src.includes('findItemSources(key){\n const list = (typeof getItemSourceList'), 'findItemSources delegates to getItemSourceList');
+  assert.ok(wsIncludes(src, 'findItemSources(key){ const list = typeof getItemSourceList'), 'findItemSources delegates to getItemSourceList'); // V7 · DBT-01
 });
 
 // ————————————————————————— D —————————————————————————

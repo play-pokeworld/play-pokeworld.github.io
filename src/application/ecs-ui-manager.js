@@ -277,6 +277,3 @@ export class ECSUIManager {
     }
   }
 }
-
-
-

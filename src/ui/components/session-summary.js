@@ -23,10 +23,18 @@
 import { h } from '../../engine/render/vdom.js';
 
 export function sessionStatGridVNode(stats) {
-  return h('div', { class: 'battle-session-summary-grid' },
-    ...(stats || []).map((s) => h('div', { class: 'battle-session-summary-stat' },
-      h('b', null, s.value == null ? '' : String(s.value)),
-      h('span', null, s.label || ''))));
+  return h(
+    'div',
+    { class: 'battle-session-summary-grid' },
+    ...(stats || []).map((s) =>
+      h(
+        'div',
+        { class: 'battle-session-summary-stat' },
+        h('b', null, s.value == null ? '' : String(s.value)),
+        h('span', null, s.label || '')
+      )
+    )
+  );
 }
 
 export function summarySectionTitleVNode(label) {
@@ -46,16 +54,35 @@ export function summaryEmptyVNode(label) {
  */
 export function damageRowVNode(row) {
   const pct = Math.max(0, Math.min(100, Math.round(Number(row.pct) || 0)));
-  return h('div', { class: 'battle-damage-row' },
-    h('div', { class: 'battle-damage-head' },
-      h('div', { class: 'battle-damage-poke' },
+  return h(
+    'div',
+    { class: 'battle-damage-row' },
+    h(
+      'div',
+      { class: 'battle-damage-head' },
+      h(
+        'div',
+        { class: 'battle-damage-poke' },
         h.raw(row.spriteHtml || ''),
-        h('b', null, row.name || '')),
-      h('div', { class: 'battle-damage-values' },
+        h('b', null, row.name || '')
+      ),
+      h(
+        'div',
+        { class: 'battle-damage-values' },
         h('span', null, row.valueText || ''),
-        h('small', null, `${pct}%${row.koCount ? ` · ${row.koCount} KO` : ''}`))),
-    h('div', { class: 'battle-damage-bar' },
-      h('div', { class: 'battle-damage-fill', dataset: { pct: String(pct) }, style: { width: `${pct}%`, '--pct': `${pct}%` } })));
+        h('small', null, `${pct}%${row.koCount ? ` · ${row.koCount} KO` : ''}`)
+      )
+    ),
+    h(
+      'div',
+      { class: 'battle-damage-bar' },
+      h('div', {
+        class: 'battle-damage-fill',
+        dataset: { pct: String(pct) },
+        style: { width: `${pct}%`, '--pct': `${pct}%` },
+      })
+    )
+  );
 }
 
 export function damageListVNode(rows) {
@@ -64,14 +91,23 @@ export function damageListVNode(rows) {
 
 /** One captured-Pokémon entry (shiny variant by class). */
 export function captureEntryVNode(e) {
-  return h('div', { class: `battle-summary-entry ${e.shiny ? 'is-shiny' : 'is-normal'}` },
+  return h(
+    'div',
+    { class: `battle-summary-entry ${e.shiny ? 'is-shiny' : 'is-normal'}` },
     h('div', { class: 'pw-summary-sprite' }, h.raw(e.spriteHtml || '')),
-    h('div', { class: 'pw-flex-1' },
-      h('div', { class: 'pw-summary-name' },
+    h(
+      'div',
+      { class: 'pw-flex-1' },
+      h(
+        'div',
+        { class: 'pw-summary-name' },
         e.shiny ? h('span', { class: 'pw-shiny-star' }, '★') : null,
-        e.name || ''),
-      h('div', { class: 'pw-text-sm pw-light1' }, e.subLabel || '')),
-    h('div', { class: 'pw-summary-count' }, `×${e.count == null ? 1 : e.count}`));
+        e.name || ''
+      ),
+      h('div', { class: 'pw-text-sm pw-light1' }, e.subLabel || '')
+    ),
+    h('div', { class: 'pw-summary-count' }, `×${e.count == null ? 1 : e.count}`)
+  );
 }
 
 export function captureListVNode(entries) {
@@ -80,11 +116,17 @@ export function captureListVNode(entries) {
 
 /** One found-item entry. */
 export function itemEntryVNode(e) {
-  return h('div', { class: 'pw-card-bordered pw-row pw-gap-sm battle-summary-entry is-normal' },
+  return h(
+    'div',
+    { class: 'pw-card-bordered pw-row pw-gap-sm battle-summary-entry is-normal' },
     h.raw(e.iconHtml || ''),
-    h('div', null,
+    h(
+      'div',
+      null,
       h('div', { class: 'pw-bold pw-text-sm pw-light2' }, e.name || ''),
-      h('div', { class: 'pw-text-sm pw-light1' }, `×${e.qty == null ? 1 : e.qty}`)));
+      h('div', { class: 'pw-text-sm pw-light1' }, `×${e.qty == null ? 1 : e.qty}`)
+    )
+  );
 }
 
 export function itemListVNode(entries) {
@@ -96,14 +138,17 @@ export function lootChipVNode(c) {
   // PASSE 39 — les monnaies s'affichent sprite + chiffre (jamais « × ») :
   // « +150 » pour l'argent gagné en combat, « 250 » pour les jetons.
   if (c.currency) {
-    return h('div', { class: 'loot-item loot-currency', title: c.title || '' },
+    return h(
+      'div',
+      { class: 'loot-item loot-currency', title: c.title || '' },
       h.raw(c.html || ''),
-      h('span', { class: 'loot-count' }, (c.prefix || '') + String(c.amount)));
+      h('span', { class: 'loot-count' }, (c.prefix || '') + String(c.amount))
+    );
   }
-  return h('div', { class: 'loot-item', title: c.title || '' },
+  return h(
+    'div',
+    { class: 'loot-item', title: c.title || '' },
     h.raw(c.html || ''),
-    c.count > 1 ? h('span', { class: 'loot-count' }, `×${c.count}`) : null);
+    c.count > 1 ? h('span', { class: 'loot-count' }, `×${c.count}`) : null
+  );
 }
-
-
-

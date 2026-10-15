@@ -116,11 +116,11 @@ test('wave21: SpecialFormsView — rows, UNQUOTED buy args, owned badge, 72px sp
   const html = SpecialFormsView.toHTML({
     title: 'T',
     rows: [
-      { spriteHtml: spr, nameLabel: '☀️ Morphéo Solaire', owned: false, descText: 'Forme stabilisée…', sideText: '20 000₽', callArgs: '387,20000' },
+      { spriteHtml: spr, nameLabel: '☀️ Morphéo Solaire', owned: false, descText: 'Forme stabilisée…', sideText: '20 000₽', callArgs: '351,1,20000' },
       { spriteHtml: spr, nameLabel: '❄️ Morphéo Blizzard', owned: true, ownedText: 'Acheté — forme déjà obtenue…', sideText: '✓' },
     ],
   });
-  assert.ok(html.includes('data-action="legacy-call" data-call="buySpecialFormPokemon" data-call-args="387,20000"'), 'buy contract — UNQUOTED numeric args (exact)');
+  assert.ok(html.includes('data-action="legacy-call" data-call="buySpecialFormPokemon" data-call-args="351,1,20000"'), 'buy contract — UNQUOTED numeric args (exact)');
   assert.ok((html.match(/pw-manage-card/g) || []).length === 2, 'two cards rendered');
   assert.ok((html.match(/pw-owned/g) || []).length === 1, 'owned badge state (.pw-owned contract)');
   const ownedPos = html.indexOf('pw-owned');
@@ -132,7 +132,8 @@ test('wave21: SpecialFormsView — rows, UNQUOTED buy args, owned badge, 72px sp
 test('wave21: forms adapter delegates + shapes localized models', () => {
   assert.ok(LOCINFO_JS.includes('views.SpecialFormsView.toHTML(model)'), 'adapter delegates to SpecialFormsView');
   assert.ok(LOCINFO_JS.includes('PokeUI views not loaded (SpecialFormsView)'), 'strict view guard');
-  assert.ok(LOCINFO_JS.includes('callArgs: f.id + \',\' + f.price'), 'unquoted numeric args shaped in the adapter');
+  // V7 · FORM-01 — buy contract is now (baseId, slot, price), still UNQUOTED numeric args.
+  assert.ok(LOCINFO_JS.includes("callArgs: f.base + ',' + f.slot + ',' + price"), 'unquoted numeric args shaped in the adapter');
   assert.ok(LOCINFO_JS.includes('fs-panel-filters'), 'money filter-slot behaviour preserved');
   assert.ok(!/renderCastformFormsPanel[\s\S]{0,120}innerHTML\s*=\s*html/.test(LOCINFO_JS), 'no raw-HTML accumulation left on the forms panel path');
 });

@@ -63,12 +63,12 @@ test('world:encounter record cadence explicitly on EncounterCooldown (strict par
 });
 
 test('pickWildFromTable reproduces the classic rule (roaming, buckets, fallbacks)', () => {
-  // roaming roll: first rng call below 0.003 forces the roaming legendary at 45
+  // roaming roll: first rng call below 0.01 forces the roaming legendary at 75
   const roam = pickWildFromTable([[16, 2, 5, 'common']], { roamingId: 144, rng: () => 0.001 });
   assert.equal(roam.isRoaming, true);
   assert.equal(roam.speciesId, 144);
   assert.equal(roam.level, ROAMING_LEVEL);
-  assert.ok(ROAMING_CHANCE > 0 && ROAMING_CHANCE < 0.01, 'roaming stays a rare 0.3% roll');
+  assert.equal(ROAMING_CHANCE, 0.01, 'V7 ROAM-01: roaming is a 1 % roll (D3)');
 
   // bucket roll: 0.0 → rare bucket; table without rare entries falls back to common
   const wild = [[10, 3, 6, 'common'], [13, 3, 6, 'uncommon'], [150, 50, 55, 'rare']];

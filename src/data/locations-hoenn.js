@@ -14,7 +14,7 @@ export var LOCS_HOENN = {
   slateport:      { name: 'Poivressel',      type: 'town', x: 488, y: 692, w: 80, h: 152, conn: ['route109', 'route110', 'route134'], wild: [], shopId: 'slateport_market', champ: null, badgeReq: 1 },
   mauville:       { name: 'Lavandia',        type: 'town', x: 508, y: 396, w: 152, h: 72, conn: ['route110', 'route111', 'route117', 'route118'], wild: [], shopId: 'mauville', champ: 'wattson', badgeReq: 2 },
   verdanturf:     { name: 'Vergazon',        type: 'town', x: 260, y: 404, w: 72, h: 72, conn: ['route117', 'rusturf_tunnel'], wild: [], shopId: 'verdanturf', champ: null, badgeReq: 2 },
-  fallarbor:      { name: 'Autopia',         type: 'town', x: 212, y: 84, w: 72, h: 72, conn: ['route113', 'route114'], wild: [], shopId: 'fallarbor', champ: null, badgeReq: 2 },
+  fallarbor:      { name: 'Autopia',         type: 'town', x: 212, y: 84, w: 72, h: 72, conn: ['route113', 'route114', 'birth_island'], wild: [], shopId: 'fallarbor', champ: null, badgeReq: 2 },
   lavaridge:      { name: 'Vermilava',       type: 'town', x: 324, y: 292, w: 72, h: 72, conn: ['route112', 'mt_chimney'], wild: [], shopId: 'lavaridge', champ: 'flannery', badgeReq: 3 },
   fortree:        { name: 'Cimmery',         type: 'town', x: 724, y: 84, w: 72, h: 72, conn: ['route119', 'route120'], wild: [], shopId: 'fortree', champ: 'winona', badgeReq: 5 },
   lilycove:       { name: 'Nénucrique',      type: 'town', x: 1116, y: 240, w: 152, h: 80, conn: ['route121', 'route124', 'aqua_hideout'], wild: [], shopId: 'lilycove_dept_store', champ: null, badgeReq: 6 },
@@ -89,6 +89,8 @@ export var LOCS_HOENN = {
   // Ancient Tomb: positioned between Route 119 and Route 120, but
   // ONLY ACCESSIBLE from Route 120 (the route that unlocks it).
   ancient_tomb:    { name: 'Tombeau Antique (Registeel)', type: 'dungeon', x: 720, y: 260, w: 56, h: 48, conn: ['route120'], wild: [[337, 26, 32, 'common'], [338, 26, 32, 'common'], [344, 28, 34, 'uncommon'], [379, 30, 40, 'rare']], shopId: null, champ: null, badgeReq: 6 },
+  // V7 · LEG-02 — Île de l'Aurore (Deoxys) : atteinte depuis Autopia (navette du Centre Spatial).
+  birth_island:    { name: "Île de l'Aurore",   type: 'dungeon', x: 60, y: 20, w: 72, h: 56, conn: ['fallarbor'], wild: [[72, 40, 48, 'common'], [278, 40, 48, 'common'], [120, 42, 50, 'uncommon'], [121, 46, 52, 'rare']], shopId: null, champ: null, badgeReq: 8 },
 };
 
 for (const id in LOCS_HOENN) { const loc = LOCS_HOENN[id]; if (loc && loc.minWins === undefined) loc.minWins = (loc.type === 'town') ? 0 : 10; }

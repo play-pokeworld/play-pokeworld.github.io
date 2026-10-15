@@ -73,12 +73,13 @@ test('currentLang() defaults to fr (native), explicit G.lang still wins', () => 
   assert.ok(!/G\.lang\) \? G\.lang : 'en'/.test(i18nJs), 'no en fallback at boot');
 });
 
-test('all three initial-state factories seed lang fr', () => {
+test('the single initial-state factory seeds lang fr (V7 · DBT-03: save.js and the bridge import it)', () => {
   assert.match(initialState, /lang: 'fr'/);
   assert.ok(!/lang: 'en'/.test(initialState));
   for (const src of [saveJs, bridge]) {
-    assert.ok(!/lang:'en'/.test(src), 'inline fallback objects seed fr');
-    assert.match(src, /lang:'fr'/);
+    assert.ok(!/lang:'en'/.test(src), 'no inline fallback object seeds en');
+    assert.ok(!/lang:'fr'/.test(src), 'V7 · DBT-03 — no inline initial-state copy left');
+    assert.match(src, /domain\/game\/initial-state\.js/);
   }
 });
 

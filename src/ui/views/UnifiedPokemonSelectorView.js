@@ -77,73 +77,125 @@ export class UnifiedPokemonSelectorModal extends UIView {
     // Sort buttons: one entity per criterion (state-driven active class).
     this.sortButtonEntities = SORT_CRITERIA.map((crit) => {
       const entity = this.spawn(`ui:selector-sort-${crit.id}`, []);
-      entity.addComponent(new UIInteractiveComponent({
-        onClick: () => {
-          this.sortBy = crit.id;
-          this._renderSortButtons(); // état → rendu (classe active unique)
-          this._refreshGrid();
-        },
-      }));
-      entity.addComponent(new UIRenderComponent({
-        // Markup copied verbatim from the historical DS Button
-        // (pw-ui-btn pw-ui-btn--secondary [is-active active] usm-sort-btn,
-        //  label en span.pw-ui-btn-text).
-        template: (e) => h('button', {
-          class: this.sortBy === crit.id
-            ? 'pw-ui-btn pw-ui-btn--secondary is-active active usm-sort-btn'
-            : 'pw-ui-btn pw-ui-btn--secondary usm-sort-btn',
-          dataset: entityDataset(e),
-        }, h('span', { class: 'pw-ui-btn-text' }, crit.label)),
-      }));
+      entity.addComponent(
+        new UIInteractiveComponent({
+          onClick: () => {
+            this.sortBy = crit.id;
+            this._renderSortButtons(); // état → rendu (classe active unique)
+            this._refreshGrid();
+          },
+        })
+      );
+      entity.addComponent(
+        new UIRenderComponent({
+          // Markup copied verbatim from the historical DS Button
+          // (pw-ui-btn pw-ui-btn--secondary [is-active active] usm-sort-btn,
+          //  label en span.pw-ui-btn-text).
+          template: (e) =>
+            h(
+              'button',
+              {
+                class:
+                  this.sortBy === crit.id
+                    ? 'pw-ui-btn pw-ui-btn--secondary is-active active usm-sort-btn'
+                    : 'pw-ui-btn pw-ui-btn--secondary usm-sort-btn',
+                dataset: entityDataset(e),
+              },
+              h('span', { class: 'pw-ui-btn-text' }, crit.label)
+            ),
+        })
+      );
       return entity;
     });
 
     // Toolbar region: sort bar + search field (DS WriteBox markup).
     this.toolbarEntity = this.spawn('ui:selector-toolbar', []);
-    this.toolbarEntity.addComponent(new UIRenderComponent({
-      template: () => h('div', { class: 'box-filter-panel ui-control-toolbar' },
-        h('div', { class: 'usm-sort-bar' },
-          h('span', { class: 'sort-label' }, 'Trier par :'),
-          h('span', { class: 'pw-usm-sort-btns', style: { display: 'contents' } },
-            ...this.sortButtonEntities.map((e) => e.get(UIRenderComponent).renderTemplate()))),
-        h('div', { class: 'pw-ui-writebox' },
-          h('input', {
-            type: 'text',
-            class: 'pw-ui-writebox-input',
-            placeholder: 'Rechercher...',
-            onInput: (e) => {
-              this.searchQuery = String((e && e.target && e.target.value) || '').toLowerCase();
-              this._refreshGrid();
-            },
-          }))),
-    }));
+    this.toolbarEntity.addComponent(
+      new UIRenderComponent({
+        template: () =>
+          h(
+            'div',
+            { class: 'box-filter-panel ui-control-toolbar' },
+            h(
+              'div',
+              { class: 'usm-sort-bar' },
+              h('span', { class: 'sort-label' }, 'Trier par :'),
+              h(
+                'span',
+                { class: 'pw-usm-sort-btns', style: { display: 'contents' } },
+                ...this.sortButtonEntities.map((e) => e.get(UIRenderComponent).renderTemplate())
+              )
+            ),
+            h(
+              'div',
+              { class: 'pw-ui-writebox' },
+              h('input', {
+                type: 'text',
+                class: 'pw-ui-writebox-input',
+                placeholder: 'Rechercher...',
+                onInput: (e) => {
+                  this.searchQuery = String((e && e.target && e.target.value) || '').toLowerCase();
+                  this._refreshGrid();
+                },
+              })
+            )
+          ),
+      })
+    );
 
     // Grid region: card entities are its children (re-spawned by _syncCards).
     this.gridEntity = this.spawn('ui:selector-grid', []);
-    this.gridEntity.addComponent(new UIRenderComponent({
-      template: (e) => h('div', {
-        class: 'pw-ui-layout pw-ui-layout--grid',
-        style: { display: 'grid', 'grid-template-columns': 'repeat(auto-fill, minmax(180px, 1fr))', gap: '12px' },
-      }, h('span', { class: 'pw-usm-grid-cells', style: { display: 'contents' } }, ...renderChildren(e))),
-    }));
+    this.gridEntity.addComponent(
+      new UIRenderComponent({
+        template: (e) =>
+          h(
+            'div',
+            {
+              class: 'pw-ui-layout pw-ui-layout--grid',
+              style: {
+                display: 'grid',
+                'grid-template-columns': 'repeat(auto-fill, minmax(180px, 1fr))',
+                gap: '12px',
+              },
+            },
+            h(
+              'span',
+              { class: 'pw-usm-grid-cells', style: { display: 'contents' } },
+              ...renderChildren(e)
+            )
+          ),
+      })
+    );
 
     // Footer region: the single close button entity.
     this.closeButtonEntity = this.spawn('ui:selector-close', []);
-    this.closeButtonEntity.addComponent(new UIInteractiveComponent({
-      onClick: () => this.close(),
-    }));
-    this.closeButtonEntity.addComponent(new UIRenderComponent({
-      template: (e) => h('button', {
-        class: 'pw-ui-btn pw-ui-btn--secondary',
-        dataset: entityDataset(e),
-      }, h('span', { class: 'pw-ui-btn-text' }, 'Fermer')),
-    }));
+    this.closeButtonEntity.addComponent(
+      new UIInteractiveComponent({
+        onClick: () => this.close(),
+      })
+    );
+    this.closeButtonEntity.addComponent(
+      new UIRenderComponent({
+        template: (e) =>
+          h(
+            'button',
+            {
+              class: 'pw-ui-btn pw-ui-btn--secondary',
+              dataset: entityDataset(e),
+            },
+            h('span', { class: 'pw-ui-btn-text' }, 'Fermer')
+          ),
+      })
+    );
   }
 
   /** @returns {*} vnode of the grid cells fragment (raw canonical cards). */
   _cellsFragmentVNode() {
-    return h('span', { class: 'pw-usm-grid-cells', style: { display: 'contents' } },
-      ...renderChildren(this.gridEntity));
+    return h(
+      'span',
+      { class: 'pw-usm-grid-cells', style: { display: 'contents' } },
+      ...renderChildren(this.gridEntity)
+    );
   }
 
   /** Re-spawn one card entity per currently visible Pokémon (state → entities). */
@@ -156,7 +208,8 @@ export class UnifiedPokemonSelectorModal extends UIView {
     if (this.searchQuery) {
       filtered = filtered.filter((p) => {
         // PASSE 29 (item 11): search the localized name for the ACTIVE language.
-        if (typeof globalThis.pokemonMatchesSearch === 'function') return globalThis.pokemonMatchesSearch(p, this.searchQuery);
+        if (typeof globalThis.pokemonMatchesSearch === 'function')
+          return globalThis.pokemonMatchesSearch(p, this.searchQuery);
         const n = String(p.name || '').toLowerCase();
         const id = String(p.id || '').toLowerCase();
         return n.includes(this.searchQuery) || id.includes(this.searchQuery);
@@ -171,20 +224,30 @@ export class UnifiedPokemonSelectorModal extends UIView {
 
     for (const poke of filtered) {
       const cell = this.spawn('ui:selector-card', [], this.gridEntity);
-      cell.addComponent(new UIInteractiveComponent({
-        onClick: () => {
-          eventBus.emit('input:select', { mode: this.mode, pokemon: poke });
-          if (this.onSelect) this.onSelect(poke);
-        },
-      }));
-      cell.addComponent(new UIRenderComponent({
-        // Trusted internal markup: canonical card generator / DS fallback.
-        template: (e) => h('div', { style: { display: 'contents' }, dataset: entityDataset(e) },
-          h.raw(new PokemonCardTemplate(poke, {
-            size: 64,
-            showHP: this.mode === 'team_select' || this.mode === 'item_target',
-          }).html())),
-      }));
+      cell.addComponent(
+        new UIInteractiveComponent({
+          onClick: () => {
+            eventBus.emit('input:select', { mode: this.mode, pokemon: poke });
+            if (this.onSelect) this.onSelect(poke);
+          },
+        })
+      );
+      cell.addComponent(
+        new UIRenderComponent({
+          // Trusted internal markup: canonical card generator / DS fallback.
+          template: (e) =>
+            h(
+              'div',
+              { style: { display: 'contents' }, dataset: entityDataset(e) },
+              h.raw(
+                new PokemonCardTemplate(poke, {
+                  size: 64,
+                  showHP: this.mode === 'team_select' || this.mode === 'item_target',
+                }).html()
+              )
+            ),
+        })
+      );
     }
   }
 
@@ -192,8 +255,11 @@ export class UnifiedPokemonSelectorModal extends UIView {
   _renderSortButtons() {
     if (!this._sortBtnsHost) return;
     renderInto(
-      h('span', { style: { display: 'contents' } },
-        ...this.sortButtonEntities.map((e) => e.get(UIRenderComponent).renderTemplate())),
+      h(
+        'span',
+        { style: { display: 'contents' } },
+        ...this.sortButtonEntities.map((e) => e.get(UIRenderComponent).renderTemplate())
+      ),
       this._sortBtnsHost
     );
   }
@@ -207,11 +273,17 @@ export class UnifiedPokemonSelectorModal extends UIView {
 
   /** Monolithic virtual tree (doctrine: ONE tree — adapters/tests string mode). */
   buildView() {
-    return h('div', { dataset: { view: this.name } },
+    return h(
+      'div',
+      { dataset: { view: this.name } },
       this.toolbarEntity.get(UIRenderComponent).renderTemplate(),
       this.gridEntity.get(UIRenderComponent).renderTemplate(),
-      h('div', { class: 'pw-actions' },
-        this.closeButtonEntity.get(UIRenderComponent).renderTemplate()));
+      h(
+        'div',
+        { class: 'pw-actions' },
+        this.closeButtonEntity.get(UIRenderComponent).renderTemplate()
+      )
+    );
   }
 
   /**
@@ -297,6 +369,3 @@ export class UnifiedPokemonSelectorModal extends UIView {
     return out;
   }
 }
-
-
-

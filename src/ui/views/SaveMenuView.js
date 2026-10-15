@@ -24,6 +24,7 @@
  * Model (shaped by the classic adapter):
  * {
  *   title, subtitle, newLabel, importLabel,
+ *   discordUrl, discordLabel,            // V7-R1 #4 (optional — hidden when no URL)
  *   empty: { title, desc } | null,
  *   cardsHtml: string[],                 // saveCardHTML() output strings
  * }
@@ -33,6 +34,7 @@
 import { UIView } from './UIView.js';
 import { UIRenderComponent } from '../../engine/components/UIRenderComponent.js';
 import { h, toHTMLString } from '../../engine/render/vdom.js';
+import { discordLinkVNode } from '../components/discord-link.js';
 
 export class SaveMenuView extends UIView {
   constructor(model) {
@@ -43,58 +45,131 @@ export class SaveMenuView extends UIView {
     const m = this.model;
     return [
       h('div', { class: 'save-menu-bg-layer', 'aria-hidden': 'true' }),
-      h('section', { class: 'save-menu-panel', 'aria-labelledby': 'save-menu-title' },
-        h('div', { class: 'save-menu-title-block' },
+      h(
+        'section',
+        { class: 'save-menu-panel', 'aria-labelledby': 'save-menu-title' },
+        h(
+          'div',
+          { class: 'save-menu-title-block' },
           // ONE title only (user rule): the game name, no kicker bubble.
           h('h1', { id: 'save-menu-title' }, m.title || ''),
-          h('p', { id: 'save-menu-subtitle' }, m.subtitle || '')),
-        h('div', { class: 'save-menu-list-shell' },
-          h('button', {
-            type: 'button', id: 'save-menu-prev', class: 'hbtn save-menu-scroll-btn',
-            dataset: { action: 'legacy-call', call: 'scrollSaveList', callArgs: '-1' },
-          }, '‹'),
-          h('div', { id: 'save-menu-list', class: 'save-menu-list' },
+          h('p', { id: 'save-menu-subtitle' }, m.subtitle || '')
+        ),
+        h(
+          'div',
+          { class: 'save-menu-list-shell' },
+          h(
+            'button',
+            {
+              type: 'button',
+              id: 'save-menu-prev',
+              class: 'hbtn save-menu-scroll-btn',
+              dataset: { action: 'legacy-call', call: 'scrollSaveList', callArgs: '-1' },
+            },
+            '‹'
+          ),
+          h(
+            'div',
+            { id: 'save-menu-list', class: 'save-menu-list' },
             m.empty
-              ? h('div', { class: 'save-menu-empty' },
+              ? h(
+                  'div',
+                  { class: 'save-menu-empty' },
                   h('div', { class: 'save-menu-empty-icon' }, '◇'),
                   h('h2', null, m.empty.title || ''),
-                  h('p', null, h.raw(m.empty.desc || '')))
+                  h('p', null, h.raw(m.empty.desc || ''))
+                )
               : null,
-            ...(Array.isArray(m.cardsHtml) ? m.cardsHtml.filter(Boolean).map((html) => h.raw(html)) : [])),
-          h('button', {
-            type: 'button', id: 'save-menu-next', class: 'hbtn save-menu-scroll-btn',
-            dataset: { action: 'legacy-call', call: 'scrollSaveList', callArgs: '1' },
-          }, '›')),
-        h('div', { class: 'save-menu-actions' },
-          h('button', {
-            type: 'button', id: 'save-menu-new-btn', class: 'hbtn save-menu-action-primary',
-            dataset: { action: 'legacy-call', call: 'createNewSaveFromMenu', callArgs: '' },
-          }, m.newLabel || ''),
-          h('label', { id: 'save-menu-import-label', class: 'hbtn save-menu-action-secondary', for: 'save-menu-import-file' }, m.importLabel || ''),
+            ...(Array.isArray(m.cardsHtml)
+              ? m.cardsHtml.filter(Boolean).map((html) => h.raw(html))
+              : [])
+          ),
+          h(
+            'button',
+            {
+              type: 'button',
+              id: 'save-menu-next',
+              class: 'hbtn save-menu-scroll-btn',
+              dataset: { action: 'legacy-call', call: 'scrollSaveList', callArgs: '1' },
+            },
+            '›'
+          )
+        ),
+        h(
+          'div',
+          { class: 'save-menu-actions' },
+          h(
+            'button',
+            {
+              type: 'button',
+              id: 'save-menu-new-btn',
+              class: 'hbtn save-menu-action-primary',
+              dataset: { action: 'legacy-call', call: 'createNewSaveFromMenu', callArgs: '' },
+            },
+            m.newLabel || ''
+          ),
+          h(
+            'label',
+            {
+              id: 'save-menu-import-label',
+              class: 'hbtn save-menu-action-secondary',
+              for: 'save-menu-import-file',
+            },
+            m.importLabel || ''
+          ),
           h('input', {
-            type: 'file', id: 'save-menu-import-file', accept: '.json,application/json',
-            class: 'pw-static-010', dataset: { action: 'import-save-file' },
-          })),
-        h('div', { class: 'save-menu-lang-actions', style: { display: 'flex', gap: '8px', marginTop: '14px', justifyContent: 'center' } },
-          h('button', {
-            type: 'button',
-            class: `hbtn lang-btn${(typeof globalThis.currentLang === 'function' && globalThis.currentLang() === 'fr') ? ' active' : ''}`,
-            dataset: { action: 'legacy-call', call: 'setSaveMenuLang', callArgs: "'fr'" },
-          }, 'FR'),
-          h('button', {
-            type: 'button',
-            class: `hbtn lang-btn${(typeof globalThis.currentLang === 'function' && globalThis.currentLang() === 'en') ? ' active' : ''}`,
-            dataset: { action: 'legacy-call', call: 'setSaveMenuLang', callArgs: "'en'" },
-          }, 'EN')
-        )),
+            type: 'file',
+            id: 'save-menu-import-file',
+            accept: '.json,application/json',
+            class: 'pw-static-010',
+            dataset: { action: 'import-save-file' },
+          })
+        ),
+        // V7-R1 · retours joueurs #4 — « Rejoindre le Discord » sur l'écran
+        // des sauvegardes (même composant que dans les réglages).
+        m.discordUrl
+          ? h(
+              'div',
+              { class: 'save-menu-community' },
+              discordLinkVNode(m.discordUrl, m.discordLabel, 'save-menu-discord-btn')
+            )
+          : null,
+        h(
+          'div',
+          {
+            class: 'save-menu-lang-actions',
+            style: { display: 'flex', gap: '8px', marginTop: '14px', justifyContent: 'center' },
+          },
+          h(
+            'button',
+            {
+              type: 'button',
+              class: `hbtn lang-btn${typeof globalThis.currentLang === 'function' && globalThis.currentLang() === 'fr' ? ' active' : ''}`,
+              dataset: { action: 'legacy-call', call: 'setSaveMenuLang', callArgs: "'fr'" },
+            },
+            'FR'
+          ),
+          h(
+            'button',
+            {
+              type: 'button',
+              class: `hbtn lang-btn${typeof globalThis.currentLang === 'function' && globalThis.currentLang() === 'en' ? ' active' : ''}`,
+              dataset: { action: 'legacy-call', call: 'setSaveMenuLang', callArgs: "'en'" },
+            },
+            'EN'
+          )
+        )
+      ),
     ];
   }
 
   onLoad() {
     this.windowEntity = this.spawn('ui:save-menu', []);
-    this.windowEntity.addComponent(new UIRenderComponent({
-      template: () => this.windowVNode(),
-    }));
+    this.windowEntity.addComponent(
+      new UIRenderComponent({
+        template: () => this.windowVNode(),
+      })
+    );
   }
 
   /**
@@ -108,6 +183,3 @@ export class SaveMenuView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
-
-
-

@@ -154,7 +154,7 @@ test('phase 46 G: shiny roll at spawn time (visible in combat) — NO catch rate
 test('phase 46 H: Delta Episode still locked behind Kalos', () => {
   const src = R('src/data/story-quests-hoenn.js');
   assert.ok(src.includes('isKalosCompleted'));
-  const helpers = R('src/data/game-helpers.js');
+  const helpers = R('src/data/region.js'); // V7 · DBT-09 — progression régionale extraite de game-helpers.js
   assert.ok(helpers.includes('function isKalosCompleted'));
 });
 
@@ -165,12 +165,15 @@ test('phase 46 I: no more Base 3D renderer in the runtime project', () => {
   assert.ok(!idx.includes('win-base3d'));
 });
 
-test('phase 46 J: SHINY_CHANCE config aligned to 1/4096', () => {
-  // Single canonical engine config (legacy src/game/Config.js removed)
-  assert.ok(R('src/data/game-config.js').includes('SHINY_CHANCE: 1/4096'));
+test('phase 46 J: single canonical config (V7 · DBT-02 — only READ constants remain)', () => {
+  // Single canonical engine config (legacy src/game/Config.js removed).
+  // V7 · DBT-02 : SHINY_CHANCE / REGIONS / MAX_* n'étaient lus nulle part → supprimés ;
+  // le taux chromatique réel vit dans le code qui le tire (isSpeciesShiny / rollShiny).
+  const cfg = R('src/data/game-config.js');
+  assert.ok(!cfg.includes('SHINY_CHANCE'), 'no dead SHINY_CHANCE constant');
   // Hoenn merged into the canonical config
-  assert.ok(R('src/data/game-config.js').includes('HOENN_STARTERS: [252, 255, 258]'));
-  assert.ok(R('src/data/game-config.js').includes("hoenn: { name: 'Hoenn', start: 252, end: 386, badges: 8 }"));
+  assert.ok(cfg.includes('HOENN_STARTERS: [252, 255, 258]'));
+  assert.ok(cfg.includes('SAVE_VERSION: 4'));
 });
 
 

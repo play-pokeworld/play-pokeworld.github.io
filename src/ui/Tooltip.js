@@ -16,7 +16,10 @@
 // Shared safe-HTML service (engine pwSetHtml when present, else direct).
 // globalThis-backed so concatenated VM harnesses and classic stubs stay valid.
 if (typeof globalThis !== 'undefined' && typeof globalThis._pwSetHtmlSafe !== 'function') {
-  globalThis._pwSetHtmlSafe = function (el, html) { if (typeof globalThis.pwSetHtml === 'function') globalThis.pwSetHtml(el, html); else el.innerHTML = html; };
+  globalThis._pwSetHtmlSafe = function (el, html) {
+    if (typeof globalThis.pwSetHtml === 'function') globalThis.pwSetHtml(el, html);
+    else el.innerHTML = html;
+  };
 }
 
 export class Tooltip {
@@ -64,6 +67,3 @@ export class Tooltip {
     }
   }
 }
-
-
-

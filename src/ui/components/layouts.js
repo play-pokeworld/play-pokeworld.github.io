@@ -31,22 +31,40 @@ import { h, cx, renderChildren } from './component-utils.js';
 export function createLayout(scene, props = {}) {
   const entity = scene.spawn('ui:layout', [], props.parent || undefined);
   entity.addComponent(new UILayoutComponent(props));
-  entity.addComponent(new UIRenderComponent({
-    layer: 'ui',
-    template: (e) => {
-      const layout = e.get(UILayoutComponent);
-      const fixedRegions = [];
-      if (layout.fixedRegions.includes('top')) fixedRegions.push('top');
-      if (layout.fixedRegions.includes('bottom')) fixedRegions.push('bottom');
-      return h('div', {
-        class: cx('pw-layout', `pw-layout--${layout.direction}`, layout.hasFixedRegions && 'pw-layout--fixed-regions', props.className),
-        style: { display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: '0' },
+  entity.addComponent(
+    new UIRenderComponent({
+      layer: 'ui',
+      template: (e) => {
+        const layout = e.get(UILayoutComponent);
+        const fixedRegions = [];
+        if (layout.fixedRegions.includes('top')) fixedRegions.push('top');
+        if (layout.fixedRegions.includes('bottom')) fixedRegions.push('bottom');
+        return h(
+          'div',
+          {
+            class: cx(
+              'pw-layout',
+              `pw-layout--${layout.direction}`,
+              layout.hasFixedRegions && 'pw-layout--fixed-regions',
+              props.className
+            ),
+            style: { display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: '0' },
+          },
+          props.fixedTop
+            ? h('div', { class: 'pw-layout-fixed pw-layout-fixed--top' }, props.fixedTop)
+            : null,
+          h(
+            'div',
+            { class: cx('pw-layout-body', props.bodyClassName), style: layout.bodyStyle() },
+            renderChildren(e)
+          ),
+          props.fixedBottom
+            ? h('div', { class: 'pw-layout-fixed pw-layout-fixed--bottom' }, props.fixedBottom)
+            : null
+        );
       },
-        props.fixedTop ? h('div', { class: 'pw-layout-fixed pw-layout-fixed--top' }, props.fixedTop) : null,
-        h('div', { class: cx('pw-layout-body', props.bodyClassName), style: layout.bodyStyle() }, renderChildren(e)),
-        props.fixedBottom ? h('div', { class: 'pw-layout-fixed pw-layout-fixed--bottom' }, props.fixedBottom) : null);
-    },
-  }));
+    })
+  );
   return entity;
 }
 
@@ -76,6 +94,3 @@ export function createHorizontalLayout(scene, props = {}) {
 export function createGridLayout(scene, props = {}) {
   return createLayout(scene, { cols: 3, ...props, direction: 'grid' });
 }
-
-
-

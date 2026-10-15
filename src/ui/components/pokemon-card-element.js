@@ -30,12 +30,14 @@
  * @module ui/components/pokemon-card-element
  */
 
-
 // Fallback if util.js is not loaded — targeted unit tests.
 // Shared safe-HTML service (engine pwSetHtml when present, else direct).
 // globalThis-backed so concatenated VM harnesses and classic stubs stay valid.
 if (typeof globalThis !== 'undefined' && typeof globalThis._pwSetHtmlSafe !== 'function') {
-  globalThis._pwSetHtmlSafe = function (el, html) { if (typeof globalThis.pwSetHtml === 'function') globalThis.pwSetHtml(el, html); else el.innerHTML = html; };
+  globalThis._pwSetHtmlSafe = function (el, html) {
+    if (typeof globalThis.pwSetHtml === 'function') globalThis.pwSetHtml(el, html);
+    else el.innerHTML = html;
+  };
 }
 
 /**
@@ -49,29 +51,36 @@ function _hpDisp(v) {
 }
 
 function resolveLegacyCardHtml(poke, options) {
-  const gen = (typeof globalThis !== 'undefined' && typeof globalThis.generatePokeCardHTML === 'function'
-    ? globalThis.generatePokeCardHTML
-    : (typeof window !== 'undefined' && typeof window.generatePokeCardHTML === 'function'
-      ? window.generatePokeCardHTML : null));
+  const gen =
+    typeof globalThis !== 'undefined' && typeof globalThis.generatePokeCardHTML === 'function'
+      ? globalThis.generatePokeCardHTML
+      : typeof window !== 'undefined' && typeof window.generatePokeCardHTML === 'function'
+        ? window.generatePokeCardHTML
+        : null;
   if (!gen) return null;
   try {
-    return gen(poke, (options && options.index != null ? options.index : 0), {
-      isActive: !!options.isActive,
-      isEnemy: !!options.isEnemy,
-      isFainted: !!(options.isFainted || (poke && poke.currentHP !== undefined && poke.currentHP <= 0)),
-      showMoves: options.showMoves !== undefined ? !!options.showMoves : true,
-      showXP: !!options.showXP,
-      showStatus: !!options.showStatus,
-      movesAsBars: !!options.movesAsBars,
-      movesDraggable: !!options.movesDraggable,
-      itemReadonly: !!options.itemReadonly,
-      noSpriteHandlers: !!options.noSpriteHandlers,
-      spriteTitle: options.spriteTitle || null,
-      moveInfoContextless: !!options.moveInfoContextless,
-      onLeftClickSprite: options.onLeftClickSprite || null,
-      onRightClickSprite: options.onRightClickSprite || null,
-      onLeftClickItem: options.onLeftClickItem || null,
-    }) || null;
+    return (
+      gen(poke, options && options.index != null ? options.index : 0, {
+        isActive: !!options.isActive,
+        isEnemy: !!options.isEnemy,
+        isFainted: !!(
+          options.isFainted ||
+          (poke && poke.currentHP !== undefined && poke.currentHP <= 0)
+        ),
+        showMoves: options.showMoves !== undefined ? !!options.showMoves : true,
+        showXP: !!options.showXP,
+        showStatus: !!options.showStatus,
+        movesAsBars: !!options.movesAsBars,
+        movesDraggable: !!options.movesDraggable,
+        itemReadonly: !!options.itemReadonly,
+        noSpriteHandlers: !!options.noSpriteHandlers,
+        spriteTitle: options.spriteTitle || null,
+        moveInfoContextless: !!options.moveInfoContextless,
+        onLeftClickSprite: options.onLeftClickSprite || null,
+        onRightClickSprite: options.onRightClickSprite || null,
+        onLeftClickItem: options.onLeftClickItem || null,
+      }) || null
+    );
   } catch (_) {
     return null;
   }
@@ -80,10 +89,21 @@ function resolveLegacyCardHtml(poke, options) {
 function resolveSpriteUrl(poke, options) {
   const num = (poke && poke.id) || 1;
   const isShiny = !!(options.shiny || (poke && (poke.shinyActive || poke.shiny)));
-  const gen = (typeof globalThis !== 'undefined' && typeof globalThis.getPokemonSpriteUrl === 'function' && globalThis.getPokemonSpriteUrl)
-    || (typeof window !== 'undefined' && typeof window.getPokemonSpriteUrl === 'function' && window.getPokemonSpriteUrl)
-    || null;
-  if (gen) { try { return gen(num, isShiny); } catch (_) { /* fallthrough */ } }
+  const gen =
+    (typeof globalThis !== 'undefined' &&
+      typeof globalThis.getPokemonSpriteUrl === 'function' &&
+      globalThis.getPokemonSpriteUrl) ||
+    (typeof window !== 'undefined' &&
+      typeof window.getPokemonSpriteUrl === 'function' &&
+      window.getPokemonSpriteUrl) ||
+    null;
+  if (gen) {
+    try {
+      return gen(num, isShiny);
+    } catch (_) {
+      /* fallthrough */
+    }
+  }
   return `src/assets/images/pokemon/${isShiny ? 'frontShiny' : 'front'}/${num}.png`;
 }
 
@@ -139,12 +159,15 @@ function renderStandaloneCard(template) {
     // PASSE 38f — la barre utilise les PV AFFICHÉS (mêmes entiers que le
     // texte) : à « full hp » la barre est pleine, plus d'oscillation flottante.
     const _dm = _hpDisp(poke.maxHP);
-    const pct = _dm > 0 ? Math.max(0, Math.min(100, Math.floor((_hpDisp(poke.currentHP) / _dm) * 100))) : 0;
-    globalThis._pwSetHtmlSafe(hpBox, // Wave 13: inline width (self-contained bar), data-pct contract kept.
+    const pct =
+      _dm > 0 ? Math.max(0, Math.min(100, Math.floor((_hpDisp(poke.currentHP) / _dm) * 100))) : 0;
+    globalThis._pwSetHtmlSafe(
+      hpBox, // Wave 13: inline width (self-contained bar), data-pct contract kept.
       `<div class="hp-bar"><div class="hp-fill ${pct > 50 ? 'high' : pct > 20 ? 'medium' : 'low'}" data-pct="${pct}" style="width:${pct}%"></div></div>` +
-      // PASSE 26o — PV flottants côté moteur : arrondi à l'affichage (jamais de
-      // « 6.899999999999999 »), plancher à 1 tant que le Pokémon est debout.
-      `<div class="hp-text">${_hpDisp(poke.currentHP)}/${_hpDisp(poke.maxHP)} PV</div>`);
+        // PASSE 26o — PV flottants côté moteur : arrondi à l'affichage (jamais de
+        // « 6.899999999999999 »), plancher à 1 tant que le Pokémon est debout.
+        `<div class="hp-text">${_hpDisp(poke.currentHP)}/${_hpDisp(poke.maxHP)} PV</div>`
+    );
     info.appendChild(hpBox);
   }
   el.appendChild(info);
@@ -206,6 +229,3 @@ export class PokemonCardTemplate {
     return el.outerHTML;
   }
 }
-
-
-

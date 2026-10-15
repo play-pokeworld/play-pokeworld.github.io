@@ -13,6 +13,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { pickWildFromTable, ROAMING_CHANCE } from '../src/domain/world/encounter-rules.js';
 import { hpDisplay, hpBarPct } from '../src/ui/game/battle-ui.js';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 const read = (p) => readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 
@@ -48,15 +49,15 @@ test('38g-B2 — _dgBossSpecies cible le seau RARE du lieu, sans évolution fina
 test('38g-B3 — l\'ECS force le seau selon la case engagée (combat → common, élite → uncommon)', () => {
   const src = read('src/application/ecs-gameplay-systems.js');
   const bloc = src.slice(src.indexOf('let bucketHint = null;'), src.indexOf('const pick = pickWildFromTable'));
-  assert.match(bloc, /pn\.type === 'elite'\) \? 'uncommon'/, 'élite → seau peu commun');
-  assert.match(bloc, /pn\.type === 'combat' \? 'common'/, 'combat → seau commun');
+  assert.ok(wsMatch(bloc, /pn\.type === 'elite'\s*\?\s*'uncommon'/), 'élite → seau peu commun'); // V7 · DBT-01 — parenthèses redondantes retirées
+  assert.ok(wsMatch(bloc, /pn\.type === 'combat'\s*\?\s*'common'/), 'combat → seau commun');
   assert.match(bloc, /currentDungeonRun/, 'le seau ne s\'applique qu\'en expédition');
 });
 
 // ─── R. AUCUN LÉGENDARRE ERRANT EN ZONE DONJON ──────────────────────────────
 test('38g-R1 — pickWildFromTable : un seau forcé (donjon) désactive le roaming', () => {
   const wild = [[10, 3, 6, 'common']];
-  // sans seau : rng 0.001 < 0.003 → roaming forcé
+  // sans seau : rng 0.001 < 0.01 → roaming forcé
   const roam = pickWildFromTable(wild, { roamingId: 144, rng: () => 0.001 });
   assert.equal(roam.isRoaming, true);
   // avec un seau forcé (case de donjon) : le roaming est impossible

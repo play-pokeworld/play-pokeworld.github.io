@@ -39,6 +39,7 @@
  *   name,                // Pokémon display name
  *   levelLabel,          // pre-formatted ('Nv.50' / 'Lv.50')
  *   badgesHtml,          // optional raw HTML row of status badges
+ *   formBadge,           // V7 · FORM-03 — optional « Forme » tile badge (text)
  *   select: { call, callArgs, contextCall, contextArgs } | null,
  *   actions: [{ label, call, callArgs, title, className }] — only USABLE
  *            actions must be passed; unusable ones are never rendered.
@@ -70,31 +71,61 @@ export function pokeCardVNode(model = {}) {
 
   const actions = Array.isArray(model.actions) ? model.actions.filter(Boolean) : [];
 
-  return h('div', {
-    class: cx('box-card pw-poke-card', model.shiny && 'box-card--shiny', model.extraClass),
-    dataset,
-    title: model.title || '',
-  },
-    h('div', { class: cx('ab-icon box-tile', model.shiny && 'shiny-spark is-shiny') },
-      pokemonSpriteVNode({ imgSrc: model.imgSrc, emoji: model.emoji, shiny: !!model.shiny, size: model.size || 'standard' }),
+  return h(
+    'div',
+    {
+      class: cx('box-card pw-poke-card', model.shiny && 'box-card--shiny', model.extraClass),
+      dataset,
+      title: model.title || '',
+    },
+    h(
+      'div',
+      { class: cx('ab-icon box-tile', model.shiny && 'shiny-spark is-shiny') },
+      pokemonSpriteVNode({
+        imgSrc: model.imgSrc,
+        emoji: model.emoji,
+        shiny: !!model.shiny,
+        size: model.size || 'standard',
+      }),
       // Level pill UNDER the sprite — SAME styling hook as the dex number
       // chip (.box-card .box-level / .dex-entry .dex-number share a rule).
       h('div', { class: 'box-level' }, model.levelLabel || ''),
       // Shiny ★ top-right of the tile, exactly like .dex-shiny.
-      h('div', { class: cx('box-shiny', model.shiny ? 'is-visible' : 'is-hidden') }, '★')),
+      h('div', { class: cx('box-shiny', model.shiny ? 'is-visible' : 'is-hidden') }, '★'),
+      // V7 · FORM-03 — « Forme » badge top-left when the Pokémon is a form.
+      model.formBadge ? h('div', { class: 'pw-box-form-badge' }, String(model.formBadge)) : null
+    ),
     h('div', { class: 'pw-bold pw-text-sm box-name' }, model.name || '?'),
     model.badgesHtml
-      ? h('div', { class: 'box-status-badges', dataset: { action: 'stop-propagation' } }, h.raw(model.badgesHtml))
+      ? h(
+          'div',
+          { class: 'box-status-badges', dataset: { action: 'stop-propagation' } },
+          h.raw(model.badgesHtml)
+        )
       : null,
     actions.length
-      ? h('div', { class: 'box-actions', dataset: { action: 'stop-propagation' } },
-          ...actions.map((a) => h('button', {
-            type: 'button',
-            class: cx('hbtn extracted-bridge-style-013', a.className),
-            dataset: { action: 'legacy-call', call: a.call, callArgs: a.callArgs != null ? a.callArgs : '' },
-            title: a.title || '',
-          }, a.label)))
-      : null);
+      ? h(
+          'div',
+          { class: 'box-actions', dataset: { action: 'stop-propagation' } },
+          ...actions.map((a) =>
+            h(
+              'button',
+              {
+                type: 'button',
+                class: cx('hbtn extracted-bridge-style-013', a.className),
+                dataset: {
+                  action: 'legacy-call',
+                  call: a.call,
+                  callArgs: a.callArgs != null ? a.callArgs : '',
+                },
+                title: a.title || '',
+              },
+              a.label
+            )
+          )
+        )
+      : null
+  );
 }
 
 /**
@@ -105,6 +136,3 @@ export function pokeCardVNode(model = {}) {
 export function pokeCardHTML(model = {}) {
   return toHTMLString(pokeCardVNode(model));
 }
-
-
-

@@ -34,58 +34,102 @@ import { cx } from './component-utils.js';
 
 export function staffSummaryVNode(m) {
   return [
-    h('div', { class: 'staff-summary' },
-      h('b', null, m.activeLabel || ''), ` ${m.activeCount ?? 0}/${m.max ?? 1}`),
-    h('div', { class: 'staff-summary-tip' }, ...(m.tipLines || []).map((line) => [
-      h.raw(line || ''), h('br'),
-    ]).flat(Infinity).slice(0, -1)),
+    h(
+      'div',
+      { class: 'staff-summary' },
+      h('b', null, m.activeLabel || ''),
+      ` ${m.activeCount ?? 0}/${m.max ?? 1}`
+    ),
+    h(
+      'div',
+      { class: 'staff-summary-tip' },
+      ...(m.tipLines || [])
+        .map((line) => [h.raw(line || ''), h('br')])
+        .flat(Infinity)
+        .slice(0, -1)
+    ),
   ];
 }
 
 export function staffCardVNode(c) {
   const children = [
     h('div', { class: 'staff-card-sprite' }, h.raw(c.spriteHtml || '')),
-    h('div', { class: 'staff-card-head' },
+    h(
+      'div',
+      { class: 'staff-card-head' },
       h('b', null, c.name || ''),
-      h('span', null, c.location || '')),
+      h('span', null, c.location || '')
+    ),
     h('div', { class: 'staff-card-desc' }, c.desc || ''),
   ];
   if (c.owned) {
     if (c.bonusHtml) children.push(h.raw(c.bonusHtml));
     if (c.xp) {
-      children.push(h('div', { class: 'staff-xp' },
-        h('div', { class: 'staff-xp-label' }, c.xp.label || ''),
-        h('div', { class: 'staff-xp-bar' },
-          // Wave 13: inline width (self-contained bar), data-pct contract kept.
-          h('div', {
-            dataset: { pct: String(Math.max(0, Math.min(100, Math.round(Number(c.xp.pct) || 0)))) },
-            style: { width: `${Math.max(0, Math.min(100, Math.round(Number(c.xp.pct) || 0)))}%` },
-          }))));
+      children.push(
+        h(
+          'div',
+          { class: 'staff-xp' },
+          h('div', { class: 'staff-xp-label' }, c.xp.label || ''),
+          h(
+            'div',
+            { class: 'staff-xp-bar' },
+            // Wave 13: inline width (self-contained bar), data-pct contract kept.
+            h('div', {
+              dataset: {
+                pct: String(Math.max(0, Math.min(100, Math.round(Number(c.xp.pct) || 0)))),
+              },
+              style: { width: `${Math.max(0, Math.min(100, Math.round(Number(c.xp.pct) || 0)))}%` },
+            })
+          )
+        )
+      );
     }
     if (c.levelLabel) children.push(h('div', { class: 'staff-level-pill' }, c.levelLabel));
   } else if (c.hire && c.hire.lockedLabel) {
     // Locked location: informational row, NO dead button (user rule).
     children.push(h('div', { class: 'staff-hire-locked' }, h.raw(c.hire.lockedLabel)));
   } else if (c.hire) {
-    children.push(h('button', {
-      class: 'hbtn automation-buy-btn',
-      dataset: {
-        action: 'legacy-call',
-        call: c.hire.call || '',
-        callArgs: c.hire.args == null ? '' : String(c.hire.args),
-      },
-    }, h.raw(c.hire.label || '')));
+    children.push(
+      h(
+        'button',
+        {
+          class: 'hbtn automation-buy-btn',
+          dataset: {
+            action: 'legacy-call',
+            call: c.hire.call || '',
+            callArgs: c.hire.args == null ? '' : String(c.hire.args),
+          },
+        },
+        h.raw(c.hire.label || '')
+      )
+    );
   }
-  return h('div', {
-    class: cx('staff-card', c.owned ? 'is-owned' : 'is-unowned', c.active && 'is-active'),
-    ...(c.owned ? { dataset: { action: 'legacy-call', call: c.toggleCall || '', callArgs: c.toggleArgs == null ? '' : String(c.toggleArgs) } } : {}),
-  }, ...children);
+  return h(
+    'div',
+    {
+      class: cx('staff-card', c.owned ? 'is-owned' : 'is-unowned', c.active && 'is-active'),
+      ...(c.owned
+        ? {
+            dataset: {
+              action: 'legacy-call',
+              call: c.toggleCall || '',
+              callArgs: c.toggleArgs == null ? '' : String(c.toggleArgs),
+            },
+          }
+        : {}),
+    },
+    ...children
+  );
 }
 
 export function staffListVNode(m) {
   return [
     ...staffSummaryVNode(m || {}),
-    h('div', { class: 'staff-list staff-card-grid' }, ...((m && m.cards) || []).map(staffCardVNode)),
+    h(
+      'div',
+      { class: 'staff-list staff-card-grid' },
+      ...((m && m.cards) || []).map(staffCardVNode)
+    ),
   ];
 }
 
@@ -93,6 +137,3 @@ export function staffListVNode(m) {
 export function staffListHTML(m) {
   return toHTMLString(staffListVNode(m));
 }
-
-
-

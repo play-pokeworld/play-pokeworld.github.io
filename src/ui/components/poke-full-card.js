@@ -76,13 +76,19 @@ export function pokeFullCardVNode(model = {}) {
   // .pw-poke-circle-bg (DS2807 — the single dark disc). A second bg layer
   // here stacked two translucent halos into a much lighter ring than on
   // the PC box / Pokédex screens.
-  const spriteNode = h('div', {
-    class: cx('poke-sprite-container large', model.shiny && 'shiny'),
-    dataset: sp.handlers === false ? {} : actionDataset('data', sp.click, sp.context),
-    title: sp.title || '',
-  },
-    h('div', { class: 'poke-sprite' },
-      pokemonSpriteVNode({ imgSrc: sp.imgSrc, emoji: sp.emoji, shiny: !!model.shiny, size: 'team' })));
+  const spriteNode = h(
+    'div',
+    {
+      class: cx('poke-sprite-container large', model.shiny && 'shiny'),
+      dataset: sp.handlers === false ? {} : actionDataset('data', sp.click, sp.context),
+      title: sp.title || '',
+    },
+    h(
+      'div',
+      { class: 'poke-sprite' },
+      pokemonSpriteVNode({ imgSrc: sp.imgSrc, emoji: sp.emoji, shiny: !!model.shiny, size: 'team' })
+    )
+  );
 
   let itemBadge = null;
   if (item) {
@@ -97,41 +103,83 @@ export function pokeFullCardVNode(model = {}) {
       itemDataset.contextCall = item.context.call;
       itemDataset.contextArgs = item.context.args != null ? item.context.args : '';
     }
-    itemBadge = h('div', {
-      class: cx('poke-item-badge', item.empty && 'empty'),
-      dataset: itemDataset,
-      title: item.title || '',
-    }, item.empty ? '+' : h.raw(item.spriteHtml || ''));
+    itemBadge = h(
+      'div',
+      {
+        class: cx('poke-item-badge', item.empty && 'empty'),
+        dataset: itemDataset,
+        title: item.title || '',
+      },
+      item.empty ? '+' : h.raw(item.spriteHtml || '')
+    );
   }
 
-  children.push(h('div', { class: 'poke-card-top' },
-    h('div', { class: 'pw-relative' }, spriteNode, itemBadge),
-    h('div', { class: 'poke-info' },
-      h('div', { class: 'poke-name' },
-        h('span', null,
-          model.shinyStar ? h.raw('<span class="pw-shiny-star">★</span>') : null,
-          model.name || '?'),
-        model.caughtBallHtml ? h.raw(model.caughtBallHtml) : null,
-        h('span', { class: 'poke-level' }, `Nv.${model.level != null ? model.level : '?'}`)),
-      h('div', { class: 'hp-bar-container' },
-        h('div', { class: 'hp-bar' },
-          // Wave 13: hp fill width inline (self-contained bar), data-pct
-          // kept as the legacy painter contract.
-          h('div', {
-            class: cx('hp-fill', model.hp && model.hp.cls),
-            dataset: { pct: String(model.hp ? Math.max(0, Math.min(100, Math.round(model.hp.pct || 0))) : 0) },
-            style: { width: `${model.hp ? Math.max(0, Math.min(100, Math.round(model.hp.pct || 0))) : 0}%` },
-          })),
-        h('div', { class: 'hp-text' }, `${model.hp ? hpNum(model.hp.current) : '?'}/${model.hp ? hpNum(model.hp.max) : '?'} PV`)),
-      model.xp
-        ? h('div', { class: 'xp-bar-container' },
-            h('div', { class: 'xp-bar' },
-              h('div', {
-                class: 'xp-fill',
-                dataset: { pct: String(Math.max(0, Math.min(100, Math.round(model.xp.pct || 0)))) },
-                style: { width: `${Math.max(0, Math.min(100, Math.round(model.xp.pct || 0)))}%` },
-              })))
-        : null)));
+  children.push(
+    h(
+      'div',
+      { class: 'poke-card-top' },
+      h('div', { class: 'pw-relative' }, spriteNode, itemBadge),
+      h(
+        'div',
+        { class: 'poke-info' },
+        h(
+          'div',
+          { class: 'poke-name' },
+          h(
+            'span',
+            null,
+            model.shinyStar ? h.raw('<span class="pw-shiny-star">★</span>') : null,
+            model.name || '?'
+          ),
+          model.caughtBallHtml ? h.raw(model.caughtBallHtml) : null,
+          h('span', { class: 'poke-level' }, `Nv.${model.level != null ? model.level : '?'}`)
+        ),
+        h(
+          'div',
+          { class: 'hp-bar-container' },
+          h(
+            'div',
+            { class: 'hp-bar' },
+            // Wave 13: hp fill width inline (self-contained bar), data-pct
+            // kept as the legacy painter contract.
+            h('div', {
+              class: cx('hp-fill', model.hp && model.hp.cls),
+              dataset: {
+                pct: String(
+                  model.hp ? Math.max(0, Math.min(100, Math.round(model.hp.pct || 0))) : 0
+                ),
+              },
+              style: {
+                width: `${model.hp ? Math.max(0, Math.min(100, Math.round(model.hp.pct || 0))) : 0}%`,
+              },
+            })
+          ),
+          h(
+            'div',
+            { class: 'hp-text' },
+            `${model.hp ? hpNum(model.hp.current) : '?'}/${model.hp ? hpNum(model.hp.max) : '?'} PV`
+          )
+        ),
+        model.xp
+          ? h(
+              'div',
+              { class: 'xp-bar-container' },
+              h(
+                'div',
+                { class: 'xp-bar' },
+                h('div', {
+                  class: 'xp-fill',
+                  dataset: {
+                    pct: String(Math.max(0, Math.min(100, Math.round(model.xp.pct || 0)))),
+                  },
+                  style: { width: `${Math.max(0, Math.min(100, Math.round(model.xp.pct || 0)))}%` },
+                })
+              )
+            )
+          : null
+      )
+    )
+  );
 
   // ── Status badges (game-built trusted html) ──────────────────────────
   if (model.statusBadgesHtml) {
@@ -147,22 +195,27 @@ export function pokeFullCardVNode(model = {}) {
       if (mv.drag) dataset[mv.drag.datasetKey] = mv.drag.value;
       dataset.contextCall = 'openMoveInfo';
       dataset.contextArgs = mv.contextArgs;
-      return h('div', {
-        // The row itself carries the type class: the charge fill
-        // (--charge-color on .pw-charge-move) and the left border then use
-        // the EXACT same --type-* colour token everywhere (user feedback).
-        class: cx('poke-move',
-          mv.typeCls && `type-${mv.typeCls}`,
-          isBar && 'charging pw-charge-move',
-          isBar && mv.next && 'ready',
-          !isBar && mv.drag && 'draggable-move'),
-        draggable: mv.drag ? 'true' : undefined,
-        dataset,
-        title: mv.title || '',
-      },
+      return h(
+        'div',
+        {
+          // The row itself carries the type class: the charge fill
+          // (--charge-color on .pw-charge-move) and the left border then use
+          // the EXACT same --type-* colour token everywhere (user feedback).
+          class: cx(
+            'poke-move',
+            mv.typeCls && `type-${mv.typeCls}`,
+            isBar && 'charging pw-charge-move',
+            isBar && mv.next && 'ready',
+            !isBar && mv.drag && 'draggable-move'
+          ),
+          draggable: mv.drag ? 'true' : undefined,
+          dataset,
+          title: mv.title || '',
+        },
         h('span', { class: 'move-name' }, mv.name),
         h('span', { class: `move-type type-${mv.typeCls}` }, mv.typeLabel),
-        mv.effHtml ? h.raw(mv.effHtml) : null);
+        mv.effHtml ? h.raw(mv.effHtml) : null
+      );
     });
     children.push(h('div', { class: 'poke-moves' }, ...cells));
   }
@@ -175,10 +228,19 @@ export function pokeFullCardVNode(model = {}) {
   // changement de Pokémon actif — c'est ce qui laisse tourner la Poké Ball.
   const morphKey = model.morphKey || null;
 
-  return h('div', {
-    class: cx('poke-card pw-poke-card', model.active && 'active', model.fainted && 'fainted', model.extraClass),
-    dataset: morphKey ? { pwKey: morphKey } : undefined,
-  }, ...children);
+  return h(
+    'div',
+    {
+      class: cx(
+        'poke-card pw-poke-card',
+        model.active && 'active',
+        model.fainted && 'fainted',
+        model.extraClass
+      ),
+      dataset: morphKey ? { pwKey: morphKey } : undefined,
+    },
+    ...children
+  );
 }
 
 /**
@@ -189,6 +251,3 @@ export function pokeFullCardVNode(model = {}) {
 export function pokeFullCardHTML(model = {}) {
   return toHTMLString(pokeFullCardVNode(model));
 }
-
-
-

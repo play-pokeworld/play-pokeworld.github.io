@@ -23,9 +23,11 @@ export class HatcheryWindowView extends UIView {
 
   onLoad() {
     this.windowEntity = this.spawn('ui:machine-window', []);
-    this.windowEntity.addComponent(new UIRenderComponent({
-      template: (e) => machineWindowVNode(Object.assign({ entityId: e.id }, this.model)),
-    }));
+    this.windowEntity.addComponent(
+      new UIRenderComponent({
+        template: (e) => machineWindowVNode(Object.assign({ entityId: e.id }, this.model)),
+      })
+    );
   }
 
   /**
@@ -39,6 +41,3 @@ export class HatcheryWindowView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
-
-
-

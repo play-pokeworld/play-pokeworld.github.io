@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 // ─── Wave 15 (2026-08-05): user-screenshot feedback — source contracts ───
 // Every test pins ONE fix from the feedback batch (see MIGRATION_STATUS).
@@ -48,7 +49,7 @@ test('PC box (screenshot): static TRI row gone, chips in the FilterBar, fossils 
   const box = R('src/ui/game/box-selector.js');
   assert.ok(box.includes('function setUsmSubTab'), 'module setter exported');
   assert.ok(box.indexOf("grid.classList.add('usm-modern-grid')") < box.indexOf('no_pokemon_found'), 'modern class set before the empty-state return');
-  const gh = R('src/data/game-helpers.js');
+  const gh = R('src/data/box-filters.js'); // V7 · DBT-09 — barre de filtres extraite de game-helpers.js
   assert.ok(gh.includes('usm-sort-btn usm-sort-chip'), 'sort chips rendered inside the FilterBar');
   assert.ok(gh.includes('sort: sc.sort'), 'chips carry data-sort');
   const bridge = [R('src/engine/input/action-dispatcher.js'), R('src/engine/runtime/classic-bridge.js')].join('\n');
@@ -57,8 +58,8 @@ test('PC box (screenshot): static TRI row gone, chips in the FilterBar, fossils 
 
 test('bag counters: distinct-item counts per category (shadowed-variable bug)', () => {
   const inv = R('src/ui/game/inventory.js');
-  assert.ok(inv.includes('counts[cat]=(counts[cat]||0)+1'), 'count keyed by the category id');
-  assert.ok(!inv.includes('counts[c.id]=(counts[c.id]||0)+1'), 'no shadowed c.id access left');
+  assert.ok(wsIncludes(inv, 'counts[cat]=(counts[cat]||0)+1'), 'count keyed by the category id'); // V7 · DBT-01
+  assert.ok(!wsIncludes(inv, 'counts[c.id]=(counts[c.id]||0)+1'), 'no shadowed c.id access left');
 });
 
 test('shops: THE single MoneyRow component is rendered by shop AND market', () => {
@@ -106,9 +107,13 @@ test('mobile: page scrolls, bars sticky, quests folded into adventure, shortcuts
   assert.ok(idx.includes('data-mobile-view="shortcuts"'), 'shortcuts top-level button');
   assert.ok(!idx.includes('data-mobile-view="quests"'), 'quests top button removed');
   assert.ok(!idx.includes('data-mobile-manage-view="shortcuts"'), 'shortcuts out of Gestion');
-  const bridge = [R('src/engine/input/action-dispatcher.js'), R('src/engine/runtime/classic-bridge.js')].join('\n');
-  assert.ok(bridge.includes("visible = ['win-map', 'win-tabs', 'win-story']"), 'adventure = map + lieu + quêtes');
-  assert.ok(bridge.includes("view === 'shortcuts') visible = ['win-shortcuts']"), 'shortcuts view routed');
+  // V7-R1 #9 — the window ↔ mobile-view lists now live in ONE module
+  // (engine/runtime/mobile-views.js) read by applyMobileView, scrollToWin and
+  // the tutorial highlight; Currency joined the shortcuts view.
+  const bridge = [R('src/engine/input/action-dispatcher.js'), R('src/engine/runtime/classic-bridge.js'), R('src/engine/runtime/mobile-views.js')].join('\n');
+  assert.ok(bridge.includes("adventure: ['win-map', 'win-tabs', 'win-story']"), 'adventure = map + lieu + quêtes');
+  assert.ok(bridge.includes("shortcuts: ['win-shortcuts', 'win-currency']"), 'shortcuts view routed');
+  assert.ok(bridge.includes('visible = MOBILE_VIEW_WINS[view]'), 'applyMobileView reads the single source');
   const css = R('src/assets/styles/design-system.css');
   assert.ok(css.includes('overflow-x: hidden;\n    overflow-y: auto;'), 'page scrolls vertically');
   // documented supersede (wave 31): the rule now needs !important —

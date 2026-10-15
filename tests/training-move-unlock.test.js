@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import { LearnableMovesPanelView } from '../src/ui/views/LearnableMovesPanelView.js';
 import { moveRowHTML } from '../src/ui/components/move-row.js';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 // Wave 9: the learnable-moves panel shell is rendered by the ECS
 // LearnableMovesPanelView; the marker contract lives in the view source
@@ -40,6 +41,7 @@ function makeEnv(level, unlocked) {
   };
   sandbox.globalThis = sandbox;
   sandbox.window = sandbox;
+  sandbox.pwLateLink = (n) => (typeof sandbox[n] === 'function' ? sandbox[n] : null); // V7 · DBT-04 — résolveur de lien tardif (src/core/late-link.js) pour les tranches de fonctions
   vm.createContext(sandbox);
   vm.runInContext("var _pwSetHtmlSafe = function (el, html) { if (typeof pwSetHtml === 'function') pwSetHtml(el, html); else el.innerHTML = html; };", sandbox); // repli passe 16 (slices de fonctions)
   vm.runInContext(
@@ -269,7 +271,7 @@ test('the sheet button passes the explicit source (\'team\'/\'box\')', () => {
   assert.ok(POKE_MODAL.includes(`'box','\${boxId}'`), 'argument explicite box attendu');
   assert.ok(POKE_MODAL.includes(`'team',\${idx != null ? idx : 0}`), 'argument explicite team attendu');
   // Phase 8: the button is hidden on readonly sheets (otherwise it would open team[0])
-  assert.ok(/readonly \? '' : `<button class="hbtn poke-detail-full-list-btn"/.test(POKE_MODAL), 'button hidden in readonly as expected');
+  assert.ok(wsMatch(POKE_MODAL, /readonly \? '' : `<button class="hbtn poke-detail-full-list-btn"/), 'button hidden in readonly as expected'); // V7 · DBT-01
 });
 
 test('explicit \'box\' source: resolves the box Pokémon (even with team sheet shown)', () => {
@@ -344,6 +346,7 @@ test('getSpeciesTrainingOnlyPool = pool complet − niveau − CT/CS', () => {
   };
   sandbox.globalThis = sandbox;
   sandbox.window = sandbox;
+  sandbox.pwLateLink = (n) => (typeof sandbox[n] === 'function' ? sandbox[n] : null); // V7 · DBT-04 — résolveur de lien tardif (src/core/late-link.js) pour les tranches de fonctions
   vm.createContext(sandbox);
   vm.runInContext("var _pwSetHtmlSafe = function (el, html) { if (typeof pwSetHtml === 'function') pwSetHtml(el, html); else el.innerHTML = html; };", sandbox); // repli passe 16 (slices de fonctions)
   const fns = [
@@ -369,6 +372,7 @@ test('getTrainableLockedMoves draws from the training category only', () => {
   };
   sandbox.globalThis = sandbox;
   sandbox.window = sandbox;
+  sandbox.pwLateLink = (n) => (typeof sandbox[n] === 'function' ? sandbox[n] : null); // V7 · DBT-04 — résolveur de lien tardif (src/core/late-link.js) pour les tranches de fonctions
   vm.createContext(sandbox);
   vm.runInContext("var _pwSetHtmlSafe = function (el, html) { if (typeof pwSetHtml === 'function') pwSetHtml(el, html); else el.innerHTML = html; };", sandbox); // repli passe 16 (slices de fonctions)
   const m = TRAINING.match(/function getTrainableLockedMoves\(p\)\s*\{[\s\S]*?\n\}/);

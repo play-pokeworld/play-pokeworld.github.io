@@ -42,24 +42,62 @@ export class PuzzleListView extends UIView {
     const m = this.model;
     const nodes = [h('div', { class: 'pw-puzzle-list-hint' }, m.hint || '')];
     for (const c of m.cards || []) {
-      nodes.push(h('div', { class: 'pw-puzzle-card' },
-        h('div', { class: 'pw-puzzle-card-row' },
-          h('div', null,
-            h('div', { class: 'pw-puzzle-card-title' },
-              (c.icon || '✦') + ' ', c.name || '',
-              c.done ? h('span', { class: 'pw-green' }, ' ✓') : null),
-            h('div', { class: 'pw-puzzle-card-sum' }, c.summary || ''),
-            h('div', { class: `pw-text-sm pw-puzzle-status is-${c.statusKind || 'open'}` }, c.statusText || '')),
-          c.action
-            ? h('button', {
-                class: 'hbtn',
-                dataset: { action: 'legacy-call', call: 'openPuzzleExploration', callArgs: c.action.callArgs },
-              }, c.action.label || '')
-            : h('div', { class: 'pw-puzzle-lock-line' }, c.lockText || ''))));
+      nodes.push(
+        h(
+          'div',
+          { class: 'pw-puzzle-card' },
+          h(
+            'div',
+            { class: 'pw-puzzle-card-row' },
+            h(
+              'div',
+              null,
+              h(
+                'div',
+                { class: 'pw-puzzle-card-title' },
+                (c.icon || '✦') + ' ',
+                c.name || '',
+                c.done ? h('span', { class: 'pw-green' }, ' ✓') : null
+              ),
+              h('div', { class: 'pw-puzzle-card-sum' }, c.summary || ''),
+              h(
+                'div',
+                { class: `pw-text-sm pw-puzzle-status is-${c.statusKind || 'open'}` },
+                c.statusText || ''
+              )
+            ),
+            c.action
+              ? h(
+                  'button',
+                  {
+                    class: 'hbtn',
+                    dataset: {
+                      action: 'legacy-call',
+                      call: 'openPuzzleExploration',
+                      callArgs: c.action.callArgs,
+                    },
+                  },
+                  c.action.label || ''
+                )
+              : h('div', { class: 'pw-puzzle-lock-line' }, c.lockText || '')
+          )
+        )
+      );
     }
-    nodes.push(h('div', { class: 'pw-btn-center' },
-      h('button', { class: 'hbtn', dataset: { action: 'legacy-call', call: 'closeFullscreenPanel', callArgs: '' } },
-        m.closeLabel || '')));
+    nodes.push(
+      h(
+        'div',
+        { class: 'pw-btn-center' },
+        h(
+          'button',
+          {
+            class: 'hbtn',
+            dataset: { action: 'legacy-call', call: 'closeFullscreenPanel', callArgs: '' },
+          },
+          m.closeLabel || ''
+        )
+      )
+    );
     return nodes;
   }
 
@@ -92,48 +130,105 @@ export class PuzzleExplorationView extends UIView {
     }
     body.push(h('div', { class: 'pw-puzzle-summary' }, m.summary || ''));
     if (m.clue) {
-      body.push(h('div', { class: 'pw-puzzle-inscribe' },
-        h('div', { class: 'pw-puzzle-inscribe-label' }, m.clueLabel || ''),
-        m.clue));
+      body.push(
+        h(
+          'div',
+          { class: 'pw-puzzle-inscribe' },
+          h('div', { class: 'pw-puzzle-inscribe-label' }, m.clueLabel || ''),
+          m.clue
+        )
+      );
     }
 
     if (m.kind === 'sequence') {
       body.push(h('div', { id: 'puzzle-seq-progress', class: 'pw-puzzle-progress' }));
-      body.push(h('div', { class: 'pw-puzzle-seq-btns' },
-        ...(m.seqOptions || []).map((o) =>
-          h('button', { type: 'button', class: 'hbtn puzzle-seq-btn', dataset: { seqKey: o.key } }, o.label || ''))));
+      body.push(
+        h(
+          'div',
+          { class: 'pw-puzzle-seq-btns' },
+          ...(m.seqOptions || []).map((o) =>
+            h(
+              'button',
+              { type: 'button', class: 'hbtn puzzle-seq-btn', dataset: { seqKey: o.key } },
+              o.label || ''
+            )
+          )
+        )
+      );
       body.push(h('input', { id: 'puzzle-answer-input', type: 'hidden', value: '' }));
     } else if (m.kind === 'wait') {
       body.push(h('div', { class: 'pw-text-sm pw-light1 pw-puzzle-side-note' }, m.waitHint || ''));
-      body.push(h('label', { class: 'pw-text-sm', for: 'puzzle-answer-input' }, m.inputLabel || ''));
-      body.push(h('input', {
-        id: 'puzzle-answer-input', class: 'pw-puzzle-input', type: 'text',
-        maxlength: '48', autocomplete: 'off', spellcheck: 'false', placeholder: '…',
-      }));
+      body.push(
+        h('label', { class: 'pw-text-sm', for: 'puzzle-answer-input' }, m.inputLabel || '')
+      );
+      body.push(
+        h('input', {
+          id: 'puzzle-answer-input',
+          class: 'pw-puzzle-input',
+          type: 'text',
+          maxlength: '48',
+          autocomplete: 'off',
+          spellcheck: 'false',
+          placeholder: '…',
+        })
+      );
     } else if (m.kind === 'party') {
       body.push(h('div', { class: 'pw-text-sm pw-light1 pw-puzzle-side-note' }, m.partyHint || ''));
       body.push(h('input', { id: 'puzzle-answer-input', type: 'hidden', value: 'PARTY' }));
     } else {
       if (m.brailleText) body.push(h('div', { class: 'pw-puzzle-braille' }, m.brailleText));
-      body.push(h('label', { class: 'pw-text-sm', for: 'puzzle-answer-input' }, m.inputLabel || ''));
-      body.push(h('input', {
-        id: 'puzzle-answer-input', class: 'pw-puzzle-input', type: 'text',
-        maxlength: '48', autocomplete: 'off', spellcheck: 'false', placeholder: '…',
-      }));
+      body.push(
+        h('label', { class: 'pw-text-sm', for: 'puzzle-answer-input' }, m.inputLabel || '')
+      );
+      body.push(
+        h('input', {
+          id: 'puzzle-answer-input',
+          class: 'pw-puzzle-input',
+          type: 'text',
+          maxlength: '48',
+          autocomplete: 'off',
+          spellcheck: 'false',
+          placeholder: '…',
+        })
+      );
     }
 
-    return [h('div', { class: 'pw-puzzle-shell' },
-      panelHeaderVNode({
-        icon: m.icon || '✦',
-        title: m.title || '',
-        close: { call: 'closePuzzleExploration', glyph: '✕' },
-      }),
-      h('div', { class: 'pw-puzzle-body' }, body),
-      h('div', { class: 'pw-puzzle-actions' },
-        h('button', { class: 'hbtn pw-btn-cancel', dataset: { action: 'legacy-call', call: 'closePuzzleExploration', callArgs: '' } },
-          m.cancelLabel || ''),
-        h('button', { class: 'hbtn', dataset: { action: 'legacy-call', call: 'submitPuzzleAnswer', callArgs: m.confirmCallArgs || '' } },
-          m.confirmLabel || '')))];
+    return [
+      h(
+        'div',
+        { class: 'pw-puzzle-shell' },
+        panelHeaderVNode({
+          icon: m.icon || '✦',
+          title: m.title || '',
+          close: { call: 'closePuzzleExploration', glyph: '✕' },
+        }),
+        h('div', { class: 'pw-puzzle-body' }, body),
+        h(
+          'div',
+          { class: 'pw-puzzle-actions' },
+          h(
+            'button',
+            {
+              class: 'hbtn pw-btn-cancel',
+              dataset: { action: 'legacy-call', call: 'closePuzzleExploration', callArgs: '' },
+            },
+            m.cancelLabel || ''
+          ),
+          h(
+            'button',
+            {
+              class: 'hbtn',
+              dataset: {
+                action: 'legacy-call',
+                call: 'submitPuzzleAnswer',
+                callArgs: m.confirmCallArgs || '',
+              },
+            },
+            m.confirmLabel || ''
+          )
+        )
+      ),
+    ];
   }
 
   onLoad() {
@@ -164,17 +259,27 @@ export class SpecialFormsView extends UIView {
       return nodes;
     }
     for (const r of m.rows || []) {
-      nodes.push(h('div', {
-        class: `shop-item pw-manage-card pw-ui-panel${r.owned ? ' pw-owned' : ''}`,
-        dataset: r.owned ? {} : { action: 'legacy-call', call: 'buySpecialFormPokemon', callArgs: r.callArgs },
-      },
-        h('div', { class: 'pw-manage-sprite' }, h.raw(r.spriteHtml || '')),
-        h('div', { class: 'pw-flex-1' },
-          h('div', { class: 'pw-manage-name' }, r.nameLabel || ''),
-          r.owned
-            ? h('div', { class: 'pw-text-sm pw-green' }, r.ownedText || '')
-            : h('div', { class: 'pw-manage-desc pw-text-sm' }, h.raw(r.descText || ''))),
-        h('div', { class: 'pw-manage-level' }, r.sideText || '')));
+      nodes.push(
+        h(
+          'div',
+          {
+            class: `shop-item pw-manage-card pw-ui-panel${r.owned ? ' pw-owned' : ''}`,
+            dataset: r.owned
+              ? {}
+              : { action: 'legacy-call', call: 'buySpecialFormPokemon', callArgs: r.callArgs },
+          },
+          h('div', { class: 'pw-manage-sprite' }, h.raw(r.spriteHtml || '')),
+          h(
+            'div',
+            { class: 'pw-flex-1' },
+            h('div', { class: 'pw-manage-name' }, r.nameLabel || ''),
+            r.owned
+              ? h('div', { class: 'pw-text-sm pw-green' }, r.ownedText || '')
+              : h('div', { class: 'pw-manage-desc pw-text-sm' }, h.raw(r.descText || ''))
+          ),
+          h('div', { class: 'pw-manage-level' }, r.sideText || '')
+        )
+      );
     }
     return nodes;
   }
@@ -191,6 +296,3 @@ export class SpecialFormsView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
-
-
-

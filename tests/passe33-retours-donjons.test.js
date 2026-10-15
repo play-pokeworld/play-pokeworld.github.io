@@ -16,6 +16,7 @@
 import test from 'node:test';
 import assert from 'node:assert';
 import { readFileSync } from 'node:fs';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 const read = (p) => readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 
@@ -33,7 +34,7 @@ test('33.7 — le quota du palier arrête la chaîne de combats', () => {
   // n'arrêtait rien et le farm redevenait infini.
   const i = status.indexOf('PASSE 33');
   assert.ok(i > -1, 'le garde-fou de chaîne doit être présent');
-  const block = status.slice(i, i + 2400);
+  const block = status.slice(i, i + 6000); // V7 · DBT-01 — bloc plus long une fois formaté
   assert.match(block, /dungeonFloorCleared\(\)/, 'le palier purgé doit être testé');
   assert.match(block, /currentDungeonRun\(\)/, 'le garde-fou ne vaut qu\'en expédition');
   // L'arrêt doit précéder la relance : sinon il ne sert à rien.
@@ -44,12 +45,12 @@ test('33.7 — le quota du palier arrête la chaîne de combats', () => {
   const idxSpawn = code.indexOf('spawnNextWild()');
   assert.ok(idxStop > -1 && idxSpawn > -1 && idxStop < idxSpawn,
     'l\'arrêt doit être décidé avant la relance');
-  assert.match(code, /if\(_dgStop && battle\.active\)\{\s*\n?\s*endBattle\(\)/,
-    'le combat doit réellement se terminer');
+  assert.ok(wsMatch(code, /if\(_dgStop && battle\.active\)\{\s*\n?\s*endBattle\(\)/),
+    'le combat doit réellement se terminer'); // V7 · DBT-01
 });
 
 test('33.7 — le garde-fou épargne arènes et entraînement', () => {
-  const block = status.slice(status.indexOf('PASSE 33'), status.indexOf('PASSE 33') + 2400);
+  const block = status.slice(status.indexOf('PASSE 33'), status.indexOf('PASSE 33') + 6000); // V7 · DBT-01
   assert.match(block, /!battle\.isChamp/, 'les arènes ne sont pas des donjons');
   assert.match(block, /!battle\.isTraining/, 'l\'entraînement non plus');
 });

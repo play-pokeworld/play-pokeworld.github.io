@@ -46,7 +46,14 @@ import { UIRenderComponent } from '../../engine/components/UIRenderComponent.js'
 import { h, toHTMLString } from '../../engine/render/vdom.js';
 import { cx } from '../components/component-utils.js';
 import { moveRowVNode } from '../components/move-row.js';
-import { statRowVNode, rankPanelVNode, talentBlockVNode, evoMethodsVNode, shinyToggleVNode, protectionBarVNode } from '../components/poke-detail.js';
+import {
+  statRowVNode,
+  rankPanelVNode,
+  talentBlockVNode,
+  evoMethodsVNode,
+  shinyToggleVNode,
+  protectionBarVNode,
+} from '../components/poke-detail.js';
 import { panelHeaderVNode } from '../components/panel-header.js';
 
 export class PokeDetailView extends UIView {
@@ -66,80 +73,144 @@ export class PokeDetailView extends UIView {
     const hero = m.hero || {};
     const stats = m.stats || { tabs: [], panels: [] };
     const moves = m.moves || {};
-    return h('div', { class: 'pw-poke-detail-root' },
+    return h(
+      'div',
+      { class: 'pw-poke-detail-root' },
       // ── Title bar ─────────────────────────────────────────────────
       panelHeaderVNode({
         class: 'poke-detail-title',
         titleHtml: m.titleHtml || '',
         close: {
-          action: 'close-poke-modal', glyph: '✕',
+          action: 'close-poke-modal',
+          glyph: '✕',
           dataset: { resetMoveEditor: 'true', resetBoxMove: 'true' },
         },
       }),
       // ── Hero + stats ──────────────────────────────────────────────
-      h('div', { class: 'poke-detail-shell' },
-        h('section', { class: 'poke-detail-hero' },
+      h(
+        'div',
+        { class: 'poke-detail-shell' },
+        h(
+          'section',
+          { class: 'poke-detail-hero' },
           h('div', { class: 'poke-detail-name-row' }, h('div', null, h.raw(hero.nameHtml || ''))),
-          h('div', { class: cx(hero.spriteClass || 'poke-detail-sprite-card') }, h.raw(hero.spriteHtml || '')),
+          h(
+            'div',
+            { class: cx(hero.spriteClass || 'poke-detail-sprite-card') },
+            h.raw(hero.spriteHtml || '')
+          ),
           h('div', { class: 'poke-detail-types' }, h.raw(hero.typesHtml || '')),
-          hero.shinyToggle ? shinyToggleVNode(hero.shinyToggle) : (hero.shinyToggleHtml ? h.raw(hero.shinyToggleHtml) : null),
-          hero.protections ? protectionBarVNode(hero.protections) : (hero.protectionHtml ? h.raw(hero.protectionHtml) : null)),
-        h('aside', { class: 'poke-detail-side' },
-          h('div', { class: 'poke-detail-stat-tabs' },
-            ...(stats.tabs || []).map((tab) => h('button', {
-              type: 'button',
-              class: cx('poke-detail-stat-tab', tab.active && 'active'),
-              dataset: {
-                statTab: tab.id,
-                action: 'legacy-call',
-                call: 'switchPokemonStatTab',
-                callArgs: `'${tab.id}'`,
+          hero.shinyToggle
+            ? shinyToggleVNode(hero.shinyToggle)
+            : hero.shinyToggleHtml
+              ? h.raw(hero.shinyToggleHtml)
+              : null,
+          hero.protections
+            ? protectionBarVNode(hero.protections)
+            : hero.protectionHtml
+              ? h.raw(hero.protectionHtml)
+              : null
+        ),
+        h(
+          'aside',
+          { class: 'poke-detail-side' },
+          h(
+            'div',
+            { class: 'poke-detail-stat-tabs' },
+            ...(stats.tabs || []).map((tab) =>
+              h(
+                'button',
+                {
+                  type: 'button',
+                  class: cx('poke-detail-stat-tab', tab.active && 'active'),
+                  dataset: {
+                    statTab: tab.id,
+                    action: 'legacy-call',
+                    call: 'switchPokemonStatTab',
+                    callArgs: `'${tab.id}'`,
+                  },
+                },
+                tab.label
+              )
+            )
+          ),
+          ...(stats.panels || []).map((panel) =>
+            h(
+              'div',
+              {
+                class: cx('poke-detail-stat-panel', panel.active && 'active'),
+                dataset: { statPanel: panel.id },
               },
-            }, tab.label))),
-          ...(stats.panels || []).map((panel) => h('div', {
-            class: cx('poke-detail-stat-panel', panel.active && 'active'),
-            dataset: { statPanel: panel.id },
-          },
-            panel.rows
-              ? panel.rows.map(statRowVNode)
-              : h.raw(panel.rowsHtml || ''))))),
+              panel.rows ? panel.rows.map(statRowVNode) : h.raw(panel.rowsHtml || '')
+            )
+          )
+        )
+      ),
       // ── Section grid (talents / rank / evolutions) ───────────────
-      h('div', { class: 'poke-detail-section-grid' },
-        ...(m.sections || []).map((sec) => h('section', {
-          class: cx('poke-detail-panel', sec.wide && 'poke-detail-panel-wide'),
-        },
-          h('h3', null, sec.title || ''),
-          this.sectionContent(sec)))),
+      h(
+        'div',
+        { class: 'poke-detail-section-grid' },
+        ...(m.sections || []).map((sec) =>
+          h(
+            'section',
+            {
+              class: cx('poke-detail-panel', sec.wide && 'poke-detail-panel-wide'),
+            },
+            h('h3', null, sec.title || ''),
+            this.sectionContent(sec)
+          )
+        )
+      ),
       // ── Moves block ───────────────────────────────────────────────
-      h('section', { class: 'poke-detail-moves-block' },
-        h('div', { class: 'poke-detail-moves-title' },
+      h(
+        'section',
+        { class: 'poke-detail-moves-block' },
+        h(
+          'div',
+          { class: 'poke-detail-moves-title' },
           h('span', null, moves.titleLabel || ''),
-          moves.cancelHtml ? h.raw(moves.cancelHtml) : null),
-        h('div', { class: 'poke-detail-moves-list current' },
+          moves.cancelHtml ? h.raw(moves.cancelHtml) : null
+        ),
+        h(
+          'div',
+          { class: 'poke-detail-moves-list current' },
           moves.knownRows
-            ? (moves.knownRows.length
-                ? moves.knownRows.map(moveRowVNode)
-                : h('div', { class: 'poke-detail-empty' }, moves.knownEmptyLabel || ''))
-            : h.raw(moves.knownHtml || '')),
+            ? moves.knownRows.length
+              ? moves.knownRows.map(moveRowVNode)
+              : h('div', { class: 'poke-detail-empty' }, moves.knownEmptyLabel || '')
+            : h.raw(moves.knownHtml || '')
+        ),
         moves.learn
-          ? h('div', { class: 'poke-detail-learn-title' }, moves.learn.titleLabel || '', moves.learn.hintHtml ? h.raw(' ' + moves.learn.hintHtml) : null)
+          ? h(
+              'div',
+              { class: 'poke-detail-learn-title' },
+              moves.learn.titleLabel || '',
+              moves.learn.hintHtml ? h.raw(' ' + moves.learn.hintHtml) : null
+            )
           : null,
         moves.learn
-          ? h('div', { class: 'poke-detail-moves-list learn' },
+          ? h(
+              'div',
+              { class: 'poke-detail-moves-list learn' },
               moves.learn.rows
-                ? (moves.learn.rows.length
-                    ? moves.learn.rows.map(moveRowVNode)
-                    : h('div', { class: 'poke-detail-empty' }, moves.learn.emptyLabel || ''))
-                : h.raw(moves.learn.rowsHtml || ''))
+                ? moves.learn.rows.length
+                  ? moves.learn.rows.map(moveRowVNode)
+                  : h('div', { class: 'poke-detail-empty' }, moves.learn.emptyLabel || '')
+                : h.raw(moves.learn.rowsHtml || '')
+            )
           : null,
-        moves.fullListBtnHtml ? h.raw(moves.fullListBtnHtml) : null));
+        moves.fullListBtnHtml ? h.raw(moves.fullListBtnHtml) : null
+      )
+    );
   }
 
   onLoad() {
     this.windowEntity = this.spawn('ui:poke-detail', []);
-    this.windowEntity.addComponent(new UIRenderComponent({
-      template: () => this.windowVNode(),
-    }));
+    this.windowEntity.addComponent(
+      new UIRenderComponent({
+        template: () => this.windowVNode(),
+      })
+    );
   }
 
   /**
@@ -153,6 +224,3 @@ export class PokeDetailView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
-
-
-

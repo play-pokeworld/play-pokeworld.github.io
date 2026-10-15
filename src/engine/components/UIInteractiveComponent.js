@@ -13,7 +13,9 @@ import { Component } from '../core/Component.js';
 import { UIRenderComponent } from './UIRenderComponent.js';
 
 export class UIInteractiveComponent extends Component {
-  static get type() { return 'UIInteractive'; }
+  static get type() {
+    return 'UIInteractive';
+  }
 
   /**
    * @param {Object} [props]
@@ -50,16 +52,19 @@ export class UIInteractiveComponent extends Component {
   }
 
   /** Enable interaction (makes the control visible again). */
-  enable() { this.disabled = false; this._dirtyRender(); }
+  enable() {
+    this.disabled = false;
+    this._dirtyRender();
+  }
 
   /** Disable interaction (hides the control when hideWhenDisabled). */
-  disable() { this.disabled = true; this._dirtyRender(); }
+  disable() {
+    this.disabled = true;
+    this._dirtyRender();
+  }
 
   _dirtyRender() {
     const render = this.entity ? this.entity.get(UIRenderComponent) : undefined;
     if (render) render.markDirty();
   }
 }
-
-
-

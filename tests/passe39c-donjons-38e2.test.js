@@ -12,6 +12,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 const read = (p) => readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 
@@ -99,7 +100,7 @@ test('38e-H1 — startBattle ne SOIGNE PAS l\'équipe pendant un donjon', async 
   const bloc = init.slice(init.indexOf('let _dgRunNow = null;'), init.indexOf('battle.active=true;'));
   assert.match(bloc, /currentDungeonRun/, 'le soin est conditionné à l\'absence d\'expédition');
   assert.match(bloc, /if \(!\(_dgRunNow && _dgRunNow\.active\)\)/, 'pas de soin quand un donjon est actif');
-  assert.match(bloc, /mp\.currentHP=mp\.maxHP;/, 'le soin complet reste hors donjon');
+  assert.ok(wsMatch(bloc, /mp\.currentHP=mp\.maxHP;/), 'le soin complet reste hors donjon'); // V7 · DBT-01
 });
 
 test('38e-H2 — endBattle ne soigne pas (naturalcure / régénérateur) pendant un donjon', () => {

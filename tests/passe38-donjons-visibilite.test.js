@@ -136,7 +136,7 @@ test('38-D9 — combat = pokéball de la barre de titre, élite étoilée, boss,
     assert.ok(existsSync(new URL('../src/assets/images/dungeon/' + f, import.meta.url)), f + ' présent');
   }
   // la case vide n'a PAS d'icône (juste le sol de caverne)
-  assert.match(js, /default: return '';\s+\/\/ case vide : pas d'icône/, 'case vide = pas d\'icône');
+  assert.match(js, /default:\s+return '';\s*\/\/ case vide : pas d'icône/, 'case vide = pas d\'icône'); // V7 · DBT-01
 });
 
 test('38-D10 — la case du joueur affiche le sprite PNJ de la carte', () => {

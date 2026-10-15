@@ -158,6 +158,7 @@ export const L_location_names_fr = {
   "seafloor_cavern": "Caverne Fond-de-Mer",
   "seafoamislands": "Îles Écume",
   "sealed_chamber": "Sanctuaire",
+  "birth_island": "Île de l'Aurore",
   "shoal_cave": "Grotte Tréfonds Mer",
   "sky_pillar": "Pilier Céleste",
   "slateport": "Poivressel",

@@ -1,0 +1,15 @@
+# V7 · DBT-01 — périmètre Prettier : le code applicatif (src/**/*.js).
+# Hors périmètre, volontairement :
+#   - src/data/          : tables de jeu (dictionnaires de données, ~45 fichiers, >40 000 lignes) ;
+#   - src/localization/  : dictionnaires FR/EN (une clé par ligne, format « "clé":"texte" »
+#                          sur lequel s'appuient les tests de parité i18n) ;
+#   - src/version.js     : généré par tools/gen-version.mjs (déjà au format Prettier).
+# Reformater ces tables n'apporte rien à la lisibilité et casserait ~60 tests
+# de contrat (regex sur le format des dictionnaires) sans aucun gain.
+src/data/
+src/localization/
+node_modules/
+dist/
+build/
+docs/
+*.min.js

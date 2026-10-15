@@ -130,9 +130,17 @@ function updateI18nLabels() {
 // in a sparse override so dex loops are not disturbed.
 const POKE_NAMES_EXTRA_EN = { 345: 'Lileep', 347: 'Anorith' };
 const POKE_NAMES_EXTRA_FR = { 345: 'Lilia', 347: 'Anorith' };
-function getPokeName(id){
- const nid = Number(id);
+function getPokeName(id, form){
+ // V7 · FORM-01 — "351-1", (351, 1) ou un Pokémon {id, form} → nom de la forme (FORMS), sinon la base.
+ if(id && typeof id === 'object'){ if(form == null) form = id.form; id = id.id; }
+ const want = (typeof parseSpeciesKey === 'function') ? parseSpeciesKey(id) : { id: Number(id), form: 0 };
+ const f = (form != null) ? (Number(form) || 0) : want.form;
+ const nid = want.id;
  const lang = currentLang();
+ if(f > 0 && typeof getFormDef === 'function'){
+  const def = getFormDef(nid, f);
+  if(def) return (typeof formName === 'function') ? formName(def, lang) : (def.name_fr || def.name_en);
+ }
  if(lang === 'en') return (POKE_NAMES_EN && POKE_NAMES_EN[nid]) || POKE_NAMES_EXTRA_EN[nid] || ((PD && PD[nid]) ? PD[nid][0] : ('#'+nid));
  return (POKE_NAMES_FR && POKE_NAMES_FR[nid]) || POKE_NAMES_EXTRA_FR[nid] || ((PD && PD[nid]) ? PD[nid][0] : ('#'+nid));
 }

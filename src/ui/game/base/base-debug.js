@@ -1,3 +1,4 @@
+import { pwLateLink } from '../../../core/late-link.js';
 // Wave 41 — native ESM module. The classic surface (window/globalThis) is
 // kept: classic consumers, VM harnesses and the engine registry.
 // ============================================================================
@@ -9,14 +10,31 @@
 // Wave 43 — lazy cross-module links (P7 regression fix):
 // zero static imports (chunks + VM harness isolates frozen); each alias resolves
 // AT CALL TIME — engine registry first, then the global surface (VM harness).
-const __pwV43Link = (n) => ((typeof PokeActions !== 'undefined' && PokeActions && typeof PokeActions.get === 'function') ? PokeActions.get(n) : null)
-  || (typeof globalThis !== 'undefined' ? globalThis[n] : null) || null;
-function baseCreate(...args) { const f = __pwV43Link('baseCreate'); return f ? f(...args) : undefined; }
-function baseGetState(...args) { const f = __pwV43Link('baseGetState'); return f ? f(...args) : undefined; }
-function baseItemList(...args) { const f = __pwV43Link('baseItemList'); return f ? f(...args) : undefined; }
-function baseNpcAdd(...args) { const f = __pwV43Link('baseNpcAdd'); return f ? f(...args) : undefined; }
-function baseStockAdd(...args) { const f = __pwV43Link('baseStockAdd'); return f ? f(...args) : undefined; }
-function baseWindowInvalidate(...args) { const f = __pwV43Link('baseWindowInvalidate'); return f ? f(...args) : undefined; }
+// V7 · DBT-05 — résolveur unique (core/late-link.js) ; alias résolus à l'appel.
+function baseCreate(...args) {
+  const f = pwLateLink('baseCreate');
+  return f ? f(...args) : undefined;
+}
+function baseGetState(...args) {
+  const f = pwLateLink('baseGetState');
+  return f ? f(...args) : undefined;
+}
+function baseItemList(...args) {
+  const f = pwLateLink('baseItemList');
+  return f ? f(...args) : undefined;
+}
+function baseNpcAdd(...args) {
+  const f = pwLateLink('baseNpcAdd');
+  return f ? f(...args) : undefined;
+}
+function baseStockAdd(...args) {
+  const f = pwLateLink('baseStockAdd');
+  return f ? f(...args) : undefined;
+}
+function baseWindowInvalidate(...args) {
+  const f = pwLateLink('baseWindowInvalidate');
+  return f ? f(...args) : undefined;
+}
 
 function baseDebugGrantAll() {
   const st = baseGetState();
@@ -28,7 +46,7 @@ function baseDebugGrantAll() {
     n++;
   }
   if (typeof notify === 'function') notify(tr('base.debug.granted', { n }), 'var(--green)');
-  if (typeof __pwV43Link('baseWindowInvalidate') === 'function') baseWindowInvalidate();
+  if (typeof pwLateLink('baseWindowInvalidate') === 'function') baseWindowInvalidate();
   return n;
 }
 
@@ -56,39 +74,49 @@ function baseDebugCreate(layoutId) {
 // No live references: baseNpcAdd copies everything.
 function baseDebugAddNpc() {
   const st = baseGetState();
-  if (!st || typeof G === 'undefined' || !G || !Array.isArray(G.team) || !G.team.length) return { ok: false, reason: 'base.err.npc_team' };
-  const name = (typeof t === 'function') ? t('base.debug.npc_name') : 'Copain';
+  if (!st || typeof G === 'undefined' || !G || !Array.isArray(G.team) || !G.team.length)
+    return { ok: false, reason: 'base.err.npc_team' };
+  const name = typeof t === 'function' ? t('base.debug.npc_name') : 'Copain';
   const res = baseNpcAdd(st, {
     name,
     sprite: 'youngster',
     team: G.team.slice(0, 3).map((p) => ({
-      id: p.id, level: p.level,
+      id: p.id,
+      level: p.level,
       moves: (Array.isArray(p.moves) ? p.moves : []).map((m) => m && m.id).filter(Boolean),
-      talent: p.talent || null, shiny: !!(p.shiny || p.shinyActive),
+      talent: p.talent || null,
+      shiny: !!(p.shiny || p.shinyActive),
     })),
     msgs: { pre: '', win: '', lose: '' },
   });
   if (res.ok && typeof notify === 'function') {
     notify(tr('base.debug.npc_added', { name }), 'var(--green)');
-    if (typeof __pwV43Link('baseWindowInvalidate') === 'function') baseWindowInvalidate();
+    if (typeof pwLateLink('baseWindowInvalidate') === 'function') baseWindowInvalidate();
   }
   return res;
 }
 
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseDebugGrantAll', baseDebugGrantAll); } else if (typeof globalThis !== 'undefined') { globalThis.baseDebugGrantAll = baseDebugGrantAll; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseDebugGrantCategory', baseDebugGrantCategory); } else if (typeof globalThis !== 'undefined') { globalThis.baseDebugGrantCategory = baseDebugGrantCategory; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseDebugCreate', baseDebugCreate); } else if (typeof globalThis !== 'undefined') { globalThis.baseDebugCreate = baseDebugCreate; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseDebugAddNpc', baseDebugAddNpc); } else if (typeof globalThis !== 'undefined') { globalThis.baseDebugAddNpc = baseDebugAddNpc; }
-
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseDebugGrantAll', baseDebugGrantAll);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseDebugGrantAll = baseDebugGrantAll;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseDebugGrantCategory', baseDebugGrantCategory);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseDebugGrantCategory = baseDebugGrantCategory;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseDebugCreate', baseDebugCreate);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseDebugCreate = baseDebugCreate;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseDebugAddNpc', baseDebugAddNpc);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseDebugAddNpc = baseDebugAddNpc;
+}
 
 // Wave 41 — native ESM module: exports the same names as the
 // classic surface kept above (bodies unchanged).
-export {
-  baseDebugGrantAll,
-  baseDebugGrantCategory,
-  baseDebugCreate,
-  baseDebugAddNpc,
-};
-
-
-
+export { baseDebugGrantAll, baseDebugGrantCategory, baseDebugCreate, baseDebugAddNpc };

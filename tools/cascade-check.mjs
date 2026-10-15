@@ -6,8 +6,43 @@
  * !important first). Simplified but exact for this codebase's selectors.
  */
 import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const css = fs.readFileSync(new URL('../src/assets/styles/design-system.css', import.meta.url), 'utf8');
+
+// ── V7 · DBT-06 — budget de cascade : le nombre de `!important` et de blocs
+// `:root` ne peut que BAISSER (tools/css-budget.json, ratchet). `--budget`
+// sort en erreur dès qu'une feuille dépasse son budget.
+export function cssBudgetReport() {
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+  const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
+  const ds = read('src/assets/styles/design-system.css');
+  const st = read('src/assets/css/style.css');
+  const count = (txt, re) => (txt.match(re) || []).length;
+  return {
+    'design-system.css !important': count(ds, /!important/g),
+    'style.css !important': count(st, /!important/g),
+    'design-system.css :root (hors @media)': count(ds, /^:root\s*\{/gm),
+    'style.css :root (hors @media)': count(st, /^:root\s*\{/gm),
+  };
+}
+if (process.argv.includes('--budget')) {
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+  const budgetFile = path.join(root, 'tools', 'css-budget.json');
+  const budget = fs.existsSync(budgetFile) ? JSON.parse(fs.readFileSync(budgetFile, 'utf8')) : {};
+  const rep = cssBudgetReport();
+  let bad = 0;
+  for (const [k, v] of Object.entries(rep)) {
+    const b = budget[k];
+    const over = b !== undefined && v > b;
+    if (over) bad++;
+    console.log(`${String(v).padStart(6)}  ${k}${b !== undefined ? `  (budget ${b}${over ? ' ✗ DÉPASSÉ' : ''})` : ''}`);
+  }
+  if (bad) { console.error('✗ cascade-check --budget : le nombre de !important / :root a augmenté.'); process.exit(1); }
+  console.log('CSS budget OK');
+  process.exit(0);
+}
 
 // Strip @media blocks keep inner rules (same cascade), strip comments.
 const clean = css.replace(/\/\*[\s\S]*?\*\//g, '');
@@ -110,7 +145,8 @@ const els = {
   'training mode row (locked)': { tag: 'div', classes: ['pokechill-row', 'training-mode-row', 'training-mode--hidden', 'is-disabled'], attrs: {} },
   'auto toggle ON (training)': { tag: 'button', classes: ['hbtn', 'training-slot-auto-btn', 'is-on'], attrs: { 'data-action': 'legacy-call' } },
 };
-for (const [name, el] of Object.entries(els)) {
+const __isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (__isMain) for (const [name, el] of Object.entries(els)) {
   const w = cascade(el);
   console.log('\n▶', name);
   for (const p of ['background', 'background-color', 'color', 'border-color', 'opacity']) {

@@ -45,9 +45,20 @@ export function rollRouteDrop(dropChance = 0.15) {
 
 // ─── Wild encounter table resolution (parity with the retired classic picker) ───
 
-export const ROAMING_CHANCE = 0.003; // 0.3% per spawn when a roaming legendary is on the route
+// V7 · P1a · ROAM-01 (D3, D18): 1 % per spawn when a roaming legendary is on
+// the route (expected 100 spawns per sighting — the UI label said « 1 % »
+// while the code rolled 0.3 %), level 75 fixed. The two constants are also
+// exposed on the classic surface so the location panel reads THEM (TXT-01:
+// no hard-coded « 1% » / « Nv.45 » in the UI).
+export const ROAMING_CHANCE = 0.01;
 export const ROAMING_LEVEL = 75;
+if (typeof globalThis !== 'undefined') {
+  globalThis.ROAMING_CHANCE = ROAMING_CHANCE;
+  globalThis.ROAMING_LEVEL = ROAMING_LEVEL;
+}
 export const BUCKET_ODDS = { rare: 0.04, uncommon: 0.2 }; // remainder = common
+// V7 · TXT-01 — exposed so the location panel labels (« ~4 % ») read the rule.
+if (typeof globalThis !== 'undefined') globalThis.BUCKET_ODDS = BUCKET_ODDS;
 
 function defaultInt(minIncl, maxIncl, rng) {
   const lo = Math.min(minIncl, maxIncl);
@@ -87,10 +98,20 @@ export function pickWildFromTable(wildEntries, opts = {}) {
   const rng = typeof opts.rng === 'function' ? opts.rng : Math.random;
   const wild = Array.isArray(wildEntries) ? wildEntries : [];
   const rareBoostPct = Math.max(0, Math.min(100, Number(opts.rareBoostPct) || 0));
-  const bucketHint = (opts.bucketHint === 'rare' || opts.bucketHint === 'uncommon' || opts.bucketHint === 'common') ? opts.bucketHint : null;
+  const bucketHint =
+    opts.bucketHint === 'rare' || opts.bucketHint === 'uncommon' || opts.bucketHint === 'common'
+      ? opts.bucketHint
+      : null;
 
-  if (!bucketHint && roamingId && rng() < ROAMING_CHANCE) {
-    return { speciesId: roamingId, level: ROAMING_LEVEL, bucket: 'roaming', isRoaming: true };
+  // The roaming roll is ALWAYS drawn on a free spawn (even with no roamer on
+  // the route) so two sessions sharing one RNG stay in lockstep whether or
+  // not a roamer is present — the offline fast-forward (roamingId forced to
+  // 0, ROAM-01) must replay exactly the live chain.
+  if (!bucketHint) {
+    const roamRoll = rng();
+    if (roamingId && roamRoll < ROAMING_CHANCE) {
+      return { speciesId: roamingId, level: ROAMING_LEVEL, bucket: 'roaming', isRoaming: true };
+    }
   }
   if (!wild.length) return null;
 
@@ -98,15 +119,22 @@ export function pickWildFromTable(wildEntries, opts = {}) {
   // PASSE 38f — un seau FORCÉ (case de donjon) prime sur le tirage pondéré.
   const rareOdds = BUCKET_ODDS.rare * (1 + rareBoostPct / 100);
   const r = rng();
-  const targetBucket = bucketHint || (r < rareOdds ? 'rare' : (r < rareOdds + BUCKET_ODDS.uncommon ? 'uncommon' : 'common'));
+  const targetBucket =
+    bucketHint ||
+    (r < rareOdds ? 'rare' : r < rareOdds + BUCKET_ODDS.uncommon ? 'uncommon' : 'common');
   // Repli par PALIER (jamais de saut) : seau visé → rare → peu commun →
   // commun → toute la table. C'est ce qui garantit qu'un donjon sans rare
   // utilise ses peu communs pour le boss, et ainsi de suite.
-  const bucketOrder = ['rare', 'uncommon', 'common'].slice(['rare', 'uncommon', 'common'].indexOf(targetBucket));
+  const bucketOrder = ['rare', 'uncommon', 'common'].slice(
+    ['rare', 'uncommon', 'common'].indexOf(targetBucket)
+  );
   let bucketEntries = [];
   for (const b of bucketOrder) {
     const ent = wild.filter((w) => (w[3] || 'common') === b);
-    if (ent.length) { bucketEntries = ent; break; }
+    if (ent.length) {
+      bucketEntries = ent;
+      break;
+    }
   }
   if (!bucketEntries.length) bucketEntries = wild;
   const entry = bucketEntries[defaultInt(0, bucketEntries.length - 1, rng)];
@@ -117,6 +145,3 @@ export function pickWildFromTable(wildEntries, opts = {}) {
     isRoaming: false,
   };
 }
-
-
-

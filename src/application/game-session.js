@@ -13,7 +13,3 @@ export function resetGameSession(session) {
   session.battleState = createInitialBattleState();
   return session;
 }
-
-
-
-

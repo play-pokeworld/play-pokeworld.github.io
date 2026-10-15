@@ -6,18 +6,23 @@
 export var STORY_QUESTS_HOENN = [
   { id: 201, region: 'hoenn', type: 'trainer_battle', loc: 'route101', battleId: 'hoenn_poochyena_route101', target: 1, rewardMoney: 500, rewardItems: { pokeball: 5 } },
   { id: 202, region: 'hoenn', type: 'talk', loc: 'oldale', target: 1, rewardMoney: 400, rewardItems: { potion: 3 } },
+  { id: 278, region: 'hoenn', type: 'trainer_battle', loc: 'route103', battleId: 'hoenn_rival_route103', target: 1, rewardMoney: 300, rewardItems: { potion: 2 } }, // V7 · HOE-01
   { id: 203, region: 'hoenn', type: 'defeat_wild', loc: 'route102', target: 5, rewardMoney: 600, rewardItems: { greatball: 3 } },
   { id: 204, region: 'hoenn', type: 'defeat_wild', loc: 'petalburg_woods', target: 6, rewardMoney: 800, rewardItems: { potion: 2 } },
   { id: 205, region: 'hoenn', type: 'defeat_wild', loc: 'route104', target: 6, rewardMoney: 700, rewardItems: { superpotion: 2 } },
   { id: 206, region: 'hoenn', type: 'defeat_wild', loc: 'petalburg_woods', target: 8, rewardMoney: 900, rewardItems: { paralyzeheal: 2 } },
   { id: 207, region: 'hoenn', type: 'badge', targetBadge: 'roxanne', target: 1, rewardMoney: 1500, rewardItems: { greatball: 5 } },
   { id: 208, region: 'hoenn', type: 'defeat_wild', loc: 'rusturf_tunnel', target: 5, rewardMoney: 800, rewardItems: { superpotion: 3 } },
+  { id: 279, region: 'hoenn', type: 'trainer_battle', loc: 'rusturf_tunnel', battleId: 'hoenn_aqua_rusturf', target: 1, rewardMoney: 600, rewardItems: { greatball: 2 } }, // V7 · HOE-01
   { id: 209, region: 'hoenn', type: 'talk', loc: 'dewford', target: 1, rewardMoney: 600 },
   { id: 210, region: 'hoenn', type: 'badge', targetBadge: 'brawly', target: 1, rewardMoney: 2000, rewardItems: { sitrus_berry: 2 } },
   { id: 211, region: 'hoenn', type: 'defeat_wild', loc: 'granite_cave', target: 8, rewardMoney: 1200, rewardItems: { ultraball: 3 } },
   { id: 212, region: 'hoenn', type: 'talk', loc: 'slateport', target: 1, rewardMoney: 1000 },
+  { id: 280, region: 'hoenn', type: 'trainer_battle', loc: 'slateport', battleId: 'hoenn_aqua_museum', target: 1, rewardMoney: 900, rewardItems: { superpotion: 2 } }, // V7 · HOE-01
+  { id: 281, region: 'hoenn', type: 'trainer_battle', loc: 'route110', battleId: 'hoenn_rival_route110', target: 1, rewardMoney: 1500, rewardItems: { greatball: 3 } }, // V7 · HOE-01
   { id: 213, region: 'hoenn', type: 'defeat_wild', loc: 'route110', target: 10, rewardMoney: 1400, rewardItems: { fullrestore: 1 } },
   { id: 214, region: 'hoenn', type: 'badge', targetBadge: 'wattson', target: 1, rewardMoney: 2500, rewardItems: { magnet: 1 } },
+  { id: 282, region: 'hoenn', type: 'trainer_battle', loc: 'mauville', battleId: 'hoenn_wally_mauville', target: 1, rewardMoney: 800, rewardItems: { pokeball: 5 } }, // V7 · HOE-01
   { id: 215, region: 'hoenn', type: 'talk', loc: 'verdanturf', target: 1, rewardMoney: 800 },
   { id: 216, region: 'hoenn', type: 'defeat_wild', loc: 'route111', target: 12, rewardMoney: 1600, rewardItems: { superrepel: 3 } },
   // ─── Discovery of Secret Bases (unlocked by quest 216) ───
@@ -26,25 +31,32 @@ export var STORY_QUESTS_HOENN = [
   { id: 219, region: 'hoenn', type: 'talk', loc: 'fallarbor', target: 1, rewardMoney: 900 },
   { id: 220, region: 'hoenn', type: 'defeat_wild', loc: 'meteor_falls', target: 10, rewardMoney: 1800, rewardItems: { star_piece: 1 } },
   { id: 221, region: 'hoenn', type: 'defeat_wild', loc: 'mt_chimney', target: 12, rewardMoney: 2000, rewardItems: { firestone: 1 } },
+  { id: 283, region: 'hoenn', type: 'trainer_battle', loc: 'mt_chimney', battleId: 'hoenn_magma_chimney', target: 1, rewardMoney: 2500, rewardItems: { ultraball: 2 } }, // V7 · HOE-01 (alimente LEG-02 Groudon)
   { id: 222, region: 'hoenn', type: 'badge', targetBadge: 'flannery', target: 1, rewardMoney: 3000, rewardItems: { charcoal: 1 } },
   { id: 223, region: 'hoenn', type: 'talk', loc: 'petalburg', target: 1, rewardMoney: 1000 },
   { id: 224, region: 'hoenn', type: 'badge', targetBadge: 'norman', target: 1, rewardMoney: 3500, rewardItems: { silk_scarf: 1 } },
   { id: 225, region: 'hoenn', type: 'defeat_wild', loc: 'route118', target: 12, rewardMoney: 1800, rewardItems: { ultraball: 5 } },
   { id: 226, region: 'hoenn', type: 'defeat_wild', loc: 'route119', target: 15, rewardMoney: 2200 },
+  { id: 284, region: 'hoenn', type: 'trainer_battle', loc: 'weather_institute', battleId: 'hoenn_aqua_weather', target: 1, rewardMoney: 3000, rewardItems: { ultraball: 3 } }, // V7 · HOE-01
+  { id: 285, region: 'hoenn', type: 'trainer_battle', loc: 'route119', battleId: 'hoenn_rival_route119', target: 1, rewardMoney: 3000, rewardItems: { fullrestore: 1 } }, // V7 · HOE-01
   { id: 227, region: 'hoenn', type: 'badge', targetBadge: 'winona', target: 1, rewardMoney: 4000, rewardItems: { sharp_beak: 1 } },
   { id: 228, region: 'hoenn', type: 'defeat_wild', loc: 'route120', target: 15, rewardMoney: 2400, rewardItems: { lum_berry: 3 } },
   { id: 229, region: 'hoenn', type: 'defeat_wild', loc: 'route121', target: 15, rewardMoney: 2400, rewardItems: { max_repel: 3 } },
   { id: 230, region: 'hoenn', type: 'talk', loc: 'lilycove', target: 1, rewardMoney: 1500 },
+  { id: 286, region: 'hoenn', type: 'trainer_battle', loc: 'lilycove', battleId: 'hoenn_rival_lilycove', target: 1, rewardMoney: 4000, rewardItems: { ultraball: 3 } }, // V7 · HOE-01
   { id: 231, region: 'hoenn', type: 'defeat_wild', loc: 'mt_pyre', target: 12, rewardMoney: 2600, rewardItems: { spell_tag: 1 } },
+  { id: 287, region: 'hoenn', type: 'trainer_battle', loc: 'mt_chimney', battleId: 'hoenn_magma_hideout', target: 1, rewardMoney: 5000, rewardItems: { rarecandy: 1 } }, // V7 · HOE-01
   { id: 232, region: 'hoenn', type: 'badge', targetBadge: 'tate_liza', target: 1, rewardMoney: 4500, rewardItems: { twisted_spoon: 1 } },
   { id: 233, region: 'hoenn', type: 'defeat_wild', loc: 'shoal_cave', target: 12, rewardMoney: 2800 },
   { id: 234, region: 'hoenn', type: 'defeat_wild', loc: 'seafloor_cavern', target: 15, rewardMoney: 3000, rewardItems: { mystic_water: 1 } },
+  { id: 288, region: 'hoenn', type: 'trainer_battle', loc: 'seafloor_cavern', battleId: 'hoenn_aqua_seafloor', target: 1, rewardMoney: 6000, rewardItems: { ultraball: 5 } }, // V7 · HOE-01 (alimente LEG-02 Kyogre)
   { id: 235, region: 'hoenn', type: 'talk', loc: 'sootopolis', target: 1, rewardMoney: 2000 },
   { id: 236, region: 'hoenn', type: 'defeat_wild', loc: 'cave_of_origin', target: 15, rewardMoney: 3500 },
   { id: 237, region: 'hoenn', type: 'defeat_wild', loc: 'sky_pillar', target: 15, rewardMoney: 4000, rewardItems: { dragon_scale: 1 } },
   { id: 238, region: 'hoenn', type: 'badge', targetBadge: 'juan', target: 1, rewardMoney: 5000, rewardItems: { prism_scale: 1 } },
   { id: 239, region: 'hoenn', type: 'talk', loc: 'pacifidlog', target: 1, rewardMoney: 2500 },
   { id: 240, region: 'hoenn', type: 'defeat_wild', loc: 'victoryroad_ho', target: 20, rewardMoney: 5000, rewardItems: { fullrestore: 5 } },
+  { id: 289, region: 'hoenn', type: 'trainer_battle', loc: 'victoryroad_ho', battleId: 'hoenn_wally_victoryroad', target: 1, rewardMoney: 6000, rewardItems: { rarecandy: 2 } }, // V7 · HOE-01
   { id: 241, region: 'hoenn', type: 'badge', targetBadge: 'hoenn_elite4', target: 1, rewardMoney: 10000, rewardItems: { rarecandy: 3 } },
   { id: 242, region: 'hoenn', type: 'talk', loc: 'littleroot', target: 1, rewardMoney: 5000, rewardItems: { heart_scale: 3 } },
   { id: 243, region: 'hoenn', type: 'talk', loc: 'battle_frontier', target: 1, rewardMoney: 3000 },

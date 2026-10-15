@@ -17,19 +17,25 @@
 import { h, toHTMLString } from '../../engine/render/vdom.js';
 
 export function trainerCardVNode(m) {
-  return h('div', { class: `trainer-visual-card role-${String(m.role || 'trainer').toLowerCase()}` },
+  return h(
+    'div',
+    { class: `trainer-visual-card role-${String(m.role || 'trainer').toLowerCase()}` },
     h('div', { class: 'trainer-sprite-placeholder' }, h.raw(m.spriteHtml || '')),
-    h('div', null,
+    h(
+      'div',
+      null,
       h('b', null, m.name || ''),
       h('span', null, m.roleLabel || ''),
-      h('div', { class: 'trainer-style-row' },
-        ...(m.styleLabels || []).slice(0, 4).map((label) => h('em', null, label)))));
+      h(
+        'div',
+        { class: 'trainer-style-row' },
+        ...(m.styleLabels || []).slice(0, 4).map((label) => h('em', null, label))
+      )
+    )
+  );
 }
 
 /** String serialization for the classic adapter (battle-team-ui.js). */
 export function trainerCardHTML(m) {
   return toHTMLString(trainerCardVNode(m));
 }
-
-
-

@@ -43,9 +43,11 @@ function daytimePhaseForHour(hour) {
  */
 function currentDaytimePhase() {
   try {
-    const forced = (typeof G !== 'undefined' && G) ? G.debugDaytime : null;
+    const forced = typeof G !== 'undefined' && G ? G.debugDaytime : null;
     if (forced && PW_DAYTIME_PHASES.includes(forced)) return forced;
-  } catch (_) { /* G absent (tests unitaires) : on suit l'horloge */ }
+  } catch (_) {
+    /* G absent (tests unitaires) : on suit l'horloge */
+  }
   return daytimePhaseForHour(new Date().getHours());
 }
 
@@ -73,13 +75,17 @@ function debugCycleDaytime() {
   if (typeof G === 'undefined' || !G) return 'auto';
   const cur = G.debugDaytime || null;
   const idx = cur ? PW_DAYTIME_PHASES.indexOf(cur) : -1;
-  const next = (idx < 0) ? PW_DAYTIME_PHASES[0]
-    : (idx >= PW_DAYTIME_PHASES.length - 1) ? null
-      : PW_DAYTIME_PHASES[idx + 1];
+  const next =
+    idx < 0
+      ? PW_DAYTIME_PHASES[0]
+      : idx >= PW_DAYTIME_PHASES.length - 1
+        ? null
+        : PW_DAYTIME_PHASES[idx + 1];
   G.debugDaytime = next;
   applyDaytime();
   const label = next || 'auto';
-  const el = (typeof document !== 'undefined') ? document.getElementById('debug-daytime-state') : null;
+  const el =
+    typeof document !== 'undefined' ? document.getElementById('debug-daytime-state') : null;
   if (el) el.textContent = label.toUpperCase();
   return label;
 }
@@ -104,12 +110,15 @@ if (typeof globalThis !== 'undefined') {
 }
 
 if (typeof document !== 'undefined') {
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', startDaytimeWatch, { once: true });
+  if (document.readyState === 'loading')
+    document.addEventListener('DOMContentLoaded', startDaytimeWatch, { once: true });
   else startDaytimeWatch();
 }
 
 if (typeof PokeActions !== 'undefined' && PokeActions) {
-  try { PokeActions.register('debugCycleDaytime', debugCycleDaytime); } catch (_) {}
+  try {
+    PokeActions.register('debugCycleDaytime', debugCycleDaytime);
+  } catch (_) {}
 }
 
 export {
@@ -120,4 +129,3 @@ export {
   startDaytimeWatch,
   PW_DAYTIME_PHASES,
 };
-

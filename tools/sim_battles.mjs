@@ -14,7 +14,7 @@
 //                level = opponent aces, natural moves for the level, 0 IV/EV;
 //  • 'trained' : 6 Pokemon, legal optimal moves (natural ∪ TM), focused
 //                EV/IV (≤ 18 each, project rule), type_boost item.
-// Usage : node tools/sim_battles.mjs [--runs 200] [--group all|gyms|story|league|atoll]
+// Usage : node tools/sim_battles.mjs [--runs 200] [--group all|gyms|story|league|legendary|atoll]
 // ─────────────────────────────────────────────────────────────────────────────
 import fs from 'node:fs';
 import path from 'node:path';
@@ -22,6 +22,9 @@ import vm from 'node:vm';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { ecsGameplayBundleSource } from './ecs-loop-bundle.mjs';
 import { harnessIsEsm, harnessBundleSource } from './harness-bundle.mjs';
+// V7 · DBT-08 — la table des types est LUE depuis le code du jeu (une seule
+// table : src/domain/battle/type-system.js), plus de copie locale.
+import { TYPES, TYPE_CHART, typeEffect } from '../src/domain/battle/type-system.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const R = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
@@ -51,17 +54,15 @@ function mulberry32(seed) {
 }
 
 // ── Bac à sable moteur ───────────────────────────────────────────────────────
-const TYPES = ['Normal','Fire','Water','Grass','Electric','Ice','Fighting','Poison','Ground','Flying','Psychic','Bug','Rock','Ghost','Dragon','Dark','Steel','Fairy'];
-const TYPE_CHART = { Normal:{Rock:.5,Steel:.5,Ghost:0}, Fire:{Fire:.5,Water:.5,Rock:.5,Dragon:.5,Grass:2,Ice:2,Bug:2,Steel:2}, Water:{Water:.5,Grass:.5,Dragon:.5,Fire:2,Ground:2,Rock:2}, Grass:{Fire:.5,Grass:.5,Poison:.5,Flying:.5,Bug:.5,Dragon:.5,Steel:.5,Water:2,Ground:2,Rock:2}, Electric:{Grass:.5,Electric:.5,Dragon:.5,Ground:0,Water:2,Flying:2}, Ice:{Water:.5,Ice:.5,Fire:2,Fighting:2,Rock:2,Steel:2,Grass:2,Ground:2,Flying:2,Dragon:2}, Fighting:{Poison:.5,Bug:.5,Psychic:.5,Flying:.5,Fairy:.5,Ghost:0,Normal:2,Ice:2,Rock:2,Dark:2,Steel:2}, Poison:{Poison:.5,Ground:.5,Rock:.5,Ghost:.5,Steel:0,Grass:2,Fairy:2}, Ground:{Grass:.5,Bug:.5,Flying:0,Fire:2,Electric:2,Poison:2,Rock:2,Steel:2}, Flying:{Electric:.5,Rock:.5,Steel:.5,Grass:2,Fighting:2,Bug:2}, Psychic:{Psychic:.5,Steel:.5,Dark:0,Fighting:2,Poison:2}, Bug:{Fire:.5,Fighting:.5,Flying:.5,Ghost:.5,Steel:.5,Fairy:.5,Grass:2,Psychic:2,Dark:2}, Rock:{Fighting:.5,Ground:.5,Steel:.5,Fire:2,Ice:2,Flying:2,Bug:2}, Ghost:{Normal:0,Fighting:0,Ghost:2,Psychic:2}, Dragon:{Steel:.5,Fairy:0,Dragon:2}, Dark:{Fighting:.5,Dark:.5,Fairy:.5,Psychic:2,Ghost:2}, Steel:{Fire:.5,Water:.5,Electric:.5,Steel:.5,Ice:2,Rock:2,Fairy:2}, Fairy:{Fire:.5,Poison:.5,Steel:.5,Fighting:2,Dragon:2,Dark:2} };
-function normType(t) { if (!t) return null; const s = String(t).toLowerCase(); return TYPES.find((n) => n.toLowerCase() === s) || null; }
-function typeEffect(atk, d1, d2) { const a = normType(atk), t1 = normType(d1), t2 = normType(d2); const f = (TYPE_CHART[a] || {})[t1] ?? 1; const s2 = t2 ? ((TYPE_CHART[a] || {})[t2] ?? 1) : 1; return f * s2; }
 
 const ENGINE_FILES = [
   'src/data/moves.js', 'src/data/pd-data.js', 'src/data/items-data.js', 'src/data/items-helpers.js',
   'src/data/poke-talents.js',
-  'src/data/locations-data.js', 'src/data/locations-johto.js', 'src/data/game-helpers.js',
+  'src/data/locations-data.js', 'src/data/locations-johto.js', 'src/data/locations-hoenn.js', 'src/data/game-helpers.js',
   'src/application/world/team.js', 'src/application/pokemon-factory.js',
-  'src/data/champions-data.js', 'src/data/official-teams-data.js',
+  'src/data/champions-data.js', 'src/data/official-teams-data.js', 'src/data/official-teams-hoenn.js',
+  // V7 · HOE-02 — Hoenn : quêtes principales (combats scénarisés) + chaînes légendaires (LEG-02).
+  'src/data/story-quests-hoenn.js', 'src/data/legendary-quests.js',
   'src/data/atoll-sets-data.js', 'src/application/world/atoll-core.js',
   'src/application/combat/battle-init.js', 'src/application/combat/battle-attack.js',
   'src/application/combat/stat-mods.js',
@@ -78,6 +79,7 @@ function makeEngineSandbox() {
     notify: () => {}, saveGame: () => {}, setMsg: () => {},
   };
   const myG = { team: [], teamSlotItems: [], collection: {}, inventory: {}, unlockedTalents: {}, pokedex: {}, lang: 'fr', region: 'kanto', badges: [] };
+  sandbox.STORY_QUESTS = []; // story-quests-hoenn.js pushes into the shared chain
   const myBattle = { log: [] };
   sandbox.window = sandbox;
   sandbox.globalThis = sandbox;
@@ -234,7 +236,7 @@ function buildPlayerPoke(id, level, { trained = false } = {}) {
 
 // Capture-plausible species: wild tables of locations with badgeReq ≤ badges.
 function wildSpeciesByBadges(region, badgeCount) {
-  const locs = region === 'johto' ? sb.LOCS_JOHTO : sb.LOCS;
+  const locs = region === 'johto' ? sb.LOCS_JOHTO : (region === 'hoenn' ? sb.LOCS_HOENN : sb.LOCS);
   const set = new Set();
   for (const loc of Object.values(locs || {})) {
     if ((loc.badgeReq || 0) > badgeCount) continue;
@@ -432,13 +434,27 @@ function teamSpecs(entry) {
   return entry.variantsByStarter ? entry.variantsByStarter[Object.keys(entry.variantsByStarter)[0]] : entry.team;
 }
 
-const GYMS = Object.entries(sb.OFFICIAL_TEAMS).filter(([, e]) => e.kind === 'gym');
-const RIVALS = Object.entries(sb.OFFICIAL_TEAMS).filter(([, e]) => e.kind === 'rival');
-const STORY = Object.entries(sb.OFFICIAL_TEAMS).filter(([, e]) => ['team_enemy', 'boss', 'quest'].includes(e.kind));
-const LEAGUE = Object.entries(sb.OFFICIAL_TEAMS).filter(([, e]) => e.kind === 'league');
+// V7 · HOE-02 — les trois régions : OFFICIAL_TEAMS (Kanto + Johto) ∪ OFFICIAL_TEAMS_HOENN.
+// (official-teams-hoenn.js fusionne déjà ses entrées dans OFFICIAL_TEAMS au chargement : on dédoublonne par clé.)
+const ALL_TEAMS = Object.entries(sb.OFFICIAL_TEAMS).concat(Object.entries(sb.OFFICIAL_TEAMS_HOENN || {}).filter(([k]) => !sb.OFFICIAL_TEAMS[k]));
+const GYMS = ALL_TEAMS.filter(([, e]) => e.kind === 'gym');
+const RIVALS = ALL_TEAMS.filter(([, e]) => e.kind === 'rival');
+const STORY = ALL_TEAMS.filter(([, e]) => ['team_enemy', 'boss', 'quest'].includes(e.kind));
+const LEAGUE = ALL_TEAMS.filter(([, e]) => e.kind === 'league');
 // Équipe endgame « entraînée » plausible (couverture mixte Kanto/Johto évoluées)
 const ENDGAME_IDS = [6, 94, 130, 149, 212, 243];
 const STORY_TRAINED_IDS = [131, 143, 76, 128, 59, 184];
+// V7 · HOE-02 / LEG-02 — équipe « préparée » de Hoenn (espèces évoluées de la région).
+const HOENN_TRAINED_IDS = [373, 376, 306, 282, 260, 330];
+// Rencontre légendaire de fin de quête : même construction que startLegendaryEncounter (PV × 2,2).
+function buildLegendaryEnemy(pokeId, level) {
+  const p = sb.createPoke(pokeId, level, false);
+  if (!p) return [];
+  p.maxHP = Math.floor(p.maxHP * 2.2);
+  p.currentHP = p.maxHP;
+  return [p];
+}
+const LEGENDARY_CHAINS = (sb.LEGENDARY_QUESTS || []).filter((q) => Array.isArray(q.steps));
 
 async function main() {
   const out = [];
@@ -481,6 +497,16 @@ async function main() {
     }
   }
 
+  if (GROUP === 'all' || GROUP === 'legendary') {
+    say('\n══ LÉGENDAIRES DE HOENN (LEG-02 : joueur préparé 6 Pokémon évolués de Hoenn au niveau de la rencontre) ══');
+    for (const q of LEGENDARY_CHAINS) {
+      const lvl = (q.encounter && q.encounter.level) || 50;
+      const r = await winRate(`legendary:${q.id}`, () => buildTrainedTeam(HOENN_TRAINED_IDS, lvl), () => buildLegendaryEnemy(q.poke, lvl), { seedKey: 'legendary:' + q.id });
+      say(`  ${q.id.padEnd(14)} #${q.poke} Nv.${String(lvl).padStart(2)} → victoires ${(r.rate * 100).toFixed(1)} % (${r.wins}/${r.runs})`);
+      r.kind = 'legendary'; r.region = q.region; results.push(r);
+    }
+  }
+
   if (GROUP === 'all' || GROUP === 'atoll') {
     say('\n══ ATOLL (passe 23 : joueur lv 100 entraîné × 8 fenêtres de rotation — benchmark non adapté) ══');
     const MODES = Object.keys(sb.ATOLL_MODES);
@@ -510,7 +536,7 @@ async function main() {
 }
 
 const results = [];
-export { sb, winRate, buildCasualTeam, buildTrainedTeam, mulberry32, hashSeed, ENDGAME_IDS, STORY_TRAINED_IDS };
+export { sb, winRate, buildCasualTeam, buildTrainedTeam, buildLegendaryEnemy, mulberry32, hashSeed, ENDGAME_IDS, STORY_TRAINED_IDS, HOENN_TRAINED_IDS, GYMS, RIVALS, STORY, LEAGUE, LEGENDARY_CHAINS };
 export const __simExports = { get results() { return results; } };
 
 // CLI execution only (the module is also imported by tests/passe23-simulations.test.js)

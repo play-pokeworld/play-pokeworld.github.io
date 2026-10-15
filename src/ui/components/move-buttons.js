@@ -27,21 +27,28 @@ import { cx } from './component-utils.js';
  * @returns {*} virtual node list (the container stays game-owned)
  */
 export function moveButtonsBarVNode(model = {}) {
-  return (model.moves || []).filter(Boolean).map((mv) => h('div', {
-    class: cx('auto-move', mv.next && 'next-up', `type-${mv.typeCls}`),
-    dataset: {
-      moveId: String(mv.moveId),
-      idx: String(mv.idx),
-      contextCall: 'openMoveInfo',
-      contextArgs: mv.contextArgs,
-    },
-    title: mv.title || '',
-  },
-    h('div', { class: 'am-top' },
-      h('span', null, `${mv.idx + 1}. ${mv.name} ${mv.effHint || ''}`),
-      h('span', { class: `am-type type-${mv.typeCls}` }, mv.typeLabel || '')),
-    h('div', { class: 'am-bar-bg' },
-      h('div', { class: 'am-bar-fill' }))));
+  return (model.moves || []).filter(Boolean).map((mv) =>
+    h(
+      'div',
+      {
+        class: cx('auto-move', mv.next && 'next-up', `type-${mv.typeCls}`),
+        dataset: {
+          moveId: String(mv.moveId),
+          idx: String(mv.idx),
+          contextCall: 'openMoveInfo',
+          contextArgs: mv.contextArgs,
+        },
+        title: mv.title || '',
+      },
+      h(
+        'div',
+        { class: 'am-top' },
+        h('span', null, `${mv.idx + 1}. ${mv.name} ${mv.effHint || ''}`),
+        h('span', { class: `am-type type-${mv.typeCls}` }, mv.typeLabel || '')
+      ),
+      h('div', { class: 'am-bar-bg' }, h('div', { class: 'am-bar-fill' }))
+    )
+  );
 }
 
 /**
@@ -52,6 +59,3 @@ export function moveButtonsBarVNode(model = {}) {
 export function moveButtonsBarHTML(model = {}) {
   return toHTMLString(moveButtonsBarVNode(model));
 }
-
-
-

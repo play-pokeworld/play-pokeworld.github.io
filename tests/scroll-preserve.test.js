@@ -5,6 +5,7 @@ import vm from 'node:vm';
 import { harnessIsEsm, harnessBundleSource } from '../tools/harness-bundle.mjs';
 import { ManagementMenuView } from '../src/ui/views/ManagementMenuView.js';
 import { computeRequiredHatchKos } from '../src/domain/breeding/hatchery-rules.js';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 // ── Phases 15+16 — anti "back to top": scroll preservation ────────────────
 // Passe 15 : helpers + capture/restauration explicites.
@@ -237,8 +238,8 @@ test('unified selector: _usmSetGridHtml helper + context key, deterministic rese
   // helper. renderUnifiedGrid grew a 4th early-return (breeding-locked
   // notice), so we compare the two populations instead of hard-coding a
   // number that goes stale each time a branch is added.
-  const calls = BOX_SELECTOR.match(/, _usmPrevScroll\);/g) || [];
-  const helperCalls = BOX_SELECTOR.match(/(?<!function )_usmSetGridHtml\(grid,/g) || [];
+  const calls = ws(BOX_SELECTOR).match(/,_usmPrevScroll\);/g) || []; // V7 · DBT-01 — appels multi-lignes
+  const helperCalls = ws(BOX_SELECTOR).match(/(?<!function)_usmSetGridHtml\(grid,/g) || [];
   assert.ok(calls.length >= 3, 'at least the 3 historical write points go through the helper');
   assert.equal(calls.length, helperCalls.length, 'every helper call forwards the captured scroll');
   // Vague 39 : l'unique écriture passe par le puits canonique (même unité,
@@ -252,13 +253,13 @@ test('unified selector: _usmSetGridHtml helper + context key, deterministic rese
 
 test('windows + bag + fossil lab: rewrites via _pwSetHtmlSafe (page + panel)', () => {
   const hw = HATCHERY_UI.match(/function renderHatcheryWindow\(\)\s*\{[\s\S]*?\n\}/);
-  assert.ok(hw && hw[0].includes('_pwSetHtmlSafe(el,'), 'day care window');
+  assert.ok(hw && wsIncludes(hw[0], '_pwSetHtmlSafe(el,'), 'day care window'); // V7 · DBT-01
   const fl = HATCHERY_UI.match(/function renderFossilLab\(el\)\s*\{[\s\S]*?\n\}/);
-  assert.ok(fl && fl[0].includes('_pwSetHtmlSafe(el,'), 'labo fossile');
+  assert.ok(fl && wsIncludes(fl[0], '_pwSetHtmlSafe(el,'), 'labo fossile'); // V7 · DBT-01
   const tw = TRAINING.match(/function renderTrainingWindow\(\)\s*\{[\s\S]*?\n\}/);
-  assert.ok(tw && tw[0].includes('_pwSetHtmlSafe(el,'), 'training window');
+  assert.ok(tw && wsIncludes(tw[0], '_pwSetHtmlSafe(el,'), 'training window');
   const inv = INVENTORY.match(/function renderInventory\(el\)\s*\{[\s\S]*?\n\}/);
-  assert.ok(inv && inv[0].includes('_pwSetHtmlSafe(el,'), 'sac');
+  assert.ok(inv && wsIncludes(inv[0], '_pwSetHtmlSafe(el,'), 'sac');
   // Every converted file shares the secure fallback service (unit tests without util.js)
   for (const [src, name] of [[HATCHERY_UI, 'day care'], [TRAINING, 'training'], [INVENTORY, 'bag'], [MINE_UI, 'mine']]) {
     assert.ok(src.includes('globalThis._pwSetHtmlSafe'), `${name}: _pwSetHtmlSafe fallback declared`);

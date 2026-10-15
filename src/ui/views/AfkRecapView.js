@@ -54,41 +54,65 @@ export class AfkRecapView extends UIView {
     const m = this.model;
     if (m.mode === 'progress') {
       const pct = Math.max(0, Math.min(100, Math.round(Number(m.pct) || 0)));
-      return [h('div', { class: 'afk-result-card' },
-        panelHeaderVNode({ title: m.title || '' }),
-        h('div', { class: 'afk-result-status' }, m.statusText || ''),
-        h('div', { class: 'afk-ff-bar' }, h('i', { style: { width: `${pct}%` } })),
-        m.stageText ? h('div', { class: 'afk-ff-stage' }, m.stageText) : null)];
+      return [
+        h(
+          'div',
+          { class: 'afk-result-card' },
+          panelHeaderVNode({ title: m.title || '' }),
+          h('div', { class: 'afk-result-status' }, m.statusText || ''),
+          h('div', { class: 'afk-ff-bar' }, h('i', { style: { width: `${pct}%` } })),
+          m.stageText ? h('div', { class: 'afk-ff-stage' }, m.stageText) : null
+        ),
+      ];
     }
 
-    const statusCls = m.statusKind === 'success' ? ' success' : (m.statusKind === 'danger' ? ' danger' : '');
-    return [h('div', { class: 'afk-result-card' },
-      panelHeaderVNode({
-        title: m.title || '',
-        // Wave 32: was `.afk-modal-close` (24px glyph in a 36px round hit
-        // area) — a private copy of the shared cross that had drifted.
-        close: { dataset: CLOSE_DS, glyph: '✕' },
-      }),
-      h('div', { class: `afk-result-status${statusCls}` }, m.statusText || ''),
-      // .afk-result-grid is a kept needle (passe28); the real grid is the
-      // shared battle-session one (same b/span cells).
-      h('div', { class: 'afk-result-grid' }, sessionStatGridVNode(m.stats || [])),
-      h('div', { class: 'pw-panel pw-info-section' },
-        summarySectionTitleVNode(m.capturesTitle || ''),
-        (m.captures && m.captures.length) ? captureListVNode(m.captures) : summaryEmptyVNode(m.emptyLabel || '')),
-      h('div', { class: 'pw-panel pw-info-section' },
-        summarySectionTitleVNode(m.itemsTitle || ''),
-        (m.items && m.items.length) ? itemListVNode(m.items) : summaryEmptyVNode(m.emptyLabel || '')),
-      m.noteText ? h('div', { class: 'pw-text-sm pw-light1 pw-afk-note' }, m.noteText) : null,
-      h('div', { class: 'afk-result-actions' },
-        h('button', { class: 'hbtn', dataset: CLOSE_DS }, m.closeLabel || '')))];
+    const statusCls =
+      m.statusKind === 'success' ? ' success' : m.statusKind === 'danger' ? ' danger' : '';
+    return [
+      h(
+        'div',
+        { class: 'afk-result-card' },
+        panelHeaderVNode({
+          title: m.title || '',
+          // Wave 32: was `.afk-modal-close` (24px glyph in a 36px round hit
+          // area) — a private copy of the shared cross that had drifted.
+          close: { dataset: CLOSE_DS, glyph: '✕' },
+        }),
+        h('div', { class: `afk-result-status${statusCls}` }, m.statusText || ''),
+        // .afk-result-grid is a kept needle (passe28); the real grid is the
+        // shared battle-session one (same b/span cells).
+        h('div', { class: 'afk-result-grid' }, sessionStatGridVNode(m.stats || [])),
+        h(
+          'div',
+          { class: 'pw-panel pw-info-section' },
+          summarySectionTitleVNode(m.capturesTitle || ''),
+          m.captures && m.captures.length
+            ? captureListVNode(m.captures)
+            : summaryEmptyVNode(m.emptyLabel || '')
+        ),
+        h(
+          'div',
+          { class: 'pw-panel pw-info-section' },
+          summarySectionTitleVNode(m.itemsTitle || ''),
+          m.items && m.items.length ? itemListVNode(m.items) : summaryEmptyVNode(m.emptyLabel || '')
+        ),
+        m.noteText ? h('div', { class: 'pw-text-sm pw-light1 pw-afk-note' }, m.noteText) : null,
+        h(
+          'div',
+          { class: 'afk-result-actions' },
+          h('button', { class: 'hbtn', dataset: CLOSE_DS }, m.closeLabel || '')
+        )
+      ),
+    ];
   }
 
   onLoad() {
     this.windowEntity = this.spawn('ui:afk-recap', []);
-    this.windowEntity.addComponent(new UIRenderComponent({
-      template: () => this.windowVNode(),
-    }));
+    this.windowEntity.addComponent(
+      new UIRenderComponent({
+        template: () => this.windowVNode(),
+      })
+    );
   }
 
   /**
@@ -102,6 +126,3 @@ export class AfkRecapView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
-
-
-

@@ -19,27 +19,40 @@
 import { h, toHTMLString } from '../../engine/render/vdom.js';
 
 export function swapFooterVNode(m) {
-  return h('div', { class: 'usm-swap-footer' },
+  return h(
+    'div',
+    { class: 'usm-swap-footer' },
     h('div', { class: 'usm-swap-footer-label' }, m.label || ''),
-    h('div', { class: 'usm-swap-footer-actions' },
-      h('button', {
-        class: 'hbtn usm-cancel-btn',
-        dataset: { action: 'legacy-call', call: 'cancelTeamSwap', callArgs: '' },
-      },
+    h(
+      'div',
+      { class: 'usm-swap-footer-actions' },
+      h(
+        'button',
+        {
+          class: 'hbtn usm-cancel-btn',
+          dataset: { action: 'legacy-call', call: 'cancelTeamSwap', callArgs: '' },
+        },
         m.iconHtml ? h.raw(`${m.iconHtml} `) : null,
-        m.cancelLabel || ''),
-      h('button', {
-        class: 'hbtn usm-remove-btn',
-        dataset: { action: 'call-close-selector', call: 'removeFromTeam', callArgs: m.removeArgs == null ? '' : String(m.removeArgs) },
-      },
+        m.cancelLabel || ''
+      ),
+      h(
+        'button',
+        {
+          class: 'hbtn usm-remove-btn',
+          dataset: {
+            action: 'call-close-selector',
+            call: 'removeFromTeam',
+            callArgs: m.removeArgs == null ? '' : String(m.removeArgs),
+          },
+        },
         m.iconHtml ? h.raw(`${m.iconHtml} `) : null,
-        m.removeLabel || '')));
+        m.removeLabel || ''
+      )
+    )
+  );
 }
 
 /** String serialization for the classic adapter (box-selector.js). */
 export function swapFooterHTML(m) {
   return toHTMLString(swapFooterVNode(m));
 }
-
-
-

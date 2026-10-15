@@ -197,7 +197,7 @@ test('wave23: pw-static — 13 dead classes deleted, live ones tokenized (mirror
 /* ─── D. quest-ui owns _repeatableRoll (browser-only ReferenceError fix) ── */
 
 test('wave23: _repeatableRoll is declared AND mirrored by its sole consumer', () => {
-  assert.ok(/(var|let) _repeatableRoll = \(typeof window !== 'undefined'/.test(QUEST_UI), 'quest-ui.js declares the roll (module scope)');
+  assert.ok(/(var|let) _repeatableRoll =\s*\(?typeof window !== 'undefined'/.test(QUEST_UI), 'quest-ui.js declares the roll (module scope)'); // V7 · DBT-01
   // Vague 41 — lock recâblé (intention préservée « exposé aux lecteurs
   // legacy ») : la pose window est devenue le shim canonique gardé globalThis
   // (window === globalThis au navigateur).

@@ -1,9 +1,9 @@
 /**
  * PokeEngine — Hand Engine
- * 
+ *
  * Central hub: creates and wires all subsystems
  * Manages the frame loop with fixed timestep
- * 
+ *
  * Usage:
  *   const engine = new PokeEngine({ container: '#game' });
  *   engine.start();
@@ -13,20 +13,21 @@
 
 class PokeEngine {
   constructor(options = {}) {
-    this.container = typeof options.container === 'string' 
-      ? document.querySelector(options.container) 
-      : (options.container || document.body);
-    
+    this.container =
+      typeof options.container === 'string'
+        ? document.querySelector(options.container)
+        : options.container || document.body;
+
     // Subsystems
     this.events = new window.PokeEventBus();
     this.world = new window.PokeECS();
     this.input = new window.PokeInput(this.container);
     this.timer = new window.PokeTimer();
     this.audio = new window.PokeAudio();
-    
+
     // Rendering
     this.renderer = null; // Set externally via assign()
-    
+
     // Frame loop
     this._running = false;
     this._lastTime = 0;
@@ -36,12 +37,12 @@ class PokeEngine {
     this._fps = 0;
     this._frameCount = 0;
     this._fpsTimer = 0;
-    
+
     // Plugins
     this._plugins = [];
     this._preUpdates = [];
     this._postUpdates = [];
-    
+
     // Emit ready
     if (options.autostart !== false) {
       if (document.readyState === 'complete') this.start();
@@ -60,8 +61,14 @@ class PokeEngine {
     return this;
   }
 
-  onPreUpdate(fn) { this._preUpdates.push(fn); return this; }
-  onPostUpdate(fn) { this._postUpdates.push(fn); return this; }
+  onPreUpdate(fn) {
+    this._preUpdates.push(fn);
+    return this;
+  }
+  onPostUpdate(fn) {
+    this._postUpdates.push(fn);
+    return this;
+  }
 
   assign(renderer) {
     this.renderer = renderer;
@@ -130,8 +137,12 @@ class PokeEngine {
   }
 
   // ─── Stats ───
-  getFPS() { return this._fps; }
-  getECSStats() { return this.world.stats(); }
+  getFPS() {
+    return this._fps;
+  }
+  getECSStats() {
+    return this.world.stats();
+  }
 
   // ─── Cleanup ───
   dispose() {
@@ -155,7 +166,3 @@ if (typeof globalThis !== 'undefined') {
   if (!globalThis.poke) globalThis.poke = {};
   globalThis.poke.Engine = PokeEngine;
 }
-
-
-
-

@@ -10,6 +10,7 @@ import { moveButtonsBarHTML } from '../src/ui/components/move-buttons.js';
 // the real ECS AfkRecapView — inject it into the sandbox exactly like the
 // production PokeUI views registry (legitimate test move, no assertion lost).
 import { AfkRecapView } from '../src/ui/views/AfkRecapView.js';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 // ── Phase 30: beta-feedback fixes ────────────────────────────────────────────
 //  A. AFK/timeskip: catch-up replays ONLY what the player was actually
@@ -167,6 +168,11 @@ function seedGame(sb, { location = 'route1', level = 12, money = 1000 } = {}) {
     G.team[0].currentHP = G.team[0].maxHP;
     battle.active = false; battle.enemyPoke = null; battle.chill = true; battle.speed = 1;
     battle.sessionCatches = []; battle.sessionItems = {}; battle.sessionWins = 0;
+    // V7 · ROAM-01 — the roamer pool follows the wall clock (12 h UTC windows):
+    // depending on the day, route1 hosts a Nv. 75 roamer (1 %/spawn) that can
+    // wipe the test team. These tests exercise the ENGINE, so they run without
+    // a roamer; the offline-roamer behaviour has its own tests (V7 ROAM-01).
+    window.getRoamingLegendaryForRoute = function(){ return 0; }; globalThis.getRoamingLegendaryForRoute = window.getRoamingLegendaryForRoute;
   `, sb);
 }
 
@@ -263,17 +269,20 @@ test('phase 30 B: loot converted to money ONLY when the stack is full (25)', () 
   let r = vm.runInContext(`grantRewardItem('occa_berry', 1)`, sb);
   assert.equal(r.added, 1, 'first copy → item into bag');
   assert.equal(r.money, 0, 'no money while the stack is not full');
-  // stack at 24 + 5: 1 slots into bag, 4 converted (25% of 20,000₽ = 5,000₽/ea)
+  // stack at 24 + 5: 1 slots into bag, 4 converted. V7 · ECO-05 (D7): the
+  // duplicate payout is 10 % of the price (20,000₽ → 2,000₽/ea), was 25 %.
+  const payout = vm.runInContext(`getDuplicateItemPayout('occa_berry')`, sb);
+  assert.equal(payout, 2000, 'ECO-05: 10 % of 20,000₽');
   vm.runInContext(`G.inventory['occa_berry'] = 24;`, sb);
   r = vm.runInContext(`grantRewardItem('occa_berry', 5)`, sb);
   assert.equal(r.added, 1, 'the remaining room is filled');
-  assert.equal(r.money, 5000 * 4, 'only the excess beyond 25 is converted');
+  assert.equal(r.money, payout * 4, 'only the excess beyond 25 is converted');
   assert.equal(vm.runInContext(`G.inventory['occa_berry']`, sb), 25, 'stack capped at 25');
   // stack already full: full conversion
   r = vm.runInContext(`grantRewardItem('occa_berry', 1)`, sb);
   assert.equal(r.added, 0);
-  assert.equal(r.money, 5000, 'full stack → money');
-  assert.equal(vm.runInContext(`G.money`, sb), 5000 * 5, 'exact cumulative total');
+  assert.equal(r.money, payout, 'full stack → money');
+  assert.equal(vm.runInContext(`G.money`, sb), payout * 5, 'exact cumulative total');
   // treasure: never converted, always stocked
   r = vm.runInContext(`grantRewardItem('nugget', 3)`, sb);
   assert.equal(r.added, 3, 'nugget: still in bag');
@@ -353,9 +362,9 @@ test('phase 30 C: training K.O.s also feed the day care (live AND fast-forward)'
 // ————————————————— D — Rewiring & decisions ————————————————————————————————
 test('phase 30 D: rewirings present, old blocks removed, i18n keys', () => {
   const oe = R('src/application/save/offline-engine.js');
-  assert.ok(oe.includes('if(!(G && G.wildSessionActive)) return res;'), 'wild FF locked by the real session');
+  assert.ok(wsIncludes(oe, 'if(!(G && G.wildSessionActive)) return res;'), 'wild FF locked by the real session'); // V7 · DBT-01
   assert.ok(oe.includes('afk_panel_daycare_levels'), 'recap: day-care levels row');
-  assert.ok(R('src/application/save/save.js').includes('G.wildSessionActive = (typeof isWildChillChainActive'), 'saveGame persiste le drapeau');
+  assert.ok(wsMatch(R('src/application/save/save.js'), /G\.wildSessionActive =\s*\(?typeof isWildChillChainActive/), 'saveGame persiste le drapeau'); // V7 · DBT-01
   assert.ok(R('src/application/combat/battle-flow.js').includes('G.wildSessionActive = false'), 'endBattle efface le drapeau');
   const hj = R('src/application/breeding/hatchery.js');
   assert.ok(hj.includes('getDaycareKosPerLevel'), 'daycare K.O. accessor kept in the classic module');
@@ -365,7 +374,7 @@ test('phase 30 D: rewirings present, old blocks removed, i18n keys', () => {
   assert.ok(R('src/application/combat/training.js').includes('hatcheryRegisterBattleKills'), 'training → day care');
   assert.ok(!R('src/application/combat/progression.js').includes('daycareShare'), 'Day-Care XP drip removed');
   assert.ok(!R('src/application/combat/battle-switch.js').includes('Daycare passive EXP'), 'XP block on champion removed (K.O.s are enough)');
-  assert.ok(R('src/data/game-helpers.js').includes('function getItemStackLimit'), 'factorized stack limit');
+  assert.ok(R('src/data/dupes.js').includes('function getItemStackLimit'), 'factorized stack limit'); // V7 · DBT-09
   assert.ok(R('src/ui/game/hatchery-ui.js').includes('getDaycareKosPerLevel'), 'UI: Day-Care K.O. counter');
   assert.ok(R('src/localization/fr/ui.js').includes('"afk_panel_daycare_levels"'), 'FR day-care recap key');
   assert.ok(R('src/localization/en/ui.js').includes('"afk_panel_daycare_levels"'), 'EN day-care recap key');

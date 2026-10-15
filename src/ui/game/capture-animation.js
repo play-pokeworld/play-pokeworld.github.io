@@ -10,7 +10,10 @@
 
 // Shared safe-HTML service (canonical sink).
 if (typeof globalThis !== 'undefined' && typeof globalThis._pwSetHtmlSafe !== 'function') {
-  globalThis._pwSetHtmlSafe = function (el, html) { if (typeof pwSetHtml === 'function') pwSetHtml(el, html); else el.innerHTML = html; };
+  globalThis._pwSetHtmlSafe = function (el, html) {
+    if (typeof pwSetHtml === 'function') pwSetHtml(el, html);
+    else el.innerHTML = html;
+  };
 }
 
 const CAPTURE_CSS = `
@@ -34,18 +37,22 @@ function _ensureStyle() {
 
 function captureAnimationsEnabled() {
   try {
-    const v = (typeof G !== 'undefined' && G && G.settings && G.settings.captureAnimations);
+    const v = typeof G !== 'undefined' && G && G.settings && G.settings.captureAnimations;
     return v !== false;
-  } catch (_) { return true; }
+  } catch (_) {
+    return true;
+  }
 }
 
 // Durée de base (ms) ajustée à la vitesse de combat : en x2/x3/x10, la
 // ball ne doit pas rester affichée aussi longtemps qu'en x1.
 function battleSpeedMult() {
   try {
-    const spd = (typeof battle !== 'undefined' && battle && battle.speed) ? Number(battle.speed) : 1;
-    return (spd > 0) ? spd : 1;
-  } catch (_) { return 1; }
+    const spd = typeof battle !== 'undefined' && battle && battle.speed ? Number(battle.speed) : 1;
+    return spd > 0 ? spd : 1;
+  } catch (_) {
+    return 1;
+  }
 }
 const BASE_DURATION = 1150;
 const BASE_PHASE2 = 700;
@@ -83,7 +90,9 @@ function playCaptureAnimation(ballKey, success, label, rate) {
 
   // Position = centre de la carte du Pokémon adverse, dans le repère de la
   // fenêtre de combat (coordonnées contenu → suit le scroll avec la carte).
-  let left = '50%', top = '40%', fixed = false;
+  let left = '50%',
+    top = '40%',
+    fixed = false;
   const row = document.getElementById('battle-team-row');
   if (row) {
     const cards = row.querySelectorAll('.poke-card');
@@ -102,39 +111,70 @@ function playCaptureAnimation(ballKey, success, label, rate) {
     }
   }
 
-  root.style.cssText = 'position:' + (fixed ? 'fixed' : 'absolute')
-    + ';left:' + left + ';top:' + top
-    + ';transform:translate(-50%,-50%);z-index:1200;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px;';
+  root.style.cssText =
+    'position:' +
+    (fixed ? 'fixed' : 'absolute') +
+    ';left:' +
+    left +
+    ';top:' +
+    top +
+    ';transform:translate(-50%,-50%);z-index:1200;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px;';
 
-  const text = label || (success ? (t('ball_catch_success') || 'Capturé !') : (t('ball_catch_fail') || 'Le Pokémon s’est échappé…'));
+  const text =
+    label ||
+    (success
+      ? t('ball_catch_success') || 'Capturé !'
+      : t('ball_catch_fail') || 'Le Pokémon s’est échappé…');
   const resultColor = success ? 'color:#A7E3A1' : 'color:#E4A0A0';
-  const ratePct = (typeof rate === 'number' && isFinite(rate)) ? Math.round(rate) : null;
+  const ratePct = typeof rate === 'number' && isFinite(rate) ? Math.round(rate) : null;
 
   // Signale au loop de combat qu'un verdict est en cours (il attend sa fin).
-  try { globalThis.__pwCaptureAnimUntil = Date.now() + dur; } catch (_) {}
+  try {
+    globalThis.__pwCaptureAnimUntil = Date.now() + dur;
+  } catch (_) {}
   clearTimeout(root._t);
   clearTimeout(root._t1);
 
   if (!enabled) {
     // Animation désactivée : on affiche seulement le verdict (toujours bloquant).
-    _pwSetHtmlSafe(root, '<span class="pw-ca-label" style="' + resultColor + '">' + text + '</span>');
-    root._t = setTimeout(() => { if (root && root.parentNode) root.remove(); }, dur);
+    _pwSetHtmlSafe(
+      root,
+      '<span class="pw-ca-label" style="' + resultColor + '">' + text + '</span>'
+    );
+    root._t = setTimeout(() => {
+      if (root && root.parentNode) root.remove();
+    }, dur);
     return;
   }
 
-  const sprite = (typeof ballSpriteUrl === 'function') ? (ballSpriteUrl(ballKey) || ('src/assets/images/items/' + (ballKey || 'pokeball') + '.png')) : ('src/assets/images/items/' + (ballKey || 'pokeball') + '.png');
-  const phase1 = '<img class="pw-ca-ball" src="' + sprite + '" alt="">'
-    + (ratePct != null
-      ? '<span class="pw-ca-rate">' + ((typeof tr === 'function') ? tr('ball_catch_chance', { rate: ratePct }) : ('Chance de Capture : ' + ratePct + '%')) + '</span>'
+  const sprite =
+    typeof ballSpriteUrl === 'function'
+      ? ballSpriteUrl(ballKey) || 'src/assets/images/items/' + (ballKey || 'pokeball') + '.png'
+      : 'src/assets/images/items/' + (ballKey || 'pokeball') + '.png';
+  const phase1 =
+    '<img class="pw-ca-ball" src="' +
+    sprite +
+    '" alt="">' +
+    (ratePct != null
+      ? '<span class="pw-ca-rate">' +
+        (typeof tr === 'function'
+          ? tr('ball_catch_chance', { rate: ratePct })
+          : 'Chance de Capture : ' + ratePct + '%') +
+        '</span>'
       : '');
   _pwSetHtmlSafe(root, phase1);
   // Phase 2 (2ᵉ mouvement) : le verdict remplace la chance affichée.
   root._t1 = setTimeout(() => {
     if (root && root.parentNode) {
-      _pwSetHtmlSafe(root, '<span class="pw-ca-label" style="' + resultColor + '">' + text + '</span>');
+      _pwSetHtmlSafe(
+        root,
+        '<span class="pw-ca-label" style="' + resultColor + '">' + text + '</span>'
+      );
     }
   }, phase2);
-  root._t = setTimeout(() => { if (root && root.parentNode) root.remove(); }, dur);
+  root._t = setTimeout(() => {
+    if (root && root.parentNode) root.remove();
+  }, dur);
 }
 
 if (typeof window !== 'undefined') {
@@ -147,4 +187,3 @@ if (typeof globalThis !== 'undefined') {
 }
 
 export { playCaptureAnimation, captureAnimationsEnabled };
-

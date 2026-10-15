@@ -58,7 +58,11 @@ export function token(name) {
 /** @param {string} hex '#rgb' or '#rrggbb' @returns {[number,number,number]} */
 function hexToRgb(hex) {
   let h = String(hex).trim().replace('#', '');
-  if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+  if (h.length === 3)
+    h = h
+      .split('')
+      .map((c) => c + c)
+      .join('');
   const n = parseInt(h, 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
@@ -95,10 +99,9 @@ export const MIN_CONTRAST_RATIO = 4.5;
 export function assertContrast(fgHex, bgHex, label = '') {
   const ratio = contrastRatio(fgHex, bgHex);
   if (ratio < MIN_CONTRAST_RATIO) {
-    throw new Error(`[ui] Contrast ${ratio.toFixed(2)} < ${MIN_CONTRAST_RATIO} (${label || `${fgHex} on ${bgHex}`})`);
+    throw new Error(
+      `[ui] Contrast ${ratio.toFixed(2)} < ${MIN_CONTRAST_RATIO} (${label || `${fgHex} on ${bgHex}`})`
+    );
   }
   return ratio;
 }
-
-
-

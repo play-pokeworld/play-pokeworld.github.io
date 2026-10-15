@@ -11,7 +11,9 @@
 import { Component } from '../core/Component.js';
 
 export class TransformComponent extends Component {
-  static get type() { return 'Transform'; }
+  static get type() {
+    return 'Transform';
+  }
 
   /**
    * @param {Object} [props]
@@ -67,6 +69,3 @@ export class TransformComponent extends Component {
     return el;
   }
 }
-
-
-

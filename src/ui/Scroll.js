@@ -11,7 +11,10 @@
 // Shared safe-HTML service (engine pwSetHtml when present, else direct).
 // globalThis-backed so concatenated VM harnesses and classic stubs stay valid.
 if (typeof globalThis !== 'undefined' && typeof globalThis._pwSetHtmlSafe !== 'function') {
-  globalThis._pwSetHtmlSafe = function (el, html) { if (typeof globalThis.pwSetHtml === 'function') globalThis.pwSetHtml(el, html); else el.innerHTML = html; };
+  globalThis._pwSetHtmlSafe = function (el, html) {
+    if (typeof globalThis.pwSetHtml === 'function') globalThis.pwSetHtml(el, html);
+    else el.innerHTML = html;
+  };
 }
 
 export class Scroll {
@@ -45,7 +48,9 @@ export class Scroll {
 
   scrollToTop() {
     if (this._element) {
-      try { this._element.scrollTop = 0; } catch (_) {}
+      try {
+        this._element.scrollTop = 0;
+      } catch (_) {}
     }
   }
 
@@ -55,10 +60,9 @@ export class Scroll {
 
   setScrollTop(top) {
     if (this._element) {
-      try { this._element.scrollTop = Number(top) || 0; } catch (_) {}
+      try {
+        this._element.scrollTop = Number(top) || 0;
+      } catch (_) {}
     }
   }
 }
-
-
-

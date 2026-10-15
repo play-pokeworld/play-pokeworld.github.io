@@ -72,7 +72,7 @@ export class ECSGameplayBridge {
 
       this.world.add(eid, 'Fighter', {
         active: i === 0,
-        currentHP: poke.currentHP !== undefined ? poke.currentHP : (poke.maxHP || 100),
+        currentHP: poke.currentHP !== undefined ? poke.currentHP : poke.maxHP || 100,
         cooldown: poke.cooldown || 0,
         maxCooldown: poke.maxCooldown || 2000,
         readyToAttack: false,
@@ -144,6 +144,3 @@ export class ECSGameplayBridge {
     return updated;
   }
 }
-
-
-

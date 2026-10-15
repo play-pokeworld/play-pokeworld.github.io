@@ -22,6 +22,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { execSync } from 'node:child_process';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 const read = (p) => readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 
@@ -252,8 +253,9 @@ test('38c-U2 — « Remonter et encaisser » est ROUGE, comme le quitter de comb
 
 // ─── 14. GUIDE + AUTO 3 MODES ───────────────────────────────────────────────
 test('38c-GD1 — le guide a une rubrique Donjon, visible dès la quête du premier donjon', () => {
-  const tuto = read('src/ui/game/tutorial.js');
-  assert.match(tuto, /dungeon:\s*\{icon/, 'rubrique donjon dans le guide');
+  // V7-R1 · #7 — les rubriques du guide vivent dans ui/game/guide-sections.js (DBT-09).
+  const tuto = read('src/ui/game/tutorial.js') + read('src/ui/game/guide-sections.js');
+  assert.match(tuto, /dungeon:\s*\{\s*icon/, 'rubrique donjon dans le guide'); // V7 · DBT-01
   assert.match(tuto, /guide_dungeon_title/, 'titre localisé');
   assert.match(tuto, /dungeonGuideUnlocked/, 'déblocage dédié');
   assert.match(tuto, /id === 'dungeon' && !dungeonGuideUnlocked\(\)/, 'filtre de déblocage branché');
@@ -327,9 +329,9 @@ test('38c-P1 — les rochers de premier plan sont nettement plus petits (sommets
 // ─── 4. POKÉBALL DE LA BARRE DE TITRE (retour 38e) ───────────────────────────
 test('38c-IC1 — la case de combat utilise la POKÉBALL de la barre de titre (pokeball.svg), pas le contour dessiné', () => {
   const js = read('src/application/world/dungeon-run.js');
-  assert.match(js, /case 'combat':\s+return t\.done \? '' : _dgGlyph\('src\/assets\/images\/dungeon\/pokeball\.svg'\)/,
+  assert.ok(wsMatch(js, /case 'combat':\s+return t\.done \? '' : _dgGlyph\('src\/assets\/images\/dungeon\/pokeball\.svg'\)/), // V7 · DBT-01
     'combat non soldé → pokéball de la barre de titre ; soldé → case vide');
-  assert.match(js, /case 'elite':\s+return t\.done \? '' : '<span class="pw-dgn-elite">'/,
+  assert.ok(wsMatch(js, /case 'elite':\s+return t\.done \? '' : '<span class="pw-dgn-elite">'/), // V7 · DBT-01
     'l\'élite superpose une étoile à la pokéball');
   // pokeball.svg = exactement l\'icône de la fenêtre « Poké Balls »
   // (cercle + trait + bouton), tracée en noir pour la teinte par masque.

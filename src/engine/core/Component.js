@@ -29,7 +29,9 @@ export class Component {
 
   constructor() {
     if (new.target === Component) {
-      throw new TypeError('[engine] Component is abstract: extend it and override static get type()');
+      throw new TypeError(
+        '[engine] Component is abstract: extend it and override static get type()'
+      );
     }
     /** @type {import('./Entity.js').Entity|null} Back-reference set by World.attach() */
     this.entity = null;
@@ -87,6 +89,3 @@ export class Component {
     this.enabled = false;
   }
 }
-
-
-

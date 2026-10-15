@@ -42,48 +42,87 @@ export class QuestView extends UIView {
 
     // Head panel entity (slots counter + upgrades shortcut button).
     this.headEntity = createPanel(this, { className: 'quest-board-head' });
-    this.headEntity.get(UIRenderComponent).template = () => h('div', { class: 'pw-ui-panel quest-board-head' },
-      h('div', null,
-        h.raw(`<b>${head.slotsLabel || ''}</b> ${head.activeCount ?? 0}/${head.max ?? 1}`),
-        h('br'),
-        h('span', null, head.timerText || '')),
-      h('button', {
-        type: 'button',
-        class: 'pw-ui-btn hbtn',
-        dataset: { action: 'legacy-call', call: 'openRepeatableUpgradeMenu', callArgs: '' },
-      }, head.upgradesIconHtml ? h.raw(`${head.upgradesIconHtml} `) : null, head.upgradesLabel || ''));
+    this.headEntity.get(UIRenderComponent).template = () =>
+      h(
+        'div',
+        { class: 'pw-ui-panel quest-board-head' },
+        h(
+          'div',
+          null,
+          h.raw(`<b>${head.slotsLabel || ''}</b> ${head.activeCount ?? 0}/${head.max ?? 1}`),
+          h('br'),
+          h('span', null, head.timerText || '')
+        ),
+        h(
+          'button',
+          {
+            type: 'button',
+            class: 'pw-ui-btn hbtn',
+            dataset: { action: 'legacy-call', call: 'openRepeatableUpgradeMenu', callArgs: '' },
+          },
+          head.upgradesIconHtml ? h.raw(`${head.upgradesIconHtml} `) : null,
+          head.upgradesLabel || ''
+        )
+      );
 
     // Offer card entities.
     this.offerEntities = (model.offers || []).map((offer) => {
       const card = this.spawn('ui:quest-offer', []);
-      card.addComponent(new UIRenderComponent({
-        template: () => h('div', { class: 'pw-ui-panel upgrade-card pw-panel' },
-          h('div', { class: 'pw-evo-title' }, offer.iconHtml ? h.raw(`${offer.iconHtml} `) : null, offer.title),
-          h('div', { class: 'pw-detail-text' }, h.raw(offer.desc || '')),
-          h('div', { class: 'pw-detail-hint' }, h.raw(offer.reward || '')),
-          offer.active
-            ? h('div', { class: 'pw-green-text' }, offer.activeLabel)
-            : QuestView.acceptVNode(offer)),
-      }));
+      card.addComponent(
+        new UIRenderComponent({
+          template: () =>
+            h(
+              'div',
+              { class: 'pw-ui-panel upgrade-card pw-panel' },
+              h(
+                'div',
+                { class: 'pw-evo-title' },
+                offer.iconHtml ? h.raw(`${offer.iconHtml} `) : null,
+                offer.title
+              ),
+              h('div', { class: 'pw-detail-text' }, h.raw(offer.desc || '')),
+              h('div', { class: 'pw-detail-hint' }, h.raw(offer.reward || '')),
+              offer.active
+                ? h('div', { class: 'pw-green-text' }, offer.activeLabel)
+                : QuestView.acceptVNode(offer)
+            ),
+        })
+      );
       return card;
     });
 
     // Pinned footer entity.
     const footer = model.footer || {};
     this.footerEntity = createFooter(this, {});
-    this.footerEntity.get(UIRenderComponent).template = () => h('div', { class: 'pw-actions' },
-      h('button', {
-        type: 'button',
-        // Hidden while unusable (cooldown): the per-second timer flips it back.
-        class: cx('pw-ui-btn hbtn extracted-bridge-style-052', footer.rerollCooldown && 'is-hidden'),
-        disabled: !!footer.rerollCooldown,
-        dataset: { action: 'legacy-call', call: 'rollRepeatables', callArgs: 'false' },
-      }, footer.rerollIconHtml ? h.raw(`${footer.rerollIconHtml} `) : null, footer.rerollLabel || ''),
-      h('button', {
-        type: 'button',
-        class: 'pw-ui-btn hbtn extracted-bridge-style-044',
-        dataset: { action: 'legacy-call', call: 'closeQuestModal', callArgs: '' },
-      }, footer.closeLabel || ''));
+    this.footerEntity.get(UIRenderComponent).template = () =>
+      h(
+        'div',
+        { class: 'pw-actions' },
+        h(
+          'button',
+          {
+            type: 'button',
+            // Hidden while unusable (cooldown): the per-second timer flips it back.
+            class: cx(
+              'pw-ui-btn hbtn extracted-bridge-style-052',
+              footer.rerollCooldown && 'is-hidden'
+            ),
+            disabled: !!footer.rerollCooldown,
+            dataset: { action: 'legacy-call', call: 'rollRepeatables', callArgs: 'false' },
+          },
+          footer.rerollIconHtml ? h.raw(`${footer.rerollIconHtml} `) : null,
+          footer.rerollLabel || ''
+        ),
+        h(
+          'button',
+          {
+            type: 'button',
+            class: 'pw-ui-btn hbtn extracted-bridge-style-044',
+            dataset: { action: 'legacy-call', call: 'closeQuestModal', callArgs: '' },
+          },
+          footer.closeLabel || ''
+        )
+      );
   }
 
   /**
@@ -94,23 +133,33 @@ export class QuestView extends UIView {
    */
   static acceptVNode(offer) {
     if (!offer.canAccept) return null;
-    return h('button', {
-      type: 'button',
-      class: 'pw-ui-btn hbtn extracted-bridge-style-051',
-      dataset: { action: 'legacy-call', call: 'acceptRepeatable', callArgs: String(offer.index) },
-    }, offer.acceptLabel);
+    return h(
+      'button',
+      {
+        type: 'button',
+        class: 'pw-ui-btn hbtn extracted-bridge-style-051',
+        dataset: { action: 'legacy-call', call: 'acceptRepeatable', callArgs: String(offer.index) },
+      },
+      offer.acceptLabel
+    );
   }
 
   /** @returns {*} Body vnode (head + intro + offer cards). */
   bodyVNode() {
-    return h('div', { class: 'pw-scene quest-board', dataset: { scene: this.name } },
+    return h(
+      'div',
+      { class: 'pw-scene quest-board', dataset: { scene: this.name } },
       this.headEntity.get(UIRenderComponent).renderTemplate(),
       h('div', { class: 'pw-detail-body' }, this.model.introText || ''),
       // Wave 28 (user): offers flow in the canonical content grid (same
       // recipe as the validated panel layouts), not a stack of full-width
       // cards.
-      h('div', { class: 'pw-quest-offer-grid' },
-        this.offerEntities.map((e) => e.get(UIRenderComponent).renderTemplate())));
+      h(
+        'div',
+        { class: 'pw-quest-offer-grid' },
+        this.offerEntities.map((e) => e.get(UIRenderComponent).renderTemplate())
+      )
+    );
   }
 
   /** @returns {*} Footer vnode (pinned actions). */
@@ -136,6 +185,3 @@ export class QuestView extends UIView {
     };
   }
 }
-
-
-

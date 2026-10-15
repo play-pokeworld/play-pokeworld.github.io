@@ -5,6 +5,7 @@ import vm from 'node:vm';
 import { pokeFullCardHTML } from '../src/ui/components/poke-full-card.js';
 import { moveButtonsBarHTML } from '../src/ui/components/move-buttons.js';
 import { harnessIsEsm, harnessBundleSource } from '../tools/harness-bundle.mjs';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 // ── Phase 17 — battle locks (Pokémon/move/item order) + drag & drop
 // and click-swap of equipped moves ───────────────────────────────────────────
@@ -56,11 +57,11 @@ test('locks: isTeamStructureLocked / notifyTeamStructureLocked helpers defined +
   assert.ok(/function notifyTeamStructureLocked\(/.test(TEAM), 'notify defined');
   assert.ok(TEAM.includes('window.isTeamStructureLocked = isTeamStructureLocked'), 'export lock');
   // Locked sites: items + Pokémon order
-  assert.ok(TEAM.includes('function equipItemOn(teamIdx, key){\n if(typeof isTeamStructureLocked'), 'equipItemOn locked');
-  assert.ok(TEAM.includes('function unequipItem(teamIdx){\n if(typeof isTeamStructureLocked'), 'unequipItem locked');
+  assert.ok(wsIncludes(TEAM, 'function equipItemOn(teamIdx, key){ if(isTeamStructureLocked()){ notifyTeamStructureLocked(); return; }'), 'equipItemOn locked'); // V7 · DBT-04 — appel direct (symbole local), plus de garde typeof ; DBT-01 — sans blancs
+  assert.ok(wsIncludes(TEAM, 'function unequipItem(teamIdx){ if(isTeamStructureLocked()){ notifyTeamStructureLocked(); return; }'), 'unequipItem locked'); // V7 · DBT-04
   for (const fn of ['openItemSelector', 'equipItemDirect', 'removeItemFromPokemon', 'unequipItemFromPokemon']) {
     // guard in the first 3 lines of the body (tolerates a comment)
-    const m = TEAM_UI.match(new RegExp(`function ${fn}\\([^)]*\\)\\{\\n(?:[^\\n]*\\n){0,2}[^\\n]*isTeamStructureLocked`));
+    const m = TEAM_UI.match(new RegExp(`function ${fn}\\([^)]*\\)\\s*\\{\\n(?:[^\\n]*\\n){0,2}[^\\n]*isTeamStructureLocked`)); // V7 · DBT-01
     assert.ok(m, `${fn} locked`);
   }
   assert.ok(TEAM_UI.includes('function teamDrop(ev, targetIdx) {\n  ev.preventDefault();\n  // Phase 17'), 'teamDrop locked');

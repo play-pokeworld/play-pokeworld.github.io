@@ -26,9 +26,11 @@ export class MapOverlaysView extends UIView {
   onLoad() {
     // Spawn the card entity UNDER the view root (renderChildren(root)).
     this.cardEntity = this.spawn('ui:map-overlays', []);
-    this.cardEntity.addComponent(new UIRenderComponent({
-      template: () => [mapHelpCardVNode(this.model)],
-    }));
+    this.cardEntity.addComponent(
+      new UIRenderComponent({
+        template: () => [mapHelpCardVNode(this.model)],
+      })
+    );
   }
 
   /** Content of #map-help-modal (adapter owns shell + .open). */
@@ -38,6 +40,3 @@ export class MapOverlaysView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
-
-
-

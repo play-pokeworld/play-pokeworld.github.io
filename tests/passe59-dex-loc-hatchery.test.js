@@ -21,6 +21,7 @@ import { fileURLToPath } from 'node:url';
 import { DexDetailView } from '../src/ui/views/DexDetailView.js';
 import { LocationInfoView } from '../src/ui/views/LocationInfoView.js';
 import { machineWindowHTML } from '../src/ui/components/machine-window.js';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const R = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
@@ -114,6 +115,7 @@ test('play records: dex/loc counters store encounters, captures, defeats and shi
   };
   sandbox.window = sandbox;
   sandbox.globalThis = sandbox;
+  sandbox.pwLateLink = (n) => (typeof sandbox[n] === 'function' ? sandbox[n] : null); // V7 · DBT-04 — résolveur de lien tardif pour la tranche de fonctions
   vm.createContext(sandbox);
   const src = R('src/application/world/collection.js');
   const start = src.indexOf('const DEX_COUNT_KEYS');
@@ -257,12 +259,12 @@ test('mode switch and fossil revival stay locked until Kanto fossil quest 25', (
   assert.ok(hatch.includes("if (!isFossilReviveUnlocked()) continue"), 'queued fossils skipped while locked');
   assert.ok(hatch.includes("if (!isFossilReviveUnlocked())"), 'instant reviveFossil blocked');
   const ui = R('src/ui/game/hatchery-ui.js');
-  assert.ok(ui.includes('canToggleMode ?'), 'empty slot omits the mode toggle while locked');
+  assert.ok(wsIncludes(ui, 'canToggleMode ?'), 'empty slot omits the mode toggle while locked'); // V7 · DBT-01
   assert.ok(!ui.includes('hatchery_fossil_locked'), 'no fossil lock teaser on the window');
   assert.ok(!ui.includes('Il faut en apprendre plus sur la réanimation des fossiles'), 'no leftover lock sentence');
   const sel = R('src/ui/game/box-selector.js');
   assert.ok(sel.includes('isFossilReviveUnlocked'), 'selector consults the fossil lock');
-  assert.ok(sel.includes("if(typeof isFossilReviveUnlocked === 'function' && !isFossilReviveUnlocked())"), 'sendFossilToHatchery refuses early');
+  assert.ok(wsIncludes(sel, "if(typeof isFossilReviveUnlocked === 'function' && !isFossilReviveUnlocked())"), 'sendFossilToHatchery refuses early'); // V7 · DBT-01
   const fr = R('src/localization/fr/ui.js');
   const en = R('src/localization/en/ui.js');
   assert.ok(!fr.includes('Il faut en apprendre plus sur la réanimation des fossiles.'), 'FR fossil lock copy removed');

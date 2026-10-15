@@ -15,6 +15,11 @@
  *   - NO storage location/zone (Pokemon is content, not container).
  *   - NO held item (HeldItem is managed by the TeamSlot entity, not the Pokemon).
  *
+ * V7 · DBT-05 — Ceci n'est PAS une seconde fabrique de Pokémon : aucune logique
+ * de stats, de chromatique ni de talent ici. LA fabrique gameplay est
+ * `createPoke()` (src/application/pokemon-factory.js) ; cette classe ne fait
+ * que projeter un Pokémon existant (`fromLegacy`) en composants ECS.
+ *
  * @module domain/pokemon/pokemon-factory
  */
 
@@ -26,9 +31,22 @@ export class PokemonFactory {
   static registerComponents(world) {
     if (!world) return;
     const comps = [
-      'Id', 'Name', 'Form', 'Shiny', 'Types', 'Level', 'Stats',
-      'EVsIVs', 'Moveset', 'Talents', 'Experience', 'StatusEffects',
-      'TeamSlot', 'SlotIndex', 'PokemonRef', 'HeldItem',
+      'Id',
+      'Name',
+      'Form',
+      'Shiny',
+      'Types',
+      'Level',
+      'Stats',
+      'EVsIVs',
+      'Moveset',
+      'Talents',
+      'Experience',
+      'StatusEffects',
+      'TeamSlot',
+      'SlotIndex',
+      'PokemonRef',
+      'HeldItem',
     ];
     for (const c of comps) {
       world.register(c);
@@ -199,6 +217,3 @@ export class PokemonFactory {
       : this.createEnemyPokemon(world, spec);
   }
 }
-
-
-

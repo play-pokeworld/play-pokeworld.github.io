@@ -39,32 +39,42 @@ export class BagView extends UIView {
     // skeleton/look to the PC box filter bar (chips + fields + search +
     // reset). Sort is a labeled dropdown, exactly like the box fields.
     this.toolbarEntity = this.spawn('ui:toolbar', []);
-    this.toolbarEntity.addComponent(new UIRenderComponent({
-      template: (e) => {
-        const activeSort = (model.sorts || []).find((s) => s.active);
-        return filterBarVNode({
-          entityId: e.id,
-          className: 'inv-toolbar',
-          chipsRowClass: 'inv-tabs',
-          chips: (model.tabs || []).map((tab) => ({
-            label: tab.label,
-            count: tab.count ?? 0,
-            active: !!tab.active,
-            call: 'setInvCat',
-            callArgs: `'${tab.id}'`,
-          })),
-          fields: [{
-            label: model.sortLabel || 'Tri',
-            name: 'inv-sort',
-            options: (model.sorts || []).map((s) => ({ value: s.id, label: s.label })),
-            current: activeSort ? activeSort.id : undefined,
-            changeCall: 'setInvSort',
-          }],
-          search: model.search ? { value: model.search.value, placeholder: model.search.placeholder, action: 'filter-bag' } : null,
-          reset: model.resetLabel ? { label: model.resetLabel, call: 'resetInvFilters' } : null,
-        });
-      },
-    }));
+    this.toolbarEntity.addComponent(
+      new UIRenderComponent({
+        template: (e) => {
+          const activeSort = (model.sorts || []).find((s) => s.active);
+          return filterBarVNode({
+            entityId: e.id,
+            className: 'inv-toolbar',
+            chipsRowClass: 'inv-tabs',
+            chips: (model.tabs || []).map((tab) => ({
+              label: tab.label,
+              count: tab.count ?? 0,
+              active: !!tab.active,
+              call: 'setInvCat',
+              callArgs: `'${tab.id}'`,
+            })),
+            fields: [
+              {
+                label: model.sortLabel || 'Tri',
+                name: 'inv-sort',
+                options: (model.sorts || []).map((s) => ({ value: s.id, label: s.label })),
+                current: activeSort ? activeSort.id : undefined,
+                changeCall: 'setInvSort',
+              },
+            ],
+            search: model.search
+              ? {
+                  value: model.search.value,
+                  placeholder: model.search.placeholder,
+                  action: 'filter-bag',
+                }
+              : null,
+            reset: model.resetLabel ? { label: model.resetLabel, call: 'resetInvFilters' } : null,
+          });
+        },
+      })
+    );
 
     // Scrollable item list entity (explicit gap: item rows carry no own
     // vertical margin, so the layout owns the spacing).
@@ -77,33 +87,51 @@ export class BagView extends UIView {
     });
     for (const item of model.items || []) {
       const cell = this.spawn('ui:bag-item', [], this.listEntity);
-      cell.addComponent(new UIInteractiveComponent({
-        action: 'legacy-call',
-        call: 'handleInventoryClick',
-        callArgs: `'${item.key}'`,
-      }));
-      cell.addComponent(new UIRenderComponent({
-        template: (ce) => {
-          const inter = ce.get(UIInteractiveComponent);
-          if (inter.renderHidden) return null;
-          return h('div', {
-            class: 'inv-item pw-starter-chosen',
-            dataset: {
-              action: 'legacy-call',
-              call: 'handleInventoryClick',
-              callArgs: `'${item.key}'`,
-              contextCall: 'openItemInfo',
-              contextArgs: `'${item.key}'`,
-              pwEid: String(ce.id),
-            },
+      cell.addComponent(
+        new UIInteractiveComponent({
+          action: 'legacy-call',
+          call: 'handleInventoryClick',
+          callArgs: `'${item.key}'`,
+        })
+      );
+      cell.addComponent(
+        new UIRenderComponent({
+          template: (ce) => {
+            const inter = ce.get(UIInteractiveComponent);
+            if (inter.renderHidden) return null;
+            return h(
+              'div',
+              {
+                class: 'inv-item pw-starter-chosen',
+                dataset: {
+                  action: 'legacy-call',
+                  call: 'handleInventoryClick',
+                  callArgs: `'${item.key}'`,
+                  contextCall: 'openItemInfo',
+                  contextArgs: `'${item.key}'`,
+                  pwEid: String(ce.id),
+                },
+              },
+              h('div', { class: 'inv-icon' }, item.iconHtml ? h.raw(item.iconHtml) : null),
+              h(
+                'div',
+                { class: 'pw-flex-1' },
+                h(
+                  'div',
+                  { class: 'inv-name pw-starter-chosen-label' },
+                  item.name,
+                  item.equippedName
+                    ? h.raw(
+                        ` <span data-style="color:var(--green);font-size:10px">✓ ${item.equippedName}</span>`
+                      )
+                    : null
+                )
+              ),
+              h('div', { class: 'inv-qty pw-starter-chosen-level' }, `×${item.qty}`)
+            );
           },
-            h('div', { class: 'inv-icon' }, item.iconHtml ? h.raw(item.iconHtml) : null),
-            h('div', { class: 'pw-flex-1' },
-              h('div', { class: 'inv-name pw-starter-chosen-label' }, item.name,
-                item.equippedName ? h.raw(` <span data-style="color:var(--green);font-size:10px">✓ ${item.equippedName}</span>`) : null)),
-            h('div', { class: 'inv-qty pw-starter-chosen-level' }, `×${item.qty}`));
-        },
-      }));
+        })
+      );
     }
   }
 
@@ -117,7 +145,11 @@ export class BagView extends UIView {
     const model = this.model;
     if (model.emptyInventory) {
       // Wave 43 — emptyLabel: trusted localized markup (inv_empty: <br><br>).
-      return h('div', { class: 'pw-empty-state-lg' }, model.emptyLabel ? h.raw(model.emptyLabel) : '');
+      return h(
+        'div',
+        { class: 'pw-empty-state-lg' },
+        model.emptyLabel ? h.raw(model.emptyLabel) : ''
+      );
     }
     if (!(model.items || []).length) {
       return h('div', { class: 'pw-empty-state-md' }, model.noResultsLabel || '');
@@ -126,9 +158,12 @@ export class BagView extends UIView {
   }
 
   buildView() {
-    return h('div', { class: 'pw-scene bag-panel-content', dataset: { scene: this.name } },
+    return h(
+      'div',
+      { class: 'pw-scene bag-panel-content', dataset: { scene: this.name } },
       this.filtersVNode(),
-      this.contentVNode());
+      this.contentVNode()
+    );
   }
 
   /**
@@ -144,6 +179,3 @@ export class BagView extends UIView {
     return { filters, content, full: filters + content };
   }
 }
-
-
-

@@ -42,10 +42,11 @@ export const gameScene = new GameScene({ bus: eventBus });
 /** @returns {boolean} True while the starter overlay is actually shown. */
 function isStarterOpen() {
   const starter = document.getElementById('starter-modal');
-  return !!(starter && (
-    (starter.classList && starter.classList.contains('open'))
-    || (starter.style && starter.style.display === 'flex')
-  ));
+  return !!(
+    starter &&
+    ((starter.classList && starter.classList.contains('open')) ||
+      (starter.style && starter.style.display === 'flex'))
+  );
 }
 
 /** @returns {boolean} True while the save menu screen owns the display. */
@@ -63,7 +64,7 @@ function isSaveMenuOpen() {
  */
 export function syncSceneWithSession() {
   if (typeof document === 'undefined') return;
-  const started = (typeof window !== 'undefined') && !!window.PokeWorldGameStarted;
+  const started = typeof window !== 'undefined' && !!window.PokeWorldGameStarted;
   const menuOpen = isStarterOpen() || (!started && isSaveMenuOpen());
   if (menuOpen) {
     if (sceneManager.current !== mainMenuScene) sceneManager.replace(mainMenuScene);
@@ -85,6 +86,3 @@ if (typeof window !== 'undefined') {
     document.addEventListener('DOMContentLoaded', syncSceneWithSession);
   }
 }
-
-
-

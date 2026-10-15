@@ -13,7 +13,10 @@
 
 // Shared safe-HTML service (canonical sink).
 if (typeof globalThis !== 'undefined' && typeof globalThis._pwSetHtmlSafe !== 'function') {
-  globalThis._pwSetHtmlSafe = function (el, html) { if (typeof pwSetHtml === 'function') pwSetHtml(el, html); else el.innerHTML = html; };
+  globalThis._pwSetHtmlSafe = function (el, html) {
+    if (typeof pwSetHtml === 'function') pwSetHtml(el, html);
+    else el.innerHTML = html;
+  };
 }
 
 const DND_CSS = `
@@ -33,8 +36,8 @@ function _ensureStyle() {
 }
 
 // ── état du drag ─────────────────────────────────────────────────────────────
-let drag = null;     // { winId, el, originCol, originIndex, placeholder, indicator, raf, clientX, clientY }
-let pending = null;  // { winId, el, startX, startY } — avant le seuil de 5 px
+let drag = null; // { winId, el, originCol, originIndex, placeholder, indicator, raf, clientX, clientY }
+let pending = null; // { winId, el, startX, startY } — avant le seuil de 5 px
 
 const THRESHOLD_PX = 5;
 const EDGE_PX = 60;
@@ -42,16 +45,20 @@ const SCROLL_STEP = 8;
 
 // ── helpers ─────────────────────────────────────────────────────────────────
 function _cols() {
-  return (typeof getDashboardCols === 'function') ? getDashboardCols() : (window.dashboardCols || {});
+  return typeof getDashboardCols === 'function' ? getDashboardCols() : window.dashboardCols || {};
 }
-function _colEl(c) { return document.getElementById('col-' + c); }
-function _scroller() { return document.getElementById('main-dashboard') || document.body; }
+function _colEl(c) {
+  return document.getElementById('col-' + c);
+}
+function _scroller() {
+  return document.getElementById('main-dashboard') || document.body;
+}
 
 // Fenêtres VISIBLES d'une colonne (une fenêtre masquée = rect nul → jamais une
 // cible valide, wave 18). La fenêtre traînée est exclue.
 function _visibleWinEls(ids, excludeId) {
   const out = [];
-  for (const id of (ids || [])) {
+  for (const id of ids || []) {
     if (id === excludeId) continue;
     const el = document.getElementById(id);
     if (!el) continue;
@@ -82,10 +89,15 @@ function _beginDrag(p, e) {
   const win = p.el;
   const rect = win.getBoundingClientRect();
   const cols = _cols();
-  let originCol = null, originIndex = -1;
+  let originCol = null,
+    originIndex = -1;
   for (let c = 1; c <= 3; c++) {
     const i = (cols[c] || []).indexOf(p.winId);
-    if (i !== -1) { originCol = c; originIndex = i; break; }
+    if (i !== -1) {
+      originCol = c;
+      originIndex = i;
+      break;
+    }
   }
   if (originCol == null) return;
 
@@ -109,26 +121,40 @@ function _beginDrag(p, e) {
   win.classList.add('pw-win-dragging');
   win.style.width = rect.width + 'px';
   win.style.height = rect.height + 'px';
-  win.style.left = (e.clientX - rect.width / 2) + 'px';
-  win.style.top = (e.clientY - 24) + 'px';
+  win.style.left = e.clientX - rect.width / 2 + 'px';
+  win.style.top = e.clientY - 24 + 'px';
   document.body.appendChild(win);
 
   const indicator = document.createElement('div');
   indicator.className = 'pw-drop-indicator';
 
-  drag = { winId: p.winId, el: win, originCol, originIndex, placeholder: ph, indicator, raf: 0, clientX: e.clientX, clientY: e.clientY };
+  drag = {
+    winId: p.winId,
+    el: win,
+    originCol,
+    originIndex,
+    placeholder: ph,
+    indicator,
+    raf: 0,
+    clientX: e.clientX,
+    clientY: e.clientY,
+  };
 }
 
 // ── ciblage (colonne la plus proche + point d'insertion au Y) ───────────────
 function _targetColumn(clientX) {
-  let best = null, bestD = Infinity;
+  let best = null,
+    bestD = Infinity;
   for (let c = 1; c <= 3; c++) {
     const colEl = _colEl(c);
     if (!colEl) continue;
     const r = colEl.getBoundingClientRect();
     if (r.width <= 0 || r.height <= 0) continue;
     const d = Math.abs(clientX - (r.left + r.width / 2));
-    if (d < bestD) { bestD = d; best = c; }
+    if (d < bestD) {
+      bestD = d;
+      best = c;
+    }
   }
   return best;
 }
@@ -138,7 +164,10 @@ function _insertIndexInCol(colNum, clientY) {
   const vis = _visibleWinEls(others, drag.winId);
   let vi = vis.length;
   for (let i = 0; i < vis.length; i++) {
-    if (clientY < vis[i].r.top + vis[i].r.height / 2) { vi = i; break; }
+    if (clientY < vis[i].r.top + vis[i].r.height / 2) {
+      vi = i;
+      break;
+    }
   }
   let insIdx = others.length;
   if (vi < vis.length) {
@@ -153,8 +182,8 @@ function _dragFrame() {
   if (!drag) return;
   drag.raf = 0;
   const win = drag.el;
-  win.style.left = (drag.clientX - win.offsetWidth / 2) + 'px';
-  win.style.top = (drag.clientY - 24) + 'px';
+  win.style.left = drag.clientX - win.offsetWidth / 2 + 'px';
+  win.style.top = drag.clientY - 24 + 'px';
 
   const col = _targetColumn(drag.clientX);
   for (let c = 1; c <= 3; c++) {
@@ -169,7 +198,10 @@ function _dragFrame() {
     let before = null;
     // Premier visible dont le milieu est sous le curseur, sinon append en fin.
     for (let i = 0; i < vis.length; i++) {
-      if (drag.clientY < vis[i].r.top + vis[i].r.height / 2) { before = vis[i].el; break; }
+      if (drag.clientY < vis[i].r.top + vis[i].r.height / 2) {
+        before = vis[i].el;
+        break;
+      }
     }
     if (before == null) colEl.appendChild(drag.indicator);
     else if (drag.indicator.parentElement !== colEl) colEl.insertBefore(drag.indicator, before);
@@ -200,13 +232,16 @@ function _onPointerMove(e) {
 function _dropDrag() {
   if (!drag) return;
   const { winId, el, originCol, originIndex, placeholder, indicator } = drag;
-  if (drag.raf) { cancelAnimationFrame(drag.raf); drag.raf = 0; }
+  if (drag.raf) {
+    cancelAnimationFrame(drag.raf);
+    drag.raf = 0;
+  }
 
   // La colonne cible est la PLUS PROCHE du curseur au moment du drop
   // (l'indicateur est purement visuel et peut ne pas avoir été placé
   // si le pointerup arrive avant la passe de frame suivante).
   const nearest = _targetColumn(drag.clientX);
-  const targetCol = (nearest != null) ? nearest : originCol;
+  const targetCol = nearest != null ? nearest : originCol;
 
   // restaure la fenêtre + nettoie le décor
   if (indicator.parentElement) indicator.remove();
@@ -225,7 +260,7 @@ function _dropDrag() {
   const cols = _cols();
   const { insIdx } = _insertIndexInCol(targetCol, drag.clientY);
   for (let c = 1; c <= 3; c++) cols[c] = (cols[c] || []).filter((id) => id !== winId);
-  const backHome = (targetCol === originCol && insIdx === originIndex);
+  const backHome = targetCol === originCol && insIdx === originIndex;
   if (!backHome) {
     if (!cols[targetCol]) cols[targetCol] = [];
     cols[targetCol].splice(insIdx, 0, winId);
@@ -233,7 +268,9 @@ function _dropDrag() {
 
   drag = null;
 
-  try { safeStorage.set('pokeworld_cols_v13', JSON.stringify(cols)); } catch (_e) {}
+  try {
+    safeStorage.set('pokeworld_cols_v13', JSON.stringify(cols));
+  } catch (_e) {}
   if (typeof setDashboardCols === 'function') setDashboardCols(cols, { persist: false });
   else if (typeof renderDashboardColumns === 'function') renderDashboardColumns();
 }
@@ -242,7 +279,10 @@ function _dropDrag() {
 function _cancelDrag() {
   if (!drag) return;
   const { el, placeholder, indicator } = drag;
-  if (drag.raf) { cancelAnimationFrame(drag.raf); drag.raf = 0; }
+  if (drag.raf) {
+    cancelAnimationFrame(drag.raf);
+    drag.raf = 0;
+  }
   if (indicator.parentElement) indicator.remove();
   el.classList.remove('pw-win-dragging');
   el.style.left = el.style.top = el.style.width = el.style.height = '';
@@ -277,11 +317,17 @@ if (typeof window !== 'undefined') {
 }
 
 // --- Migrated to ES module, globals exposed ---
-if (typeof startWinDrag !== 'undefined') { if (typeof window !== 'undefined') window.startWinDrag = startWinDrag; if (typeof globalThis !== 'undefined') globalThis.startWinDrag = startWinDrag; }
+if (typeof startWinDrag !== 'undefined') {
+  if (typeof window !== 'undefined') window.startWinDrag = startWinDrag;
+  if (typeof globalThis !== 'undefined') globalThis.startWinDrag = startWinDrag;
+}
 
 // Wave 41 — native ESM module: exports the same names as the classic surface.
 export { startWinDrag };
 
 // Wave 42 — engine-registry absorption.
-if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('startWinDrag', startWinDrag); } catch (_) {} }
-
+if (typeof PokeActions !== 'undefined' && PokeActions) {
+  try {
+    PokeActions.register('startWinDrag', startWinDrag);
+  } catch (_) {}
+}

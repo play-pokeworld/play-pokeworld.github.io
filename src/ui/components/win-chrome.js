@@ -17,8 +17,11 @@ const GRIP_DOTS = 6;
 
 /** 6-dot drag grip (decorative — the header itself is the drag handle). */
 export function winGripVNode() {
-  return h('span', { class: 'pw-win-hdr-grip', 'aria-hidden': 'true' },
-    Array.from({ length: GRIP_DOTS }, () => h('span')));
+  return h(
+    'span',
+    { class: 'pw-win-hdr-grip', 'aria-hidden': 'true' },
+    Array.from({ length: GRIP_DOTS }, () => h('span'))
+  );
 }
 
 /**
@@ -30,13 +33,15 @@ export function winHeaderTitleVNode(m) {
   const labelAttrs = { class: 'pw-win-hdr-label' };
   if (m.labelId) labelAttrs.id = m.labelId;
   if (m.labelKey) labelAttrs.dataset = { i18n: m.labelKey };
-  return h('span', { class: 'pw-win-hdr-title' },
+  return h(
+    'span',
+    { class: 'pw-win-hdr-title' },
     h('span', { class: 'pw-win-hdr-icon', 'aria-hidden': 'true' }, h.raw(m.iconHtml || '')),
-    h('span', labelAttrs, m.labelText || ''));
+    h('span', labelAttrs, m.labelText || '')
+  );
 }
 
 /* ── String helpers (DOM-free, classic adapters / preview) ─────────────── */
-export function winHeaderTitleHTML(model) { return toHTMLString(winHeaderTitleVNode(model)); }
-
-
-
+export function winHeaderTitleHTML(model) {
+  return toHTMLString(winHeaderTitleVNode(model));
+}

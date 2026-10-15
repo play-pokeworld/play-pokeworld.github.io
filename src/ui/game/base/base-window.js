@@ -1,3 +1,4 @@
+import { pwLateLink } from '../../../core/late-link.js';
 // Wave 41 — native ESM module. The classic surface (window/globalThis) is
 // kept: classic consumers, VM harnesses and the engine registry.
 // ============================================================================
@@ -20,66 +21,192 @@
 // Wave 43 — lazy cross-module links (P7 regression fix):
 // zero static imports (chunks + VM harness isolates frozen); each alias resolves
 // AT CALL TIME — engine registry first, then the global surface (VM harness).
-const __pwV43Link = (n) => ((typeof PokeActions !== 'undefined' && PokeActions && typeof PokeActions.get === 'function') ? PokeActions.get(n) : null)
-  || (typeof globalThis !== 'undefined' ? globalThis[n] : null) || null;
-function baseCreateDefault(...args) { const f = __pwV43Link('baseCreateDefault'); return f ? f(...args) : undefined; }
-function baseDialogNpc(...args) { const f = __pwV43Link('baseDialogNpc'); return f ? f(...args) : undefined; }
-function baseDialogPc(...args) { const f = __pwV43Link('baseDialogPc'); return f ? f(...args) : undefined; }
-function baseEditorAdoptVisit(...args) { const f = __pwV43Link('baseEditorAdoptVisit'); return f ? f(...args) : undefined; }
-function baseEditorCellFromEvent(...args) { const f = __pwV43Link('baseEditorCellFromEvent'); return f ? f(...args) : undefined; }
-function baseEditorClickCell(...args) { const f = __pwV43Link('baseEditorClickCell'); return f ? f(...args) : undefined; }
-function baseEditorGet(...args) { const f = __pwV43Link('baseEditorGet'); return f ? f(...args) : undefined; }
-function baseEditorGhost(...args) { const f = __pwV43Link('baseEditorGhost'); return f ? f(...args) : undefined; }
-function baseEditorLaunchNpcBattle(...args) { const f = __pwV43Link('baseEditorLaunchNpcBattle'); return f ? f(...args) : undefined; }
-function baseEditorMoveCancel(...args) { const f = __pwV43Link('baseEditorMoveCancel'); return f ? f(...args) : undefined; }
-function baseEditorPickupSel(...args) { const f = __pwV43Link('baseEditorPickupSel'); return f ? f(...args) : undefined; }
-function baseEditorRotateSel(...args) { const f = __pwV43Link('baseEditorRotateSel'); return f ? f(...args) : undefined; }
-function baseEditorSelectNpc(...args) { const f = __pwV43Link('baseEditorSelectNpc'); return f ? f(...args) : undefined; }
-function baseEditorSelectNpcNew(...args) { const f = __pwV43Link('baseEditorSelectNpcNew'); return f ? f(...args) : undefined; }
-function baseEditorSelectSlug(...args) { const f = __pwV43Link('baseEditorSelectSlug'); return f ? f(...args) : undefined; }
-function baseEditorSetHover(...args) { const f = __pwV43Link('baseEditorSetHover'); return f ? f(...args) : undefined; }
-function baseEditorStartVisit(...args) { const f = __pwV43Link('baseEditorStartVisit'); return f ? f(...args) : undefined; }
-function baseEditorStopVisit(...args) { const f = __pwV43Link('baseEditorStopVisit'); return f ? f(...args) : undefined; }
-function baseEditorVisitClick(...args) { const f = __pwV43Link('baseEditorVisitClick'); return f ? f(...args) : undefined; }
-function baseEditorVisitTick(...args) { const f = __pwV43Link('baseEditorVisitTick'); return f ? f(...args) : undefined; }
-function baseExportDownload(...args) { const f = __pwV43Link('baseExportDownload'); return f ? f(...args) : undefined; }
-function baseGetState(...args) { const f = __pwV43Link('baseGetState'); return f ? f(...args) : undefined; }
-function baseImportPickFile(...args) { const f = __pwV43Link('baseImportPickFile'); return f ? f(...args) : undefined; }
-function baseItemFootprint(...args) { const f = __pwV43Link('baseItemFootprint'); return f ? f(...args) : undefined; }
-function baseItemGet(...args) { const f = __pwV43Link('baseItemGet'); return f ? f(...args) : undefined; }
-function baseItemRotCount(...args) { const f = __pwV43Link('baseItemRotCount'); return f ? f(...args) : undefined; }
-function baseLayoutGet(...args) { const f = __pwV43Link('baseLayoutGet'); return f ? f(...args) : undefined; }
-function baseLayoutIds(...args) { const f = __pwV43Link('baseLayoutIds'); return f ? f(...args) : undefined; }
-function baseNpcCount(...args) { const f = __pwV43Link('baseNpcCount'); return f ? f(...args) : undefined; }
-function baseNpcSpriteUrl(...args) { const f = __pwV43Link('baseNpcSpriteUrl'); return f ? f(...args) : undefined; }
-function basePlacedFind(...args) { const f = __pwV43Link('basePlacedFind'); return f ? f(...args) : undefined; }
-function baseRelocate(...args) { const f = __pwV43Link('baseRelocate'); return f ? f(...args) : undefined; }
-function baseStockCount(...args) { const f = __pwV43Link('baseStockCount'); return f ? f(...args) : undefined; }
-function baseView2dDraw(...args) { const f = __pwV43Link('baseView2dDraw'); return f ? f(...args) : undefined; }
-function baseView2dLoadSprites(...args) { const f = __pwV43Link('baseView2dLoadSprites'); return f ? f(...args) : undefined; }
-function baseVisitCreate(...args) { const f = __pwV43Link('baseVisitCreate'); return f ? f(...args) : undefined; }
-function baseZoneTopAt(...args) { const f = __pwV43Link('baseZoneTopAt'); return f ? f(...args) : undefined; }
-function openBaseNpcEditor(...args) { const f = __pwV43Link('openBaseNpcEditor'); return f ? f(...args) : undefined; }
+// V7 · DBT-05 — résolveur unique (core/late-link.js) ; alias résolus à l'appel.
+function baseCreateDefault(...args) {
+  const f = pwLateLink('baseCreateDefault');
+  return f ? f(...args) : undefined;
+}
+function baseDialogNpc(...args) {
+  const f = pwLateLink('baseDialogNpc');
+  return f ? f(...args) : undefined;
+}
+function baseDialogPc(...args) {
+  const f = pwLateLink('baseDialogPc');
+  return f ? f(...args) : undefined;
+}
+function baseEditorAdoptVisit(...args) {
+  const f = pwLateLink('baseEditorAdoptVisit');
+  return f ? f(...args) : undefined;
+}
+function baseEditorCellFromEvent(...args) {
+  const f = pwLateLink('baseEditorCellFromEvent');
+  return f ? f(...args) : undefined;
+}
+function baseEditorClickCell(...args) {
+  const f = pwLateLink('baseEditorClickCell');
+  return f ? f(...args) : undefined;
+}
+function baseEditorGet(...args) {
+  const f = pwLateLink('baseEditorGet');
+  return f ? f(...args) : undefined;
+}
+function baseEditorGhost(...args) {
+  const f = pwLateLink('baseEditorGhost');
+  return f ? f(...args) : undefined;
+}
+function baseEditorLaunchNpcBattle(...args) {
+  const f = pwLateLink('baseEditorLaunchNpcBattle');
+  return f ? f(...args) : undefined;
+}
+function baseEditorMoveCancel(...args) {
+  const f = pwLateLink('baseEditorMoveCancel');
+  return f ? f(...args) : undefined;
+}
+function baseEditorPickupSel(...args) {
+  const f = pwLateLink('baseEditorPickupSel');
+  return f ? f(...args) : undefined;
+}
+function baseEditorRotateSel(...args) {
+  const f = pwLateLink('baseEditorRotateSel');
+  return f ? f(...args) : undefined;
+}
+function baseEditorSelectNpc(...args) {
+  const f = pwLateLink('baseEditorSelectNpc');
+  return f ? f(...args) : undefined;
+}
+function baseEditorSelectNpcNew(...args) {
+  const f = pwLateLink('baseEditorSelectNpcNew');
+  return f ? f(...args) : undefined;
+}
+function baseEditorSelectSlug(...args) {
+  const f = pwLateLink('baseEditorSelectSlug');
+  return f ? f(...args) : undefined;
+}
+function baseEditorSetHover(...args) {
+  const f = pwLateLink('baseEditorSetHover');
+  return f ? f(...args) : undefined;
+}
+function baseEditorStartVisit(...args) {
+  const f = pwLateLink('baseEditorStartVisit');
+  return f ? f(...args) : undefined;
+}
+function baseEditorStopVisit(...args) {
+  const f = pwLateLink('baseEditorStopVisit');
+  return f ? f(...args) : undefined;
+}
+function baseEditorVisitClick(...args) {
+  const f = pwLateLink('baseEditorVisitClick');
+  return f ? f(...args) : undefined;
+}
+function baseEditorVisitTick(...args) {
+  const f = pwLateLink('baseEditorVisitTick');
+  return f ? f(...args) : undefined;
+}
+function baseExportDownload(...args) {
+  const f = pwLateLink('baseExportDownload');
+  return f ? f(...args) : undefined;
+}
+function baseGetState(...args) {
+  const f = pwLateLink('baseGetState');
+  return f ? f(...args) : undefined;
+}
+function baseImportPickFile(...args) {
+  const f = pwLateLink('baseImportPickFile');
+  return f ? f(...args) : undefined;
+}
+function baseItemFootprint(...args) {
+  const f = pwLateLink('baseItemFootprint');
+  return f ? f(...args) : undefined;
+}
+function baseItemGet(...args) {
+  const f = pwLateLink('baseItemGet');
+  return f ? f(...args) : undefined;
+}
+function baseItemRotCount(...args) {
+  const f = pwLateLink('baseItemRotCount');
+  return f ? f(...args) : undefined;
+}
+function baseLayoutGet(...args) {
+  const f = pwLateLink('baseLayoutGet');
+  return f ? f(...args) : undefined;
+}
+function baseLayoutIds(...args) {
+  const f = pwLateLink('baseLayoutIds');
+  return f ? f(...args) : undefined;
+}
+function baseNpcCount(...args) {
+  const f = pwLateLink('baseNpcCount');
+  return f ? f(...args) : undefined;
+}
+function baseNpcSpriteUrl(...args) {
+  const f = pwLateLink('baseNpcSpriteUrl');
+  return f ? f(...args) : undefined;
+}
+function basePlacedFind(...args) {
+  const f = pwLateLink('basePlacedFind');
+  return f ? f(...args) : undefined;
+}
+function baseRelocate(...args) {
+  const f = pwLateLink('baseRelocate');
+  return f ? f(...args) : undefined;
+}
+function baseStockCount(...args) {
+  const f = pwLateLink('baseStockCount');
+  return f ? f(...args) : undefined;
+}
+function baseView2dDraw(...args) {
+  const f = pwLateLink('baseView2dDraw');
+  return f ? f(...args) : undefined;
+}
+function baseView2dLoadSprites(...args) {
+  const f = pwLateLink('baseView2dLoadSprites');
+  return f ? f(...args) : undefined;
+}
+function baseVisitCreate(...args) {
+  const f = pwLateLink('baseVisitCreate');
+  return f ? f(...args) : undefined;
+}
+function baseZoneTopAt(...args) {
+  const f = pwLateLink('baseZoneTopAt');
+  return f ? f(...args) : undefined;
+}
+function openBaseNpcEditor(...args) {
+  const f = pwLateLink('openBaseNpcEditor');
+  return f ? f(...args) : undefined;
+}
 
 const _baseWin = {
   inited: false,
-  root: null, c2d: null, c3d: null, modeSel: null, layoutSel: null, empty: null,
-  rotateBtn: null, pickupBtn: null, visitBtn: null, expBtn: null, impBtn: null, npcEditBtn: null, pcEditBtn: null,
-  hint: null, stock: null,
-  r3d: undefined,       // WebGL2 renderer (undefined = not tried yet, null = absent)
-  broken3d: false,      // phase 40: 3D cut for the session after the 1st failure
+  root: null,
+  c2d: null,
+  c3d: null,
+  modeSel: null,
+  layoutSel: null,
+  empty: null,
+  rotateBtn: null,
+  pickupBtn: null,
+  visitBtn: null,
+  expBtn: null,
+  impBtn: null,
+  npcEditBtn: null,
+  pcEditBtn: null,
+  hint: null,
+  stock: null,
+  r3d: undefined, // WebGL2 renderer (undefined = not tried yet, null = absent)
+  broken3d: false, // phase 40: 3D cut for the session after the 1st failure
   sprites2d: null,
-  spriteUrls: null,     // slug → url (for the stock thumbnails)
-  stockTab: null,       // current stock page (phase 39)
-  manP: null, iconUrls: null, // 2D manifest → thumbnail url (emerald || icon2d)
+  spriteUrls: null, // slug → url (for the stock thumbnails)
+  stockTab: null, // current stock page (phase 39)
+  manP: null,
+  iconUrls: null, // 2D manifest → thumbnail url (emerald || icon2d)
   lastSig: '',
   rendering: false,
-  visitTimer: null,     // {pw} | {id}
+  visitTimer: null, // {pw} | {id}
 };
 
 // Engine state (creates the base on the default layout if needed).
 function baseWindowState() {
-  const st = (typeof __pwV43Link('baseGetState') === 'function') ? baseGetState() : null;
+  const st = typeof pwLateLink('baseGetState') === 'function' ? baseGetState() : null;
   if (!st) return null;
   // The base is no longer auto-created: until the player has settled in
   // (quest 218), st.layoutId stays null and the window shows "no base".
@@ -110,12 +237,15 @@ function baseWindowEls() {
 
 // Editor available only if the module + the toolbar elements are present.
 function baseWindowEditorOk() {
-  return typeof __pwV43Link('baseEditorGet') === 'function' && !!_baseWin.stock;
+  return typeof pwLateLink('baseEditorGet') === 'function' && !!_baseWin.stock;
 }
 
 // Phase 42 (RSE canon): item rotation REMOVED → Rotate button hidden.
 function baseWindowHideRotate() {
-  if (_baseWin.rotateBtn) { _baseWin.rotateBtn.hidden = true; _baseWin.rotateBtn.disabled = true; }
+  if (_baseWin.rotateBtn) {
+    _baseWin.rotateBtn.hidden = true;
+    _baseWin.rotateBtn.disabled = true;
+  }
 }
 
 // Opened via file:// (double-click on index.html)? Origins are then
@@ -123,8 +253,10 @@ function baseWindowHideRotate() {
 // therefore disabled; the 2D stays fully functional.
 function baseWindowIsFileUrl() {
   try {
-    return (typeof location !== 'undefined') && location.protocol === 'file:';
-  } catch (_) { return false; }
+    return typeof location !== 'undefined' && location.protocol === 'file:';
+  } catch (_) {
+    return false;
+  }
 }
 
 // Phase 55: this window is PURELY 2D. The 3D render lives in its own
@@ -159,7 +291,8 @@ function baseWindowFillSelects() {
       og.label = t('base.win.layout_group.' + g);
       for (const id of ids) {
         const el = document.createElement('option');
-        el.value = id; el.textContent = t('base.win.layout.' + id);
+        el.value = id;
+        el.textContent = t('base.win.layout.' + id);
         og.appendChild(el);
       }
       layoutSel.appendChild(og);
@@ -192,7 +325,9 @@ function baseWindowVisitTicker(on) {
         if (r.done) baseWindowVisitTicker(false);
       } catch (e) {
         baseWindowVisitTicker(false);
-        try { console.warn('[base-window] visit tick:', e); } catch (_) {}
+        try {
+          console.warn('[base-window] visit tick:', e);
+        } catch (_) {}
       }
     };
     try {
@@ -220,7 +355,11 @@ function baseWindowVisitTicker(on) {
   } else {
     if (!_baseWin.visitTimer) return;
     try {
-      if (_baseWin.visitTimer.pw && typeof PokeWorldTimers !== 'undefined' && PokeWorldTimers.stop) {
+      if (
+        _baseWin.visitTimer.pw &&
+        typeof PokeWorldTimers !== 'undefined' &&
+        PokeWorldTimers.stop
+      ) {
         PokeWorldTimers.stop('baseVisit');
       } else if (_baseWin.visitTimer.id) {
         clearInterval(_baseWin.visitTimer.id);
@@ -236,12 +375,20 @@ function baseWindowOverlay(st) {
   const ov = {};
   if (ed.mode === 'visit' && ed.visit) {
     ov.path = ed.visit.path;
-    ov.visitor = { x: ed.visit.pos.x, y: ed.visit.pos.y,
+    ov.visitor = {
+      x: ed.visit.pos.x,
+      y: ed.visit.pos.y,
       // Phase 42: true animated hero sprite (dir + walk frames)
       dir: ed.visit.dir || 'down',
-      frame: ed.visit.path && ed.visit.path.length ? ((ed.visit.animStep | 0) % 4) : 0,
+      frame: ed.visit.path && ed.visit.path.length ? (ed.visit.animStep | 0) % 4 : 0,
       // Phase 44: perched on top of an item (display/slide)
-      subElev: (ed.visit.pos && typeof __pwV43Link('baseZoneTopAt') === 'function' && baseZoneTopAt(ed.visit.st, ed.visit.pos.x, ed.visit.pos.y)) ? 1 : 0 };
+      subElev:
+        ed.visit.pos &&
+        typeof pwLateLink('baseZoneTopAt') === 'function' &&
+        baseZoneTopAt(ed.visit.st, ed.visit.pos.x, ed.visit.pos.y)
+          ? 1
+          : 0,
+    };
     return ov;
   }
   const gh = baseEditorGhost(st);
@@ -272,7 +419,10 @@ function baseWindowManifest() {
       _baseWin.manP = Promise.resolve(window.PokeWorldBaseManifest2D);
       return _baseWin.manP;
     }
-    if (typeof fetch !== 'function') { _baseWin.manP = Promise.resolve({ items: {} }); return _baseWin.manP; }
+    if (typeof fetch !== 'function') {
+      _baseWin.manP = Promise.resolve({ items: {} });
+      return _baseWin.manP;
+    }
     _baseWin.manP = fetch('src/assets/images/secret-base/manifest.render2d.json')
       .then((r) => (r.ok ? r.json() : { items: {} }))
       .catch(() => ({ items: {} }));
@@ -320,14 +470,18 @@ async function baseWindowRenderStock(st) {
   if (!baseWindowEditorOk()) return;
   const ed = baseEditorGet();
   const urls = await baseWindowIconUrls();
-  const slugs = Object.keys(st.stock || {}).filter((s) => baseStockCount(st, s) > 0 && baseItemGet(s));
+  const slugs = Object.keys(st.stock || {}).filter(
+    (s) => baseStockCount(st, s) > 0 && baseItemGet(s)
+  );
   // Phase 47: no more "pool". The NPC is an item you place like a
   // furniture: a single button in its tab, available as long as the cap
   // is not reached (user feedback: "just an NPC item to place").
-  const _npcRoom = (typeof __pwV43Link('baseNpcCount') === 'function' && typeof BASE_NPC_MAX !== 'undefined')
-    ? Math.max(0, BASE_NPC_MAX - baseNpcCount(st)) : 0;
+  const _npcRoom =
+    typeof pwLateLink('baseNpcCount') === 'function' && typeof BASE_NPC_MAX !== 'undefined'
+      ? Math.max(0, BASE_NPC_MAX - baseNpcCount(st))
+      : 0;
   const tabs = [];
-  for (const cat of (typeof BASE_ITEM_CATEGORIES !== 'undefined' ? BASE_ITEM_CATEGORIES : [])) {
+  for (const cat of typeof BASE_ITEM_CATEGORIES !== 'undefined' ? BASE_ITEM_CATEGORIES : []) {
     const entries = slugs.filter((s) => baseItemGet(s).cat === cat);
     if (entries.length) tabs.push({ cat, entries });
   }
@@ -375,7 +529,8 @@ async function baseWindowRenderStock(st) {
     if (ed.npcNew) bNew.classList.add('sel');
     if (!canCreate) bNew.disabled = true;
     const imNew = bNew.querySelector('img');
-    if (imNew && typeof __pwV43Link('baseNpcSpriteUrl') === 'function') imNew.src = baseNpcSpriteUrl(BASE_NPC_SPRITE_DEFAULT);
+    if (imNew && typeof pwLateLink('baseNpcSpriteUrl') === 'function')
+      imNew.src = baseNpcSpriteUrl(BASE_NPC_SPRITE_DEFAULT);
     else if (imNew) imNew.remove();
     page.appendChild(bNew);
     if (!canCreate) {
@@ -439,18 +594,29 @@ function baseWindowRefreshToolbar(st) {
   if (_baseWin.pcEditBtn) {
     let selPc = false;
     if (!visit && ed.selUid != null) {
-      const it = (typeof __pwV43Link('basePlacedFind') === 'function') ? basePlacedFind(st, ed.selUid) : null;
+      const it =
+        typeof pwLateLink('basePlacedFind') === 'function' ? basePlacedFind(st, ed.selUid) : null;
       selPc = !!(it && it.s === 'pc');
     }
     _baseWin.pcEditBtn.hidden = !selPc;
     _baseWin.pcEditBtn.disabled = !selPc;
-    try { _baseWin.pcEditBtn.textContent = t('base.pc.edit_selected') || 'Modifier le PC'; } catch(_) { _baseWin.pcEditBtn.textContent = 'Modifier le PC'; }
+    try {
+      _baseWin.pcEditBtn.textContent = t('base.pc.edit_selected') || 'Modifier le PC';
+    } catch (_) {
+      _baseWin.pcEditBtn.textContent = 'Modifier le PC';
+    }
   }
   _baseWin.impBtn.disabled = visit;
   const movPlaced = !visit && ed.moveUid != null && basePlacedFind(st, ed.moveUid);
-  _baseWin.hint.textContent = t(visit ? 'base.edit.visit_hint'
-    : movPlaced ? tr('base.edit.move_hint', { name: t('base.i.' + movPlaced.s) })
-    : ((ed.slug || ed.npcId || ed.npcNew) ? 'base.edit.place_hint' : 'base.edit.select_hint'));
+  _baseWin.hint.textContent = t(
+    visit
+      ? 'base.edit.visit_hint'
+      : movPlaced
+        ? tr('base.edit.move_hint', { name: t('base.i.' + movPlaced.s) })
+        : ed.slug || ed.npcId || ed.npcNew
+          ? 'base.edit.place_hint'
+          : 'base.edit.select_hint'
+  );
   if (!visit) baseWindowRenderStock(st);
 }
 
@@ -488,14 +654,16 @@ function baseWindowCanvasLeave() {
 // battle when relevant — startBattle is called by base-editor).
 function baseWindowVisitInteractShow(res) {
   if (!res) return;
-  const say = (key, params, color) => { if (typeof notify === 'function') notify(tr(key, params), color || 'var(--light1)'); };
+  const say = (key, params, color) => {
+    if (typeof notify === 'function') notify(tr(key, params), color || 'var(--light1)');
+  };
   switch (res.type) {
     // Phase 51: OPEN a dialog box — the player reads the encounter line
     // before deciding (fallback: direct start if the dialog is missing).
     case 'npc_battle':
     case 'npc_talked':
     case 'npc_idle':
-      if (typeof __pwV43Link('baseDialogNpc') === 'function') baseDialogNpc(res);
+      if (typeof pwLateLink('baseDialogNpc') === 'function') baseDialogNpc(res);
       else if (res.type === 'npc_battle') {
         say('base.edit.battle_challenge', { name: res.npc.name }, 'var(--blue)');
         baseEditorLaunchNpcBattle(res);
@@ -504,28 +672,56 @@ function baseWindowVisitInteractShow(res) {
     case 'heal':
       // Canon: the bed heals the visitor's team.
       if (typeof G !== 'undefined' && G && Array.isArray(G.team)) {
-        for (const p of G.team) { p.currentHP = p.maxHP; p.status = null; p.statusTurns = 0; }
+        for (const p of G.team) {
+          p.currentHP = p.maxHP;
+          p.status = null;
+          p.statusTurns = 0;
+        }
       }
       say('base.edit.heal', null, 'var(--green)');
       break;
-    case 'message': say('base.edit.message'); break;
-    case 'light': say(res.on ? 'base.edit.light_on' : 'base.edit.light_off'); break;
-    case 'punch': say('base.edit.punch'); break;
-    case 'rules': say('base.edit.rules'); break;
-    case 'sit': say('base.edit.sit'); break;
-    case 'reveal': say('base.edit.reveal'); break;
-    case 'msg': say(res.msg); break;
+    case 'message':
+      say('base.edit.message');
+      break;
+    case 'light':
+      say(res.on ? 'base.edit.light_on' : 'base.edit.light_off');
+      break;
+    case 'punch':
+      say('base.edit.punch');
+      break;
+    case 'rules':
+      say('base.edit.rules');
+      break;
+    case 'sit':
+      say('base.edit.sit');
+      break;
+    case 'reveal':
+      say('base.edit.reveal');
+      break;
+    case 'msg':
+      say(res.msg);
+      break;
     case 'pc': {
       // Phase 51: the PC opens a panel (empty for now — reserved for
       // upcoming functions), with the base records in the header.
-      if (typeof __pwV43Link('baseDialogPc') === 'function') { baseDialogPc(res); break; }
+      if (typeof pwLateLink('baseDialogPc') === 'function') {
+        baseDialogPc(res);
+        break;
+      }
       const edc = baseEditorGet();
       if (edc.visitOwn) say('base.edit.pc_own', null, 'var(--blue)');
-      else if (res.record) say('base.edit.pc_record', { name: edc.visitName || '?', v: res.record.visits | 0, w: res.record.w | 0, l: res.record.l | 0 });
+      else if (res.record)
+        say('base.edit.pc_record', {
+          name: edc.visitName || '?',
+          v: res.record.visits | 0,
+          w: res.record.w | 0,
+          l: res.record.l | 0,
+        });
       else say('base.edit.pc_record_none');
       break;
     }
-    default: break;
+    default:
+      break;
   }
 }
 
@@ -546,9 +742,9 @@ function baseWindowCanvasClick(ev) {
       try {
         const step = baseEditorVisitTick();
         if (step && step.interact) baseWindowVisitInteractShow(step.interact);
-      } catch(_){}
-    }
-    else if (r.type === 'blocked' && typeof notify === 'function') notify(t('base.edit.blocked'), 'var(--light1)');
+      } catch (_) {}
+    } else if (r.type === 'blocked' && typeof notify === 'function')
+      notify(t('base.edit.blocked'), 'var(--light1)');
     else if (r.type === 'interact') baseWindowVisitInteractShow(r.res);
     baseWindowInvalidate();
     return;
@@ -564,12 +760,24 @@ function baseWindowCanvasClick(ev) {
       if (r.ok) notify(tr('base.edit.placed', { name: t('base.i.' + r.slug) }), 'var(--green)');
       else notify(t(r.reason), 'var(--red)');
     } else if (r.type === 'place_npc') {
-      if (r.ok) notify(tr('base.edit.npc_placed', { name: (st.npcs.find((n) => n.id === r.npcId) || {}).name || '?' }), 'var(--green)');
+      if (r.ok)
+        notify(
+          tr('base.edit.npc_placed', {
+            name: (st.npcs.find((n) => n.id === r.npcId) || {}).name || '?',
+          }),
+          'var(--green)'
+        );
       else notify(t(r.reason), 'var(--red)');
     } else if (r.type === 'move_npc_start') {
       notify(tr('base.edit.npc_move_hint', { name: r.name || '?' }), 'var(--blue)');
     } else if (r.type === 'move_npc') {
-      if (r.ok) notify(tr('base.edit.npc_placed', { name: (st.npcs.find((n) => n.id === r.npcId) || {}).name || '?' }), 'var(--green)');
+      if (r.ok)
+        notify(
+          tr('base.edit.npc_placed', {
+            name: (st.npcs.find((n) => n.id === r.npcId) || {}).name || '?',
+          }),
+          'var(--green)'
+        );
       else notify(t(r.reason), 'var(--red)');
     } else if (r.type === 'move_start') {
       notify(tr('base.edit.move_hint', { name: t('base.i.' + r.slug) }), 'var(--blue)');
@@ -593,11 +801,15 @@ function baseWindowSelectSlug(slug) {
 function baseWindowSelectNpcNew() {
   const st = baseWindowState();
   if (!st || !baseWindowEditorOk()) return;
-  const was = (typeof __pwV43Link('baseEditorGet') === 'function' ? baseEditorGet().npcNew : false);
+  const was = typeof pwLateLink('baseEditorGet') === 'function' ? baseEditorGet().npcNew : false;
   baseEditorSelectNpcNew(st);
-  const now = (typeof __pwV43Link('baseEditorGet') === 'function' ? baseEditorGet().npcNew : false);
+  const now = typeof pwLateLink('baseEditorGet') === 'function' ? baseEditorGet().npcNew : false;
   if (typeof notify === 'function') {
-    if (now) notify(t('base.npced.place_hint') || 'PNJ pris en main — cliquez une case pour le poser', 'var(--blue)');
+    if (now)
+      notify(
+        t('base.npced.place_hint') || 'PNJ pris en main — cliquez une case pour le poser',
+        'var(--blue)'
+      );
     else if (was) notify(t('base.edit.select_hint') || 'Sélection annulée', 'var(--light1)');
   }
   baseWindowInvalidate();
@@ -607,12 +819,14 @@ function baseWindowSelectNpcNew() {
 function baseWindowEditSelectedNpc() {
   const ed = baseEditorGet();
   if (!ed || ed.selNpc == null) return;
-  if (typeof __pwV43Link('openBaseNpcEditor') === 'function') openBaseNpcEditor(ed.selNpc);
+  if (typeof pwLateLink('openBaseNpcEditor') === 'function') openBaseNpcEditor(ed.selNpc);
 }
 
 function baseWindowEditSelectedPc() {
-  if (typeof __pwV43Link('baseDialogPc') === 'function') {
-    try { baseDialogPc(); } catch(_){}
+  if (typeof pwLateLink('baseDialogPc') === 'function') {
+    try {
+      baseDialogPc();
+    } catch (_) {}
   }
 }
 
@@ -662,7 +876,10 @@ function baseWindowPickupSel() {
   }
   const r = baseEditorPickupSel(st);
   if (r.ok && typeof notify === 'function') {
-    notify(tr(r.npc ? 'base.edit.npc_picked_up' : 'base.edit.picked_up', { name: name || '?' }), 'var(--green)');
+    notify(
+      tr(r.npc ? 'base.edit.npc_picked_up' : 'base.edit.picked_up', { name: name || '?' }),
+      'var(--green)'
+    );
   }
   baseWindowInvalidate();
 }
@@ -674,14 +891,23 @@ function baseWindowVisitToggle() {
   if (ed.mode === 'visit') {
     baseWindowVisitTicker(false);
     const sum = baseEditorStopVisit();
-    if (sum && typeof notify === 'function') notify(tr('base.edit.visit_end', { w: sum.w, l: sum.l }), 'var(--light1)');
+    if (sum && typeof notify === 'function')
+      notify(tr('base.edit.visit_end', { w: sum.w, l: sum.l }), 'var(--light1)');
   } else {
     const res = baseEditorStartVisit(st, { name: '', source: 'own' });
-    if (!res.ok) { if (typeof notify === 'function') notify(t(res.reason), 'var(--red)'); return; }
+    if (!res.ok) {
+      if (typeof notify === 'function') notify(t(res.reason), 'var(--red)');
+      return;
+    }
     if (typeof notify === 'function') notify(t('base.edit.visit_start_own'), 'var(--green)');
     // Quete decouverte (217) : visiter has base secrete.
-    try { if (typeof advanceQuests === 'function') advanceQuests('base_visit', (typeof G !== 'undefined' && G) ? G.location : null, 1); } catch (_) {}
-    try { if (typeof renderStoryWindow === 'function') renderStoryWindow(); } catch (_) {}
+    try {
+      if (typeof advanceQuests === 'function')
+        advanceQuests('base_visit', typeof G !== 'undefined' && G ? G.location : null, 1);
+    } catch (_) {}
+    try {
+      if (typeof renderStoryWindow === 'function') renderStoryWindow();
+    } catch (_) {}
   }
   baseWindowInvalidate();
 }
@@ -695,13 +921,23 @@ function baseWindowVisitToggle() {
 // advancement), plus scrolling the base window into view.
 function baseWindowVisitOwnBase() {
   const st = baseWindowState();
-  const en = (typeof G !== 'undefined' && G && G.lang === 'en');
+  const en = typeof G !== 'undefined' && G && G.lang === 'en';
   // First click may predate the first render: bind the window on demand
   // (#win-base is a static index.html element, init is idempotent).
-  if (st && !baseWindowEditorOk() && typeof baseWindowInit === 'function') { try { baseWindowInit(); } catch (_) {} }
+  if (st && !baseWindowEditorOk() && typeof baseWindowInit === 'function') {
+    try {
+      baseWindowInit();
+    } catch (_) {}
+  }
   if (!st || !baseWindowEditorOk()) return;
-  if (!(st.layoutId)) {
-    if (typeof notify === 'function') notify(en ? 'You have no Secret Base yet — settle an alcove first!' : 'Vous n\u2019avez pas encore de Base Secrète — installez-vous d\u2019abord dans une alcôve !', 'var(--light1)');
+  if (!st.layoutId) {
+    if (typeof notify === 'function')
+      notify(
+        en
+          ? 'You have no Secret Base yet — settle an alcove first!'
+          : 'Vous n\u2019avez pas encore de Base Secrète — installez-vous d\u2019abord dans une alcôve !',
+        'var(--light1)'
+      );
     return;
   }
   const ed = baseEditorGet();
@@ -710,26 +946,38 @@ function baseWindowVisitOwnBase() {
     // (own-ness lives in _baseEd.visitOwn — the visit session itself holds
     // a structuredClone of the state, no source field)
     if (ed.visit && ed.visitOwn) {
-      try { if (typeof scrollToWin === 'function') scrollToWin('win-base'); } catch (_) {}
+      try {
+        if (typeof scrollToWin === 'function') scrollToWin('win-base');
+      } catch (_) {}
       if (typeof baseWindowInvalidate === 'function') baseWindowInvalidate();
       return;
     }
     baseWindowVisitTicker(false);
-    if (typeof __pwV43Link('baseEditorStopVisit') === 'function') baseEditorStopVisit();
+    if (typeof pwLateLink('baseEditorStopVisit') === 'function') baseEditorStopVisit();
   }
   const res = baseEditorStartVisit(st, { name: '', source: 'own' });
-  if (!res.ok) { if (typeof notify === 'function') notify(t(res.reason), 'var(--red)'); return; }
+  if (!res.ok) {
+    if (typeof notify === 'function') notify(t(res.reason), 'var(--red)');
+    return;
+  }
   if (typeof notify === 'function') notify(t('base.edit.visit_start_own'), 'var(--green)');
-  try { if (typeof advanceQuests === 'function') advanceQuests('base_visit', (typeof G !== 'undefined' && G) ? G.location : null, 1); } catch (_) {}
-  try { if (typeof renderStoryWindow === 'function') renderStoryWindow(); } catch (_) {}
-  try { if (typeof scrollToWin === 'function') scrollToWin('win-base'); } catch (_) {}
+  try {
+    if (typeof advanceQuests === 'function')
+      advanceQuests('base_visit', typeof G !== 'undefined' && G ? G.location : null, 1);
+  } catch (_) {}
+  try {
+    if (typeof renderStoryWindow === 'function') renderStoryWindow();
+  } catch (_) {}
+  try {
+    if (typeof scrollToWin === 'function') scrollToWin('win-base');
+  } catch (_) {}
   if (typeof baseWindowInvalidate === 'function') baseWindowInvalidate();
 }
 
 function baseWindowExport() {
   const st = baseWindowState();
   if (!st) return;
-  if (typeof __pwV43Link('baseExportDownload') === 'function') baseExportDownload(st, null);
+  if (typeof pwLateLink('baseExportDownload') === 'function') baseExportDownload(st, null);
 }
 
 // Visited by fichier : import valid (never credite) → session interactive.
@@ -738,14 +986,18 @@ function baseWindowImport() {
   if (!st || !baseWindowEditorOk()) return;
   const ed = baseEditorGet();
   if (ed.mode === 'visit') return;
-  if (typeof __pwV43Link('baseImportPickFile') !== 'function') return;
+  if (typeof pwLateLink('baseImportPickFile') !== 'function') return;
   baseImportPickFile((res) => {
     if (!res || !res.ok) {
       if (res && res.reason && typeof notify === 'function') notify(t(res.reason), 'var(--red)');
       return;
     }
     baseEditorAdoptVisit(res.sess, { name: res.meta && res.meta.name, source: 'import' });
-    if (typeof notify === 'function') notify(tr('base.edit.visit_start', { name: (res.meta && res.meta.name) || '?' }), 'var(--green)');
+    if (typeof notify === 'function')
+      notify(
+        tr('base.edit.visit_start', { name: (res.meta && res.meta.name) || '?' }),
+        'var(--green)'
+      );
     baseWindowInvalidate();
   });
 }
@@ -755,9 +1007,11 @@ function baseWindowInit() {
   if (_baseWin.inited) return true;
   if (!baseWindowEls()) return false;
   for (const cv of [_baseWin.c2d, _baseWin.c3d]) {
-    cv.style.cssText = 'display:none;max-width:100%;margin:0 auto;image-rendering:pixelated;background:transparent';
+    cv.style.cssText =
+      'display:none;max-width:100%;margin:0 auto;image-rendering:pixelated;background:transparent';
   }
-  _baseWin.empty.style.cssText = 'display:none;opacity:.75;font-size:12px;padding:8px 4px;text-align:center';
+  _baseWin.empty.style.cssText =
+    'display:none;opacity:.75;font-size:12px;padding:8px 4px;text-align:center';
   baseWindowFillSelects();
   if (baseWindowEditorOk()) {
     // Phase 38: editor wiring (ghost + click-to-place on the 2D canvas).
@@ -798,9 +1052,12 @@ function baseWindowSig(st, mode) {
 }
 
 async function baseWindowRender() {
-  try { if (typeof PokeTrace !== 'undefined' && PokeTrace) PokeTrace.count('render', 'ui:base-window'); } catch (_) {}
-  const isHoennBlocked = (typeof G !== 'undefined' && G && G.region && !G.unlockedSecretBaseHoenn);
-  const rootEl = typeof document !== 'undefined' && document ? document.getElementById('win-base') : null;
+  try {
+    if (typeof PokeTrace !== 'undefined' && PokeTrace) PokeTrace.count('render', 'ui:base-window');
+  } catch (_) {}
+  const isHoennBlocked = typeof G !== 'undefined' && G && G.region && !G.unlockedSecretBaseHoenn;
+  const rootEl =
+    typeof document !== 'undefined' && document ? document.getElementById('win-base') : null;
   if (isHoennBlocked) {
     if (rootEl) rootEl.style.display = 'none';
     _baseWin.lastSig = 'hoenn_locked';
@@ -823,7 +1080,7 @@ async function baseWindowRender() {
   // alcove from the Location window, quest 217, or an imported friend's base):
   // it renders with its own state (sess.st), not the owner's.
   const _edV = baseWindowEditorOk() ? baseEditorGet() : null;
-  const _visitSt = (_edV && _edV.mode === 'visit' && _edV.visit) ? _edV.visit.st : null;
+  const _visitSt = _edV && _edV.mode === 'visit' && _edV.visit ? _edV.visit.st : null;
   if (!st.layoutId && !_visitSt) {
     // No established base: the window stays empty/black (the base does
     // not exist yet — it gets created via "settle here" in the Location
@@ -834,16 +1091,23 @@ async function baseWindowRender() {
     _baseWin.c2d.style.display = 'none';
     _baseWin.c3d.style.display = 'none';
     if (_baseWin.stock) _baseWin.stock.style.display = 'none';
-    for (const b of [_baseWin.pickupBtn, _baseWin.expBtn, _baseWin.impBtn, _baseWin.visitBtn]) { if (b) b.disabled = true; }
+    for (const b of [_baseWin.pickupBtn, _baseWin.expBtn, _baseWin.impBtn, _baseWin.visitBtn]) {
+      if (b) b.disabled = true;
+    }
     if (_baseWin.hint) _baseWin.hint.textContent = '';
     return;
   }
-  for (const b of [_baseWin.expBtn, _baseWin.impBtn, _baseWin.visitBtn]) { if (b) b.disabled = false; }
+  for (const b of [_baseWin.expBtn, _baseWin.impBtn, _baseWin.visitBtn]) {
+    if (b) b.disabled = false;
+  }
   const drawSt = _visitSt || st;
   _baseWin.layoutSel.value = drawSt.layoutId || _BASE_DEFAULT_LAYOUT;
-  const mode = '2d';   // phase 55 : window 2D pure (the 3D has the sienne)
+  const mode = '2d'; // phase 55 : window 2D pure (the 3D has the sienne)
   const sig = baseWindowSig(drawSt, mode) + (_visitSt ? '|V' : '');
-  if (sig === _baseWin.lastSig) { baseWindowRefreshToolbar(drawSt); return; }
+  if (sig === _baseWin.lastSig) {
+    baseWindowRefreshToolbar(drawSt);
+    return;
+  }
   _baseWin.lastSig = sig;
   _baseWin.rendering = true;
   try {
@@ -857,7 +1121,7 @@ async function baseWindowRender() {
         if (img && img.src) _baseWin.spriteUrls[slug] = img.src;
       }
     }
-    const ok = false;   // phase 55 : more of branche 3D here
+    const ok = false; // phase 55 : more of branche 3D here
     if (ok) {
       _baseWin.c3d.style.display = 'block';
       _baseWin.c2d.style.display = 'none';
@@ -872,19 +1136,26 @@ async function baseWindowRender() {
         // last resort: message in the frame (window never empty)
         _baseWin.empty.textContent = t('base.win.no_gl');
         _baseWin.empty.style.display = 'block';
-        try { console.warn('[base-window] 2D render failed:', e2); } catch (_) {}
+        try {
+          console.warn('[base-window] 2D render failed:', e2);
+        } catch (_) {}
       }
       if (mode === '3d' && typeof notify === 'function') notify(t('base.win.no_gl'), 'var(--red)');
     }
     baseWindowRefreshToolbar(drawSt);
   } catch (e) {
-    try { console.warn('[base-window] render:', e); } catch (_) {}
+    try {
+      console.warn('[base-window] render:', e);
+    } catch (_) {}
   } finally {
     _baseWin.rendering = false;
   }
 }
 
-function baseWindowSetMode() { _baseWin.lastSig = ''; baseWindowRender(); }
+function baseWindowSetMode() {
+  _baseWin.lastSig = '';
+  baseWindowRender();
+}
 
 function baseWindowSetLayout(id) {
   if (!baseWindowInit()) return;
@@ -906,7 +1177,10 @@ function baseWindowSetLayout(id) {
 }
 
 // called by debug / all changement of state externe
-function baseWindowInvalidate() { _baseWin.lastSig = ''; baseWindowRender(); }
+function baseWindowInvalidate() {
+  _baseWin.lastSig = '';
+  baseWindowRender();
+}
 
 // ─── Alcoves by route (no more dropdown menu: each Hoenn route has its
 // own base slots, as in RSE). The 36 catalog layouts
@@ -940,13 +1214,13 @@ function baseWindowGetRouteAlcoves(locId) {
 
 // Route where the current base is established (persisted in st.routeId).
 function baseWindowRouteOfCurrentBase() {
-  const st = (typeof __pwV43Link('baseGetState') === 'function') ? baseGetState() : null;
+  const st = typeof pwLateLink('baseGetState') === 'function' ? baseGetState() : null;
   return (st && st.routeId) || null;
 }
 
 function _baseLayoutLabel(id) {
-  const v = (typeof t === 'function') ? t('base.win.layout.' + id) : id;
-  return (v && v !== 'base.win.layout.' + id) ? v : id;
+  const v = typeof t === 'function' ? t('base.win.layout.' + id) : id;
+  return v && v !== 'base.win.layout.' + id ? v : id;
 }
 
 // "Visit the alcove": starts a REAL visit session in the route's empty
@@ -954,35 +1228,77 @@ function _baseLayoutLabel(id) {
 // This is the visit that counts for quest 217 (discovering the bases).
 function baseWindowVisitAlcove(locId, layoutId) {
   const alcoves = baseWindowGetRouteAlcoves(locId);
-  const en = (typeof G !== 'undefined' && G && G.lang === 'en');
+  const en = typeof G !== 'undefined' && G && G.lang === 'en';
   if (!alcoves.length) {
-    if (typeof notify === 'function') notify(en ? 'No usable alcove on this route.' : 'Aucune alcôve exploitable sur cette route.', 'var(--light1)');
+    if (typeof notify === 'function')
+      notify(
+        en ? 'No usable alcove on this route.' : 'Aucune alcôve exploitable sur cette route.',
+        'var(--light1)'
+      );
     return;
   }
-  const target = (layoutId && alcoves.includes(layoutId)) ? layoutId : alcoves[0];
-  if (typeof __pwV43Link('baseEditorGet') === 'function') {
+  const target = layoutId && alcoves.includes(layoutId) ? layoutId : alcoves[0];
+  if (typeof pwLateLink('baseEditorGet') === 'function') {
     const ed = baseEditorGet();
-    if (ed.mode === 'visit') { baseWindowVisitTicker(false); if (typeof __pwV43Link('baseEditorStopVisit') === 'function') baseEditorStopVisit(); }
+    if (ed.mode === 'visit') {
+      baseWindowVisitTicker(false);
+      if (typeof pwLateLink('baseEditorStopVisit') === 'function') baseEditorStopVisit();
+    }
   }
   // TEMPORARY state of the empty alcove (never persisted): the visit
   // session clones this state — the player's base is not modified.
-  const emptySt = (typeof __pwV43Link('baseCreateDefault') === 'function') ? baseCreateDefault() : { items: [], stock: {}, npcs: [], npcStock: [], uidSeq: 1, record: { w: 0, l: 0, visits: 0 } };
-  if (typeof __pwV43Link('baseRelocate') === 'function') baseRelocate(emptySt, target); // places the layout + automatic PC
-  const res = (typeof __pwV43Link('baseEditorAdoptVisit') === 'function' && typeof __pwV43Link('baseVisitCreate') === 'function')
-    ? baseEditorAdoptVisit(baseVisitCreate(emptySt), { name: _baseLayoutLabel(target), source: 'alcove' })
-    : { ok: false };
+  const emptySt =
+    typeof pwLateLink('baseCreateDefault') === 'function'
+      ? baseCreateDefault()
+      : {
+          items: [],
+          stock: {},
+          npcs: [],
+          npcStock: [],
+          uidSeq: 1,
+          record: { w: 0, l: 0, visits: 0 },
+        };
+  if (typeof pwLateLink('baseRelocate') === 'function') baseRelocate(emptySt, target); // places the layout + automatic PC
+  const res =
+    typeof pwLateLink('baseEditorAdoptVisit') === 'function' &&
+    typeof pwLateLink('baseVisitCreate') === 'function'
+      ? baseEditorAdoptVisit(baseVisitCreate(emptySt), {
+          name: _baseLayoutLabel(target),
+          source: 'alcove',
+        })
+      : { ok: false };
   if (!res.ok) {
-    if (typeof notify === 'function') notify(en ? 'This alcove cannot be visited right now.' : 'Impossible de visiter cette alcôve pour le moment.', 'var(--red)');
+    if (typeof notify === 'function')
+      notify(
+        en
+          ? 'This alcove cannot be visited right now.'
+          : 'Impossible de visiter cette alcôve pour le moment.',
+        'var(--red)'
+      );
     return;
   }
-  if (typeof notify === 'function') notify(en ? ('Visiting the empty alcove (' + _baseLayoutLabel(target) + '). Walk around, then settle in if you like it!') : ('Visite de l\u2019alcôve vide (' + _baseLayoutLabel(target) + '). Explorez, puis installez-vous si elle vous plaît !'), 'var(--green)');
+  if (typeof notify === 'function')
+    notify(
+      en
+        ? 'Visiting the empty alcove (' +
+            _baseLayoutLabel(target) +
+            '). Walk around, then settle in if you like it!'
+        : 'Visite de l\u2019alcôve vide (' +
+            _baseLayoutLabel(target) +
+            '). Explorez, puis installez-vous si elle vous plaît !',
+      'var(--green)'
+    );
   // NB : baseEditorAdoptVisit avance already the quete 217 (base_visit).
-  try { if (typeof scrollToWin === 'function') scrollToWin('win-base'); } catch (_) {}
+  try {
+    if (typeof scrollToWin === 'function') scrollToWin('win-base');
+  } catch (_) {}
   if (typeof baseWindowInvalidate === 'function') baseWindowInvalidate();
 }
 
 // Backward compatibility: "Examine the alcove" = visit the first alcove.
-function baseWindowSelectRouteLayout(locId) { baseWindowVisitAlcove(locId, null); }
+function baseWindowSelectRouteLayout(locId) {
+  baseWindowVisitAlcove(locId, null);
+}
 
 // "Set up here": MANDATORY confirmation once a base already exists
 // (whatever the route/alcove — relocating dismantles all furniture, never
@@ -994,29 +1310,55 @@ function baseWindowConfirmEstablish(locId, layoutId) {
   if (!st) return;
   const alcoves = baseWindowGetRouteAlcoves(locId);
   if (!alcoves.length) return;
-  const target = (layoutId && alcoves.includes(layoutId)) ? layoutId : alcoves[0];
-  const en = (typeof G !== 'undefined' && G && G.lang === 'en');
+  const target = layoutId && alcoves.includes(layoutId) ? layoutId : alcoves[0];
+  const en = typeof G !== 'undefined' && G && G.lang === 'en';
   // a base exists as soon as a layout is placed (st.routeId may be missing on
   // old saves: it must not short-circuit the confirmation).
   const hasBase = !!st.layoutId;
   if (hasBase) {
     // Already established exactly here → nothing to do.
     if (st.routeId === locId && st.layoutId === target) {
-      if (typeof notify === 'function') notify(en ? 'Your Secret Base is already established here.' : 'Votre Base Secrète est déjà établie ici.', 'var(--light1)');
+      if (typeof notify === 'function')
+        notify(
+          en
+            ? 'Your Secret Base is already established here.'
+            : 'Votre Base Secrète est déjà établie ici.',
+          'var(--light1)'
+        );
       return;
     }
     const hasFurniture = (st.items || []).some((i) => i.s !== 'pc');
     const title = en ? '🏠 Move your Secret Base?' : '🏠 Déménager votre Base Secrète ?';
     const msg = en
-      ? 'You already have a Secret Base.' + (hasFurniture ? '\nAll its furniture will be picked up and returned to your stock.' : '') + '\n\nMove your base here: ' + _baseLayoutLabel(target) + ' (' + (typeof getLocName === 'function' ? getLocName(locId) : locId) + ')?'
-      : 'Vous avez déjà une Base Secrète.' + (hasFurniture ? '\nTous ses meubles seront ramassés et retourneront dans votre stock.' : '') + '\n\nDéménager votre base ici : ' + _baseLayoutLabel(target) + ' (' + (typeof getLocName === 'function' ? getLocName(locId) : locId) + ') ?';
+      ? 'You already have a Secret Base.' +
+        (hasFurniture ? '\nAll its furniture will be picked up and returned to your stock.' : '') +
+        '\n\nMove your base here: ' +
+        _baseLayoutLabel(target) +
+        ' (' +
+        (typeof getLocName === 'function' ? getLocName(locId) : locId) +
+        ')?'
+      : 'Vous avez déjà une Base Secrète.' +
+        (hasFurniture
+          ? '\nTous ses meubles seront ramassés et retourneront dans votre stock.'
+          : '') +
+        '\n\nDéménager votre base ici : ' +
+        _baseLayoutLabel(target) +
+        ' (' +
+        (typeof getLocName === 'function' ? getLocName(locId) : locId) +
+        ') ?';
     if (typeof pwConfirm === 'function') {
-      pwConfirm(msg, function () { baseWindowEstablishRouteLayout(locId, target); }, {
-        title,
-        danger: true,
-        confirmLabel: en ? 'Move my base' : 'Déménager ma base',
-        cancelLabel: en ? 'Cancel' : 'Annuler',
-      });
+      pwConfirm(
+        msg,
+        function () {
+          baseWindowEstablishRouteLayout(locId, target);
+        },
+        {
+          title,
+          danger: true,
+          confirmLabel: en ? 'Move my base' : 'Déménager ma base',
+          cancelLabel: en ? 'Cancel' : 'Annuler',
+        }
+      );
       return;
     }
     // No design-system modal → do nothing (never fall back to native confirm()).
@@ -1029,73 +1371,287 @@ function baseWindowEstablishRouteLayout(locId, layoutId) {
   const st = baseWindowState();
   if (!st) return;
   const alcoves = baseWindowGetRouteAlcoves(locId);
-  const target = (layoutId && (typeof __pwV43Link('baseLayoutGet') !== 'function' || baseLayoutGet(layoutId))) ? layoutId : (alcoves[0] || 'cave_1');
+  const target =
+    layoutId && (typeof pwLateLink('baseLayoutGet') !== 'function' || baseLayoutGet(layoutId))
+      ? layoutId
+      : alcoves[0] || 'cave_1';
   // End any ongoing alcove visit (we are settling in!).
-  if (typeof __pwV43Link('baseEditorGet') === 'function') {
+  if (typeof pwLateLink('baseEditorGet') === 'function') {
     const ed = baseEditorGet();
-    if (ed.mode === 'visit') { baseWindowVisitTicker(false); if (typeof __pwV43Link('baseEditorStopVisit') === 'function') baseEditorStopVisit(); }
+    if (ed.mode === 'visit') {
+      baseWindowVisitTicker(false);
+      if (typeof pwLateLink('baseEditorStopVisit') === 'function') baseEditorStopVisit();
+    }
   }
   baseWindowSetLayout(target);
   // Robustness: if the window could not be initialized (missing DOM),
   // baseWindowSetLayout did nothing — move the state directly.
-  if (st.layoutId !== target && typeof __pwV43Link('baseRelocate') === 'function') baseRelocate(st, target);
+  if (st.layoutId !== target && typeof pwLateLink('baseRelocate') === 'function')
+    baseRelocate(st, target);
   st.routeId = locId || null;
-  if (typeof notify === 'function') notify((typeof G !== 'undefined' && G && G.lang === 'en') ? 'Your Secret Base is now established on this route!' : 'Votre Base Secrète est désormais établie sur cette route !', 'var(--green)');
+  if (typeof notify === 'function')
+    notify(
+      typeof G !== 'undefined' && G && G.lang === 'en'
+        ? 'Your Secret Base is now established on this route!'
+        : 'Votre Base Secrète est désormais établie sur cette route !',
+      'var(--green)'
+    );
   // Wave 35 (user): TELL the player how to enter — the "Visiter" toggle was
   // the only entry and nobody ever mentioned it (feedback: "on ne m'a jamais
   // dit d'appuyer sur visiter").
-  if (typeof notify === 'function') notify((typeof G !== 'undefined' && G && G.lang === 'en') ? 'Press Visiter (Base window) — or "Enter my base" from the Location window of this route — to walk inside!' : 'Appuyez sur Visiter (fenêtre Base) — ou « Entrer dans ma base » depuis la fenêtre Lieu de cette route — pour y entrer !', 'var(--yellow)');
+  if (typeof notify === 'function')
+    notify(
+      typeof G !== 'undefined' && G && G.lang === 'en'
+        ? 'Press Visiter (Base window) — or "Enter my base" from the Location window of this route — to walk inside!'
+        : 'Appuyez sur Visiter (fenêtre Base) — ou « Entrer dans ma base » depuis la fenêtre Lieu de cette route — pour y entrer !',
+      'var(--yellow)'
+    );
   // Quete decouverte (218) : prendre possession of has base secrete.
-  try { if (typeof advanceQuests === 'function') advanceQuests('base_establish', locId || null, 1); } catch (_) {}
-  try { if (typeof renderStoryWindow === 'function') renderStoryWindow(); } catch (_) {}
-  try { if (typeof saveGame === 'function') saveGame(); } catch (_) {}
-  try { if (typeof refreshMapAndLoc === 'function') refreshMapAndLoc(); } catch (_) {}
+  try {
+    if (typeof advanceQuests === 'function') advanceQuests('base_establish', locId || null, 1);
+  } catch (_) {}
+  try {
+    if (typeof renderStoryWindow === 'function') renderStoryWindow();
+  } catch (_) {}
+  try {
+    if (typeof saveGame === 'function') saveGame();
+  } catch (_) {}
+  try {
+    if (typeof refreshMapAndLoc === 'function') refreshMapAndLoc();
+  } catch (_) {}
 }
 
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowGetRouteAlcoves', baseWindowGetRouteAlcoves); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowGetRouteAlcoves = baseWindowGetRouteAlcoves; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowRouteOfCurrentBase', baseWindowRouteOfCurrentBase); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowRouteOfCurrentBase = baseWindowRouteOfCurrentBase; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowVisitAlcove', baseWindowVisitAlcove); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowVisitAlcove = baseWindowVisitAlcove; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowSelectRouteLayout', baseWindowSelectRouteLayout); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowSelectRouteLayout = baseWindowSelectRouteLayout; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowConfirmEstablish', baseWindowConfirmEstablish); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowConfirmEstablish = baseWindowConfirmEstablish; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowEstablishRouteLayout', baseWindowEstablishRouteLayout); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowEstablishRouteLayout = baseWindowEstablishRouteLayout; }
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowGetRouteAlcoves', baseWindowGetRouteAlcoves);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowGetRouteAlcoves = baseWindowGetRouteAlcoves;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowRouteOfCurrentBase', baseWindowRouteOfCurrentBase);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowRouteOfCurrentBase = baseWindowRouteOfCurrentBase;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowVisitAlcove', baseWindowVisitAlcove);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowVisitAlcove = baseWindowVisitAlcove;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowSelectRouteLayout', baseWindowSelectRouteLayout);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowSelectRouteLayout = baseWindowSelectRouteLayout;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowConfirmEstablish', baseWindowConfirmEstablish);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowConfirmEstablish = baseWindowConfirmEstablish;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowEstablishRouteLayout', baseWindowEstablishRouteLayout);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowEstablishRouteLayout = baseWindowEstablishRouteLayout;
+}
 
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowInit', baseWindowInit); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowInit = baseWindowInit; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowRender', baseWindowRender); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowRender = baseWindowRender; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowSetMode', baseWindowSetMode); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowSetMode = baseWindowSetMode; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowSetLayout', baseWindowSetLayout); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowSetLayout = baseWindowSetLayout; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowInvalidate', baseWindowInvalidate); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowInvalidate = baseWindowInvalidate; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowSelectSlug', baseWindowSelectSlug); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowSelectSlug = baseWindowSelectSlug; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowSelectNpc', baseWindowSelectNpc); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowSelectNpc = baseWindowSelectNpc; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowSelectTab', baseWindowSelectTab); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowSelectTab = baseWindowSelectTab; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowRotateSel', baseWindowRotateSel); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowRotateSel = baseWindowRotateSel; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowPickupSel', baseWindowPickupSel); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowPickupSel = baseWindowPickupSel; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowVisitToggle', baseWindowVisitToggle); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowVisitToggle = baseWindowVisitToggle; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowVisitOwnBase', baseWindowVisitOwnBase); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowVisitOwnBase = baseWindowVisitOwnBase; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowExport', baseWindowExport); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowExport = baseWindowExport; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowImport', baseWindowImport); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowImport = baseWindowImport; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowOverlay', baseWindowOverlay); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowOverlay = baseWindowOverlay; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowVisitTicker', baseWindowVisitTicker); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowVisitTicker = baseWindowVisitTicker; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowSelectNpcNew', baseWindowSelectNpcNew); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowSelectNpcNew = baseWindowSelectNpcNew; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowEditSelectedNpc', baseWindowEditSelectedNpc); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowEditSelectedNpc = baseWindowEditSelectedNpc; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowEditSelectedPc', baseWindowEditSelectedPc); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowEditSelectedPc = baseWindowEditSelectedPc; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowIsFileUrl', baseWindowIsFileUrl); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowIsFileUrl = baseWindowIsFileUrl; }
-
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowInit', baseWindowInit);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowInit = baseWindowInit;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowRender', baseWindowRender);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowRender = baseWindowRender;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowSetMode', baseWindowSetMode);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowSetMode = baseWindowSetMode;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowSetLayout', baseWindowSetLayout);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowSetLayout = baseWindowSetLayout;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowInvalidate', baseWindowInvalidate);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowInvalidate = baseWindowInvalidate;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowSelectSlug', baseWindowSelectSlug);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowSelectSlug = baseWindowSelectSlug;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowSelectNpc', baseWindowSelectNpc);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowSelectNpc = baseWindowSelectNpc;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowSelectTab', baseWindowSelectTab);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowSelectTab = baseWindowSelectTab;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowRotateSel', baseWindowRotateSel);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowRotateSel = baseWindowRotateSel;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowPickupSel', baseWindowPickupSel);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowPickupSel = baseWindowPickupSel;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowVisitToggle', baseWindowVisitToggle);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowVisitToggle = baseWindowVisitToggle;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowVisitOwnBase', baseWindowVisitOwnBase);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowVisitOwnBase = baseWindowVisitOwnBase;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowExport', baseWindowExport);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowExport = baseWindowExport;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowImport', baseWindowImport);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowImport = baseWindowImport;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowOverlay', baseWindowOverlay);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowOverlay = baseWindowOverlay;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowVisitTicker', baseWindowVisitTicker);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowVisitTicker = baseWindowVisitTicker;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowSelectNpcNew', baseWindowSelectNpcNew);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowSelectNpcNew = baseWindowSelectNpcNew;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowEditSelectedNpc', baseWindowEditSelectedNpc);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowEditSelectedNpc = baseWindowEditSelectedNpc;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowEditSelectedPc', baseWindowEditSelectedPc);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowEditSelectedPc = baseWindowEditSelectedPc;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseWindowIsFileUrl', baseWindowIsFileUrl);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseWindowIsFileUrl = baseWindowIsFileUrl;
+}
 
 // --- Exported globals ---
-if (typeof baseWindowCanvasClick !== 'undefined') { if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowCanvasClick', baseWindowCanvasClick); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowCanvasClick = baseWindowCanvasClick; } }
-if (typeof baseWindowCanvasLeave !== 'undefined') { if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowCanvasLeave', baseWindowCanvasLeave); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowCanvasLeave = baseWindowCanvasLeave; } }
-if (typeof baseWindowCanvasMove !== 'undefined') { if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowCanvasMove', baseWindowCanvasMove); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowCanvasMove = baseWindowCanvasMove; } }
-if (typeof baseWindowEditorOk !== 'undefined') { if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowEditorOk', baseWindowEditorOk); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowEditorOk = baseWindowEditorOk; } }
-if (typeof baseWindowEls !== 'undefined') { if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowEls', baseWindowEls); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowEls = baseWindowEls; } }
-if (typeof baseWindowEventState !== 'undefined') { if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowEventState', baseWindowEventState); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowEventState = baseWindowEventState; } }
-if (typeof baseWindowFillSelects !== 'undefined') { if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowFillSelects', baseWindowFillSelects); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowFillSelects = baseWindowFillSelects; } }
-if (typeof baseWindowHideRotate !== 'undefined') { if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowHideRotate', baseWindowHideRotate); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowHideRotate = baseWindowHideRotate; } }
-if (typeof baseWindowManifest !== 'undefined') { if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowManifest', baseWindowManifest); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowManifest = baseWindowManifest; } }
-if (typeof baseWindowRefreshToolbar !== 'undefined') { if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowRefreshToolbar', baseWindowRefreshToolbar); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowRefreshToolbar = baseWindowRefreshToolbar; } }
-if (typeof baseWindowSig !== 'undefined') { if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowSig', baseWindowSig); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowSig = baseWindowSig; } }
-if (typeof baseWindowState !== 'undefined') { if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowState', baseWindowState); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowState = baseWindowState; } }
-if (typeof baseWindowStockBtn !== 'undefined') { if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowStockBtn', baseWindowStockBtn); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowStockBtn = baseWindowStockBtn; } }
-if (typeof baseWindowVisitInteractShow !== 'undefined') { if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWindowVisitInteractShow', baseWindowVisitInteractShow); } else if (typeof globalThis !== 'undefined') { globalThis.baseWindowVisitInteractShow = baseWindowVisitInteractShow; } }
+if (typeof baseWindowCanvasClick !== 'undefined') {
+  if (typeof PokeActions !== 'undefined') {
+    PokeActions.register('baseWindowCanvasClick', baseWindowCanvasClick);
+  } else if (typeof globalThis !== 'undefined') {
+    globalThis.baseWindowCanvasClick = baseWindowCanvasClick;
+  }
+}
+if (typeof baseWindowCanvasLeave !== 'undefined') {
+  if (typeof PokeActions !== 'undefined') {
+    PokeActions.register('baseWindowCanvasLeave', baseWindowCanvasLeave);
+  } else if (typeof globalThis !== 'undefined') {
+    globalThis.baseWindowCanvasLeave = baseWindowCanvasLeave;
+  }
+}
+if (typeof baseWindowCanvasMove !== 'undefined') {
+  if (typeof PokeActions !== 'undefined') {
+    PokeActions.register('baseWindowCanvasMove', baseWindowCanvasMove);
+  } else if (typeof globalThis !== 'undefined') {
+    globalThis.baseWindowCanvasMove = baseWindowCanvasMove;
+  }
+}
+if (typeof baseWindowEditorOk !== 'undefined') {
+  if (typeof PokeActions !== 'undefined') {
+    PokeActions.register('baseWindowEditorOk', baseWindowEditorOk);
+  } else if (typeof globalThis !== 'undefined') {
+    globalThis.baseWindowEditorOk = baseWindowEditorOk;
+  }
+}
+if (typeof baseWindowEls !== 'undefined') {
+  if (typeof PokeActions !== 'undefined') {
+    PokeActions.register('baseWindowEls', baseWindowEls);
+  } else if (typeof globalThis !== 'undefined') {
+    globalThis.baseWindowEls = baseWindowEls;
+  }
+}
+if (typeof baseWindowEventState !== 'undefined') {
+  if (typeof PokeActions !== 'undefined') {
+    PokeActions.register('baseWindowEventState', baseWindowEventState);
+  } else if (typeof globalThis !== 'undefined') {
+    globalThis.baseWindowEventState = baseWindowEventState;
+  }
+}
+if (typeof baseWindowFillSelects !== 'undefined') {
+  if (typeof PokeActions !== 'undefined') {
+    PokeActions.register('baseWindowFillSelects', baseWindowFillSelects);
+  } else if (typeof globalThis !== 'undefined') {
+    globalThis.baseWindowFillSelects = baseWindowFillSelects;
+  }
+}
+if (typeof baseWindowHideRotate !== 'undefined') {
+  if (typeof PokeActions !== 'undefined') {
+    PokeActions.register('baseWindowHideRotate', baseWindowHideRotate);
+  } else if (typeof globalThis !== 'undefined') {
+    globalThis.baseWindowHideRotate = baseWindowHideRotate;
+  }
+}
+if (typeof baseWindowManifest !== 'undefined') {
+  if (typeof PokeActions !== 'undefined') {
+    PokeActions.register('baseWindowManifest', baseWindowManifest);
+  } else if (typeof globalThis !== 'undefined') {
+    globalThis.baseWindowManifest = baseWindowManifest;
+  }
+}
+if (typeof baseWindowRefreshToolbar !== 'undefined') {
+  if (typeof PokeActions !== 'undefined') {
+    PokeActions.register('baseWindowRefreshToolbar', baseWindowRefreshToolbar);
+  } else if (typeof globalThis !== 'undefined') {
+    globalThis.baseWindowRefreshToolbar = baseWindowRefreshToolbar;
+  }
+}
+if (typeof baseWindowSig !== 'undefined') {
+  if (typeof PokeActions !== 'undefined') {
+    PokeActions.register('baseWindowSig', baseWindowSig);
+  } else if (typeof globalThis !== 'undefined') {
+    globalThis.baseWindowSig = baseWindowSig;
+  }
+}
+if (typeof baseWindowState !== 'undefined') {
+  if (typeof PokeActions !== 'undefined') {
+    PokeActions.register('baseWindowState', baseWindowState);
+  } else if (typeof globalThis !== 'undefined') {
+    globalThis.baseWindowState = baseWindowState;
+  }
+}
+if (typeof baseWindowStockBtn !== 'undefined') {
+  if (typeof PokeActions !== 'undefined') {
+    PokeActions.register('baseWindowStockBtn', baseWindowStockBtn);
+  } else if (typeof globalThis !== 'undefined') {
+    globalThis.baseWindowStockBtn = baseWindowStockBtn;
+  }
+}
+if (typeof baseWindowVisitInteractShow !== 'undefined') {
+  if (typeof PokeActions !== 'undefined') {
+    PokeActions.register('baseWindowVisitInteractShow', baseWindowVisitInteractShow);
+  } else if (typeof globalThis !== 'undefined') {
+    globalThis.baseWindowVisitInteractShow = baseWindowVisitInteractShow;
+  }
+}
 
 // Wave 41 — native ESM module: exports the same names as the
 // classic surface kept above (bodies unchanged).
@@ -1141,6 +1697,3 @@ export {
   baseWindowStockBtn,
   baseWindowVisitInteractShow,
 };
-
-
-

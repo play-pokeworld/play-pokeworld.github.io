@@ -36,22 +36,29 @@ export function moveRowVNode(row) {
     dataset.contextArgs = row.context.args == null ? '' : String(row.context.args);
   }
   if (row.action) Object.assign(dataset, row.action);
-  return h('div', {
-    class: `poke-detail-move-row${row.stateClass ? ' ' + row.stateClass : ''}`,
-    dataset,
-    ...(row.title ? { title: row.title } : {}),
-  },
+  return h(
+    'div',
+    {
+      class: `poke-detail-move-row${row.stateClass ? ' ' + row.stateClass : ''}`,
+      dataset,
+      ...(row.title ? { title: row.title } : {}),
+    },
     h('span', { class: `type-badge ${row.typeCls || ''}` }, row.typeName || '?'),
     h('span', { class: 'poke-detail-move-name' }, row.name || ''),
     h('span', { class: 'poke-detail-move-meta' }, row.meta || ''),
     row.pill
-      ? h('span', { class: `poke-detail-pill ${row.pill.class || ''}`.trim(), style: { fontSize: '10px', marginLeft: 'auto' } }, row.pill.label)
-      : null);
+      ? h(
+          'span',
+          {
+            class: `poke-detail-pill ${row.pill.class || ''}`.trim(),
+            style: { fontSize: '10px', marginLeft: 'auto' },
+          },
+          row.pill.label
+        )
+      : null
+  );
 }
 
 export function moveRowHTML(row) {
   return toHTMLString(moveRowVNode(row));
 }
-
-
-

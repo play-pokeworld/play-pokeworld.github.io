@@ -176,7 +176,6 @@ export const L_en_economy = {
 "dungeon_loot_bag_money":"Expedition bag money",
 "no_loot_yet":"No loot collected yet.",
 "dungeon_boss_adjacent":"Challenge the boss from a neighboring tile.",
-"dungeon_cache_heal":"Cache: the team recovers 40% of its HP.",
 "dungeon_cache_loot":"Cache: +{tokens} DT into the bag.",
 "dungeon_node_fog":"Unknown tile",
 "dungeon_node_chest":"Chest — loot",

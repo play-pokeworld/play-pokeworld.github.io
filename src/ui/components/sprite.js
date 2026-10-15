@@ -53,26 +53,36 @@ export function createPokemonSprite(scene, props = {}) {
   });
   entity.addComponent(interactive);
 
-  entity.addComponent(new UIRenderComponent({
-    layer: 'ui',
-    template: (e) => {
-      const inter = e.get(UIInteractiveComponent);
-      if (inter.renderHidden) return null;
-      const dataset = { ...entityDataset(e) };
-      if (inter.action) dataset.action = inter.action;
-      return h('span', {
-        class: cx('pw-poke-circle-wrap', props.className),
-        style: { width: `${size}px`, height: `${size}px` },
-        dataset,
-        'aria-label': props.alt || null,
+  entity.addComponent(
+    new UIRenderComponent({
+      layer: 'ui',
+      template: (e) => {
+        const inter = e.get(UIInteractiveComponent);
+        if (inter.renderHidden) return null;
+        const dataset = { ...entityDataset(e) };
+        if (inter.action) dataset.action = inter.action;
+        return h(
+          'span',
+          {
+            class: cx('pw-poke-circle-wrap', props.className),
+            style: { width: `${size}px`, height: `${size}px` },
+            dataset,
+            'aria-label': props.alt || null,
+          },
+          h('span', { class: 'pw-poke-circle-bg' }),
+          props.imgSrc
+            ? h('img', {
+                class: cx('pw-poke-circle-img sprite-img', props.imgClass || null),
+                src: props.imgSrc,
+                alt: props.alt || '',
+                loading: 'lazy',
+              })
+            : h('span', { class: 'pw-poke-circle-emoji' }, props.emoji || '❓'),
+          props.shiny ? h('span', { class: 'pw-poke-circle-shiny' }) : null
+        );
       },
-        h('span', { class: 'pw-poke-circle-bg' }),
-        props.imgSrc
-          ? h('img', { class: cx('pw-poke-circle-img sprite-img', props.imgClass || null), src: props.imgSrc, alt: props.alt || '', loading: 'lazy' })
-          : h('span', { class: 'pw-poke-circle-emoji' }, props.emoji || '❓'),
-        props.shiny ? h('span', { class: 'pw-poke-circle-shiny' }) : null);
-    },
-  }));
+    })
+  );
   return entity;
 }
 
@@ -88,17 +98,22 @@ export function pokemonSpriteVNode(props = {}) {
   if (props.action) dataset.action = props.action;
   if (props.call) dataset.call = props.call;
   if (props.callArgs != null) dataset.callArgs = props.callArgs;
-  return h('span', {
-    class: cx('pw-poke-circle-wrap', props.className),
-    style: { width: `${size}px`, height: `${size}px` },
-    dataset,
-  },
+  return h(
+    'span',
+    {
+      class: cx('pw-poke-circle-wrap', props.className),
+      style: { width: `${size}px`, height: `${size}px` },
+      dataset,
+    },
     h('span', { class: 'pw-poke-circle-bg' }),
     props.imgSrc
-      ? h('img', { class: cx('pw-poke-circle-img sprite-img', props.imgClass || null), src: props.imgSrc, alt: props.alt || '', loading: 'lazy' })
+      ? h('img', {
+          class: cx('pw-poke-circle-img sprite-img', props.imgClass || null),
+          src: props.imgSrc,
+          alt: props.alt || '',
+          loading: 'lazy',
+        })
       : h('span', { class: 'pw-poke-circle-emoji' }, props.emoji || '❓'),
-    props.shiny ? h('span', { class: 'pw-poke-circle-shiny' }) : null);
+    props.shiny ? h('span', { class: 'pw-poke-circle-shiny' }) : null
+  );
 }
-
-
-

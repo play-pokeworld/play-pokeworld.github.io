@@ -27,41 +27,72 @@ import { h, cx, entityDataset } from './component-utils.js';
  */
 export function createToolbar(scene, props = {}) {
   const entity = scene.spawn('ui:toolbar', [], props.parent || undefined);
-  entity.addComponent(new UIStateComponent({ query: props.search && props.search.value || '' }));
-  entity.addComponent(new UIRenderComponent({
-    layer: 'ui',
-    template: (e) => h('div', {
-      class: cx('pw-toolbar pw-toolbar--fixed', props.className),
-      dataset: { ...entityDataset(e), fixed: 'true' },
-    },
-      props.tabs && props.tabs.length
-        ? h('div', { class: 'pw-toolbar-tabs', role: 'tablist' }, props.tabs.map((tab) => h('button', {
-            type: 'button', role: 'tab',
-            class: cx('pw-toolbar-tab', tab.active && 'is-active'),
-            'aria-selected': String(!!tab.active),
-            dataset: tabDataset(tab),
-          }, tab.label)))
-        : null,
-      props.search
-        ? h('input', {
-            type: 'search',
-            class: 'pw-toolbar-search',
-            value: props.search.value || '',
-            placeholder: props.search.placeholder || 'Search…',
-            'aria-label': props.search.placeholder || 'Search',
-            dataset: props.search.action ? { action: props.search.action } : {},
-          })
-        : null,
-      props.sorts && props.sorts.length
-        ? h('div', { class: 'pw-toolbar-sorts' }, props.sorts.map((sort) => h('button', {
-            type: 'button',
-            class: cx('pw-toolbar-sort', sort.active && 'is-active'),
-            dataset: sortDataset(sort),
-          }, sort.label)))
-        : null,
-      props.left ? h('div', { class: 'pw-toolbar-cluster pw-toolbar-cluster--left' }, props.left) : null,
-      props.right ? h('div', { class: 'pw-toolbar-cluster pw-toolbar-cluster--right' }, props.right) : null)
-  }));
+  entity.addComponent(new UIStateComponent({ query: (props.search && props.search.value) || '' }));
+  entity.addComponent(
+    new UIRenderComponent({
+      layer: 'ui',
+      template: (e) =>
+        h(
+          'div',
+          {
+            class: cx('pw-toolbar pw-toolbar--fixed', props.className),
+            dataset: { ...entityDataset(e), fixed: 'true' },
+          },
+          props.tabs && props.tabs.length
+            ? h(
+                'div',
+                { class: 'pw-toolbar-tabs', role: 'tablist' },
+                props.tabs.map((tab) =>
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      role: 'tab',
+                      class: cx('pw-toolbar-tab', tab.active && 'is-active'),
+                      'aria-selected': String(!!tab.active),
+                      dataset: tabDataset(tab),
+                    },
+                    tab.label
+                  )
+                )
+              )
+            : null,
+          props.search
+            ? h('input', {
+                type: 'search',
+                class: 'pw-toolbar-search',
+                value: props.search.value || '',
+                placeholder: props.search.placeholder || 'Search…',
+                'aria-label': props.search.placeholder || 'Search',
+                dataset: props.search.action ? { action: props.search.action } : {},
+              })
+            : null,
+          props.sorts && props.sorts.length
+            ? h(
+                'div',
+                { class: 'pw-toolbar-sorts' },
+                props.sorts.map((sort) =>
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      class: cx('pw-toolbar-sort', sort.active && 'is-active'),
+                      dataset: sortDataset(sort),
+                    },
+                    sort.label
+                  )
+                )
+              )
+            : null,
+          props.left
+            ? h('div', { class: 'pw-toolbar-cluster pw-toolbar-cluster--left' }, props.left)
+            : null,
+          props.right
+            ? h('div', { class: 'pw-toolbar-cluster pw-toolbar-cluster--right' }, props.right)
+            : null
+        ),
+    })
+  );
   return entity;
 }
 
@@ -82,6 +113,3 @@ function sortDataset(sort) {
   if (sort.id) dataset.sortId = sort.id;
   return dataset;
 }
-
-
-

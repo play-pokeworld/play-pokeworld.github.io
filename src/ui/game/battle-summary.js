@@ -4,14 +4,26 @@
 // Shared safe-HTML service (engine pwSetHtml when present, else direct).
 // globalThis-backed so concatenated VM harnesses and classic stubs stay valid.
 if (typeof globalThis !== 'undefined' && typeof globalThis._pwSetHtmlSafe !== 'function') {
-  globalThis._pwSetHtmlSafe = function (el, html) { if (typeof pwSetHtml === 'function') pwSetHtml(el, html); else el.innerHTML = html; };
+  globalThis._pwSetHtmlSafe = function (el, html) {
+    if (typeof pwSetHtml === 'function') pwSetHtml(el, html);
+    else el.innerHTML = html;
+  };
 }
 
-function buildBattleSessionCaptureGroups(catches){
+function buildBattleSessionCaptureGroups(catches) {
   const grouped = {};
   for (const c of catches || []) {
     const key = c.id + '_' + (c.shiny ? 'shiny' : 'normal');
-    if (!grouped[key]) grouped[key] = {id: Number(c.id), name: c.name, count: 0, shinyCount: 0, dupeCount: 0, emoji: c.emoji, shiny: !!c.shiny};
+    if (!grouped[key])
+      grouped[key] = {
+        id: Number(c.id),
+        name: c.name,
+        count: 0,
+        shinyCount: 0,
+        dupeCount: 0,
+        emoji: c.emoji,
+        shiny: !!c.shiny,
+      };
     grouped[key].count++;
     if (c.shiny) grouped[key].shinyCount++;
     if (c.dupe) grouped[key].dupeCount++;
@@ -19,15 +31,17 @@ function buildBattleSessionCaptureGroups(catches){
   return Object.values(grouped);
 }
 
-function getBattleSessionSummaryData(){
-  const b = (typeof battle !== 'undefined') ? battle : null;
+function getBattleSessionSummaryData() {
+  const b = typeof battle !== 'undefined' ? battle : null;
   // PASSE 39e — DONJON : le butin et le résumé concernent TOUT le run, pas
   // seulement le dernier combat. Quand une expédition est active, on agrège
   // run.loot + run.bag + la session de combat en cours : captures, objets,
   // argent (UN SEUL total obtenu) et jetons du sac. Hors donjon, c'est la
   // session du combat normal (comportement d'origine).
   let catches = (b && b.sessionCatches) || [];
-  let itemEntries = Object.entries((b && b.sessionItems) || {}).filter(([, qty]) => Number(qty) > 0);
+  let itemEntries = Object.entries((b && b.sessionItems) || {}).filter(
+    ([, qty]) => Number(qty) > 0
+  );
   let money = Number((b && b.sessionMoney) || 0);
   let tokens = Number((b && b.sessionTokens) || 0);
   let wins = Number((b && b.sessionWins) || 0);
@@ -55,7 +69,9 @@ function getBattleSessionSummaryData(){
   const captureGroups = buildBattleSessionCaptureGroups(catches);
   const durationMs = startedAt ? Math.max(0, Date.now() - startedAt) : 0;
   const totalItems = itemEntries.reduce((sum, [, qty]) => sum + Number(qty || 0), 0);
-  const damageEntries = Object.values((b && b.sessionDamageByPokemon) || {}).sort((a,b) => (b.damage||0) - (a.damage||0));
+  const damageEntries = Object.values((b && b.sessionDamageByPokemon) || {}).sort(
+    (a, b) => (b.damage || 0) - (a.damage || 0)
+  );
   const totalDamage = damageEntries.reduce((sum, entry) => sum + Number(entry.damage || 0), 0);
   return {
     catches,
@@ -65,8 +81,8 @@ function getBattleSessionSummaryData(){
     totalDamage,
     totalCaptures: catches.length,
     distinctCaptures: captureGroups.length,
-    shinyCaptures: catches.filter(c => c && c.shiny).length,
-    duplicateCaptures: catches.filter(c => c && c.dupe).length,
+    shinyCaptures: catches.filter((c) => c && c.shiny).length,
+    duplicateCaptures: catches.filter((c) => c && c.dupe).length,
     totalItems,
     distinctItems: itemEntries.length,
     wins,
@@ -84,24 +100,42 @@ function getBattleSessionSummaryData(){
 // here) rendered by the ECS SessionSummaryView — no HTML is hand-built in
 // this file anymore, only data + localized labels (+ sprite fragments via
 // spriteImg / itemSpriteHtml, still produced by the classic helpers).
-function battleSummaryUIModel(){
+function battleSummaryUIModel() {
   const data = getBattleSessionSummaryData();
   const title = t('battle_session_summary_title') || t('loot_summary_title');
   if (battle.isChamp) {
-    return { isChamp: true, title, champMsg: t('champ_no_loot') || "Les combats d'arène n'accordent pas de capture de Pokémon sauvage." };
+    return {
+      isChamp: true,
+      title,
+      champMsg:
+        t('champ_no_loot') || "Les combats d'arène n'accordent pas de capture de Pokémon sauvage.",
+    };
   }
 
-  const formatDuration = typeof formatPlayTime === 'function'
-    ? formatPlayTime(data.durationMs)
-    : (Math.max(0, Math.floor(data.durationMs / 1000)) + 's');
-  const locationLabel = typeof getLocName === 'function' ? getLocName(G.location) : (G.location || '');
+  const formatDuration =
+    typeof formatPlayTime === 'function'
+      ? formatPlayTime(data.durationMs)
+      : Math.max(0, Math.floor(data.durationMs / 1000)) + 's';
+  const locationLabel =
+    typeof getLocName === 'function' ? getLocName(G.location) : G.location || '';
 
-  const hasLoot = data.captureGroups.length || data.itemEntries.length || data.money > 0 || data.tokens > 0;
+  const hasLoot =
+    data.captureGroups.length || data.itemEntries.length || data.money > 0 || data.tokens > 0;
   // PASSE 39 — les monnaies du résumé : sprite + chiffre (pièce ₽, jeton JD),
   // jamais un multiplicateur « × » comme les Pokémon. Le chiffre est
   // « +N » pour l'argent gagné en combat, brut pour les jetons encaissés.
-  const moneySprite = '<img src="' + (typeof location !== 'undefined' ? new URL('src/assets/images/currency/money.svg', location.href).href : 'src/assets/images/currency/money.svg') + '" alt="" draggable="false">';
-  const tokenSprite = '<img src="' + (typeof location !== 'undefined' ? new URL('src/assets/images/currency/dungeonToken.svg', location.href).href : 'src/assets/images/currency/dungeonToken.svg') + '" alt="" draggable="false">';
+  const moneySprite =
+    '<img src="' +
+    (typeof location !== 'undefined'
+      ? new URL('src/assets/images/currency/money.svg', location.href).href
+      : 'src/assets/images/currency/money.svg') +
+    '" alt="" draggable="false">';
+  const tokenSprite =
+    '<img src="' +
+    (typeof location !== 'undefined'
+      ? new URL('src/assets/images/currency/dungeonToken.svg', location.href).href
+      : 'src/assets/images/currency/dungeonToken.svg') +
+    '" alt="" draggable="false">';
   return {
     title,
     stats: [
@@ -118,24 +152,39 @@ function battleSummaryUIModel(){
     damage: {
       title: t('battle_team_damage_title') || 'Dégâts de l’équipe',
       rows: data.damageEntries.map((entry) => ({
-        spriteHtml: spriteImg(entry.id, entry.emoji || '', { shiny: entry.shiny, size: 30 }),
+        spriteHtml: spriteImg(entry, entry.emoji || '', { shiny: entry.shiny, size: 30 }),
         name: entry.name,
-        valueText: formatNumber((entry.damage || 0)),
-        pct: data.totalDamage > 0 ? Math.max(2, Math.round((entry.damage / data.totalDamage) * 100)) : 0,
+        valueText: formatNumber(entry.damage || 0),
+        pct:
+          data.totalDamage > 0
+            ? Math.max(2, Math.round((entry.damage / data.totalDamage) * 100))
+            : 0,
         koCount: entry.kos || 0,
       })),
-      emptyLabel: t('battle_summary_no_damage') || (typeof t==='function'?t('battle_summary_no_damage'):'No damage recorded for this session.'),
+      emptyLabel:
+        t('battle_summary_no_damage') ||
+        (typeof t === 'function'
+          ? t('battle_summary_no_damage')
+          : 'No damage recorded for this session.'),
     },
     captures: {
       title: t('captured_pokemon_title'),
       entries: data.captureGroups.map((a) => ({
-        spriteHtml: spriteImg(a.id, a.emoji || '', { shiny: a.shinyCount > 0, size: 40 }),
+        spriteHtml: spriteImg(a, a.emoji || '', { shiny: a.shinyCount > 0, size: 40 }),
         shiny: a.shinyCount > 0,
         name: a.name,
-        subLabel: a.dupeCount ? `${t('battle_summary_duplicates') || 'Doublons'}: ${a.dupeCount}` : (a.shiny ? (t('battle_summary_shiny') || 'Shiny') : (t('battle_summary_standard') || 'Standard')),
+        subLabel: a.dupeCount
+          ? `${t('battle_summary_duplicates') || 'Doublons'}: ${a.dupeCount}`
+          : a.shiny
+            ? t('battle_summary_shiny') || 'Shiny'
+            : t('battle_summary_standard') || 'Standard',
         count: a.count,
       })),
-      emptyLabel: t('battle_summary_no_captures') || (typeof t==='function'?t('battle_summary_no_captures'):'No captures during this session.'),
+      emptyLabel:
+        t('battle_summary_no_captures') ||
+        (typeof t === 'function'
+          ? t('battle_summary_no_captures')
+          : 'No captures during this session.'),
     },
     items: {
       title: t('found_items_title'),
@@ -144,27 +193,50 @@ function battleSummaryUIModel(){
         name: getItemName(key),
         qty,
       })),
-      emptyLabel: t('battle_summary_no_items') || (typeof t==='function'?t('battle_summary_no_items'):'No items found during this session.'),
+      emptyLabel:
+        t('battle_summary_no_items') ||
+        (typeof t === 'function'
+          ? t('battle_summary_no_items')
+          : 'No items found during this session.'),
     },
     loot: hasLoot
       ? {
-        chips: [
-          // PASSE 39 — monnaies en tête : jeton JD (brut) puis argent de
-          // combat (+N) — sprite + chiffre, pas de multiplicateur.
-          ...(data.tokens > 0 ? [{ html: tokenSprite, title: t('dungeon_loot_bag_tokens') || 'Dungeon tokens (bag)', amount: data.tokens, currency: true }] : []),
-          ...(data.money > 0 ? [{ html: moneySprite, title: t('battle_loot_money_title') || 'Money earned in battle', amount: data.money, prefix: '+', currency: true }] : []),
-          ...data.captureGroups.map((a) => ({
-            html: spriteImg(a.id, a.emoji || '', { shiny: a.shinyCount > 0, size: 40 }),
-            title: `${a.name}${a.shinyCount ? ' (Shiny)' : ''}`,
-            count: a.count,
-          })),
-          ...data.itemEntries.map(([key, qty]) => ({
-            html: itemSpriteHtml(key, 40),
-            title: getItemName(key),
-            count: qty,
-          })),
-        ],
-      }
+          chips: [
+            // PASSE 39 — monnaies en tête : jeton JD (brut) puis argent de
+            // combat (+N) — sprite + chiffre, pas de multiplicateur.
+            ...(data.tokens > 0
+              ? [
+                  {
+                    html: tokenSprite,
+                    title: t('dungeon_loot_bag_tokens') || 'Dungeon tokens (bag)',
+                    amount: data.tokens,
+                    currency: true,
+                  },
+                ]
+              : []),
+            ...(data.money > 0
+              ? [
+                  {
+                    html: moneySprite,
+                    title: t('battle_loot_money_title') || 'Money earned in battle',
+                    amount: data.money,
+                    prefix: '+',
+                    currency: true,
+                  },
+                ]
+              : []),
+            ...data.captureGroups.map((a) => ({
+              html: spriteImg(a, a.emoji || '', { shiny: a.shinyCount > 0, size: 40 }),
+              title: `${a.name}${a.shinyCount ? ' (Shiny)' : ''}`,
+              count: a.count,
+            })),
+            ...data.itemEntries.map(([key, qty]) => ({
+              html: itemSpriteHtml(key, 40),
+              title: getItemName(key),
+              count: qty,
+            })),
+          ],
+        }
       : { empty: true, emptyLabel: t('no_loot_yet') || 'Aucun butin récolté pour le moment.' },
     restartLabel: t('loot_restart_btn') || 'Relancer le combat immédiatement',
     continueLabel: t('loot_continue_btn') || 'Continuer sur la route',
@@ -172,38 +244,61 @@ function battleSummaryUIModel(){
   };
 }
 
-function renderBattleSummary(){
+function renderBattleSummary() {
   const inner = document.getElementById('battle-summary-inner');
   const inline = document.getElementById('battle-loot-inline');
-  if(!inner && !inline) return;
-  const views = (typeof window !== 'undefined' && window.PokeUI && window.PokeUI.views) ? window.PokeUI.views : null;
-  if(!views || typeof views.SessionSummaryView !== 'function') throw new Error('[ui] PokeUI views not loaded (SessionSummaryView)');
+  if (!inner && !inline) return;
+  const views =
+    typeof window !== 'undefined' && window.PokeUI && window.PokeUI.views
+      ? window.PokeUI.views
+      : null;
+  if (!views || typeof views.SessionSummaryView !== 'function')
+    throw new Error('[ui] PokeUI views not loaded (SessionSummaryView)');
   const model = battleSummaryUIModel();
   if (inner) _pwSetHtmlSafe(inner, views.SessionSummaryView.toHTML(model));
   if (inline) _pwSetHtmlSafe(inline, views.SessionSummaryView.inlineHTML(model));
 }
 
-function openBattleSummary(_auto){
+function openBattleSummary(_auto) {
   renderBattleSummary();
   document.getElementById('battle-summary-modal').classList.add('open');
 }
 
-function closeBattleSummary(){
+function closeBattleSummary() {
   document.getElementById('battle-summary-modal').classList.remove('open');
 }
 
-
 // --- Migrated to ES module, globals exposed ---
-if (typeof renderBattleSummary !== 'undefined') { if (typeof window !== 'undefined') window.renderBattleSummary = renderBattleSummary; if (typeof globalThis !== 'undefined') globalThis.renderBattleSummary = renderBattleSummary; }
-if (typeof battleSummaryUIModel !== 'undefined') { if (typeof window !== 'undefined') window.battleSummaryUIModel = battleSummaryUIModel; if (typeof globalThis !== 'undefined') globalThis.battleSummaryUIModel = battleSummaryUIModel; }
-if (typeof openBattleSummary !== 'undefined') { if (typeof window !== 'undefined') window.openBattleSummary = openBattleSummary; if (typeof globalThis !== 'undefined') globalThis.openBattleSummary = openBattleSummary; }
-if (typeof closeBattleSummary !== 'undefined') { if (typeof window !== 'undefined') window.closeBattleSummary = closeBattleSummary; if (typeof globalThis !== 'undefined') globalThis.closeBattleSummary = closeBattleSummary; }
-
-
+if (typeof renderBattleSummary !== 'undefined') {
+  if (typeof window !== 'undefined') window.renderBattleSummary = renderBattleSummary;
+  if (typeof globalThis !== 'undefined') globalThis.renderBattleSummary = renderBattleSummary;
+}
+if (typeof battleSummaryUIModel !== 'undefined') {
+  if (typeof window !== 'undefined') window.battleSummaryUIModel = battleSummaryUIModel;
+  if (typeof globalThis !== 'undefined') globalThis.battleSummaryUIModel = battleSummaryUIModel;
+}
+if (typeof openBattleSummary !== 'undefined') {
+  if (typeof window !== 'undefined') window.openBattleSummary = openBattleSummary;
+  if (typeof globalThis !== 'undefined') globalThis.openBattleSummary = openBattleSummary;
+}
+if (typeof closeBattleSummary !== 'undefined') {
+  if (typeof window !== 'undefined') window.closeBattleSummary = closeBattleSummary;
+  if (typeof globalThis !== 'undefined') globalThis.closeBattleSummary = closeBattleSummary;
+}
 
 // --- Exported globals ---
-if (typeof buildBattleSessionCaptureGroups !== 'undefined') { if (typeof window !== 'undefined') window.buildBattleSessionCaptureGroups = buildBattleSessionCaptureGroups; if (typeof globalThis !== 'undefined') globalThis.buildBattleSessionCaptureGroups = buildBattleSessionCaptureGroups; }
-if (typeof getBattleSessionSummaryData !== 'undefined') { if (typeof window !== 'undefined') window.getBattleSessionSummaryData = getBattleSessionSummaryData; if (typeof globalThis !== 'undefined') globalThis.getBattleSessionSummaryData = getBattleSessionSummaryData; }
+if (typeof buildBattleSessionCaptureGroups !== 'undefined') {
+  if (typeof window !== 'undefined')
+    window.buildBattleSessionCaptureGroups = buildBattleSessionCaptureGroups;
+  if (typeof globalThis !== 'undefined')
+    globalThis.buildBattleSessionCaptureGroups = buildBattleSessionCaptureGroups;
+}
+if (typeof getBattleSessionSummaryData !== 'undefined') {
+  if (typeof window !== 'undefined')
+    window.getBattleSessionSummaryData = getBattleSessionSummaryData;
+  if (typeof globalThis !== 'undefined')
+    globalThis.getBattleSessionSummaryData = getBattleSessionSummaryData;
+}
 
 // Wave 41 — native ESM module: exports the same names as the
 // classic surface kept above (bodies unchanged).
@@ -220,8 +315,13 @@ export {
 // register in the registry (registry-first dispatcher = engine
 // indirection instead of the window fallback); the window surface is kept for
 // classic cross-module consumers (documented duplicate, T2-B).
-if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('openBattleSummary', openBattleSummary); } catch (_) {} }
-if (typeof PokeActions !== 'undefined' && PokeActions) { try { PokeActions.register('closeBattleSummary', closeBattleSummary); } catch (_) {} }
-
-
-
+if (typeof PokeActions !== 'undefined' && PokeActions) {
+  try {
+    PokeActions.register('openBattleSummary', openBattleSummary);
+  } catch (_) {}
+}
+if (typeof PokeActions !== 'undefined' && PokeActions) {
+  try {
+    PokeActions.register('closeBattleSummary', closeBattleSummary);
+  } catch (_) {}
+}

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { harnessBundleSource } from '../tools/harness-bundle.mjs';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 // ── Phase 35: permanent Secret Base window (dashboard) + FIX renderers ─────
 //  A. Dashboard integration: #win-base in index.html, postboot actions,
@@ -226,7 +227,7 @@ test('phase 35 F: no pw-static on win-base + mobile + guaranteed 2D fallback', (
     }
   }
   // mobile: the base is reachable via Manage → Base
-  assert.ok([R('src/engine/input/action-dispatcher.js'), R('src/engine/runtime/classic-bridge.js')].join('\n').includes("base:['win-base']"), 'mapping mobile-manage-view base');
+  assert.ok(wsIncludes([R('src/engine/input/action-dispatcher.js'), R('src/engine/runtime/classic-bridge.js'), R('src/engine/runtime/mobile-views.js')].join('\n'), "base:['win-base']"), 'mapping mobile-manage-view base'); // V7 · DBT-01 · V7-R1 #9 (mobile-views.js)
   assert.ok(idx.includes('data-mobile-manage-view="base"'), 'mobile Base subnav button');
   assert.ok(R('src/localization/fr/ui.js').includes('"base_tab"'), 'base_tab key FR');
   assert.ok(R('src/localization/en/ui.js').includes('"base_tab"'), 'base_tab key EN');

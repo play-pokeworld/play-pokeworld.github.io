@@ -37,12 +37,14 @@ export { AfkRecapView } from './AfkRecapView.js';
 export { StoryWindowView, NpcDialogView, RepeatableUpgradeView } from './StoryWindowView.js';
 export { PuzzleListView, PuzzleExplorationView, SpecialFormsView } from './PuzzleViews.js';
 export {
-  BaseNpcDialogView, BasePcDialogView, BaseNpcEditorView,
-  BaseNpcPickerView, BaseNpcItemPickerView, BaseNpcSpritePickerView, BaseNpcPresetPickerView,
+  BaseNpcDialogView,
+  BasePcDialogView,
+  BaseNpcEditorView,
+  BaseNpcPickerView,
+  BaseNpcItemPickerView,
+  BaseNpcSpritePickerView,
+  BaseNpcPresetPickerView,
 } from './BaseViews.js';
 export { AtollFactoryPrepView } from './AtollFactoryPrepView.js';
 export { UnifiedPokemonSelectorModal } from './UnifiedPokemonSelectorView.js';
 export { UnifiedTeamEditorModal } from './UnifiedTeamEditorView.js';
-
-
-

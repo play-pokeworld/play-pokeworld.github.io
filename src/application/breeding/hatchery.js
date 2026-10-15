@@ -35,7 +35,7 @@ function upgradeHatcherySlots(cost) {
     return;
   }
   cost = expected;
-  const w = (typeof ensureWallet === 'function') ? ensureWallet() : null;
+  const w = typeof ensureWallet === 'function' ? ensureWallet() : null;
   if (!w || (w.questPoints || 0) < cost) {
     notify(tr('training_slot_need_pq', { price: formatNumber(cost) }), 'var(--red)');
     return;
@@ -50,7 +50,10 @@ function upgradeHatcherySlots(cost) {
 }
 
 const _HATCHERY_AUTO_QUEUE_LIMIT = 24;
-const HATCHERY_LEGENDARY_IDS = [144, 145, 146, 150, 151, 243, 244, 245, 249, 250, 251];
+const HATCHERY_LEGENDARY_IDS = [
+  144, 145, 146, 150, 151, 243, 244, 245, 249, 250, 251, 377, 378, 379, 380, 381, 382, 383, 384,
+  385, 386,
+]; // V7 · LEG-02 : légendaires de Hoenn
 function pokemonIvTotal(p) {
   return Object.values((p && p.ivs) || {}).reduce((a, b) => a + (Number(b) || 0), 0);
 }
@@ -81,7 +84,9 @@ function pokemonBaseStatTotal(id) {
 // Bonus fix: previously the step counter also climbed on daycare slots
 // hatching level-1 Pokemon after 25–100 K.O.s — the mode routing removed that bug.
 const DAYCARE_KOS_PER_LEVEL = 10; // user decision (phase 30)
-function getDaycareKosPerLevel(_p) { return DAYCARE_KOS_PER_LEVEL; }
+function getDaycareKosPerLevel(_p) {
+  return DAYCARE_KOS_PER_LEVEL;
+}
 // hatcheryRegisterBattleKills is NOT defined here anymore: the hatchery
 // progression rule (incubation + daycare) runs in the `breeding:hatch` ECS
 // system on HatcheryProgress components (src/application/hatchery-system.js,
@@ -95,13 +100,17 @@ function hatcheryStepsForPokemon(pOrId) {
   // resolves the domain rule through the global exposed by the application
   // layer (src/application/hatchery-system.js); this accessor only gathers
   // the world knowledge (BST, legendary flag, staff bonus).
-  const rule = (typeof globalThis !== 'undefined' && globalThis.computeRequiredHatchKos)
-    || (typeof window !== 'undefined' ? window.computeRequiredHatchKos : null);
+  const rule =
+    (typeof globalThis !== 'undefined' && globalThis.computeRequiredHatchKos) ||
+    (typeof window !== 'undefined' ? window.computeRequiredHatchKos : null);
   if (typeof rule !== 'function') {
-    throw new Error('[hatchery] computeRequiredHatchKos port missing — src/application/hatchery-system.js must be loaded');
+    throw new Error(
+      '[hatchery] computeRequiredHatchKos port missing — src/application/hatchery-system.js must be loaded'
+    );
   }
   const id = Number(typeof pOrId === 'object' ? pOrId.id : pOrId);
-  const bonus = typeof getStaffBonus === 'function' ? getStaffBonus('hatchery', 'hatchery_speed') : 0;
+  const bonus =
+    typeof getStaffBonus === 'function' ? getStaffBonus('hatchery', 'hatchery_speed') : 0;
   return rule({
     bst: pokemonBaseStatTotal(id),
     isLegendary: HATCHERY_LEGENDARY_IDS.includes(id),
@@ -139,7 +148,9 @@ function ensureHatcheryAutomation() {
   if (!G.hatcheryQueues) G.hatcheryQueues = [[], [], [], []];
   if (!G.hatcheryModes) G.hatcheryModes = ['exp', 'exp', 'exp', 'exp'];
   if (!Array.isArray(G.hatcheryPendingModes)) G.hatcheryPendingModes = [null, null, null, null];
-  try { normalizeHatcheryModesForUnlocks(); } catch (_) {}
+  try {
+    normalizeHatcheryModesForUnlocks();
+  } catch (_) {}
 
   if (!a.slots || !Array.isArray(a.slots)) a.slots = [];
   const maxSlots = clamp(G.hatcheryMaxSlots || 1, 1, 4);
@@ -155,7 +166,9 @@ function ensureHatcheryAutomation() {
     });
   }
   // Slots existants (anciennes saves) : priorite by defaut = Pokemon
-  for (const s of a.slots) { if (s && !s.priority) s.priority = 'pokemon'; }
+  for (const s of a.slots) {
+    if (s && !s.priority) s.priority = 'pokemon';
+  }
   return a;
 }
 
@@ -169,12 +182,16 @@ function isStoryQuestReached(questId, region, { completedOnly = false } = {}) {
   const done = G.completedQuests || {};
   if (done[questId] || done[String(questId)]) return true;
   try {
-    if (!completedOnly && Array.isArray(G.activeQuests)
-      && G.activeQuests.some((i) => i && i.cat === 'main' && Number(i.qid) === Number(questId))) {
+    if (
+      !completedOnly &&
+      Array.isArray(G.activeQuests) &&
+      G.activeQuests.some((i) => i && i.cat === 'main' && Number(i.qid) === Number(questId))
+    ) {
       return true;
     }
   } catch (_) {}
-  const story = (typeof STORY_QUESTS !== 'undefined' && Array.isArray(STORY_QUESTS)) ? STORY_QUESTS : null;
+  const story =
+    typeof STORY_QUESTS !== 'undefined' && Array.isArray(STORY_QUESTS) ? STORY_QUESTS : null;
   // Isolated unit tests do not load the campaign table — do not break them.
   if (!story || !story.length) return true;
   try {
@@ -218,8 +235,9 @@ function hatcherySlotIsIncubation(slotIdx) {
 }
 // Filling priority for an incubation slot: 'pokemon' (default) or 'fossil'.
 function hatcherySlotPriority(slotIdx) {
-  const cfg = G.hatcheryAutomation && G.hatcheryAutomation.slots && G.hatcheryAutomation.slots[slotIdx];
-  return (cfg && cfg.priority === 'fossil') ? 'fossil' : 'pokemon';
+  const cfg =
+    G.hatcheryAutomation && G.hatcheryAutomation.slots && G.hatcheryAutomation.slots[slotIdx];
+  return cfg && cfg.priority === 'fossil' ? 'fossil' : 'pokemon';
 }
 function toggleHatcherySlotPriority(slotIdx) {
   ensureHatcheryAutomation();
@@ -227,7 +245,9 @@ function toggleHatcherySlotPriority(slotIdx) {
   if (!slotCfg) return;
   slotCfg.priority = slotCfg.priority === 'fossil' ? 'pokemon' : 'fossil';
   saveGame();
-  try { openHatcheryManagementMenu('automation'); } catch (_) {}
+  try {
+    openHatcheryManagementMenu('automation');
+  } catch (_) {}
 }
 // Phase 13 — legacy feature update
 // A queue entry is either a Pokemon uid (string) or a fossil
@@ -255,7 +275,7 @@ function upgradeHatcheryQueueSize() {
     notify(t('queue_size_maxed'), 'var(--green)');
     return;
   }
-  const w = (typeof ensureWallet === 'function') ? ensureWallet() : null;
+  const w = typeof ensureWallet === 'function' ? ensureWallet() : null;
   if (!w || (w.questPoints || 0) < cost) {
     notify(tr('training_slot_need_pq', { price: formatNumber(cost) }), 'var(--red)');
     return;
@@ -275,9 +295,11 @@ function isUidInHatchery(uid) {
 }
 function isUidInAnyTrainingQueue(uid) {
   const a = G.trainingAutomation;
-  return !(!a || !Array.isArray(a.slots) || !a.slots.some(
-    (s) => s && Array.isArray(s.queue) && s.queue.includes(uid)
-  ));
+  return !(
+    !a ||
+    !Array.isArray(a.slots) ||
+    !a.slots.some((s) => s && Array.isArray(s.queue) && s.queue.includes(uid))
+  );
 }
 function findEmptyHatcherySlot() {
   if (!G.hatchery) G.hatchery = [null];
@@ -340,7 +362,11 @@ function addPokemonToHatcheryQueue(boxId, slotIdx = null, silent = false) {
       return false;
     }
     if (targetMode === 'breed' && !isPokemonIncubationUnlocked()) {
-      notify(t('hatchery_breeding_locked') || 'Il faut en apprendre plus sur la reproduction des Pokémon.', 'var(--red)');
+      notify(
+        t('hatchery_breeding_locked') ||
+          'Il faut en apprendre plus sur la reproduction des Pokémon.',
+        'var(--red)'
+      );
       return false;
     }
     if (targetMode === 'breed' && p.level < 100) {
@@ -350,8 +376,7 @@ function addPokemonToHatcheryQueue(boxId, slotIdx = null, silent = false) {
 
     let paid = false;
     if (G.automation && (G.automation.autoHatch || G.automation.autoSeedHatchery)) {
-      const fee =
-        typeof getHatcheryAutomationFee === 'function' ? getHatcheryAutomationFee() : 0;
+      const fee = typeof getHatcheryAutomationFee === 'function' ? getHatcheryAutomationFee() : 0;
       if (fee > 0) {
         if (G.money < fee) {
           notify(t('hatchery_no_money_auto'), 'var(--red)');
@@ -374,8 +399,13 @@ function addPokemonToHatcheryQueue(boxId, slotIdx = null, silent = false) {
       paid: paid,
       mode: targetMode,
     };
-    try { if (typeof progressMainQuestType === 'function') progressMainQuestType('egg_hatch', 1); } catch (_) {}
-    try { if (targetMode === 'breed' && typeof recordDexStat === 'function' && p && p.id) recordDexStat(p.id, 'hatcheryIncub', 1); } catch (_) {}
+    try {
+      if (typeof progressMainQuestType === 'function') progressMainQuestType('egg_hatch', 1);
+    } catch (_) {}
+    try {
+      if (targetMode === 'breed' && typeof recordDexStat === 'function' && p && p.id)
+        recordDexStat(p.id, 'hatcheryIncub', 1);
+    } catch (_) {}
     saveGame();
     try {
       renderHatcheryWindow();
@@ -394,7 +424,10 @@ function addPokemonToHatcheryQueue(boxId, slotIdx = null, silent = false) {
 
   const queueMode = (G.hatcheryModes && G.hatcheryModes[targetSlotIdx]) || 'exp';
   if (queueMode === 'breed' && !isPokemonIncubationUnlocked()) {
-    notify(t('hatchery_breeding_locked') || 'Il faut en apprendre plus sur la reproduction des Pokémon.', 'var(--red)');
+    notify(
+      t('hatchery_breeding_locked') || 'Il faut en apprendre plus sur la reproduction des Pokémon.',
+      'var(--red)'
+    );
     return false;
   }
 
@@ -460,7 +493,7 @@ function hatcheryCandidateEntries() {
     ensurePokemonUid(p);
     if (cfg.excludeLocked && p.locked) continue;
     if (isPokemonInTeamByUid(p.uid)) continue;
-    const shiny = !!(p.shinyUnlocked || p.shinyActive || p.shiny || isSpeciesShiny(p.id));
+    const shiny = !!(p.shinyUnlocked || p.shinyActive || p.shiny || isSpeciesShiny(p));
     if (cfg.filterShiny === 'non_shiny' && shiny) continue;
     if (cfg.filterShiny === 'shiny' && !shiny) continue;
     const ivTotal = pokemonIvTotal(p);
@@ -502,8 +535,7 @@ function rebuildHatcheryQueue() {
   }
   saveGame();
   try {
-    if (typeof openHatcheryManagementMenu === 'function')
-      openHatcheryManagementMenu('automation');
+    if (typeof openHatcheryManagementMenu === 'function') openHatcheryManagementMenu('automation');
   } catch (_) {}
   notify(t('queue_refreshed'), 'var(--green)');
 }
@@ -566,8 +598,13 @@ function fillHatcherySlotFromQueue(slotIdx) {
         stepsReq: hatcheryStepsForPokemon(reviveId),
         mode: 'breed',
       };
-      try { if (typeof progressMainQuestType === 'function') progressMainQuestType('fossil_revive', 1); } catch (_) {}
-      if (typeof addBattleLog === 'function') addBattleLog(` [Pension] ${getItemName(fossilKey)} placé en incubation (slot #${slotIdx + 1}).`);
+      try {
+        if (typeof progressMainQuestType === 'function') progressMainQuestType('fossil_revive', 1);
+      } catch (_) {}
+      if (typeof addBattleLog === 'function')
+        addBattleLog(
+          ` [Pension] ${getItemName(fossilKey)} placé en incubation (slot #${slotIdx + 1}).`
+        );
       return true;
     }
     const uid = entry;
@@ -582,8 +619,7 @@ function fillHatcherySlotFromQueue(slotIdx) {
 
     let paid = false;
     if (G.automation && G.automation.autoSeedHatchery) {
-      const fee =
-        typeof getHatcheryAutomationFee === 'function' ? getHatcheryAutomationFee() : 0;
+      const fee = typeof getHatcheryAutomationFee === 'function' ? getHatcheryAutomationFee() : 0;
       if (fee > 0) {
         if (G.money < fee) {
           G.automation.autoSeedHatchery = false;
@@ -607,7 +643,10 @@ function fillHatcherySlotFromQueue(slotIdx) {
       paid: paid,
       mode: targetMode,
     };
-    try { if (targetMode === 'breed' && typeof recordDexStat === 'function' && p && p.id) recordDexStat(p.id, 'hatcheryIncub', 1); } catch (_) {}
+    try {
+      if (targetMode === 'breed' && typeof recordDexStat === 'function' && p && p.id)
+        recordDexStat(p.id, 'hatcheryIncub', 1);
+    } catch (_) {}
     return true;
   }
   return false;
@@ -618,10 +657,14 @@ function fillHatcherySlotFromQueue(slotIdx) {
 // moves into a slot — every queue entry is a reservation.
 function getHatcheryFossilReservations() {
   const reserved = {};
-  (G.hatcheryQueues || []).forEach((qq) => qq && qq.forEach((e) => {
-    const k = fossilKeyOfQueueEntry(e);
-    if (k) reserved[k] = (reserved[k] || 0) + 1;
-  }));
+  (G.hatcheryQueues || []).forEach(
+    (qq) =>
+      qq &&
+      qq.forEach((e) => {
+        const k = fossilKeyOfQueueEntry(e);
+        if (k) reserved[k] = (reserved[k] || 0) + 1;
+      })
+  );
   return reserved;
 }
 // Truly available copies of a fossil = bag stock − reservations.
@@ -686,15 +729,21 @@ function refillHatcheryQueueFromRules() {
 
   // Pokemon already in file / in cours / has the training (mode exp commun)
   const queuedPoke = new Set();
-  G.hatcheryQueues.forEach((q) => q && q.forEach((e) => { if (!isHatcheryFossilEntry(e)) queuedPoke.add(e); }));
+  G.hatcheryQueues.forEach(
+    (q) =>
+      q &&
+      q.forEach((e) => {
+        if (!isHatcheryFossilEntry(e)) queuedPoke.add(e);
+      })
+  );
   const busy = new Set(
     (G.hatchery || [])
       .filter(Boolean)
       .map((slot) => slot.poke && slot.poke.uid)
       .filter(Boolean)
   );
-  const pokePool = hatcheryCandidateEntries().filter((en) =>
-    !queuedPoke.has(en.uid) && !busy.has(en.uid) && !isUidInAnyTrainingQueue(en.uid)
+  const pokePool = hatcheryCandidateEntries().filter(
+    (en) => !queuedPoke.has(en.uid) && !busy.has(en.uid) && !isUidInAnyTrainingQueue(en.uid)
   );
   const fossilPool = isFossilReviveUnlocked() ? fossilQueueCandidates() : [];
 
@@ -703,7 +752,10 @@ function refillHatcheryQueueFromRules() {
   const ctx = [];
   for (let slotIdx = 0; slotIdx < maxSlots; slotIdx++) {
     // Pending mode change: this slot must not be restocked anymore.
-    if (Array.isArray(G.hatcheryPendingModes) && G.hatcheryPendingModes[slotIdx]) { ctx.push(null); continue; }
+    if (Array.isArray(G.hatcheryPendingModes) && G.hatcheryPendingModes[slotIdx]) {
+      ctx.push(null);
+      continue;
+    }
     const mode = G.hatcheryModes[slotIdx] || 'exp';
     ctx.push({
       idx: slotIdx,
@@ -724,20 +776,28 @@ function refillHatcheryQueueFromRules() {
       let entry = null;
       let usedType = null;
       if (c.mode === 'breed' && c.prefer === 'fossil' && fossilPool.length) {
-        entry = fossilPool.shift(); usedType = 'fossil';
+        entry = fossilPool.shift();
+        usedType = 'fossil';
       }
       if (entry === null && !(c.mode === 'breed' && !isPokemonIncubationUnlocked())) {
-        const pi = pokePool.findIndex((en) => (c.mode === 'breed' ? isLv100Match(en) : !isLv100Match(en)));
-        if (pi !== -1) { entry = pokePool.splice(pi, 1)[0].uid; usedType = 'pokemon'; }
+        const pi = pokePool.findIndex((en) =>
+          c.mode === 'breed' ? isLv100Match(en) : !isLv100Match(en)
+        );
+        if (pi !== -1) {
+          entry = pokePool.splice(pi, 1)[0].uid;
+          usedType = 'pokemon';
+        }
       }
       if (entry === null && c.mode === 'breed' && c.prefer === 'pokemon' && fossilPool.length) {
-        entry = fossilPool.shift(); usedType = 'fossil';
+        entry = fossilPool.shift();
+        usedType = 'fossil';
       }
       if (entry === null) continue; // nothing eligible left for this slot
       q.push(entry);
       G.hatcheryQueues[c.idx] = q;
       added++;
-      if (c.mode !== 'breed' || usedType === c.prefer) c.appendedPreferred++; else c.appendedOther++;
+      if (c.mode !== 'breed' || usedType === c.prefer) c.appendedPreferred++;
+      else c.appendedOther++;
     }
   }
 
@@ -745,8 +805,12 @@ function refillHatcheryQueueFromRules() {
   // Phase 12 — legacy feature update
   for (const c of ctx) {
     if (!c || c.mode !== 'breed') continue;
-    if (c.appendedPreferred === 0 && c.appendedOther > 0 &&
-        G.hatcheryAutomation.slots && G.hatcheryAutomation.slots[c.idx]) {
+    if (
+      c.appendedPreferred === 0 &&
+      c.appendedOther > 0 &&
+      G.hatcheryAutomation.slots &&
+      G.hatcheryAutomation.slots[c.idx]
+    ) {
       G.hatcheryAutomation.slots[c.idx].priority = c.prefer === 'fossil' ? 'pokemon' : 'fossil';
     }
   }
@@ -759,7 +823,8 @@ function refillHatcheryQueueFromRules() {
 function drainHatcheryQueuesIntoSlots() {
   let changed = false;
   const maxSlots = clamp(G.hatcheryMaxSlots || 1, 1, 4);
-  let guard = 0, progress = true;
+  let guard = 0,
+    progress = true;
   while (progress && guard++ < 8) {
     progress = false;
     for (let i = 0; i < maxSlots; i++) {
@@ -781,51 +846,56 @@ function processHatcheryQueue(force = false) {
   if (_hatcheryQueueProcessing) return false;
   _hatcheryQueueProcessing = true;
   try {
-  ensureHatcheryAutomation();
-  const autoFill = !!(G.automation && G.automation.autoSeedHatchery);
-  // Without active auto-fill (non-forced call): no queue, no slot is
-  // filled — manual placements stay case by case.
-  if (!force && !autoFill) return false;
-  if (!G.hatchery) G.hatchery = [null];
-  const maxSlots = clamp(G.hatcheryMaxSlots || 1, 1, 4);
-  while (G.hatchery.length < maxSlots) G.hatchery.push(null);
-  let changed = false;
+    ensureHatcheryAutomation();
+    const autoFill = !!(G.automation && G.automation.autoSeedHatchery);
+    // Without active auto-fill (non-forced call): no queue, no slot is
+    // filled — manual placements stay case by case.
+    if (!force && !autoFill) return false;
+    if (!G.hatchery) G.hatchery = [null];
+    const maxSlots = clamp(G.hatcheryMaxSlots || 1, 1, 4);
+    while (G.hatchery.length < maxSlots) G.hatchery.push(null);
+    let changed = false;
 
-  // 0) Anti-duplication guard: a fossil with only one copy may
-  //    stay reserved in a single queue only (repairs old saves).
-  try {
-    if (sanitizeHatcheryFossilQueues() > 0) { changed = true; saveGame(); }
-  } catch (_) {}
-
-  // Phase 31 — legacy feature update
-  //    from the existing queues before any restock.
-  if (drainHatcheryQueuesIntoSlots()) changed = true;
-
-  // 2) Round-robin restock: 1st element of each queue, then 2nd, etc. —
-  //    fair distribution between slots of the same mode (no more queue 0
-  //    full while the others stay empty).
-  const added = refillHatcheryQueueFromRules();
-  if (added) changed = true;
-
-  // 3) Consumption: still-empty slots take the 1st fresh element of
-  //    their queue — a free slot is served before piling up its own queue.
-  if (drainHatcheryQueuesIntoSlots()) changed = true;
-
-  if (changed) {
-    saveGame();
+    // 0) Anti-duplication guard: a fossil with only one copy may
+    //    stay reserved in a single queue only (repairs old saves).
     try {
-      renderHatcheryWindow();
+      if (sanitizeHatcheryFossilQueues() > 0) {
+        changed = true;
+        saveGame();
+      }
     } catch (_) {}
-    try {
-      if (
-        typeof openHatcheryManagementMenu === 'function' &&
-        document.getElementById('poke-modal')?.classList.contains('open')
-      )
-        openHatcheryManagementMenu('automation');
-    } catch (_) {}
+
+    // Phase 31 — legacy feature update
+    //    from the existing queues before any restock.
+    if (drainHatcheryQueuesIntoSlots()) changed = true;
+
+    // 2) Round-robin restock: 1st element of each queue, then 2nd, etc. —
+    //    fair distribution between slots of the same mode (no more queue 0
+    //    full while the others stay empty).
+    const added = refillHatcheryQueueFromRules();
+    if (added) changed = true;
+
+    // 3) Consumption: still-empty slots take the 1st fresh element of
+    //    their queue — a free slot is served before piling up its own queue.
+    if (drainHatcheryQueuesIntoSlots()) changed = true;
+
+    if (changed) {
+      saveGame();
+      try {
+        renderHatcheryWindow();
+      } catch (_) {}
+      try {
+        if (
+          typeof openHatcheryManagementMenu === 'function' &&
+          document.getElementById('poke-modal')?.classList.contains('open')
+        )
+          openHatcheryManagementMenu('automation');
+      } catch (_) {}
+    }
+    return changed;
+  } finally {
+    _hatcheryQueueProcessing = false;
   }
-  return changed;
-  } finally { _hatcheryQueueProcessing = false; }
 }
 
 function renderHatcheryQueuePreview(slotIdx, limit = 24) {
@@ -838,7 +908,8 @@ function renderHatcheryQueuePreview(slotIdx, limit = 24) {
       // Fossil entry: item icon + incubation cost
       const fossilKey = fossilKeyOfQueueEntry(entry);
       if (fossilKey) {
-        const dispKey = typeof getFossilDisplayKey === 'function' ? getFossilDisplayKey(fossilKey) : fossilKey;
+        const dispKey =
+          typeof getFossilDisplayKey === 'function' ? getFossilDisplayKey(fossilKey) : fossilKey;
         const rid = getFossilReviveId(fossilKey);
         const ko = rid ? hatcheryStepsForPokemon(rid) : 15;
         return `<div class="queue-chip">${itemIcon(dispKey, 28)}<span>${getItemName(dispKey)} · ${ko} KO</span><button class="queue-remove-btn" data-action="legacy-call-stop" data-call="removePokemonFromHatcheryQueue" data-call-args="${slotIdx}, '${entry}'">✕</button></div>`;
@@ -848,7 +919,7 @@ function renderHatcheryQueuePreview(slotIdx, limit = 24) {
       if (!p) return '';
       const mode = (G.hatcheryModes && G.hatcheryModes[slotIdx]) || 'exp';
       const detail = mode === 'exp' ? `Niv. ${p.level}` : `${hatcheryStepsForPokemon(p)} KO`;
-      return `<div class="queue-chip">${spriteImg(p.id, p.emoji, { size: 28, shiny: p.shinyActive })}<span>${p.name} · ${detail}</span><button class="queue-remove-btn" data-action="legacy-call-stop" data-call="removePokemonFromHatcheryQueue" data-call-args="${slotIdx}, '${entry}'">✕</button></div>`;
+      return `<div class="queue-chip">${spriteImg(p, p.emoji, { size: 28, shiny: p.shinyActive })}<span>${p.name} · ${detail}</span><button class="queue-remove-btn" data-action="legacy-call-stop" data-call="removePokemonFromHatcheryQueue" data-call-args="${slotIdx}, '${entry}'">✕</button></div>`;
     })
     .join('');
   return rows || `<div class="dict-muted">${t('queue_empty') || 'Vide'}</div>`;
@@ -865,9 +936,13 @@ function applyHatcheryShinyRoll(p) {
     p.shinyUnlocked = true;
     p.shinyActive = true;
     p.shiny = true;
-    try { if (typeof unlockShinyForSpecies === 'function') unlockShinyForSpecies(p.id); } catch (_) {}
+    try {
+      if (typeof unlockShinyForSpecies === 'function') unlockShinyForSpecies(p.id);
+    } catch (_) {}
   }
-  try { if (typeof recordDexStat === 'function' && p.id) recordDexStat(p.id, 'shinyHatched', 1); } catch (_) {}
+  try {
+    if (typeof recordDexStat === 'function' && p.id) recordDexStat(p.id, 'shinyHatched', 1);
+  } catch (_) {}
   return true;
 }
 
@@ -879,37 +954,57 @@ function hatchEgg(slotIdx = 0) {
   let p;
   if (slot.isFossil) {
     const reviveId = slot.reviveId;
-    const alreadyOwned = (typeof speciesOwned === 'function' && speciesOwned(reviveId)) || (G.pokedex && G.pokedex[reviveId] && G.pokedex[reviveId].caught);
+    const alreadyOwned =
+      (typeof speciesOwned === 'function' && speciesOwned(reviveId)) ||
+      (G.pokedex && G.pokedex[reviveId] && G.pokedex[reviveId].caught);
     // if already owned, 10% chance of +1 IV instead of a duplicate (user request)
     if (alreadyOwned) {
       // Finds an existing instance (team or box) to add an IV to
       let existing = null;
-      if (G.team) existing = G.team.find(x => x && Number(x.id) === Number(reviveId));
+      if (G.team) existing = G.team.find((x) => x && Number(x.id) === Number(reviveId));
       if (!existing) {
         for (const k in G.collection || {}) {
           const cand = G.collection[k];
-          if (cand && Number(cand.id) === Number(reviveId)) { existing = cand; break; }
+          if (cand && Number(cand.id) === Number(reviveId)) {
+            existing = cand;
+            break;
+          }
         }
       }
       if (existing && typeof chance === 'function' && chance(10)) {
-        if (!existing.ivs) existing.ivs = {hp:0, atk:0, def:0, spa:0, spd:0, spe:0};
-        const keys = ['hp','atk','def','spa','spd','spe'].filter(k => (existing.ivs[k]||0) < 12);
+        if (!existing.ivs) existing.ivs = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
+        const keys = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'].filter(
+          (k) => (existing.ivs[k] || 0) < 12
+        );
         if (keys.length) {
-          const picked = keys[Math.floor(Math.random()*keys.length)];
-          existing.ivs[picked] = (existing.ivs[picked]||0)+1;
-          try { if (typeof recalcPokeStats === 'function') recalcPokeStats(existing); } catch(_){}
-          if (typeof notify === 'function') notify(`Fossile déjà possédé : +1 IV ${picked.toUpperCase()} sur ${existing.name} !`, 'var(--green)');
+          const picked = keys[Math.floor(Math.random() * keys.length)];
+          existing.ivs[picked] = (existing.ivs[picked] || 0) + 1;
+          try {
+            if (typeof recalcPokeStats === 'function') recalcPokeStats(existing);
+          } catch (_) {}
+          if (typeof notify === 'function')
+            notify(
+              `Fossile déjà possédé : +1 IV ${picked.toUpperCase()} sur ${existing.name} !`,
+              'var(--green)'
+            );
         }
       } else {
-        if (typeof notify === 'function') notify(`Fossile déjà possédé : aucun doublon créé.`, 'var(--light1)');
+        if (typeof notify === 'function')
+          notify(`Fossile déjà possédé : aucun doublon créé.`, 'var(--light1)');
       }
       G.hatchery[slotIdx] = null;
       applyPendingHatcheryMode(slotIdx);
       if (typeof addStaffXp === 'function') addStaffXp('hatchery', 1);
-      try { if (typeof progressMainQuestType === 'function') progressMainQuestType('fossil_revive', 1); } catch (_) {}
+      try {
+        if (typeof progressMainQuestType === 'function') progressMainQuestType('fossil_revive', 1);
+      } catch (_) {}
       if (G.automation && G.automation.autoSeedHatchery) processHatcheryQueue();
-      updateHeader(); renderTeamWindow(); renderHatcheryWindow();
-      try { if (typeof saveGame === 'function') saveGame(); } catch(_){}
+      updateHeader();
+      renderTeamWindow();
+      renderHatcheryWindow();
+      try {
+        if (typeof saveGame === 'function') saveGame();
+      } catch (_) {}
       return;
     }
     const isShiny = rollShiny(reviveId);
@@ -917,40 +1012,77 @@ function hatchEgg(slotIdx = 0) {
     if (!p) return;
     G.pokedex[reviveId] = { ...(G.pokedex[reviveId] || {}), seen: true, caught: true };
     if (isShiny) {
-      p.shinyUnlocked = true; p.shinyActive = true; p.shiny = true;
+      p.shinyUnlocked = true;
+      p.shinyActive = true;
+      p.shiny = true;
       unlockShinyForSpecies(reviveId);
-      try { if (typeof recordDexStat === 'function') recordDexStat(reviveId, 'shinyHatched', 1); } catch (_) {}
+      try {
+        if (typeof recordDexStat === 'function') recordDexStat(reviveId, 'shinyHatched', 1);
+      } catch (_) {}
     }
   } else {
     p = slot.poke;
   }
-  const BABY_BREED_MAP = { 25: 172, 26: 172, 35: 173, 36: 173, 39: 174, 40: 174, 106: 236, 107: 236, 237: 236, 124: 238, 125: 239, 126: 240, 183: 298, 184: 298, 202: 360 };
+  const BABY_BREED_MAP = {
+    25: 172,
+    26: 172,
+    35: 173,
+    36: 173,
+    39: 174,
+    40: 174,
+    106: 236,
+    107: 236,
+    237: 236,
+    124: 238,
+    125: 239,
+    126: 240,
+    183: 298,
+    184: 298,
+    202: 360,
+  };
   const babyId = p ? BABY_BREED_MAP[Number(p.id)] : null;
-  const alreadyHaveBaby = babyId && (
-    (typeof speciesOwned === 'function' && speciesOwned(babyId)) ||
-    (G.pokedex && G.pokedex[babyId] && G.pokedex[babyId].caught) ||
-    (G.team && G.team.some(x => x && Number(x.id) === Number(babyId))) ||
-    Object.values(G.collection || {}).some(x => x && Number(x.id) === Number(babyId))
-  );
+  const alreadyHaveBaby =
+    babyId &&
+    ((typeof speciesOwned === 'function' && speciesOwned(babyId)) ||
+      (G.pokedex && G.pokedex[babyId] && G.pokedex[babyId].caught) ||
+      (G.team && G.team.some((x) => x && Number(x.id) === Number(babyId))) ||
+      Object.values(G.collection || {}).some((x) => x && Number(x.id) === Number(babyId)));
   if (babyId && !alreadyHaveBaby && typeof createPoke === 'function') {
     const isShiny = rollShiny(babyId);
     const babyMon = createPoke(babyId, 5, isShiny);
     if (babyMon) {
-      if (isShiny) { babyMon.shinyUnlocked = true; babyMon.shinyActive = true; babyMon.shiny = true; unlockShinyForSpecies(babyId); }
+      if (isShiny) {
+        babyMon.shinyUnlocked = true;
+        babyMon.shinyActive = true;
+        babyMon.shiny = true;
+        unlockShinyForSpecies(babyId);
+      }
       if (G.team.length < 6) {
         G.team.push(babyMon);
-        if (typeof notify === 'function') notify((typeof tr === 'function' ? tr('hatch_baby_party', { parent: p.name, baby: babyMon.name }) : `L'œuf de ${p.name} a éclot en ${babyMon.name} !`), 'var(--green)');
+        if (typeof notify === 'function')
+          notify(
+            typeof tr === 'function'
+              ? tr('hatch_baby_party', { parent: p.name, baby: babyMon.name })
+              : `L'œuf de ${p.name} a éclot en ${babyMon.name} !`,
+            'var(--green)'
+          );
       } else {
         let boxId = 'baby_' + babyId + '_' + Date.now();
-        while(G.collection[boxId]) boxId = 'baby_' + babyId + '_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+        while (G.collection[boxId])
+          boxId = 'baby_' + babyId + '_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
         G.collection[boxId] = babyMon;
-        if (typeof notify === 'function') notify((typeof tr === 'function' ? tr('hatch_baby_box', { parent: p.name, baby: babyMon.name }) : `L'œuf de ${p.name} a éclot en ${babyMon.name} dans la Boîte PC !`), 'var(--green)');
+        if (typeof notify === 'function')
+          notify(
+            typeof tr === 'function'
+              ? tr('hatch_baby_box', { parent: p.name, baby: babyMon.name })
+              : `L'œuf de ${p.name} a éclot en ${babyMon.name} dans la Boîte PC !`,
+            'var(--green)'
+          );
       }
       G.pokedex[babyId] = { ...(G.pokedex[babyId] || {}), seen: true, caught: true };
       if (isShiny) G.pokedex[babyId].shiny = true;
     }
   }
-
 
   if (!p.ivs) p.ivs = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
   const keys = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
@@ -962,10 +1094,10 @@ function hatchEgg(slotIdx = 0) {
     try {
       const active = (G.staff && G.staff.active && G.staff.active.hatchery) || [];
       if (active.includes('manager_goldenrod')) {
-        const lvl = (typeof staffLevel === 'function') ? staffLevel('manager_goldenrod') : 1;
-        if (Math.random() < (0.002 * lvl)) gain = 2;
+        const lvl = typeof staffLevel === 'function' ? staffLevel('manager_goldenrod') : 1;
+        if (Math.random() < 0.002 * lvl) gain = 2;
       }
-    } catch(_){}
+    } catch (_) {}
     p.ivs[picked] = Math.min(12, (p.ivs[picked] || 0) + gain);
     ivMsg = ` (+${gain} IV ${picked.toUpperCase()})`;
   } else {
@@ -981,8 +1113,13 @@ function hatchEgg(slotIdx = 0) {
   recalcPokeStats(p);
   p.currentHP = p.maxHP;
 
-  const _hKey = (typeof generateUniqueBoxId==='function') ? generateUniqueBoxId(p.id) : (!G.collection[String(p.id)] ? String(p.id) : ('box_' + p.id + '_' + Date.now()));
-      G.collection[_hKey] = p;
+  const _hKey =
+    typeof generateUniqueBoxId === 'function'
+      ? generateUniqueBoxId(p.id)
+      : !G.collection[String(p.id)]
+        ? String(p.id)
+        : 'box_' + p.id + '_' + Date.now();
+  G.collection[_hKey] = p;
   const hatchedWasFossil = !!slot.isFossil;
   G.hatchery[slotIdx] = null;
   // a pending mode change (incubation → day care) applies
@@ -1047,31 +1184,45 @@ function reviveFossil(fossilKey) {
   }
 
   // if already owned, 10% chance of +1 IV instead of a duplicate (user request)
-  const alreadyOwned = (typeof speciesOwned === 'function' && speciesOwned(pokeId)) || (G.pokedex && G.pokedex[pokeId] && G.pokedex[pokeId].caught);
+  const alreadyOwned =
+    (typeof speciesOwned === 'function' && speciesOwned(pokeId)) ||
+    (G.pokedex && G.pokedex[pokeId] && G.pokedex[pokeId].caught);
   if (alreadyOwned) {
     let existing = null;
-    if (G.team) existing = G.team.find(x => x && Number(x.id) === Number(pokeId));
+    if (G.team) existing = G.team.find((x) => x && Number(x.id) === Number(pokeId));
     if (!existing) {
       for (const k in G.collection || {}) {
         const cand = G.collection[k];
-        if (cand && Number(cand.id) === Number(pokeId)) { existing = cand; break; }
+        if (cand && Number(cand.id) === Number(pokeId)) {
+          existing = cand;
+          break;
+        }
       }
     }
     G.inventory[fossilKey]--;
     if (G.inventory[fossilKey] <= 0) delete G.inventory[fossilKey];
     if (existing && Math.random() < 0.1) {
-      if (!existing.ivs) existing.ivs = {hp:0,atk:0,def:0,spa:0,spd:0,spe:0};
-      const avail = ['hp','atk','def','spa','spd','spe'].filter(k => (existing.ivs[k]||0) < 12);
+      if (!existing.ivs) existing.ivs = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
+      const avail = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'].filter(
+        (k) => (existing.ivs[k] || 0) < 12
+      );
       if (avail.length) {
-        const pick = avail[Math.floor(Math.random()*avail.length)];
-        existing.ivs[pick] = (existing.ivs[pick]||0)+1;
-        try { if (typeof recalcPokeStats === 'function') recalcPokeStats(existing); } catch(_){}
+        const pick = avail[Math.floor(Math.random() * avail.length)];
+        existing.ivs[pick] = (existing.ivs[pick] || 0) + 1;
+        try {
+          if (typeof recalcPokeStats === 'function') recalcPokeStats(existing);
+        } catch (_) {}
         notify(`${existing.name} déjà possédé : +1 IV ${pick.toUpperCase()} !`, 'var(--green)');
       }
     } else {
-      notify(`${getPokeName(pokeId)} déjà possédé : pas de doublon, IV éventuel à 10%`, 'var(--light1)');
+      notify(
+        `${getPokeName(pokeId)} déjà possédé : pas de doublon, IV éventuel à 10%`,
+        'var(--light1)'
+      );
     }
-    saveGame(); updateHeader(); renderTeamWindow();
+    saveGame();
+    updateHeader();
+    renderTeamWindow();
     const el2 = document.getElementById('tab-content');
     if (el2 && _activeTab === 'fossil') renderFossilLab(el2);
     return;
@@ -1089,9 +1240,17 @@ function reviveFossil(fossilKey) {
 
   if (G.team.length < 6) {
     G.team.push(p);
-    notify(tr('fossil_revived_party', { name: p.name }), isShiny ? 'var(--light2)' : 'var(--green)');
+    notify(
+      tr('fossil_revived_party', { name: p.name }),
+      isShiny ? 'var(--light2)' : 'var(--green)'
+    );
   } else {
-    const _hKey2 = (typeof generateUniqueBoxId==='function') ? generateUniqueBoxId(pokeId) : (!G.collection[String(pokeId)] ? String(pokeId) : ('box_' + pokeId + '_' + Date.now()));
+    const _hKey2 =
+      typeof generateUniqueBoxId === 'function'
+        ? generateUniqueBoxId(pokeId)
+        : !G.collection[String(pokeId)]
+          ? String(pokeId)
+          : 'box_' + pokeId + '_' + Date.now();
     G.collection[_hKey2] = p;
     notify(tr('fossil_revived_box', { name: p.name }), isShiny ? 'var(--light2)' : 'var(--green)');
   }
@@ -1125,8 +1284,13 @@ function withdrawPokemonFromDaycare(slotIdx) {
     return;
   }
   const p = slot.poke;
-  const _hKey = (typeof generateUniqueBoxId==='function') ? generateUniqueBoxId(p.id) : (!G.collection[String(p.id)] ? String(p.id) : ('box_' + p.id + '_' + Date.now()));
-      G.collection[_hKey] = p;
+  const _hKey =
+    typeof generateUniqueBoxId === 'function'
+      ? generateUniqueBoxId(p.id)
+      : !G.collection[String(p.id)]
+        ? String(p.id)
+        : 'box_' + p.id + '_' + Date.now();
+  G.collection[_hKey] = p;
   G.hatchery[slotIdx] = null;
   saveGame();
   renderHatcheryWindow();
@@ -1155,7 +1319,13 @@ function toggleHatcherySlotMode(slotIdx) {
     G.hatchery[slotIdx].poke.level < 100
   ) {
     const ejected = G.hatchery[slotIdx].poke;
-    const _ejKey = (typeof generateUniqueBoxId==="function") ? generateUniqueBoxId(ejected.id) : (!G.collection[String(ejected.id)] ? String(ejected.id) : ("box_" + ejected.id + "_" + Date.now())); G.collection[_ejKey] = ejected;
+    const _ejKey =
+      typeof generateUniqueBoxId === 'function'
+        ? generateUniqueBoxId(ejected.id)
+        : !G.collection[String(ejected.id)]
+          ? String(ejected.id)
+          : 'box_' + ejected.id + '_' + Date.now();
+    G.collection[_ejKey] = ejected;
     G.hatchery[slotIdx] = null;
     G.hatcheryPendingModes[slotIdx] = null;
     G.hatcheryModes[slotIdx] = 'breed';
@@ -1167,12 +1337,14 @@ function toggleHatcherySlotMode(slotIdx) {
     }
     notify(
       tr('hatchery_mode_ejected', { name: ejected.name }) ||
-      `${ejected.name} a été renvoyé au PC (Incubation réservée aux Niv. 100). Liste vidée.`,
+        `${ejected.name} a été renvoyé au PC (Incubation réservée aux Niv. 100). Liste vidée.`,
       'var(--light1)'
     );
     saveGame();
     renderHatcheryWindow();
-    try { renderTeamWindow(); } catch (_) {}
+    try {
+      renderTeamWindow();
+    } catch (_) {}
     try {
       if (
         typeof openHatcheryManagementMenu === 'function' &&
@@ -1214,7 +1386,7 @@ function toggleHatcherySlotMode(slotIdx) {
       G.hatcheryQueues[slotIdx] = []; // switching mode always empties the queue
       notify(
         tr('hatchery_mode_deferred', { slot: slotIdx + 1 }) ||
-        `Slot #${slotIdx + 1} passera en mode Garderie une fois l'incubation en cours terminée.`,
+          `Slot #${slotIdx + 1} passera en mode Garderie une fois l'incubation en cours terminée.`,
         'var(--light1)'
       );
       saveGame();
@@ -1240,7 +1412,7 @@ function toggleHatcherySlotMode(slotIdx) {
     }
     hatchEgg(slotIdx);
     notify(
-      `Slot #${slotIdx + 1} ${typeof t === 'function' ? t('hatchery_mode_set', {mode: t('hatchery_mode_exp')}) : 'configured to Passive Daycare (EXP)'}.`,
+      `Slot #${slotIdx + 1} ${typeof t === 'function' ? t('hatchery_mode_set', { mode: t('hatchery_mode_exp') }) : 'configured to Passive Daycare (EXP)'}.`,
       'var(--green)'
     );
     saveGame();
@@ -1262,7 +1434,7 @@ function toggleHatcherySlotMode(slotIdx) {
     G.hatcheryAutomation.slots[slotIdx].mode = nextMode;
   }
   notify(
-    `Slot #${slotIdx + 1} ${typeof t === 'function' ? t('hatchery_mode_set', {mode: nextMode === 'exp' ? t('hatchery_mode_exp') : t('hatchery_mode_breeding')}) : 'configured to ' + (nextMode === 'exp' ? 'Passive Daycare (EXP)' : 'Breeding (Egg / IV)')}.`,
+    `Slot #${slotIdx + 1} ${typeof t === 'function' ? t('hatchery_mode_set', { mode: nextMode === 'exp' ? t('hatchery_mode_exp') : t('hatchery_mode_breeding') }) : 'configured to ' + (nextMode === 'exp' ? 'Passive Daycare (EXP)' : 'Breeding (Egg / IV)')}.`,
     'var(--green)'
   );
 
@@ -1314,92 +1486,304 @@ function applyPendingHatcheryMode(slotIdx) {
   G.hatcheryPendingModes[slotIdx] = null;
 }
 
-function setHatcherySlotAutomationOption(slotIdx, key, value){
+function setHatcherySlotAutomationOption(slotIdx, key, value) {
   ensureHatcheryAutomation();
   const slotCfg = G.hatcheryAutomation.slots[slotIdx];
-  if(slotCfg){
+  if (slotCfg) {
     slotCfg[key] = value;
     saveGame();
-    try{ openHatcheryManagementMenu('automation'); }catch(_){}
+    try {
+      openHatcheryManagementMenu('automation');
+    } catch (_) {}
   }
 }
 
-function toggleHatcheryAutomationSlot(slotIdx){
+function toggleHatcheryAutomationSlot(slotIdx) {
   ensureHatcheryAutomation();
   const slotCfg = G.hatcheryAutomation.slots[slotIdx];
-  if(!slotCfg) return;
+  if (!slotCfg) return;
   slotCfg.enabled = !slotCfg.enabled;
   saveGame();
-  try{ openHatcheryManagementMenu('automation'); }catch(_){}
+  try {
+    openHatcheryManagementMenu('automation');
+  } catch (_) {}
 }
 
 // --- Migrated to ES module, globals exposed ---
-if (typeof setHatcherySlotAutomationOption !== 'undefined') { if (typeof window !== 'undefined') window.setHatcherySlotAutomationOption = setHatcherySlotAutomationOption; if (typeof globalThis !== 'undefined') globalThis.setHatcherySlotAutomationOption = setHatcherySlotAutomationOption; }
-if (typeof toggleHatcheryAutomationSlot !== 'undefined') { if (typeof window !== 'undefined') window.toggleHatcheryAutomationSlot = toggleHatcheryAutomationSlot; if (typeof globalThis !== 'undefined') globalThis.toggleHatcheryAutomationSlot = toggleHatcheryAutomationSlot; }
-if (typeof applyHatcheryShinyRoll !== 'undefined') { if (typeof window !== 'undefined') window.applyHatcheryShinyRoll = applyHatcheryShinyRoll; if (typeof globalThis !== 'undefined') globalThis.applyHatcheryShinyRoll = applyHatcheryShinyRoll; }
-if (typeof isPokemonIncubationUnlocked !== 'undefined') { if (typeof window !== 'undefined') window.isPokemonIncubationUnlocked = isPokemonIncubationUnlocked; if (typeof globalThis !== 'undefined') globalThis.isPokemonIncubationUnlocked = isPokemonIncubationUnlocked; }
-if (typeof isFossilReviveUnlocked !== 'undefined') { if (typeof window !== 'undefined') window.isFossilReviveUnlocked = isFossilReviveUnlocked; if (typeof globalThis !== 'undefined') globalThis.isFossilReviveUnlocked = isFossilReviveUnlocked; }
-if (typeof isHatcheryModeSwitchUnlocked !== 'undefined') { if (typeof window !== 'undefined') window.isHatcheryModeSwitchUnlocked = isHatcheryModeSwitchUnlocked; if (typeof globalThis !== 'undefined') globalThis.isHatcheryModeSwitchUnlocked = isHatcheryModeSwitchUnlocked; }
-if (typeof isStoryQuestReached !== 'undefined') { if (typeof window !== 'undefined') window.isStoryQuestReached = isStoryQuestReached; if (typeof globalThis !== 'undefined') globalThis.isStoryQuestReached = isStoryQuestReached; }
-if (typeof normalizeHatcheryModesForUnlocks !== 'undefined') { if (typeof window !== 'undefined') window.normalizeHatcheryModesForUnlocks = normalizeHatcheryModesForUnlocks; if (typeof globalThis !== 'undefined') globalThis.normalizeHatcheryModesForUnlocks = normalizeHatcheryModesForUnlocks; }
-if (typeof hatcherySlotIsIncubation !== 'undefined') { if (typeof window !== 'undefined') window.hatcherySlotIsIncubation = hatcherySlotIsIncubation; if (typeof globalThis !== 'undefined') globalThis.hatcherySlotIsIncubation = hatcherySlotIsIncubation; }
-if (typeof hatcherySlotPriority !== 'undefined') { if (typeof window !== 'undefined') window.hatcherySlotPriority = hatcherySlotPriority; if (typeof globalThis !== 'undefined') globalThis.hatcherySlotPriority = hatcherySlotPriority; }
-if (typeof toggleHatcherySlotPriority !== 'undefined') { if (typeof window !== 'undefined') window.toggleHatcherySlotPriority = toggleHatcherySlotPriority; if (typeof globalThis !== 'undefined') globalThis.toggleHatcherySlotPriority = toggleHatcherySlotPriority; }
-if (typeof applyPendingHatcheryMode !== 'undefined') { if (typeof window !== 'undefined') window.applyPendingHatcheryMode = applyPendingHatcheryMode; if (typeof globalThis !== 'undefined') globalThis.applyPendingHatcheryMode = applyPendingHatcheryMode; }
-if (typeof isHatcheryFossilEntry !== 'undefined') { if (typeof window !== 'undefined') window.isHatcheryFossilEntry = isHatcheryFossilEntry; if (typeof globalThis !== 'undefined') globalThis.isHatcheryFossilEntry = isHatcheryFossilEntry; }
-if (typeof fossilKeyOfQueueEntry !== 'undefined') { if (typeof window !== 'undefined') window.fossilKeyOfQueueEntry = fossilKeyOfQueueEntry; if (typeof globalThis !== 'undefined') globalThis.fossilKeyOfQueueEntry = fossilKeyOfQueueEntry; }
-if (typeof fossilQueueCandidates !== 'undefined') { if (typeof window !== 'undefined') window.fossilQueueCandidates = fossilQueueCandidates; if (typeof globalThis !== 'undefined') globalThis.fossilQueueCandidates = fossilQueueCandidates; }
-if (typeof getHatcheryFossilReservations !== 'undefined') { if (typeof window !== 'undefined') window.getHatcheryFossilReservations = getHatcheryFossilReservations; if (typeof globalThis !== 'undefined') globalThis.getHatcheryFossilReservations = getHatcheryFossilReservations; }
-if (typeof getFossilAvailableCount !== 'undefined') { if (typeof window !== 'undefined') window.getFossilAvailableCount = getFossilAvailableCount; if (typeof globalThis !== 'undefined') globalThis.getFossilAvailableCount = getFossilAvailableCount; }
-if (typeof sanitizeHatcheryFossilQueues !== 'undefined') { if (typeof window !== 'undefined') window.sanitizeHatcheryFossilQueues = sanitizeHatcheryFossilQueues; if (typeof globalThis !== 'undefined') globalThis.sanitizeHatcheryFossilQueues = sanitizeHatcheryFossilQueues; }
-if (typeof refillHatcheryQueueFromRules !== 'undefined') { if (typeof window !== 'undefined') window.refillHatcheryQueueFromRules = refillHatcheryQueueFromRules; if (typeof globalThis !== 'undefined') globalThis.refillHatcheryQueueFromRules = refillHatcheryQueueFromRules; }
-if (typeof toggleHatcherySlotMode !== 'undefined') { if (typeof window !== 'undefined') window.toggleHatcherySlotMode = toggleHatcherySlotMode; if (typeof globalThis !== 'undefined') globalThis.toggleHatcherySlotMode = toggleHatcherySlotMode; }
-if (typeof withdrawPokemonFromDaycare !== 'undefined') { if (typeof window !== 'undefined') window.withdrawPokemonFromDaycare = withdrawPokemonFromDaycare; if (typeof globalThis !== 'undefined') globalThis.withdrawPokemonFromDaycare = withdrawPokemonFromDaycare; }
-if (typeof getHatcherySlotUpgradeCost !== 'undefined') { if (typeof window !== 'undefined') window.getHatcherySlotUpgradeCost = getHatcherySlotUpgradeCost; if (typeof globalThis !== 'undefined') globalThis.getHatcherySlotUpgradeCost = getHatcherySlotUpgradeCost; }
-if (typeof upgradeHatcherySlots !== 'undefined') { if (typeof window !== 'undefined') window.upgradeHatcherySlots = upgradeHatcherySlots; if (typeof globalThis !== 'undefined') globalThis.upgradeHatcherySlots = upgradeHatcherySlots; }
-if (typeof hatchEgg !== 'undefined') { if (typeof window !== 'undefined') window.hatchEgg = hatchEgg; if (typeof globalThis !== 'undefined') globalThis.hatchEgg = hatchEgg; }
-if (typeof getFossilInventory !== 'undefined') { if (typeof window !== 'undefined') window.getFossilInventory = getFossilInventory; if (typeof globalThis !== 'undefined') globalThis.getFossilInventory = getFossilInventory; }
-if (typeof getFossilDisplayKey !== 'undefined') { if (typeof window !== 'undefined') window.getFossilDisplayKey = getFossilDisplayKey; if (typeof globalThis !== 'undefined') globalThis.getFossilDisplayKey = getFossilDisplayKey; }
-if (typeof getFossilReviveId !== 'undefined') { if (typeof window !== 'undefined') window.getFossilReviveId = getFossilReviveId; if (typeof globalThis !== 'undefined') globalThis.getFossilReviveId = getFossilReviveId; }
-if (typeof reviveFossil !== 'undefined') { if (typeof window !== 'undefined') window.reviveFossil = reviveFossil; if (typeof globalThis !== 'undefined') globalThis.reviveFossil = reviveFossil; }
+if (typeof setHatcherySlotAutomationOption !== 'undefined') {
+  if (typeof window !== 'undefined')
+    window.setHatcherySlotAutomationOption = setHatcherySlotAutomationOption;
+  if (typeof globalThis !== 'undefined')
+    globalThis.setHatcherySlotAutomationOption = setHatcherySlotAutomationOption;
+}
+if (typeof toggleHatcheryAutomationSlot !== 'undefined') {
+  if (typeof window !== 'undefined')
+    window.toggleHatcheryAutomationSlot = toggleHatcheryAutomationSlot;
+  if (typeof globalThis !== 'undefined')
+    globalThis.toggleHatcheryAutomationSlot = toggleHatcheryAutomationSlot;
+}
+if (typeof applyHatcheryShinyRoll !== 'undefined') {
+  if (typeof window !== 'undefined') window.applyHatcheryShinyRoll = applyHatcheryShinyRoll;
+  if (typeof globalThis !== 'undefined') globalThis.applyHatcheryShinyRoll = applyHatcheryShinyRoll;
+}
+if (typeof isPokemonIncubationUnlocked !== 'undefined') {
+  if (typeof window !== 'undefined')
+    window.isPokemonIncubationUnlocked = isPokemonIncubationUnlocked;
+  if (typeof globalThis !== 'undefined')
+    globalThis.isPokemonIncubationUnlocked = isPokemonIncubationUnlocked;
+}
+if (typeof isFossilReviveUnlocked !== 'undefined') {
+  if (typeof window !== 'undefined') window.isFossilReviveUnlocked = isFossilReviveUnlocked;
+  if (typeof globalThis !== 'undefined') globalThis.isFossilReviveUnlocked = isFossilReviveUnlocked;
+}
+if (typeof isHatcheryModeSwitchUnlocked !== 'undefined') {
+  if (typeof window !== 'undefined')
+    window.isHatcheryModeSwitchUnlocked = isHatcheryModeSwitchUnlocked;
+  if (typeof globalThis !== 'undefined')
+    globalThis.isHatcheryModeSwitchUnlocked = isHatcheryModeSwitchUnlocked;
+}
+if (typeof isStoryQuestReached !== 'undefined') {
+  if (typeof window !== 'undefined') window.isStoryQuestReached = isStoryQuestReached;
+  if (typeof globalThis !== 'undefined') globalThis.isStoryQuestReached = isStoryQuestReached;
+}
+if (typeof normalizeHatcheryModesForUnlocks !== 'undefined') {
+  if (typeof window !== 'undefined')
+    window.normalizeHatcheryModesForUnlocks = normalizeHatcheryModesForUnlocks;
+  if (typeof globalThis !== 'undefined')
+    globalThis.normalizeHatcheryModesForUnlocks = normalizeHatcheryModesForUnlocks;
+}
+if (typeof hatcherySlotIsIncubation !== 'undefined') {
+  if (typeof window !== 'undefined') window.hatcherySlotIsIncubation = hatcherySlotIsIncubation;
+  if (typeof globalThis !== 'undefined')
+    globalThis.hatcherySlotIsIncubation = hatcherySlotIsIncubation;
+}
+if (typeof hatcherySlotPriority !== 'undefined') {
+  if (typeof window !== 'undefined') window.hatcherySlotPriority = hatcherySlotPriority;
+  if (typeof globalThis !== 'undefined') globalThis.hatcherySlotPriority = hatcherySlotPriority;
+}
+if (typeof toggleHatcherySlotPriority !== 'undefined') {
+  if (typeof window !== 'undefined') window.toggleHatcherySlotPriority = toggleHatcherySlotPriority;
+  if (typeof globalThis !== 'undefined')
+    globalThis.toggleHatcherySlotPriority = toggleHatcherySlotPriority;
+}
+if (typeof applyPendingHatcheryMode !== 'undefined') {
+  if (typeof window !== 'undefined') window.applyPendingHatcheryMode = applyPendingHatcheryMode;
+  if (typeof globalThis !== 'undefined')
+    globalThis.applyPendingHatcheryMode = applyPendingHatcheryMode;
+}
+if (typeof isHatcheryFossilEntry !== 'undefined') {
+  if (typeof window !== 'undefined') window.isHatcheryFossilEntry = isHatcheryFossilEntry;
+  if (typeof globalThis !== 'undefined') globalThis.isHatcheryFossilEntry = isHatcheryFossilEntry;
+}
+if (typeof fossilKeyOfQueueEntry !== 'undefined') {
+  if (typeof window !== 'undefined') window.fossilKeyOfQueueEntry = fossilKeyOfQueueEntry;
+  if (typeof globalThis !== 'undefined') globalThis.fossilKeyOfQueueEntry = fossilKeyOfQueueEntry;
+}
+if (typeof fossilQueueCandidates !== 'undefined') {
+  if (typeof window !== 'undefined') window.fossilQueueCandidates = fossilQueueCandidates;
+  if (typeof globalThis !== 'undefined') globalThis.fossilQueueCandidates = fossilQueueCandidates;
+}
+if (typeof getHatcheryFossilReservations !== 'undefined') {
+  if (typeof window !== 'undefined')
+    window.getHatcheryFossilReservations = getHatcheryFossilReservations;
+  if (typeof globalThis !== 'undefined')
+    globalThis.getHatcheryFossilReservations = getHatcheryFossilReservations;
+}
+if (typeof getFossilAvailableCount !== 'undefined') {
+  if (typeof window !== 'undefined') window.getFossilAvailableCount = getFossilAvailableCount;
+  if (typeof globalThis !== 'undefined')
+    globalThis.getFossilAvailableCount = getFossilAvailableCount;
+}
+if (typeof sanitizeHatcheryFossilQueues !== 'undefined') {
+  if (typeof window !== 'undefined')
+    window.sanitizeHatcheryFossilQueues = sanitizeHatcheryFossilQueues;
+  if (typeof globalThis !== 'undefined')
+    globalThis.sanitizeHatcheryFossilQueues = sanitizeHatcheryFossilQueues;
+}
+if (typeof refillHatcheryQueueFromRules !== 'undefined') {
+  if (typeof window !== 'undefined')
+    window.refillHatcheryQueueFromRules = refillHatcheryQueueFromRules;
+  if (typeof globalThis !== 'undefined')
+    globalThis.refillHatcheryQueueFromRules = refillHatcheryQueueFromRules;
+}
+if (typeof toggleHatcherySlotMode !== 'undefined') {
+  if (typeof window !== 'undefined') window.toggleHatcherySlotMode = toggleHatcherySlotMode;
+  if (typeof globalThis !== 'undefined') globalThis.toggleHatcherySlotMode = toggleHatcherySlotMode;
+}
+if (typeof withdrawPokemonFromDaycare !== 'undefined') {
+  if (typeof window !== 'undefined') window.withdrawPokemonFromDaycare = withdrawPokemonFromDaycare;
+  if (typeof globalThis !== 'undefined')
+    globalThis.withdrawPokemonFromDaycare = withdrawPokemonFromDaycare;
+}
+if (typeof getHatcherySlotUpgradeCost !== 'undefined') {
+  if (typeof window !== 'undefined') window.getHatcherySlotUpgradeCost = getHatcherySlotUpgradeCost;
+  if (typeof globalThis !== 'undefined')
+    globalThis.getHatcherySlotUpgradeCost = getHatcherySlotUpgradeCost;
+}
+if (typeof upgradeHatcherySlots !== 'undefined') {
+  if (typeof window !== 'undefined') window.upgradeHatcherySlots = upgradeHatcherySlots;
+  if (typeof globalThis !== 'undefined') globalThis.upgradeHatcherySlots = upgradeHatcherySlots;
+}
+if (typeof hatchEgg !== 'undefined') {
+  if (typeof window !== 'undefined') window.hatchEgg = hatchEgg;
+  if (typeof globalThis !== 'undefined') globalThis.hatchEgg = hatchEgg;
+}
+if (typeof getFossilInventory !== 'undefined') {
+  if (typeof window !== 'undefined') window.getFossilInventory = getFossilInventory;
+  if (typeof globalThis !== 'undefined') globalThis.getFossilInventory = getFossilInventory;
+}
+if (typeof getFossilDisplayKey !== 'undefined') {
+  if (typeof window !== 'undefined') window.getFossilDisplayKey = getFossilDisplayKey;
+  if (typeof globalThis !== 'undefined') globalThis.getFossilDisplayKey = getFossilDisplayKey;
+}
+if (typeof getFossilReviveId !== 'undefined') {
+  if (typeof window !== 'undefined') window.getFossilReviveId = getFossilReviveId;
+  if (typeof globalThis !== 'undefined') globalThis.getFossilReviveId = getFossilReviveId;
+}
+if (typeof reviveFossil !== 'undefined') {
+  if (typeof window !== 'undefined') window.reviveFossil = reviveFossil;
+  if (typeof globalThis !== 'undefined') globalThis.reviveFossil = reviveFossil;
+}
 
-if (typeof hatcheryStepsForPokemon !== 'undefined') { if (typeof window !== 'undefined') window.hatcheryStepsForPokemon = hatcheryStepsForPokemon; if (typeof globalThis !== 'undefined') globalThis.hatcheryStepsForPokemon = hatcheryStepsForPokemon; }
-if (typeof getDaycareKosPerLevel !== 'undefined') { if (typeof window !== 'undefined') window.getDaycareKosPerLevel = getDaycareKosPerLevel; if (typeof globalThis !== 'undefined') globalThis.getDaycareKosPerLevel = getDaycareKosPerLevel; }
+if (typeof hatcheryStepsForPokemon !== 'undefined') {
+  if (typeof window !== 'undefined') window.hatcheryStepsForPokemon = hatcheryStepsForPokemon;
+  if (typeof globalThis !== 'undefined')
+    globalThis.hatcheryStepsForPokemon = hatcheryStepsForPokemon;
+}
+if (typeof getDaycareKosPerLevel !== 'undefined') {
+  if (typeof window !== 'undefined') window.getDaycareKosPerLevel = getDaycareKosPerLevel;
+  if (typeof globalThis !== 'undefined') globalThis.getDaycareKosPerLevel = getDaycareKosPerLevel;
+}
 // hatcheryRegisterBattleKills: exposed by src/application/hatchery-system.js (ECS).
-if (typeof pokemonIvTotal !== 'undefined') { if (typeof window !== 'undefined') window.pokemonIvTotal = pokemonIvTotal; if (typeof globalThis !== 'undefined') globalThis.pokemonIvTotal = pokemonIvTotal; }
-if (typeof pokemonEvTotal !== 'undefined') { if (typeof window !== 'undefined') window.pokemonEvTotal = pokemonEvTotal; if (typeof globalThis !== 'undefined') globalThis.pokemonEvTotal = pokemonEvTotal; }
-if (typeof ensurePokemonUid !== 'undefined') { if (typeof window !== 'undefined') window.ensurePokemonUid = ensurePokemonUid; if (typeof globalThis !== 'undefined') globalThis.ensurePokemonUid = ensurePokemonUid; }
-if (typeof ensureHatcheryAutomation !== 'undefined') { if (typeof window !== 'undefined') window.ensureHatcheryAutomation = ensureHatcheryAutomation; if (typeof globalThis !== 'undefined') globalThis.ensureHatcheryAutomation = ensureHatcheryAutomation; }
-if (typeof rebuildHatcheryQueue !== 'undefined') { if (typeof window !== 'undefined') window.rebuildHatcheryQueue = rebuildHatcheryQueue; if (typeof globalThis !== 'undefined') globalThis.rebuildHatcheryQueue = rebuildHatcheryQueue; }
-if (typeof setHatcheryAutomationOption !== 'undefined') { if (typeof window !== 'undefined') window.setHatcheryAutomationOption = setHatcheryAutomationOption; if (typeof globalThis !== 'undefined') globalThis.setHatcheryAutomationOption = setHatcheryAutomationOption; }
-if (typeof processHatcheryQueue !== 'undefined') { if (typeof window !== 'undefined') window.processHatcheryQueue = processHatcheryQueue; if (typeof globalThis !== 'undefined') globalThis.processHatcheryQueue = processHatcheryQueue; }
-if (typeof drainHatcheryQueuesIntoSlots !== 'undefined') { if (typeof window !== 'undefined') window.drainHatcheryQueuesIntoSlots = drainHatcheryQueuesIntoSlots; if (typeof globalThis !== 'undefined') globalThis.drainHatcheryQueuesIntoSlots = drainHatcheryQueuesIntoSlots; }
-if (typeof renderHatcheryQueuePreview !== 'undefined') { if (typeof window !== 'undefined') window.renderHatcheryQueuePreview = renderHatcheryQueuePreview; if (typeof globalThis !== 'undefined') globalThis.renderHatcheryQueuePreview = renderHatcheryQueuePreview; }
-if (typeof getHatcheryQueueLimit !== 'undefined') { if (typeof window !== 'undefined') window.getHatcheryQueueLimit = getHatcheryQueueLimit; if (typeof globalThis !== 'undefined') globalThis.getHatcheryQueueLimit = getHatcheryQueueLimit; }
-if (typeof upgradeHatcheryQueueSize !== 'undefined') { if (typeof window !== 'undefined') window.upgradeHatcheryQueueSize = upgradeHatcheryQueueSize; if (typeof globalThis !== 'undefined') globalThis.upgradeHatcheryQueueSize = upgradeHatcheryQueueSize; }
-if (typeof addPokemonToHatcheryQueue !== 'undefined') { if (typeof window !== 'undefined') window.addPokemonToHatcheryQueue = addPokemonToHatcheryQueue; if (typeof globalThis !== 'undefined') globalThis.addPokemonToHatcheryQueue = addPokemonToHatcheryQueue; }
-if (typeof removePokemonFromHatcheryQueue !== 'undefined') { if (typeof window !== 'undefined') window.removePokemonFromHatcheryQueue = removePokemonFromHatcheryQueue; if (typeof globalThis !== 'undefined') globalThis.removePokemonFromHatcheryQueue = removePokemonFromHatcheryQueue; }
-if (typeof clearHatcheryQueue !== 'undefined') { if (typeof window !== 'undefined') window.clearHatcheryQueue = clearHatcheryQueue; if (typeof globalThis !== 'undefined') globalThis.clearHatcheryQueue = clearHatcheryQueue; }
-if (typeof isPokemonQueuedHatchery !== 'undefined') { if (typeof window !== 'undefined') window.isPokemonQueuedHatchery = isPokemonQueuedHatchery; if (typeof globalThis !== 'undefined') globalThis.isPokemonQueuedHatchery = isPokemonQueuedHatchery; }
-if (typeof FOSSIL_REVIVE_MAP !== 'undefined') { if (typeof window !== 'undefined') window.FOSSIL_REVIVE_MAP = FOSSIL_REVIVE_MAP; if (typeof globalThis !== 'undefined') globalThis.FOSSIL_REVIVE_MAP = FOSSIL_REVIVE_MAP; }
-
-
+if (typeof pokemonIvTotal !== 'undefined') {
+  if (typeof window !== 'undefined') window.pokemonIvTotal = pokemonIvTotal;
+  if (typeof globalThis !== 'undefined') globalThis.pokemonIvTotal = pokemonIvTotal;
+}
+if (typeof pokemonEvTotal !== 'undefined') {
+  if (typeof window !== 'undefined') window.pokemonEvTotal = pokemonEvTotal;
+  if (typeof globalThis !== 'undefined') globalThis.pokemonEvTotal = pokemonEvTotal;
+}
+if (typeof ensurePokemonUid !== 'undefined') {
+  if (typeof window !== 'undefined') window.ensurePokemonUid = ensurePokemonUid;
+  if (typeof globalThis !== 'undefined') globalThis.ensurePokemonUid = ensurePokemonUid;
+}
+if (typeof ensureHatcheryAutomation !== 'undefined') {
+  if (typeof window !== 'undefined') window.ensureHatcheryAutomation = ensureHatcheryAutomation;
+  if (typeof globalThis !== 'undefined')
+    globalThis.ensureHatcheryAutomation = ensureHatcheryAutomation;
+}
+if (typeof rebuildHatcheryQueue !== 'undefined') {
+  if (typeof window !== 'undefined') window.rebuildHatcheryQueue = rebuildHatcheryQueue;
+  if (typeof globalThis !== 'undefined') globalThis.rebuildHatcheryQueue = rebuildHatcheryQueue;
+}
+if (typeof setHatcheryAutomationOption !== 'undefined') {
+  if (typeof window !== 'undefined')
+    window.setHatcheryAutomationOption = setHatcheryAutomationOption;
+  if (typeof globalThis !== 'undefined')
+    globalThis.setHatcheryAutomationOption = setHatcheryAutomationOption;
+}
+if (typeof processHatcheryQueue !== 'undefined') {
+  if (typeof window !== 'undefined') window.processHatcheryQueue = processHatcheryQueue;
+  if (typeof globalThis !== 'undefined') globalThis.processHatcheryQueue = processHatcheryQueue;
+}
+if (typeof drainHatcheryQueuesIntoSlots !== 'undefined') {
+  if (typeof window !== 'undefined')
+    window.drainHatcheryQueuesIntoSlots = drainHatcheryQueuesIntoSlots;
+  if (typeof globalThis !== 'undefined')
+    globalThis.drainHatcheryQueuesIntoSlots = drainHatcheryQueuesIntoSlots;
+}
+if (typeof renderHatcheryQueuePreview !== 'undefined') {
+  if (typeof window !== 'undefined') window.renderHatcheryQueuePreview = renderHatcheryQueuePreview;
+  if (typeof globalThis !== 'undefined')
+    globalThis.renderHatcheryQueuePreview = renderHatcheryQueuePreview;
+}
+if (typeof getHatcheryQueueLimit !== 'undefined') {
+  if (typeof window !== 'undefined') window.getHatcheryQueueLimit = getHatcheryQueueLimit;
+  if (typeof globalThis !== 'undefined') globalThis.getHatcheryQueueLimit = getHatcheryQueueLimit;
+}
+if (typeof upgradeHatcheryQueueSize !== 'undefined') {
+  if (typeof window !== 'undefined') window.upgradeHatcheryQueueSize = upgradeHatcheryQueueSize;
+  if (typeof globalThis !== 'undefined')
+    globalThis.upgradeHatcheryQueueSize = upgradeHatcheryQueueSize;
+}
+if (typeof addPokemonToHatcheryQueue !== 'undefined') {
+  if (typeof window !== 'undefined') window.addPokemonToHatcheryQueue = addPokemonToHatcheryQueue;
+  if (typeof globalThis !== 'undefined')
+    globalThis.addPokemonToHatcheryQueue = addPokemonToHatcheryQueue;
+}
+if (typeof removePokemonFromHatcheryQueue !== 'undefined') {
+  if (typeof window !== 'undefined')
+    window.removePokemonFromHatcheryQueue = removePokemonFromHatcheryQueue;
+  if (typeof globalThis !== 'undefined')
+    globalThis.removePokemonFromHatcheryQueue = removePokemonFromHatcheryQueue;
+}
+if (typeof clearHatcheryQueue !== 'undefined') {
+  if (typeof window !== 'undefined') window.clearHatcheryQueue = clearHatcheryQueue;
+  if (typeof globalThis !== 'undefined') globalThis.clearHatcheryQueue = clearHatcheryQueue;
+}
+if (typeof isPokemonQueuedHatchery !== 'undefined') {
+  if (typeof window !== 'undefined') window.isPokemonQueuedHatchery = isPokemonQueuedHatchery;
+  if (typeof globalThis !== 'undefined')
+    globalThis.isPokemonQueuedHatchery = isPokemonQueuedHatchery;
+}
+if (typeof FOSSIL_REVIVE_MAP !== 'undefined') {
+  if (typeof window !== 'undefined') window.FOSSIL_REVIVE_MAP = FOSSIL_REVIVE_MAP;
+  if (typeof globalThis !== 'undefined') globalThis.FOSSIL_REVIVE_MAP = FOSSIL_REVIVE_MAP;
+}
 
 // --- Exported globals ---
-if (typeof cleanHatcheryQueue !== 'undefined') { if (typeof window !== 'undefined') window.cleanHatcheryQueue = cleanHatcheryQueue; if (typeof globalThis !== 'undefined') globalThis.cleanHatcheryQueue = cleanHatcheryQueue; }
-if (typeof fillHatcherySlotFromQueue !== 'undefined') { if (typeof window !== 'undefined') window.fillHatcherySlotFromQueue = fillHatcherySlotFromQueue; if (typeof globalThis !== 'undefined') globalThis.fillHatcherySlotFromQueue = fillHatcherySlotFromQueue; }
-if (typeof findBoxKeyByUid !== 'undefined') { if (typeof window !== 'undefined') window.findBoxKeyByUid = findBoxKeyByUid; if (typeof globalThis !== 'undefined') globalThis.findBoxKeyByUid = findBoxKeyByUid; }
-if (typeof findEmptyHatcherySlot !== 'undefined') { if (typeof window !== 'undefined') window.findEmptyHatcherySlot = findEmptyHatcherySlot; if (typeof globalThis !== 'undefined') globalThis.findEmptyHatcherySlot = findEmptyHatcherySlot; }
-if (typeof getHatcheryQueueUpgradeCost !== 'undefined') { if (typeof window !== 'undefined') window.getHatcheryQueueUpgradeCost = getHatcheryQueueUpgradeCost; if (typeof globalThis !== 'undefined') globalThis.getHatcheryQueueUpgradeCost = getHatcheryQueueUpgradeCost; }
-if (typeof hatcheryCandidateEntries !== 'undefined') { if (typeof window !== 'undefined') window.hatcheryCandidateEntries = hatcheryCandidateEntries; if (typeof globalThis !== 'undefined') globalThis.hatcheryCandidateEntries = hatcheryCandidateEntries; }
-if (typeof isPokemonInTeamByUid !== 'undefined') { if (typeof window !== 'undefined') window.isPokemonInTeamByUid = isPokemonInTeamByUid; if (typeof globalThis !== 'undefined') globalThis.isPokemonInTeamByUid = isPokemonInTeamByUid; }
-if (typeof isUidInAnyTrainingQueue !== 'undefined') { if (typeof window !== 'undefined') window.isUidInAnyTrainingQueue = isUidInAnyTrainingQueue; if (typeof globalThis !== 'undefined') globalThis.isUidInAnyTrainingQueue = isUidInAnyTrainingQueue; }
-if (typeof isUidInHatchery !== 'undefined') { if (typeof window !== 'undefined') window.isUidInHatchery = isUidInHatchery; if (typeof globalThis !== 'undefined') globalThis.isUidInHatchery = isUidInHatchery; }
-if (typeof pokemonBaseStatTotal !== 'undefined') { if (typeof window !== 'undefined') window.pokemonBaseStatTotal = pokemonBaseStatTotal; if (typeof globalThis !== 'undefined') globalThis.pokemonBaseStatTotal = pokemonBaseStatTotal; }
+if (typeof cleanHatcheryQueue !== 'undefined') {
+  if (typeof window !== 'undefined') window.cleanHatcheryQueue = cleanHatcheryQueue;
+  if (typeof globalThis !== 'undefined') globalThis.cleanHatcheryQueue = cleanHatcheryQueue;
+}
+if (typeof fillHatcherySlotFromQueue !== 'undefined') {
+  if (typeof window !== 'undefined') window.fillHatcherySlotFromQueue = fillHatcherySlotFromQueue;
+  if (typeof globalThis !== 'undefined')
+    globalThis.fillHatcherySlotFromQueue = fillHatcherySlotFromQueue;
+}
+if (typeof findBoxKeyByUid !== 'undefined') {
+  if (typeof window !== 'undefined') window.findBoxKeyByUid = findBoxKeyByUid;
+  if (typeof globalThis !== 'undefined') globalThis.findBoxKeyByUid = findBoxKeyByUid;
+}
+if (typeof findEmptyHatcherySlot !== 'undefined') {
+  if (typeof window !== 'undefined') window.findEmptyHatcherySlot = findEmptyHatcherySlot;
+  if (typeof globalThis !== 'undefined') globalThis.findEmptyHatcherySlot = findEmptyHatcherySlot;
+}
+if (typeof getHatcheryQueueUpgradeCost !== 'undefined') {
+  if (typeof window !== 'undefined')
+    window.getHatcheryQueueUpgradeCost = getHatcheryQueueUpgradeCost;
+  if (typeof globalThis !== 'undefined')
+    globalThis.getHatcheryQueueUpgradeCost = getHatcheryQueueUpgradeCost;
+}
+if (typeof hatcheryCandidateEntries !== 'undefined') {
+  if (typeof window !== 'undefined') window.hatcheryCandidateEntries = hatcheryCandidateEntries;
+  if (typeof globalThis !== 'undefined')
+    globalThis.hatcheryCandidateEntries = hatcheryCandidateEntries;
+}
+if (typeof isPokemonInTeamByUid !== 'undefined') {
+  if (typeof window !== 'undefined') window.isPokemonInTeamByUid = isPokemonInTeamByUid;
+  if (typeof globalThis !== 'undefined') globalThis.isPokemonInTeamByUid = isPokemonInTeamByUid;
+}
+if (typeof isUidInAnyTrainingQueue !== 'undefined') {
+  if (typeof window !== 'undefined') window.isUidInAnyTrainingQueue = isUidInAnyTrainingQueue;
+  if (typeof globalThis !== 'undefined')
+    globalThis.isUidInAnyTrainingQueue = isUidInAnyTrainingQueue;
+}
+if (typeof isUidInHatchery !== 'undefined') {
+  if (typeof window !== 'undefined') window.isUidInHatchery = isUidInHatchery;
+  if (typeof globalThis !== 'undefined') globalThis.isUidInHatchery = isUidInHatchery;
+}
+if (typeof pokemonBaseStatTotal !== 'undefined') {
+  if (typeof window !== 'undefined') window.pokemonBaseStatTotal = pokemonBaseStatTotal;
+  if (typeof globalThis !== 'undefined') globalThis.pokemonBaseStatTotal = pokemonBaseStatTotal;
+}
 
 // Wave 41 — native ESM module: exports the same names as the
 // classic surface kept above (bodies unchanged).
 export {
+  // V7 · DBT-08 — constantes lues par tools/economy-sim.mjs (pas de copie dans l'outil).
+  HATCHERY_SLOT_UPGRADE_COSTS,
+  HATCHERY_QUEUE_UPGRADE_COSTS,
   setHatcherySlotAutomationOption,
   toggleHatcheryAutomationSlot,
   isPokemonIncubationUnlocked,
@@ -1456,6 +1840,3 @@ export {
   isUidInHatchery,
   pokemonBaseStatTotal,
 };
-
-
-

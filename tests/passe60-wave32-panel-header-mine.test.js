@@ -24,6 +24,7 @@ import path from 'node:path';
 
 import { panelHeaderVNode, panelHeaderHTML } from '../src/ui/components/panel-header.js';
 import * as components from '../src/ui/components/index.js';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 const ROOT = path.join(import.meta.dirname, '..');
 const R = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
@@ -189,7 +190,8 @@ test('wave 32 I: the treasure row shows the item sprite and drops the ❓ marker
 
   // The sprite is supplied by the model and rendered BEFORE the name.
   assert.ok(/itemIcon\(i\.key,\s*\d+/.test(ui), 'mine-ui builds a per-treasure icon');
-  const row = view.match(/pw-mine-treasure['"][\s\S]{0,600}?\)\)\)\)/);
+  // V7 · DBT-01 — le nœud `h('span', {…}, icône, nom)` tient sur plusieurs lignes : on lit sans blancs.
+  const row = ws(view).match(/pw-mine-treasure['"][\s\S]{0,600}?\)\)\)\)/);
   assert.ok(row, 'located the treasure row markup');
   const iconPos = row[0].indexOf('iconHtml');
   const namePos = row[0].indexOf('pw-mine-treasure-name');
@@ -211,7 +213,7 @@ test('wave 32 I: the treasure row shows the item sprite and drops the ❓ marker
 
 test('wave 32 J: only unearthed treasures carry a sprite', () => {
   const ui = R('src/ui/game/mine-ui.js');
-  const rows = ui.match(/rows:\s*items\.map\([\s\S]*?\)\)\s*\}/);
+  const rows = ui.match(/rows:\s*items\.map\([\s\S]*?\)\)[,\s]*\}/); // V7 · DBT-01 — virgule finale (trailingComma es5)
   assert.ok(rows, 'located the treasure model');
   assert.ok(/i\.collected\s*\?\s*itemIcon/.test(rows[0]),
     'a buried treasure must not reveal which item it is');

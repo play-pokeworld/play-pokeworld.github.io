@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 // ── FIX pack (2026-08) — regression guards for the four requested changes ──
 //   1. Pokédex detail sheet scroll  (covered in info-panel-navigation.test.js
@@ -75,8 +76,10 @@ for (const entry of ['function startQuestTrainerBattle(', 'function startQuestDe
 test(`fix 2 — a running battle is only closed, never replaced in one click (${entry.slice(9, -1)})`, () => {
   const i = QUEST.indexOf(entry);
   const body = QUEST.slice(i, i + 3000);
-  const guard = body.slice(body.indexOf('if(_isBattleRunning())'));
-  const guardBody = guard.slice(0, guard.indexOf('\n }') + 3);
+  // V7 · DBT-01 — comparaison sans blancs : le bloc `if (_isBattleRunning()) { … }` jusqu'à son `return;`.
+  const wbody = ws(body);
+  const guard = wbody.slice(wbody.indexOf('if(_isBattleRunning())'));
+  const guardBody = guard.slice(0, guard.indexOf('return;}') + 8);
   assert.match(guardBody, /endBattle\(\)/, 'the current battle is closed');
   assert.match(guardBody, /quest_battle_stop_current/, 'the user is told why');
   assert.match(guardBody, /return;/, 'and nothing else happens on that click');
@@ -97,7 +100,7 @@ test('fix 2 — both locales carry the quest battle messages', () => {
 test('fix 3 — the mine tab no longer gates on a raw badge count', () => {
   const tabs = R('src/ui/game/tabs.js');
   assert.match(tabs, /function _mineTabUnlocked\s*\(/, 'the gate is a named helper');
-  const i = tabs.indexOf("if(tab === 'mine'");
+  const i = tabs.indexOf("if (tab === 'mine'"); // V7 · DBT-01
   assert.ok(i > -1, 'the mine tab gate exists');
   const gate = tabs.slice(i, i + 200);
   assert.match(gate, /_mineTabUnlocked\(\)/, 'the gate uses the helper');
@@ -130,7 +133,7 @@ test('fix 4 — a single source of truth worth 5 energy', async () => {
 test('fix 4 — the three consumers read the constant, not a literal', () => {
   const sites = [
     ['src/application/combat/battle-status.js', /G\.mine\.energy\s*=\s*Math\.min\(maxE,\s*G\.mine\.energy\s*\+\s*_mineEnergyPerBattle\(\)\)/],
-    ['src/application/combat/catch.js', /G\.mine\.energy\s*=\s*Math\.min\(.*\+\s*_mineEnergyPerBattle\(\)\)/],
+    ['src/application/combat/catch.js', /G\.mine\.energy\s*=\s*Math\.min\([\s\S]{0,120}?\+\s*_mineEnergyPerBattle\(\)\s*\)/], // V7 · DBT-01 — appel multi-lignes
     ['src/application/save/offline-engine.js', /_mineEnergyPerBattle\(\)\s*\*\s*res\.won/],
   ];
   for (const [f, re] of sites) {
@@ -190,7 +193,7 @@ test('follow-up A — the mobile manage views are unlock-gated', () => {
 test('follow-up A — mineUnlocked() remains the single source of truth', () => {
   const map = R('src/ui/game/map-logic.js');
   const fn = map.slice(map.indexOf('function mineUnlocked()'));
-  const body = fn.slice(0, fn.indexOf('\n}'));
+  const body = fn.slice(0, fn.indexOf('\n}') > 0 ? fn.indexOf('\n}') : fn.length); // V7 · DBT-01
   assert.match(body, /isLocUnlocked\('diglettscave'\)/, 'it gates on the real cave access');
   // The Route 2 back entrance must NOT be OR-ed in: Route 2 is cleared in the
   // first minutes, so its only remaining gate is badgeReq 3 — that OR is what
@@ -384,9 +387,9 @@ test('5th pass — the group primary is resolved from the data, not hardcoded', 
 test('6th pass — the location summary box is tied to the Explore button', () => {
   const loc = R('src/ui/game/location-info.js');
   // ONE shared predicate: the box and the button can no longer drift apart.
-  assert.match(loc, /const canExplore = \(loc\.type !== 'town'\);/, 'single source of truth');
-  assert.match(loc, /const locRec = \(canExplore && typeof getLocRecordStats/, 'summary gated by it');
-  const btn = loc.slice(loc.indexOf('if(canExplore){'));
+  assert.match(loc, /const canExplore = loc\.type !== 'town';/, 'single source of truth'); // V7 · DBT-01 — parenthèses redondantes retirées par Prettier
+  assert.ok(wsMatch(loc, /const locRec =\s*canExplore && typeof getLocRecordStats/), 'summary gated by it');
+  const btn = ws(loc).slice(ws(loc).indexOf('if(canExplore){')); // V7 · DBT-01
   assert.match(btn.slice(0, 300), /explore_btn/, 'the Explore button uses the same predicate');
   // and the old ungated forms are gone
   assert.doesNotMatch(loc, /const locRec = \(typeof getLocRecordStats/, 'no ungated summary left');

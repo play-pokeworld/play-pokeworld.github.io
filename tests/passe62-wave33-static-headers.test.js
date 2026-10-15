@@ -51,7 +51,7 @@ test('B — the four static headers are all covered', () => {
 });
 
 test('C — the module is loaded at boot and exported from the barrel', () => {
-  assert.match(MAIN, /import\s+"\.\/ui\/components\/static-headers\.js"/);
+  assert.match(MAIN, /import\s+['"]\.\/ui\/components\/static-headers\.js['"]/); // V7 · DBT-01
   assert.match(BARREL, /export\s*\{\s*pwBuildStaticHeaders\s*\}\s*from\s*'\.\/static-headers\.js'/);
 });
 

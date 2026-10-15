@@ -46,44 +46,89 @@ export function filterBarVNode(model = {}) {
   const dataset = { fixed: 'true' };
   if (model.entityId != null) dataset.pwEid = String(model.entityId);
 
-  return h('div', {
-    class: cx('box-filter-panel ui-control-toolbar ui-control-toolbar--box pw-ui-toolbar pw-filterbar', model.className),
-    dataset,
-  },
-    h('button', {
-      type: 'button',
-      class: 'hbtn pw-drawer-toggle',
-      title: 'Tiroir de filtres',
-      dataset: { action: 'legacy-call', call: 'toggleMobileDrawer', callArgs: "''" },
-    }, ''),
+  return h(
+    'div',
+    {
+      class: cx(
+        'box-filter-panel ui-control-toolbar ui-control-toolbar--box pw-ui-toolbar pw-filterbar',
+        model.className
+      ),
+      dataset,
+    },
+    h(
+      'button',
+      {
+        type: 'button',
+        class: 'hbtn pw-drawer-toggle',
+        title: 'Tiroir de filtres',
+        dataset: { action: 'legacy-call', call: 'toggleMobileDrawer', callArgs: "''" },
+      },
+      ''
+    ),
     chips.length
-      ? h('div', { class: cx('pw-chip-row', model.chipsRowClass || 'inv-tabs') },
-          ...chips.map((chip) => h('button', {
-            type: 'button',
-            class: cx('inv-tab pw-chip', chip.active && 'active', chip.extraClass),
-            dataset: { action: 'legacy-call', call: chip.call, callArgs: chip.callArgs != null ? chip.callArgs : '', ...(chip.data || {}) },
-          }, chip.label,
-            chip.count != null ? h('span', { class: 'inv-tab-count pw-chip-count' }, String(chip.count)) : null)))
+      ? h(
+          'div',
+          { class: cx('pw-chip-row', model.chipsRowClass || 'inv-tabs') },
+          ...chips.map((chip) =>
+            h(
+              'button',
+              {
+                type: 'button',
+                class: cx('inv-tab pw-chip', chip.active && 'active', chip.extraClass),
+                dataset: {
+                  action: 'legacy-call',
+                  call: chip.call,
+                  callArgs: chip.callArgs != null ? chip.callArgs : '',
+                  ...(chip.data || {}),
+                },
+              },
+              chip.label,
+              chip.count != null
+                ? h('span', { class: 'inv-tab-count pw-chip-count' }, String(chip.count))
+                : null
+            )
+          )
+        )
       : null,
     fields.length
-      ? h('div', { class: 'pw-filter-fields' },
-          ...fields.map((field) => h('label', { class: 'pw-filter-field' },
-            h('span', { class: 'pw-filter-label' }, field.label || ''),
-            h('select', {
-              class: 'pw-filter-select',
-              name: field.name || undefined,
-              dataset: {
-                action: 'select-self',
-                changeCall: field.changeCall,
-                changeArgs: field.changeArgs != null ? field.changeArgs : 'this.value',
-              },
-            }, ...(field.options || []).map((opt) => h('option', {
-              value: opt.value,
-              selected: String(opt.value) === String(field.current) ? true : undefined,
-            }, opt.label))))))
+      ? h(
+          'div',
+          { class: 'pw-filter-fields' },
+          ...fields.map((field) =>
+            h(
+              'label',
+              { class: 'pw-filter-field' },
+              h('span', { class: 'pw-filter-label' }, field.label || ''),
+              h(
+                'select',
+                {
+                  class: 'pw-filter-select',
+                  name: field.name || undefined,
+                  dataset: {
+                    action: 'select-self',
+                    changeCall: field.changeCall,
+                    changeArgs: field.changeArgs != null ? field.changeArgs : 'this.value',
+                  },
+                },
+                ...(field.options || []).map((opt) =>
+                  h(
+                    'option',
+                    {
+                      value: opt.value,
+                      selected: String(opt.value) === String(field.current) ? true : undefined,
+                    },
+                    opt.label
+                  )
+                )
+              )
+            )
+          )
+        )
       : null,
     endzone
-      ? h('div', { class: 'pw-filter-end' },
+      ? h(
+          'div',
+          { class: 'pw-filter-end' },
           model.search
             ? h('input', {
                 type: 'search',
@@ -94,13 +139,19 @@ export function filterBarVNode(model = {}) {
               })
             : null,
           model.reset
-            ? h('button', {
-                type: 'button',
-                class: 'pw-btn pw-btn--secondary pw-filter-reset',
-                dataset: { action: 'legacy-call', call: model.reset.call, callArgs: '' },
-              }, model.reset.label || 'Reset')
-            : null)
-      : null);
+            ? h(
+                'button',
+                {
+                  type: 'button',
+                  class: 'pw-btn pw-btn--secondary pw-filter-reset',
+                  dataset: { action: 'legacy-call', call: model.reset.call, callArgs: '' },
+                },
+                model.reset.label || 'Reset'
+              )
+            : null
+        )
+      : null
+  );
 }
 
 /**
@@ -111,6 +162,3 @@ export function filterBarVNode(model = {}) {
 export function filterBarHTML(model = {}) {
   return toHTMLString(filterBarVNode(model));
 }
-
-
-

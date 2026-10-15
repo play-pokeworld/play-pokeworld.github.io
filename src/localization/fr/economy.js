@@ -176,7 +176,6 @@ export const L_fr_economy = {
 "dungeon_loot_bag_money":"Argent du sac d'expédition",
 "no_loot_yet":"Aucun butin récolté pour le moment.",
 "dungeon_boss_adjacent":"Le boss se défie depuis une case voisine.",
-"dungeon_cache_heal":"Cache : l'équipe récupère 40 % de ses PV.",
 "dungeon_cache_loot":"Cache : +{tokens} JD dans le sac.",
 "dungeon_node_fog":"Case inconnue",
 "dungeon_node_chest":"Coffre — butin",

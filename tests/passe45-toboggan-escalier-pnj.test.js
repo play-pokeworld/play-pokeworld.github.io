@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import { harnessBundleSource, harnessIsEsm } from '../tools/harness-bundle.mjs';
 import crypto from 'node:crypto';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 // ── Pass 45: user feedback ─────────────────────────────────────────
 //  A. STAIRS: v8 sprite consistent with the Emerald art direction (flight in
@@ -527,7 +528,7 @@ test('phase 47 J: depth-sorted rendering (NPC behind/in front of objects)', () =
   // Phase 52: a doll/cushion ("surface" layer) takes its CARRIER's feet —
   // otherwise it slid BEHIND a large 3×3 rug (user feedback:
   // "dolls end up behind rugs").
-  assert.ok(v2.includes('(it.y + fp.d - 1)'), 'depth = the object feet row');
+  assert.ok(v2.includes('it.y + fp.d - 1)'), 'depth = the object feet row'); // V7 · DBT-01 — parenthèses redondantes retirées
   assert.ok(v2.includes('carrierFootRow'), 'a doll is painted after its carrier');
 });
 
@@ -805,7 +806,7 @@ test('phase 52 O1: Z-buffer — slide, board and dolls', () => {
   // 3: the doll is anchored to its carrier's feet
   assert.ok(v2.includes('function carrierFootRow') || v2.includes('const carrierFootRow'),
     'helper de rattachement au porteur');
-  assert.ok(v2.includes("(def.layer === 'surface')\n      ? carrierFootRow(it.x, it.y)"),
+  assert.ok(wsIncludes(v2, "def.layer === 'surface' ? carrierFootRow(it.x, it.y)"), // V7 · DBT-01
     'a doll takes the depth of its carrier\'s feet');
 });
 
@@ -1078,9 +1079,11 @@ test('phase 54 Q2: the tutorial never re-pays its rewards', () => {
     'never pay out more than the planned amount');
   // the root cause is removed: the tutorial state EXISTS from creation
   // (only files that carry the initial state — the dispatcher owns input only)
+  // V7 · DBT-03 — un seul état initial (domain/game/initial-state.js), importé par le pont et save.js.
+  assert.ok(R('src/domain/game/initial-state.js').includes('tutorial: { enabled: true'),
+    'the tutorial state is part of the single initial state (thus saved)');
   for (const f of ['src/engine/runtime/classic-bridge.js', 'src/application/save/save.js']) {
-    assert.ok(R(f).includes('tutorial:{ enabled:true'),
-      `${f}: the tutorial state is part of the initial state (thus saved)`);
+    assert.ok(R(f).includes('domain/game/initial-state.js'), `${f}: imports the single initial state`);
   }
 
   // simulation: 30 sessions where the tutorial state restarts empty

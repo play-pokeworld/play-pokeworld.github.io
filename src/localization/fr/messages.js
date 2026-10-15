@@ -97,7 +97,7 @@ export const L_fr_messages = {
 "m.map.3":"Skin Shiny",
 "m.map.30":"Agrandir la Boîte",
 "m.map.31":"UN LÉGENDAIRE ERRANT APPARAÎT : {p0} !",
-"m.map.32":"Errant (1%)",
+"m.map.32":"Errant ({pct} %)",
 "m.map.33":"peut apparaître dans les combats sauvages ici !",
 "m.map.34":"Légendaire errant en rotation (12h) :",
 "m.map.35":"Verrouillé : Maître Ligue uniquement",

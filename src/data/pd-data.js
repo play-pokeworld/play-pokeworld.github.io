@@ -297,12 +297,8 @@ PD[250] = ["Ho-Oh", "Fire", "Flying", 106, 130, 90, 110, 154, 90, , 3, 105];
   PD[384] = ["Rayquaza", "Dragon", "Flying", 105, 150, 90, 150, 90, 95, [], 45, 60];
   PD[385] = ["Jirachi", "Steel", "Psychic", 100, 100, 100, 100, 100, 100, [], 45, 60];
   PD[386] = ["Deoxys", "Psychic", "", 50, 150, 50, 150, 50, 150, [], 45, 60];
-  PD[387] = ["Morphéo Solaire", "Fire", "", 70, 70, 70, 70, 70, 70, [], 45, 60];
-  PD[388] = ["Morphéo Eau de Pluie", "Water", "", 70, 70, 70, 70, 70, 70, [], 45, 60];
-  PD[389] = ["Morphéo Blizzard", "Ice", "", 70, 70, 70, 70, 70, 70, [], 45, 60];
-  PD[390] = ["Deoxys Attaque", "Psychic", "", 50, 180, 20, 180, 20, 150, [], 45, 60];
-  PD[391] = ["Deoxys Défense", "Psychic", "", 50, 70, 160, 70, 160, 90, [], 45, 60];
-  PD[392] = ["Deoxys Vitesse", "Psychic", "", 50, 95, 90, 95, 90, 180, [], 45, 60];
+  // V7 · FORM-01 — plus aucun id > 386 : les formes (Morphéo Solaire…, Deoxys
+  // Attaque…) vivent dans src/data/forms-data.js (clés "351-1", "386-1"…).
 
   PD[252] = ["Treecko", "Grass", "", 40, 45, 35, 65, 55, 70, [], 45, 60];
   PD[253] = ["Grovyle", "Grass", "", 50, 65, 45, 85, 65, 95, [], 45, 60];

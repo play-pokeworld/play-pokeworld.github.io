@@ -38,16 +38,25 @@ import { managementTabBarVNode } from './management.js';
 
 /* ── Hero (title + description + token box) ────────────────────────────── */
 export function atollHeroVNode(m) {
-  return h('div', { class: 'pw-atoll-hero' },
-    h('div', { class: 'pw-atoll-hero-text' },
+  return h(
+    'div',
+    { class: 'pw-atoll-hero' },
+    h(
+      'div',
+      { class: 'pw-atoll-hero-text' },
       h('h2', null, m.title || ''),
-      m.desc ? h('p', null, m.desc) : null),
+      m.desc ? h('p', null, m.desc) : null
+    ),
     m.tokens != null
-      ? h('div', { class: 'pw-atoll-token-box' },
+      ? h(
+          'div',
+          { class: 'pw-atoll-token-box' },
           h('b', null, String(m.tokens)),
           h('span', null, m.tokensLabel || ''),
-          m.streakLabel ? h('small', null, m.streakLabel) : null)
-      : null);
+          m.streakLabel ? h('small', null, m.streakLabel) : null
+        )
+      : null
+  );
 }
 
 /* ── Navigation tabs (uniform bar reused) ──────────────────────────────── */
@@ -57,16 +66,26 @@ export function atollNavVNode(tabs) {
 
 /* ── Rotation meta (live countdown chip + cycle chip) ──────────────────── */
 export function atollRotationMetaVNode(m) {
-  return h('div', { class: 'pw-atoll-rotation-meta' },
-    h('span', { class: 'pw-atoll-timer-chip', dataset: { rotationTimer: 'atoll' } }, m.timerText || ''),
-    m.cycleText ? h('span', { class: 'pw-atoll-cycle-chip' }, m.cycleText) : null);
+  return h(
+    'div',
+    { class: 'pw-atoll-rotation-meta' },
+    h(
+      'span',
+      { class: 'pw-atoll-timer-chip', dataset: { rotationTimer: 'atoll' } },
+      m.timerText || ''
+    ),
+    m.cycleText ? h('span', { class: 'pw-atoll-cycle-chip' }, m.cycleText) : null
+  );
 }
 
 /* ── Group description (top of each mode page) ─────────────────────────── */
 export function atollGroupDescVNode(m) {
-  return h('div', { class: 'pw-atoll-group-desc' },
+  return h(
+    'div',
+    { class: 'pw-atoll-group-desc' },
     h('b', null, m.title || ''),
-    m.desc ? h('p', null, m.desc) : null);
+    m.desc ? h('p', null, m.desc) : null
+  );
 }
 
 /* ── Sprite chip (trusted sprite fragment in a flat dark chip) ─────────── */
@@ -84,27 +103,44 @@ export function atollRankBadgeVNode(m) {
 
 /* ── Rotating legendary bans row ───────────────────────────────────────── */
 export function atollBanRowVNode(m) {
-  return h('div', { class: 'pw-atoll-ban-row' },
+  return h(
+    'div',
+    { class: 'pw-atoll-ban-row' },
     h('span', { class: 'pw-text-sm' }, m.label || ''),
-    atollSpriteRowVNode(m.chips, 'pw-atoll-ban-chips'));
+    atollSpriteRowVNode(m.chips, 'pw-atoll-ban-chips')
+  );
 }
 
 /* ── One mode card (rank, rules, team preview, bans, ONE CTA) ──────────── */
 export function atollModeCardVNode(m) {
-  return h('div', { class: cx('pw-atoll-mode-card', m.rankClass) },
-    h('div', { class: 'pw-atoll-mode-info' },
+  return h(
+    'div',
+    { class: cx('pw-atoll-mode-card', m.rankClass) },
+    h(
+      'div',
+      { class: 'pw-atoll-mode-info' },
       atollRankBadgeVNode(m),
       h('b', { class: 'pw-atoll-mode-title' }, m.title || ''),
       m.ruleText ? h('span', { class: 'pw-atoll-mode-rule' }, m.ruleText) : null,
       m.previewLabel ? h('small', { class: 'pw-text-sm pw-light1' }, m.previewLabel) : null,
       atollSpriteRowVNode(m.previewChips),
       m.banRow ? atollBanRowVNode(m.banRow) : null,
-      m.freeNote ? h('span', { class: 'pw-atoll-free-note' }, m.freeNote) : null),
-    h('button', {
-      type: 'button',
-      class: 'hbtn pw-atoll-mode-cta',
-      dataset: { action: 'legacy-call', call: m.cta.call || '', callArgs: m.cta.args == null ? '' : String(m.cta.args) },
-    }, m.cta.label || ''));
+      m.freeNote ? h('span', { class: 'pw-atoll-free-note' }, m.freeNote) : null
+    ),
+    h(
+      'button',
+      {
+        type: 'button',
+        class: 'hbtn pw-atoll-mode-cta',
+        dataset: {
+          action: 'legacy-call',
+          call: m.cta.call || '',
+          callArgs: m.cta.args == null ? '' : String(m.cta.args),
+        },
+      },
+      m.cta.label || ''
+    )
+  );
 }
 
 export function atollModeGridVNode(cards) {
@@ -113,14 +149,21 @@ export function atollModeGridVNode(cards) {
 
 /* ── Home hub (one large card per league) ──────────────────────────────── */
 export function atollHomeCardVNode(c) {
-  return h('button', {
-    type: 'button',
-    class: 'pw-atoll-home-card',
-    dataset: { action: 'legacy-call', call: 'setAtollTab', callArgs: c.args == null ? '' : String(c.args) },
-  },
+  return h(
+    'button',
+    {
+      type: 'button',
+      class: 'pw-atoll-home-card',
+      dataset: {
+        action: 'legacy-call',
+        call: 'setAtollTab',
+        callArgs: c.args == null ? '' : String(c.args),
+      },
+    },
     h('span', { class: 'pw-atoll-home-icon', 'aria-hidden': 'true' }, c.icon || '🏟️'),
     h('b', null, c.label || ''),
-    c.sub ? h('small', { class: 'pw-text-sm pw-light1' }, c.sub) : null);
+    c.sub ? h('small', { class: 'pw-text-sm pw-light1' }, c.sub) : null
+  );
 }
 export function atollHomeGridVNode(cards) {
   return h('div', { class: 'pw-atoll-home-grid' }, (cards || []).map(atollHomeCardVNode));
@@ -128,46 +171,158 @@ export function atollHomeGridVNode(cards) {
 
 /* ── Factory run status card ───────────────────────────────────────────── */
 export function atollRunCardVNode(m) {
-  return h('div', { class: 'pw-atoll-run-card' },
-    h('div', { class: 'pw-atoll-run-head' },
+  return h(
+    'div',
+    { class: 'pw-atoll-run-card' },
+    h(
+      'div',
+      { class: 'pw-atoll-run-head' },
       h('b', null, m.title || ''),
-      h('span', { class: 'pw-text-sm pw-light1' }, m.streakText || '')),
+      h('span', { class: 'pw-text-sm pw-light1' }, m.streakText || '')
+    ),
     atollSpriteRowVNode(m.chips),
-    h('div', { class: 'pw-atoll-run-actions' },
-      h('button', {
-        type: 'button', class: 'hbtn',
-        dataset: { action: 'legacy-call', call: 'openAtollFactoryPrep', callArgs: '' },
-      }, m.prepLabel || ''),
-      h('button', {
-        type: 'button', class: 'hbtn pw-btn-danger',
-        dataset: { action: 'legacy-call', call: 'abandonAtollFactoryRunUI', callArgs: '' },
-      }, m.abandonLabel || '')),
-    m.hint ? h('small', { class: 'pw-text-sm pw-light1' }, m.hint) : null);
+    h(
+      'div',
+      { class: 'pw-atoll-run-actions' },
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'hbtn',
+          dataset: { action: 'legacy-call', call: 'openAtollFactoryPrep', callArgs: '' },
+        },
+        m.prepLabel || ''
+      ),
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'hbtn pw-btn-danger',
+          dataset: { action: 'legacy-call', call: 'abandonAtollFactoryRunUI', callArgs: '' },
+        },
+        m.abandonLabel || ''
+      )
+    ),
+    m.hint ? h('small', { class: 'pw-text-sm pw-light1' }, m.hint) : null
+  );
 }
 
 /* ── Token shop ────────────────────────────────────────────────────────── */
 export function atollShopCardVNode(m) {
-  return h('div', { class: 'pw-atoll-shop-card' },
-    h('div', { class: 'pw-atoll-shop-info' },
+  return h(
+    'div',
+    { class: 'pw-atoll-shop-card' },
+    h(
+      'div',
+      { class: 'pw-atoll-shop-info' },
       h.raw(m.iconHtml || ''),
-      h('div', { class: 'pw-atoll-shop-text' },
+      h(
+        'div',
+        { class: 'pw-atoll-shop-text' },
         h('b', null, m.name || ''),
-        h('span', { class: 'pw-text-sm pw-light1' }, m.priceText || ''))),
+        h('span', { class: 'pw-text-sm pw-light1' }, m.priceText || '')
+      )
+    ),
     m.affordable
-      ? h('button', {
-          type: 'button', class: 'hbtn pw-btn-positive',
-          dataset: { action: 'legacy-call', call: 'buyAtollItem', callArgs: m.args == null ? '' : String(m.args) },
-        }, m.buyLabel || '')
-      // User rule: an unusable control is NOT rendered — informational chip.
-      : h('span', { class: 'pw-atoll-shop-locked' }, m.missingText || ''));
+      ? h(
+          'button',
+          {
+            type: 'button',
+            class: 'hbtn pw-btn-positive',
+            dataset: {
+              action: 'legacy-call',
+              call: 'buyAtollItem',
+              callArgs: m.args == null ? '' : String(m.args),
+            },
+          },
+          m.buyLabel || ''
+        )
+      : // User rule: an unusable control is NOT rendered — informational chip.
+        h('span', { class: 'pw-atoll-shop-locked' }, m.missingText || '')
+  );
 }
 export function atollShopGridVNode(cards) {
   return h('div', { class: 'pw-atoll-shop-grid' }, (cards || []).map(atollShopCardVNode));
 }
 
-export function atollPanelHTML(model) {
-  return toHTMLString(atollHeroVNode(model && model.hero || {}));
+/* ── V7 · ATL-03 — Fragments de Légende card (home tab) ───────────────── */
+export function atollFragmentsCardVNode(m) {
+  const children = [
+    h(
+      'div',
+      { class: 'pw-atoll-run-head' },
+      h('b', null, m.title || ''),
+      h('span', { class: 'pw-text-sm pw-light1' }, m.countText || '')
+    ),
+    m.desc ? h('p', { class: 'pw-text-sm pw-light1' }, m.desc) : null,
+  ];
+  if (m.pending) {
+    children.push(
+      h(
+        'div',
+        { class: 'pw-atoll-fragment-pending' },
+        h.raw(m.pending.spriteHtml || ''),
+        h('span', { class: 'pw-text-sm' }, m.pending.text || ''),
+        h(
+          'button',
+          {
+            type: 'button',
+            class: 'hbtn pw-btn-positive',
+            dataset: {
+              action: 'legacy-call',
+              call: m.pending.call,
+              callArgs: m.pending.args || '',
+            },
+          },
+          m.pending.label || ''
+        )
+      )
+    );
+  } else if (m.choices) {
+    children.push(h('div', { class: 'pw-atoll-section-title' }, m.choicesTitle || ''));
+    children.push(
+      h(
+        'div',
+        { class: 'pw-atoll-shop-grid' },
+        m.choices.map((c) =>
+          h(
+            'div',
+            { class: 'pw-atoll-shop-card' },
+            h(
+              'div',
+              { class: 'pw-atoll-shop-info' },
+              h.raw(c.spriteHtml || ''),
+              h(
+                'div',
+                { class: 'pw-atoll-shop-text' },
+                h('b', null, c.name || ''),
+                c.caught ? h('span', { class: 'pw-text-sm pw-green' }, '✓') : null
+              )
+            ),
+            h(
+              'button',
+              {
+                type: 'button',
+                class: 'hbtn pw-btn-positive',
+                dataset: {
+                  action: 'legacy-call',
+                  call: c.call,
+                  callArgs: String(c.args == null ? '' : c.args),
+                },
+              },
+              c.label || ''
+            )
+          )
+        )
+      )
+    );
+  } else if (m.missingText) {
+    // User rule: no dead control — informational chip only.
+    children.push(h('span', { class: 'pw-atoll-shop-locked' }, m.missingText));
+  }
+  return h('div', { class: 'pw-atoll-run-card pw-atoll-fragments-card' }, ...children);
 }
 
-
-
+export function atollPanelHTML(model) {
+  return toHTMLString(atollHeroVNode((model && model.hero) || {}));
+}

@@ -31,10 +31,14 @@ export class EventBus {
   }
 
   once(event, handler, ctx = null) {
-    const off = this.on(event, (...args) => {
-      off();
-      handler.call(ctx, ...args);
-    }, ctx);
+    const off = this.on(
+      event,
+      (...args) => {
+        off();
+        handler.call(ctx, ...args);
+      },
+      ctx
+    );
     return off;
   }
 
@@ -109,7 +113,7 @@ export const eventBus = new EventBus();
 /** True when the primary pointer is a touch screen. */
 export function isTouchDevice() {
   if (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0) return true;
-  return (typeof window !== 'undefined') && ('ontouchstart' in window);
+  return typeof window !== 'undefined' && 'ontouchstart' in window;
 }
 
 /**
@@ -133,14 +137,13 @@ export function attachLongPress(el, handler, delayMs = 500, payload = {}) {
       eventBus.emit(SEMANTIC_EVENTS.LONG_PRESS, longPress);
     }, delayMs);
   });
-  el.addEventListener('touchend', () => { if (timer !== null) clearTimeout(timer); });
-  el.addEventListener('touchmove', () => { if (timer !== null) clearTimeout(timer); });
+  el.addEventListener('touchend', () => {
+    if (timer !== null) clearTimeout(timer);
+  });
+  el.addEventListener('touchmove', () => {
+    if (timer !== null) clearTimeout(timer);
+  });
 }
 
 /** Classic-script façade (window.PokeWorldEventBus mirrors this). */
 export const inputHelpers = { isTouchDevice, attachLongPress };
-
-
-
-
-

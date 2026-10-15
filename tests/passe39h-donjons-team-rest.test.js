@@ -96,8 +96,13 @@ test('39h-R3 — pendant le run, une victoire de case ne soigne PAS l\'équipe',
   M.dungeonAbandon();
 });
 
-// ─── W. WIPE : PAS DE SOIN — LA BASE RESTE L'ÉCHAPATOIRE ────────────────────
-test('39h-W1 — wipe : l\'équipe K.O. n\'est PAS soignée (défaite = base)', async () => {
+// ─── W. WIPE : L'ÉQUIPE REPART SOIGNÉE (V7-R1 #5) ───────────────────────────
+// Supersède 39h (« wipe : pas de soin, la base reste l'échappatoire ») :
+// retour joueurs V7-R1 — « soigner l'équipe à la fin du donjon » et « après
+// un combat ou une fin de donjon, toujours soigner les Pokémon » (les joueurs
+// croyaient ne plus pouvoir relancer). Le sac reste amputé de moitié : la
+// sanction est économique, plus une équipe K.O. à aller soigner.
+test('39h-W1 — wipe : le sac est amputé mais l\'équipe repart soignée (V7-R1 #5)', async () => {
   const M = await import('../src/application/world/dungeon-run.js');
   dgSandbox();
   const run = M.startDungeonRun('mtmoon'); // la run démarre avec une équipe saine
@@ -105,18 +110,21 @@ test('39h-W1 — wipe : l\'équipe K.O. n\'est PAS soignée (défaite = base)', 
   run.bag.money = 100;
   // …et l'expédition finit mal : toute l'équipe tombe au combat.
   globalThis.G.team = [
-    { currentHP: 0, maxHP: 100, status: null },
+    { currentHP: 0, maxHP: 100, status: 'burn' },
     { currentHP: 0, maxHP: 80, status: null },
   ];
   const before = globalThis.G.money;
   const res = M.dungeonOnWipe();
   assert.equal(res.outcome, 'wipe');
   for (const p of globalThis.G.team) {
-    assert.equal(p.currentHP, 0, 'K.O. : pas de soin (l\'équipe part en base)');
+    assert.equal(p.currentHP, p.maxHP, 'fin de donjon : équipe soignée (V7-R1 #5)');
+    assert.equal(p.status, null, 'états purgés');
   }
   assert.ok(globalThis.G.money > before, 'la moitié du sac est créditée');
   assert.equal(globalThis.G.dungeonRun, null, 'la run est close');
-  // Garde-fou 39g : ré-entrée impossible tant que l'équipe est à terre.
+  // Le garde-fou 39g (ré-entrée bloquée équipe K.O.) reste en place mais ne
+  // se déclenche plus ici : l'équipe est debout, une nouvelle expédition part.
   const again = M.startDungeonRun('mtmoon');
-  assert.equal(again, null, 'ré-entrée bloquée équipe K.O.');
+  assert.ok(again && again.active, 'ré-entrée possible : l\'équipe est soignée');
+  M.dungeonAbandon();
 });

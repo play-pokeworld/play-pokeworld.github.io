@@ -37,6 +37,3 @@ export class Badge {
     return el;
   }
 }
-
-
-

@@ -64,7 +64,7 @@ export class GameScene extends Scene {
     // layer MUST be gone — this reconciles the DOM truthfully (the save
     // screen is class-driven: #save-menu-screen.is-open).
     if (typeof document === 'undefined') return;
-    const started = (typeof window !== 'undefined') && !!window.PokeWorldGameStarted;
+    const started = typeof window !== 'undefined' && !!window.PokeWorldGameStarted;
     if (!started) return;
     const saveMenu = document.getElementById('save-menu-screen');
     if (saveMenu && saveMenu.classList) saveMenu.classList.remove('is-open');
@@ -86,6 +86,3 @@ export class GameScene extends Scene {
     this._openViews.clear();
   }
 }
-
-
-

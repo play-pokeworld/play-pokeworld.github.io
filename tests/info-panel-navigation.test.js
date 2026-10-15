@@ -6,6 +6,7 @@ import { pokeFullCardHTML } from '../src/ui/components/poke-full-card.js';
 import { moveButtonsBarHTML } from '../src/ui/components/move-buttons.js';
 import { InfoPanelView } from '../src/ui/views/InfoPanelView.js';
 import { harnessIsEsm, harnessBundleSource } from '../tools/harness-bundle.mjs';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 // ── Contracts of the info panels' contextual navigation (phase 4) ──────────
 const PREFLIGHT = [fs.readFileSync(new URL('../src/engine/input/action-dispatcher.js', import.meta.url), 'utf8'), fs.readFileSync(new URL('../src/engine/runtime/classic-bridge.js', import.meta.url), 'utf8')].join('\n');
@@ -209,7 +210,7 @@ test('back_to_pokemon exists in both locales', () => {
 
 test('closing the poke-modal purges the sheet and memorized source', () => {
   assert.ok(
-    /action === 'close-poke-modal'\) \{[^\n]*window\._pwPokeSheet = null/.test(PREFLIGHT),
+    wsMatch(PREFLIGHT, /action === 'close-poke-modal'\) \{[\s\S]{0,400}?window\._pwPokeSheet = null/), // V7 · DBT-01 — le bloc tient sur plusieurs lignes
     'close-poke-modal (preflight) must purge _pwPokeSheet/_pwInfoSource'
   );
   const POSTBOOT = [fs.readFileSync(new URL('../src/engine/input/action-dispatcher.js', import.meta.url), 'utf8'), fs.readFileSync(new URL('../src/engine/runtime/classic-bridge.js', import.meta.url), 'utf8')].join('\n');
@@ -218,7 +219,7 @@ test('closing the poke-modal purges the sheet and memorized source', () => {
 
 test('old saves\' movepool is normalized at load', () => {
   const SAVE = fs.readFileSync(new URL('../src/application/save/save.js', import.meta.url), 'utf8');
-  assert.ok(/Array\.isArray\(p\.movepool\)\s*\?\s*'movepool'\s*:\s*\(Array\.isArray\(p\.learnableMoves\)/.test(SAVE), 'movepool/learnableMoves field supported');
+  assert.ok(/Array\.isArray\(p\.movepool\)\s*\?\s*'movepool'\s*:\s*\(?Array\.isArray\(p\.learnableMoves\)/.test(SAVE), 'movepool/learnableMoves field supported'); // V7 · DBT-01
 });
 
 // ── Phase 7: team/battle card move pills -> back = close ───────────────────

@@ -28,23 +28,36 @@ import { h, cx, renderChildren } from './component-utils.js';
  */
 export function createHeader(scene, props) {
   const entity = scene.spawn('ui:header', [], props.parent || undefined);
-  entity.addComponent(new UIRenderComponent({
-    layer: 'ui',
-    template: (e) => h('div', { class: cx('pw-header', props.className) },
-      h('div', { class: 'pw-header-title' },
-        props.icon ? h.raw(props.icon) : null,
-        h('span', { class: 'pw-header-text' }, props.title || '')),
-      props.closable
-        ? h('button', {
-            type: 'button',
-            class: 'pw-header-close',
-            'aria-label': props.closeLabel || 'Close',
-            dataset: { action: 'pw-close' },
-            onClick: () => props.onClose && props.onClose(e),
-          }, '✕')
-        : null,
-      renderChildren(e)),
-  }));
+  entity.addComponent(
+    new UIRenderComponent({
+      layer: 'ui',
+      template: (e) =>
+        h(
+          'div',
+          { class: cx('pw-header', props.className) },
+          h(
+            'div',
+            { class: 'pw-header-title' },
+            props.icon ? h.raw(props.icon) : null,
+            h('span', { class: 'pw-header-text' }, props.title || '')
+          ),
+          props.closable
+            ? h(
+                'button',
+                {
+                  type: 'button',
+                  class: 'pw-header-close',
+                  'aria-label': props.closeLabel || 'Close',
+                  dataset: { action: 'pw-close' },
+                  onClick: () => props.onClose && props.onClose(e),
+                },
+                '✕'
+              )
+            : null,
+          renderChildren(e)
+        ),
+    })
+  );
   return entity;
 }
 
@@ -58,14 +71,16 @@ export function createHeader(scene, props) {
  */
 export function createFooter(scene, props = {}) {
   const entity = scene.spawn('ui:footer', [], props.parent || undefined);
-  entity.addComponent(new UIRenderComponent({
-    layer: 'ui',
-    template: (e) => {
-      const children = renderChildren(e);
-      if (children.every((c) => c === null)) return null; // empty footer ⇒ hidden
-      return h('div', { class: cx('pw-footer', props.className) }, children);
-    },
-  }));
+  entity.addComponent(
+    new UIRenderComponent({
+      layer: 'ui',
+      template: (e) => {
+        const children = renderChildren(e);
+        if (children.every((c) => c === null)) return null; // empty footer ⇒ hidden
+        return h('div', { class: cx('pw-footer', props.className) }, children);
+      },
+    })
+  );
   return entity;
 }
 
@@ -81,12 +96,18 @@ export function createFooter(scene, props = {}) {
  */
 export function createPanel(scene, props = {}) {
   const entity = scene.spawn('ui:panel', [], props.parent || undefined);
-  entity.addComponent(new UIRenderComponent({
-    layer: 'ui',
-    template: (e) => h('section', { class: cx('pw-panel', `pw-panel--${props.variant || 'default'}`, props.className) },
-      props.title ? h('div', { class: 'pw-panel-title' }, props.title) : null,
-      renderChildren(e)),
-  }));
+  entity.addComponent(
+    new UIRenderComponent({
+      layer: 'ui',
+      template: (e) =>
+        h(
+          'section',
+          { class: cx('pw-panel', `pw-panel--${props.variant || 'default'}`, props.className) },
+          props.title ? h('div', { class: 'pw-panel-title' }, props.title) : null,
+          renderChildren(e)
+        ),
+    })
+  );
   return entity;
 }
 
@@ -112,35 +133,62 @@ export function createWindow(scene, props) {
   const entity = scene.spawn('ui:window', [], props.parent || undefined);
   entity.addComponent(new UIInteractiveComponent({ disabled: false, hideWhenDisabled: false }));
 
-  entity.addComponent(new UIRenderComponent({
-    layer: 'modal',
-    template: (e) => h('div', {
-      class: cx('pw-window-overlay', props.className),
-      dataset: { pwOverlay: 'true' },
-      onClick: (ev) => {
-        // Click-outside-to-close: only a direct hit on the overlay closes.
-        if (!closable) return;
-        const target = ev && ev.target;
-        if (target === ev.currentTarget || (target && target.dataset && target.dataset.pwOverlay === 'true')) {
-          scene.closeWindow ? scene.closeWindow(e) : (props.onClose && props.onClose(e));
-        }
-      },
-    },
-      h('div', { class: cx('pw-window', `pw-window--${props.size || 'lg'}`), role: 'dialog', 'aria-modal': 'true' },
-        h('div', { class: 'pw-header' },
-          h('div', { class: 'pw-header-title' }, h('span', { class: 'pw-header-text' }, props.title)),
-          closable
-            ? h('button', {
-                type: 'button',
-                class: 'pw-header-close',
-                'aria-label': props.closeLabel || 'Close',
-                onClick: () => (scene.closeWindow ? scene.closeWindow(e) : (props.onClose && props.onClose(e))),
-              }, '✕')
-            : null),
-        h('div', { class: 'pw-window-body' }, renderChildren(e)))),
-  }));
+  entity.addComponent(
+    new UIRenderComponent({
+      layer: 'modal',
+      template: (e) =>
+        h(
+          'div',
+          {
+            class: cx('pw-window-overlay', props.className),
+            dataset: { pwOverlay: 'true' },
+            onClick: (ev) => {
+              // Click-outside-to-close: only a direct hit on the overlay closes.
+              if (!closable) return;
+              const target = ev && ev.target;
+              if (
+                target === ev.currentTarget ||
+                (target && target.dataset && target.dataset.pwOverlay === 'true')
+              ) {
+                scene.closeWindow ? scene.closeWindow(e) : props.onClose && props.onClose(e);
+              }
+            },
+          },
+          h(
+            'div',
+            {
+              class: cx('pw-window', `pw-window--${props.size || 'lg'}`),
+              role: 'dialog',
+              'aria-modal': 'true',
+            },
+            h(
+              'div',
+              { class: 'pw-header' },
+              h(
+                'div',
+                { class: 'pw-header-title' },
+                h('span', { class: 'pw-header-text' }, props.title)
+              ),
+              closable
+                ? h(
+                    'button',
+                    {
+                      type: 'button',
+                      class: 'pw-header-close',
+                      'aria-label': props.closeLabel || 'Close',
+                      onClick: () =>
+                        scene.closeWindow
+                          ? scene.closeWindow(e)
+                          : props.onClose && props.onClose(e),
+                    },
+                    '✕'
+                  )
+                : null
+            ),
+            h('div', { class: 'pw-window-body' }, renderChildren(e))
+          )
+        ),
+    })
+  );
   return entity;
 }
-
-
-

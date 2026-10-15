@@ -16,7 +16,3 @@ export function chancePercent(percent) {
   if (p >= 100) return true;
   return Math.random() * 100 < p;
 }
-
-
-
-

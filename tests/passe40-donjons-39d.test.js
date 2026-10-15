@@ -17,6 +17,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 const read = (p) => readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 
@@ -94,9 +95,9 @@ test('39d-G1 — la grille est plafonnée à 11×8 et respire dans la colonne', 
 test('39d-S1 — le seau est forcé par la case : combat → commun, élite → peu commun, boss → rare', () => {
   const ecs = read('src/application/ecs-gameplay-systems.js');
   const bloc = ecs.slice(ecs.indexOf('let bucketHint = null;'), ecs.indexOf('const pick = pickWildFromTable'));
-  assert.match(bloc, /pn\.type === 'elite'\) \? 'uncommon'/, 'élite → peu commun');
-  assert.match(bloc, /pn\.type === 'combat' \? 'common'/, 'combat → commun');
-  assert.match(bloc, /pn\.type === 'boss' \? 'rare'/, 'boss → rare (PASSE 39d)');
+  assert.ok(wsMatch(bloc, /pn\.type === 'elite'\s*\?\s*'uncommon'/), 'élite → peu commun'); // V7 · DBT-01
+  assert.ok(wsMatch(bloc, /pn\.type === 'combat'\s*\?\s*'common'/), 'combat → commun');
+  assert.ok(wsMatch(bloc, /pn\.type === 'boss' \? 'rare'/), 'boss → rare (PASSE 39d)'); // V7 · DBT-01
   assert.match(bloc, /currentDungeonRun/, 'le seau ne s\'applique qu\'en expédition');
 });
 
@@ -114,7 +115,7 @@ test('39d-R1 — roamingId est forcé à 0 en donjon (lieu dungeon OU run actif)
   assert.match(bloc, /loc && loc\.type === 'dungeon'/, 'lieu de type dungeon → roaming désactivé');
   assert.match(bloc, /currentDungeonRun/, 'run actif → roaming désactivé');
   const assign = src.slice(src.indexOf('table.roamingId ='), src.indexOf('table.roamingId =') + 140);
-  assert.match(assign, /inDungeon \? 0/, 'roamingId = 0 en donjon');
+  assert.ok(wsMatch(assign, /inDungeon \? 0/), 'roamingId = 0 en donjon'); // V7 · DBT-01
 });
 
 test('39d-R2 — getRoamingLegendaryForRoute renvoie null pour un donjon', () => {

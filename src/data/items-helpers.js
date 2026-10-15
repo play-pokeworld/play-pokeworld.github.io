@@ -131,10 +131,6 @@ function openItemInfo(key){
     const _sources = getItemSourceList(key);
     if (_sources.length) sourceBody = '<div class="pw-src-list">' + _sources.map(s => '<div class="pw-src-line">' + s + '</div>').join('') + '</div>';
   }
-  if (!sourceBody && typeof getItemSource === 'function') {
-    const src = getItemSource(key, lang);
-    if (src) sourceBody = '<div data-style="padding:8px 10px;background:var(--dark3);border-radius:6px;font-size:11px;color:var(--light1);">' + src + '</div>';
-  }
 
   // Remembers where this panel was opened from (dictionary, sheet, bag…) for the back button
   if (typeof window.pwInfoCaptureSource === 'function') window._pwInfoSource = window.pwInfoCaptureSource();

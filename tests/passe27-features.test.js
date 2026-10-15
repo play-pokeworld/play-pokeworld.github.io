@@ -7,6 +7,7 @@ import { pokeFullCardHTML } from '../src/ui/components/poke-full-card.js';
 import { moveButtonsBarHTML } from '../src/ui/components/move-buttons.js';
 import { AtollPanelView } from '../src/ui/views/AtollPanelView.js'; // wave 13: real DS view injected into the vm sandbox
 import { harnessBundleSource, harnessIsEsm } from '../tools/harness-bundle.mjs';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 // ── Phase 27: beta feedback ─────────────────────────────────────────────
 //  A. Items: clean descriptions (status not mangled, "xx" fixed,
@@ -134,11 +135,11 @@ test('phase 27 B: Oran/Sitrus/Cheri berries re-added (DORM-06)', () => {
     assert.ok(!R(f).includes('"stardust"'), `${f}: no more dust as reward`);
   }
   assert.ok(!R('src/ui/game/tutorial.js').includes('stardust'), 'tutorial: no more dust');
-  assert.ok(/items:\{\w+_berry:1\}/.test(R('src/ui/game/tutorial.js')), 'tutorial: one berry');
+  assert.ok(/items:\s*\{\s*\w+_berry:\s*1\s*\}/.test(R('src/ui/game/tutorial.js')), 'tutorial: one berry'); // V7 · DBT-01
   assert.ok(!R('src/localization/fr/ui.js').includes('3 Baies Oran'), 'tutorial text updated');
   // Save purge (inventory, held items, slots)
   const save = R('src/application/save/save.js');
-  assert.ok(save.includes("'sitrus_berry','cheri_berry','oran_berry'"), 'unified removal list');
+  assert.ok(wsIncludes(save, "'sitrus_berry','cheri_berry','oran_berry'"), 'unified removal list'); // V7 · DBT-01
   assert.ok(save.includes('RETIRED_ITEMS.includes(_tp.heldItem)'), 'held-item purge (team)');
   assert.ok(save.includes('RETIRED_ITEMS.includes(_cp.heldItem)'), 'held-item purge (box)');
 });

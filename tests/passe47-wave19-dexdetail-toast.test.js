@@ -24,6 +24,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DexDetailView } from '../src/ui/views/DexDetailView.js';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const R = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
@@ -142,13 +143,13 @@ test('wave19: legacy .dex-detail-* CSS deleted (gradient orb included), DS repla
 
 test('wave19: notify() maps the historical colour to a DS kind class (no inline background)', () => {
   assert.ok(UTIL_JS.includes('function pwToastKind(color)'), 'single kind mapper in util.js');
-  assert.ok(UTIL_JS.includes("el.className='pw-toast pw-toast--' + pwToastKind(color)"), 'toast kind class applied');
+  assert.ok(wsIncludes(UTIL_JS, "el.className='pw-toast pw-toast--' + pwToastKind(color)"), 'toast kind class applied'); // V7 · DBT-01
   assert.ok(!/el\.style\.background\s*=/.test(UTIL_JS), 'no inline background left in util notify');
   // Vague 41 — lock recâblé (intention 'exposé aux autres realms' préservée) :
 // la pose window est devenue le shim canonique gardé globalThis.
 assert.ok(UTIL_JS.includes("globalThis.pwToastKind = pwToastKind"), 'kind helper exposed for other realms');
   // Same 2.5s lifetime + display contract
-  assert.ok(UTIL_JS.includes("el.style.display='block'"), 'display contract kept');
+  assert.ok(wsIncludes(UTIL_JS, "el.style.display='block'"), 'display contract kept'); // V7 · DBT-01
   assert.ok(UTIL_JS.includes('2500'), 'lifetime kept');
 });
 

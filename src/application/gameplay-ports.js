@@ -24,19 +24,22 @@ export function installGameplayPorts() {
   setGameplayPorts({
     // ── Pokemon factory / daycare mechanics ──────────────────────────────
     createPoke: (id, level, shiny) =>
-      (typeof globalThis.createPoke === 'function' ? globalThis.createPoke(id, level, shiny) : null),
+      typeof globalThis.createPoke === 'function' ? globalThis.createPoke(id, level, shiny) : null,
     levelUpPokemon: (poke) => {
       if (typeof globalThis.levelUp === 'function') globalThis.levelUp(poke);
     },
     getDaycareLevelUpFee: () =>
-      (typeof globalThis.getHatcheryLevelUpFee === 'function' ? globalThis.getHatcheryLevelUpFee() : 0),
+      typeof globalThis.getHatcheryLevelUpFee === 'function'
+        ? globalThis.getHatcheryLevelUpFee()
+        : 0,
 
     // ── World / encounter knowledge ──────────────────────────────────────
     getLocationDef: (locationId) =>
-      (typeof globalThis.getLocObj === 'function' ? globalThis.getLocObj(locationId) : null),
+      typeof globalThis.getLocObj === 'function' ? globalThis.getLocObj(locationId) : null,
     getRoamingLegendaryForRoute: (locationId) =>
-      (typeof globalThis.getRoamingLegendaryForRoute === 'function'
-        ? globalThis.getRoamingLegendaryForRoute(locationId) : null),
+      typeof globalThis.getRoamingLegendaryForRoute === 'function'
+        ? globalThis.getRoamingLegendaryForRoute(locationId)
+        : null,
 
     // ── Market knowledge ─────────────────────────────────────────────────
     getWildSpeciesIds: (region) => {
@@ -46,7 +49,9 @@ export function installGameplayPorts() {
         for (const loc of Object.values(locs)) {
           for (const w of (loc && loc.wild) || []) set.add(Number(w[0]));
         }
-      } catch (_) { /* tolerate partial data tables */ }
+      } catch (_) {
+        /* tolerate partial data tables */
+      }
       return set;
     },
     getEvoTargetIds: () => {
@@ -58,7 +63,9 @@ export function installGameplayPorts() {
         for (const key of Object.keys(stoneMap)) {
           for (const target of Object.values(stoneMap[key])) set.add(Number(target));
         }
-      } catch (_) { /* tolerate partial data tables */ }
+      } catch (_) {
+        /* tolerate partial data tables */
+      }
       return set;
     },
     getPokemonData: () => globalThis.PD || {},
@@ -71,6 +78,3 @@ export function installGameplayPorts() {
 }
 
 installGameplayPorts();
-
-
-

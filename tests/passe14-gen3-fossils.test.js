@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import { computeRequiredHatchKos } from '../src/domain/breeding/hatchery-rules.js';
 import { harnessRunMixed, harnessIsEsm, harnessBundleSource } from '../tools/harness-bundle.mjs';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 // ── Passe 14 — fossiles Johto canoniques (Lilia #345 / Anorith #347),
 // fossil anti-duplication in queues, ejection on mode change,
@@ -145,8 +146,8 @@ test('revival map: root→345, claw→347 everywhere (map + items)', () => {
   assert.equal(sandbox.ITEMS.claw_fossil.revive, 347, 'ITEMS.claw_fossil.revive coherent');
   // Copy exposed by the domain (file-preflight.js): must follow the same map
   const PREFLIGHT = [fs.readFileSync(new URL('../src/engine/input/action-dispatcher.js', import.meta.url), 'utf8'), fs.readFileSync(new URL('../src/engine/runtime/classic-bridge.js', import.meta.url), 'utf8')].join('\n');
-  assert.ok(/root_fossil:345/.test(PREFLIGHT), 'domaine : root_fossil→345');
-  assert.ok(/claw_fossil:347/.test(PREFLIGHT), 'domaine : claw_fossil→347');
+  assert.ok(/root_fossil:\s*345/.test(PREFLIGHT), 'domaine : root_fossil→345'); // V7 · DBT-01
+  assert.ok(/claw_fossil:\s*347/.test(PREFLIGHT), 'domaine : claw_fossil→347');
   assert.ok(!/root_fossil:220/.test(PREFLIGHT + HATCHERY), 'no more 220 targets');
   assert.ok(!/claw_fossil:246/.test((PREFLIGHT + HATCHERY).replace(/\[220, 345\]|\[246, 347\]/g, '')), 'no more 246 targets');
 });
@@ -268,7 +269,7 @@ test('save: Johto fossils in incubation migrate to the canonical targets', () =>
 
 test("anti-flicker: the live panel is rebuilt only on structural change", () => {
   assert.ok(/trainingBattlePanelSignature\(activeSlots\)/.test(TRAINING), 'signature computed');
-  assert.ok(/if\(battleSig === _trainingBattlePanelSig && panel\.classList\.contains\('open'\)\) return/.test(TRAINING), 'rebuild skipped if unchanged');
+  assert.ok(wsMatch(TRAINING, /if\(battleSig === _trainingBattlePanelSig && panel\.classList\.contains\('open'\)\) return/), 'rebuild skipped if unchanged'); // V7 · DBT-01
   assert.ok(/data-training-text="player-move"/.test(TRAINING) && /data-training-text="enemy-move"/.test(TRAINING), 'move names patched in place');
 });
 
@@ -280,6 +281,7 @@ test('panel signature: changes with the round/enemy, stable otherwise', () => {
     findPokemonByTrainingSlot: (slot) => slot._t,
   };
   sandbox.window = sandbox; sandbox.globalThis = sandbox;
+  sandbox.pwLateLink = (n) => (typeof sandbox[n] === 'function' ? sandbox[n] : null); // V7 · DBT-04 — résolveur de lien tardif (src/core/late-link.js) pour les tranches de fonctions
   sandbox.computeRequiredHatchKos = computeRequiredHatchKos; // hatchery rule port (wave 33)
   vm.createContext(sandbox);
   vm.runInContext(block[0], sandbox);

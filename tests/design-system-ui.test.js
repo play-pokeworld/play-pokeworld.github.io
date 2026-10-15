@@ -217,7 +217,7 @@ test('Data screens: fixed toolbars routed out of the scrollers, charm out of the
   assert.ok(dexScreen.includes('dex-charm-info'), 'Shiny Charm banner lives in the fixed info bar (rebuilt screen)');
   assert.ok(dexScreen.includes('filtersVNode') && dexScreen.indexOf('dex-charm-info') < dexScreen.indexOf('buildView'), 'charm banner bound to the fixed bar, never the grid');
   const sel = R('src/ui/game/box-selector.js');
-  const m = sel.match(/showBoxFilters = \(([\s\S]*?)\) && _usmSubTab/);
+  const m = sel.match(/showBoxFilters =\s*\(([\s\S]*?)\) &&\s*_usmSubTab/); // V7 · DBT-01
   assert.ok(m, 'selector filter switch located');
   for (const mode of ['training', 'hatchery', 'preset_slot_', 'basenpc_slot_', 'training_queue_', 'hatchery_queue_']) {
     assert.ok(m[1].includes(mode), `filters enabled for selector mode ${mode}`);

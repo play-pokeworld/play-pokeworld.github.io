@@ -38,13 +38,30 @@ export class MineWindowView extends UIView {
   windowVNode() {
     const m = this.model;
     const grid = m.grid || { cols: 8, tiles: [] };
-    return h('div', { class: cx('pw-mine-window-root', m.className) },
+    return h(
+      'div',
+      { class: cx('pw-mine-window-root', m.className) },
       m.header && m.header.actions && m.header.actions.length
-        ? h('div', { class: cx(m.header.classes, 'pw-mine-header') },
-            ...m.header.actions.map((a) => h('button', {
-              type: 'button', class: 'hbtn',
-              dataset: { action: 'legacy-call', call: a.call, callArgs: a.callArgs != null ? String(a.callArgs) : '' },
-            }, a.iconHtml ? h.raw(a.iconHtml + ' ') : null, a.label)))
+        ? h(
+            'div',
+            { class: cx(m.header.classes, 'pw-mine-header') },
+            ...m.header.actions.map((a) =>
+              h(
+                'button',
+                {
+                  type: 'button',
+                  class: 'hbtn',
+                  dataset: {
+                    action: 'legacy-call',
+                    call: a.call,
+                    callArgs: a.callArgs != null ? String(a.callArgs) : '',
+                  },
+                },
+                a.iconHtml ? h.raw(a.iconHtml + ' ') : null,
+                a.label
+              )
+            )
+          )
         : null,
       m.title ? h('div', { class: 'loc-title' }, m.title) : null,
       // Wave 43 — trusted-markup contract: the subtitle is a localized string
@@ -52,74 +69,155 @@ export class MineWindowView extends UIView {
       // same template as InfoPanelView (h.raw), never user input.
       m.subtitle ? h('div', { class: 'loc-sub' }, h.raw(m.subtitle)) : null,
       m.energy
-        ? h('div', { class: 'pw-actions-row' },
-            h('div', { class: 'pw-action-flex' },
-              h('div', { class: 'pw-field-row' },
+        ? h(
+            'div',
+            { class: 'pw-actions-row' },
+            h(
+              'div',
+              { class: 'pw-action-flex' },
+              h(
+                'div',
+                { class: 'pw-field-row' },
                 h('span', null, m.energy.label),
-                h('span', { id: 'mine-energy-val', class: 'pw-mine-energy-val' }, m.energy.valueText)),
-              h('div', { class: 'stat-bar pw-mine-energy-bar' },
+                h(
+                  'span',
+                  { id: 'mine-energy-val', class: 'pw-mine-energy-val' },
+                  m.energy.valueText
+                )
+              ),
+              h(
+                'div',
+                { class: 'stat-bar pw-mine-energy-bar' },
                 // Wave 13: inline width (self-contained bar) — the DS
                 // painter only re-sets the same value (contract kept).
                 h('div', {
                   id: 'mine-energy-bar',
                   class: 'stat-fill',
-                  dataset: { pct: String(Math.max(0, Math.min(100, Math.round(Number(m.energy.pct) || 0)))) },
-                  style: { width: `${Math.max(0, Math.min(100, Math.round(Number(m.energy.pct) || 0)))}%` },
-                })),
-              h('div', { class: 'pw-field-hint' }, m.energy.hint)),
-            h('div', { class: 'pw-chip-group' },
-              ...(m.tools || []).map((tool) => h('button', {
-                type: 'button',
-                class: cx('hbtn mine-tool-btn', tool.selected && 'active'),
-                dataset: { action: 'legacy-call', call: tool.call, callArgs: tool.callArgs != null ? String(tool.callArgs) : '' },
-              }, `${tool.label} · ${tool.cost}`))))
+                  dataset: {
+                    pct: String(Math.max(0, Math.min(100, Math.round(Number(m.energy.pct) || 0)))),
+                  },
+                  style: {
+                    width: `${Math.max(0, Math.min(100, Math.round(Number(m.energy.pct) || 0)))}%`,
+                  },
+                })
+              ),
+              h('div', { class: 'pw-field-hint' }, m.energy.hint)
+            ),
+            h(
+              'div',
+              { class: 'pw-chip-group' },
+              ...(m.tools || []).map((tool) =>
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    class: cx('hbtn mine-tool-btn', tool.selected && 'active'),
+                    dataset: {
+                      action: 'legacy-call',
+                      call: tool.call,
+                      callArgs: tool.callArgs != null ? String(tool.callArgs) : '',
+                    },
+                  },
+                  `${tool.label} · ${tool.cost}`
+                )
+              )
+            )
+          )
         : null,
-      h('div', { class: 'mine-grid', dataset: { gridCols: String(grid.cols) } },
+      h(
+        'div',
+        { class: 'mine-grid', dataset: { gridCols: String(grid.cols) } },
         ...grid.tiles.map((tile) => {
           const revealed = tile.depth === 0 && !!tile.itemKey;
-          return h('div', {
-            class: cx('mine-tile',
-              `mine-tile--d${tile.depth}`,
-              tile.clickable && 'mine-tile-clickable',
-              revealed && 'mine-tile-revealed-item',
-              revealed && (`mine-tile--item-${tile.itemKey}`)),
-            // PASSE 30 (P3) — les coordonnées sont désormais portées par TOUTE
-            // tuile, cliquable ou non : l'animation de cassage doit pouvoir
-            // retrouver la case touchée après le re-rendu complet de la grille.
-            dataset: tile.clickable
-              ? { action: 'legacy-call', call: 'digMineTile', callArgs: `${tile.x},${tile.y}`, mineX: String(tile.x), mineY: String(tile.y) }
-              : { mineX: String(tile.x), mineY: String(tile.y) },
-          },
+          return h(
+            'div',
+            {
+              class: cx(
+                'mine-tile',
+                `mine-tile--d${tile.depth}`,
+                tile.clickable && 'mine-tile-clickable',
+                revealed && 'mine-tile-revealed-item',
+                revealed && `mine-tile--item-${tile.itemKey}`
+              ),
+              // PASSE 30 (P3) — les coordonnées sont désormais portées par TOUTE
+              // tuile, cliquable ou non : l'animation de cassage doit pouvoir
+              // retrouver la case touchée après le re-rendu complet de la grille.
+              dataset: tile.clickable
+                ? {
+                    action: 'legacy-call',
+                    call: 'digMineTile',
+                    callArgs: `${tile.x},${tile.y}`,
+                    mineX: String(tile.x),
+                    mineY: String(tile.y),
+                  }
+                : { mineX: String(tile.x), mineY: String(tile.y) },
+            },
             revealed
-              ? h('div', { class: cx('mine-revealed-item', tile.itemCollected && 'is-collected', `mine-item--${tile.itemKey}`) },
-                  tile.itemCenter && tile.iconHtml ? h.raw(tile.iconHtml) : null)
-              : h('div', { class: 'pw-slot-label' }, String(tile.depth)));
-        })),
+              ? h(
+                  'div',
+                  {
+                    class: cx(
+                      'mine-revealed-item',
+                      tile.itemCollected && 'is-collected',
+                      `mine-item--${tile.itemKey}`
+                    ),
+                  },
+                  tile.itemCenter && tile.iconHtml ? h.raw(tile.iconHtml) : null
+                )
+              : h('div', { class: 'pw-slot-label' }, String(tile.depth))
+          );
+        })
+      ),
       m.treasures
-        ? h('div', { class: 'pw-trainer-head' },
-            h('div', null,
-              h('span', { class: 'pw-bold' }, `${m.treasures.label} `,
-                h('span', { class: 'pw-light2' }, `${m.treasures.found} / ${m.treasures.total}`)),
+        ? h(
+            'div',
+            { class: 'pw-trainer-head' },
+            h(
+              'div',
+              null,
+              h(
+                'span',
+                { class: 'pw-bold' },
+                `${m.treasures.label} `,
+                h('span', { class: 'pw-light2' }, `${m.treasures.found} / ${m.treasures.total}`)
+              ),
               // Wave 32: buried vs unearthed is carried by the pill itself
               // (background + name colour) and, once unearthed, by the item
               // sprite placed BEFORE the name — no ❓/✔ marker.
-              h('div', { class: 'pw-field-text pw-mine-treasure-list' },
-                ...(m.treasures.rows || []).map((row) => h('span', {
-                  class: cx('pw-mine-treasure', row.collected && 'is-collected'),
-                  title: row.state ? `${row.name} — ${row.state}` : row.name,
-                  'aria-label': row.state ? `${row.name} — ${row.state}` : row.name,
-                },
-                  row.collected && row.iconHtml ? h.raw(row.iconHtml) : null,
-                  h('span', { class: 'pw-mine-treasure-name' }, row.name))))),
-            h('button', { type: 'button', class: 'hbtn', dataset: { action: 'generate-mine-layer' } }, m.newLayerLabel || ''))
-        : null);
+              h(
+                'div',
+                { class: 'pw-field-text pw-mine-treasure-list' },
+                ...(m.treasures.rows || []).map((row) =>
+                  h(
+                    'span',
+                    {
+                      class: cx('pw-mine-treasure', row.collected && 'is-collected'),
+                      title: row.state ? `${row.name} — ${row.state}` : row.name,
+                      'aria-label': row.state ? `${row.name} — ${row.state}` : row.name,
+                    },
+                    row.collected && row.iconHtml ? h.raw(row.iconHtml) : null,
+                    h('span', { class: 'pw-mine-treasure-name' }, row.name)
+                  )
+                )
+              )
+            ),
+            h(
+              'button',
+              { type: 'button', class: 'hbtn', dataset: { action: 'generate-mine-layer' } },
+              m.newLayerLabel || ''
+            )
+          )
+        : null
+    );
   }
 
   onLoad() {
     this.windowEntity = this.spawn('ui:mine-window', []);
-    this.windowEntity.addComponent(new UIRenderComponent({
-      template: () => this.windowVNode(),
-    }));
+    this.windowEntity.addComponent(
+      new UIRenderComponent({
+        template: () => this.windowVNode(),
+      })
+    );
   }
 
   /**
@@ -133,6 +231,3 @@ export class MineWindowView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
-
-
-

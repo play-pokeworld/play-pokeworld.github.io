@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import { harnessBundleSource } from '../tools/harness-bundle.mjs';
 import { pickWildFromTable } from '../src/domain/world/encounter-rules.js';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 // P5 — gisement dormant : tests de non-régression.
 // 1) DORM-00 (Passe 18) : pas d'objets post-Gen 3 dans les régions 1-3.
@@ -172,7 +173,7 @@ test('Passe 19: itemGeneration classe les générations (1→3 visibles, 4+ masq
 
 test('Passe 19: le dictionnaire filtre les objets par génération débloquée', () => {
   const src = R('src/ui/game/fullscreen-panel.js');
-  assert.ok(src.includes("keys.filter(k => (typeof G !== 'undefined' && G && G._debugShowAllItems) ? true : isItemGenUnlocked(k))"), 'dictionnaire → filtre isItemGenUnlocked (+ debug tout afficher)');
+  assert.ok(wsIncludes(src, "keys.filter((k) => typeof G !== 'undefined' && G && G._debugShowAllItems ? true : isItemGenUnlocked(k))"), 'dictionnaire → filtre isItemGenUnlocked (+ debug tout afficher)'); // V7 · DBT-01 — Prettier retire les parenthèses redondantes
 });
 
 test('DORM-01: normalizeWeather normalise rain/rainy, sun/sunny, sand/sandstorm', () => {
@@ -181,7 +182,7 @@ test('DORM-01: normalizeWeather normalise rain/rainy, sun/sunny, sand/sandstorm'
   vm.createContext(sandbox);
   const src = R('src/application/combat/battle-attack.js');
   // Extraire la fonction normalizeWeather (portée IIFE du bundle trop large) : on l'évalue isolément.
-  const m = src.match(/function normalizeWeather\(w\)\{[\s\S]*?\n\}\n/);
+  const m = src.match(/function normalizeWeather\(w\)\s*\{[\s\S]*?\n\}\n/); // V7 · DBT-01
   assert.ok(m, 'normalizeWeather présent');
   vm.runInContext(m[0] + '\nglobalThis.nw = normalizeWeather;', sandbox);
   const nw = sandbox.nw;
@@ -307,7 +308,7 @@ test('DORM-02h: Vive Griffe, Herbe Mentale, Poing Chance et Queue Lente sont câ
   assert.ok(atk.includes("attackerHeldItem === 'lucky_punch' && isPunchMove(moveId)) secChance *= 2;"), 'Poing Chance → effets secondaires ×2');
   assert.ok(atk.includes("function isPunchMove"), 'détecteur de capacité de poing présent');
   // Queue Lente : capacités lentes (multiplicateur de cooldown > 1) ×plus fort.
-  assert.ok(atk.includes("attackerHeldItem === 'lagging_tail' && typeof getMoveCooldownMultiplier === 'function' && getMoveCooldownMultiplier(mv) > 1"), 'Queue Lente → capacités lentes');
+  assert.ok(atk.includes("attackerHeldItem === 'lagging_tail' && getMoveCooldownMultiplier(mv) > 1"), 'Queue Lente → capacités lentes'); // V7 · DBT-04 — import explicite, plus de garde typeof
   // Herbe Mentale : durée de statut −1 tour.
   assert.ok(atk.includes('function heldStatusTurns'), 'Herbe Mentale → helper présent');
   // Vive Griffe : cooldown réduit sur les capacités rapides.
@@ -318,6 +319,7 @@ test('DORM-02h: Vive Griffe, Herbe Mentale, Poing Chance et Queue Lente sont câ
 
 test('DORM-02h: Herbe Mentale réduit la durée des statuts (min 1 tour)', () => {
   const sandbox = { console, window: {}, globalThis: {}, G: { team: [], teamSlotItems: [] } };
+  sandbox.pwLateLink = (n) => (typeof sandbox[n] === 'function' ? sandbox[n] : null); // V7 · DBT-04 — résolveur de lien tardif (src/core/late-link.js) pour les tranches de fonctions
   sandbox.window = sandbox; sandbox.globalThis = sandbox;
   vm.createContext(sandbox);
   const src = R('src/application/combat/battle-attack.js');
@@ -375,11 +377,11 @@ test('DORM-04: les talents « divers » sont branchés (source PokeChill)', () =
   assert.ok(atk.includes("_hasTal(attacker, 'ironfist') && isPunchMove(moveId)"), 'Poing de Fer ×1,5 poings');
   assert.ok(atk.includes("_hasTal(attacker, 'sharpness') && isSharpMove(moveId)"), 'Lame Tranchante ×1,5 lames');
   assert.ok(atk.includes("_hasTal(attacker, 'megalauncher') && isPulseMove(moveId)"), 'Méga Blaster ×1,5 pulsations');
-  assert.ok(atk.includes("_hasTal(attacker, 'reckless') && typeof getMoveCooldownMultiplier === 'function' && getMoveCooldownMultiplier(mv) > 1"), 'Témérité ×1,5 capacités lentes');
+  assert.ok(atk.includes("_hasTal(attacker, 'reckless') && getMoveCooldownMultiplier(mv) > 1"), 'Témérité ×1,5 capacités lentes'); // V7 · DBT-04
   assert.ok(atk.includes("_hasTal(attacker, 'merciless') && defender.status"), 'Impitoyable ×1,5 cible avec statut');
   assert.ok(atk.includes("_hasTal(attacker, 'rivalry') && _shareType"), 'Rivalité ×1,5 type partagé');
   assert.ok(atk.includes("_hasTal(attacker, 'sheerforce') && mv.eff && mv.effC"), 'Sans Limite détecté');
-  assert.ok(atk.includes('! _sheerForce&&mv.eff&&secChance') || atk.includes('!_sheerForce&&mv.eff&&secChance'), 'Sans Limite supprime l\'effet secondaire');
+  assert.ok(wsIncludes(atk, '!_sheerForce&&mv.eff&&secChance'), 'Sans Limite supprime l\'effet secondaire'); // V7 · DBT-01
   assert.ok(atk.includes("_hasTal(attacker, 'sandforce')"), 'Force Sable branchée');
   // Scrappy : les Spectres sont touchés par Normal/Combat.
   assert.ok(atk.includes("_talSc === 'scrappy' && eff === 0 && (mv.type === 'Normal' || mv.type === 'Fighting')"), 'Scrappy → touche les Spectres');
@@ -438,7 +440,7 @@ test('DORM-04: talents d\'efficacité/dégâts branchés (normalize, -ate, écra
   assert.ok(atk.includes("_hasTal(defender, 'wonderguard') && eff < 2"), 'Garde Mystik branchée');
   assert.ok(atk.includes("_hasTal(defender, 'purifyingsalt') && mv.type === 'Ghost'"), 'Sel Purificateur branché');
   assert.ok(atk.includes("_hasTal(attacker, 'metalhead') && isHeadMove(moveId)"), 'Tête de Fer branchée');
-  assert.ok(atk.includes("_hasTal(attacker, 'libero') && typeof getMoveCooldownMultiplier"), 'Libéro branché');
+  assert.ok(atk.includes("_hasTal(attacker, 'libero') && getMoveCooldownMultiplier(mv) < 1"), 'Libéro branché'); // V7 · DBT-04
   assert.ok(atk.includes("_hasTal(attacker, 'supremeoverlord')"), 'Général Suprême branché');
   assert.ok(atk.includes("_hasTal(attacker, 'gorillatactics')"), 'Tactique Gorille branchée');
   assert.ok(atk.includes("_hasTal(attacker, 'brittlearmor')"), 'Armure Cassante branchée');
@@ -451,7 +453,7 @@ test('DORM-04: talents d\'efficacité/dégâts branchés (normalize, -ate, écra
   assert.ok(atk.includes("_hasTal(defender, 'angerpoint')"), 'Colérique branché');
   assert.ok(atk.includes('syncStatusBack'), 'Synchro branché');
   assert.ok(atk.includes('weatherTurnsFor'), 'Climatact branché (météo)');
-  assert.ok(atk.includes("s==='confuse'"), 'Confusion gérée dans handleStatusBeforeMove');
+  assert.ok(wsIncludes(atk, "s==='confuse'"), 'Confusion gérée dans handleStatusBeforeMove'); // V7 · DBT-01
   // au contact
   assert.ok(atk.includes("_hasTal(defender, 'flamebody')"), 'Corps Ardent au contact');
   assert.ok(atk.includes("_hasTal(defender, 'effectspore')"), 'Pose Spore au contact');
@@ -564,7 +566,7 @@ test('DORM-04: capacités de statut interprétées + mécaniques PokeChill', () 
   assert.ok(atk.includes("_hasTal(attacker, 'unaware')"), 'Insouciant branché');
   assert.ok(atk.includes('_camouflageType'), 'Camouflage/Conversion branchés');
   assert.ok(atk.includes("battle.weather === 'lightscreen'"), 'écrans (dégâts) branchés');
-  assert.ok(atk.includes("_cs = applier"), 'Color Spore branché');
+  assert.ok(wsIncludes(atk, "_cs = applier"), 'Color Spore branché'); // V7 · DBT-01
   assert.ok(atk.includes('sweetveil') && atk.includes('pastelveil') && atk.includes('flowerveil') && atk.includes('aromaveil'), 'voiles d\'équipe branchés');
   assert.ok(atk.includes("battle.weather === 'safeguard'"), 'Rune Protectrice branchée');
   const status = R('src/application/combat/battle-status.js');

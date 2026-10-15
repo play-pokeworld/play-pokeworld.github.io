@@ -23,9 +23,13 @@ export class GuidePanelView extends UIView {
   onLoad() {
     // Spawn the panel entity UNDER the view root (renderChildren(root)).
     this.panelEntity = this.spawn('ui:guide-panel', []);
-    this.panelEntity.addComponent(new UIRenderComponent({
-      template: () => [this.model.mode === 'detail' ? guideDetailVNode(this.model) : guideHomeVNode(this.model)],
-    }));
+    this.panelEntity.addComponent(
+      new UIRenderComponent({
+        template: () => [
+          this.model.mode === 'detail' ? guideDetailVNode(this.model) : guideHomeVNode(this.model),
+        ],
+      })
+    );
   }
 
   /** Full panel (home or detail) as an HTML string. */
@@ -43,9 +47,11 @@ export class TutorialCardView extends UIView {
 
   onLoad() {
     this.cardEntity = this.spawn('ui:tutorial-card', []);
-    this.cardEntity.addComponent(new UIRenderComponent({
-      template: () => [tutorialQuestCardVNode(this.model)],
-    }));
+    this.cardEntity.addComponent(
+      new UIRenderComponent({
+        template: () => [tutorialQuestCardVNode(this.model)],
+      })
+    );
   }
 
   /** Tutorial quest card as an HTML string. */
@@ -55,6 +61,3 @@ export class TutorialCardView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
-
-
-

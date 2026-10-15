@@ -14,7 +14,9 @@
 import { Component } from '../core/Component.js';
 
 export class UIRenderComponent extends Component {
-  static get type() { return 'UIRender'; }
+  static get type() {
+    return 'UIRender';
+  }
 
   /**
    * @param {Object} [props]
@@ -48,6 +50,3 @@ export class UIRenderComponent extends Component {
     return this.template ? this.template(this.entity) : null;
   }
 }
-
-
-

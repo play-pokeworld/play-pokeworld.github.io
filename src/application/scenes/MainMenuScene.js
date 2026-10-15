@@ -24,10 +24,11 @@ import { Scene } from '../../engine/core/Scene.js';
 function starterOpen() {
   if (typeof document === 'undefined') return false;
   const starter = document.getElementById('starter-modal');
-  return !!(starter && (
-    (starter.classList && starter.classList.contains('open'))
-    || (starter.style && starter.style.display === 'flex')
-  ));
+  return !!(
+    starter &&
+    ((starter.classList && starter.classList.contains('open')) ||
+      (starter.style && starter.style.display === 'flex'))
+  );
 }
 
 /** @returns {boolean} True while the save menu screen owns the display. */
@@ -44,21 +45,31 @@ export class MainMenuScene extends Scene {
 
   onEnter() {
     if (typeof document === 'undefined') return;
-    const started = (typeof window !== 'undefined') && !!window.PokeWorldGameStarted;
+    const started = typeof window !== 'undefined' && !!window.PokeWorldGameStarted;
     // The menu overlay of this scene is whichever layer is actually shown.
     this._menuOverlay = starterOpen()
       ? document.getElementById('starter-modal')
-      : (saveMenuOpen()
+      : saveMenuOpen()
         ? document.getElementById('save-menu-screen')
-        : (document.getElementById('save-menu-screen') || document.getElementById('starter-modal') || null));
+        : document.getElementById('save-menu-screen') ||
+          document.getElementById('starter-modal') ||
+          null;
     if (started) return; // starter re-pick mid-session: the session classes stay.
     const body = document.body;
-    if (!starterOpen() && !saveMenuOpen()
-        && typeof window !== 'undefined' && typeof window.renderSaveMenu === 'function') {
+    if (
+      !starterOpen() &&
+      !saveMenuOpen() &&
+      typeof window !== 'undefined' &&
+      typeof window.renderSaveMenu === 'function'
+    ) {
       // Safety net: menu scene active with nothing displayed — re-open the
       // save menu (renderSaveMenu itself restores the body classes and
       // re-syncs the scenes, which is a no-op since this scene is current).
-      try { window.renderSaveMenu(); } catch (_) { /* PokeUI not ready yet: boot retries on its own tick. */ }
+      try {
+        window.renderSaveMenu();
+      } catch (_) {
+        /* PokeUI not ready yet: boot retries on its own tick. */
+      }
     } else if (body && body.classList) {
       body.classList.add('save-menu-active');
       body.classList.remove('game-started');
@@ -72,10 +83,9 @@ export class MainMenuScene extends Scene {
     if (el.id === 'save-menu-screen') {
       return !!(el.classList && el.classList.contains('is-open'));
     }
-    return !!((el.classList && el.classList.contains('open'))
-      || (el.style && el.style.display === 'flex'));
+    return !!(
+      (el.classList && el.classList.contains('open')) ||
+      (el.style && el.style.display === 'flex')
+    );
   }
 }
-
-
-

@@ -41,7 +41,8 @@ function _pwWindowCloseButton(oldBtn) {
     if (attr.name === 'class' || attr.name === 'type') continue;
     btn.setAttribute(attr.name, attr.value);
   }
-  if (!oldBtn.dataset || !oldBtn.dataset.action) btn.setAttribute('data-action', (oldBtn.dataset && oldBtn.dataset.action) || 'close-modal');
+  if (!oldBtn.dataset || !oldBtn.dataset.action)
+    btn.setAttribute('data-action', (oldBtn.dataset && oldBtn.dataset.action) || 'close-modal');
   // The CSS draws the glyph for empty .modal-close (::before '✕'); keep any
   // existing text content otherwise.
   if (oldBtn.textContent && oldBtn.textContent.trim()) btn.textContent = oldBtn.textContent;
@@ -84,7 +85,15 @@ export function pwApplyWindowChrome(inner) {
   let foot = null;
   for (let i = kids.length - 1; i >= 0; i--) {
     const el = kids[i];
-    if (el !== title && el.matches && el.matches(_PW_FOOT_SELECTOR) && !el.classList.contains('pw-panel-body')) { foot = el; break; }
+    if (
+      el !== title &&
+      el.matches &&
+      el.matches(_PW_FOOT_SELECTOR) &&
+      !el.classList.contains('pw-panel-body')
+    ) {
+      foot = el;
+      break;
+    }
   }
   if (foot) foot.classList.add('pw-panel-foot');
 
@@ -116,6 +125,3 @@ export function pwApplyWindowChrome(inner) {
 // through window; the ECS graph can also import it directly.
 if (typeof window !== 'undefined') window.pwApplyWindowChrome = pwApplyWindowChrome;
 if (typeof globalThis !== 'undefined') globalThis.pwApplyWindowChrome = pwApplyWindowChrome;
-
-
-

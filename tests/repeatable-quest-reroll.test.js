@@ -18,7 +18,7 @@ test('the reroll button timer no longer uses textContent with HTML', () => {
 
 test('the button label renders the icon as HTML and the time as text', () => {
   // Extracts the button-update block and runs it with stubs.
-  const body = QUEST_UI.match(/if \(rerollBtn\) \{[\s\S]*?\n   \}/);
+  const body = QUEST_UI.match(/(if \(rerollBtn\) \{[\s\S]*?\n    \})\n    if \(timerSpan\)/); // V7 · DBT-01 — indentation Prettier (4 espaces), bloc clos juste avant `if (timerSpan)`
   assert.ok(body, 'button block extraction impossible');
   const btn = { disabled: true, innerHTML: '', textContent: '', attrs: {}, setAttribute(k, v) { this.attrs[k] = v; } };
   const sandbox = {
@@ -32,7 +32,7 @@ test('the button label renders the icon as HTML and the time as text', () => {
     formatRepeatableCooldown: (s) => '01:15',
   };
   vm.createContext(sandbox);
-  vm.runInContext(body[0], sandbox, { filename: 'quest-ui.js#reroll' });
+  vm.runInContext(body[1], sandbox, { filename: 'quest-ui.js#reroll' });
   assert.equal(btn.textContent, '', 'textContent must not receive HTML');
   assert.ok(btn.innerHTML.includes('<span class="ui-icon"'), 'icon rendered as HTML (not as text)');
   assert.ok(btn.innerHTML.includes('01:15'), 'time shown after the icon');
@@ -40,7 +40,7 @@ test('the button label renders the icon as HTML and the time as text', () => {
   // On expiry: button re-enabled with the Reroll label
   btn.innerHTML = ''; btn.textContent = '';
   sandbox.left2 = 0;
-  vm.runInContext(body[0], sandbox);
+  vm.runInContext(body[1], sandbox);
   assert.equal(btn.disabled, false, 'button re-enabled at the end of the timer');
   assert.ok(btn.innerHTML.includes('Reroll'), 'Reroll label restored in HTML');
   assert.equal(btn.attrs['data-call'], 'rollRepeatables', 'reroll action restored');

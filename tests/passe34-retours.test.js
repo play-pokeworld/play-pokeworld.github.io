@@ -16,6 +16,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 const CSS = readFileSync(new URL('../src/assets/styles/design-system.css', import.meta.url), 'utf8');
 const DUNGEON = readFileSync(new URL('../src/application/world/dungeon-run.js', import.meta.url), 'utf8');
@@ -121,7 +122,7 @@ test('34.3 — le résumé de session ne surgit pas entre deux paliers', () => {
   // `endBattle()` ouvrait le résumé dès qu'il y avait du butin — donc à chaque
   // palier, puisque le combat y est arrêté volontairement. Défaut invisible
   // pour les sondes DOM : il a fallu une CAPTURE pour le voir.
-  assert.match(FLOW, /if\(hadLoot && !_dgRunActive\) openBattleSummary\(true\);/,
+  assert.ok(wsMatch(FLOW, /if\(hadLoot && !_dgRunActive\) openBattleSummary\(true\);/), // V7 · DBT-01
     'l\'ouverture automatique du résumé doit être conditionnée à l\'expédition');
 });
 

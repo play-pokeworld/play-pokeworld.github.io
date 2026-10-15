@@ -83,7 +83,10 @@ export class Entity {
    * @returns {Entity[]} Child entity handles (handles survive only while registered).
    */
   get children() {
-    return this.world.getChildren(this.id).map((eid) => this.world.entity(eid)).filter(Boolean);
+    return this.world
+      .getChildren(this.id)
+      .map((eid) => this.world.entity(eid))
+      .filter(Boolean);
   }
 
   /** @returns {Entity|null} */
@@ -101,6 +104,3 @@ export class Entity {
     this.world.destroyEntityTree(this.id);
   }
 }
-
-
-

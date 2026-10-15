@@ -43,7 +43,9 @@ export class LocationInfoView extends UIView {
 
   panelVNode() {
     const m = this.model;
-    return h('div', { class: 'pw-loc-info' },
+    return h(
+      'div',
+      { class: 'pw-loc-info' },
       m.overview ? locOverviewVNode(m.overview) : null,
       m.playStats ? locPlayStatsVNode(m.playStats) : null,
       m.lore ? locLoreVNode(m.lore) : null,
@@ -53,15 +55,18 @@ export class LocationInfoView extends UIView {
       ...(m.timerChips || []).map(locTimerChipVNode),
       m.wild ? [locWildMetaVNode(m.wild.meta), locWildGridVNode(m.wild.entries)] : null,
       m.drops ? locDropsVNode(m.drops) : null,
-      m.alcoves ? locAlcovesVNode(m.alcoves) : null);
+      m.alcoves ? locAlcovesVNode(m.alcoves) : null
+    );
   }
 
   onLoad() {
     // Spawn the panel entity UNDER the view root (renderChildren(root)).
     this.panelEntity = this.spawn('ui:location-info', []);
-    this.panelEntity.addComponent(new UIRenderComponent({
-      template: () => [this.panelVNode()],
-    }));
+    this.panelEntity.addComponent(
+      new UIRenderComponent({
+        template: () => [this.panelVNode()],
+      })
+    );
   }
 
   static toHTML(model) {
@@ -70,6 +75,3 @@ export class LocationInfoView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
-
-
-

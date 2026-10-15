@@ -3,7 +3,8 @@ export function createRouteEventState() {
 }
 
 export function ensureRouteEventState(gameState) {
-  if (!gameState.routeEvents || typeof gameState.routeEvents !== 'object') gameState.routeEvents = createRouteEventState();
+  if (!gameState.routeEvents || typeof gameState.routeEvents !== 'object')
+    gameState.routeEvents = createRouteEventState();
   const state = gameState.routeEvents;
   if (!state.seen || typeof state.seen !== 'object') state.seen = {};
   if (!Array.isArray(state.history)) state.history = [];
@@ -47,7 +48,3 @@ export function setRouteEventCooldown(gameState, eventId, durationMs, now = Date
   const state = ensureRouteEventState(gameState);
   state.cooldowns[eventId] = now + Math.max(0, Number(durationMs || 0));
 }
-
-
-
-

@@ -15,7 +15,7 @@
 //        - fossiles (ITEMS[].revive, minés dans la mine)
 //        - récompenses Pokémon des quêtes (histoire + Hoenn + annexes)
 //        - œufs d'incubation (BABY_BREED_MAP)
-//        - formes spéciales achetables (387-389 ← 351, 390-392 ← 386)
+//        - formes achetables (FORMS : clés "351-1"… — V7 · FORM-01)
 //        - FERMETURE par évolution : LEVEL_EVO_MAP (niveau, toujours) et
 //          STONE_EVO (objet — seulement si l'objet est OBTENABLE)
 //   B. les OBTENABILITÉS D'OBJET : boutiques (SHOPS + SHOPS_HOENN),
@@ -45,7 +45,7 @@ new Function('window', read('src/data/pd-data.js'))(fakeWindow);
 const PD = fakeWindow.PD;
 const DEX_MAX = Math.max(...Object.keys(PD).map(Number));
 const name = (id) => (PD[id] && PD[id][0]) || ('#' + id);
-const regionOf = (id) => (id <= 151 ? 'Kanto' : id <= 251 ? 'Johto' : id <= 386 ? 'Hoenn' : 'formes spéciales');
+const regionOf = (id) => (id <= 151 ? 'Kanto' : id <= 251 ? 'Johto' : 'Hoenn');
 
 // ── Modules de données ──────────────────────────────────────────────────────
 const { LOCS } = await import('../src/data/locations-data.js');
@@ -85,34 +85,51 @@ const allQuests = [
 ];
 
 // ── 1) Sources directes de Pokémon ──────────────────────────────────────────
-const sources = new Map(); // id → Set<labels>
-const addSrc = (id, label) => {
-  id = Number(id);
-  if (!id) return;
-  if (!sources.has(id)) sources.set(id, new Set());
-  sources.get(id).add(label);
+// V7 · DEX-01 — SOURCE UNIQUE : src/domain/world/species-sources.js (la même
+// fonction alimente la fiche Pokédex). L'outil ne recopie plus aucune liste.
+const { computeSpeciesSources, reachableSpecies } = await import('../src/domain/world/species-sources.js');
+const { FORMS, FORM_SHOPS } = await import('../src/data/forms-data.js');
+const { LEGENDARY_QUESTS } = await import('../src/data/legendary-quests.js').catch(() => ({ LEGENDARY_QUESTS: [] }));
+const { FOSSIL_REVIVE_MAP } = await import('../src/application/breeding/hatchery.js').catch(() => ({ FOSSIL_REVIVE_MAP: null }));
+const GAME_CONFIG = (await import('../src/data/game-config.js').catch(() => ({ GAME: {} }))).GAME || {};
+const { EVO_LEVELS: _EVL } = { EVO_LEVELS };
+const ctx = {
+  locTables: { kanto: LOCS, johto: LOCS_JOHTO, hoenn: LOCS_HOENN },
+  starters: { kanto: GAME_CONFIG.KANTO_STARTERS || [1, 4, 7], johto: GAME_CONFIG.JOHTO_STARTERS || [152, 155, 158], hoenn: GAME_CONFIG.HOENN_STARTERS || [252, 255, 258] },
+  marketStock: MARKET_STOCK,
+  fossilMap: FOSSIL_REVIVE_MAP || Object.fromEntries(Object.keys(ITEMS).filter((k) => ITEMS[k] && ITEMS[k].revive).map((k) => [k, Number(ITEMS[k].revive)])),
+  // V7 · LEG-01 — les quêtes légendaires (mains Kanto/Johto enveloppées, dernières
+  // étapes des chaînes Hoenn) ne sont listées qu'une fois : « quête légendaire ».
+  quests: allQuests.filter(([, q]) => q && q.rewardPoke && !q.legendary && !LEGENDARY_QUESTS.some((l) => l.mainQuestId != null && String(l.mainQuestId) === String(q.id))).map(([label, q]) => ({ id: q.id, label, rewardPoke: Number(q.rewardPoke) }))
+    .concat((Array.isArray(LEGENDARY_QUESTS) ? LEGENDARY_QUESTS : Object.values(LEGENDARY_QUESTS || {})).filter((q) => q && q.poke).map((q) => ({ id: q.id, label: 'quête légendaire', rewardPoke: Number(q.poke) }))),
+  babyParents: (await import('../src/domain/world/species-sources.js')).BABY_PARENTS,
+  levelEvoMap: LEVEL_EVO_MAP, evoLevels: _EVL, stoneEvo: STONE_EVO,
+  forms: FORMS, formShops: FORM_SHOPS,
+  roaming: (await import('../src/domain/world/species-sources.js')).ROAMING_SPECIES,
 };
-
-for (const [label, locs] of [['sauvage (Kanto)', LOCS], ['sauvage (Johto)', LOCS_JOHTO], ['sauvage (Hoenn)', LOCS_HOENN]]) {
-  for (const k in locs) for (const w of (locs[k].wild || [])) if (Array.isArray(w) && w.length) addSrc(w[0], label);
+const srcLabel = (s) => {
+  switch (s.kind) {
+    case 'wild': return `sauvage (${s.region}) ${s.locId} [${s.bucket} ${(s.chance * 100).toFixed(1)} %]`;
+    case 'roaming': return `légendaire errant (${s.region})`;
+    case 'starter': return `starter (${s.region})`;
+    case 'market': return `marché (${s.region})`;
+    case 'fossil': return `fossile (${s.item})`;
+    case 'quest': return `${s.label} ${s.questId}`;
+    case 'egg': return `œuf d'incubation (de ${s.parents.map(name).join('/')})`;
+    case 'form_shop': return `forme achetée — ${s.shop} ${s.price}₽ (base ${name(s.base)} en PC)`;
+    default: return null;
+  }
+};
+const sources = new Map(); // id|clé → Set<labels>
+const allKeys = [...Object.keys(PD).map(Number), ...Object.keys(FORMS)];
+for (const key of allKeys) {
+  for (const s of computeSpeciesSources(key, ctx)) {
+    const label = srcLabel(s);
+    if (!label) continue;
+    if (!sources.has(key)) sources.set(key, new Set());
+    sources.get(key).add(label);
+  }
 }
-// Pool errant (src/application/world/roaming.js) — même liste que le jeu.
-for (const id of [144, 145, 146, 151, 243, 244, 245, 251, 380, 381, 385, 386]) addSrc(id, 'légendaire errant');
-for (const id of [1, 4, 7, 152, 155, 158, 252, 255, 258]) addSrc(id, 'starter');
-for (const region of Object.keys(MARKET_STOCK)) for (const id of MARKET_STOCK[region]) addSrc(id, 'marché');
-for (const k in ITEMS) {
-  const r = Number(ITEMS[k] && ITEMS[k].revive);
-  if (r && r <= DEX_MAX) addSrc(r, `fossile (${k})`);
-}
-for (const [label, q] of allQuests) if (q && q.rewardPoke) addSrc(q.rewardPoke, label);
-// Œufs d'incubation (src/application/breeding/hatchery.js, BABY_BREED_MAP).
-const BABY_BREED_MAP = { 25: 172, 26: 172, 35: 173, 36: 173, 39: 174, 40: 174, 106: 236, 107: 236, 237: 236, 124: 238, 125: 239, 126: 240, 183: 298, 184: 298, 202: 360 };
-for (const [parent, baby] of Object.entries(BABY_BREED_MAP)) addSrc(baby, `œuf d'incubation (de ${name(parent)})`);
-// Formes spéciales achetables (labo Météo / Météorites) — base dans le PC.
-for (const [form, base] of [[387, 351], [388, 351], [389, 351], [390, 386], [391, 386], [392, 386]]) {
-  addSrc(form, `forme spéciale achetée (base ${name(base)} en PC)`);
-}
-
 // ── 2) Obtenabilité des objets ─────────────────────────────────────────────
 const itemSources = new Map(); // key → Set<labels>
 const addItemSrc = (key, label) => {
@@ -129,49 +146,24 @@ for (const [, q] of allQuests) if (q && q.rewardItems) for (const k in q.rewardI
 const itemObtainable = (key) => itemSources.has(key);
 const itemFrom = (key) => [...(itemSources.get(key) || [])].slice(0, 3).join(', ');
 
-// ── 3) Fermeture par évolution ─────────────────────────────────────────────
-// 3a. Fermeture SANS condition sur les objets (comme getReachableSpecies du jeu)
-//     → sert de contrôle et détecte « évolution possible si l'objet existait ».
-const closureAny = new Set([...sources.keys()].map(Number));
-let changed = true;
-while (changed) {
-  changed = false;
-  for (const f in LEVEL_EVO_MAP) {
-    const t = Number(LEVEL_EVO_MAP[f]);
-    if (closureAny.has(Number(f)) && !closureAny.has(t)) { closureAny.add(t); changed = true; }
-  }
-  for (const f in STONE_EVO) {
-    if (!closureAny.has(Number(f))) continue;
-    for (const sk in STONE_EVO[f]) {
-      const t = Number(STONE_EVO[f][sk]);
-      if (!closureAny.has(t)) { closureAny.add(t); changed = true; }
-    }
-  }
-}
-// 3b. Fermination CONDITIONNELLE : une évolution à objet n'est ouverte que si
-//     l'objet est obtenable quelque part dans le jeu.
-const reachable = new Set([...sources.keys()].map(Number));
+// ── 3) Fermeture par évolution (domaine : reachableSpecies) ────────────────
+const pdIds = Object.keys(PD).map(Number);
+// 3a. sans condition sur les objets (= getReachableSpecies du jeu)
+const closureAny = reachableSpecies(pdIds, ctx, () => true);
+// 3b. conditionnelle : une évolution à objet n'est ouverte que si l'objet est obtenable.
+const reachable = reachableSpecies(pdIds, ctx, itemObtainable);
 const blockedEvo = new Map(); // target id → [{from, stone}]
-changed = true;
-while (changed) {
-  changed = false;
-  for (const f in LEVEL_EVO_MAP) {
-    const t = Number(LEVEL_EVO_MAP[f]);
-    if (reachable.has(Number(f)) && !reachable.has(t)) { reachable.add(t); changed = true; }
-  }
-  for (const f in STONE_EVO) {
-    if (!reachable.has(Number(f))) continue;
-    for (const sk in STONE_EVO[f]) {
-      const t = Number(STONE_EVO[f][sk]);
-      if (reachable.has(t)) continue;
-      if (itemObtainable(sk)) { reachable.add(t); changed = true; }
-      else {
-        if (!blockedEvo.has(t)) blockedEvo.set(t, []);
-        blockedEvo.get(t).push({ from: Number(f), stone: sk });
-      }
-    }
+for (const f in STONE_EVO) {
+  if (!reachable.has(Number(f))) continue;
+  for (const sk in STONE_EVO[f]) {
+    const t = Number(STONE_EVO[f][sk]);
+    if (reachable.has(t) || itemObtainable(sk)) continue;
+    if (!blockedEvo.has(t)) blockedEvo.set(t, []);
+    blockedEvo.get(t).push({ from: Number(f), stone: sk });
   }
 }
+// Formes : chacune doit avoir une provenance directe (boutique).
+const formsWithoutSource = Object.keys(FORMS).filter((k) => !sources.has(k));
 
 // ── 4) Rapport ──────────────────────────────────────────────────────────────
 const allIds = Object.keys(PD).map(Number).sort((a, b) => a - b);
@@ -187,6 +179,8 @@ console.log(`Obtenables (fermeture évolution conditionnelle) : ${reachable.size
 console.log(`Obtenables sans condition sur les objets : ${closureAny.size}`);
 console.log(`NON obtenables : ${unobtainable.length}`);
 console.log(`Évolutions bloquées (objet inaccessible) : ${blockedOnly.length}`);
+console.log(`Formes (FORMS) : ${Object.keys(FORMS).length} — sans provenance : ${formsWithoutSource.length ? formsWithoutSource.join(', ') : '0'}`);
+for (const k of Object.keys(FORMS)) console.log(`  forme ${k} ${(FORMS[k].name_fr || '').padEnd(18)} ← ${[...(sources.get(k) || [])].join(' ; ') || 'AUCUNE SOURCE'}`);
 if (gameReach) {
   const mineOnly = [...reachable].filter((id) => !gameReach.has(id));
   const gameOnly = [...gameReach].filter((id) => !reachable.has(id));
@@ -212,6 +206,15 @@ for (const id of blockedOnly) {
   for (const b of blockedEvo.get(id)) {
     console.log(`  #${String(id).padStart(3)} ${name(id).padEnd(14)} ← ${name(b.from)} + ${b.stone}  [${b.stone} : AUCUNE source dans le jeu]`);
   }
+}
+
+// V7 · LEG-01/02 — provenance de chaque légendaire (acceptation LEG-02 : 377–386 ont une source « quête »).
+console.log('\n── 2b) LÉGENDAIRES — provenance ──');
+const LEGENDARY_SPECIES = [144, 145, 146, 150, 151, 243, 244, 245, 249, 250, 251, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386];
+for (const id of LEGENDARY_SPECIES) {
+  const labels = [...(sources.get(id) || [])];
+  const hasQuest = labels.some((l) => l.startsWith('quête légendaire'));
+  console.log(`  ${hasQuest ? '✔' : '✘'} #${String(id).padStart(3)} ${name(id).padEnd(12)} ← ${labels.join(' ; ') || 'AUCUNE SOURCE'}`);
 }
 
 console.log('\n── 3) OBJETS D’ÉVOLUTION — provenance (ou absence) ──');

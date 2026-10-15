@@ -58,10 +58,16 @@ export class ManagementMenuView extends UIView {
 
   shellVNode() {
     const m = this.model;
-    return h('div', { class: `management-shell management-${m.machine}` },
+    return h(
+      'div',
+      { class: `management-shell management-${m.machine}` },
       h('div', { class: 'management-tabs-host' }, managementTabBarVNode(m.tabs)),
-      h('div', { class: 'management-content', dataset: { machine: m.machine || '' } },
-        (m.blocks || []).map(managementBlockVNode).filter(Boolean)));
+      h(
+        'div',
+        { class: 'management-content', dataset: { machine: m.machine || '' } },
+        (m.blocks || []).map(managementBlockVNode).filter(Boolean)
+      )
+    );
   }
 
   windowVNode() {
@@ -73,9 +79,11 @@ export class ManagementMenuView extends UIView {
 
   onLoad() {
     this.windowEntity = this.spawn('ui:management-menu', []);
-    this.windowEntity.addComponent(new UIRenderComponent({
-      template: () => this.windowVNode(),
-    }));
+    this.windowEntity.addComponent(
+      new UIRenderComponent({
+        template: () => this.windowVNode(),
+      })
+    );
   }
 
   /** Full shell serialization for the classic adapters (first render). */
@@ -95,6 +103,3 @@ export class ManagementMenuView extends UIView {
     return managementBlocksHTML(model ? model.blocks : []);
   }
 }
-
-
-

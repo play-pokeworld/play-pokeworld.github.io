@@ -18,7 +18,7 @@ import { dirname, join } from 'node:path';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(ROOT, p), 'utf8');
 const css = read('src/assets/styles/design-system.css');
-const helpers = read('src/data/game-helpers.js');
+const helpers = read('src/data/box-filters.js'); // V7 · DBT-09 — recherche/filtres de boîte extraits de game-helpers.js
 const bgJs = read('src/data/location-backgrounds.js');
 const curJs = read('src/ui/game/currency-window.js');
 const cardJs = read('src/ui/components/poke-full-card.js');

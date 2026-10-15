@@ -27,6 +27,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 const read = (p) => readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 
@@ -215,7 +216,7 @@ test('39-K3 — le combat normal enregistre l\'argent gagné (sessionMoney) et l
   assert.match(init, /battle\.sessionMoney\s*=\s*0/, 'la session part à zéro argent');
   const status = read('src/application/combat/battle-status.js');
   assert.match(status, /awardWildVictoryMoney\(\)\s*\|\|\s*0/, 'la victoire sauvage est mémorisée');
-  assert.match(status, /battle\.sessionMoney\s*=\s*\(battle\.sessionMoney\s*\|\|\s*0\)\s*\+\s*Number\(reward\.money\|\|0\)/, 'l\'argent des doublons est mémorisé');
+  assert.ok(wsMatch(status, /battle\.sessionMoney\s*=\s*\(battle\.sessionMoney\s*\|\|\s*0\)\s*\+\s*Number\(reward\.money\|\|0\)/), 'l\'argent des doublons est mémorisé'); // V7 · DBT-01
   const loot = read('src/ui/game/battle-team-ui.js');
   assert.match(loot, /loot-money/, 'le butin de combat affiche l\'argent');
 });

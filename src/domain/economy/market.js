@@ -18,13 +18,39 @@
 
 /** Fixed price overrides (₽) — identical to the retired classic table. */
 export const MARKET_PRICE_OVERRIDES = {
-  1: 100000, 4: 100000, 7: 100000, 133: 180000, 137: 250000,
-  106: 140000, 107: 140000, 122: 140000, 124: 160000, 131: 220000,
-  152: 150000, 155: 150000, 158: 150000, 172: 120000, 173: 120000,
-  174: 120000, 175: 160000, 236: 180000, 196: 250000, 197: 250000,
-  199: 220000, 213: 180000, 238: 160000, 239: 160000, 240: 160000,
-  252: 150000, 255: 150000, 258: 150000, 298: 120000, 351: 160000,
-  374: 250000, 385: 300000, 386: 300000,
+  1: 100000,
+  4: 100000,
+  7: 100000,
+  133: 180000,
+  137: 250000,
+  106: 140000,
+  107: 140000,
+  122: 140000,
+  124: 160000,
+  131: 220000,
+  152: 150000,
+  155: 150000,
+  158: 150000,
+  172: 120000,
+  173: 120000,
+  174: 120000,
+  175: 160000,
+  236: 180000,
+  196: 250000,
+  197: 250000,
+  199: 220000,
+  213: 180000,
+  238: 160000,
+  239: 160000,
+  240: 160000,
+  252: 150000,
+  255: 150000,
+  258: 150000,
+  298: 120000,
+  351: 160000,
+  374: 250000,
+  385: 300000,
+  386: 300000,
 };
 
 /** Region → species ids offered on the market — classic lists, unchanged. */
@@ -60,7 +86,10 @@ export function getPokemonPrice(id, pokemonData = {}) {
   const bst = [3, 4, 5, 6, 7, 8].reduce((sum, i) => sum + (Number(row[i]) || 0), 0);
   let mult = BST_PRICE_BANDS[BST_PRICE_BANDS.length - 1].multiplier;
   for (const band of BST_PRICE_BANDS) {
-    if (bst >= band.minBst) { mult = band.multiplier; break; }
+    if (bst >= band.minBst) {
+      mult = band.multiplier;
+      break;
+    }
   }
   return Math.max(MIN_POKEMON_PRICE, Math.floor(bst * mult));
 }
@@ -123,6 +152,3 @@ export function categorizeMarketSpecies(id) {
   if (MARKET_CATEGORIES.rare.includes(n)) return 'rare';
   return 'other';
 }
-
-
-

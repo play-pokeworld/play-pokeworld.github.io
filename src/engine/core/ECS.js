@@ -13,8 +13,8 @@
 
 export class SparseSet {
   constructor() {
-    this.dense = [];  // Array of Entity IDs [eid0, eid1, ...]
-    this.data = [];   // Array of Component objects [comp0, comp1, ...]
+    this.dense = []; // Array of Entity IDs [eid0, eid1, ...]
+    this.data = []; // Array of Component objects [comp0, comp1, ...]
     this.sparse = []; // Sparse array where sparse[eid] === index in dense
   }
 
@@ -79,10 +79,10 @@ export class SparseSet {
 export class ECSWorld {
   constructor() {
     this._nextId = 1;
-    this._freeIds = [];               // Recycled entity IDs
-    this._components = new Map();     // componentName -> SparseSet
-    this._entities = new Set();       // Active entities set
-    this._systems = new Map();        // name -> { signature, fn }
+    this._freeIds = []; // Recycled entity IDs
+    this._components = new Map(); // componentName -> SparseSet
+    this._entities = new Set(); // Active entities set
+    this._systems = new Map(); // name -> { signature, fn }
     this._componentNames = new Map(); // eid -> Set<componentName> (for fast cleanup)
   }
 
@@ -301,6 +301,3 @@ if (typeof window !== 'undefined') {
   if (!window.poke) window.poke = {};
   window.poke.ECS = ECSWorld;
 }
-
-
-

@@ -5,6 +5,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 const R = (rel) => fs.readFileSync(path.join(new URL('..', import.meta.url).pathname, rel), 'utf8');
 const DS = R('src/assets/styles/design-system.css');
@@ -106,7 +107,7 @@ test('wave26/33 E/F: every sheet header resolves to the canonical band', () => {
 
 /* ── G: NPC editor — middle scroller + pinned footer ───────────────────── */
 test('wave26 G: BaseNpcEditorView wraps the form body in its own scroller', () => {
-  assert.ok(BV.includes("h('div', { class: 'pw-base-npced-scroll' }"), 'scroller node in the view');
+  assert.ok(wsIncludes(BV, "h('div', { class: 'pw-base-npced-scroll' }"), 'scroller node in the view'); // V7 · DBT-01
   assert.ok(BV.indexOf('pw-base-npced-scroll') < BV.indexOf('pw-base-npced-actions'),
     'footer is serialized AFTER the scroller');
   assert.ok(DS1.includes('.pw-base-npced-scroll {'), 'scroller CSS present');

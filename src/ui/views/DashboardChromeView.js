@@ -22,9 +22,11 @@ export class DashboardChromeView extends UIView {
 
   onLoad() {
     this.titleEntity = this.spawn('ui:win-chrome', []);
-    this.titleEntity.addComponent(new UIRenderComponent({
-      template: () => [winHeaderTitleVNode(this.model)],
-    }));
+    this.titleEntity.addComponent(
+      new UIRenderComponent({
+        template: () => [winHeaderTitleVNode(this.model)],
+      })
+    );
   }
 
   /** Header title cluster as an HTML string (shell already exists). */
@@ -34,6 +36,3 @@ export class DashboardChromeView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
-
-
-

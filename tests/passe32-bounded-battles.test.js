@@ -258,7 +258,7 @@ test('phase 32 B: legendary encounter (single chain, chill=false) resolved too',
   vm.runInContext(`
     battle.active = true; battle.isChamp = false; battle.chill = false;
     battle.isLeague = false; battle.isTraining = false; battle.resolvingKO = false;
-    battle.legendaryCatch = false; battle.noAutoCatch = true;
+    battle.legendaryQuest = false; battle.noAutoCatch = true;
     battle.enemyPoke = createPoke(144, 10, false); // weakened for the test
     battle.pMoveIdx = 0; battle.eMoveIdx = 0;
     battle.playerMods = { atk: 1, def: 1, spe: 1 }; battle.enemyMods = { atk: 1, def: 1, spe: 1 };

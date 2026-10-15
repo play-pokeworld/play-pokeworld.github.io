@@ -29,6 +29,3 @@ export { buildSpriteCircle } from './sprite-circle.js';
 // GameScene (the game itself has only 2 scenes: MainMenu + Game).
 export * as components from './components/index.js';
 export * as views from './views/index.js';
-
-
-

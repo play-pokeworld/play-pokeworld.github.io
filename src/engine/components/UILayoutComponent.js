@@ -17,10 +17,14 @@
 import { Component } from '../core/Component.js';
 
 export class UILayoutComponent extends Component {
-  static get type() { return 'UILayout'; }
+  static get type() {
+    return 'UILayout';
+  }
 
   /** @returns {string[]} */
-  static get DIRECTIONS() { return ['vertical', 'horizontal', 'grid']; }
+  static get DIRECTIONS() {
+    return ['vertical', 'horizontal', 'grid'];
+  }
 
   /**
    * @param {Object} [props]
@@ -67,7 +71,8 @@ export class UILayoutComponent extends Component {
   bodyStyle() {
     const style = { flex: '1 1 auto', minHeight: '0' };
     if (this._gapInline) style.gap = typeof this.gap === 'number' ? `${this.gap}px` : this.gap;
-    if (this._paddingInline) style.padding = typeof this.padding === 'number' ? `${this.padding}px` : this.padding;
+    if (this._paddingInline)
+      style.padding = typeof this.padding === 'number' ? `${this.padding}px` : this.padding;
     if (this.scrollable) style['overflow-y'] = 'auto';
     if (this.direction === 'grid') {
       style.display = 'grid';
@@ -83,6 +88,3 @@ export class UILayoutComponent extends Component {
     return style;
   }
 }
-
-
-

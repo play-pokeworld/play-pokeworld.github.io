@@ -6,6 +6,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 const R = (rel) => readFileSync(path.join(new URL('..', import.meta.url).pathname, rel), 'utf8');
 
@@ -76,7 +77,7 @@ test('wave29 #4: setMobileView / setMobileManageView scroll back to the top', ()
 test('wave29 regression: effContent is DECLARED (ES-module strict crash gone)', () => {
   // Passe 26d : les effets portent désormais une clé de statut (e.badge) pour
   // afficher la bulle colorée ; effContent reste déclaré.
-  const i = pokeModalJs.indexOf("getBadgeHtml === 'function' ? getBadgeHtml(e.badge) : null");
+  const i = ws(pokeModalJs).indexOf(ws("getBadgeHtml === 'function' ? getBadgeHtml(e.badge) : null")); // V7 · DBT-01
   assert.ok(i > 0);
   assert.ok(pokeModalJs.indexOf('let effContent;') > 0, 'effContent must be declared');
   assert.ok(!/var badge =[\s\S]{0,120}\beffContent = badge;[\s\S]{0,80}var effContentVar = typeof effContent/.test(pokeModalJs),

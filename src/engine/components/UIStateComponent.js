@@ -12,7 +12,9 @@ import { Component } from '../core/Component.js';
 import { UIRenderComponent } from './UIRenderComponent.js';
 
 export class UIStateComponent extends Component {
-  static get type() { return 'UIState'; }
+  static get type() {
+    return 'UIState';
+  }
 
   /**
    * @param {Object} [initial] Initial state dictionary.
@@ -47,6 +49,3 @@ export class UIStateComponent extends Component {
     return key in this.data ? this.data[key] : fallback;
   }
 }
-
-
-

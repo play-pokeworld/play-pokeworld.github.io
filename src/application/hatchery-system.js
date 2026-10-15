@@ -84,9 +84,12 @@ export function syncHatcheryEntities() {
 
 /** Move a daycare pokemon out of its slot into the collection (parity). */
 function evictSlotToCollection(G, i, poke) {
-  const key = (typeof globalThis.generateUniqueBoxId === 'function')
-    ? globalThis.generateUniqueBoxId(poke.id)
-    : (!G.collection[String(poke.id)] ? String(poke.id) : ('box_' + poke.id + '_' + Date.now()));
+  const key =
+    typeof globalThis.generateUniqueBoxId === 'function'
+      ? globalThis.generateUniqueBoxId(poke.id)
+      : !G.collection[String(poke.id)]
+        ? String(poke.id)
+        : 'box_' + poke.id + '_' + Date.now();
   G.collection[key] = poke;
   G.hatchery[i] = null;
 }
@@ -138,12 +141,19 @@ export function hatcheryRegisterBattleKills(count) {
     }
     if (outcome.kind === 'daycare-levelup') {
       daycareLevels += outcome.levelsGained;
-      try { if (typeof globalThis.progressMainQuestType === 'function') globalThis.progressMainQuestType('hatchery_level', outcome.levelsGained); } catch (_) {}
+      try {
+        if (typeof globalThis.progressMainQuestType === 'function')
+          globalThis.progressMainQuestType('hatchery_level', outcome.levelsGained);
+      } catch (_) {}
       if (outcome.fee > 0 && typeof globalThis.addBattleLog === 'function') {
         const slot = G.hatchery[i];
-        globalThis.addBattleLog(globalThis.tr('daycare_fee_log', {
-          fee: formatNumber(outcome.fee), n: outcome.levelsGained, name: slot && slot.poke ? slot.poke.name : '',
-        }));
+        globalThis.addBattleLog(
+          globalThis.tr('daycare_fee_log', {
+            fee: formatNumber(outcome.fee),
+            n: outcome.levelsGained,
+            name: slot && slot.poke ? slot.poke.name : '',
+          })
+        );
       }
       continue;
     }
@@ -152,23 +162,40 @@ export function hatcheryRegisterBattleKills(count) {
       const poke = slot && slot.poke;
       if (!poke) continue;
       daycareLevels += outcome.levelsGained || 0;
-      try { if (outcome.levelsGained > 0 && typeof globalThis.progressMainQuestType === 'function') globalThis.progressMainQuestType('hatchery_level', outcome.levelsGained); } catch (_) {}
+      try {
+        if (outcome.levelsGained > 0 && typeof globalThis.progressMainQuestType === 'function')
+          globalThis.progressMainQuestType('hatchery_level', outcome.levelsGained);
+      } catch (_) {}
       evictSlotToCollection(G, i, poke);
       if (outcome.reason === 'max-level') {
-        if (typeof globalThis.addBattleLog === 'function') globalThis.addBattleLog(globalThis.tr('daycare_max_log', { name: poke.name }));
-        globalThis.notify(globalThis.tr('daycare_evicted_max', { name: poke.name }), 'var(--green)');
+        if (typeof globalThis.addBattleLog === 'function')
+          globalThis.addBattleLog(globalThis.tr('daycare_max_log', { name: poke.name }));
+        globalThis.notify(
+          globalThis.tr('daycare_evicted_max', { name: poke.name }),
+          'var(--green)'
+        );
       } else {
-        globalThis.notify(globalThis.tr('daycare_evicted_funds', { name: poke.name, fee: formatNumber((outcome.fee || 0)) }), 'var(--red)');
+        globalThis.notify(
+          globalThis.tr('daycare_evicted_funds', {
+            name: poke.name,
+            fee: formatNumber(outcome.fee || 0),
+          }),
+          'var(--red)'
+        );
       }
     }
   }
 
   // 4. Economy write-back (daycare fees settled on the Wallet component).
   applyEconomyComponents();
-  try { if (typeof globalThis.updateHeader === 'function') globalThis.updateHeader(); } catch (_) {}
+  try {
+    if (typeof globalThis.updateHeader === 'function') globalThis.updateHeader();
+  } catch (_) {}
   syncHatcheryEntities();
   if (changed && typeof globalThis.renderHatcheryWindow === 'function') {
-    try { globalThis.renderHatcheryWindow(); } catch (_) {}
+    try {
+      globalThis.renderHatcheryWindow();
+    } catch (_) {}
   }
   return daycareLevels;
 }
@@ -183,6 +210,3 @@ if (typeof globalThis !== 'undefined') {
   globalThis.hatcheryRegisterBattleKills = hatcheryRegisterBattleKills;
   globalThis.computeRequiredHatchKos = computeRequiredHatchKos;
 }
-
-
-

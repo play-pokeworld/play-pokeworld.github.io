@@ -39,11 +39,26 @@ export class AtollFactoryPrepView extends UIView {
       }),
       h('small', { class: 'atoll-prep-hint' }, m.hintText || ''),
       h('div', { id: 'atoll-prep-body', class: 'team-view' }, h.raw(m.cardsHtml || '')),
-      h('div', { class: 'pw-btn-group' },
-        h('button', { class: 'hbtn', dataset: { action: 'legacy-call', call: 'atollFactoryPrepFight', callArgs: '' } },
-          m.continueLabel || ''),
-        h('button', { class: 'hbtn pw-btn-danger', dataset: { action: 'legacy-call', call: 'atollFactoryPrepAbandon', callArgs: '' } },
-          m.abandonLabel || '')),
+      h(
+        'div',
+        { class: 'pw-btn-group' },
+        h(
+          'button',
+          {
+            class: 'hbtn',
+            dataset: { action: 'legacy-call', call: 'atollFactoryPrepFight', callArgs: '' },
+          },
+          m.continueLabel || ''
+        ),
+        h(
+          'button',
+          {
+            class: 'hbtn pw-btn-danger',
+            dataset: { action: 'legacy-call', call: 'atollFactoryPrepAbandon', callArgs: '' },
+          },
+          m.abandonLabel || ''
+        )
+      ),
       h('small', { class: 'atoll-prep-note' }, m.noteText || ''),
     ];
   }
@@ -60,6 +75,3 @@ export class AtollFactoryPrepView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
-
-
-

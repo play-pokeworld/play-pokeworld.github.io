@@ -39,22 +39,41 @@ import { h, toHTMLString } from '../../engine/render/vdom.js';
 import { cx } from './component-utils.js';
 
 /** Same background vocabulary as the classic save library. */
-export const SAVE_CARD_BACKGROUNDS = Object.freeze(['classic', 'goldsilver', 'emerald', 'diamondpearl', 'blackwhite', 'xy', 'forest']);
-const SAVE_BACKGROUND_ALIASES = Object.freeze({ blue: 'classic', red: 'classic', green: 'emerald', purple: 'xy', gold: 'goldsilver', silver: 'goldsilver' });
+export const SAVE_CARD_BACKGROUNDS = Object.freeze([
+  'classic',
+  'goldsilver',
+  'emerald',
+  'diamondpearl',
+  'blackwhite',
+  'xy',
+  'forest',
+]);
+const SAVE_BACKGROUND_ALIASES = Object.freeze({
+  blue: 'classic',
+  red: 'classic',
+  green: 'emerald',
+  purple: 'xy',
+  gold: 'goldsilver',
+  silver: 'goldsilver',
+});
 
 /**
  * @param {string} value
  * @returns {string} a known background key ('classic' when unknown)
  */
 export function normalizeSaveCardBackground(value) {
-  const raw = String(value || '').toLowerCase().replace(/[^a-z0-9_-]+/g, '');
+  const raw = String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, '');
   const mapped = SAVE_BACKGROUND_ALIASES[raw] || raw;
   return SAVE_CARD_BACKGROUNDS.includes(mapped) ? mapped : 'classic';
 }
 
 /** Escape a value for a legacy data-call-args single-quoted argument. */
 function escArg(value) {
-  return String(value == null ? '' : value).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  return String(value == null ? '' : value)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'");
 }
 
 /**
@@ -72,23 +91,55 @@ export function saveCardVNode(model = {}) {
     dataset.contextCall = 'openSaveCardContextMenu';
     dataset.contextArgs = `'${escArg(model.id)}',event`;
   }
-  return h(mode === 'menu' ? 'button' : 'div', {
-    class: cx('save-slot', `save-bg-${bg}`, mode === 'preview' && 'save-slot-preview'),
-    dataset,
-  },
-    h('span', { class: 'save-slot-main' },
-      h('span', { class: 'save-slot-icon' },
-        model.spriteHtml ? h.raw(model.spriteHtml) : h('span', { class: 'save-slot-icon-missing' }, '?')),
-      h('span', { class: 'save-slot-title' },
+  return h(
+    mode === 'menu' ? 'button' : 'div',
+    {
+      class: cx('save-slot', `save-bg-${bg}`, mode === 'preview' && 'save-slot-preview'),
+      dataset,
+    },
+    h(
+      'span',
+      { class: 'save-slot-main' },
+      h(
+        'span',
+        { class: 'save-slot-icon' },
+        model.spriteHtml
+          ? h.raw(model.spriteHtml)
+          : h('span', { class: 'save-slot-icon-missing' }, '?')
+      ),
+      h(
+        'span',
+        { class: 'save-slot-title' },
         h('span', { class: 'save-slot-name' }, model.name || ''),
-        h('span', { class: 'save-slot-id' }, (model.idLabel || '') + ' ' + (model.id || '')))),
-    h('span', { class: 'save-slot-stats' },
-      h('span', null, h('b', null, String(model.badges != null ? model.badges : 0)), h('small', null, model.badgesLabel || '')),
-      h('span', null, h('b', null, String(model.caught != null ? model.caught : 0)), h('small', null, model.pokedexLabel || '')),
-      h('span', null, h('b', null, model.playTimeText || ''), h('small', null, model.playtimeLabel || ''))),
+        h('span', { class: 'save-slot-id' }, (model.idLabel || '') + ' ' + (model.id || ''))
+      )
+    ),
+    h(
+      'span',
+      { class: 'save-slot-stats' },
+      h(
+        'span',
+        null,
+        h('b', null, String(model.badges != null ? model.badges : 0)),
+        h('small', null, model.badgesLabel || '')
+      ),
+      h(
+        'span',
+        null,
+        h('b', null, String(model.caught != null ? model.caught : 0)),
+        h('small', null, model.pokedexLabel || '')
+      ),
+      h(
+        'span',
+        null,
+        h('b', null, model.playTimeText || ''),
+        h('small', null, model.playtimeLabel || '')
+      )
+    ),
     mode === 'menu'
       ? h('span', { class: 'save-slot-bottom' }, h('span', null, model.clickHintLabel || ''))
-      : null);
+      : null
+  );
 }
 
 /**
@@ -99,6 +150,3 @@ export function saveCardVNode(model = {}) {
 export function saveCardHTML(model = {}) {
   return toHTMLString(saveCardVNode(model));
 }
-
-
-

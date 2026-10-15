@@ -33,7 +33,8 @@ function ensureLandscapeForeground() {
 if (typeof document !== 'undefined') ensureLandscapeForeground();
 
 // Surface classique (harnais VM, tests) + surface ES module.
-if (typeof globalThis !== 'undefined') globalThis.ensureLandscapeForeground = ensureLandscapeForeground;
+if (typeof globalThis !== 'undefined')
+  globalThis.ensureLandscapeForeground = ensureLandscapeForeground;
 if (typeof window !== 'undefined') window.ensureLandscapeForeground = ensureLandscapeForeground;
 
 export { ensureLandscapeForeground };

@@ -5,7 +5,10 @@
 
 // Shared safe-HTML service (canonical sink).
 if (typeof globalThis !== 'undefined' && typeof globalThis._pwSetHtmlSafe !== 'function') {
-  globalThis._pwSetHtmlSafe = function (el, html) { if (typeof pwSetHtml === 'function') pwSetHtml(el, html); else el.innerHTML = html; };
+  globalThis._pwSetHtmlSafe = function (el, html) {
+    if (typeof pwSetHtml === 'function') pwSetHtml(el, html);
+    else el.innerHTML = html;
+  };
 }
 
 const WINDOW_CSS = `
@@ -28,8 +31,8 @@ const WINDOW_CSS = `
 .pw-ball-total{min-width:70px;text-align:right;font-size:13px;font-weight:700;color:var(--light2,#fff);font-variant-numeric:tabular-nums;}
 `;
 let _winCssInjected = false;
-function _ensureWinCss(){
-  if(_winCssInjected || typeof document === 'undefined') return;
+function _ensureWinCss() {
+  if (_winCssInjected || typeof document === 'undefined') return;
   const st = document.createElement('style');
   st.id = 'pw-currency-win-css';
   st.textContent = WINDOW_CSS;
@@ -47,15 +50,50 @@ const _FX_KIND = {
 };
 
 function currencyColumns() {
-  const w = (typeof ensureWallet === 'function') ? ensureWallet() : null;
+  const w = typeof ensureWallet === 'function' ? ensureWallet() : null;
   if (!w) return [];
-  const battlePoints = (typeof getBattlePoints === 'function') ? getBattlePoints() : 0;
+  const battlePoints = typeof getBattlePoints === 'function' ? getBattlePoints() : 0;
   return [
-    { id: 'money', labelKey: 'currency_money', gainKey: 'currency_money_gain', amount: G.money || 0, revealed: true, icon: 'src/assets/images/currency/money.svg' },
-    { id: 'dungeonTokens', labelKey: 'currency_dungeon_tokens', gainKey: 'currency_jd_gain', amount: w.dungeonTokens, revealed: !!w.revealed.dungeonTokens, icon: 'src/assets/images/currency/dungeonToken.svg' },
-    { id: 'questPoints', labelKey: 'currency_quest_points', gainKey: 'currency_pq_gain', amount: w.questPoints, revealed: !!w.revealed.questPoints, icon: 'src/assets/images/currency/questPoint.svg' },
-    { id: 'diamonds', labelKey: 'currency_diamonds', gainKey: 'currency_diamond_gain', amount: w.diamonds, revealed: !!w.revealed.diamonds, icon: 'src/assets/images/currency/diamond.svg' },
-    { id: 'battlePoints', labelKey: 'currency_battle_points', gainKey: 'currency_pc_gain', amount: battlePoints, revealed: battlePoints > 0, icon: 'src/assets/images/currency/battlePoint.svg' },
+    {
+      id: 'money',
+      labelKey: 'currency_money',
+      gainKey: 'currency_money_gain',
+      amount: G.money || 0,
+      revealed: true,
+      icon: 'src/assets/images/currency/money.svg',
+    },
+    {
+      id: 'dungeonTokens',
+      labelKey: 'currency_dungeon_tokens',
+      gainKey: 'currency_jd_gain',
+      amount: w.dungeonTokens,
+      revealed: !!w.revealed.dungeonTokens,
+      icon: 'src/assets/images/currency/dungeonToken.svg',
+    },
+    {
+      id: 'questPoints',
+      labelKey: 'currency_quest_points',
+      gainKey: 'currency_pq_gain',
+      amount: w.questPoints,
+      revealed: !!w.revealed.questPoints,
+      icon: 'src/assets/images/currency/questPoint.svg',
+    },
+    {
+      id: 'diamonds',
+      labelKey: 'currency_diamonds',
+      gainKey: 'currency_diamond_gain',
+      amount: w.diamonds,
+      revealed: !!w.revealed.diamonds,
+      icon: 'src/assets/images/currency/diamond.svg',
+    },
+    {
+      id: 'battlePoints',
+      labelKey: 'currency_battle_points',
+      gainKey: 'currency_pc_gain',
+      amount: battlePoints,
+      revealed: battlePoints > 0,
+      icon: 'src/assets/images/currency/battlePoint.svg',
+    },
   ];
 }
 
@@ -79,14 +117,29 @@ function renderCurrencyWindow() {
   const signature = shown.map((c) => c.id).join('|');
   let panel = el.querySelector('.pw-currency-panel');
   if (!panel || panel.dataset.pwSig !== signature) {
-    const html = shown.map((c) =>
-      '<div class="pw-cur-col" data-cur="' + c.id + '" title="' + (typeof t === 'function' ? (t(c.labelKey) + ' — ' + t(c.gainKey)) : c.id) + '">'
-      + '<img class="pw-cur-ico" src="' + c.icon + '" alt="">'
-      + '<span class="pw-cur-amount">' + formatNumber(Number(c.amount)) + '</span>'
-      + '<span class="pw-cur-name">' + (typeof t === 'function' ? t(c.labelKey) : c.id) + '</span>'
-      + '<span class="pw-cur-fx" id="pw-cur-fx-' + c.id + '" aria-hidden="true"></span>'
-      + '</div>'
-    ).join('');
+    const html = shown
+      .map(
+        (c) =>
+          '<div class="pw-cur-col" data-cur="' +
+          c.id +
+          '" title="' +
+          (typeof t === 'function' ? t(c.labelKey) + ' — ' + t(c.gainKey) : c.id) +
+          '">' +
+          '<img class="pw-cur-ico" src="' +
+          c.icon +
+          '" alt="">' +
+          '<span class="pw-cur-amount">' +
+          formatNumber(Number(c.amount)) +
+          '</span>' +
+          '<span class="pw-cur-name">' +
+          (typeof t === 'function' ? t(c.labelKey) : c.id) +
+          '</span>' +
+          '<span class="pw-cur-fx" id="pw-cur-fx-' +
+          c.id +
+          '" aria-hidden="true"></span>' +
+          '</div>'
+      )
+      .join('');
     _pwSetHtmlSafe(el, '<div class="pw-currency-panel">' + html + '</div>');
     panel = el.querySelector('.pw-currency-panel');
     if (panel) panel.dataset.pwSig = signature;
@@ -129,4 +182,3 @@ if (typeof globalThis !== 'undefined') {
 }
 
 export { currencyColumns, renderCurrencyWindow, _ensureWinCss };
-

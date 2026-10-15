@@ -29,16 +29,25 @@ export function statRowVNode(row) {
   // the legacy painter contract (idempotent re-set).
   const pct = Math.max(0, Math.min(100, Math.round(Number(row.pct) || 0)));
   const fillStyle = { width: `${pct}%`, '--pct': `${pct}%` };
-  if (row.color) { fillStyle.background = row.color; fillStyle['--bg'] = row.color; }
-  return h('div', { class: 'poke-detail-stat-row' },
+  if (row.color) {
+    fillStyle.background = row.color;
+    fillStyle['--bg'] = row.color;
+  }
+  return h(
+    'div',
+    { class: 'poke-detail-stat-row' },
     h('span', { class: 'poke-detail-stat-name' }, row.name || ''),
-    h('div', { class: 'poke-detail-stat-bar' },
+    h(
+      'div',
+      { class: 'poke-detail-stat-bar' },
       h('div', {
         class: 'poke-detail-stat-fill',
         dataset: { pct: String(pct), bg: row.color || '' },
         style: fillStyle,
-      })),
-    h('span', { class: 'poke-detail-stat-value' }, row.value == null ? '' : String(row.value)));
+      })
+    ),
+    h('span', { class: 'poke-detail-stat-value' }, row.value == null ? '' : String(row.value))
+  );
 }
 
 export function statRowsHTML(rows) {
@@ -48,21 +57,37 @@ export function statRowsHTML(rows) {
 /* ── Rank panel ────────────────────────────────────────────────────────── */
 export function rankPanelVNode(m) {
   const rank = String(m.rank || '?');
-  return h('div', { class: `poke-rank-panel rank-${rank.toLowerCase()}` },
+  return h(
+    'div',
+    { class: `poke-rank-panel rank-${rank.toLowerCase()}` },
     h('div', { class: 'poke-rank-letter' }, rank),
-    h('div', null,
-      h('b', null, m.label || ''),
-      h('span', null, m.bst ? `BST ${m.bst}` : '')));
+    h('div', null, h('b', null, m.label || ''), h('span', null, m.bst ? `BST ${m.bst}` : ''))
+  );
 }
 
 /* ── Ability chip (talent / hidden talent) ─────────────────────────────── */
 export function abilityChipVNode(chip) {
-  return h('div', {
-    class: cx('poke-detail-ability-chip', chip.isHidden && 'pw-hidden-ability-chip', chip.isUnlocked ? 'pw-ha-unlocked' : 'pw-ha-locked'),
-    style: chip.isHidden ? (chip.isUnlocked ? { border: '1px solid var(--accent)', background: 'rgba(236,222,183,0.14)', marginTop: '8px' } : { opacity: '0.85', border: '1px dashed var(--light1)', marginTop: '8px' }) : null,
-  },
+  return h(
+    'div',
+    {
+      class: cx(
+        'poke-detail-ability-chip',
+        chip.isHidden && 'pw-hidden-ability-chip',
+        chip.isUnlocked ? 'pw-ha-unlocked' : 'pw-ha-locked'
+      ),
+      style: chip.isHidden
+        ? chip.isUnlocked
+          ? {
+              border: '1px solid var(--accent)',
+              background: 'rgba(236,222,183,0.14)',
+              marginTop: '8px',
+            }
+          : { opacity: '0.85', border: '1px dashed var(--light1)', marginTop: '8px' }
+        : null,
+    },
     h('span', null, chip.label || ''),
-    chip.rarity ? h('small', null, chip.rarity) : null);
+    chip.rarity ? h('small', null, chip.rarity) : null
+  );
 }
 
 /**
@@ -73,9 +98,14 @@ export function abilityChipVNode(chip) {
  */
 export function talentBlockVNode(m) {
   const children = [];
-  children.push(h('div', { class: 'pw-text-sm pw-light2 pw-bold' },
-    ...(m.iconHtml ? [h.raw(`${m.iconHtml} `)] : []),
-    m.title || ''));
+  children.push(
+    h(
+      'div',
+      { class: 'pw-text-sm pw-light2 pw-bold' },
+      ...(m.iconHtml ? [h.raw(`${m.iconHtml} `)] : []),
+      m.title || ''
+    )
+  );
   if (m.readonly) {
     (m.chips || []).forEach((chip) => {
       children.push(abilityChipVNode(chip));
@@ -99,12 +129,23 @@ export function talentBlockVNode(m) {
       selectProps.dataset.changeCall = 'changePokeTalent';
       selectProps.dataset.changeArgs = m.changeArgs || '';
     }
-    children.push(h('select', selectProps,
-      (m.options || []).map((o) => h('option', {
-        value: o.value == null ? '' : String(o.value),
-        ...(o.selected ? { selected: true } : {}),
-        ...(o.disabled ? { disabled: true } : {}),
-      }, o.label))));
+    children.push(
+      h(
+        'select',
+        selectProps,
+        (m.options || []).map((o) =>
+          h(
+            'option',
+            {
+              value: o.value == null ? '' : String(o.value),
+              ...(o.selected ? { selected: true } : {}),
+              ...(o.disabled ? { disabled: true } : {}),
+            },
+            o.label
+          )
+        )
+      )
+    );
     children.push(h('div', { class: 'pw-text-84' }, m.desc || ''));
     if (m.hidden) {
       children.push(abilityChipVNode(m.hidden));
@@ -116,25 +157,43 @@ export function talentBlockVNode(m) {
 
 /* ── Shiny toggle (hero) — DS colours come from DS2809/DS2810 ──────────── */
 export function shinyToggleVNode(m) {
-  return h('button', {
-    class: `hbtn poke-detail-shiny-toggle ${m.on ? 'is-on' : 'is-off'}`,
-    dataset: { action: 'legacy-call', call: m.call || '', callArgs: m.args == null ? '' : String(m.args) },
-  },
+  return h(
+    'button',
+    {
+      class: `hbtn poke-detail-shiny-toggle ${m.on ? 'is-on' : 'is-off'}`,
+      dataset: {
+        action: 'legacy-call',
+        call: m.call || '',
+        callArgs: m.args == null ? '' : String(m.args),
+      },
+    },
     h('span', { class: 'poke-detail-shiny-star' }, '★'),
-    h('span', null, m.label || ''));
+    h('span', null, m.label || '')
+  );
 }
 
 /* ── Protection bar (favorite / lock) — same state colour language ─────── */
 export function protectionBarVNode(m) {
-  const btn = (stateClass, model, iconHtml) => h('button', {
-    class: `hbtn poke-protect-btn ${stateClass}`,
-    dataset: { action: 'legacy-call', call: model.call || '', callArgs: model.args == null ? '' : String(model.args) },
-  },
-    iconHtml ? h('span', { class: 'poke-protect-icon' }, h.raw(iconHtml)) : null,
-    h('span', { class: 'poke-protect-label' }, model.label || ''));
-  return h('div', { class: 'poke-protection-actions' },
+  const btn = (stateClass, model, iconHtml) =>
+    h(
+      'button',
+      {
+        class: `hbtn poke-protect-btn ${stateClass}`,
+        dataset: {
+          action: 'legacy-call',
+          call: model.call || '',
+          callArgs: model.args == null ? '' : String(model.args),
+        },
+      },
+      iconHtml ? h('span', { class: 'poke-protect-icon' }, h.raw(iconHtml)) : null,
+      h('span', { class: 'poke-protect-label' }, model.label || '')
+    );
+  return h(
+    'div',
+    { class: 'poke-protection-actions' },
     btn(m.favorite.on ? 'is-on' : 'is-off', m.favorite, null),
-    btn(m.lock.on ? 'is-locked' : 'is-off', m.lock, m.lock.iconHtml));
+    btn(m.lock.on ? 'is-locked' : 'is-off', m.lock, m.lock.iconHtml)
+  );
 }
 
 /* ── Evolution methods ─────────────────────────────────────────────────── */
@@ -146,15 +205,15 @@ export function evoMethodsVNode(m) {
   if (!m || m.none) {
     return h('div', { class: 'pw-progress-card' }, h.raw((m && m.noneText) || ''));
   }
-  return h('div', { class: 'pw-progress-card-subtle' },
+  return h(
+    'div',
+    { class: 'pw-progress-card-subtle' },
     h('div', { class: 'pw-progress-section-title' }, m.title || ''),
-    ...(m.rows || []).map(evoMethodRowVNode));
+    ...(m.rows || []).map(evoMethodRowVNode)
+  );
 }
 
 /** String serialization for classic call sites (pokédex detail). */
 export function evoMethodsHTML(m) {
   return toHTMLString(evoMethodsVNode(m));
 }
-
-
-

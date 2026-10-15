@@ -43,19 +43,29 @@ export class MarketView extends UIView {
     if (!cats.length) {
       return h('div', { class: 'pw-empty-state-lg' }, m.emptyLabel || '');
     }
-    return h('div', { class: 'pw-market-list' },
-      ...cats.map((cat) => [
-        h('div', { class: 'pw-manage-title pw-market-cat' }, cat.label || ''),
-        h('div', { class: 'pw-market-grid' },
-          ...cat.cards.filter(Boolean).map((card) => marketCardVNode(m, card))),
-      ]).flat());
+    return h(
+      'div',
+      { class: 'pw-market-list' },
+      ...cats
+        .map((cat) => [
+          h('div', { class: 'pw-manage-title pw-market-cat' }, cat.label || ''),
+          h(
+            'div',
+            { class: 'pw-market-grid' },
+            ...cat.cards.filter(Boolean).map((card) => marketCardVNode(m, card))
+          ),
+        ])
+        .flat()
+    );
   }
 
   onLoad() {
     this.windowEntity = this.spawn('ui:market', []);
-    this.windowEntity.addComponent(new UIRenderComponent({
-      template: () => this.windowVNode(),
-    }));
+    this.windowEntity.addComponent(
+      new UIRenderComponent({
+        template: () => this.windowVNode(),
+      })
+    );
   }
 
   /**
@@ -72,20 +82,31 @@ export class MarketView extends UIView {
 
 function marketCardVNode(m, card) {
   const selected = String(card.id) === String(m.selectedId);
-  return h('div', {
-    class: 'shop-item pw-manage-card pw-market-row' + (selected ? ' selected' : ''),
-    dataset: { action: 'legacy-call', call: 'selectMarketPokemon', callArgs: String(card.id) },
-  },
-    h('div', { class: 'pw-manage-orb pw-market-orb' },
+  return h(
+    'div',
+    {
+      class: 'shop-item pw-manage-card pw-market-row' + (selected ? ' selected' : ''),
+      dataset: { action: 'legacy-call', call: 'selectMarketPokemon', callArgs: String(card.id) },
+    },
+    h(
+      'div',
+      { class: 'pw-manage-orb pw-market-orb' },
       h('div', { class: 'pw-manage-sprite' }, h.raw(card.spriteHtml || '')),
-      card.ballSrc ? h('img', { class: 'pw-market-ball', src: card.ballSrc, alt: '' }) : null),
-    h('div', { class: 'pw-flex-1' },
-      h('div', { class: 'pw-manage-name' },
+      card.ballSrc ? h('img', { class: 'pw-market-ball', src: card.ballSrc, alt: '' }) : null
+    ),
+    h(
+      'div',
+      { class: 'pw-flex-1' },
+      h(
+        'div',
+        { class: 'pw-manage-name' },
         card.name || '',
         ' ',
-        h('span', { class: 'pw-manage-sub' }, card.numLabel || '')),
+        h('span', { class: 'pw-manage-sub' }, card.numLabel || '')
+      ),
       h('div', { class: 'pw-manage-desc' }, h.raw(card.typesHtml || '')),
-      card.ownedLabel ? h('div', { class: 'pw-text-sm pw-green' }, card.ownedLabel) : null),
-    h('div', { class: 'pw-manage-level pw-market-price' }, h.raw(card.priceLabel || '')));
+      card.ownedLabel ? h('div', { class: 'pw-text-sm pw-green' }, card.ownedLabel) : null
+    ),
+    h('div', { class: 'pw-manage-level pw-market-price' }, h.raw(card.priceLabel || ''))
+  );
 }
-

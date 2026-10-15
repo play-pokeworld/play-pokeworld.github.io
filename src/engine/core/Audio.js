@@ -9,7 +9,7 @@ class AudioManager {
     this._enabled = true;
     this._sfxVolume = 0.5;
     this._bgmVolume = 0.3;
-    this._pool = new Map();        // key -> HTMLAudioElement
+    this._pool = new Map(); // key -> HTMLAudioElement
     this._bgm = null;
     this._bgmKey = null;
     this._maxPool = 20;
@@ -34,7 +34,9 @@ class AudioManager {
         src.currentTime = 0;
         await src.play().catch(() => {});
       }
-    } catch(_e) { /* silent fail */ }
+    } catch (_e) {
+      /* silent fail */
+    }
   }
 
   // ─── BGM ───
@@ -48,22 +50,42 @@ class AudioManager {
       this._bgm = audio;
       this._bgmKey = key;
       await audio.play().catch(() => {});
-    } catch(_e) { /* silent fail */ }
+    } catch (_e) {
+      /* silent fail */
+    }
   }
 
   stopBGM() {
-    if (this._bgm) { this._bgm.pause(); this._bgm = null; this._bgmKey = null; }
+    if (this._bgm) {
+      this._bgm.pause();
+      this._bgm = null;
+      this._bgmKey = null;
+    }
   }
 
   // ─── Volume ───
-  setSFXVolume(v) { this._sfxVolume = Math.max(0, Math.min(1, v)); }
-  setBGMVolume(v) { this._bgmVolume = Math.max(0, Math.min(1, v)); if (this._bgm) this._bgm.volume = this._bgmVolume; }
-  getSFXVolume() { return this._sfxVolume; }
-  getBGMVolume() { return this._bgmVolume; }
+  setSFXVolume(v) {
+    this._sfxVolume = Math.max(0, Math.min(1, v));
+  }
+  setBGMVolume(v) {
+    this._bgmVolume = Math.max(0, Math.min(1, v));
+    if (this._bgm) this._bgm.volume = this._bgmVolume;
+  }
+  getSFXVolume() {
+    return this._sfxVolume;
+  }
+  getBGMVolume() {
+    return this._bgmVolume;
+  }
 
   // ─── Mute ───
-  setEnabled(e) { this._enabled = e; if (!e) this.stopBGM(); }
-  isEnabled() { return this._enabled; }
+  setEnabled(e) {
+    this._enabled = e;
+    if (!e) this.stopBGM();
+  }
+  isEnabled() {
+    return this._enabled;
+  }
 
   // ─── Cleanup ───
   dispose() {
@@ -82,7 +104,3 @@ if (typeof globalThis !== 'undefined') {
   if (!globalThis.poke) globalThis.poke = {};
   globalThis.poke.Audio = AudioManager;
 }
-
-
-
-

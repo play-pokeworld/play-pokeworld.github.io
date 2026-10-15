@@ -158,6 +158,7 @@ export const L_location_names_en = {
   "seafloor_cavern": "Seafloor Cavern",
   "seafoamislands": "Seafoam Islands",
   "sealed_chamber": "Sealed Chamber",
+  "birth_island": "Birth Island",
   "shoal_cave": "Shoal Cave",
   "sky_pillar": "Sky Pillar",
   "slateport": "Slateport City",

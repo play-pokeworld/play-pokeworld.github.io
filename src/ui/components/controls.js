@@ -45,39 +45,49 @@ export function createButton(scene, props) {
 
   const entity = scene.spawn('ui:button', [], props.parent || undefined);
   entity.addComponent(new UIStateComponent({ toggled: !!props.toggled }));
-  entity.addComponent(new UIInteractiveComponent({
-    onClick: props.onClick || null,
-    disabled: !!props.disabled,
-    hideWhenDisabled: props.hideWhenDisabled !== false,
-    action: props.action || null,
-    actionArgs: props.actionArgs || null,
-  }));
-  entity.addComponent(new UIRenderComponent({
-    layer: 'ui',
-    template: (e) => {
-      const interactive = e.get(UIInteractiveComponent);
-      if (interactive.renderHidden) return null; // strict rule: not rendered
-      const state = e.get(UIStateComponent);
-      const toggled = state ? state.get('toggled') : false;
-      const dataset = { ...entityDataset(e) };
-      if (interactive.action) dataset.action = interactive.action;
-      if (interactive.action === 'legacy-call' && props.call) dataset.call = props.call;
-      if (interactive.action === 'legacy-call' && props.callArgs != null) dataset.callArgs = props.callArgs;
-      return h('button', {
-        type: 'button',
-        class: cx(
-          'pw-btn',
-          `pw-btn--${variant}`,
-          props.toggle && 'pw-btn--toggle',
-          toggled && 'is-toggled',
-          props.className
-        ),
-        'aria-pressed': props.toggle ? String(toggled) : null,
-        title: props.title || null,
-        dataset,
-      }, props.icon ? h.raw(props.icon) : null, h('span', { class: 'pw-btn-label' }, props.label));
-    },
-  }));
+  entity.addComponent(
+    new UIInteractiveComponent({
+      onClick: props.onClick || null,
+      disabled: !!props.disabled,
+      hideWhenDisabled: props.hideWhenDisabled !== false,
+      action: props.action || null,
+      actionArgs: props.actionArgs || null,
+    })
+  );
+  entity.addComponent(
+    new UIRenderComponent({
+      layer: 'ui',
+      template: (e) => {
+        const interactive = e.get(UIInteractiveComponent);
+        if (interactive.renderHidden) return null; // strict rule: not rendered
+        const state = e.get(UIStateComponent);
+        const toggled = state ? state.get('toggled') : false;
+        const dataset = { ...entityDataset(e) };
+        if (interactive.action) dataset.action = interactive.action;
+        if (interactive.action === 'legacy-call' && props.call) dataset.call = props.call;
+        if (interactive.action === 'legacy-call' && props.callArgs != null)
+          dataset.callArgs = props.callArgs;
+        return h(
+          'button',
+          {
+            type: 'button',
+            class: cx(
+              'pw-btn',
+              `pw-btn--${variant}`,
+              props.toggle && 'pw-btn--toggle',
+              toggled && 'is-toggled',
+              props.className
+            ),
+            'aria-pressed': props.toggle ? String(toggled) : null,
+            title: props.title || null,
+            dataset,
+          },
+          props.icon ? h.raw(props.icon) : null,
+          h('span', { class: 'pw-btn-label' }, props.label)
+        );
+      },
+    })
+  );
   return entity;
 }
 
@@ -97,35 +107,39 @@ export function createToggle(scene, props) {
 
   const entity = scene.spawn('ui:toggle', [], props.parent || undefined);
   entity.addComponent(new UIStateComponent({ checked: !!props.checked }));
-  entity.addComponent(new UIInteractiveComponent({
-    disabled: !!props.disabled,
-    hideWhenDisabled: props.hideWhenDisabled !== false,
-    onClick: () => {
-      const state = entity.get(UIStateComponent);
-      const next = !state.get('checked');
-      state.setState({ checked: next });
-      if (props.onChange) props.onChange(next, entity);
-    },
-  }));
-  entity.addComponent(new UIRenderComponent({
-    layer: 'ui',
-    template: (e) => {
-      const interactive = e.get(UIInteractiveComponent);
-      if (interactive.renderHidden) return null;
-      const checked = e.get(UIStateComponent).get('checked');
-      return h('button', {
-        type: 'button',
-        role: 'switch',
-        'aria-checked': String(checked),
-        class: cx('pw-toggle', checked && 'is-on', props.className),
-        dataset: entityDataset(e),
+  entity.addComponent(
+    new UIInteractiveComponent({
+      disabled: !!props.disabled,
+      hideWhenDisabled: props.hideWhenDisabled !== false,
+      onClick: () => {
+        const state = entity.get(UIStateComponent);
+        const next = !state.get('checked');
+        state.setState({ checked: next });
+        if (props.onChange) props.onChange(next, entity);
       },
-        h('span', { class: 'pw-toggle-track' }, h('span', { class: 'pw-toggle-thumb' })),
-        h('span', { class: 'pw-toggle-label' }, props.label));
-    },
-  }));
+    })
+  );
+  entity.addComponent(
+    new UIRenderComponent({
+      layer: 'ui',
+      template: (e) => {
+        const interactive = e.get(UIInteractiveComponent);
+        if (interactive.renderHidden) return null;
+        const checked = e.get(UIStateComponent).get('checked');
+        return h(
+          'button',
+          {
+            type: 'button',
+            role: 'switch',
+            'aria-checked': String(checked),
+            class: cx('pw-toggle', checked && 'is-on', props.className),
+            dataset: entityDataset(e),
+          },
+          h('span', { class: 'pw-toggle-track' }, h('span', { class: 'pw-toggle-thumb' })),
+          h('span', { class: 'pw-toggle-label' }, props.label)
+        );
+      },
+    })
+  );
   return entity;
 }
-
-
-

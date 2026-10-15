@@ -67,6 +67,3 @@ export class ProgressBar {
     }
   }
 }
-
-
-

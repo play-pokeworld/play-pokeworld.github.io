@@ -129,6 +129,3 @@ export class SceneManager {
     }
   }
 }
-
-
-

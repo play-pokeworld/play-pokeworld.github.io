@@ -24,13 +24,19 @@ import { h, toHTMLString } from '../../engine/render/vdom.js';
  * @returns {*} virtual node
  */
 export function moneyRowVNode(model = {}) {
-  const amount = (model.amount !== undefined && model.amount !== null) ? String(model.amount) : '0';
-  const suffix = (model.suffix !== undefined && model.suffix !== null) ? String(model.suffix) : '₽';
-  return h('div', { class: 'pw-money-row', role: 'status', 'aria-live': 'polite' },
+  const amount = model.amount !== undefined && model.amount !== null ? String(model.amount) : '0';
+  const suffix = model.suffix !== undefined && model.suffix !== null ? String(model.suffix) : '₽';
+  return h(
+    'div',
+    { class: 'pw-money-row', role: 'status', 'aria-live': 'polite' },
     h('span', { class: 'pw-money-label' }, model.label || ''),
-    h('b', { class: 'pw-money-amount' },
+    h(
+      'b',
+      { class: 'pw-money-amount' },
       model.prefixHtml ? h.raw(model.prefixHtml) : null,
-      `${amount}${suffix}`));
+      `${amount}${suffix}`
+    )
+  );
 }
 
 /**
@@ -41,4 +47,3 @@ export function moneyRowVNode(model = {}) {
 export function moneyRowHTML(model = {}) {
   return toHTMLString(moneyRowVNode(model));
 }
-

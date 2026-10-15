@@ -58,8 +58,11 @@ export class SessionSummaryView extends UIView {
       title: m.title || '',
       titleProps: { id: 'battle-summary-title' },
       close: {
-        tag: 'button', action: 'close-battle-summary', glyph: '✕',
-        ariaLabel: m.closeLabel || '', i18nAriaLabel: 'modal_close_btn',
+        tag: 'button',
+        action: 'close-battle-summary',
+        glyph: '✕',
+        ariaLabel: m.closeLabel || '',
+        i18nAriaLabel: 'modal_close_btn',
       },
     });
   }
@@ -67,8 +70,11 @@ export class SessionSummaryView extends UIView {
   contentVNode() {
     const m = this.model;
     if (m.isChamp) {
-      return h('div', { id: 'battle-summary-content' },
-        h('div', { class: 'pw-text-sm pw-light1' }, m.champMsg || ''));
+      return h(
+        'div',
+        { id: 'battle-summary-content' },
+        h('div', { class: 'pw-text-sm pw-light1' }, m.champMsg || '')
+      );
     }
     const damage = m.damage || {};
     const captures = m.captures || {};
@@ -77,24 +83,54 @@ export class SessionSummaryView extends UIView {
     // et jeton JD s'affichent aussi dans le panneau (pas seulement dans les
     // statistiques). Les captures/objets gardent leurs sections dédiées.
     const currencyChips = ((m.loot && m.loot.chips) || []).filter((c) => c && c.currency);
-    return h('div', { id: 'battle-summary-content' },
+    return h(
+      'div',
+      { id: 'battle-summary-content' },
       sessionStatGridVNode(m.stats),
       currencyChips.length
         ? h('div', { class: 'pw-summary-currency' }, currencyChips.map(lootChipVNode))
         : null,
       summarySectionTitleVNode(damage.title),
-      (damage.rows || []).length ? damageListVNode(damage.rows) : summaryEmptyVNode(damage.emptyLabel),
+      (damage.rows || []).length
+        ? damageListVNode(damage.rows)
+        : summaryEmptyVNode(damage.emptyLabel),
       summarySectionTitleVNode(captures.title),
-      (captures.entries || []).length ? captureListVNode(captures.entries) : summaryEmptyVNode(captures.emptyLabel),
+      (captures.entries || []).length
+        ? captureListVNode(captures.entries)
+        : summaryEmptyVNode(captures.emptyLabel),
       summarySectionTitleVNode(items.title),
-      (items.entries || []).length ? itemListVNode(items.entries) : summaryEmptyVNode(items.emptyLabel));
+      (items.entries || []).length
+        ? itemListVNode(items.entries)
+        : summaryEmptyVNode(items.emptyLabel)
+    );
   }
 
   footerVNode() {
     const m = this.model;
-    return h('div', { class: 'pw-static-063' },
-      h('button', { id: 'loot-restart-btn', class: 'hbtn pw-static-064', dataset: { action: 'restart-last-battle' }, 'data-i18n': 'loot_restart_btn' }, m.restartLabel || ''),
-      h('button', { id: 'loot-continue-btn', class: 'hbtn pw-static-065', dataset: { action: 'close-battle-summary' }, 'data-i18n': 'loot_continue_btn' }, m.continueLabel || ''));
+    return h(
+      'div',
+      { class: 'pw-static-063' },
+      h(
+        'button',
+        {
+          id: 'loot-restart-btn',
+          class: 'hbtn pw-static-064',
+          dataset: { action: 'restart-last-battle' },
+          'data-i18n': 'loot_restart_btn',
+        },
+        m.restartLabel || ''
+      ),
+      h(
+        'button',
+        {
+          id: 'loot-continue-btn',
+          class: 'hbtn pw-static-065',
+          dataset: { action: 'close-battle-summary' },
+          'data-i18n': 'loot_continue_btn',
+        },
+        m.continueLabel || ''
+      )
+    );
   }
 
   windowVNode() {
@@ -103,9 +139,11 @@ export class SessionSummaryView extends UIView {
 
   onLoad() {
     this.windowEntity = this.spawn('ui:session-summary', []);
-    this.windowEntity.addComponent(new UIRenderComponent({
-      template: () => this.windowVNode(),
-    }));
+    this.windowEntity.addComponent(
+      new UIRenderComponent({
+        template: () => this.windowVNode(),
+      })
+    );
   }
 
   /** Full serialization for #battle-summary-inner (title + content + footer). */
@@ -118,10 +156,8 @@ export class SessionSummaryView extends UIView {
   /** Inline loot strip serialization for #battle-loot-inline. */
   static inlineHTML(model) {
     const loot = (model && model.loot) || {};
-    if (loot.empty) return toHTMLString(h('div', { class: 'pw-text-sm pw-light1' }, loot.emptyLabel || ''));
+    if (loot.empty)
+      return toHTMLString(h('div', { class: 'pw-text-sm pw-light1' }, loot.emptyLabel || ''));
     return toHTMLString((loot.chips || []).map(lootChipVNode));
   }
 }
-
-
-

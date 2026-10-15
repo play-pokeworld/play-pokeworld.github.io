@@ -26,6 +26,7 @@
  *   flavorLabel, flavor,
  *   evolutionsHtml,    // DS evolution-methods block (trusted, maybe '')
  *   sourcesLabel, sources: [label…],
+ *   formsLabel, forms: [{ spriteHtml, name, owned, stateLabel, sourceLabel }…],   // V7 · FORM-03
  *   movesLabel, moves: [{key, label}], noMovesLabel,
  *   talentsLabel, talents: [{key, label}], noTalentsLabel,
  *   statsLabel, stats: [{label, value}…]
@@ -39,9 +40,12 @@ import { h, toHTMLString } from '../../engine/render/vdom.js';
 import { panelHeaderVNode } from '../components/panel-header.js';
 
 function sectionVNode(title, ...bodyNodes) {
-  return h('div', { class: 'pw-panel pw-info-section pw-dex-compact-section' },
+  return h(
+    'div',
+    { class: 'pw-panel pw-info-section pw-dex-compact-section' },
     title ? h('div', { class: 'pw-section-title' }, h.raw(title)) : null,
-    h('div', { class: 'pw-info-section-body' }, ...bodyNodes));
+    h('div', { class: 'pw-info-section-body' }, ...bodyNodes)
+  );
 }
 
 function chipListVNode(chips) {
@@ -58,23 +62,34 @@ export class DexDetailView extends UIView {
     const nodes = [];
 
     // ── Header (cross = close the sheet, contract unchanged) ────────
-    nodes.push(panelHeaderVNode({
-      class: 'poke-detail-title',
-      titleProps: { class: 'pw-info-name pw-dex-title-text' },
-      title: `#${m.id} `,
-      titleExtra: [m.shiny ? h('span', { class: 'shiny-tag' }, '★') : null, String(m.name || '')],
-      close: { action: 'close-poke-modal' },
-    }));
+    nodes.push(
+      panelHeaderVNode({
+        class: 'poke-detail-title',
+        titleProps: { class: 'pw-info-name pw-dex-title-text' },
+        title: `#${m.id} `,
+        titleExtra: [m.shiny ? h('span', { class: 'shiny-tag' }, '★') : null, String(m.name || '')],
+        close: { action: 'close-poke-modal' },
+      })
+    );
 
     // ── Hero: canonical sprite disc + type badges (flat panel) ──────
-    nodes.push(h('div', { class: 'pw-panel pw-dex-hero' },
-      h.raw(m.spriteHtml || ''),
-      h('div', { class: 'pw-dex-hero-types' }, h.raw(m.typesHtml || ''))));
+    nodes.push(
+      h(
+        'div',
+        { class: 'pw-panel pw-dex-hero' },
+        h.raw(m.spriteHtml || ''),
+        h('div', { class: 'pw-dex-hero-types' }, h.raw(m.typesHtml || ''))
+      )
+    );
 
     // ── Description ─────────────────────────────────────────────────
     if (m.flavor) {
-      nodes.push(sectionVNode(m.flavorLabel || '',
-        h('div', { class: 'pw-text-sm pw-dex-flavor' }, String(m.flavor))));
+      nodes.push(
+        sectionVNode(
+          m.flavorLabel || '',
+          h('div', { class: 'pw-text-sm pw-dex-flavor' }, String(m.flavor))
+        )
+      );
     }
 
     // ── Evolutions (block already rendered by the DS component) ─────
@@ -83,58 +98,175 @@ export class DexDetailView extends UIView {
     // ── Where to find it ────────────────────────────────────────────
     const sources = (m.sources || []).filter(Boolean);
     if (sources.length) {
-      nodes.push(sectionVNode(m.sourcesLabel || '',
-        chipListVNode(sources.map((label) => h('span', { class: 'dict-chip' }, String(label))))));
+      nodes.push(
+        sectionVNode(
+          m.sourcesLabel || '',
+          chipListVNode(sources.map((label) => h('span', { class: 'dict-chip' }, String(label))))
+        )
+      );
+    }
+
+    // ── Forms (V7 · FORM-03) — one card per form: sprite, name, state, source
+    const forms = m.forms || [];
+    if (forms.length) {
+      nodes.push(
+        h(
+          'div',
+          { class: 'pw-panel pw-info-section pw-dex-compact-section pw-dex-forms' },
+          m.formsLabel ? h('div', { class: 'pw-section-title' }, h.raw(m.formsLabel)) : null,
+          h(
+            'div',
+            { class: 'pw-dex-forms-grid' },
+            forms.map((f) =>
+              h(
+                'div',
+                { class: 'pw-dex-form-card' + (f.owned ? ' is-owned' : ' is-missing') },
+                h.raw(f.spriteHtml || ''),
+                h('div', { class: 'pw-dex-form-name' }, String(f.name || '')),
+                h(
+                  'div',
+                  { class: 'pw-text-sm ' + (f.owned ? 'pw-green' : 'pw-light1') },
+                  String(f.stateLabel || '')
+                ),
+                f.sourceLabel
+                  ? h('div', { class: 'pw-text-sm pw-light2' }, String(f.sourceLabel))
+                  : null
+              )
+            )
+          )
+        )
+      );
     }
 
     // ── Moves (clickable chips → move info panel) ───────────────────
     const moves = m.moves || [];
-    nodes.push(sectionVNode(m.movesLabel || '',
-      moves.length
-        ? chipListVNode(moves.map((mv) => h('span', {
-            class: 'dict-chip',
-            dataset: { action: 'legacy-call', call: 'openMoveInfo', callArgs: `'${mv.key}'` },
-          }, String(mv.label))))
-        : h('span', { class: 'dict-muted' }, String(m.noMovesLabel || ''))));
+    nodes.push(
+      sectionVNode(
+        m.movesLabel || '',
+        moves.length
+          ? chipListVNode(
+              moves.map((mv) =>
+                h(
+                  'span',
+                  {
+                    class: 'dict-chip',
+                    dataset: {
+                      action: 'legacy-call',
+                      call: 'openMoveInfo',
+                      callArgs: `'${mv.key}'`,
+                    },
+                  },
+                  String(mv.label)
+                )
+              )
+            )
+          : h('span', { class: 'dict-muted' }, String(m.noMovesLabel || ''))
+      )
+    );
 
     // ── Talents (clickable chips → ability info panel) ──────────────
     const talents = m.talents || [];
-    nodes.push(sectionVNode(m.talentsLabel || '',
-      talents.length
-        ? chipListVNode(talents.map((tal) => h('span', {
-            class: 'dict-chip',
-            dataset: { action: 'legacy-call', call: 'openAbilityInfo', callArgs: `'${tal.key}'` },
-          }, String(tal.label))))
-        : h('span', { class: 'dict-muted' }, String(m.noTalentsLabel || ''))));
+    nodes.push(
+      sectionVNode(
+        m.talentsLabel || '',
+        talents.length
+          ? chipListVNode(
+              talents.map((tal) =>
+                h(
+                  'span',
+                  {
+                    class: 'dict-chip',
+                    dataset: {
+                      action: 'legacy-call',
+                      call: 'openAbilityInfo',
+                      callArgs: `'${tal.key}'`,
+                    },
+                  },
+                  String(tal.label)
+                )
+              )
+            )
+          : h('span', { class: 'dict-muted' }, String(m.noTalentsLabel || ''))
+      )
+    );
 
     // ── Base stats (compact inline cells — no oversized cards) ──────
     const stats = m.stats || [];
     if (stats.length) {
-      nodes.push(h('div', { class: 'pw-panel pw-info-section pw-dex-compact-section' },
-        m.statsLabel ? h('div', { class: 'pw-section-title' }, h.raw(m.statsLabel)) : null,
-        h('div', { class: 'pw-dex-stats' },
-          stats.map((s) => h('div', { class: 'pw-dex-stat-cell' },
-            h('span', { class: 'pw-dex-stat-lbl' }, String(s.label || '')),
-            h('span', { class: 'pw-dex-stat-val' }, String(s.value == null ? '' : s.value)))))));
+      nodes.push(
+        h(
+          'div',
+          { class: 'pw-panel pw-info-section pw-dex-compact-section' },
+          m.statsLabel ? h('div', { class: 'pw-section-title' }, h.raw(m.statsLabel)) : null,
+          h(
+            'div',
+            { class: 'pw-dex-stats' },
+            stats.map((s) =>
+              h(
+                'div',
+                { class: 'pw-dex-stat-cell' },
+                h('span', { class: 'pw-dex-stat-lbl' }, String(s.label || '')),
+                h('span', { class: 'pw-dex-stat-val' }, String(s.value == null ? '' : s.value))
+              )
+            )
+          )
+        )
+      );
     }
 
     // ── Play records (grouped: combat / machines / shiny) ──────────
     const groups = m.recordsGroups || [];
     const flatRecords = m.records || [];
     if (groups.length || flatRecords.length) {
-      nodes.push(h('div', { class: 'pw-panel pw-info-section pw-dex-compact-section' },
-        m.recordsLabel ? h('div', { class: 'pw-section-title' }, h.raw(m.recordsLabel)) : null,
-        groups.length
-          ? h('div', { class: 'pw-dex-records' },
-              groups.map((g) => h('div', { class: 'pw-dex-record-group' },
-                g.title ? h('div', { class: 'pw-dex-record-group-title' }, String(g.title)) : null,
-                ...(g.rows || []).map((r) => h('div', { class: 'pw-dex-record' },
-                  h('span', { class: 'pw-dex-record-lbl' }, String(r.label || '')),
-                  h('span', { class: 'pw-dex-record-val' }, String(r.value == null ? '0' : r.value)))))))
-          : h('div', { class: 'pw-dex-records' },
-              flatRecords.map((r) => h('div', { class: 'pw-dex-record' },
-                h('span', { class: 'pw-dex-record-lbl' }, String(r.label || '')),
-                h('span', { class: 'pw-dex-record-val' }, String(r.value == null ? '0' : r.value)))))));
+      nodes.push(
+        h(
+          'div',
+          { class: 'pw-panel pw-info-section pw-dex-compact-section' },
+          m.recordsLabel ? h('div', { class: 'pw-section-title' }, h.raw(m.recordsLabel)) : null,
+          groups.length
+            ? h(
+                'div',
+                { class: 'pw-dex-records' },
+                groups.map((g) =>
+                  h(
+                    'div',
+                    { class: 'pw-dex-record-group' },
+                    g.title
+                      ? h('div', { class: 'pw-dex-record-group-title' }, String(g.title))
+                      : null,
+                    ...(g.rows || []).map((r) =>
+                      h(
+                        'div',
+                        { class: 'pw-dex-record' },
+                        h('span', { class: 'pw-dex-record-lbl' }, String(r.label || '')),
+                        h(
+                          'span',
+                          { class: 'pw-dex-record-val' },
+                          String(r.value == null ? '0' : r.value)
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            : h(
+                'div',
+                { class: 'pw-dex-records' },
+                flatRecords.map((r) =>
+                  h(
+                    'div',
+                    { class: 'pw-dex-record' },
+                    h('span', { class: 'pw-dex-record-lbl' }, String(r.label || '')),
+                    h(
+                      'span',
+                      { class: 'pw-dex-record-val' },
+                      String(r.value == null ? '0' : r.value)
+                    )
+                  )
+                )
+              )
+        )
+      );
     }
 
     return nodes;
@@ -142,9 +274,11 @@ export class DexDetailView extends UIView {
 
   onLoad() {
     this.windowEntity = this.spawn('ui:dex-detail', []);
-    this.windowEntity.addComponent(new UIRenderComponent({
-      template: () => this.windowVNode(),
-    }));
+    this.windowEntity.addComponent(
+      new UIRenderComponent({
+        template: () => this.windowVNode(),
+      })
+    );
   }
 
   /**
@@ -158,6 +292,3 @@ export class DexDetailView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
-
-
-

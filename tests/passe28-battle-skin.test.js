@@ -95,10 +95,15 @@ test('PASSE 28 — les jetons de sprite ont grandi par rapport à la passe 27', 
     const hits = [...css.matchAll(new RegExp(name + ':\\s*(\\d+)px', 'g'))].map((m) => Number(m[1]));
     return hits.length ? hits[hits.length - 1] : null;
   };
-  // la dernière déclaration gagne : c'est celle de la passe 28 (hors media query)
-  const p28 = css.slice(css.indexOf('28.0 — jetons'), css.indexOf('28.1'));
-  const battle = Number(/--pc-battle-sprite:\s*(\d+)px/.exec(p28)[1]);
-  const bench = Number(/--pc-bench-sprite:\s*(\d+)px/.exec(p28)[1]);
+  // la dernière déclaration gagne : c'est celle de la passe 28 (hors media query).
+  // V7 · DBT-06 — un seul bloc :root en tête de fichier (les anciens blocs y sont
+  // fusionnés dans l'ordre) : on lit la DERNIÈRE valeur du bloc unique.
+  const rootStart = css.indexOf(':root {');
+  const rootEnd = css.indexOf('\n}', rootStart);
+  const p28 = css.slice(rootStart, rootEnd);
+  const lastIn = (name) => { const hits = [...p28.matchAll(new RegExp(name + ':\\s*(\\d+)px', 'g'))]; return Number(hits[hits.length - 1][1]); };
+  const battle = lastIn('--pc-battle-sprite');
+  const bench = lastIn('--pc-bench-sprite');
   assert.ok(battle >= 120, 'le sprite de combat doit dépasser largement les 84px de la passe 27, vu ' + battle);
   assert.ok(bench >= 70, 'le remplaçant doit dépasser les 46px de la passe 27, vu ' + bench);
   assert.ok(grab('--pc-scene-h') >= 210);

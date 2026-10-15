@@ -111,6 +111,20 @@ function classicRunSource(files) {
  *   evaluation order the harness used (R() lists / SANDBOX_FILES).
  * @returns {string} IIFE source to hand to vm.runInContext.
  */
+// V7 · DBT-08 — UN seul écouteur `exit` pour tous les bundles (avant : un
+// écouteur par bundle → MaxListenersExceededWarning dès 11 bundles dans
+// `node --test` / les simulateurs).
+const tmpDirs = new Set();
+let exitHookInstalled = false;
+function rememberTmpDir(dir) {
+  tmpDirs.add(dir);
+  if (exitHookInstalled) return;
+  exitHookInstalled = true;
+  process.on('exit', () => {
+    for (const d of tmpDirs) { try { fs.rmSync(d, { recursive: true, force: true }); } catch (_) {} }
+  });
+}
+
 export function harnessBundleSource(orderedFiles) {
   const key = orderedFiles.join('|');
   if (cache.has(key)) return cache.get(key);
@@ -126,7 +140,7 @@ export function harnessBundleSource(orderedFiles) {
   }
 
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'pw-harness-'));
-  process.on('exit', () => { try { fs.rmSync(tmp, { recursive: true, force: true }); } catch (_) {} });
+  rememberTmpDir(tmp);
 
   const entryLines = [];
   runs.forEach((r, i) => {

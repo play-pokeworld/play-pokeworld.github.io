@@ -8,12 +8,12 @@
 class InputManager {
   constructor(root) {
     this.root = root || document;
-    this._handlers = new Map();      // eventType -> [{ selector, fn, options }]
-    this._keyBindings = new Map();   // key -> [fn]
+    this._handlers = new Map(); // eventType -> [{ selector, fn, options }]
+    this._keyBindings = new Map(); // key -> [fn]
     this._longPressTimers = new Map();
     this._dragState = null;
     this._pressedKeys = new Set();
-    
+
     this._bindEvents();
   }
 
@@ -39,23 +39,35 @@ class InputManager {
   onLongPress(selector, fn, duration) {
     duration = duration || 500;
     this._addHandler('pointerdown', selector, (e, el) => {
-      const timer = setTimeout(() => { fn(e, el); }, duration);
+      const timer = setTimeout(() => {
+        fn(e, el);
+      }, duration);
       this._longPressTimers.set(el, timer);
     });
-    this._addHandler('pointerup', selector, () => {
+    this._addHandler('pointerup', selector, (_e, el) => {
       const timer = this._longPressTimers.get(el);
       if (timer) clearTimeout(timer);
+      this._longPressTimers.delete(el);
     });
-    this._addHandler('pointerleave', selector, () => {
+    this._addHandler('pointerleave', selector, (_e, el) => {
       const timer = this._longPressTimers.get(el);
       if (timer) clearTimeout(timer);
+      this._longPressTimers.delete(el);
     });
   }
 
   // ─── Drag & Drop ───
   onDrag(selector, onStart, onMove, onEnd) {
     this._addHandler('pointerdown', selector, (e, el) => {
-      this._dragState = { el: el, startX: e.clientX, startY: e.clientY, onStart, onMove, onEnd, moved: false };
+      this._dragState = {
+        el: el,
+        startX: e.clientX,
+        startY: e.clientY,
+        onStart,
+        onMove,
+        onEnd,
+        moved: false,
+      };
       el.setPointerCapture(e.pointerId);
       if (onStart) onStart(e, el);
     });
@@ -79,10 +91,12 @@ class InputManager {
       else key = p;
     }
     document.addEventListener('keydown', (e) => {
-      if (e.key.toLowerCase() === key &&
-          e.ctrlKey === mods.ctrl &&
-          e.shiftKey === mods.shift &&
-          e.altKey === mods.alt) {
+      if (
+        e.key.toLowerCase() === key &&
+        e.ctrlKey === mods.ctrl &&
+        e.shiftKey === mods.shift &&
+        e.altKey === mods.alt
+      ) {
         fn(e);
       }
     });
@@ -102,7 +116,19 @@ class InputManager {
   }
 
   _bindEvents() {
-    const eventTypes = ['click', 'dblclick', 'contextmenu', 'change', 'mouseenter', 'mouseleave', 'pointerdown', 'pointerup', 'pointermove', 'pointerleave', 'wheel'];
+    const eventTypes = [
+      'click',
+      'dblclick',
+      'contextmenu',
+      'change',
+      'mouseenter',
+      'mouseleave',
+      'pointerdown',
+      'pointerup',
+      'pointermove',
+      'pointerleave',
+      'wheel',
+    ];
     for (const type of eventTypes) {
       this.root.addEventListener(type, (e) => this._dispatch(e), { passive: type !== 'wheel' });
     }
@@ -141,8 +167,12 @@ class InputManager {
   }
 
   // ─── Utility ───
-  isKeyDown(key) { return this._pressedKeys.has(key.toLowerCase()); }
-  getDragState() { return this._dragState; }
+  isKeyDown(key) {
+    return this._pressedKeys.has(key.toLowerCase());
+  }
+  getDragState() {
+    return this._dragState;
+  }
 }
 
 // T2 (wave 38): ESM module — native class export; the engine surface
@@ -155,7 +185,3 @@ if (typeof globalThis !== 'undefined') {
   if (!globalThis.poke) globalThis.poke = {};
   globalThis.poke.Input = InputManager;
 }
-
-
-
-

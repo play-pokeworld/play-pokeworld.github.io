@@ -913,6 +913,66 @@ export const L_en_quests = {
     "desc": "Return to Littleroot: Professor Birch celebrates your legend.",
     "rewardDesc": "10,000₽ + 5 Heart Scales"
   },
+  "278": {
+    "title": "First rival: May",
+    "desc": "May waits on Route 103 with the starter that beats yours. The first duel of your Hoenn adventure!",
+    "rewardDesc": "300₽ + 2 Potions"
+  },
+  "279": {
+    "title": "The Rusturf Tunnel thief",
+    "desc": "A Team Aqua Grunt ran away with the Devon Parts. Catch him in Rusturf Tunnel.",
+    "rewardDesc": "600₽ + 2 Great Balls"
+  },
+  "280": {
+    "title": "Museum alert",
+    "desc": "Team Aqua stormed the Slateport Oceanic Museum to kidnap Captain Stern. Chase the grunts!",
+    "rewardDesc": "900₽ + 2 Super Potions"
+  },
+  "281": {
+    "title": "Rematch on Route 110",
+    "desc": "May has grown since Route 103: face her team on the Route 110 cycling road.",
+    "rewardDesc": "1,500₽ + 3 Great Balls"
+  },
+  "282": {
+    "title": "Wally's first battle",
+    "desc": "Wally caught his Ralts thanks to you. He challenges you in front of the Mauville Gym to prove himself.",
+    "rewardDesc": "800₽ + 5 Poké Balls"
+  },
+  "283": {
+    "title": "The Mt. Chimney Meteorite",
+    "desc": "Courtney, a Team Magma admin, wants to wake the volcano with the Meteorite. Beat her at the top of Mt. Chimney.",
+    "rewardDesc": "2,500₽ + 2 Ultra Balls"
+  },
+  "284": {
+    "title": "Weather Institute raid",
+    "desc": "Matt and Team Aqua took the Weather Institute to steal the climate data. Free the researchers!",
+    "rewardDesc": "3,000₽ + 3 Ultra Balls"
+  },
+  "285": {
+    "title": "May on Route 119",
+    "desc": "In front of the Weather Institute, May offers a third duel: her team now has three Pokémon.",
+    "rewardDesc": "3,000₽ + 1 Full Restore"
+  },
+  "286": {
+    "title": "Duel in Lilycove",
+    "desc": "In front of the Lilycove Department Store, May plays her last card: four Pokémon and her starter in top shape.",
+    "rewardDesc": "4,000₽ + 3 Ultra Balls"
+  },
+  "287": {
+    "title": "The Magma Hideout",
+    "desc": "Maxie, the Team Magma boss, hides in his lair on the side of Mt. Chimney with the stolen Blue Orb. Face him.",
+    "rewardDesc": "5,000₽ + 1 Rare Candy"
+  },
+  "288": {
+    "title": "At the bottom of the Cavern",
+    "desc": "Archie, the Team Aqua boss, is about to awaken Kyogre deep inside the Seafloor Cavern. Stop him!",
+    "rewardDesc": "6,000₽ + 5 Ultra Balls"
+  },
+  "289": {
+    "title": "Wally, Victory Road",
+    "desc": "Wally has become an accomplished trainer: he blocks Victory Road with Gardevoir and a full team.",
+    "rewardDesc": "6,000₽ + 2 Rare Candies"
+  },
 },
 "side": {
 "s1": {
@@ -1270,7 +1330,36 @@ export const L_en_quests = {
 "s134": { "title":"Meet-up — Mossdeep City", "desc":"Talk to the local in Mossdeep City.", "rewardDesc":"₽1,200 + Twisted Spoon" },
 "s135": { "title":"Meet-up — Sootopolis City", "desc":"Talk to the local in Sootopolis City.", "rewardDesc":"₽1,500 + Mystic Water" },
 "s136": { "title":"Meet-up — Pacifidlog Town", "desc":"Talk to the local in Pacifidlog Town.", "rewardDesc":"₽1,200 + Dragon Scale" },
-"s137": { "title":"Meet-up — Fallarbor Town", "desc":"Talk to the local in Fallarbor Town.", "rewardDesc":"₽1,000 + Moon Stone" }
+"s137": { "title":"Meet-up — Fallarbor Town", "desc":"Talk to the local in Fallarbor Town.", "rewardDesc":"₽1,000 + Moon Stone" },
+// V7 · LEG-02 — chaînes légendaires de Hoenn (legendary-quests.js)
+"leg_regirock_1": { "title":"The Seals I — The Sanctuary", "desc":"Solve the “People of the deep” riddle in the Sealed Chamber: the Keeper of the Seals wants the two sea guardians to awaken the mural.", "rewardDesc":"Quest points" },
+"leg_regirock_2": { "title":"The Seals I — Regirock", "desc":"In the Desert Ruins, solve the “Name of the stone guardian” riddle. The rock golem will wait for you there: capture not guaranteed, doubled rate, retryable encounter.", "rewardDesc":"Encounter: Regirock (Lv. 40)" },
+"leg_regice_1": { "title":"The Seals II — Regice", "desc":"With Regirock caught, the Ice Hermit opens the Island Cave: solve the “Name of the ice guardian” riddle. Regice will wait for you there (doubled rate, retryable).", "rewardDesc":"Encounter: Regice (Lv. 40)" },
+"leg_registeel_1": { "title":"The Seals III — Registeel", "desc":"With Regice caught, the Tomb Keeper entrusts you with the last riddle: “Name of the steel guardian”. Registeel will wait for you there (doubled rate, retryable).", "rewardDesc":"Encounter: Registeel (Lv. 40)" },
+"leg_latias_1": { "title":"Eon I — The Slateport rumour", "desc":"Talk to reporter Gabby in Slateport City: she filmed a red silhouette above the sea and hands you an Eon Ticket.", "rewardDesc":"Eon Ticket" },
+"leg_latias_2": { "title":"Eon II — Route 118", "desc":"Latias flies over Route 118. Win 50 wild battles on Route 118 to catch its attention.", "rewardDesc":"Quest points" },
+"leg_latias_3": { "title":"Eon III — Route 119", "desc":"It heads north. Win 50 wild battles on Route 119.", "rewardDesc":"Quest points" },
+"leg_latias_4": { "title":"Eon IV — Southern Island", "desc":"Go to Southern Island with the Eon Ticket. Latias waits for you there: capture not guaranteed, doubled rate, retryable encounter.", "rewardDesc":"Encounter: Latias (Lv. 50)" },
+"leg_latios_1": { "title":"Eon V — Route 124", "desc":"With Latias caught and the Hoenn League won, the Old Sailor of Southern Island speaks of a blue brother. Win 50 wild battles on Route 124.", "rewardDesc":"Quest points" },
+"leg_latios_2": { "title":"Eon VI — Route 125", "desc":"Win 50 wild battles on Route 125.", "rewardDesc":"Quest points" },
+"leg_latios_3": { "title":"Eon VII — Latios", "desc":"Win 50 wild battles on Route 126, then return to Southern Island: Latios waits for you there (doubled rate, retryable).", "rewardDesc":"Encounter: Latios (Lv. 50)" },
+"leg_kyogre_1": { "title":"Abyss I — The Blue Orb", "desc":"Talk to the Old Woman of Mt. Pyre: she entrusts you with the Blue Orb before Team Aqua seizes it.", "rewardDesc":"Blue Orb" },
+"leg_kyogre_2": { "title":"Abyss II — Seafloor Cavern", "desc":"Defeat Archie and Team Aqua in the Seafloor Cavern to stop them from awakening Kyogre.", "rewardDesc":"Quest points" },
+"leg_kyogre_3": { "title":"Abyss III — Route 128", "desc":"The sea is stirring. Win 150 wild battles on Route 128.", "rewardDesc":"Quest points" },
+"leg_kyogre_4": { "title":"Abyss IV — Kyogre", "desc":"Descend into the Cave of Origin with the Blue Orb: Kyogre waits for you there (capture not guaranteed, doubled rate, retryable encounter).", "rewardDesc":"Encounter: Kyogre (Lv. 70)" },
+"leg_groudon_1": { "title":"Magma I — The Red Orb", "desc":"Talk to the Old Man of Mt. Pyre: he entrusts you with the Red Orb before Team Magma seizes it.", "rewardDesc":"Red Orb" },
+"leg_groudon_2": { "title":"Magma II — Mt. Chimney", "desc":"Defeat Maxie and Team Magma at the top of Mt. Chimney to stop them from awakening Groudon.", "rewardDesc":"Quest points" },
+"leg_groudon_3": { "title":"Magma III — Route 111", "desc":"The desert rumbles. Win 150 wild battles on Route 111.", "rewardDesc":"Quest points" },
+"leg_groudon_4": { "title":"Magma IV — Groudon", "desc":"Descend into the Cave of Origin with the Red Orb: Groudon waits for you there (capture not guaranteed, doubled rate, retryable encounter).", "rewardDesc":"Encounter: Groudon (Lv. 70)" },
+"leg_rayquaza_1": { "title":"Sky I — The Meteorite Shard", "desc":"With Kyogre and Groudon caught, the Draconid Sage of the Sky Pillar hands you the Delta Meteorite Shard.", "rewardDesc":"Delta Meteorite Shard" },
+"leg_rayquaza_2": { "title":"Sky II — Route 131", "desc":"Win 100 wild battles on Route 131, at the foot of the Sky Pillar.", "rewardDesc":"Quest points" },
+"leg_rayquaza_3": { "title":"Sky III — Rayquaza", "desc":"Climb the Sky Pillar with the Delta Meteorite Shard: Rayquaza waits for you there (capture not guaranteed, doubled rate, retryable encounter).", "rewardDesc":"Encounter: Rayquaza (Lv. 70)" },
+"leg_jirachi_1": { "title":"Wish I — A thousand victories", "desc":"The Wishing Child of Fallarbor dreams of a star. First wish: win 1,000 wild battles across the Hoenn region (all your victories count).", "rewardDesc":"Quest points" },
+"leg_jirachi_2": { "title":"Wish II — Fifty species", "desc":"Second wish: catch 50 Hoenn species (the regional Pokédex counts).", "rewardDesc":"Quest points" },
+"leg_jirachi_3": { "title":"Wish III — Jirachi", "desc":"Third wish: win 200 wild battles on Mt. Chimney. The star will then come down to the summit: Jirachi waits for you there (doubled rate, retryable).", "rewardDesc":"Encounter: Jirachi (Lv. 70)" },
+"leg_deoxys_1": { "title":"Aurora I — The Space Center", "desc":"Talk to the Space Center Researcher in Fallarbor Town: a meteor has revealed an island offshore. The shuttle takes you there.", "rewardDesc":"Quest points" },
+"leg_deoxys_2": { "title":"Aurora II — The triangle", "desc":"On Birth Island, solve the “Aurora triangle” riddle.", "rewardDesc":"Quest points" },
+"leg_deoxys_3": { "title":"Aurora III — Deoxys", "desc":"Win 100 wild battles on Birth Island. Deoxys will then show itself (capture not guaranteed, doubled rate, retryable encounter).", "rewardDesc":"Encounter: Deoxys (Lv. 70)" }
 },
 
 "repeatable": {

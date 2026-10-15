@@ -23,24 +23,15 @@
  * @module engine/render/vdom
  */
 
+import { esc } from '../../core/html-escape.js';
+
 const RAW_TAG = Symbol.for('pw.raw');
 
 /**
- * HTML escaping (text nodes and attribute values).
- * @param {*} v
- * @returns {string}
+ * HTML escaping (text nodes and attribute values) — V7 · DBT-05 : implémentation
+ * unique dans core/html-escape.js, ré-exportée ici pour les consommateurs du vdom.
  */
-export function esc(v) {
-  return String(v)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-  // NOTE: single quotes stay raw — this serializer always double-quotes
-  // attribute values, so ' is safe and data-* args stay human-readable
-  // and greppable (data-call-args="'id'" — same contract as the legacy
-  // string-built markup).
-}
+export { esc };
 
 const VOID_TAGS = new Set(['img', 'br', 'hr', 'input', 'meta', 'link', 'source']);
 
@@ -52,7 +43,11 @@ const VOID_TAGS = new Set(['img', 'br', 'hr', 'input', 'meta', 'link', 'source']
  * @returns {Object} Virtual node descriptor.
  */
 export function h(tag, props = null, ...children) {
-  return { tag, props: props || {}, children: children.flat(Infinity).filter((c) => c !== null && c !== undefined && c !== false) };
+  return {
+    tag,
+    props: props || {},
+    children: children.flat(Infinity).filter((c) => c !== null && c !== undefined && c !== false),
+  };
 }
 
 /**
@@ -86,7 +81,10 @@ export function toHTMLString(node) {
   const props = node.props || {};
   for (const [key, value] of Object.entries(props)) {
     if (value === null || value === undefined || value === false) continue;
-    if (key === 'class') { attrs.push(`class="${esc(value)}"`); continue; }
+    if (key === 'class') {
+      attrs.push(`class="${esc(value)}"`);
+      continue;
+    }
     if (key === 'style' && typeof value === 'object') {
       const css = Object.entries(value)
         .filter(([, v]) => v !== null && v !== undefined && v !== '')
@@ -103,8 +101,14 @@ export function toHTMLString(node) {
       continue;
     }
     if (key.startsWith('on') && typeof value === 'function') continue; // listeners: DOM-only
-    if (key === 'disabled') { if (value) attrs.push('disabled'); continue; }
-    if (typeof value === 'boolean') { attrs.push(`${key}="${value ? 'true' : 'false'}"`); continue; }
+    if (key === 'disabled') {
+      if (value) attrs.push('disabled');
+      continue;
+    }
+    if (typeof value === 'boolean') {
+      attrs.push(`${key}="${value ? 'true' : 'false'}"`);
+      continue;
+    }
     attrs.push(`${key}="${esc(value)}"`);
   }
 
@@ -119,7 +123,7 @@ export function toHTMLString(node) {
  * @param {Document} [doc] Document to create nodes with (defaults to global).
  * @returns {Node|null}
  */
-export function mount(node, doc = (typeof document !== 'undefined' ? document : null)) {
+export function mount(node, doc = typeof document !== 'undefined' ? document : null) {
   if (!doc) throw new Error('[engine] vdom.mount requires a Document');
   if (node === null || node === undefined || node === false) return doc.createComment('empty');
   if (Array.isArray(node)) {
@@ -139,14 +143,26 @@ export function mount(node, doc = (typeof document !== 'undefined' ? document : 
   const props = node.props || {};
   for (const [key, value] of Object.entries(props)) {
     if (value === null || value === undefined || value === false) continue;
-    if (key === 'class') { el.className = String(value); continue; }
-    if (key === 'style' && typeof value === 'object') { Object.assign(el.style, value); continue; }
-    if (key === 'dataset' && typeof value === 'object') { Object.assign(el.dataset, value); continue; }
+    if (key === 'class') {
+      el.className = String(value);
+      continue;
+    }
+    if (key === 'style' && typeof value === 'object') {
+      Object.assign(el.style, value);
+      continue;
+    }
+    if (key === 'dataset' && typeof value === 'object') {
+      Object.assign(el.dataset, value);
+      continue;
+    }
     if (/^on[A-Z]/.test(key) && typeof value === 'function') {
       el.addEventListener(key.slice(2).toLowerCase(), value);
       continue;
     }
-    if (key === 'disabled') { if (value) el.setAttribute('disabled', ''); continue; }
+    if (key === 'disabled') {
+      if (value) el.setAttribute('disabled', '');
+      continue;
+    }
     el.setAttribute(key, typeof value === 'boolean' ? String(value) : String(value));
   }
   for (const child of node.children) el.appendChild(mount(child, doc));
@@ -159,11 +175,8 @@ export function mount(node, doc = (typeof document !== 'undefined' ? document : 
  * @param {Element} host
  * @param {Document} [doc]
  */
-export function renderInto(node, host, doc = (typeof document !== 'undefined' ? document : null)) {
+export function renderInto(node, host, doc = typeof document !== 'undefined' ? document : null) {
   const dom = mount(node, doc || host.ownerDocument);
   host.replaceChildren(dom);
   return host;
 }
-
-
-

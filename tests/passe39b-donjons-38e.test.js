@@ -13,6 +13,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { ws, wsIncludes, wsMatch } from './helpers/ws.js'; // V7 · DBT-01 — comparaison insensible à la mise en forme
 
 const read = (p) => readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 
@@ -60,21 +61,21 @@ test('39b-P1 — la case combat utilise la pokéball de la barre de titre (pokeb
 test('39b-B1 — sur la carte, une victoire rend TOUJOURS la main à la carte (jamais le boss auto)', () => {
   const src = read('src/application/combat/battle-status.js');
   const chain = src.slice(src.indexOf('let _dgStop = false;'), src.indexOf('// PASSE 36 — carte'));
-  assert.match(chain, /if\(_run && _run\.map\)\{\s*_dgStop = true;/, 'victoire sur carte → stop (retour à la carte)');
+  assert.ok(wsMatch(chain, /if\(_run && _run\.map\)\{\s*_dgStop = true;/), 'victoire sur carte → stop (retour à la carte)'); // V7 · DBT-01
   assert.doesNotMatch(chain, /_run\.map\)[\s\S]{0,80}?pendingDungeonBoss = true/, 'jamais de gardien auto sur carte');
 });
 
 test('39b-B2 — le tuning ne déduit plus « palier purgé → boss » quand une carte est en cours', () => {
   const src = read('src/application/encounter-system.js');
   const bloc = src.slice(src.indexOf('const flagged = '), src.indexOf('return applyDungeonBossBuff(wp, run);'));
-  assert.match(bloc, /const deduced = !run\.map/, 'déduction interdite en grille');
+  assert.match(bloc, /const deduced =\s*!run\.map/, 'déduction interdite en grille'); // V7 · DBT-01
   assert.match(bloc, /flagged \|\| deduced/, 'drapeau de case boss toujours honoré');
 });
 
 test('39b-B3 — endBattle purge pendingDungeonBoss et compte l\'argent comme butin', () => {
   const src = read('src/application/combat/battle-flow.js');
   assert.match(src, /battle\.pendingDungeonBoss = false;/, 'le drapeau « gardien » ne survit pas à la fin du combat');
-  assert.match(src, /Number\(battle\.sessionMoney\|\|0\)>0/, 'l\'argent gagné en combat compte comme du butin');
+  assert.ok(wsMatch(src, /Number\(battle\.sessionMoney\|\|0\)>0/), 'l\'argent gagné en combat compte comme du butin'); // V7 · DBT-01
 });
 
 // ─── L. PANNEAU DE BUTIN = UN SEUL RENDU (celui des combats normaux) ────────
@@ -100,8 +101,8 @@ test('39b-L2 — le résumé de session affiche les monnaies avec leur sprite et
   assert.match(summary, /tokens = Number\(bag\.tokens\) \|\| 0;/, 'jetons = sac du run');
   assert.match(summary, /currency\/money\.svg/, 'sprite pièce dans le résumé');
   assert.match(summary, /currency\/dungeonToken\.svg/, 'sprite jeton dans le résumé');
-  assert.match(summary, /amount: data\.money, prefix: '\+'/, 'argent = +N (sprite + chiffre)');
-  assert.match(summary, /amount: data\.tokens, currency: true/, 'jetons = N (sprite + chiffre)');
+  assert.ok(wsMatch(summary, /amount: data\.money, prefix: '\+'/), 'argent = +N (sprite + chiffre)'); // V7 · DBT-01
+  assert.ok(wsMatch(summary, /amount: data\.tokens, currency: true/), 'jetons = N (sprite + chiffre)');
   const view = read('src/ui/components/session-summary.js');
   assert.match(view, /c\.currency/, 'la vue gère les puces monnaies');
   assert.match(view, /c\.prefix \|\| ''/, 'préfixe + pour l\'argent de combat');
@@ -109,7 +110,7 @@ test('39b-L2 — le résumé de session affiche les monnaies avec leur sprite et
 
 test('39b-L3 — sessionTokens : zéro en combat, posé à la sortie du donjon', () => {
   const init = read('src/application/combat/battle-init.js');
-  assert.match(init, /battle\.sessionTokens=0;/, 'init combat : zéro jeton');
+  assert.ok(wsMatch(init, /battle\.sessionTokens=0;/), 'init combat : zéro jeton'); // V7 · DBT-01
   const off = read('src/application/save/offline-engine.js');
   assert.match(off, /b\.sessionTokens = 0;/, 'init offline : zéro jeton');
   const dg = read('src/application/world/dungeon-run.js');

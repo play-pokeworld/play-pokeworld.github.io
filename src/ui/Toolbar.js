@@ -31,7 +31,10 @@
 // Shared safe-HTML service (engine pwSetHtml when present, else direct).
 // globalThis-backed so concatenated VM harnesses and classic stubs stay valid.
 if (typeof globalThis !== 'undefined' && typeof globalThis._pwSetHtmlSafe !== 'function') {
-  globalThis._pwSetHtmlSafe = function (el, html) { if (typeof globalThis.pwSetHtml === 'function') globalThis.pwSetHtml(el, html); else el.innerHTML = html; };
+  globalThis._pwSetHtmlSafe = function (el, html) {
+    if (typeof globalThis.pwSetHtml === 'function') globalThis.pwSetHtml(el, html);
+    else el.innerHTML = html;
+  };
 }
 
 import { eventBus } from '../core/event-bus.js';
@@ -76,7 +79,8 @@ export class Toolbar {
       for (const opt of this.sort.options) {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'pw-ui-btn usm-sort-btn' + (String(this._sort) === String(opt.id) ? ' active' : '');
+        btn.className =
+          'pw-ui-btn usm-sort-btn' + (String(this._sort) === String(opt.id) ? ' active' : '');
         btn.dataset.sort = opt.id;
         btn.textContent = opt.label;
         btn.addEventListener('click', () => this.setSort(opt.id, true));
@@ -119,7 +123,11 @@ export class Toolbar {
   }
 
   _emit() {
-    eventBus.emit('ui:filter-change', { query: this._query, sort: this._sort, component: 'Toolbar' });
+    eventBus.emit('ui:filter-change', {
+      query: this._query,
+      sort: this._sort,
+      component: 'Toolbar',
+    });
   }
 
   /**
@@ -160,6 +168,3 @@ export class Toolbar {
     return this.fixed;
   }
 }
-
-
-

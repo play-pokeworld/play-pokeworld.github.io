@@ -70,7 +70,7 @@ export function syncPlayerPresence() {
   const loc = typeof globalThis.getLocObj === 'function' ? globalThis.getLocObj(G.location) : null;
   world.get(eid, 'WorldLocation').id = G.location || null;
   const table = world.get(eid, 'WildSpawnTable');
-  table.entries = (loc && Array.isArray(loc.wild)) ? loc.wild : [];
+  table.entries = loc && Array.isArray(loc.wild) ? loc.wild : [];
   // PASSE 38g/39d — les légendaires ERRANTS n'apparaissent JAMAIS en zone
   // donjon (retour joueur : « les roamings doivent se trouver uniquement sur
   // des routes ») : `getRoamingLegendaryForRoute` renvoie déjà null pour un
@@ -83,17 +83,24 @@ export function syncPlayerPresence() {
       if (run && run.active) inDungeon = true;
     }
   } catch (_) {}
-  table.roamingId = inDungeon ? 0
-    : (typeof globalThis.getRoamingLegendaryForRoute === 'function'
-      ? (globalThis.getRoamingLegendaryForRoute(G.location) || 0)
-      : 0);
+  table.roamingId = inDungeon
+    ? 0
+    : typeof globalThis.getRoamingLegendaryForRoute === 'function'
+      ? globalThis.getRoamingLegendaryForRoute(G.location) || 0
+      : 0;
+  // V7 · ROAM-01 (décision joueur 2026-10-14) — the roamer is ALSO on the
+  // table during the offline catch-up (window.PW_FF): farming a legendary
+  // AFK is the whole point of parking the team on its route. If the Nv. 75
+  // roamer wipes the team, that is the player's call (the recap says so).
 
   // Wallet / Inventory are the market system state too — one player entity.
   world.get(eid, 'Wallet').money = Number(G.money) || 0;
   try {
-    const w = (typeof globalThis.ensureWallet === 'function') ? globalThis.ensureWallet() : null;
-    world.get(eid, 'Wallet').diamonds = (w && typeof w.diamonds === 'number') ? w.diamonds : 0;
-  } catch (_) { world.get(eid, 'Wallet').diamonds = 0; }
+    const w = typeof globalThis.ensureWallet === 'function' ? globalThis.ensureWallet() : null;
+    world.get(eid, 'Wallet').diamonds = w && typeof w.diamonds === 'number' ? w.diamonds : 0;
+  } catch (_) {
+    world.get(eid, 'Wallet').diamonds = 0;
+  }
   world.get(eid, 'InventoryItems').counts = Object.assign({}, G.inventory || {});
   return eid;
 }
@@ -109,7 +116,7 @@ export function applyEconomyComponents() {
   if (!G || !world || eid < 0 || !world._entities.has(eid)) return false;
   G.money = Number(world.get(eid, 'Wallet').money) || 0;
   try {
-    const w = (typeof globalThis.ensureWallet === 'function') ? globalThis.ensureWallet() : null;
+    const w = typeof globalThis.ensureWallet === 'function' ? globalThis.ensureWallet() : null;
     if (w) w.diamonds = Number(world.get(eid, 'Wallet').diamonds) || 0;
   } catch (_) {}
   const counts = world.get(eid, 'InventoryItems').counts || {};
@@ -160,9 +167,14 @@ export function requestWildSpawn(reason) {
 export function spawnNextWild() {
   const G = gameState();
   const battle = globalThis.battle;
-  const loc = typeof globalThis.getLocObj === 'function' ? globalThis.getLocObj(G && G.location) : null;
+  const loc =
+    typeof globalThis.getLocObj === 'function' ? globalThis.getLocObj(G && G.location) : null;
   const wild = loc ? loc.wild : null;
-  if (!wild || !wild.length || (typeof globalThis.aliveCount === 'function' && globalThis.aliveCount() === 0)) {
+  if (
+    !wild ||
+    !wild.length ||
+    (typeof globalThis.aliveCount === 'function' && globalThis.aliveCount() === 0)
+  ) {
     if (typeof globalThis.endBattle === 'function') globalThis.endBattle();
     return;
   }
@@ -175,26 +187,46 @@ export function spawnNextWild() {
   // expédition. Le gardien doit donc pouvoir surgir ici aussi, sinon il ne
   // serait jamais rencontré sans quitter puis relancer un combat.
   wp = applyDungeonEncounterTuning(wp, G) || wp;
- battle.enemyPoke = wp;
- battle.enemyMods = { atk: 1, def: 1, spe: 1 };
- battle.playerMods = { atk: 1, def: 1, spe: 1 };
- battle.eMoveIdx = 0;
- battle.escaped = false;
- battle.attacksOnCurrentEnemy = 0; battle.enemyTurnsOnField = 0; // DORM-06 — balls spéciales
+  battle.enemyPoke = wp;
+  battle.enemyMods = { atk: 1, def: 1, spe: 1 };
+  battle.playerMods = { atk: 1, def: 1, spe: 1 };
+  battle.eMoveIdx = 0;
+  battle.escaped = false;
+  battle.attacksOnCurrentEnemy = 0;
+  battle.enemyTurnsOnField = 0; // DORM-06 — balls spéciales
   globalThis.resetEnemyCd();
   globalThis.resetPlayerCd();
-  G.pokedex[battle.enemyPoke.id] = Object.assign({}, G.pokedex[battle.enemyPoke.id] || {}, { seen: true });
+  G.pokedex[battle.enemyPoke.id] = Object.assign({}, G.pokedex[battle.enemyPoke.id] || {}, {
+    seen: true,
+  });
   try {
     const _encShiny = !!(wp.shiny || wp.shinyActive || wp._forceShiny);
-    if (typeof globalThis.recordDexEncounter === 'function') globalThis.recordDexEncounter(wp.id, _encShiny);
-    if (typeof globalThis.recordLocStat === 'function' && G.location) globalThis.recordLocStat(G.location, 'encountered', 1);
+    if (typeof globalThis.recordDexEncounter === 'function')
+      globalThis.recordDexEncounter(wp.id, _encShiny);
+    if (typeof globalThis.recordLocStat === 'function' && G.location)
+      globalThis.recordLocStat(G.location, 'encountered', 1);
   } catch (_) {}
   globalThis.clearBattleLog();
   globalThis.triggerEntryTalents('both');
   globalThis.updateBattleUI();
-  if (wp._isRoaming) globalThis.addBattleLog(globalThis.tr('roaming_legendary_appeared', { name: wp.name }));
-  if (battle.enemyPoke.shiny) globalThis.addBattleLog(`<span class="shiny-tag"></span>${globalThis.tr('wild_pokemon_shiny_appears', { name: battle.enemyPoke.name })}`);
-  else globalThis.addBattleLog(globalThis.tr('wild_pokemon_appears', { name: battle.enemyPoke.name }));
+  if (wp._isRoaming) {
+    globalThis.addBattleLog(globalThis.tr('roaming_legendary_appeared', { name: wp.name }));
+    // V7 · ROAM-01 — session counter read by the offline recap (how many
+    // roamers showed up while the player was away, and which one last).
+    battle.roamerSightings = (battle.roamerSightings || 0) + 1;
+    battle.lastRoamer = {
+      id: Number(wp.id),
+      name: wp.name,
+      level: Number(wp.level || 0),
+      shiny: !!(wp.shiny || wp.shinyActive),
+    };
+  }
+  if (battle.enemyPoke.shiny)
+    globalThis.addBattleLog(
+      `<span class="shiny-tag"></span>${globalThis.tr('wild_pokemon_shiny_appears', { name: battle.enemyPoke.name })}`
+    );
+  else
+    globalThis.addBattleLog(globalThis.tr('wild_pokemon_appears', { name: battle.enemyPoke.name }));
   globalThis.renderMoveButtons();
   globalThis.renderEnemyMoveBars();
   globalThis.renderBattleTeamRow();
@@ -254,9 +286,12 @@ function applyDungeonEncounterTuning(wp, G) {
     // PASSE 39 — avec la carte, plus d'inférence « palier purgé → gardien » :
     // un combat normal ne devient JAMAIS le boss tout seul (retour joueur).
     const flagged = !!(battle && battle.pendingDungeonBoss);
-    const deduced = !run.map
-      && (typeof globalThis.dungeonIsBossFloor === 'function' && globalThis.dungeonIsBossFloor())
-      && (typeof globalThis.dungeonFloorCleared === 'function' && globalThis.dungeonFloorCleared());
+    const deduced =
+      !run.map &&
+      typeof globalThis.dungeonIsBossFloor === 'function' &&
+      globalThis.dungeonIsBossFloor() &&
+      typeof globalThis.dungeonFloorCleared === 'function' &&
+      globalThis.dungeonFloorCleared();
     if (flagged || deduced) {
       if (battle) battle.pendingDungeonBoss = false;
       return applyDungeonBossBuff(wp, run);
@@ -273,7 +308,10 @@ function applyDungeonEncounterTuning(wp, G) {
       const pn = run.pendingNode && run.map && run.map.tiles && run.map.tiles[run.pendingNode];
       elite = !!(pn && pn.type === 'elite');
       miniboss = !!(pn && pn.type === 'boss');
-    } catch (_) { elite = false; miniboss = false; }
+    } catch (_) {
+      elite = false;
+      miniboss = false;
+    }
     if (battle) battle.dungeonElite = elite;
     if (miniboss) {
       const wp3 = applyDungeonFloorScaling(wp, run);
@@ -296,7 +334,9 @@ function applyDungeonEncounterTuning(wp, G) {
       return wp2;
     }
     return applyDungeonFloorScaling(wp, run);
-  } catch (_) { return wp; }
+  } catch (_) {
+    return wp;
+  }
 }
 
 /**
@@ -319,7 +359,9 @@ function _dgBaseStatTotal(id) {
     const d = (typeof globalThis.PD !== 'undefined' ? globalThis.PD : PD)[id];
     if (!d) return 0;
     return (d[3] | 0) + (d[4] | 0) + (d[5] | 0) + (d[6] | 0) + (d[7] | 0) + (d[8] | 0);
-  } catch (_) { return 0; }
+  } catch (_) {
+    return 0;
+  }
 }
 
 /** Dernière évolution connue d'une espèce (chaîne suivie au plus 3 crans).
@@ -341,7 +383,9 @@ function _dgFinalEvolution(id) {
       cur = n;
     }
     return cur;
-  } catch (_) { return id; }
+  } catch (_) {
+    return id;
+  }
 }
 
 /** L'espèce du gardien : le RARE de la faune locale (retour joueur 38f :
@@ -354,18 +398,23 @@ function _dgFinalEvolution(id) {
  *  `[id, nivMin, nivMax, rareté]`, pas d'objets `{id}`. */
 function _dgBossSpecies(G, fallbackId) {
   try {
-    const loc = (typeof globalThis.getLocObj === 'function') ? globalThis.getLocObj(G && G.location) : null;
+    const loc =
+      typeof globalThis.getLocObj === 'function' ? globalThis.getLocObj(G && G.location) : null;
     const wild = loc && Array.isArray(loc.wild) ? loc.wild : null;
     if (!wild || !wild.length) return fallbackId;
     const tuples = wild
-      .map(w => ({
-        id: Number(Array.isArray(w) ? w[0] : (w && w.id != null ? w.id : w)),
-        bucket: String((Array.isArray(w) ? w[3] : (w && w.bucket)) || 'common'),
+      .map((w) => ({
+        id: Number(Array.isArray(w) ? w[0] : w && w.id != null ? w.id : w),
+        bucket: String((Array.isArray(w) ? w[3] : w && w.bucket) || 'common'),
       }))
-      .filter(t => Number.isFinite(t.id) && t.id > 0);
+      .filter((t) => Number.isFinite(t.id) && t.id > 0);
     if (!tuples.length) return fallbackId;
     const hasLabels = tuples.some((t) => t.bucket !== 'common');
-    const pickBest = (list) => list.reduce((best, t) => (_dgBaseStatTotal(t.id) > _dgBaseStatTotal(best.id) ? t : best), list[0]).id;
+    const pickBest = (list) =>
+      list.reduce(
+        (best, t) => (_dgBaseStatTotal(t.id) > _dgBaseStatTotal(best.id) ? t : best),
+        list[0]
+      ).id;
     if (hasLabels) {
       for (const bucket of ['rare', 'uncommon', 'common']) {
         const cand = tuples.filter((t) => t.bucket === bucket);
@@ -375,14 +424,20 @@ function _dgBossSpecies(G, fallbackId) {
     }
     // Table sans étiquette de rareté : l'ancienne règle (faune locale évoluée
     // à fond) pour rester un vrai gardien.
-    let best = tuples[0].id, bestScore = -1;
+    let best = tuples[0].id,
+      bestScore = -1;
     for (const t of tuples) {
       const fin = _dgFinalEvolution(t.id);
       const sc = _dgBaseStatTotal(fin);
-      if (sc > bestScore) { bestScore = sc; best = fin; }
+      if (sc > bestScore) {
+        bestScore = sc;
+        best = fin;
+      }
     }
     return best || fallbackId;
-  } catch (_) { return fallbackId; }
+  } catch (_) {
+    return fallbackId;
+  }
 }
 
 function applyDungeonBossBuff(wp, run) {
@@ -399,7 +454,10 @@ function applyDungeonBossBuff(wp, run) {
     const bossId = _dgBossSpecies(G, wp.id);
     if (bossId && bossId !== wp.id && typeof globalThis.createPoke === 'function') {
       const elite = globalThis.createPoke(bossId, bossLevel, false);
-      if (elite) { elite.shiny = false; wp = elite; }
+      if (elite) {
+        elite.shiny = false;
+        wp = elite;
+      }
     }
   } catch (_) {}
 
@@ -418,7 +476,7 @@ function applyDungeonBossBuff(wp, run) {
   wp._dgBossMods = { atk: 1.5, def: 1.35 };
   wp._dgBossModsApplied = false;
   try {
-    const label = (typeof globalThis.t === 'function') ? globalThis.t('dungeon_boss_prefix') : '';
+    const label = typeof globalThis.t === 'function' ? globalThis.t('dungeon_boss_prefix') : '';
     if (label && label !== 'dungeon_boss_prefix' && !String(wp.name).startsWith(label)) {
       wp.name = label + ' ' + wp.name;
     }
@@ -444,14 +502,19 @@ export function dungeonBossTick() {
     const log = (key) => {
       try {
         if (typeof globalThis.addBattleLog === 'function' && typeof globalThis.tr === 'function') {
-          globalThis.addBattleLog('<span class="pw-red">' + globalThis.tr(key, { name: e.name }) + '</span>');
+          globalThis.addBattleLog(
+            '<span class="pw-red">' + globalThis.tr(key, { name: e.name }) + '</span>'
+          );
         }
       } catch (_) {}
     };
     if (!e._dgBossModsApplied) {
       e._dgBossModsApplied = true;
       const m = e._dgBossMods || { atk: 1.5, def: 1.35 };
-      if (b.enemyMods) { b.enemyMods.atk = m.atk; b.enemyMods.def = m.def; }
+      if (b.enemyMods) {
+        b.enemyMods.atk = m.atk;
+        b.enemyMods.def = m.def;
+      }
       log('dungeon_boss_appears');
       changed = true;
     }
@@ -464,41 +527,67 @@ export function dungeonBossTick() {
       log('dungeon_boss_enrage');
       changed = true;
     }
-  } catch (_) { return false; }
+  } catch (_) {
+    return false;
+  }
   return changed;
 }
 if (typeof globalThis !== 'undefined') globalThis.dungeonBossTick = dungeonBossTick;
 
 export function exploreArea() {
   const G = gameState();
-  if (typeof globalThis.hasActiveTrainingBattle === 'function' && globalThis.hasActiveTrainingBattle()) {
+  if (
+    typeof globalThis.hasActiveTrainingBattle === 'function' &&
+    globalThis.hasActiveTrainingBattle()
+  ) {
     globalThis.notify(globalThis.t('training_in_progress_no_battle'), 'var(--red)');
     return;
   }
-  if (!G || !G.team.length) { globalThis.setMsg(globalThis.t('no_pokemon_in_team')); return; }
+  if (!G || !G.team.length) {
+    globalThis.setMsg(globalThis.t('no_pokemon_in_team'));
+    return;
+  }
   const loc = typeof globalThis.getLocObj === 'function' ? globalThis.getLocObj(G.location) : null;
-  if (!loc || !loc.wild || !loc.wild.length) { globalThis.setMsg(globalThis.t('no_wild_pokemon_here')); return; }
+  if (!loc || !loc.wild || !loc.wild.length) {
+    globalThis.setMsg(globalThis.t('no_wild_pokemon_here'));
+    return;
+  }
   // PASSE 32 — donjons : le péage n'achète plus un accès mais une EXPÉDITION
   // (descente par paliers, sac d'expédition, remontée volontaire). Le péage
   // est donc prélevé UNE FOIS à l'ouverture de la session, plus à chaque
   // exploration ; les combats suivants de la même descente sont gratuits.
   // Voir src/application/world/dungeon-run.js et docs/PROPOSITION-DONJONS.md.
   if (loc.type === 'dungeon') {
-    const hasRun = (typeof globalThis.isDungeonRunAt === 'function') && globalThis.isDungeonRunAt(G.location);
+    const hasRun =
+      typeof globalThis.isDungeonRunAt === 'function' && globalThis.isDungeonRunAt(G.location);
     if (!hasRun) {
       if (typeof globalThis.startDungeonRun === 'function') {
         // Le péage, ses contrôles et sa notification vivent dans startDungeonRun.
         if (!globalThis.startDungeonRun(G.location)) return;
       } else {
-        const toll = (typeof globalThis.dungeonToll === 'function') ? globalThis.dungeonToll(loc.badgeReq || 0) : 0;
+        const toll =
+          typeof globalThis.dungeonToll === 'function'
+            ? globalThis.dungeonToll(loc.badgeReq || 0)
+            : 0;
         if (toll > 0) {
-          const w = (typeof globalThis.ensureWallet === 'function') ? globalThis.ensureWallet() : null;
+          const w =
+            typeof globalThis.ensureWallet === 'function' ? globalThis.ensureWallet() : null;
           if (!w || (w.dungeonTokens || 0) < toll) {
-            globalThis.notify(globalThis.tr('dungeon_toll_blocked', { need: formatNumber(toll), have: (w ? formatNumber((w.dungeonTokens || 0)) : '0') }), 'var(--red)');
+            globalThis.notify(
+              globalThis.tr('dungeon_toll_blocked', {
+                need: formatNumber(toll),
+                have: w ? formatNumber(w.dungeonTokens || 0) : '0',
+              }),
+              'var(--red)'
+            );
             return;
           }
-          if (typeof globalThis.spendDungeonTokens === 'function') globalThis.spendDungeonTokens(toll);
-          globalThis.notify(globalThis.tr('dungeon_toll_paid', { toll: formatNumber(toll) }), 'var(--blue)');
+          if (typeof globalThis.spendDungeonTokens === 'function')
+            globalThis.spendDungeonTokens(toll);
+          globalThis.notify(
+            globalThis.tr('dungeon_toll_paid', { toll: formatNumber(toll) }),
+            'var(--blue)'
+          );
           G.dungeonsExplored = (G.dungeonsExplored || 0) + 1;
         }
       }
@@ -510,10 +599,13 @@ export function exploreArea() {
     // EXCEPTION : quand `dungeonFight()` (déclenché par un clic sur une case
     // combat) appelle exploreArea(), `run.pendingNode` est POSÉ — on laisse
     // alors le combat démarrer, il solde la case à la victoire.
-    if ((typeof globalThis.isDungeonRunAt === 'function') && globalThis.isDungeonRunAt(G.location)) {
+    if (typeof globalThis.isDungeonRunAt === 'function' && globalThis.isDungeonRunAt(G.location)) {
       let _pn = null;
       try {
-        const _run = (typeof globalThis.currentDungeonRun === 'function') ? globalThis.currentDungeonRun() : null;
+        const _run =
+          typeof globalThis.currentDungeonRun === 'function'
+            ? globalThis.currentDungeonRun()
+            : null;
         _pn = _run && _run.pendingNode;
       } catch (_) {}
       if (!_pn) return;
@@ -537,11 +629,15 @@ export function exploreArea() {
  */
 export function startWildBattle() {
   const G = gameState();
-  if (typeof globalThis.hasActiveTrainingBattle === 'function' && globalThis.hasActiveTrainingBattle()) {
+  if (
+    typeof globalThis.hasActiveTrainingBattle === 'function' &&
+    globalThis.hasActiveTrainingBattle()
+  ) {
     globalThis.notify(globalThis.t('training_in_progress_no_battle'), 'var(--red)');
     return;
   }
-  const loc = typeof globalThis.getLocObj === 'function' ? globalThis.getLocObj(G && G.location) : null;
+  const loc =
+    typeof globalThis.getLocObj === 'function' ? globalThis.getLocObj(G && G.location) : null;
   const wild = loc ? loc.wild : null;
   if (!wild || !wild.length || !G || !G.team.length) return;
   const wp = requestWildSpawn('wild-button');
@@ -560,6 +656,3 @@ if (typeof globalThis !== 'undefined') {
   globalThis.exploreArea = exploreArea;
   globalThis.startWildBattle = startWildBattle;
 }
-
-
-

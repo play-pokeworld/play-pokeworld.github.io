@@ -390,12 +390,6 @@ export const L_pokemon_names_fr = [
 "Rayquaza",
 "Jirachi",
 "Deoxys",
-"Morphéo Solaire",
-"Morphéo Eau de Pluie",
-"Morphéo Blizzard",
-"Deoxys Attaque",
-"Deoxys Défense",
-"Deoxys Vitesse",
 ];
 
 // T2 (vague 38) : module ESM — export natif ; la surface classique est

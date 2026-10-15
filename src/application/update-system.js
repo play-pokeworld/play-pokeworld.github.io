@@ -17,11 +17,14 @@ function hashString(s) {
 }
 
 export function initUpdateSystem(checkIntervalMs = 60 * 1000) {
-  if (typeof globalThis.location === 'undefined' || globalThis.location.protocol === 'file:') return;
+  if (typeof globalThis.location === 'undefined' || globalThis.location.protocol === 'file:')
+    return;
 
-  fetchVersionFingerprint().then((fp) => {
-    if (fp) _initialFingerprint = fp;
-  }).catch(() => {});
+  fetchVersionFingerprint()
+    .then((fp) => {
+      if (fp) _initialFingerprint = fp;
+    })
+    .catch(() => {});
 
   if (_updateCheckTimer) clearInterval(_updateCheckTimer);
   _updateCheckTimer = setInterval(checkForAppUpdate, checkIntervalMs);
@@ -46,13 +49,16 @@ async function fetchVersionFingerprint() {
     const res = await fetch(url, {
       method: 'GET',
       cache: 'no-store',
-      headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
+      headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', Pragma: 'no-cache' },
     });
     if (!res.ok) return null;
     const text = await res.text();
     const assetMatch = text.match(/assets\/[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.(?:js|css)/g);
-    const assetStr = (assetMatch && assetMatch.length > 0) ? assetMatch.sort().join('|') : '';
-    const etag = (res.headers.get('ETag') || '').replace(/^W\//i, '').replace(/-(?:gzip|br|deflate)["']?$/i, '"').trim();
+    const assetStr = assetMatch && assetMatch.length > 0 ? assetMatch.sort().join('|') : '';
+    const etag = (res.headers.get('ETag') || '')
+      .replace(/^W\//i, '')
+      .replace(/-(?:gzip|br|deflate)["']?$/i, '"')
+      .trim();
     const lm = (res.headers.get('Last-Modified') || '').trim();
     return `h:${hashString(text)}|len:${text.length}|a:${assetStr}|etag:${etag}|lm:${lm}`;
   } catch (_) {
@@ -121,6 +127,3 @@ if (typeof globalThis !== 'undefined') {
   globalThis.checkForAppUpdate = checkForAppUpdate;
   globalThis.resetUpdateBannerState = resetUpdateBannerState;
 }
-
-
-

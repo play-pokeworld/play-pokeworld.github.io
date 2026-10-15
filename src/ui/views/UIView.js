@@ -160,7 +160,11 @@ export class UIView {
    * @returns {*} vnode
    */
   buildView() {
-    return h('div', { class: 'pw-view', dataset: { view: this.name } }, renderChildren(this.rootEntity));
+    return h(
+      'div',
+      { class: 'pw-view', dataset: { view: this.name } },
+      renderChildren(this.rootEntity)
+    );
   }
 
   /**
@@ -208,9 +212,8 @@ export class UIView {
     this._delegatedHosts.add(host);
     this._delegatedBound = true;
     host.addEventListener('click', (event) => {
-      const target = event.target && event.target.closest
-        ? event.target.closest('[data-pw-eid]')
-        : null;
+      const target =
+        event.target && event.target.closest ? event.target.closest('[data-pw-eid]') : null;
       if (!target || !host.contains(target)) return;
       const entity = this.world.entity(Number(target.dataset.pwEid));
       if (!entity || !entity.active) return;
@@ -231,6 +234,3 @@ export class UIView {
     this.dispose();
   }
 }
-
-
-

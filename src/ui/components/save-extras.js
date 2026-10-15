@@ -31,14 +31,23 @@ import { cx } from './component-utils.js';
  * @returns {*} virtual node
  */
 export function saveContextMenuVNode(model = {}) {
-  return (model.items || []).filter(Boolean).map((it) => h('button', {
-    type: 'button',
-    class: cx('save-context-item',
-      it.intent === 'dl' && 'dl-item',
-      it.intent === 'imp' && 'imp-item',
-      it.intent === 'danger' && 'danger'),
-    dataset: { action: 'legacy-call', call: it.call, callArgs: it.callArgs || '' },
-  }, it.icon ? `${it.icon} ` : '', it.label || ''));
+  return (model.items || []).filter(Boolean).map((it) =>
+    h(
+      'button',
+      {
+        type: 'button',
+        class: cx(
+          'save-context-item',
+          it.intent === 'dl' && 'dl-item',
+          it.intent === 'imp' && 'imp-item',
+          it.intent === 'danger' && 'danger'
+        ),
+        dataset: { action: 'legacy-call', call: it.call, callArgs: it.callArgs || '' },
+      },
+      it.icon ? `${it.icon} ` : '',
+      it.label || ''
+    )
+  );
 }
 
 /** HTML string of the context menu items (classic adapter). @returns {string} */
@@ -61,20 +70,28 @@ export function saveIconGridVNode(model = {}) {
   if (!Array.isArray(model.choices) || !model.choices.length) {
     return h('div', { class: 'save-icon-empty' }, model.emptyLabel || '');
   }
-  return model.choices.filter(Boolean).map((opt) => h('button', {
-    type: 'button',
-    class: cx('save-icon-choice', opt.active && 'active'),
-    dataset: {
-      action: 'legacy-call',
-      call: 'selectSaveProfileIcon',
-      callArgs: `'${opt.key}',${opt.id}`,
-    },
-  },
-    h('span', { class: 'save-icon-sprite' }, h.raw(opt.iconHtml || '')),
-    h('span', { class: 'save-icon-name' }, opt.name || ''),
-    h('small', null,
-      `#${opt.id} · ${opt.levelLabel || ''}${opt.level ?? ''}`,
-      opt.shiny ? ' ★' : '')));
+  return model.choices.filter(Boolean).map((opt) =>
+    h(
+      'button',
+      {
+        type: 'button',
+        class: cx('save-icon-choice', opt.active && 'active'),
+        dataset: {
+          action: 'legacy-call',
+          call: 'selectSaveProfileIcon',
+          callArgs: `'${opt.key}',${opt.id}`,
+        },
+      },
+      h('span', { class: 'save-icon-sprite' }, h.raw(opt.iconHtml || '')),
+      h('span', { class: 'save-icon-name' }, opt.name || ''),
+      h(
+        'small',
+        null,
+        `#${opt.id} · ${opt.levelLabel || ''}${opt.level ?? ''}`,
+        opt.shiny ? ' ★' : ''
+      )
+    )
+  );
 }
 
 /** HTML string of the icon grid (classic adapter). @returns {string} */
@@ -92,9 +109,12 @@ export function saveIconGridHTML(model = {}) {
 export function saveProfileCurrentIconVNode(model = {}) {
   return [
     h('span', { class: 'save-slot-icon' }, h.raw(model.iconHtml || '')),
-    h('span', { class: 'save-profile-icon-current-label' },
+    h(
+      'span',
+      { class: 'save-profile-icon-current-label' },
       h('span', null, model.name || ''),
-      h('small', null, model.id ? `#${model.id}` : (model.noIdLabel || ''))),
+      h('small', null, model.id ? `#${model.id}` : model.noIdLabel || '')
+    ),
   ];
 }
 
@@ -102,6 +122,3 @@ export function saveProfileCurrentIconVNode(model = {}) {
 export function saveProfileCurrentIconHTML(model = {}) {
   return toHTMLString(saveProfileCurrentIconVNode(model));
 }
-
-
-

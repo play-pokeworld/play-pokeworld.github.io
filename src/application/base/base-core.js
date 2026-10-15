@@ -16,21 +16,23 @@
 // Wave 43 — lazy cross-module links (P7 regression fix):
 // zero static imports (chunks + VM harness isolates frozen); each alias resolves
 // AT CALL TIME — engine registry first, then the global surface (VM harness).
-const __pwV43Link = (n) => ((typeof PokeActions !== 'undefined' && PokeActions && typeof PokeActions.get === 'function') ? PokeActions.get(n) : null)
-  || (typeof globalThis !== 'undefined' ? globalThis[n] : null) || null;
-function baseItemFootprint(...args) { const f = __pwV43Link('baseItemFootprint'); return f ? f(...args) : undefined; }
-function baseItemGet(...args) { const f = __pwV43Link('baseItemGet'); return f ? f(...args) : undefined; }
-function baseItemMigrate(...args) { const f = __pwV43Link('baseItemMigrate'); return f ? f(...args) : undefined; }
-function baseItemRotCount(...args) { const f = __pwV43Link('baseItemRotCount'); return f ? f(...args) : undefined; }
-function baseItemRotNormalize(...args) { const f = __pwV43Link('baseItemRotNormalize'); return f ? f(...args) : undefined; }
-function baseLayoutGet(...args) { const f = __pwV43Link('baseLayoutGet'); return f ? f(...args) : undefined; }
+// V7 · DBT-05 — plus de liens tardifs : les données de la base sont des
+// modules statiques (main.js les importe avant tout écran différé).
+import {
+  baseItemFootprint,
+  baseItemGet,
+  baseItemMigrate,
+  baseItemRotCount,
+  baseItemRotNormalize,
+} from '../../data/base-items-data.js';
+import { baseLayoutGet } from '../../data/base-layouts-data.js';
 
 const _BASE_DEFAULT_LAYOUT = 'cave_1'; // phase 37: GBA canonical forms
 
 function baseCreateDefault() {
   return {
-    layoutId: null,           // null = no base created for the moment
-    routeId: null,            // route of Hoenn ou the base is etablie
+    layoutId: null, // null = no base created for the moment
+    routeId: null, // route of Hoenn ou the base is etablie
     items: [],
     stock: {},
     npcs: [],
@@ -38,7 +40,7 @@ function baseCreateDefault() {
     spawn: null,
     uidSeq: 1,
     record: { w: 0, l: 0, visits: 0 },
-    pcMessage: '',            // message custom of the PC for visitors (flag)
+    pcMessage: '', // message custom of the PC for visitors (flag)
   };
 }
 
@@ -65,7 +67,9 @@ function baseGetState() {
 }
 
 // ——— Stock ————————————————————————————————————————————————————————————————
-function baseStockCount(st, slug) { return Math.max(0, (st.stock && st.stock[slug]) || 0); }
+function baseStockCount(st, slug) {
+  return Math.max(0, (st.stock && st.stock[slug]) || 0);
+}
 function baseStockAdd(st, slug, n) {
   if (!baseItemGet(slug) || !n) return 0;
   st.stock[slug] = baseStockCount(st, slug) + n;
@@ -76,7 +80,8 @@ function baseStockRemove(st, slug, n) {
   const take = Math.min(have, n || 1);
   if (take <= 0) return 0;
   const left = have - take;
-  if (left > 0) st.stock[slug] = left; else delete st.stock[slug];
+  if (left > 0) st.stock[slug] = left;
+  else delete st.stock[slug];
   return take;
 }
 
@@ -93,7 +98,8 @@ function baseBuildGrid(st) {
     const fp = baseItemFootprint(def, it.rot);
     for (let dy = 0; dy < fp.d; dy++) {
       for (let dx = 0; dx < fp.w; dx++) {
-        const x = it.x + dx, y = it.y + dy;
+        const x = it.x + dx,
+          y = it.y + dy;
         if (y >= 0 && y < layout.h && x >= 0 && x < layout.w) occ[y][x] = it.uid;
       }
     }
@@ -101,7 +107,10 @@ function baseBuildGrid(st) {
   for (const n of st.npcs) {
     if (n.x == null || n.y == null || !occ[n.y]) continue;
     const cur = occ[n.y][n.x];
-    if (cur == null) { occ[n.y][n.x] = 'npc:' + n.id; continue; }
+    if (cur == null) {
+      occ[n.y][n.x] = 'npc:' + n.id;
+      continue;
+    }
     // a NPC can stand on a walkable item (rug…): it takes priority.
     if (typeof cur === 'number') {
       const it = basePlacedFind(st, cur);
@@ -111,7 +120,9 @@ function baseBuildGrid(st) {
   return { layout, occ };
 }
 
-function baseCellAt(grid, x, y) { return (grid && grid.layout.cells[y]) ? grid.layout.cells[y][x] : null; }
+function baseCellAt(grid, x, y) {
+  return grid && grid.layout.cells[y] ? grid.layout.cells[y][x] : null;
+}
 
 // CARRIER furniture (floor layer with a surface, e.g. rug/desk) covering
 // cell (x,y) — independent of occ, because a "surface" item may be
@@ -175,9 +186,9 @@ function baseZoneDefAt(st, x, y) {
     const def = baseItemGet(it.s);
     if (!def) continue;
     const fp = baseItemFootprint(def, it.rot);
-    const over = def.over | 0;                 // top rows outside the footprint
-    const top = it.y - over;                   // 1st DRAWN row
-    const dep = fp.d + over;                   // total drawn height
+    const over = def.over | 0; // top rows outside the footprint
+    const top = it.y - over; // 1st DRAWN row
+    const dep = fp.d + over; // total drawn height
     if (x < it.x || x >= it.x + fp.w || y < top || y >= top + dep) continue;
     return { it, fp: { w: fp.w, d: dep }, dx: x - it.x, dy: y - top, over };
   }
@@ -193,7 +204,7 @@ function baseZoneDefAt(st, x, y) {
 function baseZoneTopAt(st, x, y) {
   const z = baseZoneDefAt(st, x, y);
   if (!z) return null;
-  if (z.it.s === 'stand') return (z.dy === 0) ? z.it : null;
+  if (z.it.s === 'stand') return z.dy === 0 ? z.it : null;
   // Slide (dy relative to the DRAWN shape, cf. baseZoneDefAt):
   //   dy 0 = housing (VISUAL overhang)
   //   dy 1 = landing + ramp head (perched)
@@ -260,7 +271,7 @@ function baseSlideRampAt(st, x, y) {
   const z = baseZoneDefAt(st, x, y);
   if (!z || z.it.s !== 'slide') return null;
   // Right column, anywhere above the rug: stepping on it = slide
-  return (z.dx === 1 && z.dy >= 1 && z.dy < z.fp.d - 1) ? z.it : null;
+  return z.dx === 1 && z.dy >= 1 && z.dy < z.fp.d - 1 ? z.it : null;
 }
 
 // Is a top↔floor transition allowed? Canon: you only climb on/off a
@@ -269,7 +280,7 @@ function baseSlideRampAt(st, x, y) {
 // the top (from the landing or by going down the slide); climbing onto it
 // from the rug or reaching it sideways from the stairs is impossible.
 function baseZoneGateOK(st, x, y, nx, ny) {
-  const ramp = (typeof baseSlideRampAt === 'function') ? baseSlideRampAt(st, nx, ny) : null;
+  const ramp = typeof baseSlideRampAt === 'function' ? baseSlideRampAt(st, nx, ny) : null;
   if (ramp) {
     const from = baseZoneDefAt(st, x, y);
     // Phase 50: the slide is only approached from the top of the slide —
@@ -284,10 +295,10 @@ function baseZoneGateOK(st, x, y, nx, ny) {
   const aTop = baseZoneTopAt(st, x, y);
   const bTop = baseZoneTopAt(st, nx, ny);
   if (aTop && bTop) return aTop.uid === bTop.uid; // top↔top: same item
-  if (!aTop && !bTop) return true;                // floor↔floor: free
+  if (!aTop && !bTop) return true; // floor↔floor: free
   const top = aTop || bTop;
   const stairAt = aTop ? baseZoneStairAt(st, nx, ny) : baseZoneStairAt(st, x, y);
-  return !!(stairAt && stairAt.uid === top.uid);  // only via the integrated stairs
+  return !!(stairAt && stairAt.uid === top.uid); // only via the integrated stairs
 }
 
 // Cell walkable on foot at the given elevation (cross-elevation moves are
@@ -310,7 +321,7 @@ function baseCellWalkable(st, grid, x, y, elev) {
   if (typeof baseZoneTopAt === 'function' && baseZoneTopAt(st, x, y)) {
     if (typeof baseZoneBlockedAt === 'function' && baseZoneBlockedAt(st, x, y)) return false;
     const uidTop = grid.occ[y] && grid.occ[y][x];
-    if (typeof uidTop === 'string') return false;   // an NPC blocks its cell
+    if (typeof uidTop === 'string') return false; // an NPC blocks its cell
     return true;
   }
 
@@ -351,8 +362,15 @@ function baseReachableSet(st, grid, sx, sy) {
   seen.add(sx + ',' + sy);
   while (q.length) {
     const [cx, cy] = q.pop();
-    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-      const nx = cx + dx, ny = cy + dy, k = nx + ',' + ny;
+    for (const [dx, dy] of [
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ]) {
+      const nx = cx + dx,
+        ny = cy + dy,
+        k = nx + ',' + ny;
       let walkable = baseCellWalkable(st, grid, nx, ny, null);
       // Stairs: a cliff becomes walkable if stairs are anchored there
       // (otherwise the high spawn would make every placement "blocking").
@@ -403,7 +421,8 @@ function baseCanPlace(st, slug, x, y, rot, opts) {
 
   // Effective origin (top-left corner of the footprint) — stairs are
   // placed by their ANCHOR (canonical bottom row) then normalized.
-  let px = x, py = y;
+  let px = x,
+    py = y;
 
   // Special case: stairs -> only on a layout anchor; they
   // cover the cliff to the north (floor/cliff cells, never occupied).
@@ -423,11 +442,19 @@ function baseCanPlace(st, slug, x, y, rot, opts) {
     // either anchor of the pair aligns the placed item at its start.
     {
       let start = px;
-      while (start > 0 && baseCellAt(grid, start - 1, ay) && baseCellAt(grid, start - 1, ay).stairAnchor) start--;
+      while (
+        start > 0 &&
+        baseCellAt(grid, start - 1, ay) &&
+        baseCellAt(grid, start - 1, ay).stairAnchor
+      )
+        start--;
       let run = true;
       for (let dx = 0; dx < fp.w; dx++) {
         const c = baseCellAt(grid, start + dx, ay);
-        if (!(c && c.stairAnchor)) { run = false; break; }
+        if (!(c && c.stairAnchor)) {
+          run = false;
+          break;
+        }
       }
       if (run) px = start;
     }
@@ -438,18 +465,20 @@ function baseCanPlace(st, slug, x, y, rot, opts) {
     }
     for (let dy = 0; dy < fp.d; dy++) {
       for (let dx = 0; dx < fp.w; dx++) {
-        const cx = px + dx, cy = py + dy;
+        const cx = px + dx,
+          cy = py + dy;
         const cell = baseCellAt(grid, cx, cy);
         if (!cell) return { ok: false, reason: 'base.err.out_of_bounds' };
-        if (cell.t !== 'floor' && cell.t !== 'cliff') return { ok: false, reason: 'base.err.floor_only' };
+        if (cell.t !== 'floor' && cell.t !== 'cliff')
+          return { ok: false, reason: 'base.err.floor_only' };
         if (cell.entrance) return { ok: false, reason: 'base.err.entrance' };
         if (grid.occ[cy][cx] != null) return { ok: false, reason: 'base.err.occupied' };
       }
     }
-  // Phase 42 — legacy feature update
-  // placeable ANYWHERE — it fills a hole (its primary purpose) or
-  // on bare floor (decorative path, play area for dolls). Rules
-  // kept: each tile must be floor|hole, free, outside entrance/spawn.
+    // Phase 42 — legacy feature update
+    // placeable ANYWHERE — it fills a hole (its primary purpose) or
+    // on bare floor (decorative path, play area for dolls). Rules
+    // kept: each tile must be floor|hole, free, outside entrance/spawn.
   } else if (def.fx === 'board') {
     for (let dy = 0; dy < fp.d; dy++) {
       const c = baseCellAt(grid, x, y + dy);
@@ -462,11 +491,13 @@ function baseCanPlace(st, slug, x, y, rot, opts) {
     // Footprint within bounds + layer rules.
     for (let dy = 0; dy < fp.d; dy++) {
       for (let dx = 0; dx < fp.w; dx++) {
-        const cx = px + dx, cy = py + dy;
+        const cx = px + dx,
+          cy = py + dy;
         const cell = baseCellAt(grid, cx, cy);
         if (!cell) return { ok: false, reason: 'base.err.out_of_bounds' };
         if (def.layer === 'wall') {
-          if (cell.t !== 'wall' && cell.t !== 'cliff') return { ok: false, reason: 'base.err.wall_only' };
+          if (cell.t !== 'wall' && cell.t !== 'cliff')
+            return { ok: false, reason: 'base.err.wall_only' };
           if (grid.occ[cy][cx] != null) return { ok: false, reason: 'base.err.occupied' };
         } else if (def.layer === 'surface') {
           // Phase 39 (user decision): dolls/cushions can also be placed
@@ -474,10 +505,13 @@ function baseCanPlace(st, slug, x, y, rot, opts) {
           // item per cell (carrier or floor), entrance/forbidden cells preserved.
           if (cell.t !== 'floor') return { ok: false, reason: 'base.err.surface_only' };
           if (cell.entrance || cell.spawnPt) return { ok: false, reason: 'base.err.entrance' };
-          if (baseSurfaceAt(st, cx, cy, ignoreUid)) return { ok: false, reason: 'base.err.surface_taken' };
+          if (baseSurfaceAt(st, cx, cy, ignoreUid))
+            return { ok: false, reason: 'base.err.surface_taken' };
           const carrier = baseCarrierAt(st, cx, cy, ignoreUid);
-          if (!carrier && grid.occ[cy][cx] != null) return { ok: false, reason: 'base.err.occupied' };
-        } else { // floor
+          if (!carrier && grid.occ[cy][cx] != null)
+            return { ok: false, reason: 'base.err.occupied' };
+        } else {
+          // floor
           if (cell.t !== 'floor') return { ok: false, reason: 'base.err.floor_only' };
           if (cell.stairAnchor) return { ok: false, reason: 'base.err.stairs_anchor' };
           if (cell.entrance) return { ok: false, reason: 'base.err.entrance' };
@@ -506,15 +540,19 @@ function baseCanPlace(st, slug, x, y, rot, opts) {
       for (let dx = 0; dx < fp.w; dx++) {
         const c = baseCellAt(grid, px + dx, py);
         const s = baseCellAt(grid, px + dx, py + fp.d);
-        if (!c || (c.t !== 'wall' && c.t !== 'cliff')) return { ok: false, reason: 'base.err.wall_only' };
+        if (!c || (c.t !== 'wall' && c.t !== 'cliff'))
+          return { ok: false, reason: 'base.err.wall_only' };
         if (!s || s.t !== 'floor') return { ok: false, reason: 'base.err.wall_only' };
       }
     }
   }
 
   // Limit canonical : 26 items poses (outside rug of bienvenue automatique).
-  const placedCount = st.items.filter((i) => baseItemGet(i.s) && baseItemGet(i.s).acq !== 'auto').length;
-  if (def.acq !== 'auto' && placedCount >= BASE_ITEM_MAX_PLACED) return { ok: false, reason: 'base.err.max_placed' };
+  const placedCount = st.items.filter(
+    (i) => baseItemGet(i.s) && baseItemGet(i.s).acq !== 'auto'
+  ).length;
+  if (def.acq !== 'auto' && placedCount >= BASE_ITEM_MAX_PLACED)
+    return { ok: false, reason: 'base.err.max_placed' };
 
   // Anti-blocking: the entrance must always reach the spawn, the PC and each NPC.
   const hypo = baseWithPlaced(st, { uid: -1, s: slug, x: px, y: py, rot });
@@ -526,13 +564,21 @@ function baseCanPlace(st, slug, x, y, rot, opts) {
     for (const n of hypo.npcs) {
       if (n.x == null) continue;
       let okAdj = false;
-      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-        if (reach.has((n.x + dx) + ',' + (n.y + dy))) { okAdj = true; break; }
+      for (const [dx, dy] of [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ]) {
+        if (reach.has(n.x + dx + ',' + (n.y + dy))) {
+          okAdj = true;
+          break;
+        }
       }
       if (!okAdj) return { ok: false, reason: 'base.err.blocks_npc' };
     }
     // verifies that the PC remains accessible same when on placed other chose that the PC
-    const pcIt = hypo.items.find(i => i.s === 'pc');
+    const pcIt = hypo.items.find((i) => i.s === 'pc');
     if (pcIt) {
       let pcAdj = false;
       const pcDef = baseItemGet('pc');
@@ -540,7 +586,7 @@ function baseCanPlace(st, slug, x, y, rot, opts) {
       for (let dy = -1; dy <= pcFp.d && !pcAdj; dy++) {
         for (let dx = -1; dx <= pcFp.w && !pcAdj; dx++) {
           if (dx >= 0 && dx < pcFp.w && dy >= 0 && dy < pcFp.d) continue;
-          if (reach.has((pcIt.x + dx) + ',' + (pcIt.y + dy))) pcAdj = true;
+          if (reach.has(pcIt.x + dx + ',' + (pcIt.y + dy))) pcAdj = true;
         }
       }
       if (!pcAdj) return { ok: false, reason: 'base.err.pc_unreachable' };
@@ -551,14 +597,18 @@ function baseCanPlace(st, slug, x, y, rot, opts) {
       for (let dy = -1; dy <= fp.d && !adj; dy++) {
         for (let dx = -1; dx <= fp.w && !adj; dx++) {
           if (dx >= 0 && dx < fp.w && dy >= 0 && dy < fp.d) continue;
-          if (reach.has((px + dx) + ',' + (py + dy))) adj = true;
+          if (reach.has(px + dx + ',' + (py + dy))) adj = true;
         }
       }
       if (!adj) return { ok: false, reason: 'base.err.pc_unreachable' };
     }
   }
   // Phase 40: a item automatique is unique by base (not of 2e PC placed).
-  if (def.acq === 'auto' && ignoreUid == null && st.items.some((i) => i.s === slug && i.uid !== st._moveUid)) {
+  if (
+    def.acq === 'auto' &&
+    ignoreUid == null &&
+    st.items.some((i) => i.s === slug && i.uid !== st._moveUid)
+  ) {
     return { ok: false, reason: 'base.err.already_placed' };
   }
   return { ok: true, rot, x: px, y: py };
@@ -567,7 +617,8 @@ function baseCanPlace(st, slug, x, y, rot, opts) {
 // ——— Placed / ramassage / rotation ———————————————————————————————————————————
 function basePlace(st, slug, x, y, rot, opts) {
   opts = opts || {};
-  if (!opts.free && baseStockCount(st, slug) <= 0) return { ok: false, reason: 'base.err.not_in_stock' };
+  if (!opts.free && baseStockCount(st, slug) <= 0)
+    return { ok: false, reason: 'base.err.not_in_stock' };
   const chk = baseCanPlace(st, slug, x, y, rot, opts);
   if (!chk.ok) return chk;
   if (!opts.free) baseStockRemove(st, slug, 1);
@@ -586,10 +637,16 @@ function basePickup(st, uid) {
   if (d0 && d0.acq === 'auto') return 0;
   const def = baseItemGet(st.items[idx].s);
   let back = 0;
-  if (def && def.acq !== 'auto') { baseStockAdd(st, st.items[idx].s, 1); back++; }
+  if (def && def.acq !== 'auto') {
+    baseStockAdd(st, st.items[idx].s, 1);
+    back++;
+  }
   const carrierCells = [];
   const fp = def ? baseItemFootprint(def, st.items[idx].rot) : null;
-  if (fp) for (let dy = 0; dy < fp.d; dy++) for (let dx = 0; dx < fp.w; dx++) carrierCells.push([st.items[idx].x + dx, st.items[idx].y + dy]);
+  if (fp)
+    for (let dy = 0; dy < fp.d; dy++)
+      for (let dx = 0; dx < fp.w; dx++)
+        carrierCells.push([st.items[idx].x + dx, st.items[idx].y + dy]);
   st.items.splice(idx, 1);
   // "Surface" items that were resting on it and are no longer valid:
   // they go back to stock (phase 39 — validated with ignoreUid so each
@@ -678,13 +735,19 @@ function baseRelocate(st, newLayoutId) {
   const pspot = basePcSpot(lay2, st);
   if (pspot) {
     if (!pc) st.items.push({ uid: st.uidSeq++, s: 'pc', x: pspot.x, y: pspot.y, rot: 0 });
-    else { pc.x = pspot.x; pc.y = pspot.y; pc.rot = 0; }
+    else {
+      pc.x = pspot.x;
+      pc.y = pspot.y;
+      pc.rot = 0;
+    }
   }
   return { ok: true };
 }
 
 // Initial creation (explicit alias).
-function baseCreate(st, layoutId) { return baseRelocate(st, layoutId); }
+function baseCreate(st, layoutId) {
+  return baseRelocate(st, layoutId);
+}
 
 // ——— "Secret buddy" NPCs ———————————————————————————————————————————————
 // team = [{id,level,moves:[..],talent,shiny}] (self-contained snapshot —
@@ -696,20 +759,23 @@ function baseNpcAdd(st, def) {
     return { ok: false, reason: 'base.err.npc_team' };
   }
   const npc = {
-    id: 'n' + (baseNpcSeq++) + '_' + Date.now().toString(36),
+    id: 'n' + baseNpcSeq++ + '_' + Date.now().toString(36),
     name: String(def.name || '').slice(0, 18) || 'Copain',
     sprite: String(def.sprite || 'youngster'),
     team: def.team.slice(0, 6).map((p) => ({
-      id: p.id | 0, level: Math.min(100, Math.max(1, p.level | 0)),
+      id: p.id | 0,
+      level: Math.min(100, Math.max(1, p.level | 0)),
       moves: Array.isArray(p.moves) ? p.moves.slice(0, 4) : [],
-      talent: p.talent || null, shiny: !!p.shiny,
+      talent: p.talent || null,
+      shiny: !!p.shiny,
     })),
     msgs: {
       pre: String((def.msgs && def.msgs.pre) || '').slice(0, 80),
       win: String((def.msgs && def.msgs.win) || '').slice(0, 80),
       lose: String((def.msgs && def.msgs.lose) || '').slice(0, 80),
     },
-    x: null, y: null,
+    x: null,
+    y: null,
   };
   st.npcStock.push(npc);
   return { ok: true, id: npc.id };
@@ -751,15 +817,15 @@ function baseNpcPlace(st, npcId, x, y) {
   const sp = st.spawn || layout.spawn;
   if (sp && !reach.has(sp.x + ',' + sp.y)) return { ok: false, reason: 'base.err.blocks_spawn' };
   // PC must stay reachable
-  const pcIt = hypo.items.find(it => it.s === 'pc');
+  const pcIt = hypo.items.find((it) => it.s === 'pc');
   if (pcIt) {
     let pcAdj = false;
     const pcDef = baseItemGet('pc');
-    const pcFp = pcDef ? baseItemFootprint(pcDef, pcIt.rot) : { w:1, d:1 };
-    for (let dy=-1; dy<=pcFp.d && !pcAdj; dy++) {
-      for (let dx=-1; dx<=pcFp.w && !pcAdj; dx++) {
-        if (dx>=0 && dx<pcFp.w && dy>=0 && dy<pcFp.d) continue;
-        if (reach.has((pcIt.x+dx)+','+(pcIt.y+dy))) pcAdj = true;
+    const pcFp = pcDef ? baseItemFootprint(pcDef, pcIt.rot) : { w: 1, d: 1 };
+    for (let dy = -1; dy <= pcFp.d && !pcAdj; dy++) {
+      for (let dx = -1; dx <= pcFp.w && !pcAdj; dx++) {
+        if (dx >= 0 && dx < pcFp.w && dy >= 0 && dy < pcFp.d) continue;
+        if (reach.has(pcIt.x + dx + ',' + (pcIt.y + dy))) pcAdj = true;
       }
     }
     if (!pcAdj) return { ok: false, reason: 'base.err.pc_unreachable' };
@@ -768,14 +834,23 @@ function baseNpcPlace(st, npcId, x, y) {
   for (const n of st.npcs) {
     if (n.x == null) continue;
     let okAdj = false;
-    for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) {
-      if (reach.has((n.x+dx)+','+(n.y+dy))) { okAdj = true; break; }
+    for (const [dx, dy] of [
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ]) {
+      if (reach.has(n.x + dx + ',' + (n.y + dy))) {
+        okAdj = true;
+        break;
+      }
     }
     if (!okAdj) return { ok: false, reason: 'base.err.blocks_npc' };
   }
 
   const npc = st.npcStock.splice(i, 1)[0];
-  npc.x = x; npc.y = y;
+  npc.x = x;
+  npc.y = y;
   st.npcs.push(npc);
   return { ok: true };
 }
@@ -784,7 +859,8 @@ function baseNpcPickup(st, npcId) {
   const i = st.npcs.findIndex((n) => n.id === npcId);
   if (i < 0) return false;
   const npc = st.npcs.splice(i, 1)[0];
-  npc.x = null; npc.y = null;
+  npc.x = null;
+  npc.y = null;
   st.npcStock.push(npc);
   return true;
 }
@@ -800,35 +876,127 @@ export const BASE_NPC_MAX = 8;
 // trainer-N.png files). We expose a varied selection; the identity
 // key is the file name, which makes rendering direct and bake-free.
 export const BASE_NPC_SPRITES = [
-  'trainer-0','trainer-1','trainer-2','trainer-3','trainer-4','trainer-5','trainer-6','trainer-7','trainer-8','trainer-9',
-  'trainer-10','trainer-11','trainer-12','trainer-13','trainer-14','trainer-15','trainer-16','trainer-17','trainer-18','trainer-19',
-  'trainer-20','trainer-21','trainer-22','trainer-23','trainer-24','trainer-25','trainer-26','trainer-27','trainer-28','trainer-29',
-  'trainer-30','trainer-31','trainer-32','trainer-33','trainer-34','trainer-35','trainer-36','trainer-37','trainer-38','trainer-39',
-  'trainer-40','trainer-41','trainer-42','trainer-43','trainer-44','trainer-45','trainer-46','trainer-47','trainer-48','trainer-49',
-  'trainer-50','trainer-51','trainer-52','trainer-53','trainer-54','trainer-55','trainer-56','trainer-57','trainer-58','trainer-59',
-  'trainer-60','trainer-61','trainer-62','trainer-63','trainer-64','trainer-65','trainer-66','trainer-67','trainer-68','trainer-69',
-  'trainer-70','trainer-71','trainer-72','trainer-73','trainer-74','trainer-75','trainer-76','trainer-77','trainer-78','trainer-79',
-  'trainer-80','trainer-81','trainer-82','trainer-83','trainer-84','trainer-85','trainer-86','trainer-87','trainer-88','trainer-89',
-  'trainer-90','trainer-91','trainer-92','trainer-93','trainer-94','trainer-95','trainer-96','trainer-97','trainer-98','trainer-99',
+  'trainer-0',
+  'trainer-1',
+  'trainer-2',
+  'trainer-3',
+  'trainer-4',
+  'trainer-5',
+  'trainer-6',
+  'trainer-7',
+  'trainer-8',
+  'trainer-9',
+  'trainer-10',
+  'trainer-11',
+  'trainer-12',
+  'trainer-13',
+  'trainer-14',
+  'trainer-15',
+  'trainer-16',
+  'trainer-17',
+  'trainer-18',
+  'trainer-19',
+  'trainer-20',
+  'trainer-21',
+  'trainer-22',
+  'trainer-23',
+  'trainer-24',
+  'trainer-25',
+  'trainer-26',
+  'trainer-27',
+  'trainer-28',
+  'trainer-29',
+  'trainer-30',
+  'trainer-31',
+  'trainer-32',
+  'trainer-33',
+  'trainer-34',
+  'trainer-35',
+  'trainer-36',
+  'trainer-37',
+  'trainer-38',
+  'trainer-39',
+  'trainer-40',
+  'trainer-41',
+  'trainer-42',
+  'trainer-43',
+  'trainer-44',
+  'trainer-45',
+  'trainer-46',
+  'trainer-47',
+  'trainer-48',
+  'trainer-49',
+  'trainer-50',
+  'trainer-51',
+  'trainer-52',
+  'trainer-53',
+  'trainer-54',
+  'trainer-55',
+  'trainer-56',
+  'trainer-57',
+  'trainer-58',
+  'trainer-59',
+  'trainer-60',
+  'trainer-61',
+  'trainer-62',
+  'trainer-63',
+  'trainer-64',
+  'trainer-65',
+  'trainer-66',
+  'trainer-67',
+  'trainer-68',
+  'trainer-69',
+  'trainer-70',
+  'trainer-71',
+  'trainer-72',
+  'trainer-73',
+  'trainer-74',
+  'trainer-75',
+  'trainer-76',
+  'trainer-77',
+  'trainer-78',
+  'trainer-79',
+  'trainer-80',
+  'trainer-81',
+  'trainer-82',
+  'trainer-83',
+  'trainer-84',
+  'trainer-85',
+  'trainer-86',
+  'trainer-87',
+  'trainer-88',
+  'trainer-89',
+  'trainer-90',
+  'trainer-91',
+  'trainer-92',
+  'trainer-93',
+  'trainer-94',
+  'trainer-95',
+  'trainer-96',
+  'trainer-97',
+  'trainer-98',
+  'trainer-99',
   'trainer-100',
 ];
 export const BASE_NPC_SPRITE_DEFAULT = 'trainer-0';
 // Portrait path for a look (identical on the render side and the UI side).
 function baseNpcSpriteUrl(sprite) {
-  const s = (BASE_NPC_SPRITES.indexOf(sprite) >= 0) ? sprite : BASE_NPC_SPRITE_DEFAULT;
+  const s = BASE_NPC_SPRITES.indexOf(sprite) >= 0 ? sprite : BASE_NPC_SPRITE_DEFAULT;
   return 'src/assets/images/trainers/profil/' + s + '.png';
 }
 
 function baseNpcFind(st, npcId) {
-  return (st.npcs || []).find((n) => n.id === npcId)
-      || (st.npcStock || []).find((n) => n.id === npcId)
-      || null;
+  return (
+    (st.npcs || []).find((n) => n.id === npcId) ||
+    (st.npcStock || []).find((n) => n.id === npcId) ||
+    null
+  );
 }
 
 function baseNpcCount(st) {
   // Requested fix: only count placed NPCs; stock is empty at load
   // to avoid the invisible pool that blocked the creator (x0)
-  return ((st.npcs || []).length);
+  return (st.npcs || []).length;
 }
 
 // Normalizes a player-entered team → FROZEN SNAPSHOT.
@@ -843,7 +1011,12 @@ function baseNpcNormalizeTeam(team) {
     out.push({
       id,
       level: Math.min(100, Math.max(1, (p && p.level) | 0 || 5)),
-      moves: Array.isArray(p && p.moves) ? p.moves.map((m) => (m && m.id) || m).filter(Boolean).slice(0, 4) : [],
+      moves: Array.isArray(p && p.moves)
+        ? p.moves
+            .map((m) => (m && m.id) || m)
+            .filter(Boolean)
+            .slice(0, 4)
+        : [],
       talent: (p && p.talent) || null,
       shiny: !!(p && p.shiny),
       // Phase 47: NPC held item (copy, never removed from the inventory)
@@ -859,11 +1032,19 @@ function baseNpcCreate(st, def) {
   if (!st) return { ok: false, reason: 'base.err.no_base' };
   if (baseNpcCount(st) >= BASE_NPC_MAX) return { ok: false, reason: 'base.err.npc_max' };
   const team = baseNpcNormalizeTeam(def && def.team);
-  const sprite = BASE_NPC_SPRITES.includes(def && def.sprite) ? def.sprite : BASE_NPC_SPRITE_DEFAULT;
+  const sprite = BASE_NPC_SPRITES.includes(def && def.sprite)
+    ? def.sprite
+    : BASE_NPC_SPRITE_DEFAULT;
   // Phase 47: a FRESHLY PLACED NPC may have an empty team — it is
   // decoration until the player configures it ("Edit" button). Only
   // the battle requires a team (baseVisitInteract checks it).
-  return baseNpcAdd(st, { name: (def && def.name) || '', sprite, team, msgs: (def && def.msgs) || {}, allowEmpty: true });
+  return baseNpcAdd(st, {
+    name: (def && def.name) || '',
+    sprite,
+    team,
+    msgs: (def && def.msgs) || {},
+    allowEmpty: true,
+  });
 }
 
 // Phase 47 — DIRECT PLACEMENT of an NPC, like any furniture (user
@@ -873,7 +1054,10 @@ function baseNpcPlaceNew(st, x, y, def) {
   const res = baseNpcCreate(st, def || {});
   if (!res.ok) return res;
   const put = baseNpcPlace(st, res.id, x, y);
-  if (!put.ok) { baseNpcDelete(st, res.id); return put; }
+  if (!put.ok) {
+    baseNpcDelete(st, res.id);
+    return put;
+  }
   return { ok: true, id: res.id };
 }
 
@@ -886,7 +1070,7 @@ function baseNpcUpdate(st, npcId, patch) {
   if (patch.sprite != null && BASE_NPC_SPRITES.includes(patch.sprite)) npc.sprite = patch.sprite;
   if (patch.team != null) {
     npc.team = baseNpcNormalizeTeam(patch.team);
-    npc.rosterKey = null;  // team edited by hand
+    npc.rosterKey = null; // team edited by hand
   }
   if (patch.msgs) {
     npc.msgs = {
@@ -901,9 +1085,15 @@ function baseNpcUpdate(st, npcId, patch) {
 // Definitive deletion (removed from the room and from the pool).
 function baseNpcDelete(st, npcId) {
   const a = (st.npcs || []).findIndex((n) => n.id === npcId);
-  if (a >= 0) { st.npcs.splice(a, 1); return true; }
+  if (a >= 0) {
+    st.npcs.splice(a, 1);
+    return true;
+  }
   const b = (st.npcStock || []).findIndex((n) => n.id === npcId);
-  if (b >= 0) { st.npcStock.splice(b, 1); return true; }
+  if (b >= 0) {
+    st.npcStock.splice(b, 1);
+    return true;
+  }
   return false;
 }
 
@@ -911,24 +1101,28 @@ function baseNpcDelete(st, npcId) {
 // presets" path requested by the user. Returns a FROZEN
 // {id,level,moves,talent,shiny} array, ready for baseNpcCreate/baseNpcUpdate.
 function baseNpcTeamFromPreset(presetKey) {
-  const G_ = (typeof G !== 'undefined') ? G : null;
+  const G_ = typeof G !== 'undefined' ? G : null;
   if (!G_) return [];
   let mons = [];
   if (!presetKey || presetKey === 'active') {
     mons = Array.isArray(G_.team) ? G_.team.filter(Boolean) : [];
   } else {
     const preset = G_.teamPresets && G_.teamPresets[presetKey];
-    const uids = (preset && Array.isArray(preset.uids)) ? preset.uids : [];
+    const uids = preset && Array.isArray(preset.uids) ? preset.uids : [];
     for (const uid of uids) {
-      const found = (typeof resolvePresetPoke === 'function') ? resolvePresetPoke(uid) : null;
+      const found = typeof resolvePresetPoke === 'function' ? resolvePresetPoke(uid) : null;
       if (found && found.p) mons.push(found.p);
     }
   }
-  return baseNpcNormalizeTeam(mons.slice(0, 6).map((p) => ({
-    id: p.id, level: p.level,
-    moves: (Array.isArray(p.moves) ? p.moves : []).map((m) => (m && m.id) || m).filter(Boolean),
-    talent: p.talent || null, shiny: !!(p.shiny || p.shinyActive),
-  })));
+  return baseNpcNormalizeTeam(
+    mons.slice(0, 6).map((p) => ({
+      id: p.id,
+      level: p.level,
+      moves: (Array.isArray(p.moves) ? p.moves : []).map((m) => (m && m.id) || m).filter(Boolean),
+      talent: p.talent || null,
+      shiny: !!(p.shiny || p.shinyActive),
+    }))
+  );
 }
 
 // —────────────────────────────────────────────────────────────────────────
@@ -936,90 +1130,272 @@ function baseSanitizeState(st) {
   if (!st || typeof st !== 'object') return baseCreateDefault();
   const clean = baseCreateDefault();
   clean.layoutId = baseLayoutGet(st.layoutId) ? st.layoutId : null;
-  clean.routeId = (typeof st.routeId === 'string' && st.routeId) ? st.routeId : null;
+  clean.routeId = typeof st.routeId === 'string' && st.routeId ? st.routeId : null;
   // Phase 42: migration to the canonical RSE catalogue (renames mapped via
   // baseItemMigrate; items outside the art direction are dropped — renames
   // go through, ORAS-only items disappear cleanly).
   for (const k of Object.keys(st.stock || {})) {
-    const mk = typeof __pwV43Link('baseItemMigrate') === 'function' ? baseItemMigrate(k) : (baseItemGet(k) ? k : null);
+    const mk = baseItemMigrate(k);
     if (!mk) continue;
     clean.stock[mk] = Math.min(99, (clean.stock[mk] | 0) + Math.max(0, st.stock[k] | 0));
     if (!clean.stock[mk]) delete clean.stock[mk];
   }
-  for (const it of (Array.isArray(st.items) ? st.items : [])) {
-    const ms = typeof __pwV43Link('baseItemMigrate') === 'function' ? baseItemMigrate(it.s) : (baseItemGet(it.s) ? it.s : null);
+  for (const it of Array.isArray(st.items) ? st.items : []) {
+    const ms = baseItemMigrate(it.s);
     if (!ms) continue;
     const chk = baseCanPlace(clean, ms, it.x | 0, it.y | 0, 0, { free: true });
     if (chk.ok) {
       clean.items.push({ uid: clean.uidSeq++, s: ms, x: chk.x, y: chk.y, rot: 0 });
     }
   }
-  for (const n of (Array.isArray(st.npcs) ? st.npcs : [])) {
+  for (const n of Array.isArray(st.npcs) ? st.npcs : []) {
     // Fix: allow NPCs with an empty team (decor) – do not delete them at sanitization
     if (!Array.isArray(n.team)) n.team = [];
-    if (n.x == null || !baseCellWalkable(clean, baseBuildGrid(clean), n.x, n.y, null)) { n.x = null; n.y = null; clean.npcs.push(n); }
-    else clean.npcs.push(n);
+    if (n.x == null || !baseCellWalkable(clean, baseBuildGrid(clean), n.x, n.y, null)) {
+      n.x = null;
+      n.y = null;
+      clean.npcs.push(n);
+    } else clean.npcs.push(n);
   }
   // Requested fix: no NPC stock save (invisible bank that blocked the creator)
   // Empty the stock on each load
   clean.npcStock = [];
   clean.pcMessage = (st.pcMessage || '').slice(0, 200);
-  clean.uidSeq = Math.max(clean.uidSeq, (st.uidSeq | 0) || 1);
-  clean.record = { w: (st.record && st.record.w | 0) || 0, l: (st.record && st.record.l | 0) || 0, visits: (st.record && st.record.visits | 0) || 0 };
+  clean.uidSeq = Math.max(clean.uidSeq, st.uidSeq | 0 || 1);
+  clean.record = {
+    w: (st.record && st.record.w | 0) || 0,
+    l: (st.record && st.record.l | 0) || 0,
+    visits: (st.record && st.record.visits | 0) || 0,
+  };
   // Phase 43: no custom spawn — always the door marker.
   return clean;
 }
 
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseCreateDefault', baseCreateDefault); } else if (typeof globalThis !== 'undefined') { globalThis.baseCreateDefault = baseCreateDefault; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseGetState', baseGetState); } else if (typeof globalThis !== 'undefined') { globalThis.baseGetState = baseGetState; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseStockAdd', baseStockAdd); } else if (typeof globalThis !== 'undefined') { globalThis.baseStockAdd = baseStockAdd; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseStockRemove', baseStockRemove); } else if (typeof globalThis !== 'undefined') { globalThis.baseStockRemove = baseStockRemove; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseStockCount', baseStockCount); } else if (typeof globalThis !== 'undefined') { globalThis.baseStockCount = baseStockCount; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseBuildGrid', baseBuildGrid); } else if (typeof globalThis !== 'undefined') { globalThis.baseBuildGrid = baseBuildGrid; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseCellWalkable', baseCellWalkable); } else if (typeof globalThis !== 'undefined') { globalThis.baseCellWalkable = baseCellWalkable; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseCarrierAt', baseCarrierAt); } else if (typeof globalThis !== 'undefined') { globalThis.baseCarrierAt = baseCarrierAt; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseSurfaceAt', baseSurfaceAt); } else if (typeof globalThis !== 'undefined') { globalThis.baseSurfaceAt = baseSurfaceAt; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseReachableSet', baseReachableSet); } else if (typeof globalThis !== 'undefined') { globalThis.baseReachableSet = baseReachableSet; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseCanPlace', baseCanPlace); } else if (typeof globalThis !== 'undefined') { globalThis.baseCanPlace = baseCanPlace; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('basePlace', basePlace); } else if (typeof globalThis !== 'undefined') { globalThis.basePlace = basePlace; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('basePickup', basePickup); } else if (typeof globalThis !== 'undefined') { globalThis.basePickup = basePickup; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('basePlacedFind', basePlacedFind); } else if (typeof globalThis !== 'undefined') { globalThis.basePlacedFind = basePlacedFind; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseRotate', baseRotate); } else if (typeof globalThis !== 'undefined') { globalThis.baseRotate = baseRotate; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseClearAll', baseClearAll); } else if (typeof globalThis !== 'undefined') { globalThis.baseClearAll = baseClearAll; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseRelocate', baseRelocate); } else if (typeof globalThis !== 'undefined') { globalThis.baseRelocate = baseRelocate; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseCreate', baseCreate); } else if (typeof globalThis !== 'undefined') { globalThis.baseCreate = baseCreate; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseNpcAdd', baseNpcAdd); } else if (typeof globalThis !== 'undefined') { globalThis.baseNpcAdd = baseNpcAdd; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseNpcPlace', baseNpcPlace); } else if (typeof globalThis !== 'undefined') { globalThis.baseNpcPlace = baseNpcPlace; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseNpcPickup', baseNpcPickup); } else if (typeof globalThis !== 'undefined') { globalThis.baseNpcPickup = baseNpcPickup; }
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseCreateDefault', baseCreateDefault);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseCreateDefault = baseCreateDefault;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseGetState', baseGetState);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseGetState = baseGetState;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseStockAdd', baseStockAdd);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseStockAdd = baseStockAdd;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseStockRemove', baseStockRemove);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseStockRemove = baseStockRemove;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseStockCount', baseStockCount);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseStockCount = baseStockCount;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseBuildGrid', baseBuildGrid);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseBuildGrid = baseBuildGrid;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseCellWalkable', baseCellWalkable);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseCellWalkable = baseCellWalkable;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseCarrierAt', baseCarrierAt);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseCarrierAt = baseCarrierAt;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseSurfaceAt', baseSurfaceAt);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseSurfaceAt = baseSurfaceAt;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseReachableSet', baseReachableSet);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseReachableSet = baseReachableSet;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseCanPlace', baseCanPlace);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseCanPlace = baseCanPlace;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('basePlace', basePlace);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.basePlace = basePlace;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('basePickup', basePickup);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.basePickup = basePickup;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('basePlacedFind', basePlacedFind);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.basePlacedFind = basePlacedFind;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseRotate', baseRotate);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseRotate = baseRotate;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseClearAll', baseClearAll);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseClearAll = baseClearAll;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseRelocate', baseRelocate);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseRelocate = baseRelocate;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseCreate', baseCreate);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseCreate = baseCreate;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseNpcAdd', baseNpcAdd);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseNpcAdd = baseNpcAdd;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseNpcPlace', baseNpcPlace);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseNpcPlace = baseNpcPlace;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseNpcPickup', baseNpcPickup);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseNpcPickup = baseNpcPickup;
+}
 // Phase 45 — editeur of PNJ (creation/edition/deletion + import of preset)
 if (typeof globalThis !== 'undefined') globalThis.BASE_NPC_MAX = BASE_NPC_MAX;
 if (typeof globalThis !== 'undefined') globalThis.BASE_NPC_SPRITES = BASE_NPC_SPRITES;
 if (typeof globalThis !== 'undefined') globalThis.BASE_NPC_SPRITE_DEFAULT = BASE_NPC_SPRITE_DEFAULT;
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseNpcSpriteUrl', baseNpcSpriteUrl); } else if (typeof globalThis !== 'undefined') { globalThis.baseNpcSpriteUrl = baseNpcSpriteUrl; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseNpcFind', baseNpcFind); } else if (typeof globalThis !== 'undefined') { globalThis.baseNpcFind = baseNpcFind; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseNpcCount', baseNpcCount); } else if (typeof globalThis !== 'undefined') { globalThis.baseNpcCount = baseNpcCount; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseNpcNormalizeTeam', baseNpcNormalizeTeam); } else if (typeof globalThis !== 'undefined') { globalThis.baseNpcNormalizeTeam = baseNpcNormalizeTeam; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseNpcCreate', baseNpcCreate); } else if (typeof globalThis !== 'undefined') { globalThis.baseNpcCreate = baseNpcCreate; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseNpcPlaceNew', baseNpcPlaceNew); } else if (typeof globalThis !== 'undefined') { globalThis.baseNpcPlaceNew = baseNpcPlaceNew; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseNpcUpdate', baseNpcUpdate); } else if (typeof globalThis !== 'undefined') { globalThis.baseNpcUpdate = baseNpcUpdate; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseNpcDelete', baseNpcDelete); } else if (typeof globalThis !== 'undefined') { globalThis.baseNpcDelete = baseNpcDelete; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseNpcTeamFromPreset', baseNpcTeamFromPreset); } else if (typeof globalThis !== 'undefined') { globalThis.baseNpcTeamFromPreset = baseNpcTeamFromPreset; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseSanitizeState', baseSanitizeState); } else if (typeof globalThis !== 'undefined') { globalThis.baseSanitizeState = baseSanitizeState; }
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseNpcSpriteUrl', baseNpcSpriteUrl);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseNpcSpriteUrl = baseNpcSpriteUrl;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseNpcFind', baseNpcFind);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseNpcFind = baseNpcFind;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseNpcCount', baseNpcCount);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseNpcCount = baseNpcCount;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseNpcNormalizeTeam', baseNpcNormalizeTeam);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseNpcNormalizeTeam = baseNpcNormalizeTeam;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseNpcCreate', baseNpcCreate);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseNpcCreate = baseNpcCreate;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseNpcPlaceNew', baseNpcPlaceNew);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseNpcPlaceNew = baseNpcPlaceNew;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseNpcUpdate', baseNpcUpdate);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseNpcUpdate = baseNpcUpdate;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseNpcDelete', baseNpcDelete);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseNpcDelete = baseNpcDelete;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseNpcTeamFromPreset', baseNpcTeamFromPreset);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseNpcTeamFromPreset = baseNpcTeamFromPreset;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseSanitizeState', baseSanitizeState);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseSanitizeState = baseSanitizeState;
+}
 // Phase 44 — heights of items (display/slide) + stairs 2 colonnes
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseStairsAt', baseStairsAt); } else if (typeof globalThis !== 'undefined') { globalThis.baseStairsAt = baseStairsAt; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseZoneTopAt', baseZoneTopAt); } else if (typeof globalThis !== 'undefined') { globalThis.baseZoneTopAt = baseZoneTopAt; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseZoneStairAt', baseZoneStairAt); } else if (typeof globalThis !== 'undefined') { globalThis.baseZoneStairAt = baseZoneStairAt; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseZoneBlockedAt', baseZoneBlockedAt); } else if (typeof globalThis !== 'undefined') { globalThis.baseZoneBlockedAt = baseZoneBlockedAt; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseSlideRampAt', baseSlideRampAt); } else if (typeof globalThis !== 'undefined') { globalThis.baseSlideRampAt = baseSlideRampAt; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseTentAt', baseTentAt); } else if (typeof globalThis !== 'undefined') { globalThis.baseTentAt = baseTentAt; }
-if (typeof PokeActions !== 'undefined') { PokeActions.register('baseZoneGateOK', baseZoneGateOK); } else if (typeof globalThis !== 'undefined') { globalThis.baseZoneGateOK = baseZoneGateOK; }
-
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseStairsAt', baseStairsAt);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseStairsAt = baseStairsAt;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseZoneTopAt', baseZoneTopAt);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseZoneTopAt = baseZoneTopAt;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseZoneStairAt', baseZoneStairAt);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseZoneStairAt = baseZoneStairAt;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseZoneBlockedAt', baseZoneBlockedAt);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseZoneBlockedAt = baseZoneBlockedAt;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseSlideRampAt', baseSlideRampAt);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseSlideRampAt = baseSlideRampAt;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseTentAt', baseTentAt);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseTentAt = baseTentAt;
+}
+if (typeof PokeActions !== 'undefined') {
+  PokeActions.register('baseZoneGateOK', baseZoneGateOK);
+} else if (typeof globalThis !== 'undefined') {
+  globalThis.baseZoneGateOK = baseZoneGateOK;
+}
 
 // --- Exported globals ---
-if (typeof baseCellAt !== 'undefined') { if (typeof PokeActions !== 'undefined') { PokeActions.register('baseCellAt', baseCellAt); } else if (typeof globalThis !== 'undefined') { globalThis.baseCellAt = baseCellAt; } }
-if (typeof basePcSpot !== 'undefined') { if (typeof PokeActions !== 'undefined') { PokeActions.register('basePcSpot', basePcSpot); } else if (typeof globalThis !== 'undefined') { globalThis.basePcSpot = basePcSpot; } }
-if (typeof baseWithPlaced !== 'undefined') { if (typeof PokeActions !== 'undefined') { PokeActions.register('baseWithPlaced', baseWithPlaced); } else if (typeof globalThis !== 'undefined') { globalThis.baseWithPlaced = baseWithPlaced; } }
-if (typeof baseZoneDefAt !== 'undefined') { if (typeof PokeActions !== 'undefined') { PokeActions.register('baseZoneDefAt', baseZoneDefAt); } else if (typeof globalThis !== 'undefined') { globalThis.baseZoneDefAt = baseZoneDefAt; } }
+if (typeof baseCellAt !== 'undefined') {
+  if (typeof PokeActions !== 'undefined') {
+    PokeActions.register('baseCellAt', baseCellAt);
+  } else if (typeof globalThis !== 'undefined') {
+    globalThis.baseCellAt = baseCellAt;
+  }
+}
+if (typeof basePcSpot !== 'undefined') {
+  if (typeof PokeActions !== 'undefined') {
+    PokeActions.register('basePcSpot', basePcSpot);
+  } else if (typeof globalThis !== 'undefined') {
+    globalThis.basePcSpot = basePcSpot;
+  }
+}
+if (typeof baseWithPlaced !== 'undefined') {
+  if (typeof PokeActions !== 'undefined') {
+    PokeActions.register('baseWithPlaced', baseWithPlaced);
+  } else if (typeof globalThis !== 'undefined') {
+    globalThis.baseWithPlaced = baseWithPlaced;
+  }
+}
+if (typeof baseZoneDefAt !== 'undefined') {
+  if (typeof PokeActions !== 'undefined') {
+    PokeActions.register('baseZoneDefAt', baseZoneDefAt);
+  } else if (typeof globalThis !== 'undefined') {
+    globalThis.baseZoneDefAt = baseZoneDefAt;
+  }
+}
 
 // Wave 41 — native ESM module: exports the same names as the
 // classic surface kept above (bodies unchanged).
@@ -1067,6 +1443,3 @@ export {
   baseWithPlaced,
   baseZoneDefAt,
 };
-
-
-

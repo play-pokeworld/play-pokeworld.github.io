@@ -449,6 +449,9 @@ var NPCS = {
   },
   {
    "quest": "s132"
+  },
+  {
+   "quest": "leg_latias_1"
   }
  ],
  "mauville": [
@@ -467,6 +470,12 @@ var NPCS = {
   },
   {
    "quest": "s137"
+  },
+  {
+   "quest": "leg_jirachi_1"
+  },
+  {
+   "quest": "leg_deoxys_1"
   }
  ],
  "lavaridge": [
@@ -571,6 +580,9 @@ var NPCS = {
  "southern_island": [
   {
    "quest": "s77"
+  },
+  {
+   "quest": "leg_latios_1"
   }
  ],
  "mirage_island": [
@@ -598,6 +610,9 @@ var NPCS = {
   },
   {
    "quest": "s130"
+  },
+  {
+   "quest": "leg_rayquaza_1"
   }
  ],
  "meteor_falls": [
@@ -638,6 +653,9 @@ var NPCS = {
   },
   {
    "quest": "s109"
+  },
+  {
+   "quest": "leg_registeel_1"
   }
  ],
  "ceruleancave": [
@@ -668,6 +686,9 @@ var NPCS = {
   },
   {
    "quest": "s106"
+  },
+  {
+   "quest": "leg_regice_1"
   }
  ],
  "mt_pyre": [
@@ -679,6 +700,12 @@ var NPCS = {
   },
   {
    "quest": "s67"
+  },
+  {
+   "quest": "leg_kyogre_1"
+  },
+  {
+   "quest": "leg_groudon_1"
   }
  ],
  "mtmoon": [
@@ -700,6 +727,9 @@ var NPCS = {
  "sealed_chamber": [
   {
    "quest": "s100"
+  },
+  {
+   "quest": "leg_regirock_1"
   }
  ],
  "route101": [

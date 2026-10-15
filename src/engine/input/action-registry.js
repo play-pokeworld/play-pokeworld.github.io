@@ -26,7 +26,9 @@ function register(name, fn) {
   if (typeof name !== 'string' || !name || typeof fn !== 'function') return false;
   const prev = _actions.get(name);
   if (prev && prev !== fn) {
-    try { console.warn('[PokeEngine] action overwritten:', name); } catch (_) {}
+    try {
+      console.warn('[PokeEngine] action overwritten:', name);
+    } catch (_) {}
   }
   _actions.set(name, fn);
   return true;
@@ -62,6 +64,3 @@ export default PokeActions;
 // harnesses may inject their own stub before evaluating classic files).
 if (typeof window !== 'undefined') window.PokeActions = PokeActions;
 if (typeof globalThis !== 'undefined') globalThis.PokeActions = PokeActions;
-
-
-

@@ -11,7 +11,10 @@
 // Shared safe-HTML service (engine pwSetHtml when present, else direct).
 // globalThis-backed so concatenated VM harnesses and classic stubs stay valid.
 if (typeof globalThis !== 'undefined' && typeof globalThis._pwSetHtmlSafe !== 'function') {
-  globalThis._pwSetHtmlSafe = function (el, html) { if (typeof globalThis.pwSetHtml === 'function') globalThis.pwSetHtml(el, html); else el.innerHTML = html; };
+  globalThis._pwSetHtmlSafe = function (el, html) {
+    if (typeof globalThis.pwSetHtml === 'function') globalThis.pwSetHtml(el, html);
+    else el.innerHTML = html;
+  };
 }
 
 export class TextBox {
@@ -32,7 +35,8 @@ export class TextBox {
 
   render() {
     const el = document.createElement('div');
-    el.className = `pw-ui-textbox pw-ui-textbox--${this.variant} ${this.bordered ? 'is-bordered' : ''} ${this.className}`.trim();
+    el.className =
+      `pw-ui-textbox pw-ui-textbox--${this.variant} ${this.bordered ? 'is-bordered' : ''} ${this.className}`.trim();
     if (typeof this.content === 'string') {
       globalThis._pwSetHtmlSafe(el, this.content);
     } else if (this.content && this.content.nodeType) {
@@ -54,6 +58,3 @@ export class TextBox {
     }
   }
 }
-
-
-

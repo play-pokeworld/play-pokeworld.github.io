@@ -32,6 +32,7 @@ import {
   atollModeGridVNode,
   atollRunCardVNode,
   atollShopGridVNode,
+  atollFragmentsCardVNode,
 } from '../components/atoll.js';
 
 export class AtollPanelView extends UIView {
@@ -42,7 +43,11 @@ export class AtollPanelView extends UIView {
   tabContentVNode() {
     const m = this.model;
     if (m.tab === 'menu') {
-      return atollHomeGridVNode(m.home);
+      return [
+        atollHomeGridVNode(m.home),
+        // V7 · ATL-03 — Fragments de Légende (compteur, invocation, rencontre en attente).
+        m.fragments ? atollFragmentsCardVNode(m.fragments) : null,
+      ];
     }
     if (m.tab === 'shop') {
       return [
@@ -62,21 +67,29 @@ export class AtollPanelView extends UIView {
   panelVNode() {
     const m = this.model;
     if (m.locked) {
-      return h('div', { class: 'pw-atoll-panel' },
-        atollHeroVNode({ title: m.lockedTitle, desc: m.lockedDesc }));
+      return h(
+        'div',
+        { class: 'pw-atoll-panel' },
+        atollHeroVNode({ title: m.lockedTitle, desc: m.lockedDesc })
+      );
     }
-    return h('div', { class: 'pw-atoll-panel' },
+    return h(
+      'div',
+      { class: 'pw-atoll-panel' },
       atollHeroVNode(m.hero),
       atollNavVNode(m.nav),
-      this.tabContentVNode());
+      this.tabContentVNode()
+    );
   }
 
   onLoad() {
     // Spawn the panel entity UNDER the view root (renderChildren(root)).
     this.panelEntity = this.spawn('ui:atoll-panel', []);
-    this.panelEntity.addComponent(new UIRenderComponent({
-      template: () => [this.panelVNode()],
-    }));
+    this.panelEntity.addComponent(
+      new UIRenderComponent({
+        template: () => [this.panelVNode()],
+      })
+    );
   }
 
   static toHTML(model) {
@@ -85,6 +98,3 @@ export class AtollPanelView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
-
-
-

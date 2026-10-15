@@ -16,18 +16,25 @@ function uiAnimationsOn() {
   try {
     if (typeof G === 'undefined' || !G || !G.settings) return true;
     return G.settings.uiAnimations !== false;
-  } catch (_) { return true; }
+  } catch (_) {
+    return true;
+  }
 }
 
 /** Respecte aussi la préférence système « réduire les animations ». */
 function _prefersReducedMotion() {
   try {
-    return typeof matchMedia === 'function'
-      && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  } catch (_) { return false; }
+    return (
+      typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
+    );
+  } catch (_) {
+    return false;
+  }
 }
 
-function _fxEnabled() { return uiAnimationsOn() && !_prefersReducedMotion(); }
+function _fxEnabled() {
+  return uiAnimationsOn() && !_prefersReducedMotion();
+}
 
 function toggleUiAnimations() {
   if (typeof G === 'undefined' || !G) return;
@@ -35,9 +42,15 @@ function toggleUiAnimations() {
   G.settings.uiAnimations = !uiAnimationsOn();
   // PASSE 30 — la couche de promeneurs du fond obéit au même interrupteur :
   // on l'allume ou on l'éteint immédiatement, sans attendre un re-rendu.
-  try { if (typeof renderBgPokemon === 'function') renderBgPokemon(); } catch (_) {}
-  try { if (typeof saveGame === 'function') saveGame(); } catch (_) {}
-  try { if (typeof openSettings === 'function') openSettings(); } catch (_) {}
+  try {
+    if (typeof renderBgPokemon === 'function') renderBgPokemon();
+  } catch (_) {}
+  try {
+    if (typeof saveGame === 'function') saveGame();
+  } catch (_) {}
+  try {
+    if (typeof openSettings === 'function') openSettings();
+  } catch (_) {}
 }
 
 // ── Nombre flottant (800 ms) ───────────────────────────────────────────────
@@ -52,9 +65,19 @@ function floatNumber(host, text, kind) {
   node.textContent = text;
   node.setAttribute('aria-hidden', 'true');
   host.appendChild(node);
-  const drop = () => { try { node.remove(); } catch (_) {} };
-  try { node.addEventListener('animationend', drop, { once: true }); } catch (_) {}
-  try { setTimeout(drop, 1200); } catch (_) { drop(); }
+  const drop = () => {
+    try {
+      node.remove();
+    } catch (_) {}
+  };
+  try {
+    node.addEventListener('animationend', drop, { once: true });
+  } catch (_) {}
+  try {
+    setTimeout(drop, 1200);
+  } catch (_) {
+    drop();
+  }
   return node;
 }
 
@@ -62,7 +85,7 @@ function floatNumber(host, text, kind) {
 function formatDelta(delta, suffix) {
   const n = Number(delta) || 0;
   const abs = Math.abs(n);
-  const body = (typeof formatNumber === 'function') ? formatNumber(abs) : String(abs);
+  const body = typeof formatNumber === 'function' ? formatNumber(abs) : String(abs);
   return (n < 0 ? '-' : '+') + body + (suffix || '');
 }
 
@@ -74,19 +97,29 @@ function _pulseClass(el, cls, ms) {
     // reflow : rejoue l'animation même si la classe vient d'être retirée
     void el.offsetWidth;
     el.classList.add(cls);
-    setTimeout(() => { try { el.classList.remove(cls); } catch (_) {} }, ms);
+    setTimeout(() => {
+      try {
+        el.classList.remove(cls);
+      } catch (_) {}
+    }, ms);
   } catch (_) {}
 }
 
 /** Secousse — coup super-efficace (200 ms). */
-function shakeElement(el) { _pulseClass(el, 'pw-fx-shake', 200); }
+function shakeElement(el) {
+  _pulseClass(el, 'pw-fx-shake', 200);
+}
 /** Pulsation — palier de succès atteint (1 000 ms). */
-function pulseElement(el) { _pulseClass(el, 'pw-fx-pulse', 1000); }
+function pulseElement(el) {
+  _pulseClass(el, 'pw-fx-pulse', 1000);
+}
 /** Éclat — capture réussie (700 ms).
  *  PASSE 31 : la classe était retirée au bout de 600 ms alors que les
  *  keyframes `pw31-capture` durent 700 ms — la fin de l'éclat (retour au
  *  calme) était coupée net. Les deux durées doivent rester synchronisées. */
-function flashCapture(el) { _pulseClass(el, 'pw-fx-capture', 700); }
+function flashCapture(el) {
+  _pulseClass(el, 'pw-fx-capture', 700);
+}
 
 // ── Deltas de monnaies (CUR-01) ────────────────────────────────────────────
 // On mémorise la dernière valeur affichée par compteur ; à chaque rendu du
@@ -104,7 +137,8 @@ function reportCurrency(id, value, opts) {
   const delta = val - prev;
   // Seuls les GAINS s'annoncent : une dépense volontaire (achat) n'a pas
   // besoin d'être signalée, le joueur vient de la déclencher.
-  if (delta > 0 && o.host) floatNumber(o.host, formatDelta(delta, o.suffix || ''), o.kind || 'money');
+  if (delta > 0 && o.host)
+    floatNumber(o.host, formatDelta(delta, o.suffix || ''), o.kind || 'money');
   return delta;
 }
 
@@ -127,19 +161,33 @@ function smoothBar(el, pct) {
 
 // --- Surface classique -----------------------------------------------------
 const _api = {
-  uiAnimationsOn, toggleUiAnimations, floatNumber, formatDelta,
-  shakeElement, pulseElement, flashCapture,
-  reportCurrency, resetCurrencyDeltas, smoothBar,
+  uiAnimationsOn,
+  toggleUiAnimations,
+  floatNumber,
+  formatDelta,
+  shakeElement,
+  pulseElement,
+  flashCapture,
+  reportCurrency,
+  resetCurrencyDeltas,
+  smoothBar,
 };
 if (typeof window !== 'undefined') Object.assign(window, _api);
 if (typeof globalThis !== 'undefined') Object.assign(globalThis, _api);
 try {
-  if (typeof PokeActions !== 'undefined' && PokeActions) PokeActions.register('toggleUiAnimations', toggleUiAnimations);
+  if (typeof PokeActions !== 'undefined' && PokeActions)
+    PokeActions.register('toggleUiAnimations', toggleUiAnimations);
 } catch (_) {}
 
 export {
-  uiAnimationsOn, toggleUiAnimations, floatNumber, formatDelta,
-  shakeElement, pulseElement, flashCapture,
-  reportCurrency, resetCurrencyDeltas, smoothBar,
+  uiAnimationsOn,
+  toggleUiAnimations,
+  floatNumber,
+  formatDelta,
+  shakeElement,
+  pulseElement,
+  flashCapture,
+  reportCurrency,
+  resetCurrencyDeltas,
+  smoothBar,
 };
-

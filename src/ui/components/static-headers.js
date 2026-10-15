@@ -46,8 +46,11 @@ const STATIC_HEADERS = [
       title: 'Réglages',
       titleProps: { id: 'settings-title', 'data-i18n': 'settings_title' },
       close: {
-        tag: 'button', action: 'close-settings', glyph: '✕',
-        ariaLabel: '', i18nAriaLabel: 'modal_close_btn',
+        tag: 'button',
+        action: 'close-settings',
+        glyph: '✕',
+        ariaLabel: '',
+        i18nAriaLabel: 'modal_close_btn',
       },
     },
   },
@@ -57,8 +60,12 @@ const STATIC_HEADERS = [
       title: '',
       titleProps: { id: 'quest-title' },
       close: {
-        tag: 'button', call: 'closeQuestModal', callArgs: '', glyph: '✕',
-        ariaLabel: 'Fermer', i18nAriaLabel: 'modal_close_btn',
+        tag: 'button',
+        call: 'closeQuestModal',
+        callArgs: '',
+        glyph: '✕',
+        ariaLabel: 'Fermer',
+        i18nAriaLabel: 'modal_close_btn',
       },
     },
   },
@@ -67,10 +74,18 @@ const STATIC_HEADERS = [
     opts: {
       class: 'pw-static-054',
       title: 'Sélection',
-      titleProps: { id: 'usm-title', class: 'pw-info-name pw-static-035', 'data-i18n': 'usm_selection' },
+      titleProps: {
+        id: 'usm-title',
+        class: 'pw-info-name pw-static-035',
+        'data-i18n': 'usm_selection',
+      },
       close: {
-        tag: 'button', action: 'close-unified-selector', glyph: '✕',
-        class: 'pw-static-055', ariaLabel: 'Fermer', i18nAriaLabel: 'modal_close_btn',
+        tag: 'button',
+        action: 'close-unified-selector',
+        glyph: '✕',
+        class: 'pw-static-055',
+        ariaLabel: 'Fermer',
+        i18nAriaLabel: 'modal_close_btn',
       },
     },
   },
@@ -80,8 +95,11 @@ const STATIC_HEADERS = [
       title: 'Butin & résumé de session',
       titleProps: { id: 'battle-summary-title', 'data-i18n': 'battle_summary_title' },
       close: {
-        tag: 'button', action: 'close-battle-summary', glyph: '✕',
-        ariaLabel: 'Fermer', i18nAriaLabel: 'modal_close_btn',
+        tag: 'button',
+        action: 'close-battle-summary',
+        glyph: '✕',
+        ariaLabel: 'Fermer',
+        i18nAriaLabel: 'modal_close_btn',
       },
     },
   },
@@ -124,5 +142,3 @@ if (typeof window !== 'undefined') {
 }
 
 export default pwBuildStaticHeaders;
-
-

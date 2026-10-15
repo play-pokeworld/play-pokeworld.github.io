@@ -54,28 +54,62 @@ export class BaseNpcDialogView extends UIView {
 
   windowVNode() {
     const m = this.model;
-    return [h('div', { class: 'pw-base-dialog' },
-      panelHeaderVNode({
-        icon: h('img', { class: 'pw-base-portrait is-28', src: m.titleIconUrl || '', alt: '' }),
-        title: m.name || '',
-        subtitle: m.subText || '',
-        subtitleClass: `pw-${m.subKind || 'light1'}`,
-        close: { call: 'closeBaseDialog' },
-      }),
-      h('div', { class: 'base-dlg-body' },
-        h('div', { class: 'base-dlg-portrait' },
-          h('img', { class: 'pw-base-portrait is-96', src: m.portraitUrl || '', alt: '' })),
-        h('div', { class: 'base-dlg-speech' }, m.speech || '')),
-      (m.teamChipsHtml || []).length
-        ? h('div', { class: 'pw-row base-dlg-team' }, ...(m.teamChipsHtml || []).map((c) => h.raw(c)))
-        : null,
-      h('div', { class: 'pw-btn-group' },
-        m.primary
-          ? h('button', { class: 'hbtn', dataset: { action: 'legacy-call', call: m.primary.call, callArgs: m.primary.callArgs || '' } },
-              m.primary.label || '')
+    return [
+      h(
+        'div',
+        { class: 'pw-base-dialog' },
+        panelHeaderVNode({
+          icon: h('img', { class: 'pw-base-portrait is-28', src: m.titleIconUrl || '', alt: '' }),
+          title: m.name || '',
+          subtitle: m.subText || '',
+          subtitleClass: `pw-${m.subKind || 'light1'}`,
+          close: { call: 'closeBaseDialog' },
+        }),
+        h(
+          'div',
+          { class: 'base-dlg-body' },
+          h(
+            'div',
+            { class: 'base-dlg-portrait' },
+            h('img', { class: 'pw-base-portrait is-96', src: m.portraitUrl || '', alt: '' })
+          ),
+          h('div', { class: 'base-dlg-speech' }, m.speech || '')
+        ),
+        (m.teamChipsHtml || []).length
+          ? h(
+              'div',
+              { class: 'pw-row base-dlg-team' },
+              ...(m.teamChipsHtml || []).map((c) => h.raw(c))
+            )
           : null,
-        h('button', { class: 'hbtn pw-btn-cancel', dataset: { action: 'legacy-call', call: 'closeBaseDialog', callArgs: '' } },
-          m.secondaryLabel || '')))];
+        h(
+          'div',
+          { class: 'pw-btn-group' },
+          m.primary
+            ? h(
+                'button',
+                {
+                  class: 'hbtn',
+                  dataset: {
+                    action: 'legacy-call',
+                    call: m.primary.call,
+                    callArgs: m.primary.callArgs || '',
+                  },
+                },
+                m.primary.label || ''
+              )
+            : null,
+          h(
+            'button',
+            {
+              class: 'hbtn pw-btn-cancel',
+              dataset: { action: 'legacy-call', call: 'closeBaseDialog', callArgs: '' },
+            },
+            m.secondaryLabel || ''
+          )
+        )
+      ),
+    ];
   }
 
   onLoad() {
@@ -100,78 +134,158 @@ export class BasePcDialogView extends UIView {
 
   flagCardVNode(f) {
     const next = f.next || null;
-    return h('div', { class: `pw-ui-panel pw-base-flag-card is-rank-${f.rankId || 'normal'}` },
-      h('div', { class: 'pw-row pw-base-flag-head' },
-        h('div', null,
+    return h(
+      'div',
+      { class: `pw-ui-panel pw-base-flag-card is-rank-${f.rankId || 'normal'}` },
+      h(
+        'div',
+        { class: 'pw-row pw-base-flag-head' },
+        h(
+          'div',
+          null,
           h('div', { class: 'pw-base-flag-rank' }, '🚩 ' + (f.rankLabel || '')),
-          h('div', { class: 'pw-base-flag-count' },
+          h(
+            'div',
+            { class: 'pw-base-flag-count' },
             (f.countLabel || '') + ' ',
             h('b', null, String(f.count || 0)),
             ' ' + (f.flagsWord || ''),
-            f.uniqueBases ? [' · ', h('b', null, String(f.uniqueBases)), ' ' + (f.basesWord || '')] : null)),
-        f.ownBadge ? h('span', { class: 'pw-badge-gold pw-base-own-badge' }, f.ownBadge) : null),
-      h('div', { class: 'pw-base-flag-bar' },
+            f.uniqueBases
+              ? [' · ', h('b', null, String(f.uniqueBases)), ' ' + (f.basesWord || '')]
+              : null
+          )
+        ),
+        f.ownBadge ? h('span', { class: 'pw-badge-gold pw-base-own-badge' }, f.ownBadge) : null
+      ),
+      h(
+        'div',
+        { class: 'pw-base-flag-bar' },
         h('div', {
           class: 'pw-base-flag-fill',
           dataset: { pct: String(Math.max(0, Math.min(100, Math.round(f.pct || 0)))) },
           style: { width: `${Math.max(0, Math.min(100, Math.round(f.pct || 0)))}%` },
-        })),
-      h('div', { class: 'pw-base-flag-next' },
+        })
+      ),
+      h(
+        'div',
+        { class: 'pw-base-flag-next' },
         next && next.kind === 'supreme'
           ? h('b', null, next.text || '')
-          : [(next && next.label) || '', ' ', h('b', null, String((next && next.req) || '')), ' ' + ((next && next.countText) || '')]),
-      h('div', { class: 'pw-base-flag-bonuses' },
+          : [
+              (next && next.label) || '',
+              ' ',
+              h('b', null, String((next && next.req) || '')),
+              ' ' + ((next && next.countText) || ''),
+            ]
+      ),
+      h(
+        'div',
+        { class: 'pw-base-flag-bonuses' },
         h('div', { class: 'pw-base-flag-bonuses-title' }, f.bonusesTitle || ''),
-        ...(f.bonusLines || []).map((l) => h('div', null, l))),
+        ...(f.bonusLines || []).map((l) => h('div', null, l))
+      ),
       f.collect
-        ? h('button', {
-            class: 'hbtn pw-btn-danger pw-base-flag-collect',
-            dataset: { action: 'legacy-call', call: 'collectSecretBaseFlag', callArgs: f.collect.callArgs || '' },
-          }, f.collect.label || '')
-        : (f.cooldownText ? h('div', { class: 'pw-base-flag-cooldown' }, '🚩 ' + f.cooldownText) : null));
+        ? h(
+            'button',
+            {
+              class: 'hbtn pw-btn-danger pw-base-flag-collect',
+              dataset: {
+                action: 'legacy-call',
+                call: 'collectSecretBaseFlag',
+                callArgs: f.collect.callArgs || '',
+              },
+            },
+            f.collect.label || ''
+          )
+        : f.cooldownText
+          ? h('div', { class: 'pw-base-flag-cooldown' }, '🚩 ' + f.cooldownText)
+          : null
+    );
   }
 
   pcPanelVNode(pc) {
     if (pc.kind === 'edit') {
-      return h('div', { class: 'pw-ui-panel pw-base-pc-panel is-edit' },
+      return h(
+        'div',
+        { class: 'pw-ui-panel pw-base-pc-panel is-edit' },
         h('div', { class: 'pw-base-pc-title' }, '💬 ' + (pc.title || '')),
         h('div', { class: 'pw-base-pc-hint' }, pc.hint || ''),
-        h('textarea', {
-          id: 'base-pc-msg-input', class: 'pw-base-pc-input',
-          maxlength: '200', placeholder: pc.placeholder || '',
-        }, pc.value || ''),
-        h('div', { class: 'pw-base-pc-actions' },
-          h('button', { class: 'hbtn', dataset: { action: 'legacy-call', call: 'saveBasePcMessage', callArgs: '' } },
-            pc.saveLabel || ''),
-          h('span', { class: 'pw-base-pc-count' }, `${(pc.value || '').length}/200`)));
+        h(
+          'textarea',
+          {
+            id: 'base-pc-msg-input',
+            class: 'pw-base-pc-input',
+            maxlength: '200',
+            placeholder: pc.placeholder || '',
+          },
+          pc.value || ''
+        ),
+        h(
+          'div',
+          { class: 'pw-base-pc-actions' },
+          h(
+            'button',
+            {
+              class: 'hbtn',
+              dataset: { action: 'legacy-call', call: 'saveBasePcMessage', callArgs: '' },
+            },
+            pc.saveLabel || ''
+          ),
+          h('span', { class: 'pw-base-pc-count' }, `${(pc.value || '').length}/200`)
+        )
+      );
     }
-    return h('div', { class: 'pw-ui-panel pw-base-pc-panel' },
+    return h(
+      'div',
+      { class: 'pw-ui-panel pw-base-pc-panel' },
       h('div', { class: 'pw-base-pc-title' }, '💬 ' + (pc.title || '')),
-      h('div', { class: 'pw-base-pc-quote' }, '“' + (pc.text || '') + '”'));
+      h('div', { class: 'pw-base-pc-quote' }, '“' + (pc.text || '') + '”')
+    );
   }
 
   windowVNode() {
     const m = this.model;
     const stats = m.stats || null;
-    return [h('div', { class: 'pw-base-dialog' },
-      panelHeaderVNode({
-        icon: '🖥️',
-        title: m.title || '',
-        subtitle: m.subText || '',
-        close: { call: 'closeBaseDialog' },
-      }),
-      stats
-        ? h('div', { class: 'pw-row base-dlg-stats' },
-            h('span', null, (stats.visitsLabel || '') + ' ', h('b', null, String(stats.visits | 0))),
-            h('span', null, (stats.winsLabel || '') + ' ', h('b', null, String(stats.wins | 0))),
-            h('span', null, (stats.lossesLabel || '') + ' ', h('b', null, String(stats.losses | 0))))
-        : null,
-      h('div', { id: 'base-pc-panel', class: 'base-dlg-panel pw-base-pc-wrap' },
-        this.flagCardVNode(m.flag || {}),
-        m.pc ? this.pcPanelVNode(m.pc) : null))];
-      // Wave 28 (user feedback): the "Fermer" button is REMOVED — it was a
-      // duplicate of the title ✕ (and of the new Escape/back handling), and
-      // it sat mid-sheet instead of at the bottom of the panel.
+    return [
+      h(
+        'div',
+        { class: 'pw-base-dialog' },
+        panelHeaderVNode({
+          icon: '🖥️',
+          title: m.title || '',
+          subtitle: m.subText || '',
+          close: { call: 'closeBaseDialog' },
+        }),
+        stats
+          ? h(
+              'div',
+              { class: 'pw-row base-dlg-stats' },
+              h(
+                'span',
+                null,
+                (stats.visitsLabel || '') + ' ',
+                h('b', null, String(stats.visits | 0))
+              ),
+              h('span', null, (stats.winsLabel || '') + ' ', h('b', null, String(stats.wins | 0))),
+              h(
+                'span',
+                null,
+                (stats.lossesLabel || '') + ' ',
+                h('b', null, String(stats.losses | 0))
+              )
+            )
+          : null,
+        h(
+          'div',
+          { id: 'base-pc-panel', class: 'base-dlg-panel pw-base-pc-wrap' },
+          this.flagCardVNode(m.flag || {}),
+          m.pc ? this.pcPanelVNode(m.pc) : null
+        )
+      ),
+    ];
+    // Wave 28 (user feedback): the "Fermer" button is REMOVED — it was a
+    // duplicate of the title ✕ (and of the new Escape/back handling), and
+    // it sat mid-sheet instead of at the bottom of the panel.
   }
 
   onLoad() {
@@ -196,53 +310,132 @@ export class BaseNpcEditorView extends UIView {
 
   windowVNode() {
     const m = this.model;
-    return [h('div', { class: 'pw-base-npced' },
-      panelHeaderVNode({
-        icon: h('img', { class: 'pw-base-portrait is-28', src: m.titleIconUrl || '', alt: '' }),
-        title: m.title || '',
-        close: { call: 'closeBaseNpcEditor' },
-      }),
-      // Wave 26 (user): everything between the header and the footer lives
-      // in ONE scroller (.pw-base-npced / DS2826) — the team and the quote
-      // fields no longer slide under the actions bar and off the sheet.
-      h('div', { class: 'pw-base-npced-scroll' },
-      h('small', { class: 'preset-manager-hint' }, m.hint || ''),
-      // Wave 28 (user): dedicated identity row — sprite LEFT, name field
-      // RIGHT, side by side. Before, the 64px portrait button was crammed
-      // into the 22px .preset-row-idx chip and OVERLAPPED the name input
-      // ("l'un par dessus l'autre").
-      h('div', { class: 'pw-base-npced-id' },
-        h('button', {
-          type: 'button', class: 'base-npc-portrait-btn pw-base-npced-id-portrait', title: m.portraitHint || '',
-          dataset: { action: 'legacy-call', call: 'baseNpcEditorOpenSpritePicker', callArgs: '' },
-        },
-          h('img', { class: 'pw-base-portrait is-64', src: m.portraitUrl || '', alt: '' }),
-          h('span', { class: 'base-npc-portrait-edit' }, '✏️')),
-        h('div', { class: 'pw-base-npced-id-name' },
-          h('input', {
-            class: 'preset-name-input', maxlength: '18', value: m.nameValue || '',
-            placeholder: m.namePlaceholder || '',
-            dataset: { changeCall: 'baseNpcEditorSetField', changeArgs: "'name', this.value" },
-          }),
-          h('div', { class: 'pw-text-sm pw-light1' }, m.spriteMetaLine || ''))),
-      h('div', { class: 'pw-row pw-btn-group pw-base-npced-teambar' },
-        h('b', null, m.teamLabel || ''),
-        h('span', { class: 'pw-text-sm pw-light1' }, m.levelAutoText || ''),
-        h('button', { class: 'hbtn', dataset: { action: 'legacy-call', call: 'baseNpcEditorOpenPresetPicker', callArgs: '' } },
-          m.presetBtnLabel || '')),
-      h('div', { id: 'base-npced-team', class: 'team-view pw-base-npced-team' }, h.raw(m.cardsHtml || '')),
-      h('div', { class: 'pw-row pw-btn-group' }, h('b', null, m.quotesLabel || '')),
-      h('div', { class: 'preset-list' },
-        ...(m.quotes || []).map((q) => h('div', { class: 'preset-row' },
-          h('span', { class: 'preset-row-count' }, q.label || ''),
-          h('input', {
-            class: 'preset-name-input', maxlength: '80', value: q.value || '',
-            dataset: { changeCall: 'baseNpcEditorSetQuote', changeArgs: `'${q.key}', this.value` },
-          }))))),
-      h('div', { class: 'pw-btn-group pw-base-npced-actions' },
-        h('button', { class: 'hbtn', dataset: { action: 'legacy-call', call: 'baseNpcEditorSave', callArgs: '' } }, m.saveLabel || ''),
-        h('button', { class: 'hbtn pw-btn-danger', dataset: { action: 'legacy-call', call: 'baseNpcEditorDelete', callArgs: '' } }, m.deleteLabel || ''),
-        h('button', { class: 'hbtn pw-btn-cancel', dataset: { action: 'legacy-call', call: 'closeBaseNpcEditor', callArgs: '' } }, m.backLabel || '')))];
+    return [
+      h(
+        'div',
+        { class: 'pw-base-npced' },
+        panelHeaderVNode({
+          icon: h('img', { class: 'pw-base-portrait is-28', src: m.titleIconUrl || '', alt: '' }),
+          title: m.title || '',
+          close: { call: 'closeBaseNpcEditor' },
+        }),
+        // Wave 26 (user): everything between the header and the footer lives
+        // in ONE scroller (.pw-base-npced / DS2826) — the team and the quote
+        // fields no longer slide under the actions bar and off the sheet.
+        h(
+          'div',
+          { class: 'pw-base-npced-scroll' },
+          h('small', { class: 'preset-manager-hint' }, m.hint || ''),
+          // Wave 28 (user): dedicated identity row — sprite LEFT, name field
+          // RIGHT, side by side. Before, the 64px portrait button was crammed
+          // into the 22px .preset-row-idx chip and OVERLAPPED the name input
+          // ("l'un par dessus l'autre").
+          h(
+            'div',
+            { class: 'pw-base-npced-id' },
+            h(
+              'button',
+              {
+                type: 'button',
+                class: 'base-npc-portrait-btn pw-base-npced-id-portrait',
+                title: m.portraitHint || '',
+                dataset: {
+                  action: 'legacy-call',
+                  call: 'baseNpcEditorOpenSpritePicker',
+                  callArgs: '',
+                },
+              },
+              h('img', { class: 'pw-base-portrait is-64', src: m.portraitUrl || '', alt: '' }),
+              h('span', { class: 'base-npc-portrait-edit' }, '✏️')
+            ),
+            h(
+              'div',
+              { class: 'pw-base-npced-id-name' },
+              h('input', {
+                class: 'preset-name-input',
+                maxlength: '18',
+                value: m.nameValue || '',
+                placeholder: m.namePlaceholder || '',
+                dataset: { changeCall: 'baseNpcEditorSetField', changeArgs: "'name', this.value" },
+              }),
+              h('div', { class: 'pw-text-sm pw-light1' }, m.spriteMetaLine || '')
+            )
+          ),
+          h(
+            'div',
+            { class: 'pw-row pw-btn-group pw-base-npced-teambar' },
+            h('b', null, m.teamLabel || ''),
+            h('span', { class: 'pw-text-sm pw-light1' }, m.levelAutoText || ''),
+            h(
+              'button',
+              {
+                class: 'hbtn',
+                dataset: {
+                  action: 'legacy-call',
+                  call: 'baseNpcEditorOpenPresetPicker',
+                  callArgs: '',
+                },
+              },
+              m.presetBtnLabel || ''
+            )
+          ),
+          h(
+            'div',
+            { id: 'base-npced-team', class: 'team-view pw-base-npced-team' },
+            h.raw(m.cardsHtml || '')
+          ),
+          h('div', { class: 'pw-row pw-btn-group' }, h('b', null, m.quotesLabel || '')),
+          h(
+            'div',
+            { class: 'preset-list' },
+            ...(m.quotes || []).map((q) =>
+              h(
+                'div',
+                { class: 'preset-row' },
+                h('span', { class: 'preset-row-count' }, q.label || ''),
+                h('input', {
+                  class: 'preset-name-input',
+                  maxlength: '80',
+                  value: q.value || '',
+                  dataset: {
+                    changeCall: 'baseNpcEditorSetQuote',
+                    changeArgs: `'${q.key}', this.value`,
+                  },
+                })
+              )
+            )
+          )
+        ),
+        h(
+          'div',
+          { class: 'pw-btn-group pw-base-npced-actions' },
+          h(
+            'button',
+            {
+              class: 'hbtn',
+              dataset: { action: 'legacy-call', call: 'baseNpcEditorSave', callArgs: '' },
+            },
+            m.saveLabel || ''
+          ),
+          h(
+            'button',
+            {
+              class: 'hbtn pw-btn-danger',
+              dataset: { action: 'legacy-call', call: 'baseNpcEditorDelete', callArgs: '' },
+            },
+            m.deleteLabel || ''
+          ),
+          h(
+            'button',
+            {
+              class: 'hbtn pw-btn-cancel',
+              dataset: { action: 'legacy-call', call: 'closeBaseNpcEditor', callArgs: '' },
+            },
+            m.backLabel || ''
+          )
+        )
+      ),
+    ];
   }
 
   onLoad() {
@@ -267,36 +460,85 @@ export class BaseNpcPickerView extends UIView {
 
   windowVNode() {
     const m = this.model;
-    return [h('div', { class: 'pw-base-picker' },
-      panelHeaderVNode({
-        icon: '🔍',
-        title: m.title || '',
-        subtitle: m.sub || '',
-        close: { call: 'renderBaseNpcEditor' },
-      }),
-      h('input', {
-        class: 'dict-search preset-pick-search', value: m.searchValue || '',
-        placeholder: m.searchPlaceholder || '',
-        dataset: { action: 'filter-base-npc-picker' },
-      }),
-      h('div', { class: 'preset-pick-list pw-base-pick-scroll' },
-        (m.rows || []).length
-          ? (m.rows || []).map((r) => h('div', {
-              class: 'inv-item preset-pick-row',
-              dataset: { action: 'legacy-call', call: 'baseNpcEditorPickChoose', callArgs: r.callArgs || '' },
+    return [
+      h(
+        'div',
+        { class: 'pw-base-picker' },
+        panelHeaderVNode({
+          icon: '🔍',
+          title: m.title || '',
+          subtitle: m.sub || '',
+          close: { call: 'renderBaseNpcEditor' },
+        }),
+        h('input', {
+          class: 'dict-search preset-pick-search',
+          value: m.searchValue || '',
+          placeholder: m.searchPlaceholder || '',
+          dataset: { action: 'filter-base-npc-picker' },
+        }),
+        h(
+          'div',
+          { class: 'preset-pick-list pw-base-pick-scroll' },
+          (m.rows || []).length
+            ? (m.rows || []).map((r) =>
+                h(
+                  'div',
+                  {
+                    class: 'inv-item preset-pick-row',
+                    dataset: {
+                      action: 'legacy-call',
+                      call: 'baseNpcEditorPickChoose',
+                      callArgs: r.callArgs || '',
+                    },
+                  },
+                  h('div', { class: 'inv-icon' }, h.raw(r.spriteHtml || '')),
+                  h(
+                    'div',
+                    { class: 'pw-flex-1' },
+                    h(
+                      'div',
+                      { class: 'inv-name' },
+                      (r.nameText || '') + ' ',
+                      h('small', { class: 'pw-light1' }, r.metaText || '')
+                    )
+                  ),
+                  h(
+                    'span',
+                    { class: `preset-pick-tag${r.inBox ? ' in-box' : ''}` },
+                    r.tagText || ''
+                  )
+                )
+              )
+            : h('div', { class: 'pw-empty-state-md' }, m.emptyLabel || '')
+        ),
+        h(
+          'div',
+          { class: 'pw-btn-group' },
+          m.remove
+            ? h(
+                'button',
+                {
+                  class: 'hbtn pw-btn-danger',
+                  dataset: {
+                    action: 'legacy-call',
+                    call: 'baseNpcEditorRemoveMon',
+                    callArgs: m.remove.callArgs || '',
+                  },
+                },
+                m.remove.label || ''
+              )
+            : null,
+          h(
+            'button',
+            {
+              class: 'hbtn pw-btn-cancel',
+              dataset: { action: 'legacy-call', call: 'renderBaseNpcEditor', callArgs: '' },
             },
-              h('div', { class: 'inv-icon' }, h.raw(r.spriteHtml || '')),
-              h('div', { class: 'pw-flex-1' },
-                h('div', { class: 'inv-name' }, (r.nameText || '') + ' ', h('small', { class: 'pw-light1' }, r.metaText || ''))),
-              h('span', { class: `preset-pick-tag${r.inBox ? ' in-box' : ''}` }, r.tagText || '')))
-          : h('div', { class: 'pw-empty-state-md' }, m.emptyLabel || '')),
-      h('div', { class: 'pw-btn-group' },
-        m.remove
-          ? h('button', { class: 'hbtn pw-btn-danger', dataset: { action: 'legacy-call', call: 'baseNpcEditorRemoveMon', callArgs: m.remove.callArgs || '' } },
-              m.remove.label || '')
-          : null,
-        h('button', { class: 'hbtn pw-btn-cancel', dataset: { action: 'legacy-call', call: 'renderBaseNpcEditor', callArgs: '' } },
-          m.backLabel || '')))];
+            m.backLabel || ''
+          )
+        )
+      ),
+    ];
   }
 
   onLoad() {
@@ -321,34 +563,72 @@ export class BaseNpcItemPickerView extends UIView {
 
   windowVNode() {
     const m = this.model;
-    return [h('div', { class: 'pw-base-picker' },
-      panelHeaderVNode({
-        iconHtml: m.titleIconHtml || '',
-        title: m.title || '',
-        subtitle: m.sub || '',
-        close: { call: 'renderBaseNpcEditor' },
-      }),
-      h('div', { class: 'preset-pick-list pw-base-pick-scroll' },
-        (m.rows || []).length
-          ? (m.rows || []).map((r) => h('div', {
-              class: `inv-item preset-pick-row${r.isCurrent ? ' is-current' : ''}`,
-              dataset: {
-                action: 'legacy-call', call: 'baseNpcEditorEquipItem', callArgs: r.callArgs || '',
-                contextCall: 'openItemInfo', contextArgs: r.contextArgs || '',
-              },
+    return [
+      h(
+        'div',
+        { class: 'pw-base-picker' },
+        panelHeaderVNode({
+          iconHtml: m.titleIconHtml || '',
+          title: m.title || '',
+          subtitle: m.sub || '',
+          close: { call: 'renderBaseNpcEditor' },
+        }),
+        h(
+          'div',
+          { class: 'preset-pick-list pw-base-pick-scroll' },
+          (m.rows || []).length
+            ? (m.rows || []).map((r) =>
+                h(
+                  'div',
+                  {
+                    class: `inv-item preset-pick-row${r.isCurrent ? ' is-current' : ''}`,
+                    dataset: {
+                      action: 'legacy-call',
+                      call: 'baseNpcEditorEquipItem',
+                      callArgs: r.callArgs || '',
+                      contextCall: 'openItemInfo',
+                      contextArgs: r.contextArgs || '',
+                    },
+                  },
+                  h('div', { class: 'inv-icon' }, h.raw(r.spriteHtml || '')),
+                  h(
+                    'div',
+                    { class: 'pw-flex-1' },
+                    h('div', { class: 'inv-name' }, r.nameText || ''),
+                    h('div', { class: 'inv-desc' }, h.raw(r.descText || ''))
+                  )
+                )
+              )
+            : h('div', { class: 'pw-empty-state-md' }, m.emptyLabel || '')
+        ),
+        h(
+          'div',
+          { class: 'pw-btn-group' },
+          m.remove
+            ? h(
+                'button',
+                {
+                  class: 'hbtn pw-btn-danger',
+                  dataset: {
+                    action: 'legacy-call',
+                    call: 'baseNpcEditorClearItem',
+                    callArgs: m.remove.callArgs || '',
+                  },
+                },
+                m.remove.label || ''
+              )
+            : null,
+          h(
+            'button',
+            {
+              class: 'hbtn pw-btn-cancel',
+              dataset: { action: 'legacy-call', call: 'renderBaseNpcEditor', callArgs: '' },
             },
-              h('div', { class: 'inv-icon' }, h.raw(r.spriteHtml || '')),
-              h('div', { class: 'pw-flex-1' },
-                h('div', { class: 'inv-name' }, r.nameText || ''),
-                h('div', { class: 'inv-desc' }, h.raw(r.descText || '')))))
-          : h('div', { class: 'pw-empty-state-md' }, m.emptyLabel || '')),
-      h('div', { class: 'pw-btn-group' },
-        m.remove
-          ? h('button', { class: 'hbtn pw-btn-danger', dataset: { action: 'legacy-call', call: 'baseNpcEditorClearItem', callArgs: m.remove.callArgs || '' } },
-              m.remove.label || '')
-          : null,
-        h('button', { class: 'hbtn pw-btn-cancel', dataset: { action: 'legacy-call', call: 'renderBaseNpcEditor', callArgs: '' } },
-          m.backLabel || '')))];
+            m.backLabel || ''
+          )
+        )
+      ),
+    ];
   }
 
   onLoad() {
@@ -372,33 +652,61 @@ export class BaseNpcSpritePickerView extends UIView {
   }
 
   static lookVNode(s) {
-    return h('button', {
-      type: 'button', class: `base-npc-look${s.selected ? ' sel' : ''}`, title: s.id || '',
-      dataset: { action: 'legacy-call', call: 'baseNpcEditorSetSprite', callArgs: `'${s.id}'` },
-    }, h('img', { class: 'pw-base-portrait is-48', src: s.url || '', alt: '' }));
+    return h(
+      'button',
+      {
+        type: 'button',
+        class: `base-npc-look${s.selected ? ' sel' : ''}`,
+        title: s.id || '',
+        dataset: { action: 'legacy-call', call: 'baseNpcEditorSetSprite', callArgs: `'${s.id}'` },
+      },
+      h('img', { class: 'pw-base-portrait is-48', src: s.url || '', alt: '' })
+    );
   }
 
   windowVNode() {
     const m = this.model;
-    return [h('div', { class: 'pw-base-picker' },
-      panelHeaderVNode({
-        icon: '🎨',
-        title: m.title || '',
-        subtitle: m.hint || null,
-        close: { call: m.closeCall || 'renderBaseNpcEditor' },
-      }),
-      h('input', {
-        class: 'dict-search pw-base-looks-filter', value: m.filterValue || '',
-        placeholder: m.filterPlaceholder || 'trainer-42...',
-        dataset: { action: 'filter-base-npc-sprite' },
-      }),
-      h('div', { class: 'base-npc-looks pw-base-looks-scroll' },
-        (m.sprites || []).length
-          ? (m.sprites || []).map((s) => BaseNpcSpritePickerView.lookVNode(s))
-          : (m.emptyLabel || '')),
-      h('div', { class: 'pw-btn-group' },
-        h('button', { class: 'hbtn pw-btn-cancel', dataset: { action: 'legacy-call', call: m.closeCall || 'renderBaseNpcEditor', callArgs: '' } },
-          m.backLabel || '')))];
+    return [
+      h(
+        'div',
+        { class: 'pw-base-picker' },
+        panelHeaderVNode({
+          icon: '🎨',
+          title: m.title || '',
+          subtitle: m.hint || null,
+          close: { call: m.closeCall || 'renderBaseNpcEditor' },
+        }),
+        h('input', {
+          class: 'dict-search pw-base-looks-filter',
+          value: m.filterValue || '',
+          placeholder: m.filterPlaceholder || 'trainer-42...',
+          dataset: { action: 'filter-base-npc-sprite' },
+        }),
+        h(
+          'div',
+          { class: 'base-npc-looks pw-base-looks-scroll' },
+          (m.sprites || []).length
+            ? (m.sprites || []).map((s) => BaseNpcSpritePickerView.lookVNode(s))
+            : m.emptyLabel || ''
+        ),
+        h(
+          'div',
+          { class: 'pw-btn-group' },
+          h(
+            'button',
+            {
+              class: 'hbtn pw-btn-cancel',
+              dataset: {
+                action: 'legacy-call',
+                call: m.closeCall || 'renderBaseNpcEditor',
+                callArgs: '',
+              },
+            },
+            m.backLabel || ''
+          )
+        )
+      ),
+    ];
   }
 
   onLoad() {
@@ -431,26 +739,60 @@ export class BaseNpcPresetPickerView extends UIView {
 
   windowVNode() {
     const m = this.model;
-    return [h('div', { class: 'pw-base-picker' },
-      panelHeaderVNode({
-        icon: '📋',
-        title: m.title || '',
-        subtitle: m.hint || '',
-        close: { call: 'renderBaseNpcEditor' },
-      }),
-      h('div', { class: 'preset-pick-list pw-base-pick-scroll' },
-        (m.rows || []).length
-          ? (m.rows || []).map((r) => h('div', {
-              class: 'inv-item preset-pick-row pw-base-preset-row',
-              dataset: { action: 'legacy-call', call: 'baseNpcEditorImportPresetFromPicker', callArgs: r.callArgs || '' },
+    return [
+      h(
+        'div',
+        { class: 'pw-base-picker' },
+        panelHeaderVNode({
+          icon: '📋',
+          title: m.title || '',
+          subtitle: m.hint || '',
+          close: { call: 'renderBaseNpcEditor' },
+        }),
+        h(
+          'div',
+          { class: 'preset-pick-list pw-base-pick-scroll' },
+          (m.rows || []).length
+            ? (m.rows || []).map((r) =>
+                h(
+                  'div',
+                  {
+                    class: 'inv-item preset-pick-row pw-base-preset-row',
+                    dataset: {
+                      action: 'legacy-call',
+                      call: 'baseNpcEditorImportPresetFromPicker',
+                      callArgs: r.callArgs || '',
+                    },
+                  },
+                  h(
+                    'div',
+                    { class: 'pw-base-preset-row-inner' },
+                    h(
+                      'div',
+                      { class: 'inv-name' },
+                      (r.name || '') + ' ',
+                      h('small', { class: 'pw-light1' }, `(${r.count || 0})`)
+                    ),
+                    h('div', { class: 'pw-base-preset-sprites' }, h.raw(r.spritesHtml || ''))
+                  )
+                )
+              )
+            : h('div', { class: 'pw-empty-state-md' }, m.emptyLabel || '')
+        ),
+        h(
+          'div',
+          { class: 'pw-btn-group' },
+          h(
+            'button',
+            {
+              class: 'hbtn pw-btn-cancel',
+              dataset: { action: 'legacy-call', call: 'renderBaseNpcEditor', callArgs: '' },
             },
-              h('div', { class: 'pw-base-preset-row-inner' },
-                h('div', { class: 'inv-name' }, (r.name || '') + ' ', h('small', { class: 'pw-light1' }, `(${r.count || 0})`)),
-                h('div', { class: 'pw-base-preset-sprites' }, h.raw(r.spritesHtml || '')))))
-          : h('div', { class: 'pw-empty-state-md' }, m.emptyLabel || '')),
-      h('div', { class: 'pw-btn-group' },
-        h('button', { class: 'hbtn pw-btn-cancel', dataset: { action: 'legacy-call', call: 'renderBaseNpcEditor', callArgs: '' } },
-          m.backLabel || '')))];
+            m.backLabel || ''
+          )
+        )
+      ),
+    ];
   }
 
   onLoad() {
@@ -465,6 +807,3 @@ export class BaseNpcPresetPickerView extends UIView {
     return toHTMLString(view.buildView());
   }
 }
-
-
-

@@ -97,10 +97,12 @@ test('wave30 CSS: NPC editor team is a 2-col grid with no nested scroller', () =
 test('wave30 #3: build stamp shipped (version.js + window.PW_BUILD + settings line)', () => {
   // documented supersede (wave 31): PW_BUILD is bumped at EVERY delivery —
   // the lock now asserts the stamp mechanism itself, not a frozen tag.
-  assert.match(versionJs, /export const PW_BUILD = 'w\d+ · \d{4}-\d{2}-\d{2}/);
+  // V7 (2026-10-14, décision joueur) : une seule version, chiffre clair MAJEUR.MINEUR.CORRECTIF.
+  assert.match(versionJs, /export const PW_VERSION = '\d+\.\d+\.\d+';/);
+  assert.match(versionJs, /export const PW_BUILD = PW_VERSION;/);
   assert.match(versionJs, /window\.PW_BUILD = PW_BUILD/);
-  assert.match(mainJs, /import "\.\/version\.js";/);
-  assert.match(mainJs, /import "\.\/ui\/components\/window-chrome\.js";/);
+  assert.match(mainJs, /import ['"]\.\/version\.js['"];/); // V7 · DBT-01 — guillemets simples
+  assert.match(mainJs, /import ['"]\.\/ui\/components\/window-chrome\.js['"];/);
   assert.match(settingsJs, /pw-build-stamp/);
   assert.match(settingsJs, /window\.PW_BUILD/);
 });

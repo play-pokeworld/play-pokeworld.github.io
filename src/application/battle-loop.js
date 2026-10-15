@@ -62,7 +62,9 @@ export function getGameplayWorld() {
  * @returns {number} number of system executions (0 when the loop is paused).
  */
 export function runBattleTick() {
-  try { PokeTrace.count('tick', 'combat:tick'); } catch (_) {}
+  try {
+    PokeTrace.count('tick', 'combat:tick');
+  } catch (_) {}
   const { world } = getGameplayWorld();
   return world.run('combat:tick', 100);
 }
@@ -88,6 +90,3 @@ if (typeof window !== 'undefined') {
   window.resolveBattleStateAnomalies = resolveBattleStateAnomalies;
   window.PokeGameplayWorld = getGameplayWorld;
 }
-
-
-

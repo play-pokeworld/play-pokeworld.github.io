@@ -11,7 +11,18 @@
  */
 
 /** Theme ids — one per [data-theme="…"] palette block in design-system.css. */
-export const THEME_IDS = ['dark', 'light', 'gameboy', 'fire', 'ocean', 'forest', 'sakura', 'midnight', 'desert', 'contrast'];
+export const THEME_IDS = [
+  'dark',
+  'light',
+  'gameboy',
+  'fire',
+  'ocean',
+  'forest',
+  'sakura',
+  'midnight',
+  'desert',
+  'contrast',
+];
 
 /**
  * The ONLY two standardized Pokémon sprite sizes allowed in the game:
@@ -33,7 +44,9 @@ export const SPRITE_SIZES = Object.freeze({
  * @returns {number} pixel size
  */
 export function spriteSizeFor(token) {
-  return Object.prototype.hasOwnProperty.call(SPRITE_SIZES, token) ? SPRITE_SIZES[token] : SPRITE_SIZES.standard;
+  return Object.prototype.hasOwnProperty.call(SPRITE_SIZES, token)
+    ? SPRITE_SIZES[token]
+    : SPRITE_SIZES.standard;
 }
 
 /** CSS var() references for the two sprite size tokens. */
@@ -41,6 +54,3 @@ export const SPRITE_SIZE_VARS = Object.freeze({
   standard: 'var(--pw-size-poke-sm, 72px)',
   team: 'var(--pw-size-poke-lg, 104px)',
 });
-
-
-

@@ -54,7 +54,9 @@ test('wave31 #3: dashboard.js still writes the inline desktop layout', () => {
 // 4) applyMobileView semantics UNTOUCHED — it still owns per-window
 //    mobile visibility (visible list + mobile-visible class + sub-nav).
 test('wave31 #4: applyMobileView still owns window visibility', () => {
-  assert.match(bridgeJs, /if \(view === 'shortcuts'\) visible = \['win-shortcuts'\]/);
+  // V7-R1 #9 — lists moved to engine/runtime/mobile-views.js (single source).
+  assert.match(bridgeJs, /visible = MOBILE_VIEW_WINS\[view\]/);
+  assert.match(bridgeJs, /from '\.\/mobile-views\.js'/);
   assert.match(bridgeJs, /win\.classList\.toggle\('mobile-visible', show\)/);
   assert.match(bridgeJs, /win\.style\.display = show \? 'flex' : 'none'/);
 });
@@ -79,8 +81,14 @@ test('wave31 #6: harness asserts the columns compute to contents', () => {
 
 // 7) Build stamp bumped (the settings stamp is how the user proves which
 //    copy they are really running — see MIGRATION_STATUS wave 30/31).
-test('wave31 #7: PW_BUILD is bumped to w31', () => {
-  assert.match(versionJs, /export const PW_BUILD = 'w31 · /);
+test('wave31 #7: PW_BUILD is bumped to w31 (or later — the stamp moves at EVERY delivery)', () => {
+  // V7 (2026-10-14): the stamp is bumped at every delivery (w32 = V7-P0a), so
+  // this check pins "at least w31" instead of the literal w31.
+  // V7 (2026-10-14) : le tampon « wNN · date » est remplacé par UNE version
+  // claire (7.x.y) — la vague 31 est antérieure à toute version 7.
+  const m = versionJs.match(/export const PW_VERSION = '(\d+)\.(\d+)\.(\d+)';/);
+  assert.ok(m, 'version format MAJEUR.MINEUR.CORRECTIF');
+  assert.ok(Number(m[1]) >= 7, `version ${m[1]}.${m[2]}.${m[3]} (≥ 7.0.0, postérieure à la vague 31)`);
 });
 
 

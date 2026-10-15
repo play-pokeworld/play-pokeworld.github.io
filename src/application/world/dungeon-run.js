@@ -1,3 +1,4 @@
+import { esc } from '../../engine/render/vdom.js';
 // ════════════════════════════════════════════════════════════════════════════
 // PASSE 32 — LES DONJONS : le péage achète une EXPÉDITION, plus un accès
 // ════════════════════════════════════════════════════════════════════════════
@@ -100,16 +101,16 @@ const DUNGEON_RULES = Object.freeze({
   depthMin: 1,
   depthMax: 3,
   multStep: 0.5,
-  wipeKeepRatio: 0.5,     // K.O. général : la moitié du sac survit
-  completionBonus: 2.5,   // le boss verse 2,5 × un palier de butin
-  exhaustedRate: 0.4,     // rendement d'un palier déjà purgé
+  wipeKeepRatio: 0.5, // K.O. général : la moitié du sac survit
+  completionBonus: 2.5, // le boss verse 2,5 × un palier de butin
+  exhaustedRate: 0.4, // rendement d'un palier déjà purgé
   refundOnFirstFloorWipe: true,
 });
 
 // ── Accès à l'état ──────────────────────────────────────────────────────────
 
 function _dgState() {
-  return (typeof globalThis !== 'undefined' && globalThis.G) ? globalThis.G : null;
+  return typeof globalThis !== 'undefined' && globalThis.G ? globalThis.G : null;
 }
 function _dgLoc(locId) {
   try {
@@ -118,7 +119,9 @@ function _dgLoc(locId) {
   return null;
 }
 function _dgNotify(msg, color) {
-  try { if (typeof globalThis.notify === 'function') globalThis.notify(msg, color); } catch (_) {}
+  try {
+    if (typeof globalThis.notify === 'function') globalThis.notify(msg, color);
+  } catch (_) {}
 }
 function _dgT(key, vars) {
   try {
@@ -134,7 +137,7 @@ function _dgT(key, vars) {
 function currentDungeonRun() {
   const G = _dgState();
   const run = G ? G.dungeonRun : null;
-  return (run && run.active) ? run : null;
+  return run && run.active ? run : null;
 }
 
 /** Le joueur est-il en expédition dans CE lieu ? */
@@ -161,7 +164,7 @@ function startDungeonRun(locId) {
   // (le combat s'ouvrirait et se refermerait aussitôt) : on bloque l'entrée
   // avec un message clair au lieu de prélever le péage pour rien.
   try {
-    const team = (G && Array.isArray(G.team)) ? G.team : [];
+    const team = G && Array.isArray(G.team) ? G.team : [];
     if (team.length && !team.some((p) => p && Number(p.currentHP) > 0)) {
       _dgNotify(_dgT('dungeon_team_ko_blocked'), 'var(--red)');
       return null;
@@ -169,14 +172,18 @@ function startDungeonRun(locId) {
   } catch (_) {}
 
   const badgeReq = Number(loc.badgeReq) || 0;
-  const toll = (typeof globalThis.dungeonToll === 'function') ? globalThis.dungeonToll(badgeReq) : 0;
+  const toll = typeof globalThis.dungeonToll === 'function' ? globalThis.dungeonToll(badgeReq) : 0;
   if (toll > 0) {
-    const w = (typeof globalThis.ensureWallet === 'function') ? globalThis.ensureWallet() : null;
-    const have = w ? (w.dungeonTokens || 0) : 0;
+    const w = typeof globalThis.ensureWallet === 'function' ? globalThis.ensureWallet() : null;
+    const have = w ? w.dungeonTokens || 0 : 0;
     if (have < toll) {
-      _dgNotify(_dgT('dungeon_toll_blocked', {
-        need: String(toll), have: String(have),
-      }), 'var(--red)');
+      _dgNotify(
+        _dgT('dungeon_toll_blocked', {
+          need: String(toll),
+          have: String(have),
+        }),
+        'var(--red)'
+      );
       return null;
     }
     if (typeof globalThis.spendDungeonTokens === 'function') globalThis.spendDungeonTokens(toll);
@@ -190,7 +197,7 @@ function startDungeonRun(locId) {
     // PASSE 39 — la profondeur dépend du DÉCOR : une forêt n'a pas de paliers.
     depth: dungeonDepthFor(badgeReq, locId),
     floor: 1,
-    wins: 0,          // victoires sur le palier courant
+    wins: 0, // victoires sur le palier courant
     totalWins: 0,
     bag: { tokens: 0, money: 0 },
     // PASSE 38c — le BUTIN DU DONJON au complet (un donjon = un combat de
@@ -200,16 +207,15 @@ function startDungeonRun(locId) {
     bossDone: false,
     startedAt: Date.now(),
     // PASSE 36 — carte du palier (variante D) : une case par combat.
-    auto: false,      // pilote automatique (débloqué après N complétions)
+    auto: false, // pilote automatique (débloqué après N complétions)
   };
   _dgGenFloorMap(G.dungeonRun);
   G.dungeonsExplored = (G.dungeonsExplored || 0) + 1;
   _dgSyncRunFlag();
   // PASSE 38e — le butin d'une expédition repart de ZÉRO : la session de
-  // combat (captures, objets, argent, jetons) du combat ou donjon précédent
-  // est vidée, sinon le panneau sous la carte affiche l'ancien butin
-  // (retour joueur : « quand on commence un donjon le butin ne se reset
-  // pas, on voit celui d'un combat ou donjon précédent »).
+  // combat (captures, objets, argent, jetons) précédente est vidée, sinon le
+  // panneau sous la carte affiche l'ancien butin (retour joueur : « quand on
+  // commence un donjon le butin ne se reset pas »).
   try {
     const _b = globalThis.battle;
     if (_b) {
@@ -242,7 +248,7 @@ function _dgHarvestRunLoot(run) {
     if (!run.loot.catches) run.loot.catches = [];
     if (!run.loot.items) run.loot.items = {};
     if (typeof run.loot.money !== 'number') run.loot.money = 0;
-    for (const c of (b.sessionCatches || [])) run.loot.catches.push(c);
+    for (const c of b.sessionCatches || []) run.loot.catches.push(c);
     b.sessionCatches = [];
     for (const [k, q] of Object.entries(b.sessionItems || {})) {
       run.loot.items[k] = (run.loot.items[k] || 0) + Number(q || 0);
@@ -261,9 +267,9 @@ function dungeonOnWin() {
   const loot = dungeonWinLoot(run.badgeReq);
   const mult = dungeonMultFor(run.floor);
   // Palier déjà purgé -> rendement réduit (voir DUNGEON_EXHAUSTED_RATE).
-  const rate = (run.wins >= dungeonQuotaFor(run.floor)) ? DUNGEON_EXHAUSTED_RATE : 1;
+  const rate = run.wins >= dungeonQuotaFor(run.floor) ? DUNGEON_EXHAUSTED_RATE : 1;
   // PASSE 36 — case ÉLITE : le risque paie double (arbitrage de la carte).
-  const b = (typeof globalThis !== 'undefined') ? globalThis.battle : null;
+  const b = typeof globalThis !== 'undefined' ? globalThis.battle : null;
   const elite = !!(b && b.dungeonElite);
   const eliteRate = elite ? 2 : 1;
   run.bag.tokens += Math.max(1, Math.round(loot.tokens * mult * rate * eliteRate));
@@ -304,7 +310,9 @@ function dungeonOnWin() {
 function _dgNearestEngagementPath(run) {
   if (!run || !run.map || !run.map.tiles) return null;
   const tiles = run.map.tiles;
-  const open = Object.values(tiles).filter((t) => !t.done && (t.type === 'combat' || t.type === 'elite' || t.type === 'boss'));
+  const open = Object.values(tiles).filter(
+    (t) => !t.done && (t.type === 'combat' || t.type === 'elite' || t.type === 'boss')
+  );
   if (!open.length) return null;
   const combats = open.filter((t) => t.type !== 'boss');
   const pool = (combats.length ? combats : open).map((t) => t.id);
@@ -313,7 +321,10 @@ function _dgNearestEngagementPath(run) {
   let found = null;
   while (queue.length) {
     const cur = queue.shift();
-    if (cur !== run.pos && pool.includes(cur)) { found = cur; break; }
+    if (cur !== run.pos && pool.includes(cur)) {
+      found = cur;
+      break;
+    }
     const t = tiles[cur];
     if (!t) continue;
     for (const [dc, dr] of _DG_DIRS) {
@@ -326,7 +337,10 @@ function _dgNearestEngagementPath(run) {
   if (!found) return null;
   const path = [];
   let p = found;
-  while (p) { path.unshift(p); p = prev[p]; }
+  while (p) {
+    path.unshift(p);
+    p = prev[p];
+  }
   return path;
 }
 
@@ -376,7 +390,11 @@ function dungeonFight() {
         dungeonMoveTo(step.id);
       }
       const finalTile = tiles[path[path.length - 1]];
-      if (finalTile && !finalTile.done && (finalTile.type === 'combat' || finalTile.type === 'elite' || finalTile.type === 'boss')) {
+      if (
+        finalTile &&
+        !finalTile.done &&
+        (finalTile.type === 'combat' || finalTile.type === 'elite' || finalTile.type === 'boss')
+      ) {
         return dungeonMoveTo(finalTile.id);
       }
     }
@@ -387,11 +405,15 @@ function dungeonFight() {
       return run;
     }
     // Repli historique : un pas vers un combat voisin, sinon une case cachée.
-    const n = near.find((x2) => x2.type === 'combat' || x2.type === 'elite')
-      || near.find((x2) => !x2.revealed) || near[0];
+    const n =
+      near.find((x2) => x2.type === 'combat' || x2.type === 'elite') ||
+      near.find((x2) => !x2.revealed) ||
+      near[0];
     if (n) return dungeonMoveTo(n.id);
   }
-  try { if (typeof globalThis.exploreArea === 'function') globalThis.exploreArea(); } catch (_) {}
+  try {
+    if (typeof globalThis.exploreArea === 'function') globalThis.exploreArea();
+  } catch (_) {}
   return run;
 }
 
@@ -423,25 +445,38 @@ function dungeonDescend() {
   const run = currentDungeonRun();
   if (!run) return null;
   if (!dungeonFloorCleared()) {
-    _dgNotify(_dgT('dungeon_floor_not_cleared', {
-      need: String(dungeonQuotaFor(run.floor)), have: String(run.wins),
-    }), 'var(--red)');
+    _dgNotify(
+      _dgT('dungeon_floor_not_cleared', {
+        need: String(dungeonQuotaFor(run.floor)),
+        have: String(run.wins),
+      }),
+      'var(--red)'
+    );
     return run;
   }
   if (run.floor >= run.depth) return run; // au boss, on ne descend plus
   run.floor += 1;
   run.wins = 0;
-  _dgGenFloorMap(run);                   // PASSE 37 — nouveau plateau quadrillé
-  _dgNotify(_dgT('dungeon_descend', {
-    floor: String(run.floor), depth: String(run.depth),
-    mult: dungeonMultFor(run.floor).toFixed(1),
-  }), 'var(--blue)');
+  _dgGenFloorMap(run); // PASSE 37 — nouveau plateau quadrillé
+  _dgNotify(
+    _dgT('dungeon_descend', {
+      floor: String(run.floor),
+      depth: String(run.depth),
+      mult: dungeonMultFor(run.floor).toFixed(1),
+    }),
+    'var(--blue)'
+  );
   refreshDungeonPanel();
   // Nouveau palier, quota vierge : la chaîne de combats reprend d'elle-même.
   _dgNoAutoResume = false;
   _dgAutoResume();
   // PASSE 36 — pilote auto : il entame lui-même la nouvelle carte.
-  if (run.auto) setTimeout(() => { try { _dgAutoStep(); } catch (_) {} }, 500);
+  if (run.auto)
+    setTimeout(() => {
+      try {
+        _dgAutoStep();
+      } catch (_) {}
+    }, 500);
   return run;
 }
 
@@ -456,7 +491,9 @@ function _dgCredit(bag) {
   }
   if (bag.money > 0) {
     G.money = (G.money || 0) + bag.money;
-    try { if (typeof globalThis.updateHeader === 'function') globalThis.updateHeader(); } catch (_) {}
+    try {
+      if (typeof globalThis.updateHeader === 'function') globalThis.updateHeader();
+    } catch (_) {}
   }
 }
 
@@ -470,7 +507,7 @@ function _dgStopBattle() {
   try {
     const b = globalThis.battle;
     if (b && b.active) {
-      b.chill = false;              // empêche la chaîne de relancer un sauvage
+      b.chill = false; // empêche la chaîne de relancer un sauvage
       b.pendingDungeonBoss = false;
       if (typeof globalThis.endBattle === 'function') globalThis.endBattle();
     }
@@ -516,7 +553,10 @@ let _dgNoAutoResume = false;
 
 function _dgAutoResume() {
   try {
-    if (_dgNoAutoResume) { _dgNoAutoResume = false; return false; }
+    if (_dgNoAutoResume) {
+      _dgNoAutoResume = false;
+      return false;
+    }
     const run = currentDungeonRun();
     if (!run || !run.active) return false;
     // PASSE 36 — CARTE : plus de relance sauvage aveugle ; c'est le choix de
@@ -526,7 +566,7 @@ function _dgAutoResume() {
     if (b && b.active) return false;
     // Équipe hors d'état de combattre : on ne relance pas dans le vide.
     if (typeof globalThis.aliveCount === 'function' && globalThis.aliveCount() <= 0) return false;
-    if (dungeonFloorCleared()) return false;      // quota atteint → rien
+    if (dungeonFloorCleared()) return false; // quota atteint → rien
     setTimeout(() => {
       try {
         const r = currentDungeonRun();
@@ -538,11 +578,15 @@ function _dgAutoResume() {
       } catch (_) {}
     }, 700);
     return true;
-  } catch (_) { return false; }
+  } catch (_) {
+    return false;
+  }
 }
 
 /** Marque la prochaine fin de combat comme volontaire (pas de relance auto). */
-function _dgSuppressAutoResume() { _dgNoAutoResume = true; }
+function _dgSuppressAutoResume() {
+  _dgNoAutoResume = true;
+}
 
 /**
  * PASSE 35 — le bouton « Quitter » du bas de la fenêtre de combat.
@@ -560,9 +604,13 @@ function dungeonQuitFromBattle() {
   const perdu = { tokens: run.bag.tokens, money: run.bag.money };
   _dgSuppressAutoResume();
   const res = dungeonAbandon();
-  _dgNotify(_dgT('dungeon_quit_battle', {
-    tokens: String(perdu.tokens), money: String(perdu.money),
-  }), 'var(--red)');
+  _dgNotify(
+    _dgT('dungeon_quit_battle', {
+      tokens: String(perdu.tokens),
+      money: String(perdu.money),
+    }),
+    'var(--red)'
+  );
   return res;
 }
 
@@ -571,9 +619,12 @@ function _dgRestoreIdleScreen() {
     const idle = document.getElementById('battle-idle-screen');
     const scene = document.getElementById('battle-active-scene');
     const b = globalThis.battle;
-    if (b && b.active) return;                 // un autre combat tourne
+    if (b && b.active) return; // un autre combat tourne
     if (idle) idle.style.display = 'flex';
-    if (scene) { scene.style.display = 'none'; scene.classList.remove('is-live'); }
+    if (scene) {
+      scene.style.display = 'none';
+      scene.classList.remove('is-live');
+    }
   } catch (_) {}
 }
 
@@ -581,10 +632,9 @@ function _dgRestoreIdleScreen() {
  * PASSE 39h — retour joueur : « après avoir fini un donjon, ma team n'est pas
  * heal, ce qui est vraiment problématique. » Pendant l'expédition il ne se
  * passe toujours AUCUN soin (règle 38e : les PV durent de combat en combat) ;
- * mais à la CLÔTURE de l'expédition (victory du gardien ou remontée), l'équipe
- * se repose en entier — PV complets, états purgés — pour que la prochaine
- * expédition reparte en pleine forme au lieu de refaire les comptes avec les
- * PV restants de la précédente.
+ * mais à la CLÔTURE de l'expédition (victoire du gardien, remontée, abandon
+ * ou défaite — V7-R1 #5), l'équipe se repose en entier — PV complets, états
+ * purgés — pour que la prochaine expédition reparte en pleine forme.
  */
 function _dgRestTeam() {
   try {
@@ -593,12 +643,21 @@ function _dgRestTeam() {
     let rested = false;
     for (const p of G.team) {
       if (!p) continue;
-      if (Number(p.currentHP) < Number(p.maxHP)) { p.currentHP = p.maxHP; rested = true; }
-      if (p.status) { p.status = null; p.statusTurns = 0; rested = true; }
+      if (Number(p.currentHP) < Number(p.maxHP)) {
+        p.currentHP = p.maxHP;
+        rested = true;
+      }
+      if (p.status) {
+        p.status = null;
+        p.statusTurns = 0;
+        rested = true;
+      }
     }
     if (rested) _dgNotify(_dgT('dungeon_run_team_healed'), 'var(--green)');
     return rested;
-  } catch (_) { return false; }
+  } catch (_) {
+    return false;
+  }
 }
 
 function dungeonAscend() {
@@ -630,14 +689,21 @@ function dungeonAscend() {
   } catch (_) {}
   const G = _dgState();
   if (G) G.dungeonRun = null;
-  _dgNotify(_dgT('dungeon_ascend', {
-    tokens: String(bag.tokens), money: String(bag.money), floor: String(run.floor),
-  }), 'var(--green)');
+  _dgNotify(
+    _dgT('dungeon_ascend', {
+      tokens: String(bag.tokens),
+      money: String(bag.money),
+      floor: String(run.floor),
+    }),
+    'var(--green)'
+  );
   refreshDungeonPanel();
   _dgSyncRunFlag();
   _dgRestoreIdleScreen();
   setTimeout(() => {
-    try { if (typeof globalThis.openBattleSummary === 'function') globalThis.openBattleSummary(true); } catch (_) {}
+    try {
+      if (typeof globalThis.openBattleSummary === 'function') globalThis.openBattleSummary(true);
+    } catch (_) {}
   }, 250);
   return { outcome: 'ascend', floor: run.floor, gained: bag };
 }
@@ -663,9 +729,14 @@ function dungeonOnWipe() {
   _dgCredit(kept);
   const G = _dgState();
   if (G) G.dungeonRun = null;
-  _dgNotify(_dgT('dungeon_wipe', {
-    tokens: String(kept.tokens), money: String(kept.money),
-  }), 'var(--red)');
+  _dgRestTeam(); // V7-R1 · #5 — expédition soldée → équipe soignée (comme à la remontée).
+  _dgNotify(
+    _dgT('dungeon_wipe', {
+      tokens: String(kept.tokens),
+      money: String(kept.money),
+    }),
+    'var(--red)'
+  );
   refreshDungeonPanel();
   _dgSyncRunFlag();
   _dgRestoreIdleScreen();
@@ -699,6 +770,7 @@ function dungeonAbandon() {
   const G = _dgState();
   if (!G || !currentDungeonRun()) return null;
   G.dungeonRun = null;
+  _dgRestTeam(); // V7-R1 · #5 — fin de donjon (abandon) = équipe soignée.
   refreshDungeonPanel();
   _dgSyncRunFlag();
   _dgRestoreIdleScreen();
@@ -707,10 +779,10 @@ function dungeonAbandon() {
 
 /** Échappement minimal — les valeurs affichées sont numériques ou traduites,
  *  mais on ne construit jamais de HTML sans filtrer. */
+// V7 · DBT-05 — un seul échappement HTML (engine/render/vdom.js `esc`) ; les
+// attributs générés ici sont toujours entre guillemets doubles.
 function _dgEsc(v) {
-  return String(v == null ? '' : v)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  return esc(v == null ? '' : v);
 }
 
 /**
@@ -764,17 +836,22 @@ function _dgTileIcon(t) {
     case 'combat':
       return t.done ? '' : _dgGlyph('src/assets/images/dungeon/pokeball.svg');
     case 'elite':
-      return t.done ? '' : '<span class="pw-dgn-elite">'
-        + _dgGlyph('src/assets/images/dungeon/pokeball.svg')
-        + '<span class="pw-dgn-ic pw-dgn-star" style="--ic:url(\'' + _dgAbs('src/assets/images/dungeon/star.svg') + '\')"></span>'
-        + '</span>';
+      return t.done
+        ? ''
+        : '<span class="pw-dgn-elite">' +
+            _dgGlyph('src/assets/images/dungeon/pokeball.svg') +
+            '<span class="pw-dgn-ic pw-dgn-star" style="--ic:url(\'' +
+            _dgAbs('src/assets/images/dungeon/star.svg') +
+            '\')"></span>' +
+            '</span>';
     case 'boss':
       return _dgGlyph('src/assets/images/dungeon/boss.png');
     case 'chest':
       return t.done ? '' : _dgGlyph('src/assets/images/dungeon/chest.png');
     case 'ladder':
       return _dgGlyph('src/assets/images/dungeon/ladder.png');
-    default: return '';   // case vide : pas d'icône
+    default:
+      return ''; // case vide : pas d'icône
   }
 }
 
@@ -797,24 +874,40 @@ function _dgGridHtml(run) {
       // PASSE 38 — toute case VISIBLE est atteignable (téléportation) ; les
       // cases voisines sous brouillard restent cliquables pour être découvertes.
       const clickable = t.revealed || open.has(t.id);
-      const cls = ['pw-dgn-tile', 't-' + t.type,
+      const cls = [
+        'pw-dgn-tile',
+        't-' + t.type,
         t.id === run.pos ? 'is-here' : null,
         !t.revealed ? 'is-fog' : null,
         t.done && t.id !== run.pos ? 'is-done' : null,
-        clickable ? 'is-open' : null].filter(Boolean).join(' ');
+        clickable ? 'is-open' : null,
+      ]
+        .filter(Boolean)
+        .join(' ');
       // Sur l'échelle elle-même, le clic DESCEND ; ailleurs, il DÉPLACE.
-      const isLadderHere = (t.type === 'ladder' && t.id === run.pos);
+      const isLadderHere = t.type === 'ladder' && t.id === run.pos;
       const callAttrs = isLadderHere
         ? ' data-call="dungeonDescend"'
         : ' data-call="dungeonMoveTo" data-call-args="\'' + t.id + '\' "';
       // PASSE 38 — la case où l'on est affiche le sprite PNJ de la carte
       // (même image que le joueur sur la carte des régions).
-      const content = (t.id === run.pos)
-        ? '<img class="pw-dgn-player" src="src/assets/images/trainers/profil/trainer-54.png" alt="" draggable="false">'
-        : _dgTileIcon(t);
-      cells.push('<button type="button" class="' + cls + '" data-action="legacy-call"'
-        + callAttrs + ' title="' + label + '" aria-label="' + label + '">'
-        + content + '</button>');
+      const content =
+        t.id === run.pos
+          ? '<img class="pw-dgn-player" src="src/assets/images/trainers/profil/trainer-54.png" alt="" draggable="false">'
+          : _dgTileIcon(t);
+      cells.push(
+        '<button type="button" class="' +
+          cls +
+          '" data-action="legacy-call"' +
+          callAttrs +
+          ' title="' +
+          label +
+          '" aria-label="' +
+          label +
+          '">' +
+          content +
+          '</button>'
+      );
     }
   }
   return '<div class="pw-dgn-grid" style="--cols:' + cols + '">' + cells.join('') + '</div>';
@@ -823,7 +916,9 @@ function _dgGridHtml(run) {
 /** PASSE 39 — formatage d'un nombre sans dépendre de formatNumber (toujours
  *  disponible en jeu, mais pas forcément dans les harnais de test). */
 function formatNumberSafe(n) {
-  try { if (typeof globalThis.formatNumber === 'function') return globalThis.formatNumber(n); } catch (_) {}
+  try {
+    if (typeof globalThis.formatNumber === 'function') return globalThis.formatNumber(n);
+  } catch (_) {}
   return String(n);
 }
 
@@ -850,23 +945,46 @@ function renderBattleDungeonBar() {
     // uniquement. Cliquer sur le mode actif l'éteint.
     const AUTO_MODES = ['boss', 'farm', 'chest'];
     const autoBtn = sum.autoUnlocked
-      ? '<span class="pw-bdg-auto">'
-        + AUTO_MODES.map((m) => '<button class="hbtn pw-bdg-btn pw-bdg-auto-mode' + (sum.auto === m ? ' is-on' : '') + '" data-action="legacy-call" data-call="dungeonSetAuto" data-call-args="' + (sum.auto === m ? 'off' : m) + '">'
-            + _dgEsc(_dgT('dungeon_auto_mode_' + m)) + '</button>').join('')
-        + '</span>'
-      : '<span class="pw-bdg-locked pw-bdg-auto-locked">' + _dgEsc(_dgT('dungeon_auto_locked', { need: String(DUNGEON_AUTO_UNLOCK_CLEARS) })) + '</span>';
+      ? '<span class="pw-bdg-auto">' +
+        AUTO_MODES.map(
+          (m) =>
+            '<button class="hbtn pw-bdg-btn pw-bdg-auto-mode' +
+            (sum.auto === m ? ' is-on' : '') +
+            '" data-action="legacy-call" data-call="dungeonSetAuto" data-call-args="' +
+            (sum.auto === m ? 'off' : m) +
+            '">' +
+            _dgEsc(_dgT('dungeon_auto_mode_' + m)) +
+            '</button>'
+        ).join('') +
+        '</span>'
+      : '<span class="pw-bdg-locked pw-bdg-auto-locked">' +
+        _dgEsc(_dgT('dungeon_auto_locked', { need: String(DUNGEON_AUTO_UNLOCK_CLEARS) })) +
+        '</span>';
     // PASSE 39 — pas de palier affiché pour un donjon à UN seul niveau
     // (forêt ≠ grotte) : « Palier 1 / 1 » n'a aucun sens.
-    const floorLabel = sum.depth > 1
-      ? '<span class="pw-bdg-floor">' + _dgEsc(_dgT('dungeon_floor_label', {
-          floor: String(sum.floor), depth: String(sum.depth) })) + '</span>'
-      : '';
-    rows.push('<div class="pw-bdg-head">'
-      + '<span class="pw-bdg-title">' + _dgEsc(_dgT('dungeon_bar_title')) + '</span>'
-      + floorLabel
-      + '<span class="pw-bdg-mult">×' + _dgEsc(sum.mult) + '</span>'
-      + autoBtn
-      + '</div>');
+    const floorLabel =
+      sum.depth > 1
+        ? '<span class="pw-bdg-floor">' +
+          _dgEsc(
+            _dgT('dungeon_floor_label', {
+              floor: String(sum.floor),
+              depth: String(sum.depth),
+            })
+          ) +
+          '</span>'
+        : '';
+    rows.push(
+      '<div class="pw-bdg-head">' +
+        '<span class="pw-bdg-title">' +
+        _dgEsc(_dgT('dungeon_bar_title')) +
+        '</span>' +
+        floorLabel +
+        '<span class="pw-bdg-mult">×' +
+        _dgEsc(sum.mult) +
+        '</span>' +
+        autoBtn +
+        '</div>'
+    );
 
     // ── le plateau quadrillé (brouillard de guerre inclus) ─────────────────
     // PASSE 38c — PLUS de légende ni d'aide clavier (retours joueur) : les
@@ -891,17 +1009,29 @@ function renderBattleDungeonBar() {
     // quitter en combat : c'est une action importante. La classe pw-btn-danger
     // sort le bouton du skin bouton générique (qui impose son fond en
     // !important) ; pw-bdg-up apporte la teinte rouge.
-    acts.push('<button class="hbtn pw-bdg-btn pw-bdg-up pw-btn-danger" data-action="legacy-call" '
-      + 'data-call="dungeonAscend">' + _dgEsc(_dgT('dungeon_ascend_btn', {
-          tokens: String(sum.bag.tokens), money: String(sum.bag.money) })) + '</button>');
+    acts.push(
+      '<button class="hbtn pw-bdg-btn pw-bdg-up pw-btn-danger" data-action="legacy-call" ' +
+        'data-call="dungeonAscend">' +
+        _dgEsc(
+          _dgT('dungeon_ascend_btn', {
+            tokens: String(sum.bag.tokens),
+            money: String(sum.bag.money),
+          })
+        ) +
+        '</button>'
+    );
     // PASSE 35/37 — pas de bouton « Reprendre » : ce sont les pas sur la
     // grille qui engagent les combats ; le bouton n'existe que pour le tout
     // premier engagement de l'expédition.
     const b = globalThis.battle;
-    const jamaisEngage = (sum.totalWins === 0);
+    const jamaisEngage = sum.totalWins === 0;
     if ((!b || !b.active) && jamaisEngage && !sum.cleared) {
-      acts.push('<button class="hbtn pw-bdg-btn pw-bdg-fight" data-action="legacy-call" '
-        + 'data-call="dungeonFight">' + _dgEsc(_dgT('dungeon_bar_fight')) + '</button>');
+      acts.push(
+        '<button class="hbtn pw-bdg-btn pw-bdg-fight" data-action="legacy-call" ' +
+          'data-call="dungeonFight">' +
+          _dgEsc(_dgT('dungeon_bar_fight')) +
+          '</button>'
+      );
     }
     rows.push('<div class="pw-bdg-actions">' + acts.join('') + '</div>');
 
@@ -910,7 +1040,9 @@ function renderBattleDungeonBar() {
     else if (typeof globalThis.pwSetHtml === 'function') globalThis.pwSetHtml(host, html);
     // PASSE 39e — la réglette de butin unifiée, sous la carte : toujours
     // synchronisée (ouverture, victoire, coffre, fin de combat).
-    try { if (typeof globalThis.renderBattleLoot === 'function') globalThis.renderBattleLoot(); } catch (_) {}
+    try {
+      if (typeof globalThis.renderBattleLoot === 'function') globalThis.renderBattleLoot();
+    } catch (_) {}
   } catch (_) {}
 }
 
@@ -920,7 +1052,8 @@ function refreshDungeonPanel() {
   try {
     if (typeof document === 'undefined') return;
     _dgSyncRunFlag();
-    const el = document.getElementById('location-info-panel') || document.getElementById('tab-content');
+    const el =
+      document.getElementById('location-info-panel') || document.getElementById('tab-content');
     if (el && typeof globalThis.renderLocInfo === 'function') globalThis.renderLocInfo(el);
     renderBattleDungeonBar();
   } catch (_) {}
@@ -995,10 +1128,19 @@ function _dgGridSizeFor(badgeReq) {
   return { cols, rows };
 }
 
-const _DG_DIRS = [[1, 0], [-1, 0], [0, -1], [0, 1]];
+const _DG_DIRS = [
+  [1, 0],
+  [-1, 0],
+  [0, -1],
+  [0, 1],
+];
 
-function _dgNodeId(col, row) { return `c${col}r${row}`; }
-function _dgNode(run, id) { return run.map && run.map.tiles ? run.map.tiles[id] : null; }
+function _dgNodeId(col, row) {
+  return `c${col}r${row}`;
+}
+function _dgNode(run, id) {
+  return run.map && run.map.tiles ? run.map.tiles[id] : null;
+}
 
 /** Plus court chemin (BFS) entre deux cases d'un plateau en construction. */
 function _dgBfsOnTiles(tiles, fromId, toId) {
@@ -1010,12 +1152,15 @@ function _dgBfsOnTiles(tiles, fromId, toId) {
     const t = tiles[cur];
     for (const [dc, dr] of _DG_DIRS) {
       const n = tiles[_dgNodeId(t.col + dc, t.row + dr)];
-      if (!n || (n.id in prev)) continue;
+      if (!n || n.id in prev) continue;
       prev[n.id] = cur;
       if (n.id === toId) {
         const path = [n.id];
         let p = cur;
-        while (p) { path.unshift(p); p = prev[p]; }
+        while (p) {
+          path.unshift(p);
+          p = prev[p];
+        }
         return path;
       }
       queue.push(n.id);
@@ -1039,7 +1184,14 @@ function _dgGenFloorMap(run) {
   const tiles = {};
   for (let c = 0; c < cols; c++) {
     for (let r = 0; r < rows; r++) {
-      tiles[_dgNodeId(c, r)] = { id: _dgNodeId(c, r), col: c, row: r, type: 'empty', revealed: false, done: false };
+      tiles[_dgNodeId(c, r)] = {
+        id: _dgNodeId(c, r),
+        col: c,
+        row: r,
+        type: 'empty',
+        revealed: false,
+        done: false,
+      };
     }
   }
   // PASSE 38 — l'entrée est EN BAS AU MILIEU (et non à gauche) : on arrive par
@@ -1099,11 +1251,13 @@ function _dgGenFloorMap(run) {
   // répartition proportionnelle à la surface : combats + coffres majoritaires
   // face aux cases vides (retour joueur : « trop de cases vides »).
   const area = cols * rows;
-  const chestCount = Math.max(5, Math.round(area * 0.10));
-  const combatCount = Math.max(12, Math.round(area * 0.40));
+  const chestCount = Math.max(5, Math.round(area * 0.1));
+  const combatCount = Math.max(12, Math.round(area * 0.4));
   // le pool de répartition exclut la zone de départ, le boss, ses gardes ET
   // le couloir de combats garanti (sinon la dispersion les écraserait).
-  const pool = Object.keys(tiles).filter((id) => !startZone.has(id) && id !== bossId && !guards.includes(id) && !corridorSet.has(id));
+  const pool = Object.keys(tiles).filter(
+    (id) => !startZone.has(id) && id !== bossId && !guards.includes(id) && !corridorSet.has(id)
+  );
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
@@ -1112,7 +1266,7 @@ function _dgGenFloorMap(run) {
   for (let n = 0; n < chestCount && k < pool.length; n++, k++) tiles[pool[k]].type = 'chest';
   for (let n = 0; n < combatCount && k < pool.length; n++, k++) {
     tiles[pool[k]].type = 'combat';
-    if (n < 2) tiles[pool[k]].type = 'elite';   // deux combats corsés, butin ×2
+    if (n < 2) tiles[pool[k]].type = 'elite'; // deux combats corsés, butin ×2
   }
   run.map = { grid: true, cols, rows, tiles };
   run.pos = startId;
@@ -1137,7 +1291,12 @@ function _dgNeighbors(run, id) {
   const t = _dgNode(run, id);
   if (!t) return [];
   const out = [];
-  for (const [dc, dr] of [[1, 0], [-1, 0], [0, -1], [0, 1]]) {
+  for (const [dc, dr] of [
+    [1, 0],
+    [-1, 0],
+    [0, -1],
+    [0, 1],
+  ]) {
     const n = _dgNode(run, _dgNodeId(t.col + dc, t.row + dr));
     if (n) out.push(n);
   }
@@ -1161,7 +1320,10 @@ function _dgBfsPath(run, targetId) {
       if (n.id === targetId) {
         const path = [n.id];
         let p = cur;
-        while (p) { path.unshift(p); p = prev[p]; }
+        while (p) {
+          path.unshift(p);
+          p = prev[p];
+        }
         return path;
       }
       queue.push(n.id);
@@ -1186,10 +1348,16 @@ function _dgTeamHpRatio() {
     const team = (G && G.team) || [];
     const alive = team.filter((p) => p && p.currentHP > 0);
     if (!alive.length) return 0;
-    let cur = 0, max = 0;
-    for (const p of alive) { cur += p.currentHP; max += p.maxHP || p.currentHP; }
+    let cur = 0,
+      max = 0;
+    for (const p of alive) {
+      cur += p.currentHP;
+      max += p.maxHP || p.currentHP;
+    }
     return max > 0 ? cur / max : 1;
-  } catch (_) { return 1; }
+  } catch (_) {
+    return 1;
+  }
 }
 
 /**
@@ -1204,7 +1372,10 @@ function dungeonMoveTo(id) {
   const run = currentDungeonRun();
   if (!run || !run.map || !run.map.grid) return null;
   const b = globalThis.battle;
-  if (b && b.active) { _dgNotify(_dgT('dungeon_map_move_blocked'), 'var(--red)'); return run; }
+  if (b && b.active) {
+    _dgNotify(_dgT('dungeon_map_move_blocked'), 'var(--red)');
+    return run;
+  }
   const tile = _dgNode(run, id);
   if (!tile) return run;
   const here = _dgNode(run, run.pos);
@@ -1226,9 +1397,17 @@ function dungeonMoveTo(id) {
     const mult = dungeonMultFor(run.floor);
     run.bag.tokens += Math.round(loot.tokens * mult * 2);
     run.bag.money += Math.round(loot.money * mult * 2);
-    _dgNotify(_dgT('dungeon_chest_loot', { tokens: String(Math.round(loot.tokens * mult * 2)) }), 'var(--green)');
+    _dgNotify(
+      _dgT('dungeon_chest_loot', { tokens: String(Math.round(loot.tokens * mult * 2)) }),
+      'var(--green)'
+    );
     refreshDungeonPanel();
-    if (run.auto) setTimeout(() => { try { _dgAutoStep(); } catch (_) {} }, 450);
+    if (run.auto)
+      setTimeout(() => {
+        try {
+          _dgAutoStep();
+        } catch (_) {}
+      }, 450);
     return run;
   }
   if (tile.type === 'ladder') {
@@ -1237,14 +1416,19 @@ function dungeonMoveTo(id) {
   if ((tile.type === 'combat' || tile.type === 'elite' || tile.type === 'boss') && !tile.done) {
     run.pendingNode = id;
     if (tile.type === 'boss' && dungeonIsBossFloor()) {
-      if (b) b.pendingDungeonBoss = true;   // le gardien, seul boss du donjon
+      if (b) b.pendingDungeonBoss = true; // le gardien, seul boss du donjon
     }
     dungeonFight();
     refreshDungeonPanel();
     return run;
   }
   refreshDungeonPanel();
-  if (run.auto) setTimeout(() => { try { _dgAutoStep(); } catch (_) {} }, 350);
+  if (run.auto)
+    setTimeout(() => {
+      try {
+        _dgAutoStep();
+      } catch (_) {}
+    }, 350);
   return run;
 }
 
@@ -1256,7 +1440,10 @@ function dungeonMove(dir) {
   const d = { right: [1, 0], left: [-1, 0], up: [0, -1], down: [0, 1] }[dir];
   if (!d) return run;
   const target = _dgNode(run, _dgNodeId(t.col + d[0], t.row + d[1]));
-  if (!target) { _dgNotify(_dgT('dungeon_map_move_blocked'), 'var(--red)'); return run; }
+  if (!target) {
+    _dgNotify(_dgT('dungeon_map_move_blocked'), 'var(--red)');
+    return run;
+  }
   return dungeonMoveTo(target.id);
 }
 
@@ -1284,12 +1471,20 @@ function dungeonSetAuto(mode) {
   if (next === 'off' || next === false || next == null) next = false;
   if (next !== false && !_DG_AUTO_MODES.includes(next)) next = false;
   if (next && !dungeonAutoUnlocked(run.loc)) {
-    _dgNotify(_dgT('dungeon_auto_locked', { need: String(DUNGEON_AUTO_UNLOCK_CLEARS) }), 'var(--red)');
+    _dgNotify(
+      _dgT('dungeon_auto_locked', { need: String(DUNGEON_AUTO_UNLOCK_CLEARS) }),
+      'var(--red)'
+    );
     return run;
   }
   run.auto = next;
   refreshDungeonPanel();
-  if (run.auto) setTimeout(() => { try { _dgAutoStep(); } catch (_) {} }, 400);
+  if (run.auto)
+    setTimeout(() => {
+      try {
+        _dgAutoStep();
+      } catch (_) {}
+    }, 400);
   return run;
 }
 
@@ -1300,7 +1495,7 @@ function _dgAutoStep() {
   const b = globalThis.battle;
   if (b && b.active) return null;
   if (typeof globalThis.aliveCount === 'function' && globalThis.aliveCount() <= 0) return null;
-  const mode = run.auto === 'chest' ? 'chest' : (run.auto === 'boss' ? 'boss' : 'farm');
+  const mode = run.auto === 'chest' ? 'chest' : run.auto === 'boss' ? 'boss' : 'farm';
   let path = null;
 
   if (mode === 'boss') {
@@ -1329,7 +1524,10 @@ function _dgAutoStep() {
       path = _dgNearestPath(run, (t) => !t.revealed);
       if (!path) path = _dgBfsPath(run, run.bossTile);
     } else {
-      path = _dgNearestPath(run, (t) => !t.done && (t.type === 'chest' || t.type === 'combat' || t.type === 'elite'));
+      path = _dgNearestPath(
+        run,
+        (t) => !t.done && (t.type === 'chest' || t.type === 'combat' || t.type === 'elite')
+      );
       if (!path) {
         if (run.pos === run.bossTile) return dungeonDescend();
         path = _dgBfsPath(run, run.bossTile);
@@ -1368,24 +1566,51 @@ function _dgInitDungeonKeys() {
 
 // ── Surface classique (fenêtres, dispatcher d'actions, harnais) ─────────────// ── Surface classique (fenêtres, dispatcher d'actions, harnais) ─────────────
 const _dgApi = {
-  dungeonDepthFor, dungeonMultFor, dungeonQuotaFor, dungeonWinLoot,
-  currentDungeonRun, isDungeonRunAt, startDungeonRun,
-  dungeonOnWin, dungeonFloorCleared, dungeonIsBossFloor, dungeonDescend, dungeonFight,
-  dungeonAscend, dungeonOnWipe, dungeonOnBossDefeated, dungeonAbandon,
-  dungeonQuitFromBattle, _dgAutoResume, _dgSuppressAutoResume,
+  dungeonDepthFor,
+  dungeonMultFor,
+  dungeonQuotaFor,
+  dungeonWinLoot,
+  currentDungeonRun,
+  isDungeonRunAt,
+  startDungeonRun,
+  dungeonOnWin,
+  dungeonFloorCleared,
+  dungeonIsBossFloor,
+  dungeonDescend,
+  dungeonFight,
+  dungeonAscend,
+  dungeonOnWipe,
+  dungeonOnBossDefeated,
+  dungeonAbandon,
+  dungeonQuitFromBattle,
+  _dgAutoResume,
+  _dgSuppressAutoResume,
   renderBattleDungeonBar,
-  dungeonRunSummary, refreshDungeonPanel, DUNGEON_RULES,
+  dungeonRunSummary,
+  refreshDungeonPanel,
+  DUNGEON_RULES,
   // PASSE 36 — carte du donjon, clavier et pilote automatique.
-  dungeonMoveTo, dungeonMove, dungeonSetAuto, dungeonAutoUnlocked,
-  _dgAutoStep, _dgGenFloorMap, DUNGEON_AUTO_UNLOCK_CLEARS,
+  dungeonMoveTo,
+  dungeonMove,
+  dungeonSetAuto,
+  dungeonAutoUnlocked,
+  _dgAutoStep,
+  _dgGenFloorMap,
+  DUNGEON_AUTO_UNLOCK_CLEARS,
   // PASSE 38c — grille progressive, gardes du boss, butin du donjon.
-  _dgGridSizeFor, _dgHarvestRunLoot,
+  _dgGridSizeFor,
+  _dgHarvestRunLoot,
   // PASSE 39 — profondeur selon le décor (forêt = 1 niveau, grotte = paliers).
-  _dgIsCaveLike, formatNumberSafe,
+  _dgIsCaveLike,
+  formatNumberSafe,
 };
 if (typeof globalThis !== 'undefined') Object.assign(globalThis, _dgApi);
 if (typeof window !== 'undefined') Object.assign(window, _dgApi);
-if (typeof PokeActions !== 'undefined' && PokeActions && typeof PokeActions.register === 'function') {
+if (
+  typeof PokeActions !== 'undefined' &&
+  PokeActions &&
+  typeof PokeActions.register === 'function'
+) {
   try {
     PokeActions.register('startDungeonRun', startDungeonRun);
     PokeActions.register('dungeonDescend', dungeonDescend);
@@ -1396,16 +1621,38 @@ if (typeof PokeActions !== 'undefined' && PokeActions && typeof PokeActions.regi
 }
 
 export {
-  dungeonDepthFor, dungeonMultFor, dungeonQuotaFor, dungeonWinLoot,
-  currentDungeonRun, isDungeonRunAt, startDungeonRun,
-  dungeonOnWin, dungeonFloorCleared, dungeonIsBossFloor, dungeonDescend, dungeonFight,
-  dungeonAscend, dungeonOnWipe, dungeonOnBossDefeated, dungeonAbandon,
-  dungeonQuitFromBattle, _dgAutoResume, _dgSuppressAutoResume,
+  dungeonDepthFor,
+  dungeonMultFor,
+  dungeonQuotaFor,
+  dungeonWinLoot,
+  currentDungeonRun,
+  isDungeonRunAt,
+  startDungeonRun,
+  dungeonOnWin,
+  dungeonFloorCleared,
+  dungeonIsBossFloor,
+  dungeonDescend,
+  dungeonFight,
+  dungeonAscend,
+  dungeonOnWipe,
+  dungeonOnBossDefeated,
+  dungeonAbandon,
+  dungeonQuitFromBattle,
+  _dgAutoResume,
+  _dgSuppressAutoResume,
   renderBattleDungeonBar,
-  dungeonRunSummary, refreshDungeonPanel, DUNGEON_RULES,
-  dungeonMoveTo, dungeonMove, dungeonSetAuto, dungeonAutoUnlocked,
-  _dgAutoStep, _dgGenFloorMap, DUNGEON_AUTO_UNLOCK_CLEARS,
-  _dgGridSizeFor, _dgHarvestRunLoot,
-  _dgIsCaveLike, formatNumberSafe,
+  dungeonRunSummary,
+  refreshDungeonPanel,
+  DUNGEON_RULES,
+  dungeonMoveTo,
+  dungeonMove,
+  dungeonSetAuto,
+  dungeonAutoUnlocked,
+  _dgAutoStep,
+  _dgGenFloorMap,
+  DUNGEON_AUTO_UNLOCK_CLEARS,
+  _dgGridSizeFor,
+  _dgHarvestRunLoot,
+  _dgIsCaveLike,
+  formatNumberSafe,
 };
-

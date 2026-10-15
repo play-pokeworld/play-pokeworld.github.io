@@ -19,9 +19,13 @@ import { UIInteractiveComponent } from '../components/UIInteractiveComponent.js'
 import { UIRenderComponent } from '../components/UIRenderComponent.js';
 
 export class UIInteractionSystem extends System {
-  static get systemName() { return 'UIInteractionSystem'; }
+  static get systemName() {
+    return 'UIInteractionSystem';
+  }
 
-  get components() { return [UIInteractiveComponent, UIRenderComponent]; }
+  get components() {
+    return [UIInteractiveComponent, UIRenderComponent];
+  }
 
   /**
    * @param {import('../core/Entity.js').Entity} _entity
@@ -46,6 +50,3 @@ export class UIInteractionSystem extends System {
     }
   }
 }
-
-
-

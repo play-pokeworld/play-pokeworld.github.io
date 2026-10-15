@@ -42,7 +42,7 @@ function makeSandbox() {
     'src/data/locations-data.js', 'src/data/locations-johto.js', 'src/data/game-helpers.js',
     'src/application/world/team.js', 'src/application/pokemon-factory.js',
     'src/data/champions-data.js', 'src/data/official-teams-data.js',
-    'src/data/story-quests.js', 'src/data/side-quests-data.js', 'src/data/npc-data.js',
+    'src/data/story-quests.js', 'src/data/side-quests-data.js', 'src/data/legendary-quests.js', 'src/data/npc-data.js',
     'src/data/repeatable-quests-data.js',
     'src/data/trainer-sprites-data.js', 'src/application/quests/quest-core.js',
   ]) {
@@ -133,12 +133,19 @@ test('side quests: s1-s55, Kanto then Johto, mandatory NPC giver, valid mainTalk
   const keys = Object.keys(SQ);
   // 137 = 30 Kanto + 25 Johto + 30 Hoenn (s1-s85) + 28 riddles (s86-s113)
   //     + 24 densification Hoenn (s114-s137) — cf. RESTE_A_FAIRE.md.
-  assert.equal(keys.length, 137, '137 side quests (s1-s137)');
+  // V7 · LEG-02 : + 28 étapes des 10 chaînes légendaires de Hoenn (leg_<nom>_<n>) = 165.
+  assert.equal(keys.length, 165, '165 side quests (s1-s137 + 28 legendary chain steps)');
+  assert.equal(keys.filter((k) => k.startsWith('leg_')).length, 28);
   for (let i = 1; i <= 30; i++) assert.ok(SQ['s' + i] && SQ['s' + i].region === 'kanto', `s${i} Kanto`);
   for (let i = 31; i <= 55; i++) assert.ok(SQ['s' + i] && SQ['s' + i].region === 'johto', `s${i} Johto`);
   const npcQuests = [];
   for (const [loc, list] of Object.entries(sb.NPCS)) for (const npc of list) if (npc.quest) npcQuests.push(npc.quest);
-  for (const sid of keys) assert.ok(npcQuests.includes(sid), `quest ${sid} has an NPC giver`);
+  // V7 · LEG-02 : une chaîne légendaire n'a qu'un donneur PNJ (étape 1) ; les
+  // étapes suivantes s'enchaînent via prevStep/nextStep (currentChainStepId).
+  for (const sid of keys) {
+    if (SQ[sid].prevStep) assert.ok(SQ[SQ[sid].prevStep] && SQ[SQ[sid].prevStep].nextStep === sid, `chain step ${sid} linked to ${SQ[sid].prevStep}`);
+    else assert.ok(npcQuests.includes(sid), `quest ${sid} has an NPC giver`);
+  }
   for (const nq of npcQuests) assert.ok(SQ[nq], `NPC gives the existing quest ${nq}`);
   // Talk quests: Prof. NPCs point to existing talk quests.
   // (Hoenn chain loaded separately: story-quests-hoenn.js extends STORY_QUESTS at boot)
@@ -188,7 +195,9 @@ test('quest texts: complete FR+EN, rewardDesc synced with the definitions', () =
     for (const lang of ['fr', 'en']) {
       const node = L[lang].quests.side[sid];
       assert.ok(node && node.title && node.desc && node.rewardDesc, `${lang} quest ${sid}: complete text`);
-      if (def.rewardMoney) assert.ok(strip(node.rewardDesc).startsWith(String(def.rewardMoney)), `${lang} quest ${sid}: amount ${def.rewardMoney} in "${node.rewardDesc}"`);
+      // V7 · TXT-01 : les étapes légendaires (leg_*) n'écrivent pas le montant en dur
+      // dans le texte — l'affichage réel vient de computeRewardText(def).
+      if (def.rewardMoney && !sid.startsWith('leg_')) assert.ok(strip(node.rewardDesc).startsWith(String(def.rewardMoney)), `${lang} quest ${sid}: amount ${def.rewardMoney} in "${node.rewardDesc}"`);
     }
   }
 });

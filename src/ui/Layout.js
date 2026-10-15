@@ -11,7 +11,10 @@
 // Shared safe-HTML service (engine pwSetHtml when present, else direct).
 // globalThis-backed so concatenated VM harnesses and classic stubs stay valid.
 if (typeof globalThis !== 'undefined' && typeof globalThis._pwSetHtmlSafe !== 'function') {
-  globalThis._pwSetHtmlSafe = function (el, html) { if (typeof globalThis.pwSetHtml === 'function') globalThis.pwSetHtml(el, html); else el.innerHTML = html; };
+  globalThis._pwSetHtmlSafe = function (el, html) {
+    if (typeof globalThis.pwSetHtml === 'function') globalThis.pwSetHtml(el, html);
+    else el.innerHTML = html;
+  };
 }
 
 export class Layout {
@@ -62,7 +65,7 @@ export class Layout {
   _applyStyle() {
     if (!this._element) return;
     this._element.className = `pw-ui-layout pw-ui-layout--${this.variant} ${this.className}`.trim();
-    this._element.style.display = (this.variant === 'grid') ? 'grid' : 'flex';
+    this._element.style.display = this.variant === 'grid' ? 'grid' : 'flex';
     this._element.style.gap = this.gap;
     if (this.variant === 'grid') {
       this._element.style.gridTemplateColumns = `repeat(${this.cols}, minmax(0, 1fr))`;
@@ -78,6 +81,3 @@ export class Layout {
     }
   }
 }
-
-
-

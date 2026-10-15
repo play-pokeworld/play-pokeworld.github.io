@@ -69,7 +69,7 @@ function closeVNode(close) {
   // The CSS draws '✕' via ::before for an empty .modal-close. Callers that
   // historically wrote the glyph inline keep doing so (identical output),
   // callers that relied on the pseudo-element pass glyph:false.
-  const glyph = close.glyph === false ? null : (close.glyph || null);
+  const glyph = close.glyph === false ? null : close.glyph || null;
   return h(close.tag === 'button' ? 'button' : 'span', props, glyph);
 }
 
@@ -96,25 +96,36 @@ export function panelHeaderVNode(opts = {}) {
 
   const iconNode = o.iconHtml
     ? h('span', { class: 'pw-info-icon' }, h.raw(o.iconHtml))
-    : (o.icon ? h('span', { class: 'pw-info-icon' }, o.icon) : null);
+    : o.icon
+      ? h('span', { class: 'pw-info-icon' }, o.icon)
+      : null;
 
-  const titleChild = o.titleHtml != null ? h.raw(o.titleHtml) : (o.title != null ? o.title : '');
-  const subtitleChild = o.subtitleHtml != null
-    ? h.raw(o.subtitleHtml)
-    : (o.subtitle != null && o.subtitle !== '' ? o.subtitle : null);
+  const titleChild = o.titleHtml != null ? h.raw(o.titleHtml) : o.title != null ? o.title : '';
+  const subtitleChild =
+    o.subtitleHtml != null
+      ? h.raw(o.subtitleHtml)
+      : o.subtitle != null && o.subtitle !== ''
+        ? o.subtitle
+        : null;
 
-  const textCluster = h('div', { class: 'pw-info-head-text' },
-    h('div', Object.assign({ class: 'pw-info-name' }, o.titleProps || {}), titleChild, o.titleExtra || null),
+  const textCluster = h(
+    'div',
+    { class: 'pw-info-head-text' },
+    h(
+      'div',
+      Object.assign({ class: 'pw-info-name' }, o.titleProps || {}),
+      titleChild,
+      o.titleExtra || null
+    ),
     subtitleChild != null
       ? h('div', { class: cx('pw-text-sm', o.subtitleClass || 'pw-light1') }, subtitleChild)
-      : null);
+      : null
+  );
 
   const props = { class: cx('modal-title', o.class) };
   if (o.id) props.id = o.id;
 
-  return h('div', props,
-    h('div', { class: 'pw-row' }, iconNode, textCluster),
-    closeVNode(o.close));
+  return h('div', props, h('div', { class: 'pw-row' }, iconNode, textCluster), closeVNode(o.close));
 }
 
 /**
@@ -126,5 +137,3 @@ export function panelHeaderVNode(opts = {}) {
 export function panelHeaderHTML(opts) {
   return toHTMLString(panelHeaderVNode(opts));
 }
-
-
