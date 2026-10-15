@@ -140,7 +140,7 @@ console.log('HTML sink contract OK (0 raw .innerHTML = outside the documented en
   console.log(`Forms OK (${Object.keys(FORMS).length} formes, PD #1–#${maxPd})`);
 }
 
-// ── V7-R2 · SND-03 / V7-R3 · SND-04 / V7-R3b · SND-05 / V7-R3c · SND-06 — audio : pistes livrées créditées (≤ 24 Mo), cris + effets fichier (≤ 15 Mo), manifeste à jour, 0 import audio dans combat/ ──
+// ── V7-R2 · SND-03 / V7-R3 · SND-04 / V7-R3b · SND-05 / V7-R3c · SND-06 / V7-R3d · SND-07 — audio : pistes livrées créditées (≤ 40 Mo), cris + effets fichier (≤ 15 Mo), manifeste à jour, 0 import audio dans combat/ ──
 {
   const audioDir = 'src/assets/audio';
   const musicDir = audioDir + '/music';
@@ -166,8 +166,8 @@ console.log('HTML sink contract OK (0 raw .innerHTML = outside the documented en
   }
   if (!credits.includes('CC0'))
     errors.push('docs/CREDITS.md : licence des pistes (CC0 / CC-BY) absente');
-  if (bytes > 24 * 1024 * 1024)
-    errors.push(`budget musique dépassé : ${(bytes / 1048576).toFixed(2)} Mo > 24 Mo`);
+  if (bytes > 40 * 1024 * 1024)
+    errors.push(`budget musique dépassé : ${(bytes / 1048576).toFixed(2)} Mo > 40 Mo`);
   let extraBytes = 0;
   for (const sub of ['cries', 'sfx'])
     for (const f of listDir(path.join(audioDir, sub)))
@@ -201,7 +201,7 @@ console.log('HTML sink contract OK (0 raw .innerHTML = outside the documented en
     process.exit(1);
   }
   console.log(
-    `Audio OK (${bundled}/${tracks.length} pistes livrées créditées, ${(bytes / 1048576).toFixed(2)} Mo ≤ 24 Mo ; ${cries} cris + effets ${(extraBytes / 1048576).toFixed(2)} Mo ≤ 15 Mo ; manifeste à jour ; combat/ sans audio)`
+    `Audio OK (${bundled}/${tracks.length} pistes livrées créditées, ${(bytes / 1048576).toFixed(2)} Mo ≤ 40 Mo ; ${cries} cris + effets ${(extraBytes / 1048576).toFixed(2)} Mo ≤ 15 Mo ; manifeste à jour ; combat/ sans audio)`
   );
 }
 

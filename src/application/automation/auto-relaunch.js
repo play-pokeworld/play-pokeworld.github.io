@@ -19,6 +19,7 @@ const AUTO_RELAUNCH_DELAY_MS = 5000;
 let _arTimer = null;
 let _arTick = null;
 let _arDeadline = 0;
+let _arCancelledAt = 0; // V7-R3d · R3d-03 — annulation manuelle (affichée dans le butin)
 
 function _arFn(name) {
   const f = globalThis[name];
@@ -33,6 +34,17 @@ function _arText(key, params) {
 function _arUnref(h) {
   if (h && typeof h.unref === 'function') h.unref();
   return h;
+}
+function _arBtn(call, label, cls) {
+  return (
+    '<button type="button" class="hbtn ' +
+    (cls || '') +
+    '" data-action="legacy-call" data-call="' +
+    call +
+    '" data-call-args="">' +
+    label +
+    '</button>'
+  );
 }
 
 /** L'amélioration a-t-elle été achetée (boutique, PQ) ? */
@@ -96,6 +108,7 @@ function autoRelaunchRemainingMs() {
 function scheduleAutoRelaunch() {
   if (!isAutoRelaunchEnabled() || !autoRelaunchAllowedHere()) return false;
   cancelAutoRelaunch(true);
+  _arCancelledAt = 0;
   _arDeadline = Date.now() + AUTO_RELAUNCH_DELAY_MS;
   _arTimer = _arUnref(globalThis.setTimeout(_arFire, AUTO_RELAUNCH_DELAY_MS));
   _arTick = _arUnref(globalThis.setInterval(renderAutoRelaunchBar, 250));
@@ -104,6 +117,7 @@ function scheduleAutoRelaunch() {
 }
 
 function cancelAutoRelaunch(silent) {
+  if (_arTimer && !silent) _arCancelledAt = Date.now(); // annulation par le joueur
   if (_arTimer) globalThis.clearTimeout(_arTimer);
   if (_arTick) globalThis.clearInterval(_arTick);
   _arTimer = null;
@@ -129,23 +143,77 @@ function _arFire() {
   return true;
 }
 
+/** V7-R3d · R3d-03 — le compte à rebours est aussi affiché DANS le menu de butin
+ *  (résumé de combat, qui recouvre l'écran de repos) avec une barre de progression
+ *  et un bouton d'arrêt ; après une annulation, le menu le dit explicitement. */
+function _arRenderSummary() {
+  const host = document.getElementById('summary-relaunch-wild');
+  if (!host) return;
+  const setHtml = _arFn('_pwSetHtmlSafe');
+  if (!autoRelaunchAllowedHere() && !_arTimer) {
+    if (host.firstElementChild) {
+      if (setHtml) setHtml(host, '');
+      else host.textContent = '';
+    }
+    return;
+  }
+  const left = autoRelaunchRemainingMs();
+  const armed = !!(_arTimer && left > 0);
+  const existing = host.firstElementChild;
+  if (armed) {
+    const textStr = _arText('auto_relaunch_countdown', { s: Math.ceil(left / 1000) });
+    const pct = Math.max(0, Math.min(100, Math.round((left / AUTO_RELAUNCH_DELAY_MS) * 100))) + '%';
+    if (existing && existing.classList.contains('is-armed')) {
+      const txt = existing.querySelector('.pw-summary-relaunch-text');
+      if (txt && txt.textContent !== textStr) txt.textContent = textStr;
+      const fill = existing.querySelector('.pw-summary-relaunch-fill');
+      if (fill && fill.style) fill.style.width = pct;
+      return;
+    }
+    const html =
+      '<div class="pw-summary-relaunch is-armed" role="status" aria-live="polite">' +
+      '<span class="pw-summary-relaunch-text">' +
+      textStr +
+      '</span><span class="pw-summary-relaunch-bar"><span class="pw-summary-relaunch-fill" style="width:' +
+      pct +
+      '"></span></span>' +
+      _arBtn(
+        'cancelAutoRelaunch',
+        _arText('auto_relaunch_cancel_btn'),
+        'pw-summary-relaunch-cancel'
+      ) +
+      '</div>';
+    if (setHtml) setHtml(host, html);
+    else host.textContent = html.replace(/<[^>]+>/g, ' ');
+    return;
+  }
+  if (_arCancelledAt) {
+    if (existing && existing.classList.contains('is-cancelled')) return;
+    const html =
+      '<div class="pw-summary-relaunch is-cancelled" role="status"><span class="pw-summary-relaunch-text">' +
+      _arText('auto_relaunch_cancelled') +
+      '</span></div>';
+    if (setHtml) setHtml(host, html);
+    else host.textContent = html.replace(/<[^>]+>/g, ' ');
+    return;
+  }
+  if (existing) {
+    if (setHtml) setHtml(host, '');
+    else host.textContent = '';
+  }
+}
+
 /** Bandeau de l'écran de repos : état de l'interrupteur + compte à rebours. */
 function renderAutoRelaunchBar() {
   if (typeof document === 'undefined') return;
   // V7-R3 · D30 — le bandeau jumeau des donjons se rafraîchit en même temps.
   const dgBar = _arFn('renderAutoDungeonRelaunchBar');
   if (dgBar) dgBar();
+  _arRenderSummary();
   const host = document.getElementById('battle-auto-relaunch');
   if (!host) return;
   const setHtml = _arFn('_pwSetHtmlSafe');
-  const btn = (call, label, cls) =>
-    '<button type="button" class="hbtn ' +
-    (cls || '') +
-    '" data-action="legacy-call" data-call="' +
-    call +
-    '" data-call-args="">' +
-    label +
-    '</button>';
+  const btn = _arBtn;
   if (!isAutoRelaunchOwned()) {
     // V7-R3c · R3c-04 — module non acheté : le bandeau annonce le prix et
     // propose l'achat direct (plus de bouton muet ni de bandeau caché).

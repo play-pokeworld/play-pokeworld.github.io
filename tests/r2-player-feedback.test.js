@@ -675,7 +675,10 @@ test('R2-04a · boutique : entrée « upgrade » payée en points de quête, ach
   // V7-R3 · R3-06 — boucle générique ['autoRelaunch','autoDungeonRelaunch'] ;
   // une amélioration déjà achetée disparaît du rayon (plus de « Acheté »).
   assert.match(shop, /for \(const upKey of \['autoRelaunch', 'autoDungeonRelaunch'\]\)/);
-  assert.match(shop, /key: upKey,\s*kind: 'upgrade',\s*currency: 'questPoints',\s*price: arCosts\[upKey\]/);
+  assert.match(
+    shop,
+    /key: upKey,\s*kind: 'upgrade',\s*currency: 'questPoints',\s*price: arCosts\[upKey\]/
+  );
   assert.match(shop, /if \(owned\) continue;/);
   assert.match(shop, /entry\.kind === 'staff' \|\| entry\.kind === 'upgrade'\) return 1/);
   assert.match(shop, /purchaseAutomationIfNeeded\(entry\.key\)/);
@@ -898,8 +901,16 @@ test('R2-05a · préférences persistées hors sauvegarde (localStorage) ; coupu
   assert.equal(sandbox.audioPlaySfx('click'), false, 'bus effets coupé');
   sandbox.audioToggle('sfx');
   assert.equal(sandbox.audioPlaySfx('click'), true);
-  assert.equal(sandbox.audioSetVolume('music', 55, { percent: true }), 0.55, 'curseur 0–100 accepté');
-  assert.equal(sandbox.audioSetVolume('music', 0.01), 0.01, 'V7-R3c — 1 % n\'est plus confondu avec 100 %');
+  assert.equal(
+    sandbox.audioSetVolume('music', 55, { percent: true }),
+    0.55,
+    'curseur 0–100 accepté'
+  );
+  assert.equal(
+    sandbox.audioSetVolume('music', 0.01),
+    0.01,
+    "V7-R3c — 1 % n'est plus confondu avec 100 %"
+  );
   assert.equal(sandbox.audioSetVolume('music', 55, { percent: true }), 0.55);
   const saved = JSON.parse(dom.window.localStorage.getItem('pokeworld_audio_prefs'));
   assert.equal(saved.musicVol, 0.55);
@@ -1011,11 +1022,12 @@ test('R2-05d · contexte musical déduit de l’état : menu, carte par région,
   assert.equal(ctx(), 'menu');
   sandbox.PokeWorldGameStarted = true;
   sandbox.G.location = 'j_route29';
-  assert.equal(ctx(), 'map:johto:j_route29');
+  // V7-R3d · SND-07 — une route sur deux porte le suffixe `:alt` (seconde piste de région)
+  assert.match(ctx(), /^map:johto:j_route29(:alt)?$/);
   sandbox.G.location = 'h_route101';
-  assert.equal(ctx(), 'map:hoenn:h_route101');
+  assert.match(ctx(), /^map:hoenn:h_route101(:alt)?$/);
   sandbox.battle = { active: true, enemyPoke: {} };
-  assert.equal(ctx(), 'battle:wild');
+  assert.equal(ctx(), 'battle:wild:hoenn', 'V7-R3d — combat sauvage régionalisé');
   sandbox.battle.isChamp = true;
   sandbox.battle.champId = 'brock';
   assert.equal(ctx(), 'battle:gym:brock');
@@ -1027,7 +1039,7 @@ test('R2-05d · contexte musical déduit de l’état : menu, carte par région,
   assert.equal(ctx(), 'battle:boss', 'gardien de donjon');
   sandbox.battle = { active: false };
   sandbox.currentDungeonRun = () => ({ active: true, loc: 'mtmoon' });
-  assert.equal(ctx(), 'dungeon:mtmoon');
+  assert.equal(ctx(), 'dungeon:mtmoon:cave');
   sandbox.PW_FF = true;
   assert.equal(ctx(), null, 'rattrapage hors-ligne : aucun changement');
   assert.equal(sandbox.audioRefreshContext(), null);
@@ -1116,17 +1128,17 @@ test('R2-05f · contrats de source : combat/ sans audio, événements émis aux 
   assert.match(R('src/application/quests/quest-core.js'), /pwEmit\('quest:completed'/);
   assert.match(R('src/core/game-utils.js'), /pwEmit\('ui:notify'/);
   assert.match(R('src/engine/runtime/classic-bridge.js'), /window\.pwEmit = pwEmit/);
-  // Crédits : chaque piste a sa ligne ; licence CC0 ; budget ≤ 24 Mo (V7-R3c : 26 pistes)
+  // Crédits : chaque piste a sa ligne ; licence CC0 ; budget ≤ 40 Mo (V7-R3d : 42 pistes)
   const credits = R('docs/CREDITS.md');
   const dir = new URL('../src/assets/audio/music/', import.meta.url);
   const tracks = fs.readdirSync(dir).filter((f) => f.endsWith('.mp3'));
-  assert.equal(tracks.length, 26);
+  assert.equal(tracks.length, 42);
   let bytes = 0;
   for (const f of tracks) {
     assert.ok(credits.includes('`' + f + '`'), `crédit ${f}`);
     bytes += fs.statSync(new URL(f, dir)).size;
   }
-  assert.ok(bytes <= 24 * 1024 * 1024);
+  assert.ok(bytes <= 40 * 1024 * 1024);
   assert.match(credits, /CC0/);
   assert.match(R('tools/copy-runtime-assets.mjs'), /src\/assets\/audio/);
   assert.match(R('tools/validate-project.mjs'), /SND-03/);

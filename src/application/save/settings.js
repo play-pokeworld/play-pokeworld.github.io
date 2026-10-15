@@ -78,25 +78,32 @@ function buildSettingsModel() {
     sound: (function () {
       const ap = typeof globalThis.audioPrefs === 'function' ? globalThis.audioPrefs() : null;
       const vol = (k, dflt) => Math.round((ap && typeof ap[k] === 'number' ? ap[k] : dflt) * 100);
+      // V7-R3d · R3d-01 — interrupteur à état lisible (Activé / Coupé) + icône par bus.
+      const icon = (name) => (globalThis.getIcon ? globalThis.getIcon(name, 16) : '');
       return {
         heading: t('settings_sound_title'),
         volumeLabel: t('settings_volume'),
+        onLabel: t('settings_audio_on'),
+        offLabel: t('settings_audio_off'),
         buses: [
           {
             id: 'music',
             label: t('settings_music'),
+            iconHtml: icon('music'),
             on: ap ? ap.musicOn : true,
             vol: vol('musicVol', 0.4),
           },
           {
             id: 'sfx',
             label: t('settings_sfx'),
+            iconHtml: icon('sound'),
             on: ap ? ap.sfxOn : true,
             vol: vol('sfxVol', 0.8),
           },
           {
             id: 'cries',
             label: t('settings_cries'),
+            iconHtml: icon('cry'),
             on: ap ? ap.criesOn !== false : true,
             vol: vol('criesVol', 0.6),
           },
@@ -182,6 +189,9 @@ function setAudioVolume(bus, value) {
     globalThis.audioSetVolume(bus, pctValue, { percent: true });
   const out = document.getElementById('audio-' + bus + '-value');
   if (out) out.textContent = pctValue + ' %';
+  // V7-R3d · R3d-01 — remplissage du curseur (partie colorée jusqu'au pouce).
+  const range = document.getElementById('audio-' + bus + '-volume');
+  if (range && range.style) range.style.setProperty('--pw-fill', pctValue + '%');
   if (bus === 'sfx' && typeof globalThis.audioPlaySfx === 'function')
     globalThis.audioPlaySfx('notify');
   if (bus === 'cries' && typeof globalThis.audioPlayCry === 'function') {

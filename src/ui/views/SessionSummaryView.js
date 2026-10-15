@@ -110,6 +110,16 @@ export class SessionSummaryView extends UIView {
     return h(
       'div',
       { class: 'pw-static-063' },
+      // V7-R3d · R3d-03 — hôtes du compte à rebours de relance automatique (combat
+      // sauvage / donjon), remplis par automation/auto-relaunch.js et
+      // auto-dungeon-relaunch.js : le joueur voit et peut arrêter la relance
+      // depuis le menu de butin, sans le fermer d'abord.
+      h(
+        'div',
+        { id: 'summary-auto-relaunch', class: 'pw-summary-relaunch-host' },
+        h('div', { id: 'summary-relaunch-wild' }),
+        h('div', { id: 'summary-relaunch-dungeon' })
+      ),
       h(
         'button',
         {

@@ -187,7 +187,7 @@ test('R3c-04 · SND-06 : 26 pistes CC0 (thèmes de ville, mer, nuit, donjons) cr
     'dungeon_lair',
   ];
   for (const k of expected) assert.ok(manifest.music[k], `piste ${k} livrée`);
-  assert.equal(Object.keys(manifest.music).length, 26);
+  assert.equal(Object.keys(manifest.music).length, 42); // V7-R3d · SND-07 : +16 pistes
   const credits = R('docs/CREDITS.md');
   for (const k of expected) assert.ok(credits.includes('`' + k + '.mp3`'), `crédit ${k}`);
   const { sandbox } = makeDomSandbox('', {});
@@ -330,7 +330,10 @@ test('R3c-08 · Mine : bouton Auto directement dans l’en-tête du panneau (bas
     items: [],
     actions: [],
   });
-  assert.match(html, /class="hbtn is-on active" aria-pressed="true"[^>]*data-call="toggleMineAutomation"/);
+  assert.match(
+    html,
+    /class="hbtn is-on active" aria-pressed="true"[^>]*data-call="toggleMineAutomation"/
+  );
   assert.match(html, /class="hbtn"[^>]*data-call="openMineManagementMenu"/);
   assert.doesNotMatch(
     html,
@@ -740,7 +743,7 @@ test('R3c-15 · migration des anciennes sauvegardes : options des filtres de bas
 // 7) LIVRAISON
 // ════════════════════════════════════════════════════════════════════════════
 test('R3c-16 · version 7.5.2, ChangeLog, roadmap, note de livraison, lanceurs copiant les assets', () => {
-  assert.equal(JSON.parse(R('package.json')).version, '7.5.2');
+  assert.match(JSON.parse(R('package.json')).version, /^7\.5\.[23]$/);
   assert.match(R('ChangeLog.md'), /## Complément V7-R3c[^\n]*7\.5\.2/);
   assert.ok(fs.existsSync(new URL('LIVRAISON-V7-R3c.md', ROOT)));
   assert.match(R('docs/ROAD_MAP_V7.md'), /R3c/);

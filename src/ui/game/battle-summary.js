@@ -262,6 +262,8 @@ function renderBattleSummary() {
 function openBattleSummary(_auto) {
   renderBattleSummary();
   document.getElementById('battle-summary-modal').classList.add('open');
+  // V7-R3d · R3d-03 — compte à rebours de relance auto affiché dans le butin.
+  if (globalThis.renderAutoRelaunchBar) globalThis.renderAutoRelaunchBar();
 }
 
 function closeBattleSummary() {

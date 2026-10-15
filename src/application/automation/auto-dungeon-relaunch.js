@@ -25,6 +25,7 @@ let _dgaTimer = null;
 let _dgaTick = null;
 let _dgaDeadline = 0;
 let _dgaLoc = null;
+let _dgaCancelledAt = 0; // V7-R3d · R3d-03 — annulation manuelle (affichée dans le butin)
 
 function _dgaFn(name) {
   const f = globalThis[name];
@@ -159,6 +160,7 @@ function scheduleAutoDungeonRelaunch(info) {
     return false;
   }
   cancelAutoDungeonRelaunch(true);
+  _dgaCancelledAt = 0;
   _dgaLoc = locId;
   _dgaDeadline = Date.now() + AUTO_DG_DELAY_MS;
   _dgaTimer = _dgaUnref(globalThis.setTimeout(_dgaFire, AUTO_DG_DELAY_MS));
@@ -168,6 +170,7 @@ function scheduleAutoDungeonRelaunch(info) {
 }
 
 function cancelAutoDungeonRelaunch(silent) {
+  if (_dgaTimer && !silent) _dgaCancelledAt = Date.now(); // annulation par le joueur
   if (_dgaTimer) globalThis.clearTimeout(_dgaTimer);
   if (_dgaTick) globalThis.clearInterval(_dgaTick);
   _dgaTimer = null;
@@ -218,22 +221,89 @@ function startAutoDungeonRun(locId, opts) {
   return true;
 }
 
-/** Bandeau de l'écran de repos (visible seulement dans un donjon, amélioration achetée). */
-function renderAutoDungeonRelaunchBar() {
-  if (typeof document === 'undefined') return;
-  const host = document.getElementById('dungeon-auto-relaunch');
-  if (!host) return;
-  const setHtml = _dgaFn('_pwSetHtmlSafe');
-  const g = globalThis.G;
-  const loc = g ? _dgaLocObj(g.location) : null;
-  const btn = (call, label, cls) =>
+function _dgaBtn(call, label, cls) {
+  return (
     '<button type="button" class="hbtn ' +
     (cls || '') +
     '" data-action="legacy-call" data-call="' +
     call +
     '" data-call-args="">' +
     label +
-    '</button>';
+    '</button>'
+  );
+}
+
+/** V7-R3d · R3d-03 — compte à rebours de la prochaine expédition DANS le menu de butin
+ *  (le résumé de fin d'expédition recouvre le bandeau de l'écran de repos). */
+function _dgaRenderSummary() {
+  const host = document.getElementById('summary-relaunch-dungeon');
+  if (!host) return;
+  const setHtml = _dgaFn('_pwSetHtmlSafe');
+  const g = globalThis.G;
+  const loc = g ? _dgaLocObj(g.location) : null;
+  if ((!loc || loc.type !== 'dungeon') && !_dgaTimer) {
+    if (host.firstElementChild) {
+      if (setHtml) setHtml(host, '');
+      else host.textContent = '';
+    }
+    return;
+  }
+  const left = autoDungeonRelaunchRemainingMs();
+  const armed = !!(_dgaTimer && left > 0);
+  const existing = host.firstElementChild;
+  if (armed) {
+    const textStr = _dgaText('auto_dg_relaunch_countdown', { s: Math.ceil(left / 1000) });
+    const pct = Math.max(0, Math.min(100, Math.round((left / AUTO_DG_DELAY_MS) * 100))) + '%';
+    if (existing && existing.classList.contains('is-armed')) {
+      const txt = existing.querySelector('.pw-summary-relaunch-text');
+      if (txt && txt.textContent !== textStr) txt.textContent = textStr;
+      const fill = existing.querySelector('.pw-summary-relaunch-fill');
+      if (fill && fill.style) fill.style.width = pct;
+      return;
+    }
+    const html =
+      '<div class="pw-summary-relaunch is-armed" role="status" aria-live="polite">' +
+      '<span class="pw-summary-relaunch-text">' +
+      textStr +
+      '</span><span class="pw-summary-relaunch-bar"><span class="pw-summary-relaunch-fill" style="width:' +
+      pct +
+      '"></span></span>' +
+      _dgaBtn(
+        'cancelAutoDungeonRelaunch',
+        _dgaText('auto_relaunch_cancel_btn'),
+        'pw-summary-relaunch-cancel'
+      ) +
+      '</div>';
+    if (setHtml) setHtml(host, html);
+    else host.textContent = html.replace(/<[^>]+>/g, ' ');
+    return;
+  }
+  if (_dgaCancelledAt) {
+    if (existing && existing.classList.contains('is-cancelled')) return;
+    const html =
+      '<div class="pw-summary-relaunch is-cancelled" role="status"><span class="pw-summary-relaunch-text">' +
+      _dgaText('auto_dg_relaunch_cancelled') +
+      '</span></div>';
+    if (setHtml) setHtml(host, html);
+    else host.textContent = html.replace(/<[^>]+>/g, ' ');
+    return;
+  }
+  if (existing) {
+    if (setHtml) setHtml(host, '');
+    else host.textContent = '';
+  }
+}
+
+/** Bandeau de l'écran de repos (visible seulement dans un donjon, amélioration achetée). */
+function renderAutoDungeonRelaunchBar() {
+  if (typeof document === 'undefined') return;
+  _dgaRenderSummary();
+  const host = document.getElementById('dungeon-auto-relaunch');
+  if (!host) return;
+  const setHtml = _dgaFn('_pwSetHtmlSafe');
+  const g = globalThis.G;
+  const loc = g ? _dgaLocObj(g.location) : null;
+  const btn = _dgaBtn;
   const costF = _dgaFn('automationCostLabel');
   if (!loc || loc.type !== 'dungeon' || (!isAutoDungeonRelaunchOwned() && !costF)) {
     host.hidden = true;

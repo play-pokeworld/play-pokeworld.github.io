@@ -74,6 +74,24 @@ const AUDIO_MUSIC_TRACKS = Object.freeze({
   sea: 'sea',
   map_night: 'map_night',
   loc_ecruteak: 'loc_ecruteak',
+  // V7-R3d · SND-07 — immersion par lieu : chaque type d'endroit a son ambiance
+  // (en exploration comme en expédition), villes et routes variées, combats régionaux.
+  dungeon_crystal: 'dungeon_crystal',
+  dungeon_ice: 'dungeon_ice',
+  dungeon_water: 'dungeon_water',
+  dungeon_park: 'dungeon_park',
+  dungeon_fire: 'dungeon_fire',
+  dungeon_desert: 'dungeon_desert',
+  dungeon_shrine: 'dungeon_shrine',
+  dungeon_haunted: 'dungeon_haunted',
+  dungeon_sky: 'dungeon_sky',
+  dungeon_hideout: 'dungeon_hideout',
+  town_market: 'town_market',
+  town_new: 'town_new',
+  town_mountain: 'town_mountain',
+  map_b: 'map_b',
+  battle_wild_johto: 'battle_wild_johto',
+  battle_wild_hoenn: 'battle_wild_hoenn',
 });
 
 const _audio = {
@@ -464,8 +482,12 @@ function audioMusicChain(context) {
   const id = parts[2] || '';
   const extra = parts[3] || ''; // V7-R3b · SND-05 — `town` (lieu) / thème de donjon
   if (kind === 'map') {
-    // V7-R3c · SND-06 — `map:<r>:<lieu>:town[:<thème>]` (home / city / coast),
+    // V7-R3c · SND-06 — `map:<r>:<lieu>:town[:<thème>]` (home / city / coast…),
     // `map:<r>:<lieu>:sea` (chenaux), `map:<r>:<lieu>:night` (routes la nuit).
+    // V7-R3d · SND-07 — `map:<r>:<lieu>:place:<thème>` (grotte, tour, forêt… visitée
+    // hors expédition → même ambiance qu'en donjon), `map:<r>:<lieu>:route:<thème>`
+    // (route à ambiance propre : désert, volcan, jungle…), `map:<r>:<lieu>:alt`
+    // (seconde piste de route pour varier d'une route à l'autre).
     const theme = parts[4] || '';
     const out = [];
     if (id) out.push('loc_' + id);
@@ -479,6 +501,15 @@ function audioMusicChain(context) {
     } else if (extra === 'night') {
       if (sub) out.push('map_' + sub + '_night');
       out.push('map_night');
+    } else if (extra === 'place') {
+      if (id) out.push('dungeon_' + id);
+      if (theme) out.push('dungeon_' + theme);
+      out.push('dungeon');
+    } else if (extra === 'route') {
+      if (theme) out.push('route_' + theme, 'dungeon_' + theme);
+    } else if (extra === 'alt') {
+      if (sub) out.push('map_' + sub + '_b');
+      out.push('map_b');
     }
     if (sub) out.push('map_' + sub);
     if (sub !== 'hoenn') out.push('map_hoenn');
@@ -489,7 +520,8 @@ function audioMusicChain(context) {
     return ['dungeon_' + sub].concat(id ? ['dungeon_' + id] : [], ['dungeon']);
   }
   if (kind === 'battle') {
-    if (sub === 'wild') return ['battle_wild'];
+    // V7-R3d · SND-07 — `battle:wild:<région>` : thème de combat propre à la région.
+    if (sub === 'wild') return (id ? ['battle_wild_' + id] : []).concat(['battle_wild']);
     if (sub === 'gym')
       return (id ? ['trainer_' + id] : []).concat(['battle_gym', 'battle_trainer']);
     if (sub === 'trainer') return (id ? ['trainer_' + id] : []).concat(['battle_trainer']);

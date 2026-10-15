@@ -129,9 +129,10 @@ export class SettingsModalView extends UIView {
             )
           )
         : null,
-      // ── V7-R2 · SND-01 / V7-R3c · SND-07 — Son : musique / interface / cris,
-      // coupure + curseur 0–100 par bus (branché via data-input-call : les
-      // attributs oninput inline sont neutralisés par le moteur).
+      // ── V7-R2 · SND-01 / V7-R3c · SND-07 / V7-R3d · R3d-01 — Son : une carte par
+      // bus (musique / interface / cris) : interrupteur coulissant à état écrit
+      // (Activé / Coupé) + curseur 0–100 à piste remplie (branché via
+      // data-input-call : les attributs oninput inline sont neutralisés par le moteur).
       m.sound && Array.isArray(m.sound.buses)
         ? h(
             'div',
@@ -140,34 +141,56 @@ export class SettingsModalView extends UIView {
             ...m.sound.buses.map((bus) =>
               h(
                 'div',
-                { class: 'settings-sound-row' },
+                {
+                  class: 'settings-sound-card' + (bus.on ? ' is-on' : ' is-off'),
+                  id: 'audio-' + bus.id + '-card',
+                },
                 h(
-                  'button',
-                  {
-                    type: 'button',
-                    class: 'hbtn' + (bus.on ? ' active' : ''),
-                    id: 'audio-' + bus.id + '-toggle',
-                    'aria-pressed': bus.on ? 'true' : 'false',
-                    dataset: {
-                      action: 'legacy-call',
-                      call: 'toggleAudioBus',
-                      callArgs: `'${bus.id}'`,
+                  'div',
+                  { class: 'settings-sound-head' },
+                  h(
+                    'span',
+                    { class: 'settings-sound-name' },
+                    bus.iconHtml ? h.raw(bus.iconHtml) : null,
+                    h('span', null, bus.label)
+                  ),
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      class: 'pw-switch' + (bus.on ? ' is-on' : ''),
+                      id: 'audio-' + bus.id + '-toggle',
+                      role: 'switch',
+                      'aria-checked': bus.on ? 'true' : 'false',
+                      'aria-label': bus.label,
+                      dataset: {
+                        action: 'legacy-call',
+                        call: 'toggleAudioBus',
+                        callArgs: `'${bus.id}'`,
+                      },
                     },
-                  },
-                  bus.label
+                    h(
+                      'span',
+                      { class: 'pw-switch-state' },
+                      bus.on ? m.sound.onLabel || '' : m.sound.offLabel || ''
+                    ),
+                    h('span', { class: 'pw-switch-track' }, h('span', { class: 'pw-switch-thumb' }))
+                  )
                 ),
                 h(
                   'label',
                   { class: 'settings-sound-volume' },
-                  h('span', null, m.sound.volumeLabel),
+                  h('span', { class: 'settings-sound-volume-label' }, m.sound.volumeLabel),
                   h('input', {
                     type: 'range',
+                    class: 'pw-range',
                     min: '0',
                     max: '100',
                     step: '1',
                     value: String(bus.vol),
                     id: 'audio-' + bus.id + '-volume',
                     'aria-label': bus.label,
+                    style: { '--pw-fill': bus.vol + '%' },
                     dataset: {
                       action: 'stop-propagation',
                       inputCall: 'setAudioVolume',

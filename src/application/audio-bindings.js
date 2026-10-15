@@ -47,47 +47,82 @@ function _fn(name) {
   return typeof f === 'function' ? f : null;
 }
 
-/** V7-R3b · SND-05 — ambiance d'un donjon sans piste dédiée (`dungeon_<thème>`) :
- *  tours hantées / sanctuaires, forêts, centrale, repaires de fin de jeu. */
-const AUDIO_DUNGEON_THEME = Object.freeze({
-  // tours, sanctuaires, ruines et lieux hantés
-  pokemontower: 'tower',
-  sprouttower: 'tower',
+/** V7-R3b · SND-05 / V7-R3d · SND-07 — ambiance d'un LIEU (`dungeon_<thème>`), appliquée
+ *  en expédition comme en simple exploration : une tour hantée, une grotte de glace ou un
+ *  volcan ne jouent plus le thème enjoué de la région. Thèmes : haunted (Tour Pokémon),
+ *  tower (manoirs, épaves, tours brûlées), shrine (sanctuaires, ruines), forest, park
+ *  (safaris, parc), plant, hideout, ice, water, fire, desert, crystal, cave (défaut), lair
+ *  (fin de jeu), sky (lieux légendaires). */
+const AUDIO_PLACE_THEME = Object.freeze({
+  // lieux hantés et tours
+  pokemontower: 'haunted',
   burnedtower: 'tower',
-  tintower: 'tower',
-  ruinsofalph: 'tower',
   pokemonmansion: 'tower',
   mt_pyre: 'tower',
   abandoned_ship: 'tower',
-  sealed_chamber: 'tower',
-  desert_ruins: 'tower',
-  island_cave: 'tower',
-  ancient_tomb: 'tower',
-  // forêts et parcs
+  // sanctuaires, ruines, chambres scellées
+  sprouttower: 'shrine',
+  tintower: 'shrine',
+  ruinsofalph: 'shrine',
+  sealed_chamber: 'shrine',
+  ancient_tomb: 'shrine',
+  // forêts, parcs et safaris
   viridianforest: 'forest',
   ilexforest: 'forest',
-  safarizone: 'forest',
-  nationalpark: 'forest',
   petalburg_woods: 'forest',
-  safari_zone_ho: 'forest',
-  // installations (centrale, labos, planques)
+  safarizone: 'park',
+  safari_zone_ho: 'park',
+  nationalpark: 'park',
+  // installations (centrale, labos) et planques
   powerplant: 'plant',
   weather_institute: 'plant',
   mossdeep_space_center: 'plant',
-  aqua_hideout: 'plant',
+  aqua_hideout: 'hideout',
+  // glace
+  icepath: 'ice',
+  seafoamislands: 'ice',
+  shoal_cave: 'ice',
+  island_cave: 'ice',
+  // eau souterraine, puits, chutes
+  whirlislands: 'water',
+  tohjofalls: 'water',
+  slowpokewell: 'water',
+  seafloor_cavern: 'water',
+  // feu et volcan
+  mt_chimney: 'fire',
+  fiery_path: 'fire',
+  // désert
+  desert_ruins: 'desert',
+  // grottes de cristal et de météores
+  granite_cave: 'crystal',
+  meteor_falls: 'crystal',
+  // grottes ordinaires (piste `dungeon` par défaut)
+  mtmoon: 'cave',
+  rocktunnel: 'cave',
+  diglettscave: 'cave',
+  diglettscave_2: 'cave',
+  mtmortar: 'cave',
+  darkcave: 'cave',
+  unioncave: 'cave',
+  rusturf_tunnel: 'cave',
+  jroute44: 'cave',
   // repaires de fin de jeu
   ceruleancave: 'lair',
   victoryroad: 'lair',
   victoryroad_jo: 'lair',
   victoryroad_ho: 'lair',
   mtsilver: 'lair',
-  cave_of_origin: 'lair',
-  sky_pillar: 'lair',
-  seafloor_cavern: 'lair',
-  birth_island: 'lair',
+  hoenn_league: 'lair',
+  // lieux légendaires
+  sky_pillar: 'sky',
+  cave_of_origin: 'sky',
+  birth_island: 'sky',
+  southern_island: 'sky',
+  mirage_island: 'sky',
 });
-/** V7-R3c · SND-06 — ambiance d'une ville sans piste dédiée (`town_<thème>`) :
- *  villes natales, grandes villes, villes côtières ; les autres suivent la région. */
+/** V7-R3c · SND-06 / V7-R3d · SND-07 — ambiance d'une ville sans piste dédiée (`town_<thème>`) :
+ *  villes natales, grandes villes, villes côtières, bourgs de marché, petits villages,
+ *  villes de montagne ; les autres suivent la région. */
 const AUDIO_TOWN_THEME = Object.freeze({
   pallet: 'home',
   newbark: 'home',
@@ -98,6 +133,7 @@ const AUDIO_TOWN_THEME = Object.freeze({
   mauville: 'city',
   slateport: 'city',
   lilycove: 'city',
+  battle_frontier: 'city',
   vermilion: 'coast',
   cinnabar: 'coast',
   billshouse: 'coast',
@@ -107,7 +143,42 @@ const AUDIO_TOWN_THEME = Object.freeze({
   mossdeep: 'coast',
   sootopolis: 'coast',
   pacifidlog: 'coast',
+  evergrande: 'coast',
+  viridian: 'market',
+  pewter: 'market',
+  cerulean: 'market',
+  fuchsia: 'market',
+  violet: 'market',
+  azalea: 'market',
+  petalburg: 'market',
+  rustboro: 'market',
+  cherrygrove: 'new',
+  oldale: 'new',
+  verdanturf: 'new',
+  fortree: 'new',
+  blackthorn: 'mountain',
+  mahogany: 'mountain',
+  indigo: 'mountain',
+  indigo_jo: 'mountain',
+  lavaridge: 'mountain',
+  fallarbor: 'mountain',
 });
+/** V7-R3d · SND-07 — routes à ambiance propre (`route_<thème>` puis `dungeon_<thème>`). */
+const AUDIO_ROUTE_THEME = Object.freeze({
+  route111: 'desert',
+  route112: 'fire',
+  route113: 'ice',
+  route119: 'park',
+  route120: 'park',
+  route23: 'lair',
+});
+/** Une route sur deux (selon son identifiant) joue la seconde piste de région
+ *  (`map_<r>_b` puis `map_b`) pour ne pas entendre toujours le même thème. */
+function _audioRouteAlt(id) {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h + id.charCodeAt(i)) | 0;
+  return h % 2 === 1;
+}
 /** Nuit (21 h – 6 h, ou phase forcée par le debug) : routes sur `map_night`. */
 function _audioIsNight() {
   try {
@@ -127,6 +198,13 @@ function _audioIsNight() {
 function audioCurrentContext() {
   if (globalThis.PW_FF) return null; // rattrapage hors-ligne : on ne change rien
   if (globalThis.PokeWorldGameStarted !== true) return 'menu';
+  const g = globalThis.G;
+  const regF = _fn('regionOfLoc');
+  let region = (g && g.region) || 'kanto';
+  try {
+    if (regF && g && g.location) region = regF(g.location) || region;
+  } catch (_) {}
+  if (region === 'atoll') region = 'hoenn';
   const b = globalThis.battle;
   if (b && b.active) {
     const e = b.enemyPoke || {};
@@ -143,38 +221,38 @@ function audioCurrentContext() {
       b.isQuestDefeatBattle
     )
       return 'battle:trainer';
-    return 'battle:wild';
+    // V7-R3d · SND-07 — thème de combat sauvage propre à la région.
+    return 'battle:wild:' + region;
   }
   const runF = _fn('currentDungeonRun');
   const run = runF ? runF() : null;
   if (run && run.active) {
     if (!run.loc) return 'dungeon';
-    const theme = AUDIO_DUNGEON_THEME[run.loc];
+    const theme = AUDIO_PLACE_THEME[run.loc];
     return 'dungeon:' + run.loc + (theme ? ':' + theme : '');
   }
-  const g = globalThis.G;
-  const regF = _fn('regionOfLoc');
-  let region = (g && g.region) || 'kanto';
-  try {
-    if (regF && g && g.location) region = regF(g.location) || region;
-  } catch (_) {}
-  if (region === 'atoll') region = 'hoenn';
   if (!g || !g.location) return 'map:' + region;
   const locF = _fn('getLocObj');
   let loc = null;
   try {
     loc = locF ? locF(g.location) : null;
   } catch (_) {}
-  // V7-R3b · SND-05 / V7-R3c · SND-06 — villes (thème : home / city / coast, puis
-  // région), chenaux (`sea`), routes de nuit (`night`) ; sinon thème de région.
+  // V7-R3b · SND-05 / V7-R3c · SND-06 / V7-R3d · SND-07 — lieux à ambiance (grottes,
+  // tours, forêts… même hors expédition), villes (thème puis région), chenaux (`sea`),
+  // routes à thème (désert, volcan…), nuit, puis alternance de deux pistes de région.
   const base = 'map:' + region + ':' + g.location;
   const type = loc ? loc.type : '';
+  const place = AUDIO_PLACE_THEME[g.location];
+  if (place || type === 'dungeon') return base + ':place' + (place ? ':' + place : '');
   if (type === 'town') {
     const theme = AUDIO_TOWN_THEME[g.location];
     return base + ':town' + (theme ? ':' + theme : '');
   }
   if (type === 'sea') return base + ':sea';
+  const routeTheme = AUDIO_ROUTE_THEME[g.location];
+  if (routeTheme) return base + ':route:' + routeTheme;
   if (_audioIsNight()) return base + ':night';
+  if (_audioRouteAlt(g.location)) return base + ':alt';
   return base;
 }
 
@@ -253,6 +331,9 @@ const _audioBindingsGlobals = {
   AUDIO_EVENT_SFX,
   AUDIO_EVENT_CRY,
   AUDIO_POLL_MS,
+  AUDIO_PLACE_THEME,
+  AUDIO_TOWN_THEME,
+  AUDIO_ROUTE_THEME,
   audioCurrentContext,
   audioRefreshContext,
   audioBindGameEvents,
@@ -274,6 +355,9 @@ export {
   AUDIO_EVENT_SFX,
   AUDIO_EVENT_CRY,
   AUDIO_POLL_MS,
+  AUDIO_PLACE_THEME,
+  AUDIO_TOWN_THEME,
+  AUDIO_ROUTE_THEME,
   audioCurrentContext,
   audioRefreshContext,
   audioBindGameEvents,
