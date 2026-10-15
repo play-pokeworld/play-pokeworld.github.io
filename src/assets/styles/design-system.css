@@ -11,6 +11,9 @@
   --pw-color-danger: #E74C3C;
   --pw-color-success: #2ECC71;
   --pw-color-info: #3498DB;
+  /* V7-R1 #4 — couleurs de marque Discord (jeton unique, jamais en dur ailleurs). */
+  --pw-color-discord: #5865F2;
+  --pw-color-discord-dark: #4752C4;
   --pw-font-main: "WinkySans", sans-serif;
   --pw-font-title: "Megrim-Regular", cursive;
   --pw-radius-sm: 4px;
@@ -14780,8 +14783,8 @@ body.pw-debug-on #debug-widget { display: flex; }
   box-sizing: border-box;
   text-decoration: none;
   cursor: pointer;
-  background: #5865F2;
-  border: 1px solid #4752C4;
+  background: var(--pw-color-discord);
+  border: 1px solid var(--pw-color-discord-dark);
   color: #fff;
   font-family: inherit;
   font-weight: 800;
@@ -14792,7 +14795,7 @@ body.pw-debug-on #debug-widget { display: flex; }
   transition: background 0.15s ease, transform 0.15s ease;
 }
 .pw-discord-btn:hover,
-#settings-inner a.pw-discord-btn:hover { background: #4752C4; color: #fff; transform: translateY(-1px); }
+#settings-inner a.pw-discord-btn:hover { background: var(--pw-color-discord-dark); color: #fff; transform: translateY(-1px); }
 /* `#settings-inner *` repeint le texte en --light2 : on réaffirme le blanc. */
 #settings-inner a.pw-discord-btn * { color: #fff; }
 .pw-discord-glyph { width: 18px; height: 18px; flex: 0 0 auto; fill: currentColor; }

@@ -132,6 +132,7 @@ export const L_fr_economy = {
 "dungeon_toll_paid":"Exploration du donjon : −{toll} JD.",
 // PASSE 32 — donjons : expédition par paliers (docs/PROPOSITION-DONJONS.md)
 "dungeon_run_started":"Expédition lancée : {depth} paliers à descendre. Le butin n'est encaissé qu'à la remontée !",
+"dungeon_run_resumed":"Expédition reprise au palier {floor}/{depth} : choisis une case de la carte du donjon pour continuer (ou remonte encaisser).",
 "dungeon_descend":"Palier {floor}/{depth} — butin ×{mult}.",
 "dungeon_ascend":"Remontée : +{tokens} JD, +{money} ₽ (palier {floor}).",
 "dungeon_wipe":"Équipe K.O. ! La moitié du sac est perdue : +{tokens} JD, +{money} ₽.",

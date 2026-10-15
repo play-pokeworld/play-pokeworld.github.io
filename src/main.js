@@ -126,6 +126,8 @@ __pwDeferredScreens.push(
 import './application/world/roaming.js';
 // PASSE 32 — donjons : sessions d'expédition (paliers, sac, remontée).
 import './application/world/dungeon-run.js';
+// V7-R1b — reprise d'une expédition sauvegardée après rechargement (hotfix).
+import './application/world/dungeon-resume.js';
 import './ui/game/header-window.js';
 import './application/world/collection.js';
 import './application/world/puzzle-explorations.js';

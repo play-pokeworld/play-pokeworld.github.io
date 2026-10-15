@@ -98,6 +98,15 @@ function initializeGameInterface() {
           startTrainingSlotTicker();
         } catch (_) {}
       }
+      // V7-R1b — expédition de donjon sauvegardée : on la REBRANCHE (drapeau
+      // <html>, grille, bandeau, pilote auto) au lieu de laisser le joueur
+      // verrouillé dans un donjon sans aucune case à jouer.
+      try {
+        if (typeof globalThis.dungeonResumeAfterLoad === 'function')
+          globalThis.dungeonResumeAfterLoad();
+      } catch (e) {
+        console.warn('[dungeon] resume after load failed', e);
+      }
     }, 200);
   } catch (e) {
     console.warn('initializeGameInterface error', e);

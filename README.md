@@ -258,6 +258,11 @@ Because the game is still in development, exported backups are strongly recommen
 
 ---
 
+## Community
+
+Join the PokéWorld Discord: **https://discord.gg/DXC48vtGV** (questions, bugs, ideas, events). The
+link is also available in-game: Settings → *Community*, and on the main (save) menu.
+
 ## Reporting bugs
 
 When reporting a bug, please include:
@@ -265,9 +270,13 @@ When reporting a bug, please include:
 1. What you were doing.
 2. Steps to reproduce the issue.
 3. Browser used.
-4. Console errors if available (`F12` → Console).
+4. Console errors if available (`F12` → Console), or the error report copied from Settings → *Diagnostic*.
 5. Your exported save if the bug is save-related.
 6. Screenshots if the bug is visual.
+
+Developer / debug mode: hidden by default since 7.3.0. Unlock it with the code `PWDEBUG` in
+Settings → *Advanced* (the same code hides it again), or from the browser console with
+`pwDebug.on()` / `pwDebug.off()`. The choice is stored on the device, not in the save.
 
 Known alpha/beta limitations:
 
@@ -298,4 +307,6 @@ Sprites and Pokémon data are based on public Pokémon resources such as [PokeAP
 ---
 
 **Have fun testing PokéWorld!** ⚡
+
+
 

@@ -132,6 +132,7 @@ export const L_en_economy = {
 "dungeon_toll_paid":"Dungeon exploration: −{toll} DT.",
 // PASSE 32 — donjons : expédition par paliers (docs/PROPOSITION-DONJONS.md)
 "dungeon_run_started":"Expedition started: {depth} floors to descend. Loot is only banked when you climb back out!",
+"dungeon_run_resumed":"Expedition resumed on floor {floor}/{depth}: pick a tile on the dungeon map to carry on (or climb back out to bank your loot).",
 "dungeon_descend":"Floor {floor}/{depth} — loot ×{mult}.",
 "dungeon_ascend":"Climbed out: +{tokens} DT, +{money} ₽ (floor {floor}).",
 "dungeon_wipe":"Team wiped! Half the bag is lost: +{tokens} DT, +{money} ₽.",

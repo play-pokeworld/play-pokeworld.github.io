@@ -166,13 +166,17 @@ function locationInfoModel() {
           formatNumber(toll);
       }
     }
+    // V7-R1b — en expédition, « Combattre au palier N » doit ENGAGER : il
+    // passe par dungeonFight() (marche jusqu'au combat le plus proche de la
+    // grille, PASSE 39f) et non par exploreArea(), muet sans case engagée —
+    // c'était l'un des verrous après un rechargement de page.
     model.actions.push({
       kind: 'button',
       cls: dgHere ? 'pw-loc-dungeon-btn' : null,
       iconHtml: uiIcon('explore', '•'),
       label: exploreLabel,
       labelHtml: exploreLabelHtml,
-      call: 'exploreArea',
+      call: dgHere ? 'dungeonFight' : 'exploreArea',
       callArgs: '',
     });
   }
