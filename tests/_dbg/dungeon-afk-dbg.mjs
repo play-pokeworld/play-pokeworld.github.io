@@ -1,0 +1,65 @@
+import { chromium } from 'playwright';
+const BASE = 'http://127.0.0.1:4174/';
+const browser = await chromium.launch();
+const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+const page = await ctx.newPage();
+const errors = []; page.on('pageerror', (e) => errors.push(e.message));
+page.on('console', (m) => { if (m.type() === 'error' || m.text().includes('dungeon-offline')) errors.push(m.type() + ': ' + m.text().slice(0, 300)); });
+await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+await page.waitForFunction(() => window.PokeWorldGameStarted === false || window.PokeWorldGameStarted === true, null, { timeout: 15000 });
+await page.evaluate(() => window.createNewSaveFromMenu && window.createNewSaveFromMenu());
+await page.waitForSelector('#starter-modal', { state: 'visible', timeout: 8000 });
+await page.evaluate(() => { const b = document.querySelector('#starter-modal [data-call*="pickStarter"], #starter-modal .starter-card, #starter-modal button'); b && b.click(); });
+await page.waitForFunction(() => window.__pwScreensReady === true, null, { timeout: 20000 });
+await page.waitForTimeout(500);
+await page.evaluate(async () => {
+  while (G.team.length < 3) G.team.push(createPoke(6, 60)); G.team.forEach((p) => { p.level = 60; recalcPokeStats(p); p.currentHP = p.maxHP; });
+  ensureWallet().dungeonTokens = 100000; G.dungeonClears = { mtmoon: 10 }; G.unlockedLocs = Object.assign({}, G.unlockedLocs || {}, { mtmoon: true }); G.badges = ['brock'];
+  clickLocation('mtmoon'); await new Promise((r) => setTimeout(r, 300));
+  const run = startDungeonRun('mtmoon');
+  const near = Object.values(run.map.tiles).find((t) => t.revealed && (t.type === 'combat' || t.type === 'elite') && !t.done);
+  if (near) dungeonMoveTo(near.id); else dungeonFight();
+  await new Promise((r) => setTimeout(r, 800));
+  saveGame(false);
+  offlinePersistSeen(Date.now() - 3 * 3600 * 1000);
+});
+await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+await page.waitForFunction(() => window.PokeWorldGameStarted === false || window.PokeWorldGameStarted === true, null, { timeout: 15000 });
+const saves = await page.evaluate(() => window.getSaveSummaries().map((s) => s.id));
+const keys = await page.evaluate(() => { const past = Date.now() - 3 * 3600 * 1000; const ks = Object.keys(localStorage).filter((k) => /afk|seen/i.test(k)); ks.forEach((k) => localStorage.setItem(k, JSON.stringify({ ts: past }))); return ks; });
+console.log('afk keys', keys);
+await page.evaluate((id) => {
+  window.__trace = [];
+  const t0 = Date.now();
+  const wrap = (name) => { const fn = window[name]; if (typeof fn !== 'function') { window.__trace.push('nofn ' + name); return; } window[name] = function () { window.__trace.push([name, Date.now() - t0, String(arguments[0]).slice(0, 20), new Error().stack.split('\n').slice(2, 6).map((l) => l.trim().replace(/^at /, '').slice(0, 60)).join(' < ')]); return fn.apply(this, arguments); }; };
+  ['saveGame', 'offlinePersistSeen', 'markAfkSeen', 'offlinePollHeartbeat', 'offlineSimulate'].forEach(wrap);
+  window.startSaveById(id);
+}, saves[0]);
+await page.waitForFunction(() => window.PokeWorldGameStarted === true, null, { timeout: 15000 });
+await page.waitForFunction(() => window.__pwScreensReady === true, null, { timeout: 20000 });
+await page.waitForFunction(() => { const m = document.getElementById('afk-result-modal'); return !!(m && m.classList.contains('open')); }, null, { timeout: 20000 }).catch(() => {});
+await page.waitForTimeout(1500);
+const st = await page.evaluate(async () => {
+  const rr = currentDungeonRun(); const res = OfflineEngine._lastResult; const modal = document.getElementById('afk-result-modal');
+  const out = { run: rr ? { floor: rr.floor, active: battle.active, pending: rr.pendingNode, auto: rr.auto, grid: !!(rr.map && rr.map.grid), tiles: !!(rr.map && rr.map.tiles), posTile: !!(rr.map && rr.map.tiles && rr.map.tiles[rr.pos]), loc: rr.loc, gloc: G.location, done: Object.values(rr.map.tiles).filter((t) => t.done).length } : null,
+    lastResult: res && { wins: res.wins, dungeon: res.dungeon, timeMs: res.timeMs }, modalText: modal ? modal.innerText.replace(/\s+/g, ' ').slice(0, 400) : '', handler: !!OfflineEngine.handler('dungeon'), ffloop: typeof offlineRunBattleFfLoop, alive: aliveCount() };
+  return out;
+});
+console.log(JSON.stringify(st, null, 1));
+const dd = await page.evaluate(async () => {
+  const run = currentDungeonRun();
+  const out = { alive: aliveCount(), team: G.team.map((p) => [p.name, p.level, p.currentHP, p.maxHP]), auto: run.auto, pos: run.pos, posTile: run.map.tiles[run.pos], gridType: Array.isArray(run.map.grid) ? 'array' : typeof run.map.grid, nTiles: Object.keys(run.map.tiles).length };
+  window.PW_FF = true; run.auto = 'farm';
+  const r1 = _dgAutoStep({ offline: true });
+  out.step = { ret: r1 ? 'run' : String(r1), pos: currentDungeonRun().pos, active: battle.active, pending: currentDungeonRun().pendingNode };
+  window.PW_FF = false; run.auto = false;
+  out.ff = await offlineFastForwardDungeon(60);
+  return out;
+});
+console.log('dd', JSON.stringify(dd));
+const dbg = await page.evaluate(() => ({ seen: offlineReadSeen(), gap: saveNow() - (offlineReadSeen() || 0), started: window.PokeWorldGameStarted, applying: OfflineEngine.applying, afkG: G.afk, keys: Object.keys(localStorage).filter((k) => /afk/i.test(k)).map((k) => [k, localStorage.getItem(k)]) }));
+console.log('dbg', JSON.stringify(dbg));
+const tr = await page.evaluate(() => window.__trace.slice(0, 30));
+console.log('trace', JSON.stringify(tr, null, 0));
+console.log('errors', errors.slice(0, 8));
+await browser.close();

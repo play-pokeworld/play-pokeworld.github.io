@@ -260,6 +260,8 @@ import './ui/game/currency-window.js';
 import './ui/game/pokeball-window.js';
 import './ui/game/fullscreen-panel.js';
 import './ui/game/preset-manager.js';
+import './application/achievements.js';
+import './ui/game/achievements-panel.js';
 import './ui/game/tutorial.js';
 import './application/bootstrap-timers.js';
 import './application/audio-bindings.js'; // V7-R2 · SND-02/03 — bus d'événements → effets, contexte → musique

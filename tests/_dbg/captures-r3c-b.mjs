@@ -1,0 +1,23 @@
+import { chromium } from 'playwright';
+const BASE = 'http://127.0.0.1:4174/';
+const browser = await chromium.launch();
+const page = await (await browser.newContext({ viewport: { width: 1400, height: 900 } })).newPage();
+await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+await page.waitForFunction(() => window.PokeWorldGameStarted === false || window.PokeWorldGameStarted === true, null, { timeout: 15000 });
+await page.evaluate(() => window.createNewSaveFromMenu && window.createNewSaveFromMenu());
+await page.waitForSelector('#starter-modal', { state: 'visible', timeout: 8000 });
+await page.evaluate(() => { const b = document.querySelector('#starter-modal [data-call*="pickStarter"], #starter-modal .starter-card, #starter-modal button'); b && b.click(); });
+await page.waitForFunction(() => window.__pwScreensReady === true, null, { timeout: 20000 });
+await page.waitForTimeout(500);
+await page.evaluate(() => { G.badges = ['brock','misty','surge','erika','koga','sabrina','blaine','giovanni']; updateFeatureWindows(); openHatcheryManagementMenu('automation'); });
+await page.waitForTimeout(500);
+const info = await page.evaluate(() => Array.from(document.querySelectorAll('.automation-locked-card')).map((c) => ({ txt: c.innerText.replace(/\s+/g, ' '), hasBuy: !!c.querySelector('.automation-buy-btn') })));
+console.log(JSON.stringify(info));
+const el = await page.$('#poke-modal #poke-modal-inner');
+if (el) await el.screenshot({ path: 'docs/captures/v7-r3c-automation-buy-card.png' });
+// buy one and verify the card disappears / toggle appears
+await page.evaluate(() => { ensureWallet().questPoints = 10000; const b = document.querySelector('.automation-locked-card .automation-buy-btn'); b && b.click(); });
+await page.waitForTimeout(400);
+const after = await page.evaluate(() => ({ locked: document.querySelectorAll('.automation-locked-card').length, toggles: Array.from(document.querySelectorAll('.automation-toggle-btn')).map((b) => b.innerText.replace(/\s+/g, ' ')), pq: ensureWallet().questPoints }));
+console.log('after buy', JSON.stringify(after));
+await browser.close();
