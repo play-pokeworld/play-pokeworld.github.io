@@ -46,6 +46,17 @@ export const GAME = {
     IV_CAP: 12, // IV maximal par statistique
   },
 
+  // ─── Statistiques (V7-R3c · le guide « Stats, IV & EV » cite CES valeurs) ───
+  // Lues par data/game-helpers.js (calcStat), combat/training.js (stage EV)
+  // et save/save-extras.js (vitamines / capsules).
+  STATS: {
+    IV_STEP_PCT: 5, // chaque point d'IV = +5 % sur la statistique
+    EV_STEP_PCT: 5, // chaque point d'EV = +5 % sur la statistique
+    SHINY_BONUS_PCT: 20, // un chromatique a toutes ses stats ×1,2
+    EV_CAP: 18, // EV maximal par statistique
+    EV_TOTAL_CAP: 36, // total d'EV maximal par Pokémon
+  },
+
   // ─── Communauté (V7-R1 · retours joueurs #4) ───
   COMMUNITY: {
     DISCORD_URL: 'https://discord.gg/DXC48vtGV',
@@ -79,6 +90,15 @@ export const CAPTURE_IV_CAP = GAME.CAPTURE.IV_CAP;
 if (typeof globalThis !== 'undefined') {
   globalThis.CAPTURE_IV_CHANCE_PCT = CAPTURE_IV_CHANCE_PCT;
   globalThis.CAPTURE_IV_CAP = CAPTURE_IV_CAP;
+}
+
+// V7-R3c — plafonds d'EV, publiés comme identifiants libres (training.js et
+// save-extras.js tournent aussi dans les harnais VM sans import).
+export const STAT_EV_CAP = GAME.STATS.EV_CAP;
+export const STAT_EV_TOTAL_CAP = GAME.STATS.EV_TOTAL_CAP;
+if (typeof globalThis !== 'undefined') {
+  globalThis.STAT_EV_CAP = STAT_EV_CAP;
+  globalThis.STAT_EV_TOTAL_CAP = STAT_EV_TOTAL_CAP;
 }
 
 // V7-R1 — lien communautaire (bouton « Rejoindre le Discord » : réglages + menu principal).

@@ -1122,8 +1122,8 @@ function hatchEgg(slotIdx = 0) {
   G.collection[_hKey] = p;
   const hatchedWasFossil = !!slot.isFossil;
   G.hatchery[slotIdx] = null;
-  // a pending mode change (incubation → day care) applies
-  // now that the incubation is over.
+  if (globalThis.pwEmit) globalThis.pwEmit('pokemonHatched', { id: p.id, shiny: !!p.shiny }); // SND-02
+  // a pending mode change (incubation → day care) applies now that the incubation is over.
   applyPendingHatcheryMode(slotIdx);
   if (typeof addStaffXp === 'function') addStaffXp('hatchery', 1);
   try {
@@ -1615,11 +1615,8 @@ if (typeof withdrawPokemonFromDaycare !== 'undefined') {
   if (typeof globalThis !== 'undefined')
     globalThis.withdrawPokemonFromDaycare = withdrawPokemonFromDaycare;
 }
-if (typeof getHatcherySlotUpgradeCost !== 'undefined') {
-  if (typeof window !== 'undefined') window.getHatcherySlotUpgradeCost = getHatcherySlotUpgradeCost;
-  if (typeof globalThis !== 'undefined')
-    globalThis.getHatcherySlotUpgradeCost = getHatcherySlotUpgradeCost;
-}
+// V7-R3 · R3-05 — coûts des emplacements lus par le guide (chiffres clés).
+Object.assign(globalThis, { getHatcherySlotUpgradeCost, HATCHERY_SLOT_UPGRADE_COSTS });
 if (typeof upgradeHatcherySlots !== 'undefined') {
   if (typeof window !== 'undefined') window.upgradeHatcherySlots = upgradeHatcherySlots;
   if (typeof globalThis !== 'undefined') globalThis.upgradeHatcherySlots = upgradeHatcherySlots;

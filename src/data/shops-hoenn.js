@@ -16,12 +16,12 @@ export var SHOPS_HOENN = {
   fallarbor: { items: ["spell_tag"] },
   lavaridge: { items: ["charcoal"] },
   fortree: { items: ["sharp_beak"] },
-  lilycove_dept_store: { items: ["leftovers", "mental_herb"] },
+  lilycove_dept_store: { items: ["leftovers", "mental_herb", "hp_up", "protein", "iron", "calcium", "carbos", "zinc", "bottle_cap", "ability_capsule"] },
   mossdeep: { items: ["twisted_spoon"] },
   sootopolis: { items: ["mystic_water"] },
   pacifidlog: { items: ["mystic_water", "dragon_scale"] },
   weather_lab: { items: [] },
-  evergrande: { items: ["leftovers", "rarecandy"] }
+  evergrande: { items: ["leftovers", "rarecandy", "bottle_cap", "golden_bottle_cap", "ability_patch"] }
 };
 
 if (typeof SHOPS !== 'undefined' && typeof SHOPS_HOENN !== 'undefined') {

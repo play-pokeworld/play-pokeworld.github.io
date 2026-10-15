@@ -150,10 +150,16 @@ const market = await page.evaluate(() => {
   };
   window.G.region = 'kanto';
   window.G.money = 500000;
+  // V7-P0 : le marché Pokémon se paie en Points de quête (pqMarketPrice), plus en ₽.
+  const wallet = window.ensureWallet();
+  wallet.questPoints = 1000000;
+  const pqBefore = wallet.questPoints;
+  const eeveePq = window.pqMarketPrice(133);
   const ids = window.getMarketPokemon();
-  window.buyPokemon(133); // Eevee — 180 000₽ override (strict parity)
+  window.buyPokemon(133); // Eevee
   const afterBuy = marketState();
   const moneyAfterEevee = window.G.money;
+  const eeveePaidPq = pqBefore - window.ensureWallet().questPoints;
   const teamOrCollection = window.G.team.some((p) => Number(p.id) === 133)
     || Object.values(window.G.collection || {}).some((p) => Number(p.id) === 133);
 
@@ -164,14 +170,19 @@ const market = await page.evaluate(() => {
 
   window.G.inventory.nugget = 2;
   const moneyBeforeSell = window.G.money;
+  const diamondsBeforeSell = window.ensureWallet().diamonds || 0;
   window.sellTreasure('nugget', 2);
-  const soldMoney = window.G.money - moneyBeforeSell;
+  // V7-P0 : les trésors de la mine se vendent en Diamants (ou en ₽ selon l'objet).
+  const soldMoney =
+    window.G.money - moneyBeforeSell + ((window.ensureWallet().diamonds || 0) - diamondsBeforeSell);
   const soldOut = !(window.G.inventory.nugget > 0);
   const final = marketState();
   return {
     stockListed: Array.isArray(ids) && ids.length > 0 && ids.includes(133),
     stockComponent: afterBuy.stock,
     eeveePaid: 500000 - moneyAfterEevee,
+    eeveePaidPq,
+    eeveePq,
     eeveeOwned: teamOrCollection,
     walletSynced: final.money === window.G.money,
     potionOk,
@@ -183,11 +194,12 @@ const market = await page.evaluate(() => {
 });
 assert.equal(market.stockListed, true, 'C1 — market stock listed through the ECS ShopStock');
 assert.ok(market.stockComponent && market.stockComponent.count > 0, 'C2 — ShopStock component carries the computed stock');
-assert.equal(market.eeveePaid, 180000, 'C3 — Eevee charged at the strict-parity override price');
+assert.ok(market.eeveePq > 0 && market.eeveePaidPq === market.eeveePq, 'C3 — Eevee charged its market price in Quest Points');
+assert.equal(market.eeveePaid, 0, 'C3b — the Pokemon market does not debit ₽ (V7-P0 currency rule)');
 assert.equal(market.eeveeOwned, true, 'C4 — bought Pokemon lands in team/collection (game handoff intact)');
 assert.equal(market.potionOk, true, 'C5 — item purchase mutates the InventoryItems component then G');
 assert.ok(market.potionPrice > 0, 'C6 — item price debited');
-assert.ok(market.soldMoney > 0, 'C7 — treasure sale credits the Wallet');
+assert.ok(market.soldMoney > 0, 'C7 — treasure sale credits the Wallet (₽ or Diamonds)');
 assert.equal(market.soldOut, true, 'C8 — sold stack removed from the inventory');
 assert.equal(market.walletSynced, true, 'C9 — Wallet component and G.money agree after all operations');
 

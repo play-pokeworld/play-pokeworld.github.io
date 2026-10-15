@@ -523,6 +523,11 @@ function renderLocInfo(el) {
   } catch (_) {}
   const loc = getLocObj(G.location);
   if (!loc) return;
+  // V7-R3 · D30 — changement de lieu : les bandeaux de relance auto suivent
+  // (celui des donjons n'apparaît que dans un donjon).
+  try {
+    if (globalThis.renderAutoRelaunchBar) globalThis.renderAutoRelaunchBar();
+  } catch (_) {}
   // Window title side effect (kept contract).
   const locTitleEl = document.getElementById('loc-win-title');
   if (locTitleEl) locTitleEl.textContent = getLocName(G.location) || 'Lieu';

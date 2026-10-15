@@ -194,6 +194,17 @@ function startBattle(enemyPoke, isChamp, champId = null, champPokeList = null) {
     const cName = getChampName(champId || battle.champId);
     addBattleLog(tr('trainer_sends', { trainer: cName, pokemon: eName }));
   }
+  // V7-R2 · SND-02 — le bus de jeu annonce l'adversaire (audio : brillant,
+  // musique de contexte) ; aucun import audio ici.
+  const _ep = battle.enemyPoke;
+  if (globalThis.pwEmit)
+    globalThis.pwEmit('battle:enemy', {
+      id: _ep.id,
+      shiny: !!(_ep.shiny || _ep.shinyActive),
+      roaming: !!_ep._isRoaming,
+      boss: !!_ep.isDungeonBoss,
+      champ: !!isChamp,
+    });
 
   const leaveBtn = document.getElementById('leave-btn');
   leaveBtn.disabled = false;

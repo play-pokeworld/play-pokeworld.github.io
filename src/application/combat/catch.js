@@ -147,6 +147,7 @@ function attemptAutoCatch(e) {
     }
   }
   if (G && G.pokeballs) G.pokeballs[ballKey] = Math.max(0, (G.pokeballs[ballKey] || 0) - 1); // ball consommée (réussite ou échec)
+  if (globalThis.pwEmit) globalThis.pwEmit('catch:throw', { ball: ballKey, shiny: wasShiny }); // V7-R2 · SND-02
   // P1 / FIX-06 : les roamers ne contournent plus le jet — même taux que tout le monde.
   // TUTO : la toute première capture (aucun Pokémon attrapé hors starter) est
   // garantie à 100 % pour ne jamais bloquer la quête « Capturer ton premier ».
@@ -162,6 +163,7 @@ function attemptAutoCatch(e) {
         p0: e.name,
       })
     );
+    if (globalThis.pwEmit) globalThis.pwEmit('catch:fail', { ball: ballKey, shiny: wasShiny }); // V7-R2 · SND-02
     try {
       if (pwLateLink('playCaptureAnimation'))
         playCaptureAnimation(
@@ -349,7 +351,13 @@ function attemptAutoCatch(e) {
     } catch (_) {}
   }
   try {
-    EventBus.emit(EVENTS.POKEMON_CAUGHT, { loc: G.location });
+    // V7-R2 · SND-02 — `shiny` dans la charge utile : fanfare dédiée (décision joueur).
+    EventBus.emit(EVENTS.POKEMON_CAUGHT, {
+      loc: G.location,
+      id: e.id,
+      shiny: wasShiny,
+      roaming: isRoaming,
+    });
   } catch (_) {}
   try {
     if (pwLateLink('syncShinyCharmProgress')) syncShinyCharmProgress();

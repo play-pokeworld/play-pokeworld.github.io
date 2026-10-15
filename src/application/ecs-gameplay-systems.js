@@ -279,6 +279,12 @@ export class ECSSystemsManager {
                   : pn.type === 'boss'
                     ? 'rare'
                     : null;
+          // V7-R3 · D29 — une case ordinaire pioche parfois (~5 %) un RARE de
+          // la zone : tous les Pokémon du donjon sont obtenables hors boss.
+          if (bucketHint === 'common') {
+            const share = Number(globalThis.DUNGEON_RARE_ON_COMMON_TILE) || 0;
+            if (share > 0 && portRng()() < share) bucketHint = 'rare';
+          }
         } catch (_) {}
         const pick = pickWildFromTable(table.entries || [], {
           roamingId: table.roamingId || 0,

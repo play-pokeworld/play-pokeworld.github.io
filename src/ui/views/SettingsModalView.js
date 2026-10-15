@@ -24,6 +24,7 @@
  *   theme: { heading, swatches: [{ label, theme }] },
  *   save:  { heading, saveLabel, loadLabel, exportLabel, importLabel,
  *            deleteLabel, deleteWarning, confirmLabel, cancelLabel },
+ *   sound:     { heading, volumeLabel, buses: [{ id, label, on, vol }] }, // V7-R3c SND-07
  *   community: { heading, hint, discordLabel, discordUrl },      // V7-R1 #4
  *   advanced:  { heading, codeLabel, codePlaceholder, submitLabel, hint,
  *                debugOn, debugOnLabel, hideLabel },             // V7-R1 #8
@@ -125,6 +126,57 @@ export class SettingsModalView extends UIView {
                 dataset: { action: 'legacy-call', call: 'toggleUiAnimations', callArgs: '' },
               },
               (m.combat.uiFxOn ? '✔ ' : '✖ ') + (m.combat.uiFxLabel || '')
+            )
+          )
+        : null,
+      // ── V7-R2 · SND-01 / V7-R3c · SND-07 — Son : musique / interface / cris,
+      // coupure + curseur 0–100 par bus (branché via data-input-call : les
+      // attributs oninput inline sont neutralisés par le moteur).
+      m.sound && Array.isArray(m.sound.buses)
+        ? h(
+            'div',
+            { class: 'settings-section settings-sound' },
+            h('h3', null, m.sound.heading),
+            ...m.sound.buses.map((bus) =>
+              h(
+                'div',
+                { class: 'settings-sound-row' },
+                h(
+                  'button',
+                  {
+                    type: 'button',
+                    class: 'hbtn' + (bus.on ? ' active' : ''),
+                    id: 'audio-' + bus.id + '-toggle',
+                    'aria-pressed': bus.on ? 'true' : 'false',
+                    dataset: {
+                      action: 'legacy-call',
+                      call: 'toggleAudioBus',
+                      callArgs: `'${bus.id}'`,
+                    },
+                  },
+                  bus.label
+                ),
+                h(
+                  'label',
+                  { class: 'settings-sound-volume' },
+                  h('span', null, m.sound.volumeLabel),
+                  h('input', {
+                    type: 'range',
+                    min: '0',
+                    max: '100',
+                    step: '1',
+                    value: String(bus.vol),
+                    id: 'audio-' + bus.id + '-volume',
+                    'aria-label': bus.label,
+                    dataset: {
+                      action: 'stop-propagation',
+                      inputCall: 'setAudioVolume',
+                      inputArgs: `'${bus.id}',this.value`,
+                    },
+                  }),
+                  h('output', { id: 'audio-' + bus.id + '-value' }, bus.vol + ' %')
+                )
+              )
             )
           )
         : null,
@@ -313,7 +365,7 @@ export class SettingsModalView extends UIView {
                     m.advanced.submitLabel
                   )
                 ),
-            m.advanced.hint ? h('p', { class: 'settings-hint' }, m.advanced.hint) : null
+            null
           )
         : null,
       // ── Diagnostics (V7 · OBS-01) ───────────────────────────────────

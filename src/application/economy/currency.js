@@ -368,6 +368,7 @@ if (typeof globalThis !== 'undefined') {
   globalThis.diamondSpriteHtml = diamondSpriteHtml;
   globalThis.pcSpriteHtml = pcSpriteHtml;
   globalThis.currencyAmountSpriteHtml = currencyAmountSpriteHtml;
+  globalThis.DUNGEON_TOLLS = DUNGEON_TOLLS; // V7-R3 · R3-05 — lu par le guide (chiffres clés)
 }
 
 export {

@@ -1,5 +1,5 @@
 // smoke-p0b.mjs — verification of the P1 UI fixes in a real Chromium:
-//  B. filter editor: 5 locked presets in order (Nouveau first), options panel
+//  B. filter editor: 5 locked presets in order (Errant first since V7-R3c), options panel
 //     collapsed by default + ⚙ toggle, type/encounter dropdowns;
 //  C. shop: first city sells ONLY Poké Ball (progressive per-town unlock);
 //  D. bag + dictionary list balls;
@@ -54,7 +54,9 @@ const editor = await page.evaluate(() => {
   };
 });
 assert.equal(editor.count, 5, 'B1 — 5 preset filters in the editor');
-assert.equal(editor.names[0], 'Nouveau', 'B2 — "Nouveau" is the FIRST filter (order = priority)');
+// V7-R3c : ordre = priorité → Errant, Nouveau chromatique, Chromatique déjà capturé, Nouveau, Déjà capturé
+assert.equal(editor.names[0], 'Errant', 'B2 — "Errant" is the FIRST filter (order = priority, R3c-06)');
+assert.ok(editor.names.indexOf('Nouveau chromatique') < editor.names.indexOf('Nouveau'), 'B2b — shiny presets come before "Nouveau"');
 assert.ok(editor.names.includes('Déjà capturé'), 'B3 — "Déjà capturé" present');
 assert.ok(editor.optsVisible.every(v => v === false), 'B4 — options hidden by default (name + ball only)');
 assert.ok(editor.paramBtns.length === 5 && editor.paramBtns.every(l => /paramètre/i.test(l)), 'B5 — each filter has its own "Modifier les paramètres" button');
@@ -233,7 +235,8 @@ assert.ok(disabled.until > Date.now(), 'A6 — disabled verdict still blocks the
 await page.evaluate(() => { if (!G.settings) G.settings = {}; G.settings.captureAnimations = true; });
 
 // ── H. Header no longer shows money ────────────────────────────────────────
-assert.equal(await page.evaluate(() => !!document.getElementById('h-money')), false, 'H1 — money removed from the title bar');
+// Passe 28 : #h-money subsiste masqué (du code historique l'écrit encore) — il ne doit pas être visible.
+assert.equal(await page.evaluate(() => { const el = document.getElementById('h-money'); return !!el && !el.hidden && el.offsetParent !== null; }), false, 'H1 — money not visible in the title bar');
 assert.equal(await page.evaluate(() => { const i = document.querySelector('#win-currency .pw-win-hdr-icon'); return i ? i.textContent.trim() : ''; }), '₽', 'H2 — ₽ symbol in the Monnaies window header (not the game title)');
 assert.equal(await page.evaluate(() => (document.querySelector('#header .brand-pokedollar') ? true : false)), false, 'H3 — no ₽ in the game title');
 

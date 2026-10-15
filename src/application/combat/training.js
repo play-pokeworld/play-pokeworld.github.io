@@ -395,7 +395,7 @@ function isTrainingModeUnlocked(mode) {
 // UI overhaul: trainingButtonHtml now returns a MODE MODEL — the actual
 // markup is owned by the DS MachineWindow component (unusable modes render
 // as INFORMATIONAL rows, never as fake buttons — design-system rule).
-function trainingModeModel(mode, enabled, slotIndex) {
+function trainingModeModel(mode, enabled, slotIndex, busy = false) {
   // Each training mode carries a dedicated color class
   // (training-mode--<mode>) to be recognizable at a glance, with a
   // matching hover state (see pw-unified.css).
@@ -423,8 +423,12 @@ function trainingModeModel(mode, enabled, slotIndex) {
   return {
     classes: modeCls,
     title: getTrainingModeLabel(mode),
-    descHtml: getTrainingModeDescription(mode, enabled),
-    clickable: !!enabled,
+    // V7-R2 — slot occupé : on garde la vraie description (avant, le mode
+    // affichait « Niveau 100 atteint » / « EV au maximum » pendant le combat).
+    descHtml: busy
+      ? getTrainingModeDescription(mode, true)
+      : getTrainingModeDescription(mode, enabled),
+    clickable: !!enabled && !busy,
     call: 'startTrainingBattle',
     callArgs: `'${mode}', ${slotIndex}`,
   };
@@ -677,13 +681,15 @@ function applyTrainingReward(trainee, mode) {
   if (mode === 'ev') {
     if (!trainee.evs) trainee.evs = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
     const keys = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
-    // FIX-02 : plafond EV par stat = 18, total EV borné à 36.
+    // FIX-02 : plafond EV par stat et total bornés (GAME.STATS, cités par le guide).
+    const evCap = Number(globalThis.STAT_EV_CAP) || 18;
+    const evTotalCap = Number(globalThis.STAT_EV_TOTAL_CAP) || 36;
     const totalEv = keys.reduce((s, k) => s + (trainee.evs[k] || 0), 0);
-    const avail = keys.filter((k) => (trainee.evs[k] || 0) < 18 && totalEv < 36);
+    const avail = keys.filter((k) => (trainee.evs[k] || 0) < evCap && totalEv < evTotalCap);
     if (avail.length) {
       const pk = avail[rand(0, avail.length - 1)];
       trainee.evs[pk]++;
-      rewardMsg = ` (+1 EV ${pk.toUpperCase()} → ${trainee.evs[pk]}/18)`;
+      rewardMsg = ` (+1 EV ${pk.toUpperCase()} → ${trainee.evs[pk]}/${evCap})`;
     } else rewardMsg = ' (EV au maximum)';
   } else if (mode === 'level') {
     const gain = Math.min(rand(2, 5), Math.max(0, 100 - (trainee.level || 1)));
@@ -997,7 +1003,11 @@ function renderTrainingBattlePanel() {
     if (chromeOff) chromeOff.style.display = ''; // wave 17: restore the battle chrome for real battles
     if (typeof battle !== 'undefined' && battle && !battle.active) {
       if (idleScreen) idleScreen.style.display = 'flex';
-      if (activeScene) activeScene.style.display = 'none';
+      if (activeScene) {
+        activeScene.style.display = 'none';
+        // V7-R2 — miroir de endBattle() : sans combat réel, la scène s'éteint.
+        activeScene.classList.remove('is-live');
+      }
       if (leaveBtn) {
         leaveBtn.disabled = false;
         leaveBtn.textContent = t('leave_battle_button') || 'Quitter le combat';
@@ -1006,7 +1016,16 @@ function renderTrainingBattlePanel() {
     return;
   }
   if (idleScreen) idleScreen.style.display = 'none';
-  if (activeScene) activeScene.style.display = 'flex';
+  if (activeScene) {
+    activeScene.style.display = 'flex';
+    // V7-R2 (retour joueur « Entraînement : fonctionne pas ») — depuis la
+    // règle CSS §32.6, `#battle-active-scene:not(.is-live)` est masquée en
+    // `!important` et l'écran de repos affiché en `!important` : le style
+    // inline posé ici n'avait plus aucun effet, le duel d'entraînement
+    // tournait en coulisses sous « Exploration au repos ». La scène doit
+    // être allumée comme pour un vrai combat : par la classe `is-live`.
+    activeScene.classList.add('is-live');
+  }
   if (leaveBtn && typeof battle !== 'undefined' && battle && !battle.active) {
     // Wave 17 (user feedback): during a pure training session the battle
     // chrome (resume/forfeit buttons) is useless — HIDE the whole row
@@ -1764,7 +1783,13 @@ function trainingAutomationSlotCardModel(i) {
   const title = tr('training_slot_title', { slot: i + 1 });
   if (!unlocked) return { title, state: 'locked', desc: t('training_slot_locked') };
   if (!purchased)
-    return { title, state: 'unpurchased', lockedLabel: t('automation_locked_upgrade') };
+    // V7-R3c · R3c-04 — prix (PQ, lu dans TRAINING_AUTOMATION_SLOT_COST) + achat direct
+    return {
+      title,
+      state: 'unpurchased',
+      lockedLabel: `${formatNumber(TRAINING_AUTOMATION_SLOT_COST)} ${t('currency_quest_points')}`,
+      buy: { call: 'buyTrainingAutomationSlot', args: String(i), label: t('buy_btn') },
+    };
   return {
     title,
     state: 'owned',
@@ -2145,11 +2170,11 @@ function trainingSlotModel(slotIndex) {
     modeRowClass: 'training-mode-row',
     modeTitleClass: 'training-mode-title',
     modes: [
-      trainingModeModel('move', state.move && !active, slotIndex),
-      trainingModeModel('talent', state.talent && !active, slotIndex),
-      trainingModeModel('ev', state.ev && !active, slotIndex),
-      trainingModeModel('hidden', state.hidden && !active, slotIndex),
-      trainingModeModel('level', state.level && !active, slotIndex),
+      trainingModeModel('move', state.move && !active, slotIndex, active && state.move),
+      trainingModeModel('talent', state.talent && !active, slotIndex, active && state.talent),
+      trainingModeModel('ev', state.ev && !active, slotIndex, active && state.ev),
+      trainingModeModel('hidden', state.hidden && !active, slotIndex, active && state.hidden),
+      trainingModeModel('level', state.level && !active, slotIndex, active && state.level),
     ],
   };
 }
@@ -2349,200 +2374,52 @@ function startTrainingBattle(mode = 'ev', slotIndex = 0) {
   renderTrainingBattlePanel();
 }
 
-// --- Migrated to ES module, globals exposed ---
-if (typeof isMoveTrainingLocked !== 'undefined') {
-  if (typeof window !== 'undefined') window.isMoveTrainingLocked = isMoveTrainingLocked;
-  if (typeof globalThis !== 'undefined') globalThis.isMoveTrainingLocked = isMoveTrainingLocked;
-}
-if (typeof getTrainingLockedMoves !== 'undefined') {
-  if (typeof window !== 'undefined') window.getTrainingLockedMoves = getTrainingLockedMoves;
-  if (typeof globalThis !== 'undefined') globalThis.getTrainingLockedMoves = getTrainingLockedMoves;
-}
-if (typeof getTrainableLockedMoves !== 'undefined') {
-  if (typeof window !== 'undefined') window.getTrainableLockedMoves = getTrainableLockedMoves;
-  if (typeof globalThis !== 'undefined')
-    globalThis.getTrainableLockedMoves = getTrainableLockedMoves;
-}
-if (typeof hasActiveTrainingBattle !== 'undefined') {
-  if (typeof window !== 'undefined') window.hasActiveTrainingBattle = hasActiveTrainingBattle;
-  if (typeof globalThis !== 'undefined')
-    globalThis.hasActiveTrainingBattle = hasActiveTrainingBattle;
-}
-if (typeof getTrainingSlotCount !== 'undefined') {
-  if (typeof window !== 'undefined') window.getTrainingSlotCount = getTrainingSlotCount;
-  if (typeof globalThis !== 'undefined') globalThis.getTrainingSlotCount = getTrainingSlotCount;
-}
-if (typeof ensureTrainingSlots !== 'undefined') {
-  if (typeof window !== 'undefined') window.ensureTrainingSlots = ensureTrainingSlots;
-  if (typeof globalThis !== 'undefined') globalThis.ensureTrainingSlots = ensureTrainingSlots;
-}
-if (typeof setTrainingSlotPokemon !== 'undefined') {
-  if (typeof window !== 'undefined') window.setTrainingSlotPokemon = setTrainingSlotPokemon;
-  if (typeof globalThis !== 'undefined') globalThis.setTrainingSlotPokemon = setTrainingSlotPokemon;
-}
-if (typeof clearTrainingSlot !== 'undefined') {
-  if (typeof window !== 'undefined') window.clearTrainingSlot = clearTrainingSlot;
-  if (typeof globalThis !== 'undefined') globalThis.clearTrainingSlot = clearTrainingSlot;
-}
-if (typeof openTrainingSlotSelector !== 'undefined') {
-  if (typeof window !== 'undefined') window.openTrainingSlotSelector = openTrainingSlotSelector;
-  if (typeof globalThis !== 'undefined')
-    globalThis.openTrainingSlotSelector = openTrainingSlotSelector;
-}
-if (typeof applyTrainingReward !== 'undefined') {
-  if (typeof window !== 'undefined') window.applyTrainingReward = applyTrainingReward;
-  if (typeof globalThis !== 'undefined') globalThis.applyTrainingReward = applyTrainingReward;
-}
-if (typeof completeTrainingSlot !== 'undefined') {
-  if (typeof window !== 'undefined') window.completeTrainingSlot = completeTrainingSlot;
-  if (typeof globalThis !== 'undefined') globalThis.completeTrainingSlot = completeTrainingSlot;
-}
-if (typeof cancelTrainingSlot !== 'undefined') {
-  if (typeof window !== 'undefined') window.cancelTrainingSlot = cancelTrainingSlot;
-  if (typeof globalThis !== 'undefined') globalThis.cancelTrainingSlot = cancelTrainingSlot;
-}
-if (typeof updateTrainingSlots !== 'undefined') {
-  if (typeof window !== 'undefined') window.updateTrainingSlots = updateTrainingSlots;
-  if (typeof globalThis !== 'undefined') globalThis.updateTrainingSlots = updateTrainingSlots;
-}
-if (typeof renderTrainingBattlePanel !== 'undefined') {
-  if (typeof window !== 'undefined') window.renderTrainingBattlePanel = renderTrainingBattlePanel;
-  if (typeof globalThis !== 'undefined')
-    globalThis.renderTrainingBattlePanel = renderTrainingBattlePanel;
-}
-if (typeof updateTrainingLiveProgress !== 'undefined') {
-  if (typeof window !== 'undefined') window.updateTrainingLiveProgress = updateTrainingLiveProgress;
-  if (typeof globalThis !== 'undefined')
-    globalThis.updateTrainingLiveProgress = updateTrainingLiveProgress;
-}
-if (typeof openTrainingSlotPokeModal !== 'undefined') {
-  if (typeof window !== 'undefined') window.openTrainingSlotPokeModal = openTrainingSlotPokeModal;
-  if (typeof globalThis !== 'undefined')
-    globalThis.openTrainingSlotPokeModal = openTrainingSlotPokeModal;
-}
-if (typeof buyTrainingAutomationSlot !== 'undefined') {
-  if (typeof window !== 'undefined') window.buyTrainingAutomationSlot = buyTrainingAutomationSlot;
-  if (typeof globalThis !== 'undefined')
-    globalThis.buyTrainingAutomationSlot = buyTrainingAutomationSlot;
-}
-if (typeof isTrainingModeUnlocked !== 'undefined') {
-  if (typeof window !== 'undefined') window.isTrainingModeUnlocked = isTrainingModeUnlocked;
-  if (typeof globalThis !== 'undefined') globalThis.isTrainingModeUnlocked = isTrainingModeUnlocked;
-}
-if (typeof isLeagueBeaten !== 'undefined') {
-  if (typeof window !== 'undefined') window.isLeagueBeaten = isLeagueBeaten;
-  if (typeof globalThis !== 'undefined') globalThis.isLeagueBeaten = isLeagueBeaten;
-}
-if (typeof hasAnyUnlockedTrainingAvailable !== 'undefined') {
-  if (typeof window !== 'undefined')
-    window.hasAnyUnlockedTrainingAvailable = hasAnyUnlockedTrainingAvailable;
-  if (typeof globalThis !== 'undefined')
-    globalThis.hasAnyUnlockedTrainingAvailable = hasAnyUnlockedTrainingAvailable;
-}
-if (typeof pullNextQueuedTraining !== 'undefined') {
-  if (typeof window !== 'undefined') window.pullNextQueuedTraining = pullNextQueuedTraining;
-  if (typeof globalThis !== 'undefined') globalThis.pullNextQueuedTraining = pullNextQueuedTraining;
-}
-if (typeof toggleTrainingAutomationSlot !== 'undefined') {
-  if (typeof window !== 'undefined')
-    window.toggleTrainingAutomationSlot = toggleTrainingAutomationSlot;
-  if (typeof globalThis !== 'undefined')
-    globalThis.toggleTrainingAutomationSlot = toggleTrainingAutomationSlot;
-}
-if (typeof setTrainingAutomationOption !== 'undefined') {
-  if (typeof window !== 'undefined')
-    window.setTrainingAutomationOption = setTrainingAutomationOption;
-  if (typeof globalThis !== 'undefined')
-    globalThis.setTrainingAutomationOption = setTrainingAutomationOption;
-}
-if (typeof rebuildTrainingQueue !== 'undefined') {
-  if (typeof window !== 'undefined') window.rebuildTrainingQueue = rebuildTrainingQueue;
-  if (typeof globalThis !== 'undefined') globalThis.rebuildTrainingQueue = rebuildTrainingQueue;
-}
-if (typeof processTrainingAutomationQueues !== 'undefined') {
-  if (typeof window !== 'undefined')
-    window.processTrainingAutomationQueues = processTrainingAutomationQueues;
-  if (typeof globalThis !== 'undefined')
-    globalThis.processTrainingAutomationQueues = processTrainingAutomationQueues;
-}
-if (typeof trainingAutomationEligible !== 'undefined') {
-  if (typeof window !== 'undefined') window.trainingAutomationEligible = trainingAutomationEligible;
-  if (typeof globalThis !== 'undefined')
-    globalThis.trainingAutomationEligible = trainingAutomationEligible;
-}
-if (typeof upgradeTrainingQueueSize !== 'undefined') {
-  if (typeof window !== 'undefined') window.upgradeTrainingQueueSize = upgradeTrainingQueueSize;
-  if (typeof globalThis !== 'undefined')
-    globalThis.upgradeTrainingQueueSize = upgradeTrainingQueueSize;
-}
-if (typeof addPokemonToTrainingQueue !== 'undefined') {
-  if (typeof window !== 'undefined') window.addPokemonToTrainingQueue = addPokemonToTrainingQueue;
-  if (typeof globalThis !== 'undefined')
-    globalThis.addPokemonToTrainingQueue = addPokemonToTrainingQueue;
-}
-if (typeof removePokemonFromTrainingQueue !== 'undefined') {
-  if (typeof window !== 'undefined')
-    window.removePokemonFromTrainingQueue = removePokemonFromTrainingQueue;
-  if (typeof globalThis !== 'undefined')
-    globalThis.removePokemonFromTrainingQueue = removePokemonFromTrainingQueue;
-}
-if (typeof clearTrainingQueue !== 'undefined') {
-  if (typeof window !== 'undefined') window.clearTrainingQueue = clearTrainingQueue;
-  if (typeof globalThis !== 'undefined') globalThis.clearTrainingQueue = clearTrainingQueue;
-}
-if (typeof isPokemonQueuedTraining !== 'undefined') {
-  if (typeof window !== 'undefined') window.isPokemonQueuedTraining = isPokemonQueuedTraining;
-  if (typeof globalThis !== 'undefined')
-    globalThis.isPokemonQueuedTraining = isPokemonQueuedTraining;
-}
-if (typeof upgradeTrainingMultiSlot !== 'undefined') {
-  if (typeof window !== 'undefined') window.upgradeTrainingMultiSlot = upgradeTrainingMultiSlot;
-  if (typeof globalThis !== 'undefined')
-    globalThis.upgradeTrainingMultiSlot = upgradeTrainingMultiSlot;
-}
-if (typeof openTrainingManagementMenu !== 'undefined') {
-  if (typeof window !== 'undefined') window.openTrainingManagementMenu = openTrainingManagementMenu;
-  if (typeof globalThis !== 'undefined')
-    globalThis.openTrainingManagementMenu = openTrainingManagementMenu;
-}
-if (typeof openTrainingUpgradeMenu !== 'undefined') {
-  if (typeof window !== 'undefined') window.openTrainingUpgradeMenu = openTrainingUpgradeMenu;
-  if (typeof globalThis !== 'undefined')
-    globalThis.openTrainingUpgradeMenu = openTrainingUpgradeMenu;
-}
-if (typeof pickTrainingBots !== 'undefined') {
-  if (typeof window !== 'undefined') window.pickTrainingBots = pickTrainingBots;
-  if (typeof globalThis !== 'undefined') globalThis.pickTrainingBots = pickTrainingBots;
-}
-if (typeof getTraineePoke !== 'undefined') {
-  if (typeof window !== 'undefined') window.getTraineePoke = getTraineePoke;
-  if (typeof globalThis !== 'undefined') globalThis.getTraineePoke = getTraineePoke;
-}
-if (typeof renderTrainingWindow !== 'undefined') {
-  if (typeof window !== 'undefined') window.renderTrainingWindow = renderTrainingWindow;
-  if (typeof globalThis !== 'undefined') globalThis.renderTrainingWindow = renderTrainingWindow;
-}
-if (typeof trainingBattlePanelSignature !== 'undefined') {
-  if (typeof window !== 'undefined')
-    window.trainingBattlePanelSignature = trainingBattlePanelSignature;
-  if (typeof globalThis !== 'undefined')
-    globalThis.trainingBattlePanelSignature = trainingBattlePanelSignature;
-}
-if (typeof trainingWindowSignature !== 'undefined') {
-  if (typeof window !== 'undefined') window.trainingWindowSignature = trainingWindowSignature;
-  if (typeof globalThis !== 'undefined')
-    globalThis.trainingWindowSignature = trainingWindowSignature;
-}
-if (typeof maybeRenderTrainingWindowTick !== 'undefined') {
-  if (typeof window !== 'undefined')
-    window.maybeRenderTrainingWindowTick = maybeRenderTrainingWindowTick;
-  if (typeof globalThis !== 'undefined')
-    globalThis.maybeRenderTrainingWindowTick = maybeRenderTrainingWindowTick;
-}
-if (typeof startTrainingBattle !== 'undefined') {
-  if (typeof window !== 'undefined') window.startTrainingBattle = startTrainingBattle;
-  if (typeof globalThis !== 'undefined') globalThis.startTrainingBattle = startTrainingBattle;
-}
+// --- Migrated to ES module, globals exposed (V7-R2 : forme compacte, même surface) ---
+const _trainingGlobals = {
+  isMoveTrainingLocked,
+  getTrainingLockedMoves,
+  getTrainableLockedMoves,
+  hasActiveTrainingBattle,
+  getTrainingSlotCount,
+  ensureTrainingSlots,
+  setTrainingSlotPokemon,
+  clearTrainingSlot,
+  openTrainingSlotSelector,
+  applyTrainingReward,
+  completeTrainingSlot,
+  cancelTrainingSlot,
+  updateTrainingSlots,
+  renderTrainingBattlePanel,
+  updateTrainingLiveProgress,
+  openTrainingSlotPokeModal,
+  buyTrainingAutomationSlot,
+  isTrainingModeUnlocked,
+  isLeagueBeaten,
+  hasAnyUnlockedTrainingAvailable,
+  pullNextQueuedTraining,
+  toggleTrainingAutomationSlot,
+  setTrainingAutomationOption,
+  rebuildTrainingQueue,
+  processTrainingAutomationQueues,
+  trainingAutomationEligible,
+  upgradeTrainingQueueSize,
+  addPokemonToTrainingQueue,
+  removePokemonFromTrainingQueue,
+  clearTrainingQueue,
+  isPokemonQueuedTraining,
+  upgradeTrainingMultiSlot,
+  openTrainingManagementMenu,
+  openTrainingUpgradeMenu,
+  pickTrainingBots,
+  getTraineePoke,
+  renderTrainingWindow,
+  trainingBattlePanelSignature,
+  trainingWindowSignature,
+  maybeRenderTrainingWindowTick,
+  startTrainingBattle,
+};
+if (typeof window !== 'undefined') Object.assign(window, _trainingGlobals);
+if (typeof globalThis !== 'undefined') Object.assign(globalThis, _trainingGlobals);
 
 // Hidden Talent Unlock - allows unlocking the hidden ability via training
 function tryUnlockHiddenAbility(p) {
@@ -2795,6 +2672,8 @@ if (typeof unlockTrainingMove !== 'undefined') {
   if (typeof window !== 'undefined') window.unlockTrainingMove = unlockTrainingMove;
   if (typeof globalThis !== 'undefined') globalThis.unlockTrainingMove = unlockTrainingMove;
 }
+// V7-R3 · R3-05 — coûts lus par le guide (chiffres clés), jamais recopiés.
+Object.assign(globalThis, { TRAINING_MULTI_SLOT_COST, TRAINING_AUTOMATION_SLOT_COST });
 
 // Wave 41 — native ESM module: exports the same names as the
 // classic surface kept above (bodies unchanged).

@@ -362,7 +362,7 @@ test('phase 30 C: training K.O.s also feed the day care (live AND fast-forward)'
 // ————————————————— D — Rewiring & decisions ————————————————————————————————
 test('phase 30 D: rewirings present, old blocks removed, i18n keys', () => {
   const oe = R('src/application/save/offline-engine.js');
-  assert.ok(wsIncludes(oe, 'if(!(G && G.wildSessionActive)) return res;'), 'wild FF locked by the real session'); // V7 · DBT-01
+  assert.ok(wsIncludes(oe, 'if(!(G && (G.wildSessionActive || offlineBootWildActive))) return res;'), 'wild FF locked by the real session (V7-R2: + flag relevé au relancement)'); // V7 · DBT-01
   assert.ok(oe.includes('afk_panel_daycare_levels'), 'recap: day-care levels row');
   assert.ok(wsMatch(R('src/application/save/save.js'), /G\.wildSessionActive =\s*\(?typeof isWildChillChainActive/), 'saveGame persiste le drapeau'); // V7 · DBT-01
   assert.ok(R('src/application/combat/battle-flow.js').includes('G.wildSessionActive = false'), 'endBattle efface le drapeau');

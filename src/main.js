@@ -79,6 +79,7 @@ import './data/pokemon-db.js';
 import './data/move-db.js';
 import './application/game-state.js';
 import './core/game-utils.js';
+import './core/audio.js'; // V7-R2 · SND-01 — moteur audio (sans import, sans réseau au boot)
 import './application/pokemon-factory.js';
 import './data/ui-icons.js';
 import './data/moves.js';
@@ -159,6 +160,7 @@ import './application/combat/battle-encounter.js';
 // src/game/combat/battle-tick.js), world:encounter (§1.1), breeding:hatch
 // (§1.2), economy:market (§1.3) — plus the gameplay ports bootstrap.
 import './application/gameplay-bundle.js';
+import './application/combat/talent-immunity.js'; // V7-R3 · R3-08 — table partagée moteur/affichage
 import './application/combat/battle-attack.js';
 import './application/combat/battle-status.js';
 import './ui/game/dom-morph.js';
@@ -185,6 +187,8 @@ __pwDeferredScreens.push(
 );
 __pwDeferredScreens.push('./ui/game/hatchery-ui.js', () => import('./ui/game/hatchery-ui.js'));
 import './application/automation/automation.js';
+import './application/automation/auto-relaunch.js'; // V7-R2 · AUTO-01
+import './application/automation/auto-dungeon-relaunch.js'; // V7-R3 · D30 — relance auto des donjons
 import './ui/game/box-selector.js';
 // V7 · FORM-02 — migrations de schéma (lues par save.js à l'ouverture d'un slot).
 import './application/save/migrations/index.js';
@@ -230,6 +234,7 @@ __pwDeferredScreens.push(
 import './application/save/save-extras.js';
 import './application/save/settings.js';
 import './application/save/offline-engine.js';
+import './application/save/dungeon-offline.js'; // V7-R2 — étape « dungeon » du rattrapage AFK
 import './ui/game/map-logic.js';
 import './ui/game/map-render.js';
 import './ui/game/region.js';
@@ -257,6 +262,7 @@ import './ui/game/fullscreen-panel.js';
 import './ui/game/preset-manager.js';
 import './ui/game/tutorial.js';
 import './application/bootstrap-timers.js';
+import './application/audio-bindings.js'; // V7-R2 · SND-02/03 — bus d'événements → effets, contexte → musique
 import './ui/game/legacy-components.js';
 import './application/scenes/index.js';
 

@@ -97,6 +97,8 @@ const UI_ICONS = {
  
  money: '<svg viewBox="0 0 24 24"fill="#F2D94E"><rect x="2"y="6"width="20"height="12"rx="2"/><circle cx="12"cy="12"r="3"/></svg>',
  
+ energy: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 10-12h-7l1-8z"/></svg>',
+ 
  badge: '<svg viewBox="0 0 24 24"fill="#94886B"><path d="M12 2l3 7h7l-5.5 4.5 2 7L12 16l-6.5 4.5 2-7L2 9h7z"/></svg>',
 };
 

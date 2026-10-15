@@ -8,10 +8,9 @@ import { pwLateLink } from '../../core/late-link.js';
 // silently filtered → empty movesets, then randomly regenerated. Teams
 // are now legitimate (natural pool ∪ TM/HM), validated by tests, and the
 // rival's team DEPENDS on the player's starter.
-// Wave 43 — lazy cross-module links (P7 regression fix):
-// zero static imports (chunks + VM harness isolates frozen); each alias resolves
-// AT CALL TIME — engine registry first, then the global surface (VM harness).
-// V7 · DBT-05 — résolveur unique (core/late-link.js) ; alias résolus à l'appel.
+// Wave 43 — lazy cross-module links (P7 regression fix): zero static imports (chunks +
+// VM harness isolates frozen); each alias resolves AT CALL TIME — engine registry first,
+// then the global surface. V7 · DBT-05 — résolveur unique (core/late-link.js).
 function applySecretBaseMoneyBonus(...args) {
   const f = pwLateLink('applySecretBaseMoneyBonus');
   return f ? f(...args) : undefined;
@@ -951,6 +950,7 @@ function claimQuest(qid, cat) {
     }
   }
   list.splice(idx, 1);
+  if (globalThis.pwEmit) globalThis.pwEmit('quest:completed', { qid: inst.qid, cat }); // V7-R2 · SND-02
 
   if (def.rewardPoke && cat === 'side') {
     const legMon = createPoke(def.rewardPoke, 50, true);

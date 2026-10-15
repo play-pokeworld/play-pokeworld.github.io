@@ -33,6 +33,34 @@ function _mineEnergyHint() {
     : t('mine_energy_hint');
 }
 
+/** « 1 000 Diamants » — prix de la mine automatique lu dans le code qui l'encaisse. */
+function _mineAutoCostLabel() {
+  const cost = Number(globalThis.MINE_AUTO_COST) || 0;
+  const fmt = globalThis.formatNumber ? globalThis.formatNumber(cost) : String(cost);
+  return `${fmt} ${t('currency_diamonds')}`;
+}
+/** V7-R3c · R3c-05 — bouton « Auto » directement dans le panneau Mine : bascule
+ *  si le module est acheté, sinon achat direct avec le prix affiché. */
+function mineAutoHeaderAction() {
+  const auto = (G && G.mine && G.mine.automation) || { purchased: false, enabled: false };
+  if (auto.purchased)
+    return {
+      label: tr('mine_auto_toggle', {
+        state: t(auto.enabled ? 'automation_enabled' : 'automation_disabled'),
+      }),
+      iconHtml: globalThis.getIcon ? globalThis.getIcon('mine', 14) : '',
+      call: 'toggleMineAutomation',
+      callArgs: '',
+      active: !!auto.enabled,
+      pressed: !!auto.enabled,
+    };
+  return {
+    label: `${t('mine_auto_title')} · ${_mineAutoCostLabel()}`,
+    iconHtml: globalThis.getIcon ? globalThis.getIcon('mine', 14) : '',
+    call: 'buyMineAutomation',
+    callArgs: '',
+  };
+}
 function mineManagementModel(page) {
   const icon = (n) => (typeof getIcon === 'function' ? getIcon(n, 14) : '');
   const call = 'openMineManagementMenu';
@@ -85,7 +113,9 @@ function mineManagementModel(page) {
           args: '',
           onLabel: t('automation_enabled'),
           offLabel: t('automation_disabled'),
-          lockedLabel: t('automation_locked_upgrade'),
+          // V7-R3c · R3c-04 — prix (Diamants, lu dans MINE_AUTO_COST) + achat direct
+          lockedLabel: _mineAutoCostLabel(),
+          buy: { call: 'buyMineAutomation', args: '', label: t('buy_btn') },
         },
       ],
     });
@@ -211,6 +241,20 @@ function openMineManagementMenu(page = 'upgrades') {
   modal.classList.add('open');
 }
 
+/** V7-R3c · R3c-05 — après un achat ou une bascule de « Mine auto » depuis
+ *  l'en-tête du panneau : le panneau est re-rendu ; le menu de gestion n'est
+ *  re-rendu que s'il est déjà ouvert (plus de modale qui surgit à chaque clic). */
+function refreshMineAutomationUi() {
+  const modal = document.getElementById('poke-modal');
+  const shell = modal && modal.querySelector('.management-shell.management-mine');
+  if (modal && shell && modal.classList.contains('open')) {
+    try {
+      openMineManagementMenu('automation');
+    } catch (_) {}
+  }
+  renderMineWindow();
+}
+
 // UI overhaul: the mine window is rendered by the ECS design system
 // (MineWindowView) — zero legacy markup below. Rock/item colors are theme
 // CLASSES on the design-system palette (mine-tile--d*/--item-*), not
@@ -284,6 +328,7 @@ function renderMine(el) {
       header: {
         classes: 'hatchery-upgrade-row',
         actions: [
+          mineAutoHeaderAction(), // V7-R3c · R3c-05
           {
             label: t('mine_management_button'),
             iconHtml: typeof getIcon === 'function' ? getIcon('settings', 14) : '',
@@ -311,9 +356,15 @@ function renderMine(el) {
           label: t('mine_tool_' + tl),
           cost: typeof mineToolEnergyCost === 'function' ? mineToolEnergyCost(tl) : 5,
           selected: tool === tl,
+          iconHtml: mineToolIcon(tl, 16),
+          title: _mineToolHint(tl),
           call: 'setMineTool',
           callArgs: `'${tl}'`,
         })),
+      // V7-R3 · R3-01 — retour joueur « retour visuel de l'outil utilisé » :
+      // ligne d'état de l'outil courant + grille marquée (curseur / aperçu).
+      toolHint: _mineToolHint(tool || 'chisel'),
+      currentTool: tool || 'chisel',
       grid: { cols: MINE_W, tiles: tiles },
       // Wave 32 (retour utilisateur) : chaque trésor est une pastille dont le
       // FOND et la couleur du nom disent s'il est encore enfoui ; une fois
@@ -342,8 +393,111 @@ function renderMine(el) {
 // être posée qu'APRÈS le rendu : d'où cette fonction appelée en fin de coup.
 // L'interrupteur d'animations (G.settings.uiAnimations, ANI-01) est respecté :
 // coupé, on ne touche pas au DOM du tout.
-function playMineDigFx(cells) {
-  if (!Array.isArray(cells) || !cells.length) return;
+// ── V7-R3 · R3-01 — RETOUR VISUEL DE L'OUTIL ────────────────────────────────
+// Icônes des outils (SVG inline, couleur courante) — pas d'emoji : rendu
+// identique partout, colorable par le thème.
+const MINE_TOOL_SVG = {
+  chisel: '<path d="M4 20l6-6"/><path d="M9 9l6 6 4-4-6-6z"/><path d="M14 3l3 3"/>',
+  hammer: '<path d="M14 4l6 6-3 3-6-6z"/><path d="M12 8l-8 8 2 2 8-8"/><path d="M3 21l3-3"/>',
+  pickaxe:
+    '<path d="M3 21l9-9"/><path d="M12 12l3-3"/><path d="M6 6c4-2 8-2 12 0"/><path d="M15 9c2 2 3 5 3 9"/>',
+  drill:
+    '<path d="M3 12h7"/><path d="M10 9h6v6h-6z"/><path d="M16 10h4v4h-4z"/><path d="M12 15l-1 5h3l1-5"/>',
+  dynamite:
+    '<path d="M6 10h10v10H6z"/><path d="M11 10V6"/><path d="M11 6c2-2 4-1 5 0"/><circle cx="17" cy="5" r="1"/>',
+};
+function mineToolIcon(tool, size) {
+  const body = MINE_TOOL_SVG[tool] || MINE_TOOL_SVG.chisel;
+  const px = Number(size) || 16;
+  return (
+    '<svg class="mine-tool-ico" viewBox="0 0 24 24" width="' +
+    px +
+    '" height="' +
+    px +
+    '" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    body +
+    '</svg>'
+  );
+}
+/** « Marteau · 15 énergie par coup · zone 3×3 · puissance 1 » (chiffres lus dans MINE_TOOL_DEFS). */
+function _mineToolHint(tool) {
+  const defs = globalThis.MINE_TOOL_DEFS || null;
+  const def = defs && defs[tool] ? defs[tool] : { shape: 'single', power: 1 };
+  const area = t('mine_tool_area_' + (def.shape || 'single'));
+  return tr('mine_tool_hint', {
+    tool: t('mine_tool_' + tool),
+    cost: String(globalThis.mineToolEnergyCost ? mineToolEnergyCost(tool) : 5),
+    area: area,
+    power: String(def.power || 1),
+  });
+}
+/** Survol d'une case : les cases que l'outil courant toucherait sont marquées. */
+function _mineAimClear(grid) {
+  grid.querySelectorAll('.mine-tile.is-aim').forEach((el) => el.classList.remove('is-aim'));
+}
+function _mineAimAt(grid, tile) {
+  _mineAimClear(grid);
+  if (!tile || !globalThis.mineToolCells || !G || !G.mine) return;
+  const x = Number(tile.dataset.mineX);
+  const y = Number(tile.dataset.mineY);
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+  for (const [cx2, cy2] of mineToolCells(G.mine.tool || 'chisel', x, y)) {
+    const el = grid.querySelector(
+      '.mine-tile[data-mine-x="' + cx2 + '"][data-mine-y="' + cy2 + '"]'
+    );
+    if (el) el.classList.add('is-aim');
+  }
+}
+function installMineAimPreview() {
+  if (typeof document === 'undefined' || !document.body) return false;
+  if (document.body.dataset.pwMineAim === '1') return true;
+  document.body.dataset.pwMineAim = '1';
+  document.addEventListener('pointerover', (ev) => {
+    const tgt = ev.target;
+    if (!tgt || typeof tgt.closest !== 'function') return;
+    const grid = tgt.closest('#mine-window-body .mine-grid');
+    if (!grid) return;
+    _mineAimAt(grid, tgt.closest('.mine-tile'));
+  });
+  document.addEventListener('pointerout', (ev) => {
+    const tgt = ev.target;
+    if (!tgt || typeof tgt.closest !== 'function') return;
+    const grid = tgt.closest('#mine-window-body .mine-grid');
+    if (!grid) return;
+    const to = ev.relatedTarget;
+    if (!to || typeof to.closest !== 'function' || !to.closest('#mine-window-body .mine-grid'))
+      _mineAimClear(grid);
+  });
+  return true;
+}
+installMineAimPreview();
+/** Au coup : l'icône de l'outil « frappe » la case visée et le coût s'envole. */
+function _mineStrikeFx(grid, hit) {
+  if (!hit || !Number.isFinite(Number(hit.x)) || !Number.isFinite(Number(hit.y))) return;
+  const tile = grid.querySelector(
+    '.mine-tile[data-mine-x="' + hit.x + '"][data-mine-y="' + hit.y + '"]'
+  );
+  if (!tile) return;
+  const fx = document.createElement('span');
+  fx.className = 'pw-mine-strike';
+  fx.dataset.tool = String(hit.tool || 'chisel');
+  _pwSetHtmlSafe(
+    fx,
+    mineToolIcon(hit.tool, 22) +
+      '<b class="pw-mine-strike-cost">−' +
+      Number(hit.cost || 0) +
+      (globalThis.getIcon ? globalThis.getIcon('energy', 11) : '') +
+      '</b>'
+  );
+  tile.appendChild(fx);
+  setTimeout(() => {
+    try {
+      fx.remove();
+    } catch (_) {}
+  }, 700);
+}
+
+function playMineDigFx(cells, hit) {
   if (typeof document === 'undefined') return;
   if (typeof uiAnimationsOn === 'function' && !uiAnimationsOn()) return;
   try {
@@ -352,6 +506,8 @@ function playMineDigFx(cells) {
   } catch (_) {}
   const grid = document.querySelector('#mine-window-body .mine-grid');
   if (!grid) return;
+  _mineStrikeFx(grid, hit); // V7-R3 · R3-01
+  if (!Array.isArray(cells) || !cells.length) return;
   for (const c of cells) {
     const tile = grid.querySelector(
       '.mine-tile[data-mine-x="' + c.x + '"][data-mine-y="' + c.y + '"]'
@@ -401,7 +557,19 @@ if (typeof playMineDigFx !== 'undefined') {
 
 // Wave 41 — native ESM module: exports the same names as the
 // classic surface kept above (bodies unchanged).
-export { openMineManagementMenu, renderMineWindow, renderMine, playMineDigFx };
+export {
+  openMineManagementMenu,
+  renderMineWindow,
+  renderMine,
+  playMineDigFx,
+  mineToolIcon,
+  installMineAimPreview,
+  refreshMineAutomationUi,
+};
+if (typeof window !== 'undefined')
+  Object.assign(window, { mineToolIcon, installMineAimPreview, refreshMineAutomationUi });
+if (typeof globalThis !== 'undefined')
+  Object.assign(globalThis, { mineToolIcon, installMineAimPreview, refreshMineAutomationUi });
 
 // Wave 42 — engine-registry absorption: these dispatched actions
 // register in the registry (registry-first dispatcher = engine

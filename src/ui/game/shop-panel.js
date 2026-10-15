@@ -190,6 +190,36 @@ function shopItemsModel(shopId, loc) {
       });
     }
   }
+  // V7-R2 · AUTO-01 — amélioration « Relance automatique » (points de quête),
+  // achat unique dans toutes les boutiques.
+  // V7-R3 · R3-06/D30 — même rayon pour la « Relance auto des donjons » ;
+  // retour joueur : une amélioration DÉJÀ ACHETÉE disparaît du rayon.
+  const arCosts = globalThis.AUTOMATION_UPGRADE_COSTS;
+  const upgradeIcons = { autoRelaunch: 'rematch', autoDungeonRelaunch: 'dungeon' };
+  for (const upKey of ['autoRelaunch', 'autoDungeonRelaunch']) {
+    if (!arCosts || !(arCosts[upKey] > 0)) continue;
+    const owned =
+      typeof globalThis.isAutomationPurchased === 'function' &&
+      !!globalThis.isAutomationPurchased(upKey);
+    if (owned) continue;
+    items.push({
+      key: upKey,
+      kind: 'upgrade',
+      currency: 'questPoints',
+      price: arCosts[upKey],
+      name: t('automation_' + upKey),
+      spriteHtml:
+        '<span class="pw-shop-upgrade-ico" aria-hidden="true">' +
+        (typeof globalThis.getIcon === 'function'
+          ? globalThis.getIcon(upgradeIcons[upKey], 32)
+          : '') +
+        '</span>',
+      stockLabel: t(
+        upKey === 'autoRelaunch' ? 'auto_relaunch_shop_desc' : 'auto_dg_relaunch_shop_desc'
+      ),
+      soldOut: false,
+    });
+  }
   // Employés : avec les autres objets, achat par 1. Déjà recruté → « Acheté » en rouge.
   if (typeof staffDefsForLocation === 'function' && typeof staffPrice === 'function') {
     const defs = staffDefsForLocation(G.location);
@@ -238,7 +268,7 @@ function shopGridHtml(model) {
     .map((it) => {
       const sel = _shopSelected === it.key;
       let priceLabel;
-      if (it.kind === 'staff' || it.kind === 'masterball') {
+      if (it.kind === 'staff' || it.kind === 'masterball' || it.kind === 'upgrade') {
         priceLabel =
           typeof currencyAmountSpriteHtml === 'function'
             ? currencyAmountSpriteHtml(it.currency, it.price)
@@ -284,7 +314,7 @@ function shopGridHtml(model) {
 // Quantité max autorisée pour l'entrée sélectionnée (sac + solde).
 function shopMaxAllowed(entry) {
   if (!entry) return 1;
-  if (entry.kind === 'staff') return 1;
+  if (entry.kind === 'staff' || entry.kind === 'upgrade') return 1;
   if (entry.kind === 'masterball') {
     // Borné par le solde de la monnaie (prix unitaire courant) + plafond 100.
     const w = typeof ensureWallet === 'function' ? ensureWallet() : null;
@@ -314,8 +344,8 @@ function shopFooterHtml(model) {
   if (!entry) return '';
   const qty = Math.max(1, Math.floor(Number(_shopQty) || 1));
 
-  // Employés : achat unique, quantité bloquée à 1.
-  if (entry.kind === 'staff') {
+  // Employés et améliorations (AUTO-01) : achat unique, quantité bloquée à 1.
+  if (entry.kind === 'staff' || entry.kind === 'upgrade') {
     const priceLabel =
       typeof currencyAmountSpriteHtml === 'function'
         ? currencyAmountSpriteHtml(entry.currency, entry.price)
@@ -330,7 +360,7 @@ function shopFooterHtml(model) {
       priceLabel +
       '</span>' +
       '<button type="button" class="hbtn pw-shop-buy" data-action="legacy-call" data-call="buySelectedFromShop" data-call-args="">' +
-      (typeof t === 'function' ? t('recruit_btn') : 'Recruter') +
+      (entry.kind === 'upgrade' ? t('buy_btn') : t('recruit_btn')) +
       '</button>' +
       '</div>'
     );
@@ -361,7 +391,7 @@ function shopFooterHtml(model) {
     '</button>' +
     '<input class="pw-shop-qty" type="number" min="1" value="' +
     qty +
-    '" data-shop-qty-input="1" oninput="shopSetQty(this.value)" data-action="stop-propagation">' +
+    '" data-shop-qty-input="1" data-input-call="shopSetQty" data-input-args="this.value" data-action="stop-propagation">' +
     '<button type="button" class="hbtn" data-action="legacy-call" data-call="shopAddQty" data-call-args="10">+10</button>' +
     '<button type="button" class="hbtn" data-action="legacy-call" data-call="shopAddQty" data-call-args="100">+100</button>' +
     '<button type="button" class="hbtn" data-action="legacy-call" data-call="shopMaxQty" data-call-args="">' +
@@ -461,6 +491,17 @@ function buySelectedFromShop() {
   if (!entry || entry.soldOut) return;
   if (entry.kind === 'staff') {
     if (typeof buyStaff === 'function') buyStaff(entry.key);
+  } else if (entry.kind === 'upgrade') {
+    // V7-R2 · AUTO-01 — même règle d'achat PQ que les modules de la pension.
+    if (typeof globalThis.purchaseAutomationIfNeeded === 'function') {
+      if (globalThis.purchaseAutomationIfNeeded(entry.key)) {
+        if (typeof globalThis.saveGame === 'function') globalThis.saveGame();
+        if (typeof globalThis.renderAutoRelaunchBar === 'function')
+          globalThis.renderAutoRelaunchBar();
+        if (typeof globalThis.renderAutoDungeonRelaunchBar === 'function')
+          globalThis.renderAutoDungeonRelaunchBar();
+      }
+    }
   } else if (entry.kind === 'masterball') {
     const qty = Math.min(Math.max(1, Math.floor(Number(_shopQty) || 1)), shopMaxAllowed(entry));
     if (typeof buyMasterBall === 'function') buyMasterBall(entry.currency, qty);
@@ -488,6 +529,7 @@ if (typeof renderShop !== 'undefined') {
   if (typeof window !== 'undefined') window.renderShop = renderShop;
   if (typeof globalThis !== 'undefined') globalThis.renderShop = renderShop;
 }
+Object.assign(globalThis, { shopItemsModel }); // V7-R3 · R3-06 — modèle testable (rayon des améliorations)
 if (typeof selectShopItem !== 'undefined') {
   if (typeof window !== 'undefined') window.selectShopItem = selectShopItem;
   if (typeof globalThis !== 'undefined') globalThis.selectShopItem = selectShopItem;

@@ -417,6 +417,15 @@ function renderPokemonDetailModal(p, opts) {
   else if (opts.idx != null) window._pwPokeSheet = { kind: 'team', idx: opts.idx };
   else window._pwPokeSheet = null;
   if (typeof window.pwInfoClearSource === 'function') window.pwInfoClearSource();
+  // V7-R3 · SND-04 — ouverture de la fiche : cri officiel (pas sur un simple rafraîchissement).
+  const _cryFor = String(p.uid || p.id);
+  if (
+    globalThis.pwEmit &&
+    (!modal.classList.contains('open') || modal.dataset.pwCryFor !== _cryFor)
+  ) {
+    modal.dataset.pwCryFor = _cryFor;
+    globalThis.pwEmit('ui:poke-detail', { id: p.id });
+  }
   // FIX (2026-08) — same surface reclaim as openDexEntry: drop any
   // `pw-info-modal` / `.pw-panel-shell` state an info panel may have left on
   // #poke-modal, otherwise this sheet renders with the info-panel geometry and
@@ -1055,58 +1064,6 @@ function refreshLearnableMovesPanelIfOpen() {
 }
 
 // --- Migrated to ES module, globals exposed ---
-if (typeof switchPokemonStatTab !== 'undefined') {
-  if (typeof window !== 'undefined') window.switchPokemonStatTab = switchPokemonStatTab;
-  if (typeof globalThis !== 'undefined') globalThis.switchPokemonStatTab = switchPokemonStatTab;
-}
-if (typeof renderPokemonDetailModal !== 'undefined') {
-  if (typeof window !== 'undefined') window.renderPokemonDetailModal = renderPokemonDetailModal;
-  if (typeof globalThis !== 'undefined')
-    globalThis.renderPokemonDetailModal = renderPokemonDetailModal;
-}
-if (typeof isPokemonLockedForBattleEdits !== 'undefined') {
-  if (typeof window !== 'undefined')
-    window.isPokemonLockedForBattleEdits = isPokemonLockedForBattleEdits;
-  if (typeof globalThis !== 'undefined')
-    globalThis.isPokemonLockedForBattleEdits = isPokemonLockedForBattleEdits;
-}
-if (typeof notifyBattleEditLocked !== 'undefined') {
-  if (typeof window !== 'undefined') window.notifyBattleEditLocked = notifyBattleEditLocked;
-  if (typeof globalThis !== 'undefined') globalThis.notifyBattleEditLocked = notifyBattleEditLocked;
-}
-if (typeof togglePokemonFavorite !== 'undefined') {
-  if (typeof window !== 'undefined') window.togglePokemonFavorite = togglePokemonFavorite;
-  if (typeof globalThis !== 'undefined') globalThis.togglePokemonFavorite = togglePokemonFavorite;
-}
-if (typeof togglePokemonLock !== 'undefined') {
-  if (typeof window !== 'undefined') window.togglePokemonLock = togglePokemonLock;
-  if (typeof globalThis !== 'undefined') globalThis.togglePokemonLock = togglePokemonLock;
-}
-if (typeof changePokeTalent !== 'undefined') {
-  if (typeof window !== 'undefined') window.changePokeTalent = changePokeTalent;
-  if (typeof globalThis !== 'undefined') globalThis.changePokeTalent = changePokeTalent;
-}
-if (typeof openReadonlyPokeModal !== 'undefined') {
-  if (typeof window !== 'undefined') window.openReadonlyPokeModal = openReadonlyPokeModal;
-  if (typeof globalThis !== 'undefined') globalThis.openReadonlyPokeModal = openReadonlyPokeModal;
-}
-if (typeof openBattleEnemyPokeModal !== 'undefined') {
-  if (typeof window !== 'undefined') window.openBattleEnemyPokeModal = openBattleEnemyPokeModal;
-  if (typeof globalThis !== 'undefined')
-    globalThis.openBattleEnemyPokeModal = openBattleEnemyPokeModal;
-}
-if (typeof openPokeModal !== 'undefined') {
-  if (typeof window !== 'undefined') window.openPokeModal = openPokeModal;
-  if (typeof globalThis !== 'undefined') globalThis.openPokeModal = openPokeModal;
-}
-if (typeof openPokeInfo !== 'undefined') {
-  if (typeof window !== 'undefined') window.openPokeInfo = openPokeInfo;
-  if (typeof globalThis !== 'undefined') globalThis.openPokeInfo = openPokeInfo;
-}
-if (typeof openMoveInfo !== 'undefined') {
-  if (typeof window !== 'undefined') window.openMoveInfo = openMoveInfo;
-  if (typeof globalThis !== 'undefined') globalThis.openMoveInfo = openMoveInfo;
-}
 
 function openBoxPokeModal(boxId) {
   _pwMarkTutorial('open_poke_sheet');
@@ -1119,36 +1076,37 @@ function openBoxPokeModal(boxId) {
   // NOT readonly — allows talent selection, shiny toggle, and move editing
   renderPokemonDetailModal(p, { boxId: boxId, readonly: false });
 }
-if (typeof openBoxPokeModal !== 'undefined') {
-  if (typeof window !== 'undefined') window.openBoxPokeModal = openBoxPokeModal;
-  if (typeof globalThis !== 'undefined') globalThis.openBoxPokeModal = openBoxPokeModal;
-}
-if (typeof openLearnableMovesPanel !== 'undefined') {
-  if (typeof window !== 'undefined') window.openLearnableMovesPanel = openLearnableMovesPanel;
-  if (typeof globalThis !== 'undefined')
-    globalThis.openLearnableMovesPanel = openLearnableMovesPanel;
-}
-if (typeof refreshLearnableMovesPanelIfOpen !== 'undefined') {
-  if (typeof window !== 'undefined')
-    window.refreshLearnableMovesPanelIfOpen = refreshLearnableMovesPanelIfOpen;
-  if (typeof globalThis !== 'undefined')
-    globalThis.refreshLearnableMovesPanelIfOpen = refreshLearnableMovesPanelIfOpen;
-}
 
 // --- Exported globals ---
-if (typeof battleEditLockMessage !== 'undefined') {
-  if (typeof window !== 'undefined') window.battleEditLockMessage = battleEditLockMessage;
-  if (typeof globalThis !== 'undefined') globalThis.battleEditLockMessage = battleEditLockMessage;
-}
-if (typeof samePokemonForBattleEditLock !== 'undefined') {
-  if (typeof window !== 'undefined')
-    window.samePokemonForBattleEditLock = samePokemonForBattleEditLock;
-  if (typeof globalThis !== 'undefined')
-    globalThis.samePokemonForBattleEditLock = samePokemonForBattleEditLock;
-}
 
 // Wave 41 — native ESM module: exports the same names as the
 // classic surface kept above (bodies unchanged).
+// Surface classique (window/globalThis) — bloc unique (V7-R3 : budget de lignes / typeof).
+const _pokeModalGlobals = {
+  switchPokemonStatTab,
+  renderPokemonDetailModal,
+  isPokemonLockedForBattleEdits,
+  notifyBattleEditLocked,
+  togglePokemonFavorite,
+  togglePokemonLock,
+  changePokeTalent,
+  openReadonlyPokeModal,
+  openBattleEnemyPokeModal,
+  openPokeModal,
+  openPokeInfo,
+  openMoveInfo,
+  openBoxPokeModal,
+  openLearnableMovesPanel,
+  refreshLearnableMovesPanelIfOpen,
+  battleEditLockMessage,
+  samePokemonForBattleEditLock,
+};
+if (typeof window !== 'undefined') Object.assign(window, _pokeModalGlobals);
+// Surface nominative conservée (contrat testé : training-move-unlock).
+if (typeof window !== 'undefined')
+  window.refreshLearnableMovesPanelIfOpen = refreshLearnableMovesPanelIfOpen;
+Object.assign(globalThis, _pokeModalGlobals);
+
 export {
   switchPokemonStatTab,
   renderPokemonDetailModal,

@@ -222,6 +222,11 @@ function applyEndOfTurnStatus(p) {
 
 async function onEnemyFaint() {
   if (!battle || !battle.enemyPoke) return;
+  if (globalThis.pwEmit)
+    globalThis.pwEmit('combat:enemy-fainted', {
+      id: battle.enemyPoke.id,
+      boss: !!battle.enemyPoke.isDungeonBoss,
+    }); // V7-R2 · SND-02
   // Phase 30: shared K.O. counter for the hatchery — each K.O. feeds
   // incubation and daycare according to each slot's mode (single function).
   try {

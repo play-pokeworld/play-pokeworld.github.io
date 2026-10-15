@@ -240,7 +240,7 @@ function initMineIfNeeded() {
   }
 }
 
-// P0 — tout l'équipement de la mine se paie en Diamants (💎).
+// P0 — tout l'équipement de la mine se paie en Diamants.
 export const MINE_AUTO_COST = 1000;
 export const MINE_TOOL_DEFS = {
   chisel: { cost: 5, power: 2, shape: 'single' },
@@ -249,7 +249,7 @@ export const MINE_TOOL_DEFS = {
   drill: { cost: 5, energy: 35, power: 2, shape: 'line5', diamondCost: 800 },
   dynamite: { cost: 5, energy: 60, power: 4, shape: 'square3', diamondCost: 1200 },
 };
-export const MINE_ENERGY_UPGRADE_COSTS = [100, 250, 500, 1000]; // en 💎
+export const MINE_ENERGY_UPGRADE_COSTS = [100, 250, 500, 1000]; // en Diamants
 let _mineAutoTicker = null;
 function appSetInterval(name, callback, delay) {
   if (typeof PokeWorldTimers !== 'undefined' && PokeWorldTimers?.set)
@@ -341,7 +341,7 @@ function buyMineAutomation() {
     notify(t('automation_already_bought'), 'var(--green)');
     return;
   }
-  // P0 — paiement en Diamants (💎).
+  // P0 — paiement en Diamants.
   const w = typeof ensureWallet === 'function' ? ensureWallet() : null;
   if (!w || (w.diamonds || 0) < MINE_AUTO_COST) {
     notify(tr('mine_auto_need_diamonds', { price: formatNumber(MINE_AUTO_COST) }), 'var(--red)');
@@ -350,6 +350,8 @@ function buyMineAutomation() {
   if (typeof spendDiamonds === 'function') spendDiamonds(MINE_AUTO_COST);
   else w.diamonds -= MINE_AUTO_COST;
   G.mine.automation.purchased = true;
+  // V7-R3c · R3c-05 — acheté depuis le panneau : le module démarre aussitôt.
+  G.mine.automation.enabled = true;
   updateHeader();
   saveGame();
   notify(
@@ -359,8 +361,14 @@ function buyMineAutomation() {
     }),
     'var(--green)'
   );
+  startMineAutomationTicker();
+  _mineAutoUiRefresh();
+}
+/** Rafraîchit le panneau Mine (et le menu de gestion seulement s'il est ouvert). */
+function _mineAutoUiRefresh() {
+  const fn = globalThis.refreshMineAutomationUi || globalThis.renderMineWindow;
   try {
-    openMineManagementMenu('automation');
+    if (fn) fn();
   } catch (_) {}
 }
 function toggleMineAutomation() {
@@ -372,9 +380,7 @@ function toggleMineAutomation() {
   G.mine.automation.enabled = !G.mine.automation.enabled;
   saveGame();
   if (G.mine.automation.enabled) startMineAutomationTicker();
-  try {
-    openMineManagementMenu('automation');
-  } catch (_) {}
+  _mineAutoUiRefresh();
 }
 function getMineEnergyUpgradeCost() {
   ensureMineAutomation();
@@ -420,7 +426,7 @@ function mineAutoStep() {
   if (!G.mine.automation.enabled || !G.mine.automation.purchased) return;
   if ((G.mine.energy || 0) < 5) return;
 
-  // P0 — usage de l'auto-mine : 1 💎 par tuile (tout en Diamants).
+  // P0 — usage de l'auto-mine : 1 Diamant par tuile (tout en Diamants).
   // Repli legacy pour les harnais VM sans currency.js (ancien frais en ₽).
   const w = typeof ensureWallet === 'function' ? ensureWallet() : null;
   if (!w) {
@@ -450,7 +456,7 @@ function mineAutoStep() {
     addBattleLog(
       typeof tr === 'function'
         ? tr('mine_auto_fee_diamonds_log')
-        : " [Mine] -1💎 pour l'extraction automatique d'une tuile."
+        : " [Mine] -1 Diamant pour l'extraction automatique d'une tuile."
     );
     updateHeader();
   } else {
@@ -638,6 +644,7 @@ function digMineTile(tx, ty, silent = false) {
       G.mine.completedCount++;
       if (typeof addStaffXp === 'function') addStaffXp('mine', 1);
       if (!silent) notify(tr('mine_found', { item: getItemName(itm.key) }), 'var(--green)');
+      if (!silent && globalThis.pwEmit) globalThis.pwEmit('mine:treasure', { key: itm.key }); // V7-R2 · SND-02
       try {
         addBattleLog(
           tr('mine_battle_log', { icon: ITEMS[itm.key]?.icon || '', item: getItemName(itm.key) })
@@ -657,7 +664,8 @@ function digMineTile(tx, ty, silent = false) {
   // Le DOM vient d'être reconstruit : c'est seulement maintenant que les
   // classes d'animation peuvent être posées sur les nouvelles tuiles.
   try {
-    if (typeof playMineDigFx === 'function') playMineDigFx(_fxCells);
+    if (typeof playMineDigFx === 'function')
+      playMineDigFx(_fxCells, { tool: tool, cost: cost, x: tx, y: ty }); // V7-R3 · R3-01
   } catch (_) {}
 }
 

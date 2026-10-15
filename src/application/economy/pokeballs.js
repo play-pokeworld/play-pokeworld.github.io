@@ -161,25 +161,41 @@ const HONOR_EVERY = 10;
 // tuto demande au joueur de poser la Poké Ball sur le filtre « Nouveau ».
 // `locked: true` = filtre de base, non supprimable, non renommable, options
 // verrouillées (mais la ball et l'ordre restent modifiables).
+// V7-R3c · R3c-06 (retour joueur : « la ball chromatique n'est pas lancée
+// quand l'espèce est déjà capturée en normal ») — sémantique des options :
+//   caught       = l'espèce est possédée (n'importe quelle couleur)
+//   shiny        = LA RENCONTRE est chromatique
+//   caughtShiny  = l'espèce est déjà possédée en chromatique
+// « Nouveau chromatique » = rencontre shiny dont on n'a pas encore le shiny,
+// que la forme normale soit capturée ou non. Les filtres les plus précis
+// (errant, chromatiques) passent AVANT « Nouveau » : premier filtre
+// correspondant = ball lancée.
 const PRESET_FILTERS = [
   {
-    id: 'new',
-    labelKey: 'ball_filter_new',
-    options: { caught: false },
+    id: 'roaming',
+    labelKey: 'ball_filter_roaming',
+    options: { encounter: 'roaming' },
     ball: 'none',
     locked: true,
   },
   {
     id: 'new_shiny',
     labelKey: 'ball_filter_new_shiny',
-    options: { caught: false, shiny: true },
+    options: { shiny: true, caughtShiny: false },
     ball: 'none',
     locked: true,
   },
   {
     id: 'caught_shiny',
     labelKey: 'ball_filter_caught_shiny',
-    options: { caughtShiny: true },
+    options: { shiny: true, caughtShiny: true },
+    ball: 'none',
+    locked: true,
+  },
+  {
+    id: 'new',
+    labelKey: 'ball_filter_new',
+    options: { caught: false },
     ball: 'none',
     locked: true,
   },
@@ -190,14 +206,9 @@ const PRESET_FILTERS = [
     ball: 'none',
     locked: true,
   },
-  {
-    id: 'roaming',
-    labelKey: 'ball_filter_roaming',
-    options: { encounter: 'roaming' },
-    ball: 'none',
-    locked: true,
-  },
 ];
+// Version des filtres de base enregistrés dans la sauvegarde (migration douce).
+const PRESET_FILTERS_VERSION = 2;
 
 const ROAMING_IDS = [144, 145, 146, 151, 243, 244, 245, 251, 380, 381, 385, 386];
 // Types rencontrés sur les routes : le filtre « type de rencontre » peut
@@ -261,7 +272,30 @@ function ensurePokeballs() {
       else b.filters.splice(at, 0, copy);
     }
   }
+  migratePresetFilters(b);
   return b;
+}
+
+// V7-R3c · R3c-06 — migration unique des filtres de base : options relues
+// dans PRESET_FILTERS (le joueur ne peut pas les éditer) et ordre de
+// priorité remis (errant, chromatiques, puis nouveau / capturé) en gardant
+// les balls, l'état activé et la place des filtres personnalisés.
+function migratePresetFilters(b) {
+  if ((Number(b.presetVersion) || 0) >= PRESET_FILTERS_VERSION) return false;
+  const byId = {};
+  for (const p of PRESET_FILTERS) byId[p.id] = p;
+  const slots = [];
+  b.filters.forEach((f, i) => {
+    if (!f.locked || !byId[f.id]) return;
+    f.options = { ...byId[f.id].options };
+    slots.push(i);
+  });
+  const ordered = PRESET_FILTERS.map((p) =>
+    b.filters.find((f) => f.locked && f.id === p.id)
+  ).filter(Boolean);
+  if (ordered.length === slots.length) slots.forEach((pos, k) => (b.filters[pos] = ordered[k]));
+  b.presetVersion = PRESET_FILTERS_VERSION;
+  return true;
 }
 
 function ballDef(type) {
@@ -469,6 +503,7 @@ function resetBallFilters() {
   const b = ensurePokeballs();
   if (!b) return;
   b.filters = PRESET_FILTERS.map((f) => ({ ...f, options: { ...f.options }, enabled: true }));
+  b.presetVersion = PRESET_FILTERS_VERSION;
   try {
     saveGame();
   } catch (_) {}
@@ -702,6 +737,8 @@ function ballFilterOptionsSummary(f) {
   if (opts.shiny) parts.push(typeof t === 'function' ? t('ball_opt_shiny') : 'chromatique');
   if (opts.caughtShiny)
     parts.push(typeof t === 'function' ? t('ball_opt_caught_shiny') : 'chromatique déjà capturé');
+  if (opts.caughtShiny === false)
+    parts.push(typeof t === 'function' ? t('ball_opt_not_caught_shiny') : 'chroma non capturé');
   if (opts.type) parts.push(typeof getTypeName === 'function' ? getTypeName(opts.type) : opts.type);
   if (opts.encounter)
     parts.push(typeof t === 'function' ? t('ball_enc_' + opts.encounter) : opts.encounter);
@@ -736,8 +773,8 @@ function filterMatches(filter, enemy) {
   const owned = typeof isSpeciesOwnedReal === 'function' ? isSpeciesOwnedReal(enemy) : false;
   const shinyOwned =
     owned && typeof isSpeciesShiny === 'function' ? isSpeciesShiny(enemy.id) : false;
-  const isShiny =
-    !!(enemy && (enemy.shinyActive || enemy.shiny || enemy._forceShiny)) || shinyOwned;
+  // V7-R3c · R3c-06 — « shiny » = la rencontre est chromatique (et rien d'autre).
+  const isShiny = !!(enemy && (enemy.shinyActive || enemy.shiny || enemy._forceShiny));
   const opts = filter.options || {};
   if ('caught' in opts && !!opts.caught !== !!owned) return false;
   if ('shiny' in opts && !!opts.shiny !== !!isShiny) return false;
@@ -828,95 +865,65 @@ function ballForEnemy(enemy) {
   for (const f of b.filters) {
     if (!f.enabled) continue;
     if (!filterMatches(f, enemy)) continue;
-    if (!f.ball || f.ball === 'none') return null; // filtre "ne pas capturer"
+    if (!f.ball || f.ball === 'none') {
+      // V7-R3c · R3c-06 — filtre de base sans ball = « pas d'avis », on passe
+      // au suivant (un nouveau chromatique n'est plus ignoré parce que
+      // « Nouveau chromatique » est resté sur « aucune ») ; un filtre
+      // personnalisé sur « aucune » reste un vrai « ne pas capturer ».
+      if (f.locked) continue;
+      return null;
+    }
     return ballCount(f.ball) > 0 ? f.ball : null;
   }
   return null;
 }
 
-// --- Surface classique -----------------------------------------------------------------
-if (typeof window !== 'undefined') {
-  window.BALL_DEFS = BALL_DEFS;
-  window.BALL_SCALE = BALL_SCALE;
-  window.BALL_CYCLE = BALL_CYCLE;
-  window.PRESET_FILTERS = PRESET_FILTERS;
-  window.HONOR_EVERY = HONOR_EVERY;
-  window.ensurePokeballs = ensurePokeballs;
-  window.ballDef = ballDef;
-  window.ballCount = ballCount;
-  window.ballSpriteUrl = ballSpriteUrl;
-  window.buyPokeballs = buyPokeballs;
-  window.cycleFilterBall = cycleFilterBall;
-  window.toggleFilterEnabled = toggleFilterEnabled;
-  window.filterMatches = filterMatches;
-  window.ballForEnemy = ballForEnemy;
-  window.ballEffectiveRate = ballEffectiveRate;
-  window.isBallHidden = isBallHidden;
-  window.ballConditionMet = ballConditionMet;
-  window.createBallFilter = createBallFilter;
-  window.resetBallFilters = resetBallFilters;
-  window.deleteBallFilter = deleteBallFilter;
-  window.moveBallFilter = moveBallFilter;
-  window.reorderBallFilter = reorderBallFilter;
-  window.renameBallFilter = renameBallFilter;
-  window.toggleBallFilterOption = toggleBallFilterOption;
-  window.setBallFilterOption = setBallFilterOption;
-  window.setBallFilterValueOption = setBallFilterValueOption;
-  window.addBallFilterOption = addBallFilterOption;
-  window.removeBallFilterOption = removeBallFilterOption;
-  window.addBallFilterValueOption = addBallFilterValueOption;
-  window.removeBallFilterValueOption = removeBallFilterValueOption;
-  window.masterBallPrices = masterBallPrices;
-  window.buyMasterBall = buyMasterBall;
-  window.masterBallTotalPrice = masterBallTotalPrice;
-  window.ballFilterLabel = ballFilterLabel;
-  window.ballFilterOptionsSummary = ballFilterOptionsSummary;
-  window.FILTER_TYPES = FILTER_TYPES;
-  window.ENCOUNTER_TYPES = ENCOUNTER_TYPES;
-  window.enemyTypes = enemyTypes;
-  window.enemyEncounterType = enemyEncounterType;
-}
-if (typeof globalThis !== 'undefined') {
-  globalThis.BALL_DEFS = BALL_DEFS;
-  globalThis.BALL_SCALE = BALL_SCALE;
-  globalThis.BALL_CYCLE = BALL_CYCLE;
-  globalThis.PRESET_FILTERS = PRESET_FILTERS;
-  globalThis.HONOR_EVERY = HONOR_EVERY;
-  globalThis.ensurePokeballs = ensurePokeballs;
-  globalThis.ballDef = ballDef;
-  globalThis.ballCount = ballCount;
-  globalThis.ballSpriteUrl = ballSpriteUrl;
-  globalThis.buyPokeballs = buyPokeballs;
-  globalThis.cycleFilterBall = cycleFilterBall;
-  globalThis.toggleFilterEnabled = toggleFilterEnabled;
-  globalThis.filterMatches = filterMatches;
-  globalThis.ballForEnemy = ballForEnemy;
-  globalThis.ballEffectiveRate = ballEffectiveRate;
-  globalThis.isBallHidden = isBallHidden;
-  globalThis.ballConditionMet = ballConditionMet;
-  globalThis.createBallFilter = createBallFilter;
-  globalThis.resetBallFilters = resetBallFilters;
-  globalThis.deleteBallFilter = deleteBallFilter;
-  globalThis.moveBallFilter = moveBallFilter;
-  globalThis.reorderBallFilter = reorderBallFilter;
-  globalThis.renameBallFilter = renameBallFilter;
-  globalThis.toggleBallFilterOption = toggleBallFilterOption;
-  globalThis.setBallFilterOption = setBallFilterOption;
-  globalThis.setBallFilterValueOption = setBallFilterValueOption;
-  globalThis.addBallFilterOption = addBallFilterOption;
-  globalThis.removeBallFilterOption = removeBallFilterOption;
-  globalThis.addBallFilterValueOption = addBallFilterValueOption;
-  globalThis.removeBallFilterValueOption = removeBallFilterValueOption;
-  globalThis.masterBallPrices = masterBallPrices;
-  globalThis.buyMasterBall = buyMasterBall;
-  globalThis.masterBallTotalPrice = masterBallTotalPrice;
-  globalThis.ballFilterLabel = ballFilterLabel;
-  globalThis.ballFilterOptionsSummary = ballFilterOptionsSummary;
-  globalThis.FILTER_TYPES = FILTER_TYPES;
-  globalThis.ENCOUNTER_TYPES = ENCOUNTER_TYPES;
-  globalThis.enemyTypes = enemyTypes;
-  globalThis.enemyEncounterType = enemyEncounterType;
-}
+// --- Surface classique (window + globalThis, V7-R3c : bloc unique) ----------------------
+const _pokeballGlobals = {
+  BALL_DEFS,
+  BALL_SCALE,
+  BALL_CYCLE,
+  PRESET_FILTERS,
+  PRESET_FILTERS_VERSION,
+  migratePresetFilters,
+  HONOR_EVERY,
+  ensurePokeballs,
+  ballDef,
+  ballCount,
+  ballSpriteUrl,
+  buyPokeballs,
+  cycleFilterBall,
+  toggleFilterEnabled,
+  filterMatches,
+  ballForEnemy,
+  ballEffectiveRate,
+  isBallHidden,
+  ballConditionMet,
+  createBallFilter,
+  resetBallFilters,
+  deleteBallFilter,
+  moveBallFilter,
+  reorderBallFilter,
+  renameBallFilter,
+  toggleBallFilterOption,
+  setBallFilterOption,
+  setBallFilterValueOption,
+  addBallFilterOption,
+  removeBallFilterOption,
+  addBallFilterValueOption,
+  removeBallFilterValueOption,
+  masterBallPrices,
+  buyMasterBall,
+  masterBallTotalPrice,
+  ballFilterLabel,
+  ballFilterOptionsSummary,
+  FILTER_TYPES,
+  ENCOUNTER_TYPES,
+  enemyTypes,
+  enemyEncounterType,
+};
+if (typeof window !== 'undefined') Object.assign(window, _pokeballGlobals);
+if (typeof globalThis !== 'undefined') Object.assign(globalThis, _pokeballGlobals);
 
 export {
   // V7 · DBT-08 — constantes lues par tools/economy-sim.mjs (pas de copie dans l'outil).

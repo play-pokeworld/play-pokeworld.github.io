@@ -61,32 +61,27 @@ function hatcheryManagementModel(page) {
       G.automation = { autoHatch: false, autoSeedHatchery: false, autoExplore: false };
     const purchased = (key) =>
       typeof isAutomationPurchased === 'function' ? isAutomationPurchased(key) : true;
+    // V7-R3c · R3c-04 — module non acheté : prix + bouton d'achat sur la carte.
+    const unlockFn = globalThis.automationUnlockModel;
+    const unlock = (key) =>
+      unlockFn ? unlockFn(key) : { purchased: false, lockedLabel: t('automation_locked_upgrade') };
+    const card = (key, iconName) =>
+      Object.assign(
+        {
+          iconHtml: icon(iconName),
+          label: t('automation_' + key),
+          purchased: true,
+          enabled: !!G.automation[key],
+          call: 'toggleAutomationButton',
+          args: `'${key}'`,
+          onLabel: t('automation_enabled'),
+          offLabel: t('automation_disabled'),
+        },
+        purchased(key) ? {} : unlock(key)
+      );
     blocks.push({
       kind: 'toggles',
-      cards: [
-        {
-          iconHtml: icon('hatchery'),
-          label: t('automation_autoHatch'),
-          purchased: purchased('autoHatch'),
-          enabled: !!G.automation.autoHatch,
-          call: 'toggleAutomationButton',
-          args: `'autoHatch'`,
-          onLabel: t('automation_enabled'),
-          offLabel: t('automation_disabled'),
-          lockedLabel: t('automation_locked_upgrade'),
-        },
-        {
-          iconHtml: icon('box'),
-          label: t('automation_autoSeedHatchery'),
-          purchased: purchased('autoSeedHatchery'),
-          enabled: !!G.automation.autoSeedHatchery,
-          call: 'toggleAutomationButton',
-          args: `'autoSeedHatchery'`,
-          onLabel: t('automation_enabled'),
-          offLabel: t('automation_disabled'),
-          lockedLabel: t('automation_locked_upgrade'),
-        },
-      ],
+      cards: [card('autoHatch', 'hatchery'), card('autoSeedHatchery', 'box')],
     });
     const maxSlotsAuto = clamp(G.hatcheryMaxSlots || 1, 1, 4);
     const slotCards = [];
@@ -300,7 +295,7 @@ function hatcherySlotCardModel(i) {
         ],
       },
       {
-        label: typeof t === 'function' ? t('filter_fav') : 'Favoris',
+        label: typeof t === 'function' ? t('box_filter_favorite') : 'Favoris',
         changeCall: 'setHatcherySlotAutomationOption',
         changeArgs: `${i}, 'filterFav', this.value`,
         options: [
@@ -309,12 +304,20 @@ function hatcherySlotCardModel(i) {
             label: typeof t === 'function' ? t('hatchery_filter_all') : 'All',
             selected: cfg.filterFav === 'all' || !cfg.filterFav,
           },
-          { value: 'fav_only', label: '⭐ Favoris', selected: cfg.filterFav === 'fav_only' },
-          { value: 'no_fav', label: 'Sans ⭐', selected: cfg.filterFav === 'no_fav' },
+          {
+            value: 'fav_only',
+            label: globalThis.t ? globalThis.t('box_filter_favorite_only') : 'Favoris',
+            selected: cfg.filterFav === 'fav_only',
+          },
+          {
+            value: 'no_fav',
+            label: globalThis.t ? globalThis.t('box_filter_not_favorite') : 'Non favoris',
+            selected: cfg.filterFav === 'no_fav',
+          },
         ],
       },
       {
-        label: typeof t === 'function' ? t('filter_region') : 'Région',
+        label: typeof t === 'function' ? t('box_filter_region') : 'Région',
         changeCall: 'setHatcherySlotAutomationOption',
         changeArgs: `${i}, 'filterRegion', this.value`,
         options: [
@@ -329,7 +332,7 @@ function hatcherySlotCardModel(i) {
         ],
       },
       {
-        label: typeof t === 'function' ? t('filter_rank') : 'Rang / IV',
+        label: typeof t === 'function' ? t('box_filter_rank') : 'Rang / IV',
         changeCall: 'setHatcherySlotAutomationOption',
         changeArgs: `${i}, 'filterRank', this.value`,
         options: [
@@ -338,12 +341,20 @@ function hatcherySlotCardModel(i) {
             label: typeof t === 'function' ? t('hatchery_filter_all') : 'All',
             selected: cfg.filterRank === 'all' || !cfg.filterRank,
           },
-          { value: 'S_or_better', label: 'Rang S+', selected: cfg.filterRank === 'S_or_better' },
-          { value: 'A_or_worse', label: 'Rang A-', selected: cfg.filterRank === 'A_or_worse' },
+          {
+            value: 'S_or_better',
+            label: globalThis.t ? globalThis.t('hatchery_filter_rank_s_plus') : 'Rang S+',
+            selected: cfg.filterRank === 'S_or_better',
+          },
+          {
+            value: 'A_or_worse',
+            label: globalThis.t ? globalThis.t('hatchery_filter_rank_a_minus') : 'Rang A-',
+            selected: cfg.filterRank === 'A_or_worse',
+          },
         ],
       },
       {
-        label: typeof t === 'function' ? t('filter_type') : 'Type',
+        label: typeof t === 'function' ? t('box_filter_type') : 'Type',
         changeCall: 'setHatcherySlotAutomationOption',
         changeArgs: `${i}, 'filterType', this.value`,
         options: [

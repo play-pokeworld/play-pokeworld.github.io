@@ -421,9 +421,14 @@ function getMovesForLevel(speciesId, level) {
 
 
 function calcStat(base, level, isHP=false, isShiny=false, iv=0, ev=0){
+ // V7-R3c — pas de chiffre en dur : GAME.STATS (game-config.js) est cité tel quel par le guide.
+ const S = (typeof GAME !== 'undefined' && GAME && GAME.STATS) || {};
+ const shinyMult = 1 + (Number(S.SHINY_BONUS_PCT) || 20) / 100;
+ const ivStep = (Number(S.IV_STEP_PCT) || 5) / 100;
+ const evStep = (Number(S.EV_STEP_PCT) || 5) / 100;
  let val = isHP ? Math.floor((2*base*level)/100) + level + 10 : Math.floor((2*base*level)/100) + 5;
- if(isShiny) val = Math.floor(val * 1.2);
- const starMult = 1 + ((iv||0) * 0.05) + ((ev||0) * 0.05);
+ if(isShiny) val = Math.floor(val * shinyMult);
+ const starMult = 1 + ((iv||0) * ivStep) + ((ev||0) * evStep);
  return Math.floor(val * starMult);
 }
 

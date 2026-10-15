@@ -352,7 +352,10 @@ function battleMoveEffBadgeHtml(moveType, isEnemy) {
         : null
       : battle && battle.enemyPoke;
     if (!target || !moveType || typeof typeEff !== 'function') return '';
-    const eff = typeEff(moveType, target.type1, target.type2);
+    // V7-R3 · R3-08 — types × talent de la cible (Lévitation, absorptions…).
+    const eff = globalThis.battleDisplayedEff
+      ? battleDisplayedEff(moveType, target)
+      : typeEff(moveType, target.type1, target.type2);
     let label = '';
     if (eff === 0) label = typeof t === 'function' ? t('eff_immune') : '×0';
     else if (eff >= 4) label = typeof t === 'function' ? t('eff_4x') : '×4';

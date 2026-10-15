@@ -71,6 +71,38 @@ function buildSettingsModel() {
       uiFxLabel: t('settings_ui_animations'),
       uiFxOn: typeof uiAnimationsOn === 'function' ? uiAnimationsOn() : true,
     },
+    // V7-R2 · SND-01 — Son : deux bus (effets / musique), volume + coupure,
+    // mémorisés hors sauvegarde (src/core/audio.js).
+    // V7-R3c · SND-07 — trois bus (musique / interface / cris), sans texte
+    // d'aide : le guide (rubrique « Réglages & son ») explique le reste.
+    sound: (function () {
+      const ap = typeof globalThis.audioPrefs === 'function' ? globalThis.audioPrefs() : null;
+      const vol = (k, dflt) => Math.round((ap && typeof ap[k] === 'number' ? ap[k] : dflt) * 100);
+      return {
+        heading: t('settings_sound_title'),
+        volumeLabel: t('settings_volume'),
+        buses: [
+          {
+            id: 'music',
+            label: t('settings_music'),
+            on: ap ? ap.musicOn : true,
+            vol: vol('musicVol', 0.4),
+          },
+          {
+            id: 'sfx',
+            label: t('settings_sfx'),
+            on: ap ? ap.sfxOn : true,
+            vol: vol('sfxVol', 0.8),
+          },
+          {
+            id: 'cries',
+            label: t('settings_cries'),
+            on: ap ? ap.criesOn !== false : true,
+            vol: vol('criesVol', 0.6),
+          },
+        ],
+      };
+    })(),
     save: {
       heading: t('save_title'),
       saveLabel: t('save_btn'),
@@ -95,7 +127,6 @@ function buildSettingsModel() {
       codeLabel: t('settings_debug_code_label'),
       codePlaceholder: t('settings_debug_code_placeholder'),
       submitLabel: t('settings_debug_code_submit'),
-      hint: t('settings_debug_code_hint'),
       debugOn: isDebugUnlocked(),
       debugOnLabel: t('settings_debug_on_label'),
       hideLabel: t('settings_debug_hide_btn'),
@@ -135,6 +166,29 @@ function toggleCaptureAnimations() {
   try {
     openSettings();
   } catch (_) {}
+}
+// V7-R2 · SND-01 — Réglages → Son.
+function toggleAudioBus(bus) {
+  if (typeof globalThis.audioToggle === 'function') globalThis.audioToggle(bus);
+  try {
+    openSettings();
+  } catch (_) {}
+}
+// V7-R3c · SND-07 — curseur 0–100 (branché par data-input-call, les attributs
+// oninput inline étant neutralisés par le moteur) ; aperçu sonore sur le bus réglé.
+function setAudioVolume(bus, value) {
+  const pctValue = Math.max(0, Math.min(100, Math.round(Number(value) || 0)));
+  if (typeof globalThis.audioSetVolume === 'function')
+    globalThis.audioSetVolume(bus, pctValue, { percent: true });
+  const out = document.getElementById('audio-' + bus + '-value');
+  if (out) out.textContent = pctValue + ' %';
+  if (bus === 'sfx' && typeof globalThis.audioPlaySfx === 'function')
+    globalThis.audioPlaySfx('notify');
+  if (bus === 'cries' && typeof globalThis.audioPlayCry === 'function') {
+    const g = globalThis.G;
+    const first = g && Array.isArray(g.team) && g.team[0] ? g.team[0].id : 25;
+    globalThis.audioPlayCry(first);
+  }
 }
 function openSettings() {
   const body = document.getElementById('settings-body');
@@ -363,6 +417,11 @@ if (typeof toggleCaptureAnimations !== 'undefined') {
   if (typeof globalThis !== 'undefined')
     globalThis.toggleCaptureAnimations = toggleCaptureAnimations;
 }
+// V7-R2 · SND-01 — Réglages → Son (surface classique pour legacy-call / oninput).
+if (typeof window !== 'undefined')
+  Object.assign(window, { toggleAudioBus, setAudioVolume, buildSettingsModel });
+if (typeof globalThis !== 'undefined')
+  Object.assign(globalThis, { toggleAudioBus, setAudioVolume });
 if (typeof clearDiagErrorsAndRefresh !== 'undefined') {
   if (typeof window !== 'undefined') window.clearDiagErrorsAndRefresh = clearDiagErrorsAndRefresh;
   if (typeof globalThis !== 'undefined')
@@ -392,6 +451,8 @@ export {
   toggleCaptureAnimations,
   captureAnimationsOn,
   clearDiagErrorsAndRefresh,
+  toggleAudioBus,
+  setAudioVolume,
 };
 
 // Wave 42 — engine-registry absorption: these dispatched actions

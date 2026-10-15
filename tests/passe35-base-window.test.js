@@ -19,11 +19,15 @@ const J = (p) => JSON.parse(R(p));
 const E = (p) => fs.existsSync(new URL(`../${p}`, import.meta.url));
 
 const SANDBOX_FILES = [
-  'src/engine/input/action-dispatcher.js', 'src/engine/runtime/classic-bridge.js',
-  'src/localization/fr/base.js', 'src/localization/en/base.js',
-  'src/localization/data.js', 'src/localization/i18n.js',
+  'src/engine/input/action-dispatcher.js',
+  'src/engine/runtime/classic-bridge.js',
+  'src/localization/fr/base.js',
+  'src/localization/en/base.js',
+  'src/localization/data.js',
+  'src/localization/i18n.js',
   'src/application/game-state.js',
-  'src/data/base-layouts-data.js', 'src/data/base-items-data.js',
+  'src/data/base-layouts-data.js',
+  'src/data/base-items-data.js',
   'src/application/base/base-core.js',
   'src/ui/game/base/base-view2d.js',
   'src/ui/game/base/base-window.js',
@@ -32,28 +36,71 @@ const SANDBOX_FILES = [
 function makeSandbox() {
   const store = new Map();
   const sandbox = {
-    console, window: {},
+    console,
+    window: {},
     document: {
       visibilityState: 'visible',
-      body: { dataset: {}, classList: { add() {}, remove() {}, toggle() {}, contains: () => false }, appendChild() {} },
-      head: { dataset: {} }, documentElement: { dataset: {}, classList: { add() {}, remove() {}, toggle() {}, contains: () => false } },
-      getElementById: () => null, querySelector: () => null, querySelectorAll: () => [],
-      createElement: () => ({ style: {}, dataset: {}, classList: { add() {}, remove() {} }, children: [], appendChild(c) { this.children.push(c); return c; }, setAttribute() {}, addEventListener() {}, click() {}, remove() {} }),
-      addEventListener() {}, removeEventListener() {},
+      body: {
+        dataset: {},
+        classList: { add() {}, remove() {}, toggle() {}, contains: () => false },
+        appendChild() {},
+      },
+      head: { dataset: {} },
+      documentElement: {
+        dataset: {},
+        classList: { add() {}, remove() {}, toggle() {}, contains: () => false },
+      },
+      getElementById: () => null,
+      querySelector: () => null,
+      querySelectorAll: () => [],
+      createElement: () => ({
+        style: {},
+        dataset: {},
+        classList: { add() {}, remove() {} },
+        children: [],
+        appendChild(c) {
+          this.children.push(c);
+          return c;
+        },
+        setAttribute() {},
+        addEventListener() {},
+        click() {},
+        remove() {},
+      }),
+      addEventListener() {},
+      removeEventListener() {},
     },
-    localStorage: { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, String(v)), removeItem: (k) => store.delete(k), clear: () => store.clear() },
+    localStorage: {
+      getItem: (k) => store.get(k) ?? null,
+      setItem: (k, v) => store.set(k, String(v)),
+      removeItem: (k) => store.delete(k),
+      clear: () => store.clear(),
+    },
     navigator: { language: 'fr' },
     location: { href: 'http://localhost/', reload() {} },
-    addEventListener() {}, removeEventListener() {},
-    matchMedia: () => ({ matches: false, media: '', addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }),
+    addEventListener() {},
+    removeEventListener() {},
+    matchMedia: () => ({
+      matches: false,
+      media: '',
+      addEventListener() {},
+      removeEventListener() {},
+      addListener() {},
+      removeListener() {},
+    }),
     requestAnimationFrame: (cb) => setTimeout(cb, 0),
-    setInterval: () => 1, clearInterval() {}, setTimeout: (cb) => setTimeout(cb, 0), clearTimeout() {},
+    setInterval: () => 1,
+    clearInterval() {},
+    setTimeout: (cb) => setTimeout(cb, 0),
+    clearTimeout() {},
     PokeWorldGameStarted: false,
   };
   sandbox.window = sandbox;
   sandbox.globalThis = sandbox;
   vm.createContext(sandbox);
-  vm.runInContext(harnessBundleSource(SANDBOX_FILES), sandbox, { filename: 'passe35-base-window [iife]' });
+  vm.runInContext(harnessBundleSource(SANDBOX_FILES), sandbox, {
+    filename: 'passe35-base-window [iife]',
+  });
   return sandbox;
 }
 
@@ -62,7 +109,13 @@ test('phase 35 A: permanent window wired (index, actions, dashboard, hook)', () 
   const idx = R('index.html');
   assert.ok(idx.includes('id="win-base"'), '#win-base present');
   assert.ok(idx.includes('data-drag-window="win-base"'), 'native drag of the dash-win');
-  for (const id of ['base-layout-select', 'base-canvas-2d', 'base-canvas-3d', 'base-panel', 'base-win-empty']) {
+  for (const id of [
+    'base-layout-select',
+    'base-canvas-2d',
+    'base-canvas-3d',
+    'base-panel',
+    'base-win-empty',
+  ]) {
     assert.ok(idx.includes(`id="${id}"`), `#${id} present`);
   }
   assert.ok(!idx.includes('id="win-base3d"'), 'no more 3D window');
@@ -70,20 +123,36 @@ test('phase 35 A: permanent window wired (index, actions, dashboard, hook)', () 
   assert.ok(!idx.includes('debug-base-window'), 'debug "test window" button removed');
   assert.ok(idx.includes('data-i18n="base.win.title"'), 'internationalized title');
 
-  const pb = [R('src/engine/input/action-dispatcher.js'), R('src/engine/runtime/classic-bridge.js')].join('\n');
+  const pb = [
+    R('src/engine/input/action-dispatcher.js'),
+    R('src/engine/runtime/classic-bridge.js'),
+  ].join('\n');
   assert.ok(pb.includes("'base-window-refresh'"), 'action refresh');
-  assert.ok(pb.includes("callGlobal('baseWindowSetMode'"), 'mode change dispatched');
-  assert.ok(pb.includes("callGlobal('baseWindowSetLayout'"), 'layout change dispatched');
+  // V7-R3c : les actions « change » passent par la table CHANGE_VALUE_ACTIONS du dispatcher
+  assert.match(
+    pb,
+    /callGlobal\('baseWindowSetMode'|'base-window-mode': 'baseWindowSetMode'/,
+    'mode change dispatched'
+  );
+  assert.match(
+    pb,
+    /callGlobal\('baseWindowSetLayout'|'base-window-layout': 'baseWindowSetLayout'/,
+    'layout change dispatched'
+  );
   assert.ok(!pb.includes('baseWindowToggle'), 'old debug action removed');
 
   const dash = R('src/ui/game/dashboard.js');
   // Passe 26g : ordre validé par le joueur — colonne 2 = Monnaies · Carte · Combat · Base.
-  assert.ok(dash.includes("'win-currency', 'win-map', 'win-battle', 'win-base'"), 'win-base in column 2 by default (new order)');
+  assert.ok(
+    dash.includes("'win-currency', 'win-map', 'win-battle', 'win-base'"),
+    'win-base in column 2 by default (new order)'
+  );
   const ensures = dash.split('win-base').length - 1;
   assert.ok(ensures >= 3, 'win-base: default + DEFAULT_COL + cols3 preset');
 
   const loader = R('src/main.js');
-  const i2 = loader.indexOf('base-view2d.js'), iw = loader.indexOf('base-window.js');
+  const i2 = loader.indexOf('base-view2d.js'),
+    iw = loader.indexOf('base-window.js');
   assert.ok(i2 > 0 && i2 < iw, '2D renderer before its window');
 
   assert.ok(R('src/ui/game/map-render.js').includes('baseWindowRender'), 'hook renderMap');
@@ -92,7 +161,8 @@ test('phase 35 A: permanent window wired (index, actions, dashboard, hook)', () 
 // ——— B — i18n ———————————————————————————————————————————————————————————
 test('phase 35 B: base.win.* finalized FR/EN (title, empty; close removed)', () => {
   const sb = makeSandbox();
-  vm.runInContext(`
+  vm.runInContext(
+    `
     for (const lang of ['fr', 'en']) {
       const w = I18N[lang] && I18N[lang].base && I18N[lang].base.win;
       if (!w) throw new Error(lang + ' base.win absent');
@@ -106,7 +176,9 @@ test('phase 35 B: base.win.* finalized FR/EN (title, empty; close removed)', () 
       }
     }
     window._ok = true;
-  `, sb);
+  `,
+    sb
+  );
   assert.ok(vm.runInContext('window._ok', sb), 'base.win.* complet');
   // Game default language = EN; each locale is forced explicitly.
   assert.equal(vm.runInContext(`(G.lang='fr', t('base.win.title'))`, sb), 'Base Secrète');
@@ -129,7 +201,8 @@ test('phase 35 C: 3D renderer removed', () => {
 
 test('phase 35 D: init + 2D render without exception + throttle signature', async () => {
   const sb = makeSandbox();
-  vm.runInContext(`
+  vm.runInContext(
+    `
     window.fetch = () => Promise.resolve({ ok: false });
     window._calls = { rects: 0, draws: 0 };
     // Pass 40: the layout selector groups its options into optgroups
@@ -159,8 +232,11 @@ test('phase 35 D: init + 2D render without exception + throttle signature', asyn
       'base-canvas-3d': mkCanvas('base-canvas-3d'),
     };
     document.getElementById = (id) => window._els[id] || null;
-  `, sb);
-  const out = vm.runInContext(`
+  `,
+    sb
+  );
+  const out = vm.runInContext(
+    `
     (async () => {
       const r = { steps: [] };
       // 1) without a loaded game (G null): hint shown, no crash
@@ -193,14 +269,24 @@ test('phase 35 D: init + 2D render without exception + throttle signature', asyn
       r.steps.push({ layouts: ls.options.length, layout: ls.value });
       return JSON.stringify(r);
     })()
-  `, sb);
+  `,
+    sb
+  );
   const r = JSON.parse(await out);
   assert.deepEqual([r.steps[0].hint, r.steps[0].txt], ['block', true], 'hint unsaved');
-  assert.deepEqual([r.steps[1].c2d, r.steps[1].c3d, r.steps[1].empty], ['block', 'none', 'none'], 'canvas 2D visible seul');
+  assert.deepEqual(
+    [r.steps[1].c2d, r.steps[1].c3d, r.steps[1].empty],
+    ['block', 'none', 'none'],
+    'canvas 2D visible seul'
+  );
   assert.ok(r.steps[1].drawn2d >= 49, `grid drawn (${r.steps[1].drawn2d} rects ≥ 49)`);
   assert.equal(r.steps[2].extra, 0, 'no re-render without change');
   assert.ok(r.steps[3].afterInv > 0, 'invalidation → redessine');
-  assert.equal(r.steps[4].layouts, 36, '36 layouts (24 canon + 6 custom + 6 colored multi-floor caves, phase 42) — optgroups counted flat');
+  assert.equal(
+    r.steps[4].layouts,
+    36,
+    '36 layouts (24 canon + 6 custom + 6 colored multi-floor caves, phase 42) — optgroups counted flat'
+  );
   assert.equal(r.steps[4].layout, 'cave_1');
 });
 
@@ -222,12 +308,36 @@ test('phase 35 F: no pw-static on win-base + mobile + guaranteed 2D fallback', (
   const css = DSFULL.slice(a, b);
   for (const m of block.matchAll(/class="([^"]*)"/g)) {
     for (const cls of m[1].split(/\s+/)) {
-      if (!cls || cls === 'dash-win' || cls === 'win-header' || cls === 'win-body' || cls === 'hbtn' || cls.startsWith('drag-handle') || cls === 'title-icon' || cls === 'win-header-title' || cls === 'base-win-controls') continue;
-      assert.ok(!new RegExp('\\.' + cls + '\\s*[{,]').test(css), `class ${cls} without conflicting legacy style`);
+      if (
+        !cls ||
+        cls === 'dash-win' ||
+        cls === 'win-header' ||
+        cls === 'win-body' ||
+        cls === 'hbtn' ||
+        cls.startsWith('drag-handle') ||
+        cls === 'title-icon' ||
+        cls === 'win-header-title' ||
+        cls === 'base-win-controls'
+      )
+        continue;
+      assert.ok(
+        !new RegExp('\\.' + cls + '\\s*[{,]').test(css),
+        `class ${cls} without conflicting legacy style`
+      );
     }
   }
   // mobile: the base is reachable via Manage → Base
-  assert.ok(wsIncludes([R('src/engine/input/action-dispatcher.js'), R('src/engine/runtime/classic-bridge.js'), R('src/engine/runtime/mobile-views.js')].join('\n'), "base:['win-base']"), 'mapping mobile-manage-view base'); // V7 · DBT-01 · V7-R1 #9 (mobile-views.js)
+  assert.ok(
+    wsIncludes(
+      [
+        R('src/engine/input/action-dispatcher.js'),
+        R('src/engine/runtime/classic-bridge.js'),
+        R('src/engine/runtime/mobile-views.js'),
+      ].join('\n'),
+      "base:['win-base']"
+    ),
+    'mapping mobile-manage-view base'
+  ); // V7 · DBT-01 · V7-R1 #9 (mobile-views.js)
   assert.ok(idx.includes('data-mobile-manage-view="base"'), 'mobile Base subnav button');
   assert.ok(R('src/localization/fr/ui.js').includes('"base_tab"'), 'base_tab key FR');
   assert.ok(R('src/localization/en/ui.js').includes('"base_tab"'), 'base_tab key EN');
@@ -237,14 +347,19 @@ test('phase 35 F: no pw-static on win-base + mobile + guaranteed 2D fallback', (
   // The safety net is elsewhere: if even the 2D fails, a message
   // is shown in the frame (the window is never empty).
   assert.ok(win.includes('last resort'), 'message if the 2D render fails');
-  assert.ok(win.includes('window never empty') || win.includes('last resort'), 'message if even 2D fails');
+  assert.ok(
+    win.includes('window never empty') || win.includes('last resort'),
+    'message if even 2D fails'
+  );
 });
 
 // ——— E — Assets: Emerald transparency + downloader ———————————————————
 test('phase 35 E: RGBA (alpha) Emerald sprites + fix wired to the downloader', () => {
   // PNG colorType 6 (RGBA) after tools/fix-emerald-alpha.py (byte 25 of the file)
   for (const f of ['azurill_doll.png', 'torchic_doll.png', 'red_brick.png', 'blue_tent.png']) {
-    const buf = fs.readFileSync(new URL(`../src/assets/images/secret-base/emerald/${f}`, import.meta.url));
+    const buf = fs.readFileSync(
+      new URL(`../src/assets/images/secret-base/emerald/${f}`, import.meta.url)
+    );
     assert.equal(buf[25], 6, `${f} en RGBA (colorType ${buf[25]})`);
   }
   const py = R('tools/download_assets.py');
@@ -254,13 +369,18 @@ test('phase 35 E: RGBA (alpha) Emerald sprites + fix wired to the downloader', (
   // Pass 42: 2D manifest 100% RSE canon (the only sprite = the native
   // Emerald asset, baked from the official metatiles/objgfx — ORAS icons removed).
   const r2 = J('src/assets/images/secret-base/manifest.render2d.json');
-  const fsSprites = fs.readdirSync(new URL('../src/assets/images/secret-base/emerald', import.meta.url)).filter((f) => f.endsWith('.png'));
+  const fsSprites = fs
+    .readdirSync(new URL('../src/assets/images/secret-base/emerald', import.meta.url))
+    .filter((f) => f.endsWith('.png'));
   assert.equal(r2.stats.sprites, fsSprites.length, 'stats.sprites == baked files');
-  assert.equal(r2.stats.sprites, 122, '122 canon sprites (120 decors + pc + stairs... ORAS purge included)');
-  for (const k of ['catalog', 'emerald', 'icon2d', 'covered', 'uncovered']) assert.ok(!(k in r2.stats), `legacy stats ${k} removed`);
-  assert.deepEqual([...r2.stats.people].sort(),
-    ['player'],
-    'personnage joueur trainer-54');
+  assert.equal(
+    r2.stats.sprites,
+    122,
+    '122 canon sprites (120 decors + pc + stairs... ORAS purge included)'
+  );
+  for (const k of ['catalog', 'emerald', 'icon2d', 'covered', 'uncovered'])
+    assert.ok(!(k in r2.stats), `legacy stats ${k} removed`);
+  assert.deepEqual([...r2.stats.people].sort(), ['player'], 'personnage joueur trainer-54');
   for (const [slug, entry] of Object.entries(r2.items)) {
     assert.equal(Object.keys(entry).join(','), 'emerald', `${slug}: unique canon sprite`);
     assert.ok(E(entry.emerald), `fichier ${slug}`);
@@ -269,7 +389,3 @@ test('phase 35 E: RGBA (alpha) Emerald sprites + fix wired to the downloader', (
   const referenced = new Set(Object.values(r2.items).map((e) => e.emerald.split('/').pop()));
   for (const f of fsSprites) assert.ok(referenced.has(f), `orphelin ${f}`);
 });
-
-
-
-

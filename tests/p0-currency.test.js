@@ -65,18 +65,21 @@ test('P0 — Poké Balls : prix, taux, ordre, Honor Ball, filtres', () => {
   assert.equal(ballDef('nope'), null);
   // Filtres par défaut (modèle PokéClicker : liste prioritaire).
   assert.equal(PRESET_FILTERS.length, 5);
-  assert.equal(PRESET_FILTERS[0].id, 'new');
-  assert.equal(PRESET_FILTERS[1].id, 'new_shiny');
-  assert.equal(PRESET_FILTERS[2].id, 'caught_shiny');
-  assert.equal(PRESET_FILTERS[3].id, 'caught');
-  assert.equal(PRESET_FILTERS[4].id, 'roaming');
-  // Le filtre "nouveau chromatique" exige shiny:true (et non capturé).
-  assert.equal(filterMatches(PRESET_FILTERS[1], { shinyActive: true, id: 999 }), true);
-  assert.equal(filterMatches(PRESET_FILTERS[1], { shinyActive: false, id: 999 }), false);
+  // V7-R3c · R3c-06 — les filtres précis (errant, chromatiques) passent avant.
+  assert.deepEqual(
+    PRESET_FILTERS.map((f) => f.id),
+    ['roaming', 'new_shiny', 'caught_shiny', 'new', 'caught']
+  );
+  const NEW_SHINY = PRESET_FILTERS.find((f) => f.id === 'new_shiny');
+  const ROAMING = PRESET_FILTERS.find((f) => f.id === 'roaming');
+  // Le filtre "nouveau chromatique" exige shiny:true et aucun shiny possédé.
+  assert.deepEqual(NEW_SHINY.options, { shiny: true, caughtShiny: false });
+  assert.equal(filterMatches(NEW_SHINY, { shinyActive: true, id: 999 }), true);
+  assert.equal(filterMatches(NEW_SHINY, { shinyActive: false, id: 999 }), false);
   // De base TOUTES les balls sont sur « none » (le tuto apprend à les poser).
   for (const f of PRESET_FILTERS) assert.equal(f.ball, 'none', f.id + ' → none');
   // Le filtre "errant" cible le type de rencontre roaming.
-  assert.equal(filterMatches(PRESET_FILTERS[4], { id: 144, _isRoaming: true }), true);
-  assert.equal(filterMatches(PRESET_FILTERS[4], { id: 25, shinyActive: false }), false);
+  assert.equal(filterMatches(ROAMING, { id: 144, _isRoaming: true }), true);
+  assert.equal(filterMatches(ROAMING, { id: 25, shinyActive: false }), false);
 });
 

@@ -46,7 +46,14 @@ const SHOPS = {
 "yache_berry",
 "leppa_berry",
 "oran_berry",
-"rarecandy"
+"rarecandy",
+"hp_up",
+"protein",
+"iron",
+"calcium",
+"carbos",
+"bottle_cap",
+"ability_capsule"
  ]
  },
 "fuchsia": {
@@ -62,7 +69,10 @@ const SHOPS = {
  },
 "indigo": {
 "items": [
-"rarecandy"
+"rarecandy",
+"bottle_cap",
+"golden_bottle_cap",
+"ability_patch"
  ]
  },
 "jnewbark": {
@@ -97,6 +107,14 @@ const SHOPS = {
 "quick_claw",
 "tanga_berry",
 "rarecandy",
+"hp_up",
+"protein",
+"iron",
+"calcium",
+"carbos",
+"zinc",
+"bottle_cap",
+"ability_capsule",
 "kings_rock",
 "dragon_scale",
 "upgrade",

@@ -116,13 +116,15 @@ function parseLegacyArgs(raw, event, element) {
   }
 }
 
+const MODAL_CLOSERS = [
+  ['#settings-modal', 'closeSettings'],
+  ['#unified-selector-modal', 'closeUnifiedSelectorModal'],
+  ['#battle-summary-modal', 'closeBattleSummary'],
+  ['#confirm-modal', 'closeConfirm'],
+  ['#fullscreen-panel-modal', 'closeFullscreenPanel'],
+];
 function closeNearestModal(closeButton) {
-  if (closeButton.closest('#settings-modal')) return callGlobal('closeSettings');
-  if (closeButton.closest('#unified-selector-modal'))
-    return callGlobal('closeUnifiedSelectorModal');
-  if (closeButton.closest('#battle-summary-modal')) return callGlobal('closeBattleSummary');
-  if (closeButton.closest('#confirm-modal')) return callGlobal('closeConfirm');
-  if (closeButton.closest('#fullscreen-panel-modal')) return callGlobal('closeFullscreenPanel');
+  for (const [sel, fn] of MODAL_CLOSERS) if (closeButton.closest(sel)) return callGlobal(fn);
   const pokeModal = document.getElementById('poke-modal');
   if (pokeModal && closeButton.closest('#poke-modal')) {
     pokeModal.classList.remove('open');
@@ -467,6 +469,13 @@ function installCriticalClickFallback(root) {
 
 installCriticalClickFallback(document);
 
+/** `data-call` + `data-call-args` → appel global (partagé par les variantes legacy-call). */
+function _legacyCall(el, event) {
+  callGlobal.apply(
+    null,
+    [el.dataset.call].concat(parseLegacyArgs(el.dataset.callArgs || '', event, el))
+  );
+}
 const actions = {
   'open-settings': function () {
     callGlobal('openSettings');
@@ -626,18 +635,9 @@ const actions = {
   'copy-export-text': function () {
     callGlobal('copyExportText');
   },
-  'legacy-call': function (el, event) {
-    callGlobal.apply(
-      null,
-      [el.dataset.call].concat(parseLegacyArgs(el.dataset.callArgs || '', event, el))
-    );
-  },
-
+  'legacy-call': _legacyCall,
   'call-close-poke': function (el, event) {
-    callGlobal.apply(
-      null,
-      [el.dataset.call].concat(parseLegacyArgs(el.dataset.callArgs || '', event, el))
-    );
+    _legacyCall(el, event);
     const m = document.getElementById('poke-modal');
     if (m) m.classList.remove('open');
   },
@@ -651,10 +651,7 @@ const actions = {
   },
   'legacy-call-stop': function (el, event) {
     event.stopPropagation();
-    callGlobal.apply(
-      null,
-      [el.dataset.call].concat(parseLegacyArgs(el.dataset.callArgs || '', event, el))
-    );
+    _legacyCall(el, event);
   },
   'call-close-selector': function (el, event) {
     callGlobal.apply(
@@ -766,41 +763,51 @@ document.addEventListener('contextmenu', function (event) {
   }
 });
 
+/** `data-change-call` / `data-input-call` (+ `-args`) : appel global générique
+ *  (V7-R3c — les attributs onchange / oninput inline sont neutralisés plus bas). */
+function _runLegacyDataCall(event, attr) {
+  const el = event.target.closest('[data-' + attr + '-call]');
+  if (!el) return;
+  const call = el.dataset[attr + 'Call'];
+  callGlobal.apply(
+    null,
+    [call].concat(parseLegacyArgs(el.dataset[attr + 'Args'] || '', event, el))
+  );
+}
+const CHANGE_VALUE_ACTIONS = {
+  'switch-map-region': 'switchMapRegion',
+  'base-window-mode': 'baseWindowSetMode',
+  'base-window-layout': 'baseWindowSetLayout',
+};
+// recherches / filtres (sac, boîte, Pokédex, dictionnaire, sélecteurs de preset et de copain)
+const INPUT_VALUE_ACTIONS = {
+  'filter-dictionary': 'setDictionarySearch',
+  'filter-bag': 'setInvSearch',
+  'filter-box': 'setBoxSearch',
+  'filter-dex': 'setDexSearch',
+  'filter-preset-picker': 'presetPickerFilter',
+  'filter-base-npc-picker': 'baseNpcPickerFilter',
+  'filter-base-npc-sprite': 'baseNpcEditorFilterSprite',
+};
 document.addEventListener('change', function (event) {
   const target = event.target.closest('[data-action]');
-  if (!target) return;
-  if (target.dataset.action === 'import-save-file' && target.files && target.files[0])
-    callGlobal('importSave', event);
-  if (target.dataset.action === 'switch-map-region') callGlobal('switchMapRegion', target.value);
-  if (target.dataset.action === 'base-window-mode') callGlobal('baseWindowSetMode', target.value);
-  if (target.dataset.action === 'base-window-layout')
-    callGlobal('baseWindowSetLayout', target.value);
-  const legacyChangeTarget = event.target.closest('[data-change-call]');
-  if (legacyChangeTarget) {
-    callGlobal.apply(
-      null,
-      [legacyChangeTarget.dataset.changeCall].concat(
-        parseLegacyArgs(legacyChangeTarget.dataset.changeArgs || '', event, legacyChangeTarget)
-      )
-    );
+  if (target) {
+    const a = target.dataset.action;
+    if (a === 'import-save-file' && target.files && target.files[0])
+      callGlobal('importSave', event);
+    if (CHANGE_VALUE_ACTIONS[a]) callGlobal(CHANGE_VALUE_ACTIONS[a], target.value);
   }
+  _runLegacyDataCall(event, 'change');
 });
 
 document.addEventListener('input', function (event) {
   const target = event.target.closest('[data-action]');
-  if (!target) return;
-  if (target.dataset.action === 'filter-unified-grid') callGlobal('filterUnifiedGrid');
-  if (target.dataset.action === 'filter-dictionary')
-    callGlobal('setDictionarySearch', target.value);
-  if (target.dataset.action === 'filter-bag') callGlobal('setInvSearch', target.value); // phase 26 : recherche of the sac
-  if (target.dataset.action === 'filter-box') callGlobal('setBoxSearch', target.value); // unified bar: PC box name search
-  if (target.dataset.action === 'filter-dex') callGlobal('setDexSearch', target.value); // unified bar: Pokédex name search
-  if (target.dataset.action === 'filter-preset-picker')
-    callGlobal('presetPickerFilter', target.value); // phase 27 : recherche of the selector of preset
-  if (target.dataset.action === 'filter-base-npc-picker')
-    callGlobal('baseNpcPickerFilter', target.value); // phase 46 : recherche of the selector of copain
-  if (target.dataset.action === 'filter-base-npc-sprite')
-    callGlobal('baseNpcEditorFilterSprite', target.value);
+  if (target) {
+    const a = target.dataset.action;
+    if (a === 'filter-unified-grid') callGlobal('filterUnifiedGrid');
+    if (INPUT_VALUE_ACTIONS[a]) callGlobal(INPUT_VALUE_ACTIONS[a], target.value);
+  }
+  _runLegacyDataCall(event, 'input');
 });
 
 document.addEventListener('pointerdown', function (event) {
@@ -890,15 +897,8 @@ document.addEventListener(
 );
 
 function installInlineHandlerSanitizerClassic(root) {
-  const eventNames = [
-    'click',
-    'contextmenu',
-    'change',
-    'mousedown',
-    'input',
-    'mouseover',
-    'mouseout',
-  ];
+  // prettier-ignore
+  const eventNames = ['click', 'contextmenu', 'change', 'mousedown', 'input', 'mouseover', 'mouseout'];
   const runtimeStyleMap = new Map();
   let runtimeStyleCount = 0;
   let runtimeStyleEl = null;

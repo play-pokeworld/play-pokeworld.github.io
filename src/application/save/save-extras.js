@@ -154,22 +154,26 @@ function applyConsumableToPoke(p, key) {
     // Décision joueur : les vitamines donnent UNIQUEMENT des EV (+1 aléatoire).
     // Les IV se montent via les Capsules (bottle_cap / golden_bottle_cap).
     _consEnsure(p);
+    const evCap = Number(globalThis.STAT_EV_CAP) || 18;
+    const evTotalCap = Number(globalThis.STAT_EV_TOTAL_CAP) || 36;
     const evTotal = _CONS_STATS.reduce((a, s) => a + (Number(p.evs[s]) || 0), 0);
-    const evCands = _CONS_STATS.filter((s) => (p.evs[s] || 0) < 18 && evTotal < 36);
+    const evCands = _CONS_STATS.filter((s) => (p.evs[s] || 0) < evCap && evTotal < evTotalCap);
     if (evCands.length) p.evs[evCands[Math.floor(Math.random() * evCands.length)]]++;
     if (typeof recalcPokeStats === 'function') recalcPokeStats(p);
     return true;
   }
   if (cat === 'iv_boost') {
     _consEnsure(p);
-    const ivCands = _CONS_STATS.filter((s) => (p.ivs[s] || 0) < 12);
+    const ivCap = Number(globalThis.CAPTURE_IV_CAP) || 12;
+    const ivCands = _CONS_STATS.filter((s) => (p.ivs[s] || 0) < ivCap);
     if (ivCands.length) p.ivs[ivCands[Math.floor(Math.random() * ivCands.length)]]++;
     if (typeof recalcPokeStats === 'function') recalcPokeStats(p);
     return true;
   }
   if (cat === 'iv_boost_all') {
     _consEnsure(p);
-    for (const s of _CONS_STATS) if ((p.ivs[s] || 0) < 12) p.ivs[s]++;
+    const ivCapAll = Number(globalThis.CAPTURE_IV_CAP) || 12;
+    for (const s of _CONS_STATS) if ((p.ivs[s] || 0) < ivCapAll) p.ivs[s]++;
     if (typeof recalcPokeStats === 'function') recalcPokeStats(p);
     return true;
   }

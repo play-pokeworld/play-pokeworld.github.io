@@ -120,6 +120,23 @@ export function upgradeGridVNode(cards) {
   );
 }
 
+/** Bouton « Acheter » d'un module non acheté — model: { call, args, label }. */
+export function automationBuyButtonVNode(buy) {
+  return h(
+    'button',
+    {
+      type: 'button',
+      class: 'hbtn automation-buy-btn',
+      dataset: {
+        action: 'legacy-call',
+        call: buy.call || '',
+        callArgs: buy.args == null ? '' : String(buy.args),
+      },
+    },
+    buy.label || ''
+  );
+}
+
 /**
  * One automation toggle card.
  * model: { label, iconHtml, purchased, enabled, call, args,
@@ -133,12 +150,15 @@ export function automationToggleCardVNode(card) {
     card.label || ''
   );
   if (card.purchased === false) {
-    // Locked automation: informational row, NO dead button (user rule).
+    // Locked automation: price read from the code that charges it, plus a
+    // direct buy button when the model provides one (V7-R3c · R3c-04) —
+    // never a dead toggle (user rule).
     return h(
       'div',
-      { class: 'automation-locked-card' },
+      { class: cx('automation-locked-card', card.buy && 'has-buy') },
       label,
-      h('b', null, card.lockedLabel || '')
+      h('b', { class: 'automation-cost' }, card.lockedLabel || ''),
+      card.buy ? automationBuyButtonVNode(card.buy) : null
     );
   }
   const on = !!card.enabled;
@@ -284,7 +304,10 @@ export function automationSlotCardVNode(m) {
         'div',
         { class: 'automation-card-head' },
         h('span', null, m.title || ''),
-        m.state === 'unpurchased' ? h('b', null, m.lockedLabel || '') : null
+        m.state === 'unpurchased'
+          ? h('b', { class: 'automation-cost' }, m.lockedLabel || '')
+          : null,
+        m.state === 'unpurchased' && m.buy ? automationBuyButtonVNode(m.buy) : null
       ),
       m.state === 'locked' ? h('div', { class: 'automation-card-desc' }, m.desc || '') : null
     );

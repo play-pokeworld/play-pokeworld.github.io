@@ -75,6 +75,7 @@ function levelUp(p) {
   const oldMax = p.maxHP;
   recalcPokeStats(p);
   p.currentHP = Math.min(p.maxHP, p.currentHP + (p.maxHP - oldMax));
+  if (globalThis.pwEmit) globalThis.pwEmit('pokemon:level-up', { id: p.id, level: p.level }); // V7-R2 · SND-02
   p.xpNext = xpForLevel(p.level + 1);
   if (p.xp < xpForLevel(p.level)) p.xp = xpForLevel(p.level);
 
@@ -205,7 +206,7 @@ function checkEvolution(p) {
 function evolve(p, targetId) {
   const nd = PD[targetId];
   if (!nd) return;
-  if (!nd) return;
+  if (globalThis.pwEmit) globalThis.pwEmit('pokemonEvolved', { from: p.id, to: targetId }); // V7-R2 · SND-02 (EVENTS.POKEMON_EVOLVED)
   if (!G.evolvedSpecies) G.evolvedSpecies = [];
   if (!G.dupeCatches) G.dupeCatches = {};
 

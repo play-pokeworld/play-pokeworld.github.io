@@ -170,10 +170,9 @@ if (typeof globalThis !== 'undefined' && typeof globalThis._pwSetHtmlSafe !== 'f
     POKEMON_HATCHED: 'pokemonHatched',
     ITEM_OBTAINED: 'itemObtained',
   });
-  // V7 · DBT-05 — le bus de jeu (window.EventBus / EVENTS) est une instance du
-  // bus unique src/core/event-bus.js ; l'émission reste tolérante aux erreurs
-  // d'un écouteur (contrat historique du pont : un listener qui plante ne casse
-  // pas le combat qui émet).
+  // V7 · DBT-05 — le bus de jeu (window.EventBus / EVENTS) est une instance du bus
+  // unique src/core/event-bus.js ; l'émission tolère les erreurs d'un écouteur
+  // (contrat historique : un listener qui plante ne casse pas le combat qui émet).
   const eventBus = new CoreEventBus();
   const _rawEmit = eventBus.emit.bind(eventBus);
   eventBus.emit = function (event, ...args) {
@@ -219,27 +218,28 @@ if (typeof globalThis !== 'undefined' && typeof globalThis._pwSetHtmlSafe !== 'f
           this.stop(name);
         }, this);
       },
-      has: function (name) {
-        return timers.has(name);
-      },
-      size: function () {
-        return timers.size;
-      },
+      has: (name) => timers.has(name),
+      size: () => timers.size,
     };
   })();
   // T2-C (wave 38): values carried by the engine (local consts) — the classic
   // surface is kept under double guard (browser window / VM globalThis).
   const PokeWorldCore = { storage, randomInt, chancePercent, clamp, timers: PokeWorldTimers };
   const PokeWorldEventBus = { EVENTS, eventBus };
+  // V7-R2 · SND-02 — émission en UNE ligne depuis le code de jeu (emit ci-dessus
+  // ne lève jamais) ; les écouteurs audio s'y abonnent, le combat n'importe rien.
+  const pwEmit = (event, payload) => eventBus.emit(event, payload);
   if (typeof window !== 'undefined') {
     window.PokeWorldCore = PokeWorldCore;
     window.PokeWorldTimers = PokeWorldTimers;
     window.PokeWorldEventBus = PokeWorldEventBus;
+    window.pwEmit = pwEmit;
   }
   if (typeof globalThis !== 'undefined') {
     globalThis.PokeWorldCore = PokeWorldCore;
     globalThis.PokeWorldTimers = PokeWorldTimers;
     globalThis.PokeWorldEventBus = PokeWorldEventBus;
+    globalThis.pwEmit = pwEmit;
   }
 
   const TYPES = Object.freeze([

@@ -76,6 +76,7 @@ function startLegendaryEncounter(pokeId, level = 65, opts) {
 async function onPlayerPokeFaint() {
   battle.paused = true;
   const p = getActivePlayerPoke();
+  if (globalThis.pwEmit) globalThis.pwEmit('combat:player-fainted', { id: p && p.id }); // V7-R2 · SND-02
   // DORM-04 — Pouvoir d'Alchimie : un coéquipier hérite temporairement du
   // talent du Pokémon K.O. (le dernier tombé de l'équipe).
   try {

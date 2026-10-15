@@ -33,7 +33,8 @@ const PICKER_CSS = `
 #pw-ball-overlay-root button{min-width:0;min-height:0;}
 #pw-ball-overlay-root button[data-action]{background:var(--pw-bg-header,#1C1A17);}
 .pw-ball-picker,.pw-ball-editor{position:fixed;inset:0;z-index:1300;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);}
-.pw-ball-box{background:var(--pw-bg-surface,#24221E);border:1px solid var(--pw-border-color,#4A3E31);border-radius:var(--pw-radius-lg,12px);padding:14px;min-width:460px;max-width:94vw;max-height:86vh;overflow:auto;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+.pw-ball-box{background:var(--pw-bg-surface,#24221E);border:1px solid var(--pw-border-color,#4A3E31);border-radius:var(--pw-radius-lg,12px);padding:14px;width:min(520px,94vw);min-width:0;max-width:94vw;max-height:86vh;overflow:auto;box-sizing:border-box;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+/* V7-R3 · MOB-03 — téléphone : la pop-up Pokéball tient dans l'écran */@media (max-width:520px){.pw-ball-box{padding:10px;width:96vw;max-width:96vw;max-height:90vh;}.pw-ball-grid{grid-template-columns:minmax(0,1fr) 46px 46px;}.pw-ball-row-opt{padding:6px;gap:6px;}.pw-ball-actions .hbtn{flex:1 1 auto;}}
 .pw-ball-title{font-size:14px;color:var(--pw-text-primary,#ECDEB7);margin-bottom:8px;font-weight:700;}
 .pw-ball-row-opt{display:flex;align-items:center;gap:10px;padding:7px 9px;border-radius:var(--pw-radius-md,8px);cursor:pointer;border:1px solid transparent;}
 .pw-ball-row-opt:hover{background:var(--pw-bg-header,#1C1A17);}
@@ -417,7 +418,9 @@ function valueRow(f, key, labelKey) {
     .join('');
   return (
     '<div class="pw-ball-opt-row">' +
-    '<button type="button" class="pw-ball-opt-btn remove" data-action="legacy-call" data-call="removeBallFilterValueOption" data-call-args="\'' +
+    '<button type="button" class="pw-ball-opt-btn remove"' +
+    (locked ? ' disabled' : '') +
+    ' data-action="legacy-call" data-call="removeBallFilterValueOption" data-call-args="\'' +
     f.id +
     "','" +
     key +
@@ -429,7 +432,11 @@ function valueRow(f, key, labelKey) {
     (locked ? ' disabled' : '') +
     (locked
       ? ''
-      : ' onchange="setBallFilterValueOption(\'' + f.id + "','" + key + '\',this.value)"') +
+      : ' data-change-call="setBallFilterValueOption" data-change-args="\'' +
+        f.id +
+        "','" +
+        key +
+        '\',this.value"') +
     '>' +
     options +
     '</select>' +

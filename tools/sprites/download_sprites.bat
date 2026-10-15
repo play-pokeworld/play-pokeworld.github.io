@@ -1,19 +1,6 @@
 @echo off
-echo ========================================
-echo   PokeWorld - Download Assets
-echo ========================================
-echo Ce script telecharge les sprites manquants
-echo.
-echo Utilisation:
-echo   node tools/download_assets_from_bat.js
-echo.
-echo Sources:
-echo - PokeAPI (sprites Pokemon)
-echo - PokeChill (items, bg)
-echo - Pokeclicker (trainers)
-echo.
+REM Ancien emplacement : le script complet est a la racine du projet.
+echo Ce script a demenage : lancez  download_assets.bat  a la racine du projet.
+echo   download_assets.bat        -> sprites + cris + audio du joueur
+echo   download_assets.bat audio  -> audio seulement
 pause
-
-
-
-

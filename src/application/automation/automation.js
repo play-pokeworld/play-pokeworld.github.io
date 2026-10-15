@@ -5,10 +5,15 @@ function renderAutomationWindow() {
   if (el) el.replaceChildren();
 }
 // P0 — les déblocages d'auto-modes se paient en Points de quête (PQ).
-export const AUTOMATION_UPGRADE_COSTS = { autoHatch: 500, autoSeedHatchery: 1000 };
+// V7-R2 · AUTO-01 — `autoRelaunch` : relance automatique des combats sauvages
+// après une défaite (vendue en boutique, aucun coût par relance — décision joueur).
+export const AUTOMATION_UPGRADE_COSTS = {
+  autoHatch: 500,
+  autoSeedHatchery: 1000,
+  autoRelaunch: 2500,
+  autoDungeonRelaunch: 5000, // V7-R3 · D30 — relance auto des expéditions (décision joueur : 5 000 PQ)
+};
 // FIX (2026-08): hatchery-ui.js reads the automation costs from here.
-if (typeof globalThis !== 'undefined')
-  globalThis.AUTOMATION_UPGRADE_COSTS = AUTOMATION_UPGRADE_COSTS;
 if (typeof globalThis !== 'undefined')
   globalThis.AUTOMATION_UPGRADE_COSTS = AUTOMATION_UPGRADE_COSTS;
 function isAutomationPurchased(key) {
@@ -17,6 +22,21 @@ function isAutomationPurchased(key) {
   if (G.automation && G.automation[key] === true && !G.automationUpgrades[key])
     G.automationUpgrades[key] = true;
   return !!G.automationUpgrades[key];
+}
+// V7-R3c · R3c-04 — retour joueur « les boutons des modes auto ne parlent pas
+// des coûts » : modèle commun d'une carte NON ACHETÉE (prix lu dans le code qui
+// l'applique + bouton d'achat direct), consommé par la pension, la mine, les
+// emplacements d'entraînement et les bandeaux Combat / Donjon.
+function automationCostLabel(key) {
+  const cost = AUTOMATION_UPGRADE_COSTS[key] || 0;
+  return `${formatNumber(cost)} ${t('currency_quest_points')}`;
+}
+function automationUnlockModel(key) {
+  return {
+    purchased: false,
+    lockedLabel: automationCostLabel(key),
+    buy: { call: 'buyAutomationUpgrade', args: `'${key}'`, label: t('buy_btn') },
+  };
 }
 function getAutomationUpgradeLabelSuffix(key) {
   const cost = AUTOMATION_UPGRADE_COSTS[key] || 0;
@@ -706,6 +726,10 @@ if (typeof buyAutomationUpgrade !== 'undefined') {
   if (typeof window !== 'undefined') window.buyAutomationUpgrade = buyAutomationUpgrade;
   if (typeof globalThis !== 'undefined') globalThis.buyAutomationUpgrade = buyAutomationUpgrade;
 }
+if (typeof globalThis !== 'undefined')
+  Object.assign(globalThis, { automationCostLabel, automationUnlockModel });
+if (typeof window !== 'undefined')
+  Object.assign(window, { automationCostLabel, automationUnlockModel });
 if (typeof toggleAutomationButton !== 'undefined') {
   if (typeof window !== 'undefined') window.toggleAutomationButton = toggleAutomationButton;
   if (typeof globalThis !== 'undefined') globalThis.toggleAutomationButton = toggleAutomationButton;
@@ -763,6 +787,7 @@ if (typeof staffXpNeed !== 'undefined') {
   if (typeof window !== 'undefined') window.staffXpNeed = staffXpNeed;
   if (typeof globalThis !== 'undefined') globalThis.staffXpNeed = staffXpNeed;
 }
+Object.assign(globalThis, { STAFF_CYCLE, STAFF_LADDERS }); // V7-R3 · R3-05 — lus par le guide
 
 // Wave 41 — native ESM module: exports the same names as the
 // classic surface kept above (bodies unchanged).
@@ -788,6 +813,8 @@ export {
   renderAutomationWindow,
   isAutomationPurchased,
   buyAutomationUpgrade,
+  automationCostLabel,
+  automationUnlockModel,
   toggleAutomationButton,
   getAutomationUpgradeLabelSuffix,
   toggleAutomation,

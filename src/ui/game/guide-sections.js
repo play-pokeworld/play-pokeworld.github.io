@@ -14,6 +14,8 @@
  * @module ui/game/guide-sections
  */
 
+import { mergeGuideSections, automationBuyPage } from './guide-sections-extra.js';
+
 function tutorialDeviceHint(kind) {
   // Touch detection flows through the central event bus input helpers
   // (window.PokeWorldInput, src/core/event-bus.js) — no raw touch sniffing here.
@@ -96,7 +98,8 @@ function currencyGuideValues() {
         if (typeof nameFn === 'function') name = nameFn(e.key) || e.key;
       } catch (_) {}
       const val = typeof fmtFn === 'function' ? fmtFn(e.value) : String(e.value);
-      return `${name} ${val} 💎`;
+      // V7-R3c — plus d'emoji : l'unité est le nom de la monnaie
+      return `${name} ${val} ${globalThis.t ? globalThis.t('currency_diamonds') : 'currency_diamonds'}`;
     })
     .join(', ');
   let mine = 'Diglett\u2019s Cave';
@@ -106,7 +109,114 @@ function currencyGuideValues() {
   return { treasures, mine };
 }
 
+/**
+ * V7-R3 · R3-05 — « Chiffres clés » : toutes les valeurs citées par le guide
+ * (taux, coûts, déblocages, plafonds) sont LUES dans le code qui les applique
+ * (encounter-rules, currency, dungeon-run, mine, hatchery, training,
+ * automation, offline-engine…) — jamais recopiées en dur dans un texte.
+ */
+function guideKeyValues() {
+  const g = globalThis;
+  const fmt = (n) => (typeof g.formatNumber === 'function' ? g.formatNumber(n) : String(n));
+  const pct = (x) => String(Math.round(Number(x) * 1000) / 10).replace('.', ',');
+  const T = (k) => (typeof t === 'function' ? t(k) : k);
+  const list = (arr) => (arr || []).map((n) => fmt(n)).join(' / ');
+  const odds = g.BUCKET_ODDS || { rare: 0.04, uncommon: 0.2 };
+  const shinyBase = g.SHINY_BASE_RATE ? Math.round(1 / g.SHINY_BASE_RATE) : 4096;
+  const costs = g.AUTOMATION_UPGRADE_COSTS || {};
+  const rules = g.DUNGEON_RULES || {};
+  const tools = g.MINE_TOOL_DEFS || {};
+  const toolCost = (k) =>
+    typeof g.mineToolEnergyCost === 'function' ? g.mineToolEnergyCost(k) : 5;
+  const toolLine = Object.keys(tools)
+    .map((k) => {
+      const d = tools[k] || {};
+      const price = d.diamondCost ? ` — ${fmt(d.diamondCost)} ${T('currency_diamonds')}` : '';
+      return `${T('mine_tool_' + k)} ${toolCost(k)} ${T('mine_energy_unit')} (${T('mine_tool_area_' + (d.shape || 'single'))}${price})`;
+    })
+    .join(' · ');
+  const curKey = { questPoints: 'currency_quest_points', battlePoints: 'currency_battle_points' };
+  const ladders = g.STAFF_LADDERS || {};
+  const staffLine = Object.keys(ladders)
+    .map((cur) => `${T(curKey[cur] || 'currency_' + cur)} ${list(ladders[cur])}`)
+    .join(' · ');
+  const mb = typeof g.masterBallPrices === 'function' ? g.masterBallPrices() : {};
+  let moneyMin = 10;
+  let moneyMax = 10;
+  try {
+    const locs = g.LOCATIONS ? Object.keys(g.LOCATIONS) : [];
+    const f = g.moneyPerKillForLocation;
+    if (typeof f === 'function' && locs.length) {
+      const vals = locs.map((l) => Number(f(l)) || 0).filter((v) => v > 0);
+      moneyMin = Math.min.apply(null, vals);
+      moneyMax = Math.max.apply(null, vals);
+    }
+  } catch (_) {}
+  const locName = (id, dflt) => {
+    try {
+      if (typeof g.getLocName === 'function') return g.getLocName(id) || dflt;
+    } catch (_) {}
+    return dflt;
+  };
+  const afkMs =
+    g.OfflineEngine && Number(g.OfflineEngine.MAX_MS) ? g.OfflineEngine.MAX_MS : 12 * 3600 * 1000;
+  return {
+    rare: pct(odds.rare),
+    uncommon: pct(odds.uncommon),
+    common: pct(1 - odds.rare - odds.uncommon),
+    roam: pct(g.ROAMING_CHANCE || 0.01),
+    roamLvl: fmt(g.ROAMING_LEVEL || 75),
+    shiny: fmt(shinyBase),
+    shinyCharm: fmt(Math.round(shinyBase / 2)),
+    moneyMin: fmt(moneyMin),
+    moneyMax: fmt(moneyMax),
+    relaunch: fmt(costs.autoRelaunch || 0),
+    dgRelaunch: fmt(costs.autoDungeonRelaunch || 0),
+    autoHatch: fmt(costs.autoHatch || 0),
+    autoSeed: fmt(costs.autoSeedHatchery || 0),
+    dgDelay: fmt(Math.round((g.AUTO_DG_DELAY_MS || 5000) / 1000)),
+    dgMode: T('dungeon_auto_mode_farm'),
+    tools: toolLine,
+    energyUpgrades: list(g.MINE_ENERGY_UPGRADE_COSTS),
+    mineAuto: fmt(g.MINE_AUTO_COST || 0),
+    mineLoc: locName('diglettscave', 'Diglett’s Cave'),
+    hatcherySlots: list(g.HATCHERY_SLOT_UPGRADE_COSTS),
+    hatcheryLoc: locName('route5', 'Route 5'),
+    trainingBadge: (() => {
+      try {
+        if (typeof g.getChampName === 'function') return g.getChampName('surge') || 'surge';
+      } catch (_) {}
+      return 'surge';
+    })(),
+    trainingSlot: fmt(g.TRAINING_MULTI_SLOT_COST || 0),
+    trainingAuto: fmt(g.TRAINING_AUTOMATION_SLOT_COST || 0),
+    staff: staffLine,
+    mbMoney: fmt(mb.money || 0),
+    mbTokens: fmt(mb.dungeonTokens || 0),
+    mbPq: fmt(mb.questPoints || 0),
+    mbDiamonds: fmt(mb.diamonds || 0),
+    afkHours: fmt(Math.round(afkMs / 3600000)),
+    tolls: list(g.DUNGEON_TOLLS),
+    depthMax: fmt(rules.depthMax || 3),
+    multStep: pct(rules.multStep || 0.5),
+    wipeKeep: pct(rules.wipeKeepRatio || 0.5),
+    completion: String(rules.completionBonus || 2.5).replace('.', ','),
+    exhausted: pct(rules.exhaustedRate || 0.4),
+    autoClears: fmt(g.DUNGEON_AUTO_UNLOCK_CLEARS || 3),
+    dgRare: pct(g.DUNGEON_RARE_ON_COMMON_TILE || 0.05),
+  };
+}
+/** Page « Chiffres clés » d'une rubrique (titre commun, texte par rubrique). */
+function keyNumbersPage(descKey) {
+  return [t('guide_key_numbers'), tr(descKey, guideKeyValues())];
+}
+
 function guideSections() {
+  // V7-R3c — rubriques « Stats, IV & EV », « Poké Balls & filtres »,
+  // « Chromatiques », « Son & musique » (guide-sections-extra.js).
+  return mergeGuideSections(_baseGuideSections());
+}
+function _baseGuideSections() {
   return {
     map: {
       icon: _icon('map'),
@@ -150,6 +260,7 @@ function guideSections() {
             ? t('guide_npc_quests_desc')
             : 'Les PNJ servent à faire avancer l’histoire, lancer des quêtes secondaires ou déclencher des combats scénarisés. Pense à revisiter les villes après les gros objectifs.',
         ],
+        keyNumbersPage('guide_key_map_desc'),
       ],
     },
     combat: {
@@ -220,6 +331,7 @@ function guideSections() {
             ? t('guide_combat_special_desc')
             : 'Arènes, Ligue, rival, Team Rocket, boss de quête et Atoll demandent surtout de la préparation : bonne équipe, bons talents, EV et objets tenus.',
         ],
+        keyNumbersPage('guide_key_combat_desc'),
       ],
     },
     // V7-R1 · retours joueurs #7 — capture & gain d'IV (valeurs lues dans le
@@ -371,6 +483,7 @@ function guideSections() {
             ? t('guide_mine_refresh_desc')
             : 'Une fois tous les objets d’une couche récupérés, la mine se renouvelle. Les futurs mineurs améliorent l’efficacité et l’endurance des sessions.',
         ],
+        keyNumbersPage('guide_key_mine_desc'),
       ],
     },
     hatchery: {
@@ -415,6 +528,7 @@ function guideSections() {
             ? t('guide_hatchery_staff_desc')
             : 'Les gérants améliorent progressivement l’efficacité de la pension. Ils se recrutent par lieu et gagnent de l’XP en travaillant.',
         ],
+        keyNumbersPage('guide_key_hatchery_desc'),
       ],
     },
     training: {
@@ -457,6 +571,7 @@ function guideSections() {
             ? t('guide_slots_auto_desc')
             : 'Each slot can have its own queue and its own auto mode. Training staff also improves system consistency.',
         ],
+        keyNumbersPage('guide_key_training_desc'),
       ],
     },
     quests: {
@@ -529,6 +644,7 @@ function guideSections() {
             ? t('guide_economy_rewards_desc')
             : 'Argent et objets viennent des quêtes, combats, mine, captures, répétables et modes spéciaux comme l’Atoll.',
         ],
+        keyNumbersPage('guide_key_economy_desc'),
       ],
     },
     automation: {
@@ -553,12 +669,25 @@ function guideSections() {
             ? t('guide_staff_desc')
             : 'Le personnel se recrute selon la progression. Chaque employé donne un bonus spécialisé et gagne des niveaux avec l’usage.',
         ],
+        // V7-R2 · AUTO-01
+        [t('guide_auto_relaunch'), t('guide_auto_relaunch_desc')],
+        // V7-R3 · R3-07 — relance auto des expéditions (prix / délai / mode lus dans le code)
+        [
+          t('guide_auto_dg_relaunch'),
+          tr('guide_auto_dg_relaunch_desc', {
+            price: guideKeyValues().dgRelaunch,
+            delay: guideKeyValues().dgDelay,
+            mode: guideKeyValues().dgMode,
+          }),
+        ],
         [
           typeof t === 'function' ? t('guide_protections') : 'Protections',
           typeof t === 'function'
             ? t('guide_protections_desc')
             : 'Les Pokémon verrouillés et certaines situations évitent que l’automatisation touche à des Pokémon que tu veux garder manuellement.',
         ],
+        automationBuyPage(), // V7-R3c — prix sur chaque bouton de mode auto
+        keyNumbersPage('guide_key_automation_desc'),
       ],
     },
     save: {
@@ -589,6 +718,7 @@ function guideSections() {
             ? t('guide_alpha_safety_desc')
             : 'Comme le projet est encore en alpha, garde toujours une exportation récente avant de tester un nouveau zip.',
         ],
+        keyNumbersPage('guide_key_afk_desc'),
       ],
     },
     atoll: {
@@ -678,6 +808,7 @@ function guideSections() {
             ? t('guide_dungeon_auto_desc')
             : 'Une fois le donjon complété plusieurs fois, le mode auto se débloque avec trois options : foncer vers le boss, explorer tout le plateau, ou ne ramasser que les coffres.',
         ],
+        keyNumbersPage('guide_key_dungeon_desc'),
       ],
     },
     base: {
@@ -763,4 +894,11 @@ function guideSections() {
   };
 }
 
-export { guideSections, tutorialDeviceHint, captureGuidePages, captureGuideValues };
+export {
+  guideSections,
+  tutorialDeviceHint,
+  captureGuidePages,
+  captureGuideValues,
+  guideKeyValues,
+  keyNumbersPage,
+};

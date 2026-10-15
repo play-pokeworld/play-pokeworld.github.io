@@ -227,6 +227,14 @@ export function spawnNextWild() {
     );
   else
     globalThis.addBattleLog(globalThis.tr('wild_pokemon_appears', { name: battle.enemyPoke.name }));
+  if (globalThis.pwEmit)
+    globalThis.pwEmit('battle:enemy', {
+      id: wp.id,
+      shiny: !!(wp.shiny || wp.shinyActive),
+      roaming: !!wp._isRoaming,
+      boss: !!wp.isDungeonBoss,
+      champ: false,
+    }); // V7-R2 · SND-02
   globalThis.renderMoveButtons();
   globalThis.renderEnemyMoveBars();
   globalThis.renderBattleTeamRow();
@@ -388,15 +396,17 @@ function _dgFinalEvolution(id) {
   }
 }
 
-/** L'espèce du gardien : le RARE de la faune locale (retour joueur 38f :
- *  « les rares de la zone doivent être les boss »). On prend l'espèce du
- *  lieu TELLE QUELLE — PAS son évolution finale : le gardien de la Forêt de
- *  Jade est Pikachu (rare de la zone), plus Raichu, qui n'y est pas
- *  disponible. Repli par palier : rare → peu commun → commun → plus forte
- *  évolution finale (l'ancienne règle, réservée aux tables sans étiquette).
- *  ATTENTION au format des tables : `loc.wild` est un tableau de TUPLES
- *  `[id, nivMin, nivMax, rareté]`, pas d'objets `{id}`. */
-function _dgBossSpecies(G, fallbackId) {
+/** L'espèce du gardien : UN RARE de la faune locale TIRÉ AU SORT à chaque
+ *  expédition (V7-R3 · D29 — retour joueur : « boss pas random et certains
+ *  Pokémon non obtenables » : avec le « meilleur rare » figé, Parc Safari ne
+ *  montrait jamais Leveinard ou Minidraco). On prend l'espèce du lieu TELLE
+ *  QUELLE — PAS son évolution finale : le gardien de la Forêt de Jade est
+ *  Pikachu (rare de la zone), pas Raichu, qui n'y est pas disponible. Repli
+ *  par palier : rares → peu communs → communs (tirage uniforme dans le premier
+ *  seau non vide) ; les tables sans étiquette gardent l'ancienne règle (plus
+ *  forte évolution finale). Format des tables : `loc.wild` est un tableau de
+ *  TUPLES `[id, nivMin, nivMax, rareté]`, pas d'objets `{id}`. */
+export function _dgBossSpecies(G, fallbackId, rng) {
   try {
     const loc =
       typeof globalThis.getLocObj === 'function' ? globalThis.getLocObj(G && G.location) : null;
@@ -410,15 +420,11 @@ function _dgBossSpecies(G, fallbackId) {
       .filter((t) => Number.isFinite(t.id) && t.id > 0);
     if (!tuples.length) return fallbackId;
     const hasLabels = tuples.some((t) => t.bucket !== 'common');
-    const pickBest = (list) =>
-      list.reduce(
-        (best, t) => (_dgBaseStatTotal(t.id) > _dgBaseStatTotal(best.id) ? t : best),
-        list[0]
-      ).id;
+    const roll = typeof rng === 'function' ? rng : Math.random;
     if (hasLabels) {
       for (const bucket of ['rare', 'uncommon', 'common']) {
         const cand = tuples.filter((t) => t.bucket === bucket);
-        if (cand.length) return pickBest(cand);
+        if (cand.length) return cand[Math.floor(roll() * cand.length) % cand.length].id;
       }
       return fallbackId;
     }
@@ -440,6 +446,13 @@ function _dgBossSpecies(G, fallbackId) {
   }
 }
 
+/** V7-R3 · D29 — part des combats ORDINAIRES d'un donjon qui piochent dans
+ *  le seau « rare » (les rares restent surtout des gardiens, mais chacun est
+ *  obtenable sans attendre le bon tirage de boss). */
+const DUNGEON_RARE_ON_COMMON_TILE = 0.05;
+if (typeof globalThis !== 'undefined')
+  globalThis.DUNGEON_RARE_ON_COMMON_TILE = DUNGEON_RARE_ON_COMMON_TILE;
+
 function applyDungeonBossBuff(wp, run) {
   if (!wp || !run) return wp;
   const G = gameState();
@@ -453,9 +466,17 @@ function applyDungeonBossBuff(wp, run) {
   try {
     const bossId = _dgBossSpecies(G, wp.id);
     if (bossId && bossId !== wp.id && typeof globalThis.createPoke === 'function') {
-      const elite = globalThis.createPoke(bossId, bossLevel, false);
+      // V7-R3 · D29 — le gardien peut être BRILLANT (D25 : les espèces rares
+      // d'un donjon se farment aussi pour leur version chromatique).
+      const bossShiny =
+        typeof globalThis.rollShiny === 'function' ? !!globalThis.rollShiny(bossId) : false;
+      const elite = globalThis.createPoke(bossId, bossLevel, bossShiny);
       if (elite) {
-        elite.shiny = false;
+        if (bossShiny) {
+          elite.shiny = true;
+          elite.shinyActive = true;
+          elite.shinyUnlocked = true;
+        }
         wp = elite;
       }
     }

@@ -18,6 +18,7 @@ from __future__ import annotations
 import concurrent.futures as futures
 import http.client
 import re
+import sys
 import time
 import urllib.error
 import urllib.parse
@@ -837,8 +838,145 @@ def make_honorball() -> None:
     im.save(out)
 
 
+# ── V7-R3 · SND-04 — AUDIO : cris PokeAPI + sources audio du joueur + manifeste ──
+# Les cris officiels des Pokémon sont servis par le dépôt PokeAPI/cries (même
+# amont que les sprites du jeu) : `latest` (génération récente) puis repli
+# `legacy` (Game Boy / DS). Un cri par espèce présente dans src/data/sprites.js ;
+# les formes réutilisent le cri de l'espèce de base.
+POKEAPI_CRIES = 'https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon'
+AUDIO_DIR = ROOT / 'src/assets/audio'
+AUDIO_SOURCES = ROOT / 'tools/audio-sources.txt'
+
+
+def download_cries() -> None:
+    out_dir = AUDIO_DIR / 'cries'
+    out_dir.mkdir(parents=True, exist_ok=True)
+    dex_ids = sorted({int(d) for _b, d, _o in parse_sprite_entries() if isinstance(d, int)})
+    jobs = [(d, out_dir / f'{d}.ogg') for d in dex_ids if not (out_dir / f'{d}.ogg').exists()]
+    print(f'[audio] cris PokeAPI : {len(dex_ids)} espèces, {len(jobs)} à télécharger')
+    if not jobs:
+        return
+
+    def fetch(dex: int, out: Path) -> bool:
+        for bucket in ('latest', 'legacy'):
+            data = request_bytes(f'{POKEAPI_CRIES}/{bucket}/{dex}.ogg')
+            if data:
+                out.write_bytes(data)
+                return True
+        return False
+
+    ok = 0
+    missing: list[int] = []
+    with futures.ThreadPoolExecutor(max_workers=16) as pool:
+        fmap = {pool.submit(fetch, d, o): d for d, o in jobs}
+        for fut in futures.as_completed(fmap):
+            if fut.result():
+                ok += 1
+            else:
+                missing.append(fmap[fut])
+    print(f'[audio] cris : {ok} téléchargé(s), {len(missing)} manquant(s)' + (f' : {sorted(missing)[:20]}' if missing else ''))
+
+
+def download_audio_sources() -> None:
+    """Musiques / effets choisis PAR LE JOUEUR : tools/audio-sources.txt liste
+    « destination = URL ou chemin local » (ex. `music/battle_wild.mp3 = https://…`
+    ou `sfx/catch.ogg = C:\\Sons\\catch.ogg`). Le jeu ne fournit aucune
+    source : c'est au joueur de renseigner la sienne."""
+    if not AUDIO_SOURCES.exists():
+        return
+    import shutil
+    n_ok = n_fail = 0
+    for raw in AUDIO_SOURCES.read_text(encoding='utf-8').splitlines():
+        line = raw.strip()
+        if not line or line.startswith('#') or '=' not in line:
+            continue
+        dest, src = (x.strip() for x in line.split('=', 1))
+        # Raccourci « dossier entier » : `music/ = C:\\Dossier` copie chaque fichier
+        # audio du dossier sous son propre nom (battle_wild.mp3 → music/battle_wild.mp3).
+        if re.match(r'^(music|sfx|cries)/$', dest):
+            folder = Path(src)
+            if not folder.is_dir():
+                n_fail += 1
+                print(f'[audio] dossier introuvable : {src}')
+                continue
+            (AUDIO_DIR / dest).mkdir(parents=True, exist_ok=True)
+            for f in sorted(folder.iterdir()):
+                if not f.is_file() or not re.match(r'^[A-Za-z0-9_\-]+\.(mp3|ogg|m4a|wav)$', f.name, re.I):
+                    continue
+                try:
+                    shutil.copyfile(f, AUDIO_DIR / dest / f.name.lower())
+                    n_ok += 1
+                except Exception as e:  # noqa: BLE001
+                    n_fail += 1
+                    print(f'[audio] échec {dest}{f.name} ← {f} : {e}')
+            continue
+        if not re.match(r'^(music|sfx|cries)/[A-Za-z0-9_\-]+\.(mp3|ogg|m4a|wav)$', dest):
+            print(f'[audio] ligne ignorée (destination invalide) : {line}')
+            continue
+        out = AUDIO_DIR / dest
+        out.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            if re.match(r'^https?://', src):
+                data = request_bytes(src, timeout=120)
+                if not data:
+                    raise RuntimeError('téléchargement vide')
+                out.write_bytes(data)
+            else:
+                shutil.copyfile(src, out)
+            n_ok += 1
+        except Exception as e:  # noqa: BLE001
+            n_fail += 1
+            print(f'[audio] échec {dest} ← {src} : {e}')
+    print(f'[audio] sources du joueur : {n_ok} fichier(s) installé(s), {n_fail} échec(s)')
+
+
+def write_audio_manifest() -> None:
+    """Même sortie que tools/audio-manifest.mjs (clés triées) : via node si
+    présent, sinon en Python pour que le .bat fonctionne sans Node."""
+    import json
+    import shutil
+    import subprocess
+    node = shutil.which('node')
+    if node:
+        r = subprocess.run([node, str(ROOT / 'tools/audio-manifest.mjs')], cwd=ROOT)
+        if r.returncode == 0:
+            return
+    def pick(sub: str, exts: list[str]) -> dict[str, str]:
+        d = AUDIO_DIR / sub
+        out: dict[str, str] = {}
+        if not d.exists():
+            return out
+        for f in sorted(p.name for p in d.iterdir() if p.is_file() and p.suffix.lower() in exts and not p.name.startswith('.')):
+            key = re.sub(r'\.[^.]+$', '', f)
+            rank = exts.index(Path(f).suffix.lower())
+            if key not in out or rank < exts.index(Path(out[key]).suffix.lower()):
+                out[key] = f
+        return out
+    music = pick('music', ['.mp3', '.ogg', '.m4a', '.wav'])
+    sfx = pick('sfx', ['.ogg', '.mp3', '.wav', '.m4a'])
+    cries = {k: v for k, v in pick('cries', ['.ogg', '.mp3', '.wav']).items() if k.isdigit()}
+    manifest = {
+        'version': 1,
+        'music': {k: 'music/' + music[k] for k in sorted(music)},
+        'sfx': {k: 'sfx/' + sfx[k] for k in sorted(sfx)},
+        'cries': {k: cries[k] for k in sorted(cries, key=int)},
+    }
+    (AUDIO_DIR / 'manifest.json').write_text(json.dumps(manifest, separators=(',', ':'), ensure_ascii=False) + '\n', encoding='utf-8')
+    print(f"[audio] manifeste : {len(music)} musique(s), {len(sfx)} effet(s), {len(cries)} cri(s)")
+
+
+def download_audio() -> None:
+    download_cries()
+    download_audio_sources()
+    write_audio_manifest()
+
+
 def main() -> None:
     started = time.time()
+    if '--audio-only' in sys.argv:
+        download_audio()
+        print(f'[audio] terminé en {time.time() - started:.1f}s')
+        return
     jobs: list[tuple[str, Path, str]] = []
 
     for bucket, dex, out in parse_sprite_entries():
@@ -915,10 +1053,16 @@ def main() -> None:
     download_base_assets()  # secret bases: Emerald 2D (phase 33/34)
     for helper_script in ['tools/repair-fonts.py', 'tools/repair-tm-sprites.py', 'tools/fetch-item-sprites.py', 'tools/fix_missing_assets.py']:
         try:
-            import subprocess, sys
+            import subprocess
             subprocess.run([sys.executable or 'python3', helper_script], cwd=ROOT, timeout=120)
         except Exception as e:
             print(f'{helper_script}: ignoré ({e})')
+
+    # V7-R3 · SND-04 — audio (cris PokeAPI, sources du joueur, manifeste).
+    try:
+        download_audio()
+    except Exception as e:  # noqa: BLE001
+        print(f'[audio] ignoré ({e})')
 
     existing = sum(1 for p in (ROOT / 'src/assets/images').rglob('*') if p.is_file())
     print(f'Downloaded/existing assets: {ok}/{len(jobs)} upstream jobs')

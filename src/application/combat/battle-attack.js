@@ -1294,16 +1294,15 @@ function executeAttack(attacker, defender, moveId, side) {
     return;
   }
 
-  if (defender.talent === 'levitate' && mv.type === 'Ground') {
-    visualTalent(side === 'player' ? 'enemy' : 'player', defender.talent, '×0');
-    spawnBattleFloat(side === 'player' ? 'enemy' : 'player', '×0', 'immune');
-    addBattleLog(tr('combat_attack_auto_1', { p0: defender.name }));
-    return;
-  }
-  if (defender.talent === 'lightningrod' && mv.type === 'Electric') {
-    visualTalent(side === 'player' ? 'enemy' : 'player', defender.talent, '×0');
-    spawnBattleFloat(side === 'player' ? 'enemy' : 'player', '×0', 'immune');
-    addBattleLog(tr('combat_attack_auto_2', { p0: defender.name }));
+  // V7-R3 · R3-08 — Lévitation / Paratonnerre lus dans la table PARTAGÉE
+  // (talent-immunity.js, principal + caché) : même règle que l'affichage.
+  const _immTal = globalThis.talentImmunityFor ? talentImmunityFor(defender, mv.type) : null;
+  if (_immTal === 'levitate' || _immTal === 'lightningrod') {
+    const _immSide = side === 'player' ? 'enemy' : 'player';
+    visualTalent(_immSide, _immTal, '×0');
+    spawnBattleFloat(_immSide, '×0', 'immune');
+    const _immKey = _immTal === 'levitate' ? 'combat_attack_auto_1' : 'combat_attack_auto_2';
+    addBattleLog(tr(_immKey, { p0: defender.name }));
     return;
   }
   const absorbMap = {

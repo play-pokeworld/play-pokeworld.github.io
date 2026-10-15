@@ -233,8 +233,9 @@ test('R1c-4c guide « Monnaies » : page en tête d’Économie, chiffres lus da
   const GS = await import('../src/ui/game/guide-sections.js');
   const page = GS.guideSections().economy.pages[0];
   assert.equal(page[0], 'guide_currencies');
-  assert.match(page[1], /N_nugget 100 💎/);
-  assert.match(page[1], /N_heart_scale 350 💎/);
+  // V7-R3c — plus d'emoji : l'unité est le nom de la monnaie (clé i18n)
+  assert.match(page[1], /N_nugget 100 currency_diamonds/);
+  assert.match(page[1], /N_heart_scale 350 currency_diamonds/);
   assert.match(page[1], /L_diglettscave/);
 });
 

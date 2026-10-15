@@ -1,0 +1,56 @@
+# PokéWorld — sources audio du joueur (V7-R3 · SND-04)
+# ------------------------------------------------------
+# Une ligne par fichier :   destination = URL ou chemin local
+# `download_assets.bat audio` copie chaque source dans src/assets/audio/<destination>,
+# régénère le manifeste, puis `regen_dist.bat` reconstruit le jeu. Aucun code à toucher.
+#
+# RACCOURCI « dossier entier » : nomme tes fichiers avec les clés ci-dessous
+# (battle_wild.mp3, loc_route1.mp3, trainer_brock.mp3…), mets-les dans un dossier, puis :
+#   music/ = C:\PokeWorldAudio\music
+#   sfx/   = C:\PokeWorldAudio\sfx
+# (ou copie-les directement dans src\assets\audio\music\ et lance regen_dist.bat)
+#
+# Depuis 7.5.1 le jeu livre déjà une bande-son complète libre (CC0) : tout fichier que tu déposes
+# ici REMPLACE la piste / l'effet du même nom (ta source est prioritaire).
+#
+# Le jeu prend toujours la clé la plus précise disponible, puis remonte :
+#   loc_<idLieu> → town_<région> → town (villes) → map_<région>      trainer_<idChampion> → battle_gym → battle_trainer
+#   dungeon_<idLieu> → dungeon_<thème> (tower/forest/plant/lair) → dungeon   battle_league / battle_legendary / battle_roaming → battle_boss
+#
+# ─── Musiques (music/<clé>.mp3 ou .ogg) ─── piste officielle qui convient (à toi de fournir le fichier)
+#   menu                  Écran-titre (ex. « Title Screen » RFVF)
+#   map_kanto             Thème de carte Kanto (ex. « Route 1 » ou « Pallet Town » RFVF)
+#   map_johto             Thème de carte Johto (ex. « New Bark Town » ou « Route 29 » HGSS)
+#   map_hoenn             Thème de carte Hoenn (ex. « Littleroot Town » ou « Route 101 » RSE/ROSA)
+#   loc_<idLieu>          Une piste par lieu : loc_pallet, loc_route1, loc_viridian, loc_pewter, loc_cerulean,
+#                         loc_lavender, loc_celadon, loc_fuchsia, loc_saffron, loc_cinnabar, loc_indigo,
+#                         loc_safarizone (« Safari Zone »), loc_viridianforest… (id = clé de LOCATIONS)
+#   battle_wild           « Battle! (Wild Pokémon) »
+#   battle_trainer        « Battle! (Trainer) »
+#   battle_gym            « Battle! (Gym Leader) »
+#   trainer_<idChampion>  Une piste par champion / rival : trainer_brock, trainer_misty, trainer_surge, trainer_erika,
+#                         trainer_koga, trainer_sabrina, trainer_blaine, trainer_giovanni, trainer_rival…
+#   battle_league         « Battle! (Elite Four) » / « Battle! (Champion) »
+#   battle_legendary      « Battle! (Legendary Pokémon) » (ex. Mewtwo RFVF, Rayquaza ROSA)
+#   battle_roaming        Thème des errants (ex. « Battle! (Raikou / Entei / Suicune) » HGSS)
+#   battle_boss           Gardien de donjon (ex. « Battle! (Frontier Brain) »)
+#   dungeon               Thème générique de grotte (ex. « Mt. Moon » RFVF)
+#   dungeon_<idLieu>      dungeon_mtmoon, dungeon_rocktunnel, dungeon_pokemontower, dungeon_safarizone,
+#                         dungeon_powerplant, dungeon_ceruleancave, dungeon_victoryroad, dungeon_mtsilver,
+#                         dungeon_tintower, dungeon_ilexforest… (id = clé de LOCATIONS de type « dungeon »)
+#
+# ─── Effets (sfx/<nom>.ogg, .mp3 ou .wav) ─── remplace l'effet synthétisé du même nom
+#   click, open, notify, error, throw, catch, catch_fail, shiny, shiny_catch, roamer, ko, faint,
+#   levelup, evolve, hatch, badge, league, boss, buy, treasure, chest, quest
+#   (liste complète : node tools/audio-manifest.mjs --list)
+#
+# ─── Cris (cries/<numéroDex>.ogg) ─── déjà installés automatiquement depuis PokeAPI/cries.
+#
+# Les musiques / effets des jeux officiels sont la propriété de Nintendo / Creatures / Game Freak :
+# ils sont installés sur VOTRE poste uniquement et ne sont pas redistribués par le dépôt.
+#
+# Exemples (à décommenter / adapter) :
+# music/ = C:\PokeWorldAudio\music
+# music/battle_wild.mp3 = C:\Musiques\Pokemon\battle-wild.mp3
+# music/trainer_brock.mp3 = https://exemple.invalid/pokemon/gym-leader.mp3
+# sfx/catch.ogg = C:\Sons\Pokemon\catch.ogg

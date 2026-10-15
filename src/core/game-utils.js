@@ -62,6 +62,7 @@ function pwToastKind(color) {
   return c ? 'neutral' : 'success';
 }
 function notify(msg, color = 'var(--green)') {
+  if (globalThis.pwEmit) globalThis.pwEmit('ui:notify', { kind: pwToastKind(color) }); // V7-R2 · SND-02
   const el = document.getElementById('notif');
   if (!el) return;
   el.textContent = msg;

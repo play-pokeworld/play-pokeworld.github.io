@@ -30,6 +30,13 @@ echo [INFO] dist introuvable - le jeu sera servi depuis la racine du projet.
 echo        Pour un build optimal : npx vite build
 echo.
 :play_have_dist
+REM -- V7-R3c : le zip ne contient plus dist\src\assets (copie de src\assets, ~33 Mo).
+REM    On le reconstitue ici (robocopy = outil Windows integre, copie seulement le neuf).
+if not exist "src\assets\" goto assets_done
+if not exist "dist\index.html" goto assets_done
+echo [INFO] Synchronisation des images / sons vers dist\src\assets ...
+robocopy "src\assets" "dist\src\assets" /E /XO /NFL /NDL /NJH /NJS /NP >nul
+:assets_done
 
 netstat -ano | findstr /R /C:":%PORT% .*LISTENING" >nul 2>nul
 if not errorlevel 1 (
@@ -163,4 +170,6 @@ echo  Appuyez sur une touche pour fermer ce panneau - le serveur continue de tou
 popd
 pause
 exit /b 0
+
+
 

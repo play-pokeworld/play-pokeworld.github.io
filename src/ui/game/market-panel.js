@@ -147,7 +147,7 @@ function marketFooterHtml(model) {
     '</button>' +
     '<input class="pw-shop-qty" type="number" min="1" value="' +
     qty +
-    '" data-shop-qty-input="1" oninput="marketSetQty(this.value)" data-action="stop-propagation">' +
+    '" data-shop-qty-input="1" data-input-call="marketSetQty" data-input-args="this.value" data-action="stop-propagation">' +
     '<button type="button" class="hbtn" data-action="legacy-call" data-call="marketAddQty" data-call-args="10">+10</button>' +
     '<button type="button" class="hbtn" data-action="legacy-call" data-call="marketAddQty" data-call-args="100">+100</button>' +
     '<button type="button" class="hbtn" data-action="legacy-call" data-call="marketMaxQty" data-call-args="">' +

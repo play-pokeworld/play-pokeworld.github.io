@@ -14,7 +14,7 @@
  *
  * Model (shaped by the classic adapter):
  * {
- *   className?, header: { classes?, actions: [{label, iconHtml?, call, callArgs?}] } | null,
+ *   className?, header: { classes?, actions: [{label, iconHtml?, call, callArgs?, active?, pressed?}] } | null,
  *   title, subtitle,
  *   energy: { label, valueText, pct, hint },
  *   tools: [{ id, label, cost, selected, call, callArgs }],
@@ -50,7 +50,9 @@ export class MineWindowView extends UIView {
                 'button',
                 {
                   type: 'button',
-                  class: 'hbtn',
+                  // V7-R3c — bouton Auto du panneau : même look que les bascules
+                  class: cx('hbtn', a.active && 'is-on active'),
+                  'aria-pressed': a.pressed == null ? null : a.pressed ? 'true' : 'false',
                   dataset: {
                     action: 'legacy-call',
                     call: a.call,
@@ -111,22 +113,39 @@ export class MineWindowView extends UIView {
                   'button',
                   {
                     type: 'button',
+                    // V7-R3 · R3-01 — outil courant : chip marquée, icône, coût
+                    // en énergie et zone d'effet (title + aria-pressed).
                     class: cx('hbtn mine-tool-btn', tool.selected && 'active'),
+                    title: tool.title || '',
+                    'aria-pressed': tool.selected ? 'true' : 'false',
                     dataset: {
                       action: 'legacy-call',
                       call: tool.call,
                       callArgs: tool.callArgs != null ? String(tool.callArgs) : '',
+                      tool: tool.id,
                     },
                   },
-                  `${tool.label} · ${tool.cost}`
+                  tool.iconHtml ? h.raw(tool.iconHtml) : null,
+                  h('span', { class: 'mine-tool-label' }, tool.label),
+                  // V7-R3c — coût en énergie : icône SVG + nombre (plus d'emoji)
+                  h(
+                    'span',
+                    { class: 'mine-tool-cost', title: m.energy ? m.energy.label : '' },
+                    globalThis.getIcon ? h.raw(globalThis.getIcon('energy', 12)) : null,
+                    String(tool.cost)
+                  )
                 )
               )
-            )
+            ),
+            m.toolHint ? h('div', { class: 'pw-field-hint mine-tool-hint' }, m.toolHint) : null
           )
         : null,
       h(
         'div',
-        { class: 'mine-grid', dataset: { gridCols: String(grid.cols) } },
+        {
+          class: 'mine-grid',
+          dataset: { gridCols: String(grid.cols), mineTool: String(m.currentTool || '') },
+        },
         ...grid.tiles.map((tile) => {
           const revealed = tile.depth === 0 && !!tile.itemKey;
           return h(

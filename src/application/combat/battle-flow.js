@@ -71,6 +71,17 @@ function restoreTeamAfterBattle(opts = {}) {
 }
 
 function endBattle() {
+  // V7-R2 · AUTO-01 — fin SUBIE d'une chaîne sauvage (équipe K.O.) : mémorisée
+  // AVANT le soin R1-06 ; la relance automatique est armée tout en bas.
+  let _arDefeat = false;
+  try {
+    _arDefeat =
+      isWildChillChainActive() &&
+      typeof G !== 'undefined' &&
+      !!G &&
+      Array.isArray(G.team) &&
+      !G.team.some((p) => p && Number(p.currentHP) > 0);
+  } catch (_) {}
   restoreAllTransformedPokemon();
   // PASSE 38e — DONJON : pas de soin automatique (naturalcure / régénérateur)
   // entre deux combats : les PV persistent pendant toute l'expédition. Ce
@@ -182,6 +193,8 @@ function endBattle() {
   // (_dgRunActive est déjà calculé en tête de fonction pour le garde-fou
   // « pas de soin en donjon ».)
   if (idleScreen) idleScreen.style.display = _dgRunActive ? 'none' : 'flex';
+  // V7-R3 — bandeaux de relance auto (combat / donjon) à jour sur l'écran de repos.
+  if (!_dgRunActive && globalThis.renderAutoRelaunchBar) globalThis.renderAutoRelaunchBar();
   if (activeScene) {
     activeScene.style.display = 'none';
     activeScene.classList.remove('is-live');
@@ -210,6 +223,14 @@ function endBattle() {
   try {
     if (_dgRunActive && typeof globalThis._dgAutoResume === 'function') globalThis._dgAutoResume();
   } catch (_) {}
+  // V7-R2 · AUTO-01 — défaite d'une chaîne sauvage hors donjon : compte à
+  // rebours de relance (ne fait rien si l'amélioration n'est pas achetée /
+  // désactivée, pendant le rattrapage hors-ligne ou sans table sauvage).
+  try {
+    if (_arDefeat && !_dgRunActive && typeof globalThis.scheduleAutoRelaunch === 'function')
+      globalThis.scheduleAutoRelaunch();
+  } catch (_) {}
+  if (globalThis.pwEmit) globalThis.pwEmit('battle:end', { defeat: _arDefeat }); // V7-R2 · SND-02/03
 }
 
 function restartLastBattle() {

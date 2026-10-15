@@ -83,6 +83,7 @@ function doSwitchBattlePoke(idx) {
   battle.pMoveIdx = 0;
   resetPlayerCd();
   addBattleLog(`Allez, <b>${p.name}</b> !`);
+  if (globalThis.pwEmit) globalThis.pwEmit('combat:player-sent', { id: p.id }); // V7-R3 · SND-04 (cri)
   triggerEntryTalents('player');
   updateBattleUI();
   renderMoveButtons();

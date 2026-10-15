@@ -1,0 +1,182 @@
+{
+  "service": "PokeTrace",
+  "enabled": true,
+  "summary": {
+    "kinds": {
+      "offline": {
+        "n": 1,
+        "firstAt": 718.2,
+        "lastAt": 718.2
+      },
+      "state": {
+        "n": 3,
+        "firstAt": 794.2,
+        "lastAt": 1586.1
+      },
+      "render": {
+        "n": 8,
+        "firstAt": 795.4,
+        "lastAt": 1588.3,
+        "gapMs": {
+          "min": 15.4,
+          "avg": 113.27,
+          "max": 421.9,
+          "samples": 7
+        }
+      },
+      "boot": {
+        "n": 3,
+        "firstAt": 870.2,
+        "lastAt": 1022.2
+      },
+      "action": {
+        "n": 5,
+        "firstAt": 1134.7,
+        "lastAt": 1587.9
+      }
+    },
+    "names": {
+      "offline|catchup": {
+        "n": 1,
+        "firstAt": 718.2,
+        "lastAt": 718.2
+      },
+      "state|save:write": {
+        "n": 3,
+        "firstAt": 794.2,
+        "lastAt": 1586.1
+      },
+      "render|ui:team-window": {
+        "n": 4,
+        "firstAt": 795.4,
+        "lastAt": 1151
+      },
+      "render|ui:loc-info": {
+        "n": 3,
+        "firstAt": 815.6,
+        "lastAt": 1166.4
+      },
+      "boot|stream:start": {
+        "n": 1,
+        "firstAt": 870.2,
+        "lastAt": 870.2
+      },
+      "boot|screens:ready": {
+        "n": 1,
+        "firstAt": 1016.8,
+        "lastAt": 1016.8
+      },
+      "boot|stream:done": {
+        "n": 1,
+        "firstAt": 1022.2,
+        "lastAt": 1022.2
+      },
+      "action|showTab": {
+        "n": 3,
+        "firstAt": 1134.7,
+        "lastAt": 1150.9
+      },
+      "action|saveGame": {
+        "n": 1,
+        "firstAt": 1586.1,
+        "lastAt": 1586.1
+      },
+      "action|baseWindowRender": {
+        "n": 1,
+        "firstAt": 1587.9,
+        "lastAt": 1587.9
+      },
+      "render|ui:base-window": {
+        "n": 1,
+        "firstAt": 1588.3,
+        "lastAt": 1588.3
+      }
+    },
+    "total": 20,
+    "ringFill": 12,
+    "t0": 442.6
+  },
+  "tail": [
+    {
+      "seq": 1,
+      "t": 718.2,
+      "kind": "offline",
+      "name": "catchup",
+      "via": "load"
+    },
+    {
+      "seq": 2,
+      "t": 794.2,
+      "kind": "state",
+      "name": "save:write",
+      "via": "auto"
+    },
+    {
+      "seq": 6,
+      "t": 870.2,
+      "kind": "boot",
+      "name": "stream:start"
+    },
+    {
+      "seq": 8,
+      "t": 1016.8,
+      "kind": "boot",
+      "name": "screens:ready"
+    },
+    {
+      "seq": 9,
+      "t": 1022.2,
+      "kind": "boot",
+      "name": "stream:done"
+    },
+    {
+      "seq": 10,
+      "t": 1134.7,
+      "kind": "action",
+      "name": "showTab",
+      "via": "registry"
+    },
+    {
+      "seq": 12,
+      "t": 1137.2,
+      "kind": "action",
+      "name": "showTab",
+      "via": "registry"
+    },
+    {
+      "seq": 13,
+      "t": 1137.9,
+      "kind": "state",
+      "name": "save:write",
+      "via": "auto"
+    },
+    {
+      "seq": 14,
+      "t": 1150.9,
+      "kind": "action",
+      "name": "showTab",
+      "via": "registry"
+    },
+    {
+      "seq": 17,
+      "t": 1586.1,
+      "kind": "action",
+      "name": "saveGame",
+      "via": "registry"
+    },
+    {
+      "seq": 18,
+      "t": 1586.1,
+      "kind": "state",
+      "name": "save:write",
+      "via": "manual"
+    },
+    {
+      "seq": 19,
+      "t": 1587.9,
+      "kind": "action",
+      "name": "baseWindowRender",
+      "via": "registry"
+    }
+  ]
+}

@@ -16,7 +16,7 @@
  * `PW_VERSION` pour les sondes et les harnais.
  */
 
-export const PW_VERSION = '7.3.2';
+export const PW_VERSION = '7.5.2';
 export const PW_BUILD = PW_VERSION;
 
 if (typeof window !== 'undefined') {

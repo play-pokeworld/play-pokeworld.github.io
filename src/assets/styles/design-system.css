@@ -6717,7 +6717,7 @@ button[data-action]:not(.save-slot):where(:not(.modal-close)) {
 /* Buttons with a dedicated state color are excluded from this generic
    background: otherwise this rule (5-class specificity) masked their
    colors (daycare mode/priority buttons, training auto — phase 14). */
-.hbtn:not(.quest-claim-btn):not(.automation-toggle-btn):not(.automation-buy-btn):not(.purchase-btn):not(.hatchery-mode-toggle):not(.hatchery-priority-toggle):not(.training-slot-auto-btn):not(.pw-btn-danger):not(.pw-btn-cancel),
+.hbtn:not(.quest-claim-btn):not(.automation-toggle-btn):not(.automation-buy-btn):not(.purchase-btn):not(.hatchery-mode-toggle):not(.hatchery-priority-toggle):not(.training-slot-auto-btn):not(.pw-btn-danger):not(.pw-btn-cancel):not(.active):not(.is-active),
 .poke-btn--secondary {
   border: 1px solid var(--pw-border-strong);
   background: rgba(236,222,183,0.12);
@@ -7680,8 +7680,12 @@ button.danger:hover, .hbtn.pw-btn-danger:hover {
 }
 
 /* Default button face (same exclusions as the historical rule: buttons
-   with a dedicated state color keep it). */
-.hbtn:not(.quest-claim-btn):not(.automation-toggle-btn):not(.automation-buy-btn):not(.purchase-btn):not(.hatchery-mode-toggle):not(.hatchery-priority-toggle):not(.training-slot-auto-btn):not(.pw-btn-danger):not(.pw-btn-cancel),
+   with a dedicated state color keep it). V7-R3c : les états .active /
+   .is-active sont exclus — cette face (10 classes, prioritaire) masquait
+   toutes les règles « .hbtn.active » (onglets de gestion, dictionnaire,
+   outils de la mine), d'où l'ancien halo de R3 ; la bascule standard
+   (accent du thème, texte sombre) redevient visible partout. */
+.hbtn:not(.quest-claim-btn):not(.automation-toggle-btn):not(.automation-buy-btn):not(.purchase-btn):not(.hatchery-mode-toggle):not(.hatchery-priority-toggle):not(.training-slot-auto-btn):not(.pw-btn-danger):not(.pw-btn-cancel):not(.active):not(.is-active),
 .pw-ui-btn,
 .usm-sort-btn,
 .inv-tab,
@@ -14830,3 +14834,118 @@ svg .pw-tuto-target > rect:nth-of-type(2) {
   .pw-tuto-target { animation: none; box-shadow: 0 0 0 3px var(--accent); }
   svg .pw-tuto-target > rect:nth-of-type(2) { animation: none; stroke-width: 5; }
 }
+
+/* ── V7-R2 · AUTO-01 — Relance automatique (écran de repos de la fenêtre Combat) ── */
+.pw-auto-relaunch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 12px;
+  color: var(--light1);
+}
+.pw-auto-relaunch[hidden] { display: none; }
+.pw-auto-relaunch-state { opacity: 0.75; }
+.pw-auto-relaunch-state.is-on { color: var(--green); opacity: 1; }
+.pw-auto-relaunch-countdown {
+  font-weight: 800;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.pw-auto-relaunch .hbtn { padding: 4px 10px; font-size: 11px; }
+.pw-shop-upgrade-ico { display: inline-flex; width: 32px; height: 32px; color: var(--accent); }
+.pw-shop-upgrade-ico svg { width: 100%; height: 100%; }
+
+/* ── V7-R2 · SND-01 — Réglages → Son ─────────────────────────────────────── */
+.settings-sound-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.settings-sound-row .hbtn { min-width: 160px; text-align: left; }
+.settings-sound-volume { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--light2); }
+.settings-sound-volume input[type='range'] { width: 120px; accent-color: var(--accent); }
+.settings-sound-volume output { min-width: 42px; font-variant-numeric: tabular-nums; text-align: right; }
+
+/* ── V7-R3 · MOB-01/02/03 — Téléphone : starter sous l'en-tête, carte de
+   sauvegarde tronquée, fenêtre Pokéball trop large ────────────────────── */
+/* MOB-01 — la fenêtre « Choisissez votre starter » passe DEVANT l'en-tête
+   (950) et la barre d'onglets mobile (961), comme les autres modales (1200). */
+#starter-modal { z-index: 1200; }
+/* MOB-02 — l'écran « Entrer dans une sauvegarde » : la carte occupe toute la
+   piste disponible entre les flèches au lieu d'une largeur fixe (286 px) que
+   le téléphone ne peut pas afficher ; les flèches rétrécissent. */
+@media (max-width: 520px) {
+  .save-menu-list-shell { grid-template-columns: 30px minmax(0, 1fr) 30px; gap: 6px; }
+  .save-menu-scroll-btn { min-width: 30px; height: 46px; font-size: 22px; }
+  .save-menu-list { gap: 10px; }
+  .save-slot,
+  .save-profile-preview .save-slot {
+    flex: 0 0 100%;
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    min-height: 0;
+  }
+  .save-slot-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .save-slot-stats span { padding: 8px 4px; }
+  .save-slot-stats b { font-size: 16px; }
+  .save-slot-id { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+  .save-menu-actions .hbtn { min-width: 0; }
+}
+
+/* ── V7-R3 · R3-01 — Mine : retour visuel de l'outil utilisé ─────────────── */
+.mine-tool-btn { display: inline-flex; align-items: center; gap: 6px; }
+.mine-tool-btn .mine-tool-ico { flex: 0 0 auto; opacity: 0.85; }
+.mine-tool-btn .mine-tool-cost { font-size: 11px; opacity: 0.8; font-variant-numeric: tabular-nums; }
+.mine-tool-btn.active .mine-tool-ico { opacity: 1; }
+/* V7-R3c — l'outil courant = bascule standard (fond clair / texte sombre, §5),
+   sans halo ni contour supplémentaire ; le coût hérite du texte sombre. */
+.mine-tool-btn.active { box-shadow: none; }
+.mine-tool-btn.active .mine-tool-cost { opacity: 0.85; }
+.mine-tool-btn .mine-tool-cost { display: inline-flex; align-items: center; gap: 2px; }
+.mine-tool-hint { margin-top: 4px; display: flex; align-items: center; gap: 6px; }
+.mine-grid[data-mine-tool] .mine-tile-clickable { cursor: crosshair; }
+/* V7-R3c — visée : contour neutre de la palette (jamais la couleur d'accent). */
+.mine-tile.is-aim { outline: 2px solid var(--light2); outline-offset: -2px; filter: brightness(1.18); z-index: 1; }
+.mine-tile.is-aim.mine-tile--d0 { outline-color: var(--light1); opacity: 0.9; }
+/* V7-R3c · R3c-04 — carte « module non acheté » : prix + bouton Acheter */
+.automation-locked-card.has-buy { flex-wrap: wrap; }
+.automation-locked-card .automation-buy-btn { flex: 0 0 auto; width: auto; min-height: 36px; padding: 8px 12px; }
+.training-auto-slot-card .automation-card-head .automation-buy-btn { width: auto; min-height: 32px; padding: 6px 10px; margin-left: auto; }
+/* V7-R3c — « Mine auto » activé : bascule standard (.active → accent du thème, cf. « Active state ») */
+.pw-mine-strike-cost { display: inline-flex; align-items: center; gap: 1px; }
+.pw-mine-strike {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: var(--accent);
+  pointer-events: none;
+  z-index: 5;
+  transform: translate(-50%, -50%);
+  animation: pw-mine-strike 0.7s ease-out forwards;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+.pw-mine-strike .mine-tool-ico { filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)); animation: pw-mine-swing 0.35s ease-out; }
+.pw-mine-strike-cost { font-size: 11px; font-weight: 800; color: var(--light2); font-variant-numeric: tabular-nums; }
+@keyframes pw-mine-strike {
+  0% { opacity: 0; transform: translate(-50%, -30%) scale(0.8); }
+  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+  100% { opacity: 0; transform: translate(-50%, -140%) scale(1); }
+}
+@keyframes pw-mine-swing {
+  0% { transform: rotate(-35deg); }
+  60% { transform: rotate(18deg); }
+  100% { transform: rotate(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pw-mine-strike, .pw-mine-strike .mine-tool-ico { animation: none; }
+}
+
+/* V7-R3c — le tableau des coûts d'automatisation a quitté les Réglages (prix sur les boutons auto + Guide). */

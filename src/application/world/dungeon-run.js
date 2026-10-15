@@ -177,13 +177,8 @@ function startDungeonRun(locId) {
     const w = typeof globalThis.ensureWallet === 'function' ? globalThis.ensureWallet() : null;
     const have = w ? w.dungeonTokens || 0 : 0;
     if (have < toll) {
-      _dgNotify(
-        _dgT('dungeon_toll_blocked', {
-          need: String(toll),
-          have: String(have),
-        }),
-        'var(--red)'
-      );
+      const _tb = { need: String(toll), have: String(have) };
+      _dgNotify(_dgT('dungeon_toll_blocked', _tb), 'var(--red)');
       return null;
     }
     if (typeof globalThis.spendDungeonTokens === 'function') globalThis.spendDungeonTokens(toll);
@@ -725,16 +720,12 @@ function dungeonOnWipe() {
   const G = _dgState();
   if (G) G.dungeonRun = null;
   _dgRestTeam(); // V7-R1 · #5 — expédition soldée → équipe soignée (comme à la remontée).
-  _dgNotify(
-    _dgT('dungeon_wipe', {
-      tokens: String(kept.tokens),
-      money: String(kept.money),
-    }),
-    'var(--red)'
-  );
+  const _wk = { tokens: String(kept.tokens), money: String(kept.money) };
+  _dgNotify(_dgT('dungeon_wipe', _wk), 'var(--red)');
   refreshDungeonPanel();
   _dgSyncRunFlag();
   _dgRestoreIdleScreen();
+  _dgRelaunchHook(run, 'wipe');
   return { outcome: 'wipe', floor: run.floor, kept, lost, refunded };
 }
 
@@ -747,6 +738,7 @@ function dungeonOnBossDefeated() {
   run.bag.tokens += Math.round(loot.tokens * mult * DUNGEON_RULES.completionBonus);
   run.bag.money += Math.round(loot.money * mult * DUNGEON_RULES.completionBonus);
   run.bossDone = true;
+  if (globalThis.pwEmit) globalThis.pwEmit('bossDefeated', { dungeon: run.id, depth: run.depth }); // V7-R2 · SND-02 (EVENTS.BOSS_DEFEATED)
   const G = _dgState();
   if (G) {
     G.dungeonClears = G.dungeonClears || {};
@@ -755,7 +747,14 @@ function dungeonOnBossDefeated() {
   const res = dungeonAscend();
   if (res) res.outcome = 'cleared';
   _dgNotify(_dgT('dungeon_cleared'), 'var(--green)');
+  _dgRelaunchHook(run, 'cleared');
   return res;
+}
+/** V7-R3 · D30 — expédition soldée (K.O.) ou achevée (gardien) → relance auto
+ *  (module automation/auto-dungeon-relaunch.js ; jamais sur abandon, ni en PW_FF). */
+function _dgRelaunchHook(run, outcome) {
+  const f = globalThis.scheduleAutoDungeonRelaunch;
+  if (f && run && globalThis.PW_FF !== true) f({ loc: run.loc, mode: run.auto || null, outcome });
 }
 
 /** Abandon explicite sans encaisser (sécurité : quitter la zone). */
@@ -1047,6 +1046,7 @@ function refreshDungeonPanel() {
   try {
     if (typeof document === 'undefined') return;
     _dgSyncRunFlag();
+    if (globalThis.PW_FF === true) return; // V7-R2 — rattrapage AFK : rendu différé (dungeon-offline.js)
     const el =
       document.getElementById('location-info-panel') || document.getElementById('tab-content');
     if (el && typeof globalThis.renderLocInfo === 'function') globalThis.renderLocInfo(el);
@@ -1394,6 +1394,7 @@ function dungeonMoveTo(id) {
 
   if (tile.type === 'chest' && !tile.done) {
     tile.done = true;
+    if (globalThis.pwEmit) globalThis.pwEmit('dungeon:chest', { floor: run.floor }); // V7-R2 · SND-02
     const loot = dungeonWinLoot(run.badgeReq);
     const mult = dungeonMultFor(run.floor);
     run.bag.tokens += Math.round(loot.tokens * mult * 2);
@@ -1476,7 +1477,7 @@ function dungeonSetAuto(mode) {
 
 /** Relance différée du pilote (après un coffre, un pas, une descente…). */
 function _dgAutoKick(run, delay) {
-  if (!run || !run.auto) return;
+  if (!run || !run.auto || globalThis.PW_FF === true) return;
   setTimeout(() => {
     try {
       _dgAutoStep();
@@ -1494,7 +1495,11 @@ function _dgAutoKick(run, delay) {
  *    · boss   → droit au boss, ne combat que ce qui barre la route.
  *  Boss battu (échelle à sa place) → on descend. Sur le dernier palier, le
  *  gardien clôt l'expédition : d'où l'importance de tout ramasser AVANT. */
-function _dgAutoStep() {
+function _dgAutoStep(opts) {
+  // V7-R2 — pendant le rattrapage hors-ligne (PW_FF), seul le moteur AFK
+  // (dungeon-offline.js, opts.offline) fait avancer le pilote : les relances
+  // différées (setTimeout) se taisent pour ne pas doubler les pas simulés.
+  if (globalThis.PW_FF === true && !(opts && opts.offline)) return null;
   const run = currentDungeonRun();
   if (!run || !run.map || !run.map.grid || !run.auto) return null;
   const b = globalThis.battle;
@@ -1515,7 +1520,15 @@ function _dgAutoStep() {
     // mission accomplie (ou mode boss) : le boss, puis l'échelle qui le remplace.
     path = _dgBfsPath(run, run.bossTile);
   }
-  if (!path || path.length < 2) return null;
+  if (!path || path.length < 2) {
+    // V7-R2 — la cible est la case où l'on se tient (combat/coffre laissé en
+    // plan par un rechargement ou le rattrapage AFK) : on la ré-engage sur place
+    // au lieu de caler (le pilote restait muet jusqu'à un clic du joueur).
+    const here = path && path.length === 1 ? _dgNode(run, run.pos) : null;
+    if (here && !here.done && ['combat', 'elite', 'boss', 'chest'].includes(here.type))
+      return dungeonMoveTo(here.id);
+    return null;
+  }
   // PASSE 38 — le pilote téléporte directement sur la cible si elle est déjà
   // visible ; sinon il fait un pas (le brouillard se lève au passage).
   // PASSE 39 — le boss est téléportable comme n'importe quelle case visible.

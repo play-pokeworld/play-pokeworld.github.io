@@ -10,9 +10,11 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SOURCES = [
   ['src/assets/images', 'dist/src/assets/images'],
+  ['src/assets/audio', 'dist/src/assets/audio'], // V7-R2 · SND-03 — musiques CC0 (docs/CREDITS.md)
 ];
 
-let copied = 0, kept = 0;
+let copied = 0,
+  kept = 0;
 for (const [relSrc, relDst] of SOURCES) {
   const srcDir = path.join(ROOT, relSrc);
   const dstDir = path.join(ROOT, relDst);
@@ -24,14 +26,18 @@ for (const [relSrc, relDst] of SOURCES) {
     const dst = path.join(dstDir, rel);
     try {
       const [a, b] = await Promise.all([fs.stat(src), fs.stat(dst)]);
-      if (a.mtimeMs <= b.mtimeMs && a.size === b.size) { kept++; continue; }
-    } catch { /* dst absent */ }
+      if (a.mtimeMs <= b.mtimeMs && a.size === b.size) {
+        kept++;
+        continue;
+      }
+    } catch {
+      /* dst absent */
+    }
     await fs.mkdir(path.dirname(dst), { recursive: true });
     await fs.copyFile(src, dst);
     copied++;
   }
 }
-console.log(`[runtime-assets] src/assets/images -> dist/src/assets/images : ${copied} copie(s), ${kept + copied} fichier(s) presents.`);
-
-
-
+console.log(
+  `[runtime-assets] ${SOURCES.map(([a]) => a).join(' + ')} -> dist/ : ${copied} copie(s), ${kept + copied} fichier(s) presents.`
+);

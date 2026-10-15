@@ -336,7 +336,6 @@ export const ATOLL_SHOP = [
 ];
 // FIX (2026-08): game-helpers.js references ATOLL_SHOP as a free identifier.
 if (typeof globalThis !== 'undefined') globalThis.ATOLL_SHOP = ATOLL_SHOP;
-if (typeof globalThis !== 'undefined') globalThis.ATOLL_SHOP = ATOLL_SHOP;
 function isAtollUnlocked() {
   return typeof isRegionLeagueWon === 'function' ? isRegionLeagueWon('kanto') : !!G.championTitle;
 }
@@ -1157,6 +1156,7 @@ function prepareAtollFactoryBattle(modeKey = 'factory_c') {
 }
 
 function openFullscreenPanel(panelType) {
+  if (globalThis.pwEmit) globalThis.pwEmit('ui:window-open', { panel: panelType }); // V7-R2 · SND-02
   try {
     if (panelType === 'inventory') {
       _pwMarkTutorial('open_bag');

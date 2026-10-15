@@ -58,6 +58,17 @@ let offlineLastHeartbeat = saveNow();
 let offlineHiddenSince = null;
 let offlineSuspendedByUs = false;
 let _offlineLastSim = null; // promise of the last simulation (tests/debug)
+// V7-R2 — horodatage « vu pour la dernière fois » relevé par loadGame AVANT les
+// normalisations de chargement (certaines sauvegardent → ré-estampillent « vu »
+// à l'instant) : sans lui, le rattrapage ne se déclenchait JAMAIS après un
+// relancement du jeu (seul le retour d'onglet masqué fonctionnait).
+let offlineBootSeenTs = null;
+let offlineBootWildActive = false; // idem pour G.wildSessionActive (recalculé à false par ces sauvegardes)
+function offlineNoteBootSeen(ts, wildActive) {
+  const n = Number(ts) || 0;
+  if (n > 0) offlineBootSeenTs = n;
+  offlineBootWildActive = !!wildActive;
+}
 const OFFLINE_TAB_ID =
   'tab-' + Math.random().toString(36).slice(2, 10) + '-' + saveNow().toString(36);
 
@@ -191,7 +202,9 @@ function offlinePollHeartbeat() {
     offlineResumeBattle();
     return;
   } // a other onglet pilote
-  const gap = Math.min(Math.max(memGap, storedGap, hiddenGap), OFFLINE_MAX_MS);
+  const bootGap = offlineBootSeenTs ? Math.max(0, now - offlineBootSeenTs) : 0; // V7-R2 (relancement)
+  offlineBootSeenTs = null;
+  const gap = Math.min(Math.max(memGap, storedGap, hiddenGap, bootGap), OFFLINE_MAX_MS);
   if (gap >= OFFLINE_MIN_GAP_MS) {
     offlineSuspendedByUs = false; // the fast-forward gere lui-same the reprise of the chaine
     _offlineLastSim = offlineSimulate(gap, 'return');
@@ -291,6 +304,10 @@ function offlineMuteUi() {
 
 // Offline fast-forward and idle simulation rules
 function offlineCanWildBattle(loc) {
+  // V7-R2 — un DONJON n'est jamais une zone de chaîne sauvage hors-ligne :
+  // l'expédition en cours est rejouée par l'étape « dungeon » (pilote + cases),
+  // et sans expédition on n'y combat pas (le péage ouvre une session).
+  if (loc && loc.type === 'dungeon') return false;
   if (!loc || !loc.wild || !loc.wild.length) return false;
   if (!G.team || !G.team.length) return false;
   if (!G.team.some((p) => p && p.currentHP > 0)) return false;
@@ -528,7 +545,7 @@ async function offlineFastForwardWildBattles(secondsBudget) {
   //    G.wildSessionActive, updated on each saveGame and cleared on each
   //    battle end. Inactive on a route or in training = 0 battles.
   if (!hadActiveChain) {
-    if (!(G && G.wildSessionActive)) return res;
+    if (!(G && (G.wildSessionActive || offlineBootWildActive))) return res;
     if (!offlineStartWildSession(loc)) return res;
   }
   if (!b.enemyPoke) {
@@ -765,6 +782,10 @@ let _offlineLastYieldAt = 0;
 let _offlineStageBase = 0;
 let _offlineStageSpan = 1;
 let _offlineStageLabel = '';
+// V7-R2 — un gestionnaire externe (donjon) peut renseigner le libellé de l'étape.
+function offlineSetStageLabel(text) {
+  _offlineStageLabel = String(text || '');
+}
 function offlineStageProgress(localFrac) {
   offlineShowProgress(
     _offlineStageBase + Math.max(0, Math.min(1, localFrac || 0)) * _offlineStageSpan,
@@ -900,6 +921,33 @@ function showAfkResultPanel(result) {
     stats.push(stat(result.boundedBattle === 'won' ? '✔' : '✖', 'afk_panel_boss_battle'));
   // V7 · ROAM-01 — a roamer showed up during the catch-up: say it loud.
   let noteText = result.message || '';
+  // V7-R2 — expédition de donjon rejouée pendant l'absence : combats, paliers,
+  // jetons, et l'issue (gardien vaincu / équipe K.O. / expédition en cours).
+  const dg = result.dungeon;
+  if (dg) {
+    stats.push(stat(dg.fights || 0, 'afk_panel_dungeon_fights'));
+    if ((dg.floors || 0) > 0) stats.push(stat('+' + dg.floors, 'afk_panel_dungeon_floors'));
+    if ((dg.tokens || 0) > 0)
+      stats.push(stat('+' + formatNumber(dg.tokens), 'afk_panel_dungeon_tokens'));
+    // V7-R3 · D30 — expéditions enchaînées par la relance auto pendant l'absence.
+    if ((dg.runs || 0) > 0) stats.push(stat(dg.runs, 'afk_panel_dungeon_runs'));
+    const dgNote =
+      (dg.runs || 0) > 1
+        ? tr('afk_dungeon_runs_note', {
+            runs: String(dg.runs),
+            clears: String(dg.clears || 0),
+            wipes: String(dg.wipes || 0),
+          })
+        : dg.cleared
+          ? t('afk_dungeon_cleared')
+          : dg.wiped
+            ? t('afk_dungeon_wiped')
+            : tr(dg.pilot ? 'afk_dungeon_ongoing_pilot' : 'afk_dungeon_ongoing', {
+                floor: String(dg.floor || 1),
+                depth: String(dg.depth || 1),
+              });
+    noteText = noteText ? dgNote + ' ' + noteText : dgNote;
+  }
   if ((result.roamers || 0) > 0) {
     stats.push(stat(result.roamers, 'afk_panel_roamers'));
     const roamNote = afkRoamerNote(result);
@@ -976,13 +1024,18 @@ async function offlineSimulate(ms, reason) {
   const agg = {};
   try {
     // Offline fast-forward and idle simulation rules
-    const STAGE_WEIGHTS = { 'wild-battles': 0.72, training: 0.23, mine: 0.05 };
+    const STAGE_WEIGHTS = { dungeon: 0.4, 'wild-battles': 0.72, training: 0.23, mine: 0.05 };
     const STAGE_LABELS = {
+      dungeon: 'offline_stage_dungeon',
       'wild-battles': 'offline_stage_battles',
       training: 'offline_stage_training',
       mine: 'offline_stage_mine',
     };
-    const names = Object.keys(OFFLINE_HANDLERS);
+    // V7-R2 — l'expédition de donjon se rejoue EN PREMIER (elle verrouille la
+    // carte : tant qu'elle dure, aucune autre chaîne de combats n'est possible).
+    const names = Object.keys(OFFLINE_HANDLERS).sort(
+      (a, b2) => (a === 'dungeon' ? 0 : 1) - (b2 === 'dungeon' ? 0 : 1)
+    );
     const unknownWeight = 0.02;
     let weightTotal = 0;
     for (const n of names) weightTotal += Number(STAGE_WEIGHTS[n] || unknownWeight);
@@ -1018,6 +1071,7 @@ async function offlineSimulate(ms, reason) {
     restoreUi();
     offlineResumeChainAfterFastForward();
     offlineSuspendedByUs = false;
+    offlineBootWildActive = false; // V7-R2 — l'indicateur de relancement ne sert qu'une fois
     try {
       afkApplying = false;
     } catch (_) {}
@@ -1025,6 +1079,8 @@ async function offlineSimulate(ms, reason) {
     const battlesRes = agg['wild-battles'] || {};
     const mineRes = agg['mine'] || {};
     const trainingRes = agg['training'] || {};
+    const dungeonRes = agg['dungeon'] || {};
+    const dungeonActive = !!(dungeonRes.fights > 0 || dungeonRes.cleared || dungeonRes.wiped);
     const teamKoAfter = countAfkTeamKo();
     // V7-R1 · #6 — K.O. comptés → hors donjon, soin comme après tout combat.
     if (typeof globalThis.restoreTeamAfterBattle === 'function')
@@ -1041,10 +1097,11 @@ async function offlineSimulate(ms, reason) {
     const result = {
       debug: reason === 'debug',
       timeMs: capped,
-      wins: Number(battlesRes.won || 0),
+      wins: Number(battlesRes.won || 0) + Number(dungeonRes.fights || 0),
       money: Math.max(0, Number(G.money || 0) - startMoney),
       fainted: Math.max(0, teamKoAfter - teamKoBefore),
-      lost: !!battlesRes.lost,
+      lost: !!battlesRes.lost || !!dungeonRes.wiped,
+      dungeon: dungeonActive ? dungeonRes : null, // V7-R2 — expédition rejouée hors-ligne
       energy: G.mine ? Math.max(0, Number(G.mine.energy || 0) - startEnergy) : 0,
       training: Number(trainingRes.sessions || 0),
       mineDigs: Number(mineRes.digs || 0),
@@ -1056,6 +1113,17 @@ async function offlineSimulate(ms, reason) {
       roamers: Number(battlesRes.roamers || 0), // V7 · ROAM-01 — errants rencontrés hors-ligne
       roamer: battlesRes.lastRoamer || null,
     };
+    // V7-R2 · AUTO-01 — chaîne sauvage perdue pendant le rattrapage : même
+    // relance différée qu'en direct (l'équipe vient d'être soignée ; jamais en
+    // donjon, le garde-fou est dans scheduleAutoRelaunch).
+    try {
+      if (
+        battlesRes.lost &&
+        !dungeonActive &&
+        typeof globalThis.scheduleAutoRelaunch === 'function'
+      )
+        globalThis.scheduleAutoRelaunch();
+    } catch (_) {}
     // Computed for readability/debug of the recap decision below, which is
     // driven by wantRecap; underscored as deliberately unused.
     const _hasActivity = !!(
@@ -1225,152 +1293,52 @@ function debugTimeSkip30Minutes() {
 installOfflineHandlers();
 
 // --- Migrated to ES module, globals exposed ---
-if (typeof OfflineEngine !== 'undefined') {
-  if (typeof window !== 'undefined') window.OfflineEngine = OfflineEngine;
-  if (typeof globalThis !== 'undefined') globalThis.OfflineEngine = OfflineEngine;
-}
-if (typeof offlineSimulate !== 'undefined') {
-  if (typeof window !== 'undefined') window.offlineSimulate = offlineSimulate;
-  if (typeof globalThis !== 'undefined') globalThis.offlineSimulate = offlineSimulate;
-}
-if (typeof offlineScheduleCatchup !== 'undefined') {
-  if (typeof window !== 'undefined') window.offlineScheduleCatchup = offlineScheduleCatchup;
-  if (typeof globalThis !== 'undefined') globalThis.offlineScheduleCatchup = offlineScheduleCatchup;
-}
-if (typeof offlinePollHeartbeat !== 'undefined') {
-  if (typeof window !== 'undefined') window.offlinePollHeartbeat = offlinePollHeartbeat;
-  if (typeof globalThis !== 'undefined') globalThis.offlinePollHeartbeat = offlinePollHeartbeat;
-}
-if (typeof offlinePersistSeen !== 'undefined') {
-  if (typeof window !== 'undefined') window.offlinePersistSeen = offlinePersistSeen;
-  if (typeof globalThis !== 'undefined') globalThis.offlinePersistSeen = offlinePersistSeen;
-}
-if (typeof offlineAcquireLock !== 'undefined') {
-  if (typeof window !== 'undefined') window.offlineAcquireLock = offlineAcquireLock;
-  if (typeof globalThis !== 'undefined') globalThis.offlineAcquireLock = offlineAcquireLock;
-}
-if (typeof offlineFastForwardWildBattles !== 'undefined') {
-  if (typeof window !== 'undefined')
-    window.offlineFastForwardWildBattles = offlineFastForwardWildBattles;
-  if (typeof globalThis !== 'undefined')
-    globalThis.offlineFastForwardWildBattles = offlineFastForwardWildBattles;
-}
-if (typeof offlineFastForwardTraining !== 'undefined') {
-  if (typeof window !== 'undefined') window.offlineFastForwardTraining = offlineFastForwardTraining;
-  if (typeof globalThis !== 'undefined')
-    globalThis.offlineFastForwardTraining = offlineFastForwardTraining;
-}
-if (typeof showAfkResultPanel !== 'undefined') {
-  if (typeof window !== 'undefined') window.showAfkResultPanel = showAfkResultPanel;
-  if (typeof globalThis !== 'undefined') globalThis.showAfkResultPanel = showAfkResultPanel;
-}
-if (typeof closeAfkResultPanel !== 'undefined') {
-  if (typeof window !== 'undefined') window.closeAfkResultPanel = closeAfkResultPanel;
-  if (typeof globalThis !== 'undefined') globalThis.closeAfkResultPanel = closeAfkResultPanel;
-}
-if (typeof debugTimeSkip30Minutes !== 'undefined') {
-  if (typeof window !== 'undefined') window.debugTimeSkip30Minutes = debugTimeSkip30Minutes;
-  if (typeof globalThis !== 'undefined') globalThis.debugTimeSkip30Minutes = debugTimeSkip30Minutes;
-}
+// V7-R2 — surface classique compactée (même liste, un seul Object.assign) ;
+// offlineRunBattleFfLoop / offlineDrainStuckLiveKOs / offlineSetStageLabel
+// servent au rattrapage de DONJON (src/application/save/dungeon-offline.js).
+const _offlineGlobals = {
+  OfflineEngine,
+  offlineSimulate,
+  offlineScheduleCatchup,
+  offlinePollHeartbeat,
+  offlinePersistSeen,
+  offlineAcquireLock,
+  offlineFastForwardWildBattles,
+  offlineFastForwardTraining,
+  showAfkResultPanel,
+  closeAfkResultPanel,
+  debugTimeSkip30Minutes,
+  countAfkTeamKo,
+  diffInventory,
+  diffSessionItems,
+  ensureAfkResultPanel,
+  groupAfkCaptures,
+  installOfflineHandlers,
+  offlineCanWildBattle,
+  offlineDaycareLevelSum,
+  offlineIsBoundedBattle,
+  offlineLockKey,
+  offlineMuteUi,
+  offlineReadSeen,
+  offlineResumeBattle,
+  offlineResumeChainAfterFastForward,
+  offlineShowProgress,
+  offlineStageProgress,
+  offlineStartWildSession,
+  offlineStopWildBattleTimer,
+  offlineSuspendBattle,
+  afkCaptureModels,
+  afkItemModels,
+  snapshotInventory,
+  snapshotSessionItems,
+  offlineRunBattleFfLoop,
+  offlineDrainStuckLiveKOs,
+  offlineSetStageLabel,
+  offlineNoteBootSeen,
+};
+if (typeof window !== 'undefined') Object.assign(window, _offlineGlobals);
+if (typeof globalThis !== 'undefined') Object.assign(globalThis, _offlineGlobals);
 if (typeof window !== 'undefined') window._offlineGetLastSim = () => _offlineLastSim;
-
-// --- Exported globals ---
-if (typeof countAfkTeamKo !== 'undefined') {
-  if (typeof window !== 'undefined') window.countAfkTeamKo = countAfkTeamKo;
-  if (typeof globalThis !== 'undefined') globalThis.countAfkTeamKo = countAfkTeamKo;
-}
-if (typeof diffInventory !== 'undefined') {
-  if (typeof window !== 'undefined') window.diffInventory = diffInventory;
-  if (typeof globalThis !== 'undefined') globalThis.diffInventory = diffInventory;
-}
-if (typeof diffSessionItems !== 'undefined') {
-  if (typeof window !== 'undefined') window.diffSessionItems = diffSessionItems;
-  if (typeof globalThis !== 'undefined') globalThis.diffSessionItems = diffSessionItems;
-}
-if (typeof ensureAfkResultPanel !== 'undefined') {
-  if (typeof window !== 'undefined') window.ensureAfkResultPanel = ensureAfkResultPanel;
-  if (typeof globalThis !== 'undefined') globalThis.ensureAfkResultPanel = ensureAfkResultPanel;
-}
-if (typeof groupAfkCaptures !== 'undefined') {
-  if (typeof window !== 'undefined') window.groupAfkCaptures = groupAfkCaptures;
-  if (typeof globalThis !== 'undefined') globalThis.groupAfkCaptures = groupAfkCaptures;
-}
-if (typeof installOfflineHandlers !== 'undefined') {
-  if (typeof window !== 'undefined') window.installOfflineHandlers = installOfflineHandlers;
-  if (typeof globalThis !== 'undefined') globalThis.installOfflineHandlers = installOfflineHandlers;
-}
-if (typeof offlineCanWildBattle !== 'undefined') {
-  if (typeof window !== 'undefined') window.offlineCanWildBattle = offlineCanWildBattle;
-  if (typeof globalThis !== 'undefined') globalThis.offlineCanWildBattle = offlineCanWildBattle;
-}
-if (typeof offlineDaycareLevelSum !== 'undefined') {
-  if (typeof window !== 'undefined') window.offlineDaycareLevelSum = offlineDaycareLevelSum;
-  if (typeof globalThis !== 'undefined') globalThis.offlineDaycareLevelSum = offlineDaycareLevelSum;
-}
-if (typeof offlineIsBoundedBattle !== 'undefined') {
-  if (typeof window !== 'undefined') window.offlineIsBoundedBattle = offlineIsBoundedBattle;
-  if (typeof globalThis !== 'undefined') globalThis.offlineIsBoundedBattle = offlineIsBoundedBattle;
-}
-if (typeof offlineLockKey !== 'undefined') {
-  if (typeof window !== 'undefined') window.offlineLockKey = offlineLockKey;
-  if (typeof globalThis !== 'undefined') globalThis.offlineLockKey = offlineLockKey;
-}
-if (typeof offlineMuteUi !== 'undefined') {
-  if (typeof window !== 'undefined') window.offlineMuteUi = offlineMuteUi;
-  if (typeof globalThis !== 'undefined') globalThis.offlineMuteUi = offlineMuteUi;
-}
-if (typeof offlineReadSeen !== 'undefined') {
-  if (typeof window !== 'undefined') window.offlineReadSeen = offlineReadSeen;
-  if (typeof globalThis !== 'undefined') globalThis.offlineReadSeen = offlineReadSeen;
-}
-if (typeof offlineResumeBattle !== 'undefined') {
-  if (typeof window !== 'undefined') window.offlineResumeBattle = offlineResumeBattle;
-  if (typeof globalThis !== 'undefined') globalThis.offlineResumeBattle = offlineResumeBattle;
-}
-if (typeof offlineResumeChainAfterFastForward !== 'undefined') {
-  if (typeof window !== 'undefined')
-    window.offlineResumeChainAfterFastForward = offlineResumeChainAfterFastForward;
-  if (typeof globalThis !== 'undefined')
-    globalThis.offlineResumeChainAfterFastForward = offlineResumeChainAfterFastForward;
-}
-if (typeof offlineShowProgress !== 'undefined') {
-  if (typeof window !== 'undefined') window.offlineShowProgress = offlineShowProgress;
-  if (typeof globalThis !== 'undefined') globalThis.offlineShowProgress = offlineShowProgress;
-}
-if (typeof offlineStageProgress !== 'undefined') {
-  if (typeof window !== 'undefined') window.offlineStageProgress = offlineStageProgress;
-  if (typeof globalThis !== 'undefined') globalThis.offlineStageProgress = offlineStageProgress;
-}
-if (typeof offlineStartWildSession !== 'undefined') {
-  if (typeof window !== 'undefined') window.offlineStartWildSession = offlineStartWildSession;
-  if (typeof globalThis !== 'undefined')
-    globalThis.offlineStartWildSession = offlineStartWildSession;
-}
-if (typeof offlineStopWildBattleTimer !== 'undefined') {
-  if (typeof window !== 'undefined') window.offlineStopWildBattleTimer = offlineStopWildBattleTimer;
-  if (typeof globalThis !== 'undefined')
-    globalThis.offlineStopWildBattleTimer = offlineStopWildBattleTimer;
-}
-if (typeof offlineSuspendBattle !== 'undefined') {
-  if (typeof window !== 'undefined') window.offlineSuspendBattle = offlineSuspendBattle;
-  if (typeof globalThis !== 'undefined') globalThis.offlineSuspendBattle = offlineSuspendBattle;
-}
-if (typeof afkCaptureModels !== 'undefined') {
-  if (typeof window !== 'undefined') window.afkCaptureModels = afkCaptureModels;
-  if (typeof globalThis !== 'undefined') globalThis.afkCaptureModels = afkCaptureModels;
-}
-if (typeof afkItemModels !== 'undefined') {
-  if (typeof window !== 'undefined') window.afkItemModels = afkItemModels;
-  if (typeof globalThis !== 'undefined') globalThis.afkItemModels = afkItemModels;
-}
-if (typeof snapshotInventory !== 'undefined') {
-  if (typeof window !== 'undefined') window.snapshotInventory = snapshotInventory;
-  if (typeof globalThis !== 'undefined') globalThis.snapshotInventory = snapshotInventory;
-}
-if (typeof snapshotSessionItems !== 'undefined') {
-  if (typeof window !== 'undefined') window.snapshotSessionItems = snapshotSessionItems;
-  if (typeof globalThis !== 'undefined') globalThis.snapshotSessionItems = snapshotSessionItems;
-}
 
 // Wave 41 — native ESM module: exports the same names as the
 // classic surface kept above (bodies unchanged).

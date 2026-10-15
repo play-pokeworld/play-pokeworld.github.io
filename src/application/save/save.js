@@ -1185,6 +1185,14 @@ function loadGame(manual = false) {
     currentSaveId = loadedId;
     ensureSaveMeta(saveData, loadedId);
     assignGlobalState(saveData.G);
+    // V7-R2 — « vu pour la dernière fois » relevé AVANT normalizeLoadedState
+    // (ses migrations sauvegardent et ré-estampillent) : c'est lui qui mesure
+    // l'absence pour le rattrapage hors-ligne au relancement du jeu.
+    const prevSeen =
+      typeof globalThis.offlineReadSeen === 'function'
+        ? globalThis.offlineReadSeen()
+        : (saveData.G && saveData.G.afk && Number(saveData.G.afk.lastSeenAt)) || 0;
+    const prevWild = !!(saveData.G && saveData.G.wildSessionActive);
     normalizeLoadedState();
     const freshData = {
       version: SAVE_VERSION,
@@ -1194,6 +1202,8 @@ function loadGame(manual = false) {
     };
     writeSlot(currentSaveId, freshData, true);
     upsertSaveIndex(freshData);
+    if (typeof globalThis.offlineNoteBootSeen === 'function')
+      globalThis.offlineNoteBootSeen(prevSeen, prevWild);
     activateCurrentSave(manual);
     return true;
   } catch (e) {
@@ -1958,381 +1968,103 @@ function migrateSinglePokemon(p, moveData) {
   return changed;
 }
 
-if (typeof migratePokemonData !== 'undefined') {
-  if (typeof window !== 'undefined') window.migratePokemonData = migratePokemonData;
-  if (typeof globalThis !== 'undefined') globalThis.migratePokemonData = migratePokemonData;
-}
-if (typeof migrateSinglePokemon !== 'undefined') {
-  if (typeof window !== 'undefined') window.migrateSinglePokemon = migrateSinglePokemon;
-  if (typeof globalThis !== 'undefined') globalThis.migrateSinglePokemon = migrateSinglePokemon;
-}
-
-if (typeof repairMissingBoxPokemon !== 'undefined') {
-  if (typeof window !== 'undefined') window.repairMissingBoxPokemon = repairMissingBoxPokemon;
-  if (typeof globalThis !== 'undefined')
-    globalThis.repairMissingBoxPokemon = repairMissingBoxPokemon;
-}
-if (typeof loadGame !== 'undefined') {
-  if (typeof window !== 'undefined') window.loadGame = loadGame;
-  if (typeof globalThis !== 'undefined') globalThis.loadGame = loadGame;
-}
-if (typeof autoSave !== 'undefined') {
-  if (typeof window !== 'undefined') window.autoSave = autoSave;
-  if (typeof globalThis !== 'undefined') globalThis.autoSave = autoSave;
-}
-if (typeof exportSave !== 'undefined') {
-  if (typeof window !== 'undefined') window.exportSave = exportSave;
-  if (typeof globalThis !== 'undefined') globalThis.exportSave = exportSave;
-}
-if (typeof importSave !== 'undefined') {
-  if (typeof window !== 'undefined') window.importSave = importSave;
-  if (typeof globalThis !== 'undefined') globalThis.importSave = importSave;
-}
-if (typeof deleteSave !== 'undefined') {
-  if (typeof window !== 'undefined') window.deleteSave = deleteSave;
-  if (typeof globalThis !== 'undefined') globalThis.deleteSave = deleteSave;
-}
-if (typeof confirmDelete !== 'undefined') {
-  if (typeof window !== 'undefined') window.confirmDelete = confirmDelete;
-  if (typeof globalThis !== 'undefined') globalThis.confirmDelete = confirmDelete;
-}
-if (typeof cancelDelete !== 'undefined') {
-  if (typeof window !== 'undefined') window.cancelDelete = cancelDelete;
-  if (typeof globalThis !== 'undefined') globalThis.cancelDelete = cancelDelete;
-}
-if (typeof doDelete !== 'undefined') {
-  if (typeof window !== 'undefined') window.doDelete = doDelete;
-  if (typeof globalThis !== 'undefined') globalThis.doDelete = doDelete;
-}
-if (typeof resetGame !== 'undefined') {
-  if (typeof window !== 'undefined') window.resetGame = resetGame;
-  if (typeof globalThis !== 'undefined') globalThis.resetGame = resetGame;
-}
-if (typeof renderSaveMenu !== 'undefined') {
-  if (typeof window !== 'undefined') window.renderSaveMenu = renderSaveMenu;
-  window.setSaveMenuLang = setSaveMenuLang;
-  if (typeof globalThis !== 'undefined') globalThis.renderSaveMenu = renderSaveMenu;
-}
-if (typeof createNewSaveFromMenu !== 'undefined') {
-  if (typeof window !== 'undefined') window.createNewSaveFromMenu = createNewSaveFromMenu;
-  if (typeof globalThis !== 'undefined') globalThis.createNewSaveFromMenu = createNewSaveFromMenu;
-}
-if (typeof startSaveById !== 'undefined') {
-  if (typeof window !== 'undefined') window.startSaveById = startSaveById;
-  if (typeof globalThis !== 'undefined') globalThis.startSaveById = startSaveById;
-}
-if (typeof importMultiSave !== 'undefined') {
-  if (typeof window !== 'undefined') window.importMultiSave = importMultiSave;
-  if (typeof globalThis !== 'undefined') globalThis.importMultiSave = importMultiSave;
-}
-if (typeof exportActiveMultiSave !== 'undefined') {
-  if (typeof window !== 'undefined') window.exportActiveMultiSave = exportActiveMultiSave;
-  if (typeof globalThis !== 'undefined') globalThis.exportActiveMultiSave = exportActiveMultiSave;
-}
-if (typeof updateSaveProfileControls !== 'undefined') {
-  if (typeof window !== 'undefined') window.updateSaveProfileControls = updateSaveProfileControls;
-  if (typeof globalThis !== 'undefined')
-    globalThis.updateSaveProfileControls = updateSaveProfileControls;
-}
-if (typeof renderSaveProfilePreviewFromControls !== 'undefined') {
-  if (typeof window !== 'undefined')
-    window.renderSaveProfilePreviewFromControls = renderSaveProfilePreviewFromControls;
-  if (typeof globalThis !== 'undefined')
-    globalThis.renderSaveProfilePreviewFromControls = renderSaveProfilePreviewFromControls;
-}
-if (typeof applySaveProfileSettings !== 'undefined') {
-  if (typeof window !== 'undefined') window.applySaveProfileSettings = applySaveProfileSettings;
-  if (typeof globalThis !== 'undefined')
-    globalThis.applySaveProfileSettings = applySaveProfileSettings;
-}
-if (typeof scrollSaveList !== 'undefined') {
-  if (typeof window !== 'undefined') window.scrollSaveList = scrollSaveList;
-  if (typeof globalThis !== 'undefined') globalThis.scrollSaveList = scrollSaveList;
-}
-if (typeof openSaveCardContextMenu !== 'undefined') {
-  if (typeof window !== 'undefined') window.openSaveCardContextMenu = openSaveCardContextMenu;
-  if (typeof globalThis !== 'undefined')
-    globalThis.openSaveCardContextMenu = openSaveCardContextMenu;
-}
-if (typeof closeSaveCardContextMenu !== 'undefined') {
-  if (typeof window !== 'undefined') window.closeSaveCardContextMenu = closeSaveCardContextMenu;
-  if (typeof globalThis !== 'undefined')
-    globalThis.closeSaveCardContextMenu = closeSaveCardContextMenu;
-}
-if (typeof downloadSaveById !== 'undefined') {
-  if (typeof window !== 'undefined') window.downloadSaveById = downloadSaveById;
-  if (typeof globalThis !== 'undefined') globalThis.downloadSaveById = downloadSaveById;
-}
-if (typeof importOverwriteSaveById !== 'undefined') {
-  if (typeof window !== 'undefined') window.importOverwriteSaveById = importOverwriteSaveById;
-  if (typeof globalThis !== 'undefined')
-    globalThis.importOverwriteSaveById = importOverwriteSaveById;
-}
-if (typeof deleteSaveById !== 'undefined') {
-  if (typeof window !== 'undefined') window.deleteSaveById = deleteSaveById;
-  if (typeof globalThis !== 'undefined') globalThis.deleteSaveById = deleteSaveById;
-}
-if (typeof selectSaveProfileIcon !== 'undefined') {
-  if (typeof window !== 'undefined') window.selectSaveProfileIcon = selectSaveProfileIcon;
-  if (typeof globalThis !== 'undefined') globalThis.selectSaveProfileIcon = selectSaveProfileIcon;
-}
-if (typeof openSaveIconBoxSelector !== 'undefined') {
-  if (typeof window !== 'undefined') window.openSaveIconBoxSelector = openSaveIconBoxSelector;
-  if (typeof globalThis !== 'undefined')
-    globalThis.openSaveIconBoxSelector = openSaveIconBoxSelector;
-}
-if (typeof getCurrentSaveId !== 'undefined') {
-  if (typeof window !== 'undefined') window.getCurrentSaveId = getCurrentSaveId;
-  if (typeof globalThis !== 'undefined') globalThis.getCurrentSaveId = getCurrentSaveId;
-}
-if (typeof formatPlayTime !== 'undefined') {
-  if (typeof window !== 'undefined') window.formatPlayTime = formatPlayTime;
-  if (typeof globalThis !== 'undefined') globalThis.formatPlayTime = formatPlayTime;
-}
-if (typeof appTimer !== 'undefined') {
-  if (typeof window !== 'undefined') window.appTimer = appTimer;
-  if (typeof globalThis !== 'undefined') globalThis.appTimer = appTimer;
-}
-if (typeof saveNow !== 'undefined') {
-  if (typeof window !== 'undefined') window.saveNow = saveNow;
-  if (typeof globalThis !== 'undefined') globalThis.saveNow = saveNow;
-}
-if (typeof makeSaveId !== 'undefined') {
-  if (typeof window !== 'undefined') window.makeSaveId = makeSaveId;
-  if (typeof globalThis !== 'undefined') globalThis.makeSaveId = makeSaveId;
-}
-if (typeof hasStarterInState !== 'undefined') {
-  if (typeof window !== 'undefined') window.hasStarterInState = hasStarterInState;
-  if (typeof globalThis !== 'undefined') globalThis.hasStarterInState = hasStarterInState;
-}
-
 // --- Export all save functions to window ---
-if (typeof _deleteSaveByIdConfirmed !== 'undefined') {
-  if (typeof window !== 'undefined') window._deleteSaveByIdConfirmed = _deleteSaveByIdConfirmed;
-  if (typeof globalThis !== 'undefined')
-    globalThis._deleteSaveByIdConfirmed = _deleteSaveByIdConfirmed;
-}
-if (typeof activateCurrentSave !== 'undefined') {
-  if (typeof window !== 'undefined') window.activateCurrentSave = activateCurrentSave;
-  if (typeof globalThis !== 'undefined') globalThis.activateCurrentSave = activateCurrentSave;
-}
-if (typeof afkStorageKey !== 'undefined') {
-  if (typeof window !== 'undefined') window.afkStorageKey = afkStorageKey;
-  if (typeof globalThis !== 'undefined') globalThis.afkStorageKey = afkStorageKey;
-}
-if (typeof assignGlobalState !== 'undefined') {
-  if (typeof window !== 'undefined') window.assignGlobalState = assignGlobalState;
-  if (typeof globalThis !== 'undefined') globalThis.assignGlobalState = assignGlobalState;
-}
-if (typeof countAfkTeamKo !== 'undefined') {
-  if (typeof window !== 'undefined') window.countAfkTeamKo = countAfkTeamKo;
-  if (typeof globalThis !== 'undefined') globalThis.countAfkTeamKo = countAfkTeamKo;
-}
-if (typeof createFreshGameState !== 'undefined') {
-  if (typeof window !== 'undefined') window.createFreshGameState = createFreshGameState;
-  if (typeof globalThis !== 'undefined') globalThis.createFreshGameState = createFreshGameState;
-}
-if (typeof defaultSaveName !== 'undefined') {
-  if (typeof window !== 'undefined') window.defaultSaveName = defaultSaveName;
-  if (typeof globalThis !== 'undefined') globalThis.defaultSaveName = defaultSaveName;
-}
-if (typeof ensureDefaultSaveIcon !== 'undefined') {
-  if (typeof window !== 'undefined') window.ensureDefaultSaveIcon = ensureDefaultSaveIcon;
-  if (typeof globalThis !== 'undefined') globalThis.ensureDefaultSaveIcon = ensureDefaultSaveIcon;
-}
-if (typeof ensureSaveCardContextMenu !== 'undefined') {
-  if (typeof window !== 'undefined') window.ensureSaveCardContextMenu = ensureSaveCardContextMenu;
-  if (typeof globalThis !== 'undefined')
-    globalThis.ensureSaveCardContextMenu = ensureSaveCardContextMenu;
-}
-if (typeof ensureSaveMeta !== 'undefined') {
-  if (typeof window !== 'undefined') window.ensureSaveMeta = ensureSaveMeta;
-  if (typeof globalThis !== 'undefined') globalThis.ensureSaveMeta = ensureSaveMeta;
-}
-if (typeof escArg !== 'undefined') {
-  if (typeof window !== 'undefined') window.escArg = escArg;
-  if (typeof globalThis !== 'undefined') globalThis.escArg = escArg;
-}
-if (typeof escHtml !== 'undefined') {
-  if (typeof window !== 'undefined') window.escHtml = escHtml;
-  if (typeof globalThis !== 'undefined') globalThis.escHtml = escHtml;
-}
-if (typeof getBoxIconOptions !== 'undefined') {
-  if (typeof window !== 'undefined') window.getBoxIconOptions = getBoxIconOptions;
-  if (typeof globalThis !== 'undefined') globalThis.getBoxIconOptions = getBoxIconOptions;
-}
-if (typeof getPreviewStateFromControls !== 'undefined') {
-  if (typeof window !== 'undefined')
-    window.getPreviewStateFromControls = getPreviewStateFromControls;
-  if (typeof globalThis !== 'undefined')
-    globalThis.getPreviewStateFromControls = getPreviewStateFromControls;
-}
-if (typeof getSaveSummaries !== 'undefined') {
-  if (typeof window !== 'undefined') window.getSaveSummaries = getSaveSummaries;
-  if (typeof globalThis !== 'undefined') globalThis.getSaveSummaries = getSaveSummaries;
-}
-if (typeof getSelectedSaveProfileIcon !== 'undefined') {
-  if (typeof window !== 'undefined') window.getSelectedSaveProfileIcon = getSelectedSaveProfileIcon;
-  if (typeof globalThis !== 'undefined')
-    globalThis.getSelectedSaveProfileIcon = getSelectedSaveProfileIcon;
-}
-if (typeof hideSaveMenu !== 'undefined') {
-  if (typeof window !== 'undefined') window.hideSaveMenu = hideSaveMenu;
-  if (typeof globalThis !== 'undefined') globalThis.hideSaveMenu = hideSaveMenu;
-}
-if (typeof importedSaveName !== 'undefined') {
-  if (typeof window !== 'undefined') window.importedSaveName = importedSaveName;
-  if (typeof globalThis !== 'undefined') globalThis.importedSaveName = importedSaveName;
-}
-if (typeof inferSaveIconId !== 'undefined') {
-  if (typeof window !== 'undefined') window.inferSaveIconId = inferSaveIconId;
-  if (typeof globalThis !== 'undefined') globalThis.inferSaveIconId = inferSaveIconId;
-}
-if (typeof markAfkSeen !== 'undefined') {
-  if (typeof window !== 'undefined') window.markAfkSeen = markAfkSeen;
-  if (typeof globalThis !== 'undefined') globalThis.markAfkSeen = markAfkSeen;
-}
-if (typeof migrateLegacySingleSave !== 'undefined') {
-  if (typeof window !== 'undefined') window.migrateLegacySingleSave = migrateLegacySingleSave;
-  if (typeof globalThis !== 'undefined')
-    globalThis.migrateLegacySingleSave = migrateLegacySingleSave;
-}
-if (typeof normalizeBackground !== 'undefined') {
-  if (typeof window !== 'undefined') window.normalizeBackground = normalizeBackground;
-  if (typeof globalThis !== 'undefined') globalThis.normalizeBackground = normalizeBackground;
-}
-if (typeof normalizeImportedSave !== 'undefined') {
-  if (typeof window !== 'undefined') window.normalizeImportedSave = normalizeImportedSave;
-  if (typeof globalThis !== 'undefined') globalThis.normalizeImportedSave = normalizeImportedSave;
-}
-if (typeof normalizeLoadedState !== 'undefined') {
-  if (typeof window !== 'undefined') window.normalizeLoadedState = normalizeLoadedState;
-  if (typeof globalThis !== 'undefined') globalThis.normalizeLoadedState = normalizeLoadedState;
-}
-if (typeof overwriteSaveFromFile !== 'undefined') {
-  if (typeof window !== 'undefined') window.overwriteSaveFromFile = overwriteSaveFromFile;
-  if (typeof globalThis !== 'undefined') globalThis.overwriteSaveFromFile = overwriteSaveFromFile;
-}
-if (typeof readSaveIndex !== 'undefined') {
-  if (typeof window !== 'undefined') window.readSaveIndex = readSaveIndex;
-  if (typeof globalThis !== 'undefined') globalThis.readSaveIndex = readSaveIndex;
-}
-if (typeof readSlot !== 'undefined') {
-  if (typeof window !== 'undefined') window.readSlot = readSlot;
-  if (typeof globalThis !== 'undefined') globalThis.readSlot = readSlot;
-}
-if (typeof removeSaveFromIndex !== 'undefined') {
-  if (typeof window !== 'undefined') window.removeSaveFromIndex = removeSaveFromIndex;
-  if (typeof globalThis !== 'undefined') globalThis.removeSaveFromIndex = removeSaveFromIndex;
-}
-if (typeof renderSaveCardMarkup !== 'undefined') {
-  if (typeof window !== 'undefined') window.renderSaveCardMarkup = renderSaveCardMarkup;
-  if (typeof globalThis !== 'undefined') globalThis.renderSaveCardMarkup = renderSaveCardMarkup;
-}
-if (typeof renderSaveIcon !== 'undefined') {
-  if (typeof window !== 'undefined') window.renderSaveIcon = renderSaveIcon;
-  if (typeof globalThis !== 'undefined') globalThis.renderSaveIcon = renderSaveIcon;
-}
-if (typeof renderSaveIconGrid !== 'undefined') {
-  if (typeof window !== 'undefined') window.renderSaveIconGrid = renderSaveIconGrid;
-  if (typeof globalThis !== 'undefined') globalThis.renderSaveIconGrid = renderSaveIconGrid;
-}
-if (typeof renderSaveProfileCurrentIcon !== 'undefined') {
-  if (typeof window !== 'undefined')
-    window.renderSaveProfileCurrentIcon = renderSaveProfileCurrentIcon;
-  if (typeof globalThis !== 'undefined')
-    globalThis.renderSaveProfileCurrentIcon = renderSaveProfileCurrentIcon;
-}
-if (typeof resetRuntimeBattleState !== 'undefined') {
-  if (typeof window !== 'undefined') window.resetRuntimeBattleState = resetRuntimeBattleState;
-  if (typeof globalThis !== 'undefined')
-    globalThis.resetRuntimeBattleState = resetRuntimeBattleState;
-}
-if (typeof saveBackgroundLabel !== 'undefined') {
-  if (typeof window !== 'undefined') window.saveBackgroundLabel = saveBackgroundLabel;
-  if (typeof globalThis !== 'undefined') globalThis.saveBackgroundLabel = saveBackgroundLabel;
-}
-if (typeof saveDownloadFilename !== 'undefined') {
-  if (typeof window !== 'undefined') window.saveDownloadFilename = saveDownloadFilename;
-  if (typeof globalThis !== 'undefined') globalThis.saveDownloadFilename = saveDownloadFilename;
-}
-if (typeof saveIdExists !== 'undefined') {
-  if (typeof window !== 'undefined') window.saveIdExists = saveIdExists;
-  if (typeof globalThis !== 'undefined') globalThis.saveIdExists = saveIdExists;
-}
-if (typeof scheduleAfkCatchup !== 'undefined') {
-  if (typeof window !== 'undefined') window.scheduleAfkCatchup = scheduleAfkCatchup;
-  if (typeof globalThis !== 'undefined') globalThis.scheduleAfkCatchup = scheduleAfkCatchup;
-}
-if (typeof slotKey !== 'undefined') {
-  if (typeof window !== 'undefined') window.slotKey = slotKey;
-  if (typeof globalThis !== 'undefined') globalThis.slotKey = slotKey;
-}
-if (typeof storageGet !== 'undefined') {
-  if (typeof window !== 'undefined') window.storageGet = storageGet;
-  if (typeof globalThis !== 'undefined') globalThis.storageGet = storageGet;
-}
-if (typeof storageRemove !== 'undefined') {
-  if (typeof window !== 'undefined') window.storageRemove = storageRemove;
-  if (typeof globalThis !== 'undefined') globalThis.storageRemove = storageRemove;
-}
-if (typeof storageSet !== 'undefined') {
-  if (typeof window !== 'undefined') window.storageSet = storageSet;
-  if (typeof globalThis !== 'undefined') globalThis.storageSet = storageSet;
-}
-if (typeof stripMoveMetaFromPokemon !== 'undefined') {
-  if (typeof window !== 'undefined') window.stripMoveMetaFromPokemon = stripMoveMetaFromPokemon;
-  if (typeof globalThis !== 'undefined')
-    globalThis.stripMoveMetaFromPokemon = stripMoveMetaFromPokemon;
-}
-if (typeof stripMoveMetaFromState !== 'undefined') {
-  if (typeof window !== 'undefined') window.stripMoveMetaFromState = stripMoveMetaFromState;
-  if (typeof globalThis !== 'undefined') globalThis.stripMoveMetaFromState = stripMoveMetaFromState;
-}
-if (typeof summarizeSaveData !== 'undefined') {
-  if (typeof window !== 'undefined') window.summarizeSaveData = summarizeSaveData;
-  if (typeof globalThis !== 'undefined') globalThis.summarizeSaveData = summarizeSaveData;
-}
-if (typeof uniqueSaveId !== 'undefined') {
-  if (typeof window !== 'undefined') window.uniqueSaveId = uniqueSaveId;
-  if (typeof globalThis !== 'undefined') globalThis.uniqueSaveId = uniqueSaveId;
-}
-if (typeof updatePlayTimeBeforeSave !== 'undefined') {
-  if (typeof window !== 'undefined') window.updatePlayTimeBeforeSave = updatePlayTimeBeforeSave;
-  if (typeof globalThis !== 'undefined')
-    globalThis.updatePlayTimeBeforeSave = updatePlayTimeBeforeSave;
-}
-if (typeof updateSaveMenuScrollButtons !== 'undefined') {
-  if (typeof window !== 'undefined')
-    window.updateSaveMenuScrollButtons = updateSaveMenuScrollButtons;
-  if (typeof globalThis !== 'undefined')
-    globalThis.updateSaveMenuScrollButtons = updateSaveMenuScrollButtons;
-}
-if (typeof upsertSaveIndex !== 'undefined') {
-  if (typeof window !== 'undefined') window.upsertSaveIndex = upsertSaveIndex;
-  if (typeof globalThis !== 'undefined') globalThis.upsertSaveIndex = upsertSaveIndex;
-}
-if (typeof writeSaveIndex !== 'undefined') {
-  if (typeof window !== 'undefined') window.writeSaveIndex = writeSaveIndex;
-  if (typeof globalThis !== 'undefined') globalThis.writeSaveIndex = writeSaveIndex;
-}
-if (typeof writeSlot !== 'undefined') {
-  if (typeof window !== 'undefined') window.writeSlot = writeSlot;
-  if (typeof globalThis !== 'undefined') globalThis.writeSlot = writeSlot;
-}
-if (typeof setSaveVersion !== 'undefined') {
-  if (typeof window !== 'undefined') window.setSaveVersion = setSaveVersion;
-  if (typeof globalThis !== 'undefined') globalThis.setSaveVersion = setSaveVersion;
-}
-if (typeof applyOfficialPokemonDataToSave !== 'undefined') {
-  if (typeof window !== 'undefined')
-    window.applyOfficialPokemonDataToSave = applyOfficialPokemonDataToSave;
-  if (typeof globalThis !== 'undefined')
-    globalThis.applyOfficialPokemonDataToSave = applyOfficialPokemonDataToSave;
-}
+// V7-R2 — surface classique compactée (même liste, un seul Object.assign).
+const _saveGlobals = {
+  migratePokemonData,
+  migrateSinglePokemon,
+  repairMissingBoxPokemon,
+  loadGame,
+  autoSave,
+  exportSave,
+  importSave,
+  deleteSave,
+  confirmDelete,
+  cancelDelete,
+  doDelete,
+  resetGame,
+  renderSaveMenu,
+  setSaveMenuLang,
+  createNewSaveFromMenu,
+  startSaveById,
+  importMultiSave,
+  exportActiveMultiSave,
+  updateSaveProfileControls,
+  renderSaveProfilePreviewFromControls,
+  applySaveProfileSettings,
+  scrollSaveList,
+  openSaveCardContextMenu,
+  closeSaveCardContextMenu,
+  downloadSaveById,
+  importOverwriteSaveById,
+  deleteSaveById,
+  selectSaveProfileIcon,
+  openSaveIconBoxSelector,
+  getCurrentSaveId,
+  formatPlayTime,
+  appTimer,
+  saveNow,
+  makeSaveId,
+  hasStarterInState,
+  _deleteSaveByIdConfirmed,
+  activateCurrentSave,
+  afkStorageKey,
+  assignGlobalState,
+  countAfkTeamKo,
+  createFreshGameState,
+  defaultSaveName,
+  ensureDefaultSaveIcon,
+  ensureSaveCardContextMenu,
+  ensureSaveMeta,
+  escArg,
+  escHtml,
+  getBoxIconOptions,
+  getPreviewStateFromControls,
+  getSaveSummaries,
+  getSelectedSaveProfileIcon,
+  hideSaveMenu,
+  importedSaveName,
+  inferSaveIconId,
+  markAfkSeen,
+  migrateLegacySingleSave,
+  normalizeBackground,
+  normalizeImportedSave,
+  normalizeLoadedState,
+  overwriteSaveFromFile,
+  readSaveIndex,
+  readSlot,
+  removeSaveFromIndex,
+  renderSaveCardMarkup,
+  renderSaveIcon,
+  renderSaveIconGrid,
+  renderSaveProfileCurrentIcon,
+  resetRuntimeBattleState,
+  saveBackgroundLabel,
+  saveDownloadFilename,
+  saveIdExists,
+  scheduleAfkCatchup,
+  slotKey,
+  storageGet,
+  storageRemove,
+  storageSet,
+  stripMoveMetaFromPokemon,
+  stripMoveMetaFromState,
+  summarizeSaveData,
+  uniqueSaveId,
+  updatePlayTimeBeforeSave,
+  updateSaveMenuScrollButtons,
+  upsertSaveIndex,
+  writeSaveIndex,
+  writeSlot,
+  setSaveVersion,
+  applyOfficialPokemonDataToSave,
+};
+if (typeof window !== 'undefined') Object.assign(window, _saveGlobals);
+if (typeof globalThis !== 'undefined') Object.assign(globalThis, _saveGlobals);
 
 // Wave 41 — native ESM module: exports the same names as the
 // classic surface kept above (bodies unchanged).
+
 export {
   debugGiveCtCs,
   isCompatibleSaveData,

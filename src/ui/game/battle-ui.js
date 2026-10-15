@@ -253,7 +253,12 @@ function renderMoveButtons() {
   p.moves.forEach(function (m, i) {
     const mv = typeof MOVES !== 'undefined' ? MOVES[m.id] : null;
     if (!mv) return;
-    const eff = b.enemyPoke ? typeEffFn(mv.type, b.enemyPoke.type1, b.enemyPoke.type2) : 1;
+    // V7-R3 · R3-08 — types × talent du défenseur (Lévitation → ×0).
+    const eff = b.enemyPoke
+      ? globalThis.battleDisplayedEff
+        ? battleDisplayedEff(mv.type, b.enemyPoke)
+        : typeEffFn(mv.type, b.enemyPoke.type1, b.enemyPoke.type2)
+      : 1;
     const effHint =
       eff === 0
         ? ' ' + (typeof t === 'function' ? t('eff_immune') : '×0')

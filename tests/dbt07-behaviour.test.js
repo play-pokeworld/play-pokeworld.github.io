@@ -20,7 +20,7 @@ const GAME_FILES = [
   'src/data/npc-data.js', 'src/data/repeatable-quests-data.js', 'src/data/trainer-sprites-data.js',
   'src/application/economy/currency.js', 'src/application/economy/pokeballs.js', 'src/application/world/collection.js',
   'src/application/world/exploration-actions.js', 'src/application/world/puzzle-explorations.js', 'src/application/quests/quest-core.js',
-  'src/application/combat/battle-init.js', 'src/application/combat/battle-attack.js', 'src/application/combat/stat-mods.js',
+  'src/application/combat/battle-init.js', 'src/application/combat/talent-immunity.js', 'src/application/combat/battle-attack.js', 'src/application/combat/stat-mods.js',
   'src/application/combat/battle-status.js', 'src/application/combat/battle-flow.js', 'src/application/combat/battle-encounter.js',
   'src/application/combat/catch.js', 'src/application/combat/progression.js',
   // Boucle ECS + système de rencontres : UN seul bundle pour partager le même monde ECS (import commun battle-loop.js).
