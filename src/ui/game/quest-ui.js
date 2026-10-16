@@ -318,7 +318,7 @@ function openNpc(locId, idx) {
   const arr = typeof NPCS !== 'undefined' ? NPCS[locId] : null;
   if (!arr || !arr[idx]) return;
   const npc = arr[idx];
-  const talkedMain = talkNpcMainQuest(npc, locId);
+  const talkedMain = talkNpcMainQuest(npc);
   // V7 · LEG-01 — les quêtes annexes « parler à … » se valident ici.
   const talkedSide = typeof talkNpcSideQuests === 'function' ? talkNpcSideQuests(locId) : false;
   const npcText = getNpc(locId, idx);

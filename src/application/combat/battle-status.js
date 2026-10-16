@@ -408,6 +408,7 @@ async function onEnemyFaint() {
       const _defShiny = !!(e && (e.shiny || e.shinyActive || e._forceShiny));
       if (pwLateLink('recordDexDefeat') && e) recordDexDefeat(e.id, _defShiny);
       if (pwLateLink('recordLocStat') && questLoc) recordLocStat(questLoc, 'beaten', 1);
+      if (globalThis.checkAchievements) globalThis.checkAchievements(G, { notify: true });
     } catch (_) {}
     if (G.mine && typeof G.mine.energy === 'number') {
       const maxE = G.mine.maxEnergy || 100;
@@ -475,7 +476,13 @@ async function onEnemyFaint() {
         }
       }
   } catch (_) {}
-  const _dropChance = Math.min(6, 1 + _dropBonus + _talentDropBonus + _incenseBonus); // base 1 % ; max 6 %
+  const _achDropBonus = globalThis.getAchievementBonus
+    ? Number(globalThis.getAchievementBonus('loot', 'global')) || 0
+    : 0;
+  const _dropChance = Math.min(
+    10,
+    1 + _dropBonus + _achDropBonus + _talentDropBonus + _incenseBonus
+  ); // base 1 % ; max 10 % avec bonus
   if (drops && drops.length && chance(_dropChance)) {
     const drop = drops[rand(0, drops.length - 1)];
     const reward = pwLateLink('grantRewardItem')

@@ -541,7 +541,7 @@ test('R3-05 · guideKeyValues() cite les VRAIES constantes ; chaque rubrique con
     const sections = guideSections();
     assert.ok(sections.map, 'map section exists');
     assert.ok(sections.combat, 'combat section exists');
-    assert.ok(sections.capture, 'capture section exists');
+    assert.ok(!sections.capture, 'capture section removed per player feedback (merged into combat)');
     assert.ok(sections.automation, 'automation section exists');
     assert.ok(!sections.sound, 'sound section removed per player feedback');
     assert.ok(hasKey(FR, 'guide_map_simple_desc') && hasKey(EN, 'guide_map_simple_desc'));

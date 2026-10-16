@@ -23,7 +23,7 @@ test('Point 1 & 2 · In-game guide: sound removed, condensed short spoiler-free 
   assert.ok(!keys.includes('sound_music'), 'sound_music section must be completely removed');
   assert.ok(keys.includes('map'), 'map section exists');
   assert.ok(keys.includes('combat'), 'combat section exists');
-  assert.ok(keys.includes('capture'), 'capture section exists');
+  assert.ok(!keys.includes('capture'), 'capture section removed (merged into combat)');
   assert.ok(keys.includes('dungeon'), 'dungeon section exists');
   assert.ok(keys.includes('mine'), 'mine section exists');
   assert.ok(keys.includes('hatchery'), 'hatchery section exists');

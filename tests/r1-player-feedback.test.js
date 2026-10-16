@@ -285,13 +285,15 @@ test('R1-07 · captureGuideValues() cite les VRAIS taux (BALL_DEFS, BALL_SCALE, 
       else delete globalThis.G;
     }
     const keys = Object.keys(sections);
+    assert.ok(!sections.capture, 'rubrique capture autonome supprimée (fusionnée dans combat)');
     assert.ok(
-      keys.indexOf('capture') >= 0 && keys.indexOf('capture') < keys.indexOf('pokemon'),
-      'rubrique Capture avant Pokémon'
+      sections.combat.pages.some(
+        (p) =>
+          (p[0] && p[0].toLowerCase().includes('capture')) ||
+          (p[1] && p[1].toLowerCase().includes('capture'))
+      ),
+      'capture intégrée dans Combat'
     );
-    assert.equal(sections.capture.icon, '<i data-icon="pokeball"></i>');
-    assert.equal(sections.capture.title, 'guide_capture_title');
-    assert.ok(sections.capture.pages.length >= 1, 'rubrique capture présente');
     // capture values checked via captureGuideValues()
     // iv values checked via captureGuideValues()
   } finally {
@@ -350,7 +352,7 @@ test('R1-07 · textes du guide Capture présents FR + EN, paramétrés (aucun % 
     const iv = src.match(/"guide_capture_iv_desc":"([^"]*)"/)[1];
     assert.ok(iv.includes('{pct}') && iv.includes('{cap}'), 'iv_desc porte {pct} et {cap}');
   }
-  assert.match(R('src/ui/game/dashboard.js'), /'win-pokeballs': 'capture'/);
+  assert.match(R('src/ui/game/dashboard.js'), /'win-pokeballs': '(?:capture|combat)'/);
 });
 
 // ── #8 — mode debug masqué, déverrouillage par code / console ───────────────

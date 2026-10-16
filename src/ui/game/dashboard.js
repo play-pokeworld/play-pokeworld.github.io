@@ -204,7 +204,7 @@ function renderDashboardChrome() {
     tools.forEach((node) => toolsWrap.appendChild(node));
     head.appendChild(toolsWrap);
     const WIN_GUIDE_SECTION = {
-      'win-achievements': 'achievements',
+      'win-achievements': false,
       'win-story': 'quests',
       'win-team': 'pokemon',
       'win-hatchery': 'hatchery',
@@ -212,7 +212,7 @@ function renderDashboardChrome() {
       'win-battle': 'combat',
       'win-base': 'base',
       'win-currency': 'economy',
-      'win-pokeballs': 'capture', // V7-R1 #7 — rubrique « Capture & IV »
+      'win-pokeballs': 'combat',
       'win-training': 'training',
       'win-tabs': 'map',
       'win-shortcuts': false,

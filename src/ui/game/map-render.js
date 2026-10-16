@@ -260,6 +260,7 @@ function renderMap() {
   }
   _pwSetHtmlSafe(nodeG, rectsHTML + labelsHTML + markersHTML);
   ensureMapHelpButton();
+  ensureMapZoomControls();
   initMobileMapPinchZoom();
   // V7-R1c — retour joueur : « garder le zoom même après un clic, sur
   // téléphone c'est embêtant de devoir re-zoomer au bon endroit à chaque
@@ -399,6 +400,129 @@ function initMobileMapPinchZoom() {
 
   panel.addEventListener('pointerup', onPointerUp);
   panel.addEventListener('pointercancel', onPointerUp);
+
+  panel.addEventListener(
+    'wheel',
+    (e) => {
+      e.preventDefault();
+      const rect = svg.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const factor = e.deltaY < 0 ? 1.2 : 1 / 1.2;
+      const oldZoom = __pwMapZoom;
+      const newZoom = Math.max(1.0, Math.min(3.0, oldZoom * factor));
+      if (newZoom === oldZoom) return;
+
+      const curW = 1600 / oldZoom;
+      const curH = 960 / oldZoom;
+      const scaleX = curW / rect.width;
+      const scaleY = curH / rect.height;
+
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+      const svgX = __pwMapVbX + mouseX * scaleX;
+      const svgY = __pwMapVbY + mouseY * scaleY;
+
+      __pwMapZoom = newZoom;
+      if (__pwMapZoom === 1.0) {
+        __pwMapVbX = 0;
+        __pwMapVbY = 0;
+      } else {
+        const newW = 1600 / __pwMapZoom;
+        const newH = 960 / __pwMapZoom;
+        const newScaleX = newW / rect.width;
+        const newScaleY = newH / rect.height;
+        __pwMapVbX = svgX - mouseX * newScaleX;
+        __pwMapVbY = svgY - mouseY * newScaleY;
+      }
+      applyMapViewBox();
+    },
+    { passive: false }
+  );
+}
+
+function ensureMapZoomControls() {
+  const panel = document.getElementById('map-panel');
+  if (!panel || document.getElementById('pw-map-zoom-controls')) return;
+
+  const bar = document.createElement('div');
+  bar.id = 'pw-map-zoom-controls';
+  bar.className = 'pw-map-zoom-controls';
+  _pwSetHtmlSafe(
+    bar,
+    `<button type="button" class="hbtn pw-map-zoom-btn" id="pw-map-zoom-in" title="Zoom +" aria-label="Zoom +">+</button>` +
+      `<button type="button" class="hbtn pw-map-zoom-btn" id="pw-map-zoom-out" title="Zoom -" aria-label="Zoom -">−</button>` +
+      `<button type="button" class="hbtn pw-map-zoom-btn" id="pw-map-zoom-reset" title="Réinitialiser" aria-label="Reset zoom">⟲</button>`
+  );
+
+  const btnIn = bar.querySelector('#pw-map-zoom-in');
+  const btnOut = bar.querySelector('#pw-map-zoom-out');
+  const btnReset = bar.querySelector('#pw-map-zoom-reset');
+
+  if (btnIn) {
+    btnIn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      mapZoomIn();
+    });
+  }
+  if (btnOut) {
+    btnOut.addEventListener('click', (e) => {
+      e.stopPropagation();
+      mapZoomOut();
+    });
+  }
+  if (btnReset) {
+    btnReset.addEventListener('click', (e) => {
+      e.stopPropagation();
+      mapZoomReset();
+    });
+  }
+
+  panel.appendChild(bar);
+}
+
+function mapZoomIn() {
+  const oldZoom = __pwMapZoom;
+  const newZoom = Math.min(3.0, oldZoom * 1.25);
+  if (newZoom === oldZoom) return;
+  const curW = 1600 / oldZoom;
+  const curH = 960 / oldZoom;
+  const centerSvgX = __pwMapVbX + curW / 2;
+  const centerSvgY = __pwMapVbY + curH / 2;
+  __pwMapZoom = newZoom;
+  const newW = 1600 / __pwMapZoom;
+  const newH = 960 / __pwMapZoom;
+  __pwMapVbX = centerSvgX - newW / 2;
+  __pwMapVbY = centerSvgY - newH / 2;
+  applyMapViewBox();
+}
+
+function mapZoomOut() {
+  const oldZoom = __pwMapZoom;
+  const newZoom = Math.max(1.0, oldZoom / 1.25);
+  if (newZoom === oldZoom) return;
+  if (newZoom <= 1.0) {
+    __pwMapZoom = 1.0;
+    __pwMapVbX = 0;
+    __pwMapVbY = 0;
+  } else {
+    const curW = 1600 / oldZoom;
+    const curH = 960 / oldZoom;
+    const centerSvgX = __pwMapVbX + curW / 2;
+    const centerSvgY = __pwMapVbY + curH / 2;
+    __pwMapZoom = newZoom;
+    const newW = 1600 / __pwMapZoom;
+    const newH = 960 / __pwMapZoom;
+    __pwMapVbX = centerSvgX - newW / 2;
+    __pwMapVbY = centerSvgY - newH / 2;
+  }
+  applyMapViewBox();
+}
+
+function mapZoomReset() {
+  __pwMapZoom = 1.0;
+  __pwMapVbX = 0;
+  __pwMapVbY = 0;
+  applyMapViewBox();
 }
 
 function clickLocation(id) {
@@ -563,6 +687,18 @@ if (typeof initMobileMapPinchZoom !== 'undefined') {
   if (typeof window !== 'undefined') window.initMobileMapPinchZoom = initMobileMapPinchZoom;
   if (typeof globalThis !== 'undefined') globalThis.initMobileMapPinchZoom = initMobileMapPinchZoom;
 }
+if (typeof mapZoomIn !== 'undefined') {
+  if (typeof window !== 'undefined') window.mapZoomIn = mapZoomIn;
+  if (typeof globalThis !== 'undefined') globalThis.mapZoomIn = mapZoomIn;
+}
+if (typeof mapZoomOut !== 'undefined') {
+  if (typeof window !== 'undefined') window.mapZoomOut = mapZoomOut;
+  if (typeof globalThis !== 'undefined') globalThis.mapZoomOut = mapZoomOut;
+}
+if (typeof mapZoomReset !== 'undefined') {
+  if (typeof window !== 'undefined') window.mapZoomReset = mapZoomReset;
+  if (typeof globalThis !== 'undefined') globalThis.mapZoomReset = mapZoomReset;
+}
 
 // Wave 41 — native ESM module: exports the same names as the
 // classic surface kept above (bodies unchanged).
@@ -572,6 +708,10 @@ export {
   clickLocation,
   refreshMapAndLoc,
   initMobileMapPinchZoom,
+  ensureMapZoomControls,
+  mapZoomIn,
+  mapZoomOut,
+  mapZoomReset,
   buildMapMarkers,
   locWildCount,
   playerMapSpriteUrl,

@@ -237,6 +237,7 @@ function attemptAutoCatch(e) {
   try {
     if (pwLateLink('recordDexCapture')) recordDexCapture(sKey, wasShiny);
     if (pwLateLink('recordLocStat') && G.location) recordLocStat(G.location, 'captured', 1);
+    if (globalThis.checkAchievements) globalThis.checkAchievements(G, { notify: true });
   } catch (_) {}
 
   if (wasShiny) unlockShinyForSpecies(sKey);

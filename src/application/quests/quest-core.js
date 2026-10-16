@@ -1,5 +1,16 @@
 import { pwLateLink } from '../../core/late-link.js';
-// Native ESM module. Teams: OFFICIAL_TEAMS. Lazy cross-module links via pwLateLink.
+// Wave 41 — native ESM module. The classic surface (window/globalThis) is
+// kept: classic consumers, VM harnesses and the engine registry.
+// Phase 18 — official teams as the single source of truth:
+// Single source of truth: OFFICIAL_TEAMS (src/data/official-teams-data.js).
+// Before this phase, TRAINER_BATTLES lived here with legacy compact move
+// ids ('shadowball', 'quickattack', 'rockthrow'…) ABSENT from MOVES →
+// silently filtered → empty movesets, then randomly regenerated. Teams
+// are now legitimate (natural pool ∪ TM/HM), validated by tests, and the
+// rival's team DEPENDS on the player's starter.
+// Wave 43 — lazy cross-module links (P7 regression fix): zero static imports (chunks +
+// VM harness isolates frozen); each alias resolves AT CALL TIME — engine registry first,
+// then the global surface. V7 · DBT-05 — résolveur unique (core/late-link.js).
 function applySecretBaseMoneyBonus(...args) {
   const f = pwLateLink('applySecretBaseMoneyBonus');
   return f ? f(...args) : undefined;
@@ -709,27 +720,10 @@ function questProgressValue(inst, def) {
 function questDone(inst, def) {
   if (!def) return false;
   if (def.type === 'badge') {
-    if (pwLateLink('isLeagueChampionId') && isLeagueChampionId(def.targetBadge)) {
-      const reg = pwLateLink('getLeagueRegionForChampion')
-        ? getLeagueRegionForChampion(def.targetBadge)
-        : null;
-      if (reg && pwLateLink('isRegionLeagueWon') && isRegionLeagueWon(reg)) return true;
-    }
-    if (def.targetBadge === 'elite4')
-      return !!(
-        G.championTitle ||
-        (G.badges || []).includes('elite4') ||
-        (G.defeatedChamps || {})['elite4']
-      );
-    if (def.targetBadge === 'johto_elite4') {
-      if (pwLateLink('isRegionLeagueWon') && isRegionLeagueWon('johto')) return true;
-      if (G.regionLeagueWon && G.regionLeagueWon.johto) return true;
-      if (G.defeatedChamps && G.defeatedChamps.johto_elite4) return true;
-      if (G.badges && G.badges.includes('johto_elite4')) return true;
-    }
-    return (
-      (G.badges || []).includes(def.targetBadge) || !!(G.defeatedChamps || {})[def.targetBadge]
-    );
+    if (pwLateLink('isLeagueChampionId') && isLeagueChampionId(def.targetBadge))
+      return isRegionLeagueWon(getLeagueRegionForChampion(def.targetBadge));
+    if (def.targetBadge === 'elite4') return !!(G.championTitle || G.badges.includes('elite4'));
+    return G.badges.includes(def.targetBadge);
   }
   if (def.type === 'badge_or_loc') {
     if (def.targetBadge && G.badges.includes(def.targetBadge)) return true;

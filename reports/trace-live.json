@@ -5,175 +5,175 @@
     "kinds": {
       "offline": {
         "n": 1,
-        "firstAt": 711.5,
-        "lastAt": 711.5
-      },
-      "state": {
-        "n": 3,
-        "firstAt": 817.9,
-        "lastAt": 1572.1
-      },
-      "render": {
-        "n": 8,
-        "firstAt": 823.8,
-        "lastAt": 1573.8,
-        "gapMs": {
-          "min": 17.2,
-          "avg": 107.14,
-          "max": 411.3,
-          "samples": 7
-        }
+        "firstAt": 974.2,
+        "lastAt": 974.2
       },
       "boot": {
         "n": 3,
-        "firstAt": 894,
-        "lastAt": 1024
+        "firstAt": 1017.2,
+        "lastAt": 1321.8
+      },
+      "render": {
+        "n": 9,
+        "firstAt": 1090,
+        "lastAt": 1819.4,
+        "gapMs": {
+          "min": 10.1,
+          "avg": 91.18,
+          "max": 411.9,
+          "samples": 8
+        }
+      },
+      "state": {
+        "n": 3,
+        "firstAt": 1200.6,
+        "lastAt": 1817.6
       },
       "action": {
         "n": 5,
-        "firstAt": 1107.5,
-        "lastAt": 1573.6
+        "firstAt": 1377.7,
+        "lastAt": 1819.2
       }
     },
     "names": {
       "offline|catchup": {
         "n": 1,
-        "firstAt": 711.5,
-        "lastAt": 711.5
-      },
-      "state|save:write": {
-        "n": 3,
-        "firstAt": 817.9,
-        "lastAt": 1572.1
-      },
-      "render|ui:team-window": {
-        "n": 4,
-        "firstAt": 823.8,
-        "lastAt": 1135.9
-      },
-      "render|ui:loc-info": {
-        "n": 3,
-        "firstAt": 843.2,
-        "lastAt": 1162.5
+        "firstAt": 974.2,
+        "lastAt": 974.2
       },
       "boot|stream:start": {
         "n": 1,
-        "firstAt": 894,
-        "lastAt": 894
+        "firstAt": 1017.2,
+        "lastAt": 1017.2
+      },
+      "render|ui:team-window": {
+        "n": 5,
+        "firstAt": 1090,
+        "lastAt": 1397.4
+      },
+      "render|ui:loc-info": {
+        "n": 3,
+        "firstAt": 1180.5,
+        "lastAt": 1407.5
+      },
+      "state|save:write": {
+        "n": 3,
+        "firstAt": 1200.6,
+        "lastAt": 1817.6
       },
       "boot|screens:ready": {
         "n": 1,
-        "firstAt": 1021.5,
-        "lastAt": 1021.5
+        "firstAt": 1320.7,
+        "lastAt": 1320.7
       },
       "boot|stream:done": {
         "n": 1,
-        "firstAt": 1024,
-        "lastAt": 1024
+        "firstAt": 1321.8,
+        "lastAt": 1321.8
       },
       "action|showTab": {
         "n": 3,
-        "firstAt": 1107.5,
-        "lastAt": 1135.8
+        "firstAt": 1377.7,
+        "lastAt": 1397.4
       },
       "action|saveGame": {
         "n": 1,
-        "firstAt": 1572.1,
-        "lastAt": 1572.1
+        "firstAt": 1817.5,
+        "lastAt": 1817.5
       },
       "action|baseWindowRender": {
         "n": 1,
-        "firstAt": 1573.6,
-        "lastAt": 1573.6
+        "firstAt": 1819.2,
+        "lastAt": 1819.2
       },
       "render|ui:base-window": {
         "n": 1,
-        "firstAt": 1573.8,
-        "lastAt": 1573.8
+        "firstAt": 1819.4,
+        "lastAt": 1819.4
       }
     },
-    "total": 20,
+    "total": 21,
     "ringFill": 12,
-    "t0": 468.2
+    "t0": 569.6
   },
   "tail": [
     {
       "seq": 1,
-      "t": 711.5,
+      "t": 974.2,
       "kind": "offline",
       "name": "catchup",
       "via": "load"
     },
     {
       "seq": 2,
-      "t": 817.9,
+      "t": 1017.2,
+      "kind": "boot",
+      "name": "stream:start"
+    },
+    {
+      "seq": 5,
+      "t": 1200.6,
       "kind": "state",
       "name": "save:write",
       "via": "auto"
     },
     {
-      "seq": 6,
-      "t": 894,
-      "kind": "boot",
-      "name": "stream:start"
-    },
-    {
       "seq": 8,
-      "t": 1021.5,
+      "t": 1320.7,
       "kind": "boot",
       "name": "screens:ready"
     },
     {
       "seq": 9,
-      "t": 1024,
+      "t": 1321.8,
       "kind": "boot",
       "name": "stream:done"
     },
     {
-      "seq": 10,
-      "t": 1107.5,
-      "kind": "action",
-      "name": "showTab",
-      "via": "registry"
-    },
-    {
-      "seq": 12,
-      "t": 1110.4,
+      "seq": 11,
+      "t": 1377.7,
       "kind": "action",
       "name": "showTab",
       "via": "registry"
     },
     {
       "seq": 13,
-      "t": 1111.2,
-      "kind": "state",
-      "name": "save:write",
-      "via": "auto"
-    },
-    {
-      "seq": 14,
-      "t": 1135.8,
+      "t": 1381.6,
       "kind": "action",
       "name": "showTab",
       "via": "registry"
     },
     {
-      "seq": 17,
-      "t": 1572.1,
+      "seq": 14,
+      "t": 1383.3,
+      "kind": "state",
+      "name": "save:write",
+      "via": "auto"
+    },
+    {
+      "seq": 15,
+      "t": 1397.4,
+      "kind": "action",
+      "name": "showTab",
+      "via": "registry"
+    },
+    {
+      "seq": 18,
+      "t": 1817.5,
       "kind": "action",
       "name": "saveGame",
       "via": "registry"
     },
     {
-      "seq": 18,
-      "t": 1572.1,
+      "seq": 19,
+      "t": 1817.6,
       "kind": "state",
       "name": "save:write",
       "via": "manual"
     },
     {
-      "seq": 19,
-      "t": 1573.6,
+      "seq": 20,
+      "t": 1819.2,
       "kind": "action",
       "name": "baseWindowRender",
       "via": "registry"

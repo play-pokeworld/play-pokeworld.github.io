@@ -78,7 +78,7 @@ export function guidePageCardVNode(p) {
     'article',
     { class: 'pw-guide-page' },
     h('h3', { class: 'pw-guide-page-title' }, p.title || ''),
-    h('p', { class: 'pw-guide-page-text' }, p.text || '')
+    h('div', { class: 'pw-guide-page-text' }, h.raw(p.text || ''))
   );
 }
 

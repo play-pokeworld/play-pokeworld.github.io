@@ -479,7 +479,10 @@ test('R3c-11 · guide : rubriques « Stats, IV & EV », « Poké Balls & filtres
   assert.ok(!ids.includes('sound'), 'sound section is removed per player feedback');
   assert.ok(ids.includes('stats'), 'stats section is restored per player feedback');
   assert.ok(ids.includes('combat'), 'combat section is present');
-  assert.ok(ids.includes('capture'), 'capture section is present');
+  assert.ok(
+    !ids.includes('capture'),
+    'capture section is removed per player feedback (merged into combat)'
+  );
 
   const iv = statsGuideValues();
   assert.equal(iv.ivCap, '12');

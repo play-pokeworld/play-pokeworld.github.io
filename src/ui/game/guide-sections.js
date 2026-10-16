@@ -77,6 +77,158 @@ function captureGuideValues() {
   };
 }
 
+function renderTypeChartGuideHtml() {
+  const types = [
+    'Normal',
+    'Fire',
+    'Water',
+    'Electric',
+    'Grass',
+    'Ice',
+    'Fighting',
+    'Poison',
+    'Ground',
+    'Flying',
+    'Psychic',
+    'Bug',
+    'Rock',
+    'Ghost',
+    'Dragon',
+    'Dark',
+    'Steel',
+    'Fairy',
+  ];
+  const colors = {
+    normal: '#A0A29F',
+    fire: '#FBA64C',
+    water: '#539DDF',
+    electric: '#F2D94E',
+    grass: '#60BE58',
+    ice: '#76D1C1',
+    fighting: '#D3425F',
+    poison: '#B763CF',
+    ground: '#DA7C4D',
+    flying: '#A1BBEC',
+    psychic: '#FA8582',
+    bug: '#92BD2D',
+    rock: '#C9BC8A',
+    ghost: '#5F6DBC',
+    dragon: '#0C6AC8',
+    dark: '#595761',
+    steel: '#5795A3',
+    fairy: '#EF90E6',
+  };
+  const darkTextTypes = new Set(['electric', 'ice', 'normal', 'flying', 'bug', 'rock']);
+
+  const getShort = (t) => {
+    const low = t.toLowerCase();
+    const map = {
+      normal: 'NOR',
+      fire: 'FEU',
+      water: 'EAU',
+      electric: 'ELE',
+      grass: 'PLA',
+      ice: 'GLA',
+      fighting: 'CBT',
+      poison: 'POI',
+      ground: 'SOL',
+      flying: 'VOL',
+      psychic: 'PSY',
+      bug: 'INS',
+      rock: 'ROC',
+      ghost: 'SPE',
+      dragon: 'DRA',
+      dark: 'TEN',
+      steel: 'ACI',
+      fairy: 'FEE',
+    };
+    return map[low] || t.slice(0, 3).toUpperCase();
+  };
+
+  const getName = (t) => {
+    if (typeof globalThis.getTypeName === 'function') return globalThis.getTypeName(t);
+    return t;
+  };
+
+  const te = globalThis.typeEff;
+
+  let out =
+    '<div class="pw-guide-type-chart-wrap" style="overflow-x:auto;max-width:100%;margin:8px 0;padding-bottom:4px;">';
+  out +=
+    '<div style="display:flex;gap:10px;margin-bottom:8px;font-size:11px;flex-wrap:wrap;align-items:center;">';
+  out +=
+    '<span><span style="display:inline-block;padding:2px 6px;background:#2e7d32;color:#fff;border-radius:4px;font-weight:bold;margin-right:4px;">2×</span> ' +
+    (typeof t === 'function'
+      ? t('guide_type_supereffective') || 'Super efficace'
+      : 'Super efficace') +
+    '</span>';
+  out +=
+    '<span><span style="display:inline-block;padding:2px 6px;background:#c62828;color:#fff;border-radius:4px;font-weight:bold;margin-right:4px;">½</span> ' +
+    (typeof t === 'function'
+      ? t('guide_type_notveryeffective') || 'Pas très efficace'
+      : 'Pas très efficace') +
+    '</span>';
+  out +=
+    '<span><span style="display:inline-block;padding:2px 6px;background:#1a1a1a;color:#888;border-radius:4px;font-weight:bold;margin-right:4px;">0</span> ' +
+    (typeof t === 'function' ? t('guide_type_noeffect') || 'Inefficace' : 'Inefficace') +
+    '</span>';
+  out +=
+    '<span><span style="display:inline-block;padding:2px 6px;background:rgba(255,255,255,0.06);color:#888;border-radius:4px;margin-right:4px;">·</span> ' +
+    (typeof t === 'function' ? t('guide_type_normal') || 'Neutre (×1)' : 'Neutre (×1)') +
+    '</span>';
+  out += '</div>';
+
+  out +=
+    '<table class="pw-guide-type-table" style="border-collapse:collapse;font-size:10px;width:100%;min-width:480px;text-align:center;">';
+  out +=
+    '<thead><tr><th style="padding:4px;border:1px solid rgba(255,255,255,0.15);">ATK\\DEF</th>';
+  for (const def of types) {
+    const low = def.toLowerCase();
+    const bg = colors[low] || '#666';
+    const fg = darkTextTypes.has(low) ? '#111' : '#fff';
+    out += `<th style="background:${bg};color:${fg};padding:3px 2px;border:1px solid rgba(255,255,255,0.2);min-width:22px;font-weight:bold;" title="${getName(def)}">${getShort(def)}</th>`;
+  }
+  out += '</tr></thead><tbody>';
+
+  for (const atk of types) {
+    const atkLow = atk.toLowerCase();
+    const atkBg = colors[atkLow] || '#666';
+    const atkFg = darkTextTypes.has(atkLow) ? '#111' : '#fff';
+    out += `<tr><th style="background:${atkBg};color:${atkFg};padding:3px 5px;text-align:left;border:1px solid rgba(255,255,255,0.2);font-weight:bold;white-space:nowrap;">${getName(atk)}</th>`;
+    for (const def of types) {
+      let eff = 1;
+      if (te) {
+        try {
+          eff = Number(te(atk, def));
+        } catch (_) {
+          eff = 1;
+        }
+      }
+      let cellBg = 'rgba(255,255,255,0.02)';
+      let cellFg = '#888';
+      let cellText = '·';
+      if (eff >= 2) {
+        cellBg = '#2e7d32';
+        cellFg = '#fff';
+        cellText = '2×';
+      } else if (eff > 0 && eff < 1) {
+        cellBg = '#c62828';
+        cellFg = '#fff';
+        cellText = '½';
+      } else if (eff === 0) {
+        cellBg = '#1a1a1a';
+        cellFg = '#777';
+        cellText = '0';
+      }
+      out += `<td style="background:${cellBg};color:${cellFg};padding:3px 1px;border:1px solid rgba(255,255,255,0.08);font-weight:${eff !== 1 ? 'bold' : 'normal'};" title="${getName(atk)} → ${getName(def)} : ×${eff}">${cellText}</td>`;
+    }
+    out += '</tr>';
+  }
+
+  out += '</tbody></table></div>';
+  return out;
+}
+
 function captureGuidePages() {
   return [
     [
@@ -247,7 +399,7 @@ function _baseGuideSections() {
     },
     combat: {
       icon: _icon('battle'),
-      title: t('guide_combat_title') || 'Combat',
+      title: t('guide_combat_title') || 'Combat & Capture',
       pages: [
         [
           typeof t === 'function' ? t('guide_combat_basics') : 'Combat automatique',
@@ -256,17 +408,22 @@ function _baseGuideSections() {
             : 'Les combats sauvages sont <b>automatiques</b> et en temps réel. La stratégie se prépare en amont avec les types et capacités.',
         ],
         [
-          typeof t === 'function' ? t('guide_combat_eff') : 'Déroulement & Capture',
+          typeof t === 'function' ? t('guide_capture_how') : 'Capture de Pokémon',
+          typeof t === 'function'
+            ? t('guide_capture_how_desc')
+            : 'Lancez des <b>Poké Balls</b> sur les Pokémon sauvages pour enrichir votre collection et renforcer votre équipe. Chaque Poké Ball possède un taux de réussite spécifique (Poké Ball : 10%, Super Ball : 20%, Hyper Ball : 30%, Master Ball : 100%). Les doublons capturés rapportent des <b>IV</b> et renforcent les statistiques.',
+        ],
+        [
+          typeof t === 'function' ? t('guide_type_chart_title') : 'Table des types',
+          renderTypeChartGuideHtml(),
+        ],
+        [
+          typeof t === 'function' ? t('guide_combat_eff') : 'Déroulement & Efficacité',
           typeof t === 'function'
             ? t('guide_combat_eff_desc')
-            : 'Battez les Pokémon pour gagner de l’<b>XP</b> et des <b>₽</b>, ou lancez une <b>Poké Ball</b> pour les capturer.',
+            : 'Battez les Pokémon pour gagner de l’<b>XP</b> et des <b>₽</b>. Ajustez vos types pour exploiter les faiblesses adverses (×2) et éviter les immunités (×0).',
         ],
       ],
-    },
-    capture: {
-      icon: _icon('pokeball'),
-      title: t('guide_capture_title'),
-      pages: captureGuidePages(),
     },
     pokemon: {
       icon: _icon('team'),
@@ -275,12 +432,6 @@ function _baseGuideSections() {
         [
           t('guide_pokemon_sheet'),
           `${tutorialDeviceHint('sheet')} ${t('guide_pokemon_sheet_desc')}`,
-        ],
-        [
-          typeof t === 'function' ? t('guide_sheet_base') : 'IV & EV',
-          typeof t === 'function'
-            ? t('guide_sheet_base_desc')
-            : 'Les <b>IV</b> augmentent le potentiel inné grâce aux doublons capturés, tandis que les <b>EV</b> récompensent l’entraînement et les vitamines.',
         ],
         [
           typeof t === 'function' ? t('guide_sheet_moves') : 'Évolutions & Capacités',

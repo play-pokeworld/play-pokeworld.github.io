@@ -13361,6 +13361,39 @@ body[data-bg="missing"] { --pc-scene-url: url('../images/bg/missing.png'); }
   #map-panel { max-height: 54vh; }
 }
 
+.pw-map-zoom-controls {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 15;
+}
+.pw-map-zoom-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 4px;
+  background: rgba(20, 24, 33, 0.85);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
+  color: var(--light2);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  user-select: none;
+}
+.pw-map-zoom-btn:hover {
+  background: var(--dark3);
+  color: #fff;
+  border-color: var(--accent);
+}
+
 /* ── 31.11 — LE MARQUEUR « VOUS ÊTES ICI » EST CENTRÉ SUR SA CASE ───────────
    Le sprite était planté au-dessus du nœud (ses pieds sur le bord haut) : sur
    une carte dense on ne savait plus à quel lieu il se rapportait. Il est
@@ -14309,6 +14342,10 @@ html[data-dungeon-run="1"] #leave-btn { display: none !important; }
   border-radius: 10px;
   padding: 10px 8px 6px;
   box-shadow: inset 0 0 14px rgba(0, 0, 0, .45);
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 .pw-dgn-svg { width: 100%; height: auto; display: block; }
 .pw-dgn-edges line {
@@ -14453,9 +14490,9 @@ html[data-dungeon-run="1"] #leave-btn { display: none !important; }
 .pw-dgn-grid {
   display: grid;
   grid-template-columns: repeat(var(--cols, 7), minmax(0, 1fr));
-  gap: clamp(2px, 0.5vw, 6px);
-  width: 100%;
-  max-width: 100%;
+  gap: 4px;
+  width: fit-content;
+  max-width: min(100%, calc(var(--cols, 7) * 44px + (var(--cols, 7) - 1) * 4px));
   max-height: min(62vh, 520px);
   overflow-y: auto;
   overflow-x: hidden;
@@ -14464,9 +14501,12 @@ html[data-dungeon-run="1"] #leave-btn { display: none !important; }
   margin: 0 auto;
 }
 #battle-dungeon-bar .pw-dgn-tile {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   aspect-ratio: 1;
-  max-height: min(48px, calc((58vh - 90px) / var(--rows, 7)));
-  max-width: min(48px, calc((100% - (var(--cols, 7) - 1) * 6px) / var(--cols, 7)));
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15069,6 +15109,29 @@ svg .pw-tuto-target > rect:nth-of-type(2) {
 .pw-ach-bonus-pill {
   font-size: 11px; font-weight: 600; padding: 2px 6px;
   background: rgba(0, 0, 0, 0.25); color: var(--light1); border-radius: 4px;
+}
+.pw-ach-pin-btn {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
+  color: var(--light2);
+  transition: all 0.15s ease;
+}
+.pw-ach-pin-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+.pw-ach-pin-btn.is-pinned {
+  background: rgba(242, 217, 78, 0.2);
+  border-color: var(--yellow);
+  color: var(--yellow);
+  font-weight: 600;
 }
 
 /* ── Metallic Rank Chips & HUD Tracker Window ── */

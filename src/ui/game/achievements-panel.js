@@ -51,17 +51,20 @@ export function renderAchievementsPanel(container) {
   if (!container) return;
   const G = globalThis.G || {};
   ensureAchievementsState(G);
+  if (typeof globalThis.checkAchievements === 'function') {
+    globalThis.checkAchievements(G, { notify: false });
+  }
 
   const lang = G.lang === 'en' ? 'en' : 'fr';
   const { totalTiers, maxTiers, completedCount } = countUnlockedAchievements(G);
   const totalPct = maxTiers > 0 ? Math.round((totalTiers / maxTiers) * 100) : 0;
 
   // Active bonuses overview
-  const moneyBonus = getAchievementBonus('money', 'global', G);
-  const xpBonus = getAchievementBonus('xp', 'global', G);
-  const lootBonus = getAchievementBonus('loot', 'global', G);
-  const catchBonus = getAchievementBonus('capture', 'global', G);
-  const shinyBonus = getAchievementBonus('shiny', 'global', G);
+  const moneyBonus = getAchievementBonus('money', 'all', G);
+  const xpBonus = getAchievementBonus('xp', 'all', G);
+  const lootBonus = getAchievementBonus('loot', 'all', G);
+  const catchBonus = getAchievementBonus('capture', 'all', G);
+  const shinyBonus = getAchievementBonus('shiny', 'all', G);
 
   const bonusPills = [];
   if (moneyBonus > 0) bonusPills.push(`+${moneyBonus}% ₽`);
@@ -122,6 +125,13 @@ export function renderAchievementsPanel(container) {
           ? `<span class="pw-badge pw-badge-info">P.${prog.currentTier + 1}/${ach.tiers.length}</span>`
           : `<span class="pw-badge pw-badge-muted">${lang === 'en' ? 'In progress' : 'En cours'}</span>`;
 
+      const isPinned = G.achievements?.pinned === ach.id;
+      const pinBtn = `
+        <button type="button" class="hbtn pw-ach-pin-btn ${isPinned ? 'is-pinned active' : ''}" data-action="legacy-call-stop" data-call="togglePinAchievement" data-call-args="'${ach.id}'" title="${isPinned ? (lang === 'en' ? 'Unpin' : 'Désépingler') : lang === 'en' ? 'Pin to dashboard tracker' : 'Épingler au suivi du tableau de bord'}" style="padding:2px 8px;font-size:11px;display:inline-flex;align-items:center;gap:4px;">
+          ${isPinned ? '📌 ' + (lang === 'en' ? 'Pinned' : 'Épinglé') : '📍 ' + (lang === 'en' ? 'Pin' : 'Épingler')}
+        </button>
+      `;
+
       return `
       <div class="pw-card pw-ach-card ${prog.isCompleted ? 'is-completed' : ''}">
         <div class="pw-ach-card-header">
@@ -144,7 +154,10 @@ export function renderAchievementsPanel(container) {
 
         <div class="pw-ach-card-footer">
           <div class="pw-ach-tiers-dots">${tierBadges}</div>
-          ${bonusText ? `<div class="pw-ach-bonus-pill">${esc(bonusText)}</div>` : ''}
+          <div style="display:flex;align-items:center;gap:8px;">
+            ${bonusText ? `<div class="pw-ach-bonus-pill">${esc(bonusText)}</div>` : ''}
+            ${pinBtn}
+          </div>
         </div>
       </div>
     `;
@@ -199,6 +212,9 @@ export function renderAchievementsTrackerWindow() {
   if (!body) return;
   const G = globalThis.G || {};
   ensureAchievementsState(G);
+  if (typeof globalThis.checkAchievements === 'function') {
+    globalThis.checkAchievements(G, { notify: false });
+  }
   const lang = G.lang === 'en' ? 'en' : 'fr';
 
   let pinnedId = G.achievements?.pinned || 'dex_kanto';
@@ -216,28 +232,59 @@ export function renderAchievementsTrackerWindow() {
   const fDef = ACHIEVEMENT_FAMILIES[pinnedAch.family] || {};
   const tierInfo = getAchievementTierInfo(prog.currentTier, pinnedAch.tiers.length);
 
+  const optionsHtml = ACHIEVEMENTS.map(
+    (a) =>
+      `<option value="${a.id}" ${a.id === pinnedId ? 'selected' : ''}>${esc(lang === 'en' ? a.name_en : a.name_fr)}</option>`
+  ).join('');
+
   const html = `
-    <div class="pw-ach-tracker-card" data-action="open-fullscreen-panel" data-panel="achievements" role="button" tabindex="0" title="${lang === 'en' ? 'Click to open Achievements' : 'Cliquer pour ouvrir les Succès'}" style="padding:8px 10px;display:flex;flex-direction:column;gap:6px;cursor:pointer;">
+    <div style="padding:6px 8px;display:flex;flex-direction:column;gap:6px;">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
-        <div style="display:flex;align-items:center;gap:6px;font-weight:bold;font-size:12px;">
-          <span>${getIconHtml(fDef.icon || 'star', 16)}</span>
-          <span>${esc(name)}</span>
-        </div>
-        <span class="pw-rank-chip ${tierInfo.cls}" style="font-size:9px;padding:2px 6px;border-radius:4px;font-weight:bold;">${lang === 'en' ? tierInfo.labelEn : tierInfo.labelFr}</span>
+        <span style="font-size:10px;text-transform:uppercase;color:var(--light1);letter-spacing:0.5px;font-weight:600;">${lang === 'en' ? 'Tracked' : 'Épinglé'}</span>
+        <select class="pw-ach-pinned-select" style="font-size:11px;padding:2px 4px;background:var(--dark3);color:var(--light2);border:1px solid var(--border);border-radius:4px;max-width:160px;cursor:pointer;">
+          ${optionsHtml}
+        </select>
       </div>
-      <div class="pw-ach-progress-row" style="margin:2px 0;">
-        <div class="pw-ach-progress-bar-bg" style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;flex:1;">
-          <div class="pw-ach-progress-bar-fill" style="width:${prog.progressPct}%;height:100%;background:var(--yellow,#f2d94e);"></div>
+
+      <div class="pw-ach-tracker-card" data-action="open-fullscreen-panel" data-panel="achievements" role="button" tabindex="0" title="${lang === 'en' ? 'Click to open Achievements' : 'Cliquer pour ouvrir les Succès'}" style="padding:8px 10px;display:flex;flex-direction:column;gap:6px;cursor:pointer;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+          <div style="display:flex;align-items:center;gap:6px;font-weight:bold;font-size:12px;">
+            <span>${getIconHtml(fDef.icon || 'star', 16)}</span>
+            <span>${esc(name)}</span>
+          </div>
+          <span class="pw-rank-chip ${tierInfo.cls}" style="font-size:9px;padding:2px 6px;border-radius:4px;font-weight:bold;">${lang === 'en' ? tierInfo.labelEn : tierInfo.labelFr}</span>
         </div>
-        <div style="font-size:10px;color:var(--light1);margin-top:2px;display:flex;justify-content:space-between;">
-          <span>${prog.metricValue} / ${prog.nextTarget}</span>
-          <span>${prog.progressPct}%</span>
+        <div class="pw-ach-progress-row" style="margin:2px 0;">
+          <div class="pw-ach-progress-bar-bg" style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;flex:1;">
+            <div class="pw-ach-progress-bar-fill" style="width:${prog.progressPct}%;height:100%;background:var(--yellow,#f2d94e);"></div>
+          </div>
+          <div style="font-size:10px;color:var(--light1);margin-top:2px;display:flex;justify-content:space-between;">
+            <span>${prog.metricValue} / ${prog.nextTarget}</span>
+            <span>${prog.progressPct}%</span>
+          </div>
         </div>
       </div>
     </div>
   `;
 
   globalThis._pwSetHtmlSafe(body, html);
+
+  const sel =
+    typeof body.querySelector === 'function' ? body.querySelector('.pw-ach-pinned-select') : null;
+  if (sel && typeof sel.addEventListener === 'function') {
+    sel.addEventListener('change', (e) => {
+      setPinnedAchievement(e.target.value);
+    });
+  }
+}
+
+export function setPinnedAchievement(achId) {
+  const G = globalThis.G || {};
+  ensureAchievementsState(G);
+  G.achievements.pinned = achId;
+  renderAchievementsTrackerWindow();
+  const fsPanel = document.getElementById('fs-panel-content');
+  if (fsPanel) renderAchievementsPanel(fsPanel);
 }
 
 export function togglePinAchievement(achId) {
@@ -259,12 +306,14 @@ if (typeof globalThis !== 'undefined') {
   globalThis.setAchievementFamilyFilter = setAchievementFamilyFilter;
   globalThis.getAchievementTierInfo = getAchievementTierInfo;
   globalThis.renderAchievementsTrackerWindow = renderAchievementsTrackerWindow;
+  globalThis.setPinnedAchievement = setPinnedAchievement;
   globalThis.togglePinAchievement = togglePinAchievement;
 }
 
 if (typeof PokeActions !== 'undefined' && PokeActions) {
   try {
     PokeActions.register('setAchievementFamilyFilter', setAchievementFamilyFilter);
+    PokeActions.register('setPinnedAchievement', setPinnedAchievement);
     PokeActions.register('togglePinAchievement', togglePinAchievement);
   } catch (_) {}
 }

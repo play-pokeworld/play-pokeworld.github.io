@@ -175,7 +175,7 @@ function guideExtraSections() {
       ],
     },
     pokeballs: {
-      after: 'capture',
+      after: 'stats',
       icon: _icon('pokeball'),
       title: _T('guide_balls_title'),
       pages: [

@@ -1016,6 +1016,12 @@ function assignGlobalState(state) {
     if (window.PokeWorldState) window.PokeWorldState.gameState = target;
   }
   if (typeof globalThis !== 'undefined') globalThis.G = target;
+  try {
+    if (typeof globalThis.ensureAchievementsState === 'function')
+      globalThis.ensureAchievementsState(target);
+    if (typeof globalThis.checkAchievements === 'function')
+      globalThis.checkAchievements(target, { notify: false });
+  } catch (_) {}
 }
 function resetRuntimeBattleState() {
   try {

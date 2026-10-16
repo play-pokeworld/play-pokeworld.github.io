@@ -1123,20 +1123,17 @@ function hatchEgg(slotIdx = 0) {
   G.collection[_hKey] = p;
   const hatchedWasFossil = !!slot.isFossil;
   G.hatchery[slotIdx] = null;
-  if (globalThis.pwEmit) globalThis.pwEmit('pokemonHatched', { id: p.id, shiny: !!p.shiny }); // SND-02
-  // a pending mode change (incubation → day care) applies now that the incubation is over.
+  if (globalThis.pwEmit) globalThis.pwEmit('pokemonHatched', { id: p.id, shiny: !!p.shiny });
   applyPendingHatcheryMode(slotIdx);
   if (typeof addStaffXp === 'function') addStaffXp('hatchery', 1);
   try {
-    if (typeof progressMainQuestType === 'function') {
-      if (hatchedWasFossil) progressMainQuestType('fossil_revive', 1);
-      else progressMainQuestType('egg_hatch', 1);
-    }
+    if (typeof progressMainQuestType === 'function')
+      progressMainQuestType(hatchedWasFossil ? 'fossil_revive' : 'egg_hatch', 1);
+    if (!hatchedWasFossil && globalThis.recordAchievementStat)
+      globalThis.recordAchievementStat('eggsHatched', 1);
+    if (globalThis.checkAchievements) globalThis.checkAchievements(G, { notify: true });
   } catch (_) {}
-
-  if (G.automation && G.automation.autoSeedHatchery) {
-    processHatcheryQueue();
-  }
+  if (G.automation && G.automation.autoSeedHatchery) processHatcheryQueue();
 
   updateHeader();
   renderTeamWindow();

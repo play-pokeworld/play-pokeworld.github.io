@@ -103,13 +103,29 @@ function countShiniesInTeam(G) {
 
 function countWildWins(G) {
   if (!G) return 0;
-  let total = Number(G.totalWildWins) || 0;
+  let totalFromStats = 0;
   if (G.locStats) {
     for (const loc in G.locStats) {
-      total = Math.max(total, total + (Number(G.locStats[loc].beaten) || 0));
+      totalFromStats += Number(G.locStats[loc]?.beaten) || 0;
     }
   }
-  return total;
+  if (G.wildWinsByLoc) {
+    for (const loc in G.wildWinsByLoc) {
+      totalFromStats = Math.max(totalFromStats, Number(G.wildWinsByLoc[loc]) || 0);
+    }
+  }
+  let totalDexBeaten = 0;
+  if (G.pokedex) {
+    for (const id in G.pokedex) {
+      totalDexBeaten += Number(G.pokedex[id]?.beaten) || 0;
+    }
+  }
+  return Math.max(
+    Number(G.totalWildWins) || 0,
+    Number(G.achievements?.stats?.wildWins) || 0,
+    totalFromStats,
+    totalDexBeaten
+  );
 }
 
 function countFormsObtained(G) {
@@ -155,20 +171,39 @@ export function getAchievementMetricValue(achOrId, G = globalThis.G) {
       return countLegendariesCaught(G);
     case 'shiny_captured':
       return countShiniesCaught(G);
-    case 'shiny_hatched':
-      return stats.shinyHatched || 0;
-    case 'shiny_beaten':
-      return stats.shinyBeaten || 0;
+    case 'shiny_hatched': {
+      let count = Number(stats.shinyHatched) || 0;
+      if (G.pokedex) {
+        for (const id in G.pokedex) {
+          count += Number(G.pokedex[id]?.shinyHatched) || 0;
+        }
+      }
+      return count;
+    }
+    case 'shiny_beaten': {
+      let count = Number(stats.shinyBeaten) || 0;
+      if (G.pokedex) {
+        for (const id in G.pokedex) {
+          count += Number(G.pokedex[id]?.shinyBeaten) || 0;
+        }
+      }
+      return count;
+    }
     case 'shiny_team':
       return countShiniesInTeam(G);
     case 'wild_wins':
       return countWildWins(G);
-    case 'trainers_defeated':
-      return stats.trainersDefeated || 0;
-    case 'champions_beaten':
-      return Array.isArray(G.badges) ? G.badges.length : 0;
+    case 'trainers_defeated': {
+      const champCount = G.defeatedChamps ? Object.keys(G.defeatedChamps).length : 0;
+      return Math.max(stats.trainersDefeated || 0, champCount);
+    }
+    case 'champions_beaten': {
+      const bCount = Array.isArray(G.badges) ? G.badges.length : 0;
+      const cCount = G.defeatedChamps ? Object.keys(G.defeatedChamps).length : 0;
+      return Math.max(bCount, cCount);
+    }
     case 'leagues_won':
-      return G.regionLeagueWon ? Object.keys(G.regionLeagueWon).length : 0;
+      return G.regionLeagueWon ? Object.keys(G.regionLeagueWon).length : G.championTitle ? 1 : 0;
     case 'one_hit_kos':
       return stats.oneHitKOs || 0;
     case 'flawless_wins':
@@ -178,7 +213,17 @@ export function getAchievementMetricValue(achOrId, G = globalThis.G) {
       if (G.dupeCatches) {
         for (const k in G.dupeCatches) dupes += Number(G.dupeCatches[k]) || 0;
       }
-      return countTotalCaughtDex(G) + dupes;
+      let collDupes = 0;
+      if (G.collection) {
+        for (const k in G.collection) {
+          collDupes += Number(G.collection[k]?.dupeCount) || 0;
+        }
+      }
+      return Math.max(
+        countTotalCaughtDex(G) + dupes,
+        countTotalCaughtDex(G) + collDupes,
+        Number(stats.totalCaptures) || 0
+      );
     }
     case 'afk_captures':
       return stats.afkCatches || 0;
@@ -220,8 +265,15 @@ export function getAchievementMetricValue(achOrId, G = globalThis.G) {
       return stats.routes100Dex || 0;
     case 'route_masteries_gold':
       return stats.routeMasteriesGold || 0;
-    case 'dungeons_completed':
-      return stats.dungeonsCompleted || 0;
+    case 'dungeons_completed': {
+      let clears = Number(stats.dungeonsCompleted) || 0;
+      if (G.dungeonClears) {
+        for (const loc in G.dungeonClears) {
+          clears += Number(G.dungeonClears[loc]) || 0;
+        }
+      }
+      return Math.max(clears, Number(G.dungeonsExplored) || 0);
+    }
     case 'regions_unlocked': {
       let r = 1;
       if (G.badges) {
@@ -230,46 +282,120 @@ export function getAchievementMetricValue(achOrId, G = globalThis.G) {
       }
       return r;
     }
-    case 'eggs_hatched':
-      return stats.eggsHatched || 0;
-    case 'max_iv_pokemon':
-      return stats.maxIvPokemon || 0;
+    case 'eggs_hatched': {
+      let count = Number(stats.eggsHatched) || 0;
+      if (G.pokedex) {
+        for (const id in G.pokedex) {
+          count += Number(G.pokedex[id]?.hatcheryIncub) || 0;
+        }
+      }
+      return count;
+    }
+    case 'max_iv_pokemon': {
+      let count = Number(stats.maxIvPokemon) || 0;
+      const allMons = [...(G.team || []), ...Object.values(G.collection || {})];
+      let found = 0;
+      for (const m of allMons) {
+        if (!m || !m.ivs) continue;
+        const sum = Object.values(m.ivs).reduce((s, v) => s + (Number(v) || 0), 0);
+        if (sum >= 72) found++;
+      }
+      return Math.max(count, found);
+    }
     case 'babies_hatched':
       return stats.babiesHatched || 0;
     case 'incub_dupes':
       return stats.incubDupes || 0;
-    case 'twelve_iv_stat':
-      return stats.twelveIvStat || 0;
+    case 'twelve_iv_stat': {
+      let count = Number(stats.twelveIvStat) || 0;
+      const allMons = [...(G.team || []), ...Object.values(G.collection || {})];
+      let found = 0;
+      for (const m of allMons) {
+        if (!m || !m.ivs) continue;
+        if (Object.values(m.ivs).some((v) => Number(v) >= 12)) found++;
+      }
+      return Math.max(count, found);
+    }
     case 'training_sessions':
       return stats.trainingSessions || 0;
-    case 'max_ev_pokemon':
-      return stats.maxEvPokemon || 0;
+    case 'max_ev_pokemon': {
+      let count = Number(stats.maxEvPokemon) || 0;
+      const allMons = [...(G.team || []), ...Object.values(G.collection || {})];
+      let found = 0;
+      for (const m of allMons) {
+        if (!m || !m.evs) continue;
+        const sum = Object.values(m.evs).reduce((s, v) => s + (Number(v) || 0), 0);
+        if (sum >= 510) found++;
+      }
+      return Math.max(count, found);
+    }
     case 'hidden_abilities':
       return G.unlockedTalents ? Object.keys(G.unlockedTalents).length : 0;
-    case 'rare_abilities':
-      return stats.rareAbilities || 0;
+    case 'rare_abilities': {
+      let count = Number(stats.rareAbilities) || 0;
+      const allMons = [...(G.team || []), ...Object.values(G.collection || {})];
+      let found = 0;
+      for (const m of allMons) {
+        if (m && (m.talentUnlocked || m.hiddenTalentActive || (m.talent && m.talent !== 'default')))
+          found++;
+      }
+      return Math.max(count, found);
+    }
     case 'mine_layers':
       return (G.mine && G.mine.completedCount) || 0;
     case 'mine_treasures':
-      return stats.mineTreasures || 0;
-    case 'mine_fossils':
-      return stats.mineFossils || 0;
-    case 'mine_evo_items':
-      return stats.mineEvoItems || 0;
+      return Math.max(stats.mineTreasures || 0, (G.mine && G.mine.completedCount) || 0);
+    case 'mine_fossils': {
+      let fCount = Number(stats.mineFossils) || 0;
+      if (G.inventory) {
+        const fossilKeys = [
+          'helix_fossil',
+          'dome_fossil',
+          'old_amber',
+          'root_fossil',
+          'claw_fossil',
+          'fossil',
+        ];
+        for (const fk of fossilKeys) fCount += Number(G.inventory[fk]) || 0;
+      }
+      return fCount;
+    }
+    case 'mine_evo_items': {
+      let evoCount = Number(stats.mineEvoItems) || 0;
+      if (G.inventory) {
+        const evoKeys = [
+          'fire_stone',
+          'water_stone',
+          'thunder_stone',
+          'leaf_stone',
+          'moon_stone',
+          'sun_stone',
+        ];
+        for (const ek of evoKeys) evoCount += Number(G.inventory[ek]) || 0;
+      }
+      return evoCount;
+    }
     case 'mine_layers_100':
       return stats.mineLayers100 || 0;
     case 'money_earned':
-      return stats.moneyEarned || G.money || 0;
+      return Math.max(Number(stats.moneyEarned) || 0, Number(G.money) || 0);
     case 'money_spent':
       return stats.moneySpent || 0;
     case 'distinct_items':
       return G.inventory
         ? Object.keys(G.inventory).filter((k) => (G.inventory[k] || 0) > 0).length
         : 0;
-    case 'max_level_staff':
-      return stats.maxLevelStaff || 0;
+    case 'max_level_staff': {
+      let maxLvl = Number(stats.maxLevelStaff) || 0;
+      if (G.staff && G.staff.level) {
+        for (const id in G.staff.level) maxLvl = Math.max(maxLvl, Number(G.staff.level[id]) || 1);
+      }
+      return maxLvl;
+    }
     case 'atoll_streak':
-      return (G.atoll && G.atoll.bestStreak) || 0;
+      return (
+        (G.atoll && G.atoll.bestStreak) || (G.atoll && G.atoll.streak) || stats.atollStreak || 0
+      );
     case 'atoll_room_wins':
       return stats.atollRoomWins || 0;
     case 'atoll_bosses':
@@ -289,7 +415,7 @@ export function getAchievementMetricValue(achOrId, G = globalThis.G) {
     case 'magikarp_loyal':
       return stats.magikarpBattles || 0;
     case 'pepite_collector':
-      return stats.nuggetsSold || 0;
+      return Math.max(stats.nuggetsSold || 0, (G.inventory && G.inventory['nugget']) || 0);
     case 'all_nighter':
       return G.playTimeMs || 0;
     case 'back_to_roots':
@@ -412,7 +538,8 @@ export function getAchievementBonus(bonusType, scope = 'global', G = globalThis.
     if (tier === undefined || tier < 0) continue;
 
     const achScope = ach.scope || 'global';
-    const matchesScope = scope === 'all' || achScope === 'global' || achScope === scope;
+    const matchesScope =
+      scope === 'all' ? true : scope === 'global' ? achScope === 'global' : achScope === scope;
     if (!matchesScope) continue;
 
     const val = ach.bonus.values[tier];
@@ -428,6 +555,13 @@ export function getAchievementBonus(bonusType, scope = 'global', G = globalThis.
   }
 
   return total;
+}
+
+export function recordAchievementStat(key, amount = 1, G = globalThis.G) {
+  if (!G) return 0;
+  ensureAchievementsState(G);
+  G.achievements.stats[key] = (Number(G.achievements.stats[key]) || 0) + Number(amount);
+  return G.achievements.stats[key];
 }
 
 export function countUnlockedAchievements(G = globalThis.G) {
@@ -457,5 +591,6 @@ if (typeof globalThis !== 'undefined') {
   globalThis.checkAchievements = checkAchievements;
   globalThis.recalculateAllAchievements = recalculateAllAchievements;
   globalThis.getAchievementBonus = getAchievementBonus;
+  globalThis.recordAchievementStat = recordAchievementStat;
   globalThis.countUnlockedAchievements = countUnlockedAchievements;
 }

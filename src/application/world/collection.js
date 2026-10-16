@@ -39,6 +39,17 @@ function getShinyRateForSpecies(speciesId) {
   } catch (_) {
     /* noop */
   }
+  try {
+    const achFn = globalThis.getAchievementBonus;
+    if (achFn) {
+      const achMult = Number(achFn('shiny', 'global'));
+      if (Number.isFinite(achMult) && achMult > 1) {
+        rate = Math.min(1, rate * achMult);
+      }
+    }
+  } catch (_) {
+    /* noop */
+  }
   return rate;
 }
 
