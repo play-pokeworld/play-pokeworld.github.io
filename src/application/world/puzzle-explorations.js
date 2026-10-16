@@ -12,7 +12,10 @@ if (typeof globalThis !== 'undefined' && typeof globalThis._pwSetHtmlSafe !== 'f
     else el.innerHTML = html;
   };
 }
-// Secret explorations — v4.1 (immersion, Regi braille + ritual)
+// Secret explorations — v4.1
+// Immersion, no UI jargon, sequences without feedback before confirmation,
+// shuffled buttons, FR answers, Regi braille + ritual, shrine = real team.
+
 function _shuffle(arr) {
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {
@@ -1136,9 +1139,6 @@ function completePuzzleExploration(puzzleId) {
     if (pwLateLink('advanceQuests')) {
       advanceQuests('puzzle', puzzle.id, 1);
       if (puzzle.loc) advanceQuests('puzzle', puzzle.loc, 0);
-      if (puzzle.loc === 'ruinsofalph' || String(puzzle.id).startsWith('alph_')) {
-        advanceQuests('story_talk', 113);
-      }
     }
   } catch (_) {}
   if (pwLateLink('notify')) {
@@ -1180,28 +1180,37 @@ function completePuzzleExploration(puzzleId) {
 }
 
 // Wave 41 — surface kept (window → globalThis block, same scope).
-if (typeof globalThis !== 'undefined') {
-  Object.assign(globalThis, {
-    PUZZLE_EXPLORATIONS,
-    ensurePuzzleState,
-    getPuzzleById,
-    isPuzzleCompleted,
-    isPuzzleEverCompleted,
-    isPuzzleSolvedThisRun,
-    resetPuzzleRun,
-    puzzleRequirementsMet,
-    getPuzzlesForLocation,
-    countCompletedPuzzles,
-    openPuzzleListForLocation,
-    renderPuzzleListPanel,
-    openPuzzleExploration,
-    closePuzzleExploration,
-    submitPuzzleAnswer,
-    completePuzzleExploration,
-    getPuzzleClue,
-    getPuzzleDisplayName,
-    getPuzzleSummary,
-  });
+if (typeof globalThis !== 'undefined') globalThis.PUZZLE_EXPLORATIONS = PUZZLE_EXPLORATIONS;
+if (typeof globalThis !== 'undefined') globalThis.ensurePuzzleState = ensurePuzzleState;
+if (typeof globalThis !== 'undefined') globalThis.getPuzzleById = getPuzzleById;
+if (typeof globalThis !== 'undefined') globalThis.isPuzzleCompleted = isPuzzleCompleted;
+if (typeof globalThis !== 'undefined') globalThis.isPuzzleEverCompleted = isPuzzleEverCompleted;
+if (typeof globalThis !== 'undefined') globalThis.isPuzzleSolvedThisRun = isPuzzleSolvedThisRun;
+if (typeof globalThis !== 'undefined') globalThis.resetPuzzleRun = resetPuzzleRun;
+if (typeof globalThis !== 'undefined') globalThis.puzzleRequirementsMet = puzzleRequirementsMet;
+if (typeof globalThis !== 'undefined') globalThis.getPuzzlesForLocation = getPuzzlesForLocation;
+if (typeof globalThis !== 'undefined') globalThis.countCompletedPuzzles = countCompletedPuzzles;
+if (typeof globalThis !== 'undefined')
+  globalThis.openPuzzleListForLocation = openPuzzleListForLocation;
+if (typeof globalThis !== 'undefined') globalThis.renderPuzzleListPanel = renderPuzzleListPanel;
+if (typeof globalThis !== 'undefined') globalThis.openPuzzleExploration = openPuzzleExploration;
+if (typeof globalThis !== 'undefined') globalThis.closePuzzleExploration = closePuzzleExploration;
+if (typeof globalThis !== 'undefined') globalThis.submitPuzzleAnswer = submitPuzzleAnswer;
+if (typeof globalThis !== 'undefined')
+  globalThis.completePuzzleExploration = completePuzzleExploration;
+
+// --- Exported globals ---
+if (typeof getPuzzleClue !== 'undefined') {
+  if (typeof window !== 'undefined') window.getPuzzleClue = getPuzzleClue;
+  if (typeof globalThis !== 'undefined') globalThis.getPuzzleClue = getPuzzleClue;
+}
+if (typeof getPuzzleDisplayName !== 'undefined') {
+  if (typeof window !== 'undefined') window.getPuzzleDisplayName = getPuzzleDisplayName;
+  if (typeof globalThis !== 'undefined') globalThis.getPuzzleDisplayName = getPuzzleDisplayName;
+}
+if (typeof getPuzzleSummary !== 'undefined') {
+  if (typeof window !== 'undefined') window.getPuzzleSummary = getPuzzleSummary;
+  if (typeof globalThis !== 'undefined') globalThis.getPuzzleSummary = getPuzzleSummary;
 }
 
 // Wave 41 — native ESM module: exports the same names as the

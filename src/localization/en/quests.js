@@ -289,22 +289,22 @@ export const L_en_quests = {
 },
 "58": {
 "title":"The Ice Bird of Seafoam",
-"desc":"Explore the frozen depths of Seafoam Islands and knock out 25 wild Pokémon to challenge Articuno!",
+"desc":"Explore the frozen depths of Seafoam Islands and knock out 150 wild Pokémon to challenge Articuno!",
 "rewardDesc":"9,000₽ + Articuno (Lv.50)"
 },
 "59": {
 "title":"The Thunder Bird of Power Plant",
-"desc":"Enter the abandoned Power Plant and defeat 25 wild Pokémon to summon Zapdos!",
+"desc":"Enter the abandoned Power Plant and defeat 150 wild Pokémon to summon Zapdos!",
 "rewardDesc":"9,000₽ + Zapdos (Lv.50)"
 },
 "60": {
 "title":"The Fire Bird of Victory Road",
-"desc":"Brave Victory Road and knock out 25 wild Pokémon to encounter Moltres!",
+"desc":"Brave Victory Road and knock out 150 wild Pokémon to encounter Moltres!",
 "rewardDesc":"9,000₽ + Moltres (Lv.50)"
 },
 "61": {
 "title":"Pokémon Mansion Archives",
-"desc":"Explore the ruined Pokémon Mansion on Cinnabar Island. Knock out 25 wild Pokémon to uncover secrets.",
+"desc":"Explore the ruined Pokémon Mansion on Cinnabar Island. Knock out 90 wild Pokémon to uncover secrets.",
 "rewardDesc":"13,000₽ + 1 Rare Candy"
 },
 "62": {
@@ -314,12 +314,12 @@ export const L_en_quests = {
 },
 "63": {
 "title":"The Ultimate Clone of Cerulean Cave",
-"desc":"Now Kanto Champion, enter Cerulean Cave north of Cerulean. Triumph over 25 wild Pokémon to capture Mewtwo!",
+"desc":"Now Kanto Champion, enter Cerulean Cave north of Cerulean. Triumph over 150 wild Pokémon to capture Mewtwo!",
 "rewardDesc":"22,000₽ + Mewtwo (Lv.70)"
 },
 "64": {
 "title":"The Mythical Miracle of Safari Zone",
-"desc":"Explore the vast Safari Zone. Defeat 25 wild Pokémon to encounter the mythical Mew. Mew can also roam through Kanto.",
+"desc":"Explore the vast Safari Zone. Defeat 150 wild Pokémon to encounter the mythical Mew. Mew can also roam through Kanto.",
 "rewardDesc":"25,000₽ + 1 Shiny Charm + Mew (Lv.50)"
 },
 "101": {
@@ -499,32 +499,32 @@ export const L_en_quests = {
 },
 "136": {
 "title":"Raikou, the Purple Thunder",
-"desc":"At Ecruteak’s Burned Tower, knock out 25 wild Pokémon to draw out Raikou and challenge it.",
+"desc":"At Ecruteak’s Burned Tower, knock out 150 wild Pokémon to draw out Raikou and challenge it.",
 "rewardDesc":"16,000₽ + Raikou (Lv.50)"
 },
 "137": {
 "title":"Entei, the Living Volcano",
-"desc":"At Ecruteak’s Burned Tower, knock out 25 wild Pokémon to draw out Entei and challenge it.",
+"desc":"At Ecruteak’s Burned Tower, knock out 150 wild Pokémon to draw out Entei and challenge it.",
 "rewardDesc":"16,000₽ + Entei (Lv.50)"
 },
 "138": {
 "title":"Suicune, the Northern Wind",
-"desc":"At Ecruteak’s Burned Tower, knock out 25 wild Pokémon to draw out Suicune and challenge it.",
+"desc":"At Ecruteak’s Burned Tower, knock out 150 wild Pokémon to draw out Suicune and challenge it.",
 "rewardDesc":"16,000₽ + 1 Rainbow Wing + Suicune (Lv.50)"
 },
 "139": {
 "title":"Whirl Islands: Lugia",
-"desc":"At Whirl Islands, present the Silver Wing to awaken Lugia, guardian of the seas.",
+"desc":"At Whirl Islands, knock out 150 wild Pokémon to awaken Lugia, guardian of the seas.",
 "rewardDesc":"20,000₽ + Lugia (Lv.70)"
 },
 "140": {
 "title":"Bell Tower: Ho-Oh",
-"desc":"At Ecruteak's Bell Tower, present the Rainbow Wing to make Ho-Oh appear.",
+"desc":"At Ecruteak's Bell Tower, knock out 150 wild Pokémon to make Ho-Oh appear.",
 "rewardDesc":"20,000₽ + Ho-Oh (Lv.70)"
 },
 "141": {
 "title":"Ilex Forest: Celebi",
-"desc":"In Ilex Forest's sacred clearing, the time-travel guardian Celebi sometimes appears to patient trainers. Knock out 25 wild Pokémon to draw it out!",
+"desc":"In Ilex Forest's sacred clearing, the time-travel guardian Celebi sometimes appears to patient trainers. Knock out 150 wild Pokémon to draw it out!",
 "rewardDesc":"20,000₽ + Celebi (Lv.50)"
 },
 

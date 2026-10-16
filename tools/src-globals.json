@@ -1602,7 +1602,6 @@
 "ensureLandscapeForeground",
 "ensureLocStats",
 "ensureMapHelpButton",
-"ensureMapZoomControls",
 "ensureMarketplace",
 "ensureMineAutomation",
 "ensureMineTools",
@@ -2535,7 +2534,6 @@
 "resetGame",
 "resetGameSession",
 "resetInvFilters",
-"resetMapZoom",
 "resetPlayerCd",
 "resetPuzzleRun",
 "resetRuntimeBattleState",
@@ -2933,6 +2931,5 @@
 "writeSaveIndex",
 "writeSlot",
 "xpForLevel",
-"zonesUnlockedByClearing",
-"zoomMap"
+"zonesUnlockedByClearing"
 ]

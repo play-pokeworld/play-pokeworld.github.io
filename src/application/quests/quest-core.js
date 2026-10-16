@@ -780,14 +780,7 @@ function advanceQuests(type, loc, amount) {
   const region = G.region || 'kanto';
 
   function locMatches(def, type, loc) {
-    const fReg = pwLateLink('regionOfLoc') || globalThis.regionOfLoc;
-    const targetRegion = def.region || (def.loc && fReg ? fReg(def.loc) : null);
-    const actionRegion = loc && fReg ? fReg(loc) : G.region || 'kanto';
-
-    // Scoping régional strict : les tâches régionales ne progressent que dans leur région
-    if (targetRegion && targetRegion !== actionRegion) return false;
     if (def.region && def.region !== (G.region || 'kanto')) return false;
-
     if (type === 'puzzle') {
       if (def.targetPuzzleId && loc === def.targetPuzzleId) return true;
       if (def.loc && loc === def.loc) return true;

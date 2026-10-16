@@ -1805,8 +1805,8 @@ function trainingAutomationSlotCardModel(i) {
       lockedLabel: `${formatNumber(TRAINING_AUTOMATION_SLOT_COST)} ${t('currency_quest_points')}`,
       buy: { call: 'buyTrainingAutomationSlot', args: String(i), label: t('buy_btn') },
     };
-  const fee = pwLateLink('getTrainingAutomationFee') ? getTrainingAutomationFee() : 500;
-  const usageCost = fee > 0 ? `${fee}₽ / combat` : typeof t === 'function' ? t('free') : 'Gratuit';
+  const fee = typeof getTrainingAutomationFee === 'function' ? getTrainingAutomationFee() : 500;
+  const usageCost = fee > 0 ? `${fee}₽ / combat` : (typeof t === 'function' ? t('free') : 'Gratuit');
   return {
     title,
     state: 'owned',
@@ -2152,10 +2152,9 @@ function trainingSlotModel(slotIndex) {
       ? G.trainingAutomation.slots[slotIndex]
       : { enabled: false };
   const autoPurchased = isTrainingAutomationPurchased(slotIndex);
-  const fee = pwLateLink('getTrainingAutomationFee') ? getTrainingAutomationFee() : 500;
-  const usageCost = fee > 0 ? `${fee}₽ / combat` : typeof t === 'function' ? t('free') : 'Gratuit';
+  const fee = typeof getTrainingAutomationFee === 'function' ? getTrainingAutomationFee() : 500;
+  const usageCost = fee > 0 ? `${fee}₽ / combat` : (typeof t === 'function' ? t('free') : 'Gratuit');
   actions.push({
-    classes: `training-slot-auto-btn ${autoState.enabled ? 'is-on' : 'is-off'}`,
     label: autoPurchased
       ? autoState.enabled
         ? `${t('training_auto_on')} (${usageCost})`
@@ -2164,6 +2163,7 @@ function trainingSlotModel(slotIndex) {
     iconHtml: pwLateLink('getIcon') ? getIcon('settings', 14) : '',
     call: 'toggleTrainingAutomationSlot',
     callArgs: `${slotIndex}, false`,
+    classes: `training-slot-auto-btn ${autoState.enabled ? 'is-on' : 'is-off'}`,
   });
   return {
     cardClass: 'training-slot-card pw-poke-card',

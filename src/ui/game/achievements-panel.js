@@ -142,10 +142,9 @@ export function renderAchievementsPanel(container) {
           <div class="pw-ach-progress-text">${prog.metricValue} / ${prog.nextTarget} (${prog.progressPct}%)</div>
         </div>
 
-        <div class="pw-ach-card-footer" style="display:flex;align-items:center;gap:6px;">
+        <div class="pw-ach-card-footer">
           <div class="pw-ach-tiers-dots">${tierBadges}</div>
           ${bonusText ? `<div class="pw-ach-bonus-pill">${esc(bonusText)}</div>` : ''}
-          <button type="button" class="hbtn pw-ach-pin-btn${G.achievements?.pinned === ach.id ? ' active' : ''}" style="margin-left:auto;font-size:10px;padding:2px 8px;" data-action="legacy-call-stop" data-call="togglePinAchievement" data-call-args="'${ach.id}'">${G.achievements?.pinned === ach.id ? '📌 ' + (lang === 'en' ? 'Pinned' : 'Épinglé') : lang === 'en' ? 'Pin' : 'Épingler'}</button>
         </div>
       </div>
     `;
@@ -214,7 +213,6 @@ export function renderAchievementsTrackerWindow() {
 
   const prog = getAchievementProgress(pinnedAch, G);
   const name = lang === 'en' ? pinnedAch.name_en : pinnedAch.name_fr;
-  const desc = lang === 'en' ? pinnedAch.desc_en : pinnedAch.desc_fr;
   const fDef = ACHIEVEMENT_FAMILIES[pinnedAch.family] || {};
   const tierInfo = getAchievementTierInfo(prog.currentTier, pinnedAch.tiers.length);
 
@@ -227,14 +225,13 @@ export function renderAchievementsTrackerWindow() {
         </div>
         <span class="pw-rank-chip ${tierInfo.cls}" style="font-size:9px;padding:2px 6px;border-radius:4px;font-weight:bold;">${lang === 'en' ? tierInfo.labelEn : tierInfo.labelFr}</span>
       </div>
-      <div style="font-size:11px;color:var(--light2);line-height:1.25;margin:2px 0;">${esc(desc)}</div>
       <div class="pw-ach-progress-row" style="margin:2px 0;">
-        <div class="pw-ach-progress-bar-bg" style="height:8px;background:rgba(255,255,255,0.12);border-radius:4px;overflow:hidden;flex:1;">
-          <div class="pw-ach-progress-bar-fill" style="width:${prog.progressPct}%;height:100%;background:var(--yellow,#f2d94e);border-radius:4px;transition:width .2s ease;"></div>
+        <div class="pw-ach-progress-bar-bg" style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;flex:1;">
+          <div class="pw-ach-progress-bar-fill" style="width:${prog.progressPct}%;height:100%;background:var(--yellow,#f2d94e);"></div>
         </div>
-        <div style="font-size:11px;font-weight:bold;color:var(--light1);margin-top:4px;display:flex;justify-content:space-between;align-items:center;">
-          <span>${lang === 'en' ? 'Target' : 'Objectif'} : <strong style="color:var(--light2);">${prog.metricValue} / ${prog.nextTarget}</strong></span>
-          <span style="color:var(--yellow,#f2d94e);font-size:11px;">${prog.progressPct}%</span>
+        <div style="font-size:10px;color:var(--light1);margin-top:2px;display:flex;justify-content:space-between;">
+          <span>${prog.metricValue} / ${prog.nextTarget}</span>
+          <span>${prog.progressPct}%</span>
         </div>
       </div>
     </div>

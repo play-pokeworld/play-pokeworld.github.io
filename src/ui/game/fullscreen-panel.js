@@ -450,7 +450,6 @@ function startAtollBattle(modeKey = 'tower_c') {
     G.team = JSON.parse(JSON.stringify(run.team));
     const rentalTag = t('atoll_rental') + ' ';
     G.team.forEach((p) => {
-      if (p) p._isRental = true;
       if (p && !String(p.name || '').startsWith(rentalTag))
         p.name = rentalTag + (p.name || getPokeName(p));
     });

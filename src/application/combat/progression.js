@@ -169,7 +169,13 @@ function getEvolutionMethodsModel(id) {
 
   if (nid === 236) {
     rows.push(
-      `<b>${t('m.progression.8')}</b> ${tr('m.progression.7', { lvl: 20 })} <b>${getPokeName(237)}</b>`
+      `<b>${t('m.progression.8')}</b> ${tr('m.progression.7', { lvl: 20 })} <b>${getPokeName(106)}</b> (Attaque > Défense)`
+    );
+    rows.push(
+      `<b>${t('m.progression.8')}</b> ${tr('m.progression.7', { lvl: 20 })} <b>${getPokeName(107)}</b> (Défense > Attaque)`
+    );
+    rows.push(
+      `<b>${t('m.progression.8')}</b> ${tr('m.progression.7', { lvl: 20 })} <b>${getPokeName(237)}</b> (Attaque = Défense)`
     );
   } else if (LEVEL_EVO_MAP[nid] && EVO_LEVELS[nid]) {
     const targetId = LEVEL_EVO_MAP[nid];
@@ -223,10 +229,17 @@ function checkEvolution(p) {
     return;
   }
   if (p.id === 236 && p.level >= 20) {
-    // Tyrogue -> Kapoera uniquement au niveau 20
-    if (!canEvolveToRegion(237)) return;
-    if (p._evoDone && p._evoDone[237]) return;
-    evolve(p, 237);
+    // Tyrogue -> Hitmonlee (atk > def), Hitmonchan (def > atk), Hitmontop (atk == def)
+    const atk = (p.ivs && p.ivs.atk != null) ? p.ivs.atk : (p.atk || 0);
+    const def = (p.ivs && p.ivs.def != null) ? p.ivs.def : (p.def || 0);
+    let target = 237;
+    if (atk > def) target = 106;
+    else if (def > atk) target = 107;
+    else {
+      target = canEvolveToRegion(237) ? 237 : (p.id % 2 === 0 ? 106 : 107);
+    }
+    if (!canEvolveToRegion(target)) return;
+    evolve(p, target);
     return;
   }
   const pid = Number(p.id);

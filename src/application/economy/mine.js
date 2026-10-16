@@ -440,31 +440,27 @@ function mineAutoStep() {
   if ((G.mine.energy || 0) < 5) return;
 
   // Usage de l'auto-mine : 1 Diamant par tuile (100% Diamants, jamais de Pokédollars).
-  const hasWallet =
-    typeof ensureWallet === 'function' || (G && typeof G.wallet === 'object' && G.wallet !== null);
   const w = typeof ensureWallet === 'function' ? ensureWallet() : G && G.wallet;
-  if (hasWallet) {
-    const currentDiamonds = w ? w.diamonds || 0 : 0;
-    if (currentDiamonds < 1) {
-      G.mine.automation.enabled = false;
-      notify(t('mine_auto_no_diamonds'), 'var(--red)');
-      saveGame();
-      try {
-        renderMineWindow();
-      } catch (_) {}
-      return;
-    }
-    if (typeof spendDiamonds === 'function') {
-      spendDiamonds(1);
-      addBattleLog(
-        typeof tr === 'function'
-          ? tr('mine_auto_fee_diamonds_log')
-          : " [Mine] -1 Diamant pour l'extraction automatique d'une tuile."
-      );
-      updateHeader();
-    } else if (w) {
-      w.diamonds -= 1;
-    }
+  const currentDiamonds = w ? (w.diamonds || 0) : ((G && G.wallet && G.wallet.diamonds) || 0);
+  if (currentDiamonds < 1) {
+    G.mine.automation.enabled = false;
+    notify(t('mine_auto_no_diamonds'), 'var(--red)');
+    saveGame();
+    try {
+      renderMineWindow();
+    } catch (_) {}
+    return;
+  }
+  if (typeof spendDiamonds === 'function') {
+    spendDiamonds(1);
+    addBattleLog(
+      typeof tr === 'function'
+        ? tr('mine_auto_fee_diamonds_log')
+        : " [Mine] -1 Diamant pour l'extraction automatique d'une tuile."
+    );
+    updateHeader();
+  } else if (w) {
+    w.diamonds -= 1;
   }
 
   const oldTool = G.mine.tool;

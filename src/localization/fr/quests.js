@@ -499,32 +499,32 @@ export const L_fr_quests = {
 },
 "136": {
 "title":"Raikou, la Foudre Pourpre",
-"desc":"À la Tour Cendrée de Rosalia, mettez K.O. 25 Pokémon sauvages pour attirer Raikou et le défier.",
+"desc":"À la Tour Cendrée de Rosalia, mettez K.O. 150 Pokémon sauvages pour attirer Raikou et le défier.",
 "rewardDesc":"16 000₽ + Raikou (Nv.50)"
 },
 "137": {
 "title":"Entei, le Volcan Vivant",
-"desc":"À la Tour Cendrée de Rosalia, mettez K.O. 25 Pokémon sauvages pour attirer Entei et le défier.",
+"desc":"À la Tour Cendrée de Rosalia, mettez K.O. 150 Pokémon sauvages pour attirer Entei et le défier.",
 "rewardDesc":"16 000₽ + Entei (Nv.50)"
 },
 "138": {
 "title":"Suicune, l’Aurore Boréale",
-"desc":"À la Tour Cendrée de Rosalia, mettez K.O. 25 Pokémon sauvages pour attirer Suicune et le défier.",
+"desc":"À la Tour Cendrée de Rosalia, mettez K.O. 150 Pokémon sauvages pour attirer Suicune et le défier.",
 "rewardDesc":"16 000₽ + 1 Aile Arc-en-ciel + Suicune (Nv.50)"
 },
 "139": {
 "title":"Tourb’Îles : Lugia",
-"desc":"Aux Tourb’Îles, présentez l'Aile d'Argent pour éveiller Lugia, gardien des mers.",
+"desc":"Aux Tourb’Îles, mettez K.O. 150 Pokémon sauvages pour éveiller Lugia, gardien des mers.",
 "rewardDesc":"20 000₽ + Lugia (Nv.70)"
 },
 "140": {
 "title":"Tour Carillon : Ho-Oh",
-"desc":"À la Tour Carillon de Rosalia, présentez l'Aile Arc-en-ciel pour faire apparaître Ho-Oh.",
+"desc":"À la Tour Carillon de Rosalia, mettez K.O. 150 Pokémon sauvages pour faire apparaître Ho-Oh.",
 "rewardDesc":"20 000₽ + Ho-Oh (Nv.70)"
 },
 "141": {
 "title":"Bois aux Chênes : Celebi",
-"desc":"Dans la clairière sacrée du Bois aux Chênes, le gardien du temps Celebi apparaît parfois aux dresseurs patients. Mettez K.O. 25 Pokémon sauvages pour l'attirer !",
+"desc":"Dans la clairière sacrée du Bois aux Chênes, le gardien du temps Celebi apparaît parfois aux dresseurs patients. Mettez K.O. 150 Pokémon sauvages pour l'attirer !",
 "rewardDesc":"20 000₽ + Celebi (Nv.50)"
 },
 

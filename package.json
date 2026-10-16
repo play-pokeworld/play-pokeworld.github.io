@@ -1,6 +1,6 @@
 {
   "name": "pokeworld-refactor",
-  "version": "7.5.3",
+  "version": "7.6.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -22,7 +22,7 @@
     "sim:battles": "node tools/sim_battles.mjs --runs 50"
   },
   "devDependencies": {
-    "esbuild": "^0.28.1",
+    "esbuild": "^0.28.2",
     "eslint": "^10.7.0",
     "jsdom": "^29.1.1",
     "playwright": "^1.62.1",

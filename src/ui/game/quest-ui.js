@@ -551,9 +551,8 @@ function getRepeatableChoices() {
   return _repeatableRoll;
 }
 function isRepeatableAvailable(q) {
-  if (!q) return false;
-  const qRegion =
-    q.region || (q.loc && typeof regionOfLoc === 'function' ? regionOfLoc(q.loc) : 'kanto');
+  if (!q || !q.loc) return true;
+  const qRegion = typeof regionOfLoc === 'function' ? regionOfLoc(q.loc) : q.region || 'kanto';
   return qRegion === (G.region || 'kanto');
 }
 function repeatablePool() {
@@ -656,8 +655,7 @@ function renderRepeatableBoard() {
     offers: _repeatableRoll.map((tpl, i) => {
       const activeInst = (G.repeatables || []).find((r) => r.tplId === tpl.id);
       const active = !!activeInst;
-      const isDone =
-        activeInst && typeof questDone === 'function' ? questDone(activeInst, tpl) : false;
+      const isDone = activeInst && typeof questDone === 'function' ? questDone(activeInst, tpl) : false;
       const prog =
         activeInst && typeof questProgressValue === 'function'
           ? questProgressValue(activeInst, tpl)

@@ -387,10 +387,10 @@ test('LEG-01 — Kanto/Johto main legendary quests: encounter gated on location,
   assert.equal(sb.attemptAutoCatch(sb.battle.enemy), true);
 });
 
-test('LEG-01 — battle-status completes a reward battle only when the capture succeeded (source contract)', () => {
+test('LEG-01 — battle-status completes a reward battle upon defeat, whether captured or not (source contract)', () => {
   const src = R('src/application/combat/battle-status.js');
   assert.ok(/caughtNow = \(?attemptAutoCatch\(e\) === true\)?/.test(src)); // V7 · DBT-01
-  assert.ok(wsMatch(src, /if\(caughtNow\) completeQuestRewardBattle\(completedQuestId, completedCat\);/)); // V7 · DBT-01
+  assert.ok(wsMatch(src, /completeQuestRewardBattle\(completedQuestId, completedCat\);/)); // V7 · DBT-01
   assert.ok(/legendary_quest_escaped/.test(src));
   assert.ok(!/battle\.legendaryCatch/.test(R('src/application/combat/catch.js')), 'forced success removed from catch.js');
   assert.ok(!/battle\.legendaryCatch/.test(R('src/application/combat/battle-encounter.js')));

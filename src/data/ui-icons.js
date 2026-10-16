@@ -105,7 +105,7 @@ const UI_ICONS = {
  
  energy: '<svg viewBox="0 0 24 24"fill="none"stroke="currentColor"stroke-width="2"stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 10-12h-7l1-8z"/></svg>',
  
-  badge: '<svg viewBox="0 0 24 24" fill="none"><path d="M7.5 2.5h9l5 5v9l-5 5h-9l-5-5v-9z" fill="#9ca3af" stroke="#4b5563" stroke-width="1.5" stroke-linejoin="round"/><path d="M7.5 2.5l4.5 5 4.5-5" fill="#d1d5db" stroke="#4b5563" stroke-width="1.2"/><path d="M7.5 21.5l4.5-5 4.5 5" fill="#6b7280" stroke="#4b5563" stroke-width="1.2"/><path d="M2.5 7.5l5 4.5-5 4.5" fill="#d1d5db" stroke="#4b5563" stroke-width="1.2"/><path d="M21.5 7.5l-5 4.5 5 4.5" fill="#6b7280" stroke="#4b5563" stroke-width="1.2"/><path d="M12 7.5l4.5 4.5-4.5 4.5-4.5-4.5z" fill="#e5e7eb" stroke="#374151" stroke-width="1.2"/></svg>',
+  badge: '<svg viewBox="0 0 24 24"fill="#94886B"><path d="M12 2l3 7h7l-5.5 4.5 2 7L12 16l-6.5 4.5 2-7L2 9h7z"/></svg>',
  star: '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
  sword: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/></svg>',
  trainer: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
