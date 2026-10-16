@@ -83,7 +83,27 @@ export class QuestView extends UIView {
               h('div', { class: 'pw-detail-text' }, h.raw(offer.desc || '')),
               h('div', { class: 'pw-detail-hint' }, h.raw(offer.reward || '')),
               offer.active
-                ? h('div', { class: 'pw-green-text' }, offer.activeLabel)
+                ? offer.isDone
+                  ? h(
+                      'button',
+                      {
+                        type: 'button',
+                        class: 'pw-ui-btn hbtn is-done quest-claim-btn',
+                        dataset: {
+                          action: 'legacy-call',
+                          call: offer.claimCall || 'claimQuest',
+                          callArgs: offer.claimArgs || '',
+                        },
+                      },
+                      offer.claimLabel || 'Valider'
+                    )
+                  : h(
+                      'div',
+                      { class: 'pw-green-text' },
+                      offer.progressText
+                        ? `${offer.activeLabel || 'En cours'} (${offer.progressText})`
+                        : offer.activeLabel || 'En cours'
+                    )
                 : QuestView.acceptVNode(offer)
             ),
         })

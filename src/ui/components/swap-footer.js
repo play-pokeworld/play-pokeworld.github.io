@@ -19,36 +19,43 @@
 import { h, toHTMLString } from '../../engine/render/vdom.js';
 
 export function swapFooterVNode(m) {
-  return h(
-    'div',
-    { class: 'usm-swap-footer' },
-    h('div', { class: 'usm-swap-footer-label' }, m.label || ''),
+  const actions = [
     h(
-      'div',
-      { class: 'usm-swap-footer-actions' },
-      h(
-        'button',
-        {
-          class: 'hbtn usm-cancel-btn',
-          dataset: { action: 'legacy-call', call: 'cancelTeamSwap', callArgs: '' },
+      'button',
+      {
+        class: 'hbtn usm-cancel-btn',
+        dataset: {
+          action: 'legacy-call',
+          call: m.cancelCall || 'cancelTeamSwap',
+          callArgs: m.cancelArgs || '',
         },
-        m.iconHtml ? h.raw(`${m.iconHtml} `) : null,
-        m.cancelLabel || ''
-      ),
+      },
+      m.iconHtml ? h.raw(`${m.iconHtml} `) : null,
+      m.cancelLabel || ''
+    ),
+  ];
+  if (m.removeLabel) {
+    actions.push(
       h(
         'button',
         {
           class: 'hbtn usm-remove-btn',
           dataset: {
             action: 'call-close-selector',
-            call: 'removeFromTeam',
+            call: m.removeCall || 'removeFromTeam',
             callArgs: m.removeArgs == null ? '' : String(m.removeArgs),
           },
         },
         m.iconHtml ? h.raw(`${m.iconHtml} `) : null,
         m.removeLabel || ''
       )
-    )
+    );
+  }
+  return h(
+    'div',
+    { class: 'usm-swap-footer' },
+    h('div', { class: 'usm-swap-footer-label' }, m.label || ''),
+    h('div', { class: 'usm-swap-footer-actions' }, ...actions)
   );
 }
 

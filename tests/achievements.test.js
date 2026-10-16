@@ -136,15 +136,13 @@ test('ACH-01 / anti-inflation — multipliers calculation and strict caps', () =
 
 import { L_fr_ui } from '../src/localization/fr/ui.js';
 
-test('HLP-ach — in-game guide includes achievements section', () => {
+test('HLP-ach — achievements has its dedicated panel and tracker (removed from guide)', async () => {
   globalThis.t = (k) => L_fr_ui[k] || k;
   globalThis.tr = (k, v) => L_fr_ui[k] || k;
   globalThis.G = globalThis.G || { badges: [], unlockedLocs: {} };
   const sections = guideSections();
-  assert.ok(sections.achievements, 'achievements guide section must exist');
-  assert.ok(sections.achievements.pages.length >= 4, 'Must have at least 4 guide pages');
-  const allText = sections.achievements.pages.map((p) => p.join(' ')).join(' ');
-  assert.ok(/rétroactif|retroactive/i.test(allText), 'Must explain retroactivity');
-  assert.ok(/bonus|portée|scope/i.test(allText), 'Must explain bonus scopes');
-  assert.ok(/inflation|plafond|cap/i.test(allText), 'Must explain anti-inflation safeguards');
+  assert.ok(!sections.achievements, 'achievements is removed from guide since it has its own dedicated page');
+  const { renderAchievementsPanel, renderAchievementsTrackerWindow } = await import('../src/ui/game/achievements-panel.js');
+  assert.equal(typeof renderAchievementsPanel, 'function');
+  assert.equal(typeof renderAchievementsTrackerWindow, 'function');
 });

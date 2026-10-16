@@ -103,6 +103,12 @@ const SHOPS = {
  },
 "jgoldenrod": {
 "items": [
+"firestone",
+"waterstone",
+"thunderstone",
+"leafstone",
+"moonstone",
+"sunstone",
 "lucky_punch",
 "quick_claw",
 "tanga_berry",

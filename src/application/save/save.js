@@ -335,7 +335,21 @@ function normalizeLoadedState() {
   }
   if (typeof resetUpdateBannerState === 'function') resetUpdateBannerState();
   if (!G) G = {};
+  if (G._atollTeamBackup) {
+    G.team = G._atollTeamBackup;
+    delete G._atollTeamBackup;
+  }
+  if (G._atollTeamSlotItemsBackup) {
+    G.teamSlotItems = G._atollTeamSlotItemsBackup;
+    delete G._atollTeamSlotItemsBackup;
+  }
+  if (Array.isArray(G.team)) {
+    G.team = G.team.filter((p) => p && !p._isRental);
+  }
   if (!G.collection) G.collection = {};
+  for (const k in G.collection) {
+    if (G.collection[k] && G.collection[k]._isRental) delete G.collection[k];
+  }
   // deletion of the Proxy (lisibilite) – on nettoie juste the cles techniques accidentelles
   try {
     for (const k in G.collection) {
@@ -1129,11 +1143,28 @@ function saveGame(manual = false) {
       markAfkSeen(false);
     updatePlayTimeBeforeSave();
     G.saveMeta.pendingStarter = false;
+    const gClone = JSON.parse(JSON.stringify(G));
+    if (gClone._atollTeamBackup) {
+      gClone.team = gClone._atollTeamBackup;
+      delete gClone._atollTeamBackup;
+      if (gClone._atollTeamSlotItemsBackup) {
+        gClone.teamSlotItems = gClone._atollTeamSlotItemsBackup;
+        delete gClone._atollTeamSlotItemsBackup;
+      }
+    }
+    if (Array.isArray(gClone.team)) {
+      gClone.team = gClone.team.filter((p) => p && !p._isRental);
+    }
+    if (gClone.collection) {
+      for (const k in gClone.collection) {
+        if (gClone.collection[k] && gClone.collection[k]._isRental) delete gClone.collection[k];
+      }
+    }
     const saveData = {
       version: SAVE_VERSION,
       timestamp: saveNow(),
       saveId: currentSaveId,
-      G: JSON.parse(JSON.stringify(G)),
+      G: gClone,
     };
     ensureSaveMeta(saveData, currentSaveId);
     const json = JSON.stringify(saveData);

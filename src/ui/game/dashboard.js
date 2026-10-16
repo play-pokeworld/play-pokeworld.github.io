@@ -23,7 +23,7 @@ if (typeof globalThis !== 'undefined' && !globalThis.safeStorage) {
 // milieu  = Monnaies · Carte · Combat · Base secrète
 // droite  = Raccourcis · Lieu · Entraînement · Mine
 let dashboardCols = {
-  1: ['win-pokeballs', 'win-story', 'win-team', 'win-hatchery'],
+  1: ['win-achievements', 'win-pokeballs', 'win-story', 'win-team', 'win-hatchery'],
   2: ['win-currency', 'win-map', 'win-battle', 'win-base'],
   3: ['win-shortcuts', 'win-tabs', 'win-training', 'win-mine'],
 };
@@ -59,6 +59,7 @@ function renderDashboardColumns() {
   // (migration des anciennes sauvegardes) — injectée dans sa colonne de base
   // (Passe 26g) si absente de toutes les colonnes.
   const DEFAULT_COL = {
+    'win-achievements': 1,
     'win-story': 1,
     'win-team': 1,
     'win-hatchery': 1,
@@ -104,6 +105,15 @@ function renderDashboardColumns() {
         if (wEl) colEl.appendChild(wEl);
       });
     }
+  }
+  if (typeof renderAchievementsTrackerWindow === 'function') {
+    try {
+      renderAchievementsTrackerWindow();
+    } catch (_) {}
+  } else if (typeof globalThis.renderAchievementsTrackerWindow === 'function') {
+    try {
+      globalThis.renderAchievementsTrackerWindow();
+    } catch (_) {}
   }
 }
 
@@ -194,6 +204,7 @@ function renderDashboardChrome() {
     tools.forEach((node) => toolsWrap.appendChild(node));
     head.appendChild(toolsWrap);
     const WIN_GUIDE_SECTION = {
+      'win-achievements': 'achievements',
       'win-story': 'quests',
       'win-team': 'pokemon',
       'win-hatchery': 'hatchery',
@@ -234,7 +245,7 @@ function resetAllWins() {
 function setWindowLayout(preset) {
   if (preset === 'cols3') {
     dashboardCols = {
-      1: ['win-pokeballs', 'win-story', 'win-team', 'win-hatchery'],
+      1: ['win-achievements', 'win-pokeballs', 'win-story', 'win-team', 'win-hatchery'],
       2: ['win-currency', 'win-map', 'win-battle', 'win-base'],
       3: ['win-shortcuts', 'win-tabs', 'win-training', 'win-mine'],
     };

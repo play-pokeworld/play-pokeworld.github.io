@@ -325,10 +325,12 @@ var NPCS = {
  ],
  "ruinsofalph": [
   {
-   "quest": "s92"
+   "quest": "s92",
+   "mainTalk": 113
   },
   {
-   "quest": "s93"
+   "quest": "s93",
+   "mainTalk": 116
   },
   {
    "quest": "s40"

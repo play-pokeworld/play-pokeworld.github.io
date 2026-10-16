@@ -260,6 +260,7 @@ function renderMap() {
   }
   _pwSetHtmlSafe(nodeG, rectsHTML + labelsHTML + markersHTML);
   ensureMapHelpButton();
+  ensureMapZoomControls();
   initMobileMapPinchZoom();
   // V7-R1c — retour joueur : « garder le zoom même après un clic, sur
   // téléphone c'est embêtant de devoir re-zoomer au bon endroit à chaque
@@ -399,6 +400,109 @@ function initMobileMapPinchZoom() {
 
   panel.addEventListener('pointerup', onPointerUp);
   panel.addEventListener('pointercancel', onPointerUp);
+
+  panel.addEventListener(
+    'wheel',
+    (e) => {
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.15 : 0.87;
+      zoomMap(factor, e.clientX, e.clientY);
+    },
+    { passive: false }
+  );
+}
+
+function zoomMap(factor, cxScreen, cyScreen) {
+  const svg = document.getElementById('map-svg');
+  if (!svg) return;
+  const rect = svg.getBoundingClientRect();
+  if (!rect.width || !rect.height) return;
+
+  const oldZoom = __pwMapZoom;
+  const newZoom = Math.max(1.0, Math.min(3.5, oldZoom * factor));
+  if (Math.abs(newZoom - oldZoom) < 0.001) return;
+
+  const curW = 1600 / oldZoom;
+  const curH = 960 / oldZoom;
+  const scaleX = curW / rect.width;
+  const scaleY = curH / rect.height;
+
+  const cx = cxScreen != null ? cxScreen - rect.left : rect.width / 2;
+  const cy = cyScreen != null ? cyScreen - rect.top : rect.height / 2;
+  const svgCx = __pwMapVbX + cx * scaleX;
+  const svgCy = __pwMapVbY + cy * scaleY;
+
+  __pwMapZoom = newZoom;
+  const newW = 1600 / newZoom;
+  const newH = 960 / newZoom;
+  const newScaleX = newW / rect.width;
+  const newScaleY = newH / rect.height;
+
+  __pwMapVbX = svgCx - cx * newScaleX;
+  __pwMapVbY = svgCy - cy * newScaleY;
+
+  if (__pwMapZoom <= 1.001) {
+    __pwMapZoom = 1.0;
+    __pwMapVbX = 0;
+    __pwMapVbY = 0;
+  }
+  applyMapViewBox();
+}
+
+function resetMapZoom() {
+  __pwMapZoom = 1.0;
+  __pwMapVbX = 0;
+  __pwMapVbY = 0;
+  applyMapViewBox();
+}
+
+function ensureMapZoomControls() {
+  const panel = document.getElementById('map-panel');
+  if (!panel || document.getElementById('map-zoom-controls')) return;
+
+  const wrap = document.createElement('div');
+  wrap.id = 'map-zoom-controls';
+  wrap.className = 'map-zoom-controls';
+
+  const btnIn = document.createElement('button');
+  btnIn.type = 'button';
+  btnIn.className = 'map-zoom-btn';
+  btnIn.textContent = '+';
+  btnIn.title = globalThis.t ? globalThis.t('zoom_in') || 'Zoomer (+)' : 'Zoomer (+)';
+  btnIn.setAttribute('aria-label', 'Zoomer');
+  btnIn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    zoomMap(1.3);
+  });
+
+  const btnReset = document.createElement('button');
+  btnReset.type = 'button';
+  btnReset.className = 'map-zoom-btn';
+  btnReset.textContent = '⟲';
+  btnReset.title = globalThis.t
+    ? globalThis.t('zoom_reset') || 'Réinitialiser (1:1)'
+    : 'Réinitialiser (1:1)';
+  btnReset.setAttribute('aria-label', 'Réinitialiser');
+  btnReset.addEventListener('click', (e) => {
+    e.stopPropagation();
+    resetMapZoom();
+  });
+
+  const btnOut = document.createElement('button');
+  btnOut.type = 'button';
+  btnOut.className = 'map-zoom-btn';
+  btnOut.textContent = '−';
+  btnOut.title = globalThis.t ? globalThis.t('zoom_out') || 'Dézoomer (−)' : 'Dézoomer (−)';
+  btnOut.setAttribute('aria-label', 'Dézoomer');
+  btnOut.addEventListener('click', (e) => {
+    e.stopPropagation();
+    zoomMap(0.77);
+  });
+
+  wrap.appendChild(btnIn);
+  wrap.appendChild(btnReset);
+  wrap.appendChild(btnOut);
+  panel.appendChild(wrap);
 }
 
 function clickLocation(id) {

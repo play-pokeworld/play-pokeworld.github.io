@@ -237,7 +237,9 @@ export function pokeFullCardVNode(model = {}) {
         model.fainted && 'fainted',
         model.extraClass
       ),
-      dataset: morphKey ? { pwKey: morphKey } : undefined,
+      dataset: morphKey
+        ? { pwKey: morphKey, ...(model.cardDataset || {}) }
+        : model.cardDataset || undefined,
     },
     ...children
   );

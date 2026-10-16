@@ -32,9 +32,10 @@ function automationCostLabel(key) {
   return `${formatNumber(cost)} ${t('currency_quest_points')}`;
 }
 function automationUnlockModel(key) {
+  const costLabel = automationCostLabel(key);
   return {
     purchased: false,
-    lockedLabel: automationCostLabel(key),
+    lockedLabel: costLabel,
     buy: { call: 'buyAutomationUpgrade', args: `'${key}'`, label: t('buy_btn') },
   };
 }
@@ -46,16 +47,16 @@ function purchaseAutomationIfNeeded(key) {
   const cost = AUTOMATION_UPGRADE_COSTS[key] || 0;
   if (!cost || isAutomationPurchased(key)) return true;
   // P0 — paiement en Points de quête.
-  const w = typeof ensureWallet === 'function' ? ensureWallet() : null;
+  const w = globalThis.ensureWallet ? globalThis.ensureWallet() : null;
   if (!w || (w.questPoints || 0) < cost) {
     notify(tr('automation_upgrade_need_pq', { price: formatNumber(cost) }), 'var(--red)');
     return false;
   }
-  if (typeof spendQuestPoints === 'function') spendQuestPoints(cost);
+  if (globalThis.spendQuestPoints) globalThis.spendQuestPoints(cost);
   else w.questPoints -= cost;
   if (!G.automationUpgrades || typeof G.automationUpgrades !== 'object') G.automationUpgrades = {};
   G.automationUpgrades[key] = true;
-  updateHeader();
+  if (globalThis.updateHeader) globalThis.updateHeader();
   notify(
     tr('automation_upgrade_bought_pq', { name: t('automation_' + key), price: formatNumber(cost) }),
     'var(--green)'
@@ -67,11 +68,27 @@ function buyAutomationUpgrade(key) {
     notify(t('automation_already_bought'), 'var(--green)');
     return;
   }
-  if (purchaseAutomationIfNeeded(key)) {
-    saveGame();
-    try {
-      openHatcheryManagementMenu('automation');
-    } catch (_) {}
+  const cost = AUTOMATION_UPGRADE_COSTS[key] || 0;
+  const price = `${formatNumber(cost)} ${t('currency_quest_points')}`;
+  const name = t('automation_' + key) || key;
+  const msg =
+    tr('automation_buy_confirm', { name, price }) ||
+    `Acheter l'automatisation « ${name} » pour ${price} ?`;
+
+  const doBuy = () => {
+    if (purchaseAutomationIfNeeded(key)) {
+      saveGame();
+      try {
+        openHatcheryManagementMenu('automation');
+      } catch (_) {}
+    }
+  };
+
+  const confirmFn = globalThis.pwConfirm || null;
+  if (confirmFn) {
+    confirmFn(msg, doBuy, { title: t('management_automation') });
+  } else {
+    doBuy();
   }
 }
 function toggleAutomationButton(key) {
@@ -105,7 +122,7 @@ function toggleAutomation(key, val) {
       if (typeof processHatcheryQueue === 'function') processHatcheryQueue();
       if (typeof renderHatcheryWindow === 'function') renderHatcheryWindow();
       if (typeof renderTeamWindow === 'function') renderTeamWindow();
-      if (typeof updateHeader === 'function') updateHeader();
+      if (globalThis.updateHeader) globalThis.updateHeader();
     } catch (e) {
       console.error(e);
     }
@@ -346,9 +363,7 @@ function getHatcheryLevelUpFee() {
 
 function getMineAutomationFee() {
   if (!G.mine || !G.mine.automation || !G.mine.automation.enabled) return 0;
-  const baseFee = 500; // 500₽ per tile
-  const discount = getStaffSectorDiscount('mine');
-  return Math.max(0, Math.ceil(baseFee * (1 - discount)));
+  return 1; // 1 Diamant par tuile
 }
 
 function canAccessStaffLocation(def) {
@@ -388,7 +403,7 @@ function staffPrice(def) {
 function staffHasFunds(hire) {
   if (hire.currency === 'money') return (G.money || 0) >= hire.price;
   if (hire.currency === 'questPoints') {
-    const w = typeof ensureWallet === 'function' ? ensureWallet() : null;
+    const w = globalThis.ensureWallet ? globalThis.ensureWallet() : null;
     return !!(w && w.questPoints >= hire.price);
   }
   if (hire.currency === 'diamonds') {
@@ -557,19 +572,28 @@ function staffListModel(type) {
         : typeof t === 'function'
           ? t('fee_mine')
           : 'tile mined';
-  const baseFeeVal = type === 'hatchery' ? 1000 : type === 'training' ? 500 : 500;
+  const isMine = type === 'mine';
+  const baseFeeVal = type === 'hatchery' ? 1000 : 500;
   const disc = getStaffSectorDiscount(type);
   const curFee = Math.max(0, Math.ceil(baseFeeVal * (1 - disc)));
   const combinedLv = getStaffSectorLevelsCombined(type);
+
+  const feeText = isMine
+    ? typeof tr === 'function'
+      ? tr('mine_auto_fee_text', { n: 1 })
+      : '1 Diamant'
+    : `${curFee}₽`;
+
+  const tip1 = `💡 ${typeof t === 'function' ? t('sector_fee_label') : '<b>Fees for'} ${sectorName} :</b> ${feeText} ${typeof t === 'function' ? t('sector_fee_per') : 'per'} ${feeLabel}.`;
+  const tip2 = isMine
+    ? `<i>${typeof t === 'function' ? t('sector_mine_fee_desc') || 'L’automatisation de la mine consomme 1 Diamant par tuile extraite.' : 'Automation consumes 1 Diamond per tile mined.'}</i>`
+    : `<i>${typeof t === 'function' ? t('sector_fee_desc') : 'Level all staff to 100 (Max) to reduce fees to 0₽!'} (${typeof t === 'function' ? t('sector_fee_levels') : 'Combined sector levels'} : ${combinedLv}/500)</i>`;
 
   return {
     activeCount: active.length,
     max,
     activeLabel: t('staff_active'),
-    tipLines: [
-      `💡 ${typeof t === 'function' ? t('sector_fee_label') : '<b>Fees for'} ${sectorName} :</b> ${curFee}₽ ${typeof t === 'function' ? t('sector_fee_per') : 'per'} ${feeLabel}.`,
-      `<i>${typeof t === 'function' ? t('sector_fee_desc') : 'Level all staff to 100 (Max) to reduce fees to 0₽!'} (${typeof t === 'function' ? t('sector_fee_levels') : 'Combined sector levels'} : ${combinedLv}/500)</i>`,
-    ],
+    tipLines: [tip1, tip2],
     cards: defs.map((def) => {
       const owned = !!G.staff.owned[def.id];
       const isActive = active.includes(def.id);

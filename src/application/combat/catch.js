@@ -136,6 +136,11 @@ function attemptAutoCatch(e) {
   let ballRate = pwLateLink('ballEffectiveRate')
     ? ballEffectiveRate(ballKey, e)
     : (ballDefNow && ballDefNow.rate) || 10;
+  const achFn = globalThis.getAchievementBonus;
+  if (achFn) {
+    const achCatch = achFn('capture', 'global');
+    if (achCatch > 0) ballRate = Math.min(100, ballRate + achCatch);
+  }
   // V7 · LEG-01 (D13) — rencontre de fin de quête légendaire : taux × 2 (plafond
   // 100 %), jamais garanti. Pokémon offert par une quête (questGift) : garanti.
   if (typeof battle !== 'undefined' && battle) {

@@ -54,14 +54,20 @@ export function installGameplayPorts() {
       }
       return set;
     },
-    getEvoTargetIds: () => {
+    getEvoTargetIds: (region) => {
       const set = new Set();
       try {
         const levelMap = globalThis.LEVEL_EVO_MAP || {};
-        for (const target of Object.values(levelMap)) set.add(Number(target));
+        for (const [baseId, target] of Object.entries(levelMap)) {
+          if (region === 'kanto' && Number(baseId) > 151) continue;
+          if (region === 'johto' && (Number(baseId) < 152 || Number(baseId) > 251)) continue;
+          set.add(Number(target));
+        }
         const stoneMap = globalThis.STONE_EVO || {};
-        for (const key of Object.keys(stoneMap)) {
-          for (const target of Object.values(stoneMap[key])) set.add(Number(target));
+        for (const baseId of Object.keys(stoneMap)) {
+          if (region === 'kanto' && Number(baseId) > 151) continue;
+          if (region === 'johto' && (Number(baseId) < 152 || Number(baseId) > 251)) continue;
+          for (const target of Object.values(stoneMap[baseId])) set.add(Number(target));
         }
       } catch (_) {
         /* tolerate partial data tables */

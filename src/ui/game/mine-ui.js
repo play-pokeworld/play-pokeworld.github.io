@@ -45,9 +45,9 @@ function mineAutoHeaderAction() {
   const auto = (G && G.mine && G.mine.automation) || { purchased: false, enabled: false };
   if (auto.purchased)
     return {
-      label: tr('mine_auto_toggle', {
+      label: `${tr('mine_auto_toggle', {
         state: t(auto.enabled ? 'automation_enabled' : 'automation_disabled'),
-      }),
+      })} (1 ${t('currency_diamonds')} / tuile)`,
       iconHtml: globalThis.getIcon ? globalThis.getIcon('mine', 14) : '',
       call: 'toggleMineAutomation',
       callArgs: '',
@@ -109,10 +109,11 @@ function mineManagementModel(page) {
           label: t('mine_auto_title'),
           purchased: !!auto.purchased,
           enabled: !!auto.enabled,
+          usageCost: `1 ${t('currency_diamonds')} / tuile`,
           call: 'toggleMineAutomation',
           args: '',
-          onLabel: t('automation_enabled'),
-          offLabel: t('automation_disabled'),
+          onLabel: `${t('automation_enabled')} (1 ${t('currency_diamonds')} / tuile)`,
+          offLabel: `${t('automation_disabled')} (1 ${t('currency_diamonds')} / tuile)`,
           // V7-R3c · R3c-04 — prix (Diamants, lu dans MINE_AUTO_COST) + achat direct
           lockedLabel: _mineAutoCostLabel(),
           buy: { call: 'buyMineAutomation', args: '', label: t('buy_btn') },

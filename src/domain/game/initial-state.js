@@ -31,6 +31,7 @@ export function createInitialGameState() {
     storyIdx: 0,
     storyProgress: 0,
     unlockedTalents: {},
+    mineUnlocked: false,
     activeQuests: [],
     repeatables: [],
     visitedMaps: {},
@@ -41,6 +42,7 @@ export function createInitialGameState() {
     playTimeMs: 0,
     saveMeta: {},
     tutorial: { enabled: true, completed: {}, dismissedTips: {}, rewards: {} },
+    achievements: { unlockedTiers: {}, unlockedAt: {}, stats: {} },
     routeEvents: createRouteEventState(),
   };
 }

@@ -68,13 +68,13 @@ test('wave 33 C: the legacy .pw-modal-* header geometry is deleted', () => {
 /* ── 3. Geometry lives in tokens, so no panel can silently drift ────── */
 test('wave 33 D: the header band is described by shared tokens only', () => {
   for (const token of [
-    '--pw-header-h: 34px',
+    '--pw-header-h: 50px',
     '--pw-header-pad: 0 8px 0 10px',
     '--pw-header-radius: 10px',
     '--pw-header-gap: 8px',
     '--pw-header-title-size: 12px',
-    '--pw-header-close-size: 34px',
-    '--pw-header-close-glyph: 17px',
+    '--pw-header-close-size: 40px',
+    '--pw-header-close-glyph: 18px',
   ]) assert.ok(DS.includes(token), `token defined: ${token}`);
 
   const canonical = DS.match(/\.modal-title,\s*\n\.pw-modal-header,\s*\n#fs-panel-header,[\s\S]*?\}/);

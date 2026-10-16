@@ -313,46 +313,33 @@ function renderAutoDungeonRelaunchBar() {
   }
   host.hidden = false;
   if (!isAutoDungeonRelaunchOwned()) {
-    // V7-R3c · R3c-04 — module non acheté : prix + achat direct dans le bandeau.
-    const locked =
-      '<span class="pw-auto-relaunch-title">' +
-      _dgaText('auto_dg_relaunch_title') +
-      '</span><span class="pw-auto-relaunch-state is-locked">' +
-      _dgaText('auto_dg_relaunch_locked', { price: costF(AUTO_DG_KEY) }) +
-      '</span>' +
-      btn(
-        'buyAutoDungeonRelaunchUpgrade',
-        _dgaText('buy_btn'),
-        'pw-auto-relaunch-buy automation-buy-btn'
-      );
+    host.hidden = false;
+    const priceText = costF(AUTO_DG_KEY);
+    const locked = btn(
+      'buyAutoDungeonRelaunchUpgrade',
+      _dgaText('auto_dg_relaunch_locked', { price: priceText }),
+      'pw-auto-relaunch-buy automation-buy-btn'
+    );
     if (setHtml) setHtml(host, locked);
     else host.textContent = locked.replace(/<[^>]+>/g, ' ');
     return;
   }
+  host.hidden = false;
   const on = isAutoDungeonRelaunchEnabled();
   const left = autoDungeonRelaunchRemainingMs();
-  let html =
-    '<span class="pw-auto-relaunch-title">' + _dgaText('auto_dg_relaunch_title') + '</span>';
+  let html = '';
   if (_dgaTimer && left > 0) {
     html +=
       '<span class="pw-auto-relaunch-countdown">' +
       _dgaText('auto_dg_relaunch_countdown', { s: Math.ceil(left / 1000) }) +
       '</span>' +
       btn('cancelAutoDungeonRelaunch', _dgaText('auto_relaunch_cancel'), 'pw-auto-relaunch-cancel');
-  } else {
-    html +=
-      '<span class="pw-auto-relaunch-state' +
-      (on ? ' is-on' : '') +
-      '">' +
-      _dgaText(on ? 'auto_dg_relaunch_on' : 'auto_dg_relaunch_off', {
-        mode: _dgaText('dungeon_auto_mode_' + autoDungeonRelaunchMode()),
-      }) +
-      '</span>';
   }
+  const label = _dgaText('auto_dg_btn_dungeon') || 'Relance auto donjon';
   html += btn(
     'toggleAutoDungeonRelaunch',
-    _dgaText(on ? 'auto_relaunch_toggle_off' : 'auto_relaunch_toggle_on'),
-    'pw-auto-relaunch-toggle'
+    label,
+    'pw-auto-relaunch-toggle' + (on ? ' active' : '')
   );
   if (setHtml) setHtml(host, html);
   else host.textContent = html.replace(/<[^>]+>/g, ' ');
@@ -360,13 +347,28 @@ function renderAutoDungeonRelaunchBar() {
 
 /** V7-R3c — achat depuis le bandeau du donjon (même caisse que la boutique). */
 function buyAutoDungeonRelaunchUpgrade() {
-  const buyF = _dgaFn('purchaseAutomationIfNeeded');
-  if (!buyF || !buyF(AUTO_DG_KEY)) return false;
-  setAutoDungeonRelaunchEnabled(true);
-  const saveF = _dgaFn('saveGame');
-  if (saveF) saveF();
-  renderAutoDungeonRelaunchBar();
-  return true;
+  const costF = _dgaFn('formatNumber') || String;
+  const price = costF(AUTO_DG_KEY) + ' ' + _dgaText('currency_quest_points');
+  const title = _dgaText('auto_dg_relaunch_title') || 'Relance auto des donjons';
+  const msg =
+    _dgaText('auto_relaunch_buy_confirm', { price }) || `Acheter la « ${title} » pour ${price} ?`;
+
+  const doBuy = () => {
+    const buyF = _dgaFn('purchaseAutomationIfNeeded');
+    if (!buyF || !buyF(AUTO_DG_KEY)) return false;
+    setAutoDungeonRelaunchEnabled(true);
+    const saveF = _dgaFn('saveGame');
+    if (saveF) saveF();
+    renderAutoDungeonRelaunchBar();
+    return true;
+  };
+
+  const confirmFn = globalThis.pwConfirm || null;
+  if (confirmFn) {
+    confirmFn(msg, doBuy, { title });
+  } else {
+    doBuy();
+  }
 }
 
 const _autoDungeonRelaunchGlobals = {

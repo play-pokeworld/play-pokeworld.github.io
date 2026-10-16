@@ -551,8 +551,9 @@ function getRepeatableChoices() {
   return _repeatableRoll;
 }
 function isRepeatableAvailable(q) {
-  if (!q || !q.loc) return true;
-  const qRegion = typeof regionOfLoc === 'function' ? regionOfLoc(q.loc) : q.region || 'kanto';
+  if (!q) return false;
+  const qRegion =
+    q.region || (q.loc && typeof regionOfLoc === 'function' ? regionOfLoc(q.loc) : 'kanto');
   return qRegion === (G.region || 'kanto');
 }
 function repeatablePool() {
@@ -653,9 +654,20 @@ function renderRepeatableBoard() {
     },
     introText: t('m.quest_ui.7'),
     offers: _repeatableRoll.map((tpl, i) => {
-      const active = G.repeatables.some((r) => r.tplId === tpl.id);
+      const activeInst = (G.repeatables || []).find((r) => r.tplId === tpl.id);
+      const active = !!activeInst;
+      const isDone =
+        activeInst && typeof questDone === 'function' ? questDone(activeInst, tpl) : false;
+      const prog =
+        activeInst && typeof questProgressValue === 'function'
+          ? questProgressValue(activeInst, tpl)
+          : activeInst
+            ? activeInst.progress || 0
+            : 0;
+      const tgt = tpl.target || 1;
       const rt = getQuestText('repeatable', tpl.id);
       return {
+        id: tpl.id,
         index: i,
         iconHtml: tpl.iconHtml || (typeof getIcon === 'function' ? getIcon('rematch', 14) : ''),
         title: rt.title,
@@ -665,6 +677,11 @@ function renderRepeatableBoard() {
             ? computeRewardText('repeatable', tpl)
             : rt.rewardDesc,
         active: active,
+        isDone: isDone,
+        progressText: active ? `${prog} / ${tgt}` : '',
+        claimLabel: t('m.quest_ui.26') || 'Valider',
+        claimCall: 'claimQuest',
+        claimArgs: `'r_${tpl.id}','repeatable'`,
         canAccept: activeCount < max && !active,
         acceptLabel: t('m.quest_ui.5'),
         activeLabel: t('m.quest_ui.6'),
@@ -819,11 +836,18 @@ function acceptRepeatable(i) {
     delete G.completedQuests['repeatable_' + tpl.id];
     delete G.completedQuests[tpl.id];
   }
+  const initBaseline =
+    tpl.type === 'defeat_wild' && tpl.loc
+      ? typeof getQuestWildWinCount === 'function'
+        ? getQuestWildWinCount(tpl)
+        : 0
+      : 0;
   G.repeatables.push({
     qid: 'r_' + tpl.id,
     tplId: tpl.id,
     cat: 'repeatable',
     def: tpl,
+    baseline: initBaseline,
     progress: 0,
     done: false,
   });

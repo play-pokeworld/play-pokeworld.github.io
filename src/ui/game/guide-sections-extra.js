@@ -75,10 +75,10 @@ function statsGuideValues() {
     evStep: _fmt(evStep),
     shinyBonus: _fmt(Number(S.SHINY_BONUS_PCT) || 20),
     ivCap: _fmt(ivCap),
-    ivMaxBonus: _fmt(ivCap * ivStep),
+    ivMaxBonus: ivCap * ivStep,
     evCap: _fmt(evCap),
     evTotal: _fmt(Number(S.EV_TOTAL_CAP) || 36),
-    evMaxBonus: _fmt(evCap * evStep),
+    evMaxBonus: evCap * evStep,
     capturePct: _fmt(Number(C.IV_CHANCE_PCT) || 10),
     bottleCap: _price('bottle_cap'),
     goldenCap: _price('golden_bottle_cap'),
@@ -156,19 +156,20 @@ function soundGuideValues() {
  * = id de la rubrique de guide-sections.js derrière laquelle s'insérer.
  */
 function guideExtraSections() {
-  const sv = statsGuideValues();
   const bv = ballGuideValues();
-  const snd = soundGuideValues();
   const shv = shinyGuideValues();
+  const sv = statsGuideValues();
   return {
     stats: {
-      after: 'pokemon',
+      after: 'combat',
       icon: _icon('training'),
       title: _T('guide_stats_title'),
       pages: [
         [_T('guide_stats_formula'), _TR('guide_stats_formula_desc', sv)],
-        [_T('guide_stats_iv_gain'), _TR('guide_stats_iv_gain_desc', sv)],
-        [_T('guide_stats_iv_items'), _TR('guide_stats_iv_items_desc', sv)],
+        [
+          _T('guide_stats_iv_gain'),
+          _TR('guide_stats_iv_gain_desc', sv) + ' ' + _TR('guide_stats_iv_items_desc', sv),
+        ],
         [_T('guide_stats_ev_gain'), _TR('guide_stats_ev_gain_desc', sv)],
         [_T('guide_stats_abilities'), _TR('guide_stats_abilities_desc', sv)],
       ],
@@ -178,31 +179,17 @@ function guideExtraSections() {
       icon: _icon('pokeball'),
       title: _T('guide_balls_title'),
       pages: [
-        [_T('guide_balls_filters'), _TR('guide_balls_filters_desc', bv)],
+        [_T('guide_balls_filters'), _T('guide_balls_filters_desc')],
         [_T('guide_balls_shiny_case'), _T('guide_balls_shiny_case_desc')],
-        [_T('guide_balls_custom'), _T('guide_balls_custom_desc')],
-        [_T('guide_balls_special'), _TR('guide_balls_special_desc', bv)],
       ],
     },
     shiny: {
       after: 'pokeballs',
-      icon: _icon('shiny'),
+      icon: _icon('star'),
       title: _T('guide_shiny_title'),
       pages: [
         [_T('guide_shiny_odds'), _TR('guide_shiny_odds_desc', shv)],
         [_T('guide_shiny_bonus'), _TR('guide_shiny_bonus_desc', shv)],
-        [_T('guide_shiny_dupes'), _T('guide_shiny_dupes_desc')],
-        [_T('guide_shiny_farm'), _T('guide_shiny_farm_desc')],
-      ],
-    },
-    sound: {
-      after: 'save',
-      icon: _icon('settings'),
-      title: _T('guide_sound_title'),
-      pages: [
-        [_T('guide_sound_settings'), _TR('guide_sound_settings_desc', snd)],
-        [_T('guide_sound_places'), _TR('guide_sound_places_desc', snd)],
-        [_T('guide_sound_official'), _T('guide_sound_official_desc')],
       ],
     },
   };

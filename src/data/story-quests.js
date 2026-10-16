@@ -460,7 +460,7 @@ var STORY_QUESTS = [
   "loc": "saffron",
   "battleId": "kanto_dojo_master",
   "target": 1,
-  "rewardPoke": 236,
+  "rewardPoke": 106,
   "rewardLevel": 25
  },
  {

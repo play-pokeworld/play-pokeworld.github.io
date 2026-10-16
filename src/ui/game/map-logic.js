@@ -302,8 +302,32 @@ function trainingUnlocked() {
 // testing the main entrance covers the whole place: the Route 2 back entrance
 // can no longer open on the 3rd badge while the real one is still locked.
 function mineUnlocked() {
-  if (G && (G.location === 'diglettscave' || G.location === 'diglettscave_2')) return true;
-  return isLocUnlocked('diglettscave');
+  if (!G) return false;
+  if (G.mineUnlocked) return true;
+  if (G.location === 'diglettscave' || G.location === 'diglettscave_2') {
+    G.mineUnlocked = true;
+    return true;
+  }
+  if (G.unlockedLocs && (G.unlockedLocs.diglettscave || G.unlockedLocs.diglettscave_2)) {
+    G.mineUnlocked = true;
+    return true;
+  }
+  if (
+    G.mine &&
+    ((G.mine.totalLayersDug || 0) > 0 ||
+      (G.mine.layersDug || 0) > 0 ||
+      (G.mine.items && G.mine.items.length) ||
+      (G.mine.unlockedTools && Object.keys(G.mine.unlockedTools).length > 1) ||
+      (G.mine.automation && G.mine.automation.purchased))
+  ) {
+    G.mineUnlocked = true;
+    return true;
+  }
+  if (typeof isLocUnlocked === 'function' && isLocUnlocked('diglettscave')) {
+    G.mineUnlocked = true;
+    return true;
+  }
+  return false;
 }
 function secretBaseUnlocked() {
   return !!(typeof G !== 'undefined' && G && G.unlockedSecretBaseHoenn);

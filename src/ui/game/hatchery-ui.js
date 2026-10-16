@@ -65,20 +65,33 @@ function hatcheryManagementModel(page) {
     const unlockFn = globalThis.automationUnlockModel;
     const unlock = (key) =>
       unlockFn ? unlockFn(key) : { purchased: false, lockedLabel: t('automation_locked_upgrade') };
-    const card = (key, iconName) =>
-      Object.assign(
+    const card = (key, iconName) => {
+      const fee =
+        key === 'autoHatch'
+          ? typeof getHatcheryAutomationFee === 'function'
+            ? getHatcheryAutomationFee()
+            : 1000
+          : typeof getHatcheryLevelUpFee === 'function'
+            ? getHatcheryLevelUpFee()
+            : 100;
+      const feeUnit = key === 'autoHatch' ? 'œuf' : 'niv.';
+      const usageCost =
+        fee > 0 ? `${fee}₽ / ${feeUnit}` : typeof t === 'function' ? t('free') : 'Gratuit';
+      return Object.assign(
         {
           iconHtml: icon(iconName),
           label: t('automation_' + key),
           purchased: true,
           enabled: !!G.automation[key],
+          usageCost,
           call: 'toggleAutomationButton',
           args: `'${key}'`,
-          onLabel: t('automation_enabled'),
-          offLabel: t('automation_disabled'),
+          onLabel: `${t('automation_enabled')} (${usageCost})`,
+          offLabel: `${t('automation_disabled')} (${usageCost})`,
         },
         purchased(key) ? {} : unlock(key)
       );
+    };
     blocks.push({
       kind: 'toggles',
       cards: [card('autoHatch', 'hatchery'), card('autoSeedHatchery', 'box')],

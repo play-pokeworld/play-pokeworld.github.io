@@ -16,7 +16,7 @@ export var SHOPS_HOENN = {
   fallarbor: { items: ["spell_tag"] },
   lavaridge: { items: ["charcoal"] },
   fortree: { items: ["sharp_beak"] },
-  lilycove_dept_store: { items: ["leftovers", "mental_herb", "hp_up", "protein", "iron", "calcium", "carbos", "zinc", "bottle_cap", "ability_capsule"] },
+  lilycove_dept_store: { items: ["firestone", "waterstone", "thunderstone", "leafstone", "moonstone", "sunstone", "leftovers", "mental_herb", "hp_up", "protein", "iron", "calcium", "carbos", "zinc", "bottle_cap", "ability_capsule"] },
   mossdeep: { items: ["twisted_spoon"] },
   sootopolis: { items: ["mystic_water"] },
   pacifidlog: { items: ["mystic_water", "dragon_scale"] },

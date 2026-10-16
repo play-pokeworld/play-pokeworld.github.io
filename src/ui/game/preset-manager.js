@@ -146,6 +146,12 @@ function presetEditorCardHtml(pk, i) {
     movesAsBars: false,
     movesDraggable: true,
     moveInfoContextless: true,
+    cardDataset: {
+      action: 'legacy-call',
+      call: 'presetEditorPick',
+      callArgs: String(i),
+      presetSlot: String(i),
+    },
     // Sprite click = change Pokemon; right-click = open the sheet (edit)
     onRightClickSprite: `presetEditorOpenInfo(${i})`,
     onLeftClickSprite: `presetEditorPick(${i})`,
@@ -352,6 +358,16 @@ function presetEditorRemoveMember(slot) {
     } catch (_) {}
   }
   renderPresetEditor();
+}
+
+function removeFromPreset(slot) {
+  presetEditorRemoveMember(slot);
+  if (typeof window !== 'undefined' && typeof window.closeUnifiedSelectorModal === 'function') {
+    window.closeUnifiedSelectorModal();
+  }
+  if (typeof window !== 'undefined' && window._presetEditorOpen) {
+    openPresetEditor(window._presetEditorOpen);
+  }
 }
 
 // ── 3a) Selector of Pokemon (in the modal) ────────────────────────────
@@ -674,6 +690,10 @@ if (typeof presetEditorSwapMove !== 'undefined') {
   if (typeof window !== 'undefined') window.presetEditorSwapMove = presetEditorSwapMove;
   if (typeof globalThis !== 'undefined') globalThis.presetEditorSwapMove = presetEditorSwapMove;
 }
+if (typeof removeFromPreset !== 'undefined') {
+  if (typeof window !== 'undefined') window.removeFromPreset = removeFromPreset;
+  if (typeof globalThis !== 'undefined') globalThis.removeFromPreset = removeFromPreset;
+}
 if (typeof presetEditorRemoveMember !== 'undefined') {
   if (typeof window !== 'undefined') window.presetEditorRemoveMember = presetEditorRemoveMember;
   if (typeof globalThis !== 'undefined')
@@ -724,6 +744,8 @@ export {
   renderPresetPicker,
   renderPresetItemPicker,
   presetEditorCardHtml,
+  removeFromPreset,
+  presetEditorRemoveMember,
   installPresetEditorDragDrop,
 };
 
@@ -732,6 +754,9 @@ export {
 // indirection instead of the window fallback); the window surface is kept for
 // classic cross-module consumers (documented duplicate, T2-B).
 if (typeof PokeActions !== 'undefined' && PokeActions) {
+  try {
+    PokeActions.register('removeFromPreset', removeFromPreset);
+  } catch (_) {}
   try {
     PokeActions.register('openPresetEditor', openPresetEditor);
   } catch (_) {}

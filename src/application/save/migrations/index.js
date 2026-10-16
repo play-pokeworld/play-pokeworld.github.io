@@ -159,6 +159,12 @@ export function migrateSaveData(saveData) {
   }
   if (saveData.G.saveMeta && typeof saveData.G.saveMeta === 'object')
     saveData.G.saveMeta.version = v;
+  if (saveData.G) {
+    if (typeof globalThis.ensureAchievementsState === 'function')
+      globalThis.ensureAchievementsState(saveData.G);
+    if (typeof globalThis.recalculateAllAchievements === 'function')
+      globalThis.recalculateAllAchievements(saveData.G);
+  }
   out.to = v;
   return out;
 }

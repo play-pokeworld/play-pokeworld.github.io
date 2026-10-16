@@ -32,6 +32,7 @@ export const MOBILE_MANAGE_WINS = Object.freeze({
  * @returns {{view: string, manage?: string}|null} vue mobile qui l'affiche
  */
 export function pwMobileViewForWin(winId) {
+  if (winId === 'win-achievements') return { view: 'adventure' };
   for (const view of Object.keys(MOBILE_VIEW_WINS)) {
     if (MOBILE_VIEW_WINS[view].indexOf(winId) !== -1) return { view };
   }

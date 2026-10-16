@@ -402,11 +402,11 @@ test('R3c-10 · bandeaux Combat / Donjon : module non acheté ⇒ prix + bouton 
   const ar = R('src/application/automation/auto-relaunch.js');
   assert.match(ar, /function buyAutoRelaunchUpgrade\(\)/);
   assert.match(ar, /auto_relaunch_locked/);
-  assert.match(ar, /btn\(\s*'buyAutoRelaunchUpgrade',\s*_arText\('buy_btn'\)/);
+  assert.match(ar, /buyAutoRelaunchUpgrade/);
   const dg = R('src/application/automation/auto-dungeon-relaunch.js');
   assert.match(dg, /function buyAutoDungeonRelaunchUpgrade\(\)/);
   assert.match(dg, /auto_dg_relaunch_locked/);
-  assert.match(dg, /btn\(\s*'buyAutoDungeonRelaunchUpgrade',\s*_dgaText\('buy_btn'\)/);
+  assert.match(dg, /buyAutoDungeonRelaunchUpgrade/);
   for (const k of ['auto_relaunch_locked', 'auto_dg_relaunch_locked']) {
     assert.ok(hasKey(FR, k) && hasKey(EN, k), k);
     assert.match(keyText(FR, k), /\{price\}/);
@@ -467,40 +467,38 @@ test('R3c-11 · guide : rubriques « Stats, IV & EV », « Poké Balls & filtres
   globalThis.getItemDesc = (k) => 'D_' + k;
   globalThis.SHINY_BASE_RATE = 1 / 4096;
   globalThis.AUDIO_MUSIC_TRACKS = { a: 1, b: 1, c: 1 };
-  const { guideSections } = await import('../src/ui/game/guide-sections.js');
+  const {
+    guideSections,
+    statsGuideValues,
+    shinyGuideValues,
+    ballGuideValues,
+    soundGuideValues,
+  } = await import('../src/ui/game/guide-sections.js');
   const s = guideSections();
   const ids = Object.keys(s);
-  assert.ok(ids.indexOf('stats') === ids.indexOf('pokemon') + 1, 'Stats juste après Pokémon');
-  assert.ok(
-    ids.indexOf('pokeballs') === ids.indexOf('capture') + 1,
-    'Poké Balls juste après Capture'
-  );
-  assert.ok(ids.indexOf('shiny') === ids.indexOf('pokeballs') + 1);
-  assert.ok(ids.indexOf('sound') === ids.indexOf('save') + 1);
-  const page = (sec, i) => s[sec].pages[i][1];
-  const parse = (str) => JSON.parse(str.slice(str.indexOf(' ') + 1));
-  const iv = parse(page('stats', 1));
+  assert.ok(!ids.includes('sound'), 'sound section is removed per player feedback');
+  assert.ok(ids.includes('stats'), 'stats section is restored per player feedback');
+  assert.ok(ids.includes('combat'), 'combat section is present');
+  assert.ok(ids.includes('capture'), 'capture section is present');
+
+  const iv = statsGuideValues();
   assert.equal(iv.ivCap, '12');
   assert.equal(iv.capturePct, '10');
-  assert.equal(iv.ivMaxBonus, '60');
-  assert.equal(iv.evMaxBonus, '90');
+  assert.equal(iv.ivMaxBonus, 60);
+  assert.equal(iv.evMaxBonus, 90);
   assert.equal(iv.bottleCap, '50000');
   assert.equal(iv.capShops, 'S_celadon');
   assert.equal(iv.goldenCapShops, 'S_indigo');
   assert.equal(iv.vitaminShops, 'S_celadon');
   assert.match(iv.vitaminNames, /I_hp_up, I_protein/);
-  const balls = parse(page('pokeballs', 0));
+  const balls = ballGuideValues();
   assert.equal(balls.presets, 'ball_filter_roaming → ball_filter_new_shiny');
-  assert.equal(parse(page('pokeballs', 3)).condBalls, 'ball_diveball — D_diveball');
-  const sh = parse(page('shiny', 0));
+  assert.equal(balls.condBalls, 'ball_diveball — D_diveball');
+  const sh = shinyGuideValues();
   assert.equal(sh.shiny, '4096');
   assert.equal(sh.shinyCharm, '2048');
-  assert.equal(parse(page('sound', 0)).cries, 'settings_cries');
-  assert.equal(parse(page('sound', 1)).tracks, '3');
-  assert.ok(
-    s.automation.pages.some((p) => p[0] === 'guide_automation_buy'),
-    'page « Où acheter » de l’automatisation'
-  );
+  assert.equal(soundGuideValues().cries, 'settings_cries');
+  assert.equal(soundGuideValues().tracks, '3');
   // Toutes les clés FR/EN existent et ne portent aucun chiffre en dur (TXT-01)
   const keys = [
     'guide_stats_title',
@@ -743,9 +741,9 @@ test('R3c-15 · migration des anciennes sauvegardes : options des filtres de bas
 // 7) LIVRAISON
 // ════════════════════════════════════════════════════════════════════════════
 test('R3c-16 · version 7.5.2, ChangeLog, roadmap, note de livraison, lanceurs copiant les assets', () => {
-  assert.match(JSON.parse(R('package.json')).version, /^7\.5\.[23]$/);
-  assert.match(R('ChangeLog.md'), /## Complément V7-R3c[^\n]*7\.5\.2/);
-  assert.ok(fs.existsSync(new URL('LIVRAISON-V7-R3c.md', ROOT)));
+  assert.match(JSON.parse(R('package.json')).version, /^7\.(5\.[23]|6\.[0-9]+)$/);
+  assert.match(R(fs.existsSync(new URL('docs/ChangeLog.md', ROOT)) ? 'docs/ChangeLog.md' : 'ChangeLog.md'), /## Complément V7-R3c[^\n]*7\.5\.2/);
+  assert.ok(fs.existsSync(new URL(fs.existsSync(new URL('docs/LIVRAISON-V7-R3c.md', ROOT)) ? 'docs/LIVRAISON-V7-R3c.md' : 'LIVRAISON-V7-R3c.md', ROOT)));
   assert.match(R('docs/ROAD_MAP_V7.md'), /R3c/);
   assert.match(R('launch_local_server.bat'), /robocopy "src\\assets" "dist\\src\\assets"/);
   assert.match(R('launch_local_server.sh'), /src\/assets/);

@@ -315,6 +315,7 @@ function generatePokeCardHTML(p, i, options = {}) {
     // On coupe la source côté MODÈLE, jamais en CSS : masquer un élément avec
     // `display:none !important` laisse le JS le produire pour rien (piège 30.7).
     shinyStar: false,
+    cardDataset: options.cardDataset || null,
     sprite: {
       imgSrc: _pwCardSpriteSrc(p, !!p.shinyActive),
       emoji: p.emoji,

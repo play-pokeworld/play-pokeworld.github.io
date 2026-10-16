@@ -162,8 +162,14 @@ function diamondsDiscoverable() {
 // Récompense d'une victoire sauvage (le robinet principal de ₽).
 function awardWildVictoryMoney() {
   const base = moneyPerKillForLocation();
-  const amount =
+  let amount =
     typeof applySecretBaseMoneyBonus === 'function' ? applySecretBaseMoneyBonus(base) : base;
+  const achFn = globalThis.getAchievementBonus;
+  if (achFn) {
+    const reg = (G && G.region) || 'kanto';
+    const bonusPct = achFn('money', 'global') + achFn('money', `region:${reg}`);
+    if (bonusPct > 0) amount = Math.floor(amount * (1 + bonusPct / 100));
+  }
   G.money = (G.money || 0) + amount;
   return amount;
 }

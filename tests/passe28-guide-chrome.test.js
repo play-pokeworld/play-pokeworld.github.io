@@ -98,13 +98,13 @@ test('DashboardChromeView: ONE grip, icon lifted, label hooks kept', () => {
 
 test('index.html shells: 12 DS headers, zero legacy chrome classes', () => {
   // P0 : deux fenêtres ajoutées (win-currency + win-pokeballs) → 12 headers.
-  assert.equal((INDEX.match(/class="pw-win-hdr" data-drag-window/g) || []).length, 12, '12 headers');
+  assert.equal((INDEX.match(/class="pw-win-hdr" data-drag-window/g) || []).length, 13, '13 headers');
   assert.equal((INDEX.match(/<span class="pw-win-hdr-grip"/g) || []).length, 0, '0 grip (supprimés définitivement)');
   // Wave 27: 11 i18n labels, not 12 — map-win-title is the deliberate exception:
   // map_title_name contains {region} and the data-i18n label pass painted the
   // RAW template ("Carte {region}" on screen); the node is now owned by the two
   // interpolated writers (region.js / map-render.js). Guarded in passe54.
-  assert.equal((INDEX.match(/class="pw-win-hdr-label" data-i18n=/g) || []).length, 11, '11 labels (+ map title, wave 27)');
+  assert.equal((INDEX.match(/class="pw-win-hdr-label" data-i18n=/g) || []).length, 12, '12 labels (+ map title, wave 27)');
   assert.ok(!INDEX.includes('class="title-icon"') && !INDEX.includes('class="drag-handle"'), 'legacy chrome gone');
 });
 

@@ -130,6 +130,19 @@ export function renderShortcutsWindow() {
       color: 'var(--red)',
       unlocked: isLeagueBeaten,
     },
+    {
+      iconHtml: iconHtml('badge', '🏅'),
+      label:
+        typeof window !== 'undefined' && typeof window.t === 'function'
+          ? window.G && window.G.lang === 'en'
+            ? 'Badges'
+            : 'Badges'
+          : 'Badges',
+      action: 'open-fullscreen-panel',
+      value: 'badges',
+      color: '#ffd700',
+      unlocked: true,
+    },
   ];
 
   const buttons = allButtons.filter(function (b) {

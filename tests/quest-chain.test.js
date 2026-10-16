@@ -320,7 +320,7 @@ test('NPC: data and locations strictly parallel (every entry has name + FR/EN li
   for (const loc of Object.keys(en)) assert.ok(sb.NPCS[loc], `EN location '${loc}' exists on the data side`);
 });
 
-test('phase 21 — Kanto special rewards: Eevee, Porygon, Lapras, Tyrogue (Dojo), Aerodactyl', () => {
+test('phase 21 — Kanto special rewards: Eevee, Porygon, Lapras, Hitmonlee (Dojo), Aerodactyl', () => {
   const byId = {}; for (const q of kanto) byId[q.id] = q;
   assert.equal(byId[35].rewardPoke, 133, 'quest 35: Eevee from Celadon Mansion');
   assert.equal(byId[35].rewardLevel, 25, 'quest 35: Lv.25 (FRLG canon)');
@@ -330,7 +330,7 @@ test('phase 21 — Kanto special rewards: Eevee, Porygon, Lapras, Tyrogue (Dojo)
   assert.equal(byId[43].rewardLevel, 25, 'quest 43: Lv.25 (FRLG canon: Silph employee)');
   assert.equal(byId[44].type, 'trainer_battle', 'quest 44: the Dojo is a scripted battle');
   assert.equal(byId[44].battleId, 'kanto_dojo_master', 'quest 44: Karate King (Koichi, FRLG)');
-  assert.equal(byId[44].rewardPoke, 236, 'quest 44: gift = Tyrogue (hitmonlee OR hitmonchan path)');
+  assert.equal(byId[44].rewardPoke, 106, 'quest 44: gift = Hitmonlee (canon Kanto Dojo)');
   assert.equal(byId[44].rewardLevel, 25, 'quest 44: Lv.25 (FRLG gift canon)');
   assert.equal(byId[51].rewardPoke, 142, 'quest 51: Aerodactyl from the Cinnabar lab');
   assert.equal(byId[51].rewardLevel, 30, 'quest 51: Lv.30');

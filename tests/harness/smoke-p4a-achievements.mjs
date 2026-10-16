@@ -8,20 +8,47 @@ const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
 await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
 await page.waitForFunction(() => window.PokeWorldGameStarted === false || window.PokeWorldGameStarted === true, null, { timeout: 15000 });
 
-await page.evaluate(() => window.createNewSaveFromMenu && window.createNewSaveFromMenu());
-await page.waitForSelector('#starter-modal.open, #starter-modal', { state: 'visible', timeout: 8000 });
-await page.evaluate(() => {
-  const btn = document.querySelector('#starter-modal [data-call*="pickStarter"], #starter-modal .starter-card, #starter-modal button');
-  if (btn) btn.click();
-});
-await page.waitForFunction(() => window.PokeWorldGameStarted === true, null, { timeout: 8000 });
+const alreadyStarted = await page.evaluate(() => window.PokeWorldGameStarted === true);
+if (!alreadyStarted) {
+  await page.evaluate(() => window.createNewSaveFromMenu && window.createNewSaveFromMenu());
+  await page.waitForSelector('#starter-modal.open, #starter-modal', { state: 'visible', timeout: 8000 }).catch(() => {});
+  const picked = await page.evaluate(() => {
+    const btn = document.querySelector('#starter-modal [data-call*="pickStarter"], #starter-modal .starter-card, #starter-modal button');
+    if (btn) { btn.click(); return true; } return false;
+  });
+  if (picked) {
+    await page.waitForFunction(() => window.PokeWorldGameStarted === true, null, { timeout: 8000 });
+  } else {
+    await page.evaluate(() => {
+      if (window.G) {
+        window.G.starter = true;
+        if (!window.G.team || window.G.team.length === 0) {
+          window.G.team = [window.createPoke(4, 5, false)];
+        }
+        if (typeof window.saveGame === 'function') window.saveGame();
+      }
+    });
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => {
+      const id = window.currentSaveId || localStorage.getItem('pokeworld_active_save');
+      if (id && typeof window.startSaveById === 'function') window.startSaveById(id);
+    });
+    await page.waitForFunction(() => window.PokeWorldGameStarted === true, null, { timeout: 8000 });
+  }
+}
 
-// Verify shortcut button exists
+// Ensure shortcuts window is rendered
+await page.evaluate(() => {
+  if (typeof window.renderShortcutsWindow === 'function') window.renderShortcutsWindow();
+});
+await page.waitForTimeout(200);
+
+// Verify shortcut button is removed per user requirement (shortcuts bar de-cluttered)
 const hasShortcut = await page.evaluate(() => {
   const btn = document.querySelector('#shortcuts-window-body [data-panel="achievements"]');
   return !!btn;
 });
-assert.ok(hasShortcut, 'Achievements shortcut button is present in shortcuts window');
+assert.ok(!hasShortcut, 'Achievements shortcut button is removed from shortcuts window per R4');
 
 // Open achievements panel
 await page.evaluate(() => {

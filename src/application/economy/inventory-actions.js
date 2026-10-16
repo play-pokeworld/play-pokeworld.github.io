@@ -86,7 +86,12 @@ function onInventoryClick(key) {
         (stoneMap[pid] && (stoneMap[pid][normKey] || stoneMap[pid][key])) ||
         (stoneMap[p.id] && (stoneMap[p.id][normKey] || stoneMap[p.id][key]));
       // always list compatible Pokemon, even when the evolution target is already owned
-      if (targetId) candidates.push({ p, loc: 'team', idx, targetId: Number(targetId) });
+      if (targetId) {
+        const canEvolve = globalThis.canEvolveToRegion
+          ? globalThis.canEvolveToRegion(targetId)
+          : true;
+        if (canEvolve) candidates.push({ p, loc: 'team', idx, targetId: Number(targetId) });
+      }
     });
     Object.entries(G.collection || {}).forEach(([idStr, p]) => {
       if (!p) return;
@@ -94,7 +99,12 @@ function onInventoryClick(key) {
       const targetId =
         (stoneMap[pid] && (stoneMap[pid][normKey] || stoneMap[pid][key])) ||
         (stoneMap[p.id] && (stoneMap[p.id][normKey] || stoneMap[p.id][key]));
-      if (targetId) candidates.push({ p, loc: 'box', idStr, targetId: Number(targetId) });
+      if (targetId) {
+        const canEvolve = globalThis.canEvolveToRegion
+          ? globalThis.canEvolveToRegion(targetId)
+          : true;
+        if (canEvolve) candidates.push({ p, loc: 'box', idStr, targetId: Number(targetId) });
+      }
     });
     // "Species concerned" section (Pokedex reference) when no mon is in team/box
     let catalogHtml = '';
@@ -103,7 +113,10 @@ function onInventoryClick(key) {
       for (const pidStr of Object.keys(stoneMap)) {
         const map = stoneMap[pidStr];
         const tid = map && (map[normKey] || map[key]);
-        if (tid) catalog.push({ base: Number(pidStr), target: Number(tid) });
+        if (tid) {
+          const canEvolve = globalThis.canEvolveToRegion ? globalThis.canEvolveToRegion(tid) : true;
+          if (canEvolve) catalog.push({ base: Number(pidStr), target: Number(tid) });
+        }
       }
       if (catalog.length) {
         catalogHtml =

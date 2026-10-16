@@ -450,6 +450,7 @@ function startAtollBattle(modeKey = 'tower_c') {
     G.team = JSON.parse(JSON.stringify(run.team));
     const rentalTag = t('atoll_rental') + ' ';
     G.team.forEach((p) => {
+      if (p) p._isRental = true;
       if (p && !String(p.name || '').startsWith(rentalTag))
         p.name = rentalTag + (p.name || getPokeName(p));
     });
@@ -1201,6 +1202,8 @@ function openFullscreenPanel(panelType) {
     dictionary: t('dictionary_title'),
     guide: t('guide_title'),
     atoll: t('battle_atoll_title'),
+    badges:
+      typeof G !== 'undefined' && G?.lang === 'en' ? 'Gym Badges & Leagues' : 'Badges & Ligues',
     presets: t('panel_presets_title'),
     puzzles:
       typeof t === 'function' && t('panel_puzzles_title') !== 'panel_puzzles_title'
@@ -1254,11 +1257,23 @@ function openFullscreenPanel(panelType) {
       window.setGuideSection(null);
     else renderGuidePanel(content);
   } else if (panelType === 'atoll') renderBattleAtoll(content);
-  else if (panelType === 'castform_forms' && typeof renderCastformFormsPanel === 'function')
+  else if (panelType === 'badges') {
+    if (typeof globalThis.renderBadgesPanel === 'function') globalThis.renderBadgesPanel(content);
+    else if (typeof window !== 'undefined' && typeof window.renderBadgesPanel === 'function')
+      window.renderBadgesPanel(content);
+  } else if (panelType === 'castform_forms' && typeof renderCastformFormsPanel === 'function')
     renderCastformFormsPanel(content);
   else if (panelType === 'deoxys_forms' && typeof renderDeoxysFormsPanel === 'function')
     renderDeoxysFormsPanel(content);
-  else if (panelType === 'puzzles') {
+  else if (panelType === 'achievements') {
+    if (typeof window !== 'undefined' && typeof window.renderAchievementsPanel === 'function')
+      window.renderAchievementsPanel(content);
+    else if (
+      typeof globalThis !== 'undefined' &&
+      typeof globalThis.renderAchievementsPanel === 'function'
+    )
+      globalThis.renderAchievementsPanel(content);
+  } else if (panelType === 'puzzles') {
     if (typeof renderPuzzleListPanel === 'function')
       renderPuzzleListPanel(
         window._puzzleLocPending || (typeof G !== 'undefined' && G ? G.location : null)
@@ -1286,140 +1301,41 @@ function openGuideSection(section) {
 }
 
 // --- Migrated to ES module, globals exposed ---
-if (typeof setDictionarySearch !== 'undefined') {
-  if (typeof window !== 'undefined') window.setDictionarySearch = setDictionarySearch;
-  if (typeof globalThis !== 'undefined') globalThis.setDictionarySearch = setDictionarySearch;
-}
-if (typeof findItemSources !== 'undefined') {
-  if (typeof window !== 'undefined') window.findItemSources = findItemSources;
-  if (typeof globalThis !== 'undefined') globalThis.findItemSources = findItemSources;
-}
-if (typeof setDictionaryTab !== 'undefined') {
-  if (typeof window !== 'undefined') window.setDictionaryTab = setDictionaryTab;
-  if (typeof globalThis !== 'undefined') globalThis.setDictionaryTab = setDictionaryTab;
-}
-if (typeof renderDictionary !== 'undefined') {
-  if (typeof window !== 'undefined') window.renderDictionary = renderDictionary;
-  if (typeof globalThis !== 'undefined') globalThis.renderDictionary = renderDictionary;
-}
-if (typeof openAbilityInfo !== 'undefined') {
-  if (typeof window !== 'undefined') window.openAbilityInfo = openAbilityInfo;
-  if (typeof globalThis !== 'undefined') globalThis.openAbilityInfo = openAbilityInfo;
-}
-if (typeof openFullscreenPanel !== 'undefined') {
-  if (typeof window !== 'undefined') window.openFullscreenPanel = openFullscreenPanel;
-  if (typeof globalThis !== 'undefined') globalThis.openFullscreenPanel = openFullscreenPanel;
-}
-if (typeof closeFullscreenPanel !== 'undefined') {
-  if (typeof window !== 'undefined') window.closeFullscreenPanel = closeFullscreenPanel;
-  if (typeof globalThis !== 'undefined') globalThis.closeFullscreenPanel = closeFullscreenPanel;
-}
-if (typeof openGuideSection !== 'undefined') {
-  if (typeof window !== 'undefined') window.openGuideSection = openGuideSection;
-  if (typeof globalThis !== 'undefined') globalThis.openGuideSection = openGuideSection;
-}
-if (typeof renderBattleAtoll !== 'undefined') {
-  if (typeof window !== 'undefined') window.renderBattleAtoll = renderBattleAtoll;
-  if (typeof globalThis !== 'undefined') globalThis.renderBattleAtoll = renderBattleAtoll;
-}
-if (typeof atollPanelModel !== 'undefined') {
-  if (typeof window !== 'undefined') window.atollPanelModel = atollPanelModel;
-  if (typeof globalThis !== 'undefined') globalThis.atollPanelModel = atollPanelModel;
-}
-if (typeof setAtollTab !== 'undefined') {
-  if (typeof window !== 'undefined') window.setAtollTab = setAtollTab;
-  if (typeof globalThis !== 'undefined') globalThis.setAtollTab = setAtollTab;
-}
-if (typeof restoreAtollTeam !== 'undefined') {
-  if (typeof window !== 'undefined') window.restoreAtollTeam = restoreAtollTeam;
-  if (typeof globalThis !== 'undefined') globalThis.restoreAtollTeam = restoreAtollTeam;
-}
-if (typeof startAtollBattle !== 'undefined') {
-  if (typeof window !== 'undefined') window.startAtollBattle = startAtollBattle;
-  if (typeof globalThis !== 'undefined') globalThis.startAtollBattle = startAtollBattle;
-}
-if (typeof prepareAtollFactoryBattle !== 'undefined') {
-  if (typeof window !== 'undefined') window.prepareAtollFactoryBattle = prepareAtollFactoryBattle;
-  if (typeof globalThis !== 'undefined')
-    globalThis.prepareAtollFactoryBattle = prepareAtollFactoryBattle;
-}
-if (typeof openAtollFactoryPrep !== 'undefined') {
-  if (typeof window !== 'undefined') window.openAtollFactoryPrep = openAtollFactoryPrep;
-  if (typeof globalThis !== 'undefined') globalThis.openAtollFactoryPrep = openAtollFactoryPrep;
-}
-if (typeof closeAtollFactoryPrep !== 'undefined') {
-  if (typeof window !== 'undefined') window.closeAtollFactoryPrep = closeAtollFactoryPrep;
-  if (typeof globalThis !== 'undefined') globalThis.closeAtollFactoryPrep = closeAtollFactoryPrep;
-}
-if (typeof atollFactoryPrepFight !== 'undefined') {
-  if (typeof window !== 'undefined') window.atollFactoryPrepFight = atollFactoryPrepFight;
-  if (typeof globalThis !== 'undefined') globalThis.atollFactoryPrepFight = atollFactoryPrepFight;
-}
-if (typeof atollFactoryPrepAbandon !== 'undefined') {
-  if (typeof window !== 'undefined') window.atollFactoryPrepAbandon = atollFactoryPrepAbandon;
-  if (typeof globalThis !== 'undefined')
-    globalThis.atollFactoryPrepAbandon = atollFactoryPrepAbandon;
-}
-if (typeof atollFactorySwapPoke !== 'undefined') {
-  if (typeof window !== 'undefined') window.atollFactorySwapPoke = atollFactorySwapPoke;
-  if (typeof globalThis !== 'undefined') globalThis.atollFactorySwapPoke = atollFactorySwapPoke;
-}
-if (typeof atollFactorySwapMoves !== 'undefined') {
-  if (typeof window !== 'undefined') window.atollFactorySwapMoves = atollFactorySwapMoves;
-  if (typeof globalThis !== 'undefined') globalThis.atollFactorySwapMoves = atollFactorySwapMoves;
-}
-if (typeof renderAtollFactoryPrep !== 'undefined') {
-  if (typeof window !== 'undefined') window.renderAtollFactoryPrep = renderAtollFactoryPrep;
-  if (typeof globalThis !== 'undefined') globalThis.renderAtollFactoryPrep = renderAtollFactoryPrep;
-}
-if (typeof installAtollPrepDragDrop !== 'undefined') {
-  if (typeof window !== 'undefined') window.installAtollPrepDragDrop = installAtollPrepDragDrop;
-  if (typeof globalThis !== 'undefined')
-    globalThis.installAtollPrepDragDrop = installAtollPrepDragDrop;
-}
-if (typeof completeAtollBattle !== 'undefined') {
-  if (typeof window !== 'undefined') window.completeAtollBattle = completeAtollBattle;
-  if (typeof globalThis !== 'undefined') globalThis.completeAtollBattle = completeAtollBattle;
-}
-if (typeof buyAtollItem !== 'undefined') {
-  if (typeof window !== 'undefined') window.buyAtollItem = buyAtollItem;
-  if (typeof globalThis !== 'undefined') globalThis.buyAtollItem = buyAtollItem;
-}
-
-// --- Exported globals ---
-if (typeof abandonAtollFactoryRunUI !== 'undefined') {
-  if (typeof window !== 'undefined') window.abandonAtollFactoryRunUI = abandonAtollFactoryRunUI;
-  if (typeof globalThis !== 'undefined')
-    globalThis.abandonAtollFactoryRunUI = abandonAtollFactoryRunUI;
-}
-if (typeof atollFactoryPrepCardHtml !== 'undefined') {
-  if (typeof window !== 'undefined') window.atollFactoryPrepCardHtml = atollFactoryPrepCardHtml;
-  if (typeof globalThis !== 'undefined')
-    globalThis.atollFactoryPrepCardHtml = atollFactoryPrepCardHtml;
-}
-if (typeof atollTeamForRestriction !== 'undefined') {
-  if (typeof window !== 'undefined') window.atollTeamForRestriction = atollTeamForRestriction;
-  if (typeof globalThis !== 'undefined')
-    globalThis.atollTeamForRestriction = atollTeamForRestriction;
-}
-if (typeof createAtollTeam !== 'undefined') {
-  if (typeof window !== 'undefined') window.createAtollTeam = createAtollTeam;
-  if (typeof globalThis !== 'undefined') globalThis.createAtollTeam = createAtollTeam;
-}
-if (typeof innerScrollReset !== 'undefined') {
-  if (typeof window !== 'undefined') window.innerScrollReset = innerScrollReset;
-  if (typeof globalThis !== 'undefined') globalThis.innerScrollReset = innerScrollReset;
-}
-if (typeof isAtollUnlocked !== 'undefined') {
-  if (typeof window !== 'undefined') window.isAtollUnlocked = isAtollUnlocked;
-  if (typeof globalThis !== 'undefined') globalThis.isAtollUnlocked = isAtollUnlocked;
-}
-if (typeof validateAtollRankRestriction !== 'undefined') {
-  if (typeof window !== 'undefined')
-    window.validateAtollRankRestriction = validateAtollRankRestriction;
-  if (typeof globalThis !== 'undefined')
-    globalThis.validateAtollRankRestriction = validateAtollRankRestriction;
-}
+const _fsGlobals = {
+  setDictionarySearch,
+  findItemSources,
+  setDictionaryTab,
+  renderDictionary,
+  openAbilityInfo,
+  openFullscreenPanel,
+  closeFullscreenPanel,
+  openGuideSection,
+  renderBattleAtoll,
+  atollPanelModel,
+  setAtollTab,
+  restoreAtollTeam,
+  startAtollBattle,
+  prepareAtollFactoryBattle,
+  openAtollFactoryPrep,
+  closeAtollFactoryPrep,
+  atollFactoryPrepFight,
+  atollFactoryPrepAbandon,
+  atollFactorySwapPoke,
+  atollFactorySwapMoves,
+  renderAtollFactoryPrep,
+  installAtollPrepDragDrop,
+  completeAtollBattle,
+  buyAtollItem,
+  abandonAtollFactoryRunUI,
+  atollFactoryPrepCardHtml,
+  atollTeamForRestriction,
+  createAtollTeam,
+  innerScrollReset,
+  isAtollUnlocked,
+  validateAtollRankRestriction,
+};
+if (typeof window !== 'undefined') Object.assign(window, _fsGlobals);
+if (typeof globalThis !== 'undefined') Object.assign(globalThis, _fsGlobals);
 
 // Wave 41 — native ESM module: exports the same names as the
 // classic surface kept above (bodies unchanged).

@@ -5,175 +5,175 @@
     "kinds": {
       "offline": {
         "n": 1,
-        "firstAt": 708.4,
-        "lastAt": 708.4
+        "firstAt": 585.7,
+        "lastAt": 585.7
       },
       "render": {
         "n": 9,
-        "firstAt": 780,
-        "lastAt": 1572.5,
+        "firstAt": 605.3,
+        "lastAt": 1333.2,
         "gapMs": {
-          "min": 14.8,
-          "avg": 99.06,
-          "max": 408.6,
+          "min": 11,
+          "avg": 90.99,
+          "max": 415.1,
           "samples": 8
         }
       },
       "state": {
         "n": 3,
-        "firstAt": 836.3,
-        "lastAt": 1569.8
+        "firstAt": 679.2,
+        "lastAt": 1331.8
       },
       "boot": {
         "n": 3,
-        "firstAt": 897.1,
-        "lastAt": 1014.4
+        "firstAt": 720.6,
+        "lastAt": 847.7
       },
       "action": {
         "n": 5,
-        "firstAt": 1126.4,
-        "lastAt": 1571.7
+        "firstAt": 895,
+        "lastAt": 1333.1
       }
     },
     "names": {
       "offline|catchup": {
         "n": 1,
-        "firstAt": 708.4,
-        "lastAt": 708.4
+        "firstAt": 585.7,
+        "lastAt": 585.7
       },
       "render|ui:team-window": {
         "n": 5,
-        "firstAt": 780,
-        "lastAt": 1141.4
+        "firstAt": 605.3,
+        "lastAt": 907.1
       },
       "state|save:write": {
         "n": 3,
-        "firstAt": 836.3,
-        "lastAt": 1569.8
+        "firstAt": 679.2,
+        "lastAt": 1331.8
       },
       "render|ui:loc-info": {
         "n": 3,
-        "firstAt": 872.1,
-        "lastAt": 1163.9
+        "firstAt": 692.1,
+        "lastAt": 918.1
       },
       "boot|stream:start": {
         "n": 1,
-        "firstAt": 897.1,
-        "lastAt": 897.1
+        "firstAt": 720.6,
+        "lastAt": 720.6
       },
       "boot|screens:ready": {
         "n": 1,
-        "firstAt": 1012,
-        "lastAt": 1012
+        "firstAt": 845.5,
+        "lastAt": 845.5
       },
       "boot|stream:done": {
         "n": 1,
-        "firstAt": 1014.4,
-        "lastAt": 1014.4
+        "firstAt": 847.7,
+        "lastAt": 847.7
       },
       "action|showTab": {
         "n": 3,
-        "firstAt": 1126.4,
-        "lastAt": 1141.3
+        "firstAt": 895,
+        "lastAt": 907.1
       },
       "action|saveGame": {
         "n": 1,
-        "firstAt": 1569.8,
-        "lastAt": 1569.8
+        "firstAt": 1331.8,
+        "lastAt": 1331.8
       },
       "action|baseWindowRender": {
         "n": 1,
-        "firstAt": 1571.7,
-        "lastAt": 1571.7
+        "firstAt": 1333.1,
+        "lastAt": 1333.1
       },
       "render|ui:base-window": {
         "n": 1,
-        "firstAt": 1572.5,
-        "lastAt": 1572.5
+        "firstAt": 1333.2,
+        "lastAt": 1333.2
       }
     },
     "total": 21,
     "ringFill": 12,
-    "t0": 485
+    "t0": 389.7
   },
   "tail": [
     {
       "seq": 1,
-      "t": 708.4,
+      "t": 585.7,
       "kind": "offline",
       "name": "catchup",
       "via": "load"
     },
     {
       "seq": 3,
-      "t": 836.3,
+      "t": 679.2,
       "kind": "state",
       "name": "save:write",
       "via": "auto"
     },
     {
       "seq": 6,
-      "t": 897.1,
+      "t": 720.6,
       "kind": "boot",
       "name": "stream:start"
     },
     {
-      "seq": 8,
-      "t": 1012,
+      "seq": 9,
+      "t": 845.5,
       "kind": "boot",
       "name": "screens:ready"
     },
     {
-      "seq": 9,
-      "t": 1014.4,
+      "seq": 10,
+      "t": 847.7,
       "kind": "boot",
       "name": "stream:done"
     },
     {
       "seq": 11,
-      "t": 1126.4,
+      "t": 895,
       "kind": "action",
       "name": "showTab",
       "via": "registry"
     },
     {
       "seq": 13,
-      "t": 1131.2,
+      "t": 898.7,
       "kind": "action",
       "name": "showTab",
       "via": "registry"
     },
     {
       "seq": 14,
-      "t": 1132,
+      "t": 899.3,
       "kind": "state",
       "name": "save:write",
       "via": "auto"
     },
     {
       "seq": 15,
-      "t": 1141.3,
+      "t": 907.1,
       "kind": "action",
       "name": "showTab",
       "via": "registry"
     },
     {
       "seq": 18,
-      "t": 1569.8,
+      "t": 1331.8,
       "kind": "action",
       "name": "saveGame",
       "via": "registry"
     },
     {
       "seq": 19,
-      "t": 1569.8,
+      "t": 1331.8,
       "kind": "state",
       "name": "save:write",
       "via": "manual"
     },
     {
       "seq": 20,
-      "t": 1571.7,
+      "t": 1333.1,
       "kind": "action",
       "name": "baseWindowRender",
       "via": "registry"

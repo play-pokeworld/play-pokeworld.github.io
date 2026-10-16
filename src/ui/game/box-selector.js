@@ -19,19 +19,7 @@ function isPokemonTakenByHatcheryOrTraining(p) {
   }
   return false;
 }
-// Wave 41 — native ESM module. The classic surface (window/globalThis) is
-// kept: classic consumers, VM harnesses and the engine registry.
-// Selector state lives on the shared global object: the unified-selector
-// VM harnesses drive it directly (env._usmAction = …) and the classic app
-// mutates it through the setters below. A lexical binding would shadow those
-// external writes.
-// Fallback if util.js is not loaded — targeted unit tests.
-// Shared safe-HTML service (engine pwSetHtml when present, else direct).
-// globalThis-backed so concatenated VM harnesses and classic stubs stay valid.
-// Wave 43 — lazy cross-module links (P7 regression fix):
-// zero static imports (chunks + VM harness isolates frozen); each alias resolves
-// AT CALL TIME — engine registry first, then the global surface (VM harness).
-// V7 · DBT-05 — résolveur unique (core/late-link.js) ; alias résolus à l'appel.
+// V7 · DBT-05 — native ESM module & late links. Selector state on shared global object.
 function baseNpcEditorAcceptPick(...args) {
   const f = pwLateLink('baseNpcEditorAcceptPick');
   return f ? f(...args) : undefined;
@@ -167,6 +155,14 @@ function openUnifiedSelectorModal(actionType) {
 function closeUnifiedSelectorModal() {
   const modal = document.getElementById('unified-selector-modal');
   if (modal) modal.style.display = 'none';
+  if (
+    String(_usmAction).startsWith('preset_slot_') &&
+    typeof window !== 'undefined' &&
+    window._presetEditorOpen &&
+    typeof window.openPresetEditor === 'function'
+  ) {
+    window.openPresetEditor(window._presetEditorOpen);
+  }
 }
 
 function sortUnifiedGrid(crit) {
@@ -263,6 +259,46 @@ function renderUnifiedSwapFooter() {
           cancelLabel: t('cancel'),
           removeLabel: t('remove'),
           removeArgs: String(_swapIdx),
+        })
+      );
+      footer.style.display = 'block';
+    }
+  } else if (String(_usmAction).startsWith('preset_slot_')) {
+    const slot = Number(String(_usmAction).split('_').pop());
+    const pk = typeof window !== 'undefined' ? window._presetEditorOpen : null;
+    const preset = (G && G.teamPresets && pk && G.teamPresets[pk]) || null;
+    const uid = preset && preset.uids && preset.uids[slot];
+    const found =
+      uid && typeof window !== 'undefined' && typeof window.resolvePresetPoke === 'function'
+        ? window.resolvePresetPoke(uid)
+        : null;
+    const presetPoke = found ? found.p : null;
+    const comp =
+      (typeof window !== 'undefined' && window.PokeUI && window.PokeUI.components) || null;
+    if (comp && typeof comp.swapFooterHTML === 'function') {
+      const pokeName = presetPoke
+        ? typeof window !== 'undefined' && typeof window.getPokeName === 'function'
+          ? window.getPokeName(presetPoke)
+          : presetPoke.name
+        : '';
+      _pwSetHtmlSafe(
+        footer,
+        comp.swapFooterHTML({
+          label: presetPoke
+            ? tr('selected_pokemon', {
+                name: pokeName,
+                level: presetPoke.level,
+              })
+            : '',
+          iconHtml:
+            typeof window !== 'undefined' && typeof window.getIcon === 'function'
+              ? window.getIcon('close', 14)
+              : '',
+          cancelLabel: t('cancel'),
+          cancelCall: 'cancelTeamSwap',
+          removeLabel: presetPoke ? t('remove') : '',
+          removeCall: 'removeFromPreset',
+          removeArgs: String(slot),
         })
       );
       footer.style.display = 'block';
@@ -637,6 +673,13 @@ function cancelTeamSwap() {
       window._swapFromTeamIdx = null;
     } catch (_) {}
   closeUnifiedSelectorModal();
+  if (
+    typeof window !== 'undefined' &&
+    window._presetEditorOpen &&
+    typeof window.openPresetEditor === 'function'
+  ) {
+    window.openPresetEditor(window._presetEditorOpen);
+  }
 }
 
 function renderFossilTabContent() {
@@ -1065,70 +1108,25 @@ function selectUnifiedCard(loc, idStr) {
 }
 
 // --- Migrated to ES module, globals exposed ---
-if (typeof openUnifiedSelectorModal !== 'undefined') {
-  if (typeof window !== 'undefined') window.openUnifiedSelectorModal = openUnifiedSelectorModal;
-  if (typeof globalThis !== 'undefined')
-    globalThis.openUnifiedSelectorModal = openUnifiedSelectorModal;
-}
-if (typeof closeUnifiedSelectorModal !== 'undefined') {
-  if (typeof window !== 'undefined') window.closeUnifiedSelectorModal = closeUnifiedSelectorModal;
-  if (typeof globalThis !== 'undefined')
-    globalThis.closeUnifiedSelectorModal = closeUnifiedSelectorModal;
-}
-if (typeof sortUnifiedGrid !== 'undefined') {
-  if (typeof window !== 'undefined') window.sortUnifiedGrid = sortUnifiedGrid;
-  if (typeof globalThis !== 'undefined') globalThis.sortUnifiedGrid = sortUnifiedGrid;
-}
-if (typeof filterUnifiedGrid !== 'undefined') {
-  if (typeof window !== 'undefined') window.filterUnifiedGrid = filterUnifiedGrid;
-  if (typeof globalThis !== 'undefined') globalThis.filterUnifiedGrid = filterUnifiedGrid;
-}
-if (typeof setFilterType !== 'undefined') {
-  if (typeof window !== 'undefined') window.setFilterType = setFilterType;
-  if (typeof globalThis !== 'undefined') globalThis.setFilterType = setFilterType;
-}
-if (typeof setFilterShiny !== 'undefined') {
-  if (typeof window !== 'undefined') window.setFilterShiny = setFilterShiny;
-  if (typeof globalThis !== 'undefined') globalThis.setFilterShiny = setFilterShiny;
-}
-if (typeof setFilterTeam !== 'undefined') {
-  if (typeof window !== 'undefined') window.setFilterTeam = setFilterTeam;
-  if (typeof globalThis !== 'undefined') globalThis.setFilterTeam = setFilterTeam;
-}
-if (typeof setUsmSubTab !== 'undefined') {
-  if (typeof window !== 'undefined') window.setUsmSubTab = setUsmSubTab;
-  if (typeof globalThis !== 'undefined') globalThis.setUsmSubTab = setUsmSubTab;
-}
-if (typeof renderUnifiedGrid !== 'undefined') {
-  if (typeof window !== 'undefined') window.renderUnifiedGrid = renderUnifiedGrid;
-  if (typeof globalThis !== 'undefined') globalThis.renderUnifiedGrid = renderUnifiedGrid;
-}
-if (typeof renderUnifiedSwapFooter !== 'undefined') {
-  if (typeof window !== 'undefined') window.renderUnifiedSwapFooter = renderUnifiedSwapFooter;
-  if (typeof globalThis !== 'undefined')
-    globalThis.renderUnifiedSwapFooter = renderUnifiedSwapFooter;
-}
-if (typeof cancelTeamSwap !== 'undefined') {
-  if (typeof window !== 'undefined') window.cancelTeamSwap = cancelTeamSwap;
-  if (typeof globalThis !== 'undefined') globalThis.cancelTeamSwap = cancelTeamSwap;
-}
-if (typeof renderFossilTabContent !== 'undefined') {
-  if (typeof window !== 'undefined') window.renderFossilTabContent = renderFossilTabContent;
-  if (typeof globalThis !== 'undefined') globalThis.renderFossilTabContent = renderFossilTabContent;
-}
-if (typeof _renderUsmItemBackFooter !== 'undefined') {
-  if (typeof window !== 'undefined') window._renderUsmItemBackFooter = _renderUsmItemBackFooter;
-  if (typeof globalThis !== 'undefined')
-    globalThis._renderUsmItemBackFooter = _renderUsmItemBackFooter;
-}
-if (typeof sendFossilToHatchery !== 'undefined') {
-  if (typeof window !== 'undefined') window.sendFossilToHatchery = sendFossilToHatchery;
-  if (typeof globalThis !== 'undefined') globalThis.sendFossilToHatchery = sendFossilToHatchery;
-}
-if (typeof selectUnifiedCard !== 'undefined') {
-  if (typeof window !== 'undefined') window.selectUnifiedCard = selectUnifiedCard;
-  if (typeof globalThis !== 'undefined') globalThis.selectUnifiedCard = selectUnifiedCard;
-}
+const _boxSelectorGlobals = {
+  openUnifiedSelectorModal,
+  closeUnifiedSelectorModal,
+  sortUnifiedGrid,
+  filterUnifiedGrid,
+  setFilterType,
+  setFilterShiny,
+  setFilterTeam,
+  setUsmSubTab,
+  renderUnifiedGrid,
+  renderUnifiedSwapFooter,
+  cancelTeamSwap,
+  renderFossilTabContent,
+  _renderUsmItemBackFooter,
+  sendFossilToHatchery,
+  selectUnifiedCard,
+};
+if (typeof window !== 'undefined') Object.assign(window, _boxSelectorGlobals);
+if (typeof globalThis !== 'undefined') Object.assign(globalThis, _boxSelectorGlobals);
 
 // Wave 41 — native ESM module: exports the same names as the
 // classic surface kept above (bodies unchanged).

@@ -1199,28 +1199,43 @@ function buyTrainingAutomationSlot(slotIndex) {
     notify(t('automation_already_bought'), 'var(--green)');
     return;
   }
-  const w = pwLateLink('ensureWallet') ? ensureWallet() : null;
-  if (!w || (w.questPoints || 0) < TRAINING_AUTOMATION_SLOT_COST) {
+  const price = `${formatNumber(TRAINING_AUTOMATION_SLOT_COST)} ${t('currency_quest_points')}`;
+  const title = tr('training_slot_title', { slot: idx + 1 });
+  const msg =
+    tr('automation_buy_confirm', { name: title, price }) ||
+    `Acheter l'automatisation d'entraînement (${title}) pour ${price} ?`;
+
+  const doBuy = () => {
+    const w = pwLateLink('ensureWallet') ? ensureWallet() : null;
+    if (!w || (w.questPoints || 0) < TRAINING_AUTOMATION_SLOT_COST) {
+      notify(
+        tr('automation_upgrade_need_pq', { price: formatNumber(TRAINING_AUTOMATION_SLOT_COST) }),
+        'var(--red)'
+      );
+      return;
+    }
+    if (pwLateLink('spendQuestPoints')) spendQuestPoints(TRAINING_AUTOMATION_SLOT_COST);
+    else w.questPoints -= TRAINING_AUTOMATION_SLOT_COST;
+    const a = ensureTrainingAutomation();
+    a.purchasedSlots[String(idx)] = true;
+    updateHeader();
+    saveGame();
     notify(
-      tr('automation_upgrade_need_pq', { price: formatNumber(TRAINING_AUTOMATION_SLOT_COST) }),
-      'var(--red)'
+      tr('automation_upgrade_bought_pq', {
+        name: tr('training_slot_title', { slot: idx + 1 }),
+        price: formatNumber(TRAINING_AUTOMATION_SLOT_COST),
+      }),
+      'var(--green)'
     );
-    return;
+    openTrainingManagementMenu('automation');
+  };
+
+  const confirmFn = globalThis.pwConfirm || null;
+  if (confirmFn) {
+    confirmFn(msg, doBuy, { title: t('training_title') || 'Entraînement' });
+  } else {
+    doBuy();
   }
-  if (pwLateLink('spendQuestPoints')) spendQuestPoints(TRAINING_AUTOMATION_SLOT_COST);
-  else w.questPoints -= TRAINING_AUTOMATION_SLOT_COST;
-  const a = ensureTrainingAutomation();
-  a.purchasedSlots[String(idx)] = true;
-  updateHeader();
-  saveGame();
-  notify(
-    tr('automation_upgrade_bought_pq', {
-      name: tr('training_slot_title', { slot: idx + 1 }),
-      price: formatNumber(TRAINING_AUTOMATION_SLOT_COST),
-    }),
-    'var(--green)'
-  );
-  openTrainingManagementMenu('automation');
 }
 function setTrainingAutomationOption(slotIndex, key, value) {
   const idx = clamp(Number(slotIndex) || 0, 0, 1);
@@ -1790,12 +1805,15 @@ function trainingAutomationSlotCardModel(i) {
       lockedLabel: `${formatNumber(TRAINING_AUTOMATION_SLOT_COST)} ${t('currency_quest_points')}`,
       buy: { call: 'buyTrainingAutomationSlot', args: String(i), label: t('buy_btn') },
     };
+  const fee = pwLateLink('getTrainingAutomationFee') ? getTrainingAutomationFee() : 500;
+  const usageCost = fee > 0 ? `${fee}₽ / combat` : typeof t === 'function' ? t('free') : 'Gratuit';
   return {
     title,
     state: 'owned',
     enabled: !!cfg.enabled,
-    onLabel: t('training_auto_on'),
-    offLabel: t('training_auto_off'),
+    usageCost,
+    onLabel: `${t('training_auto_on')} (${usageCost})`,
+    offLabel: `${t('training_auto_off')} (${usageCost})`,
     toggle: { call: 'toggleTrainingAutomationSlot', args: String(i) },
     rules: trainingAutomationRulesModel(i, cfg),
     queue: {
@@ -2134,18 +2152,18 @@ function trainingSlotModel(slotIndex) {
       ? G.trainingAutomation.slots[slotIndex]
       : { enabled: false };
   const autoPurchased = isTrainingAutomationPurchased(slotIndex);
-  // Phase 14: explicit "Auto: on/off" label (like the management menu
-  // card) — the green color comes from the .training-slot-auto-btn CSS.
+  const fee = pwLateLink('getTrainingAutomationFee') ? getTrainingAutomationFee() : 500;
+  const usageCost = fee > 0 ? `${fee}₽ / combat` : typeof t === 'function' ? t('free') : 'Gratuit';
   actions.push({
+    classes: `training-slot-auto-btn ${autoState.enabled ? 'is-on' : 'is-off'}`,
     label: autoPurchased
       ? autoState.enabled
-        ? t('training_auto_on')
-        : t('training_auto_off')
+        ? `${t('training_auto_on')} (${usageCost})`
+        : `${t('training_auto_off')} (${usageCost})`
       : tr('automation_buy_button', { price: formatNumber(TRAINING_AUTOMATION_SLOT_COST) }),
     iconHtml: pwLateLink('getIcon') ? getIcon('settings', 14) : '',
     call: 'toggleTrainingAutomationSlot',
     callArgs: `${slotIndex}, false`,
-    classes: `training-slot-auto-btn ${autoState.enabled ? 'is-on' : 'is-off'}`,
   });
   return {
     cardClass: 'training-slot-card pw-poke-card',

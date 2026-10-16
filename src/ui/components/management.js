@@ -173,6 +173,7 @@ export function automationToggleCardVNode(card) {
       },
     },
     label,
+    card.usageCost ? h('span', { class: 'automation-usage-fee' }, card.usageCost) : null,
     h('b', null, on ? card.onLabel || '' : card.offLabel || '')
   );
 }
@@ -327,6 +328,7 @@ export function automationSlotCardVNode(m) {
         },
       },
       h('span', null, m.title || ''),
+      m.usageCost ? h('span', { class: 'automation-usage-fee' }, m.usageCost) : null,
       h('b', null, on ? m.onLabel || '' : m.offLabel || '')
     ),
     automationRulesGridVNode(m.rules),

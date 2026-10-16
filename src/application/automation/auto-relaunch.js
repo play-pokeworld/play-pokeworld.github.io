@@ -35,13 +35,15 @@ function _arUnref(h) {
   if (h && typeof h.unref === 'function') h.unref();
   return h;
 }
-function _arBtn(call, label, cls) {
+function _arBtn(call, label, cls, attrs) {
   return (
     '<button type="button" class="hbtn ' +
     (cls || '') +
     '" data-action="legacy-call" data-call="' +
     call +
-    '" data-call-args="">' +
+    '" data-call-args=""' +
+    (attrs ? ' ' + attrs : '') +
+    '>' +
     label +
     '</button>'
   );
@@ -225,11 +227,12 @@ function renderAutoRelaunchBar() {
       return;
     }
     host.hidden = false;
-    const locked =
-      '<span class="pw-auto-relaunch-state is-locked">' +
-      _arText('auto_relaunch_locked', { price: costF(AUTO_RELAUNCH_KEY) }) +
-      '</span>' +
-      btn('buyAutoRelaunchUpgrade', _arText('buy_btn'), 'pw-auto-relaunch-buy automation-buy-btn');
+    const priceText = costF(AUTO_RELAUNCH_KEY);
+    const locked = btn(
+      'buyAutoRelaunchUpgrade',
+      _arText('auto_relaunch_locked', { price: priceText }),
+      'pw-auto-relaunch-buy automation-buy-btn'
+    );
     if (setHtml) setHtml(host, locked);
     else host.textContent = locked.replace(/<[^>]+>/g, ' ');
     return;
@@ -244,18 +247,20 @@ function renderAutoRelaunchBar() {
       _arText('auto_relaunch_countdown', { s: Math.ceil(left / 1000) }) +
       '</span>' +
       btn('cancelAutoRelaunch', _arText('auto_relaunch_cancel'), 'pw-auto-relaunch-cancel');
-  } else {
-    html +=
-      '<span class="pw-auto-relaunch-state' +
-      (on ? ' is-on' : '') +
-      '">' +
-      _arText(on ? 'auto_relaunch_on' : 'auto_relaunch_off') +
-      '</span>';
   }
+  const stateKey = on ? 'auto_relaunch_on' : 'auto_relaunch_off';
+  const label = _arText('auto_relaunch_btn_battle') || 'Relance auto combat';
   html += btn(
     'toggleAutoRelaunch',
-    _arText(on ? 'auto_relaunch_toggle_off' : 'auto_relaunch_toggle_on'),
-    'pw-auto-relaunch-toggle'
+    label,
+    'pw-auto-relaunch-toggle' + (on ? ' active' : ''),
+    'aria-label="' +
+      _arText(stateKey) +
+      '" data-state="' +
+      stateKey +
+      '" title="' +
+      _arText(stateKey) +
+      '"'
   );
   if (setHtml) setHtml(host, html);
   else host.textContent = html.replace(/<[^>]+>/g, ' ');
@@ -263,13 +268,28 @@ function renderAutoRelaunchBar() {
 
 /** V7-R3c — achat depuis le bandeau de repos (même caisse que la boutique). */
 function buyAutoRelaunchUpgrade() {
-  const buyF = _arFn('purchaseAutomationIfNeeded');
-  if (!buyF || !buyF(AUTO_RELAUNCH_KEY)) return false;
-  setAutoRelaunchEnabled(true);
-  const saveF = _arFn('saveGame');
-  if (saveF) saveF();
-  renderAutoRelaunchBar();
-  return true;
+  const costF = _arFn('formatNumber') || String;
+  const price = costF(AUTO_RELAUNCH_KEY) + ' ' + _arText('currency_quest_points');
+  const title = _arText('auto_relaunch_title') || 'Relance automatique';
+  const msg =
+    _arText('auto_relaunch_buy_confirm', { price }) || `Acheter la « ${title} » pour ${price} ?`;
+
+  const doBuy = () => {
+    const buyF = _arFn('purchaseAutomationIfNeeded');
+    if (!buyF || !buyF(AUTO_RELAUNCH_KEY)) return false;
+    setAutoRelaunchEnabled(true);
+    const saveF = _arFn('saveGame');
+    if (saveF) saveF();
+    renderAutoRelaunchBar();
+    return true;
+  };
+
+  const confirmFn = globalThis.pwConfirm || null;
+  if (confirmFn) {
+    confirmFn(msg, doBuy, { title });
+  } else {
+    doBuy();
+  }
 }
 
 const _autoRelaunchGlobals = {

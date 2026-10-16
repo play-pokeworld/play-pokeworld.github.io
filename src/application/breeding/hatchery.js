@@ -1024,6 +1024,7 @@ function hatchEgg(slotIdx = 0) {
     p = slot.poke;
   }
   const BABY_BREED_MAP = {
+    176: 175,
     25: 172,
     26: 172,
     35: 173,

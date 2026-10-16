@@ -38,6 +38,9 @@ function _flushHeaderWindows() {
     renderTrainingWindow();
   } catch (_) {}
   try {
+    if (typeof renderAchievementsTrackerWindow === 'function') renderAchievementsTrackerWindow();
+  } catch (_) {}
+  try {
     renderMineWindow();
   } catch (_) {}
   try {

@@ -576,6 +576,14 @@ function ensureQuestState() {
     G.unlockedSecretBaseHoenn = true;
   if (!Array.isArray(G.activeQuests)) G.activeQuests = [];
   if (!Array.isArray(G.repeatables)) G.repeatables = [];
+  else {
+    for (const inst of G.repeatables) {
+      if (inst && !inst.def && typeof REPEATABLE_QUESTS !== 'undefined') {
+        const tId = inst.tplId || (inst.qid ? String(inst.qid).replace(/^r_/, '') : null);
+        inst.def = REPEATABLE_QUESTS.find((q) => q.id === tId);
+      }
+    }
+  }
   if (typeof G.totalWildWins !== 'number') G.totalWildWins = 0;
   if (typeof G.repeatableSlotUpgrades !== 'number') G.repeatableSlotUpgrades = 0;
   G.repeatableSlotUpgrades = clamp(G.repeatableSlotUpgrades || 0, 0, 4);
@@ -693,6 +701,14 @@ function questProgressValue(inst, def) {
     return Math.max(inst.progress || 0, v == null ? 0 : v);
   }
   if (def.type === 'defeat_wild') {
+    if (inst.cat === 'repeatable') {
+      const base =
+        typeof inst.baseline === 'number'
+          ? inst.baseline
+          : (inst.baseline = getQuestWildWinCount(def));
+      const afterStart = Math.max(0, getQuestWildWinCount(def) - base);
+      return Math.max(inst.progress || 0, afterStart);
+    }
     const region = def.region || (G && G.region) || 'kanto';
     const baseline = ensureQuestBaseline(region, def) || 0;
     const afterStart = Math.max(0, getQuestWildWinCount(def) - baseline);
@@ -764,7 +780,14 @@ function advanceQuests(type, loc, amount) {
   const region = G.region || 'kanto';
 
   function locMatches(def, type, loc) {
+    const fReg = pwLateLink('regionOfLoc') || globalThis.regionOfLoc;
+    const targetRegion = def.region || (def.loc && fReg ? fReg(def.loc) : null);
+    const actionRegion = loc && fReg ? fReg(loc) : G.region || 'kanto';
+
+    // Scoping régional strict : les tâches régionales ne progressent que dans leur région
+    if (targetRegion && targetRegion !== actionRegion) return false;
     if (def.region && def.region !== (G.region || 'kanto')) return false;
+
     if (type === 'puzzle') {
       if (def.targetPuzzleId && loc === def.targetPuzzleId) return true;
       if (def.loc && loc === def.loc) return true;
@@ -889,6 +912,18 @@ function claimQuest(qid, cat) {
   if (cat === 'repeatable') {
     // P0 — compteur de complétion (tutoriel / succès).
     G.repeatablesCompleted = (G.repeatablesCompleted || 0) + 1;
+    if (G.completedQuests) {
+      delete G.completedQuests['r_' + inst.tplId];
+      delete G.completedQuests['repeatable_' + inst.tplId];
+      delete G.completedQuests[inst.tplId];
+      delete G.completedQuests[inst.qid];
+    }
+    const region = (def && def.region) || G.region || 'kanto';
+    if (G.questBaselines && G.questBaselines[region]) {
+      delete G.questBaselines[region][String(inst.qid)];
+      delete G.questBaselines[region][String(inst.tplId)];
+      delete G.questBaselines[region][String(def && def.id)];
+    }
   }
   if (def.rewardItems) {
     if (pwLateLink('grantRewardItems')) grantRewardItems(def.rewardItems);
@@ -1621,87 +1656,28 @@ if (typeof getQuestDefinitionForInstance !== 'undefined') {
   if (typeof globalThis !== 'undefined')
     globalThis.getQuestDefinitionForInstance = getQuestDefinitionForInstance;
 }
-if (typeof getActiveLocalDefeatQuestForLocation !== 'undefined') {
-  if (typeof window !== 'undefined')
-    window.getActiveLocalDefeatQuestForLocation = getActiveLocalDefeatQuestForLocation;
-  if (typeof globalThis !== 'undefined')
-    globalThis.getActiveLocalDefeatQuestForLocation = getActiveLocalDefeatQuestForLocation;
-}
-if (typeof getQuestBattlePool !== 'undefined') {
-  if (typeof window !== 'undefined') window.getQuestBattlePool = getQuestBattlePool;
-  if (typeof globalThis !== 'undefined') globalThis.getQuestBattlePool = getQuestBattlePool;
-}
-if (typeof startQuestDefeatBattle !== 'undefined') {
-  if (typeof window !== 'undefined') window.startQuestDefeatBattle = startQuestDefeatBattle;
-  if (typeof globalThis !== 'undefined') globalThis.startQuestDefeatBattle = startQuestDefeatBattle;
-}
-if (typeof getTrainerBattleDef !== 'undefined') {
-  if (typeof window !== 'undefined') window.getTrainerBattleDef = getTrainerBattleDef;
-  if (typeof globalThis !== 'undefined') globalThis.getTrainerBattleDef = getTrainerBattleDef;
-}
-if (typeof getTrainerBattleName !== 'undefined') {
-  if (typeof window !== 'undefined') window.getTrainerBattleName = getTrainerBattleName;
-  if (typeof globalThis !== 'undefined') globalThis.getTrainerBattleName = getTrainerBattleName;
-}
-if (typeof getTrainerBattleDialog !== 'undefined') {
-  if (typeof window !== 'undefined') window.getTrainerBattleDialog = getTrainerBattleDialog;
-  if (typeof globalThis !== 'undefined') globalThis.getTrainerBattleDialog = getTrainerBattleDialog;
-}
-if (typeof getPlayerStarterSpecies !== 'undefined') {
-  if (typeof window !== 'undefined') window.getPlayerStarterSpecies = getPlayerStarterSpecies;
-  if (typeof globalThis !== 'undefined')
-    globalThis.getPlayerStarterSpecies = getPlayerStarterSpecies;
-}
-if (typeof migrateQuestSaveV2 !== 'undefined') {
-  if (typeof window !== 'undefined') window.migrateQuestSaveV2 = migrateQuestSaveV2;
-  if (typeof globalThis !== 'undefined') globalThis.migrateQuestSaveV2 = migrateQuestSaveV2;
-}
-if (typeof migrateQuestSaveV3 !== 'undefined') {
-  if (typeof window !== 'undefined') window.migrateQuestSaveV3 = migrateQuestSaveV3;
-  if (typeof globalThis !== 'undefined') globalThis.migrateQuestSaveV3 = migrateQuestSaveV3;
-}
-if (typeof QUEST_V3_JOHTO_REMAP !== 'undefined') {
-  if (typeof window !== 'undefined') window.QUEST_V3_JOHTO_REMAP = QUEST_V3_JOHTO_REMAP;
-  if (typeof globalThis !== 'undefined') globalThis.QUEST_V3_JOHTO_REMAP = QUEST_V3_JOHTO_REMAP;
-}
-if (typeof migrateQuestSaveV4 !== 'undefined') {
-  if (typeof window !== 'undefined') window.migrateQuestSaveV4 = migrateQuestSaveV4;
-  if (typeof globalThis !== 'undefined') globalThis.migrateQuestSaveV4 = migrateQuestSaveV4;
-}
-if (typeof QUEST_V4_KANTO_REMAP !== 'undefined') {
-  if (typeof window !== 'undefined') window.QUEST_V4_KANTO_REMAP = QUEST_V4_KANTO_REMAP;
-  if (typeof globalThis !== 'undefined') globalThis.QUEST_V4_KANTO_REMAP = QUEST_V4_KANTO_REMAP;
-}
-if (typeof QUEST_V4_SIDE_JOHTO_REMAP !== 'undefined') {
-  if (typeof window !== 'undefined') window.QUEST_V4_SIDE_JOHTO_REMAP = QUEST_V4_SIDE_JOHTO_REMAP;
-  if (typeof globalThis !== 'undefined')
-    globalThis.QUEST_V4_SIDE_JOHTO_REMAP = QUEST_V4_SIDE_JOHTO_REMAP;
-}
-if (typeof startQuestTrainerBattle !== 'undefined') {
-  if (typeof window !== 'undefined') window.startQuestTrainerBattle = startQuestTrainerBattle;
-  if (typeof globalThis !== 'undefined')
-    globalThis.startQuestTrainerBattle = startQuestTrainerBattle;
-}
-if (typeof completeQuestTrainerBattle !== 'undefined') {
-  if (typeof window !== 'undefined') window.completeQuestTrainerBattle = completeQuestTrainerBattle;
-  if (typeof globalThis !== 'undefined')
-    globalThis.completeQuestTrainerBattle = completeQuestTrainerBattle;
-}
-if (typeof _refreshUI !== 'undefined') {
-  if (typeof window !== 'undefined') window._refreshUI = _refreshUI;
-  if (typeof globalThis !== 'undefined') globalThis._refreshUI = _refreshUI;
-}
-
-// --- Exported globals ---
-if (typeof createTrainerBattleTeam !== 'undefined') {
-  if (typeof window !== 'undefined') window.createTrainerBattleTeam = createTrainerBattleTeam;
-  if (typeof globalThis !== 'undefined')
-    globalThis.createTrainerBattleTeam = createTrainerBattleTeam;
-}
-if (typeof migrateQuestSaveV5 !== 'undefined') {
-  if (typeof window !== 'undefined') window.migrateQuestSaveV5 = migrateQuestSaveV5;
-  if (typeof globalThis !== 'undefined') globalThis.migrateQuestSaveV5 = migrateQuestSaveV5;
-}
+const _questGlobals = {
+  getActiveLocalDefeatQuestForLocation,
+  getQuestBattlePool,
+  startQuestDefeatBattle,
+  getTrainerBattleDef,
+  getTrainerBattleName,
+  getTrainerBattleDialog,
+  getPlayerStarterSpecies,
+  migrateQuestSaveV2,
+  migrateQuestSaveV3,
+  QUEST_V3_JOHTO_REMAP,
+  migrateQuestSaveV4,
+  QUEST_V4_KANTO_REMAP,
+  QUEST_V4_SIDE_JOHTO_REMAP,
+  startQuestTrainerBattle,
+  completeQuestTrainerBattle,
+  _refreshUI,
+  createTrainerBattleTeam,
+  migrateQuestSaveV5,
+};
+if (typeof window !== 'undefined') Object.assign(window, _questGlobals);
+if (typeof globalThis !== 'undefined') Object.assign(globalThis, _questGlobals);
 
 // Wave 41 — native ESM module: exports the same names as the
 // classic surface kept above (bodies unchanged).

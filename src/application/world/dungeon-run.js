@@ -904,7 +904,7 @@ function _dgGridHtml(run) {
       );
     }
   }
-  return '<div class="pw-dgn-grid" style="--cols:' + cols + '">' + cells.join('') + '</div>';
+  return `<div class="pw-dgn-grid" style="--cols:${cols};--rows:${rows}">${cells.join('')}</div>`;
 }
 
 /** PASSE 39 — formatage d'un nombre sans dépendre de formatNumber (toujours

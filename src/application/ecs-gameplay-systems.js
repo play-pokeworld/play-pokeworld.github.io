@@ -509,7 +509,7 @@ export class ECSSystemsManager {
                 : new Set(),
             evoTargetIds:
               typeof gameplayPorts.getEvoTargetIds === 'function'
-                ? gameplayPorts.getEvoTargetIds()
+                ? gameplayPorts.getEvoTargetIds(region)
                 : new Set(),
             pokemonData:
               typeof gameplayPorts.getPokemonData === 'function'

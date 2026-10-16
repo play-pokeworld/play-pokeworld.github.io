@@ -1,14 +1,31 @@
 import { pwLateLink } from '../../core/late-link.js';
-// NOTE: region gate kept for reference — no evolution path currently calls it
-// (region access is enforced upstream, at capture/team level). Underscored so
-// the lint rule for deliberately unused declarations applies.
-function _canEvolveToRegion(targetId) {
+function canEvolveToRegion(targetId) {
   const nid = Number(targetId);
-  if (nid >= 152 && nid <= 251)
-    return pwLateLink('canAccessRegion') ? canAccessRegion('johto') : true;
-  if (nid >= 252 && nid <= 386)
-    return pwLateLink('canAccessRegion') ? canAccessRegion('hoenn') : true;
-  return true;
+  const fRegion = pwLateLink('getPokemonRegion') || globalThis.getPokemonRegion;
+  const reg = fRegion ? fRegion(nid) : nid <= 151 ? 'kanto' : nid <= 251 ? 'johto' : 'hoenn';
+  if (!reg || reg === 'kanto' || reg === 'unknown') return true;
+  if (typeof G !== 'undefined' && G) {
+    if (G.unlockedRegions && G.unlockedRegions[reg]) return true;
+    if (G.region) {
+      const order = [
+        'kanto',
+        'johto',
+        'hoenn',
+        'sinnoh',
+        'unova',
+        'kalos',
+        'alola',
+        'galar',
+        'paldea',
+      ];
+      const playerIdx = order.indexOf(G.region);
+      const targetIdx = order.indexOf(reg);
+      if (playerIdx >= targetIdx && targetIdx >= 0) return true;
+    }
+  }
+  const fAccess = pwLateLink('canAccessRegion') || globalThis.canAccessRegion;
+  if (!fAccess) return false;
+  return !!fAccess(reg);
 }
 // Wave 41 — native ESM module. The classic surface (window/globalThis) is
 // kept: classic consumers, VM harnesses and the engine registry.
@@ -37,11 +54,17 @@ function gainXP(enemy) {
   const base = Math.floor((enemy.xpYield * enemy.level) / 7);
   const alive = G.team.filter((p) => p.currentHP > 0);
   if (!alive.length) return 0;
-  const xpMult =
+  let xpMult =
     typeof pwLateLink('getSecretBaseBonuses') === 'function' &&
     Number.isFinite(getSecretBaseBonuses().xpMult)
       ? getSecretBaseBonuses().xpMult
       : 1;
+  const achFn = globalThis.getAchievementBonus;
+  if (achFn) {
+    const reg = (G && G.region) || 'kanto';
+    const achXp = achFn('xp', 'global') + achFn('xp', `region:${reg}`);
+    if (achXp > 0) xpMult *= 1 + achXp / 100;
+  }
   const baseShare = Math.max(1, Math.floor(base * 0.7 * xpMult));
   let maxShare = 0;
   for (const p of alive) {
@@ -144,7 +167,11 @@ function getEvolutionMethodsModel(id) {
   const nid = Number(id);
   const rows = [];
 
-  if (LEVEL_EVO_MAP[nid] && EVO_LEVELS[nid]) {
+  if (nid === 236) {
+    rows.push(
+      `<b>${t('m.progression.8')}</b> ${tr('m.progression.7', { lvl: 20 })} <b>${getPokeName(237)}</b>`
+    );
+  } else if (LEVEL_EVO_MAP[nid] && EVO_LEVELS[nid]) {
     const targetId = LEVEL_EVO_MAP[nid];
     const targetName = getPokeName(targetId);
     rows.push(
@@ -195,10 +222,18 @@ function checkEvolution(p) {
     }
     return;
   }
+  if (p.id === 236 && p.level >= 20) {
+    // Tyrogue -> Kapoera uniquement au niveau 20
+    if (!canEvolveToRegion(237)) return;
+    if (p._evoDone && p._evoDone[237]) return;
+    evolve(p, 237);
+    return;
+  }
   const pid = Number(p.id);
   const evoLevel = EVO_LEVELS[pid] || EVO_LEVELS[p.id];
   const targetId = LEVEL_EVO_MAP[pid] || LEVEL_EVO_MAP[p.id];
   if (evoLevel && targetId && p.level >= evoLevel) {
+    if (!canEvolveToRegion(targetId)) return;
     if (p._evoDone && p._evoDone[targetId]) return;
     evolve(p, targetId);
   }
@@ -589,6 +624,16 @@ function tryStoneEvo(teamIdx, stoneKey) {
     setMsg(t('legacy_message_n2_cet_objet_na_aucun_effet_sur_ce_pok_mon'));
     return;
   }
+  if (!canEvolveToRegion(evo)) {
+    const fRegion = pwLateLink('getPokemonRegion') || globalThis.getPokemonRegion;
+    const fName = pwLateLink('getRegionDisplayName') || globalThis.getRegionDisplayName;
+    const reg = fRegion ? fRegion(evo) : 'cette région';
+    const regName = fName ? fName(reg) : reg;
+    const msg = `Évolution indisponible : ${regName} n'est pas encore débloqué !`;
+    setMsg(msg);
+    if (pwLateLink('notify')) notify(msg, 'var(--red)');
+    return;
+  }
   const minLvl = [
     350, 367, 368, 208, 212, 186, 192, 182, 134, 135, 136, 196, 197, 26, 62, 91, 121, 230, 233,
   ].includes(evo)
@@ -701,6 +746,16 @@ function tryBoxStoneEvo(boxKey, stoneKey) {
     setMsg(t('legacy_message_n2_cet_objet_na_aucun_effet_sur_ce_pok_mon'));
     return;
   }
+  if (!canEvolveToRegion(evo)) {
+    const fRegion = pwLateLink('getPokemonRegion') || globalThis.getPokemonRegion;
+    const fName = pwLateLink('getRegionDisplayName') || globalThis.getRegionDisplayName;
+    const reg = fRegion ? fRegion(evo) : 'cette région';
+    const regName = fName ? fName(reg) : reg;
+    const msg = `Évolution indisponible : ${regName} n'est pas encore débloqué !`;
+    setMsg(msg);
+    if (pwLateLink('notify')) notify(msg, 'var(--red)');
+    return;
+  }
   const minLvl = [
     350, 367, 368, 208, 212, 186, 192, 182, 134, 135, 136, 196, 197, 26, 62, 91, 121, 230, 233,
   ].includes(evo)
@@ -762,6 +817,11 @@ if (typeof tryBoxStoneEvo !== 'undefined') {
   if (typeof globalThis !== 'undefined') globalThis.tryBoxStoneEvo = tryBoxStoneEvo;
 }
 
+if (typeof canEvolveToRegion !== 'undefined') {
+  if (typeof window !== 'undefined') window.canEvolveToRegion = canEvolveToRegion;
+  if (typeof globalThis !== 'undefined') globalThis.canEvolveToRegion = canEvolveToRegion;
+}
+
 // Wave 41 — native ESM module: exports the same names as the
 // classic surface kept above (bodies unchanged).
 export {
@@ -773,4 +833,5 @@ export {
   evolve,
   tryStoneEvo,
   tryBoxStoneEvo,
+  canEvolveToRegion,
 };
