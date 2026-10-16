@@ -46,6 +46,14 @@ function restoreTeamAfterBattle(opts = {}) {
   let healed = false;
   try {
     if (typeof G === 'undefined' || !G || !Array.isArray(G.team)) return false;
+    if (
+      opts.unlessBattle &&
+      typeof globalThis.battle !== 'undefined' &&
+      globalThis.battle &&
+      globalThis.battle.active
+    ) {
+      return false;
+    }
     if (opts.unlessDungeon && typeof globalThis.currentDungeonRun === 'function') {
       const run = globalThis.currentDungeonRun();
       if (run && run.active) return false;

@@ -79,10 +79,27 @@ function battleTalentTypeMult(moveType, defender, typeEff) {
 }
 
 /** Efficacité AFFICHÉE d'une capacité contre une cible : types × talent. */
-function battleDisplayedEff(moveType, defender) {
+function battleDisplayedEff(moveType, defender, attacker) {
   if (!defender || !moveType) return 1;
-  const te = globalThis.typeEff;
-  const base = te ? Number(te(moveType, defender.type1, defender.type2)) : 1;
+  const mt = String(moveType).toLowerCase();
+  const d1 = String(defender.type1 || '').toLowerCase();
+  const d2 = String(defender.type2 || '').toLowerCase();
+  const isGhost = d1 === 'ghost' || d2 === 'ghost';
+  const isNormalOrFight = mt === 'normal' || mt === 'fighting';
+  const hasScrappy =
+    attacker && (attacker.talent === 'scrappy' || pokeActiveTalents(attacker).includes('scrappy'));
+
+  let base = 1;
+  if (hasScrappy && isNormalOrFight && isGhost) {
+    const te = globalThis.typeEff;
+    const otherType = d1 === 'ghost' ? defender.type2 : defender.type1;
+    base = otherType && te ? Number(te(moveType, otherType)) : 1;
+    if (isNaN(base) || base <= 0) base = 1;
+  } else {
+    const te = globalThis.typeEff;
+    const raw = te ? Number(te(moveType, defender.type1, defender.type2)) : 1;
+    base = Number.isFinite(raw) ? raw : 1;
+  }
   const eff = Number.isFinite(base) ? base : 1;
   return eff * battleTalentTypeMult(moveType, defender, eff);
 }

@@ -84,7 +84,7 @@ export var LOCS_HOENN = {
   abandoned_ship:  { name: 'Épave',           type: 'dungeon', x: 416, y: 848, w: 96, h: 64, conn: ['route108'], wild: [[72, 20, 26, 'common'], [73, 24, 28, 'uncommon'], [319, 24, 28, 'uncommon']], shopId: null, champ: null, badgeReq: 4 },
   sealed_chamber:  { name: 'Sanctuaire',      type: 'dungeon', x: 656, y: 600, w: 96, h: 80, conn: ['route134'], wild: [[41, 28, 34, 'common'], [369, 30, 36, 'rare']], shopId: null, champ: null, badgeReq: 7 },
   // Regi ruins (puzzle explorations) — accessible after advanced badges
-  desert_ruins:    { name: 'Ruines Désert (Regirock)',   type: 'dungeon', x: 520, y: 280, w: 72, h: 64, conn: ['route111'], wild: [[27, 20, 26, 'common'], [328, 20, 26, 'common'], [74, 20, 26, 'uncommon']], shopId: null, champ: null, badgeReq: 4 },
+  desert_ruins:    { name: 'Ruines Désert (Regirock)',   type: 'dungeon', x: 520, y: 280, w: 72, h: 64, conn: ['route111'], wild: [[27, 20, 26, 'common'], [328, 20, 26, 'common'], [74, 20, 26, 'uncommon'], [377, 30, 40, 'rare']], shopId: null, champ: null, badgeReq: 4 },
   island_cave:     { name: 'Grotte Isolée (Regice)',   type: 'dungeon', x: 1520, y: 200, w: 72, h: 64, conn: ['route105'], wild: [[86, 20, 28, 'common'], [363, 22, 28, 'uncommon'], [361, 22, 28, 'uncommon'], [378, 30, 40, 'rare']], shopId: null, champ: null, badgeReq: 5 },
   // Ancient Tomb: positioned between Route 119 and Route 120, but
   // ONLY ACCESSIBLE from Route 120 (the route that unlocks it).

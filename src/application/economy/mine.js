@@ -441,7 +441,7 @@ function mineAutoStep() {
 
   // Usage de l'auto-mine : 1 Diamant par tuile (100% Diamants, jamais de Pokédollars).
   const w = typeof ensureWallet === 'function' ? ensureWallet() : G && G.wallet;
-  const currentDiamonds = w ? (w.diamonds || 0) : ((G && G.wallet && G.wallet.diamonds) || 0);
+  const currentDiamonds = w ? w.diamonds || 0 : (G && G.wallet && G.wallet.diamonds) || 0;
   if (currentDiamonds < 1) {
     G.mine.automation.enabled = false;
     notify(t('mine_auto_no_diamonds'), 'var(--red)');

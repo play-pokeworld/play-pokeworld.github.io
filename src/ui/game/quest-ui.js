@@ -318,7 +318,7 @@ function openNpc(locId, idx) {
   const arr = typeof NPCS !== 'undefined' ? NPCS[locId] : null;
   if (!arr || !arr[idx]) return;
   const npc = arr[idx];
-  const talkedMain = talkNpcMainQuest(npc);
+  const talkedMain = talkNpcMainQuest(npc, locId);
   // V7 · LEG-01 — les quêtes annexes « parler à … » se valident ici.
   const talkedSide = typeof talkNpcSideQuests === 'function' ? talkNpcSideQuests(locId) : false;
   const npcText = getNpc(locId, idx);
@@ -655,7 +655,8 @@ function renderRepeatableBoard() {
     offers: _repeatableRoll.map((tpl, i) => {
       const activeInst = (G.repeatables || []).find((r) => r.tplId === tpl.id);
       const active = !!activeInst;
-      const isDone = activeInst && typeof questDone === 'function' ? questDone(activeInst, tpl) : false;
+      const isDone =
+        activeInst && typeof questDone === 'function' ? questDone(activeInst, tpl) : false;
       const prog =
         activeInst && typeof questProgressValue === 'function'
           ? questProgressValue(activeInst, tpl)

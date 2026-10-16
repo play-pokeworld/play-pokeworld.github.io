@@ -73,10 +73,35 @@ function getLocObj(id) {
   var locs = typeof LOCS !== 'undefined' ? LOCS : (typeof window !== 'undefined' ? window.LOCS : null);
   var johto = typeof LOCS_JOHTO !== 'undefined' ? LOCS_JOHTO : (typeof window !== 'undefined' ? window.LOCS_JOHTO : null);
   var hoenn = typeof LOCS_HOENN !== 'undefined' ? LOCS_HOENN : (typeof window !== 'undefined' ? window.LOCS_HOENN : null);
-  if (locs && locs[id]) return locs[id];
-  if (johto && johto[id]) return johto[id];
-  if (hoenn && hoenn[id]) return hoenn[id];
-  return null;
+  var obj = null;
+  if (locs && locs[id]) obj = locs[id];
+  else if (johto && johto[id]) obj = johto[id];
+  else if (hoenn && hoenn[id]) obj = hoenn[id];
+  if (!obj) return null;
+
+  if (id === 'whirlislands') {
+    const gObj = typeof G !== 'undefined' ? G : (typeof globalThis !== 'undefined' && globalThis.G ? globalThis.G : null);
+    const hasLugiaQuest = (gObj && gObj.completedQuests && gObj.completedQuests[139]) ||
+      (gObj && gObj.mainStep && Number(gObj.mainStep.johto) >= 40);
+    const hasLugia = obj.wild && obj.wild.some((w) => Number(w[0]) === 249);
+    if (hasLugiaQuest && !hasLugia) {
+      return Object.assign({}, obj, { wild: obj.wild.concat([[249, 70, 70, 'rare']]) });
+    } else if (!hasLugiaQuest && hasLugia) {
+      return Object.assign({}, obj, { wild: obj.wild.filter((w) => Number(w[0]) !== 249) });
+    }
+  }
+  if (id === 'tintower') {
+    const gObj = typeof G !== 'undefined' ? G : (typeof globalThis !== 'undefined' && globalThis.G ? globalThis.G : null);
+    const hasHoOhQuest = (gObj && gObj.completedQuests && gObj.completedQuests[140]) ||
+      (gObj && gObj.mainStep && Number(gObj.mainStep.johto) >= 40);
+    const hasHoOh = obj.wild && obj.wild.some((w) => Number(w[0]) === 250);
+    if (hasHoOhQuest && !hasHoOh) {
+      return Object.assign({}, obj, { wild: obj.wild.concat([[250, 70, 70, 'rare']]) });
+    } else if (!hasHoOhQuest && hasHoOh) {
+      return Object.assign({}, obj, { wild: obj.wild.filter((w) => Number(w[0]) !== 250) });
+    }
+  }
+  return obj;
 }
 
 

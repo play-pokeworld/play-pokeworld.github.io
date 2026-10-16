@@ -113,3 +113,119 @@ test('P4c-07 — docs/POKEDEX_OBTENTION.xlsx has 5 sheets, all 386 Pokemon, and 
   const stats = fs.statSync('docs/POKEDEX_OBTENTION.xlsx');
   assert.ok(stats.size > 20000, 'Excel spreadsheet is complete (> 20 KB)');
 });
+
+test('P4c-08 — Johto talk quests (Ruines d\'Alpha 113/116, Tour Cendree 118) validate upon talking to NPC', async () => {
+  globalThis.document = { getElementById: () => null };
+  globalThis.updateHeader = () => {};
+  globalThis.notify = () => {};
+  globalThis.saveGame = () => {};
+  globalThis.renderQuests = () => {};
+  globalThis.refreshMapAndLoc = () => {};
+  globalThis.showTab = () => {};
+  globalThis.t = () => '';
+  const origGetLocObj = globalThis.getLocObj;
+  globalThis.getLocObj = () => ({});
+
+  await import('../src/core/game-utils.js');
+  await import('../src/data/story-quests.js');
+  const { talkNpcMainQuest } = await import('../src/application/quests/quest-core.js');
+  const { NPCS } = await import('../src/data/npc-data.js');
+
+  // Test Quest 113
+  globalThis.G = {
+    region: 'johto',
+    inventory: {},
+    _questMigrated: true,
+    _questIdMigrationV2: 2,
+    _questIdMigrationV3: 3,
+    _questIdMigrationV4: 4,
+    _questIdMigrationV5: 5,
+    _questIdMigrationV6: 6,
+    _questIdMigrationV7: 7,
+    mainStep: { johto: 12 },
+    mainProgress: { johto: 0 },
+    activeQuests: [{ id: 'main_113', cat: 'main', qid: 113, progress: 0, done: false }],
+    completedQuests: {}
+  };
+
+  const npcAlpha0 = NPCS['ruinsofalph'][0];
+  const ok113 = talkNpcMainQuest(npcAlpha0, 'ruinsofalph');
+  assert.strictEqual(ok113, true, 'talkNpcMainQuest succeeded for quest 113');
+  assert.ok(globalThis.G.completedQuests['113'], 'Quest 113 marked completed');
+  assert.strictEqual(globalThis.G.mainStep.johto, 13, 'mainStep.johto progressed to 13');
+
+  // Test Quest 118
+  globalThis.G.mainStep.johto = 17;
+  globalThis.G.activeQuests = [{ id: 'main_118', cat: 'main', qid: 118, progress: 0, done: false }];
+  const npcBurned0 = NPCS['burnedtower'][0];
+  const ok118 = talkNpcMainQuest(npcBurned0, 'burnedtower');
+  assert.strictEqual(ok118, true, 'talkNpcMainQuest succeeded for quest 118');
+  assert.ok(globalThis.G.completedQuests['118'], 'Quest 118 marked completed');
+  assert.strictEqual(globalThis.G.mainStep.johto, 18, 'mainStep.johto progressed to 18');
+
+  if (origGetLocObj) globalThis.getLocObj = origGetLocObj;
+  else delete globalThis.getLocObj;
+});
+
+test('P4c-09 — Lugia and Ho-Oh unlock when player completed Johto quests via mainStep', async () => {
+  const { getLocObj } = await import('../src/data/game-helpers.js');
+
+  // Player with no Johto quests remaining (mainStep.johto >= 40)
+  globalThis.G = { completedQuests: {}, mainStep: { johto: 41 }, pokedex: {} };
+  const whirl = getLocObj('whirlislands');
+  const tin = getLocObj('tintower');
+
+  assert.ok(
+    whirl.wild.some((w) => Number(w[0]) === 249),
+    'Lugia unlocked when Johto finished (mainStep >= 40)'
+  );
+  assert.ok(
+    tin.wild.some((w) => Number(w[0]) === 250),
+    'Ho-Oh unlocked when Johto finished (mainStep >= 40)'
+  );
+});
+
+test('P4c-10 — All subsequent Johto talk quests (121, 122, 124, 130) validate when speaking to any NPC or via direct talk action', async () => {
+  globalThis.ITEMS = new Proxy({}, { get: () => ({ name: 'Item', type: 'misc' }) });
+  globalThis.addToInventory = (k, n) => {
+    if (globalThis.G) {
+      globalThis.G.inventory = globalThis.G.inventory || {};
+      globalThis.G.inventory[k] = (globalThis.G.inventory[k] || 0) + n;
+    }
+  };
+  const { talkNpcMainQuest } = await import('../src/application/quests/quest-core.js');
+
+  const talkSteps = [
+    { qid: 121, step: 20, loc: 'cianwood' },
+    { qid: 122, step: 21, loc: 'olivine' },
+    { qid: 124, step: 23, loc: 'lakerage' },
+    { qid: 130, step: 29, loc: 'blackthorn' },
+  ];
+
+  for (const t of talkSteps) {
+    globalThis.G = {
+      region: 'johto',
+      location: t.loc,
+      inventory: {},
+      _questMigrated: true,
+      _questIdMigrationV2: 2,
+      _questIdMigrationV3: 3,
+      _questIdMigrationV4: 4,
+      _questIdMigrationV5: 5,
+      _questIdMigrationV6: 6,
+      _questIdMigrationV7: 7,
+      mainStep: { johto: t.step },
+      mainProgress: { johto: 0 },
+      activeQuests: [{ id: 'main_' + t.qid, cat: 'main', qid: t.qid, progress: 0, done: false }],
+      completedQuests: {},
+    };
+
+    // Validate by passing null NPC and matching location (direct action button or location talk)
+    const res = talkNpcMainQuest(null, t.loc);
+    assert.strictEqual(res, true, `talkNpcMainQuest succeeded for quest ${t.qid} at ${t.loc}`);
+    assert.ok(globalThis.G.completedQuests[t.qid], `Quest ${t.qid} marked completed`);
+    assert.strictEqual(globalThis.G.mainStep.johto, t.step + 1, `mainStep.johto advanced from ${t.step} to ${t.step + 1}`);
+  }
+});
+
+

@@ -325,21 +325,26 @@ var NPCS = {
  ],
  "ruinsofalph": [
   {
-   "quest": "s92"
+   "quest": "s92",
+   "mainTalk": 113
   },
   {
-   "quest": "s93"
+   "quest": "s93",
+   "mainTalk": 116
   },
   {
-   "quest": "s40"
+   "quest": "s40",
+   "mainTalk": 113
   }
  ],
  "burnedtower": [
   {
-   "quest": "s96"
+   "quest": "s96",
+   "mainTalk": 118
   },
   {
-   "quest": "s97"
+   "quest": "s97",
+   "mainTalk": 118
   }
  ],
  "billshouse": [

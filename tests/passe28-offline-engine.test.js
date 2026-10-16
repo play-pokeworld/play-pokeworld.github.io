@@ -338,6 +338,7 @@ test('phase 28 C: auto mine uncapped (12 h ≠ 10 min) AND interleaved regenerat
   vm.runInContext(`
     currentSaveId = 'PW-TEST';
     G.starter = true; G.badges = []; G.money = 1000000;
+    G.wallet = { diamonds: 100000, money: 1000000 };
     initMineIfNeeded();
     G.mine.automation = { enabled: true, purchased: true };
     G.mine.energy = 0;

@@ -230,13 +230,13 @@ function checkEvolution(p) {
   }
   if (p.id === 236 && p.level >= 20) {
     // Tyrogue -> Hitmonlee (atk > def), Hitmonchan (def > atk), Hitmontop (atk == def)
-    const atk = (p.ivs && p.ivs.atk != null) ? p.ivs.atk : (p.atk || 0);
-    const def = (p.ivs && p.ivs.def != null) ? p.ivs.def : (p.def || 0);
+    const atk = p.ivs && p.ivs.atk != null ? p.ivs.atk : p.atk || 0;
+    const def = p.ivs && p.ivs.def != null ? p.ivs.def : p.def || 0;
     let target = 237;
     if (atk > def) target = 106;
     else if (def > atk) target = 107;
     else {
-      target = canEvolveToRegion(237) ? 237 : (p.id % 2 === 0 ? 106 : 107);
+      target = canEvolveToRegion(237) ? 237 : p.id % 2 === 0 ? 106 : 107;
     }
     if (!canEvolveToRegion(target)) return;
     evolve(p, target);
