@@ -194,7 +194,7 @@ export const L_fr_ui = {
 "typ_sea":"Chenal maritime",
 "typ_town":"Ville",
 "wild_poke":"Pokémon sauvages",
-"win_battle":"Combat en direct (PokéChill)",
+"win_battle":"Combat en direct",
 "win_map":"Carte Kanto",
 "win_tabs":"Lieu",
 "win_team":"Équipe Active",

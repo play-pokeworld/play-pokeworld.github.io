@@ -192,7 +192,7 @@ export const L_en_ui = {
 "typ_sea":"Sea Road",
 "typ_town":"Town / City",
 "wild_poke":"Wild Pokémon",
-"win_battle":"Live Battle (PokéChill)",
+"win_battle":"Live Battle",
 "win_map":"Kanto Map",
 "win_tabs":"Location",
 "win_team":"Active Party",
