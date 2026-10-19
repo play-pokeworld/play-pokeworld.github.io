@@ -15,15 +15,12 @@ import { LocationSystem } from '../src/systems/LocationSystem.js';
 import { BattleSystem } from '../src/systems/BattleSystem.js';
 import { NotificationSystem } from '../src/systems/NotificationSystem.js';
 import { PreferencesSystem } from '../src/systems/PreferencesSystem.js';
-import { CurrenciesData } from '../src/data/CurrenciesData.js';
-import { PokemonDB } from '../src/data/PokemonDB.js';
-import { LocationDB } from '../src/data/LocationDB.js';
-import { ItemDB } from '../src/data/ItemDB.js';
-import { QuestDB } from '../src/data/QuestDB.js';
-import { SaveThemes } from '../src/data/SaveThemes.js';
-import { QuestEventTypes } from '../src/data/quests/QuestEventTypes.js';
-import { DefeatWildQuest } from '../src/data/quests/DefeatWildQuest.js';
-import { CatchQuest } from '../src/data/quests/CatchQuest.js';
+import { CurrenciesData } from '../src/data/save/CurrenciesData.js';
+import { PokemonDB } from '../src/data/pokemon/PokemonDB.js';
+import { LocationDB } from '../src/data/world/LocationDB.js';
+import { ItemDB } from '../src/data/items/ItemDB.js';
+import { QuestDB } from '../src/data/quests/QuestDB.js';
+import { SaveThemes } from '../src/data/save/SaveThemes.js';
 import { SaveCreatedEvent } from '../src/core/events/SaveCreatedEvent.js';
 import { LocationChangedEvent } from '../src/core/events/LocationChangedEvent.js';
 import { BattleStartedEvent } from '../src/core/events/BattleStartedEvent.js';
@@ -79,12 +76,13 @@ describe('Core', (test) => {
 });
 
 describe('Data', (test) => {
-  test('PokemonDB resolves ids, names and slugs', () => {
+  test('PokemonDB resolves species ids and national dex numbers', () => {
     const db = PokemonDB.getInstance();
-    const pikachu = db.getById(25);
+    const pikachu = db.getById('pikachu');
     assert.ok(pikachu, 'pikachu');
-    assert.equal(pikachu.getSlug(), 'pikachu');
-    assert.equal(db.getBySlug('pikachu').id, 25);
+    assert.equal(pikachu.dex, 25);
+    assert.equal(db.getByDex(25).id, 'pikachu');
+    assert.deepEqual([...pikachu.getTypes()], ['electric']);
   });
 
   test('LocationDB and ItemDB load the raw tables', () => {
@@ -110,29 +108,19 @@ describe('Data', (test) => {
     assert.equal(SaveThemes.normalize(theme), theme);
   });
 
-  test('QuestDB builds typed quests', () => {
+  test('QuestDB exposes the three main chains', () => {
     const quests = QuestDB.getInstance();
-    if (quests.init && !quests.getStoryQuests().length) quests.init();
-    assert.ok(quests.getStoryQuests().length > 0, 'story quests');
-  });
-
-  test('quests react only to their event type and location', () => {
-    const quest = new DefeatWildQuest({ id: 'q', target: 2, loc: 'route1' });
-    quest.checkEvent(QuestEventTypes.WILD_DEFEATED, { loc: 'route2' });
-    quest.checkEvent(QuestEventTypes.POKEMON_CAUGHT, { loc: 'route1' });
-    assert.equal(quest.progress, 0);
-    quest.checkEvent(QuestEventTypes.WILD_DEFEATED, { loc: 'route1' });
-    quest.checkEvent(QuestEventTypes.WILD_DEFEATED, { loc: 'route1' });
-    quest.checkEvent(QuestEventTypes.WILD_DEFEATED, { loc: 'route1' });
-    assert.ok(quest.isCompleted() && quest.progress === 2);
-    assert.ok(new CatchQuest({ id: 'c' }) instanceof CatchQuest);
+    assert.ok(quests.getMainChain('kanto').length > 0, 'kanto');
+    assert.ok(quests.getMainChain('johto').length > 0, 'johto');
+    assert.ok(quests.getMainChain('hoenn').length > 0, 'hoenn');
+    assert.equal(quests.getMainQuest('kanto', 0).key, quests.getMainChain('kanto')[0].key);
   });
 });
 
 describe('SaveSystem', (test) => {
   test('creates, lists and reloads a save', () => {
     const created = capture(SaveCreatedEvent);
-    const save = saves.createNewSave(1, 'Red', 'charmander', 'forest');
+    const save = saves.createNewSave('Red', 'charmander', 'forest');
     assert.equal(created.length, 1);
     assert.equal(save.team[0].species, 'charmander');
     const list = saves.listExistingSaves();
@@ -141,7 +129,7 @@ describe('SaveSystem', (test) => {
   });
 
   test('renames, duplicates, exports, imports and deletes', () => {
-    const save = saves.createNewSave(2, 'Blue', 'squirtle');
+    const save = saves.createNewSave('Blue', 'squirtle');
     assert.equal(saves.renameSlot(save.id, 'Green').player.trainerName, 'Green');
     const copy = saves.duplicateSlot(save.id);
     assert.ok(copy && copy.id !== save.id, 'duplicate');
@@ -158,7 +146,7 @@ describe('SaveSystem', (test) => {
 
 describe('Gameplay systems', (test) => {
   test('LocationSystem travels to adjacent places and refuses locked ones', () => {
-    saves.createNewSave(3, 'Ash', 'bulbasaur');
+    saves.createNewSave('Ash', 'bulbasaur');
     const moves = capture(LocationChangedEvent);
     const locations = LocationSystem.getInstance();
     assert.ok(locations.travelTo('route1'));

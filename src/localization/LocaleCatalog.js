@@ -21,7 +21,7 @@ import { L_en_stats } from './en/stats.js';
 import { L_en_pokedex } from './en/pokedex.js';
 import { L_en_types } from './en/types.js';
 import { L_en_talents } from './en/talents.js';
-import { L_en_champions } from './en/champions.js';
+import { L_en_trainers } from './en/trainers.js';
 import { L_en_shops } from './en/shops.js';
 import { L_en_lore } from './en/lore.js';
 import { L_location_names_en } from './en/locations.js';
@@ -34,6 +34,7 @@ import { notifications as en_notifications } from './en/notifications.js';
 import { debug as en_debug } from './en/debug.js';
 import { panels as en_panels } from './en/panels.js';
 import { settings as en_settings } from './en/settings.js';
+import { battleLog as en_battle_log } from './en/battle-log.js';
 
 import { L_fr_ui } from './fr/ui.js';
 import { L_fr_combat } from './fr/combat.js';
@@ -46,7 +47,7 @@ import { L_fr_stats } from './fr/stats.js';
 import { L_fr_pokedex } from './fr/pokedex.js';
 import { L_fr_types } from './fr/types.js';
 import { L_fr_talents } from './fr/talents.js';
-import { L_fr_champions } from './fr/champions.js';
+import { L_fr_trainers } from './fr/trainers.js';
 import { L_fr_shops } from './fr/shops.js';
 import { L_fr_lore } from './fr/lore.js';
 import { L_location_names_fr } from './fr/locations.js';
@@ -59,6 +60,7 @@ import { notifications as fr_notifications } from './fr/notifications.js';
 import { debug as fr_debug } from './fr/debug.js';
 import { panels as fr_panels } from './fr/panels.js';
 import { settings as fr_settings } from './fr/settings.js';
+import { battleLog as fr_battle_log } from './fr/battle-log.js';
 
 /**
  * @typedef {Object} LocaleDomain
@@ -83,7 +85,7 @@ export const LOCALE_CATALOG = Object.freeze({
     { source: L_en_pokedex },
     { source: L_en_types, prefix: 'type' },
     { source: L_en_talents, prefix: 'talent' },
-    { source: L_en_champions, prefix: 'champion' },
+    { source: L_en_trainers, prefix: 'trainer' },
     { source: L_en_shops, prefix: 'shop' },
     { source: L_en_lore, prefix: 'lore' },
     { source: L_location_names_en, prefix: 'location' },
@@ -95,7 +97,8 @@ export const LOCALE_CATALOG = Object.freeze({
     { source: en_notifications },
     { source: en_debug },
     { source: en_panels },
-    { source: en_settings }
+    { source: en_settings },
+    { source: en_battle_log, prefix: 'battle_log' }
   ]),
   fr: Object.freeze([
     { source: L_fr_ui },
@@ -109,7 +112,7 @@ export const LOCALE_CATALOG = Object.freeze({
     { source: L_fr_pokedex },
     { source: L_fr_types, prefix: 'type' },
     { source: L_fr_talents, prefix: 'talent' },
-    { source: L_fr_champions, prefix: 'champion' },
+    { source: L_fr_trainers, prefix: 'trainer' },
     { source: L_fr_shops, prefix: 'shop' },
     { source: L_fr_lore, prefix: 'lore' },
     { source: L_location_names_fr, prefix: 'location' },
@@ -121,6 +124,7 @@ export const LOCALE_CATALOG = Object.freeze({
     { source: fr_notifications },
     { source: fr_debug },
     { source: fr_panels },
-    { source: fr_settings }
+    { source: fr_settings },
+    { source: fr_battle_log, prefix: 'battle_log' }
   ])
 });

@@ -183,7 +183,7 @@ export class UIElement extends BaseObject {
   setVisible(visible) {
     this._isVisible = !!visible;
     // Visibility is driven by the .is-hidden class only (see ui-element.css).
-    this._dom.classList.toggle('is-hidden', !this._isVisible);
+    this.toggleClass('is-hidden', !this._isVisible);
   }
 
   show() {
@@ -200,16 +200,18 @@ export class UIElement extends BaseObject {
 
   /** @param {string} className */
   addClass(className) {
-    if (className) this._dom.classList.add(className);
+    // contains() first: classList.add/remove rewrite the attribute even when nothing changes
+    if (className && !this._dom.classList.contains(className)) this._dom.classList.add(className);
   }
 
   /** @param {string} className */
   removeClass(className) {
-    if (className) this._dom.classList.remove(className);
+    if (className && this._dom.classList.contains(className)) this._dom.classList.remove(className);
   }
 
   /** @param {string} className @param {boolean} [force] */
   toggleClass(className, force) {
+    if (force !== undefined && this._dom.classList.contains(className) === !!force) return !!force;
     return this._dom.classList.toggle(className, force);
   }
 
@@ -283,8 +285,14 @@ export class UIElement extends BaseObject {
    */
   _setCssVariable(name, value) {
     if (!this._dom.style || typeof this._dom.style.setProperty !== 'function') return;
-    if (value === null || value === undefined) this._dom.style.removeProperty(name);
-    else this._dom.style.setProperty(name, value);
+    if (value === null || value === undefined) {
+      this._dom.style.removeProperty(name);
+      return;
+    }
+    const next = String(value);
+    // Unchanged value: no style invalidation (drag frames, live gauges)
+    if (typeof this._dom.style.getPropertyValue === 'function' && this._dom.style.getPropertyValue(name) === next) return;
+    this._dom.style.setProperty(name, next);
   }
 
   /**

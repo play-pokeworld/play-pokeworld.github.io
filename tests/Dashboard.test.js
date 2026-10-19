@@ -12,7 +12,7 @@ import { ModalIds } from '../src/config/ModalIds.js';
 import { DashboardLayoutSystem } from '../src/systems/DashboardLayoutSystem.js';
 import { SaveSystem } from '../src/systems/SaveSystem.js';
 import { TeamSystem } from '../src/systems/TeamSystem.js';
-import { PokemonData } from '../src/data/PokemonData.js';
+import { PokemonData } from '../src/data/pokemon/PokemonData.js';
 import { DashboardView } from '../src/ui/dashboard/DashboardView.js';
 import { StoryPanel } from '../src/panels/StoryPanel.js';
 import { MapPanel } from '../src/panels/MapPanel.js';
@@ -106,10 +106,10 @@ describe('Modals and team', (test) => {
     settings.destroy();
   });
 
-  test('the starter modal receives its slot and its back button cancels', () => {
+  test('the starter modal opens on request and its back button cancels', () => {
     const chosen = [];
     const modal = new StarterModal({ onStarterChosen: (...args) => chosen.push(args) });
-    EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.STARTER, { slotIndex: 4 }));
+    EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.STARTER));
     assert.ok(modal.isOpen(), 'opened by request');
     const back = modal.getDomElement().querySelector('.starter-back-btn');
     assert.ok(back, 'back button exists');
@@ -120,7 +120,7 @@ describe('Modals and team', (test) => {
   });
 
   test('TeamSystem.setLead swaps the lead, saves and emits', () => {
-    const save = SaveSystem.getInstance().createNewSave(7, 'Brock', 'charmander');
+    const save = SaveSystem.getInstance().createNewSave('Brock', 'charmander');
     save.team.push(new PokemonData({ species: 'onix', level: 12 }));
     const events = [];
     const unsubscribe = EventBus.getInstance().subscribe(TeamChangedEvent, (event) => events.push(event));

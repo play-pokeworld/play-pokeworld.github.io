@@ -6,7 +6,7 @@
  *   3. trainer nickname field (rework addition — required before picking),
  *   4. the three starter cards, 5. footer: "Back" button (rework addition) + hint.
  * No header bar and backdrop clicks are ignored; "Back" or Escape returns to the save menu.
- * Opened through `new ModalOpenRequestedEvent(ModalIds.STARTER, { slotIndex })`.
+ * Opened through `new ModalOpenRequestedEvent(ModalIds.STARTER)`.
  */
 
 import { UIModal } from '../ui/UIModal.js';
@@ -16,7 +16,8 @@ import { UIPokemonSprite, PokemonSpriteSizes } from '../ui/UIPokemonSprite.js';
 import { UITextInput } from '../ui/UITextInput.js';
 import { UIButton } from '../ui/UIButton.js';
 import { ModalIds } from '../config/ModalIds.js';
-import { STARTERS_BY_REGION, DEFAULT_STARTER_REGION } from '../data/StarterData.js';
+import { PokemonDB } from '../data/pokemon/PokemonDB.js';
+import { STARTERS_BY_REGION, DEFAULT_STARTER_REGION } from '../data/pokemon/StarterData.js';
 import { GameConfig } from '../config/GameConfig.js';
 import { t } from '../localization/LocalizationManager.js';
 
@@ -25,7 +26,7 @@ const NAME_INPUT_ID = 'starter-name-input';
 export class StarterModal extends UIModal {
   /**
    * @param {Object} [options={}]
-   * @param {Function} [options.onStarterChosen=null] - (slotIndex, trainerName, species) => void
+   * @param {Function} [options.onStarterChosen=null] - (trainerName, species) => void
    * @param {string} [options.region]                 - Key of STARTERS_BY_REGION
    */
   constructor(options = {}) {
@@ -44,7 +45,6 @@ export class StarterModal extends UIModal {
 
     this._onStarterChosen = options.onStarterChosen || null;
     this._region = options.region || DEFAULT_STARTER_REGION;
-    this._slotIndex = 1;
 
     /** @private @type {UITextInput|null} */
     this._nameInput = null;
@@ -65,11 +65,9 @@ export class StarterModal extends UIModal {
   }
 
   /**
-   * Opens the modal for a given save slot; the nickname field starts empty.
-   * @param {{slotIndex?: number}} [params={}]
+   * Opens the modal for a new save; the nickname field starts empty.
    */
-  open(params = {}) {
-    this._slotIndex = params.slotIndex ?? 1;
+  open() {
     this._renderContent();
     super.open();
     this._nameInput.focus();
@@ -152,7 +150,7 @@ export class StarterModal extends UIModal {
 
   /**
    * @private
-   * @param {import('../data/StarterData.js').StarterDefinition} starter
+   * @param {import('../data/pokemon/StarterData.js').StarterDefinition} starter
    * @returns {UIContainer}
    */
   _buildStarterCard(starter) {
@@ -160,7 +158,7 @@ export class StarterModal extends UIModal {
     const card = new UIContainer({ className: 'starter-card starter-card--custom' });
     card.setAttribute('role', 'button');
     card.setAttribute('tabindex', '0');
-    card.setData('starterId', starter.id);
+    card.setData('starterId', starter.species);
     card.setData('starterRegion', this._region);
 
     const sprite = new UIContainer({ className: 'poke-sprite' });
@@ -170,7 +168,7 @@ export class StarterModal extends UIModal {
     const info = new UIContainer({ className: 'pw-flex-1' });
     const nameRow = new UIContainer({ className: 'poke-name pw-text-md' });
     nameRow.addChild(new UIText({ text: name }));
-    nameRow.addChild(new UIText({ className: 'pw-text-sm starter-dex-number', text: t('starter_dex_number', { id: starter.id }) }));
+    nameRow.addChild(new UIText({ className: 'pw-text-sm starter-dex-number', text: t('starter_dex_number', { id: PokemonDB.getInstance().getById(starter.species)?.dex ?? 0 }) }));
     info.addChild(nameRow);
     info.addChild(new UIText({ tagName: 'div', className: 'pw-text-glow', text: t(starter.descKey) }));
     card.addChild(info);
@@ -219,11 +217,11 @@ export class StarterModal extends UIModal {
     }
 
     const trainerName = this._nameInput.getValue();
-    console.log(t('debug_starter_picked', { id: starter.id, name: t(starter.nameKey) }));
+    console.log(t('debug_starter_picked', { id: starter.species, name: t(starter.nameKey) }));
     this.close();
 
     if (this._onStarterChosen) {
-      this._onStarterChosen(this._slotIndex, trainerName, starter.species);
+      this._onStarterChosen(trainerName, starter.species);
     }
   }
 }

@@ -13,10 +13,12 @@ export class UITextInput extends UIElement {
    * @param {string} [options.value='']
    * @param {string} [options.placeholder='']
    * @param {number} [options.maxLength=0]       - 0 = unlimited
-   * @param {'text'|'password'} [options.type='text']
+   * @param {'text'|'password'|'number'} [options.type='text']
+   * @param {number} [options.min] - Lowest value of a number input
    * @param {string} [options.className='']
    * @param {Function} [options.onInput=null]    - (value, input) => void
    * @param {Function} [options.onSubmit=null]   - Called on Enter: (value, input) => void
+   * @param {Function} [options.onChange=null]   - Value committed (blur or Enter): (value, input) => void
    */
   constructor(options = {}) {
     super({
@@ -27,13 +29,15 @@ export class UITextInput extends UIElement {
       tag: 'Input'
     });
 
-    this._dom.setAttribute('type', options.type === 'password' ? 'password' : 'text');
+    this._dom.setAttribute('type', ['password', 'number'].includes(options.type) ? options.type : 'text');
+    if (options.min !== undefined) this._dom.setAttribute('min', String(options.min));
     this._dom.setAttribute('autocomplete', 'off');
     this._dom.setAttribute('spellcheck', 'false');
     this._dom.setAttribute('data-stop-drag', 'true');
 
     this._onInput = options.onInput || null;
     this._onSubmit = options.onSubmit || null;
+    this._onChange = options.onChange || null;
 
     if (options.maxLength) this.setMaxLength(options.maxLength);
     if (options.placeholder) this.setPlaceholder(options.placeholder);
@@ -42,6 +46,9 @@ export class UITextInput extends UIElement {
     this.addDomListener('input', () => {
       this.setInvalid(false);
       if (this._onInput) this._onInput(this.getValue(), this);
+    });
+    this.addDomListener('change', () => {
+      if (this._onChange) this._onChange(this.getValue(), this);
     });
     this.addDomListener('keydown', (event) => {
       if (event.key === 'Enter' && this._onSubmit) {

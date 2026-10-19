@@ -63,7 +63,10 @@ export class UIText extends UIElement {
    * @param {string|number} text
    */
   setText(text) {
-    this._dom.textContent = text != null ? String(text) : '';
+    const value = text != null ? String(text) : '';
+    // Unchanged text: no DOM write (live views call setText on every game event)
+    if (this._dom.textContent === value && this._dom.childNodes.length <= 1) return;
+    this._dom.textContent = value;
   }
 
   /** @returns {string} */

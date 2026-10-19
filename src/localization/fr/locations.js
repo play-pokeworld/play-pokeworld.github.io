@@ -1,14 +1,15 @@
-// ===== FR — Location names (all regions) =====
-
+// ===== FR — Location names (key = location id) =====
+// Keys come from the data tables (tools/data); texts can be edited by hand.
 export const L_location_names_fr = {
   "abandoned_ship": "Épave",
   "ancient_tomb": "Tombeau Antique (Registeel)",
   "aqua_hideout": "Planque Aqua",
   "azalea": "Écorcia",
   "battle_frontier": "Zone de Combat",
+  "billshouse": "Chalet de Léo",
+  "birth_island": "Île de l'Aurore",
   "blackthorn": "Ébénelle",
   "burnedtower": "Tour Cendrée",
-  "billshouse": "Chalet de Léo",
   "cave_of_origin": "Grotte Origine",
   "celadon": "Céladopole",
   "cerulean": "Azuria",
@@ -158,7 +159,6 @@ export const L_location_names_fr = {
   "seafloor_cavern": "Caverne Fond-de-Mer",
   "seafoamislands": "Îles Écume",
   "sealed_chamber": "Sanctuaire",
-  "birth_island": "Île de l'Aurore",
   "shoal_cave": "Grotte Tréfonds Mer",
   "sky_pillar": "Pilier Céleste",
   "slateport": "Poivressel",

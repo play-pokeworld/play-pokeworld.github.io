@@ -1,6 +1,6 @@
 {
   "name": "pokeworld-clean",
-  "version": "1.2.0",
+  "version": "1.6.0",
   "private": true,
   "description": "PokéWorld — clean-architecture rework (static browser game + zero-dependency local server).",
   "type": "module",
@@ -9,6 +9,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "test": "node test_suite.js"
+    "test": "node test_suite.js",
+    "data": "node tools/data/build-all.mjs"
   }
 }

@@ -9,11 +9,15 @@
   --red-hover: #E55575;
   --discord: #5865F2;
   --discord-hover: #4752C4;
-  --pw-bg-app: #151412;
-  --pw-bg-surface-elevated: #36342F;
-  --pw-border-light: rgba(255, 255, 255, 0.1);
+  /* Surfaces derive from the theme palette of design-system.css (dark = original values). */
+  --pw-bg-app: color-mix(in srgb, var(--pw-bg-header) 75%, black);
+  --pw-bg-surface-elevated: var(--dark1);
+  --pw-bg-surface-hover: color-mix(in srgb, var(--dark1) 88%, var(--light2));
+  --pw-bg-inset: color-mix(in srgb, var(--dark1) 55%, transparent);
+  --pw-border-soft: color-mix(in srgb, var(--light2) 30%, transparent);
+  --pw-border-light: color-mix(in srgb, var(--light2) 10%, transparent);
   --pw-border-focus: #FFE15E;
-  --pw-text-muted: #8E8472;
+  --pw-text-muted: color-mix(in srgb, var(--pw-text-secondary) 70%, transparent);
   --pw-text-dark: #1C1A17;
   --pw-text-white: #FFFFFF;
   --pw-accent-gold: #FFE15E;

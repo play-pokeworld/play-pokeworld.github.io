@@ -108,3 +108,13 @@
   flex: none;
   min-width: var(--pw-starter-back-w, 96px);
 }
+
+/* --- Theme awareness (v1.3): the original rules use fixed white / black values --- */
+.starter-card .pw-text-glow {
+  color: color-mix(in srgb, var(--pw-text-primary) 85%, transparent);
+  text-shadow: none;
+}
+
+#starter-modal-title {
+  text-shadow: 0 1px 3px color-mix(in srgb, var(--dark1) 70%, transparent);
+}

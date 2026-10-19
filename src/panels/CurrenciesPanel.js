@@ -8,7 +8,7 @@ import { UIContainer } from '../ui/UIContainer.js';
 import { UIText } from '../ui/UIText.js';
 import { UIImage } from '../ui/UIImage.js';
 import { SaveSystem } from '../systems/SaveSystem.js';
-import { CURRENCIES } from '../data/CurrencyDefinitions.js';
+import { CURRENCIES } from '../data/save/CurrencyDefinitions.js';
 import { CurrencyChangedEvent } from '../core/events/CurrencyChangedEvent.js';
 import { TextFormatter } from '../core/TextFormatter.js';
 import { WindowIds } from '../config/DashboardLayout.js';

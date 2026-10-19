@@ -45,7 +45,7 @@ export class AchievementsPanel extends DraggablePanel {
   /** @private */
   _render() {
     this.clearChildren();
-    const caught = SaveSystem.getInstance().getCurrentSave()?.player.caughtCount ?? 0;
+    const caught = SaveSystem.getInstance().getCurrentSave()?.pokedex.getCaughtCount() ?? 0;
     const total = PlayerDefaults.KANTO_DEX_SIZE;
     const pct = Math.min(100, Math.round((caught / total) * 100));
     const pinnedLabel = t(PINNABLE_ACHIEVEMENTS.find((a) => a.id === this._pinnedId).labelKey);

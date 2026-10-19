@@ -5,10 +5,13 @@
  * Layout:
  *   StorageKeys.SAVE_LIBRARY             ordered JSON array of save summaries (the source of truth)
  *   StorageKeys.SAVE_SLOT_PREFIX + id    JSON payload of one save
- *   StorageKeys.ACTIVE_SAVE(_ID)         mirror of the active save (original game compatibility)
+ *   StorageKeys.ACTIVE_SAVE_ID           id of the active save
+ * A save is written ONCE per save (its slot payload); the index only holds the summary shown
+ * by the save menu. StorageKeys.ACTIVE_SAVE (full mirror written by builds before v1.4) is only
+ * read by the one-time legacy migration, then removed.
  */
 
-import { SaveData } from '../data/SaveData.js';
+import { SaveData } from '../data/save/SaveData.js';
 import { LocalStore } from '../core/LocalStore.js';
 import { StorageKeys } from '../config/StorageKeys.js';
 
@@ -35,8 +38,8 @@ export class SaveStorage {
       id: save.id,
       name: save.player.trainerName,
       background: save.background,
-      badges: save.player.badges,
-      caught: save.player.caughtCount,
+      badges: save.player.getBadgeCount(),
+      caught: save.pokedex.getCaughtCount(),
       playTimeSeconds: save.player.playTimeSeconds,
       updatedAt: save.updatedAt
     };
@@ -61,9 +64,7 @@ export class SaveStorage {
   static read(id) {
     const json = LocalStore.getJson(`${StorageKeys.SAVE_SLOT_PREFIX}${id}`, null);
     if (!json) return null;
-    const save = new SaveData(String(id));
-    save.deserialize(json);
-    return save;
+    return SaveData.fromJson(json);
   }
 
   /**
@@ -78,12 +79,11 @@ export class SaveStorage {
   }
 
   /**
-   * Marks a save as the active one (mirrored for the original game format).
+   * Marks a save as the active one (only its id is stored).
    * @param {SaveData} save
    */
   static writeActive(save) {
     LocalStore.setString(StorageKeys.ACTIVE_SAVE_ID, save.id);
-    LocalStore.setJson(StorageKeys.ACTIVE_SAVE, save.serialize());
   }
 
   /**
@@ -94,10 +94,7 @@ export class SaveStorage {
     LocalStore.remove(`${StorageKeys.SAVE_SLOT_PREFIX}${id}`);
     SaveStorage.writeIndex((SaveStorage.readIndex() || []).filter((entry) => entry.id !== id));
 
-    if (LocalStore.getString(StorageKeys.ACTIVE_SAVE_ID) === id) {
-      LocalStore.remove(StorageKeys.ACTIVE_SAVE_ID);
-      LocalStore.remove(StorageKeys.ACTIVE_SAVE);
-    }
+    if (LocalStore.getString(StorageKeys.ACTIVE_SAVE_ID) === id) LocalStore.remove(StorageKeys.ACTIVE_SAVE_ID);
   }
 
   /**
@@ -120,6 +117,7 @@ export class SaveStorage {
       }
     }
     keep(SaveStorage._fromJson(LocalStore.getJson(StorageKeys.ACTIVE_SAVE, null)));
+    LocalStore.remove(StorageKeys.ACTIVE_SAVE);
 
     const saves = [...found.values()];
     for (const save of saves) {
@@ -136,8 +134,6 @@ export class SaveStorage {
    */
   static _fromJson(json) {
     if (!json || typeof json !== 'object') return null;
-    const save = new SaveData();
-    save.deserialize(json);
-    return save;
+    return SaveData.fromJson(json);
   }
 }

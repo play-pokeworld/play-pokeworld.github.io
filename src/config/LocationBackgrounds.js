@@ -13,7 +13,7 @@ export const BACKGROUND_SCENES = Object.freeze(['beach', 'cave', 'desert', 'fore
 export const DEFAULT_BACKGROUND_SCENE = 'route';
 
 /** Fallback scene per location type. */
-const SCENE_BY_TYPE = Object.freeze({
+const SCENE_BY_KIND = Object.freeze({
   town: 'town',
   route: 'route',
   dungeon: 'cave',
@@ -142,15 +142,15 @@ const SCENE_KEYWORDS = Object.freeze([
 ]);
 
 /**
- * Scene of a location: explicit table, then id keywords, then location type, then the default.
+ * Scene of a location: explicit table, then id keywords, then location kind, then the default.
  * @param {string|null} locationId
- * @param {string|null} [locationType]
+ * @param {string|null} [locationKind]
  * @returns {string} One of BACKGROUND_SCENES
  */
-export function resolveLocationScene(locationId, locationType = null) {
+export function resolveLocationScene(locationId, locationKind = null) {
   if (!locationId) return DEFAULT_BACKGROUND_SCENE;
   if (SCENE_BY_LOCATION[locationId]) return SCENE_BY_LOCATION[locationId];
   const keyword = SCENE_KEYWORDS.find(([pattern]) => pattern.test(locationId));
   if (keyword) return keyword[1];
-  return SCENE_BY_TYPE[locationType] ?? DEFAULT_BACKGROUND_SCENE;
+  return SCENE_BY_KIND[locationKind] ?? DEFAULT_BACKGROUND_SCENE;
 }

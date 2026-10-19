@@ -26,13 +26,15 @@ import { Engine } from '../core/Engine.js';
 import { EventBus } from '../core/EventBus.js';
 import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
 import { ModalIds } from '../config/ModalIds.js';
-import { SaveThemes } from '../data/SaveThemes.js';
+import { SaveThemes } from '../data/save/SaveThemes.js';
 import { GameConfig } from '../config/GameConfig.js';
+import { DEFAULT_UI_THEME } from '../config/UiThemes.js';
 import { LocalizationManager, t } from '../localization/LocalizationManager.js';
 
 export class SaveMenuPage extends BasePage {
   constructor() {
-    super('SaveMenuPage');
+    // The save menu always uses the dark palette, whatever the theme chosen in game.
+    super('SaveMenuPage', {}, { forcedTheme: DEFAULT_UI_THEME });
 
     /** @private @type {ConfirmDialog|null} */
     this._confirmDialog = null;
@@ -95,8 +97,8 @@ export class SaveMenuPage extends BasePage {
   _buildModals() {
     // Opened by request (ModalIds.STARTER) from the "New game" button
     this.addChild(new StarterModal({
-      onStarterChosen: (slotIndex, trainerName, starterSpecies) => {
-        this._handleCreateSave(slotIndex, trainerName, starterSpecies);
+      onStarterChosen: (trainerName, starterSpecies) => {
+        this._handleCreateSave(trainerName, starterSpecies);
       }
     }));
 
@@ -253,19 +255,17 @@ export class SaveMenuPage extends BasePage {
 
   /** @private */
   _onNewGameClick() {
-    const nextIndex = SaveSystem.getInstance().listExistingSaves().length + 1;
-    EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.STARTER, { slotIndex: nextIndex }));
+    EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.STARTER));
   }
 
   /**
    * @private
-   * @param {number} slotIndex
    * @param {string} trainerName
    * @param {string} starterSpecies
    * @returns {Object}
    */
-  _handleCreateSave(slotIndex, trainerName, starterSpecies) {
-    const newSave = SaveSystem.getInstance().createNewSave(slotIndex, trainerName, starterSpecies, SaveThemes.random());
+  _handleCreateSave(trainerName, starterSpecies) {
+    const newSave = SaveSystem.getInstance().createNewSave(trainerName, starterSpecies, SaveThemes.random());
     this._notify(t('notif_new_save_created', { name: newSave.player.trainerName }), NotificationTones.SUCCESS);
     this._enterGameWithSave(newSave);
     return newSave;

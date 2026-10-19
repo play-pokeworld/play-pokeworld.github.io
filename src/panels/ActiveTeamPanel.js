@@ -8,9 +8,11 @@ import { UIContainer } from '../ui/UIContainer.js';
 import { UIText } from '../ui/UIText.js';
 import { TeamMemberCard } from './components/TeamMemberCard.js';
 import { TeamSystem } from '../systems/TeamSystem.js';
+import { BattleSystem } from '../systems/BattleSystem.js';
 import { EventBus } from '../core/EventBus.js';
 import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
 import { TeamChangedEvent } from '../core/events/TeamChangedEvent.js';
+import { BattleStartedEvent } from '../core/events/BattleStartedEvent.js';
 import { BattleStateChangedEvent } from '../core/events/BattleStateChangedEvent.js';
 import { BattleEndedEvent } from '../core/events/BattleEndedEvent.js';
 import { ModalIds } from '../config/ModalIds.js';
@@ -34,6 +36,7 @@ export class ActiveTeamPanel extends DraggablePanel {
     });
     this.refresh();
     this.listen(TeamChangedEvent, () => this.refresh());
+    this.listen(BattleStartedEvent, () => this.refresh());
     this.listen(BattleStateChangedEvent, () => this.refresh());
     this.listen(BattleEndedEvent, () => this.refresh());
   }
@@ -43,26 +46,53 @@ export class ActiveTeamPanel extends DraggablePanel {
     EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.TEAM));
   }
 
-  /** Rebuilds the cards from the current save. */
+  /**
+   * Synchronizes the cards with the current team. Existing cards are updated in place
+   * (called on every battle tick); nodes are only created or removed when the team size changes.
+   */
   refresh() {
-    this.clearChildren();
     const team = TeamSystem.getInstance().getTeam();
+    const foe = BattleSystem.getInstance().getCurrentFoe();
+    if (!this._cards) this._cards = [];
 
+    while (this._cards.length > team.length) {
+      const card = this._cards.pop();
+      this.removeChild(card);
+      card.destroy();
+    }
     team.forEach((pokemon, index) => {
-      this.addChild(new TeamMemberCard({ pokemon, index, onClick: () => this._openTeamModal() }));
+      if (!this._cards[index]) {
+        const card = new TeamMemberCard({ index, onClick: () => this._openTeamModal() });
+        this._cards.push(card);
+        if (this._addSlot) this.insertChildBefore(card, this._addSlot);
+        else this.addChild(card);
+      }
+      this._cards[index].setPokemon(pokemon, foe);
     });
 
-    if (team.length < PlayerDefaults.TEAM_SIZE) {
-      const addSlot = new UIContainer({
+    this._syncAddSlot(team.length);
+  }
+
+  /**
+   * @private Shows the "add a Pokémon" slot while the team is not full.
+   * @param {number} teamSize
+   */
+  _syncAddSlot(teamSize) {
+    if (!this._addSlot) {
+      this._addSlotCount = new UIText({ tagName: 'div', className: 'pw-text-sm pw-light1' });
+      this._addSlot = new UIContainer({
         className: 'pw-drop-zone',
         children: [
           new UIText({ tagName: 'div', className: 'pw-text-lg', text: t('add_slot_symbol') }),
           new UIText({ tagName: 'div', className: 'pw-text-sm pw-light2 pw-bold', text: t('add_pokemon') }),
-          new UIText({ tagName: 'div', className: 'pw-text-sm pw-light1', text: t('value_over_max', { value: team.length, max: PlayerDefaults.TEAM_SIZE }) })
+          this._addSlotCount
         ]
       });
-      addSlot.addDomListener('click', () => this._openTeamModal());
-      this.addChild(addSlot);
+      this._addSlot.addDomListener('click', () => this._openTeamModal());
+      this.addChild(this._addSlot);
     }
+    this._addSlotCount.setText(t('value_over_max', { value: teamSize, max: PlayerDefaults.TEAM_SIZE }));
+    if (teamSize < PlayerDefaults.TEAM_SIZE) this._addSlot.show();
+    else this._addSlot.hide();
   }
 }

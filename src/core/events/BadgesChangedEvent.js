@@ -1,6 +1,6 @@
 /**
  * @file BadgesChangedEvent.js
- * @brief Emitted when the badge count changes.
+ * @brief Emitted when the player earns a badge.
  */
 
 import { BaseEvent } from '../BaseEvent.js';
@@ -10,13 +10,15 @@ export class BadgesChangedEvent extends BaseEvent {
   static TYPE = 'BadgesChangedEvent';
 
   /**
-   * @param {number} currentBadges - Badges owned
+   * @param {string[]} badgeIds - Badges owned (gym leader ids, e.g. 'brock')
    * @param {number} totalBadges - Badges available
    */
-  constructor(currentBadges, totalBadges) {
+  constructor(badgeIds, totalBadges) {
     super(BadgesChangedEvent.TYPE);
+    /** @type {ReadonlyArray<string>} */
+    this.badgeIds = Object.freeze([...badgeIds]);
     /** @type {number} */
-    this.currentBadges = currentBadges;
+    this.currentBadges = badgeIds.length;
     /** @type {number} */
     this.totalBadges = totalBadges;
   }

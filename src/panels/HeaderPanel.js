@@ -46,7 +46,7 @@ export class HeaderPanel extends UIElement {
     this.addChild(settingsButton);
 
     const player = SaveSystem.getInstance().getCurrentSave()?.player;
-    this._renderBadges(player?.badges ?? 0, player?.totalBadges ?? PlayerDefaults.TOTAL_BADGES);
+    this._renderBadges(player?.getBadgeCount() ?? 0, PlayerDefaults.TOTAL_BADGES);
     this.listen(BadgesChangedEvent, (event) => this._renderBadges(event.currentBadges, event.totalBadges));
   }
 

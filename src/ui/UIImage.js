@@ -39,13 +39,18 @@ export class UIImage extends UIElement {
 
   /** @param {string} src */
   setSource(src) {
+    const value = src || '';
+    // Same image: keep the decoded bitmap (re-setting src restarts the load)
+    if (this._dom.getAttribute('src') === value) return;
     this._usedFallback = false;
-    this._dom.setAttribute('src', src || '');
+    this._dom.setAttribute('src', value);
   }
 
   /** @param {string} alt */
   setAlt(alt) {
-    this._dom.setAttribute('alt', alt || '');
+    const value = alt || '';
+    if (this._dom.getAttribute('alt') === value) return;
+    this._dom.setAttribute('alt', value);
   }
 
   /** @private */

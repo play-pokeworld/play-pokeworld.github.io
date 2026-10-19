@@ -10,8 +10,14 @@
   min-width: 200px;
   padding: 6px;
   border-radius: 12px;
-  border: 1px solid rgba(236, 222, 183, 0.38);
-  background: rgba(37, 37, 34, 0.96);
+  border: 1px solid color-mix(in srgb, var(--light2) 38%, transparent);
+  background: color-mix(in srgb, var(--dark2) 96%, transparent);
+}
+
+/* The original save-card menu skin uses fixed dark values: follow the theme. */
+.save-card-context-menu {
+  border-color: color-mix(in srgb, var(--light2) 38%, transparent);
+  background: color-mix(in srgb, var(--dark2) 96%, transparent);
 }
 
 /* design-system hides .save-card-context-menu until .open is set */

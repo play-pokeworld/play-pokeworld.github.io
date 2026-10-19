@@ -1,4 +1,3 @@
-// ===== FR — Noms des types =====
 // ===== FR — Type names =====
 // Phase 24: consumed via the nested 'types' domain (t('types.fire')) and
 // getTypeName(). Keys are the engine ids (lowercase).

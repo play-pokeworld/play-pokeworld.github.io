@@ -27,6 +27,11 @@ import { LocationPanel } from '../panels/LocationPanel.js';
 import { TrainingCenterPanel } from '../panels/TrainingCenterPanel.js';
 import { TeamModal } from '../panels/TeamModal.js';
 import { SettingsModal } from '../panels/settings/SettingsModal.js';
+import { BallFilterEditorModal } from '../panels/BallFilterEditorModal.js';
+import { BallPickerModal } from '../panels/BallPickerModal.js';
+import { ShopPanel } from '../panels/fullscreen/ShopPanel.js';
+import { BadgesPanel } from '../panels/fullscreen/BadgesPanel.js';
+import { BagPanel } from '../panels/fullscreen/BagPanel.js';
 import { DashboardColumns } from '../config/DashboardLayout.js';
 import { t } from '../localization/LocalizationManager.js';
 
@@ -47,11 +52,9 @@ export class GamePage extends BasePage {
       new ActiveTeamPanel(DashboardColumns.LEFT),
       new HatcheryPanel(DashboardColumns.LEFT),
       new MinePanel(DashboardColumns.LEFT),
-
       new MapPanel(DashboardColumns.CENTER),
       new BattlePanel(DashboardColumns.CENTER),
       new SecretBasePanel(DashboardColumns.CENTER),
-      
       new ShortcutsPanel(DashboardColumns.RIGHT),
       new CurrenciesPanel(DashboardColumns.RIGHT),
       new PokeballsPanel(DashboardColumns.RIGHT),
@@ -66,7 +69,13 @@ export class GamePage extends BasePage {
       // Bottom message line (shown by the mobile CSS only)
       new UIText({ id: 'msg-log', tagName: 'div', text: t('welcome_msg') }),
       new TeamModal(),
-      new SettingsModal()
+      new SettingsModal(),
+      new BallFilterEditorModal(),
+      // After the editor: the picker opens above it.
+      new BallPickerModal(),
+      new ShopPanel(),
+      new BadgesPanel(),
+      new BagPanel()
     ]);
   }
 }

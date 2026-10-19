@@ -11,7 +11,7 @@ import { UIContainer } from './UIContainer.js';
 import { UIText } from './UIText.js';
 import { UIImage } from './UIImage.js';
 import { UIPokemonSprite, PokemonSpriteSizes } from './UIPokemonSprite.js';
-import { SaveThemes, SAVE_THEMES } from '../data/SaveThemes.js';
+import { SaveThemes, SAVE_THEMES } from '../data/save/SaveThemes.js';
 import { PlayerDefaults } from '../config/PlayerDefaults.js';
 import { AssetPaths } from '../config/AssetPaths.js';
 import { t } from '../localization/LocalizationManager.js';
@@ -112,7 +112,7 @@ export class SaveCard extends UIElement {
     const player = save.player || {};
     const trainerName = player.trainerName || t('default_trainer_name');
     const badgesCount = Array.isArray(player.badges) ? player.badges.length : (Number(player.badges) || 0);
-    const caughtCount = player.caughtCount ?? (Array.isArray(save.team) ? save.team.length : 0);
+    const caughtCount = save.pokedex ? save.pokedex.getCaughtCount() : 0;
 
     // 1. Header row: trainer avatar + name / id
     const mainRow = new UIContainer({ tagName: 'span', className: 'save-slot-main' });

@@ -70,3 +70,74 @@
 .save-slot.save-bg-blackwhite .save-slot-stats span {
   background: rgba(0, 0, 0, 0.45);
 }
+
+/* ==========================================================================
+   Theme-aware save screen (v1.3)
+   --------------------------------------------------------------------------
+   The original stylesheet paints the save screen with fixed dark rgba values
+   while its texts use the theme tokens: with any non-dark UI theme the screen
+   became a dark glass panel with dark text. Every surface below is derived
+   from the active theme tokens instead (color-mix keeps the original alphas).
+   ========================================================================== */
+
+.save-menu-screen {
+  background:
+    radial-gradient(circle at 20% 15%, color-mix(in srgb, var(--blue) 38%, transparent), transparent 32%),
+    radial-gradient(circle at 82% 28%, color-mix(in srgb, var(--yellow) 24%, transparent), transparent 28%),
+    linear-gradient(180deg, color-mix(in srgb, var(--dark1) 80%, transparent), color-mix(in srgb, var(--dark1) 90%, transparent)),
+    url('../images/bg/empty.jpg');
+  background-size: auto, auto, auto, cover;
+  background-position: center top;
+}
+
+.save-menu-panel {
+  background: color-mix(in srgb, var(--dark2) 72%, transparent);
+  border-color: color-mix(in srgb, var(--light2) 34%, transparent);
+}
+
+#save-menu-title {
+  text-shadow: 0 5px 0 color-mix(in srgb, var(--dark1) 60%, transparent),
+               0 0 24px color-mix(in srgb, var(--light2) 26%, transparent);
+}
+
+#save-menu-subtitle,
+.save-menu-empty p {
+  color: color-mix(in srgb, var(--light2) 80%, transparent);
+}
+
+.save-menu-kicker {
+  border-color: color-mix(in srgb, var(--light2) 38%, transparent);
+  background: color-mix(in srgb, var(--dark1) 40%, transparent);
+}
+
+.save-menu-empty {
+  border-color: color-mix(in srgb, var(--light2) 30%, transparent);
+  background: color-mix(in srgb, var(--dark1) 35%, transparent);
+}
+
+.save-menu-empty-icon {
+  border-color: color-mix(in srgb, var(--light2) 36%, transparent);
+  color: color-mix(in srgb, var(--light2) 86%, transparent);
+}
+
+.save-menu-scroll-btn {
+  background: color-mix(in srgb, var(--light2) 22%, transparent);
+  border-color: color-mix(in srgb, var(--light2) 42%, transparent);
+}
+
+/* Save cards carry their OWN palette (the random card theme chosen at creation):
+   they keep the default dark tokens whatever the UI theme, otherwise their
+   texts would turn dark on the dark card artworks. */
+.save-slot {
+  --dark1: #36342F;
+  --dark2: #444138;
+  --dark3: #524f48;
+  --light1: #C9BC9C;
+  --light2: #ECDEB7;
+  --pw-border: rgba(236, 222, 183, 0.35);
+  --pw-bg-sprite: #191714;
+  --pw-circle-bg: radial-gradient(circle, rgba(236, 222, 183, 0.25) 0%, rgba(236, 222, 183, 0.08) 70%, transparent 100%);
+  --pw-border-color: #4A3E31;
+  --pw-text-primary: #ECDEB7;
+  --pw-text-secondary: #C8BBA0;
+}

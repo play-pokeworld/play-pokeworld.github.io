@@ -27,6 +27,9 @@ export const notifications = {
   notif_starter_chosen: '{name} a rejoint votre aventure !',
   notif_level_up: '{name} monte au niveau {level} !',
   notif_enemy_defeated: '{name} sauvage est vaincu ! (+{exp} EXP, +{money}₽)',
+  notif_trainer_defeated: '{trainer} est vaincu !',
+  trainer_battle_running: 'Un combat est déjà en cours.',
+  trainer_need_badges: 'Il faut {need} badges de la région pour défier {trainer}.',
   notif_pokemon_caught: 'Et hop ! {name} sauvage a été capturé !',
   notif_channel_muted: 'Le canal {channel} a été désactivé.',
   notif_channel_unmuted: 'Le canal {channel} a été activé.'

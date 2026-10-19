@@ -30,6 +30,11 @@ body:not(.mobile-mode) #main-dashboard {
   overflow-y: auto !important;
   overscroll-behavior: contain;
   align-items: flex-start !important;
+  /* Smooth wheel scrolling (v1.3): at a device pixel ratio below 1.5 Chromium keeps a
+     scroller with a transparent background on the MAIN thread (to keep LCD text), so
+     every wheel step waited for a repaint of the whole dashboard and the scroll moved
+     by visible notches. Promoting the scroller makes the compositor scroll it. */
+  will-change: scroll-position;
 }
 
 body:not(.mobile-mode) #main-dashboard > .dash-col {
@@ -109,4 +114,32 @@ body.mobile-mode:has(#header) .pw-notification-container {
    keep the positioning given by design-system.css as if they were direct children of the body. */
 .pw-mobile-dashboard-nav {
   display: contents;
+}
+
+
+/* --- Animated backdrop (v1.3) ---------------------------------------------------
+   design-system.css animates `background-position` of the full-screen body::before,
+   which repaints the whole viewport on every frame and competes with scrolling.
+   Same look, compositor-only: the layer is one tile wider than the viewport and
+   slides by exactly one tile (seamless loop), at the original speed
+   (4000px / 600s = 6.67px/s; tile width 2969px -> 445s). */
+body::before {
+  left: calc(-1 * var(--pw-backdrop-tile-w));
+  width: calc(100% + var(--pw-backdrop-tile-w));
+  background-position: 0 0;
+  animation: pw-backdrop-slide 445s linear infinite;
+  will-change: transform;
+}
+
+:root {
+  --pw-backdrop-tile-w: 2969px; /* width of assets/images/bg/main-bg.png */
+}
+
+@keyframes pw-backdrop-slide {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(var(--pw-backdrop-tile-w), 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before { animation: none; }
 }

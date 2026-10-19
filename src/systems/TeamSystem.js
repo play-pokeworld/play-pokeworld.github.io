@@ -8,6 +8,7 @@ import { BaseSystem } from './BaseSystem.js';
 import { SaveSystem } from './SaveSystem.js';
 import { EventBus } from '../core/EventBus.js';
 import { TeamChangedEvent } from '../core/events/TeamChangedEvent.js';
+import { PlayerDefaults } from '../config/PlayerDefaults.js';
 
 export class TeamSystem extends BaseSystem {
   /** @private @type {TeamSystem|null} */
@@ -25,9 +26,29 @@ export class TeamSystem extends BaseSystem {
     super('TeamSystem', 'System');
   }
 
-  /** @returns {import('../data/PokemonData.js').PokemonData[]} Team of the active save (live array) */
+  /** @returns {import('../data/pokemon/PokemonData.js').PokemonData[]} Team of the active save (live array) */
   getTeam() {
     return SaveSystem.getInstance().getCurrentSave()?.team ?? [];
+  }
+
+  /** @returns {boolean} The team has a free slot */
+  hasFreeSlot() {
+    return this.getTeam().length < PlayerDefaults.TEAM_SIZE;
+  }
+
+  /**
+   * Adds a Pokémon to the team and marks it caught in the Pokédex. Does not persist: the caller
+   * saves once after its whole operation.
+   * @param {import('../data/pokemon/PokemonData.js').PokemonData} pokemon
+   * @returns {boolean} False when the team is full or no save is loaded
+   */
+  addPokemon(pokemon) {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    if (!save || !this.hasFreeSlot()) return false;
+    save.team.push(pokemon);
+    save.pokedex.markCaught(pokemon.species, pokemon.shiny);
+    EventBus.getInstance().dispatch(new TeamChangedEvent(save.team.length));
+    return true;
   }
 
   /**

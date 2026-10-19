@@ -17,6 +17,12 @@ if (!process.env.VERBOSE) {
 await import('./tests/StaticRules.test.js');
 await import('./tests/Localization.test.js');
 await import('./tests/Systems.test.js');
+await import('./tests/GameData.test.js');
+await import('./tests/DataLayer.test.js');
+await import('./tests/BattleEngine.test.js');
+await import('./tests/Catch.test.js');
+await import('./tests/Trainers.test.js');
+await import('./tests/Shop.test.js');
 await import('./tests/UiWidgets.test.js');
 await import('./tests/Dashboard.test.js');
 await import('./tests/Launcher.test.js');

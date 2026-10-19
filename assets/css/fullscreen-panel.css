@@ -1,0 +1,44 @@
+/* ==========================================================================
+   PokéWorld — Full-screen panels (UIFullscreenPanel: shop, bag, PC box, badges)
+   Port of the inline overlay style of the original openFullscreenPanel() and of the
+   `#fullscreen-panel-modal` rules of design-system.css, bound to classes.
+   ========================================================================== */
+
+.pw-fullscreen-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .92);
+  z-index: 960; /* above the sticky #header (950), below UIModal (1000) */
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  backdrop-filter: blur(3px);
+}
+.pw-fullscreen-overlay.is-open { display: flex; }
+
+.pw-fullscreen-overlay > .pw-modal-container {
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius);
+  background: var(--pw-surface);
+  box-shadow: var(--pw-shadow);
+  color: var(--light2);
+}
+.pw-fullscreen-overlay > .pw-modal-container > .modal-title {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.pw-fullscreen-overlay .pw-modal-search-bar.is-filled {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+/* The container keeps its 90vh height (design-system .pw-modal-container): only the body scrolls. */
+.pw-fullscreen-overlay .pw-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}

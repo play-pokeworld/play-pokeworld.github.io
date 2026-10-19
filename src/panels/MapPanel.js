@@ -6,7 +6,7 @@
 import { DraggablePanel } from '../ui/DraggablePanel.js';
 import { UIDropdown } from '../ui/UIDropdown.js';
 import { UIMapView } from '../ui/UIMapView.js';
-import { LocationDB } from '../data/LocationDB.js';
+import { LocationDB } from '../data/world/LocationDB.js';
 import { LocationSystem, LocationStates } from '../systems/LocationSystem.js';
 import { NotificationSystem } from '../systems/NotificationSystem.js';
 import { NotificationChannels, NotificationTones } from '../config/NotificationConfig.js';
@@ -64,18 +64,18 @@ export class MapPanel extends DraggablePanel {
   _render() {
     const locations = LocationSystem.getInstance();
     this._map.setBackground(AssetPaths.regionMap(this._region));
-    this._map.setNodes(LocationDB.getInstance().getByRegion(this._region).map((loc) => {
+    this._map.setNodes(LocationDB.getInstance().getByRegion(this._region).filter((loc) => loc.layout).map((loc) => {
       const state = locations.getState(loc.id);
       const label = t(`location.${loc.id}`);
       return {
         id: loc.id,
-        x: loc.x,
-        y: loc.y,
-        w: loc.w ?? DEFAULT_NODE_SIZE,
-        h: loc.h ?? DEFAULT_NODE_SIZE,
+        x: loc.layout.x,
+        y: loc.layout.y,
+        w: loc.layout.w ?? DEFAULT_NODE_SIZE,
+        h: loc.layout.h ?? DEFAULT_NODE_SIZE,
         label,
         state,
-        tooltip: state === LocationStates.LOCKED ? t('map_location_locked', { name: label, badges: loc.badgeReq ?? 0 }) : label
+        tooltip: state === LocationStates.LOCKED ? t('map_location_locked', { name: label, badges: loc.badgesRequired }) : label
       };
     }));
   }
@@ -88,7 +88,7 @@ export class MapPanel extends DraggablePanel {
     const name = t(`location.${locationId}`);
     if (!LocationSystem.getInstance().travelTo(locationId)) {
       NotificationSystem.getInstance().notifyTemporary(
-        t('map_location_locked', { name, badges: LocationDB.getInstance().getById(locationId)?.badgeReq ?? 0 }),
+        t('map_location_locked', { name, badges: LocationDB.getInstance().getById(locationId)?.badgesRequired ?? 0 }),
         { channel: NotificationChannels.GAMEPLAY, tone: NotificationTones.DANGER }
       );
       return;

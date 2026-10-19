@@ -1,14 +1,15 @@
-// ===== EN — Location names (all regions) =====
-
+// ===== EN — Location names (key = location id) =====
+// Keys come from the data tables (tools/data); texts can be edited by hand.
 export const L_location_names_en = {
   "abandoned_ship": "Abandoned Ship",
   "ancient_tomb": "Ancient Tomb (Registeel)",
   "aqua_hideout": "Aqua Hideout",
   "azalea": "Azalea Town",
   "battle_frontier": "Battle Frontier",
+  "billshouse": "Bill's Cottage",
+  "birth_island": "Birth Island",
   "blackthorn": "Blackthorn City",
   "burnedtower": "Burned Tower",
-  "billshouse": "Bill's Cottage",
   "cave_of_origin": "Cave of Origin",
   "celadon": "Celadon City",
   "cerulean": "Cerulean City",
@@ -158,7 +159,6 @@ export const L_location_names_en = {
   "seafloor_cavern": "Seafloor Cavern",
   "seafoamislands": "Seafoam Islands",
   "sealed_chamber": "Sealed Chamber",
-  "birth_island": "Birth Island",
   "shoal_cave": "Shoal Cave",
   "sky_pillar": "Sky Pillar",
   "slateport": "Slateport City",

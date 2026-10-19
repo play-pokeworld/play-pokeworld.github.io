@@ -1,0 +1,13 @@
+/* Bag full-screen panel (original BagView layout: vertical list, 12 px gap). */
+#fs-inventory .pw-modal-search-bar { display: block; }
+.inv-list-root { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.inv-item.selected { border-color: var(--accent, #94886B); box-shadow: 0 0 0 1px var(--accent, #94886B) inset; }
+.inv-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.inv-icon-img { max-width: 40px; max-height: 40px; }
+.inv-name { display: flex; flex-direction: column; }
+.inv-holder { color: var(--green); font-size: 10px; }
+.pw-bag-detail { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding: 10px 12px; border-radius: 10px; background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .1); }
+.pw-bag-detail-icon { width: 48px; height: 48px; flex-shrink: 0; }
+.pw-bag-detail-text { display: flex; flex-direction: column; gap: 4px; }
+.pw-bag-detail-name { font-weight: 700; color: var(--light1, #ECDEB7); }
+.pw-bag-detail-desc { font-size: 12px; color: var(--light2); }

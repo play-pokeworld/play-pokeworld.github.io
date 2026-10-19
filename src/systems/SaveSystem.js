@@ -7,7 +7,7 @@
 
 import { BaseSystem } from './BaseSystem.js';
 import { SaveStorage } from './SaveStorage.js';
-import { SaveData, generateSaveId } from '../data/SaveData.js';
+import { SaveData, generateSaveId } from '../data/save/SaveData.js';
 import { EventBus } from '../core/EventBus.js';
 import { SaveLoadedEvent } from '../core/events/SaveLoadedEvent.js';
 import { SaveCreatedEvent } from '../core/events/SaveCreatedEvent.js';
@@ -52,16 +52,14 @@ export class SaveSystem extends BaseSystem {
   }
 
   /**
-   * Creates, persists and activates a new save.
-   * @param {number} slotId
+   * Creates, persists and activates a new save (appended at the end of the library).
    * @param {string} trainerName
    * @param {string} starterSpecies
    * @param {string} [background]
    * @returns {SaveData}
    */
-  createNewSave(slotId, trainerName, starterSpecies, background) {
-    const save = SaveData.createNew(slotId, trainerName, starterSpecies, background);
-    save.slotId = typeof slotId === 'number' ? slotId : 1;
+  createNewSave(trainerName, starterSpecies, background) {
+    const save = SaveData.createNew(trainerName, starterSpecies, background);
     this._currentSave = save;
     this.saveCurrent();
 
@@ -126,12 +124,9 @@ export class SaveSystem extends BaseSystem {
     const source = SaveStorage.read(String(sourceId));
     if (!source) return null;
 
-    const copy = new SaveData();
-    copy.deserialize({
+    const copy = SaveData.fromJson({
       ...source.serialize(),
       id: generateSaveId(),
-      saveId: undefined,
-      slotId: this.listExistingSaves().length + 1,
       createdAt: Date.now(),
       updatedAt: Date.now()
     });
@@ -186,8 +181,7 @@ export class SaveSystem extends BaseSystem {
     }
     if (!parsed || typeof parsed !== 'object') return null;
 
-    const save = new SaveData();
-    save.deserialize(parsed);
+    const save = SaveData.fromJson(parsed);
     this._currentSave = save;
     this.saveCurrent();
     console.log(t('debug_save_loaded', { id: save.id }));

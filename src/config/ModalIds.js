@@ -9,5 +9,13 @@
 export const ModalIds = Object.freeze({
   STARTER: 'starter-modal-inner',
   TEAM: 'team-modal',
-  SETTINGS: 'settings-window'
+  SETTINGS: 'settings-window',
+  /** Params: { filterId } */
+  BALL_PICKER: 'pw-ball-picker',
+  BALL_FILTERS: 'pw-ball-editor',
+  /** Full-screen panels (UIFullscreenPanel) */
+  SHOP: 'fs-shop',
+  BAG: 'fs-inventory',
+  BOX: 'fs-box',
+  BADGES: 'fs-badges'
 });

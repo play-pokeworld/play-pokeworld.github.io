@@ -13,6 +13,12 @@ import { PreferencesSystem } from './systems/PreferencesSystem.js';
 import { LocationSystem } from './systems/LocationSystem.js';
 import { BattleSystem } from './systems/BattleSystem.js';
 import { TeamSystem } from './systems/TeamSystem.js';
+import { BoxSystem } from './systems/BoxSystem.js';
+import { PokeballSystem } from './systems/PokeballSystem.js';
+import { CatchSystem } from './systems/CatchSystem.js';
+import { QuestSystem } from './systems/QuestSystem.js';
+import { TrainerSystem } from './systems/TrainerSystem.js';
+import { ShopSystem } from './systems/ShopSystem.js';
 import { registerAllPages } from './pages/PageRegistry.js';
 import { PageIds } from './pages/PageIds.js';
 import { AppShell } from './ui/AppShell.js';
@@ -47,7 +53,13 @@ window.addEventListener('DOMContentLoaded', () => {
   engine.registerSystem('DashboardLayoutSystem', DashboardLayoutSystem.getInstance());
   engine.registerSystem('LocationSystem', LocationSystem.getInstance());
   engine.registerSystem('TeamSystem', TeamSystem.getInstance());
+  engine.registerSystem('BoxSystem', BoxSystem.getInstance());
+  engine.registerSystem('PokeballSystem', PokeballSystem.getInstance());
+  engine.registerSystem('CatchSystem', CatchSystem.getInstance());
   engine.registerSystem('BattleSystem', BattleSystem.getInstance());
+  engine.registerSystem('QuestSystem', QuestSystem.getInstance());
+  engine.registerSystem('TrainerSystem', TrainerSystem.getInstance());
+  engine.registerSystem('ShopSystem', ShopSystem.getInstance());
 
   // 3. Overlays living above every page
   AppShell.mountOverlay(new NotificationCenterView());

@@ -14,8 +14,8 @@ import { SaveSystem } from '../../systems/SaveSystem.js';
 import { NotificationSystem } from '../../systems/NotificationSystem.js';
 import { NotificationChannels, NotificationTones } from '../../config/NotificationConfig.js';
 import { GameConfig } from '../../config/GameConfig.js';
-import { TRAINER_AVATARS } from '../../data/TrainerAvatars.js';
-import { SaveThemes, SAVE_THEMES } from '../../data/SaveThemes.js';
+import { TRAINER_AVATARS } from '../../data/save/TrainerAvatars.js';
+import { SaveThemes, SAVE_THEMES } from '../../data/save/SaveThemes.js';
 import { t } from '../../localization/LocalizationManager.js';
 
 export class SaveProfileSection extends SettingsSection {

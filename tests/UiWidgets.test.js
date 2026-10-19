@@ -80,7 +80,7 @@ describe('UI widgets', (test) => {
   });
 
   test('SaveCard renders a save summary', () => {
-    const save = SaveSystem.getInstance().createNewSave(9, 'Misty', 'squirtle');
+    const save = SaveSystem.getInstance().createNewSave('Misty', 'squirtle');
     let clicked = false;
     const card = new SaveCard({ save, mode: 'menu', onClick: () => { clicked = true; } });
     assert.ok(card.getDomElement().textContent.includes('Misty'));

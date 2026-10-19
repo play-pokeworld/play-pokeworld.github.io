@@ -86,8 +86,11 @@ export class UIProgressBar extends UIElement {
    * @param {'high'|'medium'|'low'|'is-done'|''} state
    */
   setFillState(state) {
+    const next = FILL_STATES.includes(state) ? state : '';
+    if (this._fillState === next) return;
+    this._fillState = next;
     for (const name of FILL_STATES) this._fill.removeClass(name);
-    if (FILL_STATES.includes(state)) this._fill.addClass(state);
+    if (next) this._fill.addClass(next);
   }
 
   /** @param {'sm'|'md'|'lg'} size */

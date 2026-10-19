@@ -1,0 +1,156 @@
+/**
+ * @file CatchSystem.js
+ * @brief Automatic catch after a won battle (C++ equivalent: class CatchSystem : public BaseSystem).
+ * No DOM access. Port of the original attemptAutoCatch():
+ *   1. the Poké Ball filters choose the ball (BallSelector); no ball → nothing is thrown;
+ *   2. rate = BallRateRules.effectiveRate (only the ball counts), changed by the quest kind
+ *      (CatchRules.finalRate); the ball is consumed whatever the result;
+ *   3. CatchRules.roll (guaranteed first catch);
+ *   4. success: Pokédex, statistics; a shiny encounter unlocks the shiny of the species
+ *      (owned ones become shiny);
+ *      - species and form already owned (duplicate): no new Pokémon, 10 % chance of +1 IV on
+ *        the owned one;
+ *      - otherwise a new Pokémon, level 1 (level 5 with a Luxury Ball), talent weighted by rarity,
+ *        10 % chance of +1 IV, no held item: team when a slot is free, PC box otherwise;
+ *      - dungeon tokens (duplicates included), PokemonCaughtEvent.
+ * The battle log lines go to the session log; the caller saves once afterwards.
+ */
+
+import { BaseSystem } from './BaseSystem.js';
+import { TeamSystem } from './TeamSystem.js';
+import { BoxSystem } from './BoxSystem.js';
+import { EventBus } from '../core/EventBus.js';
+import { Random } from '../core/Random.js';
+import { PokemonFactory } from '../data/pokemon/PokemonFactory.js';
+import { LocationDB } from '../data/world/LocationDB.js';
+import { QuestCatchKinds } from '../data/catch/QuestCatchKinds.js';
+import { BallRules } from '../config/BallRules.js';
+import { CaptureRules } from '../config/CaptureRules.js';
+import { CatchEncounter } from './catch/CatchEncounter.js';
+import { BallSelector } from './catch/BallSelector.js';
+import { BallRateRules } from './catch/BallRateRules.js';
+import { CatchRules } from './catch/CatchRules.js';
+import { SpeciesOwnership } from './catch/SpeciesOwnership.js';
+import { RewardRules } from './battle/RewardRules.js';
+import { PokemonCaughtEvent } from '../core/events/PokemonCaughtEvent.js';
+
+/** Currency earned by every catch. */
+const CATCH_CURRENCY = 'dungeonToken';
+
+export class CatchSystem extends BaseSystem {
+  /** @private @type {CatchSystem|null} */
+  static _instance = null;
+
+  /** @returns {CatchSystem} */
+  static getInstance() {
+    if (!CatchSystem._instance) {
+      CatchSystem._instance = new CatchSystem();
+    }
+    return CatchSystem._instance;
+  }
+
+  constructor() {
+    super('CatchSystem', 'System');
+    /** @private @type {Random} */ this._random = Random.default;
+  }
+
+  /**
+   * Random source of the next catches (tests use Random.sequence).
+   * @param {Random} random
+   */
+  setRandom(random) {
+    this._random = random;
+  }
+
+  /**
+   * @param {Object} attempt
+   * @param {import('../data/save/SaveData.js').SaveData} attempt.save
+   * @param {import('./battle/BattleSession.js').BattleSession} attempt.session - Finished battle
+   * @param {string} attempt.locationId
+   * @param {string} [attempt.questKind=QuestCatchKinds.NONE]
+   * @returns {boolean} true when the Pokémon was caught (duplicates included)
+   */
+  attempt({ save, session, locationId, questKind = QuestCatchKinds.NONE }) {
+    const foe = session.foe.pokemon;
+    const log = session.log;
+    const name = foe.getDisplayName();
+    const location = LocationDB.getInstance().getById(locationId);
+    const owned = SpeciesOwnership.isOwned(save, foe.species, foe.form);
+    const encounter = new CatchEncounter({
+      pokemon: foe,
+      owned,
+      shinyOwned: owned && SpeciesOwnership.isShinyUnlocked(save, foe.species, foe.form),
+      locationKind: location?.kind ?? null,
+      weather: session.field.weather,
+      foeTurns: session.foeTurns,
+      playerAttacks: session.playerAttacks
+    });
+
+    const ballId = BallSelector.ballFor(save.ballFilters.getAll(), encounter, (id) => save.inventory.count(id));
+    if (!ballId) {
+      log.add('battle_log.ball_no_target', { name });
+      return false;
+    }
+    const ballRate = BallRateRules.effectiveRate(ballId, encounter);
+    const rate = CatchRules.finalRate(ballRate, questKind);
+    save.inventory.remove(ballId, 1);
+    const firstCatch = save.statistics.caughtTotal === 0 && save.box.length === 0 && save.team.length <= 1;
+    if (!CatchRules.roll(rate, firstCatch, this._random)) {
+      log.add('battle_log.catch_fail', { name, ballId });
+      return false;
+    }
+
+    log.add('battle_log.catch_success', { name, ballId });
+    save.statistics.recordCatch();
+    save.pokedex.markCaught(foe.species, foe.shiny);
+    if (foe.shiny) this._unlockShiny(save, foe);
+    if (owned) this._keepDuplicate(save, foe, log);
+    else this._storeNew(save, foe, ballId, log);
+
+    const tokens = RewardRules.catchTokens(location);
+    save.currencies.add(CATCH_CURRENCY, tokens);
+    log.add('battle_log.catch_tokens', { amount: tokens });
+    EventBus.getInstance().dispatch(new PokemonCaughtEvent(foe.species, locationId, foe.shiny));
+    return true;
+  }
+
+  /**
+   * Original unlockShinyForSpecies: every owned Pokémon of the species and form becomes shiny.
+   * @private
+   */
+  _unlockShiny(save, foe) {
+    for (const pokemon of SpeciesOwnership.ownedPokemon(save)) {
+      if (pokemon.species === foe.species && pokemon.form === foe.form && !pokemon.shiny) pokemon.setShiny(true);
+    }
+  }
+
+  /** @private */
+  _keepDuplicate(save, foe, log) {
+    const existing = SpeciesOwnership.findOwned(save, foe.species, foe.form);
+    const stat = existing ? CatchRules.rollIvBonus(existing, this._random) : null;
+    if (stat) log.add('battle_log.catch_duplicate_iv', { name: existing.getDisplayName(), stat });
+    save.statistics.recordDuplicateCatch(foe.species);
+    if (foe.shiny) log.add('battle_log.catch_shiny_unlocked', { name: foe.getDisplayName() });
+    log.add('battle_log.catch_duplicate', { name: foe.getDisplayName() });
+  }
+
+  /** @private */
+  _storeNew(save, foe, ballId, log) {
+    const luxury = ballId === BallRules.LUXURY_BALL;
+    const level = luxury ? CaptureRules.LUXURY_CAUGHT_LEVEL : CaptureRules.CAUGHT_LEVEL;
+    const shiny = foe.shiny || SpeciesOwnership.isShinyUnlocked(save, foe.species, foe.form);
+    const caught = PokemonFactory.create(foe.species, level, { form: foe.form, shiny, random: this._random });
+    if (!caught) return;
+    caught.talent = CatchRules.rollTalent(caught.getSpecies(), this._random) ?? caught.talent;
+    const stat = CatchRules.rollIvBonus(caught, this._random);
+    caught.healFull();
+    if (luxury) log.add('battle_log.catch_luxury_level', { name: caught.getDisplayName(), ballId, level: caught.level });
+    if (stat) log.add('battle_log.catch_iv', { name: caught.getDisplayName(), stat });
+    if (TeamSystem.getInstance().addPokemon(caught)) {
+      log.add('battle_log.catch_team', { name: caught.getDisplayName(), level: caught.level });
+    } else {
+      BoxSystem.getInstance().addPokemon(caught);
+      log.add('battle_log.catch_box', { name: caught.getDisplayName(), level: caught.level });
+    }
+  }
+}

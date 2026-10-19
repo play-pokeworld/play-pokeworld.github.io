@@ -3,14 +3,16 @@
  * @brief Windows launcher and local server regressions (the v0 start.bat did not run).
  */
 
+import { TrainerDB } from '../src/data/trainers/TrainerDB.js';
+import { LeagueDB } from '../src/data/trainers/LeagueDB.js';
 import fs from 'fs';
 import path from 'path';
 import { describe, assert } from './TestRunner.js';
 import { listJsFiles, findMatches } from './SourceScanner.js';
 import { AssetPaths } from '../src/config/AssetPaths.js';
 import { BACKGROUND_SCENES } from '../src/config/LocationBackgrounds.js';
-import { PokemonDB } from '../src/data/PokemonDB.js';
-import { STARTERS_BY_REGION } from '../src/data/StarterData.js';
+import { PokemonDB } from '../src/data/pokemon/PokemonDB.js';
+import { STARTERS_BY_REGION } from '../src/data/pokemon/StarterData.js';
 
 describe('Launcher and server', (test) => {
   const bat = fs.readFileSync('start.bat', 'utf8');
@@ -55,7 +57,7 @@ describe('Asset paths', (test) => {
 
   test('every species has a sprite and every shiny sprite has a normal one', () => {
     const missing = PokemonDB.getInstance().getAll()
-      .map((species) => AssetPaths.pokemonSprite(species.getSlug()))
+      .map((species) => species.getSpritePath())
       .filter((file) => !fs.existsSync(path.resolve(file)));
     assert.empty(missing, 'missing Pokémon sprites');
     const shinyDir = path.resolve('assets/images/pokemon/shiny');
@@ -63,13 +65,16 @@ describe('Asset paths', (test) => {
     assert.empty(orphans, 'shiny sprites without a normal sprite');
   });
 
-  test('referenced images exist (trainer, icon, starters, scenes, balls, currencies)', () => {
+  test('referenced images exist (trainer, icon, starters, scenes, badges, trainer sprites)', () => {
     const files = [
       AssetPaths.defaultTrainerSprite(),
       AssetPaths.appIcon(),
       ...Object.values(STARTERS_BY_REGION).flat().map((starter) => AssetPaths.pokemonSprite(starter.species)),
-      ...BACKGROUND_SCENES.map((scene) => `assets/images/bg/${scene}.png`)
+      ...BACKGROUND_SCENES.map((scene) => `assets/images/bg/${scene}.png`),
+      ...[...TrainerDB.getInstance().getAll(), ...LeagueDB.getInstance().getAll()]
+        .filter((entry) => entry.badgeImage).map((entry) => AssetPaths.badge(entry.badgeImage)),
+      ...TrainerDB.getInstance().getAll().filter((trainer) => trainer.sprite).map((trainer) => AssetPaths.trainerSprite(trainer.sprite))
     ];
-    assert.empty(files.filter((file) => !fs.existsSync(path.resolve(file))), 'missing images');
+    assert.empty(files.filter((file) => !fs.existsSync(path.resolve(decodeURIComponent(file)))), 'missing images');
   });
 });

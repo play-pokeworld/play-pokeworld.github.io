@@ -4,6 +4,10 @@
  * (C++ equivalent: class AppShell, static — the application window).
  * It mirrors application state onto the document: language, colour theme,
  * developer mode flag and mobile layout flag.
+ *
+ * Theme: the player's preferred theme (settings) can be overridden by the active page
+ * (`forceTheme`, e.g. the save menu is always dark); the preference is kept and comes
+ * back when the override is released.
  */
 
 import { EventBus } from '../core/EventBus.js';
@@ -20,6 +24,11 @@ const MOBILE_CLASS = 'mobile-mode';
 const DRAGGING_CLASS = 'pw-window-drag-active';
 
 export class AppShell {
+  /** @private Theme chosen in the settings. */
+  static _preferredTheme = DEFAULT_UI_THEME;
+  /** @private Theme imposed by the active page, or null. */
+  static _forcedTheme = null;
+
   /**
    * Applies the initial state and keeps the document in sync with future changes.
    * @param {{lang: string, theme: string, debug: boolean}} initialState
@@ -41,10 +50,34 @@ export class AppShell {
     document.documentElement.setAttribute('lang', lang);
   }
 
-  /** @param {string} themeId - 'dark' removes the attribute (default palette) */
+  /**
+   * Preferred theme of the player (applied unless a page forces another one).
+   * @param {string} themeId
+   */
   static setTheme(themeId) {
+    AppShell._preferredTheme = themeId || DEFAULT_UI_THEME;
+    AppShell._applyTheme();
+  }
+
+  /**
+   * Imposes a theme while a page is displayed (null releases it).
+   * @param {string|null} themeId
+   */
+  static forceTheme(themeId) {
+    AppShell._forcedTheme = themeId || null;
+    AppShell._applyTheme();
+  }
+
+  /** @returns {string} Theme currently displayed */
+  static getDisplayedTheme() {
+    return AppShell._forcedTheme || AppShell._preferredTheme;
+  }
+
+  /** @private 'dark' removes the attribute (default palette) */
+  static _applyTheme() {
     if (typeof document === 'undefined' || !document.documentElement) return;
-    if (!themeId || themeId === DEFAULT_UI_THEME) {
+    const themeId = AppShell.getDisplayedTheme();
+    if (themeId === DEFAULT_UI_THEME) {
       document.documentElement.removeAttribute('data-theme');
     } else {
       document.documentElement.setAttribute('data-theme', themeId);

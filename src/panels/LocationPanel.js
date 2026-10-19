@@ -8,13 +8,14 @@ import { UIContainer } from '../ui/UIContainer.js';
 import { UIText } from '../ui/UIText.js';
 import { UIButton } from '../ui/UIButton.js';
 import { UIPokemonSprite, PokemonSpriteSizes } from '../ui/UIPokemonSprite.js';
-import { LocationDB } from '../data/LocationDB.js';
-import { PokemonDB } from '../data/PokemonDB.js';
+import { LocationDB } from '../data/world/LocationDB.js';
+import { LocationKinds } from '../data/world/LocationKinds.js';
+import { PokemonDB } from '../data/pokemon/PokemonDB.js';
 import { LocationSystem } from '../systems/LocationSystem.js';
-import { BattleSystem } from '../systems/BattleSystem.js';
-import { NotificationSystem } from '../systems/NotificationSystem.js';
-import { NotificationChannels, NotificationTones } from '../config/NotificationConfig.js';
 import { LocationChangedEvent } from '../core/events/LocationChangedEvent.js';
+import { BadgesChangedEvent } from '../core/events/BadgesChangedEvent.js';
+import { TrainerDefeatedEvent } from '../core/events/TrainerDefeatedEvent.js';
+import { LocationActions } from './components/LocationActions.js';
 import { WindowIds } from '../config/DashboardLayout.js';
 import { t } from '../localization/LocalizationManager.js';
 
@@ -41,6 +42,8 @@ export class LocationPanel extends DraggablePanel {
     this.addChild(this._content);
 
     this.listen(LocationChangedEvent, () => this._render());
+    this.listen(BadgesChangedEvent, () => this._render());
+    this.listen(TrainerDefeatedEvent, () => this._render());
     this._render();
   }
 
@@ -49,7 +52,6 @@ export class LocationPanel extends DraggablePanel {
     const locationId = LocationSystem.getInstance().getCurrentLocationId();
     const location = LocationDB.getInstance().getById(locationId);
     const encounters = LocationDB.getInstance().getEncounters(locationId);
-    const notify = (key, tone) => NotificationSystem.getInstance().notifyTemporary(t(key), { channel: NotificationChannels.GAMEPLAY, tone });
 
     this._content.clearChildren();
     this._content.addChildren([
@@ -63,18 +65,10 @@ export class LocationPanel extends DraggablePanel {
               new UIText({ className: 'pw-badge-chip', text: t(`map_region_${location?.region ?? 'kanto'}`) })
             ]
           }),
-          new UIText({ tagName: 'div', className: 'pw-loc-desc', text: t(location?.type === 'town' ? 'loc_desc_town' : 'loc_desc_wild') })
+          new UIText({ tagName: 'div', className: 'pw-loc-desc', text: t(location?.kind === LocationKinds.TOWN ? 'loc_desc_town' : 'loc_desc_wild') })
         ]
       }),
-      new UIContainer({
-        className: 'pw-loc-action-grid',
-        children: [
-          new UIButton({ variant: 'hbtn', className: 'pw-btn-primary', icon: 'swords', text: t('btn_explore'), onClick: () => BattleSystem.getInstance().startBattle(locationId) }),
-          new UIButton({ variant: 'hbtn', icon: 'trophy', text: t('btn_challenge'), onClick: () => notify('gym_closed', NotificationTones.ACCENT) }),
-          new UIButton({ variant: 'hbtn', icon: 'cart', text: t('btn_shop'), onClick: () => notify('shop_welcome', NotificationTones.INFO) }),
-          new UIButton({ variant: 'hbtn', icon: 'chat', text: t('btn_talk'), onClick: () => notify('npc_greeting', NotificationTones.ACCENT) })
-        ]
-      }),
+      new LocationActions(location, encounters.length),
       new UIContainer({
         className: 'pw-loc-wild-meta',
         children: [
@@ -88,7 +82,7 @@ export class LocationPanel extends DraggablePanel {
 
   /**
    * @private
-   * @param {Array<{speciesId: number, minLvl: number, maxLvl: number}>} encounters
+   * @param {Array<{species: string, minLevel: number, maxLevel: number}>} encounters
    */
   static _wildGrid(encounters) {
     const grid = new UIContainer({ className: 'pw-loc-wild-grid' });
@@ -97,15 +91,15 @@ export class LocationPanel extends DraggablePanel {
       return grid;
     }
     for (const encounter of encounters) {
-      const species = PokemonDB.getInstance().getById(encounter.speciesId);
+      const species = PokemonDB.getInstance().getById(encounter.species);
       if (!species) continue;
       const name = t(species.getNameKey());
       grid.addChild(new UIContainer({
         className: 'pw-loc-wild-card',
         children: [
-          new UIPokemonSprite({ species: species.getSlug(), alt: name, size: PokemonSpriteSizes.CONTEXT }),
+          new UIPokemonSprite({ species: species.id, alt: name, size: PokemonSpriteSizes.CONTEXT }),
           new UIText({ className: 'pw-loc-wild-name', text: name }),
-          new UIText({ className: 'pw-loc-wild-level', text: t('level_range', { min: encounter.minLvl, max: encounter.maxLvl }) })
+          new UIText({ className: 'pw-loc-wild-level', text: t('level_range', { min: encounter.minLevel, max: encounter.maxLevel }) })
         ]
       }));
     }

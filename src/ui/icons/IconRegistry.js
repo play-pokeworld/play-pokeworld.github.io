@@ -110,7 +110,9 @@ const ICONS = Object.freeze({
   zap: stroke(['M13 2L3 14h9l-1 8 10-12h-9z']),
   coin: stroke(['M12 7v10', 'M14.5 9.5h-4a1.5 1.5 0 000 3h3a1.5 1.5 0 010 3h-4'], [circle(12, 12, 9)]),
   tent: stroke(['M3 20L12 4l9 16z', 'M10 20l2-5 2 5']),
-  plus: stroke(['M12 5v14', 'M5 12h14'])
+  plus: stroke(['M12 5v14', 'M5 12h14']),
+  minus: stroke(['M5 12h14']),
+  grip: stroke([], [circle(9, 6, 1), circle(15, 6, 1), circle(9, 12, 1), circle(15, 12, 1), circle(9, 18, 1), circle(15, 18, 1)])
 });
 
 export class IconRegistry {

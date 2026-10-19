@@ -1,0 +1,37 @@
+/* Gym badges & leagues full-screen panel (port of the inline styles of the original
+   ui/game/badges-panel.js). --pw-badge-color is the colour of the badge (data). */
+#fs-badges .pw-modal-search-bar { justify-content: center; }
+.pw-badges-tabs { display: flex; gap: 8px; justify-content: center; }
+.pw-badges-panel-container { padding: 16px; max-width: 800px; margin: 0 auto; color: var(--text); }
+.pw-badges-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(255, 255, 255, .1); }
+.pw-badges-heading { margin: 0; font-size: 18px; }
+.pw-badges-subtitle { font-size: 12px; color: var(--light1); margin-top: 4px; }
+.pw-badges-counters { text-align: right; }
+.pw-badges-count { font-size: 13px; font-weight: bold; color: var(--yellow); }
+.pw-leagues-count { font-size: 12px; color: var(--light1); }
+
+.pw-badges-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.pw-leagues-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+
+.pw-badge-card, .pw-league-card { border-radius: 8px; border: 1px solid rgba(255, 255, 255, .06); background: rgba(255, 255, 255, .02); }
+.pw-badge-card.obtained, .pw-league-card.obtained { background: rgba(255, 255, 255, .08); border-color: var(--pw-badge-color, rgba(255, 255, 255, .2)); }
+.pw-badge-card { display: flex; flex-direction: column; align-items: center; padding: 12px 8px; text-align: center; }
+.pw-league-card { display: flex; align-items: center; gap: 12px; padding: 12px; }
+
+.pw-badge-emblem { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.pw-badge-card .pw-badge-emblem { margin-bottom: 8px; min-height: 48px; }
+.pw-badge-emblem-img { width: 48px; height: 48px; transition: filter .2s ease; filter: grayscale(1) opacity(.35); }
+.pw-league-card .pw-badge-emblem-img { width: 40px; height: 40px; }
+.obtained .pw-badge-emblem-img { filter: drop-shadow(0 0 6px var(--pw-badge-color, #ffd700)); }
+.pw-league-card.obtained .pw-badge-emblem-img { filter: drop-shadow(0 0 6px #ffd700); }
+
+.pw-badge-card-title { font-weight: bold; font-size: 12px; color: var(--light1); }
+.obtained .pw-badge-card-title { color: #fff; }
+.pw-league-card.obtained .pw-badge-card-title { color: #ffd700; }
+.pw-badge-card-line { font-size: 10px; color: var(--light1); margin-top: 2px; }
+.pw-badge-card .pw-badge-card-line-2 { font-size: 9px; color: var(--light2); }
+.pw-badge-card-status { font-size: 10px; color: var(--light2); margin-top: 3px; font-weight: bold; }
+.obtained .pw-badge-card-status { color: var(--green); }
+.pw-badges-title-block, .pw-badges-counters, .pw-badge-card-text { display: flex; flex-direction: column; }
+.pw-badges-counters { align-items: flex-end; }
+.pw-badge-card .pw-badge-card-text { align-items: center; }

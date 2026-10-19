@@ -36,7 +36,7 @@ describe('Static rules', (test) => {
   });
 
   test('no inline style assignment (styling goes through CSS classes and variables)', () => {
-    assert.empty(findMatches(SRC, CODE, /\.style\.(?!setProperty|removeProperty)[A-Za-z]+\s*=|\.style\s*=|cssText/), 'inline styles');
+    assert.empty(findMatches(SRC, CODE, /\.style\.(?!setProperty|removeProperty|getPropertyValue)[A-Za-z]+\s*=|\.style\s*=|cssText/), 'inline styles');
   });
 
   test('pages are only imported by PageRegistry', () => {

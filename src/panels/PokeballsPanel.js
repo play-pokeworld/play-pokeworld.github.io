@@ -1,25 +1,26 @@
 /**
  * @file PokeballsPanel.js
- * @brief Poké Ball rules window: which ball is thrown for each capture case (C++: class PokeballsPanel : public DraggablePanel).
+ * @brief Poké Ball window: one row per capture filter, in priority order
+ * (C++: class PokeballsPanel : public DraggablePanel). Port of the original
+ * renderPokeballWindow(): Name | Ball | Qty table; a disabled filter is greyed out; clicking the
+ * ball slot opens the ball picker; the gear opens the filter editor. Balls are bought in shops.
  */
 
 import { DraggablePanel } from '../ui/DraggablePanel.js';
 import { UIContainer } from '../ui/UIContainer.js';
 import { UIText } from '../ui/UIText.js';
-import { UIImage } from '../ui/UIImage.js';
 import { UIButton } from '../ui/UIButton.js';
-import { NotificationSystem } from '../systems/NotificationSystem.js';
-import { NotificationChannels } from '../config/NotificationConfig.js';
+import { BallSlotIcon } from './components/BallSlotIcon.js';
+import { PokeballSystem } from '../systems/PokeballSystem.js';
+import { EventBus } from '../core/EventBus.js';
+import { TextFormatter } from '../core/TextFormatter.js';
+import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
+import { BallFiltersChangedEvent } from '../core/events/BallFiltersChangedEvent.js';
+import { InventoryChangedEvent } from '../core/events/InventoryChangedEvent.js';
+import { SaveLoadedEvent } from '../core/events/SaveLoadedEvent.js';
+import { ModalIds } from '../config/ModalIds.js';
 import { WindowIds } from '../config/DashboardLayout.js';
-import { AssetPaths } from '../config/AssetPaths.js';
 import { t } from '../localization/LocalizationManager.js';
-
-/** Default capture rules until the inventory system is ported. */
-const DEFAULT_BALL_RULES = Object.freeze([
-  { id: 'not_caught', labelKey: 'ball_filter_new', ball: 'Pokeball', ballNameKey: 'ball_pokeball', quantity: 25, enabled: true },
-  { id: 'caught', labelKey: 'ball_filter_already_caught', ball: 'Pokeball', ballNameKey: 'ball_pokeball', quantity: 25, enabled: true },
-  { id: 'shiny', labelKey: 'ball_filter_shiny', ball: 'Ultraball', ballNameKey: 'ball_ultraball', quantity: 3, enabled: true }
-]);
 
 export class PokeballsPanel extends DraggablePanel {
   /**
@@ -39,16 +40,26 @@ export class PokeballsPanel extends DraggablePanel {
     const settings = new UIButton({
       className: 'pw-win-tool-btn',
       icon: 'settings',
-      onClick: () => NotificationSystem.getInstance().notifyTemporary(
-        t('feature_coming_soon', { name: t('ball_settings') }),
-        { channel: NotificationChannels.GAMEPLAY }
-      )
+      onClick: () => EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.BALL_FILTERS))
     });
     settings.setTooltip(t('ball_settings'));
     settings.setAriaLabel(t('ball_settings'));
     this.addHeaderAction(settings);
 
-    this.addChild(new UIContainer({
+    this._grid = new UIContainer({ className: 'pw-ball-grid' });
+    this.addChild(new UIContainer({ className: 'pw-ball-panel', children: [this._grid] }));
+
+    for (const eventClass of [BallFiltersChangedEvent, InventoryChangedEvent, SaveLoadedEvent]) {
+      this.listen(eventClass, () => this._render());
+    }
+    this._render();
+  }
+
+  /** @private */
+  _render() {
+    const balls = PokeballSystem.getInstance();
+    this._grid.clearChildren();
+    this._grid.addChild(new UIContainer({
       className: 'pw-ball-head',
       children: [
         new UIText({ className: 'pw-ball-head-name', text: t('ball_col_name') }),
@@ -56,22 +67,27 @@ export class PokeballsPanel extends DraggablePanel {
         new UIText({ className: 'pw-ball-col', text: t('ball_col_qty') })
       ]
     }));
-
-    for (const rule of DEFAULT_BALL_RULES) {
+    for (const filter of balls.getFilters()) {
       const ballCell = new UIContainer({
         tagName: 'span',
         className: 'pw-ball-row-cell pw-ball-row-ball',
-        children: [new UIImage({ src: AssetPaths.pokeball(rule.ball), alt: t(rule.ballNameKey), className: 'pw-ball-icon' })]
+        children: [new BallSlotIcon(filter.ball)]
       });
       ballCell.setTooltip(t('ball_cycle_hint'));
-      this.addChild(new UIContainer({
-        className: `pw-ball-row ${rule.enabled ? '' : 'off'}`.trim(),
+      ballCell.addDomListener('click', () => EventBus.getInstance().dispatch(
+        new ModalOpenRequestedEvent(ModalIds.BALL_PICKER, { filterId: filter.id })
+      ));
+      const quantity = filter.hasBall() ? balls.getCount(filter.ball) : 0;
+      const row = new UIContainer({
+        className: 'pw-ball-row',
         children: [
-          new UIText({ className: 'pw-ball-row-cell pw-ball-row-name', text: t(rule.labelKey) }),
+          new UIText({ className: 'pw-ball-row-cell pw-ball-row-name', text: balls.getLabel(filter) }),
           ballCell,
-          new UIText({ className: 'pw-ball-row-cell pw-ball-row-qty', text: String(rule.quantity) })
+          new UIText({ className: 'pw-ball-row-cell pw-ball-row-qty', text: TextFormatter.formatNumber(quantity) })
         ]
-      }));
+      });
+      row.toggleClass('off', !filter.enabled);
+      this._grid.addChild(row);
     }
   }
 }

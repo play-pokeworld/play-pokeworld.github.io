@@ -1,0 +1,216 @@
+/* ==========================================================================
+   PokéWorld — Poké Ball picker and filter editor
+   (BallPickerModal.js, BallFilterEditorModal.js, components/BallFilter*.js)
+   Port of the PICKER_CSS block the original ui/game/pokeball-window.js injected at runtime.
+   The panel rows (.pw-ball-panel / .pw-ball-head / .pw-ball-row) keep the original rules of
+   design-system.css; only the icon size lives here.
+   ========================================================================== */
+
+/* --- Ball icon (22 px in the panel and the editor, 26 px in the picker) --- */
+.pw-ball-icon { image-rendering: pixelated; }
+.pw-ball-icon--md { width: 22px; height: 22px; }
+.pw-ball-icon--lg { width: 26px; height: 26px; }
+
+/* --- Overlay and box (original .pw-ball-picker / .pw-ball-editor / .pw-ball-box) --- */
+.pw-modal-backdrop.pw-ball-overlay {
+  z-index: 1300;
+  background-color: rgba(0, 0, 0, .55);
+  backdrop-filter: none;
+}
+.pw-modal-backdrop.pw-ball-overlay--picker { z-index: 1310; }
+
+.pw-panel--modal-window.pw-ball-box {
+  display: block;
+  background: var(--pw-bg-surface, #24221E);
+  border: 1px solid var(--pw-border-color, #4A3E31);
+  border-radius: var(--pw-radius-lg, 12px);
+  padding: 14px;
+  width: min(520px, 94vw);
+  min-width: 0;
+  max-width: 94vw;
+  max-height: 86vh;
+  overflow: auto;
+  box-sizing: border-box;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .5);
+  backdrop-filter: none;
+}
+.pw-ball-box > .win-body { padding: 0; overflow: visible; }
+
+.pw-ball-title { font-size: 14px; color: var(--pw-text-primary, #ECDEB7); margin-bottom: 8px; font-weight: 700; }
+
+/* --- Picker rows --- */
+.pw-ball-row-opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 9px;
+  border-radius: var(--pw-radius-md, 8px);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.pw-ball-row-opt:hover { background: var(--pw-bg-header, #1C1A17); }
+.pw-ball-row-opt.selected { background: var(--pw-accent-color, #FFA500); border-color: var(--pw-accent-color, #FFA500); }
+.pw-ball-name-block { flex: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.pw-ball-name { font-size: 13px; color: var(--pw-text-primary, #ECDEB7); font-weight: 700; }
+.pw-ball-desc { font-size: 10.5px; color: var(--pw-text-secondary, #C8BBA0); line-height: 1.25; }
+.pw-ball-row-opt.selected .pw-ball-name { color: #1C1A17; }
+.pw-ball-row-opt.selected .pw-ball-desc { color: rgba(28, 26, 23, .82); }
+.pw-ball-qty2 { font-size: 12px; color: var(--pw-text-secondary, #C8BBA0); font-variant-numeric: tabular-nums; }
+.pw-ball-row-opt.selected .pw-ball-qty2 { color: #1C1A17; font-weight: 700; }
+
+/* --- Editor --- */
+.pw-ball-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.pw-ball-editor-top { display: flex; gap: 8px; margin-bottom: 6px; }
+.pw-ball-editor-note { font-size: 11px; color: var(--pw-text-secondary, #C8BBA0); margin-bottom: 8px; }
+
+.pw-ball-filter-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 7px 8px;
+  border-radius: var(--pw-radius-md, 8px);
+  background: var(--pw-bg-header, #1C1A17);
+  border: 1px solid var(--pw-border-color, #4A3E31);
+  margin-bottom: 6px;
+}
+.pw-ball-filter-row.off { opacity: .4; }
+.pw-ball-filter-row.is-dragging { opacity: .5; border-color: var(--pw-accent-color, #FFA500); }
+.pw-ball-filter-row.is-drop-target { border-color: var(--pw-accent-color, #FFA500); }
+.pw-ball-filter-top { display: flex; align-items: center; gap: 7px; }
+
+.pw-ball-drag {
+  display: inline-flex;
+  cursor: grab;
+  color: var(--pw-text-secondary, #999);
+  font-size: 15px;
+  padding: 0 2px;
+  user-select: none;
+  touch-action: none;
+}
+.pw-ball-filter-row.is-dragging .pw-ball-drag { cursor: grabbing; }
+
+.pw-input.pw-ball-filter-name-input {
+  flex: 1;
+  min-width: 80px;
+  background: var(--pw-bg-sprite, #191714);
+  border: 1px solid var(--pw-border-color, #4A3E31);
+  border-radius: var(--pw-radius-sm, 4px);
+  color: var(--pw-text-primary, #ECDEB7);
+  padding: 4px 6px;
+  font-size: 13px;
+}
+.pw-ball-filter-name { flex: 1; min-width: 80px; font-size: 13px; color: var(--pw-text-primary, #ECDEB7); padding: 4px 6px; }
+.pw-ball-del-pad { width: 24px; flex-shrink: 0; }
+
+/* On / off switch (a UIButton: the knob is drawn by ::after) */
+.pw-button.pw-ball-switch {
+  position: relative;
+  width: 42px;
+  height: 22px;
+  min-width: 0;
+  min-height: 0;
+  background: var(--pw-bg-sprite, #191714);
+  border: 1px solid var(--pw-border-color, #4A3E31);
+  border-radius: 999px;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: background .15s, border-color .15s;
+}
+.pw-button.pw-ball-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--pw-text-primary, #ECDEB7);
+  transition: left .15s;
+}
+.pw-button.pw-ball-switch.on { background: var(--pw-color-success, #2ECC71); border-color: var(--pw-color-success, #2ECC71); }
+.pw-button.pw-ball-switch.on::after { left: 22px; background: #0F380F; }
+
+.pw-ball-ball-btn { display: flex; align-items: center; justify-content: center; width: 36px; cursor: pointer; flex-shrink: 0; }
+
+.pw-button.pw-ball-del {
+  background: none;
+  border: none;
+  color: var(--pw-color-danger, #E74C3C);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 6px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.pw-button.pw-ball-params-toggle {
+  display: block;
+  width: 100%;
+  margin-top: 2px;
+  background: var(--pw-bg-surface, #24221E);
+  border: 1px solid var(--pw-border-color, #4A3E31);
+  border-radius: var(--pw-radius-md, 8px);
+  color: var(--pw-text-primary, #ECDEB7);
+  font-size: 11px;
+  font-weight: 400;
+  padding: 4px 8px;
+  cursor: pointer;
+  text-align: center;
+}
+.pw-button.pw-ball-params-toggle:hover { background: var(--pw-bg-header, #1C1A17); }
+.pw-button.pw-ball-params-toggle.on {
+  color: #1C1A17;
+  background: var(--pw-accent-color, #FFA500);
+  border-color: var(--pw-accent-color, #FFA500);
+  font-weight: 700;
+}
+
+/* --- Option lines --- */
+.pw-ball-opts { display: flex; flex-direction: column; gap: 4px; padding: 6px 0 0 0; }
+.pw-ball-opt-row { display: flex; align-items: center; gap: 8px; min-height: 26px; padding: 3px 6px; border-radius: var(--pw-radius-sm, 4px); }
+.pw-ball-opt-row.avail { background: var(--pw-bg-surface, #24221E); }
+
+.pw-button.pw-ball-opt-btn {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  min-height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  border: none;
+  flex-shrink: 0;
+  padding: 0;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .35);
+}
+.pw-button.pw-ball-opt-btn .pw-icon { width: 14px; height: 14px; stroke-width: 3; }
+.pw-button.pw-ball-opt-btn.add { background: var(--pw-color-success, #2ECC71); }
+.pw-button.pw-ball-opt-btn.remove { background: var(--pw-color-danger, #E74C3C); }
+.pw-button.pw-ball-opt-btn:hover { filter: brightness(1.1); }
+.pw-button.pw-ball-opt-btn:disabled { opacity: .4; cursor: default; filter: none; }
+.pw-ball-opt-label { font-size: 12px; color: var(--pw-text-primary, #ECDEB7); }
+
+.pw-ball-sel .pw-dropdown-select {
+  background: var(--pw-bg-sprite, #191714) !important;
+  border: 1px solid var(--pw-border-color, #4A3E31) !important;
+  border-radius: var(--pw-radius-sm, 4px) !important;
+  color: var(--pw-text-primary, #ECDEB7) !important;
+  padding: 3px 5px !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  max-width: 130px;
+}
+.pw-ball-sel.is-disabled .pw-dropdown-select { opacity: .55 !important; }
+
+/* Phone: the pop-up fits the screen (original V7-R3 · MOB-03) */
+@media (max-width: 520px) {
+  .pw-panel--modal-window.pw-ball-box { padding: 10px; width: 96vw; max-width: 96vw; max-height: 90vh; }
+  .pw-ball-row-opt { padding: 6px; gap: 6px; }
+  .pw-ball-actions .hbtn { flex: 1 1 auto; }
+}

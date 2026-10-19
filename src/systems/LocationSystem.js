@@ -6,9 +6,10 @@
 import { BaseSystem } from './BaseSystem.js';
 import { SaveSystem } from './SaveSystem.js';
 import { EventBus } from '../core/EventBus.js';
-import { LocationDB } from '../data/LocationDB.js';
+import { LocationDB } from '../data/world/LocationDB.js';
 import { PlayerDefaults } from '../config/PlayerDefaults.js';
 import { LocationChangedEvent } from '../core/events/LocationChangedEvent.js';
+import { NpcTalkedEvent } from '../core/events/NpcTalkedEvent.js';
 import { t } from '../localization/LocalizationManager.js';
 
 /** Map node states (each maps to a CSS class of UIMapView). */
@@ -35,7 +36,7 @@ export class LocationSystem extends BaseSystem {
     super('LocationSystem', 'System');
   }
 
-  /** @private @returns {import('../data/PlayerData.js').PlayerData|null} */
+  /** @private @returns {import('../data/save/PlayerData.js').PlayerData|null} */
   _player() {
     return SaveSystem.getInstance().getCurrentSave()?.player ?? null;
   }
@@ -57,7 +58,7 @@ export class LocationSystem extends BaseSystem {
   isLocked(locationId) {
     const location = LocationDB.getInstance().getById(locationId);
     if (!location) return true;
-    return (location.badgeReq ?? 0) > (this._player()?.badges ?? 0);
+    return location.badgesRequired > (this._player()?.getBadgeCount() ?? 0);
   }
 
   /**
@@ -69,7 +70,15 @@ export class LocationSystem extends BaseSystem {
     if (locationId === currentId) return LocationStates.CURRENT;
     if (this.isLocked(locationId)) return LocationStates.LOCKED;
     const current = LocationDB.getInstance().getById(currentId);
-    return current && (current.conn || []).includes(locationId) ? LocationStates.ADJACENT : LocationStates.REACHABLE;
+    return current && current.connections.includes(locationId) ? LocationStates.ADJACENT : LocationStates.REACHABLE;
+  }
+
+  /**
+   * Talks to the people of the current location (talk quest objectives listen to it).
+   */
+  talkToNpc() {
+    if (!this._player()) return;
+    EventBus.getInstance().dispatch(new NpcTalkedEvent(this.getCurrentLocationId()));
   }
 
   /**

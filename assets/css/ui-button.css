@@ -84,7 +84,7 @@
 
 .pw-button--secondary:hover {
   border-color: var(--pw-accent-gold);
-  background-color: #38342E;
+  background-color: var(--pw-bg-surface-hover);
 }
 
 .pw-button--danger {
@@ -116,7 +116,7 @@
 
 .pw-button--ghost:hover {
   color: var(--pw-text-primary);
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: color-mix(in srgb, var(--light2) 6%, transparent);
 }
 
 .pw-button--tab {

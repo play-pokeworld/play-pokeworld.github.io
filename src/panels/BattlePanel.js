@@ -9,14 +9,17 @@ import { UIContainer } from '../ui/UIContainer.js';
 import { UIText } from '../ui/UIText.js';
 import { UIIcon } from '../ui/UIIcon.js';
 import { UIButton } from '../ui/UIButton.js';
-import { BattleCombatantCard, CombatantSides } from './components/BattleCombatantCard.js';
+import { BattleCombatantCard } from './components/BattleCombatantCard.js';
+import { BattleTimeline } from './components/BattleTimeline.js';
+import { BattleSides } from '../config/BattleSides.js';
+import { BattleAttackEvent } from '../core/events/BattleAttackEvent.js';
 import { BattleSystem } from '../systems/BattleSystem.js';
 import { BattleStartedEvent } from '../core/events/BattleStartedEvent.js';
 import { BattleStateChangedEvent } from '../core/events/BattleStateChangedEvent.js';
 import { BattleEndedEvent } from '../core/events/BattleEndedEvent.js';
 import { LocationChangedEvent } from '../core/events/LocationChangedEvent.js';
 import { LocationSystem } from '../systems/LocationSystem.js';
-import { LocationDB } from '../data/LocationDB.js';
+import { LocationDB } from '../data/world/LocationDB.js';
 import { AppShell } from '../ui/AppShell.js';
 import { resolveLocationScene } from '../config/LocationBackgrounds.js';
 import { WindowIds } from '../config/DashboardLayout.js';
@@ -49,13 +52,15 @@ export class BattlePanel extends DraggablePanel {
       ]
     });
 
-    this._foeCard = new BattleCombatantCard({ side: CombatantSides.FOE });
-    this._playerCard = new BattleCombatantCard({ side: CombatantSides.PLAYER });
+    this._foeCard = new BattleCombatantCard({ side: BattleSides.FOE });
+    this._playerCard = new BattleCombatantCard({ side: BattleSides.PLAYER });
+    this._timeline = new BattleTimeline();
     this._activeScene = new UIContainer({
       id: 'battle-active-scene',
       // Visibility follows the original rule: `.is-live` shows the scene and hides the idle screen (design-system A.2).
       className: 'pw-static-037 pw-battle-active',
       children: [
+        this._timeline,
         new UIContainer({ id: 'battle-team-row', className: 'team-container pw-battle-team-row', children: [this._foeCard, this._playerCard] }),
         new UIContainer({
           className: 'pw-battle-action-row',
@@ -84,7 +89,11 @@ export class BattlePanel extends DraggablePanel {
 
     this.addChildren([this._idleScreen, this._activeScene, lootRow]);
 
-    this.listen(BattleStartedEvent, (event) => this._showBattle(event.playerPokemon, event.foePokemon));
+    this.listen(BattleStartedEvent, (event) => {
+      this._timeline.clear();
+      this._showBattle(event.playerPokemon, event.foePokemon);
+    });
+    this.listen(BattleAttackEvent, (event) => this._timeline.addAttack(event));
     this.listen(BattleStateChangedEvent, (event) => this._showBattle(event.playerPokemon, event.foePokemon));
     this.listen(BattleEndedEvent, (event) => this._onBattleEnded(event));
     this.listen(LocationChangedEvent, (event) => this._applyScene(event.locationId));
@@ -102,14 +111,14 @@ export class BattlePanel extends DraggablePanel {
    */
   _applyScene(locationId) {
     const location = locationId ? LocationDB.getInstance().getById(locationId) : null;
-    AppShell.setSceneBackground(resolveLocationScene(locationId, location?.type ?? null));
+    AppShell.setSceneBackground(resolveLocationScene(locationId, location?.kind ?? null));
   }
 
   /** @private */
   _showBattle(player, foe) {
     this._activeScene.addClass('is-live');
-    this._playerCard.setPokemon(player);
-    this._foeCard.setPokemon(foe);
+    this._playerCard.setPokemon(player, foe);
+    this._foeCard.setPokemon(foe, player);
   }
 
   /**

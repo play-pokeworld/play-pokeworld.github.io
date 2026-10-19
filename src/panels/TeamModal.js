@@ -54,8 +54,8 @@ export class TeamModal extends StaticModalPanel {
               })
             ]
           }),
-          new UIText({ tagName: 'div', className: 'pw-team-modal-hp', text: t('hp_value_over_max', { value: pokemon.hp, max: pokemon.maxHp }) }),
-          new UIText({ tagName: 'div', className: 'pw-team-modal-exp', text: t('exp_value_over_max', { value: pokemon.exp, max: pokemon.maxExp }) }),
+          new UIText({ tagName: 'div', className: 'pw-team-modal-hp', text: t('hp_value_over_max', { value: pokemon.hp, max: pokemon.getMaxHp() }) }),
+          new UIText({ tagName: 'div', className: 'pw-team-modal-exp', text: t('exp_value_over_max', { value: pokemon.getExpInLevel(), max: pokemon.getExpLevelSpan() }) }),
           index > 0 && new UIButton({
             text: t('team_set_lead_btn'),
             variant: 'secondary',

@@ -584,3 +584,45 @@ body.mobile-mode .mobile-subnav-bar.is-hidden { display: none !important; }
   top: -6px !important;
   font-size: 13px !important;
 }
+
+/* Battle timeline (v1.3): move chips take the colour of their type (BattleTimeline adds .type-<id>) */
+.battle-timeline-chip.type-normal { --chip-color: var(--type-normal); }
+.battle-timeline-chip.type-fire { --chip-color: var(--type-fire); }
+.battle-timeline-chip.type-water { --chip-color: var(--type-water); }
+.battle-timeline-chip.type-electric { --chip-color: var(--type-electric); }
+.battle-timeline-chip.type-grass { --chip-color: var(--type-grass); }
+.battle-timeline-chip.type-ice { --chip-color: var(--type-ice); }
+.battle-timeline-chip.type-fighting { --chip-color: var(--type-fighting); }
+.battle-timeline-chip.type-poison { --chip-color: var(--type-poison); }
+.battle-timeline-chip.type-ground { --chip-color: var(--type-ground); }
+.battle-timeline-chip.type-flying { --chip-color: var(--type-flying); }
+.battle-timeline-chip.type-psychic { --chip-color: var(--type-psychic); }
+.battle-timeline-chip.type-bug { --chip-color: var(--type-bug); }
+.battle-timeline-chip.type-rock { --chip-color: var(--type-rock); }
+.battle-timeline-chip.type-ghost { --chip-color: var(--type-ghost); }
+.battle-timeline-chip.type-dragon { --chip-color: var(--type-dragon); }
+.battle-timeline-chip.type-dark { --chip-color: var(--type-dark); }
+.battle-timeline-chip.type-steel { --chip-color: var(--type-steel); }
+.battle-timeline-chip.type-fairy { --chip-color: var(--type-fairy); }
+/* Damage chips of non-neutral hits: the design-system rule paints every chip with --chip-color */
+.battle-timeline-chip.super { --chip-color: #ff8a3d; }
+.battle-timeline-chip.resist { --chip-color: #b8c7d9; }
+.battle-timeline-chip.immune { --chip-color: #d3425f; }
+
+/* Pokémon cards on light themes (v1.3): the legacy rules paint move rows and the level pill
+   with a black veil and type-coloured text, which is unreadable on a light card. */
+:root:is([data-theme="light"], [data-theme="sakura"]) :is(#battle-team-row, #team-window-body) .poke-move:not(.empty) {
+  background: rgba(255, 255, 255, 0.55) !important;
+}
+:root:is([data-theme="light"], [data-theme="sakura"]) :is(#battle-team-row, #team-window-body) .poke-move .move-name {
+  color: var(--pw-text-primary) !important;
+  opacity: 1 !important;
+}
+:root:is([data-theme="light"], [data-theme="sakura"]) :is(#battle-team-row, #team-window-body) .poke-move .move-eff-badge {
+  background: rgba(0, 0, 0, 0.1) !important;
+  color: var(--pw-text-primary) !important;
+}
+:root:is([data-theme="light"], [data-theme="sakura"]) #battle-team-row .poke-level {
+  background: rgba(0, 0, 0, 0.12) !important;
+  color: var(--pw-text-primary) !important;
+}

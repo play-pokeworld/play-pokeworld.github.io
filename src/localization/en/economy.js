@@ -79,6 +79,9 @@ export const L_en_economy = {
 "ball_cycle_hint":"Click to change the filter's ball",
 "ball_settings":"Poké Ball settings",
 "ball_editor_hint":"Order sets priority: the first match decides the ball thrown. A base filter left on “None” hands over to the next filter; a custom filter on “None” throws nothing.",
+"ball_custom_filter_name":"Filter {n}",
+"ball_desc_separator":" · ",
+"ball_qty_times":"× {n}",
 "ball_new_filter":"New filter",
 "ball_reset_filters":"Reset",
 "ball_enable":"Enable / disable the filter",
@@ -213,5 +216,14 @@ export const L_en_economy = {
 "training_slot_need_pq":"You need {price} QP.",
 "staff_shop_title":"Staff",
   currency_farm_points: "Farm points",
-  currency_contest_tokens: "Contest tokens"
+  currency_contest_tokens: "Contest tokens",
+  shop_locked: "This shop is still closed.",
+  shop_locked_title: "Shop locked",
+  shop_locked_desc: "This elite shop is reserved for the winners of: {league}.",
+  shop_bag_full: "Bag full: {max} max.",
+  shop_not_enough: "Not enough funds.",
+  shop_bought: "Bought: {quantity}× {name}.",
+  shop_honor_bonus: "Bonus: {quantity}× {name} for free!",
+  shop_offer_with_currency: "{name} ({currency})",
+  shop_add_qty: "+{n}"
 };

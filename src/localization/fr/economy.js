@@ -79,6 +79,9 @@ export const L_fr_economy = {
 "ball_cycle_hint":"Cliquer change la ball du filtre",
 "ball_settings":"Paramètres des Poké Balls",
 "ball_editor_hint":"L'ordre détermine la priorité : la première correspondance définit la ball lancée. Un filtre de base laissé sur « Aucune » passe la main au filtre suivant ; un filtre personnalisé sur « Aucune » ne lance rien.",
+"ball_custom_filter_name":"Filtre {n}",
+"ball_desc_separator":" · ",
+"ball_qty_times":"× {n}",
 "ball_new_filter":"Nouveau filtre",
 "ball_reset_filters":"Réinitialiser",
 "ball_enable":"Activer / désactiver le filtre",
@@ -213,5 +216,14 @@ export const L_fr_economy = {
 "training_slot_need_pq":"Il te faut {price} PQ.",
 "staff_shop_title":"Employés",
   currency_farm_points: "Points de ferme",
-  currency_contest_tokens: "Jetons de concours"
+  currency_contest_tokens: "Jetons de concours",
+  shop_locked: "Cette boutique est encore fermée.",
+  shop_locked_title: "Boutique verrouillée",
+  shop_locked_desc: "Cette boutique d'élite est réservée aux vainqueurs de : {league}.",
+  shop_bag_full: "Sac plein : {max} max.",
+  shop_not_enough: "Pas assez de fonds.",
+  shop_bought: "Acheté : {quantity}× {name}.",
+  shop_honor_bonus: "Bonus : {quantity}× {name} offerte(s) !",
+  shop_offer_with_currency: "{name} ({currency})",
+  shop_add_qty: "+{n}"
 };
