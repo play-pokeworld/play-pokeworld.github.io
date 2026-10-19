@@ -107,10 +107,3 @@ export const L_en_npc = {
   "weather_institute": [{"name":"Head Researcher","lines":["The weather patterns change rapidly across Hoenn."]},{"name":"Scientist Dalton","lines":["I have a request for you…","Let's talk if you have a moment."]}],
   "whirlislands": [{"name":"Old Fisherman","lines":["Deep in the Whirl Islands sleeps Lugia.","Listen to the abyss's song."]}]
 };
-
-// T2 (vague 38) : module ESM — export natif ; la surface classique est
-// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
-if (typeof globalThis !== 'undefined') globalThis.L_en_npc = L_en_npc;
-
-
-

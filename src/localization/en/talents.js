@@ -809,10 +809,3 @@ export const L_en_talents = {
     "desc": "Normal-type moves become Dragon-type moves, and their power is multiplied by x1.3"
   }
 };
-
-// T2 (vague 38) : module ESM — export natif ; la surface classique est
-// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
-if (typeof globalThis !== 'undefined') globalThis.L_en_talents = L_en_talents;
-
-
-

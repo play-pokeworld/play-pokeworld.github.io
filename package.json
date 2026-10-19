@@ -1,32 +1,14 @@
 {
-  "name": "pokeworld-refactor",
-  "version": "7.6.0",
+  "name": "pokeworld-clean",
+  "version": "1.2.0",
   "private": true,
+  "description": "PokéWorld — clean-architecture rework (static browser game + zero-dependency local server).",
   "type": "module",
-  "scripts": {
-    "dev": "node tools/gen-version.mjs && vite --host 0.0.0.0",
-    "build": "node tools/gen-version.mjs && node tools/audio-manifest.mjs && vite build && node tools/copy-runtime-assets.mjs && node tools/check-chunk-order.mjs",
-    "preview": "vite preview --host 0.0.0.0",
-    "validate": "node tools/gen-version.mjs --quiet && node tools/validate-project.mjs",
-    "check:i18n": "node tools/check-i18n.mjs",
-    "lint": "node tools/gen-src-globals.mjs && eslint . --quiet",
-    "test": "npm run lint && node --test tests",
-    "check": "npm run validate && npm run format:check && npm run check:i18n && npm run build && npm test",
-    "format": "prettier --write \"src/**/*.js\"",
-    "format:check": "prettier --check \"src/**/*.js\"",
-    "download:assets": "python3 tools/download_assets.py",
-    "download:audio": "python3 tools/download_assets.py --audio-only",
-    "audio:manifest": "node tools/audio-manifest.mjs --list",
-    "audit": "python3 tools/audit_project.py",
-    "sim:economy": "node tools/economy-sim.mjs --check",
-    "sim:battles": "node tools/sim_battles.mjs --runs 50"
+  "engines": {
+    "node": ">=18"
   },
-  "devDependencies": {
-    "esbuild": "^0.28.2",
-    "eslint": "^10.7.0",
-    "jsdom": "^29.1.1",
-    "playwright": "^1.62.1",
-    "prettier": "^3.9.5",
-    "vite": "latest"
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test_suite.js"
   }
 }

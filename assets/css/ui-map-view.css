@@ -1,0 +1,41 @@
+/* ==========================================================================
+   UIMapView Component CSS
+   Node colours and states of the world map (the original wrote them as SVG
+   fill / stroke attributes).
+   ========================================================================== */
+
+.pw-map-view {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.pw-map-view .loc-node-shadow { fill: #000; opacity: 0.4; }
+.pw-map-view .loc-node-body { fill: rgba(83, 157, 223, 0.55); stroke: #fff; stroke-width: 2; }
+.pw-map-view .loc-node-ring { fill: none; stroke: var(--light2); stroke-width: 3; opacity: 0.9; }
+
+.pw-map-view .loc-node.current .loc-node-body { fill: rgba(255, 165, 0, 0.6); stroke: var(--light2); stroke-width: 4; }
+.pw-map-view .loc-node.adjacent .loc-node-body { fill: rgba(96, 190, 88, 0.55); }
+.pw-map-view .loc-node.locked .loc-node-body { fill: rgba(40, 40, 40, 0.6); stroke: #444; }
+.pw-map-view .loc-node.locked .loc-node-shadow { opacity: 0.35; }
+.pw-map-view .loc-node:not(.locked):hover .loc-node-body { filter: brightness(1.25); }
+
+.pw-map-view .map-label { cursor: pointer; }
+.pw-map-view .map-label rect { fill: rgba(0, 0, 0, 0.8); stroke: rgba(255, 255, 255, 0.25); stroke-width: 0.8; }
+.pw-map-view .map-label text { font-size: 12px; font-weight: bold; fill: #ececec; }
+.pw-map-view .map-label.current rect { stroke: #94886B; }
+.pw-map-view .map-label.current text { fill: #94886B; }
+.pw-map-view .map-label.reachable text { fill: #ececec; }
+.pw-map-view .map-label.locked { cursor: not-allowed; opacity: 0.6; }
+.pw-map-view .map-label.locked text { fill: #9a9a9a; }
+
+.pw-map-view .loc-node-ring.pulse { animation: pw-map-pulse 1.6s ease-in-out infinite; }
+
+@keyframes pw-map-pulse {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 0.3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pw-map-view .loc-node-ring.pulse { animation: none; }
+}

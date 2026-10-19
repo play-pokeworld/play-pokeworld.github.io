@@ -212,11 +212,6 @@ export const L_fr_economy = {
 "mine_auto_fee_diamonds_log":"[Mine] −1 Diamants pour l'extraction automatique d'une tuile.",
 "training_slot_need_pq":"Il te faut {price} PQ.",
 "staff_shop_title":"Employés",
+  currency_farm_points: "Points de ferme",
+  currency_contest_tokens: "Jetons de concours"
 };
-
-// T2 (vague 38) : module ESM — export natif ; la surface classique est
-// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
-if (typeof globalThis !== 'undefined') globalThis.L_fr_economy = L_fr_economy;
-
-
-

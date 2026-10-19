@@ -8,7 +8,6 @@ export const L_fr_combat = {
 "dupe_tag":"doublon",
 "leave_combat":"Quitter le combat",
 "live_loot":"Butin en direct :",
-"no_loot_yet":"Aucun butin récolté pour le moment.",
 "battle_summary_no_damage":"Aucun dégât enregistré pour cette session.",
 "battle_summary_no_captures":"Aucune capture pendant cette session.",
 "battle_summary_no_items":"Aucun objet trouvé pendant cette session.",
@@ -144,10 +143,3 @@ export const L_fr_combat = {
 "eff_very_weak":"Très peu efficace...",
 "battle_in_progress":"Combat en cours",
 };
-
-// T2 (vague 38) : module ESM — export natif ; la surface classique est
-// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
-if (typeof globalThis !== 'undefined') globalThis.L_fr_combat = L_fr_combat;
-
-
-

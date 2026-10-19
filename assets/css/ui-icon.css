@@ -1,0 +1,35 @@
+/* ==========================================================================
+   UIIcon Component CSS — glyphs inherit currentColor
+   ========================================================================== */
+
+:where(.pw-icon) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 1.15em;
+  height: 1.15em;
+  line-height: 1;
+}
+
+.pw-icon-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.pw-icon-svg--fill {
+  fill: currentColor;
+  stroke: none;
+}
+
+.pw-icon-svg--stroke {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pw-icon--sm { width: 14px; height: 14px; }
+.pw-icon--md { width: 18px; height: 18px; }
+.pw-icon--lg { width: 24px; height: 24px; }

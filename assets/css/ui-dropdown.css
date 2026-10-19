@@ -1,0 +1,57 @@
+/* ==========================================================================
+   PokéWorld UI — UIDropdown Component Styles
+   Matches authentic map-region-select and custom game dropdowns.
+   ========================================================================== */
+
+.pw-select-wrap {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  vertical-align: middle;
+}
+
+.pw-dropdown-select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-color: var(--dark3, #524f48) !important;
+  color: var(--light2, #ECDEB7) !important;
+  border: 1px solid var(--dark3, #524f48) !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  padding: 5px 28px 5px 10px !important;
+  min-width: 120px !important;
+  height: 28px !important;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23ECDEB7' stroke-width='2'/></svg>") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 9px center !important;
+  cursor: pointer !important;
+  outline: none !important;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.pw-dropdown-select:hover {
+  border-color: var(--accent, #FFA500) !important;
+}
+
+.pw-dropdown-select:focus {
+  border-color: var(--light2, #ECDEB7) !important;
+}
+
+.pw-dropdown-select option {
+  background-color: var(--dark2, #444138) !important;
+  color: var(--light2, #ECDEB7) !important;
+  padding: 6px 8px !important;
+}
+
+.pw-dropdown-select option:disabled {
+  color: var(--light1, #C9BC9C) !important;
+  opacity: 0.65 !important;
+}
+
+.pw-select-wrap.is-disabled .pw-dropdown-select {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+

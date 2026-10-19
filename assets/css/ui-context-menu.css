@@ -1,0 +1,25 @@
+/* ==========================================================================
+   UIContextMenu Component CSS (generic defaults — the save menu skin lives
+   in design-system.css under .save-card-context-menu / .save-context-item)
+   ========================================================================== */
+
+:where(.pw-context-menu) {
+  z-index: 25000;
+  display: grid;
+  gap: 4px;
+  min-width: 200px;
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid rgba(236, 222, 183, 0.38);
+  background: rgba(37, 37, 34, 0.96);
+}
+
+/* design-system hides .save-card-context-menu until .open is set */
+.save-card-context-menu.open {
+  display: grid;
+}
+
+:where(.pw-context-item) {
+  justify-content: flex-start;
+  width: 100%;
+}

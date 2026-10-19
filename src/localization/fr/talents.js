@@ -810,10 +810,3 @@ export const L_fr_talents = {
     "desc": "Les capacités Normal deviennent Dragon, puissance x1.3."
   }
 };
-
-// T2 (vague 38) : module ESM — export natif ; la surface classique est
-// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
-if (typeof globalThis !== 'undefined') globalThis.L_fr_talents = L_fr_talents;
-
-
-

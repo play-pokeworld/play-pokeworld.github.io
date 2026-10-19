@@ -1481,18 +1481,5 @@ export const L_fr_quests = {
 }
 };
 
-
-
 // Vague 39 — réconciliation : la table de descriptions (615 clés) vit dans sa
 // maison canonique fr/move-descs.js ; ce fichier la ré-exporte (contrat ESM intact).
-export { L_fr_move_descs } from './move-descs.js';
-
-
-// Wave 36 (T2 slice): real ES module — data.js merges L_* dictionaries
-// through the global object at eval.
-if (typeof globalThis !== 'undefined') {
-  globalThis.L_fr_quests = L_fr_quests;
-}
-
-
-

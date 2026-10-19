@@ -1,0 +1,44 @@
+/* ==========================================================================
+   Small dialog content (rename / delete confirmation in StaticModalPanel)
+   ========================================================================== */
+
+.pw-dialog-field {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px 4px;
+}
+
+.pw-dialog-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--light2);
+}
+
+.pw-dialog-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--light1);
+}
+
+.pw-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 16px 16px;
+}
+
+.pw-dialog-actions .pw-btn-primary {
+  background: var(--light2);
+  color: var(--dark1);
+}
+
+.pw-dialog-actions .pw-btn-danger {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
+
+/* Buttons keep their natural width (design-system .pw-btn-danger sets flex:1) */
+.pw-dialog-actions > .pw-element {
+  flex: 0 0 auto;
+}

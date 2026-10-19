@@ -55,9 +55,9 @@ export const L_en_messages = {
 "m.catch.2":"{p0} Lv.1 joined your active Party!",
 "m.catch.3":"Duplicate bonus: +{p0}₽",
 "m.catch.4":"You already own {p0}! Traded for {p1}₽.",
-"m.catch.5":"<span class=\"shiny-tag\"></span> Shiny Skin unlocked for {p0}!",
-"m.catch.6":"<span class=\"msg-green\"> {p0} was captured!</span>",
-"m.catch.7":"<span class=\"msg-light1\"> The wild {p0} escaped capture...</span>",
+"m.catch.5":"Shiny Skin unlocked for {p0}!",
+"m.catch.6":"{p0} was captured!",
+"m.catch.7":"The wild {p0} escaped capture...",
 "m.hatchery.1":"{p0} hatched at Lv.1{p1}!",
 "m.hatchery.2":"SHINY HATCH! {p0} hatched as Shiny !",
 "m.inventory.1":"All your Pokémon are already level 100!",
@@ -87,7 +87,7 @@ export const L_en_messages = {
 "m.map.20":"No other moves available.",
 "m.map.21":"Learn",
 "m.map.22":"Pow:",
-"m.map.23":"Learnable moves '+(full?'<span class=\"msg-red\">(forget one first)</span>':'') + ':",
+"m.map.23":"Learnable moves:",
 "m.map.24":"Forget",
 "m.map.25":"Pow:",
 "m.map.26":"Locked: Farm/catch to unlock",
@@ -126,7 +126,7 @@ export const L_en_messages = {
 "m.map.6":"No other moves available.",
 "m.map.7":"Learn",
 "m.map.8":"Pow:",
-"m.map.9":"Learnable moves '+(full?'<span class=\"msg-red\">(forget one first)</span>':'') + ':",
+"m.map.9":"Learnable moves:",
 "m.moves.1":"Map:",
 "m.moves.10":"Forfeit",
 "m.moves.11":"Automation (PokéClicker Tools)",
@@ -339,12 +339,6 @@ export const L_en_messages = {
 "daycare_evicted_funds":"{name} was removed from the Daycare: not enough money to pay for its new levels ({fee}₽ required)!",
 "daycare_evicted_max":"{name} reached Level 100 and leaves the Daycare!",
 "treasure_sold":" Sold {n}x {item} for +{gain}₽!",
-"evolution_region_locked":"This evolution ({region}) will unlock after discovering {region}!"
+"evolution_region_locked":"This evolution ({region}) will unlock after discovering {region}!",
+  "m.map.forget_first": "(forget one first)"
 };
-
-// T2 (vague 38) : module ESM — export natif ; la surface classique est
-// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
-if (typeof globalThis !== 'undefined') globalThis.L_en_messages = L_en_messages;
-
-
-

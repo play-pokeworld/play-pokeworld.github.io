@@ -1,0 +1,109 @@
+/**
+ * @file panels.js (en)
+ * @brief Texts of the game-page panels (map, location, team, achievements, battle log...).
+ */
+export const panels = {
+  app_name: 'PokéWorld',
+
+  // Map
+  map_title: 'Map',
+  map_current_loc: 'Current location: {name}',
+  loc_pallet_town: 'Pallet Town',
+  loc_route_1: 'Route 1',
+  loc_viridian_city: 'Viridian City',
+  loc_route_2: 'Route 2',
+  loc_pewter_city: 'Pewter City',
+
+  // Location
+  btn_explore: 'Explore',
+  btn_challenge: 'Challenge',
+  btn_shop: 'Shop',
+  btn_talk: 'Talk',
+  battle_wild_encountered: 'A wild {name} appeared!',
+  gym_closed: 'The local Gym is closed for now.',
+  shop_welcome: 'Welcome to the Poké Mart!',
+  npc_greeting: 'Prof. Oak: “Take good care of your Pokémon!”',
+  loc_wild_pokemon: 'Wild Pokémon in this area',
+
+  // Achievements
+  achievements_pinned_label: 'Pinned',
+  ach_dex_kanto: 'Kanto Pokédex',
+  ach_badges_kanto: 'Kanto Badges',
+  ach_total_battles: 'Battles won',
+  notif_achievement_pinned: 'Achievement pinned: {name}',
+  ach_open_hint: 'Click to open Achievements',
+
+  // Hatchery / mine / secret base
+  hatchery_slot_empty: 'Free slot',
+  mine_dig_feedback: 'Pickaxe strike!',
+  base_room_preview: 'Secret Base (Kanto/Hoenn)',
+  btn_visit: 'Visit',
+  secret_base_decor_btn: 'Decorate',
+
+  // Poké Balls filters
+  ball_filter_already_caught: 'Already caught',
+  ball_filter_shiny: 'Shiny',
+
+  // Team modal
+  team_modal_title: 'Team Management',
+  team_set_lead_btn: 'Set as lead',
+  level_short: 'Lv.',
+  hp_label: 'HP',
+  exp_label: 'EXP',
+
+  // Settings
+  save_success: 'Game saved successfully.',
+
+  // Battle log
+  combat_wild_encounter: 'A wild {name} appeared!',
+  combat_player_attack: '{attacker} used {move} and dealt {damage} damage!',
+  combat_enemy_attack: 'The wild {attacker} used {move} and dealt {damage} damage!',
+  combat_victory: 'The wild {name} fainted!',
+  combat_reward_summary: 'You gained {exp} EXP and {money} ₽.',
+  combat_player_fainted: 'Your Pokémon fainted!',
+  value_over_max: "{value} / {max}",
+  percent_value: "{value}%",
+  hp_value_over_max: "{value} / {max} HP",
+  exp_value_over_max: "{value} / {max} XP",
+  level_short_value: "Lv.{level}",
+  level_range: "Lv.{min}–{max}",
+  money_amount: "₽{value}",
+  add_slot_symbol: "+",
+  held_item_empty_symbol: "+",
+  held_item_tooltip: "Held item: {name}",
+  ach_rank_bronze: "Bronze",
+  ach_progress_summary: "{done} / {total} achievements unlocked",
+  story_no_quest: "No main quest in progress.",
+  quest_progress_label: "Progress",
+  battle_loot_summary: "Session loot: <b>₽{money}</b> · <b>{exp} XP</b>",
+  battle_no_wild_here: "No wild Pokémon here.",
+  battle_no_team: "Your team cannot fight.",
+  loc_species_count: "{count} species",
+  loc_no_wild: "No wild Pokémon in this area.",
+  loc_desc_town: "A peaceful town. Heal your team and prepare your next adventure.",
+  loc_desc_wild: "Wild Pokémon lurk in the tall grass. Explore to battle them!",
+  map_location_locked: "{name} — {badges} badges required",
+  feature_coming_soon: "{name}: coming soon.",
+  training_dummy_title: "Training dummy",
+  training_dummy_desc: "Train your Pokémon to gain experience safely.",
+  training_start_btn: "Start training",
+  team_new_lead: "{name} now leads the team.",
+  hatchery_mystery_egg: "Mystery egg",
+  shortcut_badges: "Badges",
+  save_profile_avatar: "Profile icon",
+  avatar_red: "Red (Boy)",
+  avatar_leaf: "Leaf (Girl)",
+  avatar_blue: "Blue (Rival)",
+  avatar_youngster: "Youngster",
+  avatar_cooltrainer_f: "Cooltrainer",
+  avatar_gentleman: "Gentleman",
+  avatar_scientist: "Scientist",
+  avatar_breeder_f: "Pokémon Breeder",
+  avatar_dragon_tamer: "Dragon Tamer",
+  avatar_rocket_grunt: "Team Rocket Grunt",
+  quest_claim_btn: "Claim reward",
+  quest_in_progress_btn: "In progress…",
+  quest_reward_claimed: "Reward for \"{title}\" claimed!",
+  quest_still_in_progress: "\"{title}\" is still in progress.",
+  move_slot_empty: "-"
+};

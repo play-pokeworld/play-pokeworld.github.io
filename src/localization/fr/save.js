@@ -1,0 +1,75 @@
+/**
+ * Save Menu & Slot Localization (French)
+ */
+export const save = {
+  // Main Save Menu Screen
+  save_menu_title: 'PokéWorld',
+  save_menu_subtitle: 'Choisis une sauvegarde ou crée une nouvelle aventure.',
+  save_menu_empty_title: 'Aucune sauvegarde trouvée',
+  save_menu_empty_desc: 'Crée une nouvelle sauvegarde ou importe un fichier pour l’ajouter à la liste.',
+  save_menu_new: 'Nouvelle partie',
+  save_menu_import: 'Importer',
+  save_menu_click_hint: 'Cliquer pour lancer',
+  save_menu_badges: 'Badges',
+  save_menu_pokedex: 'Pokédex',
+  save_menu_playtime: 'Temps',
+  save_menu_id: 'ID',
+  
+  // Right-Click Context Menu
+  save_context_download: 'Télécharger',
+  save_context_import_overwrite: 'Importer (écraser)',
+  save_context_duplicate: 'Dupliquer la sauvegarde',
+  save_context_delete: 'Supprimer',
+  
+  // New Game Modal
+  new_game_title: 'Nouvelle Partie',
+  new_game_trainer_name: 'Nom du dresseur',
+  new_game_trainer_placeholder: 'Red',
+  new_game_theme: 'Style de carte',
+  new_game_theme_classic: 'Bleu Classique',
+  new_game_theme_goldsilver: 'Or & Argent',
+  new_game_theme_emerald: 'Émeraude',
+  new_game_theme_diamondpearl: 'Diamant & Perle',
+  new_game_theme_blackwhite: 'Noir & Blanc',
+  new_game_theme_xy: 'X & Y',
+  new_game_theme_forest: 'Forêt Enchantée',
+  new_game_cancel: 'Annuler',
+  new_game_start: 'Commencer l\'Aventure',
+  new_game_validation_name: 'Veuillez renseigner un nom de dresseur valide.',
+  
+  // Delete Confirmation
+  save_delete_title: 'Confirmation de suppression',
+  save_delete_prompt: 'Êtes-vous certain de vouloir supprimer la sauvegarde {id} ({name}) ? Cette action est irréversible.',
+  save_delete_success: 'Sauvegarde {id} supprimée avec succès.',
+  save_duplicate_success: 'Sauvegarde dupliquée sous l\'identifiant {id}.',
+  save_import_success: 'Sauvegarde importée avec succès ({name}) !',
+  save_import_invalid: 'Le fichier sélectionné n\'est pas une sauvegarde PokéWorld valide.',
+  notif_new_save_created: 'Nouvelle partie créée pour {name} !',
+  save_click_to_continue: 'Cliquer pour continuer',
+  save_id_prefix: 'ID:',
+  save_badges_label: 'Badges',
+  save_pokedex_label: 'Pokédex',
+  save_playtime_label: 'Temps',
+
+  // Save menu — added in v1.1 (keys used by SaveMenuPage / SaveCard)
+  save_menu_prev_aria: 'Sauvegardes précédentes',
+  save_menu_next_aria: 'Sauvegardes suivantes',
+  save_context_rename: 'Renommer',
+  save_context_export: 'Exporter (JSON)',
+  save_rename_title: 'Renommer la sauvegarde',
+  save_rename_prompt: 'Nouveau nom du Dresseur :',
+  save_renamed_success: 'Sauvegarde renommée : {name}',
+  save_duplicated_success: 'Sauvegarde dupliquée avec succès !',
+  save_exported_success: 'Fichier de sauvegarde exporté !',
+  save_deleted_success: 'Sauvegarde définitivement supprimée.',
+  save_card_id: 'ID : {id}',
+  save_playtime_minutes: '{m}m',
+  save_playtime_hours: '{h}h {m}m',
+  default_trainer_name: 'Dresseur',
+  btn_cancel: 'Annuler',
+  btn_confirm: 'Valider',
+  btn_delete: 'Supprimer',
+  lang_label_fr: 'FR',
+  lang_label_en: 'EN',
+  lang_switch_aria: 'Changer la langue',
+};

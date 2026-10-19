@@ -1,2 +1,14 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Windows batch files must keep CRLF line endings, otherwise cmd.exe mis-parses
+# labels and blocks (this is what broke start.bat in v0).
+*.bat text eol=crlf
+*.cmd text eol=crlf
+tools/launcher/*.txt text eol=crlf
+
+# Everything else: normalized LF in the repository.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.ico binary

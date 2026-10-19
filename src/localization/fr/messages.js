@@ -55,9 +55,9 @@ export const L_fr_messages = {
 "m.catch.2":"{p0} Nv.1 rejoint votre Équipe active !",
 "m.catch.3":"Doublon détecté – {p0}₽",
 "m.catch.4":"Vous possédez déjà {p0} ! Échangé contre {p1}₽.",
-"m.catch.5":"<span class=\"shiny-tag\"></span> Skin Shiny débloqué pour {p0} !",
-"m.catch.6":"<span class=\"msg-green\"> {p0} a été capturé !</span>",
-"m.catch.7":"<span class=\"msg-light1\"> Le {p0} sauvage s'est échappé après sa défaite...</span>",
+"m.catch.5":"Skin Shiny débloqué pour {p0} !",
+"m.catch.6":"{p0} a été capturé !",
+"m.catch.7":"Le {p0} sauvage s'est échappé après sa défaite...",
 "m.hatchery.1":"{p0} éclot Nv.1{p1} !",
 "m.hatchery.2":"ÉCLOSION SHINY ! {p0} est né Shiny !",
 "m.inventory.1":"Tous vos Pokémon sont déjà niveau 100 !",
@@ -87,7 +87,7 @@ export const L_fr_messages = {
 "m.map.20":"Aucune autre capacité disponible.",
 "m.map.21":"Apprendre",
 "m.map.22":"Puiss :",
-"m.map.23":"Capacités apprenables '+(full?'<span class=\"msg-red\">(oubliez-en une d'abord)</span>':'') + ' :",
+"m.map.23":"Capacités apprenables :",
 "m.map.24":"Oublier",
 "m.map.25":"Puiss :",
 "m.map.26":"Verrouillé : à capturer pour débloquer",
@@ -126,7 +126,7 @@ export const L_fr_messages = {
 "m.map.6":"Aucune autre capacité disponible.",
 "m.map.7":"Apprendre",
 "m.map.8":"Puiss :",
-"m.map.9":"Capacités apprenables '+(full?'<span class=\"msg-red\">(oubliez-en une d'abord)</span>':'') + ' :",
+"m.map.9":"Capacités apprenables :",
 "m.moves.1":"Carte :",
 "m.moves.10":"Abandonner",
 "m.moves.11":"Automatisation (PokéClicker Tools)",
@@ -339,12 +339,6 @@ export const L_fr_messages = {
 "daycare_evicted_funds":"{name} a été retiré de la Garderie : fonds insuffisants pour payer ses nouveaux niveaux ({fee}₽ requis) !",
 "daycare_evicted_max":"{name} a atteint le Niveau 100 et sort de la Garderie !",
 "treasure_sold":" Vendu {n}x {item} pour +{gain}₽ !",
-"evolution_region_locked":"Cette évolution ({region}) se débloquera après avoir découvert {region} !"
+"evolution_region_locked":"Cette évolution ({region}) se débloquera après avoir découvert {region} !",
+  "m.map.forget_first": "(oubliez-en une d'abord)"
 };
-
-// T2 (vague 38) : module ESM — export natif ; la surface classique est
-// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
-if (typeof globalThis !== 'undefined') globalThis.L_fr_messages = L_fr_messages;
-
-
-

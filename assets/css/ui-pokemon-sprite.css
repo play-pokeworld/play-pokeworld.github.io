@@ -1,0 +1,10 @@
+/* ==========================================================================
+   UIPokemonSprite Component CSS
+   Disc / wrapper look comes from design-system.css (.pw-poke-circle-wrap,
+   .pw-poke-circle-bg, .pw-poke-circle-img). Only the size tokens live here
+   (the original set them as inline width/height styles).
+   ========================================================================== */
+
+.pw-poke-circle-wrap--standard { width: 56px; height: 56px; }
+.pw-poke-circle-wrap--large { width: 72px; height: 72px; }
+.pw-poke-circle-wrap--team { width: 96px; height: 96px; }

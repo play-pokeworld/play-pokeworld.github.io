@@ -1,0 +1,84 @@
+/* ==========================================================================
+   UIText Component CSS & Inline Symbol Icons
+   ========================================================================== */
+
+/* Specificity policy: base-widget defaults are wrapped in :where() so they
+   carry ZERO specificity. Any component/page class (e.g. .hbtn,
+   .save-menu-bg-layer) therefore overrides them without !important. */
+
+:where(.pw-text) {
+  display: inline-block;
+  line-height: 1.4;
+  color: inherit;
+}
+
+/* --- Inline Symbol Icons (for currency, badges, balls, pokémon) --- */
+.pw-inline-icon {
+  display: inline-block;
+  vertical-align: middle;
+  height: 1.15em;
+  width: auto;
+  max-width: 1.5em;
+  margin: 0 2px;
+  object-fit: contain;
+}
+
+.pw-inline-icon--currency {
+  height: 1.2em;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+.pw-inline-icon--ball {
+  height: 1.25em;
+}
+
+.pw-inline-icon--badge {
+  height: 1.35em;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
+}
+
+.pw-inline-icon--pokemon {
+  height: 1.5em;
+}
+
+.pw-currency-value {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 700;
+  color: var(--pw-accent-gold);
+}
+
+/* --- Text Alignment Modifiers --- */
+:where(.pw-text--align-left) {
+  text-align: left;
+}
+
+:where(.pw-text--align-center) {
+  text-align: center;
+}
+
+:where(.pw-text--align-right) {
+  text-align: right;
+}
+
+/* --- Text Size Modifiers --- */
+.pw-text--xs { font-size: var(--pw-font-size-xs); }
+.pw-text--sm { font-size: var(--pw-font-size-sm); }
+.pw-text--md { font-size: var(--pw-font-size-md); }
+.pw-text--lg { font-size: var(--pw-font-size-lg); }
+.pw-text--xl { font-size: var(--pw-font-size-xl); }
+
+/* --- Text Weight & Color Modifiers --- */
+.pw-text--bold { font-weight: 700; }
+.pw-text--muted { color: var(--pw-text-muted); }
+.pw-text--gold { color: var(--pw-accent-gold); }
+.pw-text--danger { color: var(--pw-accent-danger); }
+.pw-text--success { color: var(--pw-accent-success); }
+
+/* --- Semantic Colour Modifiers (controlled by JS setColor(token)) --- */
+.pw-text--color-primary { color: var(--light2); }
+.pw-text--color-secondary { color: var(--light1); }
+.pw-text--color-muted { color: var(--pw-text-muted); }
+.pw-text--color-accent { color: var(--accent); }
+.pw-text--color-danger { color: var(--red); }
+.pw-text--color-success { color: var(--green); }

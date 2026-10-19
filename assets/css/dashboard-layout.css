@@ -1,0 +1,112 @@
+/* ==========================================================================
+   Dashboard scroll & drag model (v1.2) — loaded last, overrides the legacy
+   layers of design-system.css.
+   - The game screen is exactly one viewport high; the header never moves.
+   - #main-dashboard is the ONLY scroll container: it scrolls down to the
+     bottom of the longest column.
+   - Columns and windows take the height of their content: a DraggablePanel is
+     never cut and never scrolls internally.
+   - A dragged window follows the pointer through a GPU transform only.
+   ========================================================================== */
+
+.pw-game-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.pw-game-screen > #header {
+  flex: none;
+}
+
+body:not(.mobile-mode) #main-dashboard {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  align-items: flex-start !important;
+}
+
+body:not(.mobile-mode) #main-dashboard > .dash-col {
+  height: auto !important;
+  max-height: none !important;
+  min-height: 120px;
+  overflow: visible !important;
+  padding-bottom: 4px;
+}
+
+body:not(.mobile-mode) #main-dashboard .dash-win {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  max-height: none !important;
+  transition: none !important;
+}
+
+body:not(.mobile-mode) #main-dashboard .dash-win > .win-body {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* Large secret-base rooms scale down to the column instead of scrolling. */
+body:not(.mobile-mode) #main-dashboard #base-panel.win-body canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* --- Window being dragged (mounted at the end of <body>) --- */
+.dash-win.pw-win-dragging {
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: var(--pw-drag-w, auto) !important;
+  height: var(--pw-drag-h, auto) !important;
+  margin: 0 !important;
+  z-index: 10000 !important;
+  transform: translate3d(var(--pw-drag-x, 0), var(--pw-drag-y, 0), 0) !important;
+  will-change: transform;
+  transition: none !important;
+  opacity: .93 !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, .6) !important;
+  pointer-events: none !important;
+}
+
+body.pw-window-drag-active,
+body.pw-window-drag-active * {
+  user-select: none !important;
+  cursor: grabbing !important;
+}
+
+/* --- Top bar: fixed height so that overlays can sit right below it --- */
+body:not(.mobile-mode) .pw-game-screen > #header {
+  height: var(--pw-game-header-h);
+  min-height: var(--pw-game-header-h);
+  box-sizing: border-box;
+}
+
+body.mobile-mode {
+  --pw-game-header-h: 52px;
+  --pw-mobile-nav-h: 54px; /* sticky main nav row of design-system.css (J2) */
+}
+
+/* Toasts never cover the logo / title bar of the game screen. */
+body:has(#header) .pw-notification-container {
+  top: calc(var(--pw-game-header-h) + 8px);
+}
+
+/* On mobile the main nav row sticks under the header: toasts go below it too. */
+body.mobile-mode:has(#header) .pw-notification-container {
+  top: calc(var(--pw-game-header-h) + var(--pw-mobile-nav-h) + 8px);
+}
+
+/* MobileDashboardNav is a pure grouping widget: its children (.mobile-nav-bar, .mobile-subnav)
+   keep the positioning given by design-system.css as if they were direct children of the body. */
+.pw-mobile-dashboard-nav {
+  display: contents;
+}

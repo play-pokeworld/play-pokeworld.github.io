@@ -1,0 +1,146 @@
+/* ==========================================================================
+   UIButton Component CSS
+   Configured and customized dynamically from JS
+   ========================================================================== */
+
+/* Specificity policy: base-widget defaults are wrapped in :where() so they
+   carry ZERO specificity. Any component/page class (e.g. .hbtn,
+   .save-menu-bg-layer) therefore overrides them without !important. */
+
+:where(.pw-button) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  font-weight: 600;
+  border-radius: var(--pw-radius-sm);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease-in-out;
+  outline: none;
+  text-decoration: none;
+  background-color: transparent;
+  color: var(--pw-text-primary);
+}
+
+:where(.pw-button:active) {
+  transform: translateY(1px);
+}
+
+/* --- Alignment Modifiers (controlled by JS setTextAlign) --- */
+:where(.pw-button--align-left) {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+:where(.pw-button--align-center) {
+  justify-content: center;
+  text-align: center;
+}
+
+:where(.pw-button--align-right) {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+/* --- Size Modifiers (controlled by JS setSize) --- */
+:where(.pw-button--sm) {
+  padding: 4px 10px;
+  font-size: var(--pw-font-size-xs);
+}
+
+:where(.pw-button--md) {
+  padding: 8px 16px;
+  font-size: var(--pw-font-size-sm);
+}
+
+:where(.pw-button--lg) {
+  padding: 12px 24px;
+  font-size: var(--pw-font-size-md);
+}
+
+/* --- Width Modifier --- */
+.pw-button--full-width {
+  width: 100%;
+}
+
+/* --- Visual Variants (controlled by JS setVariant) --- */
+.pw-button--primary {
+  background-color: var(--pw-accent-gold);
+  color: var(--pw-text-dark);
+  border-color: var(--pw-accent-gold);
+}
+
+.pw-button--primary:hover {
+  background-color: var(--pw-accent-gold-hover);
+  box-shadow: 0 0 10px rgba(255, 225, 94, 0.4);
+}
+
+.pw-button--secondary {
+  background-color: var(--pw-bg-surface-elevated);
+  color: var(--pw-text-primary);
+  border-color: var(--pw-border-color);
+}
+
+.pw-button--secondary:hover {
+  border-color: var(--pw-accent-gold);
+  background-color: #38342E;
+}
+
+.pw-button--danger {
+  background-color: var(--pw-accent-danger);
+  color: var(--pw-text-white);
+  border-color: var(--pw-accent-danger);
+}
+
+.pw-button--danger:hover {
+  background-color: var(--pw-accent-danger-hover);
+  box-shadow: 0 0 10px rgba(231, 76, 60, 0.4);
+}
+
+.pw-button--success {
+  background-color: var(--pw-accent-success);
+  color: var(--pw-text-dark);
+  border-color: var(--pw-accent-success);
+}
+
+.pw-button--success:hover {
+  background-color: var(--pw-accent-success-hover);
+}
+
+.pw-button--ghost {
+  background-color: transparent;
+  color: var(--pw-text-secondary);
+  border-color: transparent;
+}
+
+.pw-button--ghost:hover {
+  color: var(--pw-text-primary);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.pw-button--tab {
+  background: transparent;
+  color: var(--pw-text-secondary);
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  padding: 8px 14px;
+}
+
+.pw-button--tab.is-active,
+.pw-button--tab:hover {
+  color: var(--pw-accent-gold);
+  border-bottom-color: var(--pw-accent-gold);
+}
+
+:where(.pw-button-icon) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+:where(.pw-button-text) {
+  line-height: 1;
+}
+

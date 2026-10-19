@@ -1,0 +1,18 @@
+/* ==========================================================================
+   UIImage Component CSS
+   ========================================================================== */
+
+:where(.pw-image) {
+  display: block;
+  max-width: 100%;
+  user-select: none;
+}
+
+.pw-image--pixelated {
+  image-rendering: pixelated;
+}
+
+/* Source and fallback both failed: keep the layout, hide the broken glyph */
+.pw-image.is-broken {
+  visibility: hidden;
+}

@@ -1,0 +1,20 @@
+/* ==========================================================================
+   UIFileButton Component CSS — label wrapping a hidden file input
+   ========================================================================== */
+
+:where(.pw-file-btn) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Visually hidden but still reachable by the <label for> association */
+.pw-file-btn-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}

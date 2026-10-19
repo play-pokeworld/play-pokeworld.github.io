@@ -1,0 +1,11 @@
+PokeWorld needs Node.js to run locally (the game uses ES modules,
+which browsers refuse to load from file:// URLs).
+  1. Download the LTS version from https://nodejs.org
+  2. Install it with the default options.
+  3. Run start.bat again.
+
+PokeWorld a besoin de Node.js pour tourner en local (le jeu utilise
+des modules ES que les navigateurs refusent de charger en file://).
+  1. Telechargez la version LTS sur https://nodejs.org
+  2. Installez-la avec les options par defaut.
+  3. Relancez start.bat.

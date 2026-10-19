@@ -1,0 +1,72 @@
+/* ==========================================================================
+   PokéWorld — Save Menu (rework extras only)
+   --------------------------------------------------------------------------
+   The canonical look of the save screen (.save-menu-screen, .save-menu-panel,
+   #save-menu-title, .save-slot*, .save-card-context-menu...) is defined ONCE in
+   design-system.css, exactly like the original game. This file must only hold
+   what the rework adds on top of it — never re-declare those rules here
+   (v1.0 duplicated them with different values: wrong title font, background
+   layer pushed to mid-screen, Discord button repainted by .hbtn).
+   ========================================================================== */
+
+/* --- Rework addition: soft fade on the left/right edges of the save carousel
+       (only when cards are present: the empty-state box keeps its original width) --- */
+.save-menu-list:has(.save-slot) {
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 32px, #000 calc(100% - 32px), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 32px, #000 calc(100% - 32px), transparent 100%);
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
+/* --- Icon glyphs replacing the legacy text characters (‹ › ◇) --- */
+.save-menu-scroll-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.save-menu-scroll-btn .pw-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.save-menu-empty-icon .pw-icon {
+  width: 26px;
+  height: 26px;
+}
+
+/* --- Import button: the native file input stays hidden inside the label --- */
+.save-menu-action-secondary.pw-file-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* --- Language switcher: centred under the Discord button --- */
+.save-menu-lang-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+/* --- Context menu items: icon + label --- */
+.save-context-item .pw-button-icon .pw-icon {
+  width: 15px;
+  height: 15px;
+}
+
+/* Fix of an original-game conflict: the global `button.danger` rule painted the
+   "Delete" item solid red under pink text (unreadable). Keep the item flat;
+   the red tint only appears on hover (design-system rule). */
+#save-card-context-menu .save-context-item.danger:not(:hover) {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+
+/* Fix of an original-game contrast issue: on the half-white "Black & White"
+   card theme the white stat numbers were invisible on the light half. */
+.save-slot.save-bg-blackwhite .save-slot-stats span {
+  background: rgba(0, 0, 0, 0.45);
+}

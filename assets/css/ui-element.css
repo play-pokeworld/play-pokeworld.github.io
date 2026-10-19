@@ -1,0 +1,44 @@
+/* ==========================================================================
+   UIElement Base CSS
+   ========================================================================== */
+
+/* Specificity policy: base-widget defaults are wrapped in :where() so they
+   carry ZERO specificity. Any component/page class (e.g. .hbtn,
+   .save-menu-bg-layer) therefore overrides them without !important. */
+
+:where(.pw-element) {
+  position: relative;
+  box-sizing: border-box;
+}
+
+.pw-element.is-hidden {
+  display: none !important;
+}
+
+.pw-element.is-disabled {
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+}
+
+:where(.pw-page) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* Floating elements positioned at runtime through UIElement.setPosition(x, y).
+   JS only pushes the two coordinates; the layout rule lives here. */
+.pw-element.pw-floating {
+  position: fixed;
+  left: var(--pw-pos-x, 0);
+  top: var(--pw-pos-y, 0);
+}
+
+/* Hidden but still occupying its layout slot (e.g. carousel arrows) */
+.pw-element.is-invisible {
+  visibility: hidden !important;
+}

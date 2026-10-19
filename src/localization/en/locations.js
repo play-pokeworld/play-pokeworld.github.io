@@ -180,10 +180,3 @@ export const L_location_names_en = {
   "weather_institute": "Weather Institute",
   "whirlislands": "Whirl Islands"
 };
-
-// T2 (vague 38) : module ESM — export natif ; la surface classique est
-// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
-if (typeof globalThis !== 'undefined') globalThis.L_location_names_en = L_location_names_en;
-
-
-

@@ -1,0 +1,29 @@
+/* ==========================================================================
+   UITextInput Component CSS
+   ========================================================================== */
+
+:where(.pw-input) {
+  font-family: inherit;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(236, 222, 183, 0.3);
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--light2);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  user-select: text;
+}
+
+.pw-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.pw-input::placeholder {
+  color: color-mix(in srgb, var(--light1) 70%, transparent);
+}
+
+.pw-input.is-invalid {
+  border-color: var(--red);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--red) 30%, transparent);
+}

@@ -1,0 +1,75 @@
+/**
+ * Save Menu & Slot Localization (English)
+ */
+export const save = {
+  // Main Save Menu Screen
+  save_menu_title: 'PokéWorld',
+  save_menu_subtitle: 'Choose a save or create a new adventure.',
+  save_menu_empty_title: 'No save found',
+  save_menu_empty_desc: 'Create a new save or import a file to add it to the list.',
+  save_menu_new: 'New save',
+  save_menu_import: 'Import',
+  save_menu_click_hint: 'Click to play',
+  save_menu_badges: 'Badges',
+  save_menu_pokedex: 'Pokédex',
+  save_menu_playtime: 'Play time',
+  save_menu_id: 'ID',
+  
+  // Right-Click Context Menu
+  save_context_download: 'Download',
+  save_context_import_overwrite: 'Import (overwrite)',
+  save_context_duplicate: 'Duplicate Save',
+  save_context_delete: 'Delete',
+  
+  // New Game Modal
+  new_game_title: 'New Game',
+  new_game_trainer_name: 'Trainer Name',
+  new_game_trainer_placeholder: 'Red',
+  new_game_theme: 'Card Theme',
+  new_game_theme_classic: 'Classic Blue',
+  new_game_theme_goldsilver: 'Gold & Silver',
+  new_game_theme_emerald: 'Emerald',
+  new_game_theme_diamondpearl: 'Diamond & Pearl',
+  new_game_theme_blackwhite: 'Black & White',
+  new_game_theme_xy: 'X & Y',
+  new_game_theme_forest: 'Enchanted Forest',
+  new_game_cancel: 'Cancel',
+  new_game_start: 'Start Adventure',
+  new_game_validation_name: 'Please enter a valid trainer name.',
+  
+  // Delete Confirmation
+  save_delete_title: 'Delete Save Confirmation',
+  save_delete_prompt: 'Are you sure you want to delete save {id} ({name})? This cannot be undone.',
+  save_delete_success: 'Save {id} deleted successfully.',
+  save_duplicate_success: 'Save duplicated successfully as {id}.',
+  save_import_success: 'Save imported successfully ({name})!',
+  save_import_invalid: 'The selected file is not a valid PokéWorld save file.',
+  notif_new_save_created: 'New game created for {name}!',
+  save_click_to_continue: 'Click to continue',
+  save_id_prefix: 'ID:',
+  save_badges_label: 'Badges',
+  save_pokedex_label: 'Pokédex',
+  save_playtime_label: 'Playtime',
+
+  // Save menu — added in v1.1 (keys used by SaveMenuPage / SaveCard)
+  save_menu_prev_aria: 'Previous saves',
+  save_menu_next_aria: 'Next saves',
+  save_context_rename: 'Rename',
+  save_context_export: 'Export (JSON)',
+  save_rename_title: 'Rename save',
+  save_rename_prompt: 'New Trainer name:',
+  save_renamed_success: 'Save renamed: {name}',
+  save_duplicated_success: 'Save duplicated successfully!',
+  save_exported_success: 'Save file exported!',
+  save_deleted_success: 'Save permanently deleted.',
+  save_card_id: 'ID: {id}',
+  save_playtime_minutes: '{m}m',
+  save_playtime_hours: '{h}h {m}m',
+  default_trainer_name: 'Trainer',
+  btn_cancel: 'Cancel',
+  btn_confirm: 'Confirm',
+  btn_delete: 'Delete',
+  lang_label_fr: 'FR',
+  lang_label_en: 'EN',
+  lang_switch_aria: 'Change language',
+};

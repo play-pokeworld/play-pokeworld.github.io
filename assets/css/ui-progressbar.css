@@ -1,0 +1,70 @@
+/* ==========================================================================
+   UIProgressBar Component CSS
+   ========================================================================== */
+
+.pw-progress-bar {
+  position: relative;
+  height: 14px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+}
+
+.pw-progress-bar--sm {
+  height: 10px;
+}
+
+.pw-progress-bar--lg {
+  height: 20px;
+}
+
+.pw-progress-fill {
+  height: 100%;
+  width: var(--pw-progress, 0%);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- Progress Bar Variants (controllable via JS setVariant) --- */
+.pw-progress-bar--hp .pw-progress-fill {
+  background: linear-gradient(90deg, #27ae60, #2ecc71);
+}
+
+.pw-progress-bar--exp .pw-progress-fill {
+  background: linear-gradient(90deg, #2980b9, #3498db);
+}
+
+.pw-progress-bar--energy .pw-progress-fill {
+  background: linear-gradient(90deg, #d35400, #e67e22);
+}
+
+.pw-progress-bar--dungeon .pw-progress-fill {
+  background: linear-gradient(90deg, #8e44ad, #9b59b6);
+}
+
+.pw-progress-bar--gold .pw-progress-fill {
+  background: linear-gradient(90deg, #f39c12, #ffe15e);
+}
+
+.pw-progress-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
+
+/* --- Legacy skins (UIProgressBar trackClassName / fillClassName): only the ratio is shared.
+   !important: the ratio is the single runtime value of the widget and must win over the
+   skin rules of design-system.css (some of them set a width, e.g. --pct based ones). --- */
+.pw-progress > .pw-progress-fill {
+  width: var(--pw-progress, 0%) !important;
+}

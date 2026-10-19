@@ -1,0 +1,167 @@
+/**
+ * Notifications Styles
+ * Top-left descending notification stack, channels and badges.
+ * Dynamically sized to content; vertically centered dismiss action on the right.
+ */
+.pw-notification-container {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+  max-width: 400px;
+  width: calc(100vw - 32px);
+}
+
+.pw-toast-card {
+  pointer-events: auto;
+  background: rgba(30, 27, 24, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(236, 222, 183, 0.25);
+  border-left: 4px solid var(--green, #2ecc71);
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+  color: var(--light2, #ECDEB7);
+  font-family: 'Winky Sans', 'Segoe UI', system-ui, sans-serif;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: fit-content;
+  max-width: 380px;
+  min-width: 180px;
+  box-sizing: border-box;
+}
+
+.pw-toast-card.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.pw-toast-card.is-leaving {
+  opacity: 0;
+  transform: translateX(-24px);
+}
+
+.pw-toast-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pw-toast-top {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.pw-toast-badge {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.pw-toast-badge.channel-system {
+  background: rgba(52, 152, 219, 0.22);
+  color: #70b5ff;
+  border: 1px solid rgba(52, 152, 219, 0.4);
+}
+
+.pw-toast-badge.channel-gameplay {
+  background: rgba(46, 204, 113, 0.22);
+  color: #69f0ae;
+  border: 1px solid rgba(46, 204, 113, 0.4);
+}
+
+.pw-toast-badge.channel-battle {
+  background: rgba(231, 76, 60, 0.22);
+  color: #ff8a80;
+  border: 1px solid rgba(231, 76, 60, 0.4);
+}
+
+.pw-toast-badge.channel-economy {
+  background: rgba(241, 196, 15, 0.22);
+  color: #ffd54f;
+  border: 1px solid rgba(241, 196, 15, 0.4);
+}
+
+.pw-toast-badge.channel-achievement {
+  background: rgba(155, 89, 182, 0.22);
+  color: #e1bee7;
+  border: 1px solid rgba(155, 89, 182, 0.4);
+}
+
+.pw-toast-body {
+  font-size: 13px;
+  line-height: 1.4;
+  color: #ECDEB7;
+  word-break: break-word;
+}
+
+.pw-toast-action {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pw-toast-timer-tag {
+  font-size: 10px;
+  color: #C8BBA0;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.pw-toast-close {
+  background: transparent;
+  border: none;
+  color: #C8BBA0;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.pw-toast-close:hover {
+  background: rgba(231, 76, 60, 0.25);
+  color: #ff8a80;
+}
+
+
+/* UIToast close button is a UIButton: neutralize the generic .pw-button skin */
+.pw-button.pw-toast-close {
+  min-height: 0;
+  min-width: 0;
+  box-shadow: none;
+}
+
+.pw-toast-close .pw-icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* --- Semantic tones (NotificationSystem.notify(msg, { tone: '<tone>' })) --- */
+.pw-toast-card.pw-toast--tone-success { border-left-color: var(--green); }
+.pw-toast-card.pw-toast--tone-danger { border-left-color: var(--red); }
+.pw-toast-card.pw-toast--tone-info { border-left-color: var(--blue); }
+.pw-toast-card.pw-toast--tone-accent { border-left-color: var(--accent); }
+.pw-toast-card.pw-toast--tone-warning { border-left-color: var(--orange); }

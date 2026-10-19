@@ -1,0 +1,92 @@
+/* ==========================================================================
+   UIPanel Component CSS
+   ========================================================================== */
+
+.pw-panel {
+  background-color: var(--pw-bg-surface);
+  border: 1px solid var(--pw-border-color);
+  border-radius: var(--pw-radius-md);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--pw-shadow-sm);
+  transition: border-color 0.15s ease;
+}
+
+.pw-panel--collapsible .pw-panel-header {
+  cursor: pointer;
+}
+
+.pw-panel-header {
+  background-color: rgba(0, 0, 0, 0.25);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--pw-border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 38px;
+}
+
+.pw-panel-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pw-panel-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pw-panel-title {
+  font-size: var(--pw-font-size-sm);
+  font-weight: 700;
+  color: var(--pw-accent-gold);
+  text-transform: none;
+  letter-spacing: 0.3px;
+}
+
+.pw-panel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pw-panel-body {
+  padding: 12px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.pw-panel-footer {
+  padding: 8px 12px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid var(--pw-border-color);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* --- Panel Border & Accent Modifiers --- */
+.pw-panel--accent-gold {
+  border-color: var(--pw-accent-gold);
+}
+
+.pw-panel--dense .pw-panel-body {
+  padding: 8px;
+}
+
+
+/* --- UIPanel collapse state (UIPanel.toggleCollapse) --- */
+.pw-win-hdr.is-collapsible {
+  cursor: pointer;
+}
+
+.dash-win.is-collapsed > .win-body,
+.dash-win.is-collapsed > .pw-panel-footer {
+  display: none;
+}

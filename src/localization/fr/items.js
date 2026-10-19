@@ -100,6 +100,26 @@ export const L_fr_items = {
     "name": "Lunettes Choix",
     "desc": "Objet tenu avec un effet spécial."
   },
+  "choice_scarf": {
+    "name": "Mouchoir Choix",
+    "desc": "Vitesse +50 % au cumul max (25/25)."
+  },
+  "swift_charm": {
+    "name": "Charme Vif",
+    "desc": "Vitesse et PV max +30 % au cumul max."
+  },
+  "focus_lens": {
+    "name": "Lentille Focus",
+    "desc": "Vitesse et Att. Spé. +35 % au cumul max."
+  },
+  "power_gem": {
+    "name": "Rayon Gemme",
+    "desc": "Attaque Spéciale +40 % au cumul max."
+  },
+  "thick_club": {
+    "name": "Masse Os",
+    "desc": "Tenu (Osselait/Ossatueur) : Attaque +40 % !"
+  },
   "life_orb": {
     "name": "Orbe Vie",
     "desc": "Objet tenu avec un effet spécial."
@@ -926,7 +946,6 @@ export const L_fr_items = {
   }
 };
 
-
 // Canonical names for items which must never fall back to a localization key.
 Object.assign(L_fr_items, {
   prine_berry: { name: 'Baie Prine', desc: 'Augmente la Défense de 25 % au cumul maximal.' },
@@ -939,7 +958,6 @@ Object.assign(L_fr_items, {
   shiny_charm: { name: 'Charme Chroma', desc: 'Obtenu en complétant 100 % d\'un Pokédex régional. Augmente les chances de chromatique uniquement pour les Pokémon des régions complétées (taux 1/2048).' },
   upgrade: { name: 'Améliorator', desc: 'Objet d’évolution pour les Pokémon compatibles.' }
 });
-
 
 Object.assign(L_fr_items, {
   skull_fossil: { name: 'Fossile Crâne', desc: 'Un fossile officiel réservé à son futur Pokémon compatible.' },
@@ -979,7 +997,6 @@ Object.assign(L_fr_items, {
 Object.assign(L_fr_items, {
  firestone:{name:'Pierre Feu',desc:'Une pierre permettant à certains Pokémon d’évoluer.'}, waterstone:{name:'Pierre Eau',desc:'Une pierre permettant à certains Pokémon d’évoluer.'}, thunderstone:{name:'Pierre Foudre',desc:'Une pierre permettant à certains Pokémon d’évoluer.'}, leafstone:{name:'Pierre Plante',desc:'Une pierre permettant à certains Pokémon d’évoluer.'}, moonstone:{name:'Pierre Lune',desc:'Une pierre permettant à certains Pokémon d’évoluer.'}, sunstone:{name:'Pierre Soleil',desc:'Une pierre permettant à certains Pokémon d’évoluer.'}, pokeflute:{name:'Poké Flûte',desc:'Réveille les Pokémon endormis et permet de progresser dans l’aventure.'}, nugget:{name:'Pépite',desc:'Pépite d’or déterrée dans la mine : se revend contre des diamants.'}, stardust:{name:'Poussière Étoile',desc:'Jolie poussière rouge déterrée dans la mine : se revend contre des diamants.'}, muscle_band:{name:'Muscle Band',desc:'Objet tenu qui augmente l’Attaque.'}, rarecandy:{name:'Super Bonbon',desc:'Augmente instantanément le niveau d’un Pokémon de 1.'}, kings_rock:{name:'Roche Royale',desc:'Objet d’évolution pour les Pokémon compatibles.'}, dragon_scale:{name:'Écaille Draco',desc:'Objet d’évolution pour les Pokémon compatibles.'}, deep_sea_scale:{name:'Écaille Océan',desc:'Objet d’évolution pour les Pokémon compatibles.'}, deep_sea_tooth:{name:'Dent Océan',desc:'Objet d’évolution pour les Pokémon compatibles.'}, silver_wing:{name:'Aile Argentée',desc:'Objet-clé requis pour rencontrer Lugia.'}, rainbow_wing:{name:'Arcenci’Aile',desc:'Objet-clé requis pour rencontrer Ho-Oh.'}
 });
-
 
 Object.assign(L_fr_items, {
   occa_berry: { name: L_fr_items.occa_berry?.name || 'occa berry', desc: 'Objet tenu : réduit de 30 % les dégâts super efficaces de type Feu.' },
@@ -1035,10 +1052,3 @@ Object.assign(L_fr_items, {
   fossilized_drake: { ...(L_fr_items.fossilized_drake || {name:'fossilized_drake'}), desc: 'Un fossile de Galar à combiner avec un autre fossile pour réanimer un Pokémon.' },
   fossilized_fish: { ...(L_fr_items.fossilized_fish || {name:'fossilized_fish'}), desc: 'Un fossile de Galar à combiner avec un autre fossile pour réanimer un Pokémon.' }
 });
-
-// T2 (vague 38) : module ESM — export natif ; la surface classique est
-// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
-if (typeof globalThis !== 'undefined') globalThis.L_fr_items = L_fr_items;
-
-
-

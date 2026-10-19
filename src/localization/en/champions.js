@@ -44,10 +44,3 @@ export const L_en_champions = {
   "steven": {"name":"Steven Stone","title":"Hoenn Champion","badgeName":"Hoenn Champion Title"},
   "hoenn_elite4": {"name":"Hoenn League","title":"Hoenn League","badgeName":"Hoenn Champion Title"},
 };
-
-// T2 (vague 38) : module ESM — export natif ; la surface classique est
-// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
-if (typeof globalThis !== 'undefined') globalThis.L_en_champions = L_en_champions;
-
-
-

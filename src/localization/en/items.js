@@ -1050,7 +1050,6 @@ export const L_en_items = {
   }
 };
 
-
 Object.assign(L_en_items, {
   skull_fossil: { name: 'Skull Fossil', desc: 'An official fossil reserved for its future compatible Pokémon.' },
   armor_fossil: { name: 'Armor Fossil', desc: 'An official fossil reserved for its future compatible Pokémon.' },
@@ -1085,7 +1084,6 @@ Object.assign(L_en_items, {
   unremarkable_teacup: { name: 'Unremarkable Teacup', desc: 'An official evolution item for a compatible Pokémon.' },
   masterpiece_teacup: { name: 'Masterpiece Teacup', desc: 'An official evolution item for a compatible Pokémon.' }
 });
-
 
 Object.assign(L_en_items, {
   occa_berry: { name: L_en_items.occa_berry?.name || 'occa berry', desc: 'When held: reduces super-effective Fire-type damage by 30%.' },
@@ -1141,10 +1139,3 @@ Object.assign(L_en_items, {
   fossilized_drake: { ...(L_en_items.fossilized_drake || {name:'fossilized_drake'}), desc: 'A Galar fossil component. Combine it with another fossil to revive a Pokémon.' },
   fossilized_fish: { ...(L_en_items.fossilized_fish || {name:'fossilized_fish'}), desc: 'A Galar fossil component. Combine it with another fossil to revive a Pokémon.' }
 });
-
-// T2 (vague 38) : module ESM — export natif ; la surface classique est
-// gardée sur l'objet global pour les registres (data.js) et les harnais VM.
-if (typeof globalThis !== 'undefined') globalThis.L_en_items = L_en_items;
-
-
-

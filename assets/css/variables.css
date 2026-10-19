@@ -1,0 +1,49 @@
+/* ==========================================================================
+   Rework-only design tokens. The palette, fonts and theme tokens live in
+   design-system.css (the original stylesheet); only tokens it does not define
+   are declared here, so there is a single source of truth per token.
+   ========================================================================== */
+
+:root {
+  --accent-hover: #FFF099;
+  --red-hover: #E55575;
+  --discord: #5865F2;
+  --discord-hover: #4752C4;
+  --pw-bg-app: #151412;
+  --pw-bg-surface-elevated: #36342F;
+  --pw-border-light: rgba(255, 255, 255, 0.1);
+  --pw-border-focus: #FFE15E;
+  --pw-text-muted: #8E8472;
+  --pw-text-dark: #1C1A17;
+  --pw-text-white: #FFFFFF;
+  --pw-accent-gold: #FFE15E;
+  --pw-accent-gold-hover: #FFF099;
+  --pw-accent-danger: #D3425F;
+  --pw-accent-danger-hover: #E55575;
+  --pw-accent-success: #2ECC71;
+  --pw-radius-xl: 24px;
+}
+
+* {
+  font-family: var(--pw-font-main);
+  letter-spacing: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--pw-bg-app);
+  color: var(--pw-text-primary);
+  line-height: 1.4;
+  user-select: none;
+  overflow: hidden;
+  height: 100vh;
+}
+
+#app-root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+

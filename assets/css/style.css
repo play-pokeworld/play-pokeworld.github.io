@@ -1,0 +1,166 @@
+/* ==========================================================================
+   PokéWorld Main Unified Stylesheet
+   Imports all modular stylesheets following clean C++ OOP architecture.
+   Strict rule: CSS handles 100% of the styling, JS handles behavior and state.
+   ========================================================================== */
+
+@import url("./variables.css");
+@import url("./design-system.css");
+@import url("./ui-element.css");
+@import url("./ui-button.css");
+@import url("./ui-text.css");
+@import url("./ui-progressbar.css");
+@import url("./ui-panel.css");
+@import url("./ui-modal.css");
+@import url("./ui-dropdown.css");
+@import url("./ui-input.css");
+@import url("./ui-icon.css");
+@import url("./ui-image.css");
+@import url("./ui-link.css");
+@import url("./ui-file-button.css");
+@import url("./ui-context-menu.css");
+@import url("./ui-dialog.css");
+@import url("./ui-pokemon-sprite.css");
+@import url("./ui-map-view.css");
+@import url("./save-menu.css");
+@import url("./starter-modal.css");
+@import url("./game-dashboard.css");
+@import url("./notifications.css");
+@import url("./panels.css");
+@import url("./dashboard-layout.css");
+
+/* ==========================================================================
+   Universal Scrollbar Elimination
+   Requirement: Scrollbars must NOT be visible anywhere in the game.
+   ========================================================================== */
+
+*, *::before, *::after {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE & Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none !important; /* Chrome / Safari / Edge / Blink */
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* ==========================================================================
+   Draggable Window Chrome & Visual Indicators (DND-01)
+   ========================================================================== */
+
+.pw-win-hdr {
+  cursor: grab !important;
+  user-select: none;
+}
+
+.pw-win-hdr:active {
+  cursor: grabbing !important;
+}
+
+.pw-win-placeholder {
+  height: var(--pw-placeholder-h, 0);
+  width: 100%;
+  border: 1px dashed var(--accent, #FFA500) !important;
+  border-radius: var(--pw-radius-md, 10px) !important;
+  background: var(--pw-accent-soft, rgba(255,165,0,.10)) !important;
+  flex: none !important;
+  box-sizing: border-box !important;
+}
+
+.dash-col.col-hovered {
+  outline: 2px dashed #539DDF !important;
+  outline-offset: 4px;
+}
+
+/* ==========================================================================
+   Static Modals in 3 Discrete Sizes
+   ========================================================================== */
+
+.pw-static-modal--lg {
+  width: min(96vw, 1180px) !important;
+  max-width: 1180px !important;
+  max-height: 92vh !important;
+}
+
+.pw-static-modal--md {
+  width: min(90vw, 680px) !important;
+  max-width: 680px !important;
+  max-height: 85vh !important;
+}
+
+.pw-static-modal--sm {
+  width: min(88vw, 420px) !important;
+  max-width: 420px !important;
+  max-height: 70vh !important;
+}
+
+/* ==========================================================================
+   Responsive & Mobile Navigation Layout
+   ========================================================================== */
+
+@media (max-width: 850px), (pointer: coarse) {
+  body.mobile-mode #main-dashboard {
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    padding: 0 0 70px 0 !important;
+    gap: 10px !important;
+  }
+
+  body.mobile-mode .dash-col {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 8px !important;
+  }
+
+  body.mobile-mode .dash-win {
+    width: 100% !important;
+    margin-bottom: 8px !important;
+  }
+
+  body.mobile-mode .mobile-nav-bar {
+    display: flex !important;
+    position: sticky !important;
+    top: 52px !important;
+    z-index: 960 !important;
+    background: var(--dark1, #1C1A17) !important;
+    border-bottom: 1px solid rgba(236,222,183,0.15) !important;
+    padding: 6px 8px !important;
+    gap: 6px !important;
+    overflow-x: auto !important;
+  }
+
+  body.mobile-mode .mobile-subnav-bar {
+    display: flex !important;
+    position: sticky !important;
+    top: 92px !important;
+    z-index: 959 !important;
+    background: var(--dark2, #25231F) !important;
+    border-bottom: 1px solid rgba(236,222,183,0.12) !important;
+    padding: 4px 8px !important;
+    gap: 6px !important;
+    overflow-x: auto !important;
+  }
+
+  body.mobile-mode .mob-btn,
+  body.mobile-mode .mob-sub-btn {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    border-radius: 6px !important;
+    white-space: nowrap !important;
+    background: rgba(236,222,183,0.08) !important;
+    color: var(--light2, #ECDEB7) !important;
+    border: 1px solid rgba(236,222,183,0.2) !important;
+    cursor: pointer !important;
+  }
+
+  body.mobile-mode .mob-btn.active,
+  body.mobile-mode .mob-sub-btn.active {
+    background: var(--light2, #ECDEB7) !important;
+    color: var(--dark1, #1C1A17) !important;
+    border-color: var(--light2, #ECDEB7) !important;
+  }
+}
+

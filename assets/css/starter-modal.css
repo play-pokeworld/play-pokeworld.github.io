@@ -1,0 +1,110 @@
+/* ==========================================================================
+   PokéWorld — Starter selection modal (StarterModal.js)
+   Base look (#starter-modal-inner, .starter-card, .poke-sprite...) comes from
+   design-system.css like the original game. This file adds:
+     - the dark overlay of the original (#starter-modal),
+     - the trainer nickname field (rework addition),
+   ========================================================================== */
+
+/* Original overlay: near-opaque black, no blur */
+.pw-modal-backdrop.pw-starter-overlay {
+  background-color: rgba(0, 0, 0, 0.92);
+  backdrop-filter: none;
+}
+
+/* The window has no header bar: the body is the whole content */
+#starter-modal-inner > .win-body {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: visible;
+}
+
+.starter-welcome {
+  margin-bottom: 6px;
+}
+
+.starter-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* --- Trainer nickname field (sits under the welcome / title texts) --- */
+.starter-name-field {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  margin: 14px auto 6px;
+  width: min(100%, 360px);
+}
+
+.starter-name-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--light2);
+}
+
+.starter-name-input.pw-input {
+  width: 100%;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.starter-name-error {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--red);
+}
+
+/* --- Cards --- */
+.starter-cards-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0 10px;
+}
+
+.starter-cards-stack .starter-card {
+  margin-bottom: 0;
+}
+
+/* Plain "Choose" label like the original (design-system's coloured
+   .starter-choose-btn pill is intentionally not used) */
+.starter-choose-label {
+  align-self: center;
+}
+
+.starter-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.starter-dex-number {
+  margin-left: 4px;
+}
+
+.starter-modal-footer {
+  margin-top: 0;
+}
+
+/* Footer: "Back" button on the left, hint centered in the remaining space (v1.2). */
+.starter-modal-footer-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.starter-modal-footer-row > .starter-modal-footer {
+  flex: 1 1 auto;
+  text-align: center;
+  /* keeps the hint centered on the modal despite the button width */
+  padding-right: var(--pw-starter-back-w, 96px);
+}
+
+.starter-back-btn {
+  flex: none;
+  min-width: var(--pw-starter-back-w, 96px);
+}
