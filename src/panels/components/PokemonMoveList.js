@@ -44,6 +44,23 @@ export class PokemonMoveList extends UIContainer {
   }
 
   /**
+   * Paints the live next-move charge on the existing row (the battle engine remains authoritative).
+   * @param {number} index
+   * @param {number} progressPercent
+   */
+  setBattleProgress(index, progressPercent) {
+    const bounded = Math.max(0, Math.min(100, Number(progressPercent) || 0));
+    this.getChildren().forEach((move, slot) => {
+      const element = move.getDomElement();
+      if (!element.classList.contains('poke-move') || element.classList.contains('empty')) return;
+      const charging = slot === index;
+      move.toggleClass('charging', charging);
+      move.toggleClass('ready', charging && bounded >= 99);
+      element.style.setProperty('--charge-pct', charging ? `${bounded}%` : '0%');
+    });
+  }
+
+  /**
    * @private
    * @param {Readonly<Object>} move - MoveDB definition
    * @param {string[]|null} opponentTypes

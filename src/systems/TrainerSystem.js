@@ -161,7 +161,8 @@ export class TrainerSystem extends BaseSystem {
   /** @private @returns {boolean} */
   _beaten(save, owner, isLeague) {
     if (!save) return false;
-    if (isLeague || owner.kind === TrainerKinds.GYM) return save.player.hasBadge(owner.id);
+    if (isLeague) return save.statistics.hasWonLeague(owner.region);
+    if (owner.kind === TrainerKinds.GYM) return save.player.hasBadge(owner.id);
     return (save.statistics.trainerWins[owner.id] || 0) > 0;
   }
 

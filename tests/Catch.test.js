@@ -26,10 +26,12 @@ import { BallFilterMatcher } from '../src/systems/catch/BallFilterMatcher.js';
 import { BallSelector } from '../src/systems/catch/BallSelector.js';
 import { BallRateRules } from '../src/systems/catch/BallRateRules.js';
 import { SaveSystem } from '../src/systems/SaveSystem.js';
+import { SaveStorage } from '../src/systems/SaveStorage.js';
 import { PokeballSystem } from '../src/systems/PokeballSystem.js';
 import { CatchSystem } from '../src/systems/CatchSystem.js';
 import { BallFiltersChangedEvent } from '../src/core/events/BallFiltersChangedEvent.js';
 import { PokemonCaughtEvent } from '../src/core/events/PokemonCaughtEvent.js';
+import { CaptureAttemptResolvedEvent } from '../src/core/events/CaptureAttemptResolvedEvent.js';
 
 /** Encounter of a fresh wild Pokémon. */
 function encounterOf(species, { level = 5, shiny = false, owned = false, shinyOwned = false, locationKind = LocationKinds.ROUTE, ...rest } = {}) {
@@ -140,6 +142,39 @@ describe('Catch rates', (test) => {
 });
 
 describe('PokeballSystem commands', (test) => {
+  test('a successful filter edit is saved before its change event is published', () => {
+    const saveSystem = SaveSystem.getInstance();
+    const save = saveSystem.createNewSave('Filtre persistant', 'bulbasaur');
+    const balls = PokeballSystem.getInstance();
+    const originalSaveCurrent = saveSystem.saveCurrent;
+    const order = [];
+    let publishedFilterId = null;
+    let persistedBall = null;
+    const onChange = (event) => {
+      order.push('event');
+      publishedFilterId = event.filterId;
+      persistedBall = SaveStorage.read(save.id)?.ballFilters.getById(event.filterId)?.ball ?? null;
+    };
+
+    saveSystem.saveCurrent = function () {
+      order.push('save-start');
+      const result = originalSaveCurrent.call(this);
+      order.push('save-finished');
+      return result;
+    };
+    EventBus.getInstance().subscribe(BallFiltersChangedEvent, onChange);
+    try {
+      assert.equal(balls.setBall('new', 'greatball'), true);
+    } finally {
+      EventBus.getInstance().unsubscribe(BallFiltersChangedEvent, onChange);
+      saveSystem.saveCurrent = originalSaveCurrent;
+    }
+
+    assert.deepEqual(order, ['save-start', 'save-finished', 'event']);
+    assert.equal(publishedFilterId, 'new');
+    assert.equal(persistedBall, 'greatball', 'listeners observe the saved filter state');
+  });
+
   test('base filters: ball, switch and order only', () => {
     SaveSystem.getInstance().createNewSave('Filtres', 'bulbasaur');
     const balls = PokeballSystem.getInstance();
@@ -247,10 +282,14 @@ describe('Catch flow', (test) => {
     const save = SaveSystem.getInstance().createNewSave('Capture', 'charmander');
     PokeballSystem.getInstance().setBall('new', 'pokeball');
     const caught = [];
+    const captureResults = [];
     const onCaught = (event) => caught.push(event);
+    const onCaptureResolved = (event) => captureResults.push(event);
     EventBus.getInstance().subscribe(PokemonCaughtEvent, onCaught);
+    EventBus.getInstance().subscribe(CaptureAttemptResolvedEvent, onCaptureResolved);
     const { result, keys } = attempt(save, PokemonFactory.create('rattata', 3), Random.sequence([0.99]));
     EventBus.getInstance().unsubscribe(PokemonCaughtEvent, onCaught);
+    EventBus.getInstance().unsubscribe(CaptureAttemptResolvedEvent, onCaptureResolved);
     assert.ok(result, 'a 10 % roll of 99 still succeeds on the first catch');
     assert.equal(save.team.length, 2);
     assert.equal(save.team[1].level, CaptureRules.CAUGHT_LEVEL);
@@ -259,6 +298,9 @@ describe('Catch flow', (test) => {
     assert.ok(save.currencies.get('dungeonToken') >= 1);
     assert.ok(keys.includes('battle_log.catch_success') && keys.includes('battle_log.catch_team'));
     assert.deepEqual(caught.map((event) => event.speciesId), ['rattata']);
+    assert.deepEqual(captureResults.map((event) => ({ speciesId: event.speciesId, ballId: event.ballId, caught: event.caught })), [
+      { speciesId: 'rattata', ballId: 'pokeball', caught: true }
+    ]);
   });
 
   test('later catches roll the rate; a duplicate is not kept but may raise an IV', () => {
@@ -267,9 +309,16 @@ describe('Catch flow', (test) => {
     balls.setBall('new', 'pokeball');
     balls.setBall('caught', 'pokeball');
     attempt(save, PokemonFactory.create('rattata', 3));
+    const captureResults = [];
+    const onCaptureResolved = (event) => captureResults.push(event);
+    EventBus.getInstance().subscribe(CaptureAttemptResolvedEvent, onCaptureResolved);
     const failed = attempt(save, PokemonFactory.create('pidgey', 3), Random.sequence([0.99]));
+    EventBus.getInstance().unsubscribe(CaptureAttemptResolvedEvent, onCaptureResolved);
     assert.equal(failed.result, false);
     assert.ok(failed.keys.includes('battle_log.catch_fail'));
+    assert.deepEqual(captureResults.map((event) => ({ speciesId: event.speciesId, ballId: event.ballId, caught: event.caught })), [
+      { speciesId: 'pidgey', ballId: 'pokeball', caught: false }
+    ]);
     const owned = save.team[1];
     const ivTotal = Object.values(owned.ivs).reduce((sum, iv) => sum + iv, 0);
     const duplicate = attempt(save, PokemonFactory.create('rattata', 3), Random.sequence([0]));

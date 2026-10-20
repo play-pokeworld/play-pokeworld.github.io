@@ -13,6 +13,8 @@ import { WindowIds } from '../config/DashboardLayout.js';
 import { SHORTCUTS } from '../config/Shortcuts.js';
 import { EventBus } from '../core/EventBus.js';
 import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
+import { ContentAccessChangedEvent } from '../core/events/ContentAccessChangedEvent.js';
+import { FeatureAccessSystem } from '../systems/FeatureAccessSystem.js';
 import { t } from '../localization/LocalizationManager.js';
 
 export class ShortcutsPanel extends DraggablePanel {
@@ -30,7 +32,19 @@ export class ShortcutsPanel extends DraggablePanel {
       name: 'ShortcutsPanel'
     });
 
+    this._accessSnapshot = FeatureAccessSystem.getInstance().getSnapshot();
+    this._renderShortcuts();
+    this.listen(ContentAccessChangedEvent, (event) => {
+      this._accessSnapshot = event;
+      this._renderShortcuts();
+    });
+  }
+
+  /** @private */
+  _renderShortcuts() {
+    this.clearChildren();
     for (const shortcut of SHORTCUTS) {
+      if (shortcut.requiresChampionTitle && !this._accessSnapshot.championTitle) continue;
       const button = new UIButton({
         className: 'shortcut-action-btn',
         variant: shortcut.variant,

@@ -1,6 +1,8 @@
 # Audit du rework PokéWorld — v1.0 (mis à jour en v1.1)
 
-Date : 19/10/2026 · Base analysée : dump « Rework 2 » (133 fichiers) · Référence : dépôt original `play-pokeworld.github.io`.
+> **État courant : v1.10.0 / schéma 12.** La passe récente sépare titres de Ligue et badges d'Arène, répare les accès persistants de sauvegardes historiques, laisse les panneaux verrouillés visibles, et rapproche l'en-tête/Réglages de `origin/main`. Voir [`PHASE_v1.10.md`](PHASE_v1.10.md) pour le journal de livraison, les tests et les limites de smoke QA.
+
+Date de l'audit initial : 19/10/2026 · Base analysée : dump « Rework 2 » (133 fichiers) · Référence : dépôt original `play-pokeworld.github.io`.
 
 Légende : ✅ corrigé · ⚠️ reste à faire (priorité **P1** haute → **P3** basse)
 
@@ -179,4 +181,35 @@ Légende : ✅ corrigé · ⚠️ reste à faire (priorité **P1** haute → **P
 | Frise de combat, statut de capture, badges d'efficacité | ✅ `BattleTimeline`, `CaughtStatusBall`, `PokemonMoveList` + `TypeChart`, `MoveDB`, `MoveLearnset`, `PokedexData`. |
 | `BattleActionCompletedEvent` jamais émis | ✅ Supprimé. |
 | Gestion des données | 📄 Analyse et plan dans `docs/DATA_REVIEW.md`. |
+
+## 6. Complément de suivi — v1.7 (19/10/2026)
+
+- Les corrections v1.7 sont détaillées dans `docs/PHASE_v1.7.md` : header (badges / réglages), monnaies
+  sans cadres, récompenses de quête liées aux données, Lieu centré sans tags, équipe et scène de combat.
+- Les 20 presets sont documentés dans `docs/DATA_MODEL.md` : schéma 5, migration des références
+  originales et composition depuis l’équipe ou la boîte ; l’accès direct est depuis la fenêtre Équipe.
+- Le bouton Résumé ouvre désormais le journal, les gains du dernier combat et des totaux de session.
+  Le résumé ne reprend pas encore les captures / objets / dégâts / durée / butin de donjon de `main`.
+- `npm test` : **176 réussis, 0 échec** ; `node --check` et `git diff --check` passent. Le rendu visuel
+  responsive reste à faire valider manuellement, faute de navigateur automatisé dans le dépôt.
+
+## 7. Complément de suivi — v1.9 (20/10/2026)
+
+- Livraison source Rework **1.9.0**, schéma de sauvegarde **9**. Le schéma 6 est une étape de
+  développement intermédiaire, pas une version 1.8 publiée.
+- Les notes françaises de cette livraison sont dans `docs/PHASE_v1.9.md`; le modèle de sauvegarde
+  actuel est décrit dans `docs/DATA_MODEL.md`.
+- Le contenu comprend 64 quêtes principales Kanto (194 sur les trois régions), le tutoriel de dix
+  étapes, les expéditions de donjon en grille, et les systèmes Kanto d'entraînement, pension/fossiles,
+  mine et vente. Les détails et limites de parité sont documentés dans la note de phase.
+- Vérifications réussies : `npm test` (**190/190**), `node --check` sur tous les fichiers JS/MJS de
+  `src`, `tests` et `tools`, `git diff --check`, validation de données et contrôle des versions.
+- Smoke test serveur : HTTP 200 sur `/`, `/src/main.js`, la feuille de style principale et un sprite.
+  Playwright à 390 px crée une sauvegarde, recharge la page, rouvre la sauvegarde et n'observe aucune erreur JavaScript.
+- Archive : intégrité `unzip -t` validée; **2 449 entrées**, sans `.git`, `node_modules` ni caches.
+  Après extraction, `npm test` repasse à **190 réussis, 0 échec** et les ressources essentielles répondent
+  toutes en HTTP 200.
+- Correctif de démarrage après retour utilisateur : ajout de l'import explicite de
+  `DashboardWindowFocusRequestedEvent` dans `MobileDashboardNav`; un test de régression instancie la
+  navigation mobile et vérifie le routage de la demande de focus.
 

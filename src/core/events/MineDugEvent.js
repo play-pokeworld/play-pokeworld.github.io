@@ -1,20 +1,19 @@
 /**
  * @file MineDugEvent.js
- * @brief Emitted when the mine yields items.
+ * @brief Emitted when the mine reveals one or more loot objects.
  */
-
 import { BaseEvent } from '../BaseEvent.js';
 
 export class MineDugEvent extends BaseEvent {
-  /** Bus key of this event type (never derived from the minifiable class name). */
   static TYPE = 'MineDugEvent';
 
   /**
-   * @param {number} count - Items dug up
+   * @param {number} count
+   * @param {{deferSave?: boolean}} [options]
    */
-  constructor(count) {
+  constructor(count, { deferSave = false } = {}) {
     super(MineDugEvent.TYPE);
-    /** @type {number} */
     this.count = count;
+    this.deferSave = deferSave;
   }
 }

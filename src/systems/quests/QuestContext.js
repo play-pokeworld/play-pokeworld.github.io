@@ -72,6 +72,6 @@ export class QuestContext {
 
   /** @param {string} region @returns {boolean} */
   hasWonLeague(region) {
-    return this._save.statistics.leaguesWon.includes(region);
+    return this._save.statistics.hasWonLeague(region);
   }
 }

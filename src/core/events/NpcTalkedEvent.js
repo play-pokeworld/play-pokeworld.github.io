@@ -11,10 +11,13 @@ export class NpcTalkedEvent extends BaseEvent {
 
   /**
    * @param {string} locationId - Location of the NPC
+   * @param {string|null} [npcId=null] - Stable identity when a specific NPC was selected
    */
-  constructor(locationId) {
+  constructor(locationId, npcId = null) {
     super(NpcTalkedEvent.TYPE);
     /** @type {string} */
     this.locationId = locationId;
+    /** @type {string|null} */
+    this.npcId = typeof npcId === 'string' && npcId.length > 0 ? npcId : null;
   }
 }

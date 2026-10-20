@@ -4,10 +4,10 @@
  * Written by the systems that own the action (BattleSystem, MineSystem…) BEFORE they dispatch
  * the matching event, so listeners (QuestSystem, achievements) always read up-to-date values.
  *
- * Serialized shape (save schema 3):
- *   { wildWins: { <locationId>: n }, trainerWins: { <trainerId>: n }, solvedPuzzles: [ids],
- *     leaguesWon: [regions], caughtTotal, duplicateCatches: { <species>: n }, hatcheryLevel }
- * (duplicateCatches: save schema 4; purchases { <itemId>: n }: added in v1.6, optional, read as {} when absent)
+ * Serialized shape (save schema 12; league titles remain region ids, never Gym badge ids):
+ *   { wildWins: { <locationId>: n }, capturesByLocation: { <locationId>: n },
+ *     trainerWins: { <trainerId>: n }, solvedPuzzles: [ids], leaguesWon: [regions],
+ *     caughtTotal, duplicateCatches: { <species>: n }, hatcheryLevel, trainingSessions }
  */
 import { BaseModel } from '../core/BaseModel.js';
 import { LocationDB } from '../world/LocationDB.js';
@@ -36,9 +36,17 @@ export class StatisticsData extends BaseModel {
     this.wildWins[locationId] = (this.wildWins[locationId] || 0) + 1;
   }
 
-  /** One more Pokémon caught (original G.stats caught counter), duplicates included. */
-  recordCatch() {
+  /** One more Pokémon caught (original G.stats caught counter), duplicates included. @param {string|null} [locationId] */
+  recordCatch(locationId = null) {
     this.caughtTotal++;
+    if (typeof locationId === 'string' && locationId) {
+      this.capturesByLocation[locationId] = (this.capturesByLocation[locationId] || 0) + 1;
+    }
+  }
+
+  /** @param {string} locationId @returns {number} Captures made at this location */
+  capturesInLocation(locationId) {
+    return this.capturesByLocation[locationId] || 0;
   }
 
   /**
@@ -52,6 +60,16 @@ export class StatisticsData extends BaseModel {
   /** @param {string} trainerId */
   recordTrainerWin(trainerId) {
     this.trainerWins[trainerId] = (this.trainerWins[trainerId] || 0) + 1;
+  }
+
+  /** @param {number} [levels=1] */
+  recordHatcheryLevels(levels = 1) {
+    this.hatcheryLevel += Math.max(0, Math.floor(Number(levels) || 0));
+  }
+
+  /** @param {number} [sessions=1] */
+  recordTrainingSession(sessions = 1) {
+    this.trainingSessions += Math.max(0, Math.floor(Number(sessions) || 0));
   }
 
   /**
@@ -68,9 +86,14 @@ export class StatisticsData extends BaseModel {
     if (!this.solvedPuzzles.includes(puzzleId)) this.solvedPuzzles.push(puzzleId);
   }
 
+  /** @param {string} region @returns {boolean} */
+  hasWonLeague(region) {
+    return typeof region === 'string' && this.leaguesWon.includes(region);
+  }
+
   /** @param {string} region */
   recordLeague(region) {
-    if (!this.leaguesWon.includes(region)) this.leaguesWon.push(region);
+    if (typeof region === 'string' && region && !this.leaguesWon.includes(region)) this.leaguesWon.push(region);
   }
 
   /**
@@ -100,13 +123,15 @@ export class StatisticsData extends BaseModel {
   serialize() {
     return {
       wildWins: { ...this.wildWins },
+      capturesByLocation: { ...this.capturesByLocation },
       trainerWins: { ...this.trainerWins },
       solvedPuzzles: [...this.solvedPuzzles],
       leaguesWon: [...this.leaguesWon],
       caughtTotal: this.caughtTotal,
       duplicateCatches: { ...this.duplicateCatches },
       purchases: { ...this.purchases },
-      hatcheryLevel: this.hatcheryLevel
+      hatcheryLevel: this.hatcheryLevel,
+      trainingSessions: this.trainingSessions
     };
   }
 
@@ -115,6 +140,8 @@ export class StatisticsData extends BaseModel {
     const raw = data || {};
     /** @type {Record<string, number>} */
     this.wildWins = readCounters(raw.wildWins);
+    /** @type {Record<string, number>} */
+    this.capturesByLocation = readCounters(raw.capturesByLocation);
     /** @type {Record<string, number>} */
     this.trainerWins = readCounters(raw.trainerWins);
     /** @type {string[]} */
@@ -125,6 +152,7 @@ export class StatisticsData extends BaseModel {
     /** @type {Record<string, number>} */
     this.duplicateCatches = readCounters(raw.duplicateCatches);
     this.hatcheryLevel = Math.max(0, Math.floor(Number(raw.hatcheryLevel) || 0));
+    this.trainingSessions = Math.max(0, Math.floor(Number(raw.trainingSessions) || 0));
     /** @type {Record<string, number>} Items bought in shops */
     this.purchases = readCounters(raw.purchases);
   }

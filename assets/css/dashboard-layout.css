@@ -88,16 +88,101 @@ body.pw-window-drag-active * {
   cursor: grabbing !important;
 }
 
-/* --- Top bar: fixed height so that overlays can sit right below it --- */
+/* --- Original top bar: height, spacing and control dimensions match main --- */
 body:not(.mobile-mode) .pw-game-screen > #header {
-  height: var(--pw-game-header-h);
-  min-height: var(--pw-game-header-h);
+  height: auto;
+  min-height: 56px;
   box-sizing: border-box;
+}
+
+body:not(.mobile-mode) #header.pw-header-panel {
+  gap: 12px;
+  padding: 10px 20px;
+}
+body:not(.mobile-mode) #header .pw-header-brand {
+  gap: 10px;
+  font-size: 20px;
+  letter-spacing: 2px;
+}
+body:not(.mobile-mode) #header .pw-header-brand-mark {
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+body:not(.mobile-mode) #header .pw-header-badges {
+  min-width: 200px;
+  gap: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 13px;
+  line-height: normal;
+}
+#header .pw-header-badges-line {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+  white-space: nowrap;
+}
+body:not(.mobile-mode) #header #settings-btn.pw-header-settings {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  padding: 8px;
+  border-radius: 10px;
+}
+#header #settings-btn .pw-button-icon {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+}
+#header #settings-btn .pw-button-icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 body.mobile-mode {
   --pw-game-header-h: 52px;
   --pw-mobile-nav-h: 54px; /* sticky main nav row of design-system.css (J2) */
+}
+
+/* Match the original mobile header height and preserve the device safe area.
+   This selector intentionally overrides only the Rework header dock, without
+   changing the original global mobile rule in design-system.css. */
+body.mobile-mode #header.pw-header-panel {
+  gap: 4px;
+  padding: max(8px, env(safe-area-inset-top)) 10px 8px;
+  min-height: 52px;
+}
+body.mobile-mode #header .pw-header-brand {
+  gap: 10px;
+  font-size: 17px;
+  letter-spacing: 2px;
+}
+body.mobile-mode #header .pw-header-brand-mark {
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+  box-sizing: border-box;
+}
+body.mobile-mode #header .pw-header-badges {
+  min-width: 0;
+  gap: 0;
+  padding: 0;
+  font-size: 11px;
+}
+body.mobile-mode #header #settings-btn.pw-header-settings {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  padding: 8px;
 }
 
 /* Toasts never cover the logo / title bar of the game screen. */

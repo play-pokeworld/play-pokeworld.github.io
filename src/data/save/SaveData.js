@@ -2,14 +2,15 @@
  * @file SaveData.js
  * @brief One save file: composition of one model per domain (C++: class SaveData : public BaseModel).
  *
- * Serialized shape (config/SaveSchema.js, version 4):
+ * Serialized shape (config/SaveSchema.js, current version):
  *   { version, id, background, createdAt, updatedAt,
  *     player: PlayerData, currencies: CurrenciesData, pokedex: PokedexData, team: PokemonData[],
  *     box: PokemonData[] (PC box: catches made with a full team), inventory: InventoryData
- *     (Poké Balls included), ballFilters: BallFiltersData, quests: QuestProgressData,
- *     statistics: StatisticsData }
+ *     (Poké Balls included), ballFilters: BallFiltersData, teamPresets: TeamPresetsData,
+ *     quests: QuestProgressData, statistics: StatisticsData, tutorial: TutorialProgressData,
+ *     dungeons: DungeonData, hatchery: HatcheryData, mine: MineData, access: ContentAccessData }
  *
- * deserialize() first runs SaveMigrator (original game exports, v1, v2, v3 → current), then every
+ * deserialize() first runs SaveMigrator (original game exports, schema v1 through current), then every
  * domain model reads the current shape only. Uses the original save id format (PW-TIMESTAMP-RANDOM).
  */
 import { BaseModel } from '../core/BaseModel.js';
@@ -18,8 +19,14 @@ import { CurrenciesData } from './CurrenciesData.js';
 import { PokedexData } from './PokedexData.js';
 import { InventoryData } from './InventoryData.js';
 import { BallFiltersData } from './BallFiltersData.js';
+import { TeamPresetsData } from './TeamPresetsData.js';
 import { QuestProgressData } from './QuestProgressData.js';
 import { StatisticsData } from './StatisticsData.js';
+import { TutorialProgressData } from './TutorialProgressData.js';
+import { DungeonData } from './DungeonData.js';
+import { HatcheryData } from './HatcheryData.js';
+import { MineData } from './MineData.js';
+import { ContentAccessData } from './ContentAccessData.js';
 import { SaveThemes } from './SaveThemes.js';
 import { SaveMigrator } from './migrations/SaveMigrator.js';
 import { PokemonData } from '../pokemon/PokemonData.js';
@@ -64,10 +71,22 @@ export class SaveData extends BaseModel {
     this.inventory = new InventoryData();
     /** @type {BallFiltersData} */
     this.ballFilters = new BallFiltersData();
+    /** @type {TeamPresetsData} */
+    this.teamPresets = new TeamPresetsData();
     /** @type {QuestProgressData} */
     this.quests = new QuestProgressData();
     /** @type {StatisticsData} */
     this.statistics = new StatisticsData();
+    /** @type {TutorialProgressData} */
+    this.tutorial = new TutorialProgressData();
+    /** @type {DungeonData} */
+    this.dungeons = new DungeonData();
+    /** @type {HatcheryData} */
+    this.hatchery = new HatcheryData();
+    /** @type {MineData} */
+    this.mine = new MineData();
+    /** @type {ContentAccessData} Sticky progression facts; evaluated by FeatureAccessSystem. */
+    this.access = new ContentAccessData();
   }
 
   /**
@@ -83,6 +102,10 @@ export class SaveData extends BaseModel {
     save.player.trainerName = trainerName || PlayerDefaults.TRAINER_NAME;
     const starter = findStarter(starterSpecies) || STARTERS_BY_REGION[DEFAULT_STARTER_REGION][0];
     save.team = [PokemonFactory.create(starter.species, PlayerDefaults.STARTER_LEVEL)];
+    const starterRegion = Object.keys(STARTERS_BY_REGION).find((region) =>
+      STARTERS_BY_REGION[region].some((entry) => entry.species === starter.species)
+    );
+    if (starterRegion) save.access.unlockRegionStarter(starterRegion);
     save.pokedex = new PokedexData({ [starter.species]: { seen: true, caught: true, shiny: false } });
     save.inventory = new InventoryData({ ...BallRules.STARTING_BALLS });
     return save;
@@ -116,8 +139,14 @@ export class SaveData extends BaseModel {
       box: this.box.map((pokemon) => pokemon.serialize()),
       inventory: this.inventory.serialize(),
       ballFilters: this.ballFilters.serialize(),
+      teamPresets: this.teamPresets.serialize(),
       quests: this.quests.serialize(),
-      statistics: this.statistics.serialize()
+      statistics: this.statistics.serialize(),
+      tutorial: this.tutorial.serialize(),
+      dungeons: this.dungeons.serialize(),
+      hatchery: this.hatchery.serialize(),
+      mine: this.mine.serialize(),
+      access: this.access.serialize()
     };
   }
 
@@ -139,7 +168,13 @@ export class SaveData extends BaseModel {
     this.box = (Array.isArray(data.box) ? data.box : []).map((raw) => new PokemonData(raw));
     this.inventory = new InventoryData(data.inventory);
     this.ballFilters = new BallFiltersData(data.ballFilters);
+    this.teamPresets = new TeamPresetsData(data.teamPresets);
     this.quests = new QuestProgressData(data.quests);
     this.statistics = new StatisticsData(data.statistics);
+    this.tutorial = new TutorialProgressData(data.tutorial);
+    this.dungeons = new DungeonData(data.dungeons);
+    this.hatchery = new HatcheryData(data.hatchery);
+    this.mine = new MineData(data.mine);
+    this.access = new ContentAccessData(data.access);
   }
 }

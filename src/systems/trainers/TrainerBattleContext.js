@@ -6,7 +6,7 @@
  *
  * Original settlement (battle-switch.js / quest-core.js completeQuestTrainerBattle):
  *  - gym: first win -> badge + reward money; rematch -> no money;
- *  - league: first win -> title (badge = league id) + league won + reward money; rematch -> no money;
+ *  - league: first win -> regional title + reward money; rematch -> no money;
  *  - gym / league: experience for every living member (TrainerRewardRules.expShare);
  *  - quest trainers (rival, villain, boss…): quest points from the reward, no experience.
  */
@@ -39,11 +39,12 @@ export class TrainerBattleContext {
     if (LocalizationManager.getInstance().has(`trainer.${first.id}.intro`)) {
       this.openingLines.push({ key: 'battle_log.trainer_quote', params: { quoteTrainerId: first.id, quoteKind: 'intro', trainerId: first.id } });
     }
-    /** @type {Array<{pokemon: Object, intro?: {key: string, params: Object}}>} */
+    /** @type {Array<{pokemon: Object, trainerId: string, intro?: {key: string, params: Object}}>} */
     this.foes = [];
     teams.forEach((team, stage) => {
+      const trainerId = trainers[stage]?.id ?? id;
       team.forEach((pokemon, index) => {
-        const entry = { pokemon };
+        const entry = { pokemon, trainerId };
         if (stage > 0 && index === 0) {
           entry.intro = {
             key: 'battle_log.league_next_trainer',
@@ -71,7 +72,7 @@ export class TrainerBattleContext {
   onVictory({ save, session, locationId }) {
     const log = session.log;
     const owner = this.league ?? this.trainers[0];
-    const wonBefore = this.league ? save.player.hasBadge(this.league.id) : this._wonBefore(save, owner);
+    const wonBefore = this.league ? save.statistics.hasWonLeague(this.league.region) : this._wonBefore(save, owner);
     for (const trainer of this.trainers) save.statistics.recordTrainerWin(trainer.id);
     if (this.league) save.statistics.recordTrainerWin(this.league.id);
     log.add('battle_log.trainer_defeated', { trainerId: owner.id });
@@ -80,8 +81,8 @@ export class TrainerBattleContext {
     let questPoints = 0;
     if (this.league || owner.kind === TrainerKinds.GYM) {
       if (!wonBefore) {
-        save.player.earnBadge(owner.id);
         if (this.league) save.statistics.recordLeague(this.league.region);
+        else save.player.earnBadge(owner.id);
         money = owner.reward;
         save.currencies.add(TrainerRules.MONEY_CURRENCY, money);
         log.add(this.league ? 'battle_log.league_title' : 'battle_log.badge_earned', { trainerId: owner.id, badgeTrainerId: owner.id });

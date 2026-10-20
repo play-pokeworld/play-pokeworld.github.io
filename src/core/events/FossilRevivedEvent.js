@@ -1,20 +1,19 @@
 /**
  * @file FossilRevivedEvent.js
- * @brief Emitted when a fossil is revived.
+ * @brief Emitted after a fossil successfully revives a Pokémon, including a duplicate IV outcome.
  */
-
 import { BaseEvent } from '../BaseEvent.js';
 
 export class FossilRevivedEvent extends BaseEvent {
-  /** Bus key of this event type (never derived from the minifiable class name). */
   static TYPE = 'FossilRevivedEvent';
 
   /**
-   * @param {string} speciesId - PokemonDB id of the revived Pokémon
+   * @param {string} speciesId
+   * @param {{deferSave?: boolean}} [options]
    */
-  constructor(speciesId) {
+  constructor(speciesId, { deferSave = false } = {}) {
     super(FossilRevivedEvent.TYPE);
-    /** @type {string} */
     this.speciesId = speciesId;
+    this.deferSave = deferSave;
   }
 }

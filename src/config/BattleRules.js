@@ -83,6 +83,10 @@ export const BattleRules = Object.freeze({
   MONEY_EXPONENT: 1.15,
   MONEY_REGION_STEP: 9,
   MONEY_MAX_BADGES: 8,
+  /** Original route-drop chance; active team loot talents add their declared bonus. */
+  WILD_DROP_BASE_CHANCE_PCT: 1,
+  WILD_DROP_MAX_CHANCE_PCT: 10,
+  WILD_DROP_HELD_ITEM_BONUS_PCT: 1,
   /** Catch: ball rate in percent (default when the ball has none); 100+ always succeeds. */
   DEFAULT_BALL_RATE: 10,
   GUARANTEED_CATCH_RATE: 100,

@@ -24,6 +24,7 @@ import { L_en_talents } from './en/talents.js';
 import { L_en_trainers } from './en/trainers.js';
 import { L_en_shops } from './en/shops.js';
 import { L_en_lore } from './en/lore.js';
+import { L_en_npc } from './en/npc.js';
 import { L_location_names_en } from './en/locations.js';
 import { L_pokemon_names_en } from './en/pokemon-names.js';
 import { L_move_names_en } from './en/move-names.js';
@@ -50,6 +51,7 @@ import { L_fr_talents } from './fr/talents.js';
 import { L_fr_trainers } from './fr/trainers.js';
 import { L_fr_shops } from './fr/shops.js';
 import { L_fr_lore } from './fr/lore.js';
+import { L_fr_npc } from './fr/npc.js';
 import { L_location_names_fr } from './fr/locations.js';
 import { L_pokemon_names_fr } from './fr/pokemon-names.js';
 import { L_move_names_fr } from './fr/move-names.js';
@@ -88,6 +90,7 @@ export const LOCALE_CATALOG = Object.freeze({
     { source: L_en_trainers, prefix: 'trainer' },
     { source: L_en_shops, prefix: 'shop' },
     { source: L_en_lore, prefix: 'lore' },
+    { source: L_en_npc, prefix: 'npc' },
     { source: L_location_names_en, prefix: 'location' },
     { source: L_pokemon_names_en, prefix: 'pokemon' },
     { source: L_move_names_en, prefix: 'move' },
@@ -115,6 +118,7 @@ export const LOCALE_CATALOG = Object.freeze({
     { source: L_fr_trainers, prefix: 'trainer' },
     { source: L_fr_shops, prefix: 'shop' },
     { source: L_fr_lore, prefix: 'lore' },
+    { source: L_fr_npc, prefix: 'npc' },
     { source: L_location_names_fr, prefix: 'location' },
     { source: L_pokemon_names_fr, prefix: 'pokemon' },
     { source: L_move_names_fr, prefix: 'move' },

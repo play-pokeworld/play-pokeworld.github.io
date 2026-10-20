@@ -1,20 +1,19 @@
 /**
  * @file TrainingSessionCompletedEvent.js
- * @brief Emitted when a training center session ends.
+ * @brief Emitted once a training session ends, whether it was won or lost.
  */
-
 import { BaseEvent } from '../BaseEvent.js';
 
 export class TrainingSessionCompletedEvent extends BaseEvent {
-  /** Bus key of this event type (never derived from the minifiable class name). */
   static TYPE = 'TrainingSessionCompletedEvent';
 
   /**
-   * @param {number} count - Sessions completed
+   * @param {number} count
+   * @param {{deferSave?: boolean}} [options]
    */
-  constructor(count) {
+  constructor(count, { deferSave = false } = {}) {
     super(TrainingSessionCompletedEvent.TYPE);
-    /** @type {number} */
     this.count = count;
+    this.deferSave = deferSave;
   }
 }

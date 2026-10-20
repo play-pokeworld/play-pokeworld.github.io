@@ -13,6 +13,8 @@ import { TeamChangedEvent } from '../core/events/TeamChangedEvent.js';
 import { ModalIds } from '../config/ModalIds.js';
 import { NotificationSystem } from '../systems/NotificationSystem.js';
 import { NotificationChannels } from '../config/NotificationConfig.js';
+import { EventBus } from '../core/EventBus.js';
+import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
 import { t } from '../localization/LocalizationManager.js';
 
 export class TeamModal extends StaticModalPanel {
@@ -66,6 +68,14 @@ export class TeamModal extends StaticModalPanel {
       }));
     });
     this.addChild(grid);
+    this.addChild(new UIContainer({
+      className: 'pw-team-modal-actions',
+      children: [new UIButton({
+        text: t('teams_manager_open'),
+        variant: 'secondary',
+        onClick: () => EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.TEAM_PRESETS))
+      })]
+    }));
   }
 
   /**

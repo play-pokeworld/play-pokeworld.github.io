@@ -54,6 +54,16 @@ function convertPokemon(pokemon) {
   };
 }
 
+/** @param {*} raw @returns {Object|undefined} */
+function convertHatchery(raw) {
+  if (!raw || typeof raw !== 'object') return undefined;
+  const slots = Array.isArray(raw.slots) ? raw.slots.map((slot) => {
+    if (!slot || typeof slot !== 'object' || slot.kind !== 'daycare' || !slot.pokemon) return slot ?? null;
+    return { ...slot, pokemon: convertPokemon(slot.pokemon) };
+  }) : [];
+  return { ...raw, slots };
+}
+
 /**
  * @param {*} value - Legacy portrait value ('trainer-0.png', 'npcs/Youngster.png', stem)
  * @returns {string}
@@ -87,6 +97,7 @@ export const MigrationV2ToV3 = Object.freeze({
       },
       team: (raw.team || []).map(convertPokemon),
       ...(Array.isArray(raw.box) ? { box: raw.box.map(convertPokemon) } : {}),
+      ...(raw.hatchery ? { hatchery: convertHatchery(raw.hatchery) } : {}),
       inventory: raw.inventory || {},
       quests: raw.quests || {},
       statistics: raw.statistics || {}

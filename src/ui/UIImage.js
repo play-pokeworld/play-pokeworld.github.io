@@ -41,8 +41,16 @@ export class UIImage extends UIElement {
   setSource(src) {
     const value = src || '';
     // Same image: keep the decoded bitmap (re-setting src restarts the load)
-    if (this._dom.getAttribute('src') === value) return;
+    if (value && this._dom.getAttribute('src') === value && !this._dom.classList.contains('is-broken')) return;
     this._usedFallback = false;
+    if (!value) {
+      // An empty src makes browsers request the current document and dispatch an error.
+      // That poisoned a later held-item image with a stale `is-broken` visibility rule.
+      this._dom.removeAttribute('src');
+      this.removeClass('is-broken');
+      return;
+    }
+    this.removeClass('is-broken');
     this._dom.setAttribute('src', value);
   }
 

@@ -11,8 +11,17 @@
  *   3 — v1.4: PokemonData v2 (uid, total exp, talent, IVs / EVs, no derived values), badge ids,
  *       inventory, quests, statistics; no saveId / slotId.
  *   4 — v1.5: Poké Ball filters (`ballFilters`), PC box (`box`), statistics.duplicateCatches.
+ *   5 — v1.7: twenty UID-based team presets and the active preset id.
+ *   6 — intermediate development schema (not a package release): progressive currency visibility
+ *       and capture counts by location.
+ *   7 — v1.9: guided tutorial completion and one-time reward guards.
+ *   8 — v1.9: persistent dungeon expeditions, maps and clear counts.
+ *   9 — v1.9: persistent Kanto hatchery and mine state, plus training-session statistics.
+ *  10 — v1.9.1: sticky unlocked locations, feature access and champion/starter milestones.
+ *  11 — v1.9.1: repeatable board unlock, persisted offers, reroll timestamp and slot upgrades.
+ *  12 — v1.10: league titles separated from Gym badges; legacy feature unlocks repaired.
  */
 
 export const SaveSchema = Object.freeze({
-  VERSION: 4
+  VERSION: 12
 });

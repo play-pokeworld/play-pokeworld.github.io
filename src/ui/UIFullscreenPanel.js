@@ -83,10 +83,13 @@ export class UIFullscreenPanel extends UIElement {
   /**
    * Replaces the body content.
    * @param {UIElement[]} children
+   * @param {{preserveScroll?: boolean}} [options]
    */
-  setContent(children) {
+  setContent(children, { preserveScroll = false } = {}) {
+    const scrollTop = preserveScroll ? this._body.getDomElement().scrollTop : 0;
     this._body.clearChildren();
     this._body.addChildren(children);
+    if (preserveScroll) this._body.getDomElement().scrollTop = scrollTop;
   }
 
   /** @param {Object} [params] */

@@ -5,11 +5,15 @@
 
 import { BaseSystem } from './BaseSystem.js';
 import { SaveSystem } from './SaveSystem.js';
+import { FeatureAccessSystem } from './FeatureAccessSystem.js';
 import { EventBus } from '../core/EventBus.js';
 import { LocationDB } from '../data/world/LocationDB.js';
+import { NpcDirectory } from '../data/world/NpcDirectory.js';
 import { PlayerDefaults } from '../config/PlayerDefaults.js';
 import { LocationChangedEvent } from '../core/events/LocationChangedEvent.js';
 import { NpcTalkedEvent } from '../core/events/NpcTalkedEvent.js';
+import { NotificationSystem } from './NotificationSystem.js';
+import { NotificationChannels, NotificationTones } from '../config/NotificationConfig.js';
 import { t } from '../localization/LocalizationManager.js';
 
 /** Map node states (each maps to a CSS class of UIMapView). */
@@ -53,12 +57,10 @@ export class LocationSystem extends BaseSystem {
 
   /**
    * @param {string} locationId
-   * @returns {boolean} True when the badge requirement is not met
+   * @returns {boolean} True when the central progression resolver denies access
    */
   isLocked(locationId) {
-    const location = LocationDB.getInstance().getById(locationId);
-    if (!location) return true;
-    return location.badgesRequired > (this._player()?.getBadgeCount() ?? 0);
+    return !FeatureAccessSystem.getInstance().isLocationUnlocked(locationId);
   }
 
   /**
@@ -74,11 +76,17 @@ export class LocationSystem extends BaseSystem {
   }
 
   /**
-   * Talks to the people of the current location (talk quest objectives listen to it).
+   * Talks to a selected person at the current location. Talk quest objectives continue to use
+   * the location, while progression gates can inspect the stable NPC identity.
+   * @param {string|null} [npcId=null]
+   * @returns {boolean} False if no save is loaded or the selected person is not at this location
    */
-  talkToNpc() {
-    if (!this._player()) return;
-    EventBus.getInstance().dispatch(new NpcTalkedEvent(this.getCurrentLocationId()));
+  talkToNpc(npcId = null) {
+    if (!this._player()) return false;
+    const locationId = this.getCurrentLocationId();
+    if (npcId != null && !NpcDirectory.getById(locationId, npcId)) return false;
+    EventBus.getInstance().dispatch(new NpcTalkedEvent(locationId, npcId));
+    return true;
   }
 
   /**
@@ -91,6 +99,14 @@ export class LocationSystem extends BaseSystem {
     const player = this._player();
     if (!location || !player || this.isLocked(locationId)) {
       console.warn(t('debug_travel_refused', { id: locationId }));
+      return false;
+    }
+    const run = SaveSystem.getInstance().getCurrentSave()?.dungeons?.run;
+    if (run?.active && run.locationId !== locationId) {
+      NotificationSystem.getInstance().notifyTemporary(t('dungeon_locked_travel'), {
+        channel: NotificationChannels.GAMEPLAY,
+        tone: NotificationTones.WARNING
+      });
       return false;
     }
     player.location = locationId;

@@ -27,6 +27,10 @@ export class BagItemRow extends UIContainer {
       new UIContainer({ className: 'pw-flex-1', children: [name] }),
       new UIText({ tagName: 'div', className: 'inv-qty pw-starter-chosen-level', text: t('bag_qty', { n: entry.quantity }) })
     ]);
-    this.addDomListener('click', () => onSelect(entry.itemId));
+    this.addDomListener('click', (event) => {
+      // A native double click produces a second rebuild under the pointer and shifts the list.
+      if (event.detail > 1) return;
+      onSelect(entry.itemId);
+    });
   }
 }

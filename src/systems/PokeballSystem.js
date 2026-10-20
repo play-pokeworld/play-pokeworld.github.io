@@ -14,6 +14,7 @@ import { BaseSystem } from './BaseSystem.js';
 import { SaveSystem } from './SaveSystem.js';
 import { EventBus } from '../core/EventBus.js';
 import { BallFiltersChangedEvent } from '../core/events/BallFiltersChangedEvent.js';
+import { BallFiltersCommitEvent } from '../core/events/BallFiltersCommitEvent.js';
 import { BallFilterData } from '../data/save/BallFilterData.js';
 import { BallFiltersData } from '../data/save/BallFiltersData.js';
 import { BallFilterOptions, BALL_FILTER_TYPES } from '../data/catch/BallFilterOptions.js';
@@ -273,6 +274,7 @@ export class PokeballSystem extends BaseSystem {
    * @returns {boolean} true
    */
   _commit(filterId) {
+    EventBus.getInstance().dispatch(new BallFiltersCommitEvent(filterId));
     SaveSystem.getInstance().saveCurrent();
     EventBus.getInstance().dispatch(new BallFiltersChangedEvent(filterId));
     return true;

@@ -33,6 +33,7 @@ import { CatchRules } from './catch/CatchRules.js';
 import { SpeciesOwnership } from './catch/SpeciesOwnership.js';
 import { RewardRules } from './battle/RewardRules.js';
 import { PokemonCaughtEvent } from '../core/events/PokemonCaughtEvent.js';
+import { CaptureAttemptResolvedEvent } from '../core/events/CaptureAttemptResolvedEvent.js';
 
 /** Currency earned by every catch. */
 const CATCH_CURRENCY = 'dungeonToken';
@@ -71,9 +72,37 @@ export class CatchSystem extends BaseSystem {
    * @returns {boolean} true when the Pokémon was caught (duplicates included)
    */
   attempt({ save, session, locationId, questKind = QuestCatchKinds.NONE }) {
+    return this.attemptDetailed({ save, session, locationId, questKind }).caught;
+  }
+
+  /**
+   * Detailed capture result for battle-session loot tracking. `attempt()` remains the boolean
+   * compatibility surface used by existing systems and tests.
+   * @param {Object} attempt
+   * @param {import('../data/save/SaveData.js').SaveData} attempt.save
+   * @param {import('./battle/BattleSession.js').BattleSession} attempt.session
+   * @param {string} attempt.locationId
+   * @param {string} [attempt.questKind=QuestCatchKinds.NONE]
+   * @param {boolean} [attempt.deferTokens=false] - Leave catch tokens for an expedition settlement
+   * @returns {{caught:boolean, ballId:string|null, duplicate:boolean, pokemon:Object|null, addedToTeam:boolean, tokens:number}}
+   */
+  attemptDetailed({ save, session, locationId, questKind = QuestCatchKinds.NONE, deferTokens = false }) {
     const foe = session.foe.pokemon;
     const log = session.log;
     const name = foe.getDisplayName();
+    const failed = (ballId = null) => ({ caught: false, ballId, duplicate: false, pokemon: null, addedToTeam: false, tokens: 0 });
+    const dispatchResult = (caught, duplicate = false) => EventBus.getInstance().dispatch(
+      new CaptureAttemptResolvedEvent({
+        speciesId: foe.species,
+        form: foe.form,
+        name,
+        shiny: foe.shiny,
+        ballId,
+        rate,
+        caught,
+        duplicate
+      })
+    );
     const location = LocationDB.getInstance().getById(locationId);
     const owned = SpeciesOwnership.isOwned(save, foe.species, foe.form);
     const encounter = new CatchEncounter({
@@ -89,7 +118,7 @@ export class CatchSystem extends BaseSystem {
     const ballId = BallSelector.ballFor(save.ballFilters.getAll(), encounter, (id) => save.inventory.count(id));
     if (!ballId) {
       log.add('battle_log.ball_no_target', { name });
-      return false;
+      return failed();
     }
     const ballRate = BallRateRules.effectiveRate(ballId, encounter);
     const rate = CatchRules.finalRate(ballRate, questKind);
@@ -97,21 +126,30 @@ export class CatchSystem extends BaseSystem {
     const firstCatch = save.statistics.caughtTotal === 0 && save.box.length === 0 && save.team.length <= 1;
     if (!CatchRules.roll(rate, firstCatch, this._random)) {
       log.add('battle_log.catch_fail', { name, ballId });
-      return false;
+      dispatchResult(false);
+      return failed(ballId);
     }
 
     log.add('battle_log.catch_success', { name, ballId });
-    save.statistics.recordCatch();
+    save.statistics.recordCatch(locationId);
     save.pokedex.markCaught(foe.species, foe.shiny);
     if (foe.shiny) this._unlockShiny(save, foe);
-    if (owned) this._keepDuplicate(save, foe, log);
-    else this._storeNew(save, foe, ballId, log);
+    let storedPokemon = null;
+    let addedToTeam = false;
+    if (owned) {
+      this._keepDuplicate(save, foe, log);
+    } else {
+      const stored = this._storeNew(save, foe, ballId, log);
+      storedPokemon = stored?.pokemon ?? null;
+      addedToTeam = stored?.addedToTeam === true;
+    }
 
     const tokens = RewardRules.catchTokens(location);
-    save.currencies.add(CATCH_CURRENCY, tokens);
+    if (!deferTokens) save.currencies.add(CATCH_CURRENCY, tokens);
     log.add('battle_log.catch_tokens', { amount: tokens });
     EventBus.getInstance().dispatch(new PokemonCaughtEvent(foe.species, locationId, foe.shiny));
-    return true;
+    dispatchResult(true, owned);
+    return { caught: true, ballId, duplicate: owned, pokemon: storedPokemon, addedToTeam, tokens };
   }
 
   /**
@@ -134,7 +172,7 @@ export class CatchSystem extends BaseSystem {
     log.add('battle_log.catch_duplicate', { name: foe.getDisplayName() });
   }
 
-  /** @private */
+  /** @private @returns {{pokemon:Object, addedToTeam:boolean}|null} */
   _storeNew(save, foe, ballId, log) {
     const luxury = ballId === BallRules.LUXURY_BALL;
     const level = luxury ? CaptureRules.LUXURY_CAUGHT_LEVEL : CaptureRules.CAUGHT_LEVEL;
@@ -146,11 +184,13 @@ export class CatchSystem extends BaseSystem {
     caught.healFull();
     if (luxury) log.add('battle_log.catch_luxury_level', { name: caught.getDisplayName(), ballId, level: caught.level });
     if (stat) log.add('battle_log.catch_iv', { name: caught.getDisplayName(), stat });
-    if (TeamSystem.getInstance().addPokemon(caught)) {
+    const addedToTeam = TeamSystem.getInstance().addPokemon(caught);
+    if (addedToTeam) {
       log.add('battle_log.catch_team', { name: caught.getDisplayName(), level: caught.level });
     } else {
       BoxSystem.getInstance().addPokemon(caught);
       log.add('battle_log.catch_box', { name: caught.getDisplayName(), level: caught.level });
     }
+    return { pokemon: caught, addedToTeam };
   }
 }

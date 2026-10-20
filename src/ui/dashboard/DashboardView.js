@@ -34,7 +34,8 @@ export class DashboardView extends UIElement {
     this._columns = new Map();
     /** @private @type {Map<string, import('../DraggablePanel.js').DraggablePanel>} */
     this._windows = new Map();
-
+    /** @private @type {Set<string>|null} Mobile focus filter; null means desktop/all. */
+    this._visibleWindowIds = null;
     for (const column of DASHBOARD_COLUMN_ORDER) {
       const container = new UIContainer(COLUMN_DOM[column]);
       container.setData('col', column);
@@ -53,6 +54,7 @@ export class DashboardView extends UIElement {
   addWindow(panel) {
     this._windows.set(panel.getWindowId(), panel);
     this._columns.get(panel.getDefaultColumn()).addChild(panel);
+    this._applyWindowVisibility(panel.getWindowId(), panel);
   }
 
   /**
@@ -110,13 +112,21 @@ export class DashboardView extends UIElement {
    * @param {Iterable<string>|null} ids
    */
   setVisibleWindows(ids) {
-    const visible = ids ? new Set(ids) : null;
-    for (const [id, panel] of this._windows) {
-      const shown = visible === null || visible.has(id);
-      panel.toggleClass('is-hidden', !shown);
-      // design-system: `body.mobile-mode .dash-win` is hidden unless `.mobile-visible`.
-      panel.toggleClass('mobile-visible', visible !== null && shown);
-    }
+    this._visibleWindowIds = ids === null ? null : new Set(ids || []);
+    this._applyVisibility();
+  }
+
+  /** Applies the selected mobile focus; progression-locked panels stay visible and explain their gate. */
+  _applyVisibility() {
+    for (const [id, panel] of this._windows) this._applyWindowVisibility(id, panel);
+  }
+
+  /** @private @param {string} id @param {import('../DraggablePanel.js').DraggablePanel} panel */
+  _applyWindowVisibility(id, panel) {
+    const focusGranted = this._visibleWindowIds === null || this._visibleWindowIds.has(id);
+    panel.toggleClass('is-hidden', !focusGranted);
+    // Progression locks are rendered inside the panel; only the selected mobile tab hides it.
+    panel.toggleClass('mobile-visible', this._visibleWindowIds !== null && focusGranted);
   }
 
   /**
@@ -156,6 +166,19 @@ export class DashboardView extends UIElement {
       if (bounds.height > 0) result.push({ id, bounds });
     }
     return result;
+  }
+
+  /**
+   * Scrolls a requested dashboard window into view.
+   * @param {string} windowId
+   * @returns {boolean}
+   */
+  focusWindow(windowId) {
+    const panel = this._windows.get(windowId);
+    if (!panel) return false;
+    const element = panel.getDomElement();
+    if (typeof element.scrollIntoView === 'function') element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return true;
   }
 
   /**

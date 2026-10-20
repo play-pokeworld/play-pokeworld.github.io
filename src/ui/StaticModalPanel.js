@@ -17,6 +17,10 @@ export class StaticModalPanel extends UIModal {
    * @param {string} [options.size='md'] - 'lg' | 'md' | 'sm'
    * @param {boolean} [options.closeOnBackdrop=true]
    * @param {boolean} [options.showCloseBtn=true]
+   * @param {boolean} [options.hasHeader=true]
+   * @param {string} [options.overlayId='']
+   * @param {string} [options.overlayClassName='']
+   * @param {string} [options.bodyClassName='']
    */
   constructor(options = {}) {
     const size = options.size || 'md';
@@ -27,6 +31,10 @@ export class StaticModalPanel extends UIModal {
       className: `pw-static-modal pw-static-modal--${size} ${options.className || ''}`.trim(),
       closeOnBackdrop: options.closeOnBackdrop !== false,
       showCloseBtn: options.showCloseBtn !== false,
+      hasHeader: options.hasHeader !== false,
+      overlayId: options.overlayId || '',
+      overlayClassName: options.overlayClassName || '',
+      bodyClassName: options.bodyClassName || '',
       name: options.name || 'StaticModalPanel'
     });
 

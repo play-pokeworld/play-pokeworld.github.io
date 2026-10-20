@@ -22,6 +22,8 @@ export class UIModal extends UIPanel {
    * @param {string} [options.className='']        - Extra classes for the window
    * @param {string} [options.overlayId='']        - Id of the backdrop overlay
    * @param {string} [options.overlayClassName=''] - Extra classes for the backdrop overlay
+   * @param {string} [options.bodyId='']
+   * @param {string} [options.bodyClassName='']
    * @param {boolean} [options.hasHeader=true]     - Renders the .pw-win-hdr title bar
    * @param {boolean} [options.hasFooter=false]
    * @param {boolean} [options.closeOnBackdrop=true]
@@ -38,6 +40,8 @@ export class UIModal extends UIPanel {
       // UIPanel only builds a header when hasHeader === true or a title exists.
       hasHeader: hasHeader ? true : false,
       hasFooter: options.hasFooter || false,
+      bodyId: options.bodyId || '',
+      bodyClassName: options.bodyClassName || '',
       name: options.name || 'UIModal',
     });
 
@@ -118,9 +122,9 @@ export class UIModal extends UIPanel {
     if (this._isOpen) return;
     this._isOpen = true;
     this._overlayDom.classList.remove('is-hidden');
-    this._overlayDom.classList.add('is-open');
+    this._overlayDom.classList.add('is-open', 'open');
     this.show();
-    this.onEnter();
+    this.onEnter(params);
     EventBus.getInstance().dispatch(new ModalToggledEvent(this.getName(), true));
   }
 
@@ -128,7 +132,7 @@ export class UIModal extends UIPanel {
   close() {
     if (!this._isOpen) return;
     this._isOpen = false;
-    this._overlayDom.classList.remove('is-open');
+    this._overlayDom.classList.remove('is-open', 'open');
     this._overlayDom.classList.add('is-hidden');
     this.hide();
     this.onExit();

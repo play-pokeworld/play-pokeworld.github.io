@@ -12,6 +12,8 @@ import { StorageKeys } from '../config/StorageKeys.js';
 import { UiThemes } from '../config/UiThemes.js';
 import { ThemeChangedEvent } from '../core/events/ThemeChangedEvent.js';
 import { DebugModeChangedEvent } from '../core/events/DebugModeChangedEvent.js';
+import { AnimationPreferencesChangedEvent } from '../core/events/AnimationPreferencesChangedEvent.js';
+import { AnimationPreferences, DEFAULT_ANIMATION_PREFERENCES } from '../config/AnimationPreferences.js';
 
 /** Audio buses shown in the settings, with their default state. */
 export const AUDIO_BUSES = Object.freeze(['music', 'sfx', 'cries']);
@@ -84,5 +86,43 @@ export class PreferencesSystem extends BaseSystem {
     const stored = LocalStore.getJson(StorageKeys.AUDIO_SETTINGS, {}) || {};
     stored[busId] = { ...this.getAudioBus(busId), ...patch };
     LocalStore.setJson(StorageKeys.AUDIO_SETTINGS, stored);
+  }
+
+  /** @returns {Record<string, boolean>} Capture and visual-feedback preferences. */
+  getAnimationPreferences() {
+    const raw = LocalStore.getJson(StorageKeys.ANIMATION_SETTINGS, {});
+    const stored = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+    return Object.freeze(Object.fromEntries(
+      Object.entries(DEFAULT_ANIMATION_PREFERENCES).map(([id, fallback]) => [
+        id,
+        typeof stored[id] === 'boolean' ? stored[id] : fallback
+      ])
+    ));
+  }
+
+  /** @param {string} preferenceId */
+  getAnimationPreference(preferenceId) {
+    const preferences = this.getAnimationPreferences();
+    return Object.prototype.hasOwnProperty.call(preferences, preferenceId)
+      ? preferences[preferenceId]
+      : true;
+  }
+
+  /**
+   * Persists one supported animation preference and notifies document/UI adapters.
+   * @param {string} preferenceId
+   * @param {boolean} enabled
+   * @returns {boolean} Whether the stored value changed
+   */
+  setAnimationPreference(preferenceId, enabled) {
+    if (!Object.values(AnimationPreferences).includes(preferenceId)) return false;
+    const next = !!enabled;
+    const current = this.getAnimationPreferences();
+    if (current[preferenceId] === next) return false;
+
+    const preferences = { ...current, [preferenceId]: next };
+    LocalStore.setJson(StorageKeys.ANIMATION_SETTINGS, preferences);
+    EventBus.getInstance().dispatch(new AnimationPreferencesChangedEvent(preferenceId, next, preferences));
+    return true;
   }
 }

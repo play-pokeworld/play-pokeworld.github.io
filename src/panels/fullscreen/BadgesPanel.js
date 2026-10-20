@@ -16,6 +16,7 @@ import { LeagueDB } from '../../data/trainers/LeagueDB.js';
 import { LocationDB } from '../../data/world/LocationDB.js';
 import { SaveSystem } from '../../systems/SaveSystem.js';
 import { BadgesChangedEvent } from '../../core/events/BadgesChangedEvent.js';
+import { TrainerDefeatedEvent } from '../../core/events/TrainerDefeatedEvent.js';
 import { t } from '../../localization/LocalizationManager.js';
 
 /** Tab showing every region. */
@@ -29,6 +30,9 @@ export class BadgesPanel extends UIFullscreenPanel {
     this.listen(BadgesChangedEvent, () => {
       if (this.isOpen()) this._render();
     });
+    this.listen(TrainerDefeatedEvent, (event) => {
+      if (this.isOpen() && LeagueDB.getInstance().getById(event.trainerId)) this._render();
+    });
   }
 
   /** @override */
@@ -38,8 +42,10 @@ export class BadgesPanel extends UIFullscreenPanel {
 
   /** @private */
   _render() {
-    const player = SaveSystem.getInstance().getCurrentSave()?.player;
+    const save = SaveSystem.getInstance().getCurrentSave();
+    const player = save?.player;
     const has = (id) => !!player?.hasBadge(id);
+    const hasLeague = (league) => !!save?.statistics.hasWonLeague(league.region);
     const regions = REGIONS.filter((region) => region.available);
     const gyms = regions.flatMap((region) => TrainerDB.getInstance().getGyms(region.id));
     const leagues = LeagueDB.getInstance().getAll();
@@ -70,7 +76,7 @@ export class BadgesPanel extends UIFullscreenPanel {
     }
     const leagueGrid = new UIContainer({ className: 'pw-leagues-grid' });
     for (const league of leagues.filter(shown)) {
-      const beaten = has(league.id);
+      const beaten = hasLeague(league);
       leagueGrid.addChild(new UIBadgeCard({
         image: AssetPaths.badge(league.badgeImage),
         title: t(`trainer.${league.id}.name`),
@@ -99,7 +105,7 @@ export class BadgesPanel extends UIFullscreenPanel {
               className: 'pw-badges-counters',
               children: [
                 new UIText({ tagName: 'div', className: 'pw-badges-count', text: t('badges_count', { n: gyms.filter((gym) => has(gym.id)).length, total: gyms.length }) }),
-                new UIText({ tagName: 'div', className: 'pw-leagues-count', text: t('leagues_count', { n: leagues.filter((league) => has(league.id)).length, total: leagues.length }) })
+                new UIText({ tagName: 'div', className: 'pw-leagues-count', text: t('leagues_count', { n: leagues.filter(hasLeague).length, total: leagues.length }) })
               ]
             })
           ]

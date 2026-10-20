@@ -1,10 +1,12 @@
 /**
  * @file LanguageSection.js
  * @brief Settings → language selector (C++: class LanguageSection : public SettingsSection).
+ * Language selection uses visible buttons, with the selected language marked as active.
  */
 
 import { SettingsSection } from './SettingsSection.js';
-import { UIDropdown } from '../../ui/UIDropdown.js';
+import { UIContainer } from '../../ui/UIContainer.js';
+import { UIButton } from '../../ui/UIButton.js';
 import { GameConfig } from '../../config/GameConfig.js';
 import { LocalizationManager, t } from '../../localization/LocalizationManager.js';
 
@@ -15,12 +17,21 @@ export class LanguageSection extends SettingsSection {
 
   /** @override */
   build() {
-    this.addChild(new UIDropdown({
-      id: 'settings-language-select',
-      options: GameConfig.SUPPORTED_LANGUAGES.map((lang) => ({ value: lang, label: t(`lang_name_${lang}`) })),
-      value: LocalizationManager.getInstance().currentLang,
-      // The dialog rebuilds itself on LanguageChangedEvent.
-      onChange: (lang) => LocalizationManager.getInstance().setLanguage(lang)
+    const activeLanguage = LocalizationManager.getInstance().currentLang;
+    this.addChild(new UIContainer({
+      className: 'pw-settings-choices pw-settings-language-buttons',
+      children: GameConfig.SUPPORTED_LANGUAGES.map((lang) => {
+        const button = new UIButton({
+          text: t(`lang_name_${lang}`),
+          className: 'pw-settings-choice lang-btn',
+          variant: 'hbtn',
+          onClick: () => LocalizationManager.getInstance().setLanguage(lang)
+        });
+        button.setAttribute('data-lang', lang);
+        button.setActive(lang === activeLanguage);
+        button.setAttribute('aria-pressed', lang === activeLanguage ? 'true' : 'false');
+        return button;
+      })
     }));
   }
 }

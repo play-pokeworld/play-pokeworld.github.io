@@ -18,6 +18,7 @@ import { HeldEffectKinds } from '../src/data/items/HeldEffectKinds.js';
 import { PokemonFactory } from '../src/data/pokemon/PokemonFactory.js';
 import { BattleSides } from '../src/config/BattleSides.js';
 import { BattleRules } from '../src/config/BattleRules.js';
+import { BattleConfig } from '../src/config/BattleConfig.js';
 import {
   CoverageStates, MOVE_EFFECT_COVERAGE, TALENT_EFFECT_COVERAGE, HELD_EFFECT_COVERAGE
 } from '../src/systems/battle/BattleEffectCoverage.js';
@@ -32,15 +33,19 @@ import { CatchRules } from '../src/systems/catch/CatchRules.js';
 import { QuestCatchKinds } from '../src/data/catch/QuestCatchKinds.js';
 import { PokeballSystem } from '../src/systems/PokeballSystem.js';
 import { EncounterRules } from '../src/systems/battle/EncounterRules.js';
+import { DungeonBattleRules } from '../src/systems/battle/DungeonBattleRules.js';
+import { StatChangeRules } from '../src/systems/battle/StatChangeRules.js';
 import { BattleSession, BattleOutcomes } from '../src/systems/battle/BattleSession.js';
 import { BattleLogFormatter } from '../src/systems/battle/BattleLogFormatter.js';
 import { battleLog as enBattleLog } from '../src/localization/en/battle-log.js';
 import { battleLog as frBattleLog } from '../src/localization/fr/battle-log.js';
 import { SaveSystem } from '../src/systems/SaveSystem.js';
+import { TeamSystem } from '../src/systems/TeamSystem.js';
 import { BattleSystem } from '../src/systems/BattleSystem.js';
 import { LocationSystem } from '../src/systems/LocationSystem.js';
 import { PokemonDefeatedEvent } from '../src/core/events/PokemonDefeatedEvent.js';
 import { BattleAttackEvent } from '../src/core/events/BattleAttackEvent.js';
+import { BattleStateChangedEvent } from '../src/core/events/BattleStateChangedEvent.js';
 import { PokemonCaughtEvent } from '../src/core/events/PokemonCaughtEvent.js';
 import { QuestEncounterRequestedEvent } from '../src/core/events/QuestEncounterRequestedEvent.js';
 
@@ -120,7 +125,7 @@ describe('Battle rules', (test) => {
     const field = new BattleField();
     const move = (id) => MoveDB.getInstance().getById(id);
     const immune = DamageCalculator.compute({ attacker: fighter('rattata', 20), defender: fighter('gastly', 20, BattleSides.FOE), move: move('tackle'), field, random: Random.sequence([0.5]) });
-    assert.ok(immune.immune);
+    assert.ok(immune.immune, 'Grounded immunity remains absolute');
     assert.equal(immune.damage, 0);
     const charmander = fighter('charmander', 20);
     const bulbasaur = fighter('bulbasaur', 20, BattleSides.FOE);
@@ -129,10 +134,10 @@ describe('Battle rules', (test) => {
     const high = hit(bulbasaur, 0.99);
     const low = hit(bulbasaur, 0);
     assert.equal(high.effectiveness, 2);
-    assert.ok(high.damage > low.damage, `${high.damage} > ${low.damage}`);
+    assert.ok(high.damage > low.damage, `high random roll exceeds low roll (${high.damage} > ${low.damage})`);
     const resisted = hit(squirtle, 0.99);
     assert.equal(resisted.effectiveness, 0.5);
-    assert.ok(resisted.damage < high.damage);
+    assert.ok(resisted.damage < high.damage, `resisted damage is lower (${resisted.damage} < ${high.damage})`);
   });
 
   test('status: type immunities and inflict / cure', () => {
@@ -188,6 +193,34 @@ describe('Battle rules', (test) => {
     lucky.talent = 'superluck';
     assert.ok(Math.abs(EncounterRules.shinyRate([lucky]) - BattleRules.SHINY_BASE_RATE * 1.15) < 1e-12);
   });
+
+  test('dungeon tile rarity, level and HP scaling match the grid encounter type', () => {
+    const encounters = [
+      { species: 'pidgey', minLevel: 5, maxLevel: 5, rarity: 'common' },
+      { species: 'rattata', minLevel: 5, maxLevel: 5, rarity: 'uncommon' },
+      { species: 'spearow', minLevel: 5, maxLevel: 5, rarity: 'rare' }
+    ];
+    const common = DungeonBattleRules.draw(encounters, [], Random.sequence([0.5]), { tileType: 'combat', floor: 1, depth: 3 });
+    const elite = DungeonBattleRules.draw(encounters, [], Random.sequence([0.5]), { tileType: 'elite', floor: 2, depth: 3 });
+    const miniBoss = DungeonBattleRules.draw(encounters, [], Random.sequence([0.5]), { tileType: 'boss', floor: 1, depth: 3 });
+    const finalBoss = DungeonBattleRules.draw(encounters, [], Random.sequence([0.5]), { tileType: 'boss', floor: 3, depth: 3 });
+
+    assert.equal(common.pokemon.species, 'pidgey');
+    assert.equal(common.foeOptions.hpMultiplier, 1);
+    assert.equal(elite.pokemon.species, 'rattata');
+    assert.equal(elite.pokemon.level, 10, 'floor scaling + elite level bonus');
+    assert.equal(elite.foeOptions.hpMultiplier, 1.15 * 1.25);
+    assert.equal(miniBoss.pokemon.species, 'spearow');
+    assert.equal(miniBoss.pokemon.level, 8);
+    assert.equal(miniBoss.foeOptions.hpMultiplier, 2);
+    assert.equal(finalBoss.pokemon.species, 'spearow');
+    assert.equal(finalBoss.pokemon.level, 19);
+    assert.deepEqual(finalBoss.foeOptions.statMultipliers, { atk: 1.5, def: 1.35 });
+    const boss = new BattleCombatant(finalBoss.pokemon, BattleSides.FOE, { npc: true, ...finalBoss.foeOptions });
+    assert.equal(boss.dungeonBoss, true);
+    assert.equal(boss.hp, boss.maxHp);
+    assert.equal(boss.maxHp, Math.round(finalBoss.pokemon.getMaxHp() * 4.5));
+  });
 });
 
 describe('Battle session', (test) => {
@@ -200,6 +233,113 @@ describe('Battle session', (test) => {
     const lines = session.log.drain().map((entry) => BattleLogFormatter.format(entry));
     assert.ok(lines.length > 1);
     assert.ok(lines.every((line) => !line.includes('battle_log.') && !line.includes('{')), lines.join('\n'));
+  });
+
+  test('a capture verdict holds the wild chain until its transition completes', () => {
+    const realNow = Date.now;
+    let now = 10000;
+    Date.now = () => now;
+    try {
+      const player = PokemonFactory.create('charizard', 60);
+      player.moves = ['tackle'];
+      const first = PokemonFactory.create('pidgey', 3);
+      const next = PokemonFactory.create('rattata', 3);
+      const session = new BattleSession({
+        team: [player],
+        foe: first,
+        reserves: [{ pokemon: next }],
+        random: Random.sequence([0.5])
+      });
+      session.start();
+      session.playerCooldownMs = 0;
+      session.foeCooldownMs = 100000;
+      assert.equal(session.pauseForCapture(700), true);
+      session.update(0.1);
+
+      assert.ok(first.isFainted());
+      assert.equal(session.foe.pokemon, first, 'the next foe stays queued while the capture verdict is visible');
+      now = 10699;
+      session.update(0.1);
+      assert.equal(session.foe.pokemon, first, 'the pause lasts until its wall-clock deadline');
+      now = 10700;
+      session.update(0.1);
+      assert.equal(session.foe.pokemon, next);
+    } finally {
+      Date.now = realNow;
+    }
+  });
+
+  test('a dungeon guardian enters one-time fury below half HP and keeps its base modifiers', () => {
+    const player = PokemonFactory.create('rattata', 10);
+    player.moves = ['tackle'];
+    const foe = PokemonFactory.create('pidgey', 10);
+    const session = new BattleSession({
+      team: [player],
+      foe,
+      foeOptions: { hpMultiplier: 4.5, statMultipliers: { atk: 1.5, def: 1.35 }, dungeonBoss: true },
+      random: Random.sequence([0.5])
+    });
+    session.start();
+    session.foe.pokemon.hp = Math.ceil(session.foe.maxHp * 0.5);
+    session.playerCooldownMs = 0;
+    session.foeCooldownMs = 100000;
+    session.update(0.1);
+
+    assert.equal(session.foe.dungeonEnraged, true);
+    assert.ok(Math.abs(session.foe.statMods.atk - 2.1) < 1e-12);
+    assert.equal(session.foe.statMods.spe, 1.6);
+    assert.ok(session.foeCooldownMs < 99900, 'the pending foe cooldown is accelerated');
+    assert.equal(session.log.drain().filter((entry) => entry.key === 'dungeon_boss_enrage').length, 1);
+
+    session.foe.statMods.atk = 0.5;
+    session.foe.statModTurns.atk = 1;
+    StatChangeRules.tick(session.foe);
+    assert.ok(Math.abs(session.foe.statMods.atk - 2.1) < 1e-12, 'timed changes return to the guardian baseline');
+    session._checkDungeonBossEnrage(session.foe);
+    assert.equal(session.log.drain().filter((entry) => entry.key === 'dungeon_boss_enrage').length, 0, 'fury triggers only once');
+  });
+
+  test('manual switch resets volatile state and applies Natural Cure', () => {
+    const current = PokemonFactory.create('charmander', 20);
+    current.talent = 'naturalcure';
+    const next = PokemonFactory.create('squirtle', 20);
+    const fainted = PokemonFactory.create('weedle', 10);
+    fainted.takeDamage(fainted.hp);
+    const session = new BattleSession({ team: [current, next, fainted], foe: PokemonFactory.create('pidgey', 10), random: Random.sequence([0.5]) });
+    session.start();
+    session.active.status = 'burn';
+    session.active.statMods.atk = 0.5;
+    session.team[1].statMods.def = 0.5;
+
+    assert.equal(session.switchPlayerPokemon(1), true);
+    assert.equal(session.active.pokemon, next);
+    assert.equal(session.team[0].status, null);
+    assert.equal(session.team[0].statMods.atk, 1);
+    assert.equal(session.active.statMods.def, 1);
+    assert.equal(session.switchPlayerPokemon(1), false, 'cannot switch to the active Pokémon');
+    assert.equal(session.switchPlayerPokemon(2), false, 'cannot select a fainted Pokémon');
+    assert.equal(session.switchPlayerPokemon(99), false, 'invalid team index');
+  });
+
+  test('the next trainer foe is sent automatically after a knockout', () => {
+    const player = PokemonFactory.create('charizard', 60);
+    player.moves = ['tackle'];
+    const first = PokemonFactory.create('pidgey', 3);
+    first.hp = 1;
+    const next = PokemonFactory.create('rattata', 3);
+    const session = new BattleSession({
+      team: [player],
+      foe: first,
+      reserves: [{ pokemon: next }],
+      random: Random.sequence([0.5])
+    });
+    session.start();
+    session.update(5);
+    assert.ok(first.isFainted());
+    assert.equal(session.foe.pokemon, next);
+    assert.equal(session.sentFoes.length, 2);
+    assert.equal(session.reserveCount, 0);
+    assert.ok(session.foeCooldownMs >= BattleConfig.FOE_SWITCH_DELAY_S * 1000);
   });
 
   test('a fainted member is replaced by the next one; no member left is a defeat', () => {
@@ -234,7 +374,7 @@ describe('Battle session', (test) => {
 });
 
 describe('BattleSystem integration', (test) => {
-  test('a won wild battle records the win, pays, catches, dispatches events and heals the team', () => {
+  test('a wild win pays and catches before the next foe, then the chain can be stopped', () => {
     const saves = SaveSystem.getInstance();
     const save = saves.createNewSave('Arbitre', 'charmander');
     save.team[0].setLevel(60);
@@ -254,24 +394,70 @@ describe('BattleSystem integration', (test) => {
     battle.setRandom(Random.sequence([0.2, 0.8, 0.5]));
     const money = save.currencies.get('money');
     assert.ok(battle.startBattle('route1'));
-    for (let i = 0; i < 6000 && battle.isActive(); i++) battle.update(0.1);
-    EventBus.getInstance().unsubscribe(PokemonDefeatedEvent, onDefeated);
-    EventBus.getInstance().unsubscribe(BattleAttackEvent, onAttack);
-    EventBus.getInstance().unsubscribe(PokemonCaughtEvent, onCaught);
-    battle.setRandom(Random.default);
-    assert.ok(!battle.isActive());
-    assert.equal(defeated.length, 1);
+    for (let i = 0; i < 6000 && !caught.length; i++) battle.update(0.1);
+    assert.ok(caught.length > 0, 'the first wild catch succeeds during the chain');
+    assert.ok(battle.isActive(), 'the next foe is already in the same live session');
+    assert.ok(defeated.length >= 1);
     assert.equal(defeated[0].locationId, 'route1');
-    assert.equal(save.statistics.wildWins.route1, 1);
+    assert.ok(save.statistics.wildWins.route1 >= 1);
     assert.ok(save.currencies.get('money') > money);
     assert.ok(attacks.length > 0);
-    assert.equal(save.inventory.count('pokeball'), balls - 1, 'the ball is consumed');
-    assert.equal(caught.length, 1, 'the first catch always succeeds');
+    assert.equal(save.inventory.count('pokeball'), balls - 1, 'the ball is consumed once for the first encounter');
     assert.equal(save.team.length, 2);
     assert.equal(save.statistics.caughtTotal, 1);
     assert.ok(save.pokedex.isCaught(caught[0].speciesId));
-    assert.ok(save.team.every((pokemon) => pokemon.hp === pokemon.getMaxHp()));
     assert.ok(battle.getLog().every((line) => !line.includes('battle_log.')));
+
+    EventBus.getInstance().unsubscribe(PokemonDefeatedEvent, onDefeated);
+    EventBus.getInstance().unsubscribe(BattleAttackEvent, onAttack);
+    EventBus.getInstance().unsubscribe(PokemonCaughtEvent, onCaught);
+    battle.endBattle(false);
+    battle.setRandom(Random.default);
+    assert.ok(!battle.isActive());
+    assert.ok(save.team.every((pokemon) => pokemon.hp === pokemon.getMaxHp()));
+  });
+
+  test('BattleSystem publishes the automatically sent trainer reserve to the battle view', () => {
+    const save = SaveSystem.getInstance().createNewSave('Remplaçant', 'charmander');
+    save.team[0].setLevel(60);
+    save.team[0].moves = ['tackle'];
+    const first = PokemonFactory.create('pidgey', 3);
+    first.hp = 1;
+    const reserve = PokemonFactory.create('rattata', 3);
+    const changes = [];
+    const onStateChanged = (event) => changes.push(event);
+    EventBus.getInstance().subscribe(BattleStateChangedEvent, onStateChanged);
+    const battle = BattleSystem.getInstance();
+    battle.setRandom(Random.sequence([0.5]));
+    assert.ok(battle.startTrainerBattle({
+      id: 'switch-test',
+      foes: [{ pokemon: first }, { pokemon: reserve }],
+      openingLines: [],
+      onVictory: () => ({ expShare: 0, money: 0 })
+    }, 'route1'));
+    battle.update(5);
+    EventBus.getInstance().unsubscribe(BattleStateChangedEvent, onStateChanged);
+    battle.setRandom(Random.default);
+    assert.equal(battle.getCurrentFoe(), reserve);
+    assert.ok(changes.some((event) => event.foePokemon === reserve));
+    battle.endBattle(false);
+  });
+
+  test('manual battle switch updates the player and notifies battle views', () => {
+    const save = SaveSystem.getInstance().createNewSave('Switch', 'charmander');
+    const reserve = PokemonFactory.create('squirtle', 12);
+    assert.ok(TeamSystem.getInstance().addPokemon(reserve));
+    const changes = [];
+    const onStateChanged = (event) => changes.push(event);
+    EventBus.getInstance().subscribe(BattleStateChangedEvent, onStateChanged);
+    const battle = BattleSystem.getInstance();
+    assert.ok(battle.startBattle('route1'));
+    assert.equal(battle.switchPlayerPokemon(1), true);
+    EventBus.getInstance().unsubscribe(BattleStateChangedEvent, onStateChanged);
+    assert.equal(battle.getPlayerPokemon(), reserve);
+    assert.ok(changes.some((event) => event.playerPokemon === reserve));
+    assert.equal(battle.switchPlayerPokemon(1), false, 'active slot cannot be selected twice');
+    battle.endBattle(false);
   });
 
   test('a quest encounter request starts a battle against the quest Pokémon', () => {

@@ -51,6 +51,8 @@ export const battleLog = {
   exp_none: 'The foe was too weak (+0 XP).',
   level_up: '{name} grows to level {level}!',
   money: 'You earn ₽{money}.',
+  item_found: 'Item found: {item}!',
+  item_duplicate_money: '{item} was already owned and converted into +₽{money}.',
   catch_success: '{name} was captured!',
   catch_fail: '{name} broke free from the {ball}!',
   ball_no_target: 'No filter catches {name}.',

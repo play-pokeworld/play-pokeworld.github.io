@@ -32,7 +32,11 @@
 @import url("./shop.css");
 @import url("./badges.css");
 @import url("./bag.css");
+@import url("./pokedex.css");
+@import url("./dungeons.css");
+@import url("./guide.css");
 @import url("./dashboard-layout.css");
+@import url("./pokemon-background.css");
 
 /* ==========================================================================
    Universal Scrollbar Elimination

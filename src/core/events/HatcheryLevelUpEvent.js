@@ -1,23 +1,21 @@
 /**
  * @file HatcheryLevelUpEvent.js
- * @brief Emitted when the hatchery gains levels.
+ * @brief Emitted when one or more daycare Pokémon gain levels.
  */
-
 import { BaseEvent } from '../BaseEvent.js';
 
 export class HatcheryLevelUpEvent extends BaseEvent {
-  /** Bus key of this event type (never derived from the minifiable class name). */
   static TYPE = 'HatcheryLevelUpEvent';
 
   /**
-   * @param {number} levelsGained - Levels gained at once
-   * @param {number} level - New hatchery level
+   * @param {number} levelsGained
+   * @param {number} level - Total hatchery levels earned in this save
+   * @param {{deferSave?: boolean}} [options]
    */
-  constructor(levelsGained, level) {
+  constructor(levelsGained, level, { deferSave = false } = {}) {
     super(HatcheryLevelUpEvent.TYPE);
-    /** @type {number} */
     this.levelsGained = levelsGained;
-    /** @type {number} */
     this.level = level;
+    this.deferSave = deferSave;
   }
 }

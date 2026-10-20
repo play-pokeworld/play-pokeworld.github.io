@@ -15,9 +15,21 @@ import { MigrationOriginalToV1 } from './MigrationOriginalToV1.js';
 import { MigrationV1ToV2 } from './MigrationV1ToV2.js';
 import { MigrationV2ToV3 } from './MigrationV2ToV3.js';
 import { MigrationV3ToV4 } from './MigrationV3ToV4.js';
+import { MigrationV4ToV5 } from './MigrationV4ToV5.js';
+import { MigrationV5ToV6 } from './MigrationV5ToV6.js';
+import { MigrationV6ToV7 } from './MigrationV6ToV7.js';
+import { MigrationV7ToV8 } from './MigrationV7ToV8.js';
+import { MigrationV8ToV9 } from './MigrationV8ToV9.js';
+import { MigrationV9ToV10 } from './MigrationV9ToV10.js';
+import { MigrationV10ToV11 } from './MigrationV10ToV11.js';
+import { MigrationV11ToV12 } from './MigrationV11ToV12.js';
 
 /** Ordered chain: MIGRATIONS[i].from === i. */
-const MIGRATIONS = Object.freeze([MigrationOriginalToV1, MigrationV1ToV2, MigrationV2ToV3, MigrationV3ToV4]);
+const MIGRATIONS = Object.freeze([
+  MigrationOriginalToV1, MigrationV1ToV2, MigrationV2ToV3, MigrationV3ToV4,
+  MigrationV4ToV5, MigrationV5ToV6, MigrationV6ToV7, MigrationV7ToV8,
+  MigrationV8ToV9, MigrationV9ToV10, MigrationV10ToV11, MigrationV11ToV12
+]);
 
 export class SaveMigrator {
   /**

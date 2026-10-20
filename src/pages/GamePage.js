@@ -8,6 +8,7 @@
 
 import { BasePage } from './BasePage.js';
 import { UIText } from '../ui/UIText.js';
+import { PokemonBackgroundView } from '../ui/PokemonBackgroundView.js';
 import { DashboardView } from '../ui/dashboard/DashboardView.js';
 import { MobileDashboardNav } from '../ui/dashboard/MobileDashboardNav.js';
 import { DashboardLayoutSystem } from '../systems/DashboardLayoutSystem.js';
@@ -19,6 +20,10 @@ import { HatcheryPanel } from '../panels/HatcheryPanel.js';
 import { MinePanel } from '../panels/MinePanel.js';
 import { MapPanel } from '../panels/MapPanel.js';
 import { BattlePanel } from '../panels/BattlePanel.js';
+import { BattleSummaryModal } from '../panels/BattleSummaryModal.js';
+import { NpcTalkModal } from '../panels/NpcTalkModal.js';
+import { RepeatableQuestModal } from '../panels/RepeatableQuestModal.js';
+import { RepeatableSlotUpgradeModal } from '../panels/RepeatableSlotUpgradeModal.js';
 import { SecretBasePanel } from '../panels/SecretBasePanel.js';
 import { ShortcutsPanel } from '../panels/ShortcutsPanel.js';
 import { CurrenciesPanel } from '../panels/CurrenciesPanel.js';
@@ -26,12 +31,17 @@ import { PokeballsPanel } from '../panels/PokeballsPanel.js';
 import { LocationPanel } from '../panels/LocationPanel.js';
 import { TrainingCenterPanel } from '../panels/TrainingCenterPanel.js';
 import { TeamModal } from '../panels/TeamModal.js';
+import { TeamPresetsModal } from '../panels/TeamPresetsModal.js';
+import { PokemonInfoModal } from '../panels/PokemonInfoModal.js';
+import { HeldItemPickerModal } from '../panels/HeldItemPickerModal.js';
 import { SettingsModal } from '../panels/settings/SettingsModal.js';
 import { BallFilterEditorModal } from '../panels/BallFilterEditorModal.js';
 import { BallPickerModal } from '../panels/BallPickerModal.js';
 import { ShopPanel } from '../panels/fullscreen/ShopPanel.js';
 import { BadgesPanel } from '../panels/fullscreen/BadgesPanel.js';
 import { BagPanel } from '../panels/fullscreen/BagPanel.js';
+import { PokedexPanel } from '../panels/fullscreen/PokedexPanel.js';
+import { GuidePanel } from '../panels/fullscreen/GuidePanel.js';
 import { DashboardColumns } from '../config/DashboardLayout.js';
 import { t } from '../localization/LocalizationManager.js';
 
@@ -63,19 +73,29 @@ export class GamePage extends BasePage {
     ]);
 
     this.addChildren([
+      new PokemonBackgroundView(),
       new HeaderPanel(),
       new MobileDashboardNav(dashboard),
       dashboard,
       // Bottom message line (shown by the mobile CSS only)
       new UIText({ id: 'msg-log', tagName: 'div', text: t('welcome_msg') }),
       new TeamModal(),
+      new TeamPresetsModal(),
+      new PokemonInfoModal(),
+      new HeldItemPickerModal(),
+      new BattleSummaryModal(),
+      new NpcTalkModal(),
       new SettingsModal(),
       new BallFilterEditorModal(),
       // After the editor: the picker opens above it.
       new BallPickerModal(),
+      new RepeatableQuestModal(),
+      new RepeatableSlotUpgradeModal(),
       new ShopPanel(),
       new BadgesPanel(),
-      new BagPanel()
+      new BagPanel(),
+      new PokedexPanel(),
+      new GuidePanel()
     ]);
   }
 }

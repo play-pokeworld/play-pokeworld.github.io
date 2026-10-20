@@ -1,0 +1,52 @@
+/* Dungeon expedition: a compact, keyboard-focusable map that fits the battle dashboard. */
+.pw-dungeon-expedition { width: 100%; margin-top: 8px; }
+.pw-dungeon-panel,
+.pw-dungeon-last-run { display: grid; gap: 8px; padding: 10px; }
+.pw-dungeon-header { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.pw-dungeon-title { font-weight: 900; color: var(--pw-text-primary); }
+.pw-dungeon-location,
+.pw-dungeon-floor,
+.pw-dungeon-multiplier { color: var(--pw-text-secondary); font-size: 12px; }
+.pw-dungeon-bag-summary { color: var(--pw-text-secondary); font-size: 12px; line-height: 1.45; }
+.pw-dungeon-loot { display: flex; flex-wrap: wrap; gap: 4px; }
+.pw-dungeon-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.pw-dungeon-map-unavailable { color: var(--pw-text-secondary); font-size: 12px; }
+.pw-dgn-grid {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  padding: 6px;
+  border: 1px solid var(--pw-border-color);
+  border-radius: var(--pw-radius-md);
+  background: var(--pw-bg-surface);
+  outline-color: var(--pw-accent-color);
+}
+.pw-dgn-grid--7 { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.pw-dgn-grid--8 { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+.pw-dgn-grid--9 { grid-template-columns: repeat(9, minmax(0, 1fr)); }
+.pw-dgn-grid--10 { grid-template-columns: repeat(10, minmax(0, 1fr)); }
+.pw-dgn-grid--11 { grid-template-columns: repeat(11, minmax(0, 1fr)); }
+.pw-dgn-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 27px;
+  padding: 2px;
+  border: 1px solid var(--pw-border-color);
+  border-radius: var(--pw-radius-sm);
+  background: var(--pw-bg-surface-elevated);
+  color: var(--pw-text-secondary);
+}
+.pw-dgn-tile .pw-icon { width: 15px; height: 15px; }
+.pw-dgn-tile.is-fog { background: var(--pw-bg-surface); opacity: .52; }
+.pw-dgn-tile.is-open { border-color: var(--pw-border-strong); }
+.pw-dgn-tile.is-here { border-color: var(--pw-accent-color); color: var(--pw-accent-color); }
+.pw-dgn-tile.is-done { opacity: .55; }
+.pw-dgn-tile.t-combat { color: var(--pw-color-danger); }
+.pw-dgn-tile.t-elite { color: var(--orange); }
+.pw-dgn-tile.t-boss { color: var(--pw-accent-color); }
+.pw-dgn-tile.t-chest { color: var(--pw-color-success); }
+.pw-dgn-tile.t-ladder { color: var(--pw-accent-color); }
+.pw-dgn-tile:disabled { cursor: default; }

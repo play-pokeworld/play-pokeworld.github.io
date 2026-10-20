@@ -1,20 +1,19 @@
 /**
  * @file MineItemSoldEvent.js
- * @brief Emitted when mine items are sold.
+ * @brief Emitted when mine treasure is sold; the quest objective counts units.
  */
-
 import { BaseEvent } from '../BaseEvent.js';
 
 export class MineItemSoldEvent extends BaseEvent {
-  /** Bus key of this event type (never derived from the minifiable class name). */
   static TYPE = 'MineItemSoldEvent';
 
   /**
-   * @param {number} count - Items sold
+   * @param {number} count
+   * @param {{deferSave?: boolean}} [options]
    */
-  constructor(count) {
+  constructor(count, { deferSave = false } = {}) {
     super(MineItemSoldEvent.TYPE);
-    /** @type {number} */
     this.count = count;
+    this.deferSave = deferSave;
   }
 }

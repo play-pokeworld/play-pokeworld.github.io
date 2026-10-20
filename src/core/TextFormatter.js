@@ -156,4 +156,10 @@ export class TextFormatter {
     const lang = LocalizationManager.getInstance().currentLang;
     return Number(value ?? 0).toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US');
   }
+
+  /** @param {number} milliseconds @returns {string} Whole-minute and seconds countdown (M:SS). */
+  static formatMinutesSeconds(milliseconds) {
+    const seconds = Math.ceil(Math.max(0, Number(milliseconds) || 0) / 1000);
+    return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+  }
 }

@@ -17,6 +17,10 @@ export const StorageKeys = Object.freeze({
   DASHBOARD_COLUMNS: 'pokeworld_cols_v13',
   /** JSON object of the audio buses (music / sfx / cries). */
   AUDIO_SETTINGS: 'pw_audio',
+  /** JSON object of persisted capture/UI feedback animation preferences. */
+  ANIMATION_SETTINGS: 'pw_animation_preferences',
+  /** JSON array of the most recent browser errors used by the diagnostics section. */
+  DIAGNOSTIC_ERRORS: 'pw_diagnostic_errors',
 
   /** Save library index (JSON array of save summaries). */
   SAVE_LIBRARY: 'pokeworld_saves_v1',

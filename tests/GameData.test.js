@@ -133,6 +133,7 @@ describe('Pokédex', (test) => {
     assert.equal(dex.getCaughtStatus('rattata'), CaughtStatus.SHINY);
     assert.equal(dex.getCaughtCount(), 1);
     assert.equal(dex.getSeenCount(), 2);
+    assert.deepEqual(dex.getCaughtSpecies(), [{ species: 'rattata', shiny: true }]);
   });
 
   test('serializes and sanitizes', () => {

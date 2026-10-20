@@ -8,6 +8,8 @@ import { PokemonDB } from '../pokemon/PokemonDB.js';
 import { TalentDB } from '../pokemon/TalentDB.js';
 import { MoveDB } from '../battle/MoveDB.js';
 import { ItemDB } from '../items/ItemDB.js';
+import { MineLootDB } from '../items/MineLootDB.js';
+import { TrainingOpponentDB } from '../training/TrainingOpponentDB.js';
 import { LocationDB } from '../world/LocationDB.js';
 import { QuestDB } from '../quests/QuestDB.js';
 import { TrainerDB } from '../trainers/TrainerDB.js';
@@ -22,6 +24,8 @@ export class DataValidator {
       MoveDB.getInstance(),
       PokemonDB.getInstance(),
       ItemDB.getInstance(),
+      MineLootDB.getInstance(),
+      TrainingOpponentDB.getInstance(),
       TrainerDB.getInstance(),
       LeagueDB.getInstance(),
       ShopDB.getInstance(),

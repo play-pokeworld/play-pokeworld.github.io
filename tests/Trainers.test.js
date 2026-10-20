@@ -146,10 +146,12 @@ describe('Trainer battles', (test) => {
     assert.ok(TrainerSystem.getInstance().challenge('elite4', { locationId: 'indigo' }));
     runBattle(battle);
     battle.setRandom(Random.default);
-    assert.ok(save.player.hasBadge('elite4'));
-    assert.ok(save.statistics.leaguesWon.includes('kanto'));
+    assert.equal(save.player.hasBadge('elite4'), false, 'a league title is not stored as a Gym badge');
+    assert.equal(save.player.getBadgeCount(), 8, 'the title does not inflate the Gym badge counter');
+    assert.ok(save.statistics.hasWonLeague('kanto'));
+    assert.equal(TrainerSystem.getInstance().getChallenge('elite4').state, ChallengeStates.REMATCH);
     for (const id of ['lorelei', 'bruno', 'agatha', 'lance', 'blue']) assert.equal(save.statistics.trainerWins[id], 1, id);
-    assert.equal(BadgeRules.regionCount(save.player, 'kanto'), 8, 'the title is not a gym badge');
+    assert.equal(BadgeRules.regionCount(save.player, 'kanto'), 8, 'the league title is separate from the Gym badges');
   });
 
   test('a quest trainer pays quest points and counts for its boss objective', () => {

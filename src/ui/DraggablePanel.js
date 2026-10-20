@@ -8,7 +8,12 @@
  */
 
 import { UIPanel } from './UIPanel.js';
+import { UIButton } from './UIButton.js';
 import { DashboardColumns } from '../config/DashboardLayout.js';
+import { GUIDE_SECTION_FOR_WINDOW } from '../config/GuideSections.js';
+import { ModalIds } from '../config/ModalIds.js';
+import { EventBus } from '../core/EventBus.js';
+import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
 import { t } from '../localization/LocalizationManager.js';
 
 const COLUMN_IDS = Object.freeze(Object.values(DashboardColumns));
@@ -37,6 +42,19 @@ export class DraggablePanel extends UIPanel {
       name: options.name || 'DraggablePanel'
     });
     this._headerDom.setAttribute('data-drag-window', options.id);
+
+    const section = GUIDE_SECTION_FOR_WINDOW[options.id] ?? null;
+    const helpButton = new UIButton({
+      variant: 'ghost',
+      size: 'sm',
+      className: 'pw-win-tool-btn pw-win-help-btn',
+      icon: 'help',
+      onClick: () => EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.GUIDE, { section }))
+    });
+    helpButton.setData('stopDrag', 'true');
+    helpButton.setAriaLabel(t('guide_open_from_panel', { panel: options.title || t('guide_title') }));
+    helpButton.setTooltip(t('guide_open_help'));
+    this.addHeaderAction(helpButton);
 
     if (!COLUMN_IDS.includes(options.column)) {
       console.warn(t('debug_panel_column_invalid', { id: options.id, column: String(options.column) }));

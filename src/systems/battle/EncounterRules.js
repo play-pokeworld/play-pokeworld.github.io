@@ -29,13 +29,21 @@ export class EncounterRules {
    * @param {ReadonlyArray<{species: string, minLevel: number, maxLevel: number, rarity?: string}>} encounters
    * @param {ReadonlyArray<import('../../data/pokemon/PokemonData.js').PokemonData>} team
    * @param {import('../../core/Random.js').Random} random
+   * @param {{bucketHint?:'common'|'uncommon'|'rare'|null}} [options]
    * @returns {import('../../data/pokemon/PokemonData.js').PokemonData|null}
    */
-  static drawWild(encounters, team, random) {
+  static drawWild(encounters, team, random, { bucketHint = null } = {}) {
     if (encounters.length === 0) return null;
+    let candidates = encounters;
+    if (['common', 'uncommon', 'rare'].includes(bucketHint)) {
+      const priority = ['rare', 'uncommon', 'common'];
+      const start = priority.indexOf(bucketHint);
+      const bucket = priority.slice(start).find((rarity) => encounters.some((candidate) => (candidate.rarity || 'common') === rarity));
+      candidates = bucket ? encounters.filter((candidate) => (candidate.rarity || 'common') === bucket) : encounters;
+    }
     const weightOf = (entry) => BattleConfig.RARITY_WEIGHTS[entry.rarity] ?? BattleConfig.RARITY_WEIGHTS.common;
-    let roll = random.next() * encounters.reduce((sum, entry) => sum + weightOf(entry), 0);
-    const entry = encounters.find((candidate) => (roll -= weightOf(candidate)) < 0) || encounters[0];
+    let roll = random.next() * candidates.reduce((sum, entry) => sum + weightOf(entry), 0);
+    const entry = candidates.find((candidate) => (roll -= weightOf(candidate)) < 0) || candidates[0];
     if (!PokemonDB.getInstance().has(entry.species)) return null;
     const level = random.int(entry.minLevel, entry.maxLevel);
     const shiny = random.next() < EncounterRules.shinyRate(team);

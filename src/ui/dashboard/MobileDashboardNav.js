@@ -9,6 +9,7 @@
 import { UIElement } from '../UIElement.js';
 import { UITabBar } from '../UITabBar.js';
 import { AppShell } from '../AppShell.js';
+import { DashboardWindowFocusRequestedEvent } from '../../core/events/DashboardWindowFocusRequestedEvent.js';
 import {
   MOBILE_BREAKPOINT_PX,
   MOBILE_VIEWS,
@@ -53,6 +54,7 @@ export class MobileDashboardNav extends UIElement {
       }
     });
     this.addChildren([this._mainBar, this._subBar]);
+    this.listen(DashboardWindowFocusRequestedEvent, (event) => this._focusWindow(event.windowId));
   }
 
   /** @override */
@@ -77,6 +79,25 @@ export class MobileDashboardNav extends UIElement {
   _updateMode(viewportWidth) {
     AppShell.setMobileMode(viewportWidth <= MOBILE_BREAKPOINT_PX);
     this._applyVisibility();
+  }
+
+  /** @private Selects the mobile view containing a window, then scrolls to it. */
+  _focusWindow(windowId) {
+    const mainView = MOBILE_VIEWS.find((view) => view.windows.includes(windowId));
+    if (mainView) {
+      this._view = mainView.id;
+      this._mainBar.select(mainView.id, false);
+    } else {
+      const manageView = MOBILE_MANAGE_VIEWS.find((view) => view.windows.includes(windowId));
+      if (manageView) {
+        this._view = MOBILE_MANAGE_VIEW_ID;
+        this._manageView = manageView.id;
+        this._mainBar.select(MOBILE_MANAGE_VIEW_ID, false);
+        this._subBar.select(manageView.id, false);
+      }
+    }
+    this._applyVisibility();
+    this._dashboard.focusWindow(windowId);
   }
 
   /** @private Shows the windows of the selected tab (every window on desktop). */

@@ -1,7 +1,6 @@
 /**
  * @file CurrenciesData.js
- * @brief Wallet model: single source of truth for every currency, money included
- * (C++ equivalent: class CurrenciesData : public BaseModel).
+ * @brief Wallet model: one amount and one progressive visibility flag per currency.
  */
 
 import { BaseModel } from '../core/BaseModel.js';
@@ -10,53 +9,70 @@ import { CurrencyChangedEvent } from '../../core/events/CurrencyChangedEvent.js'
 import { CURRENCIES } from './CurrencyDefinitions.js';
 
 export class CurrenciesData extends BaseModel {
-  /**
-   * @param {Object} [initialData={}]
-   */
+  /** @param {Object} [initialData={}] */
   constructor(initialData = {}) {
     super('CurrenciesData', 'Data');
     this.deserialize(initialData);
   }
 
-  /**
-   * @param {string} id - Currency id (see CurrencyDefinitions)
-   * @returns {number}
-   */
+  /** @param {string} id @returns {number} */
   get(id) {
     return typeof this[id] === 'number' ? this[id] : 0;
   }
 
   /**
-   * Modifies the amount of a currency (never below zero) and notifies listeners.
+   * @param {string} id
+   * @returns {boolean} Whether the currency belongs in the wallet panel
+   */
+  isRevealed(id) {
+    if (!CURRENCIES.some((currency) => currency.id === id)) return false;
+    if (id === 'battlePoint') return this.get(id) > 0;
+    return this.revealed[id] === true;
+  }
+
+  /**
+   * Reveals a currency without changing its balance (used by unlock systems such as the mine).
+   * @param {string} id
+   * @returns {boolean} Whether visibility changed
+   */
+  reveal(id) {
+    if (!CURRENCIES.some((currency) => currency.id === id) || this.isRevealed(id)) return false;
+    this.revealed[id] = true;
+    EventBus.getInstance().dispatch(new CurrencyChangedEvent(id, this.get(id)));
+    return true;
+  }
+
+  /**
+   * Modifies a balance (never below zero), revealing earned currencies as in the original.
    * @param {string} id
    * @param {number} delta
    */
   add(id, delta) {
-    this[id] = Math.max(0, this.get(id) + delta);
+    const before = this.get(id);
+    this[id] = Math.max(0, before + delta);
+    if (delta > 0 && id !== 'battlePoint' && CURRENCIES.some((currency) => currency.id === id)) {
+      this.revealed[id] = true;
+    }
     EventBus.getInstance().dispatch(new CurrencyChangedEvent(id, this[id]));
   }
 
-  /**
-   * @override
-   * @returns {Object}
-   */
+  /** @override @returns {Object} */
   serialize() {
-    const out = {};
-    for (const def of CURRENCIES) {
-      out[def.id] = this.get(def.id);
-    }
+    const out = { revealed: { ...this.revealed } };
+    for (const definition of CURRENCIES) out[definition.id] = this.get(definition.id);
     return out;
   }
 
-  /**
-   * Missing currencies get their start amount.
-   * @override
-   * @param {Object} data
-   */
+  /** @override @param {Object} data */
   deserialize(data = {}) {
-    const raw = data || {};
-    for (const def of CURRENCIES) {
-      this[def.id] = Number.isFinite(raw[def.id]) ? raw[def.id] : def.startAmount;
+    const raw = data && typeof data === 'object' ? data : {};
+    const rawReveal = raw.revealed && typeof raw.revealed === 'object' ? raw.revealed : {};
+    this.revealed = {};
+    for (const definition of CURRENCIES) {
+      const amount = raw[definition.id];
+      this[definition.id] = Number.isFinite(amount) ? Math.max(0, amount) : definition.startAmount;
+      this.revealed[definition.id] = definition.id === 'money' ||
+        rawReveal[definition.id] === true || this[definition.id] > 0;
     }
   }
 }

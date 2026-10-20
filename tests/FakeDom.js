@@ -128,7 +128,7 @@ export class FakeElement {
 /** @returns {Object} A bare event object understood by FakeElement.dispatchEvent */
 export function fakeEvent(type, init = {}) {
   return {
-    type, bubbles: !!init.bubbles, key: init.key, button: init.button ?? 0, clientX: init.clientX ?? 0, clientY: init.clientY ?? 0,
+    type, bubbles: !!init.bubbles, key: init.key, detail: init.detail ?? 0, button: init.button ?? 0, clientX: init.clientX ?? 0, clientY: init.clientY ?? 0,
     target: null, currentTarget: null, _stopped: false,
     preventDefault() {}, stopPropagation() { this._stopped = true; }
   };

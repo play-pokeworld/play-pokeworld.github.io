@@ -70,7 +70,7 @@ export class StatChangeRules {
       combatant.statModTurns[stat]--;
       if (combatant.statModTurns[stat] <= 0) {
         delete combatant.statModTurns[stat];
-        combatant.statMods[stat] = 1;
+        combatant.statMods[stat] = combatant._baseStatMultipliers?.[stat] ?? 1;
       }
     }
   }

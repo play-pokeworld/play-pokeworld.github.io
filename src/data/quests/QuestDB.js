@@ -23,6 +23,39 @@ import { PokemonDB } from '../pokemon/PokemonDB.js';
 import { REGIONS } from '../../config/Regions.js';
 import { TrainerDB } from '../trainers/TrainerDB.js';
 import { LeagueDB } from '../trainers/LeagueDB.js';
+import { CURRENCIES } from '../save/CurrencyDefinitions.js';
+import { QuestRules } from '../../config/QuestRules.js';
+
+/** @param {*} value @returns {number} */
+function positiveInteger(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.max(0, Math.floor(number)) : 0;
+}
+
+/** @param {Object} raw */
+function readRewards(raw = {}) {
+  const questPoints = positiveInteger(raw.questPoints);
+  const currencies = {};
+  for (const [currencyId, rawQuantity] of Object.entries(raw.currencies || {})) {
+    const quantity = positiveInteger(rawQuantity);
+    if (quantity > 0) currencies[currencyId] = quantity;
+  }
+  // Backward-compatible source data: questPoints has always paid the quest-point currency.
+  if (questPoints > 0 && currencies[QuestRules.REWARD_CURRENCY] == null) {
+    currencies[QuestRules.REWARD_CURRENCY] = questPoints;
+  }
+  const items = {};
+  for (const [itemId, rawQuantity] of Object.entries(raw.items || {})) {
+    const quantity = positiveInteger(rawQuantity);
+    if (quantity > 0) items[itemId] = quantity;
+  }
+  return {
+    questPoints,
+    currencies,
+    items,
+    pokemon: raw.pokemon ? { ...raw.pokemon } : null
+  };
+}
 
 export class QuestDB extends DataRepository {
   /** @type {QuestDB|null} */
@@ -60,11 +93,7 @@ export class QuestDB extends DataRepository {
         region: raw.region || null,
         location: raw.location || null,
         objective: { ...raw.objective, count: Math.max(1, Number(raw.objective?.count) || 1) },
-        rewards: {
-          questPoints: Number(raw.rewards?.questPoints) || 0,
-          items: { ...(raw.rewards?.items || {}) },
-          pokemon: raw.rewards?.pokemon ? { ...raw.rewards.pokemon } : null
-        },
+        rewards: readRewards(raw.rewards),
         chain: raw.chain ? { ...raw.chain } : null,
         requires: raw.requires ? { ...raw.requires } : null,
         encounter: raw.encounter ? { ...raw.encounter } : null,
@@ -120,6 +149,7 @@ export class QuestDB extends DataRepository {
     const locations = LocationDB.getInstance();
     const items = ItemDB.getInstance();
     const species = PokemonDB.getInstance();
+    const currencyIds = new Set(CURRENCIES.map((currency) => currency.id));
     for (const quest of this._entries.values()) {
       const { key, objective, rewards } = quest;
       if (!Object.values(QuestCategories).includes(quest.category)) problems.push(this._problem(key, 'category', quest.category));
@@ -135,6 +165,9 @@ export class QuestDB extends DataRepository {
       if (objective.species && !species.has(objective.species)) problems.push(this._problem(key, 'objective.species', objective.species));
       for (const itemId of Object.keys(rewards.items)) {
         if (!items.has(itemId)) problems.push(this._problem(key, 'rewards.items', itemId));
+      }
+      for (const currencyId of Object.keys(rewards.currencies || {})) {
+        if (!currencyIds.has(currencyId)) problems.push(this._problem(key, 'rewards.currencies', currencyId));
       }
       if (rewards.pokemon && !species.has(rewards.pokemon.species)) problems.push(this._problem(key, 'rewards.pokemon', rewards.pokemon.species));
       if (quest.encounter && !locations.has(quest.encounter.location)) problems.push(this._problem(key, 'encounter', quest.encounter.location));

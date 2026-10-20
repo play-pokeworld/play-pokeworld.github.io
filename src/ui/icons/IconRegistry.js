@@ -66,6 +66,11 @@ const ICONS = Object.freeze({
     mode: 'stroke',
     paths: ['M18 6L6 18', 'M6 6l12 12']
   },
+  check: {
+    viewBox: '0 0 24 24',
+    mode: 'stroke',
+    paths: ['M20 6L9 17l-5-5']
+  },
 
   // --- Window header glyphs ---
   settings: stroke(
@@ -94,11 +99,18 @@ const ICONS = Object.freeze({
   dumbbell: stroke(['M6 6v12', 'M18 6v12', 'M3 9h6', 'M15 9h6', 'M3 15h6', 'M15 15h6', 'M9 12h6']),
 
   // --- Action glyphs (buttons, shortcuts) ---
-  box: stroke(['M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z', 'M3.27 6.96L12 12.01l8.73-5.05', 'M12 22.08V12']),
+  box: stroke(['M21 8a2 2 0 00-2-2H5a2 2 0 00-2 2v11a2 2 0 002 2h14a2 2 0 002-2z', 'M3 8l3-5h12l3 5', 'M12 12v5', 'M9.5 14.5h5']),
+  bag: stroke(['M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z', 'M3 6h18', 'M16 10a4 4 0 01-8 0']),
   backpack: stroke(['M5 10a7 7 0 0114 0v10a2 2 0 01-2 2H7a2 2 0 01-2-2z', 'M9 4V2h6v2', 'M8 14h8', 'M8 18h8']),
   store: stroke(['M3 9l1.5-5h15L21 9', 'M3 9h18v2a3 3 0 01-6 0 3 3 0 01-6 0 3 3 0 01-6 0z', 'M5 13v8h14v-8', 'M10 21v-5h4v5']),
+  shop: stroke(['M3 9l1-5h16l1 5', 'M4 9h16v11H4z', 'M9 20v-6h6v6']),
   bookOpen: stroke(['M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z', 'M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z']),
+  dictionary: stroke(['M4 19.5A2.5 2.5 0 016.5 17H20', 'M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z', 'M9 7h6', 'M9 11h6']),
   help: stroke(['M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3', 'M12 17h.01'], [circle(12, 12, 10)]),
+  guide: stroke(['M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3', 'M12 17h.01'], [circle(12, 12, 10)]),
+  badge: stroke(['M7.5 2.5h9l5 5v9l-5 5h-9l-5-5v-9z', 'M9 6h6l3 3v6l-3 3H9l-3-3V9z', 'M12 8.5l1.1 2.2 2.4.35-1.75 1.7.4 2.4L12 14l-2.15 1.15.4-2.4-1.75-1.7 2.4-.35z']),
+  atoll: stroke(['M3 19c3-2 5-2 8 0 3-2 5-2 10 0', 'M7 14c1.5-3 3-4.5 5-4.5S15.5 11 17 14', 'M12 10V4', 'M9 6l3-2 3 2']),
+  info: stroke(['M12 16v-4', 'M12 8h.01'], [circle(12, 12, 10)]),
   medal: stroke(['M8.21 13.89L7 23l5-3 5 3-1.21-9.12'], [circle(12, 8, 7)]),
   cart: stroke(['M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6'], [circle(9, 21, 1), circle(20, 21, 1)]),
   chat: stroke(['M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z']),

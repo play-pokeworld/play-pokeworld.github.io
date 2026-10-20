@@ -35,14 +35,52 @@ export class BoxSystem extends BaseSystem {
    * Stores a Pokémon in the box and marks it caught in the Pokédex. Does not persist: the caller
    * saves once after its whole operation.
    * @param {import('../data/pokemon/PokemonData.js').PokemonData} pokemon
+   * @param {{notify?: boolean}} [options]
    * @returns {boolean} False when no save is loaded
    */
-  addPokemon(pokemon) {
+  addPokemon(pokemon, { notify = true } = {}) {
     const save = SaveSystem.getInstance().getCurrentSave();
-    if (!save) return false;
+    if (!save || !pokemon) return false;
     save.box.push(pokemon);
     save.pokedex.markCaught(pokemon.species, pokemon.shiny);
-    EventBus.getInstance().dispatch(new BoxChangedEvent(save.box.length));
+    if (notify) EventBus.getInstance().dispatch(new BoxChangedEvent(save.box.length));
     return true;
+  }
+
+  /**
+   * Removes a Pokémon by its stable uid.
+   * @param {string} uid
+   * @param {{persist?: boolean, notify?: boolean}} [options]
+   * @returns {import('../data/pokemon/PokemonData.js').PokemonData|null}
+   */
+  removePokemon(uid, { persist = true, notify = true } = {}) {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    if (!save) return null;
+    const index = save.box.findIndex((pokemon) => pokemon.uid === uid);
+    if (index < 0) return null;
+    const [pokemon] = save.box.splice(index, 1);
+    if (persist) SaveSystem.getInstance().saveCurrent();
+    if (notify) this.dispatchChanged();
+    return pokemon;
+  }
+
+  /**
+   * Replaces the PC contents as part of a batch roster operation.
+   * @param {import('../data/pokemon/PokemonData.js').PokemonData[]} box
+   * @param {{persist?: boolean, notify?: boolean}} [options]
+   * @returns {boolean}
+   */
+  replaceContents(box, { persist = true, notify = true } = {}) {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    if (!save || !Array.isArray(box)) return false;
+    save.box = [...box];
+    if (persist) SaveSystem.getInstance().saveCurrent();
+    if (notify) this.dispatchChanged();
+    return true;
+  }
+
+  /** Emits the standard box event after a batch roster mutation. */
+  dispatchChanged() {
+    EventBus.getInstance().dispatch(new BoxChangedEvent(this.getBox().length));
   }
 }

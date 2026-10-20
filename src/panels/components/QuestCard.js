@@ -8,7 +8,7 @@ import { UIContainer } from '../../ui/UIContainer.js';
 import { UIText } from '../../ui/UIText.js';
 import { UIButton } from '../../ui/UIButton.js';
 import { UIProgressBar } from '../../ui/UIProgressBar.js';
-import { questRewardText } from './QuestRewardText.js';
+import { QuestRewardsView } from './QuestRewardsView.js';
 import { t } from '../../localization/LocalizationManager.js';
 
 export class QuestCard extends UIContainer {
@@ -26,7 +26,7 @@ export class QuestCard extends UIContainer {
     this._desc = new UIText({ tagName: 'div', className: 'pw-text-sm pw-light1 pw-quest-card-desc' });
     this._progressText = new UIText();
     this._bar = new UIProgressBar({ value: 0, max: 1, trackClassName: 'pw-progress-bar-sm quest-progress-container', fillClassName: 'quest-progress-bar' });
-    this._reward = new UIText({ tagName: 'div', className: 'pw-quest-reward' });
+    this._reward = new QuestRewardsView();
     /** @private @type {boolean} true while the button challenges the quest trainer */
     this._challenging = false;
     this._claim = new UIButton({
@@ -61,7 +61,7 @@ export class QuestCard extends UIContainer {
     this._progressText.setText(t('value_over_max', { value: progress, max: count }));
     this._bar.setValue(progress, count);
     this._bar.setFillState(complete ? 'is-done' : '');
-    this._reward.setRichText(questRewardText(quest.rewards));
+    this._reward.setRewards(quest.rewards);
     this._claim.setText(t(complete ? 'quest_claim_btn' : this._challenging ? 'quest_challenge_btn' : 'quest_in_progress_btn'));
     this._claim.toggleClass('is-done', complete);
     this._claim.toggleClass('is-challenge', this._challenging);

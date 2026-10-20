@@ -1,8 +1,10 @@
-# Data model (v1.5)
+# Data model (v1.10)
 
-How the rework stores, loads, validates and saves its data. This document replaces the
-recommendations of `docs/DATA_REVIEW.md` (v1.3), which are now implemented except where noted
-in its status table.
+How the Rework stores, loads, validates and saves its data. The package release is **1.10.0** and
+`SaveSchema.VERSION` is **12**; those are separate version numbers. League titles are stored as
+regional entries in `statistics.leaguesWon`, never as Gym badge IDs. This document replaces the
+recommendations of `docs/DATA_REVIEW.md` (v1.3), which are now implemented except where noted in its
+status table.
 
 ---
 
@@ -10,7 +12,7 @@ in its status table.
 
 | | Static definitions | Per-save state |
 |---|---|---|
-| What | Species, forms, talents, moves, items, locations, encounters, quests | Player, wallet, Pokédex, team, inventory, quest progress, statistics |
+| What | Species, forms, talents, moves, items, locations, encounters, quests | Player, wallet, Pokédex, team, PC box, team presets, inventory, quest/tutor progress, statistics, dungeons, hatchery, mine |
 | Where | `src/data/raw/*-data.js` → repositories | `SaveData` and its models (`src/data/save/`) |
 | Written by | Generators in `tools/data/` only | `SaveSystem` only |
 | Mutable | Never (deep frozen) | Through model methods that dispatch change events |
@@ -70,27 +72,44 @@ Frozen enums shared by the generators, the validator and the engine:
 
 ---
 
-## 3. Save format (schema 4)
+## 3. Save format (schema 12, package v1.10.0)
 
 ```js
 {
-  version: 4, id: 'PW-…', background, createdAt, updatedAt,
-  player:     { trainerName, trainerSprite, region, location, playTimeSeconds, badges: [ids] },
-  currencies: { money, dungeonToken, questPoint, diamond, battlePoint, farmPoint, contestToken },
-  pokedex:    { <species>: { seen, caught, shiny } },
-  team:       [ { uid, species, form, nickname, level, exp, hp, shiny, talent, heldItem,
-                  moves: [ids], ivs: {…}, evs: {…} } ],
-  box:        [ PokemonData… ]                       (PC box: catches made with a full team)
-  inventory:  { <itemId>: quantity },                (Poké Balls included)
-  ballFilters:[ { id, name, options { caught?, shiny?, caughtShiny?, type?, encounter? },
-                  ball, enabled } ]                  (priority order)
-  quests:     { mainStep: { <region>: n }, active: { <key>: { progress } }, completed: [keys],
-                repeatablesCompleted },
-  statistics: { wildWins: { <location>: n }, trainerWins: { <trainer>: n }, solvedPuzzles: [],
-                leaguesWon: [regions], caughtTotal, duplicateCatches: { <species>: n },
-                hatcheryLevel }
+  version: 12, id: 'PW-…', background, createdAt, updatedAt,
+  player:       { trainerName, trainerSprite, region, location, playTimeSeconds, badges: [ids] },
+  currencies:   { money, dungeonToken, questPoint, diamond, battlePoint, farmPoint, contestToken,
+                  revealed: { <currencyId>: boolean } },
+  pokedex:      { <species>: { seen, caught, shiny } },
+  team:         [ PokemonData… ],                    (active party)
+  box:          [ PokemonData… ],                    (PC box)
+  inventory:    { <itemId>: quantity },              (Poké Balls included)
+  ballFilters:  [ { id, name, options, ball, enabled } ],
+  teamPresets:  { activeId, slots: [ { id, name, members: [uids] } ] },
+  quests:       { mainStep: { <region>: n }, active: { <key>: { progress } }, completed: [keys],
+                  repeatablesCompleted, repeatableUnlocked, repeatableChoices: [ids],
+                  repeatableLastRollAt: epochMs, repeatableSlotUpgrades },
+  statistics:   { wildWins, capturesByLocation, trainerWins, solvedPuzzles, leaguesWon,
+                  caughtTotal, duplicateCatches, purchases, hatcheryLevel, trainingSessions },
+  tutorial:     { enabled, completed: [stepIds], rewardsClaimed: [stepIds] },
+  dungeons:     { exploredTotal, clears: { <locationId>: n }, run: DungeonRunData|null, lastRun },
+  hatchery:     { maxSlots, slots: [null | DaycareSlot | FossilSlot] },
+  mine:         { energy, maxEnergy, tool, grid, items, completedCount, lastEnergyAt },
+  access:       { unlockedLocations: [ids], unlockedFeatures: { <featureId>: true },
+                  regionStarters: [regionIds], championTitle }
 }
 ```
+
+`teamPresets` always contains 20 ordered slots (`preset1`…`preset20`), with a stable `activeId`.
+Each slot stores only Pokémon UIDs (maximum six) and an optional custom name; Pokémon remain owned by
+`team` or `box`, so editing a preset never copies or deletes a Pokémon. `TeamPresetSystem.load()`
+resolves those references, applies the selected roster through `TeamSystem` / `BoxSystem`, moves
+unselected party members into the box, and is disabled during battle.
+
+The `hatchery` model persists daycare Pokémon and fossil incubation progress. The `mine` model stores
+the current grid, tool, exposed-loot shapes and energy timestamp; the `dungeons` model stores an active,
+resumable floor map, carried loot and the last-run summary. Tutorial completion and reward-claim flags
+are separate so one-time rewards cannot be duplicated.
 
 - `PokemonData`: stats and max HP come from `StatCalculator` (base stats, level, IVs / EVs, shiny
   ×1.2); the level is derived from the total experience (`ExperienceCurve`). New Pokémon are built
@@ -100,6 +119,10 @@ Frozen enums shared by the generators, the validator and the engine:
   pays the overflow in money (10 % of the price), as the original `grantRewardItem`.
 - `CurrenciesData` follows `CurrencyDefinitions` (start amounts, visibility). Quest rewards are
   paid in `questPoint` (the original `rewardMoney`).
+- `access` stores sticky progression facts: locations, facilities already acquired, regional starters
+  and a champion milestone. `regionStarters` is not the region-unlock rule; the accessible-region
+  list is derived from the original league + full regional Pokédex conditions and published in the
+  `FeatureAccessSystem` snapshot.
 
 ### Loading and writing
 
@@ -113,17 +136,63 @@ Frozen enums shared by the generators, the validator and the engine:
   - `MigrationV3ToV4`: original `pokeballs.counts` join the inventory, `pokeballs.filters` become
     `ballFilters` (`customName` → `name`), empty `box`; a save without any ball gets the starting
     balls (10 Poké Balls).
+  - `MigrationV4ToV5`: adds 20 team preset slots and migrates both current-shaped data and original
+    `G.teamPresets.presetN = { name, uids }` / `G.activePresetId` references.
+  - `MigrationV5ToV6`: persists progressive currency visibility and captures by location.
+  - `MigrationV6ToV7`: stores tutorial completion and one-time reward flags; legacy saves without
+    tutorial state are not enrolled retroactively.
+  - `MigrationV7ToV8`: adds dungeon expedition state, maps, loot and clear counters.
+  - `MigrationV8ToV9`: adds hatchery slots, mine state and training-session statistics.
+  - `MigrationV9ToV10`: preserves explicit access and previously reached content; infers sticky
+    hatchery/mine/training access from durable save evidence, while never unlocking a never-used
+    feature merely because the old UI showed its panel. Original export facts are forwarded by
+    `MigrationOriginalToV1`.
+  - `MigrationV10ToV11`: adds and backfills repeatable-board unlocks, persisted offers, cooldown and
+    slot upgrades without reopening an unused board.
+  - `MigrationV11ToV12`: removes known League IDs from `player.badges`, rebuilds regional League
+    titles from statistics, legacy badges and trainer wins, and repairs facility unlocks when the
+    save contains durable evidence (saved gate flags, reached locations, facility progress or
+    required Gym badges). Unknown forward-compatible badge IDs remain untouched.
 - `SaveSystem` is the only writer: **one write per operation** (`saveCurrent()` after a battle,
   a quest claim, a travel…), through `SaveStorage` → `LocalStore`.
+
+### Central content access (schema 12)
+
+`FeatureAccessSystem` is the single DOM-free resolver for world reachability and the Pension, Mine
+and Training gates. `ContentAccessRules` declares exceptional map gates; generated location
+connections, regional badge counts and win requirements remain in `LocationDB`. Gameplay commands
+ask the resolver before changing state, so a panel cannot grant itself access or repeat its own
+version of the rule.
+
+The resolver persists newly earned facts in `ContentAccessData`, then publishes one immutable
+`ContentAccessChangedEvent` snapshot (`features`, `locations`, `regions`, starter facts and champion
+milestone). Progression-locked facility windows stay visible on desktop and render localized gate
+messages; mobile focus still hides non-selected windows. The dashboard does not duplicate domain
+rules. The hatchery, mine and training systems query the resolver before every state-changing action.
+
+For the header denominator, `regions` follows the original rule: Kanto is open by default; Johto
+requires the Kanto League plus the complete Kanto Pokédex; Hoenn requires the Johto League plus the
+complete Johto Pokédex. Thus the denominator is eight badges per accessible region, and updates on
+Pokédex changes. This calculation is deliberately distinct from the `regionStarters` acquisition
+facts.
+
+`MigrationV9ToV10` keeps access that was already recorded and carries forward evidence of use from
+older saves (unlocked locations/features, daycare/mine progress, training sessions and starters).
+`MigrationV11ToV12` repairs the later schema from persisted unlock flags and durable location,
+facility or badge evidence. A player whose save never reached a gated feature stays gated. System
+and migration tests cover acquired and not-yet-acquired cases; the dashboard test verifies visible
+locked panels and mobile focus behavior.
 
 ---
 
 ## 4. Quests
 
 - **Definition** (`QuestDB`, frozen): `{ key, category, id, region, location, objective { type, count,
-  … }, rewards { questPoints, items, pokemon }, chain, requires, encounter, locked }`.
+  … }, rewards { questPoints, currencies, items, pokemon }, chain, requires, encounter, locked }`.
+  Reward UI is generated from these reward fields rather than a parallel hard-coded reward sentence.
 - **Progress** (`QuestProgressData`, per save): active quests with their progress, main step per
-  region, completed side quests, repeatable counter.
+  region, completed side quests, repeatable counter, unlock flag, persisted offer ids, last-roll
+  timestamp and purchased slot upgrades.
 - **Objective classes**: one class per `ObjectiveTypes` value in `data/quests/objectives/`, each
   declaring the events it listens to (`static EVENTS`) and how an event advances the progress
   (`KillObjective` ← `PokemonDefeatedEvent`, `CatchObjective` ← `PokemonCaughtEvent`,
@@ -135,6 +204,23 @@ Frozen enums shared by the generators, the validator and the engine:
   (quest points, items through `grantItem`, gift Pokémon) and advances the chain. A quest whose
   reward Pokémon must be met dispatches `QuestEncounterRequestedEvent`; `BattleSystem` runs the
   encounter and claims again with `{ encounterWon: true }` once the Pokémon is caught.
+- **Repeatable board**: the system persists three offer ids, their last-roll timestamp, the unlock
+  fact and zero to four purchased slot upgrades. Offers are filtered by the player's region; r30–r38
+  are explicitly Johto-only, including the otherwise unlocated catch/mining contracts. The board
+  rejects acceptance when locked or full, rerolls for free every ten minutes, and charges the
+  configured Pokédollar cost in the system. Capacity grows from one to five active contracts.
+- **NPC dialogue and unlock**: `LocaleCatalog` loads each location's localized NPC names and lines;
+  `NpcDirectory` supplies stable identities and `NpcTalkModal` lets the player select an individual
+  person. `NpcTalkedEvent` carries both `locationId` and an optional `npcId`; a new save unlocks the
+  board only for `cerulean` + `swimmer-ondee` (Nageuse Ondée / Swimmer Ondée). Legacy migrations
+  still preserve an existing unlock or recognized repeatable progress.
+- **Migration from original saves** maps accepted `G.repeatables` instances to
+  `repeatable.<templateId>` keys in `active`, preserving progress, completed state and location
+  baselines against `wildWinsByLoc`. It also migrates `repeatableChoices`, `repeatableLastRollAt`,
+  `repeatableSlotUpgrades` (or the legacy capacity), and the original unlock flag/backfills. The
+  v10→v11 migration adds defaults to Rework saves and infers prior access from active/completed
+  contracts, saved offers, purchased slots, badges or Johto progression; brand-new saves remain
+  locked until the target NPC is selected.
 
 Adding an objective type: add the value to `ObjectiveTypes`, write the class, register it, emit
 the event from the system that owns the action. No other file changes.
@@ -182,14 +268,23 @@ UI: `PokeballsPanel` (filters, ball, quantity of the chosen ball), `BallFilterEd
 
 | Event | Emitted by | Consumed by |
 |---|---|---|
-| `SaveCreatedEvent`, `SaveLoadedEvent` | `SaveSystem` | QuestSystem, panels |
+| `SaveCreatedEvent`, `SaveLoadedEvent` | `SaveSystem` | QuestSystem, panels, FeatureAccessSystem |
+| `NpcTalkedEvent` | `LocationSystem` | QuestSystem; `npcId` distinguishes a selected NPC from generic talk |
+| `ContentAccessChangedEvent` | `FeatureAccessSystem` | DashboardView, HeaderPanel, access-sensitive shortcuts |
 | `CurrencyChangedEvent`, `InventoryChangedEvent`, `TeamChangedEvent` | save models / TeamSystem | panels, objectives |
 | `PokemonDefeatedEvent` | `BattleSystem` | quest objectives |
 | `PokemonCaughtEvent` | `CatchSystem` | quest objectives |
+| `PokedexChangedEvent` | `PokedexData` | Pokédex panels, LocationPanel, FeatureAccessSystem |
 | `BallFiltersChangedEvent` | `PokeballSystem` | Poké Ball panel and editor |
-| `BoxChangedEvent` | `BoxSystem` | (future PC box window) |
+| `TeamPresetsChangedEvent` | `TeamPresetSystem` | preset manager |
+| `BoxChangedEvent` | `BoxSystem` | team preset manager; (future PC box window) |
 | `BattleStartedEvent`, `BattleStateChangedEvent`, `BattleAttackEvent`, `BattleEndedEvent` | `BattleSystem` | battle and team panels |
 | `QuestProgressedEvent`, `QuestCompletedEvent`, `QuestClaimedEvent`, `QuestEncounterRequestedEvent` | `QuestSystem` | StoryPanel, BattleSystem |
-| `LocationChangedEvent` | `LocationSystem` | map, battle scene, QuestSystem |
+| `DungeonEnteredEvent`, `DungeonRunChangedEvent`, `DungeonBattleResolvedEvent` | `DungeonSystem` / `BattleSystem` | TutorialSystem, expedition panel |
+| `HatcheryChangedEvent`, `HatcheryLevelUpEvent` | `HatcherySystem` | hatchery panel, quest objectives |
+| `MineChangedEvent`, `MineDugEvent`, `MineItemSoldEvent` | `MineSystem` / `SaleSystem` | mine panel, quest objectives |
+| `TrainingSessionCompletedEvent` | `TrainingSystem` | quest objectives |
+| `TutorialProgressChangedEvent` | `TutorialSystem` | tutorial card |
+| `LocationChangedEvent` | `LocationSystem` | map, battle scene, QuestSystem, facility panels |
 
 Models mutate their state **before** dispatching, so a listener always reads the new state.

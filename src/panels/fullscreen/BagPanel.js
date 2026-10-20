@@ -8,9 +8,13 @@ import { UIFullscreenPanel } from '../../ui/UIFullscreenPanel.js';
 import { UIContainer } from '../../ui/UIContainer.js';
 import { UIText } from '../../ui/UIText.js';
 import { UIImage } from '../../ui/UIImage.js';
+import { UIButton } from '../../ui/UIButton.js';
 import { ModalIds } from '../../config/ModalIds.js';
 import { BAG_CATEGORIES, BAG_SORT_OPTIONS, BagSorts } from '../../config/BagCategories.js';
 import { ItemDB } from '../../data/items/ItemDB.js';
+import { ItemKinds } from '../../data/items/ItemKinds.js';
+import { SaleSystem } from '../../systems/SaleSystem.js';
+import { TextFormatter } from '../../core/TextFormatter.js';
 import { SaveSystem } from '../../systems/SaveSystem.js';
 import { BagQuery } from '../../systems/inventory/BagQuery.js';
 import { InventoryChangedEvent } from '../../core/events/InventoryChangedEvent.js';
@@ -106,17 +110,43 @@ export class BagPanel extends UIFullscreenPanel {
 
   /** @private Description card of the clicked item. */
   _detail(entry) {
+    const definition = ItemDB.getInstance().getById(entry.itemId);
+    const details = new UIContainer({
+      className: 'pw-bag-detail-text',
+      children: [
+        new UIText({ tagName: 'div', className: 'pw-bag-detail-name', text: `${entry.name} ${t('bag_qty', { n: entry.quantity })}` }),
+        new UIText({ tagName: 'div', className: 'pw-bag-detail-desc', richText: descOf(entry.itemId) })
+      ]
+    });
+    if (definition?.kind === ItemKinds.TREASURE) {
+      const quote = SaleSystem.getInstance().getQuote(entry.itemId, 1);
+      const price = quote?.currencyId === 'money'
+        ? t('money_amount', { value: TextFormatter.formatNumber(quote.gain) })
+        : `${TextFormatter.formatNumber(quote?.gain ?? 0)} ${t('currency_diamonds')}`;
+      details.addChild(new UIContainer({
+        className: 'pw-bag-sale-controls',
+        children: [
+          new UIText({ className: 'pw-bag-sale-price', text: t('sale_price', { price }) }),
+          new UIButton({
+            variant: 'success',
+            size: 'sm',
+            text: t('sale_sell_one'),
+            onClick: () => SaleSystem.getInstance().sell(entry.itemId, 1)
+          }),
+          entry.quantity > 1 ? new UIButton({
+            variant: 'secondary',
+            size: 'sm',
+            text: t('sale_sell_all', { count: TextFormatter.formatNumber(entry.quantity) }),
+            onClick: () => SaleSystem.getInstance().sell(entry.itemId, entry.quantity)
+          }) : null
+        ]
+      }));
+    }
     return new UIContainer({
       className: 'pw-bag-detail',
       children: [
         new UIImage({ src: ItemDB.getInstance().getImagePath(entry.itemId), alt: entry.name, className: 'pw-bag-detail-icon', pixelated: true }),
-        new UIContainer({
-          className: 'pw-bag-detail-text',
-          children: [
-            new UIText({ tagName: 'div', className: 'pw-bag-detail-name', text: `${entry.name} ${t('bag_qty', { n: entry.quantity })}` }),
-            new UIText({ tagName: 'div', className: 'pw-bag-detail-desc', richText: descOf(entry.itemId) })
-          ]
-        })
+        details
       ]
     });
   }

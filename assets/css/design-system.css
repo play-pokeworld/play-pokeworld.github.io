@@ -95,8 +95,8 @@
 
   /* V7 · DBT-06 — fusionné depuis l’ancien bloc :root (ordre de déclaration conservé) */
   --pw-header-h: 50px;
-  /* Real height of the game top bar (#header), used to keep overlays below it. */
-  --pw-game-header-h: 64px;
+  /* Original #header minimum height; used to keep notifications below the top bar. */
+  --pw-game-header-h: 56px;
   /* Wave 33 — the header band is defined by these four tokens ONLY. Every
      panel header (reference fullscreen panels included) resolves to them;
      no panel may redeclare height/padding/radius/title-size locally. */
@@ -3003,10 +3003,8 @@ button.tab {
 }
 .battle-damage-fill {
   height: 100%;
-  /* Wave 13: flat solid fill (no gradients on coloured elements). The
-     component now emits the width inline; --pct stays as fallback for
-     legacy painter-only consumers. */
-  width: var(--pct, 0%);
+  /* UIProgressBar supplies its ratio through the standard widget variable. */
+  width: var(--pw-progress, var(--pct, 0%));
   background: var(--blue);
   border-radius: 999px;
 }
@@ -8017,13 +8015,25 @@ button.danger:hover, .hbtn.pw-btn-danger:hover {
   color: var(--light1); /* #C9BC9C on --dark1 = 7.3 : 1 */
   white-space: nowrap;
 }
-.pw-filter-select, .pw-filter-input {
-  height: 30px; padding: 0 8px; box-sizing: border-box;
-  background: var(--dark2); color: var(--light2);
-  border: 1px solid var(--dark3); border-radius: 8px;
-  font: inherit; font-size: 11px; font-weight: 600;
+.pw-filter-select {
+  height: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
-.pw-filter-select:focus, .pw-filter-input:focus { outline: none; border-color: var(--light1); }
+.pw-filter-select .pw-dropdown-select, .pw-filter-input {
+  height: 30px !important;
+  padding: 0 28px 0 8px !important;
+  box-sizing: border-box;
+  background-color: var(--dark2) !important;
+  color: var(--light2) !important;
+  border: 1px solid var(--dark3) !important;
+  border-radius: 8px !important;
+  font: inherit;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+}
+.pw-filter-select .pw-dropdown-select:focus, .pw-filter-input:focus { outline: none; border-color: var(--light1) !important; }
 .pw-filter-reset { margin-left: auto; }
 /* The legacy per-field markup (label>span+select without the pw- classes)
    inherits the same look so old call sites cannot drift visually. */
@@ -8220,9 +8230,9 @@ button.pw-hatchery-offer--breed .pw-hatchery-offer-mode { color: var(--purple) !
 .pw-settings-choices { display: flex; gap: 8px; }
 button.pw-settings-choice { flex: 1; padding: 8px; font-weight: bold; }
 button.theme-swatch--dark { background-color: #12151c !important; }
-button.theme-swatch--light { background-color: #d64566 !important; }
+button.theme-swatch--light { background-color: #C73B5B !important; }
 button.theme-swatch--gameboy { background-color: #306230 !important; }
-button.theme-swatch--fire { background-color: #ff5722 !important; }
+button.theme-swatch--fire { background-color: #BF360C !important; }
 button.theme-swatch--ocean { background-color: #0E2233 !important; }
 button.theme-swatch--forest { background-color: #1B2A1B !important; }
 button.theme-swatch--sakura { background-color: #FDF2F5 !important; }
@@ -8771,12 +8781,6 @@ button.hatchery-hatch-btn[data-call="hatchEgg"] * { color: #f6f1dc !important; }
 .pw-loc-info { display: grid; gap: 10px; }
 .pw-loc-overview { padding: 12px; border-radius: 12px; }
 .pw-loc-overview-title { color: var(--pw-text-primary); font-weight: 900; font-size: 16px; margin-bottom: 8px; }
-.pw-loc-overview-meta { display: flex; flex-wrap: wrap; gap: 8px; }
-.pw-loc-meta-chip {
-  display: inline-flex; align-items: center; min-height: 26px; padding: 3px 10px; border-radius: 999px;
-  background: rgba(0,0,0,.24); border: 1px solid var(--pw-border-color);
-  color: var(--light1); font-size: 11px; font-weight: 800;
-}
 .pw-loc-lore { padding: 10px 12px; border-radius: 12px; display: grid; gap: 4px; }
 .pw-loc-action-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(150px,100%), 1fr)); gap: 8px; }
 .pw-loc-action-btn, .pw-loc-action-row {
@@ -11978,6 +11982,14 @@ body {
   .pw-fx-smooth { transition: none !important; }
   .pw-fx-float { display: none !important; }
 }
+
+/* The Settings accessibility switch uses the same feedback layer, without
+   disabling modal, navigation or decorative background transitions. */
+body.pw-ui-animations-off .pw-fx-float { display: none !important; }
+body.pw-ui-animations-off .pw-fx-shake,
+body.pw-ui-animations-off .pw-fx-pulse,
+body.pw-ui-animations-off .pw-fx-capture { animation: none !important; }
+body.pw-ui-animations-off .pw-fx-smooth { transition: none !important; }
 
 /* Fenêtres étroites : la barre de monnaies passe sous le titre plutôt que
    d'écraser le bouton des réglages. */

@@ -12,8 +12,11 @@ import { NotificationSystem } from './NotificationSystem.js';
 import { NotificationChannels, NotificationTones } from '../config/NotificationConfig.js';
 import { LocationDB } from '../data/world/LocationDB.js';
 import { ShopDB } from '../data/shops/ShopDB.js';
+import { LeagueDB } from '../data/trainers/LeagueDB.js';
 import { ShopRules } from '../config/ShopRules.js';
 import { ShopCatalog } from './shop/ShopCatalog.js';
+import { ShopPurchaseCompletedEvent } from '../core/events/ShopPurchaseCompletedEvent.js';
+import { EventBus } from '../core/EventBus.js';
 import { t } from '../localization/LocalizationManager.js';
 
 /** Results of ShopSystem.buy(). */
@@ -57,8 +60,11 @@ export class ShopSystem extends BaseSystem {
    */
   isLocked(locationId = LocationSystem.getInstance().getCurrentLocationId()) {
     const shop = this.getShop(locationId);
+    if (!shop?.requiresLeague) return false;
     const save = SaveSystem.getInstance().getCurrentSave();
-    return !!shop?.requiresLeague && !save?.player.hasBadge(shop.requiresLeague);
+    const league = LeagueDB.getInstance().getById(shop.requiresLeague);
+    if (!save || !league) return true;
+    return !save.statistics.hasWonLeague(league.region);
   }
 
   /**
@@ -96,6 +102,7 @@ export class ShopSystem extends BaseSystem {
     save.statistics.recordPurchase(offer.itemId, amount);
     const bonus = offer.itemId === honor.from ? Math.floor((before + amount) / honor.every) - Math.floor(before / honor.every) : 0;
     if (bonus > 0) save.inventory.add(honor.ball, bonus);
+    EventBus.getInstance().dispatch(new ShopPurchaseCompletedEvent(offer.itemId, amount, locationId, offer.currency, total));
     SaveSystem.getInstance().saveCurrent();
 
     const name = t(`item.${offer.itemId}.name`);

@@ -59,6 +59,13 @@ export class PokedexData extends BaseModel {
     return count;
   }
 
+  /** @returns {Array<{species: string, shiny: boolean}>} Caught species for collection displays. */
+  getCaughtSpecies() {
+    return [...this._entries.entries()]
+      .filter(([, entry]) => entry.caught)
+      .map(([species, entry]) => ({ species, shiny: entry.shiny }));
+  }
+
   /** @param {string} species */
   markSeen(species) {
     if (!species || this.isSeen(species)) return;

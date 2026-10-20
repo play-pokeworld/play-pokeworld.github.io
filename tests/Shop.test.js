@@ -60,6 +60,8 @@ describe('Shops', (test) => {
     assert.equal(ShopSystem.getInstance().isLocked('indigo'), true);
     assert.equal(ShopSystem.getInstance().buy('rarecandy', 1, 'indigo'), PurchaseResults.LOCKED);
     save.player.earnBadge('elite4');
+    assert.equal(ShopSystem.getInstance().isLocked('indigo'), true, 'a league id is never accepted as a Gym badge');
+    save.statistics.recordLeague('kanto');
     assert.equal(ShopSystem.getInstance().isLocked('indigo'), false);
     assert.equal(ShopSystem.getInstance().buy('rarecandy', 1, 'indigo'), PurchaseResults.OK);
   });

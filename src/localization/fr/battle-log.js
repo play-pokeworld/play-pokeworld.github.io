@@ -51,6 +51,8 @@ export const battleLog = {
   exp_none: 'Adversaire trop faible (+0 XP).',
   level_up: '{name} passe au niveau {level} !',
   money: 'Vous gagnez {money} ₽.',
+  item_found: 'Objet trouvé : {item} !',
+  item_duplicate_money: '{item} déjà possédé : converti en +{money} ₽.',
   catch_success: '{name} a été capturé !',
   catch_fail: '{name} s\u2019est échappé de la {ball} !',
   ball_no_target: 'Aucun filtre ne capture {name}.',

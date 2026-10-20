@@ -8,13 +8,23 @@ import { EventBus } from '../src/core/EventBus.js';
 import { LocalStore } from '../src/core/LocalStore.js';
 import { TextFormatter } from '../src/core/TextFormatter.js';
 import { StorageKeys } from '../src/config/StorageKeys.js';
+import { AnimationPreferences } from '../src/config/AnimationPreferences.js';
 import { BattleConfig } from '../src/config/BattleConfig.js';
 import { NotificationChannels } from '../src/config/NotificationConfig.js';
 import { SaveSystem } from '../src/systems/SaveSystem.js';
 import { LocationSystem } from '../src/systems/LocationSystem.js';
 import { BattleSystem } from '../src/systems/BattleSystem.js';
+import { TeamSystem } from '../src/systems/TeamSystem.js';
+import { BoxSystem } from '../src/systems/BoxSystem.js';
+import { TeamPresetSystem } from '../src/systems/TeamPresetSystem.js';
+import { PokemonFactory } from '../src/data/pokemon/PokemonFactory.js';
 import { NotificationSystem } from '../src/systems/NotificationSystem.js';
 import { PreferencesSystem } from '../src/systems/PreferencesSystem.js';
+import { DiagnosticsSystem, DIAGNOSTIC_LIMITS } from '../src/systems/DiagnosticsSystem.js';
+import { BrowserDiagnostics } from '../src/ui/BrowserDiagnostics.js';
+import { DiagnosticsChangedEvent } from '../src/core/events/DiagnosticsChangedEvent.js';
+import { AnimationPreferencesChangedEvent } from '../src/core/events/AnimationPreferencesChangedEvent.js';
+import { questRewardEntries } from '../src/panels/components/QuestRewardsView.js';
 import { CurrenciesData } from '../src/data/save/CurrenciesData.js';
 import { PokemonDB } from '../src/data/pokemon/PokemonDB.js';
 import { LocationDB } from '../src/data/world/LocationDB.js';
@@ -25,6 +35,8 @@ import { SaveCreatedEvent } from '../src/core/events/SaveCreatedEvent.js';
 import { LocationChangedEvent } from '../src/core/events/LocationChangedEvent.js';
 import { BattleStartedEvent } from '../src/core/events/BattleStartedEvent.js';
 import { BattleEndedEvent } from '../src/core/events/BattleEndedEvent.js';
+import { TeamChangedEvent } from '../src/core/events/TeamChangedEvent.js';
+import { BoxChangedEvent } from '../src/core/events/BoxChangedEvent.js';
 import { CurrencyChangedEvent } from '../src/core/events/CurrencyChangedEvent.js';
 import { ThemeChangedEvent } from '../src/core/events/ThemeChangedEvent.js';
 import { NotificationDispatchedEvent } from '../src/core/events/NotificationDispatchedEvent.js';
@@ -72,6 +84,21 @@ describe('Core', (test) => {
     assert.ok(segments[1].bold && segments[1].text === '5');
     assert.ok(segments[3].italic);
     assert.equal(TextFormatter.toPlainText('<b>x</b> {n}', { n: 2 }), 'x 2');
+  });
+
+  test('quest reward entries are derived from current currency, item and Pokémon data', () => {
+    const entries = questRewardEntries({
+      currencies: { money: 42, questPoint: 12 },
+      items: { rarecandy: 2 },
+      pokemon: { species: 'pikachu', level: 8 }
+    });
+    assert.deepEqual(entries.map(({ kind, id, quantity }) => ({ kind, id, quantity })), [
+      { kind: 'currency', id: 'money', quantity: 42 },
+      { kind: 'currency', id: 'questPoint', quantity: 12 },
+      { kind: 'item', id: 'rarecandy', quantity: 2 },
+      { kind: 'pokemon', id: 'pikachu', quantity: 1 }
+    ]);
+    assert.ok(entries[1].icon.endsWith('/questPoint.svg'));
   });
 });
 
@@ -157,17 +184,72 @@ describe('Gameplay systems', (test) => {
     assert.equal(locations.travelTo('nowhere'), false);
   });
 
-  test('BattleSystem plays rounds through update(dt) until the battle ends', () => {
+  test('team presets save, edit, load from the box and move the old party into the box', () => {
+    const save = saves.createNewSave('Presetter', 'charmander');
+    const teamSystem = TeamSystem.getInstance();
+    const boxSystem = BoxSystem.getInstance();
+    const active = teamSystem.getTeam()[0];
+    const reserve = PokemonFactory.create('squirtle', 12);
+    const boxed = PokemonFactory.create('eevee', 10);
+    assert.ok(teamSystem.addPokemon(reserve));
+    assert.ok(boxSystem.addPokemon(boxed));
+    saves.saveCurrent();
+
+    const presets = TeamPresetSystem.getInstance();
+    assert.equal(presets.getAll().length, 20);
+    assert.ok(presets.rename('preset1', 'Water team'));
+    assert.ok(presets.setMembers('preset1', [boxed.uid, active.uid]));
+    assert.ok(presets.saveCurrentToPreset('preset2'));
+    assert.deepEqual(presets.getPreset('preset2').members, [active.uid, reserve.uid]);
+
+    const teamEvents = capture(TeamChangedEvent);
+    const boxEvents = capture(BoxChangedEvent);
+    const result = presets.load('preset1');
+    assert.deepEqual({ ok: result.ok, count: result.count, missingCount: result.missingCount }, { ok: true, count: 2, missingCount: 0 });
+    assert.deepEqual(teamSystem.getTeam().map((pokemon) => pokemon.uid), [boxed.uid, active.uid]);
+    assert.deepEqual(boxSystem.getBox().map((pokemon) => pokemon.uid), [reserve.uid]);
+    assert.equal(save.teamPresets.activeId, 'preset1');
+    assert.equal(teamEvents.length, 1);
+    assert.equal(boxEvents.length, 1);
+  });
+
+  test('wild BattleSystem settles each foe and automatically chains the next encounter', () => {
     const started = capture(BattleStartedEvent);
     const ended = capture(BattleEndedEvent);
     const battle = BattleSystem.getInstance();
+    if (battle.isActive()) battle.endBattle(false);
+    const save = saves.createNewSave('Battle chain', 'charmander');
+    assert.ok(TeamSystem.getInstance().addPokemon(PokemonFactory.create('mewtwo', 100)));
+    assert.ok(TeamSystem.getInstance().setLead(1));
     assert.ok(battle.startBattle('route1'), 'battle starts');
     assert.equal(started.length, 1);
+    const initialFoe = battle.getCurrentFoe();
+    const combatState = battle.getCombatState();
+    assert.ok(combatState && combatState.player && combatState.foe && combatState.field, 'combat presentation snapshot');
+    const activeSummary = battle.getBattleSummary();
+    assert.equal(activeSummary.state, 'active');
+    assert.ok(activeSummary.foeName, 'summary identifies the current foe');
+    assert.equal(activeSummary.run.locationId, 'route1');
     assert.equal(battle.startBattle('route1'), false, 'no second battle');
-    for (let i = 0; i < 5000 && battle.isActive(); i++) battle.update(0.1);
-    assert.ok(!battle.isActive(), 'battle finished');
+
+    for (let i = 0; i < 10000 && (battle.getBattleSummary().run?.battles ?? 0) < 2; i++) battle.update(0.1);
+    const chainedSummary = battle.getBattleSummary();
+    assert.ok(battle.isActive(), 'wild battle stays active after an individual foe is defeated');
+    assert.ok(chainedSummary.run.battles >= 2, 'at least two encounters were settled');
+    assert.ok(battle.getCurrentFoe() !== initialFoe, 'the next wild foe was sent automatically');
+    assert.equal(started.length, 1, 'the chain remains one battle session');
+    assert.ok(chainedSummary.run.moneyGained > 0, 'wild money is paid per defeated foe');
+    assert.ok(save.statistics.wildWins.route1 >= 2, 'every defeated wild foe updates location statistics');
+    battle.endBattle(false);
     assert.equal(ended.length, 1);
     assert.ok(battle.getLog().length > 1, 'log filled');
+    const summary = battle.getBattleSummary();
+    assert.equal(summary.state, 'ended');
+    assert.equal(summary.victory, ended[0].victory);
+    assert.equal(summary.run.battles, chainedSummary.run.battles, 'loot summary preserves the full chain');
+    assert.ok(summary.session.battles >= summary.run.battles, 'session counters include chained foes');
+    assert.ok(summary.session.wins <= summary.session.battles, 'session totals are internally consistent');
+    assert.deepEqual(summary.log, battle.getLog());
   });
 
   test('attack cooldowns follow the original speed formula', () => {
@@ -199,7 +281,7 @@ describe('Gameplay systems', (test) => {
     assert.equal(notifications.getRecord(id), null);
   });
 
-  test('PreferencesSystem persists theme, debug mode and audio', () => {
+  test('PreferencesSystem persists theme, debug mode, audio and animation choices', () => {
     const prefs = PreferencesSystem.getInstance();
     prefs.setTheme('ocean');
     assert.equal(prefs.getTheme(), 'ocean');
@@ -209,5 +291,52 @@ describe('Gameplay systems', (test) => {
     assert.ok(prefs.isDebugMode());
     prefs.setAudioBus('music', { volume: 40 });
     assert.equal(prefs.getAudioBus('music').volume, 40);
+
+    const changes = [];
+    const onAnimationChanged = (event) => changes.push(event);
+    EventBus.getInstance().subscribe(AnimationPreferencesChangedEvent, onAnimationChanged);
+    prefs.setAnimationPreference(AnimationPreferences.CAPTURE, false);
+    assert.equal(prefs.getAnimationPreference(AnimationPreferences.CAPTURE), false);
+    assert.equal(prefs.setAnimationPreference(AnimationPreferences.CAPTURE, false), false, 'unchanged values are not re-emitted');
+    assert.equal(changes.length, 1);
+    assert.equal(changes[0].preferenceId, AnimationPreferences.CAPTURE);
+    assert.equal(changes[0].enabled, false);
+    prefs.setAnimationPreference(AnimationPreferences.CAPTURE, true);
+    EventBus.getInstance().unsubscribe(AnimationPreferencesChangedEvent, onAnimationChanged);
+  });
+
+  test('DiagnosticsSystem bounds, persists, deduplicates and clears browser errors', () => {
+    const diagnostics = DiagnosticsSystem.getInstance();
+    diagnostics.clearErrors();
+    const events = [];
+    const onChanged = (event) => events.push(event);
+    EventBus.getInstance().subscribe(DiagnosticsChangedEvent, onChanged);
+    const repeated = new Error('repeated browser failure');
+    assert.ok(diagnostics.recordError(repeated, { source: 'test' }));
+    assert.equal(diagnostics.recordError(repeated, { source: 'test' }), null, 'the same error object is stored once');
+    for (let index = 0; index < DIAGNOSTIC_LIMITS.ERRORS + 5; index++) {
+      diagnostics.recordError(new Error(`browser failure ${index}`), 'test');
+    }
+    const stored = LocalStore.getJson(StorageKeys.DIAGNOSTIC_ERRORS, []);
+    assert.equal(diagnostics.getErrorCount(), DIAGNOSTIC_LIMITS.ERRORS);
+    assert.equal(stored.length, DIAGNOSTIC_LIMITS.ERRORS);
+    assert.ok(stored.every((entry) => entry.stack.length <= DIAGNOSTIC_LIMITS.STACK_LENGTH));
+    assert.ok(events.length > 1 && events.every((event) => event.max === DIAGNOSTIC_LIMITS.ERRORS));
+    assert.equal(diagnostics.clearErrors(), true);
+    assert.equal(diagnostics.getErrorCount(), 0);
+    assert.deepEqual(LocalStore.getJson(StorageKeys.DIAGNOSTIC_ERRORS, null), []);
+
+    const listeners = new Map();
+    const target = { addEventListener: (type, listener) => listeners.set(type, listener) };
+    assert.equal(BrowserDiagnostics.install(target), true);
+    assert.equal(BrowserDiagnostics.install(target), false, 'global hooks install once per target');
+    listeners.get('error')({ error: new Error('uncaught browser error') });
+    listeners.get('unhandledrejection')({ reason: 'rejected request' });
+    assert.equal(diagnostics.getErrorCount(), 2);
+    const report = JSON.parse(BrowserDiagnostics.buildErrorReport());
+    assert.equal(report.errors.length, 2);
+    assert.ok(!JSON.stringify(report).includes('Testeur'), 'the support report does not include the save display name');
+    diagnostics.clearErrors();
+    EventBus.getInstance().unsubscribe(DiagnosticsChangedEvent, onChanged);
   });
 });

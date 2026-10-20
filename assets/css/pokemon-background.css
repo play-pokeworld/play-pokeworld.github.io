@@ -1,0 +1,90 @@
+/* Collection animation: the view supplies sprites and profile classes; CSS owns motion. */
+.pw-background-pokemon-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: layout paint;
+  background: transparent;
+}
+
+.pw-background-pokemon-walker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--pw-background-pokemon-size, 120px);
+  height: var(--pw-background-pokemon-size, 120px);
+  animation-duration: 38s;
+  animation-delay: 0s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
+  will-change: transform;
+}
+
+.pw-background-pokemon-sprite {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  opacity: 1;
+  filter: none;
+}
+
+.pw-background-pokemon-sprite.is-shiny {
+  filter: drop-shadow(0 0 9px rgba(255, 209, 72, .78));
+}
+
+.pw-background-pokemon-walker--route-0 { animation-name: pw-background-pokemon-nw-se; }
+.pw-background-pokemon-walker--route-1 { animation-name: pw-background-pokemon-ne-sw; }
+.pw-background-pokemon-walker--route-2 { animation-name: pw-background-pokemon-sw-ne; }
+.pw-background-pokemon-walker--route-3 { animation-name: pw-background-pokemon-se-nw; }
+
+.pw-background-pokemon-walker--size-0 { --pw-background-pokemon-size: 96px; }
+.pw-background-pokemon-walker--size-1 { --pw-background-pokemon-size: 110px; }
+.pw-background-pokemon-walker--size-2 { --pw-background-pokemon-size: 124px; }
+.pw-background-pokemon-walker--size-3 { --pw-background-pokemon-size: 138px; }
+.pw-background-pokemon-walker--size-4 { --pw-background-pokemon-size: 150px; }
+
+.pw-background-pokemon-walker--speed-0 { animation-duration: 26s; }
+.pw-background-pokemon-walker--speed-1 { animation-duration: 31s; }
+.pw-background-pokemon-walker--speed-2 { animation-duration: 36s; }
+.pw-background-pokemon-walker--speed-3 { animation-duration: 41s; }
+.pw-background-pokemon-walker--speed-4 { animation-duration: 46s; }
+.pw-background-pokemon-walker--speed-5 { animation-duration: 52s; }
+
+.pw-background-pokemon-walker--phase-0 { animation-delay: 0s; }
+.pw-background-pokemon-walker--phase-1 { animation-delay: -4s; }
+.pw-background-pokemon-walker--phase-2 { animation-delay: -8s; }
+.pw-background-pokemon-walker--phase-3 { animation-delay: -12s; }
+.pw-background-pokemon-walker--phase-4 { animation-delay: -16s; }
+.pw-background-pokemon-walker--phase-5 { animation-delay: -20s; }
+.pw-background-pokemon-walker--phase-6 { animation-delay: -24s; }
+.pw-background-pokemon-walker--phase-7 { animation-delay: -28s; }
+
+@keyframes pw-background-pokemon-nw-se {
+  from { transform: translate3d(calc(0px - var(--pw-background-pokemon-size) - 4vw), calc(0px - var(--pw-background-pokemon-size) - 4vh), 0); }
+  to { transform: translate3d(calc(100vw + var(--pw-background-pokemon-size) + 4vw), calc(100vh + var(--pw-background-pokemon-size) + 4vh), 0); }
+}
+@keyframes pw-background-pokemon-ne-sw {
+  from { transform: translate3d(calc(100vw + var(--pw-background-pokemon-size) + 4vw), calc(0px - var(--pw-background-pokemon-size) - 4vh), 0); }
+  to { transform: translate3d(calc(0px - var(--pw-background-pokemon-size) - 4vw), calc(100vh + var(--pw-background-pokemon-size) + 4vh), 0); }
+}
+@keyframes pw-background-pokemon-sw-ne {
+  from { transform: translate3d(calc(0px - var(--pw-background-pokemon-size) - 4vw), calc(100vh + var(--pw-background-pokemon-size) + 4vh), 0); }
+  to { transform: translate3d(calc(100vw + var(--pw-background-pokemon-size) + 4vw), calc(0px - var(--pw-background-pokemon-size) - 4vh), 0); }
+}
+@keyframes pw-background-pokemon-se-nw {
+  from { transform: translate3d(calc(100vw + var(--pw-background-pokemon-size) + 4vw), calc(100vh + var(--pw-background-pokemon-size) + 4vh), 0); }
+  to { transform: translate3d(calc(0px - var(--pw-background-pokemon-size) - 4vw), calc(0px - var(--pw-background-pokemon-size) - 4vh), 0); }
+}
+
+@media (max-width: 850px) {
+  .pw-background-pokemon-walker { width: 82px; height: 82px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pw-background-pokemon-layer { display: none !important; }
+}

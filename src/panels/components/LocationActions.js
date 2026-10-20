@@ -6,16 +6,16 @@
  */
 import { UIContainer } from '../../ui/UIContainer.js';
 import { UIActionTile, ActionTileVariants } from '../../ui/UIActionTile.js';
-import { LocationSystem } from '../../systems/LocationSystem.js';
 import { BattleSystem } from '../../systems/BattleSystem.js';
+import { DungeonSystem } from '../../systems/DungeonSystem.js';
 import { TrainerSystem } from '../../systems/TrainerSystem.js';
 import { ShopSystem } from '../../systems/ShopSystem.js';
 import { ChallengeStates } from '../../systems/trainers/ChallengeStates.js';
-import { NotificationSystem } from '../../systems/NotificationSystem.js';
-import { NotificationChannels, NotificationTones } from '../../config/NotificationConfig.js';
 import { ModalIds } from '../../config/ModalIds.js';
 import { EventBus } from '../../core/EventBus.js';
 import { ModalOpenRequestedEvent } from '../../core/events/ModalOpenRequestedEvent.js';
+import { LocationKinds } from '../../data/world/LocationKinds.js';
+import { TextFormatter } from '../../core/TextFormatter.js';
 import { t } from '../../localization/LocalizationManager.js';
 
 export class LocationActions extends UIContainer {
@@ -30,12 +30,27 @@ export class LocationActions extends UIContainer {
       text: t('btn_talk'),
       icon: 'chat',
       variant: ActionTileVariants.NPC,
-      onClick: () => {
-        LocationSystem.getInstance().talkToNpc();
-        NotificationSystem.getInstance().notifyTemporary(t('npc_greeting'), { channel: NotificationChannels.GAMEPLAY, tone: NotificationTones.ACCENT });
-      }
+      onClick: () => EventBus.getInstance().dispatch(
+        new ModalOpenRequestedEvent(ModalIds.NPC_TALK, { locationId: location.id })
+      )
     }));
-    if (encounterCount > 0) {
+    if (location.kind === LocationKinds.DUNGEON) {
+      const run = DungeonSystem.getInstance().getRun();
+      const elsewhere = run?.active && run.locationId !== location.id;
+      const label = elsewhere
+        ? t('dungeon_other_run_action')
+        : run?.active
+          ? t('dungeon_resume_action')
+          : t('dungeon_enter_action', {
+            cost: TextFormatter.formatNumber(DungeonSystem.getInstance().entryToll(location.id)),
+            currency: t('currency_dungeon_tokens')
+          });
+      this.addChild(new UIActionTile({
+        text: label,
+        icon: 'door',
+        onClick: elsewhere ? null : () => DungeonSystem.getInstance().enter(location.id)
+      }));
+    } else if (encounterCount > 0) {
       this.addChild(new UIActionTile({ text: t('explore_btn'), icon: 'swords', onClick: () => BattleSystem.getInstance().startBattle(location.id) }));
     }
     if (location.shop) this.addChild(LocationActions._shopTile(location));

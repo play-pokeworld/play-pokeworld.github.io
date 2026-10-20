@@ -11,3 +11,5 @@
 .pw-bag-detail-text { display: flex; flex-direction: column; gap: 4px; }
 .pw-bag-detail-name { font-weight: 700; color: var(--light1, #ECDEB7); }
 .pw-bag-detail-desc { font-size: 12px; color: var(--light2); }
+.pw-bag-sale-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; width: 100%; margin-top: 6px; }
+.pw-bag-sale-price { color: var(--accent, #FFA500); font-size: 12px; font-weight: 700; }

@@ -23,15 +23,27 @@ export class BattleCombatant {
    * @param {boolean} [options.npc=false] - Wild or trainer Pokémon
    * @param {boolean} [options.hiddenTalentActive] - Defaults to `npc`
    * @param {number} [options.heldQuantity=0] - Owned copies of the held item (player items scale)
+   * @param {number} [options.hpMultiplier=1] - Temporary wild-encounter HP scale
+   * @param {Object} [options.statMultipliers={}] - Temporary initial battle stat modifiers
+   * @param {boolean} [options.dungeonBoss=false] - Marks a final dungeon guardian
    */
-  constructor(pokemon, side, { npc = false, hiddenTalentActive = npc, heldQuantity = 0 } = {}) {
+  constructor(pokemon, side, { npc = false, hiddenTalentActive = npc, heldQuantity = 0, hpMultiplier = 1, statMultipliers = {}, dungeonBoss = false } = {}) {
     this.pokemon = pokemon;
     this.side = side;
     this.npc = npc;
     this.hiddenTalentActive = hiddenTalentActive;
     this.heldQuantity = heldQuantity;
+    const hpScale = Number(hpMultiplier);
+    this.hpMultiplier = npc && Number.isFinite(hpScale) ? Math.max(1, hpScale) : 1;
+    this.dungeonBoss = npc && dungeonBoss === true;
+    this.dungeonEnraged = false;
+    this._baseStatMultipliers = Object.fromEntries(MODIFIABLE_STATS.map((stat) => {
+      const multiplier = Number(statMultipliers?.[stat]);
+      return [stat, Number.isFinite(multiplier) && multiplier > 0 ? Math.max(0.1, multiplier) : 1];
+    }));
+    if (this.hpMultiplier > 1) pokemon.hp = Math.round(pokemon.getMaxHp() * this.hpMultiplier);
     /** @type {Record<string, number>} */
-    this.statMods = Object.fromEntries(MODIFIABLE_STATS.map((stat) => [stat, 1]));
+    this.statMods = { ...this._baseStatMultipliers };
     /** @type {Record<string, number>} Remaining turns of each modified stat */
     this.statModTurns = {};
     /** @type {string|null} */
@@ -75,7 +87,7 @@ export class BattleCombatant {
 
   /** @returns {number} */
   get maxHp() {
-    return this.pokemon.getMaxHp();
+    return Math.max(1, Math.round(this.pokemon.getMaxHp() * this.hpMultiplier));
   }
 
   /** @returns {number} */
@@ -173,7 +185,7 @@ export class BattleCombatant {
   /** @param {number} amount @returns {number} HP actually restored */
   heal(amount) {
     const before = this.pokemon.hp;
-    this.pokemon.heal(Math.max(0, Math.floor(amount)));
+    this.pokemon.hp = Math.min(this.maxHp, this.pokemon.hp + Math.max(0, Math.floor(amount)));
     return this.pokemon.hp - before;
   }
 
@@ -184,7 +196,7 @@ export class BattleCombatant {
 
   /** Clears the volatile state (switch-in, end of battle). */
   resetVolatile() {
-    for (const stat of MODIFIABLE_STATS) this.statMods[stat] = 1;
+    for (const stat of MODIFIABLE_STATS) this.statMods[stat] = this._baseStatMultipliers[stat];
     this.statModTurns = {};
     this.flinched = false;
     this.consecutiveUses = 0;

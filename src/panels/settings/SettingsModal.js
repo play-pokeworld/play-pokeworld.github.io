@@ -14,6 +14,8 @@ import { SaveProfileSection } from './SaveProfileSection.js';
 import { SaveManagementSection } from './SaveManagementSection.js';
 import { CommunitySection } from './CommunitySection.js';
 import { AdvancedSection } from './AdvancedSection.js';
+import { CombatSettingsSection } from './CombatSettingsSection.js';
+import { DiagnosticsSection } from './DiagnosticsSection.js';
 import { LanguageChangedEvent } from '../../core/events/LanguageChangedEvent.js';
 import { Engine } from '../../core/Engine.js';
 import { PageIds } from '../../pages/PageIds.js';
@@ -22,7 +24,14 @@ import { t } from '../../localization/LocalizationManager.js';
 
 export class SettingsModal extends UIModal {
   constructor() {
-    super({ id: ModalIds.SETTINGS, title: t('settings_title'), size: 'lg', name: 'SettingsModal' });
+    super({
+      id: ModalIds.SETTINGS,
+      title: t('settings_title'),
+      size: 'md',
+      className: 'pw-settings-modal-window',
+      overlayClassName: 'pw-settings-modal-backdrop',
+      name: 'SettingsModal'
+    });
     this.setBodyClass('pw-settings-root');
 
     /** @private @type {ConfirmDialog} */
@@ -37,11 +46,13 @@ export class SettingsModal extends UIModal {
     this._sections = [
       new LanguageSection(),
       new ThemeSection(),
+      new CombatSettingsSection(),
       new SoundSection(),
       new SaveProfileSection(),
       new SaveManagementSection({ onLeaveGame: leaveGame, confirmDialog: this._confirmDialog }),
       new CommunitySection(),
-      new AdvancedSection()
+      new AdvancedSection(),
+      new DiagnosticsSection()
     ];
     this.addChildren(this._sections);
 

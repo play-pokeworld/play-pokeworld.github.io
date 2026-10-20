@@ -6,6 +6,7 @@
 import { DraggablePanel } from '../ui/DraggablePanel.js';
 import { UIContainer } from '../ui/UIContainer.js';
 import { UIText } from '../ui/UIText.js';
+import { UIButton } from '../ui/UIButton.js';
 import { TeamMemberCard } from './components/TeamMemberCard.js';
 import { TeamSystem } from '../systems/TeamSystem.js';
 import { BattleSystem } from '../systems/BattleSystem.js';
@@ -34,6 +35,19 @@ export class ActiveTeamPanel extends DraggablePanel {
       bodyClassName: 'team-view',
       name: 'ActiveTeamPanel'
     });
+    const presetButton = new UIButton({
+      className: 'team-presets-open-btn',
+      variant: 'hbtn',
+      size: 'sm',
+      text: t('teams_manager_open'),
+      onClick: () => this._openPresetManager()
+    });
+    this._presetToolbar = new UIContainer({
+      className: 'pw-team-toolbar',
+      children: [presetButton]
+    });
+    this.addChild(this._presetToolbar);
+
     this.refresh();
     this.listen(TeamChangedEvent, () => this.refresh());
     this.listen(BattleStartedEvent, () => this.refresh());
@@ -44,6 +58,21 @@ export class ActiveTeamPanel extends DraggablePanel {
   /** @private Opens the team management modal. */
   _openTeamModal() {
     EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.TEAM));
+  }
+
+  /** Opens the 20-slot manager directly from the team window. @private */
+  _openPresetManager() {
+    EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.TEAM_PRESETS));
+  }
+
+  /** @private @param {number} teamIndex */
+  _openPokemonInfo(teamIndex) {
+    EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.POKEMON_INFO, { teamIndex }));
+  }
+
+  /** @private @param {number} teamIndex */
+  _openHeldItemPicker(teamIndex) {
+    EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.HELD_ITEM_PICKER, { teamIndex }));
   }
 
   /**
@@ -62,7 +91,12 @@ export class ActiveTeamPanel extends DraggablePanel {
     }
     team.forEach((pokemon, index) => {
       if (!this._cards[index]) {
-        const card = new TeamMemberCard({ index, onClick: () => this._openTeamModal() });
+        const card = new TeamMemberCard({
+          index,
+          onClick: () => this._openTeamModal(),
+          onInfoClick: (teamIndex) => this._openPokemonInfo(teamIndex),
+          onHeldItemClick: (teamIndex) => this._openHeldItemPicker(teamIndex)
+        });
         this._cards.push(card);
         if (this._addSlot) this.insertChildBefore(card, this._addSlot);
         else this.addChild(card);

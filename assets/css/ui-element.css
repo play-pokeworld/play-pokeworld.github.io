@@ -6,6 +6,10 @@
    carry ZERO specificity. Any component/page class (e.g. .hbtn,
    .save-menu-bg-layer) therefore overrides them without !important. */
 
+:where([hidden]) {
+  display: none !important;
+}
+
 :where(.pw-element) {
   position: relative;
   box-sizing: border-box;
