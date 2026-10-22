@@ -6,8 +6,9 @@
  * experience, current HP, shiny flag, IV / EV spreads. Everything else is DERIVED from the data
  * repositories and never saved: display name, sprite, types, stats, max HP, experience bounds.
  *
- * Serialized shape (save schema 3):
- *   { uid, species, form, nickname, level, exp, hp, shiny, talent, heldItem, moves[], ivs{}, evs{} }
+ * Serialized shape (save schema 15):
+ *   { uid, species, form, nickname, level, exp, hp, shiny, favorite, locked, talent, heldItem,
+ *     moves[], unlockedMoves[], ivs{}, evs{} }
  */
 import { BaseModel } from '../core/BaseModel.js';
 import { AssetPaths } from '../../config/AssetPaths.js';
@@ -152,6 +153,55 @@ export class PokemonData extends BaseModel {
   }
 
   /**
+   * Adds EVs without exceeding the per-stat or aggregate game caps.
+   * @param {string} stat - PokemonRules.STAT_KEYS value
+   * @param {number} [amount=1]
+   * @returns {number} EVs added
+   */
+  addEv(stat, amount = 1) {
+    if (!PokemonRules.STAT_KEYS.includes(stat)) return 0;
+    const requested = Math.max(0, Math.floor(Number(amount) || 0));
+    const total = PokemonRules.STAT_KEYS.reduce((sum, key) => sum + this.evs[key], 0);
+    const added = Math.min(requested, PokemonRules.EV_MAX - this.evs[stat], PokemonRules.EV_TOTAL_MAX - total);
+    if (added <= 0) return 0;
+    this._changeStats(() => { this.evs[stat] += added; });
+    return added;
+  }
+
+  /**
+   * Changes species while retaining this Pokémon's identity and progression.
+   * The caller owns evolution eligibility and persistence.
+   * @param {string} targetSpecies
+   * @returns {boolean}
+   */
+  evolveTo(targetSpecies) {
+    const source = this.getSpecies();
+    const target = PokemonDB.getInstance().getById(targetSpecies);
+    if (!source || !target || source.id === target.id || !source.evolutions.some((entry) => entry.to === target.id)) return false;
+    const oldMax = this.getMaxHp();
+    const oldTalentIndex = source.talents.indexOf(this.talent);
+    const wasHiddenTalent = source.hiddenTalent === this.talent;
+    this.species = target.id;
+    if (this.form && !target.getForm(this.form)) this.form = '';
+    if (!target.talents.includes(this.talent)) {
+      this.talent = wasHiddenTalent && target.hiddenTalent
+        ? target.hiddenTalent
+        : target.talents[oldTalentIndex] || target.talents[0] || target.hiddenTalent || null;
+    }
+    this._invalidateStats();
+    const newMax = this.getMaxHp();
+    this.hp = Math.max(0, Math.min(newMax, this.hp + (newMax - oldMax)));
+    return true;
+  }
+
+  /** @param {string} moveId @returns {boolean} */
+  unlockMove(moveId) {
+    if (typeof moveId !== 'string' || !moveId || this.unlockedMoves.includes(moveId)) return false;
+    this.unlockedMoves.push(moveId);
+    return true;
+  }
+
+  /**
    * @param {boolean} shiny - Shiny Pokémon have boosted stats (PokemonRules.SHINY_STAT_MULT)
    */
   setShiny(shiny) {
@@ -224,9 +274,12 @@ export class PokemonData extends BaseModel {
       exp: this.exp,
       hp: this.hp,
       shiny: this.shiny,
+      favorite: this.favorite,
+      locked: this.locked,
       talent: this.talent,
       heldItem: this.heldItem,
       moves: [...this.moves],
+      unlockedMoves: [...this.unlockedMoves],
       ivs: { ...this.ivs },
       evs: { ...this.evs }
     };
@@ -248,9 +301,17 @@ export class PokemonData extends BaseModel {
     this.level = Math.max(PokemonRules.MIN_LEVEL, Math.min(PokemonRules.MAX_LEVEL, Math.floor(Number(raw.level) || 5)));
     this.exp = Math.max(Number(raw.exp) || 0, ExperienceCurve.levelStart(this.level));
     this.shiny = raw.shiny === true;
+    this.favorite = raw.favorite === true;
+    this.locked = raw.locked === true;
     this.talent = raw.talent || null;
     this.heldItem = raw.heldItem || null;
     this.moves = Array.isArray(raw.moves) ? raw.moves.filter((id) => typeof id === 'string') : [];
+    const unlockedMoves = Array.isArray(raw.unlockedMoves)
+      ? raw.unlockedMoves
+      : Array.isArray(raw.trainingUnlockedMoves)
+        ? raw.trainingUnlockedMoves
+        : [];
+    this.unlockedMoves = [...new Set(unlockedMoves.filter((id) => typeof id === 'string' && id.length > 0))];
     this.ivs = StatCalculator.clampSpread(raw.ivs, PokemonRules.IV_MAX);
     this.evs = StatCalculator.clampSpread(raw.evs, PokemonRules.EV_MAX, PokemonRules.EV_TOTAL_MAX);
     this._invalidateStats();

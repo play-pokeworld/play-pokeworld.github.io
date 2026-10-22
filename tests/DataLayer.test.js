@@ -13,6 +13,7 @@ import { QuestRules } from '../src/config/QuestRules.js';
 import { TeamPresetsData } from '../src/data/save/TeamPresetsData.js';
 import { TeamPresetRules } from '../src/config/TeamPresetRules.js';
 import { QuestDB } from '../src/data/quests/QuestDB.js';
+import { NpcQuestDirectory } from '../src/data/quests/NpcQuestDirectory.js';
 import { ObjectiveRegistry } from '../src/data/quests/objectives/ObjectiveRegistry.js';
 import { ObjectiveTypes } from '../src/data/quests/ObjectiveTypes.js';
 import { ItemStacking } from '../src/data/items/ItemStacking.js';
@@ -29,6 +30,8 @@ import { PokemonCaughtEvent } from '../src/core/events/PokemonCaughtEvent.js';
 import { LocationChangedEvent } from '../src/core/events/LocationChangedEvent.js';
 import { QuestCompletedEvent } from '../src/core/events/QuestCompletedEvent.js';
 import { QuestClaimedEvent } from '../src/core/events/QuestClaimedEvent.js';
+import { InventoryChangedEvent } from '../src/core/events/InventoryChangedEvent.js';
+import { PokedexChangedEvent } from '../src/core/events/PokedexChangedEvent.js';
 
 /** Subscribes to an event class and returns the list of received events. */
 function capture(EventClass) {
@@ -101,9 +104,13 @@ describe('Save migrations', (test) => {
         location: 'route1',
         money: 1234,
         badges: ['brock'],
+        unlockedLocs: { route4: true, route6: false },
+        visitedMaps: { route22: true },
         playTimeMs: 65000,
         wallet: { questPoints: 7, diamonds: 2 },
-        team: [{ id: 25, level: 12, xp: 1500, currentHP: 10, maxHP: 40, moves: [{ id: 'thundershock' }], shiny: true }],
+        team: [{ id: 25, level: 12, xp: 1500, currentHP: 10, maxHP: 40, moves: [{ id: 'thundershock' }], shiny: true, favorite: true, locked: true }],
+        collection: { stored_squirtle: { id: 7, level: 5, currentHP: 20, maxHP: 20, favorite: true, locked: false } },
+        boxFilters: { favorite: 'favorite', rank: 'S' },
         pokedex: { 25: { caught: true, shiny: true }, 16: { caught: false } },
         inventory: { pokeball: 4 },
         wildWinsByLoc: { route1: 12 },
@@ -111,7 +118,7 @@ describe('Save migrations', (test) => {
         completedQuests: { side_s1: true },
         activeQuests: [{ qid: 4, cat: 'main', progress: 6 }],
         regionLeagueWon: { johto: true },
-        defeatedChamps: { elite4: true, hoenn_elite4: true }
+        defeatedChamps: { elite4: 1, hoenn_elite4: true }
       }
     });
     assert.equal(data.version, SaveSchema.VERSION);
@@ -123,6 +130,12 @@ describe('Save migrations', (test) => {
     assert.equal(save.currencies.get('questPoint'), 7);
     assert.equal(save.team[0].species, 'pikachu');
     assert.ok(save.team[0].shiny && save.team[0].talent, 'shiny kept, talent filled');
+    assert.equal(save.team[0].favorite, true);
+    assert.equal(save.team[0].locked, true);
+    assert.equal(save.box[0].favorite, true);
+    assert.equal(save.box[0].locked, false);
+    assert.equal(save.boxFilters.get('favorite'), 'favorite');
+    assert.equal(save.boxFilters.get('rank'), 'S');
     assert.ok(save.team[0].hp > 0 && save.team[0].hp <= save.team[0].getMaxHp());
     assert.equal(save.pokedex.getCaughtStatus('pikachu'), 'shiny');
     assert.ok(save.pokedex.isSeen('pidgey') && !save.pokedex.isCaught('pidgey'));
@@ -132,8 +145,92 @@ describe('Save migrations', (test) => {
     assert.equal(save.access.championTitle, true);
     assert.equal(save.quests.getMainStep('kanto'), 3);
     assert.equal(save.quests.isRepeatableUnlocked(), true, 'the original badge backfill unlock is preserved');
+    assert.ok(save.access.hasLocation('route1'), 'the current legacy map is retained');
+    assert.ok(save.access.hasLocation('route3'), 'the original first-badge route backfill is restored');
+    assert.ok(save.access.hasLocation('route4'), 'an explicit legacy unlock is retained');
+    assert.ok(save.access.hasLocation('route22'), 'a visited map is restored');
+    assert.equal(save.access.hasLocation('route6'), false, 'a false legacy unlock flag is ignored');
     assert.ok(save.quests.isCompleted('side.s1'));
     assert.equal(save.quests.getProgress('main.4'), 6);
+  });
+
+  test('original badge map backfill preserves routes and route-derived features without unlocking the mine on Surge alone', () => {
+    const migrated = SaveMigrator.migrate({
+      G: {
+        region: 'kanto',
+        location: 'pallet',
+        badges: ['brock', 'misty', 'surge', 'koga'],
+        team: [],
+        collection: {},
+        pokedex: {}
+      }
+    });
+    const access = new Set(migrated.access.unlockedLocations);
+    for (const id of [
+      'pallet', 'route1', 'viridian', 'route2', 'viridianforest', 'pewter', 'route3', 'route22',
+      'mtmoon', 'route4', 'cerulean', 'route5', 'route6', 'vermilion', 'fuchsia'
+    ]) assert.ok(access.has(id), `${id} is restored from the original badge backfill`);
+    assert.equal(migrated.access.unlockedFeatures.hatchery, true, 'the restored Route 5 unlock preserves the hatchery');
+    assert.equal(migrated.access.unlockedFeatures.training, true, 'Surge preserves training access');
+    assert.equal(migrated.access.unlockedFeatures.mine, false, 'Surge alone does not claim a Diglett Cave visit');
+
+    const visitedMine = SaveMigrator.migrate({
+      G: { region: 'kanto', badges: ['surge'], visitedMaps: { diglettscave: true } }
+    });
+    assert.equal(visitedMine.access.unlockedFeatures.mine, true, 'a recorded cave visit preserves the mine');
+  });
+
+  test('early Rework schemas merge top-level visited maps and unlock facts into sticky access', () => {
+    const v9 = SaveMigrator.migrate({
+      version: 9,
+      player: { trainerName: 'Older Rework', region: 'kanto', location: 'pallet', badges: [] },
+      visitedMaps: { route22: true },
+      unlockedLocs: { route4: true, route6: false },
+      statistics: {}
+    });
+    assert.ok(v9.access.unlockedLocations.includes('route22'));
+    assert.ok(v9.access.unlockedLocations.includes('route4'));
+    assert.ok(!v9.access.unlockedLocations.includes('route6'));
+    assert.ok(v9.access.unlockedLocations.includes('pallet'));
+
+    const v11 = SaveMigrator.migrate({
+      version: 11,
+      player: { trainerName: 'Older Rework', region: 'kanto', location: 'pallet', badges: [] },
+      visitedMaps: { diglettscave: true },
+      access: { unlockedLocations: [], unlockedFeatures: {} },
+      statistics: {}
+    });
+    assert.ok(v11.access.unlockedLocations.includes('diglettscave'));
+    assert.equal(v11.access.unlockedFeatures.mine, true, 'an explicit old cave visit repairs the mine feature');
+  });
+
+  test('legacy secret-base access imports the Hoenn main.216 milestone only when proven', () => {
+    const unlockStep = QuestDB.getInstance().getMainChain('hoenn')
+      .findIndex((quest) => quest.key === 'main.216') + 1;
+    const unlocked = SaveMigrator.migrate({
+      G: {
+        region: 'hoenn',
+        location: 'route111',
+        mainStep: { hoenn: 0 },
+        unlockedSecretBaseHoenn: true
+      }
+    });
+    assert.equal(unlocked.quests.mainStep.hoenn, unlockStep, 'legacy flag maps to completion of main.216');
+
+    const completedQuest = SaveMigrator.migrate({
+      G: { region: 'hoenn', mainStep: { hoenn: 0 }, completedQuests: { 216: true } }
+    });
+    assert.equal(completedQuest.quests.mainStep.hoenn, unlockStep, 'the recorded original milestone is retained');
+
+    const oldProgress = SaveMigrator.migrate({
+      G: { region: 'hoenn', mainStep: { hoenn: 16 } }
+    });
+    assert.equal(oldProgress.quests.mainStep.hoenn, unlockStep, 'the original story-step backfill preserves the milestone');
+
+    const locked = SaveMigrator.migrate({
+      G: { region: 'hoenn', mainStep: { hoenn: 0 } }
+    });
+    assert.equal(locked.quests.mainStep.hoenn, 0, 'a save without milestone evidence remains locked');
   });
 
   test('accepted repeatable quests migrate with their progress and remain serializable', () => {
@@ -288,7 +385,7 @@ describe('Save migrations', (test) => {
     assert.equal(restored.access.championTitle, true);
   });
 
-  test('schema 11 migration separates league titles and repairs durable facility access', () => {
+  test('schema 11 migration separates league titles and preserves only durable facility access', () => {
     const migrated = SaveMigrator.migrate({
       version: 11,
       id: 'PW-V11-LEAGUE-ACCESS',
@@ -317,20 +414,20 @@ describe('Save migrations', (test) => {
     const restored = SaveData.fromJson(migrated);
     assert.equal(restored.player.getBadgeCount(), 3, 'old league IDs no longer inflate Gym badge count');
     assert.ok(['kanto', 'johto', 'hoenn'].every((region) => restored.statistics.hasWonLeague(region)));
-    assert.equal(restored.access.hasFeature('hatchery'), true, 'two Gym badges preserve Route 5 access');
+    assert.equal(restored.access.hasFeature('hatchery'), false, 'badges alone do not prove Route 5 access');
     assert.equal(restored.access.hasFeature('mine'), true, 'a previously unlocked mine location remains available');
     assert.equal(restored.access.hasFeature('training'), true, 'Lt. Surge badge preserves training access');
     assert.equal(restored.access.championTitle, true, 'a migrated league win preserves the champion milestone');
 
-    const earnedByBadges = SaveData.fromJson(SaveMigrator.migrate({
+    const badgesOnly = SaveData.fromJson(SaveMigrator.migrate({
       version: 11,
       player: { trainerName: 'Progressed', region: 'kanto', location: 'pallet', badges: ['brock', 'misty', 'surge'] },
       statistics: {},
       access: { unlockedFeatures: { hatchery: false, mine: false, training: false } }
     }));
-    assert.equal(earnedByBadges.access.hasFeature('hatchery'), true, 'two Gym badges preserve the Route 5 gate');
-    assert.equal(earnedByBadges.access.hasFeature('mine'), true, 'three Gym badges preserve the mine gate');
-    assert.equal(earnedByBadges.access.hasFeature('training'), true, 'the Surge badge preserves training access');
+    assert.equal(badgesOnly.access.hasFeature('hatchery'), false, 'two Gym badges alone do not prove Route 5 access');
+    assert.equal(badgesOnly.access.hasFeature('mine'), false, 'three Gym badges alone do not prove cave access');
+    assert.equal(badgesOnly.access.hasFeature('training'), true, 'the Surge badge is the training prerequisite');
 
     const championFlagOnly = SaveData.fromJson(SaveMigrator.migrate({
       version: 11,
@@ -339,6 +436,129 @@ describe('Save migrations', (test) => {
       access: { championTitle: true }
     }));
     assert.ok(championFlagOnly.statistics.hasWonLeague('kanto'), 'a legacy champion milestone recovers the Kanto League title');
+  });
+
+  test('schema 12 migration moves TM unlocks from the team and PC without changing active moves', () => {
+    const raw = {
+      version: 12,
+      team: [{ species: 'pikachu', moves: ['thundershock'], trainingUnlockedMoves: ['thunderbolt', 'thunderbolt', 'missing_move'] }],
+      box: [{ species: 'squirtle', moves: ['tackle'], trainingUnlockedMoves: ['surf'] }]
+    };
+    const original = JSON.stringify(raw);
+    const migrated = SaveMigrator.migrate(raw);
+    assert.equal(migrated.version, SaveSchema.VERSION);
+    assert.deepEqual(migrated.team[0].moves, ['thundershock']);
+    assert.deepEqual(migrated.team[0].unlockedMoves, ['thunderbolt', 'missing_move']);
+    assert.deepEqual(migrated.box[0].moves, ['tackle']);
+    assert.deepEqual(migrated.box[0].unlockedMoves, ['surf']);
+    assert.ok(!('trainingUnlockedMoves' in migrated.team[0]));
+    assert.equal(JSON.stringify(raw), original, 'migration does not mutate input');
+  });
+
+  test('schema 13 persists PC filters and Pokémon favorite/lock flags through team, box, and hatchery', () => {
+    const raw = {
+      version: 13,
+      team: [{ species: 'pikachu', favorite: true, locked: true }],
+      box: [{ species: 'squirtle', favorite: false, locked: true, fav: true }],
+      boxFilters: { favorite: 'favorite', locked: 'unlocked', rank: 'S', search: 'squirtle' },
+      hatchery: { maxSlots: 1, slots: [{ kind: 'daycare', pokemon: { species: 'eevee', favorite: true, locked: true }, knockouts: 2 }] }
+    };
+    const original = JSON.stringify(raw);
+    const migrated = SaveMigrator.migrate(raw);
+    assert.equal(migrated.version, SaveSchema.VERSION);
+    assert.equal(migrated.team[0].favorite, true);
+    assert.equal(migrated.team[0].locked, true);
+    assert.equal(migrated.box[0].favorite, true, 'legacy fav alias is retained as favorite');
+    assert.equal(migrated.box[0].locked, true);
+    assert.equal(migrated.hatchery.slots[0].pokemon.favorite, true);
+    assert.equal(migrated.hatchery.slots[0].pokemon.locked, true);
+    assert.equal(JSON.stringify(raw), original, 'migration does not mutate input');
+
+    const restored = SaveData.fromJson(migrated);
+    assert.equal(restored.team[0].favorite, true);
+    assert.equal(restored.team[0].locked, true);
+    assert.equal(restored.box[0].favorite, true);
+    assert.equal(restored.box[0].locked, true);
+    assert.equal(restored.boxFilters.get('favorite'), 'favorite');
+    assert.equal(restored.boxFilters.get('locked'), 'unlocked');
+    assert.equal(restored.boxFilters.get('rank'), 'S');
+    assert.equal(restored.boxFilters.get('search'), 'squirtle');
+    assert.equal(SaveData.fromJson(restored.serialize()).boxFilters.get('favorite'), 'favorite');
+  });
+
+  test('schema 14 saves gain an empty secret-base domain without changing progression', () => {
+    const raw = {
+      version: 14,
+      id: 'PW-TEST-00015',
+      player: { trainerName: 'No base', region: 'hoenn', location: 'littleroot', badges: [] },
+      quests: { mainStep: { hoenn: 0 } },
+      access: { unlockedFeatures: {} }
+    };
+    const original = JSON.stringify(raw);
+    const migrated = SaveMigrator.migrate(raw);
+    assert.equal(migrated.version, SaveSchema.VERSION);
+    assert.deepEqual(migrated.secretBase, {});
+    assert.equal(JSON.stringify(raw), original, 'the schema migration does not mutate input');
+
+    const save = SaveData.fromJson(migrated);
+    assert.equal(save.secretBase.isEstablished(), false);
+    assert.equal(save.secretBase.getFlagRankId(), 'normal');
+    assert.equal(save.quests.getMainStep('hoenn'), 0, 'migration does not unlock the feature');
+    assert.deepEqual(save.serialize().secretBase.decorations, []);
+  });
+
+  test('original save migration preserves the established secret base and flag progress', () => {
+    const raw = {
+      G: {
+        region: 'hoenn',
+        location: 'route111',
+        base: {
+          layoutId: 'cave_1',
+          routeId: 'route111',
+          items: [{ uid: 7, s: 'small_desk', x: 2, y: 3, rot: 1 }],
+          stock: { red_tent: 2 },
+          npcs: [{
+            id: 'n1', name: 'Élodie', sprite: 'trainer-54', x: 4, y: 5,
+            team: [{ id: 25, level: 20, moves: [{ id: 'thundershock' }], talent: 'static', shiny: true, item: 'light_ball' }],
+            msgs: { pre: 'Bonjour', win: 'Bravo', lose: 'Encore' }
+          }],
+          npcStock: [{ id: 'n2', name: 'Réserve', sprite: 'trainer-2', x: null, y: null, team: [] }],
+          spawn: { x: 1, y: 2 },
+          uidSeq: 8,
+          record: { w: 3, l: 2, visits: 9 },
+          pcMessage: 'Bienvenue'
+        },
+        secretBaseFlags: { count: 12, collectedIds: { route111: 1700000000000 }, lastRankNotified: 'bronze' }
+      }
+    };
+    const original = JSON.stringify(raw);
+    const migrated = SaveMigrator.migrate(raw);
+    assert.equal(JSON.stringify(raw), original, 'legacy migration does not mutate input');
+    assert.equal(migrated.version, SaveSchema.VERSION);
+
+    const save = SaveData.fromJson(migrated);
+    const base = save.secretBase;
+    assert.equal(base.isEstablished(), true);
+    assert.equal(base.layoutId, 'cave_1');
+    assert.equal(base.locationId, 'route111');
+    assert.deepEqual(base.decorations, [{ uid: 7, itemId: 'small_desk', x: 2, y: 3, rotation: 0 }], 'the current reference no longer supports rotation');
+    assert.equal(base.stock.red_tent, 2);
+    assert.equal(base.npcs[0].team[0].species, 'pikachu', 'legacy dex ids become stable species slugs');
+    assert.deepEqual(base.npcs[0].team[0].moves, ['thundershock']);
+    assert.deepEqual(base.npcs[0].messages, { pre: 'Bonjour', win: 'Bravo', lose: 'Encore' });
+    assert.equal(base.npcStock[0].x, null, 'an unplaced legacy NPC stays unplaced');
+    assert.deepEqual(base.spawn, { x: 1, y: 2 });
+    assert.equal(base.nextUid, 8);
+    assert.deepEqual(base.record, { wins: 3, losses: 2, visits: 9 });
+    assert.equal(base.pcMessage, 'Bienvenue');
+    assert.equal(base.flags.count, 12);
+    assert.equal(base.flags.lastRankNotified, 'bronze');
+    assert.deepEqual(base.flags.collectedIds, { route111: 1700000000000 });
+    assert.equal(base.getUniqueBaseCount(), 1);
+    assert.equal(base.getFlagRankId(), 'bronze');
+
+    const roundTrip = SaveData.fromJson(JSON.parse(JSON.stringify(save.serialize())));
+    assert.deepEqual(roundTrip.secretBase.serialize(), base.serialize());
   });
 
   test('schema 2 saves keep their experience ratio and drop derived fields', () => {
@@ -414,7 +634,9 @@ describe('Quest system', (test) => {
     const save = SaveSystem.getInstance().getCurrentSave();
     const claimed = capture(QuestClaimedEvent);
     const points = save.currencies.get('questPoint');
-    LocationSystem.getInstance().talkToNpc();
+    LocationSystem.getInstance().talkToNpc('kanto_pallet_npc_02');
+    assert.equal(save.quests.getProgress('main.1'), 0, 'talking to a different person does not advance the quest');
+    LocationSystem.getInstance().talkToNpc(NpcQuestDirectory.getNpcIdForQuest('main.1'));
     claimed.stop();
     assert.equal(claimed.length, 1);
     assert.equal(save.quests.getMainStep('kanto'), 1);
@@ -541,17 +763,30 @@ describe('Quest system', (test) => {
     assert.ok(status.complete, 'badge quest complete on activation');
   });
 
-  test('claim pays every currency listed in the quest reward data', () => {
-    const save = SaveSystem.getInstance().getCurrentSave();
+  test('claim pays every reward with one save and defers nested change events', () => {
+    const saves = SaveSystem.getInstance();
+    const save = saves.createNewSave('Quest claim transaction', 'charmander');
     const key = 'side.currency_fixture';
     const quest = {
       key,
       category: 'side',
-      rewards: { currencies: { money: 23, dungeonToken: 4 }, questPoints: 0, items: {}, pokemon: null }
+      rewards: {
+        currencies: { money: 23, dungeonToken: 4 },
+        questPoints: 0,
+        items: { rarecandy: 1 },
+        pokemon: { species: 'pikachu', level: 5 }
+      }
     };
     const originalGetStatus = quests.getStatus;
+    const originalSaveCurrent = saves.saveCurrent;
     const beforeMoney = save.currencies.get('money');
     const beforeTokens = save.currencies.get('dungeonToken');
+    const beforeTeam = save.team.length;
+    const claimed = capture(QuestClaimedEvent);
+    const inventory = capture(InventoryChangedEvent);
+    const dex = capture(PokedexChangedEvent);
+    let writes = 0;
+    saves.saveCurrent = function (...args) { writes++; return originalSaveCurrent.apply(this, args); };
     quests.getStatus = (requestedKey) => requestedKey === key
       ? { complete: true, quest }
       : originalGetStatus.call(quests, requestedKey);
@@ -559,8 +794,18 @@ describe('Quest system', (test) => {
       assert.ok(quests.claim(key));
     } finally {
       quests.getStatus = originalGetStatus;
+      saves.saveCurrent = originalSaveCurrent;
+      claimed.stop();
+      inventory.stop();
+      dex.stop();
     }
     assert.equal(save.currencies.get('money'), beforeMoney + 23);
     assert.equal(save.currencies.get('dungeonToken'), beforeTokens + 4);
+    assert.equal(save.inventory.count('rarecandy'), 1);
+    assert.equal(save.team.length, beforeTeam + 1);
+    assert.equal(writes, 1, 'nested inventory, Pokédex and access updates are saved as one claim');
+    assert.equal(claimed[0]?.deferSave, true);
+    assert.ok(inventory.length > 0 && inventory.every((event) => event.deferSave));
+    assert.ok(dex.length > 0 && dex.every((event) => event.deferSave));
   });
 });

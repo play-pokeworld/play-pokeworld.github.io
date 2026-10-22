@@ -47,20 +47,4 @@ export class HeldItemSystem extends BaseSystem {
     return TeamSystem.getInstance().setHeldItem(teamIndex, null);
   }
 
-  /**
-   * Inventory-backed held items for the picker. `heldByIndex` is -1 when unused.
-   * @param {number} teamIndex
-   * @returns {Array<{itemId:string, quantity:number, heldByIndex:number}>}
-   */
-  getOptions(teamIndex) {
-    const save = SaveSystem.getInstance().getCurrentSave();
-    if (!save) return [];
-    return save.inventory.entries()
-      .filter(({ id, quantity }) => quantity > 0 && ItemDB.getInstance().getById(id)?.kind === ItemKinds.HELD)
-      .map(({ id, quantity }) => ({
-        itemId: id,
-        quantity,
-        heldByIndex: save.team.findIndex((pokemon, index) => index !== teamIndex && pokemon.heldItem === id)
-      }));
-  }
 }

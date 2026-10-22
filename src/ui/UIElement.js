@@ -275,6 +275,24 @@ export class UIElement extends BaseObject {
     if (typeof this._dom.focus === 'function') this._dom.focus();
   }
 
+  /** @returns {string|null} Stable focus key of the currently focused descendant, if any. */
+  getFocusedDataKey() {
+    const active = this._dom.ownerDocument?.activeElement;
+    if (!active || !this._dom.contains?.(active)) return null;
+    return active.getAttribute?.('data-focus-key') || null;
+  }
+
+  /** Focuses a descendant previously tagged with setData('focusKey', key). @param {string} key */
+  focusDescendantByDataKey(key) {
+    if (!key) return false;
+    const escaped = String(key).replace(/["\\]/g, '\\$&');
+    const target = this._dom.querySelector?.(`[data-focus-key="${escaped}"]`);
+    if (!target || typeof target.focus !== 'function') return false;
+    try { target.focus({ preventScroll: true }); }
+    catch { target.focus(); }
+    return true;
+  }
+
   /**
    * Pushes a runtime value (percentage, coordinate...) to CSS through a
    * custom property. This is the ONLY bridge allowed between JS values and

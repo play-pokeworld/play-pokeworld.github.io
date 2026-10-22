@@ -4,6 +4,7 @@ export const L_fr_base = {
 "export_done":"Base exportée en JSON !",
 "win":{
 "moved":"Base déménagée : {name}. Les meubles sont retournés au stock.",
+"established":"Base secrète établie : {name} !",
 "title":"Base Secrète",
 "mode_label":"Mode de rendu",
 "layout_label":"Gabarit de la base",
@@ -29,7 +30,11 @@ export const L_fr_base = {
 "cave_yellow_5":"Grotte Jaune · Mezzanine 5","cave_yellow_6":"Grotte Jaune · Balcons 6"
 }
 },
-"debug":{"granted":"Catalogue déco : {n} objets ajoutés au stock (debug).","npc_name":"PNJ","npc_added":"PNJ créé depuis ton équipe actuelle : {name}.","npcs_added":"{n} PNJ installés dans la base !"},
+"debug":{"granted":"Catalogue déco : {n} objets ajoutés au stock (debug).","grant_button":"Accorder le catalogue (debug)","npc_name":"PNJ","npc_added":"PNJ créé depuis ton équipe actuelle : {name}.","npcs_added":"{n} PNJ installés dans la base !"},
+"action":{"visit_base":"Visiter ta base · {name}","preview_alcove":"Explorer l’alcôve · {name}","establish":"Établir ma base ici","move":"Déménager ma base ici","move_confirm_title":"Déménager la Base Secrète ?","move_confirm_message":"Les décorations seront rendues au stock et les PNJ de la salle seront retirés, comme dans la référence.","move_confirm":"Déménager"},
+"panel":{"find_alcove":"Depuis une route de Hoenn, ouvre une alcôve dans le panneau Lieu pour t’y installer.","edit":"Éditer la base","stop_edit":"Terminer l’édition","exchange_title":"Visiter un fichier","pc_message_save":"Enregistrer le message du PC","bonus_label":"Bonus des drapeaux","bonus_money":"+{value} % d’argent","bonus_xp":"+{value} % d’expérience","bonus_mine":"+{value} % d’énergie max à la Mine","bonus_route":"+{value} point(s) de butin de route","no_bonus":"Aucun bonus actif","selected_stock":"Objet sélectionné : {name} · clique une case pour le poser.","selected_decoration":"Décoration sélectionnée · clique une case pour la déplacer.","selected_npc":"PNJ sélectionné · clique une case pour le déplacer.","select_hint":"Choisis un objet du stock, un meuble ou un PNJ à déplacer.","unselect":"Annuler la sélection","cancel_place":"Annuler la pose","npc_remove":"Retirer le PNJ","npc_add":"Créer un PNJ avec l’équipe active","npc_save":"Enregistrer le PNJ","npc_copy_team":"Copier l’équipe active","npc_name_placeholder":"Nom du PNJ","npc_pre_placeholder":"Réplique avant le combat","npc_win_placeholder":"Réplique si le visiteur gagne","npc_lose_placeholder":"Réplique si le visiteur perd"},
+"flag":{"collect":"Prendre le drapeau","collected":"Drapeau récupéré ! Total : {count}.","rank_up":"Nouveau rang : {rank} !","own":"Tu ne peux pas prendre le drapeau de ta propre base.","cooldown":"Tu as déjà pris ce drapeau. Réessaie dans {remainingHours} h.","rank":{"normal":"Normal","bronze":"Bronze","silver":"Argent","gold":"Or","platinum":"Platine"}},
+
 "edit":{
 "move_hint":"{name} en main : clique une case pour le poser là, clic droit pour l\u2019annuler (+ « Ramasser » pour le ranger).",
 "need2d":"L\u2019édition se fait en mode 2D Émeraude — bascule le rendu en haut à droite.",
@@ -63,8 +68,12 @@ export const L_fr_base = {
 "export":"Exporter",
 "import":"Visiter un fichier…",
 "battle_challenge":"{name} te défie !",
+"battle_intro":"{name} relève le défi !",
+"battle_intro_quote":"{name} lance son défi : « {quote} »",
+"battle_quote":"« {quote} » — {name}",
 "battle_won":"Victoire contre {name} !",
 "battle_lost":"Défaite face à {name}…",
+"npc_default_name":"Dresseur de Base",
 "heal":"L'équipe est toute guérie !",
 "sit":"Tu te reposes un instant…",
 "light_on":"La lampe s'allume.",
@@ -89,11 +98,27 @@ export const L_fr_base = {
 "door_break":"Vous enfoncez la fausse porte !",
 "invisible":"Il y a quelque chose d'invisible ici…",
 "makiwara":"Un poteau utilisé par les maîtres d'armes pour s'entraîner à Coupe.",
-"note":"La note « {note} » résonne."
+"note":"La note « {note} » résonne.",
+"title":"Visite de Base Secrète",
+"title_named":"Base de {name}",
+"no_visit":"Aucune visite en cours.",
+"hint_alcove":"Alcôve temporaire : établis ou déplace ta base ici, ou termine la visite.",
+"own_room":"Ta propre base",
+"item":"Tu regardes {name}.",
+"challenge":"Combattre",
+"challenge_confirm":"Veux-tu lancer un combat contre {name} ?"
 },
 "err":{
 "unknown":"Objet inconnu.",
 "no_base":"Aucune base secrète pour l'instant.",
+"wrong_region":"Les Bases secrètes ne sont accessibles qu’à Hoenn.",
+"location":"Cette alcôve n’existe pas à cet endroit.",
+"already_established":"Tu as déjà établi une Base secrète.",
+"wrong_location":"Tu dois être dans le lieu de l’alcôve.",
+"battle_active":"Un combat est déjà en cours.",
+"debug_only":"Cette action est réservée au mode debug.",
+"no_visit":"Aucune visite de Base secrète n'est en cours.",
+"visit_active":"Une visite de Base secrète est déjà en cours.",
 "stairs_anchor":"L'escalier doit être posé sur la rampe prévue.",
 "board_hole":"La planche (2 cases de haut) se pose le haut sur un trou.",
 "pc_unreachable":"Le PC doit rester joignable à pied depuis l\u2019ouverture.",
@@ -191,7 +216,11 @@ export const L_fr_base = {
 "msg_hint":"Message pour les visiteurs qui prennent ton drapeau",
 "msg_placeholder":"Bienvenue dans ma base ! Amuse-toi bien !",
 "msg_label":"Message personnalisé",
-"edit_selected":"Modifier le PC"
+"edit_selected":"Modifier le PC",
+"title":"PC de la base",
+"no_message":"Aucun message laissé par le propriétaire.",
+"rank_summary":"Rang {rank} · {count} drapeau(x)",
+"next_rank":"Progression : {count} drapeau(x) · prochain palier à {next}"
 },
 
 "npc":{

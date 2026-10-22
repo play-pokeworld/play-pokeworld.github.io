@@ -11,10 +11,13 @@ export class PokedexChangedEvent extends BaseEvent {
 
   /**
    * @param {string} species - Species slug whose entry changed
+   * @param {{deferSave?:boolean}} [options] - A wider game operation owns persistence when true.
    */
-  constructor(species) {
+  constructor(species, { deferSave = false } = {}) {
     super(PokedexChangedEvent.TYPE);
     /** @type {string} */
     this.species = species;
+    /** @type {boolean} */
+    this.deferSave = deferSave === true;
   }
 }

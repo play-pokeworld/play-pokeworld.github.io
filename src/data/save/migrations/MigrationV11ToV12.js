@@ -7,11 +7,10 @@
  * player.badges. The latter is reserved for Gym badges and feeds the 8-badge counter.
  */
 import { LeagueDB } from '../../trainers/LeagueDB.js';
-import { TrainerDB } from '../../trainers/TrainerDB.js';
-import { LocationDB } from '../../world/LocationDB.js';
 import { HatcheryRules } from '../../../config/HatcheryRules.js';
 import { MineRules } from '../../../config/MineRules.js';
 import { TrainingRules } from '../../../config/TrainingRules.js';
+import { collectLegacyLocationUnlocks } from './LegacyLocationAccessMigration.js';
 
 /** @param {*} value @returns {string[]} */
 function readIds(value) {
@@ -47,15 +46,6 @@ function hasMineProgress(mine) {
   return positiveNumber(mine.completedCount ?? mine.totalLayersDug ?? mine.layersDug) > 0 ||
     (Array.isArray(mine.items) && mine.items.length > 0) || extraTool ||
     !!mine.automation?.purchased || (gridExists && Array.isArray(mine.items) && mine.items.length > 0);
-}
-
-/** @param {string} region @param {number} required @param {string[]} badges @returns {boolean} */
-function hasBadgeThreshold(region, required, badges) {
-  if (!(required > 0)) return false;
-  const owned = new Set(badges);
-  const count = TrainerDB.getInstance().getGyms(region)
-    .filter((gym) => owned.has(gym.id) || owned.has(gym.badge)).length;
-  return count >= required;
 }
 
 /** @param {*} features @param {string} id @returns {boolean} */
@@ -100,22 +90,18 @@ export const MigrationV11ToV12 = Object.freeze({
     // non-league identifiers are kept exactly once and in their original order.
     const gymBadges = badges.filter((id) => !leagueById.has(id));
 
-    const unlockedLocations = new Set(readIds(access.unlockedLocations ?? access.locations ?? access.unlockedLocs));
-    if (typeof player.location === 'string' && player.location) unlockedLocations.add(player.location);
-    const hatcheryLocation = LocationDB.getInstance().getById(HatcheryRules.LOCATION_ID);
-    const mineLocation = LocationDB.getInstance().getById(MineRules.LOCATION_ID);
-    const mineLocationId = MineRules.LOCATION_ID;
-    const mineWasVisited = unlockedLocations.has(mineLocationId) || unlockedLocations.has('diglettscave_2');
+    const unlockedLocations = new Set(collectLegacyLocationUnlocks(source));
+    const mineWasVisited = unlockedLocations.has(MineRules.LOCATION_ID) || unlockedLocations.has('diglettscave_2');
     const hatcheryFlag = hasFeatureFlag(rawFeatures, 'hatchery') || access.hatcheryUnlocked === true || source.hatcheryUnlocked === true;
     const mineFlag = hasFeatureFlag(rawFeatures, 'mine') || access.mineUnlocked === true || source.mineUnlocked === true;
     const trainingFlag = hasFeatureFlag(rawFeatures, 'training') || access.trainingUnlocked === true || source.trainingUnlocked === true;
     const unlockedFeatures = {
       ...rawFeatures,
+      // Keep explicit proof from older saves. Badge count alone is not durable proof:
+      // the corresponding route/cave may still be inaccessible in the map graph.
       hatchery: hatcheryFlag || unlockedLocations.has(HatcheryRules.LOCATION_ID) ||
-        hasHatcheryProgress(source.hatchery) || positiveNumber(statistics.hatcheryLevel) > 0 ||
-        !!hatcheryLocation && hasBadgeThreshold(hatcheryLocation.region, hatcheryLocation.badgesRequired, gymBadges),
-      mine: mineFlag || mineWasVisited || hasMineProgress(source.mine) ||
-        !!mineLocation && hasBadgeThreshold(mineLocation.region, mineLocation.badgesRequired, gymBadges),
+        hasHatcheryProgress(source.hatchery) || positiveNumber(statistics.hatcheryLevel) > 0,
+      mine: mineFlag || mineWasVisited || hasMineProgress(source.mine),
       training: trainingFlag || gymBadges.includes(TrainingRules.REQUIRED_BADGE_ID) ||
         positiveNumber(statistics.trainingSessions) > 0
     };

@@ -24,6 +24,8 @@ import { InventoryChangedEvent } from '../core/events/InventoryChangedEvent.js';
 import { LocationChangedEvent } from '../core/events/LocationChangedEvent.js';
 import { SaveCreatedEvent } from '../core/events/SaveCreatedEvent.js';
 import { SaveLoadedEvent } from '../core/events/SaveLoadedEvent.js';
+import { SaveDeletedEvent } from '../core/events/SaveDeletedEvent.js';
+import { ContentAccessChangedEvent } from '../core/events/ContentAccessChangedEvent.js';
 import { LocationSystem } from '../systems/LocationSystem.js';
 import { TextFormatter } from '../core/TextFormatter.js';
 import { t } from '../localization/LocalizationManager.js';
@@ -42,7 +44,8 @@ export class HatcheryPanel extends DraggablePanel {
     });
     for (const eventClass of [
       HatcheryChangedEvent, HatcheryLevelUpEvent, TeamChangedEvent, BoxChangedEvent,
-      InventoryChangedEvent, LocationChangedEvent, SaveCreatedEvent, SaveLoadedEvent
+      InventoryChangedEvent, LocationChangedEvent, SaveCreatedEvent, SaveLoadedEvent,
+      SaveDeletedEvent, ContentAccessChangedEvent
     ]) this.listen(eventClass, () => this._render());
     this._render();
   }
@@ -54,8 +57,20 @@ export class HatcheryPanel extends DraggablePanel {
   }
 
   /** @private */
+  _syncVisibility() {
+    const locationId = LocationSystem.getInstance().getCurrentLocationId();
+    const hatcheryUnlocked = HatcherySystem.getInstance().isUnlocked();
+    const fossilLabUnlocked = locationId === FossilRules.LAB_LOCATION_ID && FossilSystem.getInstance().isRevivalUnlocked();
+    const visible = hatcheryUnlocked || fossilLabUnlocked;
+    this.toggleClass('pw-progression-hidden', !visible);
+    return visible;
+  }
+
+  /** @private */
   _render() {
+    const visible = this._syncVisibility();
     this.clearChildren();
+    if (!visible) return;
     const locationId = LocationSystem.getInstance().getCurrentLocationId();
     if (locationId === FossilRules.LAB_LOCATION_ID) {
       this._renderFossilLab();

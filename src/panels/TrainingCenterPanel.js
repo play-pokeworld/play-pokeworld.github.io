@@ -20,6 +20,8 @@ import { TeamChangedEvent } from '../core/events/TeamChangedEvent.js';
 import { BoxChangedEvent } from '../core/events/BoxChangedEvent.js';
 import { SaveCreatedEvent } from '../core/events/SaveCreatedEvent.js';
 import { SaveLoadedEvent } from '../core/events/SaveLoadedEvent.js';
+import { SaveDeletedEvent } from '../core/events/SaveDeletedEvent.js';
+import { ContentAccessChangedEvent } from '../core/events/ContentAccessChangedEvent.js';
 import { t } from '../localization/LocalizationManager.js';
 
 export class TrainingCenterPanel extends DraggablePanel {
@@ -37,7 +39,8 @@ export class TrainingCenterPanel extends DraggablePanel {
     this._selectedUid = '';
     for (const eventClass of [
       TrainingBattleChangedEvent, TrainingResultChangedEvent, LocationChangedEvent,
-      TeamChangedEvent, BoxChangedEvent, SaveCreatedEvent, SaveLoadedEvent
+      TeamChangedEvent, BoxChangedEvent, SaveCreatedEvent, SaveLoadedEvent,
+      SaveDeletedEvent, ContentAccessChangedEvent
     ]) this.listen(eventClass, () => this._render());
     this._render();
   }
@@ -50,16 +53,15 @@ export class TrainingCenterPanel extends DraggablePanel {
 
   /** @private */
   _render() {
-    this.clearChildren();
     const system = TrainingSystem.getInstance();
+    const unlocked = system.isUnlocked();
+    this.toggleClass('pw-progression-hidden', !unlocked);
+    this.clearChildren();
+    if (!unlocked) return;
     const state = system.getSnapshot();
     const candidates = system.getCandidates();
     if (state.active) {
       this.addChild(this._activeSession(state));
-      return;
-    }
-    if (!system.isUnlocked()) {
-      this.addChild(new UIText({ tagName: 'div', className: 'pw-training-locked', text: t('training_badge_required') }));
       return;
     }
     if (!system.canUseHere()) {

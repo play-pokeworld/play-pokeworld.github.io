@@ -4,6 +4,15 @@
    `#fullscreen-panel-modal` rules of design-system.css, bound to classes.
    ========================================================================== */
 
+/* Keep the Pokédex and Guide on the same responsive width curve as Bag and PC. */
+:root { --pw-modal-container-max-width: 960px; }
+@media (min-width: 1600px) {
+  :root { --pw-modal-container-max-width: 1380px; }
+}
+@media (min-width: 2200px) {
+  :root { --pw-modal-container-max-width: 1820px; }
+}
+
 .pw-fullscreen-overlay {
   position: fixed;
   inset: 0;
@@ -16,6 +25,8 @@
   backdrop-filter: blur(3px);
 }
 .pw-fullscreen-overlay.is-open { display: flex; }
+/* A Bag opened from the Pokémon sheet sits above that sheet without closing it. */
+.pw-fullscreen-overlay.pw-bag-held-item-mode { z-index: 32000; }
 
 .pw-fullscreen-overlay > .pw-modal-container {
   border: 1px solid var(--pw-border);
@@ -36,9 +47,121 @@
   gap: 8px;
   flex-wrap: wrap;
 }
-/* The container keeps its 90vh height (design-system .pw-modal-container): only the body scrolls. */
+/* Keep every fullscreen panel the same viewport footprint on touch/small screens. */
+@media (max-width: 640px), (pointer: coarse) {
+  .pw-fullscreen-overlay {
+    align-items: flex-start;
+    padding: 6px;
+  }
+  .pw-fullscreen-overlay > .pw-modal-container {
+    width: calc(100vw - 12px);
+    max-width: calc(100vw - 12px);
+    height: calc(100vh - 12px);
+    max-height: calc(100vh - 12px);
+  }
+}
+
+/* The body scrolls independently; fixed controls can use the optional footer slot. */
 .pw-fullscreen-overlay .pw-modal-body {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
+}
+.pw-fullscreen-overlay .pw-modal-footer.is-filled {
+  flex: 0 0 auto;
+  padding: 12px 18px;
+  border-top: 1px solid var(--pw-border);
+  background: var(--dark1);
+}
+.pw-held-item-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.pw-held-item-actions .pw-button { min-width: 132px; }
+#fs-box .pw-box-selection-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+#fs-box .pw-box-selection-footer-label {
+  color: var(--light2);
+  font-weight: 900;
+}
+#fs-box .pw-box-selection-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#fs-box .pw-box-selection-footer-actions .pw-button {
+  min-width: 132px;
+}
+
+/* PC filters and sort categories: one full-width, reference-style toolbar. */
+#fs-box .pw-modal-search-bar.is-filled {
+  display: block;
+}
+#fs-box .pw-box-filterbar {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+#fs-box .pw-box-filterbar > .pw-chip-row {
+  flex: 1 1 100%;
+  width: 100%;
+  min-width: 0;
+}
+#fs-box .pw-box-filterbar > .pw-filter-fields {
+  flex: 1 1 100%;
+  width: 100%;
+  min-width: 0;
+}
+#fs-box .pw-box-filterbar .pw-filter-field {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+#fs-box .pw-box-filterbar > .pw-filter-end {
+  flex: 1 1 100%;
+  width: 100%;
+  min-width: 0;
+  margin-left: 0;
+}
+#fs-box .pw-box-filterbar .pw-filter-input {
+  flex: 1 1 180px;
+  min-width: min(180px, 100%);
+}
+
+@media (max-width: 640px), (pointer: coarse) {
+  #fs-box .pw-modal-search-bar.is-filled {
+    padding: 8px 10px;
+  }
+  #fs-box .pw-box-filterbar > .pw-filter-end {
+    flex-wrap: wrap;
+  }
+  #fs-box .pw-modal-footer.is-filled {
+    padding: 10px;
+  }
+  #fs-box .pw-box-selection-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  #fs-box .pw-box-selection-footer-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #fs-box .pw-box-selection-footer-actions .pw-button {
+    min-width: 0;
+    width: 100%;
+  }
+  .pw-held-item-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .pw-held-item-actions .pw-button {
+    min-width: 0;
+    width: 100%;
+  }
 }

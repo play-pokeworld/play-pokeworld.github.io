@@ -6,7 +6,7 @@
 
 export const GameConfig = Object.freeze({
   /** Rework release number (boot log). Keep in sync with package.json and the delivered zip name. */
-  VERSION: '1.10.0',
+  VERSION: '1.14.16',
 
   /** Official community invite (same link as the original game: data/game-config.js). */
   DISCORD_URL: 'https://discord.gg/DXC48vtGV',

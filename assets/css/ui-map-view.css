@@ -1,7 +1,7 @@
 /* ==========================================================================
    UIMapView Component CSS
-   Node colours and states of the world map (the original wrote them as SVG
-   fill / stroke attributes).
+   Semantic node fills match main's six map-color states; travel state only
+   controls the current/locked outline and cursor behavior.
    ========================================================================== */
 
 .pw-map-view {
@@ -11,12 +11,20 @@
 }
 
 .pw-map-view .loc-node-shadow { fill: #000; opacity: 0.4; }
-.pw-map-view .loc-node-body { fill: rgba(83, 157, 223, 0.55); stroke: #fff; stroke-width: 2; }
+.pw-map-view .loc-node-body { fill: rgba(255, 255, 255, 0.10); stroke: #fff; stroke-width: 2; }
+.pw-map-view .loc-node.map-color-quest .loc-node-body { fill: rgba(31, 138, 59, 0.55); }
+.pw-map-view .loc-node.map-color-roaming .loc-node-body { fill: rgba(123, 31, 162, 0.55); }
+.pw-map-view .loc-node.map-color-catch .loc-node-body { fill: rgba(21, 101, 194, 0.55); }
+.pw-map-view .loc-node.map-color-shiny .loc-node-body { fill: rgba(201, 160, 0, 0.60); }
+.pw-map-view .loc-node.map-color-locked .loc-node-body { fill: rgba(58, 63, 68, 0.55); }
+.pw-map-view .loc-node.map-color-complete .loc-node-body {
+  fill: rgba(255, 255, 255, 0.10);
+  stroke: rgba(255, 255, 255, 0.25);
+}
 .pw-map-view .loc-node-ring { fill: none; stroke: var(--light2); stroke-width: 3; opacity: 0.9; }
 
-.pw-map-view .loc-node.current .loc-node-body { fill: rgba(255, 165, 0, 0.6); stroke: var(--light2); stroke-width: 4; }
-.pw-map-view .loc-node.adjacent .loc-node-body { fill: rgba(96, 190, 88, 0.55); }
-.pw-map-view .loc-node.locked .loc-node-body { fill: rgba(40, 40, 40, 0.6); stroke: #444; }
+.pw-map-view .loc-node.current .loc-node-body { stroke: var(--light2); stroke-width: 4; }
+.pw-map-view .loc-node.locked .loc-node-body { stroke: #444; }
 .pw-map-view .loc-node.locked .loc-node-shadow { opacity: 0.35; }
 .pw-map-view .loc-node:not(.locked):hover .loc-node-body { filter: brightness(1.25); }
 

@@ -48,11 +48,7 @@ export class RepeatableSlotUpgradeModal extends StaticModalPanel {
   _render() {
     this.clearChildren();
     const state = QuestSystem.getInstance().getRepeatableBoardState();
-    if (!state.unlocked) {
-      this.addChild(new UIText({ className: 'pw-repeatable-board-empty', text: t('repeatable_unlock_hint') }));
-      this.addChild(new UIButton({ variant: 'secondary', text: t('close_btn'), onClick: () => this.close() }));
-      return;
-    }
+    if (!state.unlocked) return;
     this.addChild(new UIText({ tagName: 'div', className: 'pw-repeatable-upgrade-current', text: t('repeatable_slots_current', {
       count: state.slotCount,
       max: QuestRules.REPEATABLE_MAX_SLOTS

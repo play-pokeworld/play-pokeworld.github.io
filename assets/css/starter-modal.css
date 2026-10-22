@@ -12,8 +12,18 @@
   backdrop-filter: none;
 }
 
+/* Both the new-save and regional starter windows share the original wide shell. */
+.starter-modal-window {
+  width: min(96vw, 980px);
+  max-width: none;
+  max-height: 90vh;
+  overflow-y: auto;
+  color: var(--light2);
+}
+
 /* The window has no header bar: the body is the whole content */
-#starter-modal-inner > .win-body {
+#starter-modal-inner > .win-body,
+.starter-modal-window > .win-body {
   display: flex;
   flex-direction: column;
   padding: 0;

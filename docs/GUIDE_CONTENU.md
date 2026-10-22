@@ -163,6 +163,30 @@ dreamball: { kind: 'ball', price: 3000, ball: { rate: 25, sprite: 'dream-ball', 
 
 Ajoutez son id dans la liste `items` d'une boutique (§ 6). Un objet **sans prix** est refusé par la validation.
 
+### 3.5 Utilisation d'objets déjà prise en charge (Rework 1.11)
+
+L'inventaire n'exécute pas automatiquement une action à partir d'un simple champ `category` : les
+actions prises en charge sont explicitement contrôlées par `ItemUseSystem` / `ItemUseRules`.
+
+- **CT / CS** : l'entrée d'objet porte `move`. L'utiliser sur un Pokémon admissible consomme l'objet
+  et ajoute la capacité à `unlockedMoves`; cela ne modifie pas immédiatement les quatre attaques
+  actives. Le joueur choisit ensuite un emplacement dans la fiche Pokémon via `MoveLearningSystem`.
+- **Évolutions** : les objets d'évolution sont liés aux évolutions déclarées des espèces. La
+  `link_stone` remplace les échanges pour Kadabra, Machopeur, Gravalanch et Spectrum à partir du
+  niveau 40. Pour remplacer l'évolution d'une espèce déjà générée, copiez l'entrée complète depuis
+  `src/data/raw/species-data.js` vers `src/data/content/species-content.js` et ne changez que
+  `evolutions`; ne modifiez jamais la table `raw`.
+- **Consommables de cette livraison** : `rarecandy` augmente d'un niveau; les six vitamines (`hp_up`,
+  `protein`, `iron`, `calcium`, `zinc`, `carbos`) ajoutent **1 EV aléatoire admissible** sans dépasser
+  les plafonds individuels ou total de Rework. Chaque description doit être renseignée en FR et EN.
+- Bonbons de temps, capsules IV, objets de talent et menthes restent différés; ils ne sont pas rendus
+  utilisables dans ce lot. Ajouter une nouvelle famille d'effets nécessite des règles, un système sans
+  DOM, des tests et une interface localisée — les seules données ne suffisent pas.
+
+`ItemUseSystem` choisit la cible dans l'équipe ou le PC via `TeamSystem` / `BoxSystem`, bloque
+l'utilisation en combat, consomme et sauvegarde une seule fois par opération. L'UI passe par le Sac,
+`ItemTargetModal` et, pour les CT/CS, `PokemonInfoModal` + `PokemonMoveLearningModal`.
+
 ---
 
 ## 4. Ajouter une quête
@@ -212,6 +236,32 @@ légendaire), `encounter: { location, level }` (le Pokémon récompense se renco
 }
 ```
 
+### 4.3 Quêtes proposées par un PNJ précis
+
+Les identités affichées sont localisées dans `src/localization/{fr,en}/npc.js`, sous la forme
+`npc.<lieu>.<index>.id`, `.name` et `.lines.<n>`. Pour tout PNJ qui déverrouille une quête, ajoutez
+le **même identifiant stable** dans les deux langues; ne déduisez jamais l'identité de l'index du
+tableau ou du nom traduit. Les liens de Kanto, écrits à la main, sont dans
+`src/data/content/NpcQuestLinks.js` : `mainQuestKey`, `sideQuestKey` ou `repeatableBoard`.
+
+Un objectif `talk` lié à ce contenu progresse uniquement quand `NpcTalkedEvent.npcId` correspond au
+PNJ attendu. L'interface n'affiche l'offre correspondante qu'à ce PNJ. Les conversations génériques
+ou avec un autre personnage ne doivent pas valider cette quête. Après ajout : testez les deux
+langues, l'id lié dans `NpcQuestDirectory`, et un dialogue avec un PNJ voisin qui ne doit rien valider.
+
+### 4.4 Puzzles d'exploration — Kanto
+
+Le contenu fait main des six puzzles est dans `src/data/content/KantoPuzzleContent.js`; **ne modifiez
+pas** `src/data/raw/`. Chaque définition porte un id stable, un lieu, des clés de localisation, les
+indices, les options/séquence ou réponses acceptées, les prérequis et les récompenses. Les textes FR
+et EN vivent dans `src/localization/{fr,en}/puzzles.js`. `PuzzleDB`, `PuzzleRules` et `PuzzleSystem`
+valident/résolvent les puzzles sans DOM; `PuzzleSolveModal` / `PuzzleListPanel` ne font que l'UI.
+
+La première réussite verse argent + objet une seule fois et émet `PuzzleSolvedEvent`. Un rejeu donne
+`max(200, floor(rewardMoney * 0.1))` en argent, sans réattribuer l'objet. Toute nouvelle définition
+doit avoir ses clés dans les deux langues, des prérequis valides, un test de résolution/récompense et
+un test de rejeu.
+
 ---
 
 ## 5. Ajouter un lieu ou une région
@@ -258,6 +308,14 @@ Le bouton **Explorer** n'apparaît que si le lieu a des rencontres.
 4. Lieux, rectangles, rencontres (§ 5.1 à 5.3), avec `region: 'sinnoh'`.
 5. Starters éventuels : `STARTERS_BY_REGION.sinnoh` dans `StarterData.js`.
 6. Arènes et ligue : § 7 (le compteur de badges et le panneau Badges suivent automatiquement).
+
+### 5.5 Base secrète Hoenn — portée du ZIP Kanto
+
+`SecretBaseAccessSystem` dérive l'accès du jalon historique `main.216` (l'export original peut porter
+l'ID/étape équivalents). `SecretBasePanel` et l'onglet mobile ne deviennent visibles qu'après cette
+preuve. Le contenu de base secrète Hoenn (lieux, pièces, décorations, visites et combats de PNJ) n'est
+pas porté dans cette livraison Kanto : ne marquez pas cette fonctionnalité comme jouable parce que le
+jalon a migré. Utilisez `FeatureAccessSystem` plutôt que d'écrire un déverrouillage depuis l'UI.
 
 ---
 

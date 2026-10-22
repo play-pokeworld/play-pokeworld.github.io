@@ -14,8 +14,9 @@ export class PokemonDefeatedEvent extends BaseEvent {
    * @param {number} level - Its level
    * @param {string} locationId - Location of the battle
    * @param {boolean} wild - true for a wild Pokémon, false for a trainer Pokémon
+   * @param {{deferSave?:boolean}} [options] - Defer listener persistence to the battle transaction
    */
-  constructor(speciesId, level, locationId, wild) {
+  constructor(speciesId, level, locationId, wild, { deferSave = false } = {}) {
     super(PokemonDefeatedEvent.TYPE);
     /** @type {string} */
     this.speciesId = speciesId;
@@ -25,5 +26,7 @@ export class PokemonDefeatedEvent extends BaseEvent {
     this.locationId = locationId;
     /** @type {boolean} */
     this.wild = wild;
+    /** @type {boolean} */
+    this.deferSave = deferSave === true;
   }
 }

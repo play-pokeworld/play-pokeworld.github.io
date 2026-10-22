@@ -3,7 +3,6 @@
  * @brief Row of mutually exclusive tab buttons (C++ equivalent: class UITabBar : public UIElement).
  * The selected tab carries the `active` state class of UIButton.
  */
-
 import { UIElement } from './UIElement.js';
 import { UIButton } from './UIButton.js';
 
@@ -19,29 +18,40 @@ export class UITabBar extends UIElement {
   constructor(options = {}) {
     super({ className: `pw-tab-bar ${options.className || ''}`.trim(), name: options.name || 'UITabBar' });
     this._onSelect = options.onSelect || null;
+    this._buttonClassName = options.buttonClassName || '';
     /** @private @type {Map<string, UIButton>} */
     this._buttons = new Map();
+    this._selectedId = '';
+    this.setTabs(options.tabs || [], options.selectedId || '');
+  }
 
-    for (const tab of options.tabs || []) {
+  /**
+   * Replaces the available tabs while preserving the selected id when possible.
+   * @param {Array<{id: string, label: string, icon?: string}>} tabs
+   * @param {string} [preferredId]
+   */
+  setTabs(tabs, preferredId = this._selectedId) {
+    for (const button of this._buttons.values()) {
+      this.removeChild(button);
+      button.destroy();
+    }
+    this._buttons.clear();
+    for (const tab of tabs || []) {
       const button = new UIButton({
         text: tab.label,
         icon: tab.icon || '',
-        className: options.buttonClassName || '',
+        className: this._buttonClassName,
         onClick: () => this.select(tab.id, true)
       });
       this._buttons.set(tab.id, button);
       this.addChild(button);
     }
     this._selectedId = '';
-    const first = (options.tabs || [])[0];
-    this.select(options.selectedId || (first ? first.id : ''), false);
+    const selected = this._buttons.has(preferredId) ? preferredId : this._buttons.keys().next().value || '';
+    if (selected) this.select(selected, false);
   }
 
-  /**
-   * Selects a tab.
-   * @param {string} tabId
-   * @param {boolean} [notify=true] - Calls onSelect when true
-   */
+  /** @param {string} tabId @param {boolean} [notify=true] */
   select(tabId, notify = true) {
     if (!this._buttons.has(tabId)) return;
     this._selectedId = tabId;

@@ -62,12 +62,27 @@ export class CaptureAnimationView extends UIContainer {
     const row = document.getElementById('battle-team-row');
     const card = row?.querySelector('.pw-enemy-card') || row?.querySelector('.poke-card');
     if (!panel || !card || typeof panel.getBoundingClientRect !== 'function' || typeof card.getBoundingClientRect !== 'function') {
+      this.addClass('is-viewport-fixed');
       this._setCssVariable('--pw-capture-x', '50%');
       this._setCssVariable('--pw-capture-y', '40%');
       return;
     }
     const panelRect = panel.getBoundingClientRect();
     const cardRect = card.getBoundingClientRect();
+    const viewportWidth = Number(document.documentElement?.clientWidth) || 0;
+    const viewportHeight = Number(document.documentElement?.clientHeight) || 0;
+    const cardVisible = cardRect.width > 0 && cardRect.height > 0
+      && cardRect.right > 0 && cardRect.left < viewportWidth
+      && cardRect.bottom > 0 && cardRect.top < viewportHeight;
+    if (!cardVisible) {
+      // The dashboard can scroll the battle column completely out of view while
+      // the Route 1 action remains visible. Keep the capture verdict on screen.
+      this.addClass('is-viewport-fixed');
+      this._setCssVariable('--pw-capture-x', '50%');
+      this._setCssVariable('--pw-capture-y', '40%');
+      return;
+    }
+    this.removeClass('is-viewport-fixed');
     this._setCssVariable('--pw-capture-x', `${Math.round(cardRect.left + cardRect.width / 2 - panelRect.left + (panel.scrollLeft || 0))}px`);
     this._setCssVariable('--pw-capture-y', `${Math.round(cardRect.top + cardRect.height / 2 - panelRect.top + (panel.scrollTop || 0))}px`);
   }

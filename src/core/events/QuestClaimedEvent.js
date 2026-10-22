@@ -11,10 +11,13 @@ export class QuestClaimedEvent extends BaseEvent {
 
   /**
    * @param {string} questKey - QuestDB key (<category>.<id>)
+   * @param {{deferSave?:boolean}} [options] - A wider game operation owns persistence when true.
    */
-  constructor(questKey) {
+  constructor(questKey, { deferSave = false } = {}) {
     super(QuestClaimedEvent.TYPE);
     /** @type {string} */
     this.questKey = questKey;
+    /** @type {boolean} */
+    this.deferSave = deferSave === true;
   }
 }

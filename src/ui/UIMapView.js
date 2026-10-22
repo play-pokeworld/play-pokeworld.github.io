@@ -2,7 +2,8 @@
  * @file UIMapView.js
  * @brief Interactive SVG world map (C++ equivalent: class UIMapView : public UIElement).
  * Renders a background picture and one node per location (rounded zone + name pill).
- * Node colours are CSS concerns: each node gets `.loc-node.<state>` (see ui-map-view.css).
+ * Travel states and semantic legend colors are CSS concerns; they are carried separately as
+ * `.loc-node.<state>.map-color-<status>` (see ui-map-view.css).
  */
 
 import { UIElement } from './UIElement.js';
@@ -24,7 +25,8 @@ const CURRENT_RING_MARGIN = 6;
  * @property {number} w
  * @property {number} h
  * @property {string} label  - Localized name
- * @property {string} state  - CSS state class (e.g. 'current', 'adjacent', 'locked')
+ * @property {string} state  - Travel-state CSS class (e.g. 'current', 'adjacent', 'locked')
+ * @property {string} [mapColorStatus] - Semantic map-color state used by the legend
  * @property {string} [tooltip]
  */
 
@@ -94,7 +96,12 @@ export class UIMapView extends UIElement {
   static _buildNode(node) {
     const x0 = node.x - node.w / 2;
     const y0 = node.y - node.h / 2;
-    const group = svgNode('g', { class: `loc-node ${node.state}`, 'data-node-id': node.id });
+    const colorStatus = node.mapColorStatus || 'complete';
+    const group = svgNode('g', {
+      class: `loc-node ${node.state} map-color-${colorStatus}`,
+      'data-node-id': node.id,
+      'data-map-color-status': colorStatus
+    });
     const title = svgNode('title');
     title.textContent = node.tooltip || node.label;
     group.appendChild(title);

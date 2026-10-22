@@ -15,6 +15,7 @@ export class UIDropdown extends UIElement {
    * @param {string} [options.id='']
    * @param {string} [options.name='UIDropdown']
    * @param {Function} [options.onChange=null]
+   * @param {string} [options.focusKey='']
    * @param {boolean} [options.disabled=false]
    */
   constructor(options = {}) {
@@ -33,6 +34,7 @@ export class UIDropdown extends UIElement {
       this._selectEl.id = options.id;
     }
     this._selectEl.setAttribute('data-stop-drag', 'true');
+    if (options.focusKey) this._selectEl.setAttribute('data-focus-key', options.focusKey);
 
     this._dom.appendChild(this._selectEl);
 

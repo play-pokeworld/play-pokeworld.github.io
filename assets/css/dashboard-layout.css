@@ -1,20 +1,31 @@
 /* ==========================================================================
-   Dashboard scroll & drag model (v1.2) — loaded last, overrides the legacy
-   layers of design-system.css.
-   - The game screen is exactly one viewport high; the header never moves.
-   - #main-dashboard is the ONLY scroll container: it scrolls down to the
-     bottom of the longest column.
-   - Columns and windows take the height of their content: a DraggablePanel is
-     never cut and never scrolls internally.
+   Page scroll & dashboard drag model — loaded last, overrides the legacy layers.
+   - The document scrolls like the reference; its header remains sticky.
+   - The dashboard grows to the longest column instead of clipping it inside
+     an inner scrollport. Windows themselves never scroll internally.
    - A dragged window follows the pointer through a GPU transform only.
    ========================================================================== */
+
+body:not(.save-menu-active) {
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100vh;
+  height: auto;
+}
+
+#app-root {
+  min-height: 100vh;
+  height: auto;
+  overflow: visible;
+}
 
 .pw-game-screen {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  height: 100dvh;
-  overflow: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: auto;
+  overflow: visible;
 }
 
 .pw-game-screen > #header {
@@ -22,19 +33,32 @@
 }
 
 body:not(.mobile-mode) #main-dashboard {
-  flex: 1 1 0 !important;
-  min-height: 0 !important;
+  flex: 0 0 auto !important;
+  min-height: calc(100vh - 65px) !important;
   height: auto !important;
   max-height: none !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-  overscroll-behavior: contain;
+  overflow: visible !important;
+  overscroll-behavior: auto;
+  line-height: normal;
   align-items: flex-start !important;
-  /* Smooth wheel scrolling (v1.3): at a device pixel ratio below 1.5 Chromium keeps a
-     scroller with a transparent background on the MAIN thread (to keep LCD text), so
-     every wheel step waited for a repaint of the whole dashboard and the scroll moved
-     by visible notches. Promoting the scroller makes the compositor scroll it. */
-  will-change: scroll-position;
+}
+
+/* Mobile also uses document scrolling; no hidden dashboard scrollport. */
+body.mobile-mode #main-dashboard {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* Match the original 1:2:1 dashboard columns at desktop widths. */
+body:not(.mobile-mode) #main-dashboard > #col-1,
+body:not(.mobile-mode) #main-dashboard > #col-3 {
+  flex: 1 1 0;
+  min-width: 0;
+}
+body:not(.mobile-mode) #main-dashboard > #col-2 {
+  flex: 2 1 0;
+  min-width: 0;
 }
 
 body:not(.mobile-mode) #main-dashboard > .dash-col {
@@ -42,6 +66,8 @@ body:not(.mobile-mode) #main-dashboard > .dash-col {
   max-height: none !important;
   min-height: 120px;
   overflow: visible !important;
+  gap: 8px;
+  padding-right: 0;
   padding-bottom: 4px;
 }
 
@@ -91,7 +117,7 @@ body.pw-window-drag-active * {
 /* --- Original top bar: height, spacing and control dimensions match main --- */
 body:not(.mobile-mode) .pw-game-screen > #header {
   height: auto;
-  min-height: 56px;
+  min-height: 65px;
   box-sizing: border-box;
 }
 
@@ -111,9 +137,14 @@ body:not(.mobile-mode) #header .pw-header-brand-mark {
   border-radius: 10px;
   box-sizing: border-box;
 }
+body:not(.mobile-mode) #header .pw-header-brand-mark img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
 body:not(.mobile-mode) #header .pw-header-badges {
   min-width: 200px;
-  gap: 0;
+  gap: 16px;
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -122,16 +153,17 @@ body:not(.mobile-mode) #header .pw-header-badges {
   line-height: normal;
 }
 #header .pw-header-badges-line {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0;
+  display: contents;
   white-space: nowrap;
 }
+#header .pw-header-punctuation {
+  display: contents;
+}
 body:not(.mobile-mode) #header #settings-btn.pw-header-settings {
-  width: 38px;
-  height: 38px;
-  min-width: 38px;
-  min-height: 38px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   padding: 8px;
   border-radius: 10px;
 }

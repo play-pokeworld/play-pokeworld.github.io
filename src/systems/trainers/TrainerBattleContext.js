@@ -16,6 +16,8 @@ import { TrainerRules } from '../../config/TrainerRules.js';
 import { EventBus } from '../../core/EventBus.js';
 import { TrainerDefeatedEvent } from '../../core/events/TrainerDefeatedEvent.js';
 import { LocalizationManager } from '../../localization/LocalizationManager.js';
+import { BonusSystem } from '../BonusSystem.js';
+import { BonusTypes } from '../../config/BonusRules.js';
 
 export class TrainerBattleContext {
   /**
@@ -69,7 +71,7 @@ export class TrainerBattleContext {
    * @param {string} args.locationId
    * @returns {{money: number, questPoints: number, expShare: number}}
    */
-  onVictory({ save, session, locationId }) {
+  onVictory({ save, session, locationId, deferSave = true }) {
     const log = session.log;
     const owner = this.league ?? this.trainers[0];
     const wonBefore = this.league ? save.statistics.hasWonLeague(this.league.region) : this._wonBefore(save, owner);
@@ -82,8 +84,8 @@ export class TrainerBattleContext {
     if (this.league || owner.kind === TrainerKinds.GYM) {
       if (!wonBefore) {
         if (this.league) save.statistics.recordLeague(this.league.region);
-        else save.player.earnBadge(owner.id);
-        money = owner.reward;
+        else save.player.earnBadge(owner.id, { deferSave });
+        money = BonusSystem.getInstance().applyMultiplier(owner.reward, BonusTypes.MONEY);
         save.currencies.add(TrainerRules.MONEY_CURRENCY, money);
         log.add(this.league ? 'battle_log.league_title' : 'battle_log.badge_earned', { trainerId: owner.id, badgeTrainerId: owner.id });
         if (money > 0) log.add('battle_log.money', { money });
@@ -100,8 +102,12 @@ export class TrainerBattleContext {
 
     const living = save.team.filter((pokemon) => !pokemon.isFainted()).length;
     const expShare = this.grantsExperience ? TrainerRewardRules.expShare(session.sentFoes, living) : 0;
-    for (const trainer of this.trainers) EventBus.getInstance().dispatch(new TrainerDefeatedEvent(trainer.id, locationId));
-    if (this.league) EventBus.getInstance().dispatch(new TrainerDefeatedEvent(this.league.id, locationId));
+    for (const trainer of this.trainers) EventBus.getInstance().dispatch(
+      new TrainerDefeatedEvent(trainer.id, locationId, { deferSave })
+    );
+    if (this.league) EventBus.getInstance().dispatch(
+      new TrainerDefeatedEvent(this.league.id, locationId, { deferSave })
+    );
     return { money, questPoints, expShare };
   }
 

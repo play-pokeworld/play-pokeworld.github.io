@@ -1,52 +1,245 @@
 /* Dungeon expedition: a compact, keyboard-focusable map that fits the battle dashboard. */
-.pw-dungeon-expedition { width: 100%; margin-top: 8px; }
+.pw-dungeon-expedition {
+  width: 100%;
+  min-width: 0;
+  margin-top: 8px;
+}
 .pw-dungeon-panel,
-.pw-dungeon-last-run { display: grid; gap: 8px; padding: 10px; }
-.pw-dungeon-header { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
-.pw-dungeon-title { font-weight: 900; color: var(--pw-text-primary); }
+.pw-dungeon-last-run {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 10px;
+}
+.pw-dungeon-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
+.pw-dungeon-title {
+  color: var(--pw-text-primary);
+  font-weight: 900;
+}
 .pw-dungeon-location,
-.pw-dungeon-floor,
-.pw-dungeon-multiplier { color: var(--pw-text-secondary); font-size: 12px; }
-.pw-dungeon-bag-summary { color: var(--pw-text-secondary); font-size: 12px; line-height: 1.45; }
+.pw-dungeon-floor {
+  color: var(--pw-text-secondary);
+  font-size: 12px;
+}
+.pw-dungeon-multiplier {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border: 1px solid var(--light1);
+  border-radius: 999px;
+  background: var(--dark1);
+  color: var(--light2);
+  font-size: 12px;
+  font-weight: 700;
+}
+.pw-dungeon-bag-summary {
+  padding: 8px 10px;
+  border-radius: var(--pw-radius-md);
+  background: var(--dark1);
+  color: var(--pw-text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
 .pw-dungeon-loot { display: flex; flex-wrap: wrap; gap: 4px; }
 .pw-dungeon-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.pw-dungeon-actions > .pw-button { flex: 1 1 160px; }
 .pw-dungeon-map-unavailable { color: var(--pw-text-secondary); font-size: 12px; }
-.pw-dgn-grid {
+
+/* Reference-style cave board: bounded cells on desktop, scrollable rather than
+   clipped on narrow screens, with the grid sized from the saved map columns. */
+.pw-dungeon-expedition .pw-dgn-grid {
   display: grid;
-  gap: 3px;
-  width: 100%;
-  padding: 6px;
-  border: 1px solid var(--pw-border-color);
-  border-radius: var(--pw-radius-md);
-  background: var(--pw-bg-surface);
-  outline-color: var(--pw-accent-color);
+  grid-template-columns: repeat(7, minmax(32px, 44px));
+  gap: 4px;
+  width: fit-content;
+  max-width: 100%;
+  max-height: min(62vh, 520px);
+  overflow: auto;
+  justify-content: start;
+  align-content: start;
+  margin: 0 auto;
+  padding: 10px 8px 6px;
+  border: 1px solid var(--light1);
+  border-radius: 10px;
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(0, 0, 0, .20), transparent 70%),
+    var(--dark1);
+  box-shadow: inset 0 0 14px rgba(0, 0, 0, .45);
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
-.pw-dgn-grid--7 { grid-template-columns: repeat(7, minmax(0, 1fr)); }
-.pw-dgn-grid--8 { grid-template-columns: repeat(8, minmax(0, 1fr)); }
-.pw-dgn-grid--9 { grid-template-columns: repeat(9, minmax(0, 1fr)); }
-.pw-dgn-grid--10 { grid-template-columns: repeat(10, minmax(0, 1fr)); }
-.pw-dgn-grid--11 { grid-template-columns: repeat(11, minmax(0, 1fr)); }
-.pw-dgn-tile {
+.pw-dungeon-expedition .pw-dgn-grid--7 { grid-template-columns: repeat(7, minmax(32px, 44px)); }
+.pw-dungeon-expedition .pw-dgn-grid--8 { grid-template-columns: repeat(8, minmax(32px, 44px)); }
+.pw-dungeon-expedition .pw-dgn-grid--9 { grid-template-columns: repeat(9, minmax(32px, 44px)); }
+.pw-dungeon-expedition .pw-dgn-grid--10 { grid-template-columns: repeat(10, minmax(32px, 44px)); }
+.pw-dungeon-expedition .pw-dgn-grid--11 { grid-template-columns: repeat(11, minmax(32px, 44px)); }
+.pw-dungeon-expedition .pw-dgn-grid:focus-visible {
+  outline: 2px solid var(--light2);
+  outline-offset: 3px;
+}
+.pw-dungeon-expedition .pw-dgn-tile {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   min-width: 0;
-  min-height: 27px;
-  padding: 2px;
-  border: 1px solid var(--pw-border-color);
-  border-radius: var(--pw-radius-sm);
-  background: var(--pw-bg-surface-elevated);
-  color: var(--pw-text-secondary);
+  min-height: 32px;
+  aspect-ratio: 1;
+  padding: 0 !important;
+  border: 2px solid var(--light1) !important;
+  border-radius: 8px;
+  background: var(--dark2) !important;
+  color: var(--light2) !important;
+  font-size: 17px;
+  line-height: 1;
+  transition: transform .12s ease, box-shadow .2s ease;
 }
-.pw-dgn-tile .pw-icon { width: 15px; height: 15px; }
-.pw-dgn-tile.is-fog { background: var(--pw-bg-surface); opacity: .52; }
-.pw-dgn-tile.is-open { border-color: var(--pw-border-strong); }
-.pw-dgn-tile.is-here { border-color: var(--pw-accent-color); color: var(--pw-accent-color); }
-.pw-dgn-tile.is-done { opacity: .55; }
-.pw-dgn-tile.t-combat { color: var(--pw-color-danger); }
-.pw-dgn-tile.t-elite { color: var(--orange); }
-.pw-dgn-tile.t-boss { color: var(--pw-accent-color); }
-.pw-dgn-tile.t-chest { color: var(--pw-color-success); }
-.pw-dgn-tile.t-ladder { color: var(--pw-accent-color); }
-.pw-dgn-tile:disabled { cursor: default; }
+.pw-dungeon-expedition .pw-dgn-tile .pw-icon {
+  display: inline-flex;
+  width: 74%;
+  height: 74%;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.pw-dungeon-expedition .pw-dgn-tile .pw-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Fog is unmistakable from explored empty ground, as in the reference map. */
+.pw-dungeon-expedition .pw-dgn-tile.is-fog {
+  background:
+    radial-gradient(120% 120% at 30% 18%, rgba(0, 0, 0, .28), transparent 62%),
+    radial-gradient(150% 150% at 82% 88%, rgba(0, 0, 0, .38), transparent 72%),
+    var(--dark1) !important;
+  border-color: color-mix(in srgb, var(--light1) 22%, transparent) !important;
+  color: var(--light1) !important;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, .55);
+}
+.pw-dungeon-expedition .pw-dgn-tile.is-fog::before {
+  content: '?';
+  color: var(--light1);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: 0 0 6px rgba(0, 0, 0, .9);
+}
+
+/* Each tile kind keeps its own reference hue and surface treatment. */
+.pw-dungeon-expedition .pw-dgn-tile.t-empty:not(.is-fog) {
+  background: var(--dark1) !important;
+  border-style: dashed !important;
+  border-color: color-mix(in srgb, var(--light1) 45%, transparent) !important;
+  color: var(--light1) !important;
+  opacity: .85;
+}
+.pw-dungeon-expedition .pw-dgn-tile.t-combat:not(.is-fog) {
+  background:
+    radial-gradient(120% 120% at 50% 20%, color-mix(in srgb, var(--pw-dgn-tint) 34%, transparent), transparent 68%),
+    color-mix(in srgb, var(--pw-dgn-tint) 16%, var(--dark2)) !important;
+  border-color: var(--pw-dgn-tint) !important;
+  color: var(--pw-dgn-tint) !important;
+  box-shadow: 0 0 8px -3px var(--pw-dgn-tint);
+}
+.pw-dungeon-expedition .pw-dgn-tile.t-elite:not(.is-fog) {
+  background:
+    radial-gradient(120% 120% at 50% 20%, color-mix(in srgb, var(--orange) 40%, transparent), transparent 68%),
+    color-mix(in srgb, var(--orange) 20%, var(--dark2)) !important;
+  border-color: var(--orange) !important;
+  color: var(--orange) !important;
+  font-weight: 700;
+  box-shadow: 0 0 8px -3px var(--orange);
+}
+.pw-dungeon-expedition .pw-dgn-tile.t-chest:not(.is-fog) {
+  background:
+    radial-gradient(120% 120% at 50% 20%, color-mix(in srgb, var(--yellow) 30%, transparent), transparent 68%),
+    color-mix(in srgb, var(--yellow) 14%, var(--dark2)) !important;
+  border-color: var(--yellow) !important;
+  color: var(--yellow) !important;
+  box-shadow: 0 0 8px -3px var(--yellow);
+}
+.pw-dungeon-expedition .pw-dgn-tile.t-boss:not(.is-fog) {
+  background:
+    radial-gradient(120% 120% at 50% 20%, color-mix(in srgb, var(--red) 40%, transparent), transparent 68%),
+    color-mix(in srgb, var(--red) 24%, var(--dark2)) !important;
+  border-color: var(--red) !important;
+  border-width: 3px !important;
+  color: var(--red) !important;
+  box-shadow: 0 0 0 1px var(--red), 0 0 12px -2px var(--red);
+  animation: pw-dungeon-boss-pulse 1.6s ease-in-out infinite;
+}
+.pw-dungeon-expedition .pw-dgn-tile.t-ladder {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--blue) 34%, var(--dark2)), color-mix(in srgb, var(--blue) 18%, var(--dark2))) !important;
+  border-color: var(--blue) !important;
+  color: var(--blue) !important;
+  box-shadow: 0 0 12px -2px var(--blue);
+}
+@keyframes pw-dungeon-boss-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px var(--red), 0 0 8px -3px var(--red); }
+  50% { box-shadow: 0 0 0 1px var(--red), 0 0 16px 0 var(--red); }
+}
+
+/* Open, completed, and current-position states remain distinct from tile type. */
+.pw-dungeon-expedition .pw-dgn-tile.is-open { cursor: pointer; }
+.pw-dungeon-expedition .pw-dgn-tile.is-open:hover {
+  border-color: var(--light2) !important;
+  transform: translateY(-1px);
+}
+.pw-dungeon-expedition .pw-dgn-tile:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 2px solid var(--light2);
+  outline-offset: 2px;
+}
+.pw-dungeon-expedition .pw-dgn-tile:disabled { cursor: default; }
+.pw-dungeon-expedition .pw-dgn-tile.is-done:not(.is-here) {
+  opacity: .55;
+  filter: saturate(.7);
+}
+.pw-dungeon-expedition .pw-dgn-tile.t-ladder.is-done {
+  opacity: 1;
+  filter: none;
+}
+.pw-dungeon-expedition .pw-dgn-tile.is-done:not(.is-here):not(.t-ladder):not(.t-boss) {
+  background: var(--dark1) !important;
+  border-style: dashed !important;
+  border-color: color-mix(in srgb, var(--light1) 45%, transparent) !important;
+  border-width: 2px !important;
+  color: var(--light1) !important;
+  opacity: .85;
+  filter: none;
+  box-shadow: none;
+  animation: none;
+}
+.pw-dungeon-expedition .pw-dgn-tile.is-done:not(.is-here):not(.t-ladder):not(.t-boss) .pw-icon {
+  display: none;
+}
+.pw-dungeon-expedition .pw-dgn-tile.is-here {
+  border-color: var(--light2) !important;
+  border-width: 3px !important;
+  outline: 2px solid var(--light2);
+  outline-offset: 2px;
+  opacity: 1;
+  filter: none;
+}
+.pw-dungeon-expedition .pw-dgn-tile.is-here .pw-icon { color: var(--light2) !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pw-dungeon-expedition .pw-dgn-tile,
+  .pw-dungeon-expedition .pw-dgn-tile.t-boss { transition: none !important; animation: none !important; }
+}
+
+@media (max-width: 600px) {
+  .pw-dungeon-panel,
+  .pw-dungeon-last-run { padding: 8px; }
+  .pw-dungeon-actions { flex-direction: column; }
+  .pw-dungeon-actions > .pw-button { flex-basis: auto; width: 100%; }
+}

@@ -11,12 +11,13 @@ import { BattleSystem } from '../../systems/BattleSystem.js';
 import { LocationSystem } from '../../systems/LocationSystem.js';
 import { DungeonRules } from '../../config/DungeonRules.js';
 import { DungeonRunChangedEvent } from '../../core/events/DungeonRunChangedEvent.js';
+import { BattleStartedEvent } from '../../core/events/BattleStartedEvent.js';
+import { BattleEndedEvent } from '../../core/events/BattleEndedEvent.js';
 import { SaveLoadedEvent } from '../../core/events/SaveLoadedEvent.js';
 import { TextFormatter } from '../../core/TextFormatter.js';
 import { t } from '../../localization/LocalizationManager.js';
 
 const TILE_ICONS = Object.freeze({
-  empty: 'emptyDiamond',
   combat: 'swords',
   elite: 'zap',
   chest: 'box',
@@ -37,6 +38,8 @@ export class DungeonExpeditionPanel extends UIContainer {
   constructor() {
     super({ className: 'pw-dungeon-expedition', name: 'DungeonExpeditionPanel' });
     this.listen(DungeonRunChangedEvent, () => this.render());
+    this.listen(BattleStartedEvent, () => this.render());
+    this.listen(BattleEndedEvent, () => this.render());
     this.listen(SaveLoadedEvent, () => this.render());
     this.render();
   }

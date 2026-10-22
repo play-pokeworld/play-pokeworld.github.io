@@ -9,6 +9,8 @@ import { LocationSystem } from './LocationSystem.js';
 import { LocationDB } from '../data/world/LocationDB.js';
 import { DungeonRunData } from '../data/save/DungeonRunData.js';
 import { DungeonRules } from '../config/DungeonRules.js';
+import { BonusSystem } from './BonusSystem.js';
+import { BonusTypes } from '../config/BonusRules.js';
 import { Random } from '../core/Random.js';
 import { EventBus } from '../core/EventBus.js';
 import { DungeonEnteredEvent } from '../core/events/DungeonEnteredEvent.js';
@@ -39,6 +41,7 @@ export class DungeonSystem extends BaseSystem {
     this._random = Random.default;
     this._battleResolved = null;
     this._saveChanged = null;
+    this._settledRunForBattle = null;
   }
 
   /** @override */
@@ -46,6 +49,7 @@ export class DungeonSystem extends BaseSystem {
     if (this._battleResolved) return;
     this._battleResolved = (event) => this._onBattleResolved(event);
     this._saveChanged = (event) => {
+      this._settledRunForBattle = null;
       const save = SaveSystem.getInstance().getCurrentSave();
       const run = save?.dungeons.run;
       EventBus.getInstance().dispatch(new DungeonRunChangedEvent(run?.locationId ?? null, event.constructor.TYPE, !!run));
@@ -78,10 +82,42 @@ export class DungeonSystem extends BaseSystem {
     return SaveSystem.getInstance().getCurrentSave()?.dungeons.run ?? null;
   }
 
+  /** @returns {Object|null} Immutable presentation snapshot of the active expedition. */
+  getRunSummary() {
+    const run = this.getRun();
+    if (!run?.active) return null;
+    return Object.freeze({
+      locationId: run.locationId,
+      totalWins: run.totalWins,
+      startedAt: run.startedAt,
+      bag: Object.freeze({ ...run.bag }),
+      loot: Object.freeze({
+        catches: Object.freeze(run.loot.catches.map((entry) => Object.freeze({ ...entry }))),
+        items: Object.freeze({ ...run.loot.items }),
+        money: run.loot.money,
+        tokens: run.loot.tokens
+      })
+    });
+  }
+
   /** @returns {Object|null} */
   getLastRun() {
     const last = SaveSystem.getInstance().getCurrentSave()?.dungeons.lastRun;
     return last ? JSON.parse(JSON.stringify(last)) : null;
+  }
+
+  /**
+   * Returns the terminal expedition only for the battle that settled it; prevents a later
+   * unrelated battle summary from inheriting an older persisted lastRun.
+   * @param {string|null} battleRunId
+   * @returns {Object|null}
+   */
+  getLastRunForBattle(battleRunId) {
+    const pending = this._settledRunForBattle;
+    if (!pending || typeof battleRunId !== 'string' || !battleRunId || pending.battleRunId !== battleRunId) return null;
+    const current = SaveSystem.getInstance().getCurrentSave()?.dungeons.lastRun;
+    if (!current || current.startedAt !== pending.summary.startedAt || current.endedAt !== pending.summary.endedAt) return null;
+    return JSON.parse(JSON.stringify(pending.summary));
   }
 
   /** @returns {boolean} */
@@ -169,6 +205,7 @@ export class DungeonSystem extends BaseSystem {
     save.dungeons.setRun(run);
     save.dungeons.exploredTotal++;
     save.dungeons.lastRun = null;
+    this._settledRunForBattle = null;
 
     EventBus.getInstance().dispatch(new DungeonEnteredEvent(locationId, toll, location.winsToClear));
     SaveSystem.getInstance().saveCurrent();
@@ -309,6 +346,7 @@ export class DungeonSystem extends BaseSystem {
     const save = SaveSystem.getInstance().getCurrentSave();
     const run = save?.dungeons.run;
     if (!run?.active || run.locationId !== event.locationId) return;
+    this._settledRunForBattle = null;
     const nodeId = event.nodeId || run.pendingNode;
     const tile = nodeId ? run.map?.tiles?.[nodeId] : null;
     if (!tile || tile.done || run.pendingNode !== nodeId) return;
@@ -327,6 +365,7 @@ export class DungeonSystem extends BaseSystem {
         kept.tokens += refunded;
       }
       this._closeRunWithSettlement(save, run, 'wipe', kept, lost, refunded, true);
+      this._rememberSettledRun(event, save.dungeons.lastRun);
       this._notify('dungeon_wipe', NotificationTones.DANGER, {
         tokens: TextFormatter.formatNumber(kept.tokens),
         money: TextFormatter.formatNumber(kept.money)
@@ -358,6 +397,7 @@ export class DungeonSystem extends BaseSystem {
           save.dungeons.recordClear(run.locationId);
           const kept = { ...run.bag };
           this._closeRunWithSettlement(save, run, 'cleared', kept, { tokens: 0, money: 0 }, 0, true);
+          this._rememberSettledRun(event, save.dungeons.lastRun);
           this._notify('dungeon_cleared', NotificationTones.SUCCESS);
           return;
         }
@@ -386,9 +426,9 @@ export class DungeonSystem extends BaseSystem {
     const bag = { ...run.bag };
     const lost = bank ? { tokens: 0, money: 0 } : { ...bag };
     if (rest) this._restTeam(save);
-    if (bank) this._creditBag(save, bag);
+    const credited = bank ? this._creditBag(save, bag) : { tokens: 0, money: 0 };
     const locationId = run.locationId;
-    save.dungeons.lastRun = this._summary(run, outcome, bank ? bag : { tokens: 0, money: 0 }, lost, 0);
+    save.dungeons.lastRun = this._summary(run, outcome, credited, lost, 0);
     save.dungeons.setRun(null);
     const battle = BattleSystem.getInstance();
     if (battle.isActive()) {
@@ -397,20 +437,31 @@ export class DungeonSystem extends BaseSystem {
       SaveSystem.getInstance().saveCurrent();
     }
     this._changed(locationId, outcome, false);
+    const displayedBag = bank ? credited : bag;
     this._notify(outcome === 'ascended' ? 'dungeon_ascend' : 'dungeon_abandoned',
       outcome === 'ascended' ? NotificationTones.SUCCESS : NotificationTones.WARNING,
-      { tokens: TextFormatter.formatNumber(bag.tokens), money: TextFormatter.formatNumber(bag.money), floor: String(run.floor) });
+      { tokens: TextFormatter.formatNumber(displayedBag.tokens), money: TextFormatter.formatNumber(displayedBag.money), floor: String(run.floor) });
     return true;
   }
 
   /** @private */
   _closeRunWithSettlement(save, run, outcome, kept, lost, refunded, rest) {
     if (rest) this._restTeam(save);
-    this._creditBag(save, kept);
+    const credited = this._creditBag(save, kept);
     const locationId = run.locationId;
-    save.dungeons.lastRun = this._summary(run, outcome, kept, lost, refunded);
+    save.dungeons.lastRun = this._summary(run, outcome, credited, lost, refunded);
     save.dungeons.setRun(null);
     this._changed(locationId, outcome, false);
+  }
+
+  /** @private @param {DungeonBattleResolvedEvent} event @param {Object|null} summary */
+  _rememberSettledRun(event, summary) {
+    const battleRunId = event.battleRun?.runId;
+    if (!summary || typeof battleRunId !== 'string' || !battleRunId) return;
+    this._settledRunForBattle = {
+      battleRunId,
+      summary: JSON.parse(JSON.stringify(summary))
+    };
   }
 
   /** @private @param {DungeonRunData} run */
@@ -437,8 +488,13 @@ export class DungeonSystem extends BaseSystem {
 
   /** @private @param {import('../data/save/SaveData.js').SaveData} save @param {{tokens:number,money:number}} bag */
   _creditBag(save, bag) {
-    if (bag.tokens > 0) save.currencies.add('dungeonToken', bag.tokens);
-    if (bag.money > 0) save.currencies.add('money', bag.money);
+    const credited = { tokens: Math.max(0, Number(bag.tokens) || 0), money: 0 };
+    if (credited.tokens > 0) save.currencies.add('dungeonToken', credited.tokens);
+    if (bag.money > 0) {
+      credited.money = BonusSystem.getInstance().applyMultiplier(bag.money, BonusTypes.MONEY);
+      save.currencies.add(BonusTypes.MONEY, credited.money);
+    }
+    return credited;
   }
 
   /** @private @param {import('../data/save/SaveData.js').SaveData} save */

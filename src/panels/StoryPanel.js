@@ -17,6 +17,7 @@ import { DashboardWindowFocusRequestedEvent } from '../core/events/DashboardWind
 import { EventBus } from '../core/EventBus.js';
 import { QuestSystem } from '../systems/QuestSystem.js';
 import { QuestCategories } from '../data/quests/QuestCategories.js';
+import { QuestDB } from '../data/quests/QuestDB.js';
 import { TrainerSystem } from '../systems/TrainerSystem.js';
 import { NotificationSystem } from '../systems/NotificationSystem.js';
 import { NotificationChannels, NotificationTones } from '../config/NotificationConfig.js';
@@ -35,6 +36,16 @@ const QUEST_SECTIONS = Object.freeze([
   Object.freeze({ category: QuestCategories.SIDE, titleKey: 'guide_side_quests' }),
   Object.freeze({ category: QuestCategories.REPEATABLE, titleKey: 'guide_repeatable_quests' })
 ]);
+
+/** @param {QuestSystem} quests @returns {{region:string,step:number,total:number}|null} */
+function getMainQuestProgress(quests) {
+  const status = quests.getMainQuest();
+  if (!status) return null;
+  const region = status.quest.region;
+  const chain = QuestDB.getInstance().getMainChain(region);
+  const index = chain.findIndex((quest) => quest.key === status.quest.key);
+  return index < 0 ? null : { region, step: index + 1, total: chain.length };
+}
 
 export class StoryPanel extends DraggablePanel {
   /**
@@ -59,7 +70,11 @@ export class StoryPanel extends DraggablePanel {
   /** @private */
   _render() {
     const quests = QuestSystem.getInstance();
-    const statuses = quests.getActiveQuests();
+    const repeatableUnlocked = quests.isRepeatableUnlocked();
+    const statuses = quests.getActiveQuests().filter((status) =>
+      repeatableUnlocked || status.quest.category !== QuestCategories.REPEATABLE
+    );
+    const mainProgress = getMainQuestProgress(quests);
     const tutorialStatus = TutorialSystem.getInstance().getCardStatus();
     this.clearChildren();
     if (tutorialStatus) {
@@ -81,31 +96,39 @@ export class StoryPanel extends DraggablePanel {
       group.addChild(new UIText({
         tagName: 'h3',
         className: 'pw-story-quest-section-title',
-        text: t(section.titleKey)
+        text: section.category === QuestCategories.MAIN && mainProgress
+          ? t('story_main_quest_progress', {
+              region: t(`region_${mainProgress.region}`),
+              step: mainProgress.step,
+              total: mainProgress.total
+            })
+          : t(section.titleKey)
       }));
       for (const status of sectionStatuses) {
         const card = new QuestCard({
           onClaim: (key) => this._claim(key),
           onChallenge: (key) => TrainerSystem.getInstance().challengeQuest(key)
         });
-        card.setStatus(status, TrainerSystem.getInstance().getQuestOpponent(status.quest.key) !== null);
+        card.setStatus(
+          status,
+          TrainerSystem.getInstance().getQuestOpponent(status.quest.key) !== null,
+          status.quest.category === QuestCategories.MAIN ? mainProgress?.step ?? null : null
+        );
         group.addChild(card);
       }
       this.addChild(group);
     }
 
-    const repeatableAccess = new UIContainer({ className: 'pw-story-repeatable-action' });
-    if (quests.isRepeatableUnlocked()) {
+    if (repeatableUnlocked) {
+      const repeatableAccess = new UIContainer({ className: 'pw-story-repeatable-action' });
       repeatableAccess.addChild(new UIButton({
         variant: 'hbtn',
         icon: 'book',
         text: t('repeatable_board_open'),
         onClick: () => EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.REPEATABLE_QUESTS))
       }));
-    } else {
-      repeatableAccess.addChild(new UIText({ className: 'pw-story-repeatable-hint', text: t('repeatable_unlock_hint') }));
+      this.addChild(repeatableAccess);
     }
-    this.addChild(repeatableAccess);
   }
 
   /** @private @param {Object} status */
@@ -131,7 +154,7 @@ export class StoryPanel extends DraggablePanel {
         break;
       }
       case 'pokemon_sheet':
-        bus.dispatch(new ModalOpenRequestedEvent(ModalIds.POKEMON_INFO, { index: 0 }));
+        bus.dispatch(new ModalOpenRequestedEvent(ModalIds.POKEMON_INFO, { teamIndex: 0 }));
         break;
       case 'bag':
         bus.dispatch(new ModalOpenRequestedEvent(ModalIds.BAG));

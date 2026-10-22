@@ -1,6 +1,6 @@
 # Audit du rework PokéWorld — v1.0 (mis à jour en v1.1)
 
-> **État courant : v1.10.0 / schéma 12.** La passe récente sépare titres de Ligue et badges d'Arène, répare les accès persistants de sauvegardes historiques, laisse les panneaux verrouillés visibles, et rapproche l'en-tête/Réglages de `origin/main`. Voir [`PHASE_v1.10.md`](PHASE_v1.10.md) pour le journal de livraison, les tests et les limites de smoke QA.
+> **État courant : v1.14.12 / schéma 15.** Cette reprise améliore le choix d'objet tenu dans le Sac et ajoute un footer fixe d'annulation/retrait pendant le remplacement d'un Pokémon de l'équipe depuis la Boîte PC; `BoxPanel` reste générique et `TeamBoxTransferSystem` conserve les mutations d'équipe/PC. Les versions et statuts historiques des audits de sections ci-dessous restent ceux des phases où ils ont été rédigés; le suivi courant est dans [`SUIVI_CORRECTIFS.md`](SUIVI_CORRECTIFS.md).
 
 Date de l'audit initial : 19/10/2026 · Base analysée : dump « Rework 2 » (133 fichiers) · Référence : dépôt original `play-pokeworld.github.io`.
 
@@ -212,4 +212,120 @@ Légende : ✅ corrigé · ⚠️ reste à faire (priorité **P1** haute → **P
 - Correctif de démarrage après retour utilisateur : ajout de l'import explicite de
   `DashboardWindowFocusRequestedEvent` dans `MobileDashboardNav`; un test de régression instancie la
   navigation mobile et vérifie le routage de la demande de focus.
+
+## 8. Complément de suivi — v1.11 (20/10/2026)
+
+- Livraison source Rework **1.11.0**, schéma **13**. Le paquet et le lockfile annoncent la même
+  version. La migration `12 → 13` déplace `trainingUnlockedMoves` vers `unlockedMoves`, préserve les
+  identifiants de capacité non reconnus et ne modifie pas les attaques actives.
+- Flux livrés dans le périmètre confirmé : offres/avancement PNJ liés à des IDs stables; six puzzles
+  Kanto localisés; dépôt/retrait/échange PC via les systèmes; CT/CS débloquant les capacités avant
+  l'équipement choisi depuis la fiche; Rare Candy, six vitamines et Pierre Liaison sur le Pokémon
+  ciblé; bilan terminal du donjon corrélé au combat exact. Le menu Base secrète réutilise le jalon
+  historique, mais le gameplay Hoenn correspondant reste hors de ce ZIP.
+- `npm test` : **236 réussis, 0 échec**. `git diff --check` et les vérifications syntaxiques ciblées
+  passent. La validation couvre les systèmes et la migration, mais ne remplace pas une partie complète.
+- Smoke Playwright ciblé à 390 × 844 et sur bureau : flux CT → cible → apprentissage différé, objet
+  sur Pokémon d'équipe et de PC, sélection d'évolution, bonbon/vitamine, et déploiement des filtres
+  mobiles du Sac. La suite automatise le règlement des chemins boss/wipe; aucun parcours réel complet
+  jusqu'au boss final n'est revendiqué.
+- **Limites explicites :** pas de certification de complétion end-to-end de chaque quête Kanto, pas
+  de validation pixel par pixel de toutes les pages et de tous les thèmes, pas de gameplay Base secrète
+  Hoenn. Le rapport `docs/PHASE_v1.11.md` sépare les éléments terminés, partiels, non vérifiés et
+  différés.
+- Archive `pokeworld-rework-1.11.0.zip` : 2 436 fichiers; intégrité `unzip -t` validée et suite testée
+  après extraction (**236 réussis, 0 échec**). Le paquet exclut `.git/`, `.playwright-cli/`, dépendances
+  et caches.
+
+## 9. Complément de suivi — v1.12.0 (21/10/2026)
+
+- Version de paquet **1.12.0**, schéma **14**; versions synchronisées entre `GameConfig`,
+  `package.json` et le lockfile. La migration `13 → 14` conserve les filtres PC et les flags Favori/
+  Verrouillé dans les données Pokémon. La refonte du Pokédex est en lecture seule et n'ajoute aucun
+  champ de sauvegarde.
+- Le rapport détaillé et les limites sont dans `docs/PHASE_v1.12.md`. Les critères reçus couvrent
+  header, tutoriel/quêtes, Lieu/carte, résumé et animation de capture, raccourcis, objets tenus,
+  sélecteur, PC (Favoris, Verrouillés, Rang et autres filtres), masquage des installations avant
+  prérequis, errants à rotation de 12 h, Pokédex et Guide.
+- L'errance suit les règles explicitement autorisées : rotation UTC de 12 h, taux strict de 1 %,
+  niveau 75, villes et donjons exclus, combat/capture ordinaires. Les poids/tirages ordinaires Rework
+  restent inchangés.
+- `npm test` : **252 réussis, 0 échec** après l'ajout des tests UI Pokédex et de rang SS PC, ainsi que la correction des libellés du tiroir mobile. Les vues Guide et Pokédex ont été inspectées sur bureau et à 390 × 844;
+  les filtres mobiles du Pokédex se déploient, restent dans la largeur et portent le bon libellé.
+- Le bilan n'est pas une certification d'un parcours Kanto complet ou d'une parité pixel par pixel
+  de tous les écrans. Le gameplay complet de la Base secrète Hoenn reste hors du périmètre; ses
+  panneaux demeurent masqués avant le jalon historique.
+- Archive `pokeworld-rework-1.12.0.zip` : **2 448 fichiers**, intégrité `unzip -t` validée; `.git/`,
+  `.playwright-cli/`, dépendances et caches absents. L'extraction passe `npm test` (**252/252**) et
+  ses ressources principales répondent HTTP 200.
+
+## 10. Reprise corrective après contestation de 1.12.0 — 21/10/2026
+
+- L'utilisateur a refusé le constat de conformité de 1.12.0; les contrôles unitaires et observations
+  navigateur historiques ne sont pas considérés comme preuve de la demande initiale.
+- Contenu puzzle hors Kanto repris : 25 définitions ajoutées manuellement et localisées; le catalogue
+  totalise 31 puzzles. Résolution système et modal couvrent code, braille, équipe et attente en plus des
+  séquences; progression vers une quête puzzle et actions de lieu hors Kanto sont testées.
+- Un parcours de région manquant a été identifié puis corrigé dans l'architecture Rework : après les
+  exigences Ligue/Pokédex de `main`, changer de région transporte au départ; le premier accès à Johto/
+  Hoenn demande le starter régional, ajouté à l'équipe ou à la Boîte PC via les systèmes. Route 29/101
+  est conditionnée à ce choix. Voyage, synchronisation de quête et choix de starter passent chacun par
+  une seule écriture de sauvegarde dans les tests.
+- L'audit comparatif `main` ↔ Rework donne **0 différence de déblocage sur 1 602 états de nœuds**
+  (3 régions × 9 paliers de badges), avec victoires locales, starters, gates de quête/objets et accès
+  Ligue représentés. Pour le Parc Naturel, l'utilisateur a choisi d'aligner l'accès sur la carte active
+  de `main` tout en gardant le donjon et ses rencontres de la table Johto dédiée.
+- Dernière suite complète : **280 réussis, 0 échec**. Vérification `node --check` de tous les JS/MJS de
+  `src`, `tests`, `tools` et `git diff --check` réussies.
+- **À la date de ce rapport intermédiaire**, aucune validation navigateur des nouveaux correctifs et
+  aucune comparaison visuelle complète n'avaient encore été effectuées. La suite 1.13.0 ci-dessous
+  consigne les vérifications ciblées réalisées ensuite; les parcours multi-régions complets restent
+  hors certification.
+
+## 11. Clôture de suivi — v1.13.0 (21/10/2026)
+
+- Version **1.13.0**, schéma **14**, alignée dans `package.json`, `package-lock.json` et `GameConfig.VERSION`.
+  Aucun nouveau champ de sauvegarde et aucune migration.
+- `npm test` passe **286/286** lors de trois exécutions consécutives. Le fixture du test d'immunité
+  contre les types a été rendu déterministe afin que le talent aléatoire Scrappy ne désactive pas
+  l'immunité Ghost/Normal testée; aucune règle de combat n'a changé. Tous les JS/MJS de `src`, `tests`
+  et `tools` passent `node --check`; `git diff --check` passe.
+- Contrôle navigateur Story à 1280 × 720 : chaîne Kanto **1/64 → 2/64** après dialogue avec le Prof.
+  Chen; « En cours… » et objectifs/titres visibles; actions Tutoriel alignées au retour près avec
+  `main` (écart résiduel des cartes d'environ 1–2 px, sans prétention pixel-perfect). Les mêmes
+  étapes de dialogue et de titre ont été vérifiées en anglais.
+- Parcours navigateur Route 1 : après dix victoires, le nœud Jadielle/Viridian est passé de verrouillé
+  à adjacent et le clic a déplacé le joueur dans la ville. Le combat reste aléatoire; aucune balance
+  ni rencontre ordinaire n'a été modifiée.
+- Parcours navigateur Équipe/PC : capture d'un Rattata, équipe 2/6, preset enregistré 2/6, PC 1 / équipe
+  1, puis retrait PC 0 / équipe 2; les deux Pokémon ont des IDs uniques et distincts. Aucune erreur
+  JS/console pendant le parcours.
+- Mobile réel simulé (`hasTouch: true`, 390 × 844) : aide tactile correcte, navigation Équipe et
+  Raccourcis, ouverture Boîte PC et largeur de document sans débordement horizontal.
+- Le starter initial reste capturé dans le Pokédex et le tracker Kanto affiche 1/25 (4%), comme demandé.
+  Les parcours complets Johto/Hoenn et une partie régionale entière ne sont pas certifiés.
+
+## 12. Port Base secrète — v1.14.0 (21/10/2026)
+
+- Version **1.14.0**, schéma de sauvegarde **15**; `package.json`, `package-lock.json` et `GameConfig.VERSION` sont synchronisés. La migration conserve les bases legacy, décorations/placements, stock, PNJ/équipes/messages, emplacement, records, message PC et drapeaux; les rotations historiques restent normalisées à 0.
+- Comparaison automatique à `main` : **122/122 décorations** et **36/36 layouts**; les propriétés manuelles de chaque décoration et les 36 grilles ASCII correspondent exactement. Les 17 routes et leurs alcôves restent celles de la référence.
+- Contrôle navigateur à 1440 × 1000 sur fixture : aperçu d'alcôve, établissement d'une nouvelle base, entrée depuis Lieu, édition d'une décoration provenant du stock, enregistrement du message PC et modification d'un PNJ. L'éditeur se ferme à l'entrée en visite; l'établissement n'incrémente pas artificiellement le record de visites.
+- Déplacement de `tree_1` à `bush_1` confirmé depuis Lieu : le modal se ferme, les décorations détenues retournent au stock, le PC reste automatique, les PNJ sont retirés, aucun nouveau meuble n'est accordé et le déplacement n'est pas compté comme une visite.
+- Échange JSON visite-seule : import d'une base distante, interaction avec son PC, prise d'un drapeau et respect du délai de 24 h. L'ID d'export stable Rework n'a pas été modifié; l'export n'ajoute pas le champ `pcMessage` absent de la référence.
+- Combat d'un PNJ visité : démarrage du moteur standard, fin de duel puis reprise de la visite. Les tests confirment l'événement de résolution Base dédié, sans règlement de dresseur ordinaire, capture, récompense sauvage ni événement ordinaire de KO.
+- Acquisition : aucun magasin Base, meuble initial ou grant gameplay; le PC automatique est le seul objet créé. Les drapeaux alimentent le fournisseur de bonus commun (argent, EXP, énergie Mine et butin route aux seuils prévus); le catalogue de succès n'est pas activé.
+- `npm test` : **301 réussis, 0 échec**, sur la source et après extraction du ZIP. Playwright à 1440 × 1000 et audit tactile mobile 390 × 844 (onglet Base, éditeur, modal de visite; largeur documentaire constante à 390 px) : aucune erreur JavaScript/console, aucune réponse HTTP en échec et aucun débordement horizontal.
+- Archive finale `pokeworld-rework-1.14.0.zip` : **2 487 fichiers**, `unzip -t` sans erreur; pas de `.git`, dépendances, caches, scripts/fixtures temporaires ou captures. Après extraction, `node --check` sur tous les JS/MJS et la cohérence version **1.14.0** / schéma **15** sont confirmés. `git diff --check` passe sur la source.
+- Limite de preuve : les chemins de progression Base cités sont observés dans le navigateur; cela ne certifie pas une partie Hoenn complète ni chacune des 122 décorations individuellement.
+
+## 13. Équipe — sélection d’objet tenu par le Sac — v1.14.1 (21/10/2026)
+
+- **Point 1 uniquement** de la liste de correctifs. Version paquet/config **1.14.1**, lockfile aligné; schéma sauvegarde inchangé (**15**).
+- Les deux actions (badge d’objet tenu de la carte Équipe et bouton de la fiche Pokémon) ouvrent `ModalIds.BAG` en mode `held-item`. Le panneau séparé `HeldItemPickerModal`, son identifiant et son composant de ligne parallèle ont été retirés; le rendu emploie `BagItemRow` du Sac avec les descriptions, quantités, indisponibilités et interactions clavier nécessaires.
+- La fiche Pokémon restait au-dessus du Sac et interceptait les clics. Le mode tenu ajoute désormais sa classe de superposition et passe à z-index **32 000**, contre **31 000** pour la fiche; celle-ci reste ouverte et le Sac redevient le plan interactif supérieur.
+- `BagPanel` rafraîchit le mode de sélection à la modification de l’inventaire/de l’équipe et aux événements de début/fin de combat; l’état verrouillé ne peut donc pas rester périmé. Équipement et retrait continuent de passer par `HeldItemSystem`/`TeamSystem`, avec une seule écriture de sauvegarde.
+- `npm test` : **303 réussis, 0 échec**; trois tests ciblés vérifient les deux points d’entrée, l’utilisation du Sac, le verrouillage d’un objet tenu par un autre Pokémon, une seule sauvegarde à l’équipement et le rafraîchissement du verrou de combat.
+- Playwright bureau **1280 × 900** : l’objet de la carte Équipe ouvre le Sac, où l’objet déjà tenu par un coéquipier est indisponible; l’équipement d’un objet possédé ferme le Sac et met à jour la carte. Sur mobile tactile **390 × 844**, « Changer » depuis la fiche ouvre le Sac au-dessus (z-index 32 000 contre 31 000), permet l’équipement et laisse la fiche ouverte; largeur du document toujours 390 px. Aucune erreur JavaScript ni réponse HTTP échouée.
+- Archive `pokeworld-rework-1.14.1.zip` : **2 488 fichiers**, intégrité `unzip -t` validée; sans `.git`, dépendances, caches ni artefacts temporaires. Après extraction, `npm test` **303/303**, `node --check` sur tous les JS/MJS et versions package/lock/config **1.14.1**, schéma **15**.
+- Les points **2 à 16** et la porte globale « Kanto entièrement jouable, sans perte de focus ni changement non demandé » restent **ouverts**; voir `SUIVI_CORRECTIFS.md`. Cette livraison ne prétend pas les avoir corrigés.
 

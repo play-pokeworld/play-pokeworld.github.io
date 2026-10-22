@@ -16,7 +16,11 @@ import { SaleSystem, SaleResults } from '../src/systems/SaleSystem.js';
 import { TrainingSystem, TrainingResults } from '../src/systems/TrainingSystem.js';
 import { QuestSystem } from '../src/systems/QuestSystem.js';
 import { QuestDB } from '../src/data/quests/QuestDB.js';
+import { PuzzleDB } from '../src/data/quests/PuzzleDB.js';
 import { ObjectiveRegistry } from '../src/data/quests/objectives/ObjectiveRegistry.js';
+import { PuzzleSystem, PuzzleOutcomes } from '../src/systems/PuzzleSystem.js';
+import { SecretBaseAccessSystem } from '../src/systems/SecretBaseAccessSystem.js';
+import { PuzzleSolvedEvent } from '../src/core/events/PuzzleSolvedEvent.js';
 import { BattleFoeKnockedOutEvent } from '../src/core/events/BattleFoeKnockedOutEvent.js';
 import { MineItemSoldEvent } from '../src/core/events/MineItemSoldEvent.js';
 import { FossilRules } from '../src/config/FossilRules.js';
@@ -43,6 +47,90 @@ describe('Kanto gameplay', (test) => {
     assert.equal(chain[0].key, 'main.1');
     assert.equal(chain.at(-1).key, 'main.64');
     assert.ok(chain.every((quest) => quest.region === 'kanto' && ObjectiveRegistry.has(quest.objective.type)));
+  });
+
+  test('all 31 localized puzzle definitions validate across three regions', () => {
+    const puzzles = PuzzleDB.getInstance();
+    assert.equal(puzzles.count, 31);
+    assert.equal(puzzles.getByLocation('ceruleancave').length, 2);
+    assert.equal(puzzles.getByLocation('seafoamislands').length, 2);
+    assert.equal(puzzles.getByLocation('mtmoon').length, 2);
+    assert.equal(puzzles.getByLocation('ruinsofalph').length, 2);
+    assert.equal(puzzles.getByLocation('sealed_chamber').length, 3);
+    assert.equal(puzzles.getByLocation('desert_ruins').length, 3);
+    assert.deepEqual(puzzles.validate(), []);
+  });
+
+  test('puzzle system checks location and prerequisites before solving', () => {
+    const save = newKantoSave('Puzzle locks', 'ceruleancave');
+    const puzzles = PuzzleSystem.getInstance();
+    assert.equal(puzzles.getStatus('cerulean_sigil_b'), PuzzleOutcomes.LOCKED);
+    assert.equal(puzzles.solveSequence('cerulean_sigil_b', ['shade', 'bolt', 'lake', 'rock']).result, PuzzleOutcomes.LOCKED);
+    assert.equal(puzzles.solveSequence('mtmoon_fossils_a', ['helix', 'dome', 'amber', 'tools']).result, PuzzleOutcomes.WRONG_LOCATION);
+    assert.deepEqual(save.statistics.solvedPuzzles, []);
+  });
+
+  test('puzzles grant the first reward once, notify puzzle quests, replay for money, and save atomically', () => {
+    const save = newKantoSave('Puzzle rewards', 'ceruleancave');
+    const quests = QuestSystem.getInstance();
+    const puzzles = PuzzleSystem.getInstance();
+    assert.ok(quests.accept('side.s86'));
+    const moneyBefore = save.currencies.get('money');
+    const itemBefore = save.inventory.count('twisted_spoon');
+    const solved = [];
+    const onSolved = (event) => solved.push(event);
+    EventBus.getInstance().subscribe(PuzzleSolvedEvent, onSolved);
+    const originalSaveCurrent = saves.saveCurrent;
+    let writes = 0;
+    saves.saveCurrent = function (...args) {
+      writes++;
+      return originalSaveCurrent.apply(this, args);
+    };
+    try {
+      const first = puzzles.solveSequence('cerulean_sigil_a', ['rock', 'lake', 'bolt', 'shade']);
+      assert.equal(first.result, PuzzleOutcomes.SOLVED_FIRST);
+      assert.equal(puzzles.getStatus('cerulean_sigil_a'), PuzzleOutcomes.SOLVED);
+      assert.equal(save.currencies.get('money'), moneyBefore + 6000);
+      assert.equal(save.inventory.count('twisted_spoon'), itemBefore + 1);
+      assert.equal(save.quests.getProgress('side.s86'), 1, 'the active matching puzzle objective progresses');
+      assert.equal(solved.length, 1);
+      assert.equal(solved[0].puzzleId, 'cerulean_sigil_a');
+      assert.equal(solved[0].firstTime, true);
+      assert.equal(solved[0].deferSave, true);
+      assert.equal(writes, 1, 'the whole solve is persisted with one write');
+
+      writes = 0;
+      const again = puzzles.solveSequence('cerulean_sigil_a', ['rock', 'lake', 'bolt', 'shade']);
+      assert.equal(again.result, PuzzleOutcomes.SOLVED_AGAIN);
+      assert.equal(save.currencies.get('money'), moneyBefore + 6600);
+      assert.equal(save.inventory.count('twisted_spoon'), itemBefore + 1, 'replays do not grant the item again');
+      assert.equal(solved.length, 2);
+      assert.equal(solved[1].firstTime, false);
+      assert.equal(writes, 1, 'a replay also has one save write');
+    } finally {
+      saves.saveCurrent = originalSaveCurrent;
+      EventBus.getInstance().unsubscribe(PuzzleSolvedEvent, onSolved);
+    }
+  });
+
+  test('code puzzle answers normalize accents and case', () => {
+    const save = newKantoSave('Puzzle code', 'mtmoon');
+    save.statistics.recordPuzzle('mtmoon_fossils_a');
+    const result = PuzzleSystem.getInstance().solveCode('mtmoon_lunar_code', 'LúNe');
+    assert.equal(result.result, PuzzleOutcomes.SOLVED_FIRST);
+    assert.equal(result.firstTime, true);
+    assert.equal(save.inventory.count('moonstone'), 1);
+  });
+
+  test('secret base stays hidden until the Hoenn main.216 milestone is completed', () => {
+    const save = newKantoSave('Base milestone', 'route111');
+    save.player.region = 'hoenn';
+    const access = SecretBaseAccessSystem.getInstance();
+    const unlockStep = access.getUnlockStep();
+    save.quests.setMainStep('hoenn', unlockStep - 1);
+    assert.equal(access.isUnlocked(), false);
+    save.quests.setMainStep('hoenn', unlockStep);
+    assert.equal(access.isUnlocked(), true);
   });
 
   test('fossil revival is locked until main quest Kanto 25 is active', () => {

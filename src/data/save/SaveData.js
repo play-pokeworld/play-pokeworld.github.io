@@ -5,10 +5,11 @@
  * Serialized shape (config/SaveSchema.js, current version):
  *   { version, id, background, createdAt, updatedAt,
  *     player: PlayerData, currencies: CurrenciesData, pokedex: PokedexData, team: PokemonData[],
- *     box: PokemonData[] (PC box: catches made with a full team), inventory: InventoryData
- *     (Poké Balls included), ballFilters: BallFiltersData, teamPresets: TeamPresetsData,
+ *     box: PokemonData[] (PC box: catches made with a full team), boxFilters: BoxFiltersData,
+ *     inventory: InventoryData (Poké Balls included), ballFilters: BallFiltersData, teamPresets: TeamPresetsData,
  *     quests: QuestProgressData, statistics: StatisticsData, tutorial: TutorialProgressData,
- *     dungeons: DungeonData, hatchery: HatcheryData, mine: MineData, access: ContentAccessData }
+ *     dungeons: DungeonData, hatchery: HatcheryData, mine: MineData,
+ *     secretBase: SecretBaseData, access: ContentAccessData }
  *
  * deserialize() first runs SaveMigrator (original game exports, schema v1 through current), then every
  * domain model reads the current shape only. Uses the original save id format (PW-TIMESTAMP-RANDOM).
@@ -17,6 +18,7 @@ import { BaseModel } from '../core/BaseModel.js';
 import { PlayerData } from './PlayerData.js';
 import { CurrenciesData } from './CurrenciesData.js';
 import { PokedexData } from './PokedexData.js';
+import { BoxFiltersData } from './BoxFiltersData.js';
 import { InventoryData } from './InventoryData.js';
 import { BallFiltersData } from './BallFiltersData.js';
 import { TeamPresetsData } from './TeamPresetsData.js';
@@ -26,6 +28,7 @@ import { TutorialProgressData } from './TutorialProgressData.js';
 import { DungeonData } from './DungeonData.js';
 import { HatcheryData } from './HatcheryData.js';
 import { MineData } from './MineData.js';
+import { SecretBaseData } from './SecretBaseData.js';
 import { ContentAccessData } from './ContentAccessData.js';
 import { SaveThemes } from './SaveThemes.js';
 import { SaveMigrator } from './migrations/SaveMigrator.js';
@@ -67,6 +70,8 @@ export class SaveData extends BaseModel {
     this.team = [];
     /** @type {PokemonData[]} */
     this.box = [];
+    /** @type {BoxFiltersData} */
+    this.boxFilters = new BoxFiltersData();
     /** @type {InventoryData} */
     this.inventory = new InventoryData();
     /** @type {BallFiltersData} */
@@ -85,6 +90,8 @@ export class SaveData extends BaseModel {
     this.hatchery = new HatcheryData();
     /** @type {MineData} */
     this.mine = new MineData();
+    /** @type {SecretBaseData} */
+    this.secretBase = new SecretBaseData();
     /** @type {ContentAccessData} Sticky progression facts; evaluated by FeatureAccessSystem. */
     this.access = new ContentAccessData();
   }
@@ -137,6 +144,7 @@ export class SaveData extends BaseModel {
       pokedex: this.pokedex.serialize(),
       team: this.team.map((pokemon) => pokemon.serialize()),
       box: this.box.map((pokemon) => pokemon.serialize()),
+      boxFilters: this.boxFilters.serialize(),
       inventory: this.inventory.serialize(),
       ballFilters: this.ballFilters.serialize(),
       teamPresets: this.teamPresets.serialize(),
@@ -146,6 +154,7 @@ export class SaveData extends BaseModel {
       dungeons: this.dungeons.serialize(),
       hatchery: this.hatchery.serialize(),
       mine: this.mine.serialize(),
+      secretBase: this.secretBase.serialize(),
       access: this.access.serialize()
     };
   }
@@ -166,6 +175,7 @@ export class SaveData extends BaseModel {
     this.pokedex = new PokedexData(data.pokedex);
     this.team = (Array.isArray(data.team) ? data.team : []).map((raw) => new PokemonData(raw));
     this.box = (Array.isArray(data.box) ? data.box : []).map((raw) => new PokemonData(raw));
+    this.boxFilters = new BoxFiltersData(data.boxFilters);
     this.inventory = new InventoryData(data.inventory);
     this.ballFilters = new BallFiltersData(data.ballFilters);
     this.teamPresets = new TeamPresetsData(data.teamPresets);
@@ -175,6 +185,7 @@ export class SaveData extends BaseModel {
     this.dungeons = new DungeonData(data.dungeons);
     this.hatchery = new HatcheryData(data.hatchery);
     this.mine = new MineData(data.mine);
+    this.secretBase = new SecretBaseData(data.secretBase);
     this.access = new ContentAccessData(data.access);
   }
 }

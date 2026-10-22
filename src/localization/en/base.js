@@ -4,6 +4,7 @@ export const L_en_base = {
 "export_done":"Base exported as JSON!",
 "win":{
 "moved":"Base moved: {name}. Your furniture was returned to the stock.",
+"established":"Secret Base established: {name}!",
 "title":"Secret Base",
 "mode_label":"Render mode",
 "layout_label":"Base layout",
@@ -29,7 +30,11 @@ export const L_en_base = {
 "cave_yellow_5":"Yellow Cave · Mezzanine 5","cave_yellow_6":"Yellow Cave · Balconies 6"
 }
 },
-"debug":{"granted":"Decoration catalog: {n} items added to stock (debug).","npc_name":"NPC","npc_added":"NPC created from your current party: {name}.","npcs_added":"{n} NPCs settled into the base!"},
+"debug":{"granted":"Decoration catalog: {n} items added to stock (debug).","grant_button":"Grant catalog (debug)","npc_name":"NPC","npc_added":"NPC created from your current party: {name}.","npcs_added":"{n} NPCs settled into the base!"},
+"action":{"visit_base":"Visit your base · {name}","preview_alcove":"Explore alcove · {name}","establish":"Establish my base here","move":"Move my base here","move_confirm_title":"Move your Secret Base?","move_confirm_message":"Decorations will return to stock and the room’s NPCs will be removed, matching the reference behavior.","move_confirm":"Move base"},
+"panel":{"find_alcove":"From a Hoenn route, open a Secret Base alcove in the Location panel to settle there.","edit":"Edit base","stop_edit":"Finish editing","exchange_title":"Visit a file","pc_message_save":"Save PC message","bonus_label":"Flag bonuses","bonus_money":"+{value}% money","bonus_xp":"+{value}% experience","bonus_mine":"+{value}% Mine max energy","bonus_route":"+{value} route loot point(s)","no_bonus":"No active bonus","selected_stock":"Selected: {name} · click a tile to place it.","selected_decoration":"Decoration selected · click a tile to move it.","selected_npc":"NPC selected · click a tile to move them.","select_hint":"Choose stock, a placed decoration, or an NPC to move.","unselect":"Clear selection","cancel_place":"Cancel placement","npc_remove":"Remove NPC","npc_add":"Create NPC from active team","npc_save":"Save NPC","npc_copy_team":"Copy active team","npc_name_placeholder":"NPC name","npc_pre_placeholder":"Line before battle","npc_win_placeholder":"Line if visitor wins","npc_lose_placeholder":"Line if visitor loses"},
+"flag":{"collect":"Take flag","collected":"Flag collected! Total: {count}.","rank_up":"New rank: {rank}!","own":"You cannot take the flag from your own base.","cooldown":"You already took this flag. Try again in {remainingHours} h.","rank":{"normal":"Normal","bronze":"Bronze","silver":"Silver","gold":"Gold","platinum":"Platinum"}},
+
 "edit":{
 "move_hint":"Holding {name}: click a tile to set it down there, right-click to cancel (or « Pick up » to stash it).",
 "need2d":"Editing happens in Emerald 2D mode — switch the renderer in the top-right corner.",
@@ -63,8 +68,12 @@ export const L_en_base = {
 "export":"Export",
 "import":"Visit a file…",
 "battle_challenge":"{name} challenges you!",
+"battle_intro":"{name} accepts the challenge!",
+"battle_intro_quote":"{name} challenges you: “{quote}”",
+"battle_quote":"“{quote}” — {name}",
 "battle_won":"Victory against {name}!",
 "battle_lost":"Defeat against {name}…",
+"npc_default_name":"Secret Base Trainer",
 "heal":"Your party is fully healed!",
 "sit":"You rest for a moment…",
 "light_on":"The lamp turns on.",
@@ -89,11 +98,27 @@ export const L_en_base = {
 "door_break":"You smash through the fake door!",
 "invisible":"There's something invisible here…",
 "makiwara":"A post used by sword masters for Cut practice.",
-"note":"The note “{note}” rings."
+"note":"The note “{note}” rings.",
+"title":"Secret Base Visit",
+"title_named":"{name}’s Base",
+"no_visit":"No visit is in progress.",
+"hint_alcove":"Temporary alcove: establish or move your base here, or end the visit.",
+"own_room":"Your own base",
+"item":"You look at {name}.",
+"challenge":"Battle",
+"challenge_confirm":"Start a battle against {name}?"
 },
 "err":{
 "unknown":"Unknown item.",
 "no_base":"No secret base yet.",
+"wrong_region":"Secret Bases are only available in Hoenn.",
+"location":"There is no Secret Base alcove at this location.",
+"already_established":"You already established a Secret Base.",
+"wrong_location":"You must be at the alcove’s location.",
+"battle_active":"A battle is already in progress.",
+"debug_only":"This action is only available in debug mode.",
+"no_visit":"No secret-base visit is in progress.",
+"visit_active":"A secret-base visit is already in progress.",
 "stairs_anchor":"Stairs must be placed on the dedicated ramp spot.",
 "board_hole":"The board (2 tiles tall) is placed with its top on a hole.",
 "pc_unreachable":"The PC must stay reachable on foot from the entrance.",
@@ -191,7 +216,11 @@ export const L_en_base = {
 "msg_hint":"Message for visitors who take your flag",
 "msg_placeholder":"Welcome to my base! Have fun!",
 "msg_label":"Custom message",
-"edit_selected":"Edit PC"
+"edit_selected":"Edit PC",
+"title":"Base PC",
+"no_message":"The owner left no message.",
+"rank_summary":"{rank} rank · {count} flag(s)",
+"next_rank":"Progress: {count} flag(s) · next milestone at {next}"
 },
 
 "npc":{

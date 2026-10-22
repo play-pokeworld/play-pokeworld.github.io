@@ -6,6 +6,8 @@ import { BaseSystem } from './BaseSystem.js';
 import { SaveSystem } from './SaveSystem.js';
 import { EventBus } from '../core/EventBus.js';
 import { TutorialRules } from '../config/TutorialRules.js';
+import { BonusSystem } from './BonusSystem.js';
+import { BonusTypes } from '../config/BonusRules.js';
 import { ItemDB } from '../data/items/ItemDB.js';
 import { grantItem } from './inventory/ItemGrant.js';
 import { NotificationSystem } from './NotificationSystem.js';
@@ -44,6 +46,8 @@ export class TutorialSystem extends BaseSystem {
     super('TutorialSystem', 'System');
     /** @private @type {Array<[Function, Function]>} */
     this._subscriptions = [];
+    /** @private @type {{saveId:string|null,stepId:string|null,progress:number|null,enabled:boolean}|null} */
+    this._lastProgressSnapshot = null;
   }
 
   /** @override */
@@ -70,6 +74,7 @@ export class TutorialSystem extends BaseSystem {
     const bus = EventBus.getInstance();
     for (const [eventClass, callback] of this._subscriptions) bus.unsubscribe(eventClass, callback);
     this._subscriptions = [];
+    this._lastProgressSnapshot = null;
     super.onDestroy();
   }
 
@@ -150,10 +155,26 @@ export class TutorialSystem extends BaseSystem {
       save.tutorial.enabled = false;
       changed = true;
     }
-    if (!changed) return false;
 
-    if (persist) SaveSystem.getInstance().saveCurrent();
-    const changedStep = completedNow.at(-1)?.id ?? milestone ?? null;
+    const nextStep = TutorialRules.STEPS.find((step) => !save.tutorial.isCompleted(step.id)) || null;
+    const snapshot = {
+      saveId: String(save.id || ''),
+      stepId: nextStep?.id ?? null,
+      progress: nextStep ? this._progressFor(nextStep, save) : null,
+      enabled: !!save.tutorial.enabled
+    };
+    const isSaveLoad = event instanceof SaveCreatedEvent || event instanceof SaveLoadedEvent;
+    const previous = this._lastProgressSnapshot;
+    const progressChanged = !!previous && !isSaveLoad && previous.saveId === snapshot.saveId && (
+      previous.stepId !== snapshot.stepId ||
+      previous.progress !== snapshot.progress ||
+      previous.enabled !== snapshot.enabled
+    );
+    this._lastProgressSnapshot = snapshot;
+    if (!changed && !progressChanged) return false;
+
+    if (changed && persist) SaveSystem.getInstance().saveCurrent();
+    const changedStep = completedNow.at(-1)?.id ?? milestone ?? (progressChanged ? snapshot.stepId : null);
     EventBus.getInstance().dispatch(new TutorialProgressChangedEvent(changedStep, save.tutorial.enabled));
     return true;
   }
@@ -205,7 +226,10 @@ export class TutorialSystem extends BaseSystem {
   _payReward(step, save) {
     save.tutorial.markRewardClaimed(step.id);
     const hasReward = step.reward.money > 0 || step.reward.dungeonToken > 0 || Object.keys(step.reward.items).length > 0;
-    if (step.reward.money > 0) save.currencies.add('money', step.reward.money);
+    if (step.reward.money > 0) {
+      const money = BonusSystem.getInstance().applyMultiplier(step.reward.money, BonusTypes.MONEY);
+      save.currencies.add(BonusTypes.MONEY, money);
+    }
     if (step.reward.dungeonToken > 0) save.currencies.add('dungeonToken', step.reward.dungeonToken);
     for (const [itemId, quantity] of Object.entries(step.reward.items)) grantItem(save, itemId, quantity);
     NotificationSystem.getInstance().notifyTemporary(

@@ -13,6 +13,7 @@ import { BattleConfig } from '../src/config/BattleConfig.js';
 import { NotificationChannels } from '../src/config/NotificationConfig.js';
 import { SaveSystem } from '../src/systems/SaveSystem.js';
 import { LocationSystem } from '../src/systems/LocationSystem.js';
+import { FeatureAccessSystem } from '../src/systems/FeatureAccessSystem.js';
 import { BattleSystem } from '../src/systems/BattleSystem.js';
 import { TeamSystem } from '../src/systems/TeamSystem.js';
 import { BoxSystem } from '../src/systems/BoxSystem.js';
@@ -182,6 +183,22 @@ describe('Gameplay systems', (test) => {
     assert.ok(locations.isLocked('route3'));
     assert.equal(locations.travelTo('route3'), false);
     assert.equal(locations.travelTo('nowhere'), false);
+  });
+
+  test('a cleared route unlocks the next map destination and allows travel', () => {
+    const save = saves.createNewSave('Map progression', 'bulbasaur');
+    const locations = LocationSystem.getInstance();
+    const access = FeatureAccessSystem.getInstance();
+    assert.ok(locations.travelTo('route1'), 'the starter route is reachable');
+    const blocked = access.getLocationAccessStatus('viridian');
+    assert.equal(blocked.reason, 'wins', 'the next town explains the route-clear prerequisite');
+    assert.equal(blocked.remainingWins, 10);
+
+    for (let index = 0; index < 10; index++) save.statistics.recordWildWin('route1');
+    access.refresh('route-clear-test', { force: true, persist: false });
+    assert.equal(access.getLocationAccessStatus('viridian').unlocked, true);
+    assert.ok(locations.travelTo('viridian'), 'the map destination becomes traversable after the route clears');
+    assert.equal(locations.getCurrentLocationId(), 'viridian');
   });
 
   test('team presets save, edit, load from the box and move the old party into the box', () => {

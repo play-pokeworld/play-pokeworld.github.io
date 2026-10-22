@@ -5,8 +5,8 @@
  * - Each panel is created with its starting column; addWindow() stacks it at the bottom of that column,
  *   so creation order = top-to-bottom order. The resulting default layout is handed to
  *   DashboardLayoutSystem, which restores the layout saved by the player on top of it.
- * - The dashboard is the only scroll container of the game screen: the columns grow with their
- *   content and the windows are never cut nor scrolled internally.
+ * - The browser document is the page scroller; the dashboard and columns grow with their content,
+ *   and windows are not scrolled internally (the map keeps its own bounded viewport).
  * - Owns the WindowDragController (attached while the page is active).
  */
 
@@ -116,7 +116,7 @@ export class DashboardView extends UIElement {
     this._applyVisibility();
   }
 
-  /** Applies the selected mobile focus; progression-locked panels stay visible and explain their gate. */
+  /** Applies the selected mobile focus while leaving progression-gated panels fully hidden. */
   _applyVisibility() {
     for (const [id, panel] of this._windows) this._applyWindowVisibility(id, panel);
   }

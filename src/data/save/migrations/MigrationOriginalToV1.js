@@ -19,6 +19,9 @@ import { ObjectiveTypes } from '../../quests/ObjectiveTypes.js';
 import { LocationDB } from '../../world/LocationDB.js';
 import { HatcheryRules } from '../../../config/HatcheryRules.js';
 import { QuestRules } from '../../../config/QuestRules.js';
+import { SecretBaseRules } from '../../../config/SecretBaseRules.js';
+import { migrateLegacySecretBase } from './LegacySecretBaseMigration.js';
+import { collectLegacyLocationUnlocks } from './LegacyLocationAccessMigration.js';
 
 /** Original wallet field -> CurrencyDefinitions id. */
 const WALLET_FIELDS = Object.freeze({
@@ -48,10 +51,15 @@ function convertPokemon(pokemon) {
     maxHp: pokemon.maxHP,
     totalExp: pokemon.xp,
     shiny: !!(pokemon.shinyActive || pokemon.shiny),
+    favorite: pokemon.favorite === true || pokemon.fav === true,
+    locked: pokemon.locked === true,
     uid: pokemon.uid,
     talent: pokemon.talent ? String(pokemon.talent).toLowerCase() : null,
     heldItem: pokemon.heldItem || null,
     moves: (pokemon.moves || []).map((move) => (typeof move === 'string' ? move : move?.id)).filter(Boolean),
+    unlockedMoves: Array.isArray(pokemon.trainingUnlockedMoves)
+      ? pokemon.trainingUnlockedMoves.map((move) => (typeof move === 'string' ? move : move?.id)).filter(Boolean)
+      : [],
     ivs: pokemon.ivs,
     evs: pokemon.evs
   };
@@ -238,12 +246,25 @@ function convertQuests(G) {
   ));
   const rawLastRollAt = Number(G.repeatableLastRollAt);
   const repeatableLastRollAt = Number.isFinite(rawLastRollAt) ? Math.max(0, Math.floor(rawLastRollAt)) : 0;
+  const mainStep = { ...(G.mainStep || {}) };
+  const rawHoennStep = Number(mainStep[SecretBaseRules.REGION]);
+  const normalizedHoennStep = Number.isFinite(rawHoennStep) ? Math.max(0, Math.floor(rawHoennStep)) : 0;
+  const legacySecretBaseMilestone = G.unlockedSecretBaseHoenn === true ||
+    G.completedQuests?.[SecretBaseRules.LEGACY_UNLOCK_QUEST_ID] === true ||
+    normalizedHoennStep >= SecretBaseRules.LEGACY_UNLOCK_MAIN_STEP;
+  const unlockQuestIndex = questDb.getMainChain(SecretBaseRules.REGION)
+    .findIndex((quest) => quest.key === SecretBaseRules.UNLOCK_QUEST_KEY);
+  if (legacySecretBaseMilestone && unlockQuestIndex >= 0) {
+    mainStep[SecretBaseRules.REGION] = Math.max(normalizedHoennStep, unlockQuestIndex + 1);
+  } else if (Number.isFinite(rawHoennStep)) {
+    mainStep[SecretBaseRules.REGION] = normalizedHoennStep;
+  }
   const hasActiveRepeatable = Object.keys(active).some((key) => key.startsWith(`${QuestCategories.REPEATABLE}.`));
   const repeatableUnlocked = G.repeatableQuestsUnlocked === true ||
     (Array.isArray(G.badges) && G.badges.length > 0) || G.region === 'johto' ||
     hasActiveRepeatable || repeatablesCompleted > 0 || repeatableChoices.length > 0 || repeatableSlotUpgrades > 0;
   return {
-    mainStep: { ...(G.mainStep || {}) },
+    mainStep,
     active,
     completed,
     repeatablesCompleted,
@@ -256,14 +277,16 @@ function convertQuests(G) {
 
 /** @param {Object} G Original game state @returns {string[]} Regions with a completed league */
 function convertLeagueWins(G) {
-  const wins = new Set(Object.entries(G.regionLeagueWon && typeof G.regionLeagueWon === 'object' ? G.regionLeagueWon : {})
-    .filter(([, completed]) => completed === true)
-    .map(([region]) => region));
+  const isWon = (value) => value === true || (typeof value === 'number' && Number.isFinite(value) && value > 0);
+  const flags = G.regionLeagueWon && typeof G.regionLeagueWon === 'object' ? G.regionLeagueWon : {};
+  const wins = new Set(Object.entries(flags).filter(([, completed]) => isWon(completed)).map(([region]) => region));
   const defeated = G.defeatedChamps && typeof G.defeatedChamps === 'object' ? G.defeatedChamps : {};
-  if (G.championTitle === true || G.leagueWon === true || defeated.elite4 === true) wins.add('kanto');
+  if (isWon(G.championTitle) || isWon(G.leagueWon) || isWon(defeated.elite4)) wins.add('kanto');
+  if (isWon(G.johtoChampionTitle)) wins.add('johto');
+  if (isWon(G.hoennChampionTitle)) wins.add('hoenn');
   for (const [key, completed] of Object.entries(defeated)) {
     const match = /^([a-z0-9]+)_elite4$/.exec(key);
-    if (completed === true && match) wins.add(match[1]);
+    if (isWon(completed) && match) wins.add(match[1]);
   }
   return [...wins];
 }
@@ -279,6 +302,7 @@ export const MigrationOriginalToV1 = Object.freeze({
     const G = raw.G || {};
     const meta = G.saveMeta || {};
     const leaguesWon = convertLeagueWins(G);
+    const unlockedLocations = collectLegacyLocationUnlocks(G, { mainBadgeBackfill: true });
     const currencies = {};
     for (const [field, id] of Object.entries(WALLET_FIELDS)) {
       if (Number.isFinite(G.wallet?.[field])) currencies[id] = G.wallet[field];
@@ -309,6 +333,7 @@ export const MigrationOriginalToV1 = Object.freeze({
       currencies,
       team: (G.team || []).map(convertPokemon).filter(Boolean),
       box: Object.values(G.collection || {}).map(convertPokemon).filter(Boolean),
+      boxFilters: G.boxFilters && typeof G.boxFilters === 'object' ? { ...G.boxFilters } : {},
       // v1.7 migration consumes these original ids after the other schema migrations.
       teamPresets: G.teamPresets && typeof G.teamPresets === 'object' ? { ...G.teamPresets } : null,
       activePresetId: G.activePresetId || null,
@@ -325,6 +350,7 @@ export const MigrationOriginalToV1 = Object.freeze({
       },
       hatchery: convertHatchery(G),
       mine: G.mine && typeof G.mine === 'object' ? { ...G.mine } : {},
+      secretBase: migrateLegacySecretBase(G),
       quests: convertQuests(G),
       tutorial: G.tutorial && typeof G.tutorial === 'object' ? { ...G.tutorial } : null,
       dungeons: {
@@ -334,11 +360,8 @@ export const MigrationOriginalToV1 = Object.freeze({
         lastRun: null
       },
       access: {
-        // Preserve the original map's sticky reachability instead of rebuilding it from badge totals.
-        unlockedLocations: Array.isArray(G.unlockedLocs)
-          ? G.unlockedLocs.filter((id) => typeof id === 'string')
-          : Object.entries(G.unlockedLocs && typeof G.unlockedLocs === 'object' ? G.unlockedLocs : {})
-            .filter(([, unlocked]) => unlocked === true).map(([id]) => id),
+        // Keep explicit visits/unlocks, then apply the original save-loader's badge backfill.
+        unlockedLocations,
         unlockedFeatures: {
           hatchery: G.hatcheryUnlocked === true,
           mine: G.mineUnlocked === true,

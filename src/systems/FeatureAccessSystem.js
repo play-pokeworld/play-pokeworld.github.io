@@ -11,7 +11,7 @@ import { SaveSystem } from './SaveSystem.js';
 import { EventBus } from '../core/EventBus.js';
 import { LocationDB } from '../data/world/LocationDB.js';
 import { LocationKinds } from '../data/world/LocationKinds.js';
-import { TrainerDB } from '../data/trainers/TrainerDB.js';
+import { BadgeRules } from './trainers/BadgeRules.js';
 import { QuestDB } from '../data/quests/QuestDB.js';
 import { PokemonDB } from '../data/pokemon/PokemonDB.js';
 import { STARTERS_BY_REGION } from '../data/pokemon/StarterData.js';
@@ -62,7 +62,9 @@ export class FeatureAccessSystem extends BaseSystem {
     const bus = EventBus.getInstance();
     const bind = (eventClass, reason, predicate = null) => {
       const callback = (event) => {
-        if (!predicate || predicate(event)) this.refresh(reason);
+        if (!predicate || predicate(event)) {
+          this.refresh(reason, { persist: event?.deferSave !== true });
+        }
       };
       bus.subscribe(eventClass, callback);
       this._subscriptions.push([eventClass, callback]);
@@ -255,27 +257,38 @@ export class FeatureAccessSystem extends BaseSystem {
   }
 
   /**
-   * Accessible regions for the header and other read-only UI, following the original gate:
-   * Kanto starts open; each next region needs the previous regional league and a complete
-   * previous regional Pokédex. This is intentionally separate from which regional starter
-   * has been caught (`regionStarters`).
-   * @private @param {Object} save @returns {string[]}
+   * Region access follows the original gate: the previous region's League and complete Pokédex.
+   * @param {string} regionId
+   * @returns {{unlocked:boolean,reason:string,previous?:string,caught?:number,total?:number}}
    */
-  _getAccessibleRegions(save) {
-    const regions = REGIONS.filter((region) => region.available).map((region) => region.id);
-    if (regions.length === 0) return [];
-    const accessible = [regions[0]];
-    const pokemonDb = PokemonDB.getInstance();
-    for (let index = 1; index < regions.length; index++) {
-      const previous = regions[index - 1];
-      const leagueWon = save.statistics.hasWonLeague(previous) ||
-        (previous === 'kanto' && save.access.championTitle);
-      const species = pokemonDb.getByRegion(previous);
-      const pokedexComplete = species.length > 0 && species.every((entry) => save.pokedex.isCaught(entry.id));
-      if (!leagueWon || !pokedexComplete) break;
-      accessible.push(regions[index]);
+  getRegionAccessStatus(regionId) {
+    return this._regionAccessStatus(regionId, SaveSystem.getInstance().getCurrentSave());
+  }
+
+  /** @private @param {string} regionId @param {Object|null} save */
+  _regionAccessStatus(regionId, save) {
+    const regions = REGIONS.filter((region) => region.available);
+    const targetIndex = regions.findIndex((region) => region.id === regionId);
+    if (!save || targetIndex < 0) return { unlocked: false, reason: 'unavailable' };
+    if (targetIndex === 0) return { unlocked: true, reason: '' };
+
+    const previous = regions[targetIndex - 1].id;
+    const leagueWon = save.statistics.hasWonLeague(previous) ||
+      (previous === 'kanto' && save.access.championTitle);
+    if (!leagueWon) return { unlocked: false, reason: 'league', previous };
+
+    const species = PokemonDB.getInstance().getByRegion(previous);
+    const caught = species.filter((entry) => save.pokedex.isCaught(entry.id)).length;
+    if (species.length === 0 || caught < species.length) {
+      return { unlocked: false, reason: 'dex', previous, caught, total: species.length };
     }
-    return accessible;
+    return { unlocked: true, reason: '' };
+  }
+
+  /** @private @param {Object} save @returns {string[]} */
+  _getAccessibleRegions(save) {
+    return REGIONS.filter((region) => region.available && this._regionAccessStatus(region.id, save).unlocked)
+      .map((region) => region.id);
   }
 
   /** @private @param {string} featureId @param {Object} save @returns {boolean} */
@@ -333,9 +346,7 @@ export class FeatureAccessSystem extends BaseSystem {
 
   /** @private @param {string} region @param {Object} save @returns {number} */
   _regionBadgeCount(region, save) {
-    const badgeIds = new Set(TrainerDB.getInstance().getGyms(region).map((trainer) => trainer.badge).filter(Boolean));
-    if (badgeIds.size === 0) return 0;
-    return save.player.badges.filter((badgeId) => badgeIds.has(badgeId)).length;
+    return BadgeRules.regionCount(save.player, region);
   }
 
   /** @private @param {string} region @param {Object} save @returns {boolean} */

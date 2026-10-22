@@ -19,12 +19,14 @@ import { ActiveTeamPanel } from '../panels/ActiveTeamPanel.js';
 import { HatcheryPanel } from '../panels/HatcheryPanel.js';
 import { MinePanel } from '../panels/MinePanel.js';
 import { MapPanel } from '../panels/MapPanel.js';
+import { MapHelpModal } from '../panels/MapHelpModal.js';
 import { BattlePanel } from '../panels/BattlePanel.js';
 import { BattleSummaryModal } from '../panels/BattleSummaryModal.js';
 import { NpcTalkModal } from '../panels/NpcTalkModal.js';
 import { RepeatableQuestModal } from '../panels/RepeatableQuestModal.js';
 import { RepeatableSlotUpgradeModal } from '../panels/RepeatableSlotUpgradeModal.js';
 import { SecretBasePanel } from '../panels/SecretBasePanel.js';
+import { SecretBaseVisitModal } from '../panels/SecretBaseVisitModal.js';
 import { ShortcutsPanel } from '../panels/ShortcutsPanel.js';
 import { CurrenciesPanel } from '../panels/CurrenciesPanel.js';
 import { PokeballsPanel } from '../panels/PokeballsPanel.js';
@@ -33,15 +35,21 @@ import { TrainingCenterPanel } from '../panels/TrainingCenterPanel.js';
 import { TeamModal } from '../panels/TeamModal.js';
 import { TeamPresetsModal } from '../panels/TeamPresetsModal.js';
 import { PokemonInfoModal } from '../panels/PokemonInfoModal.js';
-import { HeldItemPickerModal } from '../panels/HeldItemPickerModal.js';
+import { PokemonMoveLearningModal } from '../panels/PokemonMoveLearningModal.js';
 import { SettingsModal } from '../panels/settings/SettingsModal.js';
 import { BallFilterEditorModal } from '../panels/BallFilterEditorModal.js';
 import { BallPickerModal } from '../panels/BallPickerModal.js';
 import { ShopPanel } from '../panels/fullscreen/ShopPanel.js';
 import { BadgesPanel } from '../panels/fullscreen/BadgesPanel.js';
 import { BagPanel } from '../panels/fullscreen/BagPanel.js';
+import { BoxPanel } from '../panels/fullscreen/BoxPanel.js';
 import { PokedexPanel } from '../panels/fullscreen/PokedexPanel.js';
 import { GuidePanel } from '../panels/fullscreen/GuidePanel.js';
+import { PuzzleListPanel } from '../panels/fullscreen/PuzzleListPanel.js';
+import { PuzzleSolveModal } from '../panels/PuzzleSolveModal.js';
+import { RegionalStarterModal } from '../panels/RegionalStarterModal.js';
+import { RegionalStarterSystem } from '../systems/RegionalStarterSystem.js';
+import { ItemTargetModal } from '../panels/ItemTargetModal.js';
 import { DashboardColumns } from '../config/DashboardLayout.js';
 import { t } from '../localization/LocalizationManager.js';
 
@@ -57,19 +65,19 @@ export class GamePage extends BasePage {
     // the first window created is at the top. The layout saved by the player is restored on top.
     const dashboard = new DashboardView(DashboardLayoutSystem.getInstance());
     dashboard.addWindows([
-      new StoryPanel(DashboardColumns.LEFT),
       new AchievementsPanel(DashboardColumns.LEFT),
+      new PokeballsPanel(DashboardColumns.LEFT),
+      new StoryPanel(DashboardColumns.LEFT),
       new ActiveTeamPanel(DashboardColumns.LEFT),
       new HatcheryPanel(DashboardColumns.LEFT),
-      new MinePanel(DashboardColumns.LEFT),
+      new CurrenciesPanel(DashboardColumns.CENTER),
       new MapPanel(DashboardColumns.CENTER),
       new BattlePanel(DashboardColumns.CENTER),
       new SecretBasePanel(DashboardColumns.CENTER),
       new ShortcutsPanel(DashboardColumns.RIGHT),
-      new CurrenciesPanel(DashboardColumns.RIGHT),
-      new PokeballsPanel(DashboardColumns.RIGHT),
       new LocationPanel(DashboardColumns.RIGHT),
-      new TrainingCenterPanel(DashboardColumns.RIGHT)
+      new TrainingCenterPanel(DashboardColumns.RIGHT),
+      new MinePanel(DashboardColumns.RIGHT)
     ]);
 
     this.addChildren([
@@ -82,20 +90,28 @@ export class GamePage extends BasePage {
       new TeamModal(),
       new TeamPresetsModal(),
       new PokemonInfoModal(),
-      new HeldItemPickerModal(),
+      new PokemonMoveLearningModal(),
       new BattleSummaryModal(),
       new NpcTalkModal(),
+      new MapHelpModal(),
+      new PuzzleSolveModal(),
       new SettingsModal(),
       new BallFilterEditorModal(),
       // After the editor: the picker opens above it.
       new BallPickerModal(),
       new RepeatableQuestModal(),
       new RepeatableSlotUpgradeModal(),
+      new SecretBaseVisitModal(),
       new ShopPanel(),
       new BadgesPanel(),
       new BagPanel(),
+      new ItemTargetModal(),
+      new BoxPanel(),
       new PokedexPanel(),
-      new GuidePanel()
+      new GuidePanel(),
+      new PuzzleListPanel(),
+      new RegionalStarterModal()
     ]);
+    RegionalStarterSystem.getInstance().requestCurrentRegionStarter();
   }
 }

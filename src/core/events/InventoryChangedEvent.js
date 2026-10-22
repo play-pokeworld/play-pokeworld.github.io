@@ -12,12 +12,15 @@ export class InventoryChangedEvent extends BaseEvent {
   /**
    * @param {string} itemId - ItemDB id
    * @param {number} quantity - New quantity in the bag
+   * @param {{deferSave?:boolean}} [options] - A wider transaction owns persistence when true.
    */
-  constructor(itemId, quantity) {
+  constructor(itemId, quantity, { deferSave = false } = {}) {
     super(InventoryChangedEvent.TYPE);
     /** @type {string} */
     this.itemId = itemId;
     /** @type {number} */
     this.quantity = quantity;
+    /** @type {boolean} */
+    this.deferSave = deferSave === true;
   }
 }

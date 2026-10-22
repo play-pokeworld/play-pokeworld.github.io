@@ -41,6 +41,8 @@
 .pw-background-pokemon-walker--route-1 { animation-name: pw-background-pokemon-ne-sw; }
 .pw-background-pokemon-walker--route-2 { animation-name: pw-background-pokemon-sw-ne; }
 .pw-background-pokemon-walker--route-3 { animation-name: pw-background-pokemon-se-nw; }
+.pw-background-pokemon-walker--facing-left .pw-background-pokemon-sprite { transform: scaleX(-1); }
+.pw-background-pokemon-walker--facing-right .pw-background-pokemon-sprite { transform: scaleX(1); }
 
 .pw-background-pokemon-walker--size-0 { --pw-background-pokemon-size: 96px; }
 .pw-background-pokemon-walker--size-1 { --pw-background-pokemon-size: 110px; }
@@ -63,6 +65,7 @@
 .pw-background-pokemon-walker--phase-5 { animation-delay: -20s; }
 .pw-background-pokemon-walker--phase-6 { animation-delay: -24s; }
 .pw-background-pokemon-walker--phase-7 { animation-delay: -28s; }
+.pw-background-pokemon-walker--phase-active { animation-delay: 0s; }
 
 @keyframes pw-background-pokemon-nw-se {
   from { transform: translate3d(calc(0px - var(--pw-background-pokemon-size) - 4vw), calc(0px - var(--pw-background-pokemon-size) - 4vh), 0); }

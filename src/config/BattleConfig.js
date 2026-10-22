@@ -20,6 +20,6 @@ export const BattleConfig = Object.freeze({
   MOVE_SLOTS: 4,
   /** Chips kept in the battle timeline (oldest removed first). */
   TIMELINE_MAX_CHIPS: 8,
-  /** Encounter weights by rarity tag of the location tables. */
+  /** Original Rework weights by encounter-table entry rarity. */
   RARITY_WEIGHTS: Object.freeze({ common: 60, uncommon: 30, rare: 10, very_rare: 3 })
 });

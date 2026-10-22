@@ -65,7 +65,7 @@ export class BattleSession {
    * @param {Array<{pokemon: import('../../data/pokemon/PokemonData.js').PokemonData, intro?: {key: string, params?: Object}}>} [setup.reserves=[]]
    *   Foes sent in order after `foe` faints; `intro` precedes the default trainer send line
    * @param {() => import('../../data/pokemon/PokemonData.js').PokemonData|null} [setup.nextFoeFactory=null]
-   * @param {string} [setup.nextFoeIntroKey='battle_log.wild_appeared']
+   * @param {string|((pokemon: import('../../data/pokemon/PokemonData.js').PokemonData) => string)} [setup.nextFoeIntroKey='battle_log.wild_appeared']
    * @param {(encounter: Object, session: BattleSession) => void} [setup.onFoeDefeated=null]
    */
   constructor({ team, foe, foeOptions = {}, random, weather = null, ownedQuantity = () => 0, hiddenTalentUnlocked = () => false, training = false, reserves = [], nextFoeFactory = null, nextFoeIntroKey = 'battle_log.wild_appeared', onFoeDefeated = null }) {
@@ -423,9 +423,12 @@ export class BattleSession {
     if (this._nextFoeFactory) {
       const nextFoe = this._nextFoeFactory();
       if (nextFoe) {
+        const introKey = typeof this._nextFoeIntroKey === 'function'
+          ? this._nextFoeIntroKey(nextFoe)
+          : this._nextFoeIntroKey;
         this._sendNextFoe({
           pokemon: nextFoe,
-          intro: { key: this._nextFoeIntroKey, params: { name: nextFoe.getDisplayName() } },
+          intro: { key: introKey, params: { name: nextFoe.getDisplayName() } },
           announceOnly: true
         });
         return false;

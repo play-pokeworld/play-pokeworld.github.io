@@ -33,12 +33,17 @@ import { QuestProgressedEvent } from '../core/events/QuestProgressedEvent.js';
 import { QuestCompletedEvent } from '../core/events/QuestCompletedEvent.js';
 import { QuestClaimedEvent } from '../core/events/QuestClaimedEvent.js';
 import { QuestEncounterRequestedEvent } from '../core/events/QuestEncounterRequestedEvent.js';
+import { LocalQuestBattleRequestedEvent } from '../core/events/LocalQuestBattleRequestedEvent.js';
 import { QuestDB } from '../data/quests/QuestDB.js';
+import { NpcQuestDirectory } from '../data/quests/NpcQuestDirectory.js';
 import { QuestCategories } from '../data/quests/QuestCategories.js';
+import { ObjectiveTypes } from '../data/quests/ObjectiveTypes.js';
 import { ObjectiveRegistry } from '../data/quests/objectives/ObjectiveRegistry.js';
 import { PokemonFactory } from '../data/pokemon/PokemonFactory.js';
 import { LocationDB } from '../data/world/LocationDB.js';
 import { QuestRules } from '../config/QuestRules.js';
+import { BonusSystem } from './BonusSystem.js';
+import { BonusTypes } from '../config/BonusRules.js';
 import { PlayerDefaults } from '../config/PlayerDefaults.js';
 import { NotificationSystem } from './NotificationSystem.js';
 import { NotificationChannels, NotificationTones } from '../config/NotificationConfig.js';
@@ -88,10 +93,10 @@ export class QuestSystem extends BaseSystem {
       this._subscriptions.push([eventClass, onGameEvent]);
     }
     // Main quest follows current region; repeatable access is backfilled only from stored legacy board state.
-    const onSync = () => {
+    const onSync = (event) => {
       const mainChanged = this.syncMainQuest();
       const accessChanged = this._syncRepeatableUnlock();
-      if (mainChanged || accessChanged) SaveSystem.getInstance().saveCurrent();
+      if ((mainChanged || accessChanged) && event?.deferSave !== true) SaveSystem.getInstance().saveCurrent();
     };
     for (const eventClass of [SaveCreatedEvent, SaveLoadedEvent, LocationChangedEvent]) {
       bus.subscribe(eventClass, onSync);
@@ -120,6 +125,121 @@ export class QuestSystem extends BaseSystem {
     const objective = this._objectiveOf(quest);
     const progress = Math.min(objective.count, save.quests.getProgress(key));
     return { quest, objective, progress, count: objective.count, complete: progress >= objective.count };
+  }
+
+  /**
+   * Returns the story/side offer associated with one stable NPC identity.
+   * This is a read-only view model for NPC UI; quest state stays in QuestProgressData.
+   * @param {string} npcId
+   * @returns {{main:Object|null,side:Object|null,repeatableBoard:boolean,repeatableUnlocked:boolean}|null}
+   */
+  getNpcQuestState(npcId) {
+    const save = this._save();
+    const link = NpcQuestDirectory.get(npcId);
+    if (!save || !link) return null;
+    const quests = QuestDB.getInstance();
+    const region = save.player.region || PlayerDefaults.REGION;
+    let main = null;
+    if (link.mainQuestKey) {
+      const quest = quests.getById(link.mainQuestKey);
+      if (quest?.category === QuestCategories.MAIN && quest.region === region) {
+        const chain = quests.getMainChain(region);
+        const index = chain.findIndex((entry) => entry.key === quest.key);
+        const step = save.quests.getMainStep(region);
+        const activeStatus = this.getStatus(quest.key);
+        if (activeStatus) {
+          main = { ...activeStatus, state: activeStatus.complete ? 'ready' : 'active' };
+        } else if (index >= 0 && step > index) {
+          const objective = this._objectiveOf(quest);
+          main = { quest, objective, progress: objective.count, count: objective.count, complete: true, state: 'completed' };
+        }
+      }
+    }
+
+    let side = null;
+    if (link.sideQuestKey) {
+      const linkedQuest = quests.getById(link.sideQuestKey);
+      let quest = linkedQuest;
+      if (linkedQuest?.chain) {
+        const chain = quests.getByCategory(QuestCategories.SIDE)
+          .filter((entry) => entry.chain?.id === linkedQuest.chain.id && entry.chain.step >= linkedQuest.chain.step)
+          .sort((left, right) => left.chain.step - right.chain.step);
+        quest = chain.find((entry) => !save.quests.isCompleted(entry.key)) || linkedQuest;
+      }
+      if (quest?.category === QuestCategories.SIDE) {
+        const activeStatus = this.getStatus(quest.key);
+        if (activeStatus) {
+          side = { ...activeStatus, state: activeStatus.complete ? 'ready' : 'active' };
+        } else {
+          const objective = this._objectiveOf(quest);
+          const count = objective.count;
+          if (save.quests.isCompleted(quest.key)) {
+            side = { quest, objective, progress: count, count, complete: true, state: 'completed' };
+          } else if (this.isAvailable(quest.key)) {
+            side = { quest, objective, progress: 0, count, complete: false, state: 'offer' };
+          } else {
+            side = { quest, objective, progress: 0, count, complete: false, state: 'locked' };
+          }
+        }
+      }
+    }
+
+    return {
+      main,
+      side,
+      repeatableBoard: link.repeatableBoard === true,
+      repeatableUnlocked: link.repeatableBoard === true && this.isRepeatableUnlocked()
+    };
+  }
+
+  /**
+   * Active local defeat quest served by a temporary NPC in a place without normal wild encounters.
+   * The eligibility condition and location-group match follow the original location battle flow.
+   * @param {string} locationId
+   * @returns {{quest:Readonly<Object>,progress:number,count:number,remaining:number}|null}
+   */
+  getLocalDefeatBattleState(locationId) {
+    const save = this._save();
+    const locations = LocationDB.getInstance();
+    const location = locations.getById(locationId);
+    if (!save || !location) return null;
+    const group = locations.getGroup(locationId);
+    const hasGroupEncounters = locations.getAll().some((candidate) =>
+      locations.getGroup(candidate.id) === group && locations.getEncounters(candidate.id).length > 0
+    );
+    if (hasGroupEncounters) return null;
+    for (const key of save.quests.getActiveKeys()) {
+      const quest = QuestDB.getInstance().getById(key);
+      if (!quest || quest.objective?.type !== ObjectiveTypes.KILL) continue;
+      const currentRegion = save.player.region || PlayerDefaults.REGION;
+      if (quest.category !== QuestCategories.REPEATABLE && quest.region && quest.region !== currentRegion) continue;
+      const questLocation = quest.objective.location || quest.location;
+      if (!questLocation || LocationDB.getInstance().getGroup(questLocation) !== group) continue;
+      const status = this.getStatus(key);
+      if (!status || status.complete) continue;
+      return {
+        quest,
+        progress: status.progress,
+        count: status.count,
+        remaining: Math.max(0, status.count - status.progress)
+      };
+    }
+    return null;
+  }
+
+  /**
+   * Requests the local battle after its temporary NPC dialogue has closed.
+   * @param {string} locationId
+   * @param {string} questKey
+   * @returns {boolean} true when the request passes the active quest and location checks
+   */
+  requestLocalDefeatBattle(locationId, questKey) {
+    const save = this._save();
+    if (!save || save.player.location !== locationId) return false;
+    const state = this.getLocalDefeatBattleState(locationId);
+    if (!state || state.quest.key !== questKey) return false;
+    EventBus.getInstance().dispatch(new LocalQuestBattleRequestedEvent(locationId, questKey));
+    return true;
   }
 
   /** @returns {QuestStatus[]} Every active quest, main quest first */
@@ -433,15 +553,23 @@ export class QuestSystem extends BaseSystem {
     if (giftPokemon && !TeamSystem.getInstance().hasFreeSlot()) return false;
     const currencyRewards = quest.rewards.currencies || {};
     for (const [currencyId, quantity] of Object.entries(currencyRewards)) {
-      if (quantity > 0) save.currencies.add(currencyId, quantity);
+      if (quantity > 0) {
+        const amount = currencyId === BonusTypes.MONEY
+          ? BonusSystem.getInstance().applyMultiplier(quantity, BonusTypes.MONEY)
+          : quantity;
+        save.currencies.add(currencyId, amount);
+      }
     }
     // Legacy quest data is normalized by QuestDB, but keep this fallback for older in-memory fixtures.
     if (!Object.prototype.hasOwnProperty.call(currencyRewards, QuestRules.REWARD_CURRENCY) && quest.rewards.questPoints > 0) {
       save.currencies.add(QuestRules.REWARD_CURRENCY, quest.rewards.questPoints);
     }
-    for (const [itemId, quantity] of Object.entries(quest.rewards.items)) grantItem(save, itemId, quantity);
+    for (const [itemId, quantity] of Object.entries(quest.rewards.items)) grantItem(save, itemId, quantity, { deferSave: true });
     if (giftPokemon) {
-      TeamSystem.getInstance().addPokemon(PokemonFactory.create(pokemon.species, pokemon.level, { shiny: !!pokemon.shiny }));
+      TeamSystem.getInstance().addPokemon(
+        PokemonFactory.create(pokemon.species, pokemon.level, { shiny: !!pokemon.shiny }),
+        { deferSave: true }
+      );
     }
     save.quests.deactivate(key);
     if (quest.category === QuestCategories.MAIN) {
@@ -452,7 +580,9 @@ export class QuestSystem extends BaseSystem {
     } else {
       save.quests.repeatablesCompleted++;
     }
-    EventBus.getInstance().dispatch(new QuestClaimedEvent(key));
+    // Quest rewards and progress belong to one claim transaction; listeners refresh their views,
+    // while this method (or its enclosing battle) performs the single persistence write.
+    EventBus.getInstance().dispatch(new QuestClaimedEvent(key, { deferSave: true }));
     if (!deferSave) SaveSystem.getInstance().saveCurrent();
     return true;
   }

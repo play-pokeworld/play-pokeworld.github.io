@@ -1,10 +1,11 @@
-# Data model (v1.10)
+# Data model (v1.14)
 
-How the Rework stores, loads, validates and saves its data. The package release is **1.10.0** and
-`SaveSchema.VERSION` is **12**; those are separate version numbers. League titles are stored as
-regional entries in `statistics.leaguesWon`, never as Gym badge IDs. This document replaces the
-recommendations of `docs/DATA_REVIEW.md` (v1.3), which are now implemented except where noted in its
-status table.
+How the Rework stores, loads, validates and saves its data. The current package release is **1.14.3** and
+`SaveSchema.VERSION` is **15**; those are separate version numbers. League titles are stored as
+regional entries in `statistics.leaguesWon`, never as Gym badge IDs. Each owned Pokémon also stores
+`unlockedMoves`, `favorite` and `locked`; the latter two are PC collection metadata, not battle rules.
+This document replaces the recommendations of `docs/DATA_REVIEW.md` (v1.3), which are now implemented
+except where noted in its status table.
 
 ---
 
@@ -12,7 +13,7 @@ status table.
 
 | | Static definitions | Per-save state |
 |---|---|---|
-| What | Species, forms, talents, moves, items, locations, encounters, quests | Player, wallet, Pokédex, team, PC box, team presets, inventory, quest/tutor progress, statistics, dungeons, hatchery, mine |
+| What | Species, forms, talents, moves, items, locations, encounters, quests | Player, wallet, Pokédex, team, PC box, team presets, inventory, quest/tutor progress, statistics, dungeons, hatchery, mine, secret base |
 | Where | `src/data/raw/*-data.js` → repositories | `SaveData` and its models (`src/data/save/`) |
 | Written by | Generators in `tools/data/` only | `SaveSystem` only |
 | Mutable | Never (deep frozen) | Through model methods that dispatch change events |
@@ -72,11 +73,11 @@ Frozen enums shared by the generators, the validator and the engine:
 
 ---
 
-## 3. Save format (schema 12, package v1.10.0)
+## 3. Save format (schema 15, package v1.14.2)
 
 ```js
 {
-  version: 12, id: 'PW-…', background, createdAt, updatedAt,
+  version: 15, id: 'PW-…', background, createdAt, updatedAt,
   player:       { trainerName, trainerSprite, region, location, playTimeSeconds, badges: [ids] },
   currencies:   { money, dungeonToken, questPoint, diamond, battlePoint, farmPoint, contestToken,
                   revealed: { <currencyId>: boolean } },
@@ -85,6 +86,7 @@ Frozen enums shared by the generators, the validator and the engine:
   box:          [ PokemonData… ],                    (PC box)
   inventory:    { <itemId>: quantity },              (Poké Balls included)
   ballFilters:  [ { id, name, options, ball, enabled } ],
+  boxFilters:   { region, type, shiny, evo, favorite, locked, iv, ev, rank, forms, search },
   teamPresets:  { activeId, slots: [ { id, name, members: [uids] } ] },
   quests:       { mainStep: { <region>: n }, active: { <key>: { progress } }, completed: [keys],
                   repeatablesCompleted, repeatableUnlocked, repeatableChoices: [ids],
@@ -95,10 +97,17 @@ Frozen enums shared by the generators, the validator and the engine:
   dungeons:     { exploredTotal, clears: { <locationId>: n }, run: DungeonRunData|null, lastRun },
   hatchery:     { maxSlots, slots: [null | DaycareSlot | FossilSlot] },
   mine:         { energy, maxEnergy, tool, grid, items, completedCount, lastEnergyAt },
+  secretBase:   { layoutId, locationId, decorations, stock, npcs, npcStock, spawn, nextUid,
+                  record, pcMessage, flags: { count, collectedIds, lastRankNotified } },
   access:       { unlockedLocations: [ids], unlockedFeatures: { <featureId>: true },
                   regionStarters: [regionIds], championTitle }
 }
 ```
+
+`access.regionStarters` stores a sticky per-region choice flag; access refresh and save migrations can
+backfill it from a starter species already owned/registered. Regional starter definitions remain static
+content in `StarterData.js`. Puzzle definitions are manual, localized static content; only solved puzzle
+IDs are stored in `statistics.solvedPuzzles`.
 
 `teamPresets` always contains 20 ordered slots (`preset1`…`preset20`), with a stable `activeId`.
 Each slot stores only Pokémon UIDs (maximum six) and an optional custom name; Pokémon remain owned by
@@ -107,13 +116,26 @@ resolves those references, applies the selected roster through `TeamSystem` / `B
 unselected party members into the box, and is disabled during battle.
 
 The `hatchery` model persists daycare Pokémon and fossil incubation progress. The `mine` model stores
-the current grid, tool, exposed-loot shapes and energy timestamp; the `dungeons` model stores an active,
-resumable floor map, carried loot and the last-run summary. Tutorial completion and reward-claim flags
-are separate so one-time rewards cannot be duplicated.
+the current grid, tool, exposed-loot shapes and energy timestamp. The `secretBase` model stores the
+player's Hoenn room, placed decorations, decoration stock, NPC battle snapshots, visit record, PC
+message and flag-collection history; derived rank and distinct-base counts are not stored separately.
+The `dungeons` model stores an active,
+resumable floor map, carried loot and the last-run summary. At runtime, every battle summary has a
+unique `runId`; a terminal dungeon settlement is attached only to the summary from the exact battle
+that settled it, so later battles cannot inherit an older `lastRun`. The correlation is intentionally
+session-local, not an additional persisted save field. Tutorial completion and reward-claim flags are
+separate so one-time rewards cannot be duplicated.
 
 - `PokemonData`: stats and max HP come from `StatCalculator` (base stats, level, IVs / EVs, shiny
   ×1.2); the level is derived from the total experience (`ExperienceCurve`). New Pokémon are built
-  by `PokemonFactory.create(species, level, options)` only.
+  by `PokemonFactory.create(species, level, options)` only. `unlockedMoves` persists the CT/CS
+  unlocks separately from the active `moves` slots; `favorite` and `locked` are collection flags.
+  `MoveLearningSystem` equips a learnable move through `TeamSystem` or `BoxSystem`, after which
+  battle uses the stored active slots.
+- `ItemUseSystem` owns supported bag effects without DOM access: CT/CS unlocks, Rare Candy, the six
+  Kanto vitamins (+1 random EV within the configured caps), and item-based evolutions. Each valid
+  use and each move-slot change is one save operation; invalid uses consume nothing. `ItemTargetModal`
+  and `PokemonMoveLearningModal` provide the localized UI.
 - `InventoryData` ignores unknown item ids. Granted items go through `grantItem()`
   (`systems/inventory/ItemGrant.js`): `ItemStacking` caps held / categorized items at 25 copies and
   pays the overflow in money (10 % of the price), as the original `grantRewardItem`.
@@ -123,6 +145,13 @@ are separate so one-time rewards cannot be duplicated.
   and a champion milestone. `regionStarters` is not the region-unlock rule; the accessible-region
   list is derived from the original league + full regional Pokédex conditions and published in the
   `FeatureAccessSystem` snapshot.
+- `BoxFiltersData` persists the PC's region, type, shiny, missing-evolution, favorite, locked, IV, EV,
+  rank (E–SS) and form filters plus search. `BoxFilterRules` applies these presentation filters to the PC;
+  the UI sort order is not a gameplay or Pokémon-data field. Mutations use the save model and one
+  save operation per change.
+- `PokedexPanel` derives seen/caught/shiny totals and regional completion from the existing Pokédex
+  and accessible-region facts. Its search and filters are view state only; opening or filtering it
+  does not change or extend the save schema.
 
 ### Loading and writing
 
@@ -130,7 +159,8 @@ are separate so one-time rewards cannot be duplicated.
   current shape only.
 - Migrations are pure functions with a test fixture each:
   - `MigrationOriginalToV1`: export of the original game (`{ G: … }`): team, Pokédex, money,
-    position, badges…;
+    position, badges, plus the established secret base (`G.base`) and ORAS flag progress
+    (`G.secretBaseFlags`), with NPC roster species converted from dex numbers to stable slugs;
   - `MigrationV1ToV2`: version field, Pokédex entries, derived caught count;
   - `MigrationV2ToV3`: PokemonData v2, badge ids, inventory, quests (`convertQuests`), statistics;
   - `MigrationV3ToV4`: original `pokeballs.counts` join the inventory, `pokeballs.filters` become
@@ -153,22 +183,33 @@ are separate so one-time rewards cannot be duplicated.
     titles from statistics, legacy badges and trainer wins, and repairs facility unlocks when the
     save contains durable evidence (saved gate flags, reached locations, facility progress or
     required Gym badges). Unknown forward-compatible badge IDs remain untouched.
+  - `MigrationV12ToV13`: moves legacy per-Pokémon `trainingUnlockedMoves` into `unlockedMoves`
+    for the team and PC, removes the legacy field, deduplicates non-empty string ids, and keeps the
+    active move slots unchanged. It preserves ids that are not recognized by the current move table
+    rather than silently deleting forward-compatible data. `MigrationOriginalToV1` also carries this
+    legacy list through the full migration chain.
+  - `MigrationV13ToV14`: adds saved PC filter settings and normalizes `favorite` / `locked` flags for
+    Pokémon in the party, box and hatchery. Legacy `fav` migrates to `favorite`; battle stats and
+    active move slots are not changed.
+  - `MigrationV14ToV15`: adds the secret-base save domain to existing Rework saves without unlocking
+    it; original exports separately preserve their base and flag state through `MigrationOriginalToV1`.
 - `SaveSystem` is the only writer: **one write per operation** (`saveCurrent()` after a battle,
   a quest claim, a travel…), through `SaveStorage` → `LocalStore`.
 
-### Central content access (schema 12)
+### Central content access (schema 15)
 
-`FeatureAccessSystem` is the single DOM-free resolver for world reachability and the Pension, Mine
-and Training gates. `ContentAccessRules` declares exceptional map gates; generated location
+`FeatureAccessSystem` is the single DOM-free resolver for world reachability and the Pension, Mine,
+Training and Secret Base gates. `ContentAccessRules` declares exceptional map gates; generated location
 connections, regional badge counts and win requirements remain in `LocationDB`. Gameplay commands
 ask the resolver before changing state, so a panel cannot grant itself access or repeat its own
 version of the rule.
 
 The resolver persists newly earned facts in `ContentAccessData`, then publishes one immutable
 `ContentAccessChangedEvent` snapshot (`features`, `locations`, `regions`, starter facts and champion
-milestone). Progression-locked facility windows stay visible on desktop and render localized gate
-messages; mobile focus still hides non-selected windows. The dashboard does not duplicate domain
-rules. The hatchery, mine and training systems query the resolver before every state-changing action.
+milestone). The Secret Base, Pension, Mine and Training panels (and their mobile tabs) are hidden
+entirely until their confirmed prerequisite is reached; their actions remain system-gated as well.
+Other gated panels may show a localized requirement. The dashboard does not duplicate domain rules.
+The hatchery, mine and training systems query the resolver before every state-changing action.
 
 For the header denominator, `regions` follows the original rule: Kanto is open by default; Johto
 requires the Kanto League plus the complete Kanto Pokédex; Hoenn requires the Johto League plus the
@@ -180,8 +221,8 @@ facts.
 older saves (unlocked locations/features, daycare/mine progress, training sessions and starters).
 `MigrationV11ToV12` repairs the later schema from persisted unlock flags and durable location,
 facility or badge evidence. A player whose save never reached a gated feature stays gated. System
-and migration tests cover acquired and not-yet-acquired cases; the dashboard test verifies visible
-locked panels and mobile focus behavior.
+and migration tests cover acquired and not-yet-acquired cases; dashboard tests verify that the
+Secret Base, Pension, Mine and Training remain absent until unlocked.
 
 ---
 

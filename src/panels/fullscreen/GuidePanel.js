@@ -50,12 +50,31 @@ export class GuidePanel extends UIFullscreenPanel {
   /** @private @returns {Object[]} */
   _visibleSections() {
     const access = FeatureAccessSystem.getInstance();
+    const order = [
+      GuideSectionIds.MAP,
+      GuideSectionIds.COMBAT,
+      GuideSectionIds.STATS,
+      GuideSectionIds.POKEBALLS,
+      GuideSectionIds.SHINY,
+      GuideSectionIds.POKEMON,
+      GuideSectionIds.BAG,
+      GuideSectionIds.QUESTS,
+      GuideSectionIds.ECONOMY,
+      GuideSectionIds.SAVE,
+      GuideSectionIds.POKEDEX,
+      GuideSectionIds.ACHIEVEMENTS,
+      GuideSectionIds.DUNGEON,
+      GuideSectionIds.HATCHERY,
+      GuideSectionIds.MINE,
+      GuideSectionIds.TRAINING
+    ];
+    const positions = new Map(order.map((id, index) => [id, index]));
     return GUIDE_SECTION_DEFINITIONS.filter((section) => {
       if (!section.gate) return true;
       if (section.gate.kind === GuideGateKinds.FEATURE) return access.isFeatureUnlocked(section.gate.id);
       if (section.gate.kind === GuideGateKinds.LOCATION_KIND) return access.hasUnlockedLocationKind(section.gate.id);
       return false;
-    });
+    }).sort((left, right) => (positions.get(left.id) ?? order.length) - (positions.get(right.id) ?? order.length));
   }
 
   /** @private */
@@ -71,15 +90,21 @@ export class GuidePanel extends UIFullscreenPanel {
 
   /** @private @param {Object[]} [visibleSections] */
   _renderHome(visibleSections = this._visibleSections()) {
-    const intro = new UIText({ tagName: 'p', className: 'pw-guide-sub', text: t('guide_intro') });
+    const header = new UIContainer({
+      className: 'pw-guide-head',
+      children: [new UIContainer({
+        className: 'pw-guide-head-text',
+        children: [
+          new UIText({ tagName: 'h2', className: 'pw-guide-title', text: t('guide_title') }),
+          new UIText({ tagName: 'p', className: 'pw-guide-sub', text: t('guide_intro') })
+        ]
+      })]
+    });
     const actions = new UIContainer({ className: 'pw-guide-actions' });
-    const tutorialsEnabled = TutorialSystem.getInstance().isTutorialEnabled();
     const enableButton = new UIButton({
       variant: 'secondary',
       size: 'sm',
-      icon: 'sparkle',
       text: t('tutorial_enable'),
-      disabled: tutorialsEnabled,
       onClick: () => TutorialSystem.getInstance().setEnabled(true)
     });
     enableButton.setData('tutorialAction', 'enable');
@@ -87,7 +112,6 @@ export class GuidePanel extends UIFullscreenPanel {
       variant: 'ghost',
       size: 'sm',
       text: t('tutorial_disable_all'),
-      disabled: !tutorialsEnabled,
       onClick: () => TutorialSystem.getInstance().setEnabled(false)
     });
     disableButton.setData('tutorialAction', 'disable');
@@ -96,12 +120,7 @@ export class GuidePanel extends UIFullscreenPanel {
     const grid = new UIContainer({ className: 'pw-guide-grid' });
     for (const section of visibleSections) grid.addChild(this._sectionCard(section));
 
-    const count = new UIText({
-      tagName: 'p',
-      className: 'pw-guide-section-count',
-      text: t('guide_sections_count', { count: visibleSections.length })
-    });
-    this.setContent([intro, actions, count, grid]);
+    this.setContent([header, actions, grid]);
   }
 
   /** @private @param {Object} section @returns {UIButton} */

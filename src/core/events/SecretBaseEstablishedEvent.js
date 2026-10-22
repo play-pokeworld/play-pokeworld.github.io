@@ -11,10 +11,12 @@ export class SecretBaseEstablishedEvent extends BaseEvent {
 
   /**
    * @param {string} locationId - Location of the base
+   * @param {{deferSave?:boolean}} [options={}] - Used when establishment shares a save transaction.
    */
-  constructor(locationId) {
+  constructor(locationId, options = {}) {
     super(SecretBaseEstablishedEvent.TYPE);
     /** @type {string} */
     this.locationId = locationId;
+    this.deferSave = options.deferSave === true;
   }
 }

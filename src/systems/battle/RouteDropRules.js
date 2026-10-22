@@ -17,10 +17,11 @@ export class RouteDropRules {
 
   /**
    * @param {import('../../data/pokemon/PokemonData.js').PokemonData[]} team
+   * @param {number} extraPoints - Additive chance-point bonuses from shared bonus providers.
    * @returns {number} Drop chance in percent, capped like the original game.
    */
-  static chancePercent(team) {
-    let chance = BattleRules.WILD_DROP_BASE_CHANCE_PCT;
+  static chancePercent(team, extraPoints = 0) {
+    let chance = BattleRules.WILD_DROP_BASE_CHANCE_PCT + (Number(extraPoints) || 0);
     const items = ItemDB.getInstance();
     const talents = TalentDB.getInstance();
     for (const pokemon of team ?? []) {
@@ -41,11 +42,12 @@ export class RouteDropRules {
    * @param {string} locationId
    * @param {import('../../core/Random.js').Random} random
    * @param {import('../../data/pokemon/PokemonData.js').PokemonData[]} team
+   * @param {number} extraPoints - Additive chance-point bonuses from shared bonus providers.
    * @returns {string|null} Item id, or null when this victory produces no route item.
    */
-  static draw(locationId, random, team) {
+  static draw(locationId, random, team, extraPoints = 0) {
     const pool = RouteDropRules.poolFor(locationId);
-    if (!pool.length || !random.chance(RouteDropRules.chancePercent(team))) return null;
+    if (!pool.length || !random.chance(RouteDropRules.chancePercent(team, extraPoints))) return null;
     return random.pick(pool) ?? null;
   }
 }

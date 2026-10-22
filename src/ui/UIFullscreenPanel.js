@@ -7,9 +7,10 @@
  *     div.pw-modal-container
  *       div.modal-title > div.pw-row > div.pw-info-head-text > div.pw-info-name   + span.modal-close
  *       div.pw-modal-search-bar                  (filter bar, hidden while empty)
- *       div.pw-modal-body                        (content)
+ *       div.pw-modal-body                        (content; the only scrolling area)
+ *       div.pw-modal-footer                      (optional fixed actions, hidden while empty)
  * Opens on ModalOpenRequestedEvent(id); only one full-screen panel is open at a time (opening one
- * closes the previous one, as the original did). Subclasses fill the bars in onOpen(params).
+ * closes the previous one, as the original did). Subclasses fill these slots in onOpen(params).
  */
 import { UIElement } from './UIElement.js';
 import { UIText } from './UIText.js';
@@ -48,7 +49,9 @@ export class UIFullscreenPanel extends UIElement {
     header.addChild(close);
     this._filters = new UIElement({ className: 'pw-modal-search-bar' });
     this._body = new UIElement({ className: 'pw-modal-body' });
-    container.addChildren([header, this._filters, this._body]);
+    this._footer = new UIElement({ className: 'pw-modal-footer' });
+    this._footer.hide();
+    container.addChildren([header, this._filters, this._body, this._footer]);
     this.addChild(container);
 
     this.addDomListener('click', (event) => {
@@ -90,6 +93,18 @@ export class UIFullscreenPanel extends UIElement {
     this._body.clearChildren();
     this._body.addChildren(children);
     if (preserveScroll) this._body.getDomElement().scrollTop = scrollTop;
+  }
+
+  /**
+   * Replaces the fixed footer content. An empty footer does not take up space.
+   * @param {UIElement[]} children
+   */
+  setFooter(children) {
+    this._footer.clearChildren();
+    this._footer.addChildren(children);
+    this._footer.toggleClass('is-filled', children.length > 0);
+    if (children.length > 0) this._footer.show();
+    else this._footer.hide();
   }
 
   /** @param {Object} [params] */

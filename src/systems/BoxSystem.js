@@ -35,14 +35,14 @@ export class BoxSystem extends BaseSystem {
    * Stores a Pokémon in the box and marks it caught in the Pokédex. Does not persist: the caller
    * saves once after its whole operation.
    * @param {import('../data/pokemon/PokemonData.js').PokemonData} pokemon
-   * @param {{notify?: boolean}} [options]
+   * @param {{notify?: boolean,deferSave?:boolean}} [options]
    * @returns {boolean} False when no save is loaded
    */
-  addPokemon(pokemon, { notify = true } = {}) {
+  addPokemon(pokemon, { notify = true, deferSave = false } = {}) {
     const save = SaveSystem.getInstance().getCurrentSave();
     if (!save || !pokemon) return false;
     save.box.push(pokemon);
-    save.pokedex.markCaught(pokemon.species, pokemon.shiny);
+    save.pokedex.markCaught(pokemon.species, pokemon.shiny, { deferSave });
     if (notify) EventBus.getInstance().dispatch(new BoxChangedEvent(save.box.length));
     return true;
   }
@@ -74,6 +74,27 @@ export class BoxSystem extends BaseSystem {
     const save = SaveSystem.getInstance().getCurrentSave();
     if (!save || !Array.isArray(box)) return false;
     save.box = [...box];
+    if (persist) SaveSystem.getInstance().saveCurrent();
+    if (notify) this.dispatchChanged();
+    return true;
+  }
+
+  /** @param {string} uid @returns {import('../data/pokemon/PokemonData.js').PokemonData|null} */
+  getPokemonByUid(uid) {
+    return this.getBox().find((pokemon) => pokemon.uid === uid) ?? null;
+  }
+
+  /**
+   * Applies a domain-system update to one stored Pokémon without exposing the box array.
+   * @param {string} uid
+   * @param {(pokemon: import('../data/pokemon/PokemonData.js').PokemonData) => boolean} update
+   * @param {{persist?:boolean, notify?:boolean}} [options]
+   * @returns {boolean}
+   */
+  updatePokemon(uid, update, { persist = true, notify = true } = {}) {
+    if (typeof update !== 'function') return false;
+    const pokemon = this.getPokemonByUid(uid);
+    if (!pokemon || update(pokemon) !== true) return false;
     if (persist) SaveSystem.getInstance().saveCurrent();
     if (notify) this.dispatchChanged();
     return true;

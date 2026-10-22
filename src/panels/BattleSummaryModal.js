@@ -11,10 +11,13 @@ import { UIProgressBar } from '../ui/UIProgressBar.js';
 import { UIPokemonSprite, PokemonSpriteSizes } from '../ui/UIPokemonSprite.js';
 import { AssetPaths } from '../config/AssetPaths.js';
 import { ModalIds } from '../config/ModalIds.js';
+import { ModalNames } from '../config/ModalNames.js';
 import { BattleSystem } from '../systems/BattleSystem.js';
+import { DungeonSystem } from '../systems/DungeonSystem.js';
 import { BattleStartedEvent } from '../core/events/BattleStartedEvent.js';
 import { BattleStateChangedEvent } from '../core/events/BattleStateChangedEvent.js';
 import { BattleEndedEvent } from '../core/events/BattleEndedEvent.js';
+import { DungeonRunChangedEvent } from '../core/events/DungeonRunChangedEvent.js';
 import { SaveCreatedEvent } from '../core/events/SaveCreatedEvent.js';
 import { SaveLoadedEvent } from '../core/events/SaveLoadedEvent.js';
 import { ItemDB } from '../data/items/ItemDB.js';
@@ -28,11 +31,12 @@ export class BattleSummaryModal extends StaticModalPanel {
     super({
       id: ModalIds.BATTLE_SUMMARY,
       title: t('battle_session_summary_title'),
-      size: 'lg',
-      name: 'BattleSummaryModal'
+      size: 'md',
+      className: 'pw-battle-summary-shell',
+      name: ModalNames.BATTLE_SUMMARY
     });
     this.setBodyClass('pw-battle-summary-modal');
-    for (const eventClass of [BattleStartedEvent, BattleStateChangedEvent, BattleEndedEvent, SaveCreatedEvent, SaveLoadedEvent]) {
+    for (const eventClass of [BattleStartedEvent, BattleStateChangedEvent, BattleEndedEvent, DungeonRunChangedEvent, SaveCreatedEvent, SaveLoadedEvent]) {
       this.listen(eventClass, () => {
         if (this.isOpen()) this._render();
       });
@@ -48,7 +52,7 @@ export class BattleSummaryModal extends StaticModalPanel {
   /** @private */
   _render() {
     this.clearChildren();
-    const summary = BattleSystem.getInstance().getBattleSummary();
+    const summary = this._mergeDungeonRun(BattleSystem.getInstance().getBattleSummary());
     const run = summary.run;
     if (!run) {
       this.addChild(new UIText({ tagName: 'p', className: 'battle-summary-empty', text: t('battle_summary_empty') }));
@@ -56,16 +60,97 @@ export class BattleSummaryModal extends StaticModalPanel {
     }
 
     const layout = new UIContainer({ className: 'pw-battle-summary-layout' });
-    const left = new UIContainer({ className: 'pw-battle-summary-column pw-battle-summary-column--combat' });
-    const right = new UIContainer({ className: 'pw-battle-summary-column pw-battle-summary-column--loot' });
-    this._renderRunStats(run, left);
-    this._renderCurrencies(run, left);
-    this._renderDamage(run.damageByPokemon || [], left);
-    this._renderCaptures(run.catches || [], right);
-    this._renderItems(run.items || [], right);
-    layout.addChildren([left, right]);
+    this._renderRunStats(run, layout);
+    this._renderCurrencies(run, layout);
+    this._renderDamage(run.damageByPokemon || [], layout);
+    this._renderCaptures(run.catches || [], layout);
+    this._renderItems(run.items || [], layout);
     this.addChild(layout);
     this._renderFooter(summary);
+  }
+
+  /** @private @param {Object} summary @returns {Object} */
+  _mergeDungeonRun(summary) {
+    const dungeonSystem = DungeonSystem.getInstance();
+    const expedition = dungeonSystem.getRunSummary();
+    if (!expedition) {
+      const lastRun = summary.state === 'ended'
+        ? dungeonSystem.getLastRunForBattle(summary.run?.runId)
+        : null;
+      return lastRun ? this._mergeSettledDungeonRun(summary, lastRun) : summary;
+    }
+    const current = summary.run || {};
+    const battleIsActive = summary.state === 'active';
+    const catches = expedition.loot.catches.map((entry) => ({ ...entry }));
+    if (battleIsActive) catches.push(...(current.catches || []).map((entry) => ({ ...entry })));
+    const itemCounts = { ...expedition.loot.items };
+    if (battleIsActive) {
+      for (const entry of current.items || []) {
+        const quantity = Math.max(0, Math.floor(Number(entry.quantity) || 0));
+        if (entry.itemId && quantity > 0) itemCounts[entry.itemId] = (itemCounts[entry.itemId] || 0) + quantity;
+      }
+    }
+    const items = Object.entries(itemCounts)
+      .filter(([, quantity]) => Number(quantity) > 0)
+      .map(([itemId, quantity]) => ({ itemId, quantity }));
+    const startedAt = Number(expedition.startedAt) || 0;
+    return {
+      ...summary,
+      run: {
+        ...current,
+        locationId: expedition.locationId,
+        wins: expedition.totalWins,
+        totalWins: expedition.totalWins,
+        battles: expedition.totalWins + (battleIsActive ? 1 : 0),
+        startedAt,
+        durationMs: startedAt > 0 ? Math.max(0, Date.now() - startedAt) : 0,
+        catches,
+        items,
+        moneyGained: expedition.loot.money + (battleIsActive ? Math.max(0, Number(current.moneyGained) || 0) : 0),
+        tokensGained: expedition.bag.tokens,
+        playerKOs: current.playerKOs || 0,
+        isDungeonRun: true,
+        dungeonSettled: false
+      }
+    };
+  }
+
+  /** @private @param {Object} summary @param {Object} lastRun @returns {Object} */
+  _mergeSettledDungeonRun(summary, lastRun) {
+    const current = summary.run || {};
+    const loot = lastRun.loot || {};
+    const banked = lastRun.banked || { tokens: 0, money: 0 };
+    const lost = lastRun.lost || { tokens: 0, money: 0 };
+    const startedAt = Number(lastRun.startedAt) || 0;
+    const endedAt = Number(lastRun.endedAt) || Date.now();
+    const wins = Math.max(0, Number(lastRun.wins) || 0);
+    const catches = Array.isArray(loot.catches) ? loot.catches.map((entry) => ({ ...entry })) : [];
+    const items = Object.entries(loot.items || {})
+      .filter(([, quantity]) => Number(quantity) > 0)
+      .map(([itemId, quantity]) => ({ itemId, quantity: Math.max(0, Math.floor(Number(quantity) || 0)) }));
+    return {
+      ...summary,
+      run: {
+        ...current,
+        locationId: lastRun.locationId,
+        wins,
+        totalWins: wins,
+        battles: wins + (lastRun.outcome === 'wipe' ? 1 : 0),
+        startedAt,
+        durationMs: startedAt > 0 ? Math.max(0, endedAt - startedAt) : 0,
+        catches,
+        items,
+        moneyGained: Math.max(0, Number(loot.money) || 0),
+        tokensGained: Math.max(0, Number(banked.tokens) || 0),
+        playerKOs: current.playerKOs || 0,
+        isDungeonRun: true,
+        dungeonSettled: true,
+        dungeonOutcome: lastRun.outcome,
+        dungeonBanked: { tokens: Math.max(0, Number(banked.tokens) || 0), money: Math.max(0, Number(banked.money) || 0) },
+        dungeonLost: { tokens: Math.max(0, Number(lost.tokens) || 0), money: Math.max(0, Number(lost.money) || 0) },
+        dungeonTollRefunded: Math.max(0, Number(lastRun.tollRefunded) || 0)
+      }
+    };
   }
 
   /** @private @param {Object} run */
@@ -77,14 +162,16 @@ export class BattleSummaryModal extends StaticModalPanel {
     const duration = SaveCard.formatPlayTime(durationMs / 1000);
     const locationName = run.locationId ? t(`location.${run.locationId}`) : '';
     const metrics = [
-      [run.wins ?? run.battles ?? 0, t('afk_panel_battles')],
+      [run.battles ?? run.wins ?? 0, t('afk_panel_battles')],
       [catches.length, t('afk_panel_captures')],
       [totalItems, t('found_items_title')],
       [run.playerKOs ?? 0, t('afk_panel_team_ko')],
       [duration, t('afk_panel_duration')],
       [locationName, t('tab_info')]
     ];
-    target.addChild(new UIText({ tagName: 'h3', className: 'battle-summary-section-title', text: t('battle_summary_session_title') }));
+    if (run.dungeonSettled && run.dungeonOutcome) {
+      metrics.push([t(`dungeon_summary_outcome_${run.dungeonOutcome}`), t('dungeon_summary_outcome')]);
+    }
     const grid = new UIContainer({ className: 'battle-session-summary-grid' });
     for (const [value, label] of metrics) {
       grid.addChild(new UIContainer({
@@ -101,23 +188,50 @@ export class BattleSummaryModal extends StaticModalPanel {
   /** @private @param {Object} run @param {UIContainer} target */
   _renderCurrencies(run, target) {
     const entries = [];
-    if (run.moneyGained > 0) {
-      entries.push(this._currencyChip(
-        'money',
-        t('battle_loot_money_title'),
-        `+${TextFormatter.formatNumber(run.moneyGained)}`
-      ));
-    }
-    if (run.tokensGained > 0) {
+    const banked = run.dungeonSettled ? run.dungeonBanked || {} : null;
+    const money = banked ? Number(banked.money) || 0 : Number(run.moneyGained) || 0;
+    const tokens = banked ? Number(banked.tokens) || 0 : Number(run.tokensGained) || 0;
+    // Keep currency sprites directly below the session metrics, as in main.
+    if (tokens > 0) {
       entries.push(this._currencyChip(
         'dungeonToken',
-        t('dungeon_loot_bag_tokens'),
-        TextFormatter.formatNumber(run.tokensGained)
+        banked ? t('dungeon_summary_banked_tokens') : t('dungeon_loot_bag_tokens'),
+        TextFormatter.formatNumber(tokens)
       ));
     }
-    if (!entries.length) return;
-    target.addChild(new UIText({ tagName: 'h3', className: 'battle-summary-section-title', text: t('battle_summary_loot_title') }));
-    target.addChild(new UIContainer({ className: 'pw-summary-currency', children: entries }));
+    if (money > 0) {
+      entries.push(this._currencyChip(
+        'money',
+        banked ? t('dungeon_summary_banked_money') : t('battle_loot_money_title'),
+        `+${TextFormatter.formatNumber(money)}`
+      ));
+    }
+    if (entries.length) target.addChild(new UIContainer({ className: 'pw-summary-currency', children: entries }));
+    else if (run.dungeonSettled) target.addChild(new UIText({ className: 'battle-summary-empty', text: t('dungeon_summary_no_banked') }));
+    if (!run.dungeonSettled) return;
+
+    const settlement = [];
+    const lost = run.dungeonLost || {};
+    if (Number(lost.money) > 0) settlement.push(this._currencyChip(
+      'money',
+      t('dungeon_summary_lost_money'),
+      `−${TextFormatter.formatNumber(lost.money)}`
+    ));
+    if (Number(lost.tokens) > 0) settlement.push(this._currencyChip(
+      'dungeonToken',
+      t('dungeon_summary_lost_tokens'),
+      `−${TextFormatter.formatNumber(lost.tokens)}`
+    ));
+    if (settlement.length) {
+      target.addChild(new UIText({ tagName: 'h3', className: 'battle-summary-section-title', text: t('dungeon_summary_lost_title') }));
+      target.addChild(new UIContainer({ className: 'pw-summary-currency', children: settlement }));
+    }
+    if (run.dungeonTollRefunded > 0) {
+      target.addChild(new UIText({
+        className: 'pw-battle-summary-toll-refund',
+        text: t('dungeon_summary_toll_refund', { amount: TextFormatter.formatNumber(run.dungeonTollRefunded) })
+      }));
+    }
   }
 
   /** @private @param {string} id @param {string} title @param {string} amount */
@@ -240,7 +354,7 @@ export class BattleSummaryModal extends StaticModalPanel {
   /** @private @param {Object} summary */
   _renderFooter(summary) {
     const buttons = [];
-    if (summary.state === 'ended' && summary.run?.battles > 0) {
+    if (summary.state === 'ended' && summary.run?.battles > 0 && summary.run?.isDungeonRun !== true) {
       buttons.push(new UIButton({
         id: 'loot-restart-btn',
         variant: 'hbtn',

@@ -14,6 +14,8 @@ import { LocationSystem } from './LocationSystem.js';
 import { FeatureAccessSystem } from './FeatureAccessSystem.js';
 import { Random } from '../core/Random.js';
 import { MineRules } from '../config/MineRules.js';
+import { BonusSystem } from './BonusSystem.js';
+import { BonusTypes } from '../config/BonusRules.js';
 import { CONTENT_FEATURES } from '../config/ContentAccessRules.js';
 import { NotificationChannels, NotificationTones } from '../config/NotificationConfig.js';
 import { t } from '../localization/LocalizationManager.js';
@@ -70,9 +72,10 @@ export class MineSystem extends BaseSystem {
     const mine = SaveSystem.getInstance().getCurrentSave()?.mine;
     if (!mine) return null;
     const elapsed = Math.max(0, (Date.now() - mine.lastEnergyAt) / 1000);
+    const maxEnergy = this._effectiveMaxEnergy(mine);
     return {
-      energy: Math.min(mine.maxEnergy, mine.energy + elapsed * MineRules.ENERGY_REGEN_PER_SECOND),
-      maxEnergy: mine.maxEnergy,
+      energy: Math.min(maxEnergy, mine.energy + elapsed * MineRules.ENERGY_REGEN_PER_SECOND),
+      maxEnergy,
       tool: mine.tool,
       tools: Object.entries(MineRules.TOOLS).map(([id, rule]) => ({ id, energyCost: rule.energyCost, power: rule.power })),
       grid: mine.grid.map((row) => [...row]),
@@ -253,9 +256,15 @@ export class MineSystem extends BaseSystem {
     const now = Date.now();
     const elapsed = Math.max(0, (now - mine.lastEnergyAt) / 1000);
     if (elapsed > 0) {
-      mine.energy = Math.min(mine.maxEnergy, mine.energy + elapsed * MineRules.ENERGY_REGEN_PER_SECOND);
+      mine.energy = Math.min(this._effectiveMaxEnergy(mine), mine.energy + elapsed * MineRules.ENERGY_REGEN_PER_SECOND);
       mine.lastEnergyAt = now;
     }
+  }
+
+  /** @private @param {import('../data/save/MineData.js').MineData} mine */
+  _effectiveMaxEnergy(mine) {
+    const baseMax = Math.max(MineRules.MAX_ENERGY, Number(mine?.maxEnergy) || MineRules.MAX_ENERGY);
+    return BonusSystem.getInstance().applyMultiplier(baseMax, BonusTypes.MINE_ENERGY_MAX);
   }
 
   /** @private @param {string} reason */

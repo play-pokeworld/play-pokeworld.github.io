@@ -1,7 +1,8 @@
 /**
  * @file TalkObjective.js
- * @brief Talk to the NPCs of the quest location (original talk). A main talk quest is claimed at once,
- * like the original talkNpcMainQuest().
+ * @brief A talk objective is satisfied by a conversation in its target location.
+ * Quest-offer NPC identity is intentionally separate from objective progression: any NPC in the
+ * same location group can count once the quest is active.
  */
 import { QuestObjective } from './QuestObjective.js';
 import { ObjectiveTypes } from '../ObjectiveTypes.js';

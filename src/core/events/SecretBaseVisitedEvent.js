@@ -11,10 +11,12 @@ export class SecretBaseVisitedEvent extends BaseEvent {
 
   /**
    * @param {string} locationId - Location of the base
+   * @param {{deferSave?:boolean}} [options={}] - Used when the visit shares a save transaction.
    */
-  constructor(locationId) {
+  constructor(locationId, options = {}) {
     super(SecretBaseVisitedEvent.TYPE);
     /** @type {string} */
     this.locationId = locationId;
+    this.deferSave = options.deferSave === true;
   }
 }

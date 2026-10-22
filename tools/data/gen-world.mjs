@@ -22,6 +22,10 @@ const WEATHER_IDS = { rainy: 'rain', rain: 'rain', sunny: 'sun', sun: 'sun', san
 export async function generateWorld(source) {
   await source.module('src/data/locations-data.js');
   const kanto = globalThis.LOCS;
+  // main's active map logic closes over the monolithic Johto table from locations-data.js,
+  // including its default minWins values and the National Park map gate. Keep that access graph
+  // separate from the Johto file used for current encounter/content data.
+  const johtoMapRules = globalThis.LOCS_JOHTO;
   const { LOCS_JOHTO: johto } = await source.module('src/data/locations-johto.js');
   const { LOCS_HOENN: hoenn } = await source.module('src/data/locations-hoenn.js');
   const rows = await source.pokedexRows();
@@ -33,12 +37,13 @@ export async function generateWorld(source) {
   const unknownSpecies = [];
   for (const [region, table] of Object.entries({ kanto, johto, hoenn })) {
     for (const [id, loc] of Object.entries(table)) {
-      const entry = { region, kind: loc.type, connections: loc.conn || [] };
+      const mapRule = region === 'johto' ? (johtoMapRules?.[id] || loc) : loc;
+      const entry = { region, kind: loc.type, connections: mapRule.conn || loc.conn || [] };
       if (loc.group) entry.group = loc.group;
       if (loc.shopId) entry.shop = loc.shopId;
       if (loc.champ) entry.champion = loc.champ;
-      if (loc.badgeReq) entry.badgesRequired = loc.badgeReq;
-      if (loc.minWins) entry.winsToClear = loc.minWins;
+      if (Number(mapRule.badgeReq) > 0) entry.badgesRequired = mapRule.badgeReq;
+      if (Number(mapRule.minWins) > 0) entry.winsToClear = mapRule.minWins;
       if (loc.defaultWeather) entry.weather = WEATHER_IDS[loc.defaultWeather] || loc.defaultWeather;
       locations[id] = entry;
       layout[id] = { x: loc.x, y: loc.y, w: loc.w, h: loc.h };

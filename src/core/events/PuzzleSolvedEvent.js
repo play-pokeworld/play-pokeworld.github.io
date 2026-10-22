@@ -12,12 +12,17 @@ export class PuzzleSolvedEvent extends BaseEvent {
   /**
    * @param {string} puzzleId - Puzzle id
    * @param {string} locationId - Location of the puzzle
+   * @param {{deferSave?:boolean,firstTime?:boolean}} [options]
    */
-  constructor(puzzleId, locationId) {
+  constructor(puzzleId, locationId, { deferSave = false, firstTime = false } = {}) {
     super(PuzzleSolvedEvent.TYPE);
     /** @type {string} */
     this.puzzleId = puzzleId;
     /** @type {string} */
     this.locationId = locationId;
+    /** @type {boolean} Broader puzzle transaction owns persistence when true. */
+    this.deferSave = deferSave === true;
+    /** @type {boolean} Whether this was the first recorded clear. */
+    this.firstTime = firstTime === true;
   }
 }

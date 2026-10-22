@@ -187,7 +187,7 @@ export const L_en_items = {
   },
   "calcium": {
     "name": "Calcium",
-    "desc": null
+    "desc": "Adds 1 EV to a random eligible stat without exceeding the per-stat or total cap."
   },
   "cameruptite": {
     "name": "Cameruptite",
@@ -195,7 +195,7 @@ export const L_en_items = {
   },
   "carbos": {
     "name": "Carbos",
-    "desc": null
+    "desc": "Adds 1 EV to a random eligible stat without exceeding the per-stat or total cap."
   },
   "cerulean_berry_shop_permit": {
     "name": "Berry Shop Permit",
@@ -1115,7 +1115,7 @@ export const L_en_items = {
   },
   "hp_up": {
     "name": "HP Up",
-    "desc": null
+    "desc": "Adds 1 EV to a random eligible stat without exceeding the per-stat or total cap."
   },
   "iapapa_berry": {
     "name": "Iapapa Berry",
@@ -1147,7 +1147,7 @@ export const L_en_items = {
   },
   "iron": {
     "name": "Iron",
-    "desc": null
+    "desc": "Adds 1 EV to a random eligible stat without exceeding the per-stat or total cap."
   },
   "iron_ball": {
     "name": "Iron Ball",
@@ -1599,7 +1599,7 @@ export const L_en_items = {
   },
   "protein": {
     "name": "Protein",
-    "desc": null
+    "desc": "Adds 1 EV to a random eligible stat without exceeding the per-stat or total cap."
   },
   "psychic_gem": {
     "name": "Psychic Gem",
@@ -2063,6 +2063,6 @@ export const L_en_items = {
   },
   "zinc": {
     "name": "Zinc",
-    "desc": null
+    "desc": "Adds 1 EV to a random eligible stat without exceeding the per-stat or total cap."
   }
 };

@@ -66,25 +66,29 @@ export class PokedexData extends BaseModel {
       .map(([species, entry]) => ({ species, shiny: entry.shiny }));
   }
 
-  /** @param {string} species */
-  markSeen(species) {
+  /**
+   * @param {string} species
+   * @param {{deferSave?:boolean}} [options] - A wider game operation owns persistence when true.
+   */
+  markSeen(species, { deferSave = false } = {}) {
     if (!species || this.isSeen(species)) return;
     this._entry(species).seen = true;
-    EventBus.getInstance().dispatch(new PokedexChangedEvent(species));
+    EventBus.getInstance().dispatch(new PokedexChangedEvent(species, { deferSave }));
   }
 
   /**
    * @param {string} species
    * @param {boolean} [shiny=false]
+   * @param {{deferSave?:boolean}} [options] - A wider game operation owns persistence when true.
    */
-  markCaught(species, shiny = false) {
+  markCaught(species, shiny = false, { deferSave = false } = {}) {
     if (!species) return;
     const entry = this._entry(species);
     if (entry.caught && (entry.shiny || !shiny)) return;
     entry.seen = true;
     entry.caught = true;
     entry.shiny = entry.shiny || !!shiny;
-    EventBus.getInstance().dispatch(new PokedexChangedEvent(species));
+    EventBus.getInstance().dispatch(new PokedexChangedEvent(species, { deferSave }));
   }
 
   /**

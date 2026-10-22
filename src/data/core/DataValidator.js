@@ -12,9 +12,12 @@ import { MineLootDB } from '../items/MineLootDB.js';
 import { TrainingOpponentDB } from '../training/TrainingOpponentDB.js';
 import { LocationDB } from '../world/LocationDB.js';
 import { QuestDB } from '../quests/QuestDB.js';
+import { PuzzleDB } from '../quests/PuzzleDB.js';
 import { TrainerDB } from '../trainers/TrainerDB.js';
 import { LeagueDB } from '../trainers/LeagueDB.js';
 import { ShopDB } from '../shops/ShopDB.js';
+import { SecretBaseItemDB } from '../base/SecretBaseItemDB.js';
+import { SecretBaseLayoutDB } from '../base/SecretBaseLayoutDB.js';
 
 export class DataValidator {
   /** @returns {import('./DataRepository.js').DataRepository[]} Every repository, dependencies first */
@@ -29,13 +32,18 @@ export class DataValidator {
       TrainerDB.getInstance(),
       LeagueDB.getInstance(),
       ShopDB.getInstance(),
+      SecretBaseItemDB.getInstance(),
+      SecretBaseLayoutDB.getInstance(),
       LocationDB.getInstance(),
-      QuestDB.getInstance()
+      QuestDB.getInstance(),
+      PuzzleDB.getInstance()
     ];
   }
 
   /** @returns {import('./DataRepository.js').DataProblem[]} */
   static validateAll() {
-    return DataValidator.repositories().flatMap((repository) => repository.validate());
+    const problems = DataValidator.repositories().flatMap((repository) => repository.validate());
+    problems.push(...PokemonDB.getInstance().validateEvolutionItems(ItemDB.getInstance()));
+    return problems;
   }
 }

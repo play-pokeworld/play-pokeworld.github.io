@@ -13,8 +13,9 @@ export class PokemonCaughtEvent extends BaseEvent {
    * @param {string} speciesId - PokemonDB id
    * @param {string} locationId - Location of the capture
    * @param {boolean} shiny - Shiny specimen
+   * @param {{deferSave?:boolean}} [options] - A wider game operation owns persistence when true.
    */
-  constructor(speciesId, locationId, shiny) {
+  constructor(speciesId, locationId, shiny, { deferSave = false } = {}) {
     super(PokemonCaughtEvent.TYPE);
     /** @type {string} */
     this.speciesId = speciesId;
@@ -22,5 +23,7 @@ export class PokemonCaughtEvent extends BaseEvent {
     this.locationId = locationId;
     /** @type {boolean} */
     this.shiny = shiny;
+    /** @type {boolean} */
+    this.deferSave = deferSave === true;
   }
 }

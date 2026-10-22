@@ -97,6 +97,19 @@ export class PokemonDB extends DataRepository {
     return (formKey && species.getForm(formKey)) || species;
   }
 
+  /** @param {{has:(id:string)=>boolean}} items @returns {import('../core/DataRepository.js').DataProblem[]} */
+  validateEvolutionItems(items) {
+    const problems = [];
+    for (const species of this._entries.values()) {
+      for (const evolution of species.evolutions) {
+        if (evolution.item && !items.has(evolution.item)) {
+          problems.push(this._problem(species.id, 'evolutions.item', evolution.item));
+        }
+      }
+    }
+    return problems;
+  }
+
   /** @override */
   validate() {
     const problems = [];

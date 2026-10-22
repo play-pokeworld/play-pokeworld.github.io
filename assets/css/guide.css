@@ -3,24 +3,25 @@
    ====================================================================== */
 
 .pw-guide-panel > .pw-modal-container {
-  width: min(95vw, 1080px);
-  max-width: 1080px;
-  height: min(90vh, 860px);
+  width: min(95vw, var(--pw-modal-container-max-width, 960px));
+  max-width: var(--pw-modal-container-max-width, 960px);
+  height: 90vh;
 }
 
 .pw-guide-panel .pw-modal-body {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 20px;
+  gap: 12px;
+  padding: 16px;
   color: var(--pw-text-primary);
 }
 
 .pw-guide-sub,
 .pw-guide-detail-sub {
+  margin: 4px 0 0;
   color: var(--pw-text-secondary);
-  font-size: 14px;
-  line-height: 1.55;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .pw-guide-actions {
@@ -28,8 +29,27 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid var(--pw-border-color);
+}
+
+.pw-guide-actions .pw-button {
+  min-height: 44px;
+  padding: 7px 12px;
+  border: 1px solid color-mix(in srgb, var(--pw-text-primary) 35%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--pw-text-primary) 12%, transparent);
+  color: var(--pw-text-primary);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.pw-guide-actions .pw-button:hover:not(:disabled) {
+  border-color: var(--pw-accent-color);
+  background: color-mix(in srgb, var(--pw-text-primary) 18%, transparent);
+}
+
+.pw-guide-actions .pw-button:disabled {
+  opacity: .58;
+  cursor: not-allowed;
 }
 
 .pw-guide-section-count {
@@ -52,10 +72,10 @@
   justify-items: start;
   gap: 4px 10px;
   min-height: 74px;
-  padding: 12px;
-  border: 1px solid var(--pw-border-color);
-  border-radius: var(--pw-radius-md);
-  background: var(--pw-bg-surface);
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--pw-text-primary) 35%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--pw-text-primary) 12%, transparent);
   color: var(--pw-text-primary);
   text-align: left;
   transition: border-color .14s ease, background-color .14s ease, transform .14s ease;
@@ -64,8 +84,8 @@
 .pw-guide-card.pw-button:hover,
 .pw-guide-card.pw-button:focus-visible {
   border-color: var(--pw-accent-color);
-  background: var(--pw-bg-surface-hover);
-  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--pw-text-primary) 18%, transparent);
+  transform: translateY(-2px);
 }
 
 .pw-guide-card .pw-button-icon {
@@ -84,7 +104,8 @@
   grid-column: 2;
   grid-row: 1;
   color: inherit;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 800;
   line-height: 1.3;
   text-align: left;
 }
@@ -93,7 +114,7 @@
   grid-column: 2;
   grid-row: 2;
   color: var(--pw-text-secondary);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.3;
   text-align: left;
 }
@@ -115,9 +136,10 @@
 }
 
 .pw-guide-title {
+  margin: 0;
   color: var(--pw-text-primary);
-  font-size: clamp(18px, 2.2vw, 23px);
-  font-weight: 800;
+  font-size: 20px;
+  font-weight: 900;
   line-height: 1.25;
 }
 
@@ -128,32 +150,33 @@
 
 .pw-guide-pages {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
-  gap: 12px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
   align-content: start;
 }
 
 .pw-guide-page {
   min-width: 0;
-  padding: 14px 15px;
+  padding: 12px 14px;
   border: 1px solid var(--pw-border-color);
-  border-radius: var(--pw-radius-md);
+  border-radius: 10px;
   background: var(--pw-bg-surface);
   color: var(--pw-text-primary);
 }
 
 .pw-guide-page-title {
-  margin-bottom: 8px;
-  color: var(--pw-accent-color);
+  margin: 0 0 5px;
+  color: var(--pw-text-primary);
   font-size: 14px;
   font-weight: 800;
   line-height: 1.35;
 }
 
 .pw-guide-page-text {
-  color: var(--pw-text-primary);
+  margin: 0;
+  color: var(--pw-text-secondary);
   font-size: 13px;
-  line-height: 1.58;
+  line-height: 1.5;
   overflow-wrap: anywhere;
   user-select: text;
 }
@@ -256,16 +279,13 @@
   color: var(--pw-text-secondary);
 }
 
-@media (max-width: 640px) {
-  .pw-guide-panel {
-    padding: 0;
-  }
-
+@media (max-width: 640px), (pointer: coarse) {
   .pw-guide-panel > .pw-modal-container {
-    width: 100vw;
-    max-width: none;
-    height: 100dvh;
-    border-radius: 0;
+    width: calc(100vw - 12px);
+    max-width: calc(100vw - 12px);
+    height: calc(100vh - 12px);
+    max-height: calc(100vh - 12px);
+    border-radius: var(--pw-radius-lg);
   }
 
   .pw-guide-panel .pw-modal-body {

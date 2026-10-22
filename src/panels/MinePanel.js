@@ -14,10 +14,13 @@ import { MineSystem } from '../systems/MineSystem.js';
 import { SaveSystem } from '../systems/SaveSystem.js';
 import { MineLootDB } from '../data/items/MineLootDB.js';
 import { MineChangedEvent } from '../core/events/MineChangedEvent.js';
+import { BonusChangedEvent } from '../core/events/BonusChangedEvent.js';
 import { InventoryChangedEvent } from '../core/events/InventoryChangedEvent.js';
 import { LocationChangedEvent } from '../core/events/LocationChangedEvent.js';
 import { SaveCreatedEvent } from '../core/events/SaveCreatedEvent.js';
 import { SaveLoadedEvent } from '../core/events/SaveLoadedEvent.js';
+import { SaveDeletedEvent } from '../core/events/SaveDeletedEvent.js';
+import { ContentAccessChangedEvent } from '../core/events/ContentAccessChangedEvent.js';
 import { TextFormatter } from '../core/TextFormatter.js';
 import { t } from '../localization/LocalizationManager.js';
 
@@ -36,9 +39,10 @@ export class MinePanel extends DraggablePanel {
     this._energyElapsed = 0;
     this._energyText = null;
     this._energyBar = null;
-    for (const eventClass of [MineChangedEvent, InventoryChangedEvent, LocationChangedEvent, SaveCreatedEvent, SaveLoadedEvent]) {
-      this.listen(eventClass, () => this._render());
-    }
+    for (const eventClass of [
+      MineChangedEvent, BonusChangedEvent, InventoryChangedEvent, LocationChangedEvent,
+      SaveCreatedEvent, SaveLoadedEvent, SaveDeletedEvent, ContentAccessChangedEvent
+    ]) this.listen(eventClass, () => this._render());
     this._render();
   }
 
@@ -60,14 +64,13 @@ export class MinePanel extends DraggablePanel {
 
   /** @private */
   _render() {
+    const mineSystem = MineSystem.getInstance();
+    const unlocked = mineSystem.isUnlocked();
+    this.toggleClass('pw-progression-hidden', !unlocked);
     this.clearChildren();
     this._energyText = null;
     this._energyBar = null;
-    const mineSystem = MineSystem.getInstance();
-    if (!mineSystem.isUnlocked()) {
-      this.addChild(new UIText({ tagName: 'div', className: 'pw-mine-locked', text: t('mine_locked_badges') }));
-      return;
-    }
+    if (!unlocked) return;
     if (!mineSystem.canUseHere()) {
       this.addChild(new UIText({ tagName: 'div', className: 'pw-mine-empty', text: t('mine_location_required', {
         location: t(`location.${MineRules.LOCATION_ID}`)

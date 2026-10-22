@@ -43,14 +43,14 @@ export class TeamSystem extends BaseSystem {
    * Adds a Pokémon to the team and marks it caught in the Pokédex. Does not persist: the caller
    * saves once after its whole operation.
    * @param {import('../data/pokemon/PokemonData.js').PokemonData} pokemon
-   * @param {{notify?: boolean}} [options]
+   * @param {{notify?: boolean,deferSave?:boolean}} [options]
    * @returns {boolean} False when the team is full or no save is loaded
    */
-  addPokemon(pokemon, { notify = true } = {}) {
+  addPokemon(pokemon, { notify = true, deferSave = false } = {}) {
     const save = SaveSystem.getInstance().getCurrentSave();
     if (!save || !pokemon || !this.hasFreeSlot()) return false;
     save.team.push(pokemon);
-    save.pokedex.markCaught(pokemon.species, pokemon.shiny);
+    save.pokedex.markCaught(pokemon.species, pokemon.shiny, { deferSave });
     if (notify) EventBus.getInstance().dispatch(new TeamChangedEvent(save.team.length));
     return true;
   }
@@ -84,6 +84,52 @@ export class TeamSystem extends BaseSystem {
     [team[0], team[index]] = [team[index], team[0]];
     SaveSystem.getInstance().saveCurrent();
     EventBus.getInstance().dispatch(new TeamChangedEvent(team.length));
+    return true;
+  }
+
+  /**
+   * Swaps two active team members by stable uid (drag/drop and keyboard reorder).
+   * @param {string} firstUid
+   * @param {string} secondUid
+   * @param {{persist?:boolean,notify?:boolean}} [options]
+   * @returns {boolean}
+   */
+  swapMembers(firstUid, secondUid, { persist = true, notify = true } = {}) {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    if (!save || !firstUid || !secondUid || firstUid === secondUid) return false;
+    const firstIndex = save.team.findIndex((pokemon) => pokemon.uid === firstUid);
+    const secondIndex = save.team.findIndex((pokemon) => pokemon.uid === secondUid);
+    if (firstIndex < 0 || secondIndex < 0) return false;
+    [save.team[firstIndex], save.team[secondIndex]] = [save.team[secondIndex], save.team[firstIndex]];
+    if (persist) SaveSystem.getInstance().saveCurrent();
+    if (notify) this.dispatchChanged();
+    return true;
+  }
+
+  /**
+   * Replaces one active team member with a stored Pokémon as one roster operation.
+   * The outgoing member is appended to the PC and both owning systems are notified.
+   * @param {string} teamUid
+   * @param {string} boxUid
+   * @param {{persist?:boolean,notify?:boolean}} [options]
+   * @returns {boolean}
+   */
+  swapWithBoxMember(teamUid, boxUid, { persist = true, notify = true } = {}) {
+    if (!teamUid || !boxUid) return false;
+    const team = this.getTeam();
+    const box = BoxSystem.getInstance().getBox();
+    const teamIndex = team.findIndex((pokemon) => pokemon.uid === teamUid);
+    const boxIndex = box.findIndex((pokemon) => pokemon.uid === boxUid);
+    if (teamIndex < 0 || boxIndex < 0) return false;
+    const nextTeam = [...team];
+    const nextBox = [...box];
+    [nextTeam[teamIndex], nextBox[boxIndex]] = [nextBox[boxIndex], nextTeam[teamIndex]];
+    if (!this.replaceRoster(nextTeam, nextBox, { persist: false, notify: false })) return false;
+    if (persist) SaveSystem.getInstance().saveCurrent();
+    if (notify) {
+      this.dispatchChanged();
+      BoxSystem.getInstance().dispatchChanged();
+    }
     return true;
   }
 
@@ -131,6 +177,27 @@ export class TeamSystem extends BaseSystem {
     pokemon.heldItem = normalizedId;
     SaveSystem.getInstance().saveCurrent();
     this.dispatchChanged();
+    return true;
+  }
+
+  /** @param {string} uid @returns {import('../data/pokemon/PokemonData.js').PokemonData|null} */
+  getPokemonByUid(uid) {
+    return this.getTeam().find((pokemon) => pokemon.uid === uid) ?? null;
+  }
+
+  /**
+   * Applies a domain-system update to one owned team member without exposing the roster array.
+   * @param {string} uid
+   * @param {(pokemon: import('../data/pokemon/PokemonData.js').PokemonData) => boolean} update
+   * @param {{persist?:boolean, notify?:boolean}} [options]
+   * @returns {boolean}
+   */
+  updatePokemon(uid, update, { persist = true, notify = true } = {}) {
+    if (typeof update !== 'function') return false;
+    const pokemon = this.getPokemonByUid(uid);
+    if (!pokemon || update(pokemon) !== true) return false;
+    if (persist) SaveSystem.getInstance().saveCurrent();
+    if (notify) this.dispatchChanged();
     return true;
   }
 

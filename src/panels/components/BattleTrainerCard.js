@@ -39,9 +39,11 @@ export class BattleTrainerCard extends UIContainer {
     const translatedName = t(nameKey);
     const fallbackKey = `trainer.${presentation.trainerId}.name`;
     const fallbackName = t(fallbackKey);
-    const name = translatedName !== nameKey
-      ? translatedName
-      : (fallbackName !== fallbackKey ? fallbackName : presentation.trainerId);
+    const name = typeof presentation.displayName === 'string' && presentation.displayName
+      ? presentation.displayName
+      : translatedName !== nameKey
+        ? translatedName
+        : (fallbackName !== fallbackKey ? fallbackName : presentation.trainerId);
     const rawRole = String(presentation.role || 'trainer').toLowerCase().replace(/[^a-z0-9_-]/g, '') || 'trainer';
     const role = ROLE_ALIASES[rawRole] || rawRole;
     const roleKey = `trainer_role_${role}`;

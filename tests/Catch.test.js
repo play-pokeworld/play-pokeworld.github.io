@@ -31,6 +31,8 @@ import { PokeballSystem } from '../src/systems/PokeballSystem.js';
 import { CatchSystem } from '../src/systems/CatchSystem.js';
 import { BallFiltersChangedEvent } from '../src/core/events/BallFiltersChangedEvent.js';
 import { PokemonCaughtEvent } from '../src/core/events/PokemonCaughtEvent.js';
+import { PokedexChangedEvent } from '../src/core/events/PokedexChangedEvent.js';
+import { InventoryChangedEvent } from '../src/core/events/InventoryChangedEvent.js';
 import { CaptureAttemptResolvedEvent } from '../src/core/events/CaptureAttemptResolvedEvent.js';
 
 /** Encounter of a fresh wild Pokémon. */
@@ -301,6 +303,38 @@ describe('Catch flow', (test) => {
     assert.deepEqual(captureResults.map((event) => ({ speciesId: event.speciesId, ballId: event.ballId, caught: event.caught })), [
       { speciesId: 'rattata', ballId: 'pokeball', caught: true }
     ]);
+  });
+
+  test('a battle-owned capture defers every save-triggering event to its caller', () => {
+    const saves = SaveSystem.getInstance();
+    const save = saves.createNewSave('Capture transaction', 'charmander');
+    PokeballSystem.getInstance().setBall('new', 'pokeball');
+    const originalSaveCurrent = saves.saveCurrent;
+    const received = { caught: [], dex: [], inventory: [] };
+    const listeners = [
+      [PokemonCaughtEvent, (event) => received.caught.push(event)],
+      [PokedexChangedEvent, (event) => received.dex.push(event)],
+      [InventoryChangedEvent, (event) => received.inventory.push(event)]
+    ];
+    for (const [EventClass, listener] of listeners) EventBus.getInstance().subscribe(EventClass, listener);
+    let writes = 0;
+    saves.saveCurrent = function (...args) { writes++; return originalSaveCurrent.apply(this, args); };
+    const session = sessionWith(PokemonFactory.create('rattata', 3));
+    catcher.setRandom(Random.sequence([0.99]));
+    let result;
+    try {
+      result = catcher.attemptDetailed({ save, session, locationId: 'route1', deferSave: true });
+    } finally {
+      catcher.setRandom(Random.default);
+      saves.saveCurrent = originalSaveCurrent;
+      for (const [EventClass, listener] of listeners) EventBus.getInstance().unsubscribe(EventClass, listener);
+    }
+
+    assert.equal(result.caught, true);
+    assert.equal(writes, 0, 'the enclosing battle owns the only persistence write');
+    assert.equal(received.caught[0]?.deferSave, true);
+    assert.ok(received.dex.length > 0 && received.dex.every((event) => event.deferSave));
+    assert.ok(received.inventory.length > 0 && received.inventory.every((event) => event.deferSave));
   });
 
   test('later catches roll the rate; a duplicate is not kept but may raise an IV', () => {

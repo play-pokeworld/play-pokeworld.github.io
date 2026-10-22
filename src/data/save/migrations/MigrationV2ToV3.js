@@ -45,6 +45,8 @@ function convertPokemon(pokemon) {
     exp,
     hp: Math.round(maxHp * hpRatio),
     shiny,
+    favorite: pokemon?.favorite === true || pokemon?.fav === true,
+    locked: pokemon?.locked === true,
     // Deterministic (pure migration): the first common talent of the species.
     talent: pokemon?.talent || (species ? PokemonFactory.rollTalent(species, Random.sequence([0])) : null),
     heldItem: pokemon?.heldItem || null,

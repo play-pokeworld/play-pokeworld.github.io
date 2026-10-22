@@ -112,10 +112,11 @@ export class XxxPanel extends DraggablePanel {
 }
 ```
 
-- **A DraggablePanel is always fully visible: no scroll inside a panel.** Columns and windows take the
-  height of their content; `#main-dashboard` is the only scroll container and scrolls to the bottom of
-  the longest column (`assets/css/dashboard-layout.css`). Never give a `.win-body` a fixed height or an
-  `overflow: auto`.
+- **Dashboard scrolling matches the original page flow.** The browser document scrolls; the game header
+  stays sticky, while `#main-dashboard`, its columns and dashboard windows grow to their content height
+  (`assets/css/dashboard-layout.css`). Do not make the dashboard itself a scroll container. Dashboard
+  windows do not scroll internally; retain a bounded viewport only for an intrinsically pannable surface
+  such as the map, or a full-screen panel's content area.
 - **Dragging a window** is handled by `ui/dashboard/WindowDragController.js` (owned by `DashboardView`):
   the window follows the pointer through a CSS transform (`--pw-drag-x/y`) once per animation frame, and
   the placeholder only moves when the drop target changes. Never animate `left/top` or use
@@ -131,8 +132,9 @@ export class XxxPanel extends DraggablePanel {
   Modal ids live in `config/ModalIds.js`.
 - **Full-screen screens (shop, bag, badges, PC box…) extend `UIFullscreenPanel`** (`src/ui/`), one
   subclass per screen in `src/panels/fullscreen/`, added to the `GamePage` children and opened by
-  `ModalOpenRequestedEvent(ModalIds.XXX)`. They fill the three slots `setTitle()`, `setFilters()` (fixed
-  toolbar, built with `FilterBar`) and `setContent()` (the only scrolling area); the state
+  `ModalOpenRequestedEvent(ModalIds.XXX)`. They fill `setTitle()`, `setFilters()` (fixed toolbar,
+  built with `FilterBar`) and `setContent()` (the only scrolling area); fixed actions may use the
+  optional `setFooter()` slot, which stays outside the scroller and disappears when empty. The state
   (selection, tab, quantity) lives in the screen, the rules in a DOM-free system.
 - **Location actions are `UIActionTile`s** built by `panels/components/LocationActions.js` from the
   location data (`shop`, `champion`, encounters); a locked action is an informational row, never a
@@ -157,13 +159,13 @@ export class XxxPanel extends DraggablePanel {
 - Avoid `!important`. Prefer `:where()` for low-specificity base rules.
 - Theme-specific overrides of legacy rules go in `save-menu.css` (save screen) or `panels.css` (game
   windows), scoped with `:root[data-theme="…"]`. Light themes are `light` and `sakura`.
-- **Scroll performance** (the dashboard scrolls on the compositor, keep it that way):
+- **Scroll performance** (the document is the page scroller):
   - animate only `transform` and `opacity`; never animate `background-position`, `left/top`,
     `width/height` or use `transition: all`;
   - never animate a full-viewport layer other than with a `transform` (the animated backdrop is a
     `translate3d` of `body::before`, disabled by `prefers-reduced-motion`);
-  - a scroll container needs `will-change: scroll-position` (Chromium scrolls a non-opaque scroller
-    on the main thread at device pixel ratio < 1.5 otherwise);
+  - any deliberately nested scroll region needs `will-change: scroll-position` (Chromium scrolls a
+    non-opaque nested scroller on the main thread at device pixel ratio < 1.5 otherwise);
   - no `backdrop-filter` / big `box-shadow` on elements that move while scrolling.
 
 ## 8. Data and saves

@@ -80,10 +80,7 @@ export class RepeatableQuestModal extends StaticModalPanel {
     this.clearChildren();
     const quests = QuestSystem.getInstance();
     const state = quests.getRepeatableBoardState();
-    if (!state.unlocked) {
-      this.addChild(new UIText({ className: 'pw-repeatable-board-empty', text: t('repeatable_unlock_hint') }));
-      return;
-    }
+    if (!state.unlocked) return;
 
     const timer = state.rerollRemainingMs > 0
       ? TextFormatter.formatMinutesSeconds(state.rerollRemainingMs)

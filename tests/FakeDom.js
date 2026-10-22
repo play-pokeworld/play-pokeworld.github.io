@@ -41,6 +41,7 @@ export class FakeElement {
     this.value = '';
     this.disabled = false;
     this.scrollTop = 0;
+    this.scrollLeft = 0;
   }
 
   get className() { return this.classList.value; }
@@ -54,14 +55,28 @@ export class FakeElement {
   get textContent() { return this._text + this.children.map((c) => c.textContent).join(''); }
   set textContent(text) { this.children.forEach((c) => { c.parentNode = null; }); this.children = []; this._text = String(text ?? ''); }
 
-  setAttribute(name, value) { this.attributes.set(name, String(value)); }
-  getAttribute(name) { return this.attributes.has(name) ? this.attributes.get(name) : null; }
-  removeAttribute(name) { this.attributes.delete(name); }
-  hasAttribute(name) { return this.attributes.has(name); }
+  setAttribute(name, value) {
+    this.attributes.set(name, String(value));
+    if (name.startsWith('data-')) this.dataset[name.slice(5).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())] = String(value);
+  }
+  getAttribute(name) {
+    if (this.attributes.has(name)) return this.attributes.get(name);
+    if (name.startsWith('data-')) {
+      const key = name.slice(5).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+      return Object.hasOwn(this.dataset, key) ? String(this.dataset[key]) : null;
+    }
+    return null;
+  }
+  removeAttribute(name) {
+    this.attributes.delete(name);
+    if (name.startsWith('data-')) delete this.dataset[name.slice(5).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())];
+  }
+  hasAttribute(name) { return this.getAttribute(name) !== null; }
 
   appendChild(child) {
     if (child.parentNode) child.parentNode.removeChild(child);
     child.parentNode = this;
+    if (this.ownerDocument) child.ownerDocument = this.ownerDocument;
     this.children.push(child);
     return child;
   }
@@ -100,8 +115,8 @@ export class FakeElement {
     return true;
   }
   click() { this.dispatchEvent(fakeEvent('click', { bubbles: true })); }
-  focus() {}
-  blur() {}
+  focus() { if (globalThis.document) globalThis.document.activeElement = this; }
+  blur() { if (globalThis.document?.activeElement === this) globalThis.document.activeElement = null; }
   select() {}
   scrollBy() {}
   scrollIntoView() {}
@@ -111,6 +126,11 @@ export class FakeElement {
     return selector.split(',').some((part) => {
       const s = part.trim();
       if (s.startsWith('#')) return this.id === s.slice(1);
+      const attribute = s.match(/^\[([^\]=]+)(?:=["']?([^"'\]]+)["']?)?\]$/);
+      if (attribute) {
+        const [, name, value] = attribute;
+        return value === undefined ? this.hasAttribute(name) : this.getAttribute(name) === value;
+      }
       if (s.startsWith('.')) return s.slice(1).split('.').every((c) => this.classList.contains(c));
       return this.tagName === s.toUpperCase();
     });
@@ -155,8 +175,9 @@ export function installFakeDom() {
   globalThis.document = {
     documentElement,
     body,
-    createElement: (tag) => new FakeElement(tag),
-    createElementNS: (ns, tag) => new FakeElement(tag, ns),
+    activeElement: null,
+    createElement: (tag) => { const element = new FakeElement(tag); element.ownerDocument = globalThis.document; return element; },
+    createElementNS: (ns, tag) => { const element = new FakeElement(tag, ns); element.ownerDocument = globalThis.document; return element; },
     createTextNode: (text) => { const n = new FakeElement('#text'); n.textContent = text; return n; },
     getElementById: (id) => documentElement.querySelector(`#${id}`),
     querySelector: (s) => documentElement.querySelector(s),
@@ -165,6 +186,8 @@ export function installFakeDom() {
     removeEventListener: (...a) => documentElement.removeEventListener(...a),
     elementFromPoint: () => null
   };
+  documentElement.ownerDocument = globalThis.document;
+  body.ownerDocument = globalThis.document;
 
   const windowListeners = new FakeElement('window');
   globalThis.window = globalThis;

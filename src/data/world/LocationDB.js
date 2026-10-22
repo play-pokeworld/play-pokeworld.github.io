@@ -85,10 +85,40 @@ export class LocationDB extends DataRepository {
 
   /**
    * @param {string} id
+   * @returns {ReadonlyArray<Readonly<Object>>} Locations sharing the same map-area group
+   */
+  getGroupLocations(id) {
+    const location = this.getById(id);
+    if (!location) return [];
+    return this.getAll().filter((candidate) => candidate.group === location.group);
+  }
+
+  /**
+   * @param {string} id
    * @returns {ReadonlyArray<{species: string, minLevel: number, maxLevel: number, rarity: string}>}
    */
   getEncounters(id) {
     return this.getById(id)?.encounters || [];
+  }
+
+  /**
+   * Wild-encounter entries for the complete map area. Split map nodes that share a group
+   * display one merged list, like main's route-link groups; duplicate slots are counted once.
+   * @param {string} id
+   * @returns {Array<{species: string, minLevel: number, maxLevel: number, rarity: string}>}
+   */
+  getEncountersForGroup(id) {
+    const seen = new Set();
+    const encounters = [];
+    for (const location of this.getGroupLocations(id)) {
+      for (const slot of location.encounters) {
+        const key = [slot.species, slot.minLevel, slot.maxLevel, slot.rarity || 'common'].join(':');
+        if (seen.has(key)) continue;
+        seen.add(key);
+        encounters.push({ ...slot });
+      }
+    }
+    return encounters;
   }
 
   /**

@@ -121,7 +121,8 @@ describe('Trainer battles', (test) => {
     assert.ok(save.team[0].exp >= exp);
     assert.equal(save.statistics.trainerWins.brock, 1);
     assert.ok(events.some((event) => event instanceof TrainerDefeatedEvent && event.trainerId === 'brock'));
-    assert.ok(events.some((event) => event instanceof BadgesChangedEvent));
+    assert.ok(events.some((event) => event instanceof TrainerDefeatedEvent && event.trainerId === 'brock' && event.deferSave));
+    assert.ok(events.some((event) => event instanceof BadgesChangedEvent && event.deferSave));
     assert.ok(save.pokedex.isSeen('onix'), 'the second foe was sent and seen');
     assert.equal(BadgeRules.regionCount(save.player, 'kanto'), 1);
     assert.ok(battle.getLog().every((line) => !line.includes('battle_log.') && !line.includes('trainer.')));

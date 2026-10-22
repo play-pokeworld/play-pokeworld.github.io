@@ -13,18 +13,21 @@ export const ActionTileVariants = Object.freeze({
   DEFAULT: '',
   GYM: 'pw-loc-gym-btn',
   NPC: 'pw-loc-npc-btn',
-  QUEST: 'pw-loc-quest-btn'
+  QUEST: 'pw-loc-quest-btn',
+  DUNGEON: 'pw-loc-dungeon-btn'
 });
 
 export class UIActionTile extends UIElement {
   /**
    * @param {Object} options
-   * @param {string} options.text
+   * @param {string} [options.text='']
+   * @param {string} [options.richText] - Safe UIText template for inline symbols and emphasis
    * @param {string} [options.icon=''] - IconRegistry name
    * @param {string} [options.variant=ActionTileVariants.DEFAULT]
+   * @param {{icon:string,className?:string}|null} [options.status=null] - Optional visible status badge
    * @param {Function|null} [options.onClick=null] - null renders an informational row
    */
-  constructor({ text, icon = '', variant = ActionTileVariants.DEFAULT, onClick = null }) {
+  constructor({ text = '', richText = null, icon = '', variant = ActionTileVariants.DEFAULT, status = null, onClick = null }) {
     const clickable = typeof onClick === 'function';
     super({
       tagName: clickable ? 'button' : 'div',
@@ -40,8 +43,25 @@ export class UIActionTile extends UIElement {
     iconBox.setAttribute('aria-hidden', 'true');
     if (icon) iconBox.addChild(new UIIcon({ name: icon }));
     this.addChild(iconBox);
-    this._label = new UIText({ className: 'pw-loc-action-label pw-text-sm', text });
-    this.addChild(this._label);
+
+    const labelWrap = new UIElement({ tagName: 'span', className: 'pw-loc-action-label' });
+    if (status?.icon) {
+      const badge = new UIElement({
+        tagName: 'span',
+        className: ['pw-loc-action-status', status.className].filter(Boolean).join(' ')
+      });
+      badge.setAttribute('data-icon', status.icon);
+      badge.setAttribute('aria-hidden', 'true');
+      badge.addChild(new UIIcon({ name: status.icon, size: 'sm' }));
+      labelWrap.addChild(badge);
+    }
+    this._label = new UIText({
+      tagName: 'span',
+      className: 'pw-text-sm',
+      ...(typeof richText === 'string' ? { richText } : { text })
+    });
+    labelWrap.addChild(this._label);
+    this.addChild(labelWrap);
   }
 
   /** @returns {UIText} */

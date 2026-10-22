@@ -38,12 +38,13 @@ export class PlayerData extends BaseModel {
   /**
    * Awards a badge (no-op when already owned).
    * @param {string} badgeId - Gym leader id ('brock')
+   * @param {{deferSave?:boolean}} [options] - A wider game operation owns persistence when true.
    * @returns {boolean} true when the badge is new
    */
-  earnBadge(badgeId) {
+  earnBadge(badgeId, { deferSave = false } = {}) {
     if (!badgeId || this.hasBadge(badgeId)) return false;
     this.badges.push(badgeId);
-    EventBus.getInstance().dispatch(new BadgesChangedEvent(this.badges, PlayerDefaults.TOTAL_BADGES));
+    EventBus.getInstance().dispatch(new BadgesChangedEvent(this.badges, PlayerDefaults.TOTAL_BADGES, { deferSave }));
     return true;
   }
 

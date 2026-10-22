@@ -20,6 +20,8 @@ const CURRENCY_DIR = `${IMAGES_ROOT}currency/`;
 const BADGE_DIR = `${IMAGES_ROOT}badges/`;
 const MAP_DIR = `${IMAGES_ROOT}maps/`;
 const ITEM_DIR = `${IMAGES_ROOT}items/`;
+const SECRET_BASE_DECORATION_DIR = `${IMAGES_ROOT}secret-base/emerald/`;
+const SECRET_BASE_BACKGROUND_DIR = `${IMAGES_ROOT}secret-base/bg/emerald/`;
 const APP_ICON = `${IMAGES_ROOT}Icon.png`;
 
 /** Trainer portrait used when a save has none (file stem in assets/images/trainers/). */
@@ -99,6 +101,16 @@ export class AssetPaths {
    */
   static regionMap(region) {
     return `${MAP_DIR}${fileStem(region)}.png`;
+  }
+
+  /** @param {string} itemId @returns {string} Emerald decoration sprite */
+  static secretBaseDecoration(itemId) {
+    return `${SECRET_BASE_DECORATION_DIR}${fileStem(String(itemId || '').toLowerCase())}.png`;
+  }
+
+  /** @param {string} layoutId @returns {string} Room background */
+  static secretBaseBackground(layoutId) {
+    return `${SECRET_BASE_BACKGROUND_DIR}${fileStem(String(layoutId || '').toLowerCase())}.png`;
   }
 
   /** @returns {string} Game logo shown in the header */

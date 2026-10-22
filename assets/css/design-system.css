@@ -506,7 +506,7 @@ body { font-size: 13px; }
   gap: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   /* wave 15 (user feedback): the top bar (title/money/badges/settings)
-     stays pinned while the dashboard scrolls — overlays are z ≥ 30000,
+     stays pinned while the page scrolls — overlays are z ≥ 30000,
      so 950 keeps it under every modal. */
   position: sticky;
   top: 0;
@@ -1680,7 +1680,7 @@ body { font-size: 13px; }
 
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 .shiny-tag { color: var(--shiny); text-shadow: 0 0 8px var(--shiny); margin-right: 4px; }
-.is-shiny { box-shadow: 0 0 12px 2px var(--shiny); }
+
 
 @keyframes shiny-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.1); } }
 .shiny-spark { animation: shiny-pulse 1.5s infinite; }
@@ -8802,7 +8802,7 @@ button[data-action].pw-loc-npc-btn,
   border: 2px solid #A98DE8 !important;
   color: #FFFFFF !important;
   font-weight: 800 !important;
-  box-shadow: 0 0 10px rgba(169, 141, 232, 0.55) !important;
+  box-shadow: none !important;
 }
 button[data-action].pw-loc-quest-btn:hover,
 button[data-action].pw-loc-npc-btn:hover,
@@ -8812,7 +8812,7 @@ button[data-action].pw-loc-npc-btn:hover,
   background-color: #7252BA !important;
   border-color: #D3C2FB !important;
   color: #FFFFFF !important;
-  box-shadow: 0 0 14px rgba(211, 194, 251, 0.75) !important;
+  box-shadow: none !important;
   transform: translateY(-2px);
 }
 button[data-action].pw-loc-gym-btn,
@@ -8822,7 +8822,7 @@ button[data-action].pw-loc-gym-btn,
   border: 2px solid #FFC27F !important;
   color: #FFFFFF !important;
   font-weight: 800 !important;
-  box-shadow: 0 0 10px rgba(255, 194, 127, 0.55) !important;
+  box-shadow: none !important;
 }
 button[data-action].pw-loc-gym-btn:hover,
 .pw-loc-action-btn.pw-loc-gym-btn:hover {
@@ -8830,7 +8830,28 @@ button[data-action].pw-loc-gym-btn:hover,
   background-color: #D86E22 !important;
   border-color: #FFE0BA !important;
   color: #FFFFFF !important;
-  box-shadow: 0 0 14px rgba(255, 224, 186, 0.75) !important;
+  box-shadow: none !important;
+  transform: translateY(-2px);
+}
+/* Dungeon action tiles follow main's generic data-action treatment; the
+   reference's explore glyph is the registered sparkle geometry in Rework. */
+.pw-loc-action-btn.pw-loc-dungeon-btn {
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--light2) 12%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--light2) 35%, transparent) !important;
+  color: var(--light2) !important;
+  font-family: 'Winky Sans', 'Segoe UI', system-ui, sans-serif;
+  font-weight: 800 !important;
+  letter-spacing: 0.35px;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+.pw-loc-action-btn.pw-loc-dungeon-btn:hover {
+  background: color-mix(in srgb, var(--light2) 24%, transparent) !important;
+  border-color: var(--light2) !important;
+  color: var(--light2) !important;
+  box-shadow: none !important;
+  filter: brightness(1.15) !important;
   transform: translateY(-2px);
 }
 
@@ -8879,6 +8900,14 @@ button[data-action].pw-loc-gym-btn:hover,
 .pw-map-help-swatch.is-yellow { background: #C9A000; }
 .pw-map-help-swatch.is-gray { background: #3A3F44; }
 .pw-map-help-swatch.is-transparent { background: transparent; border-style: dashed; }
+.pw-map-help-panel { width: min(94vw, 420px); }
+.pw-map-help { display: grid; gap: 10px; padding: 14px 16px; }
+.pw-map-help-body { display: grid; gap: 10px; }
+.pw-map-help-row { display: flex; align-items: center; gap: 10px; }
+.pw-map-help-copy { display: grid; gap: 2px; min-width: 0; }
+.pw-map-help-label { color: var(--pw-text-primary); font-size: 13px; font-weight: 900; }
+.pw-map-help-description { color: var(--light1); font-size: 12px; line-height: 1.4; }
+.pw-map-help-button { font-size: 14px !important; font-weight: 900 !important; }
 
 
 #map-region-select {
@@ -9430,14 +9459,12 @@ button[data-call].pw-btn-danger:hover,
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
-/* Shiny = dex-language too (coloured tile ring, the ★ stays top-right). */
+/* The shiny star carries the status; do not put a red ring around the sprite. */
 .pw-poke-card.box-card--shiny .box-tile {
-  border-color: var(--shiny) !important;
-  box-shadow: 0 0 12px 2px color-mix(in srgb, var(--shiny) 60%, transparent);
+  border-color: transparent !important;
+  box-shadow: none !important;
 }
-/* Wave 26 (user): but inside the PC BOX that red pulsing ring is noise —
-   the top-right ★ badge alone carries the shiny signal. Scope: box only,
-   card/class contract untouched (poke-card.js still stamps the classes). */
+/* Keep the same sprite treatment for the PC's legacy card contract. */
 .box-card.box-card--shiny .box-tile { border-color: transparent !important; box-shadow: none !important; }
 .box-card .box-tile.shiny-spark, .box-card .box-tile.is-shiny { animation: none !important; box-shadow: none !important; }
 
@@ -10087,7 +10114,7 @@ button[data-action].pw-loc-npc-btn,
   border: 2px solid #A98DE8 !important;
   color: #FFFFFF !important;
   font-weight: 800 !important;
-  box-shadow: 0 0 10px rgba(169, 141, 232, 0.55) !important;
+  box-shadow: none !important;
 }
 button[data-action].pw-loc-quest-btn:hover,
 button[data-action].pw-loc-npc-btn:hover,
@@ -10097,7 +10124,7 @@ button[data-action].pw-loc-npc-btn:hover,
   background-color: #7252BA !important;
   border-color: #D3C2FB !important;
   color: #FFFFFF !important;
-  box-shadow: 0 0 14px rgba(211, 194, 251, 0.75) !important;
+  box-shadow: none !important;
   transform: translateY(-2px);
 }
 button[data-action].pw-loc-gym-btn,
@@ -10107,7 +10134,7 @@ button[data-action].pw-loc-gym-btn,
   border: 2px solid #FFC27F !important;
   color: #FFFFFF !important;
   font-weight: 800 !important;
-  box-shadow: 0 0 10px rgba(255, 194, 127, 0.55) !important;
+  box-shadow: none !important;
 }
 button[data-action].pw-loc-gym-btn:hover,
 .pw-loc-action-btn.pw-loc-gym-btn:hover {
@@ -10115,7 +10142,7 @@ button[data-action].pw-loc-gym-btn:hover,
   background-color: #D86E22 !important;
   border-color: #FFE0BA !important;
   color: #FFFFFF !important;
-  box-shadow: 0 0 14px rgba(255, 224, 186, 0.75) !important;
+  box-shadow: none !important;
   transform: translateY(-2px);
 }
 
@@ -11620,7 +11647,7 @@ body {
 }
 
 /* zone « + Ajouter un Pokémon » : même gabarit que les rangées */
-#team-window-body .pw-drop-zone {
+#team-window-body .pw-drop-zone:not(.is-hidden) {
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
@@ -14467,6 +14494,8 @@ html[data-dungeon-run="1"] #leave-btn { display: none !important; }
 /* ── PASSE 38c — « Remonter et encaisser » ROUGE, comme le quitter de
    combat : c'est une action importante, elle saute aux yeux. ─────────────── */
 .pw-bdg-up {
+  background: v aux yeux. ─────────────── */
+.pw-bdg-up {
   background: var(--red) !important;
   color: var(--light2) !important;
   font-weight: 700;
@@ -14775,8 +14804,7 @@ html[data-dungeon-run="1"] #leave-btn { display: none !important; }
   background: var(--dark2);
 }
 .pw-dgn-leg.t-combat i { border-color: var(--light1); }
-.pw-dgn-leg.t-elite i { border-color: var(--orange); }
-.pw-dgn-leg.t-boss i { border-color: var(--red); }
+.pw-var(--red); }
 .pw-dgn-leg.t-chest i { border-color: var(--green); }
 .pw-dgn-leg.t-ladder i { border-color: var(--blue); }
 .pw-dgn-leg.t-empty i { border-style: dashed; opacity: .7; }
@@ -15185,3 +15213,6 @@ svg .pw-tuto-target > rect:nth-of-type(2) {
 
 /* Header badge counter: emphasized parts rendered by UIText rich text */
 #header .hinfo strong { color: var(--light2); font-weight: bold; }
+ UIText rich text */
+#header .hinfo strong { color: var(--light2); font-weight: bold; }
+ var(--light2); font-weight: bold; }

@@ -124,12 +124,17 @@ describe('Battle rules', (test) => {
   test('damage: type immunity, super effectiveness and the random factor', () => {
     const field = new BattleField();
     const move = (id) => MoveDB.getInstance().getById(id);
-    const immune = DamageCalculator.compute({ attacker: fighter('rattata', 20), defender: fighter('gastly', 20, BattleSides.FOE), move: move('tackle'), field, random: Random.sequence([0.5]) });
-    assert.ok(immune.immune, 'Grounded immunity remains absolute');
+    const plainFighter = (species, level, side = BattleSides.PLAYER) => {
+      const pokemon = PokemonFactory.create(species, level, { random: Random.sequence([0.5]) });
+      pokemon.talent = null;
+      return new BattleCombatant(pokemon, side);
+    };
+    const immune = DamageCalculator.compute({ attacker: plainFighter('rattata', 20), defender: plainFighter('gastly', 20, BattleSides.FOE), move: move('tackle'), field, random: Random.sequence([0.5]) });
+    assert.ok(immune.immune, 'Ghost immunity remains absolute without an immunity-bypassing talent');
     assert.equal(immune.damage, 0);
-    const charmander = fighter('charmander', 20);
-    const bulbasaur = fighter('bulbasaur', 20, BattleSides.FOE);
-    const squirtle = fighter('squirtle', 20, BattleSides.FOE);
+    const charmander = plainFighter('charmander', 20);
+    const bulbasaur = plainFighter('bulbasaur', 20, BattleSides.FOE);
+    const squirtle = plainFighter('squirtle', 20, BattleSides.FOE);
     const hit = (defender, value) => DamageCalculator.compute({ attacker: charmander, defender, move: move('ember'), field, random: Random.sequence([value]) });
     const high = hit(bulbasaur, 0.99);
     const low = hit(bulbasaur, 0);
@@ -399,6 +404,7 @@ describe('BattleSystem integration', (test) => {
     assert.ok(battle.isActive(), 'the next foe is already in the same live session');
     assert.ok(defeated.length >= 1);
     assert.equal(defeated[0].locationId, 'route1');
+    assert.equal(defeated[0].deferSave, true, 'quest and access listeners join the encounter save transaction');
     assert.ok(save.statistics.wildWins.route1 >= 1);
     assert.ok(save.currencies.get('money') > money);
     assert.ok(attacks.length > 0);

@@ -187,7 +187,7 @@ export const L_fr_items = {
   },
   "calcium": {
     "name": "Calcium",
-    "desc": null
+    "desc": "Ajoute 1 EV à une statistique admissible choisie au hasard, sans dépasser les plafonds individuel ou total."
   },
   "cameruptite": {
     "name": "Caméruptite",
@@ -195,7 +195,7 @@ export const L_fr_items = {
   },
   "carbos": {
     "name": "Carbone",
-    "desc": null
+    "desc": "Ajoute 1 EV à une statistique admissible choisie au hasard, sans dépasser les plafonds individuel ou total."
   },
   "cerulean_berry_shop_permit": {
     "name": "Permis Baies (Céladon)",
@@ -1115,7 +1115,7 @@ export const L_fr_items = {
   },
   "hp_up": {
     "name": "PV Plus",
-    "desc": null
+    "desc": "Ajoute 1 EV à une statistique admissible choisie au hasard, sans dépasser les plafonds individuel ou total."
   },
   "iapapa_berry": {
     "name": "Baie Papaya",
@@ -1147,7 +1147,7 @@ export const L_fr_items = {
   },
   "iron": {
     "name": "Fer",
-    "desc": null
+    "desc": "Ajoute 1 EV à une statistique admissible choisie au hasard, sans dépasser les plafonds individuel ou total."
   },
   "iron_ball": {
     "name": "Boule de Fer",
@@ -1215,7 +1215,7 @@ export const L_fr_items = {
   },
   "leftovers": {
     "name": "Restes",
-    "desc": "Objet tenu avec un effet spécial."
+    "desc": "Held: récupère des PV à chaque tour."
   },
   "leppa_berry": {
     "name": "Baie Mepo",
@@ -1599,7 +1599,7 @@ export const L_fr_items = {
   },
   "protein": {
     "name": "Protéine",
-    "desc": null
+    "desc": "Ajoute 1 EV à une statistique admissible choisie au hasard, sans dépasser les plafonds individuel ou total."
   },
   "psychic_gem": {
     "name": "Joyau Psy",
@@ -2063,6 +2063,6 @@ export const L_fr_items = {
   },
   "zinc": {
     "name": "Zinc",
-    "desc": null
+    "desc": "Ajoute 1 EV à une statistique admissible choisie au hasard, sans dépasser les plafonds individuel ou total."
   }
 };

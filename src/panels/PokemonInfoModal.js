@@ -1,6 +1,6 @@
 /**
  * @file PokemonInfoModal.js
- * @brief Read-only Pokémon sheet with stats, IVs, EVs, moves, talent and held item.
+ * @brief Pokémon sheet with stats, IVs, EVs, move learning, talent and held item.
  */
 import { StaticModalPanel } from '../ui/StaticModalPanel.js';
 import { UIContainer } from '../ui/UIContainer.js';
@@ -10,7 +10,10 @@ import { UIImage } from '../ui/UIImage.js';
 import { UIProgressBar } from '../ui/UIProgressBar.js';
 import { UIPokemonSprite, PokemonSpriteSizes } from '../ui/UIPokemonSprite.js';
 import { TeamSystem } from '../systems/TeamSystem.js';
+import { BoxSystem } from '../systems/BoxSystem.js';
+import { MoveLearningSystem } from '../systems/MoveLearningSystem.js';
 import { TeamChangedEvent } from '../core/events/TeamChangedEvent.js';
+import { BoxChangedEvent } from '../core/events/BoxChangedEvent.js';
 import { BattleEndedEvent } from '../core/events/BattleEndedEvent.js';
 import { EventBus } from '../core/EventBus.js';
 import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
@@ -19,8 +22,10 @@ import { MoveDB } from '../data/battle/MoveDB.js';
 import { ItemDB } from '../data/items/ItemDB.js';
 import { LocalizationManager, t } from '../localization/LocalizationManager.js';
 import { TextFormatter } from '../core/TextFormatter.js';
+import { PokemonRules } from '../config/PokemonRules.js';
 
-const STAT_KEYS = Object.freeze(['hp', 'atk', 'def', 'spa', 'spd', 'spe']);
+const STAT_KEYS = PokemonRules.STAT_KEYS;
+const STAT_TABS = Object.freeze(['stats', 'ivs', 'evs']);
 
 export class PokemonInfoModal extends StaticModalPanel {
   constructor() {
@@ -37,9 +42,15 @@ export class PokemonInfoModal extends StaticModalPanel {
       name: 'PokemonInfoModal'
     });
     this._teamIndex = 0;
-    this.listen(TeamChangedEvent, () => {
-      if (this.isOpen()) this._render();
-    });
+    this._pokemonUid = null;
+    this._location = 'team';
+    this._activeStatTab = 'stats';
+    this._pendingFocusKey = null;
+    for (const eventClass of [TeamChangedEvent, BoxChangedEvent]) {
+      this.listen(eventClass, () => {
+        if (this.isOpen()) this._render();
+      });
+    }
     this.listen(BattleEndedEvent, () => {
       if (this.isOpen()) this._render();
     });
@@ -47,7 +58,23 @@ export class PokemonInfoModal extends StaticModalPanel {
 
   /** @override @param {Object} [params={}] */
   open(params = {}) {
-    if (Number.isInteger(Number(params.teamIndex))) this._teamIndex = Number(params.teamIndex);
+    const previousTarget = `${this._location}:${this._pokemonUid ?? this._teamIndex}`;
+    if (typeof params.pokemonUid === 'string') {
+      this._pokemonUid = params.pokemonUid;
+      this._location = params.location === 'box' ? 'box' : 'team';
+      if (this._location === 'team') {
+        this._teamIndex = TeamSystem.getInstance().getTeam().findIndex((pokemon) => pokemon.uid === this._pokemonUid);
+      }
+    } else {
+      this._pokemonUid = null;
+      this._location = 'team';
+      if (Number.isInteger(Number(params.teamIndex))) this._teamIndex = Number(params.teamIndex);
+    }
+    const nextTarget = `${this._location}:${this._pokemonUid ?? this._teamIndex}`;
+    if (nextTarget !== previousTarget) {
+      this._activeStatTab = 'stats';
+      if (this.isOpen()) this._pendingFocusKey = 'pokemon-info-tab-stats';
+    }
     if (this.isOpen()) {
       this._render();
       return;
@@ -61,13 +88,184 @@ export class PokemonInfoModal extends StaticModalPanel {
     this._render();
   }
 
+  /** @override */
+  onExit() {
+    super.onExit();
+    this._pokemonUid = null;
+    this._location = 'team';
+  }
+
+  /**
+   * @private
+   * @param {string} uid
+   * @param {'favorite'|'locked'} field
+   * @returns {boolean}
+   */
+  _toggleCollectionFlag(uid, field) {
+    const update = (pokemon) => {
+      if (pokemon.uid !== uid) return false;
+      pokemon[field] = !pokemon[field];
+      return true;
+    };
+    return this._location === 'box'
+      ? BoxSystem.getInstance().updatePokemon(uid, update)
+      : TeamSystem.getInstance().updatePokemon(uid, update);
+  }
+
+  /** @private @returns {{focusKey:string|null,panelScrollTop:number,panelScrollLeft:number,bodyScrollTop:number,bodyScrollLeft:number}} */
+  _captureRenderState() {
+    const focusKey = this._pendingFocusKey || this.getFocusedDataKey();
+    this._pendingFocusKey = null;
+    return {
+      focusKey,
+      panelScrollTop: Number(this._dom.scrollTop) || 0,
+      panelScrollLeft: Number(this._dom.scrollLeft) || 0,
+      bodyScrollTop: Number(this._bodyDom?.scrollTop) || 0,
+      bodyScrollLeft: Number(this._bodyDom?.scrollLeft) || 0
+    };
+  }
+
+  /** @private @param {ReturnType<PokemonInfoModal['_captureRenderState']>} state */
+  _restoreRenderState(state) {
+    if (state.focusKey) this.focusDescendantByDataKey(state.focusKey);
+    this._dom.scrollTop = state.panelScrollTop;
+    this._dom.scrollLeft = state.panelScrollLeft;
+    if (this._bodyDom) {
+      this._bodyDom.scrollTop = state.bodyScrollTop;
+      this._bodyDom.scrollLeft = state.bodyScrollLeft;
+    }
+  }
+
+  /** @private @param {'stats'|'ivs'|'evs'} tab */
+  _setActiveStatTab(tab) {
+    if (!STAT_TABS.includes(tab) || tab === this._activeStatTab) return false;
+    this._activeStatTab = tab;
+    this._pendingFocusKey = `pokemon-info-tab-${tab}`;
+    this._render();
+    return true;
+  }
+
+  /** @private @param {KeyboardEvent} event @param {'stats'|'ivs'|'evs'} currentTab */
+  _handleStatTabKeydown(event, currentTab) {
+    const currentIndex = STAT_TABS.indexOf(currentTab);
+    let nextIndex = currentIndex;
+    if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % STAT_TABS.length;
+    else if (event.key === 'ArrowLeft') nextIndex = (currentIndex + STAT_TABS.length - 1) % STAT_TABS.length;
+    else if (event.key === 'Home') nextIndex = 0;
+    else if (event.key === 'End') nextIndex = STAT_TABS.length - 1;
+    else return;
+    event.preventDefault();
+    event.stopPropagation();
+    this._setActiveStatTab(STAT_TABS[nextIndex]);
+  }
+
+  /** @private @param {Object} pokemon @param {Object} stats */
+  _renderStatTabs(pokemon, stats) {
+    const tabs = new UIContainer({ className: 'poke-detail-stat-tabs' });
+    tabs.setAttribute('role', 'tablist');
+    tabs.setAttribute('aria-label', t('pokemon_info_stat_tabs'));
+    const tabLabels = {
+      stats: 'pokemon_info_stats',
+      ivs: 'pokemon_info_ivs',
+      evs: 'pokemon_info_evs'
+    };
+    for (const tab of STAT_TABS) {
+      const active = tab === this._activeStatTab;
+      const button = new UIButton({
+        className: 'poke-detail-stat-tab',
+        variant: active ? 'primary' : 'secondary',
+        size: 'sm',
+        text: t(tabLabels[tab]),
+        onClick: () => this._setActiveStatTab(tab)
+      });
+      button.setActive(active);
+      button.setAttribute('role', 'tab');
+      button.setAttribute('id', `pokemon-info-tab-${tab}`);
+      button.setAttribute('aria-selected', String(active));
+      button.setAttribute('aria-controls', `pokemon-info-stat-panel-${tab}`);
+      button.setAttribute('tabindex', active ? '0' : '-1');
+      button.setData('focusKey', `pokemon-info-tab-${tab}`);
+      button.addDomListener('keydown', (event) => this._handleStatTabKeydown(event, tab));
+      tabs.addChild(button);
+    }
+
+    const panel = new UIContainer({ className: 'poke-detail-stat-panel active' });
+    panel.setId(`pokemon-info-stat-panel-${this._activeStatTab}`);
+    panel.setAttribute('role', 'tabpanel');
+    panel.setAttribute('aria-labelledby', `pokemon-info-tab-${this._activeStatTab}`);
+    panel.setAttribute('tabindex', '0');
+    const headingKey = tabLabels[this._activeStatTab];
+    panel.addChild(new UIText({ tagName: 'h3', text: t(headingKey) }));
+
+    if (this._activeStatTab === 'stats') {
+      const values = STAT_KEYS.map((key) => Number(stats[key]) || 0);
+      const max = Math.max(1, ...values);
+      for (const [index, key] of STAT_KEYS.entries()) {
+        const value = values[index];
+        panel.addChild(new UIContainer({
+          className: 'poke-detail-stat-row',
+          children: [
+            new UIText({ tagName: 'span', className: 'poke-detail-stat-name', text: t(`stat_${key}`) }),
+            new UIProgressBar({
+              value,
+              max,
+              trackClassName: 'poke-detail-stat-bar',
+              fillClassName: 'poke-detail-stat-fill'
+            }),
+            new UIText({ tagName: 'span', className: 'poke-detail-stat-value', text: TextFormatter.formatNumber(value) })
+          ]
+        }));
+      }
+    } else {
+      const isIv = this._activeStatTab === 'ivs';
+      const values = STAT_KEYS.map((key) => Math.max(0, Number(pokemon[isIv ? 'ivs' : 'evs']?.[key]) || 0));
+      const max = isIv ? PokemonRules.IV_MAX : PokemonRules.EV_MAX;
+      for (const [index, key] of STAT_KEYS.entries()) {
+        const value = values[index];
+        panel.addChild(new UIContainer({
+          className: 'poke-detail-stat-row',
+          children: [
+            new UIText({ tagName: 'span', className: 'poke-detail-stat-name', text: t(`stat_${key}_short`) }),
+            new UIProgressBar({
+              value,
+              max,
+              trackClassName: 'poke-detail-stat-bar',
+              fillClassName: 'poke-detail-stat-fill'
+            }),
+            new UIText({ tagName: 'span', className: 'poke-detail-stat-value', text: `${TextFormatter.formatNumber(value)} / ${max}` })
+          ]
+        }));
+      }
+      const total = values.reduce((sum, value) => sum + value, 0);
+      const totalMax = isIv ? PokemonRules.IV_MAX * STAT_KEYS.length : PokemonRules.EV_TOTAL_MAX;
+      panel.addChild(new UIContainer({
+        className: 'poke-detail-stat-total',
+        children: [
+          new UIText({ tagName: 'span', text: t(isIv ? 'pokemon_info_iv_total' : 'pokemon_info_ev_total') }),
+          new UIText({ tagName: 'strong', text: `${TextFormatter.formatNumber(total)} / ${totalMax}` })
+        ]
+      }));
+    }
+
+    return new UIContainer({ className: 'poke-detail-side', children: [tabs, panel] });
+  }
+
   /** @private */
   _render() {
+    const renderState = this._captureRenderState();
     this.clearChildren();
-    const pokemon = TeamSystem.getInstance().getTeam()[this._teamIndex];
+    const pokemon = this._pokemonUid
+      ? this._location === 'box'
+        ? BoxSystem.getInstance().getPokemonByUid(this._pokemonUid)
+        : TeamSystem.getInstance().getPokemonByUid(this._pokemonUid)
+      : TeamSystem.getInstance().getTeam()[this._teamIndex];
     if (!pokemon) {
       this.addChild(new UIText({ tagName: 'p', className: 'poke-detail-empty', text: t('pokemon_info_no_pokemon') }));
+      this._restoreRenderState(renderState);
       return;
+    }
+    if (this._pokemonUid && this._location === 'team') {
+      this._teamIndex = TeamSystem.getInstance().getTeam().findIndex((member) => member.uid === this._pokemonUid);
     }
 
     const displayName = pokemon.getDisplayName();
@@ -82,6 +280,7 @@ export class PokemonInfoModal extends StaticModalPanel {
       }
     });
     close.setAriaLabel(t('modal_close_btn'));
+    close.setData('focusKey', 'pokemon-info-close');
 
     this.addChild(new UIContainer({
       className: 'poke-detail-title',
@@ -141,57 +340,24 @@ export class PokemonInfoModal extends StaticModalPanel {
     });
 
     const stats = pokemon.getStats();
-    const maxStatValue = Math.max(1, ...STAT_KEYS.map((key) => Number(stats[key]) || 0));
-    const statsRows = STAT_KEYS.map((key) => {
-      const value = Number(stats[key]) || 0;
-      return new UIContainer({
-        className: 'poke-detail-stat-row',
-        children: [
-          new UIText({ tagName: 'span', className: 'poke-detail-stat-name', text: t(`stat_${key}`) }),
-          new UIProgressBar({
-            value,
-            max: maxStatValue,
-            trackClassName: 'poke-detail-stat-bar',
-            fillClassName: 'poke-detail-stat-fill'
-          }),
-          new UIText({ tagName: 'span', className: 'poke-detail-stat-value', text: TextFormatter.formatNumber(value) })
-        ]
-      });
-    });
-    const statsPanel = new UIContainer({
-      className: 'poke-detail-panel',
-      children: [new UIText({ tagName: 'h3', text: t('pokemon_info_stats') }), ...statsRows]
-    });
-
-    const spreadRows = STAT_KEYS.map((key) => new UIContainer({
-      className: 'poke-detail-stat-row',
-      children: [
-        new UIText({ tagName: 'span', className: 'poke-detail-stat-name', text: t(`stat_${key}_short`) }),
-        new UIText({ tagName: 'span', className: 'poke-detail-stat-value', text: TextFormatter.formatNumber(pokemon.ivs[key]) }),
-        new UIText({ tagName: 'span', className: 'poke-detail-stat-value', text: TextFormatter.formatNumber(pokemon.evs[key]) })
-      ]
-    }));
-    const spreadPanel = new UIContainer({
-      className: 'poke-detail-panel',
-      children: [
-        new UIText({ tagName: 'h3', text: t('pokemon_info_ivs_evs') }),
-        new UIContainer({
-          className: 'poke-detail-spread-head',
-          children: [
-            new UIText({ tagName: 'span', text: '' }),
-            new UIText({ tagName: 'strong', text: t('pokemon_info_ivs') }),
-            new UIText({ tagName: 'strong', text: t('pokemon_info_evs') })
-          ]
-        }),
-        ...spreadRows
-      ]
-    });
+    const statsPanel = this._renderStatTabs(pokemon, stats);
 
     const heldItem = pokemon.heldItem ? ItemDB.getInstance().getById(pokemon.heldItem) : null;
     const heldNameKey = pokemon.heldItem ? `item.${pokemon.heldItem}.name` : '';
     const heldName = heldItem
       ? (LocalizationManager.getInstance().has(heldNameKey) ? t(heldNameKey) : pokemon.heldItem)
       : t('pokemon_info_no_item');
+    const changeItemButton = this._location === 'team' ? new UIButton({
+      text: t('pokemon_info_change_item'),
+      className: 'poke-detail-mini-btn',
+      variant: 'secondary',
+      size: 'sm',
+      onClick: () => EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(
+        ModalIds.BAG,
+        { mode: 'held-item', teamIndex: this._teamIndex }
+      ))
+    }) : null;
+    changeItemButton?.setData('focusKey', 'pokemon-info-held-item');
     const heldContents = [
       new UIContainer({
         className: 'poke-detail-held-icon',
@@ -206,16 +372,7 @@ export class PokemonInfoModal extends StaticModalPanel {
           heldItem && new UIText({ tagName: 'span', text: t(`item.${pokemon.heldItem}.desc`) })
         ]
       }),
-      new UIButton({
-        text: t('pokemon_info_change_item'),
-        className: 'poke-detail-mini-btn',
-        variant: 'secondary',
-        size: 'sm',
-        onClick: () => EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(
-          ModalIds.HELD_ITEM_PICKER,
-          { teamIndex: this._teamIndex }
-        ))
-      })
+      changeItemButton
     ];
     const itemPanel = new UIContainer({
       className: 'poke-detail-panel',
@@ -274,8 +431,63 @@ export class PokemonInfoModal extends StaticModalPanel {
           : new UIText({ tagName: 'div', className: 'poke-detail-empty', text: t('pokemon_info_no_moves') })
       ]
     });
+    const learnableMoves = MoveLearningSystem.getInstance().getLearnableMoveIds(pokemon);
+    const learnableRows = learnableMoves.map((moveId) => {
+      const move = MoveDB.getInstance().getById(moveId);
+      if (!move) return null;
+      return new UIContainer({
+        className: `poke-detail-learnable-row type-${move.type}`,
+        children: [
+          new UIText({ tagName: 'span', className: `type-badge type-${move.type}`, text: t(`type.${move.type}`) }),
+          new UIText({ tagName: 'span', className: 'poke-detail-move-name', text: t(`move.${moveId}`) }),
+          new UIButton({
+            variant: 'secondary',
+            size: 'sm',
+            text: t('pokemon_info_learn_move'),
+            disabled: MoveLearningSystem.getInstance().isBattleLocked(),
+            onClick: () => EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.MOVE_LEARN, {
+              pokemonUid: pokemon.uid,
+              location: this._location,
+              moveId
+            }))
+          })
+        ]
+      });
+    }).filter(Boolean);
+    const learnablePanel = new UIContainer({
+      className: 'poke-detail-moves-block poke-detail-panel-wide',
+      children: [
+        new UIText({ tagName: 'h3', className: 'poke-detail-moves-title', text: t('pokemon_info_learnable_moves') }),
+        learnableRows.length
+          ? new UIContainer({ className: 'poke-detail-learnable-list', children: learnableRows })
+          : new UIText({ tagName: 'div', className: 'poke-detail-empty', text: t('pokemon_info_no_learnable_moves') })
+      ]
+    });
+    const favoriteButton = new UIButton({
+      variant: pokemon.favorite ? 'primary' : 'secondary',
+      size: 'sm',
+      text: t(pokemon.favorite ? 'pokemon_favorite_on' : 'pokemon_favorite_off'),
+      onClick: () => this._toggleCollectionFlag(pokemon.uid, 'favorite')
+    });
+    favoriteButton.setData('focusKey', 'pokemon-info-favorite');
+    const lockedButton = new UIButton({
+      variant: pokemon.locked ? 'primary' : 'secondary',
+      size: 'sm',
+      text: t(pokemon.locked ? 'pokemon_locked_on' : 'pokemon_locked_off'),
+      onClick: () => this._toggleCollectionFlag(pokemon.uid, 'locked')
+    });
+    lockedButton.setData('focusKey', 'pokemon-info-locked');
+    const collectionPanel = new UIContainer({
+      className: 'poke-detail-panel poke-detail-protection',
+      children: [
+        new UIText({ tagName: 'h3', text: t('guide_sheet_fav') }),
+        favoriteButton,
+        lockedButton
+      ]
+    });
 
-    this.addChild(new UIContainer({ className: 'poke-detail-shell', children: [hero, new UIContainer({ className: 'poke-detail-side', children: [statsPanel] })] }));
-    this.addChild(new UIContainer({ className: 'poke-detail-section-grid', children: [spreadPanel, itemPanel, talentPanel, movesPanel] }));
+    this.addChild(new UIContainer({ className: 'poke-detail-shell', children: [hero, statsPanel] }));
+    this.addChild(new UIContainer({ className: 'poke-detail-section-grid', children: [collectionPanel, itemPanel, talentPanel, movesPanel, learnablePanel] }));
+    this._restoreRenderState(renderState);
   }
 }

@@ -3,12 +3,13 @@
  * @brief Save migration 9 -> 10: persist sticky world / feature access.
  *
  * The old Rework showed all three feature panels, so previous use is inferred from durable data.
- * Original exports also carried `G.unlockedLocs`, `G.mineUnlocked`, starter flags and championTitle;
- * MigrationOriginalToV1 forwards those facts into this migration rather than discarding them.
+ * Original exports also carried `G.unlockedLocs`, `G.visitedMaps`, badge-based route backfills,
+ * `G.mineUnlocked`, starter flags and championTitle; MigrationOriginalToV1 translates those facts.
  */
 import { HatcheryRules } from '../../../config/HatcheryRules.js';
 import { MineRules } from '../../../config/MineRules.js';
 import { STARTERS_BY_REGION } from '../../pokemon/StarterData.js';
+import { collectLegacyLocationUnlocks } from './LegacyLocationAccessMigration.js';
 
 /** @param {*} value @returns {string[]} */
 function readIds(value) {
@@ -62,8 +63,7 @@ export const MigrationV9ToV10 = Object.freeze({
     const statistics = source.statistics && typeof source.statistics === 'object' ? source.statistics : {};
     const hatchery = source.hatchery && typeof source.hatchery === 'object' ? source.hatchery : {};
     const mine = source.mine && typeof source.mine === 'object' ? source.mine : {};
-    const unlockedLocations = new Set(readIds(legacy.unlockedLocations ?? legacy.locations ?? legacy.unlockedLocs));
-    if (typeof player.location === 'string' && player.location) unlockedLocations.add(player.location);
+    const unlockedLocations = new Set(collectLegacyLocationUnlocks(source));
     const unlockedFeatures = legacy.unlockedFeatures && typeof legacy.unlockedFeatures === 'object'
       ? { ...legacy.unlockedFeatures }
       : legacy.features && typeof legacy.features === 'object'

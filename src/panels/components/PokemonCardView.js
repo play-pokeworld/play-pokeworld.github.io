@@ -98,10 +98,11 @@ export class PokemonCardView extends UIContainer {
       : null;
     if (this._infoButton) this._infoButton.setAriaLabel(t('pokemon_info_panel'));
 
+    this._nameRow = new UIContainer({ className: 'poke-name', children: [this._name, this._level, this._caughtBall, this._infoButton] });
     this._info = new UIContainer({
       className: 'poke-info',
       children: [
-        new UIContainer({ className: 'poke-name', children: [this._name, this._level, this._caughtBall, this._infoButton] }),
+        this._nameRow,
         new UIContainer({ className: 'hp-bar-container', children: [this._hpBar, this._hpText] }),
         this._xpBar && new UIContainer({ className: 'xp-bar-container', children: [this._xpBar] }),
         this._battleStatus,

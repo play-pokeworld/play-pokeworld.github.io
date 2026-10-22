@@ -38,24 +38,26 @@ export class InventoryData extends BaseModel {
   /**
    * @param {string} itemId - ItemDB id (unknown ids are ignored)
    * @param {number} [quantity=1]
+   * @param {{deferSave?:boolean}} [options] - Event listeners defer persistence to the owning transaction.
    * @returns {boolean} false for an unknown item or a non-positive quantity
    */
-  add(itemId, quantity = 1) {
+  add(itemId, quantity = 1, { deferSave = false } = {}) {
     const amount = Math.floor(quantity);
     if (!(amount > 0) || !ItemDB.getInstance().has(itemId)) return false;
-    this._set(itemId, this.count(itemId) + amount);
+    this._set(itemId, this.count(itemId) + amount, { deferSave });
     return true;
   }
 
   /**
    * @param {string} itemId
    * @param {number} [quantity=1]
+   * @param {{deferSave?:boolean}} [options] - Event listeners defer persistence to the owning transaction.
    * @returns {boolean} false when the bag does not hold that many
    */
-  remove(itemId, quantity = 1) {
+  remove(itemId, quantity = 1, { deferSave = false } = {}) {
     const amount = Math.floor(quantity);
     if (!(amount > 0) || this.count(itemId) < amount) return false;
-    this._set(itemId, this.count(itemId) - amount);
+    this._set(itemId, this.count(itemId) - amount, { deferSave });
     return true;
   }
 
@@ -68,11 +70,12 @@ export class InventoryData extends BaseModel {
    * @private
    * @param {string} itemId
    * @param {number} quantity
+   * @param {{deferSave?:boolean}} [options]
    */
-  _set(itemId, quantity) {
+  _set(itemId, quantity, { deferSave = false } = {}) {
     if (quantity > 0) this._items.set(itemId, quantity);
     else this._items.delete(itemId);
-    EventBus.getInstance().dispatch(new InventoryChangedEvent(itemId, quantity));
+    EventBus.getInstance().dispatch(new InventoryChangedEvent(itemId, quantity, { deferSave }));
   }
 
   /** @override */

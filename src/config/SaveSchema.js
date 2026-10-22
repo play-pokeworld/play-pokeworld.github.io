@@ -20,8 +20,11 @@
  *  10 — v1.9.1: sticky unlocked locations, feature access and champion/starter milestones.
  *  11 — v1.9.1: repeatable board unlock, persisted offers, reroll timestamp and slot upgrades.
  *  12 — v1.10: league titles separated from Gym badges; legacy feature unlocks repaired.
+ *  13 — v1.11: per-Pokémon TM/HM move unlocks.
+ *  14 — v1.12: persisted PC filters and per-Pokémon favorite/collection-lock flags.
+ *  15 — development: persistent secret-base layout, stock, NPCs, visit record and flag progress.
  */
 
 export const SaveSchema = Object.freeze({
-  VERSION: 12
+  VERSION: 15
 });
