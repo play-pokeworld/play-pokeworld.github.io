@@ -62,7 +62,7 @@ export class RegionalStarterSystem extends BaseSystem {
     if (!access.regions.includes(regionId)) return false;
     if (access.regionStarters.includes(regionId) || save.access.hasRegionStarter(regionId)) return false;
     return !starters.some((starter) =>
-      [...save.team, ...save.box].some((pokemon) => pokemon.species === starter.species) ||
+      save.collection.getAll().some((pokemon) => pokemon.species === starter.species) ||
       save.pokedex.isCaught(starter.species)
     );
   }

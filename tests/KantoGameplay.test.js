@@ -8,6 +8,9 @@ import { SaveSystem } from '../src/systems/SaveSystem.js';
 import { LocationSystem } from '../src/systems/LocationSystem.js';
 import { BattleSystem } from '../src/systems/BattleSystem.js';
 import { TeamSystem } from '../src/systems/TeamSystem.js';
+import { BoxSystem } from '../src/systems/BoxSystem.js';
+import { PokemonUsageSystem } from '../src/systems/PokemonUsageSystem.js';
+import { PokemonUsageIds, PokemonActionIds } from '../src/config/PokemonUsageRules.js';
 import { PokemonFactory } from '../src/data/pokemon/PokemonFactory.js';
 import { FossilSystem, FossilAvailability } from '../src/systems/FossilSystem.js';
 import { HatcherySystem, HatcheryResults } from '../src/systems/HatcherySystem.js';
@@ -159,7 +162,7 @@ describe('Kanto gameplay', (test) => {
     assert.equal(result.result, FossilAvailability.READY);
     assert.equal(result.speciesId, 'omanyte');
     assert.equal(save.inventory.count('helix_fossil'), 1);
-    assert.ok([...save.team, ...save.box].some((pokemon) => pokemon.species === 'omanyte'));
+    assert.ok(save.collection.getAll().some((pokemon) => pokemon.species === 'omanyte'));
   });
 
   test('hatchery operations require a persisted access fact outside the unlocked story area', () => {
@@ -192,16 +195,27 @@ describe('Kanto gameplay', (test) => {
       assert.equal(deposited.result, HatcheryResults.READY);
       assert.equal(save.team.length, 1, 'the starter remains in the team');
       assert.equal(save.hatchery.slots[0].kind, 'daycare');
+      assert.equal(save.hatchery.slots[0].pokemonUid, reserve.uid, 'the daycare references the collection Pokémon');
+      assert.equal(BoxSystem.getInstance().getPokemonByUid(reserve.uid), reserve, 'the housed Pokémon stays in the PC box');
+      assert.equal(BoxSystem.getInstance().getAll().length, 2, 'no copy is created');
+      const usage = PokemonUsageSystem.getInstance();
+      assert.deepEqual(usage.getUsages(reserve.uid), [PokemonUsageIds.DAYCARE]);
+      assert.equal(usage.canPerform(reserve.uid, PokemonActionIds.LEARN_MOVE), false);
+      assert.equal(usage.canPerform(reserve.uid, PokemonActionIds.JOIN_TEAM), false);
+      assert.equal(hatchery.getCandidates().some((entry) => entry.uid === reserve.uid), false, 'a housed Pokémon cannot be deposited twice');
+      assert.equal(TeamSystem.getInstance().addMember(reserve.uid), false, 'a housed Pokémon cannot join the team');
       for (let index = 0; index < HatcheryRules.DAYCARE_KOS_PER_LEVEL; index++) {
         EventBus.getInstance().dispatch(new BattleFoeKnockedOutEvent('rattata', 5, 'route5', { deferSave: true }));
       }
-      assert.equal(save.hatchery.slots[0].pokemon.level, 11);
+      assert.equal(reserve.level, 11);
+      assert.equal(hatchery.getSnapshot().slots[0].pokemon, reserve, 'the snapshot resolves the housed Pokémon');
       assert.equal(save.hatchery.slots[0].knockouts, 0);
 
       const withdrawn = hatchery.withdrawPokemon(0);
       assert.equal(withdrawn.result, HatcheryResults.READY);
       assert.equal(withdrawn.stored, 'team');
       assert.ok(save.team.some((pokemon) => pokemon.uid === reserve.uid));
+      assert.deepEqual(usage.getUsages(reserve.uid), [PokemonUsageIds.TEAM]);
     } finally {
       hatchery.onDestroy();
     }
@@ -236,7 +250,7 @@ describe('Kanto gameplay', (test) => {
       const collected = hatchery.collectFossil(started.slotIndex);
       assert.equal(collected.result, HatcheryResults.READY);
       assert.equal(save.inventory.count('helix_fossil'), 0);
-      assert.ok([...save.team, ...save.box].some((pokemon) => pokemon.species === 'omanyte'));
+      assert.ok(save.collection.getAll().some((pokemon) => pokemon.species === 'omanyte'));
     } finally {
       hatchery.onDestroy();
     }
@@ -316,10 +330,15 @@ describe('Kanto gameplay', (test) => {
       const started = training.startSession(candidate.uid);
       assert.equal(started.result, TrainingResults.READY);
       assert.equal(started.opponentCount, TrainingRules.OPPONENT_COUNT);
+      const usage = PokemonUsageSystem.getInstance();
+      assert.ok(usage.getUsages(candidate.uid).includes(PokemonUsageIds.TRAINING), 'the trainee is claimed by the training session');
+      assert.equal(usage.canPerform(candidate.uid, PokemonActionIds.LEARN_MOVE), false);
+      assert.ok(BoxSystem.getInstance().getPokemonByUid(candidate.uid), 'the trainee stays in the PC box');
 
       training._session.outcome = BattleOutcomes.VICTORY;
       training._finishSession(training._session);
       assert.equal(training.isActive(), false);
+      assert.equal(usage.getUsages(candidate.uid).includes(PokemonUsageIds.TRAINING), false, 'the claim ends with the session');
       assert.equal(quests.getStatus('main.22')?.complete, true);
       assert.equal(quests.getStatus('main.22')?.progress, 1);
     } finally {

@@ -9,6 +9,7 @@
  *   assets/images/pokemon/<species>_<form>.png   alternate form (e.g. 'vulpix_alola')
  *   assets/images/pokemon/shiny/<same name>.png  shiny variant of the two above
  *   assets/images/trainers/<trainerName>.png     trainer portraits (player and NPCs)
+ *   assets/images/dungeon/<file>                 dungeon grid glyphs (monochrome, CSS-tinted)
  */
 
 const IMAGES_ROOT = 'assets/images/';
@@ -22,6 +23,7 @@ const MAP_DIR = `${IMAGES_ROOT}maps/`;
 const ITEM_DIR = `${IMAGES_ROOT}items/`;
 const SECRET_BASE_DECORATION_DIR = `${IMAGES_ROOT}secret-base/emerald/`;
 const SECRET_BASE_BACKGROUND_DIR = `${IMAGES_ROOT}secret-base/bg/emerald/`;
+const DUNGEON_DIR = `${IMAGES_ROOT}dungeon/`;
 const APP_ICON = `${IMAGES_ROOT}Icon.png`;
 
 /** Trainer portrait used when a save has none (file stem in assets/images/trainers/). */
@@ -111,6 +113,14 @@ export class AssetPaths {
   /** @param {string} layoutId @returns {string} Room background */
   static secretBaseBackground(layoutId) {
     return `${SECRET_BASE_BACKGROUND_DIR}${fileStem(String(layoutId || '').toLowerCase())}.png`;
+  }
+
+  /**
+   * @param {string} fileName - File in assets/images/dungeon/, e.g. 'pokeball.svg'
+   * @returns {string}
+   */
+  static dungeonTile(fileName) {
+    return `${DUNGEON_DIR}${fileName}`;
   }
 
   /** @returns {string} Game logo shown in the header */

@@ -50,20 +50,14 @@
 .pw-dungeon-actions > .pw-button { flex: 1 1 160px; }
 .pw-dungeon-map-unavailable { color: var(--pw-text-secondary); font-size: 12px; }
 
-/* Reference-style cave board: bounded cells on desktop, scrollable rather than
-   clipped on narrow screens, with the grid sized from the saved map columns. */
-.pw-dungeon-expedition .pw-dgn-grid {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(32px, 44px));
-  gap: 4px;
+/* Reference cave board (main dungeon board): a framed map holding a grid of fixed 44 px tiles,
+   one column per saved map column, centred; narrow screens scroll instead of clipping. */
+.pw-dungeon-expedition .pw-dungeon-map {
   width: fit-content;
   max-width: 100%;
-  max-height: min(62vh, 520px);
-  overflow: auto;
-  justify-content: start;
-  align-content: start;
   margin: 0 auto;
   padding: 10px 8px 6px;
+  overflow-x: auto;
   border: 1px solid var(--light1);
   border-radius: 10px;
   background:
@@ -74,11 +68,25 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
-.pw-dungeon-expedition .pw-dgn-grid--7 { grid-template-columns: repeat(7, minmax(32px, 44px)); }
-.pw-dungeon-expedition .pw-dgn-grid--8 { grid-template-columns: repeat(8, minmax(32px, 44px)); }
-.pw-dungeon-expedition .pw-dgn-grid--9 { grid-template-columns: repeat(9, minmax(32px, 44px)); }
-.pw-dungeon-expedition .pw-dgn-grid--10 { grid-template-columns: repeat(10, minmax(32px, 44px)); }
-.pw-dungeon-expedition .pw-dgn-grid--11 { grid-template-columns: repeat(11, minmax(32px, 44px)); }
+.pw-dungeon-expedition .pw-dgn-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 44px);
+  gap: 4px;
+  width: fit-content;
+  max-width: none;
+  max-height: min(62vh, 520px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  justify-content: center;
+  align-content: center;
+  margin: 0 auto;
+  scrollbar-width: none;
+}
+.pw-dungeon-expedition .pw-dgn-grid--7 { grid-template-columns: repeat(7, 44px); }
+.pw-dungeon-expedition .pw-dgn-grid--8 { grid-template-columns: repeat(8, 44px); }
+.pw-dungeon-expedition .pw-dgn-grid--9 { grid-template-columns: repeat(9, 44px); }
+.pw-dungeon-expedition .pw-dgn-grid--10 { grid-template-columns: repeat(10, 44px); }
+.pw-dungeon-expedition .pw-dgn-grid--11 { grid-template-columns: repeat(11, 44px); }
 .pw-dungeon-expedition .pw-dgn-grid:focus-visible {
   outline: 2px solid var(--light2);
   outline-offset: 3px;
@@ -87,10 +95,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  min-width: 0;
-  min-height: 32px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   aspect-ratio: 1;
+  box-sizing: border-box;
   padding: 0 !important;
   border: 2px solid var(--light1) !important;
   border-radius: 8px;
@@ -100,17 +110,41 @@
   line-height: 1;
   transition: transform .12s ease, box-shadow .2s ease;
 }
-.pw-dungeon-expedition .pw-dgn-tile .pw-icon {
-  display: inline-flex;
+
+/* Tile sprites: monochrome glyphs tinted by the tile colour (74 %), elite = Poké Ball + star
+   badge, and the trainer sprite (82 %) on the player's tile. */
+.pw-dungeon-expedition .pw-dgn-tile .pw-dgn-ic {
   width: 74%;
   height: 74%;
+  background-color: currentColor;
+  -webkit-mask-image: var(--pw-mask-icon);
+  mask-image: var(--pw-mask-icon);
+}
+.pw-dungeon-expedition .pw-dgn-tile .pw-dgn-elite {
+  position: relative;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none;
-}
-.pw-dungeon-expedition .pw-dgn-tile .pw-icon svg {
   width: 100%;
   height: 100%;
+  pointer-events: none;
+}
+.pw-dungeon-expedition .pw-dgn-tile .pw-dgn-star {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 36%;
+  height: 36%;
+}
+.pw-dungeon-expedition .pw-dgn-tile .pw-dgn-player {
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .55));
 }
 
 /* Fog is unmistakable from explored empty ground, as in the reference map. */
@@ -125,8 +159,7 @@
 }
 .pw-dungeon-expedition .pw-dgn-tile.is-fog::before {
   content: '?';
-  color: var(--light1);
-  font-size: 20px;
+  opacity: .85;
   font-weight: 700;
   line-height: 1;
   text-shadow: 0 0 6px rgba(0, 0, 0, .9);
@@ -219,18 +252,13 @@
   box-shadow: none;
   animation: none;
 }
-.pw-dungeon-expedition .pw-dgn-tile.is-done:not(.is-here):not(.t-ladder):not(.t-boss) .pw-icon {
-  display: none;
-}
 .pw-dungeon-expedition .pw-dgn-tile.is-here {
   border-color: var(--light2) !important;
   border-width: 3px !important;
-  outline: 2px solid var(--light2);
-  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--dark2), 0 0 0 4px var(--light2);
   opacity: 1;
   filter: none;
 }
-.pw-dungeon-expedition .pw-dgn-tile.is-here .pw-icon { color: var(--light2) !important; }
 
 @media (prefers-reduced-motion: reduce) {
   .pw-dungeon-expedition .pw-dgn-tile,

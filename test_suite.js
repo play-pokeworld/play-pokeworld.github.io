@@ -37,6 +37,7 @@ await import('./tests/Shop.test.js');
 await import('./tests/KantoGameplay.test.js');
 await import('./tests/ItemUse.test.js');
 await import('./tests/BagPanel.test.js');
+await import('./tests/PokemonUsage.test.js');
 await import('./tests/UiWidgets.test.js');
 await import('./tests/Dashboard.test.js');
 await import('./tests/Launcher.test.js');

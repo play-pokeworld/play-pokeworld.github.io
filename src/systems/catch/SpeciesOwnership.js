@@ -1,7 +1,8 @@
 /**
  * @file SpeciesOwnership.js
  * @brief What the player really owns (C++: class SpeciesOwnership, static), port of the original
- * isSpeciesOwnedReal() / isSpeciesShiny(): ownership is read from the team and the PC box,
+ * isSpeciesOwnedReal() / isSpeciesShiny(): ownership is read from the owned collection (the PC
+ * box: party, daycare and every other usage included),
  * never from the Pokédex (a form is a Pokémon of its own); the shiny state of a species is
  * unlocked by the Pokédex entry or by an owned shiny of that species.
  */
@@ -10,10 +11,11 @@ import { CaughtStatus } from '../../data/save/PokedexData.js';
 export class SpeciesOwnership {
   /**
    * @param {import('../../data/save/SaveData.js').SaveData} save
-   * @returns {import('../../data/pokemon/PokemonData.js').PokemonData[]} Team first, then the box
+   * @returns {import('../../data/pokemon/PokemonData.js').PokemonData[]} Team first, then the rest of the collection
    */
   static ownedPokemon(save) {
-    return [...save.team, ...save.box];
+    const team = save.team;
+    return [...team, ...save.collection.getAll().filter((pokemon) => !team.includes(pokemon))];
   }
 
   /**

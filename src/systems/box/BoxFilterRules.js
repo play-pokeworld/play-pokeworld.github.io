@@ -34,8 +34,7 @@ function filterValue(filters, key) {
 /** @param {Object} pokemon @param {string} speciesId @param {Object} save @returns {boolean} */
 function isOwnedOrCaught(save, speciesId) {
   return save.pokedex.isCaught(speciesId) ||
-    save.team.some((member) => member.species === speciesId) ||
-    save.box.some((member) => member.species === speciesId);
+    save.collection.getAll().some((member) => member.species === speciesId);
 }
 
 /** @param {Object} spread @returns {number} */

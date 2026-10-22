@@ -1,6 +1,8 @@
 /**
  * @file PokemonInfoModal.js
  * @brief Pokémon sheet with stats, IVs, EVs, move learning, talent and held item.
+ * The sheet works on any owned Pokémon (by uid). It shows where the Pokémon is currently used
+ * (PokemonUsageSystem) and disables, with their reason, only the actions that usage forbids.
  */
 import { StaticModalPanel } from '../ui/StaticModalPanel.js';
 import { UIContainer } from '../ui/UIContainer.js';
@@ -12,9 +14,13 @@ import { UIPokemonSprite, PokemonSpriteSizes } from '../ui/UIPokemonSprite.js';
 import { TeamSystem } from '../systems/TeamSystem.js';
 import { BoxSystem } from '../systems/BoxSystem.js';
 import { MoveLearningSystem } from '../systems/MoveLearningSystem.js';
+import { PokemonUsageSystem } from '../systems/PokemonUsageSystem.js';
 import { TeamChangedEvent } from '../core/events/TeamChangedEvent.js';
 import { BoxChangedEvent } from '../core/events/BoxChangedEvent.js';
+import { BattleStartedEvent } from '../core/events/BattleStartedEvent.js';
 import { BattleEndedEvent } from '../core/events/BattleEndedEvent.js';
+import { PokemonUsageChangedEvent } from '../core/events/PokemonUsageChangedEvent.js';
+import { PokemonActionIds, PokemonActionLockKinds } from '../config/PokemonUsageRules.js';
 import { EventBus } from '../core/EventBus.js';
 import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
 import { ModalIds } from '../config/ModalIds.js';
@@ -43,34 +49,25 @@ export class PokemonInfoModal extends StaticModalPanel {
     });
     this._teamIndex = 0;
     this._pokemonUid = null;
-    this._location = 'team';
     this._activeStatTab = 'stats';
     this._pendingFocusKey = null;
-    for (const eventClass of [TeamChangedEvent, BoxChangedEvent]) {
+    for (const eventClass of [TeamChangedEvent, BoxChangedEvent, PokemonUsageChangedEvent, BattleStartedEvent, BattleEndedEvent]) {
       this.listen(eventClass, () => {
         if (this.isOpen()) this._render();
       });
     }
-    this.listen(BattleEndedEvent, () => {
-      if (this.isOpen()) this._render();
-    });
   }
 
   /** @override @param {Object} [params={}] */
   open(params = {}) {
-    const previousTarget = `${this._location}:${this._pokemonUid ?? this._teamIndex}`;
+    const previousTarget = this._pokemonUid ?? `team:${this._teamIndex}`;
     if (typeof params.pokemonUid === 'string') {
       this._pokemonUid = params.pokemonUid;
-      this._location = params.location === 'box' ? 'box' : 'team';
-      if (this._location === 'team') {
-        this._teamIndex = TeamSystem.getInstance().getTeam().findIndex((pokemon) => pokemon.uid === this._pokemonUid);
-      }
     } else {
       this._pokemonUid = null;
-      this._location = 'team';
       if (Number.isInteger(Number(params.teamIndex))) this._teamIndex = Number(params.teamIndex);
     }
-    const nextTarget = `${this._location}:${this._pokemonUid ?? this._teamIndex}`;
+    const nextTarget = this._pokemonUid ?? `team:${this._teamIndex}`;
     if (nextTarget !== previousTarget) {
       this._activeStatTab = 'stats';
       if (this.isOpen()) this._pendingFocusKey = 'pokemon-info-tab-stats';
@@ -92,7 +89,6 @@ export class PokemonInfoModal extends StaticModalPanel {
   onExit() {
     super.onExit();
     this._pokemonUid = null;
-    this._location = 'team';
   }
 
   /**
@@ -107,9 +103,39 @@ export class PokemonInfoModal extends StaticModalPanel {
       pokemon[field] = !pokemon[field];
       return true;
     };
-    return this._location === 'box'
-      ? BoxSystem.getInstance().updatePokemon(uid, update)
-      : TeamSystem.getInstance().updatePokemon(uid, update);
+    return BoxSystem.getInstance().updatePokemon(uid, update);
+  }
+
+  /**
+   * Localized reason why an action is unavailable for this Pokémon, or null when it is allowed.
+   * @private
+   * @param {string} uid
+   * @param {string} action - PokemonActionIds value
+   * @returns {string|null}
+   */
+  _actionLockReason(uid, action) {
+    const lock = PokemonUsageSystem.getInstance().getActionLock(uid, action);
+    if (!lock) return null;
+    return lock.kind === PokemonActionLockKinds.REQUIRES
+      ? t(`pokemon_action_requires_${lock.usage}`)
+      : t(`pokemon_action_locked_${lock.usage}`);
+  }
+
+  /** @private @param {string|null} reason @returns {UIText|null} */
+  _lockReasonText(reason) {
+    return reason ? new UIText({ tagName: 'p', className: 'poke-detail-lock-reason', text: reason }) : null;
+  }
+
+  /** @private @param {string} uid @returns {UIContainer} Current location line */
+  _renderLocation(uid) {
+    const usage = PokemonUsageSystem.getInstance().getPrimaryUsage(uid);
+    return new UIContainer({
+      className: 'poke-detail-location',
+      children: [
+        new UIText({ tagName: 'span', className: 'poke-detail-location-label', text: t('pokemon_usage_label') }),
+        new UIText({ tagName: 'strong', text: t(usage ? `pokemon_usage_${usage}` : 'pokemon_usage_none') })
+      ]
+    });
   }
 
   /** @private @returns {{focusKey:string|null,panelScrollTop:number,panelScrollLeft:number,bodyScrollTop:number,bodyScrollLeft:number}} */
@@ -255,18 +281,14 @@ export class PokemonInfoModal extends StaticModalPanel {
     const renderState = this._captureRenderState();
     this.clearChildren();
     const pokemon = this._pokemonUid
-      ? this._location === 'box'
-        ? BoxSystem.getInstance().getPokemonByUid(this._pokemonUid)
-        : TeamSystem.getInstance().getPokemonByUid(this._pokemonUid)
+      ? BoxSystem.getInstance().getPokemonByUid(this._pokemonUid)
       : TeamSystem.getInstance().getTeam()[this._teamIndex];
     if (!pokemon) {
       this.addChild(new UIText({ tagName: 'p', className: 'poke-detail-empty', text: t('pokemon_info_no_pokemon') }));
       this._restoreRenderState(renderState);
       return;
     }
-    if (this._pokemonUid && this._location === 'team') {
-      this._teamIndex = TeamSystem.getInstance().getTeam().findIndex((member) => member.uid === this._pokemonUid);
-    }
+    this._teamIndex = TeamSystem.getInstance().getMemberUids().indexOf(pokemon.uid);
 
     const displayName = pokemon.getDisplayName();
     const speciesName = t(pokemon.getNameKey());
@@ -296,6 +318,7 @@ export class PokemonInfoModal extends StaticModalPanel {
         close
       ]
     }));
+    this.addChild(this._renderLocation(pokemon.uid));
 
     const types = pokemon.getTypes().map((type) => new UIText({
       tagName: 'span',
@@ -347,17 +370,23 @@ export class PokemonInfoModal extends StaticModalPanel {
     const heldName = heldItem
       ? (LocalizationManager.getInstance().has(heldNameKey) ? t(heldNameKey) : pokemon.heldItem)
       : t('pokemon_info_no_item');
-    const changeItemButton = this._location === 'team' ? new UIButton({
+    const heldItemLockReason = this._actionLockReason(pokemon.uid, PokemonActionIds.CHANGE_HELD_ITEM);
+    const changeItemButton = new UIButton({
       text: t('pokemon_info_change_item'),
       className: 'poke-detail-mini-btn',
       variant: 'secondary',
       size: 'sm',
-      onClick: () => EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(
-        ModalIds.BAG,
-        { mode: 'held-item', teamIndex: this._teamIndex }
-      ))
-    }) : null;
-    changeItemButton?.setData('focusKey', 'pokemon-info-held-item');
+      disabled: !!heldItemLockReason,
+      onClick: () => {
+        if (this._teamIndex < 0) return;
+        EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(
+          ModalIds.BAG,
+          { mode: 'held-item', teamIndex: this._teamIndex }
+        ));
+      }
+    });
+    changeItemButton.setData('focusKey', 'pokemon-info-held-item');
+    if (heldItemLockReason) changeItemButton.setAttribute('title', heldItemLockReason);
     const heldContents = [
       new UIContainer({
         className: 'poke-detail-held-icon',
@@ -378,7 +407,8 @@ export class PokemonInfoModal extends StaticModalPanel {
       className: 'poke-detail-panel',
       children: [
         new UIText({ tagName: 'h3', text: t('pokemon_info_held_item') }),
-        new UIContainer({ className: 'poke-detail-held', children: heldContents })
+        new UIContainer({ className: 'poke-detail-held', children: heldContents }),
+        this._lockReasonText(heldItemLockReason)
       ]
     });
 
@@ -431,7 +461,11 @@ export class PokemonInfoModal extends StaticModalPanel {
           : new UIText({ tagName: 'div', className: 'poke-detail-empty', text: t('pokemon_info_no_moves') })
       ]
     });
-    const learnableMoves = MoveLearningSystem.getInstance().getLearnableMoveIds(pokemon);
+    const moveLearning = MoveLearningSystem.getInstance();
+    const learnLockReason = moveLearning.isBattleLocked()
+      ? t('pokemon_move_learning_battle_locked')
+      : this._actionLockReason(pokemon.uid, PokemonActionIds.LEARN_MOVE);
+    const learnableMoves = moveLearning.getLearnableMoveIds(pokemon);
     const learnableRows = learnableMoves.map((moveId) => {
       const move = MoveDB.getInstance().getById(moveId);
       if (!move) return null;
@@ -444,10 +478,9 @@ export class PokemonInfoModal extends StaticModalPanel {
             variant: 'secondary',
             size: 'sm',
             text: t('pokemon_info_learn_move'),
-            disabled: MoveLearningSystem.getInstance().isBattleLocked(),
+            disabled: !!learnLockReason,
             onClick: () => EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.MOVE_LEARN, {
               pokemonUid: pokemon.uid,
-              location: this._location,
               moveId
             }))
           })
@@ -458,6 +491,7 @@ export class PokemonInfoModal extends StaticModalPanel {
       className: 'poke-detail-moves-block poke-detail-panel-wide',
       children: [
         new UIText({ tagName: 'h3', className: 'poke-detail-moves-title', text: t('pokemon_info_learnable_moves') }),
+        learnableRows.length ? this._lockReasonText(learnLockReason) : null,
         learnableRows.length
           ? new UIContainer({ className: 'poke-detail-learnable-list', children: learnableRows })
           : new UIText({ tagName: 'div', className: 'poke-detail-empty', text: t('pokemon_info_no_learnable_moves') })

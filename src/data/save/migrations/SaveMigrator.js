@@ -26,13 +26,14 @@ import { MigrationV11ToV12 } from './MigrationV11ToV12.js';
 import { MigrationV12ToV13 } from './MigrationV12ToV13.js';
 import { MigrationV13ToV14 } from './MigrationV13ToV14.js';
 import { MigrationV14ToV15 } from './MigrationV14ToV15.js';
+import { MigrationV15ToV16 } from './MigrationV15ToV16.js';
 
 /** Ordered chain: MIGRATIONS[i].from === i. */
 const MIGRATIONS = Object.freeze([
   MigrationOriginalToV1, MigrationV1ToV2, MigrationV2ToV3, MigrationV3ToV4,
   MigrationV4ToV5, MigrationV5ToV6, MigrationV6ToV7, MigrationV7ToV8,
   MigrationV8ToV9, MigrationV9ToV10, MigrationV10ToV11, MigrationV11ToV12,
-  MigrationV12ToV13, MigrationV13ToV14, MigrationV14ToV15
+  MigrationV12ToV13, MigrationV13ToV14, MigrationV14ToV15, MigrationV15ToV16
 ]);
 
 export class SaveMigrator {

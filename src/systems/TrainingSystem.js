@@ -5,8 +5,9 @@
 import { BaseSystem } from './BaseSystem.js';
 import { SaveSystem } from './SaveSystem.js';
 import { BattleSystem } from './BattleSystem.js';
-import { TeamSystem } from './TeamSystem.js';
 import { BoxSystem } from './BoxSystem.js';
+import { PokemonUsageSystem } from './PokemonUsageSystem.js';
+import { PokemonActionIds, PokemonUsageIds } from '../config/PokemonUsageRules.js';
 import { NotificationSystem } from './NotificationSystem.js';
 import { EventBus } from '../core/EventBus.js';
 import { BattleSession, BattleOutcomes } from './battle/BattleSession.js';
@@ -119,10 +120,13 @@ export class TrainingSystem extends BaseSystem {
   getCandidates() {
     const save = SaveSystem.getInstance().getCurrentSave();
     if (!save) return [];
+    const usage = PokemonUsageSystem.getInstance();
+    const others = save.collection.getAll().filter((pokemon) => !save.teamMembers.includes(pokemon.uid));
     return [
       ...save.team.map((pokemon) => ({ pokemon, source: 'team' })),
-      ...save.box.map((pokemon) => ({ pokemon, source: 'box' }))
-    ].filter(({ pokemon }) => pokemon.moves.length < MoveConfig.ACTIVE_SLOTS && this._availableMoves(pokemon).length > 0)
+      ...others.map((pokemon) => ({ pokemon, source: 'box' }))
+    ].filter(({ pokemon }) => usage.canPerform(pokemon.uid, PokemonActionIds.TRAIN))
+      .filter(({ pokemon }) => pokemon.moves.length < MoveConfig.ACTIVE_SLOTS && this._availableMoves(pokemon).length > 0)
       .map(({ pokemon, source }) => ({
         uid: pokemon.uid,
         name: pokemon.getDisplayName(),
@@ -163,7 +167,8 @@ export class TrainingSystem extends BaseSystem {
   }
 
   /**
-   * Runs the standard move-discipline training session for a team or boxed Pokémon.
+   * Runs the standard move-discipline training session for an owned Pokémon. The trainee is
+   * claimed as TRAINING in PokemonUsageSystem for the whole session (it stays in the PC box).
    * @param {string} pokemonUid
    * @param {string} [mode=TrainingRules.MODE_ID]
    * @returns {{result:string,opponentCount:number}}
@@ -177,8 +182,10 @@ export class TrainingSystem extends BaseSystem {
     if (this._session) return this._failure(TrainingResults.SESSION_ACTIVE);
     if (BattleSystem.getInstance().isActive()) return this._failure(TrainingResults.BATTLE_ACTIVE);
     if (mode !== TrainingRules.MODE_ID) return this._failure(TrainingResults.UNKNOWN_MODE);
-    const trainee = [...save.team, ...save.box].find((pokemon) => pokemon.uid === pokemonUid);
-    if (!trainee) return this._failure(TrainingResults.POKEMON_NOT_FOUND);
+    const trainee = save.collection.get(pokemonUid);
+    if (!trainee || !PokemonUsageSystem.getInstance().canPerform(pokemonUid, PokemonActionIds.TRAIN)) {
+      return this._failure(TrainingResults.POKEMON_NOT_FOUND);
+    }
     const eligibleMoves = this._availableMoves(trainee);
     if (eligibleMoves.length === 0 || trainee.moves.length >= MoveConfig.ACTIVE_SLOTS) {
       return this._failure(TrainingResults.NO_MOVES);
@@ -208,6 +215,7 @@ export class TrainingSystem extends BaseSystem {
       ))
     });
     this._session.start();
+    PokemonUsageSystem.getInstance().claim(PokemonUsageIds.TRAINING, trainee.uid);
     this._notify(t('training_session_started', { name: trainee.getDisplayName() }), NotificationTones.INFO);
     SaveSystem.getInstance().saveCurrent();
     this._dispatchBattleChanged();
@@ -332,10 +340,8 @@ export class TrainingSystem extends BaseSystem {
 
   /** @private @param {Object|null} pokemon */
   _dispatchTraineeRosterChanged(pokemon) {
-    const save = SaveSystem.getInstance().getCurrentSave();
-    if (!save || !pokemon) return;
-    if (save.team.some((entry) => entry.uid === pokemon.uid)) TeamSystem.getInstance().dispatchChanged();
-    else if (save.box.some((entry) => entry.uid === pokemon.uid)) BoxSystem.getInstance().dispatchChanged();
+    if (!SaveSystem.getInstance().getCurrentSave() || !pokemon) return;
+    BoxSystem.getInstance().dispatchPokemonChanged(pokemon.uid);
   }
 
   /** @private */
@@ -372,6 +378,7 @@ export class TrainingSystem extends BaseSystem {
 
   /** @private @param {boolean} [clearResult=false] */
   _resetSession(clearResult = false) {
+    if (this._trainee) PokemonUsageSystem.getInstance().release(PokemonUsageIds.TRAINING, this._trainee.uid);
     this._session = null;
     this._trainee = null;
     this._mode = null;

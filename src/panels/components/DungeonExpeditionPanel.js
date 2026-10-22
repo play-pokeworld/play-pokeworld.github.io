@@ -5,11 +5,15 @@
 import { UIContainer } from '../../ui/UIContainer.js';
 import { UIText } from '../../ui/UIText.js';
 import { UIButton } from '../../ui/UIButton.js';
+import { UIImage } from '../../ui/UIImage.js';
+import { UIMaskIcon } from '../../ui/UIMaskIcon.js';
 import { QuestRewardsView } from './QuestRewardsView.js';
 import { DungeonSystem } from '../../systems/DungeonSystem.js';
 import { BattleSystem } from '../../systems/BattleSystem.js';
 import { LocationSystem } from '../../systems/LocationSystem.js';
 import { DungeonRules } from '../../config/DungeonRules.js';
+import { DungeonTileVisuals } from '../../config/DungeonTileVisuals.js';
+import { AssetPaths } from '../../config/AssetPaths.js';
 import { DungeonRunChangedEvent } from '../../core/events/DungeonRunChangedEvent.js';
 import { BattleStartedEvent } from '../../core/events/BattleStartedEvent.js';
 import { BattleEndedEvent } from '../../core/events/BattleEndedEvent.js';
@@ -17,13 +21,6 @@ import { SaveLoadedEvent } from '../../core/events/SaveLoadedEvent.js';
 import { TextFormatter } from '../../core/TextFormatter.js';
 import { t } from '../../localization/LocalizationManager.js';
 
-const TILE_ICONS = Object.freeze({
-  combat: 'swords',
-  elite: 'zap',
-  chest: 'box',
-  boss: 'trophy',
-  ladder: 'chevronRight'
-});
 const TILE_LABEL_KEYS = Object.freeze({
   unknown: 'dungeon_node_fog',
   empty: 'dungeon_node_empty',
@@ -120,6 +117,7 @@ export class DungeonExpeditionPanel extends UIContainer {
     const map = run.map;
     if (!map) return new UIText({ className: 'pw-dungeon-map-unavailable', text: t('dungeon_map_unavailable') });
     const grid = new UIContainer({ className: `pw-dgn-grid pw-dgn-grid--${map.cols}` });
+    const board = new UIContainer({ className: 'pw-dungeon-map', children: [grid] });
     grid.setAttribute('role', 'grid');
     grid.setAttribute('tabindex', '0');
     grid.setAttribute('aria-label', t('dungeon_grid_aria', { floor: run.floor }));
@@ -152,17 +150,48 @@ export class DungeonExpeditionPanel extends UIContainer {
         const cell = new UIButton({
           variant: 'ghost',
           className: classes,
-          icon: tile.id === run.pos ? 'mapPin' : TILE_ICONS[knownType] || '',
           text: '',
           disabled: blocked || (!revealed && !adjacent),
           onClick: () => DungeonSystem.getInstance().moveTo(tile.id)
         });
         cell.setAriaLabel(t('dungeon_tile_aria', { tile: name, col: col + 1, row: row + 1 }));
         cell.setData('node', tile.id);
+        const content = tile.id === run.pos ? this._playerSprite() : this._tileGlyph(tile, knownType);
+        if (content) cell.addChild(content);
         grid.addChild(cell);
       }
     }
-    return grid;
+    return board;
+  }
+
+  /** @private @returns {UIImage} The trainer drawn on the player's tile, as on the reference board. */
+  _playerSprite() {
+    return new UIImage({
+      className: 'pw-dgn-player',
+      src: AssetPaths.trainerSprite(DungeonTileVisuals.PLAYER_TRAINER),
+      pixelated: true
+    });
+  }
+
+  /**
+   * Monochrome glyph of a tile, tinted by the tile colour. Fog keeps its CSS question mark and a
+   * resolved fight or chest becomes plain ground.
+   * @private
+   * @param {Object} tile
+   * @param {string} knownType
+   * @returns {import('../../ui/UIElement.js').UIElement|null}
+   */
+  _tileGlyph(tile, knownType) {
+    const file = DungeonTileVisuals.GLYPHS[knownType];
+    if (!file || (tile.done && DungeonTileVisuals.CLEARED_WHEN_DONE.includes(knownType))) return null;
+    const glyph = new UIMaskIcon({ className: 'pw-dgn-ic', src: AssetPaths.dungeonTile(file) });
+    const badge = DungeonTileVisuals.BADGES[knownType];
+    if (!badge) return glyph;
+    return new UIContainer({
+      tagName: 'span',
+      className: 'pw-dgn-elite',
+      children: [glyph, new UIMaskIcon({ className: 'pw-dgn-ic pw-dgn-star', src: AssetPaths.dungeonTile(badge) })]
+    });
   }
 
   /** @private @param {Object} last */

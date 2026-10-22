@@ -33,6 +33,7 @@ export const MoveLearningResults = Object.freeze({
   MOVE_UNKNOWN: 'move_unknown',
   MOVE_NOT_AVAILABLE: 'move_not_available',
   BATTLE_ACTIVE: 'battle_active',
+  POKEMON_IN_USE: 'pokemon_in_use',
   REPLACEMENT_REQUIRED: 'replacement_required',
   INVALID_SLOT: 'invalid_slot'
 });

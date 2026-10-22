@@ -15,6 +15,7 @@ import { QuestDB } from '../src/data/quests/QuestDB.js';
 import { QuestCategories } from '../src/data/quests/QuestCategories.js';
 import { MapPanel } from '../src/panels/MapPanel.js';
 import { MapHelpModal } from '../src/panels/MapHelpModal.js';
+import { GuidePanel } from '../src/panels/fullscreen/GuidePanel.js';
 import { LocationPanel } from '../src/panels/LocationPanel.js';
 import { StoryPanel } from '../src/panels/StoryPanel.js';
 import { NpcTalkModal } from '../src/panels/NpcTalkModal.js';
@@ -70,12 +71,19 @@ describe('Map and location corrections', (test) => {
     const map = new MapPanel(DashboardColumns.CENTER);
 
     try {
-      const button = map.getDomElement().querySelector('.pw-map-help-button');
-      assert.ok(button, 'map header has the question-mark control');
-      assert.equal(button.textContent.trim(), '?');
+      const helpButtons = map.getDomElement().querySelectorAll('.pw-win-help-btn');
+      assert.equal(helpButtons.length, 1, 'the legend is the only help control of the map window');
+      assert.equal(map.getDomElement().querySelector('.pw-map-help-button'), null, 'the old text "?" control is gone');
+      const button = helpButtons[0];
+      const actions = button.parentNode;
+      assert.equal(actions.children[0], button, 'the legend takes the first header slot of the former Guide button');
+      assert.ok(button.querySelector('.pw-icon'), 'the legend uses the help icon sprite of the former Guide button');
       assert.equal(button.getAttribute('aria-label'), t('map_legend_modal_title'));
+      const guide = new GuidePanel();
       button.click();
       assert.ok(modal.isOpen(), 'the control opens the map legend modal');
+      assert.equal(guide.isOpen(), false, 'the map window no longer opens the Guide');
+      guide.destroy();
       const expectedStates = ['quest', 'roaming', 'catch', 'shiny', 'locked', 'complete'];
       assert.deepEqual(
         [...modal.getDomElement().querySelectorAll('.pw-map-help-row')]

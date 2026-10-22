@@ -1,6 +1,7 @@
 /**
  * @file BoxChangedEvent.js
- * @brief Emitted by BoxSystem when the content of the PC box changed.
+ * @brief Emitted by BoxSystem when the PC box (the collection of every owned Pokémon) or one of
+ * its Pokémon changed.
  */
 
 import { BaseEvent } from '../BaseEvent.js';
@@ -10,7 +11,7 @@ export class BoxChangedEvent extends BaseEvent {
   static TYPE = 'BoxChangedEvent';
 
   /**
-   * @param {number} boxSize - Number of Pokémon in the box
+   * @param {number} boxSize - Number of owned Pokémon (whole collection)
    */
   constructor(boxSize) {
     super(BoxChangedEvent.TYPE);

@@ -1,7 +1,8 @@
 /**
  * @file TeamBoxTransferSystem.js
- * @brief Coordinates atomic transfers between the active team and PC storage.
+ * @brief Coordinates party changes chosen from the PC box (the collection of every owned Pokémon).
  * The BoxPanel only sends generic Pokémon-selection events; all team knowledge stays here.
+ * Selections ask for the JOIN_TEAM action so the PC only offers Pokémon no mode currently uses.
  */
 import { BaseSystem } from './BaseSystem.js';
 import { SaveSystem } from './SaveSystem.js';
@@ -13,6 +14,7 @@ import { BoxPokemonSelectionCancelledEvent } from '../core/events/BoxPokemonSele
 import { BoxPokemonSelectionRemoveRequestedEvent } from '../core/events/BoxPokemonSelectionRemoveRequestedEvent.js';
 import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
 import { ModalIds } from '../config/ModalIds.js';
+import { PokemonActionIds } from '../config/PokemonUsageRules.js';
 import { t } from '../localization/LocalizationManager.js';
 
 export class TeamBoxTransferSystem extends BaseSystem {
@@ -62,44 +64,31 @@ export class TeamBoxTransferSystem extends BaseSystem {
     });
   }
 
-  /** Moves one active team member into the PC as a single save operation. @param {string} teamUid */
+  /**
+   * Takes one member out of the party; it stays in the PC box (the collection owns it).
+   * @param {string} teamUid
+   * @returns {boolean}
+   */
   storeToBox(teamUid) {
-    const save = SaveSystem.getInstance().getCurrentSave();
     const team = TeamSystem.getInstance();
-    const box = BoxSystem.getInstance();
-    const teamMembers = team.getTeam();
-    const pokemon = team.getPokemonByUid(teamUid);
-    if (!save || teamMembers.length <= 1 || !pokemon) return false;
-
-    const nextTeam = teamMembers.filter((member) => member.uid !== teamUid);
-    const nextBox = [...box.getBox(), pokemon];
-    if (!team.replaceRoster(nextTeam, nextBox, { persist: false, notify: false })) return false;
-    this._persistAndNotify(team, box);
+    if (!team.removePokemon(teamUid, { persist: false, notify: false })) return false;
+    this._persistAndNotify(team);
     return true;
   }
 
-  /** Moves one PC Pokémon into a free team slot as a single save operation. @param {string} boxUid */
+  /** Puts one available PC Pokémon into a free party slot. @param {string} boxUid @returns {boolean} */
   withdrawFromBox(boxUid) {
-    const save = SaveSystem.getInstance().getCurrentSave();
     const team = TeamSystem.getInstance();
-    const box = BoxSystem.getInstance();
-    const pokemon = box.getPokemonByUid(boxUid);
-    if (!save || !team.hasFreeSlot() || !pokemon) return false;
-
-    const nextTeam = [...team.getTeam(), pokemon];
-    const nextBox = box.getBox().filter((member) => member.uid !== boxUid);
-    if (!team.replaceRoster(nextTeam, nextBox, { persist: false, notify: false })) return false;
-    this._persistAndNotify(team, box);
+    if (!team.addMember(boxUid, { persist: false, notify: false })) return false;
+    this._persistAndNotify(team);
     return true;
   }
 
-  /** Replaces one active team member with a PC Pokémon atomically. @param {string} teamUid @param {string} boxUid */
+  /** Replaces one party member with an available PC Pokémon. @param {string} teamUid @param {string} boxUid */
   replaceFromBox(teamUid, boxUid) {
-    const save = SaveSystem.getInstance().getCurrentSave();
     const team = TeamSystem.getInstance();
-    const box = BoxSystem.getInstance();
-    if (!save || !team.swapWithBoxMember(teamUid, boxUid, { persist: false, notify: false })) return false;
-    this._persistAndNotify(team, box);
+    if (!team.replaceMember(teamUid, boxUid, { persist: false, notify: false })) return false;
+    this._persistAndNotify(team);
     return true;
   }
 
@@ -109,6 +98,7 @@ export class TeamBoxTransferSystem extends BaseSystem {
     this._pendingSelection = { requestId, operation: request.operation, teamUid: request.teamUid || null };
     EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.BOX, {
       selectionRequestId: requestId,
+      selectionAction: PokemonActionIds.JOIN_TEAM,
       ...(request.selectionFooter ? { selectionFooter: request.selectionFooter } : {})
     }));
     return true;
@@ -136,11 +126,11 @@ export class TeamBoxTransferSystem extends BaseSystem {
     this.storeToBox(pending.teamUid);
   }
 
-  /** @private @param {TeamSystem} team @param {BoxSystem} box */
-  _persistAndNotify(team, box) {
+  /** @private @param {TeamSystem} team */
+  _persistAndNotify(team) {
     SaveSystem.getInstance().saveCurrent();
     team.dispatchChanged();
-    box.dispatchChanged();
+    BoxSystem.getInstance().dispatchChanged();
   }
 
   /** @override */

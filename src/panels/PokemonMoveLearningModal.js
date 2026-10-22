@@ -15,6 +15,7 @@ import { TeamChangedEvent } from '../core/events/TeamChangedEvent.js';
 import { BoxChangedEvent } from '../core/events/BoxChangedEvent.js';
 import { BattleStartedEvent } from '../core/events/BattleStartedEvent.js';
 import { BattleEndedEvent } from '../core/events/BattleEndedEvent.js';
+import { PokemonUsageChangedEvent } from '../core/events/PokemonUsageChangedEvent.js';
 import { t } from '../localization/LocalizationManager.js';
 
 export class PokemonMoveLearningModal extends StaticModalPanel {
@@ -28,21 +29,19 @@ export class PokemonMoveLearningModal extends StaticModalPanel {
       name: 'PokemonMoveLearningModal'
     });
     this._uid = null;
-    this._location = 'team';
     this._moveId = null;
     this._feedbackKey = null;
-    for (const eventClass of [TeamChangedEvent, BoxChangedEvent, BattleStartedEvent, BattleEndedEvent]) {
+    for (const eventClass of [TeamChangedEvent, BoxChangedEvent, PokemonUsageChangedEvent, BattleStartedEvent, BattleEndedEvent]) {
       this.listen(eventClass, () => {
         if (this.isOpen()) this._render();
       });
     }
   }
 
-  /** @override @param {{pokemonUid?:string,location?:string,moveId?:string}} [params={}] */
-  onEnter({ pokemonUid, location, moveId } = {}) {
+  /** @override @param {{pokemonUid?:string,moveId?:string}} [params={}] */
+  onEnter({ pokemonUid, moveId } = {}) {
     super.onEnter();
     this._uid = typeof pokemonUid === 'string' ? pokemonUid : null;
-    this._location = location === 'box' ? 'box' : 'team';
     this._moveId = typeof moveId === 'string' ? moveId : null;
     this._feedbackKey = null;
     this._render();
@@ -52,7 +51,6 @@ export class PokemonMoveLearningModal extends StaticModalPanel {
   onExit() {
     super.onExit();
     this._uid = null;
-    this._location = 'team';
     this._moveId = null;
     this._feedbackKey = null;
   }
@@ -61,7 +59,7 @@ export class PokemonMoveLearningModal extends StaticModalPanel {
   _render() {
     this.clearChildren();
     const system = MoveLearningSystem.getInstance();
-    const pokemon = this._uid ? system.getPokemon(this._uid, this._location) : null;
+    const pokemon = this._uid ? system.getPokemon(this._uid) : null;
     const move = this._moveId ? MoveDB.getInstance().getById(this._moveId) : null;
     if (!pokemon || !move || !system.getLearnableMoveIds(pokemon).includes(this._moveId)) {
       this.addChild(new UIText({ className: 'pw-move-learning-feedback is-error', text: t('pokemon_move_learning_unavailable') }));
@@ -75,12 +73,15 @@ export class PokemonMoveLearningModal extends StaticModalPanel {
     }));
     this.addChild(new UIText({ className: 'pw-move-learning-instruction', text: t('pokemon_move_learning_choose_slot') }));
     if (this._feedbackKey) this.addChild(new UIText({ className: 'pw-move-learning-feedback is-error', text: t(this._feedbackKey) }));
-    if (system.isBattleLocked()) {
-      this.addChild(new UIText({ className: 'pw-move-learning-feedback is-locked', text: t('pokemon_move_learning_battle_locked') }));
+    const lockKey = system.isBattleLocked()
+      ? 'pokemon_move_learning_battle_locked'
+      : system.isUsageLocked(pokemon.uid) ? 'pokemon_move_learning_in_use' : null;
+    if (lockKey) {
+      this.addChild(new UIText({ className: 'pw-move-learning-feedback is-locked', text: t(lockKey) }));
     }
 
     const options = new UIContainer({ className: 'pw-move-learning-slots' });
-    const canChange = !system.isBattleLocked();
+    const canChange = !lockKey;
     if (pokemon.moves.length < MoveConfig.ACTIVE_SLOTS) {
       options.addChild(new UIContainer({
         className: 'pw-move-learning-slot',
@@ -136,7 +137,6 @@ export class PokemonMoveLearningModal extends StaticModalPanel {
   _learn(replaceSlot) {
     const result = MoveLearningSystem.getInstance().learnMove(
       this._uid,
-      this._location,
       this._moveId,
       replaceSlot
     );
@@ -150,6 +150,7 @@ export class PokemonMoveLearningModal extends StaticModalPanel {
       [MoveLearningResults.MOVE_UNKNOWN]: 'pokemon_move_learning_unavailable',
       [MoveLearningResults.MOVE_NOT_AVAILABLE]: 'pokemon_move_learning_unavailable',
       [MoveLearningResults.BATTLE_ACTIVE]: 'pokemon_move_learning_battle_locked',
+      [MoveLearningResults.POKEMON_IN_USE]: 'pokemon_move_learning_in_use',
       [MoveLearningResults.REPLACEMENT_REQUIRED]: 'pokemon_move_learning_choose_slot',
       [MoveLearningResults.INVALID_SLOT]: 'pokemon_move_learning_unavailable'
     })[result.result] || 'pokemon_move_learning_unavailable';

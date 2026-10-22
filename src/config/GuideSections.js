@@ -128,7 +128,6 @@ export const GUIDE_SECTION_FOR_WINDOW = Object.freeze({
   [WindowIds.TEAM]: GuideSectionIds.POKEMON,
   [WindowIds.HATCHERY]: GuideSectionIds.HATCHERY,
   [WindowIds.MINE]: GuideSectionIds.MINE,
-  [WindowIds.MAP]: GuideSectionIds.MAP,
   [WindowIds.BATTLE]: GuideSectionIds.COMBAT,
   [WindowIds.BASE]: null,
   [WindowIds.SHORTCUTS]: null,

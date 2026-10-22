@@ -1,6 +1,8 @@
 /**
  * @file BoxPanel.js
- * @brief PC-storage UI. It knows the box and generic selection requests, never the team.
+ * @brief PC-storage UI. It shows the whole owned collection (wherever each Pokémon is used) and
+ * serves generic selection requests, never knowing the team. A selection request may name a
+ * PokemonActionIds value: only Pokémon allowed to perform it (PokemonUsageSystem) are offered.
  */
 import { UIFullscreenPanel } from '../../ui/UIFullscreenPanel.js';
 import { UIContainer } from '../../ui/UIContainer.js';
@@ -12,10 +14,12 @@ import { ModalIds } from '../../config/ModalIds.js';
 import { REGIONS } from '../../config/Regions.js';
 import { SaveSystem } from '../../systems/SaveSystem.js';
 import { BoxSystem } from '../../systems/BoxSystem.js';
+import { PokemonUsageSystem } from '../../systems/PokemonUsageSystem.js';
 import { BoxFilterRules } from '../../systems/box/BoxFilterRules.js';
 import { PokemonRankRules } from '../../systems/box/PokemonRankRules.js';
 import { PokemonDB } from '../../data/pokemon/PokemonDB.js';
 import { BoxChangedEvent } from '../../core/events/BoxChangedEvent.js';
+import { PokemonUsageChangedEvent } from '../../core/events/PokemonUsageChangedEvent.js';
 import { SaveCreatedEvent } from '../../core/events/SaveCreatedEvent.js';
 import { SaveLoadedEvent } from '../../core/events/SaveLoadedEvent.js';
 import { SaveDeletedEvent } from '../../core/events/SaveDeletedEvent.js';
@@ -50,10 +54,11 @@ export class BoxPanel extends UIFullscreenPanel {
   constructor() {
     super({ id: ModalIds.BOX, title: t('box_panel_title'), name: 'BoxPanel' });
     this._selectionRequestId = null;
+    this._selectionAction = null;
     this._selectionFooter = null;
     this._sort = 'id';
     this._sortDirection = DEFAULT_SORT_DIRECTION.id;
-    for (const eventClass of [BoxChangedEvent, SaveCreatedEvent, SaveLoadedEvent, SaveDeletedEvent]) {
+    for (const eventClass of [BoxChangedEvent, PokemonUsageChangedEvent, SaveCreatedEvent, SaveLoadedEvent, SaveDeletedEvent]) {
       this.listen(eventClass, () => {
         if (this.isOpen()) this._render();
       });
@@ -69,6 +74,9 @@ export class BoxPanel extends UIFullscreenPanel {
       EventBus.getInstance().dispatch(new BoxPokemonSelectionCancelledEvent(this._selectionRequestId));
     }
     this._selectionRequestId = nextRequestId;
+    this._selectionAction = nextRequestId && typeof params?.selectionAction === 'string' && params.selectionAction
+      ? params.selectionAction
+      : null;
     const footer = params?.selectionFooter;
     this._selectionFooter = this._selectionRequestId && footer
       && typeof footer.label === 'string'
@@ -88,6 +96,7 @@ export class BoxPanel extends UIFullscreenPanel {
   onClose() {
     const requestId = this._selectionRequestId;
     this._selectionRequestId = null;
+    this._selectionAction = null;
     this._selectionFooter = null;
     this.setTitle(t('box_panel_title'));
     this.setFooter([]);
@@ -119,10 +128,23 @@ export class BoxPanel extends UIFullscreenPanel {
       this.setContent([new UIText({ className: 'pw-empty-state-md', text: t('box_no_save') })]);
       return;
     }
-    const box = BoxSystem.getInstance().getBox();
+    const box = this._entries();
     this.setFilters([this._filterBar(save, box)]);
     this._renderContent(save, box);
     this._restoreFocusKey(focusKey);
+  }
+
+  /**
+   * Collection Pokémon shown by the panel: all of them, or in selection mode only those allowed to
+   * perform the requested action.
+   * @private @returns {ReadonlyArray<Object>}
+   */
+  _entries() {
+    const all = BoxSystem.getInstance().getAll();
+    const action = this._selectionRequestId ? this._selectionAction : null;
+    if (!action) return all;
+    const usage = PokemonUsageSystem.getInstance();
+    return all.filter((pokemon) => usage.canPerform(pokemon.uid, action));
   }
 
   /** @private @returns {string|null} */
@@ -216,7 +238,7 @@ export class BoxPanel extends UIFullscreenPanel {
   _setSearch(value) {
     const save = SaveSystem.getInstance().getCurrentSave();
     if (!save || !save.boxFilters.set('search', value)) return;
-    this._renderContent(save, BoxSystem.getInstance().getBox());
+    this._renderContent(save, this._entries());
   }
 
   /** @private */
@@ -297,7 +319,8 @@ export class BoxPanel extends UIFullscreenPanel {
       ariaLabel: t('box_storage_section')
     });
     if (total === 0) {
-      list.addChild(new UIText({ className: 'pw-empty-state-md', text: t('box_storage_empty') }));
+      const emptyKey = this._selectionRequestId && this._selectionAction ? 'box_selection_empty' : 'box_storage_empty';
+      list.addChild(new UIText({ className: 'pw-empty-state-md', text: t(emptyKey) }));
       return list;
     }
     if (box.length === 0) {
@@ -333,8 +356,7 @@ export class BoxPanel extends UIFullscreenPanel {
           return;
         }
         EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.POKEMON_INFO, {
-          pokemonUid: pokemon.uid,
-          location: 'box'
+          pokemonUid: pokemon.uid
         }));
       }
     });

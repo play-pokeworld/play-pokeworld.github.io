@@ -1,7 +1,7 @@
 # Data model (v1.14)
 
-How the Rework stores, loads, validates and saves its data. The current package release is **1.14.3** and
-`SaveSchema.VERSION` is **15**; those are separate version numbers. League titles are stored as
+How the Rework stores, loads, validates and saves its data. The current package release is **1.14.17** and
+`SaveSchema.VERSION` is **16**; those are separate version numbers. League titles are stored as
 regional entries in `statistics.leaguesWon`, never as Gym badge IDs. Each owned Pokémon also stores
 `unlockedMoves`, `favorite` and `locked`; the latter two are PC collection metadata, not battle rules.
 This document replaces the recommendations of `docs/DATA_REVIEW.md` (v1.3), which are now implemented
@@ -73,17 +73,17 @@ Frozen enums shared by the generators, the validator and the engine:
 
 ---
 
-## 3. Save format (schema 15, package v1.14.2)
+## 3. Save format (schema 16, package v1.14.17)
 
 ```js
 {
-  version: 15, id: 'PW-…', background, createdAt, updatedAt,
+  version: 16, id: 'PW-…', background, createdAt, updatedAt,
   player:       { trainerName, trainerSprite, region, location, playTimeSeconds, badges: [ids] },
   currencies:   { money, dungeonToken, questPoint, diamond, battlePoint, farmPoint, contestToken,
                   revealed: { <currencyId>: boolean } },
   pokedex:      { <species>: { seen, caught, shiny } },
-  team:         [ PokemonData… ],                    (active party)
-  box:          [ PokemonData… ],                    (PC box)
+  collection:   [ PokemonData… ],                    (every owned Pokémon, once; shown by the PC box)
+  team:         [ uid… ],                            (active party, ≤ 6 collection uids, lead first)
   inventory:    { <itemId>: quantity },              (Poké Balls included)
   ballFilters:  [ { id, name, options, ball, enabled } ],
   boxFilters:   { region, type, shiny, evo, favorite, locked, iv, ev, rank, forms, search },
@@ -111,9 +111,45 @@ IDs are stored in `statistics.solvedPuzzles`.
 
 `teamPresets` always contains 20 ordered slots (`preset1`…`preset20`), with a stable `activeId`.
 Each slot stores only Pokémon UIDs (maximum six) and an optional custom name; Pokémon remain owned by
-`team` or `box`, so editing a preset never copies or deletes a Pokémon. `TeamPresetSystem.load()`
-resolves those references, applies the selected roster through `TeamSystem` / `BoxSystem`, moves
-unselected party members into the box, and is disabled during battle.
+the collection, so editing a preset never copies or deletes a Pokémon. `TeamPresetSystem.load()`
+resolves those references, skips Pokémon another mode uses (daycare, training…), applies the party
+through `TeamSystem.setMembers()` (unselected members simply leave the party and stay in the PC
+box), and is disabled during battle.
+
+### Owned Pokémon collection (schema 16)
+
+`collection` is the single owner of per-save Pokémon data (`PokemonCollectionData`, keyed by uid).
+Every other domain references it by uid: the party (`TeamMembersData`), daycare slots
+(`{ kind: 'daycare', pokemonUid, knockouts }`) and team presets. A Pokémon therefore stays the same
+object wherever it is used, and the **PC box shows the whole collection** (party, daycare, training
+included) without duplicates. Loading repairs dangling references: an unknown party uid is dropped, a
+daycare Pokémon cannot also be in the party, and a daycare slot pointing to no owned Pokémon is
+emptied. A newly obtained Pokémon whose generated uid collides with an owned one receives a fresh uid.
+
+Where a Pokémon is used is answered by `PokemonUsageSystem`:
+
+| Usage (`PokemonUsageIds`) | Source |
+|---|---|
+| `team` | persisted: `save.team` uids |
+| `daycare` | persisted: hatchery daycare slots |
+| `training` | session claim by `TrainingSystem` for the trainee (cleared on save change) |
+
+Future modes claim/release their own session usage the same way. `config/PokemonUsageRules.js` maps
+each action (`PokemonActionIds`) to the usages that lock it (`lockedBy`) or that it requires
+(`requires`); `PokemonActionRules.lockFor()` evaluates them:
+
+| Action | Rule |
+|---|---|
+| `learnMove` | locked by daycare, training (and globally during a battle) |
+| `changeHeldItem` | requires team |
+| `useItem` | locked by daycare |
+| `joinTeam` | locked by team, daycare, training |
+| `depositDaycare` / `train` | locked by daycare, training |
+
+Favorite / lock flags are always editable. Generic PC selections carry the requested action
+(`selectionAction`), so the team selector only offers Pokémon allowed to join the team; the
+Pokémon sheet shows the current location and disables locked actions with their reason.
+`SpeciesOwnership` reads the whole collection, so daycare Pokémon now count as owned.
 
 The `hatchery` model persists daycare Pokémon and fossil incubation progress. The `mine` model stores
 the current grid, tool, exposed-loot shapes and energy timestamp. The `secretBase` model stores the
@@ -193,6 +229,10 @@ separate so one-time rewards cannot be duplicated.
     active move slots are not changed.
   - `MigrationV14ToV15`: adds the secret-base save domain to existing Rework saves without unlocking
     it; original exports separately preserve their base and flag state through `MigrationOriginalToV1`.
+  - `MigrationV15ToV16`: merges `team`, `box` and daycare `slot.pokemon` (or legacy `slot.poke`) into
+    one `collection`; `team` becomes a uid list and daycare slots store `pokemonUid`; `box` is removed.
+    A Pokémon without uid or with an already used uid receives a deterministic `p_v16_<n>` uid, so no
+    Pokémon is lost or duplicated.
 - `SaveSystem` is the only writer: **one write per operation** (`saveCurrent()` after a battle,
   a quest claim, a travel…), through `SaveStorage` → `LocalStore`.
 
@@ -290,10 +330,10 @@ Port of the original `economy/pokeballs.js` + `attemptAutoCatch()`.
 | `BallSelector` | First enabled matching filter wins. Ball set but none owned → no throw. "None" on a base filter → next filter; "None" on a custom filter → no throw |
 | `BallRateRules` | `rate + scaling + condition bonus`, Master Ball 100, cap 100 (`BallRules`) |
 | `CatchRules` | Quest multiplier (legendary ×2, gift 100), roll (first catch guaranteed), weighted talent (60/30/12), +1 IV chance (10 %, cap 12) |
-| `SpeciesOwnership` | Owned / shiny-unlocked checks over team + box |
+| `SpeciesOwnership` | Owned / shiny-unlocked checks over the whole collection (team first) |
 | `PokeballSystem` | The only writer of the filters: `setBall`, `toggleEnabled`, `reorder`, `create`, `reset`; custom filters only: `remove`, `rename`, `setToggle`, `setValue`, `addValue`. One save write + `BallFiltersChangedEvent` per command |
-| `CatchSystem` | The whole catch: ball, roll, Pokédex, statistics, shiny unlock, new Pokémon (level `CaptureRules.CAUGHT_LEVEL`, Luxury Ball +`LUXURY_LEVEL_BONUS`) to the team or the box, duplicate (not kept, IV chance on the owned one), dungeon tokens, `PokemonCaughtEvent` |
-| `BoxSystem` | PC box writer (`BoxChangedEvent`) |
+| `CatchSystem` | The whole catch: ball, roll, Pokédex, statistics, shiny unlock, new Pokémon (level `CaptureRules.CAUGHT_LEVEL`, Luxury Ball +`LUXURY_LEVEL_BONUS`) to the team, or only to the PC collection when the team is full, duplicate (not kept, IV chance on the owned one), dungeon tokens, `PokemonCaughtEvent` |
+| `BoxSystem` | Owner of the collection (`addPokemon`, `updatePokemon`, `BoxChangedEvent`) |
 
 The species never changes the rate, and owning the species or being in a quest never changes the
 ball: only the filters decide.
@@ -318,7 +358,8 @@ UI: `PokeballsPanel` (filters, ball, quantity of the chosen ball), `BallFilterEd
 | `PokedexChangedEvent` | `PokedexData` | Pokédex panels, LocationPanel, FeatureAccessSystem |
 | `BallFiltersChangedEvent` | `PokeballSystem` | Poké Ball panel and editor |
 | `TeamPresetsChangedEvent` | `TeamPresetSystem` | preset manager |
-| `BoxChangedEvent` | `BoxSystem` | team preset manager; (future PC box window) |
+| `BoxChangedEvent` | `BoxSystem` | PC box, Pokémon sheet, team preset manager |
+| `PokemonUsageChangedEvent` | `PokemonUsageSystem` / `TeamSystem` / `HatcherySystem` | PC box, Pokémon sheet, move-learning modal |
 | `BattleStartedEvent`, `BattleStateChangedEvent`, `BattleAttackEvent`, `BattleEndedEvent` | `BattleSystem` | battle and team panels |
 | `QuestProgressedEvent`, `QuestCompletedEvent`, `QuestClaimedEvent`, `QuestEncounterRequestedEvent` | `QuestSystem` | StoryPanel, BattleSystem |
 | `DungeonEnteredEvent`, `DungeonRunChangedEvent`, `DungeonBattleResolvedEvent` | `DungeonSystem` / `BattleSystem` | TutorialSystem, expedition panel |

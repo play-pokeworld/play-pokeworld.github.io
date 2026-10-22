@@ -1,6 +1,8 @@
 /**
  * @file HatcherySystem.js
- * @brief Daycare progression, fossil incubation and roster transfers.
+ * @brief Daycare progression, fossil incubation and daycare deposits.
+ * Daycare slots reference collection Pokémon by uid: a housed Pokémon stays in the PC box, the
+ * DAYCARE usage (PokemonUsageSystem) only locks the actions it is not allowed to perform.
  */
 import { BaseSystem } from './BaseSystem.js';
 import { SaveSystem } from './SaveSystem.js';
@@ -15,8 +17,8 @@ import { PokemonDB } from '../data/pokemon/PokemonDB.js';
 import { BattleFoeKnockedOutEvent } from '../core/events/BattleFoeKnockedOutEvent.js';
 import { HatcheryChangedEvent } from '../core/events/HatcheryChangedEvent.js';
 import { HatcheryLevelUpEvent } from '../core/events/HatcheryLevelUpEvent.js';
-import { TeamChangedEvent } from '../core/events/TeamChangedEvent.js';
-import { BoxChangedEvent } from '../core/events/BoxChangedEvent.js';
+import { PokemonUsageSystem } from './PokemonUsageSystem.js';
+import { PokemonActionIds } from '../config/PokemonUsageRules.js';
 import { LocationSystem } from './LocationSystem.js';
 import { FeatureAccessSystem } from './FeatureAccessSystem.js';
 import { HatcheryRules } from '../config/HatcheryRules.js';
@@ -73,11 +75,15 @@ export class HatcherySystem extends BaseSystem {
     super.onDestroy();
   }
 
-  /** @returns {{maxSlots:number,slots:Array<Object|null>}} */
+  /**
+   * Read-only view of the slots; daycare slots also expose their resolved collection Pokémon.
+   * @returns {{maxSlots:number,slots:Array<Object|null>}}
+   */
   getSnapshot() {
-    const hatchery = SaveSystem.getInstance().getCurrentSave()?.hatchery;
+    const save = SaveSystem.getInstance().getCurrentSave();
+    const hatchery = save?.hatchery;
     return hatchery
-      ? { maxSlots: hatchery.maxSlots, slots: hatchery.slots.map((slot) => slot ? { ...slot } : null) }
+      ? { maxSlots: hatchery.maxSlots, slots: hatchery.slots.map((slot) => this._snapshotSlot(save, slot)) }
       : { maxSlots: 0, slots: [] };
   }
 
@@ -111,16 +117,20 @@ export class HatcherySystem extends BaseSystem {
   }
 
   /**
+   * Owned Pokémon that may be deposited (party first; the last party member is never offered).
+   * `source` is 'team' for a party member, 'box' otherwise.
    * @returns {Array<{uid:string,label:string,source:string,pokemon:Object}>}
    */
   getCandidates() {
     const save = SaveSystem.getInstance().getCurrentSave();
     if (!save) return [];
-    const housed = new Set(save.hatchery.slots.filter((slot) => slot?.kind === 'daycare').map((slot) => slot.pokemon.uid));
+    const usage = PokemonUsageSystem.getInstance();
+    const team = save.team;
+    const others = save.collection.getAll().filter((pokemon) => !save.teamMembers.includes(pokemon.uid));
     return [
-      ...(save.team.length > 1 ? save.team.map((pokemon) => ({ pokemon, source: 'team' })) : []),
-      ...save.box.map((pokemon) => ({ pokemon, source: 'box' }))
-    ].filter(({ pokemon }) => !housed.has(pokemon.uid))
+      ...(team.length > 1 ? team.map((pokemon) => ({ pokemon, source: 'team' })) : []),
+      ...others.map((pokemon) => ({ pokemon, source: 'box' }))
+    ].filter(({ pokemon }) => usage.canPerform(pokemon.uid, PokemonActionIds.DEPOSIT_DAYCARE))
       .map(({ pokemon, source }) => ({ uid: pokemon.uid, label: pokemon.getDisplayName(), source, pokemon }));
   }
 
@@ -144,19 +154,19 @@ export class HatcherySystem extends BaseSystem {
     if (!this.canUseHere()) return this._failure(HatcheryResults.WRONG_LOCATION);
     const slotIndex = save.hatchery.findEmptySlot();
     if (slotIndex < 0) return this._failure(HatcheryResults.NO_SLOT);
-    const teamMember = save.team.find((pokemon) => pokemon.uid === uid);
-    const boxMember = teamMember ? null : save.box.find((pokemon) => pokemon.uid === uid);
-    const pokemon = teamMember || boxMember;
+    const pokemon = save.collection.get(uid);
     if (!pokemon) return this._failure(HatcheryResults.NOT_FOUND);
-    if (teamMember && save.team.length <= 1) return this._failure(HatcheryResults.LAST_TEAM_MEMBER);
-    const removed = teamMember
-      ? TeamSystem.getInstance().removePokemon(uid, { persist: false, notify: false })
-      : BoxSystem.getInstance().removePokemon(uid, { persist: false, notify: false });
-    if (!removed) return this._failure(HatcheryResults.NOT_FOUND);
-    save.hatchery.setSlot(slotIndex, { kind: 'daycare', pokemon: removed, knockouts: 0 });
-    if (teamMember) TeamSystem.getInstance().dispatchChanged();
-    else BoxSystem.getInstance().dispatchChanged();
-    this._dispatchChanged();
+    const teamSystem = TeamSystem.getInstance();
+    const teamMember = teamSystem.isMember(uid);
+    if (teamMember && save.teamMembers.size <= 1) return this._failure(HatcheryResults.LAST_TEAM_MEMBER);
+    if (!PokemonUsageSystem.getInstance().canPerform(uid, PokemonActionIds.DEPOSIT_DAYCARE)) {
+      return this._failure(HatcheryResults.NOT_FOUND);
+    }
+    if (teamMember && !teamSystem.removePokemon(uid, { persist: false, notify: false })) {
+      return this._failure(HatcheryResults.NOT_FOUND);
+    }
+    save.hatchery.setSlot(slotIndex, { kind: 'daycare', pokemonUid: uid, knockouts: 0 });
+    this._dispatchRosterChanged(teamMember);
     SaveSystem.getInstance().saveCurrent();
     this._notify('hatchery_deposited', { name: pokemon.getDisplayName() });
     return { result: HatcheryResults.READY, pokemon };
@@ -177,23 +187,17 @@ export class HatcherySystem extends BaseSystem {
       ? this.collectFossil(slotIndex)
       : this._failure(HatcheryResults.NOT_READY);
     if (slot.kind !== 'daycare') return this._failure(HatcheryResults.NOT_DAYCARE);
+    const pokemon = save.collection.get(slot.pokemonUid);
+    if (!pokemon) return this._failure(HatcheryResults.NOT_FOUND);
     save.hatchery.setSlot(slotIndex, null);
-    const stored = TeamSystem.getInstance().hasFreeSlot() ? 'team' : 'box';
-    const added = stored === 'team'
-      ? TeamSystem.getInstance().addPokemon(slot.pokemon, { notify: false })
-      : BoxSystem.getInstance().addPokemon(slot.pokemon, { notify: false });
-    if (!added) {
-      save.hatchery.setSlot(slotIndex, slot);
-      return this._failure(HatcheryResults.NOT_FOUND);
-    }
-    if (stored === 'team') TeamSystem.getInstance().dispatchChanged();
-    else BoxSystem.getInstance().dispatchChanged();
-    this._dispatchChanged();
+    const teamSystem = TeamSystem.getInstance();
+    const stored = teamSystem.addMember(pokemon.uid, { persist: false, notify: false }) ? 'team' : 'box';
+    this._dispatchRosterChanged(stored === 'team');
     SaveSystem.getInstance().saveCurrent();
     this._notify(stored === 'team' ? 'hatchery_withdrawn_team' : 'hatchery_withdrawn_box', {
-      name: slot.pokemon.getDisplayName()
+      name: pokemon.getDisplayName()
     });
-    return { result: HatcheryResults.READY, pokemon: slot.pokemon, stored };
+    return { result: HatcheryResults.READY, pokemon, stored };
   }
 
   /**
@@ -257,16 +261,17 @@ export class HatcherySystem extends BaseSystem {
     const levelled = [];
     for (const slot of save.hatchery.slots) {
       if (slot?.kind === 'daycare') {
-        if (slot.pokemon.level >= PokemonRules.MAX_LEVEL) continue;
+        const pokemon = save.collection.get(slot.pokemonUid);
+        if (!pokemon || pokemon.level >= PokemonRules.MAX_LEVEL) continue;
         slot.knockouts++;
         changed = true;
-        while (slot.knockouts >= HatcheryRules.DAYCARE_KOS_PER_LEVEL && slot.pokemon.level < PokemonRules.MAX_LEVEL) {
+        while (slot.knockouts >= HatcheryRules.DAYCARE_KOS_PER_LEVEL && pokemon.level < PokemonRules.MAX_LEVEL) {
           slot.knockouts -= HatcheryRules.DAYCARE_KOS_PER_LEVEL;
-          slot.pokemon.setLevel(slot.pokemon.level + 1);
+          pokemon.setLevel(pokemon.level + 1);
           levelsGained++;
-          levelled.push(slot.pokemon);
+          if (!levelled.includes(pokemon)) levelled.push(pokemon);
         }
-        if (slot.pokemon.level >= PokemonRules.MAX_LEVEL) slot.knockouts = 0;
+        if (pokemon.level >= PokemonRules.MAX_LEVEL) slot.knockouts = 0;
       } else if (slot?.kind === 'fossil' && !slot.ready) {
         slot.knockouts = Math.min(slot.required, slot.knockouts + 1);
         slot.ready = slot.knockouts >= slot.required;
@@ -283,8 +288,28 @@ export class HatcherySystem extends BaseSystem {
         name: pokemon.getDisplayName(), level: pokemon.level
       });
     }
+    if (levelled.length > 0) BoxSystem.getInstance().dispatchChanged();
     this._dispatchChanged();
     if (event.deferSave !== true) SaveSystem.getInstance().saveCurrent();
+  }
+
+  /** @private @param {import('../data/save/SaveData.js').SaveData} save @param {Object|null} slot @returns {Object|null} */
+  _snapshotSlot(save, slot) {
+    if (!slot) return null;
+    return slot.kind === 'daycare'
+      ? { ...slot, pokemon: save.collection.get(slot.pokemonUid) }
+      : { ...slot };
+  }
+
+  /**
+   * Notifies the collection, the party (when it changed) and the daycare after a deposit/withdrawal.
+   * @private @param {boolean} teamChanged
+   */
+  _dispatchRosterChanged(teamChanged) {
+    if (teamChanged) TeamSystem.getInstance().dispatchChanged();
+    else PokemonUsageSystem.getInstance().dispatchChanged();
+    BoxSystem.getInstance().dispatchChanged();
+    this._dispatchChanged();
   }
 
   /** @private @param {string} speciesId */

@@ -14,6 +14,7 @@ import { BagPanel } from '../src/panels/fullscreen/BagPanel.js';
 import { BagCategoryIds } from '../src/config/BagCategories.js';
 import { DashboardColumns } from '../src/config/DashboardLayout.js';
 import { t } from '../src/localization/LocalizationManager.js';
+import { setRoster } from './RosterFixtures.js';
 
 const saves = SaveSystem.getInstance();
 const source = (relativePath) => fs.readFileSync(path.resolve(relativePath), 'utf8');
@@ -48,7 +49,7 @@ describe('Team held-item selection through the Bag', (test) => {
     const first = PokemonFactory.create('charmander', 12);
     const second = PokemonFactory.create('bulbasaur', 12);
     second.heldItem = 'charcoal';
-    save.team = [first, second];
+    setRoster(save, [first, second]);
     save.inventory.add('charcoal', 1, { deferSave: true });
     save.inventory.add('leftovers', 1, { deferSave: true });
     saves.setCurrentSave(save);
@@ -120,7 +121,7 @@ describe('Team held-item selection through the Bag', (test) => {
     assert.equal(battle.isActive(), false, 'the isolated test starts outside a battle');
     const save = SaveData.createNew('Bag battle lock test', 'charmander');
     save.player.location = 'route1';
-    save.team = [PokemonFactory.create('charmander', 12)];
+    setRoster(save, [PokemonFactory.create('charmander', 12)]);
     save.inventory.add('leftovers', 1, { deferSave: true });
     saves.setCurrentSave(save);
     saves.saveCurrent = () => {};

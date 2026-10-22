@@ -359,7 +359,7 @@ export class FeatureAccessSystem extends BaseSystem {
     const starters = STARTERS_BY_REGION[region] || [];
     if (!starters.length) return false;
     const speciesIds = new Set(starters.map((starter) => starter.species));
-    return [...save.team, ...save.box].some((pokemon) => speciesIds.has(pokemon.species)) ||
+    return save.collection.getAll().some((pokemon) => speciesIds.has(pokemon.species)) ||
       starters.some((starter) => save.pokedex.isCaught(starter.species));
   }
 

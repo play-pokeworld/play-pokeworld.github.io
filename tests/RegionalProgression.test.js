@@ -25,6 +25,7 @@ import { DashboardColumns } from '../src/config/DashboardLayout.js';
 import { fakeEvent } from './FakeDom.js';
 import { TrainerSystem } from '../src/systems/TrainerSystem.js';
 import { ChallengeStates } from '../src/systems/trainers/ChallengeStates.js';
+import { storedOnly } from './RosterFixtures.js';
 
 describe('Regional progression', (test) => {
   test('Johto map gates follow main while National Park keeps its dedicated encounter content', () => {
@@ -278,7 +279,7 @@ describe('Regional progression', (test) => {
         assert.equal(result.success, true);
         assert.equal(result.storedIn, 'box');
         assert.equal(save.team.length, 6);
-        assert.equal(save.box.some((pokemon) => pokemon.species === 'mudkip' && pokemon.level === 5), true);
+        assert.equal(storedOnly(save).some((pokemon) => pokemon.species === 'mudkip' && pokemon.level === 5), true);
         assert.equal(save.access.hasRegionStarter('hoenn'), true);
         assert.equal(writes, 1);
         const location = LocationSystem.getInstance();

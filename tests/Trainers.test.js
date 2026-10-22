@@ -24,6 +24,7 @@ import { TrainerSystem } from '../src/systems/TrainerSystem.js';
 import { LocationSystem } from '../src/systems/LocationSystem.js';
 import { TrainerDefeatedEvent } from '../src/core/events/TrainerDefeatedEvent.js';
 import { BadgesChangedEvent } from '../src/core/events/BadgesChangedEvent.js';
+import { setRoster } from './RosterFixtures.js';
 
 /** Runs the current battle to its end. */
 function runBattle(battle) {
@@ -34,7 +35,7 @@ function runBattle(battle) {
 function strongSave(starter = 'charmander') {
   const save = SaveSystem.getInstance().createNewSave('Arbitre', starter);
   save.team[0].setLevel(100);
-  for (let i = 0; i < 5; i++) save.team.push(PokemonFactory.create('mewtwo', 100));
+  setRoster(save, [save.team[0], ...Array.from({ length: 5 }, () => PokemonFactory.create('mewtwo', 100))]);
   return save;
 }
 

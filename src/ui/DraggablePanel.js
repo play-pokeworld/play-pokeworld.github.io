@@ -29,6 +29,8 @@ export class DraggablePanel extends UIPanel {
    * @param {string} [options.bodyClassName='']
    * @param {string} [options.className='']
    * @param {string} [options.name='DraggablePanel']
+   * @param {{modalId: string, labelKey: string}} [options.help] - Replaces the contextual Guide target
+   *   of the single header help button by a window-specific help modal (e.g. the map legend)
    */
   constructor(options = {}) {
     super({
@@ -43,24 +45,45 @@ export class DraggablePanel extends UIPanel {
     });
     this._headerDom.setAttribute('data-drag-window', options.id);
 
+    /** @private @type {{modalId: string, labelKey: string}|null} */
+    this._help = options.help?.modalId ? { modalId: options.help.modalId, labelKey: options.help.labelKey || '' } : null;
+    /** @private @type {string} */
+    this._helpPanelTitle = options.title || '';
     const section = GUIDE_SECTION_FOR_WINDOW[options.id] ?? null;
-    const helpButton = new UIButton({
+    /** @private @type {UIButton} */
+    this._helpButton = new UIButton({
       variant: 'ghost',
       size: 'sm',
       className: 'pw-win-tool-btn pw-win-help-btn',
       icon: 'help',
-      onClick: () => EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.GUIDE, { section }))
+      onClick: () => EventBus.getInstance().dispatch(this._help
+        ? new ModalOpenRequestedEvent(this._help.modalId)
+        : new ModalOpenRequestedEvent(ModalIds.GUIDE, { section }))
     });
-    helpButton.setData('stopDrag', 'true');
-    helpButton.setAriaLabel(t('guide_open_from_panel', { panel: options.title || t('guide_title') }));
-    helpButton.setTooltip(t('guide_open_help'));
-    this.addHeaderAction(helpButton);
+    this._helpButton.setData('stopDrag', 'true');
+    this._syncHelpButtonLabel();
+    this.addHeaderAction(this._helpButton);
 
     if (!COLUMN_IDS.includes(options.column)) {
       console.warn(t('debug_panel_column_invalid', { id: options.id, column: String(options.column) }));
     }
     /** @private @type {string} */
     this._defaultColumn = COLUMN_IDS.includes(options.column) ? options.column : DashboardColumns.LEFT;
+  }
+
+  /**
+   * Refreshes the localized label of the header help button (call after a language change).
+   * @protected
+   */
+  _syncHelpButtonLabel() {
+    if (this._help) {
+      const label = t(this._help.labelKey);
+      this._helpButton.setAriaLabel(label);
+      this._helpButton.setTooltip(label);
+      return;
+    }
+    this._helpButton.setAriaLabel(t('guide_open_from_panel', { panel: this._helpPanelTitle || t('guide_title') }));
+    this._helpButton.setTooltip(t('guide_open_help'));
   }
 
   /** @returns {string} Column chosen at creation (DashboardColumns value) */

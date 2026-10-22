@@ -54,6 +54,7 @@ import { TeamChangedEvent } from '../src/core/events/TeamChangedEvent.js';
 import { TrainerDefeatedEvent } from '../src/core/events/TrainerDefeatedEvent.js';
 import { fakeEvent } from './FakeDom.js';
 import { PokemonInfoModal } from '../src/panels/PokemonInfoModal.js';
+import { setRoster, addOwned, storedOnly } from './RosterFixtures.js';
 
 const { LEFT, CENTER, RIGHT } = DashboardColumns;
 const DEFAULTS = Object.freeze({ [LEFT]: ['a', 'b'], [CENTER]: ['c'], [RIGHT]: ['d'] });
@@ -490,6 +491,12 @@ describe('Modals and team', (test) => {
     };
 
     try {
+      assert.ok(panel.getDomElement().querySelector('.pw-dungeon-map')?.querySelector('.pw-dgn-grid'), 'the grid sits in the framed reference board');
+      const player = getCell('c1r0')?.querySelector('.pw-dgn-player');
+      assert.ok(player?.getAttribute('src')?.endsWith('trainers/trainer-54.png'), 'the current tile shows the reference trainer sprite');
+      const glyph = getCell('c2r0')?.querySelector('.pw-dgn-ic');
+      assert.ok(glyph && /dungeon\/pokeball\.svg/.test(glyph.style.getPropertyValue('--pw-mask-icon')), 'a fight tile shows the Poké Ball sprite');
+      assert.equal(getCell('c0r0')?.querySelector('.pw-dgn-ic') ?? null, null, 'explored empty ground has no sprite');
       const resume = panel.getDomElement().querySelector('.pw-dungeon-actions')?.querySelector('button');
       assert.ok(resume, 'a saved pending encounter exposes its resume action');
       resume.click();
@@ -510,6 +517,9 @@ describe('Modals and team', (test) => {
       assert.ok(dungeons.moveTo('c2r0'), 'the player can continue to the next encounter');
       assert.ok(battle.isActive(), 'the next dungeon battle starts normally');
       assert.equal(dungeons.getRun().pendingNode, 'c2r0');
+      assert.ok(getCell('c2r0')?.querySelector('.pw-dgn-player'), 'the trainer sprite follows the player');
+      assert.equal(getCell('c1r0')?.querySelector('.pw-dgn-player') ?? null, null);
+      assert.equal(getCell('c1r0')?.querySelector('.pw-dgn-ic') ?? null, null, 'a won fight becomes plain ground');
     } finally {
       if (dungeons.isActive()) dungeons.abandon();
       if (battle.isActive()) battle.endBattle(false);
@@ -541,8 +551,11 @@ describe('Modals and team', (test) => {
     const onInfoRequest = (event) => infoRequests.push(event);
     EventBus.getInstance().subscribe(ModalOpenRequestedEvent, onInfoRequest);
     try {
-      const entry = [...panel.getDomElement().querySelectorAll('.pw-box-grid-entry')]
-        .find((row) => row.dataset.pokemonUid === stored.uid);
+      const entries = [...panel.getDomElement().querySelectorAll('.pw-box-grid-entry')];
+      assert.ok(entries.some((row) => row.dataset.pokemonUid === save.team[0].uid), 'the PC also shows the team Pokémon');
+      assert.equal(entries.length, 2, 'every owned Pokémon is shown once');
+      assert.equal(entries[0].querySelector('.pw-box-location'), null, 'PC tiles carry no location tag');
+      const entry = entries.find((row) => row.dataset.pokemonUid === stored.uid);
       const tile = entry.querySelector('.pw-box-pokemon-tile');
       const dexWidget = tile.querySelector('.pw-pokemon-grid-sprite');
       assert.ok(tile.classList.contains('dex-entry'), 'PC uses the Pokédex circular tile');
@@ -553,8 +566,8 @@ describe('Modals and team', (test) => {
       tile.click();
       assert.equal(infoRequests[0]?.modalId, ModalIds.POKEMON_INFO, 'the tile still opens the Pokémon information sheet');
       assert.equal(infoRequests[0]?.params.pokemonUid, stored.uid);
-      assert.equal(infoRequests[0]?.params.location, 'box');
-      assert.equal(save.box.length, 1, 'opening details does not move the Pokémon');
+      assert.equal('location' in infoRequests[0].params, false, 'the sheet resolves where the Pokémon is by itself');
+      assert.equal(storedOnly(save).length, 1, 'opening details does not move the Pokémon');
       assert.equal(save.team.length, 1, 'the team is not read or changed by the PC panel');
       assert.equal(writes, 0, 'opening details does not persist a save');
     } finally {
@@ -594,12 +607,15 @@ describe('Modals and team', (test) => {
       assert.ok(tile.querySelector('.pw-pokemon-grid-sprite'), 'selector tiles contain the shared Pokémon grid sprite');
       assert.ok(entry.querySelector('.box-level') && entry.querySelector('.box-name'));
       assert.ok(!panel.getDomElement().querySelector('.pw-box-roster--team'), 'the selection view contains no team data');
+      assert.equal([...panel.getDomElement().querySelectorAll('.pw-box-grid-entry')]
+        .some((row) => row.dataset.pokemonUid === team.getTeam()[0].uid), false, 'Pokémon already used by the team are not offered');
       tile.click();
       const added = team.getTeam().find((pokemon) => pokemon.uid === incoming.uid);
       assert.ok(added, 'the coordinator withdraws the selected Pokémon');
       assert.equal(added.favorite, true);
       assert.equal(added.locked, true);
-      assert.equal(box.getBox().some((pokemon) => pokemon.uid === incoming.uid), false);
+      assert.ok(box.getAll().some((pokemon) => pokemon.uid === incoming.uid), 'the Pokémon stays visible in the PC');
+      assert.equal(box.getAll().length, 2, 'joining the team never duplicates a Pokémon');
       assert.equal(writes, 1, 'team and PC are persisted once by the coordinator');
       assert.equal(panel.isOpen(), false, 'the generic selector closes after a choice');
     } finally {
@@ -615,7 +631,7 @@ describe('Modals and team', (test) => {
     const previous = saves.getCurrentSave();
     const save = SaveData.createNew('Store from team', 'charmander');
     const stored = new PokemonData({ species: 'pidgey', level: 8 });
-    save.team.push(stored);
+    setRoster(save, [save.team[0], stored]);
     saves.setCurrentSave(save);
     const panel = new ActiveTeamPanel(LEFT);
     const originalSaveCurrent = saves.saveCurrent;
@@ -629,7 +645,7 @@ describe('Modals and team', (test) => {
       storeButton.click();
       assert.equal(document.activeElement, panel._cards.get(save.team[0].uid).getDragHandle().getDomElement(), 'focus moves to the nearest surviving team card');
       assert.equal(save.team.some((pokemon) => pokemon.uid === stored.uid), false);
-      assert.ok(save.box.some((pokemon) => pokemon.uid === stored.uid));
+      assert.ok(storedOnly(save).some((pokemon) => pokemon.uid === stored.uid));
       assert.equal(writes, 1, 'store operation is persisted once');
       const lastMemberStore = panel._cards.get(save.team[0].uid).getDomElement().querySelector('.pw-team-store-btn');
       assert.equal(lastMemberStore.getAttribute('disabled'), 'disabled', 'the last active Pokémon cannot be stored away');
@@ -644,9 +660,8 @@ describe('Modals and team', (test) => {
     const saves = SaveSystem.getInstance();
     const previous = saves.getCurrentSave();
     const save = SaveData.createNew('Full team slot', 'charmander');
-    for (const species of ['pidgey', 'rattata', 'bulbasaur', 'squirtle', 'pikachu']) {
-      save.team.push(new PokemonData({ species, level: 8 }));
-    }
+    setRoster(save, [save.team[0], ...['pidgey', 'rattata', 'bulbasaur', 'squirtle', 'pikachu']
+      .map((species) => new PokemonData({ species, level: 8 }))]);
     saves.setCurrentSave(save);
     const panel = new ActiveTeamPanel(LEFT);
     try {
@@ -763,7 +778,7 @@ describe('Modals and team', (test) => {
     const save = SaveData.createNew('Team PC replacement', 'charmander');
     const outgoing = save.team[0];
     const incoming = new PokemonData({ species: 'pidgey', level: 14, favorite: true, locked: true });
-    save.box.push(incoming);
+    addOwned(save, incoming);
     saves.setCurrentSave(save);
     const panel = new ActiveTeamPanel(LEFT);
     const boxPanel = new BoxPanel();
@@ -799,7 +814,7 @@ describe('Modals and team', (test) => {
       incomingTile.click();
       assert.equal(save.team[0].uid, incoming.uid, 'the coordinator replaces the selected slot');
       assert.ok(save.team[0].favorite && save.team[0].locked, 'collection flags travel with the Pokémon');
-      assert.ok(save.box.some((pokemon) => pokemon.uid === outgoing.uid), 'the replaced Pokémon returns to the PC');
+      assert.ok(storedOnly(save).some((pokemon) => pokemon.uid === outgoing.uid), 'the replaced Pokémon returns to the PC');
       assert.equal(writes, 1, 'the team/PC exchange persists atomically once');
       assert.ok(!boxPanel.isOpen(), 'the generic selection closes after success');
       assert.equal(boxPanel.getDomElement().querySelector('.pw-box-selection-footer'), null, 'the selection footer is removed when selection ends');
@@ -819,8 +834,7 @@ describe('Modals and team', (test) => {
     const outgoing = save.team[0];
     const reserve = new PokemonData({ species: 'pidgey', level: 8 });
     const incoming = new PokemonData({ species: 'rattata', level: 9 });
-    save.team.push(reserve);
-    save.box.push(incoming);
+    setRoster(save, [outgoing, reserve], [incoming]);
     saves.setCurrentSave(save);
     const teamPanel = new ActiveTeamPanel(LEFT);
     const boxPanel = new BoxPanel();
@@ -834,7 +848,7 @@ describe('Modals and team', (test) => {
       footer.querySelector('.pw-box-selection-cancel').click();
       assert.ok(!boxPanel.isOpen(), 'cancel closes the PC choice');
       assert.ok(save.team.some((pokemon) => pokemon.uid === outgoing.uid), 'cancel keeps the active Pokémon');
-      assert.ok(save.box.some((pokemon) => pokemon.uid === incoming.uid), 'cancel leaves the PC unchanged');
+      assert.ok(storedOnly(save).some((pokemon) => pokemon.uid === incoming.uid), 'cancel leaves the PC unchanged');
       assert.equal(writes, 0, 'cancel does not save a roster mutation');
 
       teamPanel._cards.get(outgoing.uid).getDomElement().click();
@@ -844,8 +858,8 @@ describe('Modals and team', (test) => {
       remove.click();
       assert.ok(!boxPanel.isOpen(), 'remove closes the PC choice');
       assert.ok(!save.team.some((pokemon) => pokemon.uid === outgoing.uid), 'the selected team Pokémon leaves the active team');
-      assert.ok(save.box.some((pokemon) => pokemon.uid === outgoing.uid), 'the selected Pokémon is transferred to the PC');
-      assert.ok(save.box.some((pokemon) => pokemon.uid === incoming.uid), 'the untouched PC choice remains stored');
+      assert.ok(storedOnly(save).some((pokemon) => pokemon.uid === outgoing.uid), 'the selected Pokémon is transferred to the PC');
+      assert.ok(storedOnly(save).some((pokemon) => pokemon.uid === incoming.uid), 'the untouched PC choice remains stored');
       assert.equal(save.team.length, 1, 'the remaining team member is preserved');
       assert.equal(writes, 1, 'removal is one atomic save operation');
     } finally {
@@ -865,7 +879,7 @@ describe('Modals and team', (test) => {
     const pokemon = save.team[0];
     const modal = new PokemonInfoModal();
     try {
-      modal.open({ pokemonUid: pokemon.uid, location: 'team' });
+      modal.open({ pokemonUid: pokemon.uid });
       const dom = modal.getDomElement();
       assert.equal(dom.querySelectorAll('[role="tab"]').length, 3, 'three accessible data tabs are rendered');
       assert.ok(dom.querySelector('#pokemon-info-stat-panel-stats'), 'the Stats panel starts selected');
@@ -893,7 +907,7 @@ describe('Modals and team', (test) => {
 
   test('TeamSystem.setLead swaps the lead, saves and emits', () => {
     const save = SaveSystem.getInstance().createNewSave('Brock', 'charmander');
-    save.team.push(new PokemonData({ species: 'onix', level: 12 }));
+    setRoster(save, [save.team[0], new PokemonData({ species: 'onix', level: 12 })]);
     const events = [];
     const unsubscribe = EventBus.getInstance().subscribe(TeamChangedEvent, (event) => events.push(event));
     const teams = TeamSystem.getInstance();

@@ -34,6 +34,7 @@ import { PokemonCaughtEvent } from '../src/core/events/PokemonCaughtEvent.js';
 import { PokedexChangedEvent } from '../src/core/events/PokedexChangedEvent.js';
 import { InventoryChangedEvent } from '../src/core/events/InventoryChangedEvent.js';
 import { CaptureAttemptResolvedEvent } from '../src/core/events/CaptureAttemptResolvedEvent.js';
+import { storedOnly } from './RosterFixtures.js';
 
 /** Encounter of a fresh wild Pokémon. */
 function encounterOf(species, { level = 5, shiny = false, owned = false, shinyOwned = false, locationKind = LocationKinds.ROUTE, ...rest } = {}) {
@@ -242,7 +243,7 @@ describe('Save migration v3 → v4', (test) => {
     const migrated = SaveMigrator.migrate(raw);
     assert.equal(migrated.version, SaveSchema.VERSION);
     assert.ok(!('pokeballs' in migrated));
-    assert.deepEqual(migrated.box, []);
+    assert.deepEqual(migrated.collection, []);
     const save = SaveData.fromJson(migrated);
     assert.equal(save.inventory.count('pokeball'), 5);
     assert.equal(save.inventory.count('greatball'), 4);
@@ -376,7 +377,7 @@ describe('Catch flow', (test) => {
     assert.equal(save.team.length, 6);
     const boxed = attempt(save, PokemonFactory.create('ekans', 3));
     assert.ok(boxed.keys.includes('battle_log.catch_box'));
-    assert.equal(save.box.length, 1);
+    assert.equal(storedOnly(save).length, 1);
   });
 
   test('a Luxury Ball catch starts at level 5', () => {

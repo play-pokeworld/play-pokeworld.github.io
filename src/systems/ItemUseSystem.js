@@ -4,8 +4,9 @@
  */
 import { BaseSystem } from './BaseSystem.js';
 import { SaveSystem } from './SaveSystem.js';
-import { TeamSystem } from './TeamSystem.js';
 import { BoxSystem } from './BoxSystem.js';
+import { PokemonUsageSystem } from './PokemonUsageSystem.js';
+import { PokemonActionIds } from '../config/PokemonUsageRules.js';
 import { BattleSystem } from './BattleSystem.js';
 import { FeatureAccessSystem } from './FeatureAccessSystem.js';
 import { MoveLearningSystem } from './MoveLearningSystem.js';
@@ -56,7 +57,9 @@ export class ItemUseSystem extends BaseSystem {
   }
 
   /**
-   * A read-only list for the target modal. Names remain ids/nicknames; UI owns localization.
+   * A read-only list for the target modal (party first, then the rest of the collection; Pokémon
+   * whose current usage forbids item use are skipped). `location` is 'team' for a party member,
+   * 'box' otherwise. Names remain ids/nicknames; UI owns localization.
    * @param {string} itemId
    * @returns {ReadonlyArray<Object>}
    */
@@ -64,12 +67,13 @@ export class ItemUseSystem extends BaseSystem {
     const save = SaveSystem.getInstance().getCurrentSave();
     const action = this.getUseAction(itemId);
     if (!save || !action || !save.inventory.has(itemId) || BattleSystem.getInstance().isActive()) return [];
+    const others = save.collection.getAll().filter((pokemon) => !save.teamMembers.includes(pokemon.uid));
     const targets = [
       ...save.team.map((pokemon) => ({ pokemon, location: 'team' })),
-      ...save.box.map((pokemon) => ({ pokemon, location: 'box' }))
+      ...others.map((pokemon) => ({ pokemon, location: 'box' }))
     ];
     return Object.freeze(targets
-      .filter(({ pokemon }) => this._isEligible(action, itemId, pokemon))
+      .filter(({ pokemon }) => this._canTarget(action, itemId, pokemon))
       .map(({ pokemon, location }) => Object.freeze({
         uid: pokemon.uid,
         location,
@@ -82,22 +86,21 @@ export class ItemUseSystem extends BaseSystem {
   }
 
   /**
-   * Uses one supported item on an eligible team/box Pokémon. Invalid attempts never consume it.
+   * Uses one supported item on an eligible owned Pokémon. Invalid attempts never consume it.
    * @param {string} itemId
    * @param {string} uid
-   * @param {'team'|'box'} location
    * @returns {{result:string,action:string|null,pokemonUid:string|null,moveId?:string,targetSpecies?:string,stat?:string,level?:number}}
    */
-  useOnPokemon(itemId, uid, location) {
+  useOnPokemon(itemId, uid) {
     const save = SaveSystem.getInstance().getCurrentSave();
     if (!save) return { result: ItemUseResults.NO_SAVE, action: null, pokemonUid: null };
     if (!save.inventory.has(itemId)) return { result: ItemUseResults.NOT_OWNED, action: null, pokemonUid: uid || null };
     const action = this.getUseAction(itemId);
     if (!action) return { result: ItemUseResults.UNSUPPORTED, action: null, pokemonUid: uid || null };
     if (BattleSystem.getInstance().isActive()) return { result: ItemUseResults.BATTLE_ACTIVE, action, pokemonUid: uid || null };
-    const roster = this._rosterSystem(location);
-    const pokemon = roster?.getPokemonByUid(uid);
-    if (!pokemon || !this._isEligible(action, itemId, pokemon)) {
+    const box = BoxSystem.getInstance();
+    const pokemon = box.getPokemonByUid(uid);
+    if (!pokemon || !this._canTarget(action, itemId, pokemon)) {
       return { result: ItemUseResults.TARGET_INELIGIBLE, action, pokemonUid: uid || null };
     }
 
@@ -111,7 +114,7 @@ export class ItemUseSystem extends BaseSystem {
       Object.assign(effect, this._apply(action, itemId, target));
       return Object.keys(effect).length > 0;
     };
-    if (!roster.updatePokemon(uid, update, { persist: false, notify: false })) {
+    if (!box.updatePokemon(uid, update, { persist: false, notify: false })) {
       save.inventory.add(itemId, 1, { deferSave: true });
       return { result: ItemUseResults.TARGET_INELIGIBLE, action, pokemonUid: uid };
     }
@@ -120,16 +123,15 @@ export class ItemUseSystem extends BaseSystem {
       save.pokedex.markCaught(effect.targetSpecies, pokemon.shiny, { deferSave: true });
     }
     SaveSystem.getInstance().saveCurrent();
-    roster.dispatchChanged();
+    box.dispatchPokemonChanged(uid);
     this._notifyUse(itemId, action, targetName, effect);
     return { result: ItemUseResults.SUCCESS, action, pokemonUid: uid, ...effect };
   }
 
-  /** @private @param {string} location @returns {TeamSystem|BoxSystem|null} */
-  _rosterSystem(location) {
-    if (location === 'team') return TeamSystem.getInstance();
-    if (location === 'box') return BoxSystem.getInstance();
-    return null;
+  /** @private @param {string} action @param {string} itemId @param {Object} pokemon @returns {boolean} */
+  _canTarget(action, itemId, pokemon) {
+    return this._isEligible(action, itemId, pokemon)
+      && PokemonUsageSystem.getInstance().canPerform(pokemon.uid, PokemonActionIds.USE_ITEM);
   }
 
   /** @private @param {string} itemId @returns {boolean} */

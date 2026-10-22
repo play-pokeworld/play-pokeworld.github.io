@@ -58,7 +58,7 @@ export class BrowserDiagnostics {
         region: save.player.region || '',
         location: save.player.location || '',
         teamSize: save.team.length,
-        boxSize: save.box.length
+        boxSize: save.collection.size
       } : null,
       errors: DiagnosticsSystem.getInstance().getErrors()
     };

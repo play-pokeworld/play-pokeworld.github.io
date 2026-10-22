@@ -23,8 +23,10 @@
  *  13 — v1.11: per-Pokémon TM/HM move unlocks.
  *  14 — v1.12: persisted PC filters and per-Pokémon favorite/collection-lock flags.
  *  15 — development: persistent secret-base layout, stock, NPCs, visit record and flag progress.
+ *  16 — v1.14.17: one owned-Pokémon `collection`; `team` and daycare slots store uids; `box` removed
+ *       (the PC box is the view of the whole collection).
  */
 
 export const SaveSchema = Object.freeze({
-  VERSION: 15
+  VERSION: 16
 });

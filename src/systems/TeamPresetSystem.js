@@ -1,12 +1,14 @@
 /**
  * @file TeamPresetSystem.js
- * @brief Save, edit and load ordered team presets. The system is DOM-free; roster changes go
- * through TeamSystem and BoxSystem, while presets store only Pokémon uids.
+ * @brief Save, edit and load ordered team presets. The system is DOM-free; party changes go
+ * through TeamSystem, while presets store only uids of collection (PC box) Pokémon.
  */
 import { BaseSystem } from './BaseSystem.js';
 import { SaveSystem } from './SaveSystem.js';
 import { TeamSystem } from './TeamSystem.js';
 import { BoxSystem } from './BoxSystem.js';
+import { PokemonUsageSystem } from './PokemonUsageSystem.js';
+import { PokemonActionIds } from '../config/PokemonUsageRules.js';
 import { BattleSystem } from './BattleSystem.js';
 import { EventBus } from '../core/EventBus.js';
 import { TeamPresetsChangedEvent } from '../core/events/TeamPresetsChangedEvent.js';
@@ -47,16 +49,19 @@ export class TeamPresetSystem extends BaseSystem {
   }
 
   /**
-   * Resolves one saved uid against the active party and PC box.
+   * Resolves one saved uid against the collection. `source` is 'team' for a party member and
+   * 'box' otherwise; Pokémon another mode uses (daycare, training…) are not resolvable for a party.
    * @param {string} uid
    * @returns {{pokemon: import('../data/pokemon/PokemonData.js').PokemonData, source: 'team'|'box'}|null}
    */
   resolvePokemon(uid) {
     if (!uid) return null;
-    const teamPokemon = TeamSystem.getInstance().getTeam().find((pokemon) => pokemon.uid === uid);
-    if (teamPokemon) return { pokemon: teamPokemon, source: 'team' };
-    const boxPokemon = BoxSystem.getInstance().getBox().find((pokemon) => pokemon.uid === uid);
-    return boxPokemon ? { pokemon: boxPokemon, source: 'box' } : null;
+    const pokemon = BoxSystem.getInstance().getPokemonByUid(uid);
+    if (!pokemon) return null;
+    if (TeamSystem.getInstance().isMember(uid)) return { pokemon, source: 'team' };
+    return PokemonUsageSystem.getInstance().canPerform(uid, PokemonActionIds.JOIN_TEAM)
+      ? { pokemon, source: 'box' }
+      : null;
   }
 
   /**
@@ -73,11 +78,18 @@ export class TeamPresetSystem extends BaseSystem {
     });
   }
 
-  /** @returns {Array<{pokemon: import('../data/pokemon/PokemonData.js').PokemonData, source: 'team'|'box'}>} */
+  /**
+   * Pokémon a preset can use: the party first, then the collection Pokémon free to join it.
+   * @returns {Array<{pokemon: import('../data/pokemon/PokemonData.js').PokemonData, source: 'team'|'box'}>}
+   */
   getRosterMembers() {
+    const team = TeamSystem.getInstance().getTeam();
+    const usage = PokemonUsageSystem.getInstance();
+    const available = BoxSystem.getInstance().getAll()
+      .filter((pokemon) => usage.canPerform(pokemon.uid, PokemonActionIds.JOIN_TEAM));
     return [
-      ...TeamSystem.getInstance().getTeam().map((pokemon) => ({ pokemon, source: 'team' })),
-      ...BoxSystem.getInstance().getBox().map((pokemon) => ({ pokemon, source: 'box' }))
+      ...team.map((pokemon) => ({ pokemon, source: 'team' })),
+      ...available.map((pokemon) => ({ pokemon, source: 'box' }))
     ].filter(({ pokemon }) => pokemon && typeof pokemon.uid === 'string' && pokemon.uid);
   }
 
@@ -113,8 +125,8 @@ export class TeamPresetSystem extends BaseSystem {
   }
 
   /**
-   * Applies a preset to the active party, moving unselected party members into the PC box.
-   * Loading is blocked during a battle; unresolved uids are skipped without losing Pokémon.
+   * Applies a preset to the active party; unselected party members simply leave it (they stay in
+   * the PC box). Loading is blocked during a battle; unresolved or busy uids are skipped.
    * @param {string} id
    * @returns {{ok: boolean, reason?: string, count?: number, missingCount?: number}}
    */
@@ -126,7 +138,7 @@ export class TeamPresetSystem extends BaseSystem {
     if (BattleSystem.getInstance().isActive()) return { ok: false, reason: 'battle' };
     if (preset.members.length === 0) return { ok: false, reason: 'empty' };
 
-    const nextTeam = [];
+    const nextUids = [];
     const selectedUids = new Set();
     let missingCount = 0;
     for (const uid of preset.members) {
@@ -137,28 +149,20 @@ export class TeamPresetSystem extends BaseSystem {
       }
       if (selectedUids.has(uid)) continue;
       selectedUids.add(uid);
-      nextTeam.push(resolved.pokemon);
+      nextUids.push(uid);
     }
-    if (nextTeam.length === 0) return { ok: false, reason: 'not-found' };
-
-    const currentTeam = TeamSystem.getInstance().getTeam();
-    const currentBox = BoxSystem.getInstance().getBox();
-    const nextBox = currentBox.filter((pokemon) => !selectedUids.has(pokemon.uid));
-    for (const pokemon of currentTeam) {
-      if (!selectedUids.has(pokemon.uid)) nextBox.push(pokemon);
-    }
+    if (nextUids.length === 0) return { ok: false, reason: 'not-found' };
 
     const teamSystem = TeamSystem.getInstance();
-    const boxSystem = BoxSystem.getInstance();
-    if (!teamSystem.replaceRoster(nextTeam, nextBox, { persist: false, notify: false })) {
+    if (!teamSystem.setMembers(nextUids, { persist: false, notify: false })) {
       return { ok: false, reason: 'roster' };
     }
     save.teamPresets.setActiveId(id);
     saveSystem.saveCurrent();
     teamSystem.dispatchChanged();
-    boxSystem.dispatchChanged();
+    BoxSystem.getInstance().dispatchChanged();
     this._emitChanged(id);
-    return { ok: true, count: nextTeam.length, missingCount };
+    return { ok: true, count: nextUids.length, missingCount };
   }
 
   /** @private @param {string} id */

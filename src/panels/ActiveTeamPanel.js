@@ -109,10 +109,7 @@ export class ActiveTeamPanel extends DraggablePanel {
   /** @private Opens the selected Pokémon's information sheet by stable uid. */
   _openPokemonInfo(pokemonUid) {
     if (typeof pokemonUid !== 'string' || !pokemonUid) return;
-    EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.POKEMON_INFO, {
-      pokemonUid,
-      location: 'team'
-    }));
+    EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.POKEMON_INFO, { pokemonUid }));
   }
 
   /** @private @param {number} teamIndex */

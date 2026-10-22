@@ -327,9 +327,9 @@ describe('UI widgets', (test) => {
   test('Guide opens from a dashboard help button and renders the translated type chart', () => {
     const guide = new GuidePanel();
     const mapPanel = new DraggablePanel({
-      id: WindowIds.MAP,
+      id: WindowIds.LOCATION,
       column: DashboardColumns.CENTER,
-      title: 'Map'
+      title: 'Location'
     });
     const helpButton = mapPanel.getDomElement().querySelectorAll('button')
       .find((button) => button.classList.contains('pw-win-help-btn'));

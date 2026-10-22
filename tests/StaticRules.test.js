@@ -25,7 +25,7 @@ describe('Static rules', (test) => {
     assert.equal(GameConfig.VERSION, packageJson.version);
     assert.equal(packageLock.version, packageJson.version);
     assert.equal(packageLock.packages[''].version, packageJson.version);
-    assert.equal(SaveSchema.VERSION, 15);
+    assert.equal(SaveSchema.VERSION, 16);
   });
 
   test('every relative import resolves to an existing export', () => {
@@ -196,7 +196,12 @@ describe('Static rules', (test) => {
     const css = fs.readFileSync(path.resolve('assets/css/dungeons.css'), 'utf8');
     const panel = fs.readFileSync(path.resolve('src/panels/components/DungeonExpeditionPanel.js'), 'utf8');
     assert.ok(/\.pw-dungeon-expedition \.pw-dgn-grid\s*\{/.test(css), 'styles target the actual Rework panel host');
-    assert.ok(/\.pw-dungeon-expedition \.pw-dgn-grid--11\s*\{[^}]*repeat\(11, minmax\(32px, 44px\)\)/.test(css), 'the widest saved map has a bounded, scrollable layout');
+    assert.ok(/\.pw-dungeon-expedition \.pw-dgn-grid--11\s*\{[^}]*repeat\(11, 44px\)/.test(css), 'the widest saved map keeps one fixed reference column per map column');
+    assert.ok(/\.pw-dungeon-expedition \.pw-dgn-tile\s*\{[^}]*width:\s*44px;[^}]*height:\s*44px;/.test(css), 'tiles use the reference 44 px size');
+    assert.ok(/\.pw-dungeon-expedition \.pw-dungeon-map\s*\{[^}]*overflow-x:\s*auto/.test(css), 'the framed board scrolls rather than clips on narrow screens');
+    assert.ok(/\.pw-dgn-tile \.pw-dgn-ic\s*\{[^}]*width:\s*74%;[^}]*mask-image:\s*var\(--pw-mask-icon\)/.test(css), 'tile glyphs are CSS-tinted reference sprites at 74 %');
+    assert.ok(/\.pw-dgn-tile \.pw-dgn-player\s*\{[^}]*width:\s*82%/.test(css), 'the player sprite keeps the reference 82 % size');
+    assert.ok(panel.includes('AssetPaths.dungeonTile(') && panel.includes('DungeonTileVisuals') && !/mapPin|TILE_ICONS/.test(panel), 'tiles draw the reference dungeon sprites instead of generic icons');
     assert.ok(/\.pw-dungeon-expedition \.pw-dgn-tile\.is-fog::before\s*\{[^}]*content:\s*'\?'/.test(css), 'unexplored tiles show the reference question mark');
     for (const state of ['t-empty', 't-combat', 't-elite', 't-chest', 't-boss', 't-ladder']) {
       assert.ok(css.includes(`.pw-dungeon-expedition .pw-dgn-tile.${state}`), `${state} has an explicit map treatment`);

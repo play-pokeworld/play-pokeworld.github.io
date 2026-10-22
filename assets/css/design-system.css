@@ -3581,6 +3581,9 @@ button.tab {
 .poke-detail-held-text { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
 .poke-detail-held-text span, .poke-detail-subtle { color: var(--light1); font-size:12px; line-height:1.35; }
 .poke-detail-mini-btn { padding:4px 8px; font-size:11px; }
+.poke-detail-location { display:flex; align-items:center; gap:6px; margin:4px 0 8px; font-size:12px; color: var(--light2); }
+.poke-detail-location-label { color: var(--light1); }
+.poke-detail-lock-reason { margin:6px 0 0; color: var(--light1); font-size:11px; font-style:italic; line-height:1.35; }
 .poke-detail-ability-chip { display:inline-flex; gap:8px; align-items:center; border:1px solid var(--light2); border-radius:999px; padding:5px 10px; background:rgba(236,222,183,.08); }
 .poke-detail-ability-chip small { color: var(--light1); }
 .poke-detail-moves-block { margin-top:10px; padding:10px; }
@@ -8907,7 +8910,6 @@ button[data-action].pw-loc-gym-btn:hover,
 .pw-map-help-copy { display: grid; gap: 2px; min-width: 0; }
 .pw-map-help-label { color: var(--pw-text-primary); font-size: 13px; font-weight: 900; }
 .pw-map-help-description { color: var(--light1); font-size: 12px; line-height: 1.4; }
-.pw-map-help-button { font-size: 14px !important; font-weight: 900 !important; }
 
 
 #map-region-select {

@@ -32,6 +32,7 @@ import { QuestCompletedEvent } from '../src/core/events/QuestCompletedEvent.js';
 import { QuestClaimedEvent } from '../src/core/events/QuestClaimedEvent.js';
 import { InventoryChangedEvent } from '../src/core/events/InventoryChangedEvent.js';
 import { PokedexChangedEvent } from '../src/core/events/PokedexChangedEvent.js';
+import { storedOnly, rawTeam, rawStored, rawDaycare } from './RosterFixtures.js';
 
 /** Subscribes to an event class and returns the list of received events. */
 function capture(EventClass) {
@@ -132,8 +133,8 @@ describe('Save migrations', (test) => {
     assert.ok(save.team[0].shiny && save.team[0].talent, 'shiny kept, talent filled');
     assert.equal(save.team[0].favorite, true);
     assert.equal(save.team[0].locked, true);
-    assert.equal(save.box[0].favorite, true);
-    assert.equal(save.box[0].locked, false);
+    assert.equal(storedOnly(save)[0].favorite, true);
+    assert.equal(storedOnly(save)[0].locked, false);
     assert.equal(save.boxFilters.get('favorite'), 'favorite');
     assert.equal(save.boxFilters.get('rank'), 'S');
     assert.ok(save.team[0].hp > 0 && save.team[0].hp <= save.team[0].getMaxHp());
@@ -447,11 +448,11 @@ describe('Save migrations', (test) => {
     const original = JSON.stringify(raw);
     const migrated = SaveMigrator.migrate(raw);
     assert.equal(migrated.version, SaveSchema.VERSION);
-    assert.deepEqual(migrated.team[0].moves, ['thundershock']);
-    assert.deepEqual(migrated.team[0].unlockedMoves, ['thunderbolt', 'missing_move']);
-    assert.deepEqual(migrated.box[0].moves, ['tackle']);
-    assert.deepEqual(migrated.box[0].unlockedMoves, ['surf']);
-    assert.ok(!('trainingUnlockedMoves' in migrated.team[0]));
+    assert.deepEqual(rawTeam(migrated)[0].moves, ['thundershock']);
+    assert.deepEqual(rawTeam(migrated)[0].unlockedMoves, ['thunderbolt', 'missing_move']);
+    assert.deepEqual(rawStored(migrated)[0].moves, ['tackle']);
+    assert.deepEqual(rawStored(migrated)[0].unlockedMoves, ['surf']);
+    assert.ok(!('trainingUnlockedMoves' in rawTeam(migrated)[0]));
     assert.equal(JSON.stringify(raw), original, 'migration does not mutate input');
   });
 
@@ -466,19 +467,19 @@ describe('Save migrations', (test) => {
     const original = JSON.stringify(raw);
     const migrated = SaveMigrator.migrate(raw);
     assert.equal(migrated.version, SaveSchema.VERSION);
-    assert.equal(migrated.team[0].favorite, true);
-    assert.equal(migrated.team[0].locked, true);
-    assert.equal(migrated.box[0].favorite, true, 'legacy fav alias is retained as favorite');
-    assert.equal(migrated.box[0].locked, true);
-    assert.equal(migrated.hatchery.slots[0].pokemon.favorite, true);
-    assert.equal(migrated.hatchery.slots[0].pokemon.locked, true);
+    assert.equal(rawTeam(migrated)[0].favorite, true);
+    assert.equal(rawTeam(migrated)[0].locked, true);
+    assert.equal(rawStored(migrated)[0].favorite, true, 'legacy fav alias is retained as favorite');
+    assert.equal(rawStored(migrated)[0].locked, true);
+    assert.equal(rawDaycare(migrated, 0).favorite, true);
+    assert.equal(rawDaycare(migrated, 0).locked, true);
     assert.equal(JSON.stringify(raw), original, 'migration does not mutate input');
 
     const restored = SaveData.fromJson(migrated);
     assert.equal(restored.team[0].favorite, true);
     assert.equal(restored.team[0].locked, true);
-    assert.equal(restored.box[0].favorite, true);
-    assert.equal(restored.box[0].locked, true);
+    assert.equal(storedOnly(restored)[0].favorite, true);
+    assert.equal(storedOnly(restored)[0].locked, true);
     assert.equal(restored.boxFilters.get('favorite'), 'favorite');
     assert.equal(restored.boxFilters.get('locked'), 'unlocked');
     assert.equal(restored.boxFilters.get('rank'), 'S');
@@ -569,7 +570,7 @@ describe('Save migrations', (test) => {
       currencies: { money: 50 },
       team: [{ species: 'bulbasaur', level: 10, exp: 50, maxExp: 100, hp: 15, maxHp: 30, types: ['grass'] }]
     });
-    const pokemon = data.team[0];
+    const pokemon = rawTeam(data)[0];
     assert.ok(!('maxHp' in pokemon) && !('maxExp' in pokemon) && !('types' in pokemon));
     const span = ExperienceCurve.levelStart(11) - ExperienceCurve.levelStart(10);
     assert.equal(pokemon.exp, ExperienceCurve.levelStart(10) + Math.floor(span / 2));

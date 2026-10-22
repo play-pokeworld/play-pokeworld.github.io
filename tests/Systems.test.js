@@ -41,6 +41,7 @@ import { BoxChangedEvent } from '../src/core/events/BoxChangedEvent.js';
 import { CurrencyChangedEvent } from '../src/core/events/CurrencyChangedEvent.js';
 import { ThemeChangedEvent } from '../src/core/events/ThemeChangedEvent.js';
 import { NotificationDispatchedEvent } from '../src/core/events/NotificationDispatchedEvent.js';
+import { storedOnly } from './RosterFixtures.js';
 
 /** Subscribes to an event class and returns the list of received events. */
 function capture(EventClass) {
@@ -224,7 +225,8 @@ describe('Gameplay systems', (test) => {
     const result = presets.load('preset1');
     assert.deepEqual({ ok: result.ok, count: result.count, missingCount: result.missingCount }, { ok: true, count: 2, missingCount: 0 });
     assert.deepEqual(teamSystem.getTeam().map((pokemon) => pokemon.uid), [boxed.uid, active.uid]);
-    assert.deepEqual(boxSystem.getBox().map((pokemon) => pokemon.uid), [reserve.uid]);
+    assert.deepEqual(storedOnly(save).map((pokemon) => pokemon.uid), [reserve.uid]);
+    assert.equal(boxSystem.getAll().length, 3, 'the PC box still shows every owned Pokémon');
     assert.equal(save.teamPresets.activeId, 'preset1');
     assert.equal(teamEvents.length, 1);
     assert.equal(boxEvents.length, 1);

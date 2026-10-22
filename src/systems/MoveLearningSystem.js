@@ -4,8 +4,9 @@
  */
 import { BaseSystem } from './BaseSystem.js';
 import { SaveSystem } from './SaveSystem.js';
-import { TeamSystem } from './TeamSystem.js';
 import { BoxSystem } from './BoxSystem.js';
+import { PokemonUsageSystem } from './PokemonUsageSystem.js';
+import { PokemonActionIds } from '../config/PokemonUsageRules.js';
 import { BattleSystem } from './BattleSystem.js';
 import { NotificationSystem } from './NotificationSystem.js';
 import { ItemDB } from '../data/items/ItemDB.js';
@@ -61,11 +62,14 @@ export class MoveLearningSystem extends BaseSystem {
     return !pool.slice(0, naturalCount).includes(moveId);
   }
 
-  /** @param {string} uid @param {'team'|'box'} location @returns {Object|null} */
-  getPokemon(uid, location) {
-    if (location === 'team') return TeamSystem.getInstance().getPokemonByUid(uid);
-    if (location === 'box') return BoxSystem.getInstance().getPokemonByUid(uid);
-    return null;
+  /** @param {string} uid @returns {Object|null} Owned Pokémon, wherever it is used */
+  getPokemon(uid) {
+    return BoxSystem.getInstance().getPokemonByUid(uid);
+  }
+
+  /** @param {string} uid @returns {boolean} A mode using this Pokémon forbids move changes */
+  isUsageLocked(uid) {
+    return !PokemonUsageSystem.getInstance().canPerform(uid, PokemonActionIds.LEARN_MOVE);
   }
 
   /** @returns {boolean} Move editing is not allowed while a battle is in progress. */
@@ -76,16 +80,16 @@ export class MoveLearningSystem extends BaseSystem {
   /**
    * Equips a currently learnable move, optionally replacing an existing active slot.
    * @param {string} uid
-   * @param {'team'|'box'} location
    * @param {string} moveId
    * @param {number|null} [replaceSlot=null]
    * @returns {{result:string, pokemonUid:string|null}}
    */
-  learnMove(uid, location, moveId, replaceSlot = null) {
+  learnMove(uid, moveId, replaceSlot = null) {
     if (!SaveSystem.getInstance().getCurrentSave()) return { result: MoveLearningResults.NO_SAVE, pokemonUid: null };
     if (this.isBattleLocked()) return { result: MoveLearningResults.BATTLE_ACTIVE, pokemonUid: uid || null };
-    const pokemon = this.getPokemon(uid, location);
+    const pokemon = this.getPokemon(uid);
     if (!pokemon) return { result: MoveLearningResults.TARGET_MISSING, pokemonUid: null };
+    if (this.isUsageLocked(uid)) return { result: MoveLearningResults.POKEMON_IN_USE, pokemonUid: uid };
     if (!MoveDB.getInstance().has(moveId)) return { result: MoveLearningResults.MOVE_UNKNOWN, pokemonUid: uid };
     if (!this.getLearnableMoveIds(pokemon).includes(moveId)) {
       return { result: MoveLearningResults.MOVE_NOT_AVAILABLE, pokemonUid: uid };
@@ -108,16 +112,12 @@ export class MoveLearningSystem extends BaseSystem {
       }
       return true;
     };
-    const changed = location === 'team'
-      ? TeamSystem.getInstance().updatePokemon(uid, update, { persist: false, notify: false })
-      : location === 'box'
-        ? BoxSystem.getInstance().updatePokemon(uid, update, { persist: false, notify: false })
-        : false;
-    if (!changed) return { result: MoveLearningResults.TARGET_MISSING, pokemonUid: null };
+    if (!BoxSystem.getInstance().updatePokemon(uid, update, { persist: false, notify: false })) {
+      return { result: MoveLearningResults.TARGET_MISSING, pokemonUid: null };
+    }
 
     SaveSystem.getInstance().saveCurrent();
-    if (location === 'team') TeamSystem.getInstance().dispatchChanged();
-    else BoxSystem.getInstance().dispatchChanged();
+    BoxSystem.getInstance().dispatchPokemonChanged(uid);
     const name = pokemon.getDisplayName();
     NotificationSystem.getInstance().notifyTemporary(t('pokemon_info_move_learned', {
       name,

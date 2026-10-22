@@ -4,8 +4,9 @@
  *
  * Serialized shape (config/SaveSchema.js, current version):
  *   { version, id, background, createdAt, updatedAt,
- *     player: PlayerData, currencies: CurrenciesData, pokedex: PokedexData, team: PokemonData[],
- *     box: PokemonData[] (PC box: catches made with a full team), boxFilters: BoxFiltersData,
+ *     player: PlayerData, currencies: CurrenciesData, pokedex: PokedexData,
+ *     collection: PokemonCollectionData (every owned Pokémon, the PC box view),
+ *     team: TeamMembersData (ordered uids of the active party), boxFilters: BoxFiltersData,
  *     inventory: InventoryData (Poké Balls included), ballFilters: BallFiltersData, teamPresets: TeamPresetsData,
  *     quests: QuestProgressData, statistics: StatisticsData, tutorial: TutorialProgressData,
  *     dungeons: DungeonData, hatchery: HatcheryData, mine: MineData,
@@ -13,6 +14,7 @@
  *
  * deserialize() first runs SaveMigrator (original game exports, schema v1 through current), then every
  * domain model reads the current shape only. Uses the original save id format (PW-TIMESTAMP-RANDOM).
+ * `save.team` is a derived, read-only view of the party Pokémon; party changes go through TeamSystem.
  */
 import { BaseModel } from '../core/BaseModel.js';
 import { PlayerData } from './PlayerData.js';
@@ -32,7 +34,8 @@ import { SecretBaseData } from './SecretBaseData.js';
 import { ContentAccessData } from './ContentAccessData.js';
 import { SaveThemes } from './SaveThemes.js';
 import { SaveMigrator } from './migrations/SaveMigrator.js';
-import { PokemonData } from '../pokemon/PokemonData.js';
+import { PokemonCollectionData } from './PokemonCollectionData.js';
+import { TeamMembersData } from './TeamMembersData.js';
 import { PokemonFactory } from '../pokemon/PokemonFactory.js';
 import { STARTERS_BY_REGION, DEFAULT_STARTER_REGION, findStarter } from '../pokemon/StarterData.js';
 import { PlayerDefaults } from '../../config/PlayerDefaults.js';
@@ -66,10 +69,10 @@ export class SaveData extends BaseModel {
     this.currencies = new CurrenciesData();
     /** @type {PokedexData} */
     this.pokedex = new PokedexData();
-    /** @type {PokemonData[]} */
-    this.team = [];
-    /** @type {PokemonData[]} */
-    this.box = [];
+    /** @type {PokemonCollectionData} Every owned Pokémon (single owner of Pokémon data) */
+    this.collection = new PokemonCollectionData();
+    /** @type {TeamMembersData} Ordered uids of the active party */
+    this.teamMembers = new TeamMembersData();
     /** @type {BoxFiltersData} */
     this.boxFilters = new BoxFiltersData();
     /** @type {InventoryData} */
@@ -97,6 +100,15 @@ export class SaveData extends BaseModel {
   }
 
   /**
+   * Party Pokémon resolved from the collection, lead first. Read-only: party changes go through
+   * TeamSystem (the frozen array rejects accidental pushes).
+   * @returns {ReadonlyArray<import('../pokemon/PokemonData.js').PokemonData>}
+   */
+  get team() {
+    return Object.freeze(this.teamMembers.getUids().map((uid) => this.collection.get(uid)).filter(Boolean));
+  }
+
+  /**
    * Creates a fresh save with the chosen starter.
    * @param {string} trainerName
    * @param {string} starterSpecies - PokemonDB id listed in StarterData
@@ -108,7 +120,9 @@ export class SaveData extends BaseModel {
     save.background = SaveThemes.normalize(background);
     save.player.trainerName = trainerName || PlayerDefaults.TRAINER_NAME;
     const starter = findStarter(starterSpecies) || STARTERS_BY_REGION[DEFAULT_STARTER_REGION][0];
-    save.team = [PokemonFactory.create(starter.species, PlayerDefaults.STARTER_LEVEL)];
+    const starterPokemon = PokemonFactory.create(starter.species, PlayerDefaults.STARTER_LEVEL);
+    save.collection.add(starterPokemon);
+    save.teamMembers.setUids([starterPokemon.uid]);
     const starterRegion = Object.keys(STARTERS_BY_REGION).find((region) =>
       STARTERS_BY_REGION[region].some((entry) => entry.species === starter.species)
     );
@@ -142,8 +156,8 @@ export class SaveData extends BaseModel {
       player: this.player.serialize(),
       currencies: this.currencies.serialize(),
       pokedex: this.pokedex.serialize(),
-      team: this.team.map((pokemon) => pokemon.serialize()),
-      box: this.box.map((pokemon) => pokemon.serialize()),
+      collection: this.collection.serialize(),
+      team: this.teamMembers.serialize(),
       boxFilters: this.boxFilters.serialize(),
       inventory: this.inventory.serialize(),
       ballFilters: this.ballFilters.serialize(),
@@ -173,8 +187,8 @@ export class SaveData extends BaseModel {
     this.player = new PlayerData(data.player);
     this.currencies = new CurrenciesData(data.currencies);
     this.pokedex = new PokedexData(data.pokedex);
-    this.team = (Array.isArray(data.team) ? data.team : []).map((raw) => new PokemonData(raw));
-    this.box = (Array.isArray(data.box) ? data.box : []).map((raw) => new PokemonData(raw));
+    this.collection = new PokemonCollectionData(data.collection);
+    this.teamMembers = new TeamMembersData(data.team);
     this.boxFilters = new BoxFiltersData(data.boxFilters);
     this.inventory = new InventoryData(data.inventory);
     this.ballFilters = new BallFiltersData(data.ballFilters);
@@ -187,5 +201,19 @@ export class SaveData extends BaseModel {
     this.mine = new MineData(data.mine);
     this.secretBase = new SecretBaseData(data.secretBase);
     this.access = new ContentAccessData(data.access);
+    this._repairPokemonReferences();
+  }
+
+  /**
+   * Keeps uid references consistent with the collection: unknown uids are dropped and a Pokémon
+   * housed in the daycare cannot also be a party member.
+   * @private
+   */
+  _repairPokemonReferences() {
+    this.hatchery.slots.forEach((slot, index) => {
+      if (slot?.kind === 'daycare' && !this.collection.has(slot.pokemonUid)) this.hatchery.setSlot(index, null);
+    });
+    const housed = new Set(this.hatchery.getDaycareUids());
+    this.teamMembers.setUids(this.teamMembers.getUids().filter((uid) => this.collection.has(uid) && !housed.has(uid)));
   }
 }

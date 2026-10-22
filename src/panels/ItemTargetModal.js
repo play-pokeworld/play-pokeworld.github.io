@@ -138,13 +138,12 @@ export class ItemTargetModal extends StaticModalPanel {
 
   /** @private @param {Object} target */
   _useOn(target) {
-    const result = ItemUseSystem.getInstance().useOnPokemon(this._itemId, target.uid, target.location);
+    const result = ItemUseSystem.getInstance().useOnPokemon(this._itemId, target.uid);
     if (result.result === ItemUseResults.SUCCESS) {
       this.close();
       if (result.action === ItemUseActions.UNLOCK_MOVE) {
         EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.POKEMON_INFO, {
-          pokemonUid: target.uid,
-          location: target.location
+          pokemonUid: target.uid
         }));
       }
       return;

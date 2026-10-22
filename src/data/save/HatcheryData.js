@@ -1,9 +1,13 @@
 /**
  * @file HatcheryData.js
  * @brief Persistent daycare and fossil-incubation slots.
+ *
+ * Serialized shape (save schema 16):
+ *   { maxSlots, slots: [ null | { kind: 'daycare', pokemonUid, knockouts }
+ *                             | { kind: 'fossil', itemId, speciesId, knockouts, required, ready } ] }
+ * A daycare slot only references a Pokémon of PokemonCollectionData by uid.
  */
 import { BaseModel } from '../core/BaseModel.js';
-import { PokemonData } from '../pokemon/PokemonData.js';
 import { HatcheryRules } from '../../config/HatcheryRules.js';
 
 /** @param {*} value @param {number} fallback @returns {number} */
@@ -15,13 +19,13 @@ function boundedInteger(value, fallback, minimum, maximum) {
 /** @param {*} raw @returns {Object|null} */
 function readSlot(raw) {
   if (!raw || typeof raw !== 'object') return null;
-  const kind = raw.kind || (raw.isFossil ? 'fossil' : raw.pokemon || raw.poke ? 'daycare' : '');
+  const kind = raw.kind || (raw.isFossil ? 'fossil' : raw.pokemonUid ? 'daycare' : '');
   if (kind === 'daycare') {
-    const pokemon = raw.pokemon || raw.poke;
-    if (!pokemon || typeof pokemon !== 'object') return null;
+    const pokemonUid = typeof raw.pokemonUid === 'string' ? raw.pokemonUid.trim() : '';
+    if (!pokemonUid) return null;
     return {
       kind,
-      pokemon: pokemon instanceof PokemonData ? pokemon : new PokemonData(pokemon),
+      pokemonUid,
       knockouts: Math.max(0, Math.floor(Number(raw.knockouts ?? raw.steps) || 0))
     };
   }
@@ -49,6 +53,16 @@ export class HatcheryData extends BaseModel {
     return this.slots.findIndex((slot) => slot === null);
   }
 
+  /** @returns {string[]} Uids of the Pokémon currently housed in the daycare */
+  getDaycareUids() {
+    return this.slots.filter((slot) => slot?.kind === 'daycare').map((slot) => slot.pokemonUid);
+  }
+
+  /** @param {string} uid @returns {number} Index of the daycare slot housing this Pokémon, or -1 */
+  findDaycareSlot(uid) {
+    return this.slots.findIndex((slot) => slot?.kind === 'daycare' && slot.pokemonUid === uid);
+  }
+
   /**
    * @param {number} index
    * @param {Object|null} slot
@@ -66,9 +80,7 @@ export class HatcheryData extends BaseModel {
       maxSlots: this.maxSlots,
       slots: this.slots.map((slot) => {
         if (!slot) return null;
-        return slot.kind === 'daycare'
-          ? { kind: slot.kind, pokemon: slot.pokemon.serialize(), knockouts: slot.knockouts }
-          : { ...slot };
+        return { ...slot };
       })
     };
   }

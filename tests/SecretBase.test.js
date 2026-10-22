@@ -249,7 +249,7 @@ describe('Secret Base', (test) => {
     assert.ok(baseSystem.startOwnVisit().ok);
 
     const currenciesBefore = save.currencies.serialize();
-    const boxBefore = save.box.length;
+    const boxBefore = save.collection.size;
     const resolved = [];
     const knockouts = [];
     const defeats = [];
@@ -292,7 +292,7 @@ describe('Secret Base', (test) => {
     assert.deepEqual(knockouts, [], 'a Base KO must not progress ordinary kill objectives');
     assert.deepEqual(defeats, [], 'a Base duel is not a wild or ordinary trainer defeat');
     assert.equal(save.currencies.serialize().money, currenciesBefore.money, 'no trainer/wild money reward');
-    assert.equal(save.box.length, boxBefore, 'no automatic capture');
+    assert.equal(save.collection.size, boxBefore, 'no automatic capture');
     baseSystem.stopVisit();
   });
 });

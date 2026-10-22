@@ -21,9 +21,6 @@ import { QuestProgressedEvent } from '../core/events/QuestProgressedEvent.js';
 import { QuestClaimedEvent } from '../core/events/QuestClaimedEvent.js';
 import { RoamingRotationTickEvent } from '../core/events/RoamingRotationTickEvent.js';
 import { LanguageChangedEvent } from '../core/events/LanguageChangedEvent.js';
-import { UIButton } from '../ui/UIButton.js';
-import { EventBus } from '../core/EventBus.js';
-import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
 import { ModalIds } from '../config/ModalIds.js';
 import { REGIONS, MAP_CANVAS } from '../config/Regions.js';
 import { WindowIds } from '../config/DashboardLayout.js';
@@ -45,7 +42,9 @@ export class MapPanel extends DraggablePanel {
       icon: 'map',
       bodyId: 'map-panel',
       bodyClassName: 'pw-static-030 pw-map-body',
-      name: 'MapPanel'
+      name: 'MapPanel',
+      // The legend is the only help of the map window: it takes the header help button.
+      help: { modalId: ModalIds.MAP_HELP, labelKey: 'map_legend_modal_title' }
     });
     this._region = LocationSystem.getInstance().getCurrentRegion();
 
@@ -58,17 +57,6 @@ export class MapPanel extends DraggablePanel {
     });
     this._regionSelect.setAttribute('data-stop-drag', 'true');
     this.addHeaderAction(this._regionSelect);
-
-    this._mapHelpButton = new UIButton({
-      variant: 'ghost',
-      size: 'sm',
-      className: 'pw-win-tool-btn pw-map-help-button',
-      text: '?',
-      onClick: () => EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.MAP_HELP))
-    });
-    this._mapHelpButton.setData('stopDrag', 'true');
-    this.addHeaderAction(this._mapHelpButton);
-    this._syncMapHelpButtonLabel();
 
     this._map = new UIMapView({
       width: MAP_CANVAS.width,
@@ -88,7 +76,7 @@ export class MapPanel extends DraggablePanel {
       this.listen(eventClass, () => this._render());
     }
     this.listen(LanguageChangedEvent, () => {
-      this._syncMapHelpButtonLabel();
+      this._syncHelpButtonLabel();
       this._render();
     });
     this._roamingWindow = RoamingSystem.getRotationWindow();
@@ -99,13 +87,6 @@ export class MapPanel extends DraggablePanel {
       this._render();
     });
     this._render();
-  }
-
-  /** @private */
-  _syncMapHelpButtonLabel() {
-    const label = t('map_legend_modal_title');
-    this._mapHelpButton.setAriaLabel(label);
-    this._mapHelpButton.setTooltip(label);
   }
 
   /** @private @param {string} regionId */

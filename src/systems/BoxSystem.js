@@ -1,14 +1,19 @@
 /**
  * @file BoxSystem.js
- * @brief PC box operations (C++ equivalent: class BoxSystem : public BaseSystem). No DOM access.
- * The box receives the Pokémon caught while the team is full (original G.collection).
- * Views never edit the box array themselves: they call this system and listen to BoxChangedEvent.
+ * @brief PC box = the collection of every owned Pokémon (C++ equivalent: class BoxSystem :
+ * public BaseSystem). No DOM access.
+ *
+ * The collection is the single owner of Pokémon data: the party, the daycare and the other modes
+ * reference its Pokémon by uid (see PokemonUsageSystem for "where is it used"). A Pokémon therefore
+ * never leaves the PC box when it joins the team or the daycare.
+ * Views never edit the collection themselves: they call this system and listen to BoxChangedEvent.
  */
 
 import { BaseSystem } from './BaseSystem.js';
 import { SaveSystem } from './SaveSystem.js';
 import { EventBus } from '../core/EventBus.js';
 import { BoxChangedEvent } from '../core/events/BoxChangedEvent.js';
+import { TeamChangedEvent } from '../core/events/TeamChangedEvent.js';
 
 export class BoxSystem extends BaseSystem {
   /** @private @type {BoxSystem|null} */
@@ -26,66 +31,39 @@ export class BoxSystem extends BaseSystem {
     super('BoxSystem', 'System');
   }
 
-  /** @returns {import('../data/pokemon/PokemonData.js').PokemonData[]} Box of the active save (live array) */
-  getBox() {
-    return SaveSystem.getInstance().getCurrentSave()?.box ?? [];
+  /** @returns {ReadonlyArray<import('../data/pokemon/PokemonData.js').PokemonData>} Every owned Pokémon */
+  getAll() {
+    return SaveSystem.getInstance().getCurrentSave()?.collection.getAll() ?? [];
+  }
+
+  /** @returns {number} Number of owned Pokémon */
+  getCount() {
+    return SaveSystem.getInstance().getCurrentSave()?.collection.size ?? 0;
   }
 
   /**
-   * Stores a Pokémon in the box and marks it caught in the Pokédex. Does not persist: the caller
-   * saves once after its whole operation.
+   * Registers a newly obtained Pokémon in the collection (it is then shown by the PC) and marks it
+   * caught in the Pokédex. Does not persist: the caller saves once after its whole operation.
    * @param {import('../data/pokemon/PokemonData.js').PokemonData} pokemon
    * @param {{notify?: boolean,deferSave?:boolean}} [options]
-   * @returns {boolean} False when no save is loaded
+   * @returns {boolean} False when no save is loaded or the Pokémon is already registered
    */
   addPokemon(pokemon, { notify = true, deferSave = false } = {}) {
     const save = SaveSystem.getInstance().getCurrentSave();
-    if (!save || !pokemon) return false;
-    save.box.push(pokemon);
+    if (!save || !pokemon || !save.collection.add(pokemon)) return false;
     save.pokedex.markCaught(pokemon.species, pokemon.shiny, { deferSave });
-    if (notify) EventBus.getInstance().dispatch(new BoxChangedEvent(save.box.length));
-    return true;
-  }
-
-  /**
-   * Removes a Pokémon by its stable uid.
-   * @param {string} uid
-   * @param {{persist?: boolean, notify?: boolean}} [options]
-   * @returns {import('../data/pokemon/PokemonData.js').PokemonData|null}
-   */
-  removePokemon(uid, { persist = true, notify = true } = {}) {
-    const save = SaveSystem.getInstance().getCurrentSave();
-    if (!save) return null;
-    const index = save.box.findIndex((pokemon) => pokemon.uid === uid);
-    if (index < 0) return null;
-    const [pokemon] = save.box.splice(index, 1);
-    if (persist) SaveSystem.getInstance().saveCurrent();
-    if (notify) this.dispatchChanged();
-    return pokemon;
-  }
-
-  /**
-   * Replaces the PC contents as part of a batch roster operation.
-   * @param {import('../data/pokemon/PokemonData.js').PokemonData[]} box
-   * @param {{persist?: boolean, notify?: boolean}} [options]
-   * @returns {boolean}
-   */
-  replaceContents(box, { persist = true, notify = true } = {}) {
-    const save = SaveSystem.getInstance().getCurrentSave();
-    if (!save || !Array.isArray(box)) return false;
-    save.box = [...box];
-    if (persist) SaveSystem.getInstance().saveCurrent();
     if (notify) this.dispatchChanged();
     return true;
   }
 
   /** @param {string} uid @returns {import('../data/pokemon/PokemonData.js').PokemonData|null} */
   getPokemonByUid(uid) {
-    return this.getBox().find((pokemon) => pokemon.uid === uid) ?? null;
+    return SaveSystem.getInstance().getCurrentSave()?.collection.get(uid) ?? null;
   }
 
   /**
-   * Applies a domain-system update to one stored Pokémon without exposing the box array.
+   * Applies a domain-system update to one owned Pokémon, wherever it is used. Party views are
+   * notified too when the Pokémon is a party member.
    * @param {string} uid
    * @param {(pokemon: import('../data/pokemon/PokemonData.js').PokemonData) => boolean} update
    * @param {{persist?:boolean, notify?:boolean}} [options]
@@ -96,12 +74,22 @@ export class BoxSystem extends BaseSystem {
     const pokemon = this.getPokemonByUid(uid);
     if (!pokemon || update(pokemon) !== true) return false;
     if (persist) SaveSystem.getInstance().saveCurrent();
-    if (notify) this.dispatchChanged();
+    if (notify) this.dispatchPokemonChanged(uid);
     return true;
   }
 
-  /** Emits the standard box event after a batch roster mutation. */
+  /**
+   * Emits the collection event, plus the party event when the changed Pokémon is a party member.
+   * @param {string} uid
+   */
+  dispatchPokemonChanged(uid) {
+    this.dispatchChanged();
+    const save = SaveSystem.getInstance().getCurrentSave();
+    if (save?.teamMembers.includes(uid)) EventBus.getInstance().dispatch(new TeamChangedEvent(save.teamMembers.size));
+  }
+
+  /** Emits the standard collection event after a mutation. */
   dispatchChanged() {
-    EventBus.getInstance().dispatch(new BoxChangedEvent(this.getBox().length));
+    EventBus.getInstance().dispatch(new BoxChangedEvent(this.getCount()));
   }
 }

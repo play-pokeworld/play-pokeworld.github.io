@@ -21,6 +21,7 @@ import { BattleSystem } from './systems/BattleSystem.js';
 import { DungeonSystem } from './systems/DungeonSystem.js';
 import { TeamSystem } from './systems/TeamSystem.js';
 import { BoxSystem } from './systems/BoxSystem.js';
+import { PokemonUsageSystem } from './systems/PokemonUsageSystem.js';
 import { TeamBoxTransferSystem } from './systems/TeamBoxTransferSystem.js';
 import { TeamPresetSystem } from './systems/TeamPresetSystem.js';
 import { PokeballSystem } from './systems/PokeballSystem.js';
@@ -79,6 +80,7 @@ window.addEventListener('DOMContentLoaded', () => {
   engine.registerSystem('LocationSystem', LocationSystem.getInstance());
   engine.registerSystem('RegionalStarterSystem', RegionalStarterSystem.getInstance());
   engine.registerSystem('RoamingSystem', RoamingSystem.getInstance());
+  engine.registerSystem('PokemonUsageSystem', PokemonUsageSystem.getInstance());
   engine.registerSystem('TeamSystem', TeamSystem.getInstance());
   engine.registerSystem('BoxSystem', BoxSystem.getInstance());
   engine.registerSystem('TeamBoxTransferSystem', TeamBoxTransferSystem.getInstance());

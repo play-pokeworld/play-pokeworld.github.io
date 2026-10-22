@@ -33,3 +33,37 @@
 .pw-icon--sm { width: 14px; height: 14px; }
 .pw-icon--md { width: 18px; height: 18px; }
 .pw-icon--lg { width: 24px; height: 24px; }
+
+/* ==========================================================================
+   UIMaskIcon — monochrome image glyph tinted with currentColor
+   The image (--pw-mask-icon, an absolute url()) masks a currentColor fill.
+   ========================================================================== */
+
+:where(.pw-mask-icon) {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 1.15em;
+  height: 1.15em;
+  background-color: currentColor;
+  -webkit-mask-image: var(--pw-mask-icon);
+  mask-image: var(--pw-mask-icon);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  mask-position: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Browsers without CSS masks still show the monochrome sprite itself. */
+@supports not ((mask-image: none) or (-webkit-mask-image: none)) {
+  :where(.pw-mask-icon) {
+    background-color: transparent;
+    background-image: var(--pw-mask-icon);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+}

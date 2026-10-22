@@ -125,7 +125,7 @@ export class CatchSystem extends BaseSystem {
     const ballRate = BallRateRules.effectiveRate(ballId, encounter);
     const rate = CatchRules.finalRate(ballRate, questKind);
     save.inventory.remove(ballId, 1, { deferSave });
-    const firstCatch = save.statistics.caughtTotal === 0 && save.box.length === 0 && save.team.length <= 1;
+    const firstCatch = save.statistics.caughtTotal === 0 && save.collection.size <= 1;
     if (!CatchRules.roll(rate, firstCatch, this._random)) {
       log.add('battle_log.catch_fail', { name, ballId });
       dispatchResult(false);
