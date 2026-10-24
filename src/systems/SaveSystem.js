@@ -5,6 +5,8 @@
  * import, export, delete) and emits the matching events. Storage details live in SaveStorage.
  */
 
+import { SaveRules } from '../config/SaveRules.js';
+import { SaveCheckpointRequestedEvent } from '../core/events/SaveCheckpointRequestedEvent.js';
 import { BaseSystem } from './BaseSystem.js';
 import { SaveStorage } from './SaveStorage.js';
 import { SaveData, generateSaveId } from '../data/save/SaveData.js';
@@ -22,7 +24,22 @@ export class SaveSystem extends BaseSystem {
     super('SaveSystem', 'System');
     /** @private @type {SaveData|null} */
     this._currentSave = null;
+    this._checkpointElapsed = 0;
+    this._unsubscribeCheckpoint = null;
   }
+
+  /** @override */
+  init() {
+    if (!this._unsubscribeCheckpoint) this._unsubscribeCheckpoint = EventBus.getInstance().subscribe(SaveCheckpointRequestedEvent, () => this.saveCurrent());
+  }
+  /** @override @param {number} dt */
+  update(dt) {
+    if (!this._currentSave || !Number.isFinite(dt) || dt <= 0) return;
+    this._checkpointElapsed += dt;
+    if (this._checkpointElapsed >= SaveRules.CHECKPOINT_SECONDS) this.saveCurrent();
+  }
+  /** @override */
+  onDestroy() { this._unsubscribeCheckpoint?.(); this._unsubscribeCheckpoint = null; super.onDestroy(); }
 
   /** @returns {SaveSystem} */
   static getInstance() {
@@ -59,6 +76,7 @@ export class SaveSystem extends BaseSystem {
    * @returns {SaveData}
    */
   createNewSave(trainerName, starterSpecies, background) {
+    if (this._currentSave) this.saveCurrent();
     const save = SaveData.createNew(trainerName, starterSpecies, background);
     this._currentSave = save;
     this.saveCurrent();
@@ -74,6 +92,7 @@ export class SaveSystem extends BaseSystem {
    * @returns {SaveData|null}
    */
   loadSlot(idOrPosition) {
+    if (this._currentSave) this.saveCurrent();
     const key = String(idOrPosition);
     let save = SaveStorage.read(key);
     if (!save) {
@@ -92,6 +111,7 @@ export class SaveSystem extends BaseSystem {
   /** Writes the active save to storage. */
   saveCurrent() {
     if (!this._currentSave) return;
+    this._checkpointElapsed = 0;
     this._currentSave.updatedAt = Date.now();
     if (SaveStorage.write(this._currentSave)) {
       SaveStorage.writeActive(this._currentSave);
@@ -181,6 +201,7 @@ export class SaveSystem extends BaseSystem {
     }
     if (!parsed || typeof parsed !== 'object') return null;
 
+    if (this._currentSave) this.saveCurrent();
     const save = SaveData.fromJson(parsed);
     this._currentSave = save;
     this.saveCurrent();

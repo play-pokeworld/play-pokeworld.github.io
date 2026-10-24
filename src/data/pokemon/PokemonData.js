@@ -130,11 +130,12 @@ export class PokemonData extends BaseModel {
   /**
    * Sets the level (experience moved to the start of that level when below it).
    * @param {number} level
+   * @param {{resetExperience?:boolean}} [options] - Incubation restarts the parent at the new level baseline.
    */
-  setLevel(level) {
+  setLevel(level, { resetExperience = false } = {}) {
     const oldMax = this.getMaxHp();
     this.level = Math.max(PokemonRules.MIN_LEVEL, Math.min(PokemonRules.MAX_LEVEL, Math.floor(level)));
-    this.exp = Math.max(this.exp, ExperienceCurve.levelStart(this.level));
+    this.exp = resetExperience ? ExperienceCurve.levelStart(this.level) : Math.max(this.exp, ExperienceCurve.levelStart(this.level));
     this._invalidateStats();
     const newMax = this.getMaxHp();
     this.hp = Math.max(0, Math.min(newMax, this.hp + (newMax - oldMax)));

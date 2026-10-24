@@ -15,7 +15,6 @@ import { EventBus } from '../core/EventBus.js';
 import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
 import { ContentAccessChangedEvent } from '../core/events/ContentAccessChangedEvent.js';
 import { FeatureAccessSystem } from '../systems/FeatureAccessSystem.js';
-import { SaveSystem } from '../systems/SaveSystem.js';
 import { BadgesChangedEvent } from '../core/events/BadgesChangedEvent.js';
 import { LocationChangedEvent } from '../core/events/LocationChangedEvent.js';
 import { SaveCreatedEvent } from '../core/events/SaveCreatedEvent.js';
@@ -51,8 +50,7 @@ export class ShortcutsPanel extends DraggablePanel {
 
   /** @private */
   _hasMarketAccess() {
-    const save = SaveSystem.getInstance().getCurrentSave();
-    return !!save && (save.player.badges.length > 0 || save.player.region === 'johto');
+    return FeatureAccessSystem.getInstance().isMarketUnlocked();
   }
 
   /** @private */

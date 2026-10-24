@@ -2,6 +2,7 @@
  * @file DungeonRunData.js
  * @brief Persisted state of a multi-floor dungeon expedition.
  */
+import { DungeonAutoRules } from '../../config/DungeonAutoRules.js';
 import { BaseModel } from '../core/BaseModel.js';
 
 const TILE_TYPES = new Set(['empty', 'combat', 'elite', 'chest', 'boss', 'ladder']);
@@ -110,7 +111,7 @@ export class DungeonRunData extends BaseModel {
     this.map = readMap(raw.map);
     this.pos = typeof raw.pos === 'string' && this.map?.tiles[raw.pos] ? raw.pos : '';
     this.pendingNode = typeof raw.pendingNode === 'string' && this.map?.tiles[raw.pendingNode] ? raw.pendingNode : null;
-    this.auto = false;
+    this.auto=raw.auto===true?DungeonAutoRules.DEFAULT_MODE:DungeonAutoRules.MODES.includes(raw.auto)?raw.auto:false;
     if (!this.locationId) this.active = false;
   }
 }

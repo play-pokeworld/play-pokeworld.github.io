@@ -1,0 +1,127 @@
+{
+  "map_region_auroria": "Auroria",
+  "starter_auroria_mossling_desc": "Un partenaire Plante du plateau d’Auroria.",
+  "pokemon": {
+    "mossling": "Moussin"
+  },
+  "move": {
+    "chloroshot": "Trait chlorophylle"
+  },
+  "move_desc": {
+    "chloroshot": "Un trait de lumière végétale. Puissance 55, précision 100 %."
+  },
+  "item": {
+    "auroria_pass": {
+      "name": "Laissez-passer d’Auroria",
+      "desc": "Autorise l’entrée à Florécité après la mission de la route."
+    },
+    "auroria_tm_chloroshot": {
+      "name": "CT Trait chlorophylle",
+      "desc": "Déverrouille Trait chlorophylle pour un Pokémon compatible."
+    }
+  },
+  "location": {
+    "auroria_start": "Aubeval",
+    "auroria_path": "Sentier des pousses",
+    "auroria_city": "Florécité",
+    "auroria_forest": "Bois des lucioles",
+    "auroria_summit": "Sommet d’Auroria"
+  },
+  "shop": {
+    "auroria_store": {
+      "name": "Comptoir d’Auroria"
+    }
+  },
+  "trainer": {
+    "auroria_ivy": {
+      "name": "Liane",
+      "title": "Championne de Florécité",
+      "badge": "Badge Feuille",
+      "intro": "Laissons nos Pokémon nous guider.",
+      "win": "Vous avez mérité votre victoire."
+    },
+    "auroria_rival": {
+      "name": "Éloi",
+      "title": "Rival du plateau",
+      "badge": "Titre d’Auroria",
+      "intro": "Laissons nos Pokémon nous guider.",
+      "win": "Vous avez mérité votre victoire."
+    },
+    "auroria_elite_one": {
+      "name": "Aloès",
+      "title": "Conseil du plateau",
+      "badge": "Titre d’Auroria",
+      "intro": "Laissons nos Pokémon nous guider.",
+      "win": "Vous avez mérité votre victoire."
+    },
+    "auroria_elite_two": {
+      "name": "Voltine",
+      "title": "Conseil du plateau",
+      "badge": "Titre d’Auroria",
+      "intro": "Laissons nos Pokémon nous guider.",
+      "win": "Vous avez mérité votre victoire."
+    },
+    "auroria_league": {
+      "name": "Ligue d’Auroria",
+      "title": "Ligue du plateau",
+      "badge": "Titre d’Auroria",
+      "intro": "Laissons nos Pokémon nous guider.",
+      "win": "Vous avez mérité votre victoire."
+    }
+  },
+  "quests": {
+    "main": {
+      "auroria_welcome": {
+        "title": "Bienvenue sur le plateau",
+        "desc": "Parlez au professeur à Aubeval."
+      },
+      "auroria_road": {
+        "title": "Le sentier des pousses",
+        "desc": "Remportez 3 victoires sur le sentier puis récupérez le laissez-passer."
+      },
+      "auroria_gym": {
+        "title": "La Feuille de Florécité",
+        "desc": "Battez Liane et remportez son badge."
+      },
+      "auroria_rival": {
+        "title": "Le défi du plateau",
+        "desc": "Battez Éloi pour ouvrir le Bois des lucioles."
+      }
+    },
+    "side": {
+      "auroria_catches": {
+        "title": "Les espèces du sentier",
+        "desc": "Capturez deux Pokémon sur le sentier."
+      }
+    }
+  },
+  "npc": {
+    "auroria_start": [
+      {
+        "id": "auroria_guide",
+        "name": "Professeur Saule",
+        "lines": [
+          "Bienvenue à Auroria. Votre partenaire vous attend."
+        ]
+      }
+    ],
+    "auroria_city": [
+      {
+        "id": "auroria_researcher",
+        "name": "Chercheuse Iris",
+        "lines": [
+          "Étudions les Pokémon du sentier."
+        ]
+      }
+    ]
+  },
+  "fieldjournal_title": "Carnet de terrain",
+  "fieldjournal_survey": "Étudier ce site",
+  "fieldjournal_summary": "{total} site(s) étudié(s) · {reward} Pokédollars par nouveau site.",
+  "fieldjournal_state_already": "Ce site a déjà été étudié.",
+  "fieldjournal_state_battle": "Terminez le combat avant d’étudier le site.",
+  "fieldjournal_state_location": "Rendez-vous sur une route d’Auroria.",
+  "fieldjournal_state_wins": "Victoires sur ce lieu : {wins}/{required}.",
+  "fieldjournal_state_ready": "Le site est prêt à être étudié.",
+  "region_auroria": "Auroria"
+}

@@ -8,6 +8,7 @@
 
 import { UIElement } from './UIElement.js';
 import { UIIcon } from './UIIcon.js';
+import { UIText } from './UIText.js';
 
 export class UIPanel extends UIElement {
   /**
@@ -103,7 +104,16 @@ export class UIPanel extends UIElement {
    * @param {string} title - Localized text
    */
   setTitle(title) {
-    if (this._titleDom) this._titleDom.textContent = title ?? '';
+    const value=title??'';
+    if(this._titleDom&&this._titleDom.textContent!==value)this._titleDom.textContent=value;
+  }
+
+  /** Optional second header line; no-op when unchanged. @param {string} subtitle */
+  setSubtitle(subtitle){
+    const value=String(subtitle||'');if(!this._titleWrapDom||value===this._subtitleValue)return;
+    this._subtitleValue=value;
+    if(!this._subtitleWidget){this._subtitleWidget=new UIText({className:'pw-win-hdr-subtitle'});this._addChromeChild(this._subtitleWidget,this._titleWrapDom);}
+    this._subtitleWidget.setText(value);this._subtitleWidget.setVisible(!!value);this._titleWrapDom.classList.toggle('has-subtitle',!!value);
   }
 
   /**

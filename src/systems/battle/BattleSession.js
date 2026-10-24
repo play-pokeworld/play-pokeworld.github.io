@@ -11,6 +11,8 @@
  * send the next foe without ending the active session.
  * HP changes are written to the PokemonData objects; everything else is volatile.
  */
+import { BattleSessionState } from './BattleSessionState.js';
+import { SeededRandom } from '../../core/SeededRandom.js';
 import { BattleConfig } from '../../config/BattleConfig.js';
 import { BattleRules } from '../../config/BattleRules.js';
 import { PlayerDefaults } from '../../config/PlayerDefaults.js';
@@ -68,9 +70,10 @@ export class BattleSession {
    * @param {string|((pokemon: import('../../data/pokemon/PokemonData.js').PokemonData) => string)} [setup.nextFoeIntroKey='battle_log.wild_appeared']
    * @param {(encounter: Object, session: BattleSession) => void} [setup.onFoeDefeated=null]
    */
-  constructor({ team, foe, foeOptions = {}, random, weather = null, ownedQuantity = () => 0, hiddenTalentUnlocked = () => false, training = false, reserves = [], nextFoeFactory = null, nextFoeIntroKey = 'battle_log.wild_appeared', onFoeDefeated = null }) {
+  constructor({ team, foe, foeOptions = {}, random, weather = null, ownedQuantity = () => 0, hiddenTalentUnlocked = () => false, training = false, healBetweenFoes = false, reserves = [], nextFoeFactory = null, nextFoeIntroKey = 'battle_log.wild_appeared', onFoeDefeated = null }) {
     this.random = random;
     this.training = training;
+    this.healBetweenFoes = healBetweenFoes;
     this.field = new BattleField(weather);
     this.log = new BattleLog();
     this._ownedQuantity = ownedQuantity;
@@ -115,6 +118,26 @@ export class BattleSession {
     this.foeTurns = 0;
     /** @type {number} Moves used by the player (Quick Ball, original attacksOnCurrentEnemy) */
     this.playerAttacks = 0;
+  }
+
+  /** @returns {Object|null} JSON-safe finite-session state. */
+  captureState() { return BattleSessionState.capture(this); }
+
+  /**
+   * Restores state directly: start() must NOT be called afterwards.
+   * @param {Object} state
+   * @param {{resolvePokemon:Function,random?:Object,ownedQuantity?:Function,hiddenTalentUnlocked?:Function,onFoeDefeated?:Function}} options
+   * @returns {BattleSession|null}
+   */
+  static restore(state, options) {
+    const prepared = BattleSessionState.prepare(state, options.resolvePokemon);
+    if (!prepared) return null;
+    const random = state.randomState ? new SeededRandom(state.randomState) : options.random;
+    if (!random) return null;
+    const session = new BattleSession({ ...options, ...prepared, random, training: state.training,
+      healBetweenFoes: state.healBetweenFoes, weather: state.field.defaultWeather });
+    BattleSessionState.apply(session, state, prepared);
+    return session;
   }
 
   /** @private @param {import('../../data/pokemon/PokemonData.js').PokemonData} pokemon */
@@ -441,6 +464,13 @@ export class BattleSession {
   /** @private Sends a trainer reserve or the next wild Pokémon into the active session. */
   _sendNextFoe(next) {
     if (!next?.pokemon) return;
+    if (this.healBetweenFoes) {
+      this.active.heal(this.active.maxHp);
+      this.active.status = null;
+      this.active.statusTurns = 0;
+      this.active.moveIndex = 0;
+      this.active.resetVolatile();
+    }
     this.foe = new BattleCombatant(next.pokemon, BattleSides.FOE, { npc: true });
     this.sentFoes.push(next.pokemon);
     this.foeTurns = 0;

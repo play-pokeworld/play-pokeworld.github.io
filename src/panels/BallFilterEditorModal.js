@@ -22,8 +22,11 @@ export class BallFilterEditorModal extends UIModal {
   constructor() {
     super({
       id: ModalIds.BALL_FILTERS,
-      hasHeader: false,
-      showCloseBtn: false,
+      title: t('ball_settings'),
+      size: 'md',
+      hasHeader: true,
+      showCloseBtn: true,
+      hasFooter: false,
       className: 'pw-ball-box',
       overlayClassName: 'pw-ball-overlay',
       name: 'BallFilterEditorModal'
@@ -47,7 +50,6 @@ export class BallFilterEditorModal extends UIModal {
   _render() {
     this.clearChildren();
     const balls = PokeballSystem.getInstance();
-    this.addChild(new UIText({ tagName: 'div', className: 'pw-ball-title', text: t('ball_settings') }));
     this.addChild(new UIContainer({
       className: 'pw-ball-editor-top',
       children: [
@@ -66,11 +68,6 @@ export class BallFilterEditorModal extends UIModal {
       list.addItem(filter.id, row, row.getHandle());
     }
     this.addChild(list);
-
-    this.addChild(new UIContainer({
-      className: 'pw-ball-actions',
-      children: [new UIButton({ variant: 'hbtn', text: t('close_btn'), onClick: () => this.close() })]
-    }));
   }
 
   /**

@@ -40,6 +40,7 @@ export class UIProgressBar extends UIElement {
     this._max = options.max ?? 100;
     this._label = options.label || '';
     this._showText = !!options.showText;
+    this._color = options.color || null;
 
     if (!skinned) {
       this.setSize(options.size || 'md');
@@ -56,6 +57,17 @@ export class UIProgressBar extends UIElement {
     this._render();
   }
 
+  /** @returns {UIElement} */
+  getFillElement() {
+    return this._fill;
+  }
+
+  /** @param {string|null} color */
+  setColor(color) {
+    this._color = color;
+    this._render();
+  }
+
   /** @returns {number} Fill ratio in percent, clamped to [0, 100] */
   getPercent() {
     if (!(this._max > 0)) return 0;
@@ -64,10 +76,16 @@ export class UIProgressBar extends UIElement {
 
   /** @private */
   _render() {
-    this._setCssVariable('--pw-progress', `${this.getPercent()}%`);
+    const pct = `${this.getPercent()}%`;
+    this._setCssVariable('--pw-progress', pct);
+    this._fill._setCssVariable('--pct', pct);
+    if (this._color) {
+      this._fill._setCssVariable('--bg', this._color);
+    }
     if (this._text) {
       const prefix = this._label ? `${this._label}: ` : '';
-      this._text.getDomElement().textContent = `${prefix}${Math.round(this._value)} / ${Math.round(this._max)}`;
+      const text = `${prefix}${Math.round(this._value)} / ${Math.round(this._max)}`;
+      if (this._text.getDomElement().textContent !== text) this._text.getDomElement().textContent = text;
     }
   }
 
@@ -76,8 +94,11 @@ export class UIProgressBar extends UIElement {
    * @param {number} [max] - Keeps the current max when omitted
    */
   setValue(value, max) {
-    this._value = Math.max(0, Number(value) || 0);
-    if (max !== undefined && max !== null) this._max = Math.max(0, Number(max) || 0);
+    const nextValue = Math.max(0, Number(value) || 0);
+    const nextMax = max === undefined || max === null ? this._max : Math.max(0, Number(max) || 0);
+    if (this._value === nextValue && this._max === nextMax) return;
+    this._value = nextValue;
+    this._max = nextMax;
     this._render();
   }
 

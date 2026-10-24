@@ -96,6 +96,17 @@ export class AppShell {
   static setDebugMode(enabled) {
     if (typeof document === 'undefined' || !document.body) return;
     document.body.classList.toggle(DEBUG_CLASS, !!enabled);
+    document.body.classList.toggle('pw-debug-on', !!enabled);
+  }
+
+  /** @param {string} phase */
+  static setDaytime(phase) {
+    if (typeof document === 'undefined' || !document.documentElement) return;
+    if (phase === 'auto') {
+      document.documentElement.removeAttribute('data-daytime');
+    } else {
+      document.documentElement.setAttribute('data-daytime', phase);
+    }
   }
 
   /** @param {Record<string, boolean>} preferences */

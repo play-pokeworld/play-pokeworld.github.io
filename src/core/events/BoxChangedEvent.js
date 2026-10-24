@@ -13,9 +13,10 @@ export class BoxChangedEvent extends BaseEvent {
   /**
    * @param {number} boxSize - Number of owned Pokémon (whole collection)
    */
-  constructor(boxSize) {
+  constructor(boxSize, {deferSave=false}={}) {
     super(BoxChangedEvent.TYPE);
     /** @type {number} */
     this.boxSize = boxSize;
+    this.deferSave=deferSave;
   }
 }

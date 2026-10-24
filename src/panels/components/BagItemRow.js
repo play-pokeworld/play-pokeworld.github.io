@@ -61,5 +61,12 @@ export class BagItemRow extends UIContainer {
         onSelect(entry.itemId);
       });
     }
+
+    if (typeof options.onContext === 'function') {
+      this.addDomListener('contextmenu', (event) => {
+        event.preventDefault();
+        options.onContext(entry.itemId);
+      });
+    }
   }
 }

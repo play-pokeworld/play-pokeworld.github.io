@@ -11,6 +11,8 @@
  * unlock fact) are translated into QuestProgressData. Carried for MigrationV3ToV4: the PC box (`box`),
  * the Poké Ball counts and filters (`pokeballs: { counts, filters }`) and duplicate catch counters.
  */
+import { convertLegacyRelaunch } from './LegacyRelaunchMigration.js';
+import { SaveValues } from '../../core/SaveValues.js';
 import { PokemonDB } from '../../pokemon/PokemonDB.js';
 import { ItemDB } from '../../items/ItemDB.js';
 import { QuestDB } from '../../quests/QuestDB.js';
@@ -100,6 +102,17 @@ function convertHatchery(G) {
     };
   });
   return { maxSlots, slots };
+}
+
+/** @param {*} legacy - Numeric species keys and case-tolerant talent ids from the original save. */
+function convertTalentUnlocks(legacy) {
+  const result = {};
+  for (const [key, values] of Object.entries(legacy && typeof legacy === 'object' ? legacy : {})) {
+    const species = slugOf(Number(key)) || (PokemonDB.getInstance().has(key) ? key : null);
+    if (!species || !Array.isArray(values)) continue;
+    result[species] = SaveValues.ids(values.filter((id) => typeof id === 'string').map((id) => id.toLowerCase()));
+  }
+  return result;
 }
 
 /**
@@ -349,6 +362,10 @@ export const MigrationOriginalToV1 = Object.freeze({
         leaguesWon
       },
       hatchery: convertHatchery(G),
+      relaunch:convertLegacyRelaunch(G),
+      talents: convertTalentUnlocks(G.unlockedTalents),
+      // FacilityStaffData normalizes the original owned/level/xp/active arrays without inventing perks.
+      staff: SaveValues.copy(G.staff || {}),
       mine: G.mine && typeof G.mine === 'object' ? { ...G.mine } : {},
       secretBase: migrateLegacySecretBase(G),
       quests: convertQuests(G),

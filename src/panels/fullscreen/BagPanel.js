@@ -1,36 +1,50 @@
 /**
  * @file BagPanel.js
- * @brief Bag full-screen panel (original ui/game/inventory.js + BagView): category tabs with
- * counters, sort, global search, reset; item grid; the clicked item shows its description.
- * Supported item use is delegated to ItemUseSystem; treasure sale remains independent.
+ * @brief Bag full-screen panel with category tabs, counters, sorting, search,
+ * stone evolution, treasure sales, target selection routing and item inspection.
  */
 import { UIFullscreenPanel } from '../../ui/UIFullscreenPanel.js';
 import { UIContainer } from '../../ui/UIContainer.js';
 import { UIText } from '../../ui/UIText.js';
 import { UIImage } from '../../ui/UIImage.js';
 import { UIButton } from '../../ui/UIButton.js';
+import { UIPokemonSprite } from '../../ui/UIPokemonSprite.js';
 import { ModalIds } from '../../config/ModalIds.js';
 import { EventBus } from '../../core/EventBus.js';
 import { ModalOpenRequestedEvent } from '../../core/events/ModalOpenRequestedEvent.js';
 import { BAG_CATEGORIES, BAG_SORT_OPTIONS, BagCategoryIds, BagSorts } from '../../config/BagCategories.js';
 import { ItemDB } from '../../data/items/ItemDB.js';
 import { ItemKinds } from '../../data/items/ItemKinds.js';
+import { PokemonDB } from '../../data/pokemon/PokemonDB.js';
 import { SaleSystem } from '../../systems/SaleSystem.js';
 import { ItemUseSystem } from '../../systems/ItemUseSystem.js';
+import { ItemUseActions, ItemUseRules } from '../../config/ItemUseRules.js';
 import { HeldItemSystem } from '../../systems/HeldItemSystem.js';
 import { TeamSystem } from '../../systems/TeamSystem.js';
+import { BoxSystem } from '../../systems/BoxSystem.js';
+import { NotificationSystem } from '../../systems/NotificationSystem.js';
+import { NotificationChannels, NotificationTones } from '../../config/NotificationConfig.js';
 import { TextFormatter } from '../../core/TextFormatter.js';
 import { SaveSystem } from '../../systems/SaveSystem.js';
 import { BagQuery } from '../../systems/inventory/BagQuery.js';
 import { InventoryChangedEvent } from '../../core/events/InventoryChangedEvent.js';
 import { TeamChangedEvent } from '../../core/events/TeamChangedEvent.js';
+import { BoxChangedEvent } from '../../core/events/BoxChangedEvent.js';
 import { BattleStartedEvent } from '../../core/events/BattleStartedEvent.js';
 import { BattleEndedEvent } from '../../core/events/BattleEndedEvent.js';
 import { FilterBar } from '../components/FilterBar.js';
 import { BagItemRow } from '../components/BagItemRow.js';
 import { t } from '../../localization/LocalizationManager.js';
 
-const nameOf = (itemId) => t(`item.${itemId}.name`);
+const nameOf = (itemId) => {
+  const item = ItemDB.getInstance().getById(itemId);
+  if (item && [ItemKinds.TM, ItemKinds.HM].includes(item.kind)) {
+    const isCS = itemId.startsWith('cs') || item.kind === ItemKinds.HM;
+    const baseName = t(`item.${itemId}.name`);
+    return isCS ? `${baseName} CS` : `${baseName} CT`;
+  }
+  return t(`item.${itemId}.name`);
+};
 const descOf = (itemId) => t(`item.${itemId}.desc`);
 
 export class BagPanel extends UIFullscreenPanel {
@@ -44,15 +58,25 @@ export class BagPanel extends UIFullscreenPanel {
     this._sort = BagSorts.NAME_ASC;
     /** @private */
     this._search = '';
-    /** @private @type {string|null} */
-    this._selected = null;
     /** @private 'bag' or held-item equipment selection. */
     this._mode = 'bag';
     /** @private @type {number|null} */
     this._heldItemTeamIndex = null;
-    for (const eventClass of [InventoryChangedEvent, TeamChangedEvent, BattleStartedEvent, BattleEndedEvent]) {
+    /** @private @type {'stone'|'treasure'|null} */
+    this._subView = null;
+    /** @private @type {string|null} */
+    this._activeItemId = null;
+
+    for (const eventClass of [InventoryChangedEvent, TeamChangedEvent, BoxChangedEvent, BattleStartedEvent, BattleEndedEvent]) {
       this.listen(eventClass, () => {
-        if (this.isOpen()) this._render();
+        if (this.isOpen()) {
+          const save = SaveSystem.getInstance().getCurrentSave();
+          if (this._subView && this._activeItemId && (!save || save.inventory.count(this._activeItemId) <= 0)) {
+            this._subView = null;
+            this._activeItemId = null;
+          }
+          this._render();
+        }
       });
     }
   }
@@ -62,11 +86,12 @@ export class BagPanel extends UIFullscreenPanel {
     this._mode = params.mode === 'held-item' && Number.isInteger(Number(params.teamIndex)) ? 'held-item' : 'bag';
     this.toggleClass('pw-bag-held-item-mode', this._mode === 'held-item');
     this._heldItemTeamIndex = this._mode === 'held-item' ? Number(params.teamIndex) : null;
+    this._subView = null;
+    this._activeItemId = null;
     if (this._mode === 'held-item') {
       this._category = BagCategoryIds.HELD;
       this._categoryTouched = true;
       this._search = '';
-      this._selected = null;
     }
     this._render();
   }
@@ -75,6 +100,8 @@ export class BagPanel extends UIFullscreenPanel {
   onClose() {
     this._mode = 'bag';
     this._heldItemTeamIndex = null;
+    this._subView = null;
+    this._activeItemId = null;
     this.removeClass('pw-bag-held-item-mode');
     this.setFooter([]);
   }
@@ -89,6 +116,19 @@ export class BagPanel extends UIFullscreenPanel {
       this._category = BAG_CATEGORIES.find((category) => counts[category.id] > 0)?.id ?? BAG_CATEGORIES[0].id;
     }
     this._entries = entries;
+
+    if (this._subView === 'stone' && this._activeItemId) {
+      this.setFilters([]);
+      this._renderStoneEvolution(this._activeItemId);
+      return;
+    }
+
+    if (this._subView === 'treasure' && this._activeItemId) {
+      this.setFilters([]);
+      this._renderTreasureSale(this._activeItemId);
+      return;
+    }
+
     const visibleCategories = this._mode === 'held-item'
       ? BAG_CATEGORIES.filter((category) => category.id === BagCategoryIds.HELD)
       : BAG_CATEGORIES;
@@ -136,16 +176,356 @@ export class BagPanel extends UIFullscreenPanel {
     }
     const shown = BagQuery.filter([...entries], { category: this._category, search: this._search, sort: this._sort }, descOf);
     const children = [];
-    const selected = entries.find((entry) => entry.itemId === this._selected);
-    if (selected) children.push(this._detail(selected));
     if (shown.length === 0) {
       children.push(new UIText({ tagName: 'div', className: 'pw-empty-state-md', text: t('m.inventory.6') }));
     } else {
       const list = new UIContainer({ className: 'inv-list-root' });
-      for (const entry of shown) list.addChild(new BagItemRow(entry, entry.itemId === this._selected, (itemId) => this._select(itemId)));
+      for (const entry of shown) {
+        list.addChild(new BagItemRow(
+          entry,
+          false,
+          (itemId) => this._handleItemClick(itemId),
+          {
+            onContext: (itemId) => this._openItemInfo(itemId)
+          }
+        ));
+      }
       children.push(list);
     }
     this.setContent(children);
+  }
+
+  /** @private Left-click behavior dispatching to stone evolution, treasure sale, target modal or info. */
+  _handleItemClick(itemId) {
+    if (this._mode === 'held-item') {
+      this._equipHeldItem(itemId);
+      return;
+    }
+    const definition = ItemDB.getInstance().getById(itemId);
+    if (!definition) {
+      this._openItemInfo(itemId);
+      return;
+    }
+
+    if (definition.kind === ItemKinds.TREASURE) {
+      this._openTreasureSale(itemId);
+      return;
+    }
+
+    const action = ItemUseSystem.getInstance().getUseAction(itemId);
+    if (
+      definition.kind === ItemKinds.STONE ||
+      definition.kind === ItemKinds.EVOLUTION ||
+      action === ItemUseActions.EVOLVE
+    ) {
+      this._openStoneEvolution(itemId);
+      return;
+    }
+
+    if (
+      action === ItemUseActions.RARE_CANDY ||
+      action === ItemUseActions.VITAMIN ||
+      action === ItemUseActions.UNLOCK_MOVE ||
+      definition.kind === ItemKinds.CANDY ||
+      definition.kind === ItemKinds.TM ||
+      definition.kind === ItemKinds.HM ||
+      (definition.kind === ItemKinds.CONSUMABLE && definition.category === ItemUseRules.VITAMIN_CATEGORY)
+    ) {
+      this.close();
+      EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.BOX, { itemUseId: itemId }));
+      return;
+    }
+
+    if (
+      definition.kind === ItemKinds.CONSUMABLE ||
+      action
+    ) {
+      EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.ITEM_TARGET, { itemId }));
+      return;
+    }
+
+    this._openItemInfo(itemId);
+  }
+
+  /** @private Opens the detailed inspection modal with a "Back to bag" return button. */
+  _openItemInfo(itemId) {
+    EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.DICTIONARY_DETAIL, {
+      kind: 'item',
+      id: itemId,
+      backLabel: t('back_bag')
+    }));
+  }
+
+  /** @private Activates the stone evolution screen. */
+  _openStoneEvolution(itemId) {
+    this._subView = 'stone';
+    this._activeItemId = itemId;
+    this._render();
+  }
+
+  /** @private Inline stone evolution view with candidate cards and species catalog. */
+  _renderStoneEvolution(itemId) {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    const qty = save ? save.inventory.count(itemId) : 0;
+    if (qty <= 0) {
+      this._subView = null;
+      this._activeItemId = null;
+      this._render();
+      return;
+    }
+
+    const team = TeamSystem.getInstance().getTeam();
+    const allBox = BoxSystem.getInstance().getAll();
+    const teamUids = new Set(team.map((p) => p.uid));
+    const candidates = [];
+
+    for (const p of team) {
+      const species = PokemonDB.getInstance().getById(p.species);
+      const evo = species?.evolutions?.find((e) => e.item === itemId);
+      if (evo) candidates.push({ pokemon: p, evo, loc: 'team' });
+    }
+    for (const p of allBox) {
+      if (teamUids.has(p.uid)) continue;
+      const species = PokemonDB.getInstance().getById(p.species);
+      const evo = species?.evolutions?.find((e) => e.item === itemId);
+      if (evo) candidates.push({ pokemon: p, evo, loc: 'box' });
+    }
+
+    const header = new UIContainer({
+      className: 'pw-sticky-header',
+      children: [
+        new UIContainer({
+          className: 'pw-row',
+          children: [
+            new UIContainer({
+              className: 'pw-icon-box',
+              children: [
+                new UIImage({
+                  src: ItemDB.getInstance().getImagePath(itemId),
+                  alt: nameOf(itemId),
+                  className: 'inv-icon-img',
+                  pixelated: true
+                })
+              ]
+            }),
+            new UIContainer({
+              children: [
+                new UIText({ tagName: 'div', className: 'pw-sticky-title', text: `${t('use_stone')} ${nameOf(itemId)}` }),
+                new UIText({ tagName: 'div', className: 'pw-text-sm pw-light1', text: t('stone_sub') })
+              ]
+            })
+          ]
+        }),
+        new UIText({ tagName: 'div', className: 'pw-count-badge', text: `×${qty}` })
+      ]
+    });
+
+    const contentNodes = [header];
+
+    if (candidates.length > 0) {
+      const grid = new UIContainer({ className: 'pw-starter-grid' });
+      for (const candidate of candidates) {
+        const { pokemon, evo } = candidate;
+        const targetSpecies = evo.to;
+        const targetName = t(`pokemon.${targetSpecies}`);
+        const owned = save.pokedex.isCaught(targetSpecies);
+        const minLvl = Number(evo.minLevel) || 1;
+        const canEvolve = pokemon.level >= minLvl;
+
+        const orbChildren = [];
+        if (pokemon.shiny) {
+          orbChildren.push(new UIText({ tagName: 'div', className: 'evo-shiny-badge', text: '★' }));
+        }
+        orbChildren.push(new UIText({ tagName: 'div', className: 'pw-starter-level', text: `Nv.${pokemon.level}` }));
+        orbChildren.push(new UIText({
+          tagName: 'div',
+          className: `evo-owned-badge${owned ? '' : ' is-missing'}`,
+          text: owned ? '✓' : '!'
+        }));
+        orbChildren.push(new UIPokemonSprite({
+          species: pokemon.species,
+          form: pokemon.form,
+          shiny: pokemon.shiny,
+          size: 72,
+          alt: pokemon.getDisplayName()
+        }));
+        orbChildren.push(new UIText({ tagName: 'div', className: 'evo-target-label', text: `→ ${targetName}` }));
+
+        const orb = new UIContainer({ className: 'pw-starter-orb', children: orbChildren });
+        const card = new UIContainer({
+          className: 'pw-starter-card',
+          children: [orb]
+        });
+        card.setAttribute('title', `${pokemon.getDisplayName()} → ${targetName} (${owned ? t('already_owned_sp') : t('non_possede')})`);
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.addDomListener('click', () => {
+          if (!canEvolve) {
+            NotificationSystem.getInstance().notifyTemporary(
+              t('item_use_min_level_required', { min: minLvl, current: pokemon.level }),
+              { channel: NotificationChannels.GAMEPLAY, tone: NotificationTones.WARNING }
+            );
+            return;
+          }
+          const res = ItemUseSystem.getInstance().useOnPokemon(itemId, pokemon.uid);
+          if (res?.result === 'success') {
+            if (save.inventory.count(itemId) <= 0) {
+              this._subView = null;
+              this._activeItemId = null;
+            }
+            this._render();
+          }
+        });
+        grid.addChild(card);
+      }
+      contentNodes.push(grid);
+    } else {
+      contentNodes.push(new UIText({
+        tagName: 'div',
+        className: 'pw-text-sm pw-light1',
+        text: t('evo_catalog_hint')
+      }));
+      const catalogGrid = new UIContainer({ className: 'pw-starter-grid' });
+      const allSpecies = PokemonDB.getInstance().getAll();
+      for (const species of allSpecies) {
+        const evo = species.evolutions?.find((e) => e.item === itemId);
+        if (!evo) continue;
+        const targetName = t(`pokemon.${evo.to}`);
+        const ownedTarget = save.pokedex.isCaught(evo.to);
+        const ownedBase = save.pokedex.isCaught(species.id);
+
+        const orb = new UIContainer({
+          className: 'pw-starter-orb',
+          children: [
+            new UIPokemonSprite({ species: species.id, size: 56, alt: t(species.getNameKey()) }),
+            new UIText({ tagName: 'div', className: 'evo-target-label', text: `→ ${targetName}${ownedTarget ? ' ✓' : ''}` })
+          ]
+        });
+        const card = new UIContainer({
+          className: 'pw-starter-card',
+          children: [orb]
+        });
+        card.setAttribute('title', `#${species.dex} → ${targetName}`);
+        if (!ownedBase) card.addClass('is-disabled');
+        catalogGrid.addChild(card);
+      }
+      contentNodes.push(catalogGrid);
+    }
+
+    const returnBtn = new UIButton({
+      className: 'hbtn',
+      text: t('back_bag'),
+      onClick: () => {
+        this._subView = null;
+        this._activeItemId = null;
+        this._render();
+      }
+    });
+    contentNodes.push(new UIContainer({
+      className: 'pw-starter-actions',
+      children: [returnBtn]
+    }));
+
+    this.setContent(contentNodes);
+  }
+
+  /** @private Activates the treasure sale screen. */
+  _openTreasureSale(itemId) {
+    this._subView = 'treasure';
+    this._activeItemId = itemId;
+    this._render();
+  }
+
+  /** @private Inline treasure sale view matching main's design. */
+  _renderTreasureSale(itemId) {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    const qty = save ? save.inventory.count(itemId) : 0;
+    if (qty <= 0) {
+      this._subView = null;
+      this._activeItemId = null;
+      this._render();
+      return;
+    }
+
+    const quote = SaleSystem.getInstance().getQuote(itemId, 1);
+    const allQuote = SaleSystem.getInstance().getQuote(itemId, qty);
+    const isDiamonds = quote?.currencyId === 'diamonds';
+    const oneQuote = isDiamonds
+      ? `+${TextFormatter.formatNumber(quote?.gain ?? 0)} ${t('currency_diamonds')}`
+      : `+${TextFormatter.formatNumber(quote?.gain ?? 0)}₽`;
+    const allQuoteStr = isDiamonds
+      ? `+${TextFormatter.formatNumber(allQuote?.gain ?? 0)} ${t('currency_diamonds')}`
+      : `+${TextFormatter.formatNumber(allQuote?.gain ?? 0)}₽`;
+    const unitValue = isDiamonds
+      ? `${TextFormatter.formatNumber(quote?.gain ?? 0)} ${t('currency_diamonds')}`
+      : `${TextFormatter.formatNumber(quote?.gain ?? 0)}₽`;
+
+    const titleRow = new UIContainer({
+      className: 'loc-title',
+      children: [
+        new UIText({ text: `${t('m.inventory.5')} ` }),
+        new UIImage({
+          src: ItemDB.getInstance().getImagePath(itemId),
+          alt: nameOf(itemId),
+          className: 'inv-icon-img',
+          pixelated: true
+        }),
+        new UIText({ text: ` ${nameOf(itemId)}` })
+      ]
+    });
+
+    const subTitle = new UIText({
+      tagName: 'div',
+      className: 'loc-sub',
+      text: t('m.treasure_sell_sub', { qty, value: unitValue })
+    });
+
+    const sellOneBtn = new UIButton({
+      className: 'hbtn',
+      text: `${t('sale_sell_one')} (${oneQuote})`,
+      onClick: () => {
+        SaleSystem.getInstance().sell(itemId, 1);
+        if (save.inventory.count(itemId) <= 0) {
+          this._subView = null;
+          this._activeItemId = null;
+        }
+        this._render();
+      }
+    });
+
+    const actions = [sellOneBtn];
+    if (qty > 1) {
+      actions.push(new UIButton({
+        className: 'hbtn',
+        text: `${t('sale_sell_all', { count: qty })} (${allQuoteStr})`,
+        onClick: () => {
+          SaleSystem.getInstance().sell(itemId, qty);
+          this._subView = null;
+          this._activeItemId = null;
+          this._render();
+        }
+      }));
+    }
+    actions.push(new UIButton({
+      className: 'hbtn',
+      text: t('back_bag'),
+      onClick: () => {
+        this._subView = null;
+        this._activeItemId = null;
+        this._render();
+      }
+    }));
+
+    const actionsContainer = new UIContainer({
+      className: 'pw-starter-actions',
+      children: actions
+    });
+
+    this.setContent([
+      new UIContainer({
+        children: [titleRow, subTitle, actionsContainer]
+      })
+    ]);
   }
 
   /** @private Equipment-only view shown in the normal full-screen bag shell. */
@@ -272,71 +652,6 @@ export class BagPanel extends UIFullscreenPanel {
     else this._render();
   }
 
-  /** @private Description card of the clicked item. */
-  _detail(entry) {
-    const definition = ItemDB.getInstance().getById(entry.itemId);
-    const details = new UIContainer({
-      className: 'pw-bag-detail-text',
-      children: [
-        new UIText({ tagName: 'div', className: 'pw-bag-detail-name', text: `${entry.name} ${t('bag_qty', { n: entry.quantity })}` }),
-        new UIText({ tagName: 'div', className: 'pw-bag-detail-desc', richText: descOf(entry.itemId) })
-      ]
-    });
-    const action = ItemUseSystem.getInstance().getUseAction(entry.itemId);
-    if (action) {
-      const targets = ItemUseSystem.getInstance().getEligibleTargets(entry.itemId);
-      const controls = [new UIButton({
-        className: 'pw-bag-use-button',
-        variant: 'primary',
-        size: 'sm',
-        text: t('bag_item_use_button'),
-        disabled: targets.length === 0,
-        onClick: () => EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.ITEM_TARGET, { itemId: entry.itemId }))
-      })];
-      if (targets.length === 0) controls.push(new UIText({ className: 'pw-bag-use-note', text: t('item_use_no_targets') }));
-      details.addChild(new UIContainer({ className: 'pw-bag-use-controls', children: controls }));
-    } else if ([ItemKinds.TM, ItemKinds.HM, ItemKinds.STONE, ItemKinds.EVOLUTION, ItemKinds.CANDY, ItemKinds.CONSUMABLE].includes(definition?.kind)) {
-      details.addChild(new UIText({ className: 'pw-bag-use-note', text: t('item_use_deferred') }));
-    }
-    if (definition?.kind === ItemKinds.TREASURE) {
-      const quote = SaleSystem.getInstance().getQuote(entry.itemId, 1);
-      const price = quote?.currencyId === 'money'
-        ? t('money_amount', { value: TextFormatter.formatNumber(quote.gain) })
-        : `${TextFormatter.formatNumber(quote?.gain ?? 0)} ${t('currency_diamonds')}`;
-      details.addChild(new UIContainer({
-        className: 'pw-bag-sale-controls',
-        children: [
-          new UIText({ className: 'pw-bag-sale-price', text: t('sale_price', { price }) }),
-          new UIButton({
-            variant: 'success',
-            size: 'sm',
-            text: t('sale_sell_one'),
-            onClick: () => SaleSystem.getInstance().sell(entry.itemId, 1)
-          }),
-          entry.quantity > 1 ? new UIButton({
-            variant: 'secondary',
-            size: 'sm',
-            text: t('sale_sell_all', { count: TextFormatter.formatNumber(entry.quantity) }),
-            onClick: () => SaleSystem.getInstance().sell(entry.itemId, entry.quantity)
-          }) : null
-        ]
-      }));
-    }
-    return new UIContainer({
-      className: 'pw-bag-detail',
-      children: [
-        new UIImage({ src: ItemDB.getInstance().getImagePath(entry.itemId), alt: entry.name, className: 'pw-bag-detail-icon', pixelated: true }),
-        details
-      ]
-    });
-  }
-
-  /** @private */
-  _select(itemId) {
-    this._selected = this._selected === itemId ? null : itemId;
-    this._renderContent();
-  }
-
   /** @private */
   _setCategory(category) {
     if (this._mode === 'held-item' && category !== BagCategoryIds.HELD) return;
@@ -350,7 +665,6 @@ export class BagPanel extends UIFullscreenPanel {
   _reset() {
     this._sort = BagSorts.NAME_ASC;
     this._search = '';
-    this._selected = null;
     this._categoryTouched = this._mode === 'held-item';
     if (this._mode === 'held-item') this._category = BagCategoryIds.HELD;
     this._render();

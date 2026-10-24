@@ -1,0 +1,9 @@
+.pw-field-journal {
+  display: grid;
+  gap: 10px;
+  color: var(--pw-text-primary);
+}
+.pw-field-journal p {
+  margin: 0;
+  line-height: 1.5;
+}

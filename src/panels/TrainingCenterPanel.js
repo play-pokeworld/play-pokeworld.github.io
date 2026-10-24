@@ -1,22 +1,21 @@
-/**
- * @file TrainingCenterPanel.js
- * @brief Selects a trainee, starts a six-opponent session, and shows its live progress.
- */
+/** @file TrainingCenterPanel.js @brief Two persistent assignment cards and shared facility management. */
 import { DraggablePanel } from '../ui/DraggablePanel.js';
 import { UIContainer } from '../ui/UIContainer.js';
-import { UIText } from '../ui/UIText.js';
-import { UIImage } from '../ui/UIImage.js';
 import { UIButton } from '../ui/UIButton.js';
-import { UIDropdown } from '../ui/UIDropdown.js';
-import { UIProgressBar } from '../ui/UIProgressBar.js';
-import { AssetPaths } from '../config/AssetPaths.js';
+import { UIKeyedList } from '../ui/UIKeyedList.js';
+import { TrainingLockedSlotCard } from './facilities/TrainingLockedSlotCard.js';
+import { FacilityManagementSystem } from '../systems/FacilityManagementSystem.js';
+import { CurrencyChangedEvent } from '../core/events/CurrencyChangedEvent.js';
+import { TrainingSlotCard } from './facilities/TrainingSlotCard.js';
 import { WindowIds } from '../config/DashboardLayout.js';
-import { TrainingRules } from '../config/TrainingRules.js';
+import { ModalIds } from '../config/ModalIds.js';
 import { TrainingSystem } from '../systems/TrainingSystem.js';
+import { EventBus } from '../core/EventBus.js';
+import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
 import { TrainingBattleChangedEvent } from '../core/events/TrainingBattleChangedEvent.js';
 import { TrainingResultChangedEvent } from '../core/events/TrainingResultChangedEvent.js';
-import { LocationChangedEvent } from '../core/events/LocationChangedEvent.js';
-import { TeamChangedEvent } from '../core/events/TeamChangedEvent.js';
+import { BattleStartedEvent } from '../core/events/BattleStartedEvent.js';
+import { BattleEndedEvent } from '../core/events/BattleEndedEvent.js';
 import { BoxChangedEvent } from '../core/events/BoxChangedEvent.js';
 import { SaveCreatedEvent } from '../core/events/SaveCreatedEvent.js';
 import { SaveLoadedEvent } from '../core/events/SaveLoadedEvent.js';
@@ -33,124 +32,67 @@ export class TrainingCenterPanel extends DraggablePanel {
       title: t('training_center_title'),
       icon: 'dumbbell',
       bodyId: 'training-window-body',
-      bodyClassName: 'pw-static-022 pw-training-body',
-      name: 'TrainingCenterPanel'
+      bodyClassName: 'pw-static-022 pw-training-body machine-window-body',
+      name: 'TrainingCenterPanel',
     });
-    this._selectedUid = '';
-    for (const eventClass of [
-      TrainingBattleChangedEvent, TrainingResultChangedEvent, LocationChangedEvent,
-      TeamChangedEvent, BoxChangedEvent, SaveCreatedEvent, SaveLoadedEvent,
-      SaveDeletedEvent, ContentAccessChangedEvent
-    ]) this.listen(eventClass, () => this._render());
-    this._render();
+    const manage = new UIButton({
+      icon: 'settings',
+      text: t('training_management_button'),
+      className: 'hbtn pw-facility-manage',
+      onClick: () =>
+        EventBus.getInstance().dispatch(
+          new ModalOpenRequestedEvent(ModalIds.TRAINING_MANAGEMENT),
+        ),
+    });
+    manage.setAriaLabel(t('training_management_button'));
+    manage.setTooltip(t('training_management_button'));
+    this._slots = new UIKeyedList({
+      className: 'pw-training-slot-list',
+      create: (entry) => new TrainingSlotCard(entry.index),
+      update: (card, entry) => card.setEntry(entry),
+    });
+    this._lockedSlot = new TrainingLockedSlotCard();
+    this.addChildren([
+      new UIContainer({
+        className: 'hatchery-upgrade-row',
+        children: [manage],
+      }),
+      new UIContainer({
+        className: 'training-slot-grid pw-facility-slots',
+        children: [this._slots, this._lockedSlot],
+      }),
+    ]);
+    for (const event of [
+      CurrencyChangedEvent,
+      TrainingBattleChangedEvent,
+      TrainingResultChangedEvent,
+      BattleStartedEvent,
+      BattleEndedEvent,
+      BoxChangedEvent,
+      SaveCreatedEvent,
+      SaveLoadedEvent,
+      SaveDeletedEvent,
+      ContentAccessChangedEvent,
+    ])
+      this.listen(event, () => this._refresh());
+    this._refresh();
   }
-
   /** @override */
   onEnter() {
     super.onEnter();
-    this._render();
+    this._refresh();
   }
-
   /** @private */
-  _render() {
+  _refresh() {
     const system = TrainingSystem.getInstance();
-    const unlocked = system.isUnlocked();
-    this.toggleClass('pw-progression-hidden', !unlocked);
-    this.clearChildren();
-    if (!unlocked) return;
-    const state = system.getSnapshot();
-    const candidates = system.getCandidates();
-    if (state.active) {
-      this.addChild(this._activeSession(state));
-      return;
+    this.toggleClass('pw-progression-hidden', !system.isUnlocked());
+    if (system.isUnlocked()) {
+      this._slots.setEntries(system.getSnapshot().slots);
+      this._lockedSlot.setModel(
+        FacilityManagementSystem.getInstance()
+          .getUpgrades('training')
+          .find((model) => model.id === 'slots'),
+      );
     }
-    if (!system.canUseHere()) {
-      this.addChild(new UIText({ tagName: 'div', className: 'pw-training-locked', text: t('training_location_required', {
-        location: t(`location.${TrainingRules.LOCATION_ID}`)
-      }) }));
-      return;
-    }
-    if (state.lastResult) this.addChild(this._resultCard(state.lastResult));
-    if (candidates.length === 0) {
-      this.addChild(new UIText({ tagName: 'div', className: 'pw-training-empty', text: t('training_no_candidates') }));
-      return;
-    }
-    if (!candidates.some((candidate) => candidate.uid === this._selectedUid)) this._selectedUid = candidates[0].uid;
-    const select = new UIDropdown({
-      className: 'pw-training-select',
-      options: candidates.map((candidate) => ({
-        value: candidate.uid,
-        label: t('training_candidate_label', {
-          name: candidate.name,
-          level: candidate.level,
-          source: t(`hatchery_source_${candidate.source}`)
-        })
-      })),
-      value: this._selectedUid,
-      onChange: (uid) => { this._selectedUid = uid; }
-    });
-    this.addChild(new UIText({ tagName: 'div', className: 'pw-training-desc', text: t('training_session_description', {
-      count: TrainingRules.OPPONENT_COUNT,
-      mode: t('training_mode_move_title')
-    }) }));
-    this.addChild(new UIContainer({ className: 'pw-training-controls', children: [
-      select,
-      new UIButton({
-        variant: 'primary',
-        text: t('training_start_btn'),
-        onClick: () => system.startSession(select.getValue(), TrainingRules.MODE_ID)
-      })
-    ] }));
-  }
-
-  /** @private @param {Object} state */
-  _activeSession(state) {
-    return new UIContainer({
-      className: 'pw-training-card pw-training-card--active',
-      children: [
-        new UIText({ tagName: 'h3', className: 'pw-training-title', text: t('training_live_title') }),
-        new UIText({ tagName: 'div', className: 'pw-training-round', text: t('training_round_label', {
-          round: Math.min(state.opponentsDefeated + 1, state.opponentCount),
-          total: state.opponentCount
-        }) }),
-        new UIContainer({ className: 'pw-training-fighter', children: [
-          new UIImage({ src: AssetPaths.pokemonSprite(state.traineeSpecies), alt: state.traineeName, className: 'pw-training-sprite', pixelated: true }),
-          new UIContainer({ className: 'pw-training-fighter-info', children: [
-            new UIText({ tagName: 'div', text: t('training_trainee_label', { name: state.traineeName, level: state.traineeLevel }) }),
-            new UIProgressBar({ value: state.traineeHp, max: state.traineeMaxHp, variant: 'hp', size: 'sm' }),
-            new UIText({ className: 'pw-training-hp-text', text: t('hp_value_over_max', { value: state.traineeHp, max: state.traineeMaxHp }) })
-          ] })
-        ] }),
-        new UIContainer({ className: 'pw-training-fighter pw-training-fighter--foe', children: [
-          new UIImage({ src: AssetPaths.pokemonSprite(state.foeSpecies), alt: state.foeName, className: 'pw-training-sprite', pixelated: true }),
-          new UIContainer({ className: 'pw-training-fighter-info', children: [
-            new UIText({ tagName: 'div', text: t('training_opponent_label', { name: state.foeName, level: state.foeLevel }) }),
-            new UIProgressBar({ value: state.foeHp, max: state.foeMaxHp, variant: 'hp', size: 'sm' }),
-            new UIText({ className: 'pw-training-hp-text', text: t('hp_value_over_max', { value: state.foeHp, max: state.foeMaxHp }) })
-          ] })
-        ] }),
-        new UIButton({
-          variant: 'danger',
-          text: t('training_cancel_btn'),
-          onClick: () => TrainingSystem.getInstance().cancelSession()
-        })
-      ]
-    });
-  }
-
-  /** @private @param {Object} result */
-  _resultCard(result) {
-    const text = result.success
-      ? t('training_result_success', {
-        name: result.pokemonName,
-        reward: result.rewardMove ? t(`move.${result.rewardMove}.name`) : t('training_reward_none')
-      })
-      : result.result === 'cancelled'
-        ? t('training_session_cancelled')
-        : t('training_result_failed', { name: result.pokemonName || '' });
-    return new UIContainer({
-      className: `pw-training-result${result.success ? ' is-success' : ' is-failure'}`,
-      children: [new UIText({ text })]
-    });
   }
 }

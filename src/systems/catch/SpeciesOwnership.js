@@ -9,6 +9,13 @@
 import { CaughtStatus } from '../../data/save/PokedexData.js';
 
 export class SpeciesOwnership {
+  /** Permanent shiny unlock shared by capture and purchase; does not save or dispatch view events. */
+  static unlockShiny(save,species,form='') {
+    for(const pokemon of SpeciesOwnership.ownedPokemon(save)) {
+      if(pokemon.species===species&&pokemon.form===form&&!pokemon.shiny)pokemon.setShiny(true);
+    }
+  }
+
   /**
    * @param {import('../../data/save/SaveData.js').SaveData} save
    * @returns {import('../../data/pokemon/PokemonData.js').PokemonData[]} Team first, then the rest of the collection

@@ -2,6 +2,8 @@
  * @file BattleSummaryModal.js
  * @brief Original-style wild-session loot summary rendered entirely with UI widgets.
  */
+import { RelaunchControls } from './components/RelaunchControls.js';
+import { RelaunchRules } from '../config/RelaunchRules.js';
 import { StaticModalPanel } from '../ui/StaticModalPanel.js';
 import { UIContainer } from '../ui/UIContainer.js';
 import { UIText } from '../ui/UIText.js';
@@ -35,6 +37,8 @@ export class BattleSummaryModal extends StaticModalPanel {
       className: 'pw-battle-summary-shell',
       name: ModalNames.BATTLE_SUMMARY
     });
+    this._summaryContent=new UIContainer({className:'pw-summary-content'});
+    this.addChildren([this._summaryContent,new UIContainer({className:'pw-relaunch-group',children:[new RelaunchControls(RelaunchRules.WILD,'summary'),new RelaunchControls(RelaunchRules.DUNGEON,'summary')]})]);
     this.setBodyClass('pw-battle-summary-modal');
     for (const eventClass of [BattleStartedEvent, BattleStateChangedEvent, BattleEndedEvent, DungeonRunChangedEvent, SaveCreatedEvent, SaveLoadedEvent]) {
       this.listen(eventClass, () => {
@@ -51,11 +55,11 @@ export class BattleSummaryModal extends StaticModalPanel {
 
   /** @private */
   _render() {
-    this.clearChildren();
+    this._summaryContent.clearChildren();
     const summary = this._mergeDungeonRun(BattleSystem.getInstance().getBattleSummary());
     const run = summary.run;
     if (!run) {
-      this.addChild(new UIText({ tagName: 'p', className: 'battle-summary-empty', text: t('battle_summary_empty') }));
+      this._summaryContent.addChild(new UIText({ tagName: 'p', className: 'battle-summary-empty', text: t('battle_summary_empty') }));
       return;
     }
 
@@ -65,7 +69,7 @@ export class BattleSummaryModal extends StaticModalPanel {
     this._renderDamage(run.damageByPokemon || [], layout);
     this._renderCaptures(run.catches || [], layout);
     this._renderItems(run.items || [], layout);
-    this.addChild(layout);
+    this._summaryContent.addChild(layout);
     this._renderFooter(summary);
   }
 
@@ -374,6 +378,6 @@ export class BattleSummaryModal extends StaticModalPanel {
       text: t('loot_continue_btn'),
       onClick: () => this.close()
     }));
-    this.addChild(new UIContainer({ className: 'pw-static-063 pw-battle-summary-footer', children: buttons }));
+    this._summaryContent.addChild(new UIContainer({ className: 'pw-static-063 pw-battle-summary-footer', children: buttons }));
   }
 }

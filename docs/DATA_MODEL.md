@@ -1,7 +1,7 @@
 # Data model (v1.14)
 
-How the Rework stores, loads, validates and saves its data. The current package release is **1.14.17** and
-`SaveSchema.VERSION` is **16**; those are separate version numbers. League titles are stored as
+How the Rework stores, loads, validates and saves its data. The current package release is **1.14.25** and
+`SaveSchema.VERSION` is **20**; those are separate version numbers. League titles are stored as
 regional entries in `statistics.leaguesWon`, never as Gym badge IDs. Each owned Pokémon also stores
 `unlockedMoves`, `favorite` and `locked`; the latter two are PC collection metadata, not battle rules.
 This document replaces the recommendations of `docs/DATA_REVIEW.md` (v1.3), which are now implemented
@@ -73,11 +73,11 @@ Frozen enums shared by the generators, the validator and the engine:
 
 ---
 
-## 3. Save format (schema 16, package v1.14.17)
+## 3. Save format (schema 19, package v1.14.20)
 
 ```js
 {
-  version: 16, id: 'PW-…', background, createdAt, updatedAt,
+  version: 19, id: 'PW-…', background, createdAt, updatedAt,
   player:       { trainerName, trainerSprite, region, location, playTimeSeconds, badges: [ids] },
   currencies:   { money, dungeonToken, questPoint, diamond, battlePoint, farmPoint, contestToken,
                   revealed: { <currencyId>: boolean } },
@@ -95,8 +95,15 @@ Frozen enums shared by the generators, the validator and the engine:
                   caughtTotal, duplicateCatches, purchases, hatcheryLevel, trainingSessions },
   tutorial:     { enabled, completed: [stepIds], rewardsClaimed: [stepIds] },
   dungeons:     { exploredTotal, clears: { <locationId>: n }, run: DungeonRunData|null, lastRun },
-  hatchery:     { maxSlots, slots: [null | DaycareSlot | FossilSlot] },
-  mine:         { energy, maxEnergy, tool, grid, items, completedCount, lastEnergyAt },
+  talents:      { <speciesId>: [unlockedTalentIds] },
+  staff:        { owned: { <staffId>: { level, xp } }, active: { <sector>: staffId } },
+  training:     { maxSlots, queueLevel, slots: [ { pokemonUid, mode, battle, elapsed,
+                  autoPurchased, autoEnabled, autoOptions, filters, queue: [uids], result } ] },
+  hatchery:     { maxSlots, modes, pendingModes, priorities, queues, queueLevel, filters, autoOptions,
+                  autoHatchPurchased, autoHatchEnabled, autoFillPurchased, autoFillEnabled,
+                  slots: [null | DaycareSlot | IncubationSlot | FossilSlot] },
+  mine:         { energy, maxEnergy, energyLevel, tool, unlockedTools, autoPurchased, autoEnabled,
+                  grid, items, completedCount, lastEnergyAt, manualSurveyReadyAt },
   secretBase:   { layoutId, locationId, decorations, stock, npcs, npcStock, spawn, nextUid,
                   record, pcMessage, flags: { count, collectedIds, lastRankNotified } },
   access:       { unlockedLocations: [ids], unlockedFeatures: { <featureId>: true },
@@ -120,7 +127,7 @@ box), and is disabled during battle.
 
 `collection` is the single owner of per-save Pokémon data (`PokemonCollectionData`, keyed by uid).
 Every other domain references it by uid: the party (`TeamMembersData`), daycare slots
-(`{ kind: 'daycare', pokemonUid, knockouts }`) and team presets. A Pokémon therefore stays the same
+(`{ kind: 'daycare', pokemonUid, knockouts }`), incubation, training assignments/queues and team presets. A Pokémon therefore stays the same
 object wherever it is used, and the **PC box shows the whole collection** (party, daycare, training
 included) without duplicates. Loading repairs dangling references: an unknown party uid is dropped, a
 daycare Pokémon cannot also be in the party, and a daycare slot pointing to no owned Pokémon is
@@ -131,8 +138,8 @@ Where a Pokémon is used is answered by `PokemonUsageSystem`:
 | Usage (`PokemonUsageIds`) | Source |
 |---|---|
 | `team` | persisted: `save.team` uids |
-| `daycare` | persisted: hatchery daycare slots |
-| `training` | session claim by `TrainingSystem` for the trainee (cleared on save change) |
+| `daycare` | persisted: hatchery daycare/incubation slots and Pokémon queues |
+| `training` | persisted: training assignment and queue UIDs, even while idle |
 
 Future modes claim/release their own session usage the same way. `config/PokemonUsageRules.js` maps
 each action (`PokemonActionIds`) to the usages that lock it (`lockedBy`) or that it requires
@@ -141,8 +148,8 @@ each action (`PokemonActionIds`) to the usages that lock it (`lockedBy`) or that
 | Action | Rule |
 |---|---|
 | `learnMove` | locked by daycare, training (and globally during a battle) |
-| `changeHeldItem` | requires team |
-| `useItem` | locked by daycare |
+| `changeHeldItem` | requires team; locked for the active training combatant |
+| `useItem` | locked by daycare; locked for the active training combatant |
 | `joinTeam` | locked by team, daycare, training |
 | `depositDaycare` / `train` | locked by daycare, training |
 
@@ -151,7 +158,7 @@ Favorite / lock flags are always editable. Generic PC selections carry the reque
 Pokémon sheet shows the current location and disables locked actions with their reason.
 `SpeciesOwnership` reads the whole collection, so daycare Pokémon now count as owned.
 
-The `hatchery` model persists daycare Pokémon and fossil incubation progress. The `mine` model stores
+The `hatchery` model persists UID-based daycare/Pokémon incubation, fossil progress, queue order and automation settings. The `mine` model stores
 the current grid, tool, exposed-loot shapes and energy timestamp. The `secretBase` model stores the
 player's Hoenn room, placed decorations, decoration stock, NPC battle snapshots, visit record, PC
 message and flag-collection history; derived rank and distinct-base counts are not stored separately.
@@ -197,6 +204,7 @@ separate so one-time rewards cannot be duplicated.
   - `MigrationOriginalToV1`: export of the original game (`{ G: … }`): team, Pokédex, money,
     position, badges, plus the established secret base (`G.base`) and ORAS flag progress
     (`G.secretBaseFlags`), with NPC roster species converted from dex numbers to stable slugs;
+    also carries original species talent unlocks and recruited staff level/XP/activation;
   - `MigrationV1ToV2`: version field, Pokédex entries, derived caught count;
   - `MigrationV2ToV3`: PokemonData v2, badge ids, inventory, quests (`convertQuests`), statistics;
   - `MigrationV3ToV4`: original `pokeballs.counts` join the inventory, `pokeballs.filters` become
@@ -233,8 +241,70 @@ separate so one-time rewards cannot be duplicated.
     one `collection`; `team` becomes a uid list and daycare slots store `pokemonUid`; `box` is removed.
     A Pokémon without uid or with an already used uid receives a deterministic `p_v16_<n>` uid, so no
     Pokémon is lost or duplicated.
+  - `MigrationV16ToV17`: adds empty training/staff models and facility automation fields, default
+    mine tools and a validated species talent ledger backfilled from equipped talents. Collection UIDs,
+    party references and existing facility progress remain canonical. No prior battle DTO is fabricated.
+  - `MigrationV17ToV18`: adds normalized per-slot hatchery/training filters without touching collection
+    UIDs, assignments, FIFO entries or existing battle DTOs. Old hatchery sorting uses explicit `legacy`;
+    an old single training option becomes that mode, and multi-option order stays `configured`.
+    Malformed empty slots and unbounded hatchery slot counts are normalized safely.
+  - `MigrationV18ToV19`: adds `mine.manualSurveyReadyAt`, default zero (first manual survey ready).
+    Existing boards, treasure collection, energy, all UID references, filters, FIFO and battle DTOs
+    remain untouched. There is no league repair in this migration.
 - `SaveSystem` is the only writer: **one write per operation** (`saveCurrent()` after a battle,
   a quest claim, a travel…), through `SaveStorage` → `LocalStore`.
+
+### Facility state and exact training resume (schema 18)
+
+`TrainingData` stores assignments and queue UIDs, not owned Pokémon copies. Cancel stops a battle;
+only explicit slot/queue removal releases the reservation. `TrainingSystem` creates independent
+`BattleSession` runtimes from these records and updates their JSON DTOs on ticks. `SaveSystem` writes
+on a 5-second checkpoint, outgoing save switch and browser hide/unload requests (`SaveLifecycle`),
+with duplicate lifecycle flushes suppressed. Unloaded battles do not progress offline.
+
+`BattleSessionState` captures a versioned, bounded DTO: owned team UIDs, NPC Pokémon records,
+active/reserve order, HP/status, stat modifiers and turns, entry-trigger markers, history,
+weather/terrain (permanent weather encoded explicitly), cooldown clocks, elapsed time and seeded RNG
+state. `BattleSnapshotValidator` checks version, scalar bounds, collections, known identifiers and
+UID references **before** constructing any combatants or mutating owned HP. Restoration rebinds owned
+combatants to the canonical collection, never reruns `start()`/entry effects, and restores callbacks.
+An invalid/incompatible DTO is discarded, its automation paused and assignment retained. This is
+Rework-to-Rework resume; original-runtime battle snapshots are not translated.
+
+`TalentUnlockData` stores only species-appropriate normal/hidden talent IDs. Equipping is a separate
+command checked by `PokemonTalentSystem` and central action locks; hidden talent remains passive.
+Training rolls the full normal pool, including confirmations; a result records whether it was new.
+Original imports preserve `G.unlockedTalents` (numeric species IDs translated to slugs) and `G.staff`
+(owned/level/XP/active normalized to known staff, one active per sector). Original Pokémon incubation, training assignments,
+automation/queues and combat DTOs still lack complete translation and must not be described as a
+lossless legacy-facility import.
+
+Staff effective formulas live in rules/systems, not views. Advertised legacy bonuses that the reference
+never applies are disclosed without inventing effects. Legacy staff prices labelled PC use the existing
+`questPoint` currency. Johto quest 111 unlocks Pokémon incubation **when reached**, and only genuine
+collection dispatches its hatch objective. A deposit/readiness event never credits the hatch.
+
+### Slot-local automation filters (schema 18)
+
+`FacilityFilterData` holds only normalized selector facts. Hatchery fields are `filterShiny`,
+`filterIv`, `filterFav`, `filterRegion`, `filterRank`, `filterType`, `sort`; training uses `mode`,
+`filterShiny`, `filterEv`, `filterFav`, `filterRegion`, `filterRank`, `filterType`, `sort`.
+IV/EV completeness means a total of 36; filter rank S+ means IV total >= 24, **not** species rank.
+Regions follow the reference national dex ranges. Central usage/action locks still exclude unavailable
+Pokémon, including locked ones; a filter never grants a bypass.
+
+`FacilityCandidateRules` is shared by manual queue generation and empty-queue automatic selection.
+Existing FIFO entries are never re-filtered. Hatchery generation can target one slot, without touching
+another slot's queue. Training `all` mode resolves talent, hidden, move, EV, level in that order,
+skipping locked or ineligible modes. Single/configured/all choices survive serialization. Migrated
+hatchery `legacy` sorting and training `configured` priorities keep their old behavior and expose their
+compatibility controls only when selected. The main admission fee remains conditional on auto-hatch;
+auto-fill alone does not introduce a new fee.
+
+Changing an idle training assignment is atomic through the shared PC chooser. Cancelling leaves the
+old reservation intact; a running battle cannot be replaced. The Mine's explicit new-survey command
+requires UI confirmation before discarding an unfinished board, grants no hidden loot, and does not
+change energy; the default system command remains safe on an active layer.
 
 ### Central content access (schema 15)
 
@@ -370,3 +440,111 @@ UI: `PokeballsPanel` (filters, ball, quantity of the chosen ball), `BallFilterEd
 | `LocationChangedEvent` | `LocationSystem` | map, battle scene, QuestSystem, facility panels |
 
 Models mutate their state **before** dispatching, so a listener always reads the new state.
+
+
+### Manual Mine survey clock and preset editing (schema 19)
+
+`manualSurveyReadyAt` is an absolute millisecond deadline, written only after a successful manual
+`startNextLayer`. The system enforces `MineRules.MANUAL_SURVEY_COOLDOWN_MS` (600,000 ms), including
+confirmed discards, reloads and save switches. Lazy initialization and automatic renewal after genuine
+loot completion neither set nor reset the deadline. View polling reads the wall clock and never writes
+or regenerates a board. The disabled button keeps a dedicated clock skin because the original stylesheet
+intentionally hides disabled `.hbtn` controls. Existing image/dropdown defaults remain unchanged.
+
+`TeamPresetEditSystem` owns a transient UID-only draft and an opaque, save-bound PC selection request.
+It stores no Pokémon copies and adds no persisted preset shape. Cancellation discards only that draft.
+`TeamPresetSystem.applyMembers` validates before changing either the preset or the party, then performs
+one canonical team transaction and one save. `TeamPresetsPanel` is a `UIFullscreenPanel`; the separate
+`TeamPresetEditorModal` composes full `PokemonCardView`s, shared PC/item/info selectors and `UISortableList`.
+Boxed resting HP is a presentation option, never an owned-HP mutation. Whole-card pointer holds and
+handles share coordinate-based targeting; both axes are used for multi-column editors.
+
+`SecretBaseSystem.getLocationAlcovesSnapshot` exposes existing access, route layouts and ownership
+facts. `LocationAlcoves` renders its own stable bottom section and uses the existing visit, establish
+and relocate commands. First settlement is direct; relocation requires confirmation. Unrelated KO
+refreshes do not detach the section or its confirmation, and save/route changes invalidate stale UI.
+
+## 1.14.21 addition — live relaunch and pilot preferences (schema 20)
+
+`SaveData.relaunch` is a `RelaunchData` model. It stores `wild` / `dungeon` module ownership and
+activation, plus the remembered dungeon mode (`farm`, `boss`, `chest`). A module is not an inventory
+item. `DungeonRunData.auto` accepts a validated mode string or `false` (`true` from an older Rework
+save becomes `farm`). Countdown deadlines, planned targets and UI state are transient.
+
+`MigrationV19ToV20` adds normalized preferences without changing collections, reservations, queues,
+training battle DTOs or Mine clocks. Original imports recover explicit legacy automation ownership
+and preferences through `LegacyRelaunchMigration`; this does not import the original runtime's
+battle snapshots or offline simulation engine.
+
+Natural wild-chain defeat and natural dungeon finish have distinct typed events. Manual Quit,
+abandonment and climbing out do not arm relaunch. Each new dungeon run pays the canonical toll.
+A cancelled countdown does not revoke ownership or the saved activation preference.
+
+The optional tutorial kit under `docs/examples/auroria/` demonstrates an additional `fieldJournal`
+model in a separate **1.14.26-demo / schema 21 copy**. It is not part of production SaveData. See
+[the French A–Z guide](GUIDE_CREATION_REGION_A_Z.md) for content, access, systems and migration.
+
+
+## 1.14.22 addition — regional market, no save-shape change (schema 20)
+
+Market offers derive from `MarketRules`, the region, actual encounter tables, evolutions and real
+collection ownership. The access flag in `FeatureAccessSystem` snapshots is transient and derived;
+no market flag, duplicate collection or redundant purchase count is stored in `SaveData`.
+
+`ShopSystem.buyMarket` prepares the complete batch before payment, uses canonical `TeamSystem` /
+`BoxSystem` acquisition, and saves once. Only the first newly owned species may auto-join a free
+party slot; additional copies remain independent collection entries. All party entries remain UID
+references. Purchases mark the Pokédex and unlock drawn talents/shininess but do not publish a wild
+capture or hatch event. The typed completion event is `MarketPurchaseCompletedEvent`.
+
+`TeamChangedEvent` and `BoxChangedEvent` accept `deferSave` metadata for a larger acquisition
+transaction, so state-based objectives can update before its one final write. Default callers retain
+the previous behavior. The market preserves valid training DTOs, queues, reservations and Mine clocks.
+The explicitly approved Johto policy filters the unchanged Rework encounter tables (six offers),
+rather than removing nine existing wild species to reproduce the main runtime's fifteen offers.
+
+
+## 1.14.23 — interaction and legacy compatibility, schema 20 unchanged
+
+Whole-card dragging is a transient pointer gesture. The original row and collection object remain
+owned once; a CSS-variable-driven placeholder/motion never serializes or mutates the roster until
+`TeamSystem.swapMembers` commits one UID exchange. Cancellation, save changes and clicks below the
+movement threshold do not write. Combat UI switching resolves the visible party UID to the in-flight
+combatant; reordering the party does not recreate the battle or reset its HP/RNG/clocks.
+
+The original-main import recognizes explicit ownership maps, positive paid receipts, true/1 flags,
+owned-id lists and structured purchased/owned receipts. Explicit disabled preferences stay disabled.
+Missing or negative data never grants either module. All conversion remains before model reading;
+no new persisted field or schema change is introduced. A source export without purchase evidence
+cannot be repaired by inventing a purchase. The minimal Auto switch is a view of ownership, not its
+source of truth, and remains available in the applicable live battle/dungeon context.
+
+
+## 1.14.24 — named location context and cosmetic flights, schema 20 unchanged
+
+`LocationActivityRules` selects one activity from the location kind and wild/roaming availability.
+Dungeon wins over a wild pool; towns have no ordinary exploration; a roaming-only outdoor site is
+explorable. Both Location actions and relaunch presentation read this resolver. Per-module ownership,
+preferences and prices are unchanged. Toggle captions are localized names, not duplicated headings.
+
+Background flights are transient UI-only reservations. Caught/shiny species still derive from the
+active save's Pokedex; no decorative state is serialized. A separate `SeededRandom` instance seeded
+from the cosmetic clock does not draw from `Random.default` or the battle RNG. Pure flight rules
+choose fully offscreen edge endpoints, staggered start times, bounded speed/density and analytical
+minimum peer distance over their shared lifetime. CSS owns transform/opacity interpolation. A quiet
+poll recycles a bounded node pool; resize, save changes, reduced motion, visibility and page exit
+reset outside the viewport, without an offline gameplay simulation or a save write.
+
+
+## 1.14.25 — native Dictionary reimplementation, schema 20 unchanged
+
+`DictionaryCatalog` provides pure, read-only queries for items, moves, talents and their detail modals.
+Progressive item discovery is governed by `ItemGenerationRules`, filtering items by unlocked regional
+generation (Kanto=1, Johto=2, Hoenn=3; Gen 4+ hidden). Hidden items require owned inventory. Move user
+counts dynamically inspect `save.collection.getAll()`. Move learners are categorized by level pool,
+TM/HM compatibility, and training pool. Ability carriers and hidden carriers are extracted from
+species definitions.
+
+The UI is pure composition: `DictionaryPanel` extends `UIFullscreenPanel` (`ModalIds.DICTIONARY`),
+and `DictionaryDetailModal` extends `StaticModalPanel` (`ModalIds.DICTIONARY_DETAIL`). No game data or
+save schemas are mutated.

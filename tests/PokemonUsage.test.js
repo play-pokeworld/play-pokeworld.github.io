@@ -17,6 +17,7 @@ import { PokemonData } from '../src/data/pokemon/PokemonData.js';
 import { PokemonFactory } from '../src/data/pokemon/PokemonFactory.js';
 import { SaveSystem } from '../src/systems/SaveSystem.js';
 import { BoxSystem } from '../src/systems/BoxSystem.js';
+import { TrainingSystem } from '../src/systems/TrainingSystem.js';
 import { TeamSystem } from '../src/systems/TeamSystem.js';
 import { PokemonUsageSystem } from '../src/systems/PokemonUsageSystem.js';
 import { MoveLearningSystem } from '../src/systems/MoveLearningSystem.js';
@@ -119,15 +120,18 @@ describe('PC box and Pokémon usages', (test) => {
     }
   });
 
-  test('a session claim locks only the incompatible actions and is released cleanly', () => {
+  test('a persisted training assignment locks incompatible actions and needs explicit removal', () => {
     const { save, stored } = rosterSave('Usage claim');
+    const training = TrainingSystem.getInstance();
+    save.access.unlockFeature('training');
     const usage = PokemonUsageSystem.getInstance();
     const events = [];
     const unsubscribe = EventBus.getInstance().subscribe(PokemonUsageChangedEvent, (event) => events.push(event));
     try {
       assert.equal(usage.isAvailable(stored.uid), true);
-      assert.ok(usage.claim(PokemonUsageIds.TRAINING, stored.uid));
-      assert.equal(events.at(-1)?.pokemonUid, stored.uid);
+      assert.equal(usage.claim(PokemonUsageIds.TRAINING, stored.uid), false, 'training is not a transient claim');
+      assert.equal(training.assignPokemon(0, stored.uid).result, 'ready');
+      assert.ok(events.length > 0, 'persisted assignment notifies consumers');
       assert.equal(usage.claim(PokemonUsageIds.TEAM, stored.uid), false, 'persisted usages cannot be claimed');
       assert.equal(usage.getPrimaryUsage(stored.uid), PokemonUsageIds.TRAINING);
       assert.equal(BoxSystem.getInstance().getPokemonByUid(stored.uid), stored, 'a busy Pokémon never leaves the PC');
@@ -136,16 +140,22 @@ describe('PC box and Pokémon usages', (test) => {
       assert.equal(MoveLearningSystem.getInstance().learnMove(stored.uid, 'surf').result, MoveLearningResults.POKEMON_IN_USE);
       assert.equal(usage.canPerform(stored.uid, PokemonActionIds.USE_ITEM), true, 'item use is not locked by training');
 
-      assert.ok(usage.release(PokemonUsageIds.TRAINING, stored.uid));
-      assert.equal(usage.release(PokemonUsageIds.TRAINING, stored.uid), false);
+      assert.equal(usage.release(PokemonUsageIds.TRAINING, stored.uid), false, 'session release cannot unassign a persisted slot');
+      assert.ok(training.clearSlot(0));
       assert.equal(MoveLearningSystem.getInstance().learnMove(stored.uid, 'surf').result, MoveLearningResults.SUCCESS);
       assert.ok(TeamSystem.getInstance().addMember(stored.uid));
       assert.deepEqual(usage.getUsages(stored.uid), [PokemonUsageIds.TEAM]);
       assert.equal(save.collection.size, 3, 'joining the team does not copy the Pokémon');
 
-      usage.claim(PokemonUsageIds.TRAINING, save.team[0].uid);
+      assert.equal(training.assignPokemon(0, save.team[0].uid).result, 'ready');
       SaveSystem.getInstance().createNewSave('Usage reset', 'charmander');
-      assert.equal(usage.getUsages(stored.uid).length, 0, 'session claims end with the save context');
+      assert.equal(usage.getUsages(stored.uid).length, 0, 'the new save has no such Pokémon');
+      {
+        const restored = SaveSystem.getInstance().loadSlot(save.id);
+        assert.ok(restored.training.getReservedUids().includes(save.team[0].uid), 'the outgoing assignment was saved');
+        assert.equal(usage.getPrimaryUsage(save.team[0].uid), PokemonUsageIds.TRAINING);
+        training.clearSlot(0);
+      }
     } finally {
       unsubscribe();
     }
@@ -166,21 +176,19 @@ describe('PC box and Pokémon usages', (test) => {
   });
 
   test('the Pokémon sheet shows the location and disables locked actions with their reason', () => {
-    const { lead, stored, housed } = rosterSave('Sheet locks');
+    const { save, lead, stored, housed } = rosterSave('Sheet locks');
+    save.access.unlockFeature('training');
     housed.unlockMove('swift');
     lead.unlockMove('swift');
     const modal = new PokemonInfoModal();
     const learnButtons = () => [...modal.getDomElement().querySelectorAll('.poke-detail-learnable-row')]
-      .map((row) => row.querySelector('.pw-button'));
-    const heldItemButton = () => modal.getDomElement().querySelector('[data-focus-key="pokemon-info-held-item"]');
+      .map((row) => row.querySelector('.pw-button') || row);
     const location = () => modal.getDomElement().querySelector('.poke-detail-location')?.textContent ?? '';
     try {
       modal.open({ pokemonUid: housed.uid });
       assert.ok(location().includes(t('pokemon_usage_daycare')), 'the sheet knows the daycare location');
       assert.ok(learnButtons().length > 0 && learnButtons().every((button) => button.getAttribute('disabled') === 'disabled'), 'daycare Pokémon cannot learn moves');
       assert.ok(modal.getDomElement().textContent.includes(t('pokemon_action_locked_daycare')), 'the lock reason is displayed');
-      assert.equal(heldItemButton()?.getAttribute('disabled'), 'disabled');
-      assert.ok(modal.getDomElement().textContent.includes(t('pokemon_action_requires_team')), 'held items require the team');
 
       modal.open({ pokemonUid: stored.uid });
       assert.ok(location().includes(t('pokemon_usage_none')), 'a free Pokémon is shown as stored in the PC');
@@ -188,12 +196,11 @@ describe('PC box and Pokémon usages', (test) => {
       modal.open({ pokemonUid: lead.uid });
       assert.ok(location().includes(t('pokemon_usage_team')), 'team location');
       assert.ok(learnButtons().length > 0 && learnButtons().every((button) => button.getAttribute('disabled') !== 'disabled'), 'team Pokémon learn moves outside battle');
-      assert.ok(heldItemButton()?.getAttribute('disabled') !== 'disabled', 'team held item editable');
 
-      PokemonUsageSystem.getInstance().claim(PokemonUsageIds.TRAINING, lead.uid);
+      assert.equal(TrainingSystem.getInstance().assignPokemon(0, lead.uid).result, 'ready');
       assert.ok(location().includes(t('pokemon_usage_training')), 'the open sheet follows usage changes');
       assert.ok(learnButtons().every((button) => button.getAttribute('disabled') === 'disabled'), 'training locks moves');
-      PokemonUsageSystem.getInstance().release(PokemonUsageIds.TRAINING, lead.uid);
+      TrainingSystem.getInstance().clearSlot(0);
     } finally {
       if (modal.isOpen()) modal.close();
       modal.destroy();

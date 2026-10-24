@@ -48,6 +48,7 @@ import { grantItem } from './inventory/ItemGrant.js';
 import { ItemDB } from '../data/items/ItemDB.js';
 import { BattleStartedEvent } from '../core/events/BattleStartedEvent.js';
 import { BattleStateChangedEvent } from '../core/events/BattleStateChangedEvent.js';
+import { BattleRunFinishedEvent } from '../core/events/BattleRunFinishedEvent.js';
 import { BattleEndedEvent } from '../core/events/BattleEndedEvent.js';
 import { SaveCreatedEvent } from '../core/events/SaveCreatedEvent.js';
 import { SaveLoadedEvent } from '../core/events/SaveLoadedEvent.js';
@@ -109,6 +110,7 @@ export class BattleSystem extends BaseSystem {
     /** @private @type {Function|null} */ this._onLocalQuestBattleRequested = null;
     /** @private @type {Function|null} */ this._onModalToggled = null;
     /** @private @type {Function|null} */ this._onSaveContextChanged = null;
+    /** @private @type {number} */ this._speedMultiplier = 1;
   }
 
   /** @override */
@@ -311,6 +313,12 @@ export class BattleSystem extends BaseSystem {
     return true;
   }
 
+  /** @param {string} uid @returns {boolean} UI party order may change without reordering in-flight combatants. */
+  switchPlayerPokemonByUid(uid){
+    const index=this._session?.team.findIndex(combatant=>combatant.pokemon.uid===uid)??-1;
+    return index>=0&&this.switchPlayerPokemon(index);
+  }
+
   /**
    * Random source of the next battles (tests use Random.sequence).
    * @param {Random} random
@@ -449,11 +457,14 @@ export class BattleSystem extends BaseSystem {
    * @param {boolean} [victory=false]
    * @param {number} [exp=0]
    * @param {number} [money=0]
-   * @param {{questPoints?: number}} [details={}]
+   * @param {{questPoints?: number,natural?:boolean}} [details={}]
    */
   endBattle(victory = false, exp = 0, money = 0, details = {}) {
     if (!this.isActive()) return;
     const session = this._session;
+    const locationId=this._locationId;
+    const kind=this._dungeonContext?'dungeon':this._trainer?'trainer':this._questKey||this._localQuestBattleKey?'quest':this._secretBaseBattle?'base':this._wildChain?'wild':'encounter';
+    const natural=details.natural===true;
     const localQuestBattleKey = this._localQuestBattleKey;
     const secretBaseBattle = this._secretBaseBattle;
     let endedAsVictory = !!victory;
@@ -514,6 +525,32 @@ export class BattleSystem extends BaseSystem {
     this._dungeonContext = null;
     SaveSystem.getInstance().saveCurrent();
     EventBus.getInstance().dispatch(new BattleEndedEvent(endedAsVictory, exp, money));
+    EventBus.getInstance().dispatch(new BattleRunFinishedEvent(locationId,kind,endedAsVictory?'victory':natural?'defeat':'stopped',natural));
+  }
+
+  /**
+   * Sets the debug battle speed multiplier (e.g. 10 for x10 speed).
+   * @param {number} multiplier
+   */
+  setSpeedMultiplier(multiplier) {
+    this._speedMultiplier = Math.max(1, Number(multiplier) || 1);
+  }
+
+  /**
+   * @returns {number} Current speed multiplier (1 by default).
+   */
+  getSpeedMultiplier() {
+    return this._speedMultiplier || 1;
+  }
+
+  /**
+   * Toggles between 1x and 10x battle speed.
+   * @returns {number} New multiplier (1 or 10).
+   */
+  toggleSpeedMultiplierX10() {
+    const next = this.getSpeedMultiplier() === 10 ? 1 : 10;
+    this.setSpeedMultiplier(next);
+    return next;
   }
 
   /**
@@ -523,7 +560,8 @@ export class BattleSystem extends BaseSystem {
   update(dt) {
     const session = this._session;
     if (!session) return;
-    session.update(dt);
+    const timeScale = this._speedMultiplier > 1 ? this._speedMultiplier : 1;
+    session.update(dt * timeScale);
     const hits = session.drainHits();
     if (this._activeRun) {
       this._activeRun.playerKOs = session.playerKOs;
@@ -561,6 +599,10 @@ export class BattleSystem extends BaseSystem {
    * @returns {boolean}
    */
   _begin(foe, locationId, questKey, intro, reserves = [], foeOptions = {}) {
+    if (TrainingSystem.getInstance().isActive()) {
+      this._warn('facility_outdoor_blocked_training');
+      return false;
+    }
     const save = SaveSystem.getInstance().getCurrentSave();
     const team = save?.team ?? [];
     if (!team.some((pokemon) => !pokemon.isFainted())) {
@@ -576,6 +618,7 @@ export class BattleSystem extends BaseSystem {
       foeOptions,
       random: this._random,
       weather: LocationDB.getInstance().getById(locationId)?.weather ?? null,
+      hiddenTalentUnlocked: (species) => save.talents.hasHidden(species),
       ownedQuantity: (itemId) => save.inventory.count(itemId),
       reserves,
       nextFoeFactory: this._wildChain
@@ -849,7 +892,7 @@ export class BattleSystem extends BaseSystem {
         this._snapshotRun()
       ));
     }
-    this.endBattle(victory, exp, money, { questPoints });
+    this.endBattle(victory,exp,money,{questPoints,natural:true});
   }
 
   /**

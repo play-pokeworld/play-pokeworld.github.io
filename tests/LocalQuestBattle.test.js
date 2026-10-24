@@ -82,17 +82,20 @@ describe('Local quest battle', (test) => {
   });
 
   test('a local quest battle is refused while an independent training session is active', () => {
-    prepareAzaleaQuestSave('Local quest training guard');
+    const save = prepareAzaleaQuestSave('Local quest training guard');
+    save.access.unlockFeature('training');
     quests.init();
     battle.init();
     const training = TrainingSystem.getInstance();
-    const previousSession = training._session;
-    training._session = {};
+    training.init();
+    assert.equal(training.startSession(save.team[0].uid).result, 'ready');
     try {
       assert.ok(quests.requestLocalDefeatBattle('azalea', 'side.s33'));
       assert.equal(battle.isActive(), false);
     } finally {
-      training._session = previousSession;
+      training.cancelSession(0);
+      training.clearSlot(0);
+      training.onDestroy();
     }
   });
 

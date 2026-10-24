@@ -5,6 +5,7 @@
  *
  * ShopOffer: { key, kind (ShopOfferKinds), itemId, currency, unitPrice, owned, soldOut }
  */
+import { RelaunchRules } from '../../config/RelaunchRules.js';
 import { ShopDB } from '../../data/shops/ShopDB.js';
 import { ItemDB } from '../../data/items/ItemDB.js';
 import { ItemStacking } from '../../data/items/ItemStacking.js';
@@ -66,6 +67,10 @@ export class ShopCatalog {
         });
       }
     }
+    for(const [upgradeId,rule] of Object.entries(RelaunchRules.UPGRADES)){
+      if(save.relaunch?.[upgradeId]?.purchased)continue;
+      offers.push({key:rule.key,kind:ShopOfferKinds.UPGRADE,upgradeId,currency:RelaunchRules.CURRENCY,unitPrice:rule.cost,owned:0,limit:1,soldOut:false,labelKey:rule.labelKey,descriptionKey:rule.descriptionKey,icon:rule.icon});
+    }
     return offers;
   }
 
@@ -76,6 +81,7 @@ export class ShopCatalog {
    * @returns {number} Total price (Master Ball: every copy one step dearer)
    */
   static totalPrice(offer, quantity, save) {
+    if(offer.kind===ShopOfferKinds.UPGRADE)return offer.unitPrice;
     if (offer.kind !== ShopOfferKinds.MASTER_BALL) return offer.unitPrice * quantity;
     const price = ShopRules.MASTER_BALL.prices.find((entry) => entry.currency === offer.currency);
     const bought = save.statistics.purchases[offer.itemId] || 0;
@@ -91,6 +97,7 @@ export class ShopCatalog {
    * @returns {number}
    */
   static maxQuantity(offer, save) {
+    if(offer.kind===ShopOfferKinds.UPGRADE)return 1;
     const balance = save.currencies.get(offer.currency);
     let max = offer.unitPrice > 0 ? Math.floor(balance / offer.unitPrice) : 1;
     if (offer.kind === ShopOfferKinds.MASTER_BALL) {

@@ -1031,7 +1031,7 @@ body { font-size: 13px; }
 
 #settings-modal.open, #quest-modal.open, #confirm-modal.open, #poke-modal.open, #battle-summary-modal.open, #unified-selector-modal[style*="display: flex"] { display: flex; }
 
-#settings-inner, #quest-inner, #confirm-inner, #poke-modal-inner, #battle-summary-inner {
+#settings-inner, #quest-inner, #confirm-inner, #battle-summary-inner {
   background: var(--dark2);
   border: 1px solid var(--dark3);
   border-radius: 12px;
@@ -1043,6 +1043,97 @@ body { font-size: 13px; }
   overscroll-behavior: contain;
   box-shadow: 0 8px 32px rgba(0,0,0,0.6);
   color: var(--light2);
+}
+
+#poke-modal-inner.pw-panel--modal-window {
+  width: 100% !important;
+  max-width: 620px !important;
+  max-height: 88vh !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: auto !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  border-radius: 16px !important;
+  border: 1px solid var(--pw-border-color) !important;
+  background-color: var(--pw-bg-surface, var(--dark2)) !important;
+  box-shadow: var(--pw-shadow-lg) !important;
+}
+
+#poke-modal-inner.pw-panel--modal-window > .pw-win-hdr {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  height: var(--pw-header-h, 50px) !important;
+  min-height: var(--pw-header-h, 50px) !important;
+  max-height: var(--pw-header-h, 50px) !important;
+  margin: 0 !important;
+  padding: 0 12px 0 14px !important;
+  border: none !important;
+  border-bottom: 2px solid var(--pw-border-panel-header) !important;
+  background: var(--pw-bg-panel-header, rgba(0, 0, 0, 0.35)) !important;
+  border-radius: 14px 14px 0 0 !important;
+  flex: 0 0 auto !important;
+  box-sizing: border-box !important;
+}
+
+#poke-modal-inner.pw-panel--modal-window > .pw-win-hdr .pw-win-hdr-title {
+  position: static !important;
+  left: auto !important;
+  transform: none !important;
+  max-width: none !important;
+  flex: 1 1 auto !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  color: var(--light2) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.3px !important;
+}
+
+#poke-modal-inner.pw-panel--modal-window > .pw-win-hdr .pw-win-hdr-label {
+  color: var(--light2) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.3px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+#poke-modal-inner.pw-panel--modal-window > .pw-win-hdr .poke-detail-title {
+  display: inline-block !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: inherit !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  letter-spacing: inherit !important;
+  line-height: inherit !important;
+}
+
+#poke-modal-inner.pw-panel--modal-window > .win-body,
+#poke-modal-inner.pw-panel--modal-window > .pw-pokemon-info-body {
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  padding: 14px 16px !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  min-height: 0 !important;
+  max-height: none !important;
 }
 .preset-editor-modal #poke-modal-inner {
   display: flex;
@@ -3511,11 +3602,12 @@ button.tab {
   .fossil-selector-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; padding: 12px; }
   .fossil-card { min-height: 215px; padding: 10px; }
 }
-#poke-modal-inner.poke-detail-inner {
-  width: min(96vw, 860px);
-  max-width: 860px;
-  padding: 16px;
-  background: linear-gradient(180deg, var(--dark2), var(--dark1));
+#poke-modal-inner > .win-body,
+.pw-move-learning-overlay .win-body {
+  padding: 14px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 /* Wave 33: gap owned by --pw-header-gap in the canonical header block. */
 .poke-detail-id { color: var(--light1); font-size: 13px; }
@@ -3553,17 +3645,73 @@ button.tab {
 .poke-detail-types .type-badge { text-align:center; justify-content:center; border-radius: 3px; }
 .poke-detail-toggle { font-size: 12px; color: var(--light1); display:flex; gap:6px; align-items:center; }
 .poke-detail-side { padding: 10px; }
-.poke-detail-stat-tabs { display:grid; grid-template-columns: repeat(3,1fr); gap:4px; margin-bottom:8px; }
-.poke-detail-stat-tab {
-  background: var(--panel-bg);
-  color: var(--panel-text);
-  border: 1px solid var(--panel-border);
-  border-radius: 4px;
-  padding: 7px 4px;
-  font-weight: 800;
-  cursor:pointer;
+.poke-detail-stat-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--pw-border-color, rgba(255, 255, 255, 0.08));
 }
-.poke-detail-stat-tab.active { background: var(--light2); color: var(--dark1); box-shadow: inset 0 -2px 0 var(--accent); }
+.poke-detail-stat-tab,
+.poke-detail-stat-tab.pw-button {
+  background: rgba(0, 0, 0, 0.35) !important;
+  color: var(--light2, #ECDEB7) !important;
+  border: 1px solid var(--pw-border-color, rgba(255, 255, 255, 0.12)) !important;
+  border-radius: 6px !important;
+  padding: 7px 4px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.3px !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  height: auto !important;
+  min-height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  width: 100% !important;
+  opacity: 0.75 !important;
+  transition: all 0.15s ease !important;
+}
+.poke-detail-stat-tab:hover,
+.poke-detail-stat-tab.pw-button:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+.poke-detail-stat-tab.active,
+.poke-detail-stat-tab.pw-button.active,
+#poke-modal-inner .poke-detail-stat-tab.active,
+#poke-modal-inner .poke-detail-stat-tab.pw-button.active {
+  background: var(--accent) !important;
+  color: var(--dark1, #1a1816) !important;
+  border: 1px solid var(--accent) !important;
+  border-radius: 6px !important;
+  font-weight: 900 !important;
+  opacity: 1 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+  text-shadow: none !important;
+}
+.poke-detail-stat-tab.active *,
+.poke-detail-stat-tab.pw-button.active *,
+#poke-modal-inner .poke-detail-stat-tab.active *,
+#poke-modal-inner .poke-detail-stat-tab.pw-button.active * {
+  color: var(--dark1, #1a1816) !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
+.poke-detail-stat-tab:not(.active) *,
+.poke-detail-stat-tab.pw-button:not(.active) *,
+#poke-modal-inner .poke-detail-stat-tab:not(.active) *,
+#poke-modal-inner .poke-detail-stat-tab.pw-button:not(.active) * {
+  color: var(--light2, #ECDEB7) !important;
+  font-weight: 700 !important;
+}
 .poke-detail-stat-panel { display:none; }
 .poke-detail-stat-panel.active { display:block; }
 .poke-detail-stat-row { display:grid; grid-template-columns: 74px 1fr 86px; gap:8px; align-items:center; margin:6px 0; min-height:22px; }
@@ -3586,6 +3734,13 @@ button.tab {
 .poke-detail-lock-reason { margin:6px 0 0; color: var(--light1); font-size:11px; font-style:italic; line-height:1.35; }
 .poke-detail-ability-chip { display:inline-flex; gap:8px; align-items:center; border:1px solid var(--light2); border-radius:999px; padding:5px 10px; background:rgba(236,222,183,.08); }
 .poke-detail-ability-chip small { color: var(--light1); }
+.poke-detail-panel.poke-detail-talent-panel { display: flex; flex-direction: column; gap: 8px; }
+.poke-detail-panel.poke-detail-talent-panel .pw-select-wrap { width: 100%; display: flex; }
+.poke-detail-panel.poke-detail-talent-panel .pw-dropdown-select { width: 100%; }
+.poke-detail-panel.poke-detail-talent-panel .poke-detail-subtle { margin: 0; display: block; width: 100%; line-height: 1.4; }
+.poke-detail-panel.poke-detail-talent-panel .poke-detail-ability-chip { display: flex; width: fit-content; margin: 0; }
+.poke-detail-panel.poke-detail-talent-panel .poke-detail-lock-reason { margin: 0; display: block; width: 100%; }
+.pw-move-learning-overlay .pw-panel-footer { justify-content: center; }
 .poke-detail-moves-block { margin-top:10px; padding:10px; }
 .poke-detail-moves-title { display:flex; justify-content:space-between; align-items:center; }
 .poke-detail-moves-list { display:flex; flex-direction:column; gap:5px; }
@@ -3597,10 +3752,61 @@ button.tab {
 .poke-detail-pill { background:var(--green); color:var(--dark1); border-radius:999px; padding:2px 7px; font-size:11px; font-weight:900; }
 .poke-detail-pill.danger { background:var(--red); color:var(--light2); }
 .poke-detail-pill.is-learnable { background:transparent; color:var(--green); border:1px solid var(--green); }
+.poke-detail-pill.is-known { background:rgba(96,190,88,.2); color:var(--green); border:1px solid var(--green); }
+.poke-detail-move-row.known { opacity:.95; }
+.poke-detail-moves-section { margin-bottom: 12px; }
+.poke-detail-moves-section:last-child { margin-bottom: 0; }
 .poke-detail-move-row.locked { opacity:.55; }
 .poke-detail-learn-title { margin-top:12px; background:var(--panel-bg); color:var(--panel-text); text-align:center; padding:7px; border-radius:5px; }
 .poke-detail-learn-title span { color:var(--panel-text); opacity:.7; margin-left:8px; }
 .poke-detail-empty { color:var(--light1); font-size:12px; padding:8px; text-align:center; }
+.poke-detail-full-list-btn,
+.poke-detail-full-list-btn.pw-button {
+  width: calc(100% - 24px) !important;
+  margin: 8px auto 4px !important;
+  display: block !important;
+  text-align: center !important;
+  font-weight: 800 !important;
+  font-size: 13px !important;
+  padding: 8px 16px !important;
+}
+.poke-detail-pill.pw-button {
+  min-height: unset !important;
+  min-width: unset !important;
+  line-height: 1 !important;
+}
+.poke-detail-inner .modal-close,
+.poke-detail-inner .modal-close.pw-button {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  min-height: unset !important;
+  min-width: unset !important;
+  box-shadow: none !important;
+  color: var(--light2) !important;
+  font-size: 20px !important;
+  font-weight: bold !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+}
+.poke-detail-inner .modal-close:hover,
+.poke-detail-inner .modal-close.pw-button:hover {
+  filter: brightness(1.2);
+}
+#poke-modal-inner.poke-detail-inner .win-body,
+#poke-modal-inner.poke-detail-inner .pw-pokemon-info-body,
+#poke-modal-inner > .win-body,
+#poke-modal-inner > .pw-pokemon-info-body {
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  padding: 14px 16px !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
 .dict-tabs { display:flex; gap:8px; flex-wrap:wrap; padding:8px 0 12px; }
 .dict-tab.active { background:var(--light2); color:var(--dark1); }
 .dict-grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap:10px; }
@@ -3663,8 +3869,8 @@ button.tab {
   .poke-detail-move-row { grid-template-columns: 70px 1fr; }
   .poke-detail-move-meta, .poke-detail-pill { grid-column: 2; }
 }
-#poke-modal-inner .poke-detail-stat-tab { color: var(--panel-text); }
-#poke-modal-inner .poke-detail-stat-tab.active { color: var(--dark1); }
+#poke-modal-inner .poke-detail-stat-tab:not(.active) { color: var(--light2, #ECDEB7) !important; background: rgba(0, 0, 0, 0.35) !important; }
+#poke-modal-inner .poke-detail-stat-tab.active { color: var(--dark1, #1a1816) !important; background: var(--accent) !important; }
 #poke-modal-inner .poke-detail-learn-title, #poke-modal-inner .poke-detail-learn-title span { color: var(--panel-text); }
 #poke-modal-inner .poke-detail-pill { color: var(--dark1); }
 #poke-modal-inner .poke-detail-pill.danger { color: var(--light2); }
@@ -10665,38 +10871,13 @@ button[data-action].pw-loc-gym-btn:hover,
 
 
 /* ─── FIX (2026-08) — Pokédex / Pokémon detail sheet scroll contract ───
-   #poke-modal is a surface shared by the detail sheet and the move / talent /
-   item info panels. The info panels mark the modal with `pw-info-modal` and
-   wrap their content in a `.pw-panel-shell`, which switches the inner to the
-   narrow info geometry and hands scrolling to `.pw-panel-body`
-   (overflow-y: hidden on the inner). When that state survived a "back"
-   navigation, the detail sheet inherited it and its bottom rows became
-   unreachable — no scrollbar, content simply cut off.
-   The JS reset (pwResetInfoModalSurface) removes the leftover state; these
-   rules make the sheet self-sufficient so it scrolls even if some other panel
-   re-introduces those classes. */
-#poke-modal #poke-modal-inner.poke-detail-inner {
-  display: block;
+   #poke-modal is a standard UIModal window (size md) running the canonical
+   UIPanel flex architecture with fixed header, scrollable body (.win-body),
+   and optional footer. */
+#poke-modal #poke-modal-inner > .win-body {
   overflow-y: auto !important;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  max-height: 85vh;
-  padding: 16px !important;
-  width: min(96vw, 860px);
-}
-
-/* The detail sheet never uses the narrow info width, even if the modal still
-   carries `pw-info-modal` from a previous panel. */
-#poke-modal.pw-info-modal #poke-modal-inner.poke-detail-inner {
-  width: min(96vw, 860px);
-  max-height: 85vh;
-}
-
-@media (max-width: 850px), (pointer: coarse) {
-  #poke-modal #poke-modal-inner.poke-detail-inner {
-    max-height: 90vh;
-    padding: 12px !important;
-  }
 }
 
 
@@ -15215,6 +15396,3 @@ svg .pw-tuto-target > rect:nth-of-type(2) {
 
 /* Header badge counter: emphasized parts rendered by UIText rich text */
 #header .hinfo strong { color: var(--light2); font-weight: bold; }
- UIText rich text */
-#header .hinfo strong { color: var(--light2); font-weight: bold; }
- var(--light2); font-weight: bold; }

@@ -117,10 +117,21 @@ export class XxxPanel extends DraggablePanel {
   (`assets/css/dashboard-layout.css`). Do not make the dashboard itself a scroll container. Dashboard
   windows do not scroll internally; retain a bounded viewport only for an intrinsically pannable surface
   such as the map, or a full-screen panel's content area.
+- **Every panel must fit its available width**, including a narrow desktop dashboard column, not
+  only a mobile viewport. Grid tracks may not impose a minimum wider than their container. Use
+  shrinkable children, wrapping text and container-aware reflow; never hide or clip overflowing
+  content to make a panel appear responsive. Keep all actions reachable through the normal page flow.
 - **Dragging a window** is handled by `ui/dashboard/WindowDragController.js` (owned by `DashboardView`):
   the window follows the pointer through a CSS transform (`--pw-drag-x/y`) once per animation frame, and
   the placeholder only moves when the drop target changes. Never animate `left/top` or use
   `transition: all` on `.dash-win`.
+- **Whole-card team dragging starts from ordinary mouse movement**, like window dragging, not a
+  mandatory mouse hold. Read-only move bars are part of the card; real buttons/inputs keep their own
+  actions. The card follows the pointer without rebuilding its nodes. Escape/pointer cancellation
+  never changes the party or opens a phantom selector; save changes invalidate the gesture.
+- **Decorative animation never consumes gameplay RNG or writes saves.** Spawn complete sprites
+  outside the viewport, bound concurrent density and preserve reduced-motion/page visibility
+  preferences. UI may pass numeric CSS variables for trajectories; CSS animates transform/opacity.
 - **Live views are built once and updated in place.** A view refreshed by game events (battle tick,
   team change) keeps its nodes and calls setters (`UIText.setText`, `UIProgressBar.setValue`,
   `UIImage.setSource`, `addClass`…). Every setter is a **no-op when the value is unchanged**, so a refresh
@@ -191,6 +202,23 @@ export class XxxPanel extends DraggablePanel {
   keys); the test suite requires an empty problem list.
 - **Saves are migrated before they are read.** `SaveMigrator` applies pure, individually tested
   migrations (`MigrationVnToVn+1.js`); models only read the current shape.
+- **Facilities share access and ownership.** `FeatureAccessSystem` is their single progression
+  resolver. Once unlocked, Pension, Mine and Training management is independent of the current route.
+  Facility slots and queues reference `PokemonCollectionData` UIDs; they never own duplicate Pokémon.
+  Training assignments stay reserved until explicit removal, including while idle and after reload.
+- **Facility filters select future candidates only.** Slot-local filters and queue builders share
+  domain candidate rules; changing them never removes a manual FIFO entry or releases an assignment.
+  Migrations preserve legacy configured priorities, collection UIDs and valid saved battle DTOs.
+- **Preset editing is transient and UID-only.** The full-screen manager and full-card editor use
+  the common PC, item and information interfaces. Cancellation must not edit a saved preset; applying
+  an edited preset is one validated canonical party transaction and one save.
+- **Manual Mine renewal uses a saved deadline.** Enforce the ten-minute interval in the system,
+  not a view timer. Automatic/lazy layers bypass that manual clock without resetting it.
+- **Resumable training is an engine DTO, not a runtime-object dump.** Snapshot validation precedes
+  construction and owned-state mutation. Persist RNG, combatants, field and clocks; do not replay entry
+  effects or simulate offline training. A rejected snapshot pauses automation and keeps its assignment.
+- **Full Pokémon grid entries are shared.** PC, Pokédex and Location compose `PokemonGridEntry`;
+  item media use the common sprite frame with paths resolved through the item repository/`AssetPaths`.
 - **One write per operation**: systems mutate the models, then call `SaveSystem.saveCurrent()` once.
 - **Mutate before dispatch**: a model changes its state first, then dispatches its event, so
   listeners always read the new state.

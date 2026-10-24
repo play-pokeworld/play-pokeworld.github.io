@@ -159,19 +159,20 @@ export class CatchSystem extends BaseSystem {
    * @private
    */
   _unlockShiny(save, foe) {
-    for (const pokemon of SpeciesOwnership.ownedPokemon(save)) {
-      if (pokemon.species === foe.species && pokemon.form === foe.form && !pokemon.shiny) pokemon.setShiny(true);
-    }
+    SpeciesOwnership.unlockShiny(save,foe.species,foe.form);
   }
 
   /** @private */
   _keepDuplicate(save, foe, log) {
+    const species = foe.getSpecies();
+    CatchRules.unlockCapturedTalent(save, species, CatchRules.rollTalent(species, this._random), this._random);
     const existing = SpeciesOwnership.findOwned(save, foe.species, foe.form);
     const stat = existing ? CatchRules.rollIvBonus(existing, this._random) : null;
     if (stat) log.add('battle_log.catch_duplicate_iv', { name: existing.getDisplayName(), stat });
     save.statistics.recordDuplicateCatch(foe.species);
     if (foe.shiny) log.add('battle_log.catch_shiny_unlocked', { name: foe.getDisplayName() });
     log.add('battle_log.catch_duplicate', { name: foe.getDisplayName() });
+    if (existing) BoxSystem.getInstance().dispatchPokemonChanged(existing.uid);
   }
 
   /** @private @returns {{pokemon:Object, addedToTeam:boolean}|null} */

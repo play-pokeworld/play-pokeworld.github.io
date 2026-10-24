@@ -1,0 +1,46 @@
+/* Shared stable relaunch and dungeon pilot controls. */
+.pw-relaunch-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+.pw-relaunch-group:not(:has(.pw-relaunch-controls:not(.is-hidden))) {
+  display: none;
+}
+.pw-relaunch-controls {
+  display: flex;
+  min-width: 0;
+}
+.pw-relaunch-controls .pw-switch {
+  min-width: 0;
+  max-width: 100%;
+}
+.pw-shop-wallet {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.pw-shop-upgrade-icon {
+  width: 32px;
+  height: 32px;
+}
+.pw-dungeon-pilot {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--pw-border-color);
+  border-radius: 10px;
+}
+.pw-dungeon-pilot-choices {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.pw-dungeon-pilot-locked {
+  color: var(--light1);
+  font-size: 12px;
+}

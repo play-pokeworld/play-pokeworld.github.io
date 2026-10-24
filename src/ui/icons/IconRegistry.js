@@ -89,6 +89,7 @@ const ICONS = Object.freeze({
   ),
   egg: stroke(['M12 3c-3.5 0-6 4.2-6 9 0 4.5 2.2 8 6 8s6-3.5 6-8c0-4.8-2.5-9-6-9z']),
   pickaxe: stroke(['M14 3l7 7', 'M4 20l7-7', 'M14 3l-4 4 7 7 4-4', 'M2 22l8-8']),
+  dungeon:stroke(['M4 21V5h4V2h3v3h2V2h3v3h4v16H4z','M9 21v-6a3 3 0 016 0v6','M7 9h2','M15 9h2']),
   map: stroke(['M1 6v16l7-4 8 4 7-4V2l-7 4-8-4z', 'M8 2v16', 'M16 6v16']),
   swords: stroke(['M14.5 17.5L3 6V3h3l11.5 11.5', 'M13 19l6-6', 'M16 16l4 4', 'M19 21l2-2']),
   sparkle: stroke(['M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3z']),
@@ -138,6 +139,11 @@ const ICONS = Object.freeze({
   tent: stroke(['M3 20L12 4l9 16z', 'M10 20l2-5 2 5']),
   plus: stroke(['M12 5v14', 'M5 12h14']),
   minus: stroke(['M5 12h14']),
+  mineToolChisel:stroke(['M4 20l6-6','M9 9l6 6 4-4-6-6z','M14 3l3 3']),
+  mineToolHammer:stroke(['M14 4l6 6-3 3-6-6z','M12 8l-8 8 2 2 8-8','M3 21l3-3']),
+  mineToolPickaxe:stroke(['M3 21l9-9','M12 12l3-3','M6 6c4-2 8-2 12 0','M15 9c2 2 3 5 3 9']),
+  mineToolDrill:stroke(['M3 12h7','M10 9h6v6h-6z','M16 10h4v4h-4z','M12 15l-1 5h3l1-5']),
+  mineToolDynamite:stroke(['M6 10h10v10H6z','M11 10V6','M11 6c2-2 4-1 5 0'],[circle(17,5,1)]),
   grip: stroke([], [circle(9, 6, 1), circle(15, 6, 1), circle(9, 12, 1), circle(15, 12, 1), circle(9, 18, 1), circle(15, 18, 1)])
 });
 

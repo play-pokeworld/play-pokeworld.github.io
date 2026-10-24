@@ -4,6 +4,21 @@
 **Règle de livraison :** un point par ZIP par défaut. Les exceptions autorisées sont les points **2, 3, 4, 5, 11 et 12** regroupés en v1.14.2, puis les points **6–10** regroupés en un ZIP unique v1.14.3. Les points 13, 14 et 16 sont livrés séparément en v1.14.4, v1.14.5 et v1.14.6; le point 15 est livré séparément en v1.14.7; le point 17 a une première tentative v1.14.8, explicitement non acceptée pour la Boîte PC, puis des reprises séparées v1.14.10 et v1.14.11. Ces dérogations ne s’étendent pas aux autres points. Chaque archive est contrôlée avant présentation.  
 **Règles de production :** préserver l’architecture Rework et les `Rules.md`; `main` sert de référence visuelle/comportementale, pas de code à transplanter. Aucun changement de gameplay hors périmètre.
 
+## Reprise actuelle — v1.14.18 / schéma 17
+
+- **Terminés sur le périmètre testé :** vraie tuile `PokemonGridEntry` partagée avec Lieu; média objet
+  commun; accès permanent par `FeatureAccessSystem`; retrait de « Dernière expédition » limité au
+  combat en direct; réservation UID et reprise exacte de l’entraînement Rework.
+- **Fonctionnels, fidélité visuelle globale encore à affiner :** Pension, Mine et Centre
+  d’entraînement, avec améliorations, automatisation, personnel et sous-fenêtres réellement reliés aux
+  systèmes. Les 9 onglets sont contrôlés à 1 024/768/375 px; cela ne valide pas chaque action mobile.
+- **Partiel :** import des anciens états d’installations. Talents débloqués et personnel sont repris;
+  affectations/automatisations/files et combats de l’ancien runtime ne sont pas entièrement convertis.
+- **Non réalisé :** parcours intégral de Kanto, comparaison visuelle mesurée de tous les états à `main`,
+  essais Windows réels et validation sur tous les navigateurs/thèmes. Aucun blocage technique actuel.
+- **Preuves :** 372 tests automatisés, 17 scénarios Chromium; détails, décisions et reproduction dans
+  [`PHASE_v1.14.18.md`](PHASE_v1.14.18.md) et [`../tests/browser/README.md`](../tests/browser/README.md).
+
 ## Priorités critiques
 
 | Nº | Point à traiter | État | Version / preuve |
@@ -63,3 +78,169 @@
 | 1.14.15 | Retour no 3 — masquer l'emplacement d'ajout à six Pokémon | 327 tests, 0 échec sur le projet et après extraction; `node --check` sur 588 JS/MJS; `git diff --check`; métadonnées 1.14.15 / schéma 15; `unzip -t` valide; contrôle visuel manuel encore requis | `pokeworld-rework-1.14.15.zip` — 2 582 entrées, environ 14 Mo, intégrité vérifiée |
 | 1.14.16 | Retour no 4 — rapprocher l’icône, le tarif/jeton et l’action visuelle du bouton de donjon de `main` | 331 tests, 0 échec sur le projet et après extraction; `node --check` sur 589 JS/MJS; `git diff --check`; métadonnées 1.14.16 / schéma 15; `unzip -t` valide; action d'expédition active conservée selon Rework; contrôle visuel manuel encore requis | `pokeworld-rework-1.14.16.zip` — 2 584 entrées, environ 14 Mo, intégrité vérifiée |
 | 1.14.17 | Retour no 5 — Boîte PC indépendante (collection unique, schéma 16, verrous d'action), sprites de grille de donjon de `main`, légende seule aide de la Carte | 338 tests, 0 échec sur le projet et après extraction; `node --check`; `git diff --check`; métadonnées 1.14.17 / schéma 16; `unzip -t` valide; contrôle Chromium headless des trois points; contrôle manuel de jeu encore requis | `pokeworld-rework-1.14.17.zip` — 2 598 entrées, environ 14 Mo, intégrité vérifiée |
+| 1.14.18 | Lieu partagé, accès permanent et vraies gestions Pension/Mine/Entraînement; réservations UID et reprise exacte Rework; personnel/talents; schéma 17 | 372 tests source, 17 scénarios Chromium; 655 JS/MJS; contrôles responsive des 9 onglets à 1 024/768/375 px; preuves et limites dans `PHASE_v1.14.18.md`; parité visuelle exhaustive et parcours Kanto non revendiqués | `pokeworld-rework-1.14.18.zip` — archive locale versionnée, manifeste SHA-256; aucun commit/push |
+| 1.14.19 | Correction visuelle des trois installations et neuf onglets sur `main` rendu; vrais sprites et filtres par emplacement; migration schéma 18 | 396 tests, 26 scénarios Chromium (17 fonctionnels + 9 visuels/interactions); captures originales/Rework; filtres/focus/rechargement, remplacement atomique et confirmation Mine; limites dans `PHASE_v1.14.19.md` | `pokeworld-rework-1.14.19.zip` — archive vérifiée, manifeste SHA-256; aucun commit/push |
+| 1.14.20 | Huit retours Équipe / Mine / helpers / Entraînement / presets / alcôves Lieu ; schéma 19 pour le compteur Mine | 419 tests, 43 scénarios Chromium (17 fonctionnels + 9 visuels + 17 nouveaux parcours) ; drag réel, sélections/annulations, compteur persistant et confirmations ; ligues exclues à la demande utilisateur | `pokeworld-rework-1.14.20.zip` — archive vérifiée après extraction, manifeste SHA-256 ; aucun commit/push |
+
+## Mise à jour — v1.14.21 / schéma 20
+
+- Devis d’améliorations Mine/Entraînement/Pension toujours visibles, sans prose de solde insuffisant.
+- Grilles de helpers égalisées entre toutes les rangées, y compris recrutement mixte et mobile.
+- Achats uniques en boutique : relance sauvage 2 500 PQ, donjon 5 000 PQ, pas d’objet d’inventaire.
+- Relance naturelle à 5 secondes et pilote complet après 3 victoires locales : Farm/Gardien/Coffres.
+- Tutoriel français A–Z (26 chapitres), HTML autonome et kit régional exécutable dans une copie séparée.
+- 457 tests source et 56 scénarios Chromium réussis. Exemple : 12 assertions, 458 tests, 4 scénarios.
+- Réparation des anciennes ligues toujours exclue, comme demandé ; aucune revendication de campagne
+  naturelle complète, de simulation AFK hors ligne ou de test natif Windows.
+
+Détails et preuves : [rapport 1.14.21](PHASE_v1.14.21.md).
+
+
+## 1.14.22 — Entraînement adaptatif et Marché
+
+- Débordement reproduit : panneau 228 px, slots forcés à 280 px. Les pistes sont maintenant bornées
+  par le conteneur ; les petites cartes redistribuent identité, modes et achat automatique sans
+  masquer le contenu. Le document reste le scroller.
+- Raccourci Marché branché sur son vrai plein écran, composants de portefeuille/prix/quantité
+  communs à la boutique, visuel issu du main, sélection visible et vues mises à jour en place.
+- Achats en PQ par `ShopSystem`, collection unique et UID distincts, une sauvegarde, aucun faux
+  crédit de capture/éclosion. Le schéma de production reste 20.
+- Choix demandé et validé : mêmes filtres, rencontres actuelles du Rework conservées. Johto : six
+  offres, et non quinze. Kanto : neuf ; Hoenn : quatre. Aucune table générée modifiée.
+- Validation : **492 tests, 77 scénarios Chromium**, 714 vérifications syntaxiques, 41 CSS analysés,
+  `DataValidator=[]`. Kit isolé **1.14.23-demo / schéma 21** : 12 + 493 + 4 réussites.
+- Rapport et limites : [PHASE_v1.14.22.md](PHASE_v1.14.22.md). Aucune réparation de ligue réintroduite.
+
+
+## 1.14.23 — Retours équipe / ancien main / Combat
+
+- La souris ne doit plus attendre 400 ms : le glisser démarre à 5 px et suit réellement le pointeur.
+  Les lignes d’attaque en lecture seule sont saisissables ; les actions réelles restent distinctes.
+- Échap annule sans écriture ni clic parasite ; le prochain clic volontaire n’est pas avalé.
+  Les cartes et UID ne sont pas recréés pendant les refreshs ; scroll de bord testé.
+- Le switch d’un module main possédé n’est plus caché pendant un combat ou une expédition.
+  Import de fichier main testé avec propriété/préférences conservées, sans nouveau paiement.
+- Le contrôle Auto ne construit qu’un switch ; achats en boutique, pas de paragraphes/prix/statut
+  ou boutons supplémentaires sur la surface de relance.
+- Les cartes, textes et actions Combat restent dans le panneau contraint ; repos masqué en donjon.
+  Le viewport de carte reste pannable comme prévu par la règle commune.
+- **520 tests + 95 scénarios Chromium**, 718 JS/MJS et 43 CSS analysés, référentiels sans problème.
+  Kit isolé : **12 + 521 + 4**. Schéma 20 inchangé, aucune table générée modifiée.
+- Voir [PHASE_v1.14.23.md](PHASE_v1.14.23.md) pour formats testés et limite sans JSON personnel.
+
+
+## 1.14.24 — Auto nommé par lieu et fond dispersé
+
+- Les deux modules restent distincts : Auto combat sur exploration, Auto donjon sur un donjon,
+  jamais les deux en même temps. FR/EN et noms dans les deux états. Même résolveur d’activité que Lieu.
+- Le fond n’utilise plus quatre diagonales fixes ni des phases négatives : tirage de bords/points
+  hors écran, directions et vitesses variées, départs échelonnés et espacement prévisionnel.
+- Densité plafonnée selon l’écran, nœuds réutilisés, espèces/shinies capturées uniquement,
+  RNG séparé du combat, aucune écriture et respect du mouvement réduit/visibilité.
+- **551 tests + 109 scénarios Chromium**, 724 JS/MJS, 43 CSS, référentiels sans problème et
+  seize tables générées inchangées. Kit isolé **12 + 552 + 4**. Schéma 20 conservé.
+- Rapport : [PHASE_v1.14.24.md](PHASE_v1.14.24.md), avec méthode des échantillons d’animation.
+
+
+## 1.14.25 — Réimplémentation native du Dictionnaire
+
+- Remplacement du raccourci par le Dictionnaire plein format (`DictionaryPanel`, id `#fs-dictionary`).
+- Trois onglets conformes au main : Objets, Attaques, Talents avec barre d'outils fixe et recherche instantanée.
+- Découverte progressive des objets selon les générations débloquées (`ItemGenerationRules`) : 214 objets à Kanto, 252 à Johto, 277 à Hoenn, Gen 4+ masquée, masquage des balls non possédées.
+- Cartes d'entrée interactives avec indication de possession, badges de types colorés et compteurs d'utilisateurs.
+- Modale de détail superposée (`DictionaryDetailModal`, id `#pw-dictionary-detail`) avec prix, inventaire, sources d'obtention, effets de capacités, apprenants catégorisés et porteurs de talents.
+- **574 tests unitaires + 121 scénarios Chromium** réussis, 724 fichiers JS et 43 feuilles CSS validés, schéma 20 inchangé.
+- Voir [PHASE_v1.14.25.md](PHASE_v1.14.25.md) pour les détails techniques et méthodologiques.
+
+
+## 1.14.26 — Sac, Fiche d'information Pokémon, Boîte PC continue et Widget Debug complet
+
+- **Sac (Inventaire / BagView)** :
+  - Restructuration visuelle et fonctionnelle en plein écran fidèle au design du `main` tout en respectant strictement l'architecture Rework (`UIFullscreenPanel`, `UIContainer`, `UIButton`, widgets réutilisables).
+  - Gestion ergonomique des interactions : clic gauche différencié selon la nature de l'objet (pierres d'évolution déclenchant la sous-vue de sélection de cible d'évolution inline avec cartes de candidats et badges possédé/niveau ; objets de valeur/trésors déclenchant la sous-vue de vente inline avec cours en ₽ et boutons de vente unitaire / totale ; objets non utilisables ouvrant la modale de détail Dictionnaire avec bouton "Retour au sac"). Clic droit contextuel sur n'importe quel objet pour inspecter sa fiche détaillée Dictionnaire.
+  - Barre d'onglets de catégories filtrées avec compteurs dynamiques précis et recherche instantanée live par nom.
+- **Fiche d'information Pokémon (`PokemonInfoModal`)** :
+  - Restructuration visuelle complète alignée sur la référence `main` : bandeau supérieur canonique avec numéro de Pokédex national, nom, marqueur shiny et bouton de fermeture standard.
+  - Hero card supérieure épurée présentant le nom, le niveau, la localisation, la carte de sprite centrée sur disque, les badges de types colorés et les boutons interactifs de verrouillage et favori (suppression des barres parasites de PV et d'EXP qui surchargeaient la vue).
+  - Panneau latéral d'onglets épuré (suppression de l'élément `<h3>` redondant) avec couleurs harmonisées sur les 6 statistiques canoniques (`STAT_COLORS`), ratios `${val} / ${max}` subtilement formatés et totaux clairs.
+  - Grille modulaire de sections équilibrée en 2 colonnes : colonne 1 dédiée aux Talents (`PokemonTalentPanel`) ; colonne 2 combinant Rang (avec BST) et Objet tenu ; pleine largeur inférieure pour le panneau d'Évolutions.
+  - **Flux de remplacement de capacités 100% interactif et fidèle à `main`** :
+    - Détection automatique de la plénitude des capacités (4/4) avec affichage de l'indice de sélection.
+    - Clic gauche sur une capacité connue pour armer son emplacement en remplacement (jauge avec puce rouge `⬇ Remplacement` et apparition du bouton `Annuler` dans l'en-tête).
+    - Clic gauche sur une capacité apprenable pour apprendre ou remplacer immédiatement la capacité sans changer de vue.
+    - Clic droit (menu contextuel) sur toute capacité (connue ou apprenable) pour ouvrir sa fiche détaillée Dictionnaire.
+    - Bouton pleine largeur « Voir toutes les capacités » menant au catalogue complet d'apprentissage.
+- **Règles d'apprentissage et affichage des CT / CS (`BagPanel` et `BoxPanel`)** :
+  - Dans le Sac (`BagPanel`), les CT et CS affichent explicitement leur suffixe distinctif (`Surf CS`, `Toxik CT`).
+  - Lors de l'utilisation d'une CT ou CS, la Boîte PC (`BoxPanel`) applique le filtrage strict de compatibilité d'espèce (`MoveLearningSystem.canUnlockWithItem`) : seuls les Pokémon compatibles avec les types de la capacité apparaissent dans la grille. Les Pokémon incompatibles sont exclus.
+  - Titre canonique de la modale d'enseignement : `Enseigner {Capacité} (CT/CS) · ×{Quantité}`.
+  - Bannière d'instruction explicite : `Cliquez sur un Pokémon compatible pour lui enseigner {Capacité}. Quantité restante : {Quantité}`.
+  - Gestion de l'état vide avec le message canonique `Aucun Pokémon trouvé.` si la collection ne contient aucun sujet éligible.
+- **Utilisation continue des objets ciblés dans la Boîte PC (`BoxPanel`)** :
+  - Depuis le Sac (`BagPanel`), l'utilisation des Super Bonbons, vitamines (PV Plus, Protéine, Fer, Carbone, Calcium, Zinc) et objets d'apprentissage de capacités (CT/CS) bascule immédiatement sur la Boîte PC (`BoxPanel` en mode sélection d'objet `itemUseId`).
+  - **Boucle d'application continue** : la modale Boîte PC reste ouverte après chaque utilisation tant que la quantité résiduelle de l'objet dans le Sac est strictement supérieure à 0. L'utilisateur peut ainsi enchaîner les montées de niveau ou les allocations d'EVs sur les Pokémon de son équipe ou de ses boîtes sans interruption.
+  - Mise à jour instantanée des niveaux affichés, des jauges et des statistiques, accompagnée de notifications visuelles temporaires dédiées.
+  - Dès épuisement complet de l'objet (quantité tombant à 0) ou en cas d'annulation explicite (bouton "Retour au sac" ou fermeture), la Boîte PC se referme et réouvre automatiquement le Sac.
+- **Widget de Debug interactif conforme au `main` (`DebugWidget`)** :
+  - Intégration d'un bouton flottant `#debug-widget-toggle` et d'un tiroir d'actions `#debug-drawer` ancrés en bas à droite, visibles exclusivement lorsque le mode développeur est activé dans les Paramètres.
+  - Implémentation des 13 actions de débogage et de test de `main` :
+    1. `+50 000₽` : crédit instantané de 50 000 unités de chaque devise majeure (`money`, `dungeonToken`, `questPoint`, `diamond`, `battlePoint`).
+    2. `Super Bonbons +10` : ajout de 10 Super Bonbons dans l'inventaire.
+    3. `Débloquer 8 badges Kanto` : attribution immédiate des 8 badges de la Ligue Kanto.
+    4. `Énergie mine +100` : réinitialisation de l'énergie de la Mine souterraine à 100.
+    5. `Base : toutes les décos +1` : déblocage et ajout d'un exemplaire de l'ensemble du catalogue de décoration de Base Secrète.
+    6. `Base : +1 copain (équipe actuelle)` : capture de l'équipe active pour instancier un PNJ visiteur de base secrète.
+    7. `Obtenir CT/CS +1` : ajout de chaque CT et CS du jeu dans l'inventaire.
+    8. `AFK +30 min` : avance rapide temporelle simulée.
+    9. `Tous les objets +1` : ajout de chaque objet de l'ItemDB dans l'inventaire.
+    10. `Dictionnaire : tout afficher` : ouverture du Dictionnaire avec visibilité exhaustive forcée.
+    11. `Vitesse x10 : ON/OFF` : accélération dynamique du système de combat (`BattleSystem`) par un facteur 10.
+    12. `Cycle jour/nuit : AUTO / DAWN / DAY / DUSK / NIGHT` : forçage instantané de l'ambiance lumineuse via attribut `data-daytime`.
+    13. `Nettoyer doublons Boîte` : purge des doublons résiduels de la collection PC.
+- **Tests et validation** :
+  - **579 tests unitaires** réussis (100% de succès), 0 régression, schéma de sauvegarde 20 rigoureusement préservé.
+  - Suites de tests Playwright navigateur Chromium (`tests/browser/BagAndPokemonInfoParity.mjs` et `tests/browser/DebugAndBoxItemUse.mjs`) validant l'ensemble des scénarios visuels, l'enchaînement des 13 boutons debug et le cycle complet d'utilisation continue jusqu'à épuisement.
+- Voir [PHASE_v1.14.26.md](PHASE_v1.14.26.md) pour les détails complets de validation et captures d'écran.
+
+
+## 1.14.28 — Parité visuelle et fonctionnelle intégrale de la Fiche Pokémon et Modale de Capacités
+
+- **Saut de version direct à 1.14.28** : suite à la remarque de l'utilisateur concernant la publication double de la 1.14.26, passage direct à la version **1.14.28** (schéma 20 préservé).
+- **Fiche principale Pokémon (`PokemonInfoModal`)** :
+  - **Héritage architectural strict UIPanel de taille Moyen** : hérite de `UIModal` (lui-même hérité de `UIPanel`), avec format standard Moyen (`size: 'md'`), respectant les 3 tailles uniques du jeu (sm, md, lg).
+  - Vrai en-tête canonique natif UIPanel fixe (`.pw-win-hdr` avec `.pw-win-hdr-title` et titre dynamique `${isShiny ? '★ ' : ''}${displayName} #${species.dex}`, et bouton de fermeture standard `.pw-modal-close-btn`).
+  - Suppression de l'ancienne classe externe `poke-detail-inner` et des règles CSS héritées qui forçaient `display: block !important` et cassaient la structure d'en-tête et de défilement.
+  - Hero card supérieure épurée : nom en gras, niveau et localisation (`.poke-detail-name-row`), vignette sprite canonique 132px (`PokemonSpriteSizes.HERO` / `.pw-poke-circle-wrap--hero`), badges types 2 colonnes, bascule shiny (`.poke-detail-shiny-toggle`), boutons de protection (`.poke-protect-btn`) favori et verrouillé.
+  - Onglets de statistiques latéraux (`stats`, `ivs`, `evs`) au design parchemin sans en-tête `h3` redondant, jauges de statistiques colorées (`STAT_COLORS`), ratios `${val} / ${max}` et totaux pour IV et EV.
+  - **Sélecteur d'onglets de statistiques haute visibilité et couleurs du thème** : conteneur segmenté sombre (`rgba(0,0,0,0.25)`), onglets inactifs translucides discrets (`rgba(0,0,0,0.35)`), et onglet actif mis en valeur de manière éclatante avec la couleur d'accentuation du thème (`var(--accent)`), texte sombre contrasté (`var(--dark1)`) et ombre portée soignée.
+  - **Bouton Verrouiller épuré** : retrait du symbole parasite « × » devant le libellé du bouton verrouiller (`.poke-protect-btn`), harmonisé avec le bouton favori.
+  - **En-tête et dimensionnement conformes aux fenêtres moyennes** : nettoyage de la règle CSS héritée `#poke-modal-inner` (qui appliquait un rembourrage externe de 20px et un rétrécissement à 600px / 90%), neutralisation de la fausse boîte d'en-tête imbriquée `.poke-detail-title`, et alignement strict sur le format et l'en-tête de `SettingsModal` et des autres modales de taille moyenne (`size: 'md'`, `max-width: 620px`, en-tête fixe `.pw-win-hdr` de 50px de bord à bord avec titre à gauche et croix à droite, défilement confiné dans `.win-body`).
+  - Grille modulaire de sections équilibrée en 2 colonnes :
+    - **Talents** : disposition verticale stricte (`.poke-detail-talent-panel`), chaque phrase et bouton sur sa propre ligne sous le précédent sans empilement horizontal, menu déroulant conforme (`UIDropdown`), mentions de rareté `[Commun]`, `[Peu commun]`, `[Rare]`, puce Talent Caché cliquable et descriptions dédiées.
+    - **Rang & BST** (`poke-rank-panel`) avec lettre de rang métallique et total des statistiques de base.
+    - **Évolutions** (`.poke-detail-panel-wide`) affichant les conditions et cibles d'évolution.
+    - **Section Objet tenu supprimée** : aucune section d'objet tenu sur la fiche Pokémon conformément à la demande explicite.
+  - Bloc de capacités conforme :
+    - 4 capacités équipées affichées sur 4 colonnes (badge de type, nom, puissance/catégorie `${pow} ${t('power_abbrev')} · ${cat}`, puce de statut).
+    - Sélection et badge de remplacement (`_replaceSlot`), permutation directe de deux capacités équipées par simple clic, et apparition du bouton `Annuler` dans le titre.
+    - **Capacités apprenables affichées à l'identique des capacités sélectionnées** : exactement 3 colonnes (badge de type, nom, puissance/catégorie), sans aucun bouton `+` ou élément inutile. Clic sur la ligne pour apprendre ou remplacer.
+    - Clic droit contextuel sur toute capacité (connue ou apprenable) pour ouvrir sa fiche détaillée dans le Dictionnaire (`ModalIds.DICTIONARY_DETAIL`).
+    - Bouton pleine largeur « Voir toutes les capacités » (`.poke-detail-full-list-btn`) ouvrant par-dessus la modale d'apprentissage.
+- **Fenêtre dédiée d'apprentissage des capacités (`PokemonMoveLearningModal`)** :
+  - **Héritage architectural strict UIPanel de taille Moyen** : hérite de `UIModal` (qui hérite de `UIPanel`), format moyen (`size: 'md'`), empilée au-dessus de `PokemonInfoModal` (`z-index: 31001`).
+  - Fermeture ciblée par la croix native de l'en-tête (`.pw-modal-close-btn`) : ferme uniquement la modale des capacités et laisse la fiche Pokémon ouverte dessous.
+  - Vrai en-tête natif UIPanel fixe avec titre et sous-titre ratio possédé (`X/Y possédées` dans `.pw-win-hdr-subtitle`).
+  - Trois catégories avec titres visibles et compteurs : `★ Niveau (N)`, `◇ CT/CS (N)`, `▽ Entraînement (N)`.
+  - Puces d'état `✓ Équipée`, `✓ Disponible`, verrouillée avec niveau requis / inventaire requis.
+  - Clic droit contextuel pour inspecter la fiche Dictionnaire de chaque capacité.
+  - **Pied de page Footer natif UIPanel fixe (`.pw-panel-footer`)** : bouton unique `← Retour au Pokémon` (`.poke-detail-mini-btn`) configuré via `hasFooter: true` et `addFooterChild`, centré au bas de la modale.
+- **Conformité du Panneau des Filtres de Poké Balls (`BallFilterEditorModal`)** :
+  - Vrai en-tête natif `UIModal` : titre *« Paramètres des Poké Balls »*, `hasHeader: true`, bouton de fermeture natif `.pw-modal-close-btn`.
+  - Suppression du faux titre redondant dans le corps de la fenêtre (`.pw-ball-title`).
+  - Suppression du bouton « Fermer » superflu en pied de liste (`.pw-ball-actions`).
+- **Tests et validation** :
+  - **588 tests unitaires réussis sur 588 (100% de succès)**, 0 régression, schéma 20 inchangé.
+  - Suite dédiée `tests/PokemonInfoAndTmParity.test.js` enrichie pour valider la vignette 132px, la structure canonique d'en-tête, la permutation de capacités par clic, l'absence de section objet, l'intégration conforme des talents via `UIDropdown`, et la modale superposée des capacités apprenables avec ses 3 catégories et son bouton unique.
+- Voir [PHASE_v1.14.28.md](PHASE_v1.14.28.md) pour les détails complets.
+
+

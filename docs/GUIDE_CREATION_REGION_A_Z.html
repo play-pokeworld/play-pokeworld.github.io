@@ -1,0 +1,1788 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>PokéWorld — Créer une région de A à Z · 1.14.25</title><style>
+:root{--paper:#faf9f5;--ink:#202f35;--muted:#5a6f76;--line:#dde3e0;--green:#166359;--pale:#e7f1eb;--code:#172d32;--white:#fff;--accent:#ebd8a3}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 system-ui,-apple-system,Segoe UI,Arial,sans-serif}a{color:var(--green);text-decoration-thickness:1px;text-underline-offset:3px}a:hover{text-decoration:none}button{font:inherit;border:1px solid var(--line);border-radius:8px;background:white;padding:8px 14px;color:var(--green);cursor:pointer}.frame{display:grid;grid-template-columns:270px minmax(0,1000px);max-width:1370px;margin:auto;gap:42px;padding:32px}aside{position:sticky;top:24px;max-height:calc(100vh - 48px);overflow:auto;align-self:start;padding:14px 10px}aside .brand{font-size:12px;letter-spacing:.13em;font-weight:800;color:var(--muted);margin-bottom:15px}nav a{display:flex;gap:10px;text-decoration:none;padding:7px 8px;font-size:12px;line-height:1.4;border-radius:5px}nav a:hover{background:var(--pale)}nav b{min-width:20px;color:var(--green);font-size:13px}main{min-width:0;max-width:1000px;padding:0 0 70px}.tools{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:42px;padding-bottom:18px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted);letter-spacing:.04em}.eyebrow{color:var(--green);font-size:12px;letter-spacing:.12em;font-weight:700}h1{font:700 45px/1.14 Georgia,serif;max-width:760px;margin:22px 0 24px;letter-spacing:-.03em}h2{font:700 30px/1.3 Georgia,serif;margin:68px 0 24px;padding-top:18px;border-top:2px solid var(--green)}h3{font-size:20px;line-height:1.4;margin:36px 0 16px}p{margin:16px 0}blockquote{border-left:4px solid var(--green);padding:10px 23px;margin:26px 0;background:var(--pale);font-size:15px}blockquote p{margin:8px 0}ul,ol{padding-left:25px}li{margin:6px 0}code{background:#e9eeea;padding:2px 5px;border-radius:4px;color:#285950;font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}pre{background:var(--code);color:#e3f0e7;padding:24px;border-radius:10px;overflow:auto;border:1px solid #223d43;margin:24px 0}pre code{background:none;padding:0;color:inherit;font-size:12px;white-space:pre;overflow-wrap:normal}.table-wrap{overflow:auto;margin:24px 0;border:1px solid var(--line);border-radius:8px}table{border-collapse:collapse;width:100%;font-size:13px;background:var(--white)}th,td{padding:13px 15px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;min-width:120px}th{background:var(--pale);font-weight:700}td code{font-size:12px}tbody tr:last-child td{border:0}figure{margin:28px 0}figure img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:12px}figcaption{font-size:12px;color:var(--muted);text-align:center}footer{padding-top:25px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}.mobile-toc{display:none}
+@media(max-width:1050px){.frame{grid-template-columns:minmax(0,1fr);max-width:960px;padding:26px}aside{display:none}.mobile-toc{display:block}h1{font-size:37px}}
+@media(max-width:600px){.frame{padding:18px}body{font-size:15px}.tools{margin-bottom:26px;gap:8px;letter-spacing:0}h1{font-size:32px}h2{font-size:26px;margin-top:48px}h3{font-size:18px}pre{padding:16px}th,td{padding:10px}button{font-size:12px;padding:8px}.tools .scope{max-width:200px}}
+@media print{body{background:white;font-size:10pt;line-height:1.55}.frame{display:block;max-width:none;padding:0}aside,.tools,.mobile-toc{display:none}h1{font-size:29pt}h2{break-before:page;margin-top:0;font-size:22pt}h3{break-after:avoid}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f2f5f3;color:#123;border:1px solid #ddd;font-size:8pt;break-inside:auto}pre code{white-space:pre-wrap;color:inherit;font-size:8pt}.table-wrap{overflow:visible}table{font-size:8pt}th,td{padding:7px;min-width:0}a{color:inherit;text-decoration:none}figure{max-width:80%;margin:auto}blockquote{break-inside:avoid}}
+</style></head><body><div class="frame"><aside><div class="brand">POKÉWORLD / ATELIER</div><nav aria-label="Chapitres"><a href="#a"><b>A</b><span>Préparer un terrain de travail sûr</span></a><a href="#b"><b>B</b><span>Comprendre qui possède quoi</span></a><a href="#c"><b>C</b><span>Enregistrer une région réellement utilisable</span></a><a href="#d"><b>D</b><span>Construire les lieux et leur graphe</span></a><a href="#e"><b>E</b><span>Carte, rectangles et décors de combat</span></a><a href="#f"><b>F</b><span>Peupler les rencontres sauvages</span></a><a href="#g"><b>G</b><span>Ajouter un Pokémon, une forme ou une évolution</span></a><a href="#h"><b>H</b><span>Ajouter une capacité réellement utilisable</span></a><a href="#i"><b>I</b><span>Objets, CT, talents et ressources</span></a><a href="#j"><b>J</b><span>Arène, rival, équipes et ligue</span></a><a href="#k"><b>K</b><span>Boutique, tarifs et achats uniques</span></a><a href="#l"><b>L</b><span>Écrire une histoire et des quêtes</span></a><a href="#m"><b>M</b><span>Ajouter les PNJ et leurs dialogues</span></a><a href="#n"><b>N</b><span>Bloquer une zone derrière quête, combat, arène ou objet</span></a><a href="#o"><b>O</b><span>Pokédex, choix de partenaire et filtres de région</span></a><a href="#p"><b>P</b><span>Donjons et chaîne automatique</span></a><a href="#q"><b>Q</b><span>Réutiliser les installations et les Pokémon sans les dupliquer</span></a><a href="#r"><b>R</b><span>Nouveau gameplay : le modèle du Carnet de terrain</span></a><a href="#s"><b>S</b><span>Nouveau gameplay : règles, événement et commande</span></a><a href="#t"><b>T</b><span>Nouveau gameplay : le panneau, son montage et le mobile</span></a><a href="#u"><b>U</b><span>Sauvegarder, migrer et changer de partie sans perte</span></a><a href="#v"><b>V</b><span>Traductions, ressources et style sans collisions</span></a><a href="#w"><b>W</b><span>Tester le contenu, le gameplay et la migration</span></a><a href="#x"><b>X</b><span>Dépanner par symptôme</span></a><a href="#y"><b>Y</b><span>Finir proprement et livrer une modification</span></a><a href="#z"><b>Z</b><span>Checklist finale et lexique</span></a></nav></aside><main><div class="tools"><span class="scope">REWORK 1.14.25 · SCHÉMA 20<br>Guide français autonome · 26 chapitres</span><button type="button" onclick="window.print()">Imprimer / PDF</button></div><div class="eyebrow">CRÉER · COMPRENDRE · VÉRIFIER</div><h1>Créer une région et un gameplay de A à Z</h1>
+<p><strong>Tutoriel français — PokéWorld Rework 1.14.25 · sauvegarde de production : schéma 20</strong></p>
+<p>Ce document est un parcours de réalisation, pas seulement une liste de fichiers. Il explique les
+choix, les formats, les branchements et les vérifications. L’exemple suivi est <strong>Auroria</strong>, une petite
+région inventée : cinq lieux, un Pokémon, une capacité, une boutique, une arène, un rival, une ligue,
+une histoire de quatre étapes et un nouveau <strong>Carnet de terrain</strong> avec récompense persistante.</p>
+<blockquote>
+<p><strong>Deux choses différentes :</strong> les données d’Auroria sont un exemple pédagogique <strong>non activé dans
+le jeu livré</strong>. L’installateur crée une copie neuve, nommée <code>1.14.26-demo</code>, utilisant le <strong>schéma 21</strong>
+uniquement pour illustrer l’ajout d’un état de gameplay. Le projet de production reste en 1.14.25 /
+schéma 20. N’importez pas une sauvegarde de démonstration dans le jeu de production plus ancien.</p>
+</blockquote>
+<p>Le kit complet se trouve dans <code>docs/examples/auroria/</code>. Les classes reproduites ci-dessous sont les
+vrais fichiers de ce kit. Une carte schématique est fournie ; le sprite du nouveau Pokémon est une
+<strong>copie provisoire de Bulbizarre</strong>, le portrait de champion et le badge réutilisent des ressources
+existantes. Ce ne sont pas des illustrations originales d’Auroria. Remplacez-les pour votre région.</p>
+<h2>Sommaire</h2>
+<ul>
+<li><a href="#a">A — Préparer</a> · <a href="#b">B — Architecture et données</a> · <a href="#c">C — Enregistrer la région</a></li>
+<li><a href="#d">D — Lieux et graphe</a> · <a href="#e">E — Carte et décors</a> · <a href="#f">F — Rencontres</a></li>
+<li><a href="#g">G — Pokémon et formes</a> · <a href="#h">H — Capacités et apprentissage</a> · <a href="#i">I — Objets et talents</a></li>
+<li><a href="#j">J — Arènes, dresseurs, ligue</a> · <a href="#k">K — Boutiques</a> · <a href="#l">L — Quêtes</a></li>
+<li><a href="#m">M — PNJ</a> · <a href="#n">N — Verrous de progression</a> · <a href="#o">O — Pokédex et starters</a></li>
+<li><a href="#p">P — Donjons et automatisation</a> · <a href="#q">Q — Pokémon partagés et installations</a></li>
+<li><a href="#r">R — Nouveau modèle</a> · <a href="#s">S — Nouveau système</a> · <a href="#t">T — Nouveau panneau</a></li>
+<li><a href="#u">U — Migration</a> · <a href="#v">V — Traductions et présentation</a> · <a href="#w">W — Tests</a></li>
+<li><a href="#x">X — Dépannage</a> · <a href="#y">Y — Livraison</a> · <a href="#z">Z — Checklist et lexique</a></li>
+</ul>
+<p><a id="a"></a></p>
+<h2>A — Préparer un terrain de travail sûr</h2>
+<ol>
+<li>Décompressez le ZIP dans un dossier de travail ; sauvegardez vos exports de parties.</li>
+<li>Installez Node.js 18 ou plus. Le jeu n’a pas de dépendance npm d’exécution.</li>
+<li>Ouvrez un terminal <strong>à la racine</strong>, là où se trouve <code>package.json</code>.</li>
+<li>Lancez le serveur puis ouvrez son adresse. Évitez <code>file://</code> : les modules ES sont souvent bloqués.</li>
+<li>Lisez <code>Rules.md</code> avant de créer une classe. Les identifiants et commentaires du code sont en
+   anglais ; les textes joueurs sont localisés en français <strong>et</strong> en anglais.</li>
+</ol>
+<pre><code class="language-sh">node --version
+npm test
+npm start
+</code></pre>
+<p>Pour essayer directement le kit, utilisez un <strong>nouveau</strong> dossier de destination. La commande refuse
+un dossier existant et n’écrit pas dans le projet d’origine :</p>
+<pre><code class="language-sh">node docs/examples/auroria/install-example.mjs
+node .arena/auroria-demo/docs/examples/auroria/verify.mjs
+npm --prefix .arena/auroria-demo test
+</code></pre>
+<p>Puis, dans un autre terminal :</p>
+<pre><code class="language-sh">cd .arena/auroria-demo
+npm start
+</code></pre>
+<p>Arrêtez le premier serveur pour réutiliser son port, ou suivez le port libre annoncé par le second
+(le serveur essaie 3000 puis les ports suivants).
+Pour recommencer l’installation, choisissez un autre dossier vide plutôt que de réappliquer les
+patches dans une copie déjà modifiée. Le kit est fixé à la version 1.14.25 ; son installateur s’arrête
+si un point de branchement attendu a changé.</p>
+<p><strong>Ce que le kit ne fait pas :</strong> ajouter 150 espèces dessinées, équilibrer une campagne entière,
+remplacer le tutoriel initial de Kanto ou simuler une progression naturelle jusqu’à Hoenn. Son test
+prépare explicitement les faits de la région précédente avant de vérifier l’entrée dans Auroria.</p>
+<p><a id="b"></a></p>
+<h2>B — Comprendre qui possède quoi</h2>
+<p>Le trajet normal d’une action est :</p>
+<p><code>Panneau → commande d’un System → modèles de SaveData → SaveSystem → événement → setters UI</code></p>
+<ul>
+<li><code>src/data/raw/</code> contient les transcriptions générées de l’original. <strong>Ne les modifiez pas à la main.</strong></li>
+<li><code>src/data/content/</code> contient les ajouts et remplacements écrits à la main.</li>
+<li>Les dépôts <code>PokemonDB</code>, <code>MoveDB</code>, <code>LocationDB</code>, <code>QuestDB</code>, <code>TrainerDB</code>… joignent les tables et
+  exposent des définitions en lecture seule. Le dépôt des espèces s’appelle <strong>PokemonDB</strong>, pas SpeciesDB.</li>
+<li><code>src/data/save/</code> contient les faits propres à chaque partie : progression, objets, UID, horloges.</li>
+<li><code>src/systems/</code> applique les règles, sans <code>document</code>, <code>window</code>, boutons ou chaînes HTML.</li>
+<li><code>src/panels/</code> compose les widgets de <code>src/ui/</code>. Les panneaux ne paient pas et ne changent pas
+  directement la collection, les statistiques ou les quêtes.</li>
+<li><code>src/config/</code> déclare les règles, identifiants et limites partagés.</li>
+</ul>
+<h3>Ajouter n’est pas fusionner profondément</h3>
+<p><code>withContent(generated, content)</code> fait l’équivalent de <code>{...generated, ...content}</code>. Si vous redéfinissez
+<code>pikachu</code>, <strong>toute son entrée</strong> remplace l’ancienne. Écrire uniquement <code>{stats: [...]}</code> supprime ses
+champs requis. Copiez l’entrée complète et ne changez que les champs souhaités.</p>
+<p>Pour les listes, <code>withContentList</code> remplace une entrée de même clé à sa place et ajoute les nouvelles
+à la fin. Les quêtes sont identifiées par <code>catégorie + id</code>. L’ordre des quêtes principales est
+<strong>l’ordre de la table</strong>, pas le tri numérique de leur id.</p>
+<p>N’écrivez jamais dans <code>_entries</code> d’un dépôt pour ajouter du contenu : modifiez les tables puis
+rechargez complètement la page. Les dépôts et les pools de capacités sont construits et mis en cache.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Ajout</th>
+<th>Fichier manuel</th>
+<th>Dépôt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Espèce / forme</td>
+<td><code>species-content.js</code>, <code>forms-content.js</code></td>
+<td><code>PokemonDB</code></td>
+</tr>
+<tr>
+<td>Capacité / talent</td>
+<td><code>moves-content.js</code>, <code>talents-content.js</code></td>
+<td><code>MoveDB</code>, <code>TalentDB</code></td>
+</tr>
+<tr>
+<td>Objet</td>
+<td><code>items-content.js</code></td>
+<td><code>ItemDB</code></td>
+</tr>
+<tr>
+<td>Lieu / carte / rencontres</td>
+<td><code>locations-content.js</code>, <code>map-layout-content.js</code>, <code>encounters-content.js</code></td>
+<td><code>LocationDB</code></td>
+</tr>
+<tr>
+<td>Dresseur / ligue</td>
+<td><code>trainers-content.js</code>, <code>leagues-content.js</code></td>
+<td><code>TrainerDB</code>, <code>LeagueDB</code></td>
+</tr>
+<tr>
+<td>Boutique</td>
+<td><code>shops-content.js</code></td>
+<td><code>ShopDB</code></td>
+</tr>
+<tr>
+<td>Quête</td>
+<td><code>quests-content.js</code></td>
+<td><code>QuestDB</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Nuance essentielle :</strong> ajouter une espèce qui utilise des mécanismes existants est surtout du
+contenu. Ajouter une <strong>région</strong>, un type d’effet inconnu, un objectif inédit ou un nouveau gameplay
+nécessite aussi des branchements de code. Les chapitres suivants indiquent lesquels.</p>
+<p><a id="c"></a></p>
+<h2>C — Enregistrer une région réellement utilisable</h2>
+<h3>C.1 Déclaration et ordre de progression</h3>
+<p>Dans le tableau <code>REGIONS</code> de <code>src/config/Regions.js</code>, insérez ce fragment après Hoenn, avant l’entrée
+Sinnoh encore indisponible. <strong>Ne créez pas un second tableau REGIONS et ne dupliquez pas Sinnoh.</strong></p>
+<pre><code class="language-js">Object.freeze({id:'auroria',labelKey:'map_region_auroria',available:true}),
+</code></pre>
+<p><code>available: true</code> signifie « jouable », pas « déverrouillée pour toutes les parties ».
+<code>FeatureAccessSystem.getRegionAccessStatus()</code> considère les régions disponibles <strong>dans cet ordre</strong> :
+la région précédente doit avoir sa ligue gagnée <strong>et toutes ses espèces régionales capturées</strong>.
+Un Pokédex régional vide ne compte pas comme complet. Ici, Auroria suit donc Hoenn.</p>
+<p>Changer l’ordre des régions change les prérequis d’entrée. Si vous voulez une région de départ,
+un embranchement ou une entrée par quête plutôt que par ligue + Pokédex, concevez une autre règle
+dans le résolveur central et testez-la. Ne contournez pas la règle en cachant un bouton.</p>
+<h3>C.2 Point d’arrivée</h3>
+<p>Ajoutez dans <code>REGION_START_LOCATIONS</code> de <code>src/config/ContentAccessRules.js</code> :</p>
+<pre><code class="language-js">auroria: 'auroria_start',
+</code></pre>
+<p>Ce lieu doit exister, porter <code>region: 'auroria'</code> et avoir sa géométrie de carte.
+Le voyage doit passer par <code>LocationSystem.travelToRegion('auroria')</code>, pas par une affectation depuis
+l’interface à <code>save.player.region</code>. Cette commande vérifie la politique d’entrée et l’expédition active.</p>
+<h3>C.3 Audit de branchement — pas seulement une ligne</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Point</th>
+<th>Obligatoire / objectif</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Regions.js</code> et ordre des régions</td>
+<td>déclaration, disponibilité, règle précédente</td>
+</tr>
+<tr>
+<td><code>REGION_START_LOCATIONS</code></td>
+<td>destination de voyage</td>
+</tr>
+<tr>
+<td>carte dans <code>assets/images/maps/</code></td>
+<td>image résolue par <code>AssetPaths</code></td>
+</tr>
+<tr>
+<td>lieux, rectangles, rencontres</td>
+<td>contenu jouable</td>
+</tr>
+<tr>
+<td>traductions <code>map_region_auroria</code> et <code>region_auroria</code></td>
+<td>carte et filtres des installations</td>
+</tr>
+<tr>
+<td><code>StarterData.js</code> et garde de première route</td>
+<td>choix de partenaire, si cette mécanique est utilisée</td>
+</tr>
+<tr>
+<td>espèces avec <code>region: 'auroria'</code></td>
+<td>Pokédex et future condition de région complète</td>
+</tr>
+<tr>
+<td>quêtes, PNJ, dresseurs, ligue</td>
+<td>progression effective et récompenses</td>
+</tr>
+<tr>
+<td><code>FacilityFilterRules.COMMON.filterRegion</code></td>
+<td>nouvelle région reconnue dans les filtres de Pension/Entraînement</td>
+</tr>
+<tr>
+<td><code>AchievementsPanel.js</code></td>
+<td>succès régionaux et derniers paliers nationaux, si vous en voulez</td>
+</tr>
+<tr>
+<td>tutoriel initial / règles de nouvelle partie</td>
+<td>à adapter si vous autorisez de commencer directement ici</td>
+</tr>
+<tr>
+<td>migration</td>
+<td>uniquement si vous ajoutez ou changez un état sauvegardé</td>
+</tr>
+</tbody>
+</table></div>
+<p>Les anciennes migrations contiennent parfois les trois régions historiques. Ne réécrivez pas
+aveuglément une migration ancienne : elle traduit un ancien format. Ajoutez une migration nouvelle
+si le <strong>format ou la sémantique de faits sauvegardés</strong> change.</p>
+<p><a id="d"></a></p>
+<h2>D — Construire les lieux et leur graphe</h2>
+<p>Le parcours pédagogique est :</p>
+<p><code>Aubeval ↔ Sentier (3 victoires) ↔ Florécité (arène + rival) ↔ Bois (donjon) ↔ Sommet (ligue)</code></p>
+<p>Voici l’objet à <strong>fusionner avec</strong> <code>LOCATIONS_CONTENT</code> dans <code>locations-content.js</code>.
+Les exports complets montrés sont des modèles : dans un projet existant, conservez les autres entrées.</p>
+<pre><code class="language-js">export const LOCATIONS_CONTENT = {
+  &quot;auroria_start&quot;: {
+    &quot;region&quot;: &quot;auroria&quot;,
+    &quot;kind&quot;: &quot;town&quot;,
+    &quot;connections&quot;: [
+      &quot;auroria_path&quot;
+    ],
+    &quot;winsToClear&quot;: 0,
+    &quot;badgesRequired&quot;: 0,
+    &quot;shop&quot;: &quot;auroria_store&quot;
+  },
+  &quot;auroria_path&quot;: {
+    &quot;region&quot;: &quot;auroria&quot;,
+    &quot;kind&quot;: &quot;route&quot;,
+    &quot;connections&quot;: [
+      &quot;auroria_start&quot;,
+      &quot;auroria_city&quot;
+    ],
+    &quot;winsToClear&quot;: 3,
+    &quot;badgesRequired&quot;: 0
+  },
+  &quot;auroria_city&quot;: {
+    &quot;region&quot;: &quot;auroria&quot;,
+    &quot;kind&quot;: &quot;town&quot;,
+    &quot;connections&quot;: [
+      &quot;auroria_path&quot;,
+      &quot;auroria_forest&quot;
+    ],
+    &quot;winsToClear&quot;: 0,
+    &quot;badgesRequired&quot;: 0,
+    &quot;champion&quot;: &quot;auroria_ivy&quot;,
+    &quot;shop&quot;: &quot;auroria_store&quot;
+  },
+  &quot;auroria_forest&quot;: {
+    &quot;region&quot;: &quot;auroria&quot;,
+    &quot;kind&quot;: &quot;dungeon&quot;,
+    &quot;connections&quot;: [
+      &quot;auroria_city&quot;,
+      &quot;auroria_summit&quot;
+    ],
+    &quot;winsToClear&quot;: 0,
+    &quot;badgesRequired&quot;: 1
+  },
+  &quot;auroria_summit&quot;: {
+    &quot;region&quot;: &quot;auroria&quot;,
+    &quot;kind&quot;: &quot;town&quot;,
+    &quot;connections&quot;: [
+      &quot;auroria_forest&quot;
+    ],
+    &quot;winsToClear&quot;: 0,
+    &quot;badgesRequired&quot;: 1,
+    &quot;champion&quot;: &quot;auroria_league&quot;
+  }
+};
+</code></pre>
+<ul>
+<li><code>connections</code> définit les voisins. Ajoutez le <strong>lien retour</strong> ; une relation à sens unique n’est
+  pas inventée automatiquement.</li>
+<li><code>kind</code> accepte <code>town</code>, <code>route</code>, <code>sea</code>, <code>dungeon</code>. Un lieu nommé « forêt » n’est pas automatiquement
+  un donjon : c’est le champ qui le décide.</li>
+<li><code>badgesRequired</code> est un <strong>nombre de badges d’arène de la région</strong>, pas une liste de badges précis.</li>
+<li><code>winsToClear</code> est un seuil de victoires sauvages qui permet la propagation de l’accès depuis ce
+  lieu. <code>0</code> signifie aucun seuil. Cela n’impose pas de finir le gardien d’un donjon.</li>
+<li><code>shop</code> est un id de <code>ShopDB</code> ; <code>champion</code> est un id de <code>TrainerDB</code> ou <code>LeagueDB</code>.</li>
+<li><code>group</code>, facultatif, fait partager des objectifs/statistiques à plusieurs sous-zones. Ne donnez
+  pas le même groupe à toute la région : les combats d’une route valideraient alors les autres.</li>
+<li><code>weather</code>, facultatif, fixe une météo reconnue dans <code>src/data/battle/BattleFields.js</code>.</li>
+</ul>
+<p>Un lieu relié n’est pas nécessairement déverrouillé : badges, portes exceptionnelles et nettoyage
+des voisins restent évalués par <code>FeatureAccessSystem</code>.</p>
+<p><a id="e"></a></p>
+<h2>E — Carte, rectangles et décors de combat</h2><figure><img alt="Carte schématique d’Auroria, cinq lieux reliés entre lac, forêt et sommet" src="data:image/png;base64,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"><figcaption>Carte de travail du kit · 1600 × 960 · schéma, pas une illustration finale.</figcaption></figure>
+<p>La carte attend un canevas de <strong>1600 × 960</strong> (<code>MAP_CANVAS</code>). Placez votre image dans
+<code>assets/images/maps/auroria.png</code>. Les rectangles se trouvent dans <code>map-layout-content.js</code> :</p>
+<pre><code class="language-js">export const MAP_LAYOUT_CONTENT = {
+  &quot;auroria_start&quot;: {
+    &quot;x&quot;: 140,
+    &quot;y&quot;: 700,
+    &quot;w&quot;: 160,
+    &quot;h&quot;: 120
+  },
+  &quot;auroria_path&quot;: {
+    &quot;x&quot;: 350,
+    &quot;y&quot;: 610,
+    &quot;w&quot;: 260,
+    &quot;h&quot;: 90
+  },
+  &quot;auroria_city&quot;: {
+    &quot;x&quot;: 690,
+    &quot;y&quot;: 480,
+    &quot;w&quot;: 160,
+    &quot;h&quot;: 120
+  },
+  &quot;auroria_forest&quot;: {
+    &quot;x&quot;: 940,
+    &quot;y&quot;: 360,
+    &quot;w&quot;: 220,
+    &quot;h&quot;: 140
+  },
+  &quot;auroria_summit&quot;: {
+    &quot;x&quot;: 1240,
+    &quot;y&quot;: 170,
+    &quot;w&quot;: 170,
+    &quot;h&quot;: 150
+  }
+};
+</code></pre>
+<p><code>x</code>, <code>y</code> désignent le coin supérieur gauche ; <code>w</code>, <code>h</code> sont la largeur et la hauteur. Vérifiez
+les recouvrements, le contraste des noms, les zones cliquables et le déplacement de la carte sur mobile.
+Ces coordonnées ne sont pas une grille de combats : elles positionnent les lieux sur la carte régionale.</p>
+<p>Le kit fournit une carte schématique sans noms incrustés : les noms sont des libellés localisés
+posés par le jeu. Une nouvelle carte de production doit être votre propre ressource.</p>
+<h3>Le décor de combat est un autre réglage</h3>
+<p>Dans <code>src/config/LocationBackgrounds.js</code>, <code>SCENE_BY_LOCATION</code> peut préciser le décor :</p>
+<pre><code class="language-js">auroria_forest: 'forest',
+auroria_summit: 'mountain',
+</code></pre>
+<p>Le nom doit être dans <code>BACKGROUND_SCENES</code>, avec sa ressource dans <code>assets/images/bg/</code>.
+Sans exception, le décor est déduit du type : un donjon prend le décor de grotte par défaut.
+Ce choix a aussi un effet sur <code>DungeonRules.depthFor()</code> : les scènes de type grotte/montagne ont
+plusieurs étages, une forêt suit la règle non-grotte. Ne promettez pas un nombre d’étages en vous
+fondant seulement sur le nom du lieu.</p>
+<p>Si vous ajoutez une scène totalement nouvelle, il faut également sa déclaration, sa ressource et
+le raccordement CSS existant. Déposer un PNG sans l’enregistrer ne crée pas un décor utilisable.</p>
+<p><a id="f"></a></p>
+<h2>F — Peupler les rencontres sauvages</h2>
+<p>Dans <code>encounters-content.js</code> :</p>
+<pre><code class="language-js">export const ENCOUNTERS_CONTENT = {
+  &quot;auroria_path&quot;: [
+    {
+      &quot;species&quot;: &quot;mossling&quot;,
+      &quot;minLevel&quot;: 3,
+      &quot;maxLevel&quot;: 6,
+      &quot;rarity&quot;: &quot;common&quot;
+    },
+    {
+      &quot;species&quot;: &quot;pidgey&quot;,
+      &quot;minLevel&quot;: 3,
+      &quot;maxLevel&quot;: 6,
+      &quot;rarity&quot;: &quot;uncommon&quot;
+    }
+  ],
+  &quot;auroria_forest&quot;: [
+    {
+      &quot;species&quot;: &quot;mossling&quot;,
+      &quot;minLevel&quot;: 8,
+      &quot;maxLevel&quot;: 12,
+      &quot;rarity&quot;: &quot;common&quot;
+    },
+    {
+      &quot;species&quot;: &quot;pikachu&quot;,
+      &quot;minLevel&quot;: 8,
+      &quot;maxLevel&quot;: 12,
+      &quot;rarity&quot;: &quot;rare&quot;
+    }
+  ]
+};
+</code></pre>
+<p>Les trois raretés sont <code>common</code>, <code>uncommon</code>, <code>rare</code>. Utilisez des espèces existant dans <code>PokemonDB</code>,
+avec <code>minLevel ≤ maxLevel</code>. Les poids effectifs sont ceux des règles de rencontres, pas des
+pourcentages déduits des noms.</p>
+<p>Une table portant l’id d’un lieu existant remplace <strong>toute sa liste</strong>. Copiez les anciennes rencontres
+à conserver. Le bouton d’exploration exige des rencontres ; un donjon sans rencontres ne peut pas
+être lancé même si son rectangle et son type existent.</p>
+<p>Les rencontres ordinaires, rencontres de quête, Pokémon errants et équipes de dresseur sont des
+contextes différents. Ne mettez pas un boss de scénario dans les rencontres communes si sa capture
+ou sa récompense doit être unique. Utilisez les quêtes/rencontres dédiées et les systèmes existants.</p>
+<p><a id="g"></a></p>
+<h2>G — Ajouter un Pokémon, une forme ou une évolution</h2>
+<h3>G.1 Espèce — <code>species-content.js</code></h3>
+<pre><code class="language-js">export const SPECIES_CONTENT = {
+  &quot;mossling&quot;: {
+    &quot;dex&quot;: 1001,
+    &quot;region&quot;: &quot;auroria&quot;,
+    &quot;types&quot;: [
+      &quot;grass&quot;
+    ],
+    &quot;stats&quot;: [
+      50,
+      45,
+      55,
+      65,
+      60,
+      45
+    ],
+    &quot;catchRate&quot;: 120,
+    &quot;xpYield&quot;: 65,
+    &quot;talents&quot;: [
+      &quot;overgrow&quot;
+    ],
+    &quot;hiddenTalent&quot;: null,
+    &quot;evolutions&quot;: []
+  }
+};
+</code></pre>
+<ul>
+<li><code>dex</code> est un numéro de tri/Pokédex, <strong>pas l’id de l’espèce</strong>. Choisissez un numéro non utilisé.</li>
+<li><code>stats</code> suit : PV, Attaque, Défense, Attaque spéciale, Défense spéciale, Vitesse.</li>
+<li><code>region</code> détermine notamment son appartenance au Pokédex régional.</li>
+<li><code>talents</code> doit contenir des ids connus. Le talent caché est séparé du tirage normal.</li>
+<li><code>catchRate</code> est conservé comme donnée ; la capture actuelle dépend des règles de ball, pas de
+  ce taux d’espèce. Ne promettez pas un nouveau comportement en changeant seulement ce champ.</li>
+<li>Les quatre attaques actives ne sont pas définies ici : voir le chapitre H.</li>
+</ul>
+<p>Textes : <code>pokemon.mossling</code> en FR et EN. Images :</p>
+<pre><code class="language-text">assets/images/pokemon/mossling.png
+assets/images/pokemon/shiny/mossling.png
+</code></pre>
+<p>Le kit utilise Bulbizarre comme <strong>placeholder</strong>, y compris son shiny. Pour votre création, remplacez
+les images sans changer l’id stable. Le résolveur des chemins reste <code>AssetPaths.pokemonSprite()</code>.</p>
+<h3>G.2 Évolution</h3>
+<p>Exemples de valeurs du champ <code>evolutions</code> ; la cible et l’objet doivent déjà exister :</p>
+<pre><code class="language-js">evolutions: [{to:'ivysaur',level:16}]
+// Or an item evolution, not both examples at once:
+evolutions: [{to:'raichu',item:'thunderstone',minLevel:1}]
+</code></pre>
+<p>Pour une nouvelle cible, créez sa définition complète et ses ressources avant de la référencer.
+Une évolution ne doit pas cloner un Pokémon déjà possédé dans un autre modèle : utilisez le
+système d’évolution et sa gestion canonique des UID.</p>
+<h3>G.3 Forme alternative</h3>
+<p>Fragment à insérer dans <code>FORMS_CONTENT</code> ; fournissez aussi le sprite suffixé :</p>
+<pre><code class="language-js">mossling_winter: {
+  species:'mossling',form:'winter',types:['ice'],
+  stats:[50,45,60,65,65,35],kind:'alt'
+}
+</code></pre>
+<p>Chemin : <code>assets/images/pokemon/mossling_winter.png</code> et, si fourni, son équivalent shiny.
+Une forme reste la forme de l’espèce <code>mossling</code>; elle n’ajoute pas automatiquement une seconde
+espèce au total régional. Les conditions d’acquisition d’une forme doivent correspondre à un
+mécanisme réellement pris en charge ; un champ inventé n’est pas exécuté.</p>
+<p><a id="h"></a></p>
+<h2>H — Ajouter une capacité réellement utilisable</h2>
+<h3>H.1 Définition complète — <code>moves-content.js</code></h3>
+<pre><code class="language-js">export const MOVES_CONTENT = {
+  &quot;chloroshot&quot;: {
+    &quot;type&quot;: &quot;grass&quot;,
+    &quot;category&quot;: &quot;special&quot;,
+    &quot;power&quot;: 55,
+    &quot;accuracy&quot;: 100,
+    &quot;priority&quot;: 0,
+    &quot;rarity&quot;: 2,
+    &quot;cooldown&quot;: 1,
+    &quot;tags&quot;: [],
+    &quot;effects&quot;: [],
+    &quot;learnTypes&quot;: [
+      &quot;grass&quot;
+    ]
+  }
+};
+</code></pre>
+<ul>
+<li><code>category</code> : <code>physical</code>, <code>special</code>, <code>status</code>.</li>
+<li><code>power</code> : puissance ; une capacité de statut a une puissance nulle.</li>
+<li><code>accuracy</code> : pourcentage ; <code>neverMiss: true</code> est un comportement distinct, si nécessaire.</li>
+<li><code>cooldown</code> : multiplicateur du délai d’attaque, <strong>pas un nombre de secondes</strong>.</li>
+<li><code>rarity</code> participe au classement du pool d’apprentissage.</li>
+<li><code>priority</code>, <code>hits</code>, <code>tags</code>, <code>bypassDefenseBoosts</code> et <code>effects</code> sont des options connues du moteur.</li>
+<li><code>learnTypes</code> : tableau de types compatibles ; <code>learnTypes: ['all']</code> signifie tous les types.
+  Une liste vide exclut la capacité du tirage naturel, utile pour des signatures.</li>
+</ul>
+<p>Textes requis : <code>move.chloroshot</code> et <code>move_desc.chloroshot</code>, dans les deux langues.</p>
+<h3>H.2 Le piège du learnset</h3>
+<p>Le Rework actuel <strong>ne lit pas un tableau par espèce du type <code>movesAtLevel</code></strong>. <code>MoveLearnset</code> dérive
+le pool des types et des <code>learnTypes</code>, trie selon ses règles, puis garde <code>MoveConfig.POOL_SIZE</code> entrées.
+Le niveau ouvre progressivement ce pool ; les attaques stockées valides du Pokémon passent avant
+le fallback naturel. Une nouvelle capacité compatible ne devient donc pas forcément sa première attaque.</p>
+<p>Pour vérifier ce que votre Pokémon obtient vraiment :</p>
+<pre><code class="language-js">import {MoveLearnset} from './src/data/pokemon/MoveLearnset.js';
+console.log(MoveLearnset.poolFor(['grass']));
+console.log(MoveLearnset.movesForLevel(['grass'],20));
+</code></pre>
+<p>Le kit propose aussi une CT vendue en boutique. Elle déverrouille la capacité chez une cible
+compatible via <code>ItemUseSystem</code> ; le joueur choisit ensuite son emplacement actif via
+<code>MoveLearningSystem</code> et l’interface existante. Ne changez pas directement <code>pokemon.moves</code> depuis
+un nouveau panneau.</p>
+<p>Pour un <strong>nouveau système de learnsets par espèce</strong>, il faut explicitement faire évoluer le modèle
+statique, son dépôt/validation, <code>MoveLearnset</code>, l’apprentissage, l’entraînement et les tests. Ajouter
+un champ inconnu dans la définition d’une espèce ne suffit pas.</p>
+<h3>H.3 Effets existants et effet inédit</h3>
+<p>Exemple d’effet reconnu à ajouter dans <code>effects</code>, si vous voulez un risque d’empoisonnement :</p>
+<pre><code class="language-js">{kind:'status',status:'poison',chance:20,secondary:true}
+</code></pre>
+<p><code>chance: 20</code> signifie 20 %, pas <code>0.20</code>. Le vocabulaire est dans <code>MoveEffectKinds.js</code> et les
+paramètres dans <code>docs/BATTLE_EFFECTS.md</code>. Les effets sont exécutés par les handlers du moteur de
+combat ; <code>MoveDB.validate()</code> refuse un kind inconnu.</p>
+<p>Un effet vraiment inédit nécessite : une constante, un handler dans le pipeline d’effets approprié,
+son enregistrement, les conditions/paramètres validés, les textes de journal FR/EN et des tests
+(résistance/immunité, KO, multi-coups et sauvegarde si un état persiste). Ne stockez pas une fonction
+dans la table et ne rajoutez pas un second moteur de dégâts dans l’UI.</p>
+<p><a id="i"></a></p>
+<h2>I — Objets, CT, talents et ressources</h2>
+<h3>I.1 Les deux objets du kit — <code>items-content.js</code></h3>
+<pre><code class="language-js">export const ITEMS_CONTENT = {
+  &quot;auroria_pass&quot;: {
+    &quot;kind&quot;: &quot;key&quot;,
+    &quot;price&quot;: 0,
+    &quot;image&quot;: &quot;pokeflute.png&quot;
+  },
+  &quot;auroria_tm_chloroshot&quot;: {
+    &quot;kind&quot;: &quot;tm&quot;,
+    &quot;price&quot;: 1200,
+    &quot;image&quot;: null,
+    &quot;move&quot;: &quot;chloroshot&quot;
+  }
+};
+</code></pre>
+<p>Le laissez-passer est un <code>key</code> gratuit accordé par quête, <strong>pas un objet à vendre</strong>.
+La CT a un prix et référence une vraie capacité. <code>image: null</code> utilise le visuel générique prévu ;
+l’image de flûte du laissez-passer est un placeholder existant à remplacer.</p>
+<p>Familles connues : <code>held</code>, <code>tm</code>, <code>hm</code>, <code>ball</code>, <code>stone</code>, <code>evolution</code>, <code>fossil</code>, <code>key</code>, <code>consumable</code>,
+<code>candy</code>, <code>treasure</code>, <code>keystone</code>, <code>memory</code> (<code>ItemKinds.js</code>). Les champs ne créent pas automatiquement
+un usage. <code>ItemUseSystem</code> décide quels objets sont effectivement utilisables et sur quelles cibles.</p>
+<p>Exemples de mécanismes déjà branchés : CT/CS (<code>move</code>), évolution déclarée, bonbon niveau, vitamines,
+fossiles par le laboratoire. Pour un nouvel objet actif, auditez <code>ItemUseRules</code>, <code>ItemUseSystem</code>,
+la sélection de cible, la consommation, les événements et la sauvegarde unique.</p>
+<h3>I.2 Poké Balls</h3>
+<p>Une nouvelle ball nécessite une définition <code>kind: 'ball'</code>, son bloc <code>ball</code> et sa ressource SVG.
+<code>rate</code> est le taux de base ; les conditions reconnues viennent de <code>BallConditions.js</code> et sont
+évaluées par <code>BallRateRules</code>. Les filtres choisissent la ball lancée. Ne dupliquez pas ce calcul
+pour une rencontre régionale. Le stock automatique des boutiques reste piloté par <code>ShopRules</code>.</p>
+<h3>I.3 Talent</h3>
+<p>Pour réutiliser un effet existant, ajoutez une entrée complète dans <code>TALENTS_CONTENT</code>, puis sa
+traduction <code>talent.&lt;id&gt;.name</code> / <code>.desc</code>. Exemple de forme reconnue, inspirée d’Engrais :</p>
+<pre><code class="language-js">export const TALENTS_CONTENT = {
+  plateau_growth:{
+    rarity:1,affinity:['grass'],
+    effects:[{kind:'power',mult:1.35,when:{moveTypes:['grass'],selfHpBelow:0.35}}]
+  }
+};
+</code></pre>
+<p>Les paramètres de condition sont ceux réellement lus par les règles d’effets. Un talent inédit
+suit le même principe qu’une capacité inédite : vocabulaire, handler, conditions validées, textes,
+tests. Un texte vantant un bonus ne l’implémente pas.</p>
+<p><a id="j"></a></p>
+<h2>J — Arène, rival, équipes et ligue</h2>
+<h3>J.1 Une arène complète et sa revanche — <code>trainers-content.js</code></h3>
+<pre><code class="language-js">export const TRAINERS_CONTENT = {
+  &quot;auroria_ivy&quot;: {
+    &quot;kind&quot;: &quot;gym&quot;,
+    &quot;region&quot;: &quot;auroria&quot;,
+    &quot;badge&quot;: &quot;auroria_leaf&quot;,
+    &quot;badgesRequired&quot;: 0,
+    &quot;reward&quot;: 1000,
+    &quot;sprite&quot;: &quot;Brock&quot;,
+    &quot;teams&quot;: {
+      &quot;default&quot;: [
+        {
+          &quot;species&quot;: &quot;mossling&quot;,
+          &quot;level&quot;: 10,
+          &quot;moves&quot;: [
+            &quot;chloroshot&quot;
+          ]
+        }
+      ],
+      &quot;rematch&quot;: [
+        {
+          &quot;species&quot;: &quot;mossling&quot;,
+          &quot;level&quot;: 50,
+          &quot;moves&quot;: [
+            &quot;chloroshot&quot;,
+            &quot;growl&quot;
+          ]
+        }
+      ]
+    },
+    &quot;badgeImage&quot;: &quot;Rainbow&quot;
+  }
+};
+</code></pre>
+<p><code>badgeImage</code> est nécessaire pour un champion d’arène ; il désigne le nom sans <code>.svg</code> dans
+<code>assets/images/badges/</code>. <code>sprite</code> est le nom sans <code>.png</code> dans <code>assets/images/trainers/</code>.
+Le kit réutilise <code>Rainbow</code> et <code>Brock</code> comme visuels de travail.</p>
+<p><strong>Différence capitale :</strong> la victoire d’arène stocke <strong>l’id du dresseur</strong> (<code>auroria_ivy</code>) dans les
+badges du joueur. <code>badge: 'auroria_leaf'</code> est une donnée d’affichage, pas l’id à utiliser dans un
+objectif <code>badge</code> ou <code>hasBadge()</code>.</p>
+<p>Chaque membre peut préciser <code>moves</code>, <code>talent</code>, <code>item</code>, <code>ivs</code>, <code>evs</code> ; les spreads respectent les
+plafonds du Rework, pas des plafonds supposés d’un autre jeu. <code>teams.byStarter</code> permet des variantes,
+<code>teams.rematch</code> une revanche. Sans revanche définie, les règles reprennent l’équipe normale.</p>
+<h3>J.2 Rival</h3>
+<p>Même format, mais <code>kind: 'rival'</code> et pas de badge d’arène :</p>
+<pre><code class="language-js">export const TRAINERS_CONTENT = {
+  &quot;auroria_rival&quot;: {
+    &quot;kind&quot;: &quot;rival&quot;,
+    &quot;region&quot;: &quot;auroria&quot;,
+    &quot;badge&quot;: null,
+    &quot;badgesRequired&quot;: 0,
+    &quot;reward&quot;: 1000,
+    &quot;sprite&quot;: &quot;Brock&quot;,
+    &quot;teams&quot;: {
+      &quot;default&quot;: [
+        {
+          &quot;species&quot;: &quot;pidgey&quot;,
+          &quot;level&quot;: 12,
+          &quot;moves&quot;: [
+            &quot;tackle&quot;
+          ]
+        }
+      ]
+    }
+  }
+};
+</code></pre>
+<p>Les autres kinds connus sont déclarés dans <code>TrainerKinds.js</code>. Le système de dresseurs verse les
+récompenses selon le contexte : première arène/ligue, revanche, adversaire de quête. Ne versez pas
+une seconde récompense depuis le bouton « Défier ».</p>
+<h3>J.3 Ligue</h3>
+<p>Déclarez d’abord ses membres <code>auroria_elite_one</code> et <code>auroria_elite_two</code> dans <code>TRAINERS_CONTENT</code>
+(<code>kind: 'league'</code>, une équipe chacun), puis dans <code>leagues-content.js</code> :</p>
+<pre><code class="language-js">export const LEAGUES_CONTENT = {
+  &quot;auroria_league&quot;: {
+    &quot;region&quot;: &quot;auroria&quot;,
+    &quot;badge&quot;: &quot;auroria_title&quot;,
+    &quot;badgesRequired&quot;: 1,
+    &quot;reward&quot;: 5000,
+    &quot;sprite&quot;: &quot;Brock&quot;,
+    &quot;trainers&quot;: [
+      &quot;auroria_elite_one&quot;,
+      &quot;auroria_elite_two&quot;
+    ],
+    &quot;badgeImage&quot;: &quot;Champion_Stamp&quot;
+  }
+};
+</code></pre>
+<p>Le kit fournit les deux définitions d’élite complètes dans <code>content.json</code>. Reliez la ligue au lieu
+avec <code>champion: 'auroria_league'</code>. <code>TrainerSystem.challenge()</code> construit une série d’adversaires
+avec le moteur normal ; <code>TrainerBattleContext</code> fait le règlement.</p>
+<p>Le titre de ligue se lit par <code>save.statistics.hasWonLeague('auroria')</code>, <strong>pas</strong>
+<code>save.player.hasBadge('auroria_league')</code>. Les titres ne sont pas des badges d’arène. Pour une nouvelle
+quête « gagner cette ligue », ne supposez pas que l’objectif <code>badge</code> des arènes lit les titres :
+ajoutez un objectif d’état qui interroge <code>QuestContext.hasWonLeague(region)</code>, enregistrez-le dans
+<code>ObjectiveTypes</code> / <code>ObjectiveRegistry</code>, ajoutez sa description FR/EN et ses tests. L’exemple n’ajoute
+pas cette extension ; sa chaîne de quatre quêtes se termine au rival. La ligue reste jouable et
+son vrai titre régional est testé. Aucun mécanisme de réparation d’anciennes ligues n’est ajouté ici.</p>
+<p><a id="k"></a></p>
+<h2>K — Boutique, tarifs et achats uniques</h2>
+<p>Dans <code>shops-content.js</code> :</p>
+<pre><code class="language-js">export const SHOPS_CONTENT = {
+  &quot;auroria_store&quot;: {
+    &quot;items&quot;: [
+      &quot;rarecandy&quot;,
+      &quot;auroria_tm_chloroshot&quot;
+    ]
+  }
+};
+</code></pre>
+<p>Reliez ce commerce à un lieu avec <code>shop: 'auroria_store'</code>. Son nom vient de
+<code>shop.auroria_store.name</code>. Tout objet de la liste doit avoir un prix positif reconnu par <code>ItemDB</code>.
+Les objets-clés gratuits de scénario ne doivent pas figurer dans cette liste.</p>
+<p>Pour un commerce réservé à une ligue déjà gagnée, le champ <strong>existant</strong> <code>requiresLeague</code> est un
+<strong>id de ligue</strong> de <code>LeagueDB</code>, par exemple <code>auroria_league</code>. Le système vérifie le titre régional.
+Ce verrou de boutique ne bloque pas, à lui seul, l’entrée dans le lieu.</p>
+<h3>Stock automatique</h3>
+<p>Le catalogue ajoute les balls selon <code>badgesRequired</code> du lieu : Poké Ball, Super Ball à partir du
+palier 2, Hyper Ball au palier 5, offres de Master Ball au palier 8. Le prix de Master Ball croît
+avec le nombre déjà acheté ; l’achat de Poké Balls peut accorder des Honor Balls. Gardez ces règles
+centrales plutôt que de recréer des offres parallèles.</p>
+<p>Depuis 1.14.21, <strong>toutes les boutiques utilisables</strong> proposent aussi :</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Module</th>
+<th style="text-align: right;">Achat unique</th>
+<th>Type d’offre</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Relance des combats sauvages</td>
+<td style="text-align: right;">2 500 points de quête</td>
+<td><code>upgrade</code></td>
+</tr>
+<tr>
+<td>Relance des donjons</td>
+<td style="text-align: right;">5 000 points de quête</td>
+<td><code>upgrade</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Ces modules <strong>ne sont pas des objets d’inventaire</strong>. Le catalogue les retire dès qu’ils sont possédés,
+la quantité est toujours un, et <code>ShopSystem</code> possède leur transaction unique. Depuis 1.14.23,
+le panneau Combat n’affiche que le switch possédé correspondant au lieu, nommé Auto combat ou
+Auto donjon depuis 1.14.24, y compris pendant un combat ou un donjon ;
+les achats restent dans la boutique. Pour un nouveau module permanent, suivez ce type d’offre ; n’ajoutez
+pas un faux objet ou un faux Pokémon pour représenter l’amélioration.</p>
+<h3>Marché aux Pokémon (à partir de 1.14.22)</h3>
+<p>Ne confondez pas la <strong>boutique d’objets du lieu</strong> et le <strong>Marché régional</strong> des raccourcis. Le Marché
+se débloque après un badge, ou à Johto, et se paie uniquement en points de quête. <code>ShopSystem.buyMarket</code>
+possède sa transaction ; les achats ne produisent ni captures sauvages ni crédits d’éclosion.
+Le premier exemplaire d’une espèce non possédée rejoint l’équipe si une place est libre ; les autres
+restent dans la collection du PC. Chaque exemplaire garde son propre UID.</p>
+<p>Pour modifier le catalogue, éditez <code>src/config/MarketRules.js</code> :</p>
+<ul>
+<li><code>STOCK</code> donne les candidats par région. Le stock réellement affiché retire les espèces déjà
+  sauvages dans cette région et les cibles d’évolution, avec les exceptions explicites du main.</li>
+<li><code>CATEGORIES</code> détermine les groupes et identifie aussi les starters pour leur prix.</li>
+<li><code>REGION_PRICE_BANDS</code> fixe les prix selon le numéro national. Les montants sauvegardés ne sont
+  jamais arrondis : le <code>1k</code> visuel est une présentation et son infobulle conserve <code>1 000</code>.</li>
+<li>Pour une région nouvelle, ajoutez une entrée <code>STOCK</code> même si sa liste est vide : sinon le
+  comportement de repli hérité du main utilise Kanto. <code>BANNED</code> peut compléter les exclusions.</li>
+<li>Le choix validé en 1.14.22 <strong>conserve les rencontres du Rework</strong>. Johto a donc six offres, et non
+  les quinze du main exécuté : neuf de ses candidats sont déjà sauvages dans ces données.</li>
+</ul>
+<p>Exemple de ligne à ajouter <strong>dans l’objet <code>STOCK</code></strong>, et non dans les tables générées :</p>
+<pre><code class="language-js">auroria: Object.freeze(['bulbasaur']),
+</code></pre>
+<p>Cet exemple ne force pas l’achat si Bulbizarre devient sauvage à Auroria : le filtre central continue
+à s’appliquer. Pour un nouveau starter de numéro 1001, ajoutez-le aussi dans <code>CATEGORIES.starter</code>,
+puis insérez avant les autres bandes, dans <code>REGION_PRICE_BANDS</code>, par exemple :</p>
+<pre><code class="language-js">Object.freeze({ minDex: 1001, starterPrice: 10000, otherPrice: 20000 }),
+</code></pre>
+<p>Le kit Auroria ne modifie pas ce catalogue : ces lignes sont une extension facultative à réaliser
+vous-même. <code>MarketCatalog</code> reste sans DOM et sans écriture ; <code>MarketPanel</code> réutilise <code>MoneyRow</code>,
+<code>PriceTag</code> et la barre <code>ShopFooter</code> au lieu de réimplémenter les achats dans le panneau.</p>
+<p><a id="l"></a></p>
+<h2>L — Écrire une histoire et des quêtes</h2>
+<h3>L.1 La liste complète du kit — <code>quests-content.js</code></h3>
+<pre><code class="language-js">export const QUESTS_CONTENT = [
+  {
+    &quot;category&quot;: &quot;main&quot;,
+    &quot;id&quot;: &quot;auroria_welcome&quot;,
+    &quot;region&quot;: &quot;auroria&quot;,
+    &quot;location&quot;: &quot;auroria_start&quot;,
+    &quot;objective&quot;: {
+      &quot;type&quot;: &quot;talk&quot;
+    },
+    &quot;rewards&quot;: {
+      &quot;questPoints&quot;: 50
+    }
+  },
+  {
+    &quot;category&quot;: &quot;main&quot;,
+    &quot;id&quot;: &quot;auroria_road&quot;,
+    &quot;region&quot;: &quot;auroria&quot;,
+    &quot;location&quot;: &quot;auroria_path&quot;,
+    &quot;objective&quot;: {
+      &quot;type&quot;: &quot;kill&quot;,
+      &quot;location&quot;: &quot;auroria_path&quot;,
+      &quot;count&quot;: 3
+    },
+    &quot;rewards&quot;: {
+      &quot;questPoints&quot;: 100,
+      &quot;items&quot;: {
+        &quot;auroria_pass&quot;: 1
+      }
+    }
+  },
+  {
+    &quot;category&quot;: &quot;main&quot;,
+    &quot;id&quot;: &quot;auroria_gym&quot;,
+    &quot;region&quot;: &quot;auroria&quot;,
+    &quot;location&quot;: &quot;auroria_city&quot;,
+    &quot;objective&quot;: {
+      &quot;type&quot;: &quot;badge&quot;,
+      &quot;badge&quot;: &quot;auroria_ivy&quot;
+    },
+    &quot;rewards&quot;: {
+      &quot;questPoints&quot;: 100
+    }
+  },
+  {
+    &quot;category&quot;: &quot;main&quot;,
+    &quot;id&quot;: &quot;auroria_rival&quot;,
+    &quot;region&quot;: &quot;auroria&quot;,
+    &quot;location&quot;: &quot;auroria_city&quot;,
+    &quot;objective&quot;: {
+      &quot;type&quot;: &quot;boss&quot;,
+      &quot;trainer&quot;: &quot;auroria_rival&quot;
+    },
+    &quot;rewards&quot;: {
+      &quot;questPoints&quot;: 100
+    }
+  },
+  {
+    &quot;category&quot;: &quot;side&quot;,
+    &quot;id&quot;: &quot;auroria_catches&quot;,
+    &quot;region&quot;: &quot;auroria&quot;,
+    &quot;location&quot;: &quot;auroria_city&quot;,
+    &quot;objective&quot;: {
+      &quot;type&quot;: &quot;catch&quot;,
+      &quot;location&quot;: &quot;auroria_path&quot;,
+      &quot;count&quot;: 2
+    },
+    &quot;rewards&quot;: {
+      &quot;questPoints&quot;: 80
+    }
+  }
+];
+</code></pre>
+<p>Les quatre quêtes <code>main</code> sont ajoutées dans cet ordre. L’id peut être alphanumérique ; la clé de
+la deuxième est <code>main.auroria_road</code>. <strong>Le numéro de quête n’est jamais son index de progression.</strong>
+<code>getMainChain('auroria')</code> donne l’ordre réel et <code>getMainStep('auroria')</code> la position sauvegardée.</p>
+<ul>
+<li><code>location</code> est le contexte de la quête ; l’objectif peut aussi porter sa propre <code>location</code>.</li>
+<li><code>objective.count</code> est le seuil d’un compteur ; les objectifs d’état ont leurs règles propres.</li>
+<li>Les victoires de dresseur ne sont pas des <code>kill</code> sauvages. Utilisez <code>boss</code> pour un dresseur.</li>
+<li>Une quête <code>talk</code> principale est auto-réclamée une fois son objectif accompli. Les autres doivent
+  normalement être <strong>réclamées</strong> par le flux de quête : « objectif terminé » et « récompense récupérée »
+  ne sont pas interchangeables pour une porte <code>questKey</code>.</li>
+<li>Une quête secondaire doit être acceptée avant que ses compteurs réagissent aux événements.</li>
+<li>Les compteurs sont sauvegardés par <code>QuestSystem</code>, pas dans la définition de quête.</li>
+</ul>
+<h3>L.2 Objectifs disponibles et sources de progression</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Champs utiles / sens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>talk</code></td>
+<td>conversation dans le groupe du <code>location</code> de la quête</td>
+</tr>
+<tr>
+<td><code>kill</code></td>
+<td><code>count</code>, <code>location?</code>, victoires sauvages pendant l’activation</td>
+</tr>
+<tr>
+<td><code>catch</code></td>
+<td><code>count</code>, <code>location?</code>, captures</td>
+</tr>
+<tr>
+<td><code>boss</code></td>
+<td><code>trainer</code>, victoire sur le dresseur</td>
+</tr>
+<tr>
+<td><code>badge</code></td>
+<td><code>badge</code>, id du champion d’arène possédé</td>
+</tr>
+<tr>
+<td><code>item</code></td>
+<td><code>item</code>, <code>count</code>, état de l’inventaire</td>
+</tr>
+<tr>
+<td><code>own_species</code></td>
+<td><code>species</code>, présence dans <strong>l’équipe active</strong>, pas toute la collection PC</td>
+</tr>
+<tr>
+<td><code>region_wins</code></td>
+<td><code>region</code>, <code>count</code>, victoires sauvages de la région</td>
+</tr>
+<tr>
+<td><code>dex_region</code></td>
+<td><code>region</code>, <code>count</code>, espèces marquées capturées</td>
+</tr>
+<tr>
+<td><code>mine_dig</code>, <code>mine_sell</code></td>
+<td>événements de mine</td>
+</tr>
+<tr>
+<td><code>hatch</code>, <code>hatchery_level</code>, <code>fossil</code>, <code>training</code></td>
+<td>événements réels des installations</td>
+</tr>
+<tr>
+<td><code>puzzle</code>, <code>base_visit</code>, <code>base_establish</code></td>
+<td>modules associés ; paramètres de leur classe d’objectif</td>
+</tr>
+</tbody>
+</table></div>
+<p>La liste autoritaire est <code>ObjectiveTypes.js</code> et chaque classe est dans
+<code>src/data/quests/objectives/</code>. Pour connaître le comportement exact, lisez sa méthode <code>progressFor</code>
+ou <code>stateProgress</code>, ses <code>EVENTS</code> et <code>describe</code>. Un champ arbitraire <code>npc</code>, <code>enemy</code>, <code>completedDungeon</code>
+n’a aucun effet si ces méthodes ne le lisent pas.</p>
+<h3>L.3 Récompenses et prérequis</h3>
+<p>Les récompenses peuvent contenir <code>questPoints</code>, des <code>items</code>, un Pokémon et les monnaies normalisées
+prises en charge par <code>QuestDB</code>/<code>QuestSystem</code>. Les dons de Pokémon ont des règles de place ; les
+récompenses de rencontre ne sont pas de simples dons. Les quêtes légendaires utilisent <code>chain</code>,
+<code>requires</code> et parfois <code>encounter</code>. Copiez une définition existante du <strong>même mécanisme</strong> puis
+vérifiez le modèle normalisé retourné par <code>QuestDB</code>.</p>
+<p>Ne confondez pas <code>requires</code> d’une quête, les conditions d’offre d’un PNJ et les portes d’un lieu.
+Une condition sur une quête ne verrouille pas automatiquement un rectangle de carte.</p>
+<h3>L.4 Nouvel objectif</h3>
+<p>Pour « étudier trois sites » ou un autre objectif inédit :</p>
+<ol>
+<li>définissez un événement métier réel (par exemple <code>FieldJournalChangedEvent</code>) ;</li>
+<li>ajoutez la valeur dans <code>ObjectiveTypes</code> ;</li>
+<li>créez une classe <code>QuestObjective</code> de compteur, ou <code>StateObjective</code> si le fait existe déjà ;</li>
+<li>ajoutez les lectures nécessaires à <code>QuestContext</code> plutôt que de laisser l’objectif muter SaveData ;</li>
+<li>enregistrez la classe dans <code>ObjectiveRegistry</code> ;</li>
+<li>ajoutez <code>quest_objective_&lt;type&gt;</code> en FR/EN et vérifiez le rendu de <code>describe()</code> ;</li>
+<li>validez les nouvelles références dans <code>QuestDB.validate()</code> ;</li>
+<li>testez activation, mauvais événement, bon événement, réclamation unique et rechargement.</li>
+</ol>
+<p><a id="m"></a></p>
+<h2>M — Ajouter les PNJ et leurs dialogues</h2>
+<p>Les PNJ sont des enregistrements localisés sous <code>npc.&lt;lieu&gt;.&lt;index&gt;</code>. Pour un lieu neuf, ajoutez
+la même structure sous la propriété <code>npc</code> de votre domaine manuel français et anglais :</p>
+<pre><code class="language-js">auroria_start: [{
+  id:'auroria_guide',
+  name:'Professeur Saule',
+  lines:['Bienvenue à Auroria. Votre partenaire vous attend.']
+}]
+</code></pre>
+<p>Le nom et les phrases changent en anglais ; <strong>l’id <code>auroria_guide</code> reste identique</strong>. Ne déduisez
+pas l’identité d’un nom traduit ou de la position dans le tableau.</p>
+<p>Dans <code>src/data/content/NpcQuestLinks.js</code>, à l’intérieur de <code>NPC_QUEST_LINKS</code> :</p>
+<pre><code class="language-js">auroria_guide:Object.freeze({mainQuestKey:'main.auroria_welcome'}),
+auroria_researcher:Object.freeze({sideQuestKey:'side.auroria_catches'}),
+</code></pre>
+<p>Créez aussi le dialogue <code>auroria_researcher</code> à Florécité. Le kit le fournit. Un lien pointe vers une
+quête qui existe et doit correspondre à une identité présente dans les deux langues.
+<code>NpcDirectory</code> lit le dialogue ; <code>NpcQuestDirectory</code> lit l’offre ; <code>QuestSystem</code> décide de son état.</p>
+<h3>Ne pas inventer une contrainte d’identité pour TALK</h3>
+<p>Dans cette version, l’identité du PNJ détermine <strong>qui propose l’offre</strong>. Une fois une quête <code>talk</code>
+active, <code>TalkObjective</code> accepte une conversation du même groupe de lieu, même avec un autre PNJ.
+L’ancien raccourci « le PNJ doit toujours être celui du lien pour valider » serait inexact.
+Si votre histoire exige une identité stricte, ajoutez explicitement ce paramètre à l’objectif,
+vérifiez <code>event.npcId</code>, adaptez la validation et testez qu’un voisin ne valide pas. Ne promettez pas
+ce comportement en ajoutant seulement un champ ignoré.</p>
+<p><a id="n"></a></p>
+<h2>N — Bloquer une zone derrière quête, combat, arène ou objet</h2>
+<p>Toutes les portes doivent être évaluées dans <strong>FeatureAccessSystem</strong>, pas seulement dans le clic UI.
+Le système applique d’abord la règle de lieu, puis la propagation depuis les connexions nettoyées.</p>
+<h3>N.1 Quête réclamée + objet de scénario</h3>
+<p>Dans <code>LOCATION_ACCESS_GATES</code> de <code>ContentAccessRules.js</code> :</p>
+<pre><code class="language-js">auroria_city:Object.freeze({
+  questKey:'main.auroria_road',
+  itemId:'auroria_pass'
+}),
+</code></pre>
+<p>Les deux conditions sont en <strong>ET</strong>. Trois victoires ne suffisent pas si la récompense de la quête
+n’a pas encore été réclamée. Ne consommez pas un laissez-passer permanent sans concevoir la suite :
+la condition de possession peut redevenir fausse.</p>
+<h3>N.2 Un combat précis</h3>
+<p>Le kit place avant l’entrée du Bois une quête <code>boss</code> contre <code>auroria_rival</code>, puis cette porte :</p>
+<pre><code class="language-js">auroria_forest:Object.freeze({questKey:'main.auroria_rival'}),
+</code></pre>
+<p>Le donjon requiert déjà <code>badgesRequired: 1</code>. Il faut donc le badge régional <strong>et</strong> la quête du rival
+réclamée. Le combat utilise <code>TrainerSystem</code>, ses vrais adversaires et ses statistiques ; aucun
+événement de victoire n’est fabriqué par le panneau.</p>
+<h3>N.3 Une ou plusieurs arènes</h3>
+<ul>
+<li>« N’importe quels trois badges de la région » : mettez <code>badgesRequired: 3</code> sur le lieu.</li>
+<li>« Cette arène précise » : utilisez une étape <code>badge</code> avec <code>badge: 'auroria_ivy'</code>, puis une porte
+  <code>questKey</code> après sa réclamation.</li>
+<li>Si vous ne voulez <strong>aucune quête intermédiaire</strong>, ajoutez une condition dédiée au résolveur,
+  à son diagnostic (<code>getLocationAccessStatus</code>), à la validation et aux tests. Ne mettez pas
+  <code>badgeId: 'auroria_ivy'</code> dans une table en supposant qu’il est déjà interprété.</li>
+</ul>
+<h3>N.4 Starter, titre et rotation</h3>
+<p>Les portes exceptionnelles existantes comprennent <code>starterRegion</code>, <code>championTitle</code>, <code>rotationWindow</code>,
+<code>questKey</code>, <code>itemId</code>. Le kit protège la première route avec :</p>
+<pre><code class="language-js">auroria_path:Object.freeze({starterRegion:'auroria'}),
+</code></pre>
+<p><code>championTitle: true</code> signifie le titre permanent reconnu par le résolveur ou <strong>au moins une ligue
+gagnée</strong>, pas nécessairement la ligue d’Auroria. Pour une ligue régionale précise, il faut une
+extension explicitement testée lisant <code>statistics.hasWonLeague(region)</code>.</p>
+<p><code>rotationWindow</code> suit la fenêtre temporelle existante ; ne l’utilisez pas comme simple booléen.
+Un système de portes « OU », de météo ou de gardien de donjon n’est pas implicite.</p>
+<h3>N.5 Exemple d’extension, si vous en avez besoin</h3>
+<p>Ceci est une <strong>modification supplémentaire du moteur</strong>, non incluse dans le kit. Pour lire un
+nouveau champ <code>leagueRegion</code>, ajoutez un contrôle dans <code>_locationGateSatisfied</code> :</p>
+<pre><code class="language-js">if(gate.leagueRegion &amp;&amp; !save.statistics.hasWonLeague(gate.leagueRegion)) return false;
+</code></pre>
+<p>Il faut aussi le diagnostic correspondant, la validation de la région et du lieu, un rafraîchissement
+sur la victoire de ligue et des tests avant/après/reload. Sans ces autres étapes, vous aurez une
+porte opaque ou une UI qui n’affiche pas le bon état.</p>
+<h3>N.6 Pièges de sauvegarde</h3>
+<p><code>access.locations</code> contient des faits d’accès persistants, mais ces faits <strong>ne court-circuitent pas</strong>
+les conditions vérifiées avant eux. Ne l’utilisez pas pour contourner une porte depuis l’UI.
+N’insérez pas une nouvelle quête avant des étapes déjà parcourues dans une histoire existante sans
+migration : son index principal sauvegardé changerait de sens. Pour une région totalement neuve,
+les anciennes parties n’ont naturellement pas encore sa progression.</p>
+<p><a id="o"></a></p>
+<h2>O — Pokédex, choix de partenaire et filtres de région</h2>
+<h3>O.1 Origine des espèces et Pokédex</h3>
+<p><code>PokemonDB.getByRegion('auroria')</code> utilise le champ <code>region</code> de chaque <strong>espèce</strong>. La liste des
+rencontres n’est pas une définition de Pokédex régional. Croiser Roucool à Auroria ne le retire pas
+du Pokédex de Kanto et ne le compte pas automatiquement dans celui d’Auroria.</p>
+<p>Ne déplacez pas les espèces historiques dans une autre région pour remplir un nouveau Pokédex :
+vous changeriez les prérequis des anciennes campagnes. Pour des Pokédex régionaux qui se recouvrent,
+concevez une table de listes régionales et adaptez ensemble la visibilité du Pokédex, les compteurs,
+les objectifs et les portes. Ce n’est pas le modèle actuel.</p>
+<p>Les régions visibles du Pokédex suivent les régions disponibles <strong>et accessibles</strong> du résolveur.
+<code>available: true</code> ne force donc pas leur affichage chez un joueur débutant. Le PC continue de montrer
+toute la collection possédée. Ne refaites pas les cartes acceptées du Pokédex/PC pour ajouter votre région.</p>
+<h3>O.2 Partenaire régional</h3>
+<p>Dans <code>STARTERS_BY_REGION</code> (<code>src/data/pokemon/StarterData.js</code>) :</p>
+<pre><code class="language-js">auroria:Object.freeze([
+  Object.freeze({species:'mossling',nameKey:'pokemon.mossling',descKey:'starter_auroria_mossling_desc'})
+]),
+</code></pre>
+<p><code>RegionalStarterSystem</code> effectue le choix unique, ajoute le Pokémon via le propriétaire canonique,
+met à jour les faits de collection/Pokédex et le range dans le PC si nécessaire. Utilisez
+<code>chooseStarter('auroria','mossling')</code>; n’ajoutez pas une deuxième copie depuis le panneau.</p>
+<p>Réutiliser un ancien starter a des effets : le résolveur peut reconnaître ce starter dans la
+collection ou le Pokédex et considérer le choix déjà acquis. Pour un choix réellement neuf,
+utilisez une espèce propre à la nouvelle région ou adaptez explicitement la politique.</p>
+<p>Le jeu garde sa région initiale par défaut. Ajouter ce tableau ne suffit pas à rendre une nouvelle
+campagne de départ cohérente avec le tutoriel initial et les portes de voyage.</p>
+<h3>O.3 Audits faciles à oublier</h3>
+<ul>
+<li>Ajoutez <code>auroria</code> à <code>FacilityFilterRules.COMMON.filterRegion</code>, sinon les filtres d’installation
+  ne proposent pas cette valeur et leur normalisation peut l’effacer.</li>
+<li>Définissez <strong>les deux clés</strong> <code>map_region_auroria</code> et <code>region_auroria</code> en FR/EN.</li>
+<li>Les succès épinglés sont déclarés dans <code>AchievementsPanel.js</code>, avec des paliers numériques.
+  Ils ne sont pas générés automatiquement à partir de <code>REGIONS</code>. Ajoutez un succès régional si
+  souhaité et revoyez le dernier palier national lorsque le nombre d’espèces change.</li>
+<li>Auditez les assertions de couverture de données : un test exigeant exactement 419 capacités
+  doit devenir 420 si vous en ajoutez une, sans retirer le test de validité ou de gel des définitions.</li>
+</ul>
+<p><a id="p"></a></p>
+<h2>P — Donjons et chaîne automatique</h2>
+<p>Un lieu <code>kind: 'dungeon'</code> avec des rencontres utilise <code>DungeonSystem</code>. Celui-ci possède la carte,
+le péage, les combats, les coffres, la descente, les récompenses et le règlement d’échec.
+Le nouveau pilote <strong>n’est pas un second moteur</strong> : il ne fait que sélectionner une destination
+puis appeler <code>moveTo()</code> ou <code>resumePendingEncounter()</code>.</p>
+<h3>Contrat en 1.14.25</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Fonction</th>
+<th>Règle</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pilote d’un donjon</td>
+<td>gratuit, après <strong>3 expéditions terminées victorieusement dans ce donjon</strong></td>
+</tr>
+<tr>
+<td><code>farm</code></td>
+<td>explorer/régler les combats et coffres avant le gardien</td>
+</tr>
+<tr>
+<td><code>boss</code></td>
+<td>trajet direct vers le gardien puis descente</td>
+</tr>
+<tr>
+<td><code>chest</code></td>
+<td>coffres avant le gardien, pénalité de trajet pour éviter les combats inutiles</td>
+</tr>
+<tr>
+<td>Rythme du pilote</td>
+<td>départ 400 ms, pas 350 ms, coffre 450 ms ; les combats gardent leurs propres horloges</td>
+</tr>
+<tr>
+<td>Relance de donjon achetée</td>
+<td>5 secondes après fin naturelle (gardien final ou équipe K.O.)</td>
+</tr>
+<tr>
+<td>Péage</td>
+<td>payé normalement à <strong>chaque nouvelle expédition</strong>, jamais pour une simple reprise</td>
+</tr>
+<tr>
+<td>Choix mémorisé</td>
+<td>dernier mode non manuel ; réappliqué si le pilote est déverrouillé</td>
+</tr>
+<tr>
+<td>Jetons manquants</td>
+<td>la tentative s’arrête, sans boucle de paiement ou relance tardive automatique</td>
+</tr>
+<tr>
+<td>Annulation / abandon / remontée volontaire</td>
+<td>ne fabrique pas une fin naturelle à relancer</td>
+</tr>
+</tbody>
+</table></div>
+<p>Le module acheté et le déverrouillage du pilote sont <strong>indépendants</strong>. Un joueur peut piloter un
+donjon sans avoir acheté la relance ; acheter la relance ne donne pas les trois victoires.
+Avant le seuil, une nouvelle expédition reste manuelle.</p>
+<p>Les combats sauvages gagnés s’enchaînent déjà sans achat. Le module sauvage sert après une
+<strong>défaite naturelle de la chaîne</strong>, pas après chaque Pokémon vaincu, ni après « Quitter », une arène
+ou un combat spécial. Les délais sont transitoires et liés à la partie/au lieu ; ils ne sont pas
+un historique d’actions à rejouer après import.</p>
+<p><strong>Limite importante :</strong> cette chaîne fonctionne dans le moteur vivant du Rework. Ce n’est pas une
+simulation hors ligne de douze heures ni un rattrapage complet de l’AFK de l’original.</p>
+<p>Pour un donjon régional à génération ou règles différentes, ajoutez des règles de données et une
+stratégie au système existant. Ne versez jamais le contenu du coffre depuis son widget et ne
+remplacez pas les combats par une multiplication de récompenses.</p>
+<p><a id="q"></a></p>
+<h2>Q — Réutiliser les installations et les Pokémon sans les dupliquer</h2>
+<p>Le Rework possède <strong>une collection unique de Pokémon</strong>, <code>save.collection</code>. L’équipe, la Pension,
+les emplacements d’Entraînement et les presets gardent des <strong>UID</strong>, pas des copies de Pokémon.
+Le PC est la vue de toute cette collection.</p>
+<p>Si votre gameplay mobilise un Pokémon :</p>
+<ol>
+<li>stockez son UID dans le nouveau modèle ;</li>
+<li>demandez les autorisations à <code>PokemonUsageSystem</code> avec une action reconnue ;</li>
+<li>utilisez les systèmes de sélection communs du PC / des installations ;</li>
+<li>ne libérez pas une réservation parce que l’écran est fermé ou qu’un filtre a changé ;</li>
+<li>migrez les affectations et les batailles en conservant leurs UID et leur DTO complet.</li>
+</ol>
+<p>Les installations existantes sont accessibles à distance <strong>après leur déverrouillage permanent</strong>.
+Une nouvelle fonctionnalité permanente doit déclarer son fait et sa règle dans le résolveur commun,
+plutôt qu’une condition de route dans plusieurs panneaux.</p>
+<p>Les filtres ne refiltrent pas rétroactivement les FIFO manuels. Une bataille d’Entraînement
+reprend son adversaire, ses PV, son RNG, son terrain et ses délais : ne la reconstruisez pas à partir
+du seul nom du Pokémon. Les bonus de personnel annoncés mais inactifs restent signalés comme tels.
+« PC » pour un recrutement historique correspond aux <strong>points de quête</strong>, pas aux points de combat.</p>
+<p>Pour les prix, réutilisez <code>PriceTag</code>. Un bouton <code>.hbtn[disabled]</code> est caché par le design system :
+le montant d’une offre non achetable doit rester dans un conteneur informatif <strong>hors de ce bouton</strong>.
+Le prix reste visible sans message de solde insuffisant. Pour une grille de cartes de hauteurs
+variables, <code>grid-auto-rows: 1fr</code>, des cartes flex verticales et un pied <code>margin-top: auto</code> égalisent
+<strong>toutes les rangées</strong>, pas seulement les cartes d’une seule rangée.</p>
+<p><a id="r"></a></p>
+<h2>R — Nouveau gameplay : le modèle du Carnet de terrain</h2>
+<h3>R.1 Définir le comportement avant le code</h3>
+<p>Le Carnet est proposé à Auroria. Après trois victoires sauvages sur une route, hors combat, on peut
+étudier ce site <strong>une seule fois</strong> et recevoir 250 Pokédollars. Changer de partie ne doit pas transférer
+les sites ou les récompenses. Le nombre de sites est dérivé de la liste des ids ; on ne sauvegarde
+pas deux compteurs qui pourraient diverger.</p>
+<p>Ce module est un <strong>exemple de gameplay régional</strong>, pas une nouvelle installation permanente. Le
+panneau peut donc se masquer hors d’Auroria. Si vous souhaitez un déverrouillage permanent après
+une quête, déclarez-le dans <code>FeatureAccessSystem</code> et utilisez ce statut dans le système.</p>
+<h3>R.2 Modèle complet — <code>src/data/save/FieldJournalData.js</code></h3>
+<pre><code class="language-js">/** @file FieldJournalData.js @brief Stores only surveyed site IDs; counts are derived. */
+import { BaseModel } from &quot;../core/BaseModel.js&quot;;
+export class FieldJournalData extends BaseModel {
+  constructor(data = {}) {
+    super(&quot;FieldJournalData&quot;, &quot;Data&quot;);
+    this.deserialize(data);
+  }
+  deserialize(data = {}) {
+    this.sites = [
+      ...new Set(
+        (Array.isArray(data?.sites) ? data.sites : []).filter(
+          (id) =&gt; typeof id === &quot;string&quot; &amp;&amp; id.length &gt; 0,
+        ),
+      ),
+    ];
+  }
+  has(locationId) {
+    return this.sites.includes(locationId);
+  }
+  add(locationId) {
+    if (!locationId || this.has(locationId)) return false;
+    this.sites.push(locationId);
+    return true;
+  }
+  serialize() {
+    return { sites: [...this.sites] };
+  }
+}
+</code></pre>
+<p>La désérialisation accepte un champ absent et retire les doublons/valeurs invalides. La sérialisation
+renvoie une copie de la liste. Les méthodes ne connaissent ni un bouton, ni une traduction, ni le DOM.
+Les ids inconnus mais textuels sont conservés comme faits, pour ne pas perdre un ancien site simplement
+parce qu’un module de contenu est temporairement absent.</p>
+<p>Le modèle seul n’est pas encore sauvegardé : les trois branchements dans SaveData et la migration
+sont décrits au chapitre U. N’oubliez pas l’un de ces trois points.</p>
+<p><a id="s"></a></p>
+<h2>S — Nouveau gameplay : règles, événement et commande</h2>
+<h3>S.1 Règles partagées — <code>src/config/FieldJournalRules.js</code></h3>
+<pre><code class="language-js">/** @file FieldJournalRules.js @brief Sample-only field survey rules; data, never UI text. */
+export const FieldJournalRules = Object.freeze({
+  REGION: &quot;auroria&quot;,
+  MIN_WINS: 3,
+  REWARD: 250,
+  CURRENCY: &quot;money&quot;,
+});
+</code></pre>
+<p>Le seuil et la récompense n’existent qu’à un endroit ; l’UI les lit dans le snapshot. Aucun texte
+traduit n’est stocké dans les règles.</p>
+<h3>S.2 Événement — <code>src/core/events/FieldJournalChangedEvent.js</code></h3>
+<pre><code class="language-js">/** @file FieldJournalChangedEvent.js @brief A field site was surveyed through its canonical command. */
+import { BaseEvent } from &quot;../BaseEvent.js&quot;;
+export class FieldJournalChangedEvent extends BaseEvent {
+  static TYPE = &quot;FieldJournalChangedEvent&quot;;
+  constructor(locationId) {
+    super(FieldJournalChangedEvent.TYPE);
+    this.locationId = locationId;
+  }
+}
+</code></pre>
+<h3>S.3 Système complet — <code>src/systems/FieldJournalSystem.js</code></h3>
+<pre><code class="language-js">/** @file FieldJournalSystem.js @brief Sample-only gameplay: one paid survey per cleared route. */
+import { BaseSystem } from &quot;./BaseSystem.js&quot;;
+import { SaveSystem } from &quot;./SaveSystem.js&quot;;
+import { BattleSystem } from &quot;./BattleSystem.js&quot;;
+import { FeatureAccessSystem } from &quot;./FeatureAccessSystem.js&quot;;
+import { LocationSystem } from &quot;./LocationSystem.js&quot;;
+import { LocationDB } from &quot;../data/world/LocationDB.js&quot;;
+import { FieldJournalRules as Rules } from &quot;../config/FieldJournalRules.js&quot;;
+import { EventBus } from &quot;../core/EventBus.js&quot;;
+import { FieldJournalChangedEvent } from &quot;../core/events/FieldJournalChangedEvent.js&quot;;
+export class FieldJournalSystem extends BaseSystem {
+  static _instance = null;
+  static getInstance() {
+    return this._instance || (this._instance = new FieldJournalSystem());
+  }
+  constructor() {
+    super(&quot;FieldJournalSystem&quot;, &quot;System&quot;);
+  }
+  getSnapshot() {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    const location = LocationDB.getInstance().getById(
+      LocationSystem.getInstance().getCurrentLocationId(),
+    );
+    const visible = !!save &amp;&amp; save.player.region === Rules.REGION;
+    const wins =
+      save &amp;&amp; location ? save.statistics.wildWinsInGroup(location.id) : 0;
+    const already = !!location &amp;&amp; !!save?.fieldJournal.has(location.id);
+    const reason = already
+      ? &quot;already&quot;
+      : BattleSystem.getInstance().isActive()
+        ? &quot;battle&quot;
+        : location?.kind !== &quot;route&quot;
+          ? &quot;location&quot;
+          : wins &lt; Rules.MIN_WINS
+            ? &quot;wins&quot;
+            : &quot;ready&quot;;
+    return {
+      visible,
+      locationId: location?.id || null,
+      wins,
+      required: Rules.MIN_WINS,
+      total: save?.fieldJournal.sites.length || 0,
+      reward: Rules.REWARD,
+      reason,
+      canSurvey:
+        visible &amp;&amp;
+        reason === &quot;ready&quot; &amp;&amp;
+        FeatureAccessSystem.getInstance().isLocationUnlocked(location.id),
+    };
+  }
+  survey() {
+    const model = this.getSnapshot(),
+      save = SaveSystem.getInstance().getCurrentSave();
+    if (!save || !model.canSurvey || !save.fieldJournal.add(model.locationId))
+      return false;
+    save.currencies.add(Rules.CURRENCY, Rules.REWARD);
+    SaveSystem.getInstance().saveCurrent();
+    EventBus.getInstance().dispatch(
+      new FieldJournalChangedEvent(model.locationId),
+    );
+    return true;
+  }
+}
+</code></pre>
+<p>Lisez les deux méthodes séparément :</p>
+<ul>
+<li><code>getSnapshot()</code> est une requête pure pour l’UI. Elle dérive lieu, victoires, motif, montant et
+  possibilité de commande. Rafraîchir la vue ne rapporte rien et ne sauvegarde rien.</li>
+<li><code>survey()</code> relit la vraie possibilité, marque le site, verse la récompense, sauvegarde <strong>une fois</strong>
+  puis signale le changement. Un second clic ne paie pas et n’écrit pas.</li>
+</ul>
+<p>La règle interdit le versement pendant un combat. Les trois victoires d’une chaîne sauvage ne la
+terminent pas automatiquement : le joueur peut quitter normalement, puis étudier le site. Le bouton
+ne doit pas conclure le combat ou forger un <code>PokemonDefeatedEvent</code>.</p>
+<p>Ce gameplay est une commande instantanée : il n’a pas besoin d’un <code>setInterval</code> ni d’un nouveau
+moteur de boucle. Si vous ajoutez une production dans le temps, utilisez <code>BaseSystem.update(dt)</code>,
+un état sauvegardé clair et une politique explicite de temps hors ligne ; n’inventez pas un rattrapage
+qui dupliquerait les récompenses à chaque rechargement.</p>
+<p><a id="t"></a></p>
+<h2>T — Nouveau gameplay : le panneau, son montage et le mobile</h2>
+<h3>T.1 Panneau complet — <code>src/panels/FieldJournalPanel.js</code></h3>
+<pre><code class="language-js">/** @file FieldJournalPanel.js @brief Sample-only stable, localized dashboard view. */
+import { DraggablePanel } from '../ui/DraggablePanel.js';
+import { UIContainer } from '../ui/UIContainer.js';
+import { UIText } from '../ui/UIText.js';
+import { UIButton } from '../ui/UIButton.js';
+import { WindowIds } from '../config/DashboardLayout.js';
+import { FieldJournalSystem } from '../systems/FieldJournalSystem.js';
+import { FieldJournalChangedEvent } from '../core/events/FieldJournalChangedEvent.js';
+import { PokemonDefeatedEvent } from '../core/events/PokemonDefeatedEvent.js';
+import { BattleStartedEvent } from '../core/events/BattleStartedEvent.js';
+import { BattleEndedEvent } from '../core/events/BattleEndedEvent.js';
+import { LocationChangedEvent } from '../core/events/LocationChangedEvent.js';
+import { SaveCreatedEvent } from '../core/events/SaveCreatedEvent.js';
+import { SaveLoadedEvent } from '../core/events/SaveLoadedEvent.js';
+import { SaveDeletedEvent } from '../core/events/SaveDeletedEvent.js';
+import { LanguageChangedEvent } from '../core/events/LanguageChangedEvent.js';
+import { t } from '../localization/LocalizationManager.js';
+export class FieldJournalPanel extends DraggablePanel {
+  constructor(column) {
+    super({
+      id: WindowIds.FIELD_JOURNAL,
+      column,
+      title: t('fieldjournal_title'),
+      icon: 'book',
+      name: 'FieldJournalPanel',
+    });
+    this._summary = new UIText({ tagName: 'p' });
+    this._state = new UIText({ tagName: 'p' });
+    this._survey = new UIButton({
+      className: 'hbtn',
+      text: t('fieldjournal_survey'),
+      onClick: () =&gt; FieldJournalSystem.getInstance().survey(),
+    });
+    this.addChild(
+      new UIContainer({
+        className: 'pw-field-journal',
+        children: [this._summary, this._state, this._survey],
+      }),
+    );
+    for (const type of [
+      FieldJournalChangedEvent,
+      PokemonDefeatedEvent,
+      BattleStartedEvent,
+      BattleEndedEvent,
+      LocationChangedEvent,
+      SaveCreatedEvent,
+      SaveLoadedEvent,
+      SaveDeletedEvent,
+    ])
+      this.listen(type, () =&gt; this._refresh());
+    this.listen(LanguageChangedEvent, () =&gt; {
+      this.setTitle(t('fieldjournal_title'));
+      this._survey.setText(t('fieldjournal_survey'));
+      this._refresh();
+    });
+    this._refresh();
+  }
+  _refresh() {
+    const model = FieldJournalSystem.getInstance().getSnapshot();
+    this.setVisible(model.visible);
+    this._summary.setText(
+      t('fieldjournal_summary', { total: model.total, reward: model.reward }),
+    );
+    this._state.setText(
+      t(`fieldjournal_state_${model.reason}`, {
+        wins: model.wins,
+        required: model.required,
+      }),
+    );
+    this._survey.setVisible(model.canSurvey);
+  }
+}
+</code></pre>
+<p>Les widgets sont créés <strong>une fois</strong>. Le panneau réagit aussi au changement de langue pour son titre
+et son action. <code>_refresh()</code> appelle des setters qui évitent les mutations
+inutiles ; il ne détruit pas le bouton après chaque événement. Le clic appelle la commande du
+système. Les abonnements <code>this.listen()</code> sont libérés lors de la destruction du panneau.</p>
+<p>N’utilisez pas <code>innerHTML</code>, <code>document.createElement</code>, <code>.style</code> ou une référence vers un autre panneau.
+Les nouveaux widgets de base vont dans <code>src/ui/</code>. Les images passent par <code>AssetPaths</code> ; les glyphes
+par <code>IconRegistry</code> et <code>UIIcon</code>.</p>
+<h3>T.2 Identifiant et emplacement</h3>
+<p>Ajoutez à <code>WindowIds</code>, dans <code>src/config/DashboardLayout.js</code> :</p>
+<pre><code class="language-js">FIELD_JOURNAL:'win-field-journal',
+</code></pre>
+<p>Dans <code>src/pages/GamePage.js</code>, importez la classe et ajoutez-la au tableau transmis à
+<code>dashboard.addWindows()</code>, sans garder une référence dans la page :</p>
+<pre><code class="language-js">import {FieldJournalPanel} from '../panels/FieldJournalPanel.js';
+// Inside dashboard.addWindows([...]):
+new FieldJournalPanel(DashboardColumns.RIGHT),
+</code></pre>
+<p>La colonne par défaut et l’ordre viennent de cette composition. Le système de layout restaure
+ensuite les choix du joueur. Le nouvel id déclaré permet la normalisation et le déplacement de
+la fenêtre ; ne remplacez pas la disposition personnelle par une nouvelle liste fixe.</p>
+<h3>T.3 Enregistrer le système</h3>
+<p>Dans <code>src/main.js</code> :</p>
+<pre><code class="language-js">import {FieldJournalSystem} from './systems/FieldJournalSystem.js';
+// Among the existing engine registrations:
+engine.registerSystem('FieldJournalSystem',FieldJournalSystem.getInstance());
+</code></pre>
+<h3>T.4 Ne pas oublier le mobile</h3>
+<p>Dans l’exemple, on ajoute <code>WindowIds.FIELD_JOURNAL</code> à la liste <code>windows</code> de l’onglet mobile
+<code>shortcuts</code> dans <code>MOBILE_VIEWS</code>. Le panneau apparaît ainsi sous <strong>Raccourcis</strong> à Auroria. Le bureau
+seul ne suffit pas à rendre un nouveau panneau accessible sur téléphone.</p>
+<p>Pour un onglet dédié, ajoutez une entrée de navigation, ses textes et sa règle de disponibilité.
+L’UI doit demander ce statut au système/résolveur et non reproduire la règle métier. Si la fenêtre
+a besoin d’une aide dédiée, ajoutez la correspondance dans <code>GuideSections.js</code> et le contenu d’aide.</p>
+<h3>T.5 CSS — <code>assets/css/field-journal.css</code></h3>
+<pre><code class="language-css">.pw-field-journal {
+  display: grid;
+  gap: 10px;
+  color: var(--pw-text-primary);
+}
+.pw-field-journal p {
+  margin: 0;
+  line-height: 1.5;
+}
+</code></pre>
+<p>Importez cette feuille <strong>dans le bloc initial des imports</strong> de <code>assets/css/style.css</code>, avant toute règle
+CSS : une directive <code>@import</code> placée en fin de fichier serait ignorée par le navigateur.
+Gardez les couleurs sous forme de tokens pour
+les thèmes. La fenêtre de dashboard grandit avec son contenu ; le document est le scroller principal.
+Pour un véritable écran plein format, étendez <code>UIFullscreenPanel</code>, placez sa classe dans
+<code>src/panels/fullscreen/</code>, montez-la dans <code>GamePage</code>, déclarez son <code>ModalIds</code> et ouvrez-la avec
+<code>ModalOpenRequestedEvent</code>. Un système ne doit jamais chercher un élément dans le DOM pour l’ouvrir.</p>
+<p><a id="u"></a></p>
+<h2>U — Sauvegarder, migrer et changer de partie sans perte</h2>
+<h3>U.1 Trois branchements indispensables dans SaveData</h3>
+<p>Importez <code>FieldJournalData</code>, puis ajoutez les lignes aux endroits correspondants :</p>
+<pre><code class="language-js">import {FieldJournalData} from './FieldJournalData.js';
+
+// In the constructor:
+this.fieldJournal=new FieldJournalData();
+
+// In the object returned by serialize():
+fieldJournal:this.fieldJournal.serialize(),
+
+// In deserialize(data):
+this.fieldJournal=new FieldJournalData(data.fieldJournal);
+</code></pre>
+<p>Ce sont des <strong>fragments à placer dans la classe</strong>, pas un fichier exécutable isolé.
+Le premier prépare une partie neuve, le deuxième écrit le fait, le troisième le relit. Une seule
+ligne manquante donne un bug qui paraît aléatoire après rechargement.</p>
+<h3>U.2 Migration pure 20 → 21 de l’exemple</h3>
+<p>Fichier <code>src/data/save/migrations/MigrationV20ToV21.js</code> :</p>
+<pre><code class="language-js">/** @file MigrationV20ToV21.js @brief Sample-only next schema; existing fields remain unchanged. */
+import { FieldJournalData } from &quot;../FieldJournalData.js&quot;;
+export const MigrationV20ToV21 = Object.freeze({
+  from: 20,
+  to: 21,
+  migrate(raw) {
+    return {
+      ...raw,
+      version: 21,
+      fieldJournal: new FieldJournalData(raw.fieldJournal).serialize(),
+    };
+  },
+});
+</code></pre>
+<p>Puis :</p>
+<ol>
+<li>importez cette migration dans <code>SaveMigrator.js</code> et ajoutez-la <strong>à la fin</strong> de la chaîne ;</li>
+<li>passez <code>SaveSchema.VERSION</code> de 20 à 21 dans <strong>la copie de démonstration</strong> ;</li>
+<li>synchronisez <code>GameConfig.VERSION</code>, <code>package.json</code>, les deux versions racine de <code>package-lock.json</code> ;</li>
+<li>mettez à jour le contrat de schéma dans les tests et documentez la nouvelle donnée ;</li>
+<li>testez l’absence du champ, son contenu valide/invalide, le JSON round-trip et l’absence de mutation
+   des autres modèles.</li>
+</ol>
+<p>L’exemple ne touche pas aux UID, à la Pension, aux FIFO, aux batailles d’Entraînement ou à l’horloge
+de Mine. Une migration ne doit pas remettre ces états à zéro pour faciliter son nouvel ajout.
+Le migrateur traite les anciens formats avant les modèles ; ne mettez pas de logique d’import
+historique dans un panneau.</p>
+<h3>U.3 Ce qu’on sauvegarde et ce qu’on ne sauvegarde pas</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>À conserver</th>
+<th>À dériver / laisser transitoire</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ids de sites étudiés</td>
+<td>nombre de sites</td>
+</tr>
+<tr>
+<td>propriété et activation d’un module</td>
+<td>DOM du switch</td>
+</tr>
+<tr>
+<td>mode de pilote choisi</td>
+<td>chemin calculé à chaque étape</td>
+</tr>
+<tr>
+<td>DTO de combat qui doit reprendre exactement</td>
+<td>faux adversaire recréé depuis son espèce</td>
+</tr>
+<tr>
+<td>vraie échéance d’une action persistante</td>
+<td>compteur UI recalculé</td>
+</tr>
+<tr>
+<td>UID d’un Pokémon affecté</td>
+<td>copie du Pokémon dans chaque activité</td>
+</tr>
+</tbody>
+</table></div>
+<p>Un délai de relance en cours est volontairement transitoire et annulé au changement de partie/lieu.
+Ce n’est pas la même politique que le délai manuel persistant du sondage de Mine. Ne les généralisez
+pas sans décider le comportement attendu.</p>
+<p><a id="v"></a></p>
+<h2>V — Traductions, ressources et style sans collisions</h2>
+<h3>V.1 Nouvelles clés</h3>
+<p>Le kit crée un domaine <code>auroria.js</code> par langue pour les nouvelles clés libres (<code>fieldjournal_*</code>,
+<code>map_region_auroria</code>, <code>region_auroria</code>, etc.) et l’enregistre dans <code>LocaleCatalog.js</code> :</p>
+<pre><code class="language-js">import {auroria as fr_auroria} from './fr/auroria.js';
+import {auroria as en_auroria} from './en/auroria.js';
+// In each corresponding language list:
+{source:fr_auroria},
+{source:en_auroria},
+</code></pre>
+<p>N’ajoutez pas les deux sources à la même langue. Les nouvelles clés (y compris noms/descriptions de
+capacités et PNJ) restent dans ce domaine manuel. L’installateur adapte les tests de couverture pour
+recenser aussi ce contenu, sans toucher aux ressources de traduction générées de l’original.</p>
+<p>Extrait de domaine français :</p>
+<pre><code class="language-js">export const auroria={
+  map_region_auroria:'Auroria',
+  region_auroria:'Auroria',
+  pokemon:{mossling:'Moussin'},
+  fieldjournal_title:'Carnet de terrain',
+  fieldjournal_survey:'Étudier ce site',
+  fieldjournal_summary:'{total} site(s) étudié(s) · {reward} Pokédollars par nouveau site.'
+};
+</code></pre>
+<p>Le vrai fichier du kit contient aussi tous les états, lieux, objets, quêtes et textes anglais.
+La table correspondante en anglais doit avoir les <strong>mêmes clés</strong>, les mêmes ids de PNJ et les mêmes
+paramètres <code>{total}</code>, <code>{reward}</code>. Les noms traduits, eux, peuvent différer.</p>
+<h3>V.2 Modifier une clé existante</h3>
+<p>Le catalogue ne sert pas de cascade d’override : la première valeur garde la clé et les collisions
+sont signalées. Pour changer un texte existant, modifiez son domaine d’origine ou concevez un
+mécanisme d’override explicite et testé. Ajouter un deuxième <code>pokemon.pikachu</code> dans un nouveau
+fichier ne remplace pas proprement le premier.</p>
+<h3>V.3 Ressources et accessibilité</h3>
+<ul>
+<li>Tous les chemins de jeu sont résolus par <code>AssetPaths</code>, pas par une concaténation dans un panneau.</li>
+<li>Respectez la casse réelle des fichiers, y compris sur Linux (<code>Brock.png</code>, <code>Rainbow.svg</code>).</li>
+<li>Gardez les sprites nets et les proportions ; une classe <code>pixelated</code> ne remplace pas un fichier absent.</li>
+<li>Fournissez des libellés accessibles pour les boutons à icône et les switches.</li>
+<li>Vérifiez focus clavier, texte long FR/EN et petites largeurs.</li>
+<li>N’imprimez pas d’emoji à la place des glyphes du registre.</li>
+<li>Les tokens CSS maintiennent les thèmes ; pas de CSS injectée dans le code métier.</li>
+</ul>
+<p><a id="w"></a></p>
+<h2>W — Tester le contenu, le gameplay et la migration</h2>
+<h3>W.1 Validation des dépôts</h3>
+<p>À la racine de la copie modifiée :</p>
+<pre><code class="language-sh">node --input-type=module -e &quot;import {DataValidator} from './src/data/core/DataValidator.js'; const p=DataValidator.validateAll(); console.log(p); if(p.length)process.exit(1)&quot;
+npm test
+</code></pre>
+<p>La validation doit renvoyer <code>[]</code>. Un dépôt valide ne prouve pas le comportement d’une quête, la
+présence de toutes les images ou l’équilibre des combats. Il faut les trois niveaux : données,
+commandes réelles, interface navigateur.</p>
+<h3>W.2 Exemple de test de migration</h3>
+<p>Dans un test ayant déjà installé le faux DOM de la suite, adaptez ce modèle :</p>
+<pre><code class="language-js">const raw=save.serialize();
+raw.version=20;
+delete raw.fieldJournal;
+const before=JSON.parse(JSON.stringify(raw));
+const migrated=MigrationV20ToV21.migrate(raw);
+assert.deepEqual(raw,before);
+assert.equal(migrated.version,21);
+assert.deepEqual(migrated.fieldJournal,{sites:[]});
+assert.deepEqual(migrated.training,raw.training);
+assert.deepEqual(migrated.collection,raw.collection);
+assert.deepEqual(migrated.hatchery,raw.hatchery);
+</code></pre>
+<p>Testez aussi la commande deux fois : le premier appel doit récompenser et écrire une fois, le
+second zéro fois. Après chargement d’une autre partie, aucun site, UID ou paiement ne doit être hérité.
+Le fichier <code>verify.mjs</code> du kit contient ces assertions réellement exécutables.</p>
+<h3>W.3 Tests du kit, et ce qu’ils prouvent</h3>
+<p>Les commandes du chapitre A ont été exécutées sur une copie séparée :</p>
+<ul>
+<li><strong>12 vérifications ciblées</strong> : références/traductions, porte régionale, vrai voyage, choix unique
+  de starter, conversation, trois victoires sauvages réelles et quête, récompense de site unique,
+  stock de boutique, vraie arène, vrai rival, vraie ligue, migration/round-trip et changement de partie.</li>
+<li><strong>575 tests de la suite complète dans cette copie</strong> après adaptation explicite des contrats de
+  contenu et de schéma du kit.</li>
+<li><strong>4 scénarios Chromium de l’exemple</strong> : démarrage/voyage, vraies victoires et étude par clic,
+  reconstruction en anglais + navigation mobile, puis rechargement sans double paiement.</li>
+</ul>
+<p>L’installateur adapte les nombres de couverture assumés et inclut le domaine manuel dans les tests
+de noms/dialogues : une capacité et deux PNJ nouveaux, une offre principale et une secondaire
+supplémentaires. Il ne supprime pas la vérification des ids,
+des traductions, de l’architecture ou du gel des définitions.</p>
+<p>Les faits de Hoenn sont préparés pour le test d’entrée et l’équipe de combat est sur-nivelée.
+Ce n’est <strong>pas</strong> une campagne naturelle complète. Les 574 tests de production et les scénarios
+Chromium du jeu livré sont un autre ensemble, documenté dans le rapport de phase.</p>
+<h3>W.4 Recette navigateur recommandée</h3>
+<ol>
+<li>Utilisez une partie de test et les vraies commandes pour entrer dans la région.</li>
+<li>Vérifiez carte, rectangles, noms, images et dialogues ; pas de 404/erreur console.</li>
+<li>Essayez la porte avant le seuil, après le seuil, avant la réclamation puis après.</li>
+<li>Finissez les combats avec le moteur : pas d’émission synthétique d’un événement « victoire ».</li>
+<li>Vérifiez le Carnet avant trois victoires, pendant le combat, après l’étude et après reload.</li>
+<li>Testez un deuxième achat/une deuxième réclamation ; aucun double paiement ou cadeau.</li>
+<li>Changez de partie puis revenez ; comparez faits, UID et état de combat.</li>
+<li>Essayez clavier, français, anglais et mobile ; le panneau doit être dans sa navigation mobile.</li>
+</ol>
+<p><a id="x"></a></p>
+<h2>X — Dépanner par symptôme</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Symptôme</th>
+<th>À contrôler dans l’ordre</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>La région est absente</td>
+<td><code>REGIONS.available</code>, ordre, accès ligue + Pokédex, clés de texte</td>
+</tr>
+<tr>
+<td>La région est visible mais voyage refusé</td>
+<td>point de départ enregistré, prérequis, expédition active</td>
+</tr>
+<tr>
+<td>Carte vide ou fond absent</td>
+<td>nom/casse du PNG, <code>AssetPaths</code>, erreurs réseau, dimensions</td>
+</tr>
+<tr>
+<td>Lieu sans interaction</td>
+<td>définition, rectangle, accès central, rencontres/shop/champion connus</td>
+</tr>
+<tr>
+<td>Route qui s’ouvre trop tôt</td>
+<td><code>winsToClear</code>, groupes partagés, autre voisin déjà accessible, porte de quête</td>
+</tr>
+<tr>
+<td>Porte qui reste fermée</td>
+<td>badge régional vs id précis, quête réclamée, objet encore possédé, diagnostic du résolveur</td>
+</tr>
+<tr>
+<td>La capacité ne s’apprend pas</td>
+<td><code>learnTypes</code>, taille/tri du pool, niveau, attaques déjà stockées, voie CT</td>
+</tr>
+<tr>
+<td>Le talent ne fait rien</td>
+<td>kind/condition réellement implémentés, handler enregistré, état du combat</td>
+</tr>
+<tr>
+<td>Quête non comptée</td>
+<td>activation, région courante, type d’événement, groupe de lieu, objectif compteur/état</td>
+</tr>
+<tr>
+<td>TALK valide avec un autre PNJ</td>
+<td>comportement actuel volontaire de TalkObjective ; ajouter une règle stricte si voulue</td>
+</tr>
+<tr>
+<td>Ligue gagnée sans badge</td>
+<td>normal : titre dans <code>statistics.leaguesWon</code>, pas dans les badges d’arène</td>
+</tr>
+<tr>
+<td>Filtre régional revient à « tous »</td>
+<td>vocabulaire de <code>FacilityFilterRules</code> et traduction <code>region_auroria</code></td>
+</tr>
+<tr>
+<td>Nouveau panneau absent sur mobile</td>
+<td>liste <code>windows</code> de la navigation, statut visible du système</td>
+</tr>
+<tr>
+<td>Faits perdus après reload</td>
+<td>constructeur + serialize + deserialize + migration + SaveSchema</td>
+</tr>
+<tr>
+<td>Récompense dupliquée</td>
+<td>fait d’unicité posé avant paiement, commande réévaluée, sauvegarde unique</td>
+</tr>
+<tr>
+<td>Prix invisible sans argent</td>
+<td>montant enfant d’un <code>.hbtn[disabled]</code> caché ; déplacer le devis hors de l’action</td>
+</tr>
+<tr>
+<td>Toute la grille n’est pas égale</td>
+<td><code>grid-auto-rows: 1fr</code> sur la grille, stretch + flex sur la carte, pied automatique</td>
+</tr>
+</tbody>
+</table></div>
+<p>En console de développement, pour <strong>diagnostiquer</strong> le projet servi à sa racine :</p>
+<pre><code class="language-js">const {FeatureAccessSystem}=await import('./src/systems/FeatureAccessSystem.js');
+console.log(FeatureAccessSystem.getInstance().getRegionAccessStatus('auroria'));
+console.log(FeatureAccessSystem.getInstance().getLocationAccessStatus('auroria_forest'));
+</code></pre>
+<p>Les imports relatifs de la console se résolvent depuis l’URL courante ; adaptez le préfixe si vous
+servez un sous-dossier. Ces requêtes sont en lecture seule. Pour une recette valide, n’écrivez pas
+<code>unlocked = true</code> dans un dépôt ou une vue pour masquer une erreur du résolveur.</p>
+<p><a id="y"></a></p>
+<h2>Y — Finir proprement et livrer une modification</h2>
+<ol>
+<li>Relisez les diff : aucune table <code>raw</code> retouchée à la main, aucune ressource manquante.</li>
+<li>Vérifiez les ids, les références, les traductions et le parcours complet de <strong>votre</strong> petite histoire.</li>
+<li>Testez sauvegarde ancienne, sauvegarde neuve, reload, changement de partie et double action.</li>
+<li>Vérifiez la syntaxe des nouveaux modules et la suite complète.</li>
+<li>Mettez à jour les documents de données, limites et version de package ; le numéro de package
+   et celui du schéma de sauvegarde sont distincts.</li>
+<li>Créez une archive <strong>sans</strong> <code>.git</code>, <code>node_modules</code>, caches, sorties de test brutes ou copie <code>.arena</code>.</li>
+<li>Décompressez cette archive ailleurs, vérifiez ses empreintes et relancez les tests depuis elle.</li>
+<li>Rapportez exactement ce qui a tourné : un test semé n’est pas une campagne naturelle, Chromium
+   n’est pas une certification Firefox/WebKit/Windows, et une capture n’est pas une parité pixel à pixel.</li>
+</ol>
+<p>Pour vérifier vos changements sans effacer le travail existant :</p>
+<pre><code class="language-sh">git status --short
+git diff --check
+npm test
+</code></pre>
+<p>Ne corrigez pas un test en supprimant une assertion qui met en évidence un vrai bug. Une quantité
+fixe de contenu peut devoir changer après un ajout assumé ; un contrat de paiement unique,
+de conservation des UID ou de migration doit, lui, rester vérifié.</p>
+<p><a id="z"></a></p>
+<h2>Z — Checklist finale et lexique</h2>
+<h3>Checklist de région</h3>
+<ul>
+<li>[ ] Un id stable, une déclaration disponible et un ordre de régions intentionnel.</li>
+<li>[ ] Un point d’arrivée valide, une carte et des rectangles bien placés.</li>
+<li>[ ] Un graphe sans lieu orphelin ni passage alternatif involontaire à une porte.</li>
+<li>[ ] Des rencontres valides et les ressources de toutes les espèces/formes.</li>
+<li>[ ] Un choix de partenaire cohérent, sans double don ni starter déjà implicitement acquis.</li>
+<li>[ ] Des espèces réellement rattachées au Pokédex attendu, sans déplacer l’historique.</li>
+<li>[ ] Les filtres de région et leurs deux familles de libellés FR/EN audités.</li>
+<li>[ ] Des capacités/talents dont chaque effet est interprété par le moteur.</li>
+<li>[ ] Des objets aux usages implémentés, des boutiques aux prix positifs.</li>
+<li>[ ] Arènes, rival et ligue avec vrais contextes, vrais adversaires et récompenses uniques.</li>
+<li>[ ] Une histoire ordonnée, des objectifs et des PNJ aux ids identiques dans les langues.</li>
+<li>[ ] Les portes testées avant/après combat, objectif et réclamation.</li>
+<li>[ ] Les titres de ligue interrogés dans les statistiques, pas comme des badges d’arène.</li>
+<li>[ ] Aucun nouveau gameplay stocké seulement dans un panneau ou dans un dépôt statique.</li>
+<li>[ ] Aucun Pokémon dupliqué entre collection, équipe et activité : références UID.</li>
+<li>[ ] Un panneau monté sur bureau <strong>et</strong> accessible dans la navigation mobile.</li>
+<li>[ ] Des widgets stables, pas de HTML injectée, focus/clavier et thèmes conservés.</li>
+<li>[ ] Les nouveaux faits présents dans les trois phases de SaveData et dans une migration pure.</li>
+<li>[ ] Deuxième action, reload et changement de partie sans double récompense.</li>
+<li>[ ] Validation des dépôts, traductions, syntaxe, tests et archive extraite vérifiés.</li>
+</ul>
+<h3>Petit lexique</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Terme</th>
+<th>Sens dans ce projet</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Définition / dépôt (<code>DB</code>)</td>
+<td>données communes, gelées, identifiées par id</td>
+</tr>
+<tr>
+<td>Modèle de sauvegarde</td>
+<td>état d’une partie, sérialisable et migrable</td>
+</tr>
+<tr>
+<td><code>System</code></td>
+<td>propriétaire des règles et commandes, indépendant du DOM</td>
+</tr>
+<tr>
+<td>Snapshot</td>
+<td>vue de lecture dérivée pour l’UI ; pas une seconde source de vérité</td>
+</tr>
+<tr>
+<td>Événement typé</td>
+<td>classe de <code>src/core/events</code>, contrat entre systèmes et vues</td>
+</tr>
+<tr>
+<td>UID</td>
+<td>identité d’un Pokémon possédé, distincte de son espèce</td>
+</tr>
+<tr>
+<td>Groupe de lieu</td>
+<td>regroupement explicite pour statistiques et objectifs</td>
+</tr>
+<tr>
+<td>Objectif terminé</td>
+<td>seuil atteint ; récompense pas forcément réclamée</td>
+</tr>
+<tr>
+<td>Quête réclamée</td>
+<td>progression/récompense validées par <code>QuestSystem.claim()</code></td>
+</tr>
+<tr>
+<td>Schéma</td>
+<td>version du format de sauvegarde, pas version du ZIP</td>
+</tr>
+<tr>
+<td>Pilotage</td>
+<td>actions du moteur vivant ; pas calcul forfaitaire de récompenses hors ligne</td>
+</tr>
+</tbody>
+</table></div>
+<h3>Fichiers du kit à lire pour refaire l’exercice</h3>
+<ul>
+<li><code>content.json</code> : toutes les définitions de la mini-région, sans injection dans la production.</li>
+<li><code>fr.json</code>, <code>en.json</code> : les deux ressources complètes et synchronisées.</li>
+<li><code>files/src/</code> : modèle, règles, événement, système, panneau et migration montrés plus haut.</li>
+<li><code>files/assets/css/field-journal.css</code> : style du panneau.</li>
+<li><code>auroria.png</code> : carte schématique de travail.</li>
+<li><code>install-example.mjs</code> : tous les branchements explicites, dans une copie neuve.</li>
+<li><code>verify.mjs</code> : parcours de validation réel, avec les limites de fixture annoncées.</li>
+<li><code>browser-smoke.mjs</code> : contrôle facultatif Playwright de la copie servie (voir le README du kit).</li>
+</ul>
+<p><strong>Méthode à retenir :</strong> commencez par un lieu et une quête, faites tourner leurs tests, puis ajoutez
+une porte et un combat. Une fois la petite boucle jouable, étendez le contenu. Ajoutez un nouveau
+mécanisme seulement lorsque les règles existantes ne peuvent pas exprimer votre intention ; dans
+ce cas, faites évoluer ensemble données, système, UI, migration et tests.</p><footer>Le jeu livré reste en schéma 20. Le kit optionnel Auroria crée une copie de démonstration en schéma 21. Les limites d’exécution sont détaillées dans le texte.</footer></main></div></body></html>

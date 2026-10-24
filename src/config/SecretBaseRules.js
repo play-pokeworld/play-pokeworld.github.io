@@ -32,6 +32,7 @@ const FLAG_RANKS = Object.freeze([
 
 export const SecretBaseRules = Object.freeze({
   REGION: 'hoenn',
+  LOCATION_CONFIRM_ID:'pw-location-base-confirm',
   UNLOCK_QUEST_KEY: 'main.216',
   LEGACY_UNLOCK_QUEST_ID: '216',
   LEGACY_UNLOCK_MAIN_STEP: 16,

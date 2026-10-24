@@ -34,6 +34,7 @@ function stageArrow(value) {
 export class PokemonCardView extends UIContainer {
   /**
    * @param {Object} options
+   * @param {'lazy'|'eager'} [options.loading='lazy'] - Small modal previews may opt into eager media.
    * @param {string} [options.className='']
    * @param {boolean} [options.showXp=true]
    * @param {boolean} [options.showMoves=true]
@@ -49,7 +50,7 @@ export class PokemonCardView extends UIContainer {
     this._onInfoClick = typeof options.onInfoClick === 'function' ? options.onInfoClick : null;
     this._onHeldItemClick = typeof options.onHeldItemClick === 'function' ? options.onHeldItemClick : null;
 
-    this._sprite = new UIPokemonSprite({ species: '', size: PokemonSpriteSizes.CONTEXT });
+    this._sprite = new UIPokemonSprite({loading:options.loading,species:'',size:PokemonSpriteSizes.CONTEXT});
     this._name = new UIText({});
     this._level = new UIText({ className: 'poke-level' });
     this._caughtBall = new CaughtStatusBall();
@@ -135,15 +136,16 @@ export class PokemonCardView extends UIContainer {
    * Displays a Pokémon (or hides the card when null).
    * @param {import('../../data/pokemon/PokemonData.js').PokemonData|null} pokemon
    * @param {import('../../data/pokemon/PokemonData.js').PokemonData|null} [opponent=null]
+   * @param {{resting?:boolean}} [presentation] - Display boxed HP as resting without mutating owned state.
    */
-  setPokemon(pokemon, opponent = null) {
+  setPokemon(pokemon,opponent=null,{resting=false}={}) {
     if (!pokemon) {
       this.hide();
       this.toggleClass('fainted', false);
       return;
     }
     this.show();
-    this.toggleClass('fainted', pokemon.isFainted());
+    this.toggleClass('fainted',!resting&&pokemon.isFainted());
     const name = pokemon.getDisplayName();
     this._name.setText(name);
     this._level.setText(t('level_short_value', { level: pokemon.level }));
@@ -151,10 +153,11 @@ export class PokemonCardView extends UIContainer {
     this._sprite.setAlt(name);
     this._caughtBall.setSpecies(pokemon.species);
     const maxHp = pokemon.getMaxHp();
-    this._hpBar.setValue(pokemon.hp, maxHp);
-    this._hpBar.setFillState(hpFillState(pokemon.getHpPercent()));
+    const displayedHp=resting?maxHp:pokemon.hp;
+    this._hpBar.setValue(displayedHp,maxHp);
+    this._hpBar.setFillState(hpFillState(resting?100:pokemon.getHpPercent()));
     this._hpText.setText(t(this._hpTextKey, {
-      value: TextFormatter.formatNumber(pokemon.hp),
+      value: TextFormatter.formatNumber(displayedHp),
       max: TextFormatter.formatNumber(maxHp)
     }));
     if (this._xpBar) this._xpBar.setValue(pokemon.getExpInLevel(), pokemon.getExpLevelSpan());

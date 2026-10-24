@@ -18,7 +18,12 @@ export class UISwitch extends UIElement {
    * @param {Function} [options.onChange=null] - (checked) => void
    */
   constructor(options = {}) {
-    super({ tagName: 'button', className: `pw-switch ${options.className || ''}`.trim(), name: options.name || 'UISwitch', tag: 'Switch' });
+    super({
+      tagName: 'button',
+      className: `pw-switch ${options.className || ''}`.trim(),
+      name: options.name || 'UISwitch',
+      tag: 'Switch',
+    });
     this._dom.setAttribute('type', 'button');
     this._dom.setAttribute('role', 'switch');
     this._dom.setAttribute('data-stop-drag', 'true');
@@ -28,13 +33,28 @@ export class UISwitch extends UIElement {
 
     this._state = new UIText({ className: 'pw-switch-state' });
     this.addChild(this._state);
-    this.addChild(new UIContainer({ tagName: 'span', className: 'pw-switch-track', children: [new UIContainer({ tagName: 'span', className: 'pw-switch-thumb' })] }));
+    this.addChild(
+      new UIContainer({
+        tagName: 'span',
+        className: 'pw-switch-track',
+        children: [
+          new UIContainer({ tagName: 'span', className: 'pw-switch-thumb' }),
+        ],
+      }),
+    );
 
     this.setChecked(!!options.checked);
     this.addDomListener('click', () => {
       this.setChecked(!this._checked);
       if (this._onChange) this._onChange(this._checked);
     });
+  }
+
+  /** @param {string} onLabel @param {string} offLabel */
+  setLabels(onLabel, offLabel) {
+    this._onLabel = onLabel;
+    this._offLabel = offLabel;
+    this._state.setText(this._checked ? onLabel : offLabel);
   }
 
   /** @returns {boolean} */
@@ -44,6 +64,7 @@ export class UISwitch extends UIElement {
 
   /** @param {boolean} checked */
   setChecked(checked) {
+    if (this._checked === !!checked) return;
     this._checked = checked;
     this.toggleClass('is-on', checked);
     this._dom.setAttribute('aria-checked', String(checked));

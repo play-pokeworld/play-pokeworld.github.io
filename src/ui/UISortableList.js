@@ -1,23 +1,26 @@
 /**
  * @file UISortableList.js
- * @brief Reorderable list with a pointer handle and optional long-press card dragging.
+ * @brief Reorderable list with a pointer handle and immediate mouse card dragging and touch hold protection.
  * Items can be synchronized by stable key so live roster rows keep their widgets and focus.
  */
 
 import { UIContainer } from './UIContainer.js';
+import { SortableDragMotion } from './SortableDragMotion.js';
 
-const ROW_DRAG_DELAY_MS = 400;
-const DRAG_BLOCKING_TARGETS = 'button, a, input, select, textarea, .poke-move, [role="button"], [data-stop-drag="true"]';
+import { SortableListRules } from '../config/SortableListRules.js';
 
 export class UISortableList extends UIContainer {
   /**
    * @param {Object} [options={}]
    * @param {string} [options.className='']
    * @param {(fromKey: string, toKey: string) => void} [options.onReorder=null]
-   * @param {boolean} [options.rowDrag=false] - Enable native row drag after a 400 ms mouse hold
+   * @param {boolean} [options.rowDrag=false] - Enable whole-card pointer dragging
    */
   constructor(options = {}) {
-    super({ className: `pw-sortable-list ${options.className || ''}`.trim(), name: options.name || 'UISortableList' });
+    super({
+      className: `pw-sortable-list ${options.className || ''}`.trim(),
+      name: options.name || 'UISortableList',
+    });
     /** @private @type {Array<{key: string, row: import('./UIElement.js').UIElement, handle: import('./UIElement.js').UIElement|null}>} */
     this._items = [];
     /** @private */ this._onReorder = options.onReorder || null;
@@ -32,6 +35,18 @@ export class UISortableList extends UIContainer {
     this._boundHandles = new WeakSet();
     /** @private @type {WeakSet<import('./UIElement.js').UIElement>} */
     this._boundRows = new WeakSet();
+    this._suppressedClicks = new WeakMap();
+    this._followPointer = options.followPointer === true;
+    this._contextKey = options.getContextKey || (() => null);
+    this._motion = new SortableDragMotion((point) =>
+      this._updateDropTarget(point),
+    );
+    this._escape = (event) => {
+      if (event.key === 'Escape') this.cancelDrag();
+    };
+    this._blur = () => this.cancelDrag();
+    window.addEventListener('keydown', this._escape);
+    window.addEventListener('blur', this._blur);
   }
 
   /**
@@ -73,8 +88,15 @@ export class UISortableList extends UIContainer {
     const retainedRows = new Set(next.map((item) => item.row));
     for (const item of this._items) {
       if (retainedRows.has(item.row)) continue;
-      if (this._mouseDragArm?.row === item.row) this._cancelMouseDragArm(item.row);
-      if (this._nativeDrag?.row === item.row || this._nativeDrag?.target?.row === item.row) this._clearNativeDrag();
+      if (this._drag?.row === item.row || this._drag?.target?.row === item.row)
+        this._end(false);
+      if (this._mouseDragArm?.row === item.row)
+        this._cancelMouseDragArm(item.row);
+      if (
+        this._nativeDrag?.row === item.row ||
+        this._nativeDrag?.target?.row === item.row
+      )
+        this._clearNativeDrag();
       this.removeChild(item.row);
       item.row.destroy();
     }
@@ -88,14 +110,27 @@ export class UISortableList extends UIContainer {
     // Move only rows that are out of place. In the browser, insertBefore moves
     // the existing node instead of replacing its subtree; retained focus stays
     // attached to the same handle.
-    for (let index = 0; index < next.length; index++) {
-      const node = next[index].row.getDomElement();
-      const current = this._dom.children[index] || null;
-      if (current !== node) this._dom.insertBefore(node, current);
-    }
+    if (!this._motion.isActive())
+      for (let index = 0; index < next.length; index++) {
+        const node = next[index].row.getDomElement();
+        const current = this._dom.children[index] || null;
+        if (current !== node) this._dom.insertBefore(node, current);
+      }
     this._children = next.map((item) => item.row);
     this._items = next;
     if (focusedKey) this.focusDescendantByDataKey(focusedKey);
+  }
+
+  /** Cancels a gesture without committing a model mutation. */
+  cancelDrag() {
+    if (this._drag?.fromRow)
+      this._suppressedClicks.set(
+        this._drag.row,
+        Date.now() + SortableListRules.CLICK_SUPPRESSION_MS,
+      );
+    this._end(false);
+    this._clearNativeDrag();
+    this._cancelMouseDragArm();
   }
 
   /** Removes (and destroys) every item. */
@@ -112,6 +147,8 @@ export class UISortableList extends UIContainer {
     this._end(false);
     this._clearNativeDrag();
     this._cancelMouseDragArm();
+    window.removeEventListener('keydown', this._escape);
+    window.removeEventListener('blur', this._blur);
     super.onDestroy();
   }
 
@@ -121,7 +158,9 @@ export class UISortableList extends UIContainer {
     if (!handle || this._boundHandles.has(handle)) return;
     this._boundHandles.add(handle);
     handle.setAttribute('data-stop-drag', 'true');
-    handle.addDomListener('pointerdown', (event) => this._start(event, item, handle));
+    handle.addDomListener('pointerdown', (event) =>
+      this._start(event, item, handle),
+    );
     handle.addDomListener('pointermove', (event) => this._move(event));
     handle.addDomListener('pointerup', () => this._end(true));
     handle.addDomListener('pointercancel', () => this._end(false));
@@ -132,7 +171,51 @@ export class UISortableList extends UIContainer {
     if (!this._rowDragEnabled || this._boundRows.has(item.row)) return;
     this._boundRows.add(item.row);
     const row = item.row;
+    row.addClass('pw-sortable-row');
+    row.addDomListener(
+      'click',
+      (event) => {
+        if ((this._suppressedClicks.get(row) || 0) < Date.now()) return;
+        this._suppressedClicks.delete(row);
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      },
+      true,
+    );
+    row.addDomListener(
+      'touchmove',
+      (event) => {
+        if (this._drag?.row === row) event.preventDefault();
+      },
+      { passive: false },
+    );
+    row.addDomListener(
+      'contextmenu',
+      (event) => {
+        if (this._drag?.row === row) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      },
+      true,
+    );
+    row.addDomListener('pointerdown', (event) =>
+      this._armRowPointer(event, item),
+    );
+    row.addDomListener('pointermove', (event) =>
+      this._moveRowPointer(event, item),
+    );
+    row.addDomListener('pointerup', (event) =>
+      this._finishRowPointer(event, item, true),
+    );
+    row.addDomListener('pointercancel', (event) =>
+      this._finishRowPointer(event, item, false),
+    );
+    row.addDomListener('lostpointercapture', (event) =>
+      this._finishRowPointer(event, item, false),
+    );
     row.addDomListener('mousedown', (event) => {
+      if (typeof PointerEvent === 'function') return;
       if (event.button !== 0 || this._isDragBlockedTarget(event.target)) return;
       this._cancelMouseDragArm();
       const arm = { key: item.key, row, timer: null, ready: false };
@@ -142,12 +225,18 @@ export class UISortableList extends UIContainer {
         arm.ready = true;
         row.setAttribute('draggable', 'true');
         row.addClass('is-drag-armed');
-      }, ROW_DRAG_DELAY_MS);
+      }, SortableListRules.HOLD_MS);
     });
     row.addDomListener('mouseup', () => this._onRowMouseUp(item));
-    row.addDomListener('dragstart', (event) => this._startNativeDrag(event, item));
-    row.addDomListener('dragover', (event) => this._nativeDragOver(event, item));
-    row.addDomListener('dragleave', (event) => this._nativeDragLeave(event, item));
+    row.addDomListener('dragstart', (event) =>
+      this._startNativeDrag(event, item),
+    );
+    row.addDomListener('dragover', (event) =>
+      this._nativeDragOver(event, item),
+    );
+    row.addDomListener('dragleave', (event) =>
+      this._nativeDragLeave(event, item),
+    );
     row.addDomListener('drop', (event) => this._dropOnRow(event, item));
     row.addDomListener('dragend', () => {
       this._clearNativeDrag();
@@ -155,22 +244,124 @@ export class UISortableList extends UIContainer {
     });
   }
 
+  /** @private Real card dragging shares the pointer engine with handles, not HTML drag arming. */
+  _armRowPointer(event, item) {
+    if (event.isPrimary === false) return;
+    if (event.button == null || event.button === 0)
+      this._suppressedClicks.delete(item.row);
+    if (
+      (event.button != null && event.button !== 0) ||
+      this._isDragBlockedTarget(event.target)
+    )
+      return;
+    this._cancelMouseDragArm();
+    const arm = {
+      key: item.key,
+      row: item.row,
+      pointer: true,
+      pointerId: event.pointerId,
+      x: event.clientX,
+      y: event.clientY,
+      ready: false,
+      touch: event.pointerType === 'touch' || event.pointerType === 'pen',
+      context: this._contextKey(),
+      timer: null,
+    };
+    this._mouseDragArm = arm;
+    item.row.getDomElement().setPointerCapture?.(event.pointerId);
+    if (arm.touch)
+      arm.timer = setTimeout(() => {
+        if (this._mouseDragArm === arm) this._beginRowPointer(arm);
+      }, SortableListRules.HOLD_MS);
+  }
+  /** @private */
+  _beginRowPointer(arm) {
+    if (this._contextKey() !== arm.context) {
+      this._cancelMouseDragArm();
+      return;
+    }
+    arm.ready = true;
+    arm.timer = null;
+    this._drag = {
+      key: arm.key,
+      row: arm.row,
+      target: null,
+      fromRow: true,
+      pointerId: arm.pointerId,
+      context: arm.context,
+    };
+    arm.row.addClass('is-dragging');
+    if (this._followPointer) this._motion.begin(arm.row, arm.x, arm.y);
+  }
+  /** @private */
+  _moveRowPointer(event, item) {
+    const arm = this._mouseDragArm;
+    if (
+      !arm?.pointer ||
+      arm.row !== item.row ||
+      arm.pointerId !== event.pointerId
+    )
+      return;
+    if (this._contextKey() !== arm.context) {
+      this.cancelDrag();
+      return;
+    }
+    if (!arm.ready) {
+      const distance = Math.hypot(event.clientX - arm.x, event.clientY - arm.y);
+      if (arm.touch) {
+        if (distance > SortableListRules.MOVE_SLOP)
+          this._cancelMouseDragArm(item.row);
+        return;
+      }
+      if (distance <= SortableListRules.DRAG_THRESHOLD) return;
+      this._beginRowPointer(arm);
+    }
+    event.preventDefault();
+    this._move(event);
+  }
+  /** @private */
+  _finishRowPointer(event, item, commit) {
+    const arm = this._mouseDragArm;
+    if (
+      !arm?.pointer ||
+      arm.row !== item.row ||
+      arm.pointerId !== event.pointerId
+    )
+      return;
+    if (arm.ready) {
+      this._suppressedClicks.set(
+        item.row,
+        Date.now() + SortableListRules.CLICK_SUPPRESSION_MS,
+      );
+      this._end(commit && this._contextKey() === arm.context);
+    }
+    this._cancelMouseDragArm(item.row);
+  }
+
   /** @private @param {Object|null} target @returns {boolean} */
   _isDragBlockedTarget(target) {
-    return !!target?.closest?.(DRAG_BLOCKING_TARGETS);
+    return !!target?.closest?.(SortableListRules.BLOCKING_TARGETS);
   }
 
   /** @private @param {{key:string,row:import('./UIElement.js').UIElement}} item */
   _onRowMouseUp(item) {
     const arm = this._mouseDragArm;
-    if (!arm || arm.row !== item.row || this._nativeDrag?.row === item.row) return;
+    if (!arm || arm.row !== item.row || this._nativeDrag?.row === item.row)
+      return;
     this._cancelMouseDragArm(item.row);
   }
 
   /** @private @param {Object} event @param {{key:string,row:import('./UIElement.js').UIElement}} item */
   _startNativeDrag(event, item) {
     const rowNode = item.row.getDomElement();
-    if (rowNode.getAttribute('draggable') !== 'true' || this._isDragBlockedTarget(event.target)) {
+    if (this._drag?.fromRow) {
+      event.preventDefault();
+      return;
+    }
+    if (
+      rowNode.getAttribute('draggable') !== 'true' ||
+      this._isDragBlockedTarget(event.target)
+    ) {
       event.preventDefault();
       return;
     }
@@ -185,9 +376,15 @@ export class UISortableList extends UIContainer {
 
     const transfer = event.dataTransfer;
     if (transfer) {
-      try { transfer.clearData?.(); } catch {}
-      try { transfer.effectAllowed = 'move'; } catch {}
-      try { transfer.setData?.('text/plain', item.key); } catch {}
+      try {
+        transfer.clearData?.();
+      } catch {}
+      try {
+        transfer.effectAllowed = 'move';
+      } catch {}
+      try {
+        transfer.setData?.('text/plain', item.key);
+      } catch {}
     }
     item.row.removeClass('is-drag-armed');
     this._nativeDrag = { key: item.key, row: item.row, target: null };
@@ -199,7 +396,9 @@ export class UISortableList extends UIContainer {
     if (!this._nativeDrag) return;
     event.preventDefault();
     if (event.dataTransfer) {
-      try { event.dataTransfer.dropEffect = 'move'; } catch {}
+      try {
+        event.dataTransfer.dropEffect = 'move';
+      } catch {}
     }
     this._setNativeDropTarget(item);
   }
@@ -254,10 +453,24 @@ export class UISortableList extends UIContainer {
   /** @private */
   _move(event) {
     if (!this._drag) return;
-    const target = this._items.find(({ row }) => {
-      const bounds = row.getBounds();
-      return event.clientY >= bounds.top && event.clientY <= bounds.bottom;
-    }) ?? null;
+    if (this._followPointer && this._drag.fromRow)
+      this._motion.move(event.clientX, event.clientY);
+    this._updateDropTarget(event);
+  }
+  /** @private */
+  _updateDropTarget(event) {
+    if (!this._drag) return;
+    const target =
+      this._items.find(({ key, row }) => {
+        if (key === this._drag.key) return false;
+        const bounds = row.getBounds();
+        return (
+          event.clientY >= bounds.top &&
+          event.clientY <= bounds.bottom &&
+          (!Number.isFinite(event.clientX) ||
+            (event.clientX >= bounds.left && event.clientX <= bounds.right))
+        );
+      }) ?? null;
     if (target === this._drag.target) return;
     this._drag.target?.row.removeClass('is-drop-target');
     this._drag.target = target && target.key !== this._drag.key ? target : null;
@@ -269,15 +482,23 @@ export class UISortableList extends UIContainer {
     const drag = this._drag;
     if (!drag) return;
     this._drag = null;
+    this._motion.end();
     drag.row.removeClass('is-dragging');
     drag.target?.row.removeClass('is-drop-target');
-    if (commit && drag.target && this._onReorder) this._onReorder(drag.key, drag.target.key);
+    if (commit && drag.target && this._onReorder)
+      this._onReorder(drag.key, drag.target.key);
   }
 
   /** @private @param {UIElement|null} [row=null] */
   _cancelMouseDragArm(row = null) {
     const arm = this._mouseDragArm;
     if (!arm || (row && arm.row !== row)) return;
+    this._mouseDragArm = null;
+    if (
+      arm.pointer &&
+      arm.row.getDomElement().hasPointerCapture?.(arm.pointerId)
+    )
+      arm.row.getDomElement().releasePointerCapture?.(arm.pointerId);
     if (arm.timer !== null) clearTimeout(arm.timer);
     arm.row.removeAttribute('draggable');
     arm.row.removeClass('is-drag-armed');

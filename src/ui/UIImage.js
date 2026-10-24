@@ -13,6 +13,7 @@ export class UIImage extends UIElement {
    * @param {string} [options.alt='']         - Localized alternative text
    * @param {string} [options.fallbackSrc=''] - Used once if `src` fails to load
    * @param {string} [options.className='']
+   * @param {'lazy'|'eager'} [options.loading='lazy'] - Critical small sprites may opt into eager loading.
    * @param {boolean} [options.pixelated=false] - Crisp pixel-art rendering (.pw-image--pixelated)
    */
   constructor(options = {}) {
@@ -28,7 +29,7 @@ export class UIImage extends UIElement {
     this._usedFallback = false;
 
     this._dom.setAttribute('draggable', 'false');
-    this._dom.setAttribute('loading', 'lazy');
+    this._dom.setAttribute('loading',options.loading==='eager'?'eager':'lazy');
     if (options.pixelated) this.addClass('pw-image--pixelated');
 
     this.addDomListener('error', () => this._onLoadError());

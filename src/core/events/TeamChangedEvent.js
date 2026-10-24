@@ -12,9 +12,10 @@ export class TeamChangedEvent extends BaseEvent {
   /**
    * @param {number} teamSize - Number of Pokémon in the team
    */
-  constructor(teamSize) {
+  constructor(teamSize, {deferSave=false}={}) {
     super(TeamChangedEvent.TYPE);
     /** @type {number} */
     this.teamSize = teamSize;
+    this.deferSave=deferSave;
   }
 }

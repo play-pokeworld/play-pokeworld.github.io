@@ -18,6 +18,7 @@ export class ContentAccessChangedEvent extends BaseEvent {
     this.locations = Object.freeze([...(snapshot?.locations || [])]);
     this.regions = Object.freeze([...(snapshot?.regions || [])]);
     this.regionStarters = Object.freeze([...(snapshot?.regionStarters || [])]);
+    this.marketUnlocked = snapshot?.marketUnlocked === true;
     this.championTitle = snapshot?.championTitle === true;
     this.changedFeatures = Object.freeze([...(metadata.changedFeatures || [])]);
     this.changedLocations = Object.freeze([...(metadata.changedLocations || [])]);

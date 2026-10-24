@@ -51,6 +51,7 @@ export class BoxSystem extends BaseSystem {
   addPokemon(pokemon, { notify = true, deferSave = false } = {}) {
     const save = SaveSystem.getInstance().getCurrentSave();
     if (!save || !pokemon || !save.collection.add(pokemon)) return false;
+    save.talents.unlock(pokemon.species, pokemon.talent);
     save.pokedex.markCaught(pokemon.species, pokemon.shiny, { deferSave });
     if (notify) this.dispatchChanged();
     return true;
@@ -89,7 +90,7 @@ export class BoxSystem extends BaseSystem {
   }
 
   /** Emits the standard collection event after a mutation. */
-  dispatchChanged() {
-    EventBus.getInstance().dispatch(new BoxChangedEvent(this.getCount()));
+  dispatchChanged({deferSave=false}={}) {
+    EventBus.getInstance().dispatch(new BoxChangedEvent(this.getCount(),{deferSave}));
   }
 }

@@ -19,13 +19,13 @@ const CODE = listJsFiles(SRC, ['localization/fr', 'localization/en', 'data/raw']
 const DOM_ALLOWED = (file) => file.startsWith('ui/') || file === 'main.js' || file === 'core/LocalStore.js';
 
 describe('Static rules', (test) => {
-  test('release metadata stays synchronized without bumping the save schema', () => {
+  test('release metadata stays synchronized with the documented facility schema', () => {
     const packageJson = JSON.parse(fs.readFileSync(path.resolve('package.json'), 'utf8'));
     const packageLock = JSON.parse(fs.readFileSync(path.resolve('package-lock.json'), 'utf8'));
     assert.equal(GameConfig.VERSION, packageJson.version);
     assert.equal(packageLock.version, packageJson.version);
     assert.equal(packageLock.packages[''].version, packageJson.version);
-    assert.equal(SaveSchema.VERSION, 16);
+    assert.equal(SaveSchema.VERSION, 20);
   });
 
   test('every relative import resolves to an existing export', () => {

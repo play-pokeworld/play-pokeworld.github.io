@@ -16,6 +16,7 @@ import { UIElement } from './UIElement.js';
 import { UIText } from './UIText.js';
 import { EventBus } from '../core/EventBus.js';
 import { ModalToggledEvent } from '../core/events/ModalToggledEvent.js';
+import { ModalCloseRequestedEvent } from '../core/events/ModalCloseRequestedEvent.js';
 import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
 import { t } from '../localization/LocalizationManager.js';
 
@@ -57,6 +58,7 @@ export class UIFullscreenPanel extends UIElement {
     this.addDomListener('click', (event) => {
       if (event.target === this._dom) this.close();
     });
+    this.listen(ModalCloseRequestedEvent,event=>{if(event.modalId===this.getId())this.close();});
     this.listen(ModalOpenRequestedEvent, (event) => {
       if (event.modalId === this.getId()) this.open(event.params);
     });
@@ -71,6 +73,11 @@ export class UIFullscreenPanel extends UIElement {
   /** @param {string} title */
   setTitle(title) {
     this._title.setText(title);
+  }
+
+  /** @returns {string} */
+  getTitle() {
+    return this._title.getText();
   }
 
   /**

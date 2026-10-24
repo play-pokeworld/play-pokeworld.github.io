@@ -13,6 +13,8 @@ export const CaptureRules = Object.freeze({
   /** Talent of a caught Pokémon: weight of every talent of the species pool by rarity. */
   TALENT_WEIGHT_BY_RARITY: Object.freeze({ 1: 60, 2: 30 }),
   TALENT_WEIGHT_OTHER: 12,
+  /** Duplicate-capture species-ledger unlock chances from the reference game. */
+  TALENT_UNLOCK_CHANCE_BY_RARITY: Object.freeze({ 1: 100, 2: 55, 3: 30 }),
   /**
    * Dungeon tokens per catch, duplicates included (original tokensPerCatch, PokéClicker
    * routeDungeonTokens): max(MIN, round(BASE × (RANK_FACTOR × rank / (DIVISOR / (1 + region / REGION_DIVISOR)))^EXPONENT)).

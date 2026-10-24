@@ -1,6 +1,6 @@
 # Audit du rework PokéWorld — v1.0 (mis à jour en v1.1)
 
-> **État courant : v1.14.12 / schéma 15.** Cette reprise améliore le choix d'objet tenu dans le Sac et ajoute un footer fixe d'annulation/retrait pendant le remplacement d'un Pokémon de l'équipe depuis la Boîte PC; `BoxPanel` reste générique et `TeamBoxTransferSystem` conserve les mutations d'équipe/PC. Les versions et statuts historiques des audits de sections ci-dessous restent ceux des phases où ils ont été rédigés; le suivi courant est dans [`SUIVI_CORRECTIFS.md`](SUIVI_CORRECTIFS.md).
+> **État courant : v1.14.25 / schéma 20.** Dictionnaire complet réimplémenté selon le main (3 onglets Objets/Attaques/Talents, découverte progressive 214/252/277, recherche temps réel, cartes avec possession/compteurs d'utilisateurs, modales d'information superposées avec sources, effets et apprenants). **574 tests et 121 scénarios Chromium réussis**, aucun diagnostic inattendu. Kit séparé : 12 + 575 + 4 réussites. Rapport : [`PHASE_v1.14.25.md`](PHASE_v1.14.25.md).
 
 Date de l'audit initial : 19/10/2026 · Base analysée : dump « Rework 2 » (133 fichiers) · Référence : dépôt original `play-pokeworld.github.io`.
 

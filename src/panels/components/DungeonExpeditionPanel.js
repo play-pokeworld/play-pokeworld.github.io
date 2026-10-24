@@ -2,6 +2,7 @@
  * @file DungeonExpeditionPanel.js
  * @brief Grid navigation, banked satchel and controls for the current dungeon expedition.
  */
+import { DungeonPilotControls } from './DungeonPilotControls.js';
 import { UIContainer } from '../../ui/UIContainer.js';
 import { UIText } from '../../ui/UIText.js';
 import { UIButton } from '../../ui/UIButton.js';
@@ -34,6 +35,7 @@ const TILE_LABEL_KEYS = Object.freeze({
 export class DungeonExpeditionPanel extends UIContainer {
   constructor() {
     super({ className: 'pw-dungeon-expedition', name: 'DungeonExpeditionPanel' });
+    this._content=new UIContainer({className:'pw-dungeon-content'});this.addChildren([this._content,new DungeonPilotControls()]);
     this.listen(DungeonRunChangedEvent, () => this.render());
     this.listen(BattleStartedEvent, () => this.render());
     this.listen(BattleEndedEvent, () => this.render());
@@ -43,18 +45,12 @@ export class DungeonExpeditionPanel extends UIContainer {
 
   /** @param {Object} [options] */
   render() {
-    this.clearChildren();
+    this._content.clearChildren();
     const system = DungeonSystem.getInstance();
     const run = system.getRun();
     if (run?.active) {
       this.show();
-      this.addChild(this._activeRun(run));
-      return;
-    }
-    const last = system.getLastRun();
-    if (last && last.locationId === LocationSystem.getInstance().getCurrentLocationId()) {
-      this.show();
-      this.addChild(this._lastRun(last));
+      this._content.addChild(this._activeRun(run));
       return;
     }
     this.hide();
@@ -194,22 +190,4 @@ export class DungeonExpeditionPanel extends UIContainer {
     });
   }
 
-  /** @private @param {Object} last */
-  _lastRun(last) {
-    return new UIContainer({
-      className: 'pw-panel pw-dungeon-last-run',
-      children: [
-        new UIText({ className: 'pw-dungeon-title', text: t('dungeon_last_run_title') }),
-        new UIText({ text: t(`location.${last.locationId}`) }),
-        new UIText({ text: t(`dungeon_outcome_${last.outcome}`) }),
-        new UIText({ text: t('dungeon_last_run_summary', {
-          floor: last.floor,
-          depth: last.depth,
-          wins: TextFormatter.formatNumber(last.wins || 0),
-          tokens: TextFormatter.formatNumber(last.banked?.tokens || 0),
-          money: TextFormatter.formatNumber(last.banked?.money || 0)
-        }) })
-      ]
-    });
-  }
 }

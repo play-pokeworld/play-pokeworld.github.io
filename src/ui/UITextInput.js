@@ -65,7 +65,8 @@ export class UITextInput extends UIElement {
 
   /** @param {string} value */
   setValue(value) {
-    this._dom.value = value != null ? String(value) : '';
+    const next=value!=null?String(value):'';
+    if(this._dom.value!==next)this._dom.value=next;
   }
 
   /** @param {string} placeholder */

@@ -14,6 +14,8 @@ import { ShopCatalog } from '../../systems/shop/ShopCatalog.js';
 import { CurrencyChangedEvent } from '../../core/events/CurrencyChangedEvent.js';
 import { InventoryChangedEvent } from '../../core/events/InventoryChangedEvent.js';
 import { LocationChangedEvent } from '../../core/events/LocationChangedEvent.js';
+import { ShopPurchaseCompletedEvent } from '../../core/events/ShopPurchaseCompletedEvent.js';
+import { PriceTag } from '../components/PriceTag.js';
 import { MoneyRow } from '../components/MoneyRow.js';
 import { ShopItemCard } from '../components/ShopItemCard.js';
 import { ShopFooter } from '../components/ShopFooter.js';
@@ -32,6 +34,7 @@ export class ShopPanel extends UIFullscreenPanel {
       if (this.isOpen()) this._render();
     };
     this.listen(CurrencyChangedEvent, refresh);
+    this.listen(ShopPurchaseCompletedEvent,refresh);
     this.listen(InventoryChangedEvent, refresh);
     this.listen(LocationChangedEvent, refresh);
   }
@@ -47,7 +50,7 @@ export class ShopPanel extends UIFullscreenPanel {
     const shops = ShopSystem.getInstance();
     const shop = shops.getShop();
     this.setTitle(shop ? t(`shop.${shop.id}.name`) : t('panel_shop_title'));
-    this.setFilters([new MoneyRow(save?.currencies.get('money') ?? 0)]);
+    this.setFilters([new UIContainer({className:'pw-shop-wallet',children:[new MoneyRow(save?.currencies.get('money')??0),new PriceTag('questPoint',save?.currencies.get('questPoint')??0)]})]);
     if (!shop || !save) {
       this.setContent([new UIText({ tagName: 'div', className: 'pw-empty-state-lg', text: t('shop_empty') })]);
       return;

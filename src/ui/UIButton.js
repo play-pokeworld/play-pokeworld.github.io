@@ -119,7 +119,7 @@ export class UIButton extends UIElement {
    * @param {boolean} active
    */
   setActive(active) {
-    this._dom.classList.toggle('active', !!active);
+    this.toggleClass('active', !!active);
   }
 
   /**
@@ -165,6 +165,7 @@ export class UIButton extends UIElement {
    * @param {boolean} enabled
    */
   setEnabled(enabled) {
+    if (this._disabled === !enabled && this._dom.hasAttribute('disabled') === !enabled) return;
     this._disabled = !enabled;
     if (this._disabled) {
       this._dom.setAttribute('disabled', 'disabled');

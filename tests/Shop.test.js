@@ -23,7 +23,7 @@ describe('Shops', (test) => {
   test('balls follow the badge requirement of the location', () => {
     const save = SaveSystem.getInstance().createNewSave('Client', 'bulbasaur');
     const balls = (id) => ShopCatalog.offers(LocationDB.getInstance().getById(id), save)
-      .filter((offer) => offer.kind !== ShopOfferKinds.ITEM).map((offer) => offer.key);
+      .filter((offer) => [ShopOfferKinds.BALL,ShopOfferKinds.MASTER_BALL].includes(offer.kind)).map((offer) => offer.key);
     assert.deepEqual(balls('pewter'), ['pokeball']);
     assert.deepEqual(balls('indigo'), ['pokeball', 'greatball', 'ultraball',
       ...ShopRules.MASTER_BALL.prices.map((price) => `masterball:${price.currency}`)]);

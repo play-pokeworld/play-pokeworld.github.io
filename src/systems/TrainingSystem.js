@@ -1,21 +1,26 @@
 /**
  * @file TrainingSystem.js
- * @brief Kanto training-centre sessions against a type-matched six-Pokémon coaching team.
+ * @brief Persistent training assignments, two exact-resume Rework battles and automation queues.
  */
 import { BaseSystem } from './BaseSystem.js';
 import { SaveSystem } from './SaveSystem.js';
 import { BattleSystem } from './BattleSystem.js';
 import { BoxSystem } from './BoxSystem.js';
 import { PokemonUsageSystem } from './PokemonUsageSystem.js';
-import { PokemonActionIds, PokemonUsageIds } from '../config/PokemonUsageRules.js';
+import { PokemonActionIds } from '../config/PokemonUsageRules.js';
 import { NotificationSystem } from './NotificationSystem.js';
 import { EventBus } from '../core/EventBus.js';
 import { BattleSession, BattleOutcomes } from './battle/BattleSession.js';
+import { FacilityCandidateRules } from './facilities/FacilityCandidateRules.js';
+import { FacilityFilterRules } from '../config/FacilityFilterRules.js';
+import { TrainingProgression } from './facilities/TrainingProgression.js';
+import { FacilityPurchase } from './facilities/FacilityPurchase.js';
 import { Random } from '../core/Random.js';
+import { SeededRandom } from '../core/SeededRandom.js';
 import { PokemonFactory } from '../data/pokemon/PokemonFactory.js';
-import { PokemonDB } from '../data/pokemon/PokemonDB.js';
-import { MoveDB } from '../data/battle/MoveDB.js';
-import { MoveLearnset } from '../data/pokemon/MoveLearnset.js';
+import { FacilityStaffSystem } from './FacilityStaffSystem.js';
+import { StaffRules } from '../config/StaffRules.js';
+import { TrainingData } from '../data/save/TrainingData.js';
 import { TrainingOpponentDB } from '../data/training/TrainingOpponentDB.js';
 import { LocationDB } from '../data/world/LocationDB.js';
 import { LocationSystem } from './LocationSystem.js';
@@ -27,363 +32,426 @@ import { TrainingResultChangedEvent } from '../core/events/TrainingResultChanged
 import { SaveCreatedEvent } from '../core/events/SaveCreatedEvent.js';
 import { SaveLoadedEvent } from '../core/events/SaveLoadedEvent.js';
 import { TrainingRules } from '../config/TrainingRules.js';
+import { FacilityRules } from '../config/FacilityRules.js';
 import { CONTENT_FEATURES } from '../config/ContentAccessRules.js';
-import { MoveConfig } from '../config/MoveConfig.js';
 import { NotificationChannels, NotificationTones } from '../config/NotificationConfig.js';
 import { t } from '../localization/LocalizationManager.js';
 
 export const TrainingResults = Object.freeze({
-  READY: 'ready',
-  NO_SAVE: 'no-save',
-  WRONG_LOCATION: 'wrong-location',
-  FEATURE_LOCKED: 'feature-locked',
-  NEED_BADGE: 'need-badge',
-  BATTLE_ACTIVE: 'battle-active',
-  SESSION_ACTIVE: 'session-active',
-  POKEMON_NOT_FOUND: 'pokemon-not-found',
-  NO_MOVES: 'no-moves',
-  UNKNOWN_MODE: 'unknown-mode',
-  COMPLETED: 'completed',
-  CANCELLED: 'cancelled'
+  READY: 'ready', SLOT_OCCUPIED: 'slot-occupied', NO_SAVE: 'no-save', FEATURE_LOCKED: 'feature-locked', NEED_BADGE: 'need-badge',
+  BATTLE_ACTIVE: 'battle-active', SESSION_ACTIVE: 'session-active', POKEMON_NOT_FOUND: 'pokemon-not-found',
+  NO_MOVES: 'no-moves', UNKNOWN_MODE: 'unknown-mode', COMPLETED: 'completed', CANCELLED: 'cancelled',
+  MODE_LOCKED: 'mode-locked', NO_SLOT: 'no-slot', QUEUE_FULL: 'queue-full'
 });
 
 export class TrainingSystem extends BaseSystem {
-  /** @private @type {TrainingSystem|null} */
   static _instance = null;
-
   /** @returns {TrainingSystem} */
-  static getInstance() {
-    if (!TrainingSystem._instance) TrainingSystem._instance = new TrainingSystem();
-    return TrainingSystem._instance;
-  }
-
+  static getInstance() { return this._instance || (this._instance = new TrainingSystem()); }
   constructor() {
     super('TrainingSystem', 'System');
-    /** @private @type {BattleSession|null} */
-    this._session = null;
-    /** @private @type {Object|null} */
-    this._trainee = null;
-    /** @private @type {string|null} */
-    this._mode = null;
-    /** @private @type {string|null} */
-    this._locationId = null;
-    /** @private @type {Object|null} */
-    this._lastResult = null;
-    /** @private @type {number} */
-    this._elapsedSeconds = 0;
-    /** @private @type {Random} */
+    this._sessions = new Map();
+    this._saveId = null;
+    this._saveRef = null;
     this._random = Random.default;
-    /** @private @type {Function|null} */
-    this._onSaveContextChanged = null;
+    this._unsubscribers = [];
+    this._autoElapsed = 0;
   }
-
   /** @override */
   init() {
-    if (this._onSaveContextChanged) return;
-    this._onSaveContextChanged = () => this._resetSession(true);
-    EventBus.getInstance().subscribe(SaveCreatedEvent, this._onSaveContextChanged);
-    EventBus.getInstance().subscribe(SaveLoadedEvent, this._onSaveContextChanged);
+    if (this._unsubscribers.length) return;
+    this._unsubscribers = [SaveLoadedEvent, SaveCreatedEvent].map((type) =>
+      EventBus.getInstance().subscribe(type, () => this._restoreSessions()));
+    this._restoreSessions();
   }
-
   /** @override */
   onDestroy() {
-    if (this._onSaveContextChanged) {
-      EventBus.getInstance().unsubscribe(SaveCreatedEvent, this._onSaveContextChanged);
-      EventBus.getInstance().unsubscribe(SaveLoadedEvent, this._onSaveContextChanged);
-    }
-    this._onSaveContextChanged = null;
-    this._resetSession(true);
+    this._captureSessions();
+    this._unsubscribers.forEach((unsubscribe) => unsubscribe());
+    this._unsubscribers = [];
+    this._sessions.clear();
+    this._saveId = null;
+    this._saveRef = null;
     super.onDestroy();
   }
-
   /** @param {Random} random */
-  setRandom(random) {
-    this._random = random;
-  }
-
+  setRandom(random) { this._random = random; }
   /** @returns {boolean} */
-  isUnlocked() {
-    return FeatureAccessSystem.getInstance().isFeatureUnlocked(CONTENT_FEATURES.TRAINING);
-  }
-
+  isUnlocked() { return FeatureAccessSystem.getInstance().isFeatureUnlocked(CONTENT_FEATURES.TRAINING); }
   /** @returns {boolean} */
-  canUseHere() {
-    return this.isUnlocked() && LocationSystem.getInstance().getCurrentLocationId() === TrainingRules.LOCATION_ID;
-  }
-
+  canUseHere() { return this.isUnlocked(); }
   /** @returns {boolean} */
-  isActive() {
-    return !!this._session;
-  }
+  isActive() { this._ensureContext(); return this._sessions.size > 0; }
+  /** Compatibility accessor: the first live battle; owned state is always in save.training. */
+  get _session() { return this._sessions.values().next().value || null; }
+  /** @param {number} [slotIndex=0] @returns {Object|null} */
+  getLastResult(slotIndex = 0) { return SaveSystem.getInstance().getCurrentSave()?.training.slots[slotIndex]?.result || null; }
 
-  /** @returns {Array<{uid:string,name:string,species:string,level:number,source:string}>} */
-  getCandidates() {
+  /** @param {number} [slotIndex=0] @param {{queue?:boolean}} [options] @returns {Object[]} */
+  getCandidates(slotIndex=0,{queue=false,replace=false}={}) {
     const save = SaveSystem.getInstance().getCurrentSave();
-    if (!save) return [];
-    const usage = PokemonUsageSystem.getInstance();
-    const others = save.collection.getAll().filter((pokemon) => !save.teamMembers.includes(pokemon.uid));
-    return [
-      ...save.team.map((pokemon) => ({ pokemon, source: 'team' })),
-      ...others.map((pokemon) => ({ pokemon, source: 'box' }))
-    ].filter(({ pokemon }) => usage.canPerform(pokemon.uid, PokemonActionIds.TRAIN))
-      .filter(({ pokemon }) => pokemon.moves.length < MoveConfig.ACTIVE_SLOTS && this._availableMoves(pokemon).length > 0)
-      .map(({ pokemon, source }) => ({
-        uid: pokemon.uid,
-        name: pokemon.getDisplayName(),
-        species: pokemon.species,
-        level: pokemon.level,
-        source
-      }));
+    const slot=save?.training.slots[slotIndex];
+    if(!slot||(!queue&&(slot.battle||(!replace&&slot.pokemonUid)))) return [];
+    return save.collection.getAll().filter((pokemon) => !pokemon.locked &&
+      (!queue || !save.teamMembers.includes(pokemon.uid)) &&
+      PokemonUsageSystem.getInstance().canPerform(pokemon.uid, PokemonActionIds.TRAIN) &&
+      TrainingRules.MODES.some((mode) => TrainingProgression.eligible(save, pokemon, mode)))
+      .map((pokemon) => ({ uid: pokemon.uid, label: pokemon.getDisplayName(), pokemon }));
   }
-
-  /** @returns {Object|null} Defensive panel snapshot */
-  getSnapshot() {
+  /** @param {number} slotIndex @param {string} uid @param {{persist?:boolean}} [options] */
+  assignPokemon(slotIndex,uid,{persist=true,replace=false}={}) {
     const save = SaveSystem.getInstance().getCurrentSave();
-    if (!this._session || !this._trainee) {
-      return { active: false, lastResult: this._lastResult ? { ...this._lastResult } : null };
-    }
-    const session = this._session;
-    const foe = session.foe;
-    const traineeCombatant = session.active;
-    return {
-      active: true,
-      mode: this._mode,
-      modeLabel: t(`training_mode_${this._mode}_title`),
-      traineeUid: this._trainee.uid,
-      traineeName: this._trainee.getDisplayName(),
-      traineeSpecies: this._trainee.species,
-      traineeLevel: this._trainee.level,
-      traineeHp: traineeCombatant.hp,
-      traineeMaxHp: traineeCombatant.maxHp,
-      foeName: foe.name,
-      foeSpecies: foe.pokemon.species,
-      foeLevel: foe.pokemon.level,
-      foeHp: foe.hp,
-      foeMaxHp: foe.maxHp,
-      opponentsDefeated: session.defeatedFoes.length,
-      opponentCount: session.sentFoes.length + session.reserveCount,
-      saveId: save?.id ?? null
-    };
-  }
-
-  /**
-   * Runs the standard move-discipline training session for an owned Pokémon. The trainee is
-   * claimed as TRAINING in PokemonUsageSystem for the whole session (it stays in the PC box).
-   * @param {string} pokemonUid
-   * @param {string} [mode=TrainingRules.MODE_ID]
-   * @returns {{result:string,opponentCount:number}}
-   */
-  startSession(pokemonUid, mode = TrainingRules.MODE_ID) {
-    const save = SaveSystem.getInstance().getCurrentSave();
-    if (!save) return this._failure(TrainingResults.NO_SAVE);
+    const slot = save?.training.slots[slotIndex];
     if (!this.isUnlocked()) return this._failure(TrainingResults.FEATURE_LOCKED);
-    if (!this.canUseHere()) return this._failure(TrainingResults.WRONG_LOCATION);
-    if (!save.player.hasBadge(TrainingRules.REQUIRED_BADGE_ID)) return this._failure(TrainingResults.NEED_BADGE);
-    if (this._session) return this._failure(TrainingResults.SESSION_ACTIVE);
-    if (BattleSystem.getInstance().isActive()) return this._failure(TrainingResults.BATTLE_ACTIVE);
-    if (mode !== TrainingRules.MODE_ID) return this._failure(TrainingResults.UNKNOWN_MODE);
-    const trainee = save.collection.get(pokemonUid);
-    if (!trainee || !PokemonUsageSystem.getInstance().canPerform(pokemonUid, PokemonActionIds.TRAIN)) {
-      return this._failure(TrainingResults.POKEMON_NOT_FOUND);
-    }
-    const eligibleMoves = this._availableMoves(trainee);
-    if (eligibleMoves.length === 0 || trainee.moves.length >= MoveConfig.ACTIVE_SLOTS) {
-      return this._failure(TrainingResults.NO_MOVES);
-    }
-    const opponents = this._createOpponents(trainee);
-    if (opponents.length !== TrainingRules.OPPONENT_COUNT) return this._failure(TrainingResults.NO_MOVES);
-    trainee.healFull();
-    const locationId = LocationSystem.getInstance().getCurrentLocationId();
-    this._trainee = trainee;
-    this._mode = mode;
-    this._locationId = locationId;
-    this._elapsedSeconds = 0;
-    this._lastResult = null;
-    this._session = new BattleSession({
-      team: [trainee],
-      foe: opponents[0],
-      reserves: opponents.slice(1).map((pokemon) => ({ pokemon })),
-      training: true,
-      random: this._random,
-      weather: LocationDB.getInstance().getById(locationId)?.weather ?? null,
-      ownedQuantity: (itemId) => save.inventory.count(itemId),
-      onFoeDefeated: (encounter) => EventBus.getInstance().dispatch(new BattleFoeKnockedOutEvent(
-        encounter.pokemon.species,
-        encounter.pokemon.level,
-        locationId,
-        { deferSave: true }
-      ))
-    });
-    this._session.start();
-    PokemonUsageSystem.getInstance().claim(PokemonUsageIds.TRAINING, trainee.uid);
-    this._notify(t('training_session_started', { name: trainee.getDisplayName() }), NotificationTones.INFO);
-    SaveSystem.getInstance().saveCurrent();
-    this._dispatchBattleChanged();
-    return { result: TrainingResults.READY, opponentCount: opponents.length };
+    if (!slot) return this._failure(TrainingResults.NO_SLOT);
+    if (slot.battle) return this._failure(TrainingResults.SESSION_ACTIVE);
+    if(slot.pokemonUid&&slot.pokemonUid===uid) return {result:TrainingResults.READY};
+    if(slot.pokemonUid&&!replace) return this._failure(TrainingResults.SLOT_OCCUPIED);
+    if (!this.getCandidates(slotIndex,{replace}).some((entry) => entry.uid === uid)) return this._failure(TrainingResults.POKEMON_NOT_FOUND);
+    slot.pokemonUid = uid;
+    slot.result = null;
+    if (persist) this._commit();
+    return { result: TrainingResults.READY };
   }
-
-  /** @param {number} dt - Seconds since the previous engine frame */
-  update(dt) {
-    const session = this._session;
-    if (!session) return;
-    const elapsed = Number(dt);
-    if (Number.isFinite(elapsed) && elapsed > 0) this._elapsedSeconds += elapsed;
-    session.update(Math.max(0, Number.isFinite(elapsed) ? elapsed : 0));
-    const hits = session.drainHits();
-    const logEntries = session.log.drain();
-    if (session.isOver()) {
-      this._finishSession(session);
-      return;
-    }
-    if (hits.length > 0 || logEntries.length > 0) this._dispatchBattleChanged();
-    if (this._elapsedSeconds >= TrainingRules.MAX_SIMULATION_TICKS * TrainingRules.TICK_SECONDS) {
-      session.outcome = BattleOutcomes.DEFEAT;
-      this._finishSession(session, 'timeout');
-    }
-  }
-
-  /** Stops a running training battle without recording a completed session. */
-  cancelSession() {
-    if (!this._session) return false;
-    const trainee = this._trainee;
-    trainee?.healFull();
-    const result = {
-      result: TrainingResults.CANCELLED,
-      success: false,
-      mode: null,
-      pokemonUid: trainee?.uid ?? null,
-      pokemonName: trainee?.getDisplayName?.() ?? '',
-      rewardMove: null,
-      opponentsDefeated: 0
-    };
-    this._lastResult = { ...result };
-    this._resetSession();
-    SaveSystem.getInstance().saveCurrent();
-    this._dispatchTraineeRosterChanged(trainee);
-    EventBus.getInstance().dispatch(new TrainingResultChangedEvent(result));
-    this._dispatchBattleChanged();
+  /** Only explicit removal or a confirmed atomic replacement releases an assigned UID. */
+  clearSlot(slotIndex) {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    const slot = save?.training.slots[slotIndex];
+    if (!slot || slot.battle || !this.isUnlocked()) return false;
+    slot.pokemonUid = '';
+    slot.result = null;
+    this._commit();
     return true;
   }
 
-  /** @private @param {BattleSession} session @param {string} [reason] */
-  _finishSession(session, reason = null) {
+  /** @param {string} pokemonUid @param {string} [mode='move'] @param {number} [slotIndex=0] @param {Object} [options] */
+  startSession(pokemonUid, mode = TrainingRules.MODE_ID, slotIndex = 0, { automatic = false, persist = true } = {}) {
+    this._ensureContext();
     const save = SaveSystem.getInstance().getCurrentSave();
-    const trainee = this._trainee;
-    if (!save || !trainee) {
-      this._resetSession();
-      this._dispatchBattleChanged();
-      return;
+    if (!save) return this._failure(TrainingResults.NO_SAVE);
+    if (!this.isUnlocked()) return this._failure(TrainingResults.FEATURE_LOCKED);
+    const slot = save.training.slots[slotIndex];
+    if (!slot) return this._failure(TrainingResults.NO_SLOT);
+    if (slot.battle) return this._failure(TrainingResults.SESSION_ACTIVE);
+    if (BattleSystem.getInstance().isActive()) return this._failure(TrainingResults.BATTLE_ACTIVE);
+    if (!TrainingRules.MODES.includes(mode)) return this._failure(TrainingResults.UNKNOWN_MODE);
+    if (!TrainingProgression.isModeUnlocked(save, mode)) return this._failure(TrainingResults.MODE_LOCKED);
+    const trainee = save.collection.get(pokemonUid);
+    if (!trainee || !TrainingProgression.eligible(save, trainee, mode)) return this._failure(TrainingResults.NO_MOVES);
+    const fee = FacilityStaffSystem.getInstance().getFee('training', TrainingRules.AUTOMATION_FEE);
+    if (automatic && save.currencies.get(FacilityRules.MONEY_CURRENCY) < fee) return { result: 'insufficient-funds' };
+    if (slot.pokemonUid !== pokemonUid) {
+      const assigned = this.assignPokemon(slotIndex, pokemonUid, { persist: false });
+      if (assigned.result !== TrainingResults.READY) return assigned;
     }
-    const success = session.outcome === BattleOutcomes.VICTORY;
-    const opponentsDefeated = session.defeatedFoes.length;
-    let rewardMove = null;
-    if (success) {
-      const rewardOptions = this._availableMoves(trainee);
-      if (rewardOptions.length > 0 && trainee.moves.length < MoveConfig.ACTIVE_SLOTS) {
-        rewardMove = this._random.pick(rewardOptions) ?? null;
-        if (rewardMove) trainee.moves.push(rewardMove);
-      }
-    }
+    const random = new SeededRandom(this._random.int(1, 4294967295));
+    const opponents = this._createOpponents(trainee, random, mode);
+    if (opponents.length < TrainingRules.MIN_STAFF_OPPONENT_COUNT) return this._failure(TrainingResults.NO_MOVES);
     trainee.healFull();
+    slot.mode = mode;
+    slot.elapsed = 0;
+    slot.result = null;
+    const locationId = LocationSystem.getInstance().getCurrentLocationId();
+    const session = new BattleSession({ team: [trainee], foe: opponents[0],
+      reserves: opponents.slice(1).map((pokemon) => ({ pokemon })), training: true, healBetweenFoes: true,
+      random, weather: LocationDB.getInstance().getById(locationId)?.weather || null,
+      ...this._battleServices(save, locationId) });
+    session.start();
+    this._sessions.set(slotIndex, session);
+    slot.battle = { ...session.captureState(), locationId };
+    if (automatic) save.currencies.add(FacilityRules.MONEY_CURRENCY, -fee);
+    if (persist) this._commit();
+    return { result: TrainingResults.READY, opponentCount: opponents.length };
+  }
+
+  /** @param {number} [slotIndex=0] @returns {Object} */
+  getSnapshot(slotIndex = 0) {
+    this._ensureContext();
+    const save = SaveSystem.getInstance().getCurrentSave();
+    const slots = (save?.training.slots || []).map((slot, index) => this._slotSnapshot(save, slot, index));
+    return { ...(slots[slotIndex] || { active: false }), slots, maxSlots: slots.length,
+      queueLimit: FacilityRules.QUEUE_DEFAULT + (save?.training.queueLevel || 0) * FacilityRules.QUEUE_STEP,
+      queueLevel: save?.training.queueLevel || 0, saveId: save?.id || null };
+  }
+  /** @private */
+  _slotSnapshot(save, slot, index) {
+    const pokemon = save.collection.get(slot.pokemonUid);
+    const session = this._sessions.get(index);
+    const foe = session?.foe;
+    return { index, pokemon, pokemonUid: slot.pokemonUid, active: !!session,
+      mode: slot.mode, modes: TrainingProgression.modes(save, pokemon), result: slot.result,
+      autoPurchased: slot.autoPurchased, autoEnabled: slot.autoEnabled, autoOptions: [...slot.autoOptions],
+      filters:slot.filters.serialize(),
+      metadata: pokemon ? {evs:FacilityCandidateRules.total(pokemon,'evs'),talents:save.talents.getIds(pokemon.species).length,
+        talentTotal:pokemon.getSpecies().talents.length,moves:TrainingProgression.availableMoves(pokemon).length} : null,
+      queue: slot.queue.map((uid) => ({ uid, pokemon: save.collection.get(uid) })).filter((entry) => entry.pokemon),
+      traineeUid: pokemon?.uid, traineeName: pokemon?.getDisplayName(), traineeSpecies: pokemon?.species,
+      traineeLevel: pokemon?.level, traineeHp: pokemon?.hp, traineeMaxHp: pokemon?.getMaxHp(),
+      foeName: foe?.name, foeSpecies: foe?.pokemon.species, foeLevel: foe?.level, foeHp: foe?.hp, foeMaxHp: foe?.maxHp,
+      foePokemon: foe?.pokemon, traineeCooldown: session ? 1 - session.playerCooldownMs / Math.max(1, session.playerCooldownTotalMs) : 0,
+      foeCooldown: session ? 1 - session.foeCooldownMs / Math.max(1, session.foeCooldownTotalMs) : 0,
+      traineeStatus: session?.active.status, foeStatus: foe?.status,
+      traineeMove: session?.active.lastMoveId, foeMove: foe?.lastMoveId,
+      opponentsDefeated: session?.defeatedFoes.length || 0,
+      opponentCount: session ? session.sentFoes.length + session.reserveCount : TrainingRules.OPPONENT_COUNT };
+  }
+
+  /** Live combat-only projection, without recomputing move pools on animation frames. @returns {Object[]} */
+  getLiveStates() {
+    this._ensureContext();
+    const save = SaveSystem.getInstance().getCurrentSave();
+    return [...this._sessions].map(([index, session]) => ({ index, mode: save.training.slots[index].mode,
+      pokemon: session.active.pokemon, foePokemon: session.foe.pokemon,
+      opponentsDefeated: session.defeatedFoes.length, opponentCount: session.sentFoes.length + session.reserveCount,
+      player: session.active, foe: session.foe, field: session.field,
+      playerCooldownMs: session.playerCooldownMs, playerCooldownTotalMs: session.playerCooldownTotalMs,
+      foeCooldownMs: session.foeCooldownMs, foeCooldownTotalMs: session.foeCooldownTotalMs }));
+  }
+
+  /** @override @param {number} dt */
+  update(dt) {
+    this._ensureContext();
+    const save = SaveSystem.getInstance().getCurrentSave();
+    if (!save || !Number.isFinite(dt) || dt <= 0) return;
+    let changed = false;
+    for (const [index, session] of [...this._sessions]) {
+      const slot = save.training.slots[index];
+      const duration = TrainingRules.MAX_SIMULATION_TICKS * TrainingRules.TICK_SECONDS;
+      const step = Math.max(0, Math.min(dt, duration - slot.elapsed));
+      slot.elapsed += step;
+      session.update(step);
+      const hits = session.drainHits();
+      const logs = session.log.drain();
+      changed = changed || hits.length > 0 || logs.length > 0;
+      const timedOut = !session.isOver() && slot.elapsed >= duration;
+      if (timedOut) session.outcome = BattleOutcomes.DEFEAT;
+      if (session.isOver()) this._finishSession(session, timedOut ? 'timeout' : null, index);
+      else slot.battle = { ...session.captureState(), locationId: slot.battle.locationId };
+    }
+    this._autoElapsed += dt;
+    if (this._autoElapsed >= FacilityRules.AUTO_SCAN_SECONDS) { this._autoElapsed = 0; this._processAutomation(); }
+    if (changed) this._dispatchBattleChanged();
+  }
+  /** @param {number} [slotIndex=0] @returns {boolean} */
+  cancelSession(slotIndex = 0) {
+    this._ensureContext();
+    const save = SaveSystem.getInstance().getCurrentSave();
+    const slot = save?.training.slots[slotIndex];
+    if (!slot?.battle) return false;
+    save.collection.get(slot.pokemonUid)?.healFull();
+    slot.battle = null;
+    slot.autoEnabled = false;
+    slot.result = { result: TrainingResults.CANCELLED, success: false, pokemonUid: slot.pokemonUid, slotIndex };
+    this._sessions.delete(slotIndex);
+    this._commit();
+    return true;
+  }
+  /** @private @param {BattleSession} session @param {string|null} [reason] @param {number} [slotIndex=0] */
+  _finishSession(session, reason = null, slotIndex = 0) {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    const slot = save?.training.slots[slotIndex];
+    const trainee = save?.collection.get(slot?.pokemonUid);
+    if (!slot || !trainee || !slot.battle || this._sessions.get(slotIndex) !== session) return;
+    const success = session.outcome === BattleOutcomes.VICTORY;
+    const reward = success ? TrainingProgression.reward(save, trainee, slot.mode, session.random) : null;
+    trainee.healFull();
+    slot.battle = null;
+    slot.result = { result: TrainingResults.COMPLETED, success, mode: slot.mode, pokemonUid: trainee.uid,
+      reward, rewardMove: reward?.move || null,
+      opponentsDefeated: session.defeatedFoes.length, reason, slotIndex };
+    if (!success) slot.autoEnabled = false;
+    this._sessions.delete(slotIndex);
     save.statistics.recordTrainingSession();
-    const result = {
-      result: TrainingResults.COMPLETED,
-      success,
-      mode: this._mode,
-      pokemonUid: trainee.uid,
-      pokemonName: trainee.getDisplayName(),
-      rewardMove,
-      opponentsDefeated,
-      reason
-    };
-    this._lastResult = { ...result };
-    this._resetSession();
+    FacilityStaffSystem.getInstance().addXp('training', success ? 1 : 0.5);
+    const dropChance = FacilityStaffSystem.getInstance().getBonus('training', 'training_drop');
+    if (success && session.random.next() < dropChance) save.inventory.add(session.random.pick(StaffRules.TRAINING_DROP_ITEMS), 1, { deferSave: true });
+    this._captureSessions();
     EventBus.getInstance().dispatch(new TrainingSessionCompletedEvent(1, { deferSave: true }));
     SaveSystem.getInstance().saveCurrent();
-    this._dispatchTraineeRosterChanged(trainee);
-    EventBus.getInstance().dispatch(new TrainingResultChangedEvent(result));
+    BoxSystem.getInstance().dispatchPokemonChanged(trainee.uid);
+    EventBus.getInstance().dispatch(new TrainingResultChangedEvent(slot.result));
     this._dispatchBattleChanged();
-    const text = success
-      ? t('training_session_complete', {
-        name: trainee.getDisplayName(),
-        reward: rewardMove ? t(`move.${rewardMove}.name`) : t('training_reward_none')
-      })
-      : t('training_session_failed', { name: trainee.getDisplayName() });
-    this._notify(text, success ? NotificationTones.SUCCESS : NotificationTones.WARNING);
+    this._notify(success ? t('facility_training_success', { name: trainee.getDisplayName() }) :
+      t('training_session_failed', { name: trainee.getDisplayName() }), success ? NotificationTones.SUCCESS : NotificationTones.WARNING);
   }
 
-  /** @private @param {Object} trainee @returns {string[]} */
-  _availableMoves(trainee) {
-    const known = new Set(trainee.moves);
-    return MoveLearnset.poolFor(trainee.getTypes()).filter((moveId) => MoveDB.getInstance().has(moveId) && !known.has(moveId));
+  /** @returns {Object} */
+  upgradeSlot() {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    if (!this.isUnlocked()) return this._failure(TrainingResults.FEATURE_LOCKED);
+    if (!save || save.training.maxSlots >= TrainingRules.MAX_SLOT_COUNT) return { result: 'max-upgrade' };
+    const result = FacilityPurchase.apply(save, TrainingRules.SECOND_SLOT_COST, FacilityRules.QUEUE_CURRENCY, () => {
+      const expanded = new TrainingData({ ...save.training.serialize(), maxSlots: save.training.maxSlots + 1 });
+      save.training = expanded;
+    });
+    if (result.result === 'ready') this._commit();
+    return result;
+  }
+  /** @returns {Object} */
+  upgradeQueue() {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    if (!this.isUnlocked()) return this._failure(TrainingResults.FEATURE_LOCKED);
+    const cost = FacilityRules.QUEUE_UPGRADE_COSTS[save?.training.queueLevel];
+    const result = FacilityPurchase.apply(save, cost, FacilityRules.QUEUE_CURRENCY, () => save.training.queueLevel++);
+    if (result.result === 'ready') this._commit();
+    return result;
+  }
+  /** @param {number} slotIndex */
+  buyAutomation(slotIndex) {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    const slot = save?.training.slots[slotIndex];
+    if (!slot || slot.autoPurchased || !this.isUnlocked()) return { result: 'unavailable' };
+    const result = FacilityPurchase.apply(save, TrainingRules.AUTOMATION_COST, FacilityRules.QUEUE_CURRENCY, () => {
+      slot.autoPurchased = true; slot.autoOptions = ['move']; slot.filters.set('mode','move');
+    });
+    if (result.result === 'ready') this._commit();
+    return result;
+  }
+  /** @param {number} slotIndex */
+  toggleAutomation(slotIndex) {
+    const slot = SaveSystem.getInstance().getCurrentSave()?.training.slots[slotIndex];
+    if (!slot?.autoPurchased || !this.isUnlocked() || BattleSystem.getInstance().isActive()) return false;
+    slot.autoEnabled = !slot.autoEnabled;
+    this._commit();
+    return true;
+  }
+  /** @param {number} slotIndex @param {string} id */
+  toggleAutoOption(slotIndex, id) {
+    const slot = SaveSystem.getInstance().getCurrentSave()?.training.slots[slotIndex];
+    if (!slot || !TrainingRules.AUTOMATION_OPTIONS.includes(id) || !this.isUnlocked()) return false;
+    slot.filters.set('mode','configured');
+    slot.autoOptions = slot.autoOptions.includes(id) ? slot.autoOptions.filter((option) => option !== id) : [...slot.autoOptions, id];
+    this._commit(); return true;
+  }
+  /** @param {number} slotIndex @param {string} uid */
+  enqueue(slotIndex, uid) {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    const slot = save?.training.slots[slotIndex];
+    if (!slot || !this.isUnlocked() || !this.getCandidates(slotIndex, { queue: true }).some((entry) => entry.uid === uid)) return { result: 'unavailable' };
+    if (slot.queue.length >= this.getSnapshot().queueLimit) return { result: TrainingResults.QUEUE_FULL };
+    slot.queue.push(uid); this._commit(); return { result: TrainingResults.READY };
+  }
+  /** @param {number} slotIndex @returns {number} */
+  fillQueue(slotIndex) {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    const slot = save?.training.slots[slotIndex];
+    if (!slot || !this.isUnlocked()) return 0;
+    const capacity = FacilityRules.QUEUE_DEFAULT + save.training.queueLevel * FacilityRules.QUEUE_STEP;
+    const candidates=this._automaticCandidates(slotIndex).slice(0,Math.max(0,capacity-slot.queue.length));
+    slot.queue.push(...candidates.map((entry) => entry.uid));
+    if (candidates.length) this._commit();
+    return candidates.length;
   }
 
-  /** @private @param {Object} trainee */
-  _createOpponents(trainee) {
-    const type = trainee.getTypes()[0] ?? 'normal';
-    const pool = TrainingOpponentDB.getInstance().getSpeciesForType(type);
-    if (pool.length < TrainingRules.OPPONENT_COUNT) return [];
-    const baseLevel = Math.max(TrainingRules.MIN_OPPONENT_LEVEL, trainee.level + TrainingRules.MOVE_MODE_LEVEL_OFFSET);
-    return pool.slice(0, TrainingRules.OPPONENT_COUNT).map((speciesId, index) => {
-      if (!PokemonDB.getInstance().has(speciesId)) return null;
-      const variation = TrainingRules.LEVEL_VARIATION[index % TrainingRules.LEVEL_VARIATION.length];
-      const pokemon = PokemonFactory.create(speciesId, Math.max(TrainingRules.MIN_OPPONENT_LEVEL, baseLevel + variation), {
-        random: this._random
-      });
-      if (pokemon) pokemon.nickname = t('training_coach_opponent', {
-        number: index + 1,
-        name: pokemon.getDisplayName()
-      });
-      return pokemon;
-    }).filter(Boolean);
+  /** @private @param {number} slotIndex @returns {Object[]} */
+  _automaticCandidates(slotIndex) {
+    const save=SaveSystem.getInstance().getCurrentSave(),slot=save?.training.slots[slotIndex];
+    if(!slot) return [];
+    return FacilityCandidateRules.select(save,this.getCandidates(slotIndex,{queue:true})
+      .filter((entry)=>slot.autoOptions.some((mode)=>TrainingProgression.eligible(save,entry.pokemon,mode))),slot.filters.serialize());
   }
-
-  /** @private @param {Object|null} pokemon */
-  _dispatchTraineeRosterChanged(pokemon) {
-    if (!SaveSystem.getInstance().getCurrentSave() || !pokemon) return;
-    BoxSystem.getInstance().dispatchPokemonChanged(pokemon.uid);
+  /** @param {number} index @param {string} key @param {string} value @returns {boolean} */
+  setAutomationFilter(index,key,value) {
+    const slot=SaveSystem.getInstance().getCurrentSave()?.training.slots[index];
+    if (!this.isUnlocked() || !slot?.filters.set(key,value)) return false;
+    if (key==='mode' && value!=='configured') slot.autoOptions=value==='all'?[...FacilityFilterRules.MODE_ORDER]:[value];
+    this._commit(); return true;
+  }
+  /** @param {number} slotIndex @param {string|null} [uid=null] */
+  removeFromQueue(slotIndex, uid = null) {
+    const slot = SaveSystem.getInstance().getCurrentSave()?.training.slots[slotIndex];
+    if (!slot || !this.isUnlocked()) return false;
+    slot.queue = uid ? slot.queue.filter((entry) => entry !== uid) : [];
+    this._commit(); return true;
+  }
+  /** @private */
+  _processAutomation() {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    if (!save || !this.isUnlocked() || BattleSystem.getInstance().isActive()) return;
+    let changed = false;
+    save.training.slots.forEach((slot, index) => {
+      if (!slot.autoEnabled || !slot.autoPurchased || slot.battle) return;
+      const options = slot.autoOptions;
+      if (!options.length) return;
+      const fee = FacilityStaffSystem.getInstance().getFee('training', TrainingRules.AUTOMATION_FEE);
+      if (save.currencies.get(FacilityRules.MONEY_CURRENCY) < fee) return;
+      let pokemon = save.collection.get(slot.pokemonUid);
+      let mode = options.find((id) => TrainingProgression.eligible(save, pokemon, id));
+      if (!mode) {
+        if (slot.pokemonUid) return;
+        const head=slot.queue[0]||this._automaticCandidates(index)[0]?.uid;
+        if (!head || !options.some((id) => TrainingProgression.eligible(save, save.collection.get(head), id))) return;
+        slot.pokemonUid=slot.queue.length?slot.queue.shift():head;
+        pokemon = save.collection.get(slot.pokemonUid);
+        mode = options.find((id) => TrainingProgression.eligible(save, pokemon, id));
+        changed = true;
+      }
+      if (this.startSession(pokemon.uid, mode, index, { automatic: true, persist: false }).result === 'ready') changed = true;
+    });
+    if (changed) this._commit();
   }
 
   /** @private */
-  _dispatchBattleChanged() {
-    EventBus.getInstance().dispatch(new TrainingBattleChangedEvent(this.getSnapshot()));
+  _ensureContext() {
+    if (SaveSystem.getInstance().getCurrentSave() !== this._saveRef) this._restoreSessions();
   }
-
-  /** @private @param {string} result */
-  _failure(result) {
-    const key = result === TrainingResults.FEATURE_LOCKED ? 'content_feature_locked' :
-      result === TrainingResults.WRONG_LOCATION ? 'training_location_required' :
-        result === TrainingResults.NEED_BADGE ? 'training_badge_required' :
-        result === TrainingResults.BATTLE_ACTIVE ? 'training_battle_active' :
-          result === TrainingResults.SESSION_ACTIVE ? 'training_session_active' :
-            result === TrainingResults.NO_MOVES ? 'training_no_moves' : 'training_action_unavailable';
-    if (result !== TrainingResults.NO_SAVE && result !== TrainingResults.POKEMON_NOT_FOUND) {
-      const params = result === TrainingResults.WRONG_LOCATION
-        ? { location: t(`location.${TrainingRules.LOCATION_ID}`) }
-        : result === TrainingResults.FEATURE_LOCKED
-          ? { feature: t('training_center_title') }
-          : {};
-      this._notify(t(key, params), NotificationTones.WARNING);
+  /** @private */
+  _restoreSessions() {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    this._sessions.clear();
+    this._saveId = save?.id || null;
+    this._saveRef = save;
+    this._autoElapsed = 0;
+    save?.training.slots.forEach((slot, index) => {
+      if (!slot.battle) return;
+      if (slot.battle.teamUids?.length !== 1 || slot.battle.teamUids[0] !== slot.pokemonUid) { slot.battle = null; slot.autoEnabled = false; return; }
+      const session = BattleSession.restore(slot.battle, { resolvePokemon: (uid) => save.collection.get(uid),
+        random: this._random, ...this._battleServices(save, slot.battle.locationId) });
+      if (session) this._sessions.set(index, session);
+      else { slot.battle = null; slot.autoEnabled = false; }
+    });
+    this._dispatchBattleChanged();
+  }
+  /** @private */
+  _captureSessions() {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    if (save !== this._saveRef) return;
+    for (const [index, session] of this._sessions) {
+      const slot = save.training.slots[index];
+      if (slot) slot.battle = { ...session.captureState(), locationId: slot.battle?.locationId || TrainingRules.LOCATION_ID };
     }
+  }
+  /** @private */
+  _battleServices(save, locationId) {
+    return { ownedQuantity: (id) => save.inventory.count(id), hiddenTalentUnlocked: (species) => save.talents.hasHidden(species),
+      onFoeDefeated: (encounter) => EventBus.getInstance().dispatch(new BattleFoeKnockedOutEvent(
+        encounter.pokemon.species, encounter.pokemon.level, locationId, { deferSave: true })) };
+  }
+  /** @private */
+  _createOpponents(trainee, random, mode) {
+    const pool = TrainingOpponentDB.getInstance().getSpeciesForType(trainee.getTypes()[0] || 'normal');
+    const base = Math.max(TrainingRules.MIN_OPPONENT_LEVEL, trainee.level + (TrainingRules.MODE_LEVEL_OFFSETS[mode] || 0));
+    const active = SaveSystem.getInstance().getCurrentSave()?.staff.active.training;
+    const level = active === 'trainer_saffron' ? SaveSystem.getInstance().getCurrentSave().staff.owned[active]?.level || 1 : 1;
+    const count = TrainingRules.OPPONENT_COUNT - Math.round(TrainingRules.MAX_STAFF_OPPONENT_REDUCTION * (level - 1) / (StaffRules.MAX_LEVEL - 1));
+    return pool.slice(0, count).map((species, index) => PokemonFactory.create(species,
+      Math.max(TrainingRules.MIN_OPPONENT_LEVEL, base + TrainingRules.LEVEL_VARIATION[index % TrainingRules.LEVEL_VARIATION.length]),
+      { random })).filter(Boolean);
+  }
+  /** @private */
+  _commit() {
+    this._captureSessions();
+    SaveSystem.getInstance().saveCurrent();
+    PokemonUsageSystem.getInstance().dispatchChanged();
+    this._dispatchBattleChanged();
+  }
+  /** @private */
+  _dispatchBattleChanged() { EventBus.getInstance().dispatch(new TrainingBattleChangedEvent(null)); }
+  /** @private */
+  _failure(result) {
+    if (result === TrainingResults.BATTLE_ACTIVE) this._notify(t('training_battle_active'), NotificationTones.WARNING);
     return { result, opponentCount: 0 };
   }
-
   /** @private */
-  _notify(text, tone) {
-    NotificationSystem.getInstance().notifyTemporary(text, {
-      channel: NotificationChannels.GAMEPLAY,
-      tone
-    });
-  }
-
-  /** @private @param {boolean} [clearResult=false] */
-  _resetSession(clearResult = false) {
-    if (this._trainee) PokemonUsageSystem.getInstance().release(PokemonUsageIds.TRAINING, this._trainee.uid);
-    this._session = null;
-    this._trainee = null;
-    this._mode = null;
-    this._locationId = null;
-    this._elapsedSeconds = 0;
-    if (clearResult) this._lastResult = null;
-  }
+  _notify(text, tone) { NotificationSystem.getInstance().notifyTemporary(text, { channel: NotificationChannels.GAMEPLAY, tone }); }
 }

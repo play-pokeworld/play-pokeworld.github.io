@@ -10,12 +10,15 @@
  * Pokémon knows one more move every LEVEL_STEP levels (ACTIVE_SLOTS at most).
  */
 
+import { ItemDB } from '../items/ItemDB.js';
+import { ItemKinds } from '../items/ItemKinds.js';
 import { MoveDB } from '../battle/MoveDB.js';
 import { TypeChart } from '../core/TypeChart.js';
 import { MoveConfig } from '../../config/MoveConfig.js';
 
 /** @type {Map<string, string[]>} pool cache, keyed by the sorted type ids */
 const poolCache = new Map();
+const trainingPoolCache = new Map();
 
 /** Sort key of a move inside its group (original `sorter`). */
 const compareMoves = (a, b) => {
@@ -56,6 +59,27 @@ export class MoveLearnset {
     if (pool.length === 0) pool.push(MoveConfig.FALLBACK_MOVE_ID);
     poolCache.set(key, Object.freeze(pool));
     return poolCache.get(key);
+  }
+
+  /**
+   * Training-only category: compatible moves minus the entire level pool and all TM/HM moves.
+   * This does not change the approved natural learnset or the active-move fallback.
+   * @param {string[]} types @returns {string[]}
+   */
+  static trainingPoolFor(types) {
+    const normalized = (types || []).map((type) => TypeChart.normalize(type)).filter(Boolean).sort();
+    const key = normalized.join('|');
+    if (trainingPoolCache.has(key)) return trainingPoolCache.get(key);
+    const excluded = new Set(MoveLearnset.poolFor(normalized));
+    for (const item of ItemDB.getInstance().getAll()) {
+      if ([ItemKinds.TM, ItemKinds.HM].includes(item.kind) && item.move) excluded.add(item.move);
+    }
+    const result = MoveDB.getInstance().getAll().filter((move) => !excluded.has(move.id) && move.learnTypes.length > 0 &&
+      (normalized.includes(move.type) || move.learnTypes.includes(MoveConfig.ANY_TYPE) ||
+        move.learnTypes.some((type) => normalized.includes(type))))
+      .sort(compareMoves).map((move) => move.id);
+    trainingPoolCache.set(key, Object.freeze(result));
+    return trainingPoolCache.get(key);
   }
 
   /**

@@ -7,9 +7,9 @@ import { DraggablePanel } from '../ui/DraggablePanel.js';
 import { UIContainer } from '../ui/UIContainer.js';
 import { UIText } from '../ui/UIText.js';
 import { UIButton } from '../ui/UIButton.js';
-import { UIImage } from '../ui/UIImage.js';
 import { UIIcon } from '../ui/UIIcon.js';
-import { UIPokemonSprite, PokemonSpriteSizes } from '../ui/UIPokemonSprite.js';
+import { UIItemSprite } from '../ui/UIItemSprite.js';
+import { PokemonGridEntry } from './components/PokemonGridEntry.js';
 import { LocationDB } from '../data/world/LocationDB.js';
 import { NpcDirectory } from '../data/world/NpcDirectory.js';
 import { PokemonDB } from '../data/pokemon/PokemonDB.js';
@@ -37,8 +37,11 @@ import { QuestProgressedEvent } from '../core/events/QuestProgressedEvent.js';
 import { RoamingRotationTickEvent } from '../core/events/RoamingRotationTickEvent.js';
 import { LanguageChangedEvent } from '../core/events/LanguageChangedEvent.js';
 import { FeatureAccessSystem } from '../systems/FeatureAccessSystem.js';
+import { LocationAlcoves } from './components/LocationAlcoves.js';
 import { LocationActions } from './components/LocationActions.js';
-import { CaughtStatusBall } from './components/CaughtStatusBall.js';
+import { EventBus } from '../core/EventBus.js';
+import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
+import { ModalIds } from '../config/ModalIds.js';
 import { WindowIds } from '../config/DashboardLayout.js';
 import { t } from '../localization/LocalizationManager.js';
 
@@ -63,6 +66,7 @@ export class LocationPanel extends DraggablePanel {
 
     this._content = new UIContainer({ id: 'tab-content', className: 'win-body pw-static-051' });
     this.addChild(this._content);
+    this._alcoves=new LocationAlcoves();this._content.addChild(this._alcoves);this._info=null;
 
     this.listen(LocationChangedEvent, () => this._render());
     this.listen(SecretBaseChangedEvent, () => this._render());
@@ -205,8 +209,8 @@ export class LocationPanel extends DraggablePanel {
       wildSection,
       LocationPanel._dropsGrid(locationId)
     ]);
-    this._content.clearChildren();
-    this._content.addChild(info);
+    if(this._info){this._content.removeChild(this._info);this._info.destroy();}
+    this._info=info;this._content.insertChildBefore(info,this._alcoves);this._alcoves.setLocation(locationId);
   }
 
   /** @private @param {number} [now=Date.now()] */
@@ -305,17 +309,7 @@ export class LocationPanel extends DraggablePanel {
           : pokedex?.isSeen(species.id)
             ? 'is-seen'
             : 'is-missing';
-      const sprite = new UIPokemonSprite({
-        species: species.id,
-        alt: name,
-        shiny: status === CaughtStatus.SHINY,
-        size: PokemonSpriteSizes.CONTEXT
-      });
-      const disc = new UIContainer({ className: 'pw-loc-wild-disc', children: [sprite] });
-      const caughtBall = new CaughtStatusBall();
-      caughtBall.setSpecies(species.id);
-      caughtBall.addClass('pw-caught-ball');
-      disc.addChild(caughtBall);
+      const disc = LocationPanel._speciesTile(species, name, status);
       const rarity = ({
         [EncounterRarities.COMMON]: EncounterRarities.COMMON,
         [EncounterRarities.UNCOMMON]: EncounterRarities.UNCOMMON,
@@ -349,17 +343,7 @@ export class LocationPanel extends DraggablePanel {
             : pokedex?.isSeen(species.id)
               ? 'is-seen'
               : 'is-missing';
-        const sprite = new UIPokemonSprite({
-          species: species.id,
-          alt: name,
-          shiny: status === CaughtStatus.SHINY,
-          size: PokemonSpriteSizes.CONTEXT
-        });
-        const disc = new UIContainer({ className: 'pw-loc-wild-disc', children: [sprite] });
-        const caughtBall = new CaughtStatusBall();
-        caughtBall.setSpecies(species.id);
-        caughtBall.addClass('pw-caught-ball');
-        disc.addChild(caughtBall);
+        const disc = LocationPanel._speciesTile(species, name, status);
         const percent = Math.round(RoamingRules.ENCOUNTER_CHANCE * 1000) / 10;
         grid.addChild(new UIContainer({
           className: `pw-loc-wild-card pw-loc-wild-card--roaming ${stateClass}`,
@@ -375,6 +359,22 @@ export class LocationPanel extends DraggablePanel {
     return grid;
   }
 
+  /** @private @param {Object} species @param {string} name @param {string} status */
+  static _speciesTile(species, name, status) {
+    return new PokemonGridEntry({
+      species: species.id,
+      alt: name,
+      shiny: status === CaughtStatus.SHINY,
+      className: 'dex-entry pw-grid-media',
+      title: name,
+      caughtStatus: status,
+      ariaLabel: name,
+      onClick: () => EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.POKEDEX, {
+        speciesId: species.id
+      }))
+    });
+  }
+
   /** @private @param {string} locationId */
   static _dropsGrid(locationId) {
     const locationIds = LocationDB.getInstance().getGroupLocations(locationId).map((location) => location.id);
@@ -385,16 +385,11 @@ export class LocationPanel extends DraggablePanel {
       const nameKey = `item.${itemId}.name`;
       const localizedName = t(nameKey);
       const name = localizedName === nameKey ? itemId : localizedName;
-      const icon = new UIImage({
-        src: ItemDB.getInstance().getImagePath(itemId),
-        alt: name,
-        className: 'pw-loc-drop-icon',
-        pixelated: true
-      });
+      const icon = new UIItemSprite({ itemId, alt: name, className: 'pw-grid-media' });
       const card = new UIContainer({
         className: 'pw-loc-wild-card pw-loc-drop-card',
         children: [
-          new UIContainer({ className: 'pw-loc-wild-disc pw-loc-drop-disc', children: [icon] }),
+          icon,
           new UIText({ className: 'pw-loc-drop-name', text: name })
         ]
       });

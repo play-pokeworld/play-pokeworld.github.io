@@ -29,6 +29,14 @@ import { BoxPokemonSelectedEvent } from '../../core/events/BoxPokemonSelectedEve
 import { BoxPokemonSelectionCancelledEvent } from '../../core/events/BoxPokemonSelectionCancelledEvent.js';
 import { BoxPokemonSelectionRemoveRequestedEvent } from '../../core/events/BoxPokemonSelectionRemoveRequestedEvent.js';
 import { FilterBar } from '../components/FilterBar.js';
+import { ItemUseSystem } from '../../systems/ItemUseSystem.js';
+import { ItemUseActions, ItemUseResults } from '../../config/ItemUseRules.js';
+import { ItemDB } from '../../data/items/ItemDB.js';
+import { ItemKinds } from '../../data/items/ItemKinds.js';
+import { MoveLearningSystem } from '../../systems/MoveLearningSystem.js';
+import { PokemonActionIds } from '../../config/PokemonUsageRules.js';
+import { NotificationSystem } from '../../systems/NotificationSystem.js';
+import { NotificationChannels, NotificationTones } from '../../config/NotificationConfig.js';
 import { LocalizationManager, t } from '../../localization/LocalizationManager.js';
 
 const SORTS = Object.freeze([
@@ -55,7 +63,9 @@ export class BoxPanel extends UIFullscreenPanel {
     super({ id: ModalIds.BOX, title: t('box_panel_title'), name: 'BoxPanel' });
     this._selectionRequestId = null;
     this._selectionAction = null;
+    this._selectionAllowedUids = null;
     this._selectionFooter = null;
+    this._itemUseId = null;
     this._sort = 'id';
     this._sortDirection = DEFAULT_SORT_DIRECTION.id;
     for (const eventClass of [BoxChangedEvent, PokemonUsageChangedEvent, SaveCreatedEvent, SaveLoadedEvent, SaveDeletedEvent]) {
@@ -67,6 +77,10 @@ export class BoxPanel extends UIFullscreenPanel {
 
   /** @override @param {Object} [params={}] */
   onOpen(params = {}) {
+    const nextItemUseId = typeof params?.itemUseId === 'string' && params.itemUseId
+      ? params.itemUseId
+      : null;
+    this._itemUseId = nextItemUseId;
     const nextRequestId = typeof params?.selectionRequestId === 'string' && params.selectionRequestId
       ? params.selectionRequestId
       : null;
@@ -77,6 +91,9 @@ export class BoxPanel extends UIFullscreenPanel {
     this._selectionAction = nextRequestId && typeof params?.selectionAction === 'string' && params.selectionAction
       ? params.selectionAction
       : null;
+    this.toggleClass('pw-box-selector-mode', !!(nextRequestId || nextItemUseId));
+    this._selectionAllowedUids = nextRequestId && Array.isArray(params.selectionAllowedUids)
+      ? new Set(params.selectionAllowedUids.filter((uid) => typeof uid === 'string')) : null;
     const footer = params?.selectionFooter;
     this._selectionFooter = this._selectionRequestId && footer
       && typeof footer.label === 'string'
@@ -88,23 +105,77 @@ export class BoxPanel extends UIFullscreenPanel {
         removeDisabled: footer.removeDisabled === true
       }
       : null;
-    this.setTitle(this._selectionRequestId ? t('box_select_pokemon_title') : t('box_panel_title'));
+    this._updateTitle();
     this._render();
   }
 
   /** @override */
   onClose() {
+    this.removeClass('pw-box-selector-mode');
+    const wasItemUse = !!this._itemUseId;
+    this._itemUseId = null;
     const requestId = this._selectionRequestId;
     this._selectionRequestId = null;
     this._selectionAction = null;
+    this._selectionAllowedUids = null;
     this._selectionFooter = null;
     this.setTitle(t('box_panel_title'));
     this.setFooter([]);
     if (requestId) EventBus.getInstance().dispatch(new BoxPokemonSelectionCancelledEvent(requestId));
+    if (wasItemUse) EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.BAG));
+  }
+
+  /** @private */
+  _updateTitle() {
+    if (this._itemUseId) {
+      const save = SaveSystem.getInstance().getCurrentSave();
+      const qty = save ? save.inventory.count(this._itemUseId) : 0;
+      const item = ItemDB.getInstance().getById(this._itemUseId);
+      const isTmHm = item && [ItemKinds.TM, ItemKinds.HM].includes(item.kind);
+      if (isTmHm && item.move) {
+        const tmKind = (this._itemUseId.startsWith('cs') || item.kind === ItemKinds.HM) ? 'CS' : 'CT';
+        const moveName = LocalizationManager.getInstance().has(`move.${item.move}`)
+          ? t(`move.${item.move}`)
+          : item.move;
+        this.setTitle(`${t('teaching_move')} ${moveName} (${tmKind}) · ×${qty}`);
+      } else {
+        const itemName = LocalizationManager.getInstance().has(`item.${this._itemUseId}.name`)
+          ? t(`item.${this._itemUseId}.name`)
+          : this._itemUseId;
+        this.setTitle(`${t('selector_title_item_use')} · ${itemName} ×${qty}`);
+      }
+    } else if (this._selectionRequestId) {
+      this.setTitle(t('box_select_pokemon_title'));
+    } else {
+      this.setTitle(t('box_panel_title'));
+    }
   }
 
   /** @private */
   _selectionFooterView() {
+    if (this._itemUseId) {
+      const save = SaveSystem.getInstance().getCurrentSave();
+      const qty = save ? save.inventory.count(this._itemUseId) : 0;
+      const item = ItemDB.getInstance().getById(this._itemUseId);
+      const isTmHm = item && [ItemKinds.TM, ItemKinds.HM].includes(item.kind);
+      let label = '';
+      if (isTmHm && item.move) {
+        const moveName = LocalizationManager.getInstance().has(`move.${item.move}`)
+          ? t(`move.${item.move}`)
+          : item.move;
+        label = t('box_item_use_instruction_move', { move: moveName, qty });
+      } else {
+        const itemName = LocalizationManager.getInstance().has(`item.${this._itemUseId}.name`)
+          ? t(`item.${this._itemUseId}.name`)
+          : this._itemUseId;
+        label = t('box_item_use_instruction', { item: itemName, qty });
+      }
+      return new BoxSelectionFooter({
+        label,
+        cancelLabel: t('back_bag'),
+        onCancel: () => this.close()
+      });
+    }
     if (!this._selectionFooter || !this._selectionRequestId) return null;
     return new BoxSelectionFooter({
       ...this._selectionFooter,
@@ -120,7 +191,7 @@ export class BoxPanel extends UIFullscreenPanel {
 
   /** @private */
   _render() {
-    this.setFooter(this._selectionFooter ? [this._selectionFooterView()] : []);
+    this.setFooter((this._selectionFooter || this._itemUseId) ? [this._selectionFooterView()] : []);
     const focusKey = this._captureFocusKey();
     const save = SaveSystem.getInstance().getCurrentSave();
     if (!save) {
@@ -141,10 +212,24 @@ export class BoxPanel extends UIFullscreenPanel {
    */
   _entries() {
     const all = BoxSystem.getInstance().getAll();
+    if (this._itemUseId) {
+      const usage = PokemonUsageSystem.getInstance();
+      const item = ItemDB.getInstance().getById(this._itemUseId);
+      const isTmHm = item && [ItemKinds.TM, ItemKinds.HM].includes(item.kind);
+      const moveLearning = MoveLearningSystem.getInstance();
+      return all.filter((pokemon) => {
+        if (!usage.canPerform(pokemon.uid, PokemonActionIds.USE_ITEM)) return false;
+        if (isTmHm) {
+          return moveLearning.canUnlockWithItem(this._itemUseId, pokemon);
+        }
+        return true;
+      });
+    }
     const action = this._selectionRequestId ? this._selectionAction : null;
-    if (!action) return all;
+    const allowed = this._selectionRequestId ? this._selectionAllowedUids : null;
+    if (!action && !allowed) return all;
     const usage = PokemonUsageSystem.getInstance();
-    return all.filter((pokemon) => usage.canPerform(pokemon.uid, action));
+    return all.filter((pokemon) => (!allowed || allowed.has(pokemon.uid)) && (!action || usage.canPerform(pokemon.uid, action)));
   }
 
   /** @private @returns {string|null} */
@@ -256,7 +341,27 @@ export class BoxPanel extends UIFullscreenPanel {
     const content = new UIContainer({
       className: `pw-box-panel${this._selectionRequestId ? ' pw-box-panel--selection' : ''}`
     });
-    if (this._selectionRequestId) {
+    if (this._itemUseId) {
+      const qty = save ? save.inventory.count(this._itemUseId) : 0;
+      const item = ItemDB.getInstance().getById(this._itemUseId);
+      const isTmHm = item && [ItemKinds.TM, ItemKinds.HM].includes(item.kind);
+      let instructionText = '';
+      if (isTmHm && item.move) {
+        const moveName = LocalizationManager.getInstance().has(`move.${item.move}`)
+          ? t(`move.${item.move}`)
+          : item.move;
+        instructionText = t('box_item_use_instruction_move', { move: moveName, qty });
+      } else {
+        const itemName = LocalizationManager.getInstance().has(`item.${this._itemUseId}.name`)
+          ? t(`item.${this._itemUseId}.name`)
+          : this._itemUseId;
+        instructionText = t('box_item_use_instruction', { item: itemName, qty });
+      }
+      content.addChild(new UIText({
+        className: 'pw-box-instruction',
+        text: instructionText
+      }));
+    } else if (this._selectionRequestId) {
       content.addChild(new UIText({
         className: 'pw-box-instruction',
         text: t('box_select_pokemon_instruction')
@@ -319,7 +424,9 @@ export class BoxPanel extends UIFullscreenPanel {
       ariaLabel: t('box_storage_section')
     });
     if (total === 0) {
-      const emptyKey = this._selectionRequestId && this._selectionAction ? 'box_selection_empty' : 'box_storage_empty';
+      const emptyKey = this._itemUseId
+        ? 'no_pokemon_found'
+        : (this._selectionRequestId && this._selectionAction ? 'box_selection_empty' : 'box_storage_empty');
       list.addChild(new UIText({ className: 'pw-empty-state-md', text: t(emptyKey) }));
       return list;
     }
@@ -336,6 +443,10 @@ export class BoxPanel extends UIFullscreenPanel {
     const name = pokemon.getDisplayName();
     const detailsLabel = t('box_open_details', { name });
     const selectionRequestId = this._selectionRequestId;
+    const itemUseId = this._itemUseId;
+    const cardTitle = itemUseId
+      ? t('box_item_use_pokemon_aria', { name })
+      : (selectionRequestId ? t('box_select_pokemon_aria', { name }) : detailsLabel);
     const tile = new PokemonGridEntry({
       species: pokemon.species,
       form: pokemon.form,
@@ -345,11 +456,15 @@ export class BoxPanel extends UIFullscreenPanel {
       markerClassName: 'box-level pw-box-level',
       shinyClassName: 'box-shiny',
       className: 'dex-entry pw-box-pokemon-tile',
-      title: selectionRequestId ? t('box_select_pokemon_aria', { name }) : detailsLabel,
-      ariaLabel: selectionRequestId ? t('box_select_pokemon_aria', { name }) : detailsLabel,
-      focusKey: `box-${pokemon.uid}-${selectionRequestId ? 'select' : 'info'}`,
+      title: cardTitle,
+      ariaLabel: cardTitle,
+      focusKey: `box-${pokemon.uid}-${itemUseId ? 'use' : (selectionRequestId ? 'select' : 'info')}`,
       formBadge: pokemon.form ? t('box_form_badge') : '',
       onClick: () => {
+        if (itemUseId) {
+          this._handleItemUse(pokemon.uid);
+          return;
+        }
         if (selectionRequestId) {
           EventBus.getInstance().dispatch(new BoxPokemonSelectedEvent(selectionRequestId, pokemon.uid));
           this.close();
@@ -393,5 +508,44 @@ export class BoxPanel extends UIFullscreenPanel {
     }
     if (metadata.getChildren().length) entry.addChild(metadata);
     return entry;
+  }
+
+  /** @private @param {string} uid */
+  _handleItemUse(uid) {
+    if (!this._itemUseId) return;
+    const save = SaveSystem.getInstance().getCurrentSave();
+    if (!save) return;
+    const itemId = this._itemUseId;
+    const itemUseSystem = ItemUseSystem.getInstance();
+    const action = itemUseSystem.getUseAction(itemId);
+    const result = itemUseSystem.useOnPokemon(itemId, uid);
+
+    if (result.result === ItemUseResults.SUCCESS) {
+      const remaining = save.inventory.count(itemId);
+      if (remaining > 0) {
+        this._updateTitle();
+        this._render();
+      } else {
+        this.close();
+      }
+    } else if (result.result === ItemUseResults.TARGET_INELIGIBLE) {
+      const pokemon = BoxSystem.getInstance().getPokemonByUid(uid);
+      const name = pokemon ? pokemon.getDisplayName() : '';
+      let msg = t('item_use_target_invalid');
+      if (action === ItemUseActions.RARE_CANDY) {
+        msg = t('item_use_max_level', { name });
+      } else if (action === ItemUseActions.VITAMIN) {
+        msg = t('item_use_max_evs', { name });
+      }
+      NotificationSystem.getInstance().notifyTemporary(msg, {
+        channel: NotificationChannels.GAMEPLAY,
+        tone: NotificationTones.WARNING
+      });
+    } else if (result.result === ItemUseResults.BATTLE_ACTIVE) {
+      NotificationSystem.getInstance().notifyTemporary(t('item_use_battle_locked'), {
+        channel: NotificationChannels.GAMEPLAY,
+        tone: NotificationTones.WARNING
+      });
+    }
   }
 }

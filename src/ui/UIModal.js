@@ -10,6 +10,7 @@ import { UIPanel } from './UIPanel.js';
 import { UIButton } from './UIButton.js';
 import { EventBus } from '../core/EventBus.js';
 import { ModalToggledEvent } from '../core/events/ModalToggledEvent.js';
+import { ModalCloseRequestedEvent } from '../core/events/ModalCloseRequestedEvent.js';
 import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
 import { t } from '../localization/LocalizationManager.js';
 
@@ -31,12 +32,13 @@ export class UIModal extends UIPanel {
    */
   constructor(options = {}) {
     const hasHeader = options.hasHeader !== false;
+    const size = options.size || 'md';
 
     super({
       id: options.id,
       title: options.title || '',
       variant: 'modal-window',
-      className: `pw-modal--${options.size || 'md'} ${options.className || ''}`.trim(),
+      className: `pw-modal--${size} ${options.className || ''}`.trim(),
       // UIPanel only builds a header when hasHeader === true or a title exists.
       hasHeader: hasHeader ? true : false,
       hasFooter: options.hasFooter || false,
@@ -45,6 +47,7 @@ export class UIModal extends UIPanel {
       name: options.name || 'UIModal',
     });
 
+    this._size = size;
     this._closeOnBackdrop = options.closeOnBackdrop !== false;
     this._isOpen = false;
 
@@ -84,6 +87,7 @@ export class UIModal extends UIPanel {
     });
 
     // Open on request (ModalIds): released automatically when the modal is destroyed
+    this.listen(ModalCloseRequestedEvent,event=>{if(event.modalId===this.getId())this.close();});
     this.listen(ModalOpenRequestedEvent, (event) => {
       if (event.modalId && event.modalId === this.getId()) this.open(event.params);
     });
@@ -112,6 +116,11 @@ export class UIModal extends UIPanel {
   /** @returns {boolean} */
   isOpen() {
     return this._isOpen;
+  }
+
+  /** @returns {string} ('sm'|'md'|'lg') */
+  getSize() {
+    return this._size;
   }
 
   /**

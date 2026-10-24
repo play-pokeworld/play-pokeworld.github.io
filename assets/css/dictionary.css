@@ -1,0 +1,374 @@
+/* ==========================================================================
+   PokéWorld — Dictionary fullscreen panel & detail modal
+   ========================================================================== */
+
+/* Fullscreen dictionary */
+#fs-dictionary.pw-fullscreen-overlay .pw-modal-search-bar.is-filled {
+  display: block;
+  padding: 8px 16px 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.dict-toolbar {
+  width: 100%;
+}
+
+.dict-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dict-search {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.dict-grid-root {
+  width: 100%;
+}
+
+.dict-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
+  gap: 10px;
+  width: 100%;
+}
+
+.dict-entry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--dark3);
+  border-left: 4px solid var(--type-color, var(--dark3));
+  border-radius: 9px;
+  padding: 9px;
+  cursor: pointer;
+  min-height: 60px;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  min-width: 0;
+}
+
+.dict-entry:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--light2);
+}
+
+.dict-entry.owned {
+  border-color: rgba(96, 190, 88, 0.65);
+}
+
+.dict-entry-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--dark1);
+  border-radius: 8px;
+  flex: none;
+}
+
+.dict-entry-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.dict-entry b {
+  display: block;
+  font-size: 13px;
+  color: var(--light2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dict-entry span {
+  color: var(--light1);
+  font-size: 11px;
+}
+
+.dict-entry .type-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+
+.dict-entry-icon .pw-dict-talent-icon {
+  width: 22px;
+  height: 22px;
+  color: var(--light2);
+}
+
+/* Detail modal */
+#pw-dictionary-detail-overlay {
+  z-index: 35000 !important;
+}
+
+#pw-dictionary-detail.pw-static-modal {
+  width: min(var(--pw-panel-w-info, 560px), 94vw);
+  max-width: var(--pw-panel-w-info, 560px);
+  max-height: 88vh;
+  box-sizing: border-box;
+}
+
+#pw-dictionary-detail .win-body {
+  overflow-y: auto;
+  padding: 12px;
+  box-sizing: border-box;
+  max-height: calc(88vh - 48px);
+}
+
+.pw-info-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.pw-info-head .pw-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.pw-info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: 40px;
+  min-height: 40px;
+}
+
+.pw-info-icon .type-badge {
+  font-size: 12px;
+  padding: 6px 10px;
+  font-weight: 800;
+}
+
+.pw-info-head-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.pw-info-name {
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  color: var(--light2);
+  line-height: 1.2;
+}
+
+.pw-info-stat-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 8px;
+  margin: 0 0 10px 0;
+}
+
+.pw-card-dark.pw-center {
+  background: var(--dark1);
+  border: 1px solid var(--dark3);
+  border-radius: 8px;
+  padding: 8px 12px;
+  text-align: center;
+}
+
+.pw-card-dark .pw-text-lg {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.pw-info-section {
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--dark3);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+
+.pw-section-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--light2);
+  margin-bottom: 6px;
+}
+
+.pw-info-section-body {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--light2);
+}
+
+.pw-info-row-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--dark1);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--dark3);
+  margin-bottom: 10px;
+}
+
+.pw-src-list {
+  display: grid;
+  gap: 4px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.pw-src-line {
+  font-size: 11.5px;
+  color: var(--light1);
+  background: var(--dark1);
+  border-radius: 6px;
+  padding: 5px 9px;
+}
+
+.pw-move-effect-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--light2);
+}
+
+.dict-chip-line {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.dict-chip-line > b {
+  color: var(--light2);
+  font-size: 11px;
+}
+
+.dict-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 132px;
+  overflow-y: auto;
+}
+
+.dict-chip {
+  background: rgba(236, 222, 183, 0.1);
+  border: 1px solid var(--dark3);
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 11px;
+  color: var(--light2);
+}
+
+.dict-chip-hidden {
+  border-color: rgba(183, 99, 207, 0.65) !important;
+}
+
+.dict-muted {
+  color: var(--light1);
+  font-size: 12px;
+}
+
+.pw-info-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.pw-info-back-btn {
+  min-width: 140px;
+  font-weight: 700;
+}
+
+/* Stat cards vertical stacking */
+.pw-info-stat-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 8px;
+  margin: 0 0 10px 0;
+}
+.pw-info-stat-cards .pw-card-dark.pw-center {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  background: var(--dark1);
+  border: 1px solid var(--dark3);
+  border-radius: 8px;
+  padding: 8px 12px;
+  text-align: center;
+}
+.pw-info-stat-cards .pw-text-sm {
+  font-size: 11.5px;
+  color: var(--light1);
+}
+.pw-info-stat-cards .pw-text-lg {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--light2);
+}
+.pw-info-stat-cards .pw-info-value-green {
+  color: var(--green) !important;
+}
+
+/* Item images */
+.dict-entry-item-img {
+  width: 32px;
+  height: 32px;
+  max-width: 32px;
+  max-height: 32px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.pw-info-item-img {
+  width: 48px;
+  height: 48px;
+  max-width: 48px;
+  max-height: 48px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+/* Source lines */
+.pw-src-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--light1);
+  background: var(--dark1);
+  border: 1px solid var(--dark3);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+.pw-src-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--light2);
+}
+.pw-effect-bullet-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--accent);
+}

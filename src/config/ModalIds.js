@@ -11,12 +11,18 @@ export const ModalIds = Object.freeze({
   REGIONAL_STARTER: 'pw-regional-starter',
   TEAM: 'team-modal',
   TEAM_PRESETS: 'team-presets-modal',
+  TEAM_PRESET_EDITOR:'pw-team-preset-editor',
   POKEMON_INFO: 'poke-modal-inner',
   /** Params: { itemId }; choose a valid Pokémon for an inventory item. */
   ITEM_TARGET: 'pw-item-target',
   /** Params: { pokemonUid, location, moveId }; select a move slot to learn into. */
   MOVE_LEARN: 'pw-move-learn',
   BATTLE_SUMMARY: 'battle-summary-inner',
+  HATCHERY_MANAGEMENT: 'pw-hatchery-management',
+  TRAINING_MANAGEMENT: 'pw-training-management',
+  MINE_MANAGEMENT: 'pw-mine-management',
+  HATCHERY_FOSSILS: 'pw-hatchery-fossils',
+  FOSSIL_LAB: 'pw-fossil-lab',
   SETTINGS: 'settings-window',
   /** Localized people and dialogue at the current location. */
   NPC_TALK: 'pw-npc-talk',
@@ -35,9 +41,13 @@ export const ModalIds = Object.freeze({
   BALL_FILTERS: 'pw-ball-editor',
   /** Full-screen panels (UIFullscreenPanel) */
   SHOP: 'fs-shop',
+  MARKET: 'fs-market',
   BAG: 'fs-inventory',
   BOX: 'fs-box',
   BADGES: 'fs-badges',
   POKEDEX: 'fs-pokedex',
-  GUIDE: 'fs-guide'
+  RELAUNCH_CONFIRM_PREFIX:'pw-relaunch-confirm-',
+  GUIDE: 'fs-guide',
+  DICTIONARY: 'fs-dictionary',
+  DICTIONARY_DETAIL: 'pw-dictionary-detail'
 });

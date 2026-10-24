@@ -127,19 +127,19 @@ describe('Secret Base', (test) => {
   test('LocationPanel refreshes the established alcove action into own-base entry', () => {
     newUnlockedHoennSave();
     const panel = new LocationPanel(DashboardColumns.RIGHT);
-    const tile = () => panel.getDomElement().querySelector('.pw-loc-action-grid')?.children
+    const tile = () => panel.getDomElement().querySelector('.pw-loc-alcove-list')?.children
       .find((child) => child.getAttribute('data-secret-base-layout') === 'tree_1') || null;
 
     const preview = tile();
     assert.ok(preview, 'the current route exposes the alcove preview');
-    preview.click();
+    preview.querySelector('button').click();
     assert.equal(baseSystem.getVisitSnapshot()?.source, 'alcove');
     assert.ok(baseSystem.establish('route101', 'tree_1').ok);
     assert.equal(baseSystem.getVisitSnapshot(), null, 'establishment ends the temporary preview');
 
     const ownBaseAction = tile();
     assert.ok(ownBaseAction, 'the current route action is rebuilt after establishment');
-    ownBaseAction.click();
+    ownBaseAction.querySelector('button').click();
     assert.equal(baseSystem.getVisitSnapshot()?.source, 'own', 'the refreshed tile enters the owned base');
 
     baseSystem.stopVisit();

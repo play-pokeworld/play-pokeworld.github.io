@@ -12,6 +12,7 @@ export const TeamPresetRules = Object.freeze({
   NAME_MAX_LENGTH: 24,
   /** Maximum number of Pokémon in one saved party. */
   MAX_MEMBERS: 6,
+  SELECTION_PREFIX:'preset-pokemon-',
   /** Default selected slot for a new or migrated save. */
   DEFAULT_ACTIVE_ID: PRESET_IDS[0],
   /** Stable slot ids in display order. */

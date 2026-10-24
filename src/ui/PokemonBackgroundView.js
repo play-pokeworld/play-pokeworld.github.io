@@ -1,123 +1,219 @@
-/**
- * @file PokemonBackgroundView.js
- * @brief Decorative collection layer for the active game page; rendering only.
- *
- * The save's caught Pokédex entries are supplied by PokedexData and observed through
- * typed events. Movement, size and timing are expressed with CSS classes only.
- */
-
+/** @file PokemonBackgroundView.js @brief Bounded decorative collection pool; CSS flies, a quiet view poll schedules offscreen journeys. */
 import { UIContainer } from './UIContainer.js';
 import { UIImage } from './UIImage.js';
 import { SaveSystem } from '../systems/SaveSystem.js';
-import { Random } from '../core/Random.js';
+import { SeededRandom } from '../core/SeededRandom.js';
 import { AssetPaths } from '../config/AssetPaths.js';
+import { PokemonBackgroundRules as R } from '../config/PokemonBackgroundRules.js';
+import { PokemonFlightRules } from './background/PokemonFlightRules.js';
 import { PokedexChangedEvent } from '../core/events/PokedexChangedEvent.js';
 import { SaveLoadedEvent } from '../core/events/SaveLoadedEvent.js';
 import { SaveCreatedEvent } from '../core/events/SaveCreatedEvent.js';
-
-const MIN_WALKERS = 5;
-const CAUGHT_PER_EXTRA_WALKER = 10;
-
-/**
- * A quiet, pointer-transparent illustration of the save's caught collection.
- * The CSS animation has no dependency on the game clock or battle loop.
- */
+import { SaveDeletedEvent } from '../core/events/SaveDeletedEvent.js';
 export class PokemonBackgroundView extends UIContainer {
-  constructor({ random = Random.default } = {}) {
+  constructor({
+    random = null,
+    clock = () => performance.now(),
+    viewport = () => ({ width: window.innerWidth, height: window.innerHeight }),
+  } = {}) {
     super({
       id: 'pw-background-pokemon-layer',
       className: 'pw-background-pokemon-layer',
-      name: 'PokemonBackgroundView'
+      name: 'PokemonBackgroundView',
     });
-    this._random = random && typeof random.int === 'function' && typeof random.pick === 'function'
-      ? random
-      : Random.default;
-    this.setAttribute('aria-hidden', 'true');
-    this._rosterSignature = '';
-    /** @private @type {Array<{image: UIImage}>} */
+    this._clock = clock;
+    this._viewportSource = viewport;
+    this._random = random || new SeededRandom(Date.now() ^ Math.floor(clock()));
+    this._roster = [];
     this._walkers = [];
-
-    this.listen(PokedexChangedEvent, () => this.refresh());
-    this.listen(SaveLoadedEvent, () => this.refresh());
-    this.listen(SaveCreatedEvent, () => this.refresh());
+    this._save = null;
+    this._signature = '';
+    this._viewport = { width: 0, height: 0 };
+    this._nextSpawn = 0;
+    this._nextPoll = 0;
+    this._pageActive = true;
+    this._media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    this._resize = () => this.refresh(true);
+    this._motionChange = () => this.refresh(true);
+    this._visibility = () => this.refresh(true);
+    window.addEventListener('resize', this._resize);
+    this._media.addEventListener?.('change', this._motionChange);
+    document.addEventListener('visibilitychange', this._visibility);
+    this.setAttribute('aria-hidden', 'true');
+    for (const type of [
+      PokedexChangedEvent,
+      SaveLoadedEvent,
+      SaveCreatedEvent,
+      SaveDeletedEvent,
+    ])
+      this.listen(type, () => this.refresh());
     this.refresh();
   }
-
-  /** Reconciles the decorative roster with the active save. */
-  refresh() {
-    const save = SaveSystem.getInstance().getCurrentSave();
-    const roster = save?.pokedex.getCaughtSpecies() || [];
-    const signature = roster.map(({ species, shiny }) => `${species}:${shiny ? 1 : 0}`).join('|');
-    if (signature === this._rosterSignature) return;
-
-    this._rosterSignature = signature;
-    this.clearChildren();
-    this._walkers = [];
-
-    const walkerCount = roster.length === 0
-      ? 0
-      : MIN_WALKERS + Math.floor(roster.length / CAUGHT_PER_EXTRA_WALKER);
-    for (let index = 0; index < walkerCount; index++) {
-      this._walkers.push(this._createWalker(index, roster));
+  /** Reconcile captured species without interrupting journeys on ordinary Dex updates. */
+  refresh(reset = false) {
+    const save = SaveSystem.getInstance().getCurrentSave(),
+      roster = save?.pokedex.getCaughtSpecies() || [],
+      viewport = this._viewportSource();
+    const signature = roster
+      .map((p) => `${p.species}:${p.shiny ? 1 : 0}`)
+      .join('|');
+    const resized =
+      viewport.width !== this._viewport.width ||
+      viewport.height !== this._viewport.height;
+    const changed = signature !== this._signature || save !== this._save;
+    if (!reset && !resized && !changed) return;
+    if (reset || resized || save !== this._save) this._resetFlights();
+    this._save = save;
+    this._roster = roster;
+    this._signature = signature;
+    this._viewport = viewport;
+    const count = PokemonFlightRules.count(roster.length, viewport);
+    while (this._walkers.length > count) {
+      const walker = this._walkers.pop();
+      this.removeChild(walker.root);
+      walker.root.destroy();
     }
-    this.toggleClass('has-walkers', walkerCount > 0);
+    while (this._walkers.length < count) this._createWalker();
+    this.toggleClass('has-walkers', count > 0);
+    this._nextPoll = 0;
+    this._poll();
   }
-
-  /** @private @param {number} index @param {Array<{species: string, shiny: boolean}>} roster */
-  _createWalker(index, roster) {
-    const route = this._random.int(0, 3);
-    const profile = [
-      ...this._routeClasses(route),
-      `pw-background-pokemon-walker--size-${index % 5}`,
-      `pw-background-pokemon-walker--speed-${index % 6}`,
-      `pw-background-pokemon-walker--phase-${index % 8}`
-    ].join(' ');
-    const walker = new UIContainer({
-      className: `pw-background-pokemon-walker ${profile}`,
-      name: 'BackgroundPokemonWalker'
+  /** @private */
+  _createWalker() {
+    const root = new UIContainer({
+      className: 'pw-background-pokemon-walker',
+      name: 'BackgroundPokemonWalker',
     });
     const image = new UIImage({
       className: 'pw-background-pokemon-sprite',
       alt: '',
-      pixelated: true
+      pixelated: true,
+      loading: 'eager',
     });
-    walker.addChild(image);
-    walker.addDomListener('animationiteration', () => {
-      this._setRandomSpecies(image, roster);
-      this._randomizeRoute(walker);
+    root.addChild(image);
+    this.addChild(root);
+    this._walkers.push({
+      root,
+      image,
+      flight: null,
+      retryAt: 0,
+      cycle: false,
+      previousSpecies: null,
+      committedAt: 0,
     });
-    this._setRandomSpecies(image, roster);
-    this.addChild(walker);
-    return { image };
   }
-
-  /** @private @param {number} route @returns {string[]} */
-  _routeClasses(route) {
-    // Match the original: travel across one diagonal, facing the horizontal direction of travel.
-    const facing = route === 1 || route === 3 ? 'left' : 'right';
-    return [
-      `pw-background-pokemon-walker--route-${route}`,
-      `pw-background-pokemon-walker--facing-${facing}`
-    ];
+  /** @private */
+  _resetFlights() {
+    for (const walker of this._walkers) {
+      walker.root.removeClass('is-flying');
+      walker.flight = null;
+      walker.retryAt = 0;
+    }
+    this._nextSpawn = this._clock();
   }
-
-  /** @private @param {UIContainer} walker */
-  _randomizeRoute(walker) {
-    for (let route = 0; route < 4; route++) walker.removeClass(`pw-background-pokemon-walker--route-${route}`);
-    walker.removeClass('pw-background-pokemon-walker--facing-left');
-    walker.removeClass('pw-background-pokemon-walker--facing-right');
-    for (let phase = 0; phase < 8; phase++) walker.removeClass(`pw-background-pokemon-walker--phase-${phase}`);
-    const route = this._random.int(0, 3);
-    this._routeClasses(route).forEach((className) => walker.addClass(className));
-    // Initial entrants are phase-staggered. Subsequent trips begin at the new route's entrance.
-    walker.addClass('pw-background-pokemon-walker--phase-active');
+  /** @private */
+  _motionAllowed() {
+    return (
+      this._pageActive &&
+      !this._media.matches &&
+      document.visibilityState !== 'hidden'
+    );
   }
-
-  /** @private @param {UIImage} image @param {Array<{species: string, shiny: boolean}>} roster */
-  _setRandomSpecies(image, roster) {
-    if (!roster.length) return;
-    const entry = this._random.pick(roster);
-    image.setSource(AssetPaths.pokemonSprite(entry.species, '', entry.shiny));
-    image.toggleClass('is-shiny', entry.shiny);
+  /** @private */
+  _poll() {
+    if (!this._motionAllowed()) return;
+    const now = this._clock();
+    if (now < this._nextPoll) return;
+    this._nextPoll = now + R.POLL_MS;
+    for (const walker of this._walkers) {
+      if (walker.flight && now >= walker.flight.endAt) {
+        walker.flight = null;
+        walker.root.removeClass('is-flying');
+      }
+      if (walker.flight || now < walker.retryAt || !this._roster.length)
+        continue;
+      const startAt = Math.max(now, this._nextSpawn);
+      const peers = this._walkers
+        .filter((other) => other !== walker)
+        .map((other) => other.flight)
+        .filter(Boolean);
+      const flight = PokemonFlightRules.plan(
+        this._random,
+        this._viewport,
+        peers,
+        startAt,
+      );
+      if (!flight) {
+        walker.retryAt = now + R.RETRY_MS;
+        continue;
+      }
+      const alternate = this._roster.filter(
+          (p) => p.species !== walker.previousSpecies,
+        ),
+        entry = this._random.pick(alternate.length ? alternate : this._roster);
+      walker.image.setSource(
+        AssetPaths.pokemonSprite(entry.species, '', entry.shiny),
+      );
+      walker.image.toggleClass('is-shiny', entry.shiny);
+      walker.previousSpecies = entry.species;
+      walker.flight = flight;
+      walker.committedAt = now;
+      walker.cycle = !walker.cycle;
+      this._nextSpawn = flight.startAt + this._random.int(...R.SPAWN_GAP_MS);
+      for (const [key, value] of Object.entries({
+        x0: flight.from.x,
+        y0: flight.from.y,
+        x1: flight.to.x,
+        y1: flight.to.y,
+        size: flight.size,
+      }))
+        walker.root._setCssVariable(
+          `--pw-background-${key}`,
+          `${value.toFixed(3)}px`,
+        );
+      walker.root._setCssVariable(
+        '--pw-background-duration',
+        `${flight.duration}ms`,
+      );
+      walker.root._setCssVariable(
+        '--pw-background-delay',
+        `${Math.max(0, flight.startAt - now)}ms`,
+      );
+      walker.root.toggleClass(
+        'pw-background-pokemon-walker--facing-left',
+        flight.to.x < flight.from.x,
+      );
+      walker.root.toggleClass(
+        'pw-background-pokemon-walker--facing-right',
+        flight.to.x >= flight.from.x,
+      );
+      walker.root.toggleClass('flight-a', walker.cycle);
+      walker.root.toggleClass('flight-b', !walker.cycle);
+      walker.root.addClass('is-flying');
+    }
+  }
+  /** @override */
+  onUpdate() {
+    this._poll();
+  }
+  /** @override */
+  onEnter() {
+    this._pageActive = true;
+    this.refresh(true);
+    super.onEnter();
+  }
+  /** @override */
+  onExit() {
+    this._pageActive = false;
+    this._resetFlights();
+    super.onExit();
+  }
+  /** @override */
+  onDestroy() {
+    window.removeEventListener('resize', this._resize);
+    this._media.removeEventListener?.('change', this._motionChange);
+    document.removeEventListener('visibilitychange', this._visibility);
+    this._resetFlights();
+    super.onDestroy();
   }
 }

@@ -6,6 +6,7 @@ import { describe, assert } from './TestRunner.js';
 import { EventBus } from '../src/core/EventBus.js';
 import { Random } from '../src/core/Random.js';
 import { DataValidator } from '../src/data/core/DataValidator.js';
+import { MigrationV17ToV18 } from '../src/data/save/migrations/MigrationV17ToV18.js';
 import { SaveMigrator } from '../src/data/save/migrations/SaveMigrator.js';
 import { SaveData } from '../src/data/save/SaveData.js';
 import { SaveSchema } from '../src/config/SaveSchema.js';
@@ -808,5 +809,19 @@ describe('Quest system', (test) => {
     assert.equal(claimed[0]?.deferSave, true);
     assert.ok(inventory.length > 0 && inventory.every((event) => event.deferSave));
     assert.ok(dex.length > 0 && dex.every((event) => event.deferSave));
+  });
+});
+
+
+describe('Save schema 18 filter migration', (test)=>{
+  test('v17 → v18 adds only normalized filters while preserving legacy automation preferences',()=>{
+    const raw={version:17,collection:[],hatchery:{maxSlots:2,slots:[null,null],queues:[[{kind:'pokemon',uid:'owned'}],[]],autoOptions:['lowIV']},training:{maxSlots:1,slots:[{pokemonUid:'trainee',autoOptions:['level'],queue:['next'],battle:{sentinel:'retained verbatim'}}]}};
+    const before=JSON.stringify(raw),migrated=MigrationV17ToV18.migrate(raw);
+    assert.equal(JSON.stringify(raw),before);assert.equal(migrated.version,18);
+    assert.equal(migrated.hatchery.filters.length,2);assert.equal(migrated.hatchery.filters[0].sort,'legacy');
+    assert.equal(migrated.training.slots[0].filters.mode,'level');
+    assert.deepEqual(migrated.training.slots[0].battle,raw.training.slots[0].battle);
+    assert.deepEqual(migrated.hatchery.queues,raw.hatchery.queues);
+    assert.deepEqual(migrated.hatchery.autoOptions,['lowIV']);
   });
 });

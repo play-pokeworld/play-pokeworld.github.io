@@ -1767,6 +1767,7 @@ export const L_en_ui = {
   "debug_speed_x10":"x10 speed:",
   "debug_daytime":"Day/night cycle:",
   "debug_off":"OFF",
+  "debug_dedup":"Clean Box duplicates",
   "victory_title":"CHAMPION!",
   "victory_message":"You defeated all Trainers!",
   "continue_btn":"Continue",

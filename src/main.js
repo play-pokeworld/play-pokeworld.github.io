@@ -6,6 +6,10 @@
  */
 
 import { Engine } from './core/Engine.js';
+import { SaveLifecycle } from './ui/SaveLifecycle.js';
+import { FacilityStaffSystem } from './systems/FacilityStaffSystem.js';
+import { FacilityManagementSystem } from './systems/FacilityManagementSystem.js';
+import { FacilityPokemonSelectionSystem } from './systems/FacilityPokemonSelectionSystem.js';
 import { SaveSystem } from './systems/SaveSystem.js';
 import { FeatureAccessSystem } from './systems/FeatureAccessSystem.js';
 import { NotificationSystem } from './systems/NotificationSystem.js';
@@ -18,11 +22,14 @@ import { LocationSystem } from './systems/LocationSystem.js';
 import { RegionalStarterSystem } from './systems/RegionalStarterSystem.js';
 import { RoamingSystem } from './systems/RoamingSystem.js';
 import { BattleSystem } from './systems/BattleSystem.js';
+import { RelaunchSystem } from './systems/RelaunchSystem.js';
+import { DungeonAutoSystem } from './systems/DungeonAutoSystem.js';
 import { DungeonSystem } from './systems/DungeonSystem.js';
 import { TeamSystem } from './systems/TeamSystem.js';
 import { BoxSystem } from './systems/BoxSystem.js';
 import { PokemonUsageSystem } from './systems/PokemonUsageSystem.js';
 import { TeamBoxTransferSystem } from './systems/TeamBoxTransferSystem.js';
+import { TeamPresetEditSystem } from './systems/TeamPresetEditSystem.js';
 import { TeamPresetSystem } from './systems/TeamPresetSystem.js';
 import { PokeballSystem } from './systems/PokeballSystem.js';
 import { CatchSystem } from './systems/CatchSystem.js';
@@ -76,6 +83,7 @@ window.addEventListener('DOMContentLoaded', () => {
   engine.registerSystem('NotificationSystem', NotificationSystem.getInstance());
   engine.registerSystem('DiagnosticsSystem', DiagnosticsSystem.getInstance());
   BrowserDiagnostics.install();
+  SaveLifecycle.install();
   engine.registerSystem('DashboardLayoutSystem', DashboardLayoutSystem.getInstance());
   engine.registerSystem('LocationSystem', LocationSystem.getInstance());
   engine.registerSystem('RegionalStarterSystem', RegionalStarterSystem.getInstance());
@@ -85,14 +93,20 @@ window.addEventListener('DOMContentLoaded', () => {
   engine.registerSystem('BoxSystem', BoxSystem.getInstance());
   engine.registerSystem('TeamBoxTransferSystem', TeamBoxTransferSystem.getInstance());
   engine.registerSystem('TeamPresetSystem', TeamPresetSystem.getInstance());
+  engine.registerSystem('TeamPresetEditSystem',TeamPresetEditSystem.getInstance());
   engine.registerSystem('PokeballSystem', PokeballSystem.getInstance());
   engine.registerSystem('CatchSystem', CatchSystem.getInstance());
   engine.registerSystem('BattleSystem', BattleSystem.getInstance());
   engine.registerSystem('SecretBaseSystem', SecretBaseSystem.getInstance());
   engine.registerSystem('DungeonSystem', DungeonSystem.getInstance());
+  engine.registerSystem('RelaunchSystem',RelaunchSystem.getInstance());
+  engine.registerSystem('DungeonAutoSystem',DungeonAutoSystem.getInstance());
   engine.registerSystem('QuestSystem', QuestSystem.getInstance());
   engine.registerSystem('TutorialSystem', TutorialSystem.getInstance());
   engine.registerSystem('TrainerSystem', TrainerSystem.getInstance());
+  engine.registerSystem('FacilityStaffSystem', FacilityStaffSystem.getInstance());
+  engine.registerSystem('FacilityManagementSystem', FacilityManagementSystem.getInstance());
+  engine.registerSystem('FacilityPokemonSelectionSystem', FacilityPokemonSelectionSystem.getInstance());
   engine.registerSystem('HatcherySystem', HatcherySystem.getInstance());
   engine.registerSystem('MineSystem', MineSystem.getInstance());
   engine.registerSystem('SaleSystem', SaleSystem.getInstance());

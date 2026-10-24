@@ -26,7 +26,8 @@ import {
 /** Readers of the usages stored in the save, keyed by PokemonUsageIds value. */
 const PERSISTED_USAGE_READERS = Object.freeze({
   [PokemonUsageIds.TEAM]: (save, uid) => save.teamMembers.includes(uid),
-  [PokemonUsageIds.DAYCARE]: (save, uid) => save.hatchery.findDaycareSlot(uid) >= 0
+  [PokemonUsageIds.DAYCARE]: (save, uid) => save.hatchery.getReservedUids().includes(uid),
+  [PokemonUsageIds.TRAINING]: (save, uid) => save.training.findSlot(uid) >= 0
 });
 
 export class PokemonUsageSystem extends BaseSystem {
@@ -77,7 +78,9 @@ export class PokemonUsageSystem extends BaseSystem {
    * @returns {{kind:string, usage:string}|null} Lock preventing the action, or null when allowed
    */
   getActionLock(uid, action) {
-    return PokemonActionRules.lockFor(action, this.getUsages(uid));
+    const save = SaveSystem.getInstance().getCurrentSave();
+    const trainingBattle = save?.training.slots.some((slot) => slot.pokemonUid === uid && !!slot.battle) === true;
+    return PokemonActionRules.lockFor(action, this.getUsages(uid), { trainingBattle });
   }
 
   /** @param {string} uid @param {string} action @returns {boolean} */
@@ -86,7 +89,7 @@ export class PokemonUsageSystem extends BaseSystem {
   }
 
   /**
-   * Registers a session usage (e.g. the trainee of a training session).
+   * Registers a transient usage for a future mode, never a persisted facility assignment.
    * @param {string} usage - PokemonUsageIds value that is not persisted in the save
    * @param {string} uid
    * @returns {boolean}

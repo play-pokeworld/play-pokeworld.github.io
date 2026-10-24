@@ -12,6 +12,7 @@
  * Any other tag is kept as literal text.
  */
 
+import { NumberFormatRules } from '../config/NumberFormatRules.js';
 import { AssetPaths } from '../config/AssetPaths.js';
 import { LocalizationManager } from '../localization/LocalizationManager.js';
 
@@ -155,6 +156,17 @@ export class TextFormatter {
   static formatNumber(value) {
     const lang = LocalizationManager.getInstance().currentLang;
     return Number(value ?? 0).toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US');
+  }
+
+  /** @param {number} value @returns {string} Main-style truncated compact label, independent of exact stored prices. */
+  static formatCompactNumber(value) {
+    const number=Number(value)||0,magnitude=Math.abs(number);
+    if(!Number.isFinite(number)||magnitude<NumberFormatRules.BASE)return TextFormatter.formatNumber(number);
+    const exponent=Math.min(Math.floor(Math.log(magnitude)/Math.log(NumberFormatRules.BASE)),NumberFormatRules.SUFFIXES.length-1);
+    const scaled=number/NumberFormatRules.BASE**exponent;
+    const precision=Math.abs(scaled)<NumberFormatRules.DECIMAL_THRESHOLD?NumberFormatRules.SMALL_DECIMALS:0;
+    const factor=10**precision;
+    return `${Math.trunc(scaled*factor)/factor}${NumberFormatRules.SUFFIXES[exponent]}`;
   }
 
   /** @param {number} milliseconds @returns {string} Whole-minute and seconds countdown (M:SS). */

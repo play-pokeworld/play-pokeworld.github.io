@@ -41,6 +41,15 @@ await import('./tests/PokemonUsage.test.js');
 await import('./tests/UiWidgets.test.js');
 await import('./tests/Dashboard.test.js');
 await import('./tests/Launcher.test.js');
+await import('./tests/FacilityParity.test.js');
+await import('./tests/FeedbackCorrections.test.js');
+await import('./tests/RelaunchAutomation.test.js');
+await import('./tests/Market.test.js');
+await import('./tests/InteractionCorrections.test.js');
+await import('./tests/BackdropAndContext.test.js');
+await import('./tests/Dictionary.test.js');
+await import('./tests/DebugAndBoxItemUse.test.js');
+await import('./tests/PokemonInfoAndTmParity.test.js');
 
 const { failed } = await runAll();
 process.exit(failed ? 1 : 0);

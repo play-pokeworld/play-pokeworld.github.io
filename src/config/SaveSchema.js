@@ -25,8 +25,13 @@
  *  15 — development: persistent secret-base layout, stock, NPCs, visit record and flag progress.
  *  16 — v1.14.17: one owned-Pokémon `collection`; `team` and daycare slots store uids; `box` removed
  *       (the PC box is the view of the whole collection).
+ *  17 — v1.14.18: persistent facility assignments, queues, automation, staff, talent ledger and
+ *       validated versioned training battle DTOs (owned Pokémon still referenced by uid).
+ *  18 — v1.14.19: typed per-slot automation filters; existing queues, assignments and snapshots retained.
+ *  19 — v1.14.20: manual mine-survey readiness timestamp; existing boards and all other progress retained.
+ *  20 — v1.14.21: relaunch ownership/preferences and validated active dungeon pilot modes.
  */
 
 export const SaveSchema = Object.freeze({
-  VERSION: 16
+  VERSION: 20
 });

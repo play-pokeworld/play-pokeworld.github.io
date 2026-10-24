@@ -260,3 +260,9 @@ body::before {
 @media (prefers-reduced-motion: reduce) {
   body::before { animation: none; }
 }
+
+/* The legacy machine skin forces horizontal clipping (and therefore an auto Y overflow).
+   Training is a growing dashboard window: its bounded tracks reflow, and the document scrolls. */
+#main-dashboard #win-training #training-window-body {
+  overflow: visible !important;
+}

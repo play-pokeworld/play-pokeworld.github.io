@@ -8,6 +8,7 @@ import { BattleSystem } from './BattleSystem.js';
 import { LocationSystem } from './LocationSystem.js';
 import { LocationDB } from '../data/world/LocationDB.js';
 import { DungeonRunData } from '../data/save/DungeonRunData.js';
+import { DungeonAutoRules } from '../config/DungeonAutoRules.js';
 import { DungeonRules } from '../config/DungeonRules.js';
 import { BonusSystem } from './BonusSystem.js';
 import { BonusTypes } from '../config/BonusRules.js';
@@ -137,12 +138,28 @@ export class DungeonSystem extends BaseSystem {
     return location?.kind === 'dungeon' ? DungeonRules.entryToll(location.badgesRequired) : 0;
   }
 
+  /** @param {string} locationId @returns {boolean} */
+  isAutoUnlocked(locationId){return (SaveSystem.getInstance().getCurrentSave()?.dungeons.clearCount(locationId)||0)>=DungeonRules.AUTO_UNLOCK_CLEARS;}
+  /** @returns {Object|null} */
+  getAutoSnapshot(){
+    const run=this.getRun();if(!run?.active)return null;
+    return {mode:run.auto,unlocked:this.isAutoUnlocked(run.locationId),clears:SaveSystem.getInstance().getCurrentSave().dungeons.clearCount(run.locationId),required:DungeonRules.AUTO_UNLOCK_CLEARS};
+  }
+  /** @param {string|boolean} mode @returns {boolean} */
+  setAuto(mode){
+    const save=SaveSystem.getInstance().getCurrentSave(),run=this.getRun();if(!run?.active)return false;
+    const next=mode===true?DungeonAutoRules.DEFAULT_MODE:mode===false||mode==='off'?false:mode;
+    if(next!==false&&(!DungeonAutoRules.MODES.includes(next)||!this.isAutoUnlocked(run.locationId)))return false;
+    if(run.auto===next)return true;run.auto=next;if(next)save.relaunch.dungeon.mode=next;
+    this._persistAndEmit(run.locationId,'auto-changed',true);return true;
+  }
+
   /**
    * Pays the toll once and creates a resumable, saved expedition.
    * @param {string} locationId
    * @returns {boolean}
    */
-  enter(locationId = LocationSystem.getInstance().getCurrentLocationId()) {
+  enter(locationId=LocationSystem.getInstance().getCurrentLocationId(),{autoMode=false}={}) {
     const save = SaveSystem.getInstance().getCurrentSave();
     const location = LocationDB.getInstance().getById(locationId);
     if (!save || !location || location.kind !== 'dungeon') return false;
@@ -201,6 +218,7 @@ export class DungeonSystem extends BaseSystem {
       bossDefeated: false,
       startedAt: Date.now()
     });
+    if(DungeonAutoRules.MODES.includes(autoMode)&&this.isAutoUnlocked(locationId)){run.auto=autoMode;save.relaunch.dungeon.mode=autoMode;}
     this._generateFloorMap(run);
     save.dungeons.setRun(run);
     save.dungeons.exploredTotal++;

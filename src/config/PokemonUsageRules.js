@@ -16,10 +16,10 @@ export const PokemonUsageIds = Object.freeze({
 });
 
 /**
- * Usages read from the save (party, daycare slots). The others are session claims registered
+ * Usages read from the save (party, daycare/training slots and queues). Other future usages are session claims registered
  * through PokemonUsageSystem.claim() by the mode that runs them.
  */
-export const PERSISTED_POKEMON_USAGES = Object.freeze([PokemonUsageIds.TEAM, PokemonUsageIds.DAYCARE]);
+export const PERSISTED_POKEMON_USAGES = Object.freeze([PokemonUsageIds.TEAM, PokemonUsageIds.DAYCARE, PokemonUsageIds.TRAINING]);
 
 /** Reporting order, most specific first: the first usage is the one shown in the info sheet. */
 export const POKEMON_USAGE_ORDER = Object.freeze([
@@ -32,6 +32,8 @@ export const POKEMON_USAGE_ORDER = Object.freeze([
 export const PokemonActionIds = Object.freeze({
   /** Equip a learnable move (info sheet, move-learning modal). */
   LEARN_MOVE: 'learnMove',
+  /** Equip a permanently unlocked species talent. */
+  CHANGE_TALENT: 'changeTalent',
   /** Give or take a held item (held items only act in the party). */
   CHANGE_HELD_ITEM: 'changeHeldItem',
   /** Use a bag item on the Pokémon (CT/CS, Rare Candy, vitamins, evolution items). */
@@ -49,15 +51,20 @@ export const PokemonActionIds = Object.freeze({
  * Actions absent from this table (favorite / collection lock flags) are always allowed.
  */
 export const POKEMON_ACTION_RULES = Object.freeze({
+  [PokemonActionIds.CHANGE_TALENT]: Object.freeze({
+    lockedBy: Object.freeze([PokemonUsageIds.DAYCARE, PokemonUsageIds.TRAINING])
+  }),
   [PokemonActionIds.LEARN_MOVE]: Object.freeze({
     lockedBy: Object.freeze([PokemonUsageIds.DAYCARE, PokemonUsageIds.TRAINING])
   }),
   [PokemonActionIds.CHANGE_HELD_ITEM]: Object.freeze({
     requires: PokemonUsageIds.TEAM,
-    lockedBy: Object.freeze([])
+    lockedBy: Object.freeze([]),
+    lockedDuringTrainingBattle: true
   }),
   [PokemonActionIds.USE_ITEM]: Object.freeze({
-    lockedBy: Object.freeze([PokemonUsageIds.DAYCARE])
+    lockedBy: Object.freeze([PokemonUsageIds.DAYCARE]),
+    lockedDuringTrainingBattle: true
   }),
   [PokemonActionIds.JOIN_TEAM]: Object.freeze({
     lockedBy: Object.freeze([PokemonUsageIds.TEAM, PokemonUsageIds.DAYCARE, PokemonUsageIds.TRAINING])

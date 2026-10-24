@@ -1,0 +1,38 @@
+/* Card movement retains the original ancestors so its shared sprite/card skin never changes. */
+.pw-sortable-placeholder {
+  flex: none;
+  height: var(--pw-placeholder-h);
+  width: 100%;
+  min-width: 0;
+  border: 1px dashed var(--light2);
+  border-radius: var(--pw-radius-md, 10px);
+  background: var(--pw-bg-inset);
+}
+.dash-win.pw-sortable-drag-host {
+  contain: none !important;
+  overflow: visible !important;
+  z-index: 20001;
+}
+#main-dashboard.pw-sortable-drag-plane {
+  z-index: 20000;
+}
+#team-window-body .pw-sortable-row.pw-sortable-floating.is-dragging {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: var(--pw-sortable-w) !important;
+  height: var(--pw-sortable-h) !important;
+  min-width: 0;
+  margin: 0;
+  transform: translate3d(
+    var(--pw-sortable-x),
+    var(--pw-sortable-y),
+    0
+  ) !important;
+  pointer-events: none;
+  cursor: grabbing;
+  opacity: 1;
+  z-index: 20002;
+  transition: none !important;
+  will-change: transform;
+}

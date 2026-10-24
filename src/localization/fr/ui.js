@@ -1769,6 +1769,7 @@ export const L_fr_ui = {
   "debug_speed_x10":"Vitesse x10 :",
   "debug_daytime":"Cycle jour/nuit :",
   "debug_off":"OFF",
+  "debug_dedup":"Nettoyer doublons Boîte",
   "victory_title":"CHAMPION !",
   "victory_message":"Vous avez vaincu tous les Dresseurs!",
   "continue_btn":"Continuer",

@@ -4,6 +4,7 @@
  */
 import { UIContainer } from '../../ui/UIContainer.js';
 import { UIText } from '../../ui/UIText.js';
+import { CaughtStatusBall } from './CaughtStatusBall.js';
 import { PokemonGridSprite } from './PokemonGridSprite.js';
 
 export class PokemonGridEntry extends UIContainer {
@@ -62,6 +63,12 @@ export class PokemonGridEntry extends UIContainer {
       }));
     }
     this.addChild(sprite);
+    if (options.caughtStatus) {
+      const status = new CaughtStatusBall();
+      status.addClass('pw-caught-ball');
+      status.setSpecies(options.species);
+      this.addChild(status);
+    }
 
     if (!options.disabled && typeof options.onClick === 'function') {
       this.addDomListener('click', options.onClick);

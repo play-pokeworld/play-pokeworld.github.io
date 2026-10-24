@@ -1,0 +1,111 @@
+/* A battle panel grows with its content, even after moving into a narrow dashboard column. */
+#win-battle #battle-center-panel {
+  height: auto !important;
+  max-height: none !important;
+  flex: 0 0 auto !important;
+  overflow: visible !important;
+  min-width: 0;
+  container: pw-battle / inline-size;
+}
+#win-battle #battle-idle-screen,
+#win-battle #battle-active-scene {
+  height: auto !important;
+  max-height: none !important;
+  flex: 0 0 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+#win-battle .pw-relaunch-group {
+  order: 1;
+}
+#win-battle .pw-battle-action-row,
+#win-battle .pw-battle-loot-row {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+#win-battle .pw-battle-loot-row > * {
+  min-width: 0;
+  max-width: 100%;
+}
+#win-battle #battle-loot-inline {
+  flex: 1 1 150px;
+}
+#win-battle #leave-btn,
+#win-battle #loot-open-btn {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+}
+#win-battle #battle-team-row .poke-name {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+#win-battle #battle-team-row .poke-name > .pw-text:first-child {
+  white-space: normal !important;
+  overflow: visible !important;
+  overflow-wrap: anywhere;
+  text-overflow: clip !important;
+}
+#win-battle #battle-team-row .poke-move {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+@container pw-battle (max-width: 420px) {
+  #win-battle #battle-team-row {
+    --pc-battle-sprite: 88px;
+    --pc-bench-sprite: 68px;
+  }
+  #win-battle #battle-team-row .poke-card,
+  #win-battle #battle-team-row .poke-card:hover,
+  #win-battle #battle-team-row .poke-card:not(:first-child):not(.active) {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto !important;
+    min-width: 0;
+  }
+  #win-battle #battle-team-row .poke-card-top > .pw-relative {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    width: var(--pc-battle-sprite);
+    height: var(--pc-battle-sprite);
+    justify-self: center;
+    align-self: start !important;
+  }
+  #win-battle
+    #battle-team-row
+    .poke-card:not(:first-child):not(.active)
+    .poke-card-top
+    > .pw-relative {
+    width: var(--pc-bench-sprite);
+    height: var(--pc-bench-sprite);
+  }
+  #win-battle #battle-team-row .poke-info {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    width: 100%;
+    min-width: 0;
+  }
+  #win-battle #battle-team-row .poke-moves {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+    width: 100%;
+  }
+  #win-battle #battle-team-row .hp-bar-container {
+    flex-wrap: wrap;
+  }
+}
+
+/* Text content grows instead of being truncated by the reference scene skin. */
+#win-battle #battle-idle-screen .pw-static-035,
+#win-battle #battle-idle-screen .pw-static-036 {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+}
+#win-battle #battle-team-row .poke-move .move-name {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere;
+}

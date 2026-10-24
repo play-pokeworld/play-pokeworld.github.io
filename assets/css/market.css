@@ -1,0 +1,126 @@
+/* Native market geometry. Palette, orb, type pills and fullscreen chrome come from the shared design system. */
+.pw-market-list,
+.pw-market-wallet,
+.pw-market-footer {
+  line-height: normal;
+}
+.pw-market-category {
+  display: contents;
+}
+.pw-market-category > .pw-market-cat {
+  display: block;
+  width: 100%;
+}
+.pw-market-category:first-child > .pw-market-cat {
+  margin-top: 0;
+}
+.pw-market-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
+  gap: 8px;
+}
+.pw-market-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px 8px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--pw-text-white) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--pw-text-white) 9%, transparent);
+  cursor: pointer;
+  text-align: center;
+  font: inherit;
+}
+.pw-market-row:hover {
+  background: color-mix(in srgb, var(--pw-text-white) 9%, transparent);
+  border-color: color-mix(in srgb, var(--pw-text-white) 22%, transparent);
+}
+.pw-market-row.selected {
+  outline: 2px solid var(--pw-accent-color, var(--accent, var(--light2)));
+  outline-offset: -2px;
+  box-shadow: 0 0 0 2px var(--pw-accent-color) inset;
+  background: color-mix(in srgb, var(--pw-accent-color) 12%, transparent);
+}
+.pw-market-row:focus-visible {
+  outline: 2px solid var(--light2);
+  outline-offset: 2px;
+}
+.pw-market-row .pw-flex-1 {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.pw-market-row .pw-manage-name {
+  overflow-wrap: anywhere;
+}
+.pw-market-row .pw-manage-sub {
+  margin-left: 3px;
+}
+.pw-market-row .pw-manage-desc {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3px;
+}
+.pw-market-orb {
+  position: relative;
+}
+.pw-market-sprite {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+/* The legacy orb skin forces relative image positions; the ownership ball needs a scoped override. */
+.pw-market-orb .pw-market-ball {
+  inset: auto 2px 2px auto;
+  width: 20px;
+  height: 20px;
+  image-rendering: pixelated;
+}
+.pw-market-orb > .pw-market-ball {
+  position: absolute !important;
+}
+.pw-market-price {
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+}
+.pw-market-wallet .pw-money-row {
+  align-items: center;
+  min-height: 28px;
+}
+.pw-market-price .pw-price-tag-amount,
+.pw-market-footer .pw-price-tag-amount {
+  text-transform: lowercase;
+}
+.pw-market-wallet {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+.pw-market-footer {
+  border-radius: var(--pw-radius-md);
+  background: var(--pw-bg-header);
+  border-color: var(--pw-border-color);
+}
+.pw-market-footer .pw-shop-qty {
+  min-width: 0;
+  min-height: 0;
+  background: var(--pw-bg-sprite);
+  color: var(--pw-text-primary);
+  border-color: var(--pw-border-color);
+  border-radius: var(--pw-radius-sm);
+}
+.pw-market-footer .pw-shop-total {
+  color: var(--pw-text-primary);
+}
+@media (max-width: 360px) {
+  .pw-market-footer .pw-shop-total {
+    margin-left: 0;
+  }
+}

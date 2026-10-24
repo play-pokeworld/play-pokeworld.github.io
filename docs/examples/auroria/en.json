@@ -1,0 +1,127 @@
+{
+  "map_region_auroria": "Auroria",
+  "starter_auroria_mossling_desc": "A Grass partner from the Auroria plateau.",
+  "pokemon": {
+    "mossling": "Mossling"
+  },
+  "move": {
+    "chloroshot": "Chloroshot"
+  },
+  "move_desc": {
+    "chloroshot": "A ray of plant light. Power 55, accuracy 100%."
+  },
+  "item": {
+    "auroria_pass": {
+      "name": "Auroria pass",
+      "desc": "Grants entry to Bloomtown after the road mission."
+    },
+    "auroria_tm_chloroshot": {
+      "name": "Chloroshot TM",
+      "desc": "Unlocks Chloroshot for a compatible Pokémon."
+    }
+  },
+  "location": {
+    "auroria_start": "Dawnvale",
+    "auroria_path": "Seedling Path",
+    "auroria_city": "Bloomtown",
+    "auroria_forest": "Firefly Woods",
+    "auroria_summit": "Auroria Summit"
+  },
+  "shop": {
+    "auroria_store": {
+      "name": "Auroria Store"
+    }
+  },
+  "trainer": {
+    "auroria_ivy": {
+      "name": "Ivy",
+      "title": "Bloomtown Gym Leader",
+      "badge": "Leaf Badge",
+      "intro": "Let our Pokémon guide us.",
+      "win": "You earned your victory."
+    },
+    "auroria_rival": {
+      "name": "Elio",
+      "title": "Plateau rival",
+      "badge": "Auroria title",
+      "intro": "Let our Pokémon guide us.",
+      "win": "You earned your victory."
+    },
+    "auroria_elite_one": {
+      "name": "Aloe",
+      "title": "Plateau Council",
+      "badge": "Auroria title",
+      "intro": "Let our Pokémon guide us.",
+      "win": "You earned your victory."
+    },
+    "auroria_elite_two": {
+      "name": "Volta",
+      "title": "Plateau Council",
+      "badge": "Auroria title",
+      "intro": "Let our Pokémon guide us.",
+      "win": "You earned your victory."
+    },
+    "auroria_league": {
+      "name": "Auroria League",
+      "title": "Plateau League",
+      "badge": "Auroria title",
+      "intro": "Let our Pokémon guide us.",
+      "win": "You earned your victory."
+    }
+  },
+  "quests": {
+    "main": {
+      "auroria_welcome": {
+        "title": "Welcome to the plateau",
+        "desc": "Talk to the professor in Dawnvale."
+      },
+      "auroria_road": {
+        "title": "Seedling Path",
+        "desc": "Win 3 battles on the path, then claim the pass."
+      },
+      "auroria_gym": {
+        "title": "Bloomtown Leaf",
+        "desc": "Defeat Ivy and earn her badge."
+      },
+      "auroria_rival": {
+        "title": "Plateau challenge",
+        "desc": "Defeat Elio to open Firefly Woods."
+      }
+    },
+    "side": {
+      "auroria_catches": {
+        "title": "Path species",
+        "desc": "Catch two Pokémon on the path."
+      }
+    }
+  },
+  "npc": {
+    "auroria_start": [
+      {
+        "id": "auroria_guide",
+        "name": "Professor Willow",
+        "lines": [
+          "Welcome to Auroria. Your partner is waiting."
+        ]
+      }
+    ],
+    "auroria_city": [
+      {
+        "id": "auroria_researcher",
+        "name": "Researcher Iris",
+        "lines": [
+          "Let us study the Pokémon along the path."
+        ]
+      }
+    ]
+  },
+  "fieldjournal_title": "Field journal",
+  "fieldjournal_survey": "Survey this site",
+  "fieldjournal_summary": "{total} surveyed site(s) · {reward} Pokédollars per new site.",
+  "fieldjournal_state_already": "This site has already been surveyed.",
+  "fieldjournal_state_battle": "Finish the battle before surveying this site.",
+  "fieldjournal_state_location": "Visit a route in Auroria.",
+  "fieldjournal_state_wins": "Wins at this location: {wins}/{required}.",
+  "fieldjournal_state_ready": "The site is ready for a survey.",
+  "region_auroria": "Auroria"
+}

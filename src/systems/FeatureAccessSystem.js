@@ -19,6 +19,7 @@ import { REGIONS } from '../config/Regions.js';
 import { CONTENT_FEATURES, LOCATION_ACCESS_GATES, MIRAGE_ROTATION_WINDOW_MS, REGION_START_LOCATIONS } from '../config/ContentAccessRules.js';
 import { HatcheryRules } from '../config/HatcheryRules.js';
 import { MineRules } from '../config/MineRules.js';
+import { MarketRules } from '../config/MarketRules.js';
 import { TrainingRules } from '../config/TrainingRules.js';
 import { SaveCreatedEvent } from '../core/events/SaveCreatedEvent.js';
 import { SaveLoadedEvent } from '../core/events/SaveLoadedEvent.js';
@@ -100,6 +101,7 @@ export class FeatureAccessSystem extends BaseSystem {
         locations: [],
         regions: ['kanto'],
         regionStarters: [],
+        marketUnlocked: false,
         championTitle: false
       };
     }
@@ -108,8 +110,15 @@ export class FeatureAccessSystem extends BaseSystem {
       locations: this.getUnlockedLocations().map((location) => location.id),
       regions: this._getAccessibleRegions(save),
       regionStarters: [...save.access.regionStarters],
+      marketUnlocked: this.isMarketUnlocked(),
       championTitle: this._hasChampionTitle(save)
     };
+  }
+
+  /** @returns {boolean} Main's first-badge / Johto gate, shared by shortcut and purchase commands. */
+  isMarketUnlocked() {
+    const save=SaveSystem.getInstance().getCurrentSave();
+    return !!save && (save.player.badges.length>=MarketRules.ACCESS_BADGES || MarketRules.ACCESS_REGIONS.includes(save.player.region));
   }
 
   /** @param {string} featureId @returns {boolean} */

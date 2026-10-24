@@ -1,27 +1,29 @@
-/**
- * @file MinePanel.js
- * @brief Persistent grid-mine controls, energy gauge and recovered-loot view.
- */
+/** @file MinePanel.js @brief Stable energy/tools/rock board/current-layer treasures and management controls. */
 import { DraggablePanel } from '../ui/DraggablePanel.js';
 import { UIContainer } from '../ui/UIContainer.js';
+import { UIKeyedList } from '../ui/UIKeyedList.js';
 import { UIText } from '../ui/UIText.js';
-import { UIIcon } from '../ui/UIIcon.js';
 import { UIButton } from '../ui/UIButton.js';
 import { UIProgressBar } from '../ui/UIProgressBar.js';
-import { WindowIds } from '../config/DashboardLayout.js';
+import { MineToolButton } from './facilities/MineToolButton.js';
+import { ConfirmDialog } from '../ui/ConfirmDialog.js';
+import { TextFormatter } from '../core/TextFormatter.js';
+import { MineTileButton } from './facilities/MineTileButton.js';
+import { MineTreasurePill } from './facilities/MineTreasurePill.js';
+import { PriceTag } from './components/PriceTag.js';
+import { MineUiRules } from '../config/MineUiRules.js';
 import { MineRules } from '../config/MineRules.js';
+import { WindowIds } from '../config/DashboardLayout.js';
+import { ModalIds } from '../config/ModalIds.js';
 import { MineSystem } from '../systems/MineSystem.js';
-import { SaveSystem } from '../systems/SaveSystem.js';
-import { MineLootDB } from '../data/items/MineLootDB.js';
+import { EventBus } from '../core/EventBus.js';
+import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
 import { MineChangedEvent } from '../core/events/MineChangedEvent.js';
-import { BonusChangedEvent } from '../core/events/BonusChangedEvent.js';
-import { InventoryChangedEvent } from '../core/events/InventoryChangedEvent.js';
-import { LocationChangedEvent } from '../core/events/LocationChangedEvent.js';
+import { FacilityStaffChangedEvent } from '../core/events/FacilityStaffChangedEvent.js';
 import { SaveCreatedEvent } from '../core/events/SaveCreatedEvent.js';
 import { SaveLoadedEvent } from '../core/events/SaveLoadedEvent.js';
 import { SaveDeletedEvent } from '../core/events/SaveDeletedEvent.js';
 import { ContentAccessChangedEvent } from '../core/events/ContentAccessChangedEvent.js';
-import { TextFormatter } from '../core/TextFormatter.js';
 import { t } from '../localization/LocalizationManager.js';
 
 export class MinePanel extends DraggablePanel {
@@ -30,160 +32,296 @@ export class MinePanel extends DraggablePanel {
     super({
       id: WindowIds.MINE,
       column,
-      title: t('mine_window_title'),
+      title: t('facility_mine_panel_title'),
       icon: 'pickaxe',
       bodyId: 'mine-window-body',
-      bodyClassName: 'pw-static-025 pw-mine-body',
-      name: 'MinePanel'
+      bodyClassName: 'pw-static-022 pw-mine-body machine-window-body',
+      name: 'MinePanel',
     });
-    this._energyElapsed = 0;
-    this._energyText = null;
-    this._energyBar = null;
-    for (const eventClass of [
-      MineChangedEvent, BonusChangedEvent, InventoryChangedEvent, LocationChangedEvent,
-      SaveCreatedEvent, SaveLoadedEvent, SaveDeletedEvent, ContentAccessChangedEvent
-    ]) this.listen(eventClass, () => this._render());
-    this._render();
-  }
+    this._aim = null;
+    this._auto = new UIButton({
+      text: t('mine_auto_title'),
+      icon: 'pickaxe',
+      className: 'hbtn pw-mine-auto-header',
+      onClick: () => {
+        const system = MineSystem.getInstance();
+        if (system.getSnapshot()?.autoPurchased) system.toggleAutomation();
+        else system.buyAutomation();
+      },
+    });
+    this._autoPrice = new PriceTag(
+      MineRules.CURRENCY_ID,
+      MineRules.AUTOMATION_COST,
+    );
+    this._auto.addChild(this._autoPrice);
+    const manage = new UIButton({
+      icon: 'settings',
+      text: t('mine_management_button'),
+      className: 'hbtn pw-facility-manage',
+      onClick: () =>
+        EventBus.getInstance().dispatch(
+          new ModalOpenRequestedEvent(ModalIds.MINE_MANAGEMENT),
+        ),
+    });
+    manage.setAriaLabel(t('mine_management_button'));
+    manage.setTooltip(t('mine_management_button'));
 
+    this._energy = new UIText();
+    this._energyBar = new UIProgressBar({
+      trackClassName: 'stat-bar pw-mine-energy-bar',
+      fillClassName: 'stat-fill',
+    });
+    this._toolHint = new UIText({
+      tagName: 'div',
+      className: 'pw-facility-subtle mine-tool-hint',
+    });
+    this._tools = new UIContainer({ className: 'pw-chip-group pw-mine-tools' });
+    this._toolButtons = new Map();
+    for (const id of Object.keys(MineRules.TOOLS)) {
+      const button = new MineToolButton(id, () =>
+        MineSystem.getInstance().setTool(id),
+      );
+      this._toolButtons.set(id, button);
+      this._tools.addChild(button);
+    }
+    this._grid = new UIContainer({
+      className: 'mine-grid pw-mine-grid',
+      name: 'MineGrid',
+    });
+    this._grid.setData('gridCols', MineRules.WIDTH);
+    this._tiles = [];
+    this._grid.setAttribute('aria-label', t('mine_title'));
+    for (let y = 0; y < MineRules.HEIGHT; y++)
+      for (let x = 0; x < MineRules.WIDTH; x++) {
+        const tile = new MineTileButton({
+          x,
+          y,
+          onDig: () => MineSystem.getInstance().digAt(x, y),
+          onAim: (tx, ty) => this._setAim(tx, ty),
+        });
+        this._tiles.push(tile);
+        this._grid.addChild(tile);
+      }
+    this._treasures = new UIKeyedList({
+      className: 'pw-mine-treasure-list',
+      key: (entry) => entry.index,
+      create: () => new MineTreasurePill(),
+      update: (pill, entry) => pill.setEntry(entry),
+    });
+    this._confirm = new ConfirmDialog({ id: MineUiRules.SURVEY_CONFIRM_ID });
+    this._nextLayer = new UIButton({
+      id: MineUiRules.SURVEY_BUTTON_ID,
+      text: t('mine_new_layer'),
+      className: 'hbtn',
+      size: 'sm',
+      onClick: () =>
+        this._confirm.ask({
+          title: t('mine_new_layer'),
+          message: t('facility_mine_discard_confirm'),
+          danger: true,
+          onConfirm: () =>
+            MineSystem.getInstance().startNextLayer({ discardCurrent: true }),
+        }),
+    });
+    this._found = new UIText({ tagName: 'b' });
+    const subtitle = new UIText({ tagName: 'div', className: 'loc-sub' });
+    subtitle.setRichText(t('mine_sub'));
+    const energy = new UIContainer({
+      className: 'pw-action-flex',
+      children: [
+        new UIContainer({
+          className: 'pw-field-row',
+          children: [new UIText({ text: t('mine_energy') }), this._energy],
+        }),
+        this._energyBar,
+        new UIText({
+          tagName: 'div',
+          className: 'pw-field-hint',
+          text: t('mine_energy_hint', {
+            regen: MineRules.ENERGY_REGEN_PER_SECOND,
+            perBattle: MineRules.ENERGY_PER_WILD_WIN,
+          }),
+        }),
+      ],
+    });
+    this.addChildren([
+      new UIContainer({
+        className: 'pw-mine-window-root',
+        children: [
+          new UIContainer({
+            className: 'pw-mine-header',
+            children: [this._auto, manage],
+          }),
+          new UIText({
+            tagName: 'div',
+            className: 'loc-title',
+            text: t('mine_title'),
+          }),
+          subtitle,
+          new UIContainer({
+            className: 'pw-actions-row',
+            children: [energy, this._tools, this._toolHint],
+          }),
+          this._grid,
+          new UIContainer({
+            className: 'pw-trainer-head',
+            children: [
+              new UIContainer({ children: [this._found, this._treasures] }),
+              this._nextLayer,
+            ],
+          }),
+        ],
+      }),
+      this._confirm,
+    ]);
+    for (const event of [
+      MineChangedEvent,
+      FacilityStaffChangedEvent,
+      SaveCreatedEvent,
+      SaveLoadedEvent,
+      SaveDeletedEvent,
+      ContentAccessChangedEvent,
+    ])
+      this.listen(event, () => {
+        if (
+          [SaveCreatedEvent, SaveLoadedEvent, SaveDeletedEvent].includes(event)
+        )
+          this._confirm.close();
+        this._refresh();
+      });
+    this._refresh();
+  }
   /** @override */
   onEnter() {
     super.onEnter();
-    if (MineSystem.getInstance().canUseHere()) MineSystem.getInstance().ensureLayer();
-    this._render();
+    this._refresh();
   }
-
-  /** @override */
+  /** @override @param {number} dt */
   onUpdate(dt) {
     super.onUpdate(dt);
-    this._energyElapsed += Math.max(0, Number(dt) || 0);
-    if (this._energyElapsed < 1) return;
-    this._energyElapsed = 0;
+    if (MineSystem.getInstance().isUnlocked()) {
+      this._refreshEnergy();
+      this._refreshSurvey();
+    }
+  }
+  /** @private */
+  _refresh() {
+    const system = MineSystem.getInstance();
+    this.toggleClass('pw-progression-hidden', !system.isUnlocked());
+    if (!system.isUnlocked()) return;
+    const state = system.getSnapshot();
+    if (!state) return;
+    this._state = state;
     this._refreshEnergy();
-  }
-
-  /** @private */
-  _render() {
-    const mineSystem = MineSystem.getInstance();
-    const unlocked = mineSystem.isUnlocked();
-    this.toggleClass('pw-progression-hidden', !unlocked);
-    this.clearChildren();
-    this._energyText = null;
-    this._energyBar = null;
-    if (!unlocked) return;
-    if (!mineSystem.canUseHere()) {
-      this.addChild(new UIText({ tagName: 'div', className: 'pw-mine-empty', text: t('mine_location_required', {
-        location: t(`location.${MineRules.LOCATION_ID}`)
-      }) }));
-      return;
+    this._auto.setActive(state.autoEnabled);
+    this._auto.setText(
+      state.autoPurchased
+        ? t('mine_auto_toggle', {
+            state: t(
+              state.autoEnabled ? 'automation_enabled' : 'automation_disabled',
+            ),
+          })
+        : t('mine_auto_title'),
+    );
+    this._autoPrice.setAmount(
+      state.autoPurchased
+        ? MineRules.AUTOMATION_FEE
+        : MineRules.AUTOMATION_COST,
+    );
+    this._auto.setTooltip(
+      t(
+        state.autoPurchased
+          ? 'facility_mine_auto_header'
+          : 'facility_mine_auto_buy_hint',
+        {
+          cost: state.autoPurchased
+            ? MineRules.AUTOMATION_FEE
+            : MineRules.AUTOMATION_COST,
+        },
+      ),
+    );
+    this._auto.setAttribute('aria-pressed', state.autoEnabled);
+    for (const tool of state.tools) {
+      this._toolButtons.get(tool.id).setTool(tool, state.tool);
     }
-    const snapshot = MineSystem.getInstance().getSnapshot();
-    if (!snapshot) {
-      this.addChild(new UIText({ tagName: 'div', className: 'pw-mine-empty', text: t('no_save_loaded') }));
-      return;
-    }
-    this._energyText = new UIText({
-      className: 'pw-mine-energy-value',
-      text: t('value_over_max', { value: Math.floor(snapshot.energy), max: snapshot.maxEnergy })
-    });
-    this._energyBar = new UIProgressBar({
-      value: snapshot.energy,
-      max: snapshot.maxEnergy,
-      variant: 'energy',
-      size: 'sm',
-      className: 'pw-mine-energy-bar'
-    });
-    this.addChild(new UIContainer({
-      className: 'pw-mine-energy-row',
-      children: [
-        new UIContainer({ className: 'pw-mine-energy-label', children: [new UIIcon({ name: 'zap', size: 'sm' }), new UIText({ text: t('mine_energy') })] }),
-        this._energyText
-      ]
-    }));
-    this.addChild(this._energyBar);
-    this.addChild(new UIText({ tagName: 'div', className: 'pw-mine-summary', text: t('mine_completed_count', { count: snapshot.completedCount }) }));
-    this.addChild(this._toolSelector(snapshot));
-    if (!snapshot.hasLayer) {
-      this.addChild(new UIText({ tagName: 'div', className: 'pw-mine-empty', text: t('mine_start_first') }));
-      this.addChild(new UIButton({
-        variant: 'primary',
-        fullWidth: true,
-        text: t('mine_start_btn'),
-        onClick: () => MineSystem.getInstance().startNextLayer()
-      }));
-    } else {
-      this.addChild(this._grid(snapshot));
-    }
-    this.addChild(this._treasureList());
-  }
-
-  /** @private @param {Object} snapshot */
-  _toolSelector(snapshot) {
-    return new UIContainer({
-      className: 'pw-mine-tools',
-      children: snapshot.tools.map((tool) => {
-        const button = new UIButton({
-          variant: 'secondary',
-          size: 'sm',
-          className: 'pw-mine-tool',
-          text: t(`mine_tool_${tool.id}`),
-          onClick: () => MineSystem.getInstance().setTool(tool.id)
-        });
-        button.setActive(snapshot.tool === tool.id);
-        button.setTooltip(t('mine_tool_cost_hint', { cost: tool.energyCost, power: tool.power }));
-        return button;
-      })
-    });
-  }
-
-  /** @private @param {Object} snapshot */
-  _grid(snapshot) {
-    const grid = new UIContainer({ className: 'pw-mine-grid', name: 'MineGrid' });
-    for (let y = 0; y < MineRules.HEIGHT; y++) {
-      for (let x = 0; x < MineRules.WIDTH; x++) {
-        const durability = snapshot.grid[y]?.[x] ?? 0;
-        const tile = new UIButton({
-          variant: 'ghost',
-          size: 'sm',
-          className: `pw-mine-tile${durability > 0 ? ` is-solid is-depth-${durability}` : ' is-dug'}`,
-          text: durability > 0 ? String(durability) : '',
-          disabled: durability <= 0,
-          onClick: () => MineSystem.getInstance().digAt(x, y)
-        });
-        tile.setTooltip(t('mine_tile_hint', { x: x + 1, y: y + 1, durability }));
-        tile.setAttribute('aria-label', t('mine_tile_hint', { x: x + 1, y: y + 1, durability }));
-        grid.addChild(tile);
+    this._grid.setData('mineTool', state.tool);
+    for (const row of state.tiles)
+      for (const tile of row) {
+        this._tiles[tile.y * MineRules.WIDTH + tile.x].setTile(
+          tile,
+          tile.canDig,
+        );
       }
-    }
-    return grid;
-  }
+    this._treasures.setEntries(
+      state.items.map((item, index) => ({ ...item, index })),
+    );
+    this._found.setText(
+      t('mine_current_layer_found', {
+        found: state.items.filter((item) => item.collected).length,
+        total: state.items.length,
+      }),
+    );
 
-  /** @private */
-  _treasureList() {
-    const save = SaveSystem.getInstance().getCurrentSave();
-    const loot = save ? save.inventory.entries()
-      .filter(({ id }) => MineLootDB.getInstance().has(id))
-      .map(({ id, quantity }) => ({ id, quantity })) : [];
-    const items = loot.length > 0
-      ? loot.map(({ id, quantity }) => new UIText({
-        className: 'pw-mine-treasure-item',
-        text: t('mine_treasure_count', { item: t(`item.${id}.name`), count: TextFormatter.formatNumber(quantity) })
-      }))
-      : [new UIText({ className: 'pw-mine-empty-treasure', text: t('mine_treasure_empty') })];
-    return new UIContainer({
-      className: 'pw-mine-treasures',
-      children: [new UIText({ tagName: 'h3', text: t('mine_treasure_title') }), ...items]
-    });
+    const selectedTool = state.tools.find((tool) => tool.id === state.tool);
+    this._toolHint.setText(
+      t('mine_tool_hint', {
+        tool: t(`mine_tool_${state.tool}`),
+        cost: selectedTool.energyCost,
+        power: selectedTool.power,
+        area: t(`mine_tool_area_${MineUiRules.TOOL_AREAS[state.tool]}`),
+      }),
+    );
+    this._refreshSurvey();
+    if (this._aim) this._setAim(this._aim.x, this._aim.y);
   }
-
   /** @private */
   _refreshEnergy() {
-    const snapshot = MineSystem.getInstance().getSnapshot();
-    if (!snapshot || !this._energyText || !this._energyBar) return;
-    this._energyText.setText(t('value_over_max', {
-      value: Math.floor(snapshot.energy),
-      max: TextFormatter.formatNumber(snapshot.maxEnergy)
-    }));
-    this._energyBar.setValue(snapshot.energy, snapshot.maxEnergy);
+    const state = MineSystem.getInstance().getEnergySnapshot();
+    if (!state) return;
+    this._energy.setText(
+      t('value_over_max', {
+        value: Math.floor(state.energy),
+        max: state.maxEnergy,
+      }),
+    );
+    this._energyBar.setValue(state.energy, state.maxEnergy);
+  }
+  /** Read-only wall-time display: never rebuild the button or write a save while it ticks. */
+  _refreshSurvey() {
+    const survey = MineSystem.getInstance().getManualSurveySnapshot();
+    if (!survey) return;
+    const time = TextFormatter.formatMinutesSeconds(
+      survey.remainingSeconds * 1000,
+    );
+    this._nextLayer.setText(
+      survey.ready ? t('mine_new_layer') : t('mine_survey_timer', { time }),
+    );
+    this._nextLayer.setTooltip(
+      survey.ready ? t('mine_survey_ready') : t('mine_survey_wait', { time }),
+    );
+    this._nextLayer.toggleClass('hbtn', survey.ready);
+    this._nextLayer.toggleClass('pw-mine-survey-clock', !survey.ready);
+    this._nextLayer.setEnabled(survey.ready);
+  }
+
+  /** @private @param {number|null} x @param {number|null} y */
+  _setAim(x, y) {
+    this._aim = x == null ? null : { x, y };
+    const tool = this._state?.tools.find(
+      (entry) => entry.id === this._state.tool,
+    );
+    const keys = new Set(
+      x == null
+        ? []
+        : (tool?.offsets || []).map(([dx, dy]) => `${x + dx},${y + dy}`),
+    );
+    this._tiles.forEach((tile, index) =>
+      tile.toggleClass(
+        'is-aim',
+        keys.has(
+          `${index % MineRules.WIDTH},${Math.floor(index / MineRules.WIDTH)}`,
+        ),
+      ),
+    );
   }
 }

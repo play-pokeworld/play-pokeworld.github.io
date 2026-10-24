@@ -173,7 +173,9 @@ describe('Kanto gameplay', (test) => {
     assert.equal(hatchery.upgradeSlot().result, HatcheryResults.FEATURE_LOCKED);
     save.access.unlockFeature(CONTENT_FEATURES.HATCHERY);
     assert.equal(hatchery.isUnlocked(), true, 'a migrated sticky unlock survives outside the original area');
-    assert.equal(hatchery.upgradeSlot().result, HatcheryResults.WRONG_LOCATION);
+    assert.equal(hatchery.upgradeSlot().result, HatcheryResults.NEED_QUEST_POINTS);
+    save.currencies.add('questPoint', HatcheryRules.SLOT_UPGRADE_COSTS[0]);
+    assert.equal(hatchery.upgradeSlot().result, HatcheryResults.READY, 'unlocked upgrades work remotely');
   });
 
   test('hatchery upgrades and deposits use TeamSystem; daycare KOs level and return the Pokémon', () => {
@@ -213,9 +215,10 @@ describe('Kanto gameplay', (test) => {
 
       const withdrawn = hatchery.withdrawPokemon(0);
       assert.equal(withdrawn.result, HatcheryResults.READY);
-      assert.equal(withdrawn.stored, 'team');
-      assert.ok(save.team.some((pokemon) => pokemon.uid === reserve.uid));
-      assert.deepEqual(usage.getUsages(reserve.uid), [PokemonUsageIds.TEAM]);
+      assert.equal(withdrawn.stored, 'box');
+      assert.ok(!save.teamMembers.includes(reserve.uid), 'withdrawal releases a reservation without adding a team reference');
+      assert.equal(save.collection.get(reserve.uid), reserve);
+      assert.deepEqual(usage.getUsages(reserve.uid), []);
     } finally {
       hatchery.onDestroy();
     }
@@ -256,7 +259,7 @@ describe('Kanto gameplay', (test) => {
     }
   });
 
-  test('mine actions require prior feature access and the correct location', () => {
+  test('mine actions require prior feature access but remain available remotely after unlock', () => {
     const save = newKantoSave('Locked mine', 'pallet');
     const mine = MineSystem.getInstance();
 
@@ -264,7 +267,8 @@ describe('Kanto gameplay', (test) => {
     assert.equal(mine.ensureLayer().result, MineResults.FEATURE_LOCKED);
     save.access.unlockFeature(CONTENT_FEATURES.MINE);
     assert.equal(mine.isUnlocked(), true);
-    assert.equal(mine.ensureLayer().result, MineResults.WRONG_LOCATION);
+    assert.equal(mine.ensureLayer().result, MineResults.READY);
+    assert.ok(save.mine.hasGrid(), 'the remote action really creates a layer');
   });
 
   test('mine creates a Kanto grid, charges energy only for rock, and blocks premature layers', () => {
@@ -338,7 +342,9 @@ describe('Kanto gameplay', (test) => {
       training._session.outcome = BattleOutcomes.VICTORY;
       training._finishSession(training._session);
       assert.equal(training.isActive(), false);
-      assert.equal(usage.getUsages(candidate.uid).includes(PokemonUsageIds.TRAINING), false, 'the claim ends with the session');
+      assert.equal(usage.getUsages(candidate.uid).includes(PokemonUsageIds.TRAINING), true, 'assignment reserves until an explicit removal');
+      assert.ok(training.clearSlot(0));
+      assert.equal(usage.getUsages(candidate.uid).includes(PokemonUsageIds.TRAINING), false);
       assert.equal(quests.getStatus('main.22')?.complete, true);
       assert.equal(quests.getStatus('main.22')?.progress, 1);
     } finally {

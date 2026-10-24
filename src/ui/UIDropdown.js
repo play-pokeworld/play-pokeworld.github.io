@@ -11,6 +11,7 @@ export class UIDropdown extends UIElement {
    * @param {Object} [options={}]
    * @param {Array<{value: string, label: string, disabled?: boolean}>} [options.options=[]]
    * @param {string} [options.value='']
+   * @param {'default'|'native'} [options.skin='default'] - Native skin leaves contextual CSS in control.
    * @param {string} [options.className='']
    * @param {string} [options.id='']
    * @param {string} [options.name='UIDropdown']
@@ -30,6 +31,7 @@ export class UIDropdown extends UIElement {
     /** @private @type {HTMLSelectElement} */
     this._selectEl = document.createElement('select');
     this._selectEl.className = 'pw-dropdown-select';
+    if(options.skin==='native')this._selectEl.classList.add('pw-dropdown-select--native');
     if (options.id) {
       this._selectEl.id = options.id;
     }
@@ -65,7 +67,9 @@ export class UIDropdown extends UIElement {
    * @param {Array<{value: string, label: string, disabled?: boolean}>} opts
    */
   setOptions(opts) {
-    this._options = opts || [];
+    const next = (opts || []).map((entry) => ({ value: String(entry.value), label: String(entry.label), disabled: entry.disabled === true }));
+    if (JSON.stringify(this._options) === JSON.stringify(next)) return;
+    this._options = next;
     this._selectEl.replaceChildren();
     this._options.forEach(opt => {
       const optionEl = document.createElement('option');
@@ -91,7 +95,7 @@ export class UIDropdown extends UIElement {
    * @param {string} val
    */
   setValue(val) {
-    this._selectEl.value = val;
+    if (this._selectEl.value !== String(val)) this._selectEl.value = String(val);
   }
 
   /**
@@ -107,7 +111,7 @@ export class UIDropdown extends UIElement {
    * @param {boolean} enabled
    */
   setEnabled(enabled) {
-    this._selectEl.disabled = !enabled;
-    this._dom.classList.toggle('is-disabled', !enabled);
+    if (this._selectEl.disabled !== !enabled) this._selectEl.disabled = !enabled;
+    this.toggleClass('is-disabled', !enabled);
   }
 }

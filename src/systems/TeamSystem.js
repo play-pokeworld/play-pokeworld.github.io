@@ -204,8 +204,8 @@ export class TeamSystem extends BaseSystem {
   }
 
   /** Emits the standard team event (and the usage event) after a party mutation. */
-  dispatchChanged() {
-    EventBus.getInstance().dispatch(new TeamChangedEvent(this.getMemberUids().length));
+  dispatchChanged({deferSave=false}={}) {
+    EventBus.getInstance().dispatch(new TeamChangedEvent(this.getMemberUids().length,{deferSave}));
     PokemonUsageSystem.getInstance().dispatchChanged();
   }
 

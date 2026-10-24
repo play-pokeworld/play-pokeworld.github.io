@@ -12,9 +12,10 @@ export class EggHatchedEvent extends BaseEvent {
   /**
    * @param {string} speciesId - PokemonDB id of the newborn
    */
-  constructor(speciesId) {
+  constructor(speciesId, { deferSave = false } = {}) {
     super(EggHatchedEvent.TYPE);
     /** @type {string} */
     this.speciesId = speciesId;
+    this.deferSave = deferSave;
   }
 }

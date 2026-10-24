@@ -55,6 +55,16 @@ export class CatchRules {
     return weighted.length > 0 ? weighted[random.int(0, weighted.length - 1)] : null;
   }
 
+  /** A duplicate may unlock a rolled normal talent, without changing the owned Pokémon's equipment. */
+  static unlockCapturedTalent(save, species, talent, random) {
+    if (!talent || talent === species.hiddenTalent || save.talents.has(species.id, talent)) return false;
+    const rarity = TalentDB.getInstance().getById(talent)?.rarity;
+    if (!rarity) return false;
+    const chance = CaptureRules.TALENT_UNLOCK_CHANCE_BY_RARITY[rarity];
+    if (save.talents.getIds(species.id).length && !random.chance(chance)) return false;
+    return save.talents.unlock(species.id, talent);
+  }
+
   /**
    * 10 % chance of +1 IV on a random stat below the cap.
    * @param {import('../../data/pokemon/PokemonData.js').PokemonData} pokemon

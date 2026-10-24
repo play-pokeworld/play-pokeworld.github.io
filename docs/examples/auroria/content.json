@@ -1,0 +1,353 @@
+{
+  "species": {
+    "mossling": {
+      "dex": 1001,
+      "region": "auroria",
+      "types": [
+        "grass"
+      ],
+      "stats": [
+        50,
+        45,
+        55,
+        65,
+        60,
+        45
+      ],
+      "catchRate": 120,
+      "xpYield": 65,
+      "talents": [
+        "overgrow"
+      ],
+      "hiddenTalent": null,
+      "evolutions": []
+    }
+  },
+  "moves": {
+    "chloroshot": {
+      "type": "grass",
+      "category": "special",
+      "power": 55,
+      "accuracy": 100,
+      "priority": 0,
+      "rarity": 2,
+      "cooldown": 1,
+      "tags": [],
+      "effects": [],
+      "learnTypes": [
+        "grass"
+      ]
+    }
+  },
+  "items": {
+    "auroria_pass": {
+      "kind": "key",
+      "price": 0,
+      "image": "pokeflute.png"
+    },
+    "auroria_tm_chloroshot": {
+      "kind": "tm",
+      "price": 1200,
+      "image": null,
+      "move": "chloroshot"
+    }
+  },
+  "locations": {
+    "auroria_start": {
+      "region": "auroria",
+      "kind": "town",
+      "connections": [
+        "auroria_path"
+      ],
+      "winsToClear": 0,
+      "badgesRequired": 0,
+      "shop": "auroria_store"
+    },
+    "auroria_path": {
+      "region": "auroria",
+      "kind": "route",
+      "connections": [
+        "auroria_start",
+        "auroria_city"
+      ],
+      "winsToClear": 3,
+      "badgesRequired": 0
+    },
+    "auroria_city": {
+      "region": "auroria",
+      "kind": "town",
+      "connections": [
+        "auroria_path",
+        "auroria_forest"
+      ],
+      "winsToClear": 0,
+      "badgesRequired": 0,
+      "champion": "auroria_ivy",
+      "shop": "auroria_store"
+    },
+    "auroria_forest": {
+      "region": "auroria",
+      "kind": "dungeon",
+      "connections": [
+        "auroria_city",
+        "auroria_summit"
+      ],
+      "winsToClear": 0,
+      "badgesRequired": 1
+    },
+    "auroria_summit": {
+      "region": "auroria",
+      "kind": "town",
+      "connections": [
+        "auroria_forest"
+      ],
+      "winsToClear": 0,
+      "badgesRequired": 1,
+      "champion": "auroria_league"
+    }
+  },
+  "map-layout": {
+    "auroria_start": {
+      "x": 140,
+      "y": 700,
+      "w": 160,
+      "h": 120
+    },
+    "auroria_path": {
+      "x": 350,
+      "y": 610,
+      "w": 260,
+      "h": 90
+    },
+    "auroria_city": {
+      "x": 690,
+      "y": 480,
+      "w": 160,
+      "h": 120
+    },
+    "auroria_forest": {
+      "x": 940,
+      "y": 360,
+      "w": 220,
+      "h": 140
+    },
+    "auroria_summit": {
+      "x": 1240,
+      "y": 170,
+      "w": 170,
+      "h": 150
+    }
+  },
+  "encounters": {
+    "auroria_path": [
+      {
+        "species": "mossling",
+        "minLevel": 3,
+        "maxLevel": 6,
+        "rarity": "common"
+      },
+      {
+        "species": "pidgey",
+        "minLevel": 3,
+        "maxLevel": 6,
+        "rarity": "uncommon"
+      }
+    ],
+    "auroria_forest": [
+      {
+        "species": "mossling",
+        "minLevel": 8,
+        "maxLevel": 12,
+        "rarity": "common"
+      },
+      {
+        "species": "pikachu",
+        "minLevel": 8,
+        "maxLevel": 12,
+        "rarity": "rare"
+      }
+    ]
+  },
+  "shops": {
+    "auroria_store": {
+      "items": [
+        "rarecandy",
+        "auroria_tm_chloroshot"
+      ]
+    }
+  },
+  "trainers": {
+    "auroria_ivy": {
+      "kind": "gym",
+      "region": "auroria",
+      "badge": "auroria_leaf",
+      "badgesRequired": 0,
+      "reward": 1000,
+      "sprite": "Brock",
+      "teams": {
+        "default": [
+          {
+            "species": "mossling",
+            "level": 10,
+            "moves": [
+              "chloroshot"
+            ]
+          }
+        ],
+        "rematch": [
+          {
+            "species": "mossling",
+            "level": 50,
+            "moves": [
+              "chloroshot",
+              "growl"
+            ]
+          }
+        ]
+      },
+      "badgeImage": "Rainbow"
+    },
+    "auroria_rival": {
+      "kind": "rival",
+      "region": "auroria",
+      "badge": null,
+      "badgesRequired": 0,
+      "reward": 1000,
+      "sprite": "Brock",
+      "teams": {
+        "default": [
+          {
+            "species": "pidgey",
+            "level": 12,
+            "moves": [
+              "tackle"
+            ]
+          }
+        ]
+      }
+    },
+    "auroria_elite_one": {
+      "kind": "league",
+      "region": "auroria",
+      "badge": null,
+      "badgesRequired": 0,
+      "reward": 1000,
+      "sprite": "Brock",
+      "teams": {
+        "default": [
+          {
+            "species": "mossling",
+            "level": 15,
+            "moves": [
+              "chloroshot"
+            ]
+          }
+        ]
+      }
+    },
+    "auroria_elite_two": {
+      "kind": "league",
+      "region": "auroria",
+      "badge": null,
+      "badgesRequired": 0,
+      "reward": 1000,
+      "sprite": "Brock",
+      "teams": {
+        "default": [
+          {
+            "species": "pikachu",
+            "level": 18,
+            "moves": [
+              "tackle"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "leagues": {
+    "auroria_league": {
+      "region": "auroria",
+      "badge": "auroria_title",
+      "badgesRequired": 1,
+      "reward": 5000,
+      "sprite": "Brock",
+      "trainers": [
+        "auroria_elite_one",
+        "auroria_elite_two"
+      ],
+      "badgeImage": "Champion_Stamp"
+    }
+  },
+  "quests": [
+    {
+      "category": "main",
+      "id": "auroria_welcome",
+      "region": "auroria",
+      "location": "auroria_start",
+      "objective": {
+        "type": "talk"
+      },
+      "rewards": {
+        "questPoints": 50
+      }
+    },
+    {
+      "category": "main",
+      "id": "auroria_road",
+      "region": "auroria",
+      "location": "auroria_path",
+      "objective": {
+        "type": "kill",
+        "location": "auroria_path",
+        "count": 3
+      },
+      "rewards": {
+        "questPoints": 100,
+        "items": {
+          "auroria_pass": 1
+        }
+      }
+    },
+    {
+      "category": "main",
+      "id": "auroria_gym",
+      "region": "auroria",
+      "location": "auroria_city",
+      "objective": {
+        "type": "badge",
+        "badge": "auroria_ivy"
+      },
+      "rewards": {
+        "questPoints": 100
+      }
+    },
+    {
+      "category": "main",
+      "id": "auroria_rival",
+      "region": "auroria",
+      "location": "auroria_city",
+      "objective": {
+        "type": "boss",
+        "trainer": "auroria_rival"
+      },
+      "rewards": {
+        "questPoints": 100
+      }
+    },
+    {
+      "category": "side",
+      "id": "auroria_catches",
+      "region": "auroria",
+      "location": "auroria_city",
+      "objective": {
+        "type": "catch",
+        "location": "auroria_path",
+        "count": 2
+      },
+      "rewards": {
+        "questPoints": 80
+      }
+    }
+  ]
+}

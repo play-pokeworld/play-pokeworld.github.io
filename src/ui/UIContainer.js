@@ -37,7 +37,8 @@ export class UIContainer extends UIElement {
    * @param {string} text
    */
   setText(text) {
-    this._dom.textContent = text;
+    const value = text == null ? '' : String(text);
+    if (this._dom.textContent !== value || this._dom.childNodes.length > 1) this._dom.textContent = value;
   }
 }
 

@@ -1,0 +1,943 @@
+/* Reference facility composition. Palette and original skins remain in design-system.css.
+   Only shared-widget adaptation and responsive geometry are defined here. */
+.pw-facility-dashboard,
+.pw-facility-slots,
+.pw-facility-training-auto,
+.hatchery-auto-layout {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+.pw-facility-subtle {
+  color: var(--light1);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.pw-facility-dashboard p,
+.pw-facility-management p {
+  margin: 0;
+}
+.pw-facility-section-label {
+  font-size: 13px;
+}
+.pw-facility-title-row,
+.pw-facility-slot-main,
+.pw-facility-actions,
+.pw-facility-fossil-media {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.pw-facility-title-row {
+  justify-content: space-between;
+}
+.pw-facility-actions {
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+.pw-facility-slot-info {
+  display: grid;
+  gap: 3px;
+  flex: 1 1 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.pw-facility-manage {
+  width: 100%;
+  min-height: 37px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 900;
+}
+.hatchery-upgrade-row:has(.pw-facility-manage) {
+  margin: 0 0 10px;
+}
+.hatchery-slot-card.pw-facility-slot-card {
+  padding: 10px;
+  gap: 10px;
+}
+.pw-hatchery-slot-sprite {
+  width: 68px;
+  height: 68px;
+  flex: 0 0 68px;
+}
+.pw-hatchery-offer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 10px;
+  min-height: 44px;
+  white-space: normal;
+  text-align: left;
+  border: 1px solid var(--pw-border);
+  border-radius: 12px;
+  background: var(--pw-bg-inset);
+  font-size: 13px;
+  font-weight: 900;
+}
+.pw-hatchery-offer-description {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--purple);
+}
+.hatchery-slot-card.is-empty .hatchery-slot-footer {
+  justify-content: flex-end;
+}
+.hatchery-slot-card .hatchery-slot-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.pw-facility-pending,
+.pw-facility-legacy-note {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--orange);
+}
+.pw-facility-legacy-note {
+  margin: 0;
+}
+.pw-training-slot-sprite {
+  width: 62px;
+  height: 62px;
+  flex: 0 0 62px;
+}
+.training-slot-card .training-slot-pokemon {
+  grid-template-columns: 62px minmax(0, 1fr) auto;
+}
+.training-slot-card .training-slot-head {
+  font-size: 13px;
+}
+.training-slot-metadata {
+  display: block;
+  font-size: 11px;
+  color: var(--light1);
+  line-height: 1.35;
+}
+.training-slot-card .training-mode-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.training-slot-card .training-mode-row {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  padding: 10px 11px;
+  min-height: 75px;
+  border: 1px solid var(--pw-border);
+  border-radius: 8px;
+  text-align: left;
+  font-size: 12px;
+}
+.training-mode-row b {
+  font-size: 13px;
+}
+.training-mode-row small,
+.training-mode-status {
+  font-size: 11px;
+  line-height: 1.35;
+}
+.training-mode-row:not(.is-disabled) {
+  cursor: pointer;
+}
+.training-mode-row .pw-training-mode-action {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  border-radius: 8px;
+}
+.training-mode-row:focus-within {
+  outline: 2px solid var(--light2);
+  outline-offset: 2px;
+}
+.training-slot-card .pw-training-result {
+  padding: 8px;
+  border: 1px solid var(--pw-border);
+  border-radius: 8px;
+  font-size: 12px;
+}
+.pw-facility-management.pw-static-modal {
+  width: min(96vw, 980px);
+  max-width: 980px;
+  height: min(84vh, 760px);
+  max-height: 84vh;
+}
+.pw-facility-management > .pw-win-hdr {
+  flex: 0 0 50px;
+  height: 50px;
+  min-height: 50px;
+  padding: 0 14px;
+  border-bottom: 2px solid var(--light1);
+}
+.pw-facility-management > .pw-facility-management-body {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0;
+}
+.pw-facility-management .management-shell {
+  width: 100%;
+  min-height: 0;
+  gap: 12px;
+  padding-top: 8px;
+}
+.pw-facility-management .management-content {
+  min-width: 0;
+  will-change: scroll-position;
+  padding: 14px;
+}
+.pw-facility-management .management-tabs {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.pw-facility-management .management-tabs .pw-button {
+  justify-content: center;
+  font-weight: 900;
+  white-space: normal;
+}
+.pw-facility-management .upgrade-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: 10px;
+}
+.pw-facility-upgrade {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  min-width: 0;
+  border: 1px solid var(--pw-border);
+  border-radius: 12px;
+  background: var(--pw-bg-inset);
+}
+.pw-facility-upgrade > .pw-icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  display: none;
+}
+.pw-facility-upgrade-info {
+  flex: 1 1 0;
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+.pw-facility-card-title {
+  font-size: 13px;
+}
+.pw-facility-card-description,
+.pw-facility-card-status {
+  color: var(--light1);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.pw-facility-buy {
+  display: flex;
+  gap: 6px;
+  flex: 0 0 65%;
+  padding: 9px 12px;
+  font-size: 13px;
+  width: 65%;
+  min-height: 43px;
+  justify-content: center;
+}
+.pw-facility-buy.is-owned {
+  opacity: 0.65;
+}
+.pw-facility-management .automation-dashboard,
+.pw-facility-management .staff-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: 12px;
+}
+.pw-facility-auto-card {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--pw-border);
+  border-radius: 10px;
+  background: var(--pw-bg-inset);
+}
+.pw-facility-auto-card .pw-facility-title-row {
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+.pw-facility-auto-card .pw-facility-title-row > b {
+  flex: 1 1 0;
+}
+.pw-facility-auto-card .pw-icon {
+  width: 17px;
+  height: 17px;
+}
+.pw-facility-auto-card .pw-facility-title-row .hbtn {
+  padding: 6px 8px;
+  font-size: 12px;
+}
+.pw-facility-auto-card.is-on {
+  border-color: var(--green);
+}
+.pw-facility-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.pw-facility-queues,
+.pw-facility-management .training-auto-slot-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: 12px;
+}
+.pw-facility-queue-card {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 12px;
+  min-width: 0;
+  border: 1px solid var(--pw-border);
+  border-radius: 12px;
+  background: var(--pw-bg-inset);
+}
+.pw-facility-queue-card > h3 {
+  margin: 0;
+  font-size: 13px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--pw-border);
+}
+.pw-facility-queue-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+.pw-facility-queue-options > .pw-facility-auto-card {
+  flex: 1 1 100%;
+}
+.pw-facility-management .pw-facility-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  min-width: 0;
+  row-gap: 22px;
+}
+.pw-facility-filter-field {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--light1);
+  font-weight: 800;
+}
+.pw-facility-filter-field .pw-dropdown {
+  min-width: 0;
+  width: 100%;
+}
+.pw-facility-filter-field select {
+  width: 100%;
+  min-width: 0;
+  font-size: 14px;
+  padding: 8px 10px;
+  min-height: 38px;
+  background: var(--dark1);
+  color: var(--light2);
+  border: 1px solid var(--pw-border);
+  font-weight: 500;
+  border-radius: 8px;
+}
+.pw-facility-queue-box {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--pw-border);
+  border-radius: 14px;
+  background: var(--pw-bg-inset);
+}
+.pw-facility-queue-list {
+  display: grid;
+  gap: 6px;
+}
+.pw-facility-queue-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.pw-facility-queue-entry > .pw-text {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.pw-facility-queue-entry .pw-poke-circle-wrap {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+}
+.pw-facility-queue-card .queue-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.pw-facility-queue-card .queue-actions .pw-button {
+  font-size: 11px;
+  padding: 6px 8px;
+  white-space: normal;
+  background: var(--dark3);
+  border: 1px solid var(--pw-border);
+  border-radius: 10px;
+  min-height: 42px;
+  flex: 1 1 140px;
+  width: auto;
+}
+.pw-facility-staff-card {
+  display:flex;
+  flex-direction:column;
+  align-self:stretch;
+  gap: 7px;
+  padding: 12px;
+  min-width: 0;
+  border: 1px solid var(--pw-border);
+  border-radius: 12px;
+  background: var(--pw-bg-inset);
+}
+.pw-facility-staff-card .staff-card-head {
+  display: grid;
+  gap: 8px;
+  justify-content: stretch;
+}
+.pw-facility-staff-card .staff-portrait {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 10px;
+  border: 1px solid var(--pw-border);
+  background: var(--pw-bg-inset);
+  padding: 4px;
+}
+.pw-facility-staff-card .staff-card-head-text {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 3px 8px;
+}
+.pw-facility-staff-card .staff-card-head-text h3 {
+  margin: 0;
+  font-size: 15px;
+}
+.pw-facility-staff-card .staff-card-location {
+  font-size: 12px;
+  color: var(--light1);
+  text-align: right;
+  align-self: center;
+}
+.pw-facility-staff-card .staff-bonus {
+  font-size: 12px;
+  line-height: 1.35;
+}
+.pw-staff-card-footer > .pw-button {
+  justify-content: center;
+  width: 100%;
+  font-size: 13px;
+  min-height: 35px;
+}
+.pw-facility-staff-card.is-active {
+  border-color: var(--green);
+}
+.pw-fossil-picker-body {
+  overflow: auto;
+  will-change: scroll-position;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+.pw-fossil-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr));
+  gap: 12px;
+}
+.pw-fossil-picker .pw-fossil-card {
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--pw-border-color);
+  border-radius: 12px;
+}
+.pw-facility-fossil-media {
+  justify-content: center;
+}
+.pw-fullscreen-overlay.pw-box-selector-mode {
+  z-index: 1100;
+}
+.pw-training-live {
+  display: grid;
+  gap: 12px;
+  padding: 12px 0;
+  min-width: 0;
+}
+.pw-training-live > h3 {
+  margin: 0;
+  font-size: 14px;
+}
+.pw-training-live-list {
+  display: grid;
+  gap: 14px;
+}
+.pw-training-live-card {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--pw-border-color);
+  border-radius: 12px;
+  background: var(--pw-bg-inset);
+  min-width: 0;
+}
+.pw-training-live-fighters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+.pw-training-live-fighters .poke-card {
+  width: auto;
+  min-width: 0;
+  margin: 0;
+}
+.pw-training-live-fighters .poke-card-top {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pw-training-live-fighters .poke-sprite-container.large {
+  width: 72px;
+  height: 72px;
+}
+.pw-training-live-fighters .poke-sprite-container .pw-poke-circle-wrap {
+  width: 64px;
+  height: 64px;
+}
+.pw-training-live-fighters .poke-info {
+  width: 100%;
+  min-width: 0;
+}
+.pw-training-live-fighters .poke-name {
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+.pw-training-live-fighters .poke-moves {
+  grid-template-columns: 1fr;
+} /* A custom StaticModalPanel size avoids the global !important presets, without overriding them. */
+.pw-facility-management > .pw-win-hdr .pw-win-hdr-title {
+  position: static;
+  left: auto;
+  transform: none;
+  justify-content: flex-start;
+  max-width: calc(100% - 48px);
+}
+.pw-facility-management .pw-modal-close-btn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--red);
+  background: color-mix(in srgb, var(--red) 16%, transparent);
+  border-radius: 10px;
+}
+.pw-facility-management .staff-list {
+  align-items: stretch;
+  grid-auto-rows:1fr;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+}
+.pw-facility-staff-card:not(.is-owned) > .pw-staff-card-footer > .pw-button > .pw-button-text {
+  display: none;
+}
+.pw-facility-staff-card:not(.is-owned) > .pw-staff-card-footer > .pw-button .pw-price-tag {
+  width: 100%;
+  justify-content: space-between;
+}
+.pw-facility-fee-banner {
+  padding: 10px;
+  margin: 8px 0 12px;
+  border-left: 3px solid var(--yellow);
+  background: var(--pw-bg-inset);
+  font-size: 12px;
+  line-height: 1.4;
+  display: block;
+}
+/* Tracks follow their actual panel width, not only the viewport breakpoint. */
+.training-slot-grid.pw-facility-slots {
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+}
+.pw-training-body .pw-facility-manage,
+.pw-training-body .pw-facility-manage .pw-button-text {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.training-slot-card,
+.training-locked-slot {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.training-slot-card {
+  container-type: inline-size;
+  container-name: pw-training-slot;
+}
+.training-slot-card .training-slot-head {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.training-slot-card .training-slot-head > *,
+.training-slot-card .training-mode-grid,
+.training-slot-card .training-mode-row {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.training-locked-slot .pw-button {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+}
+@container pw-training-slot (max-width: 250px) {
+  .training-slot-card .training-slot-pokemon {
+    grid-template-columns: 62px minmax(0, 1fr);
+  }
+  .training-slot-card .training-slot-pokemon > .pw-facility-slot-info {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .training-slot-card .training-slot-pokemon > .pw-button {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+  .training-slot-card .pw-training-slot-automation .pw-facility-title-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .training-slot-card .pw-training-slot-automation .pw-facility-title-row > .pw-button,
+  .training-slot-card .pw-training-slot-automation .pw-facility-title-row > .pw-switch {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    justify-content: center;
+  }
+  .training-slot-card .training-mode-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .training-slot-card.pw-facility-slot-card .pw-facility-actions > .pw-button {
+    flex-basis: 100%;
+    white-space: normal;
+  }
+}
+.pw-training-slot-list {
+  display: contents;
+}
+.pw-training-slot-automation {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.pw-training-slot-automation > small,
+.pw-training-slot-automation > .pw-price-tag {
+  display: none;
+}
+.pw-training-slot-automation .pw-facility-title-row {
+  justify-content: flex-start;
+} /* The original uses three horizontal purchase cards per row, not full-width rows. */
+.pw-facility-buy:not(.is-owned) > .pw-button-text {
+  display: none;
+}
+.pw-facility-queue-filters {
+  padding: 10px;
+  border: 1px solid var(--pw-border);
+  border-radius: 14px;
+  background: var(--pw-bg-inset);
+}
+.pw-facility-filter-field .pw-select-wrap {
+  width: 100%;
+  min-width: 0;
+}
+.automation-dashboard > .pw-facility-auto-card:not(.is-owned) > small {
+  display: none;
+}
+.pw-training-queue-card .pw-facility-filter-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.pw-facility-management .training-auto-slot-list {
+  grid-template-columns: 1fr;
+}
+.pw-training-queue-card {
+  display: flex;
+  flex-direction: column;
+} /* Keep the shared 44px switch target inside the reference's compact 48px header. */
+.pw-training-queue-header {
+  order: -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 1px 10px;
+  border: 1px dashed var(--pw-border);
+  border-radius: 10px;
+  min-height: 48px;
+}
+.pw-training-queue-header > h3 {
+  margin: 0;
+  font-size: 13px;
+  flex: 1 1 0;
+}
+.pw-training-queue-header > .pw-facility-subtle {
+  flex: 1 1 0;
+}
+.pw-training-queue-header .pw-facility-auto-card {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  min-height: 0;
+  gap: 0;
+}
+.pw-training-queue-header .pw-facility-auto-card > small,
+.pw-training-queue-header .pw-facility-auto-card > .pw-price-tag {
+  display: none;
+}
+.pw-training-queue-header .pw-facility-title-row > .pw-icon {
+  display: none;
+}
+.pw-training-queue-header .pw-facility-title-row > b {
+  display: none;
+}
+.pw-training-queue-card .pw-facility-queue-options > .pw-facility-subtle {
+  flex: 1 1 100%;
+}
+.hatchery-slot-card.is-exp,
+.pw-facility-queue-card.is-exp {
+  border-left: 5px solid var(--green);
+}
+.hatchery-slot-card.is-breed,
+.pw-facility-queue-card.is-breed {
+  border-left: 5px solid var(--purple);
+}
+.pw-hatchery-slot-number {
+  display: none;
+}
+.hatchery-slot-info {
+  display: flex;
+  flex-direction: column;
+}
+.hatchery-slot-info > .pw-progress {
+  order: 1;
+}
+.hatchery-slot-footer
+  > .pw-button:first-child:not(.hatchery-mode-toggle):not(.is-hidden) {
+  flex: 1 1 0;
+}
+.pw-facility-staff {
+  display: grid;
+  gap: 8px;
+}
+.hatchery-slot-card.pw-facility-slot-card .pw-hatchery-offer {
+  border-left: 1px solid var(--pw-border);
+}
+.hatchery-slot-main[role='button']:focus-visible {
+  outline: 2px solid var(--light2);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+.training-slot-card .pw-facility-actions > .pw-button {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 9px 10px;
+  font-size: 14px;
+}
+.training-slot-card > .pw-facility-actions {
+  justify-content: stretch;
+} /* Slot-local selectors keep the reference's dark input skin and complete editor framing. */
+.pw-facility-queue-options > .pw-facility-subtle {
+  flex: 1 1 0;
+  font-size: 11px;
+}
+.automation-dashboard > .pw-facility-auto-card:not(.is-owned) {
+  min-height: 76px;
+  align-content: center;
+}
+.pw-facility-legacy-options {
+  display: grid;
+  gap: 8px;
+}
+.pw-facility-filter-field select:focus-visible {
+  outline: 2px solid var(--light2);
+  outline-offset: 2px;
+}
+.pw-facility-auto-card,
+.pw-facility-queue-card {
+  margin: 0;
+}
+.pw-training-queue-card:not(.is-purchased) .pw-training-queue-header {
+  border: 0;
+  padding: 0;
+  min-height: 0;
+}
+@media (max-width: 680px) {
+  .pw-facility-management.pw-static-modal {
+    width: 96vw;
+    height: 84dvh;
+    max-height: 84dvh;
+  }
+  .pw-facility-management .management-shell {
+    padding: 0 6px 8px;
+    gap: 8px;
+  }
+  .pw-facility-management .management-content {
+    padding: 8px;
+  }
+  .pw-facility-management .management-tabs {
+    padding: 4px;
+    gap: 4px;
+  }
+  .pw-facility-management .management-tabs .pw-button {
+    padding: 7px 4px;
+    font-size: 11px;
+    gap: 4px;
+  }
+  .pw-facility-management .management-tabs .pw-icon {
+    width: 15px;
+    height: 15px;
+  }
+  .training-slot-grid.pw-facility-slots {
+    grid-template-columns: 1fr;
+  }
+  .training-slot-card .training-mode-grid {
+    grid-template-columns: 1fr;
+  }
+  .pw-facility-upgrade {
+    gap: 7px;
+    padding: 10px;
+  }
+  .pw-facility-buy {
+    padding: 8px;
+    font-size: 12px;
+  }
+  .pw-facility-upgrade > .pw-icon {
+    display: none;
+  }
+}
+@media (max-width: 680px) {
+  .pw-training-queue-card .pw-facility-filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+/* The Mine uses the original board composition, not the generic facility dashboard grid. */
+.pw-mine-body {
+  display: block;
+}
+.pw-mine-window-root > .pw-mine-header {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin-bottom: 12px;
+}
+.pw-mine-header > .pw-button {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+  padding: 10px;
+  font-size: 12px;
+  white-space: normal;
+}
+.pw-mine-header > .pw-mine-auto-header {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3px;
+}
+.pw-mine-auto-header .pw-price-tag {
+  font-size: 11px;
+}
+.pw-mine-window-root .loc-title {
+  margin: 0;
+}
+.pw-mine-window-root > .loc-sub {
+  margin-top: 0;
+}
+.pw-mine-window-root .pw-action-flex {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+.pw-mine-window-root .mine-tool-hint {
+  flex: 1 1 100%;
+}
+.pw-mine-window-root .pw-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.pw-mine-window-root .mine-tool-btn {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+}
+.mine-tool-cost {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 11px;
+}
+.mine-tool-cost .pw-icon {
+  width: 12px;
+  height: 12px;
+}
+.pw-mine-window-root .pw-mine-tile {
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  --pw-disabled-opacity: 1;
+}
+.pw-mine-tile .pw-button-text {
+  display: none;
+}
+.pw-mine-tile .pw-slot-label {
+  font-size: 13px;
+}
+.pw-mine-tile-item {
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+  position: absolute;
+  inset: 5%;
+  margin: auto;
+}
+.pw-mine-window-root .pw-mine-energy-bar {
+  height: 4px;
+}
+
+.pw-mine-survey-clock {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--dark3);
+  border-radius: 10px;
+  color: var(--light2);
+  background: var(--dark3);
+  font-weight: 800;
+  --pw-disabled-opacity: 0.8;
+}
+
+/* Quotes are facts, not disabled actions: keep prices visible at every balance. */
+.pw-facility-price-quote { flex:0 0 auto; padding:9px 12px; border:1px solid var(--pw-border-color); border-radius:10px; background:var(--pw-bg-inset); }
+.pw-facility-price-quote > .pw-price-tag { font-size:13px; font-weight:800; }
+.pw-staff-card-footer { display:flex; flex-direction:column; gap:7px; margin-top:auto; }
+

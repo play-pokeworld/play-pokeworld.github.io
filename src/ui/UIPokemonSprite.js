@@ -7,8 +7,7 @@
  * Size is a CSS modifier class (.pw-poke-circle-wrap--<size>), never an inline style.
  */
 
-import { UIElement } from './UIElement.js';
-import { UIImage } from './UIImage.js';
+import { UISpriteFrame } from './UISpriteFrame.js';
 import { AssetPaths } from '../config/AssetPaths.js';
 
 /** Allowed size tokens (pixel values live in ui-pokemon-sprite.css). */
@@ -16,12 +15,13 @@ export const PokemonSpriteSizes = Object.freeze({
   STANDARD: 'standard', // 56px
   LARGE: 'large',       // 72px (starter cards)
   TEAM: 'team',         // 96px
+  HERO: 'hero',         // 132px (Pokemon detail sheet hero)
   CONTEXT: 'context'    // no size token: the surrounding component CSS sizes the disc
 });
 
 const VALID_SIZES = new Set(Object.values(PokemonSpriteSizes));
 
-export class UIPokemonSprite extends UIElement {
+export class UIPokemonSprite extends UISpriteFrame {
   /**
    * @param {Object} options
    * @param {string} options.species             - Species slug, resolved through AssetPaths
@@ -33,23 +33,10 @@ export class UIPokemonSprite extends UIElement {
    */
   constructor(options = {}) {
     super({
-      tagName: 'span',
-      className: `pw-poke-circle-wrap ${options.className || ''}`.trim(),
-      id: options.id,
+      ...options,
+      src: options.species ? AssetPaths.pokemonSprite(options.species, options.form || '', options.shiny === true) : '',
       name: options.name || 'UIPokemonSprite'
     });
-
-    const disc = new UIElement({ tagName: 'span', className: 'pw-poke-circle-bg' });
-    disc.setAttribute('aria-hidden', 'true');
-    this.addChild(disc);
-
-    this._image = new UIImage({
-      src: AssetPaths.pokemonSprite(options.species, options.form || '', options.shiny === true),
-      alt: options.alt || '',
-      className: 'pw-poke-circle-img sprite-img',
-      pixelated: true
-    });
-    this.addChild(this._image);
 
     this.setSize(options.size || PokemonSpriteSizes.STANDARD);
   }
@@ -57,6 +44,8 @@ export class UIPokemonSprite extends UIElement {
   /** @param {string} size - One of PokemonSpriteSizes (unknown values fall back to 'standard') */
   setSize(size) {
     const token = VALID_SIZES.has(size) ? size : PokemonSpriteSizes.STANDARD;
+    if (this._size === token) return;
+    this._size = token;
     for (const s of VALID_SIZES) this.removeClass(`pw-poke-circle-wrap--${s}`);
     if (token !== PokemonSpriteSizes.CONTEXT) this.addClass(`pw-poke-circle-wrap--${token}`);
     this.setData('size', token);
@@ -68,7 +57,7 @@ export class UIPokemonSprite extends UIElement {
    * @param {boolean} [shiny=false]
    */
   setSpecies(species, form = '', shiny = false) {
-    this._image.setSource(AssetPaths.pokemonSprite(species, form, shiny));
+    this._image.setSource(species ? AssetPaths.pokemonSprite(species, form, shiny) : '');
   }
 
   /** @param {string} alt - Localized alternative text */

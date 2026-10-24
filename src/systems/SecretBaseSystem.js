@@ -164,6 +164,14 @@ export class SecretBaseSystem extends BaseSystem {
       this.getAlcoveLayoutIds(locationId).length > 0;
   }
 
+  /** Pure route/base facts for the Location section; no additional progression gate. @param {string} locationId */
+  getLocationAlcovesSnapshot(locationId){
+    if(!this.canUseAt(locationId))return null;
+    const base=this.getBase(),established=base?.isEstablished?.()===true,baseLocationId=established?this.getBaseLocationId():null,here=established&&baseLocationId===locationId;
+    return {saveId:SaveSystem.getInstance().getCurrentSave()?.id,locationId,established,baseLocationId,baseLayoutId:established?base.layoutId:null,here,
+      rows:this.getAlcoveLayoutIds(locationId).map(id=>({id,current:here&&id===base.layoutId}))};
+  }
+
   /** @returns {string|null} The Hoenn location that contains the established alcove. */
   getBaseLocationId() {
     const base = this.getBase();

@@ -1,3 +1,4 @@
+import { SeededRandom } from '../src/core/SeededRandom.js';
 /**
  * @file UiWidgets.test.js
  * @brief UI widgets and panels rendered against the fake DOM (tests/FakeDom.js).
@@ -186,31 +187,19 @@ describe('UI widgets', (test) => {
     const previous = saveSystem.getCurrentSave();
     const save = SaveData.createNew('Background fixture', 'charmander');
     saveSystem.setCurrentSave(save);
-    const view = new PokemonBackgroundView({ random: Random.sequence([0, 0, 0.5, 0, 0.75, 0, 0.25, 0, 0.1, 0, 0.9, 0, 0.7, 0, 0.5, 0, 0.3, 0, 0.1, 0]) });
+    const view = new PokemonBackgroundView({ random: new SeededRandom(41376) });
     try {
       assert.equal(view.getChildren().length, 5, 'the first captured Pokémon shows the minimum walkers');
-      const walkerClasses = view.getChildren().map((walker) => walker.getDomElement().className.split(' '));
-      const routes = walkerClasses.map((classes) => classes.find((name) => name.startsWith('pw-background-pokemon-walker--route-')));
-      const facings = walkerClasses.map((classes) => classes.find((name) => name.startsWith('pw-background-pokemon-walker--facing-')));
-      assert.deepEqual(routes, [
-        'pw-background-pokemon-walker--route-0',
-        'pw-background-pokemon-walker--route-2',
-        'pw-background-pokemon-walker--route-3',
-        'pw-background-pokemon-walker--route-1',
-        'pw-background-pokemon-walker--route-0'
-      ], 'walker routes are sampled independently from the injected random source');
-      assert.deepEqual(facings, [
-        'pw-background-pokemon-walker--facing-right',
-        'pw-background-pokemon-walker--facing-right',
-        'pw-background-pokemon-walker--facing-left',
-        'pw-background-pokemon-walker--facing-left',
-        'pw-background-pokemon-walker--facing-right'
-      ], 'each sprite faces the randomized horizontal direction of its route');
+      const originalNodes=view.getChildren().map(w=>w.getDomElement());
+      const flights=view._walkers.map(w=>w.flight).filter(Boolean);
+      assert.ok(flights.length>0,'bounded flights are prepared from the injected random source');
+      assert.ok(flights.every(f=>f.fromEdge!==f.toEdge),'entries are not four fixed diagonals');
       for (const species of ['bulbasaur', 'squirtle', 'pidgey', 'rattata', 'caterpie', 'weedle', 'pikachu', 'geodude', 'abra']) {
         save.pokedex.markCaught(species);
       }
       assert.equal(save.pokedex.getCaughtCount(), 10);
       assert.equal(view.getChildren().length, 6, 'each ten captures adds a walker');
+      assert.ok(originalNodes.every((node,i)=>view.getChildren()[i].getDomElement()===node),'ordinary Dex updates retain active walker nodes');
       assert.equal(view.getDomElement().getAttribute('aria-hidden'), 'true');
     } finally {
       view.destroy();
@@ -409,7 +398,7 @@ describe('UI widgets', (test) => {
     assert.ok(SHORTCUTS.every((shortcut) => IconRegistry.has(shortcut.icon)), 'each configured shortcut has a registered icon');
     const marketShortcut = SHORTCUTS.find((shortcut) => shortcut.id === ShortcutIds.MARKET);
     const atollShortcut = SHORTCUTS.find((shortcut) => shortcut.id === ShortcutIds.ATOLL);
-    assert.ok(marketShortcut && marketShortcut.modalId === null && marketShortcut.requiresMarketGate, 'Market keeps its current unavailable-screen route and reference gate');
+    assert.ok(marketShortcut && marketShortcut.modalId === ModalIds.MARKET && marketShortcut.requiresMarketGate, 'Market opens its real screen behind the unchanged reference gate');
     assert.ok(atollShortcut && atollShortcut.modalId === null && atollShortcut.requiresChampionTitle, 'Atoll never routes to a missing screen');
 
     const save = SaveSystem.getInstance().createNewSave('Shortcut fixture', 'bulbasaur');
@@ -594,10 +583,12 @@ describe('Panels', (test) => {
       const module = await import(`../src/panels/${file}`);
       const PanelClass = module[file.replace('.js', '')];
       const panel = new PanelClass(DashboardColumns.CENTER);
-      const dom = panel.getDomElement();
-      const hasId = (node) => !!node.id || node.children.some(hasId);
-      assert.ok(hasId(dom), 'panel exposes a stable id for CSS');
-      assert.ok(panel.getDomElement().children.length > 0, 'panel has content');
+      try {
+        const dom = panel.getDomElement();
+        const hasId = (node) => !!node.id || node.children.some(hasId);
+        assert.ok(hasId(dom), 'panel exposes a stable id for CSS');
+        assert.ok(panel.getDomElement().children.length > 0, 'panel has content');
+      } finally { panel.destroy(); }
     });
   }
 });

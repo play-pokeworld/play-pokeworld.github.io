@@ -20,21 +20,18 @@
 .pw-modal-backdrop.pw-ball-overlay--picker { z-index: 1310; }
 
 .pw-panel--modal-window.pw-ball-box {
-  display: block;
   background: var(--pw-bg-surface, #24221E);
   border: 1px solid var(--pw-border-color, #4A3E31);
   border-radius: var(--pw-radius-lg, 12px);
-  padding: 14px;
   width: min(520px, 94vw);
   min-width: 0;
   max-width: 94vw;
   max-height: 86vh;
-  overflow: auto;
   box-sizing: border-box;
   box-shadow: 0 18px 50px rgba(0, 0, 0, .5);
   backdrop-filter: none;
 }
-.pw-ball-box > .win-body { padding: 0; overflow: visible; }
+.pw-ball-box > .win-body { padding: 14px; overflow-y: auto; flex: 1; }
 
 .pw-ball-title { font-size: 14px; color: var(--pw-text-primary, #ECDEB7); margin-bottom: 8px; font-weight: 700; }
 

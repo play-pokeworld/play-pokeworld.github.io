@@ -16,6 +16,8 @@
  * domain model reads the current shape only. Uses the original save id format (PW-TIMESTAMP-RANDOM).
  * `save.team` is a derived, read-only view of the party Pokémon; party changes go through TeamSystem.
  */
+import { ItemDB } from '../items/ItemDB.js';
+import { ItemKinds } from '../items/ItemKinds.js';
 import { BaseModel } from '../core/BaseModel.js';
 import { PlayerData } from './PlayerData.js';
 import { CurrenciesData } from './CurrenciesData.js';
@@ -29,6 +31,10 @@ import { StatisticsData } from './StatisticsData.js';
 import { TutorialProgressData } from './TutorialProgressData.js';
 import { DungeonData } from './DungeonData.js';
 import { HatcheryData } from './HatcheryData.js';
+import { FacilityStaffData } from './FacilityStaffData.js';
+import { TrainingData } from './TrainingData.js';
+import { TalentUnlockData } from './TalentUnlockData.js';
+import { RelaunchData } from './RelaunchData.js';
 import { MineData } from './MineData.js';
 import { SecretBaseData } from './SecretBaseData.js';
 import { ContentAccessData } from './ContentAccessData.js';
@@ -93,6 +99,10 @@ export class SaveData extends BaseModel {
     this.hatchery = new HatcheryData();
     /** @type {MineData} */
     this.mine = new MineData();
+    this.relaunch=new RelaunchData();
+    this.training = new TrainingData();
+    this.talents = new TalentUnlockData();
+    this.staff = new FacilityStaffData();
     /** @type {SecretBaseData} */
     this.secretBase = new SecretBaseData();
     /** @type {ContentAccessData} Sticky progression facts; evaluated by FeatureAccessSystem. */
@@ -122,6 +132,7 @@ export class SaveData extends BaseModel {
     const starter = findStarter(starterSpecies) || STARTERS_BY_REGION[DEFAULT_STARTER_REGION][0];
     const starterPokemon = PokemonFactory.create(starter.species, PlayerDefaults.STARTER_LEVEL);
     save.collection.add(starterPokemon);
+    save.talents.unlock(starterPokemon.species, starterPokemon.talent);
     save.teamMembers.setUids([starterPokemon.uid]);
     const starterRegion = Object.keys(STARTERS_BY_REGION).find((region) =>
       STARTERS_BY_REGION[region].some((entry) => entry.species === starter.species)
@@ -168,6 +179,10 @@ export class SaveData extends BaseModel {
       dungeons: this.dungeons.serialize(),
       hatchery: this.hatchery.serialize(),
       mine: this.mine.serialize(),
+      relaunch:this.relaunch.serialize(),
+      training: this.training.serialize(),
+      talents: this.talents.serialize(),
+      staff: this.staff.serialize(),
       secretBase: this.secretBase.serialize(),
       access: this.access.serialize()
     };
@@ -199,6 +214,11 @@ export class SaveData extends BaseModel {
     this.dungeons = new DungeonData(data.dungeons);
     this.hatchery = new HatcheryData(data.hatchery);
     this.mine = new MineData(data.mine);
+    this.relaunch=new RelaunchData(data.relaunch);
+    this.training = new TrainingData(data.training);
+    this.talents = new TalentUnlockData(data.talents);
+    this.staff = new FacilityStaffData(data.staff);
+    for (const pokemon of this.collection.getAll()) this.talents.unlock(pokemon.species, pokemon.talent);
     this.secretBase = new SecretBaseData(data.secretBase);
     this.access = new ContentAccessData(data.access);
     this._repairPokemonReferences();
@@ -210,10 +230,30 @@ export class SaveData extends BaseModel {
    * @private
    */
   _repairPokemonReferences() {
+    const reserved = new Set();
+    const take = (uid) => {
+      if (!this.collection.has(uid) || reserved.has(uid)) return false;
+      reserved.add(uid);
+      return true;
+    };
     this.hatchery.slots.forEach((slot, index) => {
-      if (slot?.kind === 'daycare' && !this.collection.has(slot.pokemonUid)) this.hatchery.setSlot(index, null);
+      if (slot?.pokemonUid && !take(slot.pokemonUid)) this.hatchery.setSlot(index, null);
     });
-    const housed = new Set(this.hatchery.getDaycareUids());
+    const fossilReservations = new Map();
+    this.hatchery.queues = this.hatchery.queues.map((queue) => queue.filter((entry) => {
+      if (entry.kind !== 'fossil') return take(entry.uid);
+      const item = ItemDB.getInstance().getById(entry.itemId);
+      const reservedCount = fossilReservations.get(entry.itemId) || 0;
+      if (item?.kind !== ItemKinds.FOSSIL || item.futureOnly || !item.revives || this.inventory.count(entry.itemId) <= reservedCount) return false;
+      fossilReservations.set(entry.itemId, reservedCount + 1);
+      return true;
+    }));
+    this.training.slots.forEach((slot) => {
+      if (slot.pokemonUid && !take(slot.pokemonUid)) { slot.pokemonUid = ''; slot.battle = null; }
+      if (!slot.pokemonUid) slot.battle = null;
+      slot.queue = slot.queue.filter(take);
+    });
+    const housed = new Set([...this.hatchery.getReservedUids(), ...this.training.slots.flatMap((slot) => slot.queue)]);
     this.teamMembers.setUids(this.teamMembers.getUids().filter((uid) => this.collection.has(uid) && !housed.has(uid)));
   }
 }

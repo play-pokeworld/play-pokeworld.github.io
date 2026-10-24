@@ -2,6 +2,7 @@
  * @file FossilSystem.js
  * @brief Pewter fossil laboratory and shared fossil-revival outcome.
  */
+import { HatcheryQueue } from './facilities/HatcheryQueue.js';
 import { BaseSystem } from './BaseSystem.js';
 import { SaveSystem } from './SaveSystem.js';
 import { TeamSystem } from './TeamSystem.js';
@@ -59,6 +60,9 @@ export class FossilSystem extends BaseSystem {
     return !!save && save.quests.getMainStep('kanto') >= FossilRules.UNLOCK_MAIN_STEP;
   }
 
+  /** Local laboratory access is separate from the permanently available hatchery. @returns {boolean} */
+  canUseHere() { return this.isRevivalUnlocked() && LocationSystem.getInstance().getCurrentLocationId() === FossilRules.LAB_LOCATION_ID; }
+
   /** @returns {Array<{itemId:string,speciesId:string,quantity:number}>} */
   getCandidates() {
     const save = SaveSystem.getInstance().getCurrentSave();
@@ -83,7 +87,7 @@ export class FossilSystem extends BaseSystem {
     if (LocationSystem.getInstance().getCurrentLocationId() !== FossilRules.LAB_LOCATION_ID) {
       return { result: FossilAvailability.WRONG_LOCATION, speciesId: item.revives };
     }
-    if (!save.inventory.has(itemId)) return { result: FossilAvailability.NO_ITEM, speciesId: item.revives };
+    if (HatcheryQueue.freeFossils(save, itemId) < 1) return { result: FossilAvailability.NO_ITEM, speciesId: item.revives };
     return { result: FossilAvailability.READY, speciesId: item.revives };
   }
 
@@ -99,12 +103,12 @@ export class FossilSystem extends BaseSystem {
       return { result: state.result, speciesId: state.speciesId, duplicate: false, ivStat: null, stored: null };
     }
     const save = SaveSystem.getInstance().getCurrentSave();
-    if (!save.inventory.remove(itemId, 1)) {
+    if (!save.inventory.remove(itemId, 1, { deferSave: true })) {
       return { result: FossilAvailability.NO_ITEM, speciesId: state.speciesId, duplicate: false, ivStat: null, stored: null };
     }
     const revived = this._reviveSpecies(save, state.speciesId);
     if (!revived) {
-      save.inventory.add(itemId, 1);
+      save.inventory.add(itemId, 1, { deferSave: true });
       return { result: FossilAvailability.NO_SPECIES, speciesId: state.speciesId, duplicate: false, ivStat: null, stored: null };
     }
     EventBus.getInstance().dispatch(new FossilRevivedEvent(state.speciesId, { deferSave: true }));
@@ -141,8 +145,8 @@ export class FossilSystem extends BaseSystem {
     if (!pokemon) return null;
     const stored = TeamSystem.getInstance().hasFreeSlot() ? 'team' : 'box';
     const added = stored === 'team'
-      ? TeamSystem.getInstance().addPokemon(pokemon)
-      : BoxSystem.getInstance().addPokemon(pokemon);
+      ? TeamSystem.getInstance().addPokemon(pokemon, { deferSave: true })
+      : BoxSystem.getInstance().addPokemon(pokemon, { deferSave: true });
     if (!added) return null;
     return { speciesId, duplicate: false, ivStat: null, stored, pokemon };
   }

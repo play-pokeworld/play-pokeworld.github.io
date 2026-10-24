@@ -1,3 +1,7 @@
+import { market as fr_market } from './fr/market.js';
+import { market as en_market } from './en/market.js';
+import { relaunch as en_relaunch } from './en/relaunch.js';
+import { relaunch as fr_relaunch } from './fr/relaunch.js';
 /**
  * @file LocaleCatalog.js
  * @brief Declares which translation modules make up each language (C++ equivalent: static const LocaleDomain[]).
@@ -10,6 +14,7 @@
  *   - arrays are indexed              [null, 'Bulbasaur']    -> t('pokemon.1')
  */
 
+import { facilities as en_facilities } from './en/facilities.js';
 import { L_en_ui } from './en/ui.js';
 import { L_en_combat } from './en/combat.js';
 import { L_en_economy } from './en/economy.js';
@@ -38,6 +43,7 @@ import { panels as en_panels } from './en/panels.js';
 import { settings as en_settings } from './en/settings.js';
 import { battleLog as en_battle_log } from './en/battle-log.js';
 
+import { facilities as fr_facilities } from './fr/facilities.js';
 import { L_fr_ui } from './fr/ui.js';
 import { L_fr_combat } from './fr/combat.js';
 import { L_fr_economy } from './fr/economy.js';
@@ -66,6 +72,7 @@ import { panels as fr_panels } from './fr/panels.js';
 import { settings as fr_settings } from './fr/settings.js';
 import { battleLog as fr_battle_log } from './fr/battle-log.js';
 
+
 /**
  * @typedef {Object} LocaleDomain
  * @property {Object|Array} source - Translation module export
@@ -78,7 +85,9 @@ export const FALLBACK_LANGUAGE = 'fr';
 /** @type {Readonly<Record<string, ReadonlyArray<LocaleDomain>>>} */
 export const LOCALE_CATALOG = Object.freeze({
   en: Object.freeze([
+    { source: en_market },
     { source: L_en_ui },
+    { source: en_facilities },
     { source: L_en_combat },
     { source: L_en_economy },
     { source: L_en_messages },
@@ -103,11 +112,14 @@ export const LOCALE_CATALOG = Object.freeze({
     { source: en_notifications },
     { source: en_debug },
     { source: en_panels },
+    {source:en_relaunch},
     { source: en_settings },
     { source: en_battle_log, prefix: 'battle_log' }
   ]),
   fr: Object.freeze([
+    { source: fr_market },
     { source: L_fr_ui },
+    { source: fr_facilities },
     { source: L_fr_combat },
     { source: L_fr_economy },
     { source: L_fr_messages },
@@ -132,6 +144,7 @@ export const LOCALE_CATALOG = Object.freeze({
     { source: fr_notifications },
     { source: fr_debug },
     { source: fr_panels },
+    {source:fr_relaunch},
     { source: fr_settings },
     { source: fr_battle_log, prefix: 'battle_log' }
   ])

@@ -223,12 +223,12 @@ export class UIElement extends BaseObject {
    * @param {string|number|boolean} value
    */
   setAttribute(name, value) {
-    if (name) this._dom.setAttribute(name, String(value));
+    if (name && this._dom.getAttribute(name) !== String(value)) this._dom.setAttribute(name, String(value));
   }
 
   /** @param {string} name */
   removeAttribute(name) {
-    if (name) this._dom.removeAttribute(name);
+    if (name && this._dom.hasAttribute(name)) this._dom.removeAttribute(name);
   }
 
   /**
@@ -237,7 +237,7 @@ export class UIElement extends BaseObject {
    * @param {string|number} value
    */
   setData(key, value) {
-    if (key) this._dom.dataset[key] = String(value);
+    if (key && this._dom.dataset[key] !== String(value)) this._dom.dataset[key] = String(value);
   }
 
   /**
@@ -245,7 +245,7 @@ export class UIElement extends BaseObject {
    * @param {string} label
    */
   setAriaLabel(label) {
-    this._dom.setAttribute('aria-label', label || '');
+    this.setAttribute('aria-label', label || '');
   }
 
   /**
@@ -266,8 +266,8 @@ export class UIElement extends BaseObject {
    * @param {string} text
    */
   setTooltip(text) {
-    if (text) this._dom.setAttribute('title', text);
-    else this._dom.removeAttribute('title');
+    if (text) this.setAttribute('title', text);
+    else this.removeAttribute('title');
   }
 
   /** Gives keyboard focus to the element. */
@@ -317,11 +317,12 @@ export class UIElement extends BaseObject {
    * Registers a DOM event listener with automatic cleanup on destroy()
    * @param {string} event
    * @param {Function} handler
+   * @param {AddEventListenerOptions|boolean} [options] - Shared capture/passive listener options.
    */
-  addDomListener(event, handler) {
+  addDomListener(event, handler, options=undefined) {
     const bound = handler.bind(this);
-    this._dom.addEventListener(event, bound);
-    this._registeredDomListeners.push({ event, handler: bound });
+    this._dom.addEventListener(event,bound,options);
+    this._registeredDomListeners.push({event,handler:bound,options});
   }
 
   /**
@@ -381,7 +382,7 @@ export class UIElement extends BaseObject {
    */
   onDestroy() {
     for (const entry of this._registeredDomListeners) {
-      this._dom.removeEventListener(entry.event, entry.handler);
+      this._dom.removeEventListener(entry.event,entry.handler,entry.options);
     }
     this._registeredDomListeners = [];
 

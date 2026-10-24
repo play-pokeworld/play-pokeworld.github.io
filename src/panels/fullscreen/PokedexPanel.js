@@ -57,7 +57,14 @@ export class PokedexPanel extends UIFullscreenPanel {
     if (visibleRegions.some((region) => region.id === params.region)) {
       this._filterState[PokedexFilterKeys.REGION] = params.region;
     }
-    this._selectedSpecies = null;
+    const requested = PokemonDB.getInstance().getById(params.speciesId);
+    const seen = SaveSystem.getInstance().getCurrentSave()?.pokedex.isSeen(requested?.id);
+    const visible = requested && visibleRegions.some((region) => PokemonDB.getInstance().getByRegion(region.id).some((entry) => entry.id === requested.id));
+    this._selectedSpecies = seen && visible ? requested.id : null;
+    if (this._selectedSpecies) {
+      this._filterState = { ...DEFAULT_POKEDEX_FILTERS };
+      EventBus.getInstance().dispatch(new PokedexEntryOpenedEvent(requested.id));
+    }
     this._render();
   }
 

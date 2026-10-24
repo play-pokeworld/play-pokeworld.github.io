@@ -1,0 +1,56 @@
+/** @file FacilityFilterRules.js @brief Reference automation vocabulary; IV rank is deliberately not species rank. */
+import { TYPE_IDS } from '../data/core/TypeChart.js';
+export const FacilityFilterRules = Object.freeze({
+  RANK_IV_MIN: 24,
+  MODE_ORDER: Object.freeze(['talent', 'hidden', 'move', 'ev', 'level']),
+  COMMON: Object.freeze({
+    filterShiny: Object.freeze(['all', 'non_shiny', 'shiny']),
+    filterFav: Object.freeze(['all', 'fav_only', 'no_fav']),
+    filterRegion: Object.freeze(['all', 'kanto', 'johto', 'hoenn']),
+    filterRank: Object.freeze(['all', 'S_or_better', 'A_or_worse']),
+    filterType: Object.freeze(['all', ...TYPE_IDS]),
+  }),
+  HATCHERY_SORTS: Object.freeze([
+    'iv_desc',
+    'iv_asc',
+    'level_desc',
+    'level_asc',
+    'dex',
+    'legacy',
+  ]),
+  TRAINING_SORTS: Object.freeze([
+    'ev_asc',
+    'ev_desc',
+    'level_desc',
+    'level_asc',
+    'talent_missing',
+    'move_missing',
+    'level_missing',
+    'dex',
+  ]),
+  COMPLETENESS: Object.freeze(['all', 'complete', 'incomplete']),
+  REGIONS: Object.freeze([
+    Object.freeze({ id: 'kanto', max: 151 }),
+    Object.freeze({ id: 'johto', max: 251 }),
+    Object.freeze({ id: 'hoenn', max: 386 }),
+  ]),
+  HATCHERY_FIELDS: Object.freeze([
+    'filterShiny',
+    'filterIv',
+    'filterFav',
+    'filterRegion',
+    'filterRank',
+    'filterType',
+    'sort',
+  ]),
+  TRAINING_FIELDS: Object.freeze([
+    'mode',
+    'filterShiny',
+    'filterEv',
+    'filterFav',
+    'filterRegion',
+    'filterRank',
+    'filterType',
+    'sort',
+  ]),
+});

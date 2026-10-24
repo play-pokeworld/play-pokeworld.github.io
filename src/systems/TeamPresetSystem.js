@@ -5,6 +5,7 @@
  */
 import { BaseSystem } from './BaseSystem.js';
 import { SaveSystem } from './SaveSystem.js';
+import { TeamPresetsData } from '../data/save/TeamPresetsData.js';
 import { TeamSystem } from './TeamSystem.js';
 import { BoxSystem } from './BoxSystem.js';
 import { PokemonUsageSystem } from './PokemonUsageSystem.js';
@@ -19,7 +20,8 @@ export class TeamPresetSystem extends BaseSystem {
 
   /** @returns {TeamPresetSystem} */
   static getInstance() {
-    if (!TeamPresetSystem._instance) TeamPresetSystem._instance = new TeamPresetSystem();
+    if (!TeamPresetSystem._instance)
+      TeamPresetSystem._instance = new TeamPresetSystem();
     return TeamPresetSystem._instance;
   }
 
@@ -58,8 +60,12 @@ export class TeamPresetSystem extends BaseSystem {
     if (!uid) return null;
     const pokemon = BoxSystem.getInstance().getPokemonByUid(uid);
     if (!pokemon) return null;
-    if (TeamSystem.getInstance().isMember(uid)) return { pokemon, source: 'team' };
-    return PokemonUsageSystem.getInstance().canPerform(uid, PokemonActionIds.JOIN_TEAM)
+    if (TeamSystem.getInstance().isMember(uid))
+      return { pokemon, source: 'team' };
+    return PokemonUsageSystem.getInstance().canPerform(
+      uid,
+      PokemonActionIds.JOIN_TEAM,
+    )
       ? { pokemon, source: 'box' }
       : null;
   }
@@ -74,7 +80,11 @@ export class TeamPresetSystem extends BaseSystem {
     if (!preset) return [];
     return preset.members.map((uid) => {
       const resolved = this.resolvePokemon(uid);
-      return { uid, pokemon: resolved?.pokemon ?? null, source: resolved?.source ?? null };
+      return {
+        uid,
+        pokemon: resolved?.pokemon ?? null,
+        source: resolved?.source ?? null,
+      };
     });
   }
 
@@ -85,12 +95,18 @@ export class TeamPresetSystem extends BaseSystem {
   getRosterMembers() {
     const team = TeamSystem.getInstance().getTeam();
     const usage = PokemonUsageSystem.getInstance();
-    const available = BoxSystem.getInstance().getAll()
-      .filter((pokemon) => usage.canPerform(pokemon.uid, PokemonActionIds.JOIN_TEAM));
+    const available = BoxSystem.getInstance()
+      .getAll()
+      .filter((pokemon) =>
+        usage.canPerform(pokemon.uid, PokemonActionIds.JOIN_TEAM),
+      );
     return [
       ...team.map((pokemon) => ({ pokemon, source: 'team' })),
-      ...available.map((pokemon) => ({ pokemon, source: 'box' }))
-    ].filter(({ pokemon }) => pokemon && typeof pokemon.uid === 'string' && pokemon.uid);
+      ...available.map((pokemon) => ({ pokemon, source: 'box' })),
+    ].filter(
+      ({ pokemon }) =>
+        pokemon && typeof pokemon.uid === 'string' && pokemon.uid,
+    );
   }
 
   /** @param {string} id @param {string} name @returns {boolean} */
@@ -118,7 +134,17 @@ export class TeamPresetSystem extends BaseSystem {
    */
   saveCurrentToPreset(id) {
     const save = SaveSystem.getInstance().getCurrentSave();
-    if (!save || !save.teamPresets.setMembers(id, TeamSystem.getInstance().getTeam().map((pokemon) => pokemon.uid).filter(Boolean))) return false;
+    if (
+      !save ||
+      !save.teamPresets.setMembers(
+        id,
+        TeamSystem.getInstance()
+          .getTeam()
+          .map((pokemon) => pokemon.uid)
+          .filter(Boolean),
+      )
+    )
+      return false;
     SaveSystem.getInstance().saveCurrent();
     this._emitChanged(id);
     return true;
@@ -131,35 +157,50 @@ export class TeamPresetSystem extends BaseSystem {
    * @returns {{ok: boolean, reason?: string, count?: number, missingCount?: number}}
    */
   load(id) {
-    const saveSystem = SaveSystem.getInstance();
-    const save = saveSystem.getCurrentSave();
-    const preset = save?.teamPresets.getById(id);
-    if (!save || !preset) return { ok: false, reason: 'missing' };
-    if (BattleSystem.getInstance().isActive()) return { ok: false, reason: 'battle' };
-    if (preset.members.length === 0) return { ok: false, reason: 'empty' };
-
-    const nextUids = [];
-    const selectedUids = new Set();
+    const preset = this.getPreset(id);
+    return preset
+      ? this._loadMembers(id, preset.members, false)
+      : { ok: false, reason: 'missing' };
+  }
+  /** Atomically saves a draft and applies it; refusal never partially edits a preset. @param {string} id @param {string[]} members */
+  applyMembers(id, members) {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    if (!save) return { ok: false, reason: 'missing' };
+    const normalized = new TeamPresetsData(save.teamPresets.serialize());
+    if (!normalized.setMembers(id, members))
+      return { ok: false, reason: 'missing' };
+    return this._loadMembers(id, normalized.getById(id).members, true);
+  }
+  /** @private */
+  _loadMembers(id, members, saveMembers) {
+    const saveSystem = SaveSystem.getInstance(),
+      save = saveSystem.getCurrentSave();
+    if (!save || !save.teamPresets.getById(id))
+      return { ok: false, reason: 'missing' };
+    if (BattleSystem.getInstance().isActive())
+      return { ok: false, reason: 'battle' };
+    if (!members.length) return { ok: false, reason: 'empty' };
+    const nextUids = [],
+      seen = new Set();
     let missingCount = 0;
-    for (const uid of preset.members) {
+    for (const uid of members) {
       const resolved = this.resolvePokemon(uid);
       if (!resolved) {
         missingCount++;
         continue;
       }
-      if (selectedUids.has(uid)) continue;
-      selectedUids.add(uid);
+      if (seen.has(uid)) continue;
+      seen.add(uid);
       nextUids.push(uid);
     }
-    if (nextUids.length === 0) return { ok: false, reason: 'not-found' };
-
-    const teamSystem = TeamSystem.getInstance();
-    if (!teamSystem.setMembers(nextUids, { persist: false, notify: false })) {
+    if (!nextUids.length) return { ok: false, reason: 'not-found' };
+    const team = TeamSystem.getInstance();
+    if (!team.setMembers(nextUids, { persist: false, notify: false }))
       return { ok: false, reason: 'roster' };
-    }
+    if (saveMembers) save.teamPresets.setMembers(id, members);
     save.teamPresets.setActiveId(id);
     saveSystem.saveCurrent();
-    teamSystem.dispatchChanged();
+    team.dispatchChanged();
     BoxSystem.getInstance().dispatchChanged();
     this._emitChanged(id);
     return { ok: true, count: nextUids.length, missingCount };
