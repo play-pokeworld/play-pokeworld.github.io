@@ -34,6 +34,7 @@ import { TalentDB, TalentRarity } from '../data/pokemon/TalentDB.js';
 import { LocalizationManager, t } from '../localization/LocalizationManager.js';
 import { TextFormatter } from '../core/TextFormatter.js';
 import { PokemonRules } from '../config/PokemonRules.js';
+import { PokemonFactory } from '../data/pokemon/PokemonFactory.js';
 import { BattleSystem } from '../systems/BattleSystem.js';
 import { NotificationSystem } from '../systems/NotificationSystem.js';
 import { NotificationChannels, NotificationTones } from '../config/NotificationConfig.js';
@@ -49,6 +50,7 @@ export class PokemonInfoModal extends UIModal {
       id: ModalIds.POKEMON_INFO,
       title: t('pokemon_info_title'),
       size: 'md',
+      className: 'pw-pokemon-info-window',
       bodyClassName: 'pw-pokemon-info-body',
       overlayId: 'poke-modal',
       overlayClassName: 'poke-detail-front',
@@ -65,6 +67,8 @@ export class PokemonInfoModal extends UIModal {
     }
     this._teamIndex = 0;
     this._pokemonUid = null;
+    this._displayPokemon = null;
+    this._isReadOnly = false;
     this._activeStatTab = 'stats';
     this._replaceSlot = null;
     this._pendingFocusKey = null;
@@ -77,14 +81,35 @@ export class PokemonInfoModal extends UIModal {
 
   /** @override @param {Object} [params={}] */
   open(params = {}) {
-    const previousTarget = this._pokemonUid ?? `team:${this._teamIndex}`;
-    if (typeof params.pokemonUid === 'string') {
+    const previousTarget = this._displayPokemon ?? this._pokemonUid ?? `team:${this._teamIndex}`;
+    if (params.displayPokemon) {
+      this._displayPokemon = params.displayPokemon;
+      this._pokemonUid = null;
+      this._isReadOnly = true;
+    } else if (typeof params.speciesId === 'string') {
+      const save = SaveSystem.getInstance().getCurrentSave();
+      const owned = save?.team.find((p) => p.species === params.speciesId)
+        || BoxSystem.getInstance().getAll().find((p) => p.species === params.speciesId);
+      if (owned) {
+        this._pokemonUid = owned.uid;
+        this._displayPokemon = null;
+        this._isReadOnly = false;
+      } else {
+        this._displayPokemon = PokemonFactory.create(params.speciesId, 1);
+        this._pokemonUid = null;
+        this._isReadOnly = true;
+      }
+    } else if (typeof params.pokemonUid === 'string') {
       this._pokemonUid = params.pokemonUid;
+      this._displayPokemon = null;
+      this._isReadOnly = false;
     } else {
       this._pokemonUid = null;
+      this._displayPokemon = null;
+      this._isReadOnly = false;
       if (Number.isInteger(Number(params.teamIndex))) this._teamIndex = Number(params.teamIndex);
     }
-    const nextTarget = this._pokemonUid ?? `team:${this._teamIndex}`;
+    const nextTarget = this._displayPokemon ?? this._pokemonUid ?? `team:${this._teamIndex}`;
     if (nextTarget !== previousTarget) {
       this._activeStatTab = 'stats';
       this._replaceSlot = null;
@@ -107,6 +132,8 @@ export class PokemonInfoModal extends UIModal {
   onExit() {
     super.onExit();
     this._pokemonUid = null;
+    this._displayPokemon = null;
+    this._isReadOnly = false;
     this._replaceSlot = null;
   }
 
@@ -420,21 +447,23 @@ export class PokemonInfoModal extends UIModal {
     const renderState = this._captureRenderState();
     this.clearChildren();
     const save = SaveSystem.getInstance().getCurrentSave();
-    const pokemon = this._pokemonUid
-      ? BoxSystem.getInstance().getPokemonByUid(this._pokemonUid)
-      : TeamSystem.getInstance().getTeam()[this._teamIndex];
+    const pokemon = this._displayPokemon
+      ? this._displayPokemon
+      : this._pokemonUid
+        ? BoxSystem.getInstance().getPokemonByUid(this._pokemonUid)
+        : TeamSystem.getInstance().getTeam()[this._teamIndex];
     if (!pokemon) {
       this.setTitle(t('pokemon_info_title'));
       this.addChild(new UIText({ tagName: 'p', className: 'poke-detail-empty', text: t('pokemon_info_no_pokemon') }));
       this._restoreRenderState(renderState);
       return;
     }
-    this._teamIndex = TeamSystem.getInstance().getMemberUids().indexOf(pokemon.uid);
+    this._teamIndex = this._isReadOnly ? -1 : TeamSystem.getInstance().getMemberUids().indexOf(pokemon.uid);
 
     const displayName = pokemon.getDisplayName();
     const species = pokemon.getSpecies();
-    const usage = PokemonUsageSystem.getInstance().getPrimaryUsage(pokemon.uid);
-    const locationText = t(usage ? `pokemon_usage_${usage}` : 'pokemon_usage_none');
+    const usage = this._isReadOnly ? null : PokemonUsageSystem.getInstance().getPrimaryUsage(pokemon.uid);
+    const locationText = this._isReadOnly ? '' : t(usage ? `pokemon_usage_${usage}` : 'pokemon_usage_none');
 
     // Canonical header update on UIPanel chrome
     const isShiny = pokemon.shiny;
@@ -448,7 +477,7 @@ export class PokemonInfoModal extends UIModal {
           new UIContainer({
             children: [
               new UIText({ tagName: 'b', text: displayName }),
-              new UIText({ tagName: 'span', className: 'poke-detail-location', text: `${t('level_word')} ${pokemon.level} · ${locationText}` })
+              new UIText({ tagName: 'span', className: 'poke-detail-location', text: `${t('level_word')} ${pokemon.level}${locationText ? ` · ${locationText}` : ''}` })
             ]
           })
         ]
@@ -475,44 +504,46 @@ export class PokemonInfoModal extends UIModal {
       })
     ];
 
-    const shinyUnlocked = pokemon.shinyUnlocked || (save && save.pokedex?.getCaughtStatus(pokemon.species) === CaughtStatus.SHINY) || pokemon.shiny;
-    if (shinyUnlocked) {
-      const shinyToggle = new UIButton({
-        className: `hbtn poke-detail-shiny-toggle ${pokemon.shiny ? 'is-on' : 'is-off'}`,
-        onClick: () => this._toggleShinySkin(pokemon.uid)
+    if (!this._isReadOnly) {
+      const shinyUnlocked = pokemon.shinyUnlocked || (save && save.pokedex?.getCaughtStatus(pokemon.species) === CaughtStatus.SHINY) || pokemon.shiny;
+      if (shinyUnlocked) {
+        const shinyToggle = new UIButton({
+          className: `hbtn poke-detail-shiny-toggle ${pokemon.shiny ? 'is-on' : 'is-off'}`,
+          onClick: () => this._toggleShinySkin(pokemon.uid)
+        });
+        shinyToggle.addChild(new UIText({ tagName: 'span', className: 'poke-detail-shiny-star', text: '★' }));
+        shinyToggle.addChild(new UIText({ tagName: 'span', text: t(pokemon.shiny ? 'shiny_skin_on' : 'shiny_skin_off') }));
+        heroChildren.push(shinyToggle);
+      }
+
+      const favoriteBtn = new UIButton({
+        className: `hbtn poke-protect-btn ${pokemon.favorite ? 'is-on' : 'is-off'}`,
+        onClick: () => this._toggleCollectionFlag(pokemon.uid, 'favorite')
       });
-      shinyToggle.addChild(new UIText({ tagName: 'span', className: 'poke-detail-shiny-star', text: '★' }));
-      shinyToggle.addChild(new UIText({ tagName: 'span', text: t(pokemon.shiny ? 'shiny_skin_on' : 'shiny_skin_off') }));
-      heroChildren.push(shinyToggle);
+      favoriteBtn.setData('focusKey', 'pokemon-info-favorite');
+      favoriteBtn.addChild(new UIText({
+        tagName: 'span',
+        className: 'poke-protect-label',
+        text: t(pokemon.favorite ? 'pokemon_favorite_on' : 'pokemon_favorite_off')
+      }));
+
+      const lockedBtn = new UIButton({
+        className: `hbtn poke-protect-btn ${pokemon.locked ? 'is-locked' : 'is-off'}`,
+        onClick: () => this._toggleCollectionFlag(pokemon.uid, 'locked')
+      });
+      lockedBtn.setData('focusKey', 'pokemon-info-locked');
+      lockedBtn.addChild(new UIText({
+        tagName: 'span',
+        className: 'poke-protect-label',
+        text: t(pokemon.locked ? 'pokemon_locked_on' : 'pokemon_locked_off')
+      }));
+
+      const protectActions = new UIContainer({
+        className: 'poke-protection-actions',
+        children: [favoriteBtn, lockedBtn]
+      });
+      heroChildren.push(protectActions);
     }
-
-    const favoriteBtn = new UIButton({
-      className: `hbtn poke-protect-btn ${pokemon.favorite ? 'is-on' : 'is-off'}`,
-      onClick: () => this._toggleCollectionFlag(pokemon.uid, 'favorite')
-    });
-    favoriteBtn.setData('focusKey', 'pokemon-info-favorite');
-    favoriteBtn.addChild(new UIText({
-      tagName: 'span',
-      className: 'poke-protect-label',
-      text: t(pokemon.favorite ? 'pokemon_favorite_on' : 'pokemon_favorite_off')
-    }));
-
-    const lockedBtn = new UIButton({
-      className: `hbtn poke-protect-btn ${pokemon.locked ? 'is-locked' : 'is-off'}`,
-      onClick: () => this._toggleCollectionFlag(pokemon.uid, 'locked')
-    });
-    lockedBtn.setData('focusKey', 'pokemon-info-locked');
-    lockedBtn.addChild(new UIText({
-      tagName: 'span',
-      className: 'poke-protect-label',
-      text: t(pokemon.locked ? 'pokemon_locked_on' : 'pokemon_locked_off')
-    }));
-
-    const protectActions = new UIContainer({
-      className: 'poke-protection-actions',
-      children: [favoriteBtn, lockedBtn]
-    });
-    heroChildren.push(protectActions);
 
     const hero = new UIContainer({ className: 'poke-detail-hero', children: heroChildren });
     const stats = pokemon.getStats();
@@ -556,17 +587,19 @@ export class PokemonInfoModal extends UIModal {
     if (species.evolutions && species.evolutions.length > 0) {
       for (const evo of species.evolutions) {
         const targetName = t(`pokemon.${evo.to}`);
-        if (evo.minLevel) {
+        const requiredLevel = evo.level ?? evo.minLevel;
+        if (requiredLevel && !evo.item) {
           evoRows.push(new UIText({
             tagName: 'div',
-            richText: `<b>${t('m.progression.8')}</b> ${t('m.progression.7', { lvl: evo.minLevel })} <b>${targetName}</b>`
+            richText: `<b>${t('m.progression.8')}</b> ${t('m.progression.7', { lvl: requiredLevel })} <b>${targetName}</b>`
           }));
         } else if (evo.item) {
           const itemDef = ItemDB.getInstance().getById(evo.item);
           const itemName = itemDef ? t(itemDef.nameKey) : evo.item;
+          const levelSuffix = requiredLevel ? ` (${t('m.progression.7', { lvl: requiredLevel })})` : '';
           evoRows.push(new UIText({
             tagName: 'div',
-            richText: `<b>${t('m.progression.6')}</b> ${t('m.progression.5')} ${itemName} → <b>${targetName}</b>`
+            richText: `<b>${t('m.progression.6')}</b> ${t('m.progression.5')} ${itemName}${levelSuffix} → <b>${targetName}</b>`
           }));
         } else {
           evoRows.push(new UIText({

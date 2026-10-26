@@ -74,6 +74,29 @@ export class TeamMemberCard extends PokemonCardView {
       event.stopPropagation();
       this._onInfoClick(this._pokemonUid, this._index);
     });
+
+    let touchTimer = null;
+    let touchMoved = false;
+    this.addDomListener('touchstart', (event) => {
+      touchMoved = false;
+      if (touchTimer) clearTimeout(touchTimer);
+      touchTimer = setTimeout(() => {
+        touchTimer = null;
+        if (!touchMoved && this._onInfoClick) {
+          this._onInfoClick(this._pokemonUid, this._index);
+        }
+      }, 500);
+    });
+    this.addDomListener('touchmove', () => {
+      touchMoved = true;
+      if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
+    });
+    this.addDomListener('touchend', () => {
+      if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
+    });
+    this.addDomListener('touchcancel', () => {
+      if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
+    });
     if (options.pokemon) this.setPokemon(options.pokemon, null, this._index);
   }
 

@@ -44,6 +44,8 @@ export const BattleRules = Object.freeze({
   PINCH_FAST_DIVISOR: 2,
   /** Cross Room adds this to the cross_power bonus. */
   CROSS_ROOM_ADD: 0.3,
+  /** Cross-STAB bonus when alternating between different native STAB types (+35%). */
+  CROSS_STAB_BONUS: 0.35,
   /** Training battles: damage dealt by the foe ×0.25. */
   TRAINING_FOE_DAMAGE: 0.25,
   /** Default weather / terrain duration and the duration with the matching held item. */
@@ -94,8 +96,14 @@ export const BattleRules = Object.freeze({
   SHINY_BASE_RATE: 1 / 4096,
   /** Team talents multiplying the shiny rate (original getTeamShinyRateMultiplier). */
   SHINY_TALENT_MULTS: Object.freeze({ goodasgold: 1.15, superluck: 1.15, serenegrace: 1.1 }),
-  /** Held item power level from the owned quantity of that item (original heldPowerLevel). */
-  HELD_POWER_LEVELS: Object.freeze([[25, 6], [20, 5], [15, 4], [10, 3], [5, 2]]),
+  /** Held item power level from the owned quantity of that item (original heldPowerLevel, extended to tier 25). */
+  HELD_POWER_LEVELS: Object.freeze([
+    [120, 25], [115, 24], [110, 23], [105, 22], [100, 21],
+    [95, 20], [90, 19], [85, 18], [80, 17], [75, 16],
+    [70, 15], [65, 14], [60, 13], [55, 12], [50, 11],
+    [45, 10], [40, 9], [35, 8], [30, 7],
+    [25, 6], [20, 5], [15, 4], [10, 3], [5, 2]
+  ]),
   /** Power level of NPC / wild berries (original berryLevel). */
   NPC_BERRY_LEVEL: 3,
   /** Canonical held item power of NPC / wild Pokémon (never scaled by the player's inventory). */

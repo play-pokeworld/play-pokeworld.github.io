@@ -28,6 +28,8 @@ export const ModalIds = Object.freeze({
   NPC_TALK: 'pw-npc-talk',
   /** Interactive secret-base room visit opened from the Location panel or Base panel. */
   SECRET_BASE_VISIT: 'pw-secret-base-visit',
+  SECRET_BASE_NPC: 'pw-secret-base-npc-modal',
+  SECRET_BASE_PC: 'pw-secret-base-pc-modal',
   /** Repeatable quest offer board and slot-upgrade dialog. */
   REPEATABLE_QUESTS: 'pw-repeatable-quests',
   REPEATABLE_UPGRADES: 'pw-repeatable-upgrades',
@@ -46,8 +48,12 @@ export const ModalIds = Object.freeze({
   BOX: 'fs-box',
   BADGES: 'fs-badges',
   POKEDEX: 'fs-pokedex',
+  ACHIEVEMENTS: 'fs-achievements',
+  ATOLL: 'fs-atoll',
+  ATOLL_FACTORY_PREP: 'pw-atoll-factory-prep',
   RELAUNCH_CONFIRM_PREFIX:'pw-relaunch-confirm-',
   GUIDE: 'fs-guide',
   DICTIONARY: 'fs-dictionary',
-  DICTIONARY_DETAIL: 'pw-dictionary-detail'
+  DICTIONARY_DETAIL: 'pw-dictionary-detail',
+  AFK_SUMMARY: 'afk-summary-modal'
 });

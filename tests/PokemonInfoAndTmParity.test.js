@@ -19,6 +19,11 @@ import { ModalIds } from '../src/config/ModalIds.js';
 import { t } from '../src/localization/LocalizationManager.js';
 import { setRoster } from './RosterFixtures.js';
 
+import { SettingsModal } from '../src/panels/settings/SettingsModal.js';
+import { FacilityManagementModal } from '../src/panels/facilities/FacilityManagementModal.js';
+import fs from 'fs';
+import path from 'path';
+
 const saves = SaveSystem.getInstance();
 
 describe('PokemonInfoModal and TM/HM parity', (test) => {
@@ -384,5 +389,29 @@ describe('PokemonInfoModal and TM/HM parity', (test) => {
       learnModal.destroy();
       infoModal.destroy();
     }
+  });
+
+  test('Settings, PokemonInfoModal, and FacilityManagementModals share the same size template', () => {
+    const settings = new SettingsModal();
+    const pokemonInfo = new PokemonInfoModal();
+    const mine = new FacilityManagementModal('mine');
+    const training = new FacilityManagementModal('training');
+    const hatchery = new FacilityManagementModal('hatchery');
+
+    assert.equal(settings.getSize(), 'md', 'Settings uses md template');
+    assert.equal(pokemonInfo.getSize(), 'md', 'Pokemon info uses md template');
+    assert.equal(mine.getSize(), 'md', 'Mine management uses md template');
+    assert.equal(training.getSize(), 'md', 'Training management uses md template');
+    assert.equal(hatchery.getSize(), 'md', 'Hatchery management uses md template');
+
+    settings.destroy();
+    pokemonInfo.destroy();
+    mine.destroy();
+    training.destroy();
+    hatchery.destroy();
+
+    const css = fs.readFileSync(path.resolve('assets/css/ui-modal.css'), 'utf8');
+    assert.ok(css.includes('.pw-panel--modal-window.pw-pokemon-info-window'), 'Pokemon info window is hooked to template');
+    assert.ok(css.includes('.pw-facility-management.pw-static-modal'), 'Facility management is hooked to template');
   });
 });

@@ -170,6 +170,37 @@ export class PokemonData extends BaseModel {
   }
 
   /**
+   * Returns the next eligible level-based evolution target species, or null.
+   * @returns {string|null}
+   */
+  getNextLevelEvolution() {
+    const source = this.getSpecies();
+    if (!source?.evolutions?.length) return null;
+    const evo = source.evolutions.find((entry) => !entry.item && Number.isFinite(entry.level) && this.level >= entry.level);
+    return evo ? evo.to : null;
+  }
+
+  /**
+   * Automatically executes eligible level-based evolutions in sequence (e.g. Caterpie -> Metapod -> Butterfree).
+   * @param {Function|null} [onEvolve=null] Optional callback invoked for each intermediate/final evolved species ID.
+   * @returns {string|null} The final evolved species ID, or null if no evolution occurred.
+   */
+  checkLevelEvolution(onEvolve = null) {
+    let finalTarget = null;
+    while (true) {
+      const nextTarget = this.getNextLevelEvolution();
+      if (!nextTarget || !this.evolveTo(nextTarget)) break;
+      finalTarget = nextTarget;
+      if (typeof onEvolve === 'function') {
+        try {
+          onEvolve(nextTarget);
+        } catch (_) {}
+      }
+    }
+    return finalTarget;
+  }
+
+  /**
    * Changes species while retaining this Pokémon's identity and progression.
    * The caller owns evolution eligibility and persistence.
    * @param {string} targetSpecies
@@ -192,6 +223,7 @@ export class PokemonData extends BaseModel {
     this._invalidateStats();
     const newMax = this.getMaxHp();
     this.hp = Math.max(0, Math.min(newMax, this.hp + (newMax - oldMax)));
+    this._learnLevelUpMoves();
     return true;
   }
 

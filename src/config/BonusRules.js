@@ -70,7 +70,10 @@ const TYPE_RULES = Object.freeze({
 });
 
 export const BonusRules = Object.freeze({
-  SOURCE_IDS: Object.freeze({ SECRET_BASE_FLAGS: 'secret-base-flags' }),
+  SOURCE_IDS: Object.freeze({
+    SECRET_BASE_FLAGS: 'secret-base-flags',
+    ACHIEVEMENTS: 'achievements'
+  }),
   TYPE_RULES,
   DEFAULT_AGGREGATION: 'sum',
   DEFAULT_UNIT: 'flat',

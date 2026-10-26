@@ -25,6 +25,9 @@ export const assert = {
   equal(actual, expected, message = '') {
     if (actual !== expected) throw new Error(`${message} expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`.trim());
   },
+  notEqual(actual, expected, message = '') {
+    if (actual === expected) throw new Error(`${message} expected value to not equal ${JSON.stringify(expected)}`.trim());
+  },
   deepEqual(actual, expected, message = '') {
     const a = JSON.stringify(actual);
     const b = JSON.stringify(expected);

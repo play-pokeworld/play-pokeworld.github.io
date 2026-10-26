@@ -95,6 +95,7 @@ export class BattleSystem extends BaseSystem {
     this._localQuestBattleKey = null;
     /** @private @type {boolean} */ this._battleSummaryOpen = false;
     /** @private @type {Object|null} TrainerBattleContext of the running trainer battle */ this._trainer = null;
+    /** @private @type {Object|null} AtollBattleContext of the running Atoll challenge */ this._atollBattle = null;
     /** @private @type {{visitId:string,npc:Object,resolved:boolean}|null} */ this._secretBaseBattle = null;
     /** @private @type {Object|null} Last battle outcome, rewards and localized log */ this._lastResult = null;
     /** @private @type {{battles:number,wins:number,expGained:number,moneyGained:number,questPointsGained:number}} */
@@ -244,6 +245,15 @@ export class BattleSystem extends BaseSystem {
    * @returns {{id:string, trainerId:string, role:string, sprite:string|null}|null}
    */
   getTrainerPresentation() {
+    if (this._atollBattle) {
+      return {
+        id: 'atoll',
+        trainerId: 'atoll',
+        role: 'atoll',
+        sprite: 'atoll',
+        displayName: t('battle_atoll_title')
+      };
+    }
     const baseBattle = this._secretBaseBattle;
     if (baseBattle) {
       return {
@@ -447,9 +457,31 @@ export class BattleSystem extends BaseSystem {
     return new PokemonData(snapshot);
   }
 
+  /**
+   * Starts an Atoll duel using the given AtollBattleContext.
+   * @param {Object} context
+   * @param {string} [locationId]
+   * @returns {boolean}
+   */
+  startAtollBattle(context, locationId = LocationSystem.getInstance().getCurrentLocationId()) {
+    if (this.isActive() || !context || !Array.isArray(context.foes) || !context.foes.length) return false;
+    this._wildChain = false;
+    this._localQuestBattleKey = null;
+    this._secretBaseBattle = null;
+    this._activeRun = null;
+    this._trainer = null;
+    this._healOnEnd = true;
+    this._dungeonContext = null;
+    this._atollBattle = context;
+    const [first, ...reserves] = context.foes;
+    const started = this._begin(first.pokemon, locationId, null, context.openingLines, reserves, {}, context.playerTeam || null);
+    if (!started) this._atollBattle = null;
+    return started;
+  }
+
   /** @returns {boolean} true while a trainer battle runs */
   isTrainerBattle() {
-    return !!this._trainer;
+    return !!this._trainer || !!this._atollBattle;
   }
 
   /**
@@ -463,10 +495,11 @@ export class BattleSystem extends BaseSystem {
     if (!this.isActive()) return;
     const session = this._session;
     const locationId=this._locationId;
-    const kind=this._dungeonContext?'dungeon':this._trainer?'trainer':this._questKey||this._localQuestBattleKey?'quest':this._secretBaseBattle?'base':this._wildChain?'wild':'encounter';
+    const kind=this._dungeonContext?'dungeon':this._atollBattle?'atoll':this._trainer?'trainer':this._questKey||this._localQuestBattleKey?'quest':this._secretBaseBattle?'base':this._wildChain?'wild':'encounter';
     const natural=details.natural===true;
     const localQuestBattleKey = this._localQuestBattleKey;
     const secretBaseBattle = this._secretBaseBattle;
+    const atollBattle = this._atollBattle;
     let endedAsVictory = !!victory;
     if (secretBaseBattle && !secretBaseBattle.resolved) {
       const quote = secretBaseBattle.npc.messages?.win || '';
@@ -480,6 +513,10 @@ export class BattleSystem extends BaseSystem {
       EventBus.getInstance().dispatch(new SecretBaseNpcBattleResolvedEvent(
         secretBaseBattle.visitId, secretBaseBattle.npc, false, true
       ));
+    }
+    if (atollBattle) {
+      this._atollBattle = null;
+      atollBattle.onBattleEnd(endedAsVictory, session);
     }
     if (this._activeRun) {
       this._activeRun.playerKOs = session?.playerKOs ?? this._activeRun.playerKOs;
@@ -598,13 +635,13 @@ export class BattleSystem extends BaseSystem {
    * @param {Object} [foeOptions={}] - Temporary encounter scaling
    * @returns {boolean}
    */
-  _begin(foe, locationId, questKey, intro, reserves = [], foeOptions = {}) {
+  _begin(foe, locationId, questKey, intro, reserves = [], foeOptions = {}, playerTeam = null) {
     if (TrainingSystem.getInstance().isActive()) {
       this._warn('facility_outdoor_blocked_training');
       return false;
     }
     const save = SaveSystem.getInstance().getCurrentSave();
-    const team = save?.team ?? [];
+    const team = playerTeam || this._atollBattle?.playerTeam || (save?.team ?? []);
     if (!team.some((pokemon) => !pokemon.isFainted())) {
       this._warn('battle_no_team');
       return false;
@@ -802,6 +839,11 @@ export class BattleSystem extends BaseSystem {
       EventBus.getInstance().dispatch(new SecretBaseNpcBattleResolvedEvent(
         secretBaseBattle.visitId, secretBaseBattle.npc, victory, false
       ));
+    } else if (this._atollBattle) {
+      const atoll = this._atollBattle;
+      this._atollBattle = null;
+      atoll.onBattleEnd(victory, session);
+      if (!victory) session.log.add('battle_log.defeat');
     } else if (this._wildChain && activeRun) {
       activeRun.playerKOs = session.playerKOs;
       exp = activeRun.expGained;
@@ -978,6 +1020,28 @@ export class BattleSystem extends BaseSystem {
       scorer.kos++;
     }
     run.playerKOs = session.playerKOs;
+    if (run.playerKOs >= 50) {
+      const fatigueStep = Math.max(1, Math.min(10, Math.floor((run.playerKOs - 50) / 5) + 1));
+      if (run.playerKOs === 50) {
+        session.log.add('battle_log.fatigue_warning');
+        NotificationSystem.getInstance().notifyTemporary(
+          t('battle_log.fatigue_warning'),
+          { channel: NotificationChannels.BATTLE, tone: NotificationTones.WARNING }
+        );
+      }
+      for (const member of save.team) {
+        if (!member.isFainted()) {
+          const hasStamina = member.talent === 'stamina' || (save.talents?.hasHidden && save.talents.hasHidden(member.species));
+          const fatigueDiv = hasStamina ? 2 : 1;
+          const wearDamage = Math.max(1, Math.round((member.getMaxHp() * 0.01 * fatigueStep) / fatigueDiv));
+          member.hp = Math.max(1, member.hp - wearDamage);
+          if (session.active?.pokemon?.uid === member.uid) {
+            session.active.takeDamage(wearDamage);
+          }
+          session.log.add('battle_log.fatigue_wear', { name: member.getDisplayName(), damage: wearDamage });
+        }
+      }
+    }
     NotificationSystem.getInstance().notifyTemporary(
       t('notif_enemy_defeated', { name: foe.getDisplayName(), exp: reportedExp, money }),
       { channel: NotificationChannels.BATTLE }
@@ -1027,6 +1091,17 @@ export class BattleSystem extends BaseSystem {
         t('notif_level_up', { name: member.getDisplayName(), level: member.level }),
         { channel: NotificationChannels.GAMEPLAY, tone: NotificationTones.ACCENT }
       );
+      const evolvedSpecies = member.checkLevelEvolution();
+      if (evolvedSpecies) {
+        const save = this._save();
+        save?.pokedex.markCaught(evolvedSpecies, member.shiny, { deferSave: true });
+        const evolvedName = t(`pokemon.${evolvedSpecies}`);
+        log.add('battle_log.evolved', { name: member.getDisplayName(), target: evolvedName });
+        NotificationSystem.getInstance().notifyTemporary(
+          t('item_use_evolved', { name: member.getDisplayName(), evolution: evolvedName }),
+          { channel: NotificationChannels.GAMEPLAY, tone: NotificationTones.SUCCESS }
+        );
+      }
     }
   }
 

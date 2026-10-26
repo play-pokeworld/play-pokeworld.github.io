@@ -28,7 +28,7 @@ export class FacilityManagementModal extends StaticModalPanel {
     super({
       id: presentation.modalId,
       title: t(presentation.titleKey),
-      size: 'custom',
+      size: 'md',
       className: 'management-inner pw-facility-management',
       bodyClassName: 'pw-facility-management-body',
       name: 'FacilityManagementModal',

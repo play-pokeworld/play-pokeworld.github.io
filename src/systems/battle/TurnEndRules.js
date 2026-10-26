@@ -31,6 +31,16 @@ export class TurnEndRules {
     TurnEndRules._orb(combatant, log);
     StatChangeRules.tick(combatant);
     for (const effect of combatant.talentEffects(TalentEffectKinds.TURN_STAT)) StatChangeRules.applyRaw(combatant, effect.stat, effect.mult);
+    if (combatant.hasTalent?.('moody')) {
+      const stats = ['atk', 'def', 'spa', 'spd', 'spe'];
+      const upStat = stats[Math.floor(Math.random() * stats.length)];
+      const remaining = stats.filter((s) => s !== upStat);
+      const downStat = remaining[Math.floor(Math.random() * remaining.length)];
+      StatChangeRules.applyRaw(combatant, upStat, 2.0);
+      StatChangeRules.applyRaw(combatant, downStat, 0.67);
+      log.add('battle_log.stat_up', { name: combatant.name, stat: upStat });
+      log.add('battle_log.stat_down', { name: combatant.name, stat: downStat });
+    }
     TurnEndRules._pinchHeal(combatant, log);
     if (!combatant.hasTalentEffect(TalentEffectKinds.NO_INDIRECT_DAMAGE)) TurnEndRules._statusDamage(combatant, log);
     if (combatant.heldEffect(HeldEffectKinds.LEFTOVERS) && !combatant.isFainted() && combatant.hp < combatant.maxHp) {

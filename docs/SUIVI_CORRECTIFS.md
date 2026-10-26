@@ -244,3 +244,276 @@ Détails et preuves : [rapport 1.14.21](PHASE_v1.14.21.md).
 - Voir [PHASE_v1.14.28.md](PHASE_v1.14.28.md) pour les détails complets.
 
 
+## 1.14.33 — Phase 1 : Uniformisation des affichages et gabarits de fenêtres
+
+- **Passage à la version 1.14.33** (`GameConfig.VERSION`, `package.json`, `package-lock.json`), schéma 20 canonique inchangé.
+- **Uniformisation des gabarits de panels** :
+  - Identification et suppression des dimensions isolées et codées en dur (620px pour la fiche Pokémon, 980px × 760px pour les installations).
+  - Alignement strict de la Fiche d'information Pokémon (`PokemonInfoModal`) et des trois menus de gestion d'installations (`FacilityManagementModal` : Mine, Entraînement, Pension) sur le gabarit de référence des Paramètres (`SettingsModal`) :
+    - Format bureau : `width / max-width: min(1120px, calc(100vw - 40px))`, `height / max-height: 85vh`.
+    - Format mobile : `width: min(560px, calc(100vw - 24px))`, `height: min(85vh, 720px)`.
+  - Harmonisation des composants JS : `FacilityManagementModal` bascule de `size: 'custom'` vers `size: 'md'`, `PokemonInfoModal` reçoit la classe sémantique `pw-pokemon-info-window`.
+  - Nettoyage des règles CSS parasites dans `design-system.css`, `facilities.css` et consolidation dans `ui-modal.css`.
+- **Tests et validation** :
+  - **589 tests réussis sur 589 (100% de succès)**.
+  - Ajout du test `Settings, PokemonInfoModal, and FacilityManagementModals share the same size template`.
+- Voir [PHASE_v1.14.33.md](PHASE_v1.14.33.md) pour les détails complets.
+
+
+## 1.14.33 — Phase 2.1 : Système de Succès (Achievements)
+
+- **Implémentation complète du système de succès sous l'architecture Rework** :
+  - `AchievementDB` (`src/data/achievements/AchievementDB.js`) : dépôt de données étendant `DataRepository`, couvrant les 84 succès des 15 familles (Pokédex, Shinies, Combat, Capture, Routes, Revanches, Exploration, Pension, Entraînement, Souterrain, Économie, Atoll, Base, Easter eggs, Formes) pour un total de 229 paliers.
+  - `AchievementsData` (`src/data/save/AchievementsData.js`) : modèle de données persisté étendant `BaseModel`, gérant les paliers débloqués, horodatages, succès épinglé et compteurs statistiques. Intégré dans `SaveData.js` et pris en compte dans `MigrationOriginalToV1.js` (schéma 20 inchangé).
+  - Événements `AchievementUnlockedEvent` et `AchievementPinnedEvent` créés dans `src/core/events/`.
+  - `AchievementBonusProvider` (`src/systems/achievements/AchievementBonusProvider.js`) : fournisseur de bonus permanent branché sur le `BonusSystem` unifié, appliquant les garde-fous anti-inflation (argent global max +29 %, XP globale max +25 %, capture max +4,5 pt, shiny max ×1,15, argent régional max 15 %).
+  - `AchievementSystem` (`src/systems/AchievementSystem.js`) : moteur de progression singleton avec évaluation réactive des métriques, calcul de progression, déblocage avec notification dorée, et rétroactivité complète au chargement de sauvegarde.
+  - `AchievementsFullscreenPanel` (`src/panels/fullscreen/AchievementsFullscreenPanel.js`) : modale plein écran `ModalIds.ACHIEVEMENTS` avec bannière récapitulative, barre de filtres par famille avec icônes, pastilles de paliers, badges de rangs métalliques et bouton d'épinglage.
+  - `AchievementsPanel` (`src/panels/AchievementsPanel.js`) : widget de suivi sur le tableau de bord avec sélecteur d'objectif, barre de progression et ouverture de la vue plein écran au clic.
+  - Intégration dans `IconRegistry.js` (9 glyphes SVG vectoriels), `Shortcuts.js` (raccourci vers les succès), `GamePage.js`, `main.js`, et dictionnaires FR/EN.
+- **Tests et validation** :
+  - **605 tests automatisés réussis sur 605 (100% de succès)**.
+  - Suite de tests complète ajoutée dans `tests/Achievements.test.js`.
+  - Conformité stricte aux `StaticRules.test.js` (0 violation).
+- Voir [PHASE_v1.14.33.md](PHASE_v1.14.33.md) pour les détails complets.
+
+
+## 1.14.33 — Phase 2.2 : Atoll de Combat (Battle Atoll)
+
+- **Recréation complète de l'Atoll de Combat sous l'architecture Rework** :
+  - `AtollData` (`src/data/save/AtollData.js`) : modèle de données persisté étendant `BaseModel`, stockant les jetons, la série actuelle, le record de victoires, les victoires par mode, l'état de l'Usine de Combat (mode, fenêtre, série, roster d'emprunt), et les fragments de Légende. Intégré dans `SaveData.js` et supporté par `MigrationOriginalToV1.js` (schéma 20 inchangé).
+  - `AtollDB` (`src/data/atoll/AtollDB.js`) : définition des 14 modes de défi (Tour, Usine, Arène, Dôme), rotation cyclique de 12 heures synchronisée sur UTC, graine pseudo-aléatoire déterministe régénérée tous les 3 jours, bannissements tournants de légendaires (avec la Tour Libre comme sanctuaire sans ban), sets compétitifs optimisés au niveau 100 avec budgets IV/EV <= 36, et formules de gains de jetons et fragments.
+  - Événements `AtollStateChangedEvent` et `AtollBattleFinishedEvent` créés dans `src/core/events/`.
+  - `AtollBattleContext` (`src/systems/atoll/AtollBattleContext.js`) : sauvegarde de l'équipe du joueur, gestion des équipes de location, règlement à l'issue du combat, octroi des récompenses et réorganisation forcée de l'équipe d'emprunt.
+  - `BattleSystem` (`src/systems/BattleSystem.js`) : intégration de `startAtollBattle()`, support de `_atollBattle` pour les équipes d'emprunt et métadonnées d'affichage.
+  - `AtollSystem` (`src/systems/AtollSystem.js`) : système moteur singleton gérant le verrouillage post-Ligue, la validation des équipes selon les règles de chaque mode, les sessions de l'Usine, la boutique d'échange de jetons et l'invocation des Pokémon Légendaires.
+  - `AtollFullscreenPanel` (`src/panels/fullscreen/AtollFullscreenPanel.js`) : panneau plein écran `ModalIds.ATOLL` avec panneau verrouillé pré-Ligue, en-tête héro récapitulatif, 6 onglets (Accueil, Tour, Usine, Arène, Dôme, Boutique & Fragments), minuterie de rotation dynamique et intégration d'icônes SVG conformes.
+  - `AtollFactoryPrepModal` (`src/panels/AtollFactoryPrepModal.js`) : modale de préparation tactique `ModalIds.ATOLL_FACTORY_PREP` permettant la réorganisation de la formation et des capacités des Pokémon loués.
+  - Raccourci vers l'Atoll branché sur `ModalIds.ATOLL` dans `Shortcuts.js`.
+- **Tests et validation** :
+  - **623 tests automatisés réussis sur 623 (100% de succès)**.
+  - 17 nouveaux tests unitaires complets ajoutés dans `tests/Atoll.test.js`.
+  - Conformité stricte aux `StaticRules.test.js` (0 violation).
+- Voir [PHASE_v1.14.33.md](PHASE_v1.14.33.md) pour les détails complets.
+
+
+## 1.14.33 — Phase 2.3 : Base Secrète (Secret Base)
+
+- **Consolidation et intégration complète du système de Base Secrète sous l'architecture Rework** :
+  - `SecretBaseData` (`src/data/save/SecretBaseData.js`) : modèle de données persisté étendant `BaseModel`, stockant le plan, le lieu, les décorations placées, le stock en réserve, les PNJ et leur équipe/messages, les records de visites et le suivi des drapeaux. Intégré dans `SaveData.js` et supporté par `MigrationOriginalToV1.js` (schéma 20 inchangé).
+  - `SecretBaseItemDB` & `SecretBaseLayoutDB` (`src/data/base/`) : catalogues des 122 décorations sur 8 catégories et des 36 plans de base conformes à Pokémon Émeraude.
+  - `SecretBasePlacementRules` : gestion des collisions au sol, meubles de surface, encombrements multicases et ancrages muraux.
+  - `SecretBaseFlagBonusProvider` : intégration au `BonusSystem` commun apportant les bonus échelonnés par paliers ORAS (argent, EXP, énergie de Mine, butin de route).
+  - `SecretBaseExchangeRules` : partage JSON de bases en lecture seule sans fuite de données d'inventaire ou de progression.
+  - `SecretBaseSystem` : moteur complet coordonnant l'établissement sur une alcôve, le déménagement avec retour automatique des meubles au stock, l'édition des meubles et des PNJ, les visites interactives avec déplacement animé, les duels dédiés sans effet parasite sur les compteurs sauvages, et la prise de drapeau toutes les 24h.
+  - `SecretBasePanel` & `SecretBaseVisitModal` : interfaces utilisateur conformes aux widgets Rework, avec rendu Pixel Art sur Canvas `SecretBaseRoomView`.
+  - Intégration réactive avec `AchievementSystem` : écoute de `SecretBaseChangedEvent` et progression automatique des succès `base_flags`, `base_decos`, `base_visitors`.
+- **Tests et validation** :
+  - **624 tests automatisés réussis sur 624 (100% de succès)**.
+  - 10 tests unitaires complets dans `tests/SecretBase.test.js` vérifiant l'ensemble du cycle de vie et l'intégration avec les succès.
+  - Conformité stricte aux `StaticRules.test.js` (0 violation).
+- Voir [PHASE_v1.14.33.md](PHASE_v1.14.33.md) pour les détails complets.
+
+## 1.14.34 — Correctifs Succès & Parité Base Secrète
+
+- **Ajustements du système de Succès (Achievements)** :
+  - Suppression du bouton d'épinglage individuel ; le clic sur la carte bascule l'état épinglé.
+  - Contour vert distinctif (`.is-pinned`) sur les cartes épinglées.
+  - Support de plusieurs succès épinglés simultanément dans `AchievementsData`, `AchievementSystem`, et affichage dynamique de la liste dans `AchievementsPanel`.
+  - Intégration de `FilterBar` unifiée avec drawer mobile, filtre par famille, chips de statut (`Tous`, `En cours`, `Terminés`, `Épinglés`), recherche et réinitialisation.
+  - Refonte visuelle complète de la section des bonus permanents en une grille spacieuse et claire (`.pw-ach-bonuses-section`, `.pw-ach-bonuses-grid`, `.pw-ach-bonus-card`).
+- **Parité visuelle et fonctionnelle de la Base Secrète** :
+  - Intégration du canvas 2D directement dans la fenêtre `#win-base` (`#base-canvas-2d`, échelle 32px GBA 2×) avec fonds Émeraude, ombres de contact et tri en profondeur.
+  - Barre d'outils `#base-toolbar` : « Ramasser » (`#base-ed-pickup`), « Modifier le PNJ » (`#base-ed-npc-edit`), « Modifier le PC » (`#base-ed-pc-edit`), texte d'aide contextuel (`#base-ed-hint`), « Exporter », « Visiter un fichier… » et « Visiter » / « Arrêter la visite ».
+  - Tiroir de réserve `#base-stock` avec 9 onglets de catégories, pastilles de décompte, vignettes circulaires d'objets et bouton d'ajout de PNJ.
+  - Mode visite interactif directement dans le canvas de la fenêtre avec pathfinding BFS et déclenchement des dialogues PNJ/PC.
+  - Création des modales `SecretBaseNpcModal` et `SecretBasePcModal`.
+- **Validation** :
+  - **628 tests passants sur 628 (100 % de succès)**.
+  - 27 règles statiques validées (0 violation).
+- Voir [PHASE_v1.14.34.md](PHASE_v1.14.34.md) pour les détails complets.
+
+## 1.14.35 — Ajustements Succès & Base Secrète
+
+- **Ajustements Succès (Achievements)** :
+  - Suppression de la hauteur maximale et du défilement interne sur `.pw-ach-tracker-list` : la fenêtre s'étend désormais naturellement quel que soit le nombre de succès épinglés (plus besoin de scroller au-delà de 3 succès).
+- **Ajustements Base Secrète** :
+  - Élimination des étirements de canvas et de sprites : passage en dimensions intrinsèques préservées (`width: auto; height: auto; max-width: 100%; max-height: 58vh; object-fit: contain; margin: 0 auto;`) avec centrage et bandes latérales neutres.
+  - Conformité stricte de `SecretBaseVisitModal` avec `UIModal` et `Rules.md` : en-tête avec bouton de fermeture et fermeture interactive sur clic de fond de fenêtre (backdrop).
+  - Déblocage complet des PNJ : le joueur peut poser des PNJ dès le début sans objet requis, avec un nombre illimité (`MAX_NPCS: Infinity`) et pastille infinie `∞`.
+- **Validation** :
+  - **631 tests passants sur 631 (100 % de succès)**.
+  - 27 règles statiques validées (0 violation).
+- Voir [PHASE_v1.14.35.md](PHASE_v1.14.35.md) pour les détails complets.
+
+## 1.14.36 — Isolation de la visite de Base Secrète & Refonte du formulaire PNJ
+
+- **Isolation de la visite de Base Secrète depuis la fenêtre Lieu** :
+  - La visite d'une alcôve ou de sa propre base depuis le composant `LocationAlcoves` de la fenêtre Lieu n'active plus le mode visite sur le `DraggablePanel` de la Base Secrète (`SecretBasePanel`).
+  - `SecretBaseSystem.startOwnVisit({ fromLocation: true })` et `startAlcoveVisit` transmettent désormais le marqueur `fromLocation: true` dans le snapshot de session `SecretBaseVisitChangedEvent`.
+  - `SecretBasePanel` ignore les lancements de visite externes (`fromLocation: true` ou `source: 'alcove'`), laissant le panneau d'édition intact tout en permettant à la modale de visite dédiée `SecretBaseVisitModal` de s'exécuter indépendamment.
+- **Refonte ergonomique et visuelle de la modale de modification de PNJ (`SecretBaseNpcModal`)** :
+  - Suppression de la grille étroite à 2 colonnes où les libellés et zones de saisie étaient collés.
+  - Alignement sur l'architecture et les espacements de la fenêtre `Settings` : utilisation de `.save-profile-field` avec libellés surélevés, espacements généreux (12px à 16px) et champs de saisie confortables et pleine largeur.
+  - **Galerie d'apparences visuelle (101 visuels)** : remplacement du menu déroulant brut par un sélecteur visuel interactif complet (`_mode: 'sprite-picker'`) avec filtre de recherche et cartes portraits 48px sélectionnables en un clic.
+  - **Constructeur d'équipe interactif** : fiches Pokémon individuelles avec miniatures, noms et niveaux, bouton de retrait `✕`, boutons d'ajout `+`, sélecteur de Pokémon issu de l'équipe et de la boîte PC avec recherche (`_mode: 'mon-picker'`), et sélecteur d'équipes et préréglages complets (`_mode: 'preset-picker'`).
+  - Section de répliques spacieuse avec champs dédiés pour « Avant le combat », « S'il gagne » et « S'il perd ».
+- **Validation** :
+  - **634 tests passants sur 634 (100 % de succès)**.
+  - 27 règles statiques validées (0 violation).
+- Voir [PHASE_v1.14.36.md](PHASE_v1.14.36.md) pour les détails complets.
+
+## 1.14.38 — Marqueur Joueur sur la Carte, Ergonomie PNJ Base Secrète & Équilibrage
+
+- **Marqueur visuel du joueur sur la carte (`UIMapView` & `MapPanel`)** :
+  - Restauration du marqueur du dresseur (`pw-map-player`, `pw-map-player-ring`, `pw-map-player-bob`) centré sur le nœud du lieu actuel avec infobulle localisée (« Vous êtes ici »).
+  - Déplacement instantané lors d'un voyage vers un nouveau lieu et masquage lors du changement de région.
+- **Correction du filtre de recherche de la modale PNJ (`SecretBaseNpcModal`)** :
+  - Élimination de la destruction du champ de recherche (`onInput`) lors de la saisie dans le sélecteur d'apparence (101 sprites) et le sélecteur de Pokémon.
+  - Mise à jour dynamique de la grille d'éléments sans recréer le champ de texte, préservant en permanence le focus et le curseur.
+- **Parité des cartes d'équipe du PNJ avec la référence standard** :
+  - Implémentation du composant dédié `BaseNpcMemberCard` héritant de `PokemonCardView` (`poke-card`).
+  - Affichage complet des 4 capacités (`poke-moves`), sprite de dresseur et Pokémon, niveau, badge d'objet tenu, bouton de retrait `✕` et clic pour remplacer le slot.
+  - Emplacement libre sous forme de zone de dépôt `preset-slot-empty` avec `+ Ajouter un Pokémon`.
+- **Validation d'équilibrage du jeu** :
+  - Taux de capture strictement inchangés (maintien de l'accessibilité des Pokémon rares).
+  - Confirmation de la règle des 0 XP en combat actif contre les adversaires de bas niveau.
+  - Propositions de sécurisation de la Pension contre l'abus de victoires gratuites (frais obligatoires par niveau, échelonnement des K.O.).
+  - Moteur de combat confirmé en auto-battle sans IA avec équilibre Vitesse vs Bulk/Attaque.
+- **Validation** :
+  - **635 tests passants sur 635 (100 % de succès)**.
+  - 27 règles statiques validées (0 violation).
+- Voir [PHASE_v1.14.38.md](PHASE_v1.14.38.md) pour les détails complets.
+
+## 1.14.39 — Unification Complète de l'Édition d'Équipe & Plan d'Action d'Équilibrage
+
+- **Unification du rendu et du fonctionnement des équipes** :
+  - L'édition de l'équipe du PNJ de Base Secrète (`SecretBaseNpcModal`) et l'édition des préréglages d'équipe (`TeamPresetEditorModal`) adoptent le même système visuel et interactif que l'équipe active (`ActiveTeamPanel`).
+  - Conteneur `.team-view` avec liste `.pw-team-member-list` pilotée par `UISortableList`.
+  - Cartes `.poke-card.pw-poke-card` avec poignée de glisser-déposer (`.pw-team-drag-handle`), bouton de retrait (`.pw-team-store-btn`), badge d'objet tenu, infobulle de capacités, et 4 attaques (`.poke-moves`).
+  - Emplacement d'ajout standardisé `.pw-drop-zone` avec symbole `+`, libellé « Ajouter un Pokémon » et compteur `Équipe : X/6`, visible tant que l'équipe compte moins de 6 membres.
+  - Interactions unifiées : clic gauche pour remplacer le Pokémon via le sélecteur, clic droit (menu contextuel) pour ouvrir la fiche d'informations, et réorganisation libre par glisser-déposer ou au clavier (flèches Haut / Bas).
+- **Correction du sélecteur d'importation d'équipe (`SecretBaseNpcModal`)** :
+  - Chaque carte d'équipe importable affiche désormais clairement la liste intégrale des Pokémon qui la composent (miniature sprite, nom d'espèce localisé, niveau).
+  - Élimination des images brisées causées par le passage erroné de `{ shiny }` comme second argument de `AssetPaths.pokemonSprite`.
+- **Suppression du double rond autour des sprites dans la liste des équipes (`TeamPresetsPanel`)** :
+  - Suppression des bordures et fonds résiduels sur `.preset-chip:has(.pw-poke-circle-wrap)` et `.preset-row-chips .preset-chip:not(.missing)`.
+  - Seul le disque canonique uniforme de `UIPokemonSprite` est affiché, supprimant la double bordure circulaire concentrique.
+- **Plan d'action et analyse d'équilibrage comparative approfondie** :
+  - Étude comparative détaillée entre PokéWorld, la référence (main / PokéChill) et PokéClicker (voir [docs/ANALYSE_EQUILIBRAGE_COMPARATIF.md](ANALYSE_EQUILIBRAGE_COMPARATIF.md)).
+  - *Pension & Garderie* : Barème progressif des frais (15 ₽ en début de Kanto jusqu'à 2 000 ₽ en fin de jeu), formule linéaire des K.O. (1 K.O. par niveau, total 4 950 K.O.), Level Cap régional débloqué à 100 après la Ligue, et dissociation stricte de la reproduction/incubation/IV.
+  - *Économie & Monnaies* : Articulation des 3 monnaies complémentaires (Pokédollars pour consommables/pension/vitamines, Jetons de Donjon obtenus par capture pour entrer dans les donjons, Points de Quête pour les automatisations/Master Balls).
+  - *Moteur de Combat* : Rotation des 4 capacités, facteurs de cooldown par attaque (rapide vs lourde), équilibre Vitesse vs Bulk/Dégâts, et montée en puissance des objets tenus.
+  - *Taux de capture* : Maintien strict du statu quo afin d'éviter le découragement sur les espèces rares.
+- **Validation** :
+  - **635 tests passants sur 635 (100 % de succès)**.
+  - 27 règles statiques validées (0 violation).
+- Voir [PHASE_v1.14.39.md](PHASE_v1.14.39.md) et [ANALYSE_EQUILIBRAGE_COMPARATIF.md](ANALYSE_EQUILIBRAGE_COMPARATIF.md) pour les détails complets.
+
+## 1.15.0 — Refonte du Plafond de Pension Régional, Embuscades de Carte & Combats d'Histoire
+
+- **Plafond Régional de la Pension (Daycare Regional Level Cap)** :
+  - Un Pokémon à la pension ne peut jamais dépasser le niveau du meilleur Pokémon possédé de sa propre région d'origine (`species.region`).
+  - Exemple validé : Rattatac Nv 100 (Kanto) et Kaiminus Nv 30 (Johto) -> Hoothoot (Johto) est bloqué au Nv 30 à la pension tant que Kaiminus n'est pas entraîné plus haut.
+  - Filtrage des candidats (`HatcherySystem.getCandidates`) et autoremplissage/retrait automatique adaptés.
+- **Système d'Embuscades des Teams Ennemies sur la Carte (`TeamAmbushSystem`)** :
+  - Apparition d'embuscades de sbires et boss de Teams sur la carte du monde selon l'avancement en badges.
+  - Rendu SVG dynamique avec groupe `.pw-map-team-ambush`, anneau pulsé `.pw-map-ambush-ring` et sprite officiel du dresseur.
+  - Tout déplacement vers le lieu déclenche le combat. En cas d'échec / repli, le joueur reste à l'emplacement précédent. En cas de victoire, l'embuscade est levée et le joueur entre sur le lieu.
+- **Bouton « Combattre » Ciblé dans les Quêtes (`StoryPanel` / `QuestCard`)** :
+  - Bouton direct « Combattre » réservé exclusivement aux combats d'histoire contre les Rivaux et les Teams ennemies (Rocket, Aqua, Magma).
+  - Les champions d'arène (badges) ne disposent plus du bouton direct dans les quêtes et doivent être affrontés dans leur arène.
+- **Normalisation Terminologique** :
+  - Remplacement de « Pierre Liaison » / « Link Stone » par « Câble Link » (FR) / « Link Cable » (EN).
+  - Renommage intégral du « PokéMarket » / « Marché » en « Marché Noir » / « Black Market ».
+- **Validation** :
+  - **640 tests passants sur 640 (100 % de succès)**.
+  - 27 règles statiques validées (0 violation).
+- Voir [PHASE_v1.15.0.md](PHASE_v1.15.0.md) pour les détails complets.
+
+## 1.15.1 — Formes de Base sur les Routes, Étalonnage d'Entraînement BST, Combo Cross-STAB & Quêtes du Marché Noir
+
+- **Suppression des Évolutions Sauvages sur les Routes (`encounters-content.js`)** :
+  - Remplacement des formes évoluées sauvages (`raticate`, `gloom`, `weepinbell`, `fearow`, `arbok`, `tentacruel`) des routes 14, 17, 18, 19, 20, 21, 23 par leurs formes de base (`rattata`, `oddish`, `bellsprout`, `spearow`, `ekans`, `tentacool`).
+  - Incite à la montée en niveau active des Pokémon de base pour déclencher leurs évolutions.
+- **Étalonnage Relatif de l'Entraînement des EVs (`TrainingSystem.js`)** :
+  - Calcul dynamique de niveau basé sur le ratio BST stagiaire/opposant ($\min(1.15, \max(0.60, \text{traineeBst} / \text{oppBst}))$).
+  - Permet aux Pokémon de toutes classes (y compris E et D comme Chenipan et Magicarpe) de remporter leurs combats d'entraînement d'EVs.
+- **Bonus de Combo Offensif Cross-STAB (`BattleRules.js` & `DamageCalculator.js`)** :
+  - Bonus de $+35\%$ de dégâts lors de l'alternance entre deux types STAB natifs distincts.
+- **Déblocage Narratif du Marché Noir (`FeatureAccessSystem.js`)** :
+  - Autorisation d'accès au Marché Noir suite à la complétion de la quête `main.33` (Repaire Rocket de Céladopole).
+- **Validation** :
+  - **644 tests passants sur 644 (100 % de succès)**.
+  - 27 règles statiques validées (0 violation).
+- Voir [PHASE_v1.15.1.md](PHASE_v1.15.1.md) pour les détails complets.
+
+## 1.15.2 — Capacités de Combat Spécifiques & Système de Fatigue en Combat Prolongé
+
+- **Mécaniques des Capacités de Combat Spécifiques (`DamageCalculator.js` & `MoveTyping.js`)** :
+  - `weather_ball` (Ball'Météo) : Dynamique de type selon la météo active (Eau sous Pluie, Feu sous Soleil, Roche sous Sable, Glace sous Grêle) avec multiplicateur de dégâts $\times 2$.
+  - `stored_power` (Force Ajoutée) : Puissance accrue de $+30$ par palier de statistique positive du lanceur.
+  - `body_press` (Big Splash) : Calcul des dégâts physiques basé sur la Défense (`def`) du lanceur au lieu de l'Attaque.
+- **Système de Fatigue en Combat Prolongé & Talent Endurance (`BattleSystem.js`)** :
+  - Application d'une usure de fatigue progressive sur l'équipe active au-delà de 50 combats sauvages consécutifs dans la même session.
+  - Le talent `stamina` (Endurance) divise par 2 l'usure de fatigue subie.
+- **Validation** :
+  - **648 tests passants sur 648 (100 % de succès)**.
+  - 27 règles statiques validées (0 violation).
+- Voir [PHASE_v1.15.2.md](PHASE_v1.15.2.md) pour les détails complets.
+
+## 1.15.3 — Boss de Raid Légendaires, Hard Enrage 90s, Transit Régional & Paliers de Pension
+
+- **Boss de Raid Légendaires Épiques (`DungeonBattleRules.js`)** :
+  - Points de vie des boss légendaires de donjon multipliés par $\times 35$ (Artikodin, Électhor, Sulfura, Mewtwo...).
+  - Multiplicateurs de statistiques renforcés et niveau minimal 70.
+  - Attribution du statut `legendaryBoss: true`.
+- **Hard Enrage Timer de 90 Secondes (`BattleSession.js`)** :
+  - Déclenchement d'un wipe mortel de l'équipe (`dungeon_boss_enrage_wipe`) si le boss légendaire n'est pas vaincu en 90 secondes.
+  - Impose un DPS check exigeant l'optimisation complète (IV, EV, objets, Cross-STAB).
+- **Condition de Transit Régional Pokédex Hors Légendaires (`FeatureAccessSystem.js`)** :
+  - Déblocage de la région suivante fondé sur la victoire en Ligue et la complétion du Pokédex régional standard (hors légendaires de raid endgame).
+- **Paliers de Tarification Progressive de la Pension (`HatcherySystem.js` & `HatcheryData.js`)** :
+  - Mémorisation du `initialLevel` en pension et tarification progressive de $100$ ₽ de base $+ 100$ ₽ par niveau gagné.
+- **Validation** :
+  - **652 tests passants sur 652 (100 % de succès)**.
+  - 27 règles statiques validées (0 violation).
+- Voir [PHASE_v1.15.3.md](PHASE_v1.15.3.md) pour les détails complets.
+
+## 1.15.4 — Objets Tenus Palier 25, Cristaux Z & Méga-Gemmes, Talents Simple & Lunatique, Laboratoire de Cramois'Île
+
+- **Extension des Paliers d'Objets Tenus jusqu'au Palier 25 (`BattleRules.js` & `HeldItemPower.js`)** :
+  - Échelonnement continu jusqu'au Palier 25 (120 exemplaires) pour le raid endgame.
+- **Activation des Méga-Gemmes & Cristaux Z (`DamageCalculator.js` & `BattleEffectCoverage.js`)** :
+  - Multiplicateur de puissance d'objet tenu pour `mega_stone` et boost de type $\times 1.4$ pour `z_crystal`.
+  - Statut promu de `DEFERRED` à `PORTED` dans `BattleEffectCoverage.js`.
+- **Talents Simple (`simple`) & Lunatique (`moody`) (`StatChangeRules.js` & `TurnEndRules.js`)** :
+  - Doublement des modificateurs de stats pour le talent Simple.
+  - Fluctuation de stats de fin de tour (+2 / -1) pour le talent Lunatique.
+- **Laboratoire de Résurrection de Fossiles à Cramois'Île (`FossilRules.js` & `FossilSystem.js`)** :
+  - Autorisation officielle de résurrection à Cramois'Île (`cinnabar`) en conformité avec le canon.
+- **Validation** :
+  - **657 tests passants sur 657 (100 % de succès)**.
+  - 27 règles statiques validées (0 violation).
+- Voir [PHASE_v1.15.4.md](PHASE_v1.15.4.md) pour les détails complets.
+
+## 1.15.5 — Talent Corps en Or, Moteur Fast-Forward Post-AFK & Validation Globale de Bout en Bout
+
+- **Talent Corps en Or (`goodasgold`) (`StatusRules.js` & `StatChangeRules.js`)** :
+  - Immunité totale aux altérations de statut et aux baisses de statistiques en combat.
+  - Bonus passif de $+15\%$ de chance de rencontre chromatique.
+- **Moteur Fast-Forward Déterministe Post-AFK (`FastForwardSystem.js`)** :
+  - Simulation accélérée des combats en cas de reprise après absence.
+  - Gains de monnaie, drops d'objets, avancée en pension et calcul d'usure de fatigue.
+- **Validation Globale de Bout en Bout (`Release1155.test.js`)** :
+  - Vérification de la création de nouvelle sauvegarde, starters, progression de niveau, pensions régionales et portes d'accès.
+- **Validation** :
+  - **660 tests passants sur 660 (100 % de succès)**.
+  - 27 règles statiques validées (0 violation).
+- Voir [PHASE_v1.15.5.md](PHASE_v1.15.5.md) pour les détails complets.
+
+
+
+
+
+

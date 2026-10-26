@@ -215,6 +215,45 @@ describe('Map and location corrections', (test) => {
     }
   });
 
+  test('MapPanel renders visual player marker at current location with ring and bobbing avatar', () => {
+    const saves = SaveSystem.getInstance();
+    const previousSave = saves.getCurrentSave();
+    const save = SaveData.createNew('Map player marker test', 'charmander');
+    save.player.location = 'pallet';
+    save.player.region = 'kanto';
+    save.player.trainerSprite = 'trainer-42';
+    saves.setCurrentSave(save);
+
+    const map = new MapPanel(DashboardColumns.CENTER);
+    try {
+      const mapDom = map.getDomElement();
+      const playerGroup = mapDom.querySelector('.pw-map-player');
+      assert.ok(playerGroup, 'pw-map-player group is rendered on the map');
+
+      const ring = playerGroup.querySelector('.pw-map-player-ring');
+      assert.ok(ring, 'pw-map-player-ring is rendered');
+
+      const bob = playerGroup.querySelector('.pw-map-player-bob');
+      assert.ok(bob, 'pw-map-player-bob group is rendered');
+
+      const image = bob.querySelector('image');
+      assert.ok(image, 'player trainer sprite image is rendered');
+      assert.ok(image.getAttribute('href')?.includes('trainer-42'), 'uses current player trainerSprite');
+
+      const title = playerGroup.querySelector('title');
+      assert.equal(title?.textContent, t('map_you_are_here'), 'localized you-are-here tooltip');
+
+      // Traveling to another location in the same region moves the marker
+      LocationSystem.getInstance().travelTo('route1');
+      const updatedBob = map.getDomElement().querySelector('.pw-map-player-bob')?.querySelector('image');
+      assert.ok(updatedBob, 'marker persists on route1');
+      assert.notEqual(updatedBob.getAttribute('y'), image.getAttribute('y'), 'marker moved to route1 coordinates');
+    } finally {
+      map.destroy();
+      saves.setCurrentSave(previousSave);
+    }
+  });
+
   test('location NPC and arena action rules explicitly suppress box-shadow halos', () => {
     const css = fs.readFileSync(path.resolve('assets/css/design-system.css'), 'utf8');
     const rules = [...css.matchAll(/([^{}]*(?:pw-loc-npc-btn|pw-loc-gym-btn)[^{}]*)\{([^{}]*)\}/g)];

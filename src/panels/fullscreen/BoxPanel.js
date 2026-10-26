@@ -487,6 +487,39 @@ export class BoxPanel extends UIFullscreenPanel {
       text: name
     }));
 
+    entry.addDomListener('contextmenu', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.POKEMON_INFO, {
+        pokemonUid: pokemon.uid
+      }));
+    });
+
+    let touchTimer = null;
+    let touchMoved = false;
+    entry.addDomListener('touchstart', (event) => {
+      touchMoved = false;
+      if (touchTimer) clearTimeout(touchTimer);
+      touchTimer = setTimeout(() => {
+        touchTimer = null;
+        if (!touchMoved) {
+          EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.POKEMON_INFO, {
+            pokemonUid: pokemon.uid
+          }));
+        }
+      }, 500);
+    });
+    entry.addDomListener('touchmove', () => {
+      touchMoved = true;
+      if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
+    });
+    entry.addDomListener('touchend', () => {
+      if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
+    });
+    entry.addDomListener('touchcancel', () => {
+      if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
+    });
+
     const metadata = new UIContainer({ className: 'pw-box-grid-meta' });
     const heldItemKey = pokemon.heldItem ? `item.${pokemon.heldItem}.name` : '';
     if (heldItemKey) {

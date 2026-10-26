@@ -65,7 +65,9 @@ export class UIMapView extends UIElement {
     this._terrain = svgNode('g', { class: 'pw-map-terrain' });
     this._nodes = svgNode('g', { class: 'pw-map-nodes' });
     this._labels = svgNode('g', { class: 'pw-map-labels' });
-    this._svg.append(this._terrain, this._nodes, this._labels);
+    this._ambushes = svgNode('g', { class: 'pw-map-ambush-layer' });
+    this._player = svgNode('g', { class: 'pw-map-player-layer' });
+    this._svg.append(this._terrain, this._nodes, this._labels, this._ambushes, this._player);
     this._dom.appendChild(this._svg);
 
     this.addDomListener('click', (event) => {
@@ -89,6 +91,107 @@ export class UIMapView extends UIElement {
     for (const node of nodes) {
       this._nodes.appendChild(UIMapView._buildNode(node));
       this._labels.appendChild(UIMapView._buildLabel(node));
+    }
+  }
+
+  /**
+   * Updates or hides the visual player avatar marker on the map.
+   * Matches reference `#map-svg .pw-map-player` marker with pulsing ring and bobbing avatar.
+   * @param {{x: number, y: number, spriteUrl: string, tooltip?: string}|null} player
+   */
+  setPlayer(player) {
+    this._player.textContent = '';
+    if (!player) return;
+
+    const size = 62;
+    const cx = player.x;
+    const cy = player.y;
+    const px = cx - size / 2;
+    const py = cy - size / 2;
+
+    const group = svgNode('g', { class: 'pw-map-player' });
+    if (player.tooltip) {
+      const title = svgNode('title');
+      title.textContent = player.tooltip;
+      group.appendChild(title);
+    }
+
+    group.appendChild(svgNode('ellipse', {
+      class: 'pw-map-player-ring',
+      cx,
+      cy,
+      rx: 26,
+      ry: 26
+    }));
+
+    const bobGroup = svgNode('g', { class: 'pw-map-player-bob' });
+    bobGroup.appendChild(svgNode('ellipse', {
+      cx,
+      cy: cy + size / 2 - 4,
+      rx: 16,
+      ry: 5,
+      fill: '#000',
+      opacity: '0.35'
+    }));
+
+    bobGroup.appendChild(svgNode('image', {
+      href: player.spriteUrl,
+      'xlink:href': player.spriteUrl,
+      x: px,
+      y: py,
+      width: size,
+      height: size,
+      preserveAspectRatio: 'xMidYMid meet'
+    }));
+
+    group.appendChild(bobGroup);
+    this._player.appendChild(group);
+  }
+
+  /**
+   * Updates or hides enemy team ambush markers on the map.
+   * @param {Array<{x: number, y: number, spriteUrl: string, tooltip?: string, locationId: string}>} [ambushes=[]]
+   */
+  setAmbushMarkers(ambushes = []) {
+    this._ambushes.textContent = '';
+    if (!ambushes || ambushes.length === 0) return;
+
+    for (const ambush of ambushes) {
+      const size = 56;
+      const cx = ambush.x;
+      const cy = ambush.y;
+      const px = cx - size / 2;
+      const py = cy - size / 2;
+
+      const group = svgNode('g', {
+        class: 'pw-map-team-ambush',
+        'data-node-id': ambush.locationId
+      });
+
+      if (ambush.tooltip) {
+        const title = svgNode('title');
+        title.textContent = ambush.tooltip;
+        group.appendChild(title);
+      }
+
+      group.appendChild(svgNode('circle', {
+        class: 'pw-map-ambush-ring',
+        cx,
+        cy,
+        r: 24
+      }));
+
+      group.appendChild(svgNode('image', {
+        href: ambush.spriteUrl,
+        'xlink:href': ambush.spriteUrl,
+        x: px,
+        y: py,
+        width: size,
+        height: size,
+        preserveAspectRatio: 'xMidYMid meet'
+      }));
+
+      this._ambushes.appendChild(group);
     }
   }
 

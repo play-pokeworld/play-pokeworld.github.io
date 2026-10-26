@@ -46,6 +46,16 @@
   justify-content: space-between;
   gap: 6px;
 }
+.pw-ach-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pw-ach-tracker-card .pw-ach-desc {
+  font-size: 11px;
+  color: var(--light1, #c9bc9c);
+  line-height: 1.3;
+}
 .pw-ach-title {
   display: flex;
   align-items: center;
@@ -1550,6 +1560,7 @@ body.mobile-mode .mobile-subnav-bar.is-hidden {
   gap: 10px;
   min-width: 0;
 }
+.team-view .pw-team-drag-handle,
 #team-window-body .pw-team-drag-handle {
   display: inline-flex !important;
   flex: 0 0 26px;
@@ -1564,29 +1575,36 @@ body.mobile-mode .mobile-subnav-bar.is-hidden {
   cursor: grab;
   touch-action: none;
 }
+.team-view .pw-team-drag-handle:active,
 #team-window-body .pw-team-drag-handle:active {
   cursor: grabbing;
 }
+.team-view .pw-team-drag-handle:focus-visible,
 #team-window-body .pw-team-drag-handle:focus-visible {
   outline: 2px solid var(--pw-accent-color, #ffe45c);
   outline-offset: 2px;
 }
+.team-view .poke-card[draggable='true'],
 #team-window-body .poke-card[draggable='true'] {
   cursor: grab;
 }
+.team-view .poke-card.is-drag-armed,
 #team-window-body .poke-card.is-drag-armed {
   opacity: 0.6;
   cursor: grabbing;
 }
+.team-view .poke-card.is-dragging,
 #team-window-body .poke-card.is-dragging {
   opacity: 0.56;
   border-color: var(--pw-accent-color, #ffe45c) !important;
 }
+.team-view .poke-card.is-drop-target,
 #team-window-body .poke-card.is-drop-target {
   border-color: var(--pw-accent-color, #ffe45c) !important;
   box-shadow: 0 0 0 2px
     color-mix(in srgb, var(--pw-accent-color, #ffe45c) 32%, transparent) !important;
 }
+.team-view .pw-team-store-btn,
 #team-window-body .pw-team-store-btn {
   display: inline-flex !important;
   flex: 0 0 26px;
@@ -1598,14 +1616,17 @@ body.mobile-mode .mobile-subnav-bar.is-hidden {
   margin-left: 0;
   padding: 4px;
 }
+.team-view .pw-team-store-btn:focus-visible,
 #team-window-body .pw-team-store-btn:focus-visible {
   outline: 2px solid var(--pw-accent-color, #ffe45c);
   outline-offset: 2px;
 }
+.team-view .pw-team-store-btn.is-disabled,
 #team-window-body .pw-team-store-btn.is-disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
+.team-view .poke-card-info-btn,
 #team-window-body .poke-card-info-btn {
   order: 6;
   margin-left: 0;
@@ -2386,6 +2407,13 @@ html:not([data-dungeon-run='1'])
 .pw-team-presets-manager .pw-preset-grid {
   padding: 14px 18px;
 }
+.pw-team-presets-manager .preset-row-chips .preset-chip:not(.missing),
+.preset-chip:has(.pw-poke-circle-wrap) {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
 .pw-team-presets-manager .preset-row-chips .pw-poke-circle-wrap {
   width: 56px;
   height: 56px;
@@ -2507,4 +2535,39 @@ html:not([data-dungeon-run='1'])
 .pw-loc-alcove-row .pw-loc-alcove-name {
   min-width: 160px;
   flex: 0 0 auto;
+}
+
+/* Battle Atoll preparation modal */
+.pw-atoll-prep-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.pw-atoll-prep-modal-body .atoll-prep-hint {
+  display: block;
+  color: var(--light1);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.pw-atoll-prep-modal-body .atoll-prep-note {
+  display: block;
+  color: var(--light1);
+  font-size: 11px;
+  line-height: 1.4;
+  margin-top: 8px;
+}
+.pw-team-modal-moves {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+.pw-team-modal-moves .poke-move {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  font-size: 12px;
 }

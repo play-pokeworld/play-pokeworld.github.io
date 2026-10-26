@@ -34,6 +34,7 @@ import { SaveLoadedEvent } from '../core/events/SaveLoadedEvent.js';
 import { TrainingRules } from '../config/TrainingRules.js';
 import { FacilityRules } from '../config/FacilityRules.js';
 import { CONTENT_FEATURES } from '../config/ContentAccessRules.js';
+import { PokemonDB } from '../data/pokemon/PokemonDB.js';
 import { NotificationChannels, NotificationTones } from '../config/NotificationConfig.js';
 import { t } from '../localization/LocalizationManager.js';
 
@@ -434,9 +435,21 @@ export class TrainingSystem extends BaseSystem {
     const active = SaveSystem.getInstance().getCurrentSave()?.staff.active.training;
     const level = active === 'trainer_saffron' ? SaveSystem.getInstance().getCurrentSave().staff.owned[active]?.level || 1 : 1;
     const count = TrainingRules.OPPONENT_COUNT - Math.round(TrainingRules.MAX_STAFF_OPPONENT_REDUCTION * (level - 1) / (StaffRules.MAX_LEVEL - 1));
-    return pool.slice(0, count).map((species, index) => PokemonFactory.create(species,
-      Math.max(TrainingRules.MIN_OPPONENT_LEVEL, base + TrainingRules.LEVEL_VARIATION[index % TrainingRules.LEVEL_VARIATION.length]),
-      { random })).filter(Boolean);
+
+    const traineeSpecies = trainee.getSpecies();
+    const traineeBst = Object.values(traineeSpecies?.baseStats || {}).reduce((sum, v) => sum + v, 0) || 300;
+    const pokemonDb = PokemonDB.getInstance();
+
+    return pool.slice(0, count).map((speciesId, index) => {
+      const oppSpecies = pokemonDb.getById(speciesId);
+      const oppBst = Object.values(oppSpecies?.baseStats || {}).reduce((sum, v) => sum + v, 0) || 300;
+      const bstRatio = Math.min(1.15, Math.max(0.60, traineeBst / oppBst));
+      const targetLevel = Math.max(
+        TrainingRules.MIN_OPPONENT_LEVEL,
+        Math.round((base + TrainingRules.LEVEL_VARIATION[index % TrainingRules.LEVEL_VARIATION.length]) * bstRatio)
+      );
+      return PokemonFactory.create(speciesId, targetLevel, { random });
+    }).filter(Boolean);
   }
   /** @private */
   _commit() {

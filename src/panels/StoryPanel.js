@@ -111,7 +111,7 @@ export class StoryPanel extends DraggablePanel {
         });
         card.setStatus(
           status,
-          TrainerSystem.getInstance().getQuestOpponent(status.quest.key) !== null,
+          TrainerSystem.getInstance().isStoryRivalOrTeamOpponent(status.quest.key),
           status.quest.category === QuestCategories.MAIN ? mainProgress?.step ?? null : null
         );
         group.addChild(card);

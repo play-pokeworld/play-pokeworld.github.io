@@ -32,6 +32,7 @@ import { PokedexEntryOpenedEvent } from '../../core/events/PokedexEntryOpenedEve
 import { SaveLoadedEvent } from '../../core/events/SaveLoadedEvent.js';
 import { ContentAccessChangedEvent } from '../../core/events/ContentAccessChangedEvent.js';
 import { LanguageChangedEvent } from '../../core/events/LanguageChangedEvent.js';
+import { ModalOpenRequestedEvent } from '../../core/events/ModalOpenRequestedEvent.js';
 import { EventBus } from '../../core/EventBus.js';
 import { t } from '../../localization/LocalizationManager.js';
 
@@ -386,6 +387,7 @@ export class PokedexPanel extends UIFullscreenPanel {
     if (!save?.pokedex.isSeen(speciesId)) return;
     this._selectedSpecies = speciesId;
     EventBus.getInstance().dispatch(new PokedexEntryOpenedEvent(speciesId));
+    EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.POKEMON_INFO, { speciesId }));
     this._render();
   }
 

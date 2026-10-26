@@ -184,6 +184,7 @@ describe('Kanto gameplay', (test) => {
     try {
       const save = newKantoSave('Daycare', HatcheryRules.LOCATION_ID);
       save.access.unlockFeature(CONTENT_FEATURES.HATCHERY);
+      save.team[0].setLevel(20);
       const reserve = PokemonFactory.create('pikachu', 10);
       assert.ok(TeamSystem.getInstance().addPokemon(reserve));
       save.currencies.add('questPoint', HatcheryRules.SLOT_UPGRADE_COSTS[0]);

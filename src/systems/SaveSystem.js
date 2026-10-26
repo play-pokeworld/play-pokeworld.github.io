@@ -101,6 +101,10 @@ export class SaveSystem extends BaseSystem {
     }
     if (!save) return null;
 
+    const evolvedCount = save.verifyLevelEvolutions?.() || 0;
+    if (evolvedCount > 0) {
+      SaveStorage.write(save);
+    }
     this._currentSave = save;
     SaveStorage.writeActive(save);
     console.log(t('debug_save_loaded', { id: save.id }));

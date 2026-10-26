@@ -37,6 +37,8 @@ import { TalentUnlockData } from './TalentUnlockData.js';
 import { RelaunchData } from './RelaunchData.js';
 import { MineData } from './MineData.js';
 import { SecretBaseData } from './SecretBaseData.js';
+import { AchievementsData } from './AchievementsData.js';
+import { AtollData } from './AtollData.js';
 import { ContentAccessData } from './ContentAccessData.js';
 import { SaveThemes } from './SaveThemes.js';
 import { SaveMigrator } from './migrations/SaveMigrator.js';
@@ -105,6 +107,10 @@ export class SaveData extends BaseModel {
     this.staff = new FacilityStaffData();
     /** @type {SecretBaseData} */
     this.secretBase = new SecretBaseData();
+    /** @type {AchievementsData} */
+    this.achievements = new AchievementsData();
+    /** @type {AtollData} */
+    this.atoll = new AtollData();
     /** @type {ContentAccessData} Sticky progression facts; evaluated by FeatureAccessSystem. */
     this.access = new ContentAccessData();
   }
@@ -184,6 +190,8 @@ export class SaveData extends BaseModel {
       talents: this.talents.serialize(),
       staff: this.staff.serialize(),
       secretBase: this.secretBase.serialize(),
+      achievements: this.achievements.serialize(),
+      atoll: this.atoll.serialize(),
       access: this.access.serialize()
     };
   }
@@ -220,8 +228,35 @@ export class SaveData extends BaseModel {
     this.staff = new FacilityStaffData(data.staff);
     for (const pokemon of this.collection.getAll()) this.talents.unlock(pokemon.species, pokemon.talent);
     this.secretBase = new SecretBaseData(data.secretBase);
+    this.achievements = new AchievementsData(data.achievements);
+    this.atoll = new AtollData(data.atoll);
     this.access = new ContentAccessData(data.access);
     this._repairPokemonReferences();
+    this.verifyLevelEvolutions();
+  }
+
+  /**
+   * Verifies that every owned Pokémon whose level satisfies its evolution requirement
+   * has evolved properly. Called automatically upon save load and deserialization.
+   * @returns {number} Number of Pokémon that evolved during verification.
+   */
+  verifyLevelEvolutions() {
+    if (!this.collection) return 0;
+    let evolvedCount = 0;
+    for (const pokemon of this.collection.getAll()) {
+      const evolved = pokemon.checkLevelEvolution((species) => {
+        if (this.pokedex) {
+          this.pokedex.markCaught(species, pokemon.shiny, { deferSave: true });
+        }
+        if (this.talents) {
+          this.talents.unlock(species, pokemon.talent);
+        }
+      });
+      if (evolved) {
+        evolvedCount++;
+      }
+    }
+    return evolvedCount;
   }
 
   /**

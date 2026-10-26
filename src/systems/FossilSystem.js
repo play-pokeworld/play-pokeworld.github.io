@@ -61,7 +61,9 @@ export class FossilSystem extends BaseSystem {
   }
 
   /** Local laboratory access is separate from the permanently available hatchery. @returns {boolean} */
-  canUseHere() { return this.isRevivalUnlocked() && LocationSystem.getInstance().getCurrentLocationId() === FossilRules.LAB_LOCATION_ID; }
+  canUseHere() {
+    return this.isRevivalUnlocked() && FossilRules.LAB_LOCATIONS.includes(LocationSystem.getInstance().getCurrentLocationId());
+  }
 
   /** @returns {Array<{itemId:string,speciesId:string,quantity:number}>} */
   getCandidates() {
@@ -84,7 +86,7 @@ export class FossilSystem extends BaseSystem {
     if (!item || item.kind !== ItemKinds.FOSSIL) return { result: FossilAvailability.NOT_FOSSIL, speciesId: null };
     if (item.futureOnly) return { result: FossilAvailability.FUTURE_ONLY, speciesId: null };
     if (!item.revives || !PokemonDB.getInstance().has(item.revives)) return { result: FossilAvailability.NO_SPECIES, speciesId: null };
-    if (LocationSystem.getInstance().getCurrentLocationId() !== FossilRules.LAB_LOCATION_ID) {
+    if (!FossilRules.LAB_LOCATIONS.includes(LocationSystem.getInstance().getCurrentLocationId())) {
       return { result: FossilAvailability.WRONG_LOCATION, speciesId: item.revives };
     }
     if (HatcheryQueue.freeFossils(save, itemId) < 1) return { result: FossilAvailability.NO_ITEM, speciesId: item.revives };

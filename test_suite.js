@@ -50,6 +50,16 @@ await import('./tests/BackdropAndContext.test.js');
 await import('./tests/Dictionary.test.js');
 await import('./tests/DebugAndBoxItemUse.test.js');
 await import('./tests/PokemonInfoAndTmParity.test.js');
+await import('./tests/Achievements.test.js');
+await import('./tests/Atoll.test.js');
+await import('./tests/DaycareRegionalCap.test.js');
+await import('./tests/TeamAmbush.test.js');
+await import('./tests/Release1151.test.js');
+await import('./tests/Release1152.test.js');
+await import('./tests/Release1153.test.js');
+await import('./tests/Release1154.test.js');
+await import('./tests/Release1155.test.js');
+await import('./tests/Release1156.test.js');
 
 const { failed } = await runAll();
 process.exit(failed ? 1 : 0);

@@ -26,8 +26,9 @@ export class BattleCombatant {
    * @param {number} [options.hpMultiplier=1] - Temporary wild-encounter HP scale
    * @param {Object} [options.statMultipliers={}] - Temporary initial battle stat modifiers
    * @param {boolean} [options.dungeonBoss=false] - Marks a final dungeon guardian
+   * @param {boolean} [options.legendaryBoss=false] - Marks an epic legendary raid guardian
    */
-  constructor(pokemon, side, { npc = false, hiddenTalentActive = npc, heldQuantity = 0, hpMultiplier = 1, statMultipliers = {}, dungeonBoss = false } = {}) {
+  constructor(pokemon, side, { npc = false, hiddenTalentActive = npc, heldQuantity = 0, hpMultiplier = 1, statMultipliers = {}, dungeonBoss = false, legendaryBoss = false } = {}) {
     this.pokemon = pokemon;
     this.side = side;
     this.npc = npc;
@@ -36,6 +37,7 @@ export class BattleCombatant {
     const hpScale = Number(hpMultiplier);
     this.hpMultiplier = npc && Number.isFinite(hpScale) ? Math.max(1, hpScale) : 1;
     this.dungeonBoss = npc && dungeonBoss === true;
+    this.legendaryBoss = npc && legendaryBoss === true;
     this.dungeonEnraged = false;
     this._baseStatMultipliers = Object.fromEntries(MODIFIABLE_STATS.map((stat) => {
       const multiplier = Number(statMultipliers?.[stat]);
@@ -135,6 +137,11 @@ export class BattleCombatant {
     const ids = [this.pokemon.talent];
     if (this.hiddenTalentActive && species?.hiddenTalent && species.hiddenTalent !== this.pokemon.talent) ids.push(species.hiddenTalent);
     return ids.filter(Boolean);
+  }
+
+  /** @param {string} id @returns {boolean} */
+  hasTalent(id) {
+    return this.getTalentIds().includes(id);
   }
 
   /**

@@ -604,7 +604,8 @@ export class BagPanel extends UIFullscreenPanel {
           quantityLabel: t('bag_qty', { n: entry.quantity }),
           holderLabel,
           disabled: locked || holderIsOther,
-          rowClassName: 'pw-held-item-row'
+          rowClassName: 'pw-held-item-row',
+          onContext: (itemId) => this._openItemInfo(itemId)
         }));
       }
       children.push(list);

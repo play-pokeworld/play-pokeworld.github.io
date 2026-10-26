@@ -21,6 +21,9 @@ export class StatChangeRules {
   static apply(target, stat, mult, log) {
     let factor = Number(mult);
     if (!Number.isFinite(factor) || factor <= 0 || factor === 1 || !(stat in target.statMods)) return false;
+    if (target.hasTalent?.('simple')) {
+      factor = factor > 1 ? 1 + (factor - 1) * 2 : Math.max(0.2, 1 - (1 - factor) * 2);
+    }
     if (target.hasTalentEffect(TalentEffectKinds.INVERT_STAT_CHANGES)) factor = 1 / factor;
     if (factor < 1 && StatChangeRules.isDropBlocked(target, stat)) {
       log.add('battle_log.stat_blocked', { name: target.name, stat });
@@ -48,7 +51,11 @@ export class StatChangeRules {
    */
   static applyRaw(target, stat, mult) {
     if (!(stat in target.statMods)) return;
-    target.statMods[stat] = Math.max(BattleRules.STAT_MOD_MIN, Math.min(BattleRules.STAT_MOD_MAX, target.statMods[stat] * mult));
+    let factor = Number(mult);
+    if (target.hasTalent?.('simple')) {
+      factor = factor > 1 ? 1 + (factor - 1) * 2 : Math.max(0.2, 1 - (1 - factor) * 2);
+    }
+    target.statMods[stat] = Math.max(BattleRules.STAT_MOD_MIN, Math.min(BattleRules.STAT_MOD_MAX, target.statMods[stat] * factor));
   }
 
   /**
@@ -58,6 +65,7 @@ export class StatChangeRules {
    */
   static isDropBlocked(target, stat) {
     if (target.heldEffect(HeldEffectKinds.PROTECT)) return true;
+    if (target.hasTalent?.('goodasgold')) return true;
     return target.talentEffects(TalentEffectKinds.STAT_DROP_IMMUNITY).some((effect) => !effect.stats || effect.stats.includes(stat));
   }
 

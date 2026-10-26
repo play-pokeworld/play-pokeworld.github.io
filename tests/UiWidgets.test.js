@@ -399,7 +399,7 @@ describe('UI widgets', (test) => {
     const marketShortcut = SHORTCUTS.find((shortcut) => shortcut.id === ShortcutIds.MARKET);
     const atollShortcut = SHORTCUTS.find((shortcut) => shortcut.id === ShortcutIds.ATOLL);
     assert.ok(marketShortcut && marketShortcut.modalId === ModalIds.MARKET && marketShortcut.requiresMarketGate, 'Market opens its real screen behind the unchanged reference gate');
-    assert.ok(atollShortcut && atollShortcut.modalId === null && atollShortcut.requiresChampionTitle, 'Atoll never routes to a missing screen');
+    assert.ok(atollShortcut && atollShortcut.modalId === ModalIds.ATOLL && atollShortcut.requiresChampionTitle, 'Atoll routes to its real screen behind the champion title gate');
 
     const save = SaveSystem.getInstance().createNewSave('Shortcut fixture', 'bulbasaur');
     const access = FeatureAccessSystem.getInstance();
@@ -558,7 +558,7 @@ describe('UI widgets', (test) => {
       ]);
       assert.equal(dom.querySelector('.pw-rank-chip')?.textContent, t('ach_rank_locked'));
       assert.ok(dom.querySelector('.pw-rank-chip')?.classList.contains('rank-none'));
-      assert.equal(dom.querySelector('.pw-ach-pinned-dropdown')?.querySelector('.pw-dropdown-select')?.children.length, 4);
+      assert.ok(dom.querySelector('.pw-ach-desc'), 'description is rendered under title');
     } finally {
       panel.destroy();
       saveSystem.setCurrentSave(previousSave);

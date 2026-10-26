@@ -75,6 +75,9 @@ export const battleLog = {
   rematch_no_money: 'Rematch victory: no Pokédollars.',
   quest_points: 'You earn {points} Quest Points.',
   trainer_quote: '"{quote}" — {trainer}',
+  evolved: '{name} evolved into {target}!',
+  fatigue_warning: 'Your team is growing fatigued from continuous battles!',
+  fatigue_wear: '{name} suffers fatigue wear (-{damage} HP)!',
   weather: {
     rain: 'rain', sun: 'harsh sunlight', sand: 'a sandstorm', hail: 'hail', fog: 'fog', somber: 'a somber field',
     reflect: 'Reflect', lightscreen: 'Light Screen', safeguard: 'Safeguard', trickroom: 'Trick Room',

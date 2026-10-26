@@ -161,10 +161,6 @@ export class SecretBasePlacementRules {
       if (!reachable.has(cellKey(layout.spawn.x, layout.spawn.y))) return { ok: false, reason: 'err.blocks_spawn' };
       const spawn = data?.spawn || layout.spawn;
       if (!reachable.has(cellKey(spawn.x, spawn.y))) return { ok: false, reason: 'err.blocks_spawn' };
-      for (const npc of testData.npcs || []) {
-        if (npc.x == null || npc.y == null) continue;
-        if (!this._hasReachableAdjacent(reachable, npc.x, npc.y)) return { ok: false, reason: 'err.blocks_npc' };
-      }
       const pc = (testData.decorations || []).find((entry) => entry.itemId === SecretBaseRules.ITEM_IDS.PC);
       if (pc && !this._hasReachableAdjacent(reachable, pc.x, pc.y, items.getFootprint(SecretBaseRules.ITEM_IDS.PC))) {
         return { ok: false, reason: 'err.pc_unreachable' };
@@ -205,12 +201,6 @@ export class SecretBasePlacementRules {
     const pc = (data.decorations || []).find((entry) => entry.itemId === SecretBaseRules.ITEM_IDS.PC);
     if (pc && !this._hasReachableAdjacent(reachable, pc.x, pc.y, ITEM_DB().getFootprint(SecretBaseRules.ITEM_IDS.PC))) {
       return { ok: false, reason: 'err.pc_unreachable' };
-    }
-    for (const existing of npcs) {
-      if (existing.x == null || existing.y == null) continue;
-      if (!this._hasReachableAdjacent(reachable, existing.x, existing.y)) {
-        return { ok: false, reason: 'err.blocks_npc' };
-      }
     }
     return { ok: true };
   }

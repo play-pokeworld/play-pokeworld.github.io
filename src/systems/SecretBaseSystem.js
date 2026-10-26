@@ -187,6 +187,7 @@ export class SecretBaseSystem extends BaseSystem {
     return {
       id: visit.id,
       source: visit.source,
+      fromLocation: Boolean(visit.fromLocation),
       own: visit.own,
       name: visit.meta.name,
       baseId: visit.meta.id,
@@ -374,7 +375,9 @@ export class SecretBaseSystem extends BaseSystem {
     if (!save) return this._failure(SecretBaseResults.NO_SAVE);
     if (!this.isUnlocked(save)) return this._failure(SecretBaseResults.LOCKED);
     if (!base?.isEstablished?.()) return this._failure(SecretBaseResults.NO_BASE);
-    if (base.npcs.length >= SecretBaseRules.MAX_NPCS) return this._failure('err.npc_max');
+    if (Number.isFinite(SecretBaseRules.MAX_NPCS) && base.npcs.length >= SecretBaseRules.MAX_NPCS) {
+      return this._failure('err.npc_max');
+    }
     const normalizedTeam = this._normalizeNpcTeam(team);
     if (!normalizedTeam.ok) return normalizedTeam;
     const id = `base-npc-${base.nextUid++}`;
@@ -548,7 +551,7 @@ export class SecretBaseSystem extends BaseSystem {
   }
 
   /** Starts the interactive visit to the saved base. */
-  startOwnVisit() {
+  startOwnVisit({ fromLocation = false } = {}) {
     const save = SaveSystem.getInstance().getCurrentSave();
     const base = save?.secretBase;
     if (!save) return this._failure(SecretBaseResults.NO_SAVE);
@@ -561,7 +564,7 @@ export class SecretBaseSystem extends BaseSystem {
     const locationId = this.getBaseLocationId() || LocationSystem.getInstance().getCurrentLocationId();
     const owner = save.player.trainerName || '';
     const visit = this._createVisit(data, {
-      source: 'own', locationId, id: `base-${save.id}`, ownerId: save.id, name: owner
+      source: 'own', locationId, id: `base-${save.id}`, ownerId: save.id, name: owner, fromLocation
     }, true);
     if (!visit.ok) return visit;
     base.record.visits++;
@@ -584,7 +587,7 @@ export class SecretBaseSystem extends BaseSystem {
     const data = new SecretBaseData({ layoutId, locationId, spawn: valid.layout.spawn });
     if (!this._ensurePc(data)) return this._failure(SecretBaseResults.INVALID_LAYOUT);
     const result = this._createVisit(data, {
-      source: 'alcove', locationId, id: `alcove-${layoutId}`, ownerId: null, name: ''
+      source: 'alcove', locationId, id: `alcove-${layoutId}`, ownerId: null, name: '', fromLocation: true
     }, false);
     if (!result.ok) return result;
     EventBus.getInstance().dispatch(new SecretBaseVisitedEvent(locationId));
@@ -623,6 +626,7 @@ export class SecretBaseSystem extends BaseSystem {
     this._visit = {
       id: `visit-${Date.now()}-${++this._visitSequence}`,
       source: meta.source,
+      fromLocation: Boolean(meta.fromLocation),
       own: own || ownFile,
       locationId: meta.locationId,
       meta: {

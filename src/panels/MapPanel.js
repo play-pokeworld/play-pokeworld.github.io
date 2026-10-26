@@ -10,7 +10,11 @@ import { LocationDB } from '../data/world/LocationDB.js';
 import { LocationSystem, LocationStates } from '../systems/LocationSystem.js';
 import { FeatureAccessSystem } from '../systems/FeatureAccessSystem.js';
 import { DungeonSystem } from '../systems/DungeonSystem.js';
+import { BattleSystem } from '../systems/BattleSystem.js';
 import { RoamingSystem } from '../systems/RoamingSystem.js';
+import { TeamAmbushSystem } from '../systems/TeamAmbushSystem.js';
+import { SaveSystem } from '../systems/SaveSystem.js';
+import { ConfirmDialog } from '../ui/ConfirmDialog.js';
 import { NotificationSystem } from '../systems/NotificationSystem.js';
 import { NotificationChannels, NotificationTones } from '../config/NotificationConfig.js';
 import { LocationChangedEvent } from '../core/events/LocationChangedEvent.js';
@@ -19,6 +23,7 @@ import { PokedexChangedEvent } from '../core/events/PokedexChangedEvent.js';
 import { QuestActivatedEvent } from '../core/events/QuestActivatedEvent.js';
 import { QuestProgressedEvent } from '../core/events/QuestProgressedEvent.js';
 import { QuestClaimedEvent } from '../core/events/QuestClaimedEvent.js';
+import { TeamAmbushChangedEvent } from '../core/events/TeamAmbushChangedEvent.js';
 import { RoamingRotationTickEvent } from '../core/events/RoamingRotationTickEvent.js';
 import { LanguageChangedEvent } from '../core/events/LanguageChangedEvent.js';
 import { ModalIds } from '../config/ModalIds.js';
@@ -66,12 +71,16 @@ export class MapPanel extends DraggablePanel {
     });
     this.addChild(this._map);
 
+    this._confirm = new ConfirmDialog({ id: 'pw-map-travel-confirm', name: 'MapTravelConfirm' });
+    this.addChild(this._confirm);
+
     this.listen(LocationChangedEvent, (event) => {
       this._region = event.region;
       this._regionSelect.setValue(event.region);
       this._render();
     });
     this.listen(ContentAccessChangedEvent, () => this._render());
+    this.listen(TeamAmbushChangedEvent, () => this._render());
     for (const eventClass of [PokedexChangedEvent, QuestActivatedEvent, QuestProgressedEvent, QuestClaimedEvent]) {
       this.listen(eventClass, () => this._render());
     }
@@ -97,6 +106,30 @@ export class MapPanel extends DraggablePanel {
       this._render();
       return;
     }
+
+    if (BattleSystem.getInstance().isActive() || DungeonSystem.getInstance().isActive()) {
+      this._confirm.ask({
+        title: t('leave_battle_btn'),
+        message: t('travel_in_battle_confirm'),
+        confirmLabel: t('travel_btn'),
+        danger: true,
+        onConfirm: () => {
+          if (DungeonSystem.getInstance().isActive()) {
+            DungeonSystem.getInstance().quitFromBattle();
+          } else {
+            BattleSystem.getInstance().endBattle(false);
+          }
+          this._executeChangeRegion(regionId);
+        }
+      });
+      return;
+    }
+    this._executeChangeRegion(regionId);
+  }
+
+  /** @private @param {string} regionId */
+  _executeChangeRegion(regionId) {
+    const locations = LocationSystem.getInstance();
     if (!locations.travelToRegion(regionId)) {
       this._region = locations.getCurrentRegion();
       this._regionSelect.setValue(this._region);
@@ -123,7 +156,13 @@ export class MapPanel extends DraggablePanel {
       return;
     }
 
+    if (BattleSystem.getInstance().isActive()) {
+      BattleSystem.getInstance().endBattle(false);
+    }
     const locationId = locations.getCurrentLocationId();
+    this._region = locations.getCurrentRegion();
+    this._regionSelect.setValue(this._region);
+    this._render();
     NotificationSystem.getInstance().notifyTemporary(t('map_current_loc', {
       name: t(`location.${locationId}`)
     }), { channel: NotificationChannels.GAMEPLAY, tone: NotificationTones.ACCENT });
@@ -149,6 +188,35 @@ export class MapPanel extends DraggablePanel {
         tooltip: state === LocationStates.LOCKED ? this._lockMessage(loc, label) : label
       };
     }));
+
+    const currentLocId = locations.getCurrentLocationId();
+    const currentLoc = LocationDB.getInstance().getById(currentLocId);
+    if (currentLoc && currentLoc.region === this._region && currentLoc.layout) {
+      const save = SaveSystem.getInstance().getCurrentSave();
+      const playerSprite = save?.player?.trainerSprite || 'trainer-0';
+      this._map.setPlayer({
+        x: currentLoc.layout.x,
+        y: currentLoc.layout.y,
+        spriteUrl: AssetPaths.trainerSprite(playerSprite),
+        tooltip: t('map_you_are_here')
+      });
+    } else {
+      this._map.setPlayer(null);
+    }
+
+    const ambushes = TeamAmbushSystem.getInstance().getAmbushesForRegion(this._region);
+    const ambushMarkers = ambushes.map((ambush) => {
+      const loc = LocationDB.getInstance().getById(ambush.locationId);
+      if (!loc || !loc.layout) return null;
+      return {
+        x: loc.layout.x,
+        y: loc.layout.y,
+        spriteUrl: AssetPaths.trainerSprite(ambush.sprite),
+        tooltip: t('team_ambush_tooltip', { team: t(ambush.teamNameKey) }),
+        locationId: ambush.locationId
+      };
+    }).filter(Boolean);
+    this._map.setAmbushMarkers(ambushMarkers);
   }
 
   /** @private @param {Object|null} location @param {string} name */
@@ -187,8 +255,45 @@ export class MapPanel extends DraggablePanel {
    * @param {string} locationId
    */
   _travel(locationId) {
+    const locations = LocationSystem.getInstance();
+    const currentLocId = locations.getCurrentLocationId();
+    if (locationId === currentLocId) return;
+
+    if (BattleSystem.getInstance().isActive() || DungeonSystem.getInstance().isActive()) {
+      this._confirm.ask({
+        title: t('leave_battle_btn'),
+        message: t('travel_in_battle_confirm'),
+        confirmLabel: t('travel_btn'),
+        danger: true,
+        onConfirm: () => {
+          if (DungeonSystem.getInstance().isActive()) {
+            DungeonSystem.getInstance().quitFromBattle();
+          } else {
+            BattleSystem.getInstance().endBattle(false);
+          }
+          this._executeTravel(locationId);
+        }
+      });
+      return;
+    }
+    this._executeTravel(locationId);
+  }
+
+  /**
+   * @private
+   * @param {string} locationId
+   */
+  _executeTravel(locationId) {
+    const locations = LocationSystem.getInstance();
+    const currentLocId = locations.getCurrentLocationId();
+    const ambushSystem = TeamAmbushSystem.getInstance();
+    if (ambushSystem.hasAmbush(locationId)) {
+      ambushSystem.triggerAmbush(locationId, currentLocId);
+      return;
+    }
+
     const name = t(`location.${locationId}`);
-    if (!LocationSystem.getInstance().travelTo(locationId)) {
+    if (!locations.travelTo(locationId)) {
       NotificationSystem.getInstance().notifyTemporary(
         this._lockMessage(LocationDB.getInstance().getById(locationId), name),
         { channel: NotificationChannels.GAMEPLAY, tone: NotificationTones.DANGER }

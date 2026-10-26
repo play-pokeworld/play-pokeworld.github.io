@@ -115,10 +115,15 @@ export class FeatureAccessSystem extends BaseSystem {
     };
   }
 
-  /** @returns {boolean} Main's first-badge / Johto gate, shared by shortcut and purchase commands. */
+  /** @returns {boolean} First badge, Johto gate, or Celadon Rocket hideout infiltration completion. */
   isMarketUnlocked() {
-    const save=SaveSystem.getInstance().getCurrentSave();
-    return !!save && (save.player.badges.length>=MarketRules.ACCESS_BADGES || MarketRules.ACCESS_REGIONS.includes(save.player.region));
+    const save = SaveSystem.getInstance().getCurrentSave();
+    return (
+      !!save &&
+      (save.player.badges.length >= MarketRules.ACCESS_BADGES ||
+        MarketRules.ACCESS_REGIONS.includes(save.player.region) ||
+        (save.quests?.completed?.includes?.('main.33') ?? false))
+    );
   }
 
   /** @param {string} featureId @returns {boolean} */
@@ -287,9 +292,10 @@ export class FeatureAccessSystem extends BaseSystem {
     if (!leagueWon) return { unlocked: false, reason: 'league', previous };
 
     const species = PokemonDB.getInstance().getByRegion(previous);
-    const caught = species.filter((entry) => save.pokedex.isCaught(entry.id)).length;
-    if (species.length === 0 || caught < species.length) {
-      return { unlocked: false, reason: 'dex', previous, caught, total: species.length };
+    const requiredSpecies = species.filter((entry) => !HatcheryRules.LEGENDARY_DEX.includes(entry.dex));
+    const caught = requiredSpecies.filter((entry) => save.pokedex.isCaught(entry.id)).length;
+    if (requiredSpecies.length === 0 || caught < requiredSpecies.length) {
+      return { unlocked: false, reason: 'dex', previous, caught, total: requiredSpecies.length };
     }
     return { unlocked: true, reason: '' };
   }

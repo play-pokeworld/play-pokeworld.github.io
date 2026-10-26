@@ -32,6 +32,7 @@ function readSlot(raw) {
       kind,
       pokemonUid,
       knockouts: SaveValues.integer(raw.knockouts ?? raw.steps, 0),
+      initialLevel: SaveValues.integer(raw.initialLevel, 0),
       ...(kind === 'incubation' ? { required: boundedInteger(raw.required, HatcheryRules.MAX_FOSSIL_KOS,
         HatcheryRules.MIN_FOSSIL_KOS, HatcheryRules.MAX_FOSSIL_KOS), ready: raw.ready === true } : {}),
       paid: raw.paid === true

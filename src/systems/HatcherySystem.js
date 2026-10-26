@@ -94,6 +94,34 @@ export class HatcherySystem extends BaseSystem {
       hatchFee: FacilityStaffSystem.getInstance().getFee('hatchery', HatcheryRules.AUTO_HATCH_FEE),
       levelFee: FacilityStaffSystem.getInstance().getFee('hatchery', HatcheryRules.AUTO_DAYCARE_FEE) };
   }
+  /**
+   * Returns the regional level cap for a Pokémon in daycare.
+   * A Pokémon in daycare cannot exceed the level of the player's best owned Pokémon from the same native region.
+   * @param {import('../data/save/SaveData.js').SaveData} save
+   * @param {string} speciesId
+   * @param {string|null} [currentUid=null]
+   * @returns {number} Level cap (1..100)
+   */
+  getRegionalDaycareCap(save, speciesId, currentUid = null) {
+    if (!save) return PokemonRules.MAX_LEVEL;
+    const species = PokemonDB.getInstance().getById(speciesId);
+    if (!species?.region) return PokemonRules.MAX_LEVEL;
+    const region = species.region;
+
+    const regional = save.collection.getAll().filter((p) => {
+      if (currentUid && p.uid === currentUid) return false;
+      const s = PokemonDB.getInstance().getById(p.species);
+      return s?.region === region;
+    });
+
+    if (regional.length === 0) {
+      const current = currentUid ? save.collection.get(currentUid) : null;
+      return current ? current.level : PokemonRules.MAX_LEVEL;
+    }
+
+    return Math.max(...regional.map((p) => p.level));
+  }
+
   /** @param {number} [slotIndex=0] @param {{queue?:boolean}} [options] @returns {Object[]} */
   getCandidates(slotIndex = 0, { queue = false } = {}) {
     const save = SaveSystem.getInstance().getCurrentSave();
@@ -102,7 +130,7 @@ export class HatcherySystem extends BaseSystem {
     if (incubation && !this.isPokemonIncubationUnlocked()) return [];
     return save.collection.getAll().filter((pokemon) => !pokemon.locked &&
       PokemonUsageSystem.getInstance().canPerform(pokemon.uid, PokemonActionIds.DEPOSIT_DAYCARE) &&
-      (incubation ? pokemon.level >= PokemonRules.MAX_LEVEL : pokemon.level < PokemonRules.MAX_LEVEL) &&
+      (incubation ? pokemon.level >= PokemonRules.MAX_LEVEL : pokemon.level < this.getRegionalDaycareCap(save, pokemon.species, pokemon.uid)) &&
       (!save.teamMembers.includes(pokemon.uid) || (!queue && save.teamMembers.size > 1)))
       .sort((a, b) => Number(save.teamMembers.includes(b.uid)) - Number(save.teamMembers.includes(a.uid)))
       .map((pokemon) => ({ uid: pokemon.uid, label: pokemon.getDisplayName(),
@@ -146,11 +174,28 @@ export class HatcherySystem extends BaseSystem {
     const teamMember = save.teamMembers.includes(uid);
     if (teamMember && !TeamSystem.getInstance().removePokemon(uid, { persist: false, notify: false })) return this._failure(HatcheryResults.NOT_FOUND);
     const kind = save.hatchery.modes[index];
-    save.hatchery.setSlot(index, { kind, pokemonUid: uid, knockouts: 0, paid,
+    save.hatchery.setSlot(index, { kind, pokemonUid: uid, knockouts: 0, initialLevel: pokemon.level, paid,
       ...(kind === HatcheryRules.MODE_INCUBATION ? { required: this._requiredFossilKos(pokemon.species), ready: false } : {}) });
     if (fee) save.currencies.add(FacilityRules.MONEY_CURRENCY, -fee);
     if (persist) this._commit(teamMember);
     return { result: HatcheryResults.READY, pokemon, slotIndex: index };
+  }
+  /**
+   * Calculates the progressive fee for withdrawing a Pokémon from the daycare.
+   * Base fee 100 ₽ + 100 ₽ per level gained while deposited.
+   * @param {number} slotIndex
+   * @returns {number}
+   */
+  getDaycareWithdrawFee(slotIndex) {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    if (!save) return 0;
+    const slot = save.hatchery.slots[slotIndex];
+    if (slot?.kind !== HatcheryRules.MODE_DAYCARE) return 0;
+    const pokemon = save.collection.get(slot.pokemonUid);
+    if (!pokemon) return 0;
+    const initialLevel = slot.initialLevel ?? pokemon.level;
+    const levelsGained = Math.max(0, pokemon.level - initialLevel);
+    return 100 + levelsGained * 100;
   }
   /** @param {number} slotIndex @param {Object} [options] */
   withdrawPokemon(slotIndex, { persist = true } = {}) {
@@ -159,10 +204,16 @@ export class HatcherySystem extends BaseSystem {
     const slot = save.hatchery.slots[slotIndex];
     if (slot?.kind !== HatcheryRules.MODE_DAYCARE) return this._failure(HatcheryResults.NOT_DAYCARE);
     const pokemon = save.collection.get(slot.pokemonUid);
+    const fee = this.getDaycareWithdrawFee(slotIndex);
+    const availableMoney = save.currencies.get(FacilityRules.MONEY_CURRENCY);
+    const charge = Math.min(availableMoney, fee);
+    if (charge > 0) {
+      save.currencies.add(FacilityRules.MONEY_CURRENCY, -charge);
+    }
     save.hatchery.setSlot(slotIndex, null);
     this._applyPendingMode(slotIndex);
     if (persist) this._commit();
-    return { result: HatcheryResults.READY, pokemon, stored: 'box' };
+    return { result: HatcheryResults.READY, pokemon, stored: 'box', feePaid: charge };
   }
   /** @param {string} itemId @param {number|null} [slotIndex=null] @param {Object} [options] */
   startFossilIncubation(itemId, slotIndex = null, { persist = true } = {}) {
@@ -393,7 +444,8 @@ export class HatcherySystem extends BaseSystem {
     data.slots.forEach((slot, index) => {
       if (slot?.kind === HatcheryRules.MODE_DAYCARE) {
         const pokemon = save.collection.get(slot.pokemonUid);
-        if ((data.autoHatchEnabled || data.autoFillEnabled) && pokemon?.level >= PokemonRules.MAX_LEVEL) {
+        const cap = pokemon ? this.getRegionalDaycareCap(save, pokemon.species, pokemon.uid) : PokemonRules.MAX_LEVEL;
+        if ((data.autoHatchEnabled || data.autoFillEnabled) && pokemon && pokemon.level >= cap) {
           this.withdrawPokemon(index, { persist: false }); changed = true;
         }
       } else if (slot?.ready && data.autoHatchEnabled) {
@@ -430,17 +482,23 @@ export class HatcherySystem extends BaseSystem {
     for (const slot of save.hatchery.slots) {
       if (slot?.kind === HatcheryRules.MODE_DAYCARE) {
         const pokemon = save.collection.get(slot.pokemonUid);
-        if (!pokemon || pokemon.level >= PokemonRules.MAX_LEVEL) continue;
+        if (!pokemon) continue;
+        const cap = Math.min(PokemonRules.MAX_LEVEL, this.getRegionalDaycareCap(save, pokemon.species, pokemon.uid));
+        if (pokemon.level >= cap) continue;
         slot.knockouts++; changed = true;
         const fee = save.hatchery.autoHatchEnabled || save.hatchery.autoFillEnabled
           ? FacilityStaffSystem.getInstance().getFee('hatchery', HatcheryRules.AUTO_DAYCARE_FEE) : 0;
-        while (slot.knockouts >= HatcheryRules.DAYCARE_KOS_PER_LEVEL && pokemon.level < PokemonRules.MAX_LEVEL) {
+        while (slot.knockouts >= HatcheryRules.DAYCARE_KOS_PER_LEVEL && pokemon.level < cap) {
           if (save.currencies.get(FacilityRules.MONEY_CURRENCY) < fee) break;
           slot.knockouts -= HatcheryRules.DAYCARE_KOS_PER_LEVEL;
           pokemon.setLevel(pokemon.level + 1); levels++;
+          const evolved = pokemon.checkLevelEvolution();
+          if (evolved) {
+            save.pokedex.markCaught(evolved, pokemon.shiny, { deferSave: true });
+          }
           if (fee) save.currencies.add(FacilityRules.MONEY_CURRENCY, -fee);
         }
-        if (pokemon.level >= PokemonRules.MAX_LEVEL) slot.knockouts = 0;
+        if (pokemon.level >= cap) slot.knockouts = 0;
       } else if (slot && !slot.ready) {
         slot.knockouts = Math.min(slot.required, slot.knockouts + 1); slot.ready = slot.knockouts >= slot.required; changed = true;
       }

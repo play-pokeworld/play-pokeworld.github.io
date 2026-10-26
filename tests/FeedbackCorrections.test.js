@@ -555,6 +555,8 @@ describe('Feedback corrections 1.14.20', (test) => {
     try {
       modal.open({ presetId: 'preset1' });
       assert.equal(modal._list.getChildren().length, 2);
+      assert.ok(modal.getDomElement().querySelector('.team-view'), 'renders using .team-view layout');
+      assert.ok(modal._list.getDomElement().classList.contains('pw-team-member-list'), 'renders using .pw-team-member-list');
       assert.equal(
         modal.getDomElement().querySelectorAll('.poke-moves').length,
         2,

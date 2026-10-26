@@ -36,11 +36,15 @@ export class TeamPresetEditorModal extends StaticModalPanel {
     this._returnToManager = false;
     this._cards = new Map();
     this._list = new UISortableList({
-      className: 'pw-preset-editor-list',
+      className: 'pw-team-member-list',
       rowDrag: true,
       onReorder: (a, b) => TeamPresetEditSystem.getInstance().swap(a, b),
     });
     this._list.setAttribute('role', 'list');
+    this._addSlotCount = new UIText({
+      tagName: 'div',
+      className: 'pw-text-sm pw-light1',
+    });
     this._add = new UIContainer({
       className: 'pw-drop-zone preset-slot-empty',
       children: [
@@ -52,13 +56,14 @@ export class TeamPresetEditorModal extends StaticModalPanel {
         new UIText({
           tagName: 'div',
           className: 'pw-text-sm pw-light2 pw-bold',
-          text: t('preset_add_lbl'),
+          text: t('add_pokemon'),
         }),
+        this._addSlotCount,
       ],
     });
     this._add.setAttribute('role', 'button');
     this._add.setAttribute('tabindex', '0');
-    this._add.setAriaLabel(t('preset_add_lbl'));
+    this._add.setAriaLabel(t('add_pokemon'));
     this._add.addDomListener('click', () => this._pickNext());
     this._add.addDomListener('keydown', (event) => {
       if (!['Enter', ' '].includes(event.key)) return;
@@ -72,7 +77,7 @@ export class TeamPresetEditorModal extends StaticModalPanel {
         text: t('preset_editor_hint'),
       }),
       new UIContainer({
-        className: 'team-view pw-preset-editor-grid',
+        className: 'team-view',
         children: [this._list, this._add],
       }),
     ]);
@@ -157,6 +162,7 @@ export class TeamPresetEditorModal extends StaticModalPanel {
       card.setEntry(entry);
       entries.push({ key: entry.uid, row: card, handle: card.getDragHandle() });
     }
+    this._addSlotCount.setText(t('team_count', { count: state.members.length }));
     this._add.setVisible(state.members.length < TeamPresetRules.MAX_MEMBERS);
     this._list.setItems(entries);
     for (const [uid] of this._cards)

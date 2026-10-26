@@ -18,6 +18,7 @@ import { LocationKinds, EncounterRarities } from '../data/world/LocationKinds.js
 import { ROUTE_DROPS } from '../data/world/RouteDrops.js';
 import { CaughtStatus } from '../data/save/PokedexData.js';
 import { RoamingRules } from '../config/RoamingRules.js';
+import { BattleConfig } from '../config/BattleConfig.js';
 import { LocationSystem } from '../systems/LocationSystem.js';
 import { RoamingSystem } from '../systems/RoamingSystem.js';
 import { SaveSystem } from '../systems/SaveSystem.js';
@@ -297,6 +298,12 @@ export class LocationPanel extends DraggablePanel {
       grid.addChild(new UIText({ tagName: 'div', className: 'pw-text-sm pw-light1', text: t('loc_no_wild') }));
       return grid;
     }
+
+    const roamingChance = roamingSpecies ? RoamingRules.ENCOUNTER_CHANCE : 0;
+    const remainingChance = 1 - roamingChance;
+    const weightOf = (entry) => BattleConfig.RARITY_WEIGHTS[entry.rarity] ?? BattleConfig.RARITY_WEIGHTS.common;
+    const totalWeight = encounters.reduce((sum, entry) => sum + weightOf(entry), 0);
+
     for (const encounter of encounters) {
       const species = PokemonDB.getInstance().getById(encounter.species);
       if (!species) continue;
@@ -320,13 +327,17 @@ export class LocationPanel extends DraggablePanel {
         [EncounterRarities.UNCOMMON]: 'rarity_uncommon_label',
         [EncounterRarities.RARE]: 'rarity_rare_label'
       })[rarity] || 'rarity_common_label';
+
+      const weight = weightOf(encounter);
+      const ratePct = totalWeight > 0 ? Math.round((weight / totalWeight) * remainingChance * 1000) / 10 : 0;
+
       const card = new UIContainer({
         className: `pw-loc-wild-card ${stateClass}`,
         children: [
           disc,
           new UIText({ className: 'pw-loc-wild-name', text: name }),
           new UIText({ className: 'pw-loc-wild-level', text: t('level_range', { min: encounter.minLevel, max: encounter.maxLevel }) }),
-          new UIText({ className: 'pw-loc-wild-rarity', text: t(rarityKey) })
+          new UIText({ className: 'pw-loc-wild-rarity', text: `${t(rarityKey)} · ${ratePct}%` })
         ]
       });
       grid.addChild(card);

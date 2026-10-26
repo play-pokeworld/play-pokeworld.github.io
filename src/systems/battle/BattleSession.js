@@ -118,6 +118,8 @@ export class BattleSession {
     this.foeTurns = 0;
     /** @type {number} Moves used by the player (Quick Ball, original attacksOnCurrentEnemy) */
     this.playerAttacks = 0;
+    /** @type {number} Elapsed battle time against an epic legendary boss */
+    this.legendaryElapsedMs = 0;
   }
 
   /** @returns {Object|null} JSON-safe finite-session state. */
@@ -235,6 +237,15 @@ export class BattleSession {
     const elapsedMs = dt * 1000;
     this.playerCooldownMs -= elapsedMs;
     this.foeCooldownMs -= elapsedMs;
+    if (this.foe?.legendaryBoss && !this.foe.isFainted()) {
+      this.legendaryElapsedMs = (this.legendaryElapsedMs || 0) + elapsedMs;
+      if (this.legendaryElapsedMs >= 90000 && !this.active.isFainted()) {
+        this.log.add('dungeon_boss_enrage_wipe', { name: this.foe.name });
+        this.active.takeDamage(this.active.maxHp * 10);
+        this._resolve();
+        return;
+      }
+    }
     if (this.playerCooldownMs <= 0) {
       this._act(this.active, this.foe, true);
       this.playerCooldownMs = CooldownRules.next(this.active, this._lastMoveOf(this.active), this.field, this.random);
@@ -475,10 +486,13 @@ export class BattleSession {
     this.sentFoes.push(next.pokemon);
     this.foeTurns = 0;
     this.playerAttacks = 0;
+    this.legendaryElapsedMs = 0;
     if (next.intro) this.log.add(next.intro.key, next.intro.params ?? {});
     if (!next.announceOnly) this.log.add('battle_log.trainer_sends', { name: this.foe.name });
     EntryRules.apply(this.foe, this.active, this.field, this.log);
-    this.foeCooldownMs = BattleConfig.FOE_SWITCH_DELAY_S * 1000 + CooldownRules.next(this.foe, null, this.field, this.random);
+    const switchDelay = next.announceOnly ? 0 : BattleConfig.FOE_SWITCH_DELAY_S * 1000;
+    this.foeCooldownMs = switchDelay + CooldownRules.next(this.foe, null, this.field, this.random);
+    this.foeCooldownTotalMs = this.foeCooldownMs;
   }
 
   /** @private on_ko_stat talents of the Pokémon that scored the KO (direct modifiers). */

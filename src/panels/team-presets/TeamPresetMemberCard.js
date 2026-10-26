@@ -24,16 +24,19 @@ export class TeamPresetMemberCard extends PokemonCardView {
     });
     this._uid = '';
     this._index = 0;
+    this.addClass('pw-poke-card');
     this.addClass('pw-preset-member-card');
     this.setAttribute('role', 'listitem');
     this._top = this.getChildren()[0];
     this._dragHandle = new UIButton({
       icon: 'grip',
       variant: 'ghost',
-      className: 'pw-preset-drag-handle',
+      size: 'sm',
+      className: 'pw-team-drag-handle pw-preset-drag-handle',
       onClick: (event) => event.stopPropagation(),
     });
     this._dragHandle.setAttribute('aria-keyshortcuts', 'ArrowUp ArrowDown');
+    this._dragHandle.setTooltip(t('team_reorder_hint'));
     this._dragHandle.addDomListener('keydown', (event) => {
       if (!['ArrowUp', 'ArrowDown'].includes(event.key)) return;
       event.preventDefault();
@@ -46,7 +49,8 @@ export class TeamPresetMemberCard extends PokemonCardView {
     this._remove = new UIButton({
       icon: 'close',
       variant: 'ghost',
-      className: 'pw-preset-remove',
+      size: 'sm',
+      className: 'pw-team-store-btn pw-preset-remove',
       onClick: (event) => {
         event.stopPropagation();
         TeamPresetEditSystem.getInstance().remove(this._uid);

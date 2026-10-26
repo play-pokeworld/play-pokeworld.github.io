@@ -13,7 +13,7 @@ export const BattleSnapshotRules = Object.freeze({
   FIELD_FIELDS: Object.freeze(['defaultWeather', 'weather', 'weatherTurns', 'terrain', 'terrainTurns']),
   COMBATANT_FIELDS: Object.freeze([
     'side', 'npc', 'hiddenTalentActive', 'heldQuantity', 'hpMultiplier', 'dungeonBoss',
-    'dungeonEnraged', '_baseStatMultipliers', 'statMods', 'statModTurns', 'status', 'statusTurns',
+    'dungeonEnraged', 'legendaryBoss', '_baseStatMultipliers', 'statMods', 'statModTurns', 'status', 'statusTurns',
     'accuracyPenalty', 'lastCrossType', 'seedBoost', 'flinched', 'moveIndex', 'lastMoveId',
     'consecutiveUses', 'addedType', 'typeOverride', 'nextDamageMult'
   ]),

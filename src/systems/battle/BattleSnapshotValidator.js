@@ -28,7 +28,7 @@ function json(value, depth = 0) {
 
 function combatant(value, side) {
   if (!keys(value, [...Rules.COMBATANT_FIELDS, 'usedTriggers']) || value.side !== side || value.npc !== (side === BattleSides.FOE)) return false;
-  if (!['hiddenTalentActive', 'dungeonBoss', 'dungeonEnraged', 'seedBoost', 'flinched'].every((key) => typeof value[key] === 'boolean')) return false;
+  if (!['hiddenTalentActive', 'dungeonBoss', 'dungeonEnraged', 'legendaryBoss', 'seedBoost', 'flinched'].every((key) => typeof value[key] === 'boolean')) return false;
   if (!number(value.hpMultiplier, 1, Rules.MAX_HP_MULTIPLIER) || (side === BattleSides.PLAYER && value.hpMultiplier !== 1)) return false;
   if (!['_baseStatMultipliers', 'statMods', 'statModTurns'].every((key) => keys(value[key], MODIFIABLE_STATS) &&
     Object.values(value[key]).every((entry) => number(entry)))) return false;

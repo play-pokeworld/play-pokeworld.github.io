@@ -304,6 +304,31 @@ function convertLeagueWins(G) {
   return [...wins];
 }
 
+/** @param {Object} legacy Original achievements state @returns {Object} */
+function convertAchievements(legacy) {
+  if (!legacy || typeof legacy !== 'object') return {};
+  return {
+    unlockedTiers: legacy.unlockedTiers && typeof legacy.unlockedTiers === 'object' ? { ...legacy.unlockedTiers } : {},
+    unlockedAt: legacy.unlockedAt && typeof legacy.unlockedAt === 'object' ? { ...legacy.unlockedAt } : {},
+    pinned: typeof legacy.pinned === 'string' && legacy.pinned ? legacy.pinned : 'dex_kanto',
+    stats: legacy.stats && typeof legacy.stats === 'object' ? { ...legacy.stats } : {}
+  };
+}
+
+/** @param {Object} legacy Original atoll state @returns {Object} */
+function convertAtoll(legacy) {
+  if (!legacy || typeof legacy !== 'object') return {};
+  return {
+    tokens: Math.max(0, Math.floor(Number(legacy.tokens) || 0)),
+    streak: Math.max(0, Math.floor(Number(legacy.streak) || 0)),
+    bestStreak: Math.max(0, Math.floor(Number(legacy.bestStreak) || 0)),
+    winsByMode: legacy.winsByMode && typeof legacy.winsByMode === 'object' ? { ...legacy.winsByMode } : {},
+    factoryRun: legacy.factoryRun && typeof legacy.factoryRun === 'object' ? { ...legacy.factoryRun } : null,
+    fragments: Math.max(0, Math.floor(Number(legacy.fragments) || 0)),
+    pendingFragmentLegendary: Math.max(0, Math.floor(Number(legacy.pendingFragmentLegendary) || 0))
+  };
+}
+
 export const MigrationOriginalToV1 = Object.freeze({
   from: 0,
   to: 1,
@@ -368,6 +393,8 @@ export const MigrationOriginalToV1 = Object.freeze({
       staff: SaveValues.copy(G.staff || {}),
       mine: G.mine && typeof G.mine === 'object' ? { ...G.mine } : {},
       secretBase: migrateLegacySecretBase(G),
+      achievements: convertAchievements(G.achievements),
+      atoll: convertAtoll(G.atoll),
       quests: convertQuests(G),
       tutorial: G.tutorial && typeof G.tutorial === 'object' ? { ...G.tutorial } : null,
       dungeons: {

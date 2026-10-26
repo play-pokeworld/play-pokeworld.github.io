@@ -7,6 +7,9 @@
 
 import { PokemonCardView } from './PokemonCardView.js';
 import { BattleSides } from '../../config/BattleSides.js';
+import { EventBus } from '../../core/EventBus.js';
+import { ModalOpenRequestedEvent } from '../../core/events/ModalOpenRequestedEvent.js';
+import { ModalIds } from '../../config/ModalIds.js';
 
 export class BattleCombatantCard extends PokemonCardView {
   /**
@@ -23,6 +26,7 @@ export class BattleCombatantCard extends PokemonCardView {
       hpTextKey: 'hp_value_over_max',
       name: 'BattleCombatantCard'
     });
+    this._side = options.side;
     this._onSwitch = isFoe ? null : (options.onSwitch || null);
     this._canSwitch = false;
     if (this._onSwitch) {
@@ -40,6 +44,36 @@ export class BattleCombatantCard extends PokemonCardView {
         }
       });
     }
+
+    this.addDomListener('contextmenu', (event) => {
+      if (event.target?.closest?.('button, a, input, select')) return;
+      event.preventDefault();
+      event.stopPropagation();
+      this._openInfo();
+    });
+
+    let touchTimer = null;
+    let touchMoved = false;
+    this.addDomListener('touchstart', (event) => {
+      touchMoved = false;
+      if (touchTimer) clearTimeout(touchTimer);
+      touchTimer = setTimeout(() => {
+        touchTimer = null;
+        if (!touchMoved) {
+          this._openInfo();
+        }
+      }, 500);
+    });
+    this.addDomListener('touchmove', () => {
+      touchMoved = true;
+      if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
+    });
+    this.addDomListener('touchend', () => {
+      if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
+    });
+    this.addDomListener('touchcancel', () => {
+      if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
+    });
   }
 
   /** @override */
@@ -88,5 +122,19 @@ export class BattleCombatantCard extends PokemonCardView {
   /** @private */
   _requestSwitch() {
     if (this._canSwitch && this._onSwitch) this._onSwitch();
+  }
+
+  /** @private */
+  _openInfo() {
+    if (!this._pokemon) return;
+    if (this._side === BattleSides.FOE) {
+      EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.POKEMON_INFO, {
+        displayPokemon: this._pokemon
+      }));
+    } else {
+      EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.POKEMON_INFO, {
+        pokemonUid: this._pokemon.uid
+      }));
+    }
   }
 }

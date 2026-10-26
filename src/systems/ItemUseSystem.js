@@ -119,7 +119,7 @@ export class ItemUseSystem extends BaseSystem {
       return { result: ItemUseResults.TARGET_INELIGIBLE, action, pokemonUid: uid };
     }
 
-    if (action === ItemUseActions.EVOLVE) {
+    if (effect.targetSpecies) {
       save.pokedex.markCaught(effect.targetSpecies, pokemon.shiny, { deferSave: true });
     }
     SaveSystem.getInstance().saveCurrent();
@@ -178,7 +178,8 @@ export class ItemUseSystem extends BaseSystem {
     if (action === ItemUseActions.RARE_CANDY) {
       const level = pokemon.level + 1;
       pokemon.setLevel(level);
-      return { level: pokemon.level };
+      const evolved = pokemon.checkLevelEvolution();
+      return { level: pokemon.level, targetSpecies: evolved || undefined };
     }
     if (action === ItemUseActions.VITAMIN) {
       const stat = this._random.pick(this._eligibleEvStats(pokemon));

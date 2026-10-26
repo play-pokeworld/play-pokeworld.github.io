@@ -97,6 +97,26 @@ export class TrainerSystem extends BaseSystem {
     return null;
   }
 
+  /**
+   * Checks whether a quest opponent belongs to a story rival or evil team battle.
+   * @param {string} questKey
+   * @returns {boolean}
+   */
+  isStoryRivalOrTeamOpponent(questKey) {
+    const quest = QuestDB.getInstance().getById(questKey);
+    if (!quest || quest.category !== 'main') return false;
+    const opponentId = this.getQuestOpponent(questKey);
+    if (!opponentId) return false;
+    if (quest.objective?.type === ObjectiveTypes.BADGE) return false;
+    const trainer = TrainerDB.getInstance().getById(opponentId);
+    if (!trainer) return false;
+    return (
+      trainer.kind === TrainerKinds.RIVAL ||
+      trainer.kind === TrainerKinds.TEAM_ENEMY ||
+      (trainer.kind === TrainerKinds.BOSS && !LeagueDB.getInstance().getById(opponentId))
+    );
+  }
+
   // --- Commands ---
 
   /**

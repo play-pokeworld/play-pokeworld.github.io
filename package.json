@@ -1,6 +1,6 @@
 {
   "name": "pokeworld-clean",
-  "version": "1.14.28",
+  "version": "1.15.6",
   "private": true,
   "description": "PokéWorld — clean-architecture rework (static browser game + zero-dependency local server).",
   "type": "module",

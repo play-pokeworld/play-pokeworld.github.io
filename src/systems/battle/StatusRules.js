@@ -26,6 +26,7 @@ export class StatusRules {
    */
   static isImmune(target, status, field, random) {
     if (field.weather === Weathers.SAFEGUARD) return true;
+    if (target.hasTalent?.('goodasgold')) return true;
     const immuneTypes = STATUS_IMMUNE_TYPES[status] ?? [];
     if (target.getTypes().some((type) => immuneTypes.includes(type))) return true;
     const ctx = { self: target, target: null, move: null, moveType: null, field, effectiveness: null };

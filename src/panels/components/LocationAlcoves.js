@@ -131,7 +131,7 @@ export class LocationAlcoves extends UIContainer {
   _visit(layoutId, own) {
     const system = SecretBaseSystem.getInstance(),
       result = own
-        ? system.startOwnVisit()
+        ? system.startOwnVisit({ fromLocation: true })
         : system.startAlcoveVisit(this._locationId, layoutId);
     if (result.ok)
       EventBus.getInstance().dispatch(

@@ -1238,8 +1238,8 @@ export const L_en_items = {
     "desc": null
   },
   "link_stone": {
-    "name": "Link Stone",
-    "desc": "Use: Evolve certain kinds of Pokemon (Must be level +)"
+    "name": "Link Cable",
+    "desc": "Use: Evolve certain trade-evolution Pokemon (Must be level 40+)"
   },
   "loaded_dice": {
     "name": "Loaded Dice",

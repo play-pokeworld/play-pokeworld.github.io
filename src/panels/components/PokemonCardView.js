@@ -139,6 +139,7 @@ export class PokemonCardView extends UIContainer {
    * @param {{resting?:boolean}} [presentation] - Display boxed HP as resting without mutating owned state.
    */
   setPokemon(pokemon,opponent=null,{resting=false}={}) {
+    this._pokemon = pokemon;
     if (!pokemon) {
       this.hide();
       this.toggleClass('fainted', false);

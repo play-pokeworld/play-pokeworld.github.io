@@ -1238,8 +1238,8 @@ export const L_fr_items = {
     "desc": null
   },
   "link_stone": {
-    "name": "Pierre Liaison",
-    "desc": "Utilisation : fait évoluer certains Pokémon (niveau minimum requis)"
+    "name": "Câble Link",
+    "desc": "Utilisation : fait évoluer certains Pokémon d'échange (niveau 40 requis)"
   },
   "loaded_dice": {
     "name": "Dés Pipés",

@@ -15,12 +15,16 @@ import { FeatureAccessSystem } from './systems/FeatureAccessSystem.js';
 import { NotificationSystem } from './systems/NotificationSystem.js';
 import { BonusSystem } from './systems/BonusSystem.js';
 import { SecretBaseFlagBonusProvider } from './systems/secret-base/SecretBaseFlagBonusProvider.js';
+import { AchievementBonusProvider } from './systems/achievements/AchievementBonusProvider.js';
+import { AchievementSystem } from './systems/AchievementSystem.js';
+import { AtollSystem } from './systems/AtollSystem.js';
 import { BonusRules } from './config/BonusRules.js';
 import { DashboardLayoutSystem } from './systems/DashboardLayoutSystem.js';
 import { PreferencesSystem } from './systems/PreferencesSystem.js';
 import { LocationSystem } from './systems/LocationSystem.js';
 import { RegionalStarterSystem } from './systems/RegionalStarterSystem.js';
 import { RoamingSystem } from './systems/RoamingSystem.js';
+import { TeamAmbushSystem } from './systems/TeamAmbushSystem.js';
 import { BattleSystem } from './systems/BattleSystem.js';
 import { RelaunchSystem } from './systems/RelaunchSystem.js';
 import { DungeonAutoSystem } from './systems/DungeonAutoSystem.js';
@@ -41,6 +45,7 @@ import { MineSystem } from './systems/MineSystem.js';
 import { SecretBaseSystem } from './systems/SecretBaseSystem.js';
 import { SaleSystem } from './systems/SaleSystem.js';
 import { FossilSystem } from './systems/FossilSystem.js';
+import { FastForwardSystem } from './systems/FastForwardSystem.js';
 import { TrainingSystem } from './systems/TrainingSystem.js';
 import { ShopSystem } from './systems/ShopSystem.js';
 import { DiagnosticsSystem } from './systems/DiagnosticsSystem.js';
@@ -76,9 +81,11 @@ window.addEventListener('DOMContentLoaded', () => {
   engine.init(root);
   const bonusSystem = BonusSystem.getInstance();
   bonusSystem.registerProvider(BonusRules.SOURCE_IDS.SECRET_BASE_FLAGS, new SecretBaseFlagBonusProvider());
+  bonusSystem.registerProvider(BonusRules.SOURCE_IDS.ACHIEVEMENTS, new AchievementBonusProvider());
   engine.registerSystem('PreferencesSystem', preferences);
   engine.registerSystem('SaveSystem', SaveSystem.getInstance());
   engine.registerSystem('BonusSystem', bonusSystem);
+  engine.registerSystem('AchievementSystem', AchievementSystem.getInstance());
   engine.registerSystem('FeatureAccessSystem', FeatureAccessSystem.getInstance());
   engine.registerSystem('NotificationSystem', NotificationSystem.getInstance());
   engine.registerSystem('DiagnosticsSystem', DiagnosticsSystem.getInstance());
@@ -88,6 +95,7 @@ window.addEventListener('DOMContentLoaded', () => {
   engine.registerSystem('LocationSystem', LocationSystem.getInstance());
   engine.registerSystem('RegionalStarterSystem', RegionalStarterSystem.getInstance());
   engine.registerSystem('RoamingSystem', RoamingSystem.getInstance());
+  engine.registerSystem('TeamAmbushSystem', TeamAmbushSystem.getInstance());
   engine.registerSystem('PokemonUsageSystem', PokemonUsageSystem.getInstance());
   engine.registerSystem('TeamSystem', TeamSystem.getInstance());
   engine.registerSystem('BoxSystem', BoxSystem.getInstance());
@@ -97,6 +105,7 @@ window.addEventListener('DOMContentLoaded', () => {
   engine.registerSystem('PokeballSystem', PokeballSystem.getInstance());
   engine.registerSystem('CatchSystem', CatchSystem.getInstance());
   engine.registerSystem('BattleSystem', BattleSystem.getInstance());
+  engine.registerSystem('AtollSystem', AtollSystem.getInstance());
   engine.registerSystem('SecretBaseSystem', SecretBaseSystem.getInstance());
   engine.registerSystem('DungeonSystem', DungeonSystem.getInstance());
   engine.registerSystem('RelaunchSystem',RelaunchSystem.getInstance());
@@ -111,8 +120,22 @@ window.addEventListener('DOMContentLoaded', () => {
   engine.registerSystem('MineSystem', MineSystem.getInstance());
   engine.registerSystem('SaleSystem', SaleSystem.getInstance());
   engine.registerSystem('FossilSystem', FossilSystem.getInstance());
+  engine.registerSystem('FastForwardSystem', FastForwardSystem.getInstance());
   engine.registerSystem('TrainingSystem', TrainingSystem.getInstance());
   engine.registerSystem('ShopSystem', ShopSystem.getInstance());
+
+  let hiddenTimestamp = null;
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      hiddenTimestamp = Date.now();
+    } else if (hiddenTimestamp) {
+      const elapsedMs = Date.now() - hiddenTimestamp;
+      hiddenTimestamp = null;
+      if (elapsedMs >= 4000) {
+        FastForwardSystem.getInstance().triggerCatchUp(elapsedMs);
+      }
+    }
+  });
 
   // 3. Overlays living above every page
   AppShell.mountOverlay(new NotificationCenterView());

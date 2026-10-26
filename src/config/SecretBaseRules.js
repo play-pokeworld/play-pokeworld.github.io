@@ -39,7 +39,7 @@ export const SecretBaseRules = Object.freeze({
   ALCOVES_BY_LOCATION,
   FLAG_RANKS,
   MAX_DECORATIONS: 26,
-  MAX_NPCS: 8,
+  MAX_NPCS: Infinity,
   MAX_NPC_TEAM: 6,
   MAX_NPC_NAME_LENGTH: 18,
   MAX_NPC_MESSAGE_LENGTH: 80,

@@ -17,19 +17,48 @@ import { TalentEffectKinds } from '../../data/battle/TalentEffectKinds.js';
  * @param {string} kind
  * @returns {Readonly<Object>|undefined}
  */
-const moveEffect = (move, kind) => move.effects.find((effect) => effect.kind === kind);
+const moveEffect = (move, kind) => move.effects?.find((effect) => effect.kind === kind);
 
 export class MoveTyping {
   /**
    * @param {import('./BattleCombatant.js').BattleCombatant} attacker
    * @param {Readonly<Object>} move - MoveDB entry
+   * @param {import('./BattleField.js').BattleField|null} [field=null]
    * @returns {{type: string, damageMult: number}}
    */
-  static resolve(attacker, move) {
+  static resolve(attacker, move, field = null) {
+    if (move.id === 'weather_ball' && field && field.weather) {
+      let type = 'normal';
+      let damageMult = 1;
+      switch (field.weather) {
+        case 'rain':
+          type = 'water';
+          damageMult = 2;
+          break;
+        case 'sun':
+          type = 'fire';
+          damageMult = 2;
+          break;
+        case 'sand':
+          type = 'rock';
+          damageMult = 2;
+          break;
+        case 'hail':
+        case 'ice':
+          type = 'ice';
+          damageMult = 2;
+          break;
+        default:
+          break;
+      }
+      return { type, damageMult };
+    }
     const type = moveEffect(move, MoveEffectKinds.FIXED_POWER_HIT)?.type ?? move.type;
-    for (const effect of attacker.talentEffects(TalentEffectKinds.MOVE_TYPE_CHANGE)) {
-      if (type !== effect.to && (effect.from === null || effect.from === undefined || effect.from === type)) {
-        return { type: effect.to, damageMult: effect.powerMult ?? 1 };
+    if (attacker?.talentEffects) {
+      for (const effect of attacker.talentEffects(TalentEffectKinds.MOVE_TYPE_CHANGE)) {
+        if (type !== effect.to && (effect.from === null || effect.from === undefined || effect.from === type)) {
+          return { type: effect.to, damageMult: effect.powerMult ?? 1 };
+        }
       }
     }
     return { type, damageMult: 1 };

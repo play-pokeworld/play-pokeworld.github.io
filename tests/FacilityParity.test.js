@@ -92,6 +92,7 @@ function fixture(name) {
   for (const id of ['hatchery', 'training', 'mine']) save.access.unlockFeature(id);
   for (const badge of ['brock', 'misty', 'surge', 'erika', 'koga', 'sabrina', 'blaine', 'giovanni']) save.player.earnBadge(badge);
   for (const league of LeagueDB.getInstance().getAll().filter((entry) => entry.region === 'kanto')) save.player.earnBadge(league.badge);
+  save.team[0].setLevel(50);
   for (const [currency, amount] of [['money', 100000], ['questPoint', 100000], ['diamond', 10000]]) {
     save.currencies.add(currency, amount - save.currencies.get(currency));
   }

@@ -169,10 +169,10 @@
   font-size: 12px;
 }
 .pw-facility-management.pw-static-modal {
-  width: min(96vw, 980px);
-  max-width: 980px;
-  height: min(84vh, 760px);
-  max-height: 84vh;
+  width: min(1120px, calc(100vw - 40px));
+  max-width: min(1120px, calc(100vw - 40px));
+  height: 85vh;
+  max-height: 85vh;
 }
 .pw-facility-management > .pw-win-hdr {
   flex: 0 0 50px;
@@ -789,9 +789,10 @@
 }
 @media (max-width: 680px) {
   .pw-facility-management.pw-static-modal {
-    width: 96vw;
-    height: 84dvh;
-    max-height: 84dvh;
+    width: min(560px, calc(100vw - 24px));
+    max-width: calc(100vw - 24px);
+    height: min(85vh, 720px);
+    max-height: 85vh;
   }
   .pw-facility-management .management-shell {
     padding: 0 6px 8px;

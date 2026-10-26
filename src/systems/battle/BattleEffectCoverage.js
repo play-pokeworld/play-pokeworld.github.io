@@ -54,8 +54,6 @@ export const TALENT_EFFECT_COVERAGE = Object.freeze(Object.fromEntries(
 
 /** Held effects without battle effect or not implemented yet; every other kind is PORTED. */
 const HELD_EXCEPTIONS = Object.freeze({
-  [HeldEffectKinds.Z_CRYSTAL]: DEFERRED,
-  [HeldEffectKinds.MEGA_STONE]: DEFERRED,
   [HeldEffectKinds.LOOT]: DEFERRED,
   [HeldEffectKinds.LOOT_BOOST]: DEFERRED,
   [HeldEffectKinds.ENCOUNTER]: DEFERRED,

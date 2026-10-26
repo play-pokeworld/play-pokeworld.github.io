@@ -205,6 +205,7 @@ export const L_en_economy = {
 "dungeon_quit_battle":"Expedition abandoned: the bag stays in the dungeon ({tokens} DT, {money} ₽ lost).",
 "dungeon_boss_appears":"{name} rises from the depths!",
 "dungeon_boss_enrage":"{name} flies into a rage: its attacks redouble!",
+"dungeon_boss_enrage_wipe":"{name} unleashes an annihilating blast!",
 "dungeon_log_refund":"Toll refunded ({toll} DT): the descent had not begun.",
 "oak_shop_title":"Oak items (QP)",
 "oak_need_pq":"You need {price} QP.",

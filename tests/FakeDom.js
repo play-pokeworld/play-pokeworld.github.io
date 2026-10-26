@@ -57,6 +57,7 @@ export class FakeElement {
 
   setAttribute(name, value) {
     this.attributes.set(name, String(value));
+    if (name === 'class') this.classList.value = String(value);
     if (name.startsWith('data-')) this.dataset[name.slice(5).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())] = String(value);
   }
   getAttribute(name) {
@@ -69,6 +70,7 @@ export class FakeElement {
   }
   removeAttribute(name) {
     this.attributes.delete(name);
+    if (name === 'class') this.classList.value = '';
     if (name.startsWith('data-')) delete this.dataset[name.slice(5).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())];
   }
   hasAttribute(name) { return this.getAttribute(name) !== null; }

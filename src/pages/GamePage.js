@@ -30,6 +30,8 @@ import { RepeatableQuestModal } from '../panels/RepeatableQuestModal.js';
 import { RepeatableSlotUpgradeModal } from '../panels/RepeatableSlotUpgradeModal.js';
 import { SecretBasePanel } from '../panels/SecretBasePanel.js';
 import { SecretBaseVisitModal } from '../panels/SecretBaseVisitModal.js';
+import { SecretBaseNpcModal } from '../panels/SecretBaseNpcModal.js';
+import { SecretBasePcModal } from '../panels/SecretBasePcModal.js';
 import { ShortcutsPanel } from '../panels/ShortcutsPanel.js';
 import { CurrenciesPanel } from '../panels/CurrenciesPanel.js';
 import { PokeballsPanel } from '../panels/PokeballsPanel.js';
@@ -46,6 +48,9 @@ import { BallPickerModal } from '../panels/BallPickerModal.js';
 import { MarketPanel } from '../panels/fullscreen/MarketPanel.js';
 import { ShopPanel } from '../panels/fullscreen/ShopPanel.js';
 import { BadgesPanel } from '../panels/fullscreen/BadgesPanel.js';
+import { AchievementsFullscreenPanel } from '../panels/fullscreen/AchievementsFullscreenPanel.js';
+import { AtollFullscreenPanel } from '../panels/fullscreen/AtollFullscreenPanel.js';
+import { AtollFactoryPrepModal } from '../panels/AtollFactoryPrepModal.js';
 import { BagPanel } from '../panels/fullscreen/BagPanel.js';
 import { BoxPanel } from '../panels/fullscreen/BoxPanel.js';
 import { PokedexPanel } from '../panels/fullscreen/PokedexPanel.js';
@@ -57,6 +62,7 @@ import { PuzzleSolveModal } from '../panels/PuzzleSolveModal.js';
 import { RegionalStarterModal } from '../panels/RegionalStarterModal.js';
 import { RegionalStarterSystem } from '../systems/RegionalStarterSystem.js';
 import { ItemTargetModal } from '../panels/ItemTargetModal.js';
+import { AfkSummaryModal } from '../panels/AfkSummaryModal.js';
 import { DebugWidget } from '../panels/components/DebugWidget.js';
 import { DashboardColumns } from '../config/DashboardLayout.js';
 import { t } from '../localization/LocalizationManager.js';
@@ -116,9 +122,14 @@ export class GamePage extends BasePage {
       new RepeatableQuestModal(),
       new RepeatableSlotUpgradeModal(),
       new SecretBaseVisitModal(),
+      new SecretBaseNpcModal(),
+      new SecretBasePcModal(),
       new ShopPanel(),
       new MarketPanel(),
       new BadgesPanel(),
+      new AchievementsFullscreenPanel(),
+      new AtollFullscreenPanel(),
+      new AtollFactoryPrepModal(),
       new BagPanel(),
       new ItemTargetModal(),
       new BoxPanel(),
@@ -128,6 +139,7 @@ export class GamePage extends BasePage {
       new DictionaryDetailModal(),
       new PuzzleListPanel(),
       new RegionalStarterModal(),
+      new AfkSummaryModal(),
       new DebugWidget()
     ]);
     RegionalStarterSystem.getInstance().requestCurrentRegionStarter();

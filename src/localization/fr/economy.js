@@ -205,6 +205,7 @@ export const L_fr_economy = {
 "dungeon_quit_battle":"Expédition abandonnée : le sac reste dans le donjon ({tokens} JD, {money} ₽ perdus).",
 "dungeon_boss_appears":"{name} surgit des profondeurs !",
 "dungeon_boss_enrage":"{name} entre en furie : ses attaques redoublent !",
+"dungeon_boss_enrage_wipe":"{name} déclenche une déflagration d'annihilation totale !",
 "dungeon_log_refund":"Péage remboursé ({toll} JD) : la descente n'avait pas commencé.",
 "oak_shop_title":"Objets d'Oak (PQ)",
 "oak_need_pq":"Il te faut {price} PQ.",

@@ -281,6 +281,10 @@
   align-items: center;
 }
 
+/* ==========================================================================
+   Standard Medium Modal Template (Settings, Pokémon Info, Facility Management)
+   ========================================================================== */
+
 /* Settings use at least double the existing medium width on desktop; the
    compact mobile rule below preserves the prior small-screen layout. */
 .pw-modal-backdrop.pw-settings-modal-backdrop {
@@ -294,6 +298,22 @@
   height: 85vh;
   max-height: 85vh;
   min-height: 0;
+  border: 1px solid var(--pw-border-color);
+  border-radius: 14px;
+  background: var(--pw-surface);
+  box-shadow: var(--pw-shadow);
+  backdrop-filter: none;
+}
+
+/* Unified template dimensions for Settings, Pokemon Info, and Facility Management windows */
+.pw-panel--modal-window.pw-pokemon-info-window,
+#poke-modal-inner.pw-panel--modal-window,
+.pw-facility-management.pw-static-modal {
+  width: min(1120px, calc(100vw - 40px)) !important;
+  max-width: min(1120px, calc(100vw - 40px)) !important;
+  height: 85vh !important;
+  max-height: 85vh !important;
+  min-height: 0 !important;
   border: 1px solid var(--pw-border-color);
   border-radius: 14px;
   background: var(--pw-surface);
@@ -467,6 +487,15 @@
     max-width: calc(100vw - 24px);
     height: min(85vh, 720px);
     max-height: 85vh;
+  }
+
+  .pw-panel--modal-window.pw-pokemon-info-window,
+  #poke-modal-inner.pw-panel--modal-window,
+  .pw-facility-management.pw-static-modal {
+    width: min(560px, calc(100vw - 24px)) !important;
+    max-width: calc(100vw - 24px) !important;
+    height: min(85vh, 720px) !important;
+    max-height: 85vh !important;
   }
 
   .pw-settings-modal-window > .pw-settings-root {

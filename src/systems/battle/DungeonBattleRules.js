@@ -5,9 +5,12 @@
 import { EncounterRarities } from '../../data/world/LocationKinds.js';
 import { PokemonFactory } from '../../data/pokemon/PokemonFactory.js';
 import { EncounterRules } from './EncounterRules.js';
+import { HatcheryRules } from '../../config/HatcheryRules.js';
 
 const FINAL_BOSS_HP_MULTIPLIER = 4.5;
 const FINAL_BOSS_STAT_MULTIPLIERS = Object.freeze({ atk: 1.5, def: 1.35 });
+const LEGENDARY_BOSS_HP_MULTIPLIER = 35;
+const LEGENDARY_BOSS_STAT_MULTIPLIERS = Object.freeze({ atk: 1.6, spa: 1.6, def: 1.4, spd: 1.4, spe: 1.3 });
 const MINI_BOSS_HP_MULTIPLIER = 2;
 const ELITE_HP_MULTIPLIER = 1.25;
 const RARE_ON_COMMON_TILE_CHANCE = 0.05;
@@ -33,10 +36,18 @@ export class DungeonBattleRules {
     if (tileType === 'boss' && finalFloor) {
       pokemon = DungeonBattleRules._drawBoss(encounters, team, random);
       if (!pokemon) return null;
-      pokemon.setLevel(Math.min(100, pokemon.level + 8 + Math.max(1, Number(depth) || 1) * 2));
-      hpMultiplier = FINAL_BOSS_HP_MULTIPLIER;
-      statMultipliers = FINAL_BOSS_STAT_MULTIPLIERS;
-      introKey = 'dungeon_boss_appears';
+      const isLegendary = HatcheryRules.LEGENDARY_DEX.includes(pokemon.getSpecies()?.dex);
+      if (isLegendary) {
+        pokemon.setLevel(Math.max(pokemon.level, 70));
+        hpMultiplier = LEGENDARY_BOSS_HP_MULTIPLIER;
+        statMultipliers = LEGENDARY_BOSS_STAT_MULTIPLIERS;
+        introKey = 'wild_legendary_appeared';
+      } else {
+        pokemon.setLevel(Math.min(100, pokemon.level + 8 + Math.max(1, Number(depth) || 1) * 2));
+        hpMultiplier = FINAL_BOSS_HP_MULTIPLIER;
+        statMultipliers = FINAL_BOSS_STAT_MULTIPLIERS;
+        introKey = 'dungeon_boss_appears';
+      }
     } else {
       let bucketHint = tileType === 'elite' ? 'uncommon' : tileType === 'boss' ? 'rare' : 'common';
       if (tileType === 'combat' && random.next() < RARE_ON_COMMON_TILE_CHANCE) bucketHint = 'rare';
@@ -58,9 +69,15 @@ export class DungeonBattleRules {
     }
 
     pokemon.dungeonTileType = tileType;
+    const isLegendaryBoss = tileType === 'boss' && finalFloor && HatcheryRules.LEGENDARY_DEX.includes(pokemon.getSpecies()?.dex);
     return {
       pokemon,
-      foeOptions: { hpMultiplier, statMultipliers, dungeonBoss: tileType === 'boss' && finalFloor },
+      foeOptions: {
+        hpMultiplier,
+        statMultipliers,
+        dungeonBoss: tileType === 'boss' && finalFloor,
+        legendaryBoss: isLegendaryBoss
+      },
       introKey
     };
   }

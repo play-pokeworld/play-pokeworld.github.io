@@ -2,7 +2,7 @@
  * @file SecretBaseVisitModal.js
  * @brief Interactive room visit, NPC challenge hand-off, PC/flag interaction and alcove setup.
  */
-import { StaticModalPanel } from '../ui/StaticModalPanel.js';
+import { UIModal } from '../ui/UIModal.js';
 import { UIContainer } from '../ui/UIContainer.js';
 import { UIText } from '../ui/UIText.js';
 import { UIButton } from '../ui/UIButton.js';
@@ -18,7 +18,7 @@ import { t } from '../localization/LocalizationManager.js';
 import { NotificationSystem } from '../systems/NotificationSystem.js';
 import { NotificationChannels, NotificationTones } from '../config/NotificationConfig.js';
 
-export class SecretBaseVisitModal extends StaticModalPanel {
+export class SecretBaseVisitModal extends UIModal {
   constructor() {
     super({
       id: ModalIds.SECRET_BASE_VISIT,
@@ -28,8 +28,9 @@ export class SecretBaseVisitModal extends StaticModalPanel {
       bodyClassName: 'pw-secret-base-visit-body',
       className: 'pw-secret-base-visit-modal',
       name: 'SecretBaseVisitModal',
-      closeOnBackdrop: false,
-      showCloseBtn: false
+      hasHeader: true,
+      showCloseBtn: true,
+      closeOnBackdrop: true
     });
     this._walking = false;
     this._walkElapsed = 0;
@@ -73,6 +74,17 @@ export class SecretBaseVisitModal extends StaticModalPanel {
     super.onEnter(params);
     this._pcOpen = false;
     this._render();
+  }
+
+  /** @override */
+  onExit() {
+    this._walking = false;
+    this._walkElapsed = 0;
+    this._pcOpen = false;
+    if (!this._resumeAfterBattle) {
+      SecretBaseSystem.getInstance().stopVisit();
+    }
+    super.onExit();
   }
 
   /** @override */

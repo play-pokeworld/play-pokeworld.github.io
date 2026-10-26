@@ -54,7 +54,7 @@ export const DamageTriggers = Object.freeze({ GEM: 'gem', SEED: 'seed' });
  * @param {string} kind
  * @returns {Readonly<Object>[]}
  */
-const effectsOf = (move, kind) => move.effects.filter((effect) => effect.kind === kind);
+const effectsOf = (move, kind) => move.effects?.filter((effect) => effect.kind === kind) ?? [];
 
 /** @param {number} value @returns {number} */
 const atLeastOne = (value) => Math.max(1, Math.floor(value));
@@ -66,7 +66,7 @@ export class DamageCalculator {
    */
   static compute(request) {
     const { attacker, defender, move, field, random } = request;
-    const typing = MoveTyping.resolve(attacker, move);
+    const typing = MoveTyping.resolve(attacker, move, field);
     const moveType = typing.type;
     const effectiveness = MoveTyping.effectiveness(attacker, defender, move, moveType);
     const result = { damage: 0, effectiveness, moveType, hits: 1, immune: effectiveness === 0, gemUsed: false, resistBerryUsed: false };
@@ -116,6 +116,15 @@ export class DamageCalculator {
   /** @private */
   static _power({ attacker, defender, move, random }, ctx) {
     let power = move.power || 0;
+    if (move.id === 'stored_power') {
+      let statStages = 0;
+      for (const stat of ['atk', 'def', 'spa', 'spd', 'spe']) {
+        if (attacker.statMods[stat] > 1.0) {
+          statStages += Math.round((attacker.statMods[stat] - 1.0) / 0.5);
+        }
+      }
+      power += statStages * 30;
+    }
     const fixed = effectsOf(move, MoveEffectKinds.FIXED_POWER_HIT)[0];
     if (fixed) {
       const bonus = fixed.powerIfTargetStatus;
@@ -136,8 +145,8 @@ export class DamageCalculator {
   }
 
   /** @private */
-  static _attack({ attacker, defender }, ctx, physical) {
-    const stat = physical ? 'atk' : 'spa';
+  static _attack({ attacker, defender, move }, ctx, physical) {
+    const stat = move.id === 'body_press' ? 'def' : physical ? 'atk' : 'spa';
     const category = physical ? 'physical' : 'special';
     const choice = attacker.heldEffect(HeldEffectKinds.CHOICE);
     const buff = choice && choice.stat === stat ? choice.mult : 1;
@@ -201,7 +210,11 @@ export class DamageCalculator {
           break;
         case HeldEffectKinds.LIFE_ORB:
         case HeldEffectKinds.EXTEND:
+        case HeldEffectKinds.MEGA_STONE:
           mult *= power;
+          break;
+        case HeldEffectKinds.Z_CRYSTAL:
+          if (held.type === moveType) mult *= 1.4;
           break;
         case HeldEffectKinds.PUNCH:
           if (move.tags.includes('punch')) mult *= power;
@@ -233,6 +246,9 @@ export class DamageCalculator {
     }
     if (attacker.lastCrossType && attacker.lastCrossType !== moveType) {
       let cross = 1;
+      if (attacker.getTypes().includes(attacker.lastCrossType) && attacker.getTypes().includes(moveType)) {
+        cross += BattleRules.CROSS_STAB_BONUS ?? 0.35;
+      }
       for (const effect of attacker.talentEffects(TalentEffectKinds.CROSS_POWER)) cross += effect.add;
       if (field.weather === Weathers.CROSSROOM) cross += BattleRules.CROSS_ROOM_ADD;
       mult *= cross;

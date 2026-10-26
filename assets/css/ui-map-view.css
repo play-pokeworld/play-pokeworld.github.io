@@ -39,6 +39,16 @@
 
 .pw-map-view .loc-node-ring.pulse { animation: pw-map-pulse 1.6s ease-in-out infinite; }
 
+.pw-map-view .pw-map-team-ambush {
+  cursor: pointer;
+}
+.pw-map-view .pw-map-ambush-ring {
+  fill: rgba(220, 20, 60, 0.35);
+  stroke: #ff3333;
+  stroke-width: 2.5;
+  animation: pw-map-pulse 1.4s ease-in-out infinite;
+}
+
 @keyframes pw-map-pulse {
   0%, 100% { opacity: 0.9; }
   50% { opacity: 0.3; }
