@@ -26,6 +26,11 @@ const SECRET_BASE_BACKGROUND_DIR = `${IMAGES_ROOT}secret-base/bg/emerald/`;
 const DUNGEON_DIR = `${IMAGES_ROOT}dungeon/`;
 const APP_ICON = `${IMAGES_ROOT}Icon.png`;
 
+const AUDIO_ROOT = 'assets/audio/';
+const MUSIC_DIR = `${AUDIO_ROOT}music/`;
+const SFX_DIR = `${AUDIO_ROOT}sfx/`;
+const CRIES_DIR = `${AUDIO_ROOT}cries/`;
+
 /** Trainer portrait used when a save has none (file stem in assets/images/trainers/). */
 export const DEFAULT_TRAINER_NAME = 'trainer-0';
 
@@ -126,5 +131,29 @@ export class AssetPaths {
   /** @returns {string} Game logo shown in the header */
   static appIcon() {
     return APP_ICON;
+  }
+
+  /**
+   * @param {string} trackKey - Audio track key (e.g. 'map_kanto', 'battle_wild')
+   * @returns {string}
+   */
+  static music(trackKey) {
+    return `${MUSIC_DIR}${fileStem(trackKey)}.mp3`;
+  }
+
+  /**
+   * @param {string} sfxKey - Sound effect key (e.g. 'click', 'catch')
+   * @returns {string}
+   */
+  static sfx(sfxKey) {
+    return `${SFX_DIR}${fileStem(sfxKey)}.wav`;
+  }
+
+  /**
+   * @param {number|string} dexNumber - National dex number (1..386)
+   * @returns {string}
+   */
+  static cry(dexNumber) {
+    return `${CRIES_DIR}${fileStem(dexNumber)}.ogg`;
   }
 }

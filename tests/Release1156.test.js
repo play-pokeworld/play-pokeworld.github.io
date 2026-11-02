@@ -93,21 +93,21 @@ describe('Release 1.15.6 Fixes and Mechanics', (test) => {
     assert.ok(save.pokedex.isCaught('pidgeot'), 'Pidgeot marked caught in Pokedex');
   });
 
-  test('Pokedex opens PokemonInfoModal with complete sheet on species click', () => {
+  test('Pokedex opens PokedexDetailModal with complete sheet on species click', () => {
     const save = SaveSystem.getInstance().createNewSave('DexTester', 'squirtle');
     save.pokedex.markSeen('bulbasaur');
 
     let modalOpened = null;
     const bus = EventBus.getInstance();
     const unsubscribe = bus.subscribe(ModalOpenRequestedEvent, (event) => {
-      if (event.modalId === ModalIds.POKEMON_INFO) modalOpened = event.params;
+      if (event.modalId === ModalIds.POKEDEX_DETAIL) modalOpened = event.params;
     });
 
     const panel = new PokedexPanel();
     panel.open();
     panel._selectSpecies('bulbasaur');
 
-    assert.ok(modalOpened, 'PokemonInfoModal requested from Pokedex click');
+    assert.ok(modalOpened, 'PokedexDetailModal requested from Pokedex click');
     assert.equal(modalOpened.speciesId, 'bulbasaur');
     unsubscribe();
     panel.close();

@@ -163,9 +163,6 @@ export class MapPanel extends DraggablePanel {
     this._region = locations.getCurrentRegion();
     this._regionSelect.setValue(this._region);
     this._render();
-    NotificationSystem.getInstance().notifyTemporary(t('map_current_loc', {
-      name: t(`location.${locationId}`)
-    }), { channel: NotificationChannels.GAMEPLAY, tone: NotificationTones.ACCENT });
   }
 
   /** @private */

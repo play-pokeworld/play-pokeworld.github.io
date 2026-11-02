@@ -12,7 +12,10 @@ import { TalentEffectKinds } from '../../data/battle/TalentEffectKinds.js';
 export class RouteDropRules {
   /** @param {string} locationId @returns {ReadonlyArray<string>} */
   static poolFor(locationId) {
-    return ROUTE_DROPS[locationId] ?? [];
+    if (ROUTE_DROPS[locationId] && ROUTE_DROPS[locationId].length > 0) {
+      return ROUTE_DROPS[locationId];
+    }
+    return Object.freeze(['prine_berry', 'cheri_berry', 'oran_berry', 'pecha_berry']);
   }
 
   /**

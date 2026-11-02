@@ -28,7 +28,7 @@ export class BattleCombatant {
    * @param {boolean} [options.dungeonBoss=false] - Marks a final dungeon guardian
    * @param {boolean} [options.legendaryBoss=false] - Marks an epic legendary raid guardian
    */
-  constructor(pokemon, side, { npc = false, hiddenTalentActive = npc, heldQuantity = 0, hpMultiplier = 1, statMultipliers = {}, dungeonBoss = false, legendaryBoss = false } = {}) {
+  constructor(pokemon, side, { npc = false, hiddenTalentActive = npc, heldQuantity = 0, hpMultiplier = 1, statMultipliers = {}, dungeonBoss = false, legendaryBoss = false, enrageLimitMs = 90000 } = {}) {
     this.pokemon = pokemon;
     this.side = side;
     this.npc = npc;
@@ -38,6 +38,7 @@ export class BattleCombatant {
     this.hpMultiplier = npc && Number.isFinite(hpScale) ? Math.max(1, hpScale) : 1;
     this.dungeonBoss = npc && dungeonBoss === true;
     this.legendaryBoss = npc && legendaryBoss === true;
+    this.enrageLimitMs = Number.isFinite(Number(enrageLimitMs)) ? Number(enrageLimitMs) : 90000;
     this.dungeonEnraged = false;
     this._baseStatMultipliers = Object.fromEntries(MODIFIABLE_STATS.map((stat) => {
       const multiplier = Number(statMultipliers?.[stat]);

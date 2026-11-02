@@ -66,6 +66,12 @@ export class FastForwardSystem extends BaseSystem {
       deferSave: false
     });
 
+    // When returning from AFK, team rests and recovers to full HP
+    for (const member of save.team ?? []) {
+      member.healFull();
+    }
+    SaveSystem.getInstance().saveCurrent();
+
     const itemCounts = {};
     for (const itemId of result.items) {
       itemCounts[itemId] = (itemCounts[itemId] || 0) + 1;
@@ -133,8 +139,8 @@ export class FastForwardSystem extends BaseSystem {
               const hasStamina = member.talent === 'stamina' || (save.talents?.hasHidden && save.talents.hasHidden(member.species));
               const fatigueDiv = hasStamina ? 2 : 1;
               const wearDamage = Math.max(1, Math.round((member.getMaxHp() * 0.01 * fatigueStep) / fatigueDiv));
-              member.hp = Math.max(1, member.hp - wearDamage);
-              if (member.hp > 1) anyAlive = true;
+              member.hp = Math.max(0, member.hp - wearDamage);
+              if (!member.isFainted()) anyAlive = true;
             }
           }
           if (!anyAlive) {

@@ -37,6 +37,7 @@ import { TeamPresetEditSystem } from './systems/TeamPresetEditSystem.js';
 import { TeamPresetSystem } from './systems/TeamPresetSystem.js';
 import { PokeballSystem } from './systems/PokeballSystem.js';
 import { CatchSystem } from './systems/CatchSystem.js';
+import { SanctuarySystem } from './systems/SanctuarySystem.js';
 import { QuestSystem } from './systems/QuestSystem.js';
 import { TutorialSystem } from './systems/TutorialSystem.js';
 import { TrainerSystem } from './systems/TrainerSystem.js';
@@ -48,6 +49,7 @@ import { FossilSystem } from './systems/FossilSystem.js';
 import { FastForwardSystem } from './systems/FastForwardSystem.js';
 import { TrainingSystem } from './systems/TrainingSystem.js';
 import { ShopSystem } from './systems/ShopSystem.js';
+import { AudioSystem } from './systems/AudioSystem.js';
 import { DiagnosticsSystem } from './systems/DiagnosticsSystem.js';
 import { BrowserDiagnostics } from './ui/BrowserDiagnostics.js';
 import { registerAllPages } from './pages/PageRegistry.js';
@@ -104,6 +106,7 @@ window.addEventListener('DOMContentLoaded', () => {
   engine.registerSystem('TeamPresetEditSystem',TeamPresetEditSystem.getInstance());
   engine.registerSystem('PokeballSystem', PokeballSystem.getInstance());
   engine.registerSystem('CatchSystem', CatchSystem.getInstance());
+  engine.registerSystem('SanctuarySystem', SanctuarySystem.getInstance());
   engine.registerSystem('BattleSystem', BattleSystem.getInstance());
   engine.registerSystem('AtollSystem', AtollSystem.getInstance());
   engine.registerSystem('SecretBaseSystem', SecretBaseSystem.getInstance());
@@ -123,11 +126,27 @@ window.addEventListener('DOMContentLoaded', () => {
   engine.registerSystem('FastForwardSystem', FastForwardSystem.getInstance());
   engine.registerSystem('TrainingSystem', TrainingSystem.getInstance());
   engine.registerSystem('ShopSystem', ShopSystem.getInstance());
+  engine.registerSystem('AudioSystem', AudioSystem.getInstance());
+
+  const unlockAudio = () => {
+    AudioSystem.getInstance().unlock();
+    for (const ev of ['pointerdown', 'keydown', 'touchstart']) {
+      document.removeEventListener(ev, unlockAudio, true);
+    }
+  };
+  for (const ev of ['pointerdown', 'keydown', 'touchstart']) {
+    document.addEventListener(ev, unlockAudio, true);
+  }
 
   let hiddenTimestamp = null;
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
+    const isHidden = document.hidden;
+    AudioSystem.getInstance().setHidden(isHidden);
+    if (isHidden) {
       hiddenTimestamp = Date.now();
+      if (BattleSystem.getInstance().isActive()) {
+        BattleSystem.getInstance().stopBattle();
+      }
     } else if (hiddenTimestamp) {
       const elapsedMs = Date.now() - hiddenTimestamp;
       hiddenTimestamp = null;

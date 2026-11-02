@@ -60,6 +60,28 @@ export class RoamingSystem extends BaseSystem {
   }
 
   /**
+   * Finds the current outdoor location for a roaming species in the active UTC window.
+   * @param {string} speciesId
+   * @param {number} [now=Date.now()]
+   * @returns {{region: string, locationId: string}|null}
+   */
+  static getRouteForSpecies(speciesId, now = Date.now()) {
+    if (!speciesId) return null;
+    for (const [region, regionPool] of Object.entries(RoamingRules.REGIONS || {})) {
+      const speciesIndex = (regionPool.species || []).indexOf(speciesId);
+      if (speciesIndex === -1) continue;
+      const window = RoamingSystem.getRotationWindow(now);
+      const firstRouteIndex = RoamingSystem._positiveModulo(window + regionPool.windowOffset, regionPool.routes.length);
+      const routeIndex = RoamingSystem._positiveModulo(
+        firstRouteIndex + regionPool.offsets[speciesIndex],
+        regionPool.routes.length
+      );
+      return { region, locationId: regionPool.routes[routeIndex] };
+    }
+    return null;
+  }
+
+  /**
    * @param {number} [now=Date.now()]
    * @returns {string} Zero-padded HH:MM:SS countdown, suitable for localized UI interpolation
    */

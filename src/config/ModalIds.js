@@ -48,6 +48,7 @@ export const ModalIds = Object.freeze({
   BOX: 'fs-box',
   BADGES: 'fs-badges',
   POKEDEX: 'fs-pokedex',
+  POKEDEX_DETAIL: 'pw-pokedex-detail-modal',
   ACHIEVEMENTS: 'fs-achievements',
   ATOLL: 'fs-atoll',
   ATOLL_FACTORY_PREP: 'pw-atoll-factory-prep',

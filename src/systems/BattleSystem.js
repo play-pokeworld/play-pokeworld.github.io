@@ -18,11 +18,13 @@ import { BaseSystem } from './BaseSystem.js';
 import { SaveSystem } from './SaveSystem.js';
 import { LocationSystem } from './LocationSystem.js';
 import { BonusSystem } from './BonusSystem.js';
+import { RoamingRules } from '../config/RoamingRules.js';
 import { RoamingSystem } from './RoamingSystem.js';
 import { TrainingSystem } from './TrainingSystem.js';
 import { NotificationSystem } from './NotificationSystem.js';
 import { QuestSystem } from './QuestSystem.js';
 import { CatchSystem } from './CatchSystem.js';
+import { SanctuarySystem } from './SanctuarySystem.js';
 import { EventBus } from '../core/EventBus.js';
 import { Random } from '../core/Random.js';
 import { PokemonFactory } from '../data/pokemon/PokemonFactory.js';
@@ -96,6 +98,7 @@ export class BattleSystem extends BaseSystem {
     /** @private @type {boolean} */ this._battleSummaryOpen = false;
     /** @private @type {Object|null} TrainerBattleContext of the running trainer battle */ this._trainer = null;
     /** @private @type {Object|null} AtollBattleContext of the running Atoll challenge */ this._atollBattle = null;
+    /** @private @type {Object|null} SanctuaryDefinition of the running Sanctuary Raid */ this._sanctuaryBattle = null;
     /** @private @type {{visitId:string,npc:Object,resolved:boolean}|null} */ this._secretBaseBattle = null;
     /** @private @type {Object|null} Last battle outcome, rewards and localized log */ this._lastResult = null;
     /** @private @type {{battles:number,wins:number,expGained:number,moneyGained:number,questPointsGained:number}} */
@@ -353,7 +356,7 @@ export class BattleSystem extends BaseSystem {
     const wildEncounter = dungeon
       ? null
       : EncounterRules.drawWildEncounter(encounters, team, this._random, {
-        roamingSpecies: RoamingSystem.getSpeciesAt(locationId)
+        roamingSpecies: RoamingRules.ROAMING_ENABLED ? RoamingSystem.getSpeciesAt(locationId) : null
       });
     const drawn = dungeon
       ? DungeonBattleRules.draw(encounters, team, this._random, {
@@ -479,9 +482,54 @@ export class BattleSystem extends BaseSystem {
     return started;
   }
 
+  /**
+   * Starts a Sanctuary Raid Boss battle.
+   * @param {import('../data/sanctuary/SanctuaryDB.js').SanctuaryDefinition} sanctuary
+   * @param {string} [locationId]
+   * @returns {boolean}
+   */
+  startSanctuaryBattle(sanctuary, locationId = LocationSystem.getInstance().getCurrentLocationId()) {
+    if (this.isActive() || !sanctuary) return false;
+    this._wildChain = false;
+    this._localQuestBattleKey = null;
+    this._secretBaseBattle = null;
+    this._activeRun = null;
+    this._trainer = null;
+    this._healOnEnd = true;
+    this._dungeonContext = null;
+    this._atollBattle = null;
+    this._sanctuaryBattle = sanctuary;
+
+    const boss = PokemonFactory.create(sanctuary.species, sanctuary.level, { random: this._random });
+    if (!boss) return false;
+    if (Array.isArray(sanctuary.moves) && sanctuary.moves.length > 0) {
+      boss.moves = [...sanctuary.moves];
+    }
+
+    const started = this._begin(boss, locationId, null, 'sanctuary_boss_appeared', [], {
+      legendaryBoss: true,
+      hpMultiplier: sanctuary.hpMultiplier,
+      statMultipliers: sanctuary.statMultipliers,
+      enrageLimitMs: sanctuary.enrageLimitMs
+    });
+    if (!started) {
+      this._sanctuaryBattle = null;
+      return false;
+    }
+    if (sanctuary.terrain && this._session) {
+      this._session.field.setTerrain(sanctuary.terrain, 999);
+      this._session.log.add('battle_log.terrain_set', { name: boss.getDisplayName(), terrain: sanctuary.terrain });
+    }
+    if (sanctuary.weather && this._session) {
+      this._session.field.setWeather(sanctuary.weather, Infinity);
+      this._session.log.add('battle_log.weather_set', { name: boss.getDisplayName(), weather: sanctuary.weather });
+    }
+    return true;
+  }
+
   /** @returns {boolean} true while a trainer battle runs */
   isTrainerBattle() {
-    return !!this._trainer || !!this._atollBattle;
+    return !!this._trainer || !!this._atollBattle || !!this._sanctuaryBattle;
   }
 
   /**
@@ -560,6 +608,7 @@ export class BattleSystem extends BaseSystem {
     this._activeRun = null;
     this._healOnEnd = true;
     this._dungeonContext = null;
+    this._sanctuaryBattle = null;
     SaveSystem.getInstance().saveCurrent();
     EventBus.getInstance().dispatch(new BattleEndedEvent(endedAsVictory, exp, money));
     EventBus.getInstance().dispatch(new BattleRunFinishedEvent(locationId,kind,endedAsVictory?'victory':natural?'defeat':'stopped',natural));
@@ -649,12 +698,14 @@ export class BattleSystem extends BaseSystem {
     this._locationId = locationId;
     this._questKey = questKey;
     const roamingNextFoes = new WeakSet();
+    const locationDef = LocationDB.getInstance().getById(locationId);
+    const initialWeather = this._sanctuaryBattle?.weather ?? locationDef?.weather ?? null;
     this._session = new BattleSession({
       team,
       foe,
       foeOptions,
       random: this._random,
-      weather: LocationDB.getInstance().getById(locationId)?.weather ?? null,
+      weather: initialWeather,
       hiddenTalentUnlocked: (species) => save.talents.hasHidden(species),
       ownedQuantity: (itemId) => save.inventory.count(itemId),
       reserves,
@@ -664,7 +715,7 @@ export class BattleSystem extends BaseSystem {
               LocationDB.getInstance().getEncounters(locationId),
               save.team,
               this._random,
-              { roamingSpecies: RoamingSystem.getSpeciesAt(locationId) }
+              { roamingSpecies: RoamingRules.ROAMING_ENABLED ? RoamingSystem.getSpeciesAt(locationId) : null }
             );
             const nextFoe = encounter?.pokemon ?? null;
             if (encounter?.isRoaming && nextFoe) roamingNextFoes.add(nextFoe);
@@ -696,7 +747,10 @@ export class BattleSystem extends BaseSystem {
     this._flushLog();
     // The battle owns persistence for first-seen discoveries as well as the result.
     save.pokedex.markSeen(foe.species, { deferSave: true });
-    NotificationSystem.getInstance().notifyTemporary(this._log[0], { channel: NotificationChannels.BATTLE, tone: NotificationTones.WARNING });
+    const isSpecialFoe = foe.shiny || foe.roaming || foe.legendaryBoss || (foe.getSpecies && foe.getSpecies()?.isLegendary) || this._trainer;
+    if (isSpecialFoe) {
+      NotificationSystem.getInstance().notifyTemporary(this._log[0], { channel: NotificationChannels.BATTLE, tone: NotificationTones.WARNING });
+    }
     EventBus.getInstance().dispatch(new BattleStartedEvent(this._session.active.pokemon, foe));
     return true;
   }
@@ -894,18 +948,27 @@ export class BattleSystem extends BaseSystem {
           });
           activeRun.tokensGained += capture.tokens;
         }
-        const itemId = RouteDropRules.draw(this._locationId, this._random, save.team,
-          BonusSystem.getInstance().getTotal(BonusTypes.ROUTE_LOOT));
-        if (itemId) {
-          const reward = grantItem(save, itemId, 1, { deferSave: true });
-          if (reward.added > 0) {
-            activeRun.items.push({ itemId, quantity: reward.added });
-            session.log.add('battle_log.item_found', { itemId });
+      }
+      const itemId = RouteDropRules.draw(this._locationId, this._random, save.team,
+        BonusSystem.getInstance().getTotal(BonusTypes.ROUTE_LOOT));
+      if (itemId) {
+        const reward = grantItem(save, itemId, 1, { deferSave: true });
+        if (reward.added > 0) {
+          if (activeRun) {
+            const existing = activeRun.items.find((entry) => entry.itemId === itemId);
+            if (existing) existing.quantity += reward.added;
+            else activeRun.items.push({ itemId, quantity: reward.added });
           }
-          if (reward.money > 0) {
-            activeRun.moneyGained += reward.money;
-            session.log.add('battle_log.item_duplicate_money', { itemId, money: reward.money });
-          }
+          session.log.add('battle_log.item_found', { itemId });
+          const itemDef = ItemDB.getInstance().getById(itemId);
+          const itemName = itemDef ? t(itemDef.nameKey) : itemId;
+          NotificationSystem.getInstance().notifyTemporary(
+            t('battle_log.item_found', { name: itemName }),
+            { channel: NotificationChannels.GAMEPLAY, tone: NotificationTones.SUCCESS }
+          );
+        } else if (reward.money > 0) {
+          if (activeRun) activeRun.moneyGained += reward.money;
+          session.log.add('battle_log.item_duplicate_money', { itemId, money: reward.money });
         }
       }
       NotificationSystem.getInstance().notifyTemporary(
@@ -925,7 +988,17 @@ export class BattleSystem extends BaseSystem {
       });
     }
     this._flushLog();
+    if (this._sanctuaryBattle) {
+      if (victory) {
+        SanctuarySystem.getInstance().onBossVictory(this._sanctuaryBattle.id, foe);
+      } else {
+        SanctuarySystem.getInstance().onBossDefeat(this._sanctuaryBattle.id);
+      }
+    }
     if (dungeonContext) {
+      if (victory) {
+        SanctuarySystem.getInstance().recordWildKO(this._locationId);
+      }
       EventBus.getInstance().dispatch(new DungeonBattleResolvedEvent(
         this._locationId,
         dungeonContext.nodeId,
@@ -953,6 +1026,7 @@ export class BattleSystem extends BaseSystem {
     run.wins++;
     save.pokedex.markSeen(foe.species, { deferSave: true });
     save.statistics.recordWildWin(this._locationId);
+    SanctuarySystem.getInstance().recordWildKO(this._locationId);
     EventBus.getInstance().dispatch(new PokemonDefeatedEvent(
       foe.species,
       foe.level,
@@ -1002,6 +1076,12 @@ export class BattleSystem extends BaseSystem {
         if (existing) existing.quantity += reward.added;
         else run.items.push({ itemId, quantity: reward.added });
         session.log.add('battle_log.item_found', { itemId });
+        const itemDef = ItemDB.getInstance().getById(itemId);
+        const itemName = itemDef ? t(itemDef.nameKey) : itemId;
+        NotificationSystem.getInstance().notifyTemporary(
+          t('battle_log.item_found', { name: itemName }),
+          { channel: NotificationChannels.GAMEPLAY, tone: NotificationTones.SUCCESS }
+        );
       } else if (reward.money > 0) {
         run.moneyGained += reward.money;
         session.log.add('battle_log.item_duplicate_money', { itemId, money: reward.money });
@@ -1034,18 +1114,25 @@ export class BattleSystem extends BaseSystem {
           const hasStamina = member.talent === 'stamina' || (save.talents?.hasHidden && save.talents.hasHidden(member.species));
           const fatigueDiv = hasStamina ? 2 : 1;
           const wearDamage = Math.max(1, Math.round((member.getMaxHp() * 0.01 * fatigueStep) / fatigueDiv));
-          member.hp = Math.max(1, member.hp - wearDamage);
+          member.hp = Math.max(0, member.hp - wearDamage);
           if (session.active?.pokemon?.uid === member.uid) {
             session.active.takeDamage(wearDamage);
           }
           session.log.add('battle_log.fatigue_wear', { name: member.getDisplayName(), damage: wearDamage });
         }
       }
+      if (save.team.every((member) => member.isFainted())) {
+        session.log.add('battle_log.defeat');
+        this.endBattle(false);
+        return;
+      }
     }
-    NotificationSystem.getInstance().notifyTemporary(
-      t('notif_enemy_defeated', { name: foe.getDisplayName(), exp: reportedExp, money }),
-      { channel: NotificationChannels.BATTLE }
-    );
+    if (capture.caught && foe.shiny) {
+      NotificationSystem.getInstance().notifyTemporary(
+        t('shiny_captured'),
+        { channel: NotificationChannels.BATTLE, tone: NotificationTones.SUCCESS }
+      );
+    }
     SaveSystem.getInstance().saveCurrent();
   }
 
@@ -1154,6 +1241,11 @@ export class BattleSystem extends BaseSystem {
   /** @private @returns {string|null} HeldEffectKinds value of the held item */
   _heldKind(pokemon) {
     return pokemon.heldItem ? ItemDB.getInstance().getById(pokemon.heldItem)?.effect?.kind ?? null : null;
+  }
+
+  /** @private @returns {import('../data/save/SaveData.js').SaveData|null} */
+  _save() {
+    return SaveSystem.getInstance().getCurrentSave();
   }
 
   /** @private */

@@ -14,8 +14,8 @@ export const PokemonRules = Object.freeze({
   STAR_STEP: 0.05,
   /** Highest IV of one stat (game design decision: 6 per stat). */
   IV_MAX: 6,
-  /** Highest EV of one stat and of all stats together. */
-  EV_MAX: 18,
+  /** Highest EV of one stat (6 per stat) and of all stats together (6 * 6 = 36 total). */
+  EV_MAX: 6,
   EV_TOTAL_MAX: 36,
   /** Experience curve: total experience of level L = floor(L^3 * EXP_CURVE_FACTOR). */
   EXP_CURVE_FACTOR: 0.8,

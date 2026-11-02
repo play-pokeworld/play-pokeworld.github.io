@@ -40,7 +40,7 @@ Status legend: ✅ good · ⚠️ needs work · ❌ blocking for the full game i
 | Locations | ⚠️ | Map geometry, encounters and gameplay rules in one record; French names in raw data |
 
 The architecture around the data is sound. The **content model** is not ready: it was inherited from
-the original game (itself generated from PokeChill) and still carries its shortcuts. These must be
+the original game and still carries its shortcuts. These must be
 fixed **before** the pixel-perfect panels are wired to the real game, because every panel will read
 them.
 

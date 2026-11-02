@@ -75,7 +75,7 @@ describe('Trainer data', (test) => {
     assert.deepEqual(geodude.moves, ['tackle', 'rock_throw', 'mud_slap']);
     assert.equal(onix.heldItem, 'hard_stone');
     assert.equal(onix.ivs.def, PokemonRules.IV_MAX, 'the original 12 is capped');
-    assert.equal(onix.evs.def, 18);
+    assert.equal(onix.evs.def, PokemonRules.EV_MAX, 'the original 18 is capped');
     assert.equal(onix.hp, onix.getMaxHp());
   });
 

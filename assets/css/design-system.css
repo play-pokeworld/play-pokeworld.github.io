@@ -1924,7 +1924,7 @@ select, option {
 
 
 
-/* PokeChill-style item effect box */
+/* Item effect box */
 .item-effect-box {
   padding: 10px 12px;
   background: var(--dark3);
@@ -1946,7 +1946,7 @@ select, option {
   vertical-align: middle;
 }
 
-/* PokeChill-style status/weather badges */
+/* Status/weather badges */
 [data-buff] > span {
   display: inline-block !important;
   padding: 0.1rem 0.7rem !important;
@@ -1975,7 +1975,7 @@ select, option {
   text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
-/* PokeChill-style weather badges for battle display */
+/* Weather badges for battle display */
 .poke-weather-badge,
 [data-buff="sunny"] span, [data-buff="rainy"] span,
 [data-buff="sandstorm"] span, [data-buff="hail"] span,
@@ -10891,11 +10891,11 @@ button[data-action].pw-loc-gym-btn:hover,
  * POKÉWORLD — UI SKIN 2026 (reconstruit de zéro)
  * ----------------------------------------------------------------------------
  * Feuille de style entièrement neuve, chargée APRÈS design-system.css.
- * Philosophie PokéClicker / PokeChill :
+ * Philosophie épurée :
  *   · la fenêtre est le SEUL conteneur (un cadre, pas de boîtes emboîtées) ;
  *   · le contenu = listes plates, aérées, séparées par de fins filets ;
  *   · en-têtes compacts, titre centré, outils à droite ;
- *   · fond de combat = decors Pokechill (img/bg) — voir PASSE 28.
+ *   · fond de combat = decors (img/bg) — voir PASSE 28.
  * ============================================================================ */
 
 /* ── 1. Toile : fond calme, on voit le décor ────────────────────────────── */
@@ -11284,9 +11284,9 @@ body {
  * `.poke-move.charging` + `--charge-pct`, `.poke-item-badge`).
  *
  * Modèle visuel :
- *   · COMBAT   → decor Pokechill `images/bg/*.png` (cf. PASSE 28), sauvage
+ *   · COMBAT   → decor `images/bg/*.png` (cf. PASSE 28), sauvage
  *     centré au-dessus de la ligne d'horizon, encart d'infos en parchemin ;
- *   · ÉQUIPE   → Pokéchill : rangée = grosse vignette à gauche (numéro de dex
+ *   · ÉQUIPE   → rangée = grosse vignette à gauche (numéro de dex
  *     en bas), colonne droite avec `Nom + lvl` puis 4 lignes d'attaque pleine
  *     largeur colorées par type avec badge de type à droite.
  * ============================================================================ */
@@ -11887,7 +11887,7 @@ body {
    enfants de .poke-moves) mais plus leur place :
    · en combat on les replie a zero (une carte a 1 attaque etait etiree
      par 3 lignes fantomes) ;
-   · dans la fenetre Equipe on les garde en pointilles facon Pokechill,
+   · dans la fenetre Equipe on les garde en pointilles,
      l'emplacement libre fait partie de la lecture du builder. */
 #battle-team-row .poke-move.empty {
   visibility: hidden !important;
@@ -12215,13 +12215,11 @@ body.pw-ui-animations-off .pw-fx-smooth { transition: none !important; }
 
 /* ============================================================================
    PASSE 28 — retours utilisateur : sprites trop petits, scène figée après un
-   combat, fond d'exploration mal cadré, décor de combat PokéClicker à
-   remplacer par celui de Pokéchill, monnaies hors de la barre de titre.
+   combat, fond d'exploration mal cadré, monnaies hors de la barre de titre.
 
-   Les décors viennent désormais du dépôt d'origine
-   (play-pokechill.github.io/img/bg) : ce sont des PNG pixel-art 240x112. Les
+   Les décors viennent désormais du dossier `assets/images/bg/` : ce sont des PNG pixel-art 240x112. Les
    étirer en `cover` les rendait flous et mal cadrés — d'où l'aspect
-   « horrible ». Pokéchill les affiche en `image-rendering: pixelated` calés en
+   « horrible ». On les affiche en `image-rendering: pixelated` calés en
    bas ; on reprend exactement ce traitement.
    ========================================================================== */
 
@@ -15483,3 +15481,89 @@ svg .pw-tuto-target > rect:nth-of-type(2) {
 
 /* Header badge counter: emphasized parts rendered by UIText rich text */
 #header .hinfo strong { color: var(--light2); font-weight: bold; }
+
+/* Sanctuary & Relic Card Styles */
+.pw-loc-sanctuary-card {
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--pw-bg-surface, #1e1b24);
+  border: 1px solid var(--pw-border-color, rgba(255, 255, 255, 0.1));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pw-loc-sanctuary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.pw-loc-sanctuary-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--pw-text-primary, #fff);
+}
+.pw-loc-sanctuary-level {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: rgba(255, 200, 40, 0.15);
+  color: #ffd24d;
+  border: 1px solid rgba(255, 210, 77, 0.35);
+  letter-spacing: 0.03em;
+}
+.pw-loc-sanctuary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+}
+.pw-loc-sanctuary-row-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+.pw-loc-sanctuary-row-main {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pw-text-primary, #fff);
+}
+.pw-loc-sanctuary-row-sub {
+  font-size: 11px;
+  color: var(--light1, #aaa);
+}
+.pw-loc-sanctuary-row-action {
+  flex-shrink: 0;
+}
+.pw-loc-sanctuary-row-action .pw-btn {
+  min-width: 130px;
+  white-space: nowrap;
+}
+.pw-loc-sanctuary-relic-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.pw-sanctuary-relic-mini-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.pw-sanctuary-relic-mini-icon .pw-item-circle-img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}

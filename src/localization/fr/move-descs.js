@@ -618,7 +618,7 @@ export const L_fr_move_descs = {
   "yawn": "Fait bâiller l’ennemi qui s’endort au tour suivant.",
   "zap_cannon": "Un boulet de canon électrifié qui inflige des dégâts et paralyse l’ennemi.",
   "zenheadbutt": "Le lanceur concentre sa volonté et donne un coup de tête. Peut aussi apeurer l’ennemi.",
-// Passe 26d — descriptions FR manquantes (moves PokeChill + signatures).
+// Passe 26d — descriptions FR manquantes (signatures).
   "accelerock": "Attaque 1,2× plus vite que d'habitude.",
   "air_shlash": "30 % de chances de baisser la Déf. Spé. de l'ennemi de 50 %.",
   "anchor_shot": "Piège la cible.",

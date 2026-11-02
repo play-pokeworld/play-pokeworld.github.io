@@ -126,12 +126,13 @@ describe('Item generation discovery rules', (test) => {
 });
 
 describe('DictionaryCatalog queries and business rules', (test) => {
-  test('Kanto progressive discovery returns exactly 214 items', () => {
+  test('Kanto progressive discovery returns 219 items including Kanto ancestral relics', () => {
     const save = SaveData.createNew('Dict Kanto', 'charmander');
     const items = DictionaryCatalog.getItems(save, ['kanto']);
-    assert.equal(items.length, 214);
+    assert.equal(items.length, 219);
     assert.ok(items.some((i) => i.id === 'pokeball'));
     assert.ok(items.some((i) => i.id === 'rarecandy'));
+    assert.ok(items.some((i) => i.id === 'relic_ice'));
     assert.ok(!items.some((i) => i.id === 'charcoal'));
     assert.ok(!items.some((i) => i.id === 'silk_scarf'));
     assert.ok(!items.some((i) => i.id === 'muscle_band'));

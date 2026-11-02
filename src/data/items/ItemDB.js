@@ -59,6 +59,7 @@ export class ItemDB extends DataRepository {
 
   /** @protected @override */
   _build() {
+    this._aliases = new Map();
     for (const [id, raw] of Object.entries(ITEMS_TABLE)) {
       this._entries.set(id, deepFreeze({
         id,
@@ -77,6 +78,50 @@ export class ItemDB extends DataRepository {
         image: raw.image || null
       }));
     }
+
+    const STONE_ALIASES = {
+      fire_stone: 'firestone',
+      water_stone: 'waterstone',
+      thunder_stone: 'thunderstone',
+      leaf_stone: 'leafstone',
+      moon_stone: 'moonstone',
+      sun_stone: 'sunstone',
+      linkstone: 'link_stone',
+      dawnstone: 'dawn_stone',
+      duskstone: 'dusk_stone',
+      shinystone: 'shiny_stone',
+      icestone: 'ice_stone',
+      ovalstone: 'oval_stone'
+    };
+    for (const [alias, targetId] of Object.entries(STONE_ALIASES)) {
+      if (this._entries.has(targetId)) {
+        this._aliases.set(alias, targetId);
+      }
+    }
+  }
+
+  /**
+   * @override
+   * @param {string} id
+   * @returns {Readonly<Object>|null}
+   */
+  getById(id) {
+    if (!id) return null;
+    const direct = this._entries.get(id);
+    if (direct) return direct;
+    const aliasTarget = this._aliases?.get(id);
+    if (aliasTarget) return this._entries.get(aliasTarget) || null;
+    return null;
+  }
+
+  /**
+   * @override
+   * @param {string} id
+   * @returns {boolean}
+   */
+  has(id) {
+    if (!id) return false;
+    return this._entries.has(id) || (this._aliases ? this._aliases.has(id) : false);
   }
 
   /**

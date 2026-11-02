@@ -512,6 +512,99 @@ Détails et preuves : [rapport 1.14.21](PHASE_v1.14.21.md).
   - 27 règles statiques validées (0 violation).
 - Voir [PHASE_v1.15.5.md](PHASE_v1.15.5.md) pour les détails complets.
 
+## 1.15.6 — Résolution des Retours Utilisateurs, Évolution Automatique & Parité Ergonomique
+
+- **Base Secrète — Déplacement & PNJ** :
+  - Déplacement aisé des meubles et PNJ déjà installés sans obligation de les retirer de la pièce.
+  - Levée du blocage de pose des décorations en présence de PNJ.
+- **Évolution Automatique Obligatoire & Rétroactive** :
+  - Les évolutions par niveau s'opèrent automatiquement dès le niveau requis franchi, sans bouton manuel.
+  - Vérification automatique au chargement d'une sauvegarde pour faire évoluer immédiatement tout Pokémon en retard.
+- **Pokédex & Fiches Pokémon** :
+  - Clic sur une entrée du Pokédex ouvrant la fiche détaillée d'espèce.
+  - Clic droit / appui long en combat ouvrant la fiche d'informations des Pokémon alliés et adverses.
+- **Exploration & Sécurité de Déplacement** :
+  - Dialogue de confirmation lors d'une tentative de déplacement en plein combat actif.
+  - Annulation propre des combats lors d'un transit régional.
+- **Validation** :
+  - **672 tests passants sur 672 (100 % de succès)**.
+  - Voir [PHASE_v1.15.6.md](PHASE_v1.15.6.md) pour les détails complets.
+
+## 1.15.7 — Restauration Audio, Filtrage des Notifications & Fiche Espèce Pokédex
+
+- **Restauration Intégrale de l'Audio & des Musiques (`AudioSystem.js`)** :
+  - 42 musiques BGM réparties selon les environnements (routes, villes, arènes, donjons, combats ordinaires et spéciaux).
+  - 22 effets sonores SFX pour les interactions et événements majeurs.
+  - 386 cris de Pokémon authentiques pour les Générations 1 à 3.
+  - Gestion indépendante des bus de volume (`music`, `sfx`, `cries`) synchronisés avec les préférences du joueur.
+- **Suppression du Spam de Notifications (`BattleSystem.js`)** :
+  - Élimination des notifications toasts répétitives pour les victoires de combat ordinaires et apparitions communes.
+  - Conservation exclusive des alertes prioritaires : Pokémon chromatiques (shiny), légendaires, fuyards, quêtes et succès.
+- **Fiche Espèce Pokédex Dédiée (`PokedexDetailModal.js`)** :
+  - Ouverture dédiée lors d'un clic sur une entrée du Pokédex au lieu de la fiche d'équipe `PokemonInfoModal`.
+  - Intégration des descriptions officielles (flavor text) en français et en anglais (`pokedex-flavor.js`).
+  - Sources et méthodes d'obtention exhaustives et dynamiques (`SpeciesSourceCatalog.js`).
+  - Capacités apprenables par niveau, entraînement et CT/CS avec navigation vers le dictionnaire.
+  - Talents normaux et cachés avec infobulles et redirection dictionnaire.
+  - Barres graphiques de statistiques de base et Total BST.
+- **Validation** :
+  - **677 tests passants sur 677 (100 % de succès)**.
+  - 27 règles statiques validées (0 violation).
+  - Voir [PHASE_v1.15.7.md](PHASE_v1.15.7.md) pour les détails complets.
+
+## 1.15.8 — Plafond EV, Récupération AFK, Butins de Route et Fiche Espèce Pokédex
+
+- **Plafond et Affichage des EV (`PokemonRules.js`, `PokemonInfoModal.js`)** :
+  - Plafond ramené à 6 EV par statistique et 36 EV au total, affiché en `${val} / 6` et `${total} / 36` sur la fiche individuelle.
+  - Plafond respecté par les vitamines et l'entraînement au Centre d'Entraînement.
+- **Récupération AFK et Fin de Fatigue (`UIPanel.js`, `FastForwardSystem.js`, `BattleSystem.js`, `AfkSummaryModal.js`)** :
+  - Implémentation de `setFooter(children)` dans `UIPanel.js`, résolvant le blocage de l'ouverture de `AfkSummaryModal`.
+  - Autorisation des K.O. par dégâts d'usure de fatigue (0 PV), arrêtant proprement la chaîne de combat sur épuisement total sans blocage à 1 PV.
+  - Soin complet immédiat de l'équipe active au retour d'inactivité.
+  - Arrêt automatique des combats en cours lors du masquage de l'onglet (`visibilitychange`).
+- **Butins de Route et Objets Sauvages (`RouteDrops.js`, `RouteDropRules.js`, `BattleRules.js`)** :
+  - Couverture complète des 59 routes et zones de Kanto, Johto et Hoenn avec pool de secours.
+  - Taux de butin de base porté à 15 % (max 35 %, bonus objets tenus +5 %).
+  - Notifications toasts informatives lors de la réception d'un butin de route.
+- **Refonte Haute Fidélité de la Fiche Espèce Pokédex (`PokedexDetailModal.js`)** :
+  - Structure en 2 colonnes (`poke-detail-shell`) alignée avec le gabarit de la référence.
+  - En-tête avec lecteur de cri, statut de capture, types et badges Taux de capture / EXP de base.
+  - Carte de description officielle du Pokédex en français et anglais.
+  - Chaîne évolutive complète avec niveaux et conditions d'évolution (pierres, Câble Link).
+  - Lieux de rencontre avec pourcentages d'apparition.
+  - Talents et capacités classées par onglets (Niveau, CT/CS, Entraînement) avec redirection dictionnaire.
+- **Validation** :
+  - **683 tests passants sur 683 (100 % de succès)**.
+  - Voir [PHASE_v1.15.8.md](PHASE_v1.15.8.md) pour les détails complets.
+
+## 1.15.9 — Nettoyage Pokédex, Évolutions, Sources & Continuité d'Interface
+
+- **Nettoyage Pokédex (`PokedexPanel.js`)** :
+  - Suppression intégrale de l'ancien bloc de détails inline (`pw-pokedex-detail`) qui encombrait le panneau au-dessus de la grille.
+  - Préservation exclusive de la modale encyclopédique `PokedexDetailModal` au clic sur une espèce.
+  - Retrait des imports orphelins (`LocationDB`).
+- **Formatage Propre des Évolutions (`PokedexDetailModal.js`)** :
+  - Élimination des balises HTML parasites (`<b>Niveau ...</b> en`) et du texte brut de progression.
+  - Formatage soigné : `➔ [ Niveau 16 ] ➔` et `➔ [ Pierre Eau ] ➔` avec sprites miniaturisés de la pré-évolution et de la forme finale.
+- **Enrichissement des Sources d'Obtention (`SpeciesSourceCatalog.js`, `pokedex.css`)** :
+  - Marché Noir (`MarketRules.STOCK`) référencé pour les Pokémon achetables (Évoli, Minidraco, Porygon, etc.).
+  - Position dynamique des Pokémon errants (`RoamingSystem.getRouteForSpecies(speciesId)`) calculée selon le cycle UTC de 12 heures (*"Légendaire errant : Actuellement sur Pont Pépite"*).
+  - Invocations de fragments de légende à l'Atoll de Combat (`FRAGMENT_LEGENDARIES_BY_REGION`).
+  - Titres exacts des quêtes d'histoire et secondaires associés à chaque espèce.
+  - Centrage parfait des pastilles de lieu (`.pw-pokedex-source-chip`).
+- **Continuité du Défilement sur les Onglets de Capacités (`PokedexDetailModal.js`)** :
+  - Bascule fluide entre *Niveau*, *CT* et *Entraînement* en mutant directement le conteneur `contentBox` (`_populateMoveTabContent`), évitant tout rafraîchissement global de la modale et maintenant la position exacte de défilement.
+- **Correction des Sprites de Butin de Route (`RouteDrops.js`, `ItemDB.js`, `LocationPanel.js`)** :
+  - Identifiants canoniques pour toutes les pierres d'évolution (`firestone`, `waterstone`, `thunderstone`, `leafstone`, `moonstone`, `sunstone`).
+  - Système transparent d'alias dans `ItemDB.js` (`fire_stone` ➔ `firestone`) préservant l'inventaire exact du dictionnaire.
+  - Résolution garantie des icônes d'objets dans la grille des butins de `LocationPanel`.
+- **Validation** :
+  - **687 tests passants sur 687 (100 % de succès)**.
+  - 27 règles statiques validées.
+  - Voir [PHASE_v1.15.9.md](PHASE_v1.15.9.md) pour les détails complets.
+
+
+
 
 
 

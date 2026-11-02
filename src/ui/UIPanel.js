@@ -108,6 +108,14 @@ export class UIPanel extends UIElement {
     if(this._titleDom&&this._titleDom.textContent!==value)this._titleDom.textContent=value;
   }
 
+  /**
+   * Gets the header title.
+   * @returns {string}
+   */
+  getTitle() {
+    return this._titleDom?.textContent || '';
+  }
+
   /** Optional second header line; no-op when unchanged. @param {string} subtitle */
   setSubtitle(subtitle){
     const value=String(subtitle||'');if(!this._titleWrapDom||value===this._subtitleValue)return;
@@ -160,6 +168,20 @@ export class UIPanel extends UIElement {
   addFooterChild(widget) {
     if (!this._footerDom) return widget;
     return this._addChromeChild(widget, this._footerDom);
+  }
+
+  /**
+   * Sets or appends widgets to the footer (creates footer container if not yet created).
+   * @param {UIElement|UIElement[]} children
+   */
+  setFooter(children) {
+    if (!this._footerDom) {
+      this._footerDom = document.createElement('div');
+      this._footerDom.className = 'pw-panel-footer';
+      this._dom.appendChild(this._footerDom);
+    }
+    const list = Array.isArray(children) ? children : [children];
+    for (const child of list) this.addFooterChild(child);
   }
 
   /**

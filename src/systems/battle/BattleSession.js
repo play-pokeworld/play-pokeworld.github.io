@@ -239,7 +239,8 @@ export class BattleSession {
     this.foeCooldownMs -= elapsedMs;
     if (this.foe?.legendaryBoss && !this.foe.isFainted()) {
       this.legendaryElapsedMs = (this.legendaryElapsedMs || 0) + elapsedMs;
-      if (this.legendaryElapsedMs >= 90000 && !this.active.isFainted()) {
+      const enrageLimit = this.foe.enrageLimitMs || 90000;
+      if (this.legendaryElapsedMs >= enrageLimit && !this.active.isFainted()) {
         this.log.add('dungeon_boss_enrage_wipe', { name: this.foe.name });
         this.active.takeDamage(this.active.maxHp * 10);
         this._resolve();

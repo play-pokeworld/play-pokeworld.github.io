@@ -1693,6 +1693,58 @@ export const L_en_items = {
     "name": "Red Shard",
     "desc": null
   },
+  "relic_dna": {
+    "name": "DNA Relic",
+    "desc": "Ancient key: awakens the formidable Mewtwo in Cerulean Cave."
+  },
+  "relic_fire": {
+    "name": "Blazing Relic",
+    "desc": "Ancient key: awakens the legendary Moltres at Victory Road."
+  },
+  "relic_green_orb": {
+    "name": "Jade Relic",
+    "desc": "Ancient key: summons the legendary Rayquaza atop Sky Pillar."
+  },
+  "relic_ice": {
+    "name": "Frozen Relic",
+    "desc": "Ancient key: awakens the legendary Articuno at Seafoam Islands."
+  },
+  "relic_ice_golem": {
+    "name": "Ice Golem Relic",
+    "desc": "Ancient key: awakens the legendary Regice in Island Cave."
+  },
+  "relic_origin": {
+    "name": "Origin Relic",
+    "desc": "Ancient key: attracts the mythical Mew at Pokémon Mansion."
+  },
+  "relic_rock": {
+    "name": "Rock Relic",
+    "desc": "Ancient key: awakens the legendary Regirock in Desert Ruins."
+  },
+  "relic_star": {
+    "name": "Wish Relic",
+    "desc": "Ancient key: awakens the mythical Jirachi atop Mt. Pyre."
+  },
+  "relic_steel": {
+    "name": "Steel Relic",
+    "desc": "Ancient key: awakens the legendary Registeel in the Ancient Tomb."
+  },
+  "relic_storm": {
+    "name": "Storm Relic",
+    "desc": "Ancient key: awakens the legendary Raikou at the Burned Tower."
+  },
+  "relic_thunder": {
+    "name": "Thunder Relic",
+    "desc": "Ancient key: awakens the legendary Zapdos at the Power Plant."
+  },
+  "relic_volcano": {
+    "name": "Volcano Relic",
+    "desc": "Ancient key: awakens the legendary Entei at Mt. Mortar."
+  },
+  "relic_wave": {
+    "name": "Wave Relic",
+    "desc": "Ancient key: awakens the legendary Suicune at Tohjo Falls."
+  },
   "repeatball": {
     "name": "Repeat Ball",
     "desc": "A Poké Ball that works especially well on Pokémon already caught (+25%)."

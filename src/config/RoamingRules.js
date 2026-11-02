@@ -23,6 +23,7 @@ const KANTO_JOHTO_OFFSETS = Object.freeze([0, 7, 13, 19]);
 const HOENN_OFFSETS = Object.freeze([0, 4, 8, 12]);
 
 export const RoamingRules = Object.freeze({
+  ROAMING_ENABLED: false,
   ROTATION_MS: 12 * 60 * 60 * 1000,
   ENCOUNTER_CHANCE: 0.01,
   ENCOUNTER_LEVEL: 75,

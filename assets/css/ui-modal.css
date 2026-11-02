@@ -503,3 +503,64 @@
   }
 }
 
+/* AFK Summary Modal */
+.pw-modal-backdrop#pw-afk-summary-overlay {
+  z-index: 1200;
+  background-color: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(4px);
+}
+
+.pw-afk-modal-window {
+  width: min(540px, 94vw);
+  max-width: 560px;
+  background: var(--pw-bg-surface, #24221E);
+  border: 1px solid var(--pw-border-color, #4A3E31);
+  border-radius: var(--pw-radius-lg, 14px);
+  box-shadow: var(--pw-shadow-lg);
+  box-sizing: border-box;
+}
+
+.pw-afk-summary-body {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pw-afk-row {
+  font-size: 13px;
+  color: var(--pw-text-primary, #ECDEB7);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pw-afk-items-section {
+  background: var(--pw-bg-inset, #181613);
+  border: 1px solid var(--pw-border-color, #383025);
+  border-radius: var(--pw-radius-md, 8px);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pw-afk-item-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: var(--pw-bg-surface, #24221E);
+  border: 1px solid var(--pw-border-color, #4A3E31);
+  border-radius: var(--pw-radius-sm, 6px);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pw-text-primary, #ECDEB7);
+}
+
+.pw-afk-fatigue-note {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--pw-text-secondary, #D98338);
+}
+

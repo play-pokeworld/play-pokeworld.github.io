@@ -13,6 +13,7 @@ import { UiThemes } from '../config/UiThemes.js';
 import { ThemeChangedEvent } from '../core/events/ThemeChangedEvent.js';
 import { DebugModeChangedEvent } from '../core/events/DebugModeChangedEvent.js';
 import { AnimationPreferencesChangedEvent } from '../core/events/AnimationPreferencesChangedEvent.js';
+import { AudioBusChangedEvent } from '../core/events/AudioBusChangedEvent.js';
 import { AnimationPreferences, DEFAULT_ANIMATION_PREFERENCES } from '../config/AnimationPreferences.js';
 
 /** Audio buses shown in the settings, with their default state. */
@@ -84,8 +85,10 @@ export class PreferencesSystem extends BaseSystem {
    */
   setAudioBus(busId, patch) {
     const stored = LocalStore.getJson(StorageKeys.AUDIO_SETTINGS, {}) || {};
-    stored[busId] = { ...this.getAudioBus(busId), ...patch };
+    const updated = { ...this.getAudioBus(busId), ...patch };
+    stored[busId] = updated;
     LocalStore.setJson(StorageKeys.AUDIO_SETTINGS, stored);
+    EventBus.getInstance().dispatch(new AudioBusChangedEvent(busId, updated));
   }
 
   /** @returns {Record<string, boolean>} Capture and visual-feedback preferences. */

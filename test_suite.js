@@ -60,6 +60,10 @@ await import('./tests/Release1153.test.js');
 await import('./tests/Release1154.test.js');
 await import('./tests/Release1155.test.js');
 await import('./tests/Release1156.test.js');
+await import('./tests/Release1157.test.js');
+await import('./tests/Release1158.test.js');
+await import('./tests/Release1159.test.js');
+await import('./tests/Release1160.test.js');
 
 const { failed } = await runAll();
 process.exit(failed ? 1 : 0);

@@ -18,6 +18,8 @@ import { LocationKinds, EncounterRarities } from '../data/world/LocationKinds.js
 import { ROUTE_DROPS } from '../data/world/RouteDrops.js';
 import { CaughtStatus } from '../data/save/PokedexData.js';
 import { RoamingRules } from '../config/RoamingRules.js';
+import { SanctuaryDB } from '../data/sanctuary/SanctuaryDB.js';
+import { SanctuarySystem } from '../systems/SanctuarySystem.js';
 import { BattleConfig } from '../config/BattleConfig.js';
 import { LocationSystem } from '../systems/LocationSystem.js';
 import { RoamingSystem } from '../systems/RoamingSystem.js';
@@ -94,7 +96,7 @@ export class LocationPanel extends DraggablePanel {
     const locationTitle = location ? t(`location.${locationId}`) : t('tab_info');
     this.setTitle(locationTitle);
     const encounters = locations.getEncountersForGroup(locationId);
-    const roamingSpecies = RoamingSystem.getSpeciesAt(locationId);
+    const roamingSpecies = RoamingRules.ROAMING_ENABLED ? RoamingSystem.getSpeciesAt(locationId) : null;
     this._roamingSpeciesId = roamingSpecies;
     const save = SaveSystem.getInstance().getCurrentSave();
     const pokedex = save?.pokedex ?? null;
@@ -193,6 +195,11 @@ export class LocationPanel extends DraggablePanel {
       });
     }
 
+    const sanctuary = SanctuaryDB.getInstance().getByLocation(locationId);
+    const sanctuaryCard = sanctuary
+      ? LocationPanel._sanctuaryCard(sanctuary, save, () => this._render())
+      : null;
+
     const info = new UIContainer({ className: 'pw-loc-info' });
     info.addChildren([
       new UIContainer({
@@ -203,6 +210,7 @@ export class LocationPanel extends DraggablePanel {
       }),
       stats,
       lore,
+      sanctuaryCard,
       new LocationActions(location, encounters.length, !!roamingSpecies, localQuestBattle),
       unlockProgress,
       roamingTimer,
@@ -217,7 +225,7 @@ export class LocationPanel extends DraggablePanel {
   /** @private @param {number} [now=Date.now()] */
   _updateRoamingCountdown(now = Date.now()) {
     const locationId = LocationSystem.getInstance().getCurrentLocationId();
-    const activeSpecies = RoamingSystem.getSpeciesAt(locationId, now);
+    const activeSpecies = RoamingRules.ROAMING_ENABLED ? RoamingSystem.getSpeciesAt(locationId, now) : null;
     const rotationWindow = RoamingSystem.getRotationWindow(now);
     if (activeSpecies !== this._roamingSpeciesId || (this._mirageTimerText && rotationWindow !== this._mirageRotationWindow)) {
       this._render();
@@ -226,6 +234,140 @@ export class LocationPanel extends DraggablePanel {
     const time = RoamingSystem.formatCountdown(now);
     if (this._roamingTimerText) this._roamingTimerText.setText(t('roaming_rotation_timer', { time }));
     if (this._mirageTimerText) this._mirageTimerText.setText(t('mirage_rotation_timer', { time }));
+  }
+
+  /**
+   * @private
+   * @param {import('../data/sanctuary/SanctuaryDB.js').SanctuaryDefinition} sanctuary
+   * @param {import('../data/save/SaveData.js').SaveData} save
+   * @param {Function} [onAction]
+   * @returns {UIContainer|null}
+   */
+  static _sanctuaryCard(sanctuary, save, onAction = () => {}) {
+    if (!sanctuary) return null;
+    const species = PokemonDB.getInstance().getById(sanctuary.species);
+    const bossName = species ? t(species.getNameKey()) : sanctuary.species;
+    const relic = ItemDB.getInstance().getById(sanctuary.relicItem);
+    const relicName = relic ? t(`item.${sanctuary.relicItem}.name`) : sanctuary.relicItem;
+    const relicCount = save?.inventory.count(sanctuary.relicItem) || 0;
+    const currentKOs = save?.sanctuary.getProgress(sanctuary.locationId) || 0;
+    const requiredKOs = sanctuary.requiredKOs || 30;
+    const canForge = currentKOs >= requiredKOs;
+    const canSummon = relicCount > 0;
+
+    const farmNames = (sanctuary.farmLocations || [])
+      .map((locId) => {
+        const loc = LocationDB.getInstance().getById(locId);
+        return loc ? t(`location.${locId}`) : locId;
+      })
+      .join(', ');
+
+    const card = new UIContainer({ className: 'pw-loc-sanctuary-card' });
+
+    const header = new UIContainer({
+      className: 'pw-loc-sanctuary-header',
+      children: [
+        new UIText({ tagName: 'strong', className: 'pw-loc-sanctuary-title', text: t('sanctuary_title', { name: bossName }) }),
+        new UIText({ tagName: 'span', className: 'pw-loc-sanctuary-level', text: t('sanctuary_level', { level: sanctuary.level }) })
+      ]
+    });
+
+    const relicStockLine = new UIContainer({
+      className: 'pw-loc-sanctuary-relic-line',
+      children: [
+        new UIItemSprite({ itemId: sanctuary.relicItem, className: 'pw-sanctuary-relic-mini-icon' }),
+        new UIText({
+          tagName: 'span',
+          className: 'pw-loc-sanctuary-row-main',
+          text: `${relicName} (${t('sanctuary_stock_count', { count: relicCount })})`
+        })
+      ]
+    });
+
+    const forgeInfo = new UIContainer({
+      className: 'pw-loc-sanctuary-row-info',
+      children: [
+        relicStockLine,
+        new UIText({
+          tagName: 'span',
+          className: 'pw-loc-sanctuary-row-sub',
+          text: t('sanctuary_fragments_status', { current: currentKOs, max: requiredKOs })
+        }),
+        new UIText({
+          tagName: 'span',
+          className: 'pw-loc-sanctuary-row-sub',
+          text: t('sanctuary_farm_zones', { zones: farmNames })
+        })
+      ]
+    });
+
+    const forgeBtn = new UIButton({
+      className: `pw-btn pw-loc-btn ${canForge ? 'pw-btn-primary' : 'is-disabled'}`,
+      text: t('sanctuary_forge_btn'),
+      onClick: () => {
+        if (SanctuarySystem.getInstance().forgeRelic(sanctuary.locationId)) {
+          onAction();
+        }
+      }
+    });
+
+    const forgeRow = new UIContainer({
+      className: 'pw-loc-sanctuary-row',
+      children: [
+        forgeInfo,
+        new UIContainer({ className: 'pw-loc-sanctuary-row-action', children: [forgeBtn] })
+      ]
+    });
+
+    const consumesLine = new UIContainer({
+      className: 'pw-loc-sanctuary-relic-line',
+      children: [
+        new UIText({
+          tagName: 'span',
+          className: 'pw-loc-sanctuary-row-sub',
+          text: t('sanctuary_consumes_relic_prefix', { count: 1 })
+        }),
+        new UIItemSprite({ itemId: sanctuary.relicItem, className: 'pw-sanctuary-relic-mini-icon' }),
+        new UIText({
+          tagName: 'span',
+          className: 'pw-loc-sanctuary-row-sub',
+          text: relicName
+        })
+      ]
+    });
+
+    const summonInfo = new UIContainer({
+      className: 'pw-loc-sanctuary-row-info',
+      children: [
+        new UIText({
+          tagName: 'span',
+          className: 'pw-loc-sanctuary-row-main',
+          text: t('sanctuary_summon_boss_title', { name: bossName })
+        }),
+        consumesLine
+      ]
+    });
+
+    const summonBtn = new UIButton({
+      className: `pw-btn pw-loc-btn ${canSummon ? 'pw-btn-danger' : 'is-disabled'}`,
+      text: t('sanctuary_summon_btn'),
+      onClick: () => {
+        if (canSummon) {
+          SanctuarySystem.getInstance().startBossBattle(sanctuary.id);
+        }
+      }
+    });
+
+    const summonRow = new UIContainer({
+      className: 'pw-loc-sanctuary-row',
+      children: [
+        summonInfo,
+        new UIContainer({ className: 'pw-loc-sanctuary-row-action', children: [summonBtn] })
+      ]
+    });
+
+    card.addChildren([header, forgeRow, summonRow]);
+    return card;
   }
 
   /** @private @param {string} locationId */
@@ -392,10 +534,13 @@ export class LocationPanel extends DraggablePanel {
     const itemIds = [...new Set(locationIds.flatMap((id) => ROUTE_DROPS[id] || []))];
     if (itemIds.length === 0) return null;
     const grid = new UIContainer({ className: 'pw-loc-wild-grid pw-loc-drop-grid' });
-    for (const itemId of itemIds) {
+    const itemDb = ItemDB.getInstance();
+    for (const rawId of itemIds) {
+      const itemDef = itemDb.getById(rawId);
+      const itemId = itemDef?.id || rawId;
       const nameKey = `item.${itemId}.name`;
       const localizedName = t(nameKey);
-      const name = localizedName === nameKey ? itemId : localizedName;
+      const name = localizedName === nameKey ? rawId : localizedName;
       const icon = new UIItemSprite({ itemId, alt: name, className: 'pw-grid-media' });
       const card = new UIContainer({
         className: 'pw-loc-wild-card pw-loc-drop-card',

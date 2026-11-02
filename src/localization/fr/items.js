@@ -1693,6 +1693,58 @@ export const L_fr_items = {
     "name": "Éclat Rouge",
     "desc": null
   },
+  "relic_dna": {
+    "name": "Relique ADN",
+    "desc": "Clé ancestrale : éveille le redoutable Mewtwo dans la Caverne Azurée."
+  },
+  "relic_fire": {
+    "name": "Relique Embrasée",
+    "desc": "Clé ancestrale : éveille le légendaire Sulfura sur la Route Victoire."
+  },
+  "relic_green_orb": {
+    "name": "Relique de Jade",
+    "desc": "Clé ancestrale : invoque le légendaire Rayquaza au Pilier Céleste."
+  },
+  "relic_ice": {
+    "name": "Relique Glacée",
+    "desc": "Clé ancestrale : éveille le légendaire Artikodin aux Îles Écume."
+  },
+  "relic_ice_golem": {
+    "name": "Relique Glaçon",
+    "desc": "Clé ancestrale : éveille le légendaire Regice dans la Grotte de l'Îlot."
+  },
+  "relic_origin": {
+    "name": "Relique Origine",
+    "desc": "Clé ancestrale : attire le fabuleux Mew au Manoir Pokémon."
+  },
+  "relic_rock": {
+    "name": "Relique Roc",
+    "desc": "Clé ancestrale : éveille le légendaire Regirock dans les Ruines du Désert."
+  },
+  "relic_star": {
+    "name": "Relique Vœu",
+    "desc": "Clé ancestrale : éveille le fabuleux Jirachi au sommet du Mont Mémoria."
+  },
+  "relic_steel": {
+    "name": "Relique Acier",
+    "desc": "Clé ancestrale : éveille le légendaire Registeel dans le Tombeau Antique."
+  },
+  "relic_storm": {
+    "name": "Relique Tempête",
+    "desc": "Clé ancestrale : éveille le légendaire Raikou à la Tour Cendrée."
+  },
+  "relic_thunder": {
+    "name": "Relique Foudre",
+    "desc": "Clé ancestrale : éveille le légendaire Électhor à la Centrale."
+  },
+  "relic_volcano": {
+    "name": "Relique Volcan",
+    "desc": "Clé ancestrale : éveille le légendaire Entei au Mont Creuset."
+  },
+  "relic_wave": {
+    "name": "Relique Ondine",
+    "desc": "Clé ancestrale : éveille le légendaire Suicune aux Chutes Tohjo."
+  },
   "repeatball": {
     "name": "Bis Ball",
     "desc": "Poké Ball très efficace sur les Pokémon déjà capturés (+25 %)."

@@ -41,6 +41,7 @@ import { TeamModal } from '../panels/TeamModal.js';
 import { TeamPresetsPanel } from '../panels/fullscreen/TeamPresetsPanel.js';
 import { TeamPresetEditorModal } from '../panels/team-presets/TeamPresetEditorModal.js';
 import { PokemonInfoModal } from '../panels/PokemonInfoModal.js';
+import { PokedexDetailModal } from '../panels/PokedexDetailModal.js';
 import { PokemonMoveLearningModal } from '../panels/PokemonMoveLearningModal.js';
 import { SettingsModal } from '../panels/settings/SettingsModal.js';
 import { BallFilterEditorModal } from '../panels/BallFilterEditorModal.js';
@@ -110,6 +111,7 @@ export class GamePage extends BasePage {
       new TeamPresetsPanel(),
       new TeamPresetEditorModal(),
       new PokemonInfoModal(),
+      new PokedexDetailModal(),
       new PokemonMoveLearningModal(),
       new BattleSummaryModal(),
       new NpcTalkModal(),

@@ -302,3 +302,287 @@
     align-items: flex-start;
   }
 }
+
+/* ==========================================================================
+   Pokédex Species Detail Modal (Matching main's PokeDetailView template)
+   ========================================================================== */
+.pw-panel--modal-window.pw-pokedex-species-window {
+  width: min(960px, calc(100vw - 24px));
+  max-width: 960px;
+  height: min(88vh, 820px);
+  max-height: 88vh;
+  box-sizing: border-box;
+}
+
+.pw-pokedex-species-body {
+  padding: 16px 20px;
+  max-height: calc(88vh - 60px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pw-pokedex-facts-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.pw-pokedex-fact-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--dark1, #181613);
+  border: 1px solid var(--border, #4A3E31);
+  border-radius: 6px;
+  font-size: 11.5px;
+}
+
+.pw-pokedex-fact-pill .pw-fact-label {
+  color: var(--light2, #ECDEB7);
+  font-weight: 600;
+}
+
+.pw-pokedex-fact-pill .pw-fact-val {
+  color: var(--accent, #E5C365);
+  font-weight: 800;
+}
+
+.pw-pokedex-flavor-card {
+  background: var(--dark1, #181613);
+  border: 1px solid var(--border, #4A3E31);
+  border-left: 4px solid var(--accent, #E5C365);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin: 4px 0;
+  box-sizing: border-box;
+}
+
+.pw-pokedex-flavor-text {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--light2, #ECDEB7);
+  margin: 0;
+  font-style: normal;
+  font-weight: 500;
+}
+
+.pw-pokedex-evo-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.pw-pokedex-evo-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  background: var(--dark1, #181613);
+  border: 1px solid var(--border, #4A3E31);
+  border-radius: 6px;
+  font-size: 12.5px;
+  color: var(--light2, #ECDEB7);
+  flex-wrap: wrap;
+}
+
+.pw-evo-badge {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--dark2, #24221E);
+  color: var(--light1, #FFF);
+}
+
+.pw-evo-badge--next {
+  color: var(--accent, #E5C365);
+}
+
+.pw-evo-arrow {
+  color: var(--accent, #E5C365);
+  font-weight: 700;
+  font-size: 11.5px;
+}
+
+.pw-pokedex-sources-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.pw-pokedex-source-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--dark1, #181613);
+  border: 1px solid var(--border, #4A3E31);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--light2, #ECDEB7);
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.pw-source-icon {
+  color: var(--accent, #E5C365);
+  width: 14px;
+  height: 14px;
+}
+
+.pw-pokedex-talents-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.pw-pokedex-talent-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px;
+  background: var(--dark1, #181613);
+  border: 1px solid var(--border, #4A3E31);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pw-pokedex-talent-card:hover {
+  border-color: var(--accent, #E5C365);
+  background: var(--dark2, #24221E);
+}
+
+.pw-pokedex-talent-card--hidden {
+  border-left: 3px solid var(--accent, #E5C365);
+}
+
+.pw-pokedex-talent-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pw-talent-rarity-badge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--dark2, #24221E);
+  color: var(--light2, #ECDEB7);
+}
+
+.pw-badge--hidden {
+  background: rgba(229, 195, 101, 0.2);
+  color: var(--accent, #E5C365);
+  border: 1px solid var(--accent, #E5C365);
+}
+
+.pw-dex-moves-table {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.pw-dex-move-row {
+  display: grid;
+  grid-template-columns: 60px 1.4fr 90px 70px 70px;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 12px;
+  background: var(--dark1, #181613);
+  border: 1px solid var(--border, #4A3E31);
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pw-dex-move-row:hover:not(.pw-dex-move-row--header) {
+  border-color: var(--accent, #E5C365);
+  background: var(--dark2, #24221E);
+}
+
+.pw-dex-move-row--header {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border, #4A3E31);
+  font-weight: 800;
+  color: var(--light1, #FFF);
+  cursor: default;
+  padding: 4px 12px;
+}
+
+.pw-mcol-lvl {
+  font-weight: 800;
+  color: var(--accent, #E5C365);
+}
+
+.pw-mcol-name {
+  color: var(--light2, #ECDEB7);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pw-mcol-power, .pw-mcol-acc {
+  text-align: right;
+  color: var(--light2, #ECDEB7);
+  font-weight: 700;
+}
+
+.pw-dex-tms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.pw-dex-tm-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--dark1, #181613);
+  border: 1px solid var(--border, #4A3E31);
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pw-dex-tm-chip:hover {
+  border-color: var(--accent, #E5C365);
+  background: var(--dark2, #24221E);
+}
+
+.pw-tm-code {
+  color: var(--accent, #E5C365);
+  font-weight: 800;
+  font-size: 11px;
+}
+
+.pw-tm-move-name {
+  color: var(--light2, #ECDEB7);
+  font-weight: 700;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+

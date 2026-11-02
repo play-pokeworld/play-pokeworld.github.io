@@ -1497,10 +1497,25 @@ body.mobile-mode .mobile-subnav-bar.is-hidden {
 .battle-zone-chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  color: var(--light2, #ecdeb7);
-  font-size: 11px;
-} /* Battle loot/session summary: single-column layout and 760px desktop width,
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+.battle-zone-chip--rain { background: rgba(50, 130, 240, 0.25); color: #70b8ff; border-color: rgba(112, 184, 255, 0.5); }
+.battle-zone-chip--sun { background: rgba(240, 130, 30, 0.25); color: #ffa040; border-color: rgba(255, 160, 64, 0.5); }
+.battle-zone-chip--sand { background: rgba(200, 160, 80, 0.25); color: #e6c875; border-color: rgba(210, 180, 100, 0.5); }
+.battle-zone-chip--hail { background: rgba(100, 220, 255, 0.25); color: #a0f0ff; border-color: rgba(120, 230, 255, 0.5); }
+.battle-zone-chip--fog { background: rgba(160, 180, 200, 0.25); color: #d0dce8; border-color: rgba(180, 200, 220, 0.5); }
+.battle-zone-chip--somber { background: rgba(140, 90, 210, 0.25); color: #c89aff; border-color: rgba(180, 130, 255, 0.5); }
+.battle-zone-chip--electric { background: rgba(255, 210, 30, 0.25); color: #ffe040; border-color: rgba(255, 220, 40, 0.5); }
+.battle-zone-chip--grassy { background: rgba(70, 210, 70, 0.25); color: #60e060; border-color: rgba(90, 230, 90, 0.5); }
+.battle-zone-chip--misty { background: rgba(240, 120, 200, 0.25); color: #ffa0e0; border-color: rgba(255, 150, 220, 0.5); }
+.battle-zone-chip--psychic { background: rgba(210, 70, 230, 0.25); color: #e070ff; border-color: rgba(230, 90, 255, 0.5); } /* Battle loot/session summary: single-column layout and 760px desktop width,
    following the main reference panel. */
 #battle-summary-inner.pw-battle-summary-shell {
   width: min(96vw, 760px) !important;

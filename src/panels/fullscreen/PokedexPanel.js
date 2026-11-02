@@ -22,7 +22,6 @@ import {
 } from '../../config/PokedexRules.js';
 import { PokemonDB } from '../../data/pokemon/PokemonDB.js';
 import { CaughtStatus } from '../../data/save/PokedexData.js';
-import { LocationDB } from '../../data/world/LocationDB.js';
 import { SaveSystem } from '../../systems/SaveSystem.js';
 import { FeatureAccessSystem } from '../../systems/FeatureAccessSystem.js';
 import { PokemonRankRules } from '../../systems/box/PokemonRankRules.js';
@@ -92,7 +91,6 @@ export class PokedexPanel extends UIFullscreenPanel {
       .sort((a, b) => a.dex - b.dex);
 
     const shown = this._filterSpecies(this._visibleSpecies, dex);
-    const selected = shown.find((entry) => entry.id === this._selectedSpecies && dex?.isSeen(entry.id)) || null;
     const seen = this._visibleSpecies.filter((entry) => dex?.isSeen(entry.id)).length;
     const caught = this._visibleSpecies.filter((entry) => dex?.isCaught(entry.id)).length;
     const shiny = this._visibleSpecies.filter((entry) => dex?.getCaughtStatus(entry.id) === CaughtStatus.SHINY).length;
@@ -101,7 +99,7 @@ export class PokedexPanel extends UIFullscreenPanel {
       this._overview(visibleRegions, save, dex, { seen, caught, shiny }),
       this._filterBar(visibleRegions)
     ]);
-    this._renderContent(shown, dex, selected, { preserveScroll: true });
+    this._renderContent(shown, dex, { preserveScroll: true });
     this._restoreFocusKey(focusKey);
   }
 
@@ -317,13 +315,12 @@ export class PokedexPanel extends UIFullscreenPanel {
     return visible;
   }
 
-  /** @private @param {Object[]} entries @param {Object|null} dex @param {Object|null} selected */
-  _renderContent(entries, dex, selected, { preserveScroll = false } = {}) {
+  /** @private @param {Object[]} entries @param {Object|null} dex */
+  _renderContent(entries, dex, { preserveScroll = false } = {}) {
     const grid = new PokemonGrid({ className: 'pw-pokedex-grid', ariaLabel: t('panel_pokedex_title') });
     for (const entry of entries) grid.addChild(this._entry(entry, dex));
 
     const content = [];
-    if (selected) content.push(this._detail(selected));
     if (entries.length === 0) {
       content.push(new UIText({ tagName: 'div', className: 'pw-empty-state-md pw-pokedex-empty', text: t('pokedex_no_results') }));
     } else {
@@ -357,37 +354,13 @@ export class PokedexPanel extends UIFullscreenPanel {
     });
   }
 
-  /** @private @param {Readonly<Object>} species */
-  _detail(species) {
-    const locations = LocationDB.getInstance().getAll()
-      .filter((location) => location.encounters.some((encounter) => encounter.species === species.id))
-      .map((location) => t(`location.${location.id}`));
-    const talents = species.talents.map((id) => t(`talent.${id}.name`));
-    if (species.hiddenTalent) talents.push(t(`talent.${species.hiddenTalent}.name`));
-    return new UIContainer({
-      className: 'pw-pokedex-detail',
-      children: [
-        new UIPokemonSprite({ species: species.id, alt: t(species.getNameKey()), size: PokemonSpriteSizes.STANDARD }),
-        new UIContainer({
-          className: 'pw-pokedex-detail-copy',
-          children: [
-            new UIText({ className: 'pw-pokedex-detail-title', text: t('pokedex_detail_title', { name: t(species.getNameKey()), number: String(species.dex).padStart(3, '0') }) }),
-            new UIText({ className: 'pw-pokedex-detail-line', text: t('pokedex_types', { types: species.types.map((id) => t(`type.${id}`)).join(', ') }) }),
-            new UIText({ className: 'pw-pokedex-detail-line', text: t('pokedex_talents', { talents: talents.join(', ') }) }),
-            new UIText({ className: 'pw-pokedex-detail-line', text: t('pokedex_locations', { locations: locations.length ? locations.join(', ') : t('pokedex_no_locations') }) })
-          ]
-        })
-      ]
-    });
-  }
-
   /** @private @param {string} speciesId */
   _selectSpecies(speciesId) {
     const save = SaveSystem.getInstance().getCurrentSave();
     if (!save?.pokedex.isSeen(speciesId)) return;
     this._selectedSpecies = speciesId;
     EventBus.getInstance().dispatch(new PokedexEntryOpenedEvent(speciesId));
-    EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.POKEMON_INFO, { speciesId }));
+    EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.POKEDEX_DETAIL, { speciesId }));
     this._render();
   }
 
@@ -405,8 +378,7 @@ export class PokedexPanel extends UIFullscreenPanel {
     const save = SaveSystem.getInstance().getCurrentSave();
     const dex = save?.pokedex ?? null;
     const shown = this._filterSpecies(this._visibleSpecies, dex);
-    const selected = shown.find((entry) => entry.id === this._selectedSpecies && dex?.isSeen(entry.id)) || null;
-    this._renderContent(shown, dex, selected, { preserveScroll: true });
+    this._renderContent(shown, dex, { preserveScroll: true });
   }
 
   /** @private */

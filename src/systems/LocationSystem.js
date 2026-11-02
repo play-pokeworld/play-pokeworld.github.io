@@ -16,6 +16,7 @@ import { NpcTalkedEvent } from '../core/events/NpcTalkedEvent.js';
 import { NotificationSystem } from './NotificationSystem.js';
 import { NotificationChannels, NotificationTones } from '../config/NotificationConfig.js';
 import { QuestSystem } from './QuestSystem.js';
+import { RoamingRules } from '../config/RoamingRules.js';
 import { RoamingSystem } from './RoamingSystem.js';
 import { SpeciesOwnership } from './catch/SpeciesOwnership.js';
 import { QuestCategories } from '../data/quests/QuestCategories.js';

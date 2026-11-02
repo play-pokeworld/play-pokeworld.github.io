@@ -19,6 +19,7 @@ import { PokemonDB } from '../src/data/pokemon/PokemonDB.js';
 import { ContentAccessChangedEvent } from '../src/core/events/ContentAccessChangedEvent.js';
 import { BattleSystem } from '../src/systems/BattleSystem.js';
 import { TeamSystem } from '../src/systems/TeamSystem.js';
+import { PokemonRules } from '../src/config/PokemonRules.js';
 import { PokemonData } from '../src/data/pokemon/PokemonData.js';
 import { SaveData } from '../src/data/save/SaveData.js';
 import { DungeonRunData } from '../src/data/save/DungeonRunData.js';
@@ -896,8 +897,8 @@ describe('Modals and team', (test) => {
       document.activeElement.dispatchEvent(fakeEvent('keydown', { bubbles: true, key: 'ArrowRight' }));
       assert.ok(dom.querySelector('#pokemon-info-stat-panel-evs'), 'the right arrow activates the EV tab');
       assert.equal(document.activeElement, dom.querySelector('[data-focus-key="pokemon-info-tab-evs"]'));
-      assert.ok(dom.querySelector('#pokemon-info-stat-panel-evs').textContent.includes('/ 18'), 'EV rows use the configured per-stat cap');
-      assert.ok(dom.querySelector('#pokemon-info-stat-panel-evs').textContent.includes('/ 36'), 'the EV total uses the configured total cap');
+      assert.ok(dom.querySelector('#pokemon-info-stat-panel-evs').textContent.includes(`/ ${PokemonRules.EV_MAX}`), 'EV rows use the configured per-stat cap');
+      assert.ok(dom.querySelector('#pokemon-info-stat-panel-evs').textContent.includes(`/ ${PokemonRules.EV_TOTAL_MAX}`), 'the EV total uses the configured total cap');
     } finally {
       if (modal.isOpen()) modal.close();
       modal.destroy();
