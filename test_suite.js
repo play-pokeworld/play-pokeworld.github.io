@@ -16,12 +16,15 @@ if (!process.env.VERBOSE) {
 
 await import('./tests/StaticRules.test.js');
 await import('./tests/Localization.test.js');
+await import('./tests/LocalizationRules.test.js');
+await import('./tests/LocalizationRuntime.test.js');
 await import('./tests/Systems.test.js');
 await import('./tests/SecretBase.test.js');
 await import('./tests/GameData.test.js');
 await import('./tests/DataLayer.test.js');
 await import('./tests/BattleEngine.test.js');
 await import('./tests/Roaming.test.js');
+await import('./tests/AfkCatchUp.test.js');
 await import('./tests/BoxFilters.test.js');
 await import('./tests/Tutorial.test.js');
 await import('./tests/Catch.test.js');
@@ -64,6 +67,9 @@ await import('./tests/Release1157.test.js');
 await import('./tests/Release1158.test.js');
 await import('./tests/Release1159.test.js');
 await import('./tests/Release1160.test.js');
+await import('./tests/Release1164.test.js');
+await import('./tests/Release1165.test.js');
+await import('./tests/Release1166.test.js');
 
 const { failed } = await runAll();
 process.exit(failed ? 1 : 0);

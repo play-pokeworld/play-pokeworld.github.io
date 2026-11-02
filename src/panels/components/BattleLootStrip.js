@@ -9,7 +9,7 @@ import { UIPokemonSprite, PokemonSpriteSizes } from '../../ui/UIPokemonSprite.js
 import { AssetPaths } from '../../config/AssetPaths.js';
 import { ItemDB } from '../../data/items/ItemDB.js';
 import { TextFormatter } from '../../core/TextFormatter.js';
-import { t } from '../../localization/LocalizationManager.js';
+import { t, tOr, lt } from '../../localization/LocalizationManager.js';
 
 /**
  * @param {Array<Object>} catches
@@ -71,7 +71,7 @@ export class BattleLootStrip extends UIContainer {
     }
     for (const group of groupBattleCaptures(run.catches)) {
       const chip = new UIContainer({ className: 'loot-item' });
-      chip.setTooltip(`${group.name}${group.shiny ? ` — ${t('battle_summary_shiny')}` : ''}`);
+      chip.setTooltip(group.shiny ? lt`${group.name} — ${t('battle_summary_shiny')}` : group.name);
       chip.addChild(new UIPokemonSprite({
         species: group.species,
         form: group.form,
@@ -85,9 +85,8 @@ export class BattleLootStrip extends UIContainer {
     for (const entry of run.items || []) {
       if (!entry?.itemId || !(entry.quantity > 0)) continue;
       const chip = new UIContainer({ className: 'loot-item' });
-      const nameKey = `item.${entry.itemId}.name`;
-      const itemName = t(nameKey);
-      chip.setTooltip(itemName === nameKey ? entry.itemId : itemName);
+      const itemName = tOr(`item.${entry.itemId}.name`, entry.itemId);
+      chip.setTooltip(itemName);
       chip.addChild(new UIImage({ src: ItemDB.getInstance().getImagePath(entry.itemId), alt: itemName, pixelated: true }));
       if (entry.quantity > 1) chip.addChild(new UIText({ tagName: 'span', className: 'loot-count', text: `×${TextFormatter.formatNumber(entry.quantity)}` }));
       this.addChild(chip);

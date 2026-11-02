@@ -11,6 +11,7 @@ import { BattleSystem } from './BattleSystem.js';
 import { SaveSystem } from './SaveSystem.js';
 import { LocationSystem } from './LocationSystem.js';
 import { DungeonAutoRules } from '../config/DungeonAutoRules.js';
+import { TimeSource } from '../core/TimeSource.js';
 import { DungeonPilotRules } from './dungeon/DungeonPilotRules.js';
 export class DungeonAutoSystem extends BaseSystem {
   static _instance = null;
@@ -55,7 +56,7 @@ export class DungeonAutoSystem extends BaseSystem {
       this._dueAt = 0;
       return;
     }
-    const now = Date.now(),
+    const now = TimeSource.now(),
       context = `${save.id}:${run.startedAt}:${run.floor}:${run.auto}`;
     if (this._context !== context) {
       this._context = context;
@@ -80,6 +81,14 @@ export class DungeonAutoSystem extends BaseSystem {
     if (run.map.tiles[target]?.type === 'chest')
       this._dueAt = now + DungeonAutoRules.CHEST_DELAY_MS;
     system.moveTo(target);
+  }
+  /** @returns {boolean} True while an auto dungeon run is being piloted. */
+  isRunning() {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    const run = DungeonSystem.getInstance().getRun();
+    return !!save && !!run?.active && !!run.auto &&
+      DungeonSystem.getInstance().isAutoUnlocked(run.locationId) &&
+      LocationSystem.getInstance().getCurrentLocationId() === run.locationId;
   }
   /** @override */
   onDestroy() {

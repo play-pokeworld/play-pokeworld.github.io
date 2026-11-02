@@ -17,6 +17,11 @@ import { SaveSystem } from '../src/systems/SaveSystem.js';
 import { FeatureAccessSystem } from '../src/systems/FeatureAccessSystem.js';
 import { BoxSystem } from '../src/systems/BoxSystem.js';
 import { CONTENT_FEATURES } from '../src/config/ContentAccessRules.js';
+import { TrainingRules } from '../src/config/TrainingRules.js';
+import { PokemonRules } from '../src/config/PokemonRules.js';
+import { PokemonRankRules } from '../src/systems/box/PokemonRankRules.js';
+import { SeededRandom } from '../src/core/SeededRandom.js';
+import { TrainingOpponents } from '../src/systems/facilities/TrainingOpponents.js';
 
 describe('Release 1.15.1 Specifications', (test) => {
   test('wild routes feature basic pre-evolutions only', () => {
@@ -50,33 +55,44 @@ describe('Release 1.15.1 Specifications', (test) => {
     assert.ok(!route19.encounters.some((s) => s.species === 'tentacruel'));
   });
 
-  test('adaptive training opponent levels scale proportionally to trainee BST', () => {
-    const save = SaveSystem.getInstance().createNewSave('TrainingBstTest', 'charmander');
+  test('training waves are drawn from the rank of the trainee, without duplicates or legendaries', () => {
+    const save = SaveSystem.getInstance().createNewSave('TrainingRankTest', 'charmander');
     save.access.unlockFeature(CONTENT_FEATURES.TRAINING);
     const training = TrainingSystem.getInstance();
     training.init();
 
-    // Caterpie: low BST (~195, Class E) at level 20
+    // Caterpie: base stat total 195, rank E. Dragonite: 600, rank S.
     const caterpie = PokemonFactory.create('caterpie', 20);
     BoxSystem.getInstance().addPokemon(caterpie, { deferSave: true });
-
-    // Dragonite: high BST (~600, Class S) at level 20
     const dragonite = PokemonFactory.create('dragonite', 20);
     BoxSystem.getInstance().addPokemon(dragonite, { deferSave: true });
 
-    const caterpieOpponents = training._createOpponents(caterpie, Random.default, 'move');
-    const dragoniteOpponents = training._createOpponents(dragonite, Random.default, 'move');
-
-    assert.ok(caterpieOpponents.length > 0);
-    assert.ok(dragoniteOpponents.length > 0);
-
-    const avgCaterpieOppLevel = caterpieOpponents.reduce((s, o) => s + o.level, 0) / caterpieOpponents.length;
-    const avgDragoniteOppLevel = dragoniteOpponents.reduce((s, o) => s + o.level, 0) / dragoniteOpponents.length;
-
-    assert.ok(
-      avgCaterpieOppLevel < avgDragoniteOppLevel,
-      `Class E trainee faces scaled opponents (${avgCaterpieOppLevel.toFixed(1)} vs ${avgDragoniteOppLevel.toFixed(1)})`
-    );
+    for (const [trainee, rank] of [[caterpie, 'E'], [dragonite, 'S']]) {
+      const random = new SeededRandom(20261024);
+      const waves = training._createOpponents(trainee, random, 'move');
+      assert.equal(waves.length, TrainingRules.OPPONENT_COUNT, 'a session is 30 waves');
+      assert.equal(PokemonRankRules.getRank(trainee), rank);
+      const species = waves.map((wave) => wave.species);
+      assert.equal(new Set(species).size, species.length, 'a species appears at most once');
+      assert.ok(!species.includes(trainee.species), 'the trainee never fights itself');
+      const order = PokemonRankRules.order;
+      const distance = (speciesId) => Math.abs(order.indexOf(PokemonRankRules.getRank(speciesId)) - order.indexOf(rank));
+      const distances = waves.map((wave) => distance(wave.species));
+      for (const wave of waves) {
+        assert.ok(!PokemonRules.LEGENDARY_DEX.includes(wave.getSpecies().dex), `${wave.species} is legendary`);
+        assert.ok(distance(wave.species) <= 1, `${wave.species} is not of the rank of the trainee or its neighbour`);
+      }
+      // The rank of the trainee is used first and in full before any neighbour is drawn.
+      const own = TrainingOpponents.speciesOfRank(rank).filter((id) => id !== trainee.species).length;
+      assert.equal(distances.filter((value) => value === 0).length, Math.min(waves.length, own), 'own rank first');
+      assert.deepEqual(distances, [...distances].sort((a, b) => a - b), 'the ladder never comes back to an easier rank');
+      // Level curve: from 60 % to 120 % of the mode base level (move: -2), never under MIN_OPPONENT_LEVEL.
+      const levels = waves.map((wave) => wave.level);
+      const base = trainee.level + TrainingRules.MODE_LEVEL_OFFSETS.move;
+      assert.ok(levels[0] <= Math.round(base * TrainingRules.WAVE_LEVEL_FACTOR_MIN) + 1, `first wave ${levels[0]}`);
+      assert.ok(levels.at(-1) >= Math.round(base * TrainingRules.WAVE_LEVEL_FACTOR_MAX) - 1, `last wave ${levels.at(-1)}`);
+      assert.ok(levels.every((level, index) => index === 0 || level >= levels[index - 1] - 2), 'the ladder never collapses');
+    }
   });
 
   test('Cross-STAB combo grants +35% damage when alternating between dual STAB types', () => {

@@ -9,13 +9,7 @@ import { UIText } from '../../ui/UIText.js';
 import { UIButton } from '../../ui/UIButton.js';
 import { UIProgressBar } from '../../ui/UIProgressBar.js';
 import { QuestRewardsView } from './QuestRewardsView.js';
-import { t } from '../../localization/LocalizationManager.js';
-
-/** @param {string} key @param {string} fallback @returns {string} */
-function translatedOr(key, fallback) {
-  const value = t(key);
-  return value === key ? fallback : value;
-}
+import { t, tOr } from '../../localization/LocalizationManager.js';
 
 /**
  * Display the same actionable objective text used by the story quest journal.
@@ -37,7 +31,7 @@ function objectivePresentation(status) {
   if (type === 'item') {
     const itemId = details.item || quest.objective.item || quest.objective.requiredItem || '';
     const itemKey = `item.${itemId}.name`;
-    const itemName = translatedOr(itemKey, itemId);
+    const itemName = tOr(itemKey, itemId);
     return {
       text: t(complete ? 'quest_item_obtained' : 'quest_item_obtain', { item: itemName }),
       hint: '',
@@ -48,7 +42,7 @@ function objectivePresentation(status) {
   if (type === 'boss') {
     const trainerId = details.trainer || quest.objective.trainer || '';
     const trainerKey = `trainer.${trainerId}.name`;
-    const trainerName = translatedOr(trainerKey, trainerId);
+    const trainerName = tOr(trainerKey, trainerId);
     return {
       text: t('trainer_battle_target', { trainer: trainerName }),
       hint: complete ? t('trainer_battle_done') : t('trainer_battle_hint'),

@@ -2,6 +2,8 @@
  * @file HatcheryRules.js
  * @brief Daycare and fossil incubation rules.
  */
+import { PokemonRules } from './PokemonRules.js';
+
 export const HatcheryRules = Object.freeze({
   DEFAULT_SLOT_COUNT: 1,
   MAX_SLOT_COUNT: 4,
@@ -15,7 +17,8 @@ export const HatcheryRules = Object.freeze({
   BREEDING_REGION: 'johto',
   BREEDING_MAIN_QUEST: 'main.111',
   BABY_LEVEL: 5,
-  LEGENDARY_DEX: Object.freeze([144, 145, 146, 150, 151, 243, 244, 245, 249, 250, 251, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386]),
+  /** Legendary species: single source is PokemonRules.LEGENDARY_DEX. */
+  LEGENDARY_DEX: PokemonRules.LEGENDARY_DEX,
   AUTO_HATCH_COST: 500,
   AUTO_FILL_COST: 1000,
   AUTO_HATCH_FEE: 1000,

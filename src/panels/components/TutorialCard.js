@@ -8,7 +8,7 @@ import { UIButton } from '../../ui/UIButton.js';
 import { UIProgressBar } from '../../ui/UIProgressBar.js';
 import { UIIcon } from '../../ui/UIIcon.js';
 import { getTutorialDeviceHint } from '../../ui/TutorialDeviceHint.js';
-import { t } from '../../localization/LocalizationManager.js';
+import { t, compose } from '../../localization/LocalizationManager.js';
 
 export class TutorialCard extends UIContainer {
   /** @param {(status: Object) => void} onAction @param {() => void} onDisable @param {() => void} onGuide */
@@ -71,7 +71,7 @@ export class TutorialCard extends UIContainer {
       : status.action === 'pokemon_sheet'
         ? getTutorialDeviceHint('sheet')
         : '';
-    this._how.setText([status.how, deviceHint].filter(Boolean).join(' '));
+    this._how.setText(compose(...[status.how, deviceHint].filter(Boolean).flatMap((part, index) => (index ? [' ', part] : [part]))));
     this._progressText.setText(status.progressText);
     this._progress.setValue(status.progress, status.target);
     this._action.setText(status.actionLabel);

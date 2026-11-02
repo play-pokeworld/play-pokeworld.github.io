@@ -69,8 +69,9 @@ export class BattleSession {
    * @param {() => import('../../data/pokemon/PokemonData.js').PokemonData|null} [setup.nextFoeFactory=null]
    * @param {string|((pokemon: import('../../data/pokemon/PokemonData.js').PokemonData) => string)} [setup.nextFoeIntroKey='battle_log.wild_appeared']
    * @param {(encounter: Object, session: BattleSession) => void} [setup.onFoeDefeated=null]
+   * @param {(combatant: Object, session: BattleSession) => void} [setup.onPlayerFainted=null]
    */
-  constructor({ team, foe, foeOptions = {}, random, weather = null, ownedQuantity = () => 0, hiddenTalentUnlocked = () => false, training = false, healBetweenFoes = false, reserves = [], nextFoeFactory = null, nextFoeIntroKey = 'battle_log.wild_appeared', onFoeDefeated = null }) {
+  constructor({ team, foe, foeOptions = {}, random, weather = null, ownedQuantity = () => 0, hiddenTalentUnlocked = () => false, training = false, healBetweenFoes = false, reserves = [], nextFoeFactory = null, nextFoeIntroKey = 'battle_log.wild_appeared', onFoeDefeated = null, onPlayerFainted = null }) {
     this.random = random;
     this.training = training;
     this.healBetweenFoes = healBetweenFoes;
@@ -81,6 +82,7 @@ export class BattleSession {
     this._nextFoeFactory = typeof nextFoeFactory === 'function' ? nextFoeFactory : null;
     this._nextFoeIntroKey = nextFoeIntroKey;
     this._onFoeDefeated = typeof onFoeDefeated === 'function' ? onFoeDefeated : null;
+    this._onPlayerFainted = typeof onPlayerFainted === 'function' ? onPlayerFainted : null;
     /** @type {BattleCombatant[]} */
     this.team = team.map((pokemon) => this._makePlayerCombatant(pokemon));
     this.foe = new BattleCombatant(foe, BattleSides.FOE, { npc: true, ...foeOptions });
@@ -434,6 +436,7 @@ export class BattleSession {
     }
     if (this.active.isFainted()) {
       this.playerKOs++;
+      if (this._onPlayerFainted) this._onPlayerFainted(this.active, this);
       this.log.add('battle_log.player_fainted', { name: this.active.name });
       const next = this._nextAliveIndex();
       if (next === -1) {

@@ -15,7 +15,7 @@ import { PuzzleTypes } from '../config/PuzzleTypes.js';
 import { LocationSystem } from '../systems/LocationSystem.js';
 import { LocationChangedEvent } from '../core/events/LocationChangedEvent.js';
 import { ModalIds } from '../config/ModalIds.js';
-import { t } from '../localization/LocalizationManager.js';
+import { t, joinLocalized } from '../localization/LocalizationManager.js';
 
 export class PuzzleSolveModal extends StaticModalPanel {
   constructor() {
@@ -126,7 +126,7 @@ export class PuzzleSolveModal extends StaticModalPanel {
   /** @private @param {Readonly<Object>} puzzle */
   _renderSequence(puzzle) {
     const labels = new Map(puzzle.options.map((option) => [option.key, t(option.labelKey)]));
-    const selection = this._selectedKeys.map((key) => labels.get(key) || key).join(' · ');
+    const selection = joinLocalized(' · ', this._selectedKeys.map((key) => labels.get(key) || key));
     this.addChild(new UIText({ className: 'pw-puzzle-instructions', text: t('puzzles.generic.sequence_hint') }));
     this.addChildren([
       new UIText({ tagName: 'div', className: 'pw-puzzle-selection-label', text: t('puzzles.generic.selected_sequence') }),

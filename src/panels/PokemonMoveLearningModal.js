@@ -28,7 +28,7 @@ import { BoxChangedEvent } from '../core/events/BoxChangedEvent.js';
 import { BattleStartedEvent } from '../core/events/BattleStartedEvent.js';
 import { BattleEndedEvent } from '../core/events/BattleEndedEvent.js';
 import { PokemonUsageChangedEvent } from '../core/events/PokemonUsageChangedEvent.js';
-import { LocalizationManager, t } from '../localization/LocalizationManager.js';
+import { LocalizationManager, t, lt } from '../localization/LocalizationManager.js';
 import { TextFormatter } from '../core/TextFormatter.js';
 
 export class PokemonMoveLearningModal extends UIModal {
@@ -160,7 +160,7 @@ export class PokemonMoveLearningModal extends UIModal {
       if (knownSet.has(id)) knownCount++;
       else if (availLevelSet.has(id) || availCtSet.has(id) || availTrainingSet.has(id)) availCount++;
     }
-    const countLabel = `${knownCount + availCount}/${totalCount} ${t('possessed_short')}`;
+    const countLabel = lt`${knownCount + availCount}/${totalCount} ${t('possessed_short')}`;
 
     // Header title and subtitle on UIPanel chrome
     this.setTitle(t('learnable_moves_panel_title'));
@@ -185,20 +185,20 @@ export class PokemonMoveLearningModal extends UIModal {
       const rowChildren = [
         new UIText({ tagName: 'span', className: `type-badge type-${move.type}`, text: typeLabel }),
         new UIText({ tagName: 'span', className: 'poke-detail-move-name', text: name }),
-        new UIText({ tagName: 'span', className: 'poke-detail-move-meta', text: `${power} ${t('power_abbrev')} · ${catLabel}` })
+        new UIText({ tagName: 'span', className: 'poke-detail-move-meta', text: lt`${power} ${t('power_abbrev')} · ${catLabel}` })
       ];
 
       if (isKnown) {
         rowChildren.push(new UIText({
           tagName: 'span',
           className: 'poke-detail-pill is-known',
-          text: `✓ ${t('move_pill_equipped')}`
+          text: lt`✓ ${t('move_pill_equipped')}`
         }));
       } else if (isAvailable) {
         rowChildren.push(new UIText({
           tagName: 'span',
           className: 'poke-detail-pill is-learnable',
-          text: `✓ ${t('move_pill_available')}`
+          text: lt`✓ ${t('move_pill_available')}`
         }));
       }
 
@@ -249,7 +249,7 @@ export class PokemonMoveLearningModal extends UIModal {
       children: [
         new UIText({
           tagName: 'span',
-          text: `${t('category_level_up')} (${levelUpMoveIds.length})`
+          text: lt`${t('category_level_up')} (${levelUpMoveIds.length})`
         })
       ]
     }));
@@ -271,7 +271,7 @@ export class PokemonMoveLearningModal extends UIModal {
       children: [
         new UIText({
           tagName: 'span',
-          text: `${t('category_ct_cs')} (${ctMoveIds.length})`
+          text: lt`${t('category_ct_cs')} (${ctMoveIds.length})`
         })
       ]
     }));
@@ -293,7 +293,7 @@ export class PokemonMoveLearningModal extends UIModal {
       children: [
         new UIText({
           tagName: 'span',
-          text: `${t('category_training')} (${trainingMoveIds.length})`
+          text: lt`${t('category_training')} (${trainingMoveIds.length})`
         })
       ]
     }));

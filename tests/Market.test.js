@@ -75,7 +75,7 @@ function add(species, level = 10) {
 }
 function button(panel, text) {
   return [...panel.getDomElement().querySelectorAll('button')].find(
-    (node) => node.textContent === text,
+    (node) => node.textContent === String(text),
   );
 }
 function card(panel, id) {

@@ -5,6 +5,7 @@
  */
 
 import { UIElement } from './UIElement.js';
+import { LocalizedTextBinder } from './LocalizedTextBinder.js';
 
 export class UIDropdown extends UIElement {
   /**
@@ -40,6 +41,7 @@ export class UIDropdown extends UIElement {
 
     this._dom.appendChild(this._selectEl);
 
+    /** @type {Array<{value: string, label: any, disabled: boolean}>} label keeps its LocalizedText token. */
     this._options = [];
     this._onChange = options.onChange || null;
 
@@ -67,17 +69,27 @@ export class UIDropdown extends UIElement {
    * @param {Array<{value: string, label: string, disabled?: boolean}>} opts
    */
   setOptions(opts) {
-    const next = (opts || []).map((entry) => ({ value: String(entry.value), label: String(entry.label), disabled: entry.disabled === true }));
-    if (JSON.stringify(this._options) === JSON.stringify(next)) return;
+    const next = (opts || []).map((entry) => ({
+      value: String(entry.value),
+      label: entry.label,
+      text: String(entry.label ?? ''),
+      disabled: entry.disabled === true
+    }));
+    const same = this._options.length === next.length
+      && this._options.every((current, index) => current.value === next[index].value
+        && current.text === next[index].text && current.disabled === next[index].disabled);
+    if (same) return;
     this._options = next;
     this._selectEl.replaceChildren();
-    this._options.forEach(opt => {
+    this._options.forEach((opt) => {
       const optionEl = document.createElement('option');
       optionEl.value = opt.value;
-      optionEl.textContent = opt.label;
+      optionEl.textContent = opt.text;
       if (opt.disabled) {
         optionEl.disabled = true;
       }
+      // An option label coming from t() follows the language change like any other text.
+      LocalizedTextBinder.bindText(optionEl, opt.label);
       this._selectEl.appendChild(optionEl);
     });
   }

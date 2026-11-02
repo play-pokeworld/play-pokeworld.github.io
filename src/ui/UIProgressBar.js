@@ -8,6 +8,8 @@
  */
 
 import { UIElement } from './UIElement.js';
+import { LocalizedTextBinder } from './LocalizedTextBinder.js';
+import { LocalizationManager, compose } from '../localization/LocalizationManager.js';
 
 /** Fill states toggled by setFillState() (e.g. HP colour thresholds: .hp-fill.high). */
 const FILL_STATES = Object.freeze(['high', 'medium', 'low', 'is-done']);
@@ -83,9 +85,13 @@ export class UIProgressBar extends UIElement {
       this._fill._setCssVariable('--bg', this._color);
     }
     if (this._text) {
-      const prefix = this._label ? `${this._label}: ` : '';
-      const text = `${prefix}${Math.round(this._value)} / ${Math.round(this._max)}`;
-      if (this._text.getDomElement().textContent !== text) this._text.getDomElement().textContent = text;
+      const values = `${Math.round(this._value)} / ${Math.round(this._max)}`;
+      // A translated label keeps its key: the text stays correct after a language change.
+      const token = this._label ? compose(this._label, `: ${values}`) : null;
+      const text = token ? LocalizationManager.getInstance().resolve(token) : values;
+      const node = this._text.getDomElement();
+      if (node.textContent !== text) node.textContent = text;
+      LocalizedTextBinder.bindText(node, token);
     }
   }
 

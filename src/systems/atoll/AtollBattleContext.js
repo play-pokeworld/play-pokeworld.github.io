@@ -18,7 +18,7 @@ import {
 } from '../../data/atoll/AtollDB.js';
 import { AtollBattleFinishedEvent } from '../../core/events/AtollBattleFinishedEvent.js';
 import { AtollStateChangedEvent } from '../../core/events/AtollStateChangedEvent.js';
-import { t } from '../../localization/LocalizationManager.js';
+import { t, compose } from '../../localization/LocalizationManager.js';
 
 export class AtollBattleContext {
   /**
@@ -56,7 +56,7 @@ export class AtollBattleContext {
     if (!save) return;
 
     let tokensGained = 0;
-    let reorgNotice = '';
+    let reorgNotice = null;
 
     if (victory) {
       const mode = this.mode;
@@ -71,7 +71,7 @@ export class AtollBattleContext {
           runBefore.streak += 1;
           const currentRentalTeam = session?.team?.map((p) => (p && typeof p.serialize === 'function' ? p.serialize() : p)) || runBefore.team;
           runBefore.team = reorganizeAtollFactoryTeam(currentRentalTeam, runBefore.seedWindow, runBefore.streak);
-          reorgNotice = ' ' + t('atoll_factory_reorg_notice');
+          reorgNotice = t('atoll_factory_reorg_notice');
         }
       }
 
@@ -102,7 +102,9 @@ export class AtollBattleContext {
       save.achievements.incrementStat('atoll_room_wins', 1);
 
       NotificationSystem.getInstance().notify(
-        t('atoll_win_reward', { tokens: tokensGained, streak: save.atoll.streak }) + reorgNotice,
+        reorgNotice
+          ? compose(t('atoll_win_reward', { tokens: tokensGained, streak: save.atoll.streak }), ' ', reorgNotice)
+          : t('atoll_win_reward', { tokens: tokensGained, streak: save.atoll.streak }),
         { tone: NotificationTones.SUCCESS }
       );
     } else {

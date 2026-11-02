@@ -36,5 +36,6 @@ export const L_en_shops = {
   "mossdeep": { "name": "Mossdeep City Mart" },
   "sootopolis": { "name": "Sootopolis City Mart" },
   "pacifidlog": { "name": "Pacifidlog Town Shop" },
+  "weather_lab": { "name": "Weather Lab" },
   "evergrande": { "name": "Ever Grande City Shop" }
 };

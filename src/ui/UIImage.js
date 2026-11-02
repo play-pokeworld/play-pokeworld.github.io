@@ -55,11 +55,16 @@ export class UIImage extends UIElement {
     this._dom.setAttribute('src', value);
   }
 
-  /** @param {string} alt */
+  /**
+   * Alternative text of the image. A value coming from t() stays bound to its translation.
+   * @param {string|import('../localization/LocalizedText.js').LocalizedText} alt
+   */
   setAlt(alt) {
-    const value = alt || '';
-    if (this._dom.getAttribute('alt') === value) return;
-    this._dom.setAttribute('alt', value);
+    if (!alt) {
+      this.removeAttribute('alt');
+      return;
+    }
+    this.setAttribute('alt', alt);
   }
 
   /** @private */

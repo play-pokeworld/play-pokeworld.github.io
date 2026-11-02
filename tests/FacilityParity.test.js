@@ -300,6 +300,8 @@ describe('Facility schema and exact battle replay', (test) => {
     assert.equal(training.startSession(pokemon.uid, 'level').result, 'ready');
     const old = training._session;
     const level = pokemon.level, count = save.statistics.trainingSessions;
+    // One reward per REWARD_INTERVAL_WAVES waves: the settlement needs a complete interval.
+    old.defeatedFoes = Array.from({ length: TrainingRules.REWARD_INTERVAL_WAVES }, () => old.foe.pokemon);
     old.outcome = BattleOutcomes.VICTORY;
     training.update(0.01);
     assert.ok(pokemon.level >= level + 2 && pokemon.level <= level + 5);
@@ -548,6 +550,7 @@ describe('Hatchery, staff and mining parity rules', (test) => {
     session._reserves = [];
     session.foe.takeDamage(session.foe.maxHp);
     session._pendingFoeAdvance = true;
+    session.defeatedFoes = Array.from({ length: TrainingRules.REWARD_INTERVAL_WAVES }, () => session.foe.pokemon);
     save.training.slots[0].elapsed = TrainingRules.MAX_SIMULATION_TICKS * TrainingRules.TICK_SECONDS - 0.05;
     assert.equal(writeCount(() => training.update(0.1)), 1);
     assert.ok(save.training.slots[0].result.success);
@@ -634,11 +637,13 @@ describe('Hatchery, staff and mining parity rules', (test) => {
     assert.equal(restored.staff.active.hatchery, pcStaff.id);
   });
 
-  test('effective staff formulas preserve six-to-three foes, double IV cap, fee reduction and miner energy cost', () => {
+  test('effective staff formulas shorten the waves to 24, double the IV cap, reduce fees and miner energy cost', () => {
     const save = fixture('Effective perks');
     for (const id of ['trainer_saffron', 'manager_goldenrod', 'miner_pewter']) save.staff.owned[id] = { level: 100, xp: 0 };
     save.staff.active.training = 'trainer_saffron'; save.staff.active.hatchery = 'manager_goldenrod'; save.staff.active.mine = 'miner_pewter';
-    assert.equal(training._createOpponents(save.team[0], new SeededRandom(1), 'move').length, 3);
+    // A max-level training staff member removes MAX_STAFF_OPPONENT_REDUCTION waves of the session.
+    assert.equal(training._createOpponents(save.team[0], new SeededRandom(1), 'move').length,
+      TrainingRules.OPPONENT_COUNT - TrainingRules.MAX_STAFF_OPPONENT_REDUCTION);
     assert.equal(staff.getBonus('hatchery', 'hatchery_double_iv_level'), 0.2);
     assert.equal(staff.getFee('hatchery', 1000), 800);
     assert.equal(mine.getSnapshot().tools.find((entry) => entry.id === 'chisel').energyCost, 3);

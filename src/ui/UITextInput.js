@@ -71,7 +71,7 @@ export class UITextInput extends UIElement {
 
   /** @param {string} placeholder */
   setPlaceholder(placeholder) {
-    this._dom.setAttribute('placeholder', placeholder || '');
+    this.setAttribute('placeholder', placeholder || '');
   }
 
   /** @param {number} maxLength */

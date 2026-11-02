@@ -369,6 +369,8 @@ export const panels = {
   training_trainee_label: "{name} · Nv. {level}",
   training_opponent_label: "{name} · Nv. {level}",
   training_result_success: "Session réussie pour {name}. Récompense : {reward}.",
+  training_reward_list: "{first} (+{count} autres).",
+  training_result_failed_partial: "Session interrompue pour {name}. Récompenses obtenues : {reward}.",
   training_result_failed: "Session échouée pour {name}.",
   training_session_cancelled: "Session d’entraînement abandonnée.",
   no_save_loaded: "Aucune sauvegarde active.",

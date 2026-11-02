@@ -14,7 +14,7 @@ import { SecretBaseVisitChangedEvent } from '../core/events/SecretBaseVisitChang
 import { BattleEndedEvent } from '../core/events/BattleEndedEvent.js';
 import { SaveSystem } from '../systems/SaveSystem.js';
 import { ModalIds } from '../config/ModalIds.js';
-import { t } from '../localization/LocalizationManager.js';
+import { t, LocalizationManager } from '../localization/LocalizationManager.js';
 import { NotificationSystem } from '../systems/NotificationSystem.js';
 import { NotificationChannels, NotificationTones } from '../config/NotificationConfig.js';
 
@@ -161,8 +161,8 @@ export class SecretBaseVisitModal extends UIModal {
 
   /** @private @param {string} key @param {string} [tone] @param {Object} [params] */
   _toast(key, tone = NotificationTones.INFO, params = {}) {
+    if (!LocalizationManager.getInstance().has(key)) return;
     const message = t(key, params);
-    if (!message || message === key) return;
     NotificationSystem.getInstance().notifyTemporary(message, { channel: NotificationChannels.GAMEPLAY, tone });
   }
 

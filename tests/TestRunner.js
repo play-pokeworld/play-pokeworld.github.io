@@ -23,6 +23,11 @@ export const assert = {
     if (!value) throw new Error(message);
   },
   equal(actual, expected, message = '') {
+    // t() returns a LocalizedText (a String object that keeps its key): compare it as the string it is.
+    if (actual instanceof String || expected instanceof String) {
+      if (String(actual) !== String(expected)) throw new Error(`${message} expected ${JSON.stringify(String(expected))}, got ${JSON.stringify(String(actual))}`.trim());
+      return;
+    }
     if (actual !== expected) throw new Error(`${message} expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`.trim());
   },
   notEqual(actual, expected, message = '') {

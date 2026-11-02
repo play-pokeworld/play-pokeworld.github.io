@@ -12,6 +12,7 @@ import { BattleField } from '../src/systems/battle/BattleField.js';
 import { BattleLog } from '../src/systems/battle/BattleLog.js';
 import { PokemonFactory } from '../src/data/pokemon/PokemonFactory.js';
 import { FastForwardSystem } from '../src/systems/FastForwardSystem.js';
+import { BattleSystem } from '../src/systems/BattleSystem.js';
 import { SaveSystem } from '../src/systems/SaveSystem.js';
 import { HatcherySystem } from '../src/systems/HatcherySystem.js';
 import { Random } from '../src/core/Random.js';
@@ -45,12 +46,12 @@ describe('Release 1.15.5 Specifications', (test) => {
     assert.equal(combatant.statMods.def, 1.0);
   });
 
-  test('FastForwardSystem deterministically simulates offline progress and advances daycare', () => {
+  test('FastForwardSystem never invents a battle when nothing was running', () => {
     const save = SaveSystem.getInstance().createNewSave('FastForwardTest', 'charmander');
     save.team[0].setLevel(50);
     const initialMoney = save.currencies.get(BonusTypes.MONEY);
 
-    // Deposit reserve in daycare
+    // A reserve sits in the daycare: it only progresses from real knock-outs, never from an absence.
     const reserve = PokemonFactory.create('rattata', 10);
     save.collection.add(reserve);
     save.access.unlockFeature('hatchery');
@@ -62,24 +63,16 @@ describe('Release 1.15.5 Specifications', (test) => {
     try {
       hatchery.depositPokemon(reserve.uid, 0);
 
-      const ff = FastForwardSystem.getInstance();
-      // Simulate 120 seconds of offline time on Route 1
-      const summary = ff.simulate({
-        save,
-        locationId: 'route1',
-        elapsedSeconds: 120,
-        random: Random.sequence([0.5]),
-        deferSave: true
-      });
+      // Nothing was launched: no battle, no training, no pilot, no relaunch countdown.
+      if (BattleSystem.getInstance().isActive()) BattleSystem.getInstance().endBattle(false);
+      assert.equal(BattleSystem.getInstance().isActive(), false);
+      const summary = FastForwardSystem.getInstance().simulateOffline(120000);
 
-      assert.ok(summary.battles > 0, 'Should simulate wild battles');
-      assert.ok(summary.wins > 0, 'Should record wild wins');
-      assert.ok(summary.moneyGained > 0, 'Should accumulate money');
-      assert.ok(save.currencies.get(BonusTypes.MONEY) > initialMoney, 'Player balance should increase');
-
-      // Daycare reserve should have advanced KOs / levels
+      assert.equal(summary, null, 'No activity means no replay at all');
+      assert.equal(save.currencies.get(BonusTypes.MONEY), initialMoney, 'Balance untouched');
       const slot = save.hatchery.slots[0];
-      assert.ok(slot.knockouts > 0 || reserve.level > 10, 'Daycare Pokémon should accumulate progress from offline battles');
+      assert.equal(slot.knockouts || 0, 0, 'Daycare does not progress without real knock-outs');
+      assert.equal(reserve.level, 10, 'The reserve does not level up by itself');
     } finally {
       hatchery.onDestroy();
     }

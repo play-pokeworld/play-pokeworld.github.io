@@ -19,6 +19,7 @@ import { LocationSystem } from './LocationSystem.js';
 import { FeatureAccessSystem } from './FeatureAccessSystem.js';
 import { Random } from '../core/Random.js';
 import { MineRules } from '../config/MineRules.js';
+import { TimeSource } from '../core/TimeSource.js';
 import { BonusSystem } from './BonusSystem.js';
 import { BonusTypes } from '../config/BonusRules.js';
 import { CONTENT_FEATURES } from '../config/ContentAccessRules.js';
@@ -107,11 +108,43 @@ export class MineSystem extends BaseSystem {
     return this.isUnlocked();
   }
 
+  /** Credits the energy regenerated since the last settle, through the mine's own rule. */
+  settleEnergy() {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    if (!save?.mine) return;
+    this._regenerateEnergy(save.mine);
+    this._dispatchChanged('energy');
+    SaveSystem.getInstance().saveCurrent();
+  }
+
+  /** @returns {boolean} True while the paid automation is digging on its own. */
+  isAutoRunning() {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    const mine = save?.mine;
+    return !!mine && this.isUnlocked() && mine.autoPurchased === true && mine.autoEnabled === true && mine.hasGrid();
+  }
+
+  /**
+   * Energy the mine will have recovered after `seconds` of absence, using its own regeneration rule and
+   * cap. Read-only: nothing is credited here.
+   * @param {number} seconds
+   * @returns {number}
+   */
+  projectEnergyGain(seconds) {
+    const mine = SaveSystem.getInstance().getCurrentSave()?.mine;
+    const span = Math.max(0, Number(seconds) || 0);
+    if (!mine || span <= 0) return 0;
+    const maxEnergy = this._effectiveMaxEnergy(mine);
+    const current = Math.min(maxEnergy, mine.energy + Math.max(0, (TimeSource.now() - mine.lastEnergyAt) / 1000) * MineRules.ENERGY_REGEN_PER_SECOND);
+    const projected = Math.min(maxEnergy, current + span * MineRules.ENERGY_REGEN_PER_SECOND);
+    return Math.max(0, Math.floor(projected - current));
+  }
+
   /** Lightweight energy-only projection for live gauges. @returns {Object|null} */
   getEnergySnapshot() {
     const mine = SaveSystem.getInstance().getCurrentSave()?.mine;
     if (!mine) return null;
-    const elapsed = Math.max(0, (Date.now() - mine.lastEnergyAt) / 1000);
+    const elapsed = Math.max(0, (TimeSource.now() - mine.lastEnergyAt) / 1000);
     const maxEnergy = this._effectiveMaxEnergy(mine);
     return { energy: Math.min(maxEnergy, mine.energy + elapsed * MineRules.ENERGY_REGEN_PER_SECOND), maxEnergy };
   }
@@ -123,7 +156,7 @@ export class MineSystem extends BaseSystem {
   getSnapshot() {
     const mine = SaveSystem.getInstance().getCurrentSave()?.mine;
     if (!mine) return null;
-    const elapsed = Math.max(0, (Date.now() - mine.lastEnergyAt) / 1000);
+    const elapsed = Math.max(0, (TimeSource.now() - mine.lastEnergyAt) / 1000);
     const maxEnergy = this._effectiveMaxEnergy(mine);
     return {
       energy: Math.min(maxEnergy, mine.energy + elapsed * MineRules.ENERGY_REGEN_PER_SECOND),
@@ -147,7 +180,7 @@ export class MineSystem extends BaseSystem {
   }
 
   /** Read-only absolute-time clock: viewing/reloading never resets a manual survey. @param {number} [now] */
-  getManualSurveySnapshot(now=Date.now()) {
+  getManualSurveySnapshot(now=TimeSource.now()) {
     const mine=SaveSystem.getInstance().getCurrentSave()?.mine;
     if(!mine)return null;
     const remainingMs=Math.max(0,mine.manualSurveyReadyAt-now);
@@ -184,7 +217,7 @@ export class MineSystem extends BaseSystem {
     if (!discardCurrent&&save.mine.hasGrid() && save.mine.items.length > 0 && !save.mine.items.every((item) => item.collected)) {
       return this._failure(MineResults.LAYER_ACTIVE);
     }
-    const now=Date.now(),survey=this.getManualSurveySnapshot(now);
+    const now=TimeSource.now(),survey=this.getManualSurveySnapshot(now);
     if(!survey.ready)return {...this._failure(MineResults.SURVEY_COOLDOWN),remainingSeconds:survey.remainingSeconds};
     const lootCount = this._generateLayer(save.mine);
     save.mine.manualSurveyReadyAt=now+MineRules.MANUAL_SURVEY_COOLDOWN_MS;
@@ -330,7 +363,7 @@ export class MineSystem extends BaseSystem {
     }
     mine.grid = grid;
     mine.items = placed;
-    mine.lastEnergyAt = Date.now();
+    mine.lastEnergyAt = TimeSource.now();
     return placed.length;
   }
 
@@ -370,7 +403,7 @@ export class MineSystem extends BaseSystem {
 
   /** @private @param {import('../data/save/MineData.js').MineData} mine */
   _regenerateEnergy(mine) {
-    const now = Date.now();
+    const now = TimeSource.now();
     const elapsed = Math.max(0, (now - mine.lastEnergyAt) / 1000);
     if (elapsed > 0) {
       mine.energy = Math.min(this._effectiveMaxEnergy(mine), mine.energy + elapsed * MineRules.ENERGY_REGEN_PER_SECOND);

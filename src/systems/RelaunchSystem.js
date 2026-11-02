@@ -9,6 +9,7 @@ import { LocationDB } from '../data/world/LocationDB.js';
 import { LocationActivityRules } from '../data/world/LocationActivityRules.js';
 import { RoamingSystem } from './RoamingSystem.js';
 import { RelaunchRules } from '../config/RelaunchRules.js';
+import { TimeSource } from '../core/TimeSource.js';
 import { ModalIds } from '../config/ModalIds.js';
 import { EventBus } from '../core/EventBus.js';
 import { BattleRunFinishedEvent } from '../core/events/BattleRunFinishedEvent.js';
@@ -122,7 +123,7 @@ export class RelaunchSystem extends BaseSystem {
       visible,
       currency: RelaunchRules.CURRENCY,
       canAfford: save.currencies.get(RelaunchRules.CURRENCY) >= rule.cost,
-      remainingMs: pending ? Math.max(0, pending.readyAt - Date.now()) : 0,
+      remainingMs: pending ? Math.max(0, pending.readyAt - TimeSource.now()) : 0,
       pending: !!pending,
       cancelled: this._cancelled === kind,
       blocked: this._blocked?.kind === kind ? this._blocked.reason : null,
@@ -158,13 +159,22 @@ export class RelaunchSystem extends BaseSystem {
       kind,
       locationId,
       saveId: save.id,
-      readyAt: Date.now() + RelaunchRules.DELAY_MS,
+      readyAt: TimeSource.now() + RelaunchRules.DELAY_MS,
     };
     this._cancelled = null;
     this._blocked = null;
     this._lastSecond = -1;
     this._emit(kind);
     return true;
+  }
+  /** @returns {boolean} True while a relaunch countdown is running. */
+  hasPending() {
+    return !!this._pending;
+  }
+  /** @returns {number} Seconds left on the running countdown (0 when it is due or absent). */
+  pendingWaitSeconds() {
+    if (!this._pending) return 0;
+    return Math.max(0, (this._pending.readyAt - TimeSource.now()) / 1000);
   }
   /** Stops the current countdown, not the owned preference. @param {boolean} manual */
   cancel(manual = true) {
@@ -192,7 +202,7 @@ export class RelaunchSystem extends BaseSystem {
       this.reset();
       return;
     }
-    const second = Math.ceil((pending.readyAt - Date.now()) / 1000);
+    const second = Math.ceil((pending.readyAt - TimeSource.now()) / 1000);
     if (second !== this._lastSecond) {
       this._lastSecond = second;
       this._emit(pending.kind);

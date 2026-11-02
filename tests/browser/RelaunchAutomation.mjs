@@ -47,7 +47,8 @@ async function check(name, action) {
 async function label(key) {
   return page.evaluate(
     async (key) =>
-      (await import('/src/localization/LocalizationManager.js')).t(key),
+      // t() returns a localized token: it must be converted to a primitive to cross the page boundary.
+      String((await import('/src/localization/LocalizationManager.js')).t(key)),
     key,
   );
 }

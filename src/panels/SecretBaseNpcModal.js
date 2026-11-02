@@ -19,7 +19,7 @@ import { SaveSystem } from '../systems/SaveSystem.js';
 import { PokemonDB } from '../data/pokemon/PokemonDB.js';
 import { AssetPaths } from '../config/AssetPaths.js';
 import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
-import { t } from '../localization/LocalizationManager.js';
+import { t, lt } from '../localization/LocalizationManager.js';
 import { BaseNpcMemberCard } from './components/BaseNpcMemberCard.js';
 
 function clone(value) {
@@ -184,7 +184,7 @@ export class SecretBaseNpcModal extends UIModal {
       children: [
         new UIText({
           className: 'pw-text-sm pw-light1',
-          text: `${t('npced.sprite')} · ${SecretBaseRules.NPC_SPRITES.length} dispo`
+          text: lt`${t('npced.sprite')} · ${t('base_npced_sprite_available', { count: SecretBaseRules.NPC_SPRITES.length })}`
         }),
         new UIButton({
           className: 'hbtn',
@@ -436,7 +436,7 @@ export class SecretBaseNpcModal extends UIModal {
     if (!this._looksGrid) return;
     const sprites = this._getFilteredSprites();
     if (this._looksCountText) {
-      this._looksCountText.setText(`${t('npced.sprite_picker_title')} (${sprites.length}/${SecretBaseRules.NPC_SPRITES.length})`);
+      this._looksCountText.setText(lt`${t('npced.sprite_picker_title')} (${sprites.length}/${SecretBaseRules.NPC_SPRITES.length})`);
     }
     this._looksGrid.clearChildren();
     if (!sprites.length) {
@@ -472,7 +472,7 @@ export class SecretBaseNpcModal extends UIModal {
 
     this._looksCountText = new UIText({
       tagName: 'h3',
-      text: `${t('npced.sprite_picker_title')} (${initialSprites.length}/${SecretBaseRules.NPC_SPRITES.length})`
+      text: lt`${t('npced.sprite_picker_title')} (${initialSprites.length}/${SecretBaseRules.NPC_SPRITES.length})`
     });
 
     const header = new UIContainer({
@@ -488,7 +488,7 @@ export class SecretBaseNpcModal extends UIModal {
     const filterInput = new UITextInput({
       className: 'dict-search pw-base-looks-filter',
       value: this._spriteSearch,
-      placeholder: 'trainer-42...',
+      placeholder: t('base_npced_name_example'),
       onInput: (val) => {
         this._spriteSearch = val;
         this._updateLooksGrid();
@@ -603,7 +603,7 @@ export class SecretBaseNpcModal extends UIModal {
       children: [
         new UIText({
           tagName: 'h3',
-          text: `${t('npced.pick_title')} — ${this._pickSlot + 1}/6`
+          text: lt`${t('npced.pick_title')} — ${this._pickSlot + 1}/6`
         }),
         new UIText({ className: 'settings-hint', text: t('npced.level_auto') })
       ]

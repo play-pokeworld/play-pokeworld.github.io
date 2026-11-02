@@ -36,5 +36,6 @@ export const L_fr_shops = {
   "mossdeep": { "name": "Boutique d'Algatia" },
   "sootopolis": { "name": "Boutique d'Atalanopolis" },
   "pacifidlog": { "name": "Boutique de Pacifiville" },
+  "weather_lab": { "name": "Labo Météo" },
   "evergrande": { "name": "Boutique d'Éternara" }
 };

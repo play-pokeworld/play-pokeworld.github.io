@@ -125,7 +125,7 @@ describe('Dungeon location action parity', (test) => {
     const actions = new LocationActions(location, LocationDB.getInstance().getEncounters(location.id).length);
     try {
       const row = [...actions.getDomElement().querySelectorAll('.pw-loc-action-row')]
-        .find((candidate) => candidate.textContent === t('dungeon_other_run_action'));
+        .find((candidate) => candidate.textContent === String(t('dungeon_other_run_action')));
       assert.ok(row, 'existing elsewhere warning remains informational');
       assert.equal(row.classList.contains('pw-loc-dungeon-btn'), false, 'informational state is not skinned as a button');
     } finally {

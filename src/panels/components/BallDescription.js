@@ -7,7 +7,8 @@
 
 import { ItemDB } from '../../data/items/ItemDB.js';
 import { BallRules } from '../../config/BallRules.js';
-import { LocalizationManager, t } from '../../localization/LocalizationManager.js';
+import { compose, t } from '../../localization/LocalizationManager.js';
+import { ItemDescription } from '../../data/items/ItemDescription.js';
 
 export class BallDescription {
   /**
@@ -19,8 +20,9 @@ export class BallDescription {
     const ball = ItemDB.getInstance().getById(ballId)?.ball;
     if (!ball) return '';
     const parts = [t('ball_catch_rate', { rate: ball.rate })];
-    const flavourKey = `item.${ballId}.desc`;
-    if (LocalizationManager.getInstance().has(flavourKey)) parts.push(t(flavourKey));
-    return parts.filter(Boolean).join(t('ball_desc_separator'));
+    const flavour = ItemDescription.of(ballId);
+    if (flavour) parts.push(flavour);
+    // compose() keeps the key of each part: the description follows a language change.
+    return compose(parts[0], t('ball_desc_separator'), parts[1] || '');
   }
 }

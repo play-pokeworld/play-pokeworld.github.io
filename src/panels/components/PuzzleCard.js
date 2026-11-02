@@ -7,7 +7,7 @@ import { UIIcon } from '../../ui/UIIcon.js';
 import { UIText } from '../../ui/UIText.js';
 import { UIButton } from '../../ui/UIButton.js';
 import { PuzzleDB } from '../../data/quests/PuzzleDB.js';
-import { t } from '../../localization/LocalizationManager.js';
+import { t, joinLocalized } from '../../localization/LocalizationManager.js';
 
 const STATUS_KEYS = Object.freeze({
   locked: 'puzzles.generic.status_locked',
@@ -38,11 +38,10 @@ export class PuzzleCard extends UIContainer {
     ]);
 
     if (state === 'locked') {
-      const requiredNames = puzzle.requires
+      const requiredNames = joinLocalized(', ', puzzle.requires
         .map((id) => PuzzleDB.getInstance().getById(id))
         .filter(Boolean)
-        .map((required) => t(required.titleKey))
-        .join(', ');
+        .map((required) => t(required.titleKey)));
       this.addChild(new UIText({ className: 'pw-puzzle-card-lock', text: t('puzzles.generic.lock_line') }));
       if (requiredNames) {
         this.addChild(new UIText({ className: 'pw-puzzle-card-requires', text: t('puzzles.generic.requires', { puzzles: requiredNames }) }));

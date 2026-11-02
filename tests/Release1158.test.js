@@ -84,11 +84,20 @@ describe('Release 1.15.8 - EV Cap, AFK Fatigue Recovery, Route Drops, and Pokéd
     try {
       const summaryPayload = {
         durationMs: 3600000,
-        battlesSimulated: 45,
-        currencyEarned: 3400,
-        daycareKoAdvanced: 2,
-        itemsDropped: [{ itemId: 'oran_berry', quantity: 3 }],
-        fatigueWearApplied: 10
+        simulatedMs: 3600000,
+        activities: ['battle'],
+        battles: 45,
+        wins: 45,
+        fainted: 2,
+        captures: 2,
+        captureList: [{ species: 'pidgey', shiny: false }, { species: 'rattata', shiny: true }],
+        money: 3400,
+        energy: 30,
+        training: 0,
+        mineDigs: 0,
+        daycareLevels: 2,
+        items: [{ itemId: 'oran_berry', quantity: 3 }],
+        lost: false
       };
 
       // Must not throw setFooter is not a function
@@ -96,8 +105,10 @@ describe('Release 1.15.8 - EV Cap, AFK Fatigue Recovery, Route Drops, and Pokéd
       assert.ok(afkModal.isOpen(), 'AfkSummaryModal opens cleanly');
 
       const dom = afkModal.getDomElement();
-      assert.ok(dom.textContent.includes('45'), 'Modal renders battles simulated');
-      assert.ok(dom.textContent.includes('3') && dom.textContent.includes('400'), 'Modal renders money gained');
+      assert.ok(dom.textContent.includes('45'), 'the recap renders the wild Pokémon defeated');
+      assert.ok(dom.textContent.includes('400'), 'the recap renders the money gained');
+      assert.ok(dom.textContent.includes('Pokémon capturés'), 'the recap lists the captures section');
+      assert.ok(dom.textContent.includes('Objets trouvés'), 'the recap lists the items section');
     } finally {
       if (afkModal.isOpen()) afkModal.close();
       afkModal.destroy();
@@ -105,22 +116,19 @@ describe('Release 1.15.8 - EV Cap, AFK Fatigue Recovery, Route Drops, and Pokéd
     }
   });
 
-  test('FastForwardSystem heals active team upon returning from offline catch-up', () => {
+  test('FastForwardSystem grants no free heal when the player comes back', () => {
     const saves = SaveSystem.getInstance();
     const previous = saves.getCurrentSave();
     const save = saves.createNewSave('OfflineTestTrainer', 'charmander');
     saves.setCurrentSave(save);
 
-    // Damage the starter
     const starter = save.team[0];
     starter.hp = 1;
 
-    // Simulate 30 minutes offline
-    const ff = FastForwardSystem.getInstance();
-    const summary = ff.simulateOffline(save, 1800);
-
-    assert.ok(summary, 'Offline catch-up produces a summary');
-    assert.equal(starter.hp, starter.getMaxHp(), 'Team is fully healed upon returning from offline catch-up');
+    // 30 minutes away with nothing launched: the injured starter stays injured.
+    const summary = FastForwardSystem.getInstance().simulateOffline(1800000);
+    assert.equal(summary, null, 'No activity means no report');
+    assert.equal(starter.hp, 1, 'No free full heal on return');
 
     saves.setCurrentSave(previous);
   });

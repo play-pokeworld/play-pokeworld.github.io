@@ -12,7 +12,7 @@ import { PokemonRules } from '../../config/PokemonRules.js';
 import { EventBus } from '../../core/EventBus.js';
 import { ModalOpenRequestedEvent } from '../../core/events/ModalOpenRequestedEvent.js';
 import { ModalIds } from '../../config/ModalIds.js';
-import { t } from '../../localization/LocalizationManager.js';
+import { t, lt } from '../../localization/LocalizationManager.js';
 
 export class HatcherySlotCard extends UIContainer {
   /** @param {number} index */
@@ -196,7 +196,7 @@ export class HatcherySlotCard extends UIContainer {
     }
     this._pokemonName.setText(
       pokemon
-        ? `${pokemon.getDisplayName()} ${t('facility_slot_number', { slot: entry.index + 1 })}`
+        ? lt`${pokemon.getDisplayName()} ${t('facility_slot_number', { slot: entry.index + 1 })}`
         : slot?.kind === 'fossil'
           ? t(`item.${slot.itemId}.name`)
           : '',

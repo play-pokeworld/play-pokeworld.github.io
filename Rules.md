@@ -13,6 +13,9 @@ A change that breaks a test is not finished.
    - Improvements are welcome when they are deliberate. Examples: choosing a nickname, the edge fade on the save card grid, a random theme on new save cards.
 2. Long-term maintainability comes before short-term speed.
 3. Every delivered zip carries a **version number** (`GameConfig.VERSION` and `package.json` stay in sync).
+   - **Corrective releases are patches, not major updates**: they increment the patch digit of the current
+     content release (`1.16.0` → `1.16.1`, `1.16.2`, …). A jump of the minor digit is reserved for a
+     content release. Renaming a delivered version also renames its `docs/PHASE_v<version>.md`.
 
 ## 2. Language
 
@@ -44,6 +47,51 @@ A change that breaks a test is not finished.
   | `ball_<id>` | Poké Ball |
 
 - Game data saved to disk uses **ids or slugs**, never translated names. For example, a Pokémon is stored as `species: 'charmander'`.
+  - A translation is **never** written into the save or into any game data: no `player.nickname = t('rental')`,
+    no `label = t('x')` on a persisted object. Store a flag/reference and translate where it is displayed.
+  - `LocalizedText` is a `String`: `JSON.stringify()` silently flattens it into frozen text. Anything that can
+    reach `SaveManager` stores primitives only.
+
+### 2.1 Live localization (v1.16.1)
+
+A displayed text must be able to change language **without rebuilding the window**. To get that, the text
+is never resolved twice into a string: a token carrying its key is passed down to the widget, and the widget
+re-resolves it when `LanguageChangedEvent` fires.
+
+| Need | API |
+|---|---|
+| plain text | `t('key', params)` — returns a `LocalizedText` |
+| text with a fallback | `tOr('key', fallback, params)` |
+| several parts | `compose(part1, part2, …)` |
+| interpolation | `` lt`${a} — ${b}` `` (tagged template) |
+| a list | `join(separator, items)` / `joinLocalized(separator, items)` |
+| optional text | `has('key') ? t('key') : fallback` |
+
+Forbidden, because each one freezes the text in the language active at that moment:
+
+- `` `${t('key')} …` `` — a template literal that is **not** tagged with `lt`;
+- `t('key') + ' ' + other` and `t('key').trim()/replace()/toUpperCase()` (returns a primitive);
+- `array.map(t).join(', ')` — use `joinLocalized(', ', array)`; `Array.join` on a translated list writes the
+  separators in the language of the call;
+- `String(t('key'))`, and comparing texts with `===` / `includes()` (compare ids or `String(t(...))`);
+- `if (currentLang === 'fr')` in a component or a data builder — a text never branches on the language;
+- caching `t('key')` in a field **and** re-rendering layout from it: subscribe to `LanguageChangedEvent`
+  (or let the binder refresh the widget) instead.
+
+Rules for the widgets (`src/ui/`): a widget that accepts a text accepts a `LocalizedText`, keeps the token,
+and re-resolves it on `LanguageChangedEvent` through `LocalizedTextBinder`. Writing a text attribute directly
+(`node.textContent = …`, `setAttribute` on the DOM node) bypasses the binder: always go through the widget API
+(`UIText.setText`, `UIElement.setAttribute`, `UIImage.setAlt`…).
+
+Rules for the data: game data stores **ids**. A description that does not exist yet is derived at display
+time from the data itself (`ItemDescription`, `ItemDisplayName`), never by writing a sentence in a table-less
+place, and never with a hardcoded rental/quality/label prefix.
+
+Static guards: `tests/LocalizationRules.test.js` (no `+`, no string method, no untagged template, no identity
+comparison, no hardcoded widget text, every language file registered, API shape) and
+`tests/LocalizationRuntime.test.js` (a real window already open follows the switch).
+`node tools/i18n/audit-i18n.mjs` lists the remaining candidates, `node tools/i18n/audit-keys.mjs` the keys
+used by the code that no table defines.
 
 ## 3. Files and classes
 
@@ -121,6 +169,15 @@ export class XxxPanel extends DraggablePanel {
   only a mobile viewport. Grid tracks may not impose a minimum wider than their container. Use
   shrinkable children, wrapping text and container-aware reflow; never hide or clip overflowing
   content to make a panel appear responsive. Keep all actions reachable through the normal page flow.
+  - A panel body is a single-column grid: `grid-template-columns: minmax(0, 1fr)`. Without the `0`
+    minimum, one child that cannot shrink widens the track and pushes **every** sibling out of the window.
+  - A fixed size in a row (`min-width: 130px`, `flex: 0 0 26px`, `white-space: nowrap`) must come with a
+    way to reflow: `flex-wrap: wrap` on the row plus `min-width: 0` / `overflow-wrap: anywhere` on the
+    text, and `min-width: min(<fixed>, 100%)` on the box. A `@container` query can then relax the fixed
+    size in a narrow window.
+  - An element never decides the width of its panel: the panel decides, the element adapts.
+  - Checked by `tests/browser/PanelFit.mjs` (9 widths x 12 locations, every dashboard window, plus the
+    English labels): a box, a text or a grid that crosses its window edge fails the test.
 - **Dragging a window** is handled by `ui/dashboard/WindowDragController.js` (owned by `DashboardView`):
   the window follows the pointer through a CSS transform (`--pw-drag-x/y`) once per animation frame, and
   the placeholder only moves when the drop target changes. Never animate `left/top` or use
@@ -219,6 +276,12 @@ export class XxxPanel extends DraggablePanel {
   effects or simulate offline training. A rejected snapshot pauses automation and keeps its assignment.
 - **Full Pokémon grid entries are shared.** PC, Pokédex and Location compose `PokemonGridEntry`;
   item media use the common sprite frame with paths resolved through the item repository/`AssetPaths`.
+- **Background catch-up replays, it never invents.** The AFK simulation (`FastForwardSystem`) only
+  advances activities the player launched, through the system that owns their rules
+  (`BattleSystem.catchUp`, `TrainingSystem.catchUp`, `DungeonAutoSystem`, `RelaunchSystem`). It creates
+  no encounter, grants nothing outside the real settlement, heals nothing, and does nothing when nothing
+  was running. Any absence longer than `FastForwardRules.MAX_CATCH_UP_SECONDS` is truncated, the replay
+  runs on the shiftable `TimeSource` clock, and nothing is written to the save per simulated step.
 - **One write per operation**: systems mutate the models, then call `SaveSystem.saveCurrent()` once.
 - **Mutate before dispatch**: a model changes its state first, then dispatches its event, so
   listeners always read the new state.

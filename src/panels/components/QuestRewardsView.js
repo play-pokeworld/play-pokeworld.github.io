@@ -14,7 +14,7 @@ import { CURRENCIES } from '../../data/save/CurrencyDefinitions.js';
 import { ItemDB } from '../../data/items/ItemDB.js';
 import { PokemonDB } from '../../data/pokemon/PokemonDB.js';
 import { TextFormatter } from '../../core/TextFormatter.js';
-import { t } from '../../localization/LocalizationManager.js';
+import { t, lt } from '../../localization/LocalizationManager.js';
 
 /** @param {*} value @returns {number} */
 function positiveInteger(value) {
@@ -113,7 +113,7 @@ function rewardEntryView(entry) {
   } else {
     row.addChild(new UIText({ tagName: 'span', className: 'pw-quest-reward-level', text: t('level_short_value', { level: entry.level }) }));
   }
-  row.setTooltip(entry.kind === 'currency' ? `${entry.label} · ${TextFormatter.formatNumber(entry.quantity)}` : entry.label);
+  row.setTooltip(entry.kind === 'currency' ? lt`${entry.label} · ${TextFormatter.formatNumber(entry.quantity)}` : entry.label);
   return row;
 }
 

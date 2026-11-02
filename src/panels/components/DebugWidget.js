@@ -9,9 +9,10 @@ import { UIButton } from '../../ui/UIButton.js';
 import { UIText } from '../../ui/UIText.js';
 import { AppShell } from '../../ui/AppShell.js';
 import { SaveSystem } from '../../systems/SaveSystem.js';
+import { FastForwardSystem } from '../../systems/FastForwardSystem.js';
 import { BoxSystem } from '../../systems/BoxSystem.js';
 import { TeamSystem } from '../../systems/TeamSystem.js';
-import { BattleSystem } from '../../systems/BattleSystem.js';
+import { DebugTimeScale } from '../../core/DebugTimeScale.js';
 import { SecretBaseSystem } from '../../systems/SecretBaseSystem.js';
 import { HatcherySystem } from '../../systems/HatcherySystem.js';
 import { TrainingSystem } from '../../systems/TrainingSystem.js';
@@ -23,7 +24,7 @@ import { ModalIds } from '../../config/ModalIds.js';
 import { EventBus } from '../../core/EventBus.js';
 import { ModalOpenRequestedEvent } from '../../core/events/ModalOpenRequestedEvent.js';
 import { MineChangedEvent } from '../../core/events/MineChangedEvent.js';
-import { t } from '../../localization/LocalizationManager.js';
+import { t, lt } from '../../localization/LocalizationManager.js';
 
 export class DebugWidget extends UIContainer {
   constructor() {
@@ -55,15 +56,18 @@ export class DebugWidget extends UIContainer {
       ]
     });
 
-    this._x10StateSpan = new UIText({ id: 'debug-x10-state', tagName: 'span', text: 'OFF' });
-    this._daytimeStateSpan = new UIText({ id: 'debug-daytime-state', tagName: 'span', text: 'AUTO' });
+    this._x10StateSpan = new UIText({
+      id: 'debug-x10-state', tagName: 'span',
+      text: t(DebugTimeScale.getInstance().getMultiplier() > 1 ? 'debug_state_on' : 'debug_state_off')
+    });
+    this._daytimeStateSpan = new UIText({ id: 'debug-daytime-state', tagName: 'span', text: t('debug_state_auto') });
 
     const x10Button = new UIButton({
       id: 'debug-btn-speed-x10',
       className: 'hbtn pw-static-074',
       onClick: () => this._toggleSpeedX10()
     });
-    x10Button.addChild(new UIText({ tagName: 'span', text: `${t('debug_speed_x10')} ` }));
+    x10Button.addChild(new UIText({ tagName: 'span', text: lt`${t('debug_speed_x10')} ` }));
     x10Button.addChild(this._x10StateSpan);
 
     const daytimeButton = new UIButton({
@@ -71,7 +75,7 @@ export class DebugWidget extends UIContainer {
       className: 'hbtn pw-static-074',
       onClick: () => this._cycleDaytime()
     });
-    daytimeButton.addChild(new UIText({ tagName: 'span', text: `${t('debug_daytime')} ` }));
+    daytimeButton.addChild(new UIText({ tagName: 'span', text: lt`${t('debug_daytime')} ` }));
     daytimeButton.addChild(this._daytimeStateSpan);
 
     this._drawer.addChildren([
@@ -277,17 +281,19 @@ export class DebugWidget extends UIContainer {
     });
   }
 
-  /** @private Simulates a 30-minute AFK skip for mine, training and hatchery. */
+  /** @private Replays a 30-minute absence through the real AFK catch-up and shows its report. */
   _afkSkip() {
     const save = SaveSystem.getInstance().getCurrentSave();
     if (!save) return;
-    save.mine.energy = Math.min(100, (save.mine.energy || 0) + 30);
-    save.mine.lastRegenTimestamp = Date.now();
-    EventBus.getInstance().dispatch(new MineChangedEvent('energy'));
-    TrainingSystem.getInstance().update(1800);
-    HatcherySystem.getInstance().update(1800);
-    SaveSystem.getInstance().saveCurrent();
-    NotificationSystem.getInstance().notifyTemporary(t('debug_timeskip_10m'), {
+    const outcome = FastForwardSystem.getInstance().debugSkip(30 * 60 * 1000);
+    if (!outcome) {
+      NotificationSystem.getInstance().notifyTemporary(t('debug_timeskip_unavailable'), {
+        channel: NotificationChannels.GAMEPLAY,
+        tone: NotificationTones.WARNING
+      });
+      return;
+    }
+    NotificationSystem.getInstance().notifyTemporary(t('debug_afk_done'), {
       channel: NotificationChannels.GAMEPLAY,
       tone: NotificationTones.SUCCESS
     });
@@ -317,11 +323,11 @@ export class DebugWidget extends UIContainer {
     });
   }
 
-  /** @private Toggles the battle speed multiplier between 1x and 10x. */
+  /** @private Toggles the shared debug time multiplier (battles and training) between 1x and 10x. */
   _toggleSpeedX10() {
-    const mult = BattleSystem.getInstance().toggleSpeedMultiplierX10();
+    const mult = DebugTimeScale.getInstance().toggleX10();
     const isX10 = mult === 10;
-    if (this._x10StateSpan) this._x10StateSpan.setText(isX10 ? 'ON' : 'OFF');
+    if (this._x10StateSpan) this._x10StateSpan.setText(t(isX10 ? 'debug_state_on' : 'debug_state_off'));
     NotificationSystem.getInstance().notifyTemporary(
       isX10 ? t('debug_x10_on') : t('debug_x10_off'),
       { channel: NotificationChannels.SYSTEM, tone: isX10 ? NotificationTones.SUCCESS : NotificationTones.INFO }
@@ -334,9 +340,9 @@ export class DebugWidget extends UIContainer {
     this._daytimeIndex = (this._daytimeIndex + 1) % phases.length;
     const phase = phases[this._daytimeIndex];
     AppShell.setDaytime(phase);
-    if (this._daytimeStateSpan) this._daytimeStateSpan.setText(phase.toUpperCase());
+    if (this._daytimeStateSpan) this._daytimeStateSpan.setText(phase === 'auto' ? t('debug_state_auto') : t(`debug_phase_${phase}`));
     NotificationSystem.getInstance().notifyTemporary(
-      `${t('debug_daytime')} ${phase.toUpperCase()}`,
+      lt`${t('debug_daytime')} ${phase === 'auto' ? t('debug_state_auto') : t(`debug_phase_${phase}`)}`,
       { channel: NotificationChannels.SYSTEM, tone: NotificationTones.INFO }
     );
   }

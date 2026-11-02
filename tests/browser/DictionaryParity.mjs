@@ -65,6 +65,8 @@ async function check(name, fn) {
   }
 }
 
+/** Kanto item count, computed from the rules (never hardcoded: the balance changes it). */
+let expectedItemCount = 0;
 const dictPanel = () => page.locator('#fs-dictionary');
 const detailModal = () => page.locator('#pw-dictionary-detail');
 
@@ -123,11 +125,21 @@ try {
   );
 
   await check(
-    'Kanto progressive item discovery displays exactly 214 items with no Gen 4+ items',
+    'Kanto progressive item discovery matches the rules and hides Gen 4+ items',
     async () => {
       const entries = dictPanel().locator('.dict-entry');
       const count = await entries.count();
-      assert.equal(count, 214);
+      // The Kanto progression decides how many items exist: never hardcode the total.
+      expectedItemCount = await page.evaluate(async () => {
+        const { ItemDB } = await import('/src/data/items/ItemDB.js');
+        const { ItemGenerationRules } = await import('/src/config/ItemGenerationRules.js');
+        const { FeatureAccessSystem } = await import('/src/systems/FeatureAccessSystem.js');
+        const regions = FeatureAccessSystem.getInstance().getSnapshot().regions || ['kanto'];
+        return ItemDB.getInstance()
+          .getAll()
+          .filter((item) => ItemGenerationRules.isItemGenUnlocked(item.id, regions) && !item.hidden).length;
+      });
+      assert.equal(count, expectedItemCount);
 
       const firstTexts = await entries.locator('b').allInnerTexts();
       assert.ok(firstTexts.includes('Poké Ball'));
@@ -165,7 +177,7 @@ try {
       assert.ok(await dictPanel().locator('.dict-muted').isVisible());
 
       await search.fill('');
-      assert.equal(await dictPanel().locator('.dict-entry').count(), 214);
+      assert.equal(await dictPanel().locator('.dict-entry').count(), expectedItemCount);
     },
   );
 

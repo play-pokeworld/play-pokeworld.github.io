@@ -210,3 +210,37 @@ Le runner `BagAndPokemonInfoParity.mjs` valide **17 scénarios** complets :
 
 Les neuf suites de production s'exécutent séquentiellement : **17 + 9 + 17 + 13 + 21 + 18 + 14 + 12 + 17 = 138**.
 
+
+## Pools de talents — 1.16.4
+
+```sh
+PLAYWRIGHT_MODULE=playwright npm run test:browser:talents
+```
+
+Le runner `TalentPools.mjs` valide **5 scénarios** sur la vraie fiche Pokédex : une espèce de Hoenn qui
+n'avait qu'un talent (Arcko) liste au moins dix talents distincts, sans doublon et sans répéter le talent
+caché (qui garde sa fiche `★`) ; l'onglet « Par niveau » liste toujours les 15 attaques de la règle
+d'origine ; une espèce de Kanto (Bulbasaur, 28 talents) est inchangée ; aucune clé de localisation brute
+ni erreur console ne fuit. Artifacts par défaut : `artifacts/browser-talents`.
+
+Les dix suites de production s'exécutent séquentiellement : **17 + 9 + 17 + 13 + 21 + 18 + 14 + 12 + 17 + 5 = 143**.
+
+
+
+## Vagues d'entraînement — 1.16.5
+
+```sh
+PLAYWRIGHT_MODULE=playwright npm run test:browser:training
+```
+
+`TrainingWaves.mjs` valide **6 scénarios** sur une sauvegarde qui a réellement gagné la Ligue : les cinq
+modes sont ouverts (le prérequis lisait un badge que le jeu n'écrit jamais), une session démarrée annonce
+**30 vagues** tirées dans le rang du stagiaire (aucun doublon, rang du stagiaire ou son voisin), la
+fenêtre de combat en direct affiche `Round n/30` en français et en anglais, la carte nomme un vrai
+partenaire de sparring, et l'abandon libère le Pokémon sans toucher à la collection. Depuis 1.16.6 il
+vérifie aussi, sur le **vrai bouton** du tiroir de debug (mode développeur activé puis désactivé), que
+700 ms réelles avancent la session de 0,70 s à 1x et de 7,00 s à x10. Artifacts par défaut :
+`artifacts/browser-training-waves`.
+
+Les onze suites de production s'exécutent séquentiellement :
+**17 + 9 + 17 + 13 + 21 + 18 + 14 + 12 + 17 + 5 + 6 = 149**.

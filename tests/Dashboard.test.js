@@ -234,13 +234,13 @@ describe('Dashboard view', (test) => {
     const baseLabels = () => nav._subBar.getChildren().map((button) => button.text?.getText());
 
     assert.ok(panel.getDomElement().classList.contains('pw-secret-base-gated'));
-    assert.ok(!baseLabels().includes(baseLabel));
+    assert.ok(!baseLabels().includes(String(baseLabel)));
     save.quests.setMainStep('hoenn', access.getUnlockStep());
     EventBus.getInstance().dispatch(new QuestClaimedEvent('main.216'));
     assert.ok(!panel.getDomElement().classList.contains('pw-secret-base-gated'));
     assert.ok(panel.getDomElement().querySelector('.pw-secret-base-empty-card'));
     assert.ok(!panel.getDomElement().querySelector('.pw-secret-base-status'));
-    assert.ok(baseLabels().includes(baseLabel));
+    assert.ok(baseLabels().includes(String(baseLabel)));
 
     nav.destroy();
     view.destroy();

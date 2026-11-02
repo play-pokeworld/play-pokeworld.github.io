@@ -6,7 +6,14 @@
 
 import { BaseObject } from '../core/BaseObject.js';
 import { EventBus } from '../core/EventBus.js';
+import { LocalizedTextBinder } from './LocalizedTextBinder.js';
 import { t } from '../localization/LocalizationManager.js';
+
+/**
+ * Attributes that carry player-visible text: a value coming from t() is bound to its translation,
+ * so the language change rewrites the tooltip / alternative label without rebuilding the widget.
+ */
+const LOCALIZED_ATTRIBUTES = Object.freeze(['title', 'aria-label', 'alt', 'placeholder']);
 
 export class UIElement extends BaseObject {
   /**
@@ -223,12 +230,16 @@ export class UIElement extends BaseObject {
    * @param {string|number|boolean} value
    */
   setAttribute(name, value) {
-    if (name && this._dom.getAttribute(name) !== String(value)) this._dom.setAttribute(name, String(value));
+    if (!name) return;
+    if (this._dom.getAttribute(name) !== String(value)) this._dom.setAttribute(name, String(value));
+    if (LOCALIZED_ATTRIBUTES.includes(name)) LocalizedTextBinder.bindAttribute(this._dom, name, value);
   }
 
   /** @param {string} name */
   removeAttribute(name) {
-    if (name && this._dom.hasAttribute(name)) this._dom.removeAttribute(name);
+    if (!name) return;
+    if (this._dom.hasAttribute(name)) this._dom.removeAttribute(name);
+    if (LOCALIZED_ATTRIBUTES.includes(name)) LocalizedTextBinder.release(this._dom, name);
   }
 
   /**

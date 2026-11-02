@@ -1,6 +1,6 @@
 {
   "name": "pokeworld-clean",
-  "version": "1.16.0",
+  "version": "1.16.6",
   "private": true,
   "description": "PokéWorld — clean-architecture rework (static browser game + zero-dependency local server).",
   "type": "module",
@@ -20,6 +20,14 @@
     "test:browser:backdrop": "node tests/browser/BackdropAndAutoContext.mjs",
     "test:browser:dictionary": "node tests/browser/DictionaryParity.mjs",
     "test:browser:baginfo": "node tests/browser/BagAndPokemonInfoParity.mjs",
-    "test:browser:debugbox": "node tests/browser/DebugAndBoxItemUse.mjs"
+    "test:browser:debugbox": "node tests/browser/DebugAndBoxItemUse.mjs",
+    "test:browser:language": "node tests/browser/LanguageSwitch.mjs",
+    "test:browser:fit": "node tests/browser/PanelFit.mjs",
+    "test:browser:afk": "node tests/browser/AfkCatchUp.mjs",
+    "test:browser:talents": "node tests/browser/TalentPools.mjs",
+    "test:browser:training": "node tests/browser/TrainingWaves.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.47.2"
   }
 }

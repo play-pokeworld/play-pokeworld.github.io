@@ -33,7 +33,7 @@ import { ContentAccessChangedEvent } from '../../core/events/ContentAccessChange
 import { LanguageChangedEvent } from '../../core/events/LanguageChangedEvent.js';
 import { ModalOpenRequestedEvent } from '../../core/events/ModalOpenRequestedEvent.js';
 import { EventBus } from '../../core/EventBus.js';
-import { t } from '../../localization/LocalizationManager.js';
+import { t, joinLocalized } from '../../localization/LocalizationManager.js';
 
 export class PokedexPanel extends UIFullscreenPanel {
   constructor() {
@@ -116,7 +116,7 @@ export class PokedexPanel extends UIFullscreenPanel {
   /** @private @param {ReadonlyArray<Object>} regions @param {Object|null} save @param {Object|null} dex @param {{seen:number,caught:number,shiny:number}} counts */
   _overview(regions, save, dex, counts) {
     const total = this._visibleSpecies.length;
-    const regionNames = regions.map((region) => t(`region_${region.id}`)).join(', ');
+    const regionNames = joinLocalized(', ', regions.map((region) => t(`region_${region.id}`)));
     const stat = (labelKey, value, suffix = '', extraClass = '') => new UIContainer({
       tagName: 'span',
       className: `pw-pokedex-stat${extraClass ? ` ${extraClass}` : ''}`,

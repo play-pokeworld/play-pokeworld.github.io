@@ -47,6 +47,7 @@ import { SecretBaseSystem } from './systems/SecretBaseSystem.js';
 import { SaleSystem } from './systems/SaleSystem.js';
 import { FossilSystem } from './systems/FossilSystem.js';
 import { FastForwardSystem } from './systems/FastForwardSystem.js';
+import { FastForwardRules } from './config/FastForwardRules.js';
 import { TrainingSystem } from './systems/TrainingSystem.js';
 import { ShopSystem } from './systems/ShopSystem.js';
 import { AudioSystem } from './systems/AudioSystem.js';
@@ -144,13 +145,12 @@ window.addEventListener('DOMContentLoaded', () => {
     AudioSystem.getInstance().setHidden(isHidden);
     if (isHidden) {
       hiddenTimestamp = Date.now();
-      if (BattleSystem.getInstance().isActive()) {
-        BattleSystem.getInstance().stopBattle();
-      }
+      // A battle is turn based: it cannot advance while the tab is hidden, so it is simply left as is.
+      // The elapsed time is caught up by FastForwardSystem when the player comes back.
     } else if (hiddenTimestamp) {
       const elapsedMs = Date.now() - hiddenTimestamp;
       hiddenTimestamp = null;
-      if (elapsedMs >= 4000) {
+      if (elapsedMs >= FastForwardRules.MIN_ELAPSED_MS) {
         FastForwardSystem.getInstance().triggerCatchUp(elapsedMs);
       }
     }

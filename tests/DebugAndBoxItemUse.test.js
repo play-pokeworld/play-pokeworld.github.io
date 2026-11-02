@@ -13,12 +13,15 @@ import { SecretBaseSystem } from '../src/systems/SecretBaseSystem.js';
 import { EventBus } from '../src/core/EventBus.js';
 import { ModalOpenRequestedEvent } from '../src/core/events/ModalOpenRequestedEvent.js';
 import { ModalIds } from '../src/config/ModalIds.js';
+import { MineRules } from '../src/config/MineRules.js';
 import { PokemonFactory } from '../src/data/pokemon/PokemonFactory.js';
 import { AppShell } from '../src/ui/AppShell.js';
 import { BagPanel } from '../src/panels/fullscreen/BagPanel.js';
 import { BoxPanel } from '../src/panels/fullscreen/BoxPanel.js';
 import { DebugWidget } from '../src/panels/components/DebugWidget.js';
+import { DebugTimeScale } from '../src/core/DebugTimeScale.js';
 import { setRoster } from './RosterFixtures.js';
+import { t } from '../src/localization/LocalizationManager.js';
 
 const saves = SaveSystem.getInstance();
 
@@ -222,10 +225,12 @@ describe('PC Box item usage and DebugWidget', (test) => {
     assert.ok(save.inventory.count('ct24_thunderbolt') >= 1);
     assert.ok(save.inventory.count('cs01_cut') >= 1);
 
-    // 8. AFK skip 30 min
+    // 8. AFK skip 30 min: the mine regenerates through its own rule over the skipped window
     save.mine.energy = 10;
+    save.mine.lastEnergyAt = Date.now();
     widget._afkSkip();
-    assert.equal(save.mine.energy, 40);
+    const expectedEnergy = Math.min(MineRules.MAX_ENERGY, 10 + 1800 * MineRules.ENERGY_REGEN_PER_SECOND);
+    assert.equal(save.mine.energy, expectedEnergy, 'the skipped window is credited by the real regeneration rule');
 
     // 9. Give all items
     widget._giveAllItems();
@@ -246,18 +251,19 @@ describe('PC Box item usage and DebugWidget', (test) => {
 
     // 11. Toggle x10 battle speed
     const battle = BattleSystem.getInstance();
-    assert.equal(battle.getSpeedMultiplier(), 1);
+    // The multiplier is a debug setting shared by the battle and the training loops (DebugTimeScale).
+    assert.equal(DebugTimeScale.getInstance().getMultiplier(), 1);
     widget._toggleSpeedX10();
-    assert.equal(battle.getSpeedMultiplier(), 10);
+    assert.equal(DebugTimeScale.getInstance().getMultiplier(), 10);
     assert.equal(widget._x10StateSpan.getText(), 'ON');
     widget._toggleSpeedX10();
-    assert.equal(battle.getSpeedMultiplier(), 1);
+    assert.equal(DebugTimeScale.getInstance().getMultiplier(), 1);
     assert.equal(widget._x10StateSpan.getText(), 'OFF');
 
     // 12. Cycle daytime
     widget._cycleDaytime(); // dawn
     assert.equal(document.documentElement.getAttribute('data-daytime'), 'dawn');
-    assert.equal(widget._daytimeStateSpan.getText(), 'DAWN');
+    assert.equal(widget._daytimeStateSpan.getText(), t('debug_phase_dawn'), 'the debug phase label is localized');
     widget._cycleDaytime(); // day
     assert.equal(document.documentElement.getAttribute('data-daytime'), 'day');
     widget._cycleDaytime(); // dusk

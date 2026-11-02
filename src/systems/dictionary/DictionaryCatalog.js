@@ -5,7 +5,9 @@
  * and ability carrier lists.
  */
 
+import { ItemDescription } from '../../data/items/ItemDescription.js';
 import { ItemDB } from '../../data/items/ItemDB.js';
+import { ItemDisplayName } from '../../data/items/ItemDisplayName.js';
 import { ItemKinds } from '../../data/items/ItemKinds.js';
 import { MoveDB } from '../../data/battle/MoveDB.js';
 import { TalentDB, TalentRarity } from '../../data/pokemon/TalentDB.js';
@@ -17,10 +19,7 @@ import { ROUTE_DROPS } from '../../data/world/RouteDrops.js';
 import { ShopDB } from '../../data/shops/ShopDB.js';
 import { MineLootDB } from '../../data/items/MineLootDB.js';
 import { QuestDB } from '../../data/quests/QuestDB.js';
-import {
-  LocalizationManager,
-  t,
-} from '../../localization/LocalizationManager.js';
+import { LocalizationManager, t, lt } from '../../localization/LocalizationManager.js';
 
 const ATOLL_SHOP_ITEMS = Object.freeze({
   rarecandy: 25,
@@ -36,14 +35,7 @@ export class DictionaryCatalog {
    * @returns {string}
    */
   static itemName(itemId) {
-    const rawName = t(`item.${itemId}.name`);
-    const isEn = LocalizationManager.getInstance().currentLang === 'en';
-    const item = ItemDB.getInstance().getById(itemId);
-    const isTm = itemId.startsWith('ct_') || item?.kind === ItemKinds.TM;
-    const isHm = itemId.startsWith('cs_') || item?.kind === ItemKinds.HM;
-    if (isTm) return isEn ? `${rawName} TM` : `${rawName} CT`;
-    if (isHm) return isEn ? `${rawName} HM` : `${rawName} CS`;
-    return rawName;
+    return ItemDisplayName.of(itemId);
   }
 
   /**
@@ -52,21 +44,21 @@ export class DictionaryCatalog {
    * @returns {string}
    */
   static itemTypeLabel(item) {
-    if (!item) return t('item_type_special').trim();
-    if (item.kind === ItemKinds.STONE) return t('item_type_stone').trim();
-    if (item.kind === ItemKinds.TREASURE) return t('item_type_treasure').trim();
-    if (item.kind === ItemKinds.CANDY) return t('item_type_candy').trim();
-    if (item.kind === ItemKinds.KEY) return t('item_type_key').trim();
-    if (item.kind === ItemKinds.HELD) return t('item_type_held').trim();
-    if (item.kind === ItemKinds.FOSSIL) return t('item_type_fossil').trim();
+    if (!item) return t('item_type_special');
+    if (item.kind === ItemKinds.STONE) return t('item_type_stone');
+    if (item.kind === ItemKinds.TREASURE) return t('item_type_treasure');
+    if (item.kind === ItemKinds.CANDY) return t('item_type_candy');
+    if (item.kind === ItemKinds.KEY) return t('item_type_key');
+    if (item.kind === ItemKinds.HELD) return t('item_type_held');
+    if (item.kind === ItemKinds.FOSSIL) return t('item_type_fossil');
     if (item.kind === ItemKinds.TM || item.kind === ItemKinds.HM)
-      return t('item_type_tm').trim();
+      return t('item_type_tm');
     if (item.kind === ItemKinds.EVOLUTION)
-      return t('item_type_evolution').trim();
-    if (item.kind === ItemKinds.BALL) return t('cat_pokeballs').trim();
+      return t('item_type_evolution');
+    if (item.kind === ItemKinds.BALL) return t('cat_pokeballs');
     if (item.id.endsWith('_berry') || item.id === 'prine_berry')
-      return t('item_type_berry').trim();
-    return t('item_type_special').trim();
+      return t('item_type_berry');
+    return t('item_type_special');
   }
 
   /**
@@ -107,7 +99,7 @@ export class DictionaryCatalog {
           name,
           ownedQty,
           owned: ownedQty > 0,
-          desc: t(`item.${item.id}.desc`),
+          desc: ItemDescription.of(item.id),
           subtitle:
             ownedQty > 0
               ? t('dict_owned_qty', { count: ownedQty })
@@ -233,7 +225,7 @@ export class DictionaryCatalog {
       if (shop.items.includes(itemId)) {
         addSource({
           icon: 'shop',
-          text: `${t(`shop.${shop.id}.name`)}${isTm ? ' · CT' : ''}`,
+          text: lt`${t(`shop.${shop.id}.name`)}${isTm ? ' · CT' : ''}`,
         });
       }
     }
@@ -242,7 +234,7 @@ export class DictionaryCatalog {
     if (ATOLL_SHOP_ITEMS[itemId]) {
       addSource({
         icon: 'atoll',
-        text: `${t('battle_atoll_title')} — ${ATOLL_SHOP_ITEMS[itemId]} ${t('atoll_tokens')}`,
+        text: lt`${t('battle_atoll_title')} — ${ATOLL_SHOP_ITEMS[itemId]} ${t('atoll_tokens')}`,
       });
     }
 
@@ -277,7 +269,7 @@ export class DictionaryCatalog {
       typeLabel: DictionaryCatalog.itemTypeLabel(item),
       price: item.price || 0,
       ownedQty: save?.inventory?.count(itemId) || 0,
-      desc: t(`item.${itemId}.desc`),
+      desc: ItemDescription.of(itemId),
       sources: sources.length ? sources : [t('dict_unknown_source')],
     };
   }
@@ -450,7 +442,7 @@ export class DictionaryCatalog {
     if (!query) return entries;
     return entries.filter((e) => {
       const searchBlob =
-        `${e.name} ${e.id} ${e.desc || ''} ${e.type ? t(`type.${e.type}`) : ''}`.toLowerCase();
+        lt`${e.name} ${e.id} ${e.desc || ''} ${e.type ? t(`type.${e.type}`) : ''}`.toLowerCase();
       return searchBlob.includes(query);
     });
   }

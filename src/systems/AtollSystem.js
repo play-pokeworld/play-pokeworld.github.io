@@ -36,7 +36,7 @@ import {
 } from '../data/atoll/AtollDB.js';
 import { AtollBattleContext } from './atoll/AtollBattleContext.js';
 import { AtollStateChangedEvent } from '../core/events/AtollStateChangedEvent.js';
-import { t } from '../localization/LocalizationManager.js';
+import { t, joinLocalized } from '../localization/LocalizationManager.js';
 
 export class AtollSystem extends BaseSystem {
   /** @private @type {AtollSystem|null} */
@@ -133,7 +133,7 @@ export class AtollSystem extends BaseSystem {
         return {
           valid: false,
           reasonKey: 'atoll_banned_blocked',
-          params: { pokemon: viol.slice(0, 3).map((p) => p.getDisplayName()).join(', ') }
+          params: { pokemon: joinLocalized(', ', viol.slice(0, 3).map((p) => p.getDisplayName())) }
         };
       }
     }
@@ -505,11 +505,11 @@ export class AtollSystem extends BaseSystem {
         return false;
       }
 
-      // Rehydrate rental team
-      const rentalTag = t('atoll_rental') + ' ';
+      // Rehydrate the rental team: the "rental" label is a runtime flag resolved at display time,
+      // so it follows the active language and never enters the save.
       playerTeam = run.team.map((entry) => {
         const p = new PokemonData(entry);
-        p.nickname = rentalTag + p.getDisplayName();
+        p.rental = true;
         p.hp = p.getMaxHp();
         return p;
       });

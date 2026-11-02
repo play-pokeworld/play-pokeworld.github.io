@@ -209,24 +209,15 @@ export class TrainingSlotCard extends UIContainer {
     this._result.setVisible(!!entry.result);
     const result = entry.result;
     if (result) {
-      const reward = result.reward;
-      const rewardLabel = reward?.move
-        ? t(`move.${reward.move}`)
-        : reward?.talent
-          ? reward.talentNew == null
-            ? t(`talent.${reward.talent}.name`)
-            : t('facility_reward_talent', {
-                state: t(reward.talentNew ? 'new_talent' : 'talent_confirmed'),
-                name: t(`talent.${reward.talent}.name`),
-              })
-          : reward?.levels
-            ? t('facility_reward_levels', { count: reward.levels })
-            : reward?.evs
-              ? t('facility_reward_ev', {
-                  stat: t(`stat_${reward.stat}`),
-                  count: reward.evs,
-                })
-              : t('training_reward_none');
+      // A session grants one reward per TrainingRules.REWARD_INTERVAL_WAVES waves defeated: the
+      // report lists them all (three at most, then a count) instead of the last one only.
+      const rewards = (result.rewards?.length ? result.rewards : [result.reward]).filter(Boolean);
+      const labels = rewards.map((reward) => this._rewardLabel(reward));
+      const rewardLabel = labels.length === 0
+        ? t('training_reward_none')
+        : labels.length <= 3
+          ? labels.join(' · ')
+          : t('training_reward_list', { first: labels.slice(0, 3).join(' · '), count: labels.length });
       this._result.setText(
         result.result === 'cancelled'
           ? t('training_session_cancelled')
@@ -235,14 +226,40 @@ export class TrainingSlotCard extends UIContainer {
                 name: pokemon?.getDisplayName() || result.pokemonName || '',
                 reward: rewardLabel,
               })
-            : t('training_result_failed', {
-                name: pokemon?.getDisplayName() || result.pokemonName || '',
-              }),
+            : labels.length > 0
+              ? t('training_result_failed_partial', {
+                  name: pokemon?.getDisplayName() || result.pokemonName || '',
+                  reward: rewardLabel,
+                })
+              : t('training_result_failed', {
+                  name: pokemon?.getDisplayName() || result.pokemonName || '',
+                }),
       );
       this._result.toggleClass('is-success', result.success);
       this._result.toggleClass('is-failure', !result.success);
     }
     this.toggleClass('is-active', entry.active);
     this.toggleClass('is-empty', !pokemon);
+  }
+
+  /**
+   * Localized label of one training reward.
+   * @private
+   * @param {Object} reward
+   * @returns {string}
+   */
+  _rewardLabel(reward) {
+    if (reward.move) return t(`move.${reward.move}`);
+    if (reward.talent) {
+      return reward.talentNew == null
+        ? t(`talent.${reward.talent}.name`)
+        : t('facility_reward_talent', {
+            state: t(reward.talentNew ? 'new_talent' : 'talent_confirmed'),
+            name: t(`talent.${reward.talent}.name`),
+          });
+    }
+    if (reward.levels) return t('facility_reward_levels', { count: reward.levels });
+    if (reward.evs) return t('facility_reward_ev', { stat: t(`stat_${reward.stat}`), count: reward.evs });
+    return t('training_reward_none');
   }
 }

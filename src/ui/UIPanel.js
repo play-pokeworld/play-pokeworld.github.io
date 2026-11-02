@@ -9,6 +9,8 @@
 import { UIElement } from './UIElement.js';
 import { UIIcon } from './UIIcon.js';
 import { UIText } from './UIText.js';
+import { LocalizedTextBinder } from './LocalizedTextBinder.js';
+import { LocalizationManager } from '../localization/LocalizationManager.js';
 
 export class UIPanel extends UIElement {
   /**
@@ -104,8 +106,10 @@ export class UIPanel extends UIElement {
    * @param {string} title - Localized text
    */
   setTitle(title) {
-    const value=title??'';
-    if(this._titleDom&&this._titleDom.textContent!==value)this._titleDom.textContent=value;
+    if (!this._titleDom) return;
+    const value = LocalizationManager.getInstance().resolve(title);
+    LocalizedTextBinder.bindText(this._titleDom, title);
+    if (this._titleDom.textContent !== value) this._titleDom.textContent = value;
   }
 
   /**

@@ -11,7 +11,7 @@ import { ShopOfferKinds } from '../../systems/shop/ShopOfferKinds.js';
 import { CURRENCIES } from '../../data/save/CurrencyDefinitions.js';
 import { PriceTag } from './PriceTag.js';
 import { TextFormatter } from '../../core/TextFormatter.js';
-import { t } from '../../localization/LocalizationManager.js';
+import { t, lt } from '../../localization/LocalizationManager.js';
 
 export class ShopItemCard extends UIContainer {
   /**
@@ -34,7 +34,7 @@ export class ShopItemCard extends UIContainer {
       new UIContainer({ className: 'pw-shop-price', children: [new PriceTag(offer.currency, offer.unitPrice)] }),
       offer.soldOut
         ? new UIText({ tagName: 'div', className: 'pw-shop-soldout', text: t('shop_bag_max', { n: offer.limit }) })
-        : new UIText({ tagName: 'div', className: 'pw-shop-stock', text:offer.kind===ShopOfferKinds.UPGRADE?t(offer.descriptionKey):`${t('shop_bag_lbl')} : ${TextFormatter.formatNumber(offer.owned)}` })
+        : new UIText({ tagName: 'div', className: 'pw-shop-stock', text:offer.kind===ShopOfferKinds.UPGRADE?t(offer.descriptionKey):lt`${t('shop_bag_lbl')} : ${TextFormatter.formatNumber(offer.owned)}` })
     ]);
     if (!offer.soldOut) this.addDomListener('click', () => onSelect(offer));
   }

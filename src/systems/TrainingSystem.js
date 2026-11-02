@@ -11,6 +11,7 @@ import { PokemonActionIds } from '../config/PokemonUsageRules.js';
 import { NotificationSystem } from './NotificationSystem.js';
 import { EventBus } from '../core/EventBus.js';
 import { BattleSession, BattleOutcomes } from './battle/BattleSession.js';
+import { DebugTimeScale } from '../core/DebugTimeScale.js';
 import { FacilityCandidateRules } from './facilities/FacilityCandidateRules.js';
 import { FacilityFilterRules } from '../config/FacilityFilterRules.js';
 import { TrainingProgression } from './facilities/TrainingProgression.js';
@@ -21,7 +22,7 @@ import { PokemonFactory } from '../data/pokemon/PokemonFactory.js';
 import { FacilityStaffSystem } from './FacilityStaffSystem.js';
 import { StaffRules } from '../config/StaffRules.js';
 import { TrainingData } from '../data/save/TrainingData.js';
-import { TrainingOpponentDB } from '../data/training/TrainingOpponentDB.js';
+import { TrainingOpponents } from './facilities/TrainingOpponents.js';
 import { LocationDB } from '../data/world/LocationDB.js';
 import { LocationSystem } from './LocationSystem.js';
 import { FeatureAccessSystem } from './FeatureAccessSystem.js';
@@ -32,6 +33,7 @@ import { TrainingResultChangedEvent } from '../core/events/TrainingResultChanged
 import { SaveCreatedEvent } from '../core/events/SaveCreatedEvent.js';
 import { SaveLoadedEvent } from '../core/events/SaveLoadedEvent.js';
 import { TrainingRules } from '../config/TrainingRules.js';
+import { FastForwardRules } from '../config/FastForwardRules.js';
 import { FacilityRules } from '../config/FacilityRules.js';
 import { CONTENT_FEATURES } from '../config/ContentAccessRules.js';
 import { PokemonDB } from '../data/pokemon/PokemonDB.js';
@@ -51,6 +53,8 @@ export class TrainingSystem extends BaseSystem {
   static getInstance() { return this._instance || (this._instance = new TrainingSystem()); }
   constructor() {
     super('TrainingSystem', 'System');
+    /** @private AFK catch-up: no live battle refresh per step. */
+    this._silent = false;
     this._sessions = new Map();
     this._saveId = null;
     this._saveRef = null;
@@ -165,6 +169,39 @@ export class TrainingSystem extends BaseSystem {
     return { result: TrainingResults.READY, opponentCount: opponents.length };
   }
 
+  /** @private @returns {boolean} An auto slot with a queue would start its next session on the next scan. */
+  _hasAutoWork() {
+    const save = SaveSystem.getInstance().getCurrentSave();
+    if (!save) return false;
+    return save.training.slots.some((slot) => !slot.battle && slot.autoEnabled && slot.autoPurchased &&
+      (slot.queue.length > 0 || !slot.pokemonUid));
+  }
+  /**
+   * AFK catch-up: advances the sessions the player had started, with their real mechanics, then lets the
+   * paid automation start the next queued Pokémon. It never starts a session by itself.
+   * @param {number} seconds - Remaining simulated budget
+   * @returns {number} Simulated seconds consumed
+   */
+  catchUp(seconds) {
+    const step = FastForwardRules.STEP_SECONDS;
+    let consumed = 0;
+    this._silent = true;
+    try {
+      while (consumed + step <= seconds) {
+        if (this._sessions.size === 0) {
+          if (!this._hasAutoWork()) break;
+          this._processAutomation();
+          if (this._sessions.size === 0) break;
+        }
+        // An absence is replayed in real seconds: the debug multiplier must never inflate it.
+        this._advance(step);
+        consumed += step;
+      }
+    } finally {
+      this._silent = false;
+    }
+    return consumed;
+  }
   /** @param {number} [slotIndex=0] @returns {Object} */
   getSnapshot(slotIndex = 0) {
     this._ensureContext();
@@ -211,6 +248,15 @@ export class TrainingSystem extends BaseSystem {
 
   /** @override @param {number} dt */
   update(dt) {
+    // A training session is a live simulation like a battle: the shared debug multiplier applies.
+    this._advance(DebugTimeScale.getInstance().scale(dt));
+  }
+
+  /**
+   * Advances the live sessions by an amount of simulated seconds.
+   * @private @param {number} dt
+   */
+  _advance(dt) {
     this._ensureContext();
     const save = SaveSystem.getInstance().getCurrentSave();
     if (!save || !Number.isFinite(dt) || dt <= 0) return;
@@ -254,11 +300,19 @@ export class TrainingSystem extends BaseSystem {
     const trainee = save?.collection.get(slot?.pokemonUid);
     if (!slot || !trainee || !slot.battle || this._sessions.get(slotIndex) !== session) return;
     const success = session.outcome === BattleOutcomes.VICTORY;
-    const reward = success ? TrainingProgression.reward(save, trainee, slot.mode, session.random) : null;
+    // One reward every REWARD_INTERVAL_WAVES waves really defeated (same rate per battle as the
+    // original six-opponent session); a defeated session keeps the waves it did win.
+    const rewards = [];
+    const intervals = Math.floor(session.defeatedFoes.length / TrainingRules.REWARD_INTERVAL_WAVES);
+    for (let index = 0; index < intervals; index++) {
+      const reward = TrainingProgression.reward(save, trainee, slot.mode, session.random);
+      if (reward && TrainingSystem._rewardGained(reward)) rewards.push(reward);
+    }
+    const reward = rewards[rewards.length - 1] || null;
     trainee.healFull();
     slot.battle = null;
     slot.result = { result: TrainingResults.COMPLETED, success, mode: slot.mode, pokemonUid: trainee.uid,
-      reward, rewardMove: reward?.move || null,
+      reward, rewards, rewardMove: reward?.move || null,
       opponentsDefeated: session.defeatedFoes.length, reason, slotIndex };
     if (!success) slot.autoEnabled = false;
     this._sessions.delete(slotIndex);
@@ -272,8 +326,22 @@ export class TrainingSystem extends BaseSystem {
     BoxSystem.getInstance().dispatchPokemonChanged(trainee.uid);
     EventBus.getInstance().dispatch(new TrainingResultChangedEvent(slot.result));
     this._dispatchBattleChanged();
+    if (this._silent) return;
     this._notify(success ? t('facility_training_success', { name: trainee.getDisplayName() }) :
       t('training_session_failed', { name: trainee.getDisplayName() }), success ? NotificationTones.SUCCESS : NotificationTones.WARNING);
+  }
+
+  /**
+   * True when a reward changed something (a talent already unlocked by an earlier interval of the
+   * same session grants nothing and is left out of the report).
+   * @private @param {Object} reward @returns {boolean}
+   */
+  static _rewardGained(reward) {
+    if (!reward) return false;
+    if (reward.move) return true;
+    if (reward.levels) return true;
+    if (reward.evs) return true;
+    return !!reward.talent && reward.talentNew === true;
   }
 
   /** @returns {Object} */
@@ -430,26 +498,11 @@ export class TrainingSystem extends BaseSystem {
   }
   /** @private */
   _createOpponents(trainee, random, mode) {
-    const pool = TrainingOpponentDB.getInstance().getSpeciesForType(trainee.getTypes()[0] || 'normal');
-    const base = Math.max(TrainingRules.MIN_OPPONENT_LEVEL, trainee.level + (TrainingRules.MODE_LEVEL_OFFSETS[mode] || 0));
-    const active = SaveSystem.getInstance().getCurrentSave()?.staff.active.training;
-    const level = active === 'trainer_saffron' ? SaveSystem.getInstance().getCurrentSave().staff.owned[active]?.level || 1 : 1;
-    const count = TrainingRules.OPPONENT_COUNT - Math.round(TrainingRules.MAX_STAFF_OPPONENT_REDUCTION * (level - 1) / (StaffRules.MAX_LEVEL - 1));
-
-    const traineeSpecies = trainee.getSpecies();
-    const traineeBst = Object.values(traineeSpecies?.baseStats || {}).reduce((sum, v) => sum + v, 0) || 300;
-    const pokemonDb = PokemonDB.getInstance();
-
-    return pool.slice(0, count).map((speciesId, index) => {
-      const oppSpecies = pokemonDb.getById(speciesId);
-      const oppBst = Object.values(oppSpecies?.baseStats || {}).reduce((sum, v) => sum + v, 0) || 300;
-      const bstRatio = Math.min(1.15, Math.max(0.60, traineeBst / oppBst));
-      const targetLevel = Math.max(
-        TrainingRules.MIN_OPPONENT_LEVEL,
-        Math.round((base + TrainingRules.LEVEL_VARIATION[index % TrainingRules.LEVEL_VARIATION.length]) * bstRatio)
-      );
-      return PokemonFactory.create(speciesId, targetLevel, { random });
-    }).filter(Boolean);
+    // Sparring waves of the rank of the trainee (TrainingOpponents), not the original type pools.
+    const save = SaveSystem.getInstance().getCurrentSave();
+    const staffId = save?.staff?.active?.training;
+    const staffLevel = staffId ? save.staff.owned[staffId]?.level || 1 : 1;
+    return TrainingOpponents.create(trainee, mode, TrainingOpponents.waveCount(staffLevel), random);
   }
   /** @private */
   _commit() {
@@ -459,7 +512,10 @@ export class TrainingSystem extends BaseSystem {
     this._dispatchBattleChanged();
   }
   /** @private */
-  _dispatchBattleChanged() { EventBus.getInstance().dispatch(new TrainingBattleChangedEvent(null)); }
+  _dispatchBattleChanged() {
+    if (this._silent) return;
+    EventBus.getInstance().dispatch(new TrainingBattleChangedEvent(null));
+  }
   /** @private */
   _failure(result) {
     if (result === TrainingResults.BATTLE_ACTIVE) this._notify(t('training_battle_active'), NotificationTones.WARNING);

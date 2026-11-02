@@ -15,7 +15,7 @@ import { SaveLoadedEvent } from '../core/events/SaveLoadedEvent.js';
 import { TextFormatter } from '../core/TextFormatter.js';
 import { WindowIds } from '../config/DashboardLayout.js';
 import { AssetPaths } from '../config/AssetPaths.js';
-import { t } from '../localization/LocalizationManager.js';
+import { t, lt } from '../localization/LocalizationManager.js';
 
 export class CurrenciesPanel extends DraggablePanel {
   /** @param {string} column - Starting dashboard column (DashboardColumns value) */
@@ -40,7 +40,7 @@ export class CurrenciesPanel extends DraggablePanel {
       const amount = new UIText({ className: 'pw-cur-amount' });
       const label = t(definition.labelKey);
       const tooltip = definition.gainKey
-        ? `${label} — ${t(definition.gainKey)}`
+        ? lt`${label} — ${t(definition.gainKey)}`
         : label;
       const currencyColumn = new UIContainer({
         id: `pw-cur-${definition.id}`,

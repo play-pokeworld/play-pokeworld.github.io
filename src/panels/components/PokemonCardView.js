@@ -16,7 +16,7 @@ import { CaughtStatusBall } from './CaughtStatusBall.js';
 import { hpFillState } from './HpFillState.js';
 import { ItemDB } from '../../data/items/ItemDB.js';
 import { TextFormatter } from '../../core/TextFormatter.js';
-import { t } from '../../localization/LocalizationManager.js';
+import { t, tOr } from '../../localization/LocalizationManager.js';
 
 const MOD_STAT_LABELS = Object.freeze({ atk: 'ATK', def: 'DEF', spe: 'VIT', spa: 'SPA', spd: 'SPD' });
 
@@ -199,12 +199,10 @@ export class PokemonCardView extends UIContainer {
     this._battleBuffs.clearChildren();
 
     if (status) {
-      const statusKey = `status_${status}`;
-      const label = t(statusKey);
       this._battleStatus.addChild(new UIText({
         tagName: 'span',
         className: `status-badge ${String(status).toLowerCase().replace(/[^a-z0-9_-]/g, '')}`,
-        text: label === statusKey ? status : label
+        text: tOr(`status_${status}`, status)
       }));
       this._battleStatus.show();
     } else {
@@ -235,16 +233,13 @@ export class PokemonCardView extends UIContainer {
       this._itemBadge.setAriaLabel(tooltip);
       return;
     }
-    const item = ItemDB.getInstance().getById(itemId);
-    const nameKey = `item.${itemId}.name`;
-    const name = t(nameKey);
+    const name = tOr(`item.${itemId}.name`, itemId);
     this._itemBadge.removeClass('empty');
     this._itemImage.setSource(ItemDB.getInstance().getImagePath(itemId));
-    this._itemImage.setAlt(name === nameKey ? itemId : name);
+    this._itemImage.setAlt(name);
     this._itemImage.show();
     this._itemEmpty.hide();
-    const displayName = item ? (name === nameKey ? itemId : name) : itemId;
-    const tooltip = t('held_item_tooltip', { name: displayName });
+    const tooltip = t('held_item_tooltip', { name });
     this._itemBadge.setTooltip(tooltip);
     this._itemBadge.setAriaLabel(tooltip);
   }

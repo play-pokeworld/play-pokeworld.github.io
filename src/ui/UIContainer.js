@@ -5,6 +5,8 @@
  */
 
 import { UIElement } from './UIElement.js';
+import { LocalizedTextBinder } from './LocalizedTextBinder.js';
+import { LocalizationManager } from '../localization/LocalizationManager.js';
 
 export class UIContainer extends UIElement {
   /**
@@ -34,10 +36,11 @@ export class UIContainer extends UIElement {
 
   /**
    * Sets plain text content
-   * @param {string} text
+   * @param {string|import('../localization/LocalizedText.js').LocalizedText} text
    */
   setText(text) {
-    const value = text == null ? '' : String(text);
+    const value = LocalizationManager.getInstance().resolve(text);
+    LocalizedTextBinder.bindText(this._dom, text);
     if (this._dom.textContent !== value || this._dom.childNodes.length > 1) this._dom.textContent = value;
   }
 }

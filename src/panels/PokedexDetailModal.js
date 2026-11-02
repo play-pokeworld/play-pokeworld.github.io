@@ -34,7 +34,7 @@ import { AudioSystem } from '../systems/AudioSystem.js';
 import { SaveSystem } from '../systems/SaveSystem.js';
 import { EventBus } from '../core/EventBus.js';
 import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
-import { LocalizationManager, t } from '../localization/LocalizationManager.js';
+import { LocalizationManager, t, lt } from '../localization/LocalizationManager.js';
 
 const STAT_KEYS = PokemonRules.STAT_KEYS;
 const STAT_COLORS = Object.freeze({
@@ -257,7 +257,7 @@ export class PokedexDetailModal extends UIModal {
     panel.addChild(new UIContainer({
       className: 'poke-detail-stat-total',
       children: [
-        new UIText({ tagName: 'span', text: 'TOTAL BST' }),
+        new UIText({ tagName: 'span', text: t('pokedex_stat_total') }),
         new UIText({ tagName: 'strong', text: String(bst) })
       ]
     }));
@@ -321,11 +321,11 @@ export class PokedexDetailModal extends UIModal {
       const reqLvl = link?.level ?? link?.minLevel;
       let condition = '';
       if (reqLvl && !link?.item) {
-        condition = `${t('level_word')} ${reqLvl}`;
+        condition = lt`${t('level_word')} ${reqLvl}`;
       } else if (link?.item) {
         const itemDef = ItemDB.getInstance().getById(link.item);
         const itemName = itemDef ? t(itemDef.nameKey) : link.item;
-        condition = reqLvl ? `${itemName} (${t('level_word')} ${reqLvl})` : itemName;
+        condition = reqLvl ? lt`${itemName} (${t('level_word')} ${reqLvl})` : itemName;
       }
       evoRows.push(new UIContainer({
         className: 'pw-pokedex-evo-row',
@@ -349,11 +349,11 @@ export class PokedexDetailModal extends UIModal {
         let condText = '';
 
         if (requiredLevel && !evo.item) {
-          condText = `${t('level_word')} ${requiredLevel}`;
+          condText = lt`${t('level_word')} ${requiredLevel}`;
         } else if (evo.item) {
           const itemDef = ItemDB.getInstance().getById(evo.item);
           const itemName = itemDef ? t(itemDef.nameKey) : evo.item;
-          condText = requiredLevel ? `${itemName} (${t('level_word')} ${requiredLevel})` : itemName;
+          condText = requiredLevel ? lt`${itemName} (${t('level_word')} ${requiredLevel})` : itemName;
         } else {
           condText = t('m.progression.8');
         }
@@ -450,8 +450,9 @@ export class PokedexDetailModal extends UIModal {
       return t('rarity_unknown_label');
     };
 
-    // Normal talents
-    for (const talentId of species.talents) {
+    // Normal talents: the hidden talent is listed as its own card below, and it is never drawn
+    // by the talent roll (PokemonFactory.rollTalent), so it is not repeated here.
+    for (const talentId of species.talents.filter((id) => id !== species.hiddenTalent)) {
       const talentDef = talentDb.getById(talentId);
       const talName = t(`talent.${talentId}.name`);
       const rarity = getRarityLabel(talentDef?.rarity);

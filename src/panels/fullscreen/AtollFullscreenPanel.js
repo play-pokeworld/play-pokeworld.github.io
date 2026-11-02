@@ -19,7 +19,7 @@ import { AtollStateChangedEvent } from '../../core/events/AtollStateChangedEvent
 import { RoamingRotationTickEvent } from '../../core/events/RoamingRotationTickEvent.js';
 import { LanguageChangedEvent } from '../../core/events/LanguageChangedEvent.js';
 import { ModalOpenRequestedEvent } from '../../core/events/ModalOpenRequestedEvent.js';
-import { t } from '../../localization/LocalizationManager.js';
+import { t, lt } from '../../localization/LocalizationManager.js';
 
 const TABS = Object.freeze([
   { id: 'menu', labelKey: 'atoll_home' },
@@ -295,7 +295,7 @@ export class AtollFullscreenPanel extends UIFullscreenPanel {
       textCol.addChild(new UIText({
         tagName: 'span',
         className: 'pw-text-sm pw-light1',
-        text: `${offer.price} ${t('atoll_tokens')}`
+        text: lt`${offer.price} ${t('atoll_tokens')}`
       }));
       info.addChild(textCol);
       card.addChild(info);

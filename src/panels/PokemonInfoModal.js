@@ -31,7 +31,7 @@ import { ModalIds } from '../config/ModalIds.js';
 import { MoveDB } from '../data/battle/MoveDB.js';
 import { ItemDB } from '../data/items/ItemDB.js';
 import { TalentDB, TalentRarity } from '../data/pokemon/TalentDB.js';
-import { LocalizationManager, t } from '../localization/LocalizationManager.js';
+import { LocalizationManager, t, lt } from '../localization/LocalizationManager.js';
 import { TextFormatter } from '../core/TextFormatter.js';
 import { PokemonRules } from '../config/PokemonRules.js';
 import { PokemonFactory } from '../data/pokemon/PokemonFactory.js';
@@ -376,8 +376,8 @@ export class PokemonInfoModal extends UIModal {
         value: option.id,
         disabled: !option.unlocked,
         label: option.unlocked
-          ? `${talName} [${rarityLabel}]`
-          : `${talName} [${rarityLabel}] — (${t('locked_talent_hint')})`
+          ? lt`${talName} [${rarityLabel}]`
+          : lt`${talName} [${rarityLabel}] — (${t('locked_talent_hint')})`
       };
     });
 
@@ -413,7 +413,7 @@ export class PokemonInfoModal extends UIModal {
       chip.setAttribute('role', 'button');
       chip.setAttribute('tabindex', '0');
       chip.addChild(new UIText({
-        text: `${isUnlocked ? '★ ' : ''}${t('hidden_ability_label')} : ${t(`talent.${state.hidden}.name`)} (${t(isUnlocked ? 'dict_ability_unlocked' : 'locked')})`
+        text: lt`${isUnlocked ? '★ ' : ''}${t('hidden_ability_label')} : ${t(`talent.${state.hidden}.name`)} (${t(isUnlocked ? 'dict_ability_unlocked' : 'locked')})`
       }));
       chip.addDomListener('click', () => {
         EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.DICTIONARY_DETAIL, {
@@ -477,7 +477,7 @@ export class PokemonInfoModal extends UIModal {
           new UIContainer({
             children: [
               new UIText({ tagName: 'b', text: displayName }),
-              new UIText({ tagName: 'span', className: 'poke-detail-location', text: `${t('level_word')} ${pokemon.level}${locationText ? ` · ${locationText}` : ''}` })
+              new UIText({ tagName: 'span', className: 'poke-detail-location', text: lt`${t('level_word')} ${pokemon.level}${locationText ? ` · ${locationText}` : ''}` })
             ]
           })
         ]
@@ -591,20 +591,20 @@ export class PokemonInfoModal extends UIModal {
         if (requiredLevel && !evo.item) {
           evoRows.push(new UIText({
             tagName: 'div',
-            richText: `<b>${t('m.progression.8')}</b> ${t('m.progression.7', { lvl: requiredLevel })} <b>${targetName}</b>`
+            richText: lt`<b>${t('m.progression.8')}</b> ${t('m.progression.7', { lvl: requiredLevel })} <b>${targetName}</b>`
           }));
         } else if (evo.item) {
           const itemDef = ItemDB.getInstance().getById(evo.item);
           const itemName = itemDef ? t(itemDef.nameKey) : evo.item;
-          const levelSuffix = requiredLevel ? ` (${t('m.progression.7', { lvl: requiredLevel })})` : '';
+          const levelSuffix = requiredLevel ? lt` (${t('m.progression.7', { lvl: requiredLevel })})` : '';
           evoRows.push(new UIText({
             tagName: 'div',
-            richText: `<b>${t('m.progression.6')}</b> ${t('m.progression.5')} ${itemName}${levelSuffix} → <b>${targetName}</b>`
+            richText: lt`<b>${t('m.progression.6')}</b> ${t('m.progression.5')} ${itemName}${levelSuffix} → <b>${targetName}</b>`
           }));
         } else {
           evoRows.push(new UIText({
             tagName: 'div',
-            richText: `<b>${t('m.progression.4')}</b> → <b>${targetName}</b>`
+            richText: lt`<b>${t('m.progression.4')}</b> → <b>${targetName}</b>`
           }));
         }
       }
@@ -681,7 +681,7 @@ export class PokemonInfoModal extends UIModal {
       const rowChildren = [
         new UIText({ tagName: 'span', className: `type-badge type-${move.type}`, text: typeLabel }),
         new UIText({ tagName: 'span', className: 'poke-detail-move-name', text: name }),
-        new UIText({ tagName: 'span', className: 'poke-detail-move-meta', text: `${power} ${t('power_abbrev')} · ${catLabel}` })
+        new UIText({ tagName: 'span', className: 'poke-detail-move-meta', text: lt`${power} ${t('power_abbrev')} · ${catLabel}` })
       ];
       if (isSelected) {
         rowChildren.push(new UIText({
@@ -756,7 +756,7 @@ export class PokemonInfoModal extends UIModal {
         learnTitleChildren.push(new UIText({
           tagName: 'span',
           className: 'pw-text-xs pw-light1',
-          text: ` (${t('select_move_first')})`
+          text: lt` (${t('select_move_first')})`
         }));
       }
 
@@ -781,7 +781,7 @@ export class PokemonInfoModal extends UIModal {
         const rowChildren = [
           new UIText({ tagName: 'span', className: `type-badge type-${move.type}`, text: typeLabel }),
           new UIText({ tagName: 'span', className: 'poke-detail-move-name', text: name }),
-          new UIText({ tagName: 'span', className: 'poke-detail-move-meta', text: `${power} ${t('power_abbrev')} · ${catLabel}` })
+          new UIText({ tagName: 'span', className: 'poke-detail-move-meta', text: lt`${power} ${t('power_abbrev')} · ${catLabel}` })
         ];
 
         const row = new UIContainer({

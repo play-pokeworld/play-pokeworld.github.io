@@ -31,7 +31,7 @@ import { PokemonDB } from '../data/pokemon/PokemonDB.js';
 import { MoveDB } from '../data/battle/MoveDB.js';
 import { TalentDB } from '../data/pokemon/TalentDB.js';
 import { ItemKinds } from '../data/items/ItemKinds.js';
-import { t } from '../localization/LocalizationManager.js';
+import { t, LocalizationManager } from '../localization/LocalizationManager.js';
 
 const ITEMS = () => SecretBaseItemDB.getInstance();
 const LAYOUTS = () => SecretBaseLayoutDB.getInstance();
@@ -979,8 +979,8 @@ export class SecretBaseSystem extends BaseSystem {
 
   /** @private @param {string} key @param {Object} params @param {string} [tone] */
   _notify(key, params = {}, tone = NotificationTones.INFO) {
+    if (!LocalizationManager.getInstance().has(key)) return;
     const message = t(key, params);
-    if (!message || message === key) return;
     NotificationSystem.getInstance().notifyTemporary(message, {
       channel: NotificationChannels.GAMEPLAY,
       tone

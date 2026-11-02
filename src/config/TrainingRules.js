@@ -1,19 +1,35 @@
 /**
  * @file TrainingRules.js
- * @brief Rules for the automatic six-opponent training session.
+ * @brief Rules of the training centre: the sparring waves of a session, their level curve, the
+ * reward cadence and the facility economics.
+ *
+ * The sparring waves follow the balance plan (docs/PLAN_EQUILIBRAGE_GLOBAL.md, training section:
+ * 30 sparring waves calibrated on the class and the base stat total of the trainee, with levels
+ * between 60 % and 120 % of it). The opponents are drawn from the rank of the trainee
+ * (PokemonRankRules), never from the original fixed six-species list.
  */
 export const TrainingRules = Object.freeze({
   LOCATION_ID: 'vermilion',
   REQUIRED_BADGE_ID: 'surge',
-  OPPONENT_COUNT: 6,
-  MOVE_MODE_LEVEL_OFFSET: -2,
+  /** Sparring waves of one session (plan: 30 waves). */
+  OPPONENT_COUNT: 30,
+  /** A session always keeps at least this many waves, staff included. */
+  MIN_STAFF_OPPONENT_COUNT: 6,
+  /** Waves removed by the best training staff member (30 waves at level 1 → 24 at max level). */
+  MAX_STAFF_OPPONENT_REDUCTION: 6,
+  /** One reward every REWARD_INTERVAL_WAVES waves defeated: same rate per battle as the original
+   *  six-opponent session (1 reward for 6 waves), 5 rewards for a complete 30-wave session. */
+  REWARD_INTERVAL_WAVES: 6,
+  /** Level of the waves compared to the trainee: the first wave is easier, the last one harder. */
+  WAVE_LEVEL_FACTOR_MIN: 0.6,
+  WAVE_LEVEL_FACTOR_MAX: 1.2,
+  /** Level shift of each mode, applied to the trainee level before the wave factor. */
   MODE_LEVEL_OFFSETS: Object.freeze({ move: -2, talent: -1, hidden: -1, level: 2, ev: 0 }),
-  MIN_STAFF_OPPONENT_COUNT: 3,
-  MAX_STAFF_OPPONENT_REDUCTION: 3,
   MIN_OPPONENT_LEVEL: 3,
   LEVEL_VARIATION: Object.freeze([-1, 0, 1]),
   TICK_SECONDS: 0.1,
-  MAX_SIMULATION_TICKS: 6000,
+  /** Hard cap of one session: 30 minutes of real battle time (30 waves). */
+  MAX_SIMULATION_TICKS: 18000,
   MODE_ID: 'move',
   DEFAULT_SLOT_COUNT: 1,
   MAX_SLOT_COUNT: 2,

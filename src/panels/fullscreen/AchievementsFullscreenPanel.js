@@ -18,7 +18,7 @@ import { AchievementUnlockedEvent } from '../../core/events/AchievementUnlockedE
 import { AchievementPinnedEvent } from '../../core/events/AchievementPinnedEvent.js';
 import { LanguageChangedEvent } from '../../core/events/LanguageChangedEvent.js';
 import { BonusTypes } from '../../config/BonusRules.js';
-import { t } from '../../localization/LocalizationManager.js';
+import { t, lt } from '../../localization/LocalizationManager.js';
 
 const ALL_FAMILIES = 'all';
 
@@ -187,7 +187,7 @@ export class AchievementsFullscreenPanel extends UIFullscreenPanel {
       if (contrib.type === BonusTypes.MONEY) {
         valStr = `+${contrib.value}%`;
         label = contrib.scope?.region
-          ? `${t('ach_rank_gold') === 'Gold' ? 'Money' : 'Pokédollars'} (${contrib.scope.region.toUpperCase()})`
+          ? lt`${t('ach_rank_gold') === 'Gold' ? 'Money' : 'Pokédollars'} (${contrib.scope.region.toUpperCase()})`
           : (t('ach_rank_gold') === 'Gold' ? 'Money' : 'Pokédollars');
       } else if (contrib.type === BonusTypes.XP) {
         valStr = `+${contrib.value}%`;
@@ -230,7 +230,7 @@ export class AchievementsFullscreenPanel extends UIFullscreenPanel {
             new UIText({ className: 'pw-ach-bonuses-title', text: t('ach_active_multipliers') }),
             new UIText({
               className: 'pw-ach-progress-text',
-              text: `${summary.totalTiers} / ${summary.maxTiers} ${t('ach_tiers_unlocked')} (${summary.progressPct}%)`
+              text: lt`${summary.totalTiers} / ${summary.maxTiers} ${t('ach_tiers_unlocked')} (${summary.progressPct}%)`
             })
           ]
         }),

@@ -13,7 +13,9 @@ import { ModalIds } from '../../config/ModalIds.js';
 import { EventBus } from '../../core/EventBus.js';
 import { ModalOpenRequestedEvent } from '../../core/events/ModalOpenRequestedEvent.js';
 import { BAG_CATEGORIES, BAG_SORT_OPTIONS, BagCategoryIds, BagSorts } from '../../config/BagCategories.js';
+import { ItemDescription } from '../../data/items/ItemDescription.js';
 import { ItemDB } from '../../data/items/ItemDB.js';
+import { ItemDisplayName } from '../../data/items/ItemDisplayName.js';
 import { ItemKinds } from '../../data/items/ItemKinds.js';
 import { PokemonDB } from '../../data/pokemon/PokemonDB.js';
 import { SaleSystem } from '../../systems/SaleSystem.js';
@@ -34,18 +36,10 @@ import { BattleStartedEvent } from '../../core/events/BattleStartedEvent.js';
 import { BattleEndedEvent } from '../../core/events/BattleEndedEvent.js';
 import { FilterBar } from '../components/FilterBar.js';
 import { BagItemRow } from '../components/BagItemRow.js';
-import { t } from '../../localization/LocalizationManager.js';
+import { t, tOr, compose, LocalizationManager, lt } from '../../localization/LocalizationManager.js';
 
-const nameOf = (itemId) => {
-  const item = ItemDB.getInstance().getById(itemId);
-  if (item && [ItemKinds.TM, ItemKinds.HM].includes(item.kind)) {
-    const isCS = itemId.startsWith('cs') || item.kind === ItemKinds.HM;
-    const baseName = t(`item.${itemId}.name`);
-    return isCS ? `${baseName} CS` : `${baseName} CT`;
-  }
-  return t(`item.${itemId}.name`);
-};
-const descOf = (itemId) => t(`item.${itemId}.desc`);
+const nameOf = (itemId) => ItemDisplayName.of(itemId);
+const descOf = (itemId) => ItemDescription.of(itemId);
 
 export class BagPanel extends UIFullscreenPanel {
   constructor() {
@@ -310,7 +304,7 @@ export class BagPanel extends UIFullscreenPanel {
             }),
             new UIContainer({
               children: [
-                new UIText({ tagName: 'div', className: 'pw-sticky-title', text: `${t('use_stone')} ${nameOf(itemId)}` }),
+                new UIText({ tagName: 'div', className: 'pw-sticky-title', text: lt`${t('use_stone')} ${nameOf(itemId)}` }),
                 new UIText({ tagName: 'div', className: 'pw-text-sm pw-light1', text: t('stone_sub') })
               ]
             })
@@ -356,7 +350,7 @@ export class BagPanel extends UIFullscreenPanel {
           className: 'pw-starter-card',
           children: [orb]
         });
-        card.setAttribute('title', `${pokemon.getDisplayName()} → ${targetName} (${owned ? t('already_owned_sp') : t('non_possede')})`);
+        card.setAttribute('title', lt`${pokemon.getDisplayName()} → ${targetName} (${owned ? t('already_owned_sp') : t('non_possede')})`);
         card.setAttribute('role', 'button');
         card.setAttribute('tabindex', '0');
         card.addDomListener('click', () => {
@@ -451,19 +445,19 @@ export class BagPanel extends UIFullscreenPanel {
     const allQuote = SaleSystem.getInstance().getQuote(itemId, qty);
     const isDiamonds = quote?.currencyId === 'diamonds';
     const oneQuote = isDiamonds
-      ? `+${TextFormatter.formatNumber(quote?.gain ?? 0)} ${t('currency_diamonds')}`
+      ? lt`+${TextFormatter.formatNumber(quote?.gain ?? 0)} ${t('currency_diamonds')}`
       : `+${TextFormatter.formatNumber(quote?.gain ?? 0)}₽`;
     const allQuoteStr = isDiamonds
-      ? `+${TextFormatter.formatNumber(allQuote?.gain ?? 0)} ${t('currency_diamonds')}`
+      ? lt`+${TextFormatter.formatNumber(allQuote?.gain ?? 0)} ${t('currency_diamonds')}`
       : `+${TextFormatter.formatNumber(allQuote?.gain ?? 0)}₽`;
     const unitValue = isDiamonds
-      ? `${TextFormatter.formatNumber(quote?.gain ?? 0)} ${t('currency_diamonds')}`
+      ? lt`${TextFormatter.formatNumber(quote?.gain ?? 0)} ${t('currency_diamonds')}`
       : `${TextFormatter.formatNumber(quote?.gain ?? 0)}₽`;
 
     const titleRow = new UIContainer({
       className: 'loc-title',
       children: [
-        new UIText({ text: `${t('m.inventory.5')} ` }),
+        new UIText({ text: lt`${t('m.inventory.5')} ` }),
         new UIImage({
           src: ItemDB.getInstance().getImagePath(itemId),
           alt: nameOf(itemId),
@@ -482,7 +476,7 @@ export class BagPanel extends UIFullscreenPanel {
 
     const sellOneBtn = new UIButton({
       className: 'hbtn',
-      text: `${t('sale_sell_one')} (${oneQuote})`,
+      text: lt`${t('sale_sell_one')} (${oneQuote})`,
       onClick: () => {
         SaleSystem.getInstance().sell(itemId, 1);
         if (save.inventory.count(itemId) <= 0) {
@@ -497,7 +491,7 @@ export class BagPanel extends UIFullscreenPanel {
     if (qty > 1) {
       actions.push(new UIButton({
         className: 'hbtn',
-        text: `${t('sale_sell_all', { count: qty })} (${allQuoteStr})`,
+        text: lt`${t('sale_sell_all', { count: qty })} (${allQuoteStr})`,
         onClick: () => {
           SaleSystem.getInstance().sell(itemId, qty);
           this._subView = null;
@@ -541,9 +535,7 @@ export class BagPanel extends UIFullscreenPanel {
     const currentItemId = pokemon.heldItem || null;
     const currentNameKey = currentItemId ? `item.${currentItemId}.name` : '';
     const localizedCurrentName = currentItemId ? nameOf(currentItemId) : '';
-    const currentName = currentItemId
-      ? (localizedCurrentName === currentNameKey ? currentItemId : localizedCurrentName)
-      : t('pokemon_info_no_item');
+    const currentName = currentItemId ? tOr(currentNameKey, currentItemId) : t('pokemon_info_no_item');
     const locked = HeldItemSystem.getInstance().isLocked();
     this.setFooter([this._heldItemFooter(currentItemId, locked)]);
     const shown = BagQuery.filter(
@@ -554,7 +546,7 @@ export class BagPanel extends UIFullscreenPanel {
     const currentItemRow = new UIContainer({
       className: 'pw-held-item-current',
       children: [
-        new UIText({ className: 'pw-text-sm pw-light1', text: `${t('equipped_item_label')}:` }),
+        new UIText({ className: 'pw-text-sm pw-light1', text: lt`${t('equipped_item_label')}:` }),
         currentItemId ? new UIImage({
           src: ItemDB.getInstance().getImagePath(currentItemId),
           alt: '',
@@ -579,7 +571,7 @@ export class BagPanel extends UIFullscreenPanel {
             new UIText({
               tagName: 'div',
               className: 'pw-text-md pw-bold pw-light1',
-              text: `${pokemon.getDisplayName()} ${t('level_short_value', { level: pokemon.level })}`
+              text: lt`${pokemon.getDisplayName()} ${t('level_short_value', { level: pokemon.level })}`
             }),
             currentItemRow
           ]
@@ -597,10 +589,9 @@ export class BagPanel extends UIFullscreenPanel {
         const holderLabel = holderIsOther
           ? t('held_item_equipped_elsewhere', { name: entry.holder.getDisplayName() })
           : '';
-        const descriptionKey = `item.${entry.itemId}.desc`;
-        const localizedDescription = descOf(entry.itemId);
+        const description = descOf(entry.itemId);
         list.addChild(new BagItemRow(entry, entry.itemId === currentItemId, (itemId) => this._equipHeldItem(itemId), {
-          description: localizedDescription === descriptionKey ? '' : localizedDescription,
+          description,
           quantityLabel: t('bag_qty', { n: entry.quantity }),
           holderLabel,
           disabled: locked || holderIsOther,
@@ -635,7 +626,7 @@ export class BagPanel extends UIFullscreenPanel {
       ]
     });
     actions.setAttribute('role', 'group');
-    actions.setAriaLabel(`${t('held_item_remove_btn')} / ${t('cancel')}`);
+    actions.setAriaLabel(lt`${t('held_item_remove_btn')} / ${t('cancel')}`);
     return actions;
   }
 

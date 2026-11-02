@@ -13,7 +13,7 @@ import { AtollSystem } from '../systems/AtollSystem.js';
 import { MoveDB } from '../data/battle/MoveDB.js';
 import { PokemonDB } from '../data/pokemon/PokemonDB.js';
 import { AtollStateChangedEvent } from '../core/events/AtollStateChangedEvent.js';
-import { t } from '../localization/LocalizationManager.js';
+import { t, lt } from '../localization/LocalizationManager.js';
 
 export class AtollFactoryPrepModal extends StaticModalPanel {
   constructor() {
@@ -52,7 +52,7 @@ export class AtollFactoryPrepModal extends StaticModalPanel {
     }
 
     const mode = atollSys.getMode(run.modeKey) || {};
-    this.setTitle(`${t('atoll_factory_run_title')} · ${t('atoll_factory_run_streak', { streak: run.streak || 0, mode: t(mode.label || '') })}`);
+    this.setTitle(lt`${t('atoll_factory_run_title')} · ${t('atoll_factory_run_streak', { streak: run.streak || 0, mode: t(mode.label || '') })}`);
 
     // Instruction hint
     this.addChild(new UIText({

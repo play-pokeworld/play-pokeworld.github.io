@@ -15,7 +15,7 @@ import { ModalIds } from '../config/ModalIds.js';
 import { SaveSystem } from '../systems/SaveSystem.js';
 import { DictionaryCatalog } from '../systems/dictionary/DictionaryCatalog.js';
 import { TextFormatter } from '../core/TextFormatter.js';
-import { t } from '../localization/LocalizationManager.js';
+import { t, lt } from '../localization/LocalizationManager.js';
 
 export class DictionaryDetailModal extends StaticModalPanel {
   constructor() {
@@ -319,7 +319,7 @@ export class DictionaryDetailModal extends StaticModalPanel {
           new UIText({
             tagName: 'span',
             className: 'dict-chip',
-            text: `#${s.dex} ${t(s.getNameKey())}`,
+            text: lt`#${s.dex} ${t(s.getNameKey())}`,
           }),
       );
       if (cat.species.length > cap) {
@@ -440,7 +440,7 @@ export class DictionaryDetailModal extends StaticModalPanel {
         new UIText({
           tagName: 'span',
           className: 'dict-chip',
-          text: `#${s.dex} ${t(s.getNameKey())}`,
+          text: lt`#${s.dex} ${t(s.getNameKey())}`,
         }),
     );
     if (detail.carriers.length > cap) {
@@ -485,7 +485,7 @@ export class DictionaryDetailModal extends StaticModalPanel {
           new UIText({
             tagName: 'span',
             className: 'dict-chip dict-chip-hidden',
-            text: `#${s.dex} ${t(s.getNameKey())}`,
+            text: lt`#${s.dex} ${t(s.getNameKey())}`,
           }),
       );
       if (detail.hiddenCarriers.length > cap) {

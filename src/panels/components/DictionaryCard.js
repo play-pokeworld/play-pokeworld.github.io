@@ -9,7 +9,7 @@ import { UIText } from '../../ui/UIText.js';
 import { UIIcon } from '../../ui/UIIcon.js';
 import { UIImage } from '../../ui/UIImage.js';
 import { ItemDB } from '../../data/items/ItemDB.js';
-import { t } from '../../localization/LocalizationManager.js';
+import { t, lt } from '../../localization/LocalizationManager.js';
 
 export class DictionaryCard extends UIContainer {
   /**
@@ -64,7 +64,7 @@ export class DictionaryCard extends UIContainer {
     });
 
     this.addChildren([icon, textCluster]);
-    this.setAriaLabel(`${entry.name} — ${entry.subtitle}`);
+    this.setAriaLabel(lt`${entry.name} — ${entry.subtitle}`);
 
     if (typeof onClick === 'function') {
       this.addDomListener('click', () => onClick(entry));

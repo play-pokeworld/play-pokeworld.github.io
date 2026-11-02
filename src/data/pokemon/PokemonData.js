@@ -18,7 +18,7 @@ import { StatCalculator } from './StatCalculator.js';
 import { ExperienceCurve } from './ExperienceCurve.js';
 import { MoveLearnset } from './MoveLearnset.js';
 import { Random } from '../../core/Random.js';
-import { LocalizationManager, t } from '../../localization/LocalizationManager.js';
+import { LocalizationManager, t, compose } from '../../localization/LocalizationManager.js';
 
 /** Fallback species when a save entry is corrupted. */
 const DEFAULT_SPECIES = 'pikachu';
@@ -31,6 +31,8 @@ export class PokemonData extends BaseModel {
     super(`Pokemon_${data?.species || DEFAULT_SPECIES}`, 'Data');
     /** @private @type {Readonly<Record<string, number>>|null} stats cache */
     this._stats = null;
+    /** @type {boolean} Runtime-only flag: a rental Pokémon is labelled with a translation key. */
+    this.rental = false;
     this.deserialize(data);
   }
 
@@ -62,9 +64,9 @@ export class PokemonData extends BaseModel {
    * @returns {string}
    */
   getDisplayName() {
-    if (this.nickname) return this.nickname;
-    const key = this.getNameKey();
-    return LocalizationManager.getInstance().has(key) ? t(key) : this.species;
+    const base = this.nickname || (LocalizationManager.getInstance().has(this.getNameKey()) ? t(this.getNameKey()) : this.species);
+    // A rental Pokémon (Battle Atoll) is labelled by a translation key, never by stored text.
+    return this.rental ? compose(t('atoll_rental'), ' ', base) : base;
   }
 
   /** @returns {string} */

@@ -24,7 +24,8 @@ export class NpcDirectory {
       const nameKey = `${baseKey}.name`;
       if (!localization.has(nameKey)) break;
       const idKey = `${baseKey}.id`;
-      const id = localization.has(idKey) ? localization.t(idKey) : `${locationId}:${index}`;
+      // A stable id is a plain string: it is compared by identity, never translated on screen.
+      const id = localization.has(idKey) ? localization.text(idKey) : `${locationId}:${index}`;
       const lines = [];
       for (let lineIndex = 0; lineIndex < MAX_DIALOGUE_LINES; lineIndex++) {
         const lineKey = `${baseKey}.lines.${lineIndex}`;

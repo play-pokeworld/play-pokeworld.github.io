@@ -17,6 +17,7 @@ import { DebugModeChangedEvent } from '../core/events/DebugModeChangedEvent.js';
 import { AnimationPreferencesChangedEvent } from '../core/events/AnimationPreferencesChangedEvent.js';
 import { AnimationPreferences } from '../config/AnimationPreferences.js';
 import { DEFAULT_UI_THEME } from '../config/UiThemes.js';
+import { LocalizedTextBinder } from './LocalizedTextBinder.js';
 
 /** Class put on <body> while the developer mode is unlocked. */
 const DEBUG_CLASS = 'debug-active';
@@ -52,10 +53,17 @@ export class AppShell {
     bus.subscribe(AnimationPreferencesChangedEvent, (event) => AppShell.setAnimationPreferences(event.preferences));
   }
 
-  /** @param {string} lang */
+  /**
+   * Applies a language to the document and refreshes every text bound to a translation.
+   * This is the single language-change hook of the UI: no panel implements it on its own
+   * (see `LocalizedTextBinder`). Views that also derive layout from the text listen to
+   * `LanguageChangedEvent` themselves.
+   * @param {string} lang
+   */
   static setLanguage(lang) {
     if (typeof document === 'undefined' || !document.documentElement) return;
     document.documentElement.setAttribute('lang', lang);
+    LocalizedTextBinder.refresh();
   }
 
   /**

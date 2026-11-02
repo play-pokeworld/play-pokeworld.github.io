@@ -1,7 +1,8 @@
 /**
  * @file gen-species.mjs
  * @brief Generates src/data/raw/species-data.js and forms-data.js from the original game:
- * Pokédex rows (pd-data.js), alternate forms (forms-data.js), talent pools (poke-talents.js)
+ * Pokédex rows (pd-data.js), alternate forms (forms-data.js), talent pools (poke-talents.js,
+ * completed with the type affinities by tools/data/talent-pools.mjs)
  * and evolution tables (application/combat/progression.js + the special cases of checkEvolution).
  *
  * The species id is the slug of the English name; it is also the sprite file stem
@@ -15,6 +16,7 @@ import path from 'path';
 import { OriginalSource } from './OriginalSource.mjs';
 import { writeTable, PROJECT_ROOT } from './TableWriter.mjs';
 import { syncLocaleTable } from './LocaleSync.mjs';
+import { completeTalentPool } from './talent-pools.mjs';
 
 const GENERATOR = 'tools/data/gen-species.mjs';
 
@@ -98,7 +100,13 @@ export async function generateSpecies(source) {
       stats: [hp, atk, def, spa, spd, spe],
       catchRate,
       xpYield,
-      talents: (talents.POKE_TALENTS[dex] || []).map((talent) => String(talent).toLowerCase()),
+      // Upstream pools of the Hoenn / Sinnoh ranges were never filled in (3 entries, the
+      // signature ability often listed twice): the pool is completed with the type affinities,
+      // see tools/data/talent-pools.mjs.
+      talents: completeTalentPool(
+        [lowerType(type1), lowerType(type2)].filter(Boolean),
+        (talents.POKE_TALENTS[dex] || []).map((talent) => String(talent).toLowerCase())
+      ),
       hiddenTalent: hidden ? String(hidden).toLowerCase() : null,
       evolutions: evolutions[dex] || []
     };
@@ -125,7 +133,8 @@ export async function generateSpecies(source) {
     brief: 'Pokémon species (id = English-name slug = sprite file stem).',
     notes: [
       'Entry: { dex, region, types[lowercase], stats[hp, atk, def, spa, spd, spe], catchRate, xpYield,',
-      '         talents[ids of the talent pool], hiddenTalent, evolutions[] }',
+      '         talents[ids of the talent pool: signature talents + type affinities, see',
+      '         tools/data/talent-pools.mjs], hiddenTalent, evolutions[] }',
       'Evolution: { to, level } | { to, item, minLevel } | { to, level, split: true } (all split',
       '           branches are obtained together) | { to, level, condition } (Tyrogue).',
       'catchRate and xpYield keep the original values (45 / 60 placeholders for most species).'

@@ -143,7 +143,7 @@ export const L_en_npc = {
   "burnedtower": [
     {
       "id": "npc_burnedtower_1",
-      "name": "Esprit de la Tour",
+      "name": "Tower Spirit",
       "lines": [
         "Three flames once rose here...",
         "Raikou, Entei, Suicune — the Beasts shall return."
@@ -784,7 +784,7 @@ export const L_en_npc = {
       "id": "npc_lavaridge_1",
       "name": "Adrianna",
       "lines": [
-        "Les sources chaudes !"
+        "The hot springs!"
       ]
     }
   ],
@@ -845,14 +845,14 @@ export const L_en_npc = {
       "id": "npc_littleroot_1",
       "name": "Adventurer",
       "lines": [
-        "Hoenn est magnifique !"
+        "Hoenn is beautiful!"
       ]
     },
     {
       "id": "npc_littleroot_2",
       "name": "Prof. Seko",
       "lines": [
-        "Ton Pokédex se complète !"
+        "Your Pokédex is filling up!"
       ]
     }
   ],
@@ -905,7 +905,7 @@ export const L_en_npc = {
       "id": "npc_mirage_island_1",
       "name": "Ancien",
       "lines": [
-        "L'Île Mirage apparaît dans la brume."
+        "Mirage Island appears in the mist."
       ]
     }
   ],
@@ -940,7 +940,7 @@ export const L_en_npc = {
       "id": "npc_mossdeep_space_center_1",
       "name": "Astronome",
       "lines": [
-        "L'espace est immense."
+        "Space is vast."
       ]
     },
     {
@@ -1197,7 +1197,7 @@ export const L_en_npc = {
   "pewter": [
     {
       "id": "kanto_pewter_npc_01",
-      "name": "Pokémaniac Pierre",
+      "name": "Poké Maniac Brock",
       "lines": [
         "Mt. Moon hides Moon Stones!",
         "Go test yourself!"
@@ -1451,7 +1451,7 @@ export const L_en_npc = {
       "id": "npc_rustboro_1",
       "name": "Roxanne",
       "lines": [
-        "La roche est solide."
+        "Rock is solid."
       ]
     }
   ],
@@ -1512,7 +1512,7 @@ export const L_en_npc = {
       "id": "npc_seafloor_cavern_1",
       "name": "Arthur",
       "lines": [
-        "Kyogre repose au fond."
+        "Kyogre rests at the bottom."
       ]
     },
     {
@@ -1763,7 +1763,7 @@ export const L_en_npc = {
       "id": "npc_verdanturf_1",
       "name": "Wanda",
       "lines": [
-        "Vergazon a un air pur."
+        "Verdanturf has clean air."
       ]
     }
   ],

@@ -18,6 +18,7 @@ import { PokemonForm } from './PokemonForm.js';
 import { TypeChart } from '../core/TypeChart.js';
 import { REGIONS } from '../../config/Regions.js';
 import { TalentDB } from './TalentDB.js';
+import { PokemonRules } from '../../config/PokemonRules.js';
 
 export class PokemonDB extends DataRepository {
   /** @type {PokemonDB|null} */
@@ -123,7 +124,11 @@ export class PokemonDB extends DataRepository {
       for (const evolution of species.evolutions) {
         if (!this.has(evolution.to)) problems.push(this._problem(species.id, 'evolutions', evolution.to));
       }
-      if (species.talents.length === 0) problems.push(this._problem(species.id, 'talents', null));
+      // The pool of a species is a rule, not a hand-written list (tools/data/talent-pools.mjs):
+      // a short pool means the talent roll always returns the same talent.
+      if (species.talents.length < PokemonRules.MIN_TALENT_POOL) {
+        problems.push(this._problem(species.id, 'talents', species.talents.length));
+      }
       for (const talent of [...species.talents, ...(species.hiddenTalent ? [species.hiddenTalent] : [])]) {
         if (!talents.has(talent)) problems.push(this._problem(species.id, 'talents', talent));
       }

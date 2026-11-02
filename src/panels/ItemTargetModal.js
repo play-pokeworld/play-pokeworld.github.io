@@ -9,6 +9,7 @@ import { UIButton } from '../ui/UIButton.js';
 import { UIImage } from '../ui/UIImage.js';
 import { UIPokemonSprite, PokemonSpriteSizes } from '../ui/UIPokemonSprite.js';
 import { ModalIds } from '../config/ModalIds.js';
+import { ItemDescription } from '../data/items/ItemDescription.js';
 import { ItemDB } from '../data/items/ItemDB.js';
 import { ItemUseActions, ItemUseResults } from '../config/ItemUseRules.js';
 import { ItemUseSystem } from '../systems/ItemUseSystem.js';
@@ -77,7 +78,7 @@ export class ItemTargetModal extends StaticModalPanel {
           className: 'pw-item-use-heading',
           children: [
             new UIText({ tagName: 'strong', text: t(`item.${this._itemId}.name`) }),
-            new UIText({ tagName: 'span', text: t(`item.${this._itemId}.desc`) })
+            new UIText({ tagName: 'span', text: ItemDescription.of(this._itemId) })
           ]
         })
       ]

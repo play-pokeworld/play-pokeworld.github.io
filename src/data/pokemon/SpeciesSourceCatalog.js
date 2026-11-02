@@ -15,7 +15,7 @@ import { QuestDB } from '../quests/QuestDB.js';
 import { HatcheryRules } from '../../config/HatcheryRules.js';
 import { SanctuaryDB } from '../sanctuary/SanctuaryDB.js';
 import { PokemonDB } from './PokemonDB.js';
-import { LocalizationManager, t } from '../../localization/LocalizationManager.js';
+import { LocalizationManager, t, joinLocalized } from '../../localization/LocalizationManager.js';
 
 export class SpeciesSourceCatalog {
   /**
@@ -222,7 +222,7 @@ export class SpeciesSourceCatalog {
     }
 
     if (eggParents.length > 0) {
-      lines.push(t('dex_src_egg', { parents: [...new Set(eggParents)].join(', ') }));
+      lines.push(t('dex_src_egg', { parents: joinLocalized(', ', [...new Set(eggParents)]) }));
     }
 
     return lines;

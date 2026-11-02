@@ -15,6 +15,7 @@
  */
 
 import { BaseSystem } from './BaseSystem.js';
+import { DebugTimeScale } from '../core/DebugTimeScale.js';
 import { SaveSystem } from './SaveSystem.js';
 import { LocationSystem } from './LocationSystem.js';
 import { BonusSystem } from './BonusSystem.js';
@@ -38,6 +39,7 @@ import { HeldEffectKinds } from '../data/items/HeldEffectKinds.js';
 import { NotificationChannels, NotificationTones } from '../config/NotificationConfig.js';
 import { BattleSession, BattleOutcomes } from './battle/BattleSession.js';
 import { BattleSides } from '../config/BattleSides.js';
+import { FastForwardRules } from '../config/FastForwardRules.js';
 import { BonusTypes } from '../config/BonusRules.js';
 import { BattleLogFormatter } from './battle/BattleLogFormatter.js';
 import { RewardRules } from './battle/RewardRules.js';
@@ -56,6 +58,7 @@ import { SaveCreatedEvent } from '../core/events/SaveCreatedEvent.js';
 import { SaveLoadedEvent } from '../core/events/SaveLoadedEvent.js';
 import { BattleAttackEvent } from '../core/events/BattleAttackEvent.js';
 import { PokemonDefeatedEvent } from '../core/events/PokemonDefeatedEvent.js';
+import { BattlePlayerFaintedEvent } from '../core/events/BattlePlayerFaintedEvent.js';
 import { DungeonBattleResolvedEvent } from '../core/events/DungeonBattleResolvedEvent.js';
 import { BattleFoeKnockedOutEvent } from '../core/events/BattleFoeKnockedOutEvent.js';
 import { SecretBaseNpcBattleResolvedEvent } from '../core/events/SecretBaseNpcBattleResolvedEvent.js';
@@ -90,6 +93,8 @@ export class BattleSystem extends BaseSystem {
 
   constructor() {
     super('BattleSystem', 'System');
+    /** @private AFK catch-up depth: no per-step UI event and no save per battle while > 0. */
+    this._catchUpDepth = 0;
     /** @private @type {BattleSession|null} */ this._session = null;
     /** @private @type {string|null} */ this._locationId = null;
     /** @private @type {string|null} Quest whose final encounter is running */ this._questKey = null;
@@ -114,7 +119,6 @@ export class BattleSystem extends BaseSystem {
     /** @private @type {Function|null} */ this._onLocalQuestBattleRequested = null;
     /** @private @type {Function|null} */ this._onModalToggled = null;
     /** @private @type {Function|null} */ this._onSaveContextChanged = null;
-    /** @private @type {number} */ this._speedMultiplier = 1;
   }
 
   /** @override */
@@ -609,35 +613,34 @@ export class BattleSystem extends BaseSystem {
     this._healOnEnd = true;
     this._dungeonContext = null;
     this._sanctuaryBattle = null;
-    SaveSystem.getInstance().saveCurrent();
+    if (this._catchUpDepth === 0) SaveSystem.getInstance().saveCurrent();
     EventBus.getInstance().dispatch(new BattleEndedEvent(endedAsVictory, exp, money));
     EventBus.getInstance().dispatch(new BattleRunFinishedEvent(locationId,kind,endedAsVictory?'victory':natural?'defeat':'stopped',natural));
   }
 
   /**
-   * Sets the debug battle speed multiplier (e.g. 10 for x10 speed).
-   * @param {number} multiplier
+   * AFK catch-up: finishes the battle that was already running with its real mechanics (cooldowns,
+   * damage, experience, drops, captures). It never starts a battle: with no live session it does nothing.
+   * @param {number} seconds - Remaining simulated budget
+   * @returns {number} Simulated seconds consumed
    */
-  setSpeedMultiplier(multiplier) {
-    this._speedMultiplier = Math.max(1, Number(multiplier) || 1);
+  catchUp(seconds) {
+    if (!this._session) return 0;
+    const step = FastForwardRules.STEP_SECONDS;
+    let consumed = 0;
+    this._catchUpDepth++;
+    try {
+      while (this._session && consumed + step <= seconds) {
+        this.update(step);
+        consumed += step;
+      }
+    } finally {
+      this._catchUpDepth--;
+    }
+    return consumed;
   }
 
-  /**
-   * @returns {number} Current speed multiplier (1 by default).
-   */
-  getSpeedMultiplier() {
-    return this._speedMultiplier || 1;
-  }
-
-  /**
-   * Toggles between 1x and 10x battle speed.
-   * @returns {number} New multiplier (1 or 10).
-   */
-  toggleSpeedMultiplierX10() {
-    const next = this.getSpeedMultiplier() === 10 ? 1 : 10;
-    this.setSpeedMultiplier(next);
-    return next;
-  }
+  /** The debug time multiplier is owned by DebugTimeScale and shared with the training loop. */
 
   /**
    * @override
@@ -646,8 +649,7 @@ export class BattleSystem extends BaseSystem {
   update(dt) {
     const session = this._session;
     if (!session) return;
-    const timeScale = this._speedMultiplier > 1 ? this._speedMultiplier : 1;
-    session.update(dt * timeScale);
+    session.update(DebugTimeScale.getInstance().scale(dt));
     const hits = session.drainHits();
     if (this._activeRun) {
       this._activeRun.playerKOs = session.playerKOs;
@@ -665,9 +667,16 @@ export class BattleSystem extends BaseSystem {
         row.damage += Math.max(0, Number(hit.damage) || 0);
       }
     }
-    for (const hit of hits) EventBus.getInstance().dispatch(new BattleAttackEvent(hit));
-    const changed = this._flushLog() || hits.length > 0;
-    if (changed) EventBus.getInstance().dispatch(new BattleStateChangedEvent(session.active.pokemon, session.foe.pokemon));
+    if (this._catchUpDepth === 0) {
+      for (const hit of hits) EventBus.getInstance().dispatch(new BattleAttackEvent(hit));
+      const changed = this._flushLog() || hits.length > 0;
+      if (changed) {
+        EventBus.getInstance().dispatch(new BattleStateChangedEvent(session.active.pokemon, session.foe.pokemon));
+      }
+    } else {
+      // A replay has no reader: drop the pending log lines instead of formatting tens of thousands of them.
+      session.log.drain();
+    }
     if (session.isOver()) this._finish(session);
   }
 
@@ -726,6 +735,11 @@ export class BattleSystem extends BaseSystem {
       nextFoeIntroKey: (pokemon) => roamingNextFoes.has(pokemon)
         ? 'roaming_legendary_appeared'
         : 'battle_log.wild_appeared',
+      onPlayerFainted: (combatant) => EventBus.getInstance().dispatch(new BattlePlayerFaintedEvent(
+        combatant?.pokemon?.species ?? '',
+        combatant?.pokemon?.level ?? 0,
+        locationId
+      )),
       onFoeDefeated: (encounter, runningSession) => {
         const defeated = encounter?.pokemon;
         if (defeated && !this._secretBaseBattle) EventBus.getInstance().dispatch(new BattleFoeKnockedOutEvent(

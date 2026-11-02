@@ -37,7 +37,8 @@ import { MoveLearningSystem } from '../../systems/MoveLearningSystem.js';
 import { PokemonActionIds } from '../../config/PokemonUsageRules.js';
 import { NotificationSystem } from '../../systems/NotificationSystem.js';
 import { NotificationChannels, NotificationTones } from '../../config/NotificationConfig.js';
-import { LocalizationManager, t } from '../../localization/LocalizationManager.js';
+import { LocalizationManager, t, lt } from '../../localization/LocalizationManager.js';
+import { hasText } from '../../localization/LocalizedText.js';
 
 const SORTS = Object.freeze([
   ['id', 'sort_dex_number'],
@@ -95,13 +96,12 @@ export class BoxPanel extends UIFullscreenPanel {
     this._selectionAllowedUids = nextRequestId && Array.isArray(params.selectionAllowedUids)
       ? new Set(params.selectionAllowedUids.filter((uid) => typeof uid === 'string')) : null;
     const footer = params?.selectionFooter;
-    this._selectionFooter = this._selectionRequestId && footer
-      && typeof footer.label === 'string'
-      && typeof footer.cancelLabel === 'string'
+    // Labels are localized texts (a LocalizedText keeps its key): they follow a language change.
+    this._selectionFooter = this._selectionRequestId && footer && hasText(footer.label) && hasText(footer.cancelLabel)
       ? {
         label: footer.label,
         cancelLabel: footer.cancelLabel,
-        removeLabel: typeof footer.removeLabel === 'string' ? footer.removeLabel : '',
+        removeLabel: hasText(footer.removeLabel) ? footer.removeLabel : '',
         removeDisabled: footer.removeDisabled === true
       }
       : null;
@@ -137,12 +137,12 @@ export class BoxPanel extends UIFullscreenPanel {
         const moveName = LocalizationManager.getInstance().has(`move.${item.move}`)
           ? t(`move.${item.move}`)
           : item.move;
-        this.setTitle(`${t('teaching_move')} ${moveName} (${tmKind}) · ×${qty}`);
+        this.setTitle(lt`${t('teaching_move')} ${moveName} (${tmKind}) · ×${qty}`);
       } else {
         const itemName = LocalizationManager.getInstance().has(`item.${this._itemUseId}.name`)
           ? t(`item.${this._itemUseId}.name`)
           : this._itemUseId;
-        this.setTitle(`${t('selector_title_item_use')} · ${itemName} ×${qty}`);
+        this.setTitle(lt`${t('selector_title_item_use')} · ${itemName} ×${qty}`);
       }
     } else if (this._selectionRequestId) {
       this.setTitle(t('box_select_pokemon_title'));

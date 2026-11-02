@@ -434,8 +434,8 @@ try {
       assert.ok(await tabs.nth(2).evaluate((e) => e.classList.contains('active')));
       const evPanel = pokeModal().locator('#pokemon-info-stat-panel-evs');
       assert.ok(await evPanel.isVisible());
-      assert.ok((await evPanel.innerText()).includes('/ 18'));
-      assert.ok((await evPanel.innerText()).includes('/ 36'));
+      assert.ok((await evPanel.innerText()).includes('/ 6'), 'per-stat EV cap');
+      assert.ok((await evPanel.innerText()).includes('/ 36'), 'total EV cap');
       await page.screenshot({ path: path.join(output, '06-pokemon-info-iv-ev.png') });
     },
   );

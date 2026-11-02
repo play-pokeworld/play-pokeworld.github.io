@@ -132,7 +132,7 @@ describe('UI widgets', (test) => {
     assert.equal(dom.querySelector('.pw-quest-objective-text')?.textContent, t('m.quest_ui.22'));
     assert.ok(dom.querySelector('.pw-progress-label')?.classList.contains('is-hidden'), 'talk objectives use the actionable prompt rather than a duplicate 0/1 row');
     assert.ok(dom.querySelector('.quest-progress-container')?.classList.contains('is-hidden'), 'text objectives do not show an empty progress bar');
-    assert.ok([...dom.querySelectorAll('.pw-quest-info-line')].some((node) => node.textContent === t('m.quest_ui.20') && !node.classList.contains('is-hidden')), 'a non-challenge quest shows the informative in-progress line');
+    assert.ok([...dom.querySelectorAll('.pw-quest-info-line')].some((node) => node.textContent === String(t('m.quest_ui.20')) && !node.classList.contains('is-hidden')), 'a non-challenge quest shows the informative in-progress line');
     assert.ok(dom.querySelector('.quest-claim-btn')?.classList.contains('is-hidden'), 'non-claimable quests do not show a dead disabled button');
     card.destroy();
 
@@ -376,7 +376,7 @@ describe('UI widgets', (test) => {
       assert.equal(drawerToggle.getAttribute('aria-label'), t('pokedex_filters_close'));
       drawerToggle.click();
 
-      const shinyChip = [...dom.querySelectorAll('.pw-chip')].find((button) => button.textContent.trim() === t('box_filter_shiny_only'));
+      const shinyChip = [...dom.querySelectorAll('.pw-chip')].find((button) => button.textContent.trim() === String(t('box_filter_shiny_only')));
       assert.ok(shinyChip, 'the shiny-only reference filter is visible');
       shinyChip.click();
       assert.equal(dom.querySelectorAll('.pw-pokedex-entry').length, 1, 'shiny filter narrows the grid');
@@ -442,11 +442,11 @@ describe('UI widgets', (test) => {
     const activeSort = [...sortedToolbar.querySelectorAll('.usm-sort-btn')].find((chip) => chip.classList.contains('active'));
     assert.equal(activeSort?.dataset.sort, 'level', 'sorting updates the active category in the unified toolbar');
     assert.equal(activeSort?.dataset.dir, '▼', 'the active sort category exposes the descending direction marker');
-    assert.ok(buttons.includes(t('box_filter_favorite_only')), 'favorites have a direct toolbar filter');
-    assert.ok(buttons.includes(t('box_filter_locked_only')), 'locked Pokémon have a direct toolbar filter');
+    assert.ok(buttons.includes(String(t('box_filter_favorite_only'))), 'favorites have a direct toolbar filter');
+    assert.ok(buttons.includes(String(t('box_filter_locked_only'))), 'locked Pokémon have a direct toolbar filter');
     const fieldLabels = [...dom.querySelectorAll('.pw-filter-label')].map((label) => label.textContent.trim());
-    assert.ok(!fieldLabels.includes(t('box_filter_favorite')), 'favorites use the reference toggle instead of an extra inverse dropdown');
-    assert.ok(!fieldLabels.includes(t('box_filter_locked')), 'locked state uses the reference toggle instead of an extra inverse dropdown');
+    assert.ok(!fieldLabels.includes(String(t('box_filter_favorite'))), 'favorites use the reference toggle instead of an extra inverse dropdown');
+    assert.ok(!fieldLabels.includes(String(t('box_filter_locked'))), 'locked state uses the reference toggle instead of an extra inverse dropdown');
     const rankSelect = [...dom.querySelectorAll('select')].find((selectElement) =>
       [...selectElement.querySelectorAll('option')].some((option) => option.value === 'S')
     );

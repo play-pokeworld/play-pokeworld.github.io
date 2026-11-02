@@ -38,8 +38,11 @@ export class PokemonSpecies {
     this.catchRate = Number(raw.catchRate) || 0;
     /** @type {number} Experience yield */
     this.xpYield = Number(raw.xpYield) || 0;
-    /** @type {ReadonlyArray<string>} Talent pool (TalentDB ids) */
-    this.talents = deepFreeze([...(raw.talents || [])]);
+    /**
+     * @type {ReadonlyArray<string>} Talent pool (TalentDB ids), listed order, without duplicates:
+     * a repeated id would show the same talent twice and shrink the rollable pool.
+     */
+    this.talents = deepFreeze([...new Set((raw.talents || []).map((talent) => String(talent).toLowerCase()))]);
     /** @type {string|null} Hidden talent (TalentDB id) */
     this.hiddenTalent = raw.hiddenTalent || null;
     /** @type {ReadonlyArray<Evolution>} */

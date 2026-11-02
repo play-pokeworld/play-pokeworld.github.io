@@ -4,7 +4,7 @@
  */
 import { UIContainer } from '../../ui/UIContainer.js';
 import { UIText } from '../../ui/UIText.js';
-import { t } from '../../localization/LocalizationManager.js';
+import { t, lt } from '../../localization/LocalizationManager.js';
 
 const WEATHER_KEYS = Object.freeze({
   rain: 'weather_rainy', rainy: 'weather_rainy',
@@ -47,9 +47,9 @@ function effectText(kind, turns, keys, fallbackPrefix) {
   }
   const value = Number(turns);
   if (Number.isFinite(value) && value > 0 && value < 900) {
-    return `${label} (${value} ${t('turns_abbrev')})`;
+    return lt`${label} (${value} ${t('turns_abbrev')})`;
   }
-  return `${label} (${t('weather_permanent')})`;
+  return lt`${label} (${t('weather_permanent')})`;
 }
 
 export class BattleZoneEffects extends UIContainer {
@@ -70,8 +70,8 @@ export class BattleZoneEffects extends UIContainer {
     const weatherText = effectText(weather, field?.weatherTurns, WEATHER_KEYS, 'battle_log.weather.');
     const terrainText = effectText(terrain, field?.terrainTurns, TERRAIN_KEYS, 'battle_log.terrain.');
 
-    this._weather.setText(weatherText ? `${t('weather_label')} : ${weatherText}` : '');
-    this._terrain.setText(terrainText ? `${t('terrain_label')} : ${terrainText}` : '');
+    this._weather.setText(weatherText ? lt`${t('weather_label')} : ${weatherText}` : '');
+    this._terrain.setText(terrainText ? lt`${t('terrain_label')} : ${terrainText}` : '');
 
     this._weather.getDomElement().className = `pw-text battle-zone-chip battle-zone-weather${weather ? ` battle-zone-chip--${weather}` : ''}`;
     this._terrain.getDomElement().className = `pw-text battle-zone-chip battle-zone-terrain${terrain ? ` battle-zone-chip--${terrain}` : ''}`;

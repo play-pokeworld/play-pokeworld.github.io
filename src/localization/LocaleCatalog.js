@@ -15,6 +15,7 @@ import { relaunch as fr_relaunch } from './fr/relaunch.js';
  */
 
 import { facilities as en_facilities } from './en/facilities.js';
+import { itemEffects as en_itemEffects } from './en/item-effects.js';
 import { L_en_ui } from './en/ui.js';
 import { L_en_combat } from './en/combat.js';
 import { L_en_economy } from './en/economy.js';
@@ -44,6 +45,7 @@ import { settings as en_settings } from './en/settings.js';
 import { battleLog as en_battle_log } from './en/battle-log.js';
 
 import { facilities as fr_facilities } from './fr/facilities.js';
+import { itemEffects as fr_itemEffects } from './fr/item-effects.js';
 import { L_fr_ui } from './fr/ui.js';
 import { L_fr_combat } from './fr/combat.js';
 import { L_fr_economy } from './fr/economy.js';
@@ -94,6 +96,7 @@ export const LOCALE_CATALOG = Object.freeze({
     { source: L_en_quests, prefix: 'quests' },
     { source: L_en_base },
     { source: L_en_items, prefix: 'item' },
+    { source: en_itemEffects },
     { source: L_en_stats },
     { source: L_en_pokedex },
     { source: L_en_types, prefix: 'type' },
@@ -126,6 +129,7 @@ export const LOCALE_CATALOG = Object.freeze({
     { source: L_fr_quests, prefix: 'quests' },
     { source: L_fr_base },
     { source: L_fr_items, prefix: 'item' },
+    { source: fr_itemEffects },
     { source: L_fr_stats },
     { source: L_fr_pokedex },
     { source: L_fr_types, prefix: 'type' },

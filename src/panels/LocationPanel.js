@@ -46,7 +46,7 @@ import { EventBus } from '../core/EventBus.js';
 import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
 import { ModalIds } from '../config/ModalIds.js';
 import { WindowIds } from '../config/DashboardLayout.js';
-import { t } from '../localization/LocalizationManager.js';
+import { t, tOr, compose, LocalizationManager, lt, joinLocalized } from '../localization/LocalizationManager.js';
 
 export class LocationPanel extends DraggablePanel {
   /**
@@ -146,7 +146,7 @@ export class LocationPanel extends DraggablePanel {
             className: 'pw-loc-timer-label',
             children: [
               new UIText({ tagName: 'strong', text: t('roaming_legendary_rotation') }),
-              new UIText({ tagName: 'span', text: ` ${roamingName} ${t('can_appear_here')}` })
+              new UIText({ tagName: 'span', text: lt` ${roamingName} ${t('can_appear_here')}` })
             ]
           }),
           this._roamingTimerText
@@ -170,7 +170,7 @@ export class LocationPanel extends DraggablePanel {
               new UIIcon({ name: 'fog', size: 'sm', className: 'pw-loc-mirage-icon' }),
               new UIText({
                 tagName: 'span',
-                text: ` ${t(this._mirageRotationWindow % 2 === 0 ? 'mirage_island_present' : 'mirage_island_absent')}`
+                text: lt` ${t(this._mirageRotationWindow % 2 === 0 ? 'mirage_island_present' : 'mirage_island_absent')}`
               })
             ]
           }),
@@ -255,12 +255,11 @@ export class LocationPanel extends DraggablePanel {
     const canForge = currentKOs >= requiredKOs;
     const canSummon = relicCount > 0;
 
-    const farmNames = (sanctuary.farmLocations || [])
+    const farmNames = joinLocalized(', ', (sanctuary.farmLocations || [])
       .map((locId) => {
         const loc = LocationDB.getInstance().getById(locId);
         return loc ? t(`location.${locId}`) : locId;
-      })
-      .join(', ');
+      }));
 
     const card = new UIContainer({ className: 'pw-loc-sanctuary-card' });
 
@@ -279,7 +278,7 @@ export class LocationPanel extends DraggablePanel {
         new UIText({
           tagName: 'span',
           className: 'pw-loc-sanctuary-row-main',
-          text: `${relicName} (${t('sanctuary_stock_count', { count: relicCount })})`
+          text: lt`${relicName} (${t('sanctuary_stock_count', { count: relicCount })})`
         })
       ]
     });
@@ -374,14 +373,13 @@ export class LocationPanel extends DraggablePanel {
   static _lore(locationId) {
     const speakerKey = `lore.${locationId}.speaker`;
     const textKey = `lore.${locationId}.text`;
-    const speaker = t(speakerKey);
-    const text = t(textKey);
-    if (!text || text === textKey) return null;
+    if (!LocalizationManager.getInstance().has(textKey)) return null;
+    const speaker = LocalizationManager.getInstance().has(speakerKey) ? t(speakerKey) : '';
     return new UIContainer({
       className: 'pw-panel pw-loc-lore',
       children: [
-        new UIText({ tagName: 'div', className: 'pw-bold pw-light2 pw-loc-lore-speaker', text: `${speaker === speakerKey ? '' : speaker} :` }),
-        new UIText({ tagName: 'div', className: 'pw-italic pw-text-sm pw-loc-lore-text', text: `« ${text} »` })
+        new UIText({ tagName: 'div', className: 'pw-bold pw-light2 pw-loc-lore-speaker', text: compose(speaker, ' :') }),
+        new UIText({ tagName: 'div', className: 'pw-italic pw-text-sm pw-loc-lore-text', text: compose('« ', t(textKey), ' »') })
       ]
     });
   }
@@ -408,7 +406,7 @@ export class LocationPanel extends DraggablePanel {
     }))];
     if (nextIds.length === 0) return null;
 
-    const nextNames = nextIds.slice(0, 2).map((id) => t(`location.${id}`)).join(', ');
+    const nextNames = joinLocalized(', ', nextIds.slice(0, 2).map((id) => t(`location.${id}`)));
     const label = t('win_battles_to_unlock', {
       need: required,
       from: t(`location.${location.id}`),
@@ -479,7 +477,7 @@ export class LocationPanel extends DraggablePanel {
           disc,
           new UIText({ className: 'pw-loc-wild-name', text: name }),
           new UIText({ className: 'pw-loc-wild-level', text: t('level_range', { min: encounter.minLevel, max: encounter.maxLevel }) }),
-          new UIText({ className: 'pw-loc-wild-rarity', text: `${t(rarityKey)} · ${ratePct}%` })
+          new UIText({ className: 'pw-loc-wild-rarity', text: lt`${t(rarityKey)} · ${ratePct}%` })
         ]
       });
       grid.addChild(card);
@@ -503,7 +501,7 @@ export class LocationPanel extends DraggablePanel {
           children: [
             disc,
             new UIText({ className: 'pw-loc-wild-name', text: name }),
-            new UIText({ className: 'pw-loc-wild-level', text: `${t('level_abbrev')}${RoamingRules.ENCOUNTER_LEVEL}` }),
+            new UIText({ className: 'pw-loc-wild-level', text: lt`${t('level_abbrev')}${RoamingRules.ENCOUNTER_LEVEL}` }),
             new UIText({ className: 'pw-loc-wild-rarity', text: t('roaming_short', { pct: percent }) })
           ]
         }));
@@ -538,9 +536,7 @@ export class LocationPanel extends DraggablePanel {
     for (const rawId of itemIds) {
       const itemDef = itemDb.getById(rawId);
       const itemId = itemDef?.id || rawId;
-      const nameKey = `item.${itemId}.name`;
-      const localizedName = t(nameKey);
-      const name = localizedName === nameKey ? rawId : localizedName;
+      const name = tOr(`item.${itemId}.name`, rawId);
       const icon = new UIItemSprite({ itemId, alt: name, className: 'pw-grid-media' });
       const card = new UIContainer({
         className: 'pw-loc-wild-card pw-loc-drop-card',

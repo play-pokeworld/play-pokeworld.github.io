@@ -1336,9 +1336,13 @@ body.mobile-mode .mobile-subnav-bar.is-hidden {
   background: rgba(0, 0, 0, 0.12) !important;
   color: var(--pw-text-primary) !important;
 } /* Location overview, counters and encounter cards aligned with the main reference. */
+/* The location content is a single column whose track can never be wider than the window: a child
+   that cannot shrink reflows inside its own box instead of widening the panel (Rules §5). */
 .pw-loc-info {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
+  min-width: 0;
 }
 .pw-loc-overview {
   display: flex;
@@ -1374,6 +1378,49 @@ body.mobile-mode .mobile-subnav-bar.is-hidden {
 .pw-loc-play-stats {
   margin: 0;
   padding: 10px;
+}
+/* Sanctuary card: the action button drops below its text on a narrow column instead of forcing a
+   minimum wider than the window. Nothing is clipped and text wraps where needed. */
+.pw-loc-sanctuary-card {
+  min-width: 0;
+  container-type: inline-size;
+}
+.pw-loc-sanctuary-header {
+  min-width: 0;
+}
+.pw-loc-sanctuary-title,
+.pw-loc-sanctuary-level,
+.pw-loc-sanctuary-row-main,
+.pw-loc-sanctuary-row-sub {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.pw-loc-sanctuary-row {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.pw-loc-sanctuary-row-info {
+  flex: 1 1 132px;
+  min-width: 0;
+}
+.pw-loc-sanctuary-row-action {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+}
+.pw-loc-sanctuary-row-action .pw-btn {
+  flex: 1 1 auto;
+  min-width: min(130px, 100%);
+  white-space: normal;
+}
+@container (max-width: 250px) {
+  .pw-loc-sanctuary-row-action .pw-btn {
+    min-width: 0;
+  }
+}
+.pw-loc-sanctuary-relic-line {
+  flex-wrap: wrap;
+  min-width: 0;
 }
 .pw-loc-play-stats-title {
   margin-bottom: 7px;
@@ -1618,6 +1665,20 @@ body.mobile-mode .mobile-subnav-bar.is-hidden {
   border-color: var(--pw-accent-color, #ffe45c) !important;
   box-shadow: 0 0 0 2px
     color-mix(in srgb, var(--pw-accent-color, #ffe45c) 32%, transparent) !important;
+}
+/* Team card header: the name, the level chip and the action buttons reflow on a narrow column
+   rather than pushing the card past the window edge (Rules §5: every panel fits its width). */
+.team-view .poke-name,
+#team-window-body .poke-name {
+  flex-wrap: wrap;
+  min-width: 0;
+  row-gap: 4px;
+}
+.team-view .poke-name > .pw-text,
+#team-window-body .poke-name > .pw-text {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 .team-view .pw-team-store-btn,
 #team-window-body .pw-team-store-btn {

@@ -15,9 +15,26 @@ export class TrainingProgression {
     if (!save || !TrainingRules.MODES.includes(mode)) return false;
     const badge = TrainingRules.MODE_BADGES[mode];
     if (badge) return save.player.hasBadge(badge);
-    if (TrainingRules.LEAGUE_GATED_MODES.includes(mode)) return LeagueDB.getInstance().getAll().some((league) =>
-      TrainingRules.LEAGUE_REGION_IDS.includes(league.region) && save.player.hasBadge(league.badge));
+    if (TrainingRules.LEAGUE_GATED_MODES.includes(mode)) return TrainingProgression.hasLeagueTitle(save);
     return true;
+  }
+  /**
+   * A league title is a region win. LeagueDB declares a `badge` id for its champion (`champion`),
+   * but TrainerBattleContext records the victory in statistics.leaguesWon and MigrationV11ToV12
+   * strips every league id from player.badges: testing player.hasBadge(league.badge) alone locked
+   * the league-gated modes for every save, including the ones that had beaten the league. The
+   * recorded win is the primary proof, the legacy badge id is still accepted.
+   * @param {Object} save @returns {boolean}
+   */
+  static hasLeagueTitle(save) {
+    if (!save) return false;
+    // Real proof: the region win recorded by TrainerBattleContext.
+    if (TrainingRules.LEAGUE_REGION_IDS.some((region) => save.statistics?.hasWonLeague?.(region))) return true;
+    if (save.statistics?.leaguesWon?.length > 0) return true;
+    if (save.access?.championTitle === true) return true;
+    // Legacy proof: saves that still carry the champion badge id in player.badges.
+    return LeagueDB.getInstance().getAll().some((league) =>
+      TrainingRules.LEAGUE_REGION_IDS.includes(league.region) && save.player.hasBadge(league.badge));
   }
   /** @param {Object} pokemon @returns {string[]} */
   static availableMoves(pokemon) {

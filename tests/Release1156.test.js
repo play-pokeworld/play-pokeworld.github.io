@@ -240,15 +240,13 @@ describe('Release 1.15.6 Fixes and Mechanics', (test) => {
     battle.endBattle(false);
   });
 
-  test('FastForwardSystem simulates offline progress and prepares summary for modal', () => {
+  test('FastForwardSystem leaves an idle save completely untouched', () => {
     const save = SaveSystem.getInstance().createNewSave('AfkTester', 'squirtle');
     save.player.location = 'route1';
     const ff = FastForwardSystem.getInstance();
 
-    const summary = ff.simulateOffline(60000); // 60 seconds
-    assert.ok(summary, 'Simulation produced a summary');
-    assert.ok(summary.battlesSimulated >= 10, 'Simulated reasonable battle count for 60s');
-    assert.ok(summary.currencyEarned > 0, 'Earned currency during offline AFK');
-    assert.equal(summary.durationMs, 60000);
+    const summary = ff.simulateOffline(60000); // 60 seconds away, nothing launched
+    assert.equal(summary, null, 'Nothing to simulate: no report, no reward');
+    assert.equal(BattleSystem.getInstance().isActive(), false, 'No battle was created');
   });
 });

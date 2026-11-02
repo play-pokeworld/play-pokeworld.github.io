@@ -8,7 +8,7 @@ import { EventBus } from '../../core/EventBus.js';
 import { ModalOpenRequestedEvent } from '../../core/events/ModalOpenRequestedEvent.js';
 import { ModalIds } from '../../config/ModalIds.js';
 import { HatcheryRules } from '../../config/HatcheryRules.js';
-import { t } from '../../localization/LocalizationManager.js';
+import { t, lt } from '../../localization/LocalizationManager.js';
 
 export class HatcheryQueueCard extends FacilityQueueCard {
   /** @param {number} index */
@@ -65,7 +65,7 @@ export class HatcheryQueueCard extends FacilityQueueCard {
     );
 
     this._title.setText(
-      `${t('facility_slot_number', { slot: entry.index + 1 })} · ${t(incubation ? 'hatchery_mode_incubation' : 'hatchery_mode_daycare')}`,
+      lt`${t('facility_slot_number', { slot: entry.index + 1 })} · ${t(incubation ? 'hatchery_mode_incubation' : 'hatchery_mode_daycare')}`,
     );
     this._priority.setVisible(incubation);
     this._priority.toggleClass('is-fossil', entry.priority === 'fossil');

@@ -6,7 +6,10 @@
  */
 
 import { UIElement } from './UIElement.js';
+import { LocalizedTextBinder } from './LocalizedTextBinder.js';
 import { TextFormatter } from '../core/TextFormatter.js';
+import { LocalizationManager } from '../localization/LocalizationManager.js';
+import { isLocalizedText } from '../localization/LocalizedText.js';
 
 /** Semantic colour tokens accepted by UIText.setColor() (each maps to .pw-text--color-<token>). */
 export const TEXT_COLORS = Object.freeze(['default', 'primary', 'secondary', 'muted', 'accent', 'danger', 'success']);
@@ -59,11 +62,14 @@ export class UIText extends UIElement {
   }
 
   /**
-   * Sets plain, safe text content (escaped)
-   * @param {string|number} text
+   * Sets plain, safe text content (escaped).
+   * A text coming from t() / compose() is bound to its translation: the language change writes it
+   * again by itself (see LocalizedTextBinder), the view never has to rebuild.
+   * @param {string|number|import('../localization/LocalizedText.js').LocalizedText} text
    */
   setText(text) {
-    const value = text != null ? String(text) : '';
+    const value = LocalizationManager.getInstance().resolve(text);
+    LocalizedTextBinder.bindText(this._dom, text);
     // Unchanged text: no DOM write (live views call setText on every game event)
     if (this._dom.textContent === value && this._dom.childNodes.length <= 1) return;
     this._dom.textContent = value;
@@ -77,14 +83,40 @@ export class UIText extends UIElement {
   /**
    * Sets rich text with inline symbol interpolation
    * Example: label.setRichText("Reward: {amount} {money}", { amount: 500 })
-   * @param {string} template
+   * A template coming from t() keeps its key, so a language change re-renders it in place.
+   * @param {string|import('../localization/LocalizedText.js').LocalizedText} template
    * @param {Record<string, any>} [params={}]
    */
   setRichText(template, params = {}) {
-    this._dom.textContent = '';
-    for (const segment of TextFormatter.parse(template, params)) {
-      this._dom.appendChild(UIText._renderSegment(segment));
+    const hasParams = params && Object.keys(params).length > 0;
+    const source = isLocalizedText(template) && !hasParams
+      ? template
+      : LocalizationManager.getInstance().resolve(template);
+    UIText.renderRichInto(this._dom, source, params);
+    LocalizedTextBinder.bindText(this._dom, isLocalizedText(template) && !hasParams ? template : null, UIText._writeRich);
+  }
+
+  /**
+   * Renders a rich-text template into a node (used on build and on language change).
+   * @param {HTMLElement} node
+   * @param {string} template
+   * @param {Record<string, any>} [params={}]
+   */
+  static renderRichInto(node, template, params = {}) {
+    node.textContent = '';
+    for (const segment of TextFormatter.parse(String(template), params)) {
+      node.appendChild(UIText._renderSegment(segment));
     }
+  }
+
+  /**
+   * Rich-text writer used by the localization binder: the token is already interpolated.
+   * @private
+   * @param {HTMLElement} node
+   * @param {string} text
+   */
+  static _writeRich(node, text) {
+    UIText.renderRichInto(node, text);
   }
 
   /**
