@@ -1,0 +1,389 @@
+/*
+ * panels/automation.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.automation-buy-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--green), #8bd77d);
+  color: var(--dark1);
+  font-weight: 900;
+}
+
+.automation-card {
+  border: 1px solid var(--dark3);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.22);
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.automation-card.is-owned {
+  border-color: rgba(96,190,88,0.65);
+}
+
+.automation-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--light2);
+  font-weight: 900;
+}
+
+.automation-card-desc {
+  color: var(--light1);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+
+/* design-system/pass-08.css * --------------------------------------------------------------------------- * Dated pass inherited from the former design-system.css, kept in its historical order. * * Part of the 1.16.11 split: one file, one responsibility. The order of the * @import lines in assets/css/style.css IS the cascade — never reorder them, * never import this sheet anywhere else (guarded by tests/CssStructure.test.js). */
+.automation-owned-badge {
+  color: var(--green);
+  font-size: 12px;
+}
+
+.automation-toggle-btn,
+.automation-buy-btn {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-weight: 900;
+}
+
+.automation-toggle-btn.is-off {
+  background: rgba(0,0,0,0.26);
+  color: var(--light2);
+  border-color: var(--dark3);
+}
+
+.automation-toggle-btn.is-on {
+  background: linear-gradient(135deg, var(--green), #8bd77d);
+  color: var(--dark1);
+  border-color: var(--green);
+}
+
+.automation-toggle-btn.is-on span,
+.automation-toggle-btn.is-on b {
+  color: var(--dark1);
+}
+
+.automation-toggle-btn b {
+  font-size: 12px;
+}
+
+.automation-field {
+  display: grid;
+  gap: 5px;
+  margin: 8px 0;
+  color: var(--light1);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.automation-field select {
+  width: 100%;
+  border: 1px solid var(--dark3);
+  border-radius: 8px;
+  background: var(--dark1);
+  color: var(--light2);
+  padding: 8px 10px;
+}
+
+.automation-toggle-btn.is-on, .automation-buy-btn {
+  background: linear-gradient(135deg, #477a45, #6f9f63);
+  color: #f6f1dc;
+  border-color: #6f9f63;
+}
+
+.automation-toggle-btn.is-on span,
+.automation-toggle-btn.is-on b {
+  color: #f6f1dc;
+}
+
+
+/* Phase 13: the "auto enabled" state must be clearly green (the gradient above, shared with other buttons, made it too subtle). */
+.automation-toggle-btn.is-on {
+  background: linear-gradient(135deg, var(--green), #8bd77d);
+  color: var(--dark1);
+  border-color: var(--green);
+  box-shadow: 0 0 10px rgba(120, 200, 110, 0.35);
+}
+
+.automation-toggle-btn.is-on span,
+.automation-toggle-btn.is-on b {
+  color: var(--dark1);
+  font-weight: bold;
+}
+
+.automation-toggle-btn.is-off {
+  background: rgba(0,0,0,0.26);
+  color: var(--light2);
+  border-color: rgba(236, 222, 183, 0.35);
+  border-style: dashed;
+}
+
+.management-content > .automation-card {
+  margin: 0;
+}
+
+#poke-modal-inner.management-inner .automation-card {
+  border-radius: 14px;
+  border-color: rgba(236,222,183,0.22);
+}
+
+.automation-dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.automation-locked-card {
+  min-height: 76px;
+  border: 1px solid rgba(236,222,183,0.22);
+  border-radius: 14px;
+  background: rgba(0,0,0,0.22);
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.automation-locked-card > span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.automation-locked-card span {
+  color: var(--light2);
+  font-weight: 900;
+}
+
+.automation-locked-card b {
+  color: var(--light1);
+  font-size: 12px;
+}
+
+.automation-card.is-owned {
+  border-color: rgba(96,190,88,0.62);
+}
+
+.automation-toggle-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.automation-rules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+  border: 1px solid rgba(236,222,183,0.18);
+  border-radius: 14px;
+  background: rgba(0,0,0,0.18);
+  padding: 10px;
+}
+
+.automation-buy-btn {
+  white-space: normal;
+  line-height: 1.15;
+  min-width: 96px;
+  max-width: 180px;
+  text-align: center;
+}
+
+.hatchery-auto-layout .automation-toggle-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.automation-two-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.automation-panel {
+  border: 1px solid rgba(236,222,183,0.22);
+  border-radius: 14px;
+  background: rgba(0,0,0,0.20);
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+@media (max-width: 760px) {
+.hatchery-auto-layout .automation-toggle-row,
+  .automation-two-cols {
+  grid-template-columns: 1fr;
+}
+
+}
+
+.pw-automation-field {
+  display: flex;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.pw-automation-select {
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid color-mix(in srgb, var(--light2) 16%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--pw-bg-surface) 88%, #000 12%);
+  color: var(--light2);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-family: inherit;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.pw-automation-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hbtn:not(.quest-claim-btn):not(.automation-toggle-btn):not(.automation-buy-btn):not(.purchase-btn):not(.hatchery-mode-toggle):not(.hatchery-priority-toggle):not(.training-slot-auto-btn):not(.pw-btn-danger):not(.pw-btn-cancel):not(.active):not(.is-active) {
+  border: 1px solid var(--pw-border-strong);
+  background: rgba(236,222,183,0.12);
+  color: var(--light2);
+}
+
+.automation-toggle-btn.active {
+  color: var(--dark1) !important;
+  font-weight: 900;
+}
+
+.hbtn:not(.quest-claim-btn):not(.automation-toggle-btn):not(.automation-buy-btn):not(.purchase-btn):not(.hatchery-mode-toggle):not(.hatchery-priority-toggle):not(.training-slot-auto-btn):not(.pw-btn-danger):not(.pw-btn-cancel):not(.active):not(.is-active) {
+  background: var(--pw-btn-bg) !important;
+  color: var(--pw-btn-text) !important;
+  border: 1px solid var(--pw-btn-border) !important;
+}
+
+button.automation-toggle-btn.is-on {
+  background: #60BE58 !important;
+  color: #241F16 !important;
+  border: 1px solid #489A42 !important;
+  box-shadow: 0 0 8px rgba(96, 190, 88, 0.35) !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
+
+
+/* design-system/pass-13.css * --------------------------------------------------------------------------- * Dated pass inherited from the former design-system.css, kept in its historical order. * * Part of the 1.16.11 split: one file, one responsibility. The order of the * @import lines in assets/css/style.css IS the cascade — never reorder them, * never import this sheet anywhere else (guarded by tests/CssStructure.test.js). */
+button.automation-toggle-btn.is-on * {
+  color: #241F16 !important;
+  text-shadow: none !important;
+}
+
+button.automation-toggle-btn.is-off {
+  background: rgba(0, 0, 0, 0.26) !important;
+  color: var(--light2) !important;
+  border: 1px dashed rgba(236, 222, 183, 0.35) !important;
+}
+
+button.automation-buy-btn {
+  background: #3E6B3C !important;
+  color: #f6f1dc !important;
+  border: 1px solid #60BE58 !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
+
+button.automation-buy-btn * {
+  color: #f6f1dc !important;
+}
+
+
+/* Auto-fit grids that used fixed minima could force a horizontal overflow on narrow screens — min(X, 100%) collapses them to one column instead. */
+.automation-dashboard {
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+}
+
+.automation-toggle-row {
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+}
+
+.automation-dashboard {
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+  gap: 14px;
+}
+
+.automation-locked-card.has-buy {
+  flex-wrap: wrap;
+}
+
+.automation-locked-card .automation-buy-btn {
+  flex: 0 0 auto;
+  width: auto;
+  min-height: 36px;
+  padding: 8px 12px;
+}
+
+.training-auto-slot-card .automation-card-head .automation-buy-btn {
+  width: auto;
+  min-height: 32px;
+  padding: 6px 10px;
+  margin-left: auto;
+}
+
+.pw-facility-management .automation-dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: 12px;
+}
+
+@container pw-training-slot (max-width: 250px) {
+.training-slot-card .pw-training-slot-automation .pw-facility-title-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.training-slot-card .pw-training-slot-automation .pw-facility-title-row > .pw-button,
+  .training-slot-card .pw-training-slot-automation .pw-facility-title-row > .pw-switch {
+  grid-column: 1 / -1;
+  justify-self: stretch;
+  justify-content: center;
+}
+
+}
+
+.pw-training-slot-automation {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.pw-training-slot-automation > small,
+.pw-training-slot-automation > .pw-price-tag {
+  display: none;
+}
+
+.pw-training-slot-automation .pw-facility-title-row {
+  justify-content: flex-start;
+}
+
+.automation-dashboard > .pw-facility-auto-card:not(.is-owned) > small {
+  display: none;
+}
+
+.automation-dashboard > .pw-facility-auto-card:not(.is-owned) {
+  min-height: 76px;
+  align-content: center;
+}

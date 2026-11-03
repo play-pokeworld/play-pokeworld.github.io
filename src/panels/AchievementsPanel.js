@@ -83,7 +83,7 @@ export class AchievementsPanel extends DraggablePanel {
 
     if (pinnedList.length === 0) {
       const emptyCard = new UIContainer({
-        className: 'pw-ach-empty-tracker',
+        className: 'pw-empty-state is-sm pw-ach-empty-tracker',
         children: [
           new UIText({ text: t('ach_no_pinned') })
         ]

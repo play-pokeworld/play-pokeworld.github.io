@@ -33,7 +33,11 @@ export class UIContextMenu extends UIElement {
       if (!this._dom.contains(event.target)) this.close();
     };
     this._onKeyDown = (event) => {
-      if (event.key === 'Escape') this.close();
+      if (event.key !== 'Escape') return;
+      // The menu is the top layer: Escape closes it only. preventDefault() tells the
+      // enclosing modal (ModalFocusScope) that this Escape is already consumed.
+      event.preventDefault();
+      this.close();
     };
 
     this.setVisible(false);

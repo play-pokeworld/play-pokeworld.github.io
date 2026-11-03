@@ -45,7 +45,7 @@ export class AtollFactoryPrepModal extends StaticModalPanel {
     if (!run || !Array.isArray(run.team) || !run.team.length) {
       this.addChild(new UIText({
         tagName: 'div',
-        className: 'pw-empty-state-lg',
+        className: 'pw-empty-state is-lg',
         text: t('atoll_factory_broken')
       }));
       return;

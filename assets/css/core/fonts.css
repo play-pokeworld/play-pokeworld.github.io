@@ -1,0 +1,19 @@
+/*
+ * core/fonts.css
+ * ---------------------------------------------------------------------------
+ * Font faces used by the interface.
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+@font-face {
+  font-family: 'Winky Sans';
+  src: url('../../font/WinkySans.ttf') format('truetype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Megrim-Regular';
+  src: url('../../font/Megrim-Regular.ttf') format('truetype');
+  font-display: swap;
+}

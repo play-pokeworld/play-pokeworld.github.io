@@ -1,0 +1,458 @@
+/*
+ * core/themes.css
+ * ---------------------------------------------------------------------------
+ * Per-theme overrides, scoped with `:root[data-theme="…"]`.
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+[data-theme="light"] {
+  --pw-bg-surface: #F5EFEB;
+  --pw-bg-header: #EAE0D6;
+  --pw-bg-sprite: #E0D4C8;
+  --pw-border-color: #A89A8A;
+  --pw-text-primary: #2C261F;
+  --pw-text-secondary: #5C5247;
+  --pw-circle-bg: radial-gradient(circle, rgba(168, 154, 138, 0.35) 0%, rgba(168, 154, 138, 0.12) 70%, transparent 100%);
+  --pw-map-surface: #E4EDE4;
+  --pw-accent-color: #D35400;
+}
+
+[data-theme="gameboy"] {
+  --pw-bg-surface: #8BAC0F;
+  --pw-bg-header: #9BBC0F;
+  --pw-bg-sprite: #82A20E;
+  --pw-border-color: #306230;
+  --pw-text-primary: #0F380F;
+  --pw-text-secondary: #123A12;
+  --pw-circle-bg: radial-gradient(circle, rgba(15, 56, 15, 0.25) 0%, rgba(15, 56, 15, 0.08) 70%, transparent 100%);
+  --pw-map-surface: #82A20E;
+  --pw-accent-color: #306230;
+}
+
+[data-theme="fire"] {
+  --pw-bg-surface: #2E1A16;
+  --pw-bg-header: #241410;
+  --pw-bg-sprite: #1C100C;
+  --pw-border-color: #6E3A2A;
+  --pw-text-primary: #FEE8D8;
+  --pw-text-secondary: #DFBAA4;
+  --pw-circle-bg: radial-gradient(circle, rgba(254, 232, 216, 0.25) 0%, rgba(254, 232, 216, 0.08) 70%, transparent 100%);
+  --pw-map-surface: #1C100C;
+  --pw-accent-color: #E74C3C;
+}
+
+[data-theme="light"] {
+  --dark1: #E8E0D0;
+  --dark2: #F5F0E0;
+  --dark3: #D8CDB5;
+  --light1: #806A4E;
+  --light2: #4A3B2A;
+  --accent: #806A4E;
+  --panel: #F5F0E0;
+  --panel-bg: #4A3B2A;
+  --panel-text: #E8E0D0;
+  --panel-border: #8B7355;
+  --dim: #806A4E;
+  --red: #C0392B;
+  --green: #27AE60;
+  --blue: #2980B9;
+  --orange: #E67E22;
+  --purple: #8E44AD;
+  --yellow: #F39C12;
+}
+
+[data-theme="gameboy"] {
+  --dark1: #0F380F;
+  --dark2: #306230;
+  --dark3: #8BAC0F;
+  --light1: #BCD4BC;
+  --light2: #C2D66D;
+  --accent: #BCD4BC;
+  --panel: #306230;
+  --panel-bg: #9BBC0F;
+  --panel-text: #0F380F;
+  --panel-border: #8BAC0F;
+  --dim: #BCD4BC;
+  --shiny: #FFD700;
+  --red: #C0392B;
+  --green: #27AE60;
+  --blue: #2980B9;
+  --orange: #E67E22;
+  --purple: #8E44AD;
+  --yellow: #F39C12;
+}
+
+[data-theme="fire"] {
+  --dark1: #2C1810;
+  --dark2: #4A2520;
+  --dark3: #6B3A30;
+  --light1: #E67E22;
+  --light2: #FFDAB9;
+  --accent: #E67E22;
+  --panel: #4A2520;
+  --panel-bg: #FFDAB9;
+  --panel-text: #2C1810;
+  --panel-border: #E67E22;
+  --dim: #E67E22;
+  --shiny: #FF4500;
+  --red: #FF4500;
+  --green: #FF6347;
+  --blue: #FF8C00;
+  --orange: #FF6347;
+  --purple: #FF1493;
+  --yellow: #FFD700;
+}
+
+[data-theme="light"] {
+  --pw-btn-bg: #E4D8C4;
+  --pw-btn-bg-hover: #F0E7D3;
+  --pw-btn-text: #3E332A;
+  --pw-btn-border: #B6A586;
+  --pw-btn-active-bg: #6E5636;
+  --pw-btn-active-text: #FFF7E4;
+}
+
+[data-theme="gameboy"] {
+  --pw-btn-bg: #255720;
+  --pw-btn-bg-hover: #317031;
+  --pw-btn-text: #DFF0B8;
+  --pw-btn-border: #9BBC0F;
+  --pw-btn-active-bg: #9BBC0F;
+  --pw-btn-active-text: #0F380F;
+}
+
+[data-theme="fire"] {
+  --pw-btn-bg: #632F26;
+  --pw-btn-bg-hover: #75382C;
+  --pw-btn-text: #FFD9BE;
+  --pw-btn-border: #A05340;
+  --pw-btn-active-bg: #FF8A5C;
+  --pw-btn-active-text: #2C1810;
+}
+
+[data-theme="sakura"] .pw-win-hdr-label,
+[data-theme="sakura"] .pw-win-hdr .pw-win-tool-btn {
+  color: var(--light2) !important;
+}
+
+[data-theme="ocean"] {
+  --pw-bg-surface: #0E2233;
+  --pw-bg-header: #08161F;
+  --pw-bg-sprite: #061019;
+  --pw-border-color: #1F4D6B;
+  --pw-text-primary: #DCEEF8;
+  --pw-text-secondary: #9FC4DA;
+  --pw-circle-bg: radial-gradient(circle, rgba(220, 238, 248, 0.25) 0%, rgba(220, 238, 248, 0.08) 70%, transparent 100%);
+  --pw-map-surface: #061722;
+  --pw-accent-color: #38B6E0;
+  --dark1: #08161F;
+  --dark2: #0E2233;
+  --dark3: #17415C;
+  --light1: #7FB8D4;
+  --light2: #DCEEF8;
+  --accent: #38B6E0;
+  --panel: #0E2233;
+  --panel-bg: #DCEEF8;
+  --panel-text: #08161F;
+  --panel-border: #2E6D93;
+  --dim: #7FB8D4;
+  --shiny: #7FE3FF;
+  --red: #F0736A;
+  --green: #3FBF87;
+  --blue: #38B6E0;
+  --orange: #E89B3C;
+  --purple: #9B8CF0;
+  --yellow: #EFD055;
+  --pw-btn-bg: #17415C;
+  --pw-btn-bg-hover: #1E5375;
+  --pw-btn-text: #E6F4FC;
+  --pw-btn-border: #2E6D93;
+  --pw-btn-active-bg: #38B6E0;
+  --pw-btn-active-text: #062031;
+}
+
+[data-theme="forest"] {
+  --pw-bg-surface: #1B2A1B;
+  --pw-bg-header: #132013;
+  --pw-bg-sprite: #0E170E;
+  --pw-border-color: #3C5B33;
+  --pw-text-primary: #E7F2DA;
+  --pw-text-secondary: #B6CDA3;
+  --pw-circle-bg: radial-gradient(circle, rgba(231, 242, 218, 0.25) 0%, rgba(231, 242, 218, 0.08) 70%, transparent 100%);
+  --pw-map-surface: #0F1C10;
+  --pw-accent-color: #8FD05C;
+  --dark1: #132013;
+  --dark2: #1B2A1B;
+  --dark3: #2F4A2A;
+  --light1: #9CB98A;
+  --light2: #E7F2DA;
+  --accent: #8FD05C;
+  --panel: #1B2A1B;
+  --panel-bg: #E7F2DA;
+  --panel-text: #132013;
+  --panel-border: #4F7444;
+  --dim: #9CB98A;
+  --shiny: #F2E58A;
+  --red: #F0736A;
+  --green: #5CC97F;
+  --blue: #57A9E0;
+  --orange: #E29A3F;
+  --purple: #A98DE8;
+  --yellow: #EBD25A;
+  --pw-btn-bg: #2F4A2A;
+  --pw-btn-bg-hover: #3A5A33;
+  --pw-btn-text: #EAF5DE;
+  --pw-btn-border: #4F7444;
+  --pw-btn-active-bg: #8FD05C;
+  --pw-btn-active-text: #12220E;
+}
+
+[data-theme="sakura"] {
+  --pw-bg-surface: #FDF2F5;
+  --pw-bg-header: #F6E1E8;
+  --pw-bg-sprite: #EED3DC;
+  --pw-border-color: #C99CAE;
+  --pw-text-primary: #3A2029;
+  --pw-text-secondary: #6E4A57;
+  --pw-circle-bg: radial-gradient(circle, rgba(168, 58, 99, 0.30) 0%, rgba(168, 58, 99, 0.10) 70%, transparent 100%);
+  --pw-map-surface: #F2E6EC;
+  --pw-accent-color: #A83A63;
+  --dark1: #F6E1E8;
+  --dark2: #FDF2F5;
+  --dark3: #EED3DC;
+  --light1: #6E4A57;
+  --light2: #3A2029;
+  --accent: #A83A63;
+  --panel: #FDF2F5;
+  --panel-bg: #3A2029;
+  --panel-text: #FDF2F5;
+  --panel-border: #C99CAE;
+  --dim: #6E4A57;
+  --shiny: #A83A63;
+  --red: #C0392B;
+  --green: #146B44;
+  --blue: #2A6FB0;
+  --orange: #B85C10;
+  --purple: #7D4BA8;
+  --yellow: #8A6A00;
+  --pw-btn-bg: #F2D7E0;
+  --pw-btn-bg-hover: #F9E6EC;
+  --pw-btn-text: #4A2A34;
+  --pw-btn-border: #C99CAE;
+  --pw-btn-active-bg: #A83A63;
+  --pw-btn-active-text: #FFF3F7;
+}
+
+[data-theme="midnight"] {
+  --pw-bg-surface: #101014;
+  --pw-bg-header: #08080B;
+  --pw-bg-sprite: #050507;
+  --pw-border-color: #2E2E3A;
+  --pw-text-primary: #E6E6F0;
+  --pw-text-secondary: #A6A6BC;
+  --pw-circle-bg: radial-gradient(circle, rgba(230, 230, 240, 0.22) 0%, rgba(230, 230, 240, 0.07) 70%, transparent 100%);
+  --pw-map-surface: #07070A;
+  --pw-accent-color: #9B8CF5;
+  --dark1: #08080B;
+  --dark2: #101014;
+  --dark3: #22222C;
+  --light1: #8E8EA6;
+  --light2: #E6E6F0;
+  --accent: #9B8CF5;
+  --panel: #101014;
+  --panel-bg: #E6E6F0;
+  --panel-text: #08080B;
+  --panel-border: #3C3C4C;
+  --dim: #8E8EA6;
+  --shiny: #C9B8FF;
+  --red: #E85C6A;
+  --green: #46C88A;
+  --blue: #5AA9F0;
+  --orange: #E89B4C;
+  --purple: #9B8CF5;
+  --yellow: #E9D45C;
+  --pw-btn-bg: #22222C;
+  --pw-btn-bg-hover: #2C2C38;
+  --pw-btn-text: #E9E9F4;
+  --pw-btn-border: #3C3C4C;
+  --pw-btn-active-bg: #9B8CF5;
+  --pw-btn-active-text: #0B0B10;
+}
+
+[data-theme="desert"] {
+  --pw-bg-surface: #3A2E1E;
+  --pw-bg-header: #2A2116;
+  --pw-bg-sprite: #1F1810;
+  --pw-border-color: #6B5433;
+  --pw-text-primary: #F6E7C6;
+  --pw-text-secondary: #CFB98D;
+  --pw-circle-bg: radial-gradient(circle, rgba(246, 231, 198, 0.25) 0%, rgba(246, 231, 198, 0.08) 70%, transparent 100%);
+  --pw-map-surface: #241C12;
+  --pw-accent-color: #E0A32E;
+  --dark1: #2A2116;
+  --dark2: #3A2E1E;
+  --dark3: #57432A;
+  --light1: #C0A87A;
+  --light2: #F6E7C6;
+  --accent: #E0A32E;
+  --panel: #3A2E1E;
+  --panel-bg: #F6E7C6;
+  --panel-text: #2A2116;
+  --panel-border: #8A6B40;
+  --dim: #C0A87A;
+  --shiny: #FFD98A;
+  --red: #FF8C7A;
+  --green: #5FBE7A;
+  --blue: #6FB6E4;
+  --orange: #E0A32E;
+  --purple: #B48BE0;
+  --yellow: #EFCF54;
+  --pw-btn-bg: #57432A;
+  --pw-btn-bg-hover: #674F31;
+  --pw-btn-text: #F8ECD2;
+  --pw-btn-border: #8A6B40;
+  --pw-btn-active-bg: #E0A32E;
+  --pw-btn-active-text: #2A2116;
+}
+
+[data-theme="contrast"] {
+  --pw-bg-surface: #000000;
+  --pw-bg-header: #000000;
+  --pw-bg-sprite: #0A0A0A;
+  --pw-border-color: #FFFFFF;
+  --pw-text-primary: #FFFFFF;
+  --pw-text-secondary: #F2F2F2;
+  --pw-circle-bg: radial-gradient(circle, rgba(255, 255, 255, 0.30) 0%, rgba(255, 255, 255, 0.10) 70%, transparent 100%);
+  --pw-map-surface: #000000;
+  --pw-accent-color: #FFE400;
+  --dark1: #000000;
+  --dark2: #000000;
+  --dark3: #1A1A1A;
+  --light1: #F2F2F2;
+  --light2: #FFFFFF;
+  --accent: #FFE400;
+  --panel: #000000;
+  --panel-bg: #FFFFFF;
+  --panel-text: #000000;
+  --panel-border: #FFFFFF;
+  --dim: #F2F2F2;
+  --shiny: #FFE400;
+  --red: #FF6B6B;
+  --green: #5CFF9E;
+  --blue: #79C8FF;
+  --orange: #FFAE4C;
+  --purple: #D2AEFF;
+  --yellow: #FFE400;
+  --pw-btn-bg: #000000;
+  --pw-btn-bg-hover: #1A1A1A;
+  --pw-btn-text: #FFFFFF;
+  --pw-btn-border: #FFFFFF;
+  --pw-btn-active-bg: #FFE400;
+  --pw-btn-active-text: #000000;
+}
+
+[data-theme="light"] {
+  --pw-land-sky: #CFE4F2;
+  --pw-land-horizon: #DCEBD9;
+  --pw-land-grass: #BFD9A8;
+  --pw-land-ground: #A8B894;
+}
+
+[data-theme="gameboy"] {
+  --pw-land-sky: #9BBC0F;
+  --pw-land-horizon: #8BAC0F;
+  --pw-land-grass: #306230;
+  --pw-land-ground: #0F380F;
+}
+
+[data-theme="fire"] {
+  --pw-land-sky: #3A1B12;
+  --pw-land-horizon: #5A2415;
+  --pw-land-grass: #6B2D16;
+  --pw-land-ground: #2A140C;
+}
+
+[data-theme="ocean"] {
+  --pw-land-sky: #0E2233;
+  --pw-land-horizon: #14415C;
+  --pw-land-grass: #17566B;
+  --pw-land-ground: #08161F;
+}
+
+[data-theme="forest"] {
+  --pw-land-sky: #24331F;
+  --pw-land-horizon: #31492A;
+  --pw-land-grass: #3C5A2E;
+  --pw-land-ground: #1B2617;
+}
+
+[data-theme="sakura"] {
+  --pw-land-sky: #F3D9E4;
+  --pw-land-horizon: #EFC9D8;
+  --pw-land-grass: #D9A7BE;
+  --pw-land-ground: #B98098;
+}
+
+[data-theme="midnight"] {
+  --pw-land-sky: #0B1026;
+  --pw-land-horizon: #141C3A;
+  --pw-land-grass: #1B2445;
+  --pw-land-ground: #080B1A;
+}
+
+[data-theme="desert"] {
+  --pw-land-sky: #E8D2A0;
+  --pw-land-horizon: #DCBE84;
+  --pw-land-grass: #C9A469;
+  --pw-land-ground: #A37E4B;
+}
+
+[data-theme="contrast"] {
+  --pw-land-sky: #000000;
+  --pw-land-horizon: #101010;
+  --pw-land-grass: #181818;
+  --pw-land-ground: #000000;
+}
+
+[data-theme="midnight"][data-daytime="night"],
+[data-theme="contrast"][data-daytime="night"] {
+  --pw-land-bright: .8;
+  --pw-land-tint-a: .14;
+}
+
+[data-theme="light"][data-daytime="night"],
+[data-theme="sakura"][data-daytime="night"],
+[data-theme="desert"][data-daytime="night"] {
+  --pw-land-bright: .62;
+  --pw-land-tint-a: .3;
+}
+
+:root:is([data-theme='light'], [data-theme='sakura'])
+  :is(#battle-team-row, #team-window-body)
+  .poke-move:not(.empty) {
+  background: rgba(255, 255, 255, 0.55) !important;
+}
+
+:root:is([data-theme='light'], [data-theme='sakura'])
+  :is(#battle-team-row, #team-window-body)
+  .poke-move
+  .move-name {
+  color: var(--pw-text-primary) !important;
+  opacity: 1 !important;
+}
+
+:root:is([data-theme='light'], [data-theme='sakura'])
+  :is(#battle-team-row, #team-window-body)
+  .poke-move
+  .move-eff-badge {
+  background: rgba(0, 0, 0, 0.1) !important;
+  color: var(--pw-text-primary) !important;
+}
+
+:root:is([data-theme='light'], [data-theme='sakura'])
+  #battle-team-row
+  .poke-level {
+  background: rgba(0, 0, 0, 0.12) !important;
+  color: var(--pw-text-primary) !important;
+}

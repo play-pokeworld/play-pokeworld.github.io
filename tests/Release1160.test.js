@@ -304,13 +304,13 @@ describe('Release 1.16.0 - Sanctuaries & Ancestral Relics', (test) => {
     assert.equal(RoamingRules.ROAMING_ENABLED, false, 'Roaming is globally disabled');
 
     // Mathematical rotation remains intact for deterministic testing
-    const speciesAtR1 = RoamingSystem.getSpeciesAt('route1', 0);
-    assert.equal(speciesAtR1, 'articuno');
+    assert.equal(RoamingSystem.getAssignedSpecies('route1', 0), 'articuno');
 
-    // BattleSystem will not pull roamers into wild encounters because ROAMING_ENABLED is false
+    // The switch is enforced by RoamingSystem itself: no caller has to remember it any more.
+    assert.equal(RoamingSystem.isEnabled(), false);
     const locationId = 'route1';
-    const activeRoamer = RoamingRules.ROAMING_ENABLED ? RoamingSystem.getSpeciesAt(locationId) : null;
-    assert.equal(activeRoamer, null, 'No roamer is injected into combat encounters');
+    assert.equal(RoamingSystem.getSpeciesAt(locationId, 0), null, 'No roamer is injected into combat encounters');
+    assert.equal(RoamingSystem.getSpeciesAt(locationId), null, 'No roamer is injected into combat encounters');
   });
 
   test('Battle Atoll Legend Fragments (50 fragments) summon path remains functional as an alternative for players', () => {

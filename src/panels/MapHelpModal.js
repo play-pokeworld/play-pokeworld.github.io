@@ -7,6 +7,7 @@ import { UIContainer } from '../ui/UIContainer.js';
 import { UIText } from '../ui/UIText.js';
 import { ModalIds } from '../config/ModalIds.js';
 import { LanguageChangedEvent } from '../core/events/LanguageChangedEvent.js';
+import { RoamingSystem } from '../systems/RoamingSystem.js';
 import { t } from '../localization/LocalizationManager.js';
 
 const MAP_LEGEND_ROWS = Object.freeze([
@@ -32,12 +33,21 @@ export class MapHelpModal extends StaticModalPanel {
     this._render();
   }
 
+  /**
+   * Legend rows actually reachable in this build: a switched-off feature must not advertise a colour
+   * that no node can ever carry.
+   * @returns {ReadonlyArray<Object>}
+   */
+  static legendRows() {
+    return MAP_LEGEND_ROWS.filter((row) => row.status !== 'roaming' || RoamingSystem.isEnabled());
+  }
+
   /** @private */
   _render() {
     this.setTitle(t('map_legend_modal_title'));
     this.clearChildren();
     const rows = new UIContainer({ className: 'pw-map-help-body' });
-    for (const rowData of MAP_LEGEND_ROWS) {
+    for (const rowData of MapHelpModal.legendRows()) {
       const row = new UIContainer({ className: 'pw-map-help-row' });
       row.setData('mapLegendState', rowData.status);
       const swatch = new UIContainer({ className: `pw-map-help-swatch ${rowData.swatch}` });

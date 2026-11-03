@@ -1,0 +1,30 @@
+/*
+ * core/variables.css
+ * ---------------------------------------------------------------------------
+ * Legacy palette variables (`--dark1`, `--light2`, `--accent`…) still used by the panels.
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+@media (max-width: 760px) {
+:root {
+  --pc-battle-sprite: 62px;
+  --pc-bench-sprite: 40px;
+}
+
+:root {
+  --pc-battle-sprite: 96px;
+  --pc-bench-sprite: 60px;
+  --pc-team-sprite: clamp(92px, 34%, 128px);
+  --pc-bg-band-h: 92px;
+}
+
+}
+
+@media (min-width: 1200px) {
+:root {
+  --pc-battle-sprite-h: 196px;
+  --pc-bench-sprite-h: 120px;
+}
+
+}

@@ -1,0 +1,1031 @@
+/*
+ * components/ui-button.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.action-btn .ab-label, .hbtn, .mob-btn {
+  font-size: 13px;
+}
+
+.hbtn {
+  background: var(--light1);
+  border: 1px solid var(--dark1);
+  color: var(--dark1);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.2s;
+}
+
+.hbtn:hover {
+  background: var(--light2);
+  transform: translateY(-1px);
+}
+
+.hbtn.active {
+  background: var(--light2);
+  color: var(--dark1);
+  border-color: var(--light2);
+  font-weight: bold;
+}
+
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  border-radius: 10px;
+  font-weight: 800;
+}
+
+.ui-btn.is-active {
+  background: var(--light2);
+  color: var(--dark1);
+  border-color: var(--light2);
+}
+
+.ui-btn--tool {
+  background: rgba(236,222,183,0.10);
+  color: var(--light2);
+  border-color: rgba(236,222,183,0.16);
+}
+
+.ui-btn--tab {
+  background: rgba(0,0,0,0.18);
+  color: var(--light2);
+  border-color: rgba(236,222,183,0.14);
+}
+
+.ui-btn--tool:hover, .ui-btn--tab:hover {
+  background: var(--light2);
+  color: var(--dark1);
+  border-color: var(--light2);
+}
+
+.ui-btn-icon,
+.ui-btn-label {
+  display: inline-flex;
+  align-items: center;
+  color: inherit;
+}
+
+.ui-btn-icon .ui-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.action-btn {
+  background: var(--light1);
+  border: 1px solid var(--dark1);
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.action-btn:hover {
+  border-color: var(--light2);
+  background: var(--light2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.action-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.action-btn .ab-icon {
+  font-size: 20px;
+}
+
+.action-btn .ab-label {
+  color: var(--dark1);
+  font-size: 11px;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+.mob-btn {
+  flex: 1;
+  min-height: 38px;
+  background: var(--light1);
+  border: 1px solid var(--dark1);
+  color: var(--dark1);
+  font-weight: 800;
+  font-size: 11px;
+  padding: 8px 8px;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.mob-btn:hover {
+  background: var(--light2);
+  color: var(--dark1);
+  border-color: var(--light2);
+}
+
+.mob-btn.active {
+  background: var(--light2);
+  color: var(--dark1);
+  border-color: var(--light2);
+}
+
+}
+
+.icon-btn svg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-btn svg {
+  width: 100%;
+  height: 100%;
+}
+
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  padding: 8px;
+}
+
+.action-btn {
+  border-radius: 12px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.14);
+}
+
+.hbtn, .mob-btn, .action-btn .ab-label, .action-btn {
+  font-size: 13px;
+}
+
+.hbtn, .mob-btn, .action-btn {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+@media (max-width: 420px) {
+.mob-btn {
+  padding: 8px 6px;
+}
+
+}
+
+.pw-btn-center {
+  text-align:center;
+}
+
+.pw-btn-center {
+  text-align:center;
+  margin-top:10px;
+}
+
+.pw-btn-group {
+  display:flex;
+  gap:8px;
+  margin-top:16px;
+  padding-top:12px;
+  border-top:1px solid var(--light1);
+}
+
+.pw-btn-center {
+  margin-top:12px;
+}
+
+.poke-detail-stat-tab.pw-button {
+  background: rgba(0, 0, 0, 0.35) !important;
+  color: var(--light2, #ECDEB7) !important;
+  border: 1px solid var(--pw-border-color, rgba(255, 255, 255, 0.12)) !important;
+  border-radius: 6px !important;
+  padding: 7px 4px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.3px !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  height: auto !important;
+  min-height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  width: 100% !important;
+  opacity: 0.75 !important;
+  transition: all 0.15s ease !important;
+}
+
+.poke-detail-stat-tab.pw-button:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+.poke-detail-stat-tab.pw-button.active, #poke-modal-inner .poke-detail-stat-tab.pw-button.active {
+  background: var(--accent) !important;
+  color: var(--dark1, #1a1816) !important;
+  border: 1px solid var(--accent) !important;
+  border-radius: 6px !important;
+  font-weight: 900 !important;
+  opacity: 1 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+  text-shadow: none !important;
+}
+
+.poke-detail-stat-tab.pw-button.active *, #poke-modal-inner .poke-detail-stat-tab.pw-button.active * {
+  color: var(--dark1, #1a1816) !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
+
+.poke-detail-stat-tab.pw-button:not(.active) *, #poke-modal-inner .poke-detail-stat-tab.pw-button:not(.active) * {
+  color: var(--light2, #ECDEB7) !important;
+  font-weight: 700 !important;
+}
+
+.poke-detail-full-list-btn.pw-button {
+  width: calc(100% - 24px) !important;
+  margin: 8px auto 4px !important;
+  display: block !important;
+  text-align: center !important;
+  font-weight: 800 !important;
+  font-size: 13px !important;
+  padding: 8px 16px !important;
+}
+
+.poke-detail-pill.pw-button {
+  min-height: unset !important;
+  min-width: unset !important;
+  line-height: 1 !important;
+}
+
+.poke-detail-panel .pw-stone-list .hbtn {
+  flex: 1 1 140px;
+  min-width: 120px;
+}
+
+.hatchery-upgrade-row .hbtn {
+  width: 100%;
+  padding: 10px;
+  font-weight: 900;
+}
+
+.save-menu-actions .hbtn {
+  min-width: 180px;
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 900;
+  text-align: center;
+}
+
+#unified-selector-modal .box-filter-panel .hbtn {
+  border-radius: 999px;
+  padding: 8px 14px;
+  min-height: 34px;
+  background: #b97b5b;
+  color: #fff8dc;
+  border: 0;
+  font-weight: 900;
+}
+
+.management-tabs .hbtn.active {
+  background: var(--light2);
+  color: var(--dark1);
+  font-weight: 900;
+}
+
+#poke-modal-inner .management-tabs .hbtn.active {
+  background: var(--light2);
+  color: var(--dark1);
+  border-color: var(--light2);
+  text-shadow: none;
+}
+
+#poke-modal-inner .management-tabs .hbtn.active span,
+#poke-modal-inner .management-tabs .hbtn.active b {
+  color: var(--dark1);
+}
+
+#poke-modal-inner .management-tabs .hbtn:not(.active) {
+  background: rgba(0,0,0,0.22);
+  color: var(--light2);
+  border-color: var(--dark3);
+}
+
+.management-tabs .hbtn {
+  min-height: 40px;
+  border-radius: 10px;
+  font-weight: 900;
+}
+
+.training-slot-actions .hbtn {
+  min-height: 36px;
+}
+
+#poke-modal.atoll-prep-modal .pw-btn-group {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+
+.pw-btn-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.pw-btn-center {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.pw-btn-cancel {
+  flex: 1;
+  padding: 10px;
+  background: var(--dark3);
+}
+
+.pw-btn-danger {
+  flex: 1;
+  padding: 10px;
+  background: var(--red);
+}
+
+.hbtn, .mob-btn {
+  cursor: pointer;
+  border-radius: 10px;
+  font-family: 'Winky Sans','Segoe UI',system-ui,sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.35px;
+}
+
+.hbtn:hover, .mob-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.hbtn.active, .hbtn.is-active, .mob-btn[aria-current="true"] {
+  background: var(--light2) !important;
+  color: var(--dark1) !important;
+  border-color: var(--light2) !important;
+}
+
+.pw-btn-danger {
+  background: var(--red) !important;
+  border: 1px solid var(--red) !important;
+  color: #fff !important;
+  font-weight: 900;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+}
+
+.pw-btn-danger:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+
+.pw-btn-cancel {
+  background: var(--dark3) !important;
+  border: 1px solid var(--pw-border-strong);
+  color: var(--light2) !important;
+}
+
+.hbtn, .pw-btn, .mob-btn, .btn, .pw-btn-toggle, .toggle {
+  color: var(--light2);
+}
+
+.hbtn:hover, .pw-btn:hover, .mob-btn:hover, .pw-btn-toggle:hover, .toggle:hover {
+  filter: brightness(1.15);
+  color: var(--light2);
+}
+
+
+/* Light background active buttons MUST use dark text (#36342F) */
+.hbtn.active, .hbtn.is-active, .mob-btn[aria-current="true"], .pw-btn-toggle.active, .toggle.active {
+  background: var(--light2) !important;
+  color: var(--dark1) !important;
+  border-color: var(--light2) !important;
+}
+
+.hbtn.active *, .hbtn.is-active *, .mob-btn[aria-current="true"] *, .pw-btn-toggle.active *, .toggle.active * {
+  color: var(--dark1) !important;
+}
+
+.pw-btn-danger {
+  color: #ffffff !important;
+  font-weight: 900;
+}
+
+.action-btn {
+  background: rgba(0, 0, 0, 0.45) !important;
+  border: 1px solid var(--pw-border) !important;
+  color: var(--light2) !important;
+}
+
+.action-btn:hover {
+  background: rgba(236, 222, 183, 0.18) !important;
+  border-color: var(--light2) !important;
+  color: var(--light2) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.action-btn .ab-label {
+  color: var(--light2) !important;
+  font-weight: 700;
+}
+
+.action-btn .ab-icon, .action-btn .ui-icon, .action-btn svg {
+  color: var(--light2) !important;
+  stroke: var(--light2) !important;
+  fill: none !important;
+  opacity: 1 !important;
+}
+
+.action-btn.pw-badge-purple {
+  background: rgba(156, 39, 176, 0.45) !important;
+  border: 1px solid #c058eb !important;
+  color: #ffffff !important;
+}
+
+.action-btn.pw-badge-purple:hover {
+  background: rgba(156, 39, 176, 0.75) !important;
+  border-color: #e886ff !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.55) !important;
+}
+
+.action-btn.pw-badge-purple .ab-icon, .action-btn.pw-badge-purple .ab-icon svg, .action-btn.pw-badge-purple .ab-label {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+
+/* DS2821: the buttons follow the universal flat-control paint (the old !important rgba override is deleted); only sizing stays. */
+.pw-puzzle-seq-btns .hbtn {
+  min-width: 72px;
+  min-height: 40px;
+}
+
+.pw-puzzle-seq-btns .hbtn:hover {
+  border-color: color-mix(in srgb, var(--yellow) 45%, transparent) !important;
+}
+
+.hbtn, .pw-btn, .mob-btn {
+  background: color-mix(in srgb, var(--light2) 12%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--light2) 35%, transparent) !important;
+  color: var(--light2) !important;
+  font-weight: 800 !important;
+  text-shadow: none !important;
+}
+
+.hbtn:hover, .pw-btn:hover, .mob-btn:hover {
+  background: color-mix(in srgb, var(--light2) 24%, transparent) !important;
+  border-color: var(--light2) !important;
+  color: var(--light2) !important;
+  filter: brightness(1.15) !important;
+}
+
+
+/* Selected/Active Buttons: the ACTIVE pair is a PER-THEME token (wave 17: the fixed cream-on-cream was illegible on the light theme and ignored every other theme — user feedback). Theme swatches are exempt: they keep their preview background, the selection is an inset ring (DS2817). */
+.hbtn.active, .hbtn.is-active, .mob-btn[aria-current="true"] {
+  background: var(--pw-btn-active-bg) !important;
+  color: var(--pw-btn-active-text) !important;
+  border-color: var(--pw-btn-active-bg) !important;
+  font-weight: 900 !important;
+}
+
+.hbtn.active *, .hbtn.is-active *, .mob-btn[aria-current="true"] * {
+  color: var(--pw-btn-active-text) !important;
+}
+
+.pw-btn-danger, .hbtn.pw-btn-danger {
+  background: #D3425F !important;
+  border: 1px solid #D3425F !important;
+  color: #ffffff !important;
+  font-weight: 900 !important;
+}
+
+.pw-btn-danger:hover, .hbtn.pw-btn-danger:hover {
+  background: #E55575 !important;
+  border-color: #E55575 !important;
+  color: #ffffff !important;
+}
+
+.hbtn:hover {
+  background: var(--pw-btn-bg-hover) !important;
+}
+
+.hbtn.active, .hbtn.is-active {
+  background: var(--pw-btn-active-bg) !important;
+  color: var(--pw-btn-active-text) !important;
+  border-color: var(--pw-btn-active-bg) !important;
+}
+
+.hbtn.active * {
+  color: var(--pw-btn-active-text) !important;
+  text-shadow: none !important;
+}
+
+.pw-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  background: var(--pw-btn-bg);
+  color: var(--pw-btn-text);
+  border: 1px solid var(--pw-btn-border);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  line-height: 1;
+  text-decoration: none;
+  user-select: none;
+}
+
+.pw-btn:hover {
+  background: var(--pw-btn-bg-hover);
+  transform: translateY(-1px);
+}
+
+.pw-btn--primary {
+  background: var(--pw-accent-color);
+  color: var(--pw-btn-active-text);
+  border-color: transparent;
+}
+
+.pw-btn--primary:hover {
+  filter: brightness(1.12);
+  background: var(--pw-accent-color);
+}
+
+.pw-btn--danger {
+  background: #D3425F;
+  color: #fff;
+  border-color: transparent;
+}
+
+.pw-btn--danger:hover {
+  filter: brightness(1.14);
+  background: #E55575;
+}
+
+.pw-btn--ghost {
+  background: transparent;
+  color: var(--pw-text-secondary);
+  border-color: var(--pw-border-color);
+}
+
+.pw-btn--toggle.is-toggled {
+  background: var(--pw-btn-active-bg);
+  color: var(--pw-btn-active-text);
+}
+
+
+/* STRICT ERGONOMIC RULE — an unusable control is never displayed: disabled buttons vanish entirely (display:none), they do not grey out. */
+.pw-btn[disabled], .hbtn[disabled] {
+  display: none !important;
+}
+
+.pw-poke-card.box-card .box-actions .hbtn {
+  padding: 4px 10px;
+  font-size: 11px;
+  min-height: 26px;
+}
+
+.hbtn.active {
+  background: var(--light2) !important;
+  border-color: var(--light2) !important;
+  color: var(--dark1) !important;
+  text-shadow: none !important;
+  font-weight: 800 !important;
+}
+
+
+/* 6b. Danger buttons keep their crimson even with data-action set: the universal blanket (…(0,2,1) !important) outranks the class-only .pw-btn-danger (0,2,0). Wave 18 (user feedback): EXACT SAME crimson as the DS danger family (#D3425F / hover #E55575) — the wave-17 color-mix darkened it and "Abandonner"/"Retirer" no longer matched the other red buttons. */
+.hbtn.pw-btn-danger {
+  background: #D3425F !important;
+  border-color: #D3425F !important;
+  color: #ffffff !important;
+}
+
+.hbtn.pw-btn-danger:hover {
+  background: #E55575 !important;
+  border-color: #E55575 !important;
+  color: #ffffff !important;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+.hbtn, .mob-btn {
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+.save-menu-actions .hbtn {
+  min-width: 130px !important;
+  padding: 10px 14px !important;
+  font-size: 13px !important;
+}
+
+}
+
+.pw-debug-code-row .hbtn {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 520px) {
+.save-menu-actions .hbtn {
+  min-width: 0;
+}
+
+}
+
+.pw-loc-sanctuary-row-action .pw-btn {
+  min-width: 130px;
+  white-space: nowrap;
+}
+
+:where(.pw-button) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  font-weight: 600;
+  border-radius: var(--pw-radius-sm);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease-in-out;
+  outline: none;
+  text-decoration: none;
+  background-color: transparent;
+  color: var(--pw-text-primary);
+}
+
+:where(.pw-button:active) {
+  transform: translateY(1px);
+}
+
+:where(.pw-button--align-left) {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+:where(.pw-button--align-center) {
+  justify-content: center;
+  text-align: center;
+}
+
+:where(.pw-button--align-right) {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+:where(.pw-button--sm) {
+  padding: 4px 10px;
+  font-size: var(--pw-font-size-xs);
+}
+
+:where(.pw-button--md) {
+  padding: 8px 16px;
+  font-size: var(--pw-font-size-sm);
+}
+
+:where(.pw-button--lg) {
+  padding: 12px 24px;
+  font-size: var(--pw-font-size-md);
+}
+
+.pw-button--full-width {
+  width: 100%;
+}
+
+.pw-button--primary {
+  background-color: var(--pw-accent-gold);
+  color: var(--pw-text-dark);
+  border-color: var(--pw-accent-gold);
+}
+
+.pw-button--primary:hover {
+  background-color: var(--pw-accent-gold-hover);
+  box-shadow: 0 0 10px rgba(255, 225, 94, 0.4);
+}
+
+.pw-button--secondary {
+  background-color: var(--pw-bg-surface-elevated);
+  color: var(--pw-text-primary);
+  border-color: var(--pw-border-color);
+}
+
+.pw-button--secondary:hover {
+  border-color: var(--pw-accent-gold);
+  background-color: var(--pw-bg-surface-hover);
+}
+
+.pw-button--danger {
+  background-color: var(--pw-accent-danger);
+  color: var(--pw-text-white);
+  border-color: var(--pw-accent-danger);
+}
+
+.pw-button--danger:hover {
+  background-color: var(--pw-accent-danger-hover);
+  box-shadow: 0 0 10px rgba(231, 76, 60, 0.4);
+}
+
+.pw-button--success {
+  background-color: var(--pw-accent-success);
+  color: var(--pw-text-dark);
+  border-color: var(--pw-accent-success);
+}
+
+.pw-button--success:hover {
+  background-color: var(--pw-accent-success-hover);
+}
+
+.pw-button--ghost {
+  background-color: transparent;
+  color: var(--pw-text-secondary);
+  border-color: transparent;
+}
+
+.pw-button--ghost:hover {
+  color: var(--pw-text-primary);
+  background-color: color-mix(in srgb, var(--light2) 6%, transparent);
+}
+
+.pw-button--tab {
+  background: transparent;
+  color: var(--pw-text-secondary);
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  padding: 8px 14px;
+}
+
+.pw-button--tab.is-active,
+.pw-button--tab:hover {
+  color: var(--pw-accent-gold);
+  border-bottom-color: var(--pw-accent-gold);
+}
+
+:where(.pw-button-icon) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+:where(.pw-button-text) {
+  line-height: 1;
+}
+
+.pw-button.pw-modal-close-btn,
+.pw-button.pw-modal-close-btn:hover {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  min-height: 0;
+  min-width: 0;
+  padding: 0 4px;
+}
+
+.save-context-item .pw-button-icon .pw-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.pw-button.pw-toast-close {
+  min-height: 0;
+  min-width: 0;
+  box-shadow: none;
+}
+
+.shortcut-action-btn .pw-button-icon {
+  color: var(--shortcut-color, var(--pw-text-primary));
+}
+
+.pw-loc-sanctuary-row-action .pw-btn {
+  flex: 1 1 auto;
+  min-width: min(130px, 100%);
+  white-space: normal;
+}
+
+@container (max-width: 250px) {
+.pw-loc-sanctuary-row-action .pw-btn {
+  min-width: 0;
+}
+
+}
+
+.poke-card-info-btn .pw-button-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.pw-puzzle-card > .pw-button {
+  grid-column: 2 / 4;
+  grid-row: 2;
+  justify-self: end;
+}
+
+.pw-puzzle-options .pw-button {
+  min-width: 0;
+  white-space: normal;
+}
+
+.pw-puzzle-options .pw-button.is-selected {
+  border-color: var(--accent, #ffa500);
+  color: var(--accent, #ffa500);
+}
+
+.pw-puzzle-actions .pw-button {
+  min-width: 96px;
+}
+
+@media (max-width: 520px) {
+.pw-puzzle-card > .pw-button {
+  grid-column: 2;
+}
+
+.pw-puzzle-card > .pw-button {
+  justify-self: stretch;
+}
+
+.pw-puzzle-actions .pw-button {
+  flex: 1 1 auto;
+}
+
+}
+
+@media (max-width: 680px) {
+.pw-preset-editor-actions > .pw-button {
+  flex: 1 1 auto;
+}
+
+}
+
+.pw-loc-alcove-row .pw-button {
+  flex: 0 0 auto;
+  white-space: normal;
+}
+
+#fs-box .pw-box-selection-footer-actions .pw-button {
+  min-width: 132px;
+}
+
+@media (max-width: 640px), (pointer: coarse) {
+#fs-box .pw-box-selection-footer-actions .pw-button {
+  min-width: 0;
+  width: 100%;
+}
+
+}
+
+@media (max-width: 600px) {
+.poke-detail-learnable-row .pw-button {
+  grid-column: 2;
+  justify-self: start;
+}
+
+}
+
+.pw-dungeon-actions > .pw-button {
+  flex: 1 1 160px;
+}
+
+@media (max-width: 600px) {
+.pw-dungeon-actions > .pw-button {
+  flex-basis: auto;
+  width: 100%;
+}
+
+}
+
+.pw-guide-actions .pw-button {
+  min-height: 44px;
+  padding: 7px 12px;
+  border: 1px solid color-mix(in srgb, var(--pw-text-primary) 35%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--pw-text-primary) 12%, transparent);
+  color: var(--pw-text-primary);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.pw-guide-actions .pw-button:hover:not(:disabled) {
+  border-color: var(--pw-accent-color);
+  background: color-mix(in srgb, var(--pw-text-primary) 18%, transparent);
+}
+
+.pw-guide-actions .pw-button:disabled {
+  opacity: .58;
+  cursor: not-allowed;
+}
+
+.pw-guide-card.pw-button {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-items: center;
+  justify-items: start;
+  gap: 4px 10px;
+  min-height: 74px;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--pw-text-primary) 35%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--pw-text-primary) 12%, transparent);
+  color: var(--pw-text-primary);
+  text-align: left;
+  transition: border-color .14s ease, background-color .14s ease, transform .14s ease;
+}
+
+.pw-guide-card.pw-button:hover {
+  border-color: var(--pw-accent-color);
+  background: color-mix(in srgb, var(--pw-text-primary) 18%, transparent);
+  transform: translateY(-2px);
+}
+
+.pw-guide-card .pw-button-icon {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: center;
+  color: var(--pw-accent-color);
+}
+
+.pw-guide-card .pw-button-icon .pw-icon-svg {
+  width: 21px;
+  height: 21px;
+}
+
+.pw-guide-card .pw-button-text {
+  grid-column: 2;
+  grid-row: 1;
+  color: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.3;
+  text-align: left;
+}
+
+.pw-guide-back.pw-button {
+  flex: 0 0 auto;
+  gap: 6px;
+}
+
+.pw-staff-card-footer > .pw-button {
+  justify-content: center;
+  width: 100%;
+  font-size: 13px;
+  min-height: 35px;
+}
+
+.training-locked-slot .pw-button {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+}
+
+@container pw-training-slot (max-width: 250px) {
+.training-slot-card .training-slot-pokemon > .pw-button {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+}
+
+}
+
+.hatchery-slot-footer
+  > .pw-button:first-child:not(.hatchery-mode-toggle):not(.is-hidden) {
+  flex: 1 1 0;
+}
+
+.pw-mine-header > .pw-button {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+  padding: 10px;
+  font-size: 12px;
+  white-space: normal;
+}
+
+.pw-mine-tile .pw-button-text {
+  display: none;
+}

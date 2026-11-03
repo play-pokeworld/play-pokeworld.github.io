@@ -17,12 +17,11 @@ import { UIText } from '../ui/UIText.js';
 import { UIButton } from '../ui/UIButton.js';
 import { UIImage } from '../ui/UIImage.js';
 import { UIProgressBar } from '../ui/UIProgressBar.js';
-import { UIPokemonSprite, PokemonSpriteSizes } from '../ui/UIPokemonSprite.js';
 import { ModalIds } from '../config/ModalIds.js';
-import { ItemDB } from '../data/items/ItemDB.js';
 import { TextFormatter } from '../core/TextFormatter.js';
 import { SaveCard } from '../ui/SaveCard.js';
-import { groupBattleCaptures } from './components/BattleLootStrip.js';
+import { LootItemList } from './components/LootItemList.js';
+import { CapturedPokemonList } from './components/CapturedPokemonList.js';
 import { FastForwardRules } from '../config/FastForwardRules.js';
 import { t } from '../localization/LocalizationManager.js';
 
@@ -158,66 +157,18 @@ export class AfkSummaryModal extends UIModal {
 
   /** @private @param {Array<Object>} captures @returns {UIContainer} */
   _capturesSection(captures) {
-    const section = new UIContainer({ className: 'pw-col pw-gap-sm' });
-    section.addChild(new UIText({ tagName: 'h3', className: 'battle-summary-section-title', text: t('captured_pokemon_title') }));
-    const groups = groupBattleCaptures(captures);
-    if (!groups.length) {
-      section.addChild(new UIText({ tagName: 'div', className: 'battle-summary-empty', text: t('afk_none') }));
-      return section;
-    }
-    for (const group of groups) {
-      const pokemonName = group.name || t(`pokemon.${group.species}`);
-      const subLabel = group.duplicateCount > 0
-        ? t('battle_summary_duplicate_count', { count: group.duplicateCount })
-        : t(group.shiny ? 'battle_summary_shiny' : 'battle_summary_standard');
-      section.addChild(new UIContainer({
-        className: `battle-summary-entry ${group.shiny ? 'is-shiny' : 'is-normal'}`,
-        children: [
-          new UIContainer({
-            className: 'pw-summary-sprite',
-            children: [new UIPokemonSprite({ species: group.species, form: group.form, shiny: group.shiny, alt: pokemonName, size: PokemonSpriteSizes.STANDARD })]
-          }),
-          new UIContainer({
-            className: 'pw-flex-1',
-            children: [
-              new UIText({ tagName: 'div', className: 'pw-summary-name', text: pokemonName }),
-              new UIText({ tagName: 'div', className: 'pw-text-sm pw-light1', text: subLabel })
-            ]
-          }),
-          new UIText({ tagName: 'div', className: 'pw-summary-count', text: `×${group.count}` })
-        ]
-      }));
-    }
-    return section;
+    // Same component as the battle summary (the two used to be two copies of the same block).
+    return new CapturedPokemonList({ captures, emptyKey: 'afk_none' });
   }
 
   /** @private @param {Array<Object>} items @returns {UIContainer} */
   _itemsSection(items) {
-    const section = new UIContainer({ className: 'pw-col pw-gap-sm' });
-    section.addChild(new UIText({ tagName: 'h3', className: 'battle-summary-section-title', text: t('found_items_title') }));
-    const filtered = items.filter((entry) => entry?.itemId && entry.quantity > 0);
-    if (!filtered.length) {
-      section.addChild(new UIText({ tagName: 'div', className: 'battle-summary-empty', text: t('afk_none') }));
-      return section;
-    }
-    const list = new UIContainer({ className: 'pw-row-wrap pw-gap-sm' });
-    for (const entry of filtered) {
-      const name = t(`item.${entry.itemId}.name`);
-      list.addChild(new UIContainer({
-        className: 'pw-card-bordered pw-row pw-gap-sm battle-summary-entry is-normal',
-        children: [
-          new UIImage({ src: ItemDB.getInstance().getImagePath(entry.itemId), alt: name, className: 'battle-summary-item-icon', pixelated: true }),
-          new UIContainer({
-            children: [
-              new UIText({ tagName: 'div', className: 'pw-bold pw-text-sm pw-light2', text: name }),
-              new UIText({ tagName: 'div', className: 'pw-text-sm pw-light1', text: `×${TextFormatter.formatNumber(entry.quantity)}` })
-            ]
-          })
-        ]
-      }));
-    }
-    section.addChild(list);
-    return section;
+    // Same shared list as the battle summary, so the two can never drift apart again.
+    return new LootItemList({
+      items,
+      emptyKey: 'afk_none',
+      resolveName: (itemId) => t(`item.${itemId}.name`)
+    });
   }
 
   /**

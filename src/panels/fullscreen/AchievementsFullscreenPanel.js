@@ -290,7 +290,7 @@ export class AchievementsFullscreenPanel extends UIFullscreenPanel {
       // Tier dots
       const tierDots = ach.tiers.map((target, idx) => {
         const dot = new UIContainer({
-          className: 'pw-tier-dot ' + (prog.currentTier >= idx ? 'unlocked' : 'locked')
+          className: 'pw-tier-dot' + (prog.currentTier >= idx ? 'unlocked' : 'locked')
         });
         dot.setTooltip(t('ach_tier_title', { n: idx + 1, target }));
         return dot;
@@ -373,7 +373,7 @@ export class AchievementsFullscreenPanel extends UIFullscreenPanel {
 
     const grid = cards.length > 0
       ? new UIContainer({ className: 'pw-ach-grid', children: cards })
-      : new UIText({ className: 'pw-empty-state-md', text: t('ach_no_found') });
+      : new UIText({ className: 'pw-empty-state', text: t('ach_no_found') });
 
     this.setContent([
       new UIContainer({

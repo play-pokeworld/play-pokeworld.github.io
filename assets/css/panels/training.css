@@ -1,0 +1,1098 @@
+/*
+ * panels/training.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.training-slot-card {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+  color: var(--pw-text-primary) !important;
+}
+
+.training-live-sprite, .training-slot-sprite {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.training-poke img {
+  width: 60px;
+  height: 60px;
+}
+
+.training-header-card {
+  background: rgba(0,0,0,0.22);
+  border: 1px solid var(--dark3);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.training-header-actions {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.training-mode-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(190px,1fr));
+  gap:10px;
+  margin-top:10px;
+}
+
+.training-mode-row {
+  min-height:76px;
+  border:1px solid var(--dark3);
+  border-radius:10px;
+  padding:10px;
+  background:rgba(0,0,0,0.2);
+}
+
+.training-mode-row.is-disabled {
+  opacity:.45;
+  cursor:not-allowed;
+  filter:grayscale(.4);
+}
+
+.training-mode-title {
+  font-weight:900;
+  color:var(--light2);
+  font-size:13px;
+  margin-bottom:4px;
+}
+
+.training-upgrade-line {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  padding:8px 0;
+  border-bottom:1px solid rgba(148,136,107,.25);
+}
+
+.training-mode-row {
+  cursor: pointer;
+  border-width: 2px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.25), inset 0 0 0 1px rgba(255,255,255,.06);
+  transition: transform .15s, filter .15s, box-shadow .15s;
+}
+
+.training-mode-row:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.12);
+}
+
+.training-mode-grid .training-mode-row:nth-child(1) {
+  border-color:#5cc8ff;
+  background:linear-gradient(135deg, rgba(92,200,255,.20), rgba(0,0,0,.20));
+}
+
+.training-mode-grid .training-mode-row:nth-child(2) {
+  border-color:#d68cff;
+  background:linear-gradient(135deg, rgba(214,140,255,.20), rgba(0,0,0,.20));
+}
+
+.training-mode-grid .training-mode-row:nth-child(3) {
+  border-color:#60be58;
+  background:linear-gradient(135deg, rgba(96,190,88,.22), rgba(0,0,0,.20));
+}
+
+.training-mode-grid .training-mode-row:nth-child(4) {
+  border-color:#f2d94e;
+  background:linear-gradient(135deg, rgba(242,217,78,.22), rgba(0,0,0,.20));
+}
+
+.training-mode-row.is-disabled {
+  pointer-events:none;
+  box-shadow:none;
+}
+
+.training-upgrade-line {
+  border: 2px solid var(--dark3);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 8px 0;
+  background: rgba(0,0,0,.22);
+}
+
+.training-upgrade-line.is-on {
+  border-color: var(--green);
+  background: rgba(96,190,88,.16);
+  box-shadow: 0 0 12px rgba(96,190,88,.18);
+}
+
+.training-upgrade-line.is-off {
+  border-color: var(--red);
+  background: rgba(211,66,95,.10);
+}
+
+.training-upgrade-line input {
+  transform: scale(1.25);
+}
+
+.training-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.training-slot-card,
+.training-locked-slot {
+  border: 1px solid var(--dark3);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.22);
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.training-slot-card.is-active {
+  border-color: var(--green);
+  box-shadow: 0 0 16px rgba(96,190,88,0.18), inset 0 0 0 1px rgba(96,190,88,0.18);
+}
+
+.training-slot-card.is-empty,
+.training-locked-slot {
+  border-style: dashed;
+  align-content: center;
+  min-height: 190px;
+  text-align: center;
+}
+
+.training-slot-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  color: var(--light2);
+}
+
+.training-slot-head span {
+  color: var(--light1);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.training-slot-pokemon {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.training-slot-sprite {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 25%, rgba(236,222,183,0.26), rgba(0,0,0,0.18));
+  border: 2px solid rgba(236,222,183,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.training-slot-pokemon small,
+.training-slot-empty,
+.training-slot-result,
+.training-slot-timer,
+.training-locked-slot {
+  color: var(--light1);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.training-slot-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.training-slot-progress {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--dark1);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.training-slot-progress div {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--green);
+  transition: width 0.3s;
+}
+
+.training-slot-progress .pct-0 {
+  width: 0%;
+}
+
+.training-slot-progress .pct-5 {
+  width: 5%;
+}
+
+.training-slot-progress .pct-10 {
+  width: 10%;
+}
+
+.training-slot-progress .pct-15 {
+  width: 15%;
+}
+
+.training-slot-progress .pct-20 {
+  width: 20%;
+}
+
+.training-slot-progress .pct-25 {
+  width: 25%;
+}
+
+.training-slot-progress .pct-30 {
+  width: 30%;
+}
+
+.training-slot-progress .pct-35 {
+  width: 35%;
+}
+
+.training-slot-progress .pct-40 {
+  width: 40%;
+}
+
+.training-slot-progress .pct-45 {
+  width: 45%;
+}
+
+.training-slot-progress .pct-50 {
+  width: 50%;
+}
+
+.training-slot-progress .pct-55 {
+  width: 55%;
+}
+
+.training-slot-progress .pct-60 {
+  width: 60%;
+}
+
+.training-slot-progress .pct-65 {
+  width: 65%;
+}
+
+.training-slot-progress .pct-70 {
+  width: 70%;
+}
+
+.training-slot-progress .pct-75 {
+  width: 75%;
+}
+
+.training-slot-progress .pct-80 {
+  width: 80%;
+}
+
+.training-slot-progress .pct-85 {
+  width: 85%;
+}
+
+.training-slot-progress .pct-90 {
+  width: 90%;
+}
+
+.training-slot-progress .pct-95 {
+  width: 95%;
+}
+
+.training-slot-progress .pct-100 {
+  width: 100%;
+}
+
+.training-slot-card .training-mode-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.training-live-title {
+  color: var(--light2);
+  font-weight: 900;
+  text-align: center;
+  padding: 8px;
+  border: 1px solid var(--dark3);
+  border-radius: 10px;
+  background: rgba(0,0,0,0.2);
+}
+
+.training-live-card {
+  border: 1px solid rgba(96,190,88,0.55);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.22);
+  padding: 10px;
+  display: grid;
+  gap: 9px;
+}
+
+.training-live-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--light2);
+}
+
+.training-live-head span {
+  color: var(--green);
+  font-weight: 900;
+}
+
+.training-live-duel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: stretch;
+}
+
+.training-live-poke {
+  border: 1px solid var(--dark3);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  padding: 8px;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.training-live-poke.enemy {
+  border-color: rgba(211,66,95,0.48);
+}
+
+.training-live-sprite {
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 25%, rgba(236,222,183,0.28), rgba(0,0,0,0.18));
+  border: 2px solid rgba(236,222,183,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.training-live-poke b {
+  color: var(--light2);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.training-live-poke span,
+.training-live-poke small,
+.training-live-log {
+  color: var(--light1);
+  font-size: 12px;
+}
+
+.training-live-move {
+  color: var(--light2);
+  font-size: 11px;
+  font-weight: 900;
+  min-height: 16px;
+}
+
+.training-live-cd {
+  width: 100%;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--dark1);
+  overflow: hidden;
+}
+
+.training-live-cd div {
+  height: 100%;
+  background: var(--light2);
+  border-radius: 999px;
+}
+
+.training-live-vs {
+  align-self: center;
+  color: var(--light2);
+  font-weight: 900;
+  padding: 0 2px;
+}
+
+.training-live-log {
+  min-height: 62px;
+  max-height: 82px;
+  overflow: hidden;
+  border: 1px solid var(--dark3);
+  border-radius: 8px;
+  background: rgba(0,0,0,0.18);
+  padding: 6px 8px;
+  display: grid;
+  align-content: end;
+  gap: 2px;
+}
+
+.training-auto-slot-list {
+  display: grid;
+  gap: 8px;
+}
+
+.training-auto-slot-card {
+  border: 1px solid var(--dark3);
+  border-radius: 10px;
+  background: rgba(0,0,0,0.2);
+  padding: 10px;
+  display: grid;
+  gap: 4px;
+}
+
+.training-auto-slot-card b {
+  color: var(--light2);
+}
+
+.training-auto-slot-card span {
+  color: var(--light1);
+  font-size: 12px;
+}
+
+.training-auto-slot-card.is-locked {
+  opacity: 0.55;
+}
+
+@media (max-width: 680px) {
+.training-live-duel {
+  grid-template-columns: 1fr;
+}
+
+.training-live-vs {
+  text-align: center;
+}
+
+.training-slot-card .training-mode-grid {
+  grid-template-columns: 1fr;
+}
+
+}
+
+.training-live-cd .pct-0 {
+  width: 0%;
+}
+
+.training-live-cd .pct-5 {
+  width: 5%;
+}
+
+.training-live-cd .pct-10 {
+  width: 10%;
+}
+
+.training-live-cd .pct-15 {
+  width: 15%;
+}
+
+.training-live-cd .pct-20 {
+  width: 20%;
+}
+
+.training-live-cd .pct-25 {
+  width: 25%;
+}
+
+.training-live-cd .pct-30 {
+  width: 30%;
+}
+
+.training-live-cd .pct-35 {
+  width: 35%;
+}
+
+.training-live-cd .pct-40 {
+  width: 40%;
+}
+
+.training-live-cd .pct-45 {
+  width: 45%;
+}
+
+.training-live-cd .pct-50 {
+  width: 50%;
+}
+
+.training-live-cd .pct-55 {
+  width: 55%;
+}
+
+.training-live-cd .pct-60 {
+  width: 60%;
+}
+
+.training-live-cd .pct-65 {
+  width: 65%;
+}
+
+.training-live-cd .pct-70 {
+  width: 70%;
+}
+
+.training-live-cd .pct-75 {
+  width: 75%;
+}
+
+.training-live-cd .pct-80 {
+  width: 80%;
+}
+
+.training-live-cd .pct-85 {
+  width: 85%;
+}
+
+.training-live-cd .pct-90 {
+  width: 90%;
+}
+
+.training-live-cd .pct-95 {
+  width: 95%;
+}
+
+.training-live-cd .pct-100 {
+  width: 100%;
+}
+
+.training-slot-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+
+/* Phase 14: state colors of the training window "auto" button. These rules were never applied: the generic .hbtn:not(...) rule (pw-unified.css) overrode them — the class is now excluded from that rule. Solid green + dark text, like automation. */
+.training-slot-auto-btn.is-off {
+  background: rgba(0,0,0,0.26);
+  color: var(--light2);
+  border-color: rgba(236,222,183,0.35);
+  border-style: dashed;
+}
+
+.training-slot-auto-btn.is-on {
+  background: linear-gradient(135deg, var(--green), #8bd77d);
+  color: var(--dark1);
+  border-color: var(--green);
+  box-shadow: 0 0 10px rgba(120, 200, 110, 0.35);
+  font-weight: 900;
+}
+
+.training-auto-slot-list {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.training-auto-slot-list.vertical {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.training-auto-slot-card {
+  display: grid;
+  gap: 10px;
+}
+
+.training-cd-fill {
+  height: 100%;
+  width: var(--pct, 0%);
+  background: var(--light2);
+  border-radius: 999px;
+  transition: width 0.12s linear;
+}
+
+.training-slot-sprite,
+.training-live-sprite {
+  cursor: context-menu;
+}
+
+
+/* NB: .save-slot is EXCLUDED — save cards carry their own themed background (save-bg-classic/emerald/…) which must stay visible in the settings preview as in the saves menu. */
+.training-mode-row {
+  background: rgba(0, 0, 0, 0.28) !important;
+  border: 1px solid var(--pw-border) !important;
+  color: var(--light2) !important;
+}
+
+.training-mode-row:hover {
+  background: rgba(236, 222, 183, 0.15) !important;
+  border-color: var(--light2) !important;
+  color: var(--light2) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.training-mode-row.training-mode--move {
+  background: linear-gradient(135deg, rgba(92, 200, 255, .22), rgba(0, 0, 0, .30)) !important;
+  border-color: #5cc8ff !important;
+}
+
+.training-mode-row.training-mode--move:hover {
+  background: linear-gradient(135deg, rgba(92, 200, 255, .38), rgba(0, 0, 0, .25)) !important;
+  border-color: #8ddaff !important;
+  box-shadow: 0 4px 12px rgba(92, 200, 255, .30);
+}
+
+.training-mode-row.training-mode--talent {
+  background: linear-gradient(135deg, rgba(214, 140, 255, .22), rgba(0, 0, 0, .30)) !important;
+  border-color: #d68cff !important;
+}
+
+.training-mode-row.training-mode--talent:hover {
+  background: linear-gradient(135deg, rgba(214, 140, 255, .38), rgba(0, 0, 0, .25)) !important;
+  border-color: #e5b3ff !important;
+  box-shadow: 0 4px 12px rgba(214, 140, 255, .30);
+}
+
+.training-mode-row.training-mode--ev {
+  background: linear-gradient(135deg, rgba(96, 190, 88, .24), rgba(0, 0, 0, .30)) !important;
+  border-color: #60be58 !important;
+}
+
+.training-mode-row.training-mode--ev:hover {
+  background: linear-gradient(135deg, rgba(96, 190, 88, .40), rgba(0, 0, 0, .25)) !important;
+  border-color: #8ad683 !important;
+  box-shadow: 0 4px 12px rgba(96, 190, 88, .30);
+}
+
+.training-mode-row.training-mode--hidden {
+  background: linear-gradient(135deg, rgba(251, 166, 76, .24), rgba(0, 0, 0, .30)) !important;
+  border-color: #fba64c !important;
+}
+
+.training-mode-row.training-mode--hidden:hover {
+  background: linear-gradient(135deg, rgba(251, 166, 76, .40), rgba(0, 0, 0, .25)) !important;
+  border-color: #ffc383 !important;
+  box-shadow: 0 4px 12px rgba(251, 166, 76, .30);
+}
+
+.training-mode-row.training-mode--level {
+  background: linear-gradient(135deg, rgba(242, 217, 78, .22), rgba(0, 0, 0, .30)) !important;
+  border-color: #f2d94e !important;
+}
+
+.training-mode-row.training-mode--level:hover {
+  background: linear-gradient(135deg, rgba(242, 217, 78, .38), rgba(0, 0, 0, .25)) !important;
+  border-color: #f8e88a !important;
+  box-shadow: 0 4px 12px rgba(242, 217, 78, .30);
+}
+
+.training-mode-row[class*="training-mode--"].is-disabled {
+  opacity: .45;
+  filter: grayscale(.35);
+  box-shadow: none;
+}
+
+.training-mode-row[class*="training-mode--"].is-disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.training-slot-card {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid rgba(236,222,183,0.22) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+  color: var(--pw-text-primary) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.training-slot-card:hover {
+  border-color: var(--pw-text-primary) !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.6) !important;
+  transform: translateY(-2px) !important;
+  color: var(--pw-text-primary) !important;
+}
+
+.training-slot-sprite {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+  flex-shrink: 0 !important;
+}
+
+.training-slot-sprite img {
+  position: relative !important;
+  z-index: 2 !important;
+  object-fit: contain !important;
+  image-rendering: pixelated !important;
+}
+
+.training-slot-card b, .training-slot-card strong {
+  color: var(--pw-text-primary) !important;
+  font-weight: 700 !important;
+}
+
+.training-slot-card span, .training-slot-card small, .training-slot-card p {
+  color: var(--pw-text-primary) !important;
+  opacity: 0.82;
+}
+
+.training-mode-grid .training-mode-row {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-color: var(--dark3) !important;
+}
+
+.training-mode-grid .training-mode-row.training-mode--move:not(.is-disabled) {
+  background: #5CC8FF !important;
+  border-color: #3FA8E0 !important;
+}
+
+.training-mode-grid .training-mode-row.training-mode--talent:not(.is-disabled) {
+  background: #C77DFF !important;
+  border-color: #A85BE0 !important;
+}
+
+.training-mode-grid .training-mode-row.training-mode--ev:not(.is-disabled) {
+  background: #60BE58 !important;
+  border-color: #489A42 !important;
+}
+
+.training-mode-grid .training-mode-row.training-mode--hidden:not(.is-disabled) {
+  background: #FBA64C !important;
+  border-color: #DE8A30 !important;
+}
+
+.training-mode-grid .training-mode-row.training-mode--level:not(.is-disabled) {
+  background: #F2D94E !important;
+  border-color: #CFB62F !important;
+}
+
+.training-mode-grid .training-mode-row:not(.is-disabled), .training-mode-grid .training-mode-row:not(.is-disabled) .training-mode-title, .training-mode-grid .training-mode-row:not(.is-disabled) * {
+  color: #241F16 !important;
+  text-shadow: none !important;
+}
+
+.training-auto-slot-list {
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+}
+
+.training-auto-slot-list {
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+  gap: 14px;
+}
+
+.training-live-card {
+  position: relative !important;
+  background-image:
+    linear-gradient(180deg, rgba(20, 24, 18, .70) 0%, rgba(20, 24, 18, .84) 100%),
+    url('../../images/bg/gym.png') !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-position: center, center center !important;
+  background-size: cover, 100% 100% !important;
+  image-rendering: pixelated !important;
+  overflow: hidden !important;
+}
+
+.training-live-duel {
+  position: relative !important;
+  border-radius: 10px !important;
+  padding: 8px !important;
+  background-image:
+    linear-gradient(180deg, rgba(20, 24, 18, .28) 0%, rgba(20, 24, 18, .58) 100%),
+    url('../../images/bg/gym.png') !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-position: center, center bottom !important;
+  background-size: cover, 100% 100% !important;
+  image-rendering: pixelated !important;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .35) !important;
+}
+
+.training-live-duel .training-live-poke {
+  position: relative !important;
+  border-radius: 8px !important;
+  padding: 6px !important;
+  background-image:
+    linear-gradient(180deg, rgba(24, 22, 18, .52) 0%, rgba(24, 22, 18, .78) 100%),
+    url('../../images/bg/gym.png') !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-position: center, center center !important;
+  background-size: cover, 100% 100% !important;
+  image-rendering: pixelated !important;
+  border: 1px solid rgba(0, 0, 0, .38) !important;
+}
+
+.training-live-duel .training-live-poke > * {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.training-live-duel .training-live-sprite img {
+  image-rendering: pixelated !important;
+}
+
+.training-live-duel .training-live-vs {
+  position: relative !important;
+  z-index: 1 !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, .9) !important;
+}
+
+.pw-training-body {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pw-training-card {
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(236, 222, 183, 0.18);
+  border-radius: 8px;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pw-training-title {
+  font-weight: 700;
+  color: var(--light2, #ecdeb7);
+}
+
+.pw-training-desc {
+  color: var(--light1, #c9bc9c);
+}
+
+.pw-training-round {
+  color: var(--light1, #c9bc9c);
+  font-size: 11px;
+}
+
+.pw-training-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pw-training-select {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.pw-training-locked {
+  padding: 10px;
+  color: var(--light1, #c9bc9c);
+  text-align: center;
+}
+
+.pw-training-fighter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px;
+  border-radius: 7px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.pw-training-fighter--foe {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+.pw-training-sprite {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  flex: 0 0 52px;
+}
+
+.pw-training-fighter-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pw-training-result {
+  padding: 8px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.pw-training-result.is-success {
+  border-left: 3px solid var(--green, #63b76c);
+}
+
+.pw-training-result.is-failure {
+  border-left: 3px solid var(--red, #e25b5b);
+}
+
+.pw-training-slot-sprite {
+  width: 62px;
+  height: 62px;
+  flex: 0 0 62px;
+}
+
+.training-slot-card .training-slot-pokemon {
+  grid-template-columns: 62px minmax(0, 1fr) auto;
+}
+
+.training-slot-card .training-slot-head {
+  font-size: 13px;
+}
+
+.training-slot-metadata {
+  display: block;
+  font-size: 11px;
+  color: var(--light1);
+  line-height: 1.35;
+}
+
+.training-slot-card .training-mode-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.training-slot-card .training-mode-row {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  padding: 10px 11px;
+  min-height: 75px;
+  border: 1px solid var(--pw-border);
+  border-radius: 8px;
+  text-align: left;
+  font-size: 12px;
+}
+
+.training-mode-row b {
+  font-size: 13px;
+}
+
+.training-mode-row small,
+.training-mode-status {
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.training-mode-row:not(.is-disabled) {
+  cursor: pointer;
+}
+
+.training-mode-row .pw-training-mode-action {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  border-radius: 8px;
+}
+
+.training-mode-row:focus-within {
+  outline: 2px solid var(--light2);
+  outline-offset: 2px;
+}
+
+.training-slot-card .pw-training-result {
+  padding: 8px;
+  border: 1px solid var(--pw-border);
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.pw-training-live {
+  display: grid;
+  gap: 12px;
+  padding: 12px 0;
+  min-width: 0;
+}
+
+.pw-training-live > h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.pw-training-live-list {
+  display: grid;
+  gap: 14px;
+}
+
+.pw-training-live-card {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--pw-border-color);
+  border-radius: 12px;
+  background: var(--pw-bg-inset);
+  min-width: 0;
+}
+
+.pw-training-live-fighters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.training-slot-card,
+.training-locked-slot {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.training-slot-card {
+  container-type: inline-size;
+  container-name: pw-training-slot;
+}
+
+.training-slot-card .training-slot-head {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.training-slot-card .training-slot-head > *,
+.training-slot-card .training-mode-grid,
+.training-slot-card .training-mode-row {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@container pw-training-slot (max-width: 250px) {
+.training-slot-card .training-slot-pokemon {
+  grid-template-columns: 62px minmax(0, 1fr);
+}
+
+.training-slot-card .training-mode-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+}
+
+.pw-training-slot-list {
+  display: contents;
+}
+
+@media (max-width: 680px) {
+.training-slot-card .training-mode-grid {
+  grid-template-columns: 1fr;
+}
+
+}

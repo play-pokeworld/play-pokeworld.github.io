@@ -143,6 +143,8 @@ export class SaveData extends BaseModel {
     save.collection.add(starterPokemon);
     save.talents.unlock(starterPokemon.species, starterPokemon.talent);
     save.teamMembers.setUids([starterPokemon.uid]);
+    // The save card shows an owned Pokémon: the starter is the natural first choice.
+    save.player.avatarPokemonUid = starterPokemon.uid;
     const starterRegion = Object.keys(STARTERS_BY_REGION).find((region) =>
       STARTERS_BY_REGION[region].some((entry) => entry.species === starter.species)
     );
@@ -237,31 +239,6 @@ export class SaveData extends BaseModel {
     this.sanctuary = new SanctuaryData(data.sanctuary);
     this.access = new ContentAccessData(data.access);
     this._repairPokemonReferences();
-    this.verifyLevelEvolutions();
-  }
-
-  /**
-   * Verifies that every owned Pokémon whose level satisfies its evolution requirement
-   * has evolved properly. Called automatically upon save load and deserialization.
-   * @returns {number} Number of Pokémon that evolved during verification.
-   */
-  verifyLevelEvolutions() {
-    if (!this.collection) return 0;
-    let evolvedCount = 0;
-    for (const pokemon of this.collection.getAll()) {
-      const evolved = pokemon.checkLevelEvolution((species) => {
-        if (this.pokedex) {
-          this.pokedex.markCaught(species, pokemon.shiny, { deferSave: true });
-        }
-        if (this.talents) {
-          this.talents.unlock(species, pokemon.talent);
-        }
-      });
-      if (evolved) {
-        evolvedCount++;
-      }
-    }
-    return evolvedCount;
   }
 
   /**

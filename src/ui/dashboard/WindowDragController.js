@@ -131,7 +131,11 @@ export class WindowDragController {
 
   /** @private @param {KeyboardEvent} event */
   _onKeyDown(event) {
-    if (event.key === 'Escape') this._cancelDrag();
+    if (event.key !== 'Escape' || !this._drag) return;
+    // A move is in progress: Escape aborts it only. preventDefault() tells
+    // ModalFocusScope that this Escape is consumed and must not close the window.
+    event.preventDefault();
+    this._cancelDrag();
   }
 
   /** @private The drop target depends on the scroll position. */

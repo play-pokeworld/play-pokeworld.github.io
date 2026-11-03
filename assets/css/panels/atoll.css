@@ -1,0 +1,332 @@
+/*
+ * panels/atoll.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.pw-atoll-mode-card, .pw-atoll-run-card, .pw-atoll-home-card, .pw-atoll-token-box, .pw-atoll-group-desc {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+  color: var(--pw-text-primary) !important;
+}
+
+.pw-atoll-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.pw-atoll-hero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: stretch;
+  justify-content: space-between;
+}
+
+.pw-atoll-hero-text {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.pw-atoll-hero-text h2 {
+  margin: 0 0 4px;
+  color: var(--pw-text-primary);
+  font-size: 20px;
+}
+
+.pw-atoll-hero-text p {
+  margin: 0;
+  color: var(--light1);
+  line-height: 1.4;
+  font-size: 13px;
+}
+
+.pw-atoll-token-box {
+  min-width: 150px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 2px;
+  padding: 10px 14px;
+  border-radius: 12px;
+}
+
+.pw-atoll-token-box b {
+  font-size: 26px;
+  color: var(--pw-text-primary);
+}
+
+.pw-atoll-token-box span {
+  color: var(--pw-text-primary);
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.pw-atoll-token-box small {
+  color: var(--light1);
+  font-size: 11px;
+}
+
+.pw-atoll-group-desc {
+  padding: 11px 14px;
+  border-radius: 12px;
+}
+
+.pw-atoll-group-desc b {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--pw-text-primary);
+}
+
+.pw-atoll-group-desc p {
+  margin: 0;
+  color: var(--light1);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.pw-atoll-rotation-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.pw-atoll-timer-chip, .pw-atoll-cycle-chip {
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 900;
+  border: 1px solid var(--pw-border-color);
+  background: rgba(0,0,0,.28);
+  color: var(--pw-text-primary);
+}
+
+.pw-atoll-timer-chip {
+  color: #F28B6C;
+  border-color: rgba(242,139,108,.5);
+}
+
+.pw-atoll-mode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px,100%), 1fr));
+  gap: 10px;
+  align-items: stretch;
+}
+
+.pw-atoll-mode-card {
+  display: grid;
+  grid-template-rows: minmax(0,1fr) auto;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  min-height: 172px;
+}
+
+.pw-atoll-mode-info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pw-atoll-mode-title {
+  color: var(--pw-text-primary);
+  font-size: 14px;
+}
+
+.pw-atoll-mode-rule {
+  color: var(--light1);
+  font-size: 12px;
+}
+
+.pw-atoll-mode-cta {
+  align-self: end;
+  justify-self: stretch;
+  width: 100%;
+  min-height: 38px;
+  white-space: normal;
+}
+
+.pw-atoll-mode-card.rank-e {
+  border-color: rgba(184,199,217,.45);
+}
+
+.pw-atoll-mode-card.rank-d {
+  border-color: rgba(147,212,123,.45);
+}
+
+.pw-atoll-mode-card.rank-c {
+  border-color: rgba(99,199,255,.45);
+}
+
+.pw-atoll-mode-card.rank-b {
+  border-color: rgba(217,160,232,.5);
+}
+
+.pw-atoll-mode-card.rank-a {
+  border-color: rgba(242,217,78,.52);
+}
+
+.pw-atoll-mode-card.rank-s {
+  border-color: rgba(255,138,61,.58);
+}
+
+.pw-atoll-mode-card.rank-free {
+  border-color: rgba(255,139,160,.58);
+}
+
+.pw-atoll-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.pw-atoll-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--pw-border-color);
+  border-radius: 9px;
+  background: var(--pw-bg-sprite);
+  padding: 1px;
+}
+
+.pw-atoll-ban-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  border-top: 1px dashed rgba(255,138,61,.35);
+  padding-top: 6px;
+  margin-top: 2px;
+}
+
+.pw-atoll-ban-row .pw-atoll-chip {
+  border-color: rgba(255,138,61,.5);
+}
+
+.pw-atoll-free-note {
+  color: #60BE58;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.pw-atoll-home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(190px,100%), 1fr));
+  gap: 10px;
+}
+
+.pw-atoll-home-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 128px;
+  padding: 16px 10px;
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.pw-atoll-home-card:hover {
+  border-color: var(--pw-text-primary);
+  transform: translateY(-2px);
+}
+
+.pw-atoll-home-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.pw-atoll-home-card b {
+  color: var(--pw-text-primary);
+  font-size: 15px;
+}
+
+.pw-atoll-run-card {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border-color: rgba(217,160,232,.55) !important;
+}
+
+.pw-atoll-run-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.pw-atoll-run-head b {
+  color: var(--pw-text-primary);
+}
+
+.pw-atoll-run-head span {
+  color: #D9A0E8;
+  font-weight: 900;
+}
+
+.pw-atoll-fragments-card {
+  margin-top: 12px;
+  border-color: rgba(255,214,102,.55) !important;
+}
+
+.pw-atoll-fragments-card .pw-atoll-run-head span {
+  color: #FFD666;
+}
+
+.pw-atoll-fragment-pending {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pw-atoll-run-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+.atoll-grid,
+  .atoll-panel {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+}
+
+.pw-preset-editor-body > .atoll-prep-hint {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.pw-atoll-prep-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pw-atoll-prep-modal-body .atoll-prep-hint {
+  display: block;
+  color: var(--light1);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.pw-atoll-prep-modal-body .atoll-prep-note {
+  display: block;
+  color: var(--light1);
+  font-size: 11px;
+  line-height: 1.4;
+  margin-top: 8px;
+}

@@ -19,6 +19,7 @@ import { ModalToggledEvent } from '../core/events/ModalToggledEvent.js';
 import { ModalCloseRequestedEvent } from '../core/events/ModalCloseRequestedEvent.js';
 import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
 import { t } from '../localization/LocalizationManager.js';
+import { ModalFocusScope } from './ModalFocusScope.js';
 
 export class UIFullscreenPanel extends UIElement {
   /** @private @type {UIFullscreenPanel|null} Panel currently open */
@@ -35,6 +36,7 @@ export class UIFullscreenPanel extends UIElement {
     this.setAttribute('role', 'dialog');
     this.setAttribute('aria-modal', 'true');
     this._isOpen = false;
+    this._focusScope = null;
 
     const container = new UIElement({ className: 'pw-modal-container' });
     const header = new UIElement({ className: 'modal-title' });
@@ -53,6 +55,7 @@ export class UIFullscreenPanel extends UIElement {
     this._footer = new UIElement({ className: 'pw-modal-footer' });
     this._footer.hide();
     container.addChildren([header, this._filters, this._body, this._footer]);
+    this._container = container;
     this.addChild(container);
 
     this.addDomListener('click', (event) => {
@@ -123,7 +126,14 @@ export class UIFullscreenPanel extends UIElement {
     this.addClass('is-open');
     this.show();
     this.onOpen(params);
-    if (!wasOpen) EventBus.getInstance().dispatch(new ModalToggledEvent(this.getName(), true));
+    if (!wasOpen) {
+      this._focusScope = ModalFocusScope.activate({
+        host: this._dom,
+        container: this._container,
+        onEscape: () => this.close()
+      });
+      EventBus.getInstance().dispatch(new ModalToggledEvent(this.getName(), true));
+    }
   }
 
   close() {
@@ -133,6 +143,10 @@ export class UIFullscreenPanel extends UIElement {
     this.removeClass('is-open');
     this.hide();
     this.onClose();
+    if (this._focusScope) {
+      ModalFocusScope.release(this._focusScope);
+      this._focusScope = null;
+    }
     EventBus.getInstance().dispatch(new ModalToggledEvent(this.getName(), false));
   }
 

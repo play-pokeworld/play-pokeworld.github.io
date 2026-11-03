@@ -1,0 +1,39 @@
+/*
+ * components/ui-empty-state.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.fossil-empty-state {
+  text-align: center;
+  color: var(--light2);
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+
+/* ui-empty-state.css * --------------------------------------------------------------------------- * Canonical empty state (1.16.11, audit 3.1). ONE class replaces the sixteen * local vocabularies (`pw-empty-state-md`, `pw-empty-state-lg`, * `pw-empty-center`, `battle-summary-empty`, `poke-detail-empty`, * `pw-pokedex-empty`, `base-stock-empty`, `pw-repeatable-board-empty`, * `pw-training-empty`, `pw-npc-talk-empty`, `pw-item-use-empty`, …). * * <div class="pw-empty-state">…</div> base — nothing here yet * <div class="pw-empty-state is-lg">…</div> larger — the whole window is empty * <div class="pw-empty-state is-sm">…</div> small — an empty slot in a dense block * * The base rule spans the full grid track, so a panel drops it straight into any * grid without repeating `grid-column: 1 / -1`. * Part of the 1.16.11 split: the @import order in assets/css/style.css IS the * cascade — never reorder it (tests/CssStructure.test.js). */
+.pw-empty-state {
+  grid-column: 1 / -1;
+  display: block;
+  text-align: center;
+  padding: 20px;
+  color: var(--pw-text-muted, var(--light1));
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.pw-empty-state.is-lg {
+  padding: 40px;
+  font-size: 14px;
+  color: var(--pw-text-primary, var(--light2));
+}
+
+.pw-empty-state.is-sm {
+  padding: 8px 4px;
+  font-size: 12px;
+}

@@ -322,7 +322,7 @@ export class PokedexPanel extends UIFullscreenPanel {
 
     const content = [];
     if (entries.length === 0) {
-      content.push(new UIText({ tagName: 'div', className: 'pw-empty-state-md pw-pokedex-empty', text: t('pokedex_no_results') }));
+      content.push(new UIText({ tagName: 'div', className: 'pw-empty-state', text: t('pokedex_no_results') }));
     } else {
       content.push(grid);
     }

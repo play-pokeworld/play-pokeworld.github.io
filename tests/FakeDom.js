@@ -124,17 +124,62 @@ export class FakeElement {
   scrollIntoView() {}
   getBoundingClientRect() { return { x: 0, y: 0, top: 0, left: 0, right: 0, bottom: 0, width: 0, height: 0 }; }
 
+  /**
+   * One compound selector: `#id`, `.class`, `tag`, `[attr="v"]`, and any combination of them
+   * (`#win-team .pw-poke-card[data-index="0"]` is id + class + attribute in one compound).
+   * @param {string} s
+   * @returns {boolean}
+   */
+  matchesCompound(s) {
+    if (!s) return false;
+    const token = /^(?:#([\w-]+)|\.([\w-]+)|\[([^\]=]+)(?:=["']?([^"'\]]+)["']?)?\]|([\w-]+))/;
+    let rest = s;
+    let matched = false;
+    while (rest) {
+      const found = token.exec(rest);
+      if (!found) return false;
+      const [, id, className, attrName, attrValue, tagName] = found;
+      if (id !== undefined && this.id !== id) return false;
+      if (className !== undefined && !this.classList.contains(className)) return false;
+      if (attrName !== undefined) {
+        if (attrValue === undefined ? !this.hasAttribute(attrName) : this.getAttribute(attrName) !== attrValue) return false;
+      }
+      if (tagName !== undefined && this.tagName !== tagName.toUpperCase()) return false;
+      matched = true;
+      rest = rest.slice(found[0].length);
+    }
+    return matched;
+  }
+
+  /** Splits a selector on top-level whitespace, keeping `[attr="a b"]` in one part. */
+  static splitComplex(selector) {
+    const parts = [];
+    let current = '';
+    let depth = 0;
+    for (const char of selector.trim()) {
+      if (char === '[') depth += 1;
+      else if (char === ']') depth = Math.max(0, depth - 1);
+      if (char === ' ' && depth === 0) {
+        if (current) { parts.push(current); current = ''; }
+      } else current += char;
+    }
+    if (current) parts.push(current);
+    return parts;
+  }
+
+  /** Supports compound selectors and the descendant combinator (`#win-team .card .btn`). */
   matches(selector) {
     return selector.split(',').some((part) => {
-      const s = part.trim();
-      if (s.startsWith('#')) return this.id === s.slice(1);
-      const attribute = s.match(/^\[([^\]=]+)(?:=["']?([^"'\]]+)["']?)?\]$/);
-      if (attribute) {
-        const [, name, value] = attribute;
-        return value === undefined ? this.hasAttribute(name) : this.getAttribute(name) === value;
+      const compounds = FakeElement.splitComplex(part);
+      if (!compounds.length) return false;
+      if (!this.matchesCompound(compounds[compounds.length - 1])) return false;
+      let index = compounds.length - 2;
+      let node = this.parentNode;
+      while (index >= 0 && node) {
+        if (node.matchesCompound(compounds[index])) index -= 1;
+        node = node.parentNode;
       }
-      if (s.startsWith('.')) return s.slice(1).split('.').every((c) => this.classList.contains(c));
-      return this.tagName === s.toUpperCase();
+      return index < 0;
     });
   }
   querySelectorAll(selector) {

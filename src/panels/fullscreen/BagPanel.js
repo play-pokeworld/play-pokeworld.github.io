@@ -20,6 +20,7 @@ import { ItemKinds } from '../../data/items/ItemKinds.js';
 import { PokemonDB } from '../../data/pokemon/PokemonDB.js';
 import { SaleSystem } from '../../systems/SaleSystem.js';
 import { ItemUseSystem } from '../../systems/ItemUseSystem.js';
+import { EvolutionSystem } from '../../systems/EvolutionSystem.js';
 import { ItemUseActions, ItemUseRules } from '../../config/ItemUseRules.js';
 import { HeldItemSystem } from '../../systems/HeldItemSystem.js';
 import { TeamSystem } from '../../systems/TeamSystem.js';
@@ -165,13 +166,13 @@ export class BagPanel extends UIFullscreenPanel {
       return;
     }
     if (entries.length === 0) {
-      this.setContent([new UIText({ tagName: 'div', className: 'pw-empty-state-lg', richText: t('inv_empty') })]);
+      this.setContent([new UIText({ tagName: 'div', className: 'pw-empty-state is-lg', richText: t('inv_empty') })]);
       return;
     }
     const shown = BagQuery.filter([...entries], { category: this._category, search: this._search, sort: this._sort }, descOf);
     const children = [];
     if (shown.length === 0) {
-      children.push(new UIText({ tagName: 'div', className: 'pw-empty-state-md', text: t('m.inventory.6') }));
+      children.push(new UIText({ tagName: 'div', className: 'pw-empty-state', text: t('m.inventory.6') }));
     } else {
       const list = new UIContainer({ className: 'inv-list-root' });
       for (const entry of shown) {
@@ -273,15 +274,23 @@ export class BagPanel extends UIFullscreenPanel {
     const teamUids = new Set(team.map((p) => p.uid));
     const candidates = [];
 
+    // A Pokémon that already produced a species no longer offers it, and a species from a locked
+    // region cannot be produced yet: only the level requirement is shown as a warning below.
+    const stoneCandidate = (pokemon) => {
+      const species = PokemonDB.getInstance().getById(pokemon.species);
+      const evo = species?.evolutions?.find((entry) => entry.item === itemId && !pokemon.hasEvolvedInto(entry.to));
+      if (!evo) return null;
+      const minLevel = Number(evo.minLevel) || 1;
+      if (pokemon.level >= minLevel && !EvolutionSystem.getInstance().findItemEvolution(pokemon, itemId)) return null;
+      return evo;
+    };
     for (const p of team) {
-      const species = PokemonDB.getInstance().getById(p.species);
-      const evo = species?.evolutions?.find((e) => e.item === itemId);
+      const evo = stoneCandidate(p);
       if (evo) candidates.push({ pokemon: p, evo, loc: 'team' });
     }
     for (const p of allBox) {
       if (teamUids.has(p.uid)) continue;
-      const species = PokemonDB.getInstance().getById(p.species);
-      const evo = species?.evolutions?.find((e) => e.item === itemId);
+      const evo = stoneCandidate(p);
       if (evo) candidates.push({ pokemon: p, evo, loc: 'box' });
     }
 
@@ -528,7 +537,7 @@ export class BagPanel extends UIFullscreenPanel {
     const pokemon = team[this._heldItemTeamIndex];
     if (!pokemon) {
       this.setFooter([this._heldItemFooter(null, false)]);
-      this.setContent([new UIText({ tagName: 'div', className: 'pw-empty-state-lg', text: t('pokemon_info_no_pokemon') })]);
+      this.setContent([new UIText({ tagName: 'div', className: 'pw-empty-state is-lg', text: t('pokemon_info_no_pokemon') })]);
       return;
     }
 
@@ -581,7 +590,7 @@ export class BagPanel extends UIFullscreenPanel {
 
     if (locked) children.push(new UIText({ tagName: 'div', className: 'pw-held-item-lock-note', text: t('held_item_battle_locked') }));
     if (shown.length === 0) {
-      children.push(new UIText({ tagName: 'div', className: 'pw-empty-state-md', text: t('held_item_picker_empty') }));
+      children.push(new UIText({ tagName: 'div', className: 'pw-empty-state', text: t('held_item_picker_empty') }));
     } else {
       const list = new UIContainer({ className: 'inv-list-root pw-held-item-list' });
       for (const entry of shown) {

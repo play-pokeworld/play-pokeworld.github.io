@@ -62,8 +62,8 @@ export class SpeciesSourceCatalog {
       });
     }
 
-    // 2b. Roaming legendaries
-    for (const [region, rData] of Object.entries(RoamingRules.REGIONS || {})) {
+    // 2b. Roaming legendaries (only when the roaming feature is part of the build)
+    for (const [region, rData] of Object.entries(RoamingSystem.isEnabled() ? RoamingRules.REGIONS || {} : {})) {
       if ((rData.species || []).includes(speciesId)) {
         const routeInfo = RoamingSystem.getRouteForSpecies(speciesId, now);
         sources.push({

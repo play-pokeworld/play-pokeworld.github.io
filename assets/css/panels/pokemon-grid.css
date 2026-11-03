@@ -1,0 +1,84 @@
+/*
+ * panels/pokemon-grid.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.pw-pokemon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  align-items: start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.pw-pokemon-grid-sprite {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  min-width: 72px;
+  min-height: 72px;
+  margin: 0 auto;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+  box-shadow: none;
+}
+
+.pw-pokemon-grid-marker {
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  z-index: 3;
+  transform: translateX(-50%);
+  padding: 2px 8px;
+  border: 1px solid color-mix(in srgb, var(--pw-text-primary, #ECDEB7) 16%, transparent);
+  border-radius: 999px;
+  background: var(--pw-bg-inset, #191714);
+  color: var(--pw-text-primary, #ECDEB7);
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .28);
+  pointer-events: none;
+}
+
+.pw-pokemon-grid-shiny {
+  position: absolute;
+  top: -5px;
+  right: 1px;
+  z-index: 4;
+  color: var(--shiny, #F2D94E);
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 0 6px color-mix(in srgb, var(--shiny, #F2D94E) 65%, transparent);
+  pointer-events: none;
+}
+
+@media (max-width: 640px), (pointer: coarse) {
+.pw-pokemon-grid-sprite {
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  min-height: 64px;
+}
+
+}
+
+.pw-pokemon-grid-entry > .pw-caught-ball {
+  width: 18px;
+  height: 18px;
+  right: 0;
+  bottom: 0;
+}

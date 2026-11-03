@@ -139,7 +139,10 @@ describe('Release 1.15.2 Specifications', (test) => {
     assert.equal(atkBoostHit.damage, neutralHit.damage, 'Body Press should not change when Attack is boosted');
   });
 
-  test('AFK consecutive battles (> 50 KOs) trigger team fatigue wear with Stamina halving wear', () => {
+  // v1.16.10: fatigue counts VICTORIES won in the current uninterrupted chain
+  // (`run.wins`), not the player's own knock-outs (`session.playerKOs`, reset on
+  // every BattleSession and 0 in a clean fight). The intent of this test is kept.
+  test('AFK consecutive battles (> 50 victories) trigger team fatigue wear with Stamina halving wear', () => {
     const save = SaveSystem.getInstance().createNewSave('FatigueWearTest', 'charmander');
     const regularPokemon = save.team[0];
     regularPokemon.level = 50;
@@ -160,7 +163,7 @@ describe('Release 1.15.2 Specifications', (test) => {
     const mockFoe = PokemonFactory.create('rattata', 5);
 
     const mockSession = {
-      playerKOs: 60,
+      playerKOs: 0,
       log: { add: () => {} },
       pauseForCapture: () => {},
       foe: { pokemon: mockFoe },
@@ -169,7 +172,7 @@ describe('Release 1.15.2 Specifications', (test) => {
 
     battle._session = mockSession;
     battle._locationId = 'route1';
-    battle._activeRun = { playerKOs: 0, moneyGained: 0, catches: [], items: [], damageByPokemon: {}, battles: 0, wins: 0, expGained: 0 };
+    battle._activeRun = { playerKOs: 0, moneyGained: 0, catches: [], items: [], damageByPokemon: {}, battles: 0, wins: 60, expGained: 0 };
 
     const mockEncounter = {
       pokemon: mockFoe,
@@ -179,7 +182,7 @@ describe('Release 1.15.2 Specifications', (test) => {
 
     battle._settleWildEncounter(save, mockSession, mockEncounter);
 
-    assert.ok(regularPokemon.hp < maxHpReg, 'Regular Pokémon should suffer fatigue wear damage after 60 KOs');
+    assert.ok(regularPokemon.hp < maxHpReg, 'Regular Pokémon should suffer fatigue wear damage after 60 victories');
     assert.ok(staminaPokemon.hp <= maxHpStam, 'Stamina Pokémon should suffer wear');
 
     const regWearRatio = (maxHpReg - regularPokemon.hp) / maxHpReg;

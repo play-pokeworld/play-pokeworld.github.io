@@ -24,6 +24,7 @@ import { NpcDirectory } from '../src/data/world/NpcDirectory.js';
 import { REPEATABLE_BOARD_HELP_LINES } from '../src/config/NpcDialogueRules.js';
 import { DashboardColumns } from '../src/config/DashboardLayout.js';
 import { LocalizationManager, t } from '../src/localization/LocalizationManager.js';
+import { readBundle, sheetPath } from './CssBundle.js';
 
 describe('Map and location corrections', (test) => {
   test('map color status follows main priority and uses complete route-group capture state', () => {
@@ -52,7 +53,12 @@ describe('Map and location corrections', (test) => {
       save.quests.activate('main.2');
       assert.equal(locationSystem.getMapColorStatus('route1', noRoamerAtRouteOne), LocationMapStatuses.QUEST);
       save.quests.deactivate('main.2');
-      assert.equal(locationSystem.getMapColorStatus('route1', 0), LocationMapStatuses.ROAMING);
+      // main's roaming priority cannot fire any more: at a window where the rotation would place a
+      // roamer on route 1, the map keeps the real encounter colour instead of the purple state.
+      assert.equal(RoamingSystem.getAssignedSpecies('route1', 0), 'articuno', 'the rule still places a roamer');
+      assert.equal(locationSystem.getMapColorStatus('route1', 0), LocationMapStatuses.COMPLETE,
+        'a switched-off roaming feature never paints the purple roaming state');
+      assert.equal(RoamingSystem.getSpeciesAt('route1', 0), null);
     } finally {
       saves.setCurrentSave(previous);
     }
@@ -84,7 +90,9 @@ describe('Map and location corrections', (test) => {
       assert.ok(modal.isOpen(), 'the control opens the map legend modal');
       assert.equal(guide.isOpen(), false, 'the map window no longer opens the Guide');
       guide.destroy();
-      const expectedStates = ['quest', 'roaming', 'catch', 'shiny', 'locked', 'complete'];
+      // The purple row only exists while the roaming feature is part of the build.
+      assert.equal(RoamingSystem.isEnabled(), false);
+      const expectedStates = ['quest', 'catch', 'shiny', 'locked', 'complete'];
       assert.deepEqual(
         [...modal.getDomElement().querySelectorAll('.pw-map-help-row')]
           .map((row) => row.getAttribute('data-map-legend-state')),
@@ -94,12 +102,14 @@ describe('Map and location corrections', (test) => {
       for (const language of ['fr', 'en']) {
         localization.setLanguage(language);
         const rows = [...modal.getDomElement().querySelectorAll('.pw-map-help-row')];
-        assert.equal(rows.length, 6);
+        assert.equal(rows.length, 5);
         assert.equal(rows[0].querySelector('.pw-map-help-description')?.textContent, t('map_help_green_desc'), `${language} legend text`);
         assert.ok(rows.every((row) => row.querySelector('.pw-map-help-swatch')), `${language} color swatches`);
       }
 
-      const mapCss = fs.readFileSync(path.resolve('assets/css/ui-map-view.css'), 'utf8');
+      // The purple fill stays in the stylesheet for the day the feature is switched back on; it is the
+      // legend and the map state that must not advertise it.
+      const mapCss = fs.readFileSync(sheetPath('ui-map-view.css'), 'utf8');
       for (const fill of [
         'rgba(31, 138, 59, 0.55)',
         'rgba(123, 31, 162, 0.55)',
@@ -143,7 +153,7 @@ describe('Map and location corrections', (test) => {
       assert.equal(dom.querySelector('.pw-loc-overview-meta'), null, 'location tags are not rendered');
       assert.equal(dom.querySelector('.pw-loc-overview-title')?.textContent, t('location.route2_south'));
 
-      const styles = fs.readFileSync(path.resolve('assets/css/panels.css'), 'utf8');
+      const styles = readBundle();
       assert.ok(styles.includes('font-size: clamp(20px, 3vw, 28px)'), 'place name uses a large responsive size');
       assert.ok(styles.includes('text-align: center;'), 'place name is centered in its card');
     } finally {
@@ -255,11 +265,16 @@ describe('Map and location corrections', (test) => {
   });
 
   test('location NPC and arena action rules explicitly suppress box-shadow halos', () => {
-    const css = fs.readFileSync(path.resolve('assets/css/design-system.css'), 'utf8');
+    // 1.16.11: the rules are spread over several sheets since the CSS split, so the check
+    // reads the whole cascade: what matters is that NO rule of those buttons paints a halo.
+    const css = readBundle();
     const rules = [...css.matchAll(/([^{}]*(?:pw-loc-npc-btn|pw-loc-gym-btn)[^{}]*)\{([^{}]*)\}/g)];
     assert.ok(rules.length >= 8, 'normal and hover rules cover both classic buttons and widget tiles');
-    for (const [, selector, declarations] of rules) {
-      assert.ok(declarations.includes('box-shadow: none !important;'), `${selector.trim()} suppresses all shadows`);
-    }
+    const shadows = rules
+      .filter(([, , declarations]) => /box-shadow\s*:/.test(declarations))
+      .filter(([, , declarations]) => !/box-shadow\s*:\s*none\s*!important/.test(declarations));
+    assert.deepEqual(shadows.map(([, selector]) => selector.trim()), [], 'no rule paints a shadow on these buttons');
+    assert.ok(rules.some(([, , declarations]) => declarations.includes('box-shadow: none !important;')),
+      'the halo is explicitly suppressed at least once');
   });
 });

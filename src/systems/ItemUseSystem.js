@@ -8,7 +8,7 @@ import { BoxSystem } from './BoxSystem.js';
 import { PokemonUsageSystem } from './PokemonUsageSystem.js';
 import { PokemonActionIds } from '../config/PokemonUsageRules.js';
 import { BattleSystem } from './BattleSystem.js';
-import { FeatureAccessSystem } from './FeatureAccessSystem.js';
+import { EvolutionSystem } from './EvolutionSystem.js';
 import { MoveLearningSystem } from './MoveLearningSystem.js';
 import { NotificationSystem } from './NotificationSystem.js';
 import { ItemDB } from '../data/items/ItemDB.js';
@@ -161,12 +161,7 @@ export class ItemUseSystem extends BaseSystem {
 
   /** @private @param {Object} pokemon @param {string} itemId @returns {Object|null} */
   _findEvolution(pokemon, itemId) {
-    const species = PokemonDB.getInstance().getById(pokemon.species);
-    const evolution = species?.evolutions.find((entry) => entry.item === itemId && pokemon.level >= (Number(entry.minLevel) || 1));
-    const target = evolution ? PokemonDB.getInstance().getById(evolution.to) : null;
-    if (!target) return null;
-    const accessibleRegions = FeatureAccessSystem.getInstance().getSnapshot().regions;
-    return accessibleRegions.includes(target.region) ? evolution : null;
+    return EvolutionSystem.getInstance().findItemEvolution(pokemon, itemId);
   }
 
   /** @private @param {string} action @param {string} itemId @param {Object} pokemon @returns {Object} */
@@ -176,18 +171,19 @@ export class ItemUseSystem extends BaseSystem {
       return pokemon.unlockMove(moveId) ? { moveId } : {};
     }
     if (action === ItemUseActions.RARE_CANDY) {
-      const level = pokemon.level + 1;
-      pokemon.setLevel(level);
-      const evolved = pokemon.checkLevelEvolution();
-      return { level: pokemon.level, targetSpecies: evolved || undefined };
+      pokemon.setLevel(pokemon.level + 1);
+      // The candy only raises the level: evolutions are produced by EvolutionSystem, which keeps
+      // this Pokémon and adds the evolved species at level 1 to the collection.
+      const evolved = EvolutionSystem.getInstance().applyLevelEvolutions(pokemon, { notify: false, deferSave: true });
+      return { level: pokemon.level, targetSpecies: evolved.targets[0], evolutions: evolved.targets };
     }
     if (action === ItemUseActions.VITAMIN) {
       const stat = this._random.pick(this._eligibleEvStats(pokemon));
       return stat && pokemon.addEv(stat, 1) > 0 ? { stat } : {};
     }
     if (action === ItemUseActions.EVOLVE) {
-      const evolution = this._findEvolution(pokemon, itemId);
-      return evolution && pokemon.evolveTo(evolution.to) ? { targetSpecies: evolution.to } : {};
+      const outcome = EvolutionSystem.getInstance().applyItemEvolution(pokemon, itemId, { notify: false, deferSave: true });
+      return outcome ? { targetSpecies: outcome.target } : {};
     }
     return {};
   }
@@ -203,9 +199,14 @@ export class ItemUseSystem extends BaseSystem {
     } else if (action === ItemUseActions.EVOLVE) {
       key = 'item_use_evolved';
       params.evolution = t(`pokemon.${effect.targetSpecies}`);
+      params.level = PokemonRules.MIN_LEVEL;
     } else if (action === ItemUseActions.RARE_CANDY) {
-      key = 'item_use_rare_candy';
+      key = effect.targetSpecies ? 'item_use_rare_candy_evolved' : 'item_use_rare_candy';
       params.level = effect.level;
+      if (effect.targetSpecies) {
+        params.evolution = t(`pokemon.${effect.targetSpecies}`);
+        params.minLevel = PokemonRules.MIN_LEVEL;
+      }
     } else if (action === ItemUseActions.VITAMIN) {
       key = 'item_use_vitamin';
       params.stat = t(`stat_${effect.stat}`);

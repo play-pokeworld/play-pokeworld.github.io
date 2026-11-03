@@ -1,0 +1,348 @@
+/*
+ * layout/dashboard-grid.css
+ * ---------------------------------------------------------------------------
+ * Dashboard columns and the window stacking order.
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.dash-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dash-win {
+  display: flex;
+  flex-direction: column;
+  background: var(--dark2);
+  border: 1px solid var(--dark3);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+body.mobile-mode .dash-col {
+  display: contents !important;
+}
+
+}
+
+#col-2 {
+  flex: 1.22;
+}
+
+#col-1, #col-3 {
+  flex: 0.96;
+}
+
+@media (min-width: 1440px) {
+#col-1, #col-3 {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+#col-2 {
+  flex: 2 1 0;
+}
+
+}
+
+#win-map {
+  min-height: 360px;
+}
+
+.dash-win {
+  contain: layout style;
+}
+
+.dash-win {
+  font-size: 13px;
+}
+
+@media (max-width: 1024px) {
+.dash-win {
+  max-width: 100%;
+}
+
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+.dash-win {
+  scroll-margin-top: 74px;
+}
+
+}
+
+.dash-win {
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius);
+  background: var(--pw-surface);
+  box-shadow: var(--pw-shadow);
+  color: var(--light2);
+}
+
+
+/* Wave 28 — dashboard window radius hardening. Root cause of the old divergence: the legacy inline styles that were hoisted into the generated `.pw-static-0XX` classes (block starting ~line 5750) carry their own `overflow`. Those classes have the SAME specificity as `.dash-win` (0,1,0) but are emitted LATER in this file, so they win the cascade. Half of them said `overflow:hidden` (map / mine / shortcuts -> header corners clipped, looked right), the other half said `overflow:visible` (story / team / hatchery / battle / tabs / training -> the square header painted over the rounded parent). Same markup, same `.dash-win` rule, different generated class = different corners. The two rules below re-assert the shared contract AFTER the generated block so any future extracted class cannot silently break it again. The radius is scoped to non-mobile because mobile-mode deliberately squares the windows. */
+.dash-win {
+  overflow: hidden;
+}
+
+.dash-win.insert-above {
+  box-shadow: inset 0 4px 0 0 #539DDF;
+}
+
+.dash-win.insert-below {
+  box-shadow: inset 0 -4px 0 0 #539DDF;
+}
+
+.dash-col.col-hovered {
+  outline: 2px dashed #539DDF;
+  outline-offset: 4px;
+  border-radius: var(--pw-radius-lg);
+}
+
+.dash-win.pw-win-flash {
+  animation: pwWinFlash 1s ease-out;
+}
+
+@media (min-aspect-ratio: 17/9) and (min-width: 1921px) {
+#main-dashboard .dash-col {
+  min-width: 0;
+}
+
+#main-dashboard #col-1,
+  #main-dashboard #col-3 {
+  flex: 1 1 0 !important;
+}
+
+#main-dashboard #col-2 {
+  flex: 2 1 0 !important;
+}
+
+}
+
+@media (min-aspect-ratio: 17/9) and (min-width: 2720px) {
+#main-dashboard #col-2 {
+  flex: 2 1 0 !important;
+}
+
+}
+
+
+/* 5. Window drag & drop insertion markers (user feedback: the blue strip only showed BELOW windows). The inset box-shadow strip at the TOP is painted UNDER the opaque window header (.pw-win-hdr) — always invisible. The marker is now a real bar drawn ABOVE the content (works above/below + on every column; between two windows BOTH bars show). */
+.dash-win.insert-above, .dash-win.insert-below {
+  position: relative;
+}
+
+.dash-win.insert-above::after, .dash-win.insert-below::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  height: 4px;
+  background: #539DDF;
+  border-radius: 999px;
+  box-shadow: 0 0 8px rgba(83,157,223,0.85);
+  z-index: 60;
+  pointer-events: none;
+}
+
+.dash-win.insert-above::after {
+  top: 2px;
+}
+
+.dash-win.insert-below::after {
+  bottom: 2px;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+body.mobile-mode .dash-col {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 1 1 auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#win-story .win-body,
+  #win-team .win-body,
+  #win-hatchery .win-body,
+  #win-mine .win-body,
+  #win-battle .win-body {
+  padding: 10px !important;
+  box-sizing: border-box !important;
+}
+
+}
+
+.dash-win {
+  background: var(--dark2) !important;
+  border: 1px solid var(--dark3) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset !important;
+  overflow: hidden;
+}
+
+.dash-win .win-body {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+#win-map {
+  height: 320px !important;
+  min-height: 0 !important;
+  max-height: 320px !important;
+  flex: 0 0 auto !important;
+}
+
+#win-map .win-body {
+  height: 100% !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+#win-map {
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  flex: 0 0 auto !important;
+}
+
+#win-map .win-body {
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+.dash-win.pw-sortable-drag-host {
+  contain: none !important;
+  overflow: visible !important;
+  z-index: 20001;
+}
+
+.dash-win.is-collapsed > .win-body,
+.dash-win.is-collapsed > .pw-panel-footer {
+  display: none;
+}
+
+.dash-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+}
+
+.dash-col::-webkit-scrollbar {
+  width: 5px;
+}
+
+.dash-col::-webkit-scrollbar-thumb {
+  background: var(--dark3);
+  border-radius: 4px;
+}
+
+.dash-win {
+  background: var(--dark2);
+  border: 1px solid var(--dark3);
+  border-radius: 12px;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 2px 8px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+body:not(.mobile-mode) #main-dashboard > #col-1,
+body:not(.mobile-mode) #main-dashboard > #col-3 {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+body:not(.mobile-mode) #main-dashboard > #col-2 {
+  flex: 2 1 0;
+  min-width: 0;
+}
+
+body:not(.mobile-mode) #main-dashboard > .dash-col {
+  height: auto !important;
+  max-height: none !important;
+  min-height: 120px;
+  overflow: visible !important;
+  gap: 8px;
+  padding-right: 0;
+  padding-bottom: 4px;
+}
+
+.dash-win.pw-win-dragging {
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: var(--pw-drag-w, auto) !important;
+  height: var(--pw-drag-h, auto) !important;
+  margin: 0 !important;
+  z-index: 10000 !important;
+  transform: translate3d(var(--pw-drag-x, 0), var(--pw-drag-y, 0), 0) !important;
+  will-change: transform;
+  transition: none !important;
+  opacity: .93 !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, .6) !important;
+  pointer-events: none !important;
+}
+
+#win-battle #battle-center-panel {
+  height: auto !important;
+  max-height: none !important;
+  flex: 0 0 auto !important;
+  overflow: visible !important;
+  min-width: 0;
+  container: pw-battle / inline-size;
+}
+
+#win-battle #battle-idle-screen,
+#win-battle #battle-active-scene {
+  height: auto !important;
+  max-height: none !important;
+  flex: 0 0 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+#win-battle .pw-battle-action-row,
+#win-battle .pw-battle-loot-row {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+#win-battle .pw-battle-loot-row > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+#win-battle #battle-loot-inline {
+  flex: 1 1 150px;
+}
+
+#win-battle #loot-open-btn {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+}
+
+.dash-col.col-hovered {
+  outline: 2px dashed #539DDF !important;
+  outline-offset: 4px;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+body.mobile-mode .dash-col {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 8px !important;
+}
+
+}

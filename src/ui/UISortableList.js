@@ -42,7 +42,11 @@ export class UISortableList extends UIContainer {
       this._updateDropTarget(point),
     );
     this._escape = (event) => {
-      if (event.key === 'Escape') this.cancelDrag();
+      // Only a running drag consumes Escape; otherwise the window above the list
+      // (ModalFocusScope) must still close on it.
+      if (event.key !== 'Escape' || !this._drag) return;
+      event.preventDefault();
+      this.cancelDrag();
     };
     this._blur = () => this.cancelDrag();
     window.addEventListener('keydown', this._escape);

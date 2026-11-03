@@ -196,7 +196,7 @@ export class BoxPanel extends UIFullscreenPanel {
     const save = SaveSystem.getInstance().getCurrentSave();
     if (!save) {
       this.setFilters([]);
-      this.setContent([new UIText({ className: 'pw-empty-state-md', text: t('box_no_save') })]);
+      this.setContent([new UIText({ className: 'pw-empty-state', text: t('box_no_save') })]);
       return;
     }
     const box = this._entries();
@@ -371,7 +371,7 @@ export class BoxPanel extends UIFullscreenPanel {
     const storedTitle = new UIContainer({
       className: 'pw-box-storage-heading',
       children: [
-        new UIText({ tagName: 'h2', className: 'pw-box-section-title', text: t('box_storage_section') }),
+        new UIText({ tagName: 'h2', className: 'pw-section-title is-lg', text: t('box_storage_section') }),
         new UIText({ className: 'pw-box-stored-count', text: t('box_stored_count', { count: sorted.length }) })
       ]
     });
@@ -427,11 +427,11 @@ export class BoxPanel extends UIFullscreenPanel {
       const emptyKey = this._itemUseId
         ? 'no_pokemon_found'
         : (this._selectionRequestId && this._selectionAction ? 'box_selection_empty' : 'box_storage_empty');
-      list.addChild(new UIText({ className: 'pw-empty-state-md', text: t(emptyKey) }));
+      list.addChild(new UIText({ className: 'pw-empty-state', text: t(emptyKey) }));
       return list;
     }
     if (box.length === 0) {
-      list.addChild(new UIText({ className: 'pw-empty-state-md', text: t('no_pokemon_found') }));
+      list.addChild(new UIText({ className: 'pw-empty-state', text: t('no_pokemon_found') }));
       return list;
     }
     for (const pokemon of box) list.addChild(this._pokemonEntry(pokemon));

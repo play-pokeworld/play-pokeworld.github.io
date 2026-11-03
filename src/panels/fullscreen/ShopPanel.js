@@ -52,13 +52,13 @@ export class ShopPanel extends UIFullscreenPanel {
     this.setTitle(shop ? t(`shop.${shop.id}.name`) : t('panel_shop_title'));
     this.setFilters([new UIContainer({className:'pw-shop-wallet',children:[new MoneyRow(save?.currencies.get('money')??0),new PriceTag('questPoint',save?.currencies.get('questPoint')??0)]})]);
     if (!shop || !save) {
-      this.setContent([new UIText({ tagName: 'div', className: 'pw-empty-state-lg', text: t('shop_empty') })]);
+      this.setContent([new UIText({ tagName: 'div', className: 'pw-empty-state is-lg', text: t('shop_empty') })]);
       return;
     }
     if (shops.isLocked()) {
       const league = t(`trainer.${shop.requiresLeague}.name`);
       this.setContent([new UIContainer({
-        className: 'pw-empty-state-lg',
+        className: 'pw-empty-state is-lg',
         children: [
           new UIContainer({ className: 'pw-big-icon' }),
           new UIText({ tagName: 'div', className: 'pw-choice-title', text: t('shop_locked_title') }),
@@ -79,7 +79,7 @@ export class ShopPanel extends UIFullscreenPanel {
     for (const offer of offers) {
       grid.addChild(new ShopItemCard(offer, offer.key === this._selected, (picked) => this._select(picked)));
     }
-    const children = [new UIText({ tagName: 'div', className: 'pw-cur-section-title', text: t('shop_items_title') }), grid];
+    const children = [new UIText({ tagName: 'div', className: 'pw-section-title is-sm', text: t('shop_items_title') }), grid];
     if (selected) {
       children.push(new ShopFooter({
         offer: selected,

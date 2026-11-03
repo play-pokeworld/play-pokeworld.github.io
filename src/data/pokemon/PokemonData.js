@@ -8,7 +8,7 @@
  *
  * Serialized shape (save schema 15):
  *   { uid, species, form, nickname, level, exp, hp, shiny, favorite, locked, talent, heldItem,
- *     moves[], unlockedMoves[], ivs{}, evs{} }
+ *     moves[], unlockedMoves[], ivs{}, evs{}, evolvedTargets[] }
  */
 import { BaseModel } from '../core/BaseModel.js';
 import { AssetPaths } from '../../config/AssetPaths.js';
@@ -172,60 +172,62 @@ export class PokemonData extends BaseModel {
   }
 
   /**
-   * Returns the next eligible level-based evolution target species, or null.
-   * @returns {string|null}
+   * Level-based evolution targets this Pokémon can still produce.
+   *
+   * The game never transforms a Pokémon: an evolution ADDS a new Pokémon of the evolved species
+   * at level 1 to the collection, and the source keeps its species and level (reference behaviour).
+   * Each target is produced once per Pokémon, hence `evolvedTargets`.
+   *
+   * Split evolutions (Wurmple, Nincada) list several targets at the same level and all of them are
+   * produced; conditional ones (Tyrogue) select exactly one target from the IV comparison.
+   * @returns {string[]} Species ids ready to be produced, empty when nothing is due
    */
-  getNextLevelEvolution() {
+  getPendingLevelEvolutions() {
     const source = this.getSpecies();
-    if (!source?.evolutions?.length) return null;
-    const evo = source.evolutions.find((entry) => !entry.item && Number.isFinite(entry.level) && this.level >= entry.level);
-    return evo ? evo.to : null;
+    if (!source?.evolutions?.length) return [];
+    const due = source.evolutions.filter((entry) =>
+      !entry.item && Number.isFinite(entry.level) && this.level >= entry.level);
+    if (!due.length) return [];
+    const conditional = due.filter((entry) => entry.condition);
+    const selected = conditional.length ? [this._selectConditionalEvolution(conditional)] : due;
+    return selected
+      .filter(Boolean)
+      .map((entry) => entry.to)
+      .filter((target) => !this.hasEvolvedInto(target));
   }
 
   /**
-   * Automatically executes eligible level-based evolutions in sequence (e.g. Caterpie -> Metapod -> Butterfree).
-   * @param {Function|null} [onEvolve=null] Optional callback invoked for each intermediate/final evolved species ID.
-   * @returns {string|null} The final evolved species ID, or null if no evolution occurred.
+   * Picks the evolution matching a condition (`attack_above_defense`, `defense_above_attack`,
+   * `attack_equals_defense`), the same rule as the reference: Tyrogue reads its own IVs.
+   * @private
+   * @param {ReadonlyArray<Object>} entries
+   * @returns {Object|null}
    */
-  checkLevelEvolution(onEvolve = null) {
-    let finalTarget = null;
-    while (true) {
-      const nextTarget = this.getNextLevelEvolution();
-      if (!nextTarget || !this.evolveTo(nextTarget)) break;
-      finalTarget = nextTarget;
-      if (typeof onEvolve === 'function') {
-        try {
-          onEvolve(nextTarget);
-        } catch (_) {}
-      }
-    }
-    return finalTarget;
+  _selectConditionalEvolution(entries) {
+    const attack = Number(this.ivs?.atk) || 0;
+    const defense = Number(this.ivs?.def) || 0;
+    const wanted = attack > defense
+      ? 'attack_above_defense'
+      : defense > attack
+        ? 'defense_above_attack'
+        : 'attack_equals_defense';
+    return entries.find((entry) => entry.condition === wanted) || entries[0] || null;
+  }
+
+  /** @param {string} targetSpecies @returns {boolean} True when this Pokémon already produced it */
+  hasEvolvedInto(targetSpecies) {
+    return this.evolvedTargets.includes(targetSpecies);
   }
 
   /**
-   * Changes species while retaining this Pokémon's identity and progression.
-   * The caller owns evolution eligibility and persistence.
+   * Records that this Pokémon produced `targetSpecies` (idempotent). The caller creates the new
+   * Pokémon; this only prevents a second production.
    * @param {string} targetSpecies
-   * @returns {boolean}
+   * @returns {boolean} True when the record was added
    */
-  evolveTo(targetSpecies) {
-    const source = this.getSpecies();
-    const target = PokemonDB.getInstance().getById(targetSpecies);
-    if (!source || !target || source.id === target.id || !source.evolutions.some((entry) => entry.to === target.id)) return false;
-    const oldMax = this.getMaxHp();
-    const oldTalentIndex = source.talents.indexOf(this.talent);
-    const wasHiddenTalent = source.hiddenTalent === this.talent;
-    this.species = target.id;
-    if (this.form && !target.getForm(this.form)) this.form = '';
-    if (!target.talents.includes(this.talent)) {
-      this.talent = wasHiddenTalent && target.hiddenTalent
-        ? target.hiddenTalent
-        : target.talents[oldTalentIndex] || target.talents[0] || target.hiddenTalent || null;
-    }
-    this._invalidateStats();
-    const newMax = this.getMaxHp();
-    this.hp = Math.max(0, Math.min(newMax, this.hp + (newMax - oldMax)));
-    this._learnLevelUpMoves();
+  markEvolvedInto(targetSpecies) {
+    if (!targetSpecies || this.evolvedTargets.includes(targetSpecies)) return false;
+    this.evolvedTargets.push(targetSpecies);
     return true;
   }
 
@@ -316,7 +318,8 @@ export class PokemonData extends BaseModel {
       moves: [...this.moves],
       unlockedMoves: [...this.unlockedMoves],
       ivs: { ...this.ivs },
-      evs: { ...this.evs }
+      evs: { ...this.evs },
+      evolvedTargets: [...this.evolvedTargets]
     };
   }
 
@@ -347,6 +350,9 @@ export class PokemonData extends BaseModel {
         ? raw.trainingUnlockedMoves
         : [];
     this.unlockedMoves = [...new Set(unlockedMoves.filter((id) => typeof id === 'string' && id.length > 0))];
+    this.evolvedTargets = Array.isArray(raw.evolvedTargets)
+      ? [...new Set(raw.evolvedTargets.filter((id) => typeof id === 'string' && id.length > 0))]
+      : [];
     this.ivs = StatCalculator.clampSpread(raw.ivs, PokemonRules.IV_MAX);
     this.evs = StatCalculator.clampSpread(raw.evs, PokemonRules.EV_MAX, PokemonRules.EV_TOTAL_MAX);
     this._invalidateStats();

@@ -22,7 +22,7 @@ export class LocationAlcoves extends UIContainer {
     this._signature = '';
     this._title = new UIText({
       tagName: 'div',
-      className: 'pw-loc-section-title',
+      className: 'pw-section-title',
     });
     this._description = new UIText({
       tagName: 'div',

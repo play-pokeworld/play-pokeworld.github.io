@@ -64,6 +64,7 @@ import { RegionalStarterModal } from '../panels/RegionalStarterModal.js';
 import { RegionalStarterSystem } from '../systems/RegionalStarterSystem.js';
 import { ItemTargetModal } from '../panels/ItemTargetModal.js';
 import { AfkSummaryModal } from '../panels/AfkSummaryModal.js';
+import { SaveIconPickerModal } from '../panels/SaveIconPickerModal.js';
 import { DebugWidget } from '../panels/components/DebugWidget.js';
 import { DashboardColumns } from '../config/DashboardLayout.js';
 import { t } from '../localization/LocalizationManager.js';
@@ -142,6 +143,7 @@ export class GamePage extends BasePage {
       new PuzzleListPanel(),
       new RegionalStarterModal(),
       new AfkSummaryModal(),
+      new SaveIconPickerModal(),
       new DebugWidget()
     ]);
     RegionalStarterSystem.getInstance().requestCurrentRegionStarter();

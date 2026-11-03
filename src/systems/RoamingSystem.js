@@ -1,6 +1,12 @@
 /**
  * @file RoamingSystem.js
  * @brief UTC rotation, route assignment, and view clock for roaming Pokémon. No DOM access.
+ *
+ * The whole roaming feature is switched off by RoamingRules.ROAMING_ENABLED. That switch is
+ * enforced HERE, once: every game query returns nothing and the view clock stops. Callers must not
+ * re-test the flag (two of them used to, a third forgot, and the map kept painting the purple
+ * roaming state on routes that could never host a roamer).
+ * The deterministic rotation stays available as getAssignedSpecies() for the rules and their tests.
  */
 import { BaseSystem } from './BaseSystem.js';
 import { EventBus } from '../core/EventBus.js';
@@ -26,6 +32,11 @@ export class RoamingSystem extends BaseSystem {
     this._lastTickSecond = null;
   }
 
+  /** @returns {boolean} True when the roaming feature is part of the game */
+  static isEnabled() {
+    return RoamingRules.ROAMING_ENABLED === true;
+  }
+
   /** @param {number} [now=Date.now()] @returns {number} Shared 12-hour UTC window */
   static getRotationWindow(now = Date.now()) {
     return Math.floor(now / RoamingRules.ROTATION_MS);
@@ -39,9 +50,10 @@ export class RoamingSystem extends BaseSystem {
   /**
    * @param {string} locationId
    * @param {number} [now=Date.now()]
-   * @returns {string|null} Species assigned to this outdoor location for this UTC window
+   * @returns {string|null} Species assigned to this outdoor location, whatever the feature switch:
+   * the rotation itself is a rule, not a live game query. Use getSpeciesAt() in the game.
    */
-  static getSpeciesAt(locationId, now = Date.now()) {
+  static getAssignedSpecies(locationId, now = Date.now()) {
     const location = LocationDB.getInstance().getById(locationId);
     if (!location || !OUTDOOR_KINDS.has(location.kind)) return null;
     const regionPool = RoamingRules.REGIONS[location.region];
@@ -60,13 +72,24 @@ export class RoamingSystem extends BaseSystem {
   }
 
   /**
+   * Live game query: the roamer standing on this location, or null when the feature is disabled.
+   * @param {string} locationId
+   * @param {number} [now=Date.now()]
+   * @returns {string|null}
+   */
+  static getSpeciesAt(locationId, now = Date.now()) {
+    if (!RoamingSystem.isEnabled()) return null;
+    return RoamingSystem.getAssignedSpecies(locationId, now);
+  }
+
+  /**
    * Finds the current outdoor location for a roaming species in the active UTC window.
    * @param {string} speciesId
    * @param {number} [now=Date.now()]
    * @returns {{region: string, locationId: string}|null}
    */
   static getRouteForSpecies(speciesId, now = Date.now()) {
-    if (!speciesId) return null;
+    if (!speciesId || !RoamingSystem.isEnabled()) return null;
     for (const [region, regionPool] of Object.entries(RoamingRules.REGIONS || {})) {
       const speciesIndex = (regionPool.species || []).indexOf(speciesId);
       if (speciesIndex === -1) continue;
@@ -100,6 +123,7 @@ export class RoamingSystem extends BaseSystem {
    * @override
    */
   update() {
+    if (!RoamingSystem.isEnabled()) return;
     const now = Date.now();
     const second = Math.floor(now / 1000);
     if (second === this._lastTickSecond) return;

@@ -147,7 +147,7 @@ export class LocationSystem extends BaseSystem {
     const location = LocationDB.getInstance().getById(locationId);
     const player = this._player();
     if (!location || !player || this.isLocked(locationId)) {
-      console.warn(t('debug_travel_refused', { id: locationId }));
+      console.warn(String(t('debug_travel_refused', { id: locationId })));
       return false;
     }
     const run = SaveSystem.getInstance().getCurrentSave()?.dungeons?.run;

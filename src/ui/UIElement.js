@@ -286,6 +286,12 @@ export class UIElement extends BaseObject {
     if (typeof this._dom.focus === 'function') this._dom.focus();
   }
 
+  /** @returns {boolean} True when the keyboard focus is inside this element (or on it). */
+  containsFocus() {
+    const active = this._dom.ownerDocument?.activeElement;
+    return !!(active && this._dom.contains?.(active));
+  }
+
   /** @returns {string|null} Stable focus key of the currently focused descendant, if any. */
   getFocusedDataKey() {
     const active = this._dom.ownerDocument?.activeElement;

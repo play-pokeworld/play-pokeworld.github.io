@@ -1,0 +1,253 @@
+/*
+ * components/chips.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.inv-tabs {
+  background: var(--pw-bg-header) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  border-radius: 8px !important;
+  padding: 10px !important;
+  color: var(--pw-text-primary) !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+.inv-tab {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  color: var(--pw-text-primary) !important;
+  padding: 4px 10px !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.inv-tab.active {
+  background: var(--pw-accent-color) !important;
+  border-color: var(--pw-accent-color) !important;
+  color: var(--pw-bg-surface) !important;
+  font-weight: bold !important;
+}
+
+.tab {
+  font-size: 13px;
+}
+
+.tab {
+  font-size: 13px;
+}
+
+.tab-btn {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.pw-chip-group {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+
+.dict-tabs {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  padding:8px 0 12px;
+}
+
+.dict-tab.active {
+  background:var(--light2);
+  color:var(--dark1);
+}
+
+.dict-toolbar .dict-tabs {
+  padding: 0;
+}
+
+.inv-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.inv-tab {
+  padding: 6px 10px;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.inv-tab-count {
+  background: var(--dark1);
+  color: var(--light2);
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.inv-tab.active .inv-tab-count {
+  background: var(--dark1);
+}
+
+:where(.pw-tab-bar) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pw-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tab {
+  cursor: pointer;
+  border-radius: 10px;
+  font-family: 'Winky Sans','Segoe UI',system-ui,sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.35px;
+}
+
+.tab:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.tab.active {
+  background: var(--light2) !important;
+  color: var(--dark1) !important;
+  border-color: var(--light2) !important;
+}
+
+.tab, .inv-tab, .dict-tab {
+  color: var(--light2);
+}
+
+.tab:hover, .inv-tab:hover, .dict-tab:hover {
+  filter: brightness(1.15);
+  color: var(--light2);
+}
+
+
+/* Light background active buttons MUST use dark text (#36342F) */
+.tab.active, .inv-tab.active, .dict-tab.active {
+  background: var(--light2) !important;
+  color: var(--dark1) !important;
+  border-color: var(--light2) !important;
+}
+
+.tab.active *, .inv-tab.active *, .dict-tab.active * {
+  color: var(--dark1) !important;
+}
+
+.tab, .inv-tab {
+  background: color-mix(in srgb, var(--light2) 12%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--light2) 35%, transparent) !important;
+  color: var(--light2) !important;
+  font-weight: 800 !important;
+  text-shadow: none !important;
+}
+
+.tab:hover, .inv-tab:hover {
+  background: color-mix(in srgb, var(--light2) 24%, transparent) !important;
+  border-color: var(--light2) !important;
+  color: var(--light2) !important;
+  filter: brightness(1.15) !important;
+}
+
+
+/* Selected/Active Buttons: the ACTIVE pair is a PER-THEME token (wave 17: the fixed cream-on-cream was illegible on the light theme and ignored every other theme — user feedback). Theme swatches are exempt: they keep their preview background, the selection is an inset ring (DS2817). */
+.tab.active, .inv-tab.active {
+  background: var(--pw-btn-active-bg) !important;
+  color: var(--pw-btn-active-text) !important;
+  border-color: var(--pw-btn-active-bg) !important;
+  font-weight: 900 !important;
+}
+
+.tab.active *, .inv-tab.active * {
+  color: var(--pw-btn-active-text) !important;
+}
+
+.inv-tab, .dict-tab {
+  background: var(--pw-btn-bg) !important;
+  color: var(--pw-btn-text) !important;
+  border: 1px solid var(--pw-btn-border) !important;
+}
+
+.inv-tab:hover, .dict-tab:hover {
+  background: var(--pw-btn-bg-hover) !important;
+}
+
+.inv-tab.active, .dict-tab.active, .tab.active {
+  background: var(--pw-btn-active-bg) !important;
+  color: var(--pw-btn-active-text) !important;
+  border-color: var(--pw-btn-active-bg) !important;
+}
+
+.inv-tab.active *, .dict-tab.active * {
+  color: var(--pw-btn-active-text) !important;
+  text-shadow: none !important;
+}
+
+
+/* STRICT ERGONOMIC RULE — an unusable control is never displayed: disabled buttons vanish entirely (display:none), they do not grey out. */
+.inv-tab[disabled], .dict-tab[disabled] {
+  display: none !important;
+}
+
+.pw-toolbar-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.pw-toolbar-tab {
+  border: 1px solid var(--pw-border-color);
+  background: var(--pw-btn-bg);
+  color: var(--pw-btn-text);
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pw-toolbar-tab.is-active {
+  background: var(--pw-btn-active-bg);
+  color: var(--pw-btn-active-text);
+  border-color: transparent;
+}
+
+.pw-filterbar .inv-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+#fs-box .pw-box-filterbar > .pw-chip-row {
+  flex: 1 1 100%;
+  width: 100%;
+  min-width: 0;
+}
+
+.dict-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pw-mine-window-root .pw-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}

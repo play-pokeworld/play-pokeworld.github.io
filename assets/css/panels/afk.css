@@ -1,0 +1,181 @@
+/*
+ * panels/afk.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.afk-result-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 26000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+  background: rgba(0,0,0,0.46);
+  backdrop-filter: blur(4px);
+}
+
+.afk-result-modal.open {
+  display: flex;
+}
+
+.afk-result-card {
+  width: min(620px, 96vw);
+  max-height: 92vh;
+  overflow-y: auto;
+  border: 1px solid var(--pw-border-color);
+  border-radius: 18px;
+  background: var(--pw-bg-header);
+  box-shadow: 0 22px 54px rgba(0,0,0,0.55);
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+
+/* Wave 20 (DS2820) — AFK panel restyled on theme tokens: flat colours only (the accent→green gradient fill is gone), kind tints via color-mix so they read on every theme. */
+.afk-result-status {
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--pw-text-primary) 9%, transparent);
+  border: 1px solid var(--pw-border-color);
+  color: var(--pw-text-primary);
+  font-weight: 900;
+}
+
+.afk-result-status.success {
+  background: color-mix(in srgb, var(--green) 16%, transparent);
+  border-color: var(--green);
+}
+
+.afk-ff-bar {
+  width: 100%;
+  height: 8px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--pw-text-primary) 12%, transparent);
+  overflow: hidden;
+  margin: 2px 0 4px;
+}
+
+.afk-ff-stage {
+  font-size: 12px;
+  opacity: .75;
+  text-align: center;
+  margin-top: 6px;
+  min-height: 15px;
+}
+
+.afk-ff-bar > i {
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+  background: var(--green);
+  transition: width .18s ease;
+}
+
+.afk-result-status.danger {
+  background: color-mix(in srgb, var(--red) 17%, transparent);
+  border-color: var(--red);
+}
+
+.afk-result-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 640px) {
+.afk-loot-split {
+  grid-template-columns: 1fr;
+}
+
+}
+
+.afk-result-card {
+  padding: 0 0 16px;
+}
+
+.afk-result-card > *:not(.modal-title) {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.afk-result-card > .modal-title:first-child {
+  margin-bottom: 0;
+}
+
+.pw-afk-note {
+  padding: 2px 0;
+}
+
+.afk-result-card > .modal-title:first-child {
+  margin: 0 0 var(--pw-header-gap) 0 !important;
+  border-radius: var(--pw-header-radius);
+}
+
+
+/* 3/13/14. Modal header bands TRULY full-bleed + panels above the title bar. Two recurring defects, one table: a) #poke-modal-inner * { max-width: 100% } (the readability hammer) capped every band at the CONTENT width, so its negative margins bled to the left only and the band stopped ~32px short on the right (management, PC/NPC editors, battle summary) — "horrible" half-width headers. b) The panels sat UNDER #header (z 950 vs 600/700): the game title bar painted over every opened sheet, and on mobile the shortcut bar hid the close ✕. */
+.afk-result-card > .modal-title:first-child {
+  max-width: none !important;
+}
+
+.pw-modal-backdrop#pw-afk-summary-overlay {
+  z-index: 1200;
+  background-color: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(4px);
+}
+
+.pw-afk-modal-window {
+  width: min(540px, 94vw);
+  max-width: 560px;
+  background: var(--pw-bg-surface, #24221E);
+  border: 1px solid var(--pw-border-color, #4A3E31);
+  border-radius: var(--pw-radius-lg, 14px);
+  box-shadow: var(--pw-shadow-lg);
+  box-sizing: border-box;
+}
+
+.pw-afk-summary-body {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pw-afk-row {
+  font-size: 13px;
+  color: var(--pw-text-primary, #ECDEB7);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pw-afk-items-section {
+  background: var(--pw-bg-inset, #181613);
+  border: 1px solid var(--pw-border-color, #383025);
+  border-radius: var(--pw-radius-md, 8px);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pw-afk-item-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: var(--pw-bg-surface, #24221E);
+  border: 1px solid var(--pw-border-color, #4A3E31);
+  border-radius: var(--pw-radius-sm, 6px);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pw-text-primary, #ECDEB7);
+}
+
+.pw-afk-fatigue-note {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--pw-text-secondary, #D98338);
+}

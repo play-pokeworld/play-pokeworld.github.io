@@ -1,183 +1,93 @@
-/* ==========================================================================
-   PokéWorld Main Unified Stylesheet
-   Imports all modular stylesheets following clean C++ OOP architecture.
-   Strict rule: CSS handles 100% of the styling, JS handles behavior and state.
-   ========================================================================== */
+/*
+ * PokéWorld — stylesheet manifest
+ * ---------------------------------------------------------------------------
+ * This file holds NO rule: it declares the cascade, once, in import order.
+ *   core/        design tokens, fonts, base elements, themes, animations
+ *   layout/      page skeleton, header bar, dashboard grid, window chrome, mobile
+ *   components/  one sheet per reusable widget
+ *   panels/      one sheet per game window
+ * Adding a sheet = writing it in the right folder AND adding one line here.
+ */
 
-@import url("./variables.css");
-@import url("./design-system.css");
-@import url("./ui-element.css");
-@import url("./sortable.css");
-@import url("./ui-button.css");
-@import url("./ui-text.css");
-@import url("./ui-progressbar.css");
-@import url("./ui-panel.css");
-@import url("./ui-modal.css");
-@import url("./ui-dropdown.css");
-@import url("./ui-input.css");
-@import url("./ui-icon.css");
-@import url("./ui-image.css");
-@import url("./ui-link.css");
-@import url("./ui-file-button.css");
-@import url("./ui-context-menu.css");
-@import url("./ui-dialog.css");
-@import url("./ui-pokemon-sprite.css");
-@import url("./ui-map-view.css");
-@import url("./save-menu.css");
-@import url("./starter-modal.css");
-@import url("./game-dashboard.css");
-@import url("./notifications.css");
-@import url("./panels.css");
-@import url("./pokeball-filters.css");
-@import url("./fullscreen-panel.css");
-@import url("./shop.css");
-@import url("./market.css");
-@import url("./automation.css");
-@import url("./badges.css");
-@import url("./bag.css");
-@import url("./item-use.css");
-@import url("./pokemon-grid.css");
-@import url("./pokedex.css");
-@import url("./dungeons.css");
-@import url("./guide.css");
-@import url("./dictionary.css");
-@import url("./secret-base.css");
-@import url("./dashboard-layout.css");
-@import url("./pokemon-background.css");
-@import url("./facilities.css");
-@import url("./battle-responsive.css");
-
-/* ==========================================================================
-   Universal Scrollbar Elimination
-   Requirement: Scrollbars must NOT be visible anywhere in the game.
-   ========================================================================== */
-
-*, *::before, *::after {
-  scrollbar-width: none !important; /* Firefox */
-  -ms-overflow-style: none !important; /* IE & Edge */
-}
-
-*::-webkit-scrollbar {
-  display: none !important; /* Chrome / Safari / Edge / Blink */
-  width: 0 !important;
-  height: 0 !important;
-}
-
-/* ==========================================================================
-   Draggable Window Chrome & Visual Indicators (DND-01)
-   ========================================================================== */
-
-.pw-win-hdr {
-  cursor: grab !important;
-  user-select: none;
-}
-
-.pw-win-hdr:active {
-  cursor: grabbing !important;
-}
-
-.pw-win-placeholder {
-  height: var(--pw-placeholder-h, 0);
-  width: 100%;
-  border: 1px dashed var(--accent, #FFA500) !important;
-  border-radius: var(--pw-radius-md, 10px) !important;
-  background: var(--pw-accent-soft, rgba(255,165,0,.10)) !important;
-  flex: none !important;
-  box-sizing: border-box !important;
-}
-
-.dash-col.col-hovered {
-  outline: 2px dashed #539DDF !important;
-  outline-offset: 4px;
-}
-
-/* ==========================================================================
-   Static Modals in 3 Discrete Sizes
-   ========================================================================== */
-
-.pw-static-modal--lg {
-  width: min(96vw, 1180px) !important;
-  max-width: 1180px !important;
-  max-height: 92vh !important;
-}
-
-.pw-static-modal--md {
-  width: min(90vw, 680px) !important;
-  max-width: 680px !important;
-  max-height: 85vh !important;
-}
-
-.pw-static-modal--sm {
-  width: min(88vw, 420px) !important;
-  max-width: 420px !important;
-  max-height: 70vh !important;
-}
-
-/* ==========================================================================
-   Responsive & Mobile Navigation Layout
-   ========================================================================== */
-
-@media (max-width: 850px), (pointer: coarse) {
-  body.mobile-mode #main-dashboard {
-    flex-direction: column !important;
-    width: 100% !important;
-    max-width: 100vw !important;
-    padding: 0 0 70px 0 !important;
-    gap: 10px !important;
-  }
-
-  body.mobile-mode .dash-col {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 0 8px !important;
-  }
-
-  body.mobile-mode .dash-win {
-    width: 100% !important;
-    margin-bottom: 8px !important;
-  }
-
-  body.mobile-mode .mobile-nav-bar {
-    display: flex !important;
-    position: sticky !important;
-    top: 52px !important;
-    z-index: 960 !important;
-    background: var(--dark1, #1C1A17) !important;
-    border-bottom: 1px solid rgba(236,222,183,0.15) !important;
-    padding: 6px 8px !important;
-    gap: 6px !important;
-    overflow-x: auto !important;
-  }
-
-  body.mobile-mode .mobile-subnav-bar {
-    display: flex !important;
-    position: sticky !important;
-    top: 92px !important;
-    z-index: 959 !important;
-    background: var(--dark2, #25231F) !important;
-    border-bottom: 1px solid rgba(236,222,183,0.12) !important;
-    padding: 4px 8px !important;
-    gap: 6px !important;
-    overflow-x: auto !important;
-  }
-
-  body.mobile-mode .mob-btn,
-  body.mobile-mode .mob-sub-btn {
-    padding: 6px 12px !important;
-    font-size: 12px !important;
-    font-weight: 700 !important;
-    border-radius: 6px !important;
-    white-space: nowrap !important;
-    background: rgba(236,222,183,0.08) !important;
-    color: var(--light2, #ECDEB7) !important;
-    border: 1px solid rgba(236,222,183,0.2) !important;
-    cursor: pointer !important;
-  }
-
-  body.mobile-mode .mob-btn.active,
-  body.mobile-mode .mob-sub-btn.active {
-    background: var(--light2, #ECDEB7) !important;
-    color: var(--dark1, #1C1A17) !important;
-    border-color: var(--light2, #ECDEB7) !important;
-  }
-}
+@import url("./core/fonts.css");
+@import url("./core/tokens.css");
+@import url("./core/variables.css");
+@import url("./core/themes.css");
+@import url("./core/base.css");
+@import url("./core/form-controls.css");
+@import url("./core/keyframes.css");
+@import url("./core/scrollbars.css");
+@import url("./layout/page-shell.css");
+@import url("./layout/header-bar.css");
+@import url("./layout/dashboard-grid.css");
+@import url("./layout/window-chrome.css");
+@import url("./layout/mobile.css");
+@import url("./components/ui-section-title.css");
+@import url("./components/ui-empty-state.css");
+@import url("./components/ui-button.css");
+@import url("./components/ui-text.css");
+@import url("./components/ui-toolbar.css");
+@import url("./components/legacy-buttons.css");
+@import url("./components/ui-icon.css");
+@import url("./components/ui-image.css");
+@import url("./components/ui-link.css");
+@import url("./components/ui-file-button.css");
+@import url("./components/ui-input.css");
+@import url("./components/ui-dropdown.css");
+@import url("./components/ui-progressbar.css");
+@import url("./components/ui-panel.css");
+@import url("./components/ui-modal.css");
+@import url("./components/ui-dialog.css");
+@import url("./components/ui-context-menu.css");
+@import url("./components/ui-pokemon-sprite.css");
+@import url("./components/ui-map-view.css");
+@import url("./components/modal-sizes.css");
+@import url("./components/fullscreen-panel.css");
+@import url("./components/notifications.css");
+@import url("./components/pokeball-filters.css");
+@import url("./components/sortable.css");
+@import url("./components/debug-widget.css");
+@import url("./components/badges.css");
+@import url("./components/badge-bar.css");
+@import url("./components/chips.css");
+@import url("./components/cards.css");
+@import url("./components/grid.css");
+@import url("./panels/location.css");
+@import url("./panels/shortcuts.css");
+@import url("./panels/team.css");
+@import url("./panels/team-moves.css");
+@import url("./panels/pokemon-sheet.css");
+@import url("./panels/pokemon-sheet-generated.css");
+@import url("./panels/battle-team-row.css");
+@import url("./panels/battle.css");
+@import url("./panels/battle-summary.css");
+@import url("./panels/dungeon.css");
+@import url("./panels/bag.css");
+@import url("./panels/box.css");
+@import url("./panels/pokedex.css");
+@import url("./panels/shop.css");
+@import url("./panels/market.css");
+@import url("./panels/achievements.css");
+@import url("./panels/quests.css");
+@import url("./panels/trainers.css");
+@import url("./panels/automation.css");
+@import url("./panels/training.css");
+@import url("./panels/facilities.css");
+@import url("./panels/hatchery.css");
+@import url("./panels/fossils.css");
+@import url("./panels/mine.css");
+@import url("./panels/atoll.css");
+@import url("./panels/secret-base.css");
+@import url("./panels/guide.css");
+@import url("./panels/dictionary.css");
+@import url("./panels/settings.css");
+@import url("./panels/theme-picker.css");
+@import url("./panels/save-menu.css");
+@import url("./panels/starter.css");
+@import url("./panels/afk.css");
+@import url("./panels/tutorial.css");
+@import url("./panels/npc.css");
+@import url("./panels/presets.css");
+@import url("./panels/item-use.css");
+@import url("./panels/pokemon-grid.css");
+@import url("./panels/pokemon-background.css");

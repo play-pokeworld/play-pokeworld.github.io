@@ -1,0 +1,375 @@
+/*
+ * components/cards.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.slot-card, .pw-card-evo, .pw-choice-card, .pw-card-dark, .pw-card-bordered {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+  color: var(--pw-text-primary) !important;
+}
+
+.slot-card-sprite {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.ui-control-toolbar {
+  background: var(--pw-bg-header) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  border-radius: 8px !important;
+  padding: 10px !important;
+  color: var(--pw-text-primary) !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+.ui-control-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(236,222,183,0.16);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.16);
+}
+
+.ui-stat-chip {
+  display: inline-grid;
+  gap: 2px;
+  align-items: center;
+  justify-items: center;
+  min-width: 72px;
+  padding: 6px 8px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.18);
+  border: 1px solid rgba(236,222,183,0.14);
+}
+
+.ui-stat-chip b {
+  color: var(--light2);
+}
+
+.ui-stat-chip small {
+  color: var(--light1);
+  font-size: 10px;
+}
+
+.ui-control-toolbar--box {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  align-items: end;
+}
+
+.ui-control-toolbar--box .box-filter-title {
+  grid-column: 1 / -1;
+  margin: 0 0 2px;
+  text-align: left;
+}
+
+.ui-control-toolbar--box label {
+  min-width: 0;
+}
+
+.ui-control-toolbar--box select {
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid rgba(236,222,183,0.16);
+  border-radius: 10px;
+  background: rgba(0,0,0,0.24);
+  color: var(--light2);
+  padding: 8px 10px;
+}
+
+.stat-row {
+  font-size: 13px;
+}
+
+.pw-card-83 {
+  background:#181412;
+  border-radius:6px;
+  padding:8px;
+  margin-bottom:10px;
+  border:1px solid #4a3c2a;
+}
+
+.pw-card-dark.pw-center {
+  background:var(--dark3);
+  padding:8px;
+  border-radius:6px;
+  text-align:center;
+}
+
+.pw-drop-zone {
+  background:var(--dark3);
+  border:2px dashed var(--light1);
+  border-radius:10px;
+  padding:20px;
+  text-align:center;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+
+.pw-card-bordered.pw-row.pw-gap-sm {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:var(--dark3);
+  border-radius:6px;
+  padding:8px;
+  border:1px solid var(--light1);
+}
+
+.pw-choice-title {
+  font-size:15px;
+  font-weight:bold;
+  color:var(--light2);
+  margin-bottom:8px;
+}
+
+.pw-choice-desc {
+  font-size:13px;
+  max-width:300px;
+  margin:0 auto;
+  line-height:1.4;
+  color:var(--light1);
+}
+
+.pw-choice-card {
+  cursor:pointer;
+  background:var(--light1);
+  border:2px solid var(--dark1);
+  padding:12px;
+  margin-bottom:10px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.pw-card-evo {
+  background:rgba(156,39,176,0.1);
+  border:1px solid var(--accent);
+  padding:8px;
+  border-radius:6px;
+  margin-bottom:8px;
+}
+
+.stat-row .stat-fill {
+
+}
+
+.poke-detail-stat-row {
+  display:grid;
+  grid-template-columns: 74px 1fr 86px;
+  gap:8px;
+  align-items:center;
+  margin:6px 0;
+  min-height:22px;
+}
+
+.poke-detail-panel .pw-card-83 {
+  background: rgba(0,0,0,0.18);
+  border: 1px solid rgba(148,136,107,0.35);
+  border-radius: 10px;
+  padding: 9px;
+}
+
+#poke-modal-inner .poke-detail-stat-row {
+  grid-template-columns: 74px minmax(0, 1fr) 62px;
+  gap: 8px;
+}
+
+.pw-card {
+  background: var(--dark2);
+  border-radius: 8px;
+  padding: 10px;
+  margin: 8px 0;
+}
+
+.pw-card-dark {
+  background: var(--dark3);
+  border-radius: 6px;
+  padding: 8px;
+  margin: 8px 0;
+}
+
+.pw-card-bordered {
+  background: var(--dark3);
+  border: 1px solid var(--dark1);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.pw-card-83 {
+  background: #181412;
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #4a3c2a;
+}
+
+.pw-choice-title {
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--light2);
+  margin-bottom: 8px;
+}
+
+.pw-choice-desc {
+  font-size: 13px;
+  max-width: 300px;
+  margin: 0 auto;
+  line-height: 1.4;
+  color: var(--light1);
+}
+
+.pw-choice-card {
+  cursor: pointer;
+  background: var(--light1);
+  border: 2px solid var(--dark1);
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pw-card-evo {
+  background: rgba(156,39,176,0.1);
+  border: 1px solid var(--accent);
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.pw-card {
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius);
+  background: var(--pw-surface);
+  box-shadow: var(--pw-shadow);
+  color: var(--light2);
+}
+
+
+/* NB: .save-slot is EXCLUDED — save cards carry their own themed background (save-bg-classic/emerald/…) which must stay visible in the settings preview as in the saves menu. */
+.pw-choice-card, .pw-card-dark, .pw-card-bordered {
+  background: rgba(0, 0, 0, 0.28) !important;
+  border: 1px solid var(--pw-border) !important;
+  color: var(--light2) !important;
+}
+
+.pw-choice-card:hover {
+  background: rgba(236, 222, 183, 0.15) !important;
+  border-color: var(--light2) !important;
+  color: var(--light2) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.pw-choice-title {
+  color: var(--light2) !important;
+  font-weight: 700;
+}
+
+
+/* 3. Subtitles, descriptions, stock, and secondary text always readable gold (#c9bc8a) Never allow --dark3 text on dark backgrounds */
+.pw-choice-desc {
+  color: #c9bc8a !important;
+}
+
+.pw-choice-card {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid rgba(236,222,183,0.22) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+  color: var(--pw-text-primary) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.pw-choice-card:hover {
+  border-color: var(--pw-text-primary) !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.6) !important;
+  transform: translateY(-2px) !important;
+  color: var(--pw-text-primary) !important;
+}
+
+#team-window-body .pw-drop-zone:not(.is-hidden) {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+  min-height: 76px !important;
+  padding: 12px !important;
+  border: 2px dashed var(--dark3) !important;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, .02) !important;
+  cursor: pointer !important;
+  transition: border-color .15s, background .15s !important;
+}
+
+#team-window-body .pw-drop-zone:hover {
+  border-color: var(--accent) !important;
+  background: rgba(255, 225, 94, .06) !important;
+}
+
+:where(.pw-element) {
+  position: relative;
+  box-sizing: border-box;
+}
+
+.pw-element.is-hidden {
+  display: none !important;
+}
+
+.pw-element.is-disabled {
+  opacity: var(--pw-disabled-opacity,0.5) !important;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+}
+
+
+/* Floating elements positioned at runtime through UIElement.setPosition(x, y). JS only pushes the two coordinates; the layout rule lives here. */
+.pw-element.pw-floating {
+  position: fixed;
+  left: var(--pw-pos-x, 0);
+  top: var(--pw-pos-y, 0);
+}
+
+.pw-element.is-invisible {
+  visibility: hidden !important;
+}
+
+:where(.pw-context-item) {
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.team-view .pw-drop-zone .pw-text-lg {
+  line-height: 24px !important;
+}
+
+.team-view .pw-drop-zone .pw-text-sm {
+  line-height: 17px !important;
+}
+
+.pw-card-dark.pw-center {
+  background: var(--dark1);
+  border: 1px solid var(--dark3);
+  border-radius: 8px;
+  padding: 8px 12px;
+  text-align: center;
+}

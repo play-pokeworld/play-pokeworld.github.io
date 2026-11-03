@@ -3,6 +3,7 @@
  * @brief Mode gates, eligibility and rewards. Pure domain rules; no DOM or persistence writes.
  */
 import { TrainingRules } from '../../config/TrainingRules.js';
+import { EvolutionSystem } from '../EvolutionSystem.js';
 import { PokemonRules } from '../../config/PokemonRules.js';
 import { MoveConfig } from '../../config/MoveConfig.js';
 import { MoveLearnset } from '../../data/pokemon/MoveLearnset.js';
@@ -70,6 +71,8 @@ export class TrainingProgression {
       const target = Math.min(PokemonRules.MAX_LEVEL, pokemon.level + random.int(TrainingRules.LEVEL_GAIN_MIN, TrainingRules.LEVEL_GAIN_MAX));
       reward.levels = target - pokemon.level;
       pokemon.setLevel(target);
+      // Training levels up like a battle: the Pokémon is kept and its evolutions join the box.
+      reward.evolutions = EvolutionSystem.getInstance().applyLevelEvolutions(pokemon, { notify: false, deferSave: true }).targets;
     } else if (mode === 'ev') {
       reward.stat = random.pick(PokemonRules.STAT_KEYS.filter((stat) => pokemon.evs[stat] < PokemonRules.EV_MAX)) || null;
       if (reward.stat && pokemon.addEv(reward.stat, TrainingRules.EV_GAIN)) reward.evs = TrainingRules.EV_GAIN;

@@ -1,0 +1,264 @@
+/*
+ * components/ui-pokemon-sprite.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.pw-poke-circle-wrap .sprite-img {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.poke-sprite, .starter-card .poke-sprite, .sprite-wrap, .poke-sprite-wrap, .pw-sprite {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.poke-sprite-container {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--dark2);
+  border-radius: 50%;
+  border: 2px solid var(--dark1);
+  overflow: visible;
+}
+
+.poke-sprite-container.large {
+  width: 104px;
+  height: 104px;
+}
+
+.poke-sprite {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.poke-sprite img {
+  width: 110%;
+  height: 110%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.box-card .poke-sprite {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  overflow: hidden;
+}
+
+.box-card .poke-sprite img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.starter-card .poke-sprite {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--dark2);
+  border: 2px solid var(--dark1);
+}
+
+.starter-card .poke-sprite img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.poke-sprite-container, .box-card .poke-sprite, .box-card .poke-sprite img, .starter-card .poke-sprite, .starter-card .poke-sprite img {
+  width: var(--pw-item-icon-lg);
+  height: var(--pw-item-icon-lg);
+}
+
+.poke-sprite-container.large {
+  width: 104px;
+  height: 104px;
+}
+
+.poke-sprite {
+  touch-action: manipulation;
+}
+
+.starter-card .poke-sprite--custom {
+  background: var(--starter-sprite-bg, var(--dark2));
+}
+
+.save-slot-icon .sprite-img {
+  max-width: 70px;
+  max-height: 70px;
+  object-fit: contain;
+}
+
+.save-icon-sprite .sprite-img {
+  max-width: 54px;
+  max-height: 54px;
+  object-fit: contain;
+}
+
+.sprite-img, .poke-sprite-img, .poke-sprite img {
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.poke-sprite-container, .starter-card .poke-sprite, .poke-sprite {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+  flex-shrink: 0 !important;
+}
+
+.poke-sprite-container img, .starter-card .poke-sprite img, .poke-sprite img, .sprite-img {
+  position: relative !important;
+  z-index: 2 !important;
+  object-fit: contain !important;
+  image-rendering: pixelated !important;
+}
+
+.dex-grid .sprite-img, #usm-grid .sprite-img, .box-grid .sprite-img, .pw-poke-card .sprite-img, .training-slot-card .sprite-img, .preset-row-chips .sprite-img, .preset-editor-slots .sprite-img, .starter-card .sprite-img {
+  max-width: var(--pw-size-poke-lg);
+  max-height: var(--pw-size-poke-lg);
+}
+
+.preset-chip .sprite-img {
+  width: var(--pw-size-poke-sm);
+  height: var(--pw-size-poke-sm);
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+.sprite-img {
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+}
+
+#team-window-body .poke-sprite-container {
+  background: transparent !important;
+  border: none !important;
+}
+
+#team-window-body .poke-sprite-container {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 64px !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+#team-window-body .poke-sprite img {
+  image-rendering: pixelated !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  transform-origin: center bottom !important;
+}
+
+#team-window-body .poke-sprite, #team-window-body .poke-sprite-container {
+  overflow: visible !important;
+}
+
+#team-window-body .poke-card .poke-sprite-container,
+#team-window-body .poke-card .poke-sprite {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+#team-window-body .poke-sprite-container, #team-window-body .poke-sprite {
+  display: grid !important;
+  place-items: center !important;
+  align-content: center !important;
+}
+
+#team-window-body .poke-sprite img {
+  object-position: center center !important;
+  transform-origin: center center !important;
+  align-self: center !important;
+  margin: auto !important;
+}
+
+.pw-fx-capture .poke-sprite img {
+  animation: pw31-capture-sprite 700ms ease-out !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+.pw-fx-capture .poke-sprite img {
+  animation: none !important;
+}
+
+}
+
+#team-window-body .poke-card .poke-sprite-container {
+  min-height: var(--pc-team-sprite-h) !important;
+  height: var(--pc-team-sprite-h) !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+
+#team-window-body .poke-card .poke-sprite img {
+  height: 100% !important;
+  width: auto !important;
+  max-width: 100% !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  transform-origin: center bottom !important;
+  transform: none !important;
+}
+
+#team-window-body .poke-card .poke-sprite {
+  height: var(--pc-team-sprite-h) !important;
+  min-height: var(--pc-team-sprite-h) !important;
+  width: auto !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+
+#team-window-body .poke-card .poke-sprite-container {
+  width: auto !important;
+}
+
+.pw-training-live-fighters .poke-sprite-container.large {
+  width: 72px;
+  height: 72px;
+}
+
+.pw-training-live-fighters .poke-sprite-container .pw-poke-circle-wrap {
+  width: 64px;
+  height: 64px;
+}

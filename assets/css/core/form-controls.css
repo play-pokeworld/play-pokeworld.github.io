@@ -1,0 +1,269 @@
+/*
+ * core/form-controls.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+select {
+  background-color: var(--pw-bg-surface) !important;
+  color: var(--light2) !important;
+  font-family: 'Winky Sans', 'Segoe UI', system-ui, sans-serif !important;
+}
+
+button {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+button.tab {
+  font: inherit;
+}
+
+button.modal-close {
+  font-family: inherit;
+}
+
+button.modal-close {
+  background: transparent;
+  padding: 0;
+}
+
+button.tab {
+  appearance: none;
+}
+
+button.quest-claim-btn.is-challenge,
+button.quest-claim-btn.is-challenge:not(.is-done),
+button.quest-claim-btn.is-challenge:not(:disabled) {
+  cursor: pointer;
+  opacity: 1;
+  filter: none;
+}
+
+button[data-action]:not(.save-slot):where(:not(.modal-close)) {
+  cursor: pointer;
+  border-radius: 10px;
+  font-family: 'Winky Sans','Segoe UI',system-ui,sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.35px;
+}
+
+button[data-action]:not(.save-slot):where(:not(.modal-close)) {
+  color: var(--light2);
+}
+
+button[data-action]:not(.save-slot):where(:not(.modal-close)) {
+  background: color-mix(in srgb, var(--light2) 12%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--light2) 35%, transparent) !important;
+  color: var(--light2) !important;
+  font-weight: 800 !important;
+  text-shadow: none !important;
+}
+
+button[data-action]:not(.save-slot):where(:not(.modal-close)):hover {
+  background: color-mix(in srgb, var(--light2) 24%, transparent) !important;
+  border-color: var(--light2) !important;
+  color: var(--light2) !important;
+  filter: brightness(1.15) !important;
+}
+
+button.danger {
+  background: #D3425F !important;
+  border: 1px solid #D3425F !important;
+  color: #ffffff !important;
+  font-weight: 900 !important;
+}
+
+button.danger:hover {
+  background: #E55575 !important;
+  border-color: #E55575 !important;
+  color: #ffffff !important;
+}
+
+button.usm-sort-btn.active::after {
+  content: " " attr(data-dir);
+  font-size: 11px;
+  font-weight: 900;
+  opacity: 1 !important;
+}
+
+button.pw-hatchery-offer {
+  width: 100%;
+  text-align: left;
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border-left: 4px solid var(--green) !important;
+}
+
+button.pw-hatchery-offer--breed {
+  border-left-color: var(--purple) !important;
+}
+
+button.pw-hatchery-offer .pw-hatchery-offer-mode,
+button.pw-hatchery-offer--exp .pw-hatchery-offer-mode {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--green) !important;
+}
+
+button.pw-hatchery-offer--breed .pw-hatchery-offer-mode {
+  color: var(--purple) !important;
+}
+
+button.training-slot-auto-btn.is-on {
+  background: #60BE58 !important;
+  color: #241F16 !important;
+  border: 1px solid #489A42 !important;
+  box-shadow: 0 0 8px rgba(96, 190, 88, 0.35) !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
+
+button.training-slot-auto-btn.is-on *, {
+
+}
+
+button.training-slot-auto-btn.is-off {
+  background: rgba(0, 0, 0, 0.26) !important;
+  color: var(--light2) !important;
+  border: 1px dashed rgba(236, 222, 183, 0.35) !important;
+}
+
+button.quest-claim-btn, button.purchase-btn, button.hatchery-hatch-btn[data-call="hatchEgg"] {
+  background: #3E6B3C !important;
+  color: #f6f1dc !important;
+  border: 1px solid #60BE58 !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
+
+button.quest-claim-btn *, button.purchase-btn *, button.hatchery-hatch-btn[data-call="hatchEgg"] * {
+  color: #f6f1dc !important;
+}
+
+button[data-action].pw-loc-quest-btn {
+  background: #5B4099 !important;
+  background-color: #5B4099 !important;
+  border: 2px solid #A98DE8 !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  box-shadow: none !important;
+}
+
+button[data-action].pw-loc-quest-btn:hover {
+  background: #7252BA !important;
+  background-color: #7252BA !important;
+  border-color: #D3C2FB !important;
+  color: #FFFFFF !important;
+  box-shadow: none !important;
+  transform: translateY(-2px);
+}
+
+button[data-action].hbtn.active:not(.save-slot) {
+  background: var(--light2) !important;
+  border-color: var(--light2) !important;
+  color: var(--dark1) !important;
+  text-shadow: none !important;
+  font-weight: 800 !important;
+}
+
+
+/* 6b. Danger buttons keep their crimson even with data-action set: the universal blanket (…(0,2,1) !important) outranks the class-only .pw-btn-danger (0,2,0). Wave 18 (user feedback): EXACT SAME crimson as the DS danger family (#D3425F / hover #E55575) — the wave-17 color-mix darkened it and "Abandonner"/"Retirer" no longer matched the other red buttons. */
+button[data-action].pw-btn-danger, button[data-call].pw-btn-danger {
+  background: #D3425F !important;
+  border-color: #D3425F !important;
+  color: #ffffff !important;
+}
+
+button[data-action].pw-btn-danger:hover, button[data-call].pw-btn-danger:hover {
+  background: #E55575 !important;
+  border-color: #E55575 !important;
+  color: #ffffff !important;
+}
+
+
+/* DS2820 — WAVE 20 (remaining displays: AFK recap + quest-window internals) ════════════════════════════════════════════════════════════════════════ 1) Quest buttons: challenge = FLAT accent (gradient deleted), claim = solid green with a themed border; NO greyed-out dead button is rendered anymore (the card shows an informative line instead). SPECIFICITY (Chromium discovery, same trap as the wave-19 toast bars): the flat-control hammer `.hbtn…, button[data-action]:not(…)` paints every control `light2-12% !important` at (0,3,1) — a plain `.quest-claim-btn.is-challenge` (0,2,0) rule LOSES even at EOF. The kind rules therefore carry [data-action] + !important and sit AFTER the hammer. Measured: challenge = solid var(--accent), claim = solid var(--green), text = var(--dark1) (reads on every theme). */
+button.quest-claim-btn.is-challenge[data-action] {
+  background: var(--accent) !important;
+  background-image: none !important;
+  border-color: var(--accent) !important;
+  color: var(--dark1) !important;
+}
+
+button.quest-claim-btn.is-done[data-action] {
+  background: var(--green) !important;
+  background-image: none !important;
+  border-color: color-mix(in srgb, var(--green) 70%, #000 30%) !important;
+  color: var(--dark1) !important;
+}
+
+button.quest-claim-btn.is-challenge,
+button.quest-claim-btn.is-challenge:not(.is-done),
+button.quest-claim-btn.is-challenge:not(:disabled) {
+  cursor: pointer;
+  opacity: 1;
+  filter: none;
+}
+
+button[data-action].pw-loc-quest-btn {
+  background: #5B4099 !important;
+  background-color: #5B4099 !important;
+  border: 2px solid #A98DE8 !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  box-shadow: none !important;
+}
+
+button[data-action].pw-loc-quest-btn:hover {
+  background: #7252BA !important;
+  background-color: #7252BA !important;
+  border-color: #D3C2FB !important;
+  color: #FFFFFF !important;
+  box-shadow: none !important;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+button {
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+input[type="text"],
+  input[type="search"],
+  textarea {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}
+
+}
+
+button.pw-pokemon-grid-sprite {
+  appearance: none;
+  cursor: pointer;
+  transition: transform .15s ease, filter .15s ease;
+}
+
+button.pw-pokemon-grid-sprite:hover:not(:disabled) {
+  transform: scale(1.06);
+  filter: brightness(1.06);
+}
+
+button.pw-pokemon-grid-sprite:disabled,
+button.pw-pokemon-grid-sprite.is-disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
+
+button.pw-grid-media {
+  cursor: pointer;
+  transition: transform .15s ease;
+}
+
+button.pw-grid-media:hover {
+  transform: scale(1.06);
+}

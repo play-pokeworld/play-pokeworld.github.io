@@ -22,10 +22,10 @@ import { BattleEndedEvent } from '../core/events/BattleEndedEvent.js';
 import { DungeonRunChangedEvent } from '../core/events/DungeonRunChangedEvent.js';
 import { SaveCreatedEvent } from '../core/events/SaveCreatedEvent.js';
 import { SaveLoadedEvent } from '../core/events/SaveLoadedEvent.js';
-import { ItemDB } from '../data/items/ItemDB.js';
 import { TextFormatter } from '../core/TextFormatter.js';
 import { SaveCard } from '../ui/SaveCard.js';
-import { groupBattleCaptures } from './components/BattleLootStrip.js';
+import { LootItemList } from './components/LootItemList.js';
+import { CapturedPokemonList } from './components/CapturedPokemonList.js';
 import { t } from '../localization/LocalizationManager.js';
 
 export class BattleSummaryModal extends StaticModalPanel {
@@ -59,7 +59,7 @@ export class BattleSummaryModal extends StaticModalPanel {
     const summary = this._mergeDungeonRun(BattleSystem.getInstance().getBattleSummary());
     const run = summary.run;
     if (!run) {
-      this._summaryContent.addChild(new UIText({ tagName: 'p', className: 'battle-summary-empty', text: t('battle_summary_empty') }));
+      this._summaryContent.addChild(new UIText({ tagName: 'p', className: 'pw-empty-state is-sm', text: t('battle_summary_empty') }));
       return;
     }
 
@@ -211,7 +211,7 @@ export class BattleSummaryModal extends StaticModalPanel {
       ));
     }
     if (entries.length) target.addChild(new UIContainer({ className: 'pw-summary-currency', children: entries }));
-    else if (run.dungeonSettled) target.addChild(new UIText({ className: 'battle-summary-empty', text: t('dungeon_summary_no_banked') }));
+    else if (run.dungeonSettled) target.addChild(new UIText({ className: 'pw-empty-state is-sm', text: t('dungeon_summary_no_banked') }));
     if (!run.dungeonSettled) return;
 
     const settlement = [];
@@ -227,7 +227,7 @@ export class BattleSummaryModal extends StaticModalPanel {
       `−${TextFormatter.formatNumber(lost.tokens)}`
     ));
     if (settlement.length) {
-      target.addChild(new UIText({ tagName: 'h3', className: 'battle-summary-section-title', text: t('dungeon_summary_lost_title') }));
+      target.addChild(new UIText({ tagName: 'h3', className: 'pw-section-title', text: t('dungeon_summary_lost_title') }));
       target.addChild(new UIContainer({ className: 'pw-summary-currency', children: settlement }));
     }
     if (run.dungeonTollRefunded > 0) {
@@ -251,11 +251,11 @@ export class BattleSummaryModal extends StaticModalPanel {
 
   /** @private @param {Array<Object>} damageEntries */
   _renderDamage(damageEntries, target) {
-    target.addChild(new UIText({ tagName: 'h3', className: 'battle-summary-section-title', text: t('battle_team_damage_title') }));
+    target.addChild(new UIText({ tagName: 'h3', className: 'pw-section-title', text: t('battle_team_damage_title') }));
     const sorted = [...damageEntries].sort((a, b) => (Number(b.damage) || 0) - (Number(a.damage) || 0));
     const totalDamage = sorted.reduce((sum, entry) => sum + Math.max(0, Number(entry.damage) || 0), 0);
     if (!sorted.length) {
-      target.addChild(new UIText({ tagName: 'div', className: 'battle-summary-empty', text: t('battle_summary_no_damage') }));
+      target.addChild(new UIText({ tagName: 'div', className: 'pw-empty-state is-sm', text: t('battle_summary_no_damage') }));
       return;
     }
 
@@ -295,64 +295,18 @@ export class BattleSummaryModal extends StaticModalPanel {
 
   /** @private @param {Array<Object>} catches @param {UIContainer} target */
   _renderCaptures(catches, target) {
-    target.addChild(new UIText({ tagName: 'h3', className: 'battle-summary-section-title', text: t('captured_pokemon_title') }));
-    const groups = groupBattleCaptures(catches);
-    if (!groups.length) {
-      target.addChild(new UIText({ tagName: 'div', className: 'battle-summary-empty', text: t('battle_summary_no_captures') }));
-      return;
-    }
-    const list = new UIContainer({ className: 'pw-col pw-gap-sm' });
-    for (const group of groups) {
-      const pokemonName = group.name || t(`pokemon.${group.species}`);
-      const subLabel = group.duplicateCount > 0
-        ? t('battle_summary_duplicate_count', { count: group.duplicateCount })
-        : t(group.shiny ? 'battle_summary_shiny' : 'battle_summary_standard');
-      list.addChild(new UIContainer({
-        className: `battle-summary-entry ${group.shiny ? 'is-shiny' : 'is-normal'}`,
-        children: [
-          new UIContainer({
-            className: 'pw-summary-sprite',
-            children: [new UIPokemonSprite({ species: group.species, form: group.form, shiny: group.shiny, alt: pokemonName, size: PokemonSpriteSizes.STANDARD })]
-          }),
-          new UIContainer({
-            className: 'pw-flex-1',
-            children: [
-              new UIText({ tagName: 'div', className: 'pw-summary-name', text: pokemonName }),
-              new UIText({ tagName: 'div', className: 'pw-text-sm pw-light1', text: subLabel })
-            ]
-          }),
-          new UIText({ tagName: 'div', className: 'pw-summary-count', text: `×${group.count}` })
-        ]
-      }));
-    }
-    target.addChild(list);
+    // Shared with the AFK report: one row component, so the two windows can never diverge.
+    target.addChild(new CapturedPokemonList({ captures: catches, emptyKey: 'battle_summary_no_captures' }));
   }
 
   /** @private @param {Array<Object>} items @param {UIContainer} target */
   _renderItems(items, target) {
-    target.addChild(new UIText({ tagName: 'h3', className: 'battle-summary-section-title', text: t('found_items_title') }));
-    const filtered = items.filter((entry) => entry?.itemId && entry.quantity > 0);
-    if (!filtered.length) {
-      target.addChild(new UIText({ tagName: 'div', className: 'battle-summary-empty', text: t('battle_summary_no_items') }));
-      return;
-    }
-    const list = new UIContainer({ className: 'pw-row-wrap pw-gap-sm' });
-    for (const entry of filtered) {
-      const name = t(`item.${entry.itemId}.name`);
-      list.addChild(new UIContainer({
-        className: 'pw-card-bordered pw-row pw-gap-sm battle-summary-entry is-normal',
-        children: [
-          new UIImage({ src: ItemDB.getInstance().getImagePath(entry.itemId), alt: name, className: 'battle-summary-item-icon', pixelated: true }),
-          new UIContainer({
-            children: [
-              new UIText({ tagName: 'div', className: 'pw-bold pw-text-sm pw-light2', text: name }),
-              new UIText({ tagName: 'div', className: 'pw-text-sm pw-light1', text: `×${TextFormatter.formatNumber(entry.quantity)}` })
-            ]
-          })
-        ]
-      }));
-    }
-    target.addChild(list);
+    // One shared list for both summaries: canonical item media (same 72 px frame as the location).
+    target.addChild(new LootItemList({
+      items,
+      emptyKey: 'battle_summary_no_items',
+      resolveName: (itemId) => t(`item.${itemId}.name`)
+    }));
   }
 
   /** @private @param {Object} summary */

@@ -92,7 +92,7 @@ describe('UI widgets', (test) => {
     assert.ok(vars.includes('50%'), '--pw-progress');
   });
 
-  test('tutorial card separates its step heading, title, and desktop guidance', () => {
+  test('tutorial card separates its step heading, title, and device guidance', () => {
     const card = new TutorialCard(() => {}, () => {}, () => {});
     card.setStatus({
       index: 1,
@@ -111,7 +111,17 @@ describe('UI widgets', (test) => {
     const how = dom.querySelector('.pw-tutorial-how');
     assert.equal(dom.querySelector('.pw-tutorial-step-heading')?.textContent, t('tutorial_step_lbl', { idx: 1, total: 10 }));
     assert.equal(dom.querySelector('.pw-tutorial-title')?.textContent, 'First battles');
-    assert.ok(how?.textContent.includes(t('tutorial_hint_map_pc')), 'route instructions include the desktop hint');
+    // Guidance is device-specific: nothing is appended on a pointer-fine device (the text says it all),
+    // and the mobile location hint is the only extra sentence.
+    // Guidance is device-specific: on a pointer-fine device the step text is the whole sentence,
+    // on a phone the single location hint follows it. It is never repeated twice.
+    const touch = t('tutorial_hint_map_mobile');
+    const text = how?.textContent ?? '';
+    assert.ok(
+      text.endsWith('Go to Route 1.') || text.endsWith(`Go to Route 1. ${touch}`),
+      `route instructions stay short (${text})`
+    );
+    assert.equal(text.split(touch).length - 1, text.includes(touch) ? 1 : 0, 'the device hint appears at most once');
     assert.ok(!dom.querySelector('.pw-tutorial-progress-label'), 'the reference shows the progress value without a label');
     assert.ok(!dom.querySelector('.pw-tutorial-rewards'), 'tutorial rewards stay out of the reference card layout');
   });
@@ -525,7 +535,7 @@ describe('UI widgets', (test) => {
     assert.equal(layout.querySelector('.pw-battle-summary-column--combat'), null, 'combat is not split into a side column');
     assert.equal(layout.querySelector('.pw-battle-summary-column--loot'), null, 'loot is not split into a side column');
     assert.deepEqual(
-      Array.from(layout.querySelectorAll('.battle-summary-section-title')).map((node) => node.textContent.trim()),
+      Array.from(layout.querySelectorAll('.pw-section-title')).map((node) => node.textContent.trim()),
       [t('battle_team_damage_title'), t('captured_pokemon_title'), t('found_items_title')],
       'damage, captures and items follow the reference summary order without extra section headings'
     );

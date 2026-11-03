@@ -97,7 +97,7 @@ export class PokemonMoveLearningModal extends UIModal {
     if (!pokemon) {
       this.setTitle(t('learnable_moves_panel_title'));
       this.setSubtitle('');
-      this.addChild(new UIText({ tagName: 'p', className: 'poke-detail-empty', text: t('pokemon_info_no_pokemon') }));
+      this.addChild(new UIText({ tagName: 'p', className: 'pw-empty-state is-sm', text: t('pokemon_info_no_pokemon') }));
       return;
     }
 
@@ -259,7 +259,7 @@ export class PokemonMoveLearningModal extends UIModal {
     levelSection.addChild(new UIContainer({
       className: 'poke-detail-moves-list learn',
       children: levelRows.length ? levelRows : [
-        new UIText({ tagName: 'div', className: 'poke-detail-empty', text: t('pokemon_info_no_learnable_moves') })
+        new UIText({ tagName: 'div', className: 'pw-empty-state is-sm', text: t('pokemon_info_no_learnable_moves') })
       ]
     }));
     block.addChild(levelSection);
@@ -281,7 +281,7 @@ export class PokemonMoveLearningModal extends UIModal {
     ctSection.addChild(new UIContainer({
       className: 'poke-detail-moves-list learn',
       children: ctRows.length ? ctRows : [
-        new UIText({ tagName: 'div', className: 'poke-detail-empty', text: t('pokemon_info_no_learnable_moves') })
+        new UIText({ tagName: 'div', className: 'pw-empty-state is-sm', text: t('pokemon_info_no_learnable_moves') })
       ]
     }));
     block.addChild(ctSection);
@@ -303,7 +303,7 @@ export class PokemonMoveLearningModal extends UIModal {
     trainingSection.addChild(new UIContainer({
       className: 'poke-detail-moves-list learn',
       children: trainingRows.length ? trainingRows : [
-        new UIText({ tagName: 'div', className: 'poke-detail-empty', text: t('training_no_moves') })
+        new UIText({ tagName: 'div', className: 'pw-empty-state is-sm', text: t('training_no_moves') })
       ]
     }));
     block.addChild(trainingSection);

@@ -151,7 +151,7 @@ export class NpcTalkModal extends StaticModalPanel {
     this.addChild(new UIText({ className: 'pw-npc-talk-prompt', text: t('npc_talk_choose') }));
     const npcs = NpcDirectory.getByLocation(this._locationId);
     if (npcs.length === 0) {
-      this.addChild(new UIText({ className: 'pw-npc-talk-empty', text: t('npc_talk_empty') }));
+      this.addChild(new UIText({ className: 'pw-empty-state', text: t('npc_talk_empty') }));
       this.addChild(new UIButton({
         variant: 'secondary',
         icon: 'chat',

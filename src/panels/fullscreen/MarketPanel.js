@@ -46,7 +46,7 @@ export class MarketPanel extends UIFullscreenPanel {
     ]);
     this._message = new UIText({
       tagName: 'div',
-      className: 'pw-empty-state-lg',
+      className: 'pw-empty-state is-lg',
     });
     this._categories = new Map(
       MarketRules.CATEGORY_ORDER.map((id) => [

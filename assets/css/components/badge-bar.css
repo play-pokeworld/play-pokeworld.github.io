@@ -1,0 +1,474 @@
+/*
+ * components/badge-bar.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.pw-bdg-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pw-bdg-title {
+  font-weight: 700;
+  color: var(--light2);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-size: .82em;
+}
+
+.pw-bdg-floor {
+  color: var(--light1);
+  font-weight: 600;
+}
+
+.pw-bdg-mult {
+  margin-left: auto;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--dark1);
+  border: 1px solid var(--light1);
+  color: var(--light2);
+  font-weight: 700;
+}
+
+.pw-bdg-quota {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .88em;
+  color: var(--light1);
+}
+
+.pw-bdg-bar {
+  flex: 1 1 auto;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--dark1);
+  border: 1px solid var(--light1);
+  overflow: hidden;
+}
+
+.pw-bdg-bar > i {
+  display: block;
+  height: 100%;
+  background: var(--green);
+  transition: width .25s ease;
+}
+
+.pw-bdg-bag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .88em;
+  color: var(--light1);
+}
+
+.pw-bdg-bag b {
+  margin-left: auto;
+  color: var(--light2);
+}
+
+.pw-bdg-boss {
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--dark1);
+  border: 1px solid var(--red);
+  color: var(--light2);
+  font-weight: 600;
+  font-size: .86em;
+}
+
+.pw-bdg-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pw-bdg-btn {
+  flex: 1 1 auto;
+  min-width: 140px;
+}
+
+.pw-bdg-locked {
+  flex: 1 1 auto;
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px dashed var(--light1);
+  color: var(--light1);
+  opacity: .75;
+  font-size: .84em;
+}
+
+@media (max-width: 760px) {
+.pw-bdg-btn, .pw-bdg-locked {
+  min-width: 100%;
+}
+
+}
+
+.pw-bdg-head {
+  gap: 10px;
+}
+
+.pw-bdg-title {
+  font-size: .95em;
+}
+
+.pw-bdg-floor {
+  font-size: .95em;
+}
+
+.pw-bdg-map {
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(0, 0, 0, .20), transparent 70%),
+    var(--dark1);
+  border: 1px solid var(--light1);
+  border-radius: 10px;
+  padding: 10px 8px 6px;
+  box-shadow: inset 0 0 14px rgba(0, 0, 0, .45);
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.pw-bdg-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pw-bdg-stats > div {
+  flex: 1 1 220px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--dark1);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: .95em;
+}
+
+.pw-bdg-bar {
+  height: 10px;
+}
+
+.pw-bdg-auto {
+  display: inline-flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+#battle-dungeon-bar .pw-bdg-auto-mode {
+  padding: 2px 8px !important;
+  min-width: 0 !important;
+  font-size: .78em !important;
+  border-radius: 999px;
+  border: 1px solid var(--light1) !important;
+  color: var(--light1) !important;
+  background: var(--dark2) !important;
+  cursor: pointer;
+}
+
+#battle-dungeon-bar .pw-bdg-auto-mode.is-on {
+  border-color: var(--green) !important;
+  color: var(--green) !important;
+  background: color-mix(in srgb, var(--green) 14%, var(--dark2)) !important;
+  font-weight: 700;
+}
+
+.pw-bdg-auto-locked {
+  flex: 0 1 auto;
+  min-width: 0;
+  opacity: .6;
+}
+
+.pw-bdg-up {
+  background: v aux yeux. ─────────────── */
+.pw-bdg-up {
+  background: var(--red) !important;
+  color: var(--light2) !important;
+  font-weight: 700;
+  border: 2px solid color-mix(in srgb, var(--red) 55%, var(--dark1)) !important;
+}
+.pw-bdg-up:hover {
+  background: color-mix(in srgb, var(--red) 82%, var(--light2)) !important;
+  transform: translateY(-1px);
+}
+
+ 
+.pw-bdg-actions { gap: 8px; }
+.pw-bdg-btn, .pw-bdg-locked {
+  min-width: 160px;
+  padding: 8px 10px;
+  font-size: .95em;
+}
+@media (max-width: 760px) {
+  .pw-bdg-keys { margin-left: 0; width: 100%; }
+}
+
+ 
+.pw-dgn-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 7), minmax(0, 1fr));
+  gap: 4px;
+  width: fit-content;
+  max-width: min(100%, calc(var(--cols, 7) * 44px + (var(--cols, 7) - 1) * 4px));
+  max-height: min(62vh, 520px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  justify-content: center;
+  align-content: center;
+  margin: 0 auto;
+}
+#battle-dungeon-bar .pw-dgn-tile {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 2px solid var(--light1) !important;
+  background: var(--dark2) !important;
+  color: var(--light2) !important;
+  font-size: 17px;
+  line-height: 1;
+  padding: 0;
+  transition: transform .12s ease, box-shadow .2s ease;
+}
+.pw-dgn-tile .pw-dgn-ic { width: 62%; height: 62%; fill: currentColor; }
+ 
+.pw-dgn-tile .pw-dgn-ic {
+  width: 74%;
+  height: 74%;
+  display: inline-block;
+  background-color: currentColor;
+  -webkit-mask-image: var(--ic);
+  mask-image: var(--ic);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  mask-position: center;
+  pointer-events: none;
+  user-select: none;
+}
+ 
+@supports not ((mask-image: none) or (-webkit-mask-image: none)) {
+  .pw-dgn-tile .pw-dgn-ic {
+    background-color: transparent;
+    background-image: var(--ic);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+ 
+.pw-dgn-tile .pw-dgn-ic-img {
+  width: 74%;
+  height: 74%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+ 
+.pw-dgn-tile .pw-dgn-player {
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .55));
+}
+
+ 
+#battle-dungeon-bar .pw-dgn-tile.is-fog {
+  background:
+    radial-gradient(120% 120% at 30% 18%, rgba(0, 0, 0, .28), transparent 62%),
+    radial-gradient(150% 150% at 82% 88%, rgba(0, 0, 0, .38), transparent 72%),
+    var(--dark1) !important;
+  border-color: color-mix(in srgb, var(--light1) 22%, transparent) !important;
+  color: var(--light1) !important;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, .55);
+}
+.pw-dgn-fogq {
+  opacity: .85;
+  font-weight: 700;
+  text-shadow: 0 0 6px rgba(0, 0, 0, .9);
+}
+ 
+ 
+#battle-dungeon-bar .pw-dgn-tile.t-empty:not(.is-fog) {
+  background: var(--dark1) !important;
+  border-style: dashed !important;
+  border-color: color-mix(in srgb, var(--light1) 45%, transparent) !important;
+  color: var(--light1) !important;
+  opacity: .85;
+}
+ 
+#battle-dungeon-bar .pw-dgn-tile.t-combat:not(.is-fog) {
+  background:
+    radial-gradient(120% 120% at 50% 20%, color-mix(in srgb, var(--pw-dgn-tint) 34%, transparent), transparent 68%),
+    color-mix(in srgb, var(--pw-dgn-tint) 16%, var(--dark2)) !important;
+  border-color: var(--pw-dgn-tint) !important;
+  color: var(--pw-dgn-tint) !important;
+  box-shadow: 0 0 8px -3px var(--pw-dgn-tint);
+}
+ 
+#battle-dungeon-bar .pw-dgn-tile.t-elite:not(.is-fog) {
+  background:
+    radial-gradient(120% 120% at 50% 20%, color-mix(in srgb, var(--orange) 40%, transparent), transparent 68%),
+    color-mix(in srgb, var(--orange) 20%, var(--dark2)) !important;
+  border-color: var(--orange) !important;
+  color: var(--orange) !important;
+  font-weight: 700;
+  box-shadow: 0 0 8px -3px var(--orange);
+}
+.pw-dgn-tile .pw-dgn-elite {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+.pw-dgn-tile .pw-dgn-star {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 36% !important;
+  height: 36% !important;
+  background-color: currentColor;
+  -webkit-mask-image: var(--ic);
+  mask-image: var(--ic);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  mask-position: center;
+  pointer-events: none;
+}
+ 
+#battle-dungeon-bar .pw-dgn-tile.t-chest:not(.is-fog) {
+  background:
+    radial-gradient(120% 120% at 50% 20%, color-mix(in srgb, var(--yellow) 30%, transparent), transparent 68%),
+    color-mix(in srgb, var(--yellow) 14%, var(--dark2)) !important;
+  border-color: var(--yellow) !important;
+  color: var(--yellow) !important;
+  box-shadow: 0 0 8px -3px var(--yellow);
+}
+ 
+#battle-dungeon-bar .pw-dgn-tile.t-boss:not(.is-fog) {
+  background:
+    radial-gradient(120% 120% at 50% 20%, color-mix(in srgb, var(--red) 40%, transparent), transparent 68%),
+    color-mix(in srgb, var(--red) 24%, var(--dark2)) !important;
+  border-color: var(--red) !important;
+  border-width: 3px !important;
+  color: var(--red) !important;
+  box-shadow: 0 0 0 1px var(--red), 0 0 12px -2px var(--red);
+  animation: pw38-boss-pulse 1.6s ease-in-out infinite;
+}
+@keyframes pw38-boss-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px var(--red), 0 0 8px -3px var(--red); }
+  50%      { box-shadow: 0 0 0 1px var(--red), 0 0 16px 0 var(--red); }
+}
+ 
+#battle-dungeon-bar .pw-dgn-tile.t-ladder {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--blue) 34%, var(--dark2)), color-mix(in srgb, var(--blue) 18%, var(--dark2))) !important;
+  border-color: var(--blue) !important;
+  color: var(--blue) !important;
+  box-shadow: 0 0 12px -2px var(--blue);
+}
+ 
+#battle-dungeon-bar .pw-dgn-tile.t-entrance:not(.is-fog) {
+  background: color-mix(in srgb, var(--accent) 14%, var(--dark2)) !important;
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+}
+
+ 
+#battle-dungeon-bar .pw-dgn-tile.is-open { cursor: pointer; }
+#battle-dungeon-bar .pw-dgn-tile.is-open:hover {
+  border-color: var(--light2) !important;
+  transform: translateY(-1px);
+}
+#battle-dungeon-bar .pw-dgn-tile.is-done:not(.is-here) {
+  opacity: .55;
+  filter: saturate(.7);
+}
+ 
+#battle-dungeon-bar .pw-dgn-tile.t-ladder.is-done {
+  opacity: 1;
+  filter: none;
+}
+ 
+#battle-dungeon-bar .pw-dgn-tile.is-done:not(.is-here):not(.t-ladder):not(.t-boss) {
+  background: var(--dark1) !important;
+  border-style: dashed !important;
+  border-color: color-mix(in srgb, var(--light1) 45%, transparent) !important;
+  border-width: 2px !important;
+  color: var(--light1) !important;
+  opacity: .85;
+  filter: none;
+  box-shadow: none;
+  animation: none;
+}
+ 
+#battle-dungeon-bar .pw-dgn-tile.is-here {
+  border-color: var(--light2) !important;
+  border-width: 3px !important;
+  box-shadow: 0 0 0 2px var(--dark2), 0 0 0 4px var(--light2);
+}
+@media (prefers-reduced-motion: reduce) {
+  .pw-dgn-tile.t-boss { animation: none !important; }
+  .pw-dgn-tile { transition: none !important; }
+}
+
+ 
+.pw-bdg-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  color: var(--light1);
+  padding: 2px 2px 0;
+}
+.pw-dgn-leg { display: inline-flex; align-items: center; gap: 5px; }
+.pw-dgn-leg i {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 2.5px solid var(--light1);
+  background: var(--dark2);
+}
+.pw-dgn-leg.t-combat i { border-color: var(--light1); }
+.pw-var(--red);
+}
+
+.pw-bdg-keys {
+  margin-left: auto;
+  opacity: .8;
+  font-style: italic;
+}

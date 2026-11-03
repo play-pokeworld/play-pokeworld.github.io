@@ -1,0 +1,422 @@
+/*
+ * components/ui-dropdown.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.usm-sort-bar {
+  background: var(--pw-bg-header) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  border-radius: 8px !important;
+  padding: 10px !important;
+  color: var(--pw-text-primary) !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+.usm-sort-btn {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  color: var(--pw-text-primary) !important;
+  padding: 4px 10px !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.usm-sort-btn.active {
+  background: var(--pw-accent-color) !important;
+  border-color: var(--pw-accent-color) !important;
+  color: var(--pw-bg-surface) !important;
+  font-weight: bold !important;
+}
+
+.usm-sort-btn.active {
+  background: var(--light2);
+  color: var(--dark1);
+  border-color: var(--light2);
+  font-weight: bold;
+}
+
+#usm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 14px;
+  padding: 14px;
+  background: var(--dark2);
+}
+
+#unified-selector-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 700;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+#unified-selector-modal[style*="display: flex"] {
+  display: flex;
+}
+
+#unified-selector-modal > div > div:nth-child(2) {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+#usm-subtab-bar {
+  position: sticky;
+  top: 0;
+  z-index: 9;
+}
+
+.usm-subtab-btn {
+  flex: 1;
+  padding: 8px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.usm-subtab-btn.is-active,
+.usm-subtab-btn.active {
+  background: var(--light2);
+  color: var(--dark1);
+}
+
+#usm-grid.usm-fossil-view {
+  display: block;
+  grid-template-columns: none;
+  align-content: stretch;
+  background: var(--dark2);
+  padding: 0;
+}
+
+#usm-grid.usm-fossil-view .fossil-selector-intro {
+  display: block;
+  width: auto;
+}
+
+.poke-detail-panel.poke-detail-talent-panel .pw-select-wrap {
+  width: 100%;
+  display: flex;
+}
+
+.poke-detail-panel.poke-detail-talent-panel .pw-dropdown-select {
+  width: 100%;
+}
+
+#unified-selector-modal #usm-search {
+  width: 100%;
+  min-height: 34px;
+  background: rgba(0,0,0,0.24);
+  border: 1px solid rgba(236,222,183,0.22);
+}
+
+.usm-filter-panel {
+  width: 100%;
+}
+
+#unified-selector-modal .box-filter-panel {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+#unified-selector-modal .box-filter-panel label {
+  min-width: 138px;
+  max-width: 220px;
+  display: block;
+}
+
+#unified-selector-modal .box-filter-panel label span {
+  display: none;
+}
+
+#unified-selector-modal .box-filter-panel select {
+  width: 100%;
+  border: 0;
+  border-radius: 999px;
+  background: var(--pw-bg-surface);
+  color: var(--light2);
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,0.25), 0 1px 0 rgba(255,255,255,0.06);
+  font-weight: 900;
+  padding: 8px 32px 8px 14px;
+}
+
+#usm-grid {
+  padding-bottom: 18px;
+}
+
+.usm-footer {
+  display: none;
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  padding: 10px 16px;
+  background: var(--pw-bg-header);
+  border-top: 2px solid var(--pw-border-color);
+  box-shadow: 0 -8px 18px rgba(0,0,0,0.32);
+}
+
+.usm-swap-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.usm-swap-footer-label {
+  color: var(--light2);
+  font-weight: 900;
+}
+
+.usm-swap-footer-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.usm-cancel-btn {
+  background: var(--dark3);
+  color: var(--light2);
+}
+
+.usm-remove-btn {
+  background: var(--red);
+  color: #fff;
+}
+
+@media (max-width: 760px) {
+#unified-selector-modal .box-filter-panel label {
+  min-width: 46%;
+}
+
+.usm-swap-footer {
+  display: grid;
+}
+
+.usm-swap-footer-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+}
+
+#unified-selector-modal .box-filter-panel label span {
+  display: block;
+  color: var(--light2);
+  font-size: 11px;
+  font-weight: 900;
+  margin: 0 0 4px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#unified-selector-modal .box-filter-panel {
+  align-items: end;
+}
+
+#unified-selector-modal {
+  z-index: 30000;
+}
+
+#unified-selector-modal > div {
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius);
+  background: var(--pw-surface);
+  box-shadow: var(--pw-shadow);
+  color: var(--light2);
+}
+
+#unified-selector-modal {
+  backdrop-filter: blur(3px);
+}
+
+
+/* NB: .save-slot is EXCLUDED — save cards carry their own themed background (save-bg-classic/emerald/…) which must stay visible in the settings preview as in the saves menu. */
+.usm-item {
+  background: rgba(0, 0, 0, 0.28) !important;
+  border: 1px solid var(--pw-border) !important;
+  color: var(--light2) !important;
+}
+
+.usm-item:hover {
+  background: rgba(236, 222, 183, 0.15) !important;
+  border-color: var(--light2) !important;
+  color: var(--light2) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+
+/* Light background active buttons MUST use dark text (#36342F) */
+.usm-sort-btn.active {
+  background: var(--light2) !important;
+  color: var(--dark1) !important;
+  border-color: var(--light2) !important;
+}
+
+.usm-sort-btn.active * {
+  color: var(--dark1) !important;
+}
+
+.usm-sort-btn {
+  background: color-mix(in srgb, var(--light2) 12%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--light2) 35%, transparent) !important;
+  color: var(--light2) !important;
+  font-weight: 800 !important;
+  text-shadow: none !important;
+}
+
+.usm-sort-btn:hover {
+  background: color-mix(in srgb, var(--light2) 24%, transparent) !important;
+  border-color: var(--light2) !important;
+  color: var(--light2) !important;
+  filter: brightness(1.15) !important;
+}
+
+
+/* Selected/Active Buttons: the ACTIVE pair is a PER-THEME token (wave 17: the fixed cream-on-cream was illegible on the light theme and ignored every other theme — user feedback). Theme swatches are exempt: they keep their preview background, the selection is an inset ring (DS2817). */
+.usm-sort-btn.active {
+  background: var(--pw-btn-active-bg) !important;
+  color: var(--pw-btn-active-text) !important;
+  border-color: var(--pw-btn-active-bg) !important;
+  font-weight: 900 !important;
+}
+
+.usm-sort-btn.active * {
+  color: var(--pw-btn-active-text) !important;
+}
+
+.usm-sort-btn {
+  background: var(--pw-btn-bg) !important;
+  color: var(--pw-btn-text) !important;
+  border: 1px solid var(--pw-btn-border) !important;
+}
+
+.usm-sort-btn:hover {
+  background: var(--pw-btn-bg-hover) !important;
+}
+
+.usm-sort-btn.active {
+  background: var(--pw-btn-active-bg) !important;
+  color: var(--pw-btn-active-text) !important;
+  border-color: var(--pw-btn-active-bg) !important;
+}
+
+.usm-sort-btn.active * {
+  color: var(--pw-btn-active-text) !important;
+  text-shadow: none !important;
+}
+
+
+/* STRICT ERGONOMIC RULE — an unusable control is never displayed: disabled buttons vanish entirely (display:none), they do not grey out. */
+.usm-sort-btn[disabled] {
+  display: none !important;
+}
+
+#usm-grid {
+  padding-top: 18px !important;
+}
+
+
+/* D. PC box (USM) — the screenshot bug: the TRI row is gone (sort lives in the FilterBar chips) and the grid fell back to 90px sprite-only pills because the modern class was never re-added. Modern card template: */
+#usm-grid.usm-modern-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(198px, 100%), 1fr));
+  gap: 12px;
+  align-content: start;
+  padding: 14px;
+}
+
+#usm-grid.usm-modern-grid .pw-poke-card,
+#usm-grid.usm-modern-grid .poke-card {
+  margin-bottom: 0;
+}
+
+.usm-sort-chip-last {
+  margin-right: 12px;
+}
+
+#usm-grid.usm-modern-grid {
+  grid-auto-rows: max-content;
+}
+
+#usm-grid.usm-modern-grid:has(.pw-poke-card) {
+  grid-template-columns: repeat(auto-fill, minmax(min(108px, 100%), 1fr)) !important;
+  gap: 14px !important;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+#unified-selector-modal {
+  align-items: flex-start;
+  padding-top: 6px;
+}
+
+}
+
+.pw-select-wrap {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  vertical-align: middle;
+}
+
+.pw-dropdown-select:not(.pw-dropdown-select--native) {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-color: var(--dark3, #524f48) !important;
+  color: var(--light2, #ecdeb7) !important;
+  border: 1px solid var(--dark3, #524f48) !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  padding: 5px 28px 5px 10px !important;
+  min-width: 120px !important;
+  height: 28px !important;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23ECDEB7' stroke-width='2'/></svg>") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 9px center !important;
+  cursor: pointer !important;
+  outline: none !important;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.pw-dropdown-select:not(.pw-dropdown-select--native):hover {
+  border-color: var(--accent, #ffa500) !important;
+}
+
+.pw-dropdown-select:not(.pw-dropdown-select--native):focus {
+  border-color: var(--light2, #ecdeb7) !important;
+}
+
+.pw-dropdown-select:not(.pw-dropdown-select--native) option {
+  background-color: var(--dark2, #444138) !important;
+  color: var(--light2, #ecdeb7) !important;
+  padding: 6px 8px !important;
+}
+
+.pw-dropdown-select:not(.pw-dropdown-select--native) option:disabled {
+  color: var(--light1, #c9bc9c) !important;
+  opacity: 0.65 !important;
+}
+
+.pw-select-wrap.is-disabled
+  .pw-dropdown-select:not(.pw-dropdown-select--native) {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}

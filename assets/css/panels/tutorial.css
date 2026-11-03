@@ -1,0 +1,241 @@
+/*
+ * panels/tutorial.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.pw-tut-card {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  border-radius: var(--pw-radius-lg);
+  border: 2px solid #F5C242;
+  background: var(--pw-bg-surface);
+}
+
+.pw-tut-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pw-tut-bulb {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.pw-tut-step {
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+  color: #F5C242;
+}
+
+.pw-tut-title {
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--pw-text-primary);
+}
+
+.pw-tut-desc {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--pw-text-secondary);
+  overflow-wrap: break-word;
+}
+
+.pw-tut-how {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--pw-bg-header);
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--pw-text-secondary);
+  overflow-wrap: break-word;
+}
+
+.pw-tut-how-label {
+  font-weight: 800;
+  color: var(--pw-text-primary);
+  margin-bottom: 2px;
+}
+
+.pw-tut-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--pw-bg-header);
+  overflow: hidden;
+}
+
+.pw-tut-bar-fill {
+  height: 100%;
+  background: #60BE58;
+}
+
+.pw-tut-progress {
+  font-size: 12px;
+  font-weight: 800;
+  color: #F5C242;
+  font-variant-numeric: tabular-nums;
+}
+
+.pw-tut-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pw-tuto-target {
+  position: relative;
+  z-index: 2;
+  border-radius: 8px;
+  animation: pw-tuto-pulse 1.4s ease-in-out infinite;
+}
+
+svg .pw-tuto-target {
+  animation: none;
+}
+
+svg .pw-tuto-target > rect:nth-of-type(2) {
+  stroke: var(--accent);
+  animation: pw-tuto-pulse-svg 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+.pw-tuto-target {
+  animation: none;
+  box-shadow: 0 0 0 3px var(--accent);
+}
+
+svg .pw-tuto-target > rect:nth-of-type(2) {
+  animation: none;
+  stroke-width: 5;
+}
+
+}
+
+.pw-tutorial-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-height: 96px;
+}
+
+.pw-tutorial-actions .pw-tutorial-action {
+  flex: 0 0 auto;
+  min-width: 107px;
+  min-height: 44px;
+  padding: 7px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.pw-tutorial-actions .pw-tutorial-guide,
+.pw-tutorial-actions .pw-tutorial-disable {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 7px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  background: var(--pw-bg-header);
+  border-color: var(--pw-border-color);
+  color: var(--pw-text-primary);
+}
+
+.pw-tutorial-card {
+  border: 2px solid #f5c242 !important;
+  border-radius: var(--pw-radius-lg);
+  padding: 14px 16px;
+  background: var(--pw-bg-surface);
+  box-shadow: none !important;
+}
+
+.pw-tutorial-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #f5c242;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 16px;
+  text-transform: uppercase;
+}
+
+.pw-tutorial-heading .pw-icon {
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.pw-tutorial-step-heading {
+  min-width: 0;
+}
+
+.pw-tutorial-title {
+  color: var(--pw-text-primary);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: normal;
+}
+
+.pw-tutorial-card .pw-quest-card-desc {
+  margin: 0 !important;
+  line-height: 1.45;
+}
+
+/* The how block is tinted, not inset: its text shares the card's left edge with the title and the
+   description (the inset read as a stray tab). The negative inline margin cancels the card's 16px
+   padding so the band reaches the border, and the same 16px comes back as its own padding. */
+.pw-tutorial-how {
+  margin-inline: -16px;
+  padding: 8px 16px;
+  border-left: 0;
+  border-radius: 0;
+  background: var(--pw-bg-header);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+/* The path is written on two lines (where to go, then what to click): keep the line breaks. */
+.pw-tutorial-card .pw-tutorial-how-text {
+  white-space: pre-line;
+}
+
+.pw-tutorial-card .pw-tutorial-how-label {
+  display: block;
+  margin: 0 0 2px;
+  color: var(--pw-text-primary);
+  font-size: 12.5px;
+  font-weight: 800;
+  line-height: 18.125px;
+}
+
+.pw-tutorial-card .pw-tutorial-how-text {
+  margin: 0 !important;
+  font-size: 12.5px !important;
+  line-height: 18.125px !important;
+}
+
+.pw-tutorial-progress-text {
+  align-self: start;
+  color: #f5c242;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+
+.pw-tutorial-card .pw-progress-bar {
+  height: 8px !important;
+  border: 0 !important;
+  border-radius: 999px;
+  background: var(--pw-bg-header);
+}
+
+.pw-tutorial-card .pw-progress-fill {
+  border-radius: inherit;
+}

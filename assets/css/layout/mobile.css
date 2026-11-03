@@ -1,0 +1,98 @@
+/*
+ * layout/mobile.css
+ * ---------------------------------------------------------------------------
+ * Mobile layout: stacked windows, compact chrome, touch targets.
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.mobile-nav-bar {
+  display: none;
+}
+
+.mobile-subnav-bar {
+  display: none;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+.mobile-nav-bar {
+  display: flex;
+  position: sticky;
+  top: 0;
+  z-index: 700;
+  background: linear-gradient(180deg, rgba(38,37,33,0.98), rgba(31,30,27,0.98));
+  border-bottom: 1px solid rgba(236,222,183,0.14);
+  padding: 8px;
+  gap: 6px;
+  justify-content: space-around;
+}
+
+.mobile-subnav-bar {
+  display: none;
+  position: sticky;
+  top: 52px;
+  z-index: 699;
+  background: var(--dark2);
+  border-bottom: 1px solid var(--pw-border-color);
+  padding: 6px 8px;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.mob-sub-btn {
+  flex: 1;
+  min-height: 38px;
+  background: var(--light1);
+  border: 1px solid var(--dark1);
+  color: var(--dark1);
+  font-weight: 800;
+  font-size: 11px;
+  padding: 8px 8px;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.mob-sub-btn:hover {
+  background: var(--light2);
+  color: var(--dark1);
+  border-color: var(--light2);
+}
+
+.mob-sub-btn.active {
+  background: var(--light2);
+  color: var(--dark1);
+  border-color: var(--light2);
+}
+
+.mobile-nav-bar,
+  .mobile-subnav-bar {
+  scrollbar-width: none;
+}
+
+.mobile-nav-bar::-webkit-scrollbar,
+  .mobile-subnav-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.mob-sub-btn {
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+.box-filter-panel.mobile-drawer-open, .inv-toolbar.mobile-drawer-open {
+  max-height: 600px !important;
+  overflow: visible !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+  z-index: 25 !important;
+}
+
+}
+
+
+/* MobileDashboardNav is a pure grouping widget: its children (.mobile-nav-bar, .mobile-subnav) keep the positioning given by design-system.css as if they were direct children of the body. */
+.pw-mobile-dashboard-nav {
+  display: contents;
+}

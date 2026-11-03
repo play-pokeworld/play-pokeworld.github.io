@@ -1,0 +1,475 @@
+/*
+ * panels/battle-summary.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.loot-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px;
+  justify-content: flex-start;
+  background: var(--dark2);
+  border-radius: 10px;
+}
+
+.loot-item {
+  position: relative;
+  width: var(--pw-item-icon-md);
+  height: var(--pw-item-icon-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  border-radius: 8px;
+  transition: transform 0.2s;
+}
+
+.loot-item:hover {
+  transform: scale(1.1);
+}
+
+.loot-item img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.loot-item .loot-count {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: transparent;
+  color: var(--light2);
+  font-size: 11px;
+  font-weight: bold;
+  padding: 0;
+  border: none;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+#battle-summary-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 700;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+#battle-summary-modal.open {
+  display: flex;
+}
+
+#battle-summary-inner {
+  background: var(--dark2);
+  border: 1px solid var(--dark3);
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  color: var(--light2);
+}
+
+#battle-summary-inner * {
+  color: var(--light2);
+}
+
+#battle-summary-inner {
+  max-width: 760px;
+}
+
+.loot-item .loot-count {
+  font-size: 11px;
+}
+
+#battle-summary-inner * {
+  font-size: 13px;
+}
+
+.pw-summary-sprite {
+  width:72px;
+  height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+
+.pw-summary-name {
+  font-weight:bold;
+  font-size:13px;
+  color:var(--light2);
+}
+
+.pw-summary-count {
+  background:var(--light1);
+  color:var(--dark1);
+  font-weight:bold;
+  padding:4px 10px;
+  border-radius:4px;
+  font-size: 13px;
+}
+
+.battle-summary-entry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--dark3);
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.battle-summary-entry.is-shiny {
+  border: 1px solid var(--light2);
+}
+
+.battle-summary-entry.is-normal {
+  border: 1px solid var(--light1);
+}
+
+.battle-session-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.pw-summary-currency {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+
+.pw-summary-currency .loot-item {
+  width: var(--pw-item-icon-md);
+  height: var(--pw-item-icon-md);
+  border: 1px solid color-mix(in srgb, var(--light1) 25%, transparent);
+  background: color-mix(in srgb, var(--dark2) 80%, transparent);
+}
+
+.battle-session-summary-stat {
+  border: 1px solid rgba(236,222,183,0.18);
+  border-radius: 10px;
+  background: rgba(0,0,0,0.2);
+  padding: 10px;
+  display: grid;
+  gap: 4px;
+  text-align: center;
+}
+
+.battle-session-summary-stat b {
+  color: var(--light2);
+  font-size: 16px;
+  font-weight: 900;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.battle-session-summary-stat span {
+  color: var(--light1);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.battle-damage-summary-list {
+  display: grid;
+  gap: 8px;
+}
+
+
+/* Wave 18 (user feedback): was 40px while the canonical sprite is 72px — the sprite overflowed the frame and sat off-centre. Full container now, centred, never clipped (the disc scales inside it). */
+.pw-summary-sprite {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pw-summary-name {
+  font-weight: bold;
+  font-size: 13px;
+  color: var(--light2);
+}
+
+.pw-summary-count {
+  background: var(--light1);
+  color: var(--dark1);
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  position: relative;
+  z-index: 3;
+}
+
+#battle-summary-inner {
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius);
+  background: var(--pw-surface);
+  box-shadow: var(--pw-shadow);
+  color: var(--light2);
+}
+
+#battle-summary-modal {
+  backdrop-filter: blur(3px);
+}
+
+
+/* DS2810 — scroll a modal from ANYWHERE + gold shiny toggle ──────────────────────────────────────────────────────────────────────── 1) Wheel dead zones: the modal backdrops themselves can now scroll and the inner panel uses AUTO vertical margins — it stays centred when it fits, and becomes fully reachable (top included) when the viewport is shorter than the panel (the old flex centreing clipped the top of tall panels). Together with the bridge wheel relay, the scroll works over the whole screen, not only above the panel. 2) The shiny toggle ON colour is GOLD #F5C242 (rule lives with the other toggle colours in DS2809 — see above). */
+#battle-summary-modal {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+#battle-summary-inner {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+#battle-summary-inner {
+  padding: 0 0 20px;
+}
+
+.staff-summary-tip {
+  font-size: 12px;
+  color: var(--light2);
+  margin-bottom: 12px;
+  background: rgba(255,255,255,0.05);
+  padding: 8px;
+  border-radius: 4px;
+  border-left: 3px solid var(--accent);
+}
+
+.loot-item {
+  width: var(--pw-item-icon-md);
+  height: var(--pw-item-icon-md);
+}
+
+.loot-item .loot-count {
+  z-index: 3 !important;
+  background: var(--dark1);
+  border-radius: 8px;
+  padding: 1px 5px;
+}
+
+
+/* 5. Capture rows keep the whole 72px sprite inside the frame. */
+.battle-summary-entry {
+  overflow: visible;
+}
+
+#battle-summary-modal {
+  z-index: 1200;
+}
+
+@media (min-width: 1600px) {
+#battle-summary-inner {
+  max-width: 1080px;
+}
+
+}
+
+@media (min-width: 2200px) {
+#battle-summary-inner {
+  max-width: 1380px;
+}
+
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+#battle-summary-modal {
+  align-items: flex-start;
+  padding-top: 6px;
+}
+
+#battle-summary-inner {
+  margin-top: 0 !important;
+}
+
+#battle-summary-inner {
+  max-width: 96vw !important;
+  max-height: 90vh !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-y: auto !important;
+  transform-origin: center center !important;
+}
+
+}
+
+#battle-loot-row {
+  display: none;
+}
+
+#battle-center-panel:has(#battle-active-scene.is-live) #battle-loot-row {
+  display: flex;
+}
+
+#battle-center-panel > #battle-loot-row {
+  order: 2;
+}
+
+#battle-loot-row {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.pw-ach-summary-banner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 8px;
+  border: 1px solid var(--pw-border-color);
+}
+
+.pw-ach-summary-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pw-ach-summary-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--yellow);
+}
+
+.pw-ach-summary-label {
+  font-size: 13px;
+  color: var(--light2);
+}
+
+.pw-ach-summary-bonuses {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+
+/* DS-v1.16.8 — ITEM LOOT LISTS (battle summary + AFK recap) ════════════════════════════════════════════════════════════════════════ 1) ROOT CAUSE of the "gigantic items": both summaries built their own `<img>` with the class `battle-summary-item-icon`, which NO rule ever styled — the sprite therefore rendered at its file size (24 to 371 px depending on the item). They now use the shared `LootItemList`, i.e. the canonical `UIItemSprite` in the same 72 px round frame as the location drops (`.pw-grid-media`). 2) The disc is a fixed square that never shrinks, and the meta column stacks the name over the quantity (the generic `.pw-col` gap of 8 px was too loose inside an 88 px card). NOTE: capture rows keep `.battle-summary-entry` untouched. */
+.loot-item-entry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--dark3);
+  border: 1px solid var(--light1);
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.loot-item-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pw-battle-loot-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--dark1);
+  border: 1px solid var(--dark3);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.pw-battle-loot-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  border-top: 1px solid var(--dark4, rgba(236, 222, 183, 0.18));
+  margin-top: 4px;
+}
+
+#battle-loot-inline.pw-battle-loot-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+#battle-loot-inline .loot-item {
+  flex: var(--pw-item-icon-md);
+  width: var(--pw-item-icon-md);
+  height: var(--pw-item-icon-md);
+}
+
+#battle-loot-inline .loot-currency-icon {
+  object-fit: contain;
+}
+
+#battle-summary-inner.pw-battle-summary-shell {
+  width: min(96vw, 760px) !important;
+  max-width: 760px !important;
+}
+
+.pw-battle-summary-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+  max-height: calc(92vh - 64px);
+  overflow-y: auto;
+  padding: 10px 20px 14px;
+}
+
+.pw-battle-summary-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+
+.pw-battle-summary-layout .battle-session-summary-grid {
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.pw-battle-summary-layout .pw-summary-currency {
+  gap: 6px;
+  margin: 0 0 12px;
+}
+
+.pw-battle-summary-layout .pw-summary-currency .loot-item {
+  width: var(--pw-item-icon-md);
+  height: var(--pw-item-icon-md);
+}
+
+.pw-battle-summary-toll-refund {
+  margin-top: 4px;
+  color: var(--light2);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+@media (max-width: 520px) {
+.pw-battle-summary-modal {
+  padding: 8px 10px;
+  max-height: calc(92vh - 58px);
+}
+
+}

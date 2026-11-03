@@ -19,10 +19,11 @@ import { DebugTimeScale } from '../core/DebugTimeScale.js';
 import { SaveSystem } from './SaveSystem.js';
 import { LocationSystem } from './LocationSystem.js';
 import { BonusSystem } from './BonusSystem.js';
-import { RoamingRules } from '../config/RoamingRules.js';
 import { RoamingSystem } from './RoamingSystem.js';
 import { TrainingSystem } from './TrainingSystem.js';
 import { NotificationSystem } from './NotificationSystem.js';
+import { EvolutionSystem } from './EvolutionSystem.js';
+import { BoxSystem } from './BoxSystem.js';
 import { QuestSystem } from './QuestSystem.js';
 import { CatchSystem } from './CatchSystem.js';
 import { SanctuarySystem } from './SanctuarySystem.js';
@@ -37,6 +38,7 @@ import { QuestCategories } from '../data/quests/QuestCategories.js';
 import { QuestCatchKinds } from '../data/catch/QuestCatchKinds.js';
 import { HeldEffectKinds } from '../data/items/HeldEffectKinds.js';
 import { NotificationChannels, NotificationTones } from '../config/NotificationConfig.js';
+import { PokemonRules } from '../config/PokemonRules.js';
 import { BattleSession, BattleOutcomes } from './battle/BattleSession.js';
 import { BattleSides } from '../config/BattleSides.js';
 import { FastForwardRules } from '../config/FastForwardRules.js';
@@ -70,6 +72,7 @@ import {
   LOCAL_QUEST_BATTLE_FALLBACK_POOL
 } from '../data/content/LocalQuestBattleContent.js';
 import { t } from '../localization/LocalizationManager.js';
+import { FatigueRules } from '../config/FatigueRules.js';
 
 /** Lines kept in the battle log. */
 const LOG_MAX_LINES = 200;
@@ -360,7 +363,7 @@ export class BattleSystem extends BaseSystem {
     const wildEncounter = dungeon
       ? null
       : EncounterRules.drawWildEncounter(encounters, team, this._random, {
-        roamingSpecies: RoamingRules.ROAMING_ENABLED ? RoamingSystem.getSpeciesAt(locationId) : null
+        roamingSpecies: RoamingSystem.getSpeciesAt(locationId)
       });
     const drawn = dungeon
       ? DungeonBattleRules.draw(encounters, team, this._random, {
@@ -724,7 +727,7 @@ export class BattleSystem extends BaseSystem {
               LocationDB.getInstance().getEncounters(locationId),
               save.team,
               this._random,
-              { roamingSpecies: RoamingRules.ROAMING_ENABLED ? RoamingSystem.getSpeciesAt(locationId) : null }
+              { roamingSpecies: RoamingSystem.getSpeciesAt(locationId) }
             );
             const nextFoe = encounter?.pokemon ?? null;
             if (encounter?.isRoaming && nextFoe) roamingNextFoes.add(nextFoe);
@@ -1113,34 +1116,7 @@ export class BattleSystem extends BaseSystem {
       };
       scorer.kos++;
     }
-    run.playerKOs = session.playerKOs;
-    if (run.playerKOs >= 50) {
-      const fatigueStep = Math.max(1, Math.min(10, Math.floor((run.playerKOs - 50) / 5) + 1));
-      if (run.playerKOs === 50) {
-        session.log.add('battle_log.fatigue_warning');
-        NotificationSystem.getInstance().notifyTemporary(
-          t('battle_log.fatigue_warning'),
-          { channel: NotificationChannels.BATTLE, tone: NotificationTones.WARNING }
-        );
-      }
-      for (const member of save.team) {
-        if (!member.isFainted()) {
-          const hasStamina = member.talent === 'stamina' || (save.talents?.hasHidden && save.talents.hasHidden(member.species));
-          const fatigueDiv = hasStamina ? 2 : 1;
-          const wearDamage = Math.max(1, Math.round((member.getMaxHp() * 0.01 * fatigueStep) / fatigueDiv));
-          member.hp = Math.max(0, member.hp - wearDamage);
-          if (session.active?.pokemon?.uid === member.uid) {
-            session.active.takeDamage(wearDamage);
-          }
-          session.log.add('battle_log.fatigue_wear', { name: member.getDisplayName(), damage: wearDamage });
-        }
-      }
-      if (save.team.every((member) => member.isFainted())) {
-        session.log.add('battle_log.defeat');
-        this.endBattle(false);
-        return;
-      }
-    }
+    if (this._applyFatigue(save, session, run)) return;
     if (capture.caught && foe.shiny) {
       NotificationSystem.getInstance().notifyTemporary(
         t('shiny_captured'),
@@ -1148,6 +1124,47 @@ export class BattleSystem extends BaseSystem {
       );
     }
     SaveSystem.getInstance().saveCurrent();
+  }
+
+  /**
+   * Applies "50 consecutive victories without rest" fatigue to the team.
+   * The counter is the number of victories won inside the current uninterrupted
+   * chain (`run.wins`): a chain is only interrupted when the battle ends, and
+   * that is also when the team is healed, so "rest" and "reset" coincide.
+   * @private
+   * @param {Object} save
+   * @param {import('./battle/BattleSession.js').BattleSession} session
+   * @param {Object} run - Active run summary
+   * @returns {boolean} True when the wear ended the battle (whole team fainted)
+   */
+  _applyFatigue(save, session, run) {
+    const step = FatigueRules.stepFor(run.wins);
+    if (step === 0) return false;
+    if (FatigueRules.isWarningPoint(run.wins)) {
+      session.log.add('battle_log.fatigue_warning', { count: run.wins });
+      NotificationSystem.getInstance().notifyTemporary(
+        t('battle_log.fatigue_warning', { count: run.wins }),
+        { channel: NotificationChannels.BATTLE, tone: NotificationTones.WARNING }
+      );
+    }
+    for (const member of save.team ?? []) {
+      if (member.isFainted()) continue;
+      const wearDamage = FatigueRules.wearFor(member.getMaxHp(), step, {
+        stamina: FatigueRules.hasStamina(member, save)
+      });
+      if (wearDamage <= 0) continue;
+      // `BattleCombatant.hp` reads `pokemon.hp`, so lowering the team member is
+      // enough: the active combatant follows automatically. The pre-1.16.10 code
+      // also dealt a second hit to the active Pokémon, doubling its wear.
+      member.hp = Math.max(0, member.hp - wearDamage);
+      session.log.add('battle_log.fatigue_wear', { name: member.getDisplayName(), damage: wearDamage });
+    }
+    if ((save.team ?? []).every((member) => member.isFainted())) {
+      session.log.add('battle_log.defeat');
+      this.endBattle(false);
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -1192,17 +1209,16 @@ export class BattleSystem extends BaseSystem {
         t('notif_level_up', { name: member.getDisplayName(), level: member.level }),
         { channel: NotificationChannels.GAMEPLAY, tone: NotificationTones.ACCENT }
       );
-      const evolvedSpecies = member.checkLevelEvolution();
-      if (evolvedSpecies) {
-        const save = this._save();
-        save?.pokedex.markCaught(evolvedSpecies, member.shiny, { deferSave: true });
-        const evolvedName = t(`pokemon.${evolvedSpecies}`);
-        log.add('battle_log.evolved', { name: member.getDisplayName(), target: evolvedName });
-        NotificationSystem.getInstance().notifyTemporary(
-          t('item_use_evolved', { name: member.getDisplayName(), evolution: evolvedName }),
-          { channel: NotificationChannels.GAMEPLAY, tone: NotificationTones.SUCCESS }
-        );
+      // The member keeps its species: each evolution adds the evolved species at level 1 to the box.
+      const evolutions = EvolutionSystem.getInstance().applyLevelEvolutions(member, { notify: true, deferSave: true });
+      for (const species of evolutions.targets) {
+        log.add('battle_log.evolved', {
+          name: member.getDisplayName(),
+          target: t(`pokemon.${species}`),
+          level: PokemonRules.MIN_LEVEL
+        });
       }
+      if (evolutions.targets.length) BoxSystem.getInstance().dispatchChanged();
     }
   }
 

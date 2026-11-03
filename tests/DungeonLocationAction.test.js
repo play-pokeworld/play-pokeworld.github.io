@@ -15,6 +15,7 @@ import { LocationActions } from '../src/panels/components/LocationActions.js';
 import { IconRegistry } from '../src/ui/icons/IconRegistry.js';
 import { LocalizationManager, t } from '../src/localization/LocalizationManager.js';
 import { TextFormatter } from '../src/core/TextFormatter.js';
+import { readBundle } from './CssBundle.js';
 
 describe('Dungeon location action parity', (test) => {
   test('entry uses the explore glyph, localized floor toll with the token sprite, and DungeonSystem.enter', () => {
@@ -135,7 +136,7 @@ describe('Dungeon location action parity', (test) => {
   });
 
   test('dungeon action skin matches main generic button colors and hover feedback', () => {
-    const css = fs.readFileSync(path.resolve('assets/css/design-system.css'), 'utf8');
+    const css = readBundle();
     const base = css.match(/\.pw-loc-action-btn\.pw-loc-dungeon-btn\s*\{([^}]*)\}/)?.[1] || '';
     const hover = css.match(/\.pw-loc-action-btn\.pw-loc-dungeon-btn:hover\s*\{([^}]*)\}/)?.[1] || '';
     for (const declaration of [

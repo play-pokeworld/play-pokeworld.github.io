@@ -1,0 +1,207 @@
+/*
+ * panels/shortcuts.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.shortcut-action-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shortcut-action-icon .ui-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.shortcut-action-btn {
+  border-radius: 12px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.14);
+}
+
+.shortcut-action-btn {
+  border: 2px solid var(--shortcut-color, var(--light2));
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.18), 0 6px 14px rgba(0,0,0,0.14);
+}
+
+.shortcut-action-btn:hover {
+  border-color: var(--shortcut-color, var(--light2));
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.18), 0 8px 18px rgba(0,0,0,0.20);
+}
+
+.shortcut-action-btn {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--dark3);
+  border: 2px solid var(--shortcut-color, var(--light2));
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--light2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: opacity 0.2s;
+}
+
+.shortcut-action-btn:hover {
+  opacity: 0.8;
+}
+
+.shortcut-action-icon {
+  font-size: 15px;
+}
+
+.shortcut-action-btn {
+  --shortcut-color: var(--accent);
+  border: 2px solid var(--shortcut-color, var(--light2));
+  background: linear-gradient(180deg, var(--dark2), var(--dark1));
+  color: var(--light2);
+}
+
+.shortcut-action-btn:hover {
+  border-color: var(--shortcut-color, var(--light2));
+  filter: brightness(1.08);
+}
+
+.shortcut-action-btn .shortcut-action-icon {
+  color: var(--shortcut-color, var(--light2));
+}
+
+.shortcut-action-btn[data-panel="box_view"] {
+  --shortcut-color: var(--blue);
+  border-color: var(--blue);
+}
+
+.shortcut-action-btn[data-panel="inventory"] {
+  --shortcut-color: var(--green);
+  border-color: var(--green);
+}
+
+.shortcut-action-btn[data-panel="market"] {
+  --shortcut-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.shortcut-action-btn[data-panel="pokedex"] {
+  --shortcut-color: var(--light2);
+  border-color: var(--light2);
+}
+
+.shortcut-action-btn[data-panel="dictionary"] {
+  --shortcut-color: var(--purple);
+  border-color: var(--purple);
+}
+
+.shortcut-action-btn[data-panel="guide"] {
+  --shortcut-color: var(--orange);
+  border-color: var(--orange);
+}
+
+.shortcut-action-btn[data-panel="atoll"] {
+  --shortcut-color: var(--red);
+  border-color: var(--red);
+}
+
+.shortcut-action-btn[data-panel="box_view"] .shortcut-action-icon {
+  color: var(--blue);
+}
+
+.shortcut-action-btn[data-panel="inventory"] .shortcut-action-icon {
+  color: var(--green);
+}
+
+.shortcut-action-btn[data-panel="market"] .shortcut-action-icon {
+  color: var(--accent);
+}
+
+.shortcut-action-btn[data-panel="pokedex"] .shortcut-action-icon {
+  color: var(--light2);
+}
+
+.shortcut-action-btn[data-panel="dictionary"] .shortcut-action-icon {
+  color: var(--purple);
+}
+
+.shortcut-action-btn[data-panel="guide"] .shortcut-action-icon {
+  color: var(--orange);
+}
+
+.shortcut-action-btn[data-panel="atoll"] .shortcut-action-icon {
+  color: var(--red);
+}
+
+.shortcut-action-btn {
+  color: var(--light2);
+}
+
+.shortcut-action-btn:hover {
+  filter: brightness(1.15);
+  color: var(--light2);
+}
+
+
+/* Light background active buttons MUST use dark text (#36342F) */
+.shortcut-action-btn.active {
+  background: var(--light2) !important;
+  color: var(--dark1) !important;
+  border-color: var(--light2) !important;
+}
+
+.shortcut-action-btn.active * {
+  color: var(--dark1) !important;
+}
+
+.shortcut-action-btn {
+  background: linear-gradient(180deg, var(--pw-btn-bg-hover), var(--pw-btn-bg)) !important;
+  color: var(--pw-btn-text) !important;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+.shortcut-action-btn {
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+}
+
+.shortcut-action-btn[data-panel='box_view'] {
+  --shortcut-color: var(--blue);
+  border-color: var(--blue);
+}
+
+.shortcut-action-btn[data-panel='inventory'] {
+  --shortcut-color: var(--green);
+  border-color: var(--green);
+}
+
+.shortcut-action-btn[data-panel='market'] {
+  --shortcut-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.shortcut-action-btn[data-panel='pokedex'] {
+  --shortcut-color: var(--light2);
+  border-color: var(--light2);
+}
+
+.shortcut-action-btn[data-panel='dictionary'] {
+  --shortcut-color: var(--purple);
+  border-color: var(--purple);
+}
+
+.shortcut-action-btn[data-panel='guide'] {
+  --shortcut-color: var(--orange);
+  border-color: var(--orange);
+}
+
+.shortcut-action-btn[data-panel='badges'] {
+  --shortcut-color: var(--yellow);
+  border-color: var(--yellow);
+}

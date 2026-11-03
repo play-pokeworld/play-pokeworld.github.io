@@ -1,0 +1,267 @@
+/*
+ * panels/pokemon-background.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+#pw-bg-pokemon-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+
+.pw-bg-poke {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--pw-bg-size, 46px);
+  height: var(--pw-bg-size, 46px);
+  image-rendering: pixelated;
+  opacity: var(--pw-bg-opacity, .16);
+  will-change: transform;
+  transform: translate3d(var(--pw-bg-x, 0), var(--pw-bg-y, 0), 0) scaleX(var(--pw-bg-face, 1));
+  transition: opacity 600ms ease;
+}
+
+.pw-bg-poke.is-shiny {
+  opacity: var(--pw-bg-opacity-shiny, .26);
+  filter: drop-shadow(0 0 6px rgba(255, 225, 94, .75));
+  animation: pw30-bg-shiny 2.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+.pw-bg-poke.is-shiny {
+  animation: none !important;
+}
+
+#pw-bg-pokemon-layer {
+  display: none !important;
+}
+
+}
+
+#pw-bg-pokemon-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: transparent !important;
+  contain: layout paint;
+}
+
+.pw-bg-poke {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--pw-bg-size, 120px);
+  height: var(--pw-bg-size, 120px);
+  image-rendering: pixelated;
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  opacity: calc(var(--pw-bg-opacity, .30) * var(--pw-bg-fade, 1));
+  transform: translate3d(var(--pw-bg-x, 0), calc(var(--pw-bg-y, 0px) + var(--pw-bg-bob, 0px)), 0) scaleX(var(--pw-bg-face, 1));
+  animation: pw31-bg-bob 2.6s ease-in-out infinite;
+  transition: none;
+}
+
+.pw-bg-poke:nth-child(2n) {
+  animation-duration: 3.1s;
+  animation-delay: -.6s;
+}
+
+.pw-bg-poke:nth-child(3n) {
+  animation-duration: 2.3s;
+  animation-delay: -1.2s;
+}
+
+.pw-bg-poke:nth-child(5n) {
+  animation-duration: 3.4s;
+  animation-delay: -1.9s;
+}
+
+.pw-bg-poke.is-shiny {
+  opacity: calc(var(--pw-bg-opacity-shiny, .38) * var(--pw-bg-fade, 1));
+  filter: drop-shadow(0 0 5px rgba(255, 225, 94, .55));
+}
+
+@media (prefers-reduced-motion: reduce) {
+.pw-bg-poke {
+  animation: none !important;
+}
+
+}
+
+#pw-bg-pokemon-layer {
+  z-index: 0 !important;
+}
+
+.pw-bg-poke.is-shiny {
+  filter: none !important;
+  opacity: calc(var(--pw-bg-opacity, .30) * var(--pw-bg-fade, 1)) !important;
+  animation-name: pw32-bg-hop !important;
+}
+
+.pw-bg-poke {
+  animation: pw32-bg-hop .5s steps(1, end) infinite !important;
+}
+
+.pw-bg-poke:nth-child(2n) {
+  animation-delay: -.12s !important;
+}
+
+.pw-bg-poke:nth-child(3n) {
+  animation-delay: -.25s !important;
+}
+
+.pw-bg-poke:nth-child(5n) {
+  animation-delay: -.37s !important;
+}
+
+[data-daytime="dawn"] {
+  --pw-land-bright: .92;
+  --pw-land-sat: 1.05;
+  --pw-land-tint: #FF9E6D;
+  --pw-land-tint-a: .22;
+}
+
+[data-daytime="day"] {
+  --pw-land-bright: 1;
+  --pw-land-sat: 1;
+  --pw-land-tint: transparent;
+  --pw-land-tint-a: 0;
+}
+
+[data-daytime="dusk"] {
+  --pw-land-bright: .82;
+  --pw-land-sat: 1.15;
+  --pw-land-tint: #FF6B35;
+  --pw-land-tint-a: .26;
+}
+
+[data-daytime="night"] {
+  --pw-land-bright: .55;
+  --pw-land-sat: .82;
+  --pw-land-tint: #2B4A8F;
+  --pw-land-tint-a: .34;
+}
+
+@media (prefers-reduced-motion: reduce) {
+.pw-bg-poke {
+  animation: none !important;
+}
+
+}
+
+#pw-bg-pokemon-layer,
+#pw-bg-pokemon-layer .pw-bg-poke,
+img.pw-bg-poke {
+  opacity: 1 !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+}
+
+#pw-land-fg {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--pw-land-rock);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27560%27%20height%3D%2738%27%20viewBox%3D%270%200%20560%2038%27%3E%3Cg%20fill%3D%27%2523fff%27%3E%3Cpath%20d%3D%27M18%2038%20L24%2020%20L38%2016%20L54%2024%20L58%2038%20Z%27%2F%3E%3Cpath%20d%3D%27M118%2038%20L124%2026%20L136%2021%20L150%2028%20L154%2038%20Z%27%2F%3E%3Cpath%20d%3D%27M236%2038%20L242%2026%20L252%2021%20L266%2028%20L270%2038%20Z%27%2F%3E%3Cpath%20d%3D%27M352%2038%20L358%2020%20L374%2015%20L392%2024%20L397%2038%20Z%27%2F%3E%3Cpath%20d%3D%27M468%2038%20L474%2026%20L488%2022%20L502%2028%20L506%2038%20Z%27%2F%3E%3Cpath%20d%3D%27M84%2038%20L87%2030%20L90%2038%20Z%27%2F%3E%3Cpath%20d%3D%27M200%2038%20L202%2030%20L204%2038%20Z%27%2F%3E%3Cpath%20d%3D%27M316%2038%20L318%2029%20L321%2038%20Z%27%2F%3E%3Cpath%20d%3D%27M428%2038%20L431%2030%20L434%2038%20Z%27%2F%3E%3Cpath%20d%3D%27M538%2038%20L540%2030%20L543%2038%20Z%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27560%27%20height%3D%2738%27%20viewBox%3D%270%200%20560%2038%27%3E%3Cg%20fill%3D%27%2523fff%27%3E%3Cpath%20d%3D%27M18%2038%20L24%2020%20L38%2016%20L54%2024%20L58%2038%20Z%27%2F%3E%3Cpath%20d%3D%27M118%2038%20L124%2026%20L136%2021%20L150%2028%20L154%2038%20Z%27%2F%3E%3Cpath%20d%3D%27M236%2038%20L242%2026%20L252%2021%20L266%2028%20L270%2038%20Z%27%2F%3E%3Cpath%20d%3D%27M352%2038%20L358%2020%20L374%2015%20L392%2024%20L397%2038%20Z%27%2F%3E%3Cpath%20d%3D%27M468%2038%20L474%2026%20L488%2022%20L502%2028%20L506%2038%20Z%27%2F%3E%3Cpath%20d%3D%27M84%2038%20L87%2030%20L90%2038%20Z%27%2F%3E%3Cpath%20d%3D%27M200%2038%20L202%2030%20L204%2038%20Z%27%2F%3E%3Cpath%20d%3D%27M316%2038%20L318%2029%20L321%2038%20Z%27%2F%3E%3Cpath%20d%3D%27M428%2038%20L431%2030%20L434%2038%20Z%27%2F%3E%3Cpath%20d%3D%27M538%2038%20L540%2030%20L543%2038%20Z%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-size: 560px 38px;
+  mask-size: 560px 38px;
+  -webkit-mask-position: 0 calc(var(--pw-land-h-ground) - 38px);
+  mask-position: 0 calc(var(--pw-land-h-ground) - 38px);
+  filter: brightness(var(--pw-land-bright)) saturate(var(--pw-land-sat));
+  transition: filter 1.2s ease;
+}
+
+@media (max-width: 760px) {
+#pw-land-fg {
+  -webkit-mask-size: 400px 28px;
+  mask-size: 400px 28px;
+  -webkit-mask-position: 0 calc(var(--pw-land-h-ground) - 28px);
+  mask-position: 0 calc(var(--pw-land-h-ground) - 28px);
+}
+
+}
+
+.pw-background-pokemon-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: layout paint;
+  background: transparent;
+}
+
+.pw-background-pokemon-walker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--pw-background-size, 100px);
+  height: var(--pw-background-size, 100px);
+  opacity: 0;
+  transform: translate3d(
+    var(--pw-background-x0, -200vw),
+    var(--pw-background-y0, -200vh),
+    0
+  );
+}
+
+.pw-background-pokemon-walker.is-flying {
+  animation-duration: var(--pw-background-duration);
+  animation-delay: var(--pw-background-delay, 0ms);
+  animation-timing-function: linear;
+  animation-iteration-count: 1;
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+}
+
+.pw-background-pokemon-walker.is-flying.flight-a {
+  animation-name: pw-background-flight-a;
+}
+
+.pw-background-pokemon-walker.is-flying.flight-b {
+  animation-name: pw-background-flight-b;
+}
+
+.pw-background-pokemon-sprite {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.pw-background-pokemon-sprite.is-shiny {
+  filter: drop-shadow(
+    0 0 9px color-mix(in srgb, var(--yellow) 78%, transparent)
+  );
+}
+
+.pw-background-pokemon-walker--facing-left .pw-background-pokemon-sprite {
+  transform: scaleX(-1);
+}
+
+.pw-background-pokemon-walker--facing-right .pw-background-pokemon-sprite {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+.pw-background-pokemon-layer {
+  display: none !important;
+}
+
+}

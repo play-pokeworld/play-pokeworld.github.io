@@ -24,6 +24,7 @@ const { TrainerDB } = await import('../../src/data/trainers/TrainerDB.js');
 const { LeagueDB } = await import('../../src/data/trainers/LeagueDB.js');
 const { ShopDB } = await import('../../src/data/shops/ShopDB.js');
 const { QuestDB } = await import('../../src/data/quests/QuestDB.js');
+const { ItemDescription } = await import('../../src/data/items/ItemDescription.js');
 
 const manager = LocalizationManager.getInstance();
 const tables = manager._tables;
@@ -47,7 +48,24 @@ const checkIds = (category, prefix, ids, suffixes) => {
 
 // --- repositories -----------------------------------------------------------
 const items = ItemDB.getInstance();
-checkIds('items', 'item.', items.getIds(), ['.name', '.desc']);
+// `item.<id>.name` is mandatory. `item.<id>.desc` is OPTIONAL by design
+// (v1.16.4): ItemDescription derives the text from the item data
+// (item_effect_<kind>, item_category_<category>, treasure resale value).
+// Requiring `.desc` for all 518 items produced 200 false positives and hid the
+// real gaps, so the tool now checks what the game really needs:
+//   1. a `.desc` authored in ANY language must exist in EVERY language;
+//   2. every item must resolve to a non-empty description through
+//      ItemDescription.of() (authored or derived).
+const derivedDescriptions = [];
+
+for (const id of items.getIds()) {
+  check('items', `item.${id}.name`);
+  const authored = LANGS.filter((lang) => `item.${id}.desc` in tables[lang]);
+  if (authored.length) check('items', `item.${id}.desc`);
+  else derivedDescriptions.push(id);
+  const text = ItemDescription.of(id);
+  if (!text || String(text).trim() === '') check('items-description-fallback', `item.${id}.desc (no authored text and no derivable effect/category)`);
+}
 
 const moves = MoveDB.getInstance();
 checkIds('moves', 'move.', moves.getIds(), ['']);
@@ -96,6 +114,10 @@ const { BALL_IDS } = await import('../../src/data/items/BallCatalog.js').catch((
 for (const id of BALL_IDS || []) check('balls', `ball_${id}`);
 
 // --- report ----------------------------------------------------------------
+if (!VERBOSE) {
+  // Informational only: those items are described by their effect/category.
+  console.log(`item descriptions authored: ${items.getIds().length - derivedDescriptions.length} / ${items.getIds().length} (${derivedDescriptions.length} derived from data)`);
+}
 let total = 0;
 const lines = [];
 for (const [category, entries] of [...missing.entries()].sort()) {
@@ -106,3 +128,5 @@ for (const [category, entries] of [...missing.entries()].sort()) {
 }
 console.log(lines.join('\n') || 'no missing key');
 console.log(`\ntotal missing keys: ${total}`);
+// Non-zero exit so the CI/test suite fails on a REAL gap instead of drowning in false positives.
+if (total > 0) process.exitCode = 1;

@@ -14,7 +14,7 @@ import { FacilityUiRules } from '../../config/FacilityUiRules.js';
 import { EventBus } from '../../core/EventBus.js';
 import { ModalOpenRequestedEvent } from '../../core/events/ModalOpenRequestedEvent.js';
 import { ModalIds } from '../../config/ModalIds.js';
-import { t } from '../../localization/LocalizationManager.js';
+import { t, lt, joinLocalized } from '../../localization/LocalizationManager.js';
 
 export class TrainingSlotCard extends UIContainer {
   /** @param {number} index */
@@ -258,7 +258,13 @@ export class TrainingSlotCard extends UIContainer {
             name: t(`talent.${reward.talent}.name`),
           });
     }
-    if (reward.levels) return t('facility_reward_levels', { count: reward.levels });
+    if (reward.levels) {
+      const levels = t('facility_reward_levels', { count: reward.levels });
+      const evolutions = Array.isArray(reward.evolutions) ? reward.evolutions : [];
+      if (!evolutions.length) return levels;
+      const species = joinLocalized(', ', evolutions.map((id) => t(`pokemon.${id}`)));
+      return lt`${levels} · ${t('facility_reward_evolution', { species })}`;
+    }
     if (reward.evs) return t('facility_reward_ev', { stat: t(`stat_${reward.stat}`), count: reward.evs });
     return t('training_reward_none');
   }

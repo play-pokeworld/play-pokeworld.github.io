@@ -42,6 +42,8 @@ export class PokeballsPanel extends DraggablePanel {
       icon: 'settings',
       onClick: () => EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.BALL_FILTERS))
     });
+    // Tutorial hook: the guided step "configure your Poké Balls" points its halo at this gear.
+    settings.setData('tutorial', 'ball-filters');
     settings.setTooltip(t('ball_settings'));
     settings.setAriaLabel(t('ball_settings'));
     this.addHeaderAction(settings);
@@ -74,6 +76,9 @@ export class PokeballsPanel extends DraggablePanel {
         children: [new BallSlotIcon(filter.ball)]
       });
       ballCell.setTooltip(t('ball_cycle_hint'));
+      // Tutorial hook: the guided step points its halo at the ball cell of the "new" row, because
+      // clicking that cell is what assigns a ball (the gear only edits the filter rules).
+      ballCell.setData('tutorial', 'ball-slot');
       ballCell.addDomListener('click', () => EventBus.getInstance().dispatch(
         new ModalOpenRequestedEvent(ModalIds.BALL_PICKER, { filterId: filter.id })
       ));
@@ -86,6 +91,7 @@ export class PokeballsPanel extends DraggablePanel {
           new UIText({ className: 'pw-ball-row-cell pw-ball-row-qty', text: TextFormatter.formatNumber(quantity) })
         ]
       });
+      row.setData('filter', filter.id);
       row.toggleClass('off', !filter.enabled);
       this._grid.addChild(row);
     }

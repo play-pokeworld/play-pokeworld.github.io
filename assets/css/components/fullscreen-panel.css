@@ -1,0 +1,90 @@
+/*
+ * components/fullscreen-panel.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+
+/* Wave 34: paint moved into the canonical `.modal-title` rule (it WAS the reference look, applied here to one family only). Only the sticky behaviour, which is specific to the fullscreen panel, remains. */
+#fullscreen-panel-modal > div > div:first-child {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+#fullscreen-panel-modal > div {
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius);
+  background: var(--pw-surface);
+  box-shadow: var(--pw-shadow);
+  color: var(--light2);
+}
+
+#fullscreen-panel-modal {
+  backdrop-filter: blur(3px);
+}
+
+
+/* The fullscreen-panel modal carries an INLINE z-index: 600 (JS-built shell) — !important is the only way past an inline style. */
+#fullscreen-panel-modal {
+  z-index: 1100 !important;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+#fullscreen-panel-modal {
+  align-items: flex-start !important;
+  padding-top: 6px !important;
+}
+
+#fullscreen-panel-modal > div {
+  max-width: 96vw !important;
+  max-height: 90vh !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-y: auto !important;
+  transform-origin: center center !important;
+}
+
+}
+
+@media (max-width: 480px) {
+#fullscreen-panel-modal > div {
+  transform: scale(0.92) !important;
+  width: 108% !important;
+  margin-left: -4% !important;
+}
+
+}
+
+.pw-fullscreen-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .92);
+  z-index: 960;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  backdrop-filter: blur(3px);
+}
+
+.pw-fullscreen-overlay.is-open {
+  display: flex;
+}
+
+.pw-fullscreen-overlay.pw-bag-held-item-mode {
+  z-index: 32000;
+}
+
+@media (max-width: 640px), (pointer: coarse) {
+.pw-fullscreen-overlay {
+  align-items: flex-start;
+  padding: 6px;
+}
+
+}
+
+.pw-fullscreen-overlay.pw-box-selector-mode {
+  z-index: 1100;
+}

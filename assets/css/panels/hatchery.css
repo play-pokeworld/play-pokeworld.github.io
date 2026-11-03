@@ -1,0 +1,598 @@
+/*
+ * panels/hatchery.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.hatchery-slot img {
+  width: 60px;
+  height: 60px;
+}
+
+.hatchery-auto-layout, .hatchery-slot-card {
+  font-family: 'Winky Sans', 'Segoe UI', system-ui, sans-serif !important;
+}
+
+.pw-hatchery-empty {
+  text-align:center;
+  padding:14px;
+  color:var(--light1);
+  font-size:13px;
+}
+
+.pw-hatchery-empty-icon {
+  font-size: 15px;
+  margin-bottom:4px;
+}
+
+.hatchery-slot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0,0,0,0.25);
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--hatchery-border, #5a504a);
+}
+
+.hatchery-slot.is-done {
+  --hatchery-border: var(--green);
+}
+
+.hatchery-slot.is-fossil {
+  --hatchery-border: #6b5b3e;
+}
+
+.hatchery-progress {
+  height: 100%;
+  transition: 0.3s;
+}
+
+.hatchery-progress.is-done {
+  background: var(--green);
+}
+
+.hatchery-progress.is-fossil {
+  background: var(--light2);
+}
+
+.hatchery-progress.is-normal {
+  background: var(--blue);
+}
+
+.fossil-incubate-btn {
+  width: 100%;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.hatchery-upgrade-row {
+  display:flex;
+  justify-content:flex-end;
+  margin-bottom:10px;
+}
+
+.hatchery-upgrade-row {
+  justify-content: stretch;
+}
+
+.hatchery-slot-card {
+  border: 1px solid var(--dark3);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.22);
+  padding: 10px;
+  display: grid;
+  gap: 10px;
+}
+
+.hatchery-slot-card.is-done {
+  border-color: rgba(96,190,88,0.72);
+  box-shadow: 0 0 14px rgba(96,190,88,0.14);
+}
+
+.hatchery-slot-card.is-fossil {
+  border-color: rgba(236,222,183,0.44);
+}
+
+.hatchery-slot-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.hatchery-slot-media {
+  width: 68px;
+  height: 68px;
+  flex: 0 0 68px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 25%, rgba(236,222,183,0.24), rgba(0,0,0,0.18));
+  border: 2px solid rgba(236,222,183,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hatchery-slot-info {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.hatchery-slot-name {
+  color: var(--light2);
+  font-weight: 900;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hatchery-slot-name span,
+.hatchery-slot-status {
+  color: var(--light1);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.hatchery-slot-progress {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--dark1);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.hatchery-hatch-btn {
+  width: 100%;
+  padding: 10px;
+  font-weight: 900;
+  background: var(--green);
+  color: var(--dark1);
+}
+
+.hatchery-hatch-btn {
+  background: linear-gradient(135deg, #477a45, #6f9f63);
+  color: #f6f1dc;
+  border-color: #6f9f63;
+}
+
+
+/* Phase 14 — daycare: mode buttons (daycare green / incubation purple) and priority buttons (pokemon blue / fossil bronze). Colors carried by dedicated classes because a data-style/inline background would be masked by the generic .hbtn:not(...) rule (higher specificity). */
+.hatchery-mode-toggle,
+.hatchery-priority-toggle {
+  font-size: 11px;
+  font-weight: 900;
+  padding: 4px 10px;
+  border-radius: 3px;
+  border: 1px solid transparent;
+}
+
+.hatchery-auto-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.pw-hatchery-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pw-hatchery-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pw-hatchery-empty {
+  text-align: center;
+  padding: 14px;
+  color: var(--light1);
+  font-size: 13px;
+}
+
+.pw-hatchery-empty-icon {
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.hatchery-mode-toggle.is-exp, .hatchery-mode-toggle.is-breed, .hatchery-priority-toggle.is-pokemon {
+  color: var(--dark1) !important;
+  font-weight: 900;
+}
+
+.hatchery-priority-toggle.is-fossil {
+  color: #ffffff !important;
+  font-weight: 900;
+}
+
+.hatchery-slot-card {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid rgba(236,222,183,0.22) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+  color: var(--pw-text-primary) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.hatchery-slot-card:hover {
+  border-color: var(--pw-text-primary) !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.6) !important;
+  transform: translateY(-2px) !important;
+  color: var(--pw-text-primary) !important;
+}
+
+.hatchery-slot-media {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+  flex-shrink: 0 !important;
+}
+
+.hatchery-slot-media img {
+  position: relative !important;
+  z-index: 2 !important;
+  object-fit: contain !important;
+  image-rendering: pixelated !important;
+}
+
+.hatchery-slot-card.is-exp {
+  border-left: 4px solid var(--green) !important;
+}
+
+.hatchery-slot-card.is-breed {
+  border-left: 4px solid var(--purple) !important;
+}
+
+.pw-hatchery-empty-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+}
+
+.pw-hatchery-empty-tools {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.pw-hatchery-empty-tools .hatchery-mode-toggle {
+  min-height: 28px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.pw-hatchery-mode-lock {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--light2);
+  text-align: right;
+  padding: 4px 6px;
+  line-height: 1.3;
+  max-width: 220px;
+}
+
+.hatchery-mode-toggle.is-exp {
+  background: #60BE58;
+  color: #241F16;
+  border-color: #60BE58;
+  text-shadow: none;
+}
+
+.hatchery-mode-toggle.is-breed {
+  background: #8E44AD;
+  color: #F6F1DC;
+  border-color: #8E44AD;
+  text-shadow: none;
+}
+
+.hatchery-priority-toggle.is-pokemon {
+  background: #539DDF;
+  color: #241F16;
+  border-color: #539DDF;
+  text-shadow: none;
+}
+
+.hatchery-priority-toggle.is-fossil {
+  background: #7A4E1E;
+  color: #F6F1DC;
+  border-color: #7A4E1E;
+  text-shadow: none;
+}
+
+.pw-hatchery-auto-slot {
+  border-top: 1px solid var(--dark3);
+  border-right: 1px solid var(--dark3);
+  border-bottom: 1px solid var(--dark3);
+  border-left: 5px solid #60BE58;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.02);
+  padding: 14px;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pw-hatchery-auto-slot.is-breed {
+  border-left-color: #8E44AD;
+}
+
+.pw-hatchery-auto-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding-bottom: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pw-hatchery-auto-head h4 {
+  margin: 0;
+  color: var(--light1);
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.pw-hatchery-auto-mode-label {
+  color: #60BE58;
+  font-weight: 900;
+}
+
+.pw-hatchery-auto-slot.is-breed .pw-hatchery-auto-mode-label {
+  color: #D9A0E8;
+}
+
+.pw-hatchery-auto-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pw-hatchery-auto-desc {
+  color: var(--light2);
+}
+
+.pw-hatchery-auto-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pw-hatchery-auto-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+.hatchery-card {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+}
+
+.pw-hatchery-body {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pw-hatchery-slot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(236, 222, 183, 0.18);
+  border-radius: 8px;
+}
+
+.pw-hatchery-egg-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.pw-hatchery-empty-icon {
+  font-size: 20px;
+  color: var(--light1, #c9bc9c);
+  flex-shrink: 0;
+}
+
+.pw-hatchery-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.pw-hatchery-title-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--light2, #ecdeb7);
+}
+
+.pw-hatchery-bar-bg {
+  height: 5px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.pw-hatchery-bar-fill {
+  height: 100%;
+  background: var(--accent, #ffa500);
+}
+
+.pw-hatchery-empty-text {
+  font-size: 12px;
+  color: var(--light1, #c9bc9c);
+}
+
+.pw-hatchery-hint, .pw-hatchery-progress-label, .pw-hatchery-empty-hint {
+  color: var(--light1, #c9bc9c);
+  font-size: 11px;
+}
+
+.pw-hatchery-locked {
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border: 1px solid var(--pw-border-color, rgba(236, 222, 183, 0.18));
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.18);
+  color: var(--light1, #c9bc9c);
+  font-size: 12px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.pw-hatchery-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pw-hatchery-slot {
+  align-items: center;
+}
+
+.pw-hatchery-slot--occupied,
+.pw-hatchery-slot--fossil {
+  flex-direction: row;
+}
+
+.pw-hatchery-empty-slot {
+  align-items: stretch;
+  flex-direction: column;
+}
+
+.pw-hatchery-pokemon-icon {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  flex: 0 0 42px;
+}
+
+.pw-hatchery-title-row {
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pw-hatchery-action-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.pw-hatchery-select {
+  flex: 1 1 170px;
+  min-width: 0;
+}
+
+.pw-hatchery-progress {
+  margin-top: 3px;
+}
+
+.pw-hatchery-slot--fossil.is-ready {
+  border-color: var(--green, #63b76c);
+}
+
+.pw-hatchery-title-row {
+  gap: 6px;
+}
+
+
+/* Reference facility composition. Palette and original skins remain in design-system.css. Only shared-widget adaptation and responsive geometry are defined here. */
+.hatchery-auto-layout {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.pw-hatchery-slot-sprite {
+  width: 68px;
+  height: 68px;
+  flex: 0 0 68px;
+}
+
+.pw-hatchery-offer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 10px;
+  min-height: 44px;
+  white-space: normal;
+  text-align: left;
+  border: 1px solid var(--pw-border);
+  border-radius: 12px;
+  background: var(--pw-bg-inset);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.pw-hatchery-offer-description {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--purple);
+}
+
+.hatchery-slot-card.is-empty .hatchery-slot-footer {
+  justify-content: flex-end;
+}
+
+.hatchery-slot-card .hatchery-slot-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.hatchery-slot-card.is-exp {
+  border-left: 5px solid var(--green);
+}
+
+.hatchery-slot-card.is-breed {
+  border-left: 5px solid var(--purple);
+}
+
+.pw-hatchery-slot-number {
+  display: none;
+}
+
+.hatchery-slot-info {
+  display: flex;
+  flex-direction: column;
+}

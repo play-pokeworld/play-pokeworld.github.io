@@ -21,6 +21,9 @@ import { PokedexEntryOpenedEvent } from '../src/core/events/PokedexEntryOpenedEv
 import { DungeonEnteredEvent } from '../src/core/events/DungeonEnteredEvent.js';
 import { ModalOpenRequestedEvent } from '../src/core/events/ModalOpenRequestedEvent.js';
 import { NotificationDispatchedEvent } from '../src/core/events/NotificationDispatchedEvent.js';
+import { t } from '../src/localization/LocalizationManager.js';
+import { TutorialRules } from '../src/config/TutorialRules.js';
+import { DashboardWindowFocusRequestedEvent } from '../src/core/events/DashboardWindowFocusRequestedEvent.js';
 
 const bus = EventBus.getInstance();
 
@@ -127,18 +130,53 @@ describe('Guided tutorial', (test) => {
     }
   });
 
-  test('the Pokémon-sheet action forwards the team index expected by its modal', () => {
-    const requests = [];
-    const onRequest = (event) => requests.push(event);
-    bus.subscribe(ModalOpenRequestedEvent, onRequest);
+  test('the tutorial action only reveals a control: it never travels, opens a window or picks a ball', () => {
+    const modalRequests = [];
+    const focusRequests = [];
+    const onModal = (event) => modalRequests.push(event);
+    const onFocus = (event) => focusRequests.push(event);
+    bus.subscribe(ModalOpenRequestedEvent, onModal);
+    bus.subscribe(DashboardWindowFocusRequestedEvent, onFocus);
     try {
-      StoryPanel.prototype._performTutorialAction.call(null, { action: 'pokemon_sheet' });
+      for (const step of TutorialRules.STEPS) StoryPanel.prototype._performTutorialAction.call(null, { id: step.id });
     } finally {
-      bus.unsubscribe(ModalOpenRequestedEvent, onRequest);
+      bus.unsubscribe(ModalOpenRequestedEvent, onModal);
+      bus.unsubscribe(DashboardWindowFocusRequestedEvent, onFocus);
     }
-    assert.equal(requests.length, 1);
-    assert.equal(requests[0].modalId, ModalIds.POKEMON_INFO);
-    assert.deepEqual(requests[0].params, { teamIndex: 0 });
+    assert.equal(modalRequests.length, 0, 'no modal is opened for the player');
+    // Only the mobile view switch (a navigation aid) may be requested, never a game action.
+    for (const request of focusRequests) assert.ok(String(request.windowId).startsWith('win-'), 'window focus only');
+  });
+
+
+  test('the ball step names the capture row to fill and never sends the player to the settings', () => {
+    const tutorial = TutorialSystem.getInstance();
+    tutorial.init();
+    try {
+      const save = SaveSystem.getInstance().createNewSave('Tutorial ball wording', 'charmander');
+      for (let index = 0; index < 5; index++) {
+        save.statistics.recordWildWin('route1');
+        bus.dispatch(new PokemonDefeatedEvent('pidgey', 3, 'route1', true));
+      }
+      const ballStep = tutorial.getCardStatus();
+      assert.equal(ballStep.id, 'set_pokeball_filter');
+      // The row name comes from the capture filter preset, so the text cannot drift from the window.
+      assert.ok(ballStep.how.includes(t('ball_filter_new')), 'the step names the row the player has to fill');
+      assert.ok(!ballStep.how.includes('{'), 'no empty placeholder is left on screen');
+      assert.ok(!ballStep.title.includes('{'), 'no empty placeholder in the title');
+      // The regression this test guards: the step used to answer "the gear, or the grey ball".
+      assert.ok(!/réglage|settings/i.test(ballStep.how), 'the step never sends the player to the settings');
+      assert.ok(ballStep.how.includes('\n'), 'the path is written on two lines (where to go, then what to click)');
+
+      PokeballSystem.getInstance().setBall('new', 'pokeball');
+      const catchStep = tutorial.getCardStatus();
+      assert.equal(catchStep.id, 'catch_first');
+      assert.ok(catchStep.description.includes('%'), 'the catch rate is interpolated');
+      assert.ok(!catchStep.description.includes('{'), 'no empty placeholder in the objective');
+      assert.ok(catchStep.how.includes(t('location.route1')), 'the objective names the place to stand on');
+    } finally {
+      tutorial.onDestroy();
+    }
   });
 
   test('disabling the tutorial suppresses progression and persists its preference', () => {

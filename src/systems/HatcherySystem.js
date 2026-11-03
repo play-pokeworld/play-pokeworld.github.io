@@ -28,6 +28,7 @@ import { EggHatchedEvent } from '../core/events/EggHatchedEvent.js';
 import { PokemonUsageSystem } from './PokemonUsageSystem.js';
 import { PokemonActionIds } from '../config/PokemonUsageRules.js';
 import { FeatureAccessSystem } from './FeatureAccessSystem.js';
+import { EvolutionSystem } from './EvolutionSystem.js';
 import { HatcheryRules } from '../config/HatcheryRules.js';
 import { FacilityRules } from '../config/FacilityRules.js';
 import { CONTENT_FEATURES } from '../config/ContentAccessRules.js';
@@ -492,10 +493,9 @@ export class HatcherySystem extends BaseSystem {
           if (save.currencies.get(FacilityRules.MONEY_CURRENCY) < fee) break;
           slot.knockouts -= HatcheryRules.DAYCARE_KOS_PER_LEVEL;
           pokemon.setLevel(pokemon.level + 1); levels++;
-          const evolved = pokemon.checkLevelEvolution();
-          if (evolved) {
-            save.pokedex.markCaught(evolved, pokemon.shiny, { deferSave: true });
-          }
+          // Daycare level-ups evolve the same way as battles: the Pokémon is kept and the evolved
+          // species joins the box at level 1 (silent here, the daycare counter already notifies).
+          EvolutionSystem.getInstance().applyLevelEvolutions(pokemon, { notify: false, deferSave: true });
           if (fee) save.currencies.add(FacilityRules.MONEY_CURRENCY, -fee);
         }
         if (pokemon.level >= cap) slot.knockouts = 0;

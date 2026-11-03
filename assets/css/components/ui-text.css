@@ -1,0 +1,449 @@
+/*
+ * components/ui-text.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.pw-light2 {
+  color:var(--light2);
+}
+
+.pw-light2.pw-bold {
+  color:var(--light2);
+  font-weight:bold;
+}
+
+.pw-text-sm.pw-light1 {
+  font-size: 13px;
+  color:var(--light1);
+}
+
+.pw-text-sm.pw-light1 {
+  font-size: 13px;
+  color:var(--light1);
+  margin-bottom:4px;
+}
+
+.pw-text-md {
+  font-size: 15px;
+}
+
+.pw-text-sm.pw-light1 {
+  color:var(--light1);
+  font-size:13px;
+}
+
+.pw-text-sm {
+  font-size: 13px;
+}
+
+.pw-bold.pw-text-sm {
+  font-weight:bold;
+  font-size: 13px;
+}
+
+.pw-bold.pw-light2 {
+  font-weight:bold;
+  color:var(--light2);
+  margin-bottom:3px;
+}
+
+.pw-italic {
+  font-style:italic;
+}
+
+.pw-text-sm.pw-light2.pw-bold {
+  font-size:13px;
+  color:var(--light2);
+  font-weight:bold;
+  margin-bottom:4px;
+}
+
+.pw-bold.pw-text-sm {
+  font-weight:bold;
+  font-size:13px;
+}
+
+.pw-text-84 {
+  font-size:13px;
+  color:#ddd;
+  line-height:1.3;
+}
+
+.pw-bold {
+  font-weight:bold;
+}
+
+.pw-text-sm.pw-light1 {
+  font-size:13px;
+  color:var(--light1);
+}
+
+.pw-text-sm.pw-light1.pw-center {
+  font-size: 13px;
+  color:var(--light1);
+  margin-bottom:12px;
+  text-align:center;
+}
+
+.pw-text-md.pw-bold.pw-light2 {
+  font-size: 15px;
+  font-weight:bold;
+  color:var(--light2);
+  margin-bottom:6px;
+}
+
+.pw-text-sm.pw-light1 {
+  color:var(--light1);
+  font-size: 13px;
+}
+
+.pw-text-md {
+  color:white;
+  text-shadow:0 1px 3px rgba(0,0,0,0.5);
+  font-size: 15px;
+  margin-bottom:4px;
+}
+
+.pw-text-sm {
+  color:rgba(255,255,255,0.7);
+  font-size: 13px;
+}
+
+.pw-text-sm.pw-light1.pw-center {
+  margin-top:20px;
+  font-size:13px;
+  color:var(--light1);
+  text-align:center;
+}
+
+.pw-text-lg {
+  font-size: 32px;
+  color:var(--light2);
+  margin-bottom:8px;
+}
+
+.pw-text-sm.pw-light2.pw-bold {
+  font-size: 13px;
+  color:var(--light2);
+  font-weight:bold;
+}
+
+.pw-text-sm.pw-light1 {
+  font-size: 13px;
+  color:var(--light1);
+  margin-top:4px;
+}
+
+.pw-text-md.pw-bold.pw-light1 {
+  font-size: 15px;
+  font-weight:bold;
+  color:var(--light1);
+}
+
+.pw-text-md {
+  font-size: 15px;
+  margin-bottom:8px;
+}
+
+.pw-text-sm.pw-green {
+  font-size:13px;
+  color:var(--green);
+}
+
+.pw-orange {
+  color:var(--orange);
+}
+
+.pw-red {
+  color:var(--red);
+}
+
+.pw-green {
+  color:var(--green);
+}
+
+.pw-accent {
+  color:var(--accent);
+}
+
+.pw-light1 {
+  color:var(--light1);
+}
+
+.pw-bold.pw-text-sm.pw-light2 {
+  font-weight:bold;
+  font-size: 13px;
+  color:var(--light2);
+}
+
+.pw-text-sm.pw-light2 {
+  color:var(--light2);
+  font-size:13px;
+}
+
+.pw-text-md.pw-light2 {
+  color:var(--light2);
+  font-size:15px;
+}
+
+.pw-text-md {
+  font-size:15px;
+}
+
+.pw-text-sm.pw-light2 {
+  color:var(--light2);
+  font-size: 13px;
+  margin:6px 0;
+}
+
+.pw-text-sm.pw-green {
+  color:var(--green);
+  font-size: 13px;
+  margin:6px 0;
+}
+
+.poke-detail-panel .pw-text-84, .poke-detail-panel .pw-text-sm.pw-light1 {
+  color: var(--light1);
+  line-height: 1.35;
+}
+
+.pw-light1 {
+  color: var(--light1);
+}
+
+.pw-light2 {
+  color: var(--light2);
+}
+
+.pw-green {
+  color: var(--green);
+}
+
+.pw-red {
+  color: var(--red);
+}
+
+.pw-accent {
+  color: var(--accent);
+}
+
+.pw-orange {
+  color: var(--orange);
+}
+
+.pw-text-sm {
+  font-size: 13px;
+}
+
+.pw-text-xs {
+  font-size: 11px;
+}
+
+.pw-text-md {
+  font-size: 15px;
+}
+
+.pw-text-lg {
+  font-size: 18px;
+}
+
+.pw-bold {
+  font-weight: bold;
+}
+
+.pw-black {
+  font-weight: 900;
+}
+
+.pw-italic {
+  font-style: italic;
+}
+
+.pw-accent-bold {
+  font-weight: bold;
+  color: var(--accent);
+  font-size: 13px;
+}
+
+.pw-text-84 {
+  font-size: 13px;
+  color: #ddd;
+  line-height: 1.3;
+}
+
+.pw-text-glow {
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.pw-text-shadow {
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+
+/* 3. Subtitles, descriptions, stock, and secondary text always readable gold (#c9bc8a) Never allow --dark3 text on dark backgrounds */
+.pw-text-sm, .pw-light1 {
+  color: #c9bc8a !important;
+}
+
+.box-card .pw-bold, .pw-loc-wild-card .pw-bold {
+  color: var(--pw-text-primary) !important;
+  font-weight: 700 !important;
+}
+
+.box-card .pw-light1, .box-card .pw-light2, .pw-loc-wild-card .pw-light1 {
+  color: var(--pw-text-primary) !important;
+  opacity: 0.82;
+}
+
+.pw-text-sm, .pw-light1, .pw-light2 {
+  color: var(--light1) !important;
+}
+
+.pw-text-danger {
+  color: #E28497 !important;
+}
+
+.pw-poke-card.box-card .pw-text-sm.pw-light1 {
+  color: var(--light1) !important;
+}
+
+.training-mode-grid .training-mode-row:not(.is-disabled) .pw-light1 {
+  color: #241F16 !important;
+  text-shadow: none !important;
+}
+
+.pw-atoll-ban-row > .pw-text-sm {
+  color: #F28B6C;
+  font-weight: 900;
+}
+
+.pw-text-positive {
+  color: #60BE58 !important;
+}
+
+.loot-item-meta .pw-text-sm {
+  line-height: 1.15;
+}
+
+.save-profile-portrait-text .pw-text-sm {
+  color: var(--light2);
+}
+
+:where(.pw-text) {
+  display: inline-block;
+  line-height: 1.4;
+  color: inherit;
+}
+
+:where(.pw-text--align-left) {
+  text-align: left;
+}
+
+:where(.pw-text--align-center) {
+  text-align: center;
+}
+
+:where(.pw-text--align-right) {
+  text-align: right;
+}
+
+.pw-text--xs {
+  font-size: var(--pw-font-size-xs);
+}
+
+.pw-text--sm {
+  font-size: var(--pw-font-size-sm);
+}
+
+.pw-text--md {
+  font-size: var(--pw-font-size-md);
+}
+
+.pw-text--lg {
+  font-size: var(--pw-font-size-lg);
+}
+
+.pw-text--xl {
+  font-size: var(--pw-font-size-xl);
+}
+
+.pw-text--bold {
+  font-weight: 700;
+}
+
+.pw-text--muted {
+  color: var(--pw-text-muted);
+}
+
+.pw-text--gold {
+  color: var(--pw-accent-gold);
+}
+
+.pw-text--danger {
+  color: var(--pw-accent-danger);
+}
+
+.pw-text--success {
+  color: var(--pw-accent-success);
+}
+
+.pw-text--color-primary {
+  color: var(--light2);
+}
+
+.pw-text--color-secondary {
+  color: var(--light1);
+}
+
+.pw-text--color-muted {
+  color: var(--pw-text-muted);
+}
+
+.pw-text--color-accent {
+  color: var(--accent);
+}
+
+.pw-text--color-danger {
+  color: var(--red);
+}
+
+.pw-text--color-success {
+  color: var(--green);
+}
+
+.pw-clipboard-fallback {
+  position: fixed;
+  top: 0;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.starter-card .pw-text-glow {
+  color: color-mix(in srgb, var(--pw-text-primary) 85%, transparent);
+  text-shadow: none;
+}
+
+.pw-loc-action-btn.pw-loc-npc-btn .pw-loc-action-label > .pw-text-sm {
+  line-height: normal;
+}
+
+.pw-location-alcoves > .pw-text-sm {
+  margin-bottom: 10px;
+}
+
+.pw-pokedex-stat--regions .pw-text:last-child {
+  color: var(--pw-text-primary);
+  font-weight: 900;
+}
+
+.pw-card-dark .pw-text-lg {
+  font-size: 16px;
+  font-weight: 800;
+}

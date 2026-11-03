@@ -7,6 +7,8 @@
 
 import { Engine } from './core/Engine.js';
 import { SaveLifecycle } from './ui/SaveLifecycle.js';
+import { installTutorialHighlight } from './ui/TutorialHighlight.js';
+import { installDungeonKeyboard } from './ui/DungeonKeyboard.js';
 import { FacilityStaffSystem } from './systems/FacilityStaffSystem.js';
 import { FacilityManagementSystem } from './systems/FacilityManagementSystem.js';
 import { FacilityPokemonSelectionSystem } from './systems/FacilityPokemonSelectionSystem.js';
@@ -31,6 +33,7 @@ import { DungeonAutoSystem } from './systems/DungeonAutoSystem.js';
 import { DungeonSystem } from './systems/DungeonSystem.js';
 import { TeamSystem } from './systems/TeamSystem.js';
 import { BoxSystem } from './systems/BoxSystem.js';
+import { EvolutionSystem } from './systems/EvolutionSystem.js';
 import { PokemonUsageSystem } from './systems/PokemonUsageSystem.js';
 import { TeamBoxTransferSystem } from './systems/TeamBoxTransferSystem.js';
 import { TeamPresetEditSystem } from './systems/TeamPresetEditSystem.js';
@@ -63,7 +66,7 @@ import { GameConfig } from './config/GameConfig.js';
 window.addEventListener('DOMContentLoaded', () => {
   const root = document.getElementById('app-root');
   if (!root) {
-    console.error(t('debug_root_missing'));
+    console.error(String(t('debug_root_missing')));
     return;
   }
 
@@ -77,7 +80,7 @@ window.addEventListener('DOMContentLoaded', () => {
     animationPreferences: preferences.getAnimationPreferences()
   });
 
-  console.log(t('debug_engine_boot', { version: GameConfig.VERSION }));
+  console.log(String(t('debug_engine_boot', { version: GameConfig.VERSION })));
 
   // 2. Engine and systems
   const engine = Engine.getInstance();
@@ -102,6 +105,7 @@ window.addEventListener('DOMContentLoaded', () => {
   engine.registerSystem('PokemonUsageSystem', PokemonUsageSystem.getInstance());
   engine.registerSystem('TeamSystem', TeamSystem.getInstance());
   engine.registerSystem('BoxSystem', BoxSystem.getInstance());
+  engine.registerSystem('EvolutionSystem', EvolutionSystem.getInstance());
   engine.registerSystem('TeamBoxTransferSystem', TeamBoxTransferSystem.getInstance());
   engine.registerSystem('TeamPresetSystem', TeamPresetSystem.getInstance());
   engine.registerSystem('TeamPresetEditSystem',TeamPresetEditSystem.getInstance());
@@ -159,9 +163,13 @@ window.addEventListener('DOMContentLoaded', () => {
   // 3. Overlays living above every page
   AppShell.mountOverlay(new NotificationCenterView());
 
+  // 3b. Guided tutorial halo: points at the control the current step asks for.
+  installTutorialHighlight();
+  installDungeonKeyboard();
+
   // 4. Pages (composition root) and first screen
   registerAllPages(engine.getPageManager());
   engine.getPageManager().openPage(PageIds.SAVE_MENU);
 
-  console.log(t('debug_engine_ready'));
+  console.log(String(t('debug_engine_ready')));
 });

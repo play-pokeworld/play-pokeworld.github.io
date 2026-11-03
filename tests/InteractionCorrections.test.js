@@ -1,4 +1,5 @@
 /** @file InteractionCorrections.test.js @brief Real gesture contracts, explicit legacy receipts and minimal live combat controls. */
+import { readBundle } from './CssBundle.js';
 import fs from 'node:fs';
 import { describe, assert } from './TestRunner.js';
 import { fakeEvent } from './FakeDom.js';
@@ -481,10 +482,7 @@ describe('Only the useful Auto switch in combat', (test) => {
     battle.endBattle(false);
   });
   test('battle geometry uses the container width and normal growing page flow, not clipping or fixed action offsets', () => {
-    const css = fs.readFileSync(
-      new URL('../assets/css/battle-responsive.css', import.meta.url),
-      'utf8',
-    );
+    const css = readBundle();
     assert.ok(css.includes('@container pw-battle'));
     assert.ok(css.includes('grid-template-columns: minmax(0, 1fr)'));
     assert.ok(css.includes('overflow: visible'));

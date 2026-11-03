@@ -174,11 +174,22 @@ separate so one-time rewards cannot be duplicated.
   by `PokemonFactory.create(species, level, options)` only. `unlockedMoves` persists the CT/CS
   unlocks separately from the active `moves` slots; `favorite` and `locked` are collection flags.
   `MoveLearningSystem` equips a learnable move through `TeamSystem` or `BoxSystem`, after which
-  battle uses the stored active slots.
+  battle uses the stored active slots. `evolvedTargets` stores the species this individual already
+  produced through an evolution (see `EvolutionSystem`).
+- `EvolutionSystem` is the only owner of evolution effects (level based and item based). It never
+  transforms a Pokémon: the source keeps its species, level, talent and moves, and the evolved
+  species is registered as a NEW Pokémon at level 1 (`PokemonFactory.create(target, 1)`, shiny
+  inherited, Pokédex caught) through `BoxSystem.addPokemon`. `PokemonData.evolvedTargets` records
+  the species already produced by that individual, so one Pokémon produces a given target once and
+  a check can never flood the box; it is persisted with the Pokémon. `PokemonData.getPendingLevelEvolutions()`
+  reads `species.evolutions[]` (`level`, optional `split`, optional `condition` on IVs) and the
+  item path (`item` + optional `minLevel`); targets from a locked region stay pending. Callers are
+  the battle experience path, the daycare, Rare Candy and the training levels. The information
+  sheet, the bag stone view and the PC filters all read the same data.
 - `ItemUseSystem` owns supported bag effects without DOM access: CT/CS unlocks, Rare Candy, the six
-  Kanto vitamins (+1 random EV within the configured caps), and item-based evolutions. Each valid
-  use and each move-slot change is one save operation; invalid uses consume nothing. `ItemTargetModal`
-  and `PokemonMoveLearningModal` provide the localized UI.
+  Kanto vitamins (+1 random EV within the configured caps), and item-based evolutions (delegated to
+  `EvolutionSystem`). Each valid use and each move-slot change is one save operation; invalid uses
+  consume nothing. `ItemTargetModal` and `PokemonMoveLearningModal` provide the localized UI.
 - `InventoryData` ignores unknown item ids. Granted items go through `grantItem()`
   (`systems/inventory/ItemGrant.js`): `ItemStacking` caps held / categorized items at 25 copies and
   pays the overflow in money (10 % of the price), as the original `grantRewardItem`.

@@ -63,10 +63,9 @@ export class LocationPanel extends DraggablePanel {
       name: 'LocationPanel'
     });
 
-    const infoTab = new UIButton({ className: 'tab', text: t('tab_info') });
-    infoTab.setActive(true);
-    this.addChild(new UIContainer({ id: 'tabs', className: 'pw-static-050 pw-win-tabs', children: [infoTab] }));
-
+    // No tab strip: the window has a single view, and its title already says « Lieu ». The old
+    // `#tabs` bar only repeated that word above the location name (it was meant to be hidden by
+    // `.pw-win-tabs`, but the legacy `.pw-static-050` rule won the cascade and it rendered anyway).
     this._content = new UIContainer({ id: 'tab-content', className: 'win-body pw-static-051' });
     this.addChild(this._content);
     this._alcoves=new LocationAlcoves();this._content.addChild(this._alcoves);this._info=null;
@@ -94,9 +93,12 @@ export class LocationPanel extends DraggablePanel {
     const locations = LocationDB.getInstance();
     const location = locations.getById(locationId);
     const locationTitle = location ? t(`location.${locationId}`) : t('tab_info');
-    this.setTitle(locationTitle);
+    // The window title never changes: it names the window (« Lieu »), not the place. The place
+    // itself is the first box of the body, so it stays readable and searchable in one spot.
+    this.setTitle(t('tab_info'));
     const encounters = locations.getEncountersForGroup(locationId);
-    const roamingSpecies = RoamingRules.ROAMING_ENABLED ? RoamingSystem.getSpeciesAt(locationId) : null;
+    // RoamingSystem returns null on its own when the feature is switched off.
+    const roamingSpecies = RoamingSystem.getSpeciesAt(locationId);
     this._roamingSpeciesId = roamingSpecies;
     const save = SaveSystem.getInstance().getCurrentSave();
     const pokedex = save?.pokedex ?? null;
@@ -188,7 +190,7 @@ export class LocationPanel extends DraggablePanel {
       wildSection = new UIContainer({
         className: 'pw-loc-wild-section',
         children: [
-          new UIText({ tagName: 'div', className: 'pw-loc-section-title', text: t('loc_wild_pokemon') }),
+          new UIText({ tagName: 'div', className: 'pw-section-title', text: t('loc_wild_pokemon') }),
           new UIContainer({ className: 'pw-loc-wild-meta', children: wildMeta }),
           LocationPanel._wildGrid(encounters, pokedex, roamingSpecies)
         ]
@@ -225,7 +227,7 @@ export class LocationPanel extends DraggablePanel {
   /** @private @param {number} [now=Date.now()] */
   _updateRoamingCountdown(now = Date.now()) {
     const locationId = LocationSystem.getInstance().getCurrentLocationId();
-    const activeSpecies = RoamingRules.ROAMING_ENABLED ? RoamingSystem.getSpeciesAt(locationId, now) : null;
+    const activeSpecies = RoamingSystem.getSpeciesAt(locationId, now);
     const rotationWindow = RoamingSystem.getRotationWindow(now);
     if (activeSpecies !== this._roamingSpeciesId || (this._mirageTimerText && rotationWindow !== this._mirageRotationWindow)) {
       this._render();
@@ -551,7 +553,7 @@ export class LocationPanel extends DraggablePanel {
     return new UIContainer({
       className: 'pw-loc-drops-section',
       children: [
-        new UIText({ tagName: 'div', className: 'pw-loc-section-title', text: t('drop_items_lbl') }),
+        new UIText({ tagName: 'div', className: 'pw-section-title', text: t('drop_items_lbl') }),
         grid
       ]
     });

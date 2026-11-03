@@ -1,0 +1,332 @@
+/*
+ * components/ui-panel.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.pw-ui-window {
+  background: var(--pw-bg-surface);
+  color: var(--pw-text-primary);
+  border-radius: var(--pw-radius-md);
+  border: 2px solid var(--pw-border-color);
+}
+
+.pw-ui-panel, .pw-panel {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+  color: var(--pw-text-primary) !important;
+}
+
+.pw-ui-window-footer {
+  margin: 0 !important;
+  padding: 12px 16px !important;
+  background: var(--pw-bg-header) !important;
+  border-bottom: 1px solid var(--pw-border-color) !important;
+  color: var(--pw-text-primary) !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.pw-ui-window-footer {
+  border-bottom: none !important;
+  border-top: 1px solid var(--pw-border-color) !important;
+  margin-top: 12px !important;
+}
+
+#poke-modal-inner.pw-panel--modal-window {
+  width: min(1120px, calc(100vw - 40px)) !important;
+  max-width: min(1120px, calc(100vw - 40px)) !important;
+  max-height: 85vh !important;
+  height: 85vh !important;
+  min-height: 0 !important;
+  margin: auto !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  border-radius: 16px !important;
+  border: 1px solid var(--pw-border-color) !important;
+  background-color: var(--pw-bg-surface, var(--dark2)) !important;
+  box-shadow: var(--pw-shadow-lg) !important;
+}
+
+#poke-modal-inner.pw-panel--modal-window > .pw-pokemon-info-body {
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  padding: 14px 16px !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+.pw-panel {
+  background:var(--dark2);
+  border-radius:8px;
+  padding:10px;
+  margin-bottom:10px;
+}
+
+.pw-panel {
+  background: var(--dark2);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.pw-panel-title {
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--light2);
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.pw-panel {
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius);
+  background: var(--pw-surface);
+  box-shadow: var(--pw-shadow);
+  color: var(--light2);
+}
+
+.pw-ui-btn {
+  background: var(--pw-btn-bg) !important;
+  color: var(--pw-btn-text) !important;
+  border: 1px solid var(--pw-btn-border) !important;
+}
+
+.pw-ui-btn:hover {
+  background: var(--pw-btn-bg-hover) !important;
+}
+
+.pw-ui-btn.active {
+  background: var(--pw-btn-active-bg) !important;
+  color: var(--pw-btn-active-text) !important;
+  border-color: var(--pw-btn-active-bg) !important;
+}
+
+.pw-ui-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  color: var(--pw-text-primary);
+}
+
+.pw-ui-toggle-input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.pw-ui-toggle-track {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  flex: none;
+  border-radius: 999px;
+  background: var(--pw-bg-surface);
+  border: 1px solid var(--pw-border-color);
+  transition: background 0.15s ease;
+}
+
+.pw-ui-toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--pw-text-secondary);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.pw-ui-toggle-input:checked + .pw-ui-toggle-track {
+  background: var(--pw-accent-color);
+}
+
+.pw-ui-toggle-input:checked + .pw-ui-toggle-track::after {
+  transform: translateX(18px);
+  background: var(--pw-bg-header);
+}
+
+.pw-ui-toggle-input:disabled + .pw-ui-toggle-track {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+
+/* STRICT ERGONOMIC RULE — an unusable control is never displayed: disabled buttons vanish entirely (display:none), they do not grey out. */
+.pw-ui-btn[disabled] {
+  display: none !important;
+}
+
+.pw-panel {
+  background: var(--pw-surface);
+  border: 1px solid var(--pw-border-color);
+  border-radius: 10px;
+  padding: 12px;
+  color: var(--pw-text-primary);
+}
+
+.pw-panel--soft {
+  background: var(--pw-surface-soft);
+}
+
+.pw-panel--ghost {
+  background: transparent;
+  border-color: transparent;
+}
+
+.pw-panel-title {
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--pw-text-primary);
+}
+
+#poke-modal.preset-editor-modal #poke-modal-inner:has(.pw-panel-shell), #poke-modal #poke-modal-inner:has(.pw-panel-shell) {
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden !important;
+  padding: 0 !important;
+}
+
+.pw-panel-shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+  gap: 0;
+}
+
+.pw-panel-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 20px 20px;
+}
+
+.pw-panel-foot {
+  flex: none;
+  position: static !important;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  margin: 0 !important;
+  padding: 10px 20px !important;
+  background: var(--pw-bg-header) !important;
+  border-top: 1px solid var(--pw-border-color);
+}
+
+.pw-panel-shell .preset-pick-list {
+  max-height: none;
+  overflow: visible;
+}
+
+.pw-panel {
+  background-color: var(--pw-bg-surface);
+  border: 1px solid var(--pw-border-color);
+  border-radius: var(--pw-radius-md);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--pw-shadow-sm);
+  transition: border-color 0.15s ease;
+}
+
+.pw-panel-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pw-panel-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pw-panel-title {
+  font-size: var(--pw-font-size-sm);
+  font-weight: 700;
+  color: var(--pw-accent-gold);
+  text-transform: none;
+  letter-spacing: 0.3px;
+}
+
+.pw-panel-body {
+  padding: 12px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.pw-panel--accent-gold {
+  border-color: var(--pw-accent-gold);
+}
+
+.pw-panel--dense .pw-panel-body {
+  padding: 8px;
+}
+
+.pw-panel--modal-window {
+  width: 100%;
+  max-width: 620px;
+  max-height: 88vh;
+  box-shadow: var(--pw-shadow-lg);
+  border: 1px solid var(--pw-border-color);
+  border-radius: 16px;
+  background-color: var(--pw-bg-surface);
+  backdrop-filter: blur(12px);
+  animation: modalScaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.pw-panel--modal-window.pw-pokemon-info-window, #poke-modal-inner.pw-panel--modal-window {
+  width: min(1120px, calc(100vw - 40px)) !important;
+  max-width: min(1120px, calc(100vw - 40px)) !important;
+  height: 85vh !important;
+  max-height: 85vh !important;
+  min-height: 0 !important;
+  border: 1px solid var(--pw-border-color);
+  border-radius: 14px;
+  background: var(--pw-surface);
+  box-shadow: var(--pw-shadow);
+  backdrop-filter: none;
+}
+
+@media (max-width: 600px) {
+.pw-panel--modal-window.pw-pokemon-info-window, #poke-modal-inner.pw-panel--modal-window {
+  width: min(560px, calc(100vw - 24px)) !important;
+  max-width: calc(100vw - 24px) !important;
+  height: min(85vh, 720px) !important;
+  max-height: 85vh !important;
+}
+
+}
+
+.pw-panel--modal-window.pw-pokedex-species-window {
+  width: min(960px, calc(100vw - 24px));
+  max-width: 960px;
+  height: min(88vh, 820px);
+  max-height: 88vh;
+  box-sizing: border-box;
+}

@@ -4,7 +4,8 @@
  * Same entry format as src/data/raw/species-data.js (SPECIES_TABLE); an entry with an existing id replaces the generated one.
  */
 export const SPECIES_CONTENT = {
-  // Link Stone replaces the four Kanto trade evolutions; the legacy content uses level 40.
+  // The four Kanto trade evolutions are plain level 40 evolutions, exactly like the reference
+  // (the Link Stone is not involved: it is unused there too).
   kadabra: {
     dex: 64,
     region: 'kanto',
@@ -14,7 +15,7 @@ export const SPECIES_CONTENT = {
     xpYield: 60,
     talents: ['psychicguard', 'insomnia', 'immunity', 'limber', 'owntempo', 'mistify', 'wonderskin', 'synchronize', 'strangecharm', 'naturalcure', 'technician', 'unaware', 'magicguard', 'psychicabsorb', 'pixiepelt', 'strategist', 'adaptability', 'ambidextrous', 'noguard', 'libero', 'flashpsycha'],
     hiddenTalent: 'magicguard',
-    evolutions: [{ to: 'alakazam', item: 'link_stone', minLevel: 40 }]
+    evolutions: [{ to: 'alakazam', level: 40 }]
   },
   machoke: {
     dex: 67,
@@ -25,7 +26,7 @@ export const SPECIES_CONTENT = {
     xpYield: 60,
     talents: ['grabguard', 'insomnia', 'immunity', 'limber', 'owntempo', 'resolve', 'wonderskin', 'synchronize', 'naturalcure', 'technician', 'scrappy', 'unaware', 'ironfist', 'dauntinglook', 'unburden', 'adaptability', 'ambidextrous', 'noguard', 'justified'],
     hiddenTalent: 'guts',
-    evolutions: [{ to: 'machamp', item: 'link_stone', minLevel: 40 }]
+    evolutions: [{ to: 'machamp', level: 40 }]
   },
   graveler: {
     dex: 75,
@@ -36,7 +37,7 @@ export const SPECIES_CONTENT = {
     xpYield: 60,
     talents: ['sandveil', 'rockguard', 'groundguard', 'insomnia', 'immunity', 'limber', 'owntempo', 'solid', 'wonderskin', 'synchronize', 'sandforce', 'naturalcure', 'technician', 'unaware', 'brittlearmor', 'sandypelt', 'sandrush', 'sheerforce', 'adaptability', 'ambidextrous', 'noguard', 'filter'],
     hiddenTalent: 'stoned',
-    evolutions: [{ to: 'golem', item: 'link_stone', minLevel: 40 }]
+    evolutions: [{ to: 'golem', level: 40 }]
   },
   haunter: {
     dex: 93,
@@ -47,6 +48,6 @@ export const SPECIES_CONTENT = {
     xpYield: 60,
     talents: ['poisonguard', 'insomnia', 'immunity', 'limber', 'owntempo', 'hexerei', 'noxious', 'wonderskin', 'synchronize', 'poisonpoint', 'naturalcure', 'technician', 'unaware', 'poisonabsorb', 'blackpelt', 'intimidate', 'adaptability', 'ambidextrous', 'noguard', 'flashvenum'],
     hiddenTalent: 'levitate',
-    evolutions: [{ to: 'gengar', item: 'link_stone', minLevel: 40 }]
+    evolutions: [{ to: 'gengar', level: 40 }]
   }
 };

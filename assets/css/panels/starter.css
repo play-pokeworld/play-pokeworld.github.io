@@ -1,0 +1,401 @@
+/*
+ * panels/starter.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.starter-card {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+  color: var(--pw-text-primary) !important;
+}
+
+#starter-modal-inner {
+  background: var(--dark2);
+  border: 1px solid var(--dark3);
+  border-radius: 14px;
+  padding: 22px;
+  width: min(96vw, 980px);
+  max-width: none;
+  max-height: 90vh;
+  overflow-y: auto;
+  color: var(--light2);
+}
+
+.starter-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  margin-bottom: 10px;
+  background: var(--light1);
+  border-left: 4px solid var(--accent);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.starter-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.pw-starter-actions {
+  display:flex;
+  gap:10px;
+  margin-top:16px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+.pw-starter-grid {
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  padding:16px;
+}
+
+.pw-starter-card {
+  position:relative;
+  cursor:pointer;
+}
+
+.pw-starter-orb {
+  width:72px;
+  height:72px;
+  border-radius:50%;
+  background:var(--light1);
+  border:2px solid var(--dark1);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+}
+
+.pw-starter-level {
+  position:absolute;
+  top:-8px;
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--dark1);
+  color:var(--light2);
+  font-size:13px;
+  font-weight:bold;
+  padding:2px 8px;
+  border-radius:10px;
+}
+
+.pw-starter-chosen {
+  background:var(--light1);
+  border:2px solid var(--dark1);
+  cursor:pointer;
+}
+
+.pw-starter-chosen-label {
+  color:var(--dark1);
+  font-weight:500;
+}
+
+.pw-starter-chosen-level {
+  background:var(--dark1);
+  color:var(--light2);
+  font-weight:bold;
+  padding:4px 10px;
+  border-radius:12px;
+  min-width:45px;
+  text-align:center;
+}
+
+.starter-card {
+  cursor: pointer;
+  background: var(--light1);
+}
+
+.starter-card--custom {
+  background: rgba(0,0,0,0.13);
+  border-left: 4px solid var(--starter-color, var(--accent));
+}
+
+.starter-choose-btn {
+  background: var(--starter-color, var(--accent));
+  color: white;
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: bold;
+  align-self: center;
+}
+
+.pw-starter-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.pw-starter-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px;
+}
+
+.pw-starter-card {
+  position: relative;
+  cursor: pointer;
+}
+
+.pw-starter-orb {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--light1);
+  border: 2px solid var(--dark1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.pw-starter-level {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--dark1);
+  color: var(--light2);
+  font-size: 13px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.pw-starter-chosen {
+  background: var(--light1);
+  border: 2px solid var(--dark1);
+  cursor: pointer;
+}
+
+.pw-starter-chosen-label {
+  color: var(--dark1);
+  font-weight: 500;
+}
+
+.pw-starter-chosen-level {
+  background: var(--dark1);
+  color: var(--light2);
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 12px;
+  min-width: 45px;
+  text-align: center;
+}
+
+
+/* NB: .save-slot is EXCLUDED — save cards carry their own themed background (save-bg-classic/emerald/…) which must stay visible in the settings preview as in the saves menu. */
+.pw-starter-chosen, .pw-starter-card {
+  background: rgba(0, 0, 0, 0.28) !important;
+  border: 1px solid var(--pw-border) !important;
+  color: var(--light2) !important;
+}
+
+.pw-starter-chosen:hover, .pw-starter-card:hover {
+  background: rgba(236, 222, 183, 0.15) !important;
+  border-color: var(--light2) !important;
+  color: var(--light2) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.pw-starter-chosen-label {
+  color: var(--light2) !important;
+  font-weight: 700;
+}
+
+.starter-card {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid rgba(236,222,183,0.22) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+  color: var(--pw-text-primary) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.starter-card:hover {
+  border-color: var(--pw-text-primary) !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.6) !important;
+  transform: translateY(-2px) !important;
+  color: var(--pw-text-primary) !important;
+}
+
+#starter-modal, #starter-modal-inner {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+#starter-modal-inner * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+#starter-modal-inner {
+  max-width: 96vw !important;
+  max-height: 90vh !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-y: auto !important;
+  transform-origin: center center !important;
+}
+
+}
+
+@media (max-width: 480px) {
+#starter-modal-inner {
+  transform: scale(0.92) !important;
+  width: 108% !important;
+  margin-left: -4% !important;
+}
+
+}
+
+#starter-modal {
+  z-index: 1200;
+}
+
+.starter-modal-window {
+  width: min(96vw, 980px);
+  max-width: none;
+  max-height: 90vh;
+  overflow-y: auto;
+  color: var(--light2);
+}
+
+.starter-welcome {
+  margin-bottom: 6px;
+}
+
+.starter-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.starter-name-field {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  margin: 14px auto 6px;
+  width: min(100%, 360px);
+}
+
+.starter-name-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--light2);
+}
+
+.starter-name-error {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--red);
+}
+
+.starter-cards-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0 10px;
+}
+
+.starter-cards-stack .starter-card {
+  margin-bottom: 0;
+}
+
+.starter-choose-label {
+  align-self: center;
+}
+
+.starter-back-btn {
+  flex: none;
+  min-width: var(--pw-starter-back-w, 96px);
+}
+
+.pw-starter-modal-body {
+  background: var(--dark2, #444138);
+  border: 1px solid var(--dark3, #524f48);
+  border-radius: 14px;
+  padding: 24px;
+  width: min(96vw, 920px);
+  max-height: 90vh;
+  overflow-y: auto;
+  color: var(--light2, #ecdeb7);
+  box-sizing: border-box;
+}
+
+.pw-starter-title-block {
+  text-align: center;
+  margin: 4px 0 18px 0;
+}
+
+.pw-starter-welcome {
+  text-align: center;
+  color: var(--light1, #c9bc9c);
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.pw-starter-name-box {
+  margin: 0 auto 22px auto;
+  max-width: 440px;
+  text-align: left;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(236, 222, 183, 0.25);
+  border-radius: 10px;
+  padding: 12px 16px;
+}
+
+.pw-starter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.pw-starter-card {
+  cursor: pointer;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-radius: 12px;
+  background: var(--pw-bg-surface, rgba(37, 37, 34, 0.95));
+  border: 1px solid rgba(236, 222, 183, 0.22);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.pw-starter-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  border-color: var(--accent, #ffa500);
+}
+
+.pw-starter-card.is-bulbasaur {
+  border-left: 4px solid #60be58;
+}
+
+.pw-starter-card.is-charmander {
+  border-left: 4px solid #fba64c;
+}
+
+.pw-starter-card.is-squirtle {
+  border-left: 4px solid #539ddf;
+}

@@ -1,0 +1,14 @@
+/*
+ * core/scrollbars.css
+ * ---------------------------------------------------------------------------
+ * Scrollbar styling for the page scroller and the nested scroll regions.
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+@media (max-width: 850px), (pointer: coarse) {
+.pw-tabs-nav::-webkit-scrollbar {
+  display: none !important;
+}
+
+}

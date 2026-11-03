@@ -1,0 +1,741 @@
+/*
+ * panels/quests.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.upgrade-card {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+  color: var(--pw-text-primary) !important;
+}
+
+.repeatable-upgrade-head {
+  margin: 0 !important;
+  padding: 12px 16px !important;
+  background: var(--pw-bg-header) !important;
+  border-bottom: 1px solid var(--pw-border-color) !important;
+  color: var(--pw-text-primary) !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+#quest-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 700;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+#quest-modal.open {
+  display: flex;
+}
+
+#quest-inner {
+  background: var(--dark2);
+  border: 1px solid var(--dark3);
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  color: var(--light2);
+}
+
+#quest-inner * {
+  color: var(--light2);
+}
+
+.qcard-progress, .quest-reward, .qr-title, .am-type {
+  font-size: 11px;
+}
+
+.upgrade-card {
+  font-family: 'Winky Sans', 'Segoe UI', system-ui, sans-serif !important;
+}
+
+.quest-status {
+  font-size: 13px;
+  font-weight: bold;
+  margin: 2px 0 6px;
+}
+
+.quest-status.is-done {
+  color: var(--green);
+}
+
+.quest-status:not(.is-done) {
+  color: var(--light2);
+}
+
+.quest-progress-container {
+  width: 100%;
+}
+
+.quest-progress-bar {
+  height: 100%;
+  transition: width 0.3s;
+}
+
+.quest-progress-bar.is-done {
+  background: var(--green);
+}
+
+.quest-progress-bar:not(.is-done) {
+  background: var(--light2);
+}
+
+.quest-claim-btn {
+  width: 100%;
+  padding: 6px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.quest-claim-btn.is-done {
+  background: var(--green);
+  border: 1px solid #388e3c;
+  cursor: pointer;
+  opacity: 1;
+}
+
+.quest-claim-btn.is-done-reward-poke {
+  background: var(--accent);
+  border: 1px solid #388e3c;
+}
+
+.repeatable-upgrade-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(236,222,183,0.22);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.18);
+  color: var(--light2);
+  margin-bottom: 10px;
+}
+
+.repeatable-upgrade-head span {
+  color: var(--light1);
+  font-size: 12px;
+}
+
+.mine-tool-upgrade-card {
+  border: 1px solid var(--dark3);
+  border-radius: 10px;
+  background: rgba(0,0,0,0.18);
+  padding: 9px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--light2);
+  min-height: 0;
+}
+
+.mine-tool-upgrade-card span {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.upgrade-card {
+  min-height: 76px;
+  border: 1px solid rgba(236,222,183,0.22);
+  border-radius: 14px;
+  background: rgba(0,0,0,0.22);
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.upgrade-card > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.upgrade-card b {
+  color: var(--light2);
+  font-weight: 900;
+}
+
+.upgrade-card span {
+  color: var(--light1);
+  font-size: 12px;
+}
+
+.upgrade-card.is-owned {
+  border-color: rgba(96,190,88,0.62);
+}
+
+.upgrade-card .hbtn {
+  white-space: normal;
+  line-height: 1.15;
+  min-width: 96px;
+  max-width: 180px;
+  text-align: center;
+}
+
+.quest-progress-container {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--dark1);
+  border: 1px solid var(--pw-border-color);
+  overflow: hidden;
+}
+
+.quest-progress-container .quest-progress-bar {
+  height: 100%;
+  width: var(--pct, 0%);
+  background: var(--light2);
+  border-radius: 999px;
+  transition: width .25s ease, background .2s ease;
+}
+
+.quest-progress-container .quest-progress-bar.is-done {
+  background: var(--green);
+}
+
+buttonbutton.quest-claim-btn.is-done:not(.is-challenge) {
+  cursor: pointer;
+  opacity: 1;
+}
+
+#quest-inner {
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius);
+  background: var(--pw-surface);
+  box-shadow: var(--pw-shadow);
+  color: var(--light2);
+}
+
+#quest-modal {
+  backdrop-filter: blur(3px);
+}
+
+.quest-claim-btn {
+  color: var(--dark1) !important;
+  font-weight: 900;
+}
+
+.upgrade-card {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid rgba(236,222,183,0.22) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+  color: var(--pw-text-primary) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.upgrade-card:hover {
+  border-color: var(--pw-text-primary) !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.6) !important;
+  transform: translateY(-2px) !important;
+  color: var(--pw-text-primary) !important;
+}
+
+#quest-inner {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+#quest-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 16px 20px;
+}
+
+#quest-footer {
+  flex: none;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 10px 20px;
+  background: var(--pw-bg-header);
+  border-top: 1px solid var(--pw-border-color);
+  margin: 0;
+}
+
+#quest-footer:empty {
+  display: none;
+}
+
+#quest-body .quest-board-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  margin: 0 0 10px;
+}
+
+
+/* Owned/maxed upgrade state is an INFORMATIONAL row, never a button. */
+.upgrade-card .upgrade-card-state {
+  color: var(--light1);
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+
+/* DS2810 — scroll a modal from ANYWHERE + gold shiny toggle ──────────────────────────────────────────────────────────────────────── 1) Wheel dead zones: the modal backdrops themselves can now scroll and the inner panel uses AUTO vertical margins — it stays centred when it fits, and becomes fully reachable (top included) when the viewport is shorter than the panel (the old flex centreing clipped the top of tall panels). Together with the bridge wheel relay, the scroll works over the whole screen, not only above the panel. 2) The shiny toggle ON colour is GOLD #F5C242 (rule lives with the other toggle colours in DS2809 — see above). */
+#quest-modal {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+#quest-inner {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.auto-move .am-bar-fill {
+  background: var(--type-color, var(--dark1));
+}
+
+.auto-move .am-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.auto-move .am-type {
+  background: var(--type-color);
+  color: var(--type-text, #fff);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-weight: bold;
+  text-shadow: none;
+}
+
+.auto-move .am-bar-bg {
+  height: 7px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--type-color, #777) 22%, rgba(0, 0, 0, 0.55));
+  overflow: hidden;
+}
+
+.auto-move .am-bar-fill {
+  height: 100%;
+  background: var(--type-color, var(--dark1));
+}
+
+.quest-claim-btn.is-challenge:hover {
+  filter: brightness(1.08);
+}
+
+.pw-quest-card {
+  display: grid;
+  gap: 8px;
+}
+
+.pw-quest-card-title {
+  font-weight: 900;
+  font-size: 13px;
+  color: var(--pw-text-primary);
+}
+
+.pw-quest-card-desc {
+  line-height: 1.5;
+}
+
+.pw-quest-reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  justify-self: start;
+  border: 1px solid color-mix(in srgb, var(--pw-text-primary) 26%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pw-text-primary) 7%, transparent);
+  padding: 4px 10px;
+  font-size: 12.5px;
+  color: var(--pw-text-secondary);
+}
+
+.pw-quest-info-line {
+  font-style: italic;
+}
+
+.pw-quest-section {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 900;
+  font-size: 13px;
+  margin: 10px 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--pw-border-color);
+  color: var(--pw-text-primary);
+}
+
+.pw-quest-section.is-blue {
+  color: var(--blue);
+}
+
+.pw-quest-section.is-accent {
+  color: var(--accent);
+}
+
+.pw-quest-hint {
+  font-size: 12px;
+  color: var(--pw-text-secondary);
+  text-align: center;
+  padding: 8px;
+  background: color-mix(in srgb, var(--pw-text-primary) 7%, transparent);
+  border-radius: 6px;
+}
+
+#quest-modal {
+  z-index: 1200;
+}
+
+.pw-quest-offer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: 14px;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+#quest-modal {
+  align-items: flex-start;
+  padding-top: 6px;
+}
+
+#quest-inner {
+  margin-top: 0 !important;
+}
+
+}
+
+.quest-progress-container {
+  height: 8px !important;
+  border-radius: 999px !important;
+  background: var(--dark1) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  overflow: hidden !important;
+  width: 100% !important;
+}
+
+.quest-progress-container .quest-progress-bar,
+.quest-progress-bar {
+  height: 100% !important;
+  width: var(--pct, 0%);
+  border-radius: 999px !important;
+  transition: width .3s ease, background .3s ease !important;
+}
+
+.quest-progress-bar.is-done,
+.quest-progress-container .quest-progress-bar.is-done {
+  background: var(--green) !important;
+}
+
+.quest-progress-bar:not(.is-done),
+.quest-progress-container .quest-progress-bar:not(.is-done) {
+  background: var(--blue) !important;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+.quest-card, .pw-quest-item {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+#quest-inner {
+  max-width: 96vw !important;
+  max-height: 90vh !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-y: auto !important;
+  transform-origin: center center !important;
+}
+
+}
+
+.pw-quest-offer-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+
+.quest-board .upgrade-card {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 10px 2px !important;
+  min-height: 0 !important;
+  align-items: flex-start !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  border-bottom: 1px solid var(--dark3) !important;
+}
+
+.pw-story-quest-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.pw-quest-objective {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pw-quest-objective-text {
+  margin: 0;
+}
+
+.pw-quest-objective.is-trainer {
+  margin: 6px 0;
+}
+
+.pw-quest-objective.is-trainer .pw-quest-objective-text {
+  color: var(--light2);
+  font-weight: 900;
+}
+
+.pw-story-repeatable-action {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 9px;
+}
+
+.pw-story-repeatable-hint {
+  color: var(--light1, #c9bc9c);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.pw-repeatable-board {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: calc(88vh - 68px);
+  overflow-y: auto;
+  padding: 14px 16px;
+}
+
+.pw-repeatable-board-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--pw-border-color);
+  border-radius: 10px;
+  background: var(--pw-bg-header);
+}
+
+.pw-repeatable-board-head-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pw-repeatable-board-slots {
+  color: var(--pw-text-primary);
+  font-weight: 800;
+}
+
+.pw-repeatable-board-timer {
+  color: var(--pw-text-secondary);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pw-repeatable-board-intro {
+  color: var(--pw-text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.pw-repeatable-board-section {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.pw-repeatable-board-offers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: 12px;
+}
+
+.pw-repeatable-offer-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+  min-width: 0;
+  padding: 12px;
+}
+
+.pw-repeatable-offer-heading {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.pw-repeatable-offer-heading .pw-quest-card-title {
+  font-size: 14px;
+}
+
+.pw-repeatable-offer-icon {
+  color: var(--green, #70d060);
+}
+
+.pw-repeatable-offer-card .pw-quest-card-desc {
+  line-height: 1.45;
+}
+
+.pw-repeatable-offer-card .pw-quest-rewards {
+  width: 100%;
+}
+
+.pw-repeatable-offer-accept {
+  align-self: flex-start;
+}
+
+.pw-repeatable-slots-full {
+  margin-top: 2px;
+}
+
+.pw-repeatable-board-active {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pw-repeatable-board-active .pw-quest-card {
+  margin: 0;
+}
+
+.pw-repeatable-board-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.pw-repeatable-board-actions .pw-button {
+  min-width: 140px;
+}
+
+.pw-repeatable-upgrade-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.pw-repeatable-upgrade-current {
+  padding: 10px 12px;
+  border: 1px solid var(--pw-border-color);
+  border-radius: 9px;
+  background: var(--pw-bg-header);
+}
+
+.pw-repeatable-upgrade-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (max-width: 520px) {
+.pw-repeatable-board {
+  padding: 10px;
+}
+
+.pw-repeatable-board-head {
+  align-items: stretch;
+}
+
+.pw-repeatable-board-head > .pw-button {
+  width: 100%;
+}
+
+.pw-repeatable-board-actions {
+  flex-direction: column;
+}
+
+.pw-repeatable-board-actions .pw-button {
+  width: 100%;
+}
+
+}
+
+.pw-quest-rewards {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  min-width: 0;
+}
+
+.pw-quest-reward-entry {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  color: var(--light2);
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.pw-quest-reward-icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  object-fit: contain;
+}
+
+.pw-quest-reward-pokemon {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+}
+
+.pw-quest-reward-name {
+  color: var(--light2);
+  font-weight: 700;
+}
+
+.pw-quest-reward-quantity,
+.pw-quest-reward-level {
+  color: var(--light1);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

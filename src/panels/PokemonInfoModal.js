@@ -454,7 +454,7 @@ export class PokemonInfoModal extends UIModal {
         : TeamSystem.getInstance().getTeam()[this._teamIndex];
     if (!pokemon) {
       this.setTitle(t('pokemon_info_title'));
-      this.addChild(new UIText({ tagName: 'p', className: 'poke-detail-empty', text: t('pokemon_info_no_pokemon') }));
+      this.addChild(new UIText({ tagName: 'p', className: 'pw-empty-state is-sm', text: t('pokemon_info_no_pokemon') }));
       this._restoreRenderState(renderState);
       return;
     }
@@ -588,25 +588,24 @@ export class PokemonInfoModal extends UIModal {
       for (const evo of species.evolutions) {
         const targetName = t(`pokemon.${evo.to}`);
         const requiredLevel = evo.level ?? evo.minLevel;
+        let richText;
         if (requiredLevel && !evo.item) {
-          evoRows.push(new UIText({
-            tagName: 'div',
-            richText: lt`<b>${t('m.progression.8')}</b> ${t('m.progression.7', { lvl: requiredLevel })} <b>${targetName}</b>`
-          }));
+          richText = lt`<b>${t('m.progression.8')}</b> ${t('m.progression.7', { lvl: requiredLevel })} <b>${targetName}</b>`;
         } else if (evo.item) {
           const itemDef = ItemDB.getInstance().getById(evo.item);
           const itemName = itemDef ? t(itemDef.nameKey) : evo.item;
           const levelSuffix = requiredLevel ? lt` (${t('m.progression.7', { lvl: requiredLevel })})` : '';
-          evoRows.push(new UIText({
-            tagName: 'div',
-            richText: lt`<b>${t('m.progression.6')}</b> ${t('m.progression.5')} ${itemName}${levelSuffix} → <b>${targetName}</b>`
-          }));
+          richText = lt`<b>${t('m.progression.6')}</b> ${t('m.progression.5')} ${itemName}${levelSuffix} → <b>${targetName}</b>`;
         } else {
-          evoRows.push(new UIText({
-            tagName: 'div',
-            richText: lt`<b>${t('m.progression.4')}</b> → <b>${targetName}</b>`
-          }));
+          richText = lt`<b>${t('m.progression.4')}</b> → <b>${targetName}</b>`;
         }
+        // Evolutions never transform this Pokémon: they add a level-1 copy of the target species.
+        // Once produced, the row is flagged and stays listed so the method itself remains readable.
+        const rowChildren = [new UIText({ tagName: 'div', richText })];
+        if (pokemon.hasEvolvedInto(evo.to)) {
+          rowChildren.push(new UIText({ tagName: 'span', className: 'pw-evo-done', text: t('evolution_already_obtained') }));
+        }
+        evoRows.push(new UIContainer({ className: 'pw-evo-row', children: rowChildren }));
       }
     } else {
       evoRows.push(new UIText({
@@ -619,7 +618,7 @@ export class PokemonInfoModal extends UIModal {
     const evoCard = new UIContainer({
       className: 'pw-progress-card-subtle',
       children: [
-        new UIText({ tagName: 'div', className: 'pw-progress-section-title', text: t('m.progression.2') }),
+        new UIText({ tagName: 'div', className: 'pw-section-title', text: t('m.progression.2') }),
         new UIContainer({ className: 'pw-progress-row', children: evoRows })
       ]
     });
@@ -739,7 +738,7 @@ export class PokemonInfoModal extends UIModal {
     movesChildren.push(new UIContainer({
       className: 'poke-detail-moves-list current',
       children: knownMoves.length ? knownMoves : [
-        new UIText({ tagName: 'div', className: 'poke-detail-empty', text: t('pokemon_info_no_moves') })
+        new UIText({ tagName: 'div', className: 'pw-empty-state is-sm', text: t('pokemon_info_no_moves') })
       ]
     }));
 

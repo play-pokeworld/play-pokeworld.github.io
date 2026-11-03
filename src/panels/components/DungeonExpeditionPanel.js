@@ -45,12 +45,17 @@ export class DungeonExpeditionPanel extends UIContainer {
 
   /** @param {Object} [options] */
   render() {
+    // The board is rebuilt on every move: remember whether the keyboard was on it, so the
+    // re-render does not drop the focus to the page (root cause of "arrows stop working").
+    const hadFocus = !!this._gridView?.containsFocus?.();
     this._content.clearChildren();
+    this._gridView = null;
     const system = DungeonSystem.getInstance();
     const run = system.getRun();
     if (run?.active) {
       this.show();
       this._content.addChild(this._activeRun(run));
+      if (hadFocus) this._gridView?.focus?.();
       return;
     }
     this.hide();
@@ -116,15 +121,11 @@ export class DungeonExpeditionPanel extends UIContainer {
     const board = new UIContainer({ className: 'pw-dungeon-map', children: [grid] });
     grid.setAttribute('role', 'grid');
     grid.setAttribute('tabindex', '0');
+    grid.setAttribute('aria-keyshortcuts', 'ArrowUp ArrowDown ArrowLeft ArrowRight');
     grid.setAttribute('aria-label', t('dungeon_grid_aria', { floor: run.floor }));
-    grid.addDomListener('keydown', (event) => {
-      const direction = {
-        ArrowRight: 'right', ArrowLeft: 'left', ArrowUp: 'up', ArrowDown: 'down'
-      }[event.key];
-      if (!direction) return;
-      event.preventDefault();
-      DungeonSystem.getInstance().move(direction);
-    });
+    // Arrow keys are handled at document level by ui/DungeonKeyboard.js: a listener bound to this
+    // node died with it on the next re-render, which is why the arrows stopped after one move.
+    this._gridView = grid;
     const here = map.tiles[run.pos];
     const blocked = BattleSystem.getInstance().isActive();
     for (let row = 0; row < map.rows; row++) {

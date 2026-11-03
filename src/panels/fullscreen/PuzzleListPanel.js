@@ -44,7 +44,7 @@ export class PuzzleListPanel extends UIFullscreenPanel {
   _render() {
     const entries = PuzzleSystem.getInstance().getPuzzlesAtLocation(this._locationId || '');
     if (entries.length === 0) {
-      this.setContent([new UIText({ tagName: 'div', className: 'pw-empty-state-md', text: t('puzzles.generic.nothing_here') })]);
+      this.setContent([new UIText({ tagName: 'div', className: 'pw-empty-state', text: t('puzzles.generic.nothing_here') })]);
       return;
     }
     const list = new UIContainer({ className: 'pw-puzzle-list' });

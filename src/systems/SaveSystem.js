@@ -81,7 +81,7 @@ export class SaveSystem extends BaseSystem {
     this._currentSave = save;
     this.saveCurrent();
 
-    console.log(t('debug_save_created', { id: save.id, name: save.player.trainerName }));
+    console.log(String(t('debug_save_created', { id: save.id, name: save.player.trainerName })));
     EventBus.getInstance().dispatch(new SaveCreatedEvent(save.id, save.player.trainerName));
     return save;
   }
@@ -101,13 +101,9 @@ export class SaveSystem extends BaseSystem {
     }
     if (!save) return null;
 
-    const evolvedCount = save.verifyLevelEvolutions?.() || 0;
-    if (evolvedCount > 0) {
-      SaveStorage.write(save);
-    }
     this._currentSave = save;
     SaveStorage.writeActive(save);
-    console.log(t('debug_save_loaded', { id: save.id }));
+    console.log(String(t('debug_save_loaded', { id: save.id })));
     EventBus.getInstance().dispatch(new SaveLoadedEvent(save.id, save));
     return save;
   }
@@ -119,9 +115,9 @@ export class SaveSystem extends BaseSystem {
     this._currentSave.updatedAt = Date.now();
     if (SaveStorage.write(this._currentSave)) {
       SaveStorage.writeActive(this._currentSave);
-      console.log(t('debug_save_written'));
+      console.log(String(t('debug_save_written')));
     } else {
-      console.error(t('debug_save_write_failed', { id: this._currentSave.id }));
+      console.error(String(t('debug_save_write_failed', { id: this._currentSave.id })));
     }
   }
 
@@ -135,7 +131,7 @@ export class SaveSystem extends BaseSystem {
     if (this._currentSave && this._currentSave.id === strId) {
       this._currentSave = null;
     }
-    console.log(t('debug_save_deleted', { id: strId }));
+    console.log(String(t('debug_save_deleted', { id: strId })));
     EventBus.getInstance().dispatch(new SaveDeletedEvent(strId));
   }
 
@@ -156,7 +152,7 @@ export class SaveSystem extends BaseSystem {
     });
     if (!SaveStorage.write(copy)) return null;
 
-    console.log(t('debug_save_duplicated', { src: source.id, dst: copy.id }));
+    console.log(String(t('debug_save_duplicated', { src: source.id, dst: copy.id })));
     return copy;
   }
 
@@ -177,7 +173,7 @@ export class SaveSystem extends BaseSystem {
     if (this._currentSave && this._currentSave.id === save.id) {
       this._currentSave.player.trainerName = name;
     }
-    console.log(t('debug_save_renamed', { id: save.id, name }));
+    console.log(String(t('debug_save_renamed', { id: save.id, name })));
     return save;
   }
 
@@ -200,7 +196,7 @@ export class SaveSystem extends BaseSystem {
     try {
       parsed = JSON.parse(jsonString);
     } catch (err) {
-      console.error(t('debug_save_import_failed'), err);
+      console.error(String(t('debug_save_import_failed')), err);
       return null;
     }
     if (!parsed || typeof parsed !== 'object') return null;
@@ -209,7 +205,7 @@ export class SaveSystem extends BaseSystem {
     const save = SaveData.fromJson(parsed);
     this._currentSave = save;
     this.saveCurrent();
-    console.log(t('debug_save_loaded', { id: save.id }));
+    console.log(String(t('debug_save_loaded', { id: save.id })));
     EventBus.getInstance().dispatch(new SaveLoadedEvent(save.id, save));
     return save;
   }

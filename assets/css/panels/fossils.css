@@ -1,0 +1,330 @@
+/*
+ * panels/fossils.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.pw-fossil-card {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+  color: var(--pw-text-primary) !important;
+}
+
+.fossil-target-orb, .fossil-card-img {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.pw-fossil-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:10px;
+}
+
+.pw-fossil-card {
+  background:var(--dark3);
+  border:1px solid #4a3c2e;
+  border-radius:10px;
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.pw-fossil-preview {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:rgba(0,0,0,0.2);
+  padding:8px;
+  border-radius:6px;
+}
+
+.fossil-selector-intro {
+  color: var(--light2);
+  font-size: 13px;
+  line-height: 1.35;
+  background: rgba(0,0,0,0.18);
+  border: 1px solid var(--dark3);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 10px 10px 0;
+}
+
+.fossil-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  padding: 14px;
+}
+
+.fossil-card {
+  position: relative;
+  background: linear-gradient(180deg, rgba(148,136,107,0.18), rgba(0,0,0,0.18));
+  border: 1px solid var(--dark3);
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 225px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+}
+
+.fossil-card.is-owned {
+  border-color: rgba(96,190,88,0.65);
+}
+
+.fossil-card.is-missing {
+  border-color: rgba(211,66,95,0.65);
+}
+
+.fossil-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+}
+
+.fossil-card-title {
+  min-width: 0;
+  flex: 1;
+}
+
+.fossil-name {
+  color: var(--light2);
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fossil-qty {
+  color: var(--light1);
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.fossil-owned-badge {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--green);
+  color: var(--dark1);
+  border: 2px solid var(--dark1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  flex: none;
+}
+
+.fossil-owned-badge.is-missing {
+  background: var(--red);
+  color: var(--light2);
+}
+
+.fossil-card-body {
+  background: rgba(0,0,0,0.18);
+  border: 1px solid rgba(148,136,107,0.35);
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.fossil-arrow {
+  color: var(--light1);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.fossil-target-orb {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 25%, rgba(236,222,183,0.92), var(--light1));
+  border: 2px solid var(--dark1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 12px rgba(255,255,255,0.18), 0 4px 12px rgba(0,0,0,0.3);
+}
+
+
+/* design-system/pass-06.css * --------------------------------------------------------------------------- * Dated pass inherited from the former design-system.css, kept in its historical order. * * Part of the 1.16.11 split: one file, one responsibility. The order of the * @import lines in assets/css/style.css IS the cascade — never reorder them, * never import this sheet anywhere else (guarded by tests/CssStructure.test.js). */
+.fossil-target-orb img {
+  width: 68px;
+  height: 68px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.fossil-target-name {
+  max-width: 100%;
+  color: var(--light2);
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fossil-target-name span {
+  color: var(--light1);
+  font-size: 11px;
+}
+
+.fossil-target-sub {
+  color: var(--light1);
+  font-size: 11px;
+  text-align: center;
+}
+
+.fossil-empty-icon {
+  font-size: 34px;
+}
+
+@media (max-width: 700px) {
+.fossil-selector-grid {
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+  padding: 12px;
+}
+
+.fossil-card {
+  min-height: 215px;
+  padding: 10px;
+}
+
+}
+
+.pw-fossil-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.pw-fossil-card {
+  background: var(--dark3);
+  border: 1px solid #4a3c2e;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pw-fossil-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0,0,0,0.2);
+  padding: 8px;
+  border-radius: 6px;
+}
+
+
+/* NB: .save-slot is EXCLUDED — save cards carry their own themed background (save-bg-classic/emerald/…) which must stay visible in the settings preview as in the saves menu. */
+.pw-fossil-card {
+  background: rgba(0, 0, 0, 0.28) !important;
+  border: 1px solid var(--pw-border) !important;
+  color: var(--light2) !important;
+}
+
+.pw-fossil-card:hover {
+  background: rgba(236, 222, 183, 0.15) !important;
+  border-color: var(--light2) !important;
+  color: var(--light2) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.pw-fossil-card {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid rgba(236,222,183,0.22) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+  color: var(--pw-text-primary) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.pw-fossil-card:hover {
+  border-color: var(--pw-text-primary) !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.6) !important;
+  transform: translateY(-2px) !important;
+  color: var(--pw-text-primary) !important;
+}
+
+.fossil-target-orb {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+  flex-shrink: 0 !important;
+}
+
+.fossil-target-orb img {
+  position: relative !important;
+  z-index: 2 !important;
+  object-fit: contain !important;
+  image-rendering: pixelated !important;
+}
+
+.mine-tile--item-helix_fossil, .mine-item--helix_fossil {
+  background-color: #ff7bd5 !important;
+}
+
+.mine-tile--item-dome_fossil, .mine-item--dome_fossil {
+  background-color: #ff8a3d !important;
+}
+
+.mine-tile--item-fossil, .mine-item--fossil {
+  background-color: #ff5f9e !important;
+}
+
+.mine-tile--item-root_fossil, .mine-item--root_fossil {
+  background-color: #70ff3d !important;
+}
+
+.mine-tile--item-claw_fossil, .mine-item--claw_fossil {
+  background-color: #ff5252 !important;
+}
+
+.pw-fossil-picker-body {
+  overflow: auto;
+  will-change: scroll-position;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.pw-fossil-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr));
+  gap: 12px;
+}
+
+.pw-fossil-picker .pw-fossil-card {
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--pw-border-color);
+  border-radius: 12px;
+}

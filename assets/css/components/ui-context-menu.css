@@ -1,0 +1,74 @@
+/*
+ * components/ui-context-menu.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+[oncontextmenu], [data-context-action], .move-row {
+  touch-action: manipulation;
+}
+
+.save-card-context-menu {
+  position: fixed;
+  z-index: 25000;
+  display: none;
+  min-width: 218px;
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid rgba(236,222,183,0.38);
+  background: rgba(37,37,34,0.96);
+  box-shadow: 0 16px 36px rgba(0,0,0,0.48), inset 0 0 0 1px rgba(255,255,255,0.06);
+  backdrop-filter: blur(8px);
+}
+
+.save-card-context-menu.open {
+  display: grid;
+  gap: 4px;
+}
+
+#save-card-context-menu .save-context-item.dl-item,
+#save-card-context-menu .save-context-item.dl-item:hover {
+  color: var(--blue) !important;
+}
+
+#save-card-context-menu .save-context-item.imp-item,
+#save-card-context-menu .save-context-item.imp-item:hover {
+  color: var(--green) !important;
+}
+
+#save-card-context-menu .save-context-item.danger,
+#save-card-context-menu .save-context-item.danger:hover {
+  color: #FF7A8A !important;
+}
+
+#save-card-context-menu .save-context-item.danger:hover {
+  background: rgba(211,66,95,0.24) !important;
+}
+
+:where(.pw-context-menu) {
+  z-index: 25000;
+  display: grid;
+  gap: 4px;
+  min-width: 200px;
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--light2) 38%, transparent);
+  background: color-mix(in srgb, var(--dark2) 96%, transparent);
+}
+
+.save-card-context-menu {
+  border-color: color-mix(in srgb, var(--light2) 38%, transparent);
+  background: color-mix(in srgb, var(--dark2) 96%, transparent);
+}
+
+.save-card-context-menu.open {
+  display: grid;
+}
+
+
+/* Fix of an original-game conflict: the global `button.danger` rule painted the "Delete" item solid red under pink text (unreadable). Keep the item flat; the red tint only appears on hover (design-system rule). */
+#save-card-context-menu .save-context-item.danger:not(:hover) {
+  background: transparent !important;
+  border-color: transparent !important;
+}

@@ -5,10 +5,11 @@
 import { BaseSystem } from './BaseSystem.js';
 import { SaveSystem } from './SaveSystem.js';
 import { EventBus } from '../core/EventBus.js';
-import { TutorialRules } from '../config/TutorialRules.js';
+import { TutorialRules, TUTORIAL_BALL_ROW } from '../config/TutorialRules.js';
 import { BonusSystem } from './BonusSystem.js';
 import { BonusTypes } from '../config/BonusRules.js';
 import { ItemDB } from '../data/items/ItemDB.js';
+import { BallFilterPresets } from '../data/catch/BallFilterPresets.js';
 import { grantItem } from './inventory/ItemGrant.js';
 import { NotificationSystem } from './NotificationSystem.js';
 import { NotificationChannels, NotificationTones } from '../config/NotificationConfig.js';
@@ -108,9 +109,13 @@ export class TutorialSystem extends BaseSystem {
     if (stepIndex < 0) return null;
     const step = steps[stepIndex];
     const progress = this._progressFor(step, save);
-    const params = step.id === 'catch_first'
-      ? { pct: ItemDB.getInstance().getBallRate('pokeball') }
-      : {};
+    // `pct`: the real Poké Ball rate, never a copied number. `case`: the label of the capture
+    // filter the player has to fill, taken from its preset so the text cannot drift from the UI.
+    // `place`: the place a travel step talks about, taken from the location table for the same reason.
+    const params = {};
+    if (step.id === 'catch_first') params.pct = ItemDB.getInstance().getBallRate('pokeball');
+    if (step.id === 'set_pokeball_filter') params.case = t(BallFilterPresets.labelKey(TUTORIAL_BALL_ROW));
+    if (step.reveal.kind === 'travel') params.place = t(`location.${step.reveal.locationId}`);
     const currencies = {};
     if (step.reward.money > 0) currencies.money = step.reward.money;
     if (step.reward.dungeonToken > 0) currencies.dungeonToken = step.reward.dungeonToken;
@@ -121,8 +126,7 @@ export class TutorialSystem extends BaseSystem {
       progress,
       title: t(step.titleKey),
       description: t(step.descriptionKey, params),
-      how: t(step.howKey),
-      actionLabel: t(step.actionKey),
+      how: t(step.howKey, params),
       rewardData: { currencies, items: { ...step.reward.items } },
       progressText: t('tutorial_step_progress_lbl', { cur: progress, max: step.target })
     };

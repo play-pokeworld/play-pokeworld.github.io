@@ -33,5 +33,5 @@
  */
 
 export const SaveSchema = Object.freeze({
-  VERSION: 20
+  VERSION: 21
 });

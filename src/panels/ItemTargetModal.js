@@ -91,7 +91,7 @@ export class ItemTargetModal extends StaticModalPanel {
       return;
     }
     if (targets.length === 0) {
-      this.addChild(new UIText({ className: 'pw-item-use-empty', text: t('item_use_no_targets') }));
+      this.addChild(new UIText({ className: 'pw-empty-state is-sm', text: t('item_use_no_targets') }));
       this.addChild(new UIButton({ variant: 'ghost', text: t('modal_close_btn'), onClick: () => this.close() }));
       return;
     }

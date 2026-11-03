@@ -1,0 +1,432 @@
+/*
+ * panels/team-moves.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.poke-moves {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--dark2);
+  border-radius: 0 0 11px 11px;
+}
+
+.poke-move {
+  background: var(--light1);
+  border: 1px solid var(--dark1);
+  border-radius: 6px;
+  padding: 6px 8px;
+  color: var(--dark1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: help;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+  font-size: 11px;
+}
+
+.poke-move:hover {
+  border-color: var(--light2);
+  background: var(--light2);
+}
+
+.poke-move.empty {
+  visibility: hidden;
+  cursor: default;
+}
+
+.poke-move.charging::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--charge-pct, 0%);
+  background: var(--charge-color, rgba(148,136,107,0.4));
+  transition: width 0.1s linear;
+  z-index: 0;
+}
+
+.poke-move.ready {
+  border-color: var(--dark1);
+}
+
+#base-npced-team .poke-moves {
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.poke-move {
+  font-size: 11px;
+}
+
+.poke-move-power.is-high {
+  color: var(--light2);
+}
+
+.poke-move-power.is-low {
+  color: var(--light1);
+}
+
+.poke-move-acc.is-high {
+  color: var(--green);
+}
+
+.poke-move-acc.is-low {
+  color: var(--light2);
+}
+
+.poke-move {
+  border: 1px solid var(--type-color, var(--dark1));
+  border-left: 4px solid var(--type-color, var(--dark1));
+}
+
+.poke-move {
+  border: 1px solid var(--type-color, var(--dark1));
+}
+
+.poke-detail-move-row {
+  display:grid;
+  grid-template-columns: 78px minmax(0,1fr) auto auto;
+  gap:8px;
+  align-items:center;
+  min-height:30px;
+  background:rgba(0,0,0,.24);
+  border:1px solid var(--type-color,var(--dark3));
+  border-left:4px solid var(--type-color,var(--dark3));
+  border-radius:5px;
+  padding:4px 7px;
+  cursor:help;
+}
+
+.poke-detail-move-row.clickable, .poke-detail-move-row:not(.learnable) {
+  cursor:pointer;
+}
+
+.poke-detail-move-row.selected {
+  opacity:.55;
+  border-color:var(--red);
+}
+
+.poke-detail-move-row.known {
+  opacity:.95;
+}
+
+.poke-detail-move-row.locked {
+  opacity:.55;
+}
+
+@media (max-width: 760px) {
+.poke-detail-move-row {
+  grid-template-columns: 70px 1fr;
+}
+
+}
+
+.poke-move.visual-firing {
+  filter: brightness(1.25);
+  box-shadow: 0 0 12px var(--charge-color, rgba(236,222,183,.35));
+}
+
+.poke-move.draggable-move {
+  cursor: grab;
+}
+
+.poke-move.draggable-move:active {
+  cursor: grabbing;
+}
+
+#poke-modal.atoll-prep-modal .poke-move.atoll-prep-move-over {
+  outline:2px dashed var(--light2);
+  outline-offset:1px;
+}
+
+.poke-move, .poke-move b, .poke-move strong, .poke-move small {
+  color: var(--dark1) !important;
+  text-shadow: none !important;
+}
+
+
+/* 6. Attack chips: neutral base again, the type colour ONLY drives the charge fill. The bare .type-* rules painted the WHOLE chip in the type colour (unreadable full yellow/orange slabs) — the charge bars live ON the chips (they always did), the extra bottom bar is gone from the DOM. */
+.poke-move[class*="type-"] {
+  background: var(--light1) !important;
+  color: var(--dark1) !important;
+}
+
+.poke-move[class*="type-"].charging {
+  --charge-color: var(--type-color, rgba(148,136,107,0.4));
+}
+
+
+/* 3. Battle: inactive cards (no .poke-moves below) keep their bottom rounding; active / preset / team cards keep the square joint (the moves area continues below, unchanged). */
+.poke-card > .poke-card-top:not(:has(~ .poke-moves)) {
+  border-radius: 11px;
+}
+
+#battle-team-row .poke-moves {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  min-width: 0 !important;
+}
+
+#battle-team-row .poke-card:not(:first-child):not(.active) .poke-moves {
+  display: none !important;
+}
+
+#team-window-body .poke-moves {
+  grid-column: 2 !important;
+  grid-row: 2 !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  gap: 4px !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+#battle-team-row .poke-move,
+#team-window-body .poke-move {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-height: var(--pc-move-h) !important;
+  padding: 5px 6px 5px 10px !important;
+  border-radius: 7px !important;
+  overflow: hidden !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  cursor: help !important;
+  background: rgba(0, 0, 0, .34) !important;
+  border: 1px solid var(--type-color, var(--dark3)) !important;
+  border-left: 4px solid var(--type-color, var(--dark3)) !important;
+  color: var(--type-color, var(--light2)) !important;
+  text-shadow: none !important;
+  transition: background .15s, border-color .15s !important;
+}
+
+#battle-team-row .poke-move.empty {
+  visibility: hidden !important;
+  min-height: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+#team-window-body .poke-move.empty {
+  visibility: visible !important;
+  min-height: var(--pc-move-h) !important;
+  background: rgba(0, 0, 0, 0.16) !important;
+  border: 1px dashed var(--dark3) !important;
+  border-left: 1px dashed var(--dark3) !important;
+  color: var(--light1) !important;
+  justify-content: center !important;
+  font-weight: 600 !important;
+  cursor: default !important;
+}
+
+#team-window-body .poke-move:hover {
+  background: rgba(0, 0, 0, .18) !important;
+  border-color: var(--type-color, var(--light2)) !important;
+}
+
+#battle-team-row .poke-move .move-eff-badge,
+#team-window-body .poke-move .move-eff-badge {
+  flex: 0 0 auto !important;
+  position: relative !important;
+  z-index: 2 !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  padding: 3px 6px !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, .12) !important;
+  color: var(--light2) !important;
+  text-shadow: none !important;
+}
+
+#battle-team-row .poke-move .move-eff-badge.good {
+  background: var(--green) !important;
+  color: #241F16 !important;
+}
+
+#battle-team-row .poke-move .move-eff-badge.bad {
+  background: var(--red) !important;
+  color: #fff !important;
+}
+
+#battle-team-row .poke-move.charging::before,
+#team-window-body .poke-move.charging::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 auto 0 0 !important;
+  width: var(--charge-pct, 0%) !important;
+  background: color-mix(in srgb, var(--type-color, var(--light1)) 34%, transparent) !important;
+  transition: width .1s linear !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
+
+#battle-team-row .poke-move.ready,
+#team-window-body .poke-move.ready {
+  box-shadow: 0 0 0 1px var(--type-color, var(--accent)) inset !important;
+}
+
+#team-window-body .poke-move.draggable-move {
+  cursor: grab !important;
+}
+
+#battle-team-row > .poke-card:first-child .poke-moves {
+  position: relative !important;
+  z-index: 2 !important;
+  background: var(--dark1) !important;
+  padding-left: 9px !important;
+  padding-right: 9px !important;
+}
+
+#battle-team-row > .poke-card:first-child .poke-moves {
+  border-radius: 0 0 6px 6px !important;
+  padding-top: 0 !important;
+  padding-bottom: 7px !important;
+  box-shadow: rgba(0, 0, 0, .4) 2px 2px 1px 1px !important;
+}
+
+#battle-team-row > .poke-card:first-child .poke-move.empty {
+  visibility: hidden !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-width: 0 !important;
+}
+
+#battle-team-row > .poke-card:first-child.fainted .poke-moves {
+  opacity: .55 !important;
+  filter: grayscale(.85) !important;
+}
+
+#battle-team-row > .poke-card:first-child .poke-moves {
+  background: color-mix(in srgb, var(--dark1) 90%, transparent) !important;
+}
+
+#battle-team-row > .poke-card:first-child .poke-moves {
+  border-radius: 0 0 6px 6px !important;
+  border: 1px solid var(--dark3) !important;
+  border-top: 0 !important;
+  box-shadow: none !important;
+  margin-top: 0 !important;
+  padding-top: 4px !important;
+}
+
+#battle-team-row > .poke-card .poke-move.empty,
+#battle-team-row > .poke-card:first-child .poke-move.empty {
+  visibility: visible !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: auto !important;
+  min-height: 26px !important;
+  margin: 0 !important;
+  padding: 2px 6px !important;
+  border: 1px dashed color-mix(in srgb, var(--light1) 34%, transparent) !important;
+  border-radius: 6px !important;
+  background: color-mix(in srgb, var(--dark2) 55%, transparent) !important;
+  opacity: .55 !important;
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
+#battle-team-row > .poke-card:first-child .poke-moves {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 4px !important;
+  align-content: stretch !important;
+}
+
+#battle-team-row > .poke-card:first-child .poke-moves {
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: none !important;
+  gap: 3px !important;
+  align-content: stretch !important;
+}
+
+#battle-team-row > .poke-card:first-child .poke-move {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+#battle-team-row > .poke-card:first-child .poke-moves {
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+.pw-team-modal-moves .poke-move {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.pw-dex-move-row {
+  display: grid;
+  grid-template-columns: 60px 1.4fr 90px 70px 70px;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 12px;
+  background: var(--dark1, #181613);
+  border: 1px solid var(--border, #4A3E31);
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pw-dex-move-row:hover:not(.pw-dex-move-row--header) {
+  border-color: var(--accent, #E5C365);
+  background: var(--dark2, #24221E);
+}
+
+.pw-dex-move-row--header {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border, #4A3E31);
+  font-weight: 800;
+  color: var(--light1, #FFF);
+  cursor: default;
+  padding: 4px 12px;
+}
+
+.pw-training-live-fighters .poke-moves {
+  grid-template-columns: 1fr;
+}
+
+#win-battle #battle-team-row .poke-move {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+@container pw-battle (max-width: 420px) {
+#win-battle #battle-team-row .poke-moves {
+  grid-column: 1 !important;
+  grid-row: 3 !important;
+  width: 100%;
+}
+
+}

@@ -233,7 +233,7 @@ export class AtollFullscreenPanel extends UIFullscreenPanel {
     } else if (fragmentsCount >= 50) {
       fragCard.addChild(new UIText({
         tagName: 'div',
-        className: 'pw-atoll-section-title',
+        className: 'pw-section-title is-lg',
         text: t('legend_fragment_choose')
       }));
 
@@ -279,7 +279,7 @@ export class AtollFullscreenPanel extends UIFullscreenPanel {
     const atollSys = AtollSystem.getInstance();
     container.push(new UIText({
       tagName: 'div',
-      className: 'pw-atoll-section-title',
+      className: 'pw-section-title is-lg',
       text: t('atoll_shop')
     }));
 

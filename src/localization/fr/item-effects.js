@@ -35,4 +35,8 @@ export const itemEffects = {
   "item_category_apricorn": "Noigrume : sert à fabriquer des Poké Balls.",
   "item_category_legend_key": "Objet légendaire : ouvre l'accès à un Pokémon légendaire.",
   "item_category_underground_shard": "Éclat souterrain : se trouve dans la Mine et s'échange contre des objets.",
+  "item_category_plate": "Plaque liée à Arceus : objet de collection.",
+  "item_category_farm": "Objet de culture, lié aux baies.",
+  "item_category_flute": "Flûte rare, liée aux Pokémon endormis.",
+  "item_category_tool": "Outil de terrain : aide à repérer les trésors et les jetons.",
 };

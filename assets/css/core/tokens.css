@@ -1,0 +1,220 @@
+/*
+ * core/tokens.css
+ * ---------------------------------------------------------------------------
+ * Design tokens (`--pw-*`): palette, spacing, radii, shadows, motion.
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+
+/* Rework-only design tokens. The palette, fonts and theme tokens live in design-system.css (the original stylesheet); only tokens it does not define are declared here, so there is a single source of truth per token. */
+:root {
+  --accent-hover: #FFF099;
+  --red-hover: #E55575;
+  --discord: #5865F2;
+  --discord-hover: #4752C4;
+  --pw-bg-app: color-mix(in srgb, var(--pw-bg-header) 75%, black);
+  --pw-bg-surface-elevated: var(--dark1);
+  --pw-bg-surface-hover: color-mix(in srgb, var(--dark1) 88%, var(--light2));
+  --pw-bg-inset: color-mix(in srgb, var(--dark1) 55%, transparent);
+  --pw-border-soft: color-mix(in srgb, var(--light2) 30%, transparent);
+  --pw-border-light: color-mix(in srgb, var(--light2) 10%, transparent);
+  --pw-border-focus: #FFE15E;
+  --pw-text-muted: color-mix(in srgb, var(--pw-text-secondary) 70%, transparent);
+  --pw-text-dark: #1C1A17;
+  --pw-text-white: #FFFFFF;
+  --pw-accent-gold: #FFE15E;
+  --pw-accent-gold-hover: #FFF099;
+  --pw-accent-danger: #D3425F;
+  --pw-accent-danger-hover: #E55575;
+  --pw-accent-success: #2ECC71;
+  --pw-radius-xl: 24px;
+}
+
+
+/* tokens.css * --------------------------------------------------------------------------- * Item icon scale (1.16.11, audit 3.3). One item, one of three sizes — never an * in-between value: * sm 40px bag rows, shop and market tiles, dictionary rows * md 52px item sheet, item targeting, loot strip * lg 72px location drops, battle summary, AFK report * Anything else for an item picture is a regression (tests/StyleVocabulary.test.js). * * Part of the 1.16.11 split: the @import order in assets/css/style.css IS the * cascade — never reorder it (tests/CssStructure.test.js). */
+:root {
+  --pw-item-icon-sm: 40px;
+  --pw-item-icon-md: 52px;
+  --pw-item-icon-lg: 72px;
+  --pw-item-icon-radius: 8px;
+}
+
+:root {
+  --pw-color-primary: #ECDEB7;
+  --pw-color-secondary: #36342F;
+  --pw-color-accent: #FFE15E;
+  --pw-color-danger: #E74C3C;
+  --pw-color-success: #2ECC71;
+  --pw-color-info: #3498DB;
+  --pw-color-discord: #5865F2;
+  --pw-color-discord-dark: #4752C4;
+  --pw-font-main: "Winky Sans", "Segoe UI", system-ui, sans-serif;
+  --pw-font-title: "Megrim-Regular", cursive;
+  --pw-radius-sm: 4px;
+  --pw-radius-md: 8px;
+  --pw-radius-lg: 12px;
+  --pw-spacing-xs: 4px;
+  --pw-spacing-sm: 8px;
+  --pw-spacing-md: 16px;
+  --pw-spacing-lg: 24px;
+  --pw-spacing-xl: 32px;
+  --pw-bg-surface: #24221E;
+  --pw-bg-header: #1C1A17;
+  --pw-bg-sprite: #191714;
+  --pw-border-color: #4A3E31;
+  --pw-text-primary: #ECDEB7;
+  --pw-text-secondary: #C8BBA0;
+  --pw-circle-bg: radial-gradient(circle, rgba(236, 222, 183, 0.25) 0%, rgba(236, 222, 183, 0.08) 70%, transparent 100%);
+  --pw-map-surface: #0D1B0D;
+  --pw-accent-color: #FFE15E;
+  --dark1: #36342F;
+  --pw-bg-panel-header: var(--dark1);
+  --pw-border-panel-header: var(--light1);
+  --dark2: #444138;
+  --dark3: #524f48;
+  --light1: #C9BC9C;
+  --light2: #ECDEB7;
+  --accent: #FFE15E;
+  --panel: #444138;
+  --panel-bg: #ECDEB7;
+  --panel-text: #36342F;
+  --panel-border: #C4B896;
+  --dim: #C9BC9C;
+  --shiny: #FF4444;
+  --type-bug: #92BD2D;
+  --type-dark: #595761;
+  --type-dragon: #0C6AC8;
+  --type-electric: #F2D94E;
+  --type-fairy: #EF90E6;
+  --type-fighting: #CE3E5A;
+  --type-fire: #FBA64C;
+  --type-flying: #A1BBEC;
+  --type-ghost: #5F6DBC;
+  --type-grass: #60BE58;
+  --type-ground: #DA7C4D;
+  --type-ice: #76D1C1;
+  --type-normal: #A0A29F;
+  --type-poison: #BA68D2;
+  --type-psychic: #FA8582;
+  --type-rock: #C9BC8A;
+  --type-steel: #5795A3;
+  --type-water: #539DDF;
+  --red: #D3425F;
+  --green: #60BE58;
+  --blue: #539DDF;
+  --orange: #FBA64C;
+  --purple: #B763CF;
+  --yellow: #F2D94E;
+  --pw-surface: var(--dark2);
+  --pw-surface-soft: rgba(0,0,0,0.22);
+  --pw-border: color-mix(in srgb, var(--light2) 22%, transparent);
+  --pw-border-strong: color-mix(in srgb, var(--light2) 38%, transparent);
+  --pw-radius: 14px;
+  --pw-shadow: 0 14px 36px rgba(0,0,0,0.42), inset 0 0 0 1px rgba(255,255,255,0.04);
+  --pw-shadow-lg: 0 18px 48px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --pw-header-h: 50px;
+  --pw-game-header-h: 56px;
+  --pw-header-pad: 0 8px 0 10px;
+  --pw-header-radius: 10px;
+  --pw-header-gap: 8px;
+  --pw-header-title-size: 12px;
+  --pw-header-close-size: 40px;
+  --pw-header-close-glyph: 18px;
+  --pw-panel-w-info: 560px;
+  --pw-panel-w-md: 560px;
+  --pw-panel-w-lg: 860px;
+  --pw-size-poke-sm: 72px;
+  --pw-size-poke-lg: 104px;
+  --pw-btn-bg: #5A554C;
+  --pw-btn-bg-hover: #6B655A;
+  --pw-btn-text: #F2E7C8;
+  --pw-btn-border: #6E6552;
+  --pw-btn-active-bg: #ECDEB7;
+  --pw-btn-active-text: #36342F;
+  --mine-rock-4: #4e3629;
+  --mine-rock-3: #6d4c3d;
+  --mine-rock-2: #8f6350;
+  --mine-rock-1: #b5836d;
+  --pc-scene-h: 210px;
+  --pc-wild-sprite: 132px;
+  --pc-team-sprite: clamp(72px, 26%, 132px);
+  --pc-battle-sprite: 84px;
+  --pc-bench-sprite: 46px;
+  --pc-move-h: 30px;
+  --pc-parch: #ECDEB7;
+  --pc-parch-ink: #2A2721;
+  --pc-glass: rgba(18, 20, 24, 0.62);
+  --pc-glass-brd: rgba(255, 255, 255, 0.14);
+  --pc-scene-h: 260px;
+  --pc-battle-sprite: 132px;
+  --pc-bench-sprite: 74px;
+  --pc-team-sprite: clamp(112px, 30%, 168px);
+  --pc-wild-sprite: 132px;
+  --pc-bg-band-h: 150px;
+  --pc-battle-sprite-h: 176px;
+  --pc-bench-sprite-h: 112px;
+  --pc-team-sprite-h: 132px;
+  --pw-land-sky:     #2B3A2A;
+  --pw-land-horizon: #3A4A33;
+  --pw-land-grass:   #3E4B31;
+  --pw-land-ground:  #2A2A22;
+  --pw-land-edge: color-mix(in srgb, var(--pw-land-ground) 55%, #000 45%);
+  --pw-land-bright: 1;
+  --pw-land-sat: 1;
+  --pw-land-tint: transparent;
+  --pw-land-tint-a: 0;
+  --pw-land-h-horizon: 58vh;
+  --pw-land-h-grass: 72vh;
+  --pw-land-h-ground: 88vh;
+  --pw-land-tree: color-mix(in srgb, var(--pw-land-grass) 62%, #000 38%);
+  --pw-land-rock: color-mix(in srgb, var(--pw-land-ground) 72%, #cfc6a8 28%);
+  --pw-land-rock-bg: color-mix(in srgb, var(--pw-land-grass) 52%, #1d1d17 48%);
+  --pw-dgn-tint: #A78BFA;
+}
+
+@media (min-width: 1600px) {
+:root {
+  --pw-panel-w-info: 760px;
+  --pw-panel-w-md: 900px;
+  --pw-panel-w-lg: 1280px;
+}
+
+}
+
+@media (min-width: 2200px) {
+:root {
+  --pw-panel-w-info: 980px;
+  --pw-panel-w-md: 1200px;
+  --pw-panel-w-lg: 1680px;
+}
+
+}
+
+@property --pw-bg-bob {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+:root {
+  --pw-modal-container-max-width: 960px;
+}
+
+@media (min-width: 1600px) {
+:root {
+  --pw-modal-container-max-width: 1380px;
+}
+
+}
+
+@media (min-width: 2200px) {
+:root {
+  --pw-modal-container-max-width: 1820px;
+}
+
+}
+
+:root {
+  --pw-backdrop-tile-w: 2969px;
+}

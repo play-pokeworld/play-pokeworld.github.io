@@ -2,18 +2,18 @@
  * @file SaveCard.js
  * @brief Composite widget representing a single save slot card (C++: class SaveCard : public UIElement).
  * Used in both SaveMenuPage carousel (menu mode) and SettingsModal profile preview (preview mode).
- * Built exclusively from UI widgets (UIContainer, UIText, UIImage); styling comes from the
+ * Built exclusively from UI widgets (UIContainer, UIText, UIPokemonSprite); styling comes from the
  * canonical `.save-slot*` classes of the design system.
+ *
+ * The portrait is an OWNED POKÉMON (the main game behaviour, chosen in Settings → profile), not an
+ * NPC/trainer image: see `resolveAvatarPokemon()`.
  */
 
 import { UIElement } from './UIElement.js';
 import { UIContainer } from './UIContainer.js';
 import { UIText } from './UIText.js';
-import { UIImage } from './UIImage.js';
 import { UIPokemonSprite, PokemonSpriteSizes } from './UIPokemonSprite.js';
 import { SaveThemes, SAVE_THEMES } from '../data/save/SaveThemes.js';
-import { PlayerDefaults } from '../config/PlayerDefaults.js';
-import { AssetPaths } from '../config/AssetPaths.js';
 import { t } from '../localization/LocalizationManager.js';
 
 const SECONDS_PER_MINUTE = 60;
@@ -56,27 +56,66 @@ export class SaveCard extends UIElement {
   }
 
   /**
-   * Card avatar. Like the original game, the lead Pokémon of the team is shown
-   * on the canonical disc; a trainer portrait chosen in the settings takes precedence.
+   * The Pokémon displayed on a save card: an owned Pokémon chosen by the player (the main game
+   * behaviour), never an NPC portrait.
+   *
+   * Resolution order, kept pure so that the card, the settings preview and the tests agree:
+   *   1. `player.avatarPokemonUid` when that uid is still owned,
+   *   2. the lead team member (the historical default, and what a migrated save inherits),
+   *   3. the first owned Pokémon of the collection,
+   *   4. `null` — the card then shows the explicit placeholder, never an empty disc.
+   *
+   * @param {Object} save - SaveData instance or a plain object with the same shape
+   * @returns {Object|null} the Pokémon data to draw
+   */
+  static resolveAvatarPokemon(save) {
+    const source = save || {};
+    const collection = source.collection;
+    const byUid = (uid) => (collection && typeof collection.get === 'function' ? collection.get(uid) : null);
+    const asPokemon = (entry) => {
+      if (!entry) return null;
+      if (typeof entry === 'string') return byUid(entry);
+      if (entry.species) return entry;
+      return entry.uid ? byUid(entry.uid) : null;
+    };
+
+    const chosen = asPokemon(source.player?.avatarPokemonUid);
+    if (chosen) return chosen;
+    for (const member of Array.isArray(source.team) ? source.team : []) {
+      const pokemon = asPokemon(member);
+      if (pokemon) return pokemon;
+    }
+    const all = collection && typeof collection.getAll === 'function' ? collection.getAll() : [];
+    return asPokemon(all[0]);
+  }
+
+  /**
+   * Card avatar: the Pokémon of `resolveAvatarPokemon()` on the canonical disc.
    * @private
+   * @param {Object} avatar - Pokémon data returned by resolveAvatarPokemon()
+   * @param {string} trainerName - Alt text fallback when the species has no localized name
    * @returns {UIElement}
    */
-  _buildAvatar(save, player, trainerName) {
-    const leadSpecies = Array.isArray(save.team) && save.team.length > 0 ? save.team[0].species : '';
-    const customPortrait = player.trainerSprite && player.trainerSprite !== PlayerDefaults.TRAINER_SPRITE;
-    if (customPortrait || !leadSpecies) {
-      const circle = new UIContainer({ tagName: 'span', className: 'pw-poke-circle-wrap pw-poke-circle-wrap--large' });
-      circle.addChild(new UIContainer({ tagName: 'span', className: 'pw-poke-circle-bg' }));
-      circle.addChild(new UIImage({
-        src: AssetPaths.trainerSprite(player.trainerSprite),
-        fallbackSrc: AssetPaths.defaultTrainerSprite(),
-        alt: trainerName,
-        className: 'pw-poke-circle-img sprite-img',
-        pixelated: true
-      }));
-      return circle;
+  _buildAvatar(avatar, trainerName) {
+    if (!avatar) {
+      // Explicit placeholder (the original game shows a "?" icon instead of an empty slot).
+      const missing = new UIContainer({ tagName: 'span', className: 'pw-poke-circle-wrap pw-poke-circle-wrap--large save-slot-icon-missing save-card-avatar' });
+      missing.addChild(new UIContainer({ tagName: 'span', className: 'pw-poke-circle-bg' }));
+      missing.addChild(new UIText({ tagName: 'span', className: 'pw-poke-circle-img save-slot-icon-missing-mark', text: '?' }));
+      return missing;
     }
-    return new UIPokemonSprite({ species: leadSpecies, alt: trainerName, size: PokemonSpriteSizes.LARGE });
+    const name = typeof avatar.getDisplayName === 'function'
+      ? avatar.getDisplayName()
+      : t(`pokemon.${avatar.species}`);
+    return new UIPokemonSprite({
+      species: avatar.species,
+      form: avatar.form || '',
+      shiny: avatar.shiny === true,
+      alt: name || trainerName,
+      size: PokemonSpriteSizes.LARGE,
+      // The card shows the Pokémon itself: no dark disc, the art fills the frame (user request).
+      className: 'save-card-avatar'
+    });
   }
 
   /**
@@ -118,7 +157,7 @@ export class SaveCard extends UIElement {
     const mainRow = new UIContainer({ tagName: 'span', className: 'save-slot-main' });
 
     const iconBox = new UIContainer({ tagName: 'span', className: 'save-slot-icon' });
-    iconBox.addChild(this._buildAvatar(save, player, trainerName));
+    iconBox.addChild(this._buildAvatar(SaveCard.resolveAvatarPokemon(save), trainerName));
     mainRow.addChild(iconBox);
 
     const titleBox = new UIContainer({ tagName: 'span', className: 'save-slot-title' });

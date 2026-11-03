@@ -1,0 +1,403 @@
+/*
+ * panels/shop.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.pw-atoll-shop-card {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+  color: var(--pw-text-primary) !important;
+}
+
+.shop-item .shop-name, .shop-item .shop-price {
+  font-size: 13px;
+}
+
+.shop-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--light1);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border: 2px solid var(--dark1);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.shop-item:hover {
+  border-color: var(--light2);
+  background: var(--light2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.shop-item .shop-sprite {
+  width: var(--pw-item-icon-lg);
+  height: var(--pw-item-icon-lg);
+  border-radius: 50%;
+  background: var(--light2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 2px solid var(--dark1);
+  overflow: visible;
+}
+
+.shop-item .shop-sprite img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.shop-item .shop-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.shop-item .shop-name {
+  font-weight: bold;
+  color: var(--dark1);
+  margin-bottom: 4px;
+}
+
+.shop-item .shop-desc {
+  font-size: 11px;
+  color: var(--dark3);
+}
+
+.shop-item .shop-price {
+  font-weight: bold;
+  color: var(--dark1);
+  background: var(--light2);
+  padding: 6px 12px;
+  border-radius: 14px;
+  flex-shrink: 0;
+  margin-left: 12px;
+  font-size: 13px;
+}
+
+.shop-item .shop-desc {
+  font-size: 11px;
+}
+
+.shop-item .shop-name, .shop-item .shop-price {
+  font-size: 13px;
+}
+
+.shop-item .shop-sprite, .shop-item .shop-sprite img {
+  width: var(--pw-item-icon-lg);
+  height: var(--pw-item-icon-lg);
+}
+
+.mine-tool-shop {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.mine-tool-shop {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+
+/* NB: .save-slot is EXCLUDED — save cards carry their own themed background (save-bg-classic/emerald/…) which must stay visible in the settings preview as in the saves menu. */
+.shop-item {
+  background: rgba(0, 0, 0, 0.28) !important;
+  border: 1px solid var(--pw-border) !important;
+  color: var(--light2) !important;
+}
+
+.shop-item:hover {
+  background: rgba(236, 222, 183, 0.15) !important;
+  border-color: var(--light2) !important;
+  color: var(--light2) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.shop-item b {
+  color: var(--light2) !important;
+  font-weight: 700;
+}
+
+
+/* 3. Subtitles, descriptions, stock, and secondary text always readable gold (#c9bc8a) Never allow --dark3 text on dark backgrounds */
+.shop-desc {
+  color: #c9bc8a !important;
+}
+
+.loc-shop-btn {
+  background: rgba(0, 0, 0, 0.45) !important;
+  border: 1px solid var(--pw-border) !important;
+  color: var(--light2) !important;
+}
+
+.loc-shop-btn:hover {
+  background: rgba(236, 222, 183, 0.18) !important;
+  border-color: var(--light2) !important;
+  color: var(--light2) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.shop-desc {
+  color: var(--light1) !important;
+}
+
+.mine-tool-shop {
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+}
+
+.pw-atoll-fragments-card .pw-atoll-shop-grid {
+  margin-top: 4px;
+}
+
+.pw-atoll-shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(230px,100%), 1fr));
+  gap: 10px;
+}
+
+.pw-atoll-shop-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: 12px;
+}
+
+.pw-atoll-shop-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.pw-atoll-shop-text {
+  min-width: 0;
+}
+
+.pw-atoll-shop-text b {
+  display: block;
+  color: var(--pw-text-primary);
+}
+
+.pw-atoll-shop-locked {
+  flex-shrink: 0;
+  border: 1px dashed var(--pw-border-color);
+  border-radius: 10px;
+  padding: 6px 10px;
+  color: var(--light1);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+
+/* The rebuilt shop & market lists: ONE vertical flow (rows keep their pw-choice-card / pw-manage-card look; these classes only glue the flow). */
+.pw-shop-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+
+/* Single-price cell never wraps on the stock row. */
+.pw-shop-row .pw-shop-price {
+  white-space: nowrap;
+}
+
+.mine-tool-shop {
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+  gap: 14px;
+}
+
+.pw-shop-upgrade-ico {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  color: var(--accent);
+}
+
+.pw-shop-upgrade-ico svg {
+  width: 100%;
+  height: 100%;
+}
+
+.pw-staff-price-quote > .pw-price-tag {
+  width: 100%;
+  justify-content: space-between;
+  font-weight: 800;
+}
+
+.pw-shop-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.pw-shop-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid rgba(255, 255, 255, .09);
+  cursor: pointer;
+  user-select: none;
+}
+
+.pw-shop-item:hover {
+  background: rgba(255, 255, 255, .09);
+  border-color: rgba(255, 255, 255, .22);
+}
+
+.pw-shop-item.selected {
+  background: rgba(148, 136, 107, .22);
+  border-color: var(--accent, #94886B);
+  box-shadow: 0 0 0 1px var(--accent, #94886B) inset;
+}
+
+.pw-shop-item.soldout {
+  opacity: .45;
+  cursor: default;
+}
+
+.pw-shop-item .pw-shop-ico {
+  width: var(--pw-item-icon-sm);
+  height: var(--pw-item-icon-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pw-shop-item .pw-shop-ico-img {
+  max-width: var(--pw-item-icon-sm);
+  max-height: var(--pw-item-icon-sm);
+  image-rendering: pixelated;
+}
+
+.pw-shop-item .pw-shop-name {
+  font-size: 12px;
+  color: var(--light1, #ECDEB7);
+  text-align: center;
+  line-height: 1.15;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pw-shop-item .pw-shop-price {
+  font-size: 11px;
+  color: var(--light2, #fff);
+  font-variant-numeric: tabular-nums;
+}
+
+.pw-shop-item .pw-shop-stock {
+  font-size: 11px;
+  color: var(--light3, #9aa);
+}
+
+.pw-shop-item .pw-shop-soldout {
+  font-size: 11px;
+  color: var(--red, #E4A0A0);
+  font-weight: 700;
+}
+
+.pw-shop-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid rgba(255, 255, 255, .1);
+}
+
+.pw-shop-footer .pw-shop-qty {
+  width: 72px;
+  background: #1c1a16;
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 6px;
+  color: #ECDEB7;
+  padding: 5px 8px;
+  font-size: 13px;
+}
+
+.pw-shop-footer .pw-shop-total {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--light1, #ECDEB7);
+}
+
+.pw-shop-buy {
+  font-weight: 700;
+}
+
+.pw-price-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pw-price-tag-ico {
+  width: 14px;
+  height: 14px;
+}
+
+.pw-market-price .pw-price-tag-amount,
+.pw-market-footer .pw-price-tag-amount {
+  text-transform: lowercase;
+}
+
+.pw-market-footer .pw-shop-qty {
+  min-width: 0;
+  min-height: 0;
+  background: var(--pw-bg-sprite);
+  color: var(--pw-text-primary);
+  border-color: var(--pw-border-color);
+  border-radius: var(--pw-radius-sm);
+}
+
+.pw-market-footer .pw-shop-total {
+  color: var(--pw-text-primary);
+}
+
+@media (max-width: 360px) {
+.pw-market-footer .pw-shop-total {
+  margin-left: 0;
+}
+
+}
+
+.pw-shop-wallet {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pw-shop-upgrade-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.pw-mine-auto-header .pw-price-tag {
+  font-size: 11px;
+}

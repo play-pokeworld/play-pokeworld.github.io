@@ -24,24 +24,44 @@ describe('Roaming Pokémon', (test) => {
 
   test('the shared UTC window deterministically assigns main-reference roamers', () => {
     const windowMs = RoamingRules.ROTATION_MS;
-    assert.equal(RoamingSystem.getSpeciesAt('route1', 0), 'articuno');
-    assert.equal(RoamingSystem.getSpeciesAt('route5', 0), 'zapdos');
-    assert.equal(RoamingSystem.getSpeciesAt('route7', 0), 'moltres');
-    assert.equal(RoamingSystem.getSpeciesAt('route13', 0), 'mew');
-    assert.equal(RoamingSystem.getSpeciesAt('route22', windowMs), 'articuno');
+    assert.equal(RoamingSystem.getAssignedSpecies('route1', 0), 'articuno');
+    assert.equal(RoamingSystem.getAssignedSpecies('route5', 0), 'zapdos');
+    assert.equal(RoamingSystem.getAssignedSpecies('route7', 0), 'moltres');
+    assert.equal(RoamingSystem.getAssignedSpecies('route13', 0), 'mew');
+    assert.equal(RoamingSystem.getAssignedSpecies('route22', windowMs), 'articuno');
 
-    assert.equal(RoamingSystem.getSpeciesAt('jroute34', 0), 'raikou');
-    assert.equal(RoamingSystem.getSpeciesAt('jroute43', 0), 'entei');
-    assert.equal(RoamingSystem.getSpeciesAt('jroute31', 0), 'celebi');
-    assert.equal(RoamingSystem.getSpeciesAt('nationalpark', 0), null, 'Rework dungeon locations never host roamers');
-    assert.equal(RoamingSystem.getSpeciesAt('jroute44', 8 * windowMs), null, 'dungeon exclusion applies even when the rotation selects that id');
+    assert.equal(RoamingSystem.getAssignedSpecies('jroute34', 0), 'raikou');
+    assert.equal(RoamingSystem.getAssignedSpecies('jroute43', 0), 'entei');
+    assert.equal(RoamingSystem.getAssignedSpecies('jroute31', 0), 'celebi');
+    assert.equal(RoamingSystem.getAssignedSpecies('nationalpark', 0), null, 'Rework dungeon locations never host roamers');
+    assert.equal(RoamingSystem.getAssignedSpecies('jroute44', 8 * windowMs), null, 'dungeon exclusion applies even when the rotation selects that id');
 
-    assert.equal(RoamingSystem.getSpeciesAt('route117', 0), 'latias');
-    assert.equal(RoamingSystem.getSpeciesAt('route121', 0), 'latios');
-    assert.equal(RoamingSystem.getSpeciesAt('route103', 0), 'jirachi');
-    assert.equal(RoamingSystem.getSpeciesAt('route112', 0), 'deoxys');
-    assert.equal(RoamingSystem.getSpeciesAt('route19', 21 * windowMs), 'articuno', 'Kanto sea routes are included');
-    assert.equal(RoamingSystem.getSpeciesAt('viridian', 0), null, 'towns are excluded');
+    assert.equal(RoamingSystem.getAssignedSpecies('route117', 0), 'latias');
+    assert.equal(RoamingSystem.getAssignedSpecies('route121', 0), 'latios');
+    assert.equal(RoamingSystem.getAssignedSpecies('route103', 0), 'jirachi');
+    assert.equal(RoamingSystem.getAssignedSpecies('route112', 0), 'deoxys');
+    assert.equal(RoamingSystem.getAssignedSpecies('route19', 21 * windowMs), 'articuno', 'Kanto sea routes are included');
+    assert.equal(RoamingSystem.getAssignedSpecies('viridian', 0), null, 'towns are excluded');
+  });
+
+  test('the feature switch hides the live roamer but keeps the rotation intact', () => {
+    assert.equal(RoamingSystem.isEnabled(), false, 'roaming is switched off in this build');
+    for (const pool of Object.values(RoamingRules.REGIONS)) {
+      const hosting = new Set(pool.offsets
+        .map((offset) => pool.routes[(pool.windowOffset + offset) % pool.routes.length])
+        // Only outdoor routes can host a roamer: a dungeon place holder in the pool never does.
+        .filter((routeId) => ['route', 'sea'].includes(LocationDB.getInstance().getById(routeId)?.kind)));
+      assert.ok(hosting.size > 0, `${pool.routes.length} routes, at least one roamer this window`);
+      for (const routeId of pool.routes) {
+        assert.equal(RoamingSystem.getAssignedSpecies(routeId, 0) !== null, hosting.has(routeId),
+          `${routeId} keeps its rotation rule`);
+        assert.equal(RoamingSystem.getSpeciesAt(routeId, 0), null, `${routeId} exposes no live roamer`);
+        assert.equal(RoamingSystem.getSpeciesAt(routeId), null, `${routeId} exposes no live roamer now`);
+      }
+      for (const speciesId of pool.species) {
+        assert.equal(RoamingSystem.getRouteForSpecies(speciesId, 0), null, `${speciesId} has no live route`);
+      }
+    }
   });
 
   test('the 12-hour clock reports a UTC-boundary countdown', () => {

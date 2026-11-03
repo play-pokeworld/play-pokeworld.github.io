@@ -284,7 +284,7 @@ export class SaveMenuPage extends BasePage {
     try {
       save = SaveSystem.getInstance().importFromJson(content);
     } catch (err) {
-      console.error(t('debug_save_import_failed'), err);
+      console.error(String(t('debug_save_import_failed')), err);
     }
     if (!save) {
       this._notifyImportError();

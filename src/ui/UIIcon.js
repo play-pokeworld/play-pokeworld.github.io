@@ -42,7 +42,7 @@ export class UIIcon extends UIElement {
     this._iconName = def ? iconName : '';
     this._dom.textContent = '';
     if (!def) {
-      if (iconName) console.warn(t('debug_icon_unknown', { name: iconName }));
+      if (iconName) console.warn(String(t('debug_icon_unknown', { name: iconName })));
       return;
     }
 

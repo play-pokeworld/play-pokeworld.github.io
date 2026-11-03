@@ -26,6 +26,20 @@ import { t } from '../../localization/LocalizationManager.js';
 
 export class LocationActions extends UIContainer {
   /**
+   * Marks an action tile with its tutorial role. The guided tutorial points its halo at
+   * `[data-tutorial="battle|shop|dungeon"]` inside the location window; the hook lives in the
+   * data attribute rather than in a CSS class so a restyle can never break the tutorial.
+   * @private
+   * @param {UIActionTile} tile
+   * @param {string} role
+   * @returns {UIActionTile} the same tile
+   */
+  static _hook(tile, role) {
+    tile.setData('tutorial', role);
+    return tile;
+  }
+
+  /**
    * @param {Readonly<Object>|null} location - LocationDB definition
    * @param {number} encounterCount - Regular wild encounter entries at the location
    * @param {boolean} [hasRoamingEncounter=false] - Whether an active roaming Pokémon is here
@@ -98,24 +112,30 @@ export class LocationActions extends UIContainer {
           ? `${entryLabel} — {dungeonToken} ${TextFormatter.formatNumber(toll)}`
           : null;
       this.addChild(
-        new UIActionTile({
-          text: label,
-          ...(richText ? { richText } : {}),
-          icon: 'sparkle',
-          variant: elsewhere
-            ? ActionTileVariants.DEFAULT
-            : ActionTileVariants.DUNGEON,
-          // DungeonSystem is the Rework boundary for both a paid entry and a same-place resume.
-          onClick: elsewhere ? null : () => dungeon.enter(location.id),
-        }),
+        LocationActions._hook(
+          new UIActionTile({
+            text: label,
+            ...(richText ? { richText } : {}),
+            icon: 'sparkle',
+            variant: elsewhere
+              ? ActionTileVariants.DEFAULT
+              : ActionTileVariants.DUNGEON,
+            // DungeonSystem is the Rework boundary for both a paid entry and a same-place resume.
+            onClick: elsewhere ? null : () => dungeon.enter(location.id),
+          }),
+          'dungeon',
+        ),
       );
     } else if (activity === LocationActivityKinds.WILD) {
       this.addChild(
-        new UIActionTile({
-          text: t('explore_btn'),
-          icon: 'swords',
-          onClick: () => BattleSystem.getInstance().startBattle(location.id),
-        }),
+        LocationActions._hook(
+          new UIActionTile({
+            text: t('explore_btn'),
+            icon: 'swords',
+            onClick: () => BattleSystem.getInstance().startBattle(location.id),
+          }),
+          'battle',
+        ),
       );
     }
 
@@ -251,14 +271,17 @@ export class LocationActions extends UIContainer {
         icon: 'store',
       });
     }
-    return new UIActionTile({
-      text: t('tab_shop'),
-      icon: 'store',
-      onClick: () =>
-        EventBus.getInstance().dispatch(
-          new ModalOpenRequestedEvent(ModalIds.SHOP),
-        ),
-    });
+    return LocationActions._hook(
+      new UIActionTile({
+        text: t('tab_shop'),
+        icon: 'store',
+        onClick: () =>
+          EventBus.getInstance().dispatch(
+            new ModalOpenRequestedEvent(ModalIds.SHOP),
+          ),
+      }),
+      'shop',
+    );
   }
 
   /** @private @param {Readonly<Object>} location */

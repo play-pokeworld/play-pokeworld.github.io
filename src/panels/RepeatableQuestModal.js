@@ -113,10 +113,10 @@ export class RepeatableQuestModal extends StaticModalPanel {
     this.addChild(new UIText({ className: 'pw-repeatable-board-intro', text: t('repeatable_board_intro') }));
 
     const offerSection = new UIContainer({ className: 'pw-repeatable-board-section' });
-    offerSection.addChild(new UIText({ tagName: 'h3', className: 'pw-repeatable-board-section-title', text: t('repeatable_offers_heading') }));
+    offerSection.addChild(new UIText({ tagName: 'h3', className: 'pw-section-title', text: t('repeatable_offers_heading') }));
     const offers = state.offers.filter((offer) => !offer.active);
     if (offers.length === 0) {
-      offerSection.addChild(new UIText({ className: 'pw-repeatable-board-empty', text: t('repeatable_board_no_offers') }));
+      offerSection.addChild(new UIText({ className: 'pw-empty-state is-sm', text: t('repeatable_board_no_offers') }));
     } else {
       const grid = new UIContainer({ className: 'pw-repeatable-board-offers' });
       for (const offer of offers) {
@@ -131,7 +131,7 @@ export class RepeatableQuestModal extends StaticModalPanel {
 
     if (state.activeQuests.length > 0) {
       const activeSection = new UIContainer({ className: 'pw-repeatable-board-section' });
-      activeSection.addChild(new UIText({ tagName: 'h3', className: 'pw-repeatable-board-section-title', text: t('repeatable_active_heading') }));
+      activeSection.addChild(new UIText({ tagName: 'h3', className: 'pw-section-title', text: t('repeatable_active_heading') }));
       const activeCards = new UIContainer({ className: 'pw-repeatable-board-active' });
       for (const status of state.activeQuests) {
         const card = new QuestCard({

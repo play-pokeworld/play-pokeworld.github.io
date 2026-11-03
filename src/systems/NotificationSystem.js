@@ -71,7 +71,7 @@ export class NotificationSystem extends BaseSystem {
     if (enabled) this._enabledChannels.add(channel);
     else this._enabledChannels.delete(channel);
     LocalStore.setJson(StorageKeys.NOTIFICATION_CHANNELS, [...this._enabledChannels]);
-    console.log(t(enabled ? 'debug_notif_channel_enabled' : 'debug_notif_channel_disabled', { channel }));
+    console.log(String(t(enabled ? 'debug_notif_channel_enabled' : 'debug_notif_channel_disabled', { channel })));
   }
 
   // --- Publishing ---
@@ -88,13 +88,13 @@ export class NotificationSystem extends BaseSystem {
     const tone = Object.values(NotificationTones).includes(options.tone) ? options.tone : NotificationTones.SUCCESS;
 
     if (!this.isChannelEnabled(channel)) {
-      console.log(t('debug_notif_muted_suppressed', { channel }));
+      console.log(String(t('debug_notif_muted_suppressed', { channel })));
       return null;
     }
 
     const id = `notif_${++this._idCounter}`;
     this._records.set(id, { id, message, type, channel, tone });
-    console.log(t('debug_notif_dispatched', { channel, type, message }));
+    console.log(String(t('debug_notif_dispatched', { channel, type, message })));
     EventBus.getInstance().dispatch(new NotificationDispatchedEvent(id, message, type, channel, tone));
 
     if (type === NotificationTypes.TEMPORARY) {
@@ -122,7 +122,7 @@ export class NotificationSystem extends BaseSystem {
     this._records.delete(id);
     clearTimeout(this._timers.get(id));
     this._timers.delete(id);
-    console.log(t('debug_notif_dismissed', { id }));
+    console.log(String(t('debug_notif_dismissed', { id })));
     EventBus.getInstance().dispatch(new NotificationDismissedEvent(id));
   }
 

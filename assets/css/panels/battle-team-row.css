@@ -1,0 +1,789 @@
+/*
+ * panels/battle-team-row.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+:not(#battle-team-row) > .poke-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  border-color: var(--light2);
+}
+
+#battle-team-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+:not(#battle-team-row) > .poke-card:hover, :not(#battle-team-row) > .pw-poke-card:hover {
+  border-color: var(--pw-text-primary) !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.6) !important;
+  transform: translateY(-2px) !important;
+  color: var(--pw-text-primary) !important;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+#battle-team-row {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+#battle-team-row .poke-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+}
+
+#battle-team-row .poke-card {
+  background: rgba(10,12,14,0.46) !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.25) !important;
+  padding: 10px !important;
+}
+
+#battle-team-row .poke-card.active {
+  border-left: 3px solid var(--accent) !important;
+}
+
+#battle-team-row {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: none !important;
+  grid-template-areas: none !important;
+  align-items: stretch !important;
+  gap: 8px !important;
+  min-height: 0 !important;
+  padding: 10px !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  background-color: var(--dark2) !important;
+  background-image: none !important;
+  border: 1px solid var(--dark3) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06) !important;
+}
+
+#battle-team-row .poke-card:first-child,
+#battle-team-row .poke-card:not(:first-child) {
+  grid-area: auto !important;
+}
+
+#battle-team-row .poke-card,
+#battle-team-row .poke-card:hover {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: var(--pc-battle-sprite) minmax(0, 1fr) !important;
+  grid-template-rows: auto auto !important;
+  align-items: start !important;
+  gap: 6px 10px !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 7px !important;
+  border-radius: 10px !important;
+  overflow: visible !important;
+  height: auto !important;
+  min-height: 0 !important;
+  background: rgba(26, 28, 23, .82) !important;
+  border: 1px solid rgba(255, 255, 255, .10) !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .35) !important;
+  backdrop-filter: blur(2px) !important;
+  -webkit-backdrop-filter: blur(2px) !important;
+}
+
+#battle-team-row .poke-card:first-child {
+  background: rgba(58, 44, 40, .90) !important;
+  border-color: rgba(230, 160, 120, .55) !important;
+  margin-bottom: 6px !important;
+}
+
+#battle-team-row .poke-card.active {
+  background: rgba(74, 70, 46, .88) !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 1px var(--accent), 0 4px 14px rgba(0, 0, 0, .45) !important;
+}
+
+#battle-team-row .poke-card.fainted {
+  opacity: .48 !important;
+  filter: grayscale(.85) !important;
+}
+
+#battle-team-row .poke-card-top {
+  display: contents !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+
+#battle-team-row .poke-sprite-container {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: calc(var(--pc-battle-sprite) - 8px) !important;
+  position: relative !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+#battle-team-row .pw-poke-circle-wrap,
+#battle-team-row .pw-poke-circle-bg {
+  width: 100% !important;
+  height: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+#battle-team-row .pw-poke-circle-img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  image-rendering: pixelated !important;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .5)) !important;
+}
+
+#battle-team-row .caught-status-ball {
+  width: 14px !important;
+  height: 14px !important;
+  flex: 0 0 auto !important;
+}
+
+#battle-team-row .xp-bar-container {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+#battle-team-row .xp-bar {
+  height: 3px !important;
+  border-radius: 2px !important;
+  background: rgba(0, 0, 0, .45) !important;
+  overflow: hidden !important;
+}
+
+#battle-team-row .poke-status {
+  grid-column: 2 !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+#battle-team-row .poke-card > .battle-chip {
+  display: none !important;
+}
+
+#battle-team-row .poke-card:not(:first-child):not(.active) {
+  grid-template-columns: var(--pc-bench-sprite) minmax(0, 1fr) !important;
+  padding: 5px 7px !important;
+  background: rgba(20, 22, 18, .62) !important;
+}
+
+#battle-team-row .poke-card:not(:first-child):not(.active) .poke-sprite-container {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: calc(var(--pc-bench-sprite) - 6px) !important;
+}
+
+#battle-team-row .poke-card:not(:first-child):not(.active) .xp-bar-container {
+  display: none !important;
+}
+
+@media (max-width: 760px) {
+#battle-team-row {
+  padding: 8px !important;
+  gap: 6px !important;
+}
+
+#battle-team-row .poke-card {
+  gap: 5px 8px !important;
+}
+
+}
+
+#battle-team-row {
+  background: var(--dark2) !important;
+  background-image: none !important;
+  border: 2px solid var(--light1) !important;
+  border-radius: 8px !important;
+  padding: 8px !important;
+  gap: 6px !important;
+}
+
+#battle-team-row > .poke-card:first-child {
+  position: relative !important;
+  background-color: #2C3326 !important;
+  background-image: url('../../images/bg/route.png') !important;
+  background-repeat: no-repeat !important;
+  background-position: center bottom !important;
+  background-size: cover !important;
+  image-rendering: pixelated !important;
+  border: 2px solid var(--dark1) !important;
+  border-radius: 6px !important;
+  box-shadow: rgba(0, 0, 0, .4) 0 4px 5px 1px !important;
+  padding: 10px !important;
+  min-height: var(--pc-bg-band-h) !important;
+  align-items: end !important;
+  overflow: hidden !important;
+}
+
+#battle-team-row > .poke-card:first-child::after {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(180deg, rgba(16, 20, 14, .05) 0%, rgba(16, 20, 14, .38) 100%) !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+#battle-team-row > .poke-card:first-child.fainted {
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+#battle-team-row > .poke-card:not(:first-child) {
+  border-radius: 6px !important;
+  margin: 0 !important;
+}
+
+#battle-team-row .poke-sprite,
+#battle-team-row .poke-sprite-container {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+#battle-team-row .poke-sprite img {
+  image-rendering: pixelated !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  transform-origin: center bottom !important;
+}
+
+#battle-team-row > .poke-card:not(:first-child):not(.active) .poke-sprite img {
+  --pw-bob-scale: 1.16;
+}
+
+#battle-team-row .poke-sprite, #battle-team-row .poke-sprite-container {
+  overflow: visible !important;
+}
+
+#battle-team-row > .poke-card {
+  overflow: hidden !important;
+}
+
+#battle-team-row > .poke-card:first-child {
+  background-image: var(--pc-scene-url) !important;
+}
+
+#battle-team-row {
+  background: var(--dark2) !important;
+  border-color: var(--dark3) !important;
+}
+
+#battle-team-row .poke-card,
+
+
+#battle-team-row .poke-card:first-child {
+  background-color: var(--dark1) !important;
+  border-color: var(--dark3) !important;
+}
+
+#battle-team-row .poke-card.active {
+  background: color-mix(in srgb, var(--accent) 14%, var(--dark2)) !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 1px var(--accent), 0 4px 14px rgba(0, 0, 0, .45) !important;
+}
+
+#battle-team-row > .poke-card:first-child::after {
+  background: linear-gradient(180deg, rgba(0, 0, 0, .06) 0%, rgba(0, 0, 0, .34) 100%) !important;
+}
+
+#battle-team-row > .poke-card:first-child {
+  row-gap: 0 !important;
+  column-gap: 10px !important;
+}
+
+#battle-team-row .poke-sprite-container, #battle-team-row .poke-sprite {
+  display: grid !important;
+  place-items: center !important;
+  align-content: center !important;
+}
+
+#battle-team-row .poke-sprite img, #battle-team-row .pw-poke-circle-img {
+  object-position: center center !important;
+  transform-origin: center center !important;
+  align-self: center !important;
+  margin: auto !important;
+}
+
+#battle-team-row .poke-sprite img {
+  --pw-bob-scale: 1.34;
+}
+
+#battle-team-row > .poke-card:not(:first-child):not(.active) .poke-sprite img {
+  --pw-bob-scale: 1.16;
+}
+
+#battle-team-row > .poke-card.active .poke-sprite,
+#battle-team-row > .poke-card.active .poke-sprite-container {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+#battle-team-row .status-badge, #battle-team-row .buff-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 17px !important;
+  padding: 2px 7px !important;
+  border-radius: 9px !important;
+  border: 1px solid rgba(255, 255, 255, .28) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: .02em !important;
+  line-height: 1.1 !important;
+  text-transform: none !important;
+  color: #14120E !important;
+  text-shadow: none !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .35) !important;
+}
+
+#battle-team-row .caught-status-ball {
+  width: 16px !important;
+  height: 16px !important;
+  flex: 0 0 auto !important;
+  image-rendering: pixelated !important;
+  vertical-align: middle !important;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .5)) !important;
+}
+
+#battle-team-row .poke-card .poke-sprite img {
+  animation: pw30-bob 2.6s ease-in-out infinite;
+  will-change: transform;
+}
+
+#battle-team-row > .poke-card:first-child .poke-sprite img {
+  animation-duration: 2.9s;
+  animation-delay: -.7s;
+}
+
+#battle-team-row > .poke-card:nth-child(2) .poke-sprite img {
+  animation-delay: -.2s;
+}
+
+#battle-team-row > .poke-card:nth-child(3) .poke-sprite img {
+  animation-delay: -1.1s;
+}
+
+#battle-team-row > .poke-card:nth-child(4) .poke-sprite img {
+  animation-delay: -1.6s;
+}
+
+#battle-team-row > .poke-card:nth-child(5) .poke-sprite img {
+  animation-delay: -.9s;
+}
+
+#battle-team-row > .poke-card:nth-child(6) .poke-sprite img {
+  animation-delay: -2.1s;
+}
+
+#battle-team-row > .poke-card:nth-child(7) .poke-sprite img {
+  animation-delay: -1.4s;
+}
+
+#battle-team-row .poke-card.fainted .poke-sprite img {
+  animation: none !important;
+}
+
+#battle-team-row > .poke-card:not(:first-child):not(.active) .poke-sprite img {
+  --pw-bob-scale: 1.22;
+}
+
+@media (prefers-reduced-motion: reduce) {
+#battle-team-row .poke-card .poke-sprite img {
+  animation: none !important;
+}
+
+}
+
+#battle-team-row {
+  --pc-battle-sprite: 168px;
+  --pc-bench-sprite: 104px;
+}
+
+#battle-team-row > .poke-card:first-child .poke-sprite,
+#battle-team-row > .poke-card:first-child .poke-sprite-container,
+#battle-team-row > .poke-card.active .poke-sprite,
+#battle-team-row > .poke-card.active .poke-sprite-container {
+  width: var(--pc-battle-sprite) !important;
+  height: var(--pc-battle-sprite) !important;
+  min-height: var(--pc-battle-sprite) !important;
+}
+
+#battle-team-row > .poke-card:not(:first-child):not(.active) .poke-sprite,
+#battle-team-row > .poke-card:not(:first-child):not(.active) .poke-sprite-container {
+  width: var(--pc-bench-sprite) !important;
+  height: var(--pc-bench-sprite) !important;
+  min-height: var(--pc-bench-sprite) !important;
+}
+
+@media (max-width: 760px) {
+#battle-team-row {
+  --pc-battle-sprite: 124px;
+  --pc-bench-sprite: 84px;
+}
+
+}
+
+#battle-team-row .status-badge, #battle-team-row .buff-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 18px !important;
+  padding: 2px 8px !important;
+  border-radius: 9px !important;
+  border: 1px solid rgba(0, 0, 0, .28) !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: .02em !important;
+  line-height: 1.1 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .3) !important;
+}
+
+#battle-team-row .buff-badge.atk-up {
+  background: var(--type-fighting) !important;
+  color: #FFFFFF !important;
+}
+
+#battle-team-row .buff-badge.def-up {
+  background: var(--type-steel) !important;
+  color: #FFFFFF !important;
+}
+
+#battle-team-row .buff-badge.spe-up {
+  background: var(--type-electric) !important;
+  color: #14120E !important;
+}
+
+#battle-team-row .buff-badge.atk-down {
+  background: color-mix(in srgb, var(--type-fighting) 62%, #000000) !important;
+  border-color: var(--type-fighting) !important;
+  color: #FFFFFF !important;
+}
+
+#battle-team-row .buff-badge.def-down {
+  background: color-mix(in srgb, var(--type-steel) 62%, #000000) !important;
+  border-color: var(--type-steel) !important;
+  color: #FFFFFF !important;
+}
+
+#battle-team-row .buff-badge.spe-down {
+  background: color-mix(in srgb, var(--type-electric) 62%, #000000) !important;
+  border-color: var(--type-electric) !important;
+  color: #FFFFFF !important;
+}
+
+#battle-team-row .status-badge.burn {
+  background: var(--type-fire) !important;
+  color: #14120E !important;
+}
+
+#battle-team-row .status-badge.poison, #battle-team-row .status-badge.badpoison {
+  background: var(--type-poison) !important;
+  color: #FFFFFF !important;
+}
+
+#battle-team-row .status-badge.paralysis, #battle-team-row .status-badge.para {
+  background: var(--type-electric) !important;
+  color: #14120E !important;
+}
+
+#battle-team-row .status-badge.sleep {
+  background: var(--type-normal) !important;
+  color: #14120E !important;
+}
+
+#battle-team-row .status-badge.freeze {
+  background: var(--type-ice) !important;
+  color: #14120E !important;
+}
+
+#battle-team-row .status-badge.confuse {
+  background: var(--type-psychic) !important;
+  color: #14120E !important;
+}
+
+#battle-team-row .poke-card span.status-badge, #battle-team-row .poke-card span.buff-badge {
+  opacity: 1 !important;
+}
+
+#battle-team-row .poke-card.pw-fx-capture {
+  overflow: visible !important;
+}
+
+#battle-team-row .poke-card .poke-sprite img {
+  animation: pw31-bob 2.6s ease-in-out infinite !important;
+  will-change: transform;
+}
+
+#battle-team-row > .poke-card:first-child .poke-sprite img,
+#battle-team-row > .poke-card.active .poke-sprite img {
+  --pw-bob-scale: 1.34;
+}
+
+#battle-team-row > .poke-card:not(:first-child):not(.active) .poke-sprite img {
+  --pw-bob-scale: 1.16;
+}
+
+#battle-team-row > .poke-card:first-child .poke-sprite img,
+#battle-team-row > .poke-card.active .poke-sprite img {
+  --pw-bob-lift: -7px;
+}
+
+#battle-team-row > .poke-card:not(:first-child):not(.active) .poke-sprite img {
+  --pw-bob-lift: -3px;
+}
+
+#battle-team-row > .poke-card:first-child .poke-sprite img {
+  animation-duration: 2.9s !important;
+  animation-delay: -.7s !important;
+}
+
+#battle-team-row > .poke-card:nth-child(2) .poke-sprite img {
+  animation-delay: -.2s !important;
+}
+
+#battle-team-row > .poke-card:nth-child(3) .poke-sprite img {
+  animation-delay: -1.1s !important;
+}
+
+#battle-team-row > .poke-card:nth-child(4) .poke-sprite img {
+  animation-delay: -1.6s !important;
+}
+
+#battle-team-row > .poke-card:nth-child(5) .poke-sprite img {
+  animation-delay: -.9s !important;
+}
+
+#battle-team-row > .poke-card:nth-child(6) .poke-sprite img {
+  animation-delay: -2.1s !important;
+}
+
+#battle-team-row > .poke-card:nth-child(7) .poke-sprite img {
+  animation-delay: -1.4s !important;
+}
+
+#battle-team-row .poke-card.fainted .poke-sprite img {
+  animation: none !important;
+  transform: scale(var(--pw-bob-scale, 1.34)) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+#battle-team-row .poke-card .poke-sprite img {
+  animation: none !important;
+}
+
+#battle-team-row .poke-card .poke-sprite img {
+  transform: scale(var(--pw-bob-scale, 1.34)) !important;
+}
+
+}
+
+#battle-team-row > .poke-card:first-child .poke-sprite-container,
+#battle-team-row > .poke-card.active .poke-sprite-container {
+  min-height: var(--pc-battle-sprite-h) !important;
+  height: var(--pc-battle-sprite-h) !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+
+#battle-team-row > .poke-card:first-child .poke-sprite,
+#battle-team-row > .poke-card.active .poke-sprite {
+  height: 100% !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+
+#battle-team-row > .poke-card:first-child,
+#battle-team-row > .poke-card.active {
+  min-height: var(--pc-battle-sprite-h) !important;
+  align-items: center !important;
+}
+
+#battle-team-row > .poke-card:first-child .poke-sprite img,
+#battle-team-row > .poke-card.active .poke-sprite img {
+  height: 100% !important;
+  width: auto !important;
+  max-width: 100% !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  transform-origin: center bottom !important;
+}
+
+#battle-team-row > .poke-card:not(:first-child):not(.active) .poke-sprite-container {
+  min-height: var(--pc-bench-sprite-h) !important;
+  height: var(--pc-bench-sprite-h) !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+
+#battle-team-row > .poke-card:not(:first-child):not(.active) .poke-sprite img {
+  height: 100% !important;
+  width: auto !important;
+  max-width: 100% !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  transform-origin: center bottom !important;
+}
+
+#battle-team-row .poke-card .poke-sprite img {
+  --pw-bob-scale: 1;
+}
+
+#battle-team-row .poke-card .poke-sprite img {
+  animation: pw32-hop .5s steps(1, end) infinite !important;
+  animation-delay: 0s !important;
+  will-change: transform;
+}
+
+#battle-team-row > .poke-card:nth-child(2) .poke-sprite img {
+  animation-delay: -.08s !important;
+}
+
+#battle-team-row > .poke-card:nth-child(3) .poke-sprite img {
+  animation-delay: -.16s !important;
+}
+
+#battle-team-row > .poke-card:nth-child(4) .poke-sprite img {
+  animation-delay: -.24s !important;
+}
+
+#battle-team-row > .poke-card:nth-child(5) .poke-sprite img {
+  animation-delay: -.32s !important;
+}
+
+#battle-team-row > .poke-card:nth-child(6) .poke-sprite img {
+  animation-delay: -.40s !important;
+}
+
+#battle-team-row > .poke-card:nth-child(7) .poke-sprite img {
+  animation-delay: -.12s !important;
+}
+
+#battle-team-row .poke-card.fainted .poke-sprite img {
+  animation: none !important;
+  transform: none !important;
+}
+
+#battle-team-row > .poke-card:first-child::after {
+  right: auto !important;
+  width: var(--pc-battle-sprite, 132px) !important;
+  z-index: 0 !important;
+}
+
+#battle-team-row > .poke-card:first-child .poke-status {
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+#battle-team-row > .poke-card:first-child .poke-status, #battle-team-row > .poke-card:first-child .status-badge, #battle-team-row > .poke-card:first-child .buff-badge {
+  filter: none !important;
+  opacity: 1 !important;
+  mix-blend-mode: normal !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+#battle-team-row .poke-card .poke-sprite img {
+  animation: none !important;
+}
+
+}
+
+#battle-team-row > .poke-card:not(:first-child):not(.active) .poke-sprite {
+  height: var(--pc-bench-sprite-h) !important;
+  min-height: var(--pc-bench-sprite-h) !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+
+#battle-team-row > .poke-card:not(:first-child):not(.active) .poke-sprite img {
+  height: 100% !important;
+  width: auto !important;
+  max-width: 100% !important;
+  max-height: none !important;
+}
+
+#battle-team-row > .poke-card:first-child::after {
+  background: none !important;
+  display: none !important;
+  content: none !important;
+}
+
+#battle-team-row > .poke-card:first-child .poke-sprite img {
+  animation: none !important;
+  --pw-bob: 0px;
+  transform: none !important;
+}
+
+#battle-team-row .poke-card.pw-dungeon-boss-card {
+  border-color: var(--red);
+  box-shadow: rgba(0, 0, 0, .45) 0 0 0 2px inset, var(--red) 0 0 10px -2px;
+}
+
+#battle-team-row .battle-team-member.is-switchable {
+  cursor: pointer !important;
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease,
+    filter 0.15s ease;
+}
+
+#battle-team-row .battle-team-member.is-switchable:hover {
+  border-color: var(--accent, #ffa500) !important;
+  filter: brightness(1.08);
+  outline: none;
+}
+
+#battle-team-row .battle-team-member[aria-disabled='true'] {
+  cursor: default;
+}
+
+@container pw-battle (max-width: 420px) {
+#win-battle #battle-team-row {
+  --pc-battle-sprite: 88px;
+  --pc-bench-sprite: 68px;
+}
+
+#win-battle #battle-team-row .poke-card,
+  #win-battle #battle-team-row .poke-card:hover,
+  #win-battle #battle-team-row .poke-card:not(:first-child):not(.active) {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: auto !important;
+  min-width: 0;
+}
+
+}

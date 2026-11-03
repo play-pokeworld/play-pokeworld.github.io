@@ -1,0 +1,37 @@
+/*
+ * components/modal-sizes.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.pw-preset-editor-window.pw-static-modal {
+  width: min(96vw, 980px);
+  max-width: 980px;
+  max-height: 92vh;
+}
+
+#pw-dictionary-detail.pw-static-modal {
+  width: min(var(--pw-panel-w-info, 560px), 94vw);
+  max-width: var(--pw-panel-w-info, 560px);
+  max-height: 88vh;
+  box-sizing: border-box;
+}
+
+.pw-static-modal--lg {
+  width: min(96vw, 1180px) !important;
+  max-width: 1180px !important;
+  max-height: 92vh !important;
+}
+
+.pw-static-modal--md {
+  width: min(90vw, 680px) !important;
+  max-width: 680px !important;
+  max-height: 85vh !important;
+}
+
+.pw-static-modal--sm {
+  width: min(88vw, 420px) !important;
+  max-width: 420px !important;
+  max-height: 70vh !important;
+}

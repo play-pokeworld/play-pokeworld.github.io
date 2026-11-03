@@ -401,7 +401,7 @@ export class SecretBasePanel extends DraggablePanel {
       const availableItems = catItems.filter((item) => (Number(stock[item.id]) || 0) > 0);
 
       if (availableItems.length === 0) {
-        page.addChild(new UIText({ className: 'base-stock-empty', text: t('edit.stock_empty') }));
+        page.addChild(new UIText({ className: 'pw-empty-state is-sm', text: t('edit.stock_empty') }));
       } else {
         for (const item of availableItems) {
           const count = Number(stock[item.id]) || 0;

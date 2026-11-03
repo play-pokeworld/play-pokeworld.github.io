@@ -123,7 +123,7 @@ export class SecretBaseNpcModal extends UIModal {
   _render() {
     this.clearChildren();
     if (!this._npcId) {
-      this.addChild(new UIText({ className: 'pw-empty-state-md', text: t('err.unknown') }));
+      this.addChild(new UIText({ className: 'pw-empty-state', text: t('err.unknown') }));
       return;
     }
 
@@ -440,7 +440,7 @@ export class SecretBaseNpcModal extends UIModal {
     }
     this._looksGrid.clearChildren();
     if (!sprites.length) {
-      this._looksGrid.addChild(new UIText({ className: 'pw-empty-state-md', text: t('err.unknown') }));
+      this._looksGrid.addChild(new UIText({ className: 'pw-empty-state', text: t('err.unknown') }));
       return;
     }
     const lookCards = sprites.map((id) => {
@@ -548,7 +548,7 @@ export class SecretBaseNpcModal extends UIModal {
     this._monCandidatesContainer.clearChildren();
     if (!filtered.length) {
       this._monCandidatesContainer.addChild(new UIText({
-        className: 'pw-empty-state-md',
+        className: 'pw-empty-state',
         text: t('err.unknown')
       }));
       return;
@@ -768,7 +768,7 @@ export class SecretBaseNpcModal extends UIModal {
 
     container.addChild(new UIContainer({
       className: 'preset-pick-list pw-preset-pick-list',
-      children: rows.length ? rows : [new UIText({ className: 'pw-empty-state-md', text: '—' })]
+      children: rows.length ? rows : [new UIText({ className: 'pw-empty-state', text: '—' })]
     }));
 
     const footer = new UIContainer({

@@ -50,6 +50,7 @@ export const facilities = {
   "facility_training_choose_hint": "Choose a Pokémon from the PC collection.",
   "facility_training_unlock_hint": "Moves: Lt. Surge · Level: Blaine · EVs: Giovanni · Talents: Kanto or Johto League.",
   "facility_reward_levels": "+{count} level(s)",
+  "facility_reward_evolution": "evolution: {species}",
   "facility_reward_ev": "+{count} {stat} EV",
   "facility_fossil_stock": "Available: {available} · Reserved in queues: {reserved}",
   "facility_fossil_picker_hint": "A queued fossil is reserved, not consumed. Its incubation needs real KOs before collection.",

@@ -1,0 +1,485 @@
+/*
+ * layout/header-bar.css
+ * ---------------------------------------------------------------------------
+ * Top bar: brand, player card, currencies, update banner.
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.player-card {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+  color: var(--pw-text-primary) !important;
+}
+
+#header {
+  background: var(--dark2);
+  border-bottom: 1px solid var(--dark3);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  position: sticky;
+  top: 0;
+  z-index: 950;
+  min-height: 56px;
+}
+
+#header h1 {
+  font-size: 20px;
+  color: var(--light2);
+  flex: 1;
+  letter-spacing: 2px;
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-mark {
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+  border-radius: 10px;
+  background: rgba(236,222,183,0.12);
+  border: 1px solid rgba(236,222,183,0.22);
+}
+
+.brand-mark svg {
+  width: 100%;
+  height: 100%;
+}
+
+.brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+  border-radius: 6px;
+}
+
+#header h1 {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#header h1 {
+  font-size: 13px;
+}
+
+#header h1 {
+  font-size: 20px;
+}
+
+.player-card {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid rgba(236,222,183,0.22) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+  color: var(--pw-text-primary) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.pw-money-row {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  background: rgba(236, 222, 183, 0.10);
+  border: 1px solid rgba(236, 222, 183, 0.25);
+}
+
+.pw-money-label {
+  font-size: 12px;
+  color: var(--light1);
+}
+
+.pw-money-amount {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--light2);
+}
+
+.pw-money-row {
+  background: color-mix(in srgb, var(--light2) 12%, transparent);
+  border-color: color-mix(in srgb, var(--light2) 30%, transparent);
+}
+
+.pw-update-banner {
+  background: linear-gradient(135deg, #D96B0C 0%, #B84A00 100%) !important;
+  border-bottom: 3px solid #FFC27F !important;
+  color: #FFFFFF !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  gap: 10px !important;
+  padding: 14px 40px !important;
+  position: sticky !important;
+  top: 56px !important;
+  z-index: 940 !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.6) !important;
+  font-family: "WinkySans", sans-serif !important;
+}
+
+.pw-update-banner-text {
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  color: #FFFFFF !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
+}
+
+.pw-update-banner-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+}
+
+.pw-update-banner-btn {
+  background: #FFFFFF !important;
+  border: 2px solid #FFC27F !important;
+  color: #7F2B00 !important;
+  font-weight: 900 !important;
+  font-size: 13px !important;
+  cursor: pointer !important;
+  border-radius: 8px !important;
+  padding: 8px 22px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+  transition: all 0.2s !important;
+}
+
+.pw-update-banner-btn:hover {
+  background: #FFE0BA !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.45) !important;
+}
+
+.pw-update-banner-close {
+  background: transparent !important;
+  border: none !important;
+  color: #FFE0BA !important;
+  cursor: pointer !important;
+  font-size: 18px !important;
+  padding: 4px 8px !important;
+  position: absolute !important;
+  right: 14px !important;
+  top: 10px !important;
+}
+
+.pw-update-banner-close:hover {
+  color: #FFFFFF !important;
+  transform: scale(1.1);
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+#header {
+  flex-wrap: wrap !important;
+  padding: 6px 10px !important;
+  gap: 4px !important;
+  min-height: 48px !important;
+  margin: 0 !important;
+}
+
+.pw-update-banner {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 99999 !important;
+  padding: 12px 24px !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.85) !important;
+}
+
+}
+
+.pw-cur-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .28);
+  border: 1px solid var(--dark3);
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.pw-cur-chip--hidden {
+  display: none !important;
+}
+
+.pw-cur-chip-sym {
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 13px;
+}
+
+.pw-cur-chip-ico {
+  width: 15px;
+  height: 15px;
+  image-rendering: pixelated;
+  flex: 0 0 auto;
+}
+
+#header .hinfo .pw-cur-chip-val {
+  color: var(--light2);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.pw-cur-chip-fx {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 0;
+  height: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.pw-cur-chip--energy {
+  gap: 7px;
+}
+
+.pw-cur-energy-bar {
+  display: inline-block;
+  width: 46px;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, .5);
+  overflow: hidden;
+}
+
+.pw-cur-energy-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #6FD3F5, #3E9BD6);
+}
+
+#header .hinfo .pw-cur-chip--badges {
+  color: var(--light1);
+  font-weight: 400;
+}
+
+@media (max-width: 900px) {
+.pw-cur-chip {
+  padding: 3px 8px;
+  font-size: 11px;
+}
+
+.pw-cur-energy-bar {
+  width: 34px;
+}
+
+}
+
+.pw-currency-panel .pw-cur-col {
+  --pw-cur-amount-top: 27px;
+}
+
+.pw-currency-panel .pw-cur-fx {
+  top: var(--pw-cur-amount-top) !important;
+  bottom: auto !important;
+}
+
+#header {
+  position: sticky;
+  top: 0;
+  z-index: 950;
+}
+
+.pw-currency-value {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 700;
+  color: var(--pw-accent-gold);
+}
+
+.pw-game-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background-color: transparent;
+}
+
+#header.pw-header-dock {
+  height: var(--pw-header-h);
+  background: var(--dark1);
+  border-bottom: 2px solid var(--dark3);
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.pw-currencies-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.pw-currency-item {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.pw-currency-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--light1);
+}
+
+#right-panel {
+  padding: 0;
+}
+
+#currency-window-body {
+  padding: 8px;
+  gap: 6px;
+}
+
+.pw-cur-ico {
+  width: 25px;
+  height: 25px;
+}
+
+.brand-mark img {
+  width: 28px;
+  height: 28px;
+}
+
+.pw-currency-panel {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px;
+}
+
+.pw-cur-col {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 56px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: center;
+}
+
+.pw-cur-ico {
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
+}
+
+.pw-cur-amount {
+  color: var(--light2);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: normal;
+}
+
+.pw-cur-name {
+  color: var(--light3, #9aa);
+  font-size: 11px;
+  line-height: normal;
+}
+
+.pw-market-wallet .pw-money-row {
+  align-items: center;
+  min-height: 28px;
+}
+
+.pw-game-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: auto;
+  overflow: visible;
+}
+
+.pw-game-screen > #header {
+  flex: none;
+}
+
+body:not(.mobile-mode) .pw-game-screen > #header {
+  height: auto;
+  min-height: 65px;
+  box-sizing: border-box;
+}
+
+body:not(.mobile-mode) #header .pw-header-brand {
+  gap: 10px;
+  font-size: 20px;
+  letter-spacing: 2px;
+}
+
+body:not(.mobile-mode) #header .pw-header-brand-mark {
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+body:not(.mobile-mode) #header .pw-header-brand-mark img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+#header .pw-header-badges-line {
+  display: contents;
+  white-space: nowrap;
+}
+
+#header .pw-header-punctuation {
+  display: contents;
+}
+
+body.mobile-mode #header .pw-header-brand {
+  gap: 10px;
+  font-size: 17px;
+  letter-spacing: 2px;
+}
+
+body.mobile-mode #header .pw-header-brand-mark {
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+  box-sizing: border-box;
+}

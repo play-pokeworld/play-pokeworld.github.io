@@ -1,0 +1,331 @@
+/*
+ * panels/npc.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+#base-npced-team {
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: 58vh;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  background: rgba(0,0,0,0.08);
+  border-radius: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.base-npc-looks {
+  max-height: 36vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid rgba(236,222,183,0.12);
+  border-radius: 10px;
+  background: rgba(0,0,0,0.12);
+}
+
+.base-npc-portrait-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--dark1);
+  border-radius: 12px;
+  background: var(--light1);
+  padding: 6px;
+  margin: 4px 12px 4px 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.base-npc-portrait-btn:hover {
+  border-color: var(--light2);
+  transform: scale(1.05);
+}
+
+.base-npc-portrait-edit {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--dark1);
+  color: var(--light2);
+  border-radius: 50%;
+  font-size: 12px;
+  border: 1px solid var(--light2);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.base-npc-portrait-btn:hover .base-npc-portrait-edit {
+  opacity: 1;
+}
+
+.base-npc-sprite {
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+
+.base-npc-looks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.base-npc-look {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 8px;
+  cursor: pointer;
+  background: var(--dark2);
+  color: var(--light1);
+  border: 2px solid var(--dark3);
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.base-npc-look:hover {
+  border-color: var(--light2);
+}
+
+.base-npc-look.sel {
+  border-color: var(--yellow);
+  background: var(--dark3);
+  color: var(--light2);
+}
+
+.loc-npc-btn {
+  background: rgba(156, 39, 176, 0.45) !important;
+  border: 1px solid #c058eb !important;
+  color: #ffffff !important;
+}
+
+.loc-npc-btn:hover {
+  background: rgba(156, 39, 176, 0.75) !important;
+  border-color: #e886ff !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.55) !important;
+}
+
+.loc-npc-btn .ab-icon, .loc-npc-btn .ab-icon svg, .loc-npc-btn .ab-label, .loc-npc-btn .ui-icon, .loc-npc-btn .ui-icon svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+button[data-action].pw-loc-npc-btn, .pw-loc-action-btn.pw-loc-npc-btn {
+  background: #5B4099 !important;
+  background-color: #5B4099 !important;
+  border: 2px solid #A98DE8 !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  box-shadow: none !important;
+}
+
+button[data-action].pw-loc-npc-btn:hover, .pw-loc-action-btn.pw-loc-npc-btn:hover {
+  background: #7252BA !important;
+  background-color: #7252BA !important;
+  border-color: #D3C2FB !important;
+  color: #FFFFFF !important;
+  box-shadow: none !important;
+  transform: translateY(-2px);
+}
+
+.pw-npc-line {
+  line-height: 1.55;
+  margin-bottom: 4px;
+  color: var(--pw-text-secondary);
+}
+
+button[data-action].pw-loc-npc-btn, .pw-loc-action-btn.pw-loc-npc-btn {
+  background: #5B4099 !important;
+  background-color: #5B4099 !important;
+  border: 2px solid #A98DE8 !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  box-shadow: none !important;
+}
+
+button[data-action].pw-loc-npc-btn:hover, .pw-loc-action-btn.pw-loc-npc-btn:hover {
+  background: #7252BA !important;
+  background-color: #7252BA !important;
+  border-color: #D3C2FB !important;
+  color: #FFFFFF !important;
+  box-shadow: none !important;
+  transform: translateY(-2px);
+}
+
+.pw-npc-done, .pw-npc-talked {
+  background: rgba(31, 138, 59, 0.15) !important;
+  border-color: rgba(31, 138, 59, 0.50) !important;
+  color: #4ade80 !important;
+  opacity: 0.90;
+}
+
+.pw-npc-quest-offer {
+  background: rgba(217, 119, 6, 0.20) !important;
+  border-color: rgba(245, 158, 11, 0.70) !important;
+  color: #f59e0b !important;
+  font-weight: bold !important;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.25) !important;
+}
+
+.pw-npc-quest-active {
+  background: rgba(37, 99, 235, 0.20) !important;
+  border-color: rgba(96, 165, 250, 0.70) !important;
+  color: #60a5fa !important;
+  font-weight: bold !important;
+}
+
+.pw-npc-untalked {
+  opacity: 1;
+}
+
+.pw-npc-talk {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: calc(70vh - 68px);
+  overflow-y: auto;
+  padding: 14px 16px;
+}
+
+.pw-npc-talk-location {
+  color: var(--pw-text-secondary);
+  font-size: 12px;
+}
+
+.pw-npc-talk-prompt {
+  color: var(--pw-text-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.pw-npc-talk-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.pw-npc-talk-choices .pw-button {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.pw-npc-talk-speaker {
+  color: var(--pw-text-primary);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.pw-npc-talk-line {
+  margin: 0;
+  padding: 9px 11px;
+  border-radius: 8px;
+  background: var(--pw-bg-header);
+  color: var(--pw-text-primary);
+  line-height: 1.5;
+}
+
+.pw-npc-quest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.pw-npc-quest-card {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 10px;
+  border: 1px solid var(--pw-border-color);
+  border-radius: 10px;
+  background: var(--pw-bg-header);
+}
+
+.pw-npc-quest-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pw-npc-quest-category {
+  color: var(--pw-text-secondary);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.pw-npc-quest-state {
+  color: var(--pw-accent);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.pw-npc-quest-title {
+  color: var(--pw-text-primary);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.pw-npc-quest-desc,
+.pw-npc-quest-progress,
+.pw-npc-quest-board-locked {
+  color: var(--pw-text-secondary);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.pw-npc-quest-card .pw-quest-rewards {
+  padding-top: 2px;
+}
+
+.pw-npc-quest-card > .pw-button {
+  align-self: flex-start;
+}
+
+.pw-npc-quest-card--locked {
+  border-style: dashed;
+}
+
+.pw-npc-talk-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+@media (max-width: 520px) {
+.pw-npc-talk {
+  padding: 10px;
+}
+
+.pw-npc-talk-actions {
+  flex-direction: column;
+}
+
+}
+
+.pw-loc-action-btn.pw-loc-npc-btn {
+  min-height: 65px;
+}

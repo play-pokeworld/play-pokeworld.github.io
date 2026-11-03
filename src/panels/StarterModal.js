@@ -40,6 +40,8 @@ export class StarterModal extends UIModal {
       hasFooter: false,
       closeOnBackdrop: false,
       showCloseBtn: false,
+      // Escape is handled below (it returns to the save menu, it does not just hide the window).
+      closeOnEscape: false,
       name: 'StarterModal'
     });
 
@@ -54,7 +56,10 @@ export class StarterModal extends UIModal {
     this._cards = [];
 
     this.addDomListener('keydown', (event) => {
-      if (event.key === 'Escape') this._cancel();
+      if (event.key !== 'Escape') return;
+      // Consumed here: ModalFocusScope must not close the window a second time.
+      event.preventDefault();
+      this._cancel();
     });
 
     this.onInit();
@@ -204,20 +209,20 @@ export class StarterModal extends UIModal {
   /** @private Closes without creating a save (the save menu stays underneath). */
   _cancel() {
     if (!this.isOpen()) return;
-    console.log(t('debug_starter_cancelled'));
+    console.log(String(t('debug_starter_cancelled')));
     this.close();
   }
 
   /** @private */
   _pickStarter(starter) {
     if (!this._validateName()) {
-      console.warn(t('debug_starter_name_missing'));
+      console.warn(String(t('debug_starter_name_missing')));
       this._nameInput.focus();
       return;
     }
 
     const trainerName = this._nameInput.getValue();
-    console.log(t('debug_starter_picked', { id: starter.species, name: t(starter.nameKey) }));
+    console.log(String(t('debug_starter_picked', { id: starter.species, name: t(starter.nameKey) })));
     this.close();
 
     if (this._onStarterChosen) {

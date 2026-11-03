@@ -143,7 +143,7 @@ localization/
   - `TextFormatter` parses it into nodes, with a whitelist of `b`, `strong`, `i`, `em` and `br`.
   - It is never injected as HTML.
 - Icons come from `ui/icons/IconRegistry.js`. No emoji and no copy-pasted SVG markup in panels.
-- **Keep the original ids and class names** so that the original stylesheet (`design-system.css`) keeps applying.
+- **Keep the original ids and class names** so that the inherited design-system sheets (`assets/css/design-system/`) keep applying.
   - The overlay ids of the original are reserved. Never reuse `#settings-modal`, `#quest-modal`, `#confirm-modal`, `#poke-modal`, `#battle-summary-modal` or `#unified-selector-modal` for another element.
 - Panel pattern — **a dashboard panel receives its starting column in its constructor**
   (`DashboardColumns.LEFT | CENTER | RIGHT`). Within a column, the first panel created is at the top
@@ -220,13 +220,43 @@ export class XxxPanel extends DraggablePanel {
 
 ## 7. CSS
 
-- Stylesheets live in `assets/css/` and are imported by `style.css`.
-- `design-system.css` is the original stylesheet and the **single source of truth** for palette, fonts and theme tokens.
-  - `variables.css` only adds tokens that the original does not define.
-- Use tokens such as `var(--light2)`, `var(--pw-border-color)` and `var(--pw-bg-surface)`, not hex values, so that the UI themes keep working.
-- Avoid `!important`. Prefer `:where()` for low-specificity base rules.
-- Theme-specific overrides of legacy rules go in `save-menu.css` (save screen) or `panels.css` (game
-  windows), scoped with `:root[data-theme="…"]`. Light themes are `light` and `sakura`.
+- **One entry point:** `index.html` loads `assets/css/style.css` and nothing else. `style.css` is a
+  pure `@import` manifest (no rule of its own): it declares the cascade order, once.
+  - Never write a rule in `style.css`, never add an `@import` inside a sheet, never reorder the manifest
+    without running the visual fingerprint (see §9).
+  - A sheet is imported exactly once (`tests/CssBundle.js` throws on a duplicate).
+- **One file, one object.** A sheet is named after the UI object it styles — never after a date, a
+  pass or a "misc" bucket. Four folders, one responsibility each:
+  - `core/` — tokens, variables, themes, element resets, form controls, keyframes, scrollbars: no
+    widget styling.
+  - `layout/` — page skeleton, header bar, dashboard columns, window chrome, mobile layout.
+  - `components/` — one file per reusable widget (`ui-button.css`, `ui-modal.css`, `badges.css`,
+    `ui-toolbar.css`…).
+  - `panels/` — one file per game window or panel (`bag.css`, `team.css`, `facilities.css`…).
+  - The dated `design-system/pass-*.css` sheets are **gone** (1.16.14): their rules were redistributed
+    into the sheet of the object they style. Do not recreate them, and do not add a new "pass" file.
+- **A rule may be duplicated, a selector may not be split across sheets.** When one rule lists
+  selectors owned by several objects, it is copied into each owner sheet at the position it had in
+  the reference cascade, so every selector keeps its document order.
+- **The manifest order is the cascade.** Rules of equal specificity that fight over one property are
+  decided by sheet order alone. Adding or moving a sheet therefore demands a fingerprint comparison
+  (`tests/browser/CssFingerprint.mjs`) against the reference tree — a green unit suite does not prove
+  the rendering is unchanged.
+- **Comments are English-only and explain a constraint** ("why"), never a changelog ("wave 33 did
+  X"). The phase documents in `docs/` record what changed when.
+- Tokens are the single source of truth for palette, fonts and theme colour:
+  `core/variables.css` (legacy tokens) and `core/tokens.css` (`--pw-*`).
+  - Use tokens such as `var(--light2)`, `var(--pw-border-color)` and `var(--pw-bg-surface)`, not hex
+    values, so that the UI themes keep working.
+- **Adding style is a two-step move:** write the rule in the sheet that owns the widget, then add one
+  line to the manifest if the sheet is new. `tests/CssStructure.test.js` fails otherwise (missing
+  import, orphan sheet, header-less sheet, sheet over 1 700 lines, a `pass-*`/`misc`/`shared` name, a
+  French comment, a relative `url()` that does not resolve from the new folder).
+- Avoid `!important`. Prefer `:where()` for low-specificity base rules. When a `!important` override
+  must lose to the hidden-state utility, exclude it explicitly (`:not(.is-hidden)`) instead of relying
+  on sheet order.
+- Theme-specific overrides of legacy rules go in `core/themes.css` (or the theme block of the owning
+  sheet), scoped with `:root[data-theme="…"]`. Light themes are `light` and `sakura`.
 - **Scroll performance** (the document is the page scroller):
   - animate only `transform` and `opacity`; never animate `background-position`, `left/top`,
     `width/height` or use `transition: all`;

@@ -288,7 +288,7 @@ describe('Modals and team', (test) => {
     button.click();
     assert.ok(modal.isOpen(), 'summary modal opens from the battle panel');
     assert.ok(
-      modal.getDomElement().querySelector('.battle-session-summary-grid') || modal.getDomElement().querySelector('.battle-summary-empty'),
+      modal.getDomElement().querySelector('.battle-session-summary-grid') || modal.getDomElement().querySelector('.pw-empty-state'),
       'the modal renders either the current/last battle or its empty state'
     );
     modal.close();

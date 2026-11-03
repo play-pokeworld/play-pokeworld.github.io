@@ -1,0 +1,157 @@
+/*
+ * panels/trainers.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.pw-trainer-head {
+  margin: 0 !important;
+  padding: 12px 16px !important;
+  background: var(--pw-bg-header) !important;
+  border-bottom: 1px solid var(--pw-border-color) !important;
+  color: var(--pw-text-primary) !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.pw-trainer-head {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:var(--dark3);
+  padding:10px 14px;
+  border-radius:8px;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.quest-trainer-target {
+  color:var(--light2);
+  font-weight:900;
+  margin:6px 0;
+}
+
+.trainer-visual-card {
+  grid-column: 1 / -1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(236,222,183,.22);
+  border-radius: 14px;
+  padding: 9px 12px;
+  background: linear-gradient(135deg, rgba(0,0,0,.28), rgba(83,97,122,.18));
+  color: var(--light2);
+}
+
+.trainer-sprite-placeholder {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.32);
+  border: 2px solid rgba(236,222,183,.24);
+  font-weight: 1000;
+  font-size: 18px;
+  color: var(--light2);
+  image-rendering: pixelated;
+}
+
+.trainer-visual-card.role-rocket .trainer-sprite-placeholder {
+  border-color: rgba(211,66,95,.7);
+  color:#ffb8c5;
+}
+
+.trainer-visual-card.role-rival .trainer-sprite-placeholder {
+  border-color: rgba(83,157,223,.7);
+  color:#9fd0ff;
+}
+
+.trainer-visual-card.role-gym .trainer-sprite-placeholder {
+  border-color: rgba(242,217,78,.7);
+  color:#f2d94e;
+}
+
+.trainer-visual-card.role-atoll .trainer-sprite-placeholder {
+  border-color: rgba(183,99,207,.7);
+  color:#dcb4ff;
+}
+
+#battle-trainer-host:not(:empty) {
+  margin-bottom: 8px;
+}
+
+.trainer-visual-card b {
+  display:block;
+  color:var(--light2);
+}
+
+.trainer-visual-card span {
+  color:var(--light1);
+  font-size:12px;
+  text-transform:capitalize;
+}
+
+.trainer-style-row {
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  margin-top:4px;
+}
+
+.trainer-style-row em {
+  font-style:normal;
+  color:var(--light2);
+  border:1px solid rgba(236,222,183,.18);
+  border-radius:999px;
+  padding:1px 6px;
+  font-size: 11px;
+  background:rgba(0,0,0,.18);
+}
+
+.pw-trainer-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--dark3);
+  padding: 10px 14px;
+  border-radius: 8px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.trainer-sprite-img {
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.quest-trainer-target small {
+  display: block;
+  font-weight: 400;
+  color: var(--pw-text-secondary);
+  margin-top: 2px;
+}
+
+#battle-trainer-host:not(:empty) {
+  margin-bottom: 8px;
+}
+
+.trainer-sprite-img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.trainer-visual-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}

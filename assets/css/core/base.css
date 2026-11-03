@@ -1,0 +1,1150 @@
+/*
+ * core/base.css
+ * ---------------------------------------------------------------------------
+ * Element defaults and resets (html, body, headings, form controls, selection).
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+* {
+  font-family: var(--pw-font-main);
+  letter-spacing: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--pw-bg-app);
+  color: var(--pw-text-primary);
+  line-height: 1.4;
+  user-select: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100vh;
+  height: auto;
+}
+
+.modal-footer {
+  margin: 0 !important;
+  padding: 12px 16px !important;
+  background: var(--pw-bg-header) !important;
+  border-bottom: 1px solid var(--pw-border-color) !important;
+  color: var(--pw-text-primary) !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.modal-footer {
+  border-bottom: none !important;
+  border-top: 1px solid var(--pw-border-color) !important;
+  margin-top: 12px !important;
+}
+
+* {
+  font-family: 'Winky Sans', 'Segoe UI', system-ui, sans-serif;
+  letter-spacing: 0;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--dark1);
+  color: var(--light2);
+  font-size: 13px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../../images/bg/main-bg.png');
+  background-repeat: repeat-x;
+  background-position: 0 0;
+  opacity: 0.08;
+  animation: bg-scroll 600s linear infinite reverse;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body {
+  font-size: 13px;
+}
+
+.modal-title {
+  font-size: 13px;
+}
+
+
+/* Wave 33: the original `.modal-title` rule (15px, 16px bottom margin, 12px bottom padding, hairline border) is retired. It described a THIRD header shape that only survived because the canonical block came later in the file — dead weight that made the real source of truth impossible to find. Colour is kept; geometry belongs to the canonical block alone. */
+.modal-title {
+  color: var(--light2);
+}
+
+.modal-close {
+  cursor: pointer;
+  color: var(--light2);
+  font-size: 20px;
+  font-weight: bold;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+body.mobile-mode {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body.mobile-mode #main-dashboard {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+  padding: 0 0 calc(12px + env(safe-area-inset-bottom));
+  margin: 0;
+  width: 100%;
+  gap: 8px;
+}
+
+body.mobile-mode .dash-win {
+  display: none;
+  height: auto;
+  min-height: 0;
+  border-radius: 0;
+  box-shadow: none;
+  border-left: 0;
+  border-right: 0;
+  margin: 0;
+}
+
+body.mobile-mode .dash-win.mobile-visible {
+  display: flex;
+  flex: none;
+  width: 100%;
+}
+
+body.mobile-mode #win-map {
+  order: 10;
+  height: 55dvh;
+  min-height: 340px;
+}
+
+body.mobile-mode #win-tabs {
+  order: 20;
+}
+
+body.mobile-mode #win-story {
+  order: 30;
+}
+
+body.mobile-mode #win-map .win-body {
+  overflow: auto;
+}
+
+body.mobile-mode .win-body {
+  padding: 10px;
+  overflow: visible;
+}
+
+}
+
+.modal-title {
+  letter-spacing: 0.4px;
+}
+
+@media (min-width: 851px) {
+body {
+  background-image:
+      radial-gradient(circle at 20% 0%, rgba(83,157,223,0.08), transparent 28%),
+      radial-gradient(circle at 80% 10%, rgba(242,217,78,0.05), transparent 24%);
+}
+
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--dark1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--dark3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--light1);
+}
+
+body, .modal-title {
+  font-size: 13px;
+}
+
+.modal-title > div {
+  font-size: 15px;
+}
+
+option {
+  background-color: var(--pw-bg-surface) !important;
+  color: var(--light2) !important;
+  font-family: 'Winky Sans', 'Segoe UI', system-ui, sans-serif !important;
+}
+
+.modal-close {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+@media (max-width: 1024px) {
+body {
+  overscroll-behavior: contain;
+}
+
+}
+
+.modal-close:empty::before {
+  content: '✕';
+}
+
+.modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+:where(button, [href], input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+[role="dialog"] {
+  overscroll-behavior: contain;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+body.mobile-mode #header {
+  flex-wrap: nowrap;
+  padding: max(8px, env(safe-area-inset-top)) 10px 8px;
+  min-height: 52px;
+}
+
+body.mobile-mode #header h1 {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 17px;
+}
+
+body.mobile-mode .mobile-nav-bar,
+  body.mobile-mode .mobile-subnav-bar {
+  padding-left: max(8px, env(safe-area-inset-left));
+  padding-right: max(8px, env(safe-area-inset-right));
+}
+
+body.mobile-mode #main-dashboard {
+  height: auto;
+}
+
+body.mobile-mode .win-body {
+  overflow: visible;
+  -webkit-overflow-scrolling: touch;
+}
+
+body.mobile-mode #win-map .win-body {
+  overflow: auto;
+}
+
+body.mobile-mode .mobile-nav-bar {
+  padding-bottom: 6px;
+}
+
+}
+
+@media (max-width: 420px) {
+body.mobile-mode .mob-btn,
+  body.mobile-mode .mob-sub-btn {
+  min-width: 56px;
+  padding-left: 5px;
+  padding-right: 5px;
+  font-size: 11px;
+}
+
+}
+
+@media (orientation: landscape) and (max-width: 850px) {
+body.mobile-mode #win-map {
+  height: 62dvh;
+  min-height: 260px;
+}
+
+body.mobile-mode .mobile-nav-bar {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+body.mobile-mode .mob-btn,
+  body.mobile-mode .mob-sub-btn {
+  min-height: 36px;
+}
+
+}
+
+.pw-tip.pw-text-sm {
+  background:rgba(255,255,255,0.05);
+  border-left:3px solid var(--light1);
+  padding:8px 10px;
+  border-radius:0 6px 6px 0;
+  margin:8px 0;
+  font-size:13px;
+  color:#ddd;
+  line-height:1.4;
+}
+
+.pw-tip.pw-text-sm {
+  margin-top:14px;
+  background:rgba(255,193,7,0.08);
+  border:1px solid rgba(255,193,7,0.25);
+  padding:10px;
+  border-radius:8px;
+  font-size: 13px;
+  color:var(--light1);
+}
+
+body.save-menu-active {
+  overflow: hidden;
+}
+
+.pw-clickable {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  background: var(--dark2);
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.pw-tip {
+  background: rgba(148,136,107,0.08);
+  border: 1px solid var(--light2);
+  padding: 8px 10px;
+  border-radius: 8px;
+  margin: 8px 0;
+}
+
+.pw-tag {
+  color: var(--light2);
+  background: rgba(148,136,107,0.1);
+  padding: 1px 6px;
+  border-radius: 8px;
+  border: 1px solid var(--light2);
+  font-weight: bold;
+}
+
+.modal-close {
+  cursor: pointer;
+  border-radius: 10px;
+  font-family: 'Winky Sans','Segoe UI',system-ui,sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.35px;
+}
+
+
+/* Canonical header: IDENTICAL on all non-draggable panels ── (draggable windows keep .pw-win-hdr, deliberately distinct) */
+.modal-title {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  height: var(--pw-header-h);
+  min-height: var(--pw-header-h);
+  box-sizing: border-box;
+  padding: var(--pw-header-pad);
+  margin: 0 0 var(--pw-header-gap) 0;
+  background: var(--pw-bg-panel-header);
+  border: 1px solid var(--pw-border);
+  border-bottom: 2px solid var(--pw-border-panel-header);
+  border-radius: var(--pw-header-radius);
+  color: var(--light2);
+  font-size: var(--pw-header-title-size);
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  line-height: 1;
+}
+
+.modal-title > div:first-child {
+
+}
+
+
+/* design-system/pass-11.css * --------------------------------------------------------------------------- * Dated pass inherited from the former design-system.css, kept in its historical order. * * Part of the 1.16.11 split: one file, one responsibility. The order of the * @import lines in assets/css/style.css IS the cascade — never reorder them, * never import this sheet anywhere else (guarded by tests/CssStructure.test.js). */
+.modal-title .modal-title-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: var(--pw-header-title-size);
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  line-height: 1;
+  color: var(--light2);
+}
+
+.modal-title .pw-info-name {
+  font-size: var(--pw-header-title-size);
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  line-height: 1.15;
+  color: var(--light2);
+}
+
+
+/* The header's optional subtitle stays one step down, never larger. */
+.modal-title .pw-info-head-text > .pw-text-sm {
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.modal-close {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: var(--pw-header-close-size);
+  height: var(--pw-header-close-size);
+  min-width: var(--pw-header-close-size);
+  min-height: var(--pw-header-close-size);
+  padding: 0;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--light2);
+  font-size: var(--pw-header-close-glyph);
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.modal-close:hover,
+.modal-close:focus-visible {
+  background: rgba(255, 90, 90, 0.16);
+  border-color: rgba(255, 90, 90, 0.35);
+  color: #ff9b9b;
+}
+
+.modal-close:empty::before {
+  content: '✕';
+}
+
+@media (max-width: 850px) {
+.modal-close {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+}
+
+}
+
+.pw-ui-toggle-input:focus-visible + .pw-ui-toggle-track {
+  outline: 2px solid var(--pw-accent-color);
+  outline-offset: 2px;
+}
+
+.is-hidden {
+  display: none !important;
+}
+
+.pw-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.modal, .machine-window, .machine-window-body {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+.machine-window-body * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+body:not(.mobile-mode) .dash-win {
+  border-radius: var(--pw-radius-md);
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+body.mobile-mode .mobile-nav-bar {
+  top: 52px;
+  z-index: 961;
+  background: var(--dark1);
+}
+
+body.mobile-mode .mobile-subnav-bar {
+  top: 106px;
+  z-index: 960;
+  background: var(--dark1);
+}
+
+body.mobile-mode, body.mobile-mode * {
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+body.mobile-mode .mobile-nav-bar,
+  body.mobile-mode .mobile-subnav-bar {
+  padding: 6px 8px !important;
+  margin: 0 !important;
+  border-bottom: 1px solid rgba(236,222,183,0.14) !important;
+}
+
+body.mobile-mode #main-dashboard {
+  flex-direction: column !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+  padding: 0 0 calc(16px + env(safe-area-inset-bottom)) 0 !important;
+  margin: 0 !important;
+  gap: 0 !important;
+}
+
+body.mobile-mode .dash-win {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+body.mobile-mode .dash-win.mobile-visible {
+  margin: 0 !important;
+}
+
+body.mobile-mode #win-shortcuts {
+  order: 15;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.mobile-mode #win-shortcuts .win-body,
+  body.mobile-mode #shortcuts-window-body {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 8px !important;
+  padding: 8px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 0 0 auto !important;
+  flex-grow: 0 !important;
+  margin: 0 !important;
+}
+
+body.mobile-mode #shortcuts-window-body .shortcut-action-btn {
+  width: 100% !important;
+  padding: 10px !important;
+  min-height: 42px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.modal-inner {
+  max-width: 96vw !important;
+  max-height: 90vh !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-y: auto !important;
+  transform-origin: center center !important;
+}
+
+}
+
+@media (max-width: 480px) {
+.modal-inner {
+  transform: scale(0.92) !important;
+  width: 108% !important;
+  margin-left: -4% !important;
+}
+
+}
+
+body {
+  background-color: var(--dark1) !important;
+  background-image:
+    radial-gradient(1200px 600px at 50% -10%, rgba(255,255,255,0.03), transparent 60%) !important;
+}
+
+body.pw-ui-animations-off .pw-fx-float {
+  display: none !important;
+}
+
+body.pw-ui-animations-off .pw-fx-shake,
+body.pw-ui-animations-off .pw-fx-pulse,
+body.pw-ui-animations-off .pw-fx-capture {
+  animation: none !important;
+}
+
+body.pw-ui-animations-off .pw-fx-smooth {
+  transition: none !important;
+}
+
+body {
+  --pc-scene-url: url('../../images/bg/route.png');
+}
+
+body[data-bg="beach"] {
+  --pc-scene-url: url('../../images/bg/beach.png');
+}
+
+body[data-bg="cave"] {
+  --pc-scene-url: url('../../images/bg/cave.png');
+}
+
+body[data-bg="desert"] {
+  --pc-scene-url: url('../../images/bg/desert.png');
+}
+
+body[data-bg="forest"] {
+  --pc-scene-url: url('../../images/bg/forest.png');
+}
+
+body[data-bg="gym"] {
+  --pc-scene-url: url('../../images/bg/gym.png');
+}
+
+body[data-bg="iceCave"] {
+  --pc-scene-url: url('../../images/bg/iceCave.png');
+}
+
+body[data-bg="lab"] {
+  --pc-scene-url: url('../../images/bg/lab.png');
+}
+
+body[data-bg="lake"] {
+  --pc-scene-url: url('../../images/bg/lake.png');
+}
+
+body[data-bg="mall"] {
+  --pc-scene-url: url('../../images/bg/mall.png');
+}
+
+body[data-bg="mountain"] {
+  --pc-scene-url: url('../../images/bg/mountain.png');
+}
+
+body[data-bg="night"] {
+  --pc-scene-url: url('../../images/bg/night.png');
+}
+
+body[data-bg="plant"] {
+  --pc-scene-url: url('../../images/bg/plant.png');
+}
+
+body[data-bg="route"] {
+  --pc-scene-url: url('../../images/bg/route.png');
+}
+
+body[data-bg="sea"] {
+  --pc-scene-url: url('../../images/bg/sea.png');
+}
+
+body[data-bg="snow"] {
+  --pc-scene-url: url('../../images/bg/snow.png');
+}
+
+body[data-bg="space"] {
+  --pc-scene-url: url('../../images/bg/space.png');
+}
+
+body[data-bg="tower"] {
+  --pc-scene-url: url('../../images/bg/tower.png');
+}
+
+body[data-bg="town"] {
+  --pc-scene-url: url('../../images/bg/town.png');
+}
+
+body[data-bg="trench"] {
+  --pc-scene-url: url('../../images/bg/trench.png');
+}
+
+body[data-bg="volcano"] {
+  --pc-scene-url: url('../../images/bg/volcano.png');
+}
+
+body[data-bg="dimension1"] {
+  --pc-scene-url: url('../../images/bg/dimension1.png');
+}
+
+body[data-bg="main-bg"] {
+  --pc-scene-url: url('../../images/bg/main-bg.png');
+}
+
+body[data-bg="missing"] {
+  --pc-scene-url: url('../../images/bg/missing.png');
+}
+
+html:not([data-dungeon-run="1"]) #battle-center-panel:has(#battle-active-scene:not(.is-live)) #battle-idle-screen,
+html:not([data-dungeon-run="1"]) #battle-active-scene:not(.is-live) ~ #battle-idle-screen {
+  display: flex !important;
+  margin: 0 auto !important;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  pointer-events: none;
+  background-image:
+     
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--pw-land-tint) calc(var(--pw-land-tint-a) * 100%), transparent) 0%,
+      color-mix(in srgb, var(--pw-land-tint) calc(var(--pw-land-tint-a) * 45%), transparent) 60%,
+      transparent 100%),
+     
+    linear-gradient(180deg,
+      var(--pw-land-sky) 0,
+      var(--pw-land-sky) calc(var(--pw-land-h-horizon) - 14vh),
+      var(--pw-land-horizon) calc(var(--pw-land-h-horizon) + 4vh),
+      var(--pw-land-horizon) calc(var(--pw-land-h-grass) - 12vh),
+      var(--pw-land-grass) calc(var(--pw-land-h-grass) + 2vh),
+       
+      var(--pw-land-grass) var(--pw-land-h-ground),
+      var(--pw-land-ground) var(--pw-land-h-ground),
+      var(--pw-land-ground) 100%);
+  filter: brightness(var(--pw-land-bright)) saturate(var(--pw-land-sat));
+  transition: filter 1.2s ease;
+}
+
+body::before {
+  z-index: -2 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+body::after {
+  transition: none !important;
+}
+
+}
+
+html::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background: var(--pw-land-rock-bg);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27360%27%20height%3D%2726%27%20viewBox%3D%270%200%20360%2026%27%3E%3Cg%20fill%3D%27%23fff%27%3E%3Cpath%20d%3D%27M24%2026%20a14%2012%200%200%201%2028%200%20Z%27%2F%3E%3Cpath%20d%3D%27M84%2026%20a10%209%200%200%201%2020%200%20Z%27%2F%3E%3Cpath%20d%3D%27M228%2026%20a15%2013%200%200%201%2030%200%20Z%27%2F%3E%3Cpath%20d%3D%27M318%2026%20a11%2010%200%200%201%2022%200%20Z%27%2F%3E%3Cpath%20d%3D%27M10%2026%20L14%2014%20L20%2011%20L28%2017%20L30%2026%20Z%27%2F%3E%3Cpath%20d%3D%27M60%2026%20L63%2020%20L68%2021%20L70%2026%20Z%27%2F%3E%3Cpath%20d%3D%27M120%2026%20L126%2017%20L136%2014%20L146%2019%20L149%2026%20Z%27%2F%3E%3Cpath%20d%3D%27M170%2026%20L175%2019%20L184%2020%20L187%2026%20Z%27%2F%3E%3Cpath%20d%3D%27M196%2026%20L200%2016%20L210%2014%20L218%2022%20L220%2026%20Z%27%2F%3E%3Cpath%20d%3D%27M262%2026%20L268%2015%20L278%2018%20L280%2026%20Z%27%2F%3E%3Cpath%20d%3D%27M300%2026%20L304%2020%20L312%2021%20L314%2026%20Z%27%2F%3E%3Cpath%20d%3D%27M340%2026%20L344%2016%20L352%2018%20L356%2026%20Z%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27360%27%20height%3D%2726%27%20viewBox%3D%270%200%20360%2026%27%3E%3Cg%20fill%3D%27%23fff%27%3E%3Cpath%20d%3D%27M24%2026%20a14%2012%200%200%201%2028%200%20Z%27%2F%3E%3Cpath%20d%3D%27M84%2026%20a10%209%200%200%201%2020%200%20Z%27%2F%3E%3Cpath%20d%3D%27M228%2026%20a15%2013%200%200%201%2030%200%20Z%27%2F%3E%3Cpath%20d%3D%27M318%2026%20a11%2010%200%200%201%2022%200%20Z%27%2F%3E%3Cpath%20d%3D%27M10%2026%20L14%2014%20L20%2011%20L28%2017%20L30%2026%20Z%27%2F%3E%3Cpath%20d%3D%27M60%2026%20L63%2020%20L68%2021%20L70%2026%20Z%27%2F%3E%3Cpath%20d%3D%27M120%2026%20L126%2017%20L136%2014%20L146%2019%20L149%2026%20Z%27%2F%3E%3Cpath%20d%3D%27M170%2026%20L175%2019%20L184%2020%20L187%2026%20Z%27%2F%3E%3Cpath%20d%3D%27M196%2026%20L200%2016%20L210%2014%20L218%2022%20L220%2026%20Z%27%2F%3E%3Cpath%20d%3D%27M262%2026%20L268%2015%20L278%2018%20L280%2026%20Z%27%2F%3E%3Cpath%20d%3D%27M300%2026%20L304%2020%20L312%2021%20L314%2026%20Z%27%2F%3E%3Cpath%20d%3D%27M340%2026%20L344%2016%20L352%2018%20L356%2026%20Z%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-size: 360px 26px;
+  mask-size: 360px 26px;
+  -webkit-mask-position: 0 calc(var(--pw-land-h-ground) - 26px);
+  mask-position: 0 calc(var(--pw-land-h-ground) - 26px);
+  filter: brightness(var(--pw-land-bright)) saturate(var(--pw-land-sat));
+  transition: filter 1.2s ease;
+}
+
+html::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background: var(--pw-land-tree);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27240%27%20height%3D%2764%27%20viewBox%3D%270%200%20240%2064%27%3E%3Cg%20fill%3D%27%23fff%27%3E%3Cpolygon%20points%3D%2730%2C8%2044%2C32%2016%2C32%27%2F%3E%3Cpolygon%20points%3D%2730%2C22%2049%2C52%2011%2C52%27%2F%3E%3Crect%20x%3D%2727%27%20y%3D%2750%27%20width%3D%276%27%20height%3D%2714%27%2F%3E%3Ccircle%20cx%3D%27100%27%20cy%3D%2732%27%20r%3D%2719%27%2F%3E%3Ccircle%20cx%3D%2786%27%20cy%3D%2741%27%20r%3D%2713%27%2F%3E%3Ccircle%20cx%3D%27114%27%20cy%3D%2741%27%20r%3D%2713%27%2F%3E%3Crect%20x%3D%2796%27%20y%3D%2747%27%20width%3D%278%27%20height%3D%2717%27%2F%3E%3Cpolygon%20points%3D%27182%2C14%20198%2C40%20166%2C40%27%2F%3E%3Cpolygon%20points%3D%27182%2C28%20202%2C58%20162%2C58%27%2F%3E%3Crect%20x%3D%27179%27%20y%3D%2755%27%20width%3D%276%27%20height%3D%279%27%2F%3E%3Ccircle%20cx%3D%27140%27%20cy%3D%2756%27%20r%3D%279%27%2F%3E%3Ccircle%20cx%3D%27150%27%20cy%3D%2758%27%20r%3D%277%27%2F%3E%3Cpath%20d%3D%27M0%2064%20L2%2055%20L5%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M7%2064%20L10%2048%20L12%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M15%2064%20L18%2049%20L20%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M24%2064%20L26%2050%20L29%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M34%2064%20L36%2051%20L39%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M41%2064%20L44%2052%20L46%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M49%2064%20L52%2053%20L54%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M58%2064%20L60%2054%20L63%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M68%2064%20L70%2055%20L73%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M75%2064%20L78%2048%20L80%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M83%2064%20L86%2049%20L88%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M92%2064%20L94%2050%20L97%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M102%2064%20L104%2051%20L107%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M109%2064%20L112%2052%20L114%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M117%2064%20L120%2053%20L122%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M126%2064%20L128%2054%20L131%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M136%2064%20L138%2055%20L141%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M143%2064%20L146%2048%20L148%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M151%2064%20L154%2049%20L156%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M160%2064%20L162%2050%20L165%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M170%2064%20L172%2051%20L175%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M177%2064%20L180%2052%20L182%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M185%2064%20L188%2053%20L190%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M194%2064%20L196%2054%20L199%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M204%2064%20L206%2055%20L209%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M211%2064%20L214%2048%20L216%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M219%2064%20L222%2049%20L224%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M228%2064%20L230%2050%20L233%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M238%2064%20L240%2051%20L243%2064%20Z%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27240%27%20height%3D%2764%27%20viewBox%3D%270%200%20240%2064%27%3E%3Cg%20fill%3D%27%23fff%27%3E%3Cpolygon%20points%3D%2730%2C8%2044%2C32%2016%2C32%27%2F%3E%3Cpolygon%20points%3D%2730%2C22%2049%2C52%2011%2C52%27%2F%3E%3Crect%20x%3D%2727%27%20y%3D%2750%27%20width%3D%276%27%20height%3D%2714%27%2F%3E%3Ccircle%20cx%3D%27100%27%20cy%3D%2732%27%20r%3D%2719%27%2F%3E%3Ccircle%20cx%3D%2786%27%20cy%3D%2741%27%20r%3D%2713%27%2F%3E%3Ccircle%20cx%3D%27114%27%20cy%3D%2741%27%20r%3D%2713%27%2F%3E%3Crect%20x%3D%2796%27%20y%3D%2747%27%20width%3D%278%27%20height%3D%2717%27%2F%3E%3Cpolygon%20points%3D%27182%2C14%20198%2C40%20166%2C40%27%2F%3E%3Cpolygon%20points%3D%27182%2C28%20202%2C58%20162%2C58%27%2F%3E%3Crect%20x%3D%27179%27%20y%3D%2755%27%20width%3D%276%27%20height%3D%279%27%2F%3E%3Ccircle%20cx%3D%27140%27%20cy%3D%2756%27%20r%3D%279%27%2F%3E%3Ccircle%20cx%3D%27150%27%20cy%3D%2758%27%20r%3D%277%27%2F%3E%3Cpath%20d%3D%27M0%2064%20L2%2055%20L5%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M7%2064%20L10%2048%20L12%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M15%2064%20L18%2049%20L20%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M24%2064%20L26%2050%20L29%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M34%2064%20L36%2051%20L39%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M41%2064%20L44%2052%20L46%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M49%2064%20L52%2053%20L54%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M58%2064%20L60%2054%20L63%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M68%2064%20L70%2055%20L73%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M75%2064%20L78%2048%20L80%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M83%2064%20L86%2049%20L88%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M92%2064%20L94%2050%20L97%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M102%2064%20L104%2051%20L107%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M109%2064%20L112%2052%20L114%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M117%2064%20L120%2053%20L122%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M126%2064%20L128%2054%20L131%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M136%2064%20L138%2055%20L141%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M143%2064%20L146%2048%20L148%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M151%2064%20L154%2049%20L156%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M160%2064%20L162%2050%20L165%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M170%2064%20L172%2051%20L175%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M177%2064%20L180%2052%20L182%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M185%2064%20L188%2053%20L190%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M194%2064%20L196%2054%20L199%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M204%2064%20L206%2055%20L209%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M211%2064%20L214%2048%20L216%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M219%2064%20L222%2049%20L224%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M228%2064%20L230%2050%20L233%2064%20Z%27%2F%3E%3Cpath%20d%3D%27M238%2064%20L240%2051%20L243%2064%20Z%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-size: 240px 64px;
+  mask-size: 240px 64px;
+  -webkit-mask-position: 0 calc(var(--pw-land-h-ground) - 64px);
+  mask-position: 0 calc(var(--pw-land-h-ground) - 64px);
+  filter: brightness(var(--pw-land-bright)) saturate(var(--pw-land-sat));
+  transition: filter 1.2s ease;
+}
+
+@media (max-width: 760px) {
+html::after {
+  -webkit-mask-size: 170px 46px;
+  mask-size: 170px 46px;
+  -webkit-mask-position: 0 calc(var(--pw-land-h-ground) - 46px);
+  mask-position: 0 calc(var(--pw-land-h-ground) - 46px);
+}
+
+html::before {
+  -webkit-mask-size: 260px 20px;
+  mask-size: 260px 20px;
+  -webkit-mask-position: 0 calc(var(--pw-land-h-ground) - 20px);
+  mask-position: 0 calc(var(--pw-land-h-ground) - 20px);
+}
+
+}
+
+html[data-dungeon-run="1"] #battle-idle-screen {
+  display: none !important;
+}
+
+html[data-dungeon-run="1"] #battle-dungeon-bar {
+  display: block;
+}
+
+html[data-dungeon-run="1"] #battle-loot-row {
+  display: flex;
+}
+
+body.mobile-mode #win-battle {
+  order: 10;
+}
+
+body.mobile-mode #win-pokeballs {
+  order: 20;
+}
+
+body.mobile-mode #win-shortcuts {
+  order: 10;
+}
+
+body.mobile-mode #win-currency {
+  order: 20;
+}
+
+.pw-switch:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+
+.pw-range:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+
+:where([hidden]) {
+  display: none !important;
+}
+
+.starter-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+#battle-team-row .battle-team-member.is-switchable:focus-visible {
+  border-color: var(--accent, #ffa500) !important;
+  filter: brightness(1.08);
+  outline: none;
+}
+
+body.mobile-mode .mobile-subnav-bar.is-hidden {
+  display: none !important;
+}
+
+.team-view .pw-team-drag-handle:focus-visible,
+#team-window-body .pw-team-drag-handle:focus-visible {
+  outline: 2px solid var(--pw-accent-color, #ffe45c);
+  outline-offset: 2px;
+}
+
+.team-view .pw-team-store-btn:focus-visible,
+#team-window-body .pw-team-store-btn:focus-visible {
+  outline: 2px solid var(--pw-accent-color, #ffe45c);
+  outline-offset: 2px;
+}
+
+.team-view .poke-item-badge[role='button']:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+body.pw-capture-animations-off .pw-capture-overlay .pw-ca-ball {
+  animation: none !important;
+}
+
+
+/* UIModal panels inherit `.dash-win`; mobile dashboard focus hides those windows by default. Keep modal cards visible above the dashboard and restore the modal surface treatment. */
+body.mobile-mode .pw-modal-backdrop > .pw-panel--modal-window {
+  display: flex;
+  border-radius: 16px;
+  border-left: 1px solid var(--pw-border-color);
+  border-right: 1px solid var(--pw-border-color);
+  box-shadow: var(--pw-shadow-lg);
+}
+
+html:not([data-dungeon-run='1'])
+  #battle-center-panel:has(#battle-active-scene:not(.is-live))
+  #battle-idle-screen.is-hidden {
+  display: none !important;
+}
+
+.pw-market-row:focus-visible {
+  outline: 2px solid var(--light2);
+  outline-offset: 2px;
+}
+
+button.pw-pokemon-grid-sprite:focus-visible {
+  outline: 2px solid var(--pw-accent-color, #FFE45C);
+  outline-offset: 2px;
+}
+
+.pw-box-panel .pw-box-pokemon-tile:focus-visible {
+  outline: 2px solid var(--pw-accent-color, #FFE45C);
+  outline-offset: 2px;
+}
+
+button.pw-grid-media:focus-visible {
+  outline: 2px solid var(--pw-accent-color);
+  outline-offset: 3px;
+}
+
+.pw-pokedex-entry:focus-visible:not(:disabled) {
+  outline: 2px solid var(--pw-accent-color);
+  outline-offset: 2px;
+}
+
+.pw-dungeon-expedition .pw-dgn-grid:focus-visible {
+  outline: 2px solid var(--light2);
+  outline-offset: 3px;
+}
+
+.pw-dungeon-expedition .pw-dgn-tile:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 2px solid var(--light2);
+  outline-offset: 2px;
+}
+
+.pw-guide-card.pw-button:focus-visible {
+  border-color: var(--pw-accent-color);
+  background: color-mix(in srgb, var(--pw-text-primary) 18%, transparent);
+  transform: translateY(-2px);
+}
+
+
+/* Page scroll & dashboard drag model — loaded last, overrides the legacy layers. - The document scrolls like the reference; its header remains sticky. - The dashboard grows to the longest column instead of clipping it inside an inner scrollport. Windows themselves never scroll internally. - A dragged window follows the pointer through a GPU transform only. */
+body:not(.save-menu-active) {
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100vh;
+  height: auto;
+}
+
+body:not(.mobile-mode) #main-dashboard {
+  flex: 0 0 auto !important;
+  min-height: calc(100vh - 65px) !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  overscroll-behavior: auto;
+  line-height: normal;
+  align-items: flex-start !important;
+}
+
+body.mobile-mode #main-dashboard {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+body:not(.mobile-mode) #main-dashboard .dash-win {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  max-height: none !important;
+  transition: none !important;
+}
+
+body:not(.mobile-mode) #main-dashboard .dash-win > .win-body {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+
+/* Large secret-base rooms scale down to the column instead of scrolling. */
+body:not(.mobile-mode) #main-dashboard #base-panel.win-body canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+body.pw-window-drag-active,
+body.pw-window-drag-active * {
+  user-select: none !important;
+  cursor: grabbing !important;
+}
+
+body:not(.mobile-mode) #header.pw-header-panel {
+  gap: 12px;
+  padding: 10px 20px;
+}
+
+body:not(.mobile-mode) #header .pw-header-badges {
+  min-width: 200px;
+  gap: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 13px;
+  line-height: normal;
+}
+
+body.mobile-mode {
+  --pw-game-header-h: 52px;
+  --pw-mobile-nav-h: 54px;
+}
+
+
+/* Match the original mobile header height and preserve the device safe area. This selector intentionally overrides only the Rework header dock, without changing the original global mobile rule in design-system.css. */
+body.mobile-mode #header.pw-header-panel {
+  gap: 4px;
+  padding: max(8px, env(safe-area-inset-top)) 10px 8px;
+  min-height: 52px;
+}
+
+body.mobile-mode #header .pw-header-badges {
+  min-width: 0;
+  gap: 0;
+  padding: 0;
+  font-size: 11px;
+}
+
+
+/* Toasts never cover the logo / title bar of the game screen. */
+body:has(#header) .pw-notification-container {
+  top: calc(var(--pw-game-header-h) + 8px);
+}
+
+body.mobile-mode:has(#header) .pw-notification-container {
+  top: calc(var(--pw-game-header-h) + var(--pw-mobile-nav-h) + 8px);
+}
+
+
+/* Animated backdrop (v1.3) --------------------------------------------------- design-system.css animates `background-position` of the full-screen body::before, which repaints the whole viewport on every frame and competes with scrolling. Same look, compositor-only: the layer is one tile wider than the viewport and slides by exactly one tile (seamless loop), at the original speed (4000px / 600s = 6.67px/s; tile width 2969px -> 445s). */
+body::before {
+  left: calc(-1 * var(--pw-backdrop-tile-w));
+  width: calc(100% + var(--pw-backdrop-tile-w));
+  background-position: 0 0;
+  animation: pw-backdrop-slide 445s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+body::before {
+  animation: none;
+}
+
+}
+
+.hatchery-slot-main[role='button']:focus-visible {
+  outline: 2px solid var(--light2);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.pw-facility-filter-field select:focus-visible {
+  outline: 2px solid var(--light2);
+  outline-offset: 2px;
+}
+
+
+/* Universal Scrollbar Elimination Requirement: Scrollbars must NOT be visible anywhere in the game. */
+*, *::before, *::after {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+body.mobile-mode #main-dashboard {
+  flex-direction: column !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  padding: 0 0 70px 0 !important;
+  gap: 10px !important;
+}
+
+body.mobile-mode .dash-win {
+  width: 100% !important;
+  margin-bottom: 8px !important;
+}
+
+body.mobile-mode .mobile-nav-bar {
+  display: flex !important;
+  position: sticky !important;
+  top: 52px !important;
+  z-index: 960 !important;
+  background: var(--dark1, #1C1A17) !important;
+  border-bottom: 1px solid rgba(236,222,183,0.15) !important;
+  padding: 6px 8px !important;
+  gap: 6px !important;
+  overflow-x: auto !important;
+}
+
+body.mobile-mode .mobile-subnav-bar {
+  display: flex !important;
+  position: sticky !important;
+  top: 92px !important;
+  z-index: 959 !important;
+  background: var(--dark2, #25231F) !important;
+  border-bottom: 1px solid rgba(236,222,183,0.12) !important;
+  padding: 4px 8px !important;
+  gap: 6px !important;
+  overflow-x: auto !important;
+}
+
+body.mobile-mode .mob-btn,
+  body.mobile-mode .mob-sub-btn {
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  border-radius: 6px !important;
+  white-space: nowrap !important;
+  background: rgba(236,222,183,0.08) !important;
+  color: var(--light2, #ECDEB7) !important;
+  border: 1px solid rgba(236,222,183,0.2) !important;
+  cursor: pointer !important;
+}
+
+body.mobile-mode .mob-btn.active,
+  body.mobile-mode .mob-sub-btn.active {
+  background: var(--light2, #ECDEB7) !important;
+  color: var(--dark1, #1C1A17) !important;
+  border-color: var(--light2, #ECDEB7) !important;
+}
+
+}

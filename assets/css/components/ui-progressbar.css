@@ -1,0 +1,245 @@
+/*
+ * components/ui-progressbar.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.pw-progress-card {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+  color: var(--pw-text-primary) !important;
+}
+
+.xp-bar-container {
+  margin-top: 3px;
+}
+
+.xp-bar {
+  height: 4px;
+  background: var(--dark1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.pw-progress-row {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:4px;
+}
+
+.pw-progress-card {
+  background:var(--dark2);
+  border-radius:6px;
+  padding:8px;
+  margin-bottom:10px;
+  font-size:13px;
+  color:var(--light1);
+  border:1px solid #333;
+}
+
+.pw-progress-card-subtle {
+  background:var(--dark2);
+  border-radius:6px;
+  padding:8px;
+  margin-bottom:10px;
+  font-size:13px;
+  color:var(--light2);
+  border:1px solid #333;
+}
+
+.pw-progress-label {
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  color:var(--light1);
+}
+
+.pw-progress-bar-sm {
+  height:6px;
+  background:#221e1c;
+  border-radius:3px;
+  overflow:hidden;
+  margin:4px 0 6px;
+}
+
+.staff-xp-bar {
+  height: 7px;
+  border-radius: 999px;
+  background: var(--dark1);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.staff-xp-bar div {
+  height: 100%;
+  width: var(--pct, 0%);
+  background: #6f9f63;
+  border-radius: 999px;
+}
+
+.pw-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.pw-progress-card {
+  background: var(--dark2);
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: var(--light1);
+  border: 1px solid #333;
+}
+
+.pw-progress-card-subtle {
+  background: var(--dark2);
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: var(--light2);
+  border: 1px solid #333;
+}
+
+.pw-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--light1);
+}
+
+.pw-progress-bar-sm {
+  height: 6px;
+  background: #221e1c;
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 4px 0 6px;
+}
+
+.poke-progressbar {
+  position: relative;
+  overflow: hidden;
+}
+
+.poke-progressbar-fill {
+  width: var(--pct, 0%);
+  height: 100%;
+}
+
+.poke-progressbar-fill.is-animated {
+  transition: width 0.3s ease;
+}
+
+.poke-progressbar-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  font-size: 11px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.pw-progress-bar-sm.quest-progress-container {
+  height: 8px !important;
+  border-radius: 999px !important;
+  background: var(--dark1) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  overflow: hidden !important;
+  width: 100% !important;
+}
+
+#team-window-body .xp-bar-container {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+#team-window-body .xp-bar {
+  height: 4px !important;
+  border-radius: 999px !important;
+  background: rgba(0, 0, 0, .3) !important;
+  overflow: hidden !important;
+}
+
+.pw-progress-bar {
+  position: relative;
+  height: 14px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+}
+
+.pw-progress-bar--sm {
+  height: 10px;
+}
+
+.pw-progress-bar--lg {
+  height: 20px;
+}
+
+.pw-progress-fill {
+  height: 100%;
+  width: var(--pw-progress, 0%);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pw-progress-bar--hp .pw-progress-fill {
+  background: linear-gradient(90deg, #27ae60, #2ecc71);
+}
+
+.pw-progress-bar--exp .pw-progress-fill {
+  background: linear-gradient(90deg, #2980b9, #3498db);
+}
+
+.pw-progress-bar--energy .pw-progress-fill {
+  background: linear-gradient(90deg, #d35400, #e67e22);
+}
+
+.pw-progress-bar--dungeon .pw-progress-fill {
+  background: linear-gradient(90deg, #8e44ad, #9b59b6);
+}
+
+.pw-progress-bar--gold .pw-progress-fill {
+  background: linear-gradient(90deg, #f39c12, #ffe15e);
+}
+
+.pw-progress-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
+
+/* Legacy skins (UIProgressBar trackClassName / fillClassName): only the ratio is shared. !important: the ratio is the single runtime value of the widget and must win over the skin rules of design-system.css (some of them set a width, e.g. --pct based ones). */
+.pw-progress > .pw-progress-fill {
+  width: var(--pw-progress, 0%) !important;
+}
+
+
+/* Progression-gated dashboard panels do not reserve space before their unlock condition. */
+.pw-progression-hidden {
+  display: none !important;
+}
+
+.hatchery-slot-info > .pw-progress {
+  order: 1;
+}

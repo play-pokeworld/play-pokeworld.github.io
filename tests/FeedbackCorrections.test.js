@@ -16,6 +16,7 @@ import { QuestSystem } from '../src/systems/QuestSystem.js';
 import { QuestDB } from '../src/data/quests/QuestDB.js';
 import { PokemonFactory } from '../src/data/pokemon/PokemonFactory.js';
 import { MigrationV18ToV19 } from '../src/data/save/migrations/MigrationV18ToV19.js';
+import { SaveSchema } from '../src/config/SaveSchema.js';
 import { FacilityStaffSystem } from '../src/systems/FacilityStaffSystem.js';
 import { SeededRandom } from '../src/core/SeededRandom.js';
 import { EventBus } from '../src/core/EventBus.js';
@@ -136,7 +137,7 @@ describe('Feedback corrections 1.14.20', (test) => {
     assert.deepEqual(migrated.mine.grid, raw.mine.grid);
     assert.deepEqual(migrated.collection, raw.collection);
     const loaded = SaveData.fromJson(raw);
-    assert.equal(loaded.serialize().version, 20);
+    assert.equal(loaded.serialize().version, SaveSchema.VERSION);
     assert.deepEqual(
       loaded.training.slots[0].battle,
       save.training.slots[0].battle,
@@ -618,6 +619,28 @@ describe('Feedback corrections 1.14.20', (test) => {
           .getDomElement()
           .textContent.includes(t('training_parallel_hint')),
       );
+    } finally {
+      panel.destroy();
+    }
+  });
+  test('the Location window keeps its own title and shows the place once, without a tab strip', () => {
+    const save = fresh('Location chrome');
+    save.player.location = 'route1';
+    const panel = new LocationPanel(DashboardColumns.RIGHT);
+    try {
+      const root = panel.getDomElement();
+      // The window is named after what it is, not after where the player stands.
+      assert.ok(root.textContent.includes(t('tab_info')), 'the window title is the window name');
+      assert.equal(root.querySelector('#tabs'), null, 'no single-tab strip repeating the window name');
+      // The place is shown once, in its own box at the top of the body.
+      assert.equal(
+        [...root.querySelectorAll('.pw-loc-overview-title')].filter((el) => el.textContent.includes(t('location.route1'))).length,
+        1,
+        'the place is displayed once',
+      );
+      save.player.location = 'route2';
+      panel._render();
+      assert.ok(panel.getDomElement().textContent.includes(t('tab_info')), 'still the window name after a move');
     } finally {
       panel.destroy();
     }

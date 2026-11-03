@@ -1,0 +1,1023 @@
+/*
+ * components/badges.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.buff-badge, .status-badge {
+  font-size: 13px;
+}
+
+.status-badge {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  color: white;
+}
+
+.status-badge.burn {
+  background: var(--type-fire);
+}
+
+.status-badge.poison {
+  background: var(--type-poison);
+}
+
+.status-badge.paralysis {
+  background: var(--type-electric);
+  color: var(--dark1);
+}
+
+.status-badge.sleep {
+  background: var(--type-normal);
+}
+
+.status-badge.freeze {
+  background: var(--type-ice);
+}
+
+.buff-badge {
+  font-size: 10px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  color: white;
+}
+
+.buff-badge.atk-up {
+  background: var(--type-fighting);
+}
+
+.buff-badge.def-up {
+  background: var(--type-steel);
+}
+
+.buff-badge.spe-up {
+  background: var(--type-electric);
+  color: #14120E;
+}
+
+.buff-badge.atk-down {
+  background: color-mix(in srgb, var(--type-fighting) 62%, #000000);
+}
+
+.buff-badge.def-down {
+  background: color-mix(in srgb, var(--type-steel) 62%, #000000);
+}
+
+.buff-badge.spe-down {
+  background: color-mix(in srgb, var(--type-electric) 62%, #000000);
+}
+
+.badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--light1);
+  border: 2px solid var(--dark1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.badge.earned {
+  border-color: var(--light2);
+  box-shadow: 0 0 8px rgba(236,222,183,0.4);
+}
+
+#quest-inner .type-badge, #poke-modal-inner .type-badge, #battle-summary-inner .type-badge {
+  color: white;
+}
+
+.status-badge, .buff-badge {
+  font-size: 11px;
+}
+
+.item-badge {
+  width: 40px;
+  height: 40px;
+}
+
+[data-buff] > span {
+  display: inline-block !important;
+  padding: 0.1rem 0.7rem !important;
+  border-radius: 0.2rem !important;
+  font-size: 1.1rem !important;
+  width: auto !important;
+  color: white !important;
+  cursor: help !important;
+}
+
+.poke-status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+[data-buff="sunny"] span, [data-buff="rainy"] span, [data-buff="sandstorm"] span, [data-buff="hail"] span, [data-buff="electricTerrain"] span, [data-buff="grassyTerrain"] span, [data-buff="mistyTerrain"] span {
+  display: inline-block !important;
+  padding: 0.15rem 0.8rem !important;
+  border-radius: 0.25rem !important;
+  font-size: 1rem !important;
+  font-weight: bold !important;
+  color: white !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
+  line-height: 1.4 !important;
+}
+
+[data-buff="burn"] span {
+  background: #FBA64C !important;
+}
+
+[data-buff="freeze"] span {
+  background: #76D1C1 !important;
+}
+
+[data-buff="paralysis"] span {
+  background: #F2D94E !important;
+  color: #222 !important;
+}
+
+[data-buff="poisoned"] span {
+  background: #B763CF !important;
+}
+
+[data-buff="sleep"] span {
+  background: #A0A29F !important;
+}
+
+[data-buff="confused"] span {
+  background: #FA8582 !important;
+}
+
+[data-buff="sunny"] span {
+  background: #FBA64C !important;
+}
+
+[data-buff="rainy"] span {
+  background: #539DDF !important;
+}
+
+[data-buff="sandstorm"] span {
+  background: #DA7C4D !important;
+}
+
+[data-buff="hail"] span {
+  background: #76D1C1 !important;
+}
+
+[data-buff="electricTerrain"] span {
+  background: #F2D94E !important;
+  color: #222 !important;
+}
+
+[data-buff="grassyTerrain"] span {
+  background: #60BE58 !important;
+}
+
+[data-buff="mistyTerrain"] span {
+  background: #EF90E6 !important;
+}
+
+.type-electric.type-badge {
+  color: #222 !important;
+}
+
+.type-normal.type-badge {
+  color: #222 !important;
+}
+
+.type-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.type-normal {
+  background: var(--type-normal);
+}
+
+.type-fire {
+  background: var(--type-fire);
+}
+
+.type-water {
+  background: var(--type-water);
+}
+
+.type-grass {
+  background: var(--type-grass);
+}
+
+.type-electric {
+  background: var(--type-electric);
+  color: var(--dark1);
+}
+
+.type-ice {
+  background: var(--type-ice);
+}
+
+.type-fighting {
+  background: var(--type-fighting);
+}
+
+.type-poison {
+  background: var(--type-poison);
+}
+
+.type-ground {
+  background: var(--type-ground);
+}
+
+.type-flying {
+  background: var(--type-flying);
+}
+
+.type-psychic {
+  background: var(--type-psychic);
+}
+
+.type-bug {
+  background: var(--type-bug);
+}
+
+.type-rock {
+  background: var(--type-rock);
+}
+
+.type-ghost {
+  background: var(--type-ghost);
+}
+
+.type-dragon {
+  background: var(--type-dragon);
+}
+
+.type-dark {
+  background: var(--type-dark);
+}
+
+.type-steel {
+  background: var(--type-steel);
+}
+
+.type-fairy {
+  background: var(--type-fairy);
+}
+
+.type-normal {
+  --type-color: var(--type-normal);
+}
+
+.type-fire {
+  --type-color: var(--type-fire);
+}
+
+.type-water {
+  --type-color: var(--type-water);
+}
+
+.type-grass {
+  --type-color: var(--type-grass);
+}
+
+.type-electric {
+  --type-color: var(--type-electric);
+}
+
+.type-ice {
+  --type-color: var(--type-ice);
+}
+
+.type-fighting {
+  --type-color: var(--type-fighting);
+}
+
+.type-poison {
+  --type-color: var(--type-poison);
+}
+
+.type-ground {
+  --type-color: var(--type-ground);
+}
+
+.type-flying {
+  --type-color: var(--type-flying);
+}
+
+.type-psychic {
+  --type-color: var(--type-psychic);
+}
+
+.type-bug {
+  --type-color: var(--type-bug);
+}
+
+.type-rock {
+  --type-color: var(--type-rock);
+}
+
+.type-ghost {
+  --type-color: var(--type-ghost);
+}
+
+.type-bug, .type-electric, .type-fairy, .type-fire, .type-flying,
+.type-grass, .type-ground, .type-ice, .type-normal, .type-poison,
+.type-psychic, .type-rock, .type-steel, .type-water {
+  --type-text: #241F16;
+}
+
+.type-dark, .type-dragon, .type-fighting, .type-ghost {
+  --type-text: #FFFFFF;
+}
+
+.type-dragon {
+  --type-color: var(--type-dragon);
+}
+
+.type-dark {
+  --type-color: var(--type-dark);
+}
+
+.type-steel {
+  --type-color: var(--type-steel);
+}
+
+.type-fairy {
+  --type-color: var(--type-fairy);
+}
+
+.poke-detail-types .type-badge {
+  text-align:center;
+  justify-content:center;
+  border-radius: 3px;
+}
+
+.poke-detail-types .type-badge {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 8px;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.box-status-badges {
+  position: absolute;
+  left: 5px;
+  top: 28px;
+  display: grid;
+  gap: 2px;
+  z-index: 3;
+}
+
+.box-status-badge {
+  min-width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  background: rgba(0,0,0,0.56);
+  border: 1px solid rgba(255,255,255,0.18);
+}
+
+.box-status-badge.favorite {
+  color: var(--shiny);
+}
+
+.box-status-badge.locked {
+  color: #ffb8c5;
+}
+
+.box-status-badge.queued {
+  color: var(--green);
+}
+
+.status-badge {
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.18);
+}
+
+.status-badge.para {
+  background: var(--type-electric);
+  color: var(--dark1);
+}
+
+.status-badge.badpoison {
+  background: #6f2b86;
+  color: #fff;
+}
+
+.status-badge.confuse {
+  background: #b763cf;
+  color: #fff;
+}
+
+.status-badge {
+  text-transform: none;
+}
+
+.pokemon-rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 22px;
+  border-radius: 999px;
+  padding: 0 7px;
+  font-size: 11px;
+  font-weight: 900;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(0,0,0,0.34);
+  color: var(--light2);
+}
+
+.box-status-badges .pokemon-rank-badge {
+  min-width: 22px;
+  height: 20px;
+  padding:0 5px;
+  font-size:10px;
+}
+
+.pw-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.pw-badge-type {
+  composes: pw-badge;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.pw-status-immune {
+  color: var(--red);
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.pw-status-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--dark1);
+}
+
+.pw-status-dot-owned {
+  background: #4ade80;
+}
+
+.pw-status-dot-pending {
+  background: #94886B;
+}
+
+.pw-status-dot-empty {
+  background: var(--dark3);
+  opacity: 0.5;
+}
+
+.pw-badge-purple {
+  background: var(--purple);
+  border: 1px solid #8a4fb0;
+}
+
+.pw-label-white-bold {
+  color: #fff;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.pw-charge-move {
+  --charge-pct: 0%;
+  --charge-color: var(--type-color, rgba(148,136,107,0.4));
+}
+
+.info-row, .pw-stat-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(236,222,183,0.10);
+}
+
+.type-badge, .poke-badge, .status-badge {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 18px;
+  padding: 2px 8px !important;
+  border-radius: 999px !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  color: #fff;
+  background: var(--type-color, var(--status-color, #888));
+  text-shadow: 0 1px 2px rgba(0,0,0,0.45);
+}
+
+.type-badge[data-type-color], .status-badge[data-type-color] {
+  background: attr(data-type-color color, #888);
+}
+
+.loc-action-btn.pw-badge-purple {
+  background: rgba(156, 39, 176, 0.45) !important;
+  border: 1px solid #c058eb !important;
+  color: #ffffff !important;
+}
+
+.loc-action-btn.pw-badge-purple:hover {
+  background: rgba(156, 39, 176, 0.75) !important;
+  border-color: #e886ff !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.55) !important;
+}
+
+.type-badge, .status-badge, .poke-badge, .pw-badge {
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6) !important;
+}
+
+.type-badge.type-bug, .type-bug.type-badge, .pw-badge.type-bug, span.type-bug {
+  color: #241F16 !important;
+  text-shadow: none !important;
+}
+
+.type-badge.type-electric, .type-electric.type-badge, .pw-badge.type-electric, span.type-electric {
+  color: #241F16 !important;
+  text-shadow: none !important;
+}
+
+.type-badge.type-fairy, .type-fairy.type-badge, .pw-badge.type-fairy, span.type-fairy {
+  color: #241F16 !important;
+  text-shadow: none !important;
+}
+
+.type-badge.type-fighting, .type-fighting.type-badge, .pw-badge.type-fighting, span.type-fighting {
+  background: color-mix(in srgb, var(--type-fighting) 96%, #000 4%) !important;
+  color: #ffffff !important;
+}
+
+.type-badge.type-fire, .type-fire.type-badge, .pw-badge.type-fire, span.type-fire {
+  color: #241F16 !important;
+  text-shadow: none !important;
+}
+
+.type-badge.type-flying, .type-flying.type-badge, .pw-badge.type-flying, span.type-flying {
+  color: #241F16 !important;
+  text-shadow: none !important;
+}
+
+.type-badge.type-grass, .type-grass.type-badge, .pw-badge.type-grass, span.type-grass {
+  color: #241F16 !important;
+  text-shadow: none !important;
+}
+
+.type-badge.type-ground, .type-ground.type-badge, .pw-badge.type-ground, span.type-ground {
+  color: #241F16 !important;
+  text-shadow: none !important;
+}
+
+.type-badge.type-ice, .type-ice.type-badge, .pw-badge.type-ice, span.type-ice {
+  color: #241F16 !important;
+  text-shadow: none !important;
+}
+
+.type-badge.type-normal, .type-normal.type-badge, .pw-badge.type-normal, span.type-normal {
+  color: #241F16 !important;
+  text-shadow: none !important;
+}
+
+.type-badge.type-poison, .type-poison.type-badge, .pw-badge.type-poison, span.type-poison {
+  background: color-mix(in srgb, var(--type-poison) 88%, #000 12%) !important;
+  color: #ffffff !important;
+}
+
+.type-badge.type-psychic, .type-psychic.type-badge, .pw-badge.type-psychic, span.type-psychic {
+  color: #241F16 !important;
+  text-shadow: none !important;
+}
+
+.type-badge.type-rock, .type-rock.type-badge, .pw-badge.type-rock, span.type-rock {
+  color: #241F16 !important;
+  text-shadow: none !important;
+}
+
+.type-badge.type-steel, .type-steel.type-badge, .pw-badge.type-steel, span.type-steel {
+  color: #241F16 !important;
+  text-shadow: none !important;
+}
+
+.type-badge.type-water, .type-water.type-badge, .pw-badge.type-water, span.type-water {
+  color: #241F16 !important;
+  text-shadow: none !important;
+}
+
+.pw-pending-badge {
+  font-size: 10px;
+  color: #ffd700;
+  border: 1px solid rgba(255,215,0,0.35);
+  border-radius: 3px;
+  padding: 1px 6px;
+  margin-left: 6px;
+}
+
+.pw-atoll-rank-badge {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 900;
+  border: 1px solid currentColor;
+  background: rgba(0,0,0,.28);
+  margin-bottom: 2px;
+}
+
+.pw-atoll-rank-badge.rank-e {
+  color: #B8C7D9;
+}
+
+.pw-atoll-rank-badge.rank-d {
+  color: #93D47B;
+}
+
+.pw-atoll-rank-badge.rank-c {
+  color: #63C7FF;
+}
+
+.pw-atoll-rank-badge.rank-b {
+  color: #D9A0E8;
+}
+
+.pw-atoll-rank-badge.rank-a {
+  color: #F2D94E;
+}
+
+.pw-atoll-rank-badge.rank-s {
+  color: #FF8A3D;
+}
+
+.pw-atoll-rank-badge.free {
+  color: #FF8BA0;
+}
+
+.poke-card .status-badge, .poke-card .buff-badge, #team-window-body .status-badge, #team-window-body .buff-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 17px !important;
+  padding: 2px 7px !important;
+  border-radius: 9px !important;
+  border: 1px solid rgba(255, 255, 255, .28) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: .02em !important;
+  line-height: 1.1 !important;
+  text-transform: none !important;
+  color: #14120E !important;
+  text-shadow: none !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .35) !important;
+}
+
+.buff-badge.atk-up, .buff-badge.def-up, .buff-badge.spe-up {
+  background: color-mix(in srgb, var(--green, #4CAF50) 55%, #FFFFFF) !important;
+}
+
+.buff-badge.atk-down, .buff-badge.def-down, .buff-badge.spe-down {
+  background: color-mix(in srgb, var(--red, #E53935) 48%, #FFFFFF) !important;
+}
+
+.status-badge.burn {
+  background: color-mix(in srgb, var(--type-fire) 58%, #FFFFFF) !important;
+}
+
+.status-badge.poison,
+.status-badge.badpoison {
+  background: color-mix(in srgb, var(--type-poison) 58%, #FFFFFF) !important;
+}
+
+.status-badge.paralysis,
+.status-badge.para {
+  background: color-mix(in srgb, var(--type-electric) 62%, #FFFFFF) !important;
+}
+
+.status-badge.sleep {
+  background: color-mix(in srgb, var(--type-normal) 62%, #FFFFFF) !important;
+}
+
+.status-badge.freeze {
+  background: color-mix(in srgb, var(--type-ice) 62%, #FFFFFF) !important;
+}
+
+.status-badge.confuse {
+  background: color-mix(in srgb, var(--type-psychic, #b763cf) 55%, #FFFFFF) !important;
+}
+
+.poke-card .status-badge, .poke-card .buff-badge, #team-window-body .status-badge, #team-window-body .buff-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 18px !important;
+  padding: 2px 8px !important;
+  border-radius: 9px !important;
+  border: 1px solid rgba(0, 0, 0, .28) !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: .02em !important;
+  line-height: 1.1 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .3) !important;
+}
+
+#team-window-body .buff-badge.atk-up, .poke-card .buff-badge.atk-up {
+  background: var(--type-fighting) !important;
+  color: #FFFFFF !important;
+}
+
+#team-window-body .buff-badge.def-up, .poke-card .buff-badge.def-up {
+  background: var(--type-steel) !important;
+  color: #FFFFFF !important;
+}
+
+#team-window-body .buff-badge.spe-up, .poke-card .buff-badge.spe-up {
+  background: var(--type-electric) !important;
+  color: #14120E !important;
+}
+
+#team-window-body .buff-badge.atk-down, .poke-card .buff-badge.atk-down {
+  background: color-mix(in srgb, var(--type-fighting) 62%, #000000) !important;
+  border-color: var(--type-fighting) !important;
+  color: #FFFFFF !important;
+}
+
+#team-window-body .buff-badge.def-down, .poke-card .buff-badge.def-down {
+  background: color-mix(in srgb, var(--type-steel) 62%, #000000) !important;
+  border-color: var(--type-steel) !important;
+  color: #FFFFFF !important;
+}
+
+#team-window-body .buff-badge.spe-down, .poke-card .buff-badge.spe-down {
+  background: color-mix(in srgb, var(--type-electric) 62%, #000000) !important;
+  border-color: var(--type-electric) !important;
+  color: #FFFFFF !important;
+}
+
+#team-window-body .status-badge.burn, .poke-card .status-badge.burn {
+  background: var(--type-fire) !important;
+  color: #14120E !important;
+}
+
+#team-window-body .status-badge.poison, #team-window-body .status-badge.badpoison, .poke-card .status-badge.poison, .poke-card .status-badge.badpoison {
+  background: var(--type-poison) !important;
+  color: #FFFFFF !important;
+}
+
+#team-window-body .status-badge.paralysis, #team-window-body .status-badge.para, .poke-card .status-badge.paralysis, .poke-card .status-badge.para {
+  background: var(--type-electric) !important;
+  color: #14120E !important;
+}
+
+#team-window-body .status-badge.sleep, .poke-card .status-badge.sleep {
+  background: var(--type-normal) !important;
+  color: #14120E !important;
+}
+
+#team-window-body .status-badge.freeze, .poke-card .status-badge.freeze {
+  background: var(--type-ice) !important;
+  color: #14120E !important;
+}
+
+#team-window-body .status-badge.confuse, .poke-card .status-badge.confuse {
+  background: var(--type-psychic) !important;
+  color: #14120E !important;
+}
+
+#team-window-body .poke-card span.status-badge, #team-window-body .poke-card span.buff-badge {
+  opacity: 1 !important;
+}
+
+.pw-tier-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.pw-tier-dot.unlocked {
+  background: var(--yellow);
+}
+
+.pw-tier-dot.locked {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.pw-rank-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pw-rank-chip.rank-bronze {
+  background: linear-gradient(135deg, rgb(205, 127, 50), rgb(139, 69, 19));
+  color: rgb(255, 255, 255);
+}
+
+.pw-rank-chip.rank-silver {
+  background: linear-gradient(135deg, rgb(220, 220, 220), rgb(160, 160, 160));
+  color: rgb(30, 30, 30);
+}
+
+.pw-rank-chip.rank-gold {
+  background: linear-gradient(135deg, rgb(255, 215, 0), rgb(218, 165, 32));
+  color: rgb(40, 30, 0);
+}
+
+.pw-rank-chip.rank-diamond {
+  background: linear-gradient(135deg, rgb(185, 242, 255), rgb(0, 180, 216));
+  color: rgb(10, 30, 50);
+}
+
+.pw-rank-chip {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  background: #cd7f32;
+  color: #fff;
+}
+
+.pw-rank-chip.rank-none {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--light1, #c9bc9c);
+  border: 1px solid var(--pw-border-color);
+}
+
+.pw-badges-tabs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.pw-badges-panel-container {
+  padding: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+  color: var(--text);
+}
+
+.pw-badges-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, .1);
+}
+
+.pw-badges-heading {
+  margin: 0;
+  font-size: 18px;
+}
+
+.pw-badges-subtitle {
+  font-size: 12px;
+  color: var(--light1);
+  margin-top: 4px;
+}
+
+.pw-badges-counters {
+  text-align: right;
+}
+
+.pw-badges-count {
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--yellow);
+}
+
+.pw-badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.pw-badge-card {
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, .06);
+  background: rgba(255, 255, 255, .02);
+}
+
+.pw-badge-card.obtained {
+  background: rgba(255, 255, 255, .08);
+  border-color: var(--pw-badge-color, rgba(255, 255, 255, .2));
+}
+
+.pw-badge-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 8px;
+  text-align: center;
+}
+
+.pw-badge-emblem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pw-badge-card .pw-badge-emblem {
+  margin-bottom: 8px;
+  min-height: 48px;
+}
+
+.pw-badge-emblem-img {
+  width: 48px;
+  height: 48px;
+  transition: filter .2s ease;
+  filter: grayscale(1) opacity(.35);
+}
+
+.obtained .pw-badge-emblem-img {
+  filter: drop-shadow(0 0 6px var(--pw-badge-color, #ffd700));
+}
+
+.pw-badge-card-title {
+  font-weight: bold;
+  font-size: 12px;
+  color: var(--light1);
+}
+
+.obtained .pw-badge-card-title {
+  color: #fff;
+}
+
+.pw-badge-card-line {
+  font-size: 10px;
+  color: var(--light1);
+  margin-top: 2px;
+}
+
+.pw-badge-card .pw-badge-card-line-2 {
+  font-size: 11px;
+  color: var(--light2);
+}
+
+.pw-badge-card-status {
+  font-size: 10px;
+  color: var(--light2);
+  margin-top: 3px;
+  font-weight: bold;
+}
+
+.obtained .pw-badge-card-status {
+  color: var(--green);
+}
+
+.pw-badges-title-block, .pw-badges-counters, .pw-badge-card-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.pw-badges-counters {
+  align-items: flex-end;
+}
+
+.pw-badge-card .pw-badge-card-text {
+  align-items: center;
+}
+
+.pw-badge--hidden {
+  background: rgba(229, 195, 101, 0.2);
+  color: var(--accent, #E5C365);
+  border: 1px solid var(--accent, #E5C365);
+}

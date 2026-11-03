@@ -13,6 +13,7 @@ import { ModalToggledEvent } from '../core/events/ModalToggledEvent.js';
 import { ModalCloseRequestedEvent } from '../core/events/ModalCloseRequestedEvent.js';
 import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
 import { t } from '../localization/LocalizationManager.js';
+import { ModalFocusScope } from './ModalFocusScope.js';
 
 export class UIModal extends UIPanel {
   /**
@@ -29,6 +30,8 @@ export class UIModal extends UIPanel {
    * @param {boolean} [options.hasFooter=false]
    * @param {boolean} [options.closeOnBackdrop=true]
    * @param {boolean} [options.showCloseBtn=true]
+   * @param {boolean} [options.closeOnEscape=true] - Escape closes the window (see ModalFocusScope);
+   *        only the subclasses that own a custom Escape behaviour turn it off.
    */
   constructor(options = {}) {
     const hasHeader = options.hasHeader !== false;
@@ -49,6 +52,8 @@ export class UIModal extends UIPanel {
 
     this._size = size;
     this._closeOnBackdrop = options.closeOnBackdrop !== false;
+    this._closeOnEscape = options.closeOnEscape !== false;
+    this._focusScope = null;
     this._isOpen = false;
 
     // Root overlay container (private implementation detail of the widget)
@@ -134,6 +139,11 @@ export class UIModal extends UIPanel {
     this._overlayDom.classList.add('is-open', 'open');
     this.show();
     this.onEnter(params);
+    this._focusScope = ModalFocusScope.activate({
+      host: this._overlayDom,
+      container: this._dom,
+      onEscape: this._closeOnEscape ? () => this.close() : null
+    });
     EventBus.getInstance().dispatch(new ModalToggledEvent(this.getName(), true));
   }
 
@@ -145,6 +155,10 @@ export class UIModal extends UIPanel {
     this._overlayDom.classList.add('is-hidden');
     this.hide();
     this.onExit();
+    if (this._focusScope) {
+      ModalFocusScope.release(this._focusScope);
+      this._focusScope = null;
+    }
     EventBus.getInstance().dispatch(new ModalToggledEvent(this.getName(), false));
   }
 
@@ -153,6 +167,10 @@ export class UIModal extends UIPanel {
    * @override
    */
   onDestroy() {
+    if (this._focusScope) {
+      ModalFocusScope.release(this._focusScope);
+      this._focusScope = null;
+    }
     if (this._overlayDom.parentNode) {
       this._overlayDom.parentNode.removeChild(this._overlayDom);
     }

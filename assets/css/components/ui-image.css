@@ -1,0 +1,56 @@
+/*
+ * components/ui-image.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.fossil-item-icon {
+  width: var(--pw-item-icon-md);
+  height: var(--pw-item-icon-md);
+  border-radius: 10px;
+  background: var(--dark1);
+  border: 1px solid var(--dark3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.pw-img-pixelated {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.pw-sanctuary-relic-mini-icon .pw-item-circle-img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+:where(.pw-image) {
+  display: block;
+  max-width: 100%;
+  user-select: none;
+}
+
+.pw-image--pixelated {
+  image-rendering: pixelated;
+}
+
+
+/* Source and fallback both failed: keep the layout, hide the broken glyph */
+.pw-image.is-broken {
+  visibility: hidden;
+}
+
+.inv-icon-img {
+  max-width: var(--pw-item-icon-sm);
+  max-height: var(--pw-item-icon-sm);
+}
+
+.pw-item-sprite .pw-item-circle-img {
+  width: 62%;
+  height: 62%;
+  object-fit: contain;
+}

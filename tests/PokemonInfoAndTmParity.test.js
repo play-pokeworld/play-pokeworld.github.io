@@ -4,6 +4,7 @@
  * as well as TM/HM learnability filtering in Bag and BoxPanel.
  */
 import { describe, assert } from './TestRunner.js';
+import { readBundle } from './CssBundle.js';
 import { fakeEvent } from './FakeDom.js';
 import { SaveSystem } from '../src/systems/SaveSystem.js';
 import { PokemonFactory } from '../src/data/pokemon/PokemonFactory.js';
@@ -23,6 +24,7 @@ import { SettingsModal } from '../src/panels/settings/SettingsModal.js';
 import { FacilityManagementModal } from '../src/panels/facilities/FacilityManagementModal.js';
 import fs from 'fs';
 import path from 'path';
+import { sheetPath } from './CssBundle.js';
 
 const saves = SaveSystem.getInstance();
 
@@ -286,7 +288,7 @@ describe('PokemonInfoModal and TM/HM parity', (test) => {
       // With 1 remaining copy, BoxPanel stays open, but Squirtle has already unlocked Surf,
       // and Pikachu & Bulbasaur are incompatible, so 0 compatible Pokémon remain!
       assert.ok(box.isOpen(), 'BoxPanel remains open while items remain');
-      const emptyState = dom.querySelector('.pw-empty-state-md');
+      const emptyState = dom.querySelector('.pw-empty-state');
       assert.ok(emptyState, 'Empty state displayed when no more compatible Pokémon exist');
       assert.ok(emptyState.textContent.includes(t('no_pokemon_found')), 'Empty state displays no_pokemon_found message');
     } finally {
@@ -410,7 +412,7 @@ describe('PokemonInfoModal and TM/HM parity', (test) => {
     training.destroy();
     hatchery.destroy();
 
-    const css = fs.readFileSync(path.resolve('assets/css/ui-modal.css'), 'utf8');
+    const css = readBundle();
     assert.ok(css.includes('.pw-panel--modal-window.pw-pokemon-info-window'), 'Pokemon info window is hooked to template');
     assert.ok(css.includes('.pw-facility-management.pw-static-modal'), 'Facility management is hooked to template');
   });

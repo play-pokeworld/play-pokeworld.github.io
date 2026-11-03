@@ -35,4 +35,8 @@ export const itemEffects = {
   "item_category_apricorn": "Apricorn: used to craft Poké Balls.",
   "item_category_legend_key": "Legendary item: opens the way to a legendary Pokémon.",
   "item_category_underground_shard": "Underground shard: found in the Mine, traded for items.",
+  "item_category_plate": "A plate tied to Arceus: a collectible item.",
+  "item_category_farm": "A cultivation item tied to Berries.",
+  "item_category_flute": "A rare flute tied to sleeping Pokémon.",
+  "item_category_tool": "A field tool: helps spot treasures and tokens.",
 };

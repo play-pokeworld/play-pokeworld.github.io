@@ -4,8 +4,14 @@
  * Money lives in CurrenciesData. Stores identifiers only (location id, portrait file stem,
  * badge ids): display text is resolved by the views.
  *
- * Serialized shape (save schema 3):
- *   { trainerName, trainerSprite, region, location, playTimeSeconds, badges[gym leader ids] }
+ * Serialized shape (save schema 21):
+ *   { trainerName, trainerSprite, avatarPokemonUid, region, location, playTimeSeconds,
+ *     badges[gym leader ids] }
+ *
+ * `trainerSprite` is the appearance of the player on the map and in trainers' views (an asset stem).
+ * `avatarPokemonUid` is the Pokémon shown on the save-game card (main-game behaviour: the player
+ * picks one of the Pokémon they own, never an NPC portrait). An empty string means "not chosen yet":
+ * the save card then falls back to the lead Pokémon of the team, then to the first owned Pokémon.
  */
 import { BaseModel } from '../core/BaseModel.js';
 import { EventBus } from '../../core/EventBus.js';
@@ -56,6 +62,7 @@ export class PlayerData extends BaseModel {
     return {
       trainerName: this.trainerName,
       trainerSprite: this.trainerSprite,
+      avatarPokemonUid: this.avatarPokemonUid,
       region: this.region,
       location: this.location,
       playTimeSeconds: this.playTimeSeconds,
@@ -72,6 +79,8 @@ export class PlayerData extends BaseModel {
     const raw = data || {};
     this.trainerName = raw.trainerName || PlayerDefaults.TRAINER_NAME;
     this.trainerSprite = raw.trainerSprite || PlayerDefaults.TRAINER_SPRITE;
+    /** @type {string} uid of the owned Pokémon used as the save-card portrait ('' = fall back) */
+    this.avatarPokemonUid = typeof raw.avatarPokemonUid === 'string' ? raw.avatarPokemonUid : '';
     this.region = raw.region || PlayerDefaults.REGION;
     this.location = raw.location && LocationDB.getInstance().has(raw.location) ? raw.location : PlayerDefaults.LOCATION_ID;
     this.playTimeSeconds = Math.max(0, Number(raw.playTimeSeconds) || 0);

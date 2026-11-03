@@ -1,0 +1,201 @@
+/*
+ * components/ui-toolbar.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.ui-toolbar-label {
+  color: var(--light2);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.ui-toolbar-sep {
+  width: 1px;
+  height: 22px;
+  background: rgba(236,222,183,0.14);
+}
+
+
+/* 3. Toolbar component (pw-ui-toolbar) — the ONE fixed filter bar ──── Rendered OUTSIDE scrollers (bag, dictionary, selectors): it can never scroll away or leave a gap where the grid bleeds through. */
+.pw-ui-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--pw-bg-header);
+  border: 1px solid var(--pw-border-color);
+  border-radius: 8px;
+  color: var(--pw-text-primary);
+}
+
+.pw-ui-toolbar--fixed {
+  flex: none;
+}
+
+.pw-ui-toolbar-sort {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.pw-ui-toolbar-search {
+  flex: 1 1 140px;
+  min-width: 120px;
+  min-height: 32px;
+  padding: 6px 10px;
+  background: var(--pw-bg-surface);
+  color: var(--pw-text-primary);
+  border: 1px solid var(--pw-border-color);
+  border-radius: 6px;
+}
+
+.pw-ui-toolbar-search:focus {
+  outline: 2px solid var(--pw-accent-color);
+  outline-offset: 1px;
+}
+
+.pw-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 10px;
+  background: var(--pw-bg-header);
+  border-bottom: 1px solid var(--pw-border-color);
+}
+
+.pw-toolbar--fixed {
+  flex: none;
+}
+
+.pw-toolbar-search {
+  flex: 1 1 160px;
+  min-width: 120px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--pw-border-color);
+  background: var(--pw-bg-surface);
+  color: var(--pw-text-primary);
+  font: inherit;
+  font-size: 12px;
+}
+
+.pw-toolbar-sorts {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.pw-toolbar-sort {
+  border: 1px solid var(--pw-border-color);
+  background: var(--pw-btn-bg);
+  color: var(--pw-btn-text);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pw-toolbar-sort.is-active {
+  background: var(--pw-btn-active-bg);
+  color: var(--pw-btn-active-text);
+}
+
+.pw-toolbar-cluster {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pw-toolbar-cluster--right {
+  margin-left: auto;
+}
+
+.pw-filterbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--dark1);
+  border-bottom: 2px solid var(--dark3);
+  flex-shrink: 0;
+}
+
+.pw-filterbar .inv-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.pw-filterbar {
+  row-gap: 8px;
+}
+
+.pw-filterbar .pw-chip-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.pw-filterbar button.pw-chip {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: var(--pw-bg-sprite) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  color: var(--pw-text-secondary) !important;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  text-shadow: none !important;
+  cursor: pointer;
+}
+
+.pw-filterbar button.pw-chip:hover {
+  background: var(--pw-bg-surface) !important;
+  border-color: var(--pw-text-secondary) !important;
+  color: var(--pw-text-primary) !important;
+  filter: none !important;
+}
+
+.pw-filterbar button.pw-chip.active {
+  background: var(--light2) !important;
+  border-color: var(--light2) !important;
+  color: var(--dark1) !important;
+  text-shadow: none !important;
+}
+
+.pw-filterbar button.pw-chip .pw-chip-count {
+  opacity: 0.75;
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+
+/* User request: the counter bubble keeps the SAME look in both states — light number (var(--light2)) on the dark pill — only the chip/tab label switches to dark text on the beige active background. */
+.pw-filterbar button.pw-chip .pw-chip-count {
+  opacity: 1 !important;
+  font-weight: 800 !important;
+}
+
+.pw-filterbar button.pw-chip:not(.active) .pw-chip-count {
+  color: var(--light2) !important;
+}
+
+.pw-filterbar button.pw-chip.active .pw-chip-count {
+  color: var(--light2) !important;
+  background: var(--dark1) !important;
+}

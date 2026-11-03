@@ -56,21 +56,22 @@ describe('Release 1.15.9 - Evolution Formatting, Pokédex Sources, Route Drops &
     assert.ok(dom.querySelector('.pw-item-sprite'), 'renders drop item sprite');
   });
 
-  test('SpeciesSourceCatalog lists Black Market, dynamic Roaming route, quests, and Legend Fragments', () => {
+  test('SpeciesSourceCatalog lists Black Market, quests and Legend Fragments, without a disabled roaming source', () => {
     // 1. Black Market source
     const eeveeSources = SpeciesSourceCatalog.getFormattedSources('eevee');
     assert.ok(eeveeSources.some((s) => s.includes('Marché Noir') || s.includes('Black Market')), 'Eevee lists Black Market source');
     assert.ok(eeveeSources.some((s) => s.includes('Quête') || s.includes('Quest')), 'Eevee lists Celadon Mansion quest');
 
-    // 2. Dynamic Roaming Route calculation
+    // 2. Roaming is switched off: the rotation rule still computes, the game exposes nothing and the
+    //    Pokédex must not advertise an obtainment path that cannot happen.
     const now = Date.UTC(2026, 9, 26, 14, 0, 0); // fixed timestamp
-    const articunoRoute = RoamingSystem.getRouteForSpecies('articuno', now);
-    assert.ok(articunoRoute, 'RoamingSystem computes route for Articuno');
-    assert.equal(typeof articunoRoute.locationId, 'string', 'Route has valid locationId');
+    assert.equal(RoamingSystem.getRouteForSpecies('articuno', now), null, 'no live roaming route is exposed');
+    assert.equal(RoamingSystem.getAssignedSpecies('route1', 0), 'articuno',
+      'the deterministic rotation still assigns Articuno on its own window');
 
     const articunoSources = SpeciesSourceCatalog.getFormattedSources('articuno', now);
-    assert.ok(articunoSources.some((s) => s.includes('errant') || s.includes('Roaming')), 'Articuno lists roaming source');
-    assert.ok(articunoSources.some((s) => s.includes('Pont Pépite') || s.includes('route24')), 'Articuno sources mention current active roaming route');
+    assert.equal(articunoSources.some((s) => s.includes('errant') || s.includes('Roaming')), false,
+      'Articuno lists no roaming source while the feature is off');
     assert.ok(articunoSources.some((s) => s.includes('Atoll de Combat') || s.includes('Battle Atoll')), 'Articuno lists Battle Atoll Legend Fragment summon');
 
     // 3. Mewtwo sources (Cerulean Cave wild + Quest + Legend Fragments)
@@ -170,7 +171,7 @@ describe('Release 1.15.9 - Evolution Formatting, Pokédex Sources, Route Drops &
     }
   });
 
-  test('BattleSystem._giveExp handles level-up evolution without crashing (this._save fix)', () => {
+  test('BattleSystem._giveExp produces the level-1 evolution without transforming the fighter', () => {
     const saves = SaveSystem.getInstance();
     const previous = saves.getCurrentSave();
     const save = saves.createNewSave('EvoCombatTrainer', 'bulbasaur');
@@ -190,7 +191,10 @@ describe('Release 1.15.9 - Evolution Formatting, Pokédex Sources, Route Drops &
       const expNeeded = (ExperienceCurve.levelStart(16) - bulbasaur.exp) + 50;
       battler._giveExp(bulbasaur, expNeeded);
 
-      assert.equal(bulbasaur.species, 'ivysaur', 'Bulbasaur evolved to Ivysaur during battle');
+      assert.equal(bulbasaur.species, 'bulbasaur', 'the battling Pokémon keeps its species');
+      const ivysaur = save.collection.getAll().find((pokemon) => pokemon.species === 'ivysaur');
+      assert.ok(ivysaur, 'Ivysaur joined the collection at level 1 during the battle');
+      assert.equal(ivysaur.level, 1);
       assert.ok(save.pokedex.isCaught('ivysaur'), 'Ivysaur is marked as caught in Pokédex');
     } finally {
       battler.endBattle(false);

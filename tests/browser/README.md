@@ -244,3 +244,57 @@ vérifie aussi, sur le **vrai bouton** du tiroir de debug (mode développeur act
 
 Les onze suites de production s'exécutent séquentiellement :
 **17 + 9 + 17 + 13 + 21 + 18 + 14 + 12 + 17 + 5 + 6 = 149**.
+
+
+## Rôdeurs débranchés — 1.16.7
+
+```sh
+PLAYWRIGHT_MODULE=playwright npm run test:browser:roaming
+```
+
+`RoamingOff.mjs` valide **5 scénarios** sur une sauvegarde de Kanto : la carte se charge, **aucun nœud
+ne porte la couleur violette** des rôdeurs, la rotation reste réelle (12 affectations de règle dans la
+fenêtre courante) mais **0 est exposée** au jeu, la légende de la carte ne liste que les cinq couleurs
+atteignables (aucun swatch violet) et le panneau de lieu n'affiche ni carte, ni badge, ni minuteur de
+rôdeur. Artifacts par défaut : `artifacts/browser-roaming-off`.
+
+Les douze suites de production s'exécutent séquentiellement :
+**17 + 9 + 17 + 13 + 21 + 18 + 14 + 12 + 17 + 5 + 6 + 5 = 154**.
+
+
+## Taille des sprites d'objets — 1.16.8
+
+```sh
+PLAYWRIGHT_MODULE=playwright npm run test:browser:items
+```
+
+`ItemSpriteSize.mjs` valide **8 scénarios** en mesurant les boîtes réellement rendues. La fenêtre lieu
+sert de référence (72 × 72) ; un vrai combat sauvage est lancé puis son butin reçoit des objets dont
+l'image va de 30 px à **371 px** : le résumé du combat et le rapport AFK doivent rendre **exactement**
+72 × 72, sans aucun `<img>` nu, et les trois mesures doivent être identiques. La suite contrôle aussi
+que le sac reste compact (40 px, non touché), qu'aucune autre fenêtre ne bouge, qu'en anglais les cadres
+restent à 72 px sans débordement, et que la console reste propre. Artifacts par défaut :
+`artifacts/browser-item-size`.
+
+Les treize suites de production s'exécutent séquentiellement :
+**17 + 9 + 17 + 13 + 21 + 18 + 14 + 12 + 17 + 5 + 6 + 5 + 8 = 162**.
+
+
+## Pokémon de la carte de sauvegarde — 1.16.9
+
+```sh
+PLAYWRIGHT_MODULE=playwright npm run test:browser:portrait
+```
+
+`SaveCardPortrait.mjs` valide **9 scénarios** en suivant le parcours réel : une sauvegarde avec un
+starter et deux Pokémon en boîte PC, l'ouverture des réglages (le champ « Pokémon de la carte » montre
+un sprite et **aucune option de portrait PNJ**), la fenêtre de sélection qui liste les trois Pokémon,
+la recherche qui filtre **sans perdre le focus**, une collection de 123 Pokémon sur un écran
+1280 × 700 (la fenêtre reste dans l'écran, la grille défile, le champ de recherche reste visible), le
+choix d'un Pokémon de la boîte qui met à jour l'aperçu, l'application qui persiste l'uid, puis la
+**carte du menu après rechargement** qui affiche bien le Pokémon choisi. Enfin l'ordre de résolution
+(choix → premier de l'équipe → premier possédé → « ? ») est vérifié. Artifacts par défaut :
+`artifacts/browser-save-portrait`.
+
+Les quatorze suites de production s'exécutent séquentiellement :
+**17 + 9 + 17 + 13 + 21 + 18 + 14 + 12 + 17 + 5 + 6 + 5 + 8 + 9 = 171**.

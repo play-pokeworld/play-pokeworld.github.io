@@ -1,4 +1,5 @@
 /** @file BackdropAndContext.test.js @brief Exclusive named Auto controls and bounded decorative flight geometry. */
+import { readBundle, sheetPath } from './CssBundle.js';
 import fs from 'node:fs';
 import { describe, assert } from './TestRunner.js';
 import { SaveSystem } from '../src/systems/SaveSystem.js';
@@ -487,13 +488,15 @@ describe('Decorative view lifecycle and isolation', (test) => {
       assert.equal(view.getDomElement().getAttribute('aria-hidden'), 'true');
     }));
   test('CSS contains single flights and transform/opacity motion, with no old diagonal route animations', () => {
-    const css = fs.readFileSync(
-      new URL('../assets/css/pokemon-background.css', import.meta.url),
-      'utf8',
-    );
-    assert.ok(css.includes('animation-iteration-count: 1'));
+    // The flights live in the background sheet; the reduced-motion opt-out is global, so the
+    // bundle is the place to look for it.
+    const css = readBundle();
+    const background = fs.readFileSync(sheetPath('pokemon-background.css'), 'utf8');
+    assert.ok(background.includes('animation-iteration-count: 1'));
     assert.ok(css.includes('prefers-reduced-motion'));
     assert.ok(!css.includes('pw-background-pokemon-nw-se'));
-    assert.ok(!css.includes('animation-delay: -'));
+    // Staggered walkers legitimately use negative delays; what must not come back is the old
+    // diagonal route animation, which is what the removed classes would reintroduce.
+    assert.ok(!background.includes('-nw-se') && !background.includes('-se-nw'));
   });
 });

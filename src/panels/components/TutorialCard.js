@@ -8,6 +8,7 @@ import { UIButton } from '../../ui/UIButton.js';
 import { UIProgressBar } from '../../ui/UIProgressBar.js';
 import { UIIcon } from '../../ui/UIIcon.js';
 import { getTutorialDeviceHint } from '../../ui/TutorialDeviceHint.js';
+import { tutorialReveal } from '../../ui/TutorialHighlight.js';
 import { t, compose } from '../../localization/LocalizationManager.js';
 
 export class TutorialCard extends UIContainer {
@@ -66,14 +67,14 @@ export class TutorialCard extends UIContainer {
     this._stepHeading.setText(t('tutorial_step_lbl', { idx: status.index, total: status.total }));
     this._title.setText(status.title);
     this._description.setText(status.description);
-    const deviceHint = status.action === 'route1'
-      ? getTutorialDeviceHint('map')
-      : status.action === 'pokemon_sheet'
-        ? getTutorialDeviceHint('sheet')
-        : '';
-    this._how.setText(compose(...[status.how, deviceHint].filter(Boolean).flatMap((part, index) => (index ? [' ', part] : [part]))));
+    // Only the travelling steps need it: their window sits behind the bottom bar on mobile, and the
+    // hint goes on its own line so it never runs into the last step of the path.
+    const deviceHint = status.reveal?.kind === 'travel' ? getTutorialDeviceHint() : '';
+    this._how.setText(deviceHint ? compose(status.how, '\n', deviceHint) : status.how);
     this._progressText.setText(status.progressText);
     this._progress.setValue(status.progress, status.target);
-    this._action.setText(status.actionLabel);
+    // The button names what it points at, resolved against the current place: « Afficher <lieu> »
+    // while the player is elsewhere, « Afficher Explorer » once they stand on the spot.
+    this._action.setText(tutorialReveal(status.id).label);
   }
 }

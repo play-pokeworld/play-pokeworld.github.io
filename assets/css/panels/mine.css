@@ -1,0 +1,503 @@
+/*
+ * panels/mine.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.loc-title {
+  font-size: 13px;
+}
+
+.mine-tile-clickable:hover {
+  filter: brightness(1.25);
+}
+
+.stat-fill {
+  transition: width 0.3s;
+}
+
+.stat-bar {
+  margin-bottom: 4px;
+}
+
+.mine-grid {
+  display: grid;
+  gap: 3px;
+  background: #221814;
+  padding: 8px;
+  border-radius: 10px;
+  border: 2px solid #6d4c3d;
+  margin: 12px 0;
+}
+
+.mine-tile {
+  aspect-ratio: 1;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  transition: filter 0.1s;
+  position: relative;
+}
+
+.mine-tile.is-clickable {
+  cursor: pointer;
+}
+
+.mine-tile:not(.is-clickable) {
+  cursor: default;
+}
+
+.mine-tile-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+}
+
+.mine-tile-inner.is-collected {
+  background: rgba(76,175,80,0.25);
+}
+
+.mine-tile-inner:not(.is-collected) {
+  background: rgba(148,136,107,0.25);
+}
+
+.mine-energy-fill {
+  background: var(--light2);
+}
+
+.mine-tool-btn.is-active {
+  background: var(--light2);
+  color: #000;
+  font-weight: bold;
+}
+
+.mine-item {
+  margin-right: 10px;
+}
+
+.mine-item.is-collected {
+  color: var(--green);
+  font-weight: bold;
+}
+
+.mine-grid {
+  display:grid;
+  gap:3px;
+  background:#221814;
+  padding:8px;
+  border-radius:10px;
+  border:2px solid #6d4c3d;
+  margin:12px 0;
+}
+
+.mine-tile-has-item {
+  box-shadow: 0 0 16px var(--mine-item-color, #ff4fd8), inset 0 0 10px rgba(255,255,255,0.35);
+  border: 2px solid rgba(255,255,255,0.75);
+  filter: saturate(1.75) brightness(1.18);
+}
+
+.mine-tile-revealed-item .mine-revealed-item {
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255,255,255,0.75);
+  box-shadow: inset 0 0 12px rgba(255,255,255,0.45), 0 0 12px rgba(255,255,255,0.35);
+  filter: saturate(1.7) brightness(1.2);
+}
+
+.mine-tile-revealed-item .mine-revealed-item.is-collected {
+  background: rgba(76,175,80,0.35);
+  border-color: rgba(96,190,88,0.85);
+}
+
+.mine-tool-btn.active {
+  background: var(--light2);
+  color: var(--dark1);
+  font-weight: 900;
+}
+
+.mine-grid {
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  width: min(100%, 520px);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mine-tile {
+  min-width: 0;
+  min-height: 0;
+}
+
+#mine-window-body .mine-grid {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  grid-auto-rows: auto;
+  width: min(100%, 520px);
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#mine-window-body .mine-tile {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+
+/* 3. Subtitles, descriptions, stock, and secondary text always readable gold (#c9bc8a) Never allow --dark3 text on dark backgrounds */
+.loc-sub {
+  color: #c9bc8a !important;
+}
+
+.mine-tool-btn {
+  color: var(--light2);
+}
+
+.mine-tool-btn:hover {
+  filter: brightness(1.15);
+  color: var(--light2);
+}
+
+
+/* Light background active buttons MUST use dark text (#36342F) */
+.mine-tool-btn.active {
+  background: var(--light2) !important;
+  color: var(--dark1) !important;
+  border-color: var(--light2) !important;
+}
+
+.mine-tool-btn.active * {
+  color: var(--dark1) !important;
+}
+
+.loc-sub {
+  color: var(--light1) !important;
+}
+
+[class*="mine-tile--item-"], [class*="mine-item--"] {
+  background-color: #ff4fd8 !important;
+}
+
+.mine-tile--d4 {
+  background-color: var(--mine-rock-4) !important;
+}
+
+.mine-tile--d3 {
+  background-color: var(--mine-rock-3) !important;
+}
+
+.mine-tile--d2 {
+  background-color: var(--mine-rock-2) !important;
+}
+
+.mine-tile--d1 {
+  background-color: var(--mine-rock-1) !important;
+}
+
+.mine-tile--d0 {
+  background-color: var(--dark2) !important;
+}
+
+.mine-tile--item-firestone, .mine-item--firestone {
+  background-color: #ff3b1f !important;
+}
+
+.mine-tile--item-waterstone, .mine-item--waterstone {
+  background-color: #00a6ff !important;
+}
+
+.mine-tile--item-thunderstone, .mine-item--thunderstone {
+  background-color: #ffe600 !important;
+}
+
+.mine-tile--item-leafstone, .mine-item--leafstone {
+  background-color: #39ff64 !important;
+}
+
+.mine-tile--item-moonstone, .mine-item--moonstone {
+  background-color: #d28cff !important;
+}
+
+.mine-tile--item-sunstone, .mine-item--sunstone {
+  background-color: #ffb000 !important;
+}
+
+.mine-tile--item-nugget, .mine-item--nugget {
+  background-color: #ffd84a !important;
+}
+
+.mine-tile--item-stardust, .mine-item--stardust {
+  background-color: #7ff7ff !important;
+}
+
+.mine-tile--item-old_amber, .mine-item--old_amber {
+  background-color: #ffbf2f !important;
+}
+
+.mine-tile--item-other, .mine-item--other {
+  background-color: #ff4fd8 !important;
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+.mine-grid {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+}
+
+.mine-tile {
+  position: relative;
+}
+
+.mine-tile.pw-mine-hit {
+  animation: pw30-mine-hit 280ms ease-out;
+  z-index: 2;
+}
+
+.mine-tile.pw-mine-break {
+  animation: pw30-mine-break 420ms ease-out;
+  z-index: 3;
+}
+
+.mine-tile.pw-mine-hit::after,
+.mine-tile.pw-mine-break::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(255, 248, 220, .95) 45%, transparent 46%),
+    radial-gradient(circle, rgba(226, 210, 170, .9)  45%, transparent 46%),
+    radial-gradient(circle, rgba(255, 248, 220, .85) 45%, transparent 46%),
+    radial-gradient(circle, rgba(200, 184, 148, .9)  45%, transparent 46%);
+  background-size: 5px 5px, 4px 4px, 3px 3px, 4px 4px;
+  background-repeat: no-repeat;
+  background-position: 50% 50%, 50% 50%, 50% 50%, 50% 50%;
+  animation: pw30-mine-shards 420ms ease-out forwards;
+}
+
+.mine-tile.pw-mine-reveal {
+  animation: pw30-mine-reveal 620ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+.mine-tile.pw-mine-hit, .mine-tile.pw-mine-break, .mine-tile.pw-mine-reveal, .mine-tile.pw-mine-hit::after, .mine-tile.pw-mine-break::after {
+  animation: none !important;
+}
+
+}
+
+.mine-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mine-tool-btn .mine-tool-ico {
+  flex: 0 0 auto;
+  opacity: 0.85;
+}
+
+.mine-tool-btn .mine-tool-cost {
+  font-size: 11px;
+  opacity: 0.8;
+  font-variant-numeric: tabular-nums;
+}
+
+.mine-tool-btn.active .mine-tool-ico {
+  opacity: 1;
+}
+
+.mine-tool-btn.active {
+  box-shadow: none;
+}
+
+.mine-tool-btn.active .mine-tool-cost {
+  opacity: 0.85;
+}
+
+.mine-tool-btn .mine-tool-cost {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.mine-tool-hint {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mine-grid[data-mine-tool] .mine-tile-clickable {
+  cursor: crosshair;
+}
+
+.mine-tile.is-aim {
+  outline: 2px solid var(--light2);
+  outline-offset: -2px;
+  filter: brightness(1.18);
+  z-index: 1;
+}
+
+.mine-tile.is-aim.mine-tile--d0 {
+  outline-color: var(--light1);
+  opacity: 0.9;
+}
+
+.pw-mine-strike-cost {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.pw-mine-strike {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 32px;
+  max-width: 32px;
+  height: 32px;
+  max-height: 32px;
+  color: var(--accent);
+  pointer-events: none;
+  z-index: 5;
+  transform: translate(-50%, -50%);
+  animation: pw-mine-strike 0.7s ease-out forwards;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  overflow: visible;
+  line-height: 1;
+}
+
+.pw-mine-strike .mine-tool-ico {
+  width: 20px;
+  height: 20px;
+  max-width: 20px;
+  max-height: 20px;
+  flex: 0 0 20px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
+  animation: pw-mine-swing 0.35s ease-out;
+}
+
+.pw-mine-strike-cost {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--light2);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.pw-mine-strike .ui-icon,
+.pw-mine-strike .ui-icon--11 {
+  width: 11px;
+  height: 11px;
+  max-width: 11px;
+  max-height: 11px;
+  flex: 0 0 11px;
+}
+
+.pw-mine-strike .ui-icon svg {
+  width: 11px;
+  height: 11px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+.pw-mine-strike, .pw-mine-strike .mine-tool-ico {
+  animation: none;
+}
+
+}
+
+.pw-mine-body {
+  display: block;
+}
+
+.pw-mine-window-root > .pw-mine-header {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin-bottom: 12px;
+}
+
+.pw-mine-header > .pw-mine-auto-header {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3px;
+}
+
+.pw-mine-window-root .loc-title {
+  margin: 0;
+}
+
+.pw-mine-window-root > .loc-sub {
+  margin-top: 0;
+}
+
+.pw-mine-window-root .mine-tool-hint {
+  flex: 1 1 100%;
+}
+
+.pw-mine-window-root .mine-tool-btn {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.mine-tool-cost {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 11px;
+}
+
+.pw-mine-window-root .pw-mine-tile {
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  --pw-disabled-opacity: 1;
+}
+
+.pw-mine-tile-item {
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+  position: absolute;
+  inset: 5%;
+  margin: auto;
+}
+
+.pw-mine-window-root .pw-mine-energy-bar {
+  height: 4px;
+}
+
+.pw-mine-survey-clock {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--dark3);
+  border-radius: 10px;
+  color: var(--light2);
+  background: var(--dark3);
+  font-weight: 800;
+  --pw-disabled-opacity: 0.8;
+}

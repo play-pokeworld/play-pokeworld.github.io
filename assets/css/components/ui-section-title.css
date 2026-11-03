@@ -1,0 +1,58 @@
+/*
+ * components/ui-section-title.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+
+/* ui-section-title.css * --------------------------------------------------------------------------- * Canonical section title (1.16.11, audit 3.1). ONE class replaces the nine * local vocabularies of the panels (`battle-summary-section-title`, * `pw-loc-section-title`, `pw-cur-section-title`, `pw-box-section-title`, * `pw-atoll-section-title`, `pw-progress-section-title`, * `pw-story-quest-section-title`, `pw-repeatable-board-section-title`). * * <h3 class="pw-section-title">…</h3> base — a titled block * <h3 class="pw-section-title is-lg">…</h3> larger — card / column heading * <h3 class="pw-section-title is-sm">…</h3> small caps — dense group label * * A panel never redefines the size, colour or rule of a title: it picks a size. * Tokens only, so the ten UI themes keep recolouring the heading for free. * Part of the 1.16.11 split: the @import order in assets/css/style.css IS the * cascade — never reorder it (tests/CssStructure.test.js). */
+.pw-section-title {
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+  color: var(--pw-text-primary, var(--light2));
+  margin: 2px 0 0;
+  padding: 0 0 6px;
+  border-bottom: 1px solid color-mix(in srgb, var(--pw-text-primary, var(--light2)) 22%, transparent);
+}
+
+.pw-section-title.is-lg {
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.pw-section-title.is-sm {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--light3, #9aa2b1);
+  padding-bottom: 3px;
+  border-bottom-color: color-mix(in srgb, var(--pw-text-primary, var(--light2)) 14%, transparent);
+}
+
+.pw-section-title:first-child {
+  margin-top: 0;
+}
+
+.pw-story-quest-section--main .pw-section-title {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.pw-story-quest-section--side .pw-section-title {
+  color: var(--blue);
+  border-color: color-mix(in srgb, var(--blue) 40%, transparent);
+}
+
+.pw-story-quest-section--repeatable .pw-section-title {
+  color: var(--green);
+  border-color: color-mix(in srgb, var(--green) 40%, transparent);
+}
+
+.pw-box-storage-heading .pw-section-title {
+  flex: 1;
+}

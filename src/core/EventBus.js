@@ -78,7 +78,7 @@ export class EventBus extends BaseObject {
    */
   dispatch(event) {
     if (!(event instanceof BaseEvent)) {
-      console.warn(t('debug_eventbus_unknown_event'), event);
+      console.warn(String(t('debug_eventbus_unknown_event')), event);
       return;
     }
     const list = this._listeners.get(event.type);
@@ -88,7 +88,7 @@ export class EventBus extends BaseObject {
       try {
         entry.callback.call(entry.context, event);
       } catch (err) {
-        console.error(t('debug_eventbus_listener_error', { event: event.type }), err);
+        console.error(String(t('debug_eventbus_listener_error', { event: event.type })), err);
       }
     }
   }

@@ -65,7 +65,7 @@ export class DraggablePanel extends UIPanel {
     this.addHeaderAction(this._helpButton);
 
     if (!COLUMN_IDS.includes(options.column)) {
-      console.warn(t('debug_panel_column_invalid', { id: options.id, column: String(options.column) }));
+      console.warn(String(t('debug_panel_column_invalid', { id: options.id, column: String(options.column) })));
     }
     /** @private @type {string} */
     this._defaultColumn = COLUMN_IDS.includes(options.column) ? options.column : DashboardColumns.LEFT;

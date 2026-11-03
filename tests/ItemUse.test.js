@@ -116,52 +116,47 @@ describe('Item use and move learning', (test) => {
     }
   });
 
-  test('Link Stone evolves the chosen Pokémon in place at level 40, preserving identity and progress', () => {
-    const save = saves.createNewSave('Link Stone', 'kadabra');
+  test('an evolution stone keeps the chosen Pokémon and adds the evolved species at level 1', () => {
+    const save = saves.createNewSave('Stone evo', 'vulpix');
     save.player.region = 'kanto';
-    const kadabra = PokemonFactory.create('kadabra', 40, { nickname: 'Sage' });
-    kadabra.addIv('hp');
-    kadabra.addEv('spe', 3);
-    kadabra.unlockMove('thunderbolt');
-    setRoster(save, [kadabra]);
-    save.inventory.add('link_stone', 1, { deferSave: true });
-    const uid = kadabra.uid;
-    const level = kadabra.level;
-    const exp = kadabra.exp;
-    const ivs = { ...kadabra.ivs };
-    const evs = { ...kadabra.evs };
-    const moves = [...kadabra.moves];
+    const vulpix = PokemonFactory.create('vulpix', 25, { nickname: 'Braise' });
+    setRoster(save, [vulpix]);
+    save.inventory.add('firestone', 1, { deferSave: true });
+    const uid = vulpix.uid;
+    const level = vulpix.level;
+    const exp = vulpix.exp;
     const original = saves.saveCurrent;
     let writes = 0;
     saves.saveCurrent = function (...args) { writes++; return original.apply(this, args); };
     try {
-      const result = itemUse.useOnPokemon('link_stone', uid);
+      const result = itemUse.useOnPokemon('firestone', uid);
       assert.equal(result.result, ItemUseResults.SUCCESS);
       assert.equal(result.action, ItemUseActions.EVOLVE);
-      assert.equal(result.targetSpecies, 'alakazam');
-      assert.equal(kadabra.species, 'alakazam');
-      assert.equal(kadabra.uid, uid, 'evolution mutates the selected Pokémon instead of creating a new one');
-      assert.equal(kadabra.nickname, 'Sage');
-      assert.equal(kadabra.level, level);
-      assert.equal(kadabra.exp, exp);
-      assert.deepEqual(kadabra.ivs, ivs);
-      assert.deepEqual(kadabra.evs, evs);
-      assert.deepEqual(kadabra.moves, moves);
-      assert.ok(kadabra.unlockedMoves.includes('thunderbolt'));
-      assert.equal(save.team.length, 1);
-      assert.equal(save.inventory.count('link_stone'), 0);
-      assert.ok(save.pokedex.isCaught('alakazam'));
+      assert.equal(result.targetSpecies, 'ninetales');
+      assert.equal(vulpix.species, 'vulpix', 'the source Pokémon is never transformed');
+      assert.equal(vulpix.uid, uid, 'the source keeps its identity');
+      assert.equal(vulpix.nickname, 'Braise');
+      assert.equal(vulpix.level, level);
+      assert.equal(vulpix.exp, exp);
+      assert.ok(vulpix.hasEvolvedInto('ninetales'), 'the source records the produced species');
+      const evolved = save.collection.getAll().find((entry) => entry.species === 'ninetales');
+      assert.ok(evolved, 'the evolved species joins the collection');
+      assert.equal(evolved.level, 1, 'the evolved species starts at level 1');
+      assert.notEqual(evolved.uid, uid, 'the evolved species is a new Pokémon');
+      assert.equal(save.team.length, 1, 'the party is unchanged');
+      assert.equal(save.inventory.count('firestone'), 0);
+      assert.ok(save.pokedex.isCaught('ninetales'));
       assert.equal(writes, 1);
 
-      const underlevelled = PokemonFactory.create('haunter', 39);
+      const underlevelled = PokemonFactory.create('vulpix', 24);
       addOwned(save, underlevelled);
-      save.inventory.add('link_stone', 1, { deferSave: true });
+      save.inventory.add('firestone', 1, { deferSave: true });
       writes = 0;
-      assert.equal(itemUse.getEligibleTargets('link_stone').some((entry) => entry.uid === underlevelled.uid), false);
-      const blocked = itemUse.useOnPokemon('link_stone', underlevelled.uid);
+      assert.equal(itemUse.getEligibleTargets('firestone').some((entry) => entry.uid === underlevelled.uid), false);
+      const blocked = itemUse.useOnPokemon('firestone', underlevelled.uid);
       assert.equal(blocked.result, ItemUseResults.TARGET_INELIGIBLE);
-      assert.equal(underlevelled.species, 'haunter');
-      assert.equal(save.inventory.count('link_stone'), 1);
+      assert.equal(underlevelled.species, 'vulpix');
+      assert.equal(save.inventory.count('firestone'), 1);
       assert.equal(writes, 0);
     } finally {
       saves.saveCurrent = original;

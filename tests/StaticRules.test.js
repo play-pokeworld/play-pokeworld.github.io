@@ -9,6 +9,7 @@ import { describe, assert } from './TestRunner.js';
 import { listJsFiles, findMatches, findBrokenImports, stripComments } from './SourceScanner.js';
 import { GameConfig } from '../src/config/GameConfig.js';
 import { SaveSchema } from '../src/config/SaveSchema.js';
+import { readBundle, readSheet, sheetPath, readManifest } from './CssBundle.js';
 
 const SRC = path.resolve('src');
 const ALL = listJsFiles(SRC);
@@ -25,7 +26,7 @@ describe('Static rules', (test) => {
     assert.equal(GameConfig.VERSION, packageJson.version);
     assert.equal(packageLock.version, packageJson.version);
     assert.equal(packageLock.packages[''].version, packageJson.version);
-    assert.equal(SaveSchema.VERSION, 20);
+    assert.equal(SaveSchema.VERSION, 21);
   });
 
   test('every relative import resolves to an existing export', () => {
@@ -109,18 +110,18 @@ describe('Static rules', (test) => {
     assert.empty(offenders, 'DraggablePanel subclasses without constructor(column)');
   });
 
-  test('dashboard windows stay unscrollable while the document scrolls (dashboard-layout.css)', () => {
-    const css = fs.readFileSync(path.resolve('assets/css/dashboard-layout.css'), 'utf8');
+  test('dashboard windows stay unscrollable while the document scrolls (layout/dashboard-grid.css)', () => {
+    const css = readBundle();
     assert.ok(/\.dash-win > \.win-body \{[^}]*overflow: visible !important/.test(css), 'win-body overflow visible');
     assert.ok(/body:not\(\.save-menu-active\)\s*\{[^}]*overflow-y: auto/.test(css), 'the document is the scroll container');
     assert.ok(/body:not\(\.mobile-mode\) #main-dashboard\s*\{[^}]*overflow: visible !important/.test(css), 'desktop dashboard expands instead of scrolling internally');
     assert.ok(/body\.mobile-mode #main-dashboard\s*\{[^}]*overflow: visible !important/.test(css), 'mobile dashboard expands instead of scrolling internally');
-    assert.ok(/@import url\("\.\/dashboard-layout\.css"\);\s*$/m.test(fs.readFileSync(path.resolve('assets/css/style.css'), 'utf8')), 'loaded by style.css');
+    assert.ok(/@import url\("\.\/layout\/dashboard-grid\.css"\);/.test(readManifest()), 'loaded by style.css');
   });
 
   test('the six-member Team can hide its add slot despite the dashboard display override', () => {
-    const css = fs.readFileSync(path.resolve('assets/css/design-system.css'), 'utf8');
-    const visibilityCss = fs.readFileSync(path.resolve('assets/css/ui-element.css'), 'utf8');
+    const css = readBundle();
+    const visibilityCss = readBundle();
     const team = fs.readFileSync(path.resolve('src/panels/ActiveTeamPanel.js'), 'utf8');
     assert.ok(/#team-window-body \.pw-drop-zone:not\(\.is-hidden\)\s*\{[^}]*display:\s*flex\s*!important/s.test(css), 'the flex override only matches a visible add slot');
     assert.ok(/\.pw-element\.is-hidden\s*\{[^}]*display:\s*none\s*!important/s.test(visibilityCss), 'hidden widgets retain the normal display-none rule');
@@ -128,7 +129,7 @@ describe('Static rules', (test) => {
   });
 
   test('desktop header and dashboard columns preserve the reference proportions', () => {
-    const css = fs.readFileSync(path.resolve('assets/css/dashboard-layout.css'), 'utf8');
+    const css = readBundle();
     assert.ok(/\.pw-game-screen > #header\s*\{[^}]*min-height:\s*65px/.test(css), 'desktop header keeps the 65px reference height');
     assert.ok(/#settings-btn\.pw-header-settings\s*\{[^}]*width:\s*44px[^}]*height:\s*44px/.test(css), 'settings control keeps its 44px square size');
     assert.ok(/#main-dashboard > #col-1,[\s\S]*?#main-dashboard > #col-3\s*\{[^}]*flex:\s*1 1 0/.test(css), 'outer columns have the reference 1x share');
@@ -136,11 +137,8 @@ describe('Static rules', (test) => {
   });
 
   test('Pokédex and Guide use the same responsive width tiers as Bag and PC', () => {
-    const css = fs.readFileSync(path.resolve('assets/css/fullscreen-panel.css'), 'utf8');
-    const panels = [
-      fs.readFileSync(path.resolve('assets/css/pokedex.css'), 'utf8'),
-      fs.readFileSync(path.resolve('assets/css/guide.css'), 'utf8')
-    ];
+    const css = readBundle();
+    const panels = [css];
     assert.ok(/--pw-modal-container-max-width:\s*960px/.test(css), 'the default fullscreen-panel cap is 960px');
     assert.ok(/@media \(min-width:\s*1600px\)[\s\S]*?--pw-modal-container-max-width:\s*1380px/.test(css), 'large desktop panels match the 1380px Bag/PC cap');
     assert.ok(/@media \(min-width:\s*2200px\)[\s\S]*?--pw-modal-container-max-width:\s*1820px/.test(css), 'ultra-wide panels match the 1820px Bag/PC cap');
@@ -151,8 +149,8 @@ describe('Static rules', (test) => {
   });
 
   test('PC and Pokédex Pokémon tiles keep reference geometry and silhouette states', () => {
-    const pcCss = fs.readFileSync(path.resolve('assets/css/pokemon-grid.css'), 'utf8');
-    const dexCss = fs.readFileSync(path.resolve('assets/css/pokedex.css'), 'utf8');
+    const pcCss = readBundle();
+    const dexCss = pcCss;
     assert.ok(/\.pw-box-panel \.pw-box-roster--storage\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fill, minmax\(90px, 1fr\)\)/s.test(pcCss), 'PC cards use the reference grid density');
     assert.ok(/\.pw-box-panel \.pw-box-pokemon-tile\.dex-entry\s*\{[^}]*width:\s*72px;[^}]*height:\s*72px;[^}]*border-radius:\s*50%/s.test(pcCss), 'the PC entry uses the same 72px circular tile geometry');
     assert.ok(/\.pw-box-panel \.pw-box-grid-entry \.box-level\s*\{[^}]*bottom:\s*-9px[^}]*background:\s*var\(--dark1\)/s.test(pcCss), 'the PC level pill sits beneath the sprite');
@@ -164,8 +162,8 @@ describe('Static rules', (test) => {
 
   test('PC hides rank labels and keeps sort categories in its responsive filter toolbar', () => {
     const boxPanel = fs.readFileSync(path.resolve('src/panels/fullscreen/BoxPanel.js'), 'utf8');
-    const panelCss = fs.readFileSync(path.resolve('assets/css/fullscreen-panel.css'), 'utf8');
-    const styles = fs.readFileSync(path.resolve('assets/css/panels.css'), 'utf8');
+    const panelCss = readBundle();
+    const styles = panelCss;
     assert.ok(!boxPanel.includes('pw-box-rank'), 'rank is not rendered on Pokémon entries');
     assert.ok(!styles.includes('.pw-box-rank'), 'obsolete rank-badge styling is removed');
     assert.ok(/chips:\s*\[[\s\S]*?SORTS\.map/.test(boxPanel), 'sort categories are chips inside the existing FilterBar model');
@@ -193,7 +191,7 @@ describe('Static rules', (test) => {
   });
 
   test('dungeon grid styles target the Rework widget and keep reference tile states legible', () => {
-    const css = fs.readFileSync(path.resolve('assets/css/dungeons.css'), 'utf8');
+    const css = readBundle();
     const panel = fs.readFileSync(path.resolve('src/panels/components/DungeonExpeditionPanel.js'), 'utf8');
     assert.ok(/\.pw-dungeon-expedition \.pw-dgn-grid\s*\{/.test(css), 'styles target the actual Rework panel host');
     assert.ok(/\.pw-dungeon-expedition \.pw-dgn-grid--11\s*\{[^}]*repeat\(11, 44px\)/.test(css), 'the widest saved map keeps one fixed reference column per map column');
@@ -211,9 +209,11 @@ describe('Static rules', (test) => {
   });
 
   test('Settings doubles the medium width on desktop and preserves its responsive mobile cap', () => {
-    const css = fs.readFileSync(path.resolve('assets/css/ui-modal.css'), 'utf8');
+    const css = fs.readFileSync(sheetPath('settings.css'), 'utf8');
     const desktop = css.match(/\.pw-panel--modal-window\.pw-settings-modal-window\s*\{([^}]+)\}/);
-    const mobile = css.match(/@media \(max-width: 600px\)[\s\S]*?\.pw-panel--modal-window\.pw-settings-modal-window\s*\{([^}]+)\}/);
+    // Search after the desktop rule: the sheet may open another 600px block before it.
+    const afterDesktop = css.slice(css.indexOf('min(1120px'));
+    const mobile = afterDesktop.match(/@media \(max-width: 600px\)[\s\S]*?\.pw-panel--modal-window\.pw-settings-modal-window\s*\{([^}]+)\}/);
     assert.ok(desktop, 'the Settings dialog has its dedicated desktop sizing rule');
     assert.ok(/width:\s*min\(1120px, calc\(100vw - 40px\)\)/.test(desktop[1]), 'desktop width is at least twice the 560px medium baseline, clamped to the viewport');
     assert.ok(/max-width:\s*min\(1120px, calc\(100vw - 40px\)\)/.test(desktop[1]), 'the desktop maximum follows the same viewport cap');
@@ -223,7 +223,7 @@ describe('Static rules', (test) => {
   });
 
   test('shiny sprites use the star badge, not a red border or glow', () => {
-    const css = fs.readFileSync(path.resolve('assets/css/design-system.css'), 'utf8');
+    const css = readBundle();
     const spriteRule = css.match(/\.pw-poke-card\.box-card--shiny \.box-tile\s*\{([^}]*)\}/);
     assert.ok(spriteRule, 'the legacy shiny sprite selector is explicitly normalized');
     assert.ok(/border-color:\s*transparent\s*!important/.test(spriteRule[1]), 'the sprite has no shiny-colored border');
@@ -231,13 +231,13 @@ describe('Static rules', (test) => {
   });
 
   test('background walkers mirror sprites to face the randomized travel direction', () => {
-    const css = fs.readFileSync(path.resolve('assets/css/pokemon-background.css'), 'utf8');
+    const css = fs.readFileSync(sheetPath('pokemon-background.css'), 'utf8');
     assert.ok(/\.pw-background-pokemon-walker--facing-left \.pw-background-pokemon-sprite\s*\{[^}]*transform:\s*scaleX\(-1\)/.test(css), 'leftward routes mirror the sprite');
     assert.ok(/\.pw-background-pokemon-walker--facing-right \.pw-background-pokemon-sprite\s*\{[^}]*transform:\s*scaleX\(1\)/.test(css), 'rightward routes keep the default sprite orientation');
   });
 
   test('mobile dashboard focus does not hide modal windows', () => {
-    const css = fs.readFileSync(path.resolve('assets/css/panels.css'), 'utf8');
+    const css = readBundle();
     assert.ok(/body\.mobile-mode \.pw-modal-backdrop > \.pw-panel--modal-window\s*\{[^}]*display:\s*flex/.test(css), 'modal panels stay visible above the mobile dashboard');
   });
 });

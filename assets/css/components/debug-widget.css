@@ -1,0 +1,204 @@
+/*
+ * components/debug-widget.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+#speed-toggle button {
+  font-size: 13px;
+}
+
+#msg-log {
+  display: none;
+}
+
+#debug-widget {
+  position: fixed;
+  bottom: 14px;
+  right: 14px;
+  z-index: 9990;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+#debug-toggle-btn {
+  background: var(--red);
+  color: white;
+  border: 2px solid var(--red);
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.speed-x10 {
+  display: none;
+}
+
+.debug-active .speed-x10 {
+  display: inline-block;
+}
+
+.idle-scene-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.idle-scene-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.idle-scene-icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  color: var(--light2);
+  opacity: 0.85;
+}
+
+#speed-toggle {
+  display: flex;
+  gap: 4px;
+}
+
+#speed-toggle button {
+  background: var(--dark3);
+  border: 1px solid var(--dark1);
+  color: var(--light1);
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.2s;
+}
+
+#speed-toggle button.active {
+  color: var(--light2);
+  border-color: var(--light1);
+  background: var(--dark1);
+}
+
+#leave-btn {
+  width: 100%;
+  background: var(--red);
+  color: white;
+  font-weight: bold;
+  font-size: 13px;
+  padding: 12px;
+  border: 2px solid #b33a34;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#leave-btn:hover {
+  background: #e55555;
+  transform: translateY(-1px);
+}
+
+#speed-toggle button {
+  font-size: 11px;
+}
+
+#debug-toggle-btn, #leave-btn, #msg-log {
+  font-size: 13px;
+}
+
+#debug-drawer {
+  display: none;
+  background: var(--dark1);
+  border: 2px solid var(--red);
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.85);
+  width: 260px;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#debug-drawer.open {
+  display: flex;
+}
+
+#debug-drawer.open {
+  display:flex;
+}
+
+
+/* Leave-battle: keep its danger red, but let the theme drive the base. */
+#leave-btn {
+  background: var(--red) !important;
+  color: #fff !important;
+  border: 2px solid var(--pw-btn-border) !important;
+}
+
+#leave-btn:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+
+#speed-toggle button.active {
+  background: rgba(31, 138, 59, 0.25) !important;
+  border: 1px solid #4ade80 !important;
+  color: #4ade80 !important;
+  font-weight: bold !important;
+  box-shadow: 0 0 8px rgba(74, 222, 128, 0.35) !important;
+}
+
+#debug-widget {
+  pointer-events: none !important;
+}
+
+#debug-widget > * {
+  pointer-events: auto !important;
+}
+
+#debug-toggle-btn {
+  opacity: .28 !important;
+  padding: 5px 10px !important;
+  font-size: 11px !important;
+  border-width: 1px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .5) !important;
+  transition: opacity .15s ease !important;
+}
+
+#debug-toggle-btn:hover,
+#debug-toggle-btn:focus-visible,
+#debug-widget:hover #debug-toggle-btn {
+  opacity: 1 !important;
+}
+
+#debug-drawer.open + #debug-toggle-btn {
+  opacity: 1 !important;
+}
+
+.idle-scene-icon svg {
+  width: 30px !important;
+  height: 30px !important;
+  color: var(--accent) !important;
+}
+
+html[data-dungeon-run="1"] #leave-btn {
+  display: none !important;
+}
+
+#debug-widget {
+  display: none;
+}
+
+body.debug-active #debug-widget {
+  display: flex;
+}
+
+#win-battle #leave-btn {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+}

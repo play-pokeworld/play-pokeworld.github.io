@@ -1,0 +1,1601 @@
+/*
+ * panels/pokemon-sheet.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.pw-poke-circle-wrap {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  border: none !important;
+  overflow: visible !important;
+  flex-shrink: 0 !important;
+}
+
+.pw-poke-circle-bg {
+  position: absolute !important;
+  top: 10% !important;
+  left: 10% !important;
+  width: 80% !important;
+  height: 80% !important;
+  border-radius: 50% !important;
+  background: var(--pw-circle-bg) !important;
+  border: 1px solid rgba(236, 222, 183, 0.35) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
+
+.poke-detail-sprite-card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.poke-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0 10px 8px;
+  background: var(--dark2);
+}
+
+#poke-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 700;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+#poke-modal.open {
+  display: flex;
+}
+
+.preset-editor-modal #poke-modal-inner {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px 22px;
+  gap: 14px;
+  overscroll-behavior: contain;
+}
+
+#poke-modal-inner * {
+  color: var(--light2);
+}
+
+.poke-status {
+  min-height: 26px;
+}
+
+.pw-type-info {
+  font-size: 13px;
+  padding: 3px 10px;
+}
+
+.pw-shiny {
+  color:var(--shiny);
+  margin-left:4px;
+}
+
+.pw-shiny-star {
+  color:var(--light2);
+  margin-right:4px;
+}
+
+.pw-detail-right {
+  text-align:right;
+  margin-top:10px;
+}
+
+.pw-detail-body {
+  font-size: 13px;
+  color:#ccc;
+  margin-bottom:8px;
+}
+
+.pw-evo-title {
+  font-weight:bold;
+  color:#d9a6f0;
+  font-size: 13px;
+}
+
+.pw-green-text {
+  color:var(--green);
+  font-size:13px;
+}
+
+.sprite-silhouette-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.sprite-silhouette-wrapper img {
+  object-fit: contain;
+}
+
+.sprite-silhouette-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.poke-detail-id {
+  color: var(--light1);
+  font-size: 13px;
+}
+
+.poke-detail-shell {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.95fr) minmax(280px, 1.25fr);
+  gap: 12px;
+  background: rgba(83,97,122,0.28);
+  border: 1px solid var(--dark3);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.poke-detail-hero, .poke-detail-side, .poke-detail-panel, .poke-detail-moves-block {
+  background: rgba(0,0,0,0.22);
+  border: 1px solid rgba(148,136,107,0.35);
+  border-radius: 10px;
+}
+
+.poke-detail-hero {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.poke-detail-name-row b {
+  display:block;
+  font-size: 18px;
+  color: var(--light2);
+}
+
+.poke-detail-name-row span {
+  color: var(--light1);
+  font-size: 12px;
+}
+
+.poke-detail-sprite-card {
+  min-height: 170px;
+  background:
+    linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.05) 75%),
+    linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.05) 75%),
+    radial-gradient(circle at 35% 30%, rgba(148,136,107,0.45), rgba(83,97,122,0.32));
+  background-size: 18px 18px, 18px 18px, auto;
+  background-position: 0 0, 9px 9px, 0 0;
+  border: 2px solid rgba(236,222,183,0.25);
+  border-radius: 8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.poke-detail-sprite-card img {
+  image-rendering: pixelated;
+  filter: drop-shadow(0 6px 8px rgba(0,0,0,.45));
+}
+
+.poke-detail-types {
+  display:grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap:4px;
+}
+
+.poke-detail-toggle {
+  font-size: 12px;
+  color: var(--light1);
+  display:flex;
+  gap:6px;
+  align-items:center;
+}
+
+.poke-detail-side {
+  padding: 10px;
+}
+
+.poke-detail-stat-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--pw-border-color, rgba(255, 255, 255, 0.08));
+}
+
+.poke-detail-stat-tab {
+  background: rgba(0, 0, 0, 0.35) !important;
+  color: var(--light2, #ECDEB7) !important;
+  border: 1px solid var(--pw-border-color, rgba(255, 255, 255, 0.12)) !important;
+  border-radius: 6px !important;
+  padding: 7px 4px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.3px !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  height: auto !important;
+  min-height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  width: 100% !important;
+  opacity: 0.75 !important;
+  transition: all 0.15s ease !important;
+}
+
+.poke-detail-stat-tab:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+.poke-detail-stat-tab.active, #poke-modal-inner .poke-detail-stat-tab.active {
+  background: var(--accent) !important;
+  color: var(--dark1, #1a1816) !important;
+  border: 1px solid var(--accent) !important;
+  border-radius: 6px !important;
+  font-weight: 900 !important;
+  opacity: 1 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+  text-shadow: none !important;
+}
+
+.poke-detail-stat-tab.active *, #poke-modal-inner .poke-detail-stat-tab.active * {
+  color: var(--dark1, #1a1816) !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+}
+
+.poke-detail-stat-tab:not(.active) *, #poke-modal-inner .poke-detail-stat-tab:not(.active) * {
+  color: var(--light2, #ECDEB7) !important;
+  font-weight: 700 !important;
+}
+
+.poke-detail-stat-panel {
+  display:none;
+}
+
+.poke-detail-stat-panel.active {
+  display:block;
+}
+
+.poke-detail-stat-name {
+  color: var(--light2);
+  font-size: 12px;
+  font-weight:700;
+}
+
+.poke-detail-stat-bar {
+  height:8px;
+  background: var(--dark1);
+  border-radius:999px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.poke-detail-stat-fill {
+  height:100%;
+  width: var(--pct,0%);
+  background: var(--bg, var(--light2));
+  border-radius:999px;
+}
+
+.poke-detail-section-grid {
+  display:grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin-top:10px;
+}
+
+.poke-detail-panel {
+  padding:10px;
+}
+
+.poke-detail-panel-wide {
+  grid-column: 1 / -1;
+}
+
+.poke-detail-panel h3, .poke-detail-moves-title, .poke-detail-learn-title {
+  color: var(--light2);
+  font-size:13px;
+  font-weight:800;
+  margin:0 0 8px;
+}
+
+.poke-detail-held {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.poke-detail-held-icon {
+  width:42px;
+  height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--dark1);
+  border-radius:8px;
+}
+
+.poke-detail-held-text {
+  flex:1;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+
+.poke-detail-held-text span, .poke-detail-subtle {
+  color: var(--light1);
+  font-size:12px;
+  line-height:1.35;
+}
+
+.poke-detail-mini-btn {
+  padding:4px 8px;
+  font-size:11px;
+}
+
+.poke-detail-location {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin:4px 0 8px;
+  font-size:12px;
+  color: var(--light2);
+}
+
+.poke-detail-lock-reason {
+  margin:6px 0 0;
+  color: var(--light1);
+  font-size:11px;
+  font-style:italic;
+  line-height:1.35;
+}
+
+.poke-detail-ability-chip {
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  border:1px solid var(--light2);
+  border-radius:999px;
+  padding:5px 10px;
+  background:rgba(236,222,183,.08);
+}
+
+.poke-detail-ability-chip small {
+  color: var(--light1);
+}
+
+.poke-detail-panel.poke-detail-talent-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.poke-detail-panel.poke-detail-talent-panel .poke-detail-subtle {
+  margin: 0;
+  display: block;
+  width: 100%;
+  line-height: 1.4;
+}
+
+.poke-detail-panel.poke-detail-talent-panel .poke-detail-ability-chip {
+  display: flex;
+  width: fit-content;
+  margin: 0;
+}
+
+.poke-detail-panel.poke-detail-talent-panel .poke-detail-lock-reason {
+  margin: 0;
+  display: block;
+  width: 100%;
+}
+
+.poke-detail-moves-block {
+  margin-top:10px;
+  padding:10px;
+}
+
+.poke-detail-moves-title {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.poke-detail-moves-list {
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.poke-detail-move-meta {
+  color:var(--light1);
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.poke-detail-pill {
+  background:var(--green);
+  color:var(--dark1);
+  border-radius:999px;
+  padding:2px 7px;
+  font-size:11px;
+  font-weight:900;
+}
+
+.poke-detail-pill.danger {
+  background:var(--red);
+  color:var(--light2);
+}
+
+.poke-detail-pill.is-learnable {
+  background:transparent;
+  color:var(--green);
+  border:1px solid var(--green);
+}
+
+.poke-detail-pill.is-known {
+  background:rgba(96,190,88,.2);
+  color:var(--green);
+  border:1px solid var(--green);
+}
+
+.poke-detail-moves-section {
+  margin-bottom: 12px;
+}
+
+.poke-detail-moves-section:last-child {
+  margin-bottom: 0;
+}
+
+.poke-detail-learn-title {
+  margin-top:12px;
+  background:var(--panel-bg);
+  color:var(--panel-text);
+  text-align:center;
+  padding:7px;
+  border-radius:5px;
+}
+
+.poke-detail-learn-title span {
+  color:var(--panel-text);
+  opacity:.7;
+  margin-left:8px;
+}
+
+.poke-detail-full-list-btn {
+  width: calc(100% - 24px) !important;
+  margin: 8px auto 4px !important;
+  display: block !important;
+  text-align: center !important;
+  font-weight: 800 !important;
+  font-size: 13px !important;
+  padding: 8px 16px !important;
+}
+
+#poke-modal-inner.poke-detail-inner .pw-pokemon-info-body, #poke-modal-inner > .pw-pokemon-info-body {
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  padding: 14px 16px !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+.pw-dex-hero .pw-poke-circle-wrap {
+  flex:0 0 auto;
+}
+
+.poke-detail-inner .pw-dex-compact-section {
+  padding:8px 10px;
+  margin-bottom:6px;
+}
+
+@media (max-width: 760px) {
+.poke-detail-shell, .poke-detail-section-grid {
+  grid-template-columns: 1fr;
+}
+
+.poke-detail-move-meta, .poke-detail-pill {
+  grid-column: 2;
+}
+
+}
+
+#poke-modal-inner .poke-detail-stat-tab:not(.active) {
+  color: var(--light2, #ECDEB7) !important;
+  background: rgba(0, 0, 0, 0.35) !important;
+}
+
+#poke-modal-inner .poke-detail-stat-tab.active {
+  color: var(--dark1, #1a1816) !important;
+  background: var(--accent) !important;
+}
+
+#poke-modal-inner .poke-detail-learn-title, #poke-modal-inner .poke-detail-learn-title span {
+  color: var(--panel-text);
+}
+
+#poke-modal-inner .poke-detail-pill {
+  color: var(--dark1);
+}
+
+#poke-modal-inner .poke-detail-pill.danger {
+  color: var(--light2);
+}
+
+.poke-detail-sprite-card {
+  background: radial-gradient(circle at 50% 35%, rgba(236,222,183,0.30), rgba(148,136,107,0.18) 42%, rgba(54,52,47,0.95) 100%);
+}
+
+.poke-detail-panel .pw-stone-evo {
+  background: rgba(0,0,0,0.18);
+  border: 1px solid rgba(148,136,107,0.35);
+  border-radius: 10px;
+  padding: 9px;
+}
+
+.poke-detail-panel select {
+  width: 100%;
+  background: var(--dark1);
+  color: var(--light2);
+  border: 1px solid var(--dark3);
+  border-radius: 7px;
+  padding: 7px 9px;
+  margin: 6px 0;
+}
+
+.poke-detail-panel .pw-stone-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pw-evo-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.pw-evo-done {
+  color: var(--light1);
+  font-size: 11px;
+  font-style: italic;
+}
+
+.poke-detail-shiny-toggle {
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 156px;
+  margin-top: 8px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  font-weight: 900;
+  transition: transform 0.16s, filter 0.16s, box-shadow 0.16s, background 0.16s;
+}
+
+.poke-detail-shiny-toggle.is-on {
+  background: linear-gradient(135deg, #f2d94e, #ef90e6);
+  color: #2c1810;
+  border-color: #f2d94e;
+  box-shadow: 0 0 16px rgba(242,217,78,0.32), inset 0 0 0 1px rgba(255,255,255,0.38);
+}
+
+.poke-detail-shiny-toggle.is-off {
+  background: rgba(236,222,183,0.12);
+  color: var(--light2);
+  border-color: rgba(236,222,183,0.28);
+}
+
+.poke-detail-shiny-toggle:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.poke-detail-shiny-star {
+  font-size: 15px;
+  text-shadow: 0 0 8px rgba(255,255,255,0.48);
+}
+
+.poke-protection-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.poke-protect-btn {
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  line-height: 1.2;
+}
+
+.poke-protect-btn .ui-icon {
+  width: 12px;
+  height: 12px;
+}
+
+.poke-protect-icon,
+.poke-protect-label {
+  display: inline-flex;
+  align-items: center;
+}
+
+.poke-protect-btn.is-on {
+  background: linear-gradient(135deg, #f2d94e, #ffef9a);
+  color: var(--dark1);
+  border-color: #f2d94e;
+}
+
+.poke-protect-btn.is-locked {
+  background: linear-gradient(135deg, var(--red), #ff8ba0);
+  color: #fff;
+  border-color: var(--red);
+}
+
+.poke-protect-btn.is-off {
+  background: rgba(0,0,0,0.22);
+  color: var(--light2);
+}
+
+#poke-modal-inner.management-inner {
+  width: min(1120px, calc(100vw - 40px));
+  height: 85vh;
+  min-height: 0;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  background: linear-gradient(180deg, var(--dark2), var(--dark1));
+}
+
+#poke-modal-inner.management-inner .management-title {
+  flex: 0 0 auto;
+}
+
+#poke-modal-inner.management-inner .staff-card {
+  border-radius: 14px;
+  border-color: rgba(236,222,183,0.22);
+}
+
+#poke-modal.poke-detail-front {
+  z-index: 31000;
+}
+
+#poke-modal-inner.poke-detail-inner .poke-detail-title {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+#poke-modal-inner.poke-detail-inner .poke-detail-title {
+  top: 0;
+}
+
+.move-eff-badge {
+  justify-self: end;
+  border-radius: 999px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 900;
+  background: rgba(0,0,0,.28);
+  border: 1px solid rgba(255,255,255,.12);
+  color: var(--light2);
+}
+
+.move-eff-badge.super {
+  color: #ff8a3d;
+  border-color: rgba(255,138,61,.45);
+}
+
+.move-eff-badge.resist {
+  color: #b8c7d9;
+}
+
+.move-eff-badge.immune {
+  color: #d3425f;
+}
+
+.move-eff-badge.neutral {
+  opacity: .55;
+}
+
+.poke-detail-stat-bar {
+  position: relative;
+  min-width: 0;
+}
+
+.poke-detail-stat-bar-value {
+  display: none;
+}
+
+.poke-rank-panel {
+  min-height: 96px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 2px solid rgba(236,222,183,0.22);
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(0,0,0,0.20);
+}
+
+.poke-rank-letter {
+  width: 68px;
+  height: 68px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  font-weight: 1000;
+  background: rgba(0,0,0,0.32);
+  border: 2px solid currentColor;
+}
+
+.poke-rank-panel b {
+  display:block;
+  color:var(--light2);
+  font-size:16px;
+}
+
+.poke-rank-panel span {
+  color:var(--light1);
+  font-size:12px;
+}
+
+.poke-rank-panel.rank-e {
+  color:#b8c7d9;
+}
+
+.poke-rank-panel.rank-d {
+  color:#93d47b;
+}
+
+.poke-rank-panel.rank-c {
+  color:#63c7ff;
+}
+
+.poke-rank-panel.rank-b {
+  color:#b763cf;
+}
+
+.poke-rank-panel.rank-a {
+  color:#f2d94e;
+}
+
+.poke-rank-panel.rank-s {
+  color:#ff8a3d;
+}
+
+.poke-rank-panel.rank-ss {
+  color:#ff8ba0;
+}
+
+.poke-protect-btn.is-on {
+  background: #7a6120;
+  color: #fff4c8;
+  border-color: #f2d94e;
+}
+
+#poke-modal-inner .poke-rank-panel.rank-e,
+#poke-modal-inner .poke-rank-panel.rank-e .poke-rank-letter {
+  color:#b8c7d9;
+}
+
+#poke-modal-inner .poke-rank-panel.rank-d,
+#poke-modal-inner .poke-rank-panel.rank-d .poke-rank-letter {
+  color:#93d47b;
+}
+
+#poke-modal-inner .poke-rank-panel.rank-c,
+#poke-modal-inner .poke-rank-panel.rank-c .poke-rank-letter {
+  color:#63c7ff;
+}
+
+#poke-modal-inner .poke-rank-panel.rank-b,
+#poke-modal-inner .poke-rank-panel.rank-b .poke-rank-letter {
+  color:#b763cf;
+}
+
+#poke-modal-inner .poke-rank-panel.rank-a,
+#poke-modal-inner .poke-rank-panel.rank-a .poke-rank-letter {
+  color:#f2d94e;
+}
+
+#poke-modal-inner .poke-rank-panel.rank-s,
+#poke-modal-inner .poke-rank-panel.rank-s .poke-rank-letter {
+  color:#ff8a3d;
+}
+
+#poke-modal-inner .poke-rank-panel.rank-ss,
+#poke-modal-inner .poke-rank-panel.rank-ss .poke-rank-letter {
+  color:#ff8ba0;
+}
+
+#poke-modal-inner .poke-rank-panel.rank-e {
+  border-color:rgba(184,199,217,.60);
+  background:linear-gradient(135deg, rgba(184,199,217,.14), rgba(0,0,0,.20));
+}
+
+#poke-modal-inner .poke-rank-panel.rank-d {
+  border-color:rgba(147,212,123,.60);
+  background:linear-gradient(135deg, rgba(147,212,123,.14), rgba(0,0,0,.20));
+}
+
+#poke-modal-inner .poke-rank-panel.rank-c {
+  border-color:rgba(99,199,255,.60);
+  background:linear-gradient(135deg, rgba(99,199,255,.14), rgba(0,0,0,.20));
+}
+
+#poke-modal-inner .poke-rank-panel.rank-b {
+  border-color:rgba(183,99,207,.65);
+  background:linear-gradient(135deg, rgba(183,99,207,.16), rgba(0,0,0,.20));
+}
+
+#poke-modal-inner .poke-rank-panel.rank-a {
+  border-color:rgba(242,217,78,.70);
+  background:linear-gradient(135deg, rgba(242,217,78,.18), rgba(0,0,0,.20));
+}
+
+#poke-modal-inner .poke-rank-panel.rank-s {
+  border-color:rgba(255,138,61,.75);
+  background:linear-gradient(135deg, rgba(255,138,61,.20), rgba(0,0,0,.20));
+}
+
+#poke-modal-inner .poke-rank-panel.rank-ss {
+  border-color:rgba(255,139,160,.80);
+  background:linear-gradient(135deg, rgba(255,139,160,.22), rgba(0,0,0,.20));
+}
+
+#poke-modal-inner .poke-rank-panel .poke-rank-letter {
+  box-shadow: 0 0 18px color-mix(in srgb, currentColor 28%, transparent), inset 0 0 0 1px rgba(255,255,255,.08);
+}
+
+.poke-move.pw-move-drag-src {
+  opacity: .45;
+}
+
+.poke-move.pw-move-drop-hover {
+  outline: 2px dashed var(--light2);
+  outline-offset: -2px;
+}
+
+#poke-modal.atoll-prep-modal #poke-modal-inner {
+  width:min(96vw,980px);
+  max-width:none;
+  max-height:90vh;
+  overflow-y:auto;
+  box-sizing:border-box;
+  padding:12px;
+}
+
+#poke-modal.atoll-prep-modal .atoll-prep-hint {
+  display:block;
+  color:var(--light1);
+  font-size:11.5px;
+  line-height:1.45;
+  margin:8px 2px;
+}
+
+#poke-modal.atoll-prep-modal .atoll-prep-note {
+  display:block;
+  color:var(--light1);
+  font-size:10.5px;
+  line-height:1.4;
+  margin-top:8px;
+}
+
+#poke-modal.atoll-prep-modal #atoll-prep-body {
+  margin:8px 0;
+}
+
+.pw-shiny {
+  color: var(--shiny);
+}
+
+.pw-shiny-star {
+  color: var(--light2);
+  margin-right: 4px;
+}
+
+.pw-detail-right {
+  text-align: right;
+  margin-top: 10px;
+}
+
+.pw-detail-body {
+  font-size: 13px;
+  color: #ccc;
+  margin-bottom: 8px;
+}
+
+.pw-evo-title {
+  font-weight: bold;
+  color: #d9a6f0;
+  font-size: 13px;
+}
+
+.pw-green-text {
+  color: var(--green);
+  font-size: 13px;
+}
+
+#poke-modal-inner {
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius);
+  background: var(--pw-surface);
+  box-shadow: var(--pw-shadow);
+  color: var(--light2);
+}
+
+#poke-modal {
+  backdrop-filter: blur(3px);
+}
+
+.silhouette-filtered,
+.silhouette-img {
+  filter: brightness(0) saturate(0.25);
+  opacity: 0.98;
+}
+
+
+/* Canonical header: IDENTICAL on all non-draggable panels ── (draggable windows keep .pw-win-hdr, deliberately distinct) */
+.poke-detail-title {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  height: var(--pw-header-h);
+  min-height: var(--pw-header-h);
+  box-sizing: border-box;
+  padding: var(--pw-header-pad);
+  margin: 0 0 var(--pw-header-gap) 0;
+  background: var(--pw-bg-panel-header);
+  border: 1px solid var(--pw-border);
+  border-bottom: 2px solid var(--pw-border-panel-header);
+  border-radius: var(--pw-header-radius);
+  color: var(--light2);
+  font-size: var(--pw-header-title-size);
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  line-height: 1;
+}
+
+.poke-protect-btn.is-on {
+  background: linear-gradient(135deg, var(--yellow), #e6c84c) !important;
+  color: var(--dark1) !important;
+  border-color: var(--yellow) !important;
+  font-weight: 900;
+  box-shadow: 0 0 10px rgba(255, 213, 79, 0.4);
+}
+
+.poke-protect-btn.is-on * {
+  color: var(--dark1) !important;
+}
+
+.poke-protect-btn.is-locked {
+  background: linear-gradient(135deg, var(--blue), #1976d2) !important;
+  color: #ffffff !important;
+  border-color: var(--blue) !important;
+  font-weight: 900;
+  box-shadow: 0 0 10px rgba(66, 165, 245, 0.4);
+}
+
+.poke-protect-btn.is-locked * {
+  color: #ffffff !important;
+}
+
+#poke-modal.pw-puzzle-modal #poke-modal-inner {
+  max-width: min(560px, 96vw);
+  width: 100%;
+  background: var(--dark2);
+  border: 1px solid var(--pw-border);
+  border-radius: 14px;
+  box-shadow: 0 18px 48px rgba(0,0,0,0.55);
+  padding: 0;
+  overflow: hidden;
+}
+
+#poke-modal.preset-editor-modal #poke-modal-inner {
+  width: min(96vw, 980px);
+  max-width: none;
+}
+
+.pw-poke-circle-wrap {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+  flex-shrink: 0 !important;
+}
+
+.pw-poke-circle-bg {
+  position: absolute !important;
+  top: 10% !important;
+  left: 10% !important;
+  width: 80% !important;
+  height: 80% !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle, rgba(236, 222, 183, 0.28) 0%, rgba(236, 222, 183, 0.08) 70%, transparent 100%) !important;
+  border: 1px solid rgba(236, 222, 183, 0.35) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
+
+.pw-poke-circle-wrap img {
+  position: relative !important;
+  z-index: 2 !important;
+  object-fit: contain !important;
+  image-rendering: pixelated !important;
+}
+
+.preset-chip:has(.pw-poke-circle-wrap) {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.pw-poke-circle-img {
+  position: relative;
+  z-index: 2;
+  object-fit: contain;
+}
+
+.pw-poke-circle-shiny {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  z-index: 3;
+  color: var(--shiny);
+  text-shadow: 0 0 4px rgba(0,0,0,0.6);
+  pointer-events: none;
+}
+
+.pw-header-close {
+  background: none;
+  border: 0;
+  color: var(--pw-text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.pw-header-close:hover {
+  color: var(--pw-text-primary);
+  background: var(--pw-surface-soft);
+}
+
+.pw-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--pw-border-color);
+  flex: none;
+}
+
+.pw-footer:empty {
+  display: none;
+}
+
+.pw-poke-circle-emoji {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(var(--pw-size-poke-sm) * 0.5);
+}
+
+.pw-poke-circle-shiny, .pw-shiny-star {
+  color: var(--shiny) !important;
+}
+
+.pw-machine-card-actions--end {
+  margin-top: 4px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.pw-poke-circle-bg {
+  background: var(--pw-bg-sprite) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45) !important;
+}
+
+
+/* The old halo was translucent, so an emoji fallback stacked BEHIND it stayed visible. The disc is SOLID now: the emoji content must sit on the same layer as the sprite <img> (z-index 2), above the disc. */
+.pw-poke-circle-emoji {
+  z-index: 2 !important;
+}
+
+#poke-modal-inner button.poke-protect-btn.is-on,
+#poke-modal-inner button.poke-protect-btn.is-locked {
+  background: #60BE58 !important;
+  border: 1px solid #489A42 !important;
+  color: #241F16 !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+  box-shadow: 0 0 8px rgba(96, 190, 88, 0.35) !important;
+}
+
+#poke-modal-inner button.poke-protect-btn.is-on *,
+#poke-modal-inner button.poke-protect-btn.is-locked * {
+  color: #241F16 !important;
+  text-shadow: none !important;
+}
+
+
+/* SHINY toggle: the user asked for a GOLD/amber ON state (recalls the sparkling shiny form) instead of the generic toggle green. FLAT gold #F5C242 + ink #241F16 = 9.88:1 (WCAG AAA). */
+#poke-modal-inner button.poke-detail-shiny-toggle.is-on {
+  background: #F5C242 !important;
+  border: 1px solid #D9A62E !important;
+  color: #241F16 !important;
+  font-weight: 900 !important;
+  text-shadow: none !important;
+  box-shadow: 0 0 10px rgba(245, 194, 66, 0.45) !important;
+}
+
+#poke-modal-inner button.poke-detail-shiny-toggle.is-on * {
+  color: #241F16 !important;
+  text-shadow: none !important;
+}
+
+#poke-modal-inner button.poke-detail-shiny-toggle.is-on .poke-detail-shiny-star {
+  color: #241F16 !important;
+}
+
+#poke-modal-inner button.poke-protect-btn.is-off,
+#poke-modal-inner button.poke-detail-shiny-toggle.is-off {
+  background: rgba(0, 0, 0, 0.26) !important;
+  color: var(--light2) !important;
+  border: 1px dashed rgba(236, 222, 183, 0.35) !important;
+}
+
+#poke-modal, #poke-modal-inner, .poke-detail-inner {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+#poke-modal-inner * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.poke-detail-inner {
+  overflow-wrap: break-word;
+}
+
+
+/* DS2810 — scroll a modal from ANYWHERE + gold shiny toggle ──────────────────────────────────────────────────────────────────────── 1) Wheel dead zones: the modal backdrops themselves can now scroll and the inner panel uses AUTO vertical margins — it stays centred when it fits, and becomes fully reachable (top included) when the viewport is shorter than the panel (the old flex centreing clipped the top of tall panels). Together with the bridge wheel relay, the scroll works over the whole screen, not only above the panel. 2) The shiny toggle ON colour is GOLD #F5C242 (rule lives with the other toggle colours in DS2809 — see above). */
+#poke-modal {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+#poke-modal-inner {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+
+/* DS2817 — wave 17: user-screenshot feedback, second round (REAL-GAME bugs — verified in headless Chromium, probes + screenshots, not jsdom) 1. Sprite <img> inside the canonical circle carried NO .sprite-img class and NO size rule → it rendered at its NATURAL PNG size (96px+) inside a 64px wrap, overflowed every card, covered the names (the "broken PC box" screenshot) and made sprite sizes look random. The component now ALSO tags .sprite-img (waves 15+17 cap rules apply); this rule is the hard guarantee: the img ALWAYS fills exactly its wrap (the wrap carries the canonical 72/104 px sizes). 2. The legacy ".box-card/.dex-entry" margin: 0 auto shrink-wrapped the grid item to its content width (82px pill) instead of stretching to the 198px+ track — the "empty dark pills" of the screenshot. */
+.pw-poke-circle-wrap img.pw-poke-circle-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+}
+
+.loot-item .pw-poke-circle-wrap {
+  width: var(--pw-item-icon-md);
+  height: var(--pw-item-icon-md);
+}
+
+
+/* 3. Nested-disc safeguard (markup dedupe done in wave-18 JS too): if a legacy site still nests a second wrap, the nested disc never paints and the nested wrap just fills its parent — ONE circle always. */
+.pw-poke-circle-wrap .pw-poke-circle-wrap {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.pw-poke-circle-wrap .pw-poke-circle-wrap .pw-poke-circle-bg {
+  display: none !important;
+}
+
+.save-slot-icon .pw-poke-circle-wrap {
+  width: 70px !important;
+  height: 70px !important;
+}
+
+.pw-machine-card-sprite:not(.pw-poke-circle-wrap) {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  overflow: visible !important;
+}
+
+.pw-machine-card-sprite:not(.pw-poke-circle-wrap) > .pw-poke-circle-wrap {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#poke-modal {
+  z-index: 1200;
+}
+
+@media (min-width: 1600px) {
+#poke-modal-inner.management-inner {
+  width: min(96vw, 1380px);
+  height: min(90vh, 980px);
+  min-height: min(90vh, 980px);
+  max-height: min(90vh, 980px);
+}
+
+#poke-modal.preset-editor-modal #poke-modal-inner {
+  width: min(96vw, 1380px);
+}
+
+}
+
+@media (min-width: 2200px) {
+#poke-modal-inner.management-inner {
+  width: min(96vw, 1760px);
+  height: min(92vh, 1200px);
+  min-height: min(92vh, 1200px);
+  max-height: min(92vh, 1200px);
+}
+
+#poke-modal.preset-editor-modal #poke-modal-inner {
+  width: min(96vw, 1760px);
+}
+
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+#poke-modal {
+  align-items: flex-start;
+  padding-top: 6px;
+}
+
+#poke-modal-inner {
+  margin-top: 0 !important;
+}
+
+.pw-poke-circle-img {
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+#poke-modal-inner {
+  max-width: 96vw !important;
+  max-height: 90vh !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-y: auto !important;
+  transform-origin: center center !important;
+}
+
+}
+
+@media (max-width: 480px) {
+#poke-modal-inner {
+  transform: scale(0.92) !important;
+  width: 108% !important;
+  margin-left: -4% !important;
+}
+
+}
+
+.quest-board .pw-evo-title {
+  font-size: 15px !important;
+}
+
+#team-window-body .poke-move.pw-move-drag-src {
+  opacity: .45 !important;
+}
+
+#team-window-body .poke-move.pw-move-drop-hover {
+  outline: 2px dashed var(--accent) !important;
+  outline-offset: -2px !important;
+}
+
+#battle-team-row .poke-name .pw-shiny-star {
+  display: inline-block !important;
+  color: #FFD84D !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  margin-right: 3px !important;
+  flex: 0 0 auto !important;
+  text-shadow: 0 0 5px rgba(255, 216, 77, .95), 0 1px 1px rgba(0, 0, 0, .6) !important;
+  animation: pw30-shiny-twinkle 1.6s ease-in-out infinite !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+#battle-team-row .poke-name .pw-shiny-star {
+  animation: none !important;
+}
+
+}
+
+.save-slot-icon .save-card-avatar .pw-poke-circle-bg {
+  display: none !important;
+}
+
+.save-slot-icon .save-card-avatar .pw-poke-circle-img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+}
+
+
+/* UIPokemonSprite Component CSS Disc / wrapper look comes from design-system.css (.pw-poke-circle-wrap, .pw-poke-circle-bg, .pw-poke-circle-img). Only the size tokens live here (the original set them as inline width/height styles). */
+.pw-poke-circle-wrap--standard {
+  width: 56px;
+  height: 56px;
+}
+
+.pw-poke-circle-wrap--large {
+  width: 72px;
+  height: 72px;
+}
+
+.pw-poke-circle-wrap--team {
+  width: 96px;
+  height: 96px;
+}
+
+.pw-poke-circle-wrap--hero {
+  width: 132px;
+  height: 132px;
+}
+
+.pw-preset-member .pw-poke-circle-wrap {
+  width: 36px;
+  height: 36px;
+}
+
+.pw-preset-member .pw-poke-circle-img {
+  width: 30px;
+  height: 30px;
+}
+
+#poke-modal-inner > .pw-pokemon-info-body {
+  padding: 14px 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: transparent;
+  flex: 1 1 auto;
+}
+
+#poke-modal-inner .poke-detail-stat-bar .poke-detail-stat-fill {
+  width: var(--pw-progress, 0%);
+  height: 100%;
+}
+
+.poke-detail-spread-head {
+  display: grid;
+  grid-template-columns: 74px 1fr 86px;
+  gap: 8px;
+  align-items: center;
+  margin: 4px 0 7px;
+  color: var(--light1);
+  font-size: 11px;
+}
+
+.poke-detail-stat-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 7px 9px;
+  border: 1px solid rgba(236, 222, 183, 0.18);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--light1, #c9bc9c);
+  font-size: 11px;
+}
+
+.poke-detail-stat-total strong {
+  color: var(--light2, #ecdeb7);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+#poke-modal-inner .poke-detail-name-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  min-width: 0;
+}
+
+#poke-modal-inner .poke-detail-name-row .poke-detail-id {
+  line-height: 1.35;
+}
+
+.poke-detail-protection {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.poke-detail-protection h3 {
+  flex: 1 0 100%;
+  margin: 0;
+  color: var(--light2, #ecdeb7);
+  font-size: 13px;
+}
+
+.preset-chip:has(.pw-poke-circle-wrap) {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.poke-detail-learnable-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.poke-detail-learnable-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 9px;
+  background: rgba(255,255,255,.025);
+}
+
+@media (max-width: 600px) {
+.poke-detail-learnable-row {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+}
+
+.pw-pokemon-grid-sprite > .pw-poke-circle-wrap {
+  width: 72px;
+  height: 72px;
+}
+
+.pw-pokemon-grid-sprite .pw-poke-circle-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.pw-box-panel .pw-box-pokemon-tile > .pw-pokemon-grid-sprite > .pw-poke-circle-wrap {
+  width: 72px;
+  height: 72px;
+  min-width: 72px;
+  min-height: 72px;
+}
+
+@media (max-width: 640px), (pointer: coarse) {
+.pw-pokemon-grid-sprite > .pw-poke-circle-wrap {
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  min-height: 64px;
+}
+
+}
+
+.pw-pokedex-entry .pw-poke-circle-wrap {
+  width: 72px;
+  height: 72px;
+}
+
+.pw-pokedex-entry .pw-poke-circle-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.pw-evo-badge {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--dark2, #24221E);
+  color: var(--light1, #FFF);
+}
+
+.pw-evo-badge--next {
+  color: var(--accent, #E5C365);
+}
+
+.pw-evo-arrow {
+  color: var(--accent, #E5C365);
+  font-weight: 700;
+  font-size: 11.5px;
+}
+
+.pw-source-icon {
+  color: var(--accent, #E5C365);
+  width: 14px;
+  height: 14px;
+}
+
+.pw-talent-rarity-badge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--dark2, #24221E);
+  color: var(--light2, #ECDEB7);
+}
+
+.pw-move-effect-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--light2);
+}
+
+.pw-effect-bullet-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--accent);
+}

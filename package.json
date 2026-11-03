@@ -1,6 +1,6 @@
 {
   "name": "pokeworld-clean",
-  "version": "1.16.6",
+  "version": "1.16.18",
   "private": true,
   "description": "PokéWorld — clean-architecture rework (static browser game + zero-dependency local server).",
   "type": "module",
@@ -10,6 +10,8 @@
   "scripts": {
     "start": "node server.js",
     "test": "node test_suite.js",
+    "audit:contrast": "node tools/contrast-audit.mjs --check",
+    "audit:i18n": "node tools/i18n/audit-keys.mjs",
     "test:browser": "node tests/browser/FacilityParity.mjs",
     "data": "node tools/data/build-all.mjs",
     "test:browser:visual": "node tests/browser/FacilityVisualParity.mjs",
@@ -25,7 +27,12 @@
     "test:browser:fit": "node tests/browser/PanelFit.mjs",
     "test:browser:afk": "node tests/browser/AfkCatchUp.mjs",
     "test:browser:talents": "node tests/browser/TalentPools.mjs",
-    "test:browser:training": "node tests/browser/TrainingWaves.mjs"
+    "test:browser:training": "node tests/browser/TrainingWaves.mjs",
+    "test:browser:roaming": "node tests/browser/RoamingOff.mjs",
+    "test:browser:items": "node tests/browser/ItemSpriteSize.mjs",
+    "test:browser:portrait": "node tests/browser/SaveCardPortrait.mjs",
+    "test:browser:release11610": "node tests/browser/Release11610.mjs",
+    "test:browser:release11611": "node tests/browser/Release11611.mjs"
   },
   "devDependencies": {
     "playwright": "^1.47.2"

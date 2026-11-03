@@ -50,6 +50,7 @@ export const facilities = {
   "facility_training_choose_hint": "Choisissez un Pokémon de la collection PC.",
   "facility_training_unlock_hint": "Capacités : Major Bob · Niveau : Auguste · EV : Giovanni · Talents : Ligue Kanto ou Johto.",
   "facility_reward_levels": "+{count} niveau(x)",
+  "facility_reward_evolution": "évolution : {species}",
   "facility_reward_ev": "+{count} EV {stat}",
   "facility_fossil_stock": "Disponibles : {available} · Réservés en liste : {reserved}",
   "facility_fossil_picker_hint": "Un fossile placé en liste est réservé, pas consommé. Son incubation exige de vrais K.O. avant la collecte.",

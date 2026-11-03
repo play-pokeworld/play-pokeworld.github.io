@@ -10,10 +10,9 @@ import { UIButton } from '../ui/UIButton.js';
 import { QuestCard } from './components/QuestCard.js';
 import { TutorialCard } from './components/TutorialCard.js';
 import { TutorialSystem } from '../systems/TutorialSystem.js';
-import { LocationSystem } from '../systems/LocationSystem.js';
+import { revealTutorialStep } from '../ui/TutorialHighlight.js';
 import { ModalIds } from '../config/ModalIds.js';
 import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
-import { DashboardWindowFocusRequestedEvent } from '../core/events/DashboardWindowFocusRequestedEvent.js';
 import { EventBus } from '../core/EventBus.js';
 import { QuestSystem } from '../systems/QuestSystem.js';
 import { QuestCategories } from '../data/quests/QuestCategories.js';
@@ -87,7 +86,7 @@ export class StoryPanel extends DraggablePanel {
       this.addChild(tutorialCard);
     }
     if (statuses.length === 0 && !tutorialStatus) {
-      this.addChild(new UIText({ tagName: 'div', className: 'pw-empty-center', text: t('story_no_quest') }));
+      this.addChild(new UIText({ tagName: 'div', className: 'pw-empty-state', text: t('story_no_quest') }));
     }
     for (const section of QUEST_SECTIONS) {
       const sectionStatuses = statuses.filter((status) => status.quest.category === section.category);
@@ -95,7 +94,7 @@ export class StoryPanel extends DraggablePanel {
       const group = new UIContainer({ className: `pw-story-quest-section pw-story-quest-section--${section.category}` });
       group.addChild(new UIText({
         tagName: 'h3',
-        className: 'pw-story-quest-section-title',
+        className: 'pw-section-title',
         text: section.category === QuestCategories.MAIN && mainProgress
           ? t('story_main_quest_progress', {
               region: t(`region_${mainProgress.region}`),
@@ -131,43 +130,17 @@ export class StoryPanel extends DraggablePanel {
     }
   }
 
-  /** @private @param {Object} status */
+  /**
+   * The tutorial's action button **shows** the control of the current step; it never plays the
+   * step. Teleporting the player to the place, or opening the bag for them, taught nothing: the
+   * button now brings the highlighted control (map node, action tile, window, shortcut, ball cell)
+   * into view so the player clicks it themselves.
+   * @private
+   * @param {Object} status
+   */
   _performTutorialAction(status) {
-    const bus = EventBus.getInstance();
-    switch (status.action) {
-      case 'route1':
-      case 'viridianforest': {
-        const locationId = status.action === 'route1' ? 'route1' : 'viridianforest';
-        if (LocationSystem.getInstance().travelTo(locationId)) {
-          bus.dispatch(new DashboardWindowFocusRequestedEvent(WindowIds.LOCATION));
-        }
-        break;
-      }
-      case 'ball_filters':
-        bus.dispatch(new ModalOpenRequestedEvent(ModalIds.BALL_FILTERS));
-        break;
-      case 'shop': {
-        const location = LocationSystem.getInstance();
-        if (location.getCurrentLocationId() === 'pallet' || location.travelTo('pallet')) {
-          bus.dispatch(new ModalOpenRequestedEvent(ModalIds.SHOP));
-        }
-        break;
-      }
-      case 'pokemon_sheet':
-        bus.dispatch(new ModalOpenRequestedEvent(ModalIds.POKEMON_INFO, { teamIndex: 0 }));
-        break;
-      case 'bag':
-        bus.dispatch(new ModalOpenRequestedEvent(ModalIds.BAG));
-        break;
-      case 'pokedex':
-        bus.dispatch(new ModalOpenRequestedEvent(ModalIds.POKEDEX, { region: 'kanto' }));
-        break;
-      case 'currencies':
-        bus.dispatch(new DashboardWindowFocusRequestedEvent(WindowIds.CURRENCY));
-        break;
-      default:
-        break;
-    }
+    if (!status?.id) return;
+    revealTutorialStep(status.id);
   }
 
   /**

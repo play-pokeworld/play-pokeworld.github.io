@@ -1,0 +1,1021 @@
+/*
+ * panels/save-menu.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ */
+
+
+.save-menu-kicker {
+  letter-spacing: 0.4px;
+}
+
+.save-menu-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  background: radial-gradient(circle at 20% 15%, rgba(83,157,223,0.38), transparent 32%), radial-gradient(circle at 82% 28%, rgba(242,217,78,0.24), transparent 28%), linear-gradient(180deg, rgba(12,17,32,0.92), rgba(15,20,38,0.98)), url('../../images/bg/empty.jpg');
+  background-size: auto, auto, auto, cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+.save-menu-screen.is-open {
+  display: flex;
+}
+
+.save-menu-bg-layer {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 42%;
+  background-image: url('../../images/bg/forest.png');
+  background-repeat: repeat-x;
+  background-size: auto 100%;
+  opacity: 0.28;
+  image-rendering: pixelated;
+  animation: save-menu-forest-scroll 55s linear infinite;
+  pointer-events: none;
+}
+
+.save-menu-screen::before {
+  content: '';
+  position: absolute;
+  inset: -18%;
+  background: linear-gradient(115deg, transparent 0 42%, rgba(255,255,255,0.08) 48%, transparent 56%), radial-gradient(circle at 48% 42%, rgba(236,222,183,0.12), transparent 30%);
+  animation: save-menu-light-sweep 18s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.save-menu-panel {
+  position: relative;
+  z-index: 1;
+  width: min(1040px, 96vw);
+  max-height: min(760px, 92vh);
+  display: grid;
+  grid-template-rows: auto minmax(220px, 1fr) auto;
+  gap: 18px;
+  padding: 30px;
+  border: 1px solid rgba(236,222,183,0.34);
+  border-radius: 26px;
+  background: rgba(37,37,34,0.82);
+  box-shadow: 0 24px 70px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+}
+
+.save-menu-title-block {
+  text-align: center;
+  display: grid;
+  gap: 6px;
+}
+
+.save-menu-kicker {
+  justify-self: center;
+  padding: 4px 12px;
+  border: 1px solid rgba(236,222,183,0.38);
+  border-radius: 999px;
+  color: var(--light2);
+  background: rgba(0,0,0,0.24);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+#save-menu-title {
+  font-size: clamp(44px, 9vw, 96px);
+  line-height: 0.9;
+  color: var(--light2);
+  text-shadow: 0 5px 0 rgba(0,0,0,0.36), 0 0 24px rgba(236,222,183,0.26);
+  letter-spacing: 5px;
+}
+
+#save-menu-subtitle {
+  color: rgba(236,222,183,0.78);
+  font-size: 15px;
+}
+
+.save-menu-list {
+  min-height: 220px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  align-content: start;
+  gap: 14px;
+  padding: 4px 6px 8px;
+}
+
+.save-menu-empty {
+  grid-column: 1 / -1;
+  min-height: 260px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  border: 1px dashed rgba(236,222,183,0.3);
+  border-radius: 18px;
+  background: rgba(0,0,0,0.18);
+  text-align: center;
+  color: var(--light2);
+}
+
+.save-menu-empty-icon {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid rgba(236,222,183,0.36);
+  color: rgba(236,222,183,0.86);
+  font-size: 32px;
+}
+
+.save-menu-empty p {
+  color: rgba(236,222,183,0.7);
+  max-width: 480px;
+}
+
+.save-slot {
+  --save-color: #539DDF;
+  appearance: none;
+  border: 1px solid color-mix(in srgb, var(--save-color) 70%, var(--light2));
+  color: var(--light2);
+  min-height: 184px;
+  text-align: left;
+  border-radius: 18px;
+  padding: 16px;
+  display: grid;
+  gap: 14px;
+  cursor: pointer;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.34), inset 0 0 0 1px rgba(255,255,255,0.08);
+  transition: transform 0.18s, border-color 0.18s, box-shadow 0.18s, filter 0.18s;
+  position: relative;
+  overflow: hidden;
+}
+
+.save-slot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(130deg, transparent 0 45%, rgba(255,255,255,0.16) 52%, transparent 62%);
+  transform: translateX(-120%);
+  transition: transform 0.5s;
+  pointer-events: none;
+}
+
+.save-slot:hover {
+  transform: translateY(-4px) scale(1.01);
+  filter: saturate(1.08);
+  box-shadow: 0 18px 38px rgba(0,0,0,0.45), 0 0 0 2px rgba(236,222,183,0.22);
+}
+
+.save-slot:hover::after {
+  transform: translateX(120%);
+}
+
+.save-slot-top, .save-slot-bottom {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.save-slot-name {
+  font-size: 22px;
+  font-weight: 900;
+  color: #fff5d5;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.55);
+}
+
+.save-slot-id, .save-slot-bottom {
+  color: rgba(255,255,255,0.76);
+  font-size: 11px;
+}
+
+.save-slot-id {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.3);
+  white-space: nowrap;
+}
+
+.save-slot-stats {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.save-slot-stats span {
+  display: grid;
+  gap: 2px;
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.28);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.save-slot-stats b {
+  font-size: 18px;
+  color: #fffbe6;
+}
+
+.save-slot-stats small {
+  font-size: 11px;
+  color: rgba(255,255,255,0.7);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.save-menu-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.save-menu-action-primary {
+  background: var(--light2);
+  color: var(--dark1);
+}
+
+.save-menu-action-secondary {
+  background: rgba(236,222,183,0.12);
+  color: var(--light2);
+  border-color: rgba(236,222,183,0.38);
+}
+
+.save-profile-field {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 10px;
+  color: var(--light2);
+}
+
+.save-profile-field input, .save-profile-field select {
+  width: 100%;
+  border: 1px solid var(--dark3);
+  border-radius: 8px;
+  background: var(--dark1);
+  color: var(--light2);
+  padding: 9px 10px;
+}
+
+#save-profile-section.is-disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+@media (max-width: 720px) {
+.save-menu-screen {
+  padding: 12px;
+}
+
+.save-menu-panel {
+  padding: 18px;
+  border-radius: 18px;
+}
+
+.save-menu-list {
+  grid-template-columns: 1fr;
+}
+
+.save-slot-stats {
+  grid-template-columns: 1fr;
+}
+
+.save-slot-top, .save-slot-bottom {
+  flex-direction: column;
+}
+
+}
+
+.save-menu-screen {
+  align-items: flex-start;
+  padding-top: 24px;
+  background-position: center top;
+}
+
+.save-menu-bg-layer {
+  inset: 0;
+  height: auto;
+  background-position: 0 top;
+  background-size: auto 100%;
+  opacity: 0.36;
+}
+
+.save-menu-panel {
+  background: rgba(37,37,34,0.54);
+}
+
+.save-menu-list-shell {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  gap: 10px;
+  align-items: center;
+  min-height: 226px;
+}
+
+.save-menu-list {
+  min-height: 220px;
+  overflow: hidden;
+  display: flex;
+  flex-wrap: nowrap;
+  align-content: stretch;
+  gap: 14px;
+  padding: 4px 2px 8px;
+  scroll-behavior: smooth;
+}
+
+.save-menu-scroll-btn {
+  height: 54px;
+  min-width: 40px;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 28px;
+  line-height: 1;
+  background: rgba(236,222,183,0.22);
+  color: var(--light2);
+  border-color: rgba(236,222,183,0.42);
+}
+
+
+/* Wave 27: paired with updateSaveMenuScrollButtons — visibility on a dedicated class. `.is-hidden` must stay away from these buttons: it is display:none !important here (utility rule), which removes them from the shell grid and shifts the list into the 44px button track. */
+.save-menu-scroll-btn.is-invisible {
+  visibility: hidden;
+}
+
+.save-menu-empty {
+  flex: 1 0 100%;
+}
+
+.save-slot {
+  flex: 0 0 330px;
+  width: 330px;
+  height: 198px;
+  min-height: 198px;
+  grid-template-rows: auto 1fr auto;
+  background-size: cover;
+  background-position: center;
+  border-color: rgba(236,222,183,0.52);
+}
+
+.save-slot-main {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 78px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.save-slot-icon {
+  width: 74px;
+  height: 74px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: rgba(0,0,0,0.28);
+  border: 1px solid rgba(255,255,255,0.24);
+  box-shadow: inset 0 0 18px rgba(255,255,255,0.08);
+}
+
+.save-slot-icon img {
+  max-width: 70px;
+  max-height: 70px;
+  object-fit: contain;
+}
+
+.save-slot-title {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.save-slot-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.save-slot-bottom {
+  justify-content: flex-end;
+}
+
+.save-profile-preview {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 12px;
+}
+
+.save-profile-preview .save-slot {
+  flex: 0 0 330px;
+  cursor: default;
+  pointer-events: none;
+}
+
+.save-profile-field select:disabled {
+  opacity: 0.65;
+}
+
+@media (max-width: 720px) {
+.save-menu-screen {
+  padding-top: 12px;
+}
+
+.save-menu-list-shell {
+  grid-template-columns: 36px minmax(0, 1fr) 36px;
+}
+
+.save-slot {
+  flex-basis: 286px;
+  width: 286px;
+}
+
+.save-profile-preview .save-slot {
+  flex-basis: 286px;
+}
+
+}
+
+.save-profile-icon-grid {
+  max-height: 220px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(116px, 1fr));
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--dark3);
+  border-radius: 10px;
+  background: rgba(0,0,0,0.18);
+}
+
+.save-icon-choice {
+  min-height: 112px;
+  border: 1px solid rgba(236,222,183,0.22);
+  border-radius: 10px;
+  background: rgba(0,0,0,0.22);
+  color: var(--light2);
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 8px;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.save-icon-choice:hover {
+  transform: translateY(-2px);
+  border-color: var(--light2);
+  background: rgba(236,222,183,0.14);
+}
+
+.save-icon-choice.active {
+  border-color: var(--green);
+  box-shadow: inset 0 0 0 1px var(--green), 0 0 14px rgba(96,190,88,0.22);
+}
+
+.save-icon-sprite {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.2);
+}
+
+.save-icon-sprite .save-slot-icon {
+  width: 58px;
+  height: 58px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.save-icon-sprite img {
+  max-width: 54px;
+  max-height: 54px;
+  object-fit: contain;
+}
+
+.save-icon-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 900;
+}
+
+.save-icon-choice small {
+  color: var(--light1);
+}
+
+.save-icon-empty {
+  grid-column: 1 / -1;
+  color: var(--light1);
+  padding: 12px;
+  text-align: center;
+}
+
+
+/* design-system/pass-07.css * --------------------------------------------------------------------------- * Dated pass inherited from the former design-system.css, kept in its historical order. * * Part of the 1.16.11 split: one file, one responsibility. The order of the * @import lines in assets/css/style.css IS the cascade — never reorder them, * never import this sheet anywhere else (guarded by tests/CssStructure.test.js). */
+.save-menu-screen {
+  align-items: center;
+  padding-top: 28px;
+  padding-bottom: 28px;
+  background-position: center top;
+}
+
+@media (max-width: 720px) {
+.save-menu-screen {
+  align-items: center;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+}
+
+.save-menu-screen {
+  align-items: center;
+  padding-top: 28px;
+  padding-bottom: 28px;
+  background-position: center top;
+}
+
+.save-profile-icon-current {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px;
+  border: 1px solid var(--dark3);
+  border-radius: 10px;
+  background: rgba(0,0,0,0.18);
+}
+
+.save-profile-icon-current .save-slot-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 12px;
+}
+
+.save-profile-icon-current-label {
+  display: grid;
+  gap: 3px;
+  color: var(--light2);
+  font-weight: 900;
+}
+
+.save-profile-icon-current-label small {
+  color: var(--light1);
+  font-weight: 700;
+}
+
+.save-icon-selector-card {
+  border-color: rgba(236,222,183,0.42);
+}
+
+.save-icon-selector-card.active {
+  border-color: var(--green);
+  box-shadow: inset 0 0 0 2px var(--green), 0 0 16px rgba(96,190,88,0.24);
+}
+
+@media (max-width: 720px) {
+.save-menu-screen {
+  align-items: center;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+}
+
+.save-context-item {
+  border: 0;
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: transparent;
+  color: var(--light2);
+  text-align: left;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.save-context-item:hover {
+  background: rgba(236,222,183,0.16);
+}
+
+.save-context-item.danger {
+  color: #ffb8c5;
+}
+
+.save-context-item.danger:hover {
+  background: rgba(211,66,95,0.24);
+}
+
+.save-slot {
+  border: 1px solid var(--pw-border);
+  color: #fff;
+}
+
+.save-slot:hover {
+  border-color: var(--light2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.save-slot-name {
+  color: var(--light2) !important;
+  font-weight: 700;
+}
+
+
+/* 3. Subtitles, descriptions, stock, and secondary text always readable gold (#c9bc8a) Never allow --dark3 text on dark backgrounds */
+.save-slot-id, .save-slot-stats small {
+  color: #c9bc8a !important;
+}
+
+.save-icon-choice {
+  color: var(--light2);
+}
+
+.save-icon-choice:hover {
+  filter: brightness(1.15);
+  color: var(--light2);
+}
+
+
+/* Light background active buttons MUST use dark text (#36342F) */
+.save-icon-choice.active {
+  background: var(--light2) !important;
+  color: var(--dark1) !important;
+  border-color: var(--light2) !important;
+}
+
+.save-icon-choice.active * {
+  color: var(--dark1) !important;
+}
+
+
+/* Save card era backgrounds — single canonical definition. Wave 24 removed the 3 historical copies below (a bare duplicate, a dark overlay and an alternative redesign): all were shadowed, only this live design ever painted on the real .save-slot cards. The old hammer qualifier is dropped too: its target is gone, no rule competes for these backgrounds. */
+.save-slot.save-bg-classic {
+  background: radial-gradient(circle at 88% 18%, color-mix(in srgb, var(--save-color) 65%, white) 0 7%, transparent 8%), linear-gradient(135deg, rgba(211,66,95,0.86), rgba(83,157,223,0.84));
+}
+
+.save-slot.save-bg-goldsilver {
+  background: radial-gradient(circle at 15% 20%, rgba(242,217,78,0.9), transparent 26%), radial-gradient(circle at 84% 78%, rgba(184,199,217,0.88), transparent 28%), linear-gradient(135deg, #6d5a24, #28384d);
+}
+
+.save-slot.save-bg-emerald {
+  background: radial-gradient(circle at 20% 15%, rgba(255,255,255,0.18), transparent 22%), linear-gradient(135deg, #0f6f58, #60be58 48%, #16433a);
+}
+
+.save-slot.save-bg-diamondpearl {
+  background: radial-gradient(circle at 18% 25%, rgba(185,234,255,0.62), transparent 25%), radial-gradient(circle at 82% 70%, rgba(255,190,225,0.5), transparent 24%), linear-gradient(135deg, #4068c7, #e7d8ff);
+}
+
+.save-slot.save-bg-blackwhite {
+  background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,255,255,0.2) 48%, rgba(0,0,0,0.78) 49%, rgba(0,0,0,0.92)), linear-gradient(45deg, #20242c, #f5f5f5);
+}
+
+.save-slot.save-bg-xy {
+  background: radial-gradient(circle at 25% 35%, rgba(83,157,223,0.85), transparent 28%), radial-gradient(circle at 75% 65%, rgba(211,66,95,0.78), transparent 25%), linear-gradient(135deg, #1f2e69, #27193f);
+}
+
+.save-slot.save-bg-forest {
+  background: linear-gradient(135deg, #244b2b, #152517);
+}
+
+#save-menu-screen {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+.save-context-item.dl-item {
+  color: var(--blue);
+}
+
+.save-context-item.imp-item {
+  color: var(--green);
+}
+
+.save-context-item.danger {
+  color: var(--red);
+}
+
+@media (max-width: 850px), (pointer: coarse) {
+.save-menu-screen {
+  padding: 8px !important;
+}
+
+.save-menu-panel {
+  width: 100% !important;
+  max-width: 98vw !important;
+  max-height: 94dvh !important;
+  padding: 12px !important;
+  grid-template-rows: auto 1fr auto !important;
+  gap: 10px !important;
+  border-radius: 16px !important;
+}
+
+#save-menu-title {
+  font-size: clamp(24px, 6vw, 32px) !important;
+}
+
+.save-menu-kicker {
+  padding: 2px 8px !important;
+  font-size: 11px !important;
+}
+
+#save-menu-subtitle {
+  font-size: 12px !important;
+}
+
+.save-menu-list {
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+  padding: 2px !important;
+  min-height: 0 !important;
+}
+
+.save-slot {
+  padding: 10px 12px !important;
+  gap: 6px !important;
+}
+
+.save-slot-top,
+  .save-slot-bottom {
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.save-slot-stats {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 4px 10px !important;
+  font-size: 11px !important;
+}
+
+.save-menu-actions {
+  gap: 8px !important;
+}
+
+}
+
+.save-menu-community {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.save-menu-discord-btn {
+  min-width: 220px;
+}
+
+@media (max-width: 520px) {
+.save-menu-list-shell {
+  grid-template-columns: 30px minmax(0, 1fr) 30px;
+  gap: 6px;
+}
+
+.save-menu-scroll-btn {
+  min-width: 30px;
+  height: 46px;
+  font-size: 22px;
+}
+
+.save-menu-list {
+  gap: 10px;
+}
+
+.save-slot,
+  .save-profile-preview .save-slot {
+  flex: 0 0 100%;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  min-height: 0;
+}
+
+.save-slot-stats {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.save-slot-stats span {
+  padding: 8px 4px;
+}
+
+.save-slot-stats b {
+  font-size: 16px;
+}
+
+.save-slot-id {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+}
+
+.save-profile-portrait {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border: 1px solid var(--dark3);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.18);
+  min-width: 0;
+}
+
+.save-profile-portrait-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.save-profile-portrait-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pw-save-icon-picker-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pw-save-icon-picker-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pw-save-icon-picker-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.pw-save-icon-picker-grid {
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 20px 10px;
+  padding: 18px 2px 4px;
+}
+
+.pw-save-icon-tile[aria-pressed="true"] {
+  outline: 2px solid var(--pw-accent-color, var(--light2));
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
+.save-slot-icon-missing-mark {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font-weight: 700;
+  color: var(--light1);
+  background: none;
+}
+
+.save-slot-icon .save-card-avatar {
+  width: 72px !important;
+  height: 72px !important;
+  background: none !important;
+}
+
+.save-slot-icon .save-card-avatar .save-slot-icon-missing-mark {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: 34px;
+  font-weight: 800;
+  color: rgba(255, 245, 213, 0.85);
+  background: none;
+}
+
+.save-profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--light2);
+}
+
+.save-profile-field input, .save-profile-field select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--pw-border-color);
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--light2);
+  font-size: 13px;
+  font-weight: 700;
+  outline: none;
+}
+
+
+/* Rework addition: soft fade on the left/right edges of the save carousel (only when cards are present: the empty-state box keeps its original width) */
+.save-menu-list:has(.save-slot) {
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 32px, #000 calc(100% - 32px), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 32px, #000 calc(100% - 32px), transparent 100%);
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
+.save-menu-scroll-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.save-menu-lang-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.save-slot.save-bg-blackwhite .save-slot-stats span {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+
+/* Theme-aware save screen (v1.3) -------------------------------------------------------------------------- The original stylesheet paints the save screen with fixed dark rgba values while its texts use the theme tokens: with any non-dark UI theme the screen became a dark glass panel with dark text. Every surface below is derived from the active theme tokens instead (color-mix keeps the original alphas). */
+.save-menu-screen {
+  background:
+    radial-gradient(circle at 20% 15%, color-mix(in srgb, var(--blue) 38%, transparent), transparent 32%),
+    radial-gradient(circle at 82% 28%, color-mix(in srgb, var(--yellow) 24%, transparent), transparent 28%),
+    linear-gradient(180deg, color-mix(in srgb, var(--dark1) 80%, transparent), color-mix(in srgb, var(--dark1) 90%, transparent)),
+    url('../../images/bg/empty.jpg');
+  background-size: auto, auto, auto, cover;
+  background-position: center top;
+}
+
+.save-menu-panel {
+  background: color-mix(in srgb, var(--dark2) 72%, transparent);
+  border-color: color-mix(in srgb, var(--light2) 34%, transparent);
+}
+
+#save-menu-title {
+  text-shadow: 0 5px 0 color-mix(in srgb, var(--dark1) 60%, transparent),
+               0 0 24px color-mix(in srgb, var(--light2) 26%, transparent);
+}
+
+#save-menu-subtitle,
+.save-menu-empty p {
+  color: color-mix(in srgb, var(--light2) 80%, transparent);
+}
+
+.save-menu-kicker {
+  border-color: color-mix(in srgb, var(--light2) 38%, transparent);
+  background: color-mix(in srgb, var(--dark1) 40%, transparent);
+}
+
+.save-menu-empty {
+  border-color: color-mix(in srgb, var(--light2) 30%, transparent);
+  background: color-mix(in srgb, var(--dark1) 35%, transparent);
+}
+
+.save-menu-empty-icon {
+  border-color: color-mix(in srgb, var(--light2) 36%, transparent);
+  color: color-mix(in srgb, var(--light2) 86%, transparent);
+}
+
+.save-menu-scroll-btn {
+  background: color-mix(in srgb, var(--light2) 22%, transparent);
+  border-color: color-mix(in srgb, var(--light2) 42%, transparent);
+}
+
+
+/* Save cards carry their OWN palette (the random card theme chosen at creation): they keep the default dark tokens whatever the UI theme, otherwise their texts would turn dark on the dark card artworks. */
+.save-slot {
+  --dark1: #36342F;
+  --dark2: #444138;
+  --dark3: #524f48;
+  --light1: #C9BC9C;
+  --light2: #ECDEB7;
+  --pw-border: rgba(236, 222, 183, 0.35);
+  --pw-bg-sprite: #191714;
+  --pw-circle-bg: radial-gradient(circle, rgba(236, 222, 183, 0.25) 0%, rgba(236, 222, 183, 0.08) 70%, transparent 100%);
+  --pw-border-color: #4A3E31;
+  --pw-text-primary: #ECDEB7;
+  --pw-text-secondary: #C8BBA0;
+}

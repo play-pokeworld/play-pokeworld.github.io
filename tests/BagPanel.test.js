@@ -15,6 +15,7 @@ import { BagCategoryIds } from '../src/config/BagCategories.js';
 import { DashboardColumns } from '../src/config/DashboardLayout.js';
 import { t } from '../src/localization/LocalizationManager.js';
 import { setRoster } from './RosterFixtures.js';
+import { readBundle } from './CssBundle.js';
 
 const saves = SaveSystem.getInstance();
 const source = (relativePath) => fs.readFileSync(path.resolve(relativePath), 'utf8');
@@ -25,9 +26,9 @@ describe('Team held-item selection through the Bag', (test) => {
     const info = source('src/panels/PokemonInfoModal.js');
     const page = source('src/pages/GamePage.js');
     const modalIds = source('src/config/ModalIds.js');
-    const fullscreenCss = source('assets/css/fullscreen-panel.css');
-    const bagCss = source('assets/css/bag.css');
-    const panelCss = source('assets/css/panels.css');
+    const fullscreenCss = readBundle();
+    const bagCss = readBundle();
+    const panelCss = readBundle();
 
     assert.ok(/ModalIds\.BAG,\s*\{\s*mode:\s*'held-item'/.test(team), 'team item action opens held-item mode in BagPanel');
     assert.ok(/ModalIds\.BAG,\s*\{\s*mode:\s*'held-item'/.test(info), 'Pokémon sheet item action opens the same BagPanel');

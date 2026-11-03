@@ -4,6 +4,7 @@
  */
 
 import { installFakeDom } from './FakeDom.js';
+import { EvolutionSystem } from '../src/systems/EvolutionSystem.js';
 import { describe, assert } from './TestRunner.js';
 import { SaveSystem } from '../src/systems/SaveSystem.js';
 import { LocationDB } from '../src/data/world/LocationDB.js';
@@ -26,23 +27,26 @@ import { DashboardColumns } from '../src/config/DashboardLayout.js';
 installFakeDom();
 
 describe('Release 1.15.6 Fixes and Mechanics', (test) => {
-  test('Pokemon evolution by level triggers automatically on exp gain', () => {
+  test('a level evolution keeps the Pokémon and adds the evolved species at level 1', () => {
     const save = SaveSystem.getInstance().createNewSave('EvoTester', 'bulbasaur');
     const starter = save.team[0];
     assert.equal(starter.species, 'bulbasaur');
     assert.equal(starter.level, 5);
+    const starterUid = starter.uid;
 
-    // Level up to 16
     starter.setLevel(16);
-    const evolved = starter.checkLevelEvolution();
-    assert.equal(evolved, 'ivysaur', 'Bulbasaur evolved into Ivysaur at level 16');
-    assert.equal(starter.species, 'ivysaur');
+    const first = EvolutionSystem.getInstance().applyLevelEvolutions(starter);
+    assert.deepEqual(first.targets, ['ivysaur'], 'Bulbasaur produces Ivysaur at level 16');
+    assert.equal(starter.species, 'bulbasaur', 'the starter is never transformed');
+    assert.equal(starter.uid, starterUid);
+    const ivysaur = save.collection.getAll().find((pokemon) => pokemon.species === 'ivysaur');
+    assert.ok(ivysaur, 'Ivysaur joins the collection');
+    assert.equal(ivysaur.level, 1, 'the new Pokémon starts at level 1');
+    assert.ok(save.pokedex.isCaught('ivysaur'), 'the evolved species is marked caught');
 
-    // Level up to 32
-    starter.setLevel(32);
-    const secondEvo = starter.checkLevelEvolution();
-    assert.equal(secondEvo, 'venusaur', 'Ivysaur evolved into Venusaur at level 32');
-    assert.equal(starter.species, 'venusaur');
+    const again = EvolutionSystem.getInstance().applyLevelEvolutions(starter);
+    assert.deepEqual(again.targets, [], 'one production per Pokémon and per target');
+    assert.equal(save.collection.getAll().filter((pokemon) => pokemon.species === 'ivysaur').length, 1);
   });
 
   test('PokemonInfoModal displays evolution level correctly without any manual evolve button', () => {
@@ -64,33 +68,21 @@ describe('Release 1.15.6 Fixes and Mechanics', (test) => {
     modal.close();
   });
 
-  test('Save loading verifies and automatically evolves all over-leveled Pokémon in the save', () => {
+  test('loading a save no longer rewrites over-levelled Pokémon: they evolve on their next level up', () => {
     const save = SaveSystem.getInstance().createNewSave('AutoEvoSaveTester', 'charmander');
     const starter = save.team[0];
     assert.equal(starter.species, 'charmander');
 
-    // Add un-evolved over-leveled Pokémon directly into collection (simulating old save state)
-    const overleveledCaterpie = PokemonFactory.create('caterpie', 10);
-    overleveledCaterpie.species = 'caterpie'; // explicitly level 10 Caterpie
-    save.collection.add(overleveledCaterpie);
-
+    // Over-levelled Pokémon kept from an older save state stay untouched until they level up.
     const overleveledPidgey = PokemonFactory.create('pidgey', 36);
-    overleveledPidgey.species = 'pidgey'; // explicitly level 36 Pidgey
     save.collection.add(overleveledPidgey);
+    assert.equal(typeof save.verifyLevelEvolutions, 'undefined', 'the old in-place repair pass is gone');
 
-    // Run verification on save load
-    const evolvedCount = save.verifyLevelEvolutions();
-    assert.ok(evolvedCount >= 2, 'Evolved overleveled Pokémon in collection');
-
-    // Caterpie at lv 10 must have evolved through Metapod into Butterfree
-    assert.equal(overleveledCaterpie.species, 'butterfree', 'Caterpie at level 10 auto-evolved to Butterfree');
-    assert.ok(save.pokedex.isCaught('metapod'), 'Metapod marked caught in Pokedex');
-    assert.ok(save.pokedex.isCaught('butterfree'), 'Butterfree marked caught in Pokedex');
-
-    // Pidgey at lv 36 must have evolved through Pidgeotto into Pidgeot
-    assert.equal(overleveledPidgey.species, 'pidgeot', 'Pidgey at level 36 auto-evolved to Pidgeot');
-    assert.ok(save.pokedex.isCaught('pidgeotto'), 'Pidgeotto marked caught in Pokedex');
-    assert.ok(save.pokedex.isCaught('pidgeot'), 'Pidgeot marked caught in Pokedex');
+    const evolved = EvolutionSystem.getInstance().applyLevelEvolutions(overleveledPidgey);
+    assert.deepEqual(evolved.targets, ['pidgeotto'], 'Pidgey produces Pidgeotto at its own level');
+    assert.equal(overleveledPidgey.species, 'pidgey', 'Pidgey is kept as is');
+    assert.ok(save.pokedex.isCaught('pidgeotto'));
+    assert.equal(save.collection.getAll().find((pokemon) => pokemon.species === 'pidgeotto').level, 1);
   });
 
   test('Pokedex opens PokedexDetailModal with complete sheet on species click', () => {
@@ -212,14 +204,17 @@ describe('Release 1.15.6 Fixes and Mechanics', (test) => {
     mapPanel.destroy();
   });
 
-  test('Combat battle fatigue applies wear damage to active combatant and logs wear after 50 KOs', () => {
+  // v1.16.10: the counter is the number of victories of the current chain (`run.wins`).
+  // The old version set `session.playerKOs`, which counts the PLAYER's own fainted
+  // Pokémon: it was reset on every BattleSession, so the threshold was unreachable.
+  test('Combat battle fatigue applies wear damage to active combatant and logs wear after 50 victories', () => {
     const battle = BattleSystem.getInstance();
     if (battle.isActive()) battle.endBattle(false);
     const save = SaveSystem.getInstance().createNewSave('FatigueTester', 'charmander');
     assert.ok(battle.startBattle('route1', { chain: true }));
 
     const session = battle._session;
-    session.playerKOs = 50;
+    battle._activeRun.wins = 50;
 
     // Simulate winning a wild battle at 50 KOs
     const foe = session.foe.pokemon;

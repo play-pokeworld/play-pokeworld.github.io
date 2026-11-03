@@ -1,4 +1,5 @@
 /** @file Market.test.js @brief Regional stock policy, atomic acquisition and stable shared purchase UI. */
+import { sheetPath, readManifest } from './CssBundle.js';
 import fs from 'node:fs';
 import { describe, assert } from './TestRunner.js';
 import { MarketRules } from '../src/config/MarketRules.js';
@@ -458,15 +459,15 @@ describe('Canonical market transactions', (test) => {
 
 describe('Native market view and shared purchase widgets', (test) => {
   test('all stylesheet imports precede qualified rules so the market skin is actually loaded', () => {
-    const css = fs
-      .readFileSync(new URL('../assets/css/style.css', import.meta.url), 'utf8')
-      .replace(/\/\*[\s\S]*?\*\//g, '');
-    assert.ok(css.includes('@import url("./market.css")'));
-    assert.ok(css.lastIndexOf('@import') < css.indexOf('{'));
+    const css = readManifest().replace(/\/\*[\s\S]*?\*\//g, '');
+    assert.ok(css.includes('@import url("./panels/market.css")'), 'the market sheet is imported');
+    // The manifest holds imports only: no qualified rule may appear before the last import.
+    assert.equal(css.includes('{'), false, 'style.css contains no rules at all');
+    assert.ok(css.lastIndexOf('@import') < (css.indexOf('{') === -1 ? Infinity : css.indexOf('{')));
   });
   test('training uses a container-bounded track and container reflow rather than clipping its slots', () => {
     const css = fs.readFileSync(
-      new URL('../assets/css/facilities.css', import.meta.url),
+      sheetPath('facilities.css'),
       'utf8',
     );
     assert.ok(css.includes('minmax(min(280px, 100%), 1fr)'));
