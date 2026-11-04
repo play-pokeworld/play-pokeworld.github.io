@@ -223,6 +223,13 @@ export class PokemonMoveLearningModal extends UIModal {
           backLabel: t('modal_close_btn')
         }));
       });
+      row.addLongPress(() => {
+        EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.DICTIONARY_DETAIL, {
+          kind: 'move',
+          id: moveId,
+          backLabel: t('modal_close_btn')
+        }));
+      });
 
       return row;
     };

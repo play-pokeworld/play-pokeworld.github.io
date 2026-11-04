@@ -10,6 +10,7 @@ import { EventBus } from './EventBus.js';
 import { PageChangeEvent } from './events/PageChangeEvent.js';
 import { BasePage } from '../pages/BasePage.js';
 import { t } from '../localization/LocalizationManager.js';
+import { resetPageScrollLock } from '../ui/ScrollLock.js';
 
 export class PageManager extends BaseObject {
   /**
@@ -92,6 +93,8 @@ export class PageManager extends BaseObject {
       this._currentPage = null;
     }
 
+    // Leaving a page drops any modal that was open on the previous one, lock included.
+    resetPageScrollLock();
     this._container.textContent = '';
     this._currentPage = newPage;
     this._currentPageId = pageId;

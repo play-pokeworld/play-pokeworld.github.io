@@ -298,3 +298,25 @@ choix d'un Pokémon de la boîte qui met à jour l'aperçu, l'application qui pe
 
 Les quatorze suites de production s'exécutent séquentiellement :
 **17 + 9 + 17 + 13 + 21 + 18 + 14 + 12 + 17 + 5 + 6 + 5 + 8 + 9 = 171**.
+
+## Tactile — 1.16.19
+
+```sh
+PW_URL=http://127.0.0.1:3000/ node tests/browser/MobileTouch.mjs
+```
+
+`MobileTouch.mjs` valide **14 scénarios** sur un iPhone 13 émulé (390 × 664, `pointer: coarse`,
+ratio 3). Chaque geste est un vrai envoi tactile CDP (appui maintenu, balayage), jamais
+`element.click()`. Il vérifie que le tableau de bord ne déborde pas horizontalement ; que le tiroir de
+filtres replie la recherche **sans jamais trancher un onglet** et que son bouton le déplie ; qu'un
+panneau plein écran défile sous le doigt **sans déplacer la page derrière** (verrou de défilement
+compris, relâché à la fermeture) ; que la fiche Pokémon tient dans l'écran ; que les cinq panneaux
+gardent leur contenu dans la largeur et atteignent leur dernière ligne ; qu'un **appui court** sur une
+ligne du sac lance bien l'action de l'objet alors qu'un **appui maintenu** ouvre sa fiche (et non les
+deux) ; qu'un appui maintenu sur une entrée du PC ouvre la fiche du Pokémon ; qu'un appui maintenu sur
+une carte de sauvegarde ouvre son menu **et que le menu survit au relâchement** ; que les contrôles
+visibles font au moins 34 px ; que la surface d'appui maintenu n'est pas sélectionnable ; et qu'en
+paysage un panneau tient toujours dans l'écran. Artifacts par défaut : `artifacts/browser-mobile`.
+
+Les quinze suites de production s'exécutent séquentiellement :
+**17 + 9 + 17 + 13 + 21 + 18 + 14 + 12 + 17 + 5 + 6 + 5 + 8 + 9 + 14 = 185**.

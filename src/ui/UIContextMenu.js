@@ -74,9 +74,12 @@ export class UIContextMenu extends UIElement {
     const maxY = window.innerHeight - rect.height - EDGE_MARGIN;
     this.setPosition(Math.max(EDGE_MARGIN, Math.min(x, maxX)), Math.max(EDGE_MARGIN, Math.min(y, maxY)));
 
-    // Defer so the click that opened the menu does not close it immediately.
+    // Deliberately NOT a `click` listener: on a touch screen the tap that ends a long press still
+    // fires a synthetic click after the menu is open, and that click is outside the menu, so the
+    // menu closed in the same gesture that opened it (the reported "long-press menu does nothing").
+    // `pointerdown` is race free: the press that opened the menu is already over when it is bound.
     setTimeout(() => {
-      document.addEventListener('click', this._onOutsideClick);
+      document.addEventListener('pointerdown', this._onOutsideClick);
       document.addEventListener('contextmenu', this._onOutsideClick);
       document.addEventListener('keydown', this._onKeyDown);
     }, 0);
@@ -86,7 +89,7 @@ export class UIContextMenu extends UIElement {
   close() {
     this.removeClass('open');
     this.setVisible(false);
-    document.removeEventListener('click', this._onOutsideClick);
+    document.removeEventListener('pointerdown', this._onOutsideClick);
     document.removeEventListener('contextmenu', this._onOutsideClick);
     document.removeEventListener('keydown', this._onKeyDown);
   }

@@ -7,6 +7,7 @@
 import { BaseObject } from '../core/BaseObject.js';
 import { EventBus } from '../core/EventBus.js';
 import { LocalizedTextBinder } from './LocalizedTextBinder.js';
+import { attachLongPress } from './LongPress.js';
 import { t } from '../localization/LocalizationManager.js';
 
 /**
@@ -54,6 +55,8 @@ export class UIElement extends BaseObject {
 
     /** @private @type {Array<{ event: string, handler: Function }>} */
     this._registeredDomListeners = [];
+    /** @type {Array<() => void>} Long-press detachers, released on destroy() */
+    this._longPressCleanups = [];
 
     /** @private @type {Function[]} EventBus unsubscribe handles released on destroy */
     this._busSubscriptions = [];
@@ -331,6 +334,16 @@ export class UIElement extends BaseObject {
   }
 
   /**
+   * Binds the shared long-press gesture (see ui/LongPress.js) to this element, released on destroy().
+   * Use it next to a `contextmenu` listener so a finger gets the same secondary action as a right click.
+   * @param {(event: PointerEvent) => void} handler
+   * @param {{delay?: number, tolerance?: number}} [options]
+   */
+  addLongPress(handler, options = undefined) {
+    this._longPressCleanups.push(attachLongPress(this._dom, handler.bind(this), options || {}));
+  }
+
+  /**
    * Registers a DOM event listener with automatic cleanup on destroy()
    * @param {string} event
    * @param {Function} handler
@@ -402,6 +415,9 @@ export class UIElement extends BaseObject {
       this._dom.removeEventListener(entry.event,entry.handler,entry.options);
     }
     this._registeredDomListeners = [];
+
+    for (const detach of this._longPressCleanups) detach();
+    this._longPressCleanups = [];
 
     for (const unsubscribe of this._busSubscriptions) {
       unsubscribe();

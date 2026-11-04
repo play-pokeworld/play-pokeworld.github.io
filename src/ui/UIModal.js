@@ -14,6 +14,7 @@ import { ModalCloseRequestedEvent } from '../core/events/ModalCloseRequestedEven
 import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
 import { t } from '../localization/LocalizationManager.js';
 import { ModalFocusScope } from './ModalFocusScope.js';
+import { lockPageScroll, unlockPageScroll } from './ScrollLock.js';
 
 export class UIModal extends UIPanel {
   /**
@@ -135,6 +136,7 @@ export class UIModal extends UIPanel {
   open(params = {}) {
     if (this._isOpen) return;
     this._isOpen = true;
+    lockPageScroll();
     this._overlayDom.classList.remove('is-hidden');
     this._overlayDom.classList.add('is-open', 'open');
     this.show();
@@ -151,6 +153,7 @@ export class UIModal extends UIPanel {
   close() {
     if (!this._isOpen) return;
     this._isOpen = false;
+    unlockPageScroll();
     this._overlayDom.classList.remove('is-open', 'open');
     this._overlayDom.classList.add('is-hidden');
     this.hide();
@@ -167,6 +170,8 @@ export class UIModal extends UIPanel {
    * @override
    */
   onDestroy() {
+    // A modal destroyed while open must not leave the page frozen.
+    if (this._isOpen) this.close();
     if (this._focusScope) {
       ModalFocusScope.release(this._focusScope);
       this._focusScope = null;

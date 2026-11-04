@@ -52,27 +52,9 @@ export class BattleCombatantCard extends PokemonCardView {
       this._openInfo();
     });
 
-    let touchTimer = null;
-    let touchMoved = false;
-    this.addDomListener('touchstart', (event) => {
-      touchMoved = false;
-      if (touchTimer) clearTimeout(touchTimer);
-      touchTimer = setTimeout(() => {
-        touchTimer = null;
-        if (!touchMoved) {
-          this._openInfo();
-        }
-      }, 500);
-    });
-    this.addDomListener('touchmove', () => {
-      touchMoved = true;
-      if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
-    });
-    this.addDomListener('touchend', () => {
-      if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
-    });
-    this.addDomListener('touchcancel', () => {
-      if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
+    this.addLongPress((event) => {
+      if (event.target?.closest?.('button, a, input, select')) return;
+      this._openInfo();
     });
   }
 

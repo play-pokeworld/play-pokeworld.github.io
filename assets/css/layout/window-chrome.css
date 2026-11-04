@@ -918,3 +918,15 @@ body.mobile-mode .pw-win-hdr-tools {
   flex: none !important;
   box-sizing: border-box !important;
 }
+
+/* Touch screens: the 26px header tool buttons (help "?", map legend) were the smallest targets of
+   the whole dashboard, right next to a window title. A finger needs ~34px; the icon keeps its size. */
+@media (max-width: 850px), (pointer: coarse) {
+  .pw-win-help-btn,
+  .pw-win-tool-btn {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+  }
+}

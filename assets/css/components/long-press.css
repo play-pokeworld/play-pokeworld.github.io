@@ -1,0 +1,19 @@
+/*
+ * components/long-press.css
+ * ---------------------------------------------------------------------------
+ * One file, one object: the "press and hold" gesture (src/ui/LongPress.js).
+ *
+ * A long press must not be stolen by the browser. On a phone, holding a finger on a row selects its
+ * text and opens the native callout (or the iOS magnifier) instead of letting the game run its
+ * secondary action, so the element is told not to be selectable and not to show a callout. The rules
+ * are restricted to touch screens: on a desktop a mouse never triggers the gesture, and text stays
+ * selectable there.
+ */
+
+@media (max-width: 850px), (pointer: coarse) {
+  .pw-long-press {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}

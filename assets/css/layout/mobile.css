@@ -23,6 +23,7 @@
   background: linear-gradient(180deg, rgba(38,37,33,0.98), rgba(31,30,27,0.98));
   border-bottom: 1px solid rgba(236,222,183,0.14);
   padding: 8px;
+  padding-top: max(8px, env(safe-area-inset-top, 0px));
   gap: 6px;
   justify-content: space-around;
 }
@@ -80,13 +81,6 @@
   -webkit-touch-callout: none !important;
   -webkit-user-select: none !important;
   user-select: none !important;
-}
-
-.box-filter-panel.mobile-drawer-open, .inv-toolbar.mobile-drawer-open {
-  max-height: 600px !important;
-  overflow: visible !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
-  z-index: 25 !important;
 }
 
 }

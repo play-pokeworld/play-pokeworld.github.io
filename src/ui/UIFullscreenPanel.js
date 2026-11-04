@@ -20,6 +20,7 @@ import { ModalCloseRequestedEvent } from '../core/events/ModalCloseRequestedEven
 import { ModalOpenRequestedEvent } from '../core/events/ModalOpenRequestedEvent.js';
 import { t } from '../localization/LocalizationManager.js';
 import { ModalFocusScope } from './ModalFocusScope.js';
+import { lockPageScroll, unlockPageScroll } from './ScrollLock.js';
 
 export class UIFullscreenPanel extends UIElement {
   /** @private @type {UIFullscreenPanel|null} Panel currently open */
@@ -127,6 +128,7 @@ export class UIFullscreenPanel extends UIElement {
     this.show();
     this.onOpen(params);
     if (!wasOpen) {
+      lockPageScroll();
       this._focusScope = ModalFocusScope.activate({
         host: this._dom,
         container: this._container,
@@ -147,6 +149,7 @@ export class UIFullscreenPanel extends UIElement {
       ModalFocusScope.release(this._focusScope);
       this._focusScope = null;
     }
+    unlockPageScroll();
     EventBus.getInstance().dispatch(new ModalToggledEvent(this.getName(), false));
   }
 

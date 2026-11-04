@@ -85,6 +85,10 @@ export class TeamPresetMemberCard extends PokemonCardView {
       event.stopPropagation();
       this._openInfo();
     });
+    this.addLongPress((event) => {
+      if (event.target?.closest?.('button, input, select')) return;
+      this._openInfo();
+    });
   }
   /** @returns {UIButton} */
   getDragHandle() {

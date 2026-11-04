@@ -85,3 +85,23 @@
 #main-dashboard #win-training #training-window-body {
   overflow: visible !important;
 }
+
+/* While a modal or a full-screen panel is open (src/ui/ScrollLock.js), the game page behind it must
+   not scroll: a swipe outside the panel used to drag the dashboard away under the overlay. */
+body.pw-scroll-locked {
+  overflow: hidden !important;
+}
+
+body.pw-scroll-locked .pw-page {
+  overflow: hidden !important;
+}
+
+/* Notched phones: the game shell never puts a control in the notch (landscape) or under the home
+   bar (portrait). The insets are 0 everywhere else, so this changes nothing on a plain screen. */
+@media (max-width: 850px), (pointer: coarse) {
+  .pw-page {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}

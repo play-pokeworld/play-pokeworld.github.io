@@ -68,28 +68,7 @@ export class BagItemRow extends UIContainer {
         options.onContext(entry.itemId);
       });
 
-      let touchTimer = null;
-      let touchMoved = false;
-      this.addDomListener('touchstart', (event) => {
-        touchMoved = false;
-        if (touchTimer) clearTimeout(touchTimer);
-        touchTimer = setTimeout(() => {
-          touchTimer = null;
-          if (!touchMoved) {
-            options.onContext(entry.itemId);
-          }
-        }, 500);
-      });
-      this.addDomListener('touchmove', () => {
-        touchMoved = true;
-        if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
-      });
-      this.addDomListener('touchend', () => {
-        if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
-      });
-      this.addDomListener('touchcancel', () => {
-        if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
-      });
+      this.addLongPress(() => options.onContext(entry.itemId));
     }
   }
 }

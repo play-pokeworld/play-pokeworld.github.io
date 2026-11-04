@@ -1385,8 +1385,12 @@ button.pw-static-045[data-action] {
 #unified-selector-modal .pw-static-053 {
   width: calc(100vw - 12px);
   max-width: calc(100vw - 12px);
+  /* `vh` is the *largest* viewport on a phone: with the URL bar shown the bottom of the panel sat
+     under it and the last rows were unreachable. `dvh` follows the visible height instead. */
   height: calc(100vh - 12px);
   max-height: calc(100vh - 12px);
+  height: calc(100dvh - 12px);
+  max-height: calc(100dvh - 12px);
 }
 
 }

@@ -1,19 +1,22 @@
-# Livraison — PokéWorld Rework v1.16.18
+# Livraison — PokéWorld Rework v1.16.19
 
 **Date :** 3 novembre 2026
 **Branche :** `Rework`
-**Contenu de cette livraison :** le jeu complet, avec **les colonnes de la fenêtre Poké Balls alignées**
+**Contenu de cette livraison :** le jeu complet, avec **le jeu jouable au doigt** : panneaux qui
+défilent sans bug, menus d'appui long qui s'ouvrent vraiment, contrôles à taille de doigt,
+**les colonnes de la fenêtre Poké Balls alignées**
 (sprites, nombres et titres « Ball » / « Qté » centrés au-dessus de leur colonne), **la fenêtre Lieu
 remise d'aplomb** (titre fixe « Lieu », plus de bandeau redondant), **le tutoriel réaligné et réécrit**
 (objectifs mesurables, chemin en deux lignes) et surtout **un tutoriel qui montre au lieu de jouer** : le bouton de l'étape
 affiche la cible (lieu sur la carte, bouton, fenêtre, cellule de ball) sans téléporter ni ouvrir de
-fenêtre à la place du joueur. Le CSS de la 1.16.14 reste inchangé : 82 feuilles, un fichier par objet,
-rendu vérifié identique à la 1.16.13 (43 écrans, 187 559 éléments). Les apports des versions
+fenêtre à la place du joueur. Le CSS de la 1.16.14 reste inchangé comme organisation — 84 feuilles,
+un fichier par objet — et son rendu identique à la 1.16.13 (43 écrans, 187 559 éléments). Les apports des versions
 précédentes sont inchangés : évolutions sur le modèle de la référence (Pokémon conservé, espèce
 évoluée au niveau 1, 148 évolutions par niveau et 25 par objet vérifiées une à une), P1 d'ergonomie
 traités, paliers d'affichage et de qualité de code des 1.16.11 et 1.16.12.
 
-Détail de cette phase : `docs/PHASE_v1.16.18.md` (colonnes Poké Balls), `docs/PHASE_v1.16.17.md`
+Détail de cette phase : `docs/PHASE_v1.16.19.md` (mobile / tactile), `docs/PHASE_v1.16.18.md`
+(colonnes Poké Balls), `docs/PHASE_v1.16.17.md`
 (sprite de ball) et `docs/PHASE_v1.16.16.md` (fenêtre Lieu, alignement, tutoriel). Phases antérieures :
 `docs/PHASE_v1.16.15.md` (tutoriel : bonne cible et bonnes formulations) et `docs/PHASE_v1.16.14.md`
 (CSS).
@@ -31,6 +34,25 @@ Trois possibilités, de la plus simple à la plus manuelle :
    bloquent des scripts en `file://` ; les sauvegardes et le chargement des sprites peuvent être limités.
 
 ---
+
+---
+
+## Correctif 1.16.19 — le jeu au doigt
+
+- **Menus d'appui long** : la carte de sauvegarde ne répondait qu'au clic droit, qu'aucun mobile
+  n'envoie sur un élément — son menu (renommer / dupliquer / exporter / supprimer) était donc
+  inaccessible ; il s'ouvre maintenant à l'appui maintenu. Et quand un menu s'ouvrait, le `clic` du
+  relâchement le refermait dans le même geste : il survit désormais au relâchement.
+- **Un seul geste pour tout le jeu** : six composants recopiaient la même minuterie tactile (tolérance
+  nulle au tremblement, clic non neutralisé, texte sélectionnable). Ils partagent maintenant
+  `src/ui/LongPress.js` : tolérance de 12 px, balayage jamais pris pour un appui, action secondaire
+  sans déclencher l'action principale.
+- **Panneaux** : les rangées d'onglets du sac, de la boîte PC et du dictionnaire n'étaient plus
+  tranchées en deux ; les panneaux sont dimensionnés sur la hauteur réellement visible (`dvh`) et non
+  sous la barre d'URL ; un balayage en fin de liste ne fait plus défiler la page derrière.
+- **Contrôles** : boutons d'en-tête 26 → 34 px, sélecteurs 28 → 36 px (texte 16 px, ce qui empêche iOS
+  de zoomer au focus), curseurs et champs à taille de doigt.
+- Mesures, tests et limites : `docs/PHASE_v1.16.19.md`. `npm test` passe à **876 tests**.
 
 ---
 
@@ -458,8 +480,9 @@ Détail : `docs/PHASE_v1.16.2.md`.
 
 | Suite | Résultat |
 |---|---|
-| `npm test` (860 tests unitaires/intégration) | ✅ 860 réussis, 0 échec |
+| `npm test` (876 tests unitaires/intégration) | ✅ 876 réussis, 0 échec |
 | `test/browser/Release11612.mjs` (1.16.12, relu en 1.16.15 à 1.16.18) | ✅ 10/10 (colonnes Poké Balls alignées, halo sur la ball « Nouveau », carte d'équipe, donjon clavier) |
+| `test/browser/MobileTouch.mjs` (nouveau, 1.16.19) | ✅ 14/14 (iPhone 13 émulé, gestes tactiles réels : appui long, balayage, panneaux, tailles) |
 | `npm run test:browser:release11611` (1.16.11) | ✅ 9/9 (arborescence, vocabulaire, thèmes, mobile) |
 | `npm run audit:contrast` (1.16.10, relu sur le nouveau bundle) | ✅ 147 paires, 0 sous AA |
 | `npm run audit:i18n` | ✅ 0 clé manquante |

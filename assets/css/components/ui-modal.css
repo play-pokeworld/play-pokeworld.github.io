@@ -113,10 +113,16 @@
 
 @media (max-width: 850px), (pointer: coarse) {
 #fullscreen-panel-modal .pw-modal-container {
-  width: calc(100vw - 12px);
-  max-width: calc(100vw - 12px);
+  /* Safe-area insets are subtracted, never added as padding: the container keeps its exact size on a
+     screen without a notch, and stops slipping under the notch / home bar on one that has it. */
+  width: calc(100vw - 12px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+  max-width: calc(100vw - 12px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+  /* `vh` is the *largest* viewport on a phone: with the URL bar shown the bottom of the panel sat
+     under it and the last rows were unreachable. `dvh` follows the visible height instead. */
   height: calc(100vh - 12px);
   max-height: calc(100vh - 12px);
+  height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  max-height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
 }
 
 .pw-modal-inner {
@@ -198,10 +204,16 @@
 
 @media (max-width: 640px), (pointer: coarse) {
 .pw-fullscreen-overlay > .pw-modal-container {
-  width: calc(100vw - 12px);
-  max-width: calc(100vw - 12px);
+  /* Safe-area insets are subtracted, never added as padding: the container keeps its exact size on a
+     screen without a notch, and stops slipping under the notch / home bar on one that has it. */
+  width: calc(100vw - 12px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+  max-width: calc(100vw - 12px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+  /* `vh` is the *largest* viewport on a phone: with the URL bar shown the bottom of the panel sat
+     under it and the last rows were unreachable. `dvh` follows the visible height instead. */
   height: calc(100vh - 12px);
   max-height: calc(100vh - 12px);
+  height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  max-height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
 }
 
 }
@@ -256,10 +268,16 @@
 
 @media (max-width: 640px), (pointer: coarse) {
 .pw-pokedex-panel > .pw-modal-container {
-  width: calc(100vw - 12px);
-  max-width: calc(100vw - 12px);
+  /* Safe-area insets are subtracted, never added as padding: the container keeps its exact size on a
+     screen without a notch, and stops slipping under the notch / home bar on one that has it. */
+  width: calc(100vw - 12px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+  max-width: calc(100vw - 12px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+  /* `vh` is the *largest* viewport on a phone: with the URL bar shown the bottom of the panel sat
+     under it and the last rows were unreachable. `dvh` follows the visible height instead. */
   height: calc(100vh - 12px);
   max-height: calc(100vh - 12px);
+  height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  max-height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
   border-radius: var(--pw-radius-lg);
 }
 
@@ -290,10 +308,16 @@
 
 @media (max-width: 640px), (pointer: coarse) {
 .pw-guide-panel > .pw-modal-container {
-  width: calc(100vw - 12px);
-  max-width: calc(100vw - 12px);
+  /* Safe-area insets are subtracted, never added as padding: the container keeps its exact size on a
+     screen without a notch, and stops slipping under the notch / home bar on one that has it. */
+  width: calc(100vw - 12px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+  max-width: calc(100vw - 12px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+  /* `vh` is the *largest* viewport on a phone: with the URL bar shown the bottom of the panel sat
+     under it and the last rows were unreachable. `dvh` follows the visible height instead. */
   height: calc(100vh - 12px);
   max-height: calc(100vh - 12px);
+  height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  max-height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
   border-radius: var(--pw-radius-lg);
 }
 
@@ -309,4 +333,17 @@
   padding: 8px 16px 0;
   width: 100%;
   box-sizing: border-box;
+}
+
+/* Touch screens (v1.16.19) — the panel body is the only scroller of a full-screen panel.
+   Without `overscroll-behavior: contain` the swipe that reaches the end of the list chained to the
+   page behind the overlay; the player closed the panel on a dashboard that had jumped elsewhere.
+   Safe-area insets keep the panel clear of the notch in landscape and of the home bar in portrait. */
+@media (max-width: 850px), (pointer: coarse) {
+  .pw-modal-body,
+  .pw-fullscreen-overlay .pw-modal-body {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
 }

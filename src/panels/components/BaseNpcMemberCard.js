@@ -84,11 +84,15 @@ export class BaseNpcMemberCard extends PokemonCardView {
       this._onPick?.(this._index);
     });
 
-    // 4. Right-click contextmenu opens Pokémon info modal
+    // 4. Right click, or press and hold on a touch screen, opens the Pokémon info modal
     this.addDomListener('contextmenu', (event) => {
       if (event.target?.closest?.('button, a, input, select')) return;
       event.preventDefault();
       event.stopPropagation();
+      this._openInfo();
+    });
+    this.addLongPress((event) => {
+      if (event.target?.closest?.('button, a, input, select')) return;
       this._openInfo();
     });
   }

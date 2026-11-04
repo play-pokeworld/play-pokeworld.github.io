@@ -209,6 +209,18 @@ export class SaveCard extends UIElement {
       e.preventDefault();
       if (this._onContextMenu) this._onContextMenu(this._save, e);
     });
+
+    // A touch screen has no right button: press and hold opens the same save-card menu.
+    // Without this the menu was unreachable on a phone (the card only answered `contextmenu`,
+    // which mobile browsers do not fire on a plain element).
+    if (this._onContextMenu) {
+      this.addLongPress((event) => {
+        const rect = this._dom.getBoundingClientRect();
+        const x = Number.isFinite(event.clientX) && event.clientX > 0 ? event.clientX : rect.left + rect.width / 2;
+        const y = Number.isFinite(event.clientY) && event.clientY > 0 ? event.clientY : rect.top + rect.height / 2;
+        this._onContextMenu(this._save, { clientX: x, clientY: y, preventDefault() {} });
+      });
+    }
   }
 
   /**

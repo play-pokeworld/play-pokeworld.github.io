@@ -420,3 +420,20 @@
   cursor: not-allowed !important;
   pointer-events: none !important;
 }
+
+/* Touch screens: the native select was 28px high with a 12px label, which iOS zooms into as soon as
+   it is focused and which is a narrow target for a thumb. 16px is the size below which iOS zooms. */
+@media (max-width: 850px), (pointer: coarse) {
+  .pw-dropdown-select {
+    height: 36px !important;
+    min-height: 36px !important;
+    font-size: 16px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .pw-dropdown-select:not(.pw-dropdown-select--native) {
+    height: 36px !important;
+    font-size: 16px !important;
+  }
+}

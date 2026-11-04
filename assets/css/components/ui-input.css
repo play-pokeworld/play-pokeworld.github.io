@@ -406,3 +406,52 @@ button.pw-switch {
   min-height: 34px;
   padding: 5px 12px;
 }
+
+/* Mobile filter drawer — the one place where the collapsed state of a filter toolbar is described.
+   The three toolbars (bag, PC box, dictionary) used to clamp themselves to `max-height: 52px` with
+   `overflow: hidden`, which sliced the second row of chips in half: the panel's only visible
+   defect was a cut tab row. The chips ARE the navigation of the panel, so they stay whole; only the
+   labelled selects and the search field fold away behind the toolbar's own toggle. */
+@media (max-width: 850px), (pointer: coarse) {
+  .pw-filterbar .pw-filter-fields,
+  .pw-filterbar .pw-filter-end {
+    display: none;
+  }
+
+  .pw-filterbar.mobile-drawer-open .pw-filter-fields,
+  .pw-filterbar.mobile-drawer-open .pw-filter-end {
+    display: flex;
+    width: 100%;
+  }
+}
+
+/* Touch screens: a 12px select auto-zooms the whole page when iOS focuses it, and a 22px slider is
+   hard to grab. Text fields and selects get the 16px that keeps iOS from zooming, and every control
+   gets a finger-sized height. Desktop keeps its dense look: the rules only exist for coarse pointers
+   and narrow screens. */
+@media (max-width: 850px), (pointer: coarse) {
+  :where(.pw-input),
+  .pw-filter-input {
+    font-size: 16px;
+    min-height: 40px;
+  }
+
+  .pw-range {
+    height: 34px;
+  }
+
+  .pw-range::-webkit-slider-thumb {
+    width: 22px;
+    height: 22px;
+    margin-top: -8px;
+  }
+
+  .pw-range::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+  }
+
+  .pw-switch {
+    min-height: 34px;
+  }
+}

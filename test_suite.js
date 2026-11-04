@@ -79,6 +79,8 @@ await import('./tests/Release11610.test.js');
 await import('./tests/Release11613.test.js');
 await import('./tests/CssStructure.test.js');
 await import('./tests/StyleVocabulary.test.js');
+await import('./tests/LongPress.test.js');
+await import('./tests/MobileTouchCss.test.js');
 
 const { failed } = await runAll();
 process.exit(failed ? 1 : 0);

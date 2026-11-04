@@ -2,7 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- viewport-fit=cover is what makes env(safe-area-inset-*) report real values on notched phones; without it the layout thinks the screen is a plain rectangle and content slips under the notch / home bar. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>PokéWorld</title>
   <link rel="icon" type="image/png" href="assets/images/Icon.png">
   <link rel="stylesheet" href="assets/css/style.css">

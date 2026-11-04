@@ -300,9 +300,6 @@
   background: var(--dark2) !important;
   border-radius: 12px !important;
   border: 1px solid var(--dark3) !important;
-  max-height: 52px;
-  overflow: hidden;
-  transition: max-height 0.35s ease, box-shadow 0.35s ease;
   position: relative;
 }
 
