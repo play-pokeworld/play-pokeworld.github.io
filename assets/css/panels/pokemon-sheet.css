@@ -515,9 +515,23 @@
   margin-bottom:6px;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 760px), (pointer: coarse) {
 .poke-detail-shell, .poke-detail-section-grid {
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+}
+
+.poke-detail-section-grid > *,
+.poke-detail-shell > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.poke-detail-panel,
+.poke-detail-panel-wide {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .poke-detail-move-meta, .poke-detail-pill {

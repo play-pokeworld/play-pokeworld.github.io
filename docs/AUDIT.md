@@ -338,3 +338,11 @@ Légende : ✅ corrigé · ⚠️ reste à faire (priorité **P1** haute → **P
 - La passe a maintenu les responsabilités déjà en place (`UIModal` / `UIFullscreenPanel` / `ScrollLock`) et n'a ajouté aucun gestionnaire d'interaction parallèle.
 - Vérifications : `npm test` **879/879**; nouveau `ReportedMobileWindows.mjs` **20/20** (5 tailles × 4 interfaces); `MobileTouch.mjs` **14/14** à 390 × 664; `PanelFit.mjs` **7/7**; i18n **0 clé manquante**; contraste **147/147 paires AA**.
 - Limites : pas de parcours exhaustif du jeu ou de test appareil réel/Safari/Firefox. `MarketAndResponsiveTraining.mjs` échoue après 19 scénarios sur quantité attendue 12 / observée 10; `InteractionCorrections.mjs` échoue après cinq scénarios sur l'absence du sélecteur de fermeture attendu. Ces résultats restent non validés, pas des succès. Détail : `PHASE_v1.16.20.md`.
+
+
+## 15. Reflow interne mobile — v1.16.21 (05/11/2026)
+
+- Après retour utilisateur, l'audit a ajouté les métriques de largeur scrollable et de gestuelle tactile. Défauts trouvés : rangées d'actions Settings à largeur min-content; grilles de talents et tables de capacités Pokédex avec planchers/minimums desktop.
+- Les rangées Settings s'enroulent; grilles Pokédex utilisent des pistes réductibles; colonnes des capacités se contractent, les mots s'enroulent; CT/entraînement n'imposent plus 220px.
+- Vérifications : `npm test` **880/880**; `ReportedMobileWindows.mjs` **20/20**, incluant geste tactile CDP sur chaque scroll qui déborde, vérification du scrollWidth intérieur et atteinte de la fin; `MobileTouch` **14/14**; `PanelFit` **7/7**. Viewports 320×568, 390×844, 844×390, 768×1024 et 1024×768.
+- Cette passe n'affirme pas que toutes les autres interfaces du jeu sont certifiées; pas de device réel/Safari/WebKit/Firefox. Détail : `PHASE_v1.16.21.md`.

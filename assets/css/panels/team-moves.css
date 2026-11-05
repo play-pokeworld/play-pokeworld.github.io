@@ -413,6 +413,26 @@
   padding: 4px 12px;
 }
 
+@media (max-width: 480px), (pointer: coarse) {
+  .pw-dex-move-row {
+    min-width: 0;
+    grid-template-columns: 40px minmax(0, 1fr) 48px 30px 30px;
+    gap: 4px;
+    padding: 4px;
+  }
+
+  .pw-dex-move-row > * {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .pw-dex-move-row .pw-mcol-name {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+
 .pw-training-live-fighters .poke-moves {
   grid-template-columns: 1fr;
 }

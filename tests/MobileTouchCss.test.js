@@ -122,6 +122,23 @@ describe('Touch-screen stylesheet (1.16.20)', (test) => {
       && /min\(320px, 100%\)/.test(rule.body)), 'achievement cards cannot impose a desktop minimum width');
   });
 
+  test('compact settings and Pokédex data grids can shrink without clipping', () => {
+    const settings = rules('panels/settings.css');
+    assert.ok(settings.some((rule) => rule.selector.includes('.pw-settings-row') && /flex-wrap:\s*wrap/.test(rule.body)),
+      'settings action rows wrap instead of widening the modal');
+    assert.ok(settings.some((rule) => rule.selector.includes('.pw-settings-code-row') && /flex-wrap:\s*wrap/.test(rule.body)),
+      'the debug code row can fit a narrow screen');
+    const pokemon = rules('panels/pokemon-sheet.css');
+    assert.ok(pokemon.some((rule) => rule.selector.includes('.poke-detail-section-grid')
+      && /minmax\(0, 1fr\)/.test(rule.body)), 'the Pokédex details use a zero-minimum track on narrow screens');
+    const dex = rules('panels/pokedex.css');
+    assert.ok(dex.some((rule) => rule.selector === '.pw-pokedex-talents-list'
+      && /min\(280px, 100%\)/.test(rule.body)), 'talent cards never enforce a wider-than-panel minimum');
+    const moves = rules('panels/team-moves.css');
+    assert.ok(moves.some((rule) => rule.selector === '.pw-dex-move-row'
+      && /minmax\(0, 1fr\)/.test(rule.body)), 'the move table reflows into the mobile viewport');
+  });
+
   test('the page is frozen while a layer covers it', () => {
     const lock = rules('layout/page-shell.css').filter((rule) => rule.selector.includes('pw-scroll-locked'));
     assert.ok(lock.length > 0, 'the scroll lock has its rule');

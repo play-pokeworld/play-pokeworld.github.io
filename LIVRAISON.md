@@ -1,6 +1,6 @@
-# Livraison — PokéWorld Rework v1.16.20
+# Livraison — PokéWorld Rework v1.16.21
 
-**Date :** 4 novembre 2026
+**Date :** 5 novembre 2026
 **Branche :** `Rework`
 **Contenu de cette livraison :** correctif des limites de hauteur des fenêtres modales tactiles : elles suivent désormais la zone visible du viewport (`dvh`) et leur corps peut rétrécir proprement pour garder le scroll accessible. La phase précédente conserve ses apports : panneaux qui défilent, menus d'appui long et contrôles à taille de doigt,
 **les colonnes de la fenêtre Poké Balls alignées**
@@ -14,11 +14,21 @@ précédentes sont inchangés : évolutions sur le modèle de la référence (Po
 évoluée au niveau 1, 148 évolutions par niveau et 25 par objet vérifiées une à une), P1 d'ergonomie
 traités, paliers d'affichage et de qualité de code des 1.16.11 et 1.16.12.
 
-Détail de cette phase : `docs/PHASE_v1.16.20.md` (limites des fenêtres modales au viewport visible), `docs/PHASE_v1.16.19.md` (mobile / tactile), `docs/PHASE_v1.16.18.md`
+Détail de cette phase : `docs/PHASE_v1.16.21.md` (reflow mobile des réglages et du Pokédex), `docs/PHASE_v1.16.20.md` (scroll et fenêtres), `docs/PHASE_v1.16.19.md` (mobile / tactile), `docs/PHASE_v1.16.18.md`
 (colonnes Poké Balls), `docs/PHASE_v1.16.17.md`
 (sprite de ball) et `docs/PHASE_v1.16.16.md` (fenêtre Lieu, alignement, tutoriel). Phases antérieures :
 `docs/PHASE_v1.16.15.md` (tutoriel : bonne cible et bonnes formulations) et `docs/PHASE_v1.16.14.md`
 (CSS).
+
+---
+
+## Correctif 1.16.21 — reflow mobile des contenus internes
+
+- Nouveau contrôle tactile effectif : les suites mesurent les scrollWidth internes et envoient de vrais gestes via CDP, pas uniquement des `scrollTop` programmatiques.
+- Settings : boutons de gestion de sauvegarde et code de diagnostic se replient pour ne plus élargir le contenu.
+- Détail Pokédex : colonnes de grille, cartes de talent, tables de capacités et grilles CT suivent la largeur du panneau sur téléphone.
+- `npm test` : **880 réussis, 0 échec**. `ReportedMobileWindows.mjs` : **20/20** (5 tailles × 4 interfaces, overflow intérieur et gestures); `MobileTouch.mjs` : **14/14**; `PanelFit.mjs` : **7/7**.
+- Aucune validation sur appareil physique ou navigateurs non Chromium; tous les détails sont dans `docs/PHASE_v1.16.21.md`.
 
 ---
 

@@ -795,3 +795,22 @@ body.mobile-mode #header #settings-btn.pw-header-settings {
   min-height: 38px;
   padding: 8px;
 }
+
+@media (max-width: 600px), (pointer: coarse) {
+  .pw-settings-modal-window .pw-settings-row,
+  .pw-settings-modal-window .pw-settings-code-row {
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .pw-settings-modal-window .pw-settings-row > *,
+  .pw-settings-modal-window .pw-settings-code-row > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .pw-settings-modal-window .pw-settings-row > .pw-button {
+    flex: 1 1 82px;
+  }
+}

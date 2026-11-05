@@ -14,7 +14,8 @@ const page = await browser.newPage({ viewport: { width: 390, height: 844 }, devi
 page.setDefaultTimeout(15000);
 const failures = [];
 page.on('pageerror', (error) => failures.push(error.message));
-await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+await page.goto(BASE, { waitUntil: 'networkidle' });
+const touch = await page.context().newCDPSession(page);
 await page.evaluate(async () => {
   const { SaveSystem } = await import('/src/systems/SaveSystem.js');
   const { Engine } = await import('/src/core/Engine.js');
@@ -68,12 +69,20 @@ for (const [width, height] of sizes) {
         }
       }
       const overflowing = scroll.scrollHeight > scroll.clientHeight + 1;
-      scroll.scrollTop = scroll.scrollHeight;
+      scroll.scrollTop = 0;
+      const sr = scroll.getBoundingClientRect();
       return {
         withinViewport: rect.left >= -1 && rect.top >= -1 && rect.right <= width + 1 && rect.bottom <= height + 1,
         noHorizontalScroll: document.documentElement.scrollWidth <= width + 1,
         overflowing,
-        reachesEnd: !overflowing || scroll.scrollTop >= scroll.scrollHeight - scroll.clientHeight - 1,
+        contentWidth: scroll.scrollWidth,
+        viewportWidth: scroll.clientWidth,
+        overflowers: [...scroll.querySelectorAll('*')].map((node) => ({
+          selector: `${node.tagName.toLowerCase()}.${String(node.className).trim().split(/\\s+/).slice(0, 2).join('.')}`,
+          right: Math.round(node.getBoundingClientRect().right),
+          width: Math.round(node.getBoundingClientRect().width)
+        })).filter((node) => node.width > 0 && node.right > sr.right + 2).slice(0, 8),
+        scrollBox: { x: sr.left + sr.width / 2, y: sr.top + sr.height / 2 },
         filterFits,
         chipsWhole,
         box: [Math.round(rect.width), Math.round(rect.height)]
@@ -82,9 +91,28 @@ for (const [width, height] of sizes) {
     assert.ok(!result.missing, `${entry.id} is mounted at ${width}x${height}`);
     assert.ok(result.withinViewport, `${entry.id} frame fits at ${width}x${height}: ${result.box}`);
     assert.ok(result.noHorizontalScroll, `${entry.id} does not cause page overflow at ${width}x${height}`);
-    assert.ok(result.reachesEnd, `${entry.id} reaches the end of its content at ${width}x${height}`);
+    assert.ok(result.contentWidth <= result.viewportWidth + 1, `${entry.id} content fits its scroll viewport at ${width}x${height}: ${result.contentWidth}/${result.viewportWidth}; ${JSON.stringify(result.overflowers)}`);
     assert.ok(result.filterFits && result.chipsWhole, `${entry.id} filter header remains inside its panel at ${width}x${height}`);
-    report.push(`${entry.id}@${width}x${height}`);
+    let touchScrolled = true;
+    if (result.overflowing && result.scrollBox.y > 35 && result.scrollBox.y < height - 35) {
+      const { x, y } = result.scrollBox;
+      await touch.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
+      for (let step = 1; step <= 12; step += 1) {
+        await touch.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y: y - (150 * step) / 12 }] });
+        await page.waitForTimeout(16);
+      }
+      await touch.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      await page.waitForTimeout(120);
+      touchScrolled = await page.evaluate((selector) => document.querySelector(selector)?.scrollTop > 0, entry.scroller);
+      assert.ok(touchScrolled, `${entry.id} scrolls under a real emulated finger gesture at ${width}x${height}`);
+      const reachesEnd = await page.evaluate((selector) => {
+        const scroll = document.querySelector(selector);
+        scroll.scrollTop = scroll.scrollHeight;
+        return scroll.scrollTop >= scroll.scrollHeight - scroll.clientHeight - 1;
+      }, entry.scroller);
+      assert.ok(reachesEnd, `${entry.id} can reach its final content at ${width}x${height}`);
+    }
+    report.push(`${entry.id}@${width}x${height}${result.overflowing ? ' touch-scroll' : ''}`);
     await page.evaluate(async (id) => {
       const { EventBus } = await import('/src/core/EventBus.js');
       const { ModalCloseRequestedEvent } = await import('/src/core/events/ModalCloseRequestedEvent.js');
