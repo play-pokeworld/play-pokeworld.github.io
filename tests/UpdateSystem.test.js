@@ -1,6 +1,5 @@
 import { describe, assert } from './TestRunner.js';
 import { UpdateSystem, isNewerVersion } from '../src/systems/UpdateSystem.js';
-import { DeploymentConfig } from '../src/config/DeploymentConfig.js';
 import { EventBus } from '../src/core/EventBus.js';
 import { UpdateAvailableEvent } from '../src/core/events/UpdateAvailableEvent.js';
 import { UpdateBannerDismissedEvent } from '../src/core/events/UpdateBannerDismissedEvent.js';
@@ -32,13 +31,13 @@ describe('Update notifications', (test) => {
     const onUpdate = (event) => events.push(event);
     const bus = EventBus.getInstance();
     bus.subscribe(UpdateAvailableEvent, onUpdate);
-    globalThis.fetch = async () => ({ ok: true, text: async () => "export const GameConfig = { VERSION: '1.16.27' };" });
+    globalThis.fetch = async () => ({ ok: true, text: async () => "export const GameConfig = { VERSION: '1.16.30' };" });
     const system = new UpdateSystem();
     try {
       await system.checkForUpdate();
       await system.checkForUpdate();
       assert.equal(events.length, 1);
-      assert.equal(events[0].version, '1.16.27');
+      assert.equal(events[0].version, '1.16.30');
     } finally {
       system.onDestroy();
       bus.unsubscribe(UpdateAvailableEvent, onUpdate);
@@ -46,24 +45,27 @@ describe('Update notifications', (test) => {
     }
   });
 
-  test('detects a deployment fingerprint change even when the semantic version is unchanged', async () => {
+  test('detects a newly deployed Pages commit regardless of its branch name', async () => {
     const originalFetch = globalThis.fetch;
     const events = [];
+    let deploymentId = 'commit-before';
     const onUpdate = (event) => events.push(event);
     const bus = EventBus.getInstance();
     bus.subscribe(UpdateAvailableEvent, onUpdate);
     globalThis.fetch = async (url) => ({
       ok: true,
-      text: async () => String(url).includes('DeploymentConfig.js')
-        ? "export const DeploymentConfig = { DEPLOYMENT_ID: 'new-commit-sha' };"
-        : "export const GameConfig = { VERSION: '1.16.25' };"
+      text: async () => String(url).includes('deployment-id.js')
+        ? `export const DeploymentInfo = { DEPLOYMENT_ID: '${deploymentId}' };`
+        : "export const GameConfig = { VERSION: '1.16.28' };"
     });
     const system = new UpdateSystem();
     try {
       await system.checkForUpdate();
+      assert.equal(events.length, 0);
+      deploymentId = 'commit-after';
+      await system.checkForUpdate();
       assert.equal(events.length, 1);
-      assert.equal(events[0].version, 'new-commit-sha');
-      assert.ok(DeploymentConfig.DEPLOYMENT_ID !== events[0].version);
+      assert.equal(events[0].version, 'commit-after');
     } finally {
       system.onDestroy();
       bus.unsubscribe(UpdateAvailableEvent, onUpdate);

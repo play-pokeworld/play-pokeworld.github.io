@@ -1,7 +1,6 @@
 /** @file UpdateSystem.js — checks the deployed same-origin version without touching the DOM. */
 import { BaseSystem } from './BaseSystem.js';
 import { GameConfig } from '../config/GameConfig.js';
-import { DeploymentConfig } from '../config/DeploymentConfig.js';
 import { UpdateRules } from '../config/UpdateRules.js';
 import { EventBus } from '../core/EventBus.js';
 import { UpdateAvailableEvent } from '../core/events/UpdateAvailableEvent.js';
@@ -37,6 +36,7 @@ export class UpdateSystem extends BaseSystem {
     this._isChecking = false;
     this._isAvailable = false;
     this._isDismissed = false;
+    this._knownDeploymentId = null;
     this._unsubscribeDismiss = null;
   }
 
@@ -71,8 +71,12 @@ export class UpdateSystem extends BaseSystem {
         const deploymentSource = await deploymentResponse.text();
         const deploymentMatch = deploymentSource.match(/DEPLOYMENT_ID\s*:\s*['"]([^'"]+)['"]/);
         const remoteDeploymentId = deploymentMatch?.[1];
-        if (remoteDeploymentId && remoteDeploymentId !== DeploymentConfig.DEPLOYMENT_ID) {
-          this._publishUpdate(remoteDeploymentId);
+        if (remoteDeploymentId) {
+          if (this._knownDeploymentId === null) {
+            this._knownDeploymentId = remoteDeploymentId;
+          } else if (remoteDeploymentId !== this._knownDeploymentId) {
+            this._publishUpdate(remoteDeploymentId);
+          }
         }
       }
     } catch {
