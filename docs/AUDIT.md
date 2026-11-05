@@ -333,7 +333,8 @@ Légende : ✅ corrigé · ⚠️ reste à faire (priorité **P1** haute → **P
 
 ## 14. Fenêtres modales tactiles — v1.16.20 (04/11/2026)
 
+- Cause racine identifiée : `body.mobile-mode .win-body { overflow: visible; }` écrasait le scroll interne des modales. Les règles ont été scoppées à `#main-dashboard`, conformément au contrat de page-flow du tableau de bord.
+- Corrections mutualisées/propriétaires : cadres modaux touch `dvh`/safe-area et corps scrollable; dialogue PNJ, détail Pokédex et Settings suivent la hauteur visible; barre de filtres Succès peut rétrécir et ses cartes n'imposent plus une colonne de 320 px.
 - La passe a maintenu les responsabilités déjà en place (`UIModal` / `UIFullscreenPanel` / `ScrollLock`) et n'a ajouté aucun gestionnaire d'interaction parallèle.
-- Le gabarit partagé des modales tactiles plafonne désormais sa hauteur avec `100dvh` et safe areas ; le corps `.win-body` est rétrécissable et limite la propagation du scroll. La fiche Pokémon étroite suit aussi `dvh`.
-- Vérifications : `npm test` **877/877**; `MobileTouch.mjs` **14/14** à 390 × 664 en émulation tactile iPhone 13; `PanelFit.mjs` **7/7**; i18n **0 clé manquante**; contraste **147/147 paires AA**.
-- Limites : la suite responsive globale par tailles/orientations et le parcours intégral du gameplay mobile ne sont pas certifiés. Aucun appareil réel / Safari / Firefox. `MarketAndResponsiveTraining.mjs` échoue après 19 scénarios sur quantité attendue 12 / observée 10 (également documenté antérieurement); `InteractionCorrections.mjs` échoue après cinq scénarios sur l'absence du sélecteur de fermeture attendu. Ces résultats restent non validés, pas des succès. Détail : `PHASE_v1.16.20.md`.
+- Vérifications : `npm test` **879/879**; nouveau `ReportedMobileWindows.mjs` **20/20** (5 tailles × 4 interfaces); `MobileTouch.mjs` **14/14** à 390 × 664; `PanelFit.mjs` **7/7**; i18n **0 clé manquante**; contraste **147/147 paires AA**.
+- Limites : pas de parcours exhaustif du jeu ou de test appareil réel/Safari/Firefox. `MarketAndResponsiveTraining.mjs` échoue après 19 scénarios sur quantité attendue 12 / observée 10; `InteractionCorrections.mjs` échoue après cinq scénarios sur l'absence du sélecteur de fermeture attendu. Ces résultats restent non validés, pas des succès. Détail : `PHASE_v1.16.20.md`.

@@ -25,6 +25,7 @@
     "test:browser:debugbox": "node tests/browser/DebugAndBoxItemUse.mjs",
     "test:browser:language": "node tests/browser/LanguageSwitch.mjs",
     "test:browser:fit": "node tests/browser/PanelFit.mjs",
+    "test:browser:reported-mobile": "node tests/browser/ReportedMobileWindows.mjs",
     "test:browser:afk": "node tests/browser/AfkCatchUp.mjs",
     "test:browser:talents": "node tests/browser/TalentPools.mjs",
     "test:browser:training": "node tests/browser/TrainingWaves.mjs",

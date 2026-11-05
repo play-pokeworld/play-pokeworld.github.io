@@ -18,6 +18,14 @@
   box-sizing: border-box;
 }
 
+/* Static modal templates use the visible touch viewport and leave their body as the scroll owner. */
+@media (max-width: 850px), (pointer: coarse) {
+  .pw-static-modal--lg { max-height: min(92dvh, calc(100dvh - 24px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))); }
+  .pw-static-modal--md { max-height: min(85dvh, calc(100dvh - 24px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))); }
+  .pw-static-modal--sm { max-height: min(70dvh, calc(100dvh - 24px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))); }
+  .pw-static-modal > .win-body { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+}
+
 .pw-static-modal--lg {
   width: min(96vw, 1180px) !important;
   max-width: 1180px !important;

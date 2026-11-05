@@ -151,7 +151,7 @@ body.mobile-mode #win-map .win-body {
   overflow: auto;
 }
 
-body.mobile-mode .win-body {
+body.mobile-mode #main-dashboard .win-body {
   padding: 10px;
   overflow: visible;
 }
@@ -260,7 +260,7 @@ body.mobile-mode #main-dashboard {
   height: auto;
 }
 
-body.mobile-mode .win-body {
+body.mobile-mode #main-dashboard .win-body {
   overflow: visible;
   -webkit-overflow-scrolling: touch;
 }

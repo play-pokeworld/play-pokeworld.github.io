@@ -42,6 +42,20 @@
   padding-bottom: 8px;
 }
 
+/* The shared filter toolbar is a flex child of a fixed modal header; it must be allowed to shrink. */
+.pw-ach-filterbar {
+  flex: 1 1 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.pw-ach-filterbar .pw-chip-row {
+  min-width: 0;
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
 .pw-ach-filter-chip {
   flex: 0 0 auto;
   display: inline-flex;
@@ -56,7 +70,7 @@
 
 .pw-ach-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
   gap: 12px;
 }
 

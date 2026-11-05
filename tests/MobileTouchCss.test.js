@@ -94,6 +94,34 @@ describe('Touch-screen stylesheet (1.16.20)', (test) => {
     'the Pokémon information sheet uses the visible viewport on narrow touch screens');
   });
 
+  test('mobile page-flow overflow rules do not disable modal-body scrolling', () => {
+    const mobileRules = rules('core/base.css').filter((rule) => rule.selector.includes('mobile-mode')
+      && rule.selector.includes('.win-body') && /overflow\s*:\s*visible/.test(rule.body));
+    assert.ok(mobileRules.length > 0, 'dashboard bodies retain natural page flow');
+    assert.ok(mobileRules.every((rule) => rule.selector.includes('#main-dashboard')),
+      'the page-flow override is scoped to dashboard panels, not modal content');
+  });
+
+  test('dense mobile windows and filter headers stay inside their shared panel', () => {
+    const staticModal = rules('components/modal-sizes.css');
+    assert.ok(staticModal.some((rule) => rule.selector.includes('pw-static-modal--sm') && /70dvh/.test(rule.body)),
+      'small static dialogs use the visible viewport');
+    const npc = rules('panels/npc.css');
+    assert.ok(npc.some((rule) => rule.selector === '.pw-npc-talk' && /70dvh/.test(rule.body)),
+      'long NPC conversations have a dynamic-height scrolling body');
+    const settings = rules('panels/settings.css');
+    assert.ok(settings.some((rule) => rule.selector.includes('pw-settings-modal-window') && /85dvh/.test(rule.body)),
+      'settings use the visible viewport on narrow touch layouts');
+    const pokedex = rules('components/ui-panel.css');
+    assert.ok(pokedex.some((rule) => rule.selector.includes('pw-pokedex-species-window') && /88dvh/.test(rule.body)),
+      'the species information sheet has a dynamic-height frame');
+    const achievements = rules('panels/achievements.css');
+    assert.ok(achievements.some((rule) => rule.selector === '.pw-ach-filterbar' && /min-width:\s*0/.test(rule.body)),
+      'the achievement filter can shrink inside its modal header');
+    assert.ok(achievements.some((rule) => rule.selector === '.pw-ach-grid'
+      && /min\(320px, 100%\)/.test(rule.body)), 'achievement cards cannot impose a desktop minimum width');
+  });
+
   test('the page is frozen while a layer covers it', () => {
     const lock = rules('layout/page-shell.css').filter((rule) => rule.selector.includes('pw-scroll-locked'));
     assert.ok(lock.length > 0, 'the scroll lock has its rule');

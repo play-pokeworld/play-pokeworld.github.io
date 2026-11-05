@@ -22,12 +22,13 @@ Détail de cette phase : `docs/PHASE_v1.16.20.md` (limites des fenêtres modales
 
 ---
 
-## Correctif 1.16.20 — fenêtres modales alignées sur le viewport visible
+## Correctif 1.16.20 — fenêtres tactiles, scroll et filtres
 
-- Les modales tactiles utilisent `100dvh` avec fallback `100vh` et safe areas ; le corps commun peut rétrécir et confine le scroll imbriqué. La fiche Pokémon sur petit écran suit également la hauteur dynamique.
+- Cause racine des dialogues/modales qui ne défilaient plus sur mobile : `body.mobile-mode .win-body { overflow: visible; }` s'appliquait globalement et neutralisait les corps scrollables. Le comportement de flux naturel est désormais scoppé aux panneaux du tableau de bord.
+- Les fenêtres Settings, dialogue PNJ et détail Pokédex suivent le viewport visible (`dvh`), gardent leur scroll interne et ne dépassent pas l'écran. Les menus de succès peuvent rétrécir et les cartes n'imposent plus une largeur PC.
 - Aucun système parallèle, aucune modification des règles métier ni du schéma de sauvegarde.
-- `npm test` : **877 réussis, 0 échec**. `MobileTouch.mjs` : **14/14** et `PanelFit.mjs` : **7/7** dans Chromium. Audits i18n (0 clé manquante) et contraste (147 paires AA) réussis.
-- Limites : pas de test sur appareil réel, Safari/WebKit ou Firefox. Les scénarios `MarketAndResponsiveTraining` (timeout `networkidle`) et `InteractionCorrections` (attente de fermeture de fiche) n'ont pas abouti ; voir `docs/PHASE_v1.16.20.md`.
+- `npm test` : **879 réussis, 0 échec**. `ReportedMobileWindows.mjs` : **20/20** (5 tailles × 4 fenêtres); `MobileTouch.mjs` : **14/14**; `PanelFit.mjs` : **7/7** dans Chromium. Audits i18n (0 clé manquante) et contraste (147 paires AA) réussis.
+- Limites : pas de test sur appareil réel, Safari/WebKit ou Firefox. `MarketAndResponsiveTraining` échoue après 19 scénarios sur une quantité 10/12; `InteractionCorrections` échoue après cinq scénarios sur son sélecteur de fermeture attendu. Détails et limites : `docs/PHASE_v1.16.20.md`.
 
 ---
 

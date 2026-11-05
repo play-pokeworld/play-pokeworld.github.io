@@ -326,6 +326,14 @@ button[data-action].pw-loc-npc-btn:hover, .pw-loc-action-btn.pw-loc-npc-btn:hove
 
 }
 
+@media (max-width: 850px), (pointer: coarse) {
+  .pw-npc-talk {
+    max-height: calc(70dvh - 68px);
+    min-height: 0;
+    overscroll-behavior: contain;
+  }
+}
+
 .pw-loc-action-btn.pw-loc-npc-btn {
   min-height: 65px;
 }

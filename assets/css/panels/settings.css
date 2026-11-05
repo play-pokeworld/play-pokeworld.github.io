@@ -716,10 +716,14 @@ button.pw-settings-choice.active {
   max-width: calc(100vw - 24px);
   height: min(85vh, 720px);
   max-height: 85vh;
+  height: min(85dvh, 720px);
+  max-height: min(85dvh, calc(100dvh - 24px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)));
 }
 
 .pw-settings-modal-window > .pw-settings-root {
   padding: 14px 14px 18px;
+  min-height: 0;
+  overscroll-behavior: contain;
 }
 
 }
