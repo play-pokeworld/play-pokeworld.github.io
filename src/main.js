@@ -6,6 +6,7 @@
  */
 
 import { Engine } from './core/Engine.js';
+import { PwaInstaller } from './ui/PwaInstaller.js';
 import { SaveLifecycle } from './ui/SaveLifecycle.js';
 import { installTutorialHighlight } from './ui/TutorialHighlight.js';
 import { installDungeonKeyboard } from './ui/DungeonKeyboard.js';
@@ -68,6 +69,7 @@ import { LocalizationManager, t } from './localization/LocalizationManager.js';
 import { GameConfig } from './config/GameConfig.js';
 
 window.addEventListener('DOMContentLoaded', () => {
+  PwaInstaller.register();
   const root = document.getElementById('app-root');
   if (!root) {
     console.error(String(t('debug_root_missing')));

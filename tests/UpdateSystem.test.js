@@ -1,5 +1,6 @@
 import { describe, assert } from './TestRunner.js';
 import { UpdateSystem, isNewerVersion } from '../src/systems/UpdateSystem.js';
+import { DeploymentConfig } from '../src/config/DeploymentConfig.js';
 import { EventBus } from '../src/core/EventBus.js';
 import { UpdateAvailableEvent } from '../src/core/events/UpdateAvailableEvent.js';
 import { UpdateBannerDismissedEvent } from '../src/core/events/UpdateBannerDismissedEvent.js';
@@ -31,13 +32,38 @@ describe('Update notifications', (test) => {
     const onUpdate = (event) => events.push(event);
     const bus = EventBus.getInstance();
     bus.subscribe(UpdateAvailableEvent, onUpdate);
-    globalThis.fetch = async () => ({ ok: true, text: async () => "export const GameConfig = { VERSION: '1.16.25' };" });
+    globalThis.fetch = async () => ({ ok: true, text: async () => "export const GameConfig = { VERSION: '1.16.27' };" });
     const system = new UpdateSystem();
     try {
       await system.checkForUpdate();
       await system.checkForUpdate();
       assert.equal(events.length, 1);
-      assert.equal(events[0].version, '1.16.25');
+      assert.equal(events[0].version, '1.16.27');
+    } finally {
+      system.onDestroy();
+      bus.unsubscribe(UpdateAvailableEvent, onUpdate);
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  test('detects a deployment fingerprint change even when the semantic version is unchanged', async () => {
+    const originalFetch = globalThis.fetch;
+    const events = [];
+    const onUpdate = (event) => events.push(event);
+    const bus = EventBus.getInstance();
+    bus.subscribe(UpdateAvailableEvent, onUpdate);
+    globalThis.fetch = async (url) => ({
+      ok: true,
+      text: async () => String(url).includes('DeploymentConfig.js')
+        ? "export const DeploymentConfig = { DEPLOYMENT_ID: 'new-commit-sha' };"
+        : "export const GameConfig = { VERSION: '1.16.25' };"
+    });
+    const system = new UpdateSystem();
+    try {
+      await system.checkForUpdate();
+      assert.equal(events.length, 1);
+      assert.equal(events[0].version, 'new-commit-sha');
+      assert.ok(DeploymentConfig.DEPLOYMENT_ID !== events[0].version);
     } finally {
       system.onDestroy();
       bus.unsubscribe(UpdateAvailableEvent, onUpdate);

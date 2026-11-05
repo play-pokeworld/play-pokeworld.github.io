@@ -2,12 +2,13 @@
   "expo": {
     "name": "PokéWorld",
     "slug": "pokeworld-mobile",
-    "version": "1.16.24",
+    "version": "1.16.26",
     "orientation": "default",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "ios": {"bundleIdentifier": "com.playpokeworld.mobile", "supportsTablet": true},
-    "android": {"package": "com.playpokeworld.mobile", "softwareKeyboardLayoutMode": "resize", "predictiveBackGestureEnabled": true},
+    "android": {"package": "com.playpokeworld.mobile",
+      "versionCode": 1016026, "softwareKeyboardLayoutMode": "resize", "predictiveBackGestureEnabled": true},
     "extra": {"gameUrl": "https://play-pokeworld.github.io/"}
   }
 }

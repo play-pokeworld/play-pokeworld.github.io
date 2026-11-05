@@ -1,6 +1,7 @@
 /** @file UpdateSystem.js — checks the deployed same-origin version without touching the DOM. */
 import { BaseSystem } from './BaseSystem.js';
 import { GameConfig } from '../config/GameConfig.js';
+import { DeploymentConfig } from '../config/DeploymentConfig.js';
 import { UpdateRules } from '../config/UpdateRules.js';
 import { EventBus } from '../core/EventBus.js';
 import { UpdateAvailableEvent } from '../core/events/UpdateAvailableEvent.js';
@@ -52,21 +53,39 @@ export class UpdateSystem extends BaseSystem {
     if (this._isChecking || this._isAvailable || this._isDismissed || typeof fetch !== 'function') return;
     this._isChecking = true;
     try {
-      const url = `${UpdateRules.VERSION_SOURCE_PATH}?${UpdateRules.CACHE_BUSTER_PARAM}=${Date.now()}`;
-      const response = await fetch(url, { cache: 'no-store' });
-      if (!response.ok) return;
-      const source = await response.text();
-      const match = source.match(/VERSION\s*:\s*['"](\d+(?:\.\d+){1,3})['"]/);
-      const remoteVersion = match?.[1];
-      if (remoteVersion && isNewerVersion(remoteVersion, GameConfig.VERSION)) {
-        this._isAvailable = true;
-        EventBus.getInstance().dispatch(new UpdateAvailableEvent(remoteVersion));
+      const cacheBuster = `${UpdateRules.CACHE_BUSTER_PARAM}=${Date.now()}`;
+      const [versionResponse, deploymentResponse] = await Promise.all([
+        fetch(`${UpdateRules.VERSION_SOURCE_PATH}?${cacheBuster}`, { cache: 'no-store' }),
+        fetch(`${UpdateRules.DEPLOYMENT_SOURCE_PATH}?${cacheBuster}`, { cache: 'no-store' })
+      ]);
+      if (versionResponse.ok) {
+        const versionSource = await versionResponse.text();
+        const versionMatch = versionSource.match(/VERSION\s*:\s*['"](\d+(?:\.\d+){1,3})['"]/);
+        const remoteVersion = versionMatch?.[1];
+        if (remoteVersion && isNewerVersion(remoteVersion, GameConfig.VERSION)) {
+          this._publishUpdate(remoteVersion);
+          return;
+        }
+      }
+      if (deploymentResponse.ok) {
+        const deploymentSource = await deploymentResponse.text();
+        const deploymentMatch = deploymentSource.match(/DEPLOYMENT_ID\s*:\s*['"]([^'"]+)['"]/);
+        const remoteDeploymentId = deploymentMatch?.[1];
+        if (remoteDeploymentId && remoteDeploymentId !== DeploymentConfig.DEPLOYMENT_ID) {
+          this._publishUpdate(remoteDeploymentId);
+        }
       }
     } catch {
       // Offline and file:// deployments simply retry on the next interval.
     } finally {
       this._isChecking = false;
     }
+  }
+
+  _publishUpdate(identifier) {
+    if (this._isAvailable) return;
+    this._isAvailable = true;
+    EventBus.getInstance().dispatch(new UpdateAvailableEvent(identifier));
   }
 
   onDestroy() {
