@@ -329,3 +329,11 @@ Légende : ✅ corrigé · ⚠️ reste à faire (priorité **P1** haute → **P
 - Archive `pokeworld-rework-1.14.1.zip` : **2 488 fichiers**, intégrité `unzip -t` validée; sans `.git`, dépendances, caches ni artefacts temporaires. Après extraction, `npm test` **303/303**, `node --check` sur tous les JS/MJS et versions package/lock/config **1.14.1**, schéma **15**.
 - Les points **2 à 16** et la porte globale « Kanto entièrement jouable, sans perte de focus ni changement non demandé » restent **ouverts**; voir `SUIVI_CORRECTIFS.md`. Cette livraison ne prétend pas les avoir corrigés.
 
+
+
+## 14. Fenêtres modales tactiles — v1.16.20 (04/11/2026)
+
+- La passe a maintenu les responsabilités déjà en place (`UIModal` / `UIFullscreenPanel` / `ScrollLock`) et n'a ajouté aucun gestionnaire d'interaction parallèle.
+- Le gabarit partagé des modales tactiles plafonne désormais sa hauteur avec `100dvh` et safe areas ; le corps `.win-body` est rétrécissable et limite la propagation du scroll. La fiche Pokémon étroite suit aussi `dvh`.
+- Vérifications : `npm test` **877/877**; `MobileTouch.mjs` **14/14** à 390 × 664 en émulation tactile iPhone 13; `PanelFit.mjs` **7/7**; i18n **0 clé manquante**; contraste **147/147 paires AA**.
+- Limites : la suite responsive globale par tailles/orientations et le parcours intégral du gameplay mobile ne sont pas certifiés. Aucun appareil réel / Safari / Firefox. `MarketAndResponsiveTraining.mjs` échoue après 19 scénarios sur quantité attendue 12 / observée 10 (également documenté antérieurement); `InteractionCorrections.mjs` échoue après cinq scénarios sur l'absence du sélecteur de fermeture attendu. Ces résultats restent non validés, pas des succès. Détail : `PHASE_v1.16.20.md`.

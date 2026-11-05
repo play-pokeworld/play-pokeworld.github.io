@@ -1,9 +1,8 @@
-# Livraison — PokéWorld Rework v1.16.19
+# Livraison — PokéWorld Rework v1.16.20
 
-**Date :** 3 novembre 2026
+**Date :** 4 novembre 2026
 **Branche :** `Rework`
-**Contenu de cette livraison :** le jeu complet, avec **le jeu jouable au doigt** : panneaux qui
-défilent sans bug, menus d'appui long qui s'ouvrent vraiment, contrôles à taille de doigt,
+**Contenu de cette livraison :** correctif des limites de hauteur des fenêtres modales tactiles : elles suivent désormais la zone visible du viewport (`dvh`) et leur corps peut rétrécir proprement pour garder le scroll accessible. La phase précédente conserve ses apports : panneaux qui défilent, menus d'appui long et contrôles à taille de doigt,
 **les colonnes de la fenêtre Poké Balls alignées**
 (sprites, nombres et titres « Ball » / « Qté » centrés au-dessus de leur colonne), **la fenêtre Lieu
 remise d'aplomb** (titre fixe « Lieu », plus de bandeau redondant), **le tutoriel réaligné et réécrit**
@@ -15,11 +14,20 @@ précédentes sont inchangés : évolutions sur le modèle de la référence (Po
 évoluée au niveau 1, 148 évolutions par niveau et 25 par objet vérifiées une à une), P1 d'ergonomie
 traités, paliers d'affichage et de qualité de code des 1.16.11 et 1.16.12.
 
-Détail de cette phase : `docs/PHASE_v1.16.19.md` (mobile / tactile), `docs/PHASE_v1.16.18.md`
+Détail de cette phase : `docs/PHASE_v1.16.20.md` (limites des fenêtres modales au viewport visible), `docs/PHASE_v1.16.19.md` (mobile / tactile), `docs/PHASE_v1.16.18.md`
 (colonnes Poké Balls), `docs/PHASE_v1.16.17.md`
 (sprite de ball) et `docs/PHASE_v1.16.16.md` (fenêtre Lieu, alignement, tutoriel). Phases antérieures :
 `docs/PHASE_v1.16.15.md` (tutoriel : bonne cible et bonnes formulations) et `docs/PHASE_v1.16.14.md`
 (CSS).
+
+---
+
+## Correctif 1.16.20 — fenêtres modales alignées sur le viewport visible
+
+- Les modales tactiles utilisent `100dvh` avec fallback `100vh` et safe areas ; le corps commun peut rétrécir et confine le scroll imbriqué. La fiche Pokémon sur petit écran suit également la hauteur dynamique.
+- Aucun système parallèle, aucune modification des règles métier ni du schéma de sauvegarde.
+- `npm test` : **877 réussis, 0 échec**. `MobileTouch.mjs` : **14/14** et `PanelFit.mjs` : **7/7** dans Chromium. Audits i18n (0 clé manquante) et contraste (147 paires AA) réussis.
+- Limites : pas de test sur appareil réel, Safari/WebKit ou Firefox. Les scénarios `MarketAndResponsiveTraining` (timeout `networkidle`) et `InteractionCorrections` (attente de fermeture de fiche) n'ont pas abouti ; voir `docs/PHASE_v1.16.20.md`.
 
 ---
 

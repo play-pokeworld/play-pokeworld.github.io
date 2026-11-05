@@ -18,7 +18,7 @@ const rules = (relative) => [...stripComments(read(relative)).matchAll(/([^{}]+)
 /** Rules whose selector ends the sheet segment, i.e. every rule mentioning `selector`. */
 const rulesFor = (relative, selector) => rules(relative).filter((rule) => rule.selector.includes(selector));
 
-describe('Touch-screen stylesheet (1.16.19)', (test) => {
+describe('Touch-screen stylesheet (1.16.20)', (test) => {
   test('every sheet is balanced and its media queries close where they should', () => {
     // An unclosed block silently swallows the rules that follow it: during this pass, three panel
     // sheets lost one `}` while their toolbar rule was rewritten, and desktop panels started wearing
@@ -77,6 +77,21 @@ describe('Touch-screen stylesheet (1.16.19)', (test) => {
     const body = rulesFor('components/ui-modal.css', '.pw-modal-body');
     assert.ok(body.some((rule) => /overscroll-behavior\s*:\s*contain/.test(rule.body)),
       'reaching the end of a list must not chain the swipe to the page behind');
+  });
+
+  test('touch modals track the visible viewport and keep their body shrinkable', () => {
+    const sheet = rules('components/ui-panel.css');
+    const panel = sheet.find((rule) => rule.selector === '.pw-panel--modal-window'
+      && /100dvh/.test(rule.body));
+    assert.ok(panel, 'the shared modal frame caps itself to the visible touch viewport');
+    const body = sheet.find((rule) => rule.selector === '.pw-panel--modal-window > .win-body'
+      && /min-height\s*:\s*0/.test(rule.body)
+      && /overscroll-behavior\s*:\s*contain/.test(rule.body));
+    assert.ok(body, 'the common modal body can shrink and contains nested scroll gestures');
+    const sheetRules = sheet.filter((rule) => rule.selector.includes('pw-pokemon-info-window'));
+    assert.ok(sheetRules.some((rule) => /height\s*:\s*min\(85dvh/.test(rule.body)
+      && /max-height\s*:\s*min\(85dvh/.test(rule.body)),
+    'the Pokémon information sheet uses the visible viewport on narrow touch screens');
   });
 
   test('the page is frozen while a layer covers it', () => {

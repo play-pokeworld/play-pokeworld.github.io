@@ -313,12 +313,27 @@
   backdrop-filter: none;
 }
 
+@media (max-width: 850px), (pointer: coarse) {
+  /* Modal panels must follow the visible viewport when browser chrome or the on-screen keyboard changes its height. */
+  .pw-panel--modal-window {
+    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  }
+
+  .pw-panel--modal-window > .win-body {
+    min-height: 0;
+    overscroll-behavior: contain;
+  }
+}
+
 @media (max-width: 600px) {
 .pw-panel--modal-window.pw-pokemon-info-window, #poke-modal-inner.pw-panel--modal-window {
   width: min(560px, calc(100vw - 24px)) !important;
   max-width: calc(100vw - 24px) !important;
   height: min(85vh, 720px) !important;
   max-height: 85vh !important;
+  height: min(85dvh, 720px) !important;
+  max-height: min(85dvh, 720px) !important;
 }
 
 }
