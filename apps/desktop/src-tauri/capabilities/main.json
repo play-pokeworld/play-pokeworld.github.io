@@ -1,0 +1,7 @@
+{
+  "identifier": "main-window-remote",
+  "description": "PokéWorld remote game origin. No native Tauri commands are exposed.",
+  "windows": ["main"],
+  "remote": {"urls": ["https://play-pokeworld.github.io"]},
+  "permissions": []
+}

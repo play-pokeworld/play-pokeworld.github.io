@@ -1,0 +1,13 @@
+[package]
+name = "pokeworld-desktop"
+version = "1.16.24"
+description = "PokéWorld Windows desktop shell"
+authors = ["PokéWorld"]
+edition = "2021"
+rust-version = "1.77.2"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }

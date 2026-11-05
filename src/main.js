@@ -60,6 +60,12 @@ import { registerAllPages } from './pages/PageRegistry.js';
 import { PageIds } from './pages/PageIds.js';
 import { AppShell } from './ui/AppShell.js';
 import { NotificationCenterView } from './ui/notifications/NotificationCenterView.js';
+import { UpdateBanner } from './ui/UpdateBanner.js';
+import { UpdateSystem } from './systems/UpdateSystem.js';
+import { DownloadPromptModal } from './panels/DownloadPromptModal.js';
+import { ModalOpenRequestedEvent } from './core/events/ModalOpenRequestedEvent.js';
+import { EventBus } from './core/EventBus.js';
+import { ModalIds } from './config/ModalIds.js';
 import { LocalizationManager, t } from './localization/LocalizationManager.js';
 import { GameConfig } from './config/GameConfig.js';
 
@@ -162,6 +168,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // 3. Overlays living above every page
   AppShell.mountOverlay(new NotificationCenterView());
+  AppShell.mountOverlay(new UpdateBanner());
+  AppShell.mountOverlay(new DownloadPromptModal());
+  engine.registerSystem('UpdateSystem', UpdateSystem.getInstance());
 
   // 3b. Guided tutorial halo: points at the control the current step asks for.
   installTutorialHighlight();
@@ -170,6 +179,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // 4. Pages (composition root) and first screen
   registerAllPages(engine.getPageManager());
   engine.getPageManager().openPage(PageIds.SAVE_MENU);
+  EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.DOWNLOAD_PROMPT));
 
   console.log(String(t('debug_engine_ready')));
 });

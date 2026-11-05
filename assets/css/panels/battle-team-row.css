@@ -774,16 +774,20 @@
 
 @container pw-battle (max-width: 420px) {
 #win-battle #battle-team-row {
-  --pc-battle-sprite: 88px;
-  --pc-bench-sprite: 68px;
+  --pc-battle-sprite: 64px;
+  --pc-bench-sprite: 48px;
 }
 
 #win-battle #battle-team-row .poke-card,
   #win-battle #battle-team-row .poke-card:hover,
   #win-battle #battle-team-row .poke-card:not(:first-child):not(.active) {
-  grid-template-columns: minmax(0, 1fr) !important;
-  grid-template-rows: auto !important;
+  grid-template-columns: 64px minmax(0, 1fr) !important;
+  grid-template-rows: auto auto !important;
   min-width: 0;
+}
+
+#win-battle #battle-team-row .poke-card-top {
+  display: contents !important;
 }
 
 }

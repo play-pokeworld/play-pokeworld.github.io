@@ -7,6 +7,10 @@
  */
 
 import { UIElement } from './UIElement.js';
+import { UIContainer } from './UIContainer.js';
+import { UIButton } from './UIButton.js';
+import { t } from '../localization/LocalizationManager.js';
+import { MapInteractionRules } from '../config/MapInteractionRules.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 /** Approximate label metrics (SVG units) used to size the name pill. */
@@ -55,6 +59,14 @@ export class UIMapView extends UIElement {
     this._width = options.width;
     this._height = options.height;
     this._onNodeClick = options.onNodeClick || null;
+    this._zoom = MapInteractionRules.MIN_ZOOM;
+    this._viewX = 0;
+    this._viewY = 0;
+    this._pointers = new Map();
+    this._lastPinchDistance = null;
+    this._dragDistance = 0;
+    this._suppressClickUntil = 0;
+    this._background = null;
 
     this._svg = svgNode('svg', {
       viewBox: `0 0 ${this._width} ${this._height}`,
@@ -69,19 +81,139 @@ export class UIMapView extends UIElement {
     this._player = svgNode('g', { class: 'pw-map-player-layer' });
     this._svg.append(this._terrain, this._nodes, this._labels, this._ambushes, this._player);
     this._dom.appendChild(this._svg);
+    this._buildZoomControls();
+    this._installCameraGestures();
 
     this.addDomListener('click', (event) => {
+      if (performance.now() < this._suppressClickUntil) return;
       const node = event.target.closest && event.target.closest('[data-node-id]');
       if (node && this._onNodeClick) this._onNodeClick(node.getAttribute('data-node-id'));
     });
   }
 
+
+  /** Builds accessible zoom controls using the canonical button widget. @private */
+  _buildZoomControls() {
+    const controls = new UIContainer({ className: 'pw-map-zoom-controls' });
+    const makeButton = (id, symbol, labelKey, action) => {
+      const button = new UIButton({ id, className: 'pw-map-zoom-btn', text: symbol, onClick: action });
+      button.setAriaLabel(t(labelKey));
+      button.setAttribute('title', t(labelKey));
+      controls.addChild(button);
+    };
+    makeButton('pw-map-zoom-in', '+', 'map_zoom_in', () => this._zoomAtCenter(MapInteractionRules.BUTTON_ZOOM_STEP));
+    makeButton('pw-map-zoom-out', '−', 'map_zoom_out', () => this._zoomAtCenter(1 / MapInteractionRules.BUTTON_ZOOM_STEP));
+    makeButton('pw-map-zoom-reset', '↺', 'map_zoom_reset', () => this._resetCamera());
+    this.addChild(controls);
+  }
+
+  /** Installs pointer and wheel gestures for mouse, pen and touch. @private */
+  _installCameraGestures() {
+    this.addDomListener('pointerdown', (event) => {
+      if (!event.target.closest?.('#map-svg')) return;
+      this._pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      this._dom.setPointerCapture?.(event.pointerId);
+      if (this._pointers.size === 1) this._dragDistance = 0;
+      if (this._pointers.size === 2) this._lastPinchDistance = this._pointerDistance();
+    });
+    this.addDomListener('pointermove', (event) => {
+      if (!this._pointers.has(event.pointerId)) return;
+      const previous = this._pointers.get(event.pointerId);
+      this._pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      const rect = this._svg.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const bounds = this._viewBounds();
+      if (this._pointers.size >= 2) {
+        const distance = this._pointerDistance();
+        if (this._lastPinchDistance > MapInteractionRules.PINCH_MIN_DISTANCE_PX && distance > MapInteractionRules.PINCH_MIN_DISTANCE_PX) {
+          const center = this._pointerCenter();
+          this._zoomAt(distance / this._lastPinchDistance, center.x - rect.left, center.y - rect.top, rect, bounds);
+        }
+        this._lastPinchDistance = distance;
+        this._suppressClickUntil = performance.now() + MapInteractionRules.CLICK_SUPPRESSION_MS;
+        event.preventDefault();
+      } else if (this._pointers.size === 1) {
+        this._dragDistance += Math.hypot(event.clientX - previous.x, event.clientY - previous.y);
+        if (this._zoom > MapInteractionRules.MIN_ZOOM && this._dragDistance > MapInteractionRules.DRAG_START_PX) {
+          this._viewX -= (event.clientX - previous.x) * bounds.width / rect.width;
+          this._viewY -= (event.clientY - previous.y) * bounds.height / rect.height;
+          this._applyCamera();
+          this._suppressClickUntil = performance.now() + MapInteractionRules.CLICK_SUPPRESSION_MS;
+          event.preventDefault();
+        }
+      }
+    });
+    const endPointer = (event) => {
+      this._pointers.delete(event.pointerId);
+      if (this._pointers.size < 2) this._lastPinchDistance = null;
+      if (this._pointers.size === 1) this._dragDistance = MapInteractionRules.DRAG_START_PX;
+    };
+    this.addDomListener('pointerup', endPointer);
+    this.addDomListener('pointercancel', endPointer);
+    this.addDomListener('wheel', (event) => {
+      if (!event.target.closest?.('#map-svg')) return;
+      event.preventDefault();
+      const rect = this._svg.getBoundingClientRect();
+      const factor = event.deltaY < 0 ? MapInteractionRules.WHEEL_ZOOM_STEP : 1 / MapInteractionRules.WHEEL_ZOOM_STEP;
+      this._zoomAt(factor, event.clientX - rect.left, event.clientY - rect.top, rect, this._viewBounds());
+    }, { passive: false });
+  }
+
+  _pointerDistance() {
+    const points = [...this._pointers.values()];
+    return Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+  }
+
+  _pointerCenter() {
+    const points = [...this._pointers.values()];
+    return { x: (points[0].x + points[1].x) / 2, y: (points[0].y + points[1].y) / 2 };
+  }
+
+  _viewBounds() {
+    return { width: this._width / this._zoom, height: this._height / this._zoom };
+  }
+
+  _zoomAt(factor, pointX, pointY, rect, bounds) {
+    if (!rect.width || !rect.height) return;
+    const nextZoom = Math.max(MapInteractionRules.MIN_ZOOM, Math.min(MapInteractionRules.MAX_ZOOM, this._zoom * factor));
+    if (nextZoom === this._zoom) return;
+    const mapX = this._viewX + pointX * bounds.width / rect.width;
+    const mapY = this._viewY + pointY * bounds.height / rect.height;
+    this._zoom = nextZoom;
+    const nextBounds = this._viewBounds();
+    this._viewX = mapX - pointX * nextBounds.width / rect.width;
+    this._viewY = mapY - pointY * nextBounds.height / rect.height;
+    this._applyCamera();
+  }
+
+  _zoomAtCenter(factor) {
+    const rect = this._svg.getBoundingClientRect();
+    this._zoomAt(factor, rect.width / 2, rect.height / 2, rect, this._viewBounds());
+  }
+
+  _resetCamera() {
+    this._zoom = MapInteractionRules.MIN_ZOOM;
+    this._viewX = 0;
+    this._viewY = 0;
+    this._applyCamera();
+  }
+
+  _applyCamera() {
+    const bounds = this._viewBounds();
+    this._viewX = Math.max(0, Math.min(this._width - bounds.width, this._viewX));
+    this._viewY = Math.max(0, Math.min(this._height - bounds.height, this._viewY));
+    this._svg.setAttribute('viewBox', `${this._viewX} ${this._viewY} ${bounds.width} ${bounds.height}`);
+  }
+
   /** @param {string} src - Background picture covering the canvas */
   setBackground(src) {
+    if (this._background !== null && this._background !== src) this._resetCamera();
+    this._background = src;
     this._terrain.textContent = '';
     this._terrain.appendChild(svgNode('image', {
       href: src, x: 0, y: 0, width: this._width, height: this._height, preserveAspectRatio: 'xMidYMid meet'
     }));
+    this._applyCamera();
   }
 
   /** @param {MapNode[]} nodes */

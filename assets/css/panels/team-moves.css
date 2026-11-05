@@ -444,8 +444,8 @@
 
 @container pw-battle (max-width: 420px) {
 #win-battle #battle-team-row .poke-moves {
-  grid-column: 1 !important;
-  grid-row: 3 !important;
+  grid-column: 2 !important;
+  grid-row: 2 !important;
   width: 100%;
 }
 

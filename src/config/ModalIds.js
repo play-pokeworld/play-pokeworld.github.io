@@ -24,6 +24,7 @@ export const ModalIds = Object.freeze({
   HATCHERY_FOSSILS: 'pw-hatchery-fossils',
   FOSSIL_LAB: 'pw-fossil-lab',
   SETTINGS: 'settings-window',
+  DOWNLOAD_PROMPT: 'pw-download-prompt',
   /** Params: { selectedUid, onSelect(uid) }; chooses the owned Pokémon shown on the save card. */
   SAVE_ICON_PICKER: 'pw-save-icon-picker',
   /** Localized people and dialogue at the current location. */

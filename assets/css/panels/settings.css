@@ -814,3 +814,40 @@ body.mobile-mode #header #settings-btn.pw-header-settings {
     flex: 1 1 82px;
   }
 }
+
+/* Device-aware desktop/mobile installation links shared by Settings and the launch prompt. */
+.pw-download-options {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  min-width: 0;
+}
+
+.pw-download-platform {
+  margin: 0;
+  color: var(--pw-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.pw-download-unavailable {
+  min-width: 0;
+  color: var(--pw-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.pw-download-release-link,
+.pw-download-web-link {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  justify-content: center;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.pw-download-prompt-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}

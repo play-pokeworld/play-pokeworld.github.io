@@ -16,6 +16,7 @@ import { CommunitySection } from './CommunitySection.js';
 import { AdvancedSection } from './AdvancedSection.js';
 import { CombatSettingsSection } from './CombatSettingsSection.js';
 import { DiagnosticsSection } from './DiagnosticsSection.js';
+import { DownloadSection } from './DownloadSection.js';
 import { LanguageChangedEvent } from '../../core/events/LanguageChangedEvent.js';
 import { Engine } from '../../core/Engine.js';
 import { PageIds } from '../../pages/PageIds.js';
@@ -51,6 +52,7 @@ export class SettingsModal extends UIModal {
       new SaveProfileSection(),
       new SaveManagementSection({ onLeaveGame: leaveGame, confirmDialog: this._confirmDialog }),
       new CommunitySection(),
+      new DownloadSection(),
       new AdvancedSection(),
       new DiagnosticsSection()
     ];
