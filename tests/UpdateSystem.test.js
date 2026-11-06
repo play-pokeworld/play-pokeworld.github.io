@@ -31,13 +31,13 @@ describe('Update notifications', (test) => {
     const onUpdate = (event) => events.push(event);
     const bus = EventBus.getInstance();
     bus.subscribe(UpdateAvailableEvent, onUpdate);
-    globalThis.fetch = async () => ({ ok: true, text: async () => "export const GameConfig = { VERSION: '1.16.31' };" });
+    globalThis.fetch = async () => ({ ok: true, text: async () => "export const GameConfig = { VERSION: '1.16.32' };" });
     const system = new UpdateSystem();
     try {
       await system.checkForUpdate();
       await system.checkForUpdate();
       assert.equal(events.length, 1);
-      assert.equal(events[0].version, '1.16.31');
+      assert.equal(events[0].version, '1.16.32');
     } finally {
       system.onDestroy();
       bus.unsubscribe(UpdateAvailableEvent, onUpdate);

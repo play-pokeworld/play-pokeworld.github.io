@@ -330,6 +330,19 @@
   scroll-behavior: smooth;
 }
 
+/* The cards are centred as a group, whatever their number. The remaining space is absorbed by the
+   outer auto margins only (the inner gaps keep their 14px), so one card sits dead centre and two or
+   three cards stay centred as a group. When the carousel overflows, the free space is negative and
+   auto margins resolve to zero: the track falls back on its start edge, which keeps the first card
+   reachable — a plain `justify-content: center` would push it out of the scrollable area. */
+.save-menu-list > .save-slot:first-child {
+  margin-inline-start: auto;
+}
+
+.save-menu-list > .save-slot:last-child {
+  margin-inline-end: auto;
+}
+
 .save-menu-scroll-btn {
   height: 54px;
   min-width: 40px;
