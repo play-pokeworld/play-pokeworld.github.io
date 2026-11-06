@@ -1,6 +1,6 @@
 [package]
 name = "pokeworld-desktop"
-version = "1.16.29"
+version = "1.16.30"
 description = "PokéWorld Windows desktop shell"
 authors = ["PokéWorld"]
 edition = "2021"

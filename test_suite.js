@@ -21,6 +21,7 @@ await import('./tests/LocalizationRuntime.test.js');
 await import('./tests/Systems.test.js');
 await import('./tests/UpdateSystem.test.js');
 await import('./tests/DownloadTarget.test.js');
+await import('./tests/MobileAppIcon.test.js');
 await import('./tests/MapCamera.test.js');
 await import('./tests/SecretBase.test.js');
 await import('./tests/GameData.test.js');

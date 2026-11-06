@@ -2,13 +2,27 @@
   "expo": {
     "name": "PokéWorld",
     "slug": "pokeworld-mobile",
-    "version": "1.16.29",
+    "version": "1.16.26",
     "orientation": "default",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
-    "ios": {"bundleIdentifier": "com.playpokeworld.mobile", "supportsTablet": true},
-    "android": {"package": "com.playpokeworld.mobile",
-      "versionCode": 1016029, "softwareKeyboardLayoutMode": "resize", "predictiveBackGestureEnabled": true},
-    "extra": {"gameUrl": "https://play-pokeworld.github.io/"}
+    "ios": {
+      "bundleIdentifier": "com.playpokeworld.mobile",
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.playpokeworld.mobile",
+      "versionCode": 1016027,
+      "softwareKeyboardLayoutMode": "resize",
+      "predictiveBackGestureEnabled": true,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#171612"
+      }
+    },
+    "extra": {
+      "gameUrl": "https://play-pokeworld.github.io/"
+    },
+    "icon": "./assets/icon.png"
   }
 }
