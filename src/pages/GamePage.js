@@ -16,6 +16,7 @@ import { DashboardView } from '../ui/dashboard/DashboardView.js';
 import { MobileDashboardNav } from '../ui/dashboard/MobileDashboardNav.js';
 import { DashboardLayoutSystem } from '../systems/DashboardLayoutSystem.js';
 import { HeaderPanel } from '../panels/HeaderPanel.js';
+import { NavMenu } from '../ui/NavMenu.js';
 import { StoryPanel } from '../panels/StoryPanel.js';
 import { AchievementsPanel } from '../panels/AchievementsPanel.js';
 import { ActiveTeamPanel } from '../panels/ActiveTeamPanel.js';
@@ -99,6 +100,7 @@ export class GamePage extends BasePage {
     this.addChildren([
       new PokemonBackgroundView(),
       new HeaderPanel(),
+      new NavMenu().mount(),
       new MobileDashboardNav(dashboard),
       dashboard,
       // Bottom message line (shown by the mobile CSS only)

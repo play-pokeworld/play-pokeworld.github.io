@@ -1,0 +1,3 @@
+CATALOGUE DES AFFICHAGES - 56 ecrans.
+Ouvrir CATALOGUE_AFFICHAGES.html dans un navigateur (double-clic).
+Les sprites sont lus dans ../assets/images/ : garder ce dossier dans le jeu.

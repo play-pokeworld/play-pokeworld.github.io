@@ -244,26 +244,10 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 850px), (pointer: coarse) {
-#starter-modal-inner {
-  max-width: 96vw !important;
-  max-height: 90vh !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  overflow-y: auto !important;
-  transform-origin: center center !important;
-}
-
-}
-
-@media (max-width: 480px) {
-#starter-modal-inner {
-  transform: scale(0.92) !important;
-  width: 108% !important;
-  margin-left: -4% !important;
-}
-
-}
+/* The modal is `.starter-modal-window`; `#starter-modal-inner` is a legacy id no element carries.
+   Its mobile block (96vw / 90vh / `transform: scale(0.92)` under 480px) therefore never applied — and
+   if it had, it would have shrunk the panel instead of letting it reflow. Sizing belongs to the shared
+   modal contract (components/ui-modal.css, components/modal-sizes.css). */
 
 #starter-modal {
   z-index: 1200;
@@ -398,4 +382,361 @@
 
 .pw-starter-card.is-squirtle {
   border-left: 4px solid #539ddf;
+}
+
+
+/* Touch layout — a starter card is not a desktop row squeezed into 320px.
+   At 320x568 the three parts of the row (sprite, text, "Choisir") fought for 290px: the description
+   ran under the action and the card had to be read twice. The card becomes a small block: identity on
+   the first line, description on its own full-width line, and the action as a real button at the
+   bottom — the shape of a card, not a table row. PC keeps its row. */
+@media (max-width: 850px), (pointer: coarse) {
+  .starter-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "sprite name"
+      "desc desc"
+      "choose choose";
+    align-items: center;
+    gap: 6px 12px;
+    padding: 12px;
+    transition: none;
+  }
+
+  .starter-card > .poke-sprite {
+    grid-area: sprite;
+  }
+
+  /* The wrapper only grouped the name and the description: in this layout each one gets its row. */
+  .starter-card > .pw-flex-1 {
+    display: contents;
+  }
+
+  .starter-card .poke-name {
+    grid-area: name;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .starter-card > .pw-flex-1 > .pw-text-glow {
+    grid-area: desc;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .starter-card > .starter-choose-label {
+    grid-area: choose;
+    justify-self: stretch;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--starter-color, var(--accent)) 82%, black);
+    color: var(--pw-text-dark);
+    font-weight: 800;
+  }
+
+  .starter-card--custom .starter-choose-label {
+    background: var(--dark3);
+    color: var(--light2);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * 1.16.34 - Starter window, aligned on the validated mockup.
+ * The overlay is opaque (it hides the save menu decor), the title sits on a
+ * sand band, the trainer name is labelled above its field, and the three
+ * starters form a grid of sand cards with a dashed edge (one column on touch).
+ * Everything here overrides the legacy row-cards of this sheet.
+ * ------------------------------------------------------------------------- */
+
+#starter-modal.pw-starter-overlay {
+  background:
+    radial-gradient(118% 82% at 50% -10%, color-mix(in srgb, var(--light1) 22%, var(--pw-bg-app)) 0%, transparent 58%),
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--light1) 9%, transparent) 0 1px, transparent 1px) 0 0 / 15px 15px,
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.018) 0 2px, transparent 2px 9px),
+    radial-gradient(120% 96% at 50% 112%, rgba(0, 0, 0, 0.5) 0%, transparent 62%),
+    var(--pw-bg-app);
+}
+
+/* The window is only a column of content: the overlay carries the decor, so no
+   second flat panel is stacked on top of it. */
+#starter-modal .starter-modal-window {
+  width: min(100%, 900px) !important;
+  max-width: 900px !important;
+  max-height: 92vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 8px 16px 12px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+#starter-modal .starter-welcome {
+  margin-bottom: 8px;
+  font-size: 11.5px;
+  color: var(--light1);
+}
+
+#starter-modal .starter-title-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+#starter-modal #starter-modal-title {
+  padding: 4px 30px;
+  border-radius: 6px;
+  background: var(--light1);
+  color: color-mix(in srgb, var(--dark1) 94%, var(--light1)) !important;
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.25;
+  text-shadow: none !important;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
+}
+
+#starter-modal .starter-title-block .pw-text-sm {
+  max-width: 520px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--light1) 82%, var(--pw-bg-app));
+}
+
+/* Trainer name: label on its own line, above the field. */
+#starter-modal .starter-name-field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: min(100%, 320px);
+  margin: 14px auto 8px;
+}
+
+#starter-modal .starter-name-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--light1) 82%, var(--pw-bg-app));
+}
+
+#starter-modal .starter-name-input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 2px solid color-mix(in srgb, var(--light1) 52%, transparent);
+  background: color-mix(in srgb, var(--dark2) 78%, var(--pw-bg-app));
+  color: var(--light2);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-align: center;
+}
+
+#starter-modal .starter-name-input:focus {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Starter cards: sand block, dashed edge, sprite on top, action at the bottom. */
+#starter-modal .starter-cards-stack {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 16px 0 12px;
+}
+
+#starter-modal .starter-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 196px;
+  margin: 0 !important;
+  padding: 14px 12px 12px;
+  border-radius: 10px !important;
+  background: var(--light1) !important;
+  border: 3px dashed color-mix(in srgb, var(--dark1) 52%, var(--light1)) !important;
+  outline: 3px solid color-mix(in srgb, var(--light1) 62%, var(--pw-bg-app));
+  outline-offset: 0;
+  box-shadow: none !important;
+  color: color-mix(in srgb, var(--dark1) 94%, var(--light1)) !important;
+  cursor: pointer;
+  transition: transform 0.18s ease, outline-color 0.18s ease;
+}
+
+#starter-modal .starter-card:hover,
+#starter-modal .starter-card:focus-visible {
+  transform: scale(1.03);
+  outline-color: var(--accent);
+  border-color: color-mix(in srgb, var(--dark1) 68%, var(--light1)) !important;
+}
+
+/* The disc behind the sprite is gone: the sprite stands on the card itself. */
+#starter-modal .starter-card .poke-sprite {
+  width: var(--pw-size-poke-lg);
+  height: var(--pw-size-poke-lg);
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+#starter-modal .starter-card .pw-poke-circle-bg {
+  display: none !important;
+}
+
+#starter-modal .starter-card .poke-sprite .pw-poke-circle-wrap,
+#starter-modal .starter-card .poke-sprite .poke-sprite-container {
+  width: var(--pw-size-poke-lg) !important;
+  height: var(--pw-size-poke-lg) !important;
+}
+
+#starter-modal .starter-card .poke-sprite img {
+  max-width: var(--pw-size-poke-lg);
+  max-height: var(--pw-size-poke-lg);
+}
+
+#starter-modal .starter-card .pw-flex-1 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+}
+
+#starter-modal .starter-card .poke-name {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  color: color-mix(in srgb, var(--dark1) 95%, var(--light1));
+  font-size: 15px;
+  font-weight: 800;
+}
+
+#starter-modal .starter-card .starter-dex-number {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--dark1) 74%, var(--light1));
+}
+
+#starter-modal .starter-card .pw-text-glow {
+  font-size: 11px;
+  line-height: 1.35;
+  color: color-mix(in srgb, var(--dark1) 82%, var(--light1)) !important;
+  text-shadow: none !important;
+}
+
+#starter-modal .starter-card .starter-choose-label {
+  margin-top: 6px;
+  padding: 4px 14px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--dark1) 90%, #000);
+  color: var(--light2);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#starter-modal .starter-modal-footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+#starter-modal .starter-modal-footer {
+  flex: none;
+  font-size: 11px;
+  color: color-mix(in srgb, var(--light1) 78%, var(--pw-bg-app));
+}
+
+/* Touch layout: the reference menu keeps content-sized cards that wrap and are
+   centred, instead of one stretched column with a 104px sprite. Two cards fit
+   on the first row of a phone, the third centres itself below. */
+@media (max-width: 850px), (pointer: coarse) {
+  #starter-modal .starter-modal-window {
+    padding: 6px 12px 10px !important;
+    max-height: 94vh !important;
+  }
+
+  #starter-modal .starter-welcome,
+  #starter-modal .starter-title-block .pw-text-sm {
+    font-size: 11px;
+  }
+
+  #starter-modal #starter-modal-title {
+    padding: 3px 20px !important;
+    font-size: 16px !important;
+  }
+
+  #starter-modal .starter-name-field {
+    margin: 8px auto 4px;
+  }
+
+  #starter-modal .starter-name-input {
+    height: 34px !important;
+  }
+
+  #starter-modal .starter-cards-stack {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-content: center !important;
+    gap: 10px !important;
+    margin: 10px 0 8px !important;
+  }
+
+  #starter-modal .starter-card {
+    display: flex !important;
+    grid-template-areas: none;
+    flex: 0 1 auto;
+    width: auto;
+    max-width: 45%;
+    min-height: 0;
+    padding: 9px 9px 8px !important;
+    gap: 3px !important;
+    transition: none;
+  }
+
+  #starter-modal .starter-card .poke-sprite,
+  #starter-modal .starter-card .pw-poke-circle-wrap,
+  #starter-modal .starter-card .poke-sprite-container {
+    width: 60px !important;
+    height: 60px !important;
+  }
+
+  #starter-modal .starter-card .poke-name {
+    font-size: 13px;
+    gap: 4px;
+  }
+
+  #starter-modal .starter-card .starter-dex-number,
+  #starter-modal .starter-card .pw-text-glow {
+    font-size: 11px;
+    line-height: 1.25;
+  }
+
+  #starter-modal .starter-card .starter-choose-label {
+    min-height: 0;
+    margin-top: 4px;
+    padding: 3px 10px;
+    font-size: 11px;
+  }
 }

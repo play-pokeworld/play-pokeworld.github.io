@@ -791,3 +791,22 @@
 }
 
 }
+
+/* ---------------------------------------------------------------------------
+ * 1.16.34 - The wild card (first of the row) is aligned on the box model of the
+ * other cards: same frame thickness, same padding and the same vertical
+ * alignment, so its sprite and its frame sit exactly where ours do. Only
+ * positions change here: the landscape, the colours and the rounding stay.
+ * ------------------------------------------------------------------------- */
+
+#battle-team-row > .poke-card:first-child {
+  padding: 7px 7px 7px 9px !important;
+  border-width: 1px !important;
+  align-items: start !important;
+  min-height: 0 !important;
+}
+
+#battle-team-row > .poke-card:first-child .poke-moves {
+  padding: 0 !important;
+  border-width: 0 !important;
+}

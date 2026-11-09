@@ -111,39 +111,12 @@
 
 }
 
-@media (max-width: 850px), (pointer: coarse) {
-#fullscreen-panel-modal .pw-modal-container {
-  /* Safe-area insets are subtracted, never added as padding: the container keeps its exact size on a
-     screen without a notch, and stops slipping under the notch / home bar on one that has it. */
-  width: calc(100vw - 12px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
-  max-width: calc(100vw - 12px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
-  /* `vh` is the *largest* viewport on a phone: with the URL bar shown the bottom of the panel sat
-     under it and the last rows were unreachable. `dvh` follows the visible height instead. */
-  height: calc(100vh - 12px);
-  max-height: calc(100vh - 12px);
-  height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-  max-height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-}
-
-.pw-modal-inner {
-  max-width: 96vw !important;
-  max-height: 90vh !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  overflow-y: auto !important;
-  transform-origin: center center !important;
-}
-
-}
-
-@media (max-width: 480px) {
-.pw-modal-inner {
-  transform: scale(0.92) !important;
-  width: 108% !important;
-  margin-left: -4% !important;
-}
-
-}
+/* The mobile geometry of a full-screen panel lives on its live class
+   (`.pw-fullscreen-overlay > .pw-modal-container`, further down this sheet). The two blocks that used
+   to sit here targeted `#fullscreen-panel-modal` and `.pw-modal-inner`, which no element carries: they
+   scaled the panel with `transform: scale(0.92)` and widened it to 108% instead of letting it reflow.
+   A transform also made the panel the containing block of every fixed child, so a nested layer was
+   positioned against it. Removed — a panel is sized by the visible viewport, never shrunk. */
 
 .pw-modal-backdrop {
   position: fixed;
@@ -202,7 +175,7 @@
   flex-wrap: wrap;
 }
 
-@media (max-width: 640px), (pointer: coarse) {
+@media (max-width: 850px), (pointer: coarse) {
 .pw-fullscreen-overlay > .pw-modal-container {
   /* Safe-area insets are subtracted, never added as padding: the container keeps its exact size on a
      screen without a notch, and stops slipping under the notch / home bar on one that has it. */
@@ -266,18 +239,10 @@
   padding-top: 14px;
 }
 
-@media (max-width: 640px), (pointer: coarse) {
-.pw-pokedex-panel > .pw-modal-container {
-  /* Safe-area insets are subtracted, never added as padding: the container keeps its exact size on a
-     screen without a notch, and stops slipping under the notch / home bar on one that has it. */
-  width: calc(100vw - 12px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
-  max-width: calc(100vw - 12px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
-  /* `vh` is the *largest* viewport on a phone: with the URL bar shown the bottom of the panel sat
-     under it and the last rows were unreachable. `dvh` follows the visible height instead. */
-  height: calc(100vh - 12px);
-  max-height: calc(100vh - 12px);
-  height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-  max-height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+@media (max-width: 850px), (pointer: coarse) {
+/* Size comes from the shared full-screen contract; these panels only soften their corners. */
+.pw-pokedex-panel > .pw-modal-container,
+.pw-guide-panel > .pw-modal-container {
   border-radius: var(--pw-radius-lg);
 }
 
@@ -306,21 +271,7 @@
   color: var(--pw-text-primary);
 }
 
-@media (max-width: 640px), (pointer: coarse) {
-.pw-guide-panel > .pw-modal-container {
-  /* Safe-area insets are subtracted, never added as padding: the container keeps its exact size on a
-     screen without a notch, and stops slipping under the notch / home bar on one that has it. */
-  width: calc(100vw - 12px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
-  max-width: calc(100vw - 12px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
-  /* `vh` is the *largest* viewport on a phone: with the URL bar shown the bottom of the panel sat
-     under it and the last rows were unreachable. `dvh` follows the visible height instead. */
-  height: calc(100vh - 12px);
-  max-height: calc(100vh - 12px);
-  height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-  max-height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-  border-radius: var(--pw-radius-lg);
-}
-
+@media (max-width: 850px), (pointer: coarse) {
 .pw-guide-panel .pw-modal-body {
   gap: 13px;
   padding: 14px;

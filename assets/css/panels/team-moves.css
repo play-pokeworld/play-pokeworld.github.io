@@ -450,3 +450,27 @@
 }
 
 }
+
+/* ---------------------------------------------------------------------------
+ * 1.16.34 - Battle: the four move slots share one row height, so an empty slot
+ * is exactly as tall as a filled one (it used to be thinner).
+ * ------------------------------------------------------------------------- */
+
+#battle-team-row > .poke-card .poke-moves,
+#battle-team-row > .poke-card:first-child .poke-moves {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-auto-rows: 1fr !important;
+  align-content: stretch !important;
+  gap: 3px !important;
+}
+
+#battle-team-row > .poke-card .poke-move.empty,
+#battle-team-row > .poke-card:first-child .poke-move.empty {
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 5px 6px 5px 10px !important;
+  border-width: 1px !important;
+  border-left-width: 4px !important;
+}

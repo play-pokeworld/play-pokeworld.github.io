@@ -976,3 +976,35 @@ button[data-action].pw-loc-gym-btn:hover,
   min-width: 160px;
   flex: 0 0 auto;
 }
+
+/* ---------------------------------------------------------------------------
+ * 1.16.34 - Location window: the zone scenery is the backdrop of the place
+ * name, and the name itself is a centered plate with a light translucent
+ * background: the landscape stays visible through it, the text stays readable. The scene comes from the shared `--pc-scene-url` token
+ * (design-system 29.1), so the window never repeats a path of its own.
+ * ------------------------------------------------------------------------- */
+
+.pw-loc-overview {
+  min-height: 104px;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--pw-bg-app) 28%, transparent), color-mix(in srgb, var(--pw-bg-app) 62%, transparent)),
+    var(--pc-scene-url, none) !important;
+  background-size: cover !important;
+  background-position: center 45% !important;
+  background-repeat: no-repeat !important;
+  border-color: color-mix(in srgb, var(--light1) 42%, var(--pw-border-color)) !important;
+}
+
+.pw-loc-overview-title {
+  width: auto !important;
+  max-width: 100%;
+  padding: 6px 20px;
+  margin: 0 auto;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--pw-bg-header) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--light1) 55%, transparent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
+  font-size: clamp(19px, 2.4vw, 26px);
+  text-align: center;
+}

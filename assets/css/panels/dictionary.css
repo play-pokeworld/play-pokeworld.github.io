@@ -577,9 +577,10 @@ body.mobile-mode #header .hinfo {
 
 .dict-toolbar {
   display: flex !important;
-  flex-wrap: wrap !important;
+  flex-wrap: wrap;
   gap: 6px !important;
-  padding: 6px 44px 6px 10px !important;
+  /* padding comes from the shared toolbar band (components/ui-input.css). */
+  padding: 6px 10px !important;
   background: var(--dark2) !important;
   border-radius: 12px !important;
   border: 1px solid var(--dark3) !important;

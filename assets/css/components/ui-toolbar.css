@@ -199,3 +199,29 @@
   color: var(--light2) !important;
   background: var(--dark1) !important;
 }
+
+
+/* Touch layout: the chip row of a filter toolbar is a navigation strip, so it gets one row that
+   scrolls sideways instead of four wrapped rows that push the content off the screen.
+   Measured on a 360x640 phone, the wrapped row of the PC box took 240px of a 306px content area:
+   the player saw the filters and almost nothing to filter. One row keeps every chip reachable with a
+   thumb swipe and gives the panel back the height it needs for its cards. */
+@media (max-width: 850px), (pointer: coarse) {
+  .pw-filterbar button.pw-chip {
+    height: 40px;
+    min-height: 40px;
+    padding: 0 14px;
+    font-size: 12px;
+  }
+
+  /* The toolbar keeps one band of navigation and one line of labels at most. */
+  .pw-filterbar {
+    row-gap: 6px;
+    padding-bottom: 6px;
+  }
+
+  .pw-filterbar .pw-drawer-toggle {
+    flex: 0 0 auto;
+    align-self: flex-start;
+  }
+}

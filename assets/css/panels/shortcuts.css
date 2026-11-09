@@ -19,7 +19,8 @@
 }
 
 .shortcut-action-btn {
-  border-radius: 12px;
+  border-radius: 8px;
+  min-height: 32px;
   box-shadow: 0 6px 14px rgba(0,0,0,0.14);
 }
 
@@ -35,7 +36,7 @@
 
 .shortcut-action-btn {
   width: 100%;
-  padding: 10px 12px;
+  padding: 0 9px;
   background: var(--dark3);
   border: 2px solid var(--shortcut-color, var(--light2));
   border-radius: 8px;

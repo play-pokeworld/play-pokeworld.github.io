@@ -4,6 +4,15 @@ import { EventBus } from '../src/core/EventBus.js';
 import { UpdateAvailableEvent } from '../src/core/events/UpdateAvailableEvent.js';
 import { UpdateBannerDismissedEvent } from '../src/core/events/UpdateBannerDismissedEvent.js';
 import { UpdateBanner } from '../src/ui/UpdateBanner.js';
+import { GameConfig } from '../src/config/GameConfig.js';
+
+/* The fake remote version is derived from the shipped one: a new release used to break this test,
+   which had to be edited by hand at every version bump. */
+const NEXT_VERSION = (() => {
+  const parts = String(GameConfig.VERSION).split('.').map((part) => Number(part) || 0);
+  parts[parts.length - 1] += 1;
+  return parts.join('.');
+})();
 
 describe('Update notifications', (test) => {
   test('compares dotted numeric versions safely', () => {
@@ -31,13 +40,13 @@ describe('Update notifications', (test) => {
     const onUpdate = (event) => events.push(event);
     const bus = EventBus.getInstance();
     bus.subscribe(UpdateAvailableEvent, onUpdate);
-    globalThis.fetch = async () => ({ ok: true, text: async () => "export const GameConfig = { VERSION: '1.16.32' };" });
+    globalThis.fetch = async () => ({ ok: true, text: async () => `export const GameConfig = { VERSION: '${NEXT_VERSION}' };` });
     const system = new UpdateSystem();
     try {
       await system.checkForUpdate();
       await system.checkForUpdate();
       assert.equal(events.length, 1);
-      assert.equal(events[0].version, '1.16.32');
+      assert.equal(events[0].version, NEXT_VERSION);
     } finally {
       system.onDestroy();
       bus.unsubscribe(UpdateAvailableEvent, onUpdate);

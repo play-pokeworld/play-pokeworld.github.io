@@ -251,3 +251,30 @@
   flex-wrap: wrap;
   gap: 6px;
 }
+
+
+/* Touch layout — the chip row of a filter toolbar is a navigation strip, not a paragraph.
+   `.inv-tabs` (the chip row of FilterBar) declares `flex-wrap: wrap !important`: on a phone the
+   eleven chips of the PC box therefore stacked into four rows and took 206px of the 330px the panel
+   had left for its cards. One row that scrolls sideways gives that height back and keeps every chip
+   one thumb swipe away; the legacy `!important` is the reason this override needs one too. */
+@media (max-width: 850px), (pointer: coarse) {
+  .pw-filterbar .pw-chip-row.inv-tabs {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px !important;
+    margin-bottom: 0 !important;
+  }
+
+  .pw-filterbar .pw-chip-row.inv-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pw-filterbar .pw-chip-row.inv-tabs > * {
+    flex: 0 0 auto;
+  }
+}

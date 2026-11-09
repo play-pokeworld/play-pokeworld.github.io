@@ -149,8 +149,8 @@ describe('Touch-screen stylesheet (1.16.20)', (test) => {
 
   test('fingers get finger-sized controls', () => {
     const toolButtons = rulesFor('layout/window-chrome.css', '.pw-win-tool-btn')
-      .filter((rule) => /min-width\s*:\s*34px/.test(rule.body));
-    assert.ok(toolButtons.length > 0, 'the 26px header tool buttons grow to 34px on a touch screen');
+      .filter((rule) => /min-width\s*:\s*44px/.test(rule.body));
+    assert.ok(toolButtons.length > 0, 'the 26px header tool buttons grow to 44px on a touch screen');
 
     const selects = rulesFor('components/ui-dropdown.css', '.pw-dropdown-select')
       .filter((rule) => /font-size\s*:\s*16px/.test(rule.body));
@@ -185,5 +185,82 @@ describe('Touch-screen stylesheet (1.16.20)', (test) => {
       .filter((file) => /setTimeout\([^)]*,\s*500\)/.test(fs.readFileSync(file, 'utf8')))
       .map((file) => path.relative(PROJECT_ROOT, file));
     assert.deepEqual(offenders, [], 'the press-and-hold gesture lives in one place');
+  });
+});
+
+describe('Mobile shell (1.16.32)', (test) => {
+  const readSrc = (relative) => fs.readFileSync(path.join(PROJECT_ROOT, relative), 'utf8');
+
+  test('one predicate decides the presentation, for CSS and for script', () => {
+    // Before this pass, the stylesheets matched `(max-width: 850px), (pointer: coarse)` while the
+    // dashboard compared `innerWidth <= 850`: on a wide touch screen the CSS showed the mobile layout
+    // and the script kept the desktop one, so tab switching and window visibility disagreed.
+    const layout = readSrc('src/config/DashboardLayout.js');
+    assert.ok(/export const MOBILE_MEDIA_QUERY/.test(layout), 'the media query is declared once, in config');
+    assert.ok(/pointer:\s*coarse/.test(layout), 'a coarse pointer is part of the presentation');
+
+    const shell = readSrc('src/ui/AppShell.js');
+    assert.ok(/isMobileLayout\(\)/.test(shell), 'AppShell answers "which presentation"');
+    assert.ok(/MOBILE_MEDIA_QUERY/.test(shell), 'AppShell reads the shared query');
+
+    const offenders = ['src/ui/ScrollLock.js', 'src/ui/dashboard/MobileDashboardNav.js']
+      .filter((file) => /\(max-width:\s*850px\)|pointer:\s*coarse/.test(readSrc(file)));
+    assert.deepEqual(offenders, [], 'no module carries its own copy of the media query');
+
+    const widthOnly = ['src/ui/ScrollLock.js', 'src/ui/dashboard/MobileDashboardNav.js']
+      .filter((file) => /MOBILE_BREAKPOINT_PX/.test(readSrc(file)));
+    assert.deepEqual(widthOnly, [], 'no module decides the layout from a width alone');
+  });
+
+  test('the navigation is anchored in the thumb zone and the page reserves its height', () => {
+    const nav = rulesFor('layout/mobile.css', '.mobile-nav-bar')
+      .filter((rule) => /position\s*:\s*fixed/.test(rule.body));
+    assert.ok(nav.length > 0, 'the bar is an overlay');
+    assert.ok(nav.some((rule) => /bottom\s*:\s*0/.test(rule.body)), 'the bar sits at the bottom of the screen');
+    assert.ok(nav.some((rule) => /env\(safe-area-inset-bottom/.test(rule.body)), 'the home bar never covers the tabs');
+
+    const reservation = rulesFor('layout/mobile.css', '#main-dashboard')
+      .filter((rule) => /padding-bottom/.test(rule.body) && /--pw-mobile-nav-h/.test(rule.body));
+    assert.ok(reservation.length > 0, 'the page flow keeps clear of the bar');
+
+    const tabs = rulesFor('layout/mobile.css', '.mob-btn')
+      .filter((rule) => /min-height\s*:\s*44px/.test(rule.body));
+    assert.ok(tabs.length > 0, 'a tab is 44px high');
+
+    const token = read('core/base.css');
+    assert.ok(/--pw-mobile-nav-h:\s*56px/.test(token), 'the reserved height matches the bar that exists');
+  });
+
+  test('no sheet squeezes a panel with a transform', () => {
+    // `transform: scale(0.92)` on a panel did not make it responsive: it shrank the text and the touch
+    // targets, and turned the scaled node into the containing block of every fixed child inside it.
+    const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) return walk(full);
+      return entry.name.endsWith('.css') ? [full] : [];
+    });
+    const offenders = [];
+    for (const file of walk(CSS_ROOT)) {
+      for (const rule of [...stripComments(fs.readFileSync(file, 'utf8')).matchAll(/([^{}]+)\{([^{}]*)\}/g)]) {
+        // Keyframe steps animate a scale; a panel is never *sized* by one.
+        if (/^(\d+%|from|to)$/i.test(rule[1].trim())) continue;
+        if (/transform\s*:\s*scale\(\s*0?\.\d+\s*\)/.test(rule[2])) {
+          offenders.push(`${path.relative(CSS_ROOT, file)} → ${rule[1].trim().replace(/\s+/g, ' ').slice(0, 40)}`);
+        }
+      }
+    }
+    assert.deepEqual(offenders, [], 'a panel is sized by its layout, never shrunk');
+  });
+
+  test('a filter toolbar folds into one scrolling band on touch', () => {
+    const strip = rulesFor('components/chips.css', '.pw-chip-row')
+      .filter((rule) => /flex-wrap\s*:\s*nowrap/.test(rule.body) && /overflow-x\s*:\s*auto/.test(rule.body));
+    assert.ok(strip.length > 0, 'the chip strip is one row that scrolls sideways');
+
+    const toggle = rulesFor('components/ui-input.css', '.pw-drawer-toggle')
+      .filter((rule) => /position\s*:\s*static/.test(rule.body));
+    assert.ok(toggle.length > 0, 'the drawer toggle is a row sibling, not a button floating over the chips');
+    assert.ok(toggle.some((rule) => /min-height\s*:\s*44px/.test(rule.body) || /height\s*:\s*44px/.test(rule.body)),
+      'the toggle is 44px high');
   });
 });

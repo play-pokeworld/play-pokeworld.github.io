@@ -38,6 +38,17 @@ export const DASHBOARD_COLUMN_ORDER = Object.freeze([DashboardColumns.LEFT, Dash
 /** Viewport width (px) at or below which the dashboard switches to the mobile layout. */
 export const MOBILE_BREAKPOINT_PX = 850;
 
+/**
+ * The one media query that defines the touch layout. Stylesheets and script read the *same* string,
+ * so a rule and the behaviour it depends on can never disagree: a window narrower than the breakpoint
+ * OR a coarse pointer (a finger, whatever the width) gets the mobile presentation.
+ * A wide touch screen is therefore a mobile layout, and a narrow window driven by a mouse is one too.
+ */
+export const MOBILE_MEDIA_QUERY = `(max-width: ${MOBILE_BREAKPOINT_PX}px), (pointer: coarse)`;
+
+/** Height (px) of the mobile bottom navigation, safe-area excluded. Mirrored by `--pw-mobile-nav-h`. */
+export const MOBILE_NAV_HEIGHT_PX = 56;
+
 /** Mobile bottom navigation: one tab = a set of visible windows. */
 export const MOBILE_VIEWS = Object.freeze([
   { id: 'adventure', labelKey: 'adventure_tab', windows: [WindowIds.MAP, WindowIds.LOCATION, WindowIds.STORY] },

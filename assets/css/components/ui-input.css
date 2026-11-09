@@ -159,6 +159,39 @@
   content: "▴";
 }
 
+/* The toggle used to float at `position: absolute; top: 8px; right: 8px`, i.e. on top of the last
+   chip of the strip, which became untappable underneath it. It is a row sibling now: the chips keep
+   the whole width that is left, and the toggle owns its own 44px square at the end of the band. */
+.pw-filterbar .pw-drawer-toggle {
+  position: static !important;
+  order: 3;
+  flex: 0 0 auto;
+  align-self: center;
+  width: 44px !important;
+  height: 44px !important;
+  margin-left: 6px;
+}
+
+.pw-filterbar .pw-chip-row {
+  order: 1;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+/* Closed drawer: the band is one line — the strip and the toggle side by side. Open drawer: the
+   selects and the search field take their own rows below.
+   The panel sheets used to reserve `44px` of right padding for the absolutely positioned toggle;
+   the toggle is a row sibling now, so that padding is gone with it. */
+.pw-filterbar:not(.mobile-drawer-open) {
+  flex-wrap: nowrap;
+  padding-right: 10px !important;
+}
+
+.pw-filterbar .pw-filter-fields,
+  .pw-filterbar .pw-filter-end {
+  order: 2;
+}
+
 }
 
 .pw-switch {

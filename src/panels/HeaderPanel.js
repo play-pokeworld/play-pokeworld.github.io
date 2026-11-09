@@ -27,6 +27,11 @@ export class HeaderPanel extends UIElement {
 
     const brand = new UIContainer({ tagName: 'h1', className: 'pw-header-brand' });
     const brandMark = new UIContainer({ tagName: 'span', className: 'brand-mark pw-header-brand-mark' });
+    // The brand mark is the navigation button: NavMenu listens to it and toggles the panel.
+    brandMark.setAttribute('id', 'nav-menu-btn');
+    brandMark.setAttribute('role', 'button');
+    brandMark.setAttribute('tabindex', '0');
+    brandMark.setAttribute('aria-label', t('nav_menu_title'));
     brandMark.addChild(new UIImage({ src: AssetPaths.appIcon(), alt: t('app_name') }));
     brand.addChild(brandMark);
     brand.addChild(new UIText({ text: t('app_name') }));

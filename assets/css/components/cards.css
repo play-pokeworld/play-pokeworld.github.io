@@ -27,7 +27,9 @@
   padding: 10px !important;
   color: var(--pw-text-primary) !important;
   display: flex !important;
-  flex-wrap: wrap !important;
+  /* The desktop toolbar wraps its chips and fields; the touch layout folds the same toolbar into one
+     scrolling band (components/ui-input.css) and needs to win that property. */
+  flex-wrap: wrap;
   gap: 8px !important;
   align-items: center !important;
 }

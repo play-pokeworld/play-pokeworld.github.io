@@ -422,18 +422,26 @@
 }
 
 /* Touch screens: the native select was 28px high with a 12px label, which iOS zooms into as soon as
-   it is focused and which is a narrow target for a thumb. 16px is the size below which iOS zooms. */
+   it is focused and which is a narrow target for a thumb. 16px is the size below which iOS zooms;
+   44px is the height of a finger-sized control, the same as every other control of the shell. */
 @media (max-width: 850px), (pointer: coarse) {
   .pw-dropdown-select {
-    height: 36px !important;
-    min-height: 36px !important;
+    height: 44px !important;
+    min-height: 44px !important;
     font-size: 16px !important;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
+    max-width: 100%;
   }
 
   .pw-dropdown-select:not(.pw-dropdown-select--native) {
-    height: 36px !important;
+    height: 44px !important;
     font-size: 16px !important;
+  }
+
+  /* A select never imposes a desktop minimum width on the row that holds it. */
+  .pw-select-wrap {
+    min-width: 0;
+    max-width: 100%;
   }
 }

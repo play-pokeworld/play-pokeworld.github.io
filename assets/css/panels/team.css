@@ -40,7 +40,7 @@
 
 .poke-card {
   background: var(--light1);
-  border-radius: 10px;
+  border-radius: 8px;
   margin-bottom: 8px;
   border: 1px solid var(--dark1);
   transition: all 0.2s;
@@ -1496,4 +1496,198 @@
   overflow: visible !important;
   text-overflow: clip !important;
   overflow-wrap: anywhere;
+}
+
+/*
+ * Rework v13 - team member band, validated look.
+ * One horizontal band per Pokemon: sand card, dark info box, move bars.
+ * Numbers come from the PokeChill reference (explore-team-member,
+ * explore-header-hpbox, pkmn-movebox, team-held-item).
+ */
+
+.poke-card {
+  background: var(--light1) !important;
+  border: 1px solid var(--dark1) !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.poke-card-top {
+  background: transparent !important;
+  padding: 9px 10px !important;
+  gap: 9px !important;
+  align-items: center;
+  border-radius: 0 !important;
+}
+
+/* the information block is a dark box inside the sand card */
+.poke-card-top .poke-info {
+  background: var(--dark1);
+  border-radius: 6px;
+  padding: 5px 9px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 2px 2px 1px 2px rgba(0,0,0,0.28);
+}
+
+.poke-card-top .poke-name {
+  color: var(--light2);
+  font-size: 13px;
+  gap: 7px;
+}
+
+.poke-card-top .poke-level {
+  background: var(--light1);
+  color: var(--dark1);
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.poke-card-top .hp-text {
+  color: var(--light2);
+  opacity: 0.75;
+  font-size: 11px;
+}
+
+.poke-card-top .hp-bar-container {
+  background: #1b1916;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 2px;
+  height: 9px;
+  overflow: hidden;
+}
+
+.poke-card-top .xp-bar-container {
+  background: #1b1916;
+  border-radius: 2px;
+  height: 6px;
+  overflow: hidden;
+  margin-top: 3px;
+}
+
+.poke-card-top .xp-bar-container > * {
+  background: #7cc8ee;
+}
+
+/* sprite: no disc behind it, larger, anchored to the bottom */
+#team-window-body .poke-card .poke-sprite-container,
+.team-card .poke-sprite-container,
+.poke-card .poke-sprite-container.large {
+  width: 112px !important;
+  height: 112px !important;
+  min-height: 112px !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.poke-card .poke-sprite-container img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  image-rendering: pixelated !important;
+  filter: drop-shadow(0 4px 3px rgba(0,0,0,0.45));
+}
+
+/* held item: top-left corner of the band, enlarged like team-held-item */
+.poke-card .poke-item-badge {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+.poke-card .poke-item-image {
+  width: 24px !important;
+  height: 24px !important;
+  transform: scale(1.55);
+  transform-origin: top left;
+  border-radius: 0 0 8px 0;
+  image-rendering: pixelated;
+  filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.35));
+}
+
+/*
+ * Rework 1.16.36 - Team window band, ported from the validated mockup.
+ * Scope: #team-window-body only. The battle row (#battle-team-row) is not
+ * touched: same component, different window, different sheet section.
+ */
+
+#team-window-body .poke-card {
+  background: var(--light1) !important;
+  border: 1px solid var(--dark1) !important;
+  border-bottom: 1px solid var(--dark1) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28) !important;
+  padding: 9px 10px !important;
+}
+
+#team-window-body .poke-card:hover {
+  background: var(--light2) !important;
+  border-color: var(--dark1) !important;
+}
+
+#team-window-body .poke-card-top { background: transparent !important; }
+
+/* the information block is a dark box sitting inside the sand card */
+#team-window-body .poke-card .poke-info {
+  background: var(--dark1) !important;
+  border-radius: 6px !important;
+  padding: 5px 9px !important;
+  box-shadow: 2px 2px 1px 2px rgba(0, 0, 0, 0.28) !important;
+}
+
+#team-window-body .poke-card .poke-name { color: var(--light2) !important; }
+
+#team-window-body .poke-card .poke-level {
+  background: var(--light1) !important;
+  color: var(--dark1) !important;
+}
+
+#team-window-body .poke-card .hp-text {
+  color: var(--light2) !important;
+  opacity: 0.75 !important;
+}
+
+#team-window-body .poke-card .poke-moves {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+#team-window-body .poke-card .poke-item-badge {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* the four move slots share one height: an empty slot is as tall as a filled one */
+#team-window-body .poke-card .poke-moves {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-auto-rows: 1fr !important;
+  align-content: stretch !important;
+  gap: 4px !important;
+}
+
+#team-window-body .poke-card .poke-move.empty {
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+}
+
+/* the move rows keep the dark fill of the reference band: on a sand card a
+   34% black wash left the type colours unreadable */
+#team-window-body .poke-card .poke-move { background: var(--dark2) !important; }
+
+#team-window-body .poke-card .poke-move.empty {
+  background: color-mix(in srgb, var(--dark2) 80%, var(--light1)) !important;
+  border-style: dashed !important; color: var(--light1) !important;
 }

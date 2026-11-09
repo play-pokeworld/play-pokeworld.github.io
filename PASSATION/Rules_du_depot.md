@@ -1,0 +1,352 @@
+# PokéWorld Rework — Code & Architecture Rules
+
+Binding rules for every contributor, human or AI. Read this file before you change anything.
+`npm test` enforces most of these rules automatically (see `tests/StaticRules.test.js`).
+A change that breaks a test is not finished.
+
+---
+
+## 1. Project goals
+
+1. **Full remake** of the original game (https://github.com/play-pokeworld/play-pokeworld.github.io) on a clean architecture.
+   - The rendering must stay **near-identical** to the original.
+   - Improvements are welcome when they are deliberate. Examples: choosing a nickname, the edge fade on the save card grid, a random theme on new save cards.
+2. Long-term maintainability comes before short-term speed.
+3. Every delivered zip carries a **version number** (`GameConfig.VERSION` and `package.json` stay in sync).
+   - **Corrective releases are patches, not major updates**: they increment the patch digit of the current
+     content release (`1.16.0` → `1.16.1`, `1.16.2`, …). A jump of the minor digit is reserved for a
+     content release. Renaming a delivered version also renames its `docs/PHASE_v<version>.md`.
+
+## 2. Language
+
+- **Code, identifiers and comments are written in English only.**
+- **No hardcoded user-visible text in code**, debug logs included.
+  - Every string goes through `t('key', params)` (`src/localization/LocalizationManager.js`).
+  - Write `console.log(t('debug_xxx', {...}))`, never `console.log('...')`.
+  - Tooling under `tests/` and `tools/` is developer-facing and exempt from this rule.
+- Each language has one flat table per domain: `src/localization/<lang>/<domain>.js`.
+  - A new domain must also be registered in `LocaleCatalog.js`.
+- **Parity:** FR and EN define exactly the same keys and the same `{placeholders}`.
+  - **No collisions:** a key is defined only once per language.
+- Reserved key namespaces:
+
+  | Namespace | Content |
+  |---|---|
+  | `item.<id>.name` / `item.<id>.desc` | item name / item description |
+  | `type.<id>` | type |
+  | `location.<id>` | location |
+  | `pokemon.<dexId>` | Pokémon name |
+  | `move.<id>` | move name |
+  | `move_desc.<id>` | move description |
+  | `quests.*` | quests |
+  | `channel_<id>` | notification channel |
+  | `theme_<id>` | UI theme |
+  | `save_bg_<id>` | save card theme |
+  | `lang_label_<id>` | language label |
+  | `avatar_<id>` | trainer avatar |
+  | `ball_<id>` | Poké Ball |
+
+- Game data saved to disk uses **ids or slugs**, never translated names. For example, a Pokémon is stored as `species: 'charmander'`.
+  - A translation is **never** written into the save or into any game data: no `player.nickname = t('rental')`,
+    no `label = t('x')` on a persisted object. Store a flag/reference and translate where it is displayed.
+  - `LocalizedText` is a `String`: `JSON.stringify()` silently flattens it into frozen text. Anything that can
+    reach `SaveManager` stores primitives only.
+
+### 2.1 Live localization (v1.16.1)
+
+A displayed text must be able to change language **without rebuilding the window**. To get that, the text
+is never resolved twice into a string: a token carrying its key is passed down to the widget, and the widget
+re-resolves it when `LanguageChangedEvent` fires.
+
+| Need | API |
+|---|---|
+| plain text | `t('key', params)` — returns a `LocalizedText` |
+| text with a fallback | `tOr('key', fallback, params)` |
+| several parts | `compose(part1, part2, …)` |
+| interpolation | `` lt`${a} — ${b}` `` (tagged template) |
+| a list | `join(separator, items)` / `joinLocalized(separator, items)` |
+| optional text | `has('key') ? t('key') : fallback` |
+
+Forbidden, because each one freezes the text in the language active at that moment:
+
+- `` `${t('key')} …` `` — a template literal that is **not** tagged with `lt`;
+- `t('key') + ' ' + other` and `t('key').trim()/replace()/toUpperCase()` (returns a primitive);
+- `array.map(t).join(', ')` — use `joinLocalized(', ', array)`; `Array.join` on a translated list writes the
+  separators in the language of the call;
+- `String(t('key'))`, and comparing texts with `===` / `includes()` (compare ids or `String(t(...))`);
+- `if (currentLang === 'fr')` in a component or a data builder — a text never branches on the language;
+- caching `t('key')` in a field **and** re-rendering layout from it: subscribe to `LanguageChangedEvent`
+  (or let the binder refresh the widget) instead.
+
+Rules for the widgets (`src/ui/`): a widget that accepts a text accepts a `LocalizedText`, keeps the token,
+and re-resolves it on `LanguageChangedEvent` through `LocalizedTextBinder`. Writing a text attribute directly
+(`node.textContent = …`, `setAttribute` on the DOM node) bypasses the binder: always go through the widget API
+(`UIText.setText`, `UIElement.setAttribute`, `UIImage.setAlt`…).
+
+Rules for the data: game data stores **ids**. A description that does not exist yet is derived at display
+time from the data itself (`ItemDescription`, `ItemDisplayName`), never by writing a sentence in a table-less
+place, and never with a hardcoded rental/quality/label prefix.
+
+Static guards: `tests/LocalizationRules.test.js` (no `+`, no string method, no untagged template, no identity
+comparison, no hardcoded widget text, every language file registered, API shape) and
+`tests/LocalizationRuntime.test.js` (a real window already open follows the switch).
+`node tools/i18n/audit-i18n.mjs` lists the remaining candidates, `node tools/i18n/audit-keys.mjs` the keys
+used by the code that no table defines.
+
+## 3. Files and classes
+
+- **One file = one class = one purpose.**
+  - Split any file that declares several classes, or that mixes responsibilities.
+  - Split any file that hardcodes a list of object types inside unrelated logic.
+- Group related files in folders. Examples: `core/events/`, `data/quests/`, `panels/settings/`, `ui/dashboard/`.
+- Constants live in `src/config/` as frozen objects. This covers ids, storage keys, timings, layout and asset paths.
+  - No magic strings or numbers in logic.
+- Raw game tables live in `src/data/raw/`.
+  - They are plain ESM exports: no `globalThis` or `window` surface.
+  - They are wrapped by typed repositories: `PokemonDB`, `LocationDB`, `ItemDB`, `QuestDB`.
+
+## 4. Layers
+
+```
+config/  ← constants only
+core/    ← BaseObject, EventBus + typed events, LocalStore, TextFormatter, PageManager, Engine
+data/    ← models and repositories (DOM-free)
+systems/ ← game logic singletons (DOM-free)
+ui/      ← the ONLY layer that touches the DOM (widgets, AppShell, dialogs)
+panels/  ← game windows composed from ui/ widgets
+pages/   ← top-level screens (SaveMenuPage, GamePage)
+localization/
+```
+
+- **Systems and data never touch the DOM.**
+  - They publish typed events through `EventBus` (`new XxxChangedEvent(...)`).
+  - Views subscribe with `this.listen(XxxChangedEvent, callback)`, which unsubscribes automatically on destroy.
+- **Only `src/ui/` (plus `main.js`) uses `document` / `window`.** `AppShell` owns `<html>` and `<body>`.
+- **Only `core/LocalStore.js` uses `localStorage`.** Every key is declared in `config/StorageKeys.js`, with legacy migrations in `LEGACY_STORAGE_KEYS`.
+- **Images are resolved only by `config/AssetPaths.js`.**
+  - Assets live in the root `assets/` folder, never under `src/`.
+  - Pokémon sprites: `assets/images/pokemon/<species>.png` or `<species>_<form>.png`.
+  - Shiny sprites: same file name under `assets/images/pokemon/shiny/` (`AssetPaths.pokemonSprite(species, form, true)`).
+  - Trainer sprites: `assets/images/trainers/<trainerName>.png`.
+  - The images are part of the repository and of every delivered zip (a test checks that each species has a sprite).
+- **Team mutations go through `TeamSystem`** (e.g. `setLead(index)`), which saves and emits `TeamChangedEvent`. Views never reorder `save.team` themselves.
+
+## 5. UI construction
+
+- **Never create windows, buttons or panels with raw HTML.** That means no `innerHTML`, no HTML strings and no `createElement` outside `src/ui/`.
+- Build every screen from the base widgets. Examples: `UIContainer`, `UIText`, `UIButton`, `UIImage`, `UIIcon`, `UIPanel`, `DraggablePanel`, `UIModal`, `StaticModalPanel`, `UITabBar`, `UIDropdown`, `UISwitch`, `UISlider`, `UIProgressBar`, `UITextInput`, `UISortableList` (lists reordered by drag & drop).
+  - If a needed widget does not exist, add one in `src/ui/`.
+- **Widgets expose methods that map to CSS classes**, for example `button.setVariant('primary')`, `button.text.setAlignment('center')` and `text.setColor('accent')`.
+  - **No CSS in code:** no `.style.xxx =` and no `cssText`.
+  - Dynamic values (drag position, progress) go through CSS custom properties via `_setCssVariable('--pw-…', value)`.
+- Rich text uses `UIText.setRichText(template, params)`.
+  - `TextFormatter` parses it into nodes, with a whitelist of `b`, `strong`, `i`, `em` and `br`.
+  - It is never injected as HTML.
+- Icons come from `ui/icons/IconRegistry.js`. No emoji and no copy-pasted SVG markup in panels.
+- **Keep the original ids and class names** so that the inherited design-system sheets (`assets/css/design-system/`) keep applying.
+  - The overlay ids of the original are reserved. Never reuse `#settings-modal`, `#quest-modal`, `#confirm-modal`, `#poke-modal`, `#battle-summary-modal` or `#unified-selector-modal` for another element.
+- Panel pattern — **a dashboard panel receives its starting column in its constructor**
+  (`DashboardColumns.LEFT | CENTER | RIGHT`). Within a column, the first panel created is at the top
+  and the last one at the bottom; the layout saved by the player is restored on top of that order:
+
+```js
+export class XxxPanel extends DraggablePanel {
+  /** @param {string} column - Starting dashboard column (DashboardColumns value) */
+  constructor(column) {
+    super({ id: WindowIds.XXX, column, title: t('xxx_title'), icon: 'map', bodyClassName: 'pw-xxx-root', name: 'XxxPanel' });
+    this.addChild(new UIContainer({ className: 'pw-xxx-grid', children: [...] }));
+    this.listen(SomethingChangedEvent, () => this._refresh());
+  }
+}
+```
+
+- **Dashboard scrolling matches the original page flow.** The browser document scrolls; the game header
+  stays sticky, while `#main-dashboard`, its columns and dashboard windows grow to their content height
+  (`assets/css/dashboard-layout.css`). Do not make the dashboard itself a scroll container. Dashboard
+  windows do not scroll internally; retain a bounded viewport only for an intrinsically pannable surface
+  such as the map, or a full-screen panel's content area.
+- **Every panel must fit its available width**, including a narrow desktop dashboard column, not
+  only a mobile viewport. Grid tracks may not impose a minimum wider than their container. Use
+  shrinkable children, wrapping text and container-aware reflow; never hide or clip overflowing
+  content to make a panel appear responsive. Keep all actions reachable through the normal page flow.
+  - A panel body is a single-column grid: `grid-template-columns: minmax(0, 1fr)`. Without the `0`
+    minimum, one child that cannot shrink widens the track and pushes **every** sibling out of the window.
+  - A fixed size in a row (`min-width: 130px`, `flex: 0 0 26px`, `white-space: nowrap`) must come with a
+    way to reflow: `flex-wrap: wrap` on the row plus `min-width: 0` / `overflow-wrap: anywhere` on the
+    text, and `min-width: min(<fixed>, 100%)` on the box. A `@container` query can then relax the fixed
+    size in a narrow window.
+  - An element never decides the width of its panel: the panel decides, the element adapts.
+  - Checked by `tests/browser/PanelFit.mjs` (9 widths x 12 locations, every dashboard window, plus the
+    English labels): a box, a text or a grid that crosses its window edge fails the test.
+- **Dragging a window** is handled by `ui/dashboard/WindowDragController.js` (owned by `DashboardView`):
+  the window follows the pointer through a CSS transform (`--pw-drag-x/y`) once per animation frame, and
+  the placeholder only moves when the drop target changes. Never animate `left/top` or use
+  `transition: all` on `.dash-win`.
+- **Whole-card team dragging starts from ordinary mouse movement**, like window dragging, not a
+  mandatory mouse hold. Read-only move bars are part of the card; real buttons/inputs keep their own
+  actions. The card follows the pointer without rebuilding its nodes. Escape/pointer cancellation
+  never changes the party or opens a phantom selector; save changes invalidate the gesture.
+- **Decorative animation never consumes gameplay RNG or writes saves.** Spawn complete sprites
+  outside the viewport, bound concurrent density and preserve reduced-motion/page visibility
+  preferences. UI may pass numeric CSS variables for trajectories; CSS animates transform/opacity.
+- **Live views are built once and updated in place.** A view refreshed by game events (battle tick,
+  team change) keeps its nodes and calls setters (`UIText.setText`, `UIProgressBar.setValue`,
+  `UIImage.setSource`, `addClass`…). Every setter is a **no-op when the value is unchanged**, so a refresh
+  that changes nothing causes no DOM mutation. Rebuild children only when the structure changes
+  (e.g. `PokemonMoveList` rebuilds only when the move ids or the opponent types change).
+- **Modals open through a request event**, never through a reference:
+  `EventBus.getInstance().dispatch(new ModalOpenRequestedEvent(ModalIds.XXX, params))`.
+  Each `UIModal` listens to that event and opens itself (`open(params)`) when the id is its own.
+  Modal ids live in `config/ModalIds.js`.
+- **Full-screen screens (shop, bag, badges, PC box…) extend `UIFullscreenPanel`** (`src/ui/`), one
+  subclass per screen in `src/panels/fullscreen/`, added to the `GamePage` children and opened by
+  `ModalOpenRequestedEvent(ModalIds.XXX)`. They fill `setTitle()`, `setFilters()` (fixed toolbar,
+  built with `FilterBar`) and `setContent()` (the only scrolling area); fixed actions may use the
+  optional `setFooter()` slot, which stays outside the scroller and disappears when empty. The state
+  (selection, tab, quantity) lives in the screen, the rules in a DOM-free system.
+- **Location actions are `UIActionTile`s** built by `panels/components/LocationActions.js` from the
+  location data (`shop`, `champion`, encounters); a locked action is an informational row, never a
+  greyed-out button.
+- **A modal opened from another modal stacks above it** (higher overlay z-index, registered after it
+  in `GamePage`); the first modal stays open and refreshes through events when the second one closes.
+
+## 6. Pages and navigation
+
+- Change pages only through `Engine.getInstance().getPageManager().openPage(PageIds.XXX)`.
+- **Pages never import other pages.** Only `pages/PageRegistry.js` imports page classes, which avoids circular includes.
+- **Pages are pure composition.** Every panel and modal lives in its own file and is created with `new`
+  inside the page constructor, but **a page never keeps a reference to it** (no `this._teamPanel = new …`).
+  Panels and modals talk through the EventBus (see the static test "pages never keep a reference").
+
+## 7. CSS
+
+- **One entry point:** `index.html` loads `assets/css/style.css` and nothing else. `style.css` is a
+  pure `@import` manifest (no rule of its own): it declares the cascade order, once.
+  - Never write a rule in `style.css`, never add an `@import` inside a sheet, never reorder the manifest
+    without running the visual fingerprint (see §9).
+  - A sheet is imported exactly once (`tests/CssBundle.js` throws on a duplicate).
+- **One file, one object.** A sheet is named after the UI object it styles — never after a date, a
+  pass or a "misc" bucket. Four folders, one responsibility each:
+  - `core/` — tokens, variables, themes, element resets, form controls, keyframes, scrollbars: no
+    widget styling.
+  - `layout/` — page skeleton, header bar, dashboard columns, window chrome, mobile layout.
+  - `components/` — one file per reusable widget (`ui-button.css`, `ui-modal.css`, `badges.css`,
+    `ui-toolbar.css`…).
+  - `panels/` — one file per game window or panel (`bag.css`, `team.css`, `facilities.css`…).
+  - The dated `design-system/pass-*.css` sheets are **gone** (1.16.14): their rules were redistributed
+    into the sheet of the object they style. Do not recreate them, and do not add a new "pass" file.
+- **A rule may be duplicated, a selector may not be split across sheets.** When one rule lists
+  selectors owned by several objects, it is copied into each owner sheet at the position it had in
+  the reference cascade, so every selector keeps its document order.
+- **The manifest order is the cascade.** Rules of equal specificity that fight over one property are
+  decided by sheet order alone. Adding or moving a sheet therefore demands a fingerprint comparison
+  (`tests/browser/CssFingerprint.mjs`) against the reference tree — a green unit suite does not prove
+  the rendering is unchanged.
+- **Comments are English-only and explain a constraint** ("why"), never a changelog ("wave 33 did
+  X"). The phase documents in `docs/` record what changed when.
+- Tokens are the single source of truth for palette, fonts and theme colour:
+  `core/variables.css` (legacy tokens) and `core/tokens.css` (`--pw-*`).
+  - Use tokens such as `var(--light2)`, `var(--pw-border-color)` and `var(--pw-bg-surface)`, not hex
+    values, so that the UI themes keep working.
+- **Adding style is a two-step move:** write the rule in the sheet that owns the widget, then add one
+  line to the manifest if the sheet is new. `tests/CssStructure.test.js` fails otherwise (missing
+  import, orphan sheet, header-less sheet, sheet over 1 700 lines, a `pass-*`/`misc`/`shared` name, a
+  French comment, a relative `url()` that does not resolve from the new folder).
+- Avoid `!important`. Prefer `:where()` for low-specificity base rules. When a `!important` override
+  must lose to the hidden-state utility, exclude it explicitly (`:not(.is-hidden)`) instead of relying
+  on sheet order.
+- Theme-specific overrides of legacy rules go in `core/themes.css` (or the theme block of the owning
+  sheet), scoped with `:root[data-theme="…"]`. Light themes are `light` and `sakura`.
+- **Scroll performance** (the document is the page scroller):
+  - animate only `transform` and `opacity`; never animate `background-position`, `left/top`,
+    `width/height` or use `transition: all`;
+  - never animate a full-viewport layer other than with a `transform` (the animated backdrop is a
+    `translate3d` of `body::before`, disabled by `prefers-reduced-motion`);
+  - any deliberately nested scroll region needs `will-change: scroll-position` (Chromium scrolls a
+    non-opaque nested scroller on the main thread at device pixel ratio < 1.5 otherwise);
+  - no `backdrop-filter` / big `box-shadow` on elements that move while scrolling.
+
+## 8. Data and saves
+
+- Every save operation goes through `SaveSystem`, which persists via `SaveStorage` and `LocalStore`.
+- A new save card gets a **random theme** at creation (`SaveThemes.random()`).
+- **The save format is versioned** by `config/SaveSchema.js`. Any change of the serialized shape bumps
+  `SaveSchema.VERSION`, and `SaveData.deserialize()` keeps reading every older version (including the
+  original game's `G` object). Add a test per migration (`tests/DataLayer.test.js`).
+- **Store facts, derive counts.** A count that can be computed (caught species, seen species…) is never
+  stored next to the data it counts (`PokedexData.getCaughtCount()`, not `player.caughtCount`).
+- The data model is documented in `docs/DATA_MODEL.md`; keep it up to date.
+- **Static definitions are separate from per-save state.** `data/raw/*` + repositories (`PokemonDB`,
+  `MoveDB`, `ItemDB`…) are read-only and identical for every save; progress (Pokédex, team, wallet…)
+  lives in models owned by `SaveData`.
+- **No localized text and no emoji in `data/raw/`.** Names and descriptions are localization keys
+  derived from the id (`pokemon.<id>`, `move.<id>`, `move_desc.<id>`, `type.<id>`, `location.<id>`).
+- **Ids are lowercase and stable**: types (`fire`), moves (`ember`), species slugs (`charmander`).
+  Inputs from older tables are normalized at load (`TypeChart.normalize`).
+- Generated tables say so in their header and are rebuilt by `node tools/data/build-all.mjs ../orig`
+  (`npm run data -- <original repository root>`), never edited by hand. Fix the generator or its transcription file instead.
+- **Every table passes `DataValidator`** (cross references, known effect kinds, known condition
+  keys); the test suite requires an empty problem list.
+- **Saves are migrated before they are read.** `SaveMigrator` applies pure, individually tested
+  migrations (`MigrationVnToVn+1.js`); models only read the current shape.
+- **Facilities share access and ownership.** `FeatureAccessSystem` is their single progression
+  resolver. Once unlocked, Pension, Mine and Training management is independent of the current route.
+  Facility slots and queues reference `PokemonCollectionData` UIDs; they never own duplicate Pokémon.
+  Training assignments stay reserved until explicit removal, including while idle and after reload.
+- **Facility filters select future candidates only.** Slot-local filters and queue builders share
+  domain candidate rules; changing them never removes a manual FIFO entry or releases an assignment.
+  Migrations preserve legacy configured priorities, collection UIDs and valid saved battle DTOs.
+- **Preset editing is transient and UID-only.** The full-screen manager and full-card editor use
+  the common PC, item and information interfaces. Cancellation must not edit a saved preset; applying
+  an edited preset is one validated canonical party transaction and one save.
+- **Manual Mine renewal uses a saved deadline.** Enforce the ten-minute interval in the system,
+  not a view timer. Automatic/lazy layers bypass that manual clock without resetting it.
+- **Resumable training is an engine DTO, not a runtime-object dump.** Snapshot validation precedes
+  construction and owned-state mutation. Persist RNG, combatants, field and clocks; do not replay entry
+  effects or simulate offline training. A rejected snapshot pauses automation and keeps its assignment.
+- **Full Pokémon grid entries are shared.** PC, Pokédex and Location compose `PokemonGridEntry`;
+  item media use the common sprite frame with paths resolved through the item repository/`AssetPaths`.
+- **Background catch-up replays, it never invents.** The AFK simulation (`FastForwardSystem`) only
+  advances activities the player launched, through the system that owns their rules
+  (`BattleSystem.catchUp`, `TrainingSystem.catchUp`, `DungeonAutoSystem`, `RelaunchSystem`). It creates
+  no encounter, grants nothing outside the real settlement, heals nothing, and does nothing when nothing
+  was running. Any absence longer than `FastForwardRules.MAX_CATCH_UP_SECONDS` is truncated, the replay
+  runs on the shiftable `TimeSource` clock, and nothing is written to the save per simulated step.
+- **One write per operation**: systems mutate the models, then call `SaveSystem.saveCurrent()` once.
+- **Mutate before dispatch**: a model changes its state first, then dispatches its event, so
+  listeners always read the new state.
+- **Quests are objective types.** One class per `ObjectiveTypes` value (`data/quests/objectives/`),
+  declaring the events it listens to; `QuestSystem` routes events, never `if (type === …)` chains.
+- **Battle effects are data.** Moves, talents and held items carry `{ kind, …, when? }` effects from
+  frozen vocabularies; the engine reads them in phase files and handler tables
+  (`MOVE_EFFECT_HANDLERS`), never by item / move / talent id. Every kind has a state in
+  `BattleEffectCoverage.js` (see `docs/BATTLE_EFFECTS.md`).
+- **Game rules take a `Random`.** No `Math.random()` in rules or systems; tests use
+  `Random.sequence([...])`. Rule constants live in `config/*Rules.js`.
+- **The battle engine is PokéChill's.** Its differences from the official Pokémon games are intended:
+  document them as PokéChill rules ("in PokéChill…"), never as bugs or "unlike the main series".
+  Deviations from the *original PokéWorld code* are listed in `docs/BATTLE_EFFECTS.md`.
+- **Catch: the ball comes only from the Poké Ball filters, the rate only from the ball.** Owning the
+  species or being in a quest never picks the ball; the species never changes the rate. The filters
+  are written by `PokeballSystem` only, the catch is done by `CatchSystem` only.
+- **Hand-made content goes to `src/data/content/*-content.js`**, never to `data/raw/` (rewritten by the
+  generators). Repositories merge them with `withContent` / `withContentList`: a new id adds an entry,
+  an existing id replaces the generated one. How-to for content authors: `docs/GUIDE_CONTENU.md`.
+- **Trainer battles go through a `TrainerBattleContext`** built by `TrainerSystem` (team choice,
+  rematch team, rewards, badges); `BattleSystem` stays generic and never reads trainer data.
+- **Purchases go through `ShopSystem`** (DOM-free): offers come from `ShopCatalog` (shop data +
+  `config/ShopRules.js`), counters from `StatisticsData.purchases`.
+- **Battle log entries are language neutral** (`{ key, params }` with raw ids); only
+  `BattleLogFormatter` turns them into text.
+
+## 9. Verification before delivery
+
+```bash
+npm test                      # static rules, localization, systems, game data, widgets, panels, launcher
+node --check <edited files>   # especially after regex edits of localization tables
+```
+
+- `start.bat` must stay **pure ASCII with CRLF** line endings (`.gitattributes`), and must never read `%errorlevel%` inside a `( )` block.
+- Update `README.md`, `docs/AUDIT.md` and this file when a rule or the structure changes.
+- **Every phase ships a French explanation file** `docs/PHASE_vX.Y.md` (what was done, decisions, what
+  is deferred) so the project owner can judge it.

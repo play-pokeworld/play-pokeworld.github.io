@@ -9,6 +9,8 @@
  * modal is open, whichever layer opened it, and the count keeps nested layers honest.
  */
 
+import { AppShell } from './AppShell.js';
+
 let depth = 0;
 
 /** Class put on `body`; the rule lives in layout/page-shell.css. */
@@ -18,15 +20,12 @@ const LOCK_CLASS = 'pw-scroll-locked';
  * Only a touch layout needs the lock: there, a full-screen panel is a fixed overlay on top of a page
  * that must not move under the finger. On a desktop the page itself is the scrolling surface of the
  * dense windows (a Pokémon sheet taller than the screen is reached by scrolling the page), so
- * freezing it would make its own content unreachable. Same breakpoint as the stylesheets.
+ * freezing it would make its own content unreachable. The predicate is the application's, never a
+ * local copy of a media query.
+ * @returns {boolean}
  */
-const TOUCH_LAYOUT = '(max-width: 850px), (pointer: coarse)';
-
-/** @returns {boolean} */
 function locksThisLayout() {
-  return typeof window !== 'undefined' && typeof window.matchMedia === 'function'
-    ? window.matchMedia(TOUCH_LAYOUT).matches
-    : false;
+  return AppShell.isMobileLayout();
 }
 
 /** @returns {boolean} */

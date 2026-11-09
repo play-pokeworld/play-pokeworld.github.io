@@ -250,12 +250,6 @@ body.mobile-mode #header h1 {
   font-size: 17px;
 }
 
-body.mobile-mode .mobile-nav-bar,
-  body.mobile-mode .mobile-subnav-bar {
-  padding-left: max(8px, env(safe-area-inset-left));
-  padding-right: max(8px, env(safe-area-inset-right));
-}
-
 body.mobile-mode #main-dashboard {
   height: auto;
 }
@@ -269,37 +263,12 @@ body.mobile-mode #win-map .win-body {
   overflow: auto;
 }
 
-body.mobile-mode .mobile-nav-bar {
-  padding-bottom: 6px;
-}
-
-}
-
-@media (max-width: 420px) {
-body.mobile-mode .mob-btn,
-  body.mobile-mode .mob-sub-btn {
-  min-width: 56px;
-  padding-left: 5px;
-  padding-right: 5px;
-  font-size: 11px;
-}
-
 }
 
 @media (orientation: landscape) and (max-width: 850px) {
 body.mobile-mode #win-map {
   height: 62dvh;
   min-height: 260px;
-}
-
-body.mobile-mode .mobile-nav-bar {
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
-body.mobile-mode .mob-btn,
-  body.mobile-mode .mob-sub-btn {
-  min-height: 36px;
 }
 
 }
@@ -494,33 +463,15 @@ body.save-menu-active {
 }
 
 body:not(.mobile-mode) .dash-win {
-  border-radius: var(--pw-radius-md);
+  border-radius: var(--pw-window-radius);
 }
 
 @media (max-width: 850px), (pointer: coarse) {
-body.mobile-mode .mobile-nav-bar {
-  top: 52px;
-  z-index: 961;
-  background: var(--dark1);
-}
-
-body.mobile-mode .mobile-subnav-bar {
-  top: 106px;
-  z-index: 960;
-  background: var(--dark1);
-}
 
 body.mobile-mode, body.mobile-mode * {
   -webkit-touch-callout: none !important;
   -webkit-user-select: none !important;
   user-select: none !important;
-}
-
-body.mobile-mode .mobile-nav-bar,
-  body.mobile-mode .mobile-subnav-bar {
-  padding: 6px 8px !important;
-  margin: 0 !important;
-  border-bottom: 1px solid rgba(236,222,183,0.14) !important;
 }
 
 body.mobile-mode #main-dashboard {
@@ -575,24 +526,8 @@ body.mobile-mode #shortcuts-window-body .shortcut-action-btn {
   box-sizing: border-box !important;
 }
 
-.modal-inner {
-  max-width: 96vw !important;
-  max-height: 90vh !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  overflow-y: auto !important;
-  transform-origin: center center !important;
-}
-
-}
-
-@media (max-width: 480px) {
-.modal-inner {
-  transform: scale(0.92) !important;
-  width: 108% !important;
-  margin-left: -4% !important;
-}
-
+/* `.modal-inner` is a legacy class: the modal panels are sized by components/ui-modal.css and
+   components/ui-panel.css. Nothing here shrinks a panel with `transform: scale(0.92)`. */
 }
 
 body {
@@ -865,10 +800,6 @@ body.mobile-mode #win-currency {
   outline: none;
 }
 
-body.mobile-mode .mobile-subnav-bar.is-hidden {
-  display: none !important;
-}
-
 .team-view .pw-team-drag-handle:focus-visible,
 #team-window-body .pw-team-drag-handle:focus-visible {
   outline: 2px solid var(--pw-accent-color, #ffe45c);
@@ -1020,7 +951,9 @@ body:not(.mobile-mode) #header .pw-header-badges {
 
 body.mobile-mode {
   --pw-game-header-h: 52px;
-  --pw-mobile-nav-h: 54px;
+  /* Height of the mobile bottom navigation bar (config/DashboardLayout.MOBILE_NAV_HEIGHT_PX).
+     One 6px padding band + one 44px row of tabs, safe-area excluded. */
+  --pw-mobile-nav-h: 56px;
 }
 
 
@@ -1045,7 +978,12 @@ body:has(#header) .pw-notification-container {
 }
 
 body.mobile-mode:has(#header) .pw-notification-container {
-  top: calc(var(--pw-game-header-h) + var(--pw-mobile-nav-h) + 8px);
+  /* The navigation is at the bottom of a phone screen: the notice keeps clear of the header at the
+     top and of the tabs at the bottom, in the band a thumb still reaches. */
+  top: calc(var(--pw-game-header-h) + 8px);
+  bottom: calc(var(--pw-mobile-nav-h) + 8px + env(safe-area-inset-bottom, 0px));
+  max-width: none;
+  justify-content: flex-end;
 }
 
 
@@ -1101,50 +1039,6 @@ body.mobile-mode #main-dashboard {
 body.mobile-mode .dash-win {
   width: 100% !important;
   margin-bottom: 8px !important;
-}
-
-body.mobile-mode .mobile-nav-bar {
-  display: flex !important;
-  position: sticky !important;
-  top: 52px !important;
-  z-index: 960 !important;
-  background: var(--dark1, #1C1A17) !important;
-  border-bottom: 1px solid rgba(236,222,183,0.15) !important;
-  padding: 6px 8px !important;
-  gap: 6px !important;
-  overflow-x: auto !important;
-}
-
-body.mobile-mode .mobile-subnav-bar {
-  display: flex !important;
-  position: sticky !important;
-  top: 92px !important;
-  z-index: 959 !important;
-  background: var(--dark2, #25231F) !important;
-  border-bottom: 1px solid rgba(236,222,183,0.12) !important;
-  padding: 4px 8px !important;
-  gap: 6px !important;
-  overflow-x: auto !important;
-}
-
-body.mobile-mode .mob-btn,
-  body.mobile-mode .mob-sub-btn {
-  padding: 6px 12px !important;
-  font-size: 12px !important;
-  font-weight: 700 !important;
-  border-radius: 6px !important;
-  white-space: nowrap !important;
-  background: rgba(236,222,183,0.08) !important;
-  color: var(--light2, #ECDEB7) !important;
-  border: 1px solid rgba(236,222,183,0.2) !important;
-  cursor: pointer !important;
-}
-
-body.mobile-mode .mob-btn.active,
-  body.mobile-mode .mob-sub-btn.active {
-  background: var(--light2, #ECDEB7) !important;
-  color: var(--dark1, #1C1A17) !important;
-  border-color: var(--light2, #ECDEB7) !important;
 }
 
 }

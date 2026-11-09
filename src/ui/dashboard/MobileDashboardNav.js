@@ -23,7 +23,6 @@ import { FossilSystem } from '../../systems/FossilSystem.js';
 import { LocationSystem } from '../../systems/LocationSystem.js';
 import { SecretBaseAccessSystem } from '../../systems/SecretBaseAccessSystem.js';
 import {
-  MOBILE_BREAKPOINT_PX,
   MOBILE_VIEWS,
   MOBILE_MANAGE_VIEWS,
   MOBILE_MANAGE_VIEW_ID
@@ -78,8 +77,9 @@ export class MobileDashboardNav extends UIElement {
   /** @override */
   onEnter() {
     super.onEnter();
-    this._unsubscribeResize = AppShell.onViewportResize((width) => this._updateMode(width));
-    this._updateMode(AppShell.viewportWidth());
+    // One subscription for the whole presentation: the same predicate the stylesheets read.
+    this._unsubscribeResize = AppShell.onMobileLayoutChange(() => this._updateMode());
+    this._updateMode();
   }
 
   /** @override */
@@ -90,12 +90,9 @@ export class MobileDashboardNav extends UIElement {
     super.onExit();
   }
 
-  /**
-   * @private
-   * @param {number} viewportWidth
-   */
-  _updateMode(viewportWidth) {
-    AppShell.setMobileMode(viewportWidth <= MOBILE_BREAKPOINT_PX);
+  /** @private Mirrors the presentation onto the document, then re-applies the visible windows. */
+  _updateMode() {
+    AppShell.syncMobileLayout();
     this._applyVisibility();
   }
 

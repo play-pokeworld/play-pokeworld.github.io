@@ -130,7 +130,9 @@ describe('Static rules', (test) => {
 
   test('desktop header and dashboard columns preserve the reference proportions', () => {
     const css = readBundle();
-    assert.ok(/\.pw-game-screen > #header\s*\{[^}]*min-height:\s*65px/.test(css), 'desktop header keeps the 65px reference height');
+    // Reference changed on 2026-11-07: the catalogue (now the single source of truth) draws a
+    // 56px header, validated in game. Parity is kept against that new reference.
+    assert.ok(/\.pw-game-screen > #header\s*\{[^}]*min-height:\s*56px/.test(css), 'desktop header keeps the 56px catalogue height');
     assert.ok(/#settings-btn\.pw-header-settings\s*\{[^}]*width:\s*44px[^}]*height:\s*44px/.test(css), 'settings control keeps its 44px square size');
     assert.ok(/#main-dashboard > #col-1,[\s\S]*?#main-dashboard > #col-3\s*\{[^}]*flex:\s*1 1 0/.test(css), 'outer columns have the reference 1x share');
     assert.ok(/#main-dashboard > #col-2\s*\{[^}]*flex:\s*2 1 0/.test(css), 'map column has the reference 2x share');

@@ -17,6 +17,7 @@ import { DebugModeChangedEvent } from '../core/events/DebugModeChangedEvent.js';
 import { AnimationPreferencesChangedEvent } from '../core/events/AnimationPreferencesChangedEvent.js';
 import { AnimationPreferences } from '../config/AnimationPreferences.js';
 import { DEFAULT_UI_THEME } from '../config/UiThemes.js';
+import { MOBILE_MEDIA_QUERY } from '../config/DashboardLayout.js';
 import { LocalizedTextBinder } from './LocalizedTextBinder.js';
 
 /** Class put on <body> while the developer mode is unlocked. */
@@ -139,6 +140,45 @@ export class AppShell {
   /** @returns {boolean} */
   static isMobileMode() {
     return typeof document !== 'undefined' && !!document.body && document.body.classList.contains(MOBILE_CLASS);
+  }
+
+  /**
+   * Tells whether the presentation in force is the touch one. Reads `MOBILE_MEDIA_QUERY`, the same
+   * string the stylesheets use, so script and CSS can never disagree about which layout is active.
+   * Nothing here names a device: the query answers "is the width narrow or the primary pointer
+   * imprecise", which is a presentation fact, not a guess about the hardware.
+   * @returns {boolean}
+   */
+  static isMobileLayout() {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+    return window.matchMedia(MOBILE_MEDIA_QUERY).matches;
+  }
+
+  /**
+   * Subscribes to a change of presentation (resize, rotation, mouse plugged into a tablet).
+   * @param {(mobileLayout: boolean) => void} callback
+   * @returns {Function} Unsubscribe handle
+   */
+  static onMobileLayoutChange(callback) {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return () => {};
+    const query = window.matchMedia(MOBILE_MEDIA_QUERY);
+    const handler = () => callback(query.matches);
+    query.addEventListener('change', handler);
+    window.addEventListener('resize', handler);
+    return () => {
+      query.removeEventListener('change', handler);
+      window.removeEventListener('resize', handler);
+    };
+  }
+
+  /**
+   * Mirrors the presentation onto `<body>` and returns it.
+   * @returns {boolean}
+   */
+  static syncMobileLayout() {
+    const mobileLayout = AppShell.isMobileLayout();
+    AppShell.setMobileMode(mobileLayout);
+    return mobileLayout;
   }
 
   /**

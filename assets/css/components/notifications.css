@@ -216,3 +216,33 @@
 .pw-toast-card.pw-toast--tone-warning {
   border-left-color: var(--orange);
 }
+
+/* Touch layout: a notice is read in the thumb zone and never sits on top of a panel header.
+   On a phone the top-left corner belongs to the game header and to the first rows of whatever
+   window the notice is about; the bottom of the screen, just above the navigation, is free. */
+@media (max-width: 850px), (pointer: coarse) {
+  #notif,
+  .pw-toast {
+    top: auto;
+    left: 12px;
+    right: 12px;
+    bottom: calc(var(--pw-mobile-nav-h) + 12px + env(safe-area-inset-bottom, 0px));
+    max-width: none;
+    width: auto;
+    font-size: 14px;
+  }
+
+  .pw-toast-card {
+    pointer-events: auto;
+  }
+
+  /* `.pw-button.pw-toast-close` (components/ui-button.css) zeroes the minimum size of this close
+     button; the touch layout needs it back, and the sheet is imported later, so the pair of classes
+     restores it at equal specificity. */
+  .pw-toast-close.pw-button {
+    flex: 0 0 auto;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+  }
+}

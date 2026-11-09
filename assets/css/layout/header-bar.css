@@ -437,28 +437,35 @@
 }
 
 body:not(.mobile-mode) .pw-game-screen > #header {
-  height: auto;
-  min-height: 65px;
+  height: 56px;
+  min-height: 56px;
+  background: var(--pw-bg-header);
+  border-bottom: 1px solid var(--pw-border-color);
   box-sizing: border-box;
 }
 
 body:not(.mobile-mode) #header .pw-header-brand {
   gap: 10px;
-  font-size: 20px;
-  letter-spacing: 2px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--pw-accent-color);
+  letter-spacing: 0;
 }
 
 body:not(.mobile-mode) #header .pw-header-brand-mark {
-  width: 28px;
-  height: 28px;
-  padding: 4px;
-  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  padding: 5px;
+  border-radius: 50%;
+  background: var(--pw-accent-color);
   box-sizing: border-box;
 }
 
 body:not(.mobile-mode) #header .pw-header-brand-mark img {
-  width: 18px;
-  height: 18px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(28, 26, 23, 0.22);
   object-fit: contain;
 }
 

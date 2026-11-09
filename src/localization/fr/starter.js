@@ -9,7 +9,7 @@ export const starter = {
   starter_welcome: 'Bienvenue à Kanto ! Le Prof. Chen vous attend à Bourg Palette.',
   starter_subtitle: 'Ce Pokémon vous accompagnera tout au long de votre aventure dans cette région.',
   starter_required: "Choisissez votre starter pour commencer l'aventure.",
-  starter_trainer_name: 'Pseudo du Dresseur',
+  starter_trainer_name: 'Nom du dresseur',
   starter_trainer_placeholder: 'Ex: Red, Sacha...',
   starter_name_required: 'Veuillez saisir votre pseudo de Dresseur.',
   starter_choose_btn: 'Choisir',

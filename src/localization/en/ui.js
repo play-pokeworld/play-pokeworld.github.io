@@ -1738,6 +1738,7 @@ export const L_en_ui = {
   "modal_close_btn":"Close",
   "turns_abbrev":"t.",
   "active_zone_effects":"Active Zone Effects",
+  "nav_menu_title":"Navigation",
   "settings_title":"Settings",
   "theme_title":"Theme",
   "theme_dark":"Dark",

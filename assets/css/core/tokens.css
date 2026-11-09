@@ -114,6 +114,7 @@
   --pw-shadow: 0 14px 36px rgba(0,0,0,0.42), inset 0 0 0 1px rgba(255,255,255,0.04);
   --pw-shadow-lg: 0 18px 48px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
   --pw-header-h: 50px;
+  --pw-window-radius: 10px;
   --pw-game-header-h: 56px;
   --pw-header-pad: 0 8px 0 10px;
   --pw-header-radius: 10px;

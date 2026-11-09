@@ -335,24 +335,7 @@ button.pw-settings-choice.active {
   gap: 8px !important;
 }
 
-#settings-inner {
-  max-width: 96vw !important;
-  max-height: 90vh !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  overflow-y: auto !important;
-  transform-origin: center center !important;
-}
-
-}
-
-@media (max-width: 480px) {
-#settings-inner {
-  transform: scale(0.92) !important;
-  width: 108% !important;
-  margin-left: -4% !important;
-}
-
+/* The settings window sizes itself on the visible viewport (85dvh + 100dvh); no transform squeeze. */
 }
 
 #settings-inner button.theme-swatch--sakura, #settings-inner button.theme-swatch--sakura:hover, #settings-inner button.theme-swatch--sakura.active {
@@ -767,12 +750,15 @@ button.pw-settings-choice.active {
 }
 
 body:not(.mobile-mode) #header #settings-btn.pw-header-settings {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 8px;
-  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0;
+  border: 1px solid var(--pw-border-color);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--pw-text-secondary);
 }
 
 #header #settings-btn .pw-button-icon {
@@ -788,11 +774,13 @@ body:not(.mobile-mode) #header #settings-btn.pw-header-settings {
   height: 100%;
 }
 
+/* The touch header used to shrink this button to 38px: the one control of the bar a finger has to
+   hit exactly (the desktop rule below it is 44px). Both presentations now agree on 44px. */
 body.mobile-mode #header #settings-btn.pw-header-settings {
-  width: 38px;
-  height: 38px;
-  min-width: 38px;
-  min-height: 38px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   padding: 8px;
 }
 

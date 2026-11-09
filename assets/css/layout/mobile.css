@@ -3,6 +3,15 @@
  * ---------------------------------------------------------------------------
  * Mobile layout: stacked windows, compact chrome, touch targets.
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
+ *
+ * The presentation is the touch one whenever `MOBILE_MEDIA_QUERY` (config/DashboardLayout.js) matches:
+ * a narrow window or a coarse pointer. Script reads the same string through `AppShell.isMobileLayout()`,
+ * so a rule here and the behaviour it depends on can never disagree.
+ *
+ * Shape of the mobile screen, from the top: the game header, the windows of the selected tab, then the
+ * navigation, which lives at the *bottom* of the screen — the only band a thumb reaches without
+ * regripping the phone. The page keeps scrolling the document (Rules §5); the navigation is an overlay,
+ * so the dashboard reserves its height instead of hiding content behind it.
  */
 
 
@@ -14,40 +23,71 @@
   display: none;
 }
 
+.mobile-nav-bar {
+  -webkit-tap-highlight-color: transparent;
+}
+
 @media (max-width: 850px), (pointer: coarse) {
 .mobile-nav-bar {
   display: flex;
-  position: sticky;
-  top: 0;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 700;
-  background: linear-gradient(180deg, rgba(38,37,33,0.98), rgba(31,30,27,0.98));
-  border-bottom: 1px solid rgba(236,222,183,0.14);
-  padding: 8px;
-  padding-top: max(8px, env(safe-area-inset-top, 0px));
+  background: linear-gradient(0deg, rgba(38,37,33,0.99), rgba(31,30,27,0.97));
+  border-top: 1px solid rgba(236,222,183,0.14);
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
   gap: 6px;
   justify-content: space-around;
+  align-items: stretch;
+  will-change: transform;
 }
 
 .mobile-subnav-bar {
   display: none;
-  position: sticky;
-  top: 52px;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--pw-mobile-nav-h) + env(safe-area-inset-bottom, 0px));
   z-index: 699;
   background: var(--dark2);
-  border-bottom: 1px solid var(--pw-border-color);
+  border-top: 1px solid var(--pw-border-color);
   padding: 6px 8px;
   gap: 6px;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+/* The management sub-bar only exists while the "manage" tab is selected. */
+.mobile-subnav-bar:not(.is-hidden) {
+  display: flex;
+}
+
+.mobile-subnav-bar.is-hidden {
+  display: none;
+}
+
+/* The bar buttons are the primary navigation: one row, one line of text, a finger-sized target. */
+.mobile-nav-bar .mob-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 44px;
+  padding: 4px 2px;
+  font-size: 12px;
+  line-height: 1.15;
+  white-space: normal;
+  border-radius: 10px;
 }
 
 .mob-sub-btn {
   flex: 1;
-  min-height: 38px;
+  min-height: 44px;
   background: var(--light1);
   border: 1px solid var(--dark1);
   color: var(--dark1);
   font-weight: 800;
-  font-size: 11px;
+  font-size: 12px;
   padding: 8px 8px;
   border-radius: 10px;
   text-align: center;
@@ -83,8 +123,46 @@
   user-select: none !important;
 }
 
+/* Selected state of the two bars: one visual language, whatever the tab. */
+.mobile-nav-bar .mob-btn.active,
+.mobile-nav-bar .mob-btn[aria-current="true"],
+.mobile-subnav-bar .mob-sub-btn.active {
+  background: var(--light2);
+  color: var(--dark1);
+  border-color: var(--light2);
+  font-weight: 900;
 }
 
+/* The navigation is an overlay: the page flow keeps its last window clear of it. */
+body.mobile-mode #main-dashboard {
+  padding-bottom: calc(var(--pw-mobile-nav-h) + 16px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+/* A window focused from the navigation scrolls under the header, never under the bar. */
+body.mobile-mode .dash-win {
+  scroll-margin-top: calc(var(--pw-header-h) + 72px);
+  scroll-margin-bottom: calc(var(--pw-mobile-nav-h) + 16px + env(safe-area-inset-bottom, 0px));
+}
+
+/* One rule for every icon-only control of the shell: a thumb needs 44px, whatever the screen.
+   Panels never restyle this: the size belongs to the shared chrome. */
+body.mobile-mode .pw-win-tool-btn,
+  body.mobile-mode .pw-win-hdr .hbtn,
+  body.mobile-mode .pw-modal-close-btn,
+  body.mobile-mode .pw-drawer-toggle,
+  body.mobile-mode #header .hbtn,
+  body.mobile-mode #header button,
+  body.mobile-mode .pw-map-zoom-btn {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+body.mobile-mode .pw-map-zoom-btn {
+  width: 44px;
+  height: 44px;
+}
+
+}
 
 /* MobileDashboardNav is a pure grouping widget: its children (.mobile-nav-bar, .mobile-subnav) keep the positioning given by design-system.css as if they were direct children of the body. */
 .pw-mobile-dashboard-nav {

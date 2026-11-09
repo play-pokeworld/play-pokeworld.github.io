@@ -1327,24 +1327,10 @@
   user-select: none !important;
 }
 
-#poke-modal-inner {
-  max-width: 96vw !important;
-  max-height: 90vh !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  overflow-y: auto !important;
-  transform-origin: center center !important;
-}
-
-}
-
-@media (max-width: 480px) {
-#poke-modal-inner {
-  transform: scale(0.92) !important;
-  width: 108% !important;
-  margin-left: -4% !important;
-}
-
+/* Sizing of the Pokemon sheet on touch comes from components/ui-panel.css (85dvh, shrinkable body).
+   An inner sheet is never shrunk with a transform: `scale(0.92)` reduced the text and the touch
+   targets of the densest window of the game, and made the scaled node the containing block of every
+   fixed child inside it. */
 }
 
 .quest-board .pw-evo-title {

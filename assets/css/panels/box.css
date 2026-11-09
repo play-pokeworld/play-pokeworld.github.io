@@ -27,7 +27,9 @@
   padding: 10px !important;
   color: var(--pw-text-primary) !important;
   display: flex !important;
-  flex-wrap: wrap !important;
+  /* Wrap is the desktop layout. It is not `!important`: the touch layout folds the same toolbar
+     into one band (components/ui-input.css) through a more specific selector. */
+  flex-wrap: wrap;
   gap: 8px !important;
   align-items: center !important;
 }
@@ -398,11 +400,11 @@
   gap: 6px !important;
 }
 
+/* The one-line band of a filter toolbar on touch is described once, in components/ui-input.css
+   (next to the drawer toggle that shares that band). This block only repaints the surface. */
 .box-filter-panel {
   display: flex !important;
-  flex-wrap: wrap !important;
   gap: 6px !important;
-  padding: 6px 44px 6px 10px !important;
   background: var(--dark2) !important;
   border-radius: 12px !important;
   border: 1px solid var(--dark3) !important;

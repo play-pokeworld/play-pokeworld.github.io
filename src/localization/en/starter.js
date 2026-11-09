@@ -9,7 +9,7 @@ export const starter = {
   starter_welcome: 'Welcome to Kanto! Prof. Oak is waiting for you in Pallet Town.',
   starter_subtitle: 'This Pokémon will accompany you throughout your adventure in this region.',
   starter_required: "Choose your starter to begin your adventure.",
-  starter_trainer_name: 'Trainer Nickname',
+  starter_trainer_name: 'Trainer name',
   starter_trainer_placeholder: 'Ex: Red, Ash...',
   starter_name_required: 'Please enter your Trainer Nickname.',
   starter_choose_btn: 'Choose',
