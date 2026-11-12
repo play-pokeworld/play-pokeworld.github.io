@@ -27,7 +27,7 @@
 }
 
 .pw-fossil-card {
-  background:var(--dark3);
+  background:var(--pw-bg-sprite);
   border:1px solid #4a3c2e;
   border-radius:10px;
   padding:12px;
@@ -47,7 +47,7 @@
 
 .fossil-selector-intro {
   color: var(--light2);
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   line-height: 1.35;
   background: rgba(0,0,0,0.18);
   border: 1px solid var(--dark3);
@@ -98,7 +98,7 @@
 
 .fossil-name {
   color: var(--light2);
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   font-weight: 800;
   white-space: nowrap;
   overflow: hidden;
@@ -107,7 +107,7 @@
 
 .fossil-qty {
   color: var(--light1);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   margin-top: 2px;
 }
 
@@ -121,7 +121,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 900;
+  font-weight: 700;
   flex: none;
 }
 
@@ -144,7 +144,7 @@
 
 .fossil-arrow {
   color: var(--light1);
-  font-size: 18px;
+  font-size: var(--pw-font-size-3xl);
   line-height: 1;
 }
 
@@ -172,7 +172,7 @@
 .fossil-target-name {
   max-width: 100%;
   color: var(--light2);
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   font-weight: 800;
   text-align: center;
   white-space: nowrap;
@@ -182,17 +182,17 @@
 
 .fossil-target-name span {
   color: var(--light1);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 .fossil-target-sub {
   color: var(--light1);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   text-align: center;
 }
 
 .fossil-empty-icon {
-  font-size: 34px;
+  font-size: var(--pw-font-size-display);
 }
 
 @media (max-width: 700px) {
@@ -216,7 +216,7 @@
 }
 
 .pw-fossil-card {
-  background: var(--dark3);
+  background: var(--pw-bg-sprite);
   border: 1px solid #4a3c2e;
   border-radius: 10px;
   padding: 12px;

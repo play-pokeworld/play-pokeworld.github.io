@@ -7,7 +7,7 @@
 
 #map-panel {
   position: relative;
-  background: var(--dark2);
+  background: var(--pw-bg-header);
   overflow: hidden;
   flex: 1;
 }
@@ -56,8 +56,8 @@ body.mobile-mode .map-panel,
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-weight: 900;
-  font-size: 15px;
+  font-weight: 700;
+  font-size: var(--pw-font-size-xl);
   color: var(--pw-text-primary);
   margin-bottom: 12px;
 }
@@ -135,13 +135,13 @@ body.mobile-mode .map-panel,
 
 .pw-map-help-label {
   color: var(--pw-text-primary);
-  font-size: 13px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-lg);
+  font-weight: 700;
 }
 
 .pw-map-help-description {
   color: var(--light1);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.4;
 }
 
@@ -151,7 +151,7 @@ body.mobile-mode .map-panel,
   border: 1px solid var(--pw-border-color);
   border-radius: 10px;
   padding: 6px 10px;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   font-weight: 800;
   max-width: 100%;
 }
@@ -227,11 +227,11 @@ img.pw-base-portrait.is-96 {
 #map-region-select {
   appearance: none !important;
   -webkit-appearance: none !important;
-  background: var(--dark3) !important;
+  background: var(--pw-bg-sprite) !important;
   color: var(--light2) !important;
   border: 1px solid var(--dark3) !important;
   border-radius: 8px !important;
-  font-size: 12px !important;
+  font-size: var(--pw-font-size-md) !important;
   font-weight: 700 !important;
   padding: 5px 26px 5px 10px !important;
   min-width: 132px !important;
@@ -279,7 +279,7 @@ img.pw-base-portrait.is-96 {
 }
 
 #map-svg .pw-map-foe-count {
-  font-size: 10px;
+  font-size: var(--pw-font-size-xs);
   font-weight: 700;
   fill: #fff;
   pointer-events: none;
@@ -330,28 +330,29 @@ img.pw-base-portrait.is-96 {
   z-index: 15;
 }
 
+/* The map controls are the same tile as every other control of the shell:
+   header surface, one hairline, the text colour of their row. */
 .pw-map-zoom-btn {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  font-weight: bold;
-  border-radius: 4px;
-  background: rgba(20, 24, 33, 0.85);
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
-  color: var(--light2);
+  font-size: var(--pw-font-size-lg);
+  font-weight: 700;
+  border-radius: 8px;
+  background: var(--pw-bg-header);
+  border: 1px solid var(--pw-border-color);
+  color: var(--pw-text-secondary);
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(4px);
+  box-shadow: none;
   user-select: none;
 }
 
 .pw-map-zoom-btn:hover {
-  background: var(--dark3);
-  color: #fff;
+  background: color-mix(in srgb, var(--accent) 12%, var(--pw-bg-header));
+  color: var(--pw-text-primary);
   border-color: var(--accent);
 }
 
@@ -476,7 +477,7 @@ body.mobile-mode #map-region-select {
 }
 
 .pw-map-view .map-label text {
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   font-weight: bold;
   fill: #ececec;
 }
@@ -558,7 +559,7 @@ body.mobile-mode #map-region-select {
   border: 1px solid var(--accent);
   color: var(--accent);
   font-weight: 700;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   padding: 3px 8px;
   border-radius: 4px;
   align-self: flex-start;
@@ -633,7 +634,7 @@ img.pw-hatchery-egg-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: var(--pw-font-size-3xl);
   font-weight: 800;
   border-radius: 8px;
   background: rgba(20, 24, 33, .9);

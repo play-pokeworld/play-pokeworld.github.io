@@ -17,39 +17,44 @@
 
 .pw-ball-head {
   display: grid;
-  grid-template-columns: 1fr 44px 44px;
+  /* Catalogue reference: an auto name column, a 30px ball slot and a right-aligned count. */
+  grid-template-columns: 1fr 34px 42px;
   align-items: center;
   /* Same column gap as `.pw-ball-row`: without it the header's columns are 8px wider and the
      "Ball" / "Qty" captions no longer sit above their column. */
   gap: 2px 8px;
-  padding: 0 4px 6px;
-  border-bottom: 1px solid var(--dark3);
+  padding: 2px 4px 4px;
+  border-bottom: 1px solid var(--pw-border-color);
 }
 
 .pw-ball-head-name {
-  font-size: 11px;
-  color: var(--light1);
-  text-transform: uppercase;
+  /* Catalogue says 9.5px; the project typography floor (StyleVocabulary) forbids text under 10px,
+     so the caption keeps its weight, tracking and secondary colour at 11px. */
+  font-size: var(--pw-font-size-sm);
+  font-weight: 800;
+  color: var(--pw-text-secondary);
   letter-spacing: .05em;
 }
 
 .pw-ball-col {
   text-align: center;
-  font-size: 11px;
-  color: var(--light1);
-  text-transform: uppercase;
+  /* Catalogue says 9.5px; the project typography floor (StyleVocabulary) forbids text under 10px,
+     so the caption keeps its weight, tracking and secondary colour at 11px. */
+  font-size: var(--pw-font-size-sm);
+  font-weight: 800;
+  color: var(--pw-text-secondary);
   letter-spacing: .05em;
 }
 
 .pw-ball-row {
   display: grid !important;
-  grid-template-columns: 1fr 44px 44px;
+  grid-template-columns: 1fr 34px 42px;
   align-items: center;
   gap: 2px 8px;
   min-height: 34px;
-  padding: 2px 4px;
-  border-bottom: 1px solid color-mix(in srgb, var(--light2) 10%, transparent);
-  border-radius: 6px;
+  padding: 0 4px;
+  border-bottom: 1px solid var(--pw-border-color);
+  border-radius: 0;
 }
 
 .pw-ball-row:last-of-type {
@@ -69,11 +74,11 @@
 
 .pw-ball-row-name {
   padding: 0 4px;
-  font-size: 13px;
-  color: var(--light2);
+  font-size: var(--pw-font-size-sm);
+  color: var(--pw-text-primary);
 }
 
-/* The ball cell is a 44px column holding a 22px sprite: it must centre it. It was `display: block`,
+/* The ball cell is a 34px column holding a 16px sprite: it must centre it. It was `display: block`,
    so `justify-content` did nothing and the ball hugged the left edge (0px left / 22px right). */
 .pw-ball-row-ball {
   display: flex;
@@ -82,14 +87,22 @@
   cursor: pointer;
 }
 
+/* The dashboard row is denser than the ball editor it shares `BallSlotIcon` with: the editor keeps
+   its 22px sprite, the 34px row shows the 16px one the catalogue uses. */
+.pw-ball-row .pw-ball-icon {
+  width: 16px;
+  height: 16px;
+}
+
 /* Same reason as the ball cell: a `justify-content` on a block does nothing, so the count stayed
    glued to the left edge of its column while the header said "Qty" in the middle of it. */
 .pw-ball-row-qty {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  color: var(--light1);
+  font-size: var(--pw-font-size-sm);
+  font-weight: 700;
+  color: var(--pw-text-primary);
   font-variant-numeric: tabular-nums;
 }
 
@@ -106,16 +119,16 @@
 }
 
 .pw-ball-head {
-  padding: 0 12px 6px !important;
+  padding: 2px 4px 4px !important;
 }
 
 .pw-ball-row {
   display: grid !important;
-  grid-template-columns: 1fr 44px 44px !important;
+  grid-template-columns: 1fr 34px 42px !important;
   align-items: center !important;
-  min-height: 38px !important;
-  padding: 0 12px !important;
-  border-bottom: 1px solid var(--dark3) !important;
+  min-height: 34px !important;
+  padding: 0 4px !important;
+  border-bottom: 1px solid var(--pw-border-color) !important;
   border-radius: 0 !important;
 }
 
@@ -167,7 +180,8 @@
   background: var(--pw-bg-surface, #24221E);
   border: 1px solid var(--pw-border-color, #4A3E31);
   border-radius: var(--pw-radius-lg, 12px);
-  width: min(520px, 94vw);
+  /* Catalogue frame `ball-picker`: the ball sheet is a 680 px sheet like every other modal. */
+  width: min(680px, 94vw);
   min-width: 0;
   max-width: 94vw;
   max-height: 86vh;
@@ -183,7 +197,7 @@
 }
 
 .pw-ball-title {
-  font-size: 14px;
+  font-size: var(--pw-font-size-xl);
   color: var(--pw-text-primary, #ECDEB7);
   margin-bottom: 8px;
   font-weight: 700;
@@ -217,13 +231,13 @@
 }
 
 .pw-ball-name {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   color: var(--pw-text-primary, #ECDEB7);
   font-weight: 700;
 }
 
 .pw-ball-desc {
-  font-size: 10.5px;
+  font-size: var(--pw-font-size-xs);
   color: var(--pw-text-secondary, #C8BBA0);
   line-height: 1.25;
 }
@@ -237,7 +251,7 @@
 }
 
 .pw-ball-qty2 {
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   color: var(--pw-text-secondary, #C8BBA0);
   font-variant-numeric: tabular-nums;
 }
@@ -261,7 +275,7 @@
 }
 
 .pw-ball-editor-note {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   color: var(--pw-text-secondary, #C8BBA0);
   margin-bottom: 8px;
 }
@@ -300,7 +314,7 @@
   display: inline-flex;
   cursor: grab;
   color: var(--pw-text-secondary, #999);
-  font-size: 15px;
+  font-size: var(--pw-font-size-xl);
   padding: 0 2px;
   user-select: none;
   touch-action: none;
@@ -313,7 +327,7 @@
 .pw-ball-filter-name {
   flex: 1;
   min-width: 80px;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   color: var(--pw-text-primary, #ECDEB7);
   padding: 4px 6px;
 }
@@ -374,7 +388,7 @@
   border: none;
   color: var(--pw-color-danger, #E74C3C);
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--pw-font-size-xl);
   padding: 2px 6px;
   min-width: 0;
   min-height: 0;
@@ -388,7 +402,7 @@
   border: 1px solid var(--pw-border-color, #4A3E31);
   border-radius: var(--pw-radius-md, 8px);
   color: var(--pw-text-primary, #ECDEB7);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight: 400;
   padding: 4px 8px;
   cursor: pointer;
@@ -435,7 +449,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: var(--pw-font-size-xl);
   line-height: 1;
   cursor: pointer;
   border: none;
@@ -470,7 +484,7 @@
 }
 
 .pw-ball-opt-label {
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   color: var(--pw-text-primary, #ECDEB7);
 }
 
@@ -480,7 +494,7 @@
   border-radius: var(--pw-radius-sm, 4px) !important;
   color: var(--pw-text-primary, #ECDEB7) !important;
   padding: 3px 5px !important;
-  font-size: 12px !important;
+  font-size: var(--pw-font-size-md) !important;
   font-weight: 400 !important;
   max-width: 130px;
 }

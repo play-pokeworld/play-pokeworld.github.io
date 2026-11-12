@@ -1,6 +1,7 @@
 /** @file TeamPresetListCard.js @brief Stable manager row: editable name, canonical sprite chips and real preset actions. */
 import { UIContainer } from '../../ui/UIContainer.js';
 import { UIText } from '../../ui/UIText.js';
+import { UIIcon } from '../../ui/UIIcon.js';
 import { UITextInput } from '../../ui/UITextInput.js';
 import { UIButton } from '../../ui/UIButton.js';
 import { UIPokemonSprite } from '../../ui/UIPokemonSprite.js';
@@ -105,9 +106,20 @@ export class TeamPresetListCard extends UIContainer {
     this._signature = signature;
     this._chips.clearChildren();
     if (!members.length) {
-      this._chips.addChild(
-        new UIText({ className: 'preset-chip-empty', text: t('preset_empty') }),
-      );
+      // The validated frame draws an empty slot as a round "+" and a short label: the long sentence
+      // repeated twenty times buried the list, so the tooltip keeps it.
+      const plus = new UIContainer({
+        tagName: 'span',
+        className: 'preset-empty-plus',
+        children: [new UIIcon({ name: 'plus', size: 'sm' })],
+      });
+      plus.setAttribute('aria-hidden', 'true');
+      const emptyChip = new UIText({
+        className: 'preset-chip-empty',
+        text: t('preset_empty_short'),
+      });
+      emptyChip.setTooltip(t('preset_empty'));
+      this._chips.addChildren([plus, emptyChip]);
       return;
     }
     for (const member of members) {

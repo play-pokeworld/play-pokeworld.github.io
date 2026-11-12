@@ -6,6 +6,7 @@ import { StaticModalPanel } from '../ui/StaticModalPanel.js';
 import { UIContainer } from '../ui/UIContainer.js';
 import { UIText } from '../ui/UIText.js';
 import { UIButton } from '../ui/UIButton.js';
+import { SheetRow } from './components/SheetRow.js';
 import { NpcDirectory } from '../data/world/NpcDirectory.js';
 import { NpcQuestCard } from './components/NpcQuestCard.js';
 import { QuestSystem } from '../systems/QuestSystem.js';
@@ -24,8 +25,9 @@ export class NpcTalkModal extends StaticModalPanel {
     super({
       id: ModalIds.NPC_TALK,
       title: t('npc_talk_title'),
-      size: 'sm',
+      size: 'md',
       bodyClassName: 'pw-npc-talk',
+      className: 'pw-sheet pw-npc-talk-panel',
       name: 'NpcTalkModal'
     });
     /** @private @type {string|null} */
@@ -86,7 +88,7 @@ export class NpcTalkModal extends StaticModalPanel {
     this.clearChildren();
     const locationName = t(`location.${this._locationId}`);
     this.addChild(new UIText({
-      className: 'pw-npc-talk-location',
+      className: 'pw-sheet-note',
       text: t('npc_talk_at_location', { location: locationName })
     }));
 
@@ -96,14 +98,17 @@ export class NpcTalkModal extends StaticModalPanel {
         : null;
       const quest = state?.quest.key === this._pendingLocalQuestBattle?.questKey ? state.quest : null;
       const questTitle = quest ? t(`quests.${quest.category}.${quest.id}.title`) : '';
+      this.setTitle(t('local_quest_battle_npc_name'));
       this.addChildren([
-        new UIText({ className: 'pw-npc-talk-speaker', text: t('local_quest_battle_npc_name') }),
-        new UIText({
-          tagName: 'p',
-          className: 'pw-npc-talk-line',
-          text: quest
-            ? t('local_quest_battle_npc_line', { quest: questTitle })
-            : t('quest_battle_none')
+        new UIContainer({
+          className: 'pw-sheet-quote',
+          children: [new UIText({
+            tagName: 'p',
+            className: 'pw-npc-talk-line',
+            text: quest
+              ? t('local_quest_battle_npc_line', { quest: questTitle })
+              : t('quest_battle_none')
+          })]
         }),
         quest && new UIText({
           className: 'pw-npc-talk-close-hint',
@@ -118,9 +123,12 @@ export class NpcTalkModal extends StaticModalPanel {
     }
 
     if (this._genericConversation) {
+      this.setTitle(t('npc_talk_generic_name'));
       this.addChildren([
-        new UIText({ className: 'pw-npc-talk-speaker', text: t('npc_talk_generic_name') }),
-        new UIText({ className: 'pw-npc-talk-line', text: t('npc_talk_generic_line') }),
+        new UIContainer({
+          className: 'pw-sheet-quote',
+          children: [new UIText({ tagName: 'p', className: 'pw-npc-talk-line', text: t('npc_talk_generic_line') })]
+        }),
         this._dialogueActions()
       ]);
       return;
@@ -129,17 +137,20 @@ export class NpcTalkModal extends StaticModalPanel {
     if (this._selectedNpcId) {
       const npc = NpcDirectory.getById(this._locationId, this._selectedNpcId);
       if (npc) {
-        this.addChild(new UIText({ className: 'pw-npc-talk-speaker', text: npc.name }));
+        this.setTitle(npc.name);
+        this.addChild(new SheetRow({ icon: 'chat', title: npc.name, meta: locationName }));
         const gatedLines = QuestSystem.getInstance().isRepeatableUnlocked()
           ? null
           : REPEATABLE_BOARD_HELP_LINES[npc.id];
         const visibleLines = npc.lines.filter((_, index) => !gatedLines?.includes(index));
+        const quote = new UIContainer({ className: 'pw-sheet-quote', name: 'NpcTalk:quote' });
         for (const line of visibleLines) {
-          this.addChild(new UIText({ tagName: 'p', className: 'pw-npc-talk-line', text: line }));
+          quote.addChild(new UIText({ tagName: 'p', className: 'pw-npc-talk-line', text: line }));
         }
         if (visibleLines.length === 0) {
-          this.addChild(new UIText({ className: 'pw-npc-talk-line', text: t('npc_talk_generic_line') }));
+          quote.addChild(new UIText({ tagName: 'p', className: 'pw-npc-talk-line', text: t('npc_talk_generic_line') }));
         }
+        this.addChild(quote);
         const questActions = this._npcQuestActions(npc.id);
         if (questActions) this.addChild(questActions);
         this.addChild(this._dialogueActions());
@@ -148,7 +159,7 @@ export class NpcTalkModal extends StaticModalPanel {
       this._selectedNpcId = null;
     }
 
-    this.addChild(new UIText({ className: 'pw-npc-talk-prompt', text: t('npc_talk_choose') }));
+    this.addChild(new UIText({ className: 'pw-sheet-note', text: t('npc_talk_choose') }));
     const npcs = NpcDirectory.getByLocation(this._locationId);
     if (npcs.length === 0) {
       this.addChild(new UIText({ className: 'pw-empty-state', text: t('npc_talk_empty') }));
@@ -159,18 +170,21 @@ export class NpcTalkModal extends StaticModalPanel {
         onClick: () => this._talkGenerically()
       }));
     } else {
-      const choices = new UIContainer({ className: 'pw-npc-talk-choices' });
       for (const npc of npcs) {
-        choices.addChild(new UIButton({
-          variant: 'secondary',
+        this.addChild(new SheetRow({
           icon: 'chat',
-          text: npc.name,
+          title: npc.name,
+          meta: locationName,
           onClick: () => this._talkTo(npc.id)
         }));
       }
-      this.addChild(choices);
     }
-    this.addChild(new UIButton({ variant: 'secondary', text: t('close_btn'), onClick: () => this.close() }));
+    this.addChild(new UIButton({
+      variant: 'ghost',
+      className: 'pw-sheet-btn',
+      text: t('close_btn'),
+      onClick: () => this.close()
+    }));
   }
 
   /** @private @param {string} npcId */
@@ -213,14 +227,14 @@ export class NpcTalkModal extends StaticModalPanel {
   /** @private @returns {UIContainer} */
   _dialogueActions() {
     return new UIContainer({
-      className: 'pw-npc-talk-actions',
+      className: 'pw-sheet-foot',
       children: [
-        new UIButton({ variant: 'secondary', text: t('npc_talk_back'), onClick: () => {
+        new UIButton({ variant: 'ghost', className: 'pw-sheet-btn', text: t('npc_talk_back'), onClick: () => {
           this._selectedNpcId = null;
           this._genericConversation = false;
           this._render();
         } }),
-        new UIButton({ variant: 'secondary', text: t('close_btn'), onClick: () => this.close() })
+        new UIButton({ variant: 'ghost', className: 'pw-sheet-btn is-primary', text: t('close_btn'), onClick: () => this.close() })
       ]
     });
   }

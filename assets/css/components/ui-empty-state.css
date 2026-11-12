@@ -23,17 +23,17 @@
   text-align: center;
   padding: 20px;
   color: var(--pw-text-muted, var(--light1));
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   line-height: 1.6;
 }
 
 .pw-empty-state.is-lg {
   padding: 40px;
-  font-size: 14px;
+  font-size: var(--pw-font-size-xl);
   color: var(--pw-text-primary, var(--light2));
 }
 
 .pw-empty-state.is-sm {
   padding: 8px 4px;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }

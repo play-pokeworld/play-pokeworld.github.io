@@ -6,7 +6,7 @@
 
 
 #speed-toggle button {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 #msg-log {
@@ -33,7 +33,7 @@
   font-weight: bold;
   box-shadow: 0 4px 15px rgba(0,0,0,0.6);
   cursor: pointer;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 .speed-x10 {
@@ -69,20 +69,20 @@
 }
 
 #speed-toggle button {
-  background: var(--dark3);
+  background: var(--pw-bg-sprite);
   border: 1px solid var(--dark1);
   color: var(--light1);
   padding: 4px 10px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   transition: all 0.2s;
 }
 
 #speed-toggle button.active {
   color: var(--light2);
   border-color: var(--light1);
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
 }
 
 #leave-btn {
@@ -90,7 +90,7 @@
   background: var(--red);
   color: white;
   font-weight: bold;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   padding: 12px;
   border: 2px solid #b33a34;
   border-radius: 8px;
@@ -104,16 +104,16 @@
 }
 
 #speed-toggle button {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 #debug-toggle-btn, #leave-btn, #msg-log {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 #debug-drawer {
   display: none;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   border: 2px solid var(--red);
   padding: 12px;
   border-radius: 10px;
@@ -163,7 +163,7 @@
 #debug-toggle-btn {
   opacity: .28 !important;
   padding: 5px 10px !important;
-  font-size: 11px !important;
+  font-size: var(--pw-font-size-sm) !important;
   border-width: 1px !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, .5) !important;
   transition: opacity .15s ease !important;

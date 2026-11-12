@@ -5,7 +5,6 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 .pw-panel-header, .pw-ui-window-header, .pw-header-row, .pw-actions {
   margin: 0 !important;
   padding: 12px 16px !important;
@@ -42,9 +41,9 @@
   margin: 0 !important;
   padding: 0 12px 0 14px !important;
   border: none !important;
-  border-bottom: 2px solid var(--pw-border-panel-header) !important;
+  border-bottom: 1px solid var(--pw-border-panel-header) !important;
   background: var(--pw-bg-panel-header, rgba(0, 0, 0, 0.35)) !important;
-  border-radius: 14px 14px 0 0 !important;
+  border-radius: var(--pw-window-radius) var(--pw-window-radius) 0 0 !important;
   flex: 0 0 auto !important;
   box-sizing: border-box !important;
 }
@@ -61,16 +60,14 @@
   align-items: center !important;
   gap: 8px !important;
   color: var(--light2) !important;
-  font-size: 13px !important;
+  font-size: var(--pw-font-size-lg) !important;
   font-weight: 700 !important;
-  letter-spacing: 0.3px !important;
 }
 
 #poke-modal-inner.pw-panel--modal-window > .pw-win-hdr .pw-win-hdr-label {
   color: var(--light2) !important;
-  font-size: 13px !important;
+  font-size: var(--pw-font-size-lg) !important;
   font-weight: 700 !important;
-  letter-spacing: 0.3px !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
@@ -89,7 +86,6 @@
   color: inherit !important;
   font-size: inherit !important;
   font-weight: inherit !important;
-  letter-spacing: inherit !important;
   line-height: inherit !important;
 }
 
@@ -108,8 +104,8 @@
 #win-currency .pw-win-hdr-icon {
   align-items: center;
   justify-content: center;
-  font-weight: 900;
-  font-size: 16px;
+  font-weight: 700;
+  font-size: var(--pw-font-size-2xl);
   line-height: 1;
   color: #FFCB5A;
   -webkit-text-stroke: 0.5px rgba(120,86,20,0.6);
@@ -118,7 +114,6 @@
 .win-body {
   padding: 10px;
 }
-
 
 /* Phase 37: large canon rooms (up to 17×16 tiles) — the base canvas may overflow the column when needed; internal scroll instead of cropping. */
 #base-panel.win-body {
@@ -153,7 +148,7 @@
 }
 
 .win-body, #quest-inner *:not(.modal-title):not(.modal-title *) {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 @media (max-width: 850px), (pointer: coarse) {
@@ -193,7 +188,7 @@ body.mobile-mode .pw-win-hdr {
   min-width: unset !important;
   box-shadow: none !important;
   color: var(--light2) !important;
-  font-size: 20px !important;
+  font-size: var(--pw-font-size-4xl) !important;
   font-weight: bold !important;
   line-height: 1 !important;
   cursor: pointer !important;
@@ -229,7 +224,6 @@ body.mobile-mode .pw-win-hdr {
   color: var(--light1);
 }
 
-
 /* Wave 33: `margin: 0` removed — the canonical band owns its 12px gap, and zeroing it here is what made the quest header sit flush while the reference panels had breathing room. Only `flex: none` is layout-local. */
 #quest-inner > .modal-title {
   flex: none;
@@ -260,7 +254,7 @@ body.mobile-mode .pw-win-hdr {
   gap: 8px;
   font-weight: 800;
   color: var(--pw-text-primary);
-  font-size: 14px;
+  font-size: var(--pw-font-size-xl);
 }
 
 .pw-window-overlay {
@@ -274,9 +268,9 @@ body.mobile-mode .pw-win-hdr {
 }
 
 .pw-window {
-  background: var(--pw-surface);
+  background: var(--pw-bg-surface);
   border: 1px solid var(--pw-border-color);
-  border-radius: 12px;
+  border-radius: var(--pw-window-radius);
   display: flex;
   flex-direction: column;
   max-height: min(86vh, 780px);
@@ -330,7 +324,6 @@ body.mobile-mode .pw-win-hdr {
   margin-right: 20px;
 }
 
-
 /* Wave 33 — the dashboard window title bar is the SAME header component as the panel band; it only differs where it must (it is attached to the top of a draggable window, so it keeps the grip, the grab cursor and the top-only rounding instead of floating with a gap under it). Height, padding and typography now come from the shared tokens: they used to be 44px / 0 10px 0 14px / 14px-900 against the reference's 48px / 0 8px 0 14px / 13px-700, which is why the windows read as another family. */
 .pw-win-hdr {
   height: var(--pw-header-h);
@@ -341,7 +334,7 @@ body.mobile-mode .pw-win-hdr {
   gap: 10px;
   padding: var(--pw-header-pad);
   background: var(--pw-bg-panel-header);
-  border-bottom: 2px solid var(--pw-border-panel-header);
+  border-bottom: 1px solid var(--pw-border-panel-header);
   cursor: grab;
   user-select: none;
   flex-shrink: 0;
@@ -358,7 +351,6 @@ body.mobile-mode .pw-win-hdr {
   min-width: 0;
   font-size: var(--pw-header-title-size);
   font-weight: 700;
-  letter-spacing: 0.4px;
   color: var(--pw-text-primary);
 }
 
@@ -366,7 +358,6 @@ body.mobile-mode .pw-win-hdr {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  letter-spacing: 0.4px;
 }
 
 .pw-win-hdr-grip {
@@ -415,8 +406,8 @@ body.mobile-mode .pw-win-hdr {
   border: 1px solid var(--pw-border-color);
   background: var(--pw-bg-surface);
   color: var(--pw-text-primary);
-  font-weight: 900;
-  font-size: 13px;
+  font-weight: 700;
+  font-size: var(--pw-font-size-lg);
   cursor: pointer;
   font-family: inherit;
   flex-shrink: 0;
@@ -450,7 +441,6 @@ body.mobile-mode .pw-win-hdr {
   border-radius: var(--pw-header-radius);
 }
 
-
 /* 3/13/14. Modal header bands TRULY full-bleed + panels above the title bar. Two recurring defects, one table: a) #poke-modal-inner * { max-width: 100% } (the readability hammer) capped every band at the CONTENT width, so its negative margins bled to the left only and the band stopped ~32px short on the right (management, PC/NPC editors, battle summary) — "horrible" half-width headers. b) The panels sat UNDER #header (z 950 vs 600/700): the game title bar painted over every opened sheet, and on mobile the shortcut bar hid the close ✕. */
 #poke-modal-inner > .pw-view > .modal-title:first-child, #battle-summary-inner > .pw-view > .modal-title:first-child, #poke-modal.preset-editor-modal #poke-modal-inner > .pw-view > .modal-title:first-child, #poke-modal-inner.management-inner > .pw-view > .modal-title.management-title:first-child {
   max-width: none !important;
@@ -482,7 +472,7 @@ body.mobile-mode .pw-win-hdr {
 }
 
 .pw-win-hdr {
-  background: var(--dark1) !important;
+  background: var(--pw-bg-surface) !important;
   border-bottom: 1px solid var(--dark3) !important;
   overflow: visible !important;
   height: var(--pw-header-h) !important;
@@ -498,7 +488,6 @@ body.mobile-mode .pw-win-hdr {
 
 .pw-win-hdr-label {
   font-weight: 700 !important;
-  letter-spacing: 0.4px !important;
 }
 
 .pw-win-hdr-tools {
@@ -519,7 +508,7 @@ body.mobile-mode .pw-win-hdr {
   border: 1px solid var(--pw-border-color) !important;
   background: transparent !important;
   color: var(--pw-text-secondary) !important;
-  font-size: 11px !important;
+  font-size: var(--pw-font-size-sm) !important;
   line-height: 1 !important;
   padding: 0 !important;
   display: inline-flex !important;
@@ -535,13 +524,13 @@ body.mobile-mode .pw-win-hdr {
 
 #battle-center-panel.win-body {
   min-height: 0 !important;
-  background-color: var(--dark1) !important;
+  background-color: var(--pw-bg-surface) !important;
   background-image: none !important;
   border-radius: 10px !important;
 }
 
 #battle-center-panel.win-body {
-  background: var(--dark2) !important;
+  background: var(--pw-bg-header) !important;
   background-image: none !important;
   display: flex !important;
   flex-direction: column !important;
@@ -556,7 +545,7 @@ body.mobile-mode .pw-win-hdr {
   flex-direction: column !important;
   gap: 10px !important;
   padding: 10px !important;
-  background: var(--dark2) !important;
+  background: var(--pw-bg-header) !important;
 }
 
 #pokeballs-window-body.win-body {
@@ -589,7 +578,6 @@ body.mobile-mode .pw-win-hdr {
 .dash-win > .pw-win-hdr .pw-win-hdr-label {
   color: var(--light2) !important;
   font-weight: 700 !important;
-  letter-spacing: 0.4px !important;
 }
 
 .dash-win > .pw-win-hdr .pw-win-hdr-icon svg {
@@ -683,12 +671,12 @@ body.mobile-mode .pw-win-hdr-tools {
   margin: 0 0 8px;
   padding: 0 8px 0 10px;
   border: 1px solid var(--pw-border-color);
-  border-bottom: 2px solid var(--pw-border-panel-header);
+  border-bottom: 1px solid var(--pw-border-panel-header);
   border-radius: 10px;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   box-shadow: none;
   color: var(--light2);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   font-weight: 700;
 }
 
@@ -705,9 +693,8 @@ body.mobile-mode .pw-win-hdr-tools {
 .pw-settings-modal-window .pw-win-hdr-title,
 .pw-settings-modal-window .pw-win-hdr-label {
   color: var(--light2);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   font-weight: 700;
-  letter-spacing: 0;
 }
 
 .pw-settings-modal-window .pw-win-hdr-tools {
@@ -763,7 +750,6 @@ body.mobile-mode .pw-win-hdr-tools {
 }
 
 #starter-modal-title {
-  text-shadow: 0 1px 3px color-mix(in srgb, var(--dark1) 70%, transparent);
 }
 
 .pw-header-brand {
@@ -773,8 +759,8 @@ body.mobile-mode .pw-win-hdr-tools {
 }
 
 .pw-header-brand h1 {
-  font-size: 18px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-3xl);
+  font-weight: 700;
   color: var(--light2);
   display: flex;
   align-items: center;
@@ -791,11 +777,11 @@ body.mobile-mode .pw-win-hdr-tools {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--pw-bg-surface);
   padding: 4px 12px;
   border-radius: var(--pw-radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: 13px;
+  border: 1px solid var(--pw-border-color);
+  font-size: var(--pw-font-size-lg);
   font-weight: 700;
   color: var(--light2);
 }
@@ -807,7 +793,7 @@ body.mobile-mode .pw-win-hdr-tools {
 }
 
 .pw-win-hdr {
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   border-bottom: 1px solid var(--dark3);
   height: 38px;
   display: flex;
@@ -822,8 +808,7 @@ body.mobile-mode .pw-win-hdr-tools {
   align-items: center;
   gap: 8px;
   font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.4px;
+  font-size: var(--pw-font-size-lg);
   color: var(--light2);
 }
 
@@ -866,7 +851,6 @@ body.mobile-mode .pw-win-hdr-tools {
   flex: 1 1 auto;
 }
 
-
 /* Capture verdict overlay: all presentation rules stay in CSS, while the typed event only supplies the ball, probability and localized outcome. */
 #battle-center-panel.win-body {
   position: relative;
@@ -901,14 +885,14 @@ body.mobile-mode .pw-win-hdr-tools {
 }
 
 .pw-win-hdr-subtitle {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   color: var(--light1);
   font-weight: 500;
 }
 
 .pw-preset-editor-window > .pw-panel-footer {
   padding: 10px 20px;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   border-top: 1px solid var(--pw-border-color);
   flex-shrink: 0;
 }
@@ -923,7 +907,7 @@ body.mobile-mode .pw-win-hdr-tools {
   flex: 0 0 auto;
   padding: 12px 18px;
   border-top: 1px solid var(--pw-border);
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
 }
 
 @media (max-width: 640px), (pointer: coarse) {

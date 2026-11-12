@@ -4,14 +4,14 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 .loot-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  padding: 12px;
+  gap: 8px;
+  padding: 10px;
   justify-content: flex-start;
-  background: var(--dark2);
+  background: var(--pw-bg-header);
+  border: 1px solid var(--pw-border-color);
   border-radius: 10px;
 }
 
@@ -44,11 +44,10 @@
   right: 0;
   background: transparent;
   color: var(--light2);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight: bold;
   padding: 0;
   border: none;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
 }
 
 #battle-summary-modal {
@@ -67,9 +66,9 @@
 }
 
 #battle-summary-inner {
-  background: var(--dark2);
-  border: 1px solid var(--dark3);
-  border-radius: 12px;
+  background: var(--pw-bg-surface);
+  border: 1px solid var(--pw-border-color);
+  border-radius: var(--pw-window-radius);
   padding: 20px;
   max-width: 600px;
   width: 90%;
@@ -89,11 +88,11 @@
 }
 
 .loot-item .loot-count {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 #battle-summary-inner * {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .pw-summary-sprite {
@@ -107,7 +106,7 @@
 
 .pw-summary-name {
   font-weight:bold;
-  font-size:13px;
+  font-size: var(--pw-font-size-lg);
   color:var(--light2);
 }
 
@@ -117,14 +116,14 @@
   font-weight:bold;
   padding:4px 10px;
   border-radius:4px;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .battle-summary-entry {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--dark3);
+  background: var(--pw-bg-sprite);
   border-radius: 6px;
   padding: 8px;
 }
@@ -170,8 +169,8 @@
 
 .battle-session-summary-stat b {
   color: var(--light2);
-  font-size: 16px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-2xl);
+  font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -179,7 +178,7 @@
 
 .battle-session-summary-stat span {
   color: var(--light1);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight: 800;
 }
 
@@ -187,7 +186,6 @@
   display: grid;
   gap: 8px;
 }
-
 
 /* Wave 18 (user feedback): was 40px while the canonical sprite is 72px — the sprite overflowed the frame and sat off-centre. Full container now, centred, never clipped (the disc scales inside it). */
 .pw-summary-sprite {
@@ -201,7 +199,7 @@
 
 .pw-summary-name {
   font-weight: bold;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   color: var(--light2);
 }
 
@@ -211,23 +209,22 @@
   font-weight: bold;
   padding: 4px 10px;
   border-radius: 4px;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   position: relative;
   z-index: 3;
 }
 
 #battle-summary-inner {
   border: 1px solid var(--pw-border);
-  border-radius: var(--pw-radius);
-  background: var(--pw-surface);
+  border-radius: var(--pw-window-radius);
+  background: var(--pw-bg-surface);
   box-shadow: var(--pw-shadow);
-  color: var(--light2);
+  color: var(--pw-text-primary);
 }
 
 #battle-summary-modal {
   backdrop-filter: blur(3px);
 }
-
 
 /* DS2810 — scroll a modal from ANYWHERE + gold shiny toggle ──────────────────────────────────────────────────────────────────────── 1) Wheel dead zones: the modal backdrops themselves can now scroll and the inner panel uses AUTO vertical margins — it stays centred when it fits, and becomes fully reachable (top included) when the viewport is shorter than the panel (the old flex centreing clipped the top of tall panels). Together with the bridge wheel relay, the scroll works over the whole screen, not only above the panel. 2) The shiny toggle ON colour is GOLD #F5C242 (rule lives with the other toggle colours in DS2809 — see above). */
 #battle-summary-modal {
@@ -245,7 +242,7 @@
 }
 
 .staff-summary-tip {
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   color: var(--light2);
   margin-bottom: 12px;
   background: rgba(255,255,255,0.05);
@@ -261,11 +258,10 @@
 
 .loot-item .loot-count {
   z-index: 3 !important;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   border-radius: 8px;
   padding: 1px 5px;
 }
-
 
 /* 5. Capture rows keep the whole 72px sprite inside the frame. */
 .battle-summary-entry {
@@ -349,13 +345,13 @@
 }
 
 .pw-ach-summary-value {
-  font-size: 24px;
+  font-size: var(--pw-font-size-4xl);
   font-weight: 700;
   color: var(--yellow);
 }
 
 .pw-ach-summary-label {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   color: var(--light2);
 }
 
@@ -365,13 +361,12 @@
   gap: 6px;
 }
 
-
 /* DS-v1.16.8 — ITEM LOOT LISTS (battle summary + AFK recap) ════════════════════════════════════════════════════════════════════════ 1) ROOT CAUSE of the "gigantic items": both summaries built their own `<img>` with the class `battle-summary-item-icon`, which NO rule ever styled — the sprite therefore rendered at its file size (24 to 371 px depending on the item). They now use the shared `LootItemList`, i.e. the canonical `UIItemSprite` in the same 72 px round frame as the location drops (`.pw-grid-media`). 2) The disc is a fixed square that never shrinks, and the meta column stacks the name over the quantity (the generic `.pw-col` gap of 8 px was too loose inside an 88 px card). NOTE: capture rows keep `.battle-summary-entry` untouched. */
 .loot-item-entry {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--dark3);
+  background: var(--pw-bg-sprite);
   border: 1px solid var(--light1);
   border-radius: 6px;
   padding: 8px;
@@ -388,11 +383,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   border: 1px solid var(--dark3);
   border-radius: 6px;
   padding: 6px 10px;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .pw-battle-loot-row {
@@ -462,7 +457,7 @@
 .pw-battle-summary-toll-refund {
   margin-top: 4px;
   color: var(--light2);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   line-height: 1.4;
 }
 

@@ -4,13 +4,12 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 .poke-moves {
   padding: 8px;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  background: var(--dark2);
+  background: var(--pw-bg-header);
   border-radius: 0 0 11px 11px;
 }
 
@@ -27,7 +26,7 @@
   transition: all 0.2s;
   position: relative;
   overflow: hidden;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 .poke-move:hover {
@@ -64,7 +63,7 @@
 }
 
 .poke-move {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 .poke-move-power.is-high {
@@ -83,25 +82,24 @@
   color: var(--light2);
 }
 
+/* The 4px left bar is the only trace of the type on a move card, and it is drawn once. */
 .poke-move {
-  border: 1px solid var(--type-color, var(--dark1));
-  border-left: 4px solid var(--type-color, var(--dark1));
+  border: 1px solid var(--pw-border-color);
+  border-left: 4px solid var(--type-color, var(--pw-border-color));
+  border-radius: 8px;
 }
 
-.poke-move {
-  border: 1px solid var(--type-color, var(--dark1));
-}
-
+/* A move is a row of the corpus: one neutral hairline, the small radius, the usual surfaces. The
+   type speaks through its chip, not through a coloured frame around the whole row. */
 .poke-detail-move-row {
   display:grid;
   grid-template-columns: 78px minmax(0,1fr) auto auto;
   gap:8px;
   align-items:center;
-  min-height:30px;
-  background:rgba(0,0,0,.24);
-  border:1px solid var(--type-color,var(--dark3));
-  border-left:4px solid var(--type-color,var(--dark3));
-  border-radius:5px;
+  min-height:32px;
+  background: var(--pw-bg-surface);
+  border:1px solid var(--pw-border-color);
+  border-radius:8px;
   padding:4px 7px;
   cursor:help;
 }
@@ -112,7 +110,7 @@
 
 .poke-detail-move-row.selected {
   opacity:.55;
-  border-color:var(--red);
+  border-color: var(--pw-accent-danger);
 }
 
 .poke-detail-move-row.known {
@@ -150,9 +148,7 @@
 
 .poke-move, .poke-move b, .poke-move strong, .poke-move small {
   color: var(--dark1) !important;
-  text-shadow: none !important;
 }
-
 
 /* 6. Attack chips: neutral base again, the type colour ONLY drives the charge fill. The bare .type-* rules painted the WHOLE chip in the type colour (unreadable full yellow/orange slabs) — the charge bars live ON the chips (they always did), the extra bottom bar is gone from the DOM. */
 .poke-move[class*="type-"] {
@@ -163,7 +159,6 @@
 .poke-move[class*="type-"].charging {
   --charge-color: var(--type-color, rgba(148,136,107,0.4));
 }
-
 
 /* 3. Battle: inactive cards (no .poke-moves below) keep their bottom rounding; active / preset / team cards keep the square joint (the moves area continues below, unchanged). */
 .poke-card > .poke-card-top:not(:has(~ .poke-moves)) {
@@ -207,14 +202,13 @@
   padding: 5px 6px 5px 10px !important;
   border-radius: 7px !important;
   overflow: hidden !important;
-  font-size: 11.5px !important;
+  font-size: var(--pw-font-size-sm) !important;
   font-weight: 700 !important;
   cursor: help !important;
   background: rgba(0, 0, 0, .34) !important;
   border: 1px solid var(--type-color, var(--dark3)) !important;
   border-left: 4px solid var(--type-color, var(--dark3)) !important;
   color: var(--type-color, var(--light2)) !important;
-  text-shadow: none !important;
   transition: background .15s, border-color .15s !important;
 }
 
@@ -249,13 +243,12 @@
   flex: 0 0 auto !important;
   position: relative !important;
   z-index: 2 !important;
-  font-size: 11px !important;
+  font-size: var(--pw-font-size-sm) !important;
   font-weight: 800 !important;
   padding: 3px 6px !important;
   border-radius: 999px !important;
   background: rgba(255, 255, 255, .12) !important;
   color: var(--light2) !important;
-  text-shadow: none !important;
 }
 
 #battle-team-row .poke-move .move-eff-badge.good {
@@ -292,7 +285,7 @@
 #battle-team-row > .poke-card:first-child .poke-moves {
   position: relative !important;
   z-index: 2 !important;
-  background: var(--dark1) !important;
+  background: var(--pw-bg-surface) !important;
   padding-left: 9px !important;
   padding-right: 9px !important;
 }
@@ -381,7 +374,7 @@
   padding: 4px 8px;
   background: rgba(255, 255, 255, 0.04);
   border-radius: 6px;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .pw-dex-move-row {
@@ -393,7 +386,7 @@
   background: var(--dark1, #181613);
   border: 1px solid var(--border, #4A3E31);
   border-radius: 6px;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   cursor: pointer;
   transition: all 0.15s ease;
 }

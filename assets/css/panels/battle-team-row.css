@@ -4,7 +4,6 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 :not(#battle-team-row) > .poke-card:hover {
   box-shadow: 0 4px 16px rgba(0,0,0,0.4);
   border-color: var(--light2);
@@ -63,7 +62,7 @@
   padding: 10px !important;
   border-radius: 12px !important;
   overflow: hidden !important;
-  background-color: var(--dark2) !important;
+  background-color: var(--pw-bg-header) !important;
   background-image: none !important;
   border: 1px solid var(--dark3) !important;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06) !important;
@@ -212,7 +211,7 @@
 }
 
 #battle-team-row {
-  background: var(--dark2) !important;
+  background: var(--pw-bg-header) !important;
   background-image: none !important;
   border: 2px solid var(--light1) !important;
   border-radius: 8px !important;
@@ -288,15 +287,14 @@
 }
 
 #battle-team-row {
-  background: var(--dark2) !important;
+  background: var(--pw-bg-header) !important;
   border-color: var(--dark3) !important;
 }
 
 #battle-team-row .poke-card,
 
-
 #battle-team-row .poke-card:first-child {
-  background-color: var(--dark1) !important;
+  background-color: var(--pw-bg-surface) !important;
   border-color: var(--dark3) !important;
 }
 
@@ -350,13 +348,11 @@
   padding: 2px 7px !important;
   border-radius: 9px !important;
   border: 1px solid rgba(255, 255, 255, .28) !important;
-  font-size: 10px !important;
+  font-size: var(--pw-font-size-xs) !important;
   font-weight: 700 !important;
-  letter-spacing: .02em !important;
   line-height: 1.1 !important;
   text-transform: none !important;
   color: #14120E !important;
-  text-shadow: none !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, .35) !important;
 }
 
@@ -455,12 +451,10 @@
   padding: 2px 8px !important;
   border-radius: 9px !important;
   border: 1px solid rgba(0, 0, 0, .28) !important;
-  font-size: 10px !important;
+  font-size: var(--pw-font-size-xs) !important;
   font-weight: 800 !important;
-  letter-spacing: .02em !important;
   line-height: 1.1 !important;
   text-transform: none !important;
-  text-shadow: none !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, .3) !important;
 }
 

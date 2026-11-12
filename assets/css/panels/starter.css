@@ -4,7 +4,6 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 .starter-card {
   background: var(--pw-bg-surface) !important;
   border: 1px solid var(--pw-border-color) !important;
@@ -14,7 +13,7 @@
 }
 
 #starter-modal-inner {
-  background: var(--dark2);
+  background: var(--pw-bg-header);
   border: 1px solid var(--dark3);
   border-radius: 14px;
   padding: 22px;
@@ -80,33 +79,12 @@
   top:-8px;
   left:50%;
   transform:translateX(-50%);
-  background:var(--dark1);
+  background:var(--pw-bg-surface);
   color:var(--light2);
-  font-size:13px;
+  font-size: var(--pw-font-size-lg);
   font-weight:bold;
   padding:2px 8px;
   border-radius:10px;
-}
-
-.pw-starter-chosen {
-  background:var(--light1);
-  border:2px solid var(--dark1);
-  cursor:pointer;
-}
-
-.pw-starter-chosen-label {
-  color:var(--dark1);
-  font-weight:500;
-}
-
-.pw-starter-chosen-level {
-  background:var(--dark1);
-  color:var(--light2);
-  font-weight:bold;
-  padding:4px 10px;
-  border-radius:12px;
-  min-width:45px;
-  text-align:center;
 }
 
 .starter-card {
@@ -122,7 +100,7 @@
 .starter-choose-btn {
   background: var(--starter-color, var(--accent));
   color: white;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   padding: 6px 14px;
   border-radius: 20px;
   font-weight: bold;
@@ -166,55 +144,15 @@
   top: -8px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   color: var(--light2);
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   font-weight: bold;
   padding: 2px 8px;
   border-radius: 10px;
 }
 
-.pw-starter-chosen {
-  background: var(--light1);
-  border: 2px solid var(--dark1);
-  cursor: pointer;
-}
-
-.pw-starter-chosen-label {
-  color: var(--dark1);
-  font-weight: 500;
-}
-
-.pw-starter-chosen-level {
-  background: var(--dark1);
-  color: var(--light2);
-  font-weight: bold;
-  padding: 4px 10px;
-  border-radius: 12px;
-  min-width: 45px;
-  text-align: center;
-}
-
-
 /* NB: .save-slot is EXCLUDED — save cards carry their own themed background (save-bg-classic/emerald/…) which must stay visible in the settings preview as in the saves menu. */
-.pw-starter-chosen, .pw-starter-card {
-  background: rgba(0, 0, 0, 0.28) !important;
-  border: 1px solid var(--pw-border) !important;
-  color: var(--light2) !important;
-}
-
-.pw-starter-chosen:hover, .pw-starter-card:hover {
-  background: rgba(236, 222, 183, 0.15) !important;
-  border-color: var(--light2) !important;
-  color: var(--light2) !important;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
-}
-
-.pw-starter-chosen-label {
-  color: var(--light2) !important;
-  font-weight: 700;
-}
 
 .starter-card {
   background: var(--pw-bg-surface) !important;
@@ -280,13 +218,13 @@
 }
 
 .starter-name-label {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   font-weight: 800;
   color: var(--light2);
 }
 
 .starter-name-error {
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   font-weight: 700;
   color: var(--red);
 }
@@ -331,7 +269,7 @@
 .pw-starter-welcome {
   text-align: center;
   color: var(--light1, #c9bc9c);
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   margin-bottom: 4px;
 }
 
@@ -383,7 +321,6 @@
 .pw-starter-card.is-squirtle {
   border-left: 4px solid #539ddf;
 }
-
 
 /* Touch layout — a starter card is not a desktop row squeezed into 320px.
    At 320x568 the three parts of the row (sprite, text, "Choisir") fought for 290px: the description
@@ -443,7 +380,7 @@
   }
 
   .starter-card--custom .starter-choose-label {
-    background: var(--dark3);
+    background: var(--pw-bg-sprite);
     color: var(--light2);
   }
 }
@@ -456,7 +393,7 @@
  * Everything here overrides the legacy row-cards of this sheet.
  * ------------------------------------------------------------------------- */
 
-#starter-modal.pw-starter-overlay {
+:is(#starter-modal, #regional-starter-modal).pw-starter-overlay {
   background:
     radial-gradient(118% 82% at 50% -10%, color-mix(in srgb, var(--light1) 22%, var(--pw-bg-app)) 0%, transparent 58%),
     radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--light1) 9%, transparent) 0 1px, transparent 1px) 0 0 / 15px 15px,
@@ -467,7 +404,7 @@
 
 /* The window is only a column of content: the overlay carries the decor, so no
    second flat panel is stacked on top of it. */
-#starter-modal .starter-modal-window {
+:is(#starter-modal, #regional-starter-modal) .starter-modal-window {
   width: min(100%, 900px) !important;
   max-width: 900px !important;
   max-height: 92vh !important;
@@ -480,13 +417,13 @@
   box-shadow: none !important;
 }
 
-#starter-modal .starter-welcome {
+:is(#starter-modal, #regional-starter-modal) .starter-welcome {
   margin-bottom: 8px;
-  font-size: 11.5px;
+  font-size: var(--pw-font-size-sm);
   color: var(--light1);
 }
 
-#starter-modal .starter-title-block {
+:is(#starter-modal, #regional-starter-modal) .starter-title-block {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -494,27 +431,26 @@
   text-align: center;
 }
 
-#starter-modal #starter-modal-title {
+:is(#starter-modal, #regional-starter-modal) .starter-title-band {
   padding: 4px 30px;
   border-radius: 6px;
   background: var(--light1);
   color: color-mix(in srgb, var(--dark1) 94%, var(--light1)) !important;
-  font-size: 19px;
+  font-size: var(--pw-font-size-3xl);
   font-weight: 800;
   line-height: 1.25;
-  text-shadow: none !important;
   box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
 }
 
-#starter-modal .starter-title-block .pw-text-sm {
+:is(#starter-modal, #regional-starter-modal) .starter-title-block .pw-text-sm {
   max-width: 520px;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.5;
   color: color-mix(in srgb, var(--light1) 82%, var(--pw-bg-app));
 }
 
 /* Trainer name: label on its own line, above the field. */
-#starter-modal .starter-name-field {
+:is(#starter-modal, #regional-starter-modal) .starter-name-field {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -523,15 +459,15 @@
   margin: 14px auto 8px;
 }
 
-#starter-modal .starter-name-label {
-  font-size: 11px;
+:is(#starter-modal, #regional-starter-modal) .starter-name-label {
+  font-size: var(--pw-font-size-sm);
   font-weight: 800;
   letter-spacing: 0.09em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--light1) 82%, var(--pw-bg-app));
 }
 
-#starter-modal .starter-name-input {
+:is(#starter-modal, #regional-starter-modal) .starter-name-input {
   width: 100%;
   height: 38px;
   padding: 0 12px;
@@ -539,25 +475,25 @@
   border: 2px solid color-mix(in srgb, var(--light1) 52%, transparent);
   background: color-mix(in srgb, var(--dark2) 78%, var(--pw-bg-app));
   color: var(--light2);
-  font-size: 13.5px;
+  font-size: var(--pw-font-size-lg);
   font-weight: 600;
   text-align: center;
 }
 
-#starter-modal .starter-name-input:focus {
+:is(#starter-modal, #regional-starter-modal) .starter-name-input:focus {
   outline: 3px solid var(--accent);
   outline-offset: 2px;
 }
 
 /* Starter cards: sand block, dashed edge, sprite on top, action at the bottom. */
-#starter-modal .starter-cards-stack {
+:is(#starter-modal, #regional-starter-modal) .starter-cards-stack {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
   margin: 16px 0 12px;
 }
 
-#starter-modal .starter-card {
+:is(#starter-modal, #regional-starter-modal) .starter-card {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -577,15 +513,15 @@
   transition: transform 0.18s ease, outline-color 0.18s ease;
 }
 
-#starter-modal .starter-card:hover,
-#starter-modal .starter-card:focus-visible {
+:is(#starter-modal, #regional-starter-modal) .starter-card:hover,
+:is(#starter-modal, #regional-starter-modal) .starter-card:focus-visible {
   transform: scale(1.03);
   outline-color: var(--accent);
   border-color: color-mix(in srgb, var(--dark1) 68%, var(--light1)) !important;
 }
 
 /* The disc behind the sprite is gone: the sprite stands on the card itself. */
-#starter-modal .starter-card .poke-sprite {
+:is(#starter-modal, #regional-starter-modal) .starter-card .poke-sprite {
   width: var(--pw-size-poke-lg);
   height: var(--pw-size-poke-lg);
   border: 0 !important;
@@ -593,22 +529,22 @@
   background: transparent !important;
 }
 
-#starter-modal .starter-card .pw-poke-circle-bg {
+:is(#starter-modal, #regional-starter-modal) .starter-card .pw-poke-circle-bg {
   display: none !important;
 }
 
-#starter-modal .starter-card .poke-sprite .pw-poke-circle-wrap,
-#starter-modal .starter-card .poke-sprite .poke-sprite-container {
+:is(#starter-modal, #regional-starter-modal) .starter-card .poke-sprite .pw-poke-circle-wrap,
+:is(#starter-modal, #regional-starter-modal) .starter-card .poke-sprite .poke-sprite-container {
   width: var(--pw-size-poke-lg) !important;
   height: var(--pw-size-poke-lg) !important;
 }
 
-#starter-modal .starter-card .poke-sprite img {
+:is(#starter-modal, #regional-starter-modal) .starter-card .poke-sprite img {
   max-width: var(--pw-size-poke-lg);
   max-height: var(--pw-size-poke-lg);
 }
 
-#starter-modal .starter-card .pw-flex-1 {
+:is(#starter-modal, #regional-starter-modal) .starter-card .pw-flex-1 {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -616,42 +552,41 @@
   text-align: center;
 }
 
-#starter-modal .starter-card .poke-name {
+:is(#starter-modal, #regional-starter-modal) .starter-card .poke-name {
   display: flex;
   align-items: baseline;
   justify-content: center;
   gap: 6px;
   color: color-mix(in srgb, var(--dark1) 95%, var(--light1));
-  font-size: 15px;
+  font-size: var(--pw-font-size-xl);
   font-weight: 800;
 }
 
-#starter-modal .starter-card .starter-dex-number {
-  font-size: 10.5px;
+:is(#starter-modal, #regional-starter-modal) .starter-card .starter-dex-number {
+  font-size: var(--pw-font-size-xs);
   font-weight: 600;
   color: color-mix(in srgb, var(--dark1) 74%, var(--light1));
 }
 
-#starter-modal .starter-card .pw-text-glow {
-  font-size: 11px;
+:is(#starter-modal, #regional-starter-modal) .starter-card .pw-text-glow {
+  font-size: var(--pw-font-size-sm);
   line-height: 1.35;
   color: color-mix(in srgb, var(--dark1) 82%, var(--light1)) !important;
-  text-shadow: none !important;
 }
 
-#starter-modal .starter-card .starter-choose-label {
+:is(#starter-modal, #regional-starter-modal) .starter-card .starter-choose-label {
   margin-top: 6px;
   padding: 4px 14px;
   border-radius: 6px;
   background: color-mix(in srgb, var(--dark1) 90%, #000);
   color: var(--light2);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-#starter-modal .starter-modal-footer-row {
+:is(#starter-modal, #regional-starter-modal) .starter-modal-footer-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -660,9 +595,11 @@
   margin-top: 4px;
 }
 
-#starter-modal .starter-modal-footer {
+:is(#starter-modal, #regional-starter-modal) .starter-modal-footer {
   flex: none;
-  font-size: 11px;
+  width: 100%;
+  text-align: center;
+  font-size: var(--pw-font-size-sm);
   color: color-mix(in srgb, var(--light1) 78%, var(--pw-bg-app));
 }
 
@@ -670,30 +607,30 @@
    centred, instead of one stretched column with a 104px sprite. Two cards fit
    on the first row of a phone, the third centres itself below. */
 @media (max-width: 850px), (pointer: coarse) {
-  #starter-modal .starter-modal-window {
+  :is(#starter-modal, #regional-starter-modal) .starter-modal-window {
     padding: 6px 12px 10px !important;
     max-height: 94vh !important;
   }
 
-  #starter-modal .starter-welcome,
-  #starter-modal .starter-title-block .pw-text-sm {
-    font-size: 11px;
+  :is(#starter-modal, #regional-starter-modal) .starter-welcome,
+  :is(#starter-modal, #regional-starter-modal) .starter-title-block .pw-text-sm {
+    font-size: var(--pw-font-size-sm);
   }
 
-  #starter-modal #starter-modal-title {
+  :is(#starter-modal, #regional-starter-modal) .starter-title-band {
     padding: 3px 20px !important;
-    font-size: 16px !important;
+    font-size: var(--pw-font-size-2xl) !important;
   }
 
-  #starter-modal .starter-name-field {
+  :is(#starter-modal, #regional-starter-modal) .starter-name-field {
     margin: 8px auto 4px;
   }
 
-  #starter-modal .starter-name-input {
+  :is(#starter-modal, #regional-starter-modal) .starter-name-input {
     height: 34px !important;
   }
 
-  #starter-modal .starter-cards-stack {
+  :is(#starter-modal, #regional-starter-modal) .starter-cards-stack {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: wrap !important;
@@ -703,7 +640,7 @@
     margin: 10px 0 8px !important;
   }
 
-  #starter-modal .starter-card {
+  :is(#starter-modal, #regional-starter-modal) .starter-card {
     display: flex !important;
     grid-template-areas: none;
     flex: 0 1 auto;
@@ -715,28 +652,78 @@
     transition: none;
   }
 
-  #starter-modal .starter-card .poke-sprite,
-  #starter-modal .starter-card .pw-poke-circle-wrap,
-  #starter-modal .starter-card .poke-sprite-container {
+  :is(#starter-modal, #regional-starter-modal) .starter-card .poke-sprite,
+  :is(#starter-modal, #regional-starter-modal) .starter-card .pw-poke-circle-wrap,
+  :is(#starter-modal, #regional-starter-modal) .starter-card .poke-sprite-container {
     width: 60px !important;
     height: 60px !important;
   }
 
-  #starter-modal .starter-card .poke-name {
-    font-size: 13px;
+  :is(#starter-modal, #regional-starter-modal) .starter-card .poke-name {
+    font-size: var(--pw-font-size-lg);
     gap: 4px;
   }
 
-  #starter-modal .starter-card .starter-dex-number,
-  #starter-modal .starter-card .pw-text-glow {
-    font-size: 11px;
+  :is(#starter-modal, #regional-starter-modal) .starter-card .starter-dex-number,
+  :is(#starter-modal, #regional-starter-modal) .starter-card .pw-text-glow {
+    font-size: var(--pw-font-size-sm);
     line-height: 1.25;
   }
 
-  #starter-modal .starter-card .starter-choose-label {
+  :is(#starter-modal, #regional-starter-modal) .starter-card .starter-choose-label {
     min-height: 0;
     margin-top: 4px;
     padding: 3px 10px;
-    font-size: 11px;
+    font-size: var(--pw-font-size-sm);
+  }
+}
+
+/* Regional starter: the catalogue's "same component as the Kanto starter, only the data changes".
+   The sand cards, the sprite on top and the dark pick label all come from the 1.16.34 block above;
+   the only addition is that a phone keeps the three starters on one row, smaller, exactly like the
+   catalogue's starter grid (user request: keep it as designed for PC and mobile). */
+@media (max-width: 850px), (pointer: coarse) {
+  /* The touch layout above wraps the cards two by two (max-width 45%). The regional starter keeps
+     the three starters on one row, smaller, the way the catalogue draws them on a phone. */
+  #regional-starter-modal .starter-cards-stack {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    margin: 12px 0 10px !important;
+  }
+
+  #regional-starter-modal .starter-card {
+    flex: 1 1 auto;
+    width: auto;
+    max-width: none !important;
+    min-height: 0;
+    padding: 10px 4px 8px !important;
+    gap: 3px !important;
+  }
+
+  #regional-starter-modal .starter-card .poke-sprite,
+  #regional-starter-modal .starter-card .poke-sprite .pw-poke-circle-wrap,
+  #regional-starter-modal .starter-card .poke-sprite .poke-sprite-container {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  #regional-starter-modal .starter-card .poke-sprite img {
+    max-width: 44px;
+    max-height: 44px;
+  }
+
+  #regional-starter-modal .starter-card .poke-name {
+    font-size: var(--pw-font-size-md);
+  }
+
+  #regional-starter-modal .starter-card .pw-text-glow {
+    font-size: var(--pw-font-size-xs);
+    line-height: 1.25;
+  }
+
+  #regional-starter-modal .starter-card .starter-choose-label {
+    padding: 3px 8px;
+    font-size: var(--pw-font-size-xs);
   }
 }

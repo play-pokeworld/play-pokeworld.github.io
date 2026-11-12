@@ -61,7 +61,7 @@
 .pw-held-item-lock-note {
   margin: 6px 0;
   color: var(--red);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .pw-held-item-list {
@@ -83,13 +83,13 @@
 .pw-held-item-row .inv-desc {
   margin-top: 2px;
   color: var(--pw-text-secondary);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .pw-held-item-row .inv-holder {
   margin-top: 2px;
   color: var(--pw-text-secondary);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .pw-held-item-actions {
@@ -152,21 +152,21 @@
 
 .pw-item-use-heading strong {
   color: var(--pw-text-primary, var(--light1));
-  font-size: 15px;
+  font-size: var(--pw-font-size-xl);
 }
 
 .pw-item-use-heading span,
 .pw-item-use-target-info span,
 .pw-move-learning-slot-info span {
   color: var(--pw-text-muted, var(--light2));
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.4;
 }
 
 .pw-item-use-instruction,
 .pw-move-learning-instruction {
   color: var(--pw-text-primary, var(--light1));
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .pw-item-use-targets,
@@ -200,7 +200,7 @@
 .pw-move-learning-slot-info strong {
   overflow: hidden;
   color: var(--pw-text-primary, var(--light1));
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -210,7 +210,7 @@
   border-radius: 9px;
   background: rgba(255,255,255,.045);
   color: var(--pw-text-muted, var(--light2));
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   line-height: 1.45;
 }
 

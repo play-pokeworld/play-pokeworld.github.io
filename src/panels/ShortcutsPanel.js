@@ -61,7 +61,6 @@ export class ShortcutsPanel extends DraggablePanel {
       if (shortcut.requiresMarketGate && !this._hasMarketAccess()) continue;
       const button = new UIButton({
         className: 'shortcut-action-btn',
-        variant: shortcut.variant,
         icon: shortcut.icon,
         text: t(shortcut.labelKey),
         align: 'left',

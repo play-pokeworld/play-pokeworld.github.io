@@ -68,7 +68,7 @@ body.mobile-mode .dash-col {
 }
 
 .dash-win {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 @media (max-width: 1024px) {
@@ -233,7 +233,7 @@ body.mobile-mode .dash-col {
 }
 
 .dash-col::-webkit-scrollbar-thumb {
-  background: var(--dark3);
+  background: var(--pw-bg-sprite);
   border-radius: 4px;
 }
 
@@ -325,4 +325,25 @@ body.mobile-mode .dash-col {
   padding: 0 8px !important;
 }
 
+}
+
+/* ---------------------------------------------------------------------------
+   The dashboard is the `.dash` grid of the catalogue (CATALOGUE_AFFICHAGES.html line 275):
+   a 10px page padding, a 10px gap between the columns and inside a column, and a 10px body
+   padding in every window (`.win-b`, line 141). The sheet above had accumulated 6px, 8px and
+   12px in successive waves; these three rules are the ones that paint.
+   --------------------------------------------------------------------------- */
+body:not(.mobile-mode) #main-dashboard {
+  padding: 10px;
+  gap: 10px;
+}
+
+body:not(.mobile-mode) #main-dashboard > .dash-col {
+  gap: 10px;
+  padding-right: 0;
+  padding-bottom: 0;
+}
+
+body:not(.mobile-mode) .dash-win > .win-body {
+  padding: 10px;
 }

@@ -4,9 +4,8 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 .settings-section h3 {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 #settings-modal {
@@ -25,8 +24,8 @@
 }
 
 #settings-inner {
-  background: var(--dark2);
-  border: 1px solid var(--dark3);
+  background: var(--pw-bg-surface);
+  border: 1px solid var(--pw-border-color);
   border-radius: 12px;
   padding: 20px;
   max-width: 600px;
@@ -47,9 +46,7 @@
 }
 
 .settings-section h3 {
-  letter-spacing: 0.4px;
 }
-
 
 /* waves 15+17: INSET ring only — the outer glow was clipped by the card overflow */
 .settings-row {
@@ -67,21 +64,34 @@
   margin-bottom: 20px;
 }
 
+/* A settings group opens on the shared small-caps label, the catalogue's seclbl. */
 .settings-section h3 {
-  font-size: 13px;
-  color: var(--light2);
-  margin-bottom: 10px;
-  font-weight: bold;
+  font-size: var(--pw-font-size-xs);
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--pw-text-secondary);
+  margin: 0 2px 6px;
 }
 
+/* Ten theme swatches read as a wrap of small tiles, not as ten half-width banners. */
 .theme-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 6px;
+}
+
+.theme-grid .theme-swatch {
+  height: 34px;
+  min-height: 0;
+  padding: 0 8px;
+  border-radius: 8px;
+  font-size: var(--pw-font-size-xs);
+  font-weight: 700;
 }
 
 #settings-inner *:not(.modal-title):not(.modal-title *) {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 @media (max-width: 600px) {
@@ -96,24 +106,23 @@
   overflow-y: auto;
 }
 
-
 /* Wave 33: this rule used to re-flatten the settings header (margin 0, top-only 12px radius) after the canonical block had already shaped it. Only the sticky offset is legitimately local now. */
 #settings-inner > .modal-title {
   top: 0;
 }
 
+/* The settings window is a window of the corpus: the window surface, one hairline. */
 #settings-inner {
-  border: 1px solid var(--pw-border);
+  border: 1px solid var(--pw-border-color);
   border-radius: var(--pw-radius);
-  background: var(--pw-surface);
+  background: var(--pw-bg-surface);
   box-shadow: var(--pw-shadow);
-  color: var(--light2);
+  color: var(--pw-text-primary);
 }
 
 #settings-modal {
   backdrop-filter: blur(3px);
 }
-
 
 /* Canonical header: IDENTICAL on all non-draggable panels ── (draggable windows keep .pw-win-hdr, deliberately distinct) */
 #settings-inner > .modal-title {
@@ -128,19 +137,16 @@
   margin: 0 0 var(--pw-header-gap) 0;
   background: var(--pw-bg-panel-header);
   border: 1px solid var(--pw-border);
-  border-bottom: 2px solid var(--pw-border-panel-header);
   border-radius: var(--pw-header-radius);
   color: var(--light2);
   font-size: var(--pw-header-title-size);
   font-weight: 700;
-  letter-spacing: 0.4px;
   line-height: 1;
 }
 
 #settings-inner {
   width: min(var(--pw-panel-w-md), 94vw);
 }
-
 
 /* Wave 28 — the settings header now spans the FULL panel width, like every other panel. Root cause: `#settings-inner` (rule ~line 888) carries `padding: 20px`, so its `.modal-title` child was inset by 20px on each side and read as a floating bar instead of a header band. The sibling shells do not have that problem: `#quest-inner` sets `padding: 0` and the fullscreen panels put the header outside the padded body. Rather than fight the padding with negative margins, the shell is switched to the same layout contract as `#quest-inner` (zero padding on the shell, padding carried by the body). */
 #settings-inner {
@@ -189,17 +195,15 @@ button.pw-settings-choice {
 
 #settings-inner button.hbtn.pw-btn-danger,
 #settings-inner .settings-row button.hbtn.pw-btn-danger {
-  background: #D3425F !important;
-  border: 1px solid #D3425F !important;
+  background: var(--pw-accent-danger) !important;
+  border: 1px solid var(--pw-accent-danger) !important;
   color: #ffffff !important;
-  font-weight: 900 !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35) !important;
+  font-weight: 700 !important;
 }
 
 #settings-inner button.hbtn.pw-btn-danger:hover {
   filter: brightness(1.12) !important;
 }
-
 
 /* Theme swatch tiles keep their own hue in every state (active = legacy glow border + scale, background stays the theme colour). White text — all tiles pass WCAG ≥ 4.5 (light: #C73B5B 4.99, fire: #BF360C 5.60). */
 #settings-inner button.theme-swatch--dark {
@@ -262,7 +266,6 @@ button.pw-settings-choice {
   box-sizing: border-box;
 }
 
-
 /* DS2810 — scroll a modal from ANYWHERE + gold shiny toggle ──────────────────────────────────────────────────────────────────────── 1) Wheel dead zones: the modal backdrops themselves can now scroll and the inner panel uses AUTO vertical margins — it stays centred when it fits, and becomes fully reachable (top included) when the viewport is shorter than the panel (the old flex centreing clipped the top of tall panels). Together with the bridge wheel relay, the scroll works over the whole screen, not only above the panel. 2) The shiny toggle ON colour is GOLD #F5C242 (rule lives with the other toggle colours in DS2809 — see above). */
 #settings-modal {
   overflow-y: auto;
@@ -278,7 +281,6 @@ button.pw-settings-choice.active {
   background: var(--light2) !important;
   border-color: var(--light2) !important;
   color: var(--dark1) !important;
-  text-shadow: none !important;
   font-weight: 800 !important;
 }
 
@@ -289,20 +291,19 @@ button.pw-settings-choice.active {
   box-shadow: inset 0 0 0 2px var(--blue);
 }
 
-
 /* 4. Settings: the ACTIVE language is invisible (user feedback) — "#settings-inner .hbtn" (id + class, !important) blankets every button with the idle face, so class-only .active rules always lose. Id-scoped re-assert with the per-theme ACTIVE pair (AA ≥ 6 on all 4 themes). */
 #settings-inner .hbtn.lang-btn.active,
 #settings-inner button.pw-settings-choice.active {
   background: var(--pw-btn-active-bg) !important;
   border-color: var(--pw-btn-active-bg) !important;
   color: var(--pw-btn-active-text) !important;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
 }
 
 #settings-inner .theme-swatch.active {
   border-color: var(--pw-btn-active-bg) !important;
   box-shadow: inset 0 0 0 3px var(--pw-btn-active-bg) !important;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
 }
 
 #settings-modal {
@@ -347,7 +348,7 @@ button.pw-settings-choice.active {
 }
 
 .settings-hint {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   color: var(--light1);
   margin: 0 0 8px;
   line-height: 1.4;
@@ -367,7 +368,7 @@ button.pw-settings-choice.active {
   color: #fff;
   font-family: inherit;
   font-weight: 800;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   line-height: 1.2;
   padding: 10px 16px;
   border-radius: 8px;
@@ -398,15 +399,16 @@ button.pw-settings-choice.active {
 
 .settings-sound-card {
   border: 1px solid var(--pw-border-color);
-  border-radius: var(--pw-radius-md);
-  padding: 10px 12px;
-  margin-bottom: 8px;
-  background: rgba(0, 0, 0, 0.18);
-  transition: border-color 0.2s, background 0.2s;
+  border-radius: 10px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  background: var(--pw-bg-header);
+  transition: border-color 0.2s;
 }
 
+/* Enabled is a tinted hairline, not a green frame with its own glow. */
 .settings-sound-card.is-on {
-  border-color: rgba(46, 204, 113, 0.45);
+  border-color: color-mix(in srgb, var(--success, #2ecc71) 45%, var(--pw-border-color));
 }
 
 .settings-sound-head {
@@ -420,7 +422,7 @@ button.pw-settings-choice.active {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   font-weight: 700;
   color: var(--light2);
 }
@@ -434,7 +436,7 @@ button.pw-settings-choice.active {
   align-items: center;
   gap: 10px;
   margin-top: 8px;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   color: var(--light2);
   transition: opacity 0.2s;
 }
@@ -467,7 +469,7 @@ button.pw-settings-choice.active {
 
 .pw-settings-root,
 .pw-settings-root * {
-  font-family: var(--pw-font-main, 'Winky Sans', 'Segoe UI', system-ui, sans-serif);
+  font-family: var(--pw-font-main);
 }
 
 .settings-section {
@@ -481,16 +483,16 @@ button.pw-settings-choice.active {
 }
 
 .settings-section h3 {
-  font-size: 15px;
+  font-size: var(--pw-font-size-xl);
   font-weight: 800;
   color: var(--light2);
   margin: 0 0 10px;
 }
 
 .settings-hint {
-  font-size: 12px;
-  color: var(--light1);
-  margin: 0 0 10px;
+  font-size: var(--pw-font-size-sm);
+  color: var(--pw-text-secondary);
+  margin: 0 0 8px;
 }
 
 .pw-settings-choices, .theme-grid {
@@ -499,15 +501,12 @@ button.pw-settings-choice.active {
   flex-wrap: wrap;
 }
 
+/* The card keeps the grammar declared earlier in this sheet: header surface, one hairline.
+   This block used to repaint it in a black wash with a white hairline. */
 .settings-sound-card {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 10px 14px;
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  margin-bottom: 8px;
 }
 
 .settings-sound-head {
@@ -517,17 +516,17 @@ button.pw-settings-choice.active {
 }
 
 .settings-sound-name {
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--light2);
+  font-weight: 600;
+  font-size: var(--pw-font-size-md);
+  color: var(--pw-text-primary);
 }
 
 .settings-sound-volume {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 12px;
-  color: var(--light1);
+  font-size: var(--pw-font-size-sm);
+  color: var(--pw-text-secondary);
 }
 
 .settings-sound-volume input[type="range"] {
@@ -559,7 +558,7 @@ button.pw-settings-choice.active {
 }
 
 .pw-channel-desc {
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   color: var(--light1);
 }
 
@@ -581,8 +580,8 @@ button.pw-settings-choice.active {
   max-height: 85vh;
   min-height: 0;
   border: 1px solid var(--pw-border-color);
-  border-radius: 14px;
-  background: var(--pw-surface);
+  border-radius: var(--pw-window-radius);
+  background: var(--pw-bg-surface);
   box-shadow: var(--pw-shadow);
   backdrop-filter: none;
 }
@@ -637,37 +636,50 @@ button.pw-settings-choice.active {
 .pw-settings-modal-window .settings-section h3 {
   margin: 0 0 10px;
   color: var(--light2);
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   font-weight: 700;
   line-height: 17px;
 }
 
+/* The language choices follow the theme tiles: same height, same wrap, same hairline. */
 .pw-settings-modal-window .pw-settings-language-buttons {
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 6px;
 }
 
+.pw-settings-modal-window .pw-settings-language-buttons .pw-settings-choice {
+  height: 34px;
+  min-height: 0;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: var(--pw-font-size-xs);
+}
+
+/* The ten themes are swatch tiles: a wrap of narrow chips that keep their own colour,
+   with the chosen one ringed by the accent instead of a three-pixel inset halo. */
 .pw-settings-modal-window .pw-settings-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 6px;
 }
 
 .pw-settings-modal-window .theme-swatch {
   width: 100%;
-  height: 44px;
-  min-height: 44px;
-  padding: 12px 16px;
-  border: 1px solid var(--light2) !important;
-  border-radius: 10px;
+  height: 34px;
+  min-height: 0;
+  padding: 0 10px;
+  border: 1px solid var(--pw-border-color);
+  border-radius: 8px;
   color: #ffffff;
-  font-size: 13px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-xs);
+  font-weight: 700;
 }
 
 .pw-settings-modal-window .theme-swatch.active,
 .pw-settings-modal-window .theme-swatch[aria-pressed="true"] {
-  border-color: var(--light2) !important;
-  box-shadow: inset 0 0 0 3px var(--light2) !important;
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
 }
 
 .pw-settings-modal-window button.theme-swatch--sakura,
@@ -690,7 +702,7 @@ button.pw-settings-choice.active {
 
 .pw-settings-modal-window .diag-count {
   color: var(--light1);
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 @media (max-width: 600px) {
@@ -718,8 +730,8 @@ button.pw-settings-choice.active {
 
 .pw-settings-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 6px;
 }
 
 .pw-settings-row {
@@ -755,7 +767,7 @@ body:not(.mobile-mode) #header #settings-btn.pw-header-settings {
   min-width: 36px;
   min-height: 36px;
   padding: 0;
-  border: 1px solid var(--pw-border-color);
+  border: 2px solid var(--pw-border-color);
   border-radius: 50%;
   background: transparent;
   color: var(--pw-text-secondary);
@@ -812,15 +824,15 @@ body.mobile-mode #header #settings-btn.pw-header-settings {
 .pw-download-button {
   width: 100%;
   min-width: 0;
-  min-height: 48px;
+  min-height: 44px;
   box-sizing: border-box;
   justify-content: center;
-  padding: 12px 16px;
+  padding: 10px 16px;
   border: 1px solid var(--pw-border-color);
-  border-radius: 10px;
+  border-radius: var(--pw-radius-sm);
   background: var(--accent);
-  color: var(--dark1);
-  font-weight: 800;
+  color: var(--pw-text-dark);
+  font-weight: 600;
   text-align: center;
   text-decoration: none;
 }

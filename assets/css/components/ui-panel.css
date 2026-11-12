@@ -4,7 +4,6 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 .pw-ui-window {
   background: var(--pw-bg-surface);
   color: var(--pw-text-primary);
@@ -12,13 +11,11 @@
   border: 2px solid var(--pw-border-color);
 }
 
-.pw-ui-panel, .pw-panel {
-  background: var(--pw-bg-surface) !important;
-  border: 1px solid var(--pw-border-color) !important;
-  border-radius: 8px !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
-  color: var(--pw-text-primary) !important;
-}
+/* Removed in 1.16.48: this block forced the surface, the hairline, the radius and the shadow of
+   EVERY `.pw-panel` with `!important`, with the same values as the base `.pw-panel` rule below.
+   It won against every card that wanted its own grammar (quest cards, achievement cards, facility
+   cards), which is why the catalogue look could not be reached without a second override.
+   The base rule already declares those properties, so nothing changes for a plain panel. */
 
 .pw-ui-window-footer {
   margin: 0 !important;
@@ -49,9 +46,9 @@
   overflow: hidden !important;
   display: flex !important;
   flex-direction: column !important;
-  border-radius: 16px !important;
+  border-radius: var(--pw-window-radius) !important;
   border: 1px solid var(--pw-border-color) !important;
-  background-color: var(--pw-bg-surface, var(--dark2)) !important;
+  background-color: var(--pw-bg-surface) !important;
   box-shadow: var(--pw-shadow-lg) !important;
 }
 
@@ -68,21 +65,21 @@
 }
 
 .pw-panel {
-  background:var(--dark2);
+  background:var(--pw-bg-header);
   border-radius:8px;
   padding:10px;
   margin-bottom:10px;
 }
 
 .pw-panel {
-  background: var(--dark2);
+  background: var(--pw-bg-header);
   border-radius: 8px;
   padding: 10px;
   margin-bottom: 10px;
 }
 
 .pw-panel-title {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   font-weight: bold;
   color: var(--light2);
   margin-bottom: 6px;
@@ -90,12 +87,13 @@
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
+/* A panel is a card of the corpus, not a second window: surface, one hairline, the small radius. */
 .pw-panel {
   border: 1px solid var(--pw-border);
   border-radius: var(--pw-radius);
-  background: var(--pw-surface);
+  background: var(--pw-bg-surface);
   box-shadow: var(--pw-shadow);
-  color: var(--light2);
+  color: var(--pw-text-primary);
 }
 
 .pw-ui-btn {
@@ -167,14 +165,13 @@
   cursor: not-allowed;
 }
 
-
 /* STRICT ERGONOMIC RULE — an unusable control is never displayed: disabled buttons vanish entirely (display:none), they do not grey out. */
 .pw-ui-btn[disabled] {
   display: none !important;
 }
 
 .pw-panel {
-  background: var(--pw-surface);
+  background: var(--pw-bg-surface);
   border: 1px solid var(--pw-border-color);
   border-radius: 10px;
   padding: 12px;
@@ -268,7 +265,6 @@
   font-weight: 700;
   color: var(--pw-accent-gold);
   text-transform: none;
-  letter-spacing: 0.3px;
 }
 
 .pw-panel-body {
@@ -285,13 +281,14 @@
   padding: 8px;
 }
 
+/* A window is a window: one surface, one hairline, the radius step of the corpus. */
 .pw-panel--modal-window {
   width: 100%;
   max-width: 620px;
   max-height: 88vh;
   box-shadow: var(--pw-shadow-lg);
   border: 1px solid var(--pw-border-color);
-  border-radius: 16px;
+  border-radius: var(--pw-window-radius);
   background-color: var(--pw-bg-surface);
   backdrop-filter: blur(12px);
   animation: modalScaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -307,8 +304,8 @@
   max-height: 85vh !important;
   min-height: 0 !important;
   border: 1px solid var(--pw-border-color);
-  border-radius: 14px;
-  background: var(--pw-surface);
+  border-radius: var(--pw-window-radius);
+  background: var(--pw-bg-surface);
   box-shadow: var(--pw-shadow);
   backdrop-filter: none;
 }

@@ -10,6 +10,8 @@ import { UIButton } from '../../ui/UIButton.js';
 import { UIIcon } from '../../ui/UIIcon.js';
 import { UIPokemonSprite } from '../../ui/UIPokemonSprite.js';
 import { UIItemSprite } from '../../ui/UIItemSprite.js';
+import { UITextInput } from '../../ui/UITextInput.js';
+import { SheetRow } from '../components/SheetRow.js';
 import { ModalIds } from '../../config/ModalIds.js';
 import { EventBus } from '../../core/EventBus.js';
 import { SaveSystem } from '../../systems/SaveSystem.js';
@@ -57,6 +59,12 @@ export class AtollFullscreenPanel extends UIFullscreenPanel {
 
     /** @private @type {UIText|null} */
     this._timerChip = null;
+
+    /** @private @type {string|null} Selected offer of the Atoll shop */
+    this._shopSelected = null;
+
+    /** @private @type {number} Quantity of the Atoll shop bar */
+    this._shopQuantity = 1;
 
     this.listen(AtollStateChangedEvent, () => {
       if (this.isOpen()) this._render();
@@ -169,28 +177,23 @@ export class AtollFullscreenPanel extends UIFullscreenPanel {
   _renderHomeTab(container, state) {
     const atollSys = AtollSystem.getInstance();
     const save = SaveSystem.getInstance().getCurrentSave();
-    const isEn = save?.player?.lang === 'en';
 
-    // 4 Category Hub Cards
-    const hubGrid = new UIContainer({ className: 'pw-atoll-home-grid' });
+    // The hub is a ticket list, not a grid of tiles: one row per combat centre, each row opening
+    // that centre's page (user request: the Atoll home follows the catalogue). The row grammar is
+    // the shared SheetRow, so a facility row looks like every other row of the game.
+    const tickets = new UIContainer({ className: 'pw-atoll-tickets' });
     for (const cat of HOME_CATEGORIES) {
       const wins = cat.modes.reduce((acc, mk) => acc + (state?.winsByMode?.[mk] || 0), 0);
-      const card = new UIButton({
-        className: 'pw-atoll-home-card',
+      tickets.addChild(new SheetRow({
+        icon: cat.icon,
+        title: t(cat.labelKey),
+        meta: wins > 0 ? t('atoll_ticket_record', { best: wins }) : t('atoll_ticket_never'),
+        className: 'pw-atoll-ticket',
+        trailing: new UIIcon({ name: 'chevronRight', className: 'pw-atoll-ticket-chevron' }),
         onClick: () => this._setTab(cat.id)
-      });
-      card.addChild(new UIIcon({ name: cat.icon, className: 'pw-atoll-home-icon' }));
-      card.addChild(new UIText({ tagName: 'b', text: t(cat.labelKey) }));
-      if (wins > 0) {
-        card.addChild(new UIText({
-          tagName: 'small',
-          className: 'pw-text-sm pw-light1',
-          text: isEn ? `${wins} win(s)` : `${wins} victoire(s)`
-        }));
-      }
-      hubGrid.addChild(card);
+      }));
     }
-    container.push(hubGrid);
+    container.push(tickets);
 
     // Legend Fragments Card
     const fragmentsCount = state?.fragments || 0;
@@ -284,9 +287,20 @@ export class AtollFullscreenPanel extends UIFullscreenPanel {
     }));
 
     const offers = atollSys.getShopOffers(save);
+    const tokens = save?.atoll?.tokens || 0;
+    const selected = offers.find((offer) => offer.key === this._shopSelected) ?? null;
+    if (!selected) this._shopQuantity = 1;
+    else this._shopQuantity = Math.min(Math.max(1, this._shopQuantity), this._shopMax(selected, tokens));
+
     const grid = new UIContainer({ className: 'pw-atoll-shop-grid' });
     for (const offer of offers) {
-      const card = new UIContainer({ className: 'pw-atoll-shop-card' });
+      const card = new UIButton({
+        className: `pw-atoll-shop-card${offer.key === this._shopSelected ? ' is-selected' : ''}`,
+        onClick: () => {
+          if (!offer.affordable) return;
+          this._selectShopOffer(offer.key);
+        }
+      });
       const info = new UIContainer({ className: 'pw-atoll-shop-info' });
       info.addChild(new UIItemSprite({ itemId: offer.key }));
 
@@ -301,10 +315,10 @@ export class AtollFullscreenPanel extends UIFullscreenPanel {
       card.addChild(info);
 
       if (offer.affordable) {
-        card.addChild(new UIButton({
-          variant: 'hbtn pw-btn-positive',
-          text: t('buy_btn'),
-          onClick: () => atollSys.buyItem(offer.key)
+        card.addChild(new UIText({
+          tagName: 'span',
+          className: 'pw-atoll-shop-pick',
+          text: offer.key === this._shopSelected ? t('selected_lbl') : t('choose_btn')
         }));
       } else {
         card.addChild(new UIText({
@@ -316,6 +330,65 @@ export class AtollFullscreenPanel extends UIFullscreenPanel {
       grid.addChild(card);
     }
     container.push(grid);
+
+    // The quantity bar is the shop's own bar (same classes, same square field) so the Atoll shop
+    // never invents a second grammar for the same gesture (user request).
+    if (selected) container.push(this._buildShopFooter(selected, tokens));
+  }
+
+  /** @private @param {Object} offer @param {number} tokens @returns {number} */
+  _shopMax(offer, tokens) {
+    return Math.max(1, Math.floor(tokens / Math.max(1, offer.price)));
+  }
+
+  /** @private @param {string} key */
+  _selectShopOffer(key) {
+    this._shopSelected = this._shopSelected === key ? null : key;
+    this._shopQuantity = 1;
+    this._render();
+  }
+
+  /** @private @param {Object} offer @param {number} tokens @returns {UIContainer} */
+  _buildShopFooter(offer, tokens) {
+    const footer = new UIContainer({ className: 'pw-shop-footer pw-atoll-shop-footer' });
+    const step = (label, next) => new UIButton({
+      variant: 'hbtn',
+      text: label,
+      onClick: () => {
+        this._shopQuantity = Math.min(Math.max(1, next), this._shopMax(offer, tokens));
+        this._render();
+      }
+    });
+    const input = new UITextInput({
+      type: 'number',
+      min: 1,
+      value: String(this._shopQuantity),
+      className: 'pw-shop-qty',
+      onChange: (value) => {
+        this._shopQuantity = Math.min(Math.max(1, Math.floor(Number(value) || 1)), this._shopMax(offer, tokens));
+        this._render();
+      }
+    });
+    input.setAriaLabel(t('market_quantity_label'));
+    footer.addChildren([
+      step(t('shop_reset'), 1),
+      input,
+      step(t('shop_add_qty', { n: 10 }), this._shopQuantity + 10),
+      step(t('shop_add_qty', { n: 100 }), this._shopQuantity + 100),
+      step(t('shop_max'), this._shopMax(offer, tokens)),
+      new UIText({
+        tagName: 'span',
+        className: 'pw-shop-total',
+        text: lt`${offer.price * this._shopQuantity} ${t('atoll_tokens')}`
+      }),
+      new UIButton({
+        variant: 'hbtn',
+        className: 'pw-shop-buy',
+        text: t('buy_btn'),
+        onClick: () => AtollSystem.getInstance().buyItem(offer.key, null, this._shopQuantity)
+      })
+    ]);
+    return footer;
   }
 
   /** @private */

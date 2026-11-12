@@ -350,6 +350,11 @@
   --pw-btn-border: #FFFFFF;
   --pw-btn-active-bg: #FFE400;
   --pw-btn-active-text: #000000;
+  /* The contrast theme derives its trees and rocks from near-black tokens, which made the whole
+     scenery invisible. The decor is spelled here so it stays readable on the black page. */
+  --pw-land-tree: #2A2A2A;
+  --pw-land-rock: #C9C9C9;
+  --pw-land-rock-bg: #1C1C1C;
 }
 
 [data-theme="light"] {

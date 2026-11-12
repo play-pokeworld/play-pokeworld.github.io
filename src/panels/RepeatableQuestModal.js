@@ -26,8 +26,9 @@ export class RepeatableQuestModal extends StaticModalPanel {
     super({
       id: ModalIds.REPEATABLE_QUESTS,
       title: t('repeatable_board_title'),
-      size: 'lg',
+      size: 'md',
       bodyClassName: 'pw-repeatable-board',
+      className: 'pw-sheet pw-repeatable-sheet',
       name: 'RepeatableQuestModal'
     });
     /** @private @type {ReturnType<typeof setInterval>|null} */
@@ -145,16 +146,23 @@ export class RepeatableQuestModal extends StaticModalPanel {
       this.addChild(activeSection);
     }
 
-    const actions = new UIContainer({ className: 'pw-repeatable-board-actions' });
+    // Sheet footer: the reroll keeps its own half when it is available, "Fermer" always there.
+    const foot = new UIContainer({ className: 'pw-sheet-foot' });
     if (state.rerollRemainingMs <= 0) {
-      actions.addChild(new UIButton({
-        variant: 'hbtn',
+      foot.addChild(new UIButton({
+        variant: 'ghost',
+        className: 'pw-sheet-btn',
         icon: 'refresh',
         text: t('repeatable_board_reroll'),
         onClick: () => quests.rerollRepeatableChoices()
       }));
     }
-    actions.addChild(new UIButton({ variant: 'secondary', text: t('close_btn'), onClick: () => this.close() }));
-    this.addChild(actions);
+    foot.addChild(new UIButton({
+      variant: 'ghost',
+      className: 'pw-sheet-btn',
+      text: t('close_btn'),
+      onClick: () => this.close()
+    }));
+    this.addChild(foot);
   }
 }

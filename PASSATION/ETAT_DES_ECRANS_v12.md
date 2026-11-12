@@ -1,3 +1,6 @@
+> **ARCHIVE.** Ce fichier est l'etat au 2026-11-07 (54 ecrans, avant le Lot C-coeur).
+> L'etat courant, avec les cinq statuts de validation, est `PASSATION/ETAT_DES_ECRANS_v13.md`.
+
 # Liste des écrans — état exact au 2026-11-07 (v12)
 
 > **54 écrans.** **Rien n’est coché sans que tu l’aies validé toi-même.**

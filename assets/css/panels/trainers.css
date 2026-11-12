@@ -21,7 +21,7 @@
   display:flex;
   justify-content:space-between;
   align-items:center;
-  background:var(--dark3);
+  background:var(--pw-bg-sprite);
   padding:10px 14px;
   border-radius:8px;
   flex-wrap:wrap;
@@ -30,7 +30,7 @@
 
 .quest-trainer-target {
   color:var(--light2);
-  font-weight:900;
+  font-weight: 700;
   margin:6px 0;
 }
 
@@ -56,8 +56,8 @@
   justify-content: center;
   background: rgba(0,0,0,.32);
   border: 2px solid rgba(236,222,183,.24);
-  font-weight: 1000;
-  font-size: 18px;
+  font-weight: 700;
+  font-size: var(--pw-font-size-3xl);
   color: var(--light2);
   image-rendering: pixelated;
 }
@@ -93,7 +93,7 @@
 
 .trainer-visual-card span {
   color:var(--light1);
-  font-size:12px;
+  font-size: var(--pw-font-size-md);
   text-transform:capitalize;
 }
 
@@ -110,7 +110,7 @@
   border:1px solid rgba(236,222,183,.18);
   border-radius:999px;
   padding:1px 6px;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   background:rgba(0,0,0,.18);
 }
 
@@ -118,7 +118,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--dark3);
+  background: var(--pw-bg-sprite);
   padding: 10px 14px;
   border-radius: 8px;
   flex-wrap: wrap;

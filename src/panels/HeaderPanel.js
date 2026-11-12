@@ -1,7 +1,10 @@
 /**
  * @file HeaderPanel.js
  * @brief Top bar of the game screen, matching the original #header structure.
- * Layout: brand, inline "Badges : current/total" counter, settings icon.
+ * Layout: brand, then the settings icon. The header carries no counter: the badge total used to sit
+ * on the right and the user does not want any number there (counts live in the panel bodies). The
+ * legacy badge nodes are still built, hidden, so the diagnostics and the tests that read
+ * #h-badges / #h-badges-total keep working.
  */
 
 import { UIElement } from '../ui/UIElement.js';
@@ -38,6 +41,11 @@ export class HeaderPanel extends UIElement {
     this.addChild(brand);
 
     const info = new UIContainer({ className: 'hinfo pw-static-002 pw-header-badges' });
+    // Hidden: no number on the right of the header (user request). The nodes stay in the DOM so the
+    // legacy ids #h-badges / #h-badges-total resolve.
+    info.setAttribute('hidden', '');
+    info.setAttribute('aria-hidden', 'true');
+    info.addClass('is-header-hidden');
     const badgeLine = new UIContainer({ tagName: 'span', className: 'pw-header-badges-line' });
     badgeLine.addChildren([
       new UIText({ tagName: 'span', text: t('badges_lbl') }),

@@ -184,26 +184,28 @@ export class AchievementsFullscreenPanel extends UIFullscreenPanel {
     for (const contrib of contributions) {
       let label = '';
       let valStr = '';
+      // One label per bonus type, from the shared locale table, so a raw key like pc_boxes
+      // never reaches the screen.
       if (contrib.type === BonusTypes.MONEY) {
         valStr = `+${contrib.value}%`;
         label = contrib.scope?.region
-          ? lt`${t('ach_rank_gold') === 'Gold' ? 'Money' : 'Pokédollars'} (${contrib.scope.region.toUpperCase()})`
-          : (t('ach_rank_gold') === 'Gold' ? 'Money' : 'Pokédollars');
+          ? lt`${t('ach_bonus_money')} (${contrib.scope.region.toUpperCase()})`
+          : t('ach_bonus_money');
       } else if (contrib.type === BonusTypes.XP) {
         valStr = `+${contrib.value}%`;
-        label = 'XP';
+        label = t('ach_bonus_xp');
       } else if (contrib.type === BonusTypes.CAPTURE) {
         valStr = `+${contrib.value}`;
-        label = t('ach_rank_gold') === 'Gold' ? 'Catch Rate' : 'Taux de capture';
+        label = t('ach_bonus_capture');
       } else if (contrib.type === BonusTypes.LOOT) {
         valStr = `+${contrib.value}`;
-        label = t('ach_rank_gold') === 'Gold' ? 'Loot' : 'Butin';
+        label = t('ach_bonus_loot');
       } else if (contrib.type === BonusTypes.SHINY_MULTIPLIER) {
         valStr = `×${contrib.value.toFixed(2)}`;
-        label = 'Shiny Rate';
+        label = t('ach_bonus_shiny');
       } else if (contrib.value > 0) {
         valStr = `+${contrib.value}${contrib.unit ? ' ' + contrib.unit : ''}`;
-        label = contrib.type;
+        label = t(`ach_bonus_${contrib.type}`);
       }
 
       if (valStr) {
@@ -299,64 +301,52 @@ export class AchievementsFullscreenPanel extends UIFullscreenPanel {
       // Bonus text
       const bonusText = ach.bonus ? db.getLocalizedBonusLabel(ach, Math.max(0, prog.currentTier)) : '';
 
-      // Card is clickable to toggle pin (no separate pin button)
+      // One achievement = one catalogue .row: the family disc, the text column (title,
+      // description, progress), then the end column (rank, tiers, status) pinned right.
+      // The whole row toggles the pin, so no separate pin button.
       const card = new UIContainer({
         className: 'pw-card pw-ach-card' + (prog.isCompleted ? ' is-completed' : '') + (isPinned ? ' is-pinned' : ''),
         children: [
-          // Header
           new UIContainer({
-            className: 'pw-ach-card-header',
+            className: 'pw-ach-icon',
+            children: [new UIIcon({ name: fam.icon || 'trophy' })]
+          }),
+          new UIContainer({
+            className: 'pw-ach-body',
             children: [
               new UIContainer({
-                className: 'pw-ach-card-title-group',
+                className: 'pw-ach-head',
                 children: [
-                  new UIContainer({
-                    className: 'pw-ach-icon',
-                    children: [new UIIcon({ name: fam.icon || 'trophy' })]
+                  new UIText({ className: 'pw-ach-title', text: name }),
+                  isPinned ? new UIText({ className: 'pw-ach-pinned-badge', text: t('ach_pinned') }) : null
+                ].filter(Boolean)
+              }),
+              new UIText({ className: 'pw-ach-desc', text: desc }),
+              new UIContainer({
+                className: 'pw-ach-progress-row',
+                children: [
+                  new UIProgressBar({
+                    value: prog.progressPct,
+                    max: 100,
+                    trackClassName: 'pw-ach-progress-bar-bg',
+                    fillClassName: 'pw-ach-progress-bar-fill'
                   }),
-                  new UIContainer({
-                    children: [
-                      new UIText({ className: 'pw-ach-title', text: name }),
-                      new UIText({ className: 'pw-ach-desc', text: desc })
-                    ]
+                  new UIText({
+                    className: 'pw-ach-progress-text',
+                    text: `${prog.metricValue} / ${prog.nextTarget} (${prog.progressPct}%)`
                   })
                 ]
               }),
-              new UIContainer({
-                className: 'pw-ach-status',
-                children: [
-                  isPinned ? new UIText({ className: 'pw-ach-pinned-badge', text: t('ach_pinned') }) : null,
-                  new UIText({ className: `pw-rank-chip ${tierInfo.cls}`, text: t(tierInfo.labelKey) }),
-                  statusBadge
-                ].filter(Boolean)
-              })
-            ]
-          }),
-
-          // Progress
-          new UIContainer({
-            className: 'pw-ach-progress-row',
-            children: [
-              new UIProgressBar({
-                value: prog.progressPct,
-                max: 100,
-                trackClassName: 'pw-ach-progress-bar-bg',
-                fillClassName: 'pw-ach-progress-bar-fill'
-              }),
-              new UIText({
-                className: 'pw-ach-progress-text',
-                text: `${prog.metricValue} / ${prog.nextTarget} (${prog.progressPct}%)`
-              })
-            ]
-          }),
-
-          // Footer
-          new UIContainer({
-            className: 'pw-ach-card-footer',
-            children: [
-              new UIContainer({ className: 'pw-ach-tiers-dots', children: tierDots }),
               bonusText ? new UIText({ className: 'pw-ach-bonus-pill', text: bonusText }) : null
             ].filter(Boolean)
+          }),
+          new UIContainer({
+            className: 'pw-ach-end',
+            children: [
+              new UIText({ className: `pw-rank-chip ${tierInfo.cls}`, text: t(tierInfo.labelKey) }),
+              new UIContainer({ className: 'pw-ach-tiers-dots', children: tierDots }),
+              statusBadge
+            ]
           })
         ]
       });

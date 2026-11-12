@@ -204,7 +204,7 @@ export class AtollSystem extends BaseSystem {
   }
 
   /**
-   * Swaps Pokémon positions in active rental team.
+   * Swaps Pokemon positions in active rental team.
    * @param {number} fromIndex
    * @param {number} toIndex
    * @param {import('../data/save/SaveData.js').SaveData} [save]
@@ -225,7 +225,7 @@ export class AtollSystem extends BaseSystem {
   }
 
   /**
-   * Swaps move positions for a rental Pokémon.
+   * Swaps move positions for a rental Pokemon.
    * @param {number} pokeIndex
    * @param {number} fromMoveIndex
    * @param {number} toMoveIndex
@@ -274,23 +274,27 @@ export class AtollSystem extends BaseSystem {
    * Purchases an item with Atoll tokens.
    * @param {string} itemKey
    * @param {import('../data/save/SaveData.js').SaveData} [save]
+   * @param {number} [quantity=1] - Units bought at once (the shop bar's quantity field)
    * @returns {boolean}
    */
-  buyItem(itemKey, save = null) {
+  buyItem(itemKey, save = null, quantity = 1) {
     const s = save || SaveSystem.getInstance().getCurrentSave();
     if (!s) return false;
 
     const offer = this.getShopOffers(s).find((o) => o.key === itemKey);
     if (!offer) return false;
 
-    if (s.atoll.tokens < offer.price) {
+    const count = Math.max(1, Math.floor(Number(quantity) || 1));
+    const price = offer.price * count;
+
+    if (s.atoll.tokens < price) {
       NotificationSystem.getInstance().notify(t('atoll_not_enough_tokens'), { tone: NotificationTones.DANGER });
       return false;
     }
 
-    s.atoll.spendTokens(offer.price);
-    s.inventory.add(offer.key, 1);
-    s.achievements.incrementStat('atoll_tokens_spent', offer.price);
+    s.atoll.spendTokens(price);
+    s.inventory.add(offer.key, count);
+    s.achievements.incrementStat('atoll_tokens_spent', price);
 
     NotificationSystem.getInstance().notify(
       t('atoll_item_bought', { item: offer.name }),

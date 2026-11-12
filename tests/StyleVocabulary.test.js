@@ -153,18 +153,26 @@ describe('Style vocabulary — item icons (P1 3.3)', (test) => {
   });
 });
 
-describe('Style vocabulary — typography floor (P1 3.4)', (test) => {
-  test('no declaration goes below 10px, and 10px is reserved for badges', () => {
-    const badge = /badge|pill|chip|level|lvl|count|counter|slot|dot|tag|tracker|rank|num|delta|glyph|mini/i;
-    const offenders = [];
-    for (const rule of rulesOf(readBundle())) {
-      for (const [, value] of rule.body.matchAll(/font-size:\s*([0-9.]+)px/g)) {
-        const size = Number(value);
-        if (size < 10) offenders.push(`${rule.selector} { font-size: ${value}px }`);
-        else if (size === 10 && !badge.test(rule.selector) && !/counter\(/.test(rule.body)) offenders.push(`${rule.selector} { font-size: 10px } (not a badge)`);
-      }
-    }
-    assert.deepEqual(offenders, [], 'informational text is at least 11px');
+describe('Style vocabulary — typography scale (P1 3.4, revised 1.16.48)', (test) => {
+  test('every text size comes from the scale, and the scale never goes below 10.5px', () => {
+    // 1.16.48: the text sizes live in one block of core/tokens.css. A sheet names a step
+    // (`var(--pw-font-size-lg)`), it never writes a px size — so re-scaling the interface is
+    // one edit, not 900. The floor is checked where the sizes are actually decided.
+    const tokens = fs.readFileSync(path.join(ROOT, 'assets/css/core/tokens.css'), 'utf8');
+    const scale = [...tokens.matchAll(/--pw-font-size-([a-z0-9]+):\s*([0-9.]+)px/g)]
+      .map(([, name, value]) => ({ name, value: Number(value) }));
+    assert.ok(scale.length >= 8, 'the scale declares its steps');
+    const tooSmall = scale.filter((step) => step.value < 10.5);
+    assert.deepEqual(tooSmall, [], 'no step is smaller than 10.5px (badges included)');
+
+    // One sheet is allowed to size a glyph instead of text: ui-icon.css draws icons at a px size.
+    // The save menu joined the scale in 1.16.52 (its logo reads --pw-font-size-hero).
+    const allowed = new Set(['assets/css/components/ui-icon.css']);
+    const offenders = rulesByFile()
+      .filter((rule) => !allowed.has(rule.file.split(path.sep).join('/')))
+      .filter((rule) => /font-size:\s*[0-9.]+px/.test(rule.body))
+      .map((rule) => `${rule.file}: ${rule.selector}`);
+    assert.deepEqual(offenders.slice(0, 5), [], 'a px text size outside the scale is a regression');
   });
 });
 

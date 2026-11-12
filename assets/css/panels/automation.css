@@ -4,12 +4,11 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 .automation-buy-btn {
   width: 100%;
   background: linear-gradient(135deg, var(--green), #8bd77d);
   color: var(--dark1);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .automation-card {
@@ -31,20 +30,19 @@
   justify-content: space-between;
   gap: 8px;
   color: var(--light2);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .automation-card-desc {
   color: var(--light1);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.35;
 }
-
 
 /* design-system/pass-08.css * --------------------------------------------------------------------------- * Dated pass inherited from the former design-system.css, kept in its historical order. * * Part of the 1.16.11 split: one file, one responsibility. The order of the * @import lines in assets/css/style.css IS the cascade — never reorder them, * never import this sheet anywhere else (guarded by tests/CssStructure.test.js). */
 .automation-owned-badge {
   color: var(--green);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .automation-toggle-btn,
@@ -57,7 +55,7 @@
   gap: 10px;
   padding: 12px 14px;
   border-radius: 12px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .automation-toggle-btn.is-off {
@@ -78,7 +76,7 @@
 }
 
 .automation-toggle-btn b {
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .automation-field {
@@ -86,15 +84,15 @@
   gap: 5px;
   margin: 8px 0;
   color: var(--light1);
-  font-size: 12px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-md);
+  font-weight: 700;
 }
 
 .automation-field select {
   width: 100%;
   border: 1px solid var(--dark3);
   border-radius: 8px;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   color: var(--light2);
   padding: 8px 10px;
 }
@@ -109,7 +107,6 @@
 .automation-toggle-btn.is-on b {
   color: #f6f1dc;
 }
-
 
 /* Phase 13: the "auto enabled" state must be clearly green (the gradient above, shared with other buttons, made it too subtle). */
 .automation-toggle-btn.is-on {
@@ -167,12 +164,12 @@
 
 .automation-locked-card span {
   color: var(--light2);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .automation-locked-card b {
   color: var(--light1);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .automation-card.is-owned {
@@ -247,7 +244,7 @@
   background: color-mix(in srgb, var(--pw-bg-surface) 88%, #000 12%);
   color: var(--light2);
   padding: 6px 10px;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   font-family: inherit;
   box-sizing: border-box;
   cursor: pointer;
@@ -259,37 +256,27 @@
   gap: 4px;
 }
 
-.hbtn:not(.quest-claim-btn):not(.automation-toggle-btn):not(.automation-buy-btn):not(.purchase-btn):not(.hatchery-mode-toggle):not(.hatchery-priority-toggle):not(.training-slot-auto-btn):not(.pw-btn-danger):not(.pw-btn-cancel):not(.active):not(.is-active) {
-  border: 1px solid var(--pw-border-strong);
-  background: rgba(236,222,183,0.12);
-  color: var(--light2);
-}
-
 .automation-toggle-btn.active {
   color: var(--dark1) !important;
-  font-weight: 900;
+  font-weight: 700;
 }
 
-.hbtn:not(.quest-claim-btn):not(.automation-toggle-btn):not(.automation-buy-btn):not(.purchase-btn):not(.hatchery-mode-toggle):not(.hatchery-priority-toggle):not(.training-slot-auto-btn):not(.pw-btn-danger):not(.pw-btn-cancel):not(.active):not(.is-active) {
-  background: var(--pw-btn-bg) !important;
-  color: var(--pw-btn-text) !important;
-  border: 1px solid var(--pw-btn-border) !important;
-}
+/* NB: the universal .hbtn paint that used to live here (a :not() chain over every variant, in a
+   panel sheet) is deleted: the button family is described once, in components/ui-button.css, and
+   this screen only styles its own controls. */
 
 button.automation-toggle-btn.is-on {
   background: #60BE58 !important;
   color: #241F16 !important;
   border: 1px solid #489A42 !important;
   box-shadow: 0 0 8px rgba(96, 190, 88, 0.35) !important;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
   text-shadow: none !important;
 }
-
 
 /* design-system/pass-13.css * --------------------------------------------------------------------------- * Dated pass inherited from the former design-system.css, kept in its historical order. * * Part of the 1.16.11 split: one file, one responsibility. The order of the * @import lines in assets/css/style.css IS the cascade — never reorder them, * never import this sheet anywhere else (guarded by tests/CssStructure.test.js). */
 button.automation-toggle-btn.is-on * {
   color: #241F16 !important;
-  text-shadow: none !important;
 }
 
 button.automation-toggle-btn.is-off {
@@ -302,14 +289,13 @@ button.automation-buy-btn {
   background: #3E6B3C !important;
   color: #f6f1dc !important;
   border: 1px solid #60BE58 !important;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
   text-shadow: none !important;
 }
 
 button.automation-buy-btn * {
   color: #f6f1dc !important;
 }
-
 
 /* Auto-fit grids that used fixed minima could force a horizontal overflow on narrow screens — min(X, 100%) collapses them to one column instead. */
 .automation-dashboard {

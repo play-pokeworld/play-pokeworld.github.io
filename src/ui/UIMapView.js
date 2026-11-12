@@ -66,6 +66,8 @@ export class UIMapView extends UIElement {
     this._lastPinchDistance = null;
     this._dragDistance = 0;
     this._suppressClickUntil = 0;
+    this._pressedNodeId = null;
+    this._captured = false;
     this._background = null;
 
     this._svg = svgNode('svg', {
@@ -86,8 +88,14 @@ export class UIMapView extends UIElement {
 
     this.addDomListener('click', (event) => {
       if (performance.now() < this._suppressClickUntil) return;
-      const node = event.target.closest && event.target.closest('[data-node-id]');
-      if (node && this._onNodeClick) this._onNodeClick(node.getAttribute('data-node-id'));
+      if (this._dragDistance > MapInteractionRules.DRAG_START_PX) return;
+      // A drag captures the pointer, and a captured pointer retargets the click to the view itself:
+      // `event.target` is then no longer the node. The node pressed on `pointerdown` is kept for
+      // exactly that case, so a simple click always travels.
+      const direct = event.target.closest && event.target.closest('[data-node-id]');
+      const nodeId = direct ? direct.getAttribute('data-node-id') : this._pressedNodeId;
+      this._pressedNodeId = null;
+      if (nodeId && this._onNodeClick) this._onNodeClick(nodeId);
     });
   }
 
@@ -112,7 +120,8 @@ export class UIMapView extends UIElement {
     this.addDomListener('pointerdown', (event) => {
       if (!event.target.closest?.('#map-svg')) return;
       this._pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-      this._dom.setPointerCapture?.(event.pointerId);
+      this._pressedNodeId = event.target.closest('[data-node-id]')?.getAttribute('data-node-id') || null;
+      this._captured = false;
       if (this._pointers.size === 1) this._dragDistance = 0;
       if (this._pointers.size === 2) this._lastPinchDistance = this._pointerDistance();
     });
@@ -124,6 +133,7 @@ export class UIMapView extends UIElement {
       if (!rect.width || !rect.height) return;
       const bounds = this._viewBounds();
       if (this._pointers.size >= 2) {
+        this._capturePointer(event);
         const distance = this._pointerDistance();
         if (this._lastPinchDistance > MapInteractionRules.PINCH_MIN_DISTANCE_PX && distance > MapInteractionRules.PINCH_MIN_DISTANCE_PX) {
           const center = this._pointerCenter();
@@ -135,6 +145,7 @@ export class UIMapView extends UIElement {
       } else if (this._pointers.size === 1) {
         this._dragDistance += Math.hypot(event.clientX - previous.x, event.clientY - previous.y);
         if (this._zoom > MapInteractionRules.MIN_ZOOM && this._dragDistance > MapInteractionRules.DRAG_START_PX) {
+          this._capturePointer(event);
           this._viewX -= (event.clientX - previous.x) * bounds.width / rect.width;
           this._viewY -= (event.clientY - previous.y) * bounds.height / rect.height;
           this._applyCamera();
@@ -147,6 +158,8 @@ export class UIMapView extends UIElement {
       this._pointers.delete(event.pointerId);
       if (this._pointers.size < 2) this._lastPinchDistance = null;
       if (this._pointers.size === 1) this._dragDistance = MapInteractionRules.DRAG_START_PX;
+      // A cancelled gesture never becomes a click: forget the node that was pressed.
+      if (event.type === 'pointercancel') this._pressedNodeId = null;
     };
     this.addDomListener('pointerup', endPointer);
     this.addDomListener('pointercancel', endPointer);
@@ -157,6 +170,19 @@ export class UIMapView extends UIElement {
       const factor = event.deltaY < 0 ? MapInteractionRules.WHEEL_ZOOM_STEP : 1 / MapInteractionRules.WHEEL_ZOOM_STEP;
       this._zoomAt(factor, event.clientX - rect.left, event.clientY - rect.top, rect, this._viewBounds());
     }, { passive: false });
+  }
+
+  /**
+   * Takes the pointer only when a gesture has really begun (drag or pinch).
+   * Capturing on the initial press retargets the following click to this view, which is how the
+   * map silently stopped travelling: the click no longer reached the location node.
+   * @private
+   * @param {PointerEvent} event
+   */
+  _capturePointer(event) {
+    if (this._captured) return;
+    this._captured = true;
+    this._dom.setPointerCapture?.(event.pointerId);
   }
 
   _pointerDistance() {

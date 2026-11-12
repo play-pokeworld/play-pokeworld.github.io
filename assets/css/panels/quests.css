@@ -41,7 +41,7 @@
 }
 
 #quest-inner {
-  background: var(--dark2);
+  background: var(--pw-bg-header);
   border: 1px solid var(--dark3);
   border-radius: 12px;
   padding: 20px;
@@ -59,15 +59,15 @@
 }
 
 .qcard-progress, .quest-reward, .qr-title, .am-type {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 .upgrade-card {
-  font-family: 'Winky Sans', 'Segoe UI', system-ui, sans-serif !important;
+  font-family: var(--pw-font-main) !important;
 }
 
 .quest-status {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   font-weight: bold;
   margin: 2px 0 6px;
 }
@@ -100,7 +100,7 @@
 .quest-claim-btn {
   width: 100%;
   padding: 6px;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   font-weight: bold;
   color: #fff;
 }
@@ -132,7 +132,7 @@
 
 .repeatable-upgrade-head span {
   color: var(--light1);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .mine-tool-upgrade-card {
@@ -150,8 +150,8 @@
 
 .mine-tool-upgrade-card span {
   color: var(--green);
-  font-size: 12px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-md);
+  font-weight: 700;
 }
 
 .upgrade-card {
@@ -174,12 +174,12 @@
 
 .upgrade-card b {
   color: var(--light2);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .upgrade-card span {
   color: var(--light1);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .upgrade-card.is-owned {
@@ -197,7 +197,7 @@
 .quest-progress-container {
   height: 8px;
   border-radius: 999px;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   border: 1px solid var(--pw-border-color);
   overflow: hidden;
 }
@@ -233,7 +233,7 @@ buttonbutton.quest-claim-btn.is-done:not(.is-challenge) {
 
 .quest-claim-btn {
   color: var(--dark1) !important;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .upgrade-card {
@@ -296,7 +296,7 @@ buttonbutton.quest-claim-btn.is-done:not(.is-challenge) {
 /* Owned/maxed upgrade state is an INFORMATIONAL row, never a button. */
 .upgrade-card .upgrade-card-state {
   color: var(--light1);
-  font-weight: 900;
+  font-weight: 700;
   white-space: nowrap;
 }
 
@@ -351,17 +351,24 @@ buttonbutton.quest-claim-btn.is-done:not(.is-challenge) {
 
 .pw-quest-card {
   display: grid;
-  gap: 8px;
+  gap: 6px;
+  /* Catalogue card: the tinted header surface, a hairline, a 12px radius and 10px of padding. */
+  background: var(--pw-bg-header);
+  border: 1px solid var(--pw-border-color);
+  border-radius: 12px;
+  padding: 10px;
 }
 
 .pw-quest-card-title {
-  font-weight: 900;
-  font-size: 13px;
+  font-weight: 800;
+  font-size: var(--pw-font-size-md);
   color: var(--pw-text-primary);
 }
 
 .pw-quest-card-desc {
-  line-height: 1.5;
+  font-size: var(--pw-font-size-xs);
+  color: var(--pw-text-secondary);
+  line-height: 1.35;
 }
 
 .pw-quest-reward {
@@ -373,7 +380,7 @@ buttonbutton.quest-claim-btn.is-done:not(.is-challenge) {
   border-radius: 999px;
   background: color-mix(in srgb, var(--pw-text-primary) 7%, transparent);
   padding: 4px 10px;
-  font-size: 12.5px;
+  font-size: var(--pw-font-size-md);
   color: var(--pw-text-secondary);
 }
 
@@ -385,8 +392,8 @@ buttonbutton.quest-claim-btn.is-done:not(.is-challenge) {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-weight: 900;
-  font-size: 13px;
+  font-weight: 700;
+  font-size: var(--pw-font-size-lg);
   margin: 10px 0 6px;
   padding-bottom: 4px;
   border-bottom: 1px solid var(--pw-border-color);
@@ -402,7 +409,7 @@ buttonbutton.quest-claim-btn.is-done:not(.is-challenge) {
 }
 
 .pw-quest-hint {
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   color: var(--pw-text-secondary);
   text-align: center;
   padding: 8px;
@@ -435,7 +442,7 @@ buttonbutton.quest-claim-btn.is-done:not(.is-challenge) {
 .quest-progress-container {
   height: 8px !important;
   border-radius: 999px !important;
-  background: var(--dark1) !important;
+  background: var(--pw-bg-surface) !important;
   border: 1px solid rgba(255,255,255,0.08) !important;
   overflow: hidden !important;
   width: 100% !important;
@@ -519,7 +526,7 @@ buttonbutton.quest-claim-btn.is-done:not(.is-challenge) {
 
 .pw-quest-objective.is-trainer .pw-quest-objective-text {
   color: var(--light2);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .pw-story-repeatable-action {
@@ -531,7 +538,7 @@ buttonbutton.quest-claim-btn.is-done:not(.is-challenge) {
 
 .pw-story-repeatable-hint {
   color: var(--light1, #c9bc9c);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   line-height: 1.45;
 }
 
@@ -569,13 +576,13 @@ buttonbutton.quest-claim-btn.is-done:not(.is-challenge) {
 
 .pw-repeatable-board-timer {
   color: var(--pw-text-secondary);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-variant-numeric: tabular-nums;
 }
 
 .pw-repeatable-board-intro {
   color: var(--pw-text-secondary);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.5;
 }
 
@@ -607,7 +614,7 @@ buttonbutton.quest-claim-btn.is-done:not(.is-challenge) {
 }
 
 .pw-repeatable-offer-heading .pw-quest-card-title {
-  font-size: 14px;
+  font-size: var(--pw-font-size-xl);
 }
 
 .pw-repeatable-offer-icon {
@@ -710,7 +717,7 @@ buttonbutton.quest-claim-btn.is-done:not(.is-challenge) {
   gap: 5px;
   min-width: 0;
   color: var(--light2);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   line-height: 1.25;
 }
 
@@ -738,4 +745,64 @@ buttonbutton.quest-claim-btn.is-done:not(.is-challenge) {
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+/* ---- Catalogue frame `quetes-repeat` (sheet grammar) -----------------------------------------
+ * The repeatable board keeps its head (slots + reroll timer + upgrades) and its active contracts;
+ * only the offer cards take the sheet row shape: one surface, the reward and the accept button on
+ * the right, the title and the description on the left.
+ */
+.pw-repeatable-sheet .pw-repeatable-board-head {
+  background: transparent;
+  border: 0;
+  padding: 0 0 2px;
+}
+
+.pw-repeatable-sheet .pw-repeatable-board-intro {
+  font-size: var(--pw-font-size-sm);
+  color: var(--pw-text-secondary, var(--light3));
+}
+
+.pw-repeatable-sheet .pw-repeatable-board-offers {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pw-repeatable-sheet .pw-repeatable-offer-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "head accept"
+    "desc accept"
+    "rewards accept";
+  align-items: center;
+  gap: 4px 10px;
+  padding: 9px 10px;
+  border: 1px solid var(--pw-border-color);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--pw-bg-surface) 50%, var(--pw-bg-header));
+}
+
+.pw-repeatable-sheet .pw-repeatable-offer-card .pw-quest-card-category {
+  display: none;
+}
+
+.pw-repeatable-sheet .pw-repeatable-offer-heading {
+  grid-area: head;
+}
+
+.pw-repeatable-sheet .pw-repeatable-offer-card .pw-quest-card-desc {
+  grid-area: desc;
+  font-size: var(--pw-font-size-sm);
+  color: var(--pw-text-secondary, var(--light3));
+}
+
+.pw-repeatable-sheet .pw-repeatable-offer-card .pw-quest-rewards {
+  grid-area: rewards;
+}
+
+.pw-repeatable-sheet .pw-repeatable-offer-accept {
+  grid-area: accept;
+  height: 32px;
+  font-size: var(--pw-font-size-sm);
 }

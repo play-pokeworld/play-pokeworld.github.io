@@ -4,11 +4,10 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 select {
   background-color: var(--pw-bg-surface) !important;
   color: var(--light2) !important;
-  font-family: 'Winky Sans', 'Segoe UI', system-ui, sans-serif !important;
+  font-family: var(--pw-font-main) !important;
 }
 
 button {
@@ -44,9 +43,8 @@ button.quest-claim-btn.is-challenge:not(:disabled) {
 button[data-action]:not(.save-slot):where(:not(.modal-close)) {
   cursor: pointer;
   border-radius: 10px;
-  font-family: 'Winky Sans','Segoe UI',system-ui,sans-serif;
-  font-weight: 900;
-  letter-spacing: 0.35px;
+  font-family: var(--pw-font-main);
+  font-weight: 700;
 }
 
 button[data-action]:not(.save-slot):where(:not(.modal-close)) {
@@ -58,7 +56,6 @@ button[data-action]:not(.save-slot):where(:not(.modal-close)) {
   border: 1px solid color-mix(in srgb, var(--light2) 35%, transparent) !important;
   color: var(--light2) !important;
   font-weight: 800 !important;
-  text-shadow: none !important;
 }
 
 button[data-action]:not(.save-slot):where(:not(.modal-close)):hover {
@@ -69,22 +66,22 @@ button[data-action]:not(.save-slot):where(:not(.modal-close)):hover {
 }
 
 button.danger {
-  background: #D3425F !important;
-  border: 1px solid #D3425F !important;
+  background: var(--pw-accent-danger) !important;
+  border: 1px solid var(--pw-accent-danger) !important;
   color: #ffffff !important;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
 }
 
 button.danger:hover {
-  background: #E55575 !important;
-  border-color: #E55575 !important;
+  background: var(--pw-accent-danger-hover) !important;
+  border-color: var(--pw-accent-danger-hover) !important;
   color: #ffffff !important;
 }
 
 button.usm-sort-btn.active::after {
   content: " " attr(data-dir);
-  font-size: 11px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-sm);
+  font-weight: 700;
   opacity: 1 !important;
 }
 
@@ -104,7 +101,7 @@ button.pw-hatchery-offer--breed {
 
 button.pw-hatchery-offer .pw-hatchery-offer-mode,
 button.pw-hatchery-offer--exp .pw-hatchery-offer-mode {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight: 800;
   color: var(--green) !important;
 }
@@ -118,7 +115,7 @@ button.training-slot-auto-btn.is-on {
   color: #241F16 !important;
   border: 1px solid #489A42 !important;
   box-shadow: 0 0 8px rgba(96, 190, 88, 0.35) !important;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
   text-shadow: none !important;
 }
 
@@ -136,7 +133,7 @@ button.quest-claim-btn, button.purchase-btn, button.hatchery-hatch-btn[data-call
   background: #3E6B3C !important;
   color: #f6f1dc !important;
   border: 1px solid #60BE58 !important;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
   text-shadow: none !important;
 }
 
@@ -166,24 +163,21 @@ button[data-action].hbtn.active:not(.save-slot) {
   background: var(--light2) !important;
   border-color: var(--light2) !important;
   color: var(--dark1) !important;
-  text-shadow: none !important;
   font-weight: 800 !important;
 }
 
-
-/* 6b. Danger buttons keep their crimson even with data-action set: the universal blanket (…(0,2,1) !important) outranks the class-only .pw-btn-danger (0,2,0). Wave 18 (user feedback): EXACT SAME crimson as the DS danger family (#D3425F / hover #E55575) — the wave-17 color-mix darkened it and "Abandonner"/"Retirer" no longer matched the other red buttons. */
+/* 6b. Danger buttons keep their crimson even with data-action set: the universal blanket (…(0,2,1) !important) outranks the class-only .pw-btn-danger (0,2,0). Wave 18 (user feedback): EXACT SAME crimson as the DS danger family (var(--pw-accent-danger) / hover var(--pw-accent-danger-hover)) — the wave-17 color-mix darkened it and "Abandonner"/"Retirer" no longer matched the other red buttons. */
 button[data-action].pw-btn-danger, button[data-call].pw-btn-danger {
-  background: #D3425F !important;
-  border-color: #D3425F !important;
+  background: var(--pw-accent-danger) !important;
+  border-color: var(--pw-accent-danger) !important;
   color: #ffffff !important;
 }
 
 button[data-action].pw-btn-danger:hover, button[data-call].pw-btn-danger:hover {
-  background: #E55575 !important;
-  border-color: #E55575 !important;
+  background: var(--pw-accent-danger-hover) !important;
+  border-color: var(--pw-accent-danger-hover) !important;
   color: #ffffff !important;
 }
-
 
 /* DS2820 — WAVE 20 (remaining displays: AFK recap + quest-window internals) ════════════════════════════════════════════════════════════════════════ 1) Quest buttons: challenge = FLAT accent (gradient deleted), claim = solid green with a themed border; NO greyed-out dead button is rendered anymore (the card shows an informative line instead). SPECIFICITY (Chromium discovery, same trap as the wave-19 toast bars): the flat-control hammer `.hbtn…, button[data-action]:not(…)` paints every control `light2-12% !important` at (0,3,1) — a plain `.quest-claim-btn.is-challenge` (0,2,0) rule LOSES even at EOF. The kind rules therefore carry [data-action] + !important and sit AFTER the hammer. Measured: challenge = solid var(--accent), claim = solid var(--green), text = var(--dark1) (reads on every theme). */
 button.quest-claim-btn.is-challenge[data-action] {

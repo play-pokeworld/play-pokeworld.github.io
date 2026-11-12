@@ -5,14 +5,17 @@
  */
 
 
+/* The highlighted quest card of the catalogue is `.qcard.hi`: one hairline of the accent, the
+   small square radius, the header surface. This card used to draw a 2px gold frame in a hard-coded
+   colour, the loudest element of the whole dashboard. */
 .pw-tut-card {
   display: grid;
   gap: 8px;
-  padding: 14px 16px;
+  padding: 12px;
   margin-bottom: 10px;
-  border-radius: var(--pw-radius-lg);
-  border: 2px solid #F5C242;
-  background: var(--pw-bg-surface);
+  border-radius: var(--pw-radius);
+  border: 1px solid var(--accent);
+  background: var(--pw-bg-header);
 }
 
 .pw-tut-head {
@@ -22,13 +25,13 @@
 }
 
 .pw-tut-bulb {
-  font-size: 14px;
+  font-size: var(--pw-font-size-xl);
   line-height: 1;
 }
 
 .pw-tut-step {
-  font-weight: 900;
-  font-size: 12px;
+  font-weight: 700;
+  font-size: var(--pw-font-size-md);
   letter-spacing: .4px;
   text-transform: uppercase;
   color: #F5C242;
@@ -36,13 +39,13 @@
 
 .pw-tut-title {
   font-weight: 800;
-  font-size: 15px;
+  font-size: var(--pw-font-size-xl);
   color: var(--pw-text-primary);
 }
 
 .pw-tut-desc {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   line-height: 1.45;
   color: var(--pw-text-secondary);
   overflow-wrap: break-word;
@@ -52,7 +55,7 @@
   padding: 8px 10px;
   border-radius: 8px;
   background: var(--pw-bg-header);
-  font-size: 12.5px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.45;
   color: var(--pw-text-secondary);
   overflow-wrap: break-word;
@@ -77,7 +80,7 @@
 }
 
 .pw-tut-progress {
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   font-weight: 800;
   color: #F5C242;
   font-variant-numeric: tabular-nums;
@@ -123,7 +126,6 @@ svg .pw-tuto-target > rect:nth-of-type(2) {
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  min-height: 96px;
 }
 
 .pw-tutorial-actions .pw-tutorial-action {
@@ -132,7 +134,7 @@ svg .pw-tuto-target > rect:nth-of-type(2) {
   min-height: 44px;
   padding: 7px 12px;
   border-radius: 10px;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .pw-tutorial-actions .pw-tutorial-guide,
@@ -141,17 +143,19 @@ svg .pw-tuto-target > rect:nth-of-type(2) {
   min-height: 44px;
   padding: 7px 12px;
   border-radius: 10px;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   background: var(--pw-bg-header);
   border-color: var(--pw-border-color);
   color: var(--pw-text-primary);
 }
 
+/* The guided step is a quest card like the others: same surface, same hairline, same radius.
+   The accent stays on the step caption and its progress, at 1px instead of a 2px frame. */
 .pw-tutorial-card {
-  border: 2px solid #f5c242 !important;
-  border-radius: var(--pw-radius-lg);
-  padding: 14px 16px;
-  background: var(--pw-bg-surface);
+  border: 1px solid var(--accent) !important;
+  border-radius: var(--pw-radius);
+  padding: 12px;
+  background: var(--pw-bg-header);
   box-shadow: none !important;
 }
 
@@ -159,9 +163,9 @@ svg .pw-tuto-target > rect:nth-of-type(2) {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #f5c242;
-  font-size: 12px;
-  font-weight: 900;
+  color: var(--accent);
+  font-size: var(--pw-font-size-md);
+  font-weight: 700;
   line-height: 16px;
   text-transform: uppercase;
 }
@@ -178,7 +182,7 @@ svg .pw-tuto-target > rect:nth-of-type(2) {
 
 .pw-tutorial-title {
   color: var(--pw-text-primary);
-  font-size: 15px;
+  font-size: var(--pw-font-size-md);
   font-weight: 800;
   line-height: normal;
 }
@@ -192,12 +196,12 @@ svg .pw-tuto-target > rect:nth-of-type(2) {
    description (the inset read as a stray tab). The negative inline margin cancels the card's 16px
    padding so the band reaches the border, and the same 16px comes back as its own padding. */
 .pw-tutorial-how {
-  margin-inline: -16px;
-  padding: 8px 16px;
+  margin-inline: -12px;
+  padding: 8px 12px;
   border-left: 0;
   border-radius: 0;
   background: var(--pw-bg-header);
-  font-size: 12.5px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.45;
 }
 
@@ -210,21 +214,21 @@ svg .pw-tuto-target > rect:nth-of-type(2) {
   display: block;
   margin: 0 0 2px;
   color: var(--pw-text-primary);
-  font-size: 12.5px;
+  font-size: var(--pw-font-size-md);
   font-weight: 800;
   line-height: 18.125px;
 }
 
 .pw-tutorial-card .pw-tutorial-how-text {
   margin: 0 !important;
-  font-size: 12.5px !important;
+  font-size: var(--pw-font-size-md) !important;
   line-height: 18.125px !important;
 }
 
 .pw-tutorial-progress-text {
   align-self: start;
-  color: #f5c242;
-  font-size: 12px;
+  color: var(--accent);
+  font-size: var(--pw-font-size-md);
   font-variant-numeric: tabular-nums;
   font-weight: 800;
 }

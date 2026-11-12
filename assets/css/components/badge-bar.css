@@ -4,7 +4,6 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 .pw-bdg-head {
   display: flex;
   align-items: center;
@@ -29,7 +28,7 @@
   margin-left: auto;
   padding: 1px 8px;
   border-radius: 999px;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   border: 1px solid var(--light1);
   color: var(--light2);
   font-weight: 700;
@@ -47,7 +46,7 @@
   flex: 1 1 auto;
   height: 8px;
   border-radius: 999px;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   border: 1px solid var(--light1);
   overflow: hidden;
 }
@@ -75,7 +74,7 @@
 .pw-bdg-boss {
   padding: 4px 8px;
   border-radius: 6px;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   border: 1px solid var(--red);
   color: var(--light2);
   font-weight: 600;
@@ -151,7 +150,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   border-radius: 8px;
   padding: 8px 10px;
   font-size: .95em;
@@ -174,7 +173,7 @@
   border-radius: 999px;
   border: 1px solid var(--light1) !important;
   color: var(--light1) !important;
-  background: var(--dark2) !important;
+  background: var(--pw-bg-header) !important;
   cursor: pointer;
 }
 
@@ -204,7 +203,6 @@
   transform: translateY(-1px);
 }
 
- 
 .pw-bdg-actions { gap: 8px; }
 .pw-bdg-btn, .pw-bdg-locked {
   min-width: 160px;
@@ -215,7 +213,6 @@
   .pw-bdg-keys { margin-left: 0; width: 100%; }
 }
 
- 
 .pw-dgn-grid {
   display: grid;
   grid-template-columns: repeat(var(--cols, 7), minmax(0, 1fr));
@@ -241,9 +238,9 @@
   justify-content: center;
   border-radius: 8px;
   border: 2px solid var(--light1) !important;
-  background: var(--dark2) !important;
+  background: var(--pw-bg-header) !important;
   color: var(--light2) !important;
-  font-size: 17px;
+  font-size: var(--pw-font-size-3xl);
   line-height: 1;
   padding: 0;
   transition: transform .12s ease, box-shadow .2s ease;
@@ -300,7 +297,6 @@
   filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .55));
 }
 
- 
 #battle-dungeon-bar .pw-dgn-tile.is-fog {
   background:
     radial-gradient(120% 120% at 30% 18%, rgba(0, 0, 0, .28), transparent 62%),
@@ -313,12 +309,10 @@
 .pw-dgn-fogq {
   opacity: .85;
   font-weight: 700;
-  text-shadow: 0 0 6px rgba(0, 0, 0, .9);
 }
- 
- 
+
 #battle-dungeon-bar .pw-dgn-tile.t-empty:not(.is-fog) {
-  background: var(--dark1) !important;
+  background: var(--pw-bg-surface) !important;
   border-style: dashed !important;
   border-color: color-mix(in srgb, var(--light1) 45%, transparent) !important;
   color: var(--light1) !important;
@@ -407,7 +401,6 @@
   color: var(--accent) !important;
 }
 
- 
 #battle-dungeon-bar .pw-dgn-tile.is-open { cursor: pointer; }
 #battle-dungeon-bar .pw-dgn-tile.is-open:hover {
   border-color: var(--light2) !important;
@@ -424,7 +417,7 @@
 }
  
 #battle-dungeon-bar .pw-dgn-tile.is-done:not(.is-here):not(.t-ladder):not(.t-boss) {
-  background: var(--dark1) !important;
+  background: var(--pw-bg-surface) !important;
   border-style: dashed !important;
   border-color: color-mix(in srgb, var(--light1) 45%, transparent) !important;
   border-width: 2px !important;
@@ -445,7 +438,6 @@
   .pw-dgn-tile { transition: none !important; }
 }
 
- 
 .pw-bdg-legend {
   display: flex;
   flex-wrap: wrap;
@@ -461,7 +453,7 @@
   border-radius: 50%;
   display: inline-block;
   border: 2.5px solid var(--light1);
-  background: var(--dark2);
+  background: var(--pw-bg-header);
 }
 .pw-dgn-leg.t-combat i { border-color: var(--light1); }
 .pw-var(--red);

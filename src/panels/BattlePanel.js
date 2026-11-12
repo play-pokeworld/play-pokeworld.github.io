@@ -18,6 +18,7 @@ import { BattleTrainerCard } from './components/BattleTrainerCard.js';
 import { BattleZoneEffects } from './components/BattleZoneEffects.js';
 import { CaptureAnimationView } from '../ui/CaptureAnimationView.js';
 import { BattleLootStrip } from './components/BattleLootStrip.js';
+import { ConfirmDialog } from '../ui/ConfirmDialog.js';
 import { RelaunchControls } from './components/RelaunchControls.js';
 import { RelaunchRules } from '../config/RelaunchRules.js';
 import { DungeonExpeditionPanel } from './components/DungeonExpeditionPanel.js';
@@ -117,15 +118,34 @@ export class BattlePanel extends DraggablePanel {
               id: 'leave-btn',
               className: 'pw-static-045',
               text: t('leave_battle_btn'),
-              onClick: () =>
-                DungeonSystem.getInstance().isActive()
-                  ? DungeonSystem.getInstance().quitFromBattle()
-                  : BattleSystem.getInstance().endBattle(false),
+              // Leaving loses the fight (and, in a dungeon, the bag): the catalogue asks first.
+              onClick: () => {
+                if (!this._quitConfirm) {
+                  // The battle window is a transformed panel: a dialog mounted inside it would be
+                  // clipped by its bounds, so the sheet is mounted on the page itself.
+                  this._quitConfirm = new ConfirmDialog({ id: 'pw-battle-quit-confirm' });
+                  // A floating layer goes through the shell helper, never through document.body here.
+                  AppShell.mountOverlay(this._quitConfirm);
+                }
+                this._quitConfirm.ask({
+                  title: t('battle_quit_title'),
+                  message: t('battle_quit_text'),
+                  icon: 'chevronLeft',
+                  confirmLabel: t('battle_quit_confirm'),
+                  onConfirm: () =>
+                    DungeonSystem.getInstance().isActive()
+                      ? DungeonSystem.getInstance().quitFromBattle()
+                      : BattleSystem.getInstance().endBattle(false),
+                });
+              },
             }),
           ],
         }),
       ],
     });
+
+    /** @private @type {ConfirmDialog|null} The catalogue step "Quitter le combat". */
+    this._quitConfirm = null;
 
     this._lootText = new BattleLootStrip({
       id: 'battle-loot-inline',

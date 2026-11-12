@@ -19,6 +19,7 @@ import { ModalIds } from '../config/ModalIds.js';
 import { PokemonDB } from '../data/pokemon/PokemonDB.js';
 import { STARTERS_BY_REGION, DEFAULT_STARTER_REGION } from '../data/pokemon/StarterData.js';
 import { GameConfig } from '../config/GameConfig.js';
+import { ConfirmDialog } from '../ui/ConfirmDialog.js';
 import { t } from '../localization/LocalizationManager.js';
 
 const NAME_INPUT_ID = 'starter-name-input';
@@ -54,6 +55,8 @@ export class StarterModal extends UIModal {
     this._nameError = null;
     /** @private @type {UIContainer[]} */
     this._cards = [];
+    /** @private @type {ConfirmDialog|null} The catalogue step "Confirmation du starter". */
+    this._confirm = null;
 
     this.addDomListener('keydown', (event) => {
       if (event.key !== 'Escape') return;
@@ -87,7 +90,7 @@ export class StarterModal extends UIModal {
     this.addChild(new UIText({ tagName: 'div', className: 'pw-text-sm pw-light1 pw-center starter-welcome', text: t(`starter_welcome_${this._region}`) }));
 
     const titleBlock = new UIContainer({ className: 'pw-center starter-title-block' });
-    titleBlock.addChild(new UIText({ tagName: 'div', id: 'starter-modal-title', className: 'pw-text-md pw-bold pw-light2', text: t(`starter_title_${this._region}`) }));
+    titleBlock.addChild(new UIText({ tagName: 'div', id: 'starter-modal-title', className: 'pw-text-md pw-bold pw-light2 starter-title-band', text: t(`starter_title_${this._region}`) }));
     titleBlock.addChild(new UIText({ tagName: 'div', className: 'pw-text-sm pw-light1', text: t('starter_subtitle') }));
     this.addChild(titleBlock);
 
@@ -222,11 +225,27 @@ export class StarterModal extends UIModal {
     }
 
     const trainerName = this._nameInput.getValue();
-    console.log(String(t('debug_starter_picked', { id: starter.species, name: t(starter.nameKey) })));
-    this.close();
-
-    if (this._onStarterChosen) {
-      this._onStarterChosen(trainerName, starter.species);
+    // The pick is not committed on the click: the catalogue draws a confirmation step between the
+    // card and the adventure, so the player sees the nickname and the species once more.
+    if (!this._confirm) {
+      this._confirm = new ConfirmDialog({ id: 'pw-starter-confirm' });
+      // Mounted inside this modal's backdrop so it stacks above the cards, not behind them.
+      this.addOverlayChild(this._confirm);
     }
+    this._confirm.ask({
+      title: t('starter_confirm_title'),
+      message: t('starter_confirm_text', { name: trainerName, pokemon: t(starter.nameKey) }),
+      note: t('starter_confirm_note'),
+      icon: 'check',
+      cancelLabel: t('starter_confirm_change'),
+      confirmLabel: t('starter_confirm_ok'),
+      onConfirm: () => {
+        console.log(String(t('debug_starter_picked', { id: starter.species, name: t(starter.nameKey) })));
+        this.close();
+        if (this._onStarterChosen) {
+          this._onStarterChosen(trainerName, starter.species);
+        }
+      }
+    });
   }
 }

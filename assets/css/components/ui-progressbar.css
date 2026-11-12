@@ -4,7 +4,6 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 .pw-progress-card {
   background: var(--pw-bg-surface) !important;
   border: 1px solid var(--pw-border-color) !important;
@@ -19,7 +18,7 @@
 
 .xp-bar {
   height: 4px;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   border-radius: 2px;
   overflow: hidden;
 }
@@ -32,29 +31,19 @@
 }
 
 .pw-progress-card {
-  background:var(--dark2);
+  background:var(--pw-bg-header);
   border-radius:6px;
   padding:8px;
   margin-bottom:10px;
-  font-size:13px;
+  font-size: var(--pw-font-size-lg);
   color:var(--light1);
-  border:1px solid #333;
-}
-
-.pw-progress-card-subtle {
-  background:var(--dark2);
-  border-radius:6px;
-  padding:8px;
-  margin-bottom:10px;
-  font-size:13px;
-  color:var(--light2);
   border:1px solid #333;
 }
 
 .pw-progress-label {
   display:flex;
   justify-content:space-between;
-  font-size:13px;
+  font-size: var(--pw-font-size-lg);
   color:var(--light1);
 }
 
@@ -69,7 +58,7 @@
 .staff-xp-bar {
   height: 7px;
   border-radius: 999px;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   overflow: hidden;
   border: 1px solid rgba(255,255,255,0.08);
 }
@@ -89,29 +78,30 @@
 }
 
 .pw-progress-card {
-  background: var(--dark2);
+  background: var(--pw-bg-header);
   border-radius: 6px;
   padding: 8px;
   margin-bottom: 10px;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   color: var(--light1);
   border: 1px solid #333;
 }
 
+/* One definition: a quiet block of a card, on the surface of the corpus. */
 .pw-progress-card-subtle {
-  background: var(--dark2);
-  border-radius: 6px;
+  background: var(--pw-bg-surface);
+  border: 1px solid var(--pw-border-color);
+  border-radius: 8px;
   padding: 8px;
   margin-bottom: 10px;
-  font-size: 13px;
-  color: var(--light2);
-  border: 1px solid #333;
+  font-size: var(--pw-font-size-md);
+  color: var(--pw-text-secondary);
 }
 
 .pw-progress-label {
   display: flex;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   color: var(--light1);
 }
 
@@ -142,16 +132,15 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%,-50%);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight: bold;
   color: white;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 .pw-progress-bar-sm.quest-progress-container {
   height: 8px !important;
   border-radius: 999px !important;
-  background: var(--dark1) !important;
+  background: var(--pw-bg-surface) !important;
   border: 1px solid rgba(255,255,255,0.08) !important;
   overflow: hidden !important;
   width: 100% !important;
@@ -224,16 +213,13 @@
   font-size: 0.65rem;
   font-weight: 700;
   color: #FFFFFF;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
   pointer-events: none;
 }
-
 
 /* Legacy skins (UIProgressBar trackClassName / fillClassName): only the ratio is shared. !important: the ratio is the single runtime value of the widget and must win over the skin rules of design-system.css (some of them set a width, e.g. --pct based ones). */
 .pw-progress > .pw-progress-fill {
   width: var(--pw-progress, 0%) !important;
 }
-
 
 /* Progression-gated dashboard panels do not reserve space before their unlock condition. */
 .pw-progression-hidden {

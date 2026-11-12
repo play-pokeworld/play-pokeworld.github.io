@@ -5,76 +5,66 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
-.player-card {
-  background: var(--pw-bg-surface) !important;
-  border: 1px solid var(--pw-border-color) !important;
-  border-radius: 8px !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
-  color: var(--pw-text-primary) !important;
-}
-
+/* The bar of the catalogue (CATALOGUE_AFFICHAGES.html, `.topb`): one flat band of the header
+   colour under a single hairline, a round accent mark at the left, the brand at 15px/800, and a
+   round outlined gear at the right. It used to be a lighter gradient band with a drop shadow, a
+   translucent cream square around the mark and a 22px title: four tells of the old design on the
+   only element present on every single screen. */
 #header {
-  background: var(--dark2);
-  border-bottom: 1px solid var(--dark3);
-  padding: 10px 20px;
+  background: var(--pw-bg-header);
+  border-bottom: 1px solid var(--pw-border-color);
+  padding: 0 12px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  gap: 10px;
+  height: var(--pw-game-header-h);
+  min-height: var(--pw-game-header-h);
+  box-shadow: none;
   position: sticky;
   top: 0;
   z-index: 950;
-  min-height: 56px;
-}
-
-#header h1 {
-  font-size: 20px;
-  color: var(--light2);
-  flex: 1;
-  letter-spacing: 2px;
-}
-
-.brand-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.brand-mark {
-  width: 28px;
-  height: 28px;
-  padding: 4px;
-  border-radius: 10px;
-  background: rgba(236,222,183,0.12);
-  border: 1px solid rgba(236,222,183,0.22);
-}
-
-.brand-mark svg {
-  width: 100%;
-  height: 100%;
-}
-
-.brand-mark img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  image-rendering: auto;
-  border-radius: 6px;
 }
 
 #header h1 {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  flex: 1;
+  font-size: var(--pw-font-size-xl);
+  font-weight: 800;
+  letter-spacing: 0;
+  color: var(--pw-text-primary);
 }
 
-#header h1 {
-  font-size: 13px;
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  flex: 0 0 36px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--pw-accent-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pw-accent-color) 35%, transparent);
 }
 
-#header h1 {
-  font-size: 20px;
+.brand-mark svg,
+.brand-mark img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  image-rendering: auto;
+  border-radius: 50%;
+}
+
+.player-card {
+  background: var(--pw-bg-surface) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  border-radius: var(--pw-radius-sm) !important;
+  box-shadow: none !important;
+  color: var(--pw-text-primary) !important;
 }
 
 .player-card {
@@ -99,19 +89,21 @@
 }
 
 .pw-money-label {
-  font-size: 12px;
-  color: var(--light1);
+  font-size: var(--pw-font-size-md);
+  color: var(--pw-text-secondary);
 }
 
 .pw-money-amount {
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--light2);
+  font-size: var(--pw-font-size-lg);
+  font-weight: 600;
+  color: var(--pw-text-primary);
+  font-variant-numeric: tabular-nums;
 }
 
+/* The wallet is a chip of the corpus: the elevated surface under one hairline, no cream wash. */
 .pw-money-row {
-  background: color-mix(in srgb, var(--light2) 12%, transparent);
-  border-color: color-mix(in srgb, var(--light2) 30%, transparent);
+  background: var(--pw-bg-surface-elevated);
+  border-color: var(--pw-border-color);
 }
 
 .pw-update-banner {
@@ -129,14 +121,12 @@
   top: 56px !important;
   z-index: 940 !important;
   box-shadow: 0 4px 16px rgba(0,0,0,0.6) !important;
-  font-family: "WinkySans", sans-serif !important;
 }
 
 .pw-update-banner-text {
-  font-size: 14px !important;
+  font-size: var(--pw-font-size-xl) !important;
   font-weight: 800 !important;
   color: #FFFFFF !important;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
 }
 
 .pw-update-banner-actions {
@@ -150,8 +140,8 @@
   background: #FFFFFF !important;
   border: 2px solid #FFC27F !important;
   color: #7F2B00 !important;
-  font-weight: 900 !important;
-  font-size: 13px !important;
+  font-weight: 700 !important;
+  font-size: var(--pw-font-size-lg) !important;
   cursor: pointer !important;
   border-radius: 8px !important;
   padding: 8px 22px !important;
@@ -170,7 +160,7 @@
   border: none !important;
   color: #FFE0BA !important;
   cursor: pointer !important;
-  font-size: 18px !important;
+  font-size: var(--pw-font-size-3xl) !important;
   padding: 4px 8px !important;
   position: absolute !important;
   right: 14px !important;
@@ -212,7 +202,7 @@
   border-radius: 999px;
   background: rgba(0, 0, 0, .28);
   border: 1px solid var(--dark3);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   line-height: 1;
   white-space: nowrap;
 }
@@ -224,7 +214,7 @@
 .pw-cur-chip-sym {
   font-weight: 700;
   color: var(--accent);
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .pw-cur-chip-ico {
@@ -279,7 +269,7 @@
 @media (max-width: 900px) {
 .pw-cur-chip {
   padding: 3px 8px;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 .pw-cur-energy-bar {
@@ -289,7 +279,7 @@
 }
 
 .pw-currency-panel .pw-cur-col {
-  --pw-cur-amount-top: 27px;
+  --pw-cur-amount-top: 37px;
 }
 
 .pw-currency-panel .pw-cur-fx {
@@ -320,7 +310,7 @@
 
 #header.pw-header-dock {
   height: var(--pw-header-h);
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   border-bottom: 2px solid var(--dark3);
   padding: 0 16px;
   display: flex;
@@ -345,7 +335,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .pw-currency-label {
@@ -374,13 +364,22 @@
   height: 28px;
 }
 
+/* The wallet is a grid of bare columns: no cell is framed, so a column only needs the width of its
+   own content. The tracks are therefore taken from the room available, not fixed at three: the
+   whole wallet (five currencies) sits on one line when the window is wide enough, and narrows on a
+   phone or in a column that cannot hold five. */
+/* The wallet is the `MoneyPanel` of the catalogue: one cell per currency, three equal columns of
+   6px gap, each a small surface of the header colour under a hairline (CATALOGUE_AFFICHAGES.html,
+   `.moneyrow`, line 709). It used to be bare columns on the window body, so a wallet with one
+   revealed currency and a wallet with three looked like two different components. */
 .pw-currency-panel {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 6px;
+  display: grid;
+  /* One column per currency, as the catalogue builds its wallet: `repeat(values.length, 1fr)`. */
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: 6px;
+  padding: 0;
 }
 
 .pw-cur-col {
@@ -388,34 +387,42 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  min-width: 56px;
+  gap: 3px;
+  min-width: 0;
   margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
+  padding: 9px 4px;
+  border: 1px solid var(--pw-border-color);
+  border-radius: var(--pw-radius);
+  background: var(--pw-bg-header);
   text-align: center;
 }
 
+/* A currency the save has not met yet keeps its cell: the wallet always reads as three columns,
+   only the figure stays hidden. */
+.pw-cur-col.is-locked {
+  opacity: 0.55;
+}
+
 .pw-cur-ico {
-  width: 25px;
-  height: 25px;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
 }
 
 .pw-cur-amount {
-  color: var(--light2);
-  font-size: 12px;
-  font-weight: 700;
+  color: var(--pw-text-primary);
+  font-size: var(--pw-font-size-lg);
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
   line-height: normal;
 }
 
 .pw-cur-name {
-  color: var(--light3, #9aa);
-  font-size: 11px;
-  line-height: normal;
+  max-width: 100%;
+  color: var(--pw-text-secondary);
+  /* Catalogue says 9.5px; the project typography floor forbids text under 10px. */
+  font-size: var(--pw-font-size-sm);
+  line-height: 1.15;
 }
 
 .pw-market-wallet .pw-money-row {
@@ -446,10 +453,9 @@ body:not(.mobile-mode) .pw-game-screen > #header {
 
 body:not(.mobile-mode) #header .pw-header-brand {
   gap: 10px;
-  font-size: 15px;
+  font-size: var(--pw-font-size-xl);
   font-weight: 800;
   color: var(--pw-accent-color);
-  letter-spacing: 0;
 }
 
 body:not(.mobile-mode) #header .pw-header-brand-mark {
@@ -480,8 +486,7 @@ body:not(.mobile-mode) #header .pw-header-brand-mark img {
 
 body.mobile-mode #header .pw-header-brand {
   gap: 10px;
-  font-size: 17px;
-  letter-spacing: 2px;
+  font-size: var(--pw-font-size-3xl);
 }
 
 body.mobile-mode #header .pw-header-brand-mark {
@@ -516,4 +521,16 @@ body.mobile-mode #header .pw-header-brand-mark {
     padding: 12px 42px 12px 16px !important;
     padding-top: max(12px, env(safe-area-inset-top)) !important;
   }
+}
+
+/* The header keeps no counter on the right (user request): the badge line stays in the DOM for the
+   legacy ids but never paints, and the settings button reclaims the push to the right edge that
+   .pw-static-002 used to give the badge block. */
+#header .pw-header-badges.is-header-hidden {
+  display: none !important;
+}
+
+body:not(.mobile-mode) #header #settings-btn,
+body.mobile-mode #header #settings-btn {
+  margin-left: auto;
 }

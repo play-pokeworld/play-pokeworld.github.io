@@ -37,6 +37,7 @@
 @import url("./components/ui-progressbar.css");
 @import url("./components/ui-panel.css");
 @import url("./components/ui-modal.css");
+@import url("./components/modal-sheet.css");
 @import url("./components/ui-dialog.css");
 @import url("./components/ui-context-menu.css");
 @import url("./components/long-press.css");
@@ -57,6 +58,7 @@
 @import url("./panels/location.css");
 @import url("./panels/shortcuts.css");
 @import url("./panels/team.css");
+@import url("./panels/team-window.css");
 @import url("./panels/team-moves.css");
 @import url("./panels/pokemon-sheet.css");
 @import url("./panels/pokemon-sheet-generated.css");

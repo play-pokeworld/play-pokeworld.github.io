@@ -4,9 +4,7 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 .save-menu-kicker {
-  letter-spacing: 0.4px;
 }
 
 .save-menu-screen {
@@ -83,16 +81,14 @@
 }
 
 #save-menu-title {
-  font-size: clamp(44px, 9vw, 96px);
+  font-size: var(--pw-font-size-hero);
   line-height: 0.9;
   color: var(--light2);
-  text-shadow: 0 5px 0 rgba(0,0,0,0.36), 0 0 24px rgba(236,222,183,0.26);
-  letter-spacing: 5px;
 }
 
 #save-menu-subtitle {
   color: rgba(236,222,183,0.78);
-  font-size: 15px;
+  font-size: var(--pw-font-size-xl);
 }
 
 .save-menu-list {
@@ -127,7 +123,7 @@
   border-radius: 50%;
   border: 2px solid rgba(236,222,183,0.36);
   color: rgba(236,222,183,0.86);
-  font-size: 32px;
+  font-size: var(--pw-font-size-display);
 }
 
 .save-menu-empty p {
@@ -142,7 +138,7 @@
   color: var(--light2);
   min-height: 184px;
   text-align: left;
-  border-radius: 18px;
+  border-radius: 10px;
   padding: 16px;
   display: grid;
   gap: 14px;
@@ -153,24 +149,12 @@
   overflow: hidden;
 }
 
-.save-slot::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(130deg, transparent 0 45%, rgba(255,255,255,0.16) 52%, transparent 62%);
-  transform: translateX(-120%);
-  transition: transform 0.5s;
-  pointer-events: none;
-}
-
+/* Hover answers on the hairline: a card that scales under the pointer moves the target away. */
 .save-slot:hover {
-  transform: translateY(-4px) scale(1.01);
-  filter: saturate(1.08);
-  box-shadow: 0 18px 38px rgba(0,0,0,0.45), 0 0 0 2px rgba(236,222,183,0.22);
-}
-
-.save-slot:hover::after {
-  transform: translateX(120%);
+  transform: none;
+  filter: none;
+  border-color: var(--accent);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
 .save-slot-top, .save-slot-bottom {
@@ -183,21 +167,22 @@
 }
 
 .save-slot-name {
-  font-size: 22px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-4xl);
+  font-weight: 700;
   color: #fff5d5;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.55);
 }
 
 .save-slot-id, .save-slot-bottom {
-  color: rgba(255,255,255,0.76);
-  font-size: 11px;
+  color: var(--light2);
+  font-size: var(--pw-font-size-sm);
 }
 
+/* The id is a line of the card, not a pill with a black wash. */
 .save-slot-id {
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: rgba(0,0,0,0.3);
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--light2);
   white-space: nowrap;
 }
 
@@ -212,20 +197,20 @@
 .save-slot-stats span {
   display: grid;
   gap: 2px;
-  padding: 10px;
-  border-radius: 12px;
-  background: rgba(0,0,0,0.28);
-  border: 1px solid rgba(255,255,255,0.12);
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--pw-bg-sprite);
+  border: 1px solid var(--pw-border-color);
 }
 
 .save-slot-stats b {
-  font-size: 18px;
-  color: #fffbe6;
+  font-size: var(--pw-font-size-3xl);
+  color: var(--pw-text-primary);
 }
 
 .save-slot-stats small {
-  font-size: 11px;
-  color: rgba(255,255,255,0.7);
+  font-size: var(--pw-font-size-sm);
+  color: var(--pw-text-secondary);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -259,7 +244,7 @@
   width: 100%;
   border: 1px solid var(--dark3);
   border-radius: 8px;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   color: var(--light2);
   padding: 9px 10px;
 }
@@ -348,13 +333,12 @@
   min-width: 40px;
   padding: 0;
   border-radius: 999px;
-  font-size: 28px;
+  font-size: var(--pw-font-size-5xl);
   line-height: 1;
   background: rgba(236,222,183,0.22);
   color: var(--light2);
   border-color: rgba(236,222,183,0.42);
 }
-
 
 /* Wave 27: paired with updateSaveMenuScrollButtons — visibility on a dedicated class. `.is-hidden` must stay away from these buttons: it is display:none !important here (utility rule), which removes them from the shell grid and shifts the list into the 44px button track. */
 .save-menu-scroll-btn.is-invisible {
@@ -365,15 +349,18 @@
   flex: 1 0 100%;
 }
 
+/* The save card keeps its themed illustration (save-bg-*) but follows the shared grammar of a
+   clickable cell: the small radius, one hairline, the accent on hover and no lift. The height is
+   a minimum, never a fixed box: a fixed 198px clipped the "click to continue" line. */
 .save-slot {
   flex: 0 0 330px;
   width: 330px;
-  height: 198px;
+  height: auto;
   min-height: 198px;
   grid-template-rows: auto 1fr auto;
   background-size: cover;
   background-position: center;
-  border-color: rgba(236,222,183,0.52);
+  border-color: var(--pw-border-color);
 }
 
 .save-slot-main {
@@ -385,15 +372,17 @@
   align-items: center;
 }
 
+/* The sprite well of a save card is a beige tile of the card, like its title text: a dark well
+   read as a hole punched in the artwork. The card carries its own palette, so the beige is named
+   from the card tokens and stays beige whatever the interface theme. */
 .save-slot-icon {
   width: 74px;
   height: 74px;
   display: grid;
   place-items: center;
-  border-radius: 18px;
-  background: rgba(0,0,0,0.28);
-  border: 1px solid rgba(255,255,255,0.24);
-  box-shadow: inset 0 0 18px rgba(255,255,255,0.08);
+  border-radius: 10px;
+  background: var(--light1);
+  border: 1px solid color-mix(in srgb, var(--light2) 45%, transparent);
 }
 
 .save-slot-icon img {
@@ -519,7 +508,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .save-icon-choice small {
@@ -532,7 +521,6 @@
   padding: 12px;
   text-align: center;
 }
-
 
 /* design-system/pass-07.css * --------------------------------------------------------------------------- * Dated pass inherited from the former design-system.css, kept in its historical order. * * Part of the 1.16.11 split: one file, one responsibility. The order of the * @import lines in assets/css/style.css IS the cascade — never reorder them, * never import this sheet anywhere else (guarded by tests/CssStructure.test.js). */
 .save-menu-screen {
@@ -580,7 +568,7 @@
   display: grid;
   gap: 3px;
   color: var(--light2);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .save-profile-icon-current-label small {
@@ -614,7 +602,7 @@
   color: var(--light2);
   text-align: left;
   cursor: pointer;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .save-context-item:hover {
@@ -630,25 +618,18 @@
 }
 
 .save-slot {
-  border: 1px solid var(--pw-border);
-  color: #fff;
-}
-
-.save-slot:hover {
-  border-color: var(--light2);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  color: var(--pw-text-primary);
 }
 
 .save-slot-name {
-  color: var(--light2) !important;
+  color: var(--pw-text-primary) !important;
   font-weight: 700;
 }
 
-
-/* 3. Subtitles, descriptions, stock, and secondary text always readable gold (#c9bc8a) Never allow --dark3 text on dark backgrounds */
+/* 3. Subtitles, descriptions and stock read the beige of the card title: they used to be forced to
+   a muddy gold (#c9bc8a), which no longer matched the title line. */
 .save-slot-id, .save-slot-stats small {
-  color: #c9bc8a !important;
+  color: var(--light2) !important;
 }
 
 .save-icon-choice {
@@ -660,7 +641,6 @@
   color: var(--light2);
 }
 
-
 /* Light background active buttons MUST use dark text (#36342F) */
 .save-icon-choice.active {
   background: var(--light2) !important;
@@ -671,7 +651,6 @@
 .save-icon-choice.active * {
   color: var(--dark1) !important;
 }
-
 
 /* Save card era backgrounds — single canonical definition. Wave 24 removed the 3 historical copies below (a bare duplicate, a dark overlay and an alternative redesign): all were shadowed, only this live design ever painted on the real .save-slot cards. The old hammer qualifier is dropped too: its target is gone, no rule competes for these backgrounds. */
 .save-slot.save-bg-classic {
@@ -735,16 +714,16 @@
 }
 
 #save-menu-title {
-  font-size: clamp(24px, 6vw, 32px) !important;
+  font-size: var(--pw-font-size-hero-sm) !important;
 }
 
 .save-menu-kicker {
   padding: 2px 8px !important;
-  font-size: 11px !important;
+  font-size: var(--pw-font-size-sm) !important;
 }
 
 #save-menu-subtitle {
-  font-size: 12px !important;
+  font-size: var(--pw-font-size-md) !important;
 }
 
 .save-menu-list {
@@ -771,7 +750,7 @@
   display: flex !important;
   flex-wrap: wrap !important;
   gap: 4px 10px !important;
-  font-size: 11px !important;
+  font-size: var(--pw-font-size-sm) !important;
 }
 
 .save-menu-actions {
@@ -799,7 +778,7 @@
 .save-menu-scroll-btn {
   min-width: 30px;
   height: 46px;
-  font-size: 22px;
+  font-size: var(--pw-font-size-4xl);
 }
 
 .save-menu-list {
@@ -825,7 +804,7 @@
 }
 
 .save-slot-stats b {
-  font-size: 16px;
+  font-size: var(--pw-font-size-2xl);
 }
 
 .save-slot-id {
@@ -841,9 +820,9 @@
   align-items: center;
   gap: 12px;
   padding: 8px;
-  border: 1px solid var(--dark3);
+  border: 1px solid var(--pw-border-color);
   border-radius: 10px;
-  background: rgba(0, 0, 0, 0.18);
+  background: var(--pw-bg-header);
   min-width: 0;
 }
 
@@ -902,7 +881,7 @@
   width: 100%;
   height: 100%;
   font-weight: 700;
-  color: var(--light1);
+  color: var(--dark1);
   background: none;
 }
 
@@ -917,7 +896,7 @@
   height: 100%;
   display: grid;
   place-items: center;
-  font-size: 34px;
+  font-size: var(--pw-font-size-display);
   font-weight: 800;
   color: rgba(255, 245, 213, 0.85);
   background: none;
@@ -928,22 +907,21 @@
   flex-direction: column;
   gap: 6px;
   margin-bottom: 12px;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   font-weight: 700;
   color: var(--light2);
 }
 
 .save-profile-field input, .save-profile-field select {
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid var(--pw-border-color);
-  background: rgba(0, 0, 0, 0.3);
-  color: var(--light2);
-  font-size: 13px;
+  background: var(--pw-bg-sprite);
+  color: var(--pw-text-primary);
+  font-size: var(--pw-font-size-lg);
   font-weight: 700;
   outline: none;
 }
-
 
 /* Rework addition: soft fade on the left/right edges of the save carousel (only when cards are present: the empty-state box keeps its original width) */
 .save-menu-list:has(.save-slot) {
@@ -970,7 +948,6 @@
   background: rgba(0, 0, 0, 0.45);
 }
 
-
 /* Theme-aware save screen (v1.3) -------------------------------------------------------------------------- The original stylesheet paints the save screen with fixed dark rgba values while its texts use the theme tokens: with any non-dark UI theme the screen became a dark glass panel with dark text. Every surface below is derived from the active theme tokens instead (color-mix keeps the original alphas). */
 .save-menu-screen {
   background:
@@ -988,8 +965,6 @@
 }
 
 #save-menu-title {
-  text-shadow: 0 5px 0 color-mix(in srgb, var(--dark1) 60%, transparent),
-               0 0 24px color-mix(in srgb, var(--light2) 26%, transparent);
 }
 
 #save-menu-subtitle,
@@ -1017,7 +992,6 @@
   border-color: color-mix(in srgb, var(--light2) 42%, transparent);
 }
 
-
 /* Save cards carry their OWN palette (the random card theme chosen at creation): they keep the default dark tokens whatever the UI theme, otherwise their texts would turn dark on the dark card artworks. */
 .save-slot {
   --dark1: #36342F;
@@ -1031,4 +1005,45 @@
   --pw-border-color: #4A3E31;
   --pw-text-primary: #ECDEB7;
   --pw-text-secondary: #C8BBA0;
+}
+
+/* Save card, translucency pass (user request): the Pokemon well and the stat tiles used to be
+   painted with an opaque colour that tinted the whole card. They are now a translucent white/grey
+   wash, so the card's own artwork shows through and the tiles read as glass on top of it instead of
+   as slabs. Text keeps its contrast: only the surfaces changed. */
+.save-slot-icon {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(2px);
+}
+
+.save-slot-stats span {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(2px);
+}
+
+/* The monochrome save theme used to force a black wash on the same tiles: it now uses the same
+   translucent grammar, a touch whiter because its artwork is white. */
+.save-slot.save-bg-blackwhite .save-slot-stats span {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.save-slot.save-bg-blackwhite .save-slot-icon {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* The tiles are light now, whatever the card artwork: the two lines of a tile are written in the
+   dark ink of the beige palette so the number and its label keep their contrast (the tiles used to
+   be a dark surface, where light text was the readable choice). */
+.save-slot-stats b,
+.save-slot.save-bg-blackwhite .save-slot-stats b {
+  color: var(--dark1);
+}
+
+.save-slot-stats small,
+.save-slot.save-bg-blackwhite .save-slot-stats small {
+  color: color-mix(in srgb, var(--dark1) 88%, transparent);
 }

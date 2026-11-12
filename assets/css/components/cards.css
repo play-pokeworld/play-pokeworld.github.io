@@ -20,29 +20,19 @@
   padding: 0 !important;
 }
 
-.ui-control-toolbar {
-  background: var(--pw-bg-header) !important;
-  border: 1px solid var(--pw-border-color) !important;
-  border-radius: 8px !important;
-  padding: 10px !important;
-  color: var(--pw-text-primary) !important;
-  display: flex !important;
-  /* The desktop toolbar wraps its chips and fields; the touch layout folds the same toolbar into one
-     scrolling band (components/ui-input.css) and needs to win that property. */
-  flex-wrap: wrap;
-  gap: 8px !important;
-  align-items: center !important;
-}
-
+/* The filter row of a panel: chips and fields laid on the surface, as in the catalogue.
+   (This selector used to be declared twice — the first copy, all `!important`, drew a framed band
+   over the tabs that no later rule could reach.) */
 .ui-control-toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  padding: 8px 10px;
-  border: 1px solid rgba(236,222,183,0.16);
-  border-radius: 12px;
-  background: rgba(0,0,0,0.16);
+  padding: 0 0 8px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--pw-text-primary);
 }
 
 .ui-stat-chip {
@@ -63,7 +53,7 @@
 
 .ui-stat-chip small {
   color: var(--light1);
-  font-size: 10px;
+  font-size: var(--pw-font-size-xs);
 }
 
 .ui-control-toolbar--box {
@@ -93,7 +83,7 @@
 }
 
 .stat-row {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .pw-card-83 {
@@ -105,14 +95,14 @@
 }
 
 .pw-card-dark.pw-center {
-  background:var(--dark3);
+  background:var(--pw-bg-sprite);
   padding:8px;
   border-radius:6px;
   text-align:center;
 }
 
 .pw-drop-zone {
-  background:var(--dark3);
+  background:var(--pw-bg-sprite);
   border:2px dashed var(--light1);
   border-radius:10px;
   padding:20px;
@@ -125,21 +115,21 @@
   display:flex;
   align-items:center;
   gap:8px;
-  background:var(--dark3);
+  background:var(--pw-bg-sprite);
   border-radius:6px;
   padding:8px;
   border:1px solid var(--light1);
 }
 
 .pw-choice-title {
-  font-size:15px;
+  font-size: var(--pw-font-size-xl);
   font-weight:bold;
   color:var(--light2);
   margin-bottom:8px;
 }
 
 .pw-choice-desc {
-  font-size:13px;
+  font-size: var(--pw-font-size-lg);
   max-width:300px;
   margin:0 auto;
   line-height:1.4;
@@ -192,21 +182,21 @@
 }
 
 .pw-card {
-  background: var(--dark2);
+  background: var(--pw-bg-header);
   border-radius: 8px;
   padding: 10px;
   margin: 8px 0;
 }
 
 .pw-card-dark {
-  background: var(--dark3);
+  background: var(--pw-bg-sprite);
   border-radius: 6px;
   padding: 8px;
   margin: 8px 0;
 }
 
 .pw-card-bordered {
-  background: var(--dark3);
+  background: var(--pw-bg-sprite);
   border: 1px solid var(--dark1);
   border-radius: 10px;
   padding: 12px;
@@ -221,14 +211,14 @@
 }
 
 .pw-choice-title {
-  font-size: 15px;
+  font-size: var(--pw-font-size-xl);
   font-weight: bold;
   color: var(--light2);
   margin-bottom: 8px;
 }
 
 .pw-choice-desc {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   max-width: 300px;
   margin: 0 auto;
   line-height: 1.4;
@@ -264,11 +254,14 @@
 }
 
 
-/* NB: .save-slot is EXCLUDED — save cards carry their own themed background (save-bg-classic/emerald/…) which must stay visible in the settings preview as in the saves menu. */
+/* A card is a card: the header surface under one hairline, the small radius. The black wash that
+   used to repaint these three variants with !important is gone (NB: .save-slot stays excluded, its
+   themed illustration must remain visible). */
 .pw-choice-card, .pw-card-dark, .pw-card-bordered {
-  background: rgba(0, 0, 0, 0.28) !important;
-  border: 1px solid var(--pw-border) !important;
-  color: var(--light2) !important;
+  background: var(--pw-bg-header);
+  border: 1px solid var(--pw-border-color);
+  border-radius: 8px;
+  color: var(--pw-text-primary);
 }
 
 .pw-choice-card:hover {
@@ -369,7 +362,7 @@
 }
 
 .pw-card-dark.pw-center {
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   border: 1px solid var(--dark3);
   border-radius: 8px;
   padding: 8px 12px;

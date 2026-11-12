@@ -75,15 +75,19 @@ export class CurrenciesPanel extends DraggablePanel {
     for (const definition of this._definitions) {
       const amount = this._amounts.get(definition.id);
       const column = this._columns.get(definition.id);
+      const revealed = currencies
+        ? currencies.isRevealed(definition.id)
+        : definition.id === 'money';
       if (amount) {
-        amount.setText(TextFormatter.formatNumber(currencies ? currencies.get(definition.id) : 0));
+        amount.setText(revealed || !currencies
+          ? TextFormatter.formatNumber(currencies ? currencies.get(definition.id) : 0)
+          : '\u2014');
       }
+      // The wallet keeps three cells whatever the save has met: a currency still unknown holds
+      // its column and shows a dash. Hiding it used to collapse the grid into one lone cell.
       if (column) {
-        const visible = currencies
-          ? currencies.isRevealed(definition.id)
-          : definition.id === 'money';
-        if (visible) column.show();
-        else column.hide();
+        column.show();
+        column.toggleClass('is-locked', !revealed);
       }
     }
   }

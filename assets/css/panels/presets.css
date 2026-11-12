@@ -35,21 +35,6 @@
   flex-shrink: 0;
 }
 
-.preset-row {
-  padding: 12px 18px;
-  margin: 4px 6px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.06);
-}
-
-.preset-list {
-  padding: 14px 18px;
-  gap: 12px;
-  display: flex;
-  flex-direction: column;
-  background: transparent;
-}
-
 .team-preset-save-btn .ui-icon {
   width: 18px;
   height: 18px;
@@ -70,7 +55,7 @@
 
 .team-preset-btn {
   padding: 4px 8px;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .team-preset-btn.is-active {
@@ -124,27 +109,31 @@
 
 .preset-chip.missing {
   color:var(--light1);
-  font-size:11px;
-  font-weight:900;
+  font-size: var(--pw-font-size-sm);
+  font-weight: 700;
 }
 
 .preset-chip-empty {
-  color:var(--light1);
-  font-size:10px;
-  font-style:italic;
+  color:var(--pw-text-secondary);
+  font-size:var(--pw-font-size-xs);
+  font-style:normal;
 }
 
 .preset-manager-hint {
   display: block;
-  color: var(--light1);
-  margin-bottom: 10px;
+  color: var(--pw-text-secondary);
+  font-size: var(--pw-font-size-sm);
+  margin-bottom: 8px;
   line-height: 1.4;
 }
 
+/* A preset slot is a catalogue .tslot: one quiet row, header surface, hairline, small radius.
+   The active slot is marked by the accent standing on that same hairline, never by a glow. */
 .preset-list {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  padding: 0;
 }
 
 .preset-row {
@@ -153,50 +142,47 @@
   gap: 8px;
   flex-wrap: wrap;
   padding: 8px 10px;
-  border: 1px solid var(--dark3);
-  border-radius: 10px;
-  background: rgba(0,0,0,0.20);
+  border: 1px solid var(--pw-border-color);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--pw-bg-surface) 60%, var(--pw-bg-header));
 }
 
 .preset-row.active {
-  border-color: var(--light2);
-  box-shadow: 0 0 10px rgba(236,222,183,0.25);
-  background: rgba(236,222,183,0.06);
+  border-color: var(--accent);
+  box-shadow: none;
+  background: color-mix(in srgb, var(--accent) 8%, var(--pw-bg-header));
 }
 
 .preset-row-idx {
   width: 22px;
   height: 22px;
   border-radius: 6px;
-  background: var(--dark3);
+  background: var(--pw-bg-sprite);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
-  font-weight: 900;
-  color: var(--light2);
+  font-size: var(--pw-font-size-xs);
+  font-weight: 700;
+  color: var(--pw-text-secondary);
   flex-shrink: 0;
 }
 
 .preset-name-input {
-  background: var(--dark2);
+  min-width: 120px;
+  background: transparent;
   border: 1px solid transparent;
   border-radius: 6px;
-  color: var(--light2);
-  font-weight: 900;
-  font-size: 12px;
+  color: var(--pw-text-primary);
+  font-weight: 600;
+  font-size: var(--pw-font-size-md);
   padding: 4px 8px;
   width: 150px;
   flex-shrink: 0;
 }
 
 .preset-name-input:hover, .preset-name-input:focus {
-  border-color: var(--dark3);
+  border-color: var(--pw-border-color);
   outline: none;
-}
-
-.preset-row.active .preset-name-input {
-  border-color: var(--light2);
 }
 
 .preset-row-chips {
@@ -209,15 +195,15 @@
 }
 
 .preset-chip-more {
-  font-size: 10px;
+  font-size: var(--pw-font-size-xs);
   color: var(--light1);
   padding: 2px 4px;
 }
 
 .preset-row-count {
-  font-size: 11px;
-  color: var(--light1);
-  font-weight: 900;
+  font-size: var(--pw-font-size-sm);
+  color: var(--pw-text-secondary);
+  font-weight: 600;
   flex-shrink: 0;
 }
 
@@ -229,10 +215,12 @@
 }
 
 .preset-active-tag {
-  font-size: 10px;
-  font-weight: 900;
-  color: var(--dark1);
-  background: var(--light2);
+  font-size: var(--pw-font-size-xs);
+  font-weight: 700;
+  /* The validated rule of the catalogue: --light1 carries the active state, never the accent as a
+     flat fill (see pas 16 of the screen list). */
+  color: var(--pw-bg-header);
+  background: var(--light1);
   border-radius: 999px;
   padding: 2px 8px;
 }
@@ -241,13 +229,13 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .team-preset-active {
   color: var(--light1);
   font-weight: 400;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 .preset-slot-empty, .preset-slot-missing {
@@ -284,8 +272,8 @@
 }
 
 .preset-pick-tag {
-  font-size: 10px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-xs);
+  font-weight: 700;
   color: var(--dark1);
   background: var(--light2);
   border-radius: 999px;
@@ -294,7 +282,7 @@
 }
 
 .preset-pick-tag.in-box {
-  background: var(--dark3);
+  background: var(--pw-bg-sprite);
   color: var(--light2);
 }
 
@@ -315,42 +303,20 @@
 }
 
 
-/* NB: .save-slot is EXCLUDED — save cards carry their own themed background (save-bg-classic/emerald/…) which must stay visible in the settings preview as in the saves menu. */
+/* The slot keeps the grammar declared above: mixed surface, one hairline, no lift.
+   Two later blocks used to repaint it in painted brushes with a lift on hover; they are gone,
+   because a slot is a row of a list, not a card that jumps when the pointer crosses it. */
 .preset-row {
-  background: rgba(0, 0, 0, 0.28) !important;
-  border: 1px solid var(--pw-border) !important;
-  color: var(--light2) !important;
+  color: var(--pw-text-primary);
 }
 
 .preset-row:hover {
-  background: rgba(236, 222, 183, 0.15) !important;
-  border-color: var(--light2) !important;
-  color: var(--light2) !important;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  color: var(--pw-text-primary);
 }
 
 .preset-name {
-  color: var(--light2) !important;
-  font-weight: 700;
-}
-
-.preset-row {
-  background: var(--pw-bg-surface) !important;
-  border: 1px solid rgba(236,222,183,0.22) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
-  color: var(--pw-text-primary) !important;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
-  overflow: visible !important;
-  position: relative !important;
-}
-
-.preset-row:hover {
-  border-color: var(--pw-text-primary) !important;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.6) !important;
-  transform: translateY(-2px) !important;
-  color: var(--pw-text-primary) !important;
+  color: var(--pw-text-primary);
+  font-weight: 600;
 }
 
 .preset-chip {
@@ -371,11 +337,13 @@
   border-radius: 8px;
 }
 
+/* One slot per line: a .tslot is a full-width row, so the name, the members and the three
+   actions stay on a single line instead of folding under a half-width column. */
 .pw-preset-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
-  gap: 14px;
-  padding: 14px 18px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  padding: 0;
 }
 
 .pw-preset-grid .preset-row {
@@ -395,7 +363,7 @@
 
 .pw-preset-editor-hint {
   color: var(--pw-text-secondary, #b5ad9d);
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   line-height: 1.5;
 }
 
@@ -431,7 +399,7 @@
 .pw-preset-editor-title {
   margin: 0;
   color: var(--pw-text-primary, #ecdeb7);
-  font-size: 15px;
+  font-size: var(--pw-font-size-xl);
   font-weight: 800;
 }
 
@@ -497,7 +465,7 @@
 
 .pw-preset-empty {
   color: var(--pw-text-secondary, #b5ad9d);
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   padding: 6px 2px;
 }
 
@@ -629,13 +597,13 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: var(--pw-font-size-xl);
   font-weight: 700;
   color: var(--light2);
 }
 
 .pw-preset-pick-count {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight: 600;
   color: var(--light1);
   background: rgba(255, 255, 255, 0.08);
@@ -677,7 +645,7 @@
 }
 
 .pw-preset-pick-mon-name {
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   font-weight: 700;
   color: var(--light2);
   white-space: nowrap;
@@ -686,7 +654,7 @@
 }
 
 .pw-preset-pick-mon-lvl {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   color: var(--light1);
 }
 
@@ -703,4 +671,102 @@
   align-items: center;
   gap: 4px;
   flex-wrap: wrap;
+}
+
+/* ---- Catalogue frame `presets` (sheet grammar) ------------------------------------------------
+ * The catalogue stacks the four slots in one centred column of 680 px; each slot reads as a card:
+ * name and count on the first line, members and the actions on the second. The three actions are
+ * kept (Charger / Sauver ici / Modifier): the catalogue draws two, the game has three real ones.
+ */
+.pw-team-presets-manager .pw-preset-grid,
+.pw-team-presets-manager .preset-list {
+  width: min(100%, 680px);
+  margin: 0 auto;
+}
+
+.pw-team-presets-manager .preset-manager-hint {
+  width: min(100%, 680px);
+  margin: 0 auto 8px;
+  color: var(--pw-text-secondary, var(--light3));
+  font-size: var(--pw-font-size-md);
+  line-height: 1.45;
+}
+
+.pw-team-presets-manager .preset-row {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  grid-template-areas:
+    "idx name count"
+    "idx chips actions";
+  align-items: center;
+  gap: 6px 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--pw-border-color);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--pw-bg-surface) 50%, var(--pw-bg-header));
+}
+
+.pw-team-presets-manager .preset-row-idx {
+  grid-area: idx;
+  color: var(--pw-text-secondary, var(--light3));
+  font-size: var(--pw-font-size-sm);
+  font-weight: 700;
+}
+
+.pw-team-presets-manager .preset-name-input {
+  grid-area: name;
+  min-width: 0;
+  font-size: var(--pw-font-size-md);
+  font-weight: 600;
+}
+
+.pw-team-presets-manager .preset-row-count {
+  grid-area: count;
+  justify-self: end;
+  color: var(--pw-text-secondary, var(--light3));
+  font-size: var(--pw-font-size-sm);
+  font-weight: 700;
+}
+
+.pw-team-presets-manager .preset-row-chips {
+  grid-area: chips;
+  min-width: 0;
+}
+
+.pw-team-presets-manager .preset-row-actions {
+  grid-area: actions;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pw-team-presets-manager .preset-row-actions .pw-button {
+  height: 30px;
+  font-size: var(--pw-font-size-sm);
+}
+
+/* The empty slot of the validated frame: a round outline and a short label, on one line. */
+.preset-row-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.preset-empty-plus {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--pw-border-color);
+  border-radius: 50%;
+  color: var(--pw-text-secondary, var(--light3));
+}
+
+.preset-empty-plus .pw-icon {
+  width: 14px;
+  height: 14px;
 }

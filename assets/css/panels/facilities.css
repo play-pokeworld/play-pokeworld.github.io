@@ -4,7 +4,6 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 .pw-manage-card {
   background: var(--pw-bg-surface) !important;
   border: 1px solid var(--pw-border-color) !important;
@@ -31,11 +30,11 @@
 }
 
 .management-content {
-  font-family: 'Winky Sans', 'Segoe UI', system-ui, sans-serif !important;
+  font-family: var(--pw-font-main) !important;
 }
 
 .pw-manage-title {
-  font-size:15px;
+  font-size: var(--pw-font-size-xl);
   font-weight:bold;
   color:var(--light2);
   margin-bottom:12px;
@@ -84,11 +83,11 @@
 
 .pw-manage-sub {
   color:var(--dark3);
-  font-size:13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .pw-manage-desc {
-  font-size:13px;
+  font-size: var(--pw-font-size-lg);
   color:var(--dark3);
   margin-bottom:6px;
 }
@@ -108,7 +107,7 @@
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:13px;
+  font-size: var(--pw-font-size-lg);
   color:rgba(255,255,255,0.35);
   font-weight:bold;
 }
@@ -127,7 +126,7 @@
 .queue-build-btn {
   width: 100%;
   margin-top: 8px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .queue-list {
@@ -145,7 +144,7 @@
   background: rgba(0,0,0,0.2);
   padding: 5px 8px;
   color: var(--light2);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   font-weight: 800;
 }
 
@@ -156,7 +155,7 @@
 
 .staff-summary {
   color: var(--light2);
-  font-weight: 900;
+  font-weight: 700;
   margin: 8px 0;
 }
 
@@ -190,7 +189,7 @@
 .staff-card-desc,
 .staff-level {
   color: var(--light1);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.35;
 }
 
@@ -207,7 +206,7 @@
 .queue-action-btn {
   width: 100%;
   justify-content: center;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .queue-action-btn.is-on {
@@ -229,13 +228,13 @@
   width: 22px;
   height: 22px;
   cursor: pointer;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .queue-cap {
   color: var(--light1);
-  font-size: 12px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-md);
+  font-weight: 700;
   margin-bottom: 6px;
 }
 
@@ -250,7 +249,7 @@
 
 .staff-bonus {
   color: var(--light2);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.35;
   border: 1px solid rgba(236,222,183,0.16);
   border-radius: 8px;
@@ -327,8 +326,8 @@
 
 .queue-panel-head span {
   color: var(--light1);
-  font-size: 12px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-md);
+  font-weight: 700;
 }
 
 .staff-card-grid {
@@ -353,7 +352,7 @@
   justify-content: center;
   background: rgba(0,0,0,0.22);
   border: 1px solid rgba(236,222,183,0.18);
-  font-size: 24px;
+  font-size: var(--pw-font-size-4xl);
 }
 
 .staff-card-sprite img {
@@ -363,7 +362,6 @@
   image-rendering: pixelated;
 }
 
-
 /* design-system/pass-09.css * --------------------------------------------------------------------------- * Dated pass inherited from the former design-system.css, kept in its historical order. * * Part of the 1.16.11 split: one file, one responsibility. The order of the * @import lines in assets/css/style.css IS the cascade — never reorder them, * never import this sheet anywhere else (guarded by tests/CssStructure.test.js). */
 .staff-level-pill {
   justify-self: start;
@@ -372,8 +370,8 @@
   border: 1px solid rgba(236,222,183,0.22);
   color: var(--light2);
   padding: 3px 8px;
-  font-size: 12px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-md);
+  font-weight: 700;
 }
 
 .staff-xp {
@@ -383,12 +381,12 @@
 
 .staff-xp-label {
   color: var(--light1);
-  font-size: 11px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-sm);
+  font-weight: 700;
 }
 
 .pw-manage-title {
-  font-size: 15px;
+  font-size: var(--pw-font-size-xl);
   font-weight: bold;
   color: var(--light2);
   margin-bottom: 12px;
@@ -437,11 +435,11 @@
 
 .pw-manage-sub {
   color: var(--dark3);
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .pw-manage-desc {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   color: var(--dark3);
   margin-bottom: 6px;
 }
@@ -461,7 +459,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   color: rgba(255,255,255,0.35);
   font-weight: bold;
 }
@@ -479,7 +477,6 @@
   color: var(--light1);
 }
 
-
 /* Canonical header: IDENTICAL on all non-draggable panels ── (draggable windows keep .pw-win-hdr, deliberately distinct) */
 .management-title {
   display: flex !important;
@@ -493,12 +490,11 @@
   margin: 0 0 var(--pw-header-gap) 0;
   background: var(--pw-bg-panel-header);
   border: 1px solid var(--pw-border);
-  border-bottom: 2px solid var(--pw-border-panel-header);
+  border-bottom: 1px solid var(--pw-border-panel-header);
   border-radius: var(--pw-header-radius);
   color: var(--light2);
   font-size: var(--pw-header-title-size);
   font-weight: 700;
-  letter-spacing: 0.4px;
   line-height: 1;
 }
 
@@ -506,7 +502,6 @@
   color: var(--light2) !important;
   font-weight: 700;
 }
-
 
 /* 3. Subtitles, descriptions, stock, and secondary text always readable gold (#c9bc8a) Never allow --dark3 text on dark backgrounds */
 .pw-manage-sub, .pw-manage-desc {
@@ -564,7 +559,6 @@
   overflow-wrap: break-word;
 }
 
-
 /* Auto-fit grids that used fixed minima could force a horizontal overflow on narrow screens — min(X, 100%) collapses them to one column instead. */
 .upgrade-grid {
   grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
@@ -608,7 +602,7 @@
   border: 1px dashed var(--dark3);
   border-radius: 8px;
   color: var(--light2);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   font-weight: 800;
   text-align: center;
 }
@@ -634,7 +628,7 @@
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   color: var(--light1);
 }
 
@@ -659,7 +653,7 @@
 
 .pw-auto-relaunch .hbtn {
   padding: 4px 10px;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 .pw-summary-relaunch-host > div:empty {
@@ -675,7 +669,7 @@
   border-radius: 10px;
   border: 1px solid rgba(255, 225, 94, 0.45);
   background: rgba(255, 225, 94, 0.08);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   color: var(--light2);
 }
 
@@ -717,7 +711,7 @@
 
 .pw-summary-relaunch .hbtn {
   padding: 5px 12px;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight: 800;
 }
 
@@ -793,7 +787,6 @@
   min-width: 0;
 }
 
-
 /* Reference facility composition. Palette and original skins remain in design-system.css. Only shared-widget adaptation and responsive geometry are defined here. */
 .pw-facility-dashboard, .pw-facility-slots, .pw-facility-training-auto {
   display: grid;
@@ -803,7 +796,7 @@
 
 .pw-facility-subtle {
   color: var(--light1);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.4;
 }
 
@@ -813,7 +806,7 @@
 }
 
 .pw-facility-section-label {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .pw-facility-title-row,
@@ -847,8 +840,8 @@
   width: 100%;
   min-height: 37px;
   padding: 8px 12px;
-  font-size: 13px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-lg);
+  font-weight: 700;
 }
 
 .hatchery-upgrade-row:has(.pw-facility-manage) {
@@ -862,7 +855,7 @@
 
 .pw-facility-pending,
 .pw-facility-legacy-note {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   line-height: 1.4;
   color: var(--orange);
 }
@@ -914,7 +907,7 @@
 
 .pw-facility-management .management-tabs .pw-button {
   justify-content: center;
-  font-weight: 900;
+  font-weight: 700;
   white-space: normal;
 }
 
@@ -950,13 +943,13 @@
 }
 
 .pw-facility-card-title {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .pw-facility-card-description,
 .pw-facility-card-status {
   color: var(--light1);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.4;
 }
 
@@ -965,7 +958,7 @@
   gap: 6px;
   flex: 0 0 65%;
   padding: 9px 12px;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   width: 65%;
   min-height: 43px;
   justify-content: center;
@@ -992,7 +985,7 @@
 
 .pw-facility-auto-card .pw-facility-title-row {
   flex-wrap: wrap;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .pw-facility-auto-card .pw-facility-title-row > b {
@@ -1006,7 +999,7 @@
 
 .pw-facility-auto-card .pw-facility-title-row .hbtn {
   padding: 6px 8px;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .pw-facility-auto-card.is-on {
@@ -1039,7 +1032,7 @@
 
 .pw-facility-queue-card > h3 {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   padding-bottom: 8px;
   border-bottom: 1px solid var(--pw-border);
 }
@@ -1068,7 +1061,7 @@
   display: grid;
   gap: 4px;
   min-width: 0;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   color: var(--light1);
   font-weight: 800;
 }
@@ -1081,10 +1074,10 @@
 .pw-facility-filter-field select {
   width: 100%;
   min-width: 0;
-  font-size: 14px;
+  font-size: var(--pw-font-size-xl);
   padding: 8px 10px;
   min-height: 38px;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   color: var(--light2);
   border: 1px solid var(--pw-border);
   font-weight: 500;
@@ -1116,7 +1109,7 @@
   flex: 1 1 0;
   min-width: 0;
   overflow-wrap: anywhere;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .pw-facility-queue-entry .pw-poke-circle-wrap {
@@ -1132,10 +1125,10 @@
 }
 
 .pw-facility-queue-card .queue-actions .pw-button {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   padding: 6px 8px;
   white-space: normal;
-  background: var(--dark3);
+  background: var(--pw-bg-sprite);
   border: 1px solid var(--pw-border);
   border-radius: 10px;
   min-height: 42px;
@@ -1179,18 +1172,18 @@
 
 .pw-facility-staff-card .staff-card-head-text h3 {
   margin: 0;
-  font-size: 15px;
+  font-size: var(--pw-font-size-xl);
 }
 
 .pw-facility-staff-card .staff-card-location {
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   color: var(--light1);
   text-align: right;
   align-self: center;
 }
 
 .pw-facility-staff-card .staff-bonus {
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.35;
 }
 
@@ -1238,11 +1231,10 @@
   margin: 8px 0 12px;
   border-left: 3px solid var(--yellow);
   background: var(--pw-bg-inset);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.4;
   display: block;
 }
-
 
 /* Tracks follow their actual panel width, not only the viewport breakpoint. */
 .training-slot-grid.pw-facility-slots {
@@ -1298,7 +1290,6 @@
   flex-direction: column;
 }
 
-
 /* Keep the shared 44px switch target inside the reference's compact 48px header. */
 .pw-training-queue-header {
   order: -1;
@@ -1314,7 +1305,7 @@
 
 .pw-training-queue-header > h3 {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   flex: 1 1 0;
 }
 
@@ -1368,18 +1359,17 @@
   flex: 1 1 0;
   min-width: 0;
   padding: 9px 10px;
-  font-size: 14px;
+  font-size: var(--pw-font-size-xl);
 }
 
 .training-slot-card > .pw-facility-actions {
   justify-content: stretch;
 }
 
-
 /* Slot-local selectors keep the reference's dark input skin and complete editor framing. */
 .pw-facility-queue-options > .pw-facility-subtle {
   flex: 1 1 0;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 .pw-facility-legacy-options {
@@ -1422,7 +1412,7 @@
 
 .pw-facility-management .management-tabs .pw-button {
   padding: 7px 4px;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   gap: 4px;
 }
 
@@ -1442,7 +1432,7 @@
 
 .pw-facility-buy {
   padding: 8px;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .pw-facility-upgrade > .pw-icon {
@@ -1456,9 +1446,8 @@
 }
 
 .pw-mine-tile .pw-slot-label {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
-
 
 /* Quotes are facts, not disabled actions: keep prices visible at every balance. */
 .pw-facility-price-quote {
@@ -1470,7 +1459,7 @@
 }
 
 .pw-facility-price-quote > .pw-price-tag {
-  font-size:13px;
+  font-size: var(--pw-font-size-lg);
   font-weight:800;
 }
 

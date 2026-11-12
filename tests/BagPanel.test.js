@@ -34,7 +34,7 @@ describe('Team held-item selection through the Bag', (test) => {
     assert.ok(/ModalIds\.BAG,\s*\{\s*mode:\s*'held-item'/.test(info), 'Pokémon sheet item action opens the same BagPanel');
     assert.ok(/new BagPanel\(\)/.test(page), 'GamePage registers the Bag panel');
     assert.ok(/\.pw-fullscreen-overlay\.pw-bag-held-item-mode\s*\{\s*z-index:\s*32000/.test(fullscreenCss), 'the Bag opened from a Pokémon sheet stacks above the parent modal');
-    assert.ok(/\.inv-list-root\s*\{\s*display:\s*grid;\s*grid-template-columns:\s*repeat\(auto-fill, minmax\(220px, 1fr\)\)/.test(bagCss), 'held-item selection inherits the standard Bag grid columns');
+    assert.ok(/\.inv-list-root\s*\{\s*display:\s*grid;\s*grid-template-columns:\s*repeat\(auto-fill, minmax\(\d+px, 1fr\)\)/.test(bagCss), 'held-item selection inherits the standard Bag grid columns');
     assert.ok(!/\.inv-list-root\.pw-held-item-list\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/s.test(bagCss + panelCss), 'held-item selection does not collapse back to a single list column');
     assert.ok(/\.pw-held-item-actions\s*\{[^}]*display:\s*flex/s.test(fullscreenCss), 'held-item actions use the fixed footer slot');
     assert.ok(!/HeldItemPickerModal/.test(page), 'GamePage does not register a separate item picker');

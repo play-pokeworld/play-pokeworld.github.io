@@ -4,7 +4,6 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 .dex-entry {
   background: transparent !important;
   border: none !important;
@@ -13,54 +12,62 @@
 }
 
 .dex-number {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
+/* The grid is not a container: the catalogue lays its cells on the panel surface. */
 .dex-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 14px;
-  padding: 14px;
-  background: var(--dark2);
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 6px;
+  padding: 0;
+  background: none;
 }
 
+/* A cell is a column: the number, the disc, the name. The disc is the sprite's frame, never the
+   cell's, so the grid stays alignable and nothing is fixed to one size. */
 .dex-entry {
   position: relative;
-  background: var(--light1);
-  border-radius: 50%;
-  width: 72px;
-  height: 72px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  border: 2px solid var(--dark1);
-  transition: all 0.2s;
+  gap: 1px;
+  width: 100%;
+  padding: 3px 2px;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  transition: none;
   overflow: visible;
   cursor: pointer;
-  margin: 0 auto;
+  margin: 0;
 }
 
 .dex-entry:hover {
-  border-color: var(--light2);
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transform: none;
+  box-shadow: none;
 }
 
 .dex-entry .dex-sprite {
-  width: 72px;
-  height: 72px;
+  width: 100%;
+  max-width: 58px;
+  aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0;
-  background: transparent;
-  border: none;
+  border-radius: 50%;
+  background: var(--pw-bg-sprite);
+  border: 1px solid var(--pw-border-color);
   overflow: hidden;
 }
 
+.dex-entry:hover .dex-sprite {
+  border-color: var(--pw-text-secondary);
+}
+
 .dex-entry .dex-sprite img {
-  width: 100%;
-  height: 100%;
+  width: 64%;
+  height: 64%;
   object-fit: contain;
   image-rendering: pixelated;
 }
@@ -81,15 +88,15 @@
 
 .dex-entry .dex-number {
   position: absolute;
-  top: -10px;
+  top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--dark1);
-  color: var(--light2);
-  font-size: 10px;
-  font-weight: bold;
-  padding: 2px 8px;
-  border-radius: 10px;
+  background: none;
+  color: var(--pw-text-secondary);
+  font-size: var(--pw-font-size-xs);
+  font-weight: 600;
+  padding: 0;
+  border-radius: 0;
   white-space: nowrap;
   z-index: 10;
 }
@@ -99,22 +106,8 @@
   top: -6px;
   right: -2px;
   color: var(--shiny);
-  font-size: 14px;
+  font-size: var(--pw-font-size-xl);
   z-index: 11;
-  text-shadow: 0 0 6px var(--shiny);
-}
-
-.dex-number {
-  font-size: 11px;
-}
-
-.dex-entry .dex-number {
-  font-size: 13px;
-}
-
-.dex-entry, .dex-entry .dex-sprite, .dex-entry .dex-sprite img {
-  width: var(--pw-item-icon-lg);
-  height: var(--pw-item-icon-lg);
 }
 
 .dex-shiny.is-visible {
@@ -170,7 +163,7 @@
 }
 
 .pw-dex-stat-lbl {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight:800;
   letter-spacing:.04em;
   color:var(--light1);
@@ -216,7 +209,7 @@
 }
 
 .pw-dex-record-group-title {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight:800;
   letter-spacing:.06em;
   text-transform:uppercase;
@@ -233,12 +226,12 @@
 }
 
 .pw-dex-record-lbl {
-  font-size:12px;
+  font-size: var(--pw-font-size-md);
   color:var(--light1);
 }
 
 .pw-dex-record-val {
-  font-size:13px;
+  font-size: var(--pw-font-size-lg);
   font-weight:800;
 }
 
@@ -298,7 +291,6 @@
 
 .dex-number {
   color: #ffffff !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6) !important;
 }
 
 .dex-charm-info {
@@ -326,7 +318,7 @@
 
 .dex-charm-title {
   font-weight: 800;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   margin-bottom: 6px;
   color: var(--pw-text-primary);
 }
@@ -341,7 +333,7 @@
   margin: 2px;
   padding: 3px 8px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   border: 1px solid var(--pw-border-color);
   color: var(--pw-text-primary);
   background: var(--pw-surface-soft);
@@ -386,13 +378,15 @@
   margin-left: 4px;
 }
 
+/* The summary is one card: the counters and the regional progress sit inside it, so the
+   progress block stops painting a second frame inside the first. */
 .pw-pokedex-overview {
   display: grid;
-  gap: 25px;
+  gap: 10px;
   width: 100%;
-  padding: 16px 10px 14px;
+  padding: 10px;
   border: 1px solid var(--pw-border-color);
-  border-radius: var(--pw-radius-md);
+  border-radius: 10px;
   background: var(--pw-bg-header);
   box-sizing: border-box;
 }
@@ -403,7 +397,7 @@
   align-items: center;
   gap: 5px 12px;
   color: var(--pw-text-secondary);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 .pw-pokedex-stat {
@@ -416,7 +410,7 @@
 
 .pw-pokedex-stat strong {
   color: var(--pw-text-primary);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .pw-pokedex-stat--regions {
@@ -426,21 +420,21 @@
 
 .pw-pokedex-progress {
   display: grid;
-  justify-self: start;
-  gap: 7px;
-  width: max-content;
-  min-width: 560px;
+  justify-self: stretch;
+  gap: 6px;
+  width: auto;
+  min-width: 0;
   max-width: 100%;
   box-sizing: border-box;
-  padding: 15px 14px;
-  border: 1px solid var(--pw-border-color);
-  border-radius: var(--pw-radius-md);
-  background: var(--pw-bg-surface);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
 }
 
 .pw-pokedex-progress-title {
   color: var(--pw-text-primary);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   line-height: 1.35;
 }
 
@@ -478,7 +472,7 @@
 
 .pw-pokedex-region-progress-label {
   color: inherit;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight: 800;
   white-space: nowrap;
 }
@@ -487,47 +481,52 @@
   width: 100%;
 }
 
+/* The collection grid paints nothing: it is the page surface, the same as the PC box. */
 .pw-pokedex-grid {
   grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
   align-items: start;
-  gap: 14px;
-  padding: 18px 14px 14px;
-  background: var(--dark2);
+  gap: 10px;
+  padding: 0;
+  background: none;
 }
 
+/* The collection cell is the one of the PC box: a frameless column on its track, the number
+   as a plain line above the disc. The only circle on screen is the sprite disc itself. */
 .pw-pokedex-entry.dex-entry {
   position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  width: 72px;
-  height: 72px;
-  min-width: 72px;
-  min-height: 72px;
-  margin: 0 auto;
+  justify-content: flex-start;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
   padding: 0;
-  border: 2px solid var(--dark1);
-  border-radius: 50%;
-  background: var(--light1);
-  color: var(--dark1);
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: inherit;
   font: inherit;
   cursor: pointer;
-  transition: all .2s ease;
+  transition: none;
   overflow: visible;
 }
 
+/* A hovered cell lifts nothing and casts nothing: the disc is the only thing that answers. */
 .pw-pokedex-entry:hover:not(:disabled) {
-  border-color: var(--light2);
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
+  border-color: transparent;
+  transform: none;
+  box-shadow: none;
+}
+
+.pw-pokedex-entry:hover:not(:disabled) .dex-sprite {
+  border-color: var(--accent);
 }
 
 .pw-pokedex-entry .pw-pokedex-sprite,
 .pw-pokedex-entry .dex-sprite {
-  width: 72px;
-  height: 72px;
-  min-width: 72px;
-  min-height: 72px;
+  max-width: 58px;
+  max-height: 58px;
 }
 
 .pw-pokedex-entry.unknown .dex-sprite img {
@@ -546,7 +545,7 @@
 
 .pw-pokedex-entry .pw-pokedex-number {
   z-index: 10;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   border: 0;
   box-shadow: none;
 }
@@ -573,12 +572,12 @@
 }
 
 .pw-pokedex-detail-title {
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .pw-pokedex-detail-line {
   color: var(--pw-text-secondary);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   overflow-wrap: anywhere;
 }
 
@@ -590,7 +589,7 @@
 
 .pw-pokedex-stats {
   gap: 4px 8px;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 .pw-pokedex-progress {
@@ -644,7 +643,7 @@
   background: var(--dark1, #181613);
   border: 1px solid var(--border, #4A3E31);
   border-radius: 6px;
-  font-size: 11.5px;
+  font-size: var(--pw-font-size-sm);
 }
 
 .pw-pokedex-fact-pill .pw-fact-label {
@@ -668,7 +667,7 @@
 }
 
 .pw-pokedex-flavor-text {
-  font-size: 13.5px;
+  font-size: var(--pw-font-size-lg);
   line-height: 1.65;
   color: var(--light2, #ECDEB7);
   margin: 0;
@@ -691,7 +690,7 @@
   background: var(--dark1, #181613);
   border: 1px solid var(--border, #4A3E31);
   border-radius: 6px;
-  font-size: 12.5px;
+  font-size: var(--pw-font-size-md);
   color: var(--light2, #ECDEB7);
   flex-wrap: wrap;
 }
@@ -713,7 +712,7 @@
   background: var(--dark1, #181613);
   border: 1px solid var(--border, #4A3E31);
   border-radius: 6px;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   font-weight: 700;
   color: var(--light2, #ECDEB7);
   box-sizing: border-box;
@@ -813,7 +812,7 @@
   background: var(--dark1, #181613);
   border: 1px solid var(--border, #4A3E31);
   border-radius: 6px;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -826,7 +825,7 @@
 .pw-tm-code {
   color: var(--accent, #E5C365);
   font-weight: 800;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 .pw-tm-move-name {

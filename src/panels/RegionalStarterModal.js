@@ -69,8 +69,7 @@ export class RegionalStarterModal extends UIModal {
     const titleBlock = new UIContainer({ className: 'pw-center starter-title-block' });
     titleBlock.addChild(new UIText({
       tagName: 'div',
-      id: 'starter-modal-title',
-      className: 'pw-text-md pw-bold pw-light2',
+      className: 'pw-text-md pw-bold pw-light2 starter-title-band',
       text: t(`starter_title_${this._regionId}`)
     }));
     titleBlock.addChild(new UIText({ tagName: 'div', className: 'pw-text-sm pw-light1', text: t('starter_subtitle') }));

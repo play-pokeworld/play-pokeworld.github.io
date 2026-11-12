@@ -14,7 +14,7 @@
 }
 
 .shop-item .shop-name, .shop-item .shop-price {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .shop-item {
@@ -69,7 +69,7 @@
 }
 
 .shop-item .shop-desc {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   color: var(--dark3);
 }
 
@@ -81,15 +81,15 @@
   border-radius: 14px;
   flex-shrink: 0;
   margin-left: 12px;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .shop-item .shop-desc {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 .shop-item .shop-name, .shop-item .shop-price {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .shop-item .shop-sprite, .shop-item .shop-sprite img {
@@ -197,7 +197,7 @@
   border-radius: 10px;
   padding: 6px 10px;
   color: var(--light1);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight: 700;
   text-align: center;
 }
@@ -252,21 +252,23 @@
   gap: 6px;
   padding: 10px 8px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, .04);
-  border: 1px solid rgba(255, 255, 255, .09);
+  background: var(--pw-bg-header);
+  border: 1px solid var(--pw-border-color);
   cursor: pointer;
   user-select: none;
 }
 
+/* A shop tile is a cell of the corpus: header surface, one hairline, the accent on hover and on
+   the selected item. The white washes it used to wear read as a second, colder surface. */
 .pw-shop-item:hover {
-  background: rgba(255, 255, 255, .09);
-  border-color: rgba(255, 255, 255, .22);
+  background: var(--pw-bg-surface-hover);
+  border-color: var(--accent);
 }
 
 .pw-shop-item.selected {
-  background: rgba(148, 136, 107, .22);
-  border-color: var(--accent, #94886B);
-  box-shadow: 0 0 0 1px var(--accent, #94886B) inset;
+  background: var(--pw-bg-surface-hover);
+  border-color: var(--accent);
+  box-shadow: none;
 }
 
 .pw-shop-item.soldout {
@@ -289,8 +291,8 @@
 }
 
 .pw-shop-item .pw-shop-name {
-  font-size: 12px;
-  color: var(--light1, #ECDEB7);
+  font-size: var(--pw-font-size-md);
+  color: var(--pw-text-primary);
   text-align: center;
   line-height: 1.15;
   min-height: 28px;
@@ -300,18 +302,18 @@
 }
 
 .pw-shop-item .pw-shop-price {
-  font-size: 11px;
-  color: var(--light2, #fff);
+  font-size: var(--pw-font-size-sm);
+  color: var(--pw-text-secondary);
   font-variant-numeric: tabular-nums;
 }
 
 .pw-shop-item .pw-shop-stock {
-  font-size: 11px;
-  color: var(--light3, #9aa);
+  font-size: var(--pw-font-size-sm);
+  color: var(--pw-text-secondary);
 }
 
 .pw-shop-item .pw-shop-soldout {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   color: var(--red, #E4A0A0);
   font-weight: 700;
 }
@@ -332,15 +334,16 @@
   width: 72px;
   background: #1c1a16;
   border: 1px solid rgba(255, 255, 255, .18);
-  border-radius: 6px;
+  /* A square field, like every other count in the game: no pill, no circle (user request). */
+  border-radius: var(--pw-radius-sm, 7px);
   color: #ECDEB7;
   padding: 5px 8px;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .pw-shop-footer .pw-shop-total {
   margin-left: auto;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   font-weight: 700;
   color: var(--light1, #ECDEB7);
 }
@@ -399,5 +402,5 @@
 }
 
 .pw-mine-auto-header .pw-price-tag {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }

@@ -4,7 +4,6 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 .pw-loc-overview, .pw-loc-lore, .pw-loc-wild-card, .pw-loc-timer-chip, .pw-loc-unlock-tip, .pw-loc-alcove-row {
   background: var(--pw-bg-surface) !important;
   border: 1px solid var(--pw-border-color) !important;
@@ -48,7 +47,7 @@
 
 .route-events-placeholder span {
   color: var(--light1);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .location-progress-bar {
@@ -95,7 +94,7 @@
 }
 
 .pw-loc-play-stats-title {
-  font-size:11px;
+  font-size: var(--pw-font-size-sm);
   font-weight:800;
   letter-spacing:.04em;
   text-transform:uppercase;
@@ -120,7 +119,7 @@
 }
 
 .pw-loc-play-stat-lbl {
-  font-size:11px;
+  font-size: var(--pw-font-size-sm);
   font-weight:700;
   color:var(--light1);
 }
@@ -137,13 +136,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-sm);
+  font-weight: 700;
   z-index: 2;
 }
 
 .loc-caught-badge.is-owned {
-  background: var(--dark2);
+  background: var(--pw-bg-header);
   color: var(--dark1);
 }
 
@@ -182,7 +181,6 @@
   opacity: 1 !important;
 }
 
-
 .pw-loc-wild-card {
   background: var(--pw-bg-surface) !important;
   border: 1px solid rgba(236,222,183,0.22) !important;
@@ -212,7 +210,7 @@
 }
 
 .pw-johto-lock {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   color: var(--light2);
 }
 
@@ -228,8 +226,8 @@
 
 .pw-loc-overview-title {
   color: var(--pw-text-primary);
-  font-weight: 900;
-  font-size: 16px;
+  font-weight: 700;
+  font-size: var(--pw-font-size-2xl);
   margin-bottom: 8px;
 }
 
@@ -278,7 +276,7 @@
 }
 
 .pw-loc-action-icon {
-  font-size: 20px;
+  font-size: var(--pw-font-size-4xl);
   line-height: 1;
   display: inline-flex;
   align-items: center;
@@ -330,25 +328,28 @@ button[data-action].pw-loc-gym-btn:hover,
   transform: translateY(-2px);
 }
 
+/* The dungeon tile is an action tile of the location sheet: it shares the surface, the hairline
+   and the radius of its neighbours and only marks itself with a tint of the light colour. It used
+   to be a translucent cream slab with its own weight and a lift on hover, which is why one tile of
+   the row looked like a different component. */
 .pw-loc-action-btn.pw-loc-dungeon-btn {
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--light2) 12%, transparent) !important;
-  border: 1px solid color-mix(in srgb, var(--light2) 35%, transparent) !important;
-  color: var(--light2) !important;
-  font-family: 'Winky Sans', 'Segoe UI', system-ui, sans-serif;
-  font-weight: 800 !important;
-  letter-spacing: 0.35px;
-  text-shadow: none !important;
+  border-radius: var(--pw-radius-sm);
+  background: color-mix(in srgb, var(--light1) 8%, var(--pw-bg-surface)) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  color: var(--pw-text-primary) !important;
+  font-family: var(--pw-font-main);
+  font-weight: 700 !important;
   box-shadow: none !important;
+  transform: none;
 }
 
 .pw-loc-action-btn.pw-loc-dungeon-btn:hover {
-  background: color-mix(in srgb, var(--light2) 24%, transparent) !important;
-  border-color: var(--light2) !important;
-  color: var(--light2) !important;
+  background: var(--pw-bg-surface) !important;
+  border-color: var(--accent) !important;
+  color: var(--pw-text-primary) !important;
   box-shadow: none !important;
-  filter: brightness(1.15) !important;
-  transform: translateY(-2px);
+  filter: none;
+  transform: none;
 }
 
 .pw-loc-unlock-tip {
@@ -381,13 +382,13 @@ button[data-action].pw-loc-gym-btn:hover,
   gap: 8px;
   padding: 8px 12px;
   border-radius: 12px;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .pw-loc-timer {
   color: #F28B6C;
-  font-weight: 900;
-  font-size: 12px;
+  font-weight: 700;
+  font-size: var(--pw-font-size-md);
 }
 
 .pw-loc-wild-meta {
@@ -395,7 +396,7 @@ button[data-action].pw-loc-gym-btn:hover,
   align-items: center;
   gap: 6px;
   flex-wrap: wrap;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   color: var(--light1);
 }
 
@@ -440,8 +441,8 @@ button[data-action].pw-loc-gym-btn:hover,
 
 .pw-loc-roaming-badge {
   color: #D9A0E8;
-  font-size: 12px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-md);
+  font-weight: 700;
 }
 
 .pw-loc-alcove-list {
@@ -509,7 +510,7 @@ button[data-action].pw-loc-gym-btn:hover,
   margin: .35rem 0;
   border: 2px solid var(--light1);
   border-radius: .5rem;
-  background: var(--dark2);
+  background: var(--pw-bg-header);
 }
 
 .pw-loc-dungeon-run.is-boss {
@@ -532,7 +533,7 @@ button[data-action].pw-loc-gym-btn:hover,
   font-weight: 700;
   padding: .05rem .4rem;
   border-radius: .35rem;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   color: var(--light2);
 }
 
@@ -540,7 +541,7 @@ button[data-action].pw-loc-gym-btn:hover,
 .pw-loc-dungeon-quota-bar {
   height: 7px;
   border-radius: 4px;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   overflow: hidden;
 }
 
@@ -573,7 +574,7 @@ button[data-action].pw-loc-gym-btn:hover,
   gap: .5rem;
   padding: .3rem .45rem;
   border-radius: .4rem;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
 }
 
 .pw-loc-dungeon-bag-val {
@@ -636,20 +637,19 @@ button[data-action].pw-loc-gym-btn:hover,
 }
 
 .pw-loc-sanctuary-title {
-  font-size: 15px;
+  font-size: var(--pw-font-size-xl);
   font-weight: 800;
   color: var(--pw-text-primary, #fff);
 }
 
 .pw-loc-sanctuary-level {
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   font-weight: 800;
   padding: 3px 10px;
   border-radius: 6px;
   background: rgba(255, 200, 40, 0.15);
   color: #ffd24d;
   border: 1px solid rgba(255, 210, 77, 0.35);
-  letter-spacing: 0.03em;
 }
 
 .pw-loc-sanctuary-row {
@@ -672,13 +672,13 @@ button[data-action].pw-loc-gym-btn:hover,
 }
 
 .pw-loc-sanctuary-row-main {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   font-weight: 700;
   color: var(--pw-text-primary, #fff);
 }
 
 .pw-loc-sanctuary-row-sub {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   color: var(--light1, #aaa);
 }
 
@@ -698,7 +698,6 @@ button[data-action].pw-loc-gym-btn:hover,
   gap: 8px;
   margin: 0;
 }
-
 
 /* PNJ quest states follow main: the badge remains separate from the talk icon. The tile keeps the shared high-contrast violet skin; only the status glyph is tinted. */
 .pw-loc-action-label {
@@ -736,7 +735,7 @@ button[data-action].pw-loc-gym-btn:hover,
   justify-content: space-between;
   align-items: center;
   margin-top: 10px;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight: 700;
   color: var(--light1, #c9bc9c);
   text-transform: uppercase;
@@ -765,16 +764,15 @@ button[data-action].pw-loc-gym-btn:hover,
 }
 
 .pw-loc-wild-name {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight: 700;
   color: var(--light2);
 }
 
 .pw-loc-wild-level {
-  font-size: 10px;
+  font-size: var(--pw-font-size-xs);
   color: var(--light1);
 }
-
 
 /* The location content is a single column whose track can never be wider than the window: a child that cannot shrink reflows inside its own box instead of widening the panel (Rules §5). */
 .pw-loc-info {
@@ -811,19 +809,17 @@ button[data-action].pw-loc-gym-btn:hover,
   margin: 0;
   color: var(--pw-text-primary);
   font-size: clamp(20px, 3vw, 28px);
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1.2;
   text-align: center;
   text-wrap: balance;
   overflow-wrap: anywhere;
-  text-shadow: none;
 }
 
 .pw-loc-play-stats {
   margin: 0;
   padding: 10px;
 }
-
 
 /* Sanctuary card: the action button drops below its text on a narrow column instead of forcing a minimum wider than the window. Nothing is clipped and text wraps where needed. */
 .pw-loc-sanctuary-card {
@@ -853,7 +849,6 @@ button[data-action].pw-loc-gym-btn:hover,
   min-width: 0;
 }
 
-
 /* panels/panels-03.css * --------------------------------------------------------------------------- * Panel block inherited from the former panels.css. * * Part of the 1.16.11 split: one file, one responsibility. The order of the * @import lines in assets/css/style.css IS the cascade — never reorder them, * never import this sheet anywhere else (guarded by tests/CssStructure.test.js). */
 .pw-loc-sanctuary-row-action {
   flex: 1 1 auto;
@@ -869,8 +864,8 @@ button[data-action].pw-loc-gym-btn:hover,
 .pw-loc-play-stats-title {
   margin-bottom: 7px;
   color: var(--light1);
-  font-size: 11px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-sm);
+  font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -895,7 +890,7 @@ button[data-action].pw-loc-gym-btn:hover,
   margin: 0;
   padding-top: 0;
   border-top: 0;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   color: var(--light1);
 }
 
@@ -920,19 +915,19 @@ button[data-action].pw-loc-gym-btn:hover,
 
 .pw-loc-wild-name {
   text-align: center;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   font-weight: 800;
   color: var(--pw-text-primary);
 }
 
 .pw-loc-wild-level {
   color: var(--light1);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 .pw-loc-wild-rarity {
   color: var(--light1);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   line-height: 1.2;
 }
 
@@ -958,7 +953,7 @@ button[data-action].pw-loc-gym-btn:hover,
 
 .pw-loc-drop-name {
   color: var(--light2);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight: 800;
   text-align: center;
 }
@@ -995,16 +990,17 @@ button[data-action].pw-loc-gym-btn:hover,
   border-color: color-mix(in srgb, var(--light1) 42%, var(--pw-border-color)) !important;
 }
 
+/* The place name sits on the illustration: no plaque, only a shadow to keep it legible. */
 .pw-loc-overview-title {
   width: auto !important;
   max-width: 100%;
-  padding: 6px 20px;
+  padding: 0;
   margin: 0 auto;
-  border-radius: 9px;
-  background: color-mix(in srgb, var(--pw-bg-header) 72%, transparent);
-  border: 1px solid color-mix(in srgb, var(--light1) 55%, transparent);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
   font-size: clamp(19px, 2.4vw, 26px);
+  font-weight: 700;
   text-align: center;
 }

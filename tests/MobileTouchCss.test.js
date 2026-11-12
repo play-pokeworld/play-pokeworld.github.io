@@ -118,8 +118,11 @@ describe('Touch-screen stylesheet (1.16.20)', (test) => {
     const achievements = rules('panels/achievements.css');
     assert.ok(achievements.some((rule) => rule.selector === '.pw-ach-filterbar' && /min-width:\s*0/.test(rule.body)),
       'the achievement filter can shrink inside its modal header');
+    // The grid may be a single shrinkable column or a wrapping one whose track is clamped by
+    // the container; what it never does is demand a fixed desktop minimum.
     assert.ok(achievements.some((rule) => rule.selector === '.pw-ach-grid'
-      && /min\(320px, 100%\)/.test(rule.body)), 'achievement cards cannot impose a desktop minimum width');
+      && /minmax\(0, ?1fr\)|min\(\d+px, ?100%\)/.test(rule.body)),
+    'achievement cards cannot impose a desktop minimum width');
   });
 
   test('compact settings and Pokédex data grids can shrink without clipping', () => {
@@ -152,8 +155,13 @@ describe('Touch-screen stylesheet (1.16.20)', (test) => {
       .filter((rule) => /min-width\s*:\s*44px/.test(rule.body));
     assert.ok(toolButtons.length > 0, 'the 26px header tool buttons grow to 44px on a touch screen');
 
+    // 1.16.48: the size is no longer written in px, it names the scale step that is 16px.
+    // The assertion keeps the same guarantee: the step a select uses must resolve to 16px.
+    const tokens = fs.readFileSync(path.join(PROJECT_ROOT, 'assets/css/core/tokens.css'), 'utf8');
+    const inputStep = /--pw-font-size-2xl:\s*16px/.test(tokens);
+    assert.ok(inputStep, 'the 2xl step is the 16px form-control size that keeps iOS from zooming');
     const selects = rulesFor('components/ui-dropdown.css', '.pw-dropdown-select')
-      .filter((rule) => /font-size\s*:\s*16px/.test(rule.body));
+      .filter((rule) => /font-size\s*:\s*var\(--pw-font-size-2xl\)/.test(rule.body));
     assert.ok(selects.length > 0, 'a select is 16px: below that, iOS zooms the whole page on focus');
 
     const inputs = rulesFor('components/ui-input.css', '.pw-input')
@@ -252,10 +260,18 @@ describe('Mobile shell (1.16.32)', (test) => {
     assert.deepEqual(offenders, [], 'a panel is sized by its layout, never shrunk');
   });
 
-  test('a filter toolbar folds into one scrolling band on touch', () => {
-    const strip = rulesFor('components/chips.css', '.pw-chip-row')
-      .filter((rule) => /flex-wrap\s*:\s*nowrap/.test(rule.body) && /overflow-x\s*:\s*auto/.test(rule.body));
-    assert.ok(strip.length > 0, 'the chip strip is one row that scrolls sideways');
+  test('the category strip is a grid of pills, and the toolbar stays a plain row', () => {
+    // The catalogue draws its category selector (.segx) as a grid of pills laid on the surface.
+    // The strip used to be a sideways-scrolling band; a grid wraps instead, so no chip is ever
+    // half-visible and nothing needs `!important` to win over the old flex rule.
+    const strip = rulesFor('components/chips.css', '.inv-tabs').filter((rule) => /display\s*:\s*grid/.test(rule.body));
+    assert.ok(strip.length > 0, 'the category strip lays its tabs out as a grid');
+    assert.ok(strip.some((rule) => /grid-template-columns\s*:\s*repeat\(auto-fit/.test(rule.body)),
+      'the grid takes its column count from the width it is given');
+
+    const pill = rulesFor('components/chips.css', '.inv-tab').filter((rule) => rule.selector === '.inv-tab');
+    assert.ok(pill.some((rule) => /border\s*:\s*0/.test(rule.body)), 'a pill carries no frame');
+    assert.ok(pill.some((rule) => /border-radius\s*:\s*18px/.test(rule.body)), 'a pill is fully rounded');
 
     const toggle = rulesFor('components/ui-input.css', '.pw-drawer-toggle')
       .filter((rule) => /position\s*:\s*static/.test(rule.body));

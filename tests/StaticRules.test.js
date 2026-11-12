@@ -150,15 +150,19 @@ describe('Static rules', (test) => {
     }
   });
 
-  test('PC and Pokédex Pokémon tiles keep reference geometry and silhouette states', () => {
+  test('PC and Pokédex Pokémon tiles share one cell and keep silhouette states', () => {
+    // Rework 1.16.50: the cell is the catalogue .cell — a column of number / disc / name — so the
+    // only circle in the project is the sprite's disc, and a tile takes the width of its track.
+    // The test guards that shared shape; it no longer freezes a 72px geometry.
     const pcCss = readBundle();
     const dexCss = pcCss;
-    assert.ok(/\.pw-box-panel \.pw-box-roster--storage\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fill, minmax\(90px, 1fr\)\)/s.test(pcCss), 'PC cards use the reference grid density');
-    assert.ok(/\.pw-box-panel \.pw-box-pokemon-tile\.dex-entry\s*\{[^}]*width:\s*72px;[^}]*height:\s*72px;[^}]*border-radius:\s*50%/s.test(pcCss), 'the PC entry uses the same 72px circular tile geometry');
-    assert.ok(/\.pw-box-panel \.pw-box-grid-entry \.box-level\s*\{[^}]*bottom:\s*-9px[^}]*background:\s*var\(--dark1\)/s.test(pcCss), 'the PC level pill sits beneath the sprite');
-    assert.ok(/\.pw-pokedex-entry\.dex-entry\s*\{[^}]*width:\s*72px;[^}]*height:\s*72px;[^}]*border-radius:\s*50%/s.test(dexCss), 'Pokédex entries are 72px circular tiles');
-    assert.ok(/\.pw-pokedex-entry\.unknown \.dex-sprite img\s*\{[^}]*brightness\(0\)/s.test(dexCss), 'unknown entries use the original dark silhouette');
-    assert.ok(/\.pw-pokedex-entry\.seen \.dex-sprite img\s*\{[^}]*brightness\(\.42\) saturate\(0\)/s.test(dexCss), 'seen entries use the original grayscale silhouette');
+    assert.ok(/\.pw-box-panel \.pw-box-roster--storage\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fill, minmax\(\d+px, 1fr\)\)/s.test(pcCss), 'PC cards use a reference grid density');
+    assert.ok(/\.dex-entry\s*\{[^}]*flex-direction:\s*column/s.test(dexCss), 'an entry is a column: number, disc, name');
+    assert.ok(/\.dex-entry \.dex-sprite\s*\{[^}]*border-radius:\s*50%/s.test(dexCss), 'the disc of the sprite is the only circle');
+    assert.ok(!/\.pw-box-panel \.pw-box-pokemon-tile\.dex-entry\s*\{[^}]*border-radius:\s*50%/s.test(pcCss), 'the PC tile paints no second circle around the shared cell');
+    assert.ok(!/\.pw-box-panel \.pw-box-pokemon-tile\.dex-entry\s*\{[^}]*width:\s*\d+px/s.test(pcCss), 'the PC tile takes the width of its track');
+    assert.ok(/\.unknown \.dex-sprite img\s*\{[^}]*brightness\(0\)/s.test(dexCss), 'unknown entries use the original dark silhouette');
+    assert.ok(/\.seen \.dex-sprite img\s*\{[^}]*brightness\(0?\.42\) saturate\(0\)/s.test(dexCss), 'seen entries use the original grayscale silhouette');
     assert.ok(!dexCss.includes('.pw-pokedex-name'), 'names are not added beneath the reference Pokédex tiles');
   });
 

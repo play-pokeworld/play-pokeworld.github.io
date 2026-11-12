@@ -11,7 +11,7 @@
   cursor: pointer;
   border: 2px solid var(--dark3);
   text-align: center;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight: bold;
   color: var(--light2);
   transition: all 0.2s;
@@ -45,7 +45,7 @@ button[data-action]:not(.save-slot):not(.theme-swatch):where(:not(.modal-close))
   background: var(--pw-btn-active-bg) !important;
   color: var(--pw-btn-active-text) !important;
   border-color: var(--pw-btn-active-bg) !important;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
 }
 
 button[data-action]:not(.save-slot):not(.theme-swatch):where(:not(.modal-close)).active * {
@@ -114,7 +114,7 @@ button.theme-swatch--contrast {
   color: var(--light2);
   cursor: pointer;
   font-weight: 700;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   transition: all 0.15s ease;
 }
 

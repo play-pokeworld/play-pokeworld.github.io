@@ -85,6 +85,7 @@ await import('./tests/CssStructure.test.js');
 await import('./tests/StyleVocabulary.test.js');
 await import('./tests/LongPress.test.js');
 await import('./tests/MobileTouchCss.test.js');
+await import('./tests/InterfaceGrammar.test.js');
 
 const { failed } = await runAll();
 process.exit(failed ? 1 : 0);

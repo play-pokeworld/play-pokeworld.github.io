@@ -19,7 +19,7 @@ export class BagItemRow extends UIContainer {
     const disabled = options.disabled === true;
     const rowClassName = options.rowClassName || '';
     super({
-      className: `inv-item pw-starter-chosen${rowClassName ? ` ${rowClassName}` : ''}${disabled ? ' is-disabled' : ''}`,
+      className: `inv-item${rowClassName ? ` ${rowClassName}` : ''}${disabled ? ' is-disabled' : ''}`,
       name: 'BagItemRow'
     });
     this.setData('itemId', entry.itemId);
@@ -27,7 +27,7 @@ export class BagItemRow extends UIContainer {
     this.toggleClass('selected', selected);
 
     const name = new UIContainer({
-      className: 'inv-name pw-starter-chosen-label',
+      className: 'inv-name',
       children: [new UIText({ text: entry.name })]
     });
     if (options.description) name.addChild(new UIText({ className: 'inv-desc', text: options.description }));
@@ -42,7 +42,7 @@ export class BagItemRow extends UIContainer {
       new UIContainer({ className: 'pw-flex-1', children: [name] }),
       new UIText({
         tagName: 'div',
-        className: 'inv-qty pw-starter-chosen-level',
+        className: 'inv-qty',
         text: options.quantityLabel ?? t('bag_qty', { n: entry.quantity })
       })
     ]);

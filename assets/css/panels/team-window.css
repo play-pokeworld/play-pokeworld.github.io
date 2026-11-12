@@ -1,0 +1,63 @@
+/*
+ * panels/team-window.css
+ * ---------------------------------------------------------------------------
+ * The team window of the dashboard: the cell of a team member and the empty slot.
+ * Split out of panels/team.css, which had reached the size where one more block turns
+ * it into a catch-all. Loaded right after it, so the cascade still reads team, then window.
+ */
+
+/* ---- Team window: the dashboard row grammar ---------------------------------- */
+/* A team member is a cell of the dashboard: surface mixed of body and header, one hairline,
+   the small radius. The cream card with its drop shadow belonged to the old vocabulary. */
+#team-window-body .pw-team-member-list .poke-card,
+#team-window-body .pw-sortable-row {
+  background: color-mix(in srgb, var(--pw-bg-surface) 60%, var(--pw-bg-header)) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+#team-window-body .pw-sortable-row.active,
+#team-window-body .poke-card.active {
+  border-color: var(--accent) !important;
+  box-shadow: none !important;
+}
+
+/* The four move lines are plain rows: a hairline and the type chip carry the information. */
+#team-window-body .poke-card .poke-move {
+  background: transparent !important;
+  border: 1px solid var(--pw-border-color) !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+}
+
+#team-window-body .poke-card .poke-move.empty {
+  background: transparent !important;
+  border-style: dashed !important;
+  color: var(--pw-text-secondary) !important;
+}
+
+#team-window-body .poke-card .poke-name,
+#team-window-body .poke-card .poke-name .pw-text {
+  color: var(--pw-text-primary) !important;
+}
+
+/* The level pill belongs to the chip grammar: sprite surface, one hairline, pill radius,
+   so the number stays legible whatever the theme does with the surrounding card. */
+#team-window-body .poke-card .poke-level {
+  background: var(--pw-bg-sprite) !important;
+  border: 1px solid var(--pw-border-color) !important;
+  border-radius: 999px !important;
+  color: var(--pw-text-secondary) !important;
+  font-weight: 600 !important;
+}
+
+#team-window-body .poke-card .hp-text {
+  color: var(--pw-text-secondary) !important;
+}
+
+/* The empty slot is one dashed hairline, not a two-pixel frame. */
+#team-window-body .pw-drop-zone:not(.is-hidden) {
+  border: 1px dashed var(--pw-border-color) !important;
+  background: transparent !important;
+}

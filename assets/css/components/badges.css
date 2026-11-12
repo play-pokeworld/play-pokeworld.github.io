@@ -4,13 +4,12 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 .buff-badge, .status-badge {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .status-badge {
-  font-size: 10px;
+  font-size: var(--pw-font-size-xs);
   padding: 3px 8px;
   border-radius: 4px;
   font-weight: bold;
@@ -39,7 +38,7 @@
 }
 
 .buff-badge {
-  font-size: 10px;
+  font-size: var(--pw-font-size-xs);
   padding: 3px 6px;
   border-radius: 4px;
   font-weight: bold;
@@ -80,7 +79,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: var(--pw-font-size-2xl);
 }
 
 .badge.earned {
@@ -93,7 +92,7 @@
 }
 
 .status-badge, .buff-badge {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 .item-badge {
@@ -115,10 +114,9 @@
   display: inline-block;
   padding: 3px 10px;
   border-radius: 4px;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight: bold;
   color: white;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 [data-buff="sunny"] span, [data-buff="rainy"] span, [data-buff="sandstorm"] span, [data-buff="hail"] span, [data-buff="electricTerrain"] span, [data-buff="grassyTerrain"] span, [data-buff="mistyTerrain"] span {
@@ -128,7 +126,6 @@
   font-size: 1rem !important;
   font-weight: bold !important;
   color: white !important;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
   line-height: 1.4 !important;
 }
 
@@ -198,10 +195,9 @@
   display: inline-block;
   padding: 2px 6px;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: var(--pw-font-size-xs);
   font-weight: bold;
   color: white;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 .type-normal {
@@ -366,7 +362,7 @@
 }
 
 .poke-detail-types .type-badge {
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   font-weight: 800;
   padding: 6px 8px;
   min-height: 28px;
@@ -391,7 +387,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   background: rgba(0,0,0,0.56);
   border: 1px solid rgba(255,255,255,0.18);
 }
@@ -442,8 +438,8 @@
   height: 22px;
   border-radius: 999px;
   padding: 0 7px;
-  font-size: 11px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-sm);
+  font-weight: 700;
   border: 1px solid rgba(255,255,255,0.16);
   background: rgba(0,0,0,0.34);
   color: var(--light2);
@@ -453,26 +449,25 @@
   min-width: 22px;
   height: 20px;
   padding:0 5px;
-  font-size:10px;
+  font-size: var(--pw-font-size-xs);
 }
 
 .pw-badge {
   display: inline-block;
   padding: 2px 8px;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: var(--pw-font-size-xs);
   font-weight: bold;
 }
 
 .pw-badge-type {
   composes: pw-badge;
   color: white;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 .pw-status-immune {
   color: var(--red);
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   font-weight: bold;
 }
 
@@ -492,7 +487,7 @@
 }
 
 .pw-status-dot-empty {
-  background: var(--dark3);
+  background: var(--pw-bg-sprite);
   opacity: 0.5;
 }
 
@@ -504,7 +499,7 @@
 .pw-label-white-bold {
   color: #fff;
   font-weight: bold;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .pw-charge-move {
@@ -528,8 +523,8 @@
   min-height: 18px;
   padding: 2px 8px !important;
   border-radius: 999px !important;
-  font-size: 10px !important;
-  font-weight: 900 !important;
+  font-size: var(--pw-font-size-xs) !important;
+  font-weight: 700 !important;
   line-height: 1 !important;
   color: #fff;
   background: var(--type-color, var(--status-color, #888));
@@ -556,22 +551,18 @@
 
 .type-badge, .status-badge, .poke-badge, .pw-badge {
   color: #ffffff !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6) !important;
 }
 
 .type-badge.type-bug, .type-bug.type-badge, .pw-badge.type-bug, span.type-bug {
   color: #241F16 !important;
-  text-shadow: none !important;
 }
 
 .type-badge.type-electric, .type-electric.type-badge, .pw-badge.type-electric, span.type-electric {
   color: #241F16 !important;
-  text-shadow: none !important;
 }
 
 .type-badge.type-fairy, .type-fairy.type-badge, .pw-badge.type-fairy, span.type-fairy {
   color: #241F16 !important;
-  text-shadow: none !important;
 }
 
 .type-badge.type-fighting, .type-fighting.type-badge, .pw-badge.type-fighting, span.type-fighting {
@@ -581,32 +572,26 @@
 
 .type-badge.type-fire, .type-fire.type-badge, .pw-badge.type-fire, span.type-fire {
   color: #241F16 !important;
-  text-shadow: none !important;
 }
 
 .type-badge.type-flying, .type-flying.type-badge, .pw-badge.type-flying, span.type-flying {
   color: #241F16 !important;
-  text-shadow: none !important;
 }
 
 .type-badge.type-grass, .type-grass.type-badge, .pw-badge.type-grass, span.type-grass {
   color: #241F16 !important;
-  text-shadow: none !important;
 }
 
 .type-badge.type-ground, .type-ground.type-badge, .pw-badge.type-ground, span.type-ground {
   color: #241F16 !important;
-  text-shadow: none !important;
 }
 
 .type-badge.type-ice, .type-ice.type-badge, .pw-badge.type-ice, span.type-ice {
   color: #241F16 !important;
-  text-shadow: none !important;
 }
 
 .type-badge.type-normal, .type-normal.type-badge, .pw-badge.type-normal, span.type-normal {
   color: #241F16 !important;
-  text-shadow: none !important;
 }
 
 .type-badge.type-poison, .type-poison.type-badge, .pw-badge.type-poison, span.type-poison {
@@ -616,26 +601,22 @@
 
 .type-badge.type-psychic, .type-psychic.type-badge, .pw-badge.type-psychic, span.type-psychic {
   color: #241F16 !important;
-  text-shadow: none !important;
 }
 
 .type-badge.type-rock, .type-rock.type-badge, .pw-badge.type-rock, span.type-rock {
   color: #241F16 !important;
-  text-shadow: none !important;
 }
 
 .type-badge.type-steel, .type-steel.type-badge, .pw-badge.type-steel, span.type-steel {
   color: #241F16 !important;
-  text-shadow: none !important;
 }
 
 .type-badge.type-water, .type-water.type-badge, .pw-badge.type-water, span.type-water {
   color: #241F16 !important;
-  text-shadow: none !important;
 }
 
 .pw-pending-badge {
-  font-size: 10px;
+  font-size: var(--pw-font-size-xs);
   color: #ffd700;
   border: 1px solid rgba(255,215,0,0.35);
   border-radius: 3px;
@@ -649,8 +630,8 @@
   align-items: center;
   border-radius: 999px;
   padding: 2px 10px;
-  font-size: 11px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-sm);
+  font-weight: 700;
   border: 1px solid currentColor;
   background: rgba(0,0,0,.28);
   margin-bottom: 2px;
@@ -692,13 +673,11 @@
   padding: 2px 7px !important;
   border-radius: 9px !important;
   border: 1px solid rgba(255, 255, 255, .28) !important;
-  font-size: 10px !important;
+  font-size: var(--pw-font-size-xs) !important;
   font-weight: 700 !important;
-  letter-spacing: .02em !important;
   line-height: 1.1 !important;
   text-transform: none !important;
   color: #14120E !important;
-  text-shadow: none !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, .35) !important;
 }
 
@@ -744,12 +723,10 @@
   padding: 2px 8px !important;
   border-radius: 9px !important;
   border: 1px solid rgba(0, 0, 0, .28) !important;
-  font-size: 10px !important;
+  font-size: var(--pw-font-size-xs) !important;
   font-weight: 800 !important;
-  letter-spacing: .02em !important;
   line-height: 1.1 !important;
   text-transform: none !important;
-  text-shadow: none !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, .3) !important;
 }
 
@@ -834,14 +811,18 @@
   background: rgba(255, 255, 255, 0.15);
 }
 
+/* A rank is a catalogue .lc-rank pill: sprite surface, one hairline, fully rounded,
+   the medal gradient standing in for the border when the rank is reached. */
 .pw-rank-chip {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 10px;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--pw-border-color);
+  background: var(--pw-bg-sprite);
+  color: var(--pw-text-secondary);
+  font-size: var(--pw-font-size-xs);
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .pw-rank-chip.rank-bronze {
@@ -864,18 +845,16 @@
   color: rgb(10, 30, 50);
 }
 
+/* A rank caption never wraps inside a tracker card: it used to take two lines and made the
+   card 101px tall for a single achievement. */
 .pw-rank-chip {
-  font-size: 11px;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: bold;
-  background: #cd7f32;
-  color: #fff;
+  white-space: nowrap;
+  flex: none;
 }
 
 .pw-rank-chip.rank-none {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--light1, #c9bc9c);
+  background: var(--pw-bg-sprite);
+  color: var(--pw-text-secondary);
   border: 1px solid var(--pw-border-color);
 }
 
@@ -887,133 +866,125 @@
 
 .pw-badges-panel-container {
   padding: 16px;
-  max-width: 800px;
+  /* No inner width cap: the grid takes the width the window gives it (1280 px on a desktop, the
+     catalogue reference), so the 24 badges fill the rows instead of leaving a dead margin. */
+  max-width: none;
   margin: 0 auto;
-  color: var(--text);
+  color: var(--pw-text-primary);
 }
 
-.pw-badges-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, .1);
+/* No page header: the window chrome already carries the title. Every group opens on the
+   shared small-caps label, exactly like the catalogue's seclbl rows. */
+.pw-badges-panel-container > .pw-section-title.is-sm {
+  margin: 0 2px 5px;
 }
 
-.pw-badges-heading {
-  margin: 0;
-  font-size: 18px;
+.pw-badges-panel-container > .pw-section-title.is-sm + .pw-badges-grid,
+.pw-badges-panel-container > .pw-section-title.is-sm + .pw-leagues-grid {
+  margin-bottom: 12px;
 }
 
-.pw-badges-subtitle {
-  font-size: 12px;
-  color: var(--light1);
-  margin-top: 4px;
-}
-
-.pw-badges-counters {
-  text-align: right;
-}
-
-.pw-badges-count {
-  font-size: 13px;
-  font-weight: bold;
-  color: var(--yellow);
-}
-
-.pw-badges-grid {
+/* One grid for badges and for leagues: the catalogue draws both as the same .gcell tile. */
+.pw-badges-grid,
+.pw-leagues-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 12px;
-  margin-bottom: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 6px;
+  margin-bottom: 0;
 }
 
-.pw-badge-card {
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, .06);
-  background: rgba(255, 255, 255, .02);
-}
-
-.pw-badge-card.obtained {
-  background: rgba(255, 255, 255, .08);
-  border-color: var(--pw-badge-color, rgba(255, 255, 255, .2));
-}
-
-.pw-badge-card {
+/* The tile: header surface, no frame of its own, a hairline only once the badge is earned. */
+.pw-badge-card,
+.pw-league-card {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 12px 8px;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--pw-bg-header);
+  border: 1px solid transparent;
+  border-radius: 10px;
   text-align: center;
 }
 
-.pw-badge-emblem {
+.pw-badge-card.obtained,
+.pw-league-card.obtained {
+  border-color: color-mix(in srgb, var(--pw-badge-color, var(--accent)) 55%, transparent);
+}
+
+.pw-badge-emblem,
+.pw-badge-card .pw-badge-emblem,
+.pw-league-card .pw-badge-emblem {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-}
-
-.pw-badge-card .pw-badge-emblem {
-  margin-bottom: 8px;
-  min-height: 48px;
+  min-height: 58px;
+  margin-bottom: 0;
 }
 
 .pw-badge-emblem-img {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
   transition: filter .2s ease;
   filter: grayscale(1) opacity(.35);
 }
 
+/* An earned badge shows its own colours; the glow belonged to the old framed card. */
 .obtained .pw-badge-emblem-img {
-  filter: drop-shadow(0 0 6px var(--pw-badge-color, #ffd700));
+  filter: none;
+}
+
+/* The name is the full-bleed light bar of the tile, so the wrapper stops boxing its children. */
+.pw-badge-card .pw-badge-card-text,
+.pw-league-card .pw-badge-card-text {
+  display: contents;
 }
 
 .pw-badge-card-title {
-  font-weight: bold;
-  font-size: 12px;
-  color: var(--light1);
+  display: block;
+  width: 100%;
+  padding: 3px 4px;
+  background: var(--pw-text-primary);
+  color: var(--pw-bg-header);
+  font-weight: 700;
+  font-size: var(--pw-font-size-md);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .obtained .pw-badge-card-title {
-  color: #fff;
+  color: var(--pw-bg-header);
 }
 
 .pw-badge-card-line {
-  font-size: 10px;
-  color: var(--light1);
-  margin-top: 2px;
+  display: block;
+  padding: 0 4px;
+  margin: 0;
+  font-size: var(--pw-font-size-xs);
+  line-height: 1.45;
+  color: var(--pw-text-secondary);
 }
 
 .pw-badge-card .pw-badge-card-line-2 {
-  font-size: 11px;
-  color: var(--light2);
+  font-size: var(--pw-font-size-xs);
+  color: var(--pw-text-secondary);
 }
 
 .pw-badge-card-status {
-  font-size: 10px;
-  color: var(--light2);
-  margin-top: 3px;
-  font-weight: bold;
+  display: block;
+  padding: 1px 4px 5px;
+  margin: 0;
+  font-size: var(--pw-font-size-xs);
+  font-weight: 600;
+  color: var(--pw-text-secondary);
 }
 
 .obtained .pw-badge-card-status {
-  color: var(--green);
-}
-
-.pw-badges-title-block, .pw-badges-counters, .pw-badge-card-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.pw-badges-counters {
-  align-items: flex-end;
-}
-
-.pw-badge-card .pw-badge-card-text {
-  align-items: center;
+  color: var(--success, var(--green));
 }
 
 .pw-badge--hidden {

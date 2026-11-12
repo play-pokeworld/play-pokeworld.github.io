@@ -6,10 +6,7 @@
  */
 
 
-@keyframes bg-scroll {
-  from { background-position: 0 0; }
-  to { background-position: -4000px 0; };
-}
+
 
 @keyframes pwToastIn {
   from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; };
@@ -291,4 +288,9 @@
     transform: translate3d(var(--pw-background-x1), var(--pw-background-y1), 0);
     opacity: 0;
   };
+}
+
+@keyframes bg-scroll {
+  from { background-position: 0 0; }
+  to { background-position: -2969px 0; }
 }

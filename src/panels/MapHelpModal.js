@@ -1,10 +1,16 @@
 /**
  * @file MapHelpModal.js
  * @brief Localized widget legend for the six semantic map-node colors.
+ *
+ * Laid out as the catalogue's sheet (frame `map-help`): one row per legend entry, the colour swatch
+ * in the 34 px chip, the label on the first line and the meaning on the second. The legend entries
+ * are the ones the map really paints - the catalogue frame was drawn with four invented rows, so its
+ * grammar is kept and its data is not.
  */
 import { StaticModalPanel } from '../ui/StaticModalPanel.js';
 import { UIContainer } from '../ui/UIContainer.js';
-import { UIText } from '../ui/UIText.js';
+import { UIButton } from '../ui/UIButton.js';
+import { SheetRow } from './components/SheetRow.js';
 import { ModalIds } from '../config/ModalIds.js';
 import { LanguageChangedEvent } from '../core/events/LanguageChangedEvent.js';
 import { RoamingSystem } from '../systems/RoamingSystem.js';
@@ -24,9 +30,9 @@ export class MapHelpModal extends StaticModalPanel {
     super({
       id: ModalIds.MAP_HELP,
       title: t('map_legend_modal_title'),
-      size: 'sm',
+      size: 'md',
       bodyClassName: 'pw-map-help',
-      className: 'pw-map-help-panel',
+      className: 'pw-sheet pw-map-help-panel',
       name: 'MapHelpModal'
     });
     this.listen(LanguageChangedEvent, () => this._render());
@@ -46,20 +52,25 @@ export class MapHelpModal extends StaticModalPanel {
   _render() {
     this.setTitle(t('map_legend_modal_title'));
     this.clearChildren();
-    const rows = new UIContainer({ className: 'pw-map-help-body' });
     for (const rowData of MapHelpModal.legendRows()) {
-      const row = new UIContainer({ className: 'pw-map-help-row' });
-      row.setData('mapLegendState', rowData.status);
       const swatch = new UIContainer({ className: `pw-map-help-swatch ${rowData.swatch}` });
       swatch.setAttribute('aria-hidden', 'true');
-      const copy = new UIContainer({ className: 'pw-map-help-copy' });
-      copy.addChildren([
-        new UIText({ tagName: 'strong', className: 'pw-map-help-label', text: t(rowData.labelKey) }),
-        new UIText({ className: 'pw-map-help-description', text: t(rowData.descriptionKey) })
-      ]);
-      row.addChildren([swatch, copy]);
-      rows.addChild(row);
+      const row = new SheetRow({
+        iconNode: swatch,
+        title: t(rowData.labelKey),
+        meta: t(rowData.descriptionKey),
+        className: 'pw-map-help-row',
+        nameClass: 'pw-map-help-label',
+        metaClass: 'pw-map-help-description'
+      });
+      row.setData('mapLegendState', rowData.status);
+      this.addChild(row);
     }
-    this.addChild(rows);
+    this.addChild(new UIButton({
+      text: t('close_btn'),
+      variant: 'ghost',
+      className: 'pw-sheet-btn',
+      onClick: () => this.close()
+    }));
   }
 }

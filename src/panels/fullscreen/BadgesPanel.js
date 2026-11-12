@@ -88,29 +88,15 @@ export class BadgesPanel extends UIFullscreenPanel {
       }));
     }
 
+    // Each group opens on a small-caps label holding its count, the way the catalogue's
+    // .seclbl rows introduce a grid; the window chrome already shows the panel title.
+    const sectionLabel = (text) => new UIText({ tagName: 'div', className: 'pw-section-title is-sm', text });
     this.setContent([new UIContainer({
       className: 'pw-badges-panel-container',
       children: [
-        new UIContainer({
-          className: 'pw-badges-header',
-          children: [
-            new UIContainer({
-              className: 'pw-badges-title-block',
-              children: [
-                new UIText({ tagName: 'h2', className: 'pw-badges-heading', text: t('panel_badges_title') }),
-                new UIText({ tagName: 'div', className: 'pw-badges-subtitle', text: t('badges_subtitle') })
-              ]
-            }),
-            new UIContainer({
-              className: 'pw-badges-counters',
-              children: [
-                new UIText({ tagName: 'div', className: 'pw-badges-count', text: t('badges_count', { n: gyms.filter((gym) => has(gym.id)).length, total: gyms.length }) }),
-                new UIText({ tagName: 'div', className: 'pw-leagues-count', text: t('leagues_count', { n: leagues.filter(hasLeague).length, total: leagues.length }) })
-              ]
-            })
-          ]
-        }),
+        sectionLabel(t('badges_count', { n: gyms.filter((gym) => has(gym.id)).length, total: gyms.length })),
         badgeGrid,
+        sectionLabel(t('leagues_count', { n: leagues.filter(hasLeague).length, total: leagues.length })),
         leagueGrid
       ]
     })]);

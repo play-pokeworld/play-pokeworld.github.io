@@ -21,7 +21,7 @@
 }
 
 #confirm-inner {
-  background: var(--dark2);
+  background: var(--pw-bg-header);
   border: 1px solid var(--dark3);
   border-radius: 12px;
   padding: 20px;
@@ -49,7 +49,7 @@
   border-radius:6px;
   margin-bottom:10px;
   color:#ff8a80;
-  font-size:13px;
+  font-size: var(--pw-font-size-lg);
   display:flex;
   align-items:center;
   gap:8px;
@@ -62,7 +62,7 @@
   border-radius:6px;
   margin-bottom:8px;
   color:#ff8a80;
-  font-size:13px;
+  font-size: var(--pw-font-size-lg);
   display:flex;
   align-items:center;
   gap:8px;
@@ -75,7 +75,7 @@
   border-radius: 6px;
   margin-bottom: 10px;
   color: #ff8a80;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -86,7 +86,7 @@
   border: 1px solid rgba(255,193,7,0.25);
   padding: 10px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   color: var(--light1);
 }
 
@@ -107,8 +107,8 @@
 }
 
 .pw-confirm-title {
-  font-size: 16px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-2xl);
+  font-weight: 700;
   color: var(--light2);
   margin-bottom: 10px;
   padding-bottom: 10px;
@@ -116,7 +116,7 @@
 }
 
 .pw-confirm-msg {
-  font-size: 13.5px;
+  font-size: var(--pw-font-size-lg);
   line-height: 1.5;
   color: var(--light1);
   margin-bottom: 4px;
@@ -154,7 +154,7 @@
   background: var(--red) !important;
   border-color: var(--red) !important;
   color: #fff !important;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 #confirm-yes.pw-confirm-danger:hover {
@@ -168,15 +168,15 @@
 }
 
 #confirm-yes.pw-confirm-danger {
-  background: #D3425F !important;
-  border: 1px solid #D3425F !important;
+  background: var(--pw-accent-danger) !important;
+  border: 1px solid var(--pw-accent-danger) !important;
   color: #ffffff !important;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
 }
 
 #confirm-yes.pw-confirm-danger:hover {
-  background: #E55575 !important;
-  border-color: #E55575 !important;
+  background: var(--pw-accent-danger-hover) !important;
+  border-color: var(--pw-accent-danger-hover) !important;
   color: #ffffff !important;
 }
 
@@ -220,13 +220,13 @@
 }
 
 .pw-dialog-label {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   font-weight: 800;
   color: var(--light2);
 }
 
 .pw-dialog-desc {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   line-height: 1.5;
   color: var(--light1);
 }

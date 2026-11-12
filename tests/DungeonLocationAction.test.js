@@ -135,22 +135,26 @@ describe('Dungeon location action parity', (test) => {
     }
   });
 
-  test('dungeon action skin matches main generic button colors and hover feedback', () => {
+  // The intention: a dungeon tile is an action tile like its neighbours, marked only by a tint.
+  // The values are the catalogue grammar, not a copy of the old cream slab.
+  test('dungeon action skin is the shared action tile, marked by a tint', () => {
     const css = readBundle();
     const base = css.match(/\.pw-loc-action-btn\.pw-loc-dungeon-btn\s*\{([^}]*)\}/)?.[1] || '';
     const hover = css.match(/\.pw-loc-action-btn\.pw-loc-dungeon-btn:hover\s*\{([^}]*)\}/)?.[1] || '';
     for (const declaration of [
-      'background: color-mix(in srgb, var(--light2) 12%, transparent) !important;',
-      'border: 1px solid color-mix(in srgb, var(--light2) 35%, transparent) !important;',
-      'color: var(--light2) !important;',
-      'font-weight: 800 !important;',
-      'text-shadow: none !important;',
-      'box-shadow: none !important;'
-    ]) assert.ok(base.includes(declaration), `base tile copies main's generic action skin: ${declaration}`);
+      'border-radius: var(--pw-radius-sm);',
+      'border: 1px solid var(--pw-border-color) !important;',
+      'color: var(--pw-text-primary) !important;',
+      'font-weight: 700 !important;',
+      'box-shadow: none !important;',
+      'transform: none;'
+    ]) assert.ok(base.includes(declaration), `the dungeon tile shares the action tile skin: ${declaration}`);
+    assert.ok(/background: color-mix\(in srgb, var\(--light1\) \d+%, var\(--pw-bg-surface\)\)/.test(base),
+      'the dungeon tile is the surface tinted with the light colour, not a translucent slab');
     for (const declaration of [
-      'background: color-mix(in srgb, var(--light2) 24%, transparent) !important;',
-      'border-color: var(--light2) !important;',
-      'filter: brightness(1.15) !important;'
-    ]) assert.ok(hover.includes(declaration), `hover copies main's action feedback: ${declaration}`);
+      'border-color: var(--accent) !important;',
+      'transform: none;',
+      'filter: none;'
+    ]) assert.ok(hover.includes(declaration), `the hover is the shared one: ${declaration}`);
   });
 });

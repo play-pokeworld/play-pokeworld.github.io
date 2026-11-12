@@ -4,13 +4,12 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 #header .hinfo {
   min-width: 200px;
 }
 
 #header .hinfo {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   color: var(--light1);
   display: flex;
   gap: 16px;
@@ -22,15 +21,15 @@
 }
 
 .hinfo, .hinfo span, #header .hinfo {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .item-effect-box {
   padding: 10px 12px;
-  background: var(--dark3);
+  background: var(--pw-bg-sprite);
   border-radius: 8px;
   border: 1px solid rgba(236,222,183,0.12);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.6;
   color: var(--light2);
 }
@@ -39,10 +38,9 @@
   display: inline-block;
   padding: 2px 8px;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: var(--pw-font-size-xs);
   font-weight: bold;
   color: white;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
   margin: 0 2px;
   vertical-align: middle;
 }
@@ -54,10 +52,9 @@
   width: 42px !important;
   height: 42px !important;
   border-radius: 8px !important;
-  font-size: 10px !important;
+  font-size: var(--pw-font-size-xs) !important;
   font-weight: bold !important;
   color: white !important;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
   flex: none !important;
 }
 
@@ -68,10 +65,9 @@
   align-items: center !important;
   justify-content: center !important;
   border-radius: 8px !important;
-  font-size: 10px !important;
+  font-size: var(--pw-font-size-xs) !important;
   font-weight: bold !important;
   color: white !important;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
   flex: none !important;
   background: inherit !important;
 }
@@ -98,7 +94,7 @@
 }
 
 .dict-entry .type-badge.type-fighting {
-  background: #D3425F !important;
+  background: var(--pw-accent-danger) !important;
 }
 
 .dict-entry .type-badge.type-poison {
@@ -152,7 +148,7 @@
 
 @media (max-width: 420px) {
 .hinfo {
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 }
@@ -161,7 +157,7 @@
 body.mobile-mode #header .hinfo {
   gap: 5px;
   white-space: nowrap;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 }
@@ -179,7 +175,7 @@ body.mobile-mode #header .hinfo {
   display:flex;
   justify-content:space-between;
   align-items:center;
-  background:var(--dark2);
+  background:var(--pw-bg-header);
   padding:8px 12px;
   border-radius:8px;
   margin-bottom:10px;
@@ -188,30 +184,36 @@ body.mobile-mode #header .hinfo {
 .pw-info-value-green {
   color:var(--green);
   font-weight:bold;
-  font-size: 15px;
+  font-size: var(--pw-font-size-xl);
 }
 
+/* A dictionary cell is the catalogue .row: sprite tile, name, one quiet state line.
+   The four-pixel type stripe belonged to the old framed card; the sheet carries the type. */
 .dict-grid {
   display:grid;
-  grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
-  gap:10px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap:6px;
 }
 
 .dict-entry {
   display:flex;
   align-items:center;
   gap:10px;
-  background:rgba(0,0,0,.22);
-  border:1px solid var(--dark3);
-  border-left:4px solid var(--type-color,var(--dark3));
-  border-radius:9px;
-  padding:9px;
+  padding:9px 10px;
+  background: color-mix(in srgb, var(--pw-bg-surface) 60%, var(--pw-bg-header));
+  border:1px solid var(--pw-border-color);
+  border-radius:8px;
   cursor:pointer;
-  min-height:60px;
+  min-height:0;
+  text-align:left;
+}
+
+.dict-entry:hover {
+  border-color: var(--pw-text-secondary);
 }
 
 .dict-entry.owned {
-  border-color:rgba(96,190,88,.65);
+  border-color: color-mix(in srgb, var(--success, #60be58) 55%, var(--pw-border-color));
 }
 
 .dict-entry-icon {
@@ -220,27 +222,40 @@ body.mobile-mode #header .hinfo {
   display:flex;
   align-items:center;
   justify-content:center;
-  background:var(--dark1);
+  background:var(--pw-bg-sprite);
   border-radius:8px;
-  flex:none;
+  flex:0 0 var(--pw-item-icon-sm);
+  overflow:hidden;
+}
+
+.dict-entry-text {
+  display:flex;
+  flex-direction:column;
+  gap:1px;
+  min-width:0;
 }
 
 .dict-entry b {
   display:block;
-  font-size:13px;
-  color:var(--light2);
+  font-size: var(--pw-font-size-md);
+  font-weight:600;
+  color:var(--pw-text-primary);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 .dict-entry span {
-  color:var(--light1);
-  font-size:11px;
+  color:var(--pw-text-secondary);
+  font-size: var(--pw-font-size-sm);
 }
 
+/* The information block of the sheet keeps the header surface of every catalogue card. */
 .dict-info-block {
-  background:rgba(0,0,0,.22);
-  border:1px solid var(--dark3);
-  border-radius:10px;
-  padding:12px;
+  background: var(--pw-bg-header);
+  border: 1px solid var(--pw-border-color);
+  border-radius: 10px;
+  padding: 10px;
 }
 
 .dict-info-title {
@@ -260,25 +275,27 @@ body.mobile-mode #header .hinfo {
   border:1px solid var(--dark3);
   border-radius:999px;
   padding:4px 8px;
-  font-size:12px;
+  font-size: var(--pw-font-size-md);
   cursor:pointer;
 }
 
 .dict-muted {
   color:var(--light1);
-  font-size:12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .pw-info-stat-cards.pw-dex-stats {
   grid-template-columns: repeat(3, 1fr);
 }
 
+/* The filter band of the dictionary sits on the page like every other filter row: no second
+   surface behind it, one hairline under it. */
 .dict-toolbar {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: var(--dark2);
-  border-bottom: 1px solid var(--dark3);
+  background: var(--pw-bg-page);
+  border-bottom: 1px solid var(--pw-border-color);
   padding: 8px 0 10px;
   margin-bottom: 12px;
   display: flex;
@@ -288,18 +305,18 @@ body.mobile-mode #header .hinfo {
 
 .dict-search {
   width: 100%;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   color: var(--light2);
   border: 1px solid var(--dark3);
   border-radius: 8px;
   padding: 9px 12px;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .dict-entry small {
   display: block;
   color: var(--light1);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   margin-top: 3px;
   line-height: 1.25;
 }
@@ -332,11 +349,12 @@ body.mobile-mode #header .hinfo {
 }
 
 .pw-src-line {
-  font-size:11.5px;
-  color:var(--light1);
-  background:var(--dark3);
-  border-radius:6px;
-  padding:5px 9px;
+  font-size: var(--pw-font-size-sm);
+  color: var(--pw-text-secondary);
+  background: var(--pw-bg-header);
+  border: 1px solid var(--pw-border-color);
+  border-radius: 8px;
+  padding: 4px 8px;
 }
 
 .dict-chip-line {
@@ -349,7 +367,7 @@ body.mobile-mode #header .hinfo {
 
 .dict-chip-line > b {
   color:var(--light2);
-  font-size:11px;
+  font-size: var(--pw-font-size-sm);
   min-width:86px;
 }
 
@@ -376,7 +394,7 @@ body.mobile-mode #header .hinfo {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--dark2);
+  background: var(--pw-bg-header);
   padding: 8px 12px;
   border-radius: 8px;
   margin-bottom: 10px;
@@ -384,7 +402,7 @@ body.mobile-mode #header .hinfo {
 
 .pw-info-label {
   color: var(--light1);
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .pw-info-value {
@@ -395,7 +413,7 @@ body.mobile-mode #header .hinfo {
 .pw-info-value-green {
   color: var(--green);
   font-weight: bold;
-  font-size: 15px;
+  font-size: var(--pw-font-size-xl);
 }
 
 .pw-info-row {
@@ -410,15 +428,13 @@ body.mobile-mode #header .hinfo {
 .pw-modal-header .pw-info-name {
   font-size: var(--pw-header-title-size);
   font-weight: 700;
-  letter-spacing: 0.4px;
   line-height: 1.15;
   color: var(--light2);
 }
 
-
 /* The header's optional subtitle stays one step down, never larger. */
 .pw-modal-header .pw-info-head-text > .pw-text-sm {
-  font-size: 11.5px;
+  font-size: var(--pw-font-size-sm);
   font-weight: 700;
   line-height: 1.2;
 }
@@ -456,9 +472,8 @@ body.mobile-mode #header .hinfo {
 }
 
 .pw-info-name {
-  font-size: 15px;
-  font-weight: 900;
-  letter-spacing: 0.4px;
+  font-size: var(--pw-font-size-xl);
+  font-weight: 700;
   color: var(--light2);
   line-height: 1.15;
   overflow: hidden;
@@ -482,7 +497,7 @@ body.mobile-mode #header .hinfo {
 }
 
 .pw-info-section-body {
-  font-size: 12.5px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.55;
   color: var(--light2);
 }
@@ -495,30 +510,14 @@ body.mobile-mode #header .hinfo {
   min-width: 130px;
 }
 
-
-/* NB: .save-slot is EXCLUDED — save cards carry their own themed background (save-bg-classic/emerald/…) which must stay visible in the settings preview as in the saves menu. */
-.dict-entry {
-  background: rgba(0, 0, 0, 0.28) !important;
-  border: 1px solid var(--pw-border) !important;
-  color: var(--light2) !important;
-}
-
-.dict-entry:hover {
-  background: rgba(236, 222, 183, 0.15) !important;
-  border-color: var(--light2) !important;
-  color: var(--light2) !important;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
-}
-
-.dict-entry b, .pw-info-name {
-  color: var(--light2) !important;
+/* The cell keeps the grammar declared above; only the information sheet is re-inked here. */
+.pw-info-name {
+  color: var(--pw-text-primary) !important;
   font-weight: 700;
 }
 
-
 /* 3. Subtitles, descriptions, stock, and secondary text always readable gold (#c9bc8a) Never allow --dark3 text on dark backgrounds */
-.dict-desc, .dict-entry span, .pw-info-value, .pw-src-line, .dict-muted {
+.dict-desc, .pw-info-value, .pw-src-line, .dict-muted {
   color: #c9bc8a !important;
 }
 
@@ -527,7 +526,6 @@ body.mobile-mode #header .hinfo {
   border: 1px solid var(--pw-border) !important;
   color: var(--light2) !important;
 }
-
 
 /* Light background active buttons MUST use dark text (#36342F) */
 .dict-chip.active {
@@ -571,7 +569,7 @@ body.mobile-mode #header .hinfo {
 
 @media (max-width: 850px), (pointer: coarse) {
 #header .hinfo {
-  font-size: 11px !important;
+  font-size: var(--pw-font-size-sm) !important;
   white-space: nowrap !important;
 }
 
@@ -581,7 +579,7 @@ body.mobile-mode #header .hinfo {
   gap: 6px !important;
   /* padding comes from the shared toolbar band (components/ui-input.css). */
   padding: 6px 10px !important;
-  background: var(--dark2) !important;
+  background: var(--pw-bg-header) !important;
   border-radius: 12px !important;
   border: 1px solid var(--dark3) !important;
   position: relative;
@@ -624,74 +622,13 @@ body.mobile-mode #header .hinfo {
   width: 100%;
 }
 
-.dict-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
-  gap: 10px;
-  width: 100%;
-}
-
-.dict-entry {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid var(--dark3);
-  border-left: 4px solid var(--type-color, var(--dark3));
-  border-radius: 9px;
-  padding: 9px;
-  cursor: pointer;
-  min-height: 60px;
-  text-align: left;
-  font: inherit;
-  color: inherit;
-  min-width: 0;
-}
-
-.dict-entry:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: var(--light2);
-}
-
-.dict-entry.owned {
-  border-color: rgba(96, 190, 88, 0.65);
-}
-
-.dict-entry-icon {
-  width: var(--pw-item-icon-sm);
-  height: var(--pw-item-icon-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--dark1);
-  border-radius: 8px;
-  flex: none;
-}
-
+/* The remaining pieces of the cell that the row grammar above does not state. */
 .dict-entry-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
   flex: 1 1 auto;
 }
 
-.dict-entry b {
-  display: block;
-  font-size: 13px;
-  color: var(--light2);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.dict-entry span {
-  color: var(--light1);
-  font-size: 11px;
-}
-
 .dict-entry .type-badge {
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight: 700;
   padding: 4px 6px;
   border-radius: 4px;
@@ -732,7 +669,7 @@ body.mobile-mode #header .hinfo {
 }
 
 .pw-info-icon .type-badge {
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   padding: 6px 10px;
   font-weight: 800;
 }
@@ -745,9 +682,8 @@ body.mobile-mode #header .hinfo {
 }
 
 .pw-info-name {
-  font-size: 16px;
-  font-weight: 900;
-  letter-spacing: 0.4px;
+  font-size: var(--pw-font-size-2xl);
+  font-weight: 700;
   color: var(--light2);
   line-height: 1.2;
 }
@@ -768,7 +704,7 @@ body.mobile-mode #header .hinfo {
 }
 
 .pw-info-section-body {
-  font-size: 12.5px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.55;
   color: var(--light2);
 }
@@ -777,7 +713,7 @@ body.mobile-mode #header .hinfo {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   padding: 8px 12px;
   border-radius: 8px;
   border: 1px solid var(--dark3);
@@ -792,9 +728,9 @@ body.mobile-mode #header .hinfo {
 }
 
 .pw-src-line {
-  font-size: 11.5px;
+  font-size: var(--pw-font-size-sm);
   color: var(--light1);
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   border-radius: 6px;
   padding: 5px 9px;
 }
@@ -808,7 +744,7 @@ body.mobile-mode #header .hinfo {
 
 .dict-chip-line > b {
   color: var(--light2);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 .dict-chip-list {
@@ -824,7 +760,7 @@ body.mobile-mode #header .hinfo {
   border: 1px solid var(--dark3);
   border-radius: 999px;
   padding: 4px 8px;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   color: var(--light2);
 }
 
@@ -834,7 +770,7 @@ body.mobile-mode #header .hinfo {
 
 .dict-muted {
   color: var(--light1);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .pw-info-actions {
@@ -861,7 +797,7 @@ body.mobile-mode #header .hinfo {
   align-items: center !important;
   justify-content: center !important;
   gap: 4px !important;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   border: 1px solid var(--dark3);
   border-radius: 8px;
   padding: 8px 12px;
@@ -869,12 +805,12 @@ body.mobile-mode #header .hinfo {
 }
 
 .pw-info-stat-cards .pw-text-sm {
-  font-size: 11.5px;
+  font-size: var(--pw-font-size-sm);
   color: var(--light1);
 }
 
 .pw-info-stat-cards .pw-text-lg {
-  font-size: 16px;
+  font-size: var(--pw-font-size-2xl);
   font-weight: 800;
   color: var(--light2);
 }
@@ -905,9 +841,9 @@ body.mobile-mode #header .hinfo {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   color: var(--light1);
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   border: 1px solid var(--dark3);
   border-radius: 6px;
   padding: 6px 10px;

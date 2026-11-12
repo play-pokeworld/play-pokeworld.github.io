@@ -122,7 +122,7 @@ select,input[type=text]{background:#1E1E24;border:1px solid #2E2E36;border-radiu
 .topb .pokeball{width:36px;height:36px;border-radius:50%;background:var(--pw-accent);
   display:flex;align-items:center;justify-content:center;flex:0 0 36px;box-shadow:0 0 0 3px color-mix(in srgb,var(--pw-accent) 35%,transparent)}
 .topb .brand{font-weight:800;font-size:15px;letter-spacing:.3px}
-.topb .meta{margin-left:auto;font-size:12px;color:var(--pw-text-secondary)}
+.topb .topacts{margin-left:auto}
 .topb .gear{width:36px;height:36px;border-radius:50%;border:2px solid var(--pw-border-color);
   display:flex;align-items:center;justify-content:center;color:var(--pw-text-secondary)}
 .navb{display:flex;height:64px;flex:0 0 64px;background:var(--pw-bg-header);border-top:1px solid var(--pw-border-color)}
@@ -1446,6 +1446,10 @@ select,input[type=text]{background:#1E1E24;border:1px solid #2E2E36;border-radiu
   .moneyrow.four{grid-template-columns:repeat(2,1fr)}
   .cards{grid-template-columns:repeat(auto-fill,minmax(88px,1fr))}
   .segx{grid-template-columns:repeat(auto-fit,minmax(78px,1fr))}
+  /* v31 — en 390, un selecteur a six pages (Atoll) ne tient pas sur une ligne :
+     le libelle passe a la ligne au lieu d'etre coupe. */
+  .segx .s{height:auto;min-height:32px;white-space:normal;line-height:1.15;padding:3px 5px;
+    font-size:11px;text-align:center}
   .fitgrid{grid-template-columns:repeat(auto-fit,minmax(124px,1fr))}
   .colgrid{grid-template-columns:1fr}
 }
@@ -1537,7 +1541,8 @@ select,input[type=text]{background:#1E1E24;border:1px solid #2E2E36;border-radiu
    (10px), sous la barre de 48px. Il s'ouvre depuis le bouton, pas au centre. */
 .navmenu{position:absolute;left:10px;top:56px;
   width:min(624px,calc(100% - 20px));max-height:calc(100% - 64px);overflow-y:auto;scrollbar-width:none;
-  background:var(--light2);border-radius:var(--pw-window-radius);padding:10px 12px 12px;
+  /* Le panneau s'ouvre sous la barre : angles droits en haut, arrondis en bas. */
+  background:var(--light2);border-radius:0 0 var(--pw-window-radius) var(--pw-window-radius);padding:10px 12px 12px;
   box-shadow:0 18px 40px rgba(0,0,0,.5)}
 .navmenu::-webkit-scrollbar{display:none}
 .navtiles{margin-top:0}
@@ -1555,7 +1560,76 @@ select,input[type=text]{background:#1E1E24;border:1px solid #2E2E36;border-radiu
 .win-h .fs-x{width:22px;height:22px;flex:0 0 22px;margin-left:6px;display:flex;align-items:center;
   justify-content:center;border:1px solid var(--pw-border-color);border-radius:50%;
   color:var(--pw-text-secondary)}
+/* Plus de texte a droite : c'est la croix qui ferme la ligne. */
+.win-h .fs-x{margin-left:auto}
 .win-h .r + .fs-x{margin-left:8px}
+
+/* ============================================================================
+   v31 — Passe de validation du 2026-11-09
+   1. Quantite de la barre d'achat : la case carree du jeu, pas une pastille.
+   2. Badges : la grille du jeu (UIBadgeCard) — embleme reel, nom sur bandeau clair
+      pleine largeur, dresseur puis ville, verrouille = desature.
+   3. Atoll : l'en-tete et les cartes de format du jeu (AtollFullscreenPanel).
+   ============================================================================ */
+.foot .chip.qty{border-radius:7px;min-width:44px;justify-content:center;padding:2px 0}
+
+.badgegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:6px}
+.bcard{display:flex;flex-direction:column;overflow:hidden;text-align:center;
+  background:var(--pw-bg-header);border:1px solid transparent;border-radius:10px}
+.bcard.got{border-color:color-mix(in srgb,var(--c,var(--light1)) 55%,transparent)}
+.bcard .be{display:flex;align-items:center;justify-content:center;min-height:58px}
+.bcard .be img{width:40px;height:40px;object-fit:contain;filter:grayscale(1) opacity(.35)}
+.bcard.got .be img{filter:none}
+.bcard .bt{display:block;padding:3px 4px;background:var(--light2);color:var(--pw-bg-header);
+  font-weight:700;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bcard .bl{display:block;padding:0 4px;font-size:10.5px;line-height:1.45;color:var(--pw-text-secondary)}
+.bcard .bs{display:block;padding:1px 4px 5px;font-size:10.5px;font-weight:700;color:var(--pw-text-secondary)}
+.bcard.got .bs{color:var(--ok)}
+
+.atoll-hero{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;padding:2px 0 10px}
+.atoll-hero h2{margin:0 0 4px;font-size:17px;font-weight:700;color:var(--pw-text-primary)}
+.atoll-hero p{margin:0;max-width:66ch;font-size:11.5px;line-height:1.45;color:var(--pw-text-secondary)}
+.atoll-tok{flex:0 0 auto;min-width:132px;padding:8px 14px;border-radius:10px;text-align:center;
+  background:var(--pw-bg-header);border:1px solid var(--pw-border-color)}
+.atoll-tok .v{display:block;font-size:20px;font-weight:700;color:var(--pw-text-primary)}
+.atoll-tok .l{display:block;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;
+  color:var(--pw-text-secondary)}
+.atoll-tok .s{display:block;margin-top:2px;font-size:10.5px;color:var(--pw-text-secondary)}
+.atoll-gdesc{padding:8px 10px;margin-bottom:8px;border-radius:8px;
+  background:var(--pw-bg-header);border:1px solid var(--pw-border-color)}
+.atoll-gdesc b{display:block;font-size:12px;color:var(--pw-text-primary)}
+.atoll-gdesc p{margin:2px 0 0;font-size:11px;line-height:1.45;color:var(--pw-text-secondary)}
+.atoll-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.atoll-modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:10px}
+.amode{display:flex;flex-direction:column;gap:5px;padding:10px;border-radius:10px;
+  background:var(--pw-bg-header);border:1px solid var(--pw-border-color)}
+.amode.rank-e{border-color:rgba(184,199,217,.45)}
+.amode.rank-d{border-color:rgba(147,212,123,.45)}
+.amode.rank-c{border-color:rgba(99,199,255,.45)}
+.amode.rank-b{border-color:rgba(217,160,232,.5)}
+.amode.rank-a{border-color:rgba(242,217,78,.52)}
+.amode.rank-s{border-color:rgba(255,138,61,.58)}
+.amode.rank-free{border-color:rgba(255,139,160,.58)}
+.arank{align-self:flex-start;display:inline-flex;padding:2px 10px;border-radius:999px;font-weight:700;
+  font-size:10.5px;border:1px solid currentColor;background:rgba(0,0,0,.28)}
+.arank.rank-e{color:#B8C7D9}.arank.rank-d{color:#93D47B}.arank.rank-c{color:#63C7FF}
+.arank.rank-b{color:#D9A0E8}.arank.rank-a{color:#F2D94E}.arank.rank-s{color:#FF8A3D}
+.arank.rank-free{color:#FF8BA0}
+.atitle{font-size:12.5px;font-weight:600;color:var(--pw-text-primary)}
+.arule{font-size:11px;color:var(--pw-text-secondary)}
+.albl{font-size:11px;color:var(--pw-text-secondary)}
+.achips{display:flex;flex-wrap:wrap;gap:4px}
+.achip{width:56px;height:56px;display:flex;align-items:center;justify-content:center;
+  border-radius:9px;background:var(--pw-bg-sprite);border:1px solid var(--pw-border-color)}
+.adisc{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;
+  background:color-mix(in srgb,var(--light1) 16%,transparent)}
+.adisc img{width:38px;height:38px;object-fit:contain;image-rendering:pixelated}
+.aban{display:flex;flex-wrap:wrap;gap:4px;padding-top:6px;margin-top:2px;
+  border-top:1px dashed rgba(255,138,61,.35)}
+.aban .achip{border-color:rgba(255,138,61,.5)}
+.acta{align-self:stretch;margin-top:auto;padding:7px 0;border-radius:7px;text-align:center;
+  font-size:12px;font-weight:700;color:var(--pw-text-primary);
+  background:var(--pw-bg-surface);border:1px solid var(--pw-border-color)}
 </style>
 </head>
 <body>
@@ -1928,11 +2002,19 @@ const BagRow = (it) => `<div class="bagrow"><div class="ic"><img src="${item(it[
 const BagList = (items) => `<div class="baglist">${items.map(BagRow).join('')}</div>`;
 
 /* Descriptions réelles : src/localization/fr/starter.js */
+/* Les trois starters de Johto : seuls le nom et le numero sont affiches par la fiche du starter. */
+POKEMON.chikorita = { n: 'Germignon', num: '#152' };
+POKEMON.cyndaquil = { n: 'Héricendre', num: '#155' };
+POKEMON.totodile = { n: 'Kaiminus', num: '#158' };
+
 const STARTER_DESC = {
   bulbizarre: 'Plante/Poison - Solide défensivement',
   salamèche: 'Feu - Puissance offensive élevée',
   carapuce: 'Eau - Grande endurance',
   pikachu: 'Électrique - Rapide et imprévisible',
+  chikorita: 'Plante - Calme et robuste',
+  cyndaquil: 'Feu - Rapide et explosif',
+  totodile: 'Eau - Mâchoires puissantes',
   roucool: 'Normal/Vol - Facile à prendre en main'
 };
 
@@ -2024,10 +2106,9 @@ const Cell = (id, opt = {}) => {
 const Empty = (text, icon = 'info') => `<div class="empty">${svg(icon, 26)}<div>${esc(text)}</div></div>`;
 
 /* ---- conteneurs ---- */
-const Win = ({title, icon = '', right = '', acts = ['?'], body, cls = ''}) =>
+const Win = ({title, icon = '', acts = ['?'], body, cls = ''}) =>
   `<section class="win ${cls}">
      <header class="win-h">${icon ? svg(icon, 17) : ''}<span>${esc(title)}</span>
-       ${right ? `<span class="r">${right}</span>` : ''}
        ${acts.length ? `<span class="acts">${acts.map(a => a === '?' ? HelpBtn() : `<button class="hb" title="${esc(a === 'legend' ? 'Légende' : a)}">${svg(a, 12)}</button>`).join('')}</span>` : ''}
      </header>
      <div class="win-b">${body}</div>
@@ -2054,9 +2135,11 @@ const Confirm = ({title, text, sub = '', icon = 'info', okLabel = 'Confirmer', c
     actions: [{label: cancelLabel, kind: 'ghost'}, {label: okLabel, kind: danger ? 'danger' : 'p'}],
     className});
 
-const TopBar = ({meta = 'Badges : 0 / 8', locked = false, navOpen = false} = {}) =>
+/* The bar carries the brand and the settings only: no counter and no name on its right (user
+   decision, applied to the game header as well). */
+const TopBar = ({locked = false, navOpen = false} = {}) =>
   `<div class="topb ${locked ? 'dim' : ''}"><div class="pokeball ${navOpen ? 'on' : ''}">${pokeball}</div>
-     <div class="brand">PokéWorld</div><div class="meta">${esc(meta)}</div>
+     <div class="brand">PokéWorld</div>
      <div class="topacts"><div class="gear">${svg('cog', 19)}</div></div></div>`;
 
 const NAV_ITEMS = [
@@ -2075,10 +2158,9 @@ const NAV = [['lieu','Lieu','home'],['carte','Carte','map'],['equipe','Équipe',
 const NavBar = (active) =>
   `<nav class="navb">${NAV.map(([id, label, icon]) => `<div class="t ${id === active ? 'on' : ''}">${svg(icon, 20)}<span>${label}</span></div>`).join('')}</nav>`;
 
-const Fullscreen = ({title, tabs = [], activeTab = 0, right = '', body}) =>
+const Fullscreen = ({title, tabs = [], activeTab = 0, body}) =>
   `<section class="win fs">
      <header class="win-h"><span>${esc(title)}</span>
-       ${right ? `<span class="r">${esc(right)}</span>` : ''}
        <span class="fs-x">${svg('x', 13)}</span></header>
      ${tabs.length ? Seg(tabs, activeTab) : ''}
      <div class="win-b fs-b">${body}</div>
@@ -2649,7 +2731,7 @@ const shopBody = () => `
   </div>
   <div class="foot">
     ${Btn({label: 'Reset', kind: 'ghost', size: 'sm'})}
-    <span class="chip">1</span>
+    <span class="chip qty">1</span>
     ${Btn({label: '+10', kind: 'ghost', size: 'sm'})}
     ${Btn({label: '+100', kind: 'ghost', size: 'sm'})}
     ${Btn({label: 'Max', kind: 'ghost', size: 'sm'})}
@@ -2672,7 +2754,7 @@ const marketBody = () => `
       sel: section === 0 && i === 0})).join('')}</div>`).join('')}
   <div class="foot">
     ${Btn({label: 'Reset', kind: 'ghost', size: 'sm'})}
-    <span class="chip">1</span>
+    <span class="chip qty">1</span>
     ${Btn({label: '+10', kind: 'ghost', size: 'sm'})}
     ${Btn({label: '+100', kind: 'ghost', size: 'sm'})}
     ${Btn({label: 'Max', kind: 'ghost', size: 'sm'})}
@@ -2762,13 +2844,38 @@ const atollBody = () => `${Seg(ATOLL_TABS, 0)}
       <span>${LEGEND_FRAGMENTS[0]} / ${LEGEND_FRAGMENTS[1]}</span></div></div>
     ${Btn({label: 'Choisir', kind: 'p', size: 'sm'})}</div></div>`;
 
+/* Une page de centre de combat : en-tete du jeu, description du format, rotation,
+   puis une carte par format (rang, regle, equipe de la rotation, legendaires bannis). */
+const atollFacilityBody = (key) => {
+  const fac = ATOLL_FACILITY[key];
+  const chip = (id) => `<span class="achip"><span class="adisc"><img src="${spr(id)}" alt=""></span></span>`;
+  return `${Seg(ATOLL_TABS, ATOLL_TABS.indexOf(fac.title))}
+  <div class="atoll-hero"><div>
+    <h2>${esc(ATOLL_HERO_TITLE)}</h2>
+    <p>${esc(ATOLL_HERO_TEXT)}</p></div>
+    <div class="atoll-tok"><span class="v">${ATOLL_TOKENS[0]}</span>
+      <span class="l">Jetons Atoll</span>
+      <span class="s">Série ${ATOLL_TOKENS[1]} · Record ${ATOLL_TOKENS[2]}</span></div></div>
+  <div class="atoll-gdesc"><b>${esc(fac.title)}</b><p>${esc(fac.desc)}</p></div>
+  <div class="atoll-meta">${ATOLL_ROTATION.map((m) => Chip(m)).join('')}</div>
+  <div class="atoll-modes">${fac.modes.map((mode) => `<div class="amode ${mode.cls}">
+    <span class="arank ${mode.cls}">${esc(mode.rank)}</span>
+    <div class="atitle">${esc(mode.title)}</div>
+    <div class="arule">${esc(mode.rule)}</div>
+    <div class="albl">${esc(mode.label)}</div>
+    <div class="achips">${mode.species.map((id) => chip(id)).join('')}</div>
+    ${mode.banned.length ? `<div class="albl">Légendaires bannis cette rotation :</div>
+      <div class="aban">${mode.banned.map((id) => chip(id)).join('')}</div>` : ''}
+    <div class="acta">Combattre</div></div>`).join('')}</div>`;
+};
+
 const atollShopBody = () => `${Seg(ATOLL_TABS, 5)}
   ${MoneyPanel()}
   <div class="shoplist">${ATOLL_SHOP_ITEMS.map(([name, price, icon, sub], i) => ShopItem({
     img: `<img src="${item(icon)}" alt="">`, name, price, icon: 'star', sub, sel: i === 0})).join('')}</div>
   <div class="foot">
     ${Btn({label: 'Reset', kind: 'ghost', size: 'sm'})}
-    <span class="chip">1</span>
+    <span class="chip qty">1</span>
     ${Btn({label: '+10', kind: 'ghost', size: 'sm'})}
     ${Btn({label: '+100', kind: 'ghost', size: 'sm'})}
     ${Btn({label: 'Max', kind: 'ghost', size: 'sm'})}
@@ -2795,23 +2902,92 @@ const guideBody = () => `<div class="narrow">
   <div style="display:flex;gap:6px;margin-bottom:9px">${Btn({ label: 'Activer les tutos', kind: 'p' })}${Btn({ label: 'Désactiver', kind: 'ghost' })}</div>
   ${PSecs(GUIDE_SECTIONS)}</div>`;
 
+/* ---- Badges : les 24 badges et les 3 ligues du jeu (BadgesPanel), embleme reel. ---- */
+const BADGE_ROWS = [
+  ['Badge Roche', 'Pierre', 'Argenta', 'Boulder.svg', '#998b7a', true],
+  ['Badge Cascade', 'Ondine', 'Azuria', 'Cascade.svg', '#3b92d4', true],
+  ['Badge Foudre', 'Major Bob', 'Carmin sur Mer', 'Thunder.svg', '#e5b824', false],
+  ['Badge Prisme', 'Erika', 'Céladopole', 'Rainbow.svg', '#4caf50', false],
+  ['Badge Âme', 'Koga', 'Parmanie', 'Soul.svg', '#9c27b0', false],
+  ['Badge Marais', 'Morgane', 'Safrania', 'Marsh.svg', '#e91e63', false],
+  ['Badge Volcan', 'Auguste', 'Cramois\'île', 'Volcano.svg', '#f44336', false],
+  ['Badge Terre', 'Giovanni', 'Jadielle', 'Earth.svg', '#795548', false],
+  ['Badge Zéphyr', 'Albert', 'Mauville', 'Zephyr.svg', '#80deea', false],
+  ['Badge Essaim', 'Hector', 'Écorcia', 'Hive.svg', '#8bc34a', false],
+  ['Badge Plaine', 'Blanche', 'Doublonville', 'Plain.svg', '#f06292', false],
+  ['Badge Brume', 'Mortimer', 'Rosalia', 'Fog.svg', '#7e57c2', false],
+  ['Badge Choc', 'Chuck', 'Irisia', 'Storm.svg', '#ff7043', false],
+  ['Badge Minéral', 'Jasmine', 'Oliville', 'Mineral.svg', '#b0bec5', false],
+  ['Badge Glacier', 'Frédo', 'Acajou', 'Glacier.svg', '#4dd0e1', false],
+  ['Badge Lever', 'Sandra', 'Ébénelle', 'Rising.svg', '#5c6bc0', false],
+  ['Badge Roche', 'Roxanne', 'Mérouville', 'Stone.svg', '#a1887f', false],
+  ['Badge Poing', 'Bastien', 'Myokara', 'Knuckle.svg', '#ff8a65', false],
+  ['Badge Dynamo', 'Voltère', 'Lavandia', 'Dynamo.svg', '#ffd54f', false],
+  ['Badge Chaleur', 'Adrianna', 'Vermilava', 'Heat.svg', '#ff5722', false],
+  ['Badge Équilibre', 'Norman', 'Clémenti-Ville', 'Balance.svg', '#e0e0e0', false],
+  ['Badge Plume', 'Alizée', 'Cimmery', 'Feather.svg', '#81d4fa', false],
+  ['Badge Esprit', 'Lévy & Tatia', 'Algatia', 'Mind.svg', '#ce93d8', false],
+  ['Badge Pluie', 'Juan', 'Atalanopolis', 'Rain.svg', '#29b6f6', false]
+];
+const LEAGUE_ROWS = [
+  ['Ligue Kanto', 'Plateau Indigo', 'Non vaincue', 'Champion_Stamp.svg', '#3949ab', false],
+  ['Ligue Johto', 'Plateau Indigo', 'Non vaincue', 'Champion_Stamp.svg', '#00897b', false],
+  ['Ligue Hoenn', 'Ligue Pokémon de Hoenn', 'Non vaincue', 'Champion_Stamp.svg', '#d81b60', false]
+];
+
+/* ---- Atoll : les quatre centres de combat, releves dans le jeu (AtollFullscreenPanel). ---- */
+const ATOLL_HERO_TITLE = 'Atoll de Combat';
+const ATOLL_HERO_TEXT = 'L’endgame de PokéWorld : rotation toutes les 12 h avec minuteur visible, 6 équipes tournantes par format en cycle de 3 jours à graine datée, bans de légendaires rotatifs et Usine à équipe prêtée. Le vrai défi.';
+const ATOLL_ROTATION = ['Rotation dans 01:49:25', 'Équipe 6/6 · Jour 3/3 du cycle'];
+const ATOLL_FACILITY = {
+  tour: { title: 'Tour Combat', desc: 'Séries classiques par rang (E→S) ou libre. 6 équipes tournantes par rang, renouvelées toutes les 12 h. La Tour S bannit 4 légendaires par rotation — la Tour Libre, jamais : c’est leur refuge.', modes: [
+    { rank: 'Rang max E', cls: 'rank-badge', title: 'Tour Combat — Rang E max', rule: 'Nv.100 · 4 Pokémon · +8 jetons', label: 'Équipe adverse de la rotation :', species: ['caterpie', 'sunkern', 'kakuna', 'metapod'], banned: [] },
+    { rank: 'Rang max D', cls: 'rank-badge', title: 'Tour Combat — Rang D max', rule: 'Nv.100 · 4 Pokémon · +12 jetons', label: 'Équipe adverse de la rotation :', species: ['swinub', 'tentacool', 'weedle', 'geodude'], banned: [] },
+    { rank: 'Rang max C', cls: 'rank-badge', title: 'Tour Combat — Rang C max', rule: 'Nv.100 · 5 Pokémon · +18 jetons', label: 'Équipe adverse de la rotation :', species: ['furret', 'hypno', 'seaking', 'seadra', 'marowak'], banned: [] },
+    { rank: 'Rang max B', cls: 'rank-badge', title: 'Tour Combat — Rang B max', rule: 'Nv.100 · 6 Pokémon · +26 jetons', label: 'Équipe adverse de la rotation :', species: ['pidgeot', 'octillery', 'tentacruel', 'gengar', 'vileplume', 'alakazam'], banned: [] },
+    { rank: 'Rang max A', cls: 'rank-badge', title: 'Tour Combat — Rang A max', rule: 'Nv.100 · 6 Pokémon · +38 jetons', label: 'Équipe adverse de la rotation :', species: ['gyarados', 'rhydon', 'lapras', 'scyther', 'kangaskhan', 'espeon'], banned: [] },
+    { rank: 'Rang max S', cls: 'rank-badge', title: 'Tour Combat — Rang S max', rule: 'Nv.100 · 6 Pokémon · +55 jetons', label: 'Équipe adverse de la rotation :', species: ['houndoom', 'ho-oh', 'umbreon', 'gengar', 'exeggutor', 'alakazam', 'articuno', 'mew', 'raikou', 'lugia'], banned: [] },
+    { rank: 'Libre', cls: 'rank-badge', title: 'Tour Combat — Libre', rule: 'Nv.100 · 6 Pokémon · +70 jetons', label: 'Équipe adverse de la rotation :', species: ['ho-oh', 'dragonite', 'alakazam', 'lapras', 'houndoom', 'arcanine'], banned: [] },
+  ] },
+  usine: { title: 'Usine Combat', desc: 'Équipe PRÊTÉE imposée, en série : chaque victoire soigne puis RÉORGANISE l’ordre de tes Pokémon ET de leurs attaques. L’adversaire grimpe la table de rotation (+25 % de jetons par palier). La défaite termine la série.', modes: [
+    { rank: 'Rang max C', cls: 'rank-badge', title: 'Usine Combat — Standard', rule: 'Nv.100 · 4 prêtés · +22 jetons de base', label: 'Équipe prêtée de la rotation :', species: ['ditto', 'umbreon', 'ursaring', 'sudowoodo'], banned: [] },
+    { rank: 'Rang max A', cls: 'rank-badge', title: 'Usine Combat — Expert', rule: 'Nv.100 · 5 prêtés · +42 jetons de base', label: 'Équipe prêtée de la rotation :', species: ['gyarados', 'lapras', 'snorlax', 'alakazam', 'ampharos'], banned: [] },
+  ] },
+  arene: { title: 'Arène Combat', desc: 'Formats courts à restriction (3 Pokémon, sans objets, pression des types) contre des équipes tournantes à graine datée.', modes: [
+    { rank: 'Rang max B', cls: 'rank-badge', title: 'Arène Combat — 3 Pokémon', rule: 'Nv.100 · 3 Pokémon · +24 jetons', label: 'Équipe adverse de la rotation :', species: ['ampharos', 'gengar', 'umbreon'], banned: [] },
+    { rank: 'Rang max A', cls: 'rank-badge', title: 'Arène Combat — Sans confort', rule: 'Nv.100 · 3 Pokémon · +30 jetons', label: 'Équipe adverse de la rotation :', species: ['muk', 'gyarados', 'umbreon'], banned: [] },
+    { rank: 'Rang max A', cls: 'rank-badge', title: 'Arène Combat — Pression type', rule: 'Nv.100 · 3 Pokémon · +34 jetons', label: 'Équipe adverse de la rotation :', species: ['gengar', 'tentacruel', 'scizor'], banned: [] },
+  ] },
+  dome: { title: 'Dôme Combat', desc: 'Formats longs de type tournoi, grosses récompenses. La Finale bannit 3 légendaires par rotation.', modes: [
+    { rank: 'Rang max A', cls: 'rank-badge', title: 'Dôme Combat — Demi-tournoi', rule: 'Nv.100 · 6 Pokémon · +42 jetons', label: 'Équipe adverse de la rotation :', species: ['umbreon', 'scizor', 'houndoom', 'alakazam', 'ampharos', 'forretress'], banned: [] },
+    { rank: 'Rang max S', cls: 'rank-badge', title: 'Dôme Combat — Finale', rule: 'Nv.100 · 6 Pokémon · +85 jetons', label: 'Équipe adverse de la rotation :', species: ['tyranitar', 'exeggutor', 'kingdra', 'steelix', 'ampharos', 'rhydon'], banned: ['articuno', 'zapdos', 'mew'] },
+  ] },
+};
+
+const BadgeCard = ([title, line1, line2, file, color, got]) => `
+  <div class="bcard ${got ? 'got' : ''}" style="--c:${color}">
+    <div class="be"><img src="${A}badges/${file}" alt=""></div>
+    <div class="bt">${esc(title)}</div>
+    <div class="bl">${esc(line1)}</div>
+    <div class="bl">${esc(line2)}</div>
+  </div>`;
+const LeagueCard = ([title, place, status, file, color, got]) => `
+  <div class="bcard ${got ? 'got' : ''}" style="--c:${color}">
+    <div class="be"><img src="${A}badges/${file}" alt=""></div>
+    <div class="bt">${esc(title)}</div>
+    <div class="bl">${esc(place)}</div>
+    <div class="bs">${esc(status)}</div>
+  </div>`;
+
+/* La grille est celle du jeu : 24 badges puis 3 ligues, chacune sous son compteur. */
 const badgesBody = () => {
-  const got = GYM_BADGES.filter(gym => gym[4]).length;
-  const won = LEAGUES.filter(league => league[2]).length;
-  return `${Seg(['Kanto', 'Johto', 'Hoenn', 'Tous'], 0)}
-  <div class="cards">${GYM_BADGES.map(([name, trainer, place, color, owned]) => `<div class="gcell ${owned ? '' : 'miss'}">
-    <span class="ic" style="color:${color}">${svg('trophy', 18)}</span>
-    <span class="nm">${esc(name)}</span>
-    <span class="sub">${esc(trainer)} · ${esc(place)}</span>
-    <span class="sub" style="color:${owned ? 'var(--ok)' : 'var(--pw-text-secondary)'};font-weight:700">${owned ? 'Obtenu' : 'À obtenir'}</span>
-  </div>`).join('')}</div>
-  <div class="seclbl">Ligues · ${won} / ${LEAGUES.length}</div>
-  <div class="cards">${LEAGUES.map(([name, place, beaten]) => `<div class="gcell ${beaten ? '' : 'miss'}">
-    <span class="ic" style="color:${beaten ? 'var(--ok)' : 'var(--pw-accent)'}">${svg('star', 18)}</span>
-    <span class="nm">${esc(name)}</span>
-    <span class="sub">${esc(place)}</span>
-    <span class="sub" style="font-weight:700">${beaten ? 'Vaincue' : 'Non vaincue'}</span>
-  </div>`).join('')}</div>`;
+  const got = BADGE_ROWS.filter((row) => row[5]).length;
+  const won = LEAGUE_ROWS.filter((row) => row[5]).length;
+  return `${Seg(['Kanto', 'Johto', 'Hoenn', 'Tous'], 3)}
+  <div class="seclbl">${got} / ${BADGE_ROWS.length} badges</div>
+  <div class="badgegrid">${BADGE_ROWS.map(BadgeCard).join('')}</div>
+  <div class="seclbl">${won} / ${LEAGUE_ROWS.length} ligues</div>
+  <div class="badgegrid">${LEAGUE_ROWS.map(LeagueCard).join('')}</div>`;
 };
 
 const puzzlesBody = () => `
@@ -3035,14 +3211,15 @@ const facilityManageBody = (cfg) => `
 
 const pkmnInfoBody = (id = 'florizarre') => PokemonSheet(POKEMON[id], id);
 
-const starterCards = (mons, welcome = 'Bienvenue à Kanto ! Le Prof. Chen vous attend à Bourg Palette.') => `
+const starterCards = (mons, welcome = 'Bienvenue à Kanto ! Le Prof. Chen vous attend à Bourg Palette.',
+  title = 'Choisissez votre Starter !', withName = true) => `
   <div class="starter">
     <div class="stwrap">
       <div class="stwelcome">${esc(welcome)}</div>
-      <h2 class="sttitle">Choisissez votre Starter !</h2>
+      <h2 class="sttitle">${esc(title)}</h2>
       <div class="stsub">Ce Pokémon vous accompagnera tout au long de votre aventure dans cette région.</div>
-      <div class="stname"><span>Nom du dresseur</span>
-        <input value="Ash" placeholder="Ex: Red, Sacha..." aria-label="Nom du dresseur"></div>
+      ${withName ? `<div class="stname"><span>Nom du dresseur</span>
+        <input value="Ash" placeholder="Ex: Red, Sacha..." aria-label="Nom du dresseur"></div>` : ''}
       <div class="stgrid">${mons.map((m, i) => StarterCard(m, i === 0)).join('')}</div>
       <div class="stfoot">Choisissez votre starter pour commencer l’aventure.</div>
       <div class="stback">${Btn({label: 'Retour', kind: 'ghost', icon: 'back'})}</div>
@@ -3190,7 +3367,7 @@ const SCREENS = [
   {id:'lieu', group:'Fenêtres PC / onglets mobile', label:'Lieu', kind:'win', nav:'lieu', title:'Lieu', icon:'home',
    body:locationBody(), uses:['Row','Rows','MonGrid','Btn']},
   {id:'carte', group:'Fenêtres PC / onglets mobile', label:'Carte', kind:'win', nav:'carte', title:'Carte : Kanto', icon:'map',
-   right:'Région Kanto', body:mapBody(), uses:['BtnRow']},
+   body:mapBody(), uses:['BtnRow']},
   {id:'equipe', group:'Fenêtres PC / onglets mobile', label:'Équipe', kind:'win', nav:'equipe', title:'Équipe', icon:'team',
    body:teamBody(), uses:['MonBand','MoveRow','BtnRow']},
   {id:'combat', group:'Fenêtres PC / onglets mobile', label:'Combat en direct', kind:'win', nav:'combat', title:'Combat en direct', icon:'sword',
@@ -3215,48 +3392,63 @@ const SCREENS = [
    body:trainingBody(), uses:['facilityView','Prog']},
 
   /* ---- plein écran ---- */
-  {id:'sac', group:'Plein écran', label:'Sac', kind:'fs', nav:'plus', title:'Sac', icon:'bag', right:`${BAG_TOTAL} objets`,
+  {id:'sac', group:'Plein écran', label:'Sac', kind:'fs', nav:'plus', title:'Sac', icon:'bag',
    body:bagBody('Poké Balls'), uses:['Fullscreen','Seg','SearchRow','cards'],
    note:'Sources : BagPanel + BagCategories (7 onglets réels, quantité par onglet) et BagItemRow (icône, nom, description, ×n). Tri, quantité, recherche et réinitialiser comme dans le jeu.'},
 
-  {id:'boite', group:'Plein écran', label:'Boîte PC', kind:'fs', nav:'plus', title:'Système de stockage', icon:'box', right:`${DEX.length} Pokémon`,
+  {id:'boite', group:'Plein écran', label:'Boîte PC', kind:'fs', nav:'plus', title:'Système de stockage', icon:'box',
    body:boxBody(), uses:['Fullscreen','Filters','SearchRow','cards']},
-  {id:'pokedex', group:'Plein écran', label:'Pokédex', kind:'fs', nav:'plus', title:'Pokédex', icon:'dex', right:`5 / ${DEX_TOTAL} capturés`,
+  {id:'pokedex', group:'Plein écran', label:'Pokédex', kind:'fs', nav:'plus', title:'Pokédex', icon:'dex',
    body:dexBody(), uses:['Fullscreen','moneyrow','Filters','SearchRow','cards','Cell'],
    note:'Sources : PokedexPanel (Vus, Capturés, Chromatiques, progression par région, objectif Charme Chroma, filtres au format Boîte PC) + la zone de disponibilité de chaque espèce.'},
 
-  {id:'marche', group:'Plein écran', label:'Marché', kind:'fs', nav:'plus', title:'Marché', icon:'shop', right:`${MARKET_SECTIONS.flatMap(s => s[1]).length} offres`,
+  {id:'marche', group:'Plein écran', label:'Marché', kind:'fs', nav:'plus', title:'Marché', icon:'shop',
    body:marketBody(), uses:['Fullscreen','MoneyPanel','cards','foot','row'],
    note:'Sources : MarketPanel + MarketRules. Prix en points de quête, sections Starters / Fossiles / Pokémon rares / Autres, espèce non vue = ???, Poké Ball réelle du joueur, barre d’achat du ShopFooter.'},
 
-  {id:'boutique', group:'Plein écran', label:'Boutique', kind:'fs', nav:'plus', title:'Boutique', icon:'shop', right:'Boutique de Jadielle',
+  {id:'boutique', group:'Plein écran', label:'Boutique', kind:'fs', nav:'plus', title:'Boutique', icon:'shop',
    body:shopBody(), uses:['Fullscreen','MoneyPanel','cards','foot','row','Btn'],
    note:'Sources : ShopPanel + ShopItemCard (icône, nom, prix, « Sac : n ») + ShopFooter (Reset, quantité, +10, +100, Max, total, Acheter), plus l’offre à achat unique et la boutique verrouillée.'},
 
-  {id:'badges', group:'Plein écran', label:'Badges', kind:'fs', nav:'plus', title:'Badges', icon:'star', right:'2 / 8 badges',
+  {id:'badges', group:'Plein écran', label:'Badges', kind:'fs', nav:'plus', title:'Badges', icon:'star',
    body:badgesBody(), uses:['Fullscreen','Seg','cards','seclbl'],
    note:'Sources : BadgesPanel. Onglets Tous + régions, compteurs badges / ligues, cartes d’arène (badge, dresseur, ville) et cartes de Ligue.'},
 
-  {id:'dictionnaire', group:'Plein écran', label:'Dictionnaire', kind:'fs', nav:'plus', title:'Dictionnaire', icon:'book', right:`${Object.values(DICT_ENTRIES).flat().length} entrées`,
+  {id:'dictionnaire', group:'Plein écran', label:'Dictionnaire', kind:'fs', nav:'plus', title:'Dictionnaire', icon:'book',
    body:dictionaryBody(), uses:['Fullscreen','Seg','SearchRow','colgrid','row'],
    note:'Sources : DictionaryPanel + DictionaryCatalog. Trois onglets (Objets, Attaques, Talents), recherche, état possédé / non possédé, « n Pokémon connaissent cette attaque », talent débloqué + rareté.'},
 
   {id:'guide', group:'Plein écran', label:'Guide', kind:'fs', nav:'plus', title:'Guide', icon:'guide',
    body:guideBody(), uses:['Fullscreen','Row']},
-  {id:'atoll', group:'Plein écran', label:'Atoll', kind:'fs', nav:'plus', title:'Atoll', icon:'star', right:`${ATOLL_TOKENS[0]} jetons`,
+  {id:'atoll', group:'Plein écran', label:'Atoll', kind:'fs', nav:'plus', title:'Atoll', icon:'star',
    body:atollBody(), uses:['Fullscreen','Seg','row','seclbl','Prog'],
    note:'Sources : AtollFullscreenPanel. Six onglets, en-tête jetons + série / record, quatre installations, Fragments de Légende, formats avec rang et bannis, boutique en jetons.'},
 
+  {id:'atoll-tour', group:'Plein écran', label:'Atoll — Tour Combat', kind:'fs', nav:'plus',
+   title:'Atoll — Tour Combat', icon:'sword',
+   body:atollFacilityBody('tour'), uses:['Fullscreen','Seg','Chip','cards'],
+   note:'Sources : AtollFullscreenPanel, onglet Tour Combat. Sept rangs (E→S puis Libre), règle de chaque format et équipe adverse de la rotation.'},
+  {id:'atoll-usine', group:'Plein écran', label:'Atoll — Usine Combat', kind:'fs', nav:'plus',
+   title:'Atoll — Usine Combat', icon:'gear',
+   body:atollFacilityBody('usine'), uses:['Fullscreen','Seg','Chip','cards'],
+   note:'Sources : AtollFullscreenPanel, onglet Usine Combat. Deux formats, équipe prêtée imposée, réorganisation après chaque victoire.'},
+  {id:'atoll-arene', group:'Plein écran', label:'Atoll — Arène Combat', kind:'fs', nav:'plus',
+   title:'Atoll — Arène Combat', icon:'sword',
+   body:atollFacilityBody('arene'), uses:['Fullscreen','Seg','Chip','cards'],
+   note:'Sources : AtollFullscreenPanel, onglet Arène Combat. Trois formats courts à restriction.'},
+  {id:'atoll-dome', group:'Plein écran', label:'Atoll — Dôme Combat', kind:'fs', nav:'plus',
+   title:'Atoll — Dôme Combat', icon:'trophy',
+   body:atollFacilityBody('dome'), uses:['Fullscreen','Seg','Chip','cards'],
+   note:'Sources : AtollFullscreenPanel, onglet Dôme Combat. Demi-tournoi, puis Finale avec ses légendaires bannis.'},
   {id:'atoll-boutique', group:'Plein écran', label:'Atoll — Boutique', kind:'fs', nav:'plus',
    title:'Boutique Atoll', icon:'shop',
-   right:`${ATOLL_TOKENS[0]} jetons`,
    body:atollShopBody(), uses:['Fullscreen','Seg','MoneyPanel','cards','foot'],
    note:'Source : AtollFullscreenPanel, onglet Boutique. Prix en jetons Atoll, rayons en cartes, offres à l’unité, barre d’achat du ShopFooter.'},
   {id:'puzzles', group:'Plein écran', label:'Énigmes', kind:'fs', nav:'plus', title:'Énigmes', icon:'lock', 
    body:puzzlesBody(), uses:['Fullscreen','Row','Chip']},
   {id:'presets', group:'Plein écran', label:'Presets d’équipe', kind:'fs', nav:'equipe', title:'Presets d’équipe', icon:'star',
    body:presetsBody(), uses:['Fullscreen','Tabs','MonCell']},
-  {id:'succes-fs', group:'Plein écran', label:'Succès (plein écran)', kind:'fs', nav:'plus', title:'Succès', icon:'trophy', right:`2 / ${ACH_FULL.length} terminés`,
+  {id:'succes-fs', group:'Plein écran', label:'Succès (plein écran)', kind:'fs', nav:'plus', title:'Succès', icon:'trophy',
    body:succesFullBody(), uses:['Fullscreen','Filters','SearchRow','cards','colgrid','Prog'],
    note:'Sources : AchievementsFullscreenPanel. Filtres Tous / En cours / Terminé / Épinglés + famille + recherche, bonus permanents actifs, cartes à paliers (x / y, %, rang, pastilles, épinglé, bonus).'},
 
@@ -3291,8 +3483,8 @@ const SCREENS = [
    actions:[{label:'Choisir Bulbizarre', kind:'p'}], blocking:true, note:'Fond opaque : le joueur ne voit que cette fiche avant de jouer (grammaire PokéChill).',
    uses:['Sheet','StarterCard']},
   {id:'starter-regional', group:'Modales — parcours', label:'Starter régional', kind:'modal', nav:'lieu',
-   title:'Starter régional', body:starterCards([['pikachu','Pikachu'],['bulbizarre','Bulbizarre'],['roucool','Roucool']],
-     'Un nouveau professeur vous accueille dans cette région.'),
+   title:'Starter régional', body:starterCards([['chikorita','Germignon'],['cyndaquil','Héricendre'],['totodile','Kaiminus']],
+     'Bienvenue à Johto ! Le Prof. Orme vous attend à Bourg Geon.', 'Choisissez votre Starter Johto !', false),
    fullscreen:true,
    actions:[{label:'Choisir Pikachu', kind:'p'}], blocking:true, note:'Même composant que le starter de Kanto : seules les données changent.', uses:['Sheet','StarterCard']},
   {id:'starter-confirm', group:'Modales — parcours', label:'Confirmation du starter', kind:'modal', nav:'lieu',
@@ -3431,7 +3623,7 @@ const dashboardPC = () => `
       </div>
       <div class="col">
         ${Win({ title: 'Monnaies', icon: 'coin', body: currenciesBody() })}
-        ${Win({ title: 'Carte : Kanto', icon: 'map', right: 'Région Kanto', acts: ['legend'], body: mapBody() })}
+        ${Win({ title: 'Carte : Kanto', icon: 'map', acts: ['legend'], body: mapBody() })}
         ${Win({ title: 'Combat en direct', icon: 'sword', acts: ['?'], body: battleIdle() })}
       </div>
       <div class="col">
@@ -3478,7 +3670,7 @@ function openGuide(section) {
 }
 
 function winFor(scr) {
-  return Win({title: scr.title || scr.label, icon: scr.icon || 'info', right: scr.right || '', body: scr.body});
+  return Win({title: scr.title || scr.label, icon: scr.icon || 'info', body: scr.body});
 }
 function modalOverlay(scr, wide = false) {
   const sc = scr.blocking ? 'scrim opaque' : 'scrim';
@@ -3505,7 +3697,7 @@ function renderPC(scr) {
   if (scr.id === 'save-menu') return saveMenu(false);
   if (scr.kind === 'win') {
     const body = scr.id === 'combat' ? battleBody(true) : scr.body;
-    return PCShell({main: Win({title: scr.title || scr.label, icon: scr.icon || 'info', right: scr.right || '', body})});
+    return PCShell({main: Win({title: scr.title || scr.label, icon: scr.icon || 'info', body})});
   }
   if (scr.kind === 'modal') return PCShell({
     main: Win({title: scr.nav === 'combat' ? 'Combat en direct' : scr.nav === 'equipe' ? 'Équipe' : ZONE.name,
@@ -3514,7 +3706,7 @@ function renderPC(scr) {
     overlay: modalOverlay(scr, true)});
   /* plein écran */
   return `<div class="stage">${TopBar()}<div style="flex:1;min-height:0;padding:10px;display:flex">
-    ${Fullscreen({title: scr.title, body: scr.body, right: scr.right || ''})}</div></div>`;
+    ${Fullscreen({title: scr.title, body: scr.body})}</div></div>`;
 }
 
 function baseMobile(scr) {
@@ -3540,11 +3732,10 @@ function renderMobile(scr) {
        qui defile. Avec height:100% le fond du panneau s'arretait a la hauteur du cadre et le bas
        du contenu (Lieu, Equipe...) reposait sur du vide. */
     body: `<div class="win" style="border:0;border-radius:0;min-height:100%">
-             <header class="win-h">${svg(scr.icon || 'info', 17)}<span>${esc(scr.title || scr.label)}</span>
-               ${scr.right ? `<span class="r">${scr.right}</span>` : ''}</header>
+             <header class="win-h">${svg(scr.icon || 'info', 17)}<span>${esc(scr.title || scr.label)}</span></header>
              <div class="win-b">${scr.body}</div></div>`});
   if (scr.kind === 'modal') return MobileShell({nav: scr.nav || 'lieu', body: baseMobile(scr), overlay: modalOverlay(scr)});
-  return MobileShell({nav: scr.nav || 'plus', body: Fullscreen({title: scr.title, body: scr.body, right: scr.right || ''})});
+  return MobileShell({nav: scr.nav || 'plus', body: Fullscreen({title: scr.title, body: scr.body})});
 }
 
 /* --- état --- */
@@ -3567,7 +3758,7 @@ function sideNav() {
       <a data-id="${s.id}" class="${s.id === current ? 'on' : ''}">
         ${s.label}<span class="tag">${s.kind === 'modal' ? 'modale' : s.kind === 'fs' ? 'plein écran' : s.kind === 'custom' ? 'page' : 'fenêtre'}</span>
       </a>`).join('')}`).join('');
-  document.querySelectorAll('#side a').forEach(a => a.onclick = () => { current = a.dataset.id; render(); });
+  document.querySelectorAll('#side a').forEach(a => a.onclick = () => { current = a.dataset.id; if (location.hash.slice(1) !== current) history.replaceState(null, '', '#' + current); render(); });
 }
 
 function render() {
@@ -3617,8 +3808,16 @@ document.addEventListener('keydown', (e) => {
   if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
   const i = SCREENS.findIndex(s => s.id === current);
   const n = (i + (e.key === 'ArrowRight' ? 1 : SCREENS.length - 1)) % SCREENS.length;
-  current = SCREENS[n].id; render();
+  current = SCREENS[n].id; history.replaceState(null, '', '#' + current); render();
 });
+
+/** Opens the frame named in the URL: `/catalogue/CATALOGUE_AFFICHAGES.html#sac`. */
+function openFromHash() {
+  const wanted = decodeURIComponent(location.hash.slice(1));
+  if (wanted && SCREENS.some((s) => s.id === wanted)) current = wanted;
+}
+openFromHash();
+window.addEventListener('hashchange', () => { openFromHash(); render(); });
 render();
 
 </script>

@@ -9,7 +9,7 @@
   width: var(--pw-item-icon-md);
   height: var(--pw-item-icon-md);
   border-radius: 10px;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   border: 1px solid var(--dark3);
   display: flex;
   align-items: center;

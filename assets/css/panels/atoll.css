@@ -34,45 +34,52 @@
 .pw-atoll-hero-text h2 {
   margin: 0 0 4px;
   color: var(--pw-text-primary);
-  font-size: 20px;
+  font-size: var(--pw-font-size-4xl);
 }
 
 .pw-atoll-hero-text p {
   margin: 0;
-  color: var(--light1);
+  color: var(--pw-text-secondary);
   line-height: 1.4;
-  font-size: 13px;
+  font-size: var(--pw-font-size-sm);
 }
 
+/* The token counter sits on the page: no frame of its own, the numeral carries it. */
 .pw-atoll-token-box {
   min-width: 150px;
   display: grid;
   justify-items: center;
   align-content: center;
   gap: 2px;
-  padding: 10px 14px;
-  border-radius: 12px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
 }
 
 .pw-atoll-token-box b {
-  font-size: 26px;
+  font-size: var(--pw-font-size-5xl);
   color: var(--pw-text-primary);
 }
 
 .pw-atoll-token-box span {
   color: var(--pw-text-primary);
-  font-weight: 900;
-  font-size: 12px;
+  font-weight: 700;
+  font-size: var(--pw-font-size-sm);
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .pw-atoll-token-box small {
-  color: var(--light1);
-  font-size: 11px;
+  color: var(--pw-text-secondary);
+  font-size: var(--pw-font-size-xs);
 }
 
 .pw-atoll-group-desc {
-  padding: 11px 14px;
-  border-radius: 12px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
 }
 
 .pw-atoll-group-desc b {
@@ -83,8 +90,8 @@
 
 .pw-atoll-group-desc p {
   margin: 0;
-  color: var(--light1);
-  font-size: 12px;
+  color: var(--pw-text-secondary);
+  font-size: var(--pw-font-size-sm);
   line-height: 1.4;
 }
 
@@ -95,13 +102,14 @@
   align-items: center;
 }
 
+/* Both chips follow the shared chip grammar: sprite surface, one hairline, pill radius. */
 .pw-atoll-timer-chip, .pw-atoll-cycle-chip {
   border-radius: 999px;
-  padding: 4px 12px;
-  font-size: 12px;
-  font-weight: 900;
+  padding: 2px 7px;
+  font-size: var(--pw-font-size-xs);
+  font-weight: 600;
   border: 1px solid var(--pw-border-color);
-  background: rgba(0,0,0,.28);
+  background: var(--pw-bg-sprite);
   color: var(--pw-text-primary);
 }
 
@@ -117,13 +125,16 @@
   align-items: stretch;
 }
 
+/* A mode card is the catalogue card: header surface, one hairline, the rank tinting that
+   hairline only. */
 .pw-atoll-mode-card {
   display: grid;
   grid-template-rows: minmax(0,1fr) auto;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 12px;
-  min-height: 172px;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 10px;
+  min-height: 0;
+  background: var(--pw-bg-header);
 }
 
 .pw-atoll-mode-info {
@@ -135,12 +146,13 @@
 
 .pw-atoll-mode-title {
   color: var(--pw-text-primary);
-  font-size: 14px;
+  font-size: var(--pw-font-size-md);
+  font-weight: 600;
 }
 
 .pw-atoll-mode-rule {
-  color: var(--light1);
-  font-size: 12px;
+  color: var(--pw-text-secondary);
+  font-size: var(--pw-font-size-sm);
 }
 
 .pw-atoll-mode-cta {
@@ -211,7 +223,7 @@
 
 .pw-atoll-free-note {
   color: #60BE58;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight: 700;
 }
 
@@ -240,13 +252,13 @@
 }
 
 .pw-atoll-home-icon {
-  font-size: 28px;
+  font-size: var(--pw-font-size-5xl);
   line-height: 1;
 }
 
 .pw-atoll-home-card b {
   color: var(--pw-text-primary);
-  font-size: 15px;
+  font-size: var(--pw-font-size-xl);
 }
 
 .pw-atoll-run-card {
@@ -271,7 +283,7 @@
 
 .pw-atoll-run-head span {
   color: #D9A0E8;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .pw-atoll-fragments-card {
@@ -319,14 +331,78 @@
 .pw-atoll-prep-modal-body .atoll-prep-hint {
   display: block;
   color: var(--light1);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.45;
 }
 
 .pw-atoll-prep-modal-body .atoll-prep-note {
   display: block;
   color: var(--light1);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   line-height: 1.4;
   margin-top: 8px;
+}
+
+/* Atoll home: the four combat centres are a ticket list, one row each, exactly like the catalogue's
+   home. The row itself is the shared SheetRow; only the stack and the chevron are Atoll's. */
+.pw-atoll-tickets {
+  display: grid;
+  gap: 6px;
+}
+
+.pw-atoll-tickets .pw-sheet-row {
+  border: 1px solid var(--pw-border-color);
+  border-radius: 8px;
+  background: var(--pw-bg-surface);
+}
+
+.pw-atoll-tickets .pw-sheet-row.is-action:hover,
+.pw-atoll-tickets .pw-sheet-row.is-action:focus-visible {
+  border-color: var(--pw-accent-color, var(--light2));
+}
+
+.pw-atoll-ticket-chevron {
+  color: var(--pw-text-secondary);
+}
+
+/* Atoll shop: the selected offer is ringed the way the shops ring theirs, and the quantity bar
+   reuses .pw-shop-footer — same square field as the Boutique and the Marche. */
+.pw-atoll-shop-card.is-selected {
+  border-color: var(--pw-accent-color, var(--light2)) !important;
+  box-shadow: inset 0 0 0 1px var(--pw-accent-color, var(--light2));
+}
+
+.pw-atoll-shop-pick {
+  color: var(--pw-text-secondary);
+  font-size: var(--pw-font-size-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pw-atoll-shop-card.is-selected .pw-atoll-shop-pick {
+  color: var(--pw-text-primary);
+}
+
+.pw-atoll-shop-footer {
+  margin-top: 0;
+  background: var(--pw-bg-surface);
+  border-color: var(--pw-border-color);
+}
+
+.pw-atoll-shop-footer .pw-shop-qty {
+  width: 72px;
+  background: var(--pw-bg-sprite);
+  color: var(--pw-text-primary);
+  border: 1px solid var(--pw-border-color);
+  border-radius: var(--pw-radius-sm);
+  padding: 5px 8px;
+  font-size: var(--pw-font-size-lg);
+}
+
+.pw-atoll-shop-footer .pw-shop-total {
+  margin-left: auto;
+  color: var(--pw-text-primary);
+  font-size: var(--pw-font-size-lg);
+  font-weight: 700;
 }

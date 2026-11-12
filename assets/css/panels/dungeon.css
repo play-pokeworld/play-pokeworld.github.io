@@ -4,7 +4,6 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 .pw-dgn-svg {
   width: 100%;
   height: auto;
@@ -26,7 +25,7 @@
 
 .pw-dgn-node text {
   fill: var(--light2);
-  font-size: 15px;
+  font-size: var(--pw-font-size-xl);
   text-anchor: middle;
   dominant-baseline: middle;
   pointer-events: none;
@@ -98,7 +97,6 @@
   stroke-width: 4.5;
 }
 
-
 /* design-system/pass-22.css * --------------------------------------------------------------------------- * Dated pass inherited from the former design-system.css, kept in its historical order. * * Part of the 1.16.11 split: one file, one responsibility. The order of the * @import lines in assets/css/style.css IS the cascade — never reorder them, * never import this sheet anywhere else (guarded by tests/CssStructure.test.js). */
 .pw-dgn-leg.t-chest i {
   border-color: var(--green);
@@ -114,7 +112,7 @@
 }
 
 .pw-dgn-leg.t-fog i {
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   border-color: var(--light1);
   opacity: .75;
 }
@@ -135,7 +133,7 @@
 
 .pw-dungeon-pilot-locked {
   color: var(--light1);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .pw-dungeon-expedition {
@@ -161,13 +159,13 @@
 
 .pw-dungeon-title {
   color: var(--pw-text-primary);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .pw-dungeon-location,
 .pw-dungeon-floor {
   color: var(--pw-text-secondary);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .pw-dungeon-multiplier {
@@ -176,18 +174,18 @@
   padding: 1px 8px;
   border: 1px solid var(--light1);
   border-radius: 999px;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   color: var(--light2);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   font-weight: 700;
 }
 
 .pw-dungeon-bag-summary {
   padding: 8px 10px;
   border-radius: var(--pw-radius-md);
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   color: var(--pw-text-secondary);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.45;
 }
 
@@ -205,9 +203,8 @@
 
 .pw-dungeon-map-unavailable {
   color: var(--pw-text-secondary);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
-
 
 /* Reference cave board (main dungeon board): a framed map holding a grid of fixed 44 px tiles, one column per saved map column, centred; narrow screens scroll instead of clipping. */
 .pw-dungeon-expedition .pw-dungeon-map {
@@ -275,9 +272,9 @@
   padding: 0 !important;
   border: 2px solid var(--light1) !important;
   border-radius: 8px;
-  background: var(--dark2) !important;
+  background: var(--pw-bg-header) !important;
   color: var(--light2) !important;
-  font-size: 17px;
+  font-size: var(--pw-font-size-3xl);
   line-height: 1;
   transition: transform .12s ease, box-shadow .2s ease;
 }
@@ -334,11 +331,10 @@
   opacity: .85;
   font-weight: 700;
   line-height: 1;
-  text-shadow: 0 0 6px rgba(0, 0, 0, .9);
 }
 
 .pw-dungeon-expedition .pw-dgn-tile.t-empty:not(.is-fog) {
-  background: var(--dark1) !important;
+  background: var(--pw-bg-surface) !important;
   border-style: dashed !important;
   border-color: color-mix(in srgb, var(--light1) 45%, transparent) !important;
   color: var(--light1) !important;
@@ -416,7 +412,7 @@
 }
 
 .pw-dungeon-expedition .pw-dgn-tile.is-done:not(.is-here):not(.t-ladder):not(.t-boss) {
-  background: var(--dark1) !important;
+  background: var(--pw-bg-surface) !important;
   border-style: dashed !important;
   border-color: color-mix(in srgb, var(--light1) 45%, transparent) !important;
   border-width: 2px !important;

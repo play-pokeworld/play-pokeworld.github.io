@@ -10,14 +10,15 @@
 /* Rework-only design tokens. The palette, fonts and theme tokens live in design-system.css (the original stylesheet); only tokens it does not define are declared here, so there is a single source of truth per token. */
 :root {
   --accent-hover: #FFF099;
-  --red-hover: #E55575;
+  --red-hover: var(--pw-accent-danger-hover);
   --discord: #5865F2;
   --discord-hover: #4752C4;
   --pw-bg-app: color-mix(in srgb, var(--pw-bg-header) 75%, black);
   --pw-bg-surface-elevated: var(--dark1);
   --pw-bg-surface-hover: color-mix(in srgb, var(--dark1) 88%, var(--light2));
-  --pw-bg-inset: color-mix(in srgb, var(--dark1) 55%, transparent);
-  --pw-border-soft: color-mix(in srgb, var(--light2) 30%, transparent);
+  /* An inset surface is darker than the page, a hairline is the same hairline everywhere. */
+  --pw-bg-inset: var(--pw-bg-sprite);
+  --pw-border-soft: var(--pw-border-color);
   --pw-border-light: color-mix(in srgb, var(--light2) 10%, transparent);
   --pw-border-focus: #FFE15E;
   --pw-text-muted: color-mix(in srgb, var(--pw-text-secondary) 70%, transparent);
@@ -25,8 +26,9 @@
   --pw-text-white: #FFFFFF;
   --pw-accent-gold: #FFE15E;
   --pw-accent-gold-hover: #FFF099;
-  --pw-accent-danger: #D3425F;
-  --pw-accent-danger-hover: #E55575;
+  /* Danger red of the corpus (catalogue .btn.danger), not the older crimson. */
+  --pw-accent-danger: #DB5B4A;
+  --pw-accent-danger-hover: #EE6E5C;
   --pw-accent-success: #2ECC71;
   --pw-radius-xl: 24px;
 }
@@ -49,9 +51,13 @@
   --pw-color-info: #3498DB;
   --pw-color-discord: #5865F2;
   --pw-color-discord-dark: #4752C4;
+  /* The face of the game. It was swapped for the catalogue stack for one pass and the game stopped
+     looking like itself: the catalogue is the reference for the layout of a component, not for the
+     typeface of the product. */
   --pw-font-main: "Winky Sans", "Segoe UI", system-ui, sans-serif;
   --pw-font-title: "Megrim-Regular", cursive;
-  --pw-radius-sm: 4px;
+  /* Corner steps of the corpus: 8 for a button, a chip or a stepper; 10 for a cell; 12 for a card. */
+  --pw-radius-sm: 7px;
   --pw-radius-md: 8px;
   --pw-radius-lg: 12px;
   --pw-spacing-xs: 4px;
@@ -59,9 +65,13 @@
   --pw-spacing-md: 16px;
   --pw-spacing-lg: 24px;
   --pw-spacing-xl: 32px;
+  /* The page a panel is drawn on is darker than the cards it carries: that is what makes a card,
+     a row and a chip readable without a frame. The catalogue draws its pages at #101012; the game
+     keeps the same step on its warm ramp. */
+  --pw-bg-page: #101012;
   --pw-bg-surface: #24221E;
   --pw-bg-header: #1C1A17;
-  --pw-bg-sprite: #191714;
+  --pw-bg-sprite: #2B2924;
   --pw-border-color: #4A3E31;
   --pw-text-primary: #ECDEB7;
   --pw-text-secondary: #C8BBA0;
@@ -69,8 +79,10 @@
   --pw-map-surface: #0D1B0D;
   --pw-accent-color: #FFE15E;
   --dark1: #36342F;
-  --pw-bg-panel-header: var(--dark1);
-  --pw-border-panel-header: var(--light1);
+  /* The band of the catalogue window title (CATALOGUE_AFFICHAGES.html line 138). */
+  --pw-bg-panel-header: color-mix(in srgb, var(--pw-bg-header) 70%, var(--pw-bg-surface));
+  /* The band under a panel header is the same hairline as everywhere else (it was a pale 2px rule). */
+  --pw-border-panel-header: var(--pw-border-color);
   --dark2: #444138;
   --dark3: #524f48;
   --light1: #C9BC9C;
@@ -100,26 +112,55 @@
   --type-rock: #C9BC8A;
   --type-steel: #5795A3;
   --type-water: #539DDF;
-  --red: #D3425F;
+  --red: var(--pw-accent-danger);
   --green: #60BE58;
   --blue: #539DDF;
   --orange: #FBA64C;
   --purple: #B763CF;
   --yellow: #F2D94E;
+  /* State colours of the catalogue (CATALOGUE_AFFICHAGES.html line 15). Used by the dashboard
+     shortcut rows and by the chips; they are the reference values, not approximations. */
+  --shield: #868DEE;
+  --ok: #82D382;
+  --warn: #DDA863;
+  --heal: #DD86EE;
   --pw-surface: var(--dark2);
   --pw-surface-soft: rgba(0,0,0,0.22);
-  --pw-border: color-mix(in srgb, var(--light2) 22%, transparent);
-  --pw-border-strong: color-mix(in srgb, var(--light2) 38%, transparent);
-  --pw-radius: 14px;
+  /* The hairline of a window is the same hairline as a row: one token, one value. The cream
+     `color-mix` that used to live here framed every panel twice (window, then title bar) in a
+     colour the rest of the corpus does not use. `--pw-border` stays an alias so the 45 rules that
+     read it need no rewrite. */
+  --pw-border: var(--pw-border-color);
+  --pw-border-strong: color-mix(in srgb, var(--pw-border-color) 65%, var(--light2) 35%);
+  --pw-radius: var(--pw-window-radius);
   --pw-shadow: 0 14px 36px rgba(0,0,0,0.42), inset 0 0 0 1px rgba(255,255,255,0.04);
   --pw-shadow-lg: 0 18px 48px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
-  --pw-header-h: 50px;
+  --pw-header-h: 42px;
   --pw-window-radius: 10px;
   --pw-game-header-h: 56px;
-  --pw-header-pad: 0 8px 0 10px;
+  --pw-header-pad: 0 12px;
   --pw-header-radius: 10px;
   --pw-header-gap: 8px;
-  --pw-header-title-size: 12px;
+  /* --- Typography scale (1.16.48) ---------------------------------------------
+     The only text sizes in the game. A sheet never writes a px font size: it names a
+     step, so the whole interface can be re-scaled by editing this block alone.
+     `--pw-font-size-2xl` is 16px on purpose: below that, iOS zooms the page when a
+     field takes focus. Guarded by tests/StyleVocabulary.test.js. */
+  --pw-font-size-xs: 10.5px;
+  --pw-font-size-sm: 11px;
+  --pw-font-size-md: 12px;
+  --pw-font-size-lg: 13px;
+  --pw-font-size-xl: 15px;
+  --pw-font-size-2xl: 16px;
+  --pw-font-size-3xl: 18px;
+  --pw-font-size-4xl: 22px;
+  --pw-font-size-5xl: 28px;
+  --pw-font-size-display: 32px;
+  /* The title of the save menu: a logo, not body text. Clamped here so the sheet stays on
+     tokens like every other one. */
+  --pw-font-size-hero: clamp(44px, 9vw, 96px);
+  --pw-font-size-hero-sm: clamp(24px, 6vw, 32px);
+  --pw-header-title-size: var(--pw-font-size-md);
   --pw-header-close-size: 40px;
   --pw-header-close-glyph: 18px;
   --pw-panel-w-info: 560px;
@@ -200,6 +241,16 @@
 
 :root {
   --pw-modal-container-max-width: 960px;
+}
+
+/* Desktop reference width: 1280 px, the width the catalogue draws every full-screen window at.
+   Below it the window still shrinks with the viewport (min(95vw, …)); on a phone the 95vw rule
+   stays untouched, so no screen regresses. Choosing one reference for every PC screen keeps the
+   grids (badges, bag, boxes) on the same column count from one window to the next. */
+@media (min-width: 1025px) and (pointer: fine) {
+:root {
+  --pw-modal-container-max-width: 1280px;
+}
 }
 
 @media (min-width: 1600px) {

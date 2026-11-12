@@ -1,0 +1,338 @@
+{
+ "result": {
+  "STARTER": {
+   "dispatched": "ok",
+   "opened": null
+  },
+  "REGIONAL_STARTER": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "",
+    "cls": "pw-modal-backdrop pw-starter-overlay is-"
+   }
+  },
+  "TEAM": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Gestion de l’Équipe",
+    "cls": "pw-modal-backdrop is-open open"
+   }
+  },
+  "TEAM_PRESETS": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Mes Équipes✕",
+    "cls": "pw-element pw-fullscreen-overlay pw-team"
+   }
+  },
+  "TEAM_PRESET_EDITOR": {
+   "dispatched": "ok",
+   "opened": null
+  },
+  "POKEMON_INFO": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Bulbizarre #1",
+    "cls": "pw-modal-backdrop poke-detail-front is-o"
+   }
+  },
+  "ITEM_TARGET": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Utiliser un objet",
+    "cls": "pw-modal-backdrop is-open open"
+   }
+  },
+  "MOVE_LEARN": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Capacités apprenables",
+    "cls": "pw-modal-backdrop pw-move-learning-overl"
+   }
+  },
+  "BATTLE_SUMMARY": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Butin & résumé de session",
+    "cls": "pw-modal-backdrop is-open open"
+   }
+  },
+  "HATCHERY_MANAGEMENT": {
+   "dispatched": "ok",
+   "opened": null
+  },
+  "TRAINING_MANAGEMENT": {
+   "dispatched": "ok",
+   "opened": null
+  },
+  "MINE_MANAGEMENT": {
+   "dispatched": "ok",
+   "opened": null
+  },
+  "HATCHERY_FOSSILS": {
+   "dispatched": "ok",
+   "opened": null
+  },
+  "FOSSIL_LAB": {
+   "dispatched": "ok",
+   "opened": null
+  },
+  "SETTINGS": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Réglages",
+    "cls": "pw-modal-backdrop pw-settings-modal-back"
+   }
+  },
+  "DOWNLOAD_PROMPT": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Télécharger PokéWorld",
+    "cls": "pw-modal-backdrop pw-download-prompt-bac"
+   }
+  },
+  "SAVE_ICON_PICKER": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Pokémon de la carte de sauvegarde",
+    "cls": "pw-modal-backdrop is-open open"
+   }
+  },
+  "NPC_TALK": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Habitants du lieu",
+    "cls": "pw-modal-backdrop is-open open"
+   }
+  },
+  "SECRET_BASE_VISIT": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Visite de Base Secrète",
+    "cls": "pw-modal-backdrop is-open open"
+   }
+  },
+  "SECRET_BASE_NPC": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Enregistrer le PNJ",
+    "cls": "pw-modal-backdrop is-open open"
+   }
+  },
+  "SECRET_BASE_PC": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "PC de la base",
+    "cls": "pw-modal-backdrop is-open open"
+   }
+  },
+  "REPEATABLE_QUESTS": {
+   "dispatched": "ok",
+   "opened": null
+  },
+  "REPEATABLE_UPGRADES": {
+   "dispatched": "ok",
+   "opened": null
+  },
+  "PUZZLES": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Explorations secrètes✕",
+    "cls": "pw-element pw-fullscreen-overlay is-open"
+   }
+  },
+  "PUZZLE_SOLVE": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Explorations secrètes",
+    "cls": "pw-modal-backdrop is-open open"
+   }
+  },
+  "MAP_HELP": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Code couleur de la carte",
+    "cls": "pw-modal-backdrop is-open open"
+   }
+  },
+  "BALL_PICKER": {
+   "dispatched": "ok",
+   "opened": null
+  },
+  "BALL_FILTERS": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Paramètres des Poké Balls",
+    "cls": "pw-modal-backdrop pw-ball-overlay is-ope"
+   }
+  },
+  "SHOP": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Boutique Palette✕",
+    "cls": "pw-element pw-fullscreen-overlay is-open"
+   }
+  },
+  "MARKET": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Marché Noir✕",
+    "cls": "pw-element pw-fullscreen-overlay is-open"
+   }
+  },
+  "BAG": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Sac✕",
+    "cls": "pw-element pw-fullscreen-overlay is-open"
+   }
+  },
+  "BOX": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Système de stockage Pokémon✕",
+    "cls": "pw-element pw-fullscreen-overlay is-open"
+   }
+  },
+  "BADGES": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Badges d'Arènes & Ligues✕",
+    "cls": "pw-element pw-fullscreen-overlay is-open"
+   }
+  },
+  "POKEDEX": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Pokédex✕",
+    "cls": "pw-element pw-fullscreen-overlay pw-poke"
+   }
+  },
+  "POKEDEX_DETAIL": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "#001 Bulbizarre",
+    "cls": "pw-modal-backdrop poke-detail-front is-o"
+   }
+  },
+  "ACHIEVEMENTS": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Succès✕",
+    "cls": "pw-element pw-fullscreen-overlay is-open"
+   }
+  },
+  "ATOLL": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Atoll de Combat✕",
+    "cls": "pw-element pw-fullscreen-overlay is-open"
+   }
+  },
+  "ATOLL_FACTORY_PREP": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Série Usine en cours",
+    "cls": "pw-modal-backdrop is-open open"
+   }
+  },
+  "RELAUNCH_CONFIRM_PREFIX": {
+   "dispatched": "ok",
+   "opened": null
+  },
+  "GUIDE": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Guide✕",
+    "cls": "pw-element pw-fullscreen-overlay pw-guid"
+   }
+  },
+  "DICTIONARY": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Dictionnaire✕",
+    "cls": "pw-element pw-fullscreen-overlay is-open"
+   }
+  },
+  "DICTIONARY_DETAIL": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "",
+    "cls": "pw-modal-backdrop is-open open"
+   }
+  },
+  "AFK_SUMMARY": {
+   "dispatched": "ok",
+   "opened": {
+    "title": "Retour AFK",
+    "cls": "pw-modal-backdrop is-open open"
+   }
+  }
+ },
+ "windows": [
+  {
+   "id": "win-achievements",
+   "title": "Succès"
+  },
+  {
+   "id": "win-pokeballs",
+   "title": "Poké Balls"
+  },
+  {
+   "id": "win-story",
+   "title": "Quêtes"
+  },
+  {
+   "id": "win-team",
+   "title": "Équipe"
+  },
+  {
+   "id": "win-hatchery",
+   "title": "Gestion Pension"
+  },
+  {
+   "id": "win-currency",
+   "title": "Monnaies"
+  },
+  {
+   "id": "win-map",
+   "title": "Carte : Kanto"
+  },
+  {
+   "id": "pw-map-travel-confirm",
+   "title": ""
+  },
+  {
+   "id": "win-battle",
+   "title": "Combat en direct"
+  },
+  {
+   "id": "win-base",
+   "title": "Base Secrète"
+  },
+  {
+   "id": "win-shortcuts",
+   "title": "Raccourcis"
+  },
+  {
+   "id": "win-tabs",
+   "title": "Lieu"
+  },
+  {
+   "id": "pw-location-base-confirm",
+   "title": ""
+  },
+  {
+   "id": "win-training",
+   "title": "Centre d'entraînement"
+  },
+  {
+   "id": "win-mine",
+   "title": "Mine souterraine"
+  },
+  {
+   "id": "pw-mine-survey-confirm",
+   "title": ""
+  }
+ ]
+}

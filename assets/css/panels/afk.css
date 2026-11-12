@@ -42,7 +42,7 @@
   background: color-mix(in srgb, var(--pw-text-primary) 9%, transparent);
   border: 1px solid var(--pw-border-color);
   color: var(--pw-text-primary);
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .afk-result-status.success {
@@ -60,7 +60,7 @@
 }
 
 .afk-ff-stage {
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   opacity: .75;
   text-align: center;
   margin-top: 6px;
@@ -144,7 +144,7 @@
 }
 
 .pw-afk-row {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   color: var(--pw-text-primary, #ECDEB7);
   display: flex;
   align-items: center;
@@ -169,13 +169,13 @@
   background: var(--pw-bg-surface, #24221E);
   border: 1px solid var(--pw-border-color, #4A3E31);
   border-radius: var(--pw-radius-sm, 6px);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   font-weight: 700;
   color: var(--pw-text-primary, #ECDEB7);
 }
 
 .pw-afk-fatigue-note {
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   font-style: italic;
   color: var(--pw-text-secondary, #D98338);
 }

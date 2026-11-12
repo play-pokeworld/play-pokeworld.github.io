@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PokéWorld — points à valider dans le catalogue</title>
+<style>
+  :root{
+    --surface:#242220; --line:#4A3E31; --line-soft:#332D26;
+    --ink:#ECDEB7; --ink-2:#C8BBA0; --ink-3:#8C8272; --ok:#7FBF5F; --danger:#DB5B4A;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#16150F;color:var(--ink);
+       font:13px/1.5 ui-sans-serif,system-ui,"Segoe UI",Roboto,sans-serif}
+  .wrap{max-width:960px;margin:0 auto;padding:28px 20px 80px}
+  h1{font-size:22px;font-weight:700;margin:0 0 6px}
+  .sub{color:var(--ink-2);font-size:12.5px;margin:0 0 20px}
+  .bar{position:sticky;top:0;z-index:5;display:flex;gap:10px;align-items:center;
+       background:#16150FEE;border-bottom:1px solid var(--line-soft);padding:10px 0;margin-bottom:18px;
+       font-size:12px;color:var(--ink-2)}
+  .bar b{color:var(--ink)}
+  button{font:inherit;cursor:pointer;border-radius:7px;border:1px solid var(--line);
+         background:transparent;color:var(--ink);padding:6px 12px}
+  button.p{background:var(--ink-2);border-color:var(--ink-2);color:#1A1512;font-weight:700}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin:0 0 14px}
+  .card.done{border-color:var(--ok)}
+  .head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .num{color:var(--ink-3);font-weight:700;font-size:12px}
+  .name{font-size:15px;font-weight:700}
+  .grp{color:var(--ink-3);font-size:11px}
+  .open{margin-left:auto;font-size:11.5px;text-decoration:none;color:var(--ink-2);
+        border:1px solid var(--line);border-radius:7px;padding:4px 10px}
+  ul{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+  li{display:flex;gap:9px;align-items:flex-start;background:#1E1C19;border:1px solid var(--line);
+     border-radius:7px;padding:8px 10px}
+  li label{display:flex;gap:9px;align-items:flex-start;cursor:pointer;min-width:0}
+  li.checked{border-color:var(--ok)}
+  li.checked .txt{color:var(--ink-3);text-decoration:line-through}
+  input[type=checkbox]{margin:2px 0 0;accent-color:#7FBF5F;flex:0 0 auto}
+  .txt{font-size:12px}
+  .verdict{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+  .verdict input[type=text]{flex:1 1 220px;min-width:0;background:#1E1C19;border:1px solid var(--line);
+       border-radius:7px;color:var(--ink);padding:7px 10px;font:inherit}
+  .pill{font-size:11px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--ink-2)}
+  h2{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);
+     margin:26px 0 10px}
+  textarea{width:100%;min-height:170px;background:#1E1C19;border:1px solid var(--line);border-radius:8px;
+           color:var(--ink);font:12px/1.5 ui-monospace,monospace;padding:10px}
+  .note{color:var(--ink-3);font-size:11.5px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Points à valider dans le catalogue</h1>
+  <p class="sub"><span id="total">59</span> points de contrôle : trois points globaux puis quatorze
+  écrans. Coche ce qui est bon, écris ce qui ne l'est pas, exporte ta réponse en bas de page.</p>
+
+  <div class="bar">
+    <span><b id="count">0</b> / <b>59</b> points cochés</span>
+    <span id="screens">0 / 14 écrans complets</span>
+    <span style="margin-left:auto"></span>
+    <button id="reset">Tout décocher</button>
+    <button class="p" id="export">Exporter ma réponse</button>
+  </div>
+
+  <h2>Les points globaux</h2>
+  <div class="card" data-card="global">
+    <div class="head"><span class="num">00</span><span class="name">Global</span>
+      <span class="grp">Tous les écrans</span></div>
+    <ul>
+        <li><label><input type="checkbox" data-screen="global" data-index="0"><span class="txt">Les en-têtes ne portent plus aucun nombre ni texte à droite : le titre, la croix, rien d'autre — Sac, Boîte PC, Pokédex, Marché, Boutique, Badges, Dictionnaire, Atoll, Succès et les fenêtres du tableau de bord.</span></label></li>
+        <li><label><input type="checkbox" data-screen="global" data-index="1"><span class="txt">Dans les barres d'achat (Boutique, Marché, Atoll — Boutique), la quantité « 1 » est une case carrée comme les autres cases, plus une pastille ronde.</span></label></li>
+        <li><label><input type="checkbox" data-screen="global" data-index="2"><span class="txt">En 390, les sélecteurs à six pages (Atoll) passent à la ligne : aucun libellé coupé.</span></label></li>
+    </ul>
+  </div>
+
+  <h2>Les quatorze écrans à valider</h2>
+      <section class="card" data-card="sac">
+        <div class="head">
+          <span class="num">01</span>
+          <span class="name">Sac</span>
+          <span class="grp">Plein écran</span>
+          <a class="open" href="CATALOGUE_AFFICHAGES.html#sac">Ouvrir le cadre ↗</a>
+        </div>
+        <ul>
+        <li><label><input type="checkbox" data-screen="sac" data-index="0"><span class="txt">Les 7 catégories sont des pastilles avec leur quantité, et l'active est en clair (jamais du jaune plein).</span></label></li>
+        <li><label><input type="checkbox" data-screen="sac" data-index="1"><span class="txt">La recherche tient sur une ligne, le tri et la quantité sont à côté.</span></label></li>
+        <li><label><input type="checkbox" data-screen="sac" data-index="2"><span class="txt">Une ligne d'objet = pastille ronde + sprite + nom + description + ×n, sans case encadrée.</span></label></li>
+        <li><label><input type="checkbox" data-screen="sac" data-index="3"><span class="txt">Il n'y a plus de total « n dans la catégorie · n au total ».</span></label></li>
+        <li><label><input type="checkbox" data-screen="sac" data-index="4"><span class="txt">Mobile 390 : les objets passent sur 4 colonnes, la recherche prend toute la largeur.</span></label></li>
+        </ul>
+        <div class="verdict">
+          <span class="pill">à regarder</span>
+          <input type="text" class="verdict-input" data-screen="sac" placeholder="Ce qui ne va pas, en une phrase">
+        </div>
+      </section>
+      <section class="card" data-card="boite">
+        <div class="head">
+          <span class="num">02</span>
+          <span class="name">Boîte PC</span>
+          <span class="grp">Plein écran</span>
+          <a class="open" href="CATALOGUE_AFFICHAGES.html#boite">Ouvrir le cadre ↗</a>
+        </div>
+        <ul>
+        <li><label><input type="checkbox" data-screen="boite" data-index="0"><span class="txt">Les filtres sont des pastilles, sans boîte « Filtres » ni filet autour.</span></label></li>
+        <li><label><input type="checkbox" data-screen="boite" data-index="1"><span class="txt">Une sélection Pokémon montre numéro, sprite et nom — pas de lieu, pas d'espèce, pas de cadre.</span></label></li>
+        <li><label><input type="checkbox" data-screen="boite" data-index="2"><span class="txt">Un Pokémon manquant montre numéro + pastille « ? » + nom.</span></label></li>
+        <li><label><input type="checkbox" data-screen="boite" data-index="3"><span class="txt">La grille garde 30 emplacements réguliers, sans trou.</span></label></li>
+        </ul>
+        <div class="verdict">
+          <span class="pill">à regarder</span>
+          <input type="text" class="verdict-input" data-screen="boite" placeholder="Ce qui ne va pas, en une phrase">
+        </div>
+      </section>
+      <section class="card" data-card="pokedex">
+        <div class="head">
+          <span class="num">03</span>
+          <span class="name">Pokédex</span>
+          <span class="grp">Plein écran</span>
+          <a class="open" href="CATALOGUE_AFFICHAGES.html#pokedex">Ouvrir le cadre ↗</a>
+        </div>
+        <ul>
+        <li><label><input type="checkbox" data-screen="pokedex" data-index="0"><span class="txt">Les compteurs Vus / Capturés / Chromatiques sont là, en tête.</span></label></li>
+        <li><label><input type="checkbox" data-screen="pokedex" data-index="1"><span class="txt">La progression par région et l'objectif Charme Chroma se lisent d'un coup d'œil.</span></label></li>
+        <li><label><input type="checkbox" data-screen="pokedex" data-index="2"><span class="txt">La zone d'obtention apparaît sous chaque espèce, y compris pour les manquants en « ? ».</span></label></li>
+        <li><label><input type="checkbox" data-screen="pokedex" data-index="3"><span class="txt">Les 8 pastilles de filtre ne doublonnent pas avec celles de la Boîte PC.</span></label></li>
+        </ul>
+        <div class="verdict">
+          <span class="pill">à regarder</span>
+          <input type="text" class="verdict-input" data-screen="pokedex" placeholder="Ce qui ne va pas, en une phrase">
+        </div>
+      </section>
+      <section class="card" data-card="marche">
+        <div class="head">
+          <span class="num">04</span>
+          <span class="name">Marché</span>
+          <span class="grp">Plein écran</span>
+          <a class="open" href="CATALOGUE_AFFICHAGES.html#marche">Ouvrir le cadre ↗</a>
+        </div>
+        <ul>
+        <li><label><input type="checkbox" data-screen="marche" data-index="0"><span class="txt">Les prix sont en points de quête.</span></label></li>
+        <li><label><input type="checkbox" data-screen="marche" data-index="1"><span class="txt">Une espèce non vue s'affiche « ??? ».</span></label></li>
+        <li><label><input type="checkbox" data-screen="marche" data-index="2"><span class="txt">La carte d'offre reprend la forme de la Boutique : icône + Ball, nom, prix, ligne d'état.</span></label></li>
+        <li><label><input type="checkbox" data-screen="marche" data-index="3"><span class="txt">Les 4 sections (Starters, Fossiles, Rares, Autres) et la barre d'achat sont présentes.</span></label></li>
+        </ul>
+        <div class="verdict">
+          <span class="pill">à regarder</span>
+          <input type="text" class="verdict-input" data-screen="marche" placeholder="Ce qui ne va pas, en une phrase">
+        </div>
+      </section>
+      <section class="card" data-card="boutique">
+        <div class="head">
+          <span class="num">05</span>
+          <span class="name">Boutique</span>
+          <span class="grp">Plein écran</span>
+          <a class="open" href="CATALOGUE_AFFICHAGES.html#boutique">Ouvrir le cadre ↗</a>
+        </div>
+        <ul>
+        <li><label><input type="checkbox" data-screen="boutique" data-index="0"><span class="txt">Le portefeuille en tête montre Pokédollars et points de quête.</span></label></li>
+        <li><label><input type="checkbox" data-screen="boutique" data-index="1"><span class="txt">Une offre sélectionnée se marque par une bordure claire, jamais par un aplat jaune.</span></label></li>
+        <li><label><input type="checkbox" data-screen="boutique" data-index="2"><span class="txt">L'offre à achat unique est marquée, et la boutique verrouillée reste lisible.</span></label></li>
+        <li><label><input type="checkbox" data-screen="boutique" data-index="3"><span class="txt">La barre du bas enchaîne Reset / quantité carrée / +10 / +100 / Max / total / Acheter.</span></label></li>
+        </ul>
+        <div class="verdict">
+          <span class="pill">à regarder</span>
+          <input type="text" class="verdict-input" data-screen="boutique" placeholder="Ce qui ne va pas, en une phrase">
+        </div>
+      </section>
+      <section class="card" data-card="badges">
+        <div class="head">
+          <span class="num">06</span>
+          <span class="name">Badges</span>
+          <span class="grp">Plein écran</span>
+          <a class="open" href="CATALOGUE_AFFICHAGES.html#badges">Ouvrir le cadre ↗</a>
+        </div>
+        <ul>
+        <li><label><input type="checkbox" data-screen="badges" data-index="0"><span class="txt">Chaque carte montre l'emblème réel du badge, en couleur une fois obtenu et désaturé sinon.</span></label></li>
+        <li><label><input type="checkbox" data-screen="badges" data-index="1"><span class="txt">Le nom est sur un bandeau clair pleine largeur, comme dans le jeu.</span></label></li>
+        <li><label><input type="checkbox" data-screen="badges" data-index="2"><span class="txt">Le dresseur puis la ville sont sur deux lignes, sans mention « Obtenu / À obtenir ».</span></label></li>
+        <li><label><input type="checkbox" data-screen="badges" data-index="3"><span class="txt">Les deux groupes sont introduits par leur compteur : « 2 / 24 badges » puis « 0 / 3 ligues ».</span></label></li>
+        <li><label><input type="checkbox" data-screen="badges" data-index="4"><span class="txt">Les cartes gardent leur taille : en 1280 il y en a simplement plus par ligne qu'en 960.</span></label></li>
+        </ul>
+        <div class="verdict">
+          <span class="pill">à regarder</span>
+          <input type="text" class="verdict-input" data-screen="badges" placeholder="Ce qui ne va pas, en une phrase">
+        </div>
+      </section>
+      <section class="card" data-card="dictionnaire">
+        <div class="head">
+          <span class="num">07</span>
+          <span class="name">Dictionnaire</span>
+          <span class="grp">Plein écran</span>
+          <a class="open" href="CATALOGUE_AFFICHAGES.html#dictionnaire">Ouvrir le cadre ↗</a>
+        </div>
+        <ul>
+        <li><label><input type="checkbox" data-screen="dictionnaire" data-index="0"><span class="txt">Les 3 onglets (Objets, Attaques, Talents) sont un sélecteur, pas des onglets à soulignement.</span></label></li>
+        <li><label><input type="checkbox" data-screen="dictionnaire" data-index="1"><span class="txt">« Possédé ×42 » et « Non possédé » avec cadenas se distinguent sans lire.</span></label></li>
+        <li><label><input type="checkbox" data-screen="dictionnaire" data-index="2"><span class="txt">Les colonnes suivent la largeur : 1 en 390, 2 en 768, 3 en 1280.</span></label></li>
+        <li><label><input type="checkbox" data-screen="dictionnaire" data-index="3"><span class="txt">La recherche et le compteur tiennent sur une seule ligne.</span></label></li>
+        </ul>
+        <div class="verdict">
+          <span class="pill">à regarder</span>
+          <input type="text" class="verdict-input" data-screen="dictionnaire" placeholder="Ce qui ne va pas, en une phrase">
+        </div>
+      </section>
+      <section class="card" data-card="atoll">
+        <div class="head">
+          <span class="num">08</span>
+          <span class="name">Atoll</span>
+          <span class="grp">Plein écran</span>
+          <a class="open" href="CATALOGUE_AFFICHAGES.html#atoll">Ouvrir le cadre ↗</a>
+        </div>
+        <ul>
+        <li><label><input type="checkbox" data-screen="atoll" data-index="0"><span class="txt">L'en-tête donne jetons + série / record.</span></label></li>
+        <li><label><input type="checkbox" data-screen="atoll" data-index="1"><span class="txt">Les 4 installations sont des tickets : icône, record, description, vignette de zone.</span></label></li>
+        <li><label><input type="checkbox" data-screen="atoll" data-index="2"><span class="txt">Les Fragments de Légende ont leur bloc.</span></label></li>
+        <li><label><input type="checkbox" data-screen="atoll" data-index="3"><span class="txt">Les 6 pages passent par un sélecteur pleine largeur.</span></label></li>
+        </ul>
+        <div class="verdict">
+          <span class="pill">à regarder</span>
+          <input type="text" class="verdict-input" data-screen="atoll" placeholder="Ce qui ne va pas, en une phrase">
+        </div>
+      </section>
+      <section class="card" data-card="starter-regional">
+        <div class="head">
+          <span class="num">09</span>
+          <span class="name">Starter régional</span>
+          <span class="grp">Modale — parcours</span>
+          <a class="open" href="CATALOGUE_AFFICHAGES.html#starter-regional">Ouvrir le cadre ↗</a>
+        </div>
+        <ul>
+        <li><label><input type="checkbox" data-screen="starter-regional" data-index="0"><span class="txt">Aucun nom de dresseur : le champ n'existe que sur le premier choix, au début de la partie.</span></label></li>
+        <li><label><input type="checkbox" data-screen="starter-regional" data-index="1"><span class="txt">La ligne du haut dépend de la région et de son professeur : ici Johto et le Prof. Orme, à Bourg Geon.</span></label></li>
+        <li><label><input type="checkbox" data-screen="starter-regional" data-index="2"><span class="txt">Le titre suit la région (« Choisissez votre Starter Johto ! ») ; le reste du composant est celui du starter validé.</span></label></li>
+        </ul>
+        <div class="verdict">
+          <span class="pill">à regarder</span>
+          <input type="text" class="verdict-input" data-screen="starter-regional" placeholder="Ce qui ne va pas, en une phrase">
+        </div>
+      </section>
+      <section class="card" data-card="nav-menu">
+        <div class="head">
+          <span class="num">10</span>
+          <span class="name">Menu de navigation</span>
+          <span class="grp">Page</span>
+          <a class="open" href="CATALOGUE_AFFICHAGES.html#nav-menu">Ouvrir le cadre ↗</a>
+        </div>
+        <ul>
+        <li><label><input type="checkbox" data-screen="nav-menu" data-index="0"><span class="txt">L'entrée active porte la pastille d'accent.</span></label></li>
+        <li><label><input type="checkbox" data-screen="nav-menu" data-index="1"><span class="txt">Le panneau s'ouvre sous la barre : angles droits en haut, arrondis en bas seulement.</span></label></li>
+        <li><label><input type="checkbox" data-screen="nav-menu" data-index="2"><span class="txt">Le menu suit la grammaire d'en-tête des fenêtres, sans bandeau à lui.</span></label></li>
+        <li><label><input type="checkbox" data-screen="nav-menu" data-index="3"><span class="txt">Les groupes de tuiles ne doublonnent pas avec les Raccourcis du tableau de bord.</span></label></li>
+        </ul>
+        <div class="verdict">
+          <span class="pill">à regarder</span>
+          <input type="text" class="verdict-input" data-screen="nav-menu" placeholder="Ce qui ne va pas, en une phrase">
+        </div>
+      </section>
+      <section class="card" data-card="atoll-tour">
+        <div class="head">
+          <span class="num">11</span>
+          <span class="name">Atoll — Tour Combat</span>
+          <span class="grp">Plein écran</span>
+          <a class="open" href="CATALOGUE_AFFICHAGES.html#atoll-tour">Ouvrir le cadre ↗</a>
+        </div>
+        <ul>
+        <li><label><input type="checkbox" data-screen="atoll-tour" data-index="0"><span class="txt">L'en-tête du jeu est là : « Atoll de Combat », sa description et la carte Jetons Atoll (série et record).</span></label></li>
+        <li><label><input type="checkbox" data-screen="atoll-tour" data-index="1"><span class="txt">Le format est introduit par son bloc de description, puis les deux pastilles de rotation (minuteur, équipe et jour du cycle).</span></label></li>
+        <li><label><input type="checkbox" data-screen="atoll-tour" data-index="2"><span class="txt">Une carte par rang (E → S puis Libre) : pastille de rang colorée et règle « Nv.100 · n Pokémon · +x jetons ».</span></label></li>
+        <li><label><input type="checkbox" data-screen="atoll-tour" data-index="3"><span class="txt">Chaque carte montre l'équipe adverse de la rotation en pastilles rondes, et son bouton Combattre.</span></label></li>
+        </ul>
+        <div class="verdict">
+          <span class="pill">à regarder</span>
+          <input type="text" class="verdict-input" data-screen="atoll-tour" placeholder="Ce qui ne va pas, en une phrase">
+        </div>
+      </section>
+      <section class="card" data-card="atoll-usine">
+        <div class="head">
+          <span class="num">12</span>
+          <span class="name">Atoll — Usine Combat</span>
+          <span class="grp">Plein écran</span>
+          <a class="open" href="CATALOGUE_AFFICHAGES.html#atoll-usine">Ouvrir le cadre ↗</a>
+        </div>
+        <ul>
+        <li><label><input type="checkbox" data-screen="atoll-usine" data-index="0"><span class="txt">Deux formats seulement : Standard (Rang max C) et Expert (Rang max A).</span></label></li>
+        <li><label><input type="checkbox" data-screen="atoll-usine" data-index="1"><span class="txt">La règle parle d'équipe prêtée (« 4 prêtés », « 5 prêtés ») et non d'équipe adverse.</span></label></li>
+        <li><label><input type="checkbox" data-screen="atoll-usine" data-index="2"><span class="txt">Le libellé est bien « Équipe prêtée de la rotation : ».</span></label></li>
+        <li><label><input type="checkbox" data-screen="atoll-usine" data-index="3"><span class="txt">Même en-tête et mêmes pastilles de rotation que la Tour.</span></label></li>
+        </ul>
+        <div class="verdict">
+          <span class="pill">à regarder</span>
+          <input type="text" class="verdict-input" data-screen="atoll-usine" placeholder="Ce qui ne va pas, en une phrase">
+        </div>
+      </section>
+      <section class="card" data-card="atoll-arene">
+        <div class="head">
+          <span class="num">13</span>
+          <span class="name">Atoll — Arène Combat</span>
+          <span class="grp">Plein écran</span>
+          <a class="open" href="CATALOGUE_AFFICHAGES.html#atoll-arene">Ouvrir le cadre ↗</a>
+        </div>
+        <ul>
+        <li><label><input type="checkbox" data-screen="atoll-arene" data-index="0"><span class="txt">Trois formats courts : 3 Pokémon, Sans confort, Pression type.</span></label></li>
+        <li><label><input type="checkbox" data-screen="atoll-arene" data-index="1"><span class="txt">Les rangs affichés sont B, A et A.</span></label></li>
+        <li><label><input type="checkbox" data-screen="atoll-arene" data-index="2"><span class="txt">Même carte que la Tour, avec « Équipe adverse de la rotation : ».</span></label></li>
+        </ul>
+        <div class="verdict">
+          <span class="pill">à regarder</span>
+          <input type="text" class="verdict-input" data-screen="atoll-arene" placeholder="Ce qui ne va pas, en une phrase">
+        </div>
+      </section>
+      <section class="card" data-card="atoll-dome">
+        <div class="head">
+          <span class="num">14</span>
+          <span class="name">Atoll — Dôme Combat</span>
+          <span class="grp">Plein écran</span>
+          <a class="open" href="CATALOGUE_AFFICHAGES.html#atoll-dome">Ouvrir le cadre ↗</a>
+        </div>
+        <ul>
+        <li><label><input type="checkbox" data-screen="atoll-dome" data-index="0"><span class="txt">Deux formats : Demi-tournoi (Rang max A) et Finale (Rang max S).</span></label></li>
+        <li><label><input type="checkbox" data-screen="atoll-dome" data-index="1"><span class="txt">Les deux cartes montrent 6 Pokémon adverses.</span></label></li>
+        <li><label><input type="checkbox" data-screen="atoll-dome" data-index="2"><span class="txt">La Finale ajoute « Légendaires bannis cette rotation : » avec trois pastilles encadrées en orange.</span></label></li>
+        <li><label><input type="checkbox" data-screen="atoll-dome" data-index="3"><span class="txt">Même en-tête et mêmes pastilles que les autres centres.</span></label></li>
+        </ul>
+        <div class="verdict">
+          <span class="pill">à regarder</span>
+          <input type="text" class="verdict-input" data-screen="atoll-dome" placeholder="Ce qui ne va pas, en une phrase">
+        </div>
+      </section>
+
+  <h2>Ta réponse</h2>
+  <textarea id="out" placeholder="Clique sur « Exporter ma réponse » : le texte apparaît ici, prêt à copier."></textarea>
+  <p class="note">Deux phrases par écran suffisent. Si un écran est bon, dis simplement « bon ».</p>
+</div>
+<script>
+const VSCREENS = [{"id": "sac", "name": "Sac", "group": "Plein écran", "points": ["Les 7 catégories sont des pastilles avec leur quantité, et l'active est en clair (jamais du jaune plein).", "La recherche tient sur une ligne, le tri et la quantité sont à côté.", "Une ligne d'objet = pastille ronde + sprite + nom + description + ×n, sans case encadrée.", "Il n'y a plus de total « n dans la catégorie · n au total ».", "Mobile 390 : les objets passent sur 4 colonnes, la recherche prend toute la largeur."]}, {"id": "boite", "name": "Boîte PC", "group": "Plein écran", "points": ["Les filtres sont des pastilles, sans boîte « Filtres » ni filet autour.", "Une sélection Pokémon montre numéro, sprite et nom — pas de lieu, pas d'espèce, pas de cadre.", "Un Pokémon manquant montre numéro + pastille « ? » + nom.", "La grille garde 30 emplacements réguliers, sans trou."]}, {"id": "pokedex", "name": "Pokédex", "group": "Plein écran", "points": ["Les compteurs Vus / Capturés / Chromatiques sont là, en tête.", "La progression par région et l'objectif Charme Chroma se lisent d'un coup d'œil.", "La zone d'obtention apparaît sous chaque espèce, y compris pour les manquants en « ? ».", "Les 8 pastilles de filtre ne doublonnent pas avec celles de la Boîte PC."]}, {"id": "marche", "name": "Marché", "group": "Plein écran", "points": ["Les prix sont en points de quête.", "Une espèce non vue s'affiche « ??? ».", "La carte d'offre reprend la forme de la Boutique : icône + Ball, nom, prix, ligne d'état.", "Les 4 sections (Starters, Fossiles, Rares, Autres) et la barre d'achat sont présentes."]}, {"id": "boutique", "name": "Boutique", "group": "Plein écran", "points": ["Le portefeuille en tête montre Pokédollars et points de quête.", "Une offre sélectionnée se marque par une bordure claire, jamais par un aplat jaune.", "L'offre à achat unique est marquée, et la boutique verrouillée reste lisible.", "La barre du bas enchaîne Reset / quantité carrée / +10 / +100 / Max / total / Acheter."]}, {"id": "badges", "name": "Badges", "group": "Plein écran", "points": ["Chaque carte montre l'emblème réel du badge, en couleur une fois obtenu et désaturé sinon.", "Le nom est sur un bandeau clair pleine largeur, comme dans le jeu.", "Le dresseur puis la ville sont sur deux lignes, sans mention « Obtenu / À obtenir ».", "Les deux groupes sont introduits par leur compteur : « 2 / 24 badges » puis « 0 / 3 ligues ».", "Les cartes gardent leur taille : en 1280 il y en a simplement plus par ligne qu'en 960."]}, {"id": "dictionnaire", "name": "Dictionnaire", "group": "Plein écran", "points": ["Les 3 onglets (Objets, Attaques, Talents) sont un sélecteur, pas des onglets à soulignement.", "« Possédé ×42 » et « Non possédé » avec cadenas se distinguent sans lire.", "Les colonnes suivent la largeur : 1 en 390, 2 en 768, 3 en 1280.", "La recherche et le compteur tiennent sur une seule ligne."]}, {"id": "atoll", "name": "Atoll", "group": "Plein écran", "points": ["L'en-tête donne jetons + série / record.", "Les 4 installations sont des tickets : icône, record, description, vignette de zone.", "Les Fragments de Légende ont leur bloc.", "Les 6 pages passent par un sélecteur pleine largeur."]}, {"id": "starter-regional", "name": "Starter régional", "group": "Modale — parcours", "points": ["Aucun nom de dresseur : le champ n'existe que sur le premier choix, au début de la partie.", "La ligne du haut dépend de la région et de son professeur : ici Johto et le Prof. Orme, à Bourg Geon.", "Le titre suit la région (« Choisissez votre Starter Johto ! ») ; le reste du composant est celui du starter validé."]}, {"id": "nav-menu", "name": "Menu de navigation", "group": "Page", "points": ["L'entrée active porte la pastille d'accent.", "Le panneau s'ouvre sous la barre : angles droits en haut, arrondis en bas seulement.", "Le menu suit la grammaire d'en-tête des fenêtres, sans bandeau à lui.", "Les groupes de tuiles ne doublonnent pas avec les Raccourcis du tableau de bord."]}, {"id": "atoll-tour", "name": "Atoll — Tour Combat", "group": "Plein écran", "points": ["L'en-tête du jeu est là : « Atoll de Combat », sa description et la carte Jetons Atoll (série et record).", "Le format est introduit par son bloc de description, puis les deux pastilles de rotation (minuteur, équipe et jour du cycle).", "Une carte par rang (E → S puis Libre) : pastille de rang colorée et règle « Nv.100 · n Pokémon · +x jetons ».", "Chaque carte montre l'équipe adverse de la rotation en pastilles rondes, et son bouton Combattre."]}, {"id": "atoll-usine", "name": "Atoll — Usine Combat", "group": "Plein écran", "points": ["Deux formats seulement : Standard (Rang max C) et Expert (Rang max A).", "La règle parle d'équipe prêtée (« 4 prêtés », « 5 prêtés ») et non d'équipe adverse.", "Le libellé est bien « Équipe prêtée de la rotation : ».", "Même en-tête et mêmes pastilles de rotation que la Tour."]}, {"id": "atoll-arene", "name": "Atoll — Arène Combat", "group": "Plein écran", "points": ["Trois formats courts : 3 Pokémon, Sans confort, Pression type.", "Les rangs affichés sont B, A et A.", "Même carte que la Tour, avec « Équipe adverse de la rotation : »."]}, {"id": "atoll-dome", "name": "Atoll — Dôme Combat", "group": "Plein écran", "points": ["Deux formats : Demi-tournoi (Rang max A) et Finale (Rang max S).", "Les deux cartes montrent 6 Pokémon adverses.", "La Finale ajoute « Légendaires bannis cette rotation : » avec trois pastilles encadrées en orange.", "Même en-tête et mêmes pastilles que les autres centres."]}];
+const VGLOBAL = ["Les en-têtes ne portent plus aucun nombre ni texte à droite : le titre, la croix, rien d'autre — Sac, Boîte PC, Pokédex, Marché, Boutique, Badges, Dictionnaire, Atoll, Succès et les fenêtres du tableau de bord.", "Dans les barres d'achat (Boutique, Marché, Atoll — Boutique), la quantité « 1 » est une case carrée comme les autres cases, plus une pastille ronde.", "En 390, les sélecteurs à six pages (Atoll) passent à la ligne : aucun libellé coupé."];
+const KEY = 'pw-validation-catalogue-v2';
+let state = {};
+try { state = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { state = {}; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+const TOTAL = VSCREENS.reduce((n, s) => n + s.points.length, 0) + VGLOBAL.length;
+
+document.getElementById('count').textContent = '0';
+document.getElementById('total').textContent = String(TOTAL);
+
+document.addEventListener('change', (event) => {
+  const box = event.target;
+  const id = box.dataset.screen;
+  if (!id) return;
+  state[id] = state[id] || { checks: [], verdict: '' };
+  if (box.type === 'checkbox') {
+    state[id].checks[Number(box.dataset.index)] = box.checked;
+    const row = box.closest('li');
+    if (row) row.classList.toggle('checked', box.checked);
+  } else {
+    state[id].verdict = box.value;
+  }
+  save();
+  let done = 0, full = 0;
+  for (const screen of VSCREENS) {
+    const checks = (state[screen.id] || {}).checks || [];
+    const ok = checks.filter(Boolean).length;
+    done += ok;
+    if (ok === screen.points.length) full++;
+  }
+  done += ((state.global || {}).checks || []).filter(Boolean).length;
+  document.getElementById('count').textContent = String(done);
+  document.getElementById('screens').textContent = `${full} / ${VSCREENS.length} écrans complets`;
+});
+
+document.getElementById('reset').onclick = () => { state = {}; save(); location.reload(); };
+
+document.getElementById('export').onclick = () => {
+  const lines = [`Validation du catalogue — ${new Date().toLocaleDateString('fr-FR')}`, ''];
+  const block = (name, points, entry) => {
+    const checks = entry.checks || [];
+    const ok = checks.filter(Boolean).length;
+    const verdict = (entry.verdict || '').trim();
+    const status = ok === points.length && !verdict ? 'BON' : (ok === 0 && !verdict ? 'pas regardé' : 'À CORRIGER');
+    lines.push(`— ${name} : ${status} (${ok}/${points.length})`);
+    if (verdict) lines.push('   ' + verdict);
+    points.forEach((point, j) => { if (checks[j]) lines.push('   ok · ' + point); });
+    lines.push('');
+  };
+  block('Global', VGLOBAL, state.global || {});
+  for (const screen of VSCREENS) block(screen.name, screen.points, state[screen.id] || {});
+  const out = document.getElementById('out');
+  out.value = lines.join('\n');
+  out.select();
+  try { document.execCommand('copy'); } catch (e) {}
+};
+</script>
+</body>
+</html>

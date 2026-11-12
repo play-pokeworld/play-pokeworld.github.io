@@ -4,11 +4,10 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 .ui-toolbar-label {
   color: var(--light2);
-  font-size: 11px;
-  font-weight: 900;
+  font-size: var(--pw-font-size-sm);
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.4px;
 }
@@ -19,17 +18,16 @@
   background: rgba(236,222,183,0.14);
 }
 
-
 /* 3. Toolbar component (pw-ui-toolbar) — the ONE fixed filter bar ──── Rendered OUTSIDE scrollers (bag, dictionary, selectors): it can never scroll away or leave a gap where the grid bleeds through. */
 .pw-ui-toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  padding: 8px 10px;
-  background: var(--pw-bg-header);
-  border: 1px solid var(--pw-border-color);
-  border-radius: 8px;
+  padding: 0 0 8px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
   color: var(--pw-text-primary);
 }
 
@@ -83,7 +81,7 @@
   background: var(--pw-bg-surface);
   color: var(--pw-text-primary);
   font: inherit;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
 }
 
 .pw-toolbar-sorts {
@@ -99,7 +97,7 @@
   color: var(--pw-btn-text);
   border-radius: 8px;
   padding: 5px 10px;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   font-weight: 700;
   cursor: pointer;
 }
@@ -125,9 +123,10 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 8px 12px;
-  background: var(--dark1);
-  border-bottom: 2px solid var(--dark3);
+  padding: 0 0 8px;
+  /* The catalogue lays the filters directly on the window surface: no band, no rule. */
+  background: transparent;
+  border-bottom: 0;
   flex-shrink: 0;
 }
 
@@ -150,56 +149,41 @@
   flex-wrap: wrap;
 }
 
+/* A filter chip is a pill, like the selects beside it: one surface, no frame, and the light
+   accent of the catalogue when it is the current one. */
 .pw-filterbar button.pw-chip {
-  height: 30px;
-  padding: 0 12px;
-  border-radius: 8px;
-  background: var(--pw-bg-sprite) !important;
-  border: 1px solid var(--pw-border-color) !important;
-  color: var(--pw-text-secondary) !important;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.3px;
-  text-shadow: none !important;
+  height: 28px;
+  min-height: 0;
+  min-width: 0;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--pw-bg-header);
+  color: var(--light2);
+  font-size: var(--pw-font-size-md);
+  font-weight: 600;
   cursor: pointer;
 }
 
 .pw-filterbar button.pw-chip:hover {
-  background: var(--pw-bg-surface) !important;
-  border-color: var(--pw-text-secondary) !important;
-  color: var(--pw-text-primary) !important;
-  filter: none !important;
+  background: var(--pw-bg-sprite);
+  color: var(--pw-text-primary);
+  filter: none;
 }
 
 .pw-filterbar button.pw-chip.active {
-  background: var(--light2) !important;
-  border-color: var(--light2) !important;
-  color: var(--dark1) !important;
-  text-shadow: none !important;
+  background: var(--light1);
+  color: var(--pw-bg-header);
 }
 
+/* The count rides inside the pill in both states: it never gets a bubble of its own. */
 .pw-filterbar button.pw-chip .pw-chip-count {
-  opacity: 0.75;
-  font-weight: 700;
-  margin-left: 2px;
+  margin-left: 4px;
+  color: inherit;
+  background: none;
+  opacity: 0.72;
+  font-weight: 800;
 }
-
-
-/* User request: the counter bubble keeps the SAME look in both states — light number (var(--light2)) on the dark pill — only the chip/tab label switches to dark text on the beige active background. */
-.pw-filterbar button.pw-chip .pw-chip-count {
-  opacity: 1 !important;
-  font-weight: 800 !important;
-}
-
-.pw-filterbar button.pw-chip:not(.active) .pw-chip-count {
-  color: var(--light2) !important;
-}
-
-.pw-filterbar button.pw-chip.active .pw-chip-count {
-  color: var(--light2) !important;
-  background: var(--dark1) !important;
-}
-
 
 /* Touch layout: the chip row of a filter toolbar is a navigation strip, so it gets one row that
    scrolls sideways instead of four wrapped rows that push the content off the screen.
@@ -211,7 +195,7 @@
     height: 40px;
     min-height: 40px;
     padding: 0 14px;
-    font-size: 12px;
+    font-size: var(--pw-font-size-md);
   }
 
   /* The toolbar keeps one band of navigation and one line of labels at most. */

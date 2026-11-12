@@ -1,208 +1,72 @@
 /*
  * panels/shortcuts.css
  * ---------------------------------------------------------------------------
+ * The shortcut column of the dashboard: one row per destination.
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
+/* A shortcut is `.scrow` of the catalogue (CATALOGUE_AFFICHAGES.html lines 494-496 and 647-649):
+   a 34px row of the header colour, a 9px radius, the hairline of the token mixed at half with the
+   colour of the destination, and that colour on the icon. The column used to paint the full
+   saturation on the frame, a gradient fill and a 32px height: same idea, three times too loud. */
+.shortcut-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid color-mix(in srgb, var(--shortcut-color, var(--pw-border-color)) 50%, var(--pw-border-color));
+  border-radius: 9px;
+  background: var(--pw-bg-header);
+  color: var(--pw-text-primary);
+  font-size: var(--pw-font-size-sm);
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: none;
+  transition: border-color 0.14s ease, background-color 0.14s ease;
+}
 
-.shortcut-action-icon {
-  width: 18px;
-  height: 18px;
+.shortcut-action-btn:hover {
+  border-color: var(--shortcut-color, var(--accent));
+  background: var(--pw-bg-surface);
+}
+
+.shortcut-action-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.shortcut-action-icon,
+.shortcut-action-icon .ui-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 14px;
+  height: 14px;
+  color: var(--shortcut-color, var(--pw-text-primary));
 }
 
-.shortcut-action-icon .ui-icon {
-  width: 18px;
-  height: 18px;
+.shortcut-action-btn .pw-button-label {
+  color: inherit;
 }
 
-.shortcut-action-btn {
-  border-radius: 8px;
-  min-height: 32px;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.14);
-}
-
-.shortcut-action-btn {
-  border: 2px solid var(--shortcut-color, var(--light2));
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.18), 0 6px 14px rgba(0,0,0,0.14);
-}
-
-.shortcut-action-btn:hover {
-  border-color: var(--shortcut-color, var(--light2));
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.18), 0 8px 18px rgba(0,0,0,0.20);
-}
-
-.shortcut-action-btn {
-  width: 100%;
-  padding: 0 9px;
-  background: var(--dark3);
-  border: 2px solid var(--shortcut-color, var(--light2));
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: bold;
-  color: var(--light2);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: opacity 0.2s;
-}
-
-.shortcut-action-btn:hover {
-  opacity: 0.8;
-}
-
-.shortcut-action-icon {
-  font-size: 15px;
-}
-
-.shortcut-action-btn {
-  --shortcut-color: var(--accent);
-  border: 2px solid var(--shortcut-color, var(--light2));
-  background: linear-gradient(180deg, var(--dark2), var(--dark1));
-  color: var(--light2);
-}
-
-.shortcut-action-btn:hover {
-  border-color: var(--shortcut-color, var(--light2));
-  filter: brightness(1.08);
-}
-
-.shortcut-action-btn .shortcut-action-icon {
-  color: var(--shortcut-color, var(--light2));
-}
-
-.shortcut-action-btn[data-panel="box_view"] {
-  --shortcut-color: var(--blue);
-  border-color: var(--blue);
-}
-
-.shortcut-action-btn[data-panel="inventory"] {
-  --shortcut-color: var(--green);
-  border-color: var(--green);
-}
-
-.shortcut-action-btn[data-panel="market"] {
-  --shortcut-color: var(--accent);
-  border-color: var(--accent);
-}
-
-.shortcut-action-btn[data-panel="pokedex"] {
-  --shortcut-color: var(--light2);
-  border-color: var(--light2);
-}
-
-.shortcut-action-btn[data-panel="dictionary"] {
-  --shortcut-color: var(--purple);
-  border-color: var(--purple);
-}
-
-.shortcut-action-btn[data-panel="guide"] {
-  --shortcut-color: var(--orange);
-  border-color: var(--orange);
-}
-
-.shortcut-action-btn[data-panel="atoll"] {
-  --shortcut-color: var(--red);
-  border-color: var(--red);
-}
-
-.shortcut-action-btn[data-panel="box_view"] .shortcut-action-icon {
-  color: var(--blue);
-}
-
-.shortcut-action-btn[data-panel="inventory"] .shortcut-action-icon {
-  color: var(--green);
-}
-
-.shortcut-action-btn[data-panel="market"] .shortcut-action-icon {
-  color: var(--accent);
-}
-
-.shortcut-action-btn[data-panel="pokedex"] .shortcut-action-icon {
-  color: var(--light2);
-}
-
-.shortcut-action-btn[data-panel="dictionary"] .shortcut-action-icon {
-  color: var(--purple);
-}
-
-.shortcut-action-btn[data-panel="guide"] .shortcut-action-icon {
-  color: var(--orange);
-}
-
-.shortcut-action-btn[data-panel="atoll"] .shortcut-action-icon {
-  color: var(--red);
-}
-
-.shortcut-action-btn {
-  color: var(--light2);
-}
-
-.shortcut-action-btn:hover {
-  filter: brightness(1.15);
-  color: var(--light2);
-}
-
-
-/* Light background active buttons MUST use dark text (#36342F) */
-.shortcut-action-btn.active {
-  background: var(--light2) !important;
-  color: var(--dark1) !important;
-  border-color: var(--light2) !important;
-}
-
-.shortcut-action-btn.active * {
-  color: var(--dark1) !important;
-}
-
-.shortcut-action-btn {
-  background: linear-gradient(180deg, var(--pw-btn-bg-hover), var(--pw-btn-bg)) !important;
-  color: var(--pw-btn-text) !important;
-}
+/* One colour per destination, the list of the catalogue. */
+.shortcut-action-btn[data-panel='box_view'] { --shortcut-color: var(--shield); }
+.shortcut-action-btn[data-panel='inventory'] { --shortcut-color: var(--ok); }
+.shortcut-action-btn[data-panel='pokedex'] { --shortcut-color: var(--light1); }
+.shortcut-action-btn[data-panel='achievements'] { --shortcut-color: var(--pw-accent); }
+.shortcut-action-btn[data-panel='dictionary'] { --shortcut-color: var(--heal); }
+.shortcut-action-btn[data-panel='guide'] { --shortcut-color: var(--warn); }
+.shortcut-action-btn[data-panel='badges'] { --shortcut-color: var(--type-electric); }
+.shortcut-action-btn[data-panel='market'] { --shortcut-color: var(--accent); }
+.shortcut-action-btn[data-panel='atoll'] { --shortcut-color: var(--bad, var(--pw-accent-danger)); }
 
 @media (max-width: 850px), (pointer: coarse) {
-.shortcut-action-btn {
-  -webkit-touch-callout: none !important;
-  -webkit-user-select: none !important;
-  user-select: none !important;
-}
-
-}
-
-.shortcut-action-btn[data-panel='box_view'] {
-  --shortcut-color: var(--blue);
-  border-color: var(--blue);
-}
-
-.shortcut-action-btn[data-panel='inventory'] {
-  --shortcut-color: var(--green);
-  border-color: var(--green);
-}
-
-.shortcut-action-btn[data-panel='market'] {
-  --shortcut-color: var(--accent);
-  border-color: var(--accent);
-}
-
-.shortcut-action-btn[data-panel='pokedex'] {
-  --shortcut-color: var(--light2);
-  border-color: var(--light2);
-}
-
-.shortcut-action-btn[data-panel='dictionary'] {
-  --shortcut-color: var(--purple);
-  border-color: var(--purple);
-}
-
-.shortcut-action-btn[data-panel='guide'] {
-  --shortcut-color: var(--orange);
-  border-color: var(--orange);
-}
-
-.shortcut-action-btn[data-panel='badges'] {
-  --shortcut-color: var(--yellow);
-  border-color: var(--yellow);
+  .shortcut-action-btn {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
 }

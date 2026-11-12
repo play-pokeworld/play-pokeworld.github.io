@@ -393,9 +393,10 @@ describe('Battle Atoll — UI Modals and Access Gates', (test) => {
     const tabBtns = panel.getDomElement().querySelector('.pw-badges-tabs')?.querySelectorAll('.pw-button') || [];
     assert.equal(tabBtns.length, 6, 'all 6 navigation tabs rendered');
 
-    // Home hub cards
-    const homeCards = panel.getDomElement().querySelectorAll('.pw-atoll-home-card');
-    assert.equal(homeCards.length, 4, '4 discipline hub cards on menu tab');
+    // Home hub: one ticket row per combat centre (user request: the catalogue home)
+    const homeTickets = panel.getDomElement().querySelectorAll('.pw-atoll-tickets .pw-sheet-row');
+    assert.equal(homeTickets.length, 4, '4 combat-centre tickets on the home tab');
+    assert.ok(homeTickets[0].classList.contains('is-action'), 'a ticket is a button, not a static row');
 
     // Live countdown update via RoamingRotationTickEvent
     EventBus.getInstance().dispatch(new RoamingRotationTickEvent(Date.now()));

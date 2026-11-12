@@ -4,12 +4,12 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
+/* The catalogue lays the bag filters on the window surface: no band, no frame, no radius. */
 .inv-toolbar {
-  background: var(--pw-bg-header) !important;
-  border: 1px solid var(--pw-border-color) !important;
-  border-radius: 8px !important;
-  padding: 10px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
   color: var(--pw-text-primary) !important;
   display: flex !important;
   flex-wrap: wrap !important;
@@ -18,73 +18,81 @@
 }
 
 .inv-name, .inv-qty, .inv-desc {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
+/* The item row carries exactly the matter of a catalogue .row: surface mixed of body and header,
+   one hairline, the radius of the window's small step, a sprite tile, the name, then the count. */
 .inv-item {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
-  background: var(--light1);
+  min-width: 0;
+  padding: 9px 10px;
+  background: color-mix(in srgb, var(--pw-bg-surface) 60%, var(--pw-bg-header));
+  border: 1px solid var(--pw-border-color);
   border-radius: 8px;
-  margin-bottom: 8px;
-  border: 2px solid var(--dark1);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .inv-item:hover {
   border-color: var(--light2);
-  background: var(--light2);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  background: var(--pw-bg-header);
 }
 
 .inv-icon {
   width: var(--pw-item-icon-sm);
   height: var(--pw-item-icon-sm);
+  flex: 0 0 var(--pw-item-icon-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--pw-bg-sprite);
 }
 
 .inv-icon img {
-  width: 110%;
-  height: 110%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   image-rendering: pixelated;
 }
 
 .inv-name {
   flex: 1;
-  color: var(--dark1);
-  font-weight: 500;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  color: var(--pw-text-primary);
+  font-size: var(--pw-font-size-md);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+.inv-desc {
+  color: var(--pw-text-secondary);
+  font-size: var(--pw-font-size-sm);
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The count is a number, not a badge: tabular figures at the end of the row. */
 .inv-qty {
-  background: var(--dark1);
-  color: var(--light2);
-  font-weight: bold;
-  padding: 4px 10px;
-  border-radius: 12px;
-  min-width: 40px;
-  text-align: center;
-  font-size: 11px;
-}
-
-.inv-qty, .inv-desc {
-  font-size: 11px;
-}
-
-.inv-name {
-  font-size: 13px;
-}
-
-.inv-icon, .inv-icon img {
-  width: 40px;
-  height: 40px;
+  margin-left: auto;
+  padding: 0;
+  background: none;
+  color: var(--pw-text-primary);
+  font-size: var(--pw-font-size-sm);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
 }
 
 .inv-item {
@@ -106,7 +114,7 @@
 
 .inv-filter-btn, .inv-sort-btn {
   padding: 6px 12px;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .inv-filter-btn.is-active, .inv-sort-btn.is-active {
@@ -135,7 +143,7 @@
   gap: 6px;
   padding: 3px 9px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.5;
   background: rgba(148, 136, 107, 0.16);
   border: 1px dashed var(--dark3);
@@ -180,7 +188,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   font-weight: 800;
   box-shadow: 0 2px 10px rgba(0,0,0,0.45);
 }
@@ -195,12 +203,12 @@
   bottom: -12px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   color: var(--light2);
   border: 1px solid var(--dark3);
   border-radius: 999px;
   padding: 2px 7px;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   white-space: nowrap;
   max-width: 105px;
   overflow: hidden;
@@ -211,7 +219,7 @@
   position: absolute;
   top: -8px;
   left: -8px;
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
   color: var(--shiny);
   border: 2px solid var(--shiny);
   border-radius: 999px;
@@ -220,9 +228,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
-  font-weight: 900;
-  text-shadow: 0 0 8px var(--shiny);
+  font-size: var(--pw-font-size-lg);
+  font-weight: 700;
   box-shadow: 0 2px 10px rgba(0,0,0,0.45);
 }
 
@@ -237,7 +244,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
   color: var(--light1);
 }
 
@@ -252,55 +259,21 @@
   image-rendering: crisp-edges;
 }
 
-
 /* NB: .save-slot is EXCLUDED — save cards carry their own themed background (save-bg-classic/emerald/…) which must stay visible in the settings preview as in the saves menu. */
-.inv-item {
-  background: rgba(0, 0, 0, 0.28) !important;
-  border: 1px solid var(--pw-border) !important;
-  color: var(--light2) !important;
-}
-
-.inv-item:hover {
-  background: rgba(236, 222, 183, 0.15) !important;
-  border-color: var(--light2) !important;
-  color: var(--light2) !important;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
-}
-
-.inv-name {
-  color: var(--light2) !important;
-  font-weight: 700;
-}
-
-.inv-desc {
-  color: var(--light1) !important;
-}
-
-.inv-qty {
-  color: #ffffff !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6) !important;
-}
 
 .bag-panel-content .inv-list-root {
   margin-top: 0;
 }
 
 @media (max-width: 850px), (pointer: coarse) {
-.inv-grid {
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
-  gap: 8px !important;
-}
-
 .inv-toolbar {
   display: flex !important;
   flex-wrap: wrap;
   gap: 6px !important;
-  /* padding comes from the shared toolbar band (components/ui-input.css). */
-  padding: 6px 10px !important;
-  background: var(--dark2) !important;
-  border-radius: 12px !important;
-  border: 1px solid var(--dark3) !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  border: 0 !important;
   position: relative;
 }
 
@@ -308,8 +281,8 @@
 
 .inv-list-root {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 6px;
 }
 
 .inv-item.selected {
@@ -317,23 +290,9 @@
   box-shadow: 0 0 0 1px var(--accent, #94886B) inset;
 }
 
-.inv-icon {
-  width: var(--pw-item-icon-sm);
-  height: var(--pw-item-icon-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.inv-name {
-  display: flex;
-  flex-direction: column;
-}
-
 .inv-holder {
   color: var(--green);
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
 
 .pw-bag-detail {
@@ -365,7 +324,7 @@
 }
 
 .pw-bag-detail-desc {
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   color: var(--light2);
 }
 
@@ -380,7 +339,7 @@
 
 .pw-bag-sale-price {
   color: var(--accent, #FFA500);
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   font-weight: 700;
 }
 
@@ -394,6 +353,6 @@
 
 .pw-bag-use-note {
   color: var(--pw-text-muted, var(--light2));
-  font-size: 12px;
+  font-size: var(--pw-font-size-md);
   line-height: 1.4;
 }

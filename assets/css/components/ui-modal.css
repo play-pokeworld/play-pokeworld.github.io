@@ -4,9 +4,8 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 .pw-modal-container {
-  background:var(--dark2);
+  background:var(--pw-bg-header);
   border:1px solid var(--dark3);
   border-radius:12px;
   width:95vw;
@@ -18,27 +17,27 @@
   overflow:hidden;
 }
 
-
 /* Wave 33 — the legacy `.pw-modal-header/-title/-close` geometry is GONE. It described a second, disjoint header (dark1 background, 12px 18px padding, 50px min-height, square corners, bare 22px ✕) that only the fullscreen panels ever wore. Those panels now emit the canonical markup through components/panel-header.js, so the shared rule owns the band and these classes only keep their flex-shrink role. See the canonical block. */
 .pw-modal-header {
   flex-shrink:0;
 }
 
+/* The filter slot of a fullscreen panel sits on the panel surface, level with the body: no band,
+   no rule underneath (the catalogue lays its filters straight on the surface). */
 .pw-modal-search-bar {
-  background:var(--dark1);
-  padding:10px 18px;
-  border-bottom:2px solid var(--dark3);
-  flex-shrink:0;
-  display:none;
+  background: transparent;
+  padding: 0 16px;
+  border-bottom: 0;
+  flex-shrink: 0;
+  display: none;
 }
 
 .pw-modal-body {
   flex:1;
   overflow-y:auto;
   padding:16px;
-  background:var(--dark2);
+  background:var(--pw-bg-header);
 }
-
 
 /* Wave 33: the duplicate legacy header block that lived here is retired for the same reason as its twin (~line 2399) — it re-declared a competing geometry for the reference panels. The canonical header rule is the only place where a panel header is described. */
 .pw-modal-header {
@@ -49,22 +48,13 @@
   flex: 1;
   overflow-y: auto;
   padding: 16px;
-  background: var(--dark2);
-}
-
-.pw-modal-search-bar {
-  background: var(--dark1);
-  padding: 10px 18px;
-  border-bottom: 2px solid var(--dark3);
-  flex-shrink: 0;
-  display: none;
+  background: var(--pw-bg-header);
 }
 
 .pw-modal-body {
-  background: rgba(0,0,0,0.10);
-  color: var(--light1);
+  background: transparent;
+  color: var(--pw-text-primary);
 }
-
 
 /* Canonical header: IDENTICAL on all non-draggable panels ── (draggable windows keep .pw-win-hdr, deliberately distinct) */
 .pw-modal-header {
@@ -79,12 +69,11 @@
   margin: 0 0 var(--pw-header-gap) 0;
   background: var(--pw-bg-panel-header);
   border: 1px solid var(--pw-border);
-  border-bottom: 2px solid var(--pw-border-panel-header);
+  border-bottom: 1px solid var(--pw-border-panel-header);
   border-radius: var(--pw-header-radius);
   color: var(--light2);
   font-size: var(--pw-header-title-size);
   font-weight: 700;
-  letter-spacing: 0.4px;
   line-height: 1;
 }
 
@@ -162,9 +151,9 @@
 .pw-fullscreen-overlay > .pw-modal-container {
   border: 1px solid var(--pw-border);
   border-radius: var(--pw-radius);
-  background: var(--pw-surface);
+  background: var(--pw-bg-page);
   box-shadow: var(--pw-shadow);
-  color: var(--light2);
+  color: var(--pw-text-primary);
 }
 
 .pw-fullscreen-overlay .pw-modal-search-bar.is-filled {
@@ -296,5 +285,17 @@
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
+  }
+}
+
+/* PC reference width (user decision): a full-screen window is as wide as the catalogue draws it,
+   1280 px, instead of the historical 960 px cap. The cap follows the same token as the other large
+   windows, so the column counts of the grids (badges, bag, boxes, dictionary) match from one screen
+   to the next on a desktop, and the token still grows on very wide screens. Phones and touch
+   pointers keep their own rule above (95vw / viewport minus the safe areas). */
+@media (min-width: 1025px) and (pointer: fine) {
+  .pw-fullscreen-overlay > .pw-modal-container {
+    width: min(95vw, var(--pw-modal-container-max-width, 1280px));
+    max-width: var(--pw-modal-container-max-width, 1280px);
   }
 }

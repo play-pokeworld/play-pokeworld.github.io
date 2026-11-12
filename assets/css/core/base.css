@@ -5,10 +5,8 @@
  * One file, one object: the rules below all belong to this sheet, whatever era they were written in.
  */
 
-
 * {
   font-family: var(--pw-font-main);
-  letter-spacing: 0;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -44,23 +42,24 @@ body {
 }
 
 * {
-  font-family: 'Winky Sans', 'Segoe UI', system-ui, sans-serif;
-  letter-spacing: 0;
+  font-family: var(--pw-font-main);
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
 body {
-  background-color: var(--dark1);
+  background-color: var(--pw-bg-surface);
   color: var(--light2);
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
 }
 
+/* The pixel-art strip that scrolls under every window at 8% opacity: it is part of the scenery of
+   the game screen, it stays. */
 body::before {
   content: '';
   position: fixed;
@@ -73,18 +72,15 @@ body::before {
   background-position: 0 0;
   opacity: 0.08;
   animation: bg-scroll 600s linear infinite reverse;
-  pointer-events: none;
-  z-index: 0;
 }
 
 body {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .modal-title {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
-
 
 /* Wave 33: the original `.modal-title` rule (15px, 16px bottom margin, 12px bottom padding, hairline border) is retired. It described a THIRD header shape that only survived because the canonical block came later in the file — dead weight that made the real source of truth impossible to find. Colour is kept; geometry belongs to the canonical block alone. */
 .modal-title {
@@ -94,7 +90,7 @@ body {
 .modal-close {
   cursor: pointer;
   color: var(--light2);
-  font-size: 20px;
+  font-size: var(--pw-font-size-4xl);
   font-weight: bold;
 }
 
@@ -159,7 +155,6 @@ body.mobile-mode #main-dashboard .win-body {
 }
 
 .modal-title {
-  letter-spacing: 0.4px;
 }
 
 @media (min-width: 851px) {
@@ -176,11 +171,11 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--dark1);
+  background: var(--pw-bg-surface);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--dark3);
+  background: var(--pw-bg-sprite);
   border-radius: 4px;
 }
 
@@ -189,17 +184,17 @@ body {
 }
 
 body, .modal-title {
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
 }
 
 .modal-title > div {
-  font-size: 15px;
+  font-size: var(--pw-font-size-xl);
 }
 
 option {
   background-color: var(--pw-bg-surface) !important;
   color: var(--light2) !important;
-  font-family: 'Winky Sans', 'Segoe UI', system-ui, sans-serif !important;
+  font-family: var(--pw-font-main) !important;
 }
 
 .modal-close {
@@ -247,7 +242,7 @@ body.mobile-mode #header h1 {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 17px;
+  font-size: var(--pw-font-size-3xl);
 }
 
 body.mobile-mode #main-dashboard {
@@ -279,7 +274,7 @@ body.mobile-mode #win-map {
   padding:8px 10px;
   border-radius:0 6px 6px 0;
   margin:8px 0;
-  font-size:13px;
+  font-size: var(--pw-font-size-lg);
   color:#ddd;
   line-height:1.4;
 }
@@ -290,7 +285,7 @@ body.mobile-mode #win-map {
   border:1px solid rgba(255,193,7,0.25);
   padding:10px;
   border-radius:8px;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   color:var(--light1);
 }
 
@@ -303,7 +298,7 @@ body.save-menu-active {
   align-items: center;
   gap: 8px;
   margin-bottom: 10px;
-  background: var(--dark2);
+  background: var(--pw-bg-header);
   padding: 6px 10px;
   border-radius: 6px;
   cursor: pointer;
@@ -329,11 +324,9 @@ body.save-menu-active {
 .modal-close {
   cursor: pointer;
   border-radius: 10px;
-  font-family: 'Winky Sans','Segoe UI',system-ui,sans-serif;
-  font-weight: 900;
-  letter-spacing: 0.35px;
+  font-family: var(--pw-font-main);
+  font-weight: 700;
 }
-
 
 /* Canonical header: IDENTICAL on all non-draggable panels ── (draggable windows keep .pw-win-hdr, deliberately distinct) */
 .modal-title {
@@ -348,19 +341,17 @@ body.save-menu-active {
   margin: 0 0 var(--pw-header-gap) 0;
   background: var(--pw-bg-panel-header);
   border: 1px solid var(--pw-border);
-  border-bottom: 2px solid var(--pw-border-panel-header);
+  border-bottom: 1px solid var(--pw-border-panel-header);
   border-radius: var(--pw-header-radius);
   color: var(--light2);
   font-size: var(--pw-header-title-size);
   font-weight: 700;
-  letter-spacing: 0.4px;
   line-height: 1;
 }
 
 .modal-title > div:first-child {
 
 }
-
 
 /* design-system/pass-11.css * --------------------------------------------------------------------------- * Dated pass inherited from the former design-system.css, kept in its historical order. * * Part of the 1.16.11 split: one file, one responsibility. The order of the * @import lines in assets/css/style.css IS the cascade — never reorder them, * never import this sheet anywhere else (guarded by tests/CssStructure.test.js). */
 .modal-title .modal-title-text {
@@ -370,7 +361,6 @@ body.save-menu-active {
   min-width: 0;
   font-size: var(--pw-header-title-size);
   font-weight: 700;
-  letter-spacing: 0.4px;
   line-height: 1;
   color: var(--light2);
 }
@@ -378,15 +368,13 @@ body.save-menu-active {
 .modal-title .pw-info-name {
   font-size: var(--pw-header-title-size);
   font-weight: 700;
-  letter-spacing: 0.4px;
   line-height: 1.15;
   color: var(--light2);
 }
 
-
 /* The header's optional subtitle stays one step down, never larger. */
 .modal-title .pw-info-head-text > .pw-text-sm {
-  font-size: 11.5px;
+  font-size: var(--pw-font-size-sm);
   font-weight: 700;
   line-height: 1.2;
 }
@@ -406,7 +394,7 @@ body.save-menu-active {
   background: transparent;
   color: var(--light2);
   font-size: var(--pw-header-close-glyph);
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1;
   cursor: pointer;
   flex-shrink: 0;
@@ -530,10 +518,11 @@ body.mobile-mode #shortcuts-window-body .shortcut-action-btn {
    components/ui-panel.css. Nothing here shrinks a panel with `transform: scale(0.92)`. */
 }
 
+/* The page colour is the canvas behind the landscape: it must be the darkest tone of the theme,
+   not the legacy grey that used to sit there. */
 body {
-  background-color: var(--dark1) !important;
-  background-image:
-    radial-gradient(1200px 600px at 50% -10%, rgba(255,255,255,0.03), transparent 60%) !important;
+  background-color: var(--pw-bg-page) !important;
+  background-image: none !important;
 }
 
 body.pw-ui-animations-off .pw-fx-float {
@@ -652,6 +641,9 @@ html:not([data-dungeon-run="1"]) #battle-active-scene:not(.is-live) ~ #battle-id
   margin: 0 auto !important;
 }
 
+/* The painted landscape of the game: sky, horizon, grass and ground, tinted by the time of day
+   and re-coloured by every theme through the --pw-land-* tokens. It is the identity of the game
+   screen and it stays; only its palette is derived from the theme from now on. */
 body::after {
   content: '';
   position: fixed;
@@ -821,11 +813,10 @@ body.pw-capture-animations-off .pw-capture-overlay .pw-ca-ball {
   animation: none !important;
 }
 
-
 /* UIModal panels inherit `.dash-win`; mobile dashboard focus hides those windows by default. Keep modal cards visible above the dashboard and restore the modal surface treatment. */
 body.mobile-mode .pw-modal-backdrop > .pw-panel--modal-window {
   display: flex;
-  border-radius: 16px;
+  border-radius: var(--pw-window-radius);
   border-left: 1px solid var(--pw-border-color);
   border-right: 1px solid var(--pw-border-color);
   box-shadow: var(--pw-shadow-lg);
@@ -880,7 +871,6 @@ button.pw-grid-media:focus-visible {
   transform: translateY(-2px);
 }
 
-
 /* Page scroll & dashboard drag model — loaded last, overrides the legacy layers. - The document scrolls like the reference; its header remains sticky. - The dashboard grows to the longest column instead of clipping it inside an inner scrollport. Windows themselves never scroll internally. - A dragged window follows the pointer through a GPU transform only. */
 body:not(.save-menu-active) {
   overflow-x: hidden;
@@ -920,7 +910,6 @@ body:not(.mobile-mode) #main-dashboard .dash-win > .win-body {
   overflow: visible !important;
 }
 
-
 /* Large secret-base rooms scale down to the column instead of scrolling. */
 body:not(.mobile-mode) #main-dashboard #base-panel.win-body canvas {
   max-width: 100%;
@@ -945,7 +934,7 @@ body:not(.mobile-mode) #header .pw-header-badges {
   border: 0;
   border-radius: 0;
   background: transparent;
-  font-size: 13px;
+  font-size: var(--pw-font-size-lg);
   line-height: normal;
 }
 
@@ -955,7 +944,6 @@ body.mobile-mode {
      One 6px padding band + one 44px row of tabs, safe-area excluded. */
   --pw-mobile-nav-h: 56px;
 }
-
 
 /* Match the original mobile header height and preserve the device safe area. This selector intentionally overrides only the Rework header dock, without changing the original global mobile rule in design-system.css. */
 body.mobile-mode #header.pw-header-panel {
@@ -968,9 +956,8 @@ body.mobile-mode #header .pw-header-badges {
   min-width: 0;
   gap: 0;
   padding: 0;
-  font-size: 11px;
+  font-size: var(--pw-font-size-sm);
 }
-
 
 /* Toasts never cover the logo / title bar of the game screen. */
 body:has(#header) .pw-notification-container {
@@ -985,7 +972,6 @@ body.mobile-mode:has(#header) .pw-notification-container {
   max-width: none;
   justify-content: flex-end;
 }
-
 
 /* Animated backdrop (v1.3) --------------------------------------------------- design-system.css animates `background-position` of the full-screen body::before, which repaints the whole viewport on every frame and competes with scrolling. Same look, compositor-only: the layer is one tile wider than the viewport and slides by exactly one tile (seamless loop), at the original speed (4000px / 600s = 6.67px/s; tile width 2969px -> 445s). */
 body::before {
@@ -1013,7 +999,6 @@ body::before {
   outline: 2px solid var(--light2);
   outline-offset: 2px;
 }
-
 
 /* Universal Scrollbar Elimination Requirement: Scrollbars must NOT be visible anywhere in the game. */
 *, *::before, *::after {

@@ -24,6 +24,7 @@ export class PuzzleSolveModal extends StaticModalPanel {
       title: t('puzzles.generic.panel_title'),
       size: 'md',
       bodyClassName: 'pw-puzzle-solve-modal',
+      className: 'pw-sheet pw-puzzle-sheet',
       name: 'PuzzleSolveModal'
     });
     this._puzzleId = null;
